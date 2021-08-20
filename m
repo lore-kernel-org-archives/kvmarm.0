@@ -2,71 +2,86 @@ Return-Path: <SRS0=8enQ=NL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31282C432BE
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Aug 2021 11:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A29C4338F
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Aug 2021 12:46:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A3A93604AC
-	for <kvmarm@archiver.kernel.org>; Fri, 20 Aug 2021 11:06:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A3A93604AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id F0251610D2
+	for <kvmarm@archiver.kernel.org>; Fri, 20 Aug 2021 12:46:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F0251610D2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 346E6407D1;
-	Fri, 20 Aug 2021 07:06:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BFD549E5F;
+	Fri, 20 Aug 2021 08:46:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z9-4XY4Utrmr; Fri, 20 Aug 2021 07:05:57 -0400 (EDT)
+	with ESMTP id 3IEScHIrQS2w; Fri, 20 Aug 2021 08:46:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C9E64B0E8;
-	Fri, 20 Aug 2021 07:05:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 760F64B0D6;
+	Fri, 20 Aug 2021 08:46:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C295407D1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 07:05:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40DB54B0CB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 08:46:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k7t-iW1pBGmb for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Aug 2021 07:05:54 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E156407A0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 07:05:54 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id t6XmrccuyLd7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Aug 2021 08:46:21 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5680B4B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Aug 2021 08:46:21 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1629463581;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ec6wyQR9c8nnL/eIyo5QCfAh05t7TesL5t+9W2wsXXM=;
+ b=bkBGiZj8vxWRDS5psyjJwC7mXYOJIPAsnAOz2BDSbVqI+VgUMbILotYhiKMtJA1eW3yZLt
+ ETTgT51soAFs719DT55WzjP+QLZ/FA5TKcfb86teutF+9+X4t7RfA1K2M/aXVCrclZ5Qi1
+ YZecQDoZ2iyzdLumEO20S5MWxteAArI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-599-FblG6u4AP4KYVzcnF4xSJQ-1; Fri, 20 Aug 2021 08:46:19 -0400
+X-MC-Unique: FblG6u4AP4KYVzcnF4xSJQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4016C60FDC;
- Fri, 20 Aug 2021 11:05:53 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mH2LO-006AgP-Dv; Fri, 20 Aug 2021 12:05:51 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu,
-	David Brazdil <dbrazdil@google.com>
-Subject: Re: (subset) [PATCH 0/2] Fix off-by-one in range_is_memory
-Date: Fri, 20 Aug 2021 12:05:44 +0100
-Message-Id: <162945752305.2126143.7959914980998500483.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210728153232.1018911-1-dbrazdil@google.com>
-References: <20210728153232.1018911-1-dbrazdil@google.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7A0D1018F74;
+ Fri, 20 Aug 2021 12:46:16 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-5.gru2.redhat.com [10.97.112.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 602BD69CBC;
+ Fri, 20 Aug 2021 12:46:16 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+ id AEDE0418AE12; Fri, 20 Aug 2021 09:46:11 -0300 (-03)
+Date: Fri, 20 Aug 2021 09:46:11 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v7 3/6] KVM: x86: Report host tsc and realtime values in
+ KVM_GET_CLOCK
+Message-ID: <20210820124611.GA77176@fuller.cnet>
+References: <20210816001130.3059564-1-oupton@google.com>
+ <20210816001130.3059564-4-oupton@google.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, dbrazdil@google.com,
- linux-kernel@vger.kernel.org, will@kernel.org, qperret@google.com,
- alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org,
- james.morse@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20210816001130.3059564-4-oupton@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Raghavendra Rao Anata <rananta@google.com>, Peter Shier <pshier@google.com>,
+ Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,27 +98,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 28 Jul 2021 15:32:30 +0000, David Brazdil wrote:
-> the range_is_memory function in hyp.
+On Mon, Aug 16, 2021 at 12:11:27AM +0000, Oliver Upton wrote:
+> Handling the migration of TSCs correctly is difficult, in part because
+> Linux does not provide userspace with the ability to retrieve a (TSC,
+> realtime) clock pair for a single instant in time. In lieu of a more
+> convenient facility, KVM can report similar information in the kvm_clock
+> structure.
 > 
-> David Brazdil (2):
->   KVM: arm64: Fix off-by-one in range_is_memory
->   KVM: arm64: Minor optimization of range_is_memory
+> Provide userspace with a host TSC & realtime pair iff the realtime clock
+> is based on the TSC. If userspace provides KVM_SET_CLOCK with a valid
+> realtime value, advance the KVM clock by the amount of elapsed time. Do
+> not step the KVM clock backwards, though, as it is a monotonic
+> oscillator.
 > 
->  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
 
-Applied to kvm-arm64/mmu/el2-tracking, thanks!
+This is a good idea. Userspace could check if host and destination
+clocks are up to a certain difference and not use the feature if
+not appropriate.
 
-[2/2] KVM: arm64: Minor optimization of range_is_memory
-      commit: 14ecf075fe5be01860927fdf3aa11d7b18023ab2
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
+Is there a qemu patch for it?
 
 _______________________________________________
 kvmarm mailing list
