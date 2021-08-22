@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0F3C4338F
-	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 20:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6713C4338F
+	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 20:05:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D8D6461220
-	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 20:03:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D8D6461220
+	by mail.kernel.org (Postfix) with ESMTP id 0C93A61220
+	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 20:05:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0C93A61220
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 679894B234;
-	Sun, 22 Aug 2021 16:03:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 897164B21C;
+	Sun, 22 Aug 2021 16:05:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DqpmRfpjajvs; Sun, 22 Aug 2021 16:03:45 -0400 (EDT)
+	with ESMTP id Vv9W6fKjLsKp; Sun, 22 Aug 2021 16:05:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59F124B228;
-	Sun, 22 Aug 2021 16:03:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 973124B228;
+	Sun, 22 Aug 2021 16:05:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBBEB4B217
- for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 16:03:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F26DD4B21F
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 16:05:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id udgHCGkORGPa for <kvmarm@lists.cs.columbia.edu>;
- Sun, 22 Aug 2021 16:03:40 -0400 (EDT)
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com
- [209.85.208.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 982E34B20F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 16:03:40 -0400 (EDT)
-Received: by mail-lj1-f171.google.com with SMTP id c12so27520826ljr.5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 13:03:40 -0700 (PDT)
+ with ESMTP id jyK4Dv7wx28s for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 22 Aug 2021 16:05:29 -0400 (EDT)
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com
+ [209.85.167.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D50CB4B21C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 16:05:28 -0400 (EDT)
+Received: by mail-lf1-f42.google.com with SMTP id v19so8097788lfo.7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 13:05:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=17IV80B7z8HCWsbIlNH7bRWHKU5PA3+vYIZxJpSPFvY=;
- b=XSauUzSovBMDwfx9sMUXCIeP329mMIvTrWRI0Ji2dZtdkZZLuDNmL0ZE2vti0D4ckK
- GqCtNukz/A6WggKWRbnRfE52OuwfZfz304OHesJp1qTi2KjjhiiRVxBoaZACn4IYouaQ
- fS45d1HdisXILrefVMV3XW8+3d08FJTFDJApUDGNuW5ZJql+Oa48vHZFaRr/zxeIZhM5
- q5v5dU0oqEoGYL57CTfQbTdnIRSqh1sRqHWVp5Q8ARD/7lDzQQBy6M1IWO+yPvxiCSuC
- PNK6YT/wKqdnrN8Zo5fOfihp0npN2QuDnNMtOZo30lHdezfUaCsq6872g7+915UuBcNw
- b8Mw==
+ :cc; bh=0PEDvrbZfSicA0oIINmFafS33UuNdvbh5Yog3qCkG+4=;
+ b=DidFNGmiUtjXTr1zhVXh5kDQbyb4cPPko6JsXbwUDrSTPugylFLzMyGFxza1sKm/6x
+ W+wIW2kglAX+SzN0qu70kfKNHw84M60u9N9YiLoDVj7JjQBIktEi7l3A7gT4CjCOLZTX
+ emni0cLuR0U8jDcpZzV4C/oa5pp86Tnknq/wkoJanv52Xswyf76AnEemcYS0ODyCC6Dz
+ 8R6xcMC3q2C0uMO57QDgVMm+EUT1YSwTPEmZjLdVou7dEVKMKI5TCeD7RwgS1vwqDrI5
+ kuvn80tpghRu4oaK/dI1VHz4EDKnIW4cYp9DUfkbV9mMl6KbXP6GBkS3BVEEMoGdSDrq
+ nSow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=17IV80B7z8HCWsbIlNH7bRWHKU5PA3+vYIZxJpSPFvY=;
- b=DqxHHG7ZiZO3HCduoQHzev0OiFtrjuVQLEijC9qJXXR9mf0f9OpWYH87IAbYralRsV
- ZLArnvws1m9FWsIepuG2zVX3ujT3gvMd0enXHYRSQks6873fVty21dXch2CeTi06fmCS
- 4WeAQSjAx/yx+GK55IqYske95R8qeG2thI4ObQlpOlXStvtYtnw552Tayf3CSm7qWE6I
- 1JiY3ob/UVX44DpdRNNyaqJkwuB1cd/ViZ5tgfPktKxp0x5ekFqc9tUwqFmcZGkUaQ1V
- 5BMLKcXT29ej0fPjGabE+b8gD8CXqQ8jCMYOUA9yVN5gFCZ3OLOftKv2Xs4jM0AMqf7D
- iEPw==
-X-Gm-Message-State: AOAM532TASKJeRNOxzhZX6XC3tXGMfMOE0KXh8Q4zfiSgjnKZrKggee1
- QaJ6Ag71WeyOYddY5NgX8LmWnH7CSz45EatA/w7b2g==
-X-Google-Smtp-Source: ABdhPJz1IlluDy0BzegbYGbTMt9jseXkKmiul++uvmiUY/aESxvMjkEoYWigV/QZpWkmvfZfRN5+b5YyRDdI7M0saBQ=
-X-Received: by 2002:a2e:a5c1:: with SMTP id n1mr24325561ljp.65.1629662619158; 
- Sun, 22 Aug 2021 13:03:39 -0700 (PDT)
+ bh=0PEDvrbZfSicA0oIINmFafS33UuNdvbh5Yog3qCkG+4=;
+ b=ANI0DumPXyhuu4B9c+APbnQQ+hwGfNrNAbmZCmJEMeHImNiuCLTe+erVIRCV6UOdQd
+ QzA1692k3YCQqvZN5AOEsmp6ukdQWYvj2qGOjMCujTpdxliitRp2cvDlFHJqpC5a0loq
+ GZRWSRNeBA8E90ugVRlXONrQnfUI4JgDsNFWZ4b3Dl9Z2rUuzGLd1KIZ8uLFYcpzuEQp
+ y53efjCkzA4bm+B7rs2GbfsDodx1faSWitqEyJirWohvNST07BcVOmK2mBqUy+6Khf4c
+ ysfdJrCkBqSGXZnj5AYp71UGLj6B4yI/JpTckbVKi0up9VfakHcDBnj5pNfcNz3FuAnj
+ y2tQ==
+X-Gm-Message-State: AOAM533YTbnkZ2kopytZOcX9DfdK3m6cLprnsmXZ0IUkWE3MzX66WBZA
+ OFf9KBsetFDI3oNHqXddwwLR7Y2jm0h1EA+fMpOfmg==
+X-Google-Smtp-Source: ABdhPJxFbnFAR0ELYP42ey3YRetfqvaG3XBGxBvuNqLbVWZhpYHrdP7/lcWuKLIhhk6P+saZLNgZNeGRTrPPcfdiZck=
+X-Received: by 2002:a05:6512:3ba4:: with SMTP id
+ g36mr22893893lfv.80.1629662727215; 
+ Sun, 22 Aug 2021 13:05:27 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210822152526.1291918-1-maz@kernel.org>
- <20210822152526.1291918-3-maz@kernel.org>
-In-Reply-To: <20210822152526.1291918-3-maz@kernel.org>
+ <20210822152526.1291918-4-maz@kernel.org>
+In-Reply-To: <20210822152526.1291918-4-maz@kernel.org>
 From: Oliver Upton <oupton@google.com>
-Date: Sun, 22 Aug 2021 13:03:28 -0700
-Message-ID: <CAOQ_QsicyCZj6Lsy9M66zp6NpMdSjVeoAPj-5K4NxWMHguO-7w@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] kvmtool: arm64: Use the maximum supported IPA size
- when creating the VM
+Date: Sun, 22 Aug 2021 13:05:16 -0700
+Message-ID: <CAOQ_QsgpgTfhDAg9Td4rgQmEy6m1j5RDDZZG9Q6UDNR3S58YLw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] kvmtool: arm64: Configure VM with the minimal
+ required IPA space
 To: Marc Zyngier <maz@kernel.org>
 Cc: Andre Przywara <andre.przywara@arm.com>, kernel-team@android.com,
  kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>
@@ -94,73 +95,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Marc,
+
 On Sun, Aug 22, 2021 at 8:25 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Instead of just asking the the default VM size, request the maximum
-> IPA size to the kernel, and use this at VM creation time.
+> There is some value in keeping the IPA space small, as it reduces
+> the size of the stage-2 page tables.
 >
-> The IPA space is parametrized accordingly.
+> Let's compute the required space at VM creation time, and inform
+> the kernel of our requirements.
 >
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arm/aarch64/include/kvm/kvm-arch.h | 19 ++++++++++++++++---
->  arm/aarch64/kvm.c                  | 15 +++++++++++++++
->  2 files changed, 31 insertions(+), 3 deletions(-)
->
-> diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-> index 55ef8ed1..159567b9 100644
-> --- a/arm/aarch64/include/kvm/kvm-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-arch.h
-> @@ -3,10 +3,23 @@
->
->  struct kvm;
->  unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
-> +int kvm__arch_get_ipa_limit(struct kvm *kvm);
->
-> -#define ARM_MAX_MEMORY(kvm)    ((kvm)->cfg.arch.aarch32_guest  ?       \
-> -                               ARM_LOMAP_MAX_MEMORY            :       \
-> -                               ARM_HIMAP_MAX_MEMORY)
-> +#define ARM_MAX_MEMORY(kvm)    ({                                      \
-> +       u64 max_ram;                                                    \
-> +                                                                       \
-> +       if ((kvm)->cfg.arch.aarch32_guest) {                            \
-> +               max_ram = ARM_LOMAP_MAX_MEMORY;                         \
-> +       } else {                                                        \
-> +               int ipabits = kvm__arch_get_ipa_limit(kvm);             \
-> +               if (ipabits <= 0)                                       \
-> +                       max_ram = ARM_HIMAP_MAX_MEMORY;                 \
-> +               else                                                    \
-> +                       max_ram = (1ULL << ipabits) - ARM_MEMORY_AREA;  \
-> +       }                                                               \
-> +                                                                       \
-> +       max_ram;                                                        \
-> +})
->
->  #include "arm-common/kvm-arch.h"
+>  arm/aarch64/kvm.c | 20 +++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
 >
 > diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-> index 49e1dd31..d03a27f2 100644
+> index d03a27f2..4e66a22e 100644
 > --- a/arm/aarch64/kvm.c
 > +++ b/arm/aarch64/kvm.c
-> @@ -46,3 +46,18 @@ fail:
->         return 0x80000;
->  }
+> @@ -3,6 +3,7 @@
+>  #include <asm/image.h>
 >
-> +int kvm__arch_get_ipa_limit(struct kvm *kvm)
-> +{
-> +       int ret;
+>  #include <linux/byteorder.h>
+> +#include <kvm/util.h>
+>
+>  /*
+>   * Return the TEXT_OFFSET value that the guest kernel expects. Note
+> @@ -59,5 +60,22 @@ int kvm__arch_get_ipa_limit(struct kvm *kvm)
+>
+>  int kvm__get_vm_type(struct kvm *kvm)
+>  {
+> -       return KVM_VM_TYPE_ARM_IPA_SIZE(kvm__arch_get_ipa_limit(kvm));
+> +       unsigned int ipa_bits, max_ipa_bits;
+> +       unsigned long max_ipa;
 > +
-> +       ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
-> +       if (ret <= 0)
-> +               ret = 0;
+> +       /* If we're running on an old kernel, use 0 as the VM type */
+> +       max_ipa_bits = kvm__arch_get_ipa_limit(kvm);
+> +       if (!max_ipa_bits)
+> +               return 0;
 > +
-> +       return ret;
-> +}
+> +       /* Otherwise, compute the minimal required IPA size */
+> +       max_ipa = ARM_MEMORY_AREA + kvm->cfg.ram_size - 1;
+> +       ipa_bits = max(32, fls_long(max_ipa));
+> +       pr_debug("max_ipa %lx ipa_bits %d max_ipa_bits %d",
+> +                max_ipa, ipa_bits, max_ipa_bits);
 > +
-> +int kvm__get_vm_type(struct kvm *kvm)
-> +{
-> +       return KVM_VM_TYPE_ARM_IPA_SIZE(kvm__arch_get_ipa_limit(kvm));
-> +}
+> +       if (ipa_bits > max_ipa_bits)
+> +               die("Memory too large for this system (needs %d bits, %d available)", ipa_bits, max_ipa_bits);
+
+I imagine it may not be immediately obvious to a kvmtool user what
+this log line means, like what 'bits' are being referred to here.
+Would it be more helpful to report the maximum allowed memory size for
+the system, as derived from the max IPA?
+
+--
+Thanks,
+Oliver
+
+> +
+> +       return KVM_VM_TYPE_ARM_IPA_SIZE(ipa_bits);
+>  }
 > --
 > 2.30.2
 >
@@ -168,8 +163,6 @@ On Sun, Aug 22, 2021 at 8:25 AM Marc Zyngier <maz@kernel.org> wrote:
 > kvmarm mailing list
 > kvmarm@lists.cs.columbia.edu
 > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
-Reviewed-by: Oliver Upton <oupton@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
