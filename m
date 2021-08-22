@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EC08C4338F
-	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 19:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0F3C4338F
+	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 20:03:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7D05261284
-	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 19:58:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7D05261284
+	by mail.kernel.org (Postfix) with ESMTP id D8D6461220
+	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 20:03:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D8D6461220
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA32C4B1F1;
-	Sun, 22 Aug 2021 15:58:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 679894B234;
+	Sun, 22 Aug 2021 16:03:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gvvcySAdtkkw; Sun, 22 Aug 2021 15:58:31 -0400 (EDT)
+	with ESMTP id DqpmRfpjajvs; Sun, 22 Aug 2021 16:03:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 984924B1F5;
-	Sun, 22 Aug 2021 15:58:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59F124B228;
+	Sun, 22 Aug 2021 16:03:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 224744B1C7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 15:58:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BBBEB4B217
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 16:03:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w+qv1V3FiZEL for <kvmarm@lists.cs.columbia.edu>;
- Sun, 22 Aug 2021 15:58:26 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9331E4B1F1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 15:58:26 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id r9so33369815lfn.3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 12:58:26 -0700 (PDT)
+ with ESMTP id udgHCGkORGPa for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 22 Aug 2021 16:03:40 -0400 (EDT)
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com
+ [209.85.208.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 982E34B20F
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 16:03:40 -0400 (EDT)
+Received: by mail-lj1-f171.google.com with SMTP id c12so27520826ljr.5
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 13:03:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aqYoz1kP1AguveE5o6Fj8i9Fw8RWOGMXWZpf/6/YWE0=;
- b=WM2YsJigvDvG/gtrWkKQWUPEROct1NVXABRrEYnmVdjgycNoyax1vNff+kvZlRJNx8
- bC5SLa/IrTAjw0yAKNRmq/fmFISP3vnOB77sctSEN4us8pBORoEqMoBN3t1BHOj7EdEx
- p8F4ltamZ7dFlaQP1DaHM1EFtrD5/iYPeApao8F3HMyx3Omr50/Zpd6xKw+7NG0sA/PQ
- FeciguxTiY6nZCDINHdj3Z733ZANw47l132Xu1FhkHCoxoFS9qwECZcv8KNkzefpIVnO
- NLXjbJOsDUOznNv610TgyzfmyF3I8k4eCZF2qbGwcfeJ7Vqzvw7W2vOw3juHTrfE2jfN
- Dypw==
+ :cc; bh=17IV80B7z8HCWsbIlNH7bRWHKU5PA3+vYIZxJpSPFvY=;
+ b=XSauUzSovBMDwfx9sMUXCIeP329mMIvTrWRI0Ji2dZtdkZZLuDNmL0ZE2vti0D4ckK
+ GqCtNukz/A6WggKWRbnRfE52OuwfZfz304OHesJp1qTi2KjjhiiRVxBoaZACn4IYouaQ
+ fS45d1HdisXILrefVMV3XW8+3d08FJTFDJApUDGNuW5ZJql+Oa48vHZFaRr/zxeIZhM5
+ q5v5dU0oqEoGYL57CTfQbTdnIRSqh1sRqHWVp5Q8ARD/7lDzQQBy6M1IWO+yPvxiCSuC
+ PNK6YT/wKqdnrN8Zo5fOfihp0npN2QuDnNMtOZo30lHdezfUaCsq6872g7+915UuBcNw
+ b8Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=aqYoz1kP1AguveE5o6Fj8i9Fw8RWOGMXWZpf/6/YWE0=;
- b=IBHf/Bo0xJVLgeGHT92ComwAE038+oeejRvzPsEG5oSWJb8BH9VXnvV0hEUJ7Yb64O
- QKUdpcDmZtXdAtxFa/fI23ng71Krc2Cj92CD282epdm3e1BHveTdd9/9Vt9+MBhcHDM+
- UWo2p+lRjKp5gZNn/lPcJBW2tnJnDDFwzoe0XzN5TPv9IQX1aZt8QmAf3acC7su7k3PP
- 99aIRVzuJ9xT9QUAwzeyey0BK0p8VEMk3DwiB87Jwe84+E2HeZ61oRgouG/74EST67+f
- H+j8irs1O9I34JKwGlKJKQg4hUkPu9jUASQTSAqWY5EXVswdxhQ3EOxFlNthm42wgo+h
- d8ZQ==
-X-Gm-Message-State: AOAM533ivH0RGXfwlh/qOWrIHtbskiF3hFfr+DXRaooEHBIC0KwhAGtH
- bnBxhJnipPImN9ut3sGtjrr9IFyklfnDl5Dx2BHTgA==
-X-Google-Smtp-Source: ABdhPJzuJmZrN0t+YVKxWS5C7MhBEvuLvz26E9gt+OlsVqFHya6P4iiH3RxL6/xzK4tCpXTLamV856hXOBbgzgbuJnA=
-X-Received: by 2002:a05:6512:77:: with SMTP id
- i23mr22378276lfo.411.1629662304943; 
- Sun, 22 Aug 2021 12:58:24 -0700 (PDT)
+ bh=17IV80B7z8HCWsbIlNH7bRWHKU5PA3+vYIZxJpSPFvY=;
+ b=DqxHHG7ZiZO3HCduoQHzev0OiFtrjuVQLEijC9qJXXR9mf0f9OpWYH87IAbYralRsV
+ ZLArnvws1m9FWsIepuG2zVX3ujT3gvMd0enXHYRSQks6873fVty21dXch2CeTi06fmCS
+ 4WeAQSjAx/yx+GK55IqYske95R8qeG2thI4ObQlpOlXStvtYtnw552Tayf3CSm7qWE6I
+ 1JiY3ob/UVX44DpdRNNyaqJkwuB1cd/ViZ5tgfPktKxp0x5ekFqc9tUwqFmcZGkUaQ1V
+ 5BMLKcXT29ej0fPjGabE+b8gD8CXqQ8jCMYOUA9yVN5gFCZ3OLOftKv2Xs4jM0AMqf7D
+ iEPw==
+X-Gm-Message-State: AOAM532TASKJeRNOxzhZX6XC3tXGMfMOE0KXh8Q4zfiSgjnKZrKggee1
+ QaJ6Ag71WeyOYddY5NgX8LmWnH7CSz45EatA/w7b2g==
+X-Google-Smtp-Source: ABdhPJz1IlluDy0BzegbYGbTMt9jseXkKmiul++uvmiUY/aESxvMjkEoYWigV/QZpWkmvfZfRN5+b5YyRDdI7M0saBQ=
+X-Received: by 2002:a2e:a5c1:: with SMTP id n1mr24325561ljp.65.1629662619158; 
+ Sun, 22 Aug 2021 13:03:39 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210822152526.1291918-1-maz@kernel.org>
- <20210822152526.1291918-2-maz@kernel.org>
-In-Reply-To: <20210822152526.1291918-2-maz@kernel.org>
+ <20210822152526.1291918-3-maz@kernel.org>
+In-Reply-To: <20210822152526.1291918-3-maz@kernel.org>
 From: Oliver Upton <oupton@google.com>
-Date: Sun, 22 Aug 2021 12:58:13 -0700
-Message-ID: <CAOQ_QsjKof16SLbLohYPt5xx_fS2BuWpUY0KCsFBZYs7dP+-tw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] kvmtool: Abstract KVM_VM_TYPE into a weak function
+Date: Sun, 22 Aug 2021 13:03:28 -0700
+Message-ID: <CAOQ_QsicyCZj6Lsy9M66zp6NpMdSjVeoAPj-5K4NxWMHguO-7w@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] kvmtool: arm64: Use the maximum supported IPA size
+ when creating the VM
 To: Marc Zyngier <maz@kernel.org>
 Cc: Andre Przywara <andre.przywara@arm.com>, kernel-team@android.com,
  kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>
@@ -96,57 +96,71 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Sun, Aug 22, 2021 at 8:25 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Most architectures pass a fixed value for their VM type. However,
-> arm64 uses it as a parameter describing the size of the guest's
-> physical address space.
+> Instead of just asking the the default VM size, request the maximum
+> IPA size to the kernel, and use this at VM creation time.
 >
-> In order to support this, introduce a kvm__get_vm_type() helper
-> that only returns KVM_VM_TYPE for now.
+> The IPA space is parametrized accordingly.
 >
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  include/kvm/kvm.h | 1 +
->  kvm.c             | 7 ++++++-
->  2 files changed, 7 insertions(+), 1 deletion(-)
+>  arm/aarch64/include/kvm/kvm-arch.h | 19 ++++++++++++++++---
+>  arm/aarch64/kvm.c                  | 15 +++++++++++++++
+>  2 files changed, 31 insertions(+), 3 deletions(-)
 >
-> diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-> index 56e9c8e3..ad732e56 100644
-> --- a/include/kvm/kvm.h
-> +++ b/include/kvm/kvm.h
-> @@ -114,6 +114,7 @@ int kvm__init(struct kvm *kvm);
->  struct kvm *kvm__new(void);
->  int kvm__recommended_cpus(struct kvm *kvm);
->  int kvm__max_cpus(struct kvm *kvm);
-> +int kvm__get_vm_type(struct kvm *kvm);
->  void kvm__init_ram(struct kvm *kvm);
->  int kvm__exit(struct kvm *kvm);
->  bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename);
-> diff --git a/kvm.c b/kvm.c
-> index e327541d..5bc66c8b 100644
-> --- a/kvm.c
-> +++ b/kvm.c
-> @@ -428,6 +428,11 @@ int kvm__max_cpus(struct kvm *kvm)
->         return ret;
+> diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+> index 55ef8ed1..159567b9 100644
+> --- a/arm/aarch64/include/kvm/kvm-arch.h
+> +++ b/arm/aarch64/include/kvm/kvm-arch.h
+> @@ -3,10 +3,23 @@
+>
+>  struct kvm;
+>  unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
+> +int kvm__arch_get_ipa_limit(struct kvm *kvm);
+>
+> -#define ARM_MAX_MEMORY(kvm)    ((kvm)->cfg.arch.aarch32_guest  ?       \
+> -                               ARM_LOMAP_MAX_MEMORY            :       \
+> -                               ARM_HIMAP_MAX_MEMORY)
+> +#define ARM_MAX_MEMORY(kvm)    ({                                      \
+> +       u64 max_ram;                                                    \
+> +                                                                       \
+> +       if ((kvm)->cfg.arch.aarch32_guest) {                            \
+> +               max_ram = ARM_LOMAP_MAX_MEMORY;                         \
+> +       } else {                                                        \
+> +               int ipabits = kvm__arch_get_ipa_limit(kvm);             \
+> +               if (ipabits <= 0)                                       \
+> +                       max_ram = ARM_HIMAP_MAX_MEMORY;                 \
+> +               else                                                    \
+> +                       max_ram = (1ULL << ipabits) - ARM_MEMORY_AREA;  \
+> +       }                                                               \
+> +                                                                       \
+> +       max_ram;                                                        \
+> +})
+>
+>  #include "arm-common/kvm-arch.h"
+>
+> diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+> index 49e1dd31..d03a27f2 100644
+> --- a/arm/aarch64/kvm.c
+> +++ b/arm/aarch64/kvm.c
+> @@ -46,3 +46,18 @@ fail:
+>         return 0x80000;
 >  }
 >
-> +int __attribute__((weak)) kvm__get_vm_type(struct kvm *kvm)
+> +int kvm__arch_get_ipa_limit(struct kvm *kvm)
 > +{
-> +       return KVM_VM_TYPE;
+> +       int ret;
+> +
+> +       ret = ioctl(kvm->sys_fd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
+> +       if (ret <= 0)
+> +               ret = 0;
+> +
+> +       return ret;
 > +}
 > +
->  int kvm__init(struct kvm *kvm)
->  {
->         int ret;
-> @@ -461,7 +466,7 @@ int kvm__init(struct kvm *kvm)
->                 goto err_sys_fd;
->         }
->
-> -       kvm->vm_fd = ioctl(kvm->sys_fd, KVM_CREATE_VM, KVM_VM_TYPE);
-> +       kvm->vm_fd = ioctl(kvm->sys_fd, KVM_CREATE_VM, kvm__get_vm_type(kvm));
->         if (kvm->vm_fd < 0) {
->                 pr_err("KVM_CREATE_VM ioctl");
->                 ret = kvm->vm_fd;
+> +int kvm__get_vm_type(struct kvm *kvm)
+> +{
+> +       return KVM_VM_TYPE_ARM_IPA_SIZE(kvm__arch_get_ipa_limit(kvm));
+> +}
 > --
 > 2.30.2
 >
