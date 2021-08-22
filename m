@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1274C4338F
-	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 14:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F21C432BE
+	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 14:45:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5D76161247
-	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 14:45:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5D76161247
+	by mail.kernel.org (Postfix) with ESMTP id 5F36861246
+	for <kvmarm@archiver.kernel.org>; Sun, 22 Aug 2021 14:45:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5F36861246
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 127F54B1C1;
-	Sun, 22 Aug 2021 10:45:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05BA74B1AF;
+	Sun, 22 Aug 2021 10:45:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OzM+KF0gdwIK; Sun, 22 Aug 2021 10:45:11 -0400 (EDT)
+	with ESMTP id hq13ZOWxinlw; Sun, 22 Aug 2021 10:45:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0799E4B1F7;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 238E44B1FD;
 	Sun, 22 Aug 2021 10:45:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B6A4B1F4
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D0C14B1A9
  for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 10:45:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VodXvEz9qcDF for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id aoGIQfycbEoi for <kvmarm@lists.cs.columbia.edu>;
  Sun, 22 Aug 2021 10:45:02 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E2954B1A9
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F6E74B1ED
  for <kvmarm@lists.cs.columbia.edu>; Sun, 22 Aug 2021 10:45:02 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6F14F61247;
+ by mail.kernel.org (Postfix) with ESMTPSA id B277A61284;
  Sun, 22 Aug 2021 14:45:01 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mHoiZ-006VES-Ky; Sun, 22 Aug 2021 15:44:59 +0100
+ id 1mHoia-006VES-4P; Sun, 22 Aug 2021 15:45:00 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/3] hw/arm/virt: KVM: Probe for KVM_CAP_ARM_VM_IPA_SIZE when
- creating scratch VM
-Date: Sun, 22 Aug 2021 15:44:39 +0100
-Message-Id: <20210822144441.1290891-2-maz@kernel.org>
+Subject: [PATCH 3/3] docs/system/arm/virt: Fix documentation for the 'highmem'
+ option
+Date: Sun, 22 Aug 2021 15:44:41 +0100
+Message-Id: <20210822144441.1290891-4-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210822144441.1290891-1-maz@kernel.org>
 References: <20210822144441.1290891-1-maz@kernel.org>
@@ -80,48 +80,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Although we probe for the IPA limits imposed by KVM (and the hardware)
-when computing the memory map, we still use the old style '0' when
-creating a scratch VM in kvm_arm_create_scratch_host_vcpu().
+The documentation for the 'highmem' option indicates that it controls
+the placement of both devices and RAM. The actual behaviour of QEMU
+seems to be that RAM is allowed to go beyond the 4GiB limit, and
+that only devices are constraint by this option.
 
-On systems that are severely IPA challenged (such as the Apple M1),
-this results in a failure as KVM cannot use the default 40bit that
-'0' represents.
-
-Instead, probe for the extension and use the reported IPA limit
-if available.
+Align the documentation with the actual behaviour.
 
 Cc: Andrew Jones <drjones@redhat.com>
 Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- target/arm/kvm.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ docs/system/arm/virt.rst | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index d8381ba224..cc3371a99b 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -70,12 +70,17 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
-                                       struct kvm_vcpu_init *init)
- {
-     int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
-+    int max_vm_pa_size;
+diff --git a/docs/system/arm/virt.rst b/docs/system/arm/virt.rst
+index 59acf0eeaf..e206e7565d 100644
+--- a/docs/system/arm/virt.rst
++++ b/docs/system/arm/virt.rst
+@@ -86,9 +86,9 @@ mte
+   Arm Memory Tagging Extensions. The default is ``off``.
  
-     kvmfd = qemu_open_old("/dev/kvm", O_RDWR);
-     if (kvmfd < 0) {
-         goto err;
-     }
--    vmfd = ioctl(kvmfd, KVM_CREATE_VM, 0);
-+    max_vm_pa_size = ioctl(kvmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
-+    if (max_vm_pa_size < 0) {
-+        max_vm_pa_size = 0;
-+    }
-+    vmfd = ioctl(kvmfd, KVM_CREATE_VM, max_vm_pa_size);
-     if (vmfd < 0) {
-         goto err;
-     }
+ highmem
+-  Set ``on``/``off`` to enable/disable placing devices and RAM in physical
+-  address space above 32 bits. The default is ``on`` for machine types
+-  later than ``virt-2.12``.
++  Set ``on``/``off`` to enable/disable placing devices in physical address
++  space above 32 bits. RAM in excess of 3GiB will always be placed above
++  32 bits. The default is ``on`` for machine types later than ``virt-2.12``.
+ 
+ gic-version
+   Specify the version of the Generic Interrupt Controller (GIC) to provide.
 -- 
 2.30.2
 
