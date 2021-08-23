@@ -2,101 +2,72 @@ Return-Path: <SRS0=YqI3=NO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7161DC4338F
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Aug 2021 09:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E932C4338F
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Aug 2021 09:36:39 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E30336136A
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Aug 2021 09:08:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E30336136A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id ECF446136F
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Aug 2021 09:36:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org ECF446136F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DC004B1DC;
-	Mon, 23 Aug 2021 05:08:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81C5C4B1F5;
+	Mon, 23 Aug 2021 05:36:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iOO9zvqmxvkL; Mon, 23 Aug 2021 05:08:03 -0400 (EDT)
+	with ESMTP id p5ZVqEM+RS4I; Mon, 23 Aug 2021 05:36:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C46E94B264;
-	Mon, 23 Aug 2021 05:08:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FA544B1FA;
+	Mon, 23 Aug 2021 05:36:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A54C64B25D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 05:08:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A213A4B1EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 05:36:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A7sk6juHLxOM for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Aug 2021 05:07:57 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AEC34B1DC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 05:07:57 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1629709676;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=aISp5M1izx4NH4v0Hn06V3ODxv34YeYXayvZgVqi7XI=;
- b=VVC0xQ88CHPih/Hasxu6hGx0QckDyJoNwYwMGrvYnFDEy5DtbU3KQ7PeM1oJuW+GnzhcI1
- 5IIBpbZ9sBPsSlyEE0iAteqBgUr3Cd9tblZCM9U/gBwGw6qdR2R1R8w3/IJBfonqCpMeGY
- zW5FCYvq3kvwQwR/VP9mBF0NzDoYzUg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-592-ZkaRe2kBNiaMk4I3uAf99Q-1; Mon, 23 Aug 2021 05:07:55 -0400
-X-MC-Unique: ZkaRe2kBNiaMk4I3uAf99Q-1
-Received: by mail-ej1-f71.google.com with SMTP id
- h17-20020a1709070b11b02905b5ced62193so5421966ejl.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 02:07:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=aISp5M1izx4NH4v0Hn06V3ODxv34YeYXayvZgVqi7XI=;
- b=hYD7TD5Gi8ZM2OCdwiaKTHPxGFGZ589ahmhHDCQsWNHdCzt/khE6tSmopLSGhvYQps
- ZvQ/JLLRqptLWKxPwOnzCxZajyd4sT2WyP1jAE3J/+sZ6/uw9M5uxde5CJr5u3KdtCsN
- 9pvYe8j+hJFdX0bbEWBuDYRkQ6DgGjgSLmHNqMVLDGQ6DX4aPIfQtZj9K8ggJdTITIKD
- ls68pQUy/1/3LqU6nlkARS3j1mhRamnlpJtkpaQ+C1d9DchQIrymNUSd1l+ETek11c6h
- uZBmYOq6oe9bgR8qxwGL4NjFTP4hUDO5Uggzl3ig6m0sYlsFNoP+hQkqepN8Yr5uwwsg
- aI4w==
-X-Gm-Message-State: AOAM530aEQvk+6AyCRAjtpvW5jJCfTKV1SEGSbGEuGkYx5UxsPGuZN2P
- 9Lqk8gL9xW2ZLbjjY3RQFqZR5ABTgipghgiVI8rrWrXHRunJqRQa15jjVnGL7Z25JanspfDQBN8
- rtGMzFrGyxudTMYhTOWHNrmdu
-X-Received: by 2002:a05:6402:1907:: with SMTP id
- e7mr8322341edz.201.1629709674295; 
- Mon, 23 Aug 2021 02:07:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxB8djTuJSNghEDmXQfwZUrFrUJ+XhpXaA6T6sK1VZ2LMR5UNf4tuXRgxUvxp5oivYQUoq5rg==
-X-Received: by 2002:a05:6402:1907:: with SMTP id
- e7mr8322319edz.201.1629709674115; 
- Mon, 23 Aug 2021 02:07:54 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id ks20sm6977968ejb.101.2021.08.23.02.07.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 23 Aug 2021 02:07:53 -0700 (PDT)
-Date: Mon, 23 Aug 2021 11:07:52 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/3] hw/arm/virt: KVM: Probe for KVM_CAP_ARM_VM_IPA_SIZE
- when creating scratch VM
-Message-ID: <20210823090752.nanm4wttyefg3txh@gator.home>
-References: <20210822144441.1290891-1-maz@kernel.org>
- <20210822144441.1290891-2-maz@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20210822144441.1290891-2-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id YT8CaueeISbl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Aug 2021 05:36:31 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D2234B14B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 05:36:31 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6AB4F61186;
+ Mon, 23 Aug 2021 09:36:30 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mI6NY-006ct2-AI; Mon, 23 Aug 2021 10:36:28 +0100
+Date: Mon, 23 Aug 2021 10:36:27 +0100
+Message-ID: <87bl5oqz8k.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v2 3/3] kvmtool: arm64: Configure VM with the minimal
+ required IPA space
+In-Reply-To: <CAOQ_QsgpgTfhDAg9Td4rgQmEy6m1j5RDDZZG9Q6UDNR3S58YLw@mail.gmail.com>
+References: <20210822152526.1291918-1-maz@kernel.org>
+ <20210822152526.1291918-4-maz@kernel.org>
+ <CAOQ_QsgpgTfhDAg9Td4rgQmEy6m1j5RDDZZG9Q6UDNR3S58YLw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
+ andre.przywara@arm.com, kernel-team@android.com, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Andre Przywara <andre.przywara@arm.com>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,55 +84,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Aug 22, 2021 at 03:44:39PM +0100, Marc Zyngier wrote:
-> Although we probe for the IPA limits imposed by KVM (and the hardware)
-> when computing the memory map, we still use the old style '0' when
-> creating a scratch VM in kvm_arm_create_scratch_host_vcpu().
+On Sun, 22 Aug 2021 21:05:16 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> On systems that are severely IPA challenged (such as the Apple M1),
-> this results in a failure as KVM cannot use the default 40bit that
-> '0' represents.
+> Marc,
 > 
-> Instead, probe for the extension and use the reported IPA limit
-> if available.
+> On Sun, Aug 22, 2021 at 8:25 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > There is some value in keeping the IPA space small, as it reduces
+> > the size of the stage-2 page tables.
+> >
+> > Let's compute the required space at VM creation time, and inform
+> > the kernel of our requirements.
+> >
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arm/aarch64/kvm.c | 20 +++++++++++++++++++-
+> >  1 file changed, 19 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+> > index d03a27f2..4e66a22e 100644
+> > --- a/arm/aarch64/kvm.c
+> > +++ b/arm/aarch64/kvm.c
+> > @@ -3,6 +3,7 @@
+> >  #include <asm/image.h>
+> >
+> >  #include <linux/byteorder.h>
+> > +#include <kvm/util.h>
+> >
+> >  /*
+> >   * Return the TEXT_OFFSET value that the guest kernel expects. Note
+> > @@ -59,5 +60,22 @@ int kvm__arch_get_ipa_limit(struct kvm *kvm)
+> >
+> >  int kvm__get_vm_type(struct kvm *kvm)
+> >  {
+> > -       return KVM_VM_TYPE_ARM_IPA_SIZE(kvm__arch_get_ipa_limit(kvm));
+> > +       unsigned int ipa_bits, max_ipa_bits;
+> > +       unsigned long max_ipa;
+> > +
+> > +       /* If we're running on an old kernel, use 0 as the VM type */
+> > +       max_ipa_bits = kvm__arch_get_ipa_limit(kvm);
+> > +       if (!max_ipa_bits)
+> > +               return 0;
+> > +
+> > +       /* Otherwise, compute the minimal required IPA size */
+> > +       max_ipa = ARM_MEMORY_AREA + kvm->cfg.ram_size - 1;
+> > +       ipa_bits = max(32, fls_long(max_ipa));
+> > +       pr_debug("max_ipa %lx ipa_bits %d max_ipa_bits %d",
+> > +                max_ipa, ipa_bits, max_ipa_bits);
+> > +
+> > +       if (ipa_bits > max_ipa_bits)
+> > +               die("Memory too large for this system (needs %d bits, %d available)", ipa_bits, max_ipa_bits);
 > 
-> Cc: Andrew Jones <drjones@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  target/arm/kvm.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index d8381ba224..cc3371a99b 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -70,12 +70,17 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
->                                        struct kvm_vcpu_init *init)
->  {
->      int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
-> +    int max_vm_pa_size;
->  
->      kvmfd = qemu_open_old("/dev/kvm", O_RDWR);
->      if (kvmfd < 0) {
->          goto err;
->      }
-> -    vmfd = ioctl(kvmfd, KVM_CREATE_VM, 0);
-> +    max_vm_pa_size = ioctl(kvmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_VM_IPA_SIZE);
-> +    if (max_vm_pa_size < 0) {
-> +        max_vm_pa_size = 0;
-> +    }
-> +    vmfd = ioctl(kvmfd, KVM_CREATE_VM, max_vm_pa_size);
->      if (vmfd < 0) {
->          goto err;
->      }
-> -- 
-> 2.30.2
->
+> I imagine it may not be immediately obvious to a kvmtool user what
+> this log line means, like what 'bits' are being referred to here.
+> Would it be more helpful to report the maximum allowed memory size for
+> the system, as derived from the max IPA?
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+That's consistent with what "the other VMM" does as well. But sure,
+happy to amend the message if people feel strongly about it.
 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
