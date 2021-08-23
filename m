@@ -2,84 +2,75 @@ Return-Path: <SRS0=YqI3=NO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BEC0C432BE
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Aug 2021 10:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2ED3C4338F
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Aug 2021 12:10:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E0C906124B
-	for <kvmarm@archiver.kernel.org>; Mon, 23 Aug 2021 10:26:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E0C906124B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 36BAC6137F
+	for <kvmarm@archiver.kernel.org>; Mon, 23 Aug 2021 12:10:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 36BAC6137F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CDF44B24D;
-	Mon, 23 Aug 2021 06:26:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B30784B226;
+	Mon, 23 Aug 2021 08:10:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FDoJd51TaN3d; Mon, 23 Aug 2021 06:25:59 -0400 (EDT)
+	with ESMTP id ic-uMPLecZpo; Mon, 23 Aug 2021 08:10:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DD374B206;
-	Mon, 23 Aug 2021 06:25:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 846E44B1AC;
+	Mon, 23 Aug 2021 08:10:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A3D994B1D3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 06:25:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E66DF4B1AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 08:10:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UCKQVm++DwfB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Aug 2021 06:25:57 -0400 (EDT)
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com
- [209.85.210.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A154A4B17E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 06:25:57 -0400 (EDT)
-Received: by mail-ot1-f50.google.com with SMTP id
- g66-20020a9d12c8000000b0051aeba607f1so26522965otg.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 03:25:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iil3g1xzE54TUwgwxXbVjp/I2BXWoZeDWrISpeeZe14=;
- b=BEW3pF7bCpIXQquKczEegFeZjB4PN2FJINV+cpI96e+ZQKAUumwIkxkDwpbx3KxVX/
- jEV7r2X/PXB2J5H9vROz1yIGrg/C9BzHL2ENP4rws1a69K/LMgiALseDgDCqMkZf1zTT
- iXMVQXasH/iLEIZZQ2O019Dd8bfQCg7UE4mAC5hsYCzmN3+VqRSGWNbgF2jwGtyaNrbq
- 2dh21hx5nfjAG1EedyrdGR+2AIZE0gAzriJ9sCGtm4N9Rxdpdj5w5BYRgmlh+IHNZiu9
- wOpyw2qGxapWYcgQ0s4wMPR5DW1y51wv1BZX/EIraK4Wzwln68WzoQTFeaTaW1NQ3nYg
- c3VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=iil3g1xzE54TUwgwxXbVjp/I2BXWoZeDWrISpeeZe14=;
- b=AFeAvzqn1nAP0kQLT6Ofb8BiJd9Q0o4CoAaLzKzf9FngZyszNl4OmeZUwI/BbIuyqh
- z1aBogTFRkYDWBUprD3rT4Cl+U2oTLC1JFHHgHzDbfTXA2u6Npxs5fH2d7ztPHNIPwDd
- pHGnjUo0NrgoUN58rW7vz8qgSX6n5zZWLMOBSlVyNYL5Cp8/Agth0EIJPiTVHq/GsnzE
- plwTwhy2gO9k6+bG/EDEm3xV7WcV7112uhUOIyeanVDwX5tQZy6lpAPLM80GVokjLhP3
- stNi67f2c7q6iri8IbwsuNo7Dkj/olrfjwgbhcFtlm5GTj7QhCJUzBcICRd/AFKDDzrj
- 8Mwg==
-X-Gm-Message-State: AOAM531viU60Ae2oq++Fy2r5DCJ73dDikjxU2N04GPW1Jx5UYQ5H6LPi
- BuRHLNjlhu8Vv983/n5cBYJBcwG81GiW8clfIdYcqA==
-X-Google-Smtp-Source: ABdhPJyc5KKsDid+ISzlkW07QeZX7D5K3hIbXU4y15H3axJsNCGDbA+XxfiyQc68SzeSTbGJu39OzYXXM1Av29ZlITE=
-X-Received: by 2002:a05:6830:1dac:: with SMTP id
- z12mr23465282oti.52.1629714356807; 
- Mon, 23 Aug 2021 03:25:56 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id KuEv83Dv8qBC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Aug 2021 08:10:15 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A4794B1A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Aug 2021 08:10:15 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 63CB26135F;
+ Mon, 23 Aug 2021 12:10:14 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mI8mK-006ej3-DI; Mon, 23 Aug 2021 13:10:12 +0100
+Date: Mon, 23 Aug 2021 13:10:11 +0100
+Message-ID: <875yvwqs4c.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v4 11/15] KVM: arm64: Guest exit handlers for nVHE hyp
+In-Reply-To: <CA+EHjTwyC-ZMpKQWGPqqYGHHR+YvyG3cdaxdwJfmYYf7XbBWEw@mail.gmail.com>
 References: <20210817081134.2918285-1-tabba@google.com>
- <20210817081134.2918285-16-tabba@google.com>
- <CAOQ_QsgSfHVjJkSJku5DwUe0_=ds4GduPbJ7vC-t+4_=fPVFBQ@mail.gmail.com>
-In-Reply-To: <CAOQ_QsgSfHVjJkSJku5DwUe0_=ds4GduPbJ7vC-t+4_=fPVFBQ@mail.gmail.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 23 Aug 2021 11:25:20 +0100
-Message-ID: <CA+EHjTwPgjXtrR5dFx0RBN9xdX0j7ugO=NqAmkmZqYE9N_jP7w@mail.gmail.com>
-Subject: Re: [PATCH v4 15/15] KVM: arm64: Handle protected guests at 32 bits
-To: Oliver Upton <oupton@google.com>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- pbonzini@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ <20210817081134.2918285-12-tabba@google.com>
+ <87fsv6snup.wl-maz@kernel.org> <87zgtdqz77.wl-maz@kernel.org>
+ <CA+EHjTwyC-ZMpKQWGPqqYGHHR+YvyG3cdaxdwJfmYYf7XbBWEw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com,
+ pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -97,123 +88,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
+Hi Fuad,
 
-On Thu, Aug 19, 2021 at 9:10 AM Oliver Upton <oupton@google.com> wrote:
->
-> Hi Fuad,
->
-> On Tue, Aug 17, 2021 at 1:12 AM Fuad Tabba <tabba@google.com> wrote:
+On Mon, 23 Aug 2021 11:21:05 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Thu, Aug 19, 2021 at 3:36 PM Marc Zyngier <maz@kernel.org> wrote:
+> > I realised that I wasn't very forthcoming here. I've decided to put
+> > the code where my mouth is and pushed out a branch [1] with your first
+> > 10 patches, followed by my own take on this particular problem. It
+> > compiles, and even managed to boot a Debian guest on a nVHE box.
 > >
-> > Protected KVM does not support protected AArch32 guests. However,
-> > it is possible for the guest to force run AArch32, potentially
-> > causing problems. Add an extra check so that if the hypervisor
-> > catches the guest doing that, it can prevent the guest from
-> > running again by resetting vcpu->arch.target and returning
-> > ARM_EXCEPTION_IL.
-> >
-> > If this were to happen, The VMM can try and fix it by re-
-> > initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
-> > likely not possible for protected VMs.
-> >
-> > Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-> > AArch32 systems")
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/switch.c | 37 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 37 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > index 398e62098898..0c24b7f473bf 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > @@ -20,6 +20,7 @@
-> >  #include <asm/kprobes.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_fixed_config.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/fpsimd.h>
-> > @@ -195,6 +196,39 @@ exit_handle_fn kvm_get_nvhe_exit_handler(struct kvm_vcpu *vcpu)
-> >                 return NULL;
-> >  }
-> >
-> > +/*
-> > + * Some guests (e.g., protected VMs) might not be allowed to run in AArch32. The
-> > + * check below is based on the one in kvm_arch_vcpu_ioctl_run().
-> > + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
-> > + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
-> > + * hypervisor spots a guest in such a state ensure it is handled, and don't
-> > + * trust the host to spot or fix it.
-> > + *
-> > + * Returns true if the check passed and the guest run loop can continue, or
-> > + * false if the guest should exit to the host.
-> > + */
-> > +static bool check_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
->
-> This does a bit more than just check & return, so maybe call it
-> handle_aarch32_guest()?
->
-> > +{
-> > +       if (kvm_vm_is_protected(kern_hyp_va(vcpu->kvm)) &&
->
-> maybe initialize a local with a hyp pointer to the kvm structure.
+> > As you can see, most of the early exit handling is now moved to
+> > specific handlers, unifying the handling. For the protected mode, you
+> > can provide your own handler array (just hack
+> > kvm_get_exit_handler_array() to return something else), which will do
+> > the right thing as long as you call into the existing handlers first.
+> > When it comes to the ELR/SPSR handling, it is better left to the
+> > individual handlers (which we already do in some cases, see how we
+> > skip instructions, for example).
+> > Please let me know what you think.
+> 
+> Thanks a lot for this and sorry for being late to reply. I've been
+> travelling.
 
-Will do.
+No worries, it should be me who apologies for getting to this that late.
 
-> > +           vcpu_mode_is_32bit(vcpu) &&
-> > +           FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL0),
-> > +                                        PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) <
-> > +               ID_AA64PFR0_ELx_32BIT_64BIT) {
->
-> It may be more readable to initialize a local variable with this
-> feature check, i.e:
->
-> bool aarch32_allowed = FIELD_GET(...) == ID_AA64PFR0_ELx_32BIT_64BIT;
->
-> and then:
->
->   if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu) &&
-> !aarch32_allowed) {
+> I think that your proposal looks great. All handling is consolidated
+> now and handling for protected VMs can just be added on top. There are
+> some small issues with what parameters we need (e.g., passing struct
+> kvm to kvm_get_exit_handler_array), but I will sort them out and
+> submit them in the next round.
 
-I agree.
+OK. Please base these changes on top of the three patches in my
+branch, which I will update with actual commit messages.
 
 Thanks,
-/fuad
 
-> > +               /*
-> > +                * As we have caught the guest red-handed, decide that it isn't
-> > +                * fit for purpose anymore by making the vcpu invalid. The VMM
-> > +                * can try and fix it by re-initializing the vcpu with
-> > +                * KVM_ARM_VCPU_INIT, however, this is likely not possible for
-> > +                * protected VMs.
-> > +                */
-> > +               vcpu->arch.target = -1;
-> > +               *exit_code = ARM_EXCEPTION_IL;
-> > +               return false;
-> > +       }
-> > +
-> > +       return true;
-> > +}
-> > +
-> >  /* Switch to the guest for legacy non-VHE systems */
-> >  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> >  {
-> > @@ -255,6 +289,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
-> >                 /* Jump in the fire! */
-> >                 exit_code = __guest_enter(vcpu);
-> >
-> > +               if (unlikely(!check_aarch32_guest(vcpu, &exit_code)))
-> > +                       break;
-> > +
-> >                 /* And we're baaack! */
-> >         } while (fixup_guest_exit(vcpu, &exit_code));
-> >
-> > --
-> > 2.33.0.rc1.237.g0d66db33f3-goog
-> >
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
