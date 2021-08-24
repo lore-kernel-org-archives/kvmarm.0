@@ -2,56 +2,65 @@ Return-Path: <SRS0=IXmk=NP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE25C4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Aug 2021 15:44:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C9CC4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Aug 2021 15:53:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 390E261265
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Aug 2021 15:44:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 390E261265
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 16B2F611C9
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Aug 2021 15:53:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 16B2F611C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F3724B1F3;
-	Tue, 24 Aug 2021 11:44:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93A8F4B12A;
+	Tue, 24 Aug 2021 11:53:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GOw3q8TuSk3R; Tue, 24 Aug 2021 11:44:20 -0400 (EDT)
+	with ESMTP id xcYuUgRG-U40; Tue, 24 Aug 2021 11:53:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8A2B4B1EF;
-	Tue, 24 Aug 2021 11:44:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7FAD4B1C1;
+	Tue, 24 Aug 2021 11:53:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29BD04B1E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 11:44:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 846224B102
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 11:53:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6sD+E4sVrI81 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Aug 2021 11:44:14 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A6274B1DB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 11:44:14 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A040231B;
- Tue, 24 Aug 2021 08:44:13 -0700 (PDT)
-Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 227D53F766;
- Tue, 24 Aug 2021 08:44:11 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: catalin.marinas@arm.com, will@kernel.org, maz@kernel.org,
- james.morse@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- broonie@kernel.org
-Subject: [PATCH v2] arm64: Do not trap PMSNEVFR_EL1
-Date: Tue, 24 Aug 2021 16:45:23 +0100
-Message-Id: <20210824154523.906270-1-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.33.0
+ with ESMTP id vjilKjbRDcAO for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Aug 2021 11:53:40 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 623E540573
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 11:53:40 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BD745611C8;
+ Tue, 24 Aug 2021 15:53:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1629820419;
+ bh=S/+dn5ZBf/rML65m4XV8wU/VMONHlR/+MQQqXYZkqgU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=KfeVCFFuBeoTUCsw1Kix4Dpc+24YZ5NVlYR4yZmIinQnDASuOVIebwHtoHFWpQUua
+ 7FDKLN5cH+BfWhcZhUfdQs5D6iJbwxoUG0Hm3NMJ9NWDOffP6TFS3QCmjNlKjF/Txa
+ AQYc0JOG1uNyumVsXjynz9dRpi3yPM8UFp/y2bcUnNbeCxxmN3e92Rsmzd82ip1FkT
+ qjxctXTRKKRsSHnGgJ1o+Oxgq21ggtz99A1CSUx2Oz93ju7y8aRymaulMgFe69CAGv
+ 4PB/FpmIR3cCiM5OMxBZg4tewwZXZ3dT6sAmSXbJvvzyktqRGvzmKYATQvVkdF4YJs
+ 7/NggtmaC1K1w==
+Date: Tue, 24 Aug 2021 16:53:12 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2] arm64: Do not trap PMSNEVFR_EL1
+Message-ID: <20210824155312.GD4393@sirena.org.uk>
+References: <20210824154523.906270-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
+In-Reply-To: <20210824154523.906270-1-alexandru.elisei@arm.com>
+X-Cookie: Sentient plasmoids are a gas.
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: catalin.marinas@arm.com, maz@kernel.org, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,62 +72,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============5568593222932336109=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Commit 31c00d2aeaa2 ("arm64: Disable fine grained traps on boot") zeroed
-the fine grained trap registers to prevent unwanted register traps from
-occuring. However, for the PMSNEVFR_EL1 register, the corresponding
-HDFG{R,W}TR_EL2.nPMSNEVFR_EL1 fields must be 1 to disable trapping. Set
-both fields to 1 if FEAT_SPEv1p2 is detected to disable read and write
-traps.
 
-Fixes: 31c00d2aeaa2 ("arm64: Disable fine grained traps on boot")
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
-Based on v5.14-rc7. Tested on the model, using boot-wrapper built from
-commit 5cd6238ec4ef ("aarch32: fix .globl replacement"). Without this
-patch, in NVHE mode, the model freezes when I try to access PMSNEVFR_EL1.
-With this patch, the model doesn't hang anymore.
+--===============5568593222932336109==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="GyRA7555PLgSTuth"
+Content-Disposition: inline
 
-Changes since v1:
 
-* Set the corresponding bit in HDFGWRTR_EL2 to also disable write traps. My
-  thanks to Mark for pointing it out.
+--GyRA7555PLgSTuth
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
- arch/arm64/include/asm/el2_setup.h | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+On Tue, Aug 24, 2021 at 04:45:23PM +0100, Alexandru Elisei wrote:
 
-diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
-index b83fb24954b7..3198acb2aad8 100644
---- a/arch/arm64/include/asm/el2_setup.h
-+++ b/arch/arm64/include/asm/el2_setup.h
-@@ -149,8 +149,17 @@
- 	ubfx	x1, x1, #ID_AA64MMFR0_FGT_SHIFT, #4
- 	cbz	x1, .Lskip_fgt_\@
- 
--	msr_s	SYS_HDFGRTR_EL2, xzr
--	msr_s	SYS_HDFGWTR_EL2, xzr
-+	mov	x0, xzr
-+	mrs	x1, id_aa64dfr0_el1
-+	ubfx	x1, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
-+	cmp	x1, #3
-+	b.lt	.Lset_fgt_\@
-+	/* Disable PMSNEVFR_EL1 read and write traps */
-+	orr	x0, x0, #(1 << 62)
-+
-+.Lset_fgt_\@:
-+	msr_s	SYS_HDFGRTR_EL2, x0
-+	msr_s	SYS_HDFGWTR_EL2, x0
- 	msr_s	SYS_HFGRTR_EL2, xzr
- 	msr_s	SYS_HFGWTR_EL2, xzr
- 	msr_s	SYS_HFGITR_EL2, xzr
--- 
-2.33.0
+> Commit 31c00d2aeaa2 ("arm64: Disable fine grained traps on boot") zeroed
+> the fine grained trap registers to prevent unwanted register traps from
+> occuring. However, for the PMSNEVFR_EL1 register, the corresponding
+> HDFG{R,W}TR_EL2.nPMSNEVFR_EL1 fields must be 1 to disable trapping. Set
+> both fields to 1 if FEAT_SPEv1p2 is detected to disable read and write
+> traps.
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+--GyRA7555PLgSTuth
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmElFecACgkQJNaLcl1U
+h9CEkAf/aKONR9MrgUCx5/TwTo/XLS84ZwikykFHKlvZAE7ttsl0qmqxnOMkW8E3
+DACgUHB+eqDA9eXbF0KDo3fj9T12aBKRm4NafiepudpKpPKyP5D/2YACB4jbUAP/
+Ov+nLv2IzSd8VmqTjzX70C81XFzsAh9pbkdLJp3qPOCSX30b0Zg1J07TfCOUiPH0
+yIJjlcqEsPcq+eRJT3AHaik017fbSjl9Kk+mV/BEz1m+hfaexCcXR8poNQFmxghp
+KIsdEW8M25qW+JKbFU1+WQIIh8dAPWl8R1rzZWbY7YOO+2ExawRZ3PjedYoAgpOb
+Zzkh8t0pygHbOgfPYr+hpNwrbn3ZfA==
+=cXNj
+-----END PGP SIGNATURE-----
+
+--GyRA7555PLgSTuth--
+
+--===============5568593222932336109==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============5568593222932336109==--
