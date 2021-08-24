@@ -2,84 +2,84 @@ Return-Path: <SRS0=IXmk=NP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42CA3C4338F
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Aug 2021 21:15:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 817B8C4338F
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Aug 2021 21:35:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AEB6761357
-	for <kvmarm@archiver.kernel.org>; Tue, 24 Aug 2021 21:15:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AEB6761357
+	by mail.kernel.org (Postfix) with ESMTP id EB9C56138B
+	for <kvmarm@archiver.kernel.org>; Tue, 24 Aug 2021 21:35:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EB9C56138B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2572C4B25D;
-	Tue, 24 Aug 2021 17:15:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CFDE4B220;
+	Tue, 24 Aug 2021 17:35:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ls3KE6+5y66D; Tue, 24 Aug 2021 17:15:13 -0400 (EDT)
+	with ESMTP id oLdPtqeXAqk3; Tue, 24 Aug 2021 17:34:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 114F24B168;
-	Tue, 24 Aug 2021 17:15:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E8884B23C;
+	Tue, 24 Aug 2021 17:34:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 468404B168
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 17:15:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CC8F4B1ED
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 17:34:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kfoZKfmL4Qy2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Aug 2021 17:15:10 -0400 (EDT)
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com
- [209.85.166.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BC584B13A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 17:15:10 -0400 (EDT)
-Received: by mail-il1-f170.google.com with SMTP id v2so21881699ilg.12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 14:15:10 -0700 (PDT)
+ with ESMTP id V6X8AezHDvH3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Aug 2021 17:34:57 -0400 (EDT)
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
+ [209.85.160.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AA0F4B242
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 17:34:57 -0400 (EDT)
+Received: by mail-qt1-f202.google.com with SMTP id
+ c11-20020ac87dcb0000b0290293566e00b1so11434213qte.15
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 14:34:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
- bh=ahx89PC8cIKRx7Tmgj3ezIoGMxGJS6rYJPfdg8hea3I=;
- b=Blewoeg8VpEAOSLu2fSVu1OYBII8wSOT80G8mkJfn17EhHJTy8t0VNwi1CMA35qzJH
- PRNMksekGBMvfEDa3qJe36pT4LdGCE1FTxqod0mR6XTiXTCpxXoj2DP+T3e1Oru5MOM+
- SeTcPAMWPYLnbKsWsLQAoBsq+L6rzQVil6UYcvCVGis77NysmIW+IIDOCT9829zPy+ZM
- HNSI4par/xzky/hnonF2H6lYrlRgUfMLLTvc5agLCJSH3L8ooyfq+b7JZRgqLbrSBTlT
- VR1NetWEkKhWRrdPCcXEAo3AFp8CsjP+AWP/HzqUmOPxnNQojfwhKj62gyWzJC0/tDlZ
- EkfQ==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=MZN4oBbWEOsHzWZgslUKdaHZb21enktCWRWj8WQuJHw=;
+ b=f2uwJrvQWxth4bwI4AeJ2nEFSXk8vdexb8C4dfzbWv1QjmknE206l3cu7Yym6g6ehh
+ OrKeug2E5MAt6rpGESa3/Aw/NAYrPEi1nNxFkoek8aFyTCpxO3wf0Kk6jMShgrppb4D9
+ rFxHxEtXe1fK8pIzhNY29yfg7Owk3W9yCHBMoUOOgPMPCdIUv4CSQ+0F1eYyM/PuLTyu
+ +q1+0rqToAq+FG/YBiwbBVyT7fCObJ7QzNMMINMVfm9gmVgcQ9E6Y/ONXiKcJWGgj1K+
+ 0tAiy9/VaCS7nz10iq4io3ErFLdMmJ8yk2LHsiLiYpXKG6if4gVN5XAeG30k5BHNcpQu
+ EJKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition;
- bh=ahx89PC8cIKRx7Tmgj3ezIoGMxGJS6rYJPfdg8hea3I=;
- b=g6tpEWK4sszTWn6sJvjrgqLF0y5laUTV4FlX8NL6e5R69CmxWOMtcCsa43AuKfaqXj
- jijemxjWL4LOcaWW4loyQlLWU4ITmcmxXbXXZSncOi3MRSiicpAg08jDn44Q02vWkEUO
- G6uhRKabfpUNiln5ssTkPzYFGSGecK9irgZ2HvGefrvkveFMHsYZMdD/CZrwt9Ysrvpn
- /xGX6RIFCAL2PDxBRZ7j7zi0osiis9Q7IvdUn+0MRxpq31nKRe2v1N7takw0pykJbcvb
- LZEYJK2omTQupLsOsKHZDB0X6B7t5R5ea8aIXnnpbGFyXyOldor9oLi3GkNi04eOG6M8
- Fupg==
-X-Gm-Message-State: AOAM530FQj0vEo+L5Zh5pCwhj8gTIbEG8sUO0eq1xqaVD+v2diqTqcOw
- gMyRivzu3sVUWw+1E0bD3SldXQtIjl9TOA==
-X-Google-Smtp-Source: ABdhPJzYkTLe3JL/GRn7dx88lWcWUrTlT/x7EdbbtUTbRMUsj0b7GHuF0etxTSoOuXH25YUqoAlx3g==
-X-Received: by 2002:a92:d282:: with SMTP id p2mr24901934ilp.259.1629839709100; 
- Tue, 24 Aug 2021 14:15:09 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194])
- by smtp.gmail.com with ESMTPSA id z7sm10585059ilz.25.2021.08.24.14.15.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 24 Aug 2021 14:15:08 -0700 (PDT)
-Date: Tue, 24 Aug 2021 21:15:03 +0000
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=MZN4oBbWEOsHzWZgslUKdaHZb21enktCWRWj8WQuJHw=;
+ b=mt0rncmS5WC/1NtdP8kBE7Nu4mu1Zj3nY3fUKNm+SkRDfeE3FtCQ/XC4K/SUmJeYFq
+ TORKQ+glFm3Tu5+h4i/nDtHhLCN+mDwAl3mFVnN5URzpT/l/5ZDFDFivJqILnerZ7lT1
+ TKOuNlr4ft3SoqfU4yfGem7HO1A3WHrDIVFkNntWcWrEgovQwSPYjfkd5thzESu00fQE
+ ohf3z+eqOthsPSvhILbFkWbNeGIMqZIWRt+cjSeRjF5ErlamtuHmrS5rYxibhGw6YACG
+ gOmj0QgJaQvlIAIZoI3KIMtxX/KDVIvcxL7UQpplmC/HXDU4yPA856H7DPX3kROmHfxD
+ KCrA==
+X-Gm-Message-State: AOAM5315GK/2xKj3ywVU/krNIHVcgMch6EQuiKHz+JXtbfyKrtp9QnvO
+ betDCLoiyIiQBj93z+IdYHpt0pKE43k=
+X-Google-Smtp-Source: ABdhPJwCtCRX/g2KsfsgDGe6kvtcxkVWKYRCPIOoJZwjgcnAZvePmD3HugahbZO9uzjgcarnlKhXOCFKrbI=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a05:6214:312:: with SMTP id
+ i18mr8427019qvu.48.1629840896664; Tue, 24 Aug 2021 14:34:56 -0700 (PDT)
+Date: Tue, 24 Aug 2021 21:34:50 +0000
+In-Reply-To: <YSVhV+UIMY12u2PW@google.com>
+Message-Id: <20210824213450.1206228-1-oupton@google.com>
+Mime-Version: 1.0
+References: <YSVhV+UIMY12u2PW@google.com>
+X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
+Subject: [RFC PATCH] KVM: arm64: Allow VMMs to opt-out of KVM_CAP_PTP_KVM
 From: Oliver Upton <oupton@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: KVM/arm64: Guest ABI changes do not appear rollback-safe
-Message-ID: <YSVhV+UIMY12u2PW@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, maz@kernel.org, pshier@google.com,
- linux-arm-kernel@lists.infradead.org
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: rejiw@google.com, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,47 +96,136 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey folks,
+commit 3bf725699bf6 ("KVM: arm64: Add support for the KVM PTP service")
+introduced support for a hypercall-based interface through which a KVM
+guest may query the host's walltime relative to its physical or virtual
+counter. Unfortunately, KVM does not require opt-in for the feature, and
+unconditionally provides it to guests when available.
 
-Ricardo and I were discussing hypercall support in KVM/arm64 and
-something seems to be a bit problematic. I do not see anywhere that KVM
-requires opt-in from the VMM to expose new hypercalls to the guest. To
-name a few, the TRNG and KVM PTP hypercalls are unconditionally provided
-to the guest.
+This is extremely problematic for operators who want to ensure guest
+migrations are rollback safe. If an operator were to live migrate guests
+to a kernel with KVM_CAP_PTP_KVM and subsequently need to roll back the
+kernel, guests that discovered the hypercall will get fussy *very*
+quickly.
 
-Exposing new hypercalls to guests in this manner seems very unsafe to
-me. Suppose an operator is trying to upgrade from kernel N to kernel
-N+1, which brings in the new 'widget' hypercall. Guests are live
-migrated onto the N+1 kernel, but the operator finds a defect that
-warrants a kernel rollback. VMs are then migrated from kernel N+1 -> N.
-Any guests that discovered the 'widget' hypercall are likely going to
-get fussy _very_ quickly on the old kernel.
+Plug the hazard by introducing a new capability,
+KVM_CAP_DISABLE_PTP_KVM. To maintain ABI compatibility with the
+aforementioned change, this cap is off by default. When enabled, hide
+the KVM PTP hypercall from the guest.
 
-Really, we need to ensure that the exposed guest ABI is
-backwards-compatible. Running a VMM that is blissfully unaware of the
-'widget' hypercall should not implicitly expose it to its guest on a new
-kernel.
+Fixes: 3bf725699bf6 ("KVM: arm64: Add support for the KVM PTP service")
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+Patch cleanly applies on v5.14-rc7. Delightfully untested beyond
+building it :)
 
-This conversation was in the context of devising a new UAPI that allows
-VMMs to trap hypercalls to userspace. While such an interface would
-easily work around the issue, the onus of ABI compatibility lies with
-the kernel.
+ Documentation/virt/kvm/api.rst    | 13 +++++++++++++
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/arm.c              |  5 +++++
+ arch/arm64/kvm/hypercalls.c       |  7 +++++--
+ include/uapi/linux/kvm.h          |  1 +
+ 5 files changed, 27 insertions(+), 2 deletions(-)
 
-So, this is all a long-winded way of asking: how do we dig ourselves out
-of this situation, and how to we avoid it happening again in the future?
-I believe the answer to both is to have new VM capabilities for sets of
-hypercalls exposed to the guest. Unfortunately, the unconditional
-exposure of TRNG and PTP hypercalls is ABI now, so we'd have to provide
-an opt-out at this point. For anything new, require opt-in from the VMM
-before we give it to the guest.
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index dae68e68ca23..4866418a2bb6 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7241,3 +7241,16 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
+ of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
+ the hypercalls whose corresponding bit is in the argument, and return
+ ENOSYS for the others.
++
++8.35 KVM_CAP_DISABLE_PTP_KVM
++----------------------------
++
++:Architectures: arm64
++
++This capability indicates that a VMM may disable the KVM virtual PTP
++service for a guest. KVM_CAP_PTP_KVM introduced support for this
++hypercall interface, but it is unconditionally enabled without any
++opt-out.
++
++When this capability is enabled, KVM will hide the KVM virtual PTP
++service from the guest.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 41911585ae0c..8795228aa08e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -136,6 +136,9 @@ struct kvm_arch {
+ 
+ 	/* Memory Tagging Extension enabled for the guest */
+ 	bool mte_enabled;
++
++	/* PTP KVM hypercall disabled for this guest */
++	bool ptp_kvm_disabled;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 0ca72f5cda41..b8f3b2eafd45 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -103,6 +103,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->lock);
+ 		break;
++	case KVM_CAP_DISABLE_PTP_KVM:
++		kvm->arch.ptp_kvm_disabled = true;
++		r = 0;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -217,6 +221,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
++	case KVM_CAP_DISABLE_PTP_KVM:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index 30da78f72b3b..8e9f2e1329e7 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -62,6 +62,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ {
+ 	u32 func_id = smccc_get_function(vcpu);
+ 	u64 val[4] = {SMCCC_RET_NOT_SUPPORTED};
++	struct kvm *kvm = vcpu->kvm;
+ 	u32 feature;
+ 	gpa_t gpa;
+ 
+@@ -128,10 +129,12 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+ 		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+-		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
++		if (!kvm->arch.ptp_kvm_disabled)
++			val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+-		kvm_ptp_get_time(vcpu, val);
++		if (!kvm->arch.ptp_kvm_disabled)
++			kvm_ptp_get_time(vcpu, val);
+ 		break;
+ 	case ARM_SMCCC_TRNG_VERSION:
+ 	case ARM_SMCCC_TRNG_FEATURES:
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index d9e4aabcb31a..d8419c336ec8 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1112,6 +1112,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_BINARY_STATS_FD 203
+ #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+ #define KVM_CAP_ARM_MTE 205
++#define KVM_CAP_DISABLE_PTP_KVM 206
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.33.0.rc2.250.ged5fa647cd-goog
 
-Have I missed something blatantly obvious, or do others see this as an
-issue as well? I'll reply with an example of adding opt-out for PTP.
-I'm sure other hypercalls could be handled similarly.
-
---
-Thanks,
-Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
