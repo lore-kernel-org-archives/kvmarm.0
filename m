@@ -2,56 +2,74 @@ Return-Path: <SRS0=u4Cy=NQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.0 required=3.0 tests=BAYES_00,BITCOIN_OBFU_SUBJ,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC4AC4320A
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 865D1C432BE
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 17:45:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C62E361151
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:20:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C62E361151
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id DAC93610E5
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 17:45:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DAC93610E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A0794B2A7;
-	Wed, 25 Aug 2021 12:20:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57CF94B1AF;
+	Wed, 25 Aug 2021 13:45:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Upnma4Jiujuh; Wed, 25 Aug 2021 12:20:42 -0400 (EDT)
+	with ESMTP id M1k6bAnOJjoA; Wed, 25 Aug 2021 13:45:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33F474B28E;
-	Wed, 25 Aug 2021 12:19:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C36CE4B214;
+	Wed, 25 Aug 2021 13:45:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBE214B29B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:19:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02C624B209
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 13:45:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2FFiYPVv0J9u for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Aug 2021 12:19:52 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16FD04B2F2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:18:55 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C65ED113E;
- Wed, 25 Aug 2021 09:18:54 -0700 (PDT)
-Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF7323F66F;
- Wed, 25 Aug 2021 09:18:53 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Subject: [RFC PATCH v4 kvmtool 5/5] arm64: SPE: Set KVM_ARM_VCPU_SUPPORTED_CPUS
-Date: Wed, 25 Aug 2021 17:19:58 +0100
-Message-Id: <20210825161958.266411-6-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20210825161958.266411-1-alexandru.elisei@arm.com>
-References: <20210825161958.266411-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
+ with ESMTP id Lm2L+qz-eZAU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Aug 2021 13:44:57 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF7034B205
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 13:44:57 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1294C610E8;
+ Wed, 25 Aug 2021 17:44:55 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mIwxJ-007CtG-4O; Wed, 25 Aug 2021 18:44:53 +0100
+Date: Wed, 25 Aug 2021 18:44:52 +0100
+Message-ID: <878s0ppgff.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH][kvmtool] virtio/pci: Correctly handle MSI-X masking while
+ MSI-X is disabled
+In-Reply-To: <87a6l5pmim.wl-maz@kernel.org>
+References: <20210821120742.855712-1-maz@kernel.org>
+ <20210823174833.05adee5d@slackpad.fritz.box>
+ <87tujeq5ey.wl-maz@kernel.org> <87a6l5pmim.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
+ alexandru.elisei@arm.com, tglx@linutronix.de, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,183 +86,185 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM uses the KVM_ARM_VCPU_SUPPORTED_CPUS to make sure that an SPE-enabled
-VCPU is not scheduled on a CPU without SPE. Get the cpulist of physical
-CPUs that support SPE by parsing the /sys/devices directories that the SPE
-driver creates, and passing that on as the argument for
-KVM_ARM_VCPU_SUPPORTED_CPUS.
+On Wed, 25 Aug 2021 16:33:21 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Tue, 24 Aug 2021 15:32:53 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > Hi Andre,
+> > 
+> > On Mon, 23 Aug 2021 17:48:33 +0100,
+> > Andre Przywara <andre.przywara@arm.com> wrote:
+> > > 
+> > > On Sat, 21 Aug 2021 13:07:42 +0100
+> > > Marc Zyngier <maz@kernel.org> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > > Since Linux commit 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X
+> > > > entries"), kvmtool segfaults when the guest boots and tries to
+> > > > disable all the MSI-X entries of a virtio device while MSI-X itself
+> > > > is disabled.
+> > > > 
+> > > > What Linux does is seems perfectly correct. However, kvmtool uses
+> > > > a different decoding depending on whether MSI-X is enabled for
+> > > > this device or not. Which seems pretty wrong.
+> > > 
+> > > While I really wish this would be wrong, I think this is
+> > > indeed how this is supposed to work: The Virtio legacy spec makes the
+> > > existence of those two virtio config fields dependent on the
+> > > (dynamic!) enablement status of MSI-X. This is reflected in:
+> > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/uapi/linux/virtio_pci.h#n72
+> > > and explicitly mentioned as a footnote in the virtio 0.9.5 spec[1]:
+> > > "3) ie. once you enable MSI-X on the device, the other fields move. If
+> > > you turn it off again, they move back!"
+> > 
+> > Madness! What was Rusty on at the time? I really hope the bitcoin
+> > thing is buying him better stuff...
+> > 
+> > > I agree that this looks like a bad idea, but I am afraid we are stuck
+> > > with this. It looks like the Linux driver is at fault here, it should
+> > > not issue the config access when MSIs are disabled. Something like this
+> > > (untested):
+> > > 
+> > > --- a/drivers/virtio/virtio_pci_legacy.c
+> > > +++ b/drivers/virtio/virtio_pci_legacy.c
+> > > @@ -103,6 +103,9 @@ static void vp_reset(struct virtio_device *vdev)
+> > >  
+> > >  static u16 vp_config_vector(struct virtio_pci_device *vp_dev, u16 vector)
+> > >  {
+> > > +       if (!vp_dev->msix_enabled)
+> > > +               return VIRTIO_MSI_NO_VECTOR;
+> > > +
+> > >         /* Setup the vector used for configuration events */
+> > >         iowrite16(vector, vp_dev->ioaddr + VIRTIO_MSI_CONFIG_VECTOR);
+> > >         /* Verify we had enough resources to assign the vector */
+> > > 
+> > > This is just my first idea after looking at this, happy to stand
+> > > corrected or hear about a better solution.
+> > 
+> > I don't think this works. It instead completely disables MSI-X, which
+> > is a total bore. I think the only way to deal with it is to quirk it
+> > to prevent the bulk masking to take effect before MSI-X is enabled.
+> 
+> Actually, let me correct myself. I tested the wrong configuration (why
+> isn't --force-pci the bloody default in kvmtool?). This patch doesn't
+> fix anything at all, and kvmtool just explodes.
+> 
+> Having dug further, it isn't the config space that causes problems,
+> but the programming of the MSI-X vectors. I'm starting to suspect the
+> layout of the MSI-X bar in kvmtool.
 
-It is still up to the user to make sure that the VCPUs run on the correct
-physical CPUs (those specified via KVM_ARM_VCPU_SUPPORTED_CPUS), for
-example, by using taskset.
+OK, this is hilarious. Sort of. The MSI-X bar sizing is bonkers: you
+can't fit 33 MSIs there (33 being the number of MSI-X that kvmtool
+advertises), and you will have notionally overwritten the PBA as
+well. Amusingly, the last write ends up being misdecoded as a config
+space access...
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+"works for me".
+
+	M.
+
+From a2b3a338aab535a1683cc5b424455ed7fd3a500a Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Wed, 25 Aug 2021 18:19:27 +0100
+Subject: [PATCH] virtio/pci: Size the MSI-X bar according to the number of
+ MSI-X
+
+Since 45d3b59e8c45 ("kvm tools: Increase amount of possible interrupts
+per PCI device"), the number of MSI-S has gone from 4 to 33.
+
+However, the corresponding storage hasn't been upgraded, and writing
+to the MSI-X table is a pretty risky business. Now that the Linux
+kernel writes to *all* MSI-X entries before doing anything else
+with the device, kvmtool dies a horrible death.
+
+Fix it by properly defining the size of the MSI-X bar, and make
+Linux great again.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arm/aarch64/spe.c | 130 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 130 insertions(+)
+ virtio/pci.c | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/arm/aarch64/spe.c b/arm/aarch64/spe.c
-index 673c84e63cc2..6eccc6b72677 100644
---- a/arm/aarch64/spe.c
-+++ b/arm/aarch64/spe.c
-@@ -1,3 +1,4 @@
-+#include <dirent.h>
- #include <stdio.h>
+diff --git a/virtio/pci.c b/virtio/pci.c
+index eb91f512..726146fc 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -7,6 +7,7 @@
+ #include "kvm/irq.h"
+ #include "kvm/virtio.h"
+ #include "kvm/ioeventfd.h"
++#include "kvm/util.h"
  
- #include <sys/resource.h>
-@@ -13,6 +14,8 @@
+ #include <sys/ioctl.h>
+ #include <linux/virtio_pci.h>
+@@ -14,6 +15,13 @@
+ #include <assert.h>
+ #include <string.h>
  
- #include "arm-common/gic.h"
- 
-+#define SYS_DEVICES	"/sys/devices/"
++#define ALIGN_UP(x, s)		ALIGN((x) + (s) - 1, (s))
++#define VIRTIO_NR_MSIX		(VIRTIO_PCI_MAX_VQ + VIRTIO_PCI_MAX_CONFIG)
++#define VIRTIO_MSIX_TABLE_SIZE	(VIRTIO_NR_MSIX * 16)
++#define VIRTIO_MSIX_PBA_SIZE	(ALIGN_UP(VIRTIO_MSIX_TABLE_SIZE, 64) / 8)
++#define VIRTIO_MSIX_BAR_SIZE	(1UL << fls_long(VIRTIO_MSIX_TABLE_SIZE + \
++						 VIRTIO_MSIX_PBA_SIZE))
 +
- void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ static u16 virtio_pci__port_addr(struct virtio_pci *vpci)
  {
- 	const char compatible[] = "arm,statistical-profiling-extension-v1";
-@@ -35,6 +38,118 @@ void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 	_FDT(fdt_end_node(fdt));
- }
+ 	return pci__bar_address(&vpci->pci_hdr, 0);
+@@ -336,15 +344,20 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
+ 	int vecnum;
+ 	size_t offset;
  
-+static int spe_set_supported_cpumask(char *cpumask)
-+{
-+	struct dirent *dirent;
-+	size_t cpumask_len;
-+	char *path;
-+	size_t path_len;
-+	DIR *dir;
-+	int fd;
-+	ssize_t fd_sz;
-+	int ret = 0;
+-	if (addr > msix_io_addr + PCI_IO_SIZE) {
++	if (addr > msix_io_addr + VIRTIO_MSIX_TABLE_SIZE) {
++		/* Read access to PBA */
+ 		if (is_write)
+ 			return;
+-		table  = (struct msix_table *)&vpci->msix_pba;
+-		offset = addr - (msix_io_addr + PCI_IO_SIZE);
+-	} else {
+-		table  = vpci->msix_table;
+-		offset = addr - msix_io_addr;
++		offset = addr - (msix_io_addr + VIRTIO_MSIX_TABLE_SIZE);
++		if ((offset + len) > sizeof (vpci->msix_pba))
++			return;
++		memcpy(data, (void *)&vpci->msix_pba + offset, len);
++		return;
+ 	}
 +
-+	path = calloc(1, PAGE_SIZE);
-+	if (!path)
-+		return -ENOMEM;
++	table  = vpci->msix_table;
++	offset = addr - msix_io_addr;
 +
-+	/* Make the compiler happy by copying the NULL terminating byte. */
-+	strncpy(path, SYS_DEVICES, strlen(SYS_DEVICES) + 1);
-+
-+	dir = opendir(SYS_DEVICES);
-+	if (!dir) {
-+		ret = -errno;
-+		goto out_free;
-+	}
-+
-+	cpumask_len = 0;
-+	while ((dirent = readdir(dir))) {
-+		if (dirent->d_type != DT_DIR)
-+			continue;
-+		if (strncmp(dirent->d_name, "arm_spe", 7) != 0)
-+			continue;
-+
-+		path_len = strlen(SYS_DEVICES) + strlen(dirent->d_name) +
-+			   strlen("/cpumask");
-+		/* No room for NULL. */
-+		if (path_len >= (long unsigned)PAGE_SIZE) {
-+			ret = -ENOMEM;
-+			goto out_free;
-+		}
-+
-+		strcat(path, dirent->d_name);
-+		strcat(path, "/cpumask");
-+
-+		fd = open(path, O_RDONLY);
-+		if (fd < 0) {
-+			ret = -errno;
-+			goto out_free;
-+		}
-+
-+		/* No room for comma + single digit CPU number. */
-+		if (cpumask_len >= (long unsigned)PAGE_SIZE - 2) {
-+			ret = -ENOMEM;
-+			goto out_free;
-+		}
-+		if (cpumask_len > 0)
-+			cpumask[cpumask_len++] = ',';
-+
-+		/* Newline will be converted to NULL, it's safe to fill cpumask. */
-+		fd_sz = read_file(fd, &cpumask[cpumask_len],
-+				  PAGE_SIZE - cpumask_len);
-+		if (fd_sz < 0) {
-+			ret = -errno;
-+			goto out_free;
-+		}
-+		close(fd);
-+
-+		cpumask_len = strlen(cpumask);
-+		/* Strip newline. */
-+		cpumask[--cpumask_len] = '\0';
-+
-+		/* Reset path to point to /sys/devices/ */
-+		memset(&path[strlen(SYS_DEVICES)], '\0',
-+		       strlen(path) - strlen(SYS_DEVICES));
-+	}
-+
-+	if (cpumask_len == 0)
-+		ret = -ENODEV;
-+
-+out_free:
-+	free(path);
-+	return ret;
-+}
-+
-+static int spe_set_supported_cpus(struct kvm *kvm)
-+{
-+	char *cpumask;
-+	int i, fd;
-+	int ret;
-+
-+	cpumask = calloc(1, PAGE_SIZE);
-+	if (!cpumask)
-+		return -ENOMEM;
-+
-+	ret = spe_set_supported_cpumask(cpumask);
-+	if (ret)
-+		goto out_free;
-+
-+	pr_info("SPE detected on CPUs %s", cpumask);
-+
-+	for (i = 0; i < kvm->nrcpus; i++) {
-+		fd = kvm->cpus[i]->vcpu_fd;
-+		ret = ioctl(fd, KVM_ARM_VCPU_SUPPORTED_CPUS, cpumask);
-+		if (ret == -1) {
-+			ret = -errno;
-+			goto out_free;
-+		}
-+	}
-+
-+out_free:
-+	free(cpumask);
-+	return ret;
-+}
-+
- static void spe_try_increase_mlock_limit(struct kvm *kvm)
- {
- 	u64 size = kvm->ram_size;
-@@ -88,6 +203,21 @@ static int spe__init(struct kvm *kvm)
- 	if (!kvm->cfg.arch.has_spe)
- 		return 0;
+ 	vecnum = offset / sizeof(struct msix_table);
+ 	offset = offset % sizeof(struct msix_table);
  
-+	if (kvm__supports_extension(kvm, KVM_CAP_ARM_VCPU_SUPPORTED_CPUS)) {
-+		ret = spe_set_supported_cpus(kvm);
-+		if (ret)
-+			return ret;
-+	} else {
-+		/*
-+		 * Assume that KVM knows what it's doing by not supporting the
-+		 * extension and has some other way to prevent SPE enabled VCPUs
-+		 * from running on physical CPUs without SPE, if there are
-+		 * present. Print a debug statement just in case something goes
-+		 * horribly wrong.
-+		 */
-+		pr_debug("KVM_ARM_VCPU_SUPPORTED_CPUS not present");
-+	}
-+
- 	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_LOCK_USER_MEMORY_REGION))
- 		die("KVM_CAP_ARM_LOCK_USER_MEMORY_REGION not supported");
+@@ -520,7 +533,7 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
  
+ 	port_addr = pci_get_io_port_block(PCI_IO_SIZE);
+ 	mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
+-	msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
++	msix_io_block = pci_get_mmio_block(VIRTIO_MSIX_BAR_SIZE);
+ 
+ 	vpci->pci_hdr = (struct pci_device_header) {
+ 		.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
+@@ -543,7 +556,7 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+ 		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
+ 		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
+ 		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
+-		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
++		.bar_size[2]		= cpu_to_le32(VIRTIO_MSIX_BAR_SIZE),
+ 	};
+ 
+ 	r = pci__register_bar_regions(kvm, &vpci->pci_hdr,
 -- 
-2.33.0
+2.30.2
 
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
