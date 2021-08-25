@@ -2,80 +2,88 @@ Return-Path: <SRS0=u4Cy=NQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF3FC4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 10:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC28C4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 10:20:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E78E561184
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 10:02:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E78E561184
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 41F0C6121E
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 10:20:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 41F0C6121E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DB344B1CC;
-	Wed, 25 Aug 2021 06:02:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B19CA4B1D9;
+	Wed, 25 Aug 2021 06:20:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id T-awLJP1NRAY; Wed, 25 Aug 2021 06:02:47 -0400 (EDT)
+	with ESMTP id ohjEKFV3R5OJ; Wed, 25 Aug 2021 06:20:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8AD44B1DA;
-	Wed, 25 Aug 2021 06:02:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F182E4B263;
+	Wed, 25 Aug 2021 06:20:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 016594B1D2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 06:02:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8671A4B277
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 22:50:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id stOOuDn3-ES6 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Aug 2021 06:02:42 -0400 (EDT)
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com
- [209.85.208.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C45324B1CC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 06:02:41 -0400 (EDT)
-Received: by mail-lj1-f169.google.com with SMTP id i28so42609685ljm.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 03:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=k3coRg+J3p197hAlCFr3Vj1C8Vm9KFllOcMKF9YzS/k=;
- b=cUCTblyL7c27KuwJuwJwQBvBF+zGyPs1LoT5cyb1NhbCWvEsgHwTS6wl/PEiO303Cw
- gJJRULtOxqWElvOp/NXfn3kI0QPgq+csxIwej+GRq71MCI3wyIBEn/NSVB5tGFwkPTnf
- EneqBzFzs7qVMGE6nDOBtyHlV05OrOVkJrrFQRsTt6bN+W3F4qdDcU3CECaFf7f361Bf
- 1n3XgDV0zWubWVCGgT9pAkYKSmZbCqQ4no8593xoWzxgPxA10aBBCLfWQHVouS8qAIi3
- Bn4IfggRl6ekReQHAd5BL0gQO2jxUhFREzZdRfO+rqE3AYViw3ewVvcz8UcBzrbHNc58
- Kz0g==
+ with ESMTP id Hf46PtV3PrPs for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Aug 2021 22:50:45 -0400 (EDT)
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com
+ [209.85.214.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 563D24B210
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 22:50:45 -0400 (EDT)
+Received: by mail-pl1-f181.google.com with SMTP id a5so13461515plh.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 19:50:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=G+VFbxZv56JqJJvHvZfxmdl5/mMwzz6LNS7nJgyEuFg=;
+ b=PuRuwB6GpTZkYLCohD7vc5rbOm294HWMBPOKGiKyMcID0d/cqaUomfm4BIGY/jgOL3
+ IGabpTvdWyYabHtI4zlkTEsxa3btaZbdtY8jO5jSGxiFSrKVrc7KOS8a7z3HapC8BNcS
+ QGRYo/m43G5PNg6mhJEEn7nooJHKIHnJPb7/Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=k3coRg+J3p197hAlCFr3Vj1C8Vm9KFllOcMKF9YzS/k=;
- b=Ih25aW08k6DkLjl1s8rEIeq9qzMurdCDafqlVJ5pQYhk9pXOBlcP7QANfGrjFoV6f5
- PY9/kr0F2V7RqmK9Lj4V+NZrqS9rsU746im7w5Ts6gK1kEnkRx5UgX2Nul3GZSo3bcqL
- fj+mP5y8xYikI/E7tZqUxNpxSy/q2Cl4wKHjLzk7n/ToguSacZcZ7HSU3ljBTn+oA3+u
- 6kHpelGMY6xfOjKe0zkNle6VAHqo0VrrlNW+g7FN+qg72EYwYq9XjLdCyaR29sgquNHe
- cg+uSVyucCKahui4s1JiorBpo+evJ2+SGL4Luur8cyyC6VYjfraNlKWg8Qj0lD3r3cbs
- 157w==
-X-Gm-Message-State: AOAM530DrC7pnvwPdPHXtnuxRiBjb8H0tLc964M0CGAO7EAVy3hGSGNA
- l/j6WUVOcLauZ0kX1CLOYZzrpe0yq8g0hcvC7ABftw==
-X-Google-Smtp-Source: ABdhPJwvsAjsRykTCreTtC16fO1xL5nuWVpWNxzP6GpLgqqYLx9mvjmH2w0HkFOJ93i9pThzDyeIsCSDi55qWS19CpY=
-X-Received: by 2002:a05:651c:33b:: with SMTP id
- b27mr36824255ljp.314.1629885759909; 
- Wed, 25 Aug 2021 03:02:39 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=G+VFbxZv56JqJJvHvZfxmdl5/mMwzz6LNS7nJgyEuFg=;
+ b=MwhdVIF5AmYxWEEH7ginOzwfik9MMjmSFB1k+NgF2p95kGLw7ayvzO16gWxJ24KR7D
+ iqFlzCvDQuphug82NLigx1vHqZG6ve+kqs72gSo0udPSUsfv6IE0YGS0mHG3MO80xtGe
+ FPWjaGoL+ZyhDLFEnMfzJnfrdlpzQPSWlN9q03SzQCuMXAHSdmYn8j8JZQRWxalDBgyU
+ lhD45H9RLFaxa4hq4b04P0ME71lJVeEtiOkB1rSnW1Z5fmF/nLcuq53s7eMaoUy/EIyi
+ XTrCgII3lzWu5jxwuu1AZC0Jl1zxDZ6l1m1QMpTKPrjpt4DJzaXGT3EpyKENbFdCnosf
+ oYrw==
+X-Gm-Message-State: AOAM530qk+JpQAPLi6J91t6FuIAjKFt9lgAKyot3kZ5a5THxUp9WuMh2
+ qMrrDarLA2pWHKQLy/FRThWexw==
+X-Google-Smtp-Source: ABdhPJw71JeKXknXk4vWPDjxlltZQjqQ6fdlXY/CarzMWUi3FciPU9uv5juBIo+m4zTlv2vl32DI8A==
+X-Received: by 2002:a17:90a:b00e:: with SMTP id
+ x14mr7953567pjq.155.1629859844343; 
+ Tue, 24 Aug 2021 19:50:44 -0700 (PDT)
+Received: from localhost ([2401:fa00:8f:203:d273:c78c:fce8:a0e2])
+ by smtp.gmail.com with UTF8SMTPSA id j6sm20237041pfn.107.2021.08.24.19.50.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 24 Aug 2021 19:50:44 -0700 (PDT)
+From: David Stevens <stevensd@chromium.org>
+X-Google-Original-From: David Stevens <stevensd@google.com>
+To: Marc Zyngier <maz@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v3 0/4] KVM: allow mapping non-refcounted pages
+Date: Wed, 25 Aug 2021 11:50:05 +0900
+Message-Id: <20210825025009.2081060-1-stevensd@google.com>
+X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
 MIME-Version: 1.0
-References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
-In-Reply-To: <87mtp5q3gx.wl-maz@kernel.org>
-From: Oliver Upton <oupton@google.com>
-Date: Wed, 25 Aug 2021 03:02:28 -0700
-Message-ID: <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-Mailman-Approved-At: Wed, 25 Aug 2021 06:20:00 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+ David Stevens <stevensd@chromium.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,68 +100,59 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 25, 2021 at 2:27 AM Marc Zyngier <maz@kernel.org> wrote:
-> > Exposing new hypercalls to guests in this manner seems very unsafe to
-> > me. Suppose an operator is trying to upgrade from kernel N to kernel
-> > N+1, which brings in the new 'widget' hypercall. Guests are live
-> > migrated onto the N+1 kernel, but the operator finds a defect that
-> > warrants a kernel rollback. VMs are then migrated from kernel N+1 -> N.
-> > Any guests that discovered the 'widget' hypercall are likely going to
-> > get fussy _very_ quickly on the old kernel.
->
-> This goes against what we decided to support for the *only* publicly
-> available VMM that cares about save/restore, which is that we only
-> move forward and don't rollback.
+From: David Stevens <stevensd@chromium.org>
 
-Ah, I was definitely missing this context. Current behavior makes much
-more sense then.
+This patch series adds support for mapping non-refcount VM_IO and
+VM_PFNMAP memory into the guest.
 
-> Hypercalls are the least of your
-> worries, and there is a whole range of other architectural features
-> that will have also appeared/disappeared (your own CNTPOFF series is a
-> glaring example of this).
+Currently, the gfn_to_pfn functions require being able to pin the target
+pfn, so they will fail if the pfn returned by follow_pte isn't a
+ref-counted page.  However, the KVM secondary MMUs do not require that
+the pfn be pinned, since they are integrated with the mmu notifier API.
+This series adds a new set of gfn_to_pfn_page functions which parallel
+the gfn_to_pfn functions but do not pin the pfn. The new functions
+return the page from gup if it was present, so callers can use it and
+call put_page when done.
 
-Isn't that a tad bit different though? I'll admit, I'm just as guilty
-with my own series forgetting to add a KVM_CAP (oops), but it is in my
-queue to kick out with the fix for nVHE/ptimer. Nonetheless, if a user
-takes up a new KVM UAPI, it is up to the user to run on a new kernel.
+The gfn_to_pfn functions should be depreciated, since as they are unsafe
+due to relying on trying to obtain a struct page from a pfn returned by
+follow_pte. I added new functions instead of simply adding another
+optional parameter to the existing functions to make it easier to track
+down users of the deprecated functions.
 
-My concerns are explicitly with the 'under the nose' changes, where
-KVM modifies the guest feature set without userspace opting in. Based
-on your comment, though, it would appear that other parts of KVM are
-affected too. It doesn't have to be rollback safety, either. There may
-simply be a hypercall which an operator doesn't want to give its
-guests, and it needs a way to tell KVM to hide it.
+This series updates x86 and arm64 secondary MMUs to the new API.
 
-> > Have I missed something blatantly obvious, or do others see this as an
-> > issue as well? I'll reply with an example of adding opt-out for PTP.
-> > I'm sure other hypercalls could be handled similarly.
->
-> Why do we need this? For future hypercalls, we could have some buy-in
-> capabilities. For existing ones, it is too late, and negative features
-> are just too horrible.
+v2 -> v3:
+ - rebase on kvm next branch
+v1 -> v2:
+ - Introduce new gfn_to_pfn_page functions instead of modifying the
+   behavior of existing gfn_to_pfn functions, to make the change less
+   invasive.
+ - Drop changes to mmu_audit.c
+ - Include Nicholas Piggin's patch to avoid corrupting refcount in the
+   follow_pte case, and use it in depreciated gfn_to_pfn functions.
+ - Rebase on kvm/next
 
-Oh, agreed on the nastiness. Lazy hack to realize the intended
-functional change..
+David Stevens (4):
+  KVM: mmu: introduce new gfn_to_pfn_page functions
+  KVM: x86/mmu: use gfn_to_pfn_page
+  KVM: arm64/mmu: use gfn_to_pfn_page
+  KVM: mmu: remove over-aggressive warnings
 
-> For KVM-specific hypercalls, we could get the VMM to save/restore the
-> bitmap of supported functions. That would be "less horrible". This
-> could be implemented using extra "firmware pseudo-registers" such as
-> the ones described in Documentation/virt/kvm/arm/psci.rst.
+ arch/arm64/kvm/mmu.c            |  26 +++--
+ arch/x86/kvm/mmu/mmu.c          |  50 +++++----
+ arch/x86/kvm/mmu/mmu_internal.h |   3 +-
+ arch/x86/kvm/mmu/paging_tmpl.h  |  23 ++--
+ arch/x86/kvm/mmu/tdp_mmu.c      |   6 +-
+ arch/x86/kvm/mmu/tdp_mmu.h      |   4 +-
+ arch/x86/kvm/x86.c              |   6 +-
+ include/linux/kvm_host.h        |  17 +++
+ virt/kvm/kvm_main.c             | 188 +++++++++++++++++++++++---------
+ 9 files changed, 220 insertions(+), 103 deletions(-)
 
-This seems more reasonable, especially since we do this for migrating
-the guest's PSCI version.
+-- 
+2.33.0.rc2.250.ged5fa647cd-goog
 
-Alternatively, I had thought about using a VM attribute, given the
-fact that it is non-architectural information and we avoid ABI issues
-in KVM_GET_REG_LIST without buy-in through a KVM_CAP.
-
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
