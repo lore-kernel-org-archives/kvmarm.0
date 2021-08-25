@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 909C5C432BE
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:18:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49418C4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:18:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 30D0D6113A
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:18:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 30D0D6113A
+	by mail.kernel.org (Postfix) with ESMTP id E3D8861153
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:18:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E3D8861153
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CADBF4B24E;
-	Wed, 25 Aug 2021 12:18:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8817F4B23B;
+	Wed, 25 Aug 2021 12:18:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7v84FLOLtFgO; Wed, 25 Aug 2021 12:18:22 -0400 (EDT)
+	with ESMTP id wM2N-ERJogqa; Wed, 25 Aug 2021 12:18:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 971774B2B6;
-	Wed, 25 Aug 2021 12:17:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFDF54B28A;
+	Wed, 25 Aug 2021 12:17:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 020304B1AC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:17:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7E624B214
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:17:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uz3cM03Ojmil for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Aug 2021 12:17:45 -0400 (EDT)
+ with ESMTP id ctWSWOaFPuHr for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Aug 2021 12:17:48 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 006E74B230
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:17:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6FE44B266
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:17:36 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A0E5513A1;
- Wed, 25 Aug 2021 09:17:34 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3FE5D142F;
+ Wed, 25 Aug 2021 09:17:36 -0700 (PDT)
 Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 525B03F66F;
- Wed, 25 Aug 2021 09:17:33 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E4C2A3F66F;
+ Wed, 25 Aug 2021 09:17:34 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  will@kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v4 14/39] KVM: arm64: Add SPE capability and VCPU feature
-Date: Wed, 25 Aug 2021 17:17:50 +0100
-Message-Id: <20210825161815.266051-15-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v4 15/39] drivers/perf: Expose the cpumask of CPUs that
+ support SPE
+Date: Wed, 25 Aug 2021 17:17:51 +0100
+Message-Id: <20210825161815.266051-16-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20210825161815.266051-1-alexandru.elisei@arm.com>
 References: <20210825161815.266051-1-alexandru.elisei@arm.com>
@@ -69,75 +70,161 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add the KVM_CAP_ARM_SPE capability which allows userspace to discover if
-SPE emulation is available. Add the KVM_ARM_VCPU_SPE feature which
-enables the emulation for a VCPU.
+KVM SPE emulation will require the list of CPUs that have hardware support
+for SPE. Add a function that returns the cpumask of supported CPUs
+discovered by the driver during probing.
 
-Both are disabled for now.
-
+CC: Will Deacon <will@kernel.org>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- Documentation/virt/kvm/api.rst    | 9 +++++++++
- arch/arm64/include/uapi/asm/kvm.h | 1 +
- arch/arm64/kvm/arm.c              | 3 +++
- include/uapi/linux/kvm.h          | 1 +
- 4 files changed, 14 insertions(+)
+ drivers/perf/arm_spe_pmu.c   | 30 ++++++++++++++++++------------
+ include/linux/perf/arm_pmu.h |  7 +++++++
+ 2 files changed, 25 insertions(+), 12 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 994faa24690a..68fada258b80 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7315,3 +7315,12 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
- of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
- the hypercalls whose corresponding bit is in the argument, and return
- ENOSYS for the others.
-+
-+8.35 KVM_CAP_ARM_SPE
-+--------------------
-+
-+:Architectures: arm64
-+
-+This capability indicates that Statistical Profiling Extension (SPE) emulation
-+is available in KVM. SPE emulation is enabled for each VCPU which has the
-+feature bit KVM_ARM_VCPU_SPE set.
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index b3edde68bc3e..9f0a8ea50ea9 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -106,6 +106,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_SPE		7 /* enable SPE for this CPU */
+diff --git a/drivers/perf/arm_spe_pmu.c b/drivers/perf/arm_spe_pmu.c
+index d44bcc29d99c..40749665f102 100644
+--- a/drivers/perf/arm_spe_pmu.c
++++ b/drivers/perf/arm_spe_pmu.c
+@@ -50,7 +50,6 @@ struct arm_spe_pmu_buf {
+ struct arm_spe_pmu {
+ 	struct pmu				pmu;
+ 	struct platform_device			*pdev;
+-	cpumask_t				supported_cpus;
+ 	struct hlist_node			hotplug_node;
  
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index e8a7c0c3a086..22544eb367f3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -304,6 +304,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_VCPU_SUPPORTED_CPUS:
- 		r = 1;
- 		break;
-+	case KVM_CAP_ARM_SPE:
-+		r = 0;
-+		break;
- 	default:
- 		r = 0;
+ 	int					irq; /* PPI */
+@@ -72,6 +71,8 @@ struct arm_spe_pmu {
+ 	struct perf_output_handle __percpu	*handle;
+ };
+ 
++static cpumask_t supported_cpus;
++
+ #define to_spe_pmu(p) (container_of(p, struct arm_spe_pmu, pmu))
+ 
+ /* Convert a free-running index from perf into an SPE buffer offset */
+@@ -234,9 +235,7 @@ static const struct attribute_group arm_spe_pmu_format_group = {
+ static ssize_t cpumask_show(struct device *dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+-	struct arm_spe_pmu *spe_pmu = dev_get_drvdata(dev);
+-
+-	return cpumap_print_to_pagebuf(true, buf, &spe_pmu->supported_cpus);
++	return cpumap_print_to_pagebuf(true, buf, &supported_cpus);
+ }
+ static DEVICE_ATTR_RO(cpumask);
+ 
+@@ -677,7 +676,7 @@ static int arm_spe_pmu_event_init(struct perf_event *event)
+ 		return -ENOENT;
+ 
+ 	if (event->cpu >= 0 &&
+-	    !cpumask_test_cpu(event->cpu, &spe_pmu->supported_cpus))
++	    !cpumask_test_cpu(event->cpu, &supported_cpus))
+ 		return -ENOENT;
+ 
+ 	if (arm_spe_event_to_pmsevfr(event) & arm_spe_pmsevfr_res0(spe_pmu->pmsver))
+@@ -797,11 +796,10 @@ static void arm_spe_pmu_stop(struct perf_event *event, int flags)
+ static int arm_spe_pmu_add(struct perf_event *event, int flags)
+ {
+ 	int ret = 0;
+-	struct arm_spe_pmu *spe_pmu = to_spe_pmu(event->pmu);
+ 	struct hw_perf_event *hwc = &event->hw;
+ 	int cpu = event->cpu == -1 ? smp_processor_id() : event->cpu;
+ 
+-	if (!cpumask_test_cpu(cpu, &spe_pmu->supported_cpus))
++	if (!cpumask_test_cpu(cpu, &supported_cpus))
+ 		return -ENOENT;
+ 
+ 	hwc->state = PERF_HES_UPTODATE | PERF_HES_STOPPED;
+@@ -883,6 +881,13 @@ static void arm_spe_pmu_free_aux(void *aux)
+ 	kfree(buf);
+ }
+ 
++#if IS_BUILTIN(CONFIG_ARM_SPE_PMU)
++const cpumask_t *arm_spe_pmu_supported_cpus(void)
++{
++	return &supported_cpus;
++}
++#endif
++
+ /* Initialisation and teardown functions */
+ static int arm_spe_pmu_perf_init(struct arm_spe_pmu *spe_pmu)
+ {
+@@ -1039,7 +1044,7 @@ static void __arm_spe_pmu_dev_probe(void *info)
+ 
+ 	dev_info(dev,
+ 		 "probed for CPUs %*pbl [max_record_sz %u, align %u, features 0x%llx]\n",
+-		 cpumask_pr_args(&spe_pmu->supported_cpus),
++		 cpumask_pr_args(&supported_cpus),
+ 		 spe_pmu->max_record_sz, spe_pmu->align, spe_pmu->features);
+ 
+ 	spe_pmu->features |= SPE_PMU_FEAT_DEV_PROBED;
+@@ -1083,7 +1088,7 @@ static int arm_spe_pmu_cpu_startup(unsigned int cpu, struct hlist_node *node)
+ 	struct arm_spe_pmu *spe_pmu;
+ 
+ 	spe_pmu = hlist_entry_safe(node, struct arm_spe_pmu, hotplug_node);
+-	if (!cpumask_test_cpu(cpu, &spe_pmu->supported_cpus))
++	if (!cpumask_test_cpu(cpu, &supported_cpus))
+ 		return 0;
+ 
+ 	__arm_spe_pmu_setup_one(spe_pmu);
+@@ -1095,7 +1100,7 @@ static int arm_spe_pmu_cpu_teardown(unsigned int cpu, struct hlist_node *node)
+ 	struct arm_spe_pmu *spe_pmu;
+ 
+ 	spe_pmu = hlist_entry_safe(node, struct arm_spe_pmu, hotplug_node);
+-	if (!cpumask_test_cpu(cpu, &spe_pmu->supported_cpus))
++	if (!cpumask_test_cpu(cpu, &supported_cpus))
+ 		return 0;
+ 
+ 	__arm_spe_pmu_stop_one(spe_pmu);
+@@ -1105,7 +1110,7 @@ static int arm_spe_pmu_cpu_teardown(unsigned int cpu, struct hlist_node *node)
+ static int arm_spe_pmu_dev_init(struct arm_spe_pmu *spe_pmu)
+ {
+ 	int ret;
+-	cpumask_t *mask = &spe_pmu->supported_cpus;
++	cpumask_t *mask = &supported_cpus;
+ 
+ 	/* Make sure we probe the hardware on a relevant CPU */
+ 	ret = smp_call_function_any(mask,  __arm_spe_pmu_dev_probe, spe_pmu, 1);
+@@ -1151,7 +1156,7 @@ static int arm_spe_pmu_irq_probe(struct arm_spe_pmu *spe_pmu)
+ 		return -EINVAL;
  	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index e5acc925c528..930ef91f7916 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1114,6 +1114,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_MTE 205
- #define KVM_CAP_ARM_LOCK_USER_MEMORY_REGION 206
- #define KVM_CAP_ARM_VCPU_SUPPORTED_CPUS 207
-+#define KVM_CAP_ARM_SPE 208
  
- #ifdef KVM_CAP_IRQ_ROUTING
+-	if (irq_get_percpu_devid_partition(irq, &spe_pmu->supported_cpus)) {
++	if (irq_get_percpu_devid_partition(irq, &supported_cpus)) {
+ 		dev_err(&pdev->dev, "failed to get PPI partition (%d)\n", irq);
+ 		return -EINVAL;
+ 	}
+@@ -1216,6 +1221,7 @@ static int arm_spe_pmu_device_probe(struct platform_device *pdev)
+ 	arm_spe_pmu_dev_teardown(spe_pmu);
+ out_free_handle:
+ 	free_percpu(spe_pmu->handle);
++	cpumask_clear(&supported_cpus);
+ 	return ret;
+ }
  
+diff --git a/include/linux/perf/arm_pmu.h b/include/linux/perf/arm_pmu.h
+index 505480217cf1..3121d95c575b 100644
+--- a/include/linux/perf/arm_pmu.h
++++ b/include/linux/perf/arm_pmu.h
+@@ -8,6 +8,7 @@
+ #ifndef __ARM_PMU_H__
+ #define __ARM_PMU_H__
+ 
++#include <linux/cpumask.h>
+ #include <linux/interrupt.h>
+ #include <linux/perf_event.h>
+ #include <linux/platform_device.h>
+@@ -177,4 +178,10 @@ void armpmu_free_irq(int irq, int cpu);
+ 
+ #define ARMV8_SPE_PDEV_NAME "arm,spe-v1"
+ 
++#if IS_BUILTIN(CONFIG_ARM_SPE_PMU)
++extern const cpumask_t *arm_spe_pmu_supported_cpus(void);
++#else
++static inline const cpumask_t *arm_spe_pmu_supported_cpus(void) { return NULL; };
++#endif
++
+ #endif /* __ARM_PMU_H__ */
 -- 
 2.33.0
 
