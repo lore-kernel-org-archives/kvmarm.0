@@ -7,48 +7,49 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20315C432BE
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CCCC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:17:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A448E61163
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:17:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A448E61163
+	by mail.kernel.org (Postfix) with ESMTP id 294D26113A
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:17:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 294D26113A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59A004B236;
-	Wed, 25 Aug 2021 12:17:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1E454B23F;
+	Wed, 25 Aug 2021 12:17:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mXMnp9S7qO1c; Wed, 25 Aug 2021 12:17:27 -0400 (EDT)
+	with ESMTP id zu9GTNgnn5gS; Wed, 25 Aug 2021 12:17:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30B454B25B;
-	Wed, 25 Aug 2021 12:17:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6385E4B265;
+	Wed, 25 Aug 2021 12:17:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D9214B1F5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:17:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3BE14B231
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:17:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k6DseBxCDb80 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Aug 2021 12:17:15 -0400 (EDT)
+ with ESMTP id 6QD-YRj7IY6R for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Aug 2021 12:17:17 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8FD24B213
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:17:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97C554B204
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:17:17 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 66ACE1042;
- Wed, 25 Aug 2021 09:17:15 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06BA11063;
+ Wed, 25 Aug 2021 09:17:17 -0700 (PDT)
 Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B4E303F66F;
- Wed, 25 Aug 2021 09:17:13 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB1C33F66F;
+ Wed, 25 Aug 2021 09:17:15 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  will@kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v4 02/39] KVM: arm64: Add lock/unlock memslot user API
-Date: Wed, 25 Aug 2021 17:17:38 +0100
-Message-Id: <20210825161815.266051-3-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v4 03/39] KVM: arm64: Implement the memslot lock/unlock
+ functionality
+Date: Wed, 25 Aug 2021 17:17:39 +0100
+Message-Id: <20210825161815.266051-4-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20210825161815.266051-1-alexandru.elisei@arm.com>
 References: <20210825161815.266051-1-alexandru.elisei@arm.com>
@@ -69,311 +70,378 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Stage 2 faults triggered by the profiling buffer attempting to write to
-memory are reported by the SPE hardware by asserting a buffer management
-event interrupt. Interrupts are by their nature asynchronous, which means
-that the guest might have changed its stage 1 translation tables since the
-attempted write. SPE reports the guest virtual address that caused the data
-abort, not the IPA, which means that KVM would have to walk the guest's
-stage 1 tables to find the IPA. Using the AT instruction to walk the
-guest's tables in hardware is not an option because it doesn't report the
-IPA in the case of a stage 2 fault on a stage 1 table walk.
+Pin memory in the process address space and map it in the stage 2 tables as
+a result of userspace enabling the KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
+capability; and unpin it from the process address space when the capability
+is used with the KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK flag.
 
-Avoid both issues by pre-mapping the guest memory at stage 2. This is being
-done by adding a capability that allows the user to pin the memory backing
-a memslot. The same capability can be used to unlock a memslot, which
-unpins the pages associated with the memslot, but doesn't unmap the IPA
-range from stage 2; in this case, the addresses will be unmapped from stage
-2 via the MMU notifiers when the process' address space changes.
+The current implementation has two drawbacks which will be fixed in future
+patches:
 
-For now, the capability doesn't actually do anything other than checking
-that the usage is correct; the memory operations will be added in future
-patches.
+- The dcache maintenance is done when the memslot is locked, which means
+  that it is possible that memory changes made by userspace after the ioctl
+  completes won't be visible to a guest running with the MMU off.
+
+- Tag scrubbing is done when the memslot is locked. If the MTE capability
+  is enabled after the ioctl, the guest will be able to access unsanitised
+  pages. This is prevented by forbidding userspace to enable the MTE
+  capability if any memslots are locked.
+
+Only PAGE_SIZE mappings are supported at stage 2.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- Documentation/virt/kvm/api.rst   | 56 +++++++++++++++++++++++
- arch/arm64/include/asm/kvm_mmu.h |  3 ++
- arch/arm64/kvm/arm.c             | 42 ++++++++++++++++--
- arch/arm64/kvm/mmu.c             | 76 ++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h         |  8 ++++
- 5 files changed, 181 insertions(+), 4 deletions(-)
+ Documentation/virt/kvm/api.rst    |   8 +-
+ arch/arm64/include/asm/kvm_host.h |  11 ++
+ arch/arm64/kvm/arm.c              |  22 ++++
+ arch/arm64/kvm/mmu.c              | 211 +++++++++++++++++++++++++++++-
+ 4 files changed, 245 insertions(+), 7 deletions(-)
 
 diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index dae68e68ca23..741327ef06b0 100644
+index 741327ef06b0..5aa251df7077 100644
 --- a/Documentation/virt/kvm/api.rst
 +++ b/Documentation/virt/kvm/api.rst
-@@ -6682,6 +6682,62 @@ MAP_SHARED mmap will result in an -EINVAL return.
- When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
- perform a bulk copy of tags to/from the guest.
+@@ -6717,10 +6717,10 @@ mapped at stage 2. The permissions specified in args[1] apply to both
+ mappings. The memory pinned with this capability counts towards the max
+ locked memory limit for the current process.
  
-+7.29 KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-+----------------------------------------
-+
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: flags is one of KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK or
-+                     KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
-+             args[0] is the slot number
-+             args[1] specifies the permisions when the memslot is locked or if
-+                     all memslots should be unlocked
-+
-+The presence of this capability indicates that KVM supports locking the memory
-+associated with the memslot, and unlocking a previously locked memslot.
-+
-+The 'flags' parameter is defined as follows:
-+
-+7.29.1 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK
-+-------------------------------------------------
-+
-+:Capability: 'flags' parameter to KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: args[0] contains the memory slot number
-+             args[1] contains the permissions for the locked memory:
-+                     KVM_ARM_LOCK_MEMORY_READ (mandatory) to map it with
-+                     read permissions and KVM_ARM_LOCK_MEMORY_WRITE
-+                     (optional) with write permissions
-+:Returns: 0 on success; negative error code on failure
-+
-+Enabling this capability causes the memory described by the memslot to be
-+pinned in the process address space and the corresponding stage 2 IPA range
-+mapped at stage 2. The permissions specified in args[1] apply to both
-+mappings. The memory pinned with this capability counts towards the max
-+locked memory limit for the current process.
-+
-+The capability must be enabled before any VCPUs have run. The virtual memory
-+range described by the memslot must be mapped in the userspace process without
-+any gaps. It is considered an error if write permissions are specified for a
-+memslot which logs dirty pages.
-+
-+7.29.2 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
-+---------------------------------------------------
-+
-+:Capability: 'flags' parameter to KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-+:Architectures: arm64
-+:Target: VM
-+:Parameters: args[0] contains the memory slot number
-+             args[1] optionally contains the flag KVM_ARM_UNLOCK_MEM_ALL,
-+                     which unlocks all previously locked memslots.
-+:Returns: 0 on success; negative error code on failure
-+
-+Enabling this capability causes the memory pinned when locking the memslot
-+specified in args[0] to be unpinned, or, optionally, the memory associated
-+with all locked memslots, to be unpinned. The IPA range is not unmapped
-+from stage 2.
-+
- 8. Other capabilities.
- ======================
+-The capability must be enabled before any VCPUs have run. The virtual memory
+-range described by the memslot must be mapped in the userspace process without
+-any gaps. It is considered an error if write permissions are specified for a
+-memslot which logs dirty pages.
++The capability must be enabled before any VCPUs have run. The entire virtual
++memory range described by the memslot must be mapped by the userspace process.
++It is considered an error if write permissions are specified for a memslot which
++logs dirty pages.
  
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index b52c5c4b9a3d..ef079b5eb475 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -216,6 +216,9 @@ static inline void __invalidate_icache_guest_page(void *va, size_t size)
- void kvm_set_way_flush(struct kvm_vcpu *vcpu);
- void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
+ 7.29.2 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
+ ---------------------------------------------------
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 797083203603..97ff3ed5d4b7 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -98,7 +98,18 @@ struct kvm_s2_mmu {
+ 	struct kvm_arch *arch;
+ };
  
-+int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags);
-+int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags);
++#define KVM_MEMSLOT_LOCK_READ		(1 << 0)
++#define KVM_MEMSLOT_LOCK_WRITE		(1 << 1)
++#define KVM_MEMSLOT_LOCK_MASK		0x3
 +
- static inline unsigned int kvm_get_vmid_bits(void)
- {
- 	int reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
++struct kvm_memory_slot_page {
++	struct list_head list;
++	struct page *page;
++};
++
+ struct kvm_arch_memory_slot {
++	struct kvm_memory_slot_page pages;
++	u32 flags;
+ };
+ 
+ struct kvm_arch {
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ddace63528f1..57ac97b30b3d 100644
+index 57ac97b30b3d..efb3501c6016 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -80,16 +80,43 @@ int kvm_arch_check_processor_compat(void *opaque)
- 	return 0;
+@@ -108,6 +108,25 @@ static int kvm_lock_user_memory_region_ioctl(struct kvm *kvm,
+ 	}
  }
  
-+static int kvm_arm_lock_memslot_supported(void)
++static bool kvm_arm_has_locked_memslots(struct kvm *kvm)
 +{
-+	return 0;
-+}
++	struct kvm_memslots *slots = kvm_memslots(kvm);
++	struct kvm_memory_slot *memslot;
++	bool has_locked_memslots = false;
++	int idx;
 +
-+static int kvm_lock_user_memory_region_ioctl(struct kvm *kvm,
-+					     struct kvm_enable_cap *cap)
-+{
-+	u64 slot, flags;
-+	u32 action;
-+
-+	if (cap->args[2] || cap->args[3])
-+		return -EINVAL;
-+
-+	slot = cap->args[0];
-+	flags = cap->args[1];
-+	action = cap->flags;
-+
-+	switch (action) {
-+	case KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK:
-+		return kvm_mmu_lock_memslot(kvm, slot, flags);
-+	case KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK:
-+		return kvm_mmu_unlock_memslot(kvm, slot, flags);
-+	default:
-+		return -EINVAL;
++	idx = srcu_read_lock(&kvm->srcu);
++	kvm_for_each_memslot(memslot, slots) {
++		if (memslot->arch.flags & KVM_MEMSLOT_LOCK_MASK) {
++			has_locked_memslots = true;
++			break;
++		}
 +	}
++	srcu_read_unlock(&kvm->srcu, idx);
++
++	return has_locked_memslots;
 +}
 +
  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
  			    struct kvm_enable_cap *cap)
  {
- 	int r;
- 
--	if (cap->flags)
--		return -EINVAL;
--
- 	switch (cap->cap) {
- 	case KVM_CAP_ARM_NISV_TO_USER:
-+		if (cap->flags)
-+			return -EINVAL;
- 		r = 0;
- 		kvm->arch.return_nisv_io_abort_to_user = true;
- 		break;
-@@ -99,6 +126,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+@@ -123,6 +142,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 	case KVM_CAP_ARM_MTE:
+ 		if (!system_supports_mte() || kvm->created_vcpus)
+ 			return -EINVAL;
++		if (kvm_arm_lock_memslot_supported() &&
++		    kvm_arm_has_locked_memslots(kvm))
++			return -EPERM;
  		r = 0;
  		kvm->arch.mte_enabled = true;
  		break;
-+	case KVM_CAP_ARM_LOCK_USER_MEMORY_REGION:
-+		if (!kvm_arm_lock_memslot_supported())
-+			return -EINVAL;
-+		r = kvm_lock_user_memory_region_ioctl(kvm, cap);
-+		break;
- 	default:
- 		r = -EINVAL;
- 		break;
-@@ -166,7 +198,6 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- 	return VM_FAULT_SIGBUS;
- }
- 
--
- /**
-  * kvm_arch_destroy_vm - destroy the VM data structure
-  * @kvm:	pointer to the KVM struct
-@@ -274,6 +305,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
- 		r = system_has_full_ptr_auth();
- 		break;
-+	case KVM_CAP_ARM_LOCK_USER_MEMORY_REGION:
-+		r = kvm_arm_lock_memslot_supported();
-+		break;
- 	default:
- 		r = 0;
- 	}
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 0625bf2353c2..689b24cb0f10 100644
+index 689b24cb0f10..59c2bfef2fd1 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1244,6 +1244,82 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+@@ -72,6 +72,11 @@ static bool memslot_is_logging(struct kvm_memory_slot *memslot)
+ 	return memslot->dirty_bitmap && !(memslot->flags & KVM_MEM_READONLY);
+ }
+ 
++static bool memslot_is_locked(struct kvm_memory_slot *memslot)
++{
++	return memslot->arch.flags & KVM_MEMSLOT_LOCK_MASK;
++}
++
+ /**
+  * kvm_flush_remote_tlbs() - flush all VM TLB entries for v7/8
+  * @kvm:	pointer to kvm structure.
+@@ -722,6 +727,10 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
+ 	if (map_size == PAGE_SIZE)
+ 		return true;
+ 
++	/* Allow only PAGE_SIZE mappings for locked memslots */
++	if (memslot_is_locked(memslot))
++		return false;
++
+ 	size = memslot->npages * PAGE_SIZE;
+ 
+ 	gpa_start = memslot->base_gfn << PAGE_SHIFT;
+@@ -1244,6 +1253,159 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
  	return ret;
  }
  
-+int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags)
++static int try_rlimit_memlock(unsigned long npages)
 +{
-+	struct kvm_memory_slot *memslot;
-+	struct kvm_vcpu *vcpu;
-+	int i, ret;
++	unsigned long lock_limit;
++	bool has_lock_cap;
++	int ret = 0;
 +
-+	if (slot >= KVM_MEM_SLOTS_NUM)
-+		return -EINVAL;
-+
-+	if (!(flags & KVM_ARM_LOCK_MEM_READ))
-+		return -EINVAL;
-+
-+	mutex_lock(&kvm->lock);
-+
-+	if (!kvm_lock_all_vcpus(kvm)) {
-+		ret = -EBUSY;
++	has_lock_cap = capable(CAP_IPC_LOCK);
++	if (has_lock_cap)
 +		goto out;
++
++	lock_limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
++
++	mmap_read_lock(current->mm);
++	if (npages + current->mm->locked_vm > lock_limit)
++		ret = -ENOMEM;
++	mmap_read_unlock(current->mm);
++
++out:
++	return ret;
++}
++
++static void unpin_memslot_pages(struct kvm_memory_slot *memslot, bool writable)
++{
++	struct kvm_memory_slot_page *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &memslot->arch.pages.list, list) {
++		if (writable)
++			set_page_dirty_lock(entry->page);
++		unpin_user_page(entry->page);
++		kfree(entry);
++	}
++}
++
++static int lock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot,
++			u64 flags)
++{
++	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
++	struct kvm_memory_slot_page *page_entry;
++	bool writable = flags & KVM_ARM_LOCK_MEM_WRITE;
++	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
++	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
++	struct vm_area_struct *vma;
++	unsigned long npages = memslot->npages;
++	unsigned int pin_flags = FOLL_LONGTERM;
++	unsigned long i, hva, ipa, mmu_seq;
++	int ret;
++
++	ret = try_rlimit_memlock(npages);
++	if (ret)
++		return -ENOMEM;
++
++	INIT_LIST_HEAD(&memslot->arch.pages.list);
++
++	if (writable) {
++		prot |= KVM_PGTABLE_PROT_W;
++		pin_flags |= FOLL_WRITE;
 +	}
 +
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (vcpu->arch.has_run_once) {
-+			ret = -EBUSY;
-+			goto out_unlock_vcpus;
++	hva = memslot->userspace_addr;
++	ipa = memslot->base_gfn << PAGE_SHIFT;
++
++	mmu_seq = kvm->mmu_notifier_seq;
++	smp_rmb();
++
++	for (i = 0; i < npages; i++) {
++		page_entry = kzalloc(sizeof(*page_entry), GFP_KERNEL);
++		if (!page_entry) {
++			unpin_memslot_pages(memslot, writable);
++			ret = -ENOMEM;
++			goto out_err;
++		}
++
++		mmap_read_lock(current->mm);
++		ret = pin_user_pages(hva, 1, pin_flags, &page_entry->page, &vma);
++		if (ret != 1) {
++			mmap_read_unlock(current->mm);
++			unpin_memslot_pages(memslot, writable);
++			ret = -ENOMEM;
++			goto out_err;
++		}
++		if (kvm_has_mte(kvm)) {
++			if (vma->vm_flags & VM_SHARED) {
++				ret = -EFAULT;
++			} else {
++				ret = sanitise_mte_tags(kvm,
++					page_to_pfn(page_entry->page),
++					PAGE_SIZE);
++			}
++			if (ret) {
++				mmap_read_unlock(current->mm);
++				goto out_err;
++			}
++		}
++		mmap_read_unlock(current->mm);
++
++		ret = kvm_mmu_topup_memory_cache(&cache, kvm_mmu_cache_min_pages(kvm));
++		if (ret) {
++			unpin_memslot_pages(memslot, writable);
++			goto out_err;
++		}
++
++		spin_lock(&kvm->mmu_lock);
++		if (mmu_notifier_retry(kvm, mmu_seq)) {
++			spin_unlock(&kvm->mmu_lock);
++			unpin_memslot_pages(memslot, writable);
++			ret = -EAGAIN;
++			goto out_err;
++		}
++
++		ret = kvm_pgtable_stage2_map(pgt, ipa, PAGE_SIZE,
++					     page_to_phys(page_entry->page),
++					     prot, &cache);
++		spin_unlock(&kvm->mmu_lock);
++
++		if (ret) {
++			kvm_pgtable_stage2_unmap(pgt, memslot->base_gfn << PAGE_SHIFT,
++						 i << PAGE_SHIFT);
++			unpin_memslot_pages(memslot, writable);
++			goto out_err;
++		}
++		list_add(&page_entry->list, &memslot->arch.pages.list);
++
++		hva += PAGE_SIZE;
++		ipa += PAGE_SIZE;
++	}
++
++
++	/*
++	 * Even though we've checked the limit at the start, we can still exceed
++	 * it if userspace locked other pages in the meantime or if the
++	 * CAP_IPC_LOCK capability has been revoked.
++	 */
++	ret = account_locked_vm(current->mm, npages, true);
++	if (ret) {
++		kvm_pgtable_stage2_unmap(pgt, memslot->base_gfn << PAGE_SHIFT,
++					 npages << PAGE_SHIFT);
++		unpin_memslot_pages(memslot, writable);
++		goto out_err;
++	}
++
++	memslot->arch.flags = KVM_MEMSLOT_LOCK_READ;
++	if (writable)
++		memslot->arch.flags |= KVM_MEMSLOT_LOCK_WRITE;
++
++	kvm_mmu_free_memory_cache(&cache);
++
++	return 0;
++
++out_err:
++	kvm_mmu_free_memory_cache(&cache);
++	return ret;
++}
++
+ int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags)
+ {
+ 	struct kvm_memory_slot *memslot;
+@@ -1283,7 +1445,12 @@ int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags)
+ 		goto out_unlock_slots;
+ 	}
+ 
+-	ret = -EINVAL;
++	if (memslot_is_locked(memslot)) {
++		ret = -EBUSY;
++		goto out_unlock_slots;
++	}
++
++	ret = lock_memslot(kvm, memslot, flags);
+ 
+ out_unlock_slots:
+ 	mutex_unlock(&kvm->slots_lock);
+@@ -1294,13 +1461,51 @@ int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags)
+ 	return ret;
+ }
+ 
++static int unlock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot)
++{
++	bool writable = memslot->arch.flags & KVM_MEMSLOT_LOCK_WRITE;
++	unsigned long npages = memslot->npages;
++
++	unpin_memslot_pages(memslot, writable);
++	account_locked_vm(current->mm, npages, false);
++
++	memslot->arch.flags &= ~KVM_MEMSLOT_LOCK_MASK;
++
++	return 0;
++}
++
++static int unlock_all_memslots(struct kvm *kvm)
++{
++	struct kvm_memory_slot *memslot;
++	int err, ret;
++
++	mutex_lock(&kvm->slots_lock);
++
++	ret = 0;
++	kvm_for_each_memslot(memslot, kvm_memslots(kvm)) {
++		if (!memslot_is_locked(memslot))
++			continue;
++		err = unlock_memslot(kvm, memslot);
++		if (err) {
++			kvm_err("error unlocking memslot %u: %d\n",
++				memslot->id, err);
++			/* Continue to try unlocking the rest of the slots */
++			ret = err;
 +		}
 +	}
 +
-+	mutex_lock(&kvm->slots_lock);
-+
-+	memslot = id_to_memslot(kvm_memslots(kvm), slot);
-+	if (!memslot) {
-+		ret = -EINVAL;
-+		goto out_unlock_slots;
-+	}
-+	if ((flags & KVM_ARM_LOCK_MEM_WRITE) &&
-+	    ((memslot->flags & KVM_MEM_READONLY) || memslot->dirty_bitmap)) {
-+		ret = -EPERM;
-+		goto out_unlock_slots;
-+	}
-+
-+	ret = -EINVAL;
-+
-+out_unlock_slots:
 +	mutex_unlock(&kvm->slots_lock);
-+out_unlock_vcpus:
-+	kvm_unlock_all_vcpus(kvm);
-+out:
-+	mutex_unlock(&kvm->lock);
++
 +	return ret;
 +}
 +
-+int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags)
-+{
-+	struct kvm_memory_slot *memslot;
-+	int ret;
-+
-+	if (flags & KVM_ARM_UNLOCK_MEM_ALL)
-+		return -EINVAL;
-+
-+	if (slot >= KVM_MEM_SLOTS_NUM)
-+		return -EINVAL;
-+
-+	mutex_lock(&kvm->slots_lock);
-+
-+	memslot = id_to_memslot(kvm_memslots(kvm), slot);
-+	if (!memslot) {
-+		ret = -EINVAL;
-+		goto out_unlock_slots;
-+	}
-+
-+	ret = -EINVAL;
-+
-+out_unlock_slots:
-+	mutex_unlock(&kvm->slots_lock);
-+	return ret;
-+}
-+
- bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags)
  {
- 	if (!kvm->arch.mmu.pgt)
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index d9e4aabcb31a..bcf62c7bdd2d 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1112,6 +1112,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_BINARY_STATS_FD 203
- #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
- #define KVM_CAP_ARM_MTE 205
-+#define KVM_CAP_ARM_LOCK_USER_MEMORY_REGION 206
+ 	struct kvm_memory_slot *memslot;
+ 	int ret;
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ 	if (flags & KVM_ARM_UNLOCK_MEM_ALL)
+-		return -EINVAL;
++		return unlock_all_memslots(kvm);
  
-@@ -1459,6 +1460,13 @@ struct kvm_s390_ucas_mapping {
- #define KVM_PPC_SVM_OFF		  _IO(KVMIO,  0xb3)
- #define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
+ 	if (slot >= KVM_MEM_SLOTS_NUM)
+ 		return -EINVAL;
+@@ -1313,7 +1518,7 @@ int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags)
+ 		goto out_unlock_slots;
+ 	}
  
-+/* Used by KVM_CAP_ARM_LOCK_USER_MEMORY_REGION */
-+#define KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK	(1 << 0)
-+#define   KVM_ARM_LOCK_MEM_READ				(1 << 0)
-+#define   KVM_ARM_LOCK_MEM_WRITE			(1 << 1)
-+#define KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK	(1 << 1)
-+#define   KVM_ARM_UNLOCK_MEM_ALL			(1 << 0)
-+
- /* ioctl for vm fd */
- #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+-	ret = -EINVAL;
++	ret = unlock_memslot(kvm, memslot);
  
+ out_unlock_slots:
+ 	mutex_unlock(&kvm->slots_lock);
 -- 
 2.33.0
 
