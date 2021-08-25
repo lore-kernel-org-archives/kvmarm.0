@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFBB2C4338F
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87578C4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:19:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A2ACF61153
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:19:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A2ACF61153
+	by mail.kernel.org (Postfix) with ESMTP id 2D7686115A
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 16:19:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2D7686115A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 547634B1AC;
-	Wed, 25 Aug 2021 12:19:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D656F4B265;
+	Wed, 25 Aug 2021 12:19:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6elP5kZLNFsi; Wed, 25 Aug 2021 12:19:46 -0400 (EDT)
+	with ESMTP id ytju64LTU790; Wed, 25 Aug 2021 12:19:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B72034B291;
-	Wed, 25 Aug 2021 12:18:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB8DE4B2E6;
+	Wed, 25 Aug 2021 12:18:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4509B4B276
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:18:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C9654B264
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:18:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wISE49jEb4VV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Aug 2021 12:18:48 -0400 (EDT)
+ with ESMTP id lZwmda4kJW8r for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Aug 2021 12:18:53 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61B364B264
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:18:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8D9A4B25A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 12:18:05 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1666F143D;
- Wed, 25 Aug 2021 09:18:04 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A85F11474;
+ Wed, 25 Aug 2021 09:18:05 -0700 (PDT)
 Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA8D13F66F;
- Wed, 25 Aug 2021 09:18:02 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5985A3F66F;
+ Wed, 25 Aug 2021 09:18:04 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  will@kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v4 32/39] KVM: arm64: Save/restore PMSNEVFR_EL1 on VCPU
- put/load
-Date: Wed, 25 Aug 2021 17:18:08 +0100
-Message-Id: <20210825161815.266051-33-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v4 33/39] KVM: arm64: Allow guest to use physical
+ timestamps if perfmon_capable()
+Date: Wed, 25 Aug 2021 17:18:09 +0100
+Message-Id: <20210825161815.266051-34-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20210825161815.266051-1-alexandru.elisei@arm.com>
 References: <20210825161815.266051-1-alexandru.elisei@arm.com>
@@ -70,141 +70,120 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-FEAT_SPEv1p2 introduced a new register, PMSNEVFR_EL1. The SPE driver is not
-using the register, so save the register to the guest context on vcpu_put()
-and restore it on vcpu_load() since it will not be touched by the host, and
-the value programmed by the guest doesn't affect the host.
+The SPE driver allows userspace to use physical timestamps for records only
+if the process if perfmon_capable(). Do the same for a virtual machine with
+the SPE feature.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/include/asm/kvm_spe.h  |  6 ++++++
- arch/arm64/include/asm/sysreg.h   |  1 +
- arch/arm64/kvm/arm.c              |  2 ++
- arch/arm64/kvm/spe.c              | 29 +++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c         |  1 +
- 6 files changed, 40 insertions(+)
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/include/asm/kvm_spe.h  |  7 +++++++
+ arch/arm64/kvm/hyp/nvhe/spe-sr.c  |  2 +-
+ arch/arm64/kvm/hyp/vhe/spe-sr.c   |  2 +-
+ arch/arm64/kvm/spe.c              | 14 ++++++++++++++
+ 5 files changed, 25 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e704847a7645..66f0b999cb5f 100644
+index 66f0b999cb5f..cc46f1406196 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -239,6 +239,7 @@ enum vcpu_sysreg {
+@@ -157,6 +157,8 @@ struct kvm_arch {
  
-        /* Statistical Profiling Extension Registers. */
- 	PMSCR_EL1,      /* Statistical Profiling Control Register */
-+	PMSNEVFR_EL1,   /* Sampling Inverted Event Filter Register */
- 	PMSICR_EL1,     /* Sampling Interval Counter Register */
- 	PMSIRR_EL1,     /* Sampling Interval Reload Register */
- 	PMSFCR_EL1,     /* Sampling Filter Control Register */
+ 	/* Memory Tagging Extension enabled for the guest */
+ 	bool mte_enabled;
++
++	struct kvm_spe spe;
+ };
+ 
+ struct kvm_vcpu_fault_info {
 diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
-index 934eedb0de46..6b8d4cf2cd37 100644
+index 6b8d4cf2cd37..272f1eec64f2 100644
 --- a/arch/arm64/include/asm/kvm_spe.h
 +++ b/arch/arm64/include/asm/kvm_spe.h
-@@ -28,6 +28,9 @@ int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu);
- void kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val);
- u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg);
+@@ -21,6 +21,10 @@ struct kvm_vcpu_spe {
+ 	int irq_num;		/* Buffer management interrut number */
+ };
  
-+void kvm_spe_vcpu_load(struct kvm_vcpu *vcpu);
-+void kvm_spe_vcpu_put(struct kvm_vcpu *vcpu);
++struct kvm_spe {
++	bool perfmon_capable;	/* Is the VM perfmon_capable()? */
++};
 +
- int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
- int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
-@@ -45,6 +48,9 @@ static inline int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu) { return -E
- static inline void kvm_spe_write_sysreg(struct kvm_vcpu *vcpu, int reg, u64 val) {}
- static inline u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg) { return 0; }
+ void kvm_spe_init_supported_cpus(void);
+ void kvm_spe_vm_init(struct kvm *kvm);
+ int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu);
+@@ -41,6 +45,9 @@ int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ struct kvm_vcpu_spe {
+ };
  
-+static inline void kvm_spe_vcpu_load(struct kvm_vcpu *vcpu) {}
-+static inline void kvm_spe_vcpu_put(struct kvm_vcpu *vcpu) {}
++struct kvm_spe {
++};
 +
- static inline int kvm_spe_set_attr(struct kvm_vcpu *vcpu,
- 				   struct kvm_device_attr *attr)
- {
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index b2d691bc1049..cedab4494a71 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -921,6 +921,7 @@
+ static inline void kvm_spe_init_supported_cpus(void) {}
+ static inline void kvm_spe_vm_init(struct kvm *kvm) {}
+ static inline int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu) { return -ENOEXEC; }
+diff --git a/arch/arm64/kvm/hyp/nvhe/spe-sr.c b/arch/arm64/kvm/hyp/nvhe/spe-sr.c
+index 46e47c9fd08f..4f6579daddb5 100644
+--- a/arch/arm64/kvm/hyp/nvhe/spe-sr.c
++++ b/arch/arm64/kvm/hyp/nvhe/spe-sr.c
+@@ -83,5 +83,5 @@ void __spe_restore_guest_state_nvhe(struct kvm_vcpu *vcpu,
+ 	write_sysreg_s(ctxt_sys_reg(guest_ctxt, PMBSR_EL1), SYS_PMBSR_EL1);
+ 	write_sysreg_s(ctxt_sys_reg(guest_ctxt, PMBLIMITR_EL1), SYS_PMBLIMITR_EL1);
+ 	write_sysreg_s(ctxt_sys_reg(guest_ctxt, PMSCR_EL1), SYS_PMSCR_EL1);
+-	write_sysreg_el2(0, SYS_PMSCR);
++	write_sysreg_el2(ctxt_sys_reg(guest_ctxt, PMSCR_EL2), SYS_PMSCR);
+ }
+diff --git a/arch/arm64/kvm/hyp/vhe/spe-sr.c b/arch/arm64/kvm/hyp/vhe/spe-sr.c
+index 00eab9e2ec60..f557ac64a1cc 100644
+--- a/arch/arm64/kvm/hyp/vhe/spe-sr.c
++++ b/arch/arm64/kvm/hyp/vhe/spe-sr.c
+@@ -21,7 +21,7 @@ void __spe_save_host_state_vhe(struct kvm_vcpu *vcpu,
  
- #define ID_AA64DFR0_PMSVER_8_2		0x1
- #define ID_AA64DFR0_PMSVER_8_3		0x2
-+#define ID_AA64DFR0_PMSVER_8_7		0x3
+ 	/* Disable profiling while the SPE context is being switched. */
+ 	pmscr_el2 = read_sysreg_el2(SYS_PMSCR);
+-	write_sysreg_el2(0, SYS_PMSCR);
++	write_sysreg_el2(__vcpu_sys_reg(vcpu, PMSCR_EL2), SYS_PMSCR);
+ 	isb();
  
- #define ID_DFR0_PERFMON_SHIFT		24
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 6af7ef26d2c1..cd64894b286e 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -466,6 +466,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (vcpu_has_ptrauth(vcpu))
- 		vcpu_ptrauth_disable(vcpu);
- 	kvm_arch_vcpu_load_debug_state_flags(vcpu);
-+	kvm_spe_vcpu_load(vcpu);
- 
- 	if (!cpumask_empty(&vcpu->arch.supported_cpus) &&
- 	    !cpumask_test_cpu(smp_processor_id(), &vcpu->arch.supported_cpus))
-@@ -474,6 +475,7 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
-+	kvm_spe_vcpu_put(vcpu);
- 	kvm_arch_vcpu_put_debug_state_flags(vcpu);
- 	kvm_arch_vcpu_put_fp(vcpu);
- 	if (has_vhe())
+ 	pmblimitr = read_sysreg_s(SYS_PMBLIMITR_EL1);
 diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-index f760ccd8306a..711736c49f63 100644
+index 711736c49f63..054bb16bbd79 100644
 --- a/arch/arm64/kvm/spe.c
 +++ b/arch/arm64/kvm/spe.c
-@@ -67,6 +67,35 @@ u64 kvm_spe_read_sysreg(struct kvm_vcpu *vcpu, int reg)
- 	return __vcpu_sys_reg(vcpu, reg);
+@@ -3,6 +3,7 @@
+  * Copyright (C) 2021 - ARM Ltd
+  */
+ 
++#include <linux/capability.h>
+ #include <linux/cpumask.h>
+ #include <linux/kvm_host.h>
+ #include <linux/perf/arm_pmu.h>
+@@ -29,6 +30,16 @@ void kvm_spe_vm_init(struct kvm *kvm)
+ {
+ 	/* Set supported_cpus if it isn't already initialized. */
+ 	kvm_spe_init_supported_cpus();
++
++	/*
++	 * Allow the guest to use the physical timer for timestamps only if the
++	 * VMM is perfmon_capable(), similar to what the SPE driver allows.
++	 *
++	 * CAP_PERFMON can be changed during the lifetime of the VM, so record
++	 * its value when the VM is created to avoid situations where only some
++	 * VCPUs allow physical timer timestamps, while others don't.
++	 */
++	kvm->arch.spe.perfmon_capable = perfmon_capable();
  }
  
-+static unsigned int kvm_spe_get_pmsver(void)
-+{
-+	u64 dfr0 = read_sysreg(id_aa64dfr0_el1);
-+
-+	return cpuid_feature_extract_unsigned_field(dfr0, ID_AA64DFR0_PMSVER_SHIFT);
-+}
-+
-+void kvm_spe_vcpu_load(struct kvm_vcpu *vcpu)
-+{
-+	if (!kvm_vcpu_has_spe(vcpu))
-+		return;
-+
-+	if (kvm_spe_get_pmsver() < ID_AA64DFR0_PMSVER_8_7)
-+		return;
-+
-+	write_sysreg_s(__vcpu_sys_reg(vcpu, PMSNEVFR_EL1), SYS_PMSNEVFR_EL1);
-+}
-+
-+void kvm_spe_vcpu_put(struct kvm_vcpu *vcpu)
-+{
-+	if (!kvm_vcpu_has_spe(vcpu))
-+		return;
-+
-+	if (kvm_spe_get_pmsver() < ID_AA64DFR0_PMSVER_8_7)
-+		return;
-+
-+	__vcpu_sys_reg(vcpu, PMSNEVFR_EL1) = read_sysreg_s(SYS_PMSNEVFR_EL1);
-+}
-+
- static bool kvm_vcpu_supports_spe(struct kvm_vcpu *vcpu)
- {
- 	if (!kvm_supports_spe())
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 843822be5695..064742cee425 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1562,6 +1562,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
+ static int kvm_spe_check_supported_cpus(struct kvm_vcpu *vcpu)
+@@ -54,6 +65,9 @@ int kvm_spe_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 	if (!vcpu->arch.spe.initialized)
+ 		return -EPERM;
  
- 	{ SPE_SYS_REG(SYS_PMSCR_EL1), .reg = PMSCR_EL1 },
-+	{ SPE_SYS_REG(SYS_PMSNEVFR_EL1), .reg = PMSNEVFR_EL1 },
- 	{ SPE_SYS_REG(SYS_PMSICR_EL1), .reg = PMSICR_EL1 },
- 	{ SPE_SYS_REG(SYS_PMSIRR_EL1), .reg = PMSIRR_EL1 },
- 	{ SPE_SYS_REG(SYS_PMSFCR_EL1), .reg = PMSFCR_EL1 },
++	if (vcpu->kvm->arch.spe.perfmon_capable)
++		__vcpu_sys_reg(vcpu, PMSCR_EL2) = BIT(SYS_PMSCR_EL1_PCT_SHIFT);
++
+ 	return 0;
+ }
+ 
 -- 
 2.33.0
 
