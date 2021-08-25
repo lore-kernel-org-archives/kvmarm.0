@@ -2,90 +2,73 @@ Return-Path: <SRS0=u4Cy=NQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F16C432BE
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 10:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6DBC4338F
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 10:39:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E014D61212
-	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 10:20:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E014D61212
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id D8A8860C3E
+	for <kvmarm@archiver.kernel.org>; Wed, 25 Aug 2021 10:39:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D8A8860C3E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 92C9F4B1E7;
-	Wed, 25 Aug 2021 06:20:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71A754B20D;
+	Wed, 25 Aug 2021 06:39:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0yP6GjdnyrxL; Wed, 25 Aug 2021 06:20:14 -0400 (EDT)
+	with ESMTP id pEs1L+WdTWNC; Wed, 25 Aug 2021 06:39:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7064F4B28C;
-	Wed, 25 Aug 2021 06:20:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F9A74B161;
+	Wed, 25 Aug 2021 06:39:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C3444B277
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 22:51:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EFF44B12F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 06:39:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i7dKKoSxn7pV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Aug 2021 22:51:04 -0400 (EDT)
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com
- [209.85.210.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 436E74B210
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 22:51:04 -0400 (EDT)
-Received: by mail-pf1-f175.google.com with SMTP id y11so20044781pfl.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Aug 2021 19:51:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=rKfFXl/BbyfwmX4rHQZ3Hn9r2Vj8gM4pm+E9o5QNLKs=;
- b=oaGWPYaI37IRjoaH+TWQNDm536ZSBnteIXFbFsJIRWONl2RyxSjvpCkJJrafPE3qwl
- pl0f54VAY8Mz5RYN+8THqTSTxc21EI+8plqLain6+3Q9Gou8B6mXg0c3sjVuLkmW7d8T
- ZU62l23yObbhBMHnhzBMg2wEecMY0BP6dWXHI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=rKfFXl/BbyfwmX4rHQZ3Hn9r2Vj8gM4pm+E9o5QNLKs=;
- b=QHH2eYyJ9imEM0sze8eV+RN0Nj3DOesLyiUEY9Bn8o136nJS26zs/85+ZPYzJA5xRc
- PrPVSL6wNSprWcNmpqNj+77UbyOxENfO3wJhZJUZMhGsiV6iztHjlXZBGF1NgIo4a35Q
- F2LEcAcq88v/nQDNw3DTbzZ4W6H5RXPeKSXgwMP2XFCB7Pjd4oma7b9aoTkz+eEcMW6p
- ZmxkoFEzkip7XNMzDd6fvgpDuaLRB4q3Il7mxwFgLY7XTL/vJWP9hXKY2vMRBcI91Yvf
- psqrNrqThPlhb2QC5KEGgp/y6O38/83kIh0/BVneQYfJYWio1/DaTTjnlJinRt8XxkKQ
- 5wkQ==
-X-Gm-Message-State: AOAM532YvpepuLeYYKifHm2h4QZ2OuvTnUZ+mFX+/ukLjC9NQb/8kbrA
- 3JdeUUsI7bYKNtowKtwSciBing==
-X-Google-Smtp-Source: ABdhPJwBwxXyy2P4z2kutpUEa/D8L7EFlg94RCzvp0UEeNsPtaucsoMQia1pwsRo6utZst0JN8IfvA==
-X-Received: by 2002:a62:e914:0:b029:3dd:a1d0:be57 with SMTP id
- j20-20020a62e9140000b02903dda1d0be57mr42699866pfh.11.1629859863420; 
- Tue, 24 Aug 2021 19:51:03 -0700 (PDT)
-Received: from localhost ([2401:fa00:8f:203:d273:c78c:fce8:a0e2])
- by smtp.gmail.com with UTF8SMTPSA id nl9sm3856717pjb.33.2021.08.24.19.51.00
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 24 Aug 2021 19:51:03 -0700 (PDT)
-From: David Stevens <stevensd@chromium.org>
-X-Google-Original-From: David Stevens <stevensd@google.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v3 4/4] KVM: mmu: remove over-aggressive warnings
-Date: Wed, 25 Aug 2021 11:50:09 +0900
-Message-Id: <20210825025009.2081060-5-stevensd@google.com>
-X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
-In-Reply-To: <20210825025009.2081060-1-stevensd@google.com>
-References: <20210825025009.2081060-1-stevensd@google.com>
-MIME-Version: 1.0
-X-Mailman-Approved-At: Wed, 25 Aug 2021 06:20:00 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
- David Stevens <stevensd@chromium.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+ with ESMTP id jzumUvVth8Ou for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Aug 2021 06:39:39 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ED1BC4B114
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Aug 2021 06:39:38 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2558F60C3E;
+ Wed, 25 Aug 2021 10:39:37 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mIqJj-0077a0-1S; Wed, 25 Aug 2021 11:39:35 +0100
+Date: Wed, 25 Aug 2021 11:39:34 +0100
+Message-ID: <87fsuxq049.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
+ <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
+ pshier@google.com, ricarkol@google.com, rananta@google.com, reijiw@google.com,
+ jingzhangos@google.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, drjones@redhat.com,
+ peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,51 +85,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: David Stevens <stevensd@chromium.org>
+On Wed, 25 Aug 2021 11:02:28 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> On Wed, Aug 25, 2021 at 2:27 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > Exposing new hypercalls to guests in this manner seems very unsafe to
+> > > me. Suppose an operator is trying to upgrade from kernel N to kernel
+> > > N+1, which brings in the new 'widget' hypercall. Guests are live
+> > > migrated onto the N+1 kernel, but the operator finds a defect that
+> > > warrants a kernel rollback. VMs are then migrated from kernel N+1 -> N.
+> > > Any guests that discovered the 'widget' hypercall are likely going to
+> > > get fussy _very_ quickly on the old kernel.
+> >
+> > This goes against what we decided to support for the *only* publicly
+> > available VMM that cares about save/restore, which is that we only
+> > move forward and don't rollback.
+> 
+> Ah, I was definitely missing this context. Current behavior makes much
+> more sense then.
+> 
+> > Hypercalls are the least of your
+> > worries, and there is a whole range of other architectural features
+> > that will have also appeared/disappeared (your own CNTPOFF series is a
+> > glaring example of this).
+> 
+> Isn't that a tad bit different though? I'll admit, I'm just as guilty
+> with my own series forgetting to add a KVM_CAP (oops), but it is in my
+> queue to kick out with the fix for nVHE/ptimer. Nonetheless, if a user
+> takes up a new KVM UAPI, it is up to the user to run on a new kernel.
 
-Remove two warnings that require ref counts for pages to be non-zero, as
-mapped pfns from follow_pfn may not have an initialized ref count.
+The two are linked. Exposing a new register to userspace and/or guest
+result in the same thing: you can't rollback. That's specially true in
+the QEMU case, which *learns* from the kernel what registers are
+available, and doesn't maintain a fixed list.
 
-Signed-off-by: David Stevens <stevensd@chromium.org>
----
- arch/x86/kvm/mmu/mmu.c | 7 -------
- virt/kvm/kvm_main.c    | 2 +-
- 2 files changed, 1 insertion(+), 8 deletions(-)
+> My concerns are explicitly with the 'under the nose' changes, where
+> KVM modifies the guest feature set without userspace opting in. Based
+> on your comment, though, it would appear that other parts of KVM are
+> affected too.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d2b99c2f7dfa..88ceded7f022 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -623,13 +623,6 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
- 
- 	pfn = spte_to_pfn(old_spte);
- 
--	/*
--	 * KVM does not hold the refcount of the page used by
--	 * kvm mmu, before reclaiming the page, we should
--	 * unmap it from mmu first.
--	 */
--	WARN_ON(!kvm_is_reserved_pfn(pfn) && !page_count(pfn_to_page(pfn)));
--
- 	if (is_accessed_spte(old_spte))
- 		kvm_set_pfn_accessed(pfn);
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 5c47ea93df23..e5ddf238ec64 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -168,7 +168,7 @@ bool kvm_is_zone_device_pfn(kvm_pfn_t pfn)
- 	 * the device has been pinned, e.g. by get_user_pages().  WARN if the
- 	 * page_count() is zero to help detect bad usage of this helper.
- 	 */
--	if (!pfn_valid(pfn) || WARN_ON_ONCE(!page_count(pfn_to_page(pfn))))
-+	if (!pfn_valid(pfn) || !page_count(pfn_to_page(pfn)))
- 		return false;
- 
- 	return is_zone_device_page(pfn_to_page(pfn));
+Any new system register that is exposed by a new kernel feature breaks
+rollback. And so far, we only consider it a bug if the set of exposed
+registers reduces. Anything can be added safely (as checked by one of
+the selftests added by Drew).
+
+< It doesn't have to be rollback safety, either. There may
+> simply be a hypercall which an operator doesn't want to give its
+> guests, and it needs a way to tell KVM to hide it.
+
+Fair enough. But this has to be done in a scalable way, which
+individual capability cannot provide.
+
+> > > Have I missed something blatantly obvious, or do others see this as an
+> > > issue as well? I'll reply with an example of adding opt-out for PTP.
+> > > I'm sure other hypercalls could be handled similarly.
+> >
+> > Why do we need this? For future hypercalls, we could have some buy-in
+> > capabilities. For existing ones, it is too late, and negative features
+> > are just too horrible.
+> 
+> Oh, agreed on the nastiness. Lazy hack to realize the intended
+> functional change..
+
+Well, you definitely achieved your goal of attracting my attention :).
+
+> > For KVM-specific hypercalls, we could get the VMM to save/restore the
+> > bitmap of supported functions. That would be "less horrible". This
+> > could be implemented using extra "firmware pseudo-registers" such as
+> > the ones described in Documentation/virt/kvm/arm/psci.rst.
+> 
+> This seems more reasonable, especially since we do this for migrating
+> the guest's PSCI version.
+> 
+> Alternatively, I had thought about using a VM attribute, given the
+> fact that it is non-architectural information and we avoid ABI issues
+> in KVM_GET_REG_LIST without buy-in through a KVM_CAP.
+
+The whole point is that these settings get exposed by
+KVM_GET_REG_LIST, as this is QEMU's way to dump a VM state. Given that
+we already have this for things like the spectre management state, we
+can just as well expose the bitmaps that deal with the KVM-specific
+hypercalls. After all, this falls into the realm of "KVM as VM
+firmware".
+
+For ARM-architected hypercalls (TRNG, stolen time), we may need a
+similar extension.
+
+	M.
+
 -- 
-2.33.0.rc2.250.ged5fa647cd-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
