@@ -2,101 +2,89 @@ Return-Path: <SRS0=T8IC=NR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B70C432BE
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 21:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8518CC432BE
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 21:54:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4A9A36103E
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 21:09:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4A9A36103E
+	by mail.kernel.org (Postfix) with ESMTP id F3CA860FD8
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 21:54:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F3CA860FD8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAFAA4B0CB;
-	Thu, 26 Aug 2021 17:09:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DB3C4B0E9;
+	Thu, 26 Aug 2021 17:54:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ObLpjnhULhWN; Thu, 26 Aug 2021 17:09:42 -0400 (EDT)
+	with ESMTP id RmP4MfPoAasL; Thu, 26 Aug 2021 17:54:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C59994B0E3;
-	Thu, 26 Aug 2021 17:09:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BCF64B0FE;
+	Thu, 26 Aug 2021 17:54:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0744B0CD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 15:59:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 153DF4B0F9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 17:54:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QqwtsP2QR4lO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Aug 2021 15:59:18 -0400 (EDT)
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com
- [209.85.215.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7DB954B0CC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 15:59:18 -0400 (EDT)
-Received: by mail-pg1-f180.google.com with SMTP id k24so3957450pgh.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 12:59:18 -0700 (PDT)
+ with ESMTP id eosXZwBdNFS1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Aug 2021 17:54:23 -0400 (EDT)
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com
+ [209.85.210.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 561934B0E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 17:54:23 -0400 (EDT)
+Received: by mail-pf1-f180.google.com with SMTP id 2so3887403pfo.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 14:54:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=Xc1szHQOZDqB0AYr925levUtn3vNJA/QIKkPEhre7Pk=;
- b=rAH1RZhEJy3MVfBUURq1C3iW4ra2alS9qAREXLkrJFEHcf7iDXDJip4aX5r35skET+
- jo8PoQ7D1SWj6xQfgikhRkl1CH3MaymS1zddz++K76rpR+himQM4eRquOL09b9DEA3zi
- k1GwvAYBbvUNls5+AXaN8glJCjF7KIFEFQhoKckGnN93S31/oYpDxN/8g8Ng4pR7mIlZ
- 9PgGk1EPPpJEnhqaB0anqRNL1VkcMXUzqFbZwSiDCOTTGHP0JVVcjlrSX45dE9oUOrpr
- J6hngXVZBF1o5LZ9dJoHWVzIqoA8ysZ3JGu2pnoEjug6L81eTykL5MQK90BtvdNATJv2
- Oyzg==
+ bh=sCaPZyfgDSBSeM++2OLvaLk3FiQdugkfPjVK7q/9DoA=;
+ b=cj+FPfsDzHJeRIElrWU0LClPnfou2zkCud/0foDsvUdeDK1W6YkIOudVm8U2QvZOs1
+ BhIUbLI7kJTj/MIdOKCzRMcFauN23HxrCd5yBqvDFmoO9iL1xdwKGyTCTfa71NLuL+3X
+ FEFegOBe/33YuS3pKdRFCcU7sP5X8GY9U1Igam8AMFUIisdBFsSNsFhfWzvYu48Ox4L8
+ FM3ymPAKrU9LY86hTuH3NW8idR1moWVQTljo44LKSWIROvqfr2qYoivdpcN3M45nxdQN
+ unpjx8hYKTNymELyePhdq6e4pWCXnxLApS6bN8fgqIhPYCBxqwtYaDzQHS/F91RDnU+/
+ Lcjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=Xc1szHQOZDqB0AYr925levUtn3vNJA/QIKkPEhre7Pk=;
- b=pWZBpGZSYrYeMCogGUHDzSCfF/EOrl5o5+BfmA/7rLi7AOFHAj7xVQNcrroLMj4sZ2
- GZuJXzglEueMPOg+ZKxRNfU4/IlDQ79WB1NjY7EbBBFDsWad7a2QolI4nhQrgnALiHNo
- EkLAaGpSA43PXkoE66iavMzUhdNtKxFy2HEoTYxr0guUZlYnTVrHCVhrg+FbJbze6sYq
- v7mL/xBSv8HT+sgrGDX8I1acpO8HkQkkz9TS1aDvyUd6Kah6y1v0RV2aAoIdGdI4sLX/
- 7oOUcc3PJJq8iP1r5zxQk7EzL6+fdcieoaGpy5cvSjHZ9AepG66R8QKELZ4bYlZ1RvMS
- VdIw==
-X-Gm-Message-State: AOAM531oMSbveqlugRlVyeRDX+AKDSMwp8g9w7v7DqOYOjjlxdXuIwvO
- 6FulhYQ1zyq6Q+jLmabAJaZ1qA==
-X-Google-Smtp-Source: ABdhPJw2eYzVN0czVrpB+FQtPqgZRmO7Z9UXayRPLlAY9AEDiGK/tSK4hOJrAmd1TCnyunzzfHMaVw==
-X-Received: by 2002:a62:1b97:0:b0:3ed:d347:fcac with SMTP id
- b145-20020a621b97000000b003edd347fcacmr5420756pfb.65.1630007957263; 
- Thu, 26 Aug 2021 12:59:17 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id o9sm4017917pfh.217.2021.08.26.12.59.16
+ bh=sCaPZyfgDSBSeM++2OLvaLk3FiQdugkfPjVK7q/9DoA=;
+ b=MW8VyGWZc3IE9WVxZF+g88NYevDN2RITLZH6IYV0S2yTX93r4t1/FtQ6wWoyD24A5V
+ McjhqgwUVbQVQ3fpEhuGp4c1ehxPeOnrtSM0HVYOynq84TorsevjHRl0622qFcHjlnsQ
+ 5xg8IGmDlgiBgG7H5FvfcmzX8XPw6d8riVQXK+ueoAW7VXi4ZBgvo+R2/yrphvhAqrT5
+ 1itMhG+d5rPhklyjwv3YWlCxKix/yxlq8kQ2mrT1pM8VGPtFR0x3Cu4TOOX1Lo9pKuae
+ fL7VS1OfyZekee0S5WDHbGL3dW9cBPiAnBrwi4K1AZoBCOGStxt6ke1bng2iuIDu0pME
+ N+yw==
+X-Gm-Message-State: AOAM531CSgczi7h2Mwt8JWw8bA1mDIVDgWEz7qF5RFUAV4gntn2Uot75
+ hx84Ed6uuHU5muM7KUY58cBpag==
+X-Google-Smtp-Source: ABdhPJyqCQGhwIFAG9IshmCzaXD8awQjzzye3OTrgSFXCFEJa5NtputQiag6vfd/ZQBJ065DsgGyuw==
+X-Received: by 2002:a63:a54f:: with SMTP id r15mr4989698pgu.11.1630014861986; 
+ Thu, 26 Aug 2021 14:54:21 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150])
+ by smtp.gmail.com with ESMTPSA id 141sm4155060pfv.15.2021.08.26.14.54.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Aug 2021 12:59:16 -0700 (PDT)
-Date: Thu, 26 Aug 2021 19:59:13 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH V10 01/18] perf/core: Use static_call to optimize
- perf_guest_info_callbacks
-Message-ID: <YSfykbECnC6J02Yk@google.com>
-References: <20210806133802.3528-1-lingshan.zhu@intel.com>
- <20210806133802.3528-2-lingshan.zhu@intel.com>
+ Thu, 26 Aug 2021 14:54:21 -0700 (PDT)
+Date: Thu, 26 Aug 2021 14:54:17 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v2 10/10] KVM: arm64: selftests: Add arch_timer test
+Message-ID: <YSgNiY5iAI8BFN7G@google.com>
+References: <20210818184311.517295-1-rananta@google.com>
+ <20210818184311.517295-11-rananta@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210806133802.3528-2-lingshan.zhu@intel.com>
-X-Mailman-Approved-At: Thu, 26 Aug 2021 17:09:41 -0400
-Cc: wanpengli@tencent.com, Like Xu <like.xu@linux.intel.com>,
- peterz@infradead.org, eranian@google.com, Guo Ren <guoren@kernel.org>,
- linux-riscv@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, kan.liang@linux.intel.com, ak@linux.intel.com,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, joro@8bytes.org,
- x86@kernel.org, linux-csky@vger.kernel.org, wei.w.wang@intel.com,
- linux-arm-kernel@lists.infradead.org, xen-devel@lists.xenproject.org,
- liuxiangdong5@huawei.com, bp@alien8.de,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>, boris.ostrvsky@oracle.com,
- jmattson@google.com, like.xu.linux@gmail.com, Nick Hu <nickhu@andestech.com>,
- linux-kernel@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
+In-Reply-To: <20210818184311.517295-11-rananta@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,139 +101,456 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-TL;DR: Please don't merge this patch, it's broken and is also built on a shoddy
-       foundation that I would like to fix.
-
-On Fri, Aug 06, 2021, Zhu Lingshan wrote:
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index 464917096e73..e466fc8176e1 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -6489,9 +6489,18 @@ static void perf_pending_event(struct irq_work *entry)
->   */
->  struct perf_guest_info_callbacks *perf_guest_cbs;
+On Wed, Aug 18, 2021 at 06:43:11PM +0000, Raghavendra Rao Ananta wrote:
+> Add a KVM selftest to validate the arch_timer functionality.
+> Primarily, the test sets up periodic timer interrupts and
+> validates the basic architectural expectations upon its receipt.
+> 
+> The test provides command-line options to configure the period
+> of the timer, number of iterations, and number of vCPUs.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  tools/testing/selftests/kvm/.gitignore        |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/aarch64/arch_timer.c        | 382 ++++++++++++++++++
+>  3 files changed, 384 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
+> 
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 0709af0144c8..5f6cf0c76cf8 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -1,4 +1,5 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+> +/aarch64/arch_timer
+>  /aarch64/debug-exceptions
+>  /aarch64/get-reg-list
+>  /aarch64/vgic_init
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index a170166334a3..62a2c3e4b50c 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -84,6 +84,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
+>  TEST_GEN_PROGS_x86_64 += steal_time
+>  TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
 >  
-> +/* explicitly use __weak to fix duplicate symbol error */
-> +void __weak arch_perf_update_guest_cbs(void)
+> +TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+>  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+>  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+>  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> new file mode 100644
+> index 000000000000..88333fe1e567
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -0,0 +1,382 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * arch_timer.c - Tests the aarch64 timer IRQ functionality
+> + *
+> + * The test validates both the virtual and physical timer IRQs using
+> + * CVAL and TVAL registers. This consitutes the four stages in the test.
+> + * The guest's main thread configures the timer interrupt for a stage
+> + * and waits for it to fire, with a timeout equal to the timer period.
+> + * It asserts that the timeout doesn't exceed the timer period.
+> + *
+> + * On the other hand, upon receipt of an interrupt, the guest's interrupt
+> + * handler validates the interrupt by checking if the architectural state
+> + * is in compliance with the specifications.
+> + *
+> + * The test provides command-line options to configure the timer's
+> + * period (-p), number of vCPUs (-n), and iterations per stage (-i).
+> + *
+> + * Copyright (c) 2021, Google LLC.
+> + */
+> +
+> +#define _GNU_SOURCE
+> +
+> +#include <stdlib.h>
+> +#include <pthread.h>
+> +#include <linux/kvm.h>
+> +#include <linux/sizes.h>
+> +
+> +#include "kvm_util.h"
+> +#include "processor.h"
+> +#include "delay.h"
+> +#include "arch_timer.h"
+> +#include "gic.h"
+> +
+> +#define NR_VCPUS_DEF			4
+> +#define NR_TEST_ITERS_DEF		5
+> +#define TIMER_TEST_PERIOD_MS_DEF	10
+> +#define TIMER_TEST_ERR_MARGIN_US	100
+> +
+> +struct test_args {
+> +	int nr_vcpus;
+> +	int nr_iter;
+> +	int timer_period_ms;
+> +};
+> +
+> +static struct test_args test_args = {
+> +	.nr_vcpus = NR_VCPUS_DEF,
+> +	.nr_iter = NR_TEST_ITERS_DEF,
+> +	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
+> +};
+> +
+> +#define msecs_to_usecs(msec)		((msec) * 1000LL)
+> +
+> +#define VTIMER_IRQ			27
+> +#define PTIMER_IRQ			30
+> +
+> +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
+> +	(((uint64_t)(count) << 52) | \
+> +	((uint64_t)((base) >> 16) << 16) | \
+> +	((uint64_t)(flags) << 12) | \
+> +	index)
+> +
+> +#define GICD_BASE_GPA			0x8000000ULL
+> +#define GICR_BASE_GPA			0x80A0000ULL
+> +
+> +enum guest_stage {
+> +	GUEST_STAGE_VTIMER_CVAL = 1,
+> +	GUEST_STAGE_VTIMER_TVAL,
+> +	GUEST_STAGE_PTIMER_CVAL,
+> +	GUEST_STAGE_PTIMER_TVAL,
+> +	GUEST_STAGE_MAX,
+> +};
+> +
+> +/* Sahred variables between host and guest */
+> +struct test_vcpu_shared_data {
+> +	int nr_iter;
+> +	enum guest_stage guest_stage;
+> +	uint64_t xcnt;
+> +};
+> +
+> +struct test_vcpu {
+> +	uint32_t vcpuid;
+> +	pthread_t pt_vcpu_run;
+> +	struct kvm_vm *vm;
+> +};
+> +
+> +static struct test_vcpu test_vcpu[KVM_MAX_VCPUS];
+> +static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
+> +
+> +static void
+> +guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
 > +{
+> +	switch (shared_data->guest_stage) {
+> +	case GUEST_STAGE_VTIMER_CVAL:
+> +		timer_set_next_cval_ms(VIRTUAL, test_args.timer_period_ms);
+> +		shared_data->xcnt = timer_get_cntct(VIRTUAL);
+> +		timer_set_ctl(VIRTUAL, CTL_ENABLE);
+> +		break;
+> +	case GUEST_STAGE_VTIMER_TVAL:
+> +		timer_set_next_tval_ms(VIRTUAL, test_args.timer_period_ms);
+> +		shared_data->xcnt = timer_get_cntct(VIRTUAL);
+> +		timer_set_ctl(VIRTUAL, CTL_ENABLE);
+> +		break;
+> +	case GUEST_STAGE_PTIMER_CVAL:
+> +		timer_set_next_cval_ms(PHYSICAL, test_args.timer_period_ms);
+> +		shared_data->xcnt = timer_get_cntct(PHYSICAL);
+> +		timer_set_ctl(PHYSICAL, CTL_ENABLE);
+> +		break;
+> +	case GUEST_STAGE_PTIMER_TVAL:
+> +		timer_set_next_tval_ms(PHYSICAL, test_args.timer_period_ms);
+> +		shared_data->xcnt = timer_get_cntct(PHYSICAL);
+> +		timer_set_ctl(PHYSICAL, CTL_ENABLE);
+> +		break;
+> +	default:
+> +		GUEST_ASSERT(0);
+> +	}
 > +}
 > +
->  int perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
->  {
-> +	if (WARN_ON_ONCE(perf_guest_cbs))
-> +		return -EBUSY;
+> +static void guest_validate_irq(unsigned int intid,
+> +				struct test_vcpu_shared_data *shared_data)
+> +{
+> +	enum guest_stage stage = shared_data->guest_stage;
+> +	uint64_t xcnt = 0, xcnt_diff_us, cval = 0;
+> +	unsigned long xctl = 0;
+> +	unsigned int timer_irq = 0;
 > +
->  	perf_guest_cbs = cbs;
-> +	arch_perf_update_guest_cbs();
+> +	if (stage == GUEST_STAGE_VTIMER_CVAL ||
+> +		stage == GUEST_STAGE_VTIMER_TVAL) {
+> +		xctl = timer_get_ctl(VIRTUAL);
+> +		timer_set_ctl(VIRTUAL, CTL_IMASK);
+> +		xcnt = timer_get_cntct(VIRTUAL);
+> +		cval = timer_get_cval(VIRTUAL);
+> +		timer_irq = VTIMER_IRQ;
+> +	} else if (stage == GUEST_STAGE_PTIMER_CVAL ||
+> +		stage == GUEST_STAGE_PTIMER_TVAL) {
+> +		xctl = timer_get_ctl(PHYSICAL);
+> +		timer_set_ctl(PHYSICAL, CTL_IMASK);
+> +		xcnt = timer_get_cntct(PHYSICAL);
+> +		cval = timer_get_cval(PHYSICAL);
+> +		timer_irq = PTIMER_IRQ;
+> +	} else {
+> +		GUEST_ASSERT(0);
+> +	}
+> +
+> +	xcnt_diff_us = cycles_to_usec(xcnt - shared_data->xcnt);
+> +
+> +	/* Make sure we are dealing with the correct timer IRQ */
+> +	GUEST_ASSERT_2(intid == timer_irq, intid, timer_irq);
+> +
+> +	/* Basic 'timer codition met' check */
+> +	GUEST_ASSERT_3(xcnt >= cval, xcnt, cval, xcnt_diff_us);
+> +	GUEST_ASSERT_1(xctl & CTL_ISTATUS, xctl);
+> +}
+> +
+> +static void guest_irq_handler(struct ex_regs *regs)
+> +{
+> +	unsigned int intid = gic_get_and_ack_irq();
+> +	uint32_t cpu = get_vcpuid();
+> +	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
+> +
+> +	guest_validate_irq(intid, shared_data);
+> +
+> +	WRITE_ONCE(shared_data->nr_iter, shared_data->nr_iter + 1);
+> +
+> +	gic_set_eoi(intid);
+> +}
+> +
+> +static void guest_run_stage(struct test_vcpu_shared_data *shared_data,
+> +				enum guest_stage stage)
+> +{
+> +	uint32_t irq_iter, config_iter;
+> +
+> +	shared_data->guest_stage = stage;
+> +	shared_data->nr_iter = 0;
+> +
+> +	for (config_iter = 0; config_iter < test_args.nr_iter; config_iter++) {
+> +		/* Setup the next interrupt */
+> +		guest_configure_timer_action(shared_data);
+> +
+> +		/* Setup a timeout for the interrupt to arrive */
+> +		udelay(msecs_to_usecs(test_args.timer_period_ms) +
+> +			TIMER_TEST_ERR_MARGIN_US);
+> +
+> +		irq_iter = READ_ONCE(shared_data->nr_iter);
+> +		GUEST_ASSERT_2(config_iter + 1 == irq_iter,
+> +				config_iter + 1, irq_iter);
+> +	};
+> +}
+> +
+> +static void guest_code(void)
+> +{
+> +	uint32_t cpu = get_vcpuid();
+> +	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[cpu];
+> +
+> +	local_irq_disable();
+> +
+> +	gic_init(GIC_V3, test_args.nr_vcpus,
+> +		(void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
+> +
+> +	timer_set_ctl(VIRTUAL, CTL_IMASK);
+> +	timer_set_ctl(PHYSICAL, CTL_IMASK);
+> +
+> +	gic_irq_enable(VTIMER_IRQ);
+> +	gic_irq_enable(PTIMER_IRQ);
+> +	local_irq_enable();
+> +
+> +	guest_run_stage(shared_data, GUEST_STAGE_VTIMER_CVAL);
+> +	guest_run_stage(shared_data, GUEST_STAGE_VTIMER_TVAL);
+> +	guest_run_stage(shared_data, GUEST_STAGE_PTIMER_CVAL);
+> +	guest_run_stage(shared_data, GUEST_STAGE_PTIMER_TVAL);
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static void *test_vcpu_run(void *arg)
+> +{
+> +	struct ucall uc;
+> +	struct test_vcpu *vcpu = arg;
+> +	struct kvm_vm *vm = vcpu->vm;
+> +	uint32_t vcpuid = vcpu->vcpuid;
+> +	struct test_vcpu_shared_data *shared_data = &vcpu_shared_data[vcpuid];
+> +
+> +	vcpu_run(vm, vcpuid);
+> +
+> +	switch (get_ucall(vm, vcpuid, &uc)) {
+> +	case UCALL_SYNC:
+> +	case UCALL_DONE:
+> +		break;
+> +	case UCALL_ABORT:
+> +		sync_global_from_guest(vm, *shared_data);
+> +		TEST_ASSERT(false,
+> +			"%s at %s:%ld\n\tvalues: %lu, %lu; %lu, vcpu: %u; stage: %u; iter: %u",
+> +			(const char *)uc.args[0], __FILE__, uc.args[1],
+> +			uc.args[2], uc.args[3], uc.args[4], vcpuid,
+> +			shared_data->guest_stage, shared_data->nr_iter);
+> +		break;
+> +	default:
+> +		TEST_FAIL("Unexpected guest exit\n");
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static void test_run(struct kvm_vm *vm)
+> +{
+> +	int i, ret;
+> +
+> +	for (i = 0; i < test_args.nr_vcpus; i++) {
+> +		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
+> +				test_vcpu_run, &test_vcpu[i]);
+> +		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
+> +	}
+> +
+> +	for (i = 0; i < test_args.nr_vcpus; i++)
+> +		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
+> +}
+> +
+> +static void test_vm_setup_gic(struct kvm_vm *vm, unsigned int n_gicr_pages)
 
-This is horribly broken, it fails to cleanup the static calls when KVM unregisters
-the callbacks, which happens when the vendor module, e.g. kvm_intel, is unloaded.
-The explosion doesn't happen until 'kvm' is unloaded because the functions are
-implemented in 'kvm', i.e. the use-after-free is deferred a bit.
+I think it's nicer if this takes nr_vcpus instead of gicr_pages.
 
-  BUG: unable to handle page fault for address: ffffffffa011bb90
-  #PF: supervisor instruction fetch in kernel mode
-  #PF: error_code(0x0010) - not-present page
-  PGD 6211067 P4D 6211067 PUD 6212063 PMD 102b99067 PTE 0
-  Oops: 0010 [#1] PREEMPT SMP
-  CPU: 0 PID: 1047 Comm: rmmod Not tainted 5.14.0-rc2+ #460
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-  RIP: 0010:0xffffffffa011bb90
-  Code: Unable to access opcode bytes at RIP 0xffffffffa011bb66.
-  Call Trace:
-   <NMI>
-   ? perf_misc_flags+0xe/0x50
-   ? perf_prepare_sample+0x53/0x6b0
-   ? perf_event_output_forward+0x67/0x160
-   ? kvm_clock_read+0x14/0x30
-   ? kvm_sched_clock_read+0x5/0x10
-   ? sched_clock_cpu+0xd/0xd0
-   ? __perf_event_overflow+0x52/0xf0
-   ? handle_pmi_common+0x1f2/0x2d0
-   ? __flush_tlb_all+0x30/0x30
-   ? intel_pmu_handle_irq+0xcf/0x410
-   ? nmi_handle+0x5/0x260
-   ? perf_event_nmi_handler+0x28/0x50
-   ? nmi_handle+0xc7/0x260
-   ? lock_release+0x2b0/0x2b0
-   ? default_do_nmi+0x6b/0x170
-   ? exc_nmi+0x103/0x130
-   ? end_repeat_nmi+0x16/0x1f
-   ? lock_release+0x2b0/0x2b0
-   ? lock_release+0x2b0/0x2b0
-   ? lock_release+0x2b0/0x2b0
-   </NMI>
-  Modules linked in: irqbypass [last unloaded: kvm]
+And, it possible, it would be doubly nice if it could be be made a
+library function (e.g., inside lib/aarch64/vgic.c?).
 
-Even more fun, the existing perf_guest_cbs framework is also broken, though it's
-much harder to get it to fail, and probably impossible to get it to fail without
-some help.  The issue is that perf_guest_cbs is global, which means that it can
-be nullified by KVM (during module unload) while the callbacks are being accessed
-by a PMI handler on a different CPU.
+> +{
+> +	uint64_t addr;
+> +	int gic_fd;
+> +
+> +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> +
+> +	addr = GICD_BASE_GPA;
+> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +				KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
+> +	virt_pg_map(vm, GICD_BASE_GPA, GICD_BASE_GPA);
 
-The bug has escaped notice because all dererfences of perf_guest_cbs follow the
-same "perf_guest_cbs && perf_guest_cbs->is_in_guest()" pattern, and AFAICT the
-compiler never reload perf_guest_cbs in this sequence.  The compiler does reload
-perf_guest_cbs for any future dereferences, but the ->is_in_guest() guard all but
-guarantees the PMI handler will win the race, e.g. to nullify perf_guest_cbs,
-KVM has to completely exit the guest and teardown down all VMs before it can be
-unloaded.
+Not really a big deal at the moment, but if KVM implemented ESPIs, then
+a 4k page wouldn't be enough. Why not map 64Ks as there's space for it?
 
-But with a help, e.g. RAED_ONCE(perf_guest_cbs), unloading kvm_intel can trigger
-a NULL pointer derference, e.g. this tweak
+> +
+> +	addr = REDIST_REGION_ATTR_ADDR(test_args.nr_vcpus, GICR_BASE_GPA, 0, 0);
+> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +			KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+> +	virt_map(vm, GICR_BASE_GPA, GICR_BASE_GPA, n_gicr_pages);
+> +
+> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> +}
+> +
+> +static struct kvm_vm *test_vm_create(void)
+> +{
+> +	struct kvm_vm *vm;
+> +	unsigned int i, n_gicr_pages;
+> +	int nr_vcpus = test_args.nr_vcpus;
+> +
+> +	/* Reserve additional pages for GICR MMIO based on nr_vcpus */
+> +	n_gicr_pages = vm_calc_num_guest_pages(VM_MODE_DEFAULT,
+> +						2 * SZ_64K * nr_vcpus);
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 1eb45139fcc6..202e5ad97f82 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -2954,7 +2954,7 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
- {
-        int misc = 0;
+Might be better to use vm_get_page_size instead as it doesn't need the
+mode arg. Note that you would have to call it after creating the vm
+(vm_create..), but the nice thing is that that call uses the actual mode
+that the vm was created with. I propose moving this pages calculation to
+inside test_vm_setup_gic, which could take the number of vcpus as an arg
+(instead of nr_pages).
 
--       if (perf_guest_cbs && perf_guest_cbs->is_in_guest()) {
-+       if (READ_ONCE(perf_guest_cbs) && READ_ONCE(perf_guest_cbs)->is_in_guest()) {
-                if (perf_guest_cbs->is_user_mode())
-                        misc |= PERF_RECORD_MISC_GUEST_USER;
-                else
+> +
+> +	vm = vm_create_default_with_vcpus(nr_vcpus, n_gicr_pages, 0,
+> +						guest_code, NULL);
+> +
+> +	vm_init_descriptor_tables(vm);
+> +	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
+> +
+> +	for (i = 0; i < nr_vcpus; i++) {
+> +		vcpu_init_descriptor_tables(vm, i);
+> +
+> +		test_vcpu[i].vcpuid = i;
+> +		test_vcpu[i].vm = vm;
+> +	}
+> +
+> +	ucall_init(vm, NULL);
+> +	test_vm_setup_gic(vm, n_gicr_pages);
+> +
+> +	/* Make all the test's cmdline args visible to the guest */
+> +	sync_global_to_guest(vm, test_args);
+> +
+> +	return vm;
+> +}
+> +
+> +static void test_print_help(char *name)
+> +{
+> +	pr_info("Usage: %s [-h] [-n nr_vcpus] [-i iterations] [-p timer_period_ms]\n",
+> +		name);
+> +	pr_info("\t-n: Number of vCPUs to configure (default: %u; max: %u)\n",
+> +		NR_VCPUS_DEF, KVM_MAX_VCPUS);
+> +	pr_info("\t-i: Number of iterations per stage (default: %u)\n",
+> +		NR_TEST_ITERS_DEF);
+> +	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
+> +		TIMER_TEST_PERIOD_MS_DEF);
+> +	pr_info("\t-h: print this help screen\n");
+> +}
+> +
+> +static bool parse_args(int argc, char *argv[])
+> +{
+> +	int opt;
+> +
+> +	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
+> +		switch (opt) {
+> +		case 'n':
+> +			test_args.nr_vcpus = atoi(optarg);
+> +			if (test_args.nr_vcpus <= 0) {
+> +				pr_info("Positive value needed for -n\n");
+> +				goto err;
+> +			} else if (test_args.nr_vcpus > KVM_MAX_VCPUS) {
+> +				pr_info("Max allowed vCPUs: %u\n",
+> +					KVM_MAX_VCPUS);
+> +				goto err;
+> +			}
+> +			break;
+> +		case 'i':
+> +			test_args.nr_iter = atoi(optarg);
+> +			if (test_args.nr_iter <= 0) {
+> +				pr_info("Positive value needed for -i\n");
+> +				goto err;
+> +			}
+> +			break;
+> +		case 'p':
+> +			test_args.timer_period_ms = atoi(optarg);
+> +			if (test_args.timer_period_ms <= 0) {
+> +				pr_info("Positive value needed for -p\n");
+> +				goto err;
+> +			}
+> +			break;
+> +		case 'h':
+> +		default:
+> +			goto err;
+> +		}
+> +	}
+> +
+> +	return true;
+> +
+> +err:
+> +	test_print_help(argv[0]);
+> +	return false;
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	struct kvm_vm *vm;
+> +
+> +	/* Tell stdout not to buffer its content */
+> +	setbuf(stdout, NULL);
+> +
+> +	if (!parse_args(argc, argv))
+> +		exit(KSFT_SKIP);
+> +
+> +	vm = test_vm_create();
+> +	test_run(vm);
+> +	kvm_vm_free(vm);
+> +
+> +	return 0;
+> +}
+> -- 
+> 2.33.0.rc1.237.g0d66db33f3-goog
+> 
 
-
-while spamming module load/unload leads to:
-
-  BUG: kernel NULL pointer dereference, address: 0000000000000000
-  #PF: supervisor read access in kernel mode
-  #PF: error_code(0x0000) - not-present page
-  PGD 0 P4D 0
-  Oops: 0000 [#1] PREEMPT SMP
-  CPU: 6 PID: 1825 Comm: stress Not tainted 5.14.0-rc2+ #459
-  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
-  RIP: 0010:perf_misc_flags+0x1c/0x70
-  Call Trace:
-   perf_prepare_sample+0x53/0x6b0
-   perf_event_output_forward+0x67/0x160
-   __perf_event_overflow+0x52/0xf0
-   handle_pmi_common+0x207/0x300
-   intel_pmu_handle_irq+0xcf/0x410
-   perf_event_nmi_handler+0x28/0x50
-   nmi_handle+0xc7/0x260
-   default_do_nmi+0x6b/0x170
-   exc_nmi+0x103/0x130
-   asm_exc_nmi+0x76/0xbf
-
-
-The good news is that I have a series that should fix both the existing NULL pointer
-bug and mostly obviate the need for static calls.  The bad news is that my approach,
-making perf_guest_cbs per-CPU, likely complicates turning these into static calls,
-though I'm guessing it's still a solvable problem.
-
-Tangentially related, IMO we should make architectures opt-in to getting
-perf_guest_cbs and nuke all of the code in the below files.  Except for arm,
-which recently lost KVM support, it's all a bunch of useless copy-paste code that
-serves no purpose and just complicates cleanups like this.
-
->  arch/arm/kernel/perf_callchain.c   | 16 +++++++-----
->  arch/csky/kernel/perf_callchain.c  |  4 +--
->  arch/nds32/kernel/perf_event_cpu.c | 16 +++++++-----
->  arch/riscv/kernel/perf_callchain.c |  4 +--
+Thanks,
+Ricardo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
