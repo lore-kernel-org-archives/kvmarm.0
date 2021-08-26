@@ -2,54 +2,72 @@ Return-Path: <SRS0=T8IC=NR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4ED7C432BE
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 11:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9A2C4320E
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 11:11:34 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 59269610A4
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 11:07:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 59269610A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 85D326109F
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 11:11:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 85D326109F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D40F84B10C;
-	Thu, 26 Aug 2021 07:07:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15E654B12A;
+	Thu, 26 Aug 2021 07:11:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RI5ImJcDlBWX; Thu, 26 Aug 2021 07:07:27 -0400 (EDT)
+	with ESMTP id bm2Kbl41dtUN; Thu, 26 Aug 2021 07:11:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CE1B4B153;
-	Thu, 26 Aug 2021 07:07:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A36534B10C;
+	Thu, 26 Aug 2021 07:11:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABE074B10C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 07:07:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FEAC4B0F7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 07:11:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X-3jS0Qh6COk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Aug 2021 07:07:22 -0400 (EDT)
+ with ESMTP id D49yMk1Gtg+a for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Aug 2021 07:11:22 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39F494B107
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 07:07:22 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A487B61053;
- Thu, 26 Aug 2021 11:07:19 +0000 (UTC)
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
- Alexandru Elisei <alexandru.elisei@arm.com>, will@kernel.org,
- suzuki.poulose@arm.com, james.morse@arm.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, broonie@kernel.org
-Subject: Re: [PATCH v2] arm64: Do not trap PMSNEVFR_EL1
-Date: Thu, 26 Aug 2021 12:07:12 +0100
-Message-Id: <162997601443.30374.2606931123548634826.b4-ty@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210824154523.906270-1-alexandru.elisei@arm.com>
-References: <20210824154523.906270-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CFB44B0F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 07:11:22 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 8840A60F25;
+ Thu, 26 Aug 2021 11:11:20 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mJDHy-007KjX-J3; Thu, 26 Aug 2021 12:11:18 +0100
+Date: Thu, 26 Aug 2021 12:11:18 +0100
+Message-ID: <871r6gpijt.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v2 3/3] kvmtool: arm64: Configure VM with the minimal
+ required IPA space
+In-Reply-To: <20210824014734.610f2cb2@slackpad.fritz.box>
+References: <20210822152526.1291918-1-maz@kernel.org>
+ <20210822152526.1291918-4-maz@kernel.org>
+ <20210824014734.610f2cb2@slackpad.fritz.box>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu,
+ alexandru.elisei@arm.com, will@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Will Deacon <will@kernel.org>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,22 +84,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 24 Aug 2021 16:45:23 +0100, Alexandru Elisei wrote:
-> Commit 31c00d2aeaa2 ("arm64: Disable fine grained traps on boot") zeroed
-> the fine grained trap registers to prevent unwanted register traps from
-> occuring. However, for the PMSNEVFR_EL1 register, the corresponding
-> HDFG{R,W}TR_EL2.nPMSNEVFR_EL1 fields must be 1 to disable trapping. Set
-> both fields to 1 if FEAT_SPEv1p2 is detected to disable read and write
-> traps.
+On Tue, 24 Aug 2021 01:47:34 +0100,
+Andre Przywara <andre.przywara@arm.com> wrote:
+> 
+> On Sun, 22 Aug 2021 16:25:26 +0100
+> Marc Zyngier <maz@kernel.org> wrote:
+> 
+> Hi Marc,
+> 
+> > There is some value in keeping the IPA space small, as it reduces
+> > the size of the stage-2 page tables.
+> > 
+> > Let's compute the required space at VM creation time, and inform
+> > the kernel of our requirements.
+> 
+> You mentioned some kernel bug in the first version of this patch, I
+> guess the fix for this is 262b003d059c?
+> It seems to me that this is somewhat of a regression on older host
+> kernels, when trying to run a guest with "-m 2048", for instance?
+> Should we teach kvmtool about this bug, and do a check for the bug
+> condition, when kvm__register_ram() returns with -EFAULT? And give users
+> a hint to try with one MB more or less guest RAM? Or maybe try
+> this automatically?
 
-Applied to arm64 (for-next/misc), thanks!
+I guess an additional patch could do a retry with one more bit of IPA
+space.
 
-[1/1] arm64: Do not trap PMSNEVFR_EL1
-      https://git.kernel.org/arm64/c/50cb99fa89aa
+However, the fix for this bug was backported to all stable kernels.
+Given that the audience for kvmtool is pretty limited, I'd rather only
+add this if someone actively complains.
+
+> 
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arm/aarch64/kvm.c | 20 +++++++++++++++++++-
+> >  1 file changed, 19 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+> > index d03a27f2..4e66a22e 100644
+> > --- a/arm/aarch64/kvm.c
+> > +++ b/arm/aarch64/kvm.c
+> > @@ -3,6 +3,7 @@
+> >  #include <asm/image.h>
+> >  
+> >  #include <linux/byteorder.h>
+> > +#include <kvm/util.h>
+> >  
+> >  /*
+> >   * Return the TEXT_OFFSET value that the guest kernel expects. Note
+> > @@ -59,5 +60,22 @@ int kvm__arch_get_ipa_limit(struct kvm *kvm)
+> >  
+> >  int kvm__get_vm_type(struct kvm *kvm)
+> >  {
+> > -	return KVM_VM_TYPE_ARM_IPA_SIZE(kvm__arch_get_ipa_limit(kvm));
+> > +	unsigned int ipa_bits, max_ipa_bits;
+> > +	unsigned long max_ipa;
+> > +
+> > +	/* If we're running on an old kernel, use 0 as the VM type */
+> > +	max_ipa_bits = kvm__arch_get_ipa_limit(kvm);
+> > +	if (!max_ipa_bits)
+> > +		return 0;
+> 
+> Should this return KVM_VM_TYPE, as it does at the moment? Or is this
+> more confusing than helpful?
+
+I think that'd be really confusing. If you wanted a name, it really
+should be something like KVM_LEGACY_40BIT_IPA_DONT_EVER_USE.
+
+> 
+> Just a nit anyway, the patch looks correct otherwise:
+> 
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+
+Thanks,
+
+	M.
 
 -- 
-Catalin
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
