@@ -2,78 +2,74 @@ Return-Path: <SRS0=T8IC=NR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 284D3C432BE
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 09:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE241C432BE
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 10:38:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 90B84600CC
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 09:43:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 90B84600CC
+	by mail.kernel.org (Postfix) with ESMTP id 3355B6109E
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 10:38:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3355B6109E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23FEB4B0F7;
-	Thu, 26 Aug 2021 05:43:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADF594B0C2;
+	Thu, 26 Aug 2021 06:38:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dkLDby2LSwTP; Thu, 26 Aug 2021 05:43:53 -0400 (EDT)
+	with ESMTP id Hxv51ZkDrMqV; Thu, 26 Aug 2021 06:37:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14C804B12C;
-	Thu, 26 Aug 2021 05:43:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC4644B153;
+	Thu, 26 Aug 2021 06:37:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA1E4B0F7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 05:43:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8BE54B0CB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 06:37:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oVpOFy0M1DTa for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Aug 2021 05:43:50 -0400 (EDT)
+ with ESMTP id m8CtvvMDEXNC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Aug 2021 06:37:55 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08CAC4B159
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 05:43:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AEE84B0C2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 06:37:55 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4E3B760F44;
- Thu, 26 Aug 2021 09:43:48 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6F0A06108F;
+ Thu, 26 Aug 2021 10:37:52 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mJBvG-007JiY-92; Thu, 26 Aug 2021 10:43:46 +0100
-Date: Thu, 26 Aug 2021 10:43:45 +0100
-Message-ID: <874kbcpmlq.wl-maz@kernel.org>
+ id 1mJCla-007KET-3u; Thu, 26 Aug 2021 11:37:50 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-In-Reply-To: <20210826085429.b67fzkshhl3s2vfr@gator.home>
-References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
- <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
- <87fsuxq049.wl-maz@kernel.org>
- <20210825150713.5rpwzm4grfn7akcw@gator.home>
- <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
- <20210826084945.yknl64gklxtygwal@gator.home>
- <20210826085429.b67fzkshhl3s2vfr@gator.home>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: Raghavendra Rao Ananta <rananta@google.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ James Morse <james.morse@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Trim guest debug exception handling
+Date: Thu, 26 Aug 2021 11:37:46 +0100
+Message-Id: <162997424183.1640651.9657746284386330796.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210823223940.1878930-1-rananta@google.com>
+References: <20210823223940.1878930-1-rananta@google.com>
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: drjones@redhat.com, oupton@google.com,
- kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com,
- rananta@google.com, reijiw@google.com, jingzhangos@google.com,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org
+X-SA-Exim-Rcpt-To: rananta@google.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, james.morse@arm.com, jingzhangos@google.com,
+ catalin.marinas@arm.com, reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ pshier@google.com, oupton@google.com, linux-kernel@vger.kernel.org,
+ will@kernel.org, ricarkol@google.com, linux-arm-kernel@lists.infradead.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,174 +86,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 26 Aug 2021 09:54:29 +0100,
-Andrew Jones <drjones@redhat.com> wrote:
+On Mon, 23 Aug 2021 22:39:40 +0000, Raghavendra Rao Ananta wrote:
+> The switch-case for handling guest debug exception covers
+> all the debug exception classes, but functionally, doesn't
+> do anything with them other than ESR_ELx_EC_WATCHPT_LOW.
+> Moreover, even though handled well, the 'default' case
+> could be confusing from a security point of view, stating
+> that the guests' actions can potentially flood the syslog.
+> But in reality, the code is unreachable.
+> 
+> [...]
 
-[...]
+Applied to next, thanks!
 
-> I see Marc just replied stating we'll probably just have a single
-> register. The KVM_GET_SUPPORTED_CPUID type of ioctl would be
-> overkill in that case (get-one_reg is enough). Anyway it can
-> always be added later if we expand into more registers.
+[1/1] KVM: arm64: Trim guest debug exception handling
+      commit: 8ce8a6fce9bfd3fcabe230ad104e2caf08b2e58d
 
-Here's what I propose for the KVM-specific hypercalls. Compile tested
-only, plenty of nits to sort out. But you'll get the general idea.
-Something similar could be implemented for ARM-architected hypercalls
-such as TRNG.
+Cheers,
 
 	M.
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f8be56d5342b..3fcca7cc9668 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -136,6 +136,9 @@ struct kvm_arch {
- 
- 	/* Memory Tagging Extension enabled for the guest */
- 	bool mte_enabled;
-+
-+	/* Bitmap of enabled hypercalls */
-+	unsigned long hc_bmap;
- };
- 
- struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index b3edde68bc3e..8d7a1a93f12c 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -281,6 +281,9 @@ struct kvm_arm_copy_mte_tags {
- #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED	3
- #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED     	(1U << 4)
- 
-+#define KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_0	KVM_REG_ARM_FW_REG(3)
-+#define KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_1	KVM_REG_ARM_FW_REG(4)
-+
- /* SVE registers */
- #define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fe102cd2e518..dbc136675b02 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -130,6 +130,13 @@ static void set_default_spectre(struct kvm *kvm)
- 		kvm->arch.pfr0_csv3 = 1;
- }
- 
-+
-+static void set_default_vendor_hypercalls(struct kvm *kvm)
-+{
-+	kvm->arch.hc_bmap = (BIT(ARM_SMCCC_KVM_FUNC_FEATURES) |
-+			     BIT(ARM_SMCCC_KVM_FUNC_PTP));
-+}
-+
- /**
-  * kvm_arch_init_vm - initializes a VM data structure
-  * @kvm:	pointer to the KVM struct
-@@ -156,6 +163,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
- 
- 	set_default_spectre(kvm);
-+	set_default_vendor_hypercalls(kvm);
- 
- 	return ret;
- out_free_stage2_pgd:
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index 30da78f72b3b..11f79e790f7d 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -127,8 +127,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 		val[3] = ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3;
- 		break;
- 	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
--		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
--		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
-+		val[0] = vcpu->kvm->arch.hc_bmap;
- 		break;
- 	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
- 		kvm_ptp_get_time(vcpu, val);
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 74c47d420253..ceef0c706d50 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -404,21 +404,26 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
- 	};
- }
- 
-+static const u64 fw_reg_ids[] = {
-+	KVM_REG_ARM_PSCI_VERSION,
-+	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
-+	KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
-+	KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_0,
-+};
-+
- int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
- {
--	return 3;		/* PSCI version and two workaround registers */
-+	return ARRAY_SIZE(fw_reg_ids);
- }
- 
- int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- {
--	if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices++))
--		return -EFAULT;
--
--	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1, uindices++))
--		return -EFAULT;
-+	int i;
- 
--	if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2, uindices++))
--		return -EFAULT;
-+	for (i = 0; i < ARRAY_SIZE(fw_reg_ids); i++) {
-+		if (put_user(fw_reg_ids[i], uindices++))
-+			return -EFAULT;
-+	}
- 
- 	return 0;
- }
-@@ -477,6 +482,10 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
- 		val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
- 		break;
-+	case KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_0:
-+		val = vcpu->kvm->arch.hc_bmap;
-+		break;
-+	case KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_1:
- 	default:
- 		return -ENOENT;
- 	}
-@@ -515,8 +524,9 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 				return -EINVAL;
- 			vcpu->kvm->arch.psci_version = val;
- 			return 0;
-+		default:
-+			return -EINVAL;
- 		}
--		break;
- 	}
- 
- 	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
-@@ -563,9 +573,16 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 			return -EINVAL;
- 
- 		return 0;
-+	case KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_0:
-+		/* FIXME: no vcpu should have run */
-+		/* Exclude any unknown bit */
-+		if (val & ~(BIT(ARM_SMCCC_KVM_FUNC_FEATURES) |
-+			    BIT(ARM_SMCCC_KVM_FUNC_PTP)))
-+			return -EINVAL;
-+		vcpu->kvm->arch.hc_bmap = val;
-+		return 0;
-+	case KVM_REG_ARM_KVM_SPECIFIC_HYPERCALLS_1:
- 	default:
- 		return -ENOENT;
- 	}
--
--	return -EINVAL;
- }
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
