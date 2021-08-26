@@ -2,99 +2,70 @@ Return-Path: <SRS0=T8IC=NR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A6AC432BE
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 08:49:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA562C432BE
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 08:51:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6B0CB6108D
-	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 08:49:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6B0CB6108D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 55EC361076
+	for <kvmarm@archiver.kernel.org>; Thu, 26 Aug 2021 08:51:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 55EC361076
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E032A4B0BE;
-	Thu, 26 Aug 2021 04:49:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD9444B175;
+	Thu, 26 Aug 2021 04:51:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e3grw9Kac9rk; Thu, 26 Aug 2021 04:49:54 -0400 (EDT)
+	with ESMTP id eDr0ShwnDSzJ; Thu, 26 Aug 2021 04:51:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 144BD4B126;
-	Thu, 26 Aug 2021 04:49:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74A234B169;
+	Thu, 26 Aug 2021 04:51:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 438A04B11A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 04:49:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F904B13A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 04:51:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RF09l0DFHFMr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Aug 2021 04:49:51 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E8EF4B0BE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 04:49:51 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1629967790;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ln6PLh0oSIvhON8p4ToXPZ6lvlvz9D7L0/lULqMI0Ko=;
- b=CMiyfzbiSTGGxrXe0KItYgvoOelz/Df4VrJ2qoRXi9nFkuvYtgneTTuQlzRUaw1cWi5Cf0
- uaTCdNOzCMHmsRNSWzJrhJQChslYNYg7zz22VhczU1Nx2VZWn/stheHQVzjwYpPVPObEfR
- 94ZFyDgpz7dzBtBDr003XEfbdKg0aJQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-5HvpEfXtM2qOQhHiPqQxng-1; Thu, 26 Aug 2021 04:49:49 -0400
-X-MC-Unique: 5HvpEfXtM2qOQhHiPqQxng-1
-Received: by mail-ej1-f69.google.com with SMTP id
- ne21-20020a1709077b95b029057eb61c6fdfso44810ejc.22
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 01:49:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ln6PLh0oSIvhON8p4ToXPZ6lvlvz9D7L0/lULqMI0Ko=;
- b=QYom6KL1qzsZMkvPlwMu7jzsa/LyAHmWW3yuzHwto/wdYbnXYXK2emVGfjM5lKeVcN
- 2sfDES1lmSaKuq8Bbcq3rlRlSvCaJKE1crq0TH5RKS/kAP1iaMnNTWxu0Ib7p0PHFNCK
- w+joWVgLjoihISZXFUxGdlk6jwy4hOkEufRZqRjA9jfWMf5pkbMMLdlhEGXo1TBIRmRs
- 1kltc0PxfKrtoRTVUIWeI4nRfPo5DUuh2aOKuT15Kh9KQZ4HFM7aK5thiZt2b9E53QmS
- 2FYi0f1k5vwmuws3igE46+yuPUcRILoR3jmS1Ki1g/1xtlx/ZEu1UxzHyfTjQycIp6aE
- qmdQ==
-X-Gm-Message-State: AOAM530h4duW06b1LMB3VlGhLDDi3J6Qd6gbUg5RQ4zqS2QH4h+ljvV/
- tNMwxCcn0fYRfLgEait/AcEm9cP/IMVZMFo9a7bkOFMlQim6xlLt+ZqsdNTS5p88fA3ztmypXdi
- GwTPTM7vDZ+YcHP01Mz8Lu4yQ
-X-Received: by 2002:aa7:c903:: with SMTP id b3mr3081499edt.23.1629967788037;
- Thu, 26 Aug 2021 01:49:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz5XSPMMuCJWy4sAo6/MhauoEqUg9HPAs1USfQ3qjL0KkdcrixdvQCjAzOqmBGPU8nnVl/UUA==
-X-Received: by 2002:aa7:c903:: with SMTP id b3mr3081477edt.23.1629967787806;
- Thu, 26 Aug 2021 01:49:47 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id f6sm978360eja.88.2021.08.26.01.49.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 26 Aug 2021 01:49:47 -0700 (PDT)
-Date: Thu, 26 Aug 2021 10:49:45 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-Message-ID: <20210826084945.yknl64gklxtygwal@gator.home>
-References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
- <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
- <87fsuxq049.wl-maz@kernel.org>
- <20210825150713.5rpwzm4grfn7akcw@gator.home>
- <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, pshier@google.com,
+ with ESMTP id E3fymWSFg7bV for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Aug 2021 04:51:10 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEEFA4B11B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Aug 2021 04:51:10 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 282DD61076;
+ Thu, 26 Aug 2021 08:51:08 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mJB6I-007JEw-1K; Thu, 26 Aug 2021 09:51:06 +0100
+Date: Thu, 26 Aug 2021 09:51:05 +0100
+Message-ID: <875yvspp1i.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2] arm64: Do not trap PMSNEVFR_EL1
+In-Reply-To: <20210824154523.906270-1-alexandru.elisei@arm.com>
+References: <20210824154523.906270-1-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ broonie@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: catalin.marinas@arm.com, broonie@kernel.org, will@kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -112,155 +83,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Aug 25, 2021 at 11:14:59AM -0700, Oliver Upton wrote:
-> On Wed, Aug 25, 2021 at 8:07 AM Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > On Wed, Aug 25, 2021 at 11:39:34AM +0100, Marc Zyngier wrote:
-> > > On Wed, 25 Aug 2021 11:02:28 +0100,
-> > > Oliver Upton <oupton@google.com> wrote:
-> > > >
-> > > > On Wed, Aug 25, 2021 at 2:27 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > > > > Exposing new hypercalls to guests in this manner seems very unsafe to
-> > > > > > me. Suppose an operator is trying to upgrade from kernel N to kernel
-> > > > > > N+1, which brings in the new 'widget' hypercall. Guests are live
-> > > > > > migrated onto the N+1 kernel, but the operator finds a defect that
-> > > > > > warrants a kernel rollback. VMs are then migrated from kernel N+1 -> N.
-> > > > > > Any guests that discovered the 'widget' hypercall are likely going to
-> > > > > > get fussy _very_ quickly on the old kernel.
-> > > > >
-> > > > > This goes against what we decided to support for the *only* publicly
-> > > > > available VMM that cares about save/restore, which is that we only
-> > > > > move forward and don't rollback.
-> > > >
-> > > > Ah, I was definitely missing this context. Current behavior makes much
-> > > > more sense then.
-> > > >
-> > > > > Hypercalls are the least of your
-> > > > > worries, and there is a whole range of other architectural features
-> > > > > that will have also appeared/disappeared (your own CNTPOFF series is a
-> > > > > glaring example of this).
-> > > >
-> > > > Isn't that a tad bit different though? I'll admit, I'm just as guilty
-> > > > with my own series forgetting to add a KVM_CAP (oops), but it is in my
-> > > > queue to kick out with the fix for nVHE/ptimer. Nonetheless, if a user
-> > > > takes up a new KVM UAPI, it is up to the user to run on a new kernel.
-> > >
-> > > The two are linked. Exposing a new register to userspace and/or guest
-> > > result in the same thing: you can't rollback. That's specially true in
-> > > the QEMU case, which *learns* from the kernel what registers are
-> > > available, and doesn't maintain a fixed list.
-> > >
-> > > > My concerns are explicitly with the 'under the nose' changes, where
-> > > > KVM modifies the guest feature set without userspace opting in. Based
-> > > > on your comment, though, it would appear that other parts of KVM are
-> > > > affected too.
-> > >
-> > > Any new system register that is exposed by a new kernel feature breaks
-> > > rollback. And so far, we only consider it a bug if the set of exposed
-> > > registers reduces. Anything can be added safely (as checked by one of
-> > > the selftests added by Drew).
-> > >
-> > > < It doesn't have to be rollback safety, either. There may
-> > > > simply be a hypercall which an operator doesn't want to give its
-> > > > guests, and it needs a way to tell KVM to hide it.
-> > >
-> > > Fair enough. But this has to be done in a scalable way, which
-> > > individual capability cannot provide.
-> > >
-> > > > > > Have I missed something blatantly obvious, or do others see this as an
-> > > > > > issue as well? I'll reply with an example of adding opt-out for PTP.
-> > > > > > I'm sure other hypercalls could be handled similarly.
-> > > > >
-> > > > > Why do we need this? For future hypercalls, we could have some buy-in
-> > > > > capabilities. For existing ones, it is too late, and negative features
-> > > > > are just too horrible.
-> > > >
-> > > > Oh, agreed on the nastiness. Lazy hack to realize the intended
-> > > > functional change..
-> > >
-> > > Well, you definitely achieved your goal of attracting my attention :).
-> > >
-> > > > > For KVM-specific hypercalls, we could get the VMM to save/restore the
-> > > > > bitmap of supported functions. That would be "less horrible". This
-> > > > > could be implemented using extra "firmware pseudo-registers" such as
-> > > > > the ones described in Documentation/virt/kvm/arm/psci.rst.
-> > > >
-> > > > This seems more reasonable, especially since we do this for migrating
-> > > > the guest's PSCI version.
-> > > >
-> > > > Alternatively, I had thought about using a VM attribute, given the
-> > > > fact that it is non-architectural information and we avoid ABI issues
-> > > > in KVM_GET_REG_LIST without buy-in through a KVM_CAP.
-> > >
-> > > The whole point is that these settings get exposed by
-> > > KVM_GET_REG_LIST, as this is QEMU's way to dump a VM state. Given that
-> > > we already have this for things like the spectre management state, we
-> > > can just as well expose the bitmaps that deal with the KVM-specific
-> > > hypercalls. After all, this falls into the realm of "KVM as VM
-> > > firmware".
-> > >
-> > > For ARM-architected hypercalls (TRNG, stolen time), we may need a
-> > > similar extension.
-> > >
-> >
-> > Thanks for including me Marc. I think you've mentioned all the examples
-> > of why we don't generally expect N+1 -> N migrations to work that I
-> > can think of. While some of the examples like get-reg-list could
-> > eventually be eliminated if we had CPU models to tighten our machine type
-> > state, I think N+1 -> N migrations will always be best effort at most.
-> >
-> > I agree with giving userspace control over the exposer of the hypercalls
-> > though. Using pseudo-registers for that purpose rather than a pile of
-> > CAPs also seems reasonable to me.
-> >
-> > And, while I don't think this patch is going to proceed, I thought I'd
-> > point out that the opt-out approach doesn't help much with expanding
-> > our migration support unless we require the VMM to be upgraded first.
-> >
-> > And, even then, the (N_kern, N+1_vmm) -> (N+1_kern, N_vmm) case won't
-> > work as expected, since the source enforce opt-out, but the destination
-> > won't.
+On Tue, 24 Aug 2021 16:45:23 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Right, there's going to need to be a fence in both kernel and VMM
-> versions. Before the fence, you can't rollback with either component.
-> Once on the other side of the fence, the user may freely migrate
-> between kernel + VMM combinations.
+> Commit 31c00d2aeaa2 ("arm64: Disable fine grained traps on boot") zeroed
+> the fine grained trap registers to prevent unwanted register traps from
+> occuring. However, for the PMSNEVFR_EL1 register, the corresponding
+> HDFG{R,W}TR_EL2.nPMSNEVFR_EL1 fields must be 1 to disable trapping. Set
+> both fields to 1 if FEAT_SPEv1p2 is detected to disable read and write
+> traps.
 > 
-> > Also, since the VMM doesn't key off the kernel version, for the
-> > most part N+1 VMMs won't know when they're supposed to opt-out or not,
-> > leaving it to the user to ensure they consider everything. opt-in
-> > usually only needs the user to consider what machine type they want to
-> > launch.
+> Fixes: 31c00d2aeaa2 ("arm64: Disable fine grained traps on boot")
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+> Based on v5.14-rc7. Tested on the model, using boot-wrapper built from
+> commit 5cd6238ec4ef ("aarch32: fix .globl replacement"). Without this
+> patch, in NVHE mode, the model freezes when I try to access PMSNEVFR_EL1.
+> With this patch, the model doesn't hang anymore.
 > 
-> Going the register route will implicitly require opt-out for all old
-> hypercalls. We exposed them unconditionally to the guest before, and
-> we must uphold that behavior. The default value for the bitmap will
-> have those features set. Any hypercalls added after that register
-> interface will then require explicit opt-in from userspace.
+> Changes since v1:
 > 
-> With regards to the pseudoregister interface, how would a VMM discover
-> new bits? From my perspective, you need to have two bitmaps that the
-> VMM can get at: the set of supported feature bits and the active
-> bitmap of features for a running guest.
->
+> * Set the corresponding bit in HDFGWRTR_EL2 to also disable write traps. My
+>   thanks to Mark for pointing it out.
+> 
+>  arch/arm64/include/asm/el2_setup.h | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/el2_setup.h b/arch/arm64/include/asm/el2_setup.h
+> index b83fb24954b7..3198acb2aad8 100644
+> --- a/arch/arm64/include/asm/el2_setup.h
+> +++ b/arch/arm64/include/asm/el2_setup.h
+> @@ -149,8 +149,17 @@
+>  	ubfx	x1, x1, #ID_AA64MMFR0_FGT_SHIFT, #4
+>  	cbz	x1, .Lskip_fgt_\@
+>  
+> -	msr_s	SYS_HDFGRTR_EL2, xzr
+> -	msr_s	SYS_HDFGWTR_EL2, xzr
+> +	mov	x0, xzr
+> +	mrs	x1, id_aa64dfr0_el1
+> +	ubfx	x1, x1, #ID_AA64DFR0_PMSVER_SHIFT, #4
+> +	cmp	x1, #3
+> +	b.lt	.Lset_fgt_\@
+> +	/* Disable PMSNEVFR_EL1 read and write traps */
+> +	orr	x0, x0, #(1 << 62)
+> +
+> +.Lset_fgt_\@:
+> +	msr_s	SYS_HDFGRTR_EL2, x0
+> +	msr_s	SYS_HDFGWTR_EL2, x0
+>  	msr_s	SYS_HFGRTR_EL2, xzr
+>  	msr_s	SYS_HFGWTR_EL2, xzr
+>  	msr_s	SYS_HFGITR_EL2, xzr
 
-I think we should model the pseudo-register approach off of x86's
-CPUID approach. x86 has specific get/set ioctls for CPUIDs
-(KVM_GET/SET_CPUID2), but I think we should get by with just
-get/set-one-reg. However, it might be nice/necessary to have something
-like x86's KVM_GET_SUPPORTED_CPUID which returns all the registers
-at once as a bitmap and the set bits would inform userspace of what's
-supported by the hardware and KVM.
+The beauty of negative trap bits... Thankfully this seems to be the
+only one.
 
-So a new ioctl similar to KVM_GET_SUPPORTED_CPUID would be your
-first bitmap that shows what's supported and then userpace can
-determine what it wants to change and calculate the appropriate
-pseudo-registers to set/clear bits on with set-one-reg, as x86
-would do with kvm-set-cpuid2.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-Thanks,
-drew
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
