@@ -2,66 +2,97 @@ Return-Path: <SRS0=jphx=NS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 702C1C432BE
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Aug 2021 11:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 260C4C432BE
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Aug 2021 14:57:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E2AA860FDA
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Aug 2021 11:54:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E2AA860FDA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8C68C60EFF
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Aug 2021 14:57:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8C68C60EFF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 700CA4B102;
-	Fri, 27 Aug 2021 07:54:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09DC14B128;
+	Fri, 27 Aug 2021 10:57:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bk3EzWsh6lc8; Fri, 27 Aug 2021 07:54:17 -0400 (EDT)
+	with ESMTP id Ao-xGjKouX+d; Fri, 27 Aug 2021 10:57:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44AEF4B10B;
-	Fri, 27 Aug 2021 07:54:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E16A34B0C0;
+	Fri, 27 Aug 2021 10:57:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBBD14B0E2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 07:54:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D4D94B0A5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 10:57:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4cZmfUg6ZESj for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Aug 2021 07:54:14 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 781394B0BA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 07:54:14 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 615CB60FDA;
- Fri, 27 Aug 2021 11:54:13 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mJaR1-007YG1-8P; Fri, 27 Aug 2021 12:54:11 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH][kvmtool] virtio/pci: Size the MSI-X bar according to the
- number of MSI-X
-Date: Fri, 27 Aug 2021 12:54:05 +0100
-Message-Id: <20210827115405.1981529-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+ with ESMTP id KPUstyP3Rj7p for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Aug 2021 10:57:24 -0400 (EDT)
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB7014B09C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 10:57:24 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+ References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description;
+ bh=NSdJTnTrDORwb+LwDd1YsYwMgPCJRxx0pXYK8FlAauE=; b=Fa7lAXZuZMGlhMkvCLlAaInQ0M
+ LvZMAI9dgp92KcFz4u2w541+/Nu67i2Ea3rAZpKD6Q1P9ILjKx8E7vJPC9Yy4BHzufUafcmzb+2zu
+ XEqetUQrDWVmWgUJbeWVLi3VrFACkcynBo/GAIrkEDlonwYXZkgrnKNPnvuRXhzSenXsmorxKXv3b
+ UaLmP8193HgPXArb5Wp1c/mrxTLlf/21JEFOup9O58miZONiwbcuapmO9GWG87OVfsWhj7CHiSkGX
+ N5n6bqMpN0VhS93yWvq33V/48j5w+oHy6eCsh396wVtLrGJfjfA+JtKu/NF0o3UbeTizVS7b6v5Pe
+ Ifw0PqQQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100]
+ helo=noisy.programming.kicks-ass.net)
+ by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+ id 1mJdHk-00DX6q-CH; Fri, 27 Aug 2021 14:56:48 +0000
+Received: from hirez.programming.kicks-ass.net
+ (hirez.programming.kicks-ass.net [192.168.1.225])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits))
+ (Client did not present a certificate)
+ by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 06096300DEF;
+ Fri, 27 Aug 2021 16:56:46 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+ id DA39829CFAC0B; Fri, 27 Aug 2021 16:56:45 +0200 (CEST)
+Date: Fri, 27 Aug 2021 16:56:45 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 05/15] perf: Track guest callbacks on a per-CPU basis
+Message-ID: <YSj9LQfbKxOhxqcP@hirez.programming.kicks-ass.net>
+References: <20210827005718.585190-1-seanjc@google.com>
+ <20210827005718.585190-6-seanjc@google.com>
+ <YSiRBQQE7md7ZrNC@hirez.programming.kicks-ass.net>
+ <YSj7jq32U8Euf38o@google.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- andre.przywara@arm.com, alexandru.elisei@arm.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will@kernel.org>
+Content-Disposition: inline
+In-Reply-To: <YSj7jq32U8Euf38o@google.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Guo Ren <guoren@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, linux-riscv@lists.infradead.org,
+ Vincent Chen <deanbo422@gmail.com>, Jiri Olsa <jolsa@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+ linux-csky@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ Ingo Molnar <mingo@redhat.com>, Like Xu <like.xu.linux@gmail.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Zhu Lingshan <lingshan.zhu@intel.com>,
+ Will Deacon <will@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Borislav Petkov <bp@alien8.de>, Greentime Hu <green.hu@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Namhyung Kim <namhyung@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Artem Kashkanov <artem.kashkanov@intel.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Juergen Gross <jgross@suse.com>, Nick Hu <nickhu@andestech.com>,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,131 +109,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since 45d3b59e8c45 ("kvm tools: Increase amount of possible interrupts
-per PCI device"), the number of MSI-S has gone from 4 to 33.
+On Fri, Aug 27, 2021 at 02:49:50PM +0000, Sean Christopherson wrote:
+> On Fri, Aug 27, 2021, Peter Zijlstra wrote:
+> > On Thu, Aug 26, 2021 at 05:57:08PM -0700, Sean Christopherson wrote:
+> > > Use a per-CPU pointer to track perf's guest callbacks so that KVM can set
+> > > the callbacks more precisely and avoid a lurking NULL pointer dereference.
+> > 
+> > I'm completely failing to see how per-cpu helps anything here...
+> 
+> It doesn't help until KVM is converted to set the per-cpu pointer in flows that
+> are protected against preemption, and more specifically when KVM only writes to
+> the pointer from the owning CPU.  
 
-However, the corresponding storage hasn't been upgraded, and writing
-to the MSI-X table is a pretty risky business. Now that the Linux
-kernel writes to *all* MSI-X entries before doing anything else
-with the device, kvmtool dies a horrible death.
+So the 'problem' I have with this is that sane (!KVM using) people, will
+still have to suffer that load, whereas with the static_call() we patch
+in an 'xor %rax,%rax' and only have immediate code flow.
 
-Fix it by properly defining the size of the MSI-X bar, and make
-Linux great again.
+> Ignoring static call for the moment, I don't see how the unreg side can be safe
+> using a bare single global pointer.  There is no way for KVM to prevent an NMI
+> from running in parallel on a different CPU.  If there's a more elegant solution,
+> especially something that can be backported, e.g. an rcu-protected pointer, I'm
+> all for it.  I went down the per-cpu path because it allowed for cleanups in KVM,
+> but similar cleanups can be done without per-cpu perf callbacks.
 
-This includes some fixes the PBA region decoding, as well as minor
-cleanups to make this code a bit more maintainable.
+If all the perf_guest_cbs dereferences are with preemption disabled
+(IRQs disabled, IRQ context, NMI context included), then the sequence:
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- virtio/pci.c | 42 ++++++++++++++++++++++++++++++------------
- 1 file changed, 30 insertions(+), 12 deletions(-)
+	WRITE_ONCE(perf_guest_cbs, NULL);
+	synchronize_rcu();
 
-diff --git a/virtio/pci.c b/virtio/pci.c
-index eb91f512..41085291 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -7,6 +7,7 @@
- #include "kvm/irq.h"
- #include "kvm/virtio.h"
- #include "kvm/ioeventfd.h"
-+#include "kvm/util.h"
- 
- #include <sys/ioctl.h>
- #include <linux/virtio_pci.h>
-@@ -14,6 +15,13 @@
- #include <assert.h>
- #include <string.h>
- 
-+#define ALIGN_UP(x, s)		ALIGN((x) + (s) - 1, (s))
-+#define VIRTIO_NR_MSIX		(VIRTIO_PCI_MAX_VQ + VIRTIO_PCI_MAX_CONFIG)
-+#define VIRTIO_MSIX_TABLE_SIZE	(VIRTIO_NR_MSIX * 16)
-+#define VIRTIO_MSIX_PBA_SIZE	(ALIGN_UP(VIRTIO_MSIX_TABLE_SIZE, 64) / 8)
-+#define VIRTIO_MSIX_BAR_SIZE	(1UL << fls_long(VIRTIO_MSIX_TABLE_SIZE + \
-+						 VIRTIO_MSIX_PBA_SIZE))
-+
- static u16 virtio_pci__port_addr(struct virtio_pci *vpci)
- {
- 	return pci__bar_address(&vpci->pci_hdr, 0);
-@@ -333,18 +341,27 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
- 	struct virtio_pci *vpci = vdev->virtio;
- 	struct msix_table *table;
- 	u32 msix_io_addr = virtio_pci__msix_io_addr(vpci);
-+	u32 pba_offset;
- 	int vecnum;
- 	size_t offset;
- 
--	if (addr > msix_io_addr + PCI_IO_SIZE) {
-+	BUILD_BUG_ON(VIRTIO_NR_MSIX > (sizeof(vpci->msix_pba) * 8));
-+
-+	pba_offset = vpci->pci_hdr.msix.pba_offset & ~PCI_MSIX_TABLE_BIR;
-+	if (addr >= msix_io_addr + pba_offset) {
-+		/* Read access to PBA */
- 		if (is_write)
- 			return;
--		table  = (struct msix_table *)&vpci->msix_pba;
--		offset = addr - (msix_io_addr + PCI_IO_SIZE);
--	} else {
--		table  = vpci->msix_table;
--		offset = addr - msix_io_addr;
-+		offset = addr - (msix_io_addr + pba_offset);
-+		if ((offset + len) > sizeof (vpci->msix_pba))
-+			return;
-+		memcpy(data, (void *)&vpci->msix_pba + offset, len);
-+		return;
- 	}
-+
-+	table  = vpci->msix_table;
-+	offset = addr - msix_io_addr;
-+
- 	vecnum = offset / sizeof(struct msix_table);
- 	offset = offset % sizeof(struct msix_table);
- 
-@@ -520,7 +537,7 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 
- 	port_addr = pci_get_io_port_block(PCI_IO_SIZE);
- 	mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
--	msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
-+	msix_io_block = pci_get_mmio_block(VIRTIO_MSIX_BAR_SIZE);
- 
- 	vpci->pci_hdr = (struct pci_device_header) {
- 		.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
-@@ -543,7 +560,7 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
- 		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
- 		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
--		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
-+		.bar_size[2]		= cpu_to_le32(VIRTIO_MSIX_BAR_SIZE),
- 	};
- 
- 	r = pci__register_bar_regions(kvm, &vpci->pci_hdr,
-@@ -560,8 +577,9 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 	vpci->pci_hdr.msix.cap = PCI_CAP_ID_MSIX;
- 	vpci->pci_hdr.msix.next = 0;
- 	/*
--	 * We at most have VIRTIO_PCI_MAX_VQ entries for virt queue,
--	 * VIRTIO_PCI_MAX_CONFIG entries for config.
-+	 * We at most have VIRTIO_NR_MSIX entries (VIRTIO_PCI_MAX_VQ
-+	 * entries for virt queue, VIRTIO_PCI_MAX_CONFIG entries for
-+	 * config).
- 	 *
- 	 * To quote the PCI spec:
- 	 *
-@@ -570,11 +588,11 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
- 	 * For example, a returned value of "00000000011"
- 	 * indicates a table size of 4.
- 	 */
--	vpci->pci_hdr.msix.ctrl = cpu_to_le16(VIRTIO_PCI_MAX_VQ + VIRTIO_PCI_MAX_CONFIG - 1);
-+	vpci->pci_hdr.msix.ctrl = cpu_to_le16(VIRTIO_NR_MSIX - 1);
- 
- 	/* Both table and PBA are mapped to the same BAR (2) */
- 	vpci->pci_hdr.msix.table_offset = cpu_to_le32(2);
--	vpci->pci_hdr.msix.pba_offset = cpu_to_le32(2 | PCI_IO_SIZE);
-+	vpci->pci_hdr.msix.pba_offset = cpu_to_le32(2 | VIRTIO_MSIX_TABLE_SIZE);
- 	vpci->config_vector = 0;
- 
- 	if (irq__can_signal_msi(kvm))
--- 
-2.30.2
+Ensures that all prior observers of perf_guest_csb will have completed
+and future observes must observe the NULL value.
 
 _______________________________________________
 kvmarm mailing list
