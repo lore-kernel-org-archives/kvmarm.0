@@ -2,87 +2,89 @@ Return-Path: <SRS0=jphx=NS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5AF1C432BE
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Aug 2021 15:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A96BC4320E
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Aug 2021 15:20:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3C47B60F91
-	for <kvmarm@archiver.kernel.org>; Fri, 27 Aug 2021 15:20:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3C47B60F91
+	by mail.kernel.org (Postfix) with ESMTP id 396EE60F91
+	for <kvmarm@archiver.kernel.org>; Fri, 27 Aug 2021 15:20:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 396EE60F91
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE8484B10D;
-	Fri, 27 Aug 2021 11:20:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E26EB4B12D;
+	Fri, 27 Aug 2021 11:20:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id m9ypOu-lCE7O; Fri, 27 Aug 2021 11:20:30 -0400 (EDT)
+	with ESMTP id L7Tbs5GiIm2s; Fri, 27 Aug 2021 11:20:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A698A4B118;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5E6B4B121;
 	Fri, 27 Aug 2021 11:20:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 305854B0CB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 10:49:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7353A4B121
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 10:58:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g6vNwe1BC7R0 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Aug 2021 10:49:56 -0400 (EDT)
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
- [209.85.216.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0CDF4B0C0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 10:49:55 -0400 (EDT)
-Received: by mail-pj1-f50.google.com with SMTP id h1so4702801pjs.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 07:49:55 -0700 (PDT)
+ with ESMTP id eReEIY+WsKM4 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Aug 2021 10:58:40 -0400 (EDT)
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com
+ [209.85.214.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71D194B120
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 10:58:40 -0400 (EDT)
+Received: by mail-pl1-f176.google.com with SMTP id e15so4090932plh.8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Aug 2021 07:58:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=14M76fSGlvACgnYuGU3A/x3DEJPAcKiBE8JXzhdP/4U=;
- b=pLAL3YBvEH241wYB1s4aywKaz7QeJRhSbGv+nktb/1x+GCOg0VVDMExMGUZWmZPsDc
- NVzspVTDa3lSW0dyJijr23zu+7tSFARHT4kxKiTs7I83HrgoOR9ZjAM+CS/Hri3F1VJJ
- 2cgbzigcjgD1FFxs8iuFU4QSJYpY905pXBKXs7PumwcHwyCCbOr2tLcIMDqqbkJHwm7W
- OY/wxvG8MYV6F0/ygGfrV94k17Tq04+ngUI3kmNaGgMrAB+BvHmQiIoMrL8UQ47WIDLc
- HbsUHl+jyqAkK128CP0oKREgIRQL0mf5zrS45lyHYrnz5h3QUE60Siq/ksEiSLoHHDKJ
- dUxQ==
+ bh=uRFFUbAhELNbaSp6/gZa0c8lVubPxa9shGc4LpwPEKA=;
+ b=LaTxPm5alTPx3ec48IA6+ZkyOejP1tGYjt5wY+p50UOfksJNBKAzDXOzoDDiJpQJ7C
+ 7ZlQ2CaQrXUZrhEVe/+L/sf91LGMM0vWjp8eP3YRAXU34kmcSmT/loEOx2KY28gVVCsl
+ oNwRHnusQG6CUmxymYZ58t9NT8p9wB0iZAAe71TUcHWHnrhk4i1QLthTClskPP73rEx7
+ 8W5oVGVmckueDqbKs0mB5YdxIHBLQgh+JwU0k3CO0TH8YixDpwG1SB6F/loD+NPrNZ2l
+ 0CosQb5gLTnLJ9MX51KpbZFvZYLNN8TvF8Ol0HP7oCHqmHClmMDvOIzUAi7IGzMuFHXf
+ oANw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=14M76fSGlvACgnYuGU3A/x3DEJPAcKiBE8JXzhdP/4U=;
- b=kH3oqFFGyhvQ2t7AAwzCUDbATlePSlyijAU9HMvYpUMHoXp6muJRJd7tFBC17ruFER
- XJxCjFDNC6DQ13+fKPhz0Ofzi7fuNGNZUZvqS55LpX1/zniER6oo/91uwbFz8ADkqNsE
- VBckd5CbDXe4EPcn4b2vQpFXQ5pq2mgwWaDtDbZSS0TyuTdgQaJ47dGm9eYpPthV+oJs
- 1ZKXrTNQiALtE3TLgAtJkTBN06xisDL/a0yH6i0FgrbXFC2i7nl6wOwBIYHdLWCDov1p
- UuFM2jwg+6IVGljYnkBo5B5AbL1imetYnISNK8PAMTSSkYDD+LQjHKzmP/5wDVeN4Mv1
- 0fcA==
-X-Gm-Message-State: AOAM531xIrPAEmK1cwWT+5xi0ABvDomAgQeXlYwumFhaXF8YtomljxlB
- XEhWKfx5qsZ8rpsQIjXxB01uhw==
-X-Google-Smtp-Source: ABdhPJwNNMMmz636sWquZ+PrJBprWwR45xsHh4a4A1+VNHMucrkqN70WbnI4m5X0u5NEISGgHsWDDA==
-X-Received: by 2002:a17:90a:1b0d:: with SMTP id
- q13mr23772297pjq.217.1630075794782; 
- Fri, 27 Aug 2021 07:49:54 -0700 (PDT)
+ bh=uRFFUbAhELNbaSp6/gZa0c8lVubPxa9shGc4LpwPEKA=;
+ b=nCs/obEnA81qM9g0vCt7p4X/NtgHsjLC2sfiiP7XwMkxExItpkgtmKIA4qguarO8pD
+ Byy3FHbhGQEER0/mhjLtGfVUB8SLNNWRUCttybNhRTk5RqcRH2DIVEbU+m2AD1h2xdpY
+ h0dx+nvw2TK46hNsZHmpbg5gW0JYj5ukX/LL9vS/6bXO+ruC1PhjeXmKEKADTcIdaS0v
+ 9GHoBJBGruBmuD1ddB9X97q9fpcokUiAlwY59Cy3tXlYZ+WxTAlK21g64zA9oynbBBkF
+ QJsFilH7/Vl5q6OYxsn+G4A6kVYcR8KT/jFccgKa1tPiaG/0CQhMupRZRV4Fh4eE9RWK
+ D5yQ==
+X-Gm-Message-State: AOAM53132zuwPkJYwLSp/7cDzaevsbmxFRY3fzxt0eDJ2zDklpi0poof
+ jnDHTURBJkGlGhFguNT9WKX79g==
+X-Google-Smtp-Source: ABdhPJzgh09WISpUzNhO7TIEv2MEhpi/JDC49fmE6awwyfv/L0ffcVcqSZUNcnR7TJ7/0hyFRiQ/2g==
+X-Received: by 2002:a17:902:e20a:b0:134:221f:657d with SMTP id
+ u10-20020a170902e20a00b00134221f657dmr9134631plb.78.1630076319283; 
+ Fri, 27 Aug 2021 07:58:39 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id x4sm6940653pff.126.2021.08.27.07.49.53
+ by smtp.gmail.com with ESMTPSA id e11sm6590628pfn.49.2021.08.27.07.58.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 27 Aug 2021 07:49:54 -0700 (PDT)
-Date: Fri, 27 Aug 2021 14:49:50 +0000
+ Fri, 27 Aug 2021 07:58:38 -0700 (PDT)
+Date: Fri, 27 Aug 2021 14:58:35 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 05/15] perf: Track guest callbacks on a per-CPU basis
-Message-ID: <YSj7jq32U8Euf38o@google.com>
+Subject: Re: [PATCH 07/15] KVM: Use dedicated flag to track if KVM is
+ handling an NMI from guest
+Message-ID: <YSj9mz4F2NDSKaas@google.com>
 References: <20210827005718.585190-1-seanjc@google.com>
- <20210827005718.585190-6-seanjc@google.com>
- <YSiRBQQE7md7ZrNC@hirez.programming.kicks-ass.net>
+ <20210827005718.585190-8-seanjc@google.com>
+ <YSiUnDbi/aZ3nunT@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YSiRBQQE7md7ZrNC@hirez.programming.kicks-ass.net>
+In-Reply-To: <YSiUnDbi/aZ3nunT@hirez.programming.kicks-ass.net>
 X-Mailman-Approved-At: Fri, 27 Aug 2021 11:20:29 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  Alexander Shishkin <alexander.shishkin@linux.intel.com>,
@@ -122,42 +124,36 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, Aug 27, 2021, Peter Zijlstra wrote:
-> On Thu, Aug 26, 2021 at 05:57:08PM -0700, Sean Christopherson wrote:
-> > Use a per-CPU pointer to track perf's guest callbacks so that KVM can set
-> > the callbacks more precisely and avoid a lurking NULL pointer dereference.
+> On Thu, Aug 26, 2021 at 05:57:10PM -0700, Sean Christopherson wrote:
+> > diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> > index 5cedc0e8a5d5..4c5ba4128b38 100644
+> > --- a/arch/x86/kvm/x86.h
+> > +++ b/arch/x86/kvm/x86.h
+> > @@ -395,9 +395,10 @@ static inline void kvm_unregister_perf_callbacks(void)
+> >  
+> >  DECLARE_PER_CPU(struct kvm_vcpu *, current_vcpu);
+> >  
+> > -static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu)
+> > +static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu, bool is_nmi)
+> >  {
+> >  	__this_cpu_write(current_vcpu, vcpu);
+> > +	WRITE_ONCE(vcpu->arch.handling_nmi_from_guest, is_nmi);
+> >  
+> >  	kvm_register_perf_callbacks();
+> >  }
+> > @@ -406,6 +407,7 @@ static inline void kvm_after_interrupt(struct kvm_vcpu *vcpu)
+> >  {
+> >  	kvm_unregister_perf_callbacks();
+> >  
+> > +	WRITE_ONCE(vcpu->arch.handling_nmi_from_guest, false);
+> >  	__this_cpu_write(current_vcpu, NULL);
+> >  }
 > 
-> I'm completely failing to see how per-cpu helps anything here...
+> Does this rely on kvm_{,un}register_perf_callback() being a function
+> call and thus implying a sequence point to order the stores? 
 
-It doesn't help until KVM is converted to set the per-cpu pointer in flows that
-are protected against preemption, and more specifically when KVM only writes to
-the pointer from the owning CPU.  
-
-> > On x86, KVM supports being built as a module and thus can be unloaded.
-> > And because the shared callbacks are referenced from IRQ/NMI context,
-> > unloading KVM can run concurrently with perf, and thus all of perf's
-> > checks for a NULL perf_guest_cbs are flawed as perf_guest_cbs could be
-> > nullified between the check and dereference.
-> 
-> No longer allowing KVM to be a module would be *AWESOME*. I detest how
-> much we have to export for KVM :/
-> 
-> Still, what stops KVM from doing a coherent unreg? Even the
-> static_call() proposed in the other patch, unreg can do
-> static_call_update() + synchronize_rcu() to ensure everybody sees the
-> updated pointer (would require a quick audit to see all users are with
-> preempt disabled, but I think your using per-cpu here already imposes
-> the same).
-
-Ignoring static call for the moment, I don't see how the unreg side can be safe
-using a bare single global pointer.  There is no way for KVM to prevent an NMI
-from running in parallel on a different CPU.  If there's a more elegant solution,
-especially something that can be backported, e.g. an rcu-protected pointer, I'm
-all for it.  I went down the per-cpu path because it allowed for cleanups in KVM,
-but similar cleanups can be done without per-cpu perf callbacks.
-
-As for static calls, I certainly have no objection to employing static calls for
-the callbacks, but IMO we should not be relying on static call for correctness,
-i.e. the existing bug needs to be fixed first.
+No, I'm just terrible at remembering which macros provide what ordering guarantees,
+i.e. I was thinking WRITE_ONCE provided guarantees against compiler reordering.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
