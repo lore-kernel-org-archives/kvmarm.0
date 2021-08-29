@@ -1,89 +1,93 @@
-Return-Path: <SRS0=Klgp=NT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=y5YY=NU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AD7C4320A
-	for <kvmarm@archiver.kernel.org>; Sat, 28 Aug 2021 20:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DEFC432BE
+	for <kvmarm@archiver.kernel.org>; Sun, 29 Aug 2021 02:35:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D42BB60EB5
-	for <kvmarm@archiver.kernel.org>; Sat, 28 Aug 2021 20:14:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D42BB60EB5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	by mail.kernel.org (Postfix) with ESMTP id 52ABF60E99
+	for <kvmarm@archiver.kernel.org>; Sun, 29 Aug 2021 02:35:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 52ABF60E99
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8EE4B0F5;
-	Sat, 28 Aug 2021 16:14:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2A314B0BB;
+	Sat, 28 Aug 2021 22:35:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@infradead.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JyuuJMR58VK1; Sat, 28 Aug 2021 16:14:39 -0400 (EDT)
+	with ESMTP id 5GA7pgfcXwQE; Sat, 28 Aug 2021 22:35:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A6224B132;
-	Sat, 28 Aug 2021 16:14:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8F594B132;
+	Sat, 28 Aug 2021 22:35:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B777C4B108
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Aug 2021 16:14:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A7E54B12D
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Aug 2021 22:35:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Isc2qkZSwGUk for <kvmarm@lists.cs.columbia.edu>;
- Sat, 28 Aug 2021 16:14:33 -0400 (EDT)
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6EBC4B0F5
- for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Aug 2021 16:14:33 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
- References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=5eM46mJiedShkh/qp5ZYvdDK6rHNXNQh8cRsw3NT0wc=; b=PCb7ByQnKwg1Y1b5amksoxMC18
- 750jnriAADg3ZMPkZsQ1S64I3SWooq8RAWKHR6gvS8yq6sBTJRW/xpIDhQdtdqFGSMkbRqvzaoVOX
- RbHrtpxkLKFZ4QPToWsR2xgD4PPVFivtUlICzQb4AuxKKXG0q5V1I06RklmKdc6wzT/DQawC2aUYR
- bAQTfuPsxVqPKCnKmPQWMt4oHoj06J+I7g5V81Vo50dn/UBfFPxoTMXUOcQzRt6ogYKOXQM3TuwyX
- U9SU7AVxzEm+BWC1B9V1zMc+Wy5pDKewEdcHo9SqQqbovYL6/IUQxLHaa9mf9upz2wZvb/AUhs050
- 1IIDrKxg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100]
- helo=worktop.programming.kicks-ass.net)
- by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1mK4hs-00Dw8H-MQ; Sat, 28 Aug 2021 20:13:43 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
- id 1A47F9868D7; Sat, 28 Aug 2021 22:13:36 +0200 (CEST)
-Date: Sat, 28 Aug 2021 22:13:36 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v2 00/13] perf: KVM: Fix, optimize, and clean up callbacks
-Message-ID: <20210828201336.GD4353@worktop.programming.kicks-ass.net>
-References: <20210828003558.713983-1-seanjc@google.com>
+ with ESMTP id cvYGV9psMzNQ for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 28 Aug 2021 22:35:36 -0400 (EDT)
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com
+ [209.85.166.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE81A4B0BB
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Aug 2021 22:35:35 -0400 (EDT)
+Received: by mail-il1-f176.google.com with SMTP id l10so11777607ilh.8
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 28 Aug 2021 19:35:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=RudsPPL2jXFkdPRzt+igCskpzL+QGPjfc2x3ccwPC9w=;
+ b=J9dShv8oT22vhmmqH2pkP0XLxIOEJ7tW9eSIEdnG1fyr3GwcpVNpmGYZWHtUTPwbdc
+ lKZST7xRrEZtCCb+YWt8Xhzpj6P/kSiXR0smrgRiSTf5HtapPENUniwt6x6XneYgBx0f
+ MhIbbwvej2DS9j87DesFkvJyYr27DVk+uIr34OeQabcGSnyM56UwM+VJQyZowkGY0Neh
+ OsWFl9GKalS1FqlEsxb3bHlOl0fYVMlSmFGYXE7WCyXLDSvB9bwTTYN1vCxZ84vvyh5r
+ lSjypE12DhI1TxK1lGSxbhqQx8NkclxW++kh+LZbm+cV6BzzD9CA8RVPG7HK+8BEXDGe
+ 18qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=RudsPPL2jXFkdPRzt+igCskpzL+QGPjfc2x3ccwPC9w=;
+ b=FD1IDjz+dFZ3sHevff3HfHrImhV/dqYbVwr/0QVzqPzU4QFKmAbMdCrfuSK/4b1XEL
+ j3HOYaOs7W9A4Fr9cAte7uZ0ixbDJghzFp11FVsSYleBQAupQNNlwpK8ZKOl0a3CHqan
+ mKVYTILPYjD+yBEXgj4BQrXoOXTb0KbrKCLYlnhannFj/JkEdS3YEK0cArp1xjNpqRkC
+ TS4qEwdBqmxAH6A6PJBn6b10IDHlqYCShmIlwNob6H/1/ewD+/M8vPofduS8it+SYXwY
+ UsmF4iC8HnOr5fnbgehhIhul9Ofiri5dIeKhMsGVJLB2R+X+oK2GlW8hlv2M31/QygN1
+ UfMA==
+X-Gm-Message-State: AOAM532Fdf21Y90MIMxa2o/2K7dqz8CradmjAcPWRzYAZdAGxyNz+LBS
+ FKRygGd2oBmL76+tn+22T+rz/w==
+X-Google-Smtp-Source: ABdhPJwqUHMTxEkDQA8hFpGHHEo0tu8/O2NMjK/5E7lfYuh/Mo0XzToNBlb9dDEkFv0S5CWvSmaOLA==
+X-Received: by 2002:a92:cda4:: with SMTP id g4mr11981754ild.236.1630204534995; 
+ Sat, 28 Aug 2021 19:35:34 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194])
+ by smtp.gmail.com with ESMTPSA id h11sm1851451ilc.7.2021.08.28.19.35.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 28 Aug 2021 19:35:34 -0700 (PDT)
+Date: Sun, 29 Aug 2021 02:35:30 +0000
+From: Oliver Upton <oupton@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v7 3/7] KVM: arm64: Allow userspace to configure a vCPU's
+ virtual offset
+Message-ID: <YSryci4dSuRAEg+g@google.com>
+References: <20210816001217.3063400-1-oupton@google.com>
+ <20210816001217.3063400-4-oupton@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210828003558.713983-1-seanjc@google.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Guo Ren <guoren@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, linux-riscv@lists.infradead.org,
- Vincent Chen <deanbo422@gmail.com>, Jiri Olsa <jolsa@redhat.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
- linux-csky@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- Ingo Molnar <mingo@redhat.com>, Like Xu <like.xu.linux@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Zhu Lingshan <lingshan.zhu@intel.com>,
- Will Deacon <will@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Borislav Petkov <bp@alien8.de>, Greentime Hu <green.hu@gmail.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Namhyung Kim <namhyung@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>,
- Artem Kashkanov <artem.kashkanov@intel.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Juergen Gross <jgross@suse.com>, Nick Hu <nickhu@andestech.com>,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <20210816001217.3063400-4-oupton@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,149 +104,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Aug 27, 2021 at 05:35:45PM -0700, Sean Christopherson wrote:
-> Like Xu (2):
->   perf/core: Rework guest callbacks to prepare for static_call support
->   perf/core: Use static_call to optimize perf_guest_info_callbacks
+On Mon, Aug 16, 2021 at 12:12:13AM +0000, Oliver Upton wrote:
+> Allow userspace to access the guest's virtual counter-timer offset
+> through the ONE_REG interface. The value read or written is defined to
+> be an offset from the guest's physical counter-timer. Add some
+> documentation to clarify how a VMM should use this and the existing
+> CNTVCT_EL0.
 > 
-> Sean Christopherson (11):
->   perf: Ensure perf_guest_cbs aren't reloaded between !NULL check and
->     deref
->   KVM: x86: Register perf callbacks after calling vendor's
->     hardware_setup()
->   KVM: x86: Register Processor Trace interrupt hook iff PT enabled in
->     guest
->   perf: Stop pretending that perf can handle multiple guest callbacks
->   perf: Force architectures to opt-in to guest callbacks
->   KVM: x86: Drop current_vcpu for kvm_running_vcpu + kvm_arch_vcpu
->     variable
->   KVM: x86: More precisely identify NMI from guest when handling PMI
->   KVM: Move x86's perf guest info callbacks to generic KVM
->   KVM: x86: Move Intel Processor Trace interrupt handler to vmx.c
->   KVM: arm64: Convert to the generic perf callbacks
->   KVM: arm64: Drop perf.c and fold its tiny bits of code into arm.c /
->     pmu.c
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-Lets keep the whole intel_pt crud inside x86...
+Hrm...
 
----
-Index: linux-2.6/arch/x86/events/core.c
-===================================================================
---- linux-2.6.orig/arch/x86/events/core.c
-+++ linux-2.6/arch/x86/events/core.c
-@@ -92,7 +92,7 @@ DEFINE_STATIC_CALL_RET0(x86_pmu_guest_ge
- 
- DEFINE_STATIC_CALL_RET0(x86_guest_state, *(perf_guest_cbs->state));
- DEFINE_STATIC_CALL_RET0(x86_guest_get_ip, *(perf_guest_cbs->get_ip));
--DEFINE_STATIC_CALL_RET0(x86_guest_handle_intel_pt_intr, *(perf_guest_cbs->handle_intel_pt_intr));
-+DEFINE_STATIC_CALL_RET0(x86_guest_handle_intel_pt_intr, unsigned int (*)(void));
- 
- void arch_perf_update_guest_cbs(struct perf_guest_info_callbacks *guest_cbs)
- {
-@@ -103,14 +103,6 @@ void arch_perf_update_guest_cbs(struct p
- 		static_call_update(x86_guest_state, (void *)&__static_call_return0);
- 		static_call_update(x86_guest_get_ip, (void *)&__static_call_return0);
- 	}
--
--	/* Implementing ->handle_intel_pt_intr is optional. */
--	if (guest_cbs && guest_cbs->handle_intel_pt_intr)
--		static_call_update(x86_guest_handle_intel_pt_intr,
--				   guest_cbs->handle_intel_pt_intr);
--	else
--		static_call_update(x86_guest_handle_intel_pt_intr,
--				   (void *)&__static_call_return0);
- }
- 
- u64 __read_mostly hw_cache_event_ids
-Index: linux-2.6/arch/x86/events/intel/core.c
-===================================================================
---- linux-2.6.orig/arch/x86/events/intel/core.c
-+++ linux-2.6/arch/x86/events/intel/core.c
-@@ -2782,7 +2782,7 @@ static void intel_pmu_reset(void)
- 	local_irq_restore(flags);
- }
- 
--DECLARE_STATIC_CALL(x86_guest_handle_intel_pt_intr, *(perf_guest_cbs->handle_intel_pt_intr));
-+DECLARE_STATIC_CALL(x86_guest_handle_intel_pt_intr, unsigned int (*)(void));
- 
- static int handle_pmi_common(struct pt_regs *regs, u64 status)
- {
-Index: linux-2.6/arch/x86/kvm/x86.c
-===================================================================
---- linux-2.6.orig/arch/x86/kvm/x86.c
-+++ linux-2.6/arch/x86/kvm/x86.c
-@@ -10960,7 +10960,14 @@ int kvm_arch_hardware_setup(void *opaque
- 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
- 	kvm_ops_static_call_update();
- 
--	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
-+	kvm_register_perf_callbacks();
-+	if (ops->handle_intel_pt_intr) {
-+		static_call_update(x86_guest_handle_intel_pt_intr,
-+				   ops->handle_intel_pt_intr);
-+	} else {
-+		static_call_update(x86_guest_handle_intel_pt_intr,
-+				   (void *)&__static_call_return0);
-+	}
- 
- 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
- 		supported_xss = 0;
-Index: linux-2.6/include/linux/perf_event.h
-===================================================================
---- linux-2.6.orig/include/linux/perf_event.h
-+++ linux-2.6/include/linux/perf_event.h
-@@ -32,7 +32,6 @@
- struct perf_guest_info_callbacks {
- 	unsigned int			(*state)(void);
- 	unsigned long			(*get_ip)(void);
--	unsigned int			(*handle_intel_pt_intr)(void);
- };
- 
- #ifdef CONFIG_HAVE_HW_BREAKPOINT
-Index: linux-2.6/virt/kvm/kvm_main.c
-===================================================================
---- linux-2.6.orig/virt/kvm/kvm_main.c
-+++ linux-2.6/virt/kvm/kvm_main.c
-@@ -5374,12 +5374,10 @@ static unsigned long kvm_guest_get_ip(vo
- static struct perf_guest_info_callbacks kvm_guest_cbs = {
- 	.state			= kvm_guest_state,
- 	.get_ip			= kvm_guest_get_ip,
--	.handle_intel_pt_intr	= NULL,
- };
- 
--void kvm_register_perf_callbacks(unsigned int (*pt_intr_handler)(void))
-+void kvm_register_perf_callbacks(void)
- {
--	kvm_guest_cbs.handle_intel_pt_intr = pt_intr_handler;
- 	perf_register_guest_info_callbacks(&kvm_guest_cbs);
- }
- #endif
-Index: linux-2.6/arch/arm64/kvm/arm.c
-===================================================================
---- linux-2.6.orig/arch/arm64/kvm/arm.c
-+++ linux-2.6/arch/arm64/kvm/arm.c
-@@ -1749,7 +1749,7 @@ static int init_subsystems(void)
- 		goto out;
- 
- 	kvm_pmu_init();
--	kvm_register_perf_callbacks(NULL);
-+	kvm_register_perf_callbacks();
- 
- 	kvm_sys_reg_table_init();
- 
-Index: linux-2.6/include/linux/kvm_host.h
-===================================================================
---- linux-2.6.orig/include/linux/kvm_host.h
-+++ linux-2.6/include/linux/kvm_host.h
-@@ -1121,7 +1121,7 @@ static inline bool kvm_arch_intc_initial
- #ifdef __KVM_WANT_PERF_CALLBACKS
- unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu);
- 
--void kvm_register_perf_callbacks(unsigned int (*pt_intr_handler)(void));
-+void kvm_register_perf_callbacks(void);
- static inline void kvm_unregister_perf_callbacks(void)
- {
- 	perf_unregister_guest_info_callbacks();
+I was mulling on this patch a bit more and had a thought. As previously
+discussed, the patch implements virtual offsets by broadcasting the same
+offset to all vCPUs in a guest. I wonder if this may tolerate bad
+practices from userspace that will break when KVM supports NV.
+
+Consider that a nested guest may set CNTVOFF_EL2 to whatever value it
+wants. Presumably, we will need to patch the handling of CNTVOFF_EL2 to
+*not* broadcast to all vCPUs to save/restore NV properly. If a maligned
+VMM only wrote to a single vCPU, banking on this broadcasting
+implementation, it will fall flat on its face when handling an NV guest.
+
+So, should we preemptively move to the new way of the world, wherein
+userspace accesses to CNTVOFF_EL2 are vCPU-local rather than VM-wide?
+
+No strong opinions in either direction, but figured I'd address it since
+I'll need to respin this series anyway to fix ECV+nVHE.
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
