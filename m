@@ -1,101 +1,60 @@
-Return-Path: <SRS0=y5YY=NU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=6MoU=NW=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC895C432BE
-	for <kvmarm@archiver.kernel.org>; Sun, 29 Aug 2021 08:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 249D9C432BE
+	for <kvmarm@archiver.kernel.org>; Tue, 31 Aug 2021 11:11:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 41F68608FE
-	for <kvmarm@archiver.kernel.org>; Sun, 29 Aug 2021 08:26:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 41F68608FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 9192C600D4
+	for <kvmarm@archiver.kernel.org>; Tue, 31 Aug 2021 11:10:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9192C600D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF16A4B0A5;
-	Sun, 29 Aug 2021 04:26:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CC284B091;
+	Tue, 31 Aug 2021 07:10:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id x8CAVINQAa09; Sun, 29 Aug 2021 04:26:14 -0400 (EDT)
+	with ESMTP id 9VDVlxDhfIzR; Tue, 31 Aug 2021 07:10:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C65384B12B;
-	Sun, 29 Aug 2021 04:26:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 25DAB4B191;
+	Tue, 31 Aug 2021 07:10:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 961A64B11F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Aug 2021 04:26:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8E2E4B12B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Aug 2021 07:10:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rtW4kklXnP6A for <kvmarm@lists.cs.columbia.edu>;
- Sun, 29 Aug 2021 04:26:10 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2318F4B0A5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Aug 2021 04:26:10 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1630225569;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=JjTKSJDOFG8EmUAAgQVMI2Jt5VU/rzyE9X8Go3zFFC8=;
- b=IexQHMDJy+84Pn06tSki01Qr+8i2IRSQLuqzYRSII3FLiFza6O0zO83wTiyyNNbYuLW9gL
- wbchKyJedobStUH6cW8txmJ449C0VVBA1WOgHW8QDYXl1SEJhFqIC/bImMbj2DfHr5LiwL
- DflcI/Tbj2cD64X76CSB6UiZYpwbTdU=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-r2dGxmadPx6dgQIOBnrrkw-1; Sun, 29 Aug 2021 04:26:05 -0400
-X-MC-Unique: r2dGxmadPx6dgQIOBnrrkw-1
-Received: by mail-pf1-f197.google.com with SMTP id
- h10-20020a056a00170a00b003e31c4d9992so1713520pfc.23
- for <kvmarm@lists.cs.columbia.edu>; Sun, 29 Aug 2021 01:26:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JjTKSJDOFG8EmUAAgQVMI2Jt5VU/rzyE9X8Go3zFFC8=;
- b=CCL7LBIidgHDYTJ5nT5KWDpCYkpnsER2AD43Zp1kjSz/2PhjaAMikPgAsdlxKP1nEQ
- 3Ggnu9ZGBUqRcWk9rg31KBkp4aZpHgzkHyPwaC+MM3J7z2/GkLak6R4dwIaWC4fBKGAZ
- SNlmT22p4aL4DGNV8qWOTWjyDoVH5hzLAb2q+T61rOwIuHFhSwouiS3QRON0+R7ri1ob
- nd8yTEzxM26dhjCiGzAMitfawHf+M4QGm75UPFHMhZGp7HCi0YnfFUmLokLyK/ij9q3U
- QWz3xyLdhGETbOY4pb+WhNMAZKoLvDoZX62nZOGxqOQMWpANwOop11LgnXd909v/ATM6
- o5ng==
-X-Gm-Message-State: AOAM530ymoYUwmiFk+C+4nv1GlPs0WzG4kADNJ3kQKmpUIKHt3YUCvnd
- X7JZCKAPWTjV0BFicQA8vLvSkrhDe4YT+vjKcCdki/JrloXSqTlZIDiAE//63XoiidqKVP6wXdO
- w0Zncq7ufcoXC1/bdu9QFGhndbdz8gz1biXi2Di1o
-X-Received: by 2002:a65:5603:: with SMTP id l3mr15961606pgs.281.1630225564781; 
- Sun, 29 Aug 2021 01:26:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJySWEMA4H1jF0Mcnvk8eUpODxWTAu6fA3LgRcMWeaEJLcSONqbAzIpnq1+p8Z5iypLdJCetbYIsHsD7cI638CE=
-X-Received: by 2002:a65:5603:: with SMTP id l3mr15961581pgs.281.1630225564456; 
- Sun, 29 Aug 2021 01:26:04 -0700 (PDT)
+ with ESMTP id 6hRWgm6YJJ3z for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Aug 2021 07:10:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EFD9E4B091
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Aug 2021 07:10:51 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 43EF01FB;
+ Tue, 31 Aug 2021 04:10:51 -0700 (PDT)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4EAD43F694;
+ Tue, 31 Aug 2021 04:10:50 -0700 (PDT)
+Date: Tue, 31 Aug 2021 12:10:35 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH][kvmtool] virtio/pci: Size the MSI-X bar according to
+ the number of MSI-X
+Message-ID: <20210831121035.6b5c993b@slackpad.fritz.box>
+In-Reply-To: <20210827115405.1981529-1-maz@kernel.org>
+References: <20210827115405.1981529-1-maz@kernel.org>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-References: <20210816001130.3059564-1-oupton@google.com>
- <20210816001130.3059564-7-oupton@google.com>
- <CAOQ_Qsj_MfRNRRSK1UswsfBw4c9ugSW6tKXNua=3O78sHEonvA@mail.gmail.com>
- <20210826124836.GA155749@fuller.cnet> <YSf5SV0AZMvfIEib@google.com>
-In-Reply-To: <YSf5SV0AZMvfIEib@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 29 Aug 2021 10:25:51 +0200
-Message-ID: <CABgObfbqHG59n8jitJGzL0=J-tvKYvpg4+2xV7z2dFf2rNHhqg@mail.gmail.com>
-Subject: Re: [PATCH v7 6/6] KVM: x86: Expose TSC offset controls to userspace
-To: Oliver Upton <oupton@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm <kvm@vger.kernel.org>,
- Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Peter Shier <pshier@google.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Marc Zyngier <maz@kernel.org>,
- David Matlack <dmatlack@google.com>, KVM ARM <kvmarm@lists.cs.columbia.edu>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Jim Mattson <jmattson@google.com>
+Cc: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -107,180 +66,165 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============8651692121575601562=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============8651692121575601562==
-Content-Type: multipart/alternative; boundary="000000000000ac6c9e05caae7788"
+On Fri, 27 Aug 2021 12:54:05 +0100
+Marc Zyngier <maz@kernel.org> wrote:
 
---000000000000ac6c9e05caae7788
-Content-Type: text/plain; charset="UTF-8"
+Hi Marc,
 
-This will bounce to the mailing lists because I am on a text/plain-impaired
-phone, but anyway.
+> Since 45d3b59e8c45 ("kvm tools: Increase amount of possible interrupts
+> per PCI device"), the number of MSI-S has gone from 4 to 33.
+> 
+> However, the corresponding storage hasn't been upgraded, and writing
+> to the MSI-X table is a pretty risky business. Now that the Linux
+> kernel writes to *all* MSI-X entries before doing anything else
+> with the device, kvmtool dies a horrible death.
+> 
+> Fix it by properly defining the size of the MSI-X bar, and make
+> Linux great again.
+> 
+> This includes some fixes the PBA region decoding, as well as minor
+> cleanups to make this code a bit more maintainable.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-One reason to have selftests is to allow having APIs that are not used by
-QEMU. Still, I think Maxim had an implementation of his own TSC migration
-API and it shouldn't be too hard to use the algorithm that is documented in
-this series.
+Many thanks for fixing this, it looks good to me now. Just some
+questions below:
 
-Paolo
+> ---
+>  virtio/pci.c | 42 ++++++++++++++++++++++++++++++------------
+>  1 file changed, 30 insertions(+), 12 deletions(-)
+> 
+> diff --git a/virtio/pci.c b/virtio/pci.c
+> index eb91f512..41085291 100644
+> --- a/virtio/pci.c
+> +++ b/virtio/pci.c
+> @@ -7,6 +7,7 @@
+>  #include "kvm/irq.h"
+>  #include "kvm/virtio.h"
+>  #include "kvm/ioeventfd.h"
+> +#include "kvm/util.h"
+>  
+>  #include <sys/ioctl.h>
+>  #include <linux/virtio_pci.h>
+> @@ -14,6 +15,13 @@
+>  #include <assert.h>
+>  #include <string.h>
+>  
+> +#define ALIGN_UP(x, s)		ALIGN((x) + (s) - 1, (s))
+> +#define VIRTIO_NR_MSIX		(VIRTIO_PCI_MAX_VQ + VIRTIO_PCI_MAX_CONFIG)
+> +#define VIRTIO_MSIX_TABLE_SIZE	(VIRTIO_NR_MSIX * 16)
+> +#define VIRTIO_MSIX_PBA_SIZE	(ALIGN_UP(VIRTIO_MSIX_TABLE_SIZE, 64) / 8)
+> +#define VIRTIO_MSIX_BAR_SIZE	(1UL << fls_long(VIRTIO_MSIX_TABLE_SIZE + \
+> +						 VIRTIO_MSIX_PBA_SIZE))
+> +
+>  static u16 virtio_pci__port_addr(struct virtio_pci *vpci)
+>  {
+>  	return pci__bar_address(&vpci->pci_hdr, 0);
+> @@ -333,18 +341,27 @@ static void virtio_pci__msix_mmio_callback(struct kvm_cpu *vcpu,
+>  	struct virtio_pci *vpci = vdev->virtio;
+>  	struct msix_table *table;
+>  	u32 msix_io_addr = virtio_pci__msix_io_addr(vpci);
+> +	u32 pba_offset;
+>  	int vecnum;
+>  	size_t offset;
+>  
+> -	if (addr > msix_io_addr + PCI_IO_SIZE) {
 
-Il gio 26 ago 2021, 22:28 Oliver Upton <oupton@google.com> ha scritto:
+Ouch, the missing "=" looks like another long standing bug you fixed, I
+wonder how this ever worked before? Looking deeper it looks like the
+whole PBA code was quite broken (allowing writes, for instance, and
+mixing with the code for the MSIX table)?
 
-> Marcelo,
->
-> On Thu, Aug 26, 2021 at 09:48:36AM -0300, Marcelo Tosatti wrote:
-> > On Mon, Aug 23, 2021 at 01:56:30PM -0700, Oliver Upton wrote:
-> > > Paolo,
-> > >
-> > > On Sun, Aug 15, 2021 at 5:11 PM Oliver Upton <oupton@google.com>
-> wrote:
-> > > >
-> > > > To date, VMM-directed TSC synchronization and migration has been a
-> bit
-> > > > messy. KVM has some baked-in heuristics around TSC writes to infer if
-> > > > the VMM is attempting to synchronize. This is problematic, as it
-> depends
-> > > > on host userspace writing to the guest's TSC within 1 second of the
-> last
-> > > > write.
-> > > >
-> > > > A much cleaner approach to configuring the guest's views of the TSC
-> is to
-> > > > simply migrate the TSC offset for every vCPU. Offsets are idempotent,
-> > > > and thus not subject to change depending on when the VMM actually
-> > > > reads/writes values from/to KVM. The VMM can then read the TSC once
-> with
-> > > > KVM_GET_CLOCK to capture a (realtime, host_tsc) pair at the instant
-> when
-> > > > the guest is paused.
-> > > >
-> > > > Cc: David Matlack <dmatlack@google.com>
-> > > > Cc: Sean Christopherson <seanjc@google.com>
-> > > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > >
-> > > Could you please squash the following into this patch? We need to
-> > > advertise KVM_CAP_VCPU_ATTRIBUTES to userspace. Otherwise, happy to
-> > > resend.
-> > >
-> > > Thanks,
-> > > Oliver
-> >
-> > Oliver,
-> >
-> > Is there QEMU support for this, or are you using your own
-> > userspace with this?
->
-> Apologies for not getting back to you on your first mail. Sadly, I am
-> using our own userspace for this. That being said, adding support to
-> QEMU shouldn't be too challenging. I can take a stab at it if it makes
-> the series more amenable to upstream, with the giant disclaimer that I
-> haven't done work in QEMU before. Otherwise, happy to review someone
-> else's implementation.
->
-> --
-> Thanks,
-> Oliver
->
->
+> +	BUILD_BUG_ON(VIRTIO_NR_MSIX > (sizeof(vpci->msix_pba) * 8));
+> +
+> +	pba_offset = vpci->pci_hdr.msix.pba_offset & ~PCI_MSIX_TABLE_BIR;
 
---000000000000ac6c9e05caae7788
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Any particular reason you read back the offset from the MSIX capability
+instead of just using VIRTIO_MSIX_TABLE_SIZE here? Is that to avoid
+accidentally diverging in the future, by having just one place of
+definition?
 
-<div dir=3D"auto">This will bounce to the mailing lists because I am on a t=
-ext/plain-impaired phone, but anyway.<div dir=3D"auto"><br></div><div dir=
-=3D"auto">One reason to have selftests is to allow having APIs that are not=
- used by QEMU. Still, I think Maxim had an implementation of his own TSC mi=
-gration API and it shouldn&#39;t be too hard to use the algorithm that is d=
-ocumented in this series.<div dir=3D"auto"><br></div><div dir=3D"auto">Paol=
-o</div></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
-"gmail_attr">Il gio 26 ago 2021, 22:28 Oliver Upton &lt;<a href=3D"mailto:o=
-upton@google.com">oupton@google.com</a>&gt; ha scritto:<br></div><blockquot=
-e class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc sol=
-id;padding-left:1ex">Marcelo,<br>
-<br>
-On Thu, Aug 26, 2021 at 09:48:36AM -0300, Marcelo Tosatti wrote:<br>
-&gt; On Mon, Aug 23, 2021 at 01:56:30PM -0700, Oliver Upton wrote:<br>
-&gt; &gt; Paolo,<br>
-&gt; &gt; <br>
-&gt; &gt; On Sun, Aug 15, 2021 at 5:11 PM Oliver Upton &lt;<a href=3D"mailt=
-o:oupton@google.com" target=3D"_blank" rel=3D"noreferrer">oupton@google.com=
-</a>&gt; wrote:<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; To date, VMM-directed TSC synchronization and migration has =
-been a bit<br>
-&gt; &gt; &gt; messy. KVM has some baked-in heuristics around TSC writes to=
- infer if<br>
-&gt; &gt; &gt; the VMM is attempting to synchronize. This is problematic, a=
-s it depends<br>
-&gt; &gt; &gt; on host userspace writing to the guest&#39;s TSC within 1 se=
-cond of the last<br>
-&gt; &gt; &gt; write.<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; A much cleaner approach to configuring the guest&#39;s views=
- of the TSC is to<br>
-&gt; &gt; &gt; simply migrate the TSC offset for every vCPU. Offsets are id=
-empotent,<br>
-&gt; &gt; &gt; and thus not subject to change depending on when the VMM act=
-ually<br>
-&gt; &gt; &gt; reads/writes values from/to KVM. The VMM can then read the T=
-SC once with<br>
-&gt; &gt; &gt; KVM_GET_CLOCK to capture a (realtime, host_tsc) pair at the =
-instant when<br>
-&gt; &gt; &gt; the guest is paused.<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; Cc: David Matlack &lt;<a href=3D"mailto:dmatlack@google.com"=
- target=3D"_blank" rel=3D"noreferrer">dmatlack@google.com</a>&gt;<br>
-&gt; &gt; &gt; Cc: Sean Christopherson &lt;<a href=3D"mailto:seanjc@google.=
-com" target=3D"_blank" rel=3D"noreferrer">seanjc@google.com</a>&gt;<br>
-&gt; &gt; &gt; Signed-off-by: Oliver Upton &lt;<a href=3D"mailto:oupton@goo=
-gle.com" target=3D"_blank" rel=3D"noreferrer">oupton@google.com</a>&gt;<br>
-&gt; &gt; <br>
-&gt; &gt; Could you please squash the following into this patch? We need to=
-<br>
-&gt; &gt; advertise KVM_CAP_VCPU_ATTRIBUTES to userspace. Otherwise, happy =
-to<br>
-&gt; &gt; resend.<br>
-&gt; &gt; <br>
-&gt; &gt; Thanks,<br>
-&gt; &gt; Oliver<br>
-&gt; <br>
-&gt; Oliver,<br>
-&gt; <br>
-&gt; Is there QEMU support for this, or are you using your own<br>
-&gt; userspace with this?<br>
-<br>
-Apologies for not getting back to you on your first mail. Sadly, I am<br>
-using our own userspace for this. That being said, adding support to<br>
-QEMU shouldn&#39;t be too challenging. I can take a stab at it if it makes<=
-br>
-the series more amenable to upstream, with the giant disclaimer that I<br>
-haven&#39;t done work in QEMU before. Otherwise, happy to review someone<br=
->
-else&#39;s implementation.<br>
-<br>
---<br>
-Thanks,<br>
-Oliver<br>
-<br>
-</blockquote></div>
+> +	if (addr >= msix_io_addr + pba_offset) {
+> +		/* Read access to PBA */
+>  		if (is_write)
+>  			return;
+> -		table  = (struct msix_table *)&vpci->msix_pba;
+> -		offset = addr - (msix_io_addr + PCI_IO_SIZE);
+> -	} else {
+> -		table  = vpci->msix_table;
+> -		offset = addr - msix_io_addr;
+> +		offset = addr - (msix_io_addr + pba_offset);
+> +		if ((offset + len) > sizeof (vpci->msix_pba))
+> +			return;
+> +		memcpy(data, (void *)&vpci->msix_pba + offset, len);
 
---000000000000ac6c9e05caae7788--
+Should this be a char* cast, since pointer arithmetic on void* is
+somewhat frowned upon (aka "forbidden in the C standard, but allowed as
+a GCC extension")?
 
+Cheers,
+Andre
 
---===============8651692121575601562==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> +		return;
+>  	}
+> +
+> +	table  = vpci->msix_table;
+> +	offset = addr - msix_io_addr;
+> +
+>  	vecnum = offset / sizeof(struct msix_table);
+>  	offset = offset % sizeof(struct msix_table);
+>  
+> @@ -520,7 +537,7 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  
+>  	port_addr = pci_get_io_port_block(PCI_IO_SIZE);
+>  	mmio_addr = pci_get_mmio_block(PCI_IO_SIZE);
+> -	msix_io_block = pci_get_mmio_block(PCI_IO_SIZE * 2);
+> +	msix_io_block = pci_get_mmio_block(VIRTIO_MSIX_BAR_SIZE);
+>  
+>  	vpci->pci_hdr = (struct pci_device_header) {
+>  		.vendor_id		= cpu_to_le16(PCI_VENDOR_ID_REDHAT_QUMRANET),
+> @@ -543,7 +560,7 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  		.capabilities		= (void *)&vpci->pci_hdr.msix - (void *)&vpci->pci_hdr,
+>  		.bar_size[0]		= cpu_to_le32(PCI_IO_SIZE),
+>  		.bar_size[1]		= cpu_to_le32(PCI_IO_SIZE),
+> -		.bar_size[2]		= cpu_to_le32(PCI_IO_SIZE*2),
+> +		.bar_size[2]		= cpu_to_le32(VIRTIO_MSIX_BAR_SIZE),
+>  	};
+>  
+>  	r = pci__register_bar_regions(kvm, &vpci->pci_hdr,
+> @@ -560,8 +577,9 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  	vpci->pci_hdr.msix.cap = PCI_CAP_ID_MSIX;
+>  	vpci->pci_hdr.msix.next = 0;
+>  	/*
+> -	 * We at most have VIRTIO_PCI_MAX_VQ entries for virt queue,
+> -	 * VIRTIO_PCI_MAX_CONFIG entries for config.
+> +	 * We at most have VIRTIO_NR_MSIX entries (VIRTIO_PCI_MAX_VQ
+> +	 * entries for virt queue, VIRTIO_PCI_MAX_CONFIG entries for
+> +	 * config).
+>  	 *
+>  	 * To quote the PCI spec:
+>  	 *
+> @@ -570,11 +588,11 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  	 * For example, a returned value of "00000000011"
+>  	 * indicates a table size of 4.
+>  	 */
+> -	vpci->pci_hdr.msix.ctrl = cpu_to_le16(VIRTIO_PCI_MAX_VQ + VIRTIO_PCI_MAX_CONFIG - 1);
+> +	vpci->pci_hdr.msix.ctrl = cpu_to_le16(VIRTIO_NR_MSIX - 1);
+>  
+>  	/* Both table and PBA are mapped to the same BAR (2) */
+>  	vpci->pci_hdr.msix.table_offset = cpu_to_le32(2);
+> -	vpci->pci_hdr.msix.pba_offset = cpu_to_le32(2 | PCI_IO_SIZE);
+> +	vpci->pci_hdr.msix.pba_offset = cpu_to_le32(2 | VIRTIO_MSIX_TABLE_SIZE);
+>  	vpci->config_vector = 0;
+>  
+>  	if (irq__can_signal_msi(kvm))
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============8651692121575601562==--
-
