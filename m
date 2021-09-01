@@ -5,84 +5,83 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C93C432BE
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Sep 2021 21:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A36C432BE
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Sep 2021 21:29:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 23ACF61054
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Sep 2021 21:28:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 23ACF61054
+	by mail.kernel.org (Postfix) with ESMTP id 4F56861054
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Sep 2021 21:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4F56861054
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A36BD4B0EC;
-	Wed,  1 Sep 2021 17:28:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D634C4B129;
+	Wed,  1 Sep 2021 17:29:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 950fz5JBu7xa; Wed,  1 Sep 2021 17:28:35 -0400 (EDT)
+	with ESMTP id ouwsWKX5LETO; Wed,  1 Sep 2021 17:29:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C5E084B11C;
-	Wed,  1 Sep 2021 17:28:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07F4E4B134;
+	Wed,  1 Sep 2021 17:29:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 397464B0FC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Sep 2021 17:28:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 240D44B12F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Sep 2021 17:29:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a83qdYl9m99V for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Sep 2021 17:28:33 -0400 (EDT)
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com
- [209.85.166.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21C4F4B0EC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Sep 2021 17:28:33 -0400 (EDT)
-Received: by mail-il1-f172.google.com with SMTP id s16so722274ilo.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Sep 2021 14:28:33 -0700 (PDT)
+ with ESMTP id EOz3qXNsjaTq for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Sep 2021 17:29:43 -0400 (EDT)
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com
+ [209.85.166.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F9614B129
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Sep 2021 17:29:43 -0400 (EDT)
+Received: by mail-io1-f42.google.com with SMTP id g9so976454ioq.11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Sep 2021 14:29:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=3+fQjcpnHNJkqOcBZgMNk/OB4ownjP+XnDHYqaehO9M=;
- b=B7N1+QDUbmAfLhhac7/CGzREYbLmaoWc2UO3Uwmy+f8N/Tf61TlXo0vB1T3IdPludk
- wssgaP7caejDQvt9MIh2u18lv5UelfS+beMnCiaRISTiUV/mDFka9UC/Z+oEXM3LmahT
- Kl3e8+8LI7SDihRD8M47czPSScJ3e7pDYvJFqmuFsaZy8vherdtKtNnBydHONNsAr93U
- H5PtAQieR0RlLOSVqno4mYeT2S/Ew9TdOTO6pXS/MIdqt2tSaBtsO/L7TQ5r8QeItLZa
- iN2aw+Ib2M8/mMMqv3UG6CyVgvLC3eFZrLDf7dNPxP/Uk5lkpr9HMp9w2dWC5MSErVgX
- p71Q==
+ bh=KGjRFCzfFxSnSrNaojtITxfWpjAOQrO+uEsac7dWTTA=;
+ b=qjLS/Lwo+l0y/xWgb9Yqx3gwHHIqKU/h+4CZY2e91pjpHo2fM2km+R+Aq1kPhbzrnZ
+ 9qQlZ6aVuw/V8/m7LWoa9oAT13KmdbzLWMNmSSSK1j+h8xUuBVM3U75RfhDXnSCLx56l
+ e50E1QwY4UL8edEAGNbUGfdr70SvdMu3IPDdZkNiQHr+/mypm6nHNYFwljYmDPTznfY6
+ CAdSB9tO3n2qGOn4DB8Zi0LQ1+0R1iPSeFN/+weC7GkYwQede6i4CDzK8ATXfeahkA/b
+ 7rKQEF2qEPrKFEaL6vftzbbGLeCOo2drtmjnuxEOup5KXei3+jcr/OWCRJCHnHicLRIJ
+ Rzyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=3+fQjcpnHNJkqOcBZgMNk/OB4ownjP+XnDHYqaehO9M=;
- b=IdgM4zjkOLgGDDKSqp4ZXBeIkK5MmBgDqSKBrRRDWuXTRSlAnefkNgIMGu/XZ4SU/2
- vMocDl9d0fv56na3H4mVB1WBuoLJbUNCnJlR7E8CtwWSxnoRvGBMqPzKakMTOM5f4mm6
- GYcISQITsK4Cjt81QRihHHkqJetk1WcxquASEC/586ZUjkn9rIJIDlTJU4Iwq79hTu46
- fv5xqaCGzyaq//8mRq/Snxt/+zWy6w3uf0fMxJ/27zwHHzDMf9eWEfjSnOgbNLeYIeOr
- x/CyIX/GENEVq+/56+TLYr43NzmuKC6IC3xr+15YVjUavon2y9DhQv4+Xm3DkxIGwqFy
- NiUw==
-X-Gm-Message-State: AOAM531yD8tC2NYo6HcEVgLB3CXZR1z9MCLtGQQ/q0fo8ooQuYWM4Rgs
- jHQKYiPNNzGL1oTgb7l1FmOcOA==
-X-Google-Smtp-Source: ABdhPJwcjOd7yA5KEboXCvNkf3GIALGCyQJLoG6CXjyw8BUk2rI03Z+9XHa7gQw/Jp1e1Rt2HSPjcA==
-X-Received: by 2002:a92:8747:: with SMTP id d7mr1084202ilm.173.1630531712121; 
- Wed, 01 Sep 2021 14:28:32 -0700 (PDT)
+ bh=KGjRFCzfFxSnSrNaojtITxfWpjAOQrO+uEsac7dWTTA=;
+ b=Tgo2M5pWSWa4LrwObzYQKLYLkWlUGjpwI0bocsqF6B9ut+pKOgDpH5XDj0CkBm8lCO
+ 6MJAij094FHuwM70WxyHWM7a3jTAxmKmcCqercqxtoC6Q/QaPX9NKsjTIooeYnNIQybx
+ mrFOgDZJ8p1wBrpUiYlN9YdNPNCbX9oN2WIessVIheBZZDuXsGjqoFSwTDel32n2HMSf
+ 6WYTft+QwRpW/b3zsS5HhknlJxU3aZRooJA5oLtxl3AGkH4u9joNlSd7D9WEhbP8DMX9
+ w0bVoQly+6qunes12SPUG3QjagmmmD1ZzkYjMr0jCYBscj4dbIQx2IUyRw/qAXH0zed+
+ ZZig==
+X-Gm-Message-State: AOAM533XEghJELEbFEhQEi222XoUtU/TuzX6nGZzuPTPHZNsbPzZKJUu
+ n28S1RI0QjL2vvRwoaTiGh36vQ==
+X-Google-Smtp-Source: ABdhPJwpRXLaA5TjrnDxM/2gBhOTGH/MNrIduQT/kt54RpISuyy9Ge37m9qgVMQ0ILHqKPUEOUwsTw==
+X-Received: by 2002:a02:908a:: with SMTP id x10mr1409251jaf.30.1630531782445; 
+ Wed, 01 Sep 2021 14:29:42 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194])
- by smtp.gmail.com with ESMTPSA id 7sm425362ilx.16.2021.09.01.14.28.31
+ by smtp.gmail.com with ESMTPSA id g12sm416700iok.32.2021.09.01.14.29.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Sep 2021 14:28:31 -0700 (PDT)
-Date: Wed, 1 Sep 2021 21:28:28 +0000
+ Wed, 01 Sep 2021 14:29:41 -0700 (PDT)
+Date: Wed, 1 Sep 2021 21:29:38 +0000
 From: Oliver Upton <oupton@google.com>
 To: Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v3 02/12] KVM: arm64: selftests: Add write_sysreg_s and
- read_sysreg_s
-Message-ID: <YS/wfBTnCJWn05Kn@google.com>
+Subject: Re: [PATCH v3 03/12] KVM: arm64: selftests: Add support for cpu_relax
+Message-ID: <YS/wwkZu4lfqtmYx@google.com>
 References: <20210901211412.4171835-1-rananta@google.com>
- <20210901211412.4171835-3-rananta@google.com>
+ <20210901211412.4171835-4-rananta@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210901211412.4171835-3-rananta@google.com>
+In-Reply-To: <20210901211412.4171835-4-rananta@google.com>
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
  linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -104,95 +103,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 01, 2021 at 09:14:02PM +0000, Raghavendra Rao Ananta wrote:
-> For register names that are unsupported by the assembler or the ones
-> without architectural names, add the macros write_sysreg_s and
-> read_sysreg_s to support them.
+On Wed, Sep 01, 2021 at 09:14:03PM +0000, Raghavendra Rao Ananta wrote:
+> Implement the guest helper routine, cpu_relax(), to yield
+> the processor to other tasks.
 > 
-> The functionality is derived from kvm-unit-tests and kernel's
-> arch/arm64/include/asm/sysreg.h.
+> The function was derived from
+> arch/arm64/include/asm/vdso/processor.h.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 
-Would it be possible to just include <asm/sysreg.h>? See
-tools/arch/arm64/include/asm/sysreg.h
+Reviewed-by: Oliver Upton <oupton@google.com>
 
 > ---
->  .../selftests/kvm/include/aarch64/processor.h | 61 +++++++++++++++++++
->  1 file changed, 61 insertions(+)
+>  tools/testing/selftests/kvm/include/aarch64/processor.h | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
 > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index 3cbaf5c1e26b..082cc97ad8d3 100644
+> index 082cc97ad8d3..78df059dc974 100644
 > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
 > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -118,6 +118,67 @@ void vm_install_exception_handler(struct kvm_vm *vm,
->  void vm_install_sync_handler(struct kvm_vm *vm,
->  		int vector, int ec, handler_fn handler);
+> @@ -191,6 +191,11 @@ asm(
+>  	val;								  \
+>  })
 >  
-> +/*
-> + * ARMv8 ARM reserves the following encoding for system registers:
-> + * (Ref: ARMv8 ARM, Section: "System instruction class encoding overview",
-> + *  C5.2, version:ARM DDI 0487A.f)
-> + *	[20-19] : Op0
-> + *	[18-16] : Op1
-> + *	[15-12] : CRn
-> + *	[11-8]  : CRm
-> + *	[7-5]   : Op2
-> + */
-> +#define Op0_shift	19
-> +#define Op0_mask	0x3
-> +#define Op1_shift	16
-> +#define Op1_mask	0x7
-> +#define CRn_shift	12
-> +#define CRn_mask	0xf
-> +#define CRm_shift	8
-> +#define CRm_mask	0xf
-> +#define Op2_shift	5
-> +#define Op2_mask	0x7
+> +static inline void cpu_relax(void)
+> +{
+> +	asm volatile("yield" ::: "memory");
+> +}
 > +
-> +/*
-> + * When accessed from guests, the ARM64_SYS_REG() doesn't work since it
-> + * generates a different encoding for additional KVM processing, and is
-> + * only suitable for userspace to access the register via ioctls.
-> + * Hence, define a 'pure' sys_reg() here to generate the encodings as per spec.
-> + */
-> +#define sys_reg(op0, op1, crn, crm, op2) \
-> +	(((op0) << Op0_shift) | ((op1) << Op1_shift) | \
-> +	 ((crn) << CRn_shift) | ((crm) << CRm_shift) | \
-> +	 ((op2) << Op2_shift))
-> +
-> +asm(
-> +"	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\n"
-> +"	.equ	.L__reg_num_x\\num, \\num\n"
-> +"	.endr\n"
-> +"	.equ	.L__reg_num_xzr, 31\n"
-> +"\n"
-> +"	.macro	mrs_s, rt, sreg\n"
-> +"	.inst	0xd5200000|(\\sreg)|(.L__reg_num_\\rt)\n"
-> +"	.endm\n"
-> +"\n"
-> +"	.macro	msr_s, sreg, rt\n"
-> +"	.inst	0xd5000000|(\\sreg)|(.L__reg_num_\\rt)\n"
-> +"	.endm\n"
-> +);
-> +
-> +/*
-> + * read_sysreg_s() and write_sysreg_s()'s 'reg' has to be encoded via sys_reg()
-> + */
-> +#define read_sysreg_s(reg) ({						\
-> +	u64 __val;							\
-> +	asm volatile("mrs_s %0, "__stringify(reg) : "=r" (__val));	\
-> +	__val;								\
-> +})
-> +
-> +#define write_sysreg_s(reg, val) do {					\
-> +	u64 __val = (u64)val;						\
-> +	asm volatile("msr_s "__stringify(reg) ", %x0" : : "rZ" (__val));\
-> +} while (0)
-> +
->  #define write_sysreg(reg, val)						  \
->  ({									  \
->  	u64 __val = (u64)(val);						  \
+>  #define isb()		asm volatile("isb" : : : "memory")
+>  #define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
+>  #define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
 > -- 
 > 2.33.0.153.gba50c8fa24-goog
 > 
