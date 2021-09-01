@@ -5,79 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5FDC432BE
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Sep 2021 21:14:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BCD0C432BE
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Sep 2021 21:14:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8E30860FDC
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Sep 2021 21:14:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8E30860FDC
+	by mail.kernel.org (Postfix) with ESMTP id E5B8360FDA
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Sep 2021 21:14:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E5B8360FDA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 430AE4B17E;
-	Wed,  1 Sep 2021 17:14:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BE664B190;
+	Wed,  1 Sep 2021 17:14:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FugtZLgLWATx; Wed,  1 Sep 2021 17:14:47 -0400 (EDT)
+	with ESMTP id aER6KExIOYJ6; Wed,  1 Sep 2021 17:14:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56F7B4B199;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 727684B1B5;
 	Wed,  1 Sep 2021 17:14:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D66774B150
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Sep 2021 17:14:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7F54B183
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Sep 2021 17:14:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZlIUXfWwSXzk for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id b8yQlNiIa7dz for <kvmarm@lists.cs.columbia.edu>;
  Wed,  1 Sep 2021 17:14:45 -0400 (EDT)
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
- [209.85.210.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 326E64B1E6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Sep 2021 17:14:38 -0400 (EDT)
-Received: by mail-pf1-f201.google.com with SMTP id
- b65-20020a621b44000000b003edc0db6a05so442709pfb.19
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Sep 2021 14:14:38 -0700 (PDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1173D4B17D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Sep 2021 17:14:40 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ z15-20020a25868f000000b0059c56f47e94so811677ybk.21
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Sep 2021 14:14:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=ped5Qc1MM58GGqP18bC+JKvQQkEpWjp7CacWspbiPtU=;
- b=RF+xTrhE1y86Km4Tb2P3P9x56sxf1fIXwOzrKjBM264X3P2jQzCHZAFGTfbfshgqxp
- I3ViPwQGHlQjxAgXUxwylm+7TJXn1t0vKlHBNeiWKYzy32FmgouYKSW1+zXACYXOmERd
- r1JAAHqU3TM8b+t9jnwQP7qDF27X9+iLHlb0cDiMAmb0Wv6zsY9lrfRDcfkC7z9IKFmJ
- Uc7FZRXODjWUGiyg8Nis9o3gpVnPnwn0kNKJwfzsPYJn6kCiBtbCuEpwLZQ4Djl/A/PM
- DwP067BHcP+WdQiUBG6ujxS/hVn3djeGiHvZAJqMiAbzGV9d3zi7VZkLieJlF4xW7BsM
- jeOA==
+ :cc; bh=t7NNB2BCpuNWh/XMf0nVZVQzgKyb0MYTWR38OjCe0DI=;
+ b=RWvQJmyYn0Jc4F66ttkKnWfu9o5Mo839rMCWSY9KEp6t6JNR/c1LhzARwF8ECrdYQ+
+ Jgpuag7dE6V6xfv0mNoiBfmr5CfIwg3bnLMOi/kVPgO9b4Sx1uQQrXwGWulTCcHnsJXa
+ 7kY9CEYBCFDoCaF6NkgCK/ysta5QCdEq3hlM5vk4FcY4Bg59Q8L2Zr1dncSYKknlKWRy
+ axnnpB75TCpBhEmUlt58SkJLhF54rHO9ZNlg3x8BOuo0eegq2CNUtGSUmjh1Q0/bQZBM
+ Q0rcDyDXNUI6jmaABWMbDal5nQr8lITAiTc61Ru+0R3YnZdWW2H1Av45jvttlpdyqnm+
+ IoPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=ped5Qc1MM58GGqP18bC+JKvQQkEpWjp7CacWspbiPtU=;
- b=Qfgx4KdOdNJczlJlPMySFqSnQvAcY0Uj3Oh3yqa/CitC/FE9rhgxvK0szmAHEwYzGC
- 0pKsD9B7f17Hu9/CasEwxMNlDPKRFvKqP5aXrGfGO3qoljLUHs5KmKakMzYq5rwWTKe8
- /kSdcgOnyWeeUD3k8kiKDqDVJqgN0yZbSw6K8rAsKskc8gGuUaXvlAgICNg71nmt8RBq
- COYLLcKKl8R5rFvboE73sEbOiRu2z9NUTHY1NsMK9BqPm9NVTmMUn6ZClZQdeDC/sk0u
- CtsB2kVUlSUDCEc6+exkiarIP2UfuwvVVefqpw33kEAXEvVB1pX3RiI4E6KiqR9jgdRy
- ii9Q==
-X-Gm-Message-State: AOAM5337dLS3wizoEzjdvSUEuzjwcMlmrmnejldtA9UlmindBi31INSO
- O41JF82J5h9VD3/XoDhv/CYlpS9EPEL5
-X-Google-Smtp-Source: ABdhPJzrG1HjvKDU2BB/zBmu2XADs6gKwEPEuy+cbmfKmRvnNPWrGZDzEUEU4Y01W3RLEFRXnQKuk3qmFLfy
+ bh=t7NNB2BCpuNWh/XMf0nVZVQzgKyb0MYTWR38OjCe0DI=;
+ b=n1JdEdMdiwd4zd7TRQFAf01fCdPD3/Ib/w9KDzxYJC87MVtvuwIHR8sPd1K2VUhUnC
+ ayHRc89uqcFN4LbjwaJ60y3jtJmb1NQ5Tz6N/wu4C/DTkzC+eVJ6itFIjO7iSts89CdJ
+ 5pjlkJcW6x6H23iQt9e91NggV1AGN6FXlhIqwsmZpeARwfNH0srDO1U+P9h6RVLuABco
+ vzgCKmK6Zix6ldl+lcG1byl1foJHtw9JP09XM2ORBz52LF6Hjaa2DGZoiMuIj8uIq7uU
+ snJBnkeiw/EDiuBj7VdBdlqlD76cf4/CgYuiavU8AXpuh6ehJKPTl9XvSrLNhayLhn70
+ PmOQ==
+X-Gm-Message-State: AOAM533klqRyqWy0x7m9BxevrcDys1b0kgnjVNwBpXxeo+o7V+jmlynV
+ xMMo0RwAX2R2vrG+Gg4cd2AKV80/X00A
+X-Google-Smtp-Source: ABdhPJyboGzjAq0Phk0Nu1VckjuEu5bnn6Jc8JwvdaDpj2LuhQgZyWBrwtdodmniMHA614Zpp52RkQQ8oFjN
 X-Received: from rananta-virt.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a62:7d4a:0:b0:3ef:ea37:1422 with SMTP id
- y71-20020a627d4a000000b003efea371422mr1327446pfc.0.1630530877389; Wed, 01 Sep
- 2021 14:14:37 -0700 (PDT)
-Date: Wed,  1 Sep 2021 21:14:07 +0000
+ (user=rananta job=sendgmr) by 2002:a5b:84a:: with SMTP id
+ v10mr2121594ybq.75.1630530879620; 
+ Wed, 01 Sep 2021 14:14:39 -0700 (PDT)
+Date: Wed,  1 Sep 2021 21:14:08 +0000
 In-Reply-To: <20210901211412.4171835-1-rananta@google.com>
-Message-Id: <20210901211412.4171835-8-rananta@google.com>
+Message-Id: <20210901211412.4171835-9-rananta@google.com>
 Mime-Version: 1.0
 References: <20210901211412.4171835-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
-Subject: [PATCH v3 07/12] KVM: arm64: selftests: Add support to get the vcpuid
- from MPIDR_EL1
+Subject: [PATCH v3 08/12] KVM: arm64: selftests: Add light-weight spinlock
+ support
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -102,44 +103,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-At times, such as when in the interrupt handler, the guest wants to
-get the vCPU-id that it's running on. As a result, introduce
-get_vcpuid() that parses the MPIDR_EL1 and returns the vcpuid to the
-requested caller.
+Add a simpler version of spinlock support for ARM64 for
+the guests to use.
+
+The implementation is loosely based on the spinlock
+implementation in kvm-unit-tests.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../selftests/kvm/include/aarch64/processor.h | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ tools/testing/selftests/kvm/Makefile          |  2 +-
+ .../selftests/kvm/include/aarch64/spinlock.h  | 13 +++++++++
+ .../selftests/kvm/lib/aarch64/spinlock.c      | 27 +++++++++++++++++++
+ 3 files changed, 41 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index c35bb7b8e870..8b372cd427da 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -251,4 +251,23 @@ static inline void local_irq_disable(void)
- 	asm volatile("msr daifset, #3" : : : "memory");
- }
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 5d05801ab816..61f0d376af99 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -35,7 +35,7 @@ endif
  
-+#define MPIDR_LEVEL_BITS 8
-+#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
-+#define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
-+#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-+	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
+ LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
+ LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
+-LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S
++LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c
+ LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+ 
+ TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+diff --git a/tools/testing/selftests/kvm/include/aarch64/spinlock.h b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
+new file mode 100644
+index 000000000000..cf0984106d14
+--- /dev/null
++++ b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +
-+static inline uint32_t get_vcpuid(void)
++#ifndef SELFTEST_KVM_ARM64_SPINLOCK_H
++#define SELFTEST_KVM_ARM64_SPINLOCK_H
++
++struct spinlock {
++	int v;
++};
++
++extern void spin_lock(struct spinlock *lock);
++extern void spin_unlock(struct spinlock *lock);
++
++#endif /* SELFTEST_KVM_ARM64_SPINLOCK_H */
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/spinlock.c b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+new file mode 100644
+index 000000000000..6d66a3dac237
+--- /dev/null
++++ b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+@@ -0,0 +1,27 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * ARM64 Spinlock support
++ */
++#include <stdint.h>
++
++#include "spinlock.h"
++
++void spin_lock(struct spinlock *lock)
 +{
-+	uint32_t vcpuid = 0;
-+	uint64_t mpidr = read_sysreg(mpidr_el1);
++	uint32_t val, res;
 +
-+	/* KVM limits only 16 vCPUs at level 0 */
-+	vcpuid = mpidr & 0x0f;
-+	vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 1) << 4;
-+	vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 2) << 12;
-+
-+	return vcpuid;
++	asm volatile(
++	"1:	ldaxr	%w0, [%2]\n"
++	"	cbnz	%w0, 1b\n"
++	"	mov	%w0, #1\n"
++	"	stxr	%w1, %w0, [%2]\n"
++	"	cbnz	%w1, 1b\n"
++	: "=&r" (val), "=&r" (res)
++	: "r" (&lock->v)
++	: "memory");
 +}
 +
- #endif /* SELFTEST_KVM_PROCESSOR_H */
++void spin_unlock(struct spinlock *lock)
++{
++	asm volatile("stlr wzr, [%0]\n"	: : "r" (&lock->v) : "memory");
++}
 -- 
 2.33.0.153.gba50c8fa24-goog
 
