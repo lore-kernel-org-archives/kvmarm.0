@@ -7,85 +7,80 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57725C83029
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 17:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19423C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 17:52:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CF0C3610A2
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 17:28:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CF0C3610A2
+	by mail.kernel.org (Postfix) with ESMTP id 9A5DF610CC
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 17:52:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9A5DF610CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 485B64A7FD;
-	Thu,  2 Sep 2021 13:28:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 171BD4B0BF;
+	Thu,  2 Sep 2021 13:52:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZiyHxSAkl17q; Thu,  2 Sep 2021 13:28:31 -0400 (EDT)
+	with ESMTP id sEa3YE9QmKFG; Thu,  2 Sep 2021 13:52:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BF314B0DD;
-	Thu,  2 Sep 2021 13:28:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD0994B0DD;
+	Thu,  2 Sep 2021 13:52:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29B754B090
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 13:28:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB4284B0BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 13:52:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bRRYo4dfAlDl for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Sep 2021 13:28:28 -0400 (EDT)
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
- [209.85.215.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BA4B4A7FD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 13:28:28 -0400 (EDT)
-Received: by mail-pg1-f178.google.com with SMTP id t1so2716911pgv.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Sep 2021 10:28:28 -0700 (PDT)
+ with ESMTP id J-FjgyV5JePn for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Sep 2021 13:52:16 -0400 (EDT)
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com
+ [209.85.219.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 64D9A4B0BA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 13:52:16 -0400 (EDT)
+Received: by mail-yb1-f176.google.com with SMTP id c6so5415369ybm.10
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Sep 2021 10:52:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=tlkTv+QSdLj89BzEW2jIvlFhKPTJ8DlZMmZCRyVz7HU=;
- b=FdhRZcEWHVic1uoYs4TxzGQx1jBnt1hu2TuteTVmM94eqGRGZmxlpH8weXG9NzPdm8
- tYqEi+kWRTsI71W8XqcbUIp2yrmpQMlCGd14tG8xzhA6l316CJVtXXu6uT+nu/3DSrAO
- SJy5ZJ56FflBwtg/FD5juUH50ILwZ0fTONMn2+aC+RyBePbxmsc8ACTBT9JvAzzxgpA2
- pzO49NwrYqWUcPWHkqgqWAT8HzIaKxJ7MAu3uVGspflY2pkTPuQrxnxlunyiabvyVPiv
- XPumM07kxeu2lg5IabzOiSzMFS2MKX73GQM1Hiz93FAtHXC3RILOo2Rbrhz6jRRynvc9
- iavw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xAUZw7IrrctnJdeQBEtbAhv9xiy70VOpKzIZyk6KqAA=;
+ b=iyKqthjIRwPONyCS4/FKOde7Qj8MPxzxsMuN8Ti/E5d4o95dMRFhXGD0ZN2pu7RPVp
+ JwWUX/2NUc7y4oxHWdsjIHW4i99GjxckLQGR8lyOsGYMBoUAf4tdI8Tc2b2WN05V78s1
+ 1ci/XTZoMbCx+VULa5z5tq7lKuPFjEOFL2ewyVdnHWMbRBr8zMXxtFQ47bECS/S778Vd
+ uWYSbkDI5Q7wCUKjWhT936QxX63P6W5fUF+RE1aax17r7lqa+ihcXphy+D1BQzgYmBOh
+ 74HWpCi3vjxnYhTz4SIltFZH+bMTbuiVxuEulZmZgyDq40oAz76TRf9JSIgTAEM3wNC2
+ 3lXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=tlkTv+QSdLj89BzEW2jIvlFhKPTJ8DlZMmZCRyVz7HU=;
- b=knhZgtbn+jttV61MAT/WxfpsF29lsu0bwU06m6R5o91pAEEsrzm3XCBOAivhjEli5/
- t7MQGc1zMqLbHRqhE8kVztvwAWKew1XDitHxhB61kWSll60M6R1z8joj8wlmsmibL6uY
- EGFNAYd4uX4XSfJvPcoqjxtXTkt6eGlDzBqtA+paGEa719cMuvdumnPFAdO3Pro2NlWh
- SFTlszXdJ+8TeW86wigJ4RdlxaYjxfdnf06uea1DLhU7ax7DsYnMivWvgXsRlTJwnVWi
- /FRWLMiQYB6k7y5XwJ4f1mU2fvXUl1eT3oQGwJc0iVwLc4y32slp83lpIQyyuOgP9zRP
- sHjg==
-X-Gm-Message-State: AOAM5337he/ykaKEZRM2UV0mrcpVfKdqvqQ3RnycZP00qEtRAJMMeIIG
- j4oeEesSP5x9ZFyjxEhH/CKPbQ==
-X-Google-Smtp-Source: ABdhPJz8r/7UkdfmCJP3knKikFIB42/rNdTHUUWLp90TllbLBlgVZbxCg0hV5rMB9wjHmZi6tgMQ8w==
-X-Received: by 2002:a63:b47:: with SMTP id a7mr4251871pgl.181.1630603707200;
- Thu, 02 Sep 2021 10:28:27 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id e8sm3736647pgg.31.2021.09.02.10.28.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Sep 2021 10:28:26 -0700 (PDT)
-Date: Thu, 2 Sep 2021 10:28:23 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v3 10/12] KVM: arm64: selftests: Add host support for vGIC
-Message-ID: <YTEJt2pC1cIcwvyD@google.com>
-References: <20210901211412.4171835-1-rananta@google.com>
- <20210901211412.4171835-11-rananta@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xAUZw7IrrctnJdeQBEtbAhv9xiy70VOpKzIZyk6KqAA=;
+ b=TWzEMtTt8R7HKaOD1MXLiY5DPIaJ4I45vTHYlCjrP365+ZD5jgJwisgnsDVn5XVedi
+ DVEcRg7cfE73t4AX5l8obv1mJf1l9SaQlRMEYGBxeOZyQH7VXDuDubP4Q7k5komTSpsC
+ ZIOsmRWvTERQqRL8Czd7gxjxn0/Fm/0zIr2WNMScV3+QvHwk/mvS95bDXeTIuqYsDuJY
+ /XEaQzyFRnZQL6fKy3mF8JrsLHn/Shzr9byUNa+8zuOEIxsZj49w6Z5fVy4KSQhCTEMP
+ 79fSKGEtpInFm+vD1pc0bRdwLwHNHfI3ccIMfJg1cMNiA+DUTtkecTyEeWmYXynai9h4
+ ziVA==
+X-Gm-Message-State: AOAM533tq/94Fid3TW+uqQRLqVZIfUonXblrcpIwp8HAS5LtrANR/kcN
+ F6tcccxwFjpDn+wOqettGHsMrDaoO1ffwoUHhyVKug==
+X-Google-Smtp-Source: ABdhPJwQXtJzqbxl4gNeMNvhKYFqgI/uCi3/Up5vD6artyFiw1jvBI/+9aQ5dnuQX2F2LGGKUfF/T1/Eh5NonYuxIbU=
+X-Received: by 2002:a25:4f87:: with SMTP id d129mr5967977ybb.359.1630605135660; 
+ Thu, 02 Sep 2021 10:52:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210901211412.4171835-11-rananta@google.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+References: <20210901211412.4171835-1-rananta@google.com>
+ <20210901211412.4171835-8-rananta@google.com>
+ <YTARPBhMHXjgcPlg@google.com> <20210902123656.lfzwqrlw5kbvckah@gator>
+In-Reply-To: <20210902123656.lfzwqrlw5kbvckah@gator>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 2 Sep 2021 10:52:05 -0700
+Message-ID: <CAJHc60xQYiOsQcZ64SVsVRarnb2b+fefRYq+xQ8FeqGxH0fY2w@mail.gmail.com>
+Subject: Re: [PATCH v3 07/12] KVM: arm64: selftests: Add support to get the
+ vcpuid from MPIDR_EL1
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -103,143 +98,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 01, 2021 at 09:14:10PM +0000, Raghavendra Rao Ananta wrote:
-> Implement a simple library to do perform vGIC-v3
-> setup from a host of view. This includes creating
-> a vGIC device, setting up distributor and redistributor
-> attributes, and mapping the guest physical addresses.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> 
-> ---
->  tools/testing/selftests/kvm/Makefile          |  2 +-
->  .../selftests/kvm/include/aarch64/vgic.h      | 14 ++++
->  .../testing/selftests/kvm/lib/aarch64/vgic.c  | 67 +++++++++++++++++++
->  3 files changed, 82 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 5476a8ddef60..8342f65c1d96 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -35,7 +35,7 @@ endif
->  
->  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
->  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c
-> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
->  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
->  
->  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-> new file mode 100644
-> index 000000000000..45bbf238147a
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
-> @@ -0,0 +1,14 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * ARM Generic Interrupt Controller (GIC) host specific defines
-> + */
-> +
-> +#ifndef SELFTEST_KVM_VGIC_H
-> +#define SELFTEST_KVM_VGIC_H
-> +
-> +#include <linux/kvm.h>
-> +
-> +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
-> +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa, uint32_t slot);
-> +
-> +#endif /* SELFTEST_KVM_VGIC_H */
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> new file mode 100644
-> index 000000000000..a0e4b986d335
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> @@ -0,0 +1,67 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * ARM Generic Interrupt Controller (GIC) v3 host support
-> + */
-> +
-> +#include <linux/kvm.h>
-> +#include <linux/sizes.h>
-> +
-> +#include "kvm_util.h"
-> +
-> +#define VGIC_V3_GICD_SZ		(SZ_64K)
-> +#define VGIC_V3_GICR_SZ		(2 * SZ_64K)
-> +
-> +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
-> +	(((uint64_t)(count) << 52) | \
-> +	((uint64_t)((base) >> 16) << 16) | \
-> +	((uint64_t)(flags) << 12) | \
-> +	index)
-> +
-> +static void vgic_v3_map(struct kvm_vm *vm, uint64_t addr, unsigned int size)
-> +{
-> +	unsigned int n_pages = DIV_ROUND_UP(size, vm_get_page_size(vm));
-> +
-> +	virt_map(vm, addr, addr, n_pages);
-> +}
-> +
-> +/*
-> + * vGIC-v3 default host setup
-> + *
-> + * Input args:
-> + *	vm - KVM VM
-> + *	nr_vcpus - Number of vCPUs for this VM
-> + *	gicd_base_gpa - Guest Physical Address of the Distributor region
-> + *	gicr_base_gpa - Guest Physical Address of the Redistributor region
-> + *
-> + * Output args: None
-> + *
-> + * Return: GIC file-descriptor or negative error code upon failure
-> + *
-> + * The function creates a vGIC-v3 device and maps the distributor and
-> + * redistributor regions of the guest.
-> + */
-> +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
-> +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
-> +{
-> +	uint64_t redist_attr;
-> +	int gic_fd;
-> +
-> +	TEST_ASSERT(nr_vcpus <= KVM_MAX_VCPUS,
-> +			"Invalid number of CPUs: %u\n", nr_vcpus);
-> +
-> +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+On Thu, Sep 2, 2021 at 5:37 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Wed, Sep 01, 2021 at 11:48:12PM +0000, Oliver Upton wrote:
+> > On Wed, Sep 01, 2021 at 09:14:07PM +0000, Raghavendra Rao Ananta wrote:
+> > > At times, such as when in the interrupt handler, the guest wants to
+> > > get the vCPU-id that it's running on. As a result, introduce
+> > > get_vcpuid() that parses the MPIDR_EL1 and returns the vcpuid to the
+> > > requested caller.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > ---
+> > >  .../selftests/kvm/include/aarch64/processor.h | 19 +++++++++++++++++++
+> > >  1 file changed, 19 insertions(+)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > index c35bb7b8e870..8b372cd427da 100644
+> > > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > @@ -251,4 +251,23 @@ static inline void local_irq_disable(void)
+> > >     asm volatile("msr daifset, #3" : : : "memory");
+> > >  }
+> > >
+> > > +#define MPIDR_LEVEL_BITS 8
+> > > +#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
+> > > +#define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
+> > > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
+> > > +   ((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
+> > > +
+> > > +static inline uint32_t get_vcpuid(void)
+> > > +{
+> > > +   uint32_t vcpuid = 0;
+> > > +   uint64_t mpidr = read_sysreg(mpidr_el1);
+> > > +
+> > > +   /* KVM limits only 16 vCPUs at level 0 */
+> > > +   vcpuid = mpidr & 0x0f;
+> > > +   vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 1) << 4;
+> > > +   vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 2) << 12;
+> > > +
+> > > +   return vcpuid;
+> > > +}
+> >
+> > Are we guaranteed that KVM will always compose vCPU IDs the same way? I
+> > do not believe this is guaranteed ABI.
+>
+> I don't believe we are. At least in QEMU we take pains to avoid that
+> assumption.
+>
+> >
+> > For the base case, you could pass the vCPU ID as an arg to the guest
+> > function.
+> >
+> > I do agree that finding the vCPU ID is a bit more challenging in an
+> > interrupt context. Maybe use a ucall to ask userspace? But of course,
+> > every test implements its own run loop, so its yet another case that
+> > tests need to handle.
+> >
+> > Or, you could allocate an array at runtime of length KVM_CAP_MAX_VCPUS
+> > (use the KVM_CHECK_EXTENSION ioctl to get the value). Once all vCPUs are
+> > instantiated, iterate over them from userspace to populate the {MPIDR,
+> > VCPU_ID} map. You'd need to guarantee that callers initialize the vGIC
+> > *after* adding vCPUs to the guest.
+>
+> I agree with this approach. It may even make sense to create a common
+> function that returns a {cpu_id,vcpu_index} map for other tests to use.
+>
+Interesting idea. I'll look into this.
 
-Nit: you can return early if gic_fd is bad.
+Regards,
+Raghavendra
 
-> +
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +			KVM_VGIC_V3_ADDR_TYPE_DIST, &gicd_base_gpa, true);
-> +	vgic_v3_map(vm, gicd_base_gpa, VGIC_V3_GICD_SZ);
-
-vgic_v3_map() implies that it's doing something vgic specific, when it's
-just converting bytes to pages. What about something like the following?
-
-	virt_map(vm, addr, addr, VM_BYTES_TO_PAGES(vm, VGIC_V3_GICD_SZ));
-
-and you add a VM_BYTES_TO_PAGES macro to include/kvm_util.h? I think
-this macro can be useful to others.
-
-> +
-> +	redist_attr = REDIST_REGION_ATTR_ADDR(nr_vcpus, gicr_base_gpa, 0, 0);
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-> +			KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &redist_attr, true);
-> +	vgic_v3_map(vm, gicr_base_gpa, VGIC_V3_GICR_SZ * nr_vcpus);
-> +
-> +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-> +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-> +
-> +	return gic_fd;
-> +}
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
-> 
+> Thanks,
+> drew
+>
+> >
+> > --
+> > Thanks,
+> > Oliver
+> >
+> > >  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> > > --
+> > > 2.33.0.153.gba50c8fa24-goog
+> > >
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> >
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
