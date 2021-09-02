@@ -7,89 +7,80 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34292C4332F
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 21:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19EC2C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 21:07:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D19A261074
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 21:01:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D19A261074
+	by mail.kernel.org (Postfix) with ESMTP id 8B66761074
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 21:07:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8B66761074
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 730474B10B;
-	Thu,  2 Sep 2021 17:01:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 071B14B10E;
+	Thu,  2 Sep 2021 17:07:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IJLRwAvCcDmK; Thu,  2 Sep 2021 17:01:21 -0400 (EDT)
+	with ESMTP id 6NmjxVvg4tJS; Thu,  2 Sep 2021 17:07:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1138A4B121;
-	Thu,  2 Sep 2021 17:01:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF8DE4B103;
+	Thu,  2 Sep 2021 17:07:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BAE54B10A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 15:22:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DE2F4B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 17:07:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cnZkpUFxE2uX for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Sep 2021 15:22:44 -0400 (EDT)
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com
- [209.85.214.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4B214A524
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 15:22:44 -0400 (EDT)
-Received: by mail-pl1-f178.google.com with SMTP id q21so1841205plq.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Sep 2021 12:22:44 -0700 (PDT)
+ with ESMTP id 9VsmLoWHkcyh for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Sep 2021 17:07:13 -0400 (EDT)
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com
+ [209.85.167.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E6EE4B0BD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 17:07:13 -0400 (EDT)
+Received: by mail-lf1-f53.google.com with SMTP id bq28so7214481lfb.7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Sep 2021 14:07:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=uNPtW+6uA+IorMmx89tZvAje5LA6sRmLTggdZeiUpKQ=;
- b=DUPBVsET97fo8gZE+12RRIe3oBglmGvYRDpWjPC2p+hbEXLBsAYdQvDjInkq6gYd9W
- aD0keO3ba193KwUAVcMMcw+goFfB2DAN7bF6mvu7quwJ39X0u0GDdq6d0OOhIGbnCvNx
- jE0qJTjzRRm6E8cO1WHrwHdmnAAbN2EB+EIKY49b88wbvHWGVELVHCLjaPF8+CX3gjAG
- a4OToBU85qyLrfFq90ge6iKk8oVInT2Lj4C0lF3v/U7veqJLjRlG/5Jd9L1Rhtw1lTsU
- qi+PWSS7OrPNvrRmJQp/0Rnc2emt5+f/oh+VuZc/SgzPRcMJG/Qe1jrYCg1dxv07hOOU
- Ae6A==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=XguslLdPIXxVxFmZIelMYc4XAgNZi0tFqmUYgQxOp5M=;
+ b=GRl6nsj+q44z1Ha5UTrEb/YbOYWdRlaK0fubHiqDSnXS8sWWJcwTGWoDIW2UCbn6Zr
+ Cin4HyfAIjK1TVjdigRZ9ja7ecjITroQf2sZC4PC79Xaz+k+vtV6XvjQXxLLGFS3Tgvd
+ rZxyeNE+Shn/fy1exk3CDfTmR+G77EyuLt2WAGw8j5ATWWbDt8eRpAfxm4LgmHc7p2us
+ SdVcNLtNJiQPkMgU50e+CmDwIvKnHFdoc0jTOcrwRN3F83mIHv0PA+s/3GaM1tNx243Z
+ gMITCnX0rWgJVXu10k47y/pC6aRMKRjTFKL60xjdzuDoDoXohJ5vAGs0C1TJ9uxuED5z
+ b2tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=uNPtW+6uA+IorMmx89tZvAje5LA6sRmLTggdZeiUpKQ=;
- b=mvvF1TBIg63VekM9ONNp1talZ1g2Jzg26va9QpP9PapIf5G09p4nBopCe/2TTARBVW
- PnZheS3qhCjd2f/zy2gCBipseKfgfOo/D4sQkqjmZ7/AsCqPe5e2bRmTvxhsEVs4sj0R
- zO87Hs2h4k8+4coNmYM5bmKZqfG8b1Q2ezOBnIS+8DGvfRuakWTS2CZ2HYk96zLW9i8m
- 12qKybXx+JwmbOPgVzrokLivxm+xUwxyPnx9yblwLmYGgM7C/esq0B+CsMmLz45AgKwX
- jd2op2J4Sauzoo3Xbldi0ZPWVRksoIybqDBLTWI6ZAzY70+1w+1XFPOBFzICL8HyVA4E
- 7h4A==
-X-Gm-Message-State: AOAM530IdhFcdvEi/XWVFAJCh5c9gD17YV77vC4kVHQpAKe1EXq2jAKR
- RQlP4cb2AVFvfHkEtZQJW8JdGQ==
-X-Google-Smtp-Source: ABdhPJyA+Ul43RLuBvaJkLgS2mR6ljKmyKfNqIQzvT0/kC56lZBa3GlaBfo3GRItE1F4k7nstvQBhg==
-X-Received: by 2002:a17:90a:ad02:: with SMTP id
- r2mr5529728pjq.182.1630610563431; 
- Thu, 02 Sep 2021 12:22:43 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id x75sm3674726pgx.43.2021.09.02.12.22.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Sep 2021 12:22:42 -0700 (PDT)
-Date: Thu, 2 Sep 2021 19:22:39 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v7 4/6] KVM: x86: Take the pvclock sync lock behind the
- tsc_write_lock
-Message-ID: <YTEkf3wn/PbVpYni@google.com>
-References: <20210816001130.3059564-1-oupton@google.com>
- <20210816001130.3059564-5-oupton@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=XguslLdPIXxVxFmZIelMYc4XAgNZi0tFqmUYgQxOp5M=;
+ b=n5nWzwtvlGF2BJo60jl15zrdIn6/2WBm6H8ArMJHfrN/tEzaPENcA7hJoxSIHdV5V6
+ nxFWH2TVXuPlntYZ64wEEw3l9XM3/Ty9zHiCv8Q7pIrjDydxnQMgiEtEAnhxGWwg4Rhe
+ 7WKt6jWX7ku/PJqHGU2V4tQDDE3gHG2/0CBxEJaO8QBYlN7/q4WyrLlKbi7VeF7qwgEw
+ 4G2YmUD3l0eSGu1oy2fCApt6sFDEjuryKj5dKfIgmnx6bKQWB+oJHF0w9Bu6PrsWqk4B
+ vUu4Q0T5HxMDk5CwaEnAg72roYOSiCCRJc9YgBZwrJxpad5Sbe9dW2PwKd9V17NeOVTZ
+ OqTg==
+X-Gm-Message-State: AOAM533Rq/c1sJB2eTCKzeIwtyoErMIZVmKJGvYbHHQMnjIYoNkifrF8
+ pm3UampcHaDRiY2KvBA+MizbUhJgAGngJPf5FKg2kw==
+X-Google-Smtp-Source: ABdhPJy8xnwpcjzdbh31Silho7ZsIAfWPr+R+NuwJ6UvcoeGh2m0fcJ/FCsJ2/qFTEX7zkqJV51h+rVv6z0QgWfOt/4=
+X-Received: by 2002:a05:6512:6c3:: with SMTP id u3mr80050lff.411.1630616831502; 
+ Thu, 02 Sep 2021 14:07:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210816001130.3059564-5-oupton@google.com>
-X-Mailman-Approved-At: Thu, 02 Sep 2021 17:01:18 -0400
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
+References: <20210901211412.4171835-1-rananta@google.com>
+ <20210901211412.4171835-9-rananta@google.com>
+In-Reply-To: <20210901211412.4171835-9-rananta@google.com>
+From: Oliver Upton <oupton@google.com>
+Date: Thu, 2 Sep 2021 14:06:58 -0700
+Message-ID: <CAOQ_QsiYHkyDVUuUjFb5Zc=o4=yrmVEERNqt1aAY=4uy91mbgQ@mail.gmail.com>
+Subject: Re: [PATCH v3 08/12] KVM: arm64: selftests: Add light-weight spinlock
+ support
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,75 +97,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Aug 16, 2021, Oliver Upton wrote:
-> A later change requires that the pvclock sync lock be taken while
-> holding the tsc_write_lock. Change the locking in kvm_synchronize_tsc()
-> to align with the requirement to isolate the locking change to its own
-> commit.
-> 
-> Cc: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
+On Wed, Sep 1, 2021 at 2:14 PM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> Add a simpler version of spinlock support for ARM64 for
+> the guests to use.
+>
+> The implementation is loosely based on the spinlock
+> implementation in kvm-unit-tests.
+>
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  Documentation/virt/kvm/locking.rst | 11 +++++++++++
->  arch/x86/kvm/x86.c                 |  2 +-
->  2 files changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-> index 8138201efb09..0bf346adac2a 100644
-> --- a/Documentation/virt/kvm/locking.rst
-> +++ b/Documentation/virt/kvm/locking.rst
-> @@ -36,6 +36,9 @@ On x86:
->    holding kvm->arch.mmu_lock (typically with ``read_lock``, otherwise
->    there's no need to take kvm->arch.tdp_mmu_pages_lock at all).
->  
-> +- kvm->arch.tsc_write_lock is taken outside
-> +  kvm->arch.pvclock_gtod_sync_lock
+>  tools/testing/selftests/kvm/Makefile          |  2 +-
+>  .../selftests/kvm/include/aarch64/spinlock.h  | 13 +++++++++
+>  .../selftests/kvm/lib/aarch64/spinlock.c      | 27 +++++++++++++++++++
+>  3 files changed, 41 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
+>  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+>
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 5d05801ab816..61f0d376af99 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -35,7 +35,7 @@ endif
+>
+>  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
+>  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
+> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S
+> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c
+>  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+>
+>  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/spinlock.h b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
+> new file mode 100644
+> index 000000000000..cf0984106d14
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
+> @@ -0,0 +1,13 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
 > +
->  Everything else is a leaf: no other lock is taken inside the critical
->  sections.
->  
-> @@ -222,6 +225,14 @@ time it will be set using the Dirty tracking mechanism described above.
->  :Comment:	'raw' because hardware enabling/disabling must be atomic /wrt
->  		migration.
->  
-> +:Name:		kvm_arch::pvclock_gtod_sync_lock
-> +:Type:		raw_spinlock_t
-> +:Arch:		x86
-> +:Protects:	kvm_arch::{cur_tsc_generation,cur_tsc_nsec,cur_tsc_write,
-> +			cur_tsc_offset,nr_vcpus_matched_tsc}
-> +:Comment:	'raw' because updating the kvm master clock must not be
-> +		preempted.
+> +#ifndef SELFTEST_KVM_ARM64_SPINLOCK_H
+> +#define SELFTEST_KVM_ARM64_SPINLOCK_H
 > +
->  :Name:		kvm_arch::tsc_write_lock
->  :Type:		raw_spinlock
->  :Arch:		x86
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index b1e9a4885be6..f1434cd388b9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2533,7 +2533,6 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
->  	vcpu->arch.this_tsc_write = kvm->arch.cur_tsc_write;
->  
->  	kvm_vcpu_write_tsc_offset(vcpu, offset);
-> -	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
->  
->  	spin_lock_irqsave(&kvm->arch.pvclock_gtod_sync_lock, flags);
->  	if (!matched) {
-> @@ -2544,6 +2543,7 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 data)
->  
->  	kvm_track_tsc_matching(vcpu);
->  	spin_unlock_irqrestore(&kvm->arch.pvclock_gtod_sync_lock, flags);
+> +struct spinlock {
+> +       int v;
+> +};
+> +
+> +extern void spin_lock(struct spinlock *lock);
+> +extern void spin_unlock(struct spinlock *lock);
+> +
+> +#endif /* SELFTEST_KVM_ARM64_SPINLOCK_H */
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/spinlock.c b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+> new file mode 100644
+> index 000000000000..6d66a3dac237
+> --- /dev/null
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+> @@ -0,0 +1,27 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * ARM64 Spinlock support
+> + */
+> +#include <stdint.h>
+> +
+> +#include "spinlock.h"
+> +
+> +void spin_lock(struct spinlock *lock)
+> +{
+> +       uint32_t val, res;
 
-Drop the irqsave/irqrestore in this patch instead of doing so while refactoring
-the code in the next patch.
+nit: use 'int' to match the lock value type.
 
-> +	raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
->  }
->  
->  static inline void adjust_tsc_offset_guest(struct kvm_vcpu *vcpu,
-> -- 
-> 2.33.0.rc1.237.g0d66db33f3-goog
-> 
+> +
+> +       asm volatile(
+> +       "1:     ldaxr   %w0, [%2]\n"
+> +       "       cbnz    %w0, 1b\n"
+> +       "       mov     %w0, #1\n"
+> +       "       stxr    %w1, %w0, [%2]\n"
+> +       "       cbnz    %w1, 1b\n"
+> +       : "=&r" (val), "=&r" (res)
+> +       : "r" (&lock->v)
+> +       : "memory");
+> +}
+> +
+> +void spin_unlock(struct spinlock *lock)
+> +{
+> +       asm volatile("stlr wzr, [%0]\n" : : "r" (&lock->v) : "memory");
+> +}
+> --
+> 2.33.0.153.gba50c8fa24-goog
+>
+
+Otherwise, LGTM.
+
+Reviewed-by: Oliver Upton <oupton@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
