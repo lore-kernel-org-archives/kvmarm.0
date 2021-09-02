@@ -2,86 +2,87 @@ Return-Path: <SRS0=/m9d=NY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDACC433F5
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 19:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 000B6C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 20:18:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9CEA660FD7
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 19:45:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9CEA660FD7
+	by mail.kernel.org (Postfix) with ESMTP id 6637A61131
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 20:18:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6637A61131
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D69B4B0A0;
-	Thu,  2 Sep 2021 15:45:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D76AC4B118;
+	Thu,  2 Sep 2021 16:18:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sSkgHTzNOdoo; Thu,  2 Sep 2021 15:45:19 -0400 (EDT)
+	with ESMTP id OMV0MJ2eYxPw; Thu,  2 Sep 2021 16:18:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 217B14B0A3;
-	Thu,  2 Sep 2021 15:45:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C25B94B0DF;
+	Thu,  2 Sep 2021 16:18:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58D2B4B0A3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 15:45:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EFF44B0CD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 16:18:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qdJcm+gIH1Ux for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Sep 2021 15:45:17 -0400 (EDT)
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com
- [209.85.167.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0453E4B0A0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 15:45:16 -0400 (EDT)
-Received: by mail-lf1-f54.google.com with SMTP id k13so6806263lfv.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Sep 2021 12:45:16 -0700 (PDT)
+ with ESMTP id dvxQFNnXA9pC for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Sep 2021 16:18:05 -0400 (EDT)
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com
+ [209.85.167.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 34FBA4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 16:18:05 -0400 (EDT)
+Received: by mail-lf1-f46.google.com with SMTP id m28so6991857lfj.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Sep 2021 13:18:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Hc2gcVksXzTr1IYZOTogrbXgKL8dWeh0/s29AyPzQmQ=;
- b=nGK4NeA6yxLc1weyQpFYZMrqUi3ivy+2UO+yNScnEseijwiIq21vEMLnYigeNN2xqm
- Yi6Qc1ylsTv2t0Iuok58JzuIduweJpCeJ1pmjZvwXXCKwnNoUWaG/dkE1v0p+ZLG3Mfp
- e1baudwOsKlH/fDwgBAxp8lf9bh/JLcEa+uruQgVKVdY99FIiVYvNBH4rqYDZtFR82al
- JY38xlhEi0kshEEl7eBwj3LgbiqJBijkOpZh9ODqFwQVPDHpDsnX+AeNlaVsFgqUYTap
- ypGZlUzgHzB52a8WMmkq6tkBQpthITzwz5WNifkBD0MTR7pdWkk4JU+w1ROT5lyTkSgK
- Yzew==
+ :cc; bh=kzEtkuBtgfdvovJGx2vNeyWTM6t8k4a79v7QJawW9b8=;
+ b=czGzwIMYk81Mo1UJ4KLBEMDUAJvz72+tHL59F2iqeJk960mlsaXhCo6R022M2B07In
+ duNGe9KfQKyTsvzzYDEE/6gpDpJScLS3A22Ghj96PHMr8rHTCQBBGbl41GBkkuIH0/bC
+ aIpH1wwpwOHtICD6ACln6eiZiMIz45skiZ40YUinZUOhCBApaFAZJOCiHd1r4WWJm/o1
+ 7QsFY/sTTBnpybIyL0Xz0VGaPF9lVWBtEoOwLm+P8CNil6/2RGI8w24dBMv7qFwq3jAM
+ lz/+xaiQHFvLPsxv2B3l2NkKzpM66+Qt5K1VslIIIf23xOqBi9Y4kM+tJsi1OjA6+ES4
+ +RLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Hc2gcVksXzTr1IYZOTogrbXgKL8dWeh0/s29AyPzQmQ=;
- b=jJMuWKVLK8eNelZ/oLY/NbZBfixPU5XN2zk+FEbojPLw8cWk+38ufcJ0O74Vzqc5T9
- f/nQXFAfB3zCYDisxBsSSlGirMv+uBu/tMvyvocjK6ZSXvGChHmbpAeLoZn4EJBWPS1w
- W+jC1kHFWSPOMW43xio/+VXrWRmaU1SSrQBXpB0qgqGf2RDt7ybN3zUDm19ixtfej/1w
- SqsTufAkBi3xFfhBIJdEyzX1VBvPSAumyrAxW60OlXOWMtkjbSrnEwxjEddkpzHKaS/u
- OLoCF4tZwkhhcnxsrOOyqUf7QJ3jAR8pGEJe3SEvlVuIYFhLEBEXpxFvkzU5eM8Gp60S
- 3Png==
-X-Gm-Message-State: AOAM531Kf6TzkZj0jm6XX6G0f1lia7Gr+Z6YNNQEIbOR/Y0976Xg6V15
- WH0F6CT1XO0FSf25ePiRGtedg7GyKDoP/L6qOHJP3Q==
-X-Google-Smtp-Source: ABdhPJxs82rjOaFEEVNEFjggRcMRuAgzhuR+/VhLAeGrIKZ+wPbbkII2xn5iYSx51JVsk55zn+AngBAngaE4OnGx1lU=
-X-Received: by 2002:a05:6512:1107:: with SMTP id
- l7mr3883353lfg.80.1630611915246; 
- Thu, 02 Sep 2021 12:45:15 -0700 (PDT)
+ bh=kzEtkuBtgfdvovJGx2vNeyWTM6t8k4a79v7QJawW9b8=;
+ b=ablQwAUHSsN121tMsE8mgWq0vpG7Simw4JxqlLj8rjlxli0gc57lwMHPHOQaXjqYkf
+ /oISMSs1NTc6fM2W6Z6dXYk9f1tJu3pZdnfcHlbNJduaIWyNm0Fj9S39vOkYOVAh/bR8
+ cP90qCZ1tnOzRdRb77tz3Tb1ee6h/LA5c5mKqYQ78aRsqR7gfgbDgx4lXy9eMs83EJSL
+ PBasvhFBjVsRzh3nj/BwxQTffCFxoCZZ7SmxgL6Y3/tiG/dJrLo/4IZKMqHkKay3dW8j
+ puHaRAyunB79kp3cLtVM4YqD7zS4Q9Oqsw9YLg0Y8eLKWn84/tLF0OdJocAKINGnvEei
+ vTvQ==
+X-Gm-Message-State: AOAM530tz/px2wcLpdt8sTNKeKjdH8dGQV0GLf2IJI25mFiqMuG7m4H0
+ zH5t4hOTWO41AglKX4zR/nwOJ+eAZFa1lVWYdYhkAw==
+X-Google-Smtp-Source: ABdhPJzwP18p+J/0zyaKhKGt7l6t2j60BMaCA6xIyB2Wj57888oDOG4H3w28g6Q09+bAJl5bJu0e7lkzr6X+zUIG2KE=
+X-Received: by 2002:ac2:43b6:: with SMTP id t22mr4052lfl.0.1630613883673; Thu,
+ 02 Sep 2021 13:18:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210816001130.3059564-1-oupton@google.com>
- <YTEkuXQ1cNhPoqP1@google.com>
-In-Reply-To: <YTEkuXQ1cNhPoqP1@google.com>
+References: <20210901211412.4171835-1-rananta@google.com>
+ <20210901211412.4171835-2-rananta@google.com>
+ <YS/vTVPi7Iam+ZXX@google.com>
+ <CAJHc60wx=ZN_5e9Co_s_GyFs4ytLxncbYr2-CzmTUh5DvvuuNQ@mail.gmail.com>
+In-Reply-To: <CAJHc60wx=ZN_5e9Co_s_GyFs4ytLxncbYr2-CzmTUh5DvvuuNQ@mail.gmail.com>
 From: Oliver Upton <oupton@google.com>
-Date: Thu, 2 Sep 2021 12:45:02 -0700
-Message-ID: <CAOQ_QshZCNACJy2f-jJL=U8+NROp1DoM3KXcN_3z5kE4h2JY7Q@mail.gmail.com>
-Subject: Re: [PATCH v7 0/6] KVM: x86: Add idempotent controls for migrating
- system counter state
-To: Sean Christopherson <seanjc@google.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
+Date: Thu, 2 Sep 2021 13:17:49 -0700
+Message-ID: <CAOQ_QsgQongwOuj2FCTB-iRsscMYV2myN5Czae2B_vmasMOvnA@mail.gmail.com>
+Subject: Re: [PATCH v3 01/12] KVM: arm64: selftests: Add MMIO readl/writel
+ support
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,52 +99,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 2, 2021 at 12:23 PM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Sep 1, 2021 at 3:43 PM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
 >
-> On Mon, Aug 16, 2021, Oliver Upton wrote:
-> > Applies cleanly to kvm/queue.
+> On Wed, Sep 1, 2021 at 2:23 PM Oliver Upton <oupton@google.com> wrote:
 > >
-> > Parent commit: a3e0b8bd99ab ("KVM: MMU: change tracepoints arguments to kvm_page_fault")
->
-> This needs a rebase, patch 2 and presumably patch 3 conflict with commit
-> 77fcbe823f00 ("KVM: x86: Prevent 'hv_clock->system_time' from going negative in
-> kvm_guest_time_update()").
+> > On Wed, Sep 01, 2021 at 09:14:01PM +0000, Raghavendra Rao Ananta wrote:
+> > > Define the readl() and writel() functions for the guests to
+> > > access (4-byte) the MMIO region.
+> > >
+> > > The routines, and their dependents, are inspired from the kernel's
+> > > arch/arm64/include/asm/io.h and arch/arm64/include/asm/barrier.h.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > ---
+> > >  .../selftests/kvm/include/aarch64/processor.h | 45 ++++++++++++++++++-
+> > >  1 file changed, 44 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > index c0273aefa63d..3cbaf5c1e26b 100644
+> > > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> > > @@ -130,6 +130,49 @@ void vm_install_sync_handler(struct kvm_vm *vm,
+> > >       val;                                                              \
+> > >  })
+> > >
+> > > -#define isb()        asm volatile("isb" : : : "memory")
+> > > +#define isb()                asm volatile("isb" : : : "memory")
+> >
+> > Is this a stray diff?
+> >
+> Oh no, that's intentional. Just trying to align with others below.
 
-Thanks for the heads up! I've been hands-off with this series for a
-bit, as I saw Paolo was playing around with it to fold it with his
-pvclock locking changes (branch kvm/paolo). I'll pick up your
-suggestions and get another series out with Paolo's additions.
+You are of course right, I read the diff wrong and didn't think it was
+correctly aligned.
 
---
 Thanks,
 Oliver
-
-> > v6: https://lore.kernel.org/r/20210804085819.846610-1-oupton@google.com
-> >
-> > v6 -> v7:
-> >  - Separated x86, arm64, and selftests into different series
-> >  - Rebased on top of kvm/queue
-> >
-> > Oliver Upton (6):
-> >   KVM: x86: Fix potential race in KVM_GET_CLOCK
-> >   KVM: x86: Create helper methods for KVM_{GET,SET}_CLOCK ioctls
-> >   KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
-> >   KVM: x86: Take the pvclock sync lock behind the tsc_write_lock
-> >   KVM: x86: Refactor tsc synchronization code
-> >   KVM: x86: Expose TSC offset controls to userspace
-> >
-> >  Documentation/virt/kvm/api.rst          |  42 ++-
-> >  Documentation/virt/kvm/devices/vcpu.rst |  57 ++++
-> >  Documentation/virt/kvm/locking.rst      |  11 +
-> >  arch/x86/include/asm/kvm_host.h         |   4 +
-> >  arch/x86/include/uapi/asm/kvm.h         |   4 +
-> >  arch/x86/kvm/x86.c                      | 362 +++++++++++++++++-------
-> >  include/uapi/linux/kvm.h                |   7 +-
-> >  7 files changed, 378 insertions(+), 109 deletions(-)
-> >
-> > --
-> > 2.33.0.rc1.237.g0d66db33f3-goog
-> >
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
