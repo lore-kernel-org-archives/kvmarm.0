@@ -7,97 +7,96 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 685E7C4320E
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 12:37:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F975C432BE
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 13:21:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D51A3610A2
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 12:37:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D51A3610A2
+	by mail.kernel.org (Postfix) with ESMTP id 0F59B60EE3
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 13:21:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0F59B60EE3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52F594B0FC;
-	Thu,  2 Sep 2021 08:37:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 749C64B105;
+	Thu,  2 Sep 2021 09:21:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id T2t6U9nzlnDx; Thu,  2 Sep 2021 08:37:06 -0400 (EDT)
+	with ESMTP id QMwJP6S234Yg; Thu,  2 Sep 2021 09:21:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B4514B126;
-	Thu,  2 Sep 2021 08:37:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BDB44B11A;
+	Thu,  2 Sep 2021 09:21:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF3C64B126
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 08:37:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2572B4B105
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 09:21:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2AmxzW8U95ex for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Sep 2021 08:37:01 -0400 (EDT)
+ with ESMTP id xy-QutPRgBud for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Sep 2021 09:21:20 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E04C24B0FC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 08:37:01 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40FDD4B137
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 09:21:20 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1630586221;
+ s=mimecast20190719; t=1630588880;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=XjZNhaTHu2G7qvKup1PDbiF+IV6d0VDmwJ2nyMbiAo4=;
- b=hTc+0nOGWv3vnX0quMZEGLL03iWamMRUPh3a82A4At0YGNUZnZ8vkKOuVrc0cK9iRNni5V
- /eU2iYtPNX/7may8JybFEo3ITkUZKDLqMqrtIE9FDt6SHrCcx8a8MSXaU1w11cMSRPaDH/
- KWAPzXbv+HPLLv+StuMgASZWgBPZaZ0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-HQOLOIj0PXezeiqokBdxiA-1; Thu, 02 Sep 2021 08:36:59 -0400
-X-MC-Unique: HQOLOIj0PXezeiqokBdxiA-1
-Received: by mail-wr1-f70.google.com with SMTP id
- v6-20020adfe4c6000000b001574f9d8336so485254wrm.15
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Sep 2021 05:36:59 -0700 (PDT)
+ bh=6tJf5xIvKDCnRwuvzEhUuuc4fd9eQkxx1PjNi93Vu3s=;
+ b=WU7aG3r64Z0LaItlhnEJiRXnyJk92uI5GC1C9Xd4MZ2Iz3X3uD1IlRbqXhGV0takvDjA87
+ 3Nc+hV75Unat26IumsmgLUGgS5eodGTVrRojbn7a9e4YF61PaEZAvfweLDVNKaq1uBOVwk
+ xxCHuftdxtWh9IEwT5+P8K00XxjukQU=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-602-7z3bAJNgP9epjY8KW5mGOg-1; Thu, 02 Sep 2021 09:21:17 -0400
+X-MC-Unique: 7z3bAJNgP9epjY8KW5mGOg-1
+Received: by mail-qv1-f71.google.com with SMTP id
+ jz9-20020a0562140e6900b0037795ee01abso1504219qvb.14
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Sep 2021 06:21:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=XjZNhaTHu2G7qvKup1PDbiF+IV6d0VDmwJ2nyMbiAo4=;
- b=uHDXfYtz/gC/jp/S6Qtq+4ccgUxeih7vLPxy8wvrwMkXJDSpweTAL4o2Akl1PyALtK
- hXsiGarSht6ojUjhyQ0m1n7OXpnP0i84QqaF3p5m3qi2gwgbVi+UggUeYEkCLhsqNitl
- rU3BsQBEWu+t4pLp3WCSeuQYqNQ4FChw8I2dq8UaJm4rm7ltIWQ0LRmEdsbkkUlWCx44
- hDMstDJ2KO/Ntmk8pluWKNxwDtcd5P10TzVKy64kjLoUgl6O/yx55/N2ed82itNefJes
- nCQIIX5iWk9DGLcVsqUCHk1mcGOPFksf4bgaNaewdHzyHma7cLEG4vKdGOaPW33QYFMj
- JsQw==
-X-Gm-Message-State: AOAM530Ye5ptHuLcoOG2w8u7M02neaUasiVBib3t2MbLZoyoT0eRAe6R
- 08imiYrTjxYCl5Qu9likxHOcdri2EQdZHRQqJz+sZX0Xflj2iDw5T0oVHdQ9qkJDSsT5sqfrq/p
- 5j5I4a+Brocc9vinRGvJL0aeK
-X-Received: by 2002:adf:dfc5:: with SMTP id q5mr3490261wrn.5.1630586218650;
- Thu, 02 Sep 2021 05:36:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyda7YkzbAIwptDdwUxeFFJ3yXbh0EqmH9ayktJ/+cOAYBlktEFMuEzHFWPK2Zg6EPNQDNukw==
-X-Received: by 2002:adf:dfc5:: with SMTP id q5mr3490239wrn.5.1630586218485;
- Thu, 02 Sep 2021 05:36:58 -0700 (PDT)
-Received: from gator (nat-pool-brq-t.redhat.com. [213.175.37.10])
- by smtp.gmail.com with ESMTPSA id k16sm1774372wrx.87.2021.09.02.05.36.57
+ bh=6tJf5xIvKDCnRwuvzEhUuuc4fd9eQkxx1PjNi93Vu3s=;
+ b=jZ/KfVKNiTI1/dorbm9Col9azpOs4VsIWdHwVeDQe5WGlsQnqsM708nR6epUsrMnJE
+ 7tmw+g41pXZqr7JTkXF9smgdP0/1DPxein0BRwPc+ez19t2auyDc97D1atiECzp+aIZW
+ aGj7K1/zrl9Co9+WvWcHDy1I53AiL4HO8hUkeAc2c4kZo2/3Q7swbw2Ot1zax0LJLPAE
+ gTMLwjicJWxvmu+2BgfQ3TjdUJvi0d5pTHMGOTE7HaylnBdvCBPheGu+buXhRxM8kPzL
+ 4NIZNM+rgn1jHuQCI0bbaj3R9UmIpTpu+UB2vrhFFaCi9Iybpz5YBOxqD4zqX1OrxVhj
+ KJjg==
+X-Gm-Message-State: AOAM533G91s71lQLc8sE0dIvhohj82cJIUYEAVEmFn4M7im2uPCNhq5o
+ q5YNzzD1fdR3qnrAqdb/XnjCVLZLDnj+utH+v1sKkE3Idb6HBjJvHpv3BMNh51Mkcsn0cMPaDh4
+ S7WNUgcME29wGJhOW9jxGDzAU
+X-Received: by 2002:ad4:562c:: with SMTP id cb12mr1587973qvb.6.1630588877116; 
+ Thu, 02 Sep 2021 06:21:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxG9JfvU8t2EsYROxxRPXPNKTs00M8PoYMUrrQVfghePFKxWKnhmt6JBf3fCTGn9rsZbouzrg==
+X-Received: by 2002:ad4:562c:: with SMTP id cb12mr1587947qvb.6.1630588876898; 
+ Thu, 02 Sep 2021 06:21:16 -0700 (PDT)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+ by smtp.gmail.com with ESMTPSA id g8sm1319814qkm.25.2021.09.02.06.21.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 02 Sep 2021 05:36:58 -0700 (PDT)
-Date: Thu, 2 Sep 2021 14:36:56 +0200
+ Thu, 02 Sep 2021 06:21:16 -0700 (PDT)
+Date: Thu, 2 Sep 2021 15:21:12 +0200
 From: Andrew Jones <drjones@redhat.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v3 07/12] KVM: arm64: selftests: Add support to get the
- vcpuid from MPIDR_EL1
-Message-ID: <20210902123656.lfzwqrlw5kbvckah@gator>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v3 01/12] KVM: arm64: selftests: Add MMIO readl/writel
+ support
+Message-ID: <20210902132112.yyz7iiqims3nlmmi@gator>
 References: <20210901211412.4171835-1-rananta@google.com>
- <20210901211412.4171835-8-rananta@google.com>
- <YTARPBhMHXjgcPlg@google.com>
+ <20210901211412.4171835-2-rananta@google.com>
 MIME-Version: 1.0
-In-Reply-To: <YTARPBhMHXjgcPlg@google.com>
+In-Reply-To: <20210901211412.4171835-2-rananta@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -115,81 +114,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 01, 2021 at 11:48:12PM +0000, Oliver Upton wrote:
-> On Wed, Sep 01, 2021 at 09:14:07PM +0000, Raghavendra Rao Ananta wrote:
-> > At times, such as when in the interrupt handler, the guest wants to
-> > get the vCPU-id that it's running on. As a result, introduce
-> > get_vcpuid() that parses the MPIDR_EL1 and returns the vcpuid to the
-> > requested caller.
-> > 
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  .../selftests/kvm/include/aarch64/processor.h | 19 +++++++++++++++++++
-> >  1 file changed, 19 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > index c35bb7b8e870..8b372cd427da 100644
-> > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> > @@ -251,4 +251,23 @@ static inline void local_irq_disable(void)
-> >  	asm volatile("msr daifset, #3" : : : "memory");
-> >  }
-> >  
-> > +#define MPIDR_LEVEL_BITS 8
-> > +#define MPIDR_LEVEL_SHIFT(level) (MPIDR_LEVEL_BITS * level)
-> > +#define MPIDR_LEVEL_MASK ((1 << MPIDR_LEVEL_BITS) - 1)
-> > +#define MPIDR_AFFINITY_LEVEL(mpidr, level) \
-> > +	((mpidr >> MPIDR_LEVEL_SHIFT(level)) & MPIDR_LEVEL_MASK)
-> > +
-> > +static inline uint32_t get_vcpuid(void)
-> > +{
-> > +	uint32_t vcpuid = 0;
-> > +	uint64_t mpidr = read_sysreg(mpidr_el1);
-> > +
-> > +	/* KVM limits only 16 vCPUs at level 0 */
-> > +	vcpuid = mpidr & 0x0f;
-> > +	vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 1) << 4;
-> > +	vcpuid |= MPIDR_AFFINITY_LEVEL(mpidr, 2) << 12;
-> > +
-> > +	return vcpuid;
-> > +}
+On Wed, Sep 01, 2021 at 09:14:01PM +0000, Raghavendra Rao Ananta wrote:
+> Define the readl() and writel() functions for the guests to
+> access (4-byte) the MMIO region.
 > 
-> Are we guaranteed that KVM will always compose vCPU IDs the same way? I
-> do not believe this is guaranteed ABI.
+> The routines, and their dependents, are inspired from the kernel's
+> arch/arm64/include/asm/io.h and arch/arm64/include/asm/barrier.h.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  .../selftests/kvm/include/aarch64/processor.h | 45 ++++++++++++++++++-
+>  1 file changed, 44 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index c0273aefa63d..3cbaf5c1e26b 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -130,6 +130,49 @@ void vm_install_sync_handler(struct kvm_vm *vm,
+>  	val;								  \
+>  })
+>  
+> -#define isb()	asm volatile("isb" : : : "memory")
+> +#define isb()		asm volatile("isb" : : : "memory")
+> +#define dsb(opt)	asm volatile("dsb " #opt : : : "memory")
+> +#define dmb(opt)	asm volatile("dmb " #opt : : : "memory")
+> +
+> +#define dma_wmb()	dmb(oshst)
+> +#define __iowmb()	dma_wmb()
+> +
+> +#define dma_rmb()	dmb(oshld)
+> +
+> +#define __iormb(v)							\
+> +({									\
+> +	unsigned long tmp;						\
+> +									\
+> +	dma_rmb();							\
+> +									\
+> +	/*								\
+> +	 * Courtesy of arch/arm64/include/asm/io.h:			\
+> +	 * Create a dummy control dependency from the IO read to any	\
+> +	 * later instructions. This ensures that a subsequent call	\
+> +	 * to udelay() will be ordered due to the ISB in __delay().	\
 
-I don't believe we are. At least in QEMU we take pains to avoid that
-assumption.
+We don't have udelay or __delay yet, but I assume they're coming soon.
 
-> 
-> For the base case, you could pass the vCPU ID as an arg to the guest
-> function.
-> 
-> I do agree that finding the vCPU ID is a bit more challenging in an
-> interrupt context. Maybe use a ucall to ask userspace? But of course,
-> every test implements its own run loop, so its yet another case that
-> tests need to handle.
-> 
-> Or, you could allocate an array at runtime of length KVM_CAP_MAX_VCPUS
-> (use the KVM_CHECK_EXTENSION ioctl to get the value). Once all vCPUs are
-> instantiated, iterate over them from userspace to populate the {MPIDR,
-> VCPU_ID} map. You'd need to guarantee that callers initialize the vGIC
-> *after* adding vCPUs to the guest.
+> +	 */								\
+> +	asm volatile("eor	%0, %1, %1\n"				\
+> +		     "cbnz	%0, ."					\
+> +		     : "=r" (tmp) : "r" ((unsigned long)(v))		\
+> +		     : "memory");					\
+> +})
+> +
+> +static __always_inline void __raw_writel(u32 val, volatile void *addr)
+> +{
+> +	asm volatile("str %w0, [%1]" : : "rZ" (val), "r" (addr));
+> +}
+> +
+> +static __always_inline u32 __raw_readl(const volatile void *addr)
+> +{
+> +	u32 val;
+> +	asm volatile("ldr %w0, [%1]" : "=r" (val) : "r" (addr));
+> +	return val;
+> +}
+> +
+> +#define writel_relaxed(v,c)	((void)__raw_writel((__force u32)cpu_to_le32(v),(c)))
+> +#define readl_relaxed(c)	({ u32 __r = le32_to_cpu((__force __le32)__raw_readl(c)); __r; })
 
-I agree with this approach. It may even make sense to create a common
-function that returns a {cpu_id,vcpu_index} map for other tests to use.
+Might want to explicitly include linux/types.h for these __force symbols.
+
+> +
+> +#define writel(v,c)		({ __iowmb(); writel_relaxed((v),(c));})
+> +#define readl(c)		({ u32 __v = readl_relaxed(c); __iormb(__v); __v; })
+>  
+>  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> -- 
+> 2.33.0.153.gba50c8fa24-goog
+
+
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
 drew
 
 > 
-> --
-> Thanks,
-> Oliver
-> 
-> >  #endif /* SELFTEST_KVM_PROCESSOR_H */
-> > -- 
-> > 2.33.0.153.gba50c8fa24-goog
-> > 
 > _______________________________________________
 > kvmarm mailing list
 > kvmarm@lists.cs.columbia.edu
