@@ -6,54 +6,54 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9844DC433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 18:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F68C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 18:11:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0B8D1610CC
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 18:03:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0B8D1610CC
+	by mail.kernel.org (Postfix) with ESMTP id 90AC0610CF
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Sep 2021 18:11:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 90AC0610CF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95C904B0EF;
-	Thu,  2 Sep 2021 14:03:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23DEC4B10D;
+	Thu,  2 Sep 2021 14:11:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 19qjirVqOeDq; Thu,  2 Sep 2021 14:03:40 -0400 (EDT)
+	with ESMTP id YxZsuIquS9yZ; Thu,  2 Sep 2021 14:11:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F28D4B104;
-	Thu,  2 Sep 2021 14:03:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6ECF4B108;
+	Thu,  2 Sep 2021 14:11:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A051D4B0EF
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 14:03:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DC574B108
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 14:11:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qShbv-QgX-5X for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Sep 2021 14:03:36 -0400 (EDT)
+ with ESMTP id 6q+cJMGq3eN5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Sep 2021 14:11:52 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 062CC4B093
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 14:03:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2445A4A19F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Sep 2021 14:11:52 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id E19A76109E;
- Thu,  2 Sep 2021 18:03:34 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 235E360724;
+ Thu,  2 Sep 2021 18:11:51 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mLr3k-008gvm-VA; Thu, 02 Sep 2021 19:03:33 +0100
-Date: Thu, 02 Sep 2021 19:03:32 +0100
-Message-ID: <877dfyx3bf.wl-maz@kernel.org>
+ id 1mLrBl-008h0e-4X; Thu, 02 Sep 2021 19:11:49 +0100
+Date: Thu, 02 Sep 2021 19:11:48 +0100
+Message-ID: <875yvix2xn.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Jia He <justin.he@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: Add memcg accounting to vgic
- allocations
-In-Reply-To: <20210902002801.32618-1-justin.he@arm.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Add memcg accounting to KVM allocations
+In-Reply-To: <20210902002801.32618-2-justin.he@arm.com>
 References: <20210902002801.32618-1-justin.he@arm.com>
+ <20210902002801.32618-2-justin.he@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -93,47 +93,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Jia,
-
-Once again: please add a cover letter when you have a patch
-series. It isn't rocket science, and Git will do it for you.
-
-On Thu, 02 Sep 2021 01:28:00 +0100,
+On Thu, 02 Sep 2021 01:28:01 +0100,
 Jia He <justin.he@arm.com> wrote:
 > 
 > Inspired by commit 254272ce6505 ("kvm: x86: Add memcg accounting to KVM
-> allocations"), it would be better to make arm64 vgic consistent with
+> allocations"), it would be better to make arm64 KVM consistent with
 > common kvm codes.
 > 
 > The memory allocations of VM scope should be charged into VM process
 > cgroup, hence change GFP_KERNEL to GFP_KERNEL_ACCOUNT.
 > 
-> There remained a case in vgic_set_kvm_info() since this allocation is
-> global, not in VM scope.
+> There remained a few cases since these allocations are global, not in VM
+> scope.
 > 
 > Signed-off-by: Jia He <justin.he@arm.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-debug.c   |  2 +-
->  arch/arm64/kvm/vgic/vgic-init.c    |  2 +-
->  arch/arm64/kvm/vgic/vgic-irqfd.c   |  2 +-
->  arch/arm64/kvm/vgic/vgic-its.c     | 14 +++++++-------
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  2 +-
->  arch/arm64/kvm/vgic/vgic-v4.c      |  2 +-
->  6 files changed, 12 insertions(+), 12 deletions(-)
+>  arch/arm64/kvm/arm.c      | 6 ++++--
+>  arch/arm64/kvm/mmu.c      | 2 +-
+>  arch/arm64/kvm/pmu-emul.c | 2 +-
+>  arch/arm64/kvm/reset.c    | 2 +-
+>  4 files changed, 7 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-> index f38c40a76251..e6a01f210df9 100644
-> --- a/arch/arm64/kvm/vgic/vgic-debug.c
-> +++ b/arch/arm64/kvm/vgic/vgic-debug.c
-> @@ -92,7 +92,7 @@ static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
->  		goto out;
->  	}
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index e9a2b8f27792..9d6f5bcaddef 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -289,10 +289,12 @@ long kvm_arch_dev_ioctl(struct file *filp,
 >  
-> -	iter = kmalloc(sizeof(*iter), GFP_KERNEL);
-> +	iter = kmalloc(sizeof(*iter), GFP_KERNEL_ACCOUNT);
+>  struct kvm *kvm_arch_alloc_vm(void)
+>  {
+> +	unsigned long sz = sizeof(struct kvm);
 
-This really isn't an allocation made in the context of a VM. I don't
-think this hunk belongs here.
+If you are going to introduce an extra variable, please use the
+correct type (size_t).
+
+> +
+>  	if (!has_vhe())
+> -		return kzalloc(sizeof(struct kvm), GFP_KERNEL);
+> +		return kzalloc(sz, GFP_KERNEL | GFP_KERNEL_ACCOUNT);
+
+Why both GFP_KERNEL and GFP_KERNEL_ACCOUNT?
 
 Thanks,
 
