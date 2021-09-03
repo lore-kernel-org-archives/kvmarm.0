@@ -2,104 +2,67 @@ Return-Path: <SRS0=P5lD=NZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61425C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Sep 2021 08:25:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B50C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Sep 2021 09:17:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D15B960FD7
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Sep 2021 08:25:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D15B960FD7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 1834161057
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Sep 2021 09:17:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1834161057
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 438714B177;
-	Fri,  3 Sep 2021 04:25:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C0494B162;
+	Fri,  3 Sep 2021 05:17:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8tb7XNXavbRL; Fri,  3 Sep 2021 04:25:42 -0400 (EDT)
+	with ESMTP id 2Rs0kH5Y9GiW; Fri,  3 Sep 2021 05:17:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01D134B17E;
-	Fri,  3 Sep 2021 04:25:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DCA64B159;
+	Fri,  3 Sep 2021 05:17:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E8BB4B178
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Sep 2021 04:25:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52B744B159
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Sep 2021 05:17:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WZIA7eFp2hD8 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Sep 2021 04:25:39 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B67D4B177
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Sep 2021 04:25:39 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1630657539;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=784omy9+f5Am5nR2Vqkl2J0I13vidMEZa3qsfoNTT4c=;
- b=OoruEPaOqG+v63x8EC8z3lC03T5j2aFWlTDvLGYlbr4ex366xDZMXlubhUnYh5XyuQWffs
- Y/wxjSpkPLREc5gTW5gI4+e91NQi5qUDJ+Fe41PP4POfhYd7NlX8jG38EWpxvXotUAhgZl
- 443VhpwTdii+vL+N+J7A28uGf9RdacI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-SPTQljBBMB-o5emc0G3reQ-1; Fri, 03 Sep 2021 04:25:38 -0400
-X-MC-Unique: SPTQljBBMB-o5emc0G3reQ-1
-Received: by mail-ed1-f72.google.com with SMTP id
- o11-20020a056402038b00b003c9e6fd522bso2369463edv.19
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Sep 2021 01:25:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=784omy9+f5Am5nR2Vqkl2J0I13vidMEZa3qsfoNTT4c=;
- b=FXTFXltr8cP6EP+kOPuef8hVyZPT099IahrJMf/kjkn8iZU//uq3t0eHcPu8S9HLAE
- Yc0qgZ5wGJ+dX7fXvaQQdrKHrRBF8E/cKe1qfS9kYtgWRUbEQ6ipjLfK6FkbmtNlteOR
- 87YXpHFA6pd+4CwXur35iFtJSFpTkNV3jWgd0nPEHtq/of+iMc47+/Yh8RRH+PKn+iRb
- osViTpK05rTI4SX6sLfW0m0+5M9KN4zxMAiKK6IdHXhTCKU7+X5dIA8XM50HMxGB9foG
- zwKB+CQ1zjSP/ZyXsIh+x/SO05q/mr4j+EMhiLs+PsL5UpGdhOuXATkfRPaDVQjyT9l8
- DG3w==
-X-Gm-Message-State: AOAM532IvgmXnC44wLFhq3QOyNvnRNT0KHZ3t9SohHkTsr1TO5ANj0Dx
- ZR7XPqtXyMz1x2mcDdb5DTm65qlTq8GKYOk4Pnm5VYstg2BGIa4M+33JIFzVC8Ypq8wFw3n8GeJ
- vYWSN8n0/w+O8pMk5ro+iO4Rs
-X-Received: by 2002:a17:906:fcda:: with SMTP id
- qx26mr2880451ejb.121.1630657536931; 
- Fri, 03 Sep 2021 01:25:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzLYFAkqk2qzchrOeqo0XEuIjG+9suLbk+5wak6Qfy73DWOVulKVNgzSe4ifU3BL65WnsM8eg==
-X-Received: by 2002:a17:906:fcda:: with SMTP id
- qx26mr2880426ejb.121.1630657536690; 
- Fri, 03 Sep 2021 01:25:36 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id o19sm2450076edr.18.2021.09.03.01.25.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 03 Sep 2021 01:25:36 -0700 (PDT)
-Date: Fri, 3 Sep 2021 10:25:34 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v3 08/12] KVM: arm64: selftests: Add light-weight
- spinlock support
-Message-ID: <20210903082534.jz3r2defqnrt2ee6@gator.home>
-References: <20210901211412.4171835-1-rananta@google.com>
- <20210901211412.4171835-9-rananta@google.com>
+ with ESMTP id 28HuO6bXtwYV for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Sep 2021 05:17:07 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B10A74B129
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Sep 2021 05:17:07 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6C2C26101A;
+ Fri,  3 Sep 2021 09:17:06 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mM5Jo-008oRm-FB; Fri, 03 Sep 2021 10:17:04 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Allow KVM to be disabled from the command line
+Date: Fri,  3 Sep 2021 10:16:52 +0100
+Message-Id: <20210903091652.985836-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <20210901211412.4171835-9-rananta@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, ascull@google.com, dbrazdil@google.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -116,98 +79,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 01, 2021 at 09:14:08PM +0000, Raghavendra Rao Ananta wrote:
-> Add a simpler version of spinlock support for ARM64 for
-> the guests to use.
-> 
-> The implementation is loosely based on the spinlock
-> implementation in kvm-unit-tests.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile          |  2 +-
->  .../selftests/kvm/include/aarch64/spinlock.h  | 13 +++++++++
->  .../selftests/kvm/lib/aarch64/spinlock.c      | 27 +++++++++++++++++++
->  3 files changed, 41 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
->  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 5d05801ab816..61f0d376af99 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -35,7 +35,7 @@ endif
->  
->  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
->  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
-> -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S
-> +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c
->  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
->  
->  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/spinlock.h b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
-> new file mode 100644
-> index 000000000000..cf0984106d14
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/include/aarch64/spinlock.h
-> @@ -0,0 +1,13 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +
-> +#ifndef SELFTEST_KVM_ARM64_SPINLOCK_H
-> +#define SELFTEST_KVM_ARM64_SPINLOCK_H
-> +
-> +struct spinlock {
-> +	int v;
-> +};
-> +
-> +extern void spin_lock(struct spinlock *lock);
-> +extern void spin_unlock(struct spinlock *lock);
-> +
-> +#endif /* SELFTEST_KVM_ARM64_SPINLOCK_H */
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/spinlock.c b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
-> new file mode 100644
-> index 000000000000..6d66a3dac237
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/spinlock.c
-> @@ -0,0 +1,27 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * ARM64 Spinlock support
-> + */
-> +#include <stdint.h>
-> +
-> +#include "spinlock.h"
-> +
-> +void spin_lock(struct spinlock *lock)
-> +{
-> +	uint32_t val, res;
-> +
-> +	asm volatile(
-> +	"1:	ldaxr	%w0, [%2]\n"
-> +	"	cbnz	%w0, 1b\n"
-> +	"	mov	%w0, #1\n"
-> +	"	stxr	%w1, %w0, [%2]\n"
-> +	"	cbnz	%w1, 1b\n"
-> +	: "=&r" (val), "=&r" (res)
-> +	: "r" (&lock->v)
-> +	: "memory");
-> +}
-> +
-> +void spin_unlock(struct spinlock *lock)
-> +{
-> +	asm volatile("stlr wzr, [%0]\n"	: : "r" (&lock->v) : "memory");
-> +}
-> -- 
+Although KVM can be compiled out of the kernel, it cannot be disabled
+at runtime. Allow this possibility by introducing a new mode that
+will prevent KVM from initialising.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+This is useful in the (limited) circumstances where you don't want
+KVM to be available (what is wrong with you?), or when you want
+to install another hypervisor instead (good luck with that).
 
-It makes sense that the explicit barriers in kvm-unit-tests weren't also
-inherited, because we already have the implicit barriers with these ld/st
-instruction variants. (I suppose we could improve the kvm-unit-tests
-implementation at some point.)
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ Documentation/admin-guide/kernel-parameters.txt |  3 +++
+ arch/arm64/include/asm/kvm_host.h               |  1 +
+ arch/arm64/kernel/idreg-override.c              |  1 +
+ arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
+ 4 files changed, 18 insertions(+), 1 deletion(-)
 
-Thanks,
-drew
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 91ba391f9b32..cc5f68846434 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2365,6 +2365,9 @@
+ 	kvm-arm.mode=
+ 			[KVM,ARM] Select one of KVM/arm64's modes of operation.
+ 
++			none: Forcefully disable KVM and run in nVHE mode,
++			      preventing KVM from ever initialising.
++
+ 			nvhe: Standard nVHE-based mode, without support for
+ 			      protected guests.
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f8be56d5342b..019490c67976 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -58,6 +58,7 @@
+ enum kvm_mode {
+ 	KVM_MODE_DEFAULT,
+ 	KVM_MODE_PROTECTED,
++	KVM_MODE_NONE,
+ };
+ enum kvm_mode kvm_get_mode(void);
+ 
+diff --git a/arch/arm64/kernel/idreg-override.c b/arch/arm64/kernel/idreg-override.c
+index d8e606fe3c21..57013c1b6552 100644
+--- a/arch/arm64/kernel/idreg-override.c
++++ b/arch/arm64/kernel/idreg-override.c
+@@ -95,6 +95,7 @@ static const struct {
+ 	char	alias[FTR_ALIAS_NAME_LEN];
+ 	char	feature[FTR_ALIAS_OPTION_LEN];
+ } aliases[] __initconst = {
++	{ "kvm-arm.mode=none",		"id_aa64mmfr1.vh=0" },
+ 	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
+ 	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
+ 	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index fe102cd2e518..cdc70e238316 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2064,6 +2064,11 @@ int kvm_arch_init(void *opaque)
+ 		return -ENODEV;
+ 	}
+ 
++	if (kvm_get_mode() == KVM_MODE_NONE) {
++		kvm_info("KVM disabled from command line\n");
++		return -ENODEV;
++	}
++
+ 	in_hyp_mode = is_kernel_in_hyp_mode();
+ 
+ 	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+@@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
+ 		return 0;
+ 	}
+ 
+-	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
++	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
++		kvm_mode = KVM_MODE_DEFAULT;
+ 		return 0;
++	}
++
++	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
++		kvm_mode = KVM_MODE_NONE;
++		return 0;
++	}
+ 
+ 	return -EINVAL;
+ }
+-- 
+2.30.2
 
 _______________________________________________
 kvmarm mailing list
