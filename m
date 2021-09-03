@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F821C4332F
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Sep 2021 20:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A73CDC433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Sep 2021 20:48:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D98B2600CC
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Sep 2021 20:46:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D98B2600CC
+	by mail.kernel.org (Postfix) with ESMTP id 29502610D2
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Sep 2021 20:48:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 29502610D2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 539864B215;
-	Fri,  3 Sep 2021 16:46:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95C244B212;
+	Fri,  3 Sep 2021 16:48:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dwAm2HjydAX1; Fri,  3 Sep 2021 16:46:04 -0400 (EDT)
+	with ESMTP id yiy-D+FqLT82; Fri,  3 Sep 2021 16:48:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 160C94B1DB;
-	Fri,  3 Sep 2021 16:46:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DCBE4B1E4;
+	Fri,  3 Sep 2021 16:48:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66B0D4B191
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Sep 2021 16:46:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C23714B17B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Sep 2021 16:48:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8piTkSXz4Bl5 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Sep 2021 16:46:01 -0400 (EDT)
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com
- [209.85.219.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 512564B17B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Sep 2021 16:46:01 -0400 (EDT)
-Received: by mail-yb1-f169.google.com with SMTP id c6so752499ybm.10
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Sep 2021 13:46:01 -0700 (PDT)
+ with ESMTP id RsD8UiWhGhWf for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Sep 2021 16:48:19 -0400 (EDT)
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com
+ [209.85.219.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1DEFD49DE7
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Sep 2021 16:48:19 -0400 (EDT)
+Received: by mail-yb1-f177.google.com with SMTP id e131so783686ybb.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Sep 2021 13:48:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=kzulTbYinCcR11pDJdzRGn8oPiWnTihEe16/yeEf5xc=;
- b=XWg1xQcEqy8AyCjf6nSYusGBje7hJ7ELSYUb1Eh3o2jLDF6NEu2FFcKBkxiD1AT51a
- i5P2T6WRvpcaZxPoBhn406OR80qdDS2YWyxRbWMz+XPrcPd3Q/rQaD37LhAnws4hvRMn
- xBPu/Fn11ukxdV2rbyRqDTs1JEML6qq47qgUN9nO1Vkazo+7XhOHfgtPnbLGz8OI779e
- PRxyAwcqADABqmBQtJsxX7QeUz+WpcvLPXmaY4L0UML2LtG4AsAFNgVNYfr3Qi5QrN7S
- yZTK7ecKeXjd8zdqNGMYTnsF7dPzyMiKeN5Zx3RTs0Zyh5opVidaNwKoz0v3xNn4V76g
- gyuw==
+ :cc; bh=jdumqdU9gNUc/p8x91c5FNRB2/icYIsDIBk+jupJSu0=;
+ b=NWyK5pOQlXzw905KW8xs5oC0JiBsnohXgutz955HmXNdNbbfMyIIULufhAGSkJVOCY
+ zjGyPA8gstB36oX7lPvPYgm7xM4O4QG21trj1UJYpXc6FHml6UwLrs4EjobqpWmLg+cU
+ w1tqVEi2Ntgw8zF+WLhtAHZsQAnOwaLoK5xTqV+Rws3XvCDwcOp27DTmrbNAxFW86lB0
+ s+FS2z3eem+dKeJOt/6WN0RBU6uA/4lDov8saHgbQNT8fKZCrhmXLTDBHZ9vMFNs9Cxn
+ oW9g19Juw6ODzXfGomrWWXE8Ru2UBGKImLQ73dRVUwIJwhmWqTpMBBZ8gFQeNvYRstCZ
+ Rhqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=kzulTbYinCcR11pDJdzRGn8oPiWnTihEe16/yeEf5xc=;
- b=guslrPIK23wUT12APe64hJ2KLnPGBvZaFOpUeYfnuTt/9SORyGot84t95x8izsJy4k
- W4b4DwnU79OplBKeQV+GybALfGdGT+LeGrs420IrEesFuGhIWUyCuTiCXgwdjviFfHYS
- GEWZf3g+Zzt8uZd+e4w77/GfcVi6A/wh27ZKv0b6tiqOXyOHRgu4yAncHLyGDVGJgAb8
- cC0NWZQc1ZVCOAdTfD2N3m9xV4CYbgg4GJmj4C1g4u4WR+CyYdls8deq0HpEQJpvSuUO
- CNlyhDwP2eDawv1rz5sJjr3YVkrZZqy48C7qKcP0cN9Mzvt80f5fSEOFUmJxbItP0OdG
- DqOA==
-X-Gm-Message-State: AOAM530JRpMHl8Hisk8ZJAG9eYMusE78+CFsHyYAAqnTbDUKZu8cWGDR
- h3qaPtBFZKnpNMXsqVPNa0+iHEPPAqu9FMoV4r9h1w==
-X-Google-Smtp-Source: ABdhPJxeHeESiJAghEHTj0gTD1ujj5k2ZYlYp8Q63ZKLIx+d+NM2zNaGNw3BjWA6VMD3pkCCSZs98ZEMNfOynzJl4cs=
-X-Received: by 2002:a25:af81:: with SMTP id g1mr1126405ybh.457.1630701960546; 
- Fri, 03 Sep 2021 13:46:00 -0700 (PDT)
+ bh=jdumqdU9gNUc/p8x91c5FNRB2/icYIsDIBk+jupJSu0=;
+ b=myksiKkOz4iuqMOwi2LJNmP7EJL1xnEKgsXb9IEz87+gyuD+pvK+cdUB5WSvqW9Pzi
+ E49eaPuYzoDty2sxFE8Tn6sOBqVgTpY0aFQ88pIZYKncnPDh60XjL4cfmE0yz80X9+gI
+ +sVmB7nyRFrH41/7UoM0eJHY/fxN63wQLHYT+VDSfsWNqXOdoV2tJHaP/Z376lKwVfuW
+ NUlBWArb9sYvgxfQDYxa7iN+p6fP6dFa3UMYu6Slrx2SQ/HJ9KhIbWnwWdT8F0VSj4pD
+ r8AgQM3QGMPIHOrx8CHhdO8xabxwvVlwvoE5a1Rc1nI/CUKX0B39w0iY3/j+n2xdMuMY
+ s7Dg==
+X-Gm-Message-State: AOAM530Jvw8mQEjqwBU0Ytjfs712ccGPZbCUwO69eEMVQqDzPzzPfY2n
+ Ti2C+XMJ/Urr1adPYCyYp5dQvSIrTDwebfHQupjphg==
+X-Google-Smtp-Source: ABdhPJyuepYTpoYmEXPzK6HgxRPVtcxlu73WiwhNSpb1n3TcEnYmF7orWnAI3JSDsNV/K05sXAkceQ9pKbT1jr72OGE=
+X-Received: by 2002:a25:2007:: with SMTP id g7mr1255987ybg.434.1630702098466; 
+ Fri, 03 Sep 2021 13:48:18 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210901211412.4171835-1-rananta@google.com>
  <20210901211412.4171835-11-rananta@google.com>
- <20210903100031.hptfzo5vqsgjteod@gator.home>
-In-Reply-To: <20210903100031.hptfzo5vqsgjteod@gator.home>
+ <20210903105155.dgu2bi765ngp3pgi@gator.home>
+In-Reply-To: <20210903105155.dgu2bi765ngp3pgi@gator.home>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Fri, 3 Sep 2021 13:45:47 -0700
-Message-ID: <CAJHc60wD1UA0U8ydEH1Xnc6ns8jxJ4CEaoK3zXaAjDQR2SR0AA@mail.gmail.com>
+Date: Fri, 3 Sep 2021 13:48:05 -0700
+Message-ID: <CAJHc60yVDYUPCj2W6fhq6JkzxhPwCPON2M9vL44XNDTObRa1dA@mail.gmail.com>
 Subject: Re: [PATCH v3 10/12] KVM: arm64: selftests: Add host support for vGIC
 To: Andrew Jones <drjones@redhat.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -97,17 +97,11 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Sep 3, 2021 at 3:00 AM Andrew Jones <drjones@redhat.com> wrote:
+On Fri, Sep 3, 2021 at 3:52 AM Andrew Jones <drjones@redhat.com> wrote:
 >
 > On Wed, Sep 01, 2021 at 09:14:10PM +0000, Raghavendra Rao Ananta wrote:
 > > Implement a simple library to do perform vGIC-v3
->
-> s/do//
->
-> > setup from a host of view.
->                    ^ point
->
-> > This includes creating
+> > setup from a host of view. This includes creating
 > > a vGIC device, setting up distributor and redistributor
 > > attributes, and mapping the guest physical addresses.
 > >
@@ -152,6 +146,11 @@ On Fri, Sep 3, 2021 at 3:00 AM Andrew Jones <drjones@redhat.com> wrote:
 > > +
 > > +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
 > > +             uint64_t gicd_base_gpa, uint64_t gicr_base_gpa, uint32_t slot);
+>
+> Having seen 5 arguments used in the vgic_v3_setup call in the next patch I
+> came back here to refresh my memory on that parameter. 'slot' is the one I
+> forgot, but...
+>
 > > +
 > > +#endif /* SELFTEST_KVM_VGIC_H */
 > > diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
@@ -178,12 +177,6 @@ On Fri, Sep 3, 2021 at 3:00 AM Andrew Jones <drjones@redhat.com> wrote:
 > > +     ((uint64_t)((base) >> 16) << 16) | \
 > > +     ((uint64_t)(flags) << 12) | \
 > > +     index)
->
-> This could go in vgic.h allowing us to share it in aarch64/vgic_init.c,
-> where we already have the same definition.
->
-Sure, I will move this.
-
 > > +
 > > +static void vgic_v3_map(struct kvm_vm *vm, uint64_t addr, unsigned int size)
 > > +{
@@ -210,21 +203,25 @@ Sure, I will move this.
 > > + */
 > > +int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus,
 > > +             uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
+>
+> ...looks like it was forgotten here too.
+>
+You are right. I had 'slot' to try other mechanisms, but I guess I
+forgot to clean it up.
+Thanks for catching this.
+
+Regards,
+Raghavendra
+
+> Thanks,
+> drew
+>
 > > +{
 > > +     uint64_t redist_attr;
 > > +     int gic_fd;
 > > +
 > > +     TEST_ASSERT(nr_vcpus <= KVM_MAX_VCPUS,
 > > +                     "Invalid number of CPUs: %u\n", nr_vcpus);
->
-> TEST_ASSERT(!list_empty(&vm->vcpus), ...) to ensure we've created vcpus
-> first. To be really paranoid we could even confirm the number of vcpus in
-> the list matches nr_vcpus.
->
-Great idea! I'll add these checks too.
-
-Regards
-Raghavendra
 > > +
 > > +     gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
 > > +
@@ -244,13 +241,12 @@ Raghavendra
 > > +}
 > > --
 > > 2.33.0.153.gba50c8fa24-goog
->
-> Otherwise
->
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
->
-> Thanks,
-> drew
+> >
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> >
 >
 _______________________________________________
 kvmarm mailing list
