@@ -2,81 +2,71 @@ Return-Path: <SRS0=b97j=N4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DD5C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Sep 2021 09:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F3EC433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Sep 2021 09:12:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 048AF60F3A
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Sep 2021 09:02:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 048AF60F3A
+	by mail.kernel.org (Postfix) with ESMTP id 3AAD561027
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Sep 2021 09:12:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3AAD561027
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 898524B2A0;
-	Mon,  6 Sep 2021 05:02:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C13064B2CC;
+	Mon,  6 Sep 2021 05:12:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EP8DW6mVzN67; Mon,  6 Sep 2021 05:02:14 -0400 (EDT)
+	with ESMTP id zChH7vxhqBtq; Mon,  6 Sep 2021 05:12:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9D374B2C5;
-	Mon,  6 Sep 2021 05:02:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CF564B2D7;
+	Mon,  6 Sep 2021 05:12:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26CBD4B2A0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Sep 2021 05:02:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F74C4B2CC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Sep 2021 05:12:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FTXsfWMR0krn for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Sep 2021 05:02:12 -0400 (EDT)
+ with ESMTP id Jxk9BGEIk1jv for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Sep 2021 05:12:15 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 27A274B256
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Sep 2021 05:02:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D52B4B25A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Sep 2021 05:12:15 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 24AF660F3A;
- Mon,  6 Sep 2021 09:02:11 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6E1BD60F14;
+ Mon,  6 Sep 2021 09:12:14 +0000 (UTC)
 Received: from 82-132-228-124.dab.02.net ([82.132.228.124]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mNAW1-009Dbo-1g; Mon, 06 Sep 2021 10:02:09 +0100
-Date: Mon, 06 Sep 2021 10:02:09 +0100
-Message-ID: <87k0jucc1a.wl-maz@kernel.org>
+ id 1mNAfk-009DhA-9T; Mon, 06 Sep 2021 10:12:12 +0100
+Date: Mon, 06 Sep 2021 10:12:12 +0100
+Message-ID: <87ilzecbkj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v7 3/7] KVM: arm64: Allow userspace to configure a vCPU's
- virtual offset
-In-Reply-To: <YSryci4dSuRAEg+g@google.com>
-References: <20210816001217.3063400-1-oupton@google.com>
- <20210816001217.3063400-4-oupton@google.com>
- <YSryci4dSuRAEg+g@google.com>
+Subject: Re: [PATCH 0/6] KVM: arm64: Implement PSCI SYSTEM_SUSPEND support
+In-Reply-To: <20210819223640.3564975-1-oupton@google.com>
+References: <20210819223640.3564975-1-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 82.132.228.124
 X-SA-Exim-Rcpt-To: oupton@google.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, seanjc@google.com,
- pshier@google.com, jmattson@google.com, dmatlack@google.com,
- ricarkol@google.com, jingzhangos@google.com, rananta@google.com,
- james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, drjones@redhat.com, will@kernel.org,
- catalin.marinas@arm.com
+ kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com,
+ jingzhangos@google.com, rananta@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, drjones@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,60 +83,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 29 Aug 2021 03:35:30 +0100,
+Hi Oliver,
+
+On Thu, 19 Aug 2021 23:36:34 +0100,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> On Mon, Aug 16, 2021 at 12:12:13AM +0000, Oliver Upton wrote:
-> > Allow userspace to access the guest's virtual counter-timer offset
-> > through the ONE_REG interface. The value read or written is defined to
-> > be an offset from the guest's physical counter-timer. Add some
-> > documentation to clarify how a VMM should use this and the existing
-> > CNTVCT_EL0.
-> > 
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Certain VMMs/operators may wish to give their guests the ability to
+> initiate a system suspend that could result in the VM being saved to
+> persistent storage to be resumed at a later time. The PSCI v1.0
+> specification describes an SMC, SYSTEM_SUSPEND, that allows a kernel to
+> request a system suspend. This call is optional for v1.0, and KVM
+> elected to not support the call in its v1.0 implementation.
 > 
-> Hrm...
-> 
-> I was mulling on this patch a bit more and had a thought. As previously
-> discussed, the patch implements virtual offsets by broadcasting the same
-> offset to all vCPUs in a guest. I wonder if this may tolerate bad
-> practices from userspace that will break when KVM supports NV.
-> 
-> Consider that a nested guest may set CNTVOFF_EL2 to whatever value it
-> wants. Presumably, we will need to patch the handling of CNTVOFF_EL2 to
-> *not* broadcast to all vCPUs to save/restore NV properly. If a maligned
-> VMM only wrote to a single vCPU, banking on this broadcasting
-> implementation, it will fall flat on its face when handling an NV guest.
-> 
-> So, should we preemptively move to the new way of the world, wherein
-> userspace accesses to CNTVOFF_EL2 are vCPU-local rather than VM-wide?
-> 
-> No strong opinions in either direction, but figured I'd address it since
-> I'll need to respin this series anyway to fix ECV+nVHE.
+> This series adds support for the SYSTEM_SUSPEND PSCI call to KVM/arm64.
+> Since this is a system-scoped event, KVM cannot quiesce the VM on its
+> own. We add a new system exit type in this series to clue in userspace
+> that a suspend was requested. Per the KVM_EXIT_SYSTEM_EVENT ABI, a VMM
+> that doesn't care about this event can simply resume the guest without
+> issue (we set up the calling vCPU to come out of reset correctly on next
+> KVM_RUN).
 
-Thought about this a bit more whilst being away from a computer...
+More idle thoughts on this:
 
-It all boils down to what we expose as an abstraction of a machine. If
-there is no EL2 in the VM, then there shouldn't be any way for the
-guest to observe different values for the counters as seen from
-different vcpus. That's what the architecture guarantees for a
-physical system, and we shouldn't deviate from that. Opening the door
-for userspace to do anything differently is a recipe for disaster.
+Although the definition of SYSTEM_SUSPEND is very simple from a PSCI
+perspective, I don't think it is that simple at the system level,
+because PSCI is only concerned with the CPU.
 
-It actually is an argument in favour of setting the various offsets to
-a value that keep the two physical and virtual counters in sync,
-instead of the current behaviour that allows different values to be
-observed.
+For example, what is a wake-up event? My first approach would be to
+consider interrupts to be such events. However, this approach suffers
+from at least two issues:
 
-The above is in contrast with what the architecture allows when EL2 is
-present. The hypervisor can naturally deal with the offsets as it sees
-fit, and no offset should have any bearing on it (this later point is
-of course to be moderated by CNTPOFF on the host).
+- How do you define which interrupts are actual wake-up events?
+  Nothing in the GIC architecture defines what a wake-up is (let alone
+  a wake-up event).
 
-To sum it up, I'd rather keep the CNTVOFF behaviour what it is today
-for guest that have their highest exception level at EL1. For EL2
-guests, the setting will obviously have to become per-CPU.
+- Assuming you have a way to express the above, how do you handle
+  wake-ups from interrupts that have their source in the kernel (such
+  as timers, irqfd sources)? How do you cope with directly injected
+  interrupts?
+
+It looks to me that your implementation can only work with userspace
+provided events, which is pretty limited.
+
+Other items worth considering: ongoing DMA, state of the caches at
+suspend time, device state in general All of this really needs to be
+defined before we can move forward with this feature.
+
+Thanks,
 
 	M.
 
