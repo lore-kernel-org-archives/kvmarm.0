@@ -2,85 +2,106 @@ Return-Path: <SRS0=b97j=N4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34CD1C433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Sep 2021 04:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E018CC4332F
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Sep 2021 06:39:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A7B086108E
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Sep 2021 04:33:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A7B086108E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=suse.com
+	by mail.kernel.org (Postfix) with ESMTP id 57E5461029
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Sep 2021 06:39:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 57E5461029
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11E104B2F2;
-	Mon,  6 Sep 2021 00:33:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD3934B26D;
+	Mon,  6 Sep 2021 02:39:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@suse.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7fqZLojcz2XI; Mon,  6 Sep 2021 00:33:40 -0400 (EDT)
+	with ESMTP id yQ-9o3AHTsME; Mon,  6 Sep 2021 02:39:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E32754B23E;
-	Mon,  6 Sep 2021 00:33:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9DB24B264;
+	Mon,  6 Sep 2021 02:39:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E392F4B275
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Sep 2021 00:33:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0138E4B25C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Sep 2021 02:39:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C8PDfw--eK-y for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Sep 2021 00:33:38 -0400 (EDT)
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 921724B224
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Sep 2021 00:33:38 -0400 (EDT)
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
- (No client certificate requested)
- by smtp-out2.suse.de (Postfix) with ESMTPS id 527B41FEC6;
- Mon,  6 Sep 2021 04:33:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
- t=1630902817; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
- mime-version:mime-version:content-type:content-type:
+ with ESMTP id 0XdNEZY9q092 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Sep 2021 02:39:06 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A35A4B25A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Sep 2021 02:39:06 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1630910345;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=b6KesdnObrJg5+ClNtCWSOtVfuLB+kzMDZMASkULnEk=;
- b=GcXVXkEIu9iocw5lg4Fn8QY09733juIXOTrEcNOD+fEC2RvJqHbr8aH14M72cJYK4OLGNb
- 2WA/YTLwDnbsaEINkGU+ZVDrAlYndQ9kU0Uxg92tBgfltSyfeSRxi3TvJJuEd/ecI9Kd80
- KoOzHB2hBsh8Ryww+lKkE8MU1GrS3hQ=
-Received: from imap1.suse-dmz.suse.de (imap1.suse-dmz.suse.de [192.168.254.73])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
- (No client certificate requested)
- by imap1.suse-dmz.suse.de (Postfix) with ESMTPS id 956EC1332A;
- Mon,  6 Sep 2021 04:33:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
- by imap1.suse-dmz.suse.de with ESMTPSA id yi82IiCaNWHEQQAAGKfGzw
- (envelope-from <jgross@suse.com>); Mon, 06 Sep 2021 04:33:36 +0000
-Subject: Re: [PATCH v2 5/6] kvm: allocate vcpu pointer array separately
-To: Marc Zyngier <maz@kernel.org>
-References: <20210903130808.30142-1-jgross@suse.com>
- <20210903130808.30142-6-jgross@suse.com> <871r65wwk7.wl-maz@kernel.org>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <37699e98-9a47-732d-8522-daa90f35c52f@suse.com>
-Date: Mon, 6 Sep 2021 06:33:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+ bh=pFZpAGoXWqtD1eNY9zjgxvjbpkWIm9fS1Q1YaYaJFgM=;
+ b=OBZ1bQilztxl4te6PG57UvNVqo6kIW1jESOeTAr3soI9DA5bjMl7K54uPJ1ANHaF0Q4AN2
+ ePo8CZvny2AhHhlB5I0t/BS4GGYx9xlFU43dzJrVWEdaUAr7fD3eTC2QBciMkNrK3yl4yP
+ vXPrkFT1VrEzLq3qSsJ2el/OrVm4xyk=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-F8qaapy5MSW30xU3OEcMuA-1; Mon, 06 Sep 2021 02:39:03 -0400
+X-MC-Unique: F8qaapy5MSW30xU3OEcMuA-1
+Received: by mail-ej1-f72.google.com with SMTP id
+ q15-20020a17090622cf00b005c42d287e6aso1840623eja.18
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 05 Sep 2021 23:39:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=pFZpAGoXWqtD1eNY9zjgxvjbpkWIm9fS1Q1YaYaJFgM=;
+ b=buFSx5NbFx8eHcBmy5M7Z+lSnsrR2AZSCSVeStAKvT1gS5qcu1ufpl74lb4C2TIWxu
+ WcieU5Z5VNRhPLWQJHcEPD0/8B0iYxw6Q9TBBTuIy0h4iV9yCbq0i3zU6+RYc8418ozD
+ wcPRgGBmgt7a49JoOB7LKPz8AwOuirq0IjUku9OiqinX8bPkPkMDhxPSjRHGUtDnnrFu
+ /wdVA8KiSpYZGGBc/yqyBNCPEGluBv+WGJgB4mnr/D3ag553tXaGxfXar7i22f+RKZD9
+ N0gcGeA+NYqJ23Ry6uCdTeEQ+qkw7bm6aOq8TeYVqCjbMJ7UteMo3cpEpDmBo2vabcIN
+ h1oA==
+X-Gm-Message-State: AOAM532iwTv7uFJ3l9bXxtfmp+U1KqoKB2r4JTm3gun1Hx9cxt3HUJdS
+ eDM/APsjN/gzhVCxE/deNjDGvfPXlspJR73Zl026Naam8HusLACbRuZEE2/9d36K7mqp2VGzjAQ
+ nqnHYUqxJtkSKrsTbEk349Czb
+X-Received: by 2002:a05:6402:4404:: with SMTP id
+ y4mr11919678eda.52.1630910342564; 
+ Sun, 05 Sep 2021 23:39:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyX0TpXnbRYGfoD24m32rvU84qJrmQaW7wiPn31Nr/Q9F8DbdaCT6Gpt6cuVdJvK5mJP25OsQ==
+X-Received: by 2002:a05:6402:4404:: with SMTP id
+ y4mr11919656eda.52.1630910342402; 
+ Sun, 05 Sep 2021 23:39:02 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+ by smtp.gmail.com with ESMTPSA id i13sm3885374edc.48.2021.09.05.23.39.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 05 Sep 2021 23:39:02 -0700 (PDT)
+Date: Mon, 6 Sep 2021 08:39:00 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v3 12/12] KVM: arm64: selftests: arch_timer: Support vCPU
+ migration
+Message-ID: <20210906063900.t6rbykpwyau5u32s@gator.home>
+References: <20210901211412.4171835-1-rananta@google.com>
+ <20210901211412.4171835-13-rananta@google.com>
+ <20210903110514.22x3txynin5hg46z@gator.home>
+ <CAJHc60xf90-0E8vkge=UC0Mq3Wz3g=n1OuHa2Lchw4G6egJEig@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <871r65wwk7.wl-maz@kernel.org>
-Cc: Wanpeng Li <wanpengli@tencent.com>, ehabkost@redhat.com,
- kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, Will Deacon <will@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Sean Christopherson <seanjc@google.com>,
- Borislav Petkov <bp@alien8.de>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+In-Reply-To: <CAJHc60xf90-0E8vkge=UC0Mq3Wz3g=n1OuHa2Lchw4G6egJEig@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,299 +113,83 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============6641168090159935097=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---===============6641168090159935097==
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="3dKagCqFG6FiVYjedP4HdfuCcShAmNIje"
+On Fri, Sep 03, 2021 at 01:53:27PM -0700, Raghavendra Rao Ananta wrote:
+> On Fri, Sep 3, 2021 at 4:05 AM Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > On Wed, Sep 01, 2021 at 09:14:12PM +0000, Raghavendra Rao Ananta wrote:
+> > > Since the timer stack (hardware and KVM) is per-CPU, there
+> > > are potential chances for races to occur when the scheduler
+> > > decides to migrate a vCPU thread to a different physical CPU.
+> > > Hence, include an option to stress-test this part as well by
+> > > forcing the vCPUs to migrate across physical CPUs in the
+> > > system at a particular rate.
+> > >
+> > > Originally, the bug for the fix with commit 3134cc8beb69d0d
+> > > ("KVM: arm64: vgic: Resample HW pending state on deactivation")
+> > > was discovered using arch_timer test with vCPU migrations and
+> > > can be easily reproduced.
+> > >
+> > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > > ---
+> > >  .../selftests/kvm/aarch64/arch_timer.c        | 108 +++++++++++++++++-
+> > >  1 file changed, 107 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> > > index 1383f33850e9..de246c7afab2 100644
+> > > --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> > > +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> > > @@ -14,6 +14,8 @@
+> > >   *
+> > >   * The test provides command-line options to configure the timer's
+> > >   * period (-p), number of vCPUs (-n), and iterations per stage (-i).
+> > > + * To stress-test the timer stack even more, an option to migrate the
+> > > + * vCPUs across pCPUs (-m), at a particular rate, is also provided.
+> > >   *
+> > >   * Copyright (c) 2021, Google LLC.
+> > >   */
+> > > @@ -24,6 +26,8 @@
+> > >  #include <pthread.h>
+> > >  #include <linux/kvm.h>
+> > >  #include <linux/sizes.h>
+> > > +#include <linux/bitmap.h>
+> > > +#include <sys/sysinfo.h>
+> > >
+> > >  #include "kvm_util.h"
+> > >  #include "processor.h"
+> > > @@ -41,12 +45,14 @@ struct test_args {
+> > >       int nr_vcpus;
+> > >       int nr_iter;
+> > >       int timer_period_ms;
+> > > +     int migration_freq_ms;
+> > >  };
+> > >
+> > >  static struct test_args test_args = {
+> > >       .nr_vcpus = NR_VCPUS_DEF,
+> > >       .nr_iter = NR_TEST_ITERS_DEF,
+> > >       .timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
+> > > +     .migration_freq_ms = 0,         /* Turn off migrations by default */
+> >
+> > I'd rather we enable good tests like these by default.
+> >
+> Well, that was my original idea, but I was concerned about the ease
+> for diagnosing
+> things since it'll become too noisy. And so I let it as a personal
+> preference. But I can
+> include it back and see how it goes.
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3dKagCqFG6FiVYjedP4HdfuCcShAmNIje
-Content-Type: multipart/mixed; boundary="yUBA9nuSqFZ1BE2ukBhqlNbvtfSdlrTKR";
- protected-headers="v1"
-From: Juergen Gross <jgross@suse.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, x86@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- ehabkost@redhat.com, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Wanpeng Li <wanpengli@tencent.com>, Jim Mattson <jmattson@google.com>,
- Joerg Roedel <joro@8bytes.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu
-Message-ID: <37699e98-9a47-732d-8522-daa90f35c52f@suse.com>
-Subject: Re: [PATCH v2 5/6] kvm: allocate vcpu pointer array separately
-References: <20210903130808.30142-1-jgross@suse.com>
- <20210903130808.30142-6-jgross@suse.com> <871r65wwk7.wl-maz@kernel.org>
-In-Reply-To: <871r65wwk7.wl-maz@kernel.org>
+Break the tests into two? One run without migration and one with. If
+neither work, then we can diagnose the one without first, possibly
+avoiding the need to diagnose the one with.
 
---yUBA9nuSqFZ1BE2ukBhqlNbvtfSdlrTKR
-Content-Type: multipart/mixed;
- boundary="------------C4707903CEBE0F68C86AD315"
-Content-Language: en-US
-
-This is a multi-part message in MIME format.
---------------C4707903CEBE0F68C86AD315
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 03.09.21 16:41, Marc Zyngier wrote:
-> On Fri, 03 Sep 2021 14:08:06 +0100,
-> Juergen Gross <jgross@suse.com> wrote:
->>
->> Prepare support of very large vcpu numbers per guest by moving the
->> vcpu pointer array out of struct kvm.
->>
->> Signed-off-by: Juergen Gross <jgross@suse.com>
->> ---
->> V2:
->> - rebase to new kvm_arch_free_vm() implementation
->> ---
->>   arch/arm64/kvm/arm.c            | 21 +++++++++++++++++++--
->>   arch/x86/include/asm/kvm_host.h |  5 +----
->>   arch/x86/kvm/x86.c              | 18 ++++++++++++++++++
->>   include/linux/kvm_host.h        | 17 +++++++++++++++--
->>   4 files changed, 53 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 38fff5963d9f..8bb5caeba007 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -293,10 +293,27 @@ long kvm_arch_dev_ioctl(struct file *filp,
->>  =20
->>   struct kvm *kvm_arch_alloc_vm(void)
->>   {
->> +	struct kvm *kvm;
->> +
->> +	if (!has_vhe())
->> +		kvm =3D kzalloc(sizeof(struct kvm), GFP_KERNEL);
->> +	else
->> +		kvm =3D vzalloc(sizeof(struct kvm));
->> +
->> +	if (!kvm)
->> +		return NULL;
->> +
->>   	if (!has_vhe())
->> -		return kzalloc(sizeof(struct kvm), GFP_KERNEL);
->> +		kvm->vcpus =3D kcalloc(KVM_MAX_VCPUS, sizeof(void *), GFP_KERNEL);
->> +	else
->> +		kvm->vcpus =3D vzalloc(KVM_MAX_VCPUS * sizeof(void *));
->> +
->> +	if (!kvm->vcpus) {
->> +		kvm_arch_free_vm(kvm);
->> +		kvm =3D NULL;
->> +	}
->>  =20
->> -	return vzalloc(sizeof(struct kvm));
->> +	return kvm;
->>   }
->>  =20
->>   int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kv=
-m_host.h
->> index f16fadfc030a..6c28d0800208 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -1517,10 +1517,7 @@ static inline void kvm_ops_static_call_update(v=
-oid)
->>   }
->>  =20
->>   #define __KVM_HAVE_ARCH_VM_ALLOC
->> -static inline struct kvm *kvm_arch_alloc_vm(void)
->> -{
->> -	return __vmalloc(kvm_x86_ops.vm_size, GFP_KERNEL_ACCOUNT | __GFP_ZER=
-O);
->> -}
->> +struct kvm *kvm_arch_alloc_vm(void);
->>  =20
->>   #define __KVM_HAVE_ARCH_VM_FREE
->>   void kvm_arch_free_vm(struct kvm *kvm);
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index cc552763f0e4..ff142b6dd00c 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -11126,6 +11126,24 @@ void kvm_arch_sched_in(struct kvm_vcpu *vcpu,=
- int cpu)
->>   	static_call(kvm_x86_sched_in)(vcpu, cpu);
->>   }
->>  =20
->> +struct kvm *kvm_arch_alloc_vm(void)
->> +{
->> +	struct kvm *kvm;
->> +
->> +	kvm =3D __vmalloc(kvm_x86_ops.vm_size, GFP_KERNEL_ACCOUNT | __GFP_ZE=
-RO);
->> +	if (!kvm)
->> +		return NULL;
->> +
->> +	kvm->vcpus =3D __vmalloc(KVM_MAX_VCPUS * sizeof(void *),
->> +			       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
->> +	if (!kvm->vcpus) {
->> +		vfree(kvm);
->> +		kvm =3D NULL;
->> +	}
->> +
->> +	return kvm;
->> +}
->> +
->>   void kvm_arch_free_vm(struct kvm *kvm)
->>   {
->>   	kfree(to_kvm_hv(kvm)->hv_pa_pg);
->> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->> index d75e9c2a00b1..9e2a5f1c6f54 100644
->> --- a/include/linux/kvm_host.h
->> +++ b/include/linux/kvm_host.h
->> @@ -536,7 +536,7 @@ struct kvm {
->>   	struct mutex slots_arch_lock;
->>   	struct mm_struct *mm; /* userspace tied to this vm */
->>   	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
->> -	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
->> +	struct kvm_vcpu **vcpus;
->=20
-> At this stage, I really wonder why we are not using an xarray instead.
->=20
-> I wrote this [1] a while ago, and nothing caught fire. It was also a
-> net deletion of code...
-
-Indeed, I'd prefer that solution!
-
-Are you fine with me swapping my patch with yours in the series?
-
-
-Juergen
-
-
---------------C4707903CEBE0F68C86AD315
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Description: OpenPGP public key
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------C4707903CEBE0F68C86AD315--
-
---yUBA9nuSqFZ1BE2ukBhqlNbvtfSdlrTKR--
-
---3dKagCqFG6FiVYjedP4HdfuCcShAmNIje
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmE1mh8FAwAAAAAACgkQsN6d1ii/Ey95
-Jgf+LbjnMKAdUVgG3BhFJfsNSzkdPVAPn5TQArYk2Sp2212QW26YQWoc53ZcgTbminY0H8kil7wo
-rSHpgVcn/QeA0pc+c0u7K6ELL9G1qUiXRm4zzyxQBcACcNXo608G9lCKKnCcosErejmW0SxcDYq4
-zqKTb3V+u16Y5p7KtE/DfpmhOyj7sje/XWQJVBrnC9V1fwKHOYXddjOnE5gcUUrNlqfmhmmwVRyt
-oqGszCIy3BJtW5IeSbPndeZuxOCg78vUXRpMjzCPSsyx2Qf53ORR16UYTH6W7SkNYyezq2p49S1/
-dsa969OK6dmF/t4wAqKcr4qbNzycazW+5iZSq5yJdQ==
-=jgiO
------END PGP SIGNATURE-----
-
---3dKagCqFG6FiVYjedP4HdfuCcShAmNIje--
-
---===============6641168090159935097==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============6641168090159935097==--
