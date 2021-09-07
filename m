@@ -4,89 +4,92 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C48C9C4332F
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 10:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E35C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 10:21:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1EBDE61101
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 10:17:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1EBDE61101
+	by mail.kernel.org (Postfix) with ESMTP id F1BFF610FE
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 10:21:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F1BFF610FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B9484B256;
-	Tue,  7 Sep 2021 06:17:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F43A4B20D;
+	Tue,  7 Sep 2021 06:21:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RcGwlSfyJpsm; Tue,  7 Sep 2021 06:17:39 -0400 (EDT)
+	with ESMTP id VbBq+aVx38+c; Tue,  7 Sep 2021 06:21:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE0204B249;
-	Tue,  7 Sep 2021 06:17:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B6654B22C;
+	Tue,  7 Sep 2021 06:21:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AECC4B22C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 06:17:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A1BC94B20A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 06:21:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WxhcZk85NQ+6 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Sep 2021 06:17:36 -0400 (EDT)
+ with ESMTP id x+JylORKJGQ9 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Sep 2021 06:21:39 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E2E84B218
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 06:17:36 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2FF64B1D5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 06:21:39 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1631009856;
+ s=mimecast20190719; t=1631010099;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=E7jzGz9ueYeBwNeZnfKBYm3m4e8M7rY4sBRCa4uTJkE=;
- b=BD0ydpIm+o7IDyugEPNCAn7EMoEOp71kRrJrpi7cavxg+vssuSzH+0JVGAq2b3U2HnlwHv
- 6sLPKSKj8Ibcp+lG3Q3G8aGnv4bToPKQE/Z9PhlgPPmPIUa5ZIrArYjLLDXf6jY4sCpcHL
- qIhkYn0i3QGJvbZMRz5dr7QZY50IyIA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-V8hlgmoENbKU1w9EbtkNYg-1; Tue, 07 Sep 2021 06:17:35 -0400
-X-MC-Unique: V8hlgmoENbKU1w9EbtkNYg-1
-Received: by mail-wm1-f70.google.com with SMTP id
- j33-20020a05600c48a100b002e879427915so3213679wmp.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 03:17:34 -0700 (PDT)
+ bh=f++tlxFdFC82weLDV66fZEVmzKayy0iCTttWnFQCXr8=;
+ b=e6ZsVgtH6oRx1GPqy4h0nkawtKKqgyqd+P/u7N1oLUT3x15wm694WqmzVi4UKAiWDoK1kD
+ FuaBKRSHBBE4HYWeEfLeBwB7qGA2WxCFrZ+uy1h9RMWoZEDzKgX3AsU/svPzPDAXs5dF0u
+ AFBKlDZCxQ40VMtpyUQYb67I3BHOUHM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-bf5aejcjN_uHh_HmGK4U3w-1; Tue, 07 Sep 2021 06:21:38 -0400
+X-MC-Unique: bf5aejcjN_uHh_HmGK4U3w-1
+Received: by mail-wr1-f71.google.com with SMTP id
+ p10-20020adfce0a000000b001572d05c970so1952197wrn.21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 03:21:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=E7jzGz9ueYeBwNeZnfKBYm3m4e8M7rY4sBRCa4uTJkE=;
- b=IUk50F4H0wV1oFyOK14lfqrpKXuUgfUo9celW79uVM2oXWskxg//apdOFbkKIvymvC
- n4OMVXvfn4dO+d+HGJJzRA/vqw3Hov4ENgrCYbv6JsLcXBjSZJXLgsSJYJiX8iD1HWM/
- QplLOj4XHatK1hls8NS+xFm7TfqYltmDz0EqZGI/g2izGommZ1l/QmbHj/N9t0tdwDFO
- qJLueOpl+/gKHzj9CvQGgjIeA5gq//UV6xNiBMuNOxO243kH80zvEb8BpiYelF6u2wR1
- AdxJagGM8mB7EhQMhAes34hjFpWP02xA6XzRSCiVx3oq4Mxpg7FiYc/XfYoVDWd7GoXJ
- RYpg==
-X-Gm-Message-State: AOAM531JOTRojd32y5CV3Qr5B4jbWxN1g4vYQ4ofAoKa02uf+39pkJwW
- cgt71YFhCF17fsOQQAMVJBRAbsjk82TjBC6zgjNrpx3d4V9M+WaUImY6B2NpRrZY6O0E9ogh3dU
- hEZfHglUVuP+QIDQL7AsR+6xI
-X-Received: by 2002:a1c:f405:: with SMTP id z5mr3090256wma.33.1631009853737;
- Tue, 07 Sep 2021 03:17:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwgSxJzEzGtjuQ7/P/lyGwL52Z9NQtXChjcUhJeozsVSdJmhPRhvmjvI3MRF13V/Y3GohBrYg==
-X-Received: by 2002:a1c:f405:: with SMTP id z5mr3090192wma.33.1631009852931;
- Tue, 07 Sep 2021 03:17:32 -0700 (PDT)
+ bh=f++tlxFdFC82weLDV66fZEVmzKayy0iCTttWnFQCXr8=;
+ b=SHsFhF+v4jZ4qzYcWtEymD10YRcCLrMw71mG32qOXMDcta70FC9C0eEwn9LYLDUWvJ
+ 539fI+0w+3YXnSV6wJ9xKm9b46eCpcl1EilwlyRc0W+sehCLBUAx5pTdc0f+wR1WrTFD
+ GH9yrjVNOHtzm15Bjc/YL8Fp4a4A20MP1gwr687UKog0X24vuipCmC8S1qq0llQfePBE
+ GuRx48tcHKrl0uo+QkQJCWx93zB+DaEbbyLuPWFgCY38fyjFmEzFzvymYlPrrAvMIm/I
+ QhiuXBUEyaVcESAzhB0ZwTTdQkN2r9TLfPlzOQ6Q6elC6Zf5pwwpgH2U9zXgRpLUavqj
+ ueyQ==
+X-Gm-Message-State: AOAM531rOEGrLTVU1wIUSB10Txr1HF4Rdjq/c/OmlHJ+4J2chkPv81aN
+ q1k7EXb7dOBYr/9X0owqudrYNXpkT1ezG8NKvgK83hmJx3HLi8R2STI24iEiDdNdGbXImcRsBS9
+ 5Kaw1NI5GGQdK+6H2oocdeqW8
+X-Received: by 2002:a05:6000:1563:: with SMTP id
+ 3mr18583602wrz.139.1631010097382; 
+ Tue, 07 Sep 2021 03:21:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwVgROHRJDcbz9ILwMhdnSZ3oJA6YdR1KgI9MywkZ1Cjk4U3iVAKCDYVZQ+gA4/zuyHOdxqyQ==
+X-Received: by 2002:a05:6000:1563:: with SMTP id
+ 3mr18583578wrz.139.1631010097179; 
+ Tue, 07 Sep 2021 03:21:37 -0700 (PDT)
 Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
- by smtp.gmail.com with ESMTPSA id z1sm1997446wmi.34.2021.09.07.03.17.31
+ by smtp.gmail.com with ESMTPSA id p5sm11270858wrd.25.2021.09.07.03.21.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Sep 2021 03:17:32 -0700 (PDT)
-Date: Tue, 7 Sep 2021 12:17:30 +0200
+ Tue, 07 Sep 2021 03:21:36 -0700 (PDT)
+Date: Tue, 7 Sep 2021 12:21:35 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 3/5] run_tests.sh: Add kvmtool support
-Message-ID: <20210907101730.trnsig2j4jmhinyu@gator>
+Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
+ standalone tests
+Message-ID: <20210907102135.i2w3r7j4zyj736b5@gator>
 References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-4-alexandru.elisei@arm.com>
+ <20210702163122.96110-5-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210702163122.96110-4-alexandru.elisei@arm.com>
+In-Reply-To: <20210702163122.96110-5-alexandru.elisei@arm.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -113,493 +116,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 02, 2021 at 05:31:20PM +0100, Alexandru Elisei wrote:
-> Modify run_tests.sh to use kvmtool instead of qemu to run tests when
-> kvm-unit-tests has been configured with --target=kvmtool.
+On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
+> Add support for the standalone target when running kvm-unit-tests under
+> kvmtool.
 > 
-> Example invocation:
+> Example command line invocation:
 > 
 > $ ./configure --target=kvmtool
-> $ make clean && make
-> $ ./run_scripts.sh
-> 
-> A custom location for the kvmtool binary can be set using the environment
-> variable KVMTOOL:
-> 
-> $ KVMTOOL=/path/to/kvmtool/binary ./run_scripts.sh
-> 
-> Standalone test support is absent, but will be added in subsequent patches.
+> $ make clean && make standalone
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  scripts/arch-run.bash   |  48 ++++++++++++++++--
->  scripts/runtime.bash    |  94 ++++++++++++++++++++++++++++------
->  scripts/mkstandalone.sh |   5 ++
->  arm/run                 | 110 ++++++++++++++++++++++++----------------
->  run_tests.sh            |  11 +++-
->  5 files changed, 204 insertions(+), 64 deletions(-)
+>  scripts/mkstandalone.sh | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-> index 8ceed53ed7f8..b916b0e79aca 100644
-> --- a/scripts/arch-run.bash
-> +++ b/scripts/arch-run.bash
-> @@ -69,16 +69,39 @@ run_qemu ()
->  	return $ret
->  }
->  
-> +run_kvmtool()
-> +{
-> +	local stdout errors ret sig
-> +
-> +	# kvmtool doesn't allow an initrd argument with --firmware, but configure
-> +	# sets CONFIG_ERRATA_FORCE in lib/config.h for the kvmtool target.
-> +
-> +	# stdout to {stdout}, stderr to $errors and stderr
-> +	exec {stdout}>&1
-> +	errors=$("${@}" </dev/null 2> >(tee /dev/stderr) > /dev/fd/$stdout)
-> +	ret=$?
-> +	exec {stdout}>&-
-> +
-> +	# ret=0 success, everything else is failure.
-> +	return $ret
-> +}
-> +
->  run_test_status ()
->  {
-> -	local stdout ret
-> +	local stdout ret exit_status
->  
->  	exec {stdout}>&1
-> -	lines=$(run_qemu "$@" > >(tee /dev/fd/$stdout))
-> +	if [ "$TARGET" = "kvmtool" ]; then
-> +		lines=$(run_kvmtool "$@" > >(tee /dev/fd/$stdout))
-> +		exit_status=0
-> +	else
-> +		lines=$(run_qemu "$@" > >(tee /dev/fd/$stdout))
-> +		exit_status=1
-> +	fi
-
-Now that we're adding a second VMM, let's assume that we may want to add
-more. (Actually, I have low priority aspirations to try and also use a
-Rust VMM, for example). To prepare for another VMM, everywhere we add a
-kvmtool case like this, we should use a case statement instead, e.g.
-
-   case "$TARGET" in
-   qemu)
-     lines=$(run_qemu "$@" > >(tee /dev/fd/$stdout))
-     exit_status=1
-     ;;
-   kvmtool)
-     lines=$(run_kvmtool "$@" > >(tee /dev/fd/$stdout))
-     exit_status=0
-   *) echo "$BASH_SOURCE $LINENO"; exit 2;;
-   esac
-
-This means we also need to modify configure to unconditionally do
-
-  echo "TARGET=$target" >> config.mak
-
-Right now it only does that for arm/arm64.
-
->  	ret=$?
->  	exec {stdout}>&-
->  
-> -	if [ $ret -eq 1 ]; then
-> +	if [ $ret -eq $exit_status ]; then
->  		testret=$(grep '^EXIT: ' <<<"$lines" | sed 's/.*STATUS=\([0-9][0-9]*\).*/\1/')
->  		if [ "$testret" ]; then
->  			if [ $testret -eq 1 ]; then
-> @@ -193,6 +216,25 @@ search_qemu_binary ()
->  	export PATH=$save_path
->  }
->  
-> +search_kvmtool_binary ()
-> +{
-> +	local lkvm kvmtool
-> +
-> +	for lkvm in ${KVMTOOL:-lkvm vm lkvm-static}; do
-> +		if $lkvm --help 2>/dev/null | grep -q 'The most commonly used'; then
-> +			kvmtool="$lkvm"
-> +			break
-> +		fi
-> +	done
-> +
-> +	if [ -z "$kvmtool" ]; then
-> +		echo "A kvmtool binary was not found." >&2
-> +		echo "You can set a custom location by using the KVMTOOL=<path> environment variable." >&2
-> +		return 2
-> +	fi
-> +	command -v $kvmtool
-> +}
-> +
->  initrd_create ()
->  {
->  	if [ "$ENVIRON_DEFAULT" = "yes" ]; then
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 132389c7dd59..23b238a6ab6f 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -12,14 +12,19 @@ extract_summary()
->      tail -3 | grep '^SUMMARY: ' | sed 's/^SUMMARY: /(/;s/'"$cr"'\{0,1\}$/)/'
->  }
->  
-> -# We assume that QEMU is going to work if it tried to load the kernel
-> +# We assume that QEMU/kvmtool is going to work if it tried to load the kernel
-
-assume that the VMM
-
->  premature_failure()
->  {
->      local log="$(eval $(get_cmdline _NO_FILE_4Uhere_) 2>&1)"
->  
-> -    echo "$log" | grep "_NO_FILE_4Uhere_" |
-> -        grep -q -e "could not \(load\|open\) kernel" -e "error loading" &&
-> -        return 1
-> +    if [ "$TARGET" = "kvmtool" ]; then
-> +        echo "$log" | grep "Fatal: unable to load firmware image _NO_FILE_4Uhere_" &&
-> +            return 1
-> +    else
-> +        echo "$log" | grep "_NO_FILE_4Uhere_" |
-> +            grep -q -e "could not \(load\|open\) kernel" -e "error loading" &&
-> +            return 1
-> +    fi
-
-Another place for a switch.
-
->  
->      RUNTIME_log_stderr <<< "$log"
->  
-> @@ -30,7 +35,14 @@ premature_failure()
->  get_cmdline()
->  {
->      local kernel=$1
-> -    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
-> +    local smp_param
-> +
-> +    if [ "$TARGET" = "kvmtool" ]; then
-> +        smp_param="--cpus $smp"
-> +    else
-> +        smp_param="-smp $smp"
-> +    fi
-
-switch
-
-> +    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel $RUNTIME_arch_run $kernel $smp_param $opts"
->  }
->  
->  skip_nodefault()
-> @@ -70,6 +82,35 @@ function find_word()
->      grep -Fq " $1 " <<< " $2 "
->  }
->  
-> +fixup_kvmtool_opts()
-> +{
-> +    local opts=$1
-> +    local groups=$2
-> +    local gic
-> +    local gic_version
-> +
-> +    if find_word "pmu" $groups; then
-> +        opts+=" --pmu"
-> +    fi
-> +
-> +    if find_word "its" $groups; then
-> +        gic_version=3
-> +        gic="gicv3-its"
-> +    elif [[ "$opts" =~ -machine\ *gic-version=(2|3) ]]; then
-> +        gic_version="${BASH_REMATCH[1]}"
-> +        gic="gicv$gic_version"
-> +    fi
-> +
-> +    if [ -n "$gic" ]; then
-> +        opts=${opts/-machine gic-version=$gic_version/}
-> +        opts+=" --irqchip=$gic"
-> +    fi
-> +
-> +    opts=${opts/-append/--params}
-> +
-> +    echo "$opts"
-> +}
-
-Hmm, I don't think we want to write a QEMU parameter translator for
-all other VMMs, and all other VMM architectures, that we want to
-support. I think we should add new "extra_params" variables to the
-unittest configuration instead, e.g. "kvmtool_params", where the
-extra parameters can be listed correctly and explicitly. While at
-it, I would create an alias for "extra_params", which would be
-"qemu_params" allowing unittests that support more than one VMM
-to clearly show what's what.
-
-> +
->  function run()
->  {
->      local testname="$1"
-> @@ -105,7 +146,12 @@ function run()
->          return 2
->      fi
->  
-> -    if [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" ]; then
-> +    if [ "$TARGET" = "kvmtool" ]; then
-> +        if [ -n "$accel" ] && [ "$accel" != "kvm" ]; then
-> +            print_result "SKIP" $testname "" "$accel not supported by kvmtool"
-> +            return 2
-> +        fi
-> +    elif [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" ]; then
-
-switch
-
->          print_result "SKIP" $testname "" "$accel only, but ACCEL=$ACCEL"
->          return 2
->      elif [ -n "$ACCEL" ]; then
-> @@ -126,6 +172,10 @@ function run()
->          done
->      fi
->  
-> +    if [ "$TARGET" = "kvmtool" ]; then
-> +        opts=$(fixup_kvmtool_opts "$opts" "$groups")
-> +    fi
-> +
->      last_line=$(premature_failure > >(tail -1)) && {
->          print_result "SKIP" $testname "" "$last_line"
->          return 77
-> @@ -165,13 +215,25 @@ function run()
->  #
->  # Probe for MAX_SMP, in case it's less than the number of host cpus.
->  #
-> -# This probing currently only works for ARM, as x86 bails on another
-> -# error first. Also, this probing isn't necessary for any ARM hosts
-> -# running kernels later than v4.3, i.e. those including ef748917b52
-> -# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
-> -# point when maintaining the while loop gets too tiresome, we can
-> -# just remove it...
-> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> -		|& grep -qi 'exceeds max CPUs'; do
-> -	MAX_SMP=$((MAX_SMP >> 1))
-> -done
-> +# This probing currently only works for ARM, as x86 bails on another error
-> +# first. Also, this probing isn't necessary for any ARM hosts running kernels
-> +# later than v4.3, i.e. those including ef748917b52 "arm/arm64: KVM: Remove
-> +# 'config KVM_ARM_MAX_VCPUS'". So, at some point when maintaining the while loop
-> +# gets too tiresome, we can just remove it...
-> +#
-> +# We don't need this check for kvmtool, as kvmtool will automatically limit the
-> +# number of VCPUs to what the host supports instead of exiting with an error.
-> +# kvmtool prints a message when that happens, but it's harmless and the chance
-> +# of running a kernel so old that the number of VCPUs is smaller than the number
-> +# of physical CPUs is vanishingly small.
-> +#
-> +# For qemu this check is still needed. For qemu-system-aarch64 version 6.0.0,
-> +# using TCG, the maximum number of VCPUs that mach-virt supports is 8. If a test
-> +# is running on a recent x86 machine, there's a fairly good chance that more
-> +# than 8 logical CPUs are available.
-> +if [ "$TARGET" = "qemu" ]; then
-> +    while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> +            |& grep -qi 'exceeds max CPUs'; do
-> +        MAX_SMP=$((MAX_SMP >> 1))
-> +    done
-> +fi
 > diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index cefdec30cb33..16f461c06842 100755
+> index 16f461c06842..d84bdb7e278c 100755
 > --- a/scripts/mkstandalone.sh
 > +++ b/scripts/mkstandalone.sh
-> @@ -95,6 +95,11 @@ function mkstandalone()
+> @@ -44,6 +44,10 @@ generate_test ()
+>  	config_export ARCH_NAME
+>  	config_export PROCESSOR
+>  
+> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
+> +		config_export TARGET
+> +	fi
+
+Should export unconditionally, since we'll want TARGET set
+unconditionally.
+
+> +
+>  	echo "echo BUILD_HEAD=$(cat build-head)"
+>  
+>  	if [ ! -f $kernel ]; then
+> @@ -59,7 +63,7 @@ generate_test ()
+>  		echo 'export FIRMWARE'
+>  	fi
+>  
+> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
+
+I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
+TARGET=kvmtool in configure.
+
+
+>  		temp_file ERRATATXT "$ERRATATXT"
+>  		echo 'export ERRATATXT'
+>  	fi
+> @@ -95,12 +99,8 @@ function mkstandalone()
 >  	echo Written $standalone.
 >  }
 >  
-> +if [ "$TARGET" = "kvmtool" ]; then
-> +	echo "Standalone tests not supported with kvmtool"
-> +	exit 2
-> +fi
-> +
->  if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> -if [ "$TARGET" = "kvmtool" ]; then
+> -	echo "Standalone tests not supported with kvmtool"
+> -	exit 2
+> -fi
+> -
+> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
+> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
+> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
 >  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
 >  	exit 2
-> diff --git a/arm/run b/arm/run
-> index a390ca5ae0ba..cc5890e7fec4 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -8,59 +8,81 @@ if [ -z "$STANDALONE" ]; then
->  	source config.mak
->  	source scripts/arch-run.bash
 >  fi
-> -processor="$PROCESSOR"
->  
-> -ACCEL=$(get_qemu_accelerator) ||
-> -	exit $?
-> +run_test_qemu()
-> +{
-> +    processor="$PROCESSOR"
->  
-> -qemu=$(search_qemu_binary) ||
-> -	exit $?
-> +    ACCEL=$(get_qemu_accelerator) ||
-> +        exit $?
->  
-> -if ! $qemu -machine '?' 2>&1 | grep 'ARM Virtual Machine' > /dev/null; then
-> -	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
-> -	exit 2
-> -fi
-> +    qemu=$(search_qemu_binary) ||
-> +        exit $?
->  
-> -M='-machine virt'
-> +    if ! $qemu -machine '?' 2>&1 | grep 'ARM Virtual Machine' > /dev/null; then
-> +        echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
-> +        exit 2
-> +    fi
->  
-> -if [ "$ACCEL" = "kvm" ]; then
-> -	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
-> -		M+=',gic-version=host'
-> -	fi
-> -	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
-> -		processor="host"
-> -		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-> -			processor+=",aarch64=off"
-> -		fi
-> -	fi
-> -fi
-> +    M='-machine virt'
->  
-> -if [ "$ARCH" = "arm" ]; then
-> -	M+=",highmem=off"
-> -fi
-> +    if [ "$ACCEL" = "kvm" ]; then
-> +        if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
-> +            M+=',gic-version=host'
-> +        fi
-> +        if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
-> +            processor="host"
-> +            if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
-> +                processor+=",aarch64=off"
-> +            fi
-> +        fi
-> +    fi
->  
-> -if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
-> -	echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
-> -	exit 2
-> -fi
-> +    if [ "$ARCH" = "arm" ]; then
-> +        M+=",highmem=off"
-> +    fi
->  
-> -if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
-> -		| grep backend > /dev/null; then
-> -	echo "$qemu doesn't support chr-testdev. Exiting."
-> -	exit 2
-> -fi
-> +    if ! $qemu $M -device '?' 2>&1 | grep virtconsole > /dev/null; then
-> +        echo "$qemu doesn't support virtio-console for chr-testdev. Exiting."
-> +        exit 2
-> +    fi
->  
-> -chr_testdev='-device virtio-serial-device'
-> -chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-> +    if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
-> +            | grep backend > /dev/null; then
-> +        echo "$qemu doesn't support chr-testdev. Exiting."
-> +        exit 2
-> +    fi
->  
-> -pci_testdev=
-> -if $qemu $M -device '?' 2>&1 | grep pci-testdev > /dev/null; then
-> -	pci_testdev="-device pci-testdev"
-> -fi
-> +    chr_testdev='-device virtio-serial-device'
-> +    chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
-> +
-> +    pci_testdev=
-> +    if $qemu $M -device '?' 2>&1 | grep pci-testdev > /dev/null; then
-> +        pci_testdev="-device pci-testdev"
-> +    fi
-> +
-> +    M+=",accel=$ACCEL"
-> +    command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
-> +    command+=" -display none -serial stdio -kernel"
-> +    command="$(migration_cmd) $(timeout_cmd) $command"
-> +
-> +    run_qemu $command "$@"
-> +}
-> +
-> +run_test_kvmtool()
-> +{
-> +    kvmtool=$(search_kvmtool_binary) ||
-> +        exit $?
->  
-> -M+=",accel=$ACCEL"
-> -command="$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testdev"
-> -command+=" -display none -serial stdio -kernel"
-> -command="$(migration_cmd) $(timeout_cmd) $command"
-> +    local command="$(timeout_cmd) $kvmtool run --firmware "
-> +    run_test_status $command "$@"
-> +}
->  
-> -run_qemu $command "$@"
-> +case "$TARGET" in
-> +    "qemu")
-> +        run_test_qemu "$@"
-> +        ;;
-> +    "kvmtool")
-> +        run_test_kvmtool "$@"
-> +        ;;
-> +esac
-
-Hey, here's a switch :-) But I'd add a default case that errors out for
-good measure.
-
-> diff --git a/run_tests.sh b/run_tests.sh
-> index 65108e73a2c0..b010ee3ab348 100755
-> --- a/run_tests.sh
-> +++ b/run_tests.sh
-> @@ -26,7 +26,9 @@ Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
->      -t, --tap13     Output test results in TAP format
->  
->  Set the environment variable QEMU=/path/to/qemu-system-ARCH to
-> -specify the appropriate qemu binary for ARCH-run.
-> +specify the appropriate qemu binary for ARCH-run. For arm/arm64, kvmtool
-> +is also supported and the environment variable KVMTOOL=/path/to/kvmtool
-> +can be used to specify a custom location for the kvmtool binary.
-
-How about changing this last sentence (as a separate patch first) in usage
-to
-
-ENVIRONMENT
-    QEMU            Path to QEMU binary for ARCH-run
-    ACCEL           QEMU accelerator to use, e.g. "kvm", "hvf" or "tcg"
-    TIMEOUT         Timeout duration for the timeout(1) command
-
-And then in this patch adds
-
-    KVMTOOL         Path to KVMTOOL binary for ARCH-run
-
->  
->  EOF
->  }
-> @@ -41,6 +43,13 @@ if [ $? -ne 4 ]; then
->      exit 1
->  fi
->  
-> +if [ "$TARGET" = "kvmtool" ]; then
-> +    if [ -n "$ACCEL" ] && [ "$ACCEL" != "kvm" ]; then
-> +        echo "kvmtool supports only the kvm accelerator"
-> +        exit 1
-> +    fi
-> +fi
-
-I think this belongs in arm/run, because run_tests.sh isn't always used to
-run the tests.
-
-> +
->  only_tests=""
->  args=`getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*`
->  [ $? -ne 0 ] && exit 2;
 > -- 
 > 2.32.0
-> 
+>
 
 Thanks,
-drew
+drew 
 
 _______________________________________________
 kvmarm mailing list
