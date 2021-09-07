@@ -4,90 +4,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCEEAC433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03558C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:18:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 68D7660E52
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:18:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 68D7660E52
+	by mail.kernel.org (Postfix) with ESMTP id 952F761101
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:18:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 952F761101
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B1C74B0DB;
-	Tue,  7 Sep 2021 14:18:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 486EA4B10B;
+	Tue,  7 Sep 2021 14:18:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iqcDktjoTYKD; Tue,  7 Sep 2021 14:18:13 -0400 (EDT)
+	with ESMTP id qsUpKp0DFiNP; Tue,  7 Sep 2021 14:18:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BC64B0DE;
-	Tue,  7 Sep 2021 14:18:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8F24B11B;
+	Tue,  7 Sep 2021 14:18:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FE464B0D7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:18:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB56C4B10B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:18:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K2WF6USLxU73 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Sep 2021 14:18:11 -0400 (EDT)
+ with ESMTP id t8mgRAZYjAmB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Sep 2021 14:18:38 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E8574B0C3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:18:11 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D889F4B0DB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:18:38 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1631038691;
+ s=mimecast20190719; t=1631038718;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=/Y4ioFnJuisj2BTJf1/oHJdXHMcO8vnvhxc0AOo9EVM=;
- b=Zijclc+mTnRuNE+Gyunc+QeFW8I3l6/vepQPv62P6HLCKvRv0t6/LhC33QKg3LD9XOrU6n
- WOfWJqvZRYgNkfKAVv0yOAg7l8/FxdPUJ5a2/WE2O3EYbO4cYBLqvTaZPFVNsN2M9Xk6bG
- bE1/U3pBtROn7qrqASNRiFo7xUTc88w=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-524-j71M0aBOOhqUkElRKJT_oQ-1; Tue, 07 Sep 2021 14:18:09 -0400
-X-MC-Unique: j71M0aBOOhqUkElRKJT_oQ-1
-Received: by mail-ed1-f71.google.com with SMTP id
- g4-20020a056402180400b003c2e8da869bso5782730edy.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 11:18:09 -0700 (PDT)
+ bh=LUu7mpwr2jWyNZjk6B2vNYIBEH3XQErYN13Ykm4FJUs=;
+ b=Zlv2XlJuz6/fCPCbkjkdKdtC2znDykQM3UFbYGmy4kBiBC8s+jcM0RFkq9uFdyc5rbbqG3
+ Wr+LT7/zpa0qNOfQ2Fz4ZcN9mj29PQGO5aJrSZBgJGAV31aYToreF5RajXMQATXtem+MNX
+ 9svEyhKifRefQcLShB2HvLCt1vOqCqI=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-587-vdZCXE9XMUKvmBIm-MvPUQ-1; Tue, 07 Sep 2021 14:18:37 -0400
+X-MC-Unique: vdZCXE9XMUKvmBIm-MvPUQ-1
+Received: by mail-ej1-f70.google.com with SMTP id
+ o14-20020a1709062e8e00b005d37183e041so4078553eji.21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 11:18:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=/Y4ioFnJuisj2BTJf1/oHJdXHMcO8vnvhxc0AOo9EVM=;
- b=hYfg/prXOzBaxAsITlHunch3BP+UdY387L5Yybk+riUEOs9+vSyl550jotjOJAWAlC
- v3h82/a/p4QJPSf/4LLJZCDODTKauSXurXfvU0rojXahHLXT5EczSqC2qe/Vk/DCsPHV
- mZeU4MxC2sfQm3TOTa0XdWQY+I5lcM8XJBZfJ7GBy1QI72NW5g7Pxi+n8b15anEDw0Bl
- 911NLPrwrahRDlS+JWa59U5vffYClq931UFr2/nIZGmu7iIeLX+MiO/mVo5cG3U1Xr4B
- j36rn2YAisO/0blBemSbUUnpTXtSdVtyc2z7N8qloX+9+wkcR0TK8QnQL1kBVx0ESxLT
- BbnQ==
-X-Gm-Message-State: AOAM531zcjsiV1KtSLbmBB4kltS7WFFvTCYRZ6Tb7D1ByZ7md0zAJ4AH
- kerPMNHNiJJKaU+IdCxVU6pxt7hu0uC+O7tbquNOCMh25ZrgyQE93Fdfyhfr6uBSW4iCJkPuyCC
- rk6iYY9kPSvLvgw0SwTlCxwiD
-X-Received: by 2002:aa7:cd9a:: with SMTP id x26mr844572edv.384.1631038688790; 
- Tue, 07 Sep 2021 11:18:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2BAJqv2ikfIL9GSFYL9FGap4baDkbWIjl814C12RIpseaaxrMOITupVIIE6OrP+B3Y8wgKQ==
-X-Received: by 2002:aa7:cd9a:: with SMTP id x26mr844557edv.384.1631038688652; 
- Tue, 07 Sep 2021 11:18:08 -0700 (PDT)
+ bh=LUu7mpwr2jWyNZjk6B2vNYIBEH3XQErYN13Ykm4FJUs=;
+ b=XZ0Ha8vmlAXZ4eVjC747JGjdgRMsUUetz4CDcjNp9A2+ypaI2Y78LmSXsywrR0qSgc
+ ewwknNCyoKyP0hFs1EyGFHEPKKrOzDhB0MNW7AvG10bH6JI/w60TUkYo8+7pZM41f/oN
+ lckQeJv+Cle7STGhaUms48Kby3COXNqfk+jKvGdh2c/I7Pq8KrHT1wC4+AsTmfeG9XSC
+ rCJKGr1woaOq1yhISTYOrK1ipo5jYkDmSaH4jbYkqcFwY+oAENkteEOkpgdJY9PTmvVb
+ z/pNCWoyQ91uJj5E+BUGibgndi+i0cmCi9QN4P3MUZvvEHL4DKhcWD3SLTzm6PXECDXZ
+ Y0JQ==
+X-Gm-Message-State: AOAM531xY9VeARej2+EGX2Jf7dusaHRAAtzsCbqgl8ceXiaNddiHNapb
+ LzhqlG8inmIqnhnbTCx6LAXxZ8dJI2qXrYkRFmTkJRRzwtmy14O1aX+wPvV6VBp7Fs+K+QSxDbW
+ WUJQkARREH+HArf/wod6Pdrkg
+X-Received: by 2002:a17:906:6dcb:: with SMTP id
+ j11mr19706636ejt.202.1631038716449; 
+ Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzJ16MXBVuMZi4LPFWDJ41bJqO5hzeQF793u0WWbWMrnfuEmtTm1ev6ELecKdk1XtNTMtystg==
+X-Received: by 2002:a17:906:6dcb:: with SMTP id
+ j11mr19706624ejt.202.1631038716320; 
+ Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
 Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id be5sm6926257edb.57.2021.09.07.11.18.07
+ by smtp.gmail.com with ESMTPSA id p16sm6895261eds.63.2021.09.07.11.18.35
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Sep 2021 11:18:08 -0700 (PDT)
-Date: Tue, 7 Sep 2021 20:18:06 +0200
+ Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
+Date: Tue, 7 Sep 2021 20:18:34 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v2 1/2] KVM: selftests: make memslot_perf_test arch
- independent
-Message-ID: <20210907181806.wqlspjygukc574yz@gator.home>
+Subject: Re: [PATCH v2 2/2] KVM: selftests: build the memslot tests for arm64
+Message-ID: <20210907181834.uqecqygvvlvmetbl@gator.home>
 References: <20210907180957.609966-1-ricarkol@google.com>
- <20210907180957.609966-2-ricarkol@google.com>
+ <20210907180957.609966-3-ricarkol@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210907180957.609966-2-ricarkol@google.com>
+In-Reply-To: <20210907180957.609966-3-ricarkol@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -112,21 +113,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 07, 2021 at 11:09:56AM -0700, Ricardo Koller wrote:
-> memslot_perf_test uses ucalls for synchronization between guest and
-> host. Ucalls API is architecture independent: tests do not need to know
-> details like what kind of exit they generate on a specific arch.  More
-> specifically, there is no need to check whether an exit is KVM_EXIT_IO
-> in x86 for the host to know that the exit is ucall related, as
-> get_ucall() already makes that check.
-> 
-> Change memslot_perf_test to not require specifying what exit does a
-> ucall generate. Also add a missing ucall_init.
+On Tue, Sep 07, 2021 at 11:09:57AM -0700, Ricardo Koller wrote:
+> Add memslot_perf_test and memslot_modification_stress_test to the list
+> of aarch64 selftests.
 > 
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  .../testing/selftests/kvm/memslot_perf_test.c | 56 +++++++++++--------
->  1 file changed, 34 insertions(+), 22 deletions(-)
+>  tools/testing/selftests/kvm/Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index 5832f510a16c..5ed203b9314c 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -92,6 +92,8 @@ TEST_GEN_PROGS_aarch64 += dirty_log_test
+>  TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
+>  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
+>  TEST_GEN_PROGS_aarch64 += kvm_page_table_test
+> +TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
+> +TEST_GEN_PROGS_aarch64 += memslot_perf_test
+>  TEST_GEN_PROGS_aarch64 += set_memory_region_test
+>  TEST_GEN_PROGS_aarch64 += steal_time
+>  TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
+> -- 
+> 2.33.0.153.gba50c8fa24-goog
 >
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
