@@ -4,92 +4,90 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E35C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 10:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C61FC433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 10:25:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F1BFF610FE
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 10:21:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F1BFF610FE
+	by mail.kernel.org (Postfix) with ESMTP id 8AFE5610FE
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 10:25:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8AFE5610FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F43A4B20D;
-	Tue,  7 Sep 2021 06:21:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02DF44B1FE;
+	Tue,  7 Sep 2021 06:25:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VbBq+aVx38+c; Tue,  7 Sep 2021 06:21:42 -0400 (EDT)
+	with ESMTP id x3FNgG2NonCS; Tue,  7 Sep 2021 06:25:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B6654B22C;
-	Tue,  7 Sep 2021 06:21:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 011194B20D;
+	Tue,  7 Sep 2021 06:25:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A1BC94B20A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 06:21:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E49B4B1D5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 06:25:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x+JylORKJGQ9 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Sep 2021 06:21:39 -0400 (EDT)
+ with ESMTP id ByqF9mvqA-1g for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Sep 2021 06:25:41 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2FF64B1D5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 06:21:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 258E94B1A2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 06:25:40 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1631010099;
+ s=mimecast20190719; t=1631010340;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=f++tlxFdFC82weLDV66fZEVmzKayy0iCTttWnFQCXr8=;
- b=e6ZsVgtH6oRx1GPqy4h0nkawtKKqgyqd+P/u7N1oLUT3x15wm694WqmzVi4UKAiWDoK1kD
- FuaBKRSHBBE4HYWeEfLeBwB7qGA2WxCFrZ+uy1h9RMWoZEDzKgX3AsU/svPzPDAXs5dF0u
- AFBKlDZCxQ40VMtpyUQYb67I3BHOUHM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-bf5aejcjN_uHh_HmGK4U3w-1; Tue, 07 Sep 2021 06:21:38 -0400
-X-MC-Unique: bf5aejcjN_uHh_HmGK4U3w-1
-Received: by mail-wr1-f71.google.com with SMTP id
- p10-20020adfce0a000000b001572d05c970so1952197wrn.21
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 03:21:38 -0700 (PDT)
+ bh=YkR6zwo7S5sLkEP3Hl3y8Gt+KIK6HBJlddNqv1cks4k=;
+ b=cfwsFXwEPTJ6sEweVQxvKrjHf84Somzk53aAWWZtPeEuL+0ZicFJta/XDrUTOFZ2oLoiMF
+ gg9wzVF5eQl9zV2yo5EoeFZ610krN50Ti03B1rRcQHR/x2CVVerNy4541CnRiEGS8JiUZI
+ +JQCpw+bkbOMHImcDDS/YfhlRG08RSU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-261-ceTigRwGOGytZT7AJXw-Og-1; Tue, 07 Sep 2021 06:25:39 -0400
+X-MC-Unique: ceTigRwGOGytZT7AJXw-Og-1
+Received: by mail-wr1-f72.google.com with SMTP id
+ v6-20020adfe4c6000000b001574f9d8336so1952461wrm.15
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 03:25:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=f++tlxFdFC82weLDV66fZEVmzKayy0iCTttWnFQCXr8=;
- b=SHsFhF+v4jZ4qzYcWtEymD10YRcCLrMw71mG32qOXMDcta70FC9C0eEwn9LYLDUWvJ
- 539fI+0w+3YXnSV6wJ9xKm9b46eCpcl1EilwlyRc0W+sehCLBUAx5pTdc0f+wR1WrTFD
- GH9yrjVNOHtzm15Bjc/YL8Fp4a4A20MP1gwr687UKog0X24vuipCmC8S1qq0llQfePBE
- GuRx48tcHKrl0uo+QkQJCWx93zB+DaEbbyLuPWFgCY38fyjFmEzFzvymYlPrrAvMIm/I
- QhiuXBUEyaVcESAzhB0ZwTTdQkN2r9TLfPlzOQ6Q6elC6Zf5pwwpgH2U9zXgRpLUavqj
- ueyQ==
-X-Gm-Message-State: AOAM531rOEGrLTVU1wIUSB10Txr1HF4Rdjq/c/OmlHJ+4J2chkPv81aN
- q1k7EXb7dOBYr/9X0owqudrYNXpkT1ezG8NKvgK83hmJx3HLi8R2STI24iEiDdNdGbXImcRsBS9
- 5Kaw1NI5GGQdK+6H2oocdeqW8
-X-Received: by 2002:a05:6000:1563:: with SMTP id
- 3mr18583602wrz.139.1631010097382; 
- Tue, 07 Sep 2021 03:21:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwVgROHRJDcbz9ILwMhdnSZ3oJA6YdR1KgI9MywkZ1Cjk4U3iVAKCDYVZQ+gA4/zuyHOdxqyQ==
-X-Received: by 2002:a05:6000:1563:: with SMTP id
- 3mr18583578wrz.139.1631010097179; 
- Tue, 07 Sep 2021 03:21:37 -0700 (PDT)
+ bh=YkR6zwo7S5sLkEP3Hl3y8Gt+KIK6HBJlddNqv1cks4k=;
+ b=Y/HZLKiWN1Ca9HNgCcv0zo5cwy942FS0ZHrPaYmX9vtPiG8FNICYBtNEZbQgvgKdD9
+ DUKXMLBo9R5sX7a9pDhls/Mee8sq+R6OVaSbbq1fnKp8vIROYAM72RcJwgqF+7uHKzlg
+ EQNg97Pb+HU4lifhSuJRNfbRL0m2GifLy7jfSTVCKtlJHc1HbJjYyGx6KKGdkc4XLdsR
+ daqqlb8u1uKz0bfwVTlYH+1uq5lUg21Xf0Z3fwsPckHxiyVhLkOjVp2IHyFXfW2W4hKs
+ sN2nuo3WCyzOdQ2ZPq5u37CddSbGlbNnBBtfziR3tHBznXh1VERPT53GymTNqrU0sOFZ
+ 91Eg==
+X-Gm-Message-State: AOAM533fJo1N3TR94zMz74Q750W4sUIXHWY+zO8GESCAvgEQEKiMV+5K
+ aQdBLx2eZ3J1oUBxorekriLCwhsXFzzK8NiCrCW97OV8ZH26KMbKcNaoe+aYNwnxpCj9b0yWYUH
+ +YySFWdvB8VCUc8ZBGXVv1efz
+X-Received: by 2002:a5d:6486:: with SMTP id o6mr17366328wri.193.1631010338753; 
+ Tue, 07 Sep 2021 03:25:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzSuexDTec5nPjCkxud+p5tgz5pAvum9LG2zR+d+af/JuudrOVT+AYs0JNtNTuoPUbk+lGqwQ==
+X-Received: by 2002:a5d:6486:: with SMTP id o6mr17366315wri.193.1631010338595; 
+ Tue, 07 Sep 2021 03:25:38 -0700 (PDT)
 Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
- by smtp.gmail.com with ESMTPSA id p5sm11270858wrd.25.2021.09.07.03.21.36
+ by smtp.gmail.com with ESMTPSA id t11sm2252710wmi.23.2021.09.07.03.25.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Sep 2021 03:21:36 -0700 (PDT)
-Date: Tue, 7 Sep 2021 12:21:35 +0200
+ Tue, 07 Sep 2021 03:25:38 -0700 (PDT)
+Date: Tue, 7 Sep 2021 12:25:36 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
- standalone tests
-Message-ID: <20210907102135.i2w3r7j4zyj736b5@gator>
+Subject: Re: [kvm-unit-tests RFC PATCH 5/5] configure: Ignore --erratatxt
+ when --target=kvmtool
+Message-ID: <20210907102536.jhycvnazlmj7qyto@gator>
 References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-5-alexandru.elisei@arm.com>
+ <20210702163122.96110-6-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210702163122.96110-5-alexandru.elisei@arm.com>
+In-Reply-To: <20210702163122.96110-6-alexandru.elisei@arm.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -116,71 +114,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
-> Add support for the standalone target when running kvm-unit-tests under
-> kvmtool.
+On Fri, Jul 02, 2021 at 05:31:22PM +0100, Alexandru Elisei wrote:
+> kvmtool runs a test using the -f/--firmware argument, which doesn't load an
+> initrd, making specifying an errata file useless. Instead, configure forces
+> all erratas to be enabled via the CONFIG_ERRATA_FORCE define in
+> lib/config.h.
 > 
-> Example command line invocation:
-> 
-> $ ./configure --target=kvmtool
-> $ make clean && make standalone
+> Forbid the --erratatxt option when kvm-unit-tests is configured for kvmtool
+> and let the user know that all erratas are enabled by default.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  scripts/mkstandalone.sh | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+> I'm not sure if printing an error is too strong here and a simple warning would
+> suffice. Suggestions welcome!
 > 
-> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
-> index 16f461c06842..d84bdb7e278c 100755
-> --- a/scripts/mkstandalone.sh
-> +++ b/scripts/mkstandalone.sh
-> @@ -44,6 +44,10 @@ generate_test ()
->  	config_export ARCH_NAME
->  	config_export PROCESSOR
+>  configure | 26 +++++++++++++++++++-------
+>  1 file changed, 19 insertions(+), 7 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 395c809c9c02..acd288239f80 100755
+> --- a/configure
+> +++ b/configure
+> @@ -24,7 +24,8 @@ u32_long=
+>  wa_divide=
+>  target=
+>  errata_force=0
+> -erratatxt="$srcdir/errata.txt"
+> +erratatxt_default="$srcdir/errata.txt"
+> +erratatxt="_NO_FILE_4Uhere_"
+>  host_key_document=
+>  page_size=
+>  earlycon=
+> @@ -50,7 +51,8 @@ usage() {
+>  	                           enable or disable the generation of a default environ when
+>  	                           no environ is provided by the user (enabled by default)
+>  	    --erratatxt=FILE       specify a file to use instead of errata.txt. Use
+> -	                           '--erratatxt=' to ensure no file is used.
+> +	                           '--erratatxt=' to ensure no file is used. This option is
+> +	                           invalid for arm/arm64 when target=kvmtool.
+
+Do we need to always specifiy arm/arm64 when talking about target=kvmtool?
+How much more effort would an x86 kvmtool target be to add?
+
+>  	    --host-key-document=HOST_KEY_DOCUMENT
+>  	                           Specify the machine-specific host-key document for creating
+>  	                           a PVM image with 'genprotimg' (s390x only)
+> @@ -147,11 +149,6 @@ if [ -n "$host_key_document" ] && [ ! -f "$host_key_document" ]; then
+>      exit 1
+>  fi
 >  
-> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
-> +		config_export TARGET
-> +	fi
-
-Should export unconditionally, since we'll want TARGET set
-unconditionally.
-
-> +
->  	echo "echo BUILD_HEAD=$(cat build-head)"
->  
->  	if [ ! -f $kernel ]; then
-> @@ -59,7 +63,7 @@ generate_test ()
->  		echo 'export FIRMWARE'
->  	fi
->  
-> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
-> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
-
-I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
-TARGET=kvmtool in configure.
-
-
->  		temp_file ERRATATXT "$ERRATATXT"
->  		echo 'export ERRATATXT'
->  	fi
-> @@ -95,12 +99,8 @@ function mkstandalone()
->  	echo Written $standalone.
->  }
->  
-> -if [ "$TARGET" = "kvmtool" ]; then
-> -	echo "Standalone tests not supported with kvmtool"
-> -	exit 2
+> -if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
+> -    echo "erratatxt: $erratatxt does not exist or is not a regular file"
+> -    exit 1
 > -fi
 > -
-> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
-> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
-> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
->  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
->  	exit 2
+>  arch_name=$arch
+>  [ "$arch" = "aarch64" ] && arch="arm64"
+>  [ "$arch_name" = "arm64" ] && arch_name="aarch64"
+> @@ -184,6 +181,21 @@ else
+>      fi
 >  fi
+>  
+> +if [ "$target" = "kvmtool" ]; then
+> +    if [ "$erratatxt" ] && [ "$erratatxt" != "_NO_FILE_4Uhere_" ]; then
+> +        echo "--erratatxt is not supported for target=kvmtool (all erratas enabled by default)"
+> +        usage
+> +    fi
+> +else
+> +    if [ "$erratatxt" = "_NO_FILE_4Uhere_" ]; then
+> +        erratatxt=$erratatxt_default
+> +    fi
+> +    if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
+> +        echo "erratatxt: $erratatxt does not exist or is not a regular file"
+> +        exit 1
+> +    fi
+> +fi
+
+switch
+
+> +
+>  [ -z "$processor" ] && processor="$arch"
+>  
+>  if [ "$processor" = "arm64" ]; then
 > -- 
 > 2.32.0
 >
+
+Otherwise looks good to me.
 
 Thanks,
 drew 
