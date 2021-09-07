@@ -2,64 +2,84 @@ Return-Path: <SRS0=lhJk=N5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFC3CC433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 12:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 447DCC433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 12:52:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 87A62604AC
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 12:33:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 87A62604AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id AA85C610C9
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 12:52:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AA85C610C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22EF24B1FE;
-	Tue,  7 Sep 2021 08:33:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28EA04B24D;
+	Tue,  7 Sep 2021 08:52:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NSA-Z7rXXmTK; Tue,  7 Sep 2021 08:33:24 -0400 (EDT)
+	with ESMTP id NWa1VbzWEe9s; Tue,  7 Sep 2021 08:52:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3E844B200;
-	Tue,  7 Sep 2021 08:33:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B24D4B1FC;
+	Tue,  7 Sep 2021 08:52:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 127B24B1FC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 08:33:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E15E64B1B0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 08:52:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CP0JwF8UCxRI for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Sep 2021 08:33:21 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D63694B1FE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 08:33:21 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8A1656D;
- Tue,  7 Sep 2021 05:33:21 -0700 (PDT)
-Received: from entos-ampere-02.shanghai.arm.com
- (entos-ampere-02.shanghai.arm.com [10.169.214.103])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9DD7B3F766;
- Tue,  7 Sep 2021 05:33:16 -0700 (PDT)
-From: Jia He <justin.he@arm.com>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 2/2] KVM: arm64: Add memcg accounting to KVM allocations
-Date: Tue,  7 Sep 2021 20:31:12 +0800
-Message-Id: <20210907123112.10232-3-justin.he@arm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210907123112.10232-1-justin.he@arm.com>
-References: <20210907123112.10232-1-justin.he@arm.com>
-Cc: Xiaoming Ni <nixiaoming@huawei.com>,
- Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Jia He <justin.he@arm.com>,
- Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
- Liu Shixin <liushixin2@huawei.com>, Sami Tolvanen <samitolvanen@google.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id Tdf609a1gcd2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Sep 2021 08:52:04 -0400 (EDT)
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com
+ [209.85.128.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEAE84B19D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 08:52:03 -0400 (EDT)
+Received: by mail-wm1-f50.google.com with SMTP id
+ k5-20020a05600c1c8500b002f76c42214bso1739884wms.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 05:52:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=wovuk/YJ4ZzxTgEM/WTOLuXvX25Yjntehj+QQBKkeck=;
+ b=K76J8SyL+1jOA8UfApaeCDLxztO+LZ8h4Nx9PbBNYsr+paYOiEqK9OIn2ldFs+7jzC
+ YEttCcgHMvN3u1/0AVrT+pgr4UyIN1fY0TWDjPrCpijQjVadGHS6qCJxNRMRydMpbkpe
+ vklWQApsPXT85SJjEbrr4whDc3f1MVpzfNFQ7ks6sAhOJgokRCkk4axYWPqo9Gq8UOEF
+ jTjR2dGFy5N5XLZ6yElzSZACsjQFOUeQqAW9Htb6vbipQslVAql4L3mbDnFLy8aIY//W
+ PjA+HrI7kjxQ45KDdftoS1ecm4AaCZ37azSPgx8Nz0Y44zMdL0lD1CCofVVAd3cPXEKz
+ fYsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=wovuk/YJ4ZzxTgEM/WTOLuXvX25Yjntehj+QQBKkeck=;
+ b=fUspkS3FlwST2JTT7oY5zYT6Coj7w6X1JO6zIfPyN21SQ8mVAGqwNHgCnqYq9irsMG
+ VEB1UYVHMT3FUUEEp0mk5P9VLyYW5hVkcD6f450MxKh9BTs3m8WgIvpU84klAhOQkrNP
+ cG8eke08Y7LmuO3FKGkZfSPKOZkxxyBdoi1GBHTkeZyK+UI7d3Wlg4vMhpWkke43hKQH
+ ZIlaTct89OyE9z3Qs6CLX9mroCqYOyil1tQ9nSyDGcwPnDU8Ui0rbsFFYJ5+rHJDkF3L
+ 7CXeL9NV5t4k2QOIO1zz9622QwhNLbiJK6LUD4OxQWUISNVvceFQz1fpbk1bGhpoBvM8
+ pzHA==
+X-Gm-Message-State: AOAM530VBZjeIJyPCZVtYfLCB/I9uQY3YesaI3eOH3zBaDdELkXHc+IA
+ FFg3AtQ5mKFjaTX0KWBjgdGexS/0x56uRUhzUMB8YQ==
+X-Google-Smtp-Source: ABdhPJzN1k5vdacf8pXMz+PcUOlliO8oElhlm9+Wxx2tO4deEucQ0q5nA8yws4gRRyTPG0HwiEfKkeMxeGbJ78NSUUM=
+X-Received: by 2002:a05:600c:4fcd:: with SMTP id
+ o13mr3850083wmq.32.1631019122955; 
+ Tue, 07 Sep 2021 05:52:02 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210822144441.1290891-1-maz@kernel.org>
+ <20210822144441.1290891-4-maz@kernel.org>
+In-Reply-To: <20210822144441.1290891-4-maz@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Sep 2021 13:51:13 +0100
+Message-ID: <CAFEAcA_J5W6kaaZ-oYtcRcQ5=z5nFv6bOVVu5n_ad0N8-NGzpg@mail.gmail.com>
+Subject: Re: [PATCH 3/3] docs/system/arm/virt: Fix documentation for the
+ 'highmem' option
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Android Kernel Team <kernel-team@android.com>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,91 +91,31 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Inspired by commit 254272ce6505 ("kvm: x86: Add memcg accounting to KVM
-allocations"), it would be better to make arm64 KVM consistent with
-common kvm codes.
+On Sun, 22 Aug 2021 at 15:45, Marc Zyngier <maz@kernel.org> wrote:
+>
+> The documentation for the 'highmem' option indicates that it controls
+> the placement of both devices and RAM. The actual behaviour of QEMU
+> seems to be that RAM is allowed to go beyond the 4GiB limit, and
+> that only devices are constraint by this option.
+>
+> Align the documentation with the actual behaviour.
 
-The memory allocations of VM scope should be charged into VM process
-cgroup, hence change GFP_KERNEL to GFP_KERNEL_ACCOUNT.
+I think it would be better to align the behaviour with the documentation.
 
-There remain a few cases since these allocations are global, not in VM
-scope.
+The intent of 'highmem' is to allow a configuration for use with guests
+that can't address more than 32 bits (originally, 32-bit guests without
+LPAE support compiled in). It seems like a bug that we allow the user
+to specify more RAM than will fit into that 32-bit range. We should
+instead make QEMU exit with an error if the user tries to specify
+both highmem=off and a memory size that's too big to fit.
 
-Signed-off-by: Jia He <justin.he@arm.com>
----
- arch/arm64/kvm/arm.c      | 6 ++++--
- arch/arm64/kvm/mmu.c      | 2 +-
- arch/arm64/kvm/pmu-emul.c | 2 +-
- arch/arm64/kvm/reset.c    | 2 +-
- 4 files changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 0ca72f5cda41..7a7c478b8e6b 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -293,10 +293,12 @@ long kvm_arch_dev_ioctl(struct file *filp,
- 
- struct kvm *kvm_arch_alloc_vm(void)
- {
-+	size_t sz = sizeof(struct kvm);
-+
- 	if (!has_vhe())
--		return kzalloc(sizeof(struct kvm), GFP_KERNEL);
-+		return kzalloc(sz, GFP_KERNEL_ACCOUNT);
- 
--	return vzalloc(sizeof(struct kvm));
-+	return __vmalloc(sz, GFP_KERNEL_ACCOUNT | __GFP_HIGHMEM | __GFP_ZERO);
- }
- 
- void kvm_arch_free_vm(struct kvm *kvm)
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 0625bf2353c2..801845ebd9d5 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -465,7 +465,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 		return -EINVAL;
- 	}
- 
--	pgt = kzalloc(sizeof(*pgt), GFP_KERNEL);
-+	pgt = kzalloc(sizeof(*pgt), GFP_KERNEL_ACCOUNT);
- 	if (!pgt)
- 		return -ENOMEM;
- 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index f33825c995cb..05d42f6b89e4 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -971,7 +971,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		mutex_lock(&vcpu->kvm->lock);
- 
- 		if (!vcpu->kvm->arch.pmu_filter) {
--			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL);
-+			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
- 			if (!vcpu->kvm->arch.pmu_filter) {
- 				mutex_unlock(&vcpu->kvm->lock);
- 				return -ENOMEM;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index cba7872d69a8..608c1baaaa63 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -106,7 +106,7 @@ static int kvm_vcpu_finalize_sve(struct kvm_vcpu *vcpu)
- 		    vl > SVE_VL_ARCH_MAX))
- 		return -EIO;
- 
--	buf = kzalloc(SVE_SIG_REGS_SIZE(sve_vq_from_vl(vl)), GFP_KERNEL);
-+	buf = kzalloc(SVE_SIG_REGS_SIZE(sve_vq_from_vl(vl)), GFP_KERNEL_ACCOUNT);
- 	if (!buf)
- 		return -ENOMEM;
- 
--- 
-2.17.1
-
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
