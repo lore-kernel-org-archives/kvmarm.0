@@ -2,101 +2,86 @@ Return-Path: <SRS0=lhJk=N5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03558C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A1FC433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:26:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 952F761101
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:18:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 952F761101
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id E9941610A3
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:26:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E9941610A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 486EA4B10B;
-	Tue,  7 Sep 2021 14:18:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FD6C4B0C5;
+	Tue,  7 Sep 2021 14:26:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qsUpKp0DFiNP; Tue,  7 Sep 2021 14:18:41 -0400 (EDT)
+	with ESMTP id 0O4ra6R6qLNf; Tue,  7 Sep 2021 14:26:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8F24B11B;
-	Tue,  7 Sep 2021 14:18:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62AEB4B0CD;
+	Tue,  7 Sep 2021 14:26:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB56C4B10B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:18:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C522F4B0C5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:26:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t8mgRAZYjAmB for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Sep 2021 14:18:38 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D889F4B0DB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:18:38 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1631038718;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=LUu7mpwr2jWyNZjk6B2vNYIBEH3XQErYN13Ykm4FJUs=;
- b=Zlv2XlJuz6/fCPCbkjkdKdtC2znDykQM3UFbYGmy4kBiBC8s+jcM0RFkq9uFdyc5rbbqG3
- Wr+LT7/zpa0qNOfQ2Fz4ZcN9mj29PQGO5aJrSZBgJGAV31aYToreF5RajXMQATXtem+MNX
- 9svEyhKifRefQcLShB2HvLCt1vOqCqI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-vdZCXE9XMUKvmBIm-MvPUQ-1; Tue, 07 Sep 2021 14:18:37 -0400
-X-MC-Unique: vdZCXE9XMUKvmBIm-MvPUQ-1
-Received: by mail-ej1-f70.google.com with SMTP id
- o14-20020a1709062e8e00b005d37183e041so4078553eji.21
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 11:18:37 -0700 (PDT)
+ with ESMTP id ZhZDB3Y-k0Ul for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Sep 2021 14:26:14 -0400 (EDT)
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com
+ [209.85.128.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D265D4B0C3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:26:13 -0400 (EDT)
+Received: by mail-wm1-f53.google.com with SMTP id
+ u19-20020a7bc053000000b002f8d045b2caso28206wmc.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 11:26:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=FhXgO4soHUfxUZvgfxgTnbg0Q339mdYzMA/DtCHulwM=;
+ b=XujAKCsnSv1SoIEqIFBQX0tSV/UFdURbpRl6b/A2AzaV6EgVVpRy4fvqRJVNkfktOX
+ XgjoLQtKKvIP1kxEyMRpoFzl4pPsgCNTm6Maus1bw1cg4j7VovCDgC3FeuTGZa6Q8P6Z
+ 7rnnb6gVceVdPykWLjsC8x4JFbHsqMK9HqkgsmK1F1AuHUxmTZuOYPrn1iKWo37teFlf
+ XyNBkiSk1IDWaMvYWR6D2aoS9EWu25NKX0eSuR1FAqWNn3zM+4SMFeOLiaWQSQcOVheA
+ oOlcrn9LQGeM+m4Y2PQ8vztisubnmJ3/mvJFjxngs4HaqH69lQlE3bXs7fb5qn4z7xoq
+ 7WzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=LUu7mpwr2jWyNZjk6B2vNYIBEH3XQErYN13Ykm4FJUs=;
- b=XZ0Ha8vmlAXZ4eVjC747JGjdgRMsUUetz4CDcjNp9A2+ypaI2Y78LmSXsywrR0qSgc
- ewwknNCyoKyP0hFs1EyGFHEPKKrOzDhB0MNW7AvG10bH6JI/w60TUkYo8+7pZM41f/oN
- lckQeJv+Cle7STGhaUms48Kby3COXNqfk+jKvGdh2c/I7Pq8KrHT1wC4+AsTmfeG9XSC
- rCJKGr1woaOq1yhISTYOrK1ipo5jYkDmSaH4jbYkqcFwY+oAENkteEOkpgdJY9PTmvVb
- z/pNCWoyQ91uJj5E+BUGibgndi+i0cmCi9QN4P3MUZvvEHL4DKhcWD3SLTzm6PXECDXZ
- Y0JQ==
-X-Gm-Message-State: AOAM531xY9VeARej2+EGX2Jf7dusaHRAAtzsCbqgl8ceXiaNddiHNapb
- LzhqlG8inmIqnhnbTCx6LAXxZ8dJI2qXrYkRFmTkJRRzwtmy14O1aX+wPvV6VBp7Fs+K+QSxDbW
- WUJQkARREH+HArf/wod6Pdrkg
-X-Received: by 2002:a17:906:6dcb:: with SMTP id
- j11mr19706636ejt.202.1631038716449; 
- Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzJ16MXBVuMZi4LPFWDJ41bJqO5hzeQF793u0WWbWMrnfuEmtTm1ev6ELecKdk1XtNTMtystg==
-X-Received: by 2002:a17:906:6dcb:: with SMTP id
- j11mr19706624ejt.202.1631038716320; 
- Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
-Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id p16sm6895261eds.63.2021.09.07.11.18.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 07 Sep 2021 11:18:36 -0700 (PDT)
-Date: Tue, 7 Sep 2021 20:18:34 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: selftests: build the memslot tests for arm64
-Message-ID: <20210907181834.uqecqygvvlvmetbl@gator.home>
-References: <20210907180957.609966-1-ricarkol@google.com>
- <20210907180957.609966-3-ricarkol@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=FhXgO4soHUfxUZvgfxgTnbg0Q339mdYzMA/DtCHulwM=;
+ b=Uh24QziJS39WLqJ8id/xGneZVMDsg4DGGQ0IYJMGkCUPAtC/+IqbRKhP2EUpNzFadf
+ q463xng76G0SlZtCwy8I9+cTDltStQDaXDzULgB1N5oq8yx9sixVAxprwfs5+dVac2Sa
+ qYO1k1xGiINpr7H+8hIHKrEs/vE+RHIdf8TiRiw7dCpo7114u8jM6qEvDz2GBo8PhKit
+ LWLqTLTIQGZG7Jj1JWTTV/m39sXdn1N9DmZABsWi5LUb8QojmhSKGmknro2PRu22cX0T
+ eIWUFWekn/ILgACPLSRCAkyZ21gX3DL2dWNsCzJKXiqV6CcTlXSxSlBsQH9eA8C0r5ae
+ yRWg==
+X-Gm-Message-State: AOAM532rMdoDUUeQypmJgMFc4ceTuUv4eWqM/YK2SpjP4nm8CHUeUXdp
+ 3yH5x429wsm8YgREWO1sqcSt+3kVyhBCRhM8RHehqA==
+X-Google-Smtp-Source: ABdhPJwMBtgoNU1DNZ3wjpbNoTr8qYBDuvceJ9eIxrnJpE3hgXpGIxe2N2Hyd1ZrAxjAa2aJTCxvA5d0Q8jsAy15RLE=
+X-Received: by 2002:a05:600c:19d0:: with SMTP id
+ u16mr5288352wmq.21.1631039172877; 
+ Tue, 07 Sep 2021 11:26:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210907180957.609966-3-ricarkol@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, maz@kernel.org, pshier@google.com,
- Paolo Bonzini <pbonzini@redhat.com>, maciej.szmigiero@oracle.com,
- kvmarm@lists.cs.columbia.edu
+References: <20210822144441.1290891-1-maz@kernel.org>
+ <20210822144441.1290891-4-maz@kernel.org>
+ <CAFEAcA_J5W6kaaZ-oYtcRcQ5=z5nFv6bOVVu5n_ad0N8-NGzpg@mail.gmail.com>
+ <87bl54cnx5.wl-maz@kernel.org>
+In-Reply-To: <87bl54cnx5.wl-maz@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 7 Sep 2021 19:25:23 +0100
+Message-ID: <CAFEAcA_MRyd2AcgAhvEwJY8LGbHoyz_JgTdMGAEtGegvZB0d7A@mail.gmail.com>
+Subject: Re: [PATCH 3/3] docs/system/arm/virt: Fix documentation for the
+ 'highmem' option
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm-devel <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Android Kernel Team <kernel-team@android.com>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,34 +98,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 07, 2021 at 11:09:57AM -0700, Ricardo Koller wrote:
-> Add memslot_perf_test and memslot_modification_stress_test to the list
-> of aarch64 selftests.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  tools/testing/selftests/kvm/Makefile | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index 5832f510a16c..5ed203b9314c 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -92,6 +92,8 @@ TEST_GEN_PROGS_aarch64 += dirty_log_test
->  TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
->  TEST_GEN_PROGS_aarch64 += kvm_create_max_vcpus
->  TEST_GEN_PROGS_aarch64 += kvm_page_table_test
-> +TEST_GEN_PROGS_aarch64 += memslot_modification_stress_test
-> +TEST_GEN_PROGS_aarch64 += memslot_perf_test
->  TEST_GEN_PROGS_aarch64 += set_memory_region_test
->  TEST_GEN_PROGS_aarch64 += steal_time
->  TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
+On Tue, 7 Sept 2021 at 18:10, Marc Zyngier <maz@kernel.org> wrote:
 >
+> Hi Peter,
+>
+> On Tue, 07 Sep 2021 13:51:13 +0100,
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+> >
+> > On Sun, 22 Aug 2021 at 15:45, Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > The documentation for the 'highmem' option indicates that it controls
+> > > the placement of both devices and RAM. The actual behaviour of QEMU
+> > > seems to be that RAM is allowed to go beyond the 4GiB limit, and
+> > > that only devices are constraint by this option.
+> > >
+> > > Align the documentation with the actual behaviour.
+> >
+> > I think it would be better to align the behaviour with the documentation.
+> >
+> > The intent of 'highmem' is to allow a configuration for use with guests
+> > that can't address more than 32 bits (originally, 32-bit guests without
+> > LPAE support compiled in). It seems like a bug that we allow the user
+> > to specify more RAM than will fit into that 32-bit range. We should
+> > instead make QEMU exit with an error if the user tries to specify
+> > both highmem=off and a memory size that's too big to fit.
+>
+> I'm happy to address this if you are OK with the change in user
+> visible behaviour.
+>
+> However, I am still struggling with my original goal, which is to
+> allow QEMU to create a usable KVM_based VM on systems with a small IPA
+> space (36 bits on the system I have). What would an acceptable way to
+> convey this to the code that deals with the virt memory map so that it
+> falls back to something that actually works?
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Hmm, so at the moment we can either do "fits in 32 bits" or
+"assumes at least 40 bits" but not 36 ?
 
+thanks
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
