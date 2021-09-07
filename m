@@ -2,55 +2,58 @@ Return-Path: <SRS0=lhJk=N5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 501C5C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 12:33:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B22D7C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 12:33:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BD9A06108E
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 12:33:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BD9A06108E
+	by mail.kernel.org (Postfix) with ESMTP id 4B8756103E
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 12:33:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4B8756103E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 395C14B1AC;
-	Tue,  7 Sep 2021 08:33:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 005484B20C;
+	Tue,  7 Sep 2021 08:33:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lhDcgP9o2iBH; Tue,  7 Sep 2021 08:33:13 -0400 (EDT)
+	with ESMTP id cnytwok-if3Y; Tue,  7 Sep 2021 08:33:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DE324B20E;
-	Tue,  7 Sep 2021 08:33:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BED4C4B1D5;
+	Tue,  7 Sep 2021 08:33:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 846C54B20E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 08:33:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E09F4B1B0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 08:33:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ssr-8d5mhMf5 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Sep 2021 08:33:11 -0400 (EDT)
+ with ESMTP id xNTDXwdWIT7e for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Sep 2021 08:33:16 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FF524B20C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 08:33:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9CCD4B1D5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 08:33:16 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 67CFE6D;
- Tue,  7 Sep 2021 05:33:10 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1E2CE101E;
+ Tue,  7 Sep 2021 05:33:16 -0700 (PDT)
 Received: from entos-ampere-02.shanghai.arm.com
  (entos-ampere-02.shanghai.arm.com [10.169.214.103])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 31CFC3F766;
- Tue,  7 Sep 2021 05:33:04 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id E60F93F766;
+ Tue,  7 Sep 2021 05:33:10 -0700 (PDT)
 From: Jia He <justin.he@arm.com>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
  Alexandru Elisei <alexandru.elisei@arm.com>,
  Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 0/2] Add memcg accounting to Arm KVM
-Date: Tue,  7 Sep 2021 20:31:10 +0800
-Message-Id: <20210907123112.10232-1-justin.he@arm.com>
+Subject: [PATCH v2 1/2] KVM: arm64: vgic: Add memcg accounting to vgic
+ allocations
+Date: Tue,  7 Sep 2021 20:31:11 +0800
+Message-Id: <20210907123112.10232-2-justin.he@arm.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210907123112.10232-1-justin.he@arm.com>
+References: <20210907123112.10232-1-justin.he@arm.com>
 Cc: Xiaoming Ni <nixiaoming@huawei.com>,
  Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Jia He <justin.he@arm.com>,
  Kees Cook <keescook@chromium.org>, Catalin Marinas <catalin.marinas@arm.com>,
@@ -75,35 +78,144 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Inspired by what had been done by X86 kvm and kvm common codes, it would
-be better to make arm64 kvm consistent with them.
+Inspired by commit 254272ce6505 ("kvm: x86: Add memcg accounting to KVM
+allocations"), it would be better to make arm64 vgic consistent with
+common kvm codes.
 
-The memory allocations of VM scope should be charged into VM process.
-Hence change the allocation flag from GFP_KERNEL to GFP_KERNEL_ACCOUNT.
+The memory allocations of VM scope should be charged into VM process
+cgroup, hence change GFP_KERNEL to GFP_KERNEL_ACCOUNT.
 
-There remain some GFP_KERNEL unchanged since they are global allocations,
-instead of VM scope.
+There remain a few cases since these allocations are global, not in VM
+scope.
 
-Changes:
-v2: address a few comments from Marc Zyngier, including redundant
-    GFP_KERNEL, incorrect memcg accounting and variable type   
-v1: https://lkml.org/lkml/2021/9/2/649
-
-Jia He (2):
-  KVM: arm64: vgic: Add memcg accounting to vgic allocations
-  KVM: arm64: Add memcg accounting to KVM allocations
-
- arch/arm64/kvm/arm.c               |  6 ++++--
- arch/arm64/kvm/mmu.c               |  2 +-
- arch/arm64/kvm/pmu-emul.c          |  2 +-
- arch/arm64/kvm/reset.c             |  2 +-
+Signed-off-by: Jia He <justin.he@arm.com>
+---
  arch/arm64/kvm/vgic/vgic-init.c    |  2 +-
  arch/arm64/kvm/vgic/vgic-irqfd.c   |  2 +-
  arch/arm64/kvm/vgic/vgic-its.c     | 14 +++++++-------
  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  2 +-
  arch/arm64/kvm/vgic/vgic-v4.c      |  2 +-
- 9 files changed, 18 insertions(+), 16 deletions(-)
+ 5 files changed, 11 insertions(+), 11 deletions(-)
 
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 340c51d87677..0a06d0648970 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -134,7 +134,7 @@ static int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+ 	struct kvm_vcpu *vcpu0 = kvm_get_vcpu(kvm, 0);
+ 	int i;
+ 
+-	dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL);
++	dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL_ACCOUNT);
+ 	if (!dist->spis)
+ 		return  -ENOMEM;
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic-irqfd.c b/arch/arm64/kvm/vgic/vgic-irqfd.c
+index 79f8899b234c..475059bacedf 100644
+--- a/arch/arm64/kvm/vgic/vgic-irqfd.c
++++ b/arch/arm64/kvm/vgic/vgic-irqfd.c
+@@ -139,7 +139,7 @@ int kvm_vgic_setup_default_irq_routing(struct kvm *kvm)
+ 	u32 nr = dist->nr_spis;
+ 	int i, ret;
+ 
+-	entries = kcalloc(nr, sizeof(*entries), GFP_KERNEL);
++	entries = kcalloc(nr, sizeof(*entries), GFP_KERNEL_ACCOUNT);
+ 	if (!entries)
+ 		return -ENOMEM;
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 61728c543eb9..b99f47103056 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -48,7 +48,7 @@ static struct vgic_irq *vgic_add_lpi(struct kvm *kvm, u32 intid,
+ 	if (irq)
+ 		return irq;
+ 
+-	irq = kzalloc(sizeof(struct vgic_irq), GFP_KERNEL);
++	irq = kzalloc(sizeof(struct vgic_irq), GFP_KERNEL_ACCOUNT);
+ 	if (!irq)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -332,7 +332,7 @@ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr)
+ 	 * we must be careful not to overrun the array.
+ 	 */
+ 	irq_count = READ_ONCE(dist->lpi_list_count);
+-	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL);
++	intids = kmalloc_array(irq_count, sizeof(intids[0]), GFP_KERNEL_ACCOUNT);
+ 	if (!intids)
+ 		return -ENOMEM;
+ 
+@@ -985,7 +985,7 @@ static int vgic_its_alloc_collection(struct vgic_its *its,
+ 	if (!vgic_its_check_id(its, its->baser_coll_table, coll_id, NULL))
+ 		return E_ITS_MAPC_COLLECTION_OOR;
+ 
+-	collection = kzalloc(sizeof(*collection), GFP_KERNEL);
++	collection = kzalloc(sizeof(*collection), GFP_KERNEL_ACCOUNT);
+ 	if (!collection)
+ 		return -ENOMEM;
+ 
+@@ -1029,7 +1029,7 @@ static struct its_ite *vgic_its_alloc_ite(struct its_device *device,
+ {
+ 	struct its_ite *ite;
+ 
+-	ite = kzalloc(sizeof(*ite), GFP_KERNEL);
++	ite = kzalloc(sizeof(*ite), GFP_KERNEL_ACCOUNT);
+ 	if (!ite)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -1150,7 +1150,7 @@ static struct its_device *vgic_its_alloc_device(struct vgic_its *its,
+ {
+ 	struct its_device *device;
+ 
+-	device = kzalloc(sizeof(*device), GFP_KERNEL);
++	device = kzalloc(sizeof(*device), GFP_KERNEL_ACCOUNT);
+ 	if (!device)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -1847,7 +1847,7 @@ void vgic_lpi_translation_cache_init(struct kvm *kvm)
+ 		struct vgic_translation_cache_entry *cte;
+ 
+ 		/* An allocation failure is not fatal */
+-		cte = kzalloc(sizeof(*cte), GFP_KERNEL);
++		cte = kzalloc(sizeof(*cte), GFP_KERNEL_ACCOUNT);
+ 		if (WARN_ON(!cte))
+ 			break;
+ 
+@@ -1888,7 +1888,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 	if (type != KVM_DEV_TYPE_ARM_VGIC_ITS)
+ 		return -ENODEV;
+ 
+-	its = kzalloc(sizeof(struct vgic_its), GFP_KERNEL);
++	its = kzalloc(sizeof(struct vgic_its), GFP_KERNEL_ACCOUNT);
+ 	if (!its)
+ 		return -ENOMEM;
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index a09cdc0b953c..d3fd8a6c0c9a 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -834,7 +834,7 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
+ 	if (vgic_v3_rdist_overlap(kvm, base, size))
+ 		return -EINVAL;
+ 
+-	rdreg = kzalloc(sizeof(*rdreg), GFP_KERNEL);
++	rdreg = kzalloc(sizeof(*rdreg), GFP_KERNEL_ACCOUNT);
+ 	if (!rdreg)
+ 		return -ENOMEM;
+ 
+diff --git a/arch/arm64/kvm/vgic/vgic-v4.c b/arch/arm64/kvm/vgic/vgic-v4.c
+index c1845d8f5f7e..772dd15a22c7 100644
+--- a/arch/arm64/kvm/vgic/vgic-v4.c
++++ b/arch/arm64/kvm/vgic/vgic-v4.c
+@@ -246,7 +246,7 @@ int vgic_v4_init(struct kvm *kvm)
+ 	nr_vcpus = atomic_read(&kvm->online_vcpus);
+ 
+ 	dist->its_vm.vpes = kcalloc(nr_vcpus, sizeof(*dist->its_vm.vpes),
+-				    GFP_KERNEL);
++				    GFP_KERNEL_ACCOUNT);
+ 	if (!dist->its_vm.vpes)
+ 		return -ENOMEM;
+ 
 -- 
 2.17.1
 
