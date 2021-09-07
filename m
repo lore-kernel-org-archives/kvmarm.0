@@ -2,77 +2,82 @@ Return-Path: <SRS0=lhJk=N5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB85C433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:10:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FAA7C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:10:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BC22661100
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:10:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BC22661100
+	by mail.kernel.org (Postfix) with ESMTP id EA06160E97
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Sep 2021 18:10:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EA06160E97
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ACFB4B1F0;
-	Tue,  7 Sep 2021 14:10:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E2004B1A0;
+	Tue,  7 Sep 2021 14:10:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id J8ryEoKq+bPB; Tue,  7 Sep 2021 14:10:05 -0400 (EDT)
+	with ESMTP id pC7H3Gn6hA-o; Tue,  7 Sep 2021 14:10:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 432A34B0D7;
-	Tue,  7 Sep 2021 14:10:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 632184B10E;
+	Tue,  7 Sep 2021 14:10:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2812C4A19A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:10:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB8C24B10E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:10:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mPQLmqxoFeA5 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Sep 2021 14:10:03 -0400 (EDT)
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
- [209.85.214.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E8574079D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:10:03 -0400 (EDT)
-Received: by mail-pl1-f202.google.com with SMTP id
- l12-20020a170903120c00b00138e2063268so2371284plh.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 11:10:02 -0700 (PDT)
+ with ESMTP id 1y5fI1kztnha for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Sep 2021 14:10:04 -0400 (EDT)
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
+ [209.85.210.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A411B4A19A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 14:10:04 -0400 (EDT)
+Received: by mail-pf1-f202.google.com with SMTP id
+ c7-20020aa788070000b029035630a4b35dso5618880pfo.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 11:10:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=3EL/0cpyqgf5kZhn/yI/Lhs/U8ef49iFyluZ/iCjP80=;
- b=mhBXZVspu3u44w6TnlIsSrX/pVRWzIeWBIqJN19OPCjAKtUCzp9L1+erO/3M5TG5E2
- YsJQFd2dV86my+qU4BDCIHO9Qp0Gyq4JhiQkKCmwOdaB6Ha2Sa8oiZXIRaEjQ7ARhP/O
- uEyob5uMh30dBZLgRsynbm53OdjaGwG5VNUg0KLKoikkbX1QQ4q0QcPg1yJwnfPCE9IE
- vZ4UaiwFk+dkegtlPWVIOIfbF/443npVnmrOsc4PhEsDE+ZLG9SnIRn9RMJxZ3khEyPj
- sGCEJxfNtZtNLVZrBqKoXihL5r6gTkNHrVANo1j712hzk0QYK8wWsAg63OZ3kL0IO/DL
- ylHA==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=G7khVBYFvA49zN1MZ52NeR3EN5XVTugXq2LEuJFRcSA=;
+ b=j5Bz7AXuSg3CFWHBEXnXFwThJ99vfcD2XwHZE92kzgu1zge+KC2SWxZD61KbdFqOcR
+ ASi8mmRYrhCFzIel0syhVI1xrdwW7So4mf0kTjL1ajiGQnzgvjxIz3ogBXSdOKsUfqum
+ zKbDsZ6FD/vBqHeqAltqAEMvaZV3SopNjeyIIvAt6BNbxVjycueIl+y4fPhVT8QdxqeA
+ QaJlxgkul+qDZGk4SgsFv40rGrPwaQuYvNu+dLWZEapdx/c6Kr9a8RMuznpAUviZZfeh
+ 9ahG+mehOIbgso7lxiEuic4NL/jCz2X7BVllvRYwv7JigC0jR1nkpR5OmyvQFFf9VfXz
+ tivw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=3EL/0cpyqgf5kZhn/yI/Lhs/U8ef49iFyluZ/iCjP80=;
- b=R/IpkMBpRlvPIjw7dSL0NNVEA6R50sflAzVVjR+ouCe5VALkxJ6bgE4kl2HIzFvnYM
- oEDWJxWsmkMf7SL9CR4d3hNmeqLJ6tC//mFpU3+S3eHBaNqpskh4UdNBu/3huVCjyVmR
- X2eUMkehdnPz099ekvW8vsR8ZZ/TDYPnSy/dGdzB5jILzak+RcCam5CI+e8WN3T99b2G
- pIeYapWRgTrEwIwxZ8GArTmMf0JGRlyK0QuK4zkAx0D3tRrE0/zmvRFqvi8CAkpo8H4C
- qJMeUFLEc+K0RhUOUQ6fXwJgqTh4b07XAlBWSUenpdJarOzuHOerI4kIVyP5q6DsikIJ
- sLLg==
-X-Gm-Message-State: AOAM531GUiZjXJkRgWsWaSEEcsdkeaY4HGpw2osYMe2W6evXPRW8Mq+c
- nNtdD1WAdkR4VMQKI9dYhoMuR+vW5QE0jw==
-X-Google-Smtp-Source: ABdhPJz/ZY6iRv5Y40MiQYuqg5TkSzsHv35QJyuWITR9HdnZag3X6B7AjX4oAnAHsqIedrszpQ7J/tN3PRlyOw==
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=G7khVBYFvA49zN1MZ52NeR3EN5XVTugXq2LEuJFRcSA=;
+ b=ReJPHIQ7kjuRgTrpkwCLo2lSa8B1vhyoctio3VG6r7DOLPWvGysOp7UDQOP9OQo5ZO
+ 4JNiBIhyCB+BbS2XmnIsmctnt+jYSbpEFJteWB3p0gKXi1pXX5rneGn+zY+jDRgmGiiQ
+ qbJfD6jlX/H9gGtIccYLvy3Kmh1drKkFQWJ3eVitO66yeOdaQ2kzgmBVY/4jZHRjjP/G
+ CXp0+98EgmEQqPjCCOIWyKQfpAx4l7zLuN+ls629ygqrhZuMFStxPb9xbhU7rVEKEtBI
+ gsQtEWoLVm+MXmfukFa1g24Qfzb5RtRwh5/hIrKY0onyQCey+CzAm9YjXhc/Kt0bgkRa
+ DOcA==
+X-Gm-Message-State: AOAM532gH+g5ZzBB0V7i8DQRz000deEwP1KQR6v1VhgzIpCvJ1L9BthH
+ LIDuyjA6iJeTWXHRmJy8xKgOJjvBCkS18Q==
+X-Google-Smtp-Source: ABdhPJzOG5I1fc7cdWS5mntyea5A+bvSpEcgpb5MNPWkd63BQ4U5Q72ws4t4TnVZOwpxXfsKb56ncunp1kc5Vw==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90a:7f04:: with SMTP id
- k4mr112383pjl.0.1631038201805; Tue, 07 Sep 2021 11:10:01 -0700 (PDT)
-Date: Tue,  7 Sep 2021 11:09:55 -0700
-Message-Id: <20210907180957.609966-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a17:902:c613:b0:136:5fc8:5372 with SMTP
+ id r19-20020a170902c61300b001365fc85372mr15873926plr.41.1631038203685; Tue,
+ 07 Sep 2021 11:10:03 -0700 (PDT)
+Date: Tue,  7 Sep 2021 11:09:56 -0700
+In-Reply-To: <20210907180957.609966-1-ricarkol@google.com>
+Message-Id: <20210907180957.609966-2-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20210907180957.609966-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
-Subject: [PATCH v2 0/2] KVM: selftests: enable the memslot tests in ARM64
+Subject: [PATCH v2 1/2] KVM: selftests: make memslot_perf_test arch independent
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: maz@kernel.org, pshier@google.com, Paolo Bonzini <pbonzini@redhat.com>,
@@ -93,24 +98,110 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Enable memslot_modification_stress_test and memslot_perf_test in ARM64
-(second patch). memslot_modification_stress_test builds and runs in
-aarch64 without any modification. memslot_perf_test needs some nits
-regarding ucalls (first patch).
+memslot_perf_test uses ucalls for synchronization between guest and
+host. Ucalls API is architecture independent: tests do not need to know
+details like what kind of exit they generate on a specific arch.  More
+specifically, there is no need to check whether an exit is KVM_EXIT_IO
+in x86 for the host to know that the exit is ucall related, as
+get_ucall() already makes that check.
 
-Can anybody try these two tests in s390, please?
+Change memslot_perf_test to not require specifying what exit does a
+ucall generate. Also add a missing ucall_init.
 
-Changes:
-v2: Makefile tests in the right order (from Andrew).
-
-Ricardo Koller (2):
-  KVM: selftests: make memslot_perf_test arch independent
-  KVM: selftests: build the memslot tests for arm64
-
- tools/testing/selftests/kvm/Makefile          |  2 +
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
  .../testing/selftests/kvm/memslot_perf_test.c | 56 +++++++++++--------
- 2 files changed, 36 insertions(+), 22 deletions(-)
+ 1 file changed, 34 insertions(+), 22 deletions(-)
 
+diff --git a/tools/testing/selftests/kvm/memslot_perf_test.c b/tools/testing/selftests/kvm/memslot_perf_test.c
+index d6e381e01db7..1727f75e0c2c 100644
+--- a/tools/testing/selftests/kvm/memslot_perf_test.c
++++ b/tools/testing/selftests/kvm/memslot_perf_test.c
+@@ -127,43 +127,54 @@ static bool verbose;
+ 			pr_info(__VA_ARGS__);	\
+ 	} while (0)
+ 
++static void check_mmio_access(struct vm_data *vm, struct kvm_run *run)
++{
++	TEST_ASSERT(vm->mmio_ok, "Unexpected mmio exit");
++	TEST_ASSERT(run->mmio.is_write, "Unexpected mmio read");
++	TEST_ASSERT(run->mmio.len == 8,
++		    "Unexpected exit mmio size = %u", run->mmio.len);
++	TEST_ASSERT(run->mmio.phys_addr >= vm->mmio_gpa_min &&
++		    run->mmio.phys_addr <= vm->mmio_gpa_max,
++		    "Unexpected exit mmio address = 0x%llx",
++		    run->mmio.phys_addr);
++}
++
+ static void *vcpu_worker(void *data)
+ {
+ 	struct vm_data *vm = data;
+ 	struct kvm_run *run;
+ 	struct ucall uc;
+-	uint64_t cmd;
+ 
+ 	run = vcpu_state(vm->vm, VCPU_ID);
+ 	while (1) {
+ 		vcpu_run(vm->vm, VCPU_ID);
+ 
+-		if (run->exit_reason == KVM_EXIT_IO) {
+-			cmd = get_ucall(vm->vm, VCPU_ID, &uc);
+-			if (cmd != UCALL_SYNC)
+-				break;
+-
++		switch (get_ucall(vm->vm, VCPU_ID, &uc)) {
++		case UCALL_SYNC:
++			TEST_ASSERT(uc.args[1] == 0,
++				"Unexpected sync ucall, got %lx",
++				(ulong)uc.args[1]);
+ 			sem_post(&vcpu_ready);
+ 			continue;
+-		}
+-
+-		if (run->exit_reason != KVM_EXIT_MMIO)
++		case UCALL_NONE:
++			if (run->exit_reason == KVM_EXIT_MMIO)
++				check_mmio_access(vm, run);
++			else
++				goto done;
+ 			break;
+-
+-		TEST_ASSERT(vm->mmio_ok, "Unexpected mmio exit");
+-		TEST_ASSERT(run->mmio.is_write, "Unexpected mmio read");
+-		TEST_ASSERT(run->mmio.len == 8,
+-			    "Unexpected exit mmio size = %u", run->mmio.len);
+-		TEST_ASSERT(run->mmio.phys_addr >= vm->mmio_gpa_min &&
+-			    run->mmio.phys_addr <= vm->mmio_gpa_max,
+-			    "Unexpected exit mmio address = 0x%llx",
+-			    run->mmio.phys_addr);
++		case UCALL_ABORT:
++			TEST_FAIL("%s at %s:%ld, val = %lu",
++					(const char *)uc.args[0],
++					__FILE__, uc.args[1], uc.args[2]);
++			break;
++		case UCALL_DONE:
++			goto done;
++		default:
++			TEST_FAIL("Unknown ucall %lu", uc.cmd);
++		}
+ 	}
+ 
+-	if (run->exit_reason == KVM_EXIT_IO && cmd == UCALL_ABORT)
+-		TEST_FAIL("%s at %s:%ld, val = %lu", (const char *)uc.args[0],
+-			  __FILE__, uc.args[1], uc.args[2]);
+-
++done:
+ 	return NULL;
+ }
+ 
+@@ -268,6 +279,7 @@ static bool prepare_vm(struct vm_data *data, int nslots, uint64_t *maxslots,
+ 	TEST_ASSERT(data->hva_slots, "malloc() fail");
+ 
+ 	data->vm = vm_create_default(VCPU_ID, mempages, guest_code);
++	ucall_init(data->vm, NULL);
+ 
+ 	pr_info_v("Adding slots 1..%i, each slot with %"PRIu64" pages + %"PRIu64" extra pages last\n",
+ 		max_mem_slots - 1, data->pages_per_slot, rempages);
 -- 
 2.33.0.153.gba50c8fa24-goog
 
