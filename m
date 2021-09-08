@@ -2,65 +2,82 @@ Return-Path: <SRS0=VYoy=N6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA433C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Sep 2021 16:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9877AC433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Sep 2021 21:03:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5907261154
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Sep 2021 16:11:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5907261154
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id F3D976115B
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Sep 2021 21:03:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F3D976115B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCBDA4B0F1;
-	Wed,  8 Sep 2021 12:11:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 717604B091;
+	Wed,  8 Sep 2021 17:03:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Nyg5y8c8VRln; Wed,  8 Sep 2021 12:11:46 -0400 (EDT)
+	with ESMTP id TPF-CWthlR3J; Wed,  8 Sep 2021 17:03:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD874AC80;
-	Wed,  8 Sep 2021 12:11:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6274F4B0ED;
+	Wed,  8 Sep 2021 17:03:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B33C04A524
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 12:11:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 095604B0C2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 17:03:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ymh1CYNs8rzw for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Sep 2021 12:11:44 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63CB8407D1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 12:11:44 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E5AFA1FB;
- Wed,  8 Sep 2021 09:11:43 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8EAD13F766;
- Wed,  8 Sep 2021 09:11:41 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 5/5] configure: Ignore --erratatxt when
- --target=kvmtool
-To: Andrew Jones <drjones@redhat.com>
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-6-alexandru.elisei@arm.com>
- <20210907102536.jhycvnazlmj7qyto@gator>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <f1803e06-3557-c41a-58a1-c479fd5e0b97@arm.com>
-Date: Wed, 8 Sep 2021 17:13:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <20210907102536.jhycvnazlmj7qyto@gator>
-Content-Language: en-US
-Cc: lvivier@redhat.com, linux-s390@vger.kernel.org, thuth@redhat.com,
- frankja@linux.ibm.com, kvm@vger.kernel.org, david@redhat.com,
- andre.przywara@arm.com, cohuck@redhat.com, kvm-ppc@vger.kernel.org,
- vivek.gautam@arm.com, maz@kernel.org, pbonzini@redhat.com,
- imbrenda@linux.ibm.com, kvmarm@lists.cs.columbia.edu
+ with ESMTP id YkMgo9-nkBeq for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Sep 2021 17:03:24 -0400 (EDT)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE7EC4B091
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 17:03:23 -0400 (EDT)
+Received: by mail-pf1-f201.google.com with SMTP id
+ o130-20020a62cd88000000b004053c6c1765so2098664pfg.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Sep 2021 14:03:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=JC16aUwWh6VH1dHIMo/8cnVTyU7yQibp113aKDOygMY=;
+ b=OXtBrVZQuDsj1Xd11yEKs6/hnslMSZ5qwPiSLFnQtXEJzAEZDxdwJ0oylLEAJYnpAY
+ N/uIjCw9BAaW9hztD862iMgGgd2iUeKJm0Io91e8UK+7beow+rrfR7qBsanX5C4OYBkB
+ oxyblXxt0sc1T5zq775Psfnb4LGYHas68I0MtlJwO/tXadr+oh0mmJV5uJVzqpVCC1wg
+ 6vtkOxb0K71cdgMcQ7CEjZzB7i77/VeUued+2jJ5yLu+5jwm1nOq4Xmy3QX8Kgaj3Kkk
+ Ib6Jrsz/EkXMWQPxU0zFo3452qgS0gBFH1G8cG7+oNkg4JSxllrFBy1EHWljpHeD/2Bj
+ dQRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=JC16aUwWh6VH1dHIMo/8cnVTyU7yQibp113aKDOygMY=;
+ b=tfLbxW7RSEK2oEOWVKDgbu55K0tn4HfgU6+7kD5jctBcZFL49CufmxPeVe9fOBPvcW
+ rdL7q4FzSt9oI+zHHMCP/VLEgGCRyj/DqahvBgzNEqiq5kiltI2puuk8jjuhOR/7tBLQ
+ Sd62WugY+z9JTTumoqyoUq9TTl94LKk+BKlzfWrT07KVrVhmiOkQb3Eh1UUPJkdrW7PZ
+ tTXX4AAtJu517ZunGU1Js+OSo1A1OZAalC3N+QGDiXBE5QkOw60bDHreiNI6AhmLlDaA
+ Ck4S2Kf5WCV+rTyr8aI9O3Cy2IgiToFw/U6tjYD+UFg1mRdtABXpxP64ZZRrba26/S5W
+ 7SFA==
+X-Gm-Message-State: AOAM532tURiymhY9eiuDu6CYgUMrp1DYWPk1nLQ0S8PExXSXZlP6fCbK
+ VyUb3g12U5lAvtO+oWR5Aa2EuSg5ZjviAw==
+X-Google-Smtp-Source: ABdhPJzla16tMBCgG9E0q1xwBqSq8LzrlZo3pCb2r/5jjfDudDDoT/FtwgmHXvdHMdSKQAJYM1AtIxoy9XZR+w==
+X-Received: from ricarkol2.c.googlers.com
+ ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a17:90b:1e02:: with SMTP id
+ pg2mr6190361pjb.35.1631135002966; Wed, 08 Sep 2021 14:03:22 -0700 (PDT)
+Date: Wed,  8 Sep 2021 14:03:18 -0700
+Message-Id: <20210908210320.1182303-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
+Subject: [PATCH 0/2] KVM: arm64: vgic-v3: Missing check for redist region
+ above the VM IPA size
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu, 
+ drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
+Cc: pshier@google.com, Paolo Bonzini <pbonzini@redhat.com>, shuah@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,112 +94,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
+KVM doesn't check for redist regions that extend partially above the
+VM-specified IPA (phys_size).  This can happen when using the
+KVM_VGIC_V3_ADDR_TYPE_REDIST attribute to set a new region that extends
+partially above phys_size (with the base below phys_size).  The issue is that
+vcpus can potentially run into a situation where some redistributors are
+addressable and others are not.
 
-On 9/7/21 11:25 AM, Andrew Jones wrote:
-> On Fri, Jul 02, 2021 at 05:31:22PM +0100, Alexandru Elisei wrote:
->> kvmtool runs a test using the -f/--firmware argument, which doesn't load an
->> initrd, making specifying an errata file useless. Instead, configure forces
->> all erratas to be enabled via the CONFIG_ERRATA_FORCE define in
->> lib/config.h.
->>
->> Forbid the --erratatxt option when kvm-unit-tests is configured for kvmtool
->> and let the user know that all erratas are enabled by default.
->>
->> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->> ---
->> I'm not sure if printing an error is too strong here and a simple warning would
->> suffice. Suggestions welcome!
->>
->>  configure | 26 +++++++++++++++++++-------
->>  1 file changed, 19 insertions(+), 7 deletions(-)
->>
->> diff --git a/configure b/configure
->> index 395c809c9c02..acd288239f80 100755
->> --- a/configure
->> +++ b/configure
->> @@ -24,7 +24,8 @@ u32_long=
->>  wa_divide=
->>  target=
->>  errata_force=0
->> -erratatxt="$srcdir/errata.txt"
->> +erratatxt_default="$srcdir/errata.txt"
->> +erratatxt="_NO_FILE_4Uhere_"
->>  host_key_document=
->>  page_size=
->>  earlycon=
->> @@ -50,7 +51,8 @@ usage() {
->>  	                           enable or disable the generation of a default environ when
->>  	                           no environ is provided by the user (enabled by default)
->>  	    --erratatxt=FILE       specify a file to use instead of errata.txt. Use
->> -	                           '--erratatxt=' to ensure no file is used.
->> +	                           '--erratatxt=' to ensure no file is used. This option is
->> +	                           invalid for arm/arm64 when target=kvmtool.
-> Do we need to always specifiy arm/arm64 when talking about target=kvmtool?
-> How much more effort would an x86 kvmtool target be to add?
+Patch 1 adds the missing check, and patch 2 adds a test into aarch64/vgic_init.
 
-Err.. there haven't been any commits to the x86 code, other than those caused by
-refactoring in the other parts of the code, since 2015.
+Ricardo Koller (2):
+  KVM: arm64: vgic: check redist region is not above the VM IPA size
+  KVM: arm64: selftests: test for vgic redist above the VM IPA size
 
-Ballpark estimate, it's going to be very hard even to make 50% of the tests run on
-kvmtool. I think adding adding --target=uefi is much more likely to happen for x86
-than --target=kvmtool.
+ arch/arm64/kvm/vgic/vgic-v3.c                 |  4 ++
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 44 +++++++++++++++++++
+ 2 files changed, 48 insertions(+)
 
->
->>  	    --host-key-document=HOST_KEY_DOCUMENT
->>  	                           Specify the machine-specific host-key document for creating
->>  	                           a PVM image with 'genprotimg' (s390x only)
->> @@ -147,11 +149,6 @@ if [ -n "$host_key_document" ] && [ ! -f "$host_key_document" ]; then
->>      exit 1
->>  fi
->>  
->> -if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
->> -    echo "erratatxt: $erratatxt does not exist or is not a regular file"
->> -    exit 1
->> -fi
->> -
->>  arch_name=$arch
->>  [ "$arch" = "aarch64" ] && arch="arm64"
->>  [ "$arch_name" = "arm64" ] && arch_name="aarch64"
->> @@ -184,6 +181,21 @@ else
->>      fi
->>  fi
->>  
->> +if [ "$target" = "kvmtool" ]; then
->> +    if [ "$erratatxt" ] && [ "$erratatxt" != "_NO_FILE_4Uhere_" ]; then
->> +        echo "--erratatxt is not supported for target=kvmtool (all erratas enabled by default)"
->> +        usage
->> +    fi
->> +else
->> +    if [ "$erratatxt" = "_NO_FILE_4Uhere_" ]; then
->> +        erratatxt=$erratatxt_default
->> +    fi
->> +    if [ "$erratatxt" ] && [ ! -f "$erratatxt" ]; then
->> +        echo "erratatxt: $erratatxt does not exist or is not a regular file"
->> +        exit 1
->> +    fi
->> +fi
-> switch
+-- 
+2.33.0.153.gba50c8fa24-goog
 
-Sure.
-
-Thanks,
-
-Alex
-
->
->> +
->>  [ -z "$processor" ] && processor="$arch"
->>  
->>  if [ "$processor" = "arm64" ]; then
->> -- 
->> 2.32.0
->>
-> Otherwise looks good to me.
->
-> Thanks,
-> drew 
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
