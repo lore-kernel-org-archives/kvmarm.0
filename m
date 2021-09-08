@@ -2,90 +2,111 @@ Return-Path: <SRS0=VYoy=N6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2006C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Sep 2021 01:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F87C4332F
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Sep 2021 07:16:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 08AAB6113E
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Sep 2021 01:21:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 08AAB6113E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id C0E4E61165
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Sep 2021 07:16:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C0E4E61165
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C8FE4B0D6;
-	Tue,  7 Sep 2021 21:21:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B1424B0ED;
+	Wed,  8 Sep 2021 03:16:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MOhxcneRueye; Tue,  7 Sep 2021 21:21:56 -0400 (EDT)
+	with ESMTP id GWAObcTq1XMz; Wed,  8 Sep 2021 03:16:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 847BF4B099;
-	Tue,  7 Sep 2021 21:21:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DBAA4B0BD;
+	Wed,  8 Sep 2021 03:16:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 140144B099
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 21:21:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC7844B08E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 03:16:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MBc38wMhpH6U for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Sep 2021 21:21:54 -0400 (EDT)
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com
- [209.85.208.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 016EF4A3A5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Sep 2021 21:21:53 -0400 (EDT)
-Received: by mail-lj1-f179.google.com with SMTP id s3so652866ljp.11
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Sep 2021 18:21:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=KeNC+xKtdDu6RTTBHmLc6/GMNcuVkbNM9xz7wbPcFt0=;
- b=C6PQPdgaqWvNpRQJzk5mjGikGCmfGfZG6rs53tEoPAr3c11GXY1RIpPL0qf6HG9P/q
- buUN59vo7ouy1QSmlby8yYm1wVmLwMwpc1iVPBhRRbnPvV0yJw5yxAIE+y3FaQUUj6m6
- jtnD2rlG0gohDBQoliNzFByxIk8SASTAWndDbDhzyqVcVMaVS1fcQEeSrQQ+On5tk+t7
- TFzlKpyVYDZg+krdIr/p9gjuQ56GYB8DyajIIcfPrdBMQhQaM7srg46y+/qN5qzhBxLW
- l3X5zWdH3fOA4/uIid1YC0k13YVW7Ce5EwvKIDLzcGWvocmo7GGtO4/R2Nqi2DAYHUn8
- PfIw==
+ with ESMTP id lBY-CyiH4ttR for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Sep 2021 03:16:32 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACF1F4B08B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 03:16:32 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1631085392;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nbJO5IEe+xQ4o2hyduhVSdtU4KYDyRNeaf2n3UHUb4k=;
+ b=WJE6S6dv5sCQoh/0Sd0kbD9Vd3wODjbSMpUBup5PE5aE4RUxkluK9ecSkxf1m6T1h+yJwm
+ FP1h4vhSSqxHSbkWBWuIfdVyVvwPLhJ7/F9wlZdzgz/7boRSeOh2NuwG3+mnDqZkJqkpsG
+ bN4BU89/Mg3jHQAQi8bRXnOy6/zuJz4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-453-0T3Y5J-2O9e2nDgyqFtp-Q-1; Wed, 08 Sep 2021 03:16:31 -0400
+X-MC-Unique: 0T3Y5J-2O9e2nDgyqFtp-Q-1
+Received: by mail-wm1-f69.google.com with SMTP id
+ n17-20020a7bc5d1000000b002f8ca8bacdeso508895wmk.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Sep 2021 00:16:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=KeNC+xKtdDu6RTTBHmLc6/GMNcuVkbNM9xz7wbPcFt0=;
- b=CEniNHT92FrqniDjz6Ye8bQ/u31PFWsCIi3bIlMmOlCyGUrFPsMPCyNM4qnyxVD0J+
- BsBCp3NIwZ/3+4xfDAj+jbTZtPWJ/Ha9S++6G0CoJyUsaTAij1w5SH1gyCOsju1/pk8+
- vXeEg3vIeCbFO0Gmsc8HYFT6XCfdlItQpAmRDJnODrXLHSbYSKudBVOiRoHS0egYz6g9
- 6QZk68u+yS4IbwTLsQ914O1B6HRITxTqh1RMJ57b3cyikzwcOi6NV22Agjl0aGdwnND3
- Nauk4tmHDMGwiZk+bWyfBGjJ05QNRNEkJrBGVqv++TL5XJP7bvXn3w0BgxCFenWWIksQ
- 1dvQ==
-X-Gm-Message-State: AOAM5305V2ipCCiAudt/MmRDWaB+s7VbRdaCXPLQp2Fi17d5t5sY42ms
- gyy5NPviqdUlMXXflUJK+xwp/P711yFrBfr/fmFfEw==
-X-Google-Smtp-Source: ABdhPJxmk5JpnPt/l3GLD8X4Z8zmvHTEhjebR5aPXNGM2ng2gIkRYC0aVcx89Tzi5a7HpVOXBJqnUniHbq1Mb2Oqxyc=
-X-Received: by 2002:a2e:a0c8:: with SMTP id f8mr790291ljm.170.1631064112393;
- Tue, 07 Sep 2021 18:21:52 -0700 (PDT)
+ h=x-gm-message-state:reply-to:subject:to:cc:references:from
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-transfer-encoding:content-language;
+ bh=nbJO5IEe+xQ4o2hyduhVSdtU4KYDyRNeaf2n3UHUb4k=;
+ b=XFFS9tfN3GKdMpHGYMJQlffGvX9a4KGV/amo1wHLnuoRP5hmRAQXjRbwzw88fnnUjv
+ Ewmg03sp7HDrF0Q07RSjhcn2eP2XTHWd/rbzw5siWp5H/P2kuaMT+8TDcbNoOCSeeltH
+ mTwdgWVww9Kd2b1FaHeTy5fQHOeaRKfXfIYgkQRu9KPzSQ7vdwv690eK/jp2dHeKE3JM
+ +3jEcfwKgdv6Bow9o+cHZaVOOaFE5IH95B/ObqFeIGu2/Atr9NAXzqSbrFRDn65b8cDx
+ vcT/pfXN0fWwgOWUVFnwTsCmkm/rG/tMlU68YEJwcRB/tuKvYPHK90nqcHeP4O8XCVGV
+ ac6A==
+X-Gm-Message-State: AOAM533RVHH8lX1qDCnkHKrfvKNjny5h/S0D2GelkzVUYfqmlUGWylfy
+ eZfSsTZhBkioboPeXjLHZ72f+E+orzu6ICEkNXx77kawgDKz4X3m9TjLGHCPSgeOPyQrgzxw+IJ
+ 9jOKbAOaHf7yOXKsCIOIeg8S4
+X-Received: by 2002:adf:fb91:: with SMTP id a17mr2181595wrr.376.1631085390000; 
+ Wed, 08 Sep 2021 00:16:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzPKtJXLjpkkYJc6hfE/GBP0ZcfENgsVgOUyZszAz9xpVvta2M+XQswK/zCwzROecZ4lKdbxg==
+X-Received: by 2002:adf:fb91:: with SMTP id a17mr2181580wrr.376.1631085389806; 
+ Wed, 08 Sep 2021 00:16:29 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id c3sm1259790wrd.34.2021.09.08.00.16.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 08 Sep 2021 00:16:29 -0700 (PDT)
+Subject: Re: [PATCH 2/3] hw/arm/virt: Honor highmem setting when computing
+ highest_gpa
+To: Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <maz@kernel.org>
+References: <20210822144441.1290891-1-maz@kernel.org>
+ <20210822144441.1290891-3-maz@kernel.org>
+ <CAFEAcA9=SJd52ZEQb0gyW+2q9md4KMnLy8YsME-Mkd-AbvV41Q@mail.gmail.com>
+From: Eric Auger <eric.auger@redhat.com>
+Message-ID: <8a927165-e45d-07c9-a6d6-b32303195523@redhat.com>
+Date: Wed, 8 Sep 2021 09:16:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-References: <20210907123112.10232-1-justin.he@arm.com>
- <20210907123112.10232-2-justin.he@arm.com>
-In-Reply-To: <20210907123112.10232-2-justin.he@arm.com>
-From: Oliver Upton <oupton@google.com>
-Date: Tue, 7 Sep 2021 20:21:40 -0500
-Message-ID: <CAOQ_QshwO2AtzKTNZJ1FXWTuvdvnxnLQxej1UpLAqVrJC_oCgw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: vgic: Add memcg accounting to vgic
- allocations
-To: Jia He <justin.he@arm.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>,
- Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Kees Cook <keescook@chromium.org>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, linux-kernel@vger.kernel.org,
- Liu Shixin <liushixin2@huawei.com>, Sami Tolvanen <samitolvanen@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Xiaoming Ni <nixiaoming@huawei.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <CAFEAcA9=SJd52ZEQb0gyW+2q9md4KMnLy8YsME-Mkd-AbvV41Q@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: Android Kernel Team <kernel-team@android.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>,
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -99,29 +120,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 7, 2021 at 7:33 AM Jia He <justin.he@arm.com> wrote:
+Hi
+On 9/7/21 2:58 PM, Peter Maydell wrote:
+> On Sun, 22 Aug 2021 at 15:45, Marc Zyngier <maz@kernel.org> wrote:
+>> Even when the VM is configured with highmem=off, the highest_gpa
+>> field includes devices that are above the 4GiB limit, which is
+>> what highmem=off is supposed to enforce. This leads to failures
+>> in virt_kvm_type() on systems that have a crippled IPA range,
+>> as the reported IPA space is larger than what it should be.
+>>
+>> Instead, honor the user-specified limit to only use the devices
+>> at the lowest end of the spectrum.
+>>
+>> Note that this doesn't affect memory, which is still allowed to
+>> go beyond 4GiB with highmem=on configurations.
+>>
+>> Cc: Andrew Jones <drjones@redhat.com>
+>> Cc: Eric Auger <eric.auger@redhat.com>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  hw/arm/virt.c | 10 +++++++---
+>>  1 file changed, 7 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>> index 81eda46b0b..bc189e30b8 100644
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+>> @@ -1598,7 +1598,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>>  static void virt_set_memmap(VirtMachineState *vms)
+>>  {
+>>      MachineState *ms = MACHINE(vms);
+>> -    hwaddr base, device_memory_base, device_memory_size;
+>> +    hwaddr base, device_memory_base, device_memory_size, ceiling;
+>>      int i;
+>>
+>>      vms->memmap = extended_memmap;
+>> @@ -1625,7 +1625,7 @@ static void virt_set_memmap(VirtMachineState *vms)
+>>      device_memory_size = ms->maxram_size - ms->ram_size + ms->ram_slots * GiB;
+>>
+>>      /* Base address of the high IO region */
+>> -    base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+>> +    ceiling = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+>>      if (base < device_memory_base) {
+>>          error_report("maxmem/slots too huge");
+>>          exit(EXIT_FAILURE);
+>> @@ -1642,7 +1642,11 @@ static void virt_set_memmap(VirtMachineState *vms)
+>>          vms->memmap[i].size = size;
+>>          base += size;
+>>      }
+>> -    vms->highest_gpa = base - 1;
+>> +    if (vms->highmem) {
+>> +           /* If we have highmem, move the IPA limit to the top */
+>> +           ceiling = base;
+>> +    }
+>> +    vms->highest_gpa = ceiling - 1;
+> This doesn't look right to me. If highmem is false and the
+> high IO region would be above the 4GB mark then we should not
+> create the high IO region at all, surely? This code looks like
+> it goes ahead and puts the high IO region above 4GB and then
+> lies in the highest_gpa value about what the highest used GPA is.
 >
-> Inspired by commit 254272ce6505 ("kvm: x86: Add memcg accounting to KVM
-> allocations"), it would be better to make arm64 vgic consistent with
-> common kvm codes.
+> -- PMM
 >
-> The memory allocations of VM scope should be charged into VM process
-> cgroup, hence change GFP_KERNEL to GFP_KERNEL_ACCOUNT.
->
-> There remain a few cases since these allocations are global, not in VM
-> scope.
->
-> Signed-off-by: Jia He <justin.he@arm.com>
-> ---
->  arch/arm64/kvm/vgic/vgic-init.c    |  2 +-
->  arch/arm64/kvm/vgic/vgic-irqfd.c   |  2 +-
->  arch/arm64/kvm/vgic/vgic-its.c     | 14 +++++++-------
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c |  2 +-
->  arch/arm64/kvm/vgic/vgic-v4.c      |  2 +-
->  5 files changed, 11 insertions(+), 11 deletions(-)
->
+Doesn't the problem come from "if maxram_size is < 255GiB we keep the
+legacy memory map" and set base = vms->memmap[VIRT_MEM].base +
+LEGACY_RAMLIMIT_BYTES; leading to IO regions allocated above?
+Instead shouldn't we condition this to highmem=on only then?
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+But by the way do we need to added extended_memmap IO regions at all if
+highmem=off?
+I am not wrong the VIRT_HIGH_PCIE_ECAM and VIRT_HIGH_PCIE_MMIO only are
+used if highmem=on. In create_pcie(), base_mmio_high/size_mmio_high are
+used if vms->highmem and we have ecam_id =
+VIRT_ECAM_ID(vms->highmem_ecam); with vms->highmem_ecam &= vms->highmem
+&& (!firmware_loaded || aarch64);
+
+So if I do not miss anything maybe we could skip the allocation of the
+extended_memmap IO regions if highmem=off?
+
+And doesn't it look reasonable to limit the number of vcpus if highmem=off?
+
+Thanks
+
+Eric
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
