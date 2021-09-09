@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10082C433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 01:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 292C4C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 01:39:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BAC5761166
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 01:39:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BAC5761166
+	by mail.kernel.org (Postfix) with ESMTP id D50CF6113E
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 01:39:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D50CF6113E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70E234B105;
-	Wed,  8 Sep 2021 21:39:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8834C4AC80;
+	Wed,  8 Sep 2021 21:39:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jpEdzF5gTRLX; Wed,  8 Sep 2021 21:39:05 -0400 (EDT)
+	with ESMTP id Vbgx4FTdlbJm; Wed,  8 Sep 2021 21:39:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A64F4B152;
-	Wed,  8 Sep 2021 21:39:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6453B4B0C5;
+	Wed,  8 Sep 2021 21:39:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D41A4A500
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 21:39:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D48304029C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 21:39:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nWXyvP34OSbg for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Sep 2021 21:39:02 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CED5C4B091
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 21:39:02 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id
- u1-20020a25ab01000000b0059949024617so376676ybi.17
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Sep 2021 18:39:02 -0700 (PDT)
+ with ESMTP id 8QE0FfApZp8D for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Sep 2021 21:39:06 -0400 (EDT)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C0BF24B0C5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 21:39:05 -0400 (EDT)
+Received: by mail-pj1-f73.google.com with SMTP id
+ mm23-20020a17090b359700b00185945eae0eso301494pjb.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Sep 2021 18:39:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=4OIc2sSKc5PiPc2xTSosx0KfrjbnKTlWe//IPTDuYu4=;
- b=icCH1PAZUBFK2QTRdnVCwUZk++tC3+Z/TKIBuCVxZtlGzQ97I3F4gyGsHngVphVsI9
- o4r6WjEUk26x3P3ydmjoLIRILK7iOi1YHJSCE1vbkZnAAceei8hCkoh5A+yKEbwhyRVO
- demvx+RcQSAcrO5eElDdTV7+nbYP3Ph+UD/gYB/WeKQzh2hK7IRtusYsumIPJ4zRszU9
- w+Gw37Pzhkibz+KSrFMugXzTaWpDYxIXLaOEYQzuIXpMJMlQkEDNeWOHM8U7IW0j5Hiz
- tVBy66xElaMw5oKiEHab7SRt4rSnZF4o3T2vZ3aGQ+rOBBUnJ28nPdRS/dl4qz3fuoH4
- fiYw==
+ :cc; bh=fhJBhdTI7Fph8U8UIbebfbsbJEo/+U9ZAKdtVVmT0OQ=;
+ b=rP8SFpJgPxh5O3rCo7DlGcKTQcyeoV5/8Amp4gBI8kJiTtJgE1jEuvY/WmpuCQuFdw
+ Ol5TEtCV7UxcmNrgAiMoi3ZMFJ1fOL13rECQ6SDHrCnAeHftRvScWKwQtdAh/m1WnwBM
+ AwAxJjd4jVZyvg9I3pCCNJufENKS7X9OPjXgh/rNbDIhZ/1NRb7Pb0dZtZL3x0FIoTZw
+ WWe9GS21MN2Co959shkpEpn3GO2WxfKW9VfGk06hr770AF+kqaBAsT4Mag16JXd3a5tB
+ tOxYrzOzi7UY+KbUpcEPORumjkWyN7gqFlEMSY+ox4pDYJlSUGlLD8U5xqmXzHYzI9mR
+ 9Khg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=4OIc2sSKc5PiPc2xTSosx0KfrjbnKTlWe//IPTDuYu4=;
- b=lCXoTIqa/kNUunZkbObWd52MMibjF7GNWuS1axftq92/KrjqnFBRjB4RGMxCCayURt
- slb8PbFF8w0dgrUhpcqdkGGiGBFQKHsTmeRW0bybSIQgfrq4QYeW3m0ebuQrkdnQL1hw
- 9+cXiYZtq299WK6yXNJtS7bnE1mghbzwSMg7IzWpslYqEPhCpoki0N0/rrhQFQ+ZswLy
- WDvJe4+hcCOrZ4MKR77ggYM4yhCa+PjKNmsUd/+ZRljzbmDVgZrkWb4NieOSNw7KAJ08
- Cy8AAaZzqiQfLbwxGbSVCSe+Vfsyr66r0QFZD+4sw+hLC+6yrU2HndsUztNd9lOMSq7+
- UNOA==
-X-Gm-Message-State: AOAM533J8gUW4GTf4xwwxzqhmd6ZNzJlwIDVVbicJvzZ3+BUtHpBGqww
- twQuWfABiKKcAgEgB6+CewQXsYZ3BDJH
-X-Google-Smtp-Source: ABdhPJzV7/nQ7w8OHl4rXBpv1VGAeMX7mcXIRC/vkEWV39vJHcqhs3IbBsVcXu/0kz+YtVcN0eg7d/mHOnYG
+ bh=fhJBhdTI7Fph8U8UIbebfbsbJEo/+U9ZAKdtVVmT0OQ=;
+ b=0k9Dck3Vli4coQOt6OVWuaha+Rbnui5vsqwz95FRx2Zv161+pxOl7MXrqeum1xKDNL
+ TSVdwZ8F5YNhDICbn9lE+9Ya41kKTmPko+fqK3hkSgrlN8UC0nDG0AjBFJ9MdlTUtNhi
+ spp9HFTmaEEnWvKSGmu/ob5lk9ZBlrEuUupP7UTrljIr9+fmVdNxC8p/cvLPJ+qLAwgv
+ 18z/aW95lFR5lmFrAqZYtsw/rCf9auIpJgGznMiVPvgqwvXLRHHzIh8uLNjRKLrU7tG6
+ +38iUdcX20S/zWqO4kyXO7mcnJYLUrJmdRzZg0uRVbydV+d+55ULhGbnLSg3vo/MxIbO
+ UPFA==
+X-Gm-Message-State: AOAM5320k6XqOQ484h+cgwS5s72I0MXaxUb3fhYsFqDFoFT0YwzYUhEi
+ 9jXutcu5+8vl0OkCAfyBSjBRZ/ruNQDd
+X-Google-Smtp-Source: ABdhPJy1lNBcGsIrqRNLwlUOtJjNJsPjnKdPd3b+kR3weBs5ZRkHHcD0ZUb/rO+VqjVCBrvKm12LfqSuKHJa
 X-Received: from rananta-virt.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a25:c6c1:: with SMTP id
- k184mr521559ybf.277.1631151542393; Wed, 08 Sep 2021 18:39:02 -0700 (PDT)
-Date: Thu,  9 Sep 2021 01:38:16 +0000
+ (user=rananta job=sendgmr) by 2002:a17:90b:fd7:: with SMTP id
+ gd23mr51155pjb.1.1631151544636; Wed, 08 Sep 2021 18:39:04 -0700 (PDT)
+Date: Thu,  9 Sep 2021 01:38:17 +0000
 In-Reply-To: <20210909013818.1191270-1-rananta@google.com>
-Message-Id: <20210909013818.1191270-17-rananta@google.com>
+Message-Id: <20210909013818.1191270-18-rananta@google.com>
 Mime-Version: 1.0
 References: <20210909013818.1191270-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
-Subject: [PATCH v4 16/18] KVM: arm64: selftests: arch_timer: Support vCPU
- migration
+Subject: [PATCH v4 17/18] KVM: arm64: selftests: Replace ARM64_SYS_REG with
+ ARM64_SYS_KVM_REG
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Andrew Jones <drjones@redhat.com>, James Morse <james.morse@arm.com>, 
@@ -102,233 +102,109 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since the timer stack (hardware and KVM) is per-CPU, there
-are potential chances for races to occur when the scheduler
-decides to migrate a vCPU thread to a different physical CPU.
-Hence, include an option to stress-test this part as well by
-forcing the vCPUs to migrate across physical CPUs in the
-system at a particular rate.
-
-Originally, the bug for the fix with commit 3134cc8beb69d0d
-("KVM: arm64: vgic: Resample HW pending state on deactivation")
-was discovered using arch_timer test with vCPU migrations and
-can be easily reproduced.
+With the introduction of ARM64_SYS_KVM_REG, that takes the
+system register encodings from sysreg.h directly, replace
+all the users of ARM64_SYS_REG, relyiing on the encodings
+created in processor.h, with ARM64_SYS_KVM_REG.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- .../selftests/kvm/aarch64/arch_timer.c        | 113 +++++++++++++++++-
- 1 file changed, 112 insertions(+), 1 deletion(-)
+ .../selftests/kvm/aarch64/debug-exceptions.c     |  2 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c     |  3 ++-
+ .../selftests/kvm/include/aarch64/processor.h    | 10 ----------
+ .../selftests/kvm/lib/aarch64/processor.c        | 16 ++++++++--------
+ 4 files changed, 11 insertions(+), 20 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 6141c387e6dc..aac7bcea4352 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -14,6 +14,8 @@
-  *
-  * The test provides command-line options to configure the timer's
-  * period (-p), number of vCPUs (-n), and iterations per stage (-i).
-+ * To stress-test the timer stack even more, an option to migrate the
-+ * vCPUs across pCPUs (-m), at a particular rate, is also provided.
-  *
-  * Copyright (c) 2021, Google LLC.
-  */
-@@ -24,6 +26,8 @@
- #include <pthread.h>
- #include <linux/kvm.h>
- #include <linux/sizes.h>
-+#include <linux/bitmap.h>
-+#include <sys/sysinfo.h>
- 
- #include "kvm_util.h"
- #include "processor.h"
-@@ -36,17 +40,20 @@
- #define NR_TEST_ITERS_DEF		5
- #define TIMER_TEST_PERIOD_MS_DEF	10
- #define TIMER_TEST_ERR_MARGIN_US	100
-+#define TIMER_TEST_MIGRATION_FREQ_MS	2
- 
- struct test_args {
- 	int nr_vcpus;
- 	int nr_iter;
- 	int timer_period_ms;
-+	int migration_freq_ms;
- };
- 
- static struct test_args test_args = {
- 	.nr_vcpus = NR_VCPUS_DEF,
- 	.nr_iter = NR_TEST_ITERS_DEF,
- 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
-+	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
- };
- 
- #define msecs_to_usecs(msec)		((msec) * 1000LL)
-@@ -81,6 +88,9 @@ struct test_vcpu {
- static struct test_vcpu test_vcpu[KVM_MAX_VCPUS];
- static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
- 
-+static unsigned long *vcpu_done_map;
-+static pthread_mutex_t vcpu_done_map_lock;
-+
- static void
- guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
+diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+index 11fd23e21cb4..b28b311f4dd7 100644
+--- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
++++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+@@ -190,7 +190,7 @@ static int debug_version(struct kvm_vm *vm)
  {
-@@ -216,6 +226,11 @@ static void *test_vcpu_run(void *arg)
+ 	uint64_t id_aa64dfr0;
  
- 	vcpu_run(vm, vcpuid);
- 
-+	/* Currently, any exit from guest is an indication of completion */
-+	pthread_mutex_lock(&vcpu_done_map_lock);
-+	set_bit(vcpuid, vcpu_done_map);
-+	pthread_mutex_unlock(&vcpu_done_map_lock);
-+
- 	switch (get_ucall(vm, vcpuid, &uc)) {
- 	case UCALL_SYNC:
- 	case UCALL_DONE:
-@@ -234,9 +249,76 @@ static void *test_vcpu_run(void *arg)
- 	return NULL;
+-	get_reg(vm, VCPU_ID, ARM64_SYS_REG(ID_AA64DFR0_EL1), &id_aa64dfr0);
++	get_reg(vm, VCPU_ID, ARM64_SYS_KVM_REG(SYS_ID_AA64DFR0_EL1), &id_aa64dfr0);
+ 	return id_aa64dfr0 & 0xf;
  }
  
-+static uint32_t test_get_pcpu(void)
-+{
-+	uint32_t pcpu;
-+	unsigned int nproc_conf;
-+	cpu_set_t online_cpuset;
-+
-+	nproc_conf = get_nprocs_conf();
-+	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
-+
-+	/* Randomly find an available pCPU to place a vCPU on */
-+	do {
-+		pcpu = rand() % nproc_conf;
-+	} while (!CPU_ISSET(pcpu, &online_cpuset));
-+
-+	return pcpu;
-+}
-+static int test_migrate_vcpu(struct test_vcpu *vcpu)
-+{
-+	int ret;
-+	cpu_set_t cpuset;
-+	uint32_t new_pcpu = test_get_pcpu();
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(new_pcpu, &cpuset);
-+
-+	pr_debug("Migrating vCPU: %u to pCPU: %u\n", vcpu->vcpuid, new_pcpu);
-+
-+	ret = pthread_setaffinity_np(vcpu->pt_vcpu_run,
-+					sizeof(cpuset), &cpuset);
-+
-+	/* Allow the error where the vCPU thread is already finished */
-+	TEST_ASSERT(ret == 0 || ret == ESRCH,
-+			"Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n",
-+			vcpu->vcpuid, new_pcpu, ret);
-+
-+	return ret;
-+}
-+static void *test_vcpu_migration(void *arg)
-+{
-+	unsigned int i, n_done;
-+	bool vcpu_done;
-+
-+	do {
-+		usleep(msecs_to_usecs(test_args.migration_freq_ms));
-+
-+		for (n_done = 0, i = 0; i < test_args.nr_vcpus; i++) {
-+			pthread_mutex_lock(&vcpu_done_map_lock);
-+			vcpu_done = test_bit(i, vcpu_done_map);
-+			pthread_mutex_unlock(&vcpu_done_map_lock);
-+
-+			if (vcpu_done) {
-+				n_done++;
-+				continue;
-+			}
-+
-+			test_migrate_vcpu(&test_vcpu[i]);
-+		}
-+	} while (test_args.nr_vcpus != n_done);
-+
-+	return NULL;
-+}
-+
- static void test_run(struct kvm_vm *vm)
- {
- 	int i, ret;
-+	pthread_t pt_vcpu_migration;
-+
-+	pthread_mutex_init(&vcpu_done_map_lock, NULL);
-+	vcpu_done_map = bitmap_alloc(test_args.nr_vcpus);
-+	TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n");
+diff --git a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+index 018c269990e1..4c8aa7b8a65d 100644
+--- a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
++++ b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
+@@ -91,7 +91,8 @@ int main(void)
+ 	init.features[0] |= (1 << KVM_ARM_VCPU_POWER_OFF);
+ 	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
  
- 	for (i = 0; i < test_args.nr_vcpus; i++) {
- 		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
-@@ -244,8 +326,23 @@ static void test_run(struct kvm_vm *vm)
- 		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
- 	}
+-	get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
++	get_reg(vm, VCPU_ID_TARGET,
++		ARM64_SYS_KVM_REG(SYS_MPIDR_EL1), &target_mpidr);
+ 	vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
+ 	vcpu_run(vm, VCPU_ID_SOURCE);
  
-+	/* Spawn a thread to control the vCPU migrations */
-+	if (test_args.migration_freq_ms) {
-+		srand(time(NULL));
-+
-+		ret = pthread_create(&pt_vcpu_migration, NULL,
-+					test_vcpu_migration, NULL);
-+		TEST_ASSERT(!ret, "Failed to create the migration pthread\n");
-+	}
-+
-+
- 	for (i = 0; i < test_args.nr_vcpus; i++)
- 		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
-+
-+	if (test_args.migration_freq_ms)
-+		pthread_join(pt_vcpu_migration, NULL);
-+
-+	bitmap_free(vcpu_done_map);
+diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+index 150f63101f4c..ee81dd3db516 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/processor.h
++++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+@@ -16,16 +16,6 @@
+ #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+ 			   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+ 
+-#define CPACR_EL1               3, 0,  1, 0, 2
+-#define TCR_EL1                 3, 0,  2, 0, 2
+-#define MAIR_EL1                3, 0, 10, 2, 0
+-#define MPIDR_EL1               3, 0,  0, 0, 5
+-#define TTBR0_EL1               3, 0,  2, 0, 0
+-#define SCTLR_EL1               3, 0,  1, 0, 0
+-#define VBAR_EL1                3, 0, 12, 0, 0
+-
+-#define ID_AA64DFR0_EL1         3, 0,  0, 5, 0
+-
+ /*
+  * ARM64_SYS_KVM_REG(sys_reg_id): Helper macro to convert
+  * SYS_* register definitions in sysreg.h to use in KVM
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index 9844b62227b1..d7b89aa092f5 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -240,10 +240,10 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
+ 	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
+ 	 * registers, which the variable argument list macros do.
+ 	 */
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(CPACR_EL1), 3 << 20);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_CPACR_EL1), 3 << 20);
+ 
+-	get_reg(vm, vcpuid, ARM64_SYS_REG(SCTLR_EL1), &sctlr_el1);
+-	get_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), &tcr_el1);
++	get_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_SCTLR_EL1), &sctlr_el1);
++	get_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_TCR_EL1), &tcr_el1);
+ 
+ 	switch (vm->mode) {
+ 	case VM_MODE_P52V48_4K:
+@@ -281,10 +281,10 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
+ 	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
+ 	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
+ 
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(SCTLR_EL1), sctlr_el1);
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), tcr_el1);
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(MAIR_EL1), DEFAULT_MAIR_EL1);
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(TTBR0_EL1), vm->pgd);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_SCTLR_EL1), sctlr_el1);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_TCR_EL1), tcr_el1);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_TTBR0_EL1), vm->pgd);
  }
  
- static struct kvm_vm *test_vm_create(void)
-@@ -286,6 +383,8 @@ static void test_print_help(char *name)
- 		NR_TEST_ITERS_DEF);
- 	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
- 		TIMER_TEST_PERIOD_MS_DEF);
-+	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
-+		TIMER_TEST_MIGRATION_FREQ_MS);
- 	pr_info("\t-h: print this help screen\n");
+ void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
+@@ -370,7 +370,7 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
+ {
+ 	extern char vectors;
+ 
+-	set_reg(vm, vcpuid, ARM64_SYS_REG(VBAR_EL1), (uint64_t)&vectors);
++	set_reg(vm, vcpuid, ARM64_SYS_KVM_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
  }
  
-@@ -293,7 +392,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			test_args.nr_vcpus = atoi(optarg);
-@@ -320,6 +419,13 @@ static bool parse_args(int argc, char *argv[])
- 				goto err;
- 			}
- 			break;
-+		case 'm':
-+			test_args.migration_freq_ms = atoi(optarg);
-+			if (test_args.migration_freq_ms < 0) {
-+				pr_info("0 or positive value needed for -m\n");
-+				goto err;
-+			}
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
-@@ -343,6 +449,11 @@ int main(int argc, char *argv[])
- 	if (!parse_args(argc, argv))
- 		exit(KSFT_SKIP);
- 
-+	if (get_nprocs() < 2) {
-+		print_skip("At least two physical CPUs needed for vCPU migration");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	vm = test_vm_create();
- 	test_run(vm);
- 	kvm_vm_free(vm);
+ void route_exception(struct ex_regs *regs, int vector)
 -- 
 2.33.0.153.gba50c8fa24-goog
 
