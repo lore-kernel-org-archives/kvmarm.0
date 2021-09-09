@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A93AC433F5
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 03:02:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8FCC433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 05:09:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 68A4060EE1
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 03:02:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 68A4060EE1
+	by mail.kernel.org (Postfix) with ESMTP id E7DC561139
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 05:09:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E7DC561139
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B65764B10A;
-	Wed,  8 Sep 2021 23:02:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55AD54B0DB;
+	Thu,  9 Sep 2021 01:09:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id c0bHGn45iw2F; Wed,  8 Sep 2021 23:02:37 -0400 (EDT)
+	with ESMTP id WW5w4nTpCMnj; Thu,  9 Sep 2021 01:09:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE1EE4B0C5;
-	Wed,  8 Sep 2021 23:02:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5EF4B0E1;
+	Thu,  9 Sep 2021 01:09:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 17DA84B0C5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 23:02:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E83654B0DB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 01:09:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wSGnKZWmsAah for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Sep 2021 23:02:34 -0400 (EDT)
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com
- [209.85.166.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CDF094AC80
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 23:02:34 -0400 (EDT)
-Received: by mail-il1-f174.google.com with SMTP id h29so473556ila.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Sep 2021 20:02:34 -0700 (PDT)
+ with ESMTP id cywOCirM-jgg for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Sep 2021 01:09:08 -0400 (EDT)
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com
+ [209.85.166.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD1334B0D9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 01:09:08 -0400 (EDT)
+Received: by mail-il1-f175.google.com with SMTP id a1so689955ilj.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Sep 2021 22:09:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=lS2TfPmFq21WQA7kbI98jf7rDXgRBmsiJwAOxbyrVAE=;
- b=E1i9dzXY8FPZ0L+1tJuVo2J7zoe5PQ5Nbe26IR98lKFC/EFy7vzC7ItaFodLhxWHl5
- BC4MTyEER+lWdRHF8GluZ4XPAsX77Y+uxxjgW7B0b6PFqGUtBUANxTpziKk66rKP/ew6
- VcaQtkDrk4p2eK7xJNcdBzliel9JDBPZ7I3YlVvLU8hPNUntp+0+M05YxBLrcpplsf3q
- cZgexH9nLdpb6A98a4Aenh2/cOrv6xIM7meGszXq9kjMA7T7kfXMkRpLzHb+lIpMG+1O
- VO5oLmDy9I5apJ/bpHQNuvc1a4GjsOk3zXsn4WiD+2QmOwTV1OD9GvzLQOqKkP7Dx9lC
- zgrw==
+ bh=xbj4bHxjm5asqasO4Vc5MjLZ0Sl3pjPtgh9Ovv91F4Q=;
+ b=nGJ0Xr7BsULYVjLluGwgpxnkv7l5v9ML6g4sZm6j0Ck/Wc63e5MX9UeWpTexc0+XOb
+ GaMJrf05btsC9KlhT9uyiHDMdcwz0vCewRK3pudeocIBWLCqJFRAr7V+BfQDB5e0UYzy
+ CXjG+1FkSUaaEHun5Z6hQAMk59Rdsbvga9+EF2lpCiH8tF9rAl+7EtnNcfgPEYusnZbd
+ JYglpi1njFXbXwyIhE+1H3+dO3w/8gANwbLp6PK9lwjcpzBiT6LtOGpd7HGe8sMG4KaC
+ PCz3KvFpIsKsf969B2lTHEgST1VRrZav0Zjr8bGKH8DEeUe/BEzdz3+BTq/8EPTN+pv1
+ S5cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=lS2TfPmFq21WQA7kbI98jf7rDXgRBmsiJwAOxbyrVAE=;
- b=8RpDznq1rsvQD22AY3FTUGMsCWC3s7Ahc6JVhIc3ut/VrSCPL/C1qap66fZXlCOUp8
- jNTlIE28UecsAWLV8p3G8def1KTbk85XA2+mLc+s0VQsZz2WGDhALxFEUf/tgb4AKI7v
- VmnQDH4ySIalFiKHiooR1fO6SxO28KGZZMeQVynmZZCxW0pUdDZaQVm8E+bK2InAbhOP
- 05C3xi+1vOxx6SkfVkL4B0n9DX/qNfv0I9tEutFwuzmSNtRt2i23tu4FJw+8E8Jpomxk
- CSG+0eW5cHYME5eaL4Js9tl9viOaGEsd4JcLHi91tUMovb6HVNhmNc8455BtbsPd1nVE
- jq7A==
-X-Gm-Message-State: AOAM531UTaINRkkfn9oSsvXmscko/4K1O4f37g/mRYGYfeoiOgQiiFqe
- GMLeKv9fFKnyN3yW9tb8+2sfXQ==
-X-Google-Smtp-Source: ABdhPJxnO3Xpf1rxt3cvGCIm05a/BPHERWpzorX/jlAxyWQB/SDLCIR3d7u6J9mGOmi/1JVTQda6Jw==
-X-Received: by 2002:a92:c605:: with SMTP id p5mr594556ilm.53.1631156554045;
- Wed, 08 Sep 2021 20:02:34 -0700 (PDT)
+ bh=xbj4bHxjm5asqasO4Vc5MjLZ0Sl3pjPtgh9Ovv91F4Q=;
+ b=GAiZKbStFqm0VaRO2SUH4JUJPXIH1vWBpVk8uXOVkv544qXaj5VfdZSycRxiPJMlL1
+ yPdVN389++7doXeswwUac2MF8X3oxVLeJm9hzeXlvzYYZQU/TZmGdP+38sSzn29nGwV3
+ OJzbwtdszNz+TLaI5DMMNovF3Cx2bktG/zfpW4EE1u6UnvcTWqVxEGQ71AeU6zX+49V8
+ bQ8ZdjGkI8iiFka61UN4piZldkg3DLlVC+J0Qfr/iJZGFqxNr+A89YMBcRmZnrB3fQ7y
+ HvNok/h7Mx4i5EEBDBoFolIB0V6/7NiAsNlv7zBz1GB0SHNLjb5+u2CDC3iW6oZg5Tde
+ kEYg==
+X-Gm-Message-State: AOAM532DlXsCObg1c786ucsizzBBrH7KLvOMjzH8boaJb0lZA9JiR9JA
+ 3z+rnFRBUS2aUtY9v8+LdW7tjA==
+X-Google-Smtp-Source: ABdhPJwOXqYFYeLrtyB7/JxA0sr65qpDk6mbK5Ic2/+EtmxUrips9ElJ35ZyMr3Dk5BvHeQ6OyEgow==
+X-Received: by 2002:a92:c051:: with SMTP id o17mr918314ilf.308.1631164147930; 
+ Wed, 08 Sep 2021 22:09:07 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194])
- by smtp.gmail.com with ESMTPSA id s1sm282250iln.12.2021.09.08.20.02.33
+ by smtp.gmail.com with ESMTPSA id g12sm381657iok.32.2021.09.08.22.09.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 08 Sep 2021 20:02:33 -0700 (PDT)
-Date: Thu, 9 Sep 2021 03:02:29 +0000
+ Wed, 08 Sep 2021 22:09:07 -0700 (PDT)
+Date: Thu, 9 Sep 2021 05:09:03 +0000
 From: Oliver Upton <oupton@google.com>
 To: Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v4 04/18] KVM: arm64: selftests: Introduce
- ARM64_SYS_KVM_REG
-Message-ID: <YTl5RQjJ0EFmhUlG@google.com>
+Subject: Re: [PATCH v4 09/18] KVM: arm64: selftests: Add guest support to get
+ the vcpuid
+Message-ID: <YTmW7/pY0E9cHQ+c@google.com>
 References: <20210909013818.1191270-1-rananta@google.com>
- <20210909013818.1191270-5-rananta@google.com>
+ <20210909013818.1191270-10-rananta@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210909013818.1191270-5-rananta@google.com>
+In-Reply-To: <20210909013818.1191270-10-rananta@google.com>
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
@@ -104,54 +104,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Raghu,
-
-On Thu, Sep 09, 2021 at 01:38:04AM +0000, Raghavendra Rao Ananta wrote:
-> With the inclusion of sysreg.h, that brings in system register
-> encodings, it would be redundant to re-define register encodings
-> again in processor.h to use it with ARM64_SYS_REG for the KVM
-> functions such as set_reg() or get_reg(). Hence, add helper macro,
-> ARM64_SYS_KVM_REG, that converts SYS_* definitions in sysreg.h
-> into ARM64_SYS_REG definitions.
+On Thu, Sep 09, 2021 at 01:38:09AM +0000, Raghavendra Rao Ananta wrote:
+> At times, such as when in the interrupt handler, the guest wants
+> to get the vcpuid that it's running on. As a result, introduce
+> get_vcpuid() that returns the vcpuid of the calling vcpu. At its
+> backend, the VMM prepares a map of vcpuid and mpidr during VM
+> initialization and exports the map to the guest for it to read.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  .../selftests/kvm/include/aarch64/processor.h      | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+>  .../selftests/kvm/include/aarch64/processor.h |  3 ++
+>  .../selftests/kvm/lib/aarch64/processor.c     | 46 +++++++++++++++++++
+>  2 files changed, 49 insertions(+)
 > 
 > diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index bed4ffa70905..ac8b63f8aab7 100644
+> index b6088c3c67a3..150f63101f4c 100644
 > --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
 > +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -26,6 +26,20 @@
+> @@ -133,6 +133,7 @@ void vm_install_exception_handler(struct kvm_vm *vm,
+>  		int vector, handler_fn handler);
+>  void vm_install_sync_handler(struct kvm_vm *vm,
+>  		int vector, int ec, handler_fn handler);
+> +void vm_vcpuid_map_init(struct kvm_vm *vm);
 >  
->  #define ID_AA64DFR0_EL1         3, 0,  0, 5, 0
+>  static inline void cpu_relax(void)
+>  {
+> @@ -194,4 +195,6 @@ static inline void local_irq_disable(void)
+>  	asm volatile("msr daifset, #3" : : : "memory");
+>  }
 >  
-> +/*
-> + * ARM64_SYS_KVM_REG(sys_reg_id): Helper macro to convert
-> + * SYS_* register definitions in sysreg.h to use in KVM
-> + * calls such as get_reg() and set_reg().
-> + */
-> +#define ARM64_SYS_KVM_REG(sys_reg_id)			\
-
-nit: KVM_ARM64_SYS_REG() perhaps? Dunno which is more readable.
-
-> +({							\
-> +	ARM64_SYS_REG(sys_reg_Op0(sys_reg_id),		\
-> +			sys_reg_Op1(sys_reg_id),	\
-> +			sys_reg_CRn(sys_reg_id),	\
-> +			sys_reg_CRm(sys_reg_id),	\
-> +			sys_reg_Op2(sys_reg_id));	\
-> +})
+> +int get_vcpuid(void);
 > +
 
-Could you also switch all current users of ARM64_SYS_REG() in the KVM
-selftests directory in this commit? You can also drop the system
-register encodings defined in processor.h
+I believe both of these functions could use some documentation. The
+former has implicit ordering requirements (can only be called after all
+vCPUs are created) and the latter can only be used within a guest.
 
---
-Thanks,
-Oliver
+>  #endif /* SELFTEST_KVM_PROCESSOR_H */
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index 632b74d6b3ca..9844b62227b1 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -13,9 +13,17 @@
+>  #include "processor.h"
+>  
+>  #define DEFAULT_ARM64_GUEST_STACK_VADDR_MIN	0xac0000
+> +#define VM_VCPUID_MAP_INVAL			-1
+>  
+>  static vm_vaddr_t exception_handlers;
+>  
+> +struct vm_vcpuid_map {
+> +	uint64_t mpidr;
+> +	int vcpuid;
+> +};
+> +
+> +static struct vm_vcpuid_map vcpuid_map[KVM_MAX_VCPUS];
+> +
+
+Hmm.
+
+I'm not too big of a fan that the KVM_MAX_VCPUS macro is defined in the
+KVM selftests. Really, userspace should discover the limit from the
+kernel. Especially when we want to write tests that test behavior at
+KVM's limit.
+
+That being said, there are more instances of these static allocations in
+the selftests code, so you aren't to be blamed.
+
+Related: commit 074c82c8f7cf ("kvm: x86: Increase MAX_VCPUS to 1024")
+has raised this limit.
+
+>  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+>  {
+>  	return (v + vm->page_size) & ~(vm->page_size - 1);
+> @@ -426,3 +434,41 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+>  	assert(vector < VECTOR_NUM);
+>  	handlers->exception_handlers[vector][0] = handler;
+>  }
+> +
+> +void vm_vcpuid_map_init(struct kvm_vm *vm)
+> +{
+> +	int i = 0;
+> +	struct vcpu *vcpu;
+> +	struct vm_vcpuid_map *map;
+> +
+> +	list_for_each_entry(vcpu, &vm->vcpus, list) {
+> +		map = &vcpuid_map[i++];
+> +		map->vcpuid = vcpu->id;
+> +		get_reg(vm, vcpu->id,
+> +			ARM64_SYS_KVM_REG(SYS_MPIDR_EL1), &map->mpidr);
+> +		map->mpidr &= MPIDR_HWID_BITMASK;
+> +	}
+> +
+> +	if (i < KVM_MAX_VCPUS)
+> +		vcpuid_map[i].vcpuid = VM_VCPUID_MAP_INVAL;
+> +
+> +	sync_global_to_guest(vm, vcpuid_map);
+> +}
+> +
+> +int get_vcpuid(void)
+
+nit: guest_get_vcpuid()
+
+> +{
+> +	int i, vcpuid;
+> +	uint64_t mpidr = read_sysreg(mpidr_el1) & MPIDR_HWID_BITMASK;
+> +
+> +	for (i = 0; i < KVM_MAX_VCPUS; i++) {
+> +		vcpuid = vcpuid_map[i].vcpuid;
+> +		GUEST_ASSERT_1(vcpuid != VM_VCPUID_MAP_INVAL, mpidr);
+> +
+> +		if (mpidr == vcpuid_map[i].mpidr)
+> +			return vcpuid;
+> +	}
+> +
+> +	/* We should not be reaching here */
+> +	GUEST_ASSERT_1(0, mpidr);
+> +	return -1;
+> +}
+> -- 
+> 2.33.0.153.gba50c8fa24-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
