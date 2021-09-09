@@ -2,107 +2,177 @@ Return-Path: <SRS0=JP/k=N7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F97C28B25
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 12:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD48C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 12:57:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C26B66124B
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 12:49:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C26B66124B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id E5AA7611BD
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 12:57:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E5AA7611BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A9B14B11E;
-	Thu,  9 Sep 2021 08:49:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61BB34B11E;
+	Thu,  9 Sep 2021 08:57:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@armh.onmicrosoft.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@armh.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KB8KVFk+20Bw; Thu,  9 Sep 2021 08:49:31 -0400 (EDT)
+	with ESMTP id N90zgqKpky3j; Thu,  9 Sep 2021 08:57:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7FC14B0D9;
-	Thu,  9 Sep 2021 08:49:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1706A4B106;
+	Thu,  9 Sep 2021 08:57:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D3ABC4A198
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 08:49:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 281F44B104
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 08:57:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2jO3+KklDwiF for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Sep 2021 08:49:29 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5FA840D0A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 08:49:29 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1631191769;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=/WIIV9R0O9293cVKltmhNKEdIknXhvoAmfpR0+Emkrc=;
- b=QA2TDyvUImPRNeJYKF1PAZE5Qs8XQ5L3etWkHSowvvXidV1sRO/Xhpklgq/fUnxl/y79O6
- c/RwCGwsKXiZavjFO+jNALE5qKiKfsCEeyHXIlu8UbcoxKti84dygC+BuAA3XnN1wNERAK
- 7XG6lwMEpxG0s3dkKdL61dtLhP3G3Tc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-T1quiyfGMEuv9qQAxKxXdQ-1; Thu, 09 Sep 2021 08:49:28 -0400
-X-MC-Unique: T1quiyfGMEuv9qQAxKxXdQ-1
-Received: by mail-wm1-f70.google.com with SMTP id
- y188-20020a1c7dc5000000b002e80e0b2f87so830393wmc.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 05:49:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=/WIIV9R0O9293cVKltmhNKEdIknXhvoAmfpR0+Emkrc=;
- b=niQkB25JkSPWpFhBmOyctC9zQKaeUMIZy40TGn7zSoJ/ybX4QAq2m5Ltd3u80URN34
- 8fJ2NEbiud9/ORZ4EGneLkUZ2iBBJco7etB3fzwJEp4H4c6Qs50PKEbytG6L2bazr7x1
- SuppG03sa2owG1wZAfbUl2B1dQuviSb68uK+IcTeCYnmSy/YCApAXoXa8gAvg5V/k81d
- 49Te2y4YsZOm2ytY03X36B1nkyRjZe/FKlhEIstW/KGvsJQDOrvWQrbOZJVliwrFI8Cd
- UzZzLSc4eIT/G6YjLenKqljRTxFZEGw8+9V8GkW6kprBOkXzJ0lqWLLYTT5X/pzkRqDe
- rj7A==
-X-Gm-Message-State: AOAM5319JSS87KZWNmEk2qqQjgdJb42rKmu1h9dPzpRhcR9/AsrG7mKM
- 5Azbm7J/FaN87m4lKJj3O4yYXCnjTbumaneQsmhb1iiipyFuYCw2k2+Xmh6zBC9r7yDq8UFk0W9
- 6xBlj7pXS6isrfldX7pXyw33K
-X-Received: by 2002:a1c:f315:: with SMTP id q21mr2914801wmq.76.1631191767138; 
- Thu, 09 Sep 2021 05:49:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyhRToFiGZDeV90P9U2++KGI827ZasghlkgDnXG6Np7ns/pBENdzsEK0QomGtIIK6/dnfSjDQ==
-X-Received: by 2002:a1c:f315:: with SMTP id q21mr2914753wmq.76.1631191766841; 
- Thu, 09 Sep 2021 05:49:26 -0700 (PDT)
-Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id t17sm1658091wra.95.2021.09.09.05.49.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Sep 2021 05:49:26 -0700 (PDT)
-Date: Thu, 9 Sep 2021 14:49:24 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests RFC PATCH 3/5] run_tests.sh: Add kvmtool support
-Message-ID: <20210909124924.xcuehgluucvs7gb2@gator>
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-4-alexandru.elisei@arm.com>
- <20210907101730.trnsig2j4jmhinyu@gator>
- <587a5f8c-cf04-59ec-7e35-4ca6adf87862@arm.com>
- <20210908150912.3d57akqkfux4fahj@gator>
- <56289c06-04ec-1772-6e15-98d02780876d@arm.com>
- <20210908154943.z7d6bhww3pnbaftd@gator>
- <58d25f89-ff19-2dbc-81bc-3224b8baa9fb@arm.com>
+ with ESMTP id EtisflZXXLOL for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Sep 2021 08:57:09 -0400 (EDT)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com
+ (mail-db8eur05on2070.outbound.protection.outlook.com [40.107.20.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 95E144B0BA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 08:57:09 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u5C0FhhB88kzm/EoFfVRgA3kdYjY0oNY4Gkc/K7LWM0=;
+ b=xrDY5yG2Yk8rS7krj6k/4zuekkVluZHQy4GL4IEYgSRvPAnBIEsSarSmTs0t0J4xq+37AMt4ZEr8CTxiTST/vHCkyMBj8Oydz3Vt1C1XC8kBX5MAM9ISSs+aSbuIo/w+1cEkMUISZw0JHpHhqkkK+RADRQUSCjDdKTQvYeYsa2M=
+Received: from DB3PR06CA0027.eurprd06.prod.outlook.com (2603:10a6:8:1::40) by
+ DBBPR08MB4474.eurprd08.prod.outlook.com (2603:10a6:10:c2::19) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4478.19; Thu, 9 Sep 2021 12:57:06 +0000
+Received: from DB5EUR03FT046.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:8:1:cafe::a4) by DB3PR06CA0027.outlook.office365.com
+ (2603:10a6:8:1::40) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.14 via Frontend
+ Transport; Thu, 9 Sep 2021 12:57:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; lists.cs.columbia.edu; dkim=pass (signature was
+ verified) header.d=armh.onmicrosoft.com;lists.cs.columbia.edu; dmarc=pass
+ action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DB5EUR03FT046.mail.protection.outlook.com (10.152.21.230) with
+ Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4478.19 via Frontend Transport; Thu, 9 Sep 2021 12:57:06 +0000
+Received: ("Tessian outbound d5def7722ff7:v103");
+ Thu, 09 Sep 2021 12:57:06 +0000
+X-CR-MTA-TID: 64aa7808
+Received: from e5ca704b8e4e.2
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com id
+ 49F901FA-2EE5-4EDC-AE89-1DEF0FFC46DB.1; 
+ Thu, 09 Sep 2021 12:56:56 +0000
+Received: from EUR02-HE1-obe.outbound.protection.outlook.com
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id e5ca704b8e4e.2
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+ Thu, 09 Sep 2021 12:56:56 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UGA52oiosLKDNqbLMSZ4Nt+pg2XzNnWF3tEe4T/W8y6Y3yGTm1M8Gy5Tm4oZjFqiz4LJADGuyrM+eyS5XoUAAb7ym9guMor0o/YoBtkotIiH5YZXDQ5zaimbj1mXITpDQ3ksiUJDdaHIHHtSXlHmCDIbwDVJOfqY23eTuumirbU4riLgHvHVXcMHFQi4BGs8sASMLYjjXRME7glztkqke38RRPxXuZZRvO2pcqajHnnT39B1hXZMxOUmnhW8XTq5OubppDz3IYC+PN2FcsonXtdQQ7MsSV127lNGombLb1P4ga99zYwkEayoGOM/YmIbxGvFR5XT8OH5gEU7UAjKnQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version; 
+ bh=u5C0FhhB88kzm/EoFfVRgA3kdYjY0oNY4Gkc/K7LWM0=;
+ b=gHcKpql9yt+jLGxju7jEB7mGDjeky//COgn2IhHFIK9vKYp8VlfeKr8CUerG6GaNLgfvmfOv5eBxh2Y8Z4nyY0+MIIiFd3zHl45Oy6tU8hGDVnbZW6Ie+pUU54j4DBQffxaxztheqS5BwkMPbphiE7/XCCmxsDd43h/63rGQKhbrXFTBH52/5sJ2sdmqdwP01Gklg3RR9K114D6Fmtjc7d2G2T08clhZR4gktnkLc0OWlDZ85GGh0BypjMHjc8EN5JAmSRdr1ZD2qUgthMwdwlM62Rf9nnAsA4wTndZrgoz26CpvgBEuBz1v7j59r68XKPVRhqq3FehncAhGRiQVQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u5C0FhhB88kzm/EoFfVRgA3kdYjY0oNY4Gkc/K7LWM0=;
+ b=xrDY5yG2Yk8rS7krj6k/4zuekkVluZHQy4GL4IEYgSRvPAnBIEsSarSmTs0t0J4xq+37AMt4ZEr8CTxiTST/vHCkyMBj8Oydz3Vt1C1XC8kBX5MAM9ISSs+aSbuIo/w+1cEkMUISZw0JHpHhqkkK+RADRQUSCjDdKTQvYeYsa2M=
+Received: from AM6PR08MB4376.eurprd08.prod.outlook.com (2603:10a6:20b:bb::21)
+ by AM6PR08MB2951.eurprd08.prod.outlook.com (2603:10a6:209:4e::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.16; Thu, 9 Sep
+ 2021 12:56:54 +0000
+Received: from AM6PR08MB4376.eurprd08.prod.outlook.com
+ ([fe80::a443:3fd9:42c2:4b85]) by AM6PR08MB4376.eurprd08.prod.outlook.com
+ ([fe80::a443:3fd9:42c2:4b85%5]) with mapi id 15.20.4500.016; Thu, 9 Sep 2021
+ 12:56:54 +0000
+From: Justin He <Justin.He@arm.com>
+To: Oliver Upton <oupton@google.com>
+Subject: RE: [PATCH v2 2/2] KVM: arm64: Add memcg accounting to KVM allocations
+Thread-Topic: [PATCH v2 2/2] KVM: arm64: Add memcg accounting to KVM
+ allocations
+Thread-Index: AQHXo+SXY1+Y7PRqPEOtXG6vaRVv1auZJ8aAgAI+QxA=
+Date: Thu, 9 Sep 2021 12:56:53 +0000
+Message-ID: <AM6PR08MB4376DB4B908AC37DF24290CFF7D59@AM6PR08MB4376.eurprd08.prod.outlook.com>
+References: <20210907123112.10232-1-justin.he@arm.com>
+ <20210907123112.10232-3-justin.he@arm.com>
+ <CAOQ_QsjOmHw+545J0T9i-nWV2bVGGEwHq5SPVvBOM-SHMXpP5g@mail.gmail.com>
+In-Reply-To: <CAOQ_QsjOmHw+545J0T9i-nWV2bVGGEwHq5SPVvBOM-SHMXpP5g@mail.gmail.com>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ts-tracking-id: 8C57A8ADD3029A4887FFE0F106D44668.0
+x-checkrecipientchecked: true
+Authentication-Results-Original: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=arm.com;
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-Correlation-Id: 4afc6bab-1869-4954-0c1a-08d9739153ae
+x-ms-traffictypediagnostic: AM6PR08MB2951:|DBBPR08MB4474:
+x-ms-exchange-transport-forked: True
+X-Microsoft-Antispam-PRVS: <DBBPR08MB44747C4A49D693E2CBDB2593F7D59@DBBPR08MB4474.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+nodisclaimer: true
+x-ms-oob-tlc-oobclassifiers: OLM:8273;OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: RXnSsvJKQI1XTJ2kESnnX1x9sagZJwq+s/YGfS2he5v14ZyYr0x0NhopD3uptwAS2nXUqUi/Xl8XLptmcMWYR4PYgpViRIGpQi4nUbVgcrtqjQRnerci3f61jd5xwmSCj1BsyYiLhFuTF3y2UYStXvsjG/HlM4EkXUnO03DBdzwoq/QLEbw52TOnaY3WsdlLtj4ocCQhgB29ZelUn2Cup2fB7m+fiHH2YHF5W9f2mbdQ1iOWyNi++T2a65yv9citzbNvubAcbsEowPf9uAMTPBi6jJO0ymHhhHk+jlLbp6KjwXA/0RokDB7EmtAL/HwWmlZg9nPuDWZFUe7H7soD42ySpHAH9R250k79kEqrnpgL8b7LDd566xwUBenlMXJs9brewwywS5NukITthmAURJH19S+3WnslMifOqo5yYP6/gR8srieIPhWn/z547xshNWsX8nDUmYpYmx5iKTiLRNIKjCLyMqCVmKpA6zQ44qN7gM9zSI+zDWdn2R+w2Gjdg4YTBS/dugTawLoi+HJHLhxFAccdILiFU2X2/k/QGl/nNF9kux5g5Ckt+ylry7s864pv8gLPcNKKCFmtMl0YXScsx5BsoD4oHdxDHBCNWrhu5TLZgUixC/KqUBn5lCwAGzaGPyeSgQsbt6MUZ4auebRT2tSU+Zz5rkzhlm89UVP9hJftu8NnNhrvJ9J/+PoYlJ/YWq3VVbrU7tpl7ISEOvbhUMPwoJ6cW+wv3oCPMmU=
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255; CTRY:; LANG:en;
+ SCL:1; SRV:; IPV:NLI; SFV:NSPM; H:AM6PR08MB4376.eurprd08.prod.outlook.com;
+ PTR:; CAT:NONE;
+ SFS:(4636009)(39860400002)(136003)(366004)(346002)(396003)(376002)(122000001)(5660300002)(71200400001)(38100700002)(86362001)(2906002)(83380400001)(316002)(38070700005)(26005)(52536014)(66556008)(54906003)(33656002)(8936002)(6916009)(478600001)(66946007)(186003)(9686003)(7416002)(8676002)(55016002)(66476007)(15650500001)(7696005)(76116006)(53546011)(4326008)(6506007)(64756008)(66446008)(21314003);
+ DIR:OUT; SFP:1101; 
 MIME-Version: 1.0
-In-Reply-To: <58d25f89-ff19-2dbc-81bc-3224b8baa9fb@arm.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: lvivier@redhat.com, linux-s390@vger.kernel.org, thuth@redhat.com,
- frankja@linux.ibm.com, kvm@vger.kernel.org, david@redhat.com,
- andre.przywara@arm.com, cohuck@redhat.com, kvm-ppc@vger.kernel.org,
- vivek.gautam@arm.com, maz@kernel.org, pbonzini@redhat.com,
- imbrenda@linux.ibm.com, kvmarm@lists.cs.columbia.edu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2951
+Original-Authentication-Results: google.com; dkim=none (message not signed)
+ header.d=none;google.com; dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT046.eop-EUR03.prod.protection.outlook.com
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 441c2f1a-f5b3-4d4f-435e-08d973914c7b
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jo/Z6kllQjqkF0h9g+/9fO082EzcdMO2COYiR/eWE/dCOXWt6lR6QeTUCTdMhlMA023+J8bpn/huZH0GgJPzeV61gVOTtQprzl4HGVfF9CPv2ktqHdmgAXHLkLNlFrfT3ZAYDVrYTZXx54LD0CCgo7drmRv1SVIswPoixyt7gJmopxMpkCe7iZ4WbxTsRsQ2+1RSQ6kt/KiekDWHqfnBLA2eFBzqQYyQd5dq9ftMRUIRV3538naHjJ/wAM2AXaqfq1pTemb82KmiedOXWZrarpQrRAk7EsRR2Stcxm9crKEdPg4gtMYowMV6SN76bZ8dWtzEsdusLzpuy2B17DyzZjrri6KpbI3HPvHQjjHKcyGzLBD8hfO1Jd9keJCbUx/vAE9hW/ajAcSl5IBF7SzHDWQVIsAHSt9BNF67VnkkywzuSRbsCkjrSi44hBHhoODB1MPrMzK78pq9isiAGaIgj8B3sGvPh6kXHgEM6tQQzHIDqaZlGxdPU58LmijH2ra0NY7BzyS4PT8m5pFUWF3IwoIJevp4ElfC3PgwnF7mBHiZNprQ3ON6K1u2Ue2DInFVjOqG56Ew4cqN0QDZa8OLvQNadOfJcIPB7agGicZ8Kc2919YQv381/Ylo3wSHQlq3h5vkflJXa4Tp3uce2pS9ZMauKyrcBfGnRvVTli/AJ2FHstyhVsuozh1Mb7W2NXdkoCBe/5ogZM3IGFmjI+N1d5i1rKetz3VWY2jYWow+HMA=
+X-Forefront-Antispam-Report: CIP:63.35.35.123; CTRY:IE; LANG:en; SCL:1; SRV:;
+ IPV:CAL; SFV:NSPM; H:64aa7808-outbound-1.mta.getcheckrecipient.com;
+ PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; CAT:NONE;
+ SFS:(4636009)(376002)(396003)(39860400002)(346002)(136003)(46966006)(36840700001)(33656002)(26005)(9686003)(55016002)(336012)(47076005)(83380400001)(186003)(54906003)(70586007)(86362001)(5660300002)(52536014)(107886003)(82310400003)(70206006)(316002)(6506007)(4326008)(356005)(8676002)(6862004)(478600001)(2906002)(7696005)(8936002)(53546011)(82740400003)(15650500001)(81166007)(36860700001)(21314003);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2021 12:57:06.0933 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4afc6bab-1869-4954-0c1a-08d9739153ae
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
+ Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource: DB5EUR03FT046.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR08MB4474
+Cc: Nick Desaulniers <ndesaulniers@google.com>,
+ Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>,
+ Kees Cook <keescook@chromium.org>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Liu Shixin <liushixin2@huawei.com>, Sami Tolvanen <samitolvanen@google.com>,
+ Catalin Marinas <Catalin.Marinas@arm.com>, Xiaoming Ni <nixiaoming@huawei.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -119,141 +189,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 09, 2021 at 12:33:11PM +0100, Alexandru Elisei wrote:
-> Hi Drew,
+Hi Oliver, thanks for the review, please my comments below:
+
+> -----Original Message-----
+> From: Oliver Upton <oupton@google.com>
+> Sent: Wednesday, September 8, 2021 6:29 AM
+> To: Justin He <Justin.He@arm.com>
+> Cc: Marc Zyngier <maz@kernel.org>; James Morse <James.Morse@arm.com>;
+> Alexandru Elisei <Alexandru.Elisei@arm.com>; Suzuki Poulose
+> <Suzuki.Poulose@arm.com>; Xiaoming Ni <nixiaoming@huawei.com>; Lorenzo
+> Pieralisi <Lorenzo.Pieralisi@arm.com>; Kees Cook <keescook@chromium.org>;
+> Catalin Marinas <Catalin.Marinas@arm.com>; Nick Desaulniers
+> <ndesaulniers@google.com>; linux-kernel@vger.kernel.org; Liu Shixin
+> <liushixin2@huawei.com>; Sami Tolvanen <samitolvanen@google.com>; Will
+> Deacon <will@kernel.org>; kvmarm@lists.cs.columbia.edu; linux-arm-
+> kernel@lists.infradead.org
+> Subject: Re: [PATCH v2 2/2] KVM: arm64: Add memcg accounting to KVM
+> allocations
 > 
-> On 9/8/21 4:49 PM, Andrew Jones wrote:
-> > On Wed, Sep 08, 2021 at 04:46:19PM +0100, Alexandru Elisei wrote:
-> >> Hi Drew,
-> >>
-> >> On 9/8/21 4:09 PM, Andrew Jones wrote:
-> >>> On Wed, Sep 08, 2021 at 03:33:19PM +0100, Alexandru Elisei wrote:
-> >>> ...
-> >>>>>> +fixup_kvmtool_opts()
-> >>>>>> +{
-> >>>>>> +    local opts=$1
-> >>>>>> +    local groups=$2
-> >>>>>> +    local gic
-> >>>>>> +    local gic_version
-> >>>>>> +
-> >>>>>> +    if find_word "pmu" $groups; then
-> >>>>>> +        opts+=" --pmu"
-> >>>>>> +    fi
-> >>>>>> +
-> >>>>>> +    if find_word "its" $groups; then
-> >>>>>> +        gic_version=3
-> >>>>>> +        gic="gicv3-its"
-> >>>>>> +    elif [[ "$opts" =~ -machine\ *gic-version=(2|3) ]]; then
-> >>>>>> +        gic_version="${BASH_REMATCH[1]}"
-> >>>>>> +        gic="gicv$gic_version"
-> >>>>>> +    fi
-> >>>>>> +
-> >>>>>> +    if [ -n "$gic" ]; then
-> >>>>>> +        opts=${opts/-machine gic-version=$gic_version/}
-> >>>>>> +        opts+=" --irqchip=$gic"
-> >>>>>> +    fi
-> >>>>>> +
-> >>>>>> +    opts=${opts/-append/--params}
-> >>>>>> +
-> >>>>>> +    echo "$opts"
-> >>>>>> +}
-> >>>>> Hmm, I don't think we want to write a QEMU parameter translator for
-> >>>>> all other VMMs, and all other VMM architectures, that we want to
-> >>>>> support. I think we should add new "extra_params" variables to the
-> >>>>> unittest configuration instead, e.g. "kvmtool_params", where the
-> >>>>> extra parameters can be listed correctly and explicitly. While at
-> >>>>> it, I would create an alias for "extra_params", which would be
-> >>>>> "qemu_params" allowing unittests that support more than one VMM
-> >>>>> to clearly show what's what.
-> >>>> I agree, this is a much better idea than a parameter translator. Using a dedicated
-> >>>> variable in unittests.cfg will make it easier for new tests to get support for all
-> >>>> VMMs (for example, writing a list of parameters in unittests.cfg should be easier
-> >>>> than digging through the scripts to figure exactly how and where to add a
-> >>>> translation for a new parameter), and it allow us to express parameters for other
-> >>>> VMMs which don't have a direct correspondent in qemu.
-> >>>>
-> >>>> By creating an alias, do you mean replacing extra_params with qemu_params in
-> >>>> arm/unittests.cfg? Or something else?
-> >>> Probably something like this
-> >>>
-> >>> diff --git a/scripts/common.bash b/scripts/common.bash
-> >>> index 7b983f7d6dd6..e5119ff216e5 100644
-> >>> --- a/scripts/common.bash
-> >>> +++ b/scripts/common.bash
-> >>> @@ -37,7 +37,12 @@ function for_each_unittest()
-> >>>                 elif [[ $line =~ ^smp\ *=\ *(.*)$ ]]; then
-> >>>                         smp=${BASH_REMATCH[1]}
-> >>>                 elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-> >>> -                       opts=${BASH_REMATCH[1]}
-> >>> +               elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-> >>> +                       qemu_opts=${BASH_REMATCH[1]}
-> >>> +               elif [[ $line =~ ^qemu_params\ *=\ *(.*)$ ]]; then
-> >>> +                       qemu_opts=${BASH_REMATCH[1]}
-> >>> +               elif [[ $line =~ ^kvmtool_params\ *=\ *(.*)$ ]]; then
-> >>> +                       kvmtool_opts=${BASH_REMATCH[1]}
-> >>>                 elif [[ $line =~ ^groups\ *=\ *(.*)$ ]]; then
-> >>>                         groups=${BASH_REMATCH[1]}
-> >>>                 elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
-> >>>
-> >>> and all other changes needed to support the s/opts/qemu_opts/ change
-> >>> should work. Also, an addition to the unittests.cfg documentation.
-> >> Got it, replace extra_opts with qemu_opts in the scripts.
-> >>
-> >> Yes, the documentation for unittests.cfg (at the top of the file) should
-> >> definitely be updated to document the new configuration option, kvmtool_params.
-> >>
-> >>> The above diff doesn't consider that a unittests.cfg file could have
-> >>> both an 'extra_params' and a 'qemu_params' field, but I'm not sure
-> >>> we care about that. Users should read the documentation and we
-> >>> should review changes to the committed unittests.cfg files to avoid
-> >>> that.
-> >> What do you feel about renaming extra_params -> qemu_params in unittests.cfg?
-> > Yes, that's what I would expect the patch to do.
+> Hi Jia,
+> 
+> On Tue, Sep 7, 2021 at 7:33 AM Jia He <justin.he@arm.com> wrote:
 > >
-> >> I'm
-> >> thinking it would make the usage clearer, improve consistency (we would have
-> >> qemu_params and kvmtool_params, instead of extra_params and kvmtool_params), and
-> >> remove any confusions regarding when they are used (I can see someone thinking
-> >> that extra_params are used all the time, and are appended to kvmtool_params when
-> >> --target=kvmtool). On the other hand, this could be problematic for people using
-> >> out-of-tree scripts that parse the unittest.cfg file for whatever reason (are
-> >> there people that do that?).
-> > I'm not as worried about that as about people using out-of-tree
-> > unittests.cfg files that will break when the 'extra_params' field
-> > disappears. That's why I suggested to make 'extra_params' an alias.
-> 
-> I'm sorry, but I'm still having trouble parsing what alias means in this context.
-> Do you mean keep extra_params for current tests, encourage qemu_params for new
-> tests, document that they mean the same thing and going forward qemu_params should
-> be used?
-
-Exactly, which just amounts to keeping the parsing line
-
-           elif [[ $line =~ ^extra_params\ *=\ *(.*)$ ]]; then
-                 qemu_opts=${BASH_REMATCH[1]}
-
-and some documentation changes.
-
-Thanks,
-drew
-
-> 
-> Thanks,
-> 
-> Alex
-> 
+> > Inspired by commit 254272ce6505 ("kvm: x86: Add memcg accounting to KVM
+> > allocations"), it would be better to make arm64 KVM consistent with
+> > common kvm codes.
 > >
-> > Thanks,
-> > drew
+> > The memory allocations of VM scope should be charged into VM process
+> > cgroup, hence change GFP_KERNEL to GFP_KERNEL_ACCOUNT.
 > >
-> >> Thanks,
-> >>
-> >> Alex
-> >>
-> >>> Thanks,
-> >>> drew
-> >>>
+> > There remain a few cases since these allocations are global, not in VM
+> > scope.
 > 
+> I believe there are more memory allocations that could be switched to
+> GFP_KERNEL_ACCOUNT. For non-pKVM kernels, we probably should charge
+> all stage-2 paging structure allocations to the VM process. Your patch
+> appears to only change the allocation of the kvm_pgtable structure,
+> but not descendent paging structures.
+> 
+Do you mean kvm_hyp_zalloc_page() here?
+Seems kvm_hyp_zalloc_page() is in both global and VM scopes.
+
+I will replace GFP_KERNEL with XXX_ACCOUNT in next version if no one 
+objects that.
+
+--
+Cheers,
+Justin (Jia He)
+
 
 _______________________________________________
 kvmarm mailing list
