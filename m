@@ -5,76 +5,77 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5554C433F5
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 16:39:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE75C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 16:41:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3C4B66115A
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 16:39:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3C4B66115A
+	by mail.kernel.org (Postfix) with ESMTP id 676406113A
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 16:41:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 676406113A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABC924B13D;
-	Thu,  9 Sep 2021 12:39:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D81104066E;
+	Thu,  9 Sep 2021 12:41:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LVhmlrbJkcrd; Thu,  9 Sep 2021 12:39:11 -0400 (EDT)
+	with ESMTP id GNO-lVfDhs0e; Thu,  9 Sep 2021 12:41:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C26400D5;
-	Thu,  9 Sep 2021 12:39:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9109405A6;
+	Thu,  9 Sep 2021 12:41:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 03FDD400D5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 12:39:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DEBB405A6
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 12:41:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FCHnQhZDYb71 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Sep 2021 12:39:09 -0400 (EDT)
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com
- [209.85.219.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F086E4005D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 12:39:08 -0400 (EDT)
-Received: by mail-yb1-f182.google.com with SMTP id q70so5084102ybg.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 09:39:08 -0700 (PDT)
+ with ESMTP id rtzN8NzIcpWN for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Sep 2021 12:41:13 -0400 (EDT)
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com
+ [209.85.219.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5368340256
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 12:41:13 -0400 (EDT)
+Received: by mail-yb1-f169.google.com with SMTP id v10so5127301ybm.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 09:41:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=z6S9aCreq/0VGuneRW3q7amVuNejEfZAPRbvdWpbNPQ=;
- b=m6C+xr8tBL6hn8M8cZtiWUFtOEKpLOROHS4EvWaOJSbMPA7AjRIRr1vjbiUaLXdHri
- 9bChgFEoA7TNwaIB2TxgMA7wdFDJ9wlKq71tu4BLkfkS5MTzQ26PFHISd9tpV4M3imSE
- QGv01Iujhkw0xNImfBFO/zLPR8xyfFHJs5LYzOtGCVPAXXaOpZrLqwu9aW7BDbNX1jF9
- bZyN/dJlHSEnfAZJhYmTl2j93j7oCs4u4IJoQL2RBGzQ3SrLvdei7URfW3nBY/I+KbnI
- 2fXNMFhGYk7bOI8C9+qndcbxbrCBqkwBQkMwJmF07nSgKWQvjwdtAF5XbVnq7umSh8Mf
- /Rvg==
+ :cc; bh=rkaCWrw71p3Bwx6Ujv9uVMcrBmBnNtWcMasEZoICUtg=;
+ b=dk7XG+iTfUp9mJk61u0tbmxR8do9bhReeJEjxKWTkr7mk6yTeOo7oOAKTzW88D5oFt
+ xB3/uaxC9EeaQ6xD311r2INEWMUDkeiAuOB+xS8kTK3BZlL9vZg+qv11MC8fIYro0Y4+
+ WfNT0EiCYoxOUvMMnieVkaTDR7VLJRWw+bB15aRVuHemdxOCnanUy2kYvJuB9NIKfh4o
+ yda8xdXzMwYTPZic6D+AD0ISZbeH/iymz9UQLkkpW2qaQZb1K7fQEC6ak7TXPknEKug/
+ 3XeamAAIRYw/SneBt3ifDaLJvdeuAZPpwlrp1gEJMOdbHBkld1bFwMCm5ZjFc+k35XgZ
+ 1W6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=z6S9aCreq/0VGuneRW3q7amVuNejEfZAPRbvdWpbNPQ=;
- b=OpiZQdsCbPC7XbFW0N6waYEG25jq5taq4zxfdZX3k3ztN2qE8XomZOS63nmN0usekA
- TtibC1XAMb36eY27iREPyT7aK+trY9mlASHvsZKk98Br9/Y5BmLqKi20x+R6eMV5Wbjl
- lXeGJjQ/iKqki3gmU45HWXYH6p2ZTqDpZQ+vs9bckaSZ+FbfbggaULNQytNUM7juXBze
- /e9n9ljqfRXzazLzdUZdxjhUKHscbkfSn87LfZP/1gOpVANojlr5sniuJsJmdsrp9UVZ
- wVjcJLFFNtvA1xTXOpzupwQz7qTLRAkLDWfqFUj/CuCURXzAuwZiQpfaXOx7i/fgYkId
- fuPA==
-X-Gm-Message-State: AOAM533zD9aln6vbLyhY7xRWMa+ChGL+v4GOYXbM37SbpXPXuzsHAedY
- gtxoJCNHoO1yJs4vnkA3iCudLAlrH+bfGB5wKqs8Dg==
-X-Google-Smtp-Source: ABdhPJzQhQS8ZeN1ti9BJ6nGicAZyMX4s6L1J/GWjGE8KzWUlbKpTmRa1mxRjjyzjuZ9X5UHGcqUo+phpbusAExxylk=
-X-Received: by 2002:a25:21c5:: with SMTP id h188mr4685737ybh.23.1631205548028; 
- Thu, 09 Sep 2021 09:39:08 -0700 (PDT)
+ bh=rkaCWrw71p3Bwx6Ujv9uVMcrBmBnNtWcMasEZoICUtg=;
+ b=uFon/v2XyGn5bCUGg/UHUxUy+iTJ+RJY8doiyN/+sqFO8Bs4NWXUc12fLpWqI1CyJ4
+ Iqn/QuMwlFFpXMnPwJMhh2j94KF11AYsZMWqDeQQ6nKFX/qkesumn4CpDh3Cs/BwDa5r
+ MCWU+8/U0IZQ+UYzXOTMZvClYA7H/xLeUJgiJWUpkeyG7kMISzzy9y7Mk+SA+0/+gLb0
+ pv750QdwTj4q7R7+oxm1YooY14bTJ8NxvAafSNB+5UtvzV4DFjEVsCysN/W1Q3ctMDJN
+ tlCamT4fB3tIfqhwJSFUw3mLEBXizHg5KtoSIOSu4OADFXzSOwI2Eod/tvAAXFvFWcYX
+ 4Fbg==
+X-Gm-Message-State: AOAM531Jp0RXdhPkmjxMHoxGhu2Vq4mFjM2Yi82Qw/qqF40440gZ3eN7
+ jsqnfpMteScmRIVYMUrgfToghm5BNmV/N780uh8ZbA==
+X-Google-Smtp-Source: ABdhPJxOb0z3ulldpbOkQOCns5TrLa7bWBtK5lyZgAwd9CnftUY48Lnurh5DsoueF+EhVX32OlwRpYEDMSkKxKNuJeE=
+X-Received: by 2002:a25:8093:: with SMTP id n19mr5184637ybk.414.1631205672615; 
+ Thu, 09 Sep 2021 09:41:12 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210909013818.1191270-1-rananta@google.com>
- <20210909013818.1191270-12-rananta@google.com>
- <YTmZPSEm3Fj6l1PN@google.com>
-In-Reply-To: <YTmZPSEm3Fj6l1PN@google.com>
+ <20210909013818.1191270-19-rananta@google.com>
+ <YTmdUEcbvf/7mkOw@google.com>
+In-Reply-To: <YTmdUEcbvf/7mkOw@google.com>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Thu, 9 Sep 2021 09:38:56 -0700
-Message-ID: <CAJHc60x_r46W+81=A76zC=zW_3xqmvMWf3CspiQKVVnPA0TtTA@mail.gmail.com>
-Subject: Re: [PATCH v4 11/18] KVM: arm64: selftests: Add basic GICv3 support
+Date: Thu, 9 Sep 2021 09:41:00 -0700
+Message-ID: <CAJHc60yi8Dk8d67Gd=_UJRz+71vz0LZZC_TrCE5=kqyRTwBKoA@mail.gmail.com>
+Subject: Re: [PATCH v4 18/18] KVM: selftests: vgic_init: Pull
+ REDIST_REGION_ATTR_ADDR from vgic.h
 To: Oliver Upton <oupton@google.com>
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
@@ -97,74 +98,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 8, 2021 at 10:18 PM Oliver Upton <oupton@google.com> wrote:
+On Wed, Sep 8, 2021 at 10:36 PM Oliver Upton <oupton@google.com> wrote:
 >
-> On Thu, Sep 09, 2021 at 01:38:11AM +0000, Raghavendra Rao Ananta wrote:
-> > Add basic support for ARM Generic Interrupt Controller v3.
-> > The support provides guests to setup interrupts.
-> >
-> > The work is inspired from kvm-unit-tests and the kernel's
-> > GIC driver (drivers/irqchip/irq-gic-v3.c).
+> On Thu, Sep 09, 2021 at 01:38:18AM +0000, Raghavendra Rao Ananta wrote:
+> > Pull the definition of REDIST_REGION_ATTR_ADDR from vgic.h.
 > >
 > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
 > > ---
-> >  tools/testing/selftests/kvm/Makefile          |   2 +-
-> >  .../selftests/kvm/include/aarch64/gic.h       |  21 ++
-> >  tools/testing/selftests/kvm/lib/aarch64/gic.c |  93 +++++++
-> >  .../selftests/kvm/lib/aarch64/gic_private.h   |  21 ++
-> >  .../selftests/kvm/lib/aarch64/gic_v3.c        | 240 ++++++++++++++++++
-> >  .../selftests/kvm/lib/aarch64/gic_v3.h        |  70 +++++
-> >  6 files changed, 446 insertions(+), 1 deletion(-)
-> >  create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic.h
-> >  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic.c
-> >  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_private.h
-> >  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
-> >  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.h
-> >
+> >  tools/testing/selftests/kvm/aarch64/vgic_init.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
 >
-> [...]
+> Just squash this into the commit where you hoist it into vgic.h. It is
+> fine to glob it together with the other vgic changes since you're
+> dropping it into a completely new header file.
 >
-> > +static void
-> > +gic_dist_init(enum gic_type type, unsigned int nr_cpus, void *dist_base)
-> > +{
-> > +     const struct gic_common_ops *gic_ops;
->
-> does this need to be initialized? I haven't tried compiling, but it
-> seems it should trigger a compiler warning as it is only initialized if
-> type == GIC_V3.
->
-Huh, I thought I had a default case covering this (must have gone lost
-during code reorg).
-Nice catch though! Surprisingly, the compiler never warned. I'm not
-sure if its smart
-enough to figure out that the caller of this function had
-GUEST_ASSERT(type < GIC_TYPE_MAX);
-Anyway, I'll clean it up.
+Sure, I'll squash it.
 
 Regards,
 Raghavendra
-
-> > +     spin_lock(&gic_lock);
-> > +
-> > +     /* Distributor initialization is needed only once per VM */
-> > +     if (gic_common_ops) {
-> > +             spin_unlock(&gic_lock);
-> > +             return;
-> > +     }
-> > +
-> > +     if (type == GIC_V3)
-> > +             gic_ops = &gicv3_ops;
-> > +
-> > +     gic_ops->gic_init(nr_cpus, dist_base);
-> > +     gic_common_ops = gic_ops;
-> > +
-> > +     /* Make sure that the initialized data is visible to all the vCPUs */
-> > +     dsb(sy);
-> > +
-> > +     spin_unlock(&gic_lock);
-> > +}
->
+> --
+> Thanks,
+> Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
