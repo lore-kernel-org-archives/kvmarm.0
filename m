@@ -5,83 +5,89 @@ X-Spam-Level:
 X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 926E2C433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 16:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C2BCC433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 16:47:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 06B4A6113A
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 16:43:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 06B4A6113A
+	by mail.kernel.org (Postfix) with ESMTP id D84956115B
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 16:47:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D84956115B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 893C04B15E;
-	Thu,  9 Sep 2021 12:43:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 521D44B173;
+	Thu,  9 Sep 2021 12:47:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fH7conAoadj2; Thu,  9 Sep 2021 12:43:46 -0400 (EDT)
+	with ESMTP id ZEWbfkpGxd30; Thu,  9 Sep 2021 12:47:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CBB44B10B;
-	Thu,  9 Sep 2021 12:43:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53B814B160;
+	Thu,  9 Sep 2021 12:47:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 723184066E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 12:43:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7C834B15E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 12:47:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vo+mdAhKcZNa for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Sep 2021 12:43:44 -0400 (EDT)
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com
- [209.85.219.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 82E41405A6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 12:43:44 -0400 (EDT)
-Received: by mail-yb1-f173.google.com with SMTP id k65so5105447yba.13
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 09:43:44 -0700 (PDT)
+ with ESMTP id EyzIEdT1z6YH for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Sep 2021 12:47:18 -0400 (EDT)
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com
+ [209.85.216.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2C4549E93
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 12:47:18 -0400 (EDT)
+Received: by mail-pj1-f43.google.com with SMTP id j1so1790875pjv.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 09:47:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8rBbbtBdxJo/z24uZXVl1WsJ9x865p3tX3wOkYNw8zI=;
- b=CxwyPEJx4brKYyNJfKH8xuVZVHNOb+imoHwqrC+m2OvLlX1CF4dc26BHqiDbb0sFdk
- FmFt0zmLzKgCa1DNQCsc6xZr9y3Z4pPNnzfIhUb3+16a9bNWy6ONfjK/aT8G5S4TT4x2
- SkyR9dYU1Bc3NWOfR/N8Xx4cdUqvv0TI5ThmKPXKlq0Dk9Zn2TJzowps8qXs4ziXJamP
- twWLDiVKUzt9dDskgQnZ+tuA0VajMO+0ZZb02gUUe6KXZatND7/Lkxi5UJx9cL/zyBl2
- 9opFUHOSodvBlEv+qiApY+wGv/xCn72PWdKYkA+dJ2BOP4oZE/fSnYIKWCoQG3Sc2S3C
- kONA==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=aqDJdy/bngbKNH/GkT/KKhZxJC8IlkHUa3ohSA9/WQU=;
+ b=ONNwLK04smMPzA1dePLbmmudjm0amUNmRtiYHvgryjFJBCMqEiKgQrX5RF1aC1XJJ0
+ hWGXF3y+GFritFMHREj/UVar2x+rdaZm0irWxNMv+LtAXnbin8UzvYLQtWYlJG4F3H6G
+ w4q9CvLy8UuQA9ibUg+Pkv3NyXGvwD3mDu/SSzCtu6vrwXboszDnNf6rjxv2eQomVE6U
+ t2ouvCIt+0W6zIj5Xr5K8DrtFc82Oeihv6JsJwCJ/bb42U3enEoCHMyXy6qgXkAtUxP6
+ p3suq2NUa6JIXQWTT0wXjsyD6l0MDq0FsI9i121Xi63gKbdiTks1E+Jh+xMeDaWxf5zP
+ 1Rlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8rBbbtBdxJo/z24uZXVl1WsJ9x865p3tX3wOkYNw8zI=;
- b=rnDkd6wFlbprQVe+ORhNVRysFLDxwrJ3vwEweV0/7+AmWoNNkxcKfyyDjMqnhw5kL+
- 2QEFzm2fP6FExEU3gFnVeMQv7ZfQ/Zu0QM5vmvjZZDJzg5E3LE+45q0G0eyYvouTLa9n
- 4kLVqNf2rdScIH0aEOrtm+nv6QqCD8mrl/8a8YRWhPlimvdH8FZbPvVngdHra7Ffu3F2
- PRPIr1E1WaPbiRaOKRN9OF58O/XacC8+s/pTlMWuhUUkqxR3I1HRwABrMzXPyZ+PpGl9
- vznHDX/h1ukb5ri/ak8lu6unzKt3u3YGeye0XC3se2FU8VR4W+n1+OVOsMeBqWpl/nqt
- pbiA==
-X-Gm-Message-State: AOAM531KdwZFdHr5Dkve/VIkruJA4xAghbB0xaAn+8Wk7548kzv7NLOU
- qpRcxVWtWgHM/TpSLNUW46heMCn35TzGqkCNix2vww==
-X-Google-Smtp-Source: ABdhPJxK5TixXHGpQ0HcjLdTV1bZ1SKePd5PRIPCrE5JXb/3IBGHK3nqLVQvIpatA9h6OifefO1lBmdtxEyNyano2rg=
-X-Received: by 2002:a25:cd82:: with SMTP id d124mr5096262ybf.491.1631205823874; 
- Thu, 09 Sep 2021 09:43:43 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=aqDJdy/bngbKNH/GkT/KKhZxJC8IlkHUa3ohSA9/WQU=;
+ b=3VpKdg0L4QtTEDhwseubkStM6tUmye89qbi2VRui7SJn3RguqTpNZZeUKptT7ymnl6
+ ctU8VZdA8EKjiXGZrIQakaV7MilcEMu25vpQvoQHJJF6ujVLAO6cbASkgHsKn8sqX0Kj
+ vkPS5D/dXlvtw4oimYKACW+8lHURMlW5C0cUvXH+UWj3CF6nvSbEak61ioeY+jdJD5r5
+ NN3qxl6iorvTr70Re8weUu6A5E2H08bkrqtBe7OtkMz8tmcitSVS9kmvYbEOi5AJeA/d
+ hWQ8NbS0qIU+YJmX8EA+1J0mH36t5K8LGsncbeIMuvDmX/8ZoSMlaXGfcA2Hh+XdPXI6
+ 0vgw==
+X-Gm-Message-State: AOAM531P9W8VGyjb7u78cQOv9RHGG0vPqH8btBFoig0E+LqJang6dds5
+ I4VEspQ1xmk5tcqoJIk3suwDlA==
+X-Google-Smtp-Source: ABdhPJyoRFIZmAkN7ZrnaHVghWbLzbIeUZ5Eg97bAH4sMRYbkFXJcKwlS1ZMLW/kE1H7gibUsCPBMg==
+X-Received: by 2002:a17:902:c401:b0:138:e450:1ec4 with SMTP id
+ k1-20020a170902c40100b00138e4501ec4mr3508456plk.56.1631206037420; 
+ Thu, 09 Sep 2021 09:47:17 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150])
+ by smtp.gmail.com with ESMTPSA id s9sm2622619pfu.129.2021.09.09.09.47.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 09 Sep 2021 09:47:16 -0700 (PDT)
+Date: Thu, 9 Sep 2021 09:47:13 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
+ the VM IPA size
+Message-ID: <YTo6kX7jGeR3XvPg@google.com>
+References: <20210908210320.1182303-1-ricarkol@google.com>
+ <20210908210320.1182303-2-ricarkol@google.com>
+ <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
 MIME-Version: 1.0
-References: <20210909013818.1191270-1-rananta@google.com>
- <20210909013818.1191270-4-rananta@google.com>
- <20210909065612.d36255fur5alf6sl@gator>
-In-Reply-To: <20210909065612.d36255fur5alf6sl@gator>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Thu, 9 Sep 2021 09:43:32 -0700
-Message-ID: <CAJHc60y2i9AT5rEat0pK-h2BsNjzp_1tbqGAM5Lx=V3WfBBaMA@mail.gmail.com>
-Subject: Re: [PATCH v4 03/18] KVM: arm64: selftests: Use read/write
- definitions from sysreg.h
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, pshier@google.com,
+ Paolo Bonzini <pbonzini@redhat.com>, shuah@kernel.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,29 +104,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 8, 2021 at 11:56 PM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Thu, Sep 09, 2021 at 01:38:03AM +0000, Raghavendra Rao Ananta wrote:
-> > Make use of the register read/write definitions from
-> > sysreg.h, instead of the existing definitions. A syntax
-> > correction is needed for the files that use write_sysreg()
-> > to make it compliant with the new (kernel's) syntax.
+On Thu, Sep 09, 2021 at 11:20:15AM +0100, Alexandru Elisei wrote:
+> Hi Ricardo,
+> 
+> On 9/8/21 10:03 PM, Ricardo Koller wrote:
+> > Extend vgic_v3_check_base() to verify that the redistributor regions
+> > don't go above the VM-specified IPA size (phys_size). This can happen
+> > when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
 > >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> >   base + size > phys_size AND base < phys_size
+> >
+> > vgic_v3_check_base() is used to check the redist regions bases when
+> > setting them (with the vcpus added so far) and when attempting the first
+> > vcpu-run.
+> >
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > > ---
-> >  .../selftests/kvm/aarch64/debug-exceptions.c  | 28 +++++++++----------
-> >  .../selftests/kvm/include/aarch64/processor.h | 13 +--------
-> >  2 files changed, 15 insertions(+), 26 deletions(-)
+> >  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
 > >
->
-> Same comment as Oliver, otherwise
->
-Will fix.
+> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+> > index 66004f61cd83..5afd9f6f68f6 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> > @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
+> >  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
+> >  			rdreg->base)
+> >  			return false;
+> > +
+> > +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
+> > +			kvm_phys_size(kvm))
+> > +			return false;
+> 
+> Looks to me like this same check (and the overflow one before it) is done when
+> adding a new Redistributor region in kvm_vgic_addr() -> vgic_v3_set_redist_base()
+> -> vgic_v3_alloc_redist_region() -> vgic_check_ioaddr(). As far as I can tell,
+> kvm_vgic_addr() handles both ways of setting the Redistributor address.
+> 
+> Without this patch, did you manage to set a base address such that base + size >
+> kvm_phys_size()?
+> 
 
-Regards,
-Raghavendra
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
->
+Yes, with the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API. The easiest way
+to get to this situation is with the selftest in patch 2.  I then tried
+an extra experiment: map the first redistributor, run the first vcpu,
+and access the redist from inside the guest. KVM didn't complain in any
+of these steps.
+
+Thanks,
+Ricardo
+
+> Thanks,
+> 
+> Alex
+> 
+> >  	}
+> >  
+> >  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
