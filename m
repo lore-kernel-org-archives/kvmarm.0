@@ -7,97 +7,95 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DACA9C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 13:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62940C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 13:34:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 597FD61059
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 13:20:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 597FD61059
+	by mail.kernel.org (Postfix) with ESMTP id CEFBC611C7
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 13:34:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CEFBC611C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9B3B4B11F;
-	Thu,  9 Sep 2021 09:20:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 464B64B153;
+	Thu,  9 Sep 2021 09:34:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bJ7MDnelJ-m9; Thu,  9 Sep 2021 09:20:28 -0400 (EDT)
+	with ESMTP id WOz+pM4YxU4L; Thu,  9 Sep 2021 09:34:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14D464B12F;
-	Thu,  9 Sep 2021 09:20:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C03564B115;
+	Thu,  9 Sep 2021 09:34:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AEDE4B10E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 09:20:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FFF74048A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 09:34:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id otfQKTcigLBe for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Sep 2021 09:20:25 -0400 (EDT)
+ with ESMTP id mkrKwlzHy78M for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Sep 2021 09:34:26 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A2784B106
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 09:20:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6233D402DB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 09:34:26 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1631193625;
+ s=mimecast20190719; t=1631194466;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=IPz8rCaG1n5gmzRfNCxWNsl8VhshhGe4oboIWdB5nfY=;
- b=LSyxwV6+iGlPhkCoE0U1nIUQc4ofYtvinXc8xcq8eIzpUc9NZCbefS/fHPu71fruwGEakb
- CrTm/mrvIa4tH39zZiaVqmQdOzdaU/JlvdRyq49YWVckyeuzwsBto60W3dYzg7GpOilxoF
- oHL+cnY2Hf77jorO9EPoJniJimySTII=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-vQYR_yeBM4e_OR0uS-moxA-1; Thu, 09 Sep 2021 09:20:23 -0400
-X-MC-Unique: vQYR_yeBM4e_OR0uS-moxA-1
-Received: by mail-ed1-f70.google.com with SMTP id
- u2-20020aa7d982000000b003cda80fa659so954979eds.14
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 06:20:23 -0700 (PDT)
+ bh=2Q7pFBb41mM6ea1MZnjVghiyEWdoCaTiHYJmPRbmHnQ=;
+ b=Z8aDLShh1s0kRe4EiMauK5n6/U7dtFYZDLpJUc/ytFT+9DI3losV71SF/KH158S1VVZjGc
+ yGyLnrQV7X1CkhZF8TLPAwoLO86y9VazRljPvKbgkFqAcsInX4U6NMoGSeaRbbdra5d2wD
+ MAb+L1iCTHsfg8/gc6loRi+TbQc1VmY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-70-sstOcZFJP36SNWa1b6OvoQ-1; Thu, 09 Sep 2021 09:34:25 -0400
+X-MC-Unique: sstOcZFJP36SNWa1b6OvoQ-1
+Received: by mail-wm1-f71.google.com with SMTP id
+ k5-20020a7bc3050000b02901e081f69d80so775721wmj.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 06:34:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=IPz8rCaG1n5gmzRfNCxWNsl8VhshhGe4oboIWdB5nfY=;
- b=fuFmap9MbPhS9ZxWGwpjPlyXxIcOPTgfNCnGcvlJNtU5T7v0rt+kMnBvnpF75pFv+h
- ANyQxXW3O9Fh3KRK+xk570qkvW1t+L0annJ34R2F3dOLyaWbb5PKMIt1WE2pHTsG02xu
- HDsp9dxvPYZs+TfQO5vx8bZXixx6x9NlGYoNLm33WfXjrGHM8aFHqYg/7+yEFx8L8eMv
- F/XutoovzAwtjoapsVuacudMwDE9MStNqJI4OipHK0b7l7CcW8/6RJiGpOOrPCFJyllP
- hdqXqOYbxtKVpCBBCGa/e51WP2Qkz54BOkFbTWTZkt/g3stoaTC8JMm4sWw/sAVeZ3UK
- OB5g==
-X-Gm-Message-State: AOAM533AdY6iE8idV9YXqZsFQJK0/V+cmUjzD1W/xPJK1VJxYCMDHD/E
- 4gTrntJBT4hc+wAeZAfn+no2mYo1rZA5QiTCZJiKJY+eYEhgi/Hql8I4CApPKs2ZPPP5Cu9O4lD
- wEbo6C2BpYRQ36F6BiuojfFUo
-X-Received: by 2002:a17:906:1510:: with SMTP id
- b16mr3523483ejd.332.1631193622102; 
- Thu, 09 Sep 2021 06:20:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxltN+LLKBsItVnHF6jboBkL7BG/4gKE6eUK2+syXfEg8esfR9/Hha6iEqkMhy0wQUkBEbcyQ==
-X-Received: by 2002:a17:906:1510:: with SMTP id
- b16mr3523459ejd.332.1631193621929; 
- Thu, 09 Sep 2021 06:20:21 -0700 (PDT)
+ bh=2Q7pFBb41mM6ea1MZnjVghiyEWdoCaTiHYJmPRbmHnQ=;
+ b=k0Fu5sxgzyVR7ya92bnC7JN8BgUMMhFGu0GNsZ/lhyu2tu4wjfmn1AiMkQWnlUtsgG
+ Eala3IDpXfU6voVx5uGOVkXdCBwuo/fZey1vNESquMHx2LKcTkuGKwJ7FKJAZJ/6R0gX
+ B71Rsh/lyGmdFfXsfEyKd/xZ0Rr9hGAJVIcCKdp6iybMPw4GqMZghcEyLtZUER39N7t/
+ EVC5fCvBjPavmhSPy2YUYv/xQeYR1BGCPqU2ELh0dlmK+Pq1GLowpefB0D58I26hG9C8
+ +okyDtw0a8melzLmMVTcx965PKCxdAVkAV0Sn7gz8v8WZ+xJ2v7MeNSBh1IKxIwvp9JC
+ E7rA==
+X-Gm-Message-State: AOAM531aaM2ea0/+EmdLKyc/muokyg5z8LbXcqJStAO/YIhSPa3dYAZN
+ qfOqDe952RxUNS1WAHJ7rOEJL9urRwF7E0EFCDdV3fTbU2YxgeVrAc7SVj7lZgWf1ZdL7u4Lm4v
+ tUY/TucR1wZlCuFSVXOGSvG3g
+X-Received: by 2002:adf:b60f:: with SMTP id f15mr3665003wre.257.1631194463933; 
+ Thu, 09 Sep 2021 06:34:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxAa/35Y8EeWRcAEuDGOq75zQKTD2hppp6pTHEcWPqQ1zyn1QeYm1M8X/dALPxOElMhuVHRDQ==
+X-Received: by 2002:adf:b60f:: with SMTP id f15mr3664972wre.257.1631194463710; 
+ Thu, 09 Sep 2021 06:34:23 -0700 (PDT)
 Received: from gator (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
- by smtp.gmail.com with ESMTPSA id l16sm999043eje.67.2021.09.09.06.20.20
+ by smtp.gmail.com with ESMTPSA id o10sm2053571wrc.16.2021.09.09.06.34.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Sep 2021 06:20:21 -0700 (PDT)
-Date: Thu, 9 Sep 2021 15:20:19 +0200
+ Thu, 09 Sep 2021 06:34:23 -0700 (PDT)
+Date: Thu, 9 Sep 2021 15:34:21 +0200
 From: Andrew Jones <drjones@redhat.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v4 12/18] KVM: selftests: Keep track of the number of
- vCPUs for a VM
-Message-ID: <20210909132019.etrlz2t7pes7bc2o@gator>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v4 14/18] KVM: arm64: selftests: Add host support for vGIC
+Message-ID: <20210909133421.rdkueb627glve6uz@gator>
 References: <20210909013818.1191270-1-rananta@google.com>
- <20210909013818.1191270-13-rananta@google.com>
+ <20210909013818.1191270-15-rananta@google.com>
+ <YTmce6Xn+ymngA+r@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20210909013818.1191270-13-rananta@google.com>
+In-Reply-To: <YTmce6Xn+ymngA+r@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -116,84 +114,172 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 09, 2021 at 01:38:12AM +0000, Raghavendra Rao Ananta wrote:
-> The host may want to know the number of vCPUs that were
-> created for a particular VM (used in upcoming patches).
-> Hence, include nr_vcpus as a part of 'struct kvm_vm' to
-> keep track of vCPUs as and when they are added or
-> deleted, and return to the caller via vm_get_nr_vcpus().
+On Thu, Sep 09, 2021 at 05:32:43AM +0000, Oliver Upton wrote:
+> Hi Raghu,
 > 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  tools/testing/selftests/kvm/include/kvm_util.h      | 1 +
->  tools/testing/selftests/kvm/lib/kvm_util.c          | 7 +++++++
->  tools/testing/selftests/kvm/lib/kvm_util_internal.h | 1 +
->  3 files changed, 9 insertions(+)
+> On Thu, Sep 09, 2021 at 01:38:14AM +0000, Raghavendra Rao Ananta wrote:
+> > Implement a simple library to perform vGIC-v3 setup
+> > from a host point of view. This includes creating a
+> > vGIC device, setting up distributor and redistributor
+> > attributes, and mapping the guest physical addresses.
+> > 
+> > The definition of REDIST_REGION_ATTR_ADDR is taken
+> > from aarch64/vgic_init test.
+> >
 > 
-> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> index 010b59b13917..d5d0ca919928 100644
-> --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> @@ -399,5 +399,6 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
->  
->  int vm_get_stats_fd(struct kvm_vm *vm);
->  int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
-> +int vm_get_nr_vcpus(struct kvm_vm *vm);
->  
->  #endif /* SELFTEST_KVM_UTIL_H */
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 10a8ed691c66..1b5349b5132f 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -594,6 +594,7 @@ static void vm_vcpu_rm(struct kvm_vm *vm, struct vcpu *vcpu)
->  
->  	list_del(&vcpu->list);
->  	free(vcpu);
-> +	vm->nr_vcpus--;
->  }
->  
->  void kvm_vm_release(struct kvm_vm *vmp)
-> @@ -1143,6 +1144,7 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
->  
->  	/* Add to linked-list of VCPUs. */
->  	list_add(&vcpu->list, &vm->vcpus);
-> +	vm->nr_vcpus++;
->  }
->  
->  /*
-> @@ -2343,3 +2345,8 @@ int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid)
->  
->  	return ioctl(vcpu->fd, KVM_GET_STATS_FD, NULL);
->  }
-> +
-> +int vm_get_nr_vcpus(struct kvm_vm *vm)
-> +{
-> +	return vm->nr_vcpus;
-> +}
+> Consider dropping the macro from vgic_init.c and have it just include
+> vgic.h
 
-nr_vcpus looks like useful library internal information, since the only
-other way to get the number is to iterate the vcpu list. I'm not sure
-if we need this vm_get_nr_vcpus() accessor for tests yet though. Maybe
-it'll be more clear to me when I see how it's used.
+Yes, I agree 18/18 should be squashed into this one.
+
+> 
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |  2 +-
+> >  .../selftests/kvm/include/aarch64/vgic.h      | 20 +++++++
+> >  .../testing/selftests/kvm/lib/aarch64/vgic.c  | 60 +++++++++++++++++++
+> >  3 files changed, 81 insertions(+), 1 deletion(-)
+> >  create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> > 
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index 5476a8ddef60..8342f65c1d96 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -35,7 +35,7 @@ endif
+> >  
+> >  LIBKVM = lib/assert.c lib/elf.c lib/io.c lib/kvm_util.c lib/rbtree.c lib/sparsebit.c lib/test_util.c lib/guest_modes.c lib/perf_test_util.c
+> >  LIBKVM_x86_64 = lib/x86_64/apic.c lib/x86_64/processor.c lib/x86_64/vmx.c lib/x86_64/svm.c lib/x86_64/ucall.c lib/x86_64/handlers.S
+> > -LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c
+> > +LIBKVM_aarch64 = lib/aarch64/processor.c lib/aarch64/ucall.c lib/aarch64/handlers.S lib/aarch64/spinlock.c lib/aarch64/gic.c lib/aarch64/gic_v3.c lib/aarch64/vgic.c
+> >  LIBKVM_s390x = lib/s390x/processor.c lib/s390x/ucall.c lib/s390x/diag318_test_handler.c
+> >  
+> >  TEST_GEN_PROGS_x86_64 = x86_64/cr4_cpuid_sync_test
+> > diff --git a/tools/testing/selftests/kvm/include/aarch64/vgic.h b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> > new file mode 100644
+> > index 000000000000..3a776af958a0
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/include/aarch64/vgic.h
+> > @@ -0,0 +1,20 @@
+> > +/* SPDX-License-Identifier: GPL-2.0 */
+> > +/*
+> > + * ARM Generic Interrupt Controller (GIC) host specific defines
+> > + */
+> > +
+> > +#ifndef SELFTEST_KVM_VGIC_H
+> > +#define SELFTEST_KVM_VGIC_H
+> > +
+> > +#include <linux/kvm.h>
+> > +
+> > +#define REDIST_REGION_ATTR_ADDR(count, base, flags, index) \
+> > +	(((uint64_t)(count) << 52) | \
+> > +	((uint64_t)((base) >> 16) << 16) | \
+> > +	((uint64_t)(flags) << 12) | \
+> > +	index)
+> > +
+> > +int vgic_v3_setup(struct kvm_vm *vm,
+> > +				uint64_t gicd_base_gpa, uint64_t gicr_base_gpa);
+> > +
+> > +#endif /* SELFTEST_KVM_VGIC_H */
+> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> > new file mode 100644
+> > index 000000000000..2318912ab134
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+> > @@ -0,0 +1,60 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * ARM Generic Interrupt Controller (GIC) v3 host support
+> > + */
+> > +
+> > +#include <linux/kvm.h>
+> > +#include <linux/sizes.h>
+> > +
+> > +#include "kvm_util.h"
+> > +#include "vgic.h"
+> > +
+> > +#define VGIC_V3_GICD_SZ		(SZ_64K)
+> > +#define VGIC_V3_GICR_SZ		(2 * SZ_64K)
+> 
+> These values are UAPI, consider dropping them in favor of the
+> definitions from asm/kvm.h
+
+Yes, please.
+
+> 
+> > +
+> > +/*
+> > + * vGIC-v3 default host setup
+> > + *
+> > + * Input args:
+> > + *	vm - KVM VM
+> > + *	gicd_base_gpa - Guest Physical Address of the Distributor region
+> > + *	gicr_base_gpa - Guest Physical Address of the Redistributor region
+> > + *
+> > + * Output args: None
+> > + *
+> > + * Return: GIC file-descriptor or negative error code upon failure
+> > + *
+> > + * The function creates a vGIC-v3 device and maps the distributor and
+> > + * redistributor regions of the guest. Since it depends on the number of
+> > + * vCPUs for the VM, it must be called after all the vCPUs have been created.
+> 
+> You could avoid the ordering dependency by explicitly taking nr_vcpus as
+> an arg. It would also avoid the need for 12/18.
+
+All the vcpus need to be created prior to calling
+KVM_DEV_ARM_VGIC_CTRL_INIT, so even though I don't disagree with
+simply passing nr_vcpus to this function, we should still assert
+if the VM's idea of the number doesn't match. But, this is a lib
+file, so there's no reason not to do
+
+#include "../kvm_util_internal.h"
+
+and just access the vcpu list to get the count or, if we add a
+new internal nr_vcpus member, access it directly. IOW, so far
+I don't believe we need vm_get_nr_vcpus().
+
+> 
+> Also note the required alignment on the GPA arguments you're taking.
+> 
+> > + */
+> > +int vgic_v3_setup(struct kvm_vm *vm,
+> > +		uint64_t gicd_base_gpa, uint64_t gicr_base_gpa)
+> > +{
+> > +	uint64_t redist_attr;
+> > +	int gic_fd, nr_vcpus;
+> > +	unsigned int nr_gic_pages;
+> > +
+> > +	nr_vcpus = vm_get_nr_vcpus(vm);
+> > +	TEST_ASSERT(nr_vcpus > 0, "Invalid number of CPUs: %u\n", nr_vcpus);
+> > +
+> > +	/* Distributor setup */
+> > +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+> > +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> > +			KVM_VGIC_V3_ADDR_TYPE_DIST, &gicd_base_gpa, true);
+> > +	nr_gic_pages = vm_calc_num_guest_pages(vm_get_mode(vm), VGIC_V3_GICD_SZ);
+> > +	virt_map(vm, gicd_base_gpa, gicd_base_gpa,  nr_gic_pages);
+> > +
+> > +	/* Redistributor setup */
+> > +	redist_attr = REDIST_REGION_ATTR_ADDR(nr_vcpus, gicr_base_gpa, 0, 0);
+> > +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+> > +			KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &redist_attr, true);
+> > +	nr_gic_pages = vm_calc_num_guest_pages(vm_get_mode(vm),
+> > +						VGIC_V3_GICR_SZ * nr_vcpus);
+> > +	virt_map(vm, gicr_base_gpa, gicr_base_gpa,  nr_gic_pages);
+> > +
+> > +	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> > +				KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+> > +
+> > +	return gic_fd;
+> > +}
+> > -- 
+> > 2.33.0.153.gba50c8fa24-goog
+> > 
+>
 
 Thanks,
-drew
-
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util_internal.h b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> index a03febc24ba6..be4d852d2f3b 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util_internal.h
-> @@ -56,6 +56,7 @@ struct kvm_vm {
->  	unsigned int va_bits;
->  	uint64_t max_gfn;
->  	struct list_head vcpus;
-> +	int nr_vcpus;
->  	struct userspace_mem_regions regions;
->  	struct sparsebit *vpages_valid;
->  	struct sparsebit *vpages_mapped;
-> -- 
-> 2.33.0.153.gba50c8fa24-goog
-> 
+drew 
 
 _______________________________________________
 kvmarm mailing list
