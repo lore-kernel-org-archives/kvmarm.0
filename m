@@ -7,75 +7,82 @@ X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8588CC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 02:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF48FC433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 02:55:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id F110B61181
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 02:47:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F110B61181
+	by mail.kernel.org (Postfix) with ESMTP id 4F7AE611C1
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 02:55:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4F7AE611C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71B014B0A0;
-	Wed,  8 Sep 2021 22:47:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFF334B08D;
+	Wed,  8 Sep 2021 22:55:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SJTvtXhMAfFs; Wed,  8 Sep 2021 22:47:46 -0400 (EDT)
+	with ESMTP id LkEXmMpcV-yW; Wed,  8 Sep 2021 22:55:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8146E4B0DB;
-	Wed,  8 Sep 2021 22:47:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A73BC4B0A0;
+	Wed,  8 Sep 2021 22:55:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 721904A193
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 22:47:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA4834B08D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 22:55:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0ZDoDBycFp8X for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Sep 2021 22:47:44 -0400 (EDT)
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com
- [209.85.167.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E15B4A3BF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 22:47:44 -0400 (EDT)
-Received: by mail-lf1-f46.google.com with SMTP id s10so648554lfr.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Sep 2021 19:47:44 -0700 (PDT)
+ with ESMTP id 2IoWC6DUqJ0G for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Sep 2021 22:55:45 -0400 (EDT)
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com
+ [209.85.166.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12AC44AC80
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Sep 2021 22:55:45 -0400 (EDT)
+Received: by mail-il1-f182.google.com with SMTP id x5so455709ill.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Sep 2021 19:55:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=JZuJyqgIQ3oQtgMoTdVtSIrlc/hlmnNYpLQyvIq2xfg=;
- b=VZXmr2CtnEu1xnlQB4sj2Toq9NyQnwr3mAwinwc9e8osCTTaXFE+U4Fud4LA4LQwHL
- tKIq+ogy26qQ/8sq5IHh1IZf4M4UAzkPAVyKYHJor1xFMGUQVY8Gu3C67tp1bAAGmALc
- 1vk19c5020uz/heFydrcvHLZ7iJAhJqPZCCH9/lxWmAtmgqVSUAsGQzpDbEXNU/rp8Eo
- ftURTDAMe4WoRh6lSolAyHoT2Uz9IwQvq4w1ttJUdRzg234sqSsL8cps/95yAkAPqClc
- M/+o+mVAN9ae1EQE0dH6Jjidt6164K1TboKNNsnUWx9A4aZu6ESEx2imAPJDnA6rVaUp
- QZoA==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=70g9MtOxJ+c9WQaUJGlWTIEgCLNxdZNwZARtMaXCcgM=;
+ b=fybdFrS1IowdAXfYbxOXZ3I6iSICWHOoF9IqHePDV3JYI5GmKvgKKa90x5sb5L8SYR
+ 9szwaRfJMm9JfBRUgGGY3YY12Mjuc+rk2CbaIqEdAE32pvpey8S5NzpVoqHHXoJoizU9
+ Y4m0MBUqxSXXIpH97d7OQLDeqGByZe+DbZDDbBDInbxLt8uB2fzneSrc+2gXDZ6qGE7k
+ UtVvjlpHQ5cpq/I/6xiR7ftkjaNaD1UCpUlyMn/WeV1wyAJhooWq7AgiBdv15eANHjag
+ wv9n6hADOzo+d0E/yh8ZUZBX4YFEHDZJ9eQixJtbt9LixnwUWFrLJ9+yU+ejmrjmnr5b
+ qvLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=JZuJyqgIQ3oQtgMoTdVtSIrlc/hlmnNYpLQyvIq2xfg=;
- b=FM3zVmLKYZC2+CGuSEmY7ZMZOs04XoUc4UlnJVtHTdUAM8C2pfNUp7n31DWITLjnuF
- CfmPIYkPLAtMhIVp7gtsTukugRjEJDDIF7Zc/CohW4iLcVN2tNIp1cT8KLGZMjrs1NOt
- yoXpk5gvusr1PKJZqLADrC9o3sLSpq5pjZDEgKzcusrEjfYBnza31VW2Apcvl0NarP3d
- 5ovFrm8yfkV1l60gQZQy/UV6wG/H/UUOFwbdLW3sJ6NlPpk/lDFFxS5hQx13OfGp4VUm
- 7KtlDUub2hwvf185rbiGFP7CQr3+YHMVsO6u5xkgnjrcj7Td9ZsT6/w3g4bqD1XlUzxd
- ljCQ==
-X-Gm-Message-State: AOAM531EP7UGJN87bttpsYfUoNtHsDUVDR5wx0YvEVHaFxtUSAviVFNG
- slxbYbpGD+zamZIvkCO1kWibNyiN7uM2oGeXRlIPjQ==
-X-Google-Smtp-Source: ABdhPJwf+kTCeI6PWF0qQnERCUUUEE8rZRrAMp2Rah12EYfVEJ+5BQho5Hay73HyIRWt9EKzJwn1d+yIQ9o2ln5e0jc=
-X-Received: by 2002:a05:6512:114c:: with SMTP id
- m12mr626886lfg.150.1631155662626; 
- Wed, 08 Sep 2021 19:47:42 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210909013818.1191270-1-rananta@google.com>
- <20210909013818.1191270-3-rananta@google.com>
-In-Reply-To: <20210909013818.1191270-3-rananta@google.com>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=70g9MtOxJ+c9WQaUJGlWTIEgCLNxdZNwZARtMaXCcgM=;
+ b=BpoA1ldeaYF5LtVk2vWNpK0gZLiYIUZD15XA6zeRqxqzPQIoiNgxpOr+kWJZjdRzGj
+ 8nGYs9bJb6/K3Yyo/Q3ZQN0qTP5xvEpeFCf8wteh8jwFfeT8SC0uH07mgPtyzZTSXtlc
+ szfhaTjvsfCfjv6Vzdxv1jcVnA6ElYBSU/x5InmnmadtBYx1uMm0ydikb7nRSs9R75c2
+ AkSRIaqV8nYpu5hCuE2RtbyNFslmg5fnxsGYfOV/AT75WdkE4sgY9pQ8KfG8Pnc6gn80
+ 3P7jOIK+XVXAF/odOhuRZVdCugmFL3NPTJBiwfgdDFJAw4jxgjxhnCIMIMmRQrNlrDII
+ i1CA==
+X-Gm-Message-State: AOAM532g/AXbsuPtcwgp3FKBexFkBrNfQxY0pnqNjiR1eGuhslNJ0klB
+ AAmcizMJ9x65vyPuRo/f8/8htw==
+X-Google-Smtp-Source: ABdhPJwe5z4yVVGtg+ZHPkN6LiNEnHan8VvEXYzBBzUdrsrQl6RJRGqbPl1NpgQBsDKzC/M6vmVW7Q==
+X-Received: by 2002:a92:6907:: with SMTP id e7mr563449ilc.301.1631156144318;
+ Wed, 08 Sep 2021 19:55:44 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194])
+ by smtp.gmail.com with ESMTPSA id a2sm259247ilm.82.2021.09.08.19.55.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Sep 2021 19:55:43 -0700 (PDT)
+Date: Thu, 9 Sep 2021 02:55:40 +0000
 From: Oliver Upton <oupton@google.com>
-Date: Wed, 8 Sep 2021 22:47:31 -0400
-Message-ID: <CAOQ_Qsh=F-tTre_ojiLXUfAriH-coTF_gXCcLyRb3kKM+LLhQA@mail.gmail.com>
-Subject: Re: [PATCH v4 02/18] KVM: arm64: selftests: Add sysreg.h
 To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v4 03/18] KVM: arm64: selftests: Use read/write
+ definitions from sysreg.h
+Message-ID: <YTl3rP50dYjvmmDP@google.com>
+References: <20210909013818.1191270-1-rananta@google.com>
+ <20210909013818.1191270-4-rananta@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20210909013818.1191270-4-rananta@google.com>
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
@@ -97,22 +104,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Raghu,
-
-On Wed, Sep 8, 2021 at 9:38 PM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> Bring-in the kernel's arch/arm64/include/asm/sysreg.h
-> into selftests to make use of all the standard
-> register definitions in consistence with the kernel.
->
+On Thu, Sep 09, 2021 at 01:38:03AM +0000, Raghavendra Rao Ananta wrote:
+> Make use of the register read/write definitions from
+> sysreg.h, instead of the existing definitions. A syntax
+> correction is needed for the files that use write_sysreg()
+> to make it compliant with the new (kernel's) syntax.
+> 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  .../selftests/kvm/include/aarch64/sysreg.h    | 1278 +++++++++++++++++
->  1 file changed, 1278 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/include/aarch64/sysreg.h
+>  .../selftests/kvm/aarch64/debug-exceptions.c  | 28 +++++++++----------
+>  .../selftests/kvm/include/aarch64/processor.h | 13 +--------
+>  2 files changed, 15 insertions(+), 26 deletions(-)
+>
 
-This belongs in tools/arch/arm64/include/asm/sysreg.h, I believe.
+[...]
+
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index 96578bd46a85..bed4ffa70905 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -8,6 +8,7 @@
+>  #define SELFTEST_KVM_PROCESSOR_H
+>  
+>  #include "kvm_util.h"
+> +#include "sysreg.h"
+
+#include <asm/sysreg.h>, based on comments to 02/18
+
+Otherwise:
+
+Reviewed-by: Oliver Upton <oupton@google.com>
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
