@@ -2,74 +2,111 @@ Return-Path: <SRS0=JP/k=N7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 893ECC433F5
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 14:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D146C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 14:43:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CFD4B61263
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 14:41:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CFD4B61263
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 98AA66120E
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Sep 2021 14:43:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 98AA66120E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9184B166;
-	Thu,  9 Sep 2021 10:41:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 182894B14C;
+	Thu,  9 Sep 2021 10:43:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mPLLrt-V4Apj; Thu,  9 Sep 2021 10:41:34 -0400 (EDT)
+	with ESMTP id UTw8lFHlHD1B; Thu,  9 Sep 2021 10:43:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1C1B4B11F;
-	Thu,  9 Sep 2021 10:41:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0718A4B154;
+	Thu,  9 Sep 2021 10:43:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DBD64B08E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 10:41:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15ED74B14C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 10:43:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UtwfPwUfJa7f for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Sep 2021 10:41:32 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8422D4A5A0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 10:41:32 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC8DF6D;
- Thu,  9 Sep 2021 07:41:31 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 78A7F3F59C;
- Thu,  9 Sep 2021 07:41:29 -0700 (PDT)
-Subject: Re: [kvm-unit-tests RFC PATCH 4/5] scripts: Generate kvmtool
- standalone tests
-To: Andrew Jones <drjones@redhat.com>
-References: <20210702163122.96110-1-alexandru.elisei@arm.com>
- <20210702163122.96110-5-alexandru.elisei@arm.com>
- <20210907102135.i2w3r7j4zyj736b5@gator>
- <ee11a10a-c3e6-b9ce-81e1-147025a9b5bd@arm.com>
- <20210908160743.l4hrl4de7wkxwuda@gator>
- <9d5da497-7070-31ef-282a-a11a86e0102e@arm.com>
- <20210909130553.gnzce7cs7d5stvjd@gator>
- <7313396e-de46-8a3b-902d-5a59b2089c79@arm.com>
- <20210909135429.dqreodxr7elpvmfm@gator>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-Message-ID: <e8560cdb-532c-0320-420d-c57d14cdae18@arm.com>
-Date: Thu, 9 Sep 2021 15:42:54 +0100
+ with ESMTP id t8O7EatPDwaZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Sep 2021 10:43:16 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 193414B08E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 10:43:16 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1631198595;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NXI4TwfF9ATuisncE0UeLZfKMl4lBSArTcS01RD5hDM=;
+ b=Fh1HbL9mwPFTDMGnj0tCBBh0PsoVlk7z3OzkSBeKULFrIRxzg1PmsEnC6nFETkojHSHuRh
+ e3URA96qlV0GIcalDuXGDlo67EiFOK6sc7JpEAod5hZJU9aSNO9FIudhjF44GjgG9n1hfD
+ tPw80kLbgnrd1YwrjVEYoYWLRBQ++4Y=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-367-ooPbhaCKPOG-M97eYTveYA-1; Thu, 09 Sep 2021 10:43:14 -0400
+X-MC-Unique: ooPbhaCKPOG-M97eYTveYA-1
+Received: by mail-wr1-f69.google.com with SMTP id
+ d10-20020adffbca000000b00157bc86d94eso580296wrs.20
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 07:43:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:reply-to:subject:to:cc:references:from
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-transfer-encoding:content-language;
+ bh=NXI4TwfF9ATuisncE0UeLZfKMl4lBSArTcS01RD5hDM=;
+ b=tTaZmStn7JlWQXI8LiyydcigivhkNoMUDXUJo0W5pG+UxEqt876v5IDCguRCQIHVe2
+ LM7m6Yb/iOMFppuKvYhp3bnbakZwKdrGwaKiH0zh5ZM0DGRZ+FRyenNGXXrBFm9mD1MP
+ o5oRrqzimJdzRcvoWY5f+r1ZEjAhW2L1bqyZE72fVcOCvgZxdQgidXViovzAs/fNnb9b
+ kph5E6a80j2nuJ+McHt1bff5zYZu6ucvPmB9coZyhmG8Q2nKonoJRsCJq8vCxkY8iFtY
+ FhJmzSoKY66mptrAtYUldsLuCAKbvz4h3jtG8ymIM00zRzcUS8kHx79EHdj5AJ5cmsO+
+ jmRA==
+X-Gm-Message-State: AOAM531eKNQeiq3NMS1IVv7Gp1jDQN7b63vDTfC9MdwpczE2hXbJNw4l
+ Ckyy9RfUWQEUBnzn/zMOlzofoutH0QlSoeDAgMzCNfWsTTBW+jyaHmXti+0h449Pxggcud8hRYM
+ 4akpqVwE1g9148Mn0AWdaQgjL
+X-Received: by 2002:adf:ea4d:: with SMTP id j13mr4019752wrn.86.1631198593659; 
+ Thu, 09 Sep 2021 07:43:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw1LuTiwsjnrgw/0AGWEEOKwqU3QmylhI8y8zAc70bSBImbu5FbUVlcZZAs/ShC2AxuK5Z4Jw==
+X-Received: by 2002:adf:ea4d:: with SMTP id j13mr4019708wrn.86.1631198593387; 
+ Thu, 09 Sep 2021 07:43:13 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id a5sm1748509wmm.44.2021.09.09.07.43.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 09 Sep 2021 07:43:12 -0700 (PDT)
+Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
+ the VM IPA size
+To: Alexandru Elisei <alexandru.elisei@arm.com>,
+ Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org, maz@kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+References: <20210908210320.1182303-1-ricarkol@google.com>
+ <20210908210320.1182303-2-ricarkol@google.com>
+ <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
+From: Eric Auger <eric.auger@redhat.com>
+Message-ID: <bd905ebe-f786-9d5b-d19d-03ff5fa1ba14@redhat.com>
+Date: Thu, 9 Sep 2021 16:43:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210909135429.dqreodxr7elpvmfm@gator>
+In-Reply-To: <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Cc: lvivier@redhat.com, linux-s390@vger.kernel.org, thuth@redhat.com,
- frankja@linux.ibm.com, kvm@vger.kernel.org, david@redhat.com,
- andre.przywara@arm.com, cohuck@redhat.com, kvm-ppc@vger.kernel.org,
- vivek.gautam@arm.com, maz@kernel.org, pbonzini@redhat.com,
- imbrenda@linux.ibm.com, kvmarm@lists.cs.columbia.edu
+Cc: pshier@google.com, Paolo Bonzini <pbonzini@redhat.com>, shuah@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -83,192 +120,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
+Hi,
 
-On 9/9/21 2:54 PM, Andrew Jones wrote:
-> On Thu, Sep 09, 2021 at 02:47:57PM +0100, Alexandru Elisei wrote:
->> Hi Drew,
+On 9/9/21 12:20 PM, Alexandru Elisei wrote:
+> Hi Ricardo,
+>
+> On 9/8/21 10:03 PM, Ricardo Koller wrote:
+>> Extend vgic_v3_check_base() to verify that the redistributor regions
+>> don't go above the VM-specified IPA size (phys_size). This can happen
+>> when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
 >>
->> On 9/9/21 2:05 PM, Andrew Jones wrote:
->>> On Thu, Sep 09, 2021 at 12:11:52PM +0100, Alexandru Elisei wrote:
->>>> Hi Drew,
->>>>
->>>> On 9/8/21 5:07 PM, Andrew Jones wrote:
->>>>> On Wed, Sep 08, 2021 at 04:37:39PM +0100, Alexandru Elisei wrote:
->>>>>> Hi Drew,
->>>>>>
->>>>>> On 9/7/21 11:21 AM, Andrew Jones wrote:
->>>>>>> On Fri, Jul 02, 2021 at 05:31:21PM +0100, Alexandru Elisei wrote:
->>>>>>>> Add support for the standalone target when running kvm-unit-tests under
->>>>>>>> kvmtool.
->>>>>>>>
->>>>>>>> Example command line invocation:
->>>>>>>>
->>>>>>>> $ ./configure --target=kvmtool
->>>>>>>> $ make clean && make standalone
->>>>>>>>
->>>>>>>> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
->>>>>>>> ---
->>>>>>>>  scripts/mkstandalone.sh | 14 +++++++-------
->>>>>>>>  1 file changed, 7 insertions(+), 7 deletions(-)
->>>>>>>>
->>>>>>>> diff --git a/scripts/mkstandalone.sh b/scripts/mkstandalone.sh
->>>>>>>> index 16f461c06842..d84bdb7e278c 100755
->>>>>>>> --- a/scripts/mkstandalone.sh
->>>>>>>> +++ b/scripts/mkstandalone.sh
->>>>>>>> @@ -44,6 +44,10 @@ generate_test ()
->>>>>>>>  	config_export ARCH_NAME
->>>>>>>>  	config_export PROCESSOR
->>>>>>>>  
->>>>>>>> +	if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "arm" ]; then
->>>>>>>> +		config_export TARGET
->>>>>>>> +	fi
->>>>>>> Should export unconditionally, since we'll want TARGET set
->>>>>>> unconditionally.
->>>>>> Yes, will do.
->>>>>>
->>>>>>>> +
->>>>>>>>  	echo "echo BUILD_HEAD=$(cat build-head)"
->>>>>>>>  
->>>>>>>>  	if [ ! -f $kernel ]; then
->>>>>>>> @@ -59,7 +63,7 @@ generate_test ()
->>>>>>>>  		echo 'export FIRMWARE'
->>>>>>>>  	fi
->>>>>>>>  
->>>>>>>> -	if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
->>>>>>>> +	if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ]; then
->>>>>>> I think it would be better to ensure that ENVIRON_DEFAULT is "no" for
->>>>>>> TARGET=kvmtool in configure.
->>>>>> From looking at the code, it is my understanding that with ENVIRON_DEFAULT=yes, an
->>>>>> initrd file is generated with the contents of erratatxt and other information, in
->>>>>> a key=value pair format. This initrd is then passed on to the test (please correct
->>>>>> me if I'm wrong). With ENVIRON_DEFAULT=no (set via ./configure
->>>>>> --disable-default-environ), this initrd is not generated.
->>>>>>
->>>>>> kvmtool doesn't have support for passing an initrd when loading firmware, so yes,
->>>>>> I believe the default should be no.
->>>>>>
->>>>>> However, I have two questions:
->>>>>>
->>>>>> 1. What happens when the user specifically enables the default environ via
->>>>>> ./configure --enable-default-environ --target=kvmtool? In my opinion, that should
->>>>>> be an error because the user wants something that is not possible with kvmtool
->>>>>> (loading an image with --firmware in kvmtool means that the initrd image it not
->>>>>> loaded into the guest memory and no node is generated for it in the dtb), but I
->>>>>> would like to hear your thoughts about it.
->>>>> As part of the forcing ENVIRON_DEFAULT to "no" for kvmtool in configure an
->>>>> error should be generated if a user tries to explicitly enable it.
->>>>>
->>>>>> 2. If the default environment is disabled, is it still possible for an user to
->>>>>> pass an initrd via other means? I couldn't find where that is implemented, so I'm
->>>>>> guessing it's not possible.
->>>>> Yes, a user could have a KVM_UNIT_TESTS_ENV environment variable set when
->>>>> they launch the tests. If that variable points to a file then it will get
->>>>> passed as an initrd. I guess you should also report a warning in arm/run
->>>>> if KVM_UNIT_TESTS_ENV is set which states that the environment file will
->>>>> be ignored when running with kvmtool.
->>>> Thank you for explaining it, I had looked at
->>>> scripts/arch-run.bash::initrd_create(), but it didn't click that setting the
->>>> KVM_UNIT_TESTS_ENV environment variable is enough to generate and use the initrd.
->>>>
->>>> After looking at the code some more, in the logs the -initrd argument is shown as
->>>> a comment, instead of an actual argument that is passed to qemu:
->>>>
->>>> timeout -k 1s --foreground 90s /usr/bin/qemu-system-aarch64 -nodefaults -machine
->>>> virt,gic-version=host,accel=kvm -cpu host -device virtio-serial-device -device
->>>> virtconsole,chardev=ctd -chardev testdev,id=ctd -device pci-testdev -display none
->>>> -serial stdio -kernel arm/cache.flat -smp 1 # -initrd /tmp/tmp.rUIZ3h9KLJ
->>>> QEMU_ACCEL = kvm
->>>> INFO: IDC-DIC: dcache clean to PoU required
->>>> INFO: IDC-DIC: icache invalidation to PoU required
->>>> PASS: IDC-DIC: code generation
->>>> SUMMARY: 1 tests
->>>>
->>>> This is done intentionally in scripts/arch-run.bash::run_qemu(). I don't
->>>> understand the reason for that. When I first looked at the logs, I was sure that
->>>> no initrd is passed to the test. I had to go dig through the scripts to figure out
->>>> that the "#" sign (which marks the beginning of a comment) is not present in the
->>>> qemu invocation.
->>> It's commented out because if you want to copy+paste the command line to
->>> use it again it'll fail to run because the temp file will be gone. Of
->>> course somebody depending on the environment for their test run will have
->>> other problems when it's gone, but those people can use the
->>> KVM_UNIT_TESTS_ENV variable to specify a non-temp file which includes the
->>> default environment and then configure without the default environment.
->>> The command line won't get the # in that case.
->> Hmm... wouldn't it make more sense then to generate the initrd in the logs
->> directory, and keep it there? To ensure the test runs can be reproduced manually,
->> if needed?
-> Well, there's no logs directory for standalone tests, but I do like the
-> idea of capturing the environment when possible. Possibly the best thing
-> to do is to provide an option that, when enabled, says to dump the
-> environment into the log before executing the test. That would be similar
-> to how BUILD_HEAD is output first when running the tests standalone.
-> Anyway, this is a good idea, but probably outside the scope of your
-> kvmtool work unless the initrd thing is blocking you and you need to
-> rework it anyway.
+>>   base + size > phys_size AND base < phys_size
+>>
+>> vgic_v3_check_base() is used to check the redist regions bases when
+>> setting them (with the vcpus added so far) and when attempting the first
+>> vcpu-run.
+>>
+>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+>> ---
+>>  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
+>>  1 file changed, 4 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+>> index 66004f61cd83..5afd9f6f68f6 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
+>>  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
+>>  			rdreg->base)
+>>  			return false;
+>> +
+>> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
+>> +			kvm_phys_size(kvm))
+>> +			return false;
+> Looks to me like this same check (and the overflow one before it) is done when
+> adding a new Redistributor region in kvm_vgic_addr() -> vgic_v3_set_redist_base()
+> -> vgic_v3_alloc_redist_region() -> vgic_check_ioaddr(). As far as I can tell,
+> kvm_vgic_addr() handles both ways of setting the Redistributor address.
+To me vgic_check_ioaddr() does check the base addr but not the end addr.
+So looks this fix is needed.
+As I commented on the selftest patch, I think you should double check
+your fix also handles the KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION case.
 
-I don't need to change anything about how initrd works in kvm-unit-tests for my
-kvmtool series, I was just curious to understand more about it. Thank you for the
-explanations!
+In vgic_v3_alloc_redist_region(), in this later case, we know the number
+of redistributors in the region (count), so it would be easy to check
+the end addr. But I think this would be a duplicate of your new check as
+vgic_v3_check_base() also gets called in vgic_register_redist_iodev().
+But better to check it ;-)
 
-Thanks,
+Thanks
 
-Alex
-
+Eric
+>
+> Without this patch, did you manage to set a base address such that base + size >
+> kvm_phys_size()?
 >
 > Thanks,
-> drew
 >
->> Thanks,
->>
->> Alex
->>
->>> Thanks,
->>> drew
->>>
->>>> Thanks,
->>>>
->>>> Alex
->>>>
->>>>> There aren't currently any other ways to invoke the addition of the
->>>>> -initrd command line option, because so far we only support passing a
->>>>> single file to test (the environment "file"). If we ever want to pass
->>>>> more files, then we'd need to create a simple file system on the initrd
->>>>> and make it possible to add -initrd even when no environment is desired.
->>>>> But, that may never happen.
->>>>>
->>>>> Thanks,
->>>>> drew
->>>>>
->>>>>> Thanks,
->>>>>>
->>>>>> Alex
->>>>>>
->>>>>>>>  		temp_file ERRATATXT "$ERRATATXT"
->>>>>>>>  		echo 'export ERRATATXT'
->>>>>>>>  	fi
->>>>>>>> @@ -95,12 +99,8 @@ function mkstandalone()
->>>>>>>>  	echo Written $standalone.
->>>>>>>>  }
->>>>>>>>  
->>>>>>>> -if [ "$TARGET" = "kvmtool" ]; then
->>>>>>>> -	echo "Standalone tests not supported with kvmtool"
->>>>>>>> -	exit 2
->>>>>>>> -fi
->>>>>>>> -
->>>>>>>> -if [ "$ENVIRON_DEFAULT" = "yes" ] && [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
->>>>>>>> +if [ "$TARGET" != "kvmtool" ] && [ "$ENVIRON_DEFAULT" = "yes" ] && \
->>>>>>>> +		[ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
->>>>>>>>  	echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
->>>>>>>>  	exit 2
->>>>>>>>  fi
->>>>>>>> -- 
->>>>>>>> 2.32.0
->>>>>>>>
->>>>>>> Thanks,
->>>>>>> drew 
->>>>>>>
+> Alex
+>
+>>  	}
+>>  
+>>  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
