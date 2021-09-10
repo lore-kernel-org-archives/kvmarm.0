@@ -2,88 +2,111 @@ Return-Path: <SRS0=KxuI=OA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF4BC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Sep 2021 00:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A21CBC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Sep 2021 07:12:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3ED2D611BF
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Sep 2021 00:49:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3ED2D611BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 22D64610A3
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Sep 2021 07:12:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 22D64610A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA63B4B205;
-	Thu,  9 Sep 2021 20:49:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8969E4B15C;
+	Fri, 10 Sep 2021 03:12:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I2VvRKJ4CyzJ; Thu,  9 Sep 2021 20:49:28 -0400 (EDT)
+	with ESMTP id NE7DHMDulVZZ; Fri, 10 Sep 2021 03:12:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EC534B227;
-	Thu,  9 Sep 2021 20:49:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66C984B15E;
+	Fri, 10 Sep 2021 03:12:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A24E44B1DC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 20:49:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 089674B15C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Sep 2021 03:12:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lIQI0bMDy4LG for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Sep 2021 20:49:25 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F9254B126
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 20:49:25 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id
- ib9-20020a0562141c8900b003671c3a1243so612479qvb.21
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 17:49:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=qXTzlQcki5Z1B3LV6gzbhBx4QrZxfh2wOWzu6LDwbLI=;
- b=DvMVWjV3QYWlrellGcgEt+A/tPhUiz5dpu+g0e7xAqEBmW+XVsbtrG9TSYRL/rQbF/
- Vb8PshuGDJefFH7kzGp5MQuYE4qrful3MV7uzGaerCHJkLlyAGRIqp+Fxfc5PC2M8IsI
- aCDSZ9Q4tEw62gWGjSFCY9w09U3jPwLqNBEsvGbDeRlLCi6Wz7AwUU/gRyLcto7iRBVm
- TRmv5hSI6M4wM1n2YZ59xwuxCIyw9GlkBAwvjlSKcoUB5gkBfuZGfObHt+Dxxp97BBRM
- pU3QP1vrVQGZvyf2CH3rmBHrJOMRO73ARJ1C5a+KsAiKEjtpkkxBBD7YAHn7RQBdHGps
- VfnA==
+ with ESMTP id AbsGG8EubRHK for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Sep 2021 03:12:42 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35DA54B130
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Sep 2021 03:12:42 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1631257962;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4ISP21JdBfrzKPln3oVCGs9+0XULEd4mYwEeP7w0w2c=;
+ b=ZvQt8GS/LeVFnBWsLvGmuEbi52iG41Nntsh2dQ/1g+lfeI+WCcuJESAt7zCjuHAqDOQIkm
+ t1WJlg1NIn2QKc7X2wOePcKmEBQGleJduST2+WlmW3sWL07VoKrun2WdR1SwCJmg0HBpQT
+ i2hkffe41WovpPgIiMDRtl2SnKC36WQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-450-yj_TcEVQNPm0SXY90Ne3gQ-1; Fri, 10 Sep 2021 03:12:41 -0400
+X-MC-Unique: yj_TcEVQNPm0SXY90Ne3gQ-1
+Received: by mail-wr1-f71.google.com with SMTP id
+ z2-20020a5d4c82000000b0015b140e0562so168006wrs.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Sep 2021 00:12:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=qXTzlQcki5Z1B3LV6gzbhBx4QrZxfh2wOWzu6LDwbLI=;
- b=vTY+cpA5OHYGpVEmC+wibaBoTWq3Jx/wl4s23PdRu5iUuMKrfiVTIYShNfznWeR/rY
- dvxrQNqYJ4mz2Hf4gUn8NgSoP9WN3h4L+tY2a889kdYt4zObAw+u5JbQjrYDPFb3CFw/
- VoUh/3OiaEIwxfgL1uKK5Y+0bcB/2OBTPoTxv3W+ffnZW5zSC7KM8HNAHxqvQFFl/tfZ
- 3MT0miycpwMu64M337eZ2pfHkvxhhy+Hd0e3wFwJ6MU8BzVGSCojwHxP59EU0KgfHGN3
- qmRaY0sjXamZYQ9ihiHFAlNM/sGNsZXBGdsXBo2Kf9ly39UDBlYiXx/a1ZwS9dJ5cvU6
- rwXQ==
-X-Gm-Message-State: AOAM5322nwRXK04zJfclD9jADkSKtvOaTKG81mpqo+1ybpiqB83BtVNP
- 0zeXZ6QtMQ7L7CpbgLaSZmIPyXfm++VQqA==
-X-Google-Smtp-Source: ABdhPJziAmZhL+w/+T/9SGzl2L6SkBxRI7kg2xJlY6KsdHMtvzcpxiUebER6o80VRB2Z/qQzuTXCgswqOmGYtg==
-X-Received: from ricarkol2.c.googlers.com
- ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:ad4:522c:: with SMTP id
- r12mr5969701qvq.17.1631234965148; Thu, 09 Sep 2021 17:49:25 -0700 (PDT)
-Date: Thu,  9 Sep 2021 17:49:19 -0700
-In-Reply-To: <20210910004919.1610709-1-ricarkol@google.com>
-Message-Id: <20210910004919.1610709-3-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20210910004919.1610709-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH v2 2/2] KVM: arm64: selftests: tests for vgic redist regions
- above the VM IPA size
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu, 
- drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
-Cc: pshier@google.com, Paolo Bonzini <pbonzini@redhat.com>, shuah@kernel.org
+ h=x-gm-message-state:reply-to:subject:to:cc:references:from
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-transfer-encoding:content-language;
+ bh=4ISP21JdBfrzKPln3oVCGs9+0XULEd4mYwEeP7w0w2c=;
+ b=YOL6iaAKZiR9YkQispAv1DifsR7ajJiBD4HSARMYlwV7o/BtNY88YbL6lGIAk5nP6R
+ o2W9Fgp1VXyQoK9QhqYiktqSwtYMc/Kz0L3mza7U9nLxEhZYf+4ATwFpuyuhWruBLPr1
+ V/lHQfhHcP1A5Np+xBOXhE00WSgQLzBk90TcFu/Sr4GWeDVkRdIJPD8AHVSIwEMAm85e
+ rktzbTX8tAYBSJzOcYzUH8/eMnmddWHMR8WVOGtWqrHGQKgY/NId3Miovxwbb2jKx0L/
+ k2lRFwz+no92GeDG7ksZrkWtRJV/tOrFQKc0fBej+GAFZgNCGxBzwG+Gbd5Q1/ppjmr5
+ FYqA==
+X-Gm-Message-State: AOAM531v4FwwY7Q752rn/PCQu9rXQTMSTYMW9XfXbKUJOh5DC766XGmf
+ GUdNgxRZA3qnh4ooHyA9VTugKRcu2gVFSidd/wEea5a9TAlyIR0SCgETiGJ7yhu9WYopX/o8Qmu
+ 8Rj01uAiRQPChdvh/w9tho/5K
+X-Received: by 2002:a5d:538e:: with SMTP id d14mr7966158wrv.192.1631257959757; 
+ Fri, 10 Sep 2021 00:12:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzGBvwyOl/M6aG9dvJhp94O8ADjwpjuDHrwESDcghO2xGm9zlU5kOqz87JrcqTkhEBPGLO1ng==
+X-Received: by 2002:a5d:538e:: with SMTP id d14mr7966109wrv.192.1631257959440; 
+ Fri, 10 Sep 2021 00:12:39 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id u27sm4071795wru.2.2021.09.10.00.12.38
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 10 Sep 2021 00:12:38 -0700 (PDT)
+Subject: Re: [PATCH 2/2] KVM: arm64: selftests: test for vgic redist above the
+ VM IPA size
+To: Ricardo Koller <ricarkol@google.com>
+References: <20210908210320.1182303-1-ricarkol@google.com>
+ <20210908210320.1182303-3-ricarkol@google.com>
+ <83282104-ca04-c4f5-3570-c884a22ab667@redhat.com>
+ <YTpQ4y37RhaQTJ3m@google.com>
+From: Eric Auger <eric.auger@redhat.com>
+Message-ID: <70787ee2-a393-8c1e-d8fc-aa85ff989c8c@redhat.com>
+Date: Fri, 10 Sep 2021 09:12:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
+MIME-Version: 1.0
+In-Reply-To: <YTpQ4y37RhaQTJ3m@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, maz@kernel.org, shuah@kernel.org, pshier@google.com,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -97,87 +120,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-These new tests attempt (and fail) to set a redist region using the
-KVM_VGIC_V3_ADDR_TYPE_REDIST and KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS
-with regions partially above the VM-specified IPA size (phys_size).
+Hi Ricardo,
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- .../testing/selftests/kvm/aarch64/vgic_init.c | 52 +++++++++++++++++++
- 1 file changed, 52 insertions(+)
+On 9/9/21 8:22 PM, Ricardo Koller wrote:
+> On Thu, Sep 09, 2021 at 03:54:31PM +0200, Eric Auger wrote:
+>> Hi Ricardo,
+>>
+>> On 9/8/21 11:03 PM, Ricardo Koller wrote:
+>>> This test attempts (and fails) to set a redistributor region using the
+>>> legacy KVM_VGIC_V3_ADDR_TYPE_REDIST that's partially above the
+>>> VM-specified IPA size.
+>>>
+>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+>>> ---
+>>>  .../testing/selftests/kvm/aarch64/vgic_init.c | 44 +++++++++++++++++++
+>>>  1 file changed, 44 insertions(+)
+>>>
+>>> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+>>> index 623f31a14326..6dd7b5e91421 100644
+>>> --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
+>>> +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+>>> @@ -285,6 +285,49 @@ static void test_vcpus_then_vgic(void)
+>>>  	vm_gic_destroy(&v);
+>>>  }
+>>>  
+>>> +static void test_redist_above_vm_pa_bits(enum vm_guest_mode mode)
+>>> +{
+>>> +	struct vm_gic v;
+>>> +	int ret, i;
+>>> +	uint32_t vcpuids[] = { 1, 2, 3, 4, };
+>>> +	int pa_bits = vm_guest_mode_params[mode].pa_bits;
+>>> +	uint64_t addr, psize = 1ULL << pa_bits;
+>>> +
+>>> +	/* Add vcpu 1 */
+>>> +	v.vm = vm_create_with_vcpus(mode, 1, DEFAULT_GUEST_PHY_PAGES,
+>>> +				    0, 0, guest_code, vcpuids);
+>>> +	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+>>> +
+>>> +	/* Set space for half a redist, we have 1 vcpu, so this fails. */
+>>> +	addr = psize - 0x10000;
+>>> +	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>>> +				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+>>> +	TEST_ASSERT(ret && errno == EINVAL, "not enough space for one redist");
+>>> +
+>>> +	/* Set space for 3 redists, we have 1 vcpu, so this succeeds. */
+>>> +	addr = psize - (3 * 2 * 0x10000);
+>>> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>>> +				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+>> I think you need to test both the old API (KVM_VGIC_V3_ADDR_TYPE_REDIST)
+>> and the new one (KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION).
+>>
+>> Can't you integrate those new checks in existing tests,
+>> subtest_redist_regions() and subtest_dist_rdist() which already tests
+>> base addr beyond IPA limit (but not range end unfortunately). look for
+>> E2BIG.
+>>
+> Had some issues adapting subtest_dist_rdist() as the IPA range check for
+> ADDR_TYPE_REDIST is done at 1st vcpu run.  subtest_dist_rdist() is
+> already used to set overlapping dist/redist regions, which is then
+> checked to generate EINVAL on 1st vcpu run. If subtest_dist_rdist() is
+> also used to set the redist region above phys_size, then there won't be
+> a way of checking that the vcpu run fails because of both the overlap
+> and IPA issue.  It was simpler and cleaner to just add a new function
+> for the ADDR_TYPE_REDIST IPA range test.  Will adapt
+OK I see, then effectively adding a new test was more straightforward.
+> subtest_redist_regions() as the check for ADDR_TYPE_REDIST_REGION can be
+> done when setting the regions.
+OK
+>
+> Related Question:
+>
+> Both the KVM_VGIC_V3_ADDR_TYPE_REDIST and KVM_RUN currently return
+> EINVAL with my proposed change (not E2BIG). I will change
+> KVM_VGIC_V3_ADDR_TYPE_REDIST to fail with E2BIG, but will leave KVM_RUN
+> failing with EINVAL.  Would you say that's the correct behavior?
+This looks OK to me, as long as the KVM uapi doc documents is aligned.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index 623f31a14326..15aa01dc6a4d 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -285,6 +285,57 @@ static void test_vcpus_then_vgic(void)
- 	vm_gic_destroy(&v);
- }
- 
-+static void test_redist_above_vm_pa_bits(enum vm_guest_mode mode)
-+{
-+	struct vm_gic v;
-+	int ret, i;
-+	uint32_t vcpuids[] = { 1, 2, 3, 4, };
-+	int pa_bits = vm_guest_mode_params[mode].pa_bits;
-+	uint64_t addr, psize = 1ULL << pa_bits;
-+
-+	/* Add vcpu 1 */
-+	v.vm = vm_create_with_vcpus(mode, 1, DEFAULT_GUEST_PHY_PAGES,
-+				    0, 0, guest_code, vcpuids);
-+	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-+
-+	/* The redist end is above the IPA size, so this fails. */
-+	addr = REDIST_REGION_ATTR_ADDR(1, psize - 0x10000, 0, 0);
-+	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
-+	TEST_ASSERT(ret && errno == E2BIG,
-+		"register redist region with end address beyond IPA range");
-+
-+	/* Set space for half a redist, we have 1 vcpu, so this fails. */
-+	addr = psize - 0x10000;
-+	ret = _kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
-+	TEST_ASSERT(ret && errno == E2BIG,
-+		"register redist (legacy) with end address beyond IPA range");
-+
-+	/* Set space for 3 redists, we have 1 vcpu, so this succeeds. */
-+	addr = psize - (3 * 2 * 0x10000);
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
-+
-+	addr = 0x00000;
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
-+
-+	/* Add the rest of the VCPUs */
-+	for (i = 1; i < 4; ++i)
-+		vm_vcpu_add_default(v.vm, vcpuids[i], guest_code);
-+
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-+
-+	/* Attempt to run a vcpu without enough redist space. */
-+	ret = run_vcpu(v.vm, vcpuids[3]);
-+	TEST_ASSERT(ret && errno == EINVAL,
-+			"redist base+size above IPA detected on 1st vcpu run");
-+
-+	vm_gic_destroy(&v);
-+}
-+
- static void test_new_redist_regions(void)
- {
- 	void *dummy = NULL;
-@@ -542,6 +593,7 @@ int main(int ac, char **av)
- 	test_kvm_device();
- 	test_vcpus_then_vgic();
- 	test_vgic_then_vcpus();
-+	test_redist_above_vm_pa_bits(VM_MODE_DEFAULT);
- 	test_new_redist_regions();
- 	test_typer_accesses();
- 	test_last_bit_redist_regions();
--- 
-2.33.0.309.g3052b89438-goog
+Thanks
+
+Eric
+>
+> Thanks,
+> Ricardo
+>
+>> Thanks
+>>
+>> Eric
+>>> +
+>>> +	addr = 0x00000;
+>>> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+>>> +			KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
+>>> +
+>>> +	/* Add three vcpus (2, 3, 4). */
+>>> +	for (i = 1; i < 4; ++i)
+>>> +		vm_vcpu_add_default(v.vm, vcpuids[i], guest_code);
+>>> +
+>>> +	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
+>>> +			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
+>>> +
+>>> +	/* Attempt to run a vcpu without enough redist space. */
+>>> +	ret = run_vcpu(v.vm, vcpuids[3]);
+>>> +	TEST_ASSERT(ret && errno == EINVAL,
+>>> +			"redist base+size above IPA detected on 1st vcpu run");
+>>> +
+>>> +	vm_gic_destroy(&v);
+>>> +}
+>>> +
+>>>  static void test_new_redist_regions(void)
+>>>  {
+>>>  	void *dummy = NULL;
+>>> @@ -542,6 +585,7 @@ int main(int ac, char **av)
+>>>  	test_kvm_device();
+>>>  	test_vcpus_then_vgic();
+>>>  	test_vgic_then_vcpus();
+>>> +	test_redist_above_vm_pa_bits(VM_MODE_DEFAULT);
+>>>  	test_new_redist_regions();
+>>>  	test_typer_accesses();
+>>>  	test_last_bit_redist_regions();
 
 _______________________________________________
 kvmarm mailing list
