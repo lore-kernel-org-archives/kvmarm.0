@@ -1,96 +1,71 @@
-Return-Path: <SRS0=KxuI=OA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=s9Vz=OB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDFEFC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Sep 2021 19:32:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 946F5C433EF
+	for <kvmarm@archiver.kernel.org>; Sat, 11 Sep 2021 13:12:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6094A611EF
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Sep 2021 19:32:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6094A611EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id EA9AC611CC
+	for <kvmarm@archiver.kernel.org>; Sat, 11 Sep 2021 13:12:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EA9AC611CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D68134B1BA;
-	Fri, 10 Sep 2021 15:32:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66B994B1E9;
+	Sat, 11 Sep 2021 09:12:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pBHNZFNoJLSz; Fri, 10 Sep 2021 15:32:13 -0400 (EDT)
+	with ESMTP id 4zz4QP1WMMSz; Sat, 11 Sep 2021 09:12:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F52D4B1C9;
-	Fri, 10 Sep 2021 15:32:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C17354B1F1;
+	Sat, 11 Sep 2021 09:12:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 537244B1BA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Sep 2021 15:32:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8ADE44B1E9
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Sep 2021 09:12:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tUa2QE1p8Z2y for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Sep 2021 15:32:11 -0400 (EDT)
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
- [209.85.216.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 083504B173
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Sep 2021 15:32:11 -0400 (EDT)
-Received: by mail-pj1-f50.google.com with SMTP id t20so2043539pju.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Sep 2021 12:32:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to;
- bh=gp/EtrgVV0pqgAxNAgUDSeBZ+pTvYj4FQRlJ1GMLFEU=;
- b=AuY6LIJxJFI0BygWczR7RWIpobT48uhXYq/QvfUlCY2F2I0YalDnxjBhUMIr62Sg8E
- 4IlZDKKjWK7MLYPcreaZ0X1Ilrxo/tGZOrvIE1iOHXhCYxwEyKNddT2U1bQJron5k0Sx
- ZDrP2tbC8Bf35TrbfoqPaLSbT9sL/Fgv/5uIhDJiuO9wUtFqmLsqEXDIE55iiVi2SjUU
- qSBbiZFEzmFSwOwlFRTQStZ5ljt1Buo1xGWjG/u/EiIMmxjsKMQl2BiPAdde/Hj95btQ
- XO0Am4J0baDlBhg260FYw9vdd1rYHzVyl3sexJA3W3i7xgKEs2PAMMC0LxRhaJID/giR
- UGwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=gp/EtrgVV0pqgAxNAgUDSeBZ+pTvYj4FQRlJ1GMLFEU=;
- b=0z4834ER952NfAhlL4+BMeGXzcWE5Ba12dXkNJFr+NQM37pxZ/fhaVHvXt85j38nwf
- HxOqev7QgIz5H4DmrrrSZ+aH2SVaCL48sz4b880JE9u9o5vbmnv7jUiVK5Sp60C8fKWm
- QxDKyI5cQePEWDLKye1GVKxEpGPHBNJU9ZW/GGPJWmGJ8mL2U80+90YHmdkxcm6JZXWr
- x6mdb8pvhfLPs9YeH3zKt9jD+YtU2mIN1HztBuQens83BDFAp5yjTcVUDLgxobfLttVP
- b4vqAZSlMW2pAdWjH5bmbPWsMgPzgZHKSQuXLcazmJcwdNXh9osUGuVFbp94Avgyi5Zy
- 4Z9g==
-X-Gm-Message-State: AOAM530g+KeUY0/2zVKba8iL5SL8sT2zsK/VlckLEELndzXI5ZQ49zR8
- eiU8XOej/Kmj8uaqpJJmO1wGIQ==
-X-Google-Smtp-Source: ABdhPJx7k1Xe3NcxnUviUrljAE+Zul5MGB53kScveWe4Yie9kWrVt15hLLhM0LFtFUt7WR4y2CTMGA==
-X-Received: by 2002:a17:902:db05:b0:139:1b8:10c0 with SMTP id
- m5-20020a170902db0500b0013901b810c0mr8811814plx.26.1631302329725; 
- Fri, 10 Sep 2021 12:32:09 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id a71sm5922769pfd.86.2021.09.10.12.32.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Sep 2021 12:32:09 -0700 (PDT)
-Date: Fri, 10 Sep 2021 12:32:05 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: vgic: check redist region is not above
- the VM IPA size
-Message-ID: <YTuytfGTDlaoz0yH@google.com>
-References: <20210908210320.1182303-1-ricarkol@google.com>
- <20210908210320.1182303-2-ricarkol@google.com>
- <b368e9cf-ec28-1768-edf9-dfdc7fa108f8@arm.com>
- <YTo6kX7jGeR3XvPg@google.com>
- <5eb41efd-2ff2-d25b-5801-f4a56457a09f@arm.com>
- <80bdbdb3-1bff-aa99-c49b-76d6bd960aa9@redhat.com>
+ with ESMTP id hq5xnoyAd4MN for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 11 Sep 2021 09:12:11 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEE3E4B173
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Sep 2021 09:12:10 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6E03D61205;
+ Sat, 11 Sep 2021 13:12:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1631365928;
+ bh=BvUepuoep7XTWaVhs83x1LXOtgm9K1UWGy0biRI2gO4=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=c6WJG379Oebp2jZvOHCPoW3E6rsvz/rzxrLPI061XzuOR71/4i9V2QYVEElpvcPIB
+ n0CGum/BcQGQ7BFHmFBd1uulwA//eVHBkQvpceOj+oqLT9c+BIEt0mkWh03nNNIq/1
+ pJxiQ+itEcLLJDT/b2QFdNghFgk6yAOgCwjyZppVSoA57aNpCuWD4ctMIeTCJN7+vP
+ kmk8EAzOPt1aF8DDqLBPRL72XCdTyNztmkH2OPIXK7YjMBjzGkteiQ3IZuWyQfwToa
+ bVpxeDjpPozMEsh8DZzZDeRdoIYhUM9vPQZGPDrt2QGBGDOsLoPLn9C8OHL7ElqZS6
+ 6jZM1bwnjHRKA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.14 13/32] KVM: arm64: Make hyp_panic() more robust
+ when protected mode is enabled
+Date: Sat, 11 Sep 2021 09:11:30 -0400
+Message-Id: <20210911131149.284397-13-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210911131149.284397-1-sashal@kernel.org>
+References: <20210911131149.284397-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <80bdbdb3-1bff-aa99-c49b-76d6bd960aa9@redhat.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, shuah@kernel.org, pshier@google.com,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+X-stable: review
+X-Patchwork-Hint: Ignore
+Cc: Sasha Levin <sashal@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,175 +77,140 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alexandru and Eric,
+From: Will Deacon <will@kernel.org>
 
-On Fri, Sep 10, 2021 at 10:42:23AM +0200, Eric Auger wrote:
-> Hi Alexandru,
-> =
+[ Upstream commit ccac96977243d7916053550f62e6489760ad0adc ]
 
-> On 9/10/21 10:28 AM, Alexandru Elisei wrote:
-> > Hi Ricardo,
-> >
-> > On 9/9/21 5:47 PM, Ricardo Koller wrote:
-> >> On Thu, Sep 09, 2021 at 11:20:15AM +0100, Alexandru Elisei wrote:
-> >>> Hi Ricardo,
-> >>>
-> >>> On 9/8/21 10:03 PM, Ricardo Koller wrote:
-> >>>> Extend vgic_v3_check_base() to verify that the redistributor regions
-> >>>> don't go above the VM-specified IPA size (phys_size). This can happen
-> >>>> when using the legacy KVM_VGIC_V3_ADDR_TYPE_REDIST attribute with:
-> >>>>
-> >>>>   base + size > phys_size AND base < phys_size
-> >>>>
-> >>>> vgic_v3_check_base() is used to check the redist regions bases when
-> >>>> setting them (with the vcpus added so far) and when attempting the f=
-irst
-> >>>> vcpu-run.
-> >>>>
-> >>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> >>>> ---
-> >>>>  arch/arm64/kvm/vgic/vgic-v3.c | 4 ++++
-> >>>>  1 file changed, 4 insertions(+)
-> >>>>
-> >>>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgi=
-c-v3.c
-> >>>> index 66004f61cd83..5afd9f6f68f6 100644
-> >>>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> >>>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> >>>> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
-> >>>>  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
-> >>>>  			rdreg->base)
-> >>>>  			return false;
-> >>>> +
-> >>>> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
-> >>>> +			kvm_phys_size(kvm))
-> >>>> +			return false;
-> >>> Looks to me like this same check (and the overflow one before it) is =
-done when
-> >>> adding a new Redistributor region in kvm_vgic_addr() -> vgic_v3_set_r=
-edist_base()
-> >>> -> vgic_v3_alloc_redist_region() -> vgic_check_ioaddr(). As far as I =
-can tell,
-> >>> kvm_vgic_addr() handles both ways of setting the Redistributor addres=
-s.
-> >>>
-> >>> Without this patch, did you manage to set a base address such that ba=
-se + size >
-> >>> kvm_phys_size()?
-> >>>
-> >> Yes, with the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API. The easiest way
-> >> to get to this situation is with the selftest in patch 2.  I then tried
-> >> an extra experiment: map the first redistributor, run the first vcpu,
-> >> and access the redist from inside the guest. KVM didn't complain in any
-> >> of these steps.
-> > Yes, Eric pointed out that I was mistaken and there is no check being d=
-one for
-> > base + size > kvm_phys_size().
-> >
-> > What I was trying to say is that this check is better done when the use=
-r creates a
-> > Redistributor region, not when a VCPU is first run. We have everything =
-we need to
-> > make the check when a region is created, why wait until the VCPU is run?
-> >
-> > For example, vgic_v3_insert_redist_region() is called each time the add=
-s a new
-> > Redistributor region (via either of the two APIs), and already has a ch=
-eck for the
-> > upper limit overflowing (identical to the check in vgic_v3_check_base()=
-). I would
-> > add the check against the maximum IPA size there.
-> you seem to refer to an old kernel as vgic_v3_insert_redist_region was
-> renamed into=A0 vgic_v3_alloc_redist_region in
-> e5a35635464b kvm: arm64: vgic-v3: Introduce vgic_v3_free_redist_region()
-> =
+When protected mode is enabled, the host is unable to access most parts
+of the EL2 hypervisor image, including 'hyp_physvirt_offset' and the
+contents of the hypervisor's '.rodata.str' section. Unfortunately,
+nvhe_hyp_panic_handler() tries to read from both of these locations when
+handling a BUG() triggered at EL2; the former for converting the ELR to
+a physical address and the latter for displaying the name of the source
+file where the BUG() occurred.
 
-> I think in case you use the old rdist API you do not know yet the size
-> of the redist region at this point (count=3D0), hence Ricardo's choice to
-> do the check latter.
+Hack the EL2 panic asm to pass both physical and virtual ELR values to
+the host and utilise the newly introduced CONFIG_NVHE_EL2_DEBUG so that
+we disable stage-2 protection for the host before returning to the EL1
+panic handler. If the debug option is not enabled, display the address
+instead of the source file:line information.
 
-Just wanted to add one more detail. vgic_v3_check_base() is also called
-when creating the redistributor region (via vgic_v3_set_redist_base ->
-vgic_register_redist_iodev). This patch reuses that check for the old
-redist API to also check for "base + size > kvm_phys_size()" with a size
-calculated using the vcpus added so far.
+Cc: Andrew Scull <ascull@google.com>
+Cc: Quentin Perret <qperret@google.com>
+Signed-off-by: Will Deacon <will@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20210813130336.8139-1-will@kernel.org
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/arm64/kvm/handle_exit.c   | 23 ++++++++++++++---------
+ arch/arm64/kvm/hyp/nvhe/host.S | 21 +++++++++++++++++----
+ 2 files changed, 31 insertions(+), 13 deletions(-)
 
-> >
-> > Also, because vgic_v3_insert_redist_region() already checks for overflo=
-w, I
-> > believe the overflow check in vgic_v3_check_base() is redundant.
-> >
-
-It's redundant for the new redist API, but still needed for the old
-redist API.
-
-> > As far as I can tell, vgic_v3_check_base() is there to make sure that t=
-he
-> > Distributor doesn't overlap with any of the Redistributors, and because=
- the
-> > Redistributors and the Distributor can be created in any order, we defe=
-r the check
-> > until the first VCPU is run. I might be wrong about this, someone pleas=
-e correct
-> > me if I'm wrong.
-> >
-> > Also, did you verify that KVM is also doing this check for GICv2? KVM d=
-oes
-> > something similar and calls vgic_v2_check_base() when mapping the GIC r=
-esources,
-> > and I don't see a check for the maximum IPA size in that function eithe=
-r.
-> =
-
-> I think vgic_check_ioaddr() called in kvm_vgic_addr() does the job (it
-> checks the base @)
->
-
-It seems that GICv2 suffers from the same problem. The cpu interface
-base is checked but the end can extend above IPA size. Note that the cpu
-interface is 8KBs and vgic_check_ioaddr() is only checking that its base
-is 4KB aligned and below IPA size. The distributor region is 4KB so
-vgic_check_ioaddr() is enough in that case.
-
-What about the following?
-
-I can work on the next version of this patch (v2 has the GICv2 issue)
-which adds vgic_check_range(), which is like vgic_check_ioaddr() but
-with a size arg.  kvm_vgic_addr() can then call vgic_check_range() and
-do all the checks for GICv2 and GICv3. Note that for GICv2, there's no
-need to wait until first vcpu run to do the check. Also note that I will
-have to keep the change in vgic_v3_check_base() to check for the old v3
-redist API at first vcpu run.
-
-Thanks,
-Ricardo
-
-> Thanks
-> =
-
-> Eric
-> >
-> > Thanks,
-> >
-> > Alex
-> >
-> >> Thanks,
-> >> Ricardo
-> >>
-> >>> Thanks,
-> >>>
-> >>> Alex
-> >>>
-> >>>>  	}
-> >>>>  =
-
-> >>>>  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
-> =
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 6f48336b1d86..04ebab299aa4 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -292,11 +292,12 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
+ 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
+ }
+ 
+-void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr,
++void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
++					      u64 elr_virt, u64 elr_phys,
+ 					      u64 par, uintptr_t vcpu,
+ 					      u64 far, u64 hpfar) {
+-	u64 elr_in_kimg = __phys_to_kimg(__hyp_pa(elr));
+-	u64 hyp_offset = elr_in_kimg - kaslr_offset() - elr;
++	u64 elr_in_kimg = __phys_to_kimg(elr_phys);
++	u64 hyp_offset = elr_in_kimg - kaslr_offset() - elr_virt;
+ 	u64 mode = spsr & PSR_MODE_MASK;
+ 
+ 	/*
+@@ -309,20 +310,24 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr,
+ 		kvm_err("Invalid host exception to nVHE hyp!\n");
+ 	} else if (ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
+ 		   (esr & ESR_ELx_BRK64_ISS_COMMENT_MASK) == BUG_BRK_IMM) {
+-		struct bug_entry *bug = find_bug(elr_in_kimg);
+ 		const char *file = NULL;
+ 		unsigned int line = 0;
+ 
+ 		/* All hyp bugs, including warnings, are treated as fatal. */
+-		if (bug)
+-			bug_get_file_line(bug, &file, &line);
++		if (!is_protected_kvm_enabled() ||
++		    IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
++			struct bug_entry *bug = find_bug(elr_in_kimg);
++
++			if (bug)
++				bug_get_file_line(bug, &file, &line);
++		}
+ 
+ 		if (file)
+ 			kvm_err("nVHE hyp BUG at: %s:%u!\n", file, line);
+ 		else
+-			kvm_err("nVHE hyp BUG at: %016llx!\n", elr + hyp_offset);
++			kvm_err("nVHE hyp BUG at: %016llx!\n", elr_virt + hyp_offset);
+ 	} else {
+-		kvm_err("nVHE hyp panic at: %016llx!\n", elr + hyp_offset);
++		kvm_err("nVHE hyp panic at: %016llx!\n", elr_virt + hyp_offset);
+ 	}
+ 
+ 	/*
+@@ -334,5 +339,5 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr,
+ 	kvm_err("Hyp Offset: 0x%llx\n", hyp_offset);
+ 
+ 	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%016lx\n",
+-	      spsr, elr, esr, far, hpfar, par, vcpu);
++	      spsr, elr_virt, esr, far, hpfar, par, vcpu);
+ }
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index 2b23400e0fb3..4b652ffb591d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -7,6 +7,7 @@
+ #include <linux/linkage.h>
+ 
+ #include <asm/assembler.h>
++#include <asm/kvm_arm.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
+ 
+@@ -85,12 +86,24 @@ SYM_FUNC_START(__hyp_do_panic)
+ 
+ 	mov	x29, x0
+ 
++#ifdef CONFIG_NVHE_EL2_DEBUG
++	/* Ensure host stage-2 is disabled */
++	mrs	x0, hcr_el2
++	bic	x0, x0, #HCR_VM
++	msr	hcr_el2, x0
++	isb
++	tlbi	vmalls12e1
++	dsb	nsh
++#endif
++
+ 	/* Load the panic arguments into x0-7 */
+ 	mrs	x0, esr_el2
+-	get_vcpu_ptr x4, x5
+-	mrs	x5, far_el2
+-	mrs	x6, hpfar_el2
+-	mov	x7, xzr			// Unused argument
++	mov	x4, x3
++	mov	x3, x2
++	hyp_pa	x3, x6
++	get_vcpu_ptr x5, x6
++	mrs	x6, far_el2
++	mrs	x7, hpfar_el2
+ 
+ 	/* Enter the host, conditionally restoring the host context. */
+ 	cbz	x29, __host_enter_without_restoring
+-- 
+2.30.2
 
 _______________________________________________
 kvmarm mailing list
