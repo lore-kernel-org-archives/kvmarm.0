@@ -1,70 +1,85 @@
-Return-Path: <SRS0=s9Vz=OB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=OUTu=OC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD38C4332F
-	for <kvmarm@archiver.kernel.org>; Sat, 11 Sep 2021 13:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C028C433EF
+	for <kvmarm@archiver.kernel.org>; Sun, 12 Sep 2021 07:05:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 984606124B
-	for <kvmarm@archiver.kernel.org>; Sat, 11 Sep 2021 13:12:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 984606124B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8F87E61211
+	for <kvmarm@archiver.kernel.org>; Sun, 12 Sep 2021 07:05:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8F87E61211
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2262B4B173;
-	Sat, 11 Sep 2021 09:12:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D40AF4B13E;
+	Sun, 12 Sep 2021 03:05:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dJ+WmTDWOIFM; Sat, 11 Sep 2021 09:12:52 -0400 (EDT)
+	with ESMTP id ofZmlm1rnThh; Sun, 12 Sep 2021 03:05:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC1CF4B1ED;
-	Sat, 11 Sep 2021 09:12:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B09004B1E2;
+	Sun, 12 Sep 2021 03:05:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AD504B187
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Sep 2021 09:12:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D4CF4B1DC
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Sep 2021 03:05:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Sw4wkEXV75EH for <kvmarm@lists.cs.columbia.edu>;
- Sat, 11 Sep 2021 09:12:51 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E4E04B173
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Sep 2021 09:12:51 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 953BE61248;
- Sat, 11 Sep 2021 13:12:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1631365970;
- bh=BvUepuoep7XTWaVhs83x1LXOtgm9K1UWGy0biRI2gO4=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=X/HcQbAGit4GWfH/pnNkXPAM4U0lHsgZRsGi2rXsu5aPOi32YuSh8DBWE5OkVtiek
- lTV2UxILPUdlEAkreXrl8WJEs/3tk8vrYy5s79oRvTXUHaAhc6CKcg+q4TCcc6Mrm9
- LFgPRpPqdW/2BgqNz1I2G7J/dSzRmg1tPkAn+D1uPbwwppPQ7hjHNgCHVulfCak0lu
- gY99D4DuO3lC2WMrQsat5Lsb93N1NevnDotxkY0UNB56zXJfzqGpOxcN1c+Ses5TvT
- o0WLJYzLApgCzgx82/R1lGeu48j7MvHG1JPPfaLyjvz7B2DZO6VmI8Esf+tQjopY6E
- 50Y3pizmhtG+g==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 12/29] KVM: arm64: Make hyp_panic() more robust
- when protected mode is enabled
-Date: Sat, 11 Sep 2021 09:12:16 -0400
-Message-Id: <20210911131233.284800-12-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210911131233.284800-1-sashal@kernel.org>
-References: <20210911131233.284800-1-sashal@kernel.org>
+ with ESMTP id hn8z9+3F7qZv for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 12 Sep 2021 03:05:39 -0400 (EDT)
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com
+ [209.85.214.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 487EB4B13E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Sep 2021 03:05:39 -0400 (EDT)
+Received: by mail-pl1-f170.google.com with SMTP id o8so739610pll.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 12 Sep 2021 00:05:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QNpLnODXD3KMtIbZW9KjXBpb07wZf63uyRmwVpvp6IQ=;
+ b=KS9b8sBMavB5IM/KGnAEWQlq7rcYa7fBiZ5xKnoY5Mef+At1q0wBN1hS5AW3dW2KDO
+ ltQOtyijdPz/7V6QMRljKwGSuEFjsbpJMI6YxmWvpOAves6kHDJWe21DjFj3blFFVBBE
+ NcAhkl+fdkP1Ww5MHqA9WYZ/SF6fwCG5QXN8cmxHVvPgFGWRWHivy4WoHgh54LuOrNo3
+ RSwPItRUJ7XTMyUztTyG/md/pUYZ/siRmme/3DH8RLknVR7UfxtItclIvSa+P6X7KNu3
+ n9A0utp4LeyUrBdIQIBFpsm3QKkjqS5IdCUiD4LyoFRHpwUsJQsAmJDslrNJ0et7xf9T
+ SUQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QNpLnODXD3KMtIbZW9KjXBpb07wZf63uyRmwVpvp6IQ=;
+ b=3YuVEkdctPN99QfYzXFHlT2p/lLfURNRdXizAYrXcnOOHc/xENDfLuLcNPdf1TScl1
+ ceDZoZ688DW8v/ZrRfA0cR0JIwJFgmCH/Ubksj7F+GX4nTwQ0xvwQcJUuQg5XeZA4+o9
+ PNM4/7lw+wmv5FCSXoOHmkmIPMTTOXGElxQR471TH5/ObvqOsnxEnxISepnFSiUOh+qp
+ As+oUJcf8RVNExhDqTa8z1qy1ktGC6qJ1YkShOyBBpUKvBAcV7bZWJvSHo7FByDn6iMy
+ R+QVjQDroYn1cyNjLBFHAvdSOgDKJEMIqgilnvaSeM0CQkC6GX4q7V8msn3frXrwA4QA
+ tT0g==
+X-Gm-Message-State: AOAM533gjvolWOzabyH2OwGxuAaYaL9Rs1xA5qhuRP/I7J/3z7dUF3Bw
+ UcdAhP7lnHUiLZT5y+mY42wF3hd6lEUbAZzJxZbDUQ==
+X-Google-Smtp-Source: ABdhPJxdd84H/DsUuLXrFrUnP2cmjHGR9a4YQXIREdU5uKBdYshF8RaY9FwAu6nWcCNUpa+wHuqKzNOa3l5fx2WmBN4=
+X-Received: by 2002:a17:902:654c:b0:13a:5661:3d33 with SMTP id
+ d12-20020a170902654c00b0013a56613d33mr5222572pln.40.1631430338122; Sun, 12
+ Sep 2021 00:05:38 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Cc: Sasha Levin <sashal@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+References: <20210909013818.1191270-1-rananta@google.com>
+ <20210909013818.1191270-10-rananta@google.com>
+In-Reply-To: <20210909013818.1191270-10-rananta@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Sun, 12 Sep 2021 00:05:22 -0700
+Message-ID: <CAAeT=Fw0Z1USVpdi2iRMRq0ktTP4+VFzfy31FWV36VPOCTq6_w@mail.gmail.com>
+Subject: Re: [PATCH v4 09/18] KVM: arm64: selftests: Add guest support to get
+ the vcpuid
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -82,136 +97,24 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Will Deacon <will@kernel.org>
+Hi Raghu and all,
 
-[ Upstream commit ccac96977243d7916053550f62e6489760ad0adc ]
+On Wed, Sep 8, 2021 at 6:38 PM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
+>
+> At times, such as when in the interrupt handler, the guest wants
+> to get the vcpuid that it's running on. As a result, introduce
+> get_vcpuid() that returns the vcpuid of the calling vcpu. At its
+> backend, the VMM prepares a map of vcpuid and mpidr during VM
+> initialization and exports the map to the guest for it to read.
 
-When protected mode is enabled, the host is unable to access most parts
-of the EL2 hypervisor image, including 'hyp_physvirt_offset' and the
-contents of the hypervisor's '.rodata.str' section. Unfortunately,
-nvhe_hyp_panic_handler() tries to read from both of these locations when
-handling a BUG() triggered at EL2; the former for converting the ELR to
-a physical address and the latter for displaying the name of the source
-file where the BUG() occurred.
+How about using TPIDR_EL1 to hold the vcpuid ?
+i.e. have aarch64_vcpu_setup() set the register to vcpuid and
+guest_get_vcpuid() simply return a value of the register.
+This would be a simpler solution to implement.
 
-Hack the EL2 panic asm to pass both physical and virtual ELR values to
-the host and utilise the newly introduced CONFIG_NVHE_EL2_DEBUG so that
-we disable stage-2 protection for the host before returning to the EL1
-panic handler. If the debug option is not enabled, display the address
-instead of the source file:line information.
-
-Cc: Andrew Scull <ascull@google.com>
-Cc: Quentin Perret <qperret@google.com>
-Signed-off-by: Will Deacon <will@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20210813130336.8139-1-will@kernel.org
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/arm64/kvm/handle_exit.c   | 23 ++++++++++++++---------
- arch/arm64/kvm/hyp/nvhe/host.S | 21 +++++++++++++++++----
- 2 files changed, 31 insertions(+), 13 deletions(-)
-
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 6f48336b1d86..04ebab299aa4 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -292,11 +292,12 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
- 		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
- }
- 
--void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr,
-+void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
-+					      u64 elr_virt, u64 elr_phys,
- 					      u64 par, uintptr_t vcpu,
- 					      u64 far, u64 hpfar) {
--	u64 elr_in_kimg = __phys_to_kimg(__hyp_pa(elr));
--	u64 hyp_offset = elr_in_kimg - kaslr_offset() - elr;
-+	u64 elr_in_kimg = __phys_to_kimg(elr_phys);
-+	u64 hyp_offset = elr_in_kimg - kaslr_offset() - elr_virt;
- 	u64 mode = spsr & PSR_MODE_MASK;
- 
- 	/*
-@@ -309,20 +310,24 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr,
- 		kvm_err("Invalid host exception to nVHE hyp!\n");
- 	} else if (ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
- 		   (esr & ESR_ELx_BRK64_ISS_COMMENT_MASK) == BUG_BRK_IMM) {
--		struct bug_entry *bug = find_bug(elr_in_kimg);
- 		const char *file = NULL;
- 		unsigned int line = 0;
- 
- 		/* All hyp bugs, including warnings, are treated as fatal. */
--		if (bug)
--			bug_get_file_line(bug, &file, &line);
-+		if (!is_protected_kvm_enabled() ||
-+		    IS_ENABLED(CONFIG_NVHE_EL2_DEBUG)) {
-+			struct bug_entry *bug = find_bug(elr_in_kimg);
-+
-+			if (bug)
-+				bug_get_file_line(bug, &file, &line);
-+		}
- 
- 		if (file)
- 			kvm_err("nVHE hyp BUG at: %s:%u!\n", file, line);
- 		else
--			kvm_err("nVHE hyp BUG at: %016llx!\n", elr + hyp_offset);
-+			kvm_err("nVHE hyp BUG at: %016llx!\n", elr_virt + hyp_offset);
- 	} else {
--		kvm_err("nVHE hyp panic at: %016llx!\n", elr + hyp_offset);
-+		kvm_err("nVHE hyp panic at: %016llx!\n", elr_virt + hyp_offset);
- 	}
- 
- 	/*
-@@ -334,5 +339,5 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr, u64 elr,
- 	kvm_err("Hyp Offset: 0x%llx\n", hyp_offset);
- 
- 	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%016lx\n",
--	      spsr, elr, esr, far, hpfar, par, vcpu);
-+	      spsr, elr_virt, esr, far, hpfar, par, vcpu);
- }
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 2b23400e0fb3..4b652ffb591d 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -7,6 +7,7 @@
- #include <linux/linkage.h>
- 
- #include <asm/assembler.h>
-+#include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
- 
-@@ -85,12 +86,24 @@ SYM_FUNC_START(__hyp_do_panic)
- 
- 	mov	x29, x0
- 
-+#ifdef CONFIG_NVHE_EL2_DEBUG
-+	/* Ensure host stage-2 is disabled */
-+	mrs	x0, hcr_el2
-+	bic	x0, x0, #HCR_VM
-+	msr	hcr_el2, x0
-+	isb
-+	tlbi	vmalls12e1
-+	dsb	nsh
-+#endif
-+
- 	/* Load the panic arguments into x0-7 */
- 	mrs	x0, esr_el2
--	get_vcpu_ptr x4, x5
--	mrs	x5, far_el2
--	mrs	x6, hpfar_el2
--	mov	x7, xzr			// Unused argument
-+	mov	x4, x3
-+	mov	x3, x2
-+	hyp_pa	x3, x6
-+	get_vcpu_ptr x5, x6
-+	mrs	x6, far_el2
-+	mrs	x7, hpfar_el2
- 
- 	/* Enter the host, conditionally restoring the host context. */
- 	cbz	x29, __host_enter_without_restoring
--- 
-2.30.2
-
+Thanks,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
