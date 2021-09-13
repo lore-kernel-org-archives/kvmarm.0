@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E965DC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 20:50:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09EEFC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 20:50:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9AB5A61106
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 20:50:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9AB5A61106
+	by mail.kernel.org (Postfix) with ESMTP id B219761103
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 20:50:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B219761103
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E4504A19A;
-	Mon, 13 Sep 2021 16:50:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65AF94B1E9;
+	Mon, 13 Sep 2021 16:50:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MZmGGYj1A5gR; Mon, 13 Sep 2021 16:50:04 -0400 (EDT)
+	with ESMTP id Dv7F3NkIC4N1; Mon, 13 Sep 2021 16:50:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6CA4B209;
-	Mon, 13 Sep 2021 16:50:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 522D24B1C8;
+	Mon, 13 Sep 2021 16:50:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ECA5D4B1ED
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 16:50:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5406A4B1E6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 16:50:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uuGPqo3rqMLK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Sep 2021 16:50:02 -0400 (EDT)
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
- [209.85.219.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E0F84B1CB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 16:50:01 -0400 (EDT)
-Received: by mail-yb1-f202.google.com with SMTP id
- i77-20020a25d150000000b005b1d20152b0so1406144ybg.14
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 13:50:01 -0700 (PDT)
+ with ESMTP id Tw8CnMk+PbK5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Sep 2021 16:50:05 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 539C14B202
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 16:50:04 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ v66-20020a25abc8000000b0059ef57c3386so14646851ybi.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 13:50:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=HPlM28T/oJ4/6Xh6FGi+9sK76pxmz7U2+VXMGXF95EA=;
- b=dkwAaN+LMm6q6/tB7urEEM/7txHMfCp1yhEmH8oTSSC5G1JbBVb95On7HExWMTLTlN
- 3cXIoUFeGGMdfRQC4MNL7aP9VmrS4Fe+eHCP7yUL3arzSTlYuO8akfR5jS0vUHa7XXNA
- 3OI8KyIk+mslCm7yPV1vhpfiA/Ba9h1lX5egHL2gxptQ2ch9lVlH+5iOx9HcJANmNn32
- rjz3vqIGy74jr984zD9uo9pXVr1CgydnPYgm1WnRKZ3FbdPGQyp5KCekA4D+3BtGI81G
- d6f8N2lvxT7WcHx/Otrt+PGPOnGMo6ISulk/Xzs+W71PNknHOah1LkDcX/gX9orguSK4
- vHLw==
+ :cc; bh=RPKmsJf8WZ0Uq/9BsypZtQKa6wrsTaT9QMXRWAn7wEs=;
+ b=NDjvx97IgaGT85nBiadBaDpI0UyIxHU8mosTjqdDd23Myy+XgccitfxwvgnNa1wycF
+ BjAIMUdokS5IbQddUTx1El2rI+tHfpoHmE05wEnmsnHH4nO66gT8nid2W9a8toph79Yw
+ HonNemVZo3XdBYxEqdv0lYtjCypp28BCFvJJQ1OqRo0fCo1rpAkUmjHREeZnksnNWaZZ
+ Qz1jeykeqiBTz8GThFoJ7kAhsTcwQ2QBmjpzvSfWUj12lk1DKqHOHvNlnbt8V41CUEmT
+ V32bQXXBffJ2sy3aCgdxlQuqSIxwIySy+Y3KiMj3Nit75E3DZfcC/iSDvA8dFc98zQDL
+ rM9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=HPlM28T/oJ4/6Xh6FGi+9sK76pxmz7U2+VXMGXF95EA=;
- b=Wdxpbncf/SVN7/GGsOv51zuiiF1IQuTig5TQLdJsalkYGXktEdMadDptN7+4zFqzM9
- lhyWLn8mDmsfxN56cZRqDaajSlWb7fVzng0z+Cpts0Od10nS+wiAKyVFpQVe3CXqnOVu
- YxvokoptnsXH7dSxCB3TdRG7GXp7KQXEBQDKVaBKkG7aYDh1kWLF3jqebyJxVVwBOz0D
- rrQtIzF+BfPu2ZuCy6Fqo5KfBmDLVlE48fQOMJbhA1JCEuj8Bi0qojG1K50qOVxGNSAt
- yjdWWPy6UFs/UPiyfADVdR0hVcR9+2mS0w7CvtUnVZwdyI2MpVoM6NsrVDfoCmADjoOj
- IhdA==
-X-Gm-Message-State: AOAM531SedUd0QQSu4tc581yWZ4cjz8+UB8XS4FCCed0ykU9yIyvSJRH
- FKGs5pU8ZHfjrTx/dSjKSiYMKSqAz3qy
-X-Google-Smtp-Source: ABdhPJx7o2pSPQVSa/VQZq1XUtFrn7ZyngcYvhLBDeiBG0SA9xzMD53Z15pr27SHTsOPEN6MGy9A8rGlE4Tx
+ bh=RPKmsJf8WZ0Uq/9BsypZtQKa6wrsTaT9QMXRWAn7wEs=;
+ b=F0zvTQMDi72u812ufDALrs8cF0XBhNOpZn0BkZFVQNeZsZaVFe3KeE90Tx+wwUdTVL
+ q4kW4CaLRPeHoKYD6yPb9KfajdmoDfJXwoitXfnZhxIJauwgAEq0pZcpLBqY3NrHRXi0
+ dq4hrLCtyWw5cKvyOLtqtSRyE3QZaCTwzyJw3HSZb8FjRTn+CDf+2Ib1cPfxVHwogyhM
+ s/WmS6wRx7ur761Ym1FgOGhdETtno2AWH5JGdgK6V5QLpQ0FPULfFkWiS0/5cHBJsrAV
+ dbCra2mcRegqf9Ui/MOQGAOM5JpzU0Cd63jjHuQ3Buw4wyFdHIF42K9buS1fxzTcuHQR
+ 4Irg==
+X-Gm-Message-State: AOAM5333wYyoIITOav6FsS1JFbzkeOKvMNZdGf06IdoBuubOaUFyfo5Q
+ +L7HCY0yTx3kuepn6otxk3bDlmAsOz7Z
+X-Google-Smtp-Source: ABdhPJyfvHspvKcMFJDqwp4bVITpxHQ5XcPoZyJH4ggpu00/5Mg05cH03Gxtzi5Vl/6xJeTsvycll8h+jzTh
 X-Received: from rananta-virt.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a25:7146:: with SMTP id
- m67mr18421920ybc.353.1631566200594; Mon, 13 Sep 2021 13:50:00 -0700 (PDT)
-Date: Mon, 13 Sep 2021 20:49:24 +0000
+ (user=rananta job=sendgmr) by 2002:a25:9d01:: with SMTP id
+ i1mr18564769ybp.88.1631566203899; Mon, 13 Sep 2021 13:50:03 -0700 (PDT)
+Date: Mon, 13 Sep 2021 20:49:25 +0000
 In-Reply-To: <20210913204930.130715-1-rananta@google.com>
-Message-Id: <20210913204930.130715-9-rananta@google.com>
+Message-Id: <20210913204930.130715-10-rananta@google.com>
 Mime-Version: 1.0
 References: <20210913204930.130715-1-rananta@google.com>
 X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
-Subject: [PATCH v5 08/14] KVM: arm64: selftests: Add support to disable and
- enable local IRQs
+Subject: [PATCH v5 09/14] KVM: arm64: selftests: Add guest support to get the
+ vcpuid
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
  Andrew Jones <drjones@redhat.com>, James Morse <james.morse@arm.com>, 
@@ -102,35 +102,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add functions local_irq_enable() and local_irq_disable() to
-enable and disable the IRQs from the guest, respectively.
+At times, such as when in the interrupt handler, the guest wants
+to get the vcpuid that it's running on to pull the per-cpu private
+data. As a result, introduce guest_get_vcpuid() that returns the
+vcpuid of the calling vcpu. The interface is architecture
+independent, but defined only for arm64 as of now.
 
+Suggested-by: Reiji Watanabe <reijiw@google.com>
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- .../testing/selftests/kvm/include/aarch64/processor.h  | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ tools/testing/selftests/kvm/include/kvm_util.h      | 2 ++
+ tools/testing/selftests/kvm/lib/aarch64/processor.c | 6 ++++++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 265054c24481..515d04a3c27d 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -172,4 +172,14 @@ static __always_inline u32 __raw_readl(const volatile void *addr)
- #define writel(v,c)		({ __iowmb(); writel_relaxed((v),(c));})
- #define readl(c)		({ u32 __v = readl_relaxed(c); __iormb(__v); __v; })
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 010b59b13917..5770751a5735 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -400,4 +400,6 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
+ int vm_get_stats_fd(struct kvm_vm *vm);
+ int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
  
-+static inline void local_irq_enable(void)
-+{
-+	asm volatile("msr daifclr, #3" : : : "memory");
-+}
++int guest_get_vcpuid(void);
 +
-+static inline void local_irq_disable(void)
-+{
-+	asm volatile("msr daifset, #3" : : : "memory");
-+}
+ #endif /* SELFTEST_KVM_UTIL_H */
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+index db64ee206064..f1255f44dad0 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+@@ -277,6 +277,7 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
+ 	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
+ 	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
+ 	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), vm->pgd);
++	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TPIDR_EL1), vcpuid);
+ }
+ 
+ void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
+@@ -426,3 +427,8 @@ void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+ 	assert(vector < VECTOR_NUM);
+ 	handlers->exception_handlers[vector][0] = handler;
+ }
 +
- #endif /* SELFTEST_KVM_PROCESSOR_H */
++int guest_get_vcpuid(void)
++{
++	return read_sysreg(tpidr_el1);
++}
 -- 
 2.33.0.309.g3052b89438-goog
 
