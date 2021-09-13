@@ -2,92 +2,86 @@ Return-Path: <SRS0=oqs1=OD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3863DC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 21:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46397C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 23:10:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A6F2461056
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 21:44:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A6F2461056
+	by mail.kernel.org (Postfix) with ESMTP id 993036113D
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 23:10:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 993036113D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CC5B4B104;
-	Mon, 13 Sep 2021 17:44:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02FCE4B1F1;
+	Mon, 13 Sep 2021 19:10:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z3Tolee5WEX8; Mon, 13 Sep 2021 17:43:58 -0400 (EDT)
+	with ESMTP id lEi2vE-8GWgX; Mon, 13 Sep 2021 19:10:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE77C4B13E;
-	Mon, 13 Sep 2021 17:43:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 944C94B1E7;
+	Mon, 13 Sep 2021 19:10:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 339E74B13E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 17:43:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2E294B1BC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 19:10:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kcgI2i09DYQK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Sep 2021 17:43:56 -0400 (EDT)
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com
- [209.85.210.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F17804B104
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 17:43:55 -0400 (EDT)
-Received: by mail-pf1-f173.google.com with SMTP id v123so10126549pfb.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 14:43:55 -0700 (PDT)
+ with ESMTP id z5ALBq6g341b for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Sep 2021 19:10:00 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58D624B1AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 19:10:00 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ b9-20020a5b07890000b0290558245b7eabso14926917ybq.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 16:10:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=sG2eyH9Bgb1L/y1jzf6CQp6ymvgMkzFT8CFUJyXDBcQ=;
- b=TWS+2rX8IxtjrkxvQtcSH/ADskq5QVzTpyXa/gp84aAP+wRjMIAzVdqhgRvPzuL4mo
- ChskmWITqBwQR4TyWlFo7HszU3Tk/JmS55gCwXHHKOJ1FARnRAHMIJwTLcvr3agz6NMS
- XtT+97h0KqDF2lHmoQ9/AfAAqJ6Lk0q9ywzmHxHD/uRQdXVAAWVwHgCdsCRK7klJ9Er3
- XOGXQq1QSDafboUYWUSM8EHRLgHYORG2Mrw7xS4IFqpOCsi/U3PvonrnEe+0i7wIBB0i
- gIqkd49tlbo/10Xd4fShNYZ0ZGaM7NXx0v+hBiPlkMdeF6rd+IHT0FHevBm1eqxhjAC2
- 1UGA==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=AejLs9aVC/boLaGWx5dhQOuvfu5QcQg2e7Q1Pv3t0nk=;
+ b=VYfO//Mv8fz7BeCUQSwXaZE3kTuDgbr/8p68/Pa6AGtZ5fOIxOa8DU9XaGK6I9HAJo
+ YO6qnkmbY7FCXeD7lnjLFbsSUNlvScES3rwNo5eOUtkrJZTWUheXzsCLfiPV+IiLY+fU
+ ozoGyNMvoBSrICQ7jb395jtYeNDPQVL50L7RmJigo/3m3FwFmNn3zFgO7aF5+iF7m8xm
+ XENhy2+kUK0NhwFN6y+NUJzk/sHe6vSBJdwH1QiM1GecHQZmcJq02DhO759580A0KIrq
+ HDFJcaAFtUqV8/Sc0FB0oWooKdna0c4X1At2Uk5jVOUN7PH416a76ns/Z+fCfB4wWJjR
+ +7Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=sG2eyH9Bgb1L/y1jzf6CQp6ymvgMkzFT8CFUJyXDBcQ=;
- b=VNolH40ZXjsptEtH1ZBUb4U+08fL+2Cb+/J9T7c9GnTE0Hs9MgScjbE7Kw+JAn/TEV
- 5ioC5XsLzLHhpvgimw/x1ioj95xOs8xSjapI2VX1sYuRrrjkTWxh1qtctPLR/+GHT36E
- 961RNrmtEoPIooiYv3kfAumAm4cL8rXCnvKw5pva2uMG7tPxANlQxTWsoYqXWL2ECMOI
- +IfWVOTuc1hiBZXHsI+9NpvyexX92EOe7MZ+3LIu9OcSFreqNJO/FG91j7LwkJ8bAPZH
- 8zJOqkLFF3df+ZdnBI2bP1Job8fxIRw6AaHFqFrebB5fUhICRAKhKWF0iG84D3wsPvni
- dx1w==
-X-Gm-Message-State: AOAM530slvuB5mJy0G5KFN/U93VbIJXozC4tkXZMI6Oq4mvaUCzzQF2E
- ohxboH5RGRKl3JaIfXBVldRfzg==
-X-Google-Smtp-Source: ABdhPJwgblB3hOcn7bN2z+YFe7ozcUxqKzo3wlKfTkc5oVOZHVQhtOLvuw4PrXPWus8czkAZNPgAWg==
-X-Received: by 2002:aa7:8387:0:b029:395:a683:a0e6 with SMTP id
- u7-20020aa783870000b0290395a683a0e6mr1441934pfm.12.1631569434793; 
- Mon, 13 Sep 2021 14:43:54 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id u15sm8384455pfl.14.2021.09.13.14.43.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 13 Sep 2021 14:43:54 -0700 (PDT)
-Date: Mon, 13 Sep 2021 14:43:50 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH v5 04/14] KVM: arm64: selftests: Introduce
- ARM64_SYS_KVM_REG
-Message-ID: <YT/GFj9GVv6ZD8I5@google.com>
-References: <20210913204930.130715-1-rananta@google.com>
- <20210913204930.130715-5-rananta@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210913204930.130715-5-rananta@google.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=AejLs9aVC/boLaGWx5dhQOuvfu5QcQg2e7Q1Pv3t0nk=;
+ b=BCcBQKOONr0wUwkC32IEkc9jNrrnBj990DTTOLvdFRRc4m7SsFhvuj6gpfVNYwjR0H
+ Gt0LO3+Bnqd4IfMo1bReu1e+yoArMQl/umD5Au5T2k++QfMuGAv5GrZlbmlWDa9B20ej
+ XpWVdfLMgOdHZqWFBg/wKEVg38qoOSCTUpFJX+yYUTW2QQ0eD6JAFeNoLYi+48EcaeKq
+ HDczwCrR0cRD52zKptztlnYp6s8vaezZ3CCTFN4OKo3dufzwWoAzuokAxu7txu3sOrta
+ L/NqSFc8mn19uOlq0DWGwhjr1XVkyrFKdhYFByCaHWWnRXhrAnZC+zqGQC8Yle3ap81L
+ M0yA==
+X-Gm-Message-State: AOAM533hwH9RSP+h8oUTTgBRrNVbP9TWQORic8rhEjT3KKhkRWaVCFeg
+ UsWN1XMy8yPF+U7rZoJoeoaFH3cFxDiR
+X-Google-Smtp-Source: ABdhPJx87pW9Ied8bxMGtkKpQrFGORk9JFZeLQcy/JswJuk8sx2ITO8wKRoc9NocnvcEVCEdYo5L20q+qd9s
+X-Received: from rananta-virt.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a25:c88:: with SMTP id
+ 130mr18342376ybm.176.1631574599765; 
+ Mon, 13 Sep 2021 16:09:59 -0700 (PDT)
+Date: Mon, 13 Sep 2021 23:09:41 +0000
+Message-Id: <20210913230955.156323-1-rananta@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
+Subject: [PATCH v6 00/14] KVM: arm64: selftests: Introduce arch_timer selftest
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+ Andrew Jones <drjones@redhat.com>, James Morse <james.morse@arm.com>, 
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -105,130 +99,203 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 13, 2021 at 08:49:20PM +0000, Raghavendra Rao Ananta wrote:
-> With the inclusion of sysreg.h, that brings in system register
-> encodings, it would be redundant to re-define register encodings
-> again in processor.h to use it with ARM64_SYS_REG for the KVM
-> functions such as set_reg() or get_reg(). Hence, add helper macro,
-> ARM64_SYS_KVM_REG, that converts SYS_* definitions in sysreg.h
-> into ARM64_SYS_REG definitions.
-> 
-> Also replace all the users of ARM64_SYS_REG, relying on
-> the encodings created in processor.h, with ARM64_SYS_KVM_REG and
-> remove the definitions.
-> 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> ---
->  .../selftests/kvm/aarch64/debug-exceptions.c  |  2 +-
->  .../selftests/kvm/aarch64/psci_cpu_on_test.c  |  2 +-
->  .../selftests/kvm/include/aarch64/processor.h | 20 ++++++++++---------
->  .../selftests/kvm/lib/aarch64/processor.c     | 16 +++++++--------
->  4 files changed, 21 insertions(+), 19 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> index 11fd23e21cb4..ea189d83abf7 100644
-> --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
-> @@ -190,7 +190,7 @@ static int debug_version(struct kvm_vm *vm)
->  {
->  	uint64_t id_aa64dfr0;
->  
-> -	get_reg(vm, VCPU_ID, ARM64_SYS_REG(ID_AA64DFR0_EL1), &id_aa64dfr0);
-> +	get_reg(vm, VCPU_ID, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1), &id_aa64dfr0);
->  	return id_aa64dfr0 & 0xf;
->  }
->  
-> diff --git a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
-> index 018c269990e1..4c5f6814030f 100644
-> --- a/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
-> +++ b/tools/testing/selftests/kvm/aarch64/psci_cpu_on_test.c
-> @@ -91,7 +91,7 @@ int main(void)
->  	init.features[0] |= (1 << KVM_ARM_VCPU_POWER_OFF);
->  	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
->  
-> -	get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
-> +	get_reg(vm, VCPU_ID_TARGET, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &target_mpidr);
->  	vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
->  	vcpu_run(vm, VCPU_ID_SOURCE);
->  
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index 7989e832cafb..93797783abad 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -16,15 +16,17 @@
->  #define ARM64_CORE_REG(x) (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
->  			   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
->  
-> -#define CPACR_EL1               3, 0,  1, 0, 2
-> -#define TCR_EL1                 3, 0,  2, 0, 2
-> -#define MAIR_EL1                3, 0, 10, 2, 0
-> -#define MPIDR_EL1               3, 0,  0, 0, 5
-> -#define TTBR0_EL1               3, 0,  2, 0, 0
-> -#define SCTLR_EL1               3, 0,  1, 0, 0
-> -#define VBAR_EL1                3, 0, 12, 0, 0
-> -
-> -#define ID_AA64DFR0_EL1         3, 0,  0, 5, 0
-> +/*
-> + * KVM_ARM64_SYS_REG(sys_reg_id): Helper macro to convert
-> + * SYS_* register definitions in asm/sysreg.h to use in KVM
-> + * calls such as get_reg() and set_reg().
-> + */
-> +#define KVM_ARM64_SYS_REG(sys_reg_id)			\
-> +	ARM64_SYS_REG(sys_reg_Op0(sys_reg_id),		\
-> +			sys_reg_Op1(sys_reg_id),	\
-> +			sys_reg_CRn(sys_reg_id),	\
-> +			sys_reg_CRm(sys_reg_id),	\
-> +			sys_reg_Op2(sys_reg_id))
->  
->  /*
->   * Default MAIR
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> index 632b74d6b3ca..db64ee206064 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> @@ -232,10 +232,10 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
->  	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
->  	 * registers, which the variable argument list macros do.
->  	 */
-> -	set_reg(vm, vcpuid, ARM64_SYS_REG(CPACR_EL1), 3 << 20);
-> +	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_CPACR_EL1), 3 << 20);
->  
-> -	get_reg(vm, vcpuid, ARM64_SYS_REG(SCTLR_EL1), &sctlr_el1);
-> -	get_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), &tcr_el1);
-> +	get_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), &sctlr_el1);
-> +	get_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TCR_EL1), &tcr_el1);
->  
->  	switch (vm->mode) {
->  	case VM_MODE_P52V48_4K:
-> @@ -273,10 +273,10 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
->  	tcr_el1 |= (1 << 8) | (1 << 10) | (3 << 12);
->  	tcr_el1 |= (64 - vm->va_bits) /* T0SZ */;
->  
-> -	set_reg(vm, vcpuid, ARM64_SYS_REG(SCTLR_EL1), sctlr_el1);
-> -	set_reg(vm, vcpuid, ARM64_SYS_REG(TCR_EL1), tcr_el1);
-> -	set_reg(vm, vcpuid, ARM64_SYS_REG(MAIR_EL1), DEFAULT_MAIR_EL1);
-> -	set_reg(vm, vcpuid, ARM64_SYS_REG(TTBR0_EL1), vm->pgd);
-> +	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_SCTLR_EL1), sctlr_el1);
-> +	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TCR_EL1), tcr_el1);
-> +	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_MAIR_EL1), DEFAULT_MAIR_EL1);
-> +	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_TTBR0_EL1), vm->pgd);
->  }
->  
->  void vcpu_dump(FILE *stream, struct kvm_vm *vm, uint32_t vcpuid, uint8_t indent)
-> @@ -362,7 +362,7 @@ void vcpu_init_descriptor_tables(struct kvm_vm *vm, uint32_t vcpuid)
->  {
->  	extern char vectors;
->  
-> -	set_reg(vm, vcpuid, ARM64_SYS_REG(VBAR_EL1), (uint64_t)&vectors);
-> +	set_reg(vm, vcpuid, KVM_ARM64_SYS_REG(SYS_VBAR_EL1), (uint64_t)&vectors);
->  }
->  
->  void route_exception(struct ex_regs *regs, int vector)
-> -- 
-> 2.33.0.309.g3052b89438-goog
-> 
+Hello,
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
+The patch series adds a KVM selftest to validate the behavior of
+ARM's generic timer (patch-13). The test programs the timer IRQs
+periodically, and for each interrupt, it validates the behaviour
+against the architecture specifications. The test further provides
+a command-line interface to configure the number of vCPUs, the
+period of the timer, and the number of iterations that the test
+has to run for.
+
+Patch-14 adds an option to randomly migrate the vCPUs to different
+physical CPUs across the system. The bug for the fix provided by
+Marc with commit 3134cc8beb69d0d ("KVM: arm64: vgic: Resample HW
+pending state on deactivation") was discovered using arch_timer
+test with vCPU migrations.
+
+Since the test heavily depends on interrupts, patch-12 adds a host
+library to setup ARM Generic Interrupt Controller v3 (GICv3). This
+includes creating a vGIC device, setting up distributor and
+redistributor attributes, and mapping the guest physical addresses.
+Symmetrical to this, patch-11 adds a guest library to talk to the vGIC,
+which includes initializing the controller, enabling/disabling the
+interrupts, and so on.
+
+The following patches are utility patches that the above ones make use
+of:
+Patch-1 adds readl/writel support for guests to access MMIO space.
+
+Patch-2 imports arch/arm64/include/asm/sysreg.h into
+tools/arch/arm64/include/asm/ to make use of the register encodings
+and read/write definitions.
+
+Patch-3 is not directly related to the test, but makes
+aarch64/debug-exceptions.c use the read/write definitions from the
+imported sysreg.h and remove the existing definitions of read_sysreg()
+and write_sysreg().
+
+Patch-4 introduces ARM64_SYS_KVM_REG, that helps convert the SYS_*
+register encodings in sysreg.h to be acceptable by get_reg() and set_reg().
+It further replaces the users of ARM64_SYS_REG to use the new macro.
+
+Patch-5 adds the support for cpu_relax().
+
+Patch-6 adds basic arch_timer framework.
+
+Patch-7 adds udelay() support for the guests to utilize.
+
+Patch-8 adds local_irq_enable() and local_irq_disable() for the guests
+to enable/disable interrupts.
+
+Patch-9 adds the support to get the vcpuid for the guests. This allows
+them to access any cpu-centric private data in the upcoming patches.
+
+Patch-10 adds a light-weight support for spinlocks for the guests to
+use.
+
+The patch series, specifically the library support, is derived from the
+kvm-unit-tests and the kernel itself.
+
+Regards,
+Raghavendra
+
+v5 -> v6:
+
+- Corrected the syntax for write_sysreg_s in gic_v3.c (11/14) so that
+  the file can be compiled with the unmodified
+  arch/arm64/include/asm/sysreg.h that's imported into tools/.
+
+v4 -> v5:
+
+Addressed the comments by Andrew, Oliver, and Reiji (Thanks, again):
+- Squashed patches 17/18 and 18/18 into 3/18 and 14/18, respectively.
+- Dropped patches to keep track kvm_utils of nr_vcpus (12/18) and
+  vm_get_mode() (13/18) as they were no longer needed.
+- Instead of creating the a map, exporting the vcpuid to the guest
+  is done by using the TPIDR_EL1 register.
+- Just to be on the safer side, gic.c's gic_dist_init() explicitly
+  checks if gic_ops is NULL.
+- Move sysreg.h from within selftests to tool/arch/arm64/include/asm/.
+- Rename ARM64_SYS_KVM_REG to KVM_ARM64_SYS_REG to improve readability.
+- Use the GIC regions' sizes from asm/kvm.h instead of re-defining it
+  in the vgic host support.
+- Get the timer IRQ numbers via timer's device attributes
+  (KVM_ARM_VCPU_TIMER_IRQ_PTIMER, KVM_ARM_VCPU_TIMER_IRQ_VTIMER) instead
+  of depending on default numbers to be safe.
+- Add check to see if the vCPU migrations are in fact enabled, before
+  looking for at least two online physical CPUs for the test.
+- Add missing blank lines in the arch_timer test.
+
+v3 -> v4:
+
+Addressed the comments by Andrew, Oliver, and Ricardo (Thank you):
+- Reimplemented get_vcpuid() by exporting a map of vcpuid:mpidr to the
+  guest.
+- Import sysreg.h from arch/arm64/include/asm/sysreg.h to get the system
+  register encodings and its read/write support. As a result, delete the
+  existing definitions in processor.h.
+- Introduce ARM64_SYS_KVM_REG that converts SYS_* register definitions
+  from sysreg.h into the encodings accepted by get_reg() and set_reg().
+- Hence, remove the existing encodings of system registers (CPACR_EL1,
+  TCR_EL1, and friends) and replace all the its consumers throughout
+  the selftests with ARM64_SYS_KVM_REG.
+- Keep track of number of vCPUs in 'struct kvm_vm'.
+- Add a helper method to get the KVM VM's mode.
+- Modify the vGIC host function vgic_v3_setup to make use of the above
+  two helper methods, which prevents it from accepting nr_vcpus as
+  an argument.
+- Move the definition of REDIST_REGION_ATTR_ADDR from lib/aarch64/vgic.c
+  to include/aarch64/vgic.h.
+- Make the selftest, vgic_init.c, use the definition of REDIST_REGION_ATTR_ADDR
+  from include/aarch64/vgic.h.
+- Turn ON vCPU migration by default (-m 2).
+- Add pr_debug() to log vCPU migrations. Helpful for diagnosis.
+- Change TEST_ASSERT(false,...) to TEST_FAIL() in the base arch_timer
+  test.
+- Include linux/types.h for __force definitions.
+- Change the type of 'val' to 'int' in spin_lock() to match the lock
+  value type.
+- Fix typos in code files and comments.
+
+v2 -> v3:
+
+- Addressed the comments from Ricardo regarding moving the vGIC host
+  support for selftests to its own library.
+- Added an option (-m) to migrate the guest vCPUs to physical CPUs
+  in the system.
+
+v1 -> v2:
+
+Addressed comments from Zenghui in include/aarch64/arch_timer.h:
+- Correct the header description
+- Remove unnecessary inclusion of linux/sizes.h
+- Re-arrange CTL_ defines in ascending order
+- Remove inappropriate 'return' from timer_set_* functions, which
+  returns 'void'.
+
+v1: https://lore.kernel.org/kvmarm/20210813211211.2983293-1-rananta@google.com/
+v2: https://lore.kernel.org/kvmarm/20210818184311.517295-1-rananta@google.com/
+v3: https://lore.kernel.org/kvmarm/20210901211412.4171835-1-rananta@google.com/
+v4: https://lore.kernel.org/kvmarm/20210909013818.1191270-1-rananta@google.com/
+v5: https://lore.kernel.org/kvmarm/20210913204930.130715-1-rananta@google.com/
+
+Raghavendra Rao Ananta (14):
+  KVM: arm64: selftests: Add MMIO readl/writel support
+  tools: arm64: Import sysreg.h
+  KVM: arm64: selftests: Use read/write definitions from sysreg.h
+  KVM: arm64: selftests: Introduce ARM64_SYS_KVM_REG
+  KVM: arm64: selftests: Add support for cpu_relax
+  KVM: arm64: selftests: Add basic support for arch_timers
+  KVM: arm64: selftests: Add basic support to generate delays
+  KVM: arm64: selftests: Add support to disable and enable local IRQs
+  KVM: arm64: selftests: Add guest support to get the vcpuid
+  KVM: arm64: selftests: Add light-weight spinlock support
+  KVM: arm64: selftests: Add basic GICv3 support
+  KVM: arm64: selftests: Add host support for vGIC
+  KVM: arm64: selftests: Add arch_timer test
+  KVM: arm64: selftests: arch_timer: Support vCPU migration
+
+ tools/arch/arm64/include/asm/sysreg.h         | 1278 +++++++++++++++++
+ tools/testing/selftests/kvm/.gitignore        |    1 +
+ tools/testing/selftests/kvm/Makefile          |    3 +-
+ .../selftests/kvm/aarch64/arch_timer.c        |  479 ++++++
+ .../selftests/kvm/aarch64/debug-exceptions.c  |   30 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c  |    2 +-
+ .../testing/selftests/kvm/aarch64/vgic_init.c |    3 +-
+ .../kvm/include/aarch64/arch_timer.h          |  142 ++
+ .../selftests/kvm/include/aarch64/delay.h     |   25 +
+ .../selftests/kvm/include/aarch64/gic.h       |   21 +
+ .../selftests/kvm/include/aarch64/processor.h |   88 +-
+ .../selftests/kvm/include/aarch64/spinlock.h  |   13 +
+ .../selftests/kvm/include/aarch64/vgic.h      |   20 +
+ .../testing/selftests/kvm/include/kvm_util.h  |    2 +
+ tools/testing/selftests/kvm/lib/aarch64/gic.c |   95 ++
+ .../selftests/kvm/lib/aarch64/gic_private.h   |   21 +
+ .../selftests/kvm/lib/aarch64/gic_v3.c        |  240 ++++
+ .../selftests/kvm/lib/aarch64/gic_v3.h        |   70 +
+ .../selftests/kvm/lib/aarch64/processor.c     |   22 +-
+ .../selftests/kvm/lib/aarch64/spinlock.c      |   27 +
+ .../testing/selftests/kvm/lib/aarch64/vgic.c  |   70 +
+ 21 files changed, 2606 insertions(+), 46 deletions(-)
+ create mode 100644 tools/arch/arm64/include/asm/sysreg.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/delay.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_private.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
+
+-- 
+2.33.0.309.g3052b89438-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
