@@ -2,90 +2,88 @@ Return-Path: <SRS0=oqs1=OD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C94FC433FE
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 12:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4667C433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 16:51:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B293C60FC0
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 12:21:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B293C60FC0
+	by mail.kernel.org (Postfix) with ESMTP id 2953D60FF2
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 16:51:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2953D60FF2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33FC44B1D5;
-	Mon, 13 Sep 2021 08:21:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 949144B1E9;
+	Mon, 13 Sep 2021 12:51:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id REHsygBMVJ4o; Mon, 13 Sep 2021 08:21:29 -0400 (EDT)
+	with ESMTP id J5Wx6n2g+vxQ; Mon, 13 Sep 2021 12:51:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0178A4B173;
-	Mon, 13 Sep 2021 08:21:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 868924B121;
+	Mon, 13 Sep 2021 12:51:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7800B4B108
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 08:21:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 920EC4B121
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 12:51:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fBtfBN7OXaD4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Sep 2021 08:21:26 -0400 (EDT)
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com
- [209.85.208.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29E004B0ED
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 08:21:26 -0400 (EDT)
-Received: by mail-lj1-f179.google.com with SMTP id i28so16930090ljm.7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 05:21:26 -0700 (PDT)
+ with ESMTP id 85HLV6C9rqEd for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Sep 2021 12:51:47 -0400 (EDT)
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com
+ [209.85.219.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A89414B11E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 12:51:47 -0400 (EDT)
+Received: by mail-yb1-f174.google.com with SMTP id c206so21815048ybb.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 09:51:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mkr8GOjoBt/sh+RCX4NVAn9v5w6wwN8N4sC5/LVecLA=;
- b=kR/uxi3CryVYq6q7Z20ITMsyt2ZmDDhJy7TgEY1iE0l+AtHmw88xgWRoWRsPPUv4Rw
- PnKdZmU6XqepvjmrbZfm2nGuJOyttz9JmGPLsg3ugLO+SddJndUxq8zUWLdrn3Dnmwg5
- dzu0/nmeGhi0RlG/Ri1O2Ibls+3dgHDmuUE5DtTN9TeT10viZ50AnSbztISK7U2CWBXN
- gUA4Pwx56w9AXs2w8rM3lXBOxqIXlc5BBIF9mrLYJozSuDWaeVB9PT4DU0VsXHd0k1/7
- IKqhOTVdqJpl97QlZwEuTNFJk7OGl0qM8l0T10lOeNY+wleTCZeJMy/OWIFiEol7uRHZ
- 2BmA==
+ :cc; bh=3/SIYclYJBA8R/7MLXxAd/hpBEuATYrK81iK2vA0aLI=;
+ b=UaGSj5rF9TV4TbKEczi4abu9Nvmk3QFlrNsZ94RkSIZo5XRGdw1+Yp8wU1bW9ZIKU7
+ qVYpBNuU+BqPWj1VV0lFT/GWawzyPNcOXttDDmhFRg+yEyIx+9mPVAx48lK+heY3iA3U
+ HfCW9WvnXI6sbmUfIeRc2nkS12QocvHXtxiMMfataHdNLwYk/dbbfasez2yumAPudGYC
+ n/k5QceOvkIZ5XWqkUBFnHcWLXjV0SJXVTJO0j+H5/1iEevGYv+hiF5UfvY0YT6vNala
+ zKfQdTpdroaT4Tu5XUNzVCE60Q3x49dFineIsNw6rXKH899hYBUZPrQ4vrEEBC5tbuni
+ gB4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=mkr8GOjoBt/sh+RCX4NVAn9v5w6wwN8N4sC5/LVecLA=;
- b=SFHe1jWn1inSdbs6+gjBqKc7VhtuajDJZGAelxCP15xUdNiUnMos6IQjzvkDpb6RaD
- 6AzfcQo2rtssDla9aGi5SgcUfIeU7wWZeyEf1fKnAcmA8AB44+S0oR3h2RuXMoQFim+4
- PkSM3yCOUOzTDSc8DHFjXRayQmXLAojb5qVuCcuKByFPCKDwRy+2nF2zyCkVq8Aj0yKf
- r6WMe+6NSWJLWgxTHdCYSH+dkwon2VD4GjbrKtKtvaXb4q/ADd3h0/nGuqJo0ShVA49/
- zdwcHbq3G9c34WIgNYhMuWhVksKb+ayqAgQbdUGLSuTF0Ddf3PgnN8B6zKTJTWlgzggk
- 7nHQ==
-X-Gm-Message-State: AOAM533/lNthUrroL/Pa62Km4VShuM1kHXSEZ7No9RMAGci1JMTWT4U6
- zAx6KMgAqvIE9wjLc7+Hr8KKoWXG75vUNa0yu9QtAQ==
-X-Google-Smtp-Source: ABdhPJxpRNZpvn+RgdwcF7pGsUajFGcjpWr1uruf5bZ9zplVRACTkUcrAX5PCEYsDxpjuH5xU3b2oY0Kk/miHbjUmz0=
-X-Received: by 2002:a2e:154e:: with SMTP id 14mr10342555ljv.374.1631535684043; 
- Mon, 13 Sep 2021 05:21:24 -0700 (PDT)
+ bh=3/SIYclYJBA8R/7MLXxAd/hpBEuATYrK81iK2vA0aLI=;
+ b=Rlnyt9VwL/CMYhiVTgsBipsUPd109MpbiSZDd09oKTMi21MS1GR88uY+X64W1wp7uo
+ wTJQixWC5W96lkRJUWmNBPo10WN1vwtM19ajDZHa97Zy+5UlnelQO59Z1UVbwjQuE4dU
+ mCAA5b13V5bc8wVfs86zQURMejf9PLXjl6DkWwPswntf/1W1LjCSKUWIKBiJIC4c6A9O
+ Ad/HAtX+u67We3dmfrNW8pFD43Up8HzxQV+dXMEfXIpEOpFsPXbLwblJ/9UgKrl7zhEO
+ 4CIRAovutmUSG6d0I1DjEpQjZjp/mAuEUwM7FQRa/zFIHRon+KeagQzv5QnZQqHKtTVU
+ EDFQ==
+X-Gm-Message-State: AOAM532IFuy0LCbgaBcWiZ8lPXGyEiZ6LEgz+5Z5juNGwWeg+qGEAPm8
+ s/tJLY5ZYmBCoucFK+C2ABmyAonwRarknuZCKzrwrA==
+X-Google-Smtp-Source: ABdhPJxF0MJAT41gnQOnRX7DjWFM0GLtwxdoVZIW+Gw+fILuc0cKnD6bHktwWwOauF6yqJrWs2OzSb/bX+FogXn7Y8c=
+X-Received: by 2002:a25:50c7:: with SMTP id
+ e190mr17068088ybb.439.1631551907001; 
+ Mon, 13 Sep 2021 09:51:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210907123112.10232-1-justin.he@arm.com>
- <20210907123112.10232-3-justin.he@arm.com>
- <CAOQ_QsjOmHw+545J0T9i-nWV2bVGGEwHq5SPVvBOM-SHMXpP5g@mail.gmail.com>
- <AM6PR08MB4376DB4B908AC37DF24290CFF7D59@AM6PR08MB4376.eurprd08.prod.outlook.com>
-In-Reply-To: <AM6PR08MB4376DB4B908AC37DF24290CFF7D59@AM6PR08MB4376.eurprd08.prod.outlook.com>
-From: Oliver Upton <oupton@google.com>
-Date: Mon, 13 Sep 2021 08:21:12 -0400
-Message-ID: <CAOQ_QshF+N7Q=-cXAoMSW4Gcy7mr_oFVpye7fEBqPeR8+3mK0Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] KVM: arm64: Add memcg accounting to KVM allocations
-To: Justin He <justin.he@arm.com>
-Cc: Nick Desaulniers <ndesaulniers@google.com>,
- Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Kees Cook <keescook@chromium.org>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Liu Shixin <liushixin2@huawei.com>, Sami Tolvanen <samitolvanen@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Xiaoming Ni <nixiaoming@huawei.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+References: <20210909013818.1191270-1-rananta@google.com>
+ <20210909013818.1191270-10-rananta@google.com>
+ <CAAeT=Fw0Z1USVpdi2iRMRq0ktTP4+VFzfy31FWV36VPOCTq6_w@mail.gmail.com>
+ <20210913073512.x774i5hi3s4wmopx@gator.home>
+In-Reply-To: <20210913073512.x774i5hi3s4wmopx@gator.home>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 13 Sep 2021 09:51:35 -0700
+Message-ID: <CAJHc60wVJP4=s3r16nLWXA8o=k71OagvLFrWVWwJJnLycHMQyw@mail.gmail.com>
+Subject: Re: [PATCH v4 09/18] KVM: arm64: selftests: Add guest support to get
+ the vcpuid
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,55 +100,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Justin,
-
-On Thu, Sep 9, 2021 at 8:57 AM Justin He <Justin.He@arm.com> wrote:
+On Mon, Sep 13, 2021 at 12:35 AM Andrew Jones <drjones@redhat.com> wrote:
 >
-> Hi Oliver, thanks for the review, please my comments below:
+> On Sun, Sep 12, 2021 at 12:05:22AM -0700, Reiji Watanabe wrote:
+> > Hi Raghu and all,
+> >
+> > On Wed, Sep 8, 2021 at 6:38 PM Raghavendra Rao Ananta
+> > <rananta@google.com> wrote:
+> > >
+> > > At times, such as when in the interrupt handler, the guest wants
+> > > to get the vcpuid that it's running on. As a result, introduce
+> > > get_vcpuid() that returns the vcpuid of the calling vcpu. At its
+> > > backend, the VMM prepares a map of vcpuid and mpidr during VM
+> > > initialization and exports the map to the guest for it to read.
+> >
+> > How about using TPIDR_EL1 to hold the vcpuid ?
+> > i.e. have aarch64_vcpu_setup() set the register to vcpuid and
+> > guest_get_vcpuid() simply return a value of the register.
+> > This would be a simpler solution to implement.
 >
-> > -----Original Message-----
-> > From: Oliver Upton <oupton@google.com>
-> > Sent: Wednesday, September 8, 2021 6:29 AM
-> > To: Justin He <Justin.He@arm.com>
-> > Cc: Marc Zyngier <maz@kernel.org>; James Morse <James.Morse@arm.com>;
-> > Alexandru Elisei <Alexandru.Elisei@arm.com>; Suzuki Poulose
-> > <Suzuki.Poulose@arm.com>; Xiaoming Ni <nixiaoming@huawei.com>; Lorenzo
-> > Pieralisi <Lorenzo.Pieralisi@arm.com>; Kees Cook <keescook@chromium.org>;
-> > Catalin Marinas <Catalin.Marinas@arm.com>; Nick Desaulniers
-> > <ndesaulniers@google.com>; linux-kernel@vger.kernel.org; Liu Shixin
-> > <liushixin2@huawei.com>; Sami Tolvanen <samitolvanen@google.com>; Will
-> > Deacon <will@kernel.org>; kvmarm@lists.cs.columbia.edu; linux-arm-
-> > kernel@lists.infradead.org
-> > Subject: Re: [PATCH v2 2/2] KVM: arm64: Add memcg accounting to KVM
-> > allocations
-> >
-> > Hi Jia,
-> >
-> > On Tue, Sep 7, 2021 at 7:33 AM Jia He <justin.he@arm.com> wrote:
-> > >
-> > > Inspired by commit 254272ce6505 ("kvm: x86: Add memcg accounting to KVM
-> > > allocations"), it would be better to make arm64 KVM consistent with
-> > > common kvm codes.
-> > >
-> > > The memory allocations of VM scope should be charged into VM process
-> > > cgroup, hence change GFP_KERNEL to GFP_KERNEL_ACCOUNT.
-> > >
-> > > There remain a few cases since these allocations are global, not in VM
-> > > scope.
-> >
-> > I believe there are more memory allocations that could be switched to
-> > GFP_KERNEL_ACCOUNT. For non-pKVM kernels, we probably should charge
-> > all stage-2 paging structure allocations to the VM process. Your patch
-> > appears to only change the allocation of the kvm_pgtable structure,
-> > but not descendent paging structures.
-> >
-> Do you mean kvm_hyp_zalloc_page() here?
-> Seems kvm_hyp_zalloc_page() is in both global and VM scopes.
+> That is a great suggestion. It's arch-specific, but maybe the
+> other architectures can mimic it with their own capabilities.
+> And, in the unlikely event a unit test wants that register for
+> itself, then it can build its own mpidr-vcpuid map if necessary.
+> Ship it :-)
+>
+Thanks for the suggestion, Reiji. I'll send out a patch soon for this.
 
-Doh! kvm_hyp_zalloc_page() is only for the hyp's page tables, hence I
-believe your patch is correct as it stands. As such:
-
-Reviewed-by: Oliver Upton <oupton@google.com>
+Regards,
+Raghavendra
+> Thanks,
+> drew
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
