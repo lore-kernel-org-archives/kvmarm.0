@@ -1,100 +1,107 @@
-Return-Path: <SRS0=OUTu=OC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=oqs1=OD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C060AC433FE
-	for <kvmarm@archiver.kernel.org>; Sun, 12 Sep 2021 16:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13975C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 07:25:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 49D3F61076
-	for <kvmarm@archiver.kernel.org>; Sun, 12 Sep 2021 16:33:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 49D3F61076
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 63EB361040
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Sep 2021 07:25:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 63EB361040
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4C0E4B1B2;
-	Sun, 12 Sep 2021 12:33:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D31374B1C7;
+	Mon, 13 Sep 2021 03:25:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HKuUdp3733I3; Sun, 12 Sep 2021 12:33:07 -0400 (EDT)
+	with ESMTP id 5Vr5HvLDfk07; Mon, 13 Sep 2021 03:25:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CFD54B1FC;
-	Sun, 12 Sep 2021 12:33:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D1B64B134;
+	Mon, 13 Sep 2021 03:25:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77F294B163
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 16:28:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D4484B10A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 03:25:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JyVz4-T+y6ev for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Sep 2021 16:28:15 -0400 (EDT)
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
- [209.85.214.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B5D34B152
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Sep 2021 16:28:15 -0400 (EDT)
-Received: by mail-pl1-f175.google.com with SMTP id 5so746047plo.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Sep 2021 13:28:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=KkIQUN6UVWVDGVs7gQUvenivKjOnMibWM6lN26FSefU=;
- b=FVbJMuxsPdMboW3fGRpeknq9uQRgiNFYMkfTDCp+yIJU/r8SnfixFRLOMHCuS02TXV
- RwGohEECz7j1XeRtYg7gQzlcG+vLV6rsHNncc7O4uYVacKrMziWXHeyXi3ToHSI5Krci
- dAtD/keu37A2un94zex2UJJKhbPBH+ZA+1B3gpOkZmfN9W4RivrlV4R9/tQ/9cnZUrgu
- RzQYH2dMHu7mQiJ40p9ZTab+fVOUV0+TFBglNS4NUUQKTHkf9HLIB/mCNlTcORWAPzSS
- K/4cGRMB01MOZSLT6KTLNPsQp2b002EpBhgBufLFsJW1FvkHgofIBfja7U+61OoYFw47
- vXng==
+ with ESMTP id 8P4EAP61D4nw for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Sep 2021 03:25:50 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB8B54B0FB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 03:25:50 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1631517950;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ycK/tCqEmqie6iTs/9nBScnQKNEMyPZZHddjJC00ddA=;
+ b=Nszw7igIwXv8MotuBMueU66EOUPlva4uMv3IcRYJ2G9/yRhvVsSyJkSnrAP7RpEZNhlU8w
+ aIf6WBOIV2tRBpzROoGKFFUCg9T5OWGI6NILnIA0epoHFync+H98pxXHgENi5PoHormZ8q
+ 3CGDVi7rAIhQ6YCpiqJVKDtcnZ6KK7o=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-wLdEIfKRNqKwgLaOqn5T6w-1; Mon, 13 Sep 2021 03:25:49 -0400
+X-MC-Unique: wLdEIfKRNqKwgLaOqn5T6w-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ g11-20020a056402090b00b003d114f9cb8aso2024454edz.20
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Sep 2021 00:25:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=KkIQUN6UVWVDGVs7gQUvenivKjOnMibWM6lN26FSefU=;
- b=ZJ9wJoF8bGpqvpHjv442lAhLXaRpbtw3MstQu/pma/e9ASvCiD4dnDNAxzi4+yp0De
- qxtMjuxkg6h+toxZTN1l0zLFFj6E+YoACIAn3BwfRw9wdi7sJ5ZouGcnMNCAVfWdCA9s
- 3acnjEHdVL8VVUHPMrwcl1f6tCArik0MbdojkjpS/Zbbvpa1CcVn9qMzlpfEVsTSphXG
- igKoNntpiTqSIJ7c7RtQaDO8qc1atgV1VGbkr4pobTNKBX70IB0JNnqrtfGlCrDvusx9
- 3+rRNtdpmqRvLR9SynL1w0CBXlHmrVBNWJpIw4CZZx9Wh0psjzYl/FnO3q8c9nOd3LDk
- vJ/Q==
-X-Gm-Message-State: AOAM532jjw9Eg3wCl1geCK1XsaeqYfqtdldNzaj+pRylCqf5ifsUQKYi
- SHeJKJ7PUduzs82HgDxSCETNTQ==
-X-Google-Smtp-Source: ABdhPJyAc4CRr9tF0y4feLojYbdHTKlOemQgA2iiZMpEO+mvtfr+51OjqPfvtnvGWSxrmgXGK89LBw==
-X-Received: by 2002:a17:90a:428e:: with SMTP id
- p14mr5632154pjg.92.1631219294432; 
- Thu, 09 Sep 2021 13:28:14 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id b4sm3124696pga.69.2021.09.09.13.28.13
+ bh=ycK/tCqEmqie6iTs/9nBScnQKNEMyPZZHddjJC00ddA=;
+ b=MExQ/g1jVwdk5sprZ8c9DvNYp737TkJfH5syKsDFMI5np0g5GPgKZJd9bHhtukn8NT
+ 0k2emFnb7ySW2TqAihwLU8QPo5JWPoqpvfHPiYtiWgS9PxCmK5A817zG67l3xb0SIcPU
+ l8EPA8dw8vC5HV4yfjCfnSXyaDMT+6T3NcopFD4hEIVsomPRPnnzCN3N3yhptROjk9iB
+ hK80pAj5sZaRTF/6wZSdKPHsv9eu/Xmjlhz1jrrIvy1m7fkSzQKW2qpGlcSRgCtKuEsY
+ Krcwx6WK2v0zWFDcjbGL4d2D2KAx4ZnA0cMmBgfQm8+UrQ626zLcWL0sKxtp5L+4SKmz
+ 1tww==
+X-Gm-Message-State: AOAM533g+gQO7L71kOunGihIa8/nI+yh4oNPCpnIVTqCfG684To6Rz5d
+ AdEHX+dfKsBrJAtEAkJxUNNTmrL6F1XLOmuhw/9y+d8zi4nhLvbPuJfKxtuNe/HGQ94XR2Zt9sT
+ vGVJHh31aUXxVz9CXrrJdq/Hf
+X-Received: by 2002:a50:d4dc:: with SMTP id e28mr11571603edj.106.1631517948189; 
+ Mon, 13 Sep 2021 00:25:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxNxTQ2vLqD78w1qZ/yyGrwNlAgo4kC8ZoLROpW9R1ep9CmZ5X0HutmNcr1ZAX/1oPEj6kYKw==
+X-Received: by 2002:a50:d4dc:: with SMTP id e28mr11571587edj.106.1631517947927; 
+ Mon, 13 Sep 2021 00:25:47 -0700 (PDT)
+Received: from gator.home (cst2-174-132.cust.vodafone.cz. [31.30.174.132])
+ by smtp.gmail.com with ESMTPSA id m10sm2962374ejx.76.2021.09.13.00.25.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 09 Sep 2021 13:28:14 -0700 (PDT)
-Date: Thu, 9 Sep 2021 20:28:10 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 5/6] kvm: allocate vcpu pointer array separately
-Message-ID: <YTpuWl3Uhu4qpC1U@google.com>
-References: <20210903130808.30142-1-jgross@suse.com>
- <20210903130808.30142-6-jgross@suse.com>
- <871r65wwk7.wl-maz@kernel.org>
- <37699e98-9a47-732d-8522-daa90f35c52f@suse.com>
- <87eea2c9zu.wl-maz@kernel.org>
+ Mon, 13 Sep 2021 00:25:47 -0700 (PDT)
+Date: Mon, 13 Sep 2021 09:25:45 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v4 09/18] KVM: arm64: selftests: Add guest support to get
+ the vcpuid
+Message-ID: <20210913072545.vmmlejgg6jtsz4pm@gator.home>
+References: <20210909013818.1191270-1-rananta@google.com>
+ <20210909013818.1191270-10-rananta@google.com>
+ <20210909075643.fhngqu6tqrpe33gl@gator>
+ <CAJHc60wRkUyKEdY0ok0uC7r=P0FME+Lb7oapz+AKbjaNDhFHyA@mail.gmail.com>
+ <20210910081001.4gljsvmcovvoylwt@gator>
+ <CAJHc60yhg7oYiJpHJK27M7=qo0CMOX+Qj9+q-ZHgTVhWr_76aA@mail.gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <CAJHc60yhg7oYiJpHJK27M7=qo0CMOX+Qj9+q-ZHgTVhWr_76aA@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-In-Reply-To: <87eea2c9zu.wl-maz@kernel.org>
-X-Mailman-Approved-At: Sun, 12 Sep 2021 12:33:05 -0400
-Cc: Juergen Gross <jgross@suse.com>, Wanpeng Li <wanpengli@tencent.com>,
- ehabkost@redhat.com, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Joerg Roedel <joro@8bytes.org>,
- x86@kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- Will Deacon <will@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -111,30 +118,174 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 06, 2021, Marc Zyngier wrote:
-> On Mon, 06 Sep 2021 05:33:35 +0100,
-> Juergen Gross <jgross@suse.com> wrote:
-> > 
-> > On 03.09.21 16:41, Marc Zyngier wrote:
+On Fri, Sep 10, 2021 at 11:03:58AM -0700, Raghavendra Rao Ananta wrote:
+> On Fri, Sep 10, 2021 at 1:10 AM Andrew Jones <drjones@redhat.com> wrote:
 > >
-> > > At this stage, I really wonder why we are not using an xarray instead.
-> > > 
-> > > I wrote this [1] a while ago, and nothing caught fire. It was also a
-> > > net deletion of code...
-> > 
-> > Indeed, I'd prefer that solution!
-> > 
-> > Are you fine with me swapping my patch with yours in the series?
-> 
-> Of course, feel free to grab the whole series. You'll probably need
-> the initial patches to set the scene for this. On their own, they are
-> a nice cleanup, and I trust you can write a decent commit message for
-> the three patches affecting mips/s390/x86.
+> > On Thu, Sep 09, 2021 at 10:10:56AM -0700, Raghavendra Rao Ananta wrote:
+> > > On Thu, Sep 9, 2021 at 12:56 AM Andrew Jones <drjones@redhat.com> wrote:
+> > > >
+> > > > On Thu, Sep 09, 2021 at 01:38:09AM +0000, Raghavendra Rao Ananta wrote:
+> > ...
+> > > > > +     for (i = 0; i < KVM_MAX_VCPUS; i++) {
+> > > > > +             vcpuid = vcpuid_map[i].vcpuid;
+> > > > > +             GUEST_ASSERT_1(vcpuid != VM_VCPUID_MAP_INVAL, mpidr);
+> > > >
+> > > > We don't want this assert if it's possible to have sparse maps, which
+> > > > it probably isn't ever going to be, but...
+> > > >
+> > > If you look at the way the array is arranged, the element with
+> > > VM_VCPUID_MAP_INVAL acts as a sentinel for us and all the proper
+> > > elements would lie before this. So, I don't think we'd have a sparse
+> > > array here.
+> >
+> > If we switch to my suggestion of adding map entries at vcpu-add time and
+> > removing them at vcpu-rm time, then the array may become sparse depending
+> > on the order of removals.
+> >
+> Oh, I get it now. But like you mentioned, we add entries to the map
+> while the vCPUs are getting added and then sync_global_to_guest()
+> later. This seems like a lot of maintainance, unless I'm interpreting
+> it wrong or not seeing an advantage.
 
-It would also be a good idea to convert kvm_for_each_vcpu() to use xa_for_each(),
-I assume that's more performant than 2x atomic_read() + xa_load().  Unless I'm
-misreading the code, xa_for_each() is guaranteed to iterate in ascending index
-order, i.e. preserves the current vcpu0..vcpuN iteration order.
+The advantage is that you don't need to create all vcpus before calling
+the map init function. While it's true that we'll still require a call
+after adding all vcpus if we want to export the map to the guest, i.e.
+sync_global_to_guest, we'll never have to worry about the map being
+out of synch wrt vcpus on the host side, and there's no need to call
+sync_global_to_guest at all when the test needs the map, but the guest
+doesn't need to access it.
+
+> I like your idea of coming up an arch-independent interface, however.
+> So I modified it similar to the familiar ucall interface that we have
+> and does everything in one shot to avoid any confusion:
+
+Right, ucall_init does call sync_global_to_guest, but it's the only
+lib function so far. Everything else exported to the guest must be
+done explicitly.
+
+> 
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util.h
+> b/tools/testing/selftests/kvm/include/kvm_util.h
+> index 010b59b13917..0e87cb0c980b 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util.h
+> @@ -400,4 +400,24 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t
+> vcpu_id, struct ucall *uc);
+>  int vm_get_stats_fd(struct kvm_vm *vm);
+>  int vcpu_get_stats_fd(struct kvm_vm *vm, uint32_t vcpuid);
+> 
+> +#define VM_CPUID_MAP_INVAL -1
+> +
+> +struct vm_cpuid_map {
+> +       uint64_t hw_cpuid;
+> +       int vcpuid;
+> +};
+> +
+> +/*
+> + * Create a vcpuid:hw_cpuid map and export it to the guest
+> + *
+> + * Input Args:
+> + *   vm - KVM VM.
+> + *
+> + * Output Args: None
+> + *
+> + * Must be called after all the vCPUs are added to the VM
+> + */
+> +void vm_cpuid_map_init(struct kvm_vm *vm);
+> +int guest_get_vcpuid(void);
+> +
+>  #endif /* SELFTEST_KVM_UTIL_H */
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> index db64ee206064..e796bb3984a6 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
+> @@ -16,6 +16,8 @@
+> 
+>  static vm_vaddr_t exception_handlers;
+> 
+> +static struct vm_cpuid_map cpuid_map[KVM_MAX_VCPUS];
+> +
+>  static uint64_t page_align(struct kvm_vm *vm, uint64_t v)
+>  {
+>         return (v + vm->page_size) & ~(vm->page_size - 1);
+> @@ -426,3 +428,42 @@ void vm_install_exception_handler(struct kvm_vm
+> *vm, int vector,
+>         assert(vector < VECTOR_NUM);
+>         handlers->exception_handlers[vector][0] = handler;
+>  }
+> +
+> +void vm_cpuid_map_init(struct kvm_vm *vm)
+> +{
+> +       int i = 0;
+> +       struct vcpu *vcpu;
+> +       struct vm_cpuid_map *map;
+> +
+> +       TEST_ASSERT(!list_empty(&vm->vcpus), "vCPUs must have been created\n");
+> +
+> +       list_for_each_entry(vcpu, &vm->vcpus, list) {
+> +               map = &cpuid_map[i++];
+> +               map->vcpuid = vcpu->id;
+> +               get_reg(vm, vcpu->id,
+> KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &map->hw_cpuid);
+> +               map->hw_cpuid &= MPIDR_HWID_BITMASK;
+> +       }
+> +
+> +       if (i < KVM_MAX_VCPUS)
+> +               cpuid_map[i].vcpuid = VM_CPUID_MAP_INVAL;
+> +
+> +       sync_global_to_guest(vm, cpuid_map);
+> +}
+> +
+> +int guest_get_vcpuid(void)
+> +{
+> +       int i, vcpuid;
+> +       uint64_t mpidr = read_sysreg(mpidr_el1) & MPIDR_HWID_BITMASK;
+> +
+> +       for (i = 0; i < KVM_MAX_VCPUS; i++) {
+> +               vcpuid = cpuid_map[i].vcpuid;
+> +
+> +               /* Was this vCPU added to the VM after the map was
+> initialized? */
+> +               GUEST_ASSERT_1(vcpuid != VM_CPUID_MAP_INVAL, mpidr);
+> +
+> +               if (mpidr == cpuid_map[i].hw_cpuid)
+> +                       return vcpuid;
+> +       }
+> +
+> +       /* We should not be reaching here */
+> +       GUEST_ASSERT_1(0, mpidr);
+> +       return -1;
+> +}
+> 
+> This would ensure that we don't have a sparse array and can use the
+> last non-vCPU element as a sentinal node.
+> If you still feel preparing the map as and when the vCPUs are created
+> makes more sense, I can go for it.
+
+Yup, I think that's still my preference. We don't really need a
+sentinel node for such a small array. We can just do
+
+static struct vm_cpuid_map cpuid_map[KVM_MAX_VCPUS] = { [0 ... KVM_MAX_VCPUS - 1] = VM_CPUID_MAP_INVAL };
+
+to ensure all invalid nodes are invalid. After a full loop
+if we didn't find a valid entry, then we assert, which easily
+supports a sparse array.
+
+Also, please don't forget that guest_get_vcpuid() can be common for all
+architectures. We just need an arch-specific call for get_hw_cpuid().
+
+Thanks,
+drew
+
+> 
+> Regards,
+> Raghavendra
+> > Thanks,
+> > drew
+> >
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
