@@ -2,80 +2,78 @@ Return-Path: <SRS0=sbHD=OG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37356C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Sep 2021 18:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2888FC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Sep 2021 18:15:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D977E611CA
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Sep 2021 18:15:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D977E611CA
+	by mail.kernel.org (Postfix) with ESMTP id CF07E6120D
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Sep 2021 18:15:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CF07E6120D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8ED034B11F;
-	Thu, 16 Sep 2021 14:15:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 820F64B195;
+	Thu, 16 Sep 2021 14:15:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id grITlJSLTxoX; Thu, 16 Sep 2021 14:15:37 -0400 (EDT)
+	with ESMTP id tgS55cKh3E6d; Thu, 16 Sep 2021 14:15:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F1E64B17B;
-	Thu, 16 Sep 2021 14:15:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6863E4B0B8;
+	Thu, 16 Sep 2021 14:15:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD9F44B13B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 14:15:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0872C4B092
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 14:15:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y6rrRgNY49xK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Sep 2021 14:15:33 -0400 (EDT)
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
- [209.85.219.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4FEEC4B125
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 14:15:32 -0400 (EDT)
-Received: by mail-qv1-f74.google.com with SMTP id
- b8-20020a0562141148b02902f1474ce8b7so63319442qvt.20
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 11:15:32 -0700 (PDT)
+ with ESMTP id DFr4pIli69Ax for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Sep 2021 14:15:41 -0400 (EDT)
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
+ [209.85.219.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D48444B090
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 14:15:41 -0400 (EDT)
+Received: by mail-qv1-f73.google.com with SMTP id
+ f14-20020a056214076e00b003773e95910bso63229341qvz.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 11:15:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=A0zcWhYnFXgM2Yz5qdLIdnhrCI0/H5A1ERXqkcBiVfM=;
- b=qyKCwyk28EPcoPL5VPZ2Qnasv1FrtC00q+EiyYviFT82Uds5oI/JKh7Quuv9RkfV2J
- Cpm/qj+cbgrgOXY5nxxkzO/rclGw6FX/9qqVNTnF6/l89/T4aY8d8H0KSvRpfJzLnfTy
- 1YEc4FgwXKVE5xYDpHASoidAgDhUTlpyr86f3Ueitw3X7LZTAQNZrdgP2Ll1S0zH31yp
- vldAgUp7KfnVItwArTR+GL5ZlepA8YuipZAxbDG1vLsVuc6Homy9fLqlGWZ6susoQenP
- XM21BnFagBOqtDDLNuKC9+LCN8/T+mxTFDiZ3izj8gr9Zaw8cv59X5MG5mJ42bt2eX+5
- 4K4g==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=Pe7x0KqNWpd27U8B0VgFmhUlzq7CaBZRDC7FTGm6BYo=;
+ b=c/zDfdFNoGgGDawStlpHk9tXybqTTvO3qklooPCSh2RZyn1jO926yAJN3EkzROcnWV
+ +7Jv8frVlp+AjiKuCpYLQYVNhudtlSi3aG5XE0qVftcRBxmfkVHYUFK2g3I/ufLuYsD5
+ yXWxHrl/35QQy9F3h5xRX4vnkMen65DAtcmDUlpWA2jh2qYxeZTWx7cuJq7rLgB37IjF
+ FR1hGU1oD+z2TrGqXS1Hb1S8jn7kM7JHUntQZubO19eBArz72mowND7VvAXe/MPZogEM
+ wCS3fOC64SO9FdoDCKIccrMyRTFwuxu7FOoW75kCgb27aM9H/lW5xEtfwu2ZTfFFx8KR
+ /M9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=A0zcWhYnFXgM2Yz5qdLIdnhrCI0/H5A1ERXqkcBiVfM=;
- b=m52xNcxw9P1NLLMz5xUDf3XeHySMEMemU7I1FdsiCcmcXYWonlbsgX4jHlZhRj5Vaw
- YHgLwxTSnMFJPBCaZ0vIwTnanWRZ5HrP2ULo0Euf83Rm05Ow9sEnui4o+Ke+/aX7KI5h
- wc3jr+fztIVFNyoSCfDetGNGE3Z2KfJ7/vEt3Q6u5p2XikFKvwKnz2sN2MejTQ0EbJ8e
- UGZX82UD0PYwPV/KfRk9L04gKjn8nyOvFKuLh0xjishGg5xpAT1FQvQ8jHjusEr8/e4G
- shcG4IrOsi3NuwmKW6e5imjPfbpml7hA0cEDzDEzYcFyfAuCis273P8KiFZHPvx90dgK
- dLLg==
-X-Gm-Message-State: AOAM533MHh4Qip9WE7tJof7a7ScE96P9oBYSupXBwjun12G3OtQO258Z
- fc05ZCzv72k8IZg3AoM7lBnUSc6bCw0=
-X-Google-Smtp-Source: ABdhPJz89q3cQse2sxyQIvdV21JvVAjzcBgpnxgOtU4wDBghMmmYVYVlOAEgFfu+/BtI6YOHK1ap8JRHpA8=
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=Pe7x0KqNWpd27U8B0VgFmhUlzq7CaBZRDC7FTGm6BYo=;
+ b=p+60dl+XJdprYNaSnBmCLMjhIlspOvpTAZ7GY9xgYTow0jaKyyHekSx3y2wkJuobgA
+ q15glCl+aAJt6K0OVQyL29dwpt5WyO1vaRg3GBbdWgb6FOnt7G7EmhBYX30GtkoPhzvv
+ 7to8cAPCZghlCWnhrcbJV9/JmfUL365Owj5KMMW5S+qH0876LzncBJMcaEyRi1KKzmYa
+ XnSHVn8YkKdN0XKP1+he0VHUXF/mAzgNTQCbIP6igf3lx3jWS81JZwyHP0kbpE0RhTH5
+ g1BMAtmnlhu2HE1xMqeWjvXSyoklNcaFf2ngZmiT7XAbZbYaRCYiDhGVDPCBj3DtxdTw
+ xK2w==
+X-Gm-Message-State: AOAM530jx56Ppr23ZKTk1KMRwvGHmfkV6hnQojpQz5/twbaUHdH6wofG
+ tXSoQGUlxgRX5MtjqIzac7VbmWzX9k4=
+X-Google-Smtp-Source: ABdhPJyvIbX+FueQ86OOu11wGIo24Yj/vbCnWhhfcLYDpB8XPsQIlfG3Y+cSd9yAQkcLoDzHF5ajFaxNvtk=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6214:12ad:: with SMTP id
- w13mr6780738qvu.13.1631816131983; Thu, 16 Sep 2021 11:15:31 -0700 (PDT)
-Date: Thu, 16 Sep 2021 18:15:10 +0000
-In-Reply-To: <20210916181510.963449-1-oupton@google.com>
-Message-Id: <20210916181510.963449-9-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a0c:9146:: with SMTP id
+ q64mr6704127qvq.38.1631816141556; 
+ Thu, 16 Sep 2021 11:15:41 -0700 (PDT)
+Date: Thu, 16 Sep 2021 18:15:31 +0000
+Message-Id: <20210916181538.968978-1-oupton@google.com>
 Mime-Version: 1.0
-References: <20210916181510.963449-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v8 8/8] KVM: arm64: Emulate physical counter offsetting on
- non-ECV systems
+Subject: [PATCH v8 0/7] KVM: x86: Add idempotent controls for migrating system
+ counter state
 From: Oliver Upton <oupton@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
@@ -99,239 +97,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Unfortunately, ECV hasn't yet arrived in any tangible hardware. At the
-same time, controlling the guest view of the physical counter-timer is
-useful. Support guest counter-timer offsetting on non-ECV systems by
-trapping guest accesses to the physical counter-timer. Emulate reads of
-the physical counter in the fast exit path.
+KVM's current means of saving/restoring system counters is plagued with
+temporal issues. On x86, we migrate the guest's system counter by-value
+through the respective guest's IA32_TSC value. Restoring system counters
+by-value is brittle as the state is not idempotent: the host system
+counter is still oscillating between the attempted save and restore.
+Furthermore, VMMs may wish to transparently live migrate guest VMs,
+meaning that they include the elapsed time due to live migration blackout
+in the guest system counter view. The VMM thread could be preempted for
+any number of reasons (scheduler, L0 hypervisor under nested) between the
+time that it calculates the desired guest counter value and when
+KVM actually sets this counter state.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- arch/arm64/include/asm/sysreg.h         |  2 ++
- arch/arm64/kvm/arch_timer.c             | 47 +++++++++++++------------
- arch/arm64/kvm/hyp/include/hyp/switch.h | 32 +++++++++++++++++
- arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 11 ++++--
- include/kvm/arm_arch_timer.h            |  3 ++
- 5 files changed, 71 insertions(+), 24 deletions(-)
+Despite the value-based interface that we present to userspace, KVM
+actually has idempotent guest controls by way of the TSC offset.
+We can avoid all of the issues associated with a value-based interface
+by abstracting these offset controls in a new device attribute. This
+series introduces new vCPU device attributes to provide userspace access
+to the vCPU's system counter offset.
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index d5a686dff57e..cb9f72ebd6ec 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -506,6 +506,8 @@
- #define SYS_AMEVCNTR0_MEM_STALL		SYS_AMEVCNTR0_EL0(3)
- 
- #define SYS_CNTFRQ_EL0			sys_reg(3, 3, 14, 0, 0)
-+#define SYS_CNTPCT_EL0			sys_reg(3, 3, 14, 0, 1)
-+#define SYS_CNTPCTSS_EL0		sys_reg(3, 3, 14, 0, 5)
- 
- #define SYS_CNTP_TVAL_EL0		sys_reg(3, 3, 14, 2, 0)
- #define SYS_CNTP_CTL_EL0		sys_reg(3, 3, 14, 2, 1)
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 68fb5ddb9e7a..2280a99ab98b 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -51,7 +51,7 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
- static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
- 			      struct arch_timer_context *timer,
- 			      enum kvm_arch_timer_regs treg);
--static void kvm_timer_enable_traps_vhe(void);
-+static void kvm_timer_enable_traps_vhe(struct kvm_vcpu *vcpu);
- 
- u32 timer_get_ctl(struct arch_timer_context *ctxt)
- {
-@@ -179,8 +179,13 @@ static void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
- {
- 	if (has_vhe()) {
- 		map->direct_vtimer = vcpu_vtimer(vcpu);
--		map->direct_ptimer = vcpu_ptimer(vcpu);
--		map->emul_ptimer = NULL;
-+		if (!ptimer_emulation_required(vcpu)) {
-+			map->direct_ptimer = vcpu_ptimer(vcpu);
-+			map->emul_ptimer = NULL;
-+		} else {
-+			map->direct_ptimer = NULL;
-+			map->emul_ptimer = vcpu_ptimer(vcpu);
-+		}
- 	} else {
- 		map->direct_vtimer = vcpu_vtimer(vcpu);
- 		map->direct_ptimer = NULL;
-@@ -666,7 +671,7 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 		timer_emulate(map.emul_ptimer);
- 
- 	if (has_vhe())
--		kvm_timer_enable_traps_vhe();
-+		kvm_timer_enable_traps_vhe(vcpu);
- }
- 
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu)
-@@ -1364,22 +1369,29 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
-  * The host kernel runs at EL2 with HCR_EL2.TGE == 1,
-  * and this makes those bits have no effect for the host kernel execution.
-  */
--static void kvm_timer_enable_traps_vhe(void)
-+static void kvm_timer_enable_traps_vhe(struct kvm_vcpu *vcpu)
- {
- 	/* When HCR_EL2.E2H ==1, EL1PCEN and EL1PCTEN are shifted by 10 */
- 	u32 cnthctl_shift = 10;
--	u64 val;
-+	u64 val, mask;
-+
-+	mask = CNTHCTL_EL1PCEN << cnthctl_shift;
-+	mask |= CNTHCTL_EL1PCTEN << cnthctl_shift;
- 
--	/*
--	 * VHE systems allow the guest direct access to the EL1 physical
--	 * timer/counter.
--	 */
- 	val = read_sysreg(cnthctl_el2);
--	val |= (CNTHCTL_EL1PCEN << cnthctl_shift);
--	val |= (CNTHCTL_EL1PCTEN << cnthctl_shift);
- 
- 	if (cpus_have_final_cap(ARM64_HAS_ECV2))
- 		val |= CNTHCTL_ECV;
-+
-+	/*
-+	 * VHE systems allow the guest direct access to the EL1 physical
-+	 * timer/counter if offsetting isn't requested on a non-ECV system.
-+	 */
-+	if (ptimer_emulation_required(vcpu))
-+		val &= ~mask;
-+	else
-+		val |= mask;
-+
- 	write_sysreg(val, cnthctl_el2);
- }
- 
-@@ -1434,9 +1446,6 @@ static int kvm_arm_timer_set_attr_offset(struct kvm_vcpu *vcpu,
- 	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
- 	u64 offset;
- 
--	if (!kvm_timer_physical_offset_allowed())
--		return -ENXIO;
--
- 	if (get_user(offset, uaddr))
- 		return -EFAULT;
- 
-@@ -1485,9 +1494,6 @@ static int kvm_arm_timer_get_attr_offset(struct kvm_vcpu *vcpu,
- 	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
- 	u64 offset;
- 
--	if (!kvm_timer_physical_offset_allowed())
--		return -ENXIO;
--
- 	offset = timer_get_offset(vcpu_ptimer(vcpu));
- 	return put_user(offset, uaddr);
- }
-@@ -1511,11 +1517,8 @@ int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	switch (attr->attr) {
- 	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
- 	case KVM_ARM_VCPU_TIMER_IRQ_PTIMER:
--		return 0;
- 	case KVM_ARM_VCPU_TIMER_PHYS_OFFSET:
--		if (kvm_timer_physical_offset_allowed())
--			return 0;
--		break;
-+		return 0;
- 	}
- 
- 	return -ENXIO;
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index a0e78a6027be..9c42a299957c 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -15,6 +15,7 @@
- #include <linux/jump_label.h>
- #include <uapi/linux/psci.h>
- 
-+#include <kvm/arm_arch_timer.h>
- #include <kvm/arm_psci.h>
- 
- #include <asm/barrier.h>
-@@ -409,6 +410,34 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static inline u64 __timer_read_cntpct(struct kvm_vcpu *vcpu)
-+{
-+	return __arch_counter_get_cntpct() - vcpu_ptimer(vcpu)->host_offset;
-+}
-+
-+static inline bool __hyp_handle_counter(struct kvm_vcpu *vcpu)
-+{
-+	u32 sysreg;
-+	int rt;
-+	u64 rv;
-+
-+	if (kvm_timer_physical_offset_allowed())
-+		return false;
-+
-+	if (kvm_vcpu_trap_get_class(vcpu) != ESR_ELx_EC_SYS64)
-+		return false;
-+
-+	sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	if (sysreg != SYS_CNTPCT_EL0 && sysreg != SYS_CNTPCTSS_EL0)
-+		return false;
-+
-+	rt = kvm_vcpu_sys_get_rt(vcpu);
-+	rv = __timer_read_cntpct(vcpu);
-+	vcpu_set_reg(vcpu, rt, rv);
-+	__kvm_skip_instr(vcpu);
-+	return true;
-+}
-+
- /*
-  * Return true when we were able to fixup the guest exit and should return to
-  * the guest, false when we should restore the host state and return to the
-@@ -443,6 +472,9 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	if (*exit_code != ARM_EXCEPTION_TRAP)
- 		goto exit;
- 
-+	if (__hyp_handle_counter(vcpu))
-+		goto guest;
-+
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
- 	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 &&
- 	    handle_tx2_tvm(vcpu))
-diff --git a/arch/arm64/kvm/hyp/nvhe/timer-sr.c b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-index 9072e71693ba..6c0834421eae 100644
---- a/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/nvhe/timer-sr.c
-@@ -39,10 +39,17 @@ void __timer_enable_traps(struct kvm_vcpu *vcpu)
- 
- 	/*
- 	 * Disallow physical timer access for the guest
--	 * Physical counter access is allowed
- 	 */
- 	val = read_sysreg(cnthctl_el2);
- 	val &= ~CNTHCTL_EL1PCEN;
--	val |= CNTHCTL_EL1PCTEN;
-+
-+	/*
-+	 * Disallow physical counter access for the guest if offsetting is
-+	 * requested on a non-ECV system.
-+	 */
-+	if (ptimer_emulation_required(vcpu))
-+		val &= ~CNTHCTL_EL1PCTEN;
-+	else
-+		val |= CNTHCTL_EL1PCTEN;
- 	write_sysreg(val, cnthctl_el2);
- }
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index d06294aa356e..252c012db505 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -96,6 +96,9 @@ bool kvm_arch_timer_get_input_level(int vintid);
- 
- #define arch_timer_ctx_index(ctx)	((ctx) - vcpu_timer((ctx)->vcpu)->timers)
- 
-+#define ptimer_emulation_required(v)	\
-+	(!cpus_have_final_cap(ARM64_HAS_ECV2) && vcpu_ptimer(v)->host_offset)
-+
- u64 kvm_arm_timer_read_sysreg(struct kvm_vcpu *vcpu,
- 			      enum kvm_arch_timers tmr,
- 			      enum kvm_arch_timer_regs treg);
+Patches 1-2 are Paolo's refactorings around locking and the
+KVM_{GET,SET}_CLOCK ioctls.
+
+Patch 3 cures a race where use_master_clock is read outside of the
+pvclock lock in the KVM_GET_CLOCK ioctl.
+
+Patch 4 adopts Paolo's suggestion, augmenting the KVM_{GET,SET}_CLOCK
+ioctls to provide userspace with a (host_tsc, realtime) instant. This is
+essential for a VMM to perform precise migration of the guest's system
+counters.
+
+Patch 5 does away with the pvclock spin lock in favor of a sequence
+lock based on the tsc_write_lock. The original patch is from Paolo, I
+touched it up a bit to fix a deadlock and some unused variables that
+caused -Werror to scream.
+
+Patch 6 extracts the TSC synchronization tracking code in a way that it
+can be used for both offset-based and value-based TSC synchronization
+schemes.
+
+Finally, patch 7 implements a vCPU device attribute which allows VMMs to
+get at the TSC offset of a vCPU.
+
+This series was tested with the new KVM selftests for the KVM clock and
+system counter offset controls on Haswell hardware. Kernel was built
+with CONFIG_LOCKDEP given the new locking changes/lockdep assertions
+here.
+
+Note that these tests are mailed as a separate series due to the
+dependencies in both x86 and arm64.
+
+Applies cleanly to 5.15-rc1
+
+v8: http://lore.kernel.org/r/20210816001130.3059564-1-oupton@google.com
+
+v7 -> v8:
+ - Rebased to 5.15-rc1
+ - Picked up Paolo's version of the series, which includes locking
+   changes
+ - Make KVM advertise KVM_CAP_VCPU_ATTRIBUTES
+
+Oliver Upton (4):
+  KVM: x86: Fix potential race in KVM_GET_CLOCK
+  KVM: x86: Report host tsc and realtime values in KVM_GET_CLOCK
+  KVM: x86: Refactor tsc synchronization code
+  KVM: x86: Expose TSC offset controls to userspace
+
+Paolo Bonzini (3):
+  kvm: x86: abstract locking around pvclock_update_vm_gtod_copy
+  KVM: x86: extract KVM_GET_CLOCK/KVM_SET_CLOCK to separate functions
+  kvm: x86: protect masterclock with a seqcount
+
+ Documentation/virt/kvm/api.rst          |  42 ++-
+ Documentation/virt/kvm/devices/vcpu.rst |  57 +++
+ arch/x86/include/asm/kvm_host.h         |  12 +-
+ arch/x86/include/uapi/asm/kvm.h         |   4 +
+ arch/x86/kvm/x86.c                      | 458 ++++++++++++++++--------
+ include/uapi/linux/kvm.h                |   7 +-
+ 6 files changed, 419 insertions(+), 161 deletions(-)
+
 -- 
 2.33.0.309.g3052b89438-goog
 
