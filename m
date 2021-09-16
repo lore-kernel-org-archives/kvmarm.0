@@ -1,77 +1,86 @@
-Return-Path: <SRS0=HAfI=OF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=sbHD=OG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBDC5C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Sep 2021 09:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2D1C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Sep 2021 18:15:28 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 688976124E
-	for <kvmarm@archiver.kernel.org>; Wed, 15 Sep 2021 09:39:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 688976124E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 25F7061209
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Sep 2021 18:15:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 25F7061209
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE1834B0BE;
-	Wed, 15 Sep 2021 05:39:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 850C34B128;
+	Thu, 16 Sep 2021 14:15:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hUA5lt59B2jC; Wed, 15 Sep 2021 05:39:32 -0400 (EDT)
+	with ESMTP id P4WagzYCw8vc; Thu, 16 Sep 2021 14:15:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4803D4B091;
-	Wed, 15 Sep 2021 05:39:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A8954B11A;
+	Thu, 16 Sep 2021 14:15:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 142B74ACC9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Sep 2021 21:19:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D08D4B0B8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 14:15:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s08NaQMxp90m for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Sep 2021 21:19:24 -0400 (EDT)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 499C74A19F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Sep 2021 21:19:24 -0400 (EDT)
-X-IronPort-AV: E=McAfee;i="6200,9189,10107"; a="209407411"
-X-IronPort-AV: E=Sophos;i="5.85,292,1624345200"; d="scan'208";a="209407411"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Sep 2021 18:19:22 -0700
-X-IronPort-AV: E=Sophos;i="5.85,292,1624345200"; d="scan'208";a="544371674"
-Received: from zhoushua-mobl1.ccr.corp.intel.com (HELO [10.255.30.237])
- ([10.255.30.237])
- by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Sep 2021 18:19:14 -0700
-Message-ID: <186c330e-be42-4c49-545c-8f73573b5869@intel.com>
-Date: Wed, 15 Sep 2021 09:19:12 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.0.3
-Subject: Re: [PATCH V10 01/18] perf/core: Use static_call to optimize
- perf_guest_info_callbacks
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-References: <20210806133802.3528-1-lingshan.zhu@intel.com>
- <20210806133802.3528-2-lingshan.zhu@intel.com> <YSfykbECnC6J02Yk@google.com>
-From: "Zhu, Lingshan" <lingshan.zhu@intel.com>
-In-Reply-To: <YSfykbECnC6J02Yk@google.com>
-X-Mailman-Approved-At: Wed, 15 Sep 2021 05:39:31 -0400
-Cc: wanpengli@tencent.com, Like Xu <like.xu@linux.intel.com>,
- peterz@infradead.org, eranian@google.com, Guo Ren <guoren@kernel.org>,
- linux-riscv@lists.infradead.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, kan.liang@linux.intel.com, ak@linux.intel.com,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, joro@8bytes.org,
- x86@kernel.org, linux-csky@vger.kernel.org, wei.w.wang@intel.com,
- linux-arm-kernel@lists.infradead.org, xen-devel@lists.xenproject.org,
- liuxiangdong5@huawei.com, bp@alien8.de,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>, boris.ostrvsky@oracle.com,
- jmattson@google.com, like.xu.linux@gmail.com, Nick Hu <nickhu@andestech.com>,
- linux-kernel@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
+ with ESMTP id loCGHl4Y8SIC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Sep 2021 14:15:23 -0400 (EDT)
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com
+ [209.85.166.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E64ED4B09C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 14:15:23 -0400 (EDT)
+Received: by mail-il1-f202.google.com with SMTP id
+ m15-20020a056e021c2f00b0022c598b86c3so14787465ilh.22
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 11:15:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=btDL3L/+bb3DbBRXEgGoHsE8Zt71CBQL97fPH4EXk/A=;
+ b=pH3ZPSHyuyqIdw7sVb6pv1UZzHZwd5tpk6oKk5pjSrUAGZjaI6gPpcnwmDwWIogj5j
+ zj/3RnzxsG3WAEUhnmKI2g0W+tsSXBeox49VmFI5O+cpKSsRpG/6GdcRVsEh7H69XLxb
+ XOCV8gStUGRy/QembchUDT3ZrwTt9voEZqdtsOVVh1EdYKxtygL1sfUnFlqfSlCayr3t
+ HbiYWAEvdfR74JBhPty46cWzByaiwZHagXS7CSXSfkcVw7Uj5nHRYsUlPFFfU0JkmTYg
+ HtQtxiOVYuCMtNh4+rjvCaFJCVWe0PvSpdy9xi6x/3YSDDF8pGUZYGKCaMNPV/IUnAkq
+ mkcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=btDL3L/+bb3DbBRXEgGoHsE8Zt71CBQL97fPH4EXk/A=;
+ b=GasgFN5Rf6Nkvb4hHermDSzpe3BC2cHk06wOxZYsOpvc6yrblFkc7kgbX2PFHN93Cl
+ Glq1M+ZV+4Hb+O5LBFKnxKVK1FFkRZGuAzviad8KF92HWy8d9f/ACaUbEEpdhjLRPNTc
+ gFWvydVwzMBkkzz4j5iJ+sP1ykOOKkhQPYZbAXCMaqbdjQ+YykOaoVXk2fszGp/tEqPN
+ dBDxjxf8mPHyhplY3aOKWGm5bW25UmuhYChh8kNVqqfZtWoGstwkkQ2o9J98cXPIP9Yo
+ fB3ye6bWGb16ebFG8pdUHEVxNQQPuwXIJlW0C2Ri1hTCmchxT5E5RrJg6TDwwedoHzjr
+ GeCw==
+X-Gm-Message-State: AOAM532kcZ/fXw1y4Js771wbCgEDBKSrsCM1zagS3atTEn4GMO8JdHEg
+ BkkxBUSYp+qjh7HiXX5+qfwPKIPunNw=
+X-Google-Smtp-Source: ABdhPJxFWTKFCHnmW32IKSDzUpsnORPNcQrlWReCXvncQJer79Nhv+dt9vMYUea9GMm6JAvZIYiN8o71iQI=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a92:90a:: with SMTP id
+ y10mr5002860ilg.108.1631816123285; 
+ Thu, 16 Sep 2021 11:15:23 -0700 (PDT)
+Date: Thu, 16 Sep 2021 18:15:02 +0000
+Message-Id: <20210916181510.963449-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+Subject: [PATCH v8 0/8] KVM: arm64: Add idempotent controls to migrate guest
+ counter
+From: Oliver Upton <oupton@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,154 +92,91 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Currently, on KVM/arm64, we only allow a VMM to migrate the guest's
+virtual counter by-value. Saving and restoring the counter by value is
+problematic in the fact that the recorded state is not idempotent.
+Furthermore, we obfuscate from userspace the fact that the architecture
+actually provides offset-based controls.
 
+Another issue is that KVM/arm64 doesn't provide userspace with the
+controls of the physical counter-timer. This series aims to address both
+issues by adding offset-based controls for the virtual and physical
+counters.
 
-On 8/27/2021 3:59 AM, Sean Christopherson wrote:
-> TL;DR: Please don't merge this patch, it's broken and is also built on a shoddy
->         foundation that I would like to fix.
-Hi Sean,Peter, Paolo
+Patches 1-2 are refactor changes required to provide offset controls to
+userspace and putting in some generic plumbing to use for both physical
+and virtual offsets.
 
-I will send out an V11 which drops this patch since it's buggy, and Sean 
-is working on fix this.
-Does this sound good?
+Patch 3 is a minor refactor, creating a helper function to get the
+number of timer registers for a particular vCPU.
 
-Thanks,
-Zhu Lingshan
->
-> On Fri, Aug 06, 2021, Zhu Lingshan wrote:
->> diff --git a/kernel/events/core.c b/kernel/events/core.c
->> index 464917096e73..e466fc8176e1 100644
->> --- a/kernel/events/core.c
->> +++ b/kernel/events/core.c
->> @@ -6489,9 +6489,18 @@ static void perf_pending_event(struct irq_work *entry)
->>    */
->>   struct perf_guest_info_callbacks *perf_guest_cbs;
->>   
->> +/* explicitly use __weak to fix duplicate symbol error */
->> +void __weak arch_perf_update_guest_cbs(void)
->> +{
->> +}
->> +
->>   int perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
->>   {
->> +	if (WARN_ON_ONCE(perf_guest_cbs))
->> +		return -EBUSY;
->> +
->>   	perf_guest_cbs = cbs;
->> +	arch_perf_update_guest_cbs();
-> This is horribly broken, it fails to cleanup the static calls when KVM unregisters
-> the callbacks, which happens when the vendor module, e.g. kvm_intel, is unloaded.
-> The explosion doesn't happen until 'kvm' is unloaded because the functions are
-> implemented in 'kvm', i.e. the use-after-free is deferred a bit.
->
->    BUG: unable to handle page fault for address: ffffffffa011bb90
->    #PF: supervisor instruction fetch in kernel mode
->    #PF: error_code(0x0010) - not-present page
->    PGD 6211067 P4D 6211067 PUD 6212063 PMD 102b99067 PTE 0
->    Oops: 0010 [#1] PREEMPT SMP
->    CPU: 0 PID: 1047 Comm: rmmod Not tainted 5.14.0-rc2+ #460
->    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->    RIP: 0010:0xffffffffa011bb90
->    Code: Unable to access opcode bytes at RIP 0xffffffffa011bb66.
->    Call Trace:
->     <NMI>
->     ? perf_misc_flags+0xe/0x50
->     ? perf_prepare_sample+0x53/0x6b0
->     ? perf_event_output_forward+0x67/0x160
->     ? kvm_clock_read+0x14/0x30
->     ? kvm_sched_clock_read+0x5/0x10
->     ? sched_clock_cpu+0xd/0xd0
->     ? __perf_event_overflow+0x52/0xf0
->     ? handle_pmi_common+0x1f2/0x2d0
->     ? __flush_tlb_all+0x30/0x30
->     ? intel_pmu_handle_irq+0xcf/0x410
->     ? nmi_handle+0x5/0x260
->     ? perf_event_nmi_handler+0x28/0x50
->     ? nmi_handle+0xc7/0x260
->     ? lock_release+0x2b0/0x2b0
->     ? default_do_nmi+0x6b/0x170
->     ? exc_nmi+0x103/0x130
->     ? end_repeat_nmi+0x16/0x1f
->     ? lock_release+0x2b0/0x2b0
->     ? lock_release+0x2b0/0x2b0
->     ? lock_release+0x2b0/0x2b0
->     </NMI>
->    Modules linked in: irqbypass [last unloaded: kvm]
->
-> Even more fun, the existing perf_guest_cbs framework is also broken, though it's
-> much harder to get it to fail, and probably impossible to get it to fail without
-> some help.  The issue is that perf_guest_cbs is global, which means that it can
-> be nullified by KVM (during module unload) while the callbacks are being accessed
-> by a PMI handler on a different CPU.
->
-> The bug has escaped notice because all dererfences of perf_guest_cbs follow the
-> same "perf_guest_cbs && perf_guest_cbs->is_in_guest()" pattern, and AFAICT the
-> compiler never reload perf_guest_cbs in this sequence.  The compiler does reload
-> perf_guest_cbs for any future dereferences, but the ->is_in_guest() guard all but
-> guarantees the PMI handler will win the race, e.g. to nullify perf_guest_cbs,
-> KVM has to completely exit the guest and teardown down all VMs before it can be
-> unloaded.
->
-> But with a help, e.g. RAED_ONCE(perf_guest_cbs), unloading kvm_intel can trigger
-> a NULL pointer derference, e.g. this tweak
->
-> diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-> index 1eb45139fcc6..202e5ad97f82 100644
-> --- a/arch/x86/events/core.c
-> +++ b/arch/x86/events/core.c
-> @@ -2954,7 +2954,7 @@ unsigned long perf_misc_flags(struct pt_regs *regs)
->   {
->          int misc = 0;
->
-> -       if (perf_guest_cbs && perf_guest_cbs->is_in_guest()) {
-> +       if (READ_ONCE(perf_guest_cbs) && READ_ONCE(perf_guest_cbs)->is_in_guest()) {
->                  if (perf_guest_cbs->is_user_mode())
->                          misc |= PERF_RECORD_MISC_GUEST_USER;
->                  else
->
->
-> while spamming module load/unload leads to:
->
->    BUG: kernel NULL pointer dereference, address: 0000000000000000
->    #PF: supervisor read access in kernel mode
->    #PF: error_code(0x0000) - not-present page
->    PGD 0 P4D 0
->    Oops: 0000 [#1] PREEMPT SMP
->    CPU: 6 PID: 1825 Comm: stress Not tainted 5.14.0-rc2+ #459
->    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->    RIP: 0010:perf_misc_flags+0x1c/0x70
->    Call Trace:
->     perf_prepare_sample+0x53/0x6b0
->     perf_event_output_forward+0x67/0x160
->     __perf_event_overflow+0x52/0xf0
->     handle_pmi_common+0x207/0x300
->     intel_pmu_handle_irq+0xcf/0x410
->     perf_event_nmi_handler+0x28/0x50
->     nmi_handle+0xc7/0x260
->     default_do_nmi+0x6b/0x170
->     exc_nmi+0x103/0x130
->     asm_exc_nmi+0x76/0xbf
->
->
-> The good news is that I have a series that should fix both the existing NULL pointer
-> bug and mostly obviate the need for static calls.  The bad news is that my approach,
-> making perf_guest_cbs per-CPU, likely complicates turning these into static calls,
-> though I'm guessing it's still a solvable problem.
->
-> Tangentially related, IMO we should make architectures opt-in to getting
-> perf_guest_cbs and nuke all of the code in the below files.  Except for arm,
-> which recently lost KVM support, it's all a bunch of useless copy-paste code that
-> serves no purpose and just complicates cleanups like this.
->
->>   arch/arm/kernel/perf_callchain.c   | 16 +++++++-----
->>   arch/csky/kernel/perf_callchain.c  |  4 +--
->>   arch/nds32/kernel/perf_event_cpu.c | 16 +++++++-----
->>   arch/riscv/kernel/perf_callchain.c |  4 +--
+Patch 4 exposes a vCPU's virtual offset through the KVM_*_ONE_REG
+ioctls. When NV support is added to KVM, CNTVOFF_EL2 will be considered
+a guest system register. So, it is safe to expose it now through that
+ioctl.
+
+Patch 5 adds a cpufeature bit to detect 'full' ECV implementations,
+providing EL2 with the ability to offset the physical counter-timer.
+
+Patch 6 exposes a vCPU's physical offset as a vCPU device attribute.
+This is deliberate, as the attribute is not architectural; KVM uses this
+attribute to track the host<->guest offset.
+
+Patch 7 is a prepatory change for the sake of physical offset emulation,
+as counter-timer traps must be configured separately for each vCPU.
+
+Patch 8 allows non-ECV hosts to support the physical offset vCPU device
+attribute, by trapping and emulating the physical counter registers.
+
+This series was tested on an Ampere Mt. Jade system (non-ECV, VHE and
+nVHE). I did not test this on the FVP, as I need to really figure out
+tooling for it on my workstation.
+
+Applies cleanly to v5.15-rc1
+
+v7: http://lore.kernel.org/r/20210816001217.3063400-1-oupton@google.com
+
+v7 -> v8:
+ - Only use ECV if !VHE
+ - Only expose CNTVOFF_EL2 register to userspace with opt-in
+ - Refer to the direct_ptimer explicitly
+
+Oliver Upton (8):
+  KVM: arm64: Refactor update_vtimer_cntvoff()
+  KVM: arm64: Separate guest/host counter offset values
+  KVM: arm64: Make a helper function to get nr of timer regs
+  KVM: arm64: Allow userspace to configure a vCPU's virtual offset
+  arm64: cpufeature: Enumerate support for FEAT_ECV >= 0x2
+  KVM: arm64: Allow userspace to configure a guest's counter-timer
+    offset
+  KVM: arm64: Configure timer traps in vcpu_load() for VHE
+  KVM: arm64: Emulate physical counter offsetting on non-ECV systems
+
+ Documentation/arm64/booting.rst         |   7 +
+ Documentation/virt/kvm/api.rst          |  23 +++
+ Documentation/virt/kvm/devices/vcpu.rst |  28 ++++
+ arch/arm64/include/asm/kvm_host.h       |   3 +
+ arch/arm64/include/asm/sysreg.h         |   5 +
+ arch/arm64/include/uapi/asm/kvm.h       |   2 +
+ arch/arm64/kernel/cpufeature.c          |  10 ++
+ arch/arm64/kvm/arch_timer.c             | 196 +++++++++++++++++++++---
+ arch/arm64/kvm/arm.c                    |   9 +-
+ arch/arm64/kvm/guest.c                  |  28 +++-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  32 ++++
+ arch/arm64/kvm/hyp/nvhe/timer-sr.c      |  11 +-
+ arch/arm64/tools/cpucaps                |   1 +
+ include/clocksource/arm_arch_timer.h    |   1 +
+ include/kvm/arm_arch_timer.h            |  14 +-
+ include/uapi/linux/kvm.h                |   1 +
+ 16 files changed, 337 insertions(+), 34 deletions(-)
+
+-- 
+2.33.0.309.g3052b89438-goog
 
 _______________________________________________
 kvmarm mailing list
