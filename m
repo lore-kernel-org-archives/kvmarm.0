@@ -1,87 +1,98 @@
-Return-Path: <SRS0=sbHD=OG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=nyIz=OH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEED9C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Sep 2021 18:16:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B09FC433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Sep 2021 07:29:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 63F9A61244
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Sep 2021 18:16:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 63F9A61244
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id ACA3161152
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Sep 2021 07:29:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org ACA3161152
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19B2B4B1E6;
-	Thu, 16 Sep 2021 14:16:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 278814A198;
+	Fri, 17 Sep 2021 03:29:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JOZ9y+PH8LDt; Thu, 16 Sep 2021 14:16:13 -0400 (EDT)
+	with ESMTP id AZJFGHtnAjFw; Fri, 17 Sep 2021 03:29:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 811714B1FE;
-	Thu, 16 Sep 2021 14:16:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B11104B08D;
+	Fri, 17 Sep 2021 03:29:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D2874B163
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 14:16:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7781D4A2E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Sep 2021 03:29:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0if2pk1zfKGy for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Sep 2021 14:16:10 -0400 (EDT)
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
- [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 140E54B0CB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 14:16:07 -0400 (EDT)
-Received: by mail-qv1-f73.google.com with SMTP id
- u6-20020ad449a6000000b003798010ad14so63132786qvx.10
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Sep 2021 11:16:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Jo3jDqyeYJxHTghdjTSap/sGN1bxajOYxVwklxu7bWA=;
- b=pWQvEGHm7bH1GMoSyq55V3ReY1YWle4IuUb8kruzdacZ4VmBhZuy/dsiBGld1eWAWu
- VnM5YsMlT2tx4amwEWzQa8jFI64K9cvTtbU6T4xKWsrb6eMWZdta8qPZt+mTwfHlOVG/
- URpoaWL8fEaqR3YJNWi2jYhsvuEItlvyALgXgVoNGNF1fxJsn0yIAPK5W2qTD4NoiQqX
- FzLf1I955MRZRQ776dVyXYg27ZXw99UzznImKCa+BGMtyBG8fBTeWHNjWix36y39YIZE
- FR7Y8D1hyWKwco9OmQgDTvlhdJh6b1zwLMSu8omzxXZHNeLZxA8fTSm1DvM0PGIGDi9/
- RiRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=Jo3jDqyeYJxHTghdjTSap/sGN1bxajOYxVwklxu7bWA=;
- b=epX7koefLEtzuvGkSzsuhHb2Uu2CJsmpUwn69kBCGPkucPbwKNUSOEpM8au9QSvqVl
- BKaUnRdS5BOc03KMEKzhoun3SRHORj+Tpbm9D2drz6adkOxRc8hA1YXYvXYFMSYw7qF+
- KjrYU2WohQRyv33wP5B+WI/5c7OdP3at4KhTcd70tqr1svfrAttvyx9nNWh5w4Kx7Mot
- UKsP15JeW4fzxOmJQiRpZNZdf3j/L8ZT9Ar3lTzkfwJiT7S4MPINXndi+s7LcLROjKb0
- a1iws8gZ9pq+BkRhGwS6hdtE6pq9iWDnkFks9TLrWixnn5woiAiJmrBudO4k5ADAh9wg
- PpQA==
-X-Gm-Message-State: AOAM533kX+LAd9Ijjr6VexfiKNyoanTfo2+q5WlmRn9FK+pWKFhK/PiX
- y2u3S6sJdK1a6K0gJ7R4gdcXZL1a1bU=
-X-Google-Smtp-Source: ABdhPJwDiSi0ZPRJseGEFzbAQlsEdEq5dnm1i+UY0kiUdKyUyLjB/6Jh3NrJjzqszbTMYIxokAGG2QBgAjw=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6214:431:: with SMTP id
- a17mr6551202qvy.48.1631816166794; Thu, 16 Sep 2021 11:16:06 -0700 (PDT)
-Date: Thu, 16 Sep 2021 18:15:54 +0000
-In-Reply-To: <20210916181555.973085-1-oupton@google.com>
-Message-Id: <20210916181555.973085-9-oupton@google.com>
-Mime-Version: 1.0
-References: <20210916181555.973085-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v8 8/9] selftests: KVM: Add counter emulation benchmark
-From: Oliver Upton <oupton@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- Sean Christopherson <seanjc@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+ with ESMTP id Ml1A6-7QDdgr for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Sep 2021 03:29:36 -0400 (EDT)
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C3BD64A198
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Sep 2021 03:29:36 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+ References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description;
+ bh=17mkqfuKdfnPg9YSAeGWHc/O4GLOFEnsaFTJ4hUb1Qc=; b=R175PzEhjMPDTuiig9T+/8FvBN
+ wCwITbQjI86keC2UZcKL3oHklcXqScPxlhfsprjzgtQHXNUwlN8OYqdLQ7ztxGmPqLPGGL1HvK5TW
+ 8un1CwadAtDZMXP8kHm7KJ60CKQlzq6kBsXmSOCidcFaqUG49FGQ/Q91WQSCSzrudnHUpN1n/dtAK
+ 3oCiHTPea1eYl35kiZcqB3afHwTSqwkSRYpje8CyTQKsMtTXOUjDfhQXOeCpbGDLw3jXUuiLQwU+o
+ fpmbPjE5lGD64IJe7KimQfKhdgCV7/TWkKj798HvtN0fT0soP/DzPI91f4RdvEreoDEx02Cp2qq0O
+ NM1LgiIg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100]
+ helo=noisy.programming.kicks-ass.net)
+ by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+ id 1mR8Ig-003p42-0g; Fri, 17 Sep 2021 07:28:46 +0000
+Received: from hirez.programming.kicks-ass.net
+ (hirez.programming.kicks-ass.net [192.168.1.225])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits))
+ (Client did not present a certificate)
+ by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 64E5430031A;
+ Fri, 17 Sep 2021 09:28:42 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+ id EBC3F2B27F98D; Fri, 17 Sep 2021 09:28:41 +0200 (CEST)
+Date: Fri, 17 Sep 2021 09:28:41 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH v2 00/13] perf: KVM: Fix, optimize, and clean up callbacks
+Message-ID: <YURDqVZ1UXKCiKPV@hirez.programming.kicks-ass.net>
+References: <20210828003558.713983-1-seanjc@google.com>
+ <20210828201336.GD4353@worktop.programming.kicks-ass.net>
+ <YUO5J/jTMa2KGbsq@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <YUO5J/jTMa2KGbsq@google.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Guo Ren <guoren@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, linux-riscv@lists.infradead.org,
+ Vincent Chen <deanbo422@gmail.com>, Jiri Olsa <jolsa@redhat.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+ linux-csky@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ Ingo Molnar <mingo@redhat.com>, Like Xu <like.xu.linux@gmail.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Zhu Lingshan <lingshan.zhu@intel.com>,
+ Will Deacon <will@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Borislav Petkov <bp@alien8.de>, Greentime Hu <green.hu@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Namhyung Kim <namhyung@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Artem Kashkanov <artem.kashkanov@intel.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Juergen Gross <jgross@suse.com>, Nick Hu <nickhu@andestech.com>,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,261 +109,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a test case for counter emulation on arm64. A side effect of how KVM
-handles physical counter offsetting on non-ECV systems is that the
-virtual counter will always hit hardware and the physical could be
-emulated. Force emulation by writing a nonzero offset to the physical
-counter and compare the elapsed cycles to a direct read of the hardware
-register.
+On Thu, Sep 16, 2021 at 09:37:43PM +0000, Sean Christopherson wrote:
+> On Sat, Aug 28, 2021, Peter Zijlstra wrote:
 
-Reviewed-by: Ricardo Koller <ricarkol@google.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/aarch64/counter_emulation_benchmark.c | 207 ++++++++++++++++++
- 3 files changed, 209 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
+> Argh, sorry, I somehow managed to miss all of your replies.  I'll get back to
+> this series next week.  Thanks for the quick response!
+> 
+> > Lets keep the whole intel_pt crud inside x86...
+> 
+> In theory, I like the idea of burying intel_pt inside x86 (and even in
+> Intel+VMX code for the most part), but the actual implementation is a
+> bit gross.  Because of the whole "KVM can be a module" thing,
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index aa5a5197716e..ae2564b27af0 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+/aarch64/counter_emulation_benchmark
- /aarch64/debug-exceptions
- /aarch64/get-reg-list
- /aarch64/psci_cpu_on_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index fd61d0063c50..3c80899b40ee 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -86,6 +86,7 @@ TEST_GEN_PROGS_x86_64 += steal_time
- TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
- TEST_GEN_PROGS_x86_64 += system_counter_offset_test
- 
-+TEST_GEN_PROGS_aarch64 += aarch64/counter_emulation_benchmark
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
-diff --git a/tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c b/tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
-new file mode 100644
-index 000000000000..48dbd9459102
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/counter_emulation_benchmark.c
-@@ -0,0 +1,207 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * counter_emulation_benchmark.c -- test to measure the effects of counter
-+ * emulation on guest reads of the physical counter.
-+ *
-+ * Copyright (c) 2021, Google LLC.
-+ */
-+
-+#define _GNU_SOURCE
-+#include <asm/kvm.h>
-+#include <linux/kvm.h>
-+#include <stdio.h>
-+#include <stdint.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "test_util.h"
-+
-+#define VCPU_ID 0
-+
-+static struct counter_values {
-+	uint64_t cntvct_start;
-+	uint64_t cntpct;
-+	uint64_t cntvct_end;
-+} counter_values;
-+
-+static uint64_t nr_iterations = 1000;
-+
-+static void do_test(void)
-+{
-+	/*
-+	 * Open-coded approach instead of using helper methods to keep a tight
-+	 * interval around the physical counter read.
-+	 */
-+	asm volatile("isb\n\t"
-+		     "mrs %[cntvct_start], cntvct_el0\n\t"
-+		     "isb\n\t"
-+		     "mrs %[cntpct], cntpct_el0\n\t"
-+		     "isb\n\t"
-+		     "mrs %[cntvct_end], cntvct_el0\n\t"
-+		     "isb\n\t"
-+		     : [cntvct_start] "=r"(counter_values.cntvct_start),
-+		     [cntpct] "=r"(counter_values.cntpct),
-+		     [cntvct_end] "=r"(counter_values.cntvct_end));
-+}
-+
-+static void guest_main(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < nr_iterations; i++) {
-+		do_test();
-+		GUEST_SYNC(i);
-+	}
-+
-+	for (i = 0; i < nr_iterations; i++) {
-+		do_test();
-+		GUEST_SYNC(i);
-+	}
-+}
-+
-+static void enter_guest(struct kvm_vm *vm)
-+{
-+	struct ucall uc;
-+
-+	vcpu_ioctl(vm, VCPU_ID, KVM_RUN, NULL);
-+
-+	switch (get_ucall(vm, VCPU_ID, &uc)) {
-+	case UCALL_SYNC:
-+		break;
-+	case UCALL_ABORT:
-+		TEST_ASSERT(false, "%s at %s:%ld", (const char *)uc.args[0],
-+			    __FILE__, uc.args[1]);
-+		break;
-+	default:
-+		TEST_ASSERT(false, "unexpected exit: %s",
-+			    exit_reason_str(vcpu_state(vm, VCPU_ID)->exit_reason));
-+		break;
-+	}
-+}
-+
-+static double counter_frequency(void)
-+{
-+	uint32_t freq;
-+
-+	asm volatile("mrs %0, cntfrq_el0"
-+		     : "=r" (freq));
-+
-+	return freq / 1000000.0;
-+}
-+
-+static void log_csv(FILE *csv, bool trapped)
-+{
-+	double freq = counter_frequency();
-+
-+	fprintf(csv, "%s,%.02f,%lu,%lu,%lu\n",
-+		trapped ? "true" : "false", freq,
-+		counter_values.cntvct_start,
-+		counter_values.cntpct,
-+		counter_values.cntvct_end);
-+}
-+
-+static double run_loop(struct kvm_vm *vm, FILE *csv, bool trapped)
-+{
-+	double avg = 0;
-+	int i;
-+
-+	for (i = 0; i < nr_iterations; i++) {
-+		uint64_t delta;
-+
-+		enter_guest(vm);
-+		sync_global_from_guest(vm, counter_values);
-+
-+		if (csv)
-+			log_csv(csv, trapped);
-+
-+		delta = counter_values.cntvct_end - counter_values.cntvct_start;
-+		avg = ((avg * i) + delta) / (i + 1);
-+	}
-+
-+	return avg;
-+}
-+
-+static void setup_counter(struct kvm_vm *vm, uint64_t offset)
-+{
-+	vcpu_access_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-+				KVM_ARM_VCPU_TIMER_PHYS_OFFSET, &offset,
-+				true);
-+}
-+
-+static void run_tests(struct kvm_vm *vm, FILE *csv)
-+{
-+	double avg_trapped, avg_native, freq;
-+
-+	freq = counter_frequency();
-+
-+	if (csv)
-+		fputs("trapped,freq_mhz,cntvct_start,cntpct,cntvct_end\n", csv);
-+
-+	/* no physical offsetting; kvm allows reads of cntpct_el0 */
-+	setup_counter(vm, 0);
-+	avg_native = run_loop(vm, csv, false);
-+
-+	/* force emulation of the physical counter */
-+	setup_counter(vm, 1);
-+	avg_trapped = run_loop(vm, csv, true);
-+
-+	pr_info("%lu iterations: average cycles (@%.02fMHz) native: %.02f, trapped: %.02f\n",
-+		nr_iterations, freq, avg_native, avg_trapped);
-+}
-+
-+static void usage(const char *program_name)
-+{
-+	fprintf(stderr,
-+		"Usage: %s [-h] [-o csv_file] [-n iterations]\n"
-+		"  -h prints this message\n"
-+		"  -n number of test iterations (default: %lu)\n"
-+		"  -o csv file to write data\n",
-+		program_name, nr_iterations);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct kvm_vm *vm;
-+	FILE *csv = NULL;
-+	int opt;
-+
-+	while ((opt = getopt(argc, argv, "hn:o:")) != -1) {
-+		switch (opt) {
-+		case 'o':
-+			csv = fopen(optarg, "w");
-+			if (!csv) {
-+				fprintf(stderr, "failed to open file '%s': %d\n",
-+					optarg, errno);
-+				exit(1);
-+			}
-+			break;
-+		case 'n':
-+			nr_iterations = strtoul(optarg, NULL, 0);
-+			break;
-+		default:
-+			fprintf(stderr, "unrecognized option: '-%c'\n", opt);
-+			/* fallthrough */
-+		case 'h':
-+			usage(argv[0]);
-+			exit(1);
-+		}
-+	}
-+
-+	vm = vm_create_default(VCPU_ID, 0, guest_main);
-+	sync_global_to_guest(vm, nr_iterations);
-+	ucall_init(vm, NULL);
-+
-+	if (_vcpu_has_device_attr(vm, VCPU_ID, KVM_ARM_VCPU_TIMER_CTRL,
-+				  KVM_ARM_VCPU_TIMER_PHYS_OFFSET)) {
-+		print_skip("KVM_ARM_VCPU_TIMER_PHYS_OFFSET not supported.");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	run_tests(vm, csv);
-+	kvm_vm_free(vm);
-+
-+	if (csv)
-+		fclose(csv);
-+}
--- 
-2.33.0.464.g1972c5931b-goog
+ARGH!! we should really fix that. I've heard other archs have made much
+better choices here.
 
+> either
+> the static call and __static_call_return0 would need to be exported,
+> or a new register/unregister pair would have to be exported.
+
+So I don't mind exporting __static_call_return0, but exporting a raw
+static_call is much like exporting a function pointer :/
+
+> The unregister path would also need its own synchronize_rcu().  In general, I
+> don't love duplicating the logic, but it's not the end of the world.
+> 
+> Either way works for me.  Paolo or Peter, do either of you have a preference?
+
+Can we de-feature kvm as a module and only have this PT functionality
+when built-in? :-)
+
+
+> > ---
+> > Index: linux-2.6/arch/x86/events/core.c
+> > ===================================================================
+> > --- linux-2.6.orig/arch/x86/events/core.c
+> > +++ linux-2.6/arch/x86/events/core.c
+> > @@ -92,7 +92,7 @@ DEFINE_STATIC_CALL_RET0(x86_pmu_guest_ge
+> >  
+> >  DEFINE_STATIC_CALL_RET0(x86_guest_state, *(perf_guest_cbs->state));
+> >  DEFINE_STATIC_CALL_RET0(x86_guest_get_ip, *(perf_guest_cbs->get_ip));
+> > -DEFINE_STATIC_CALL_RET0(x86_guest_handle_intel_pt_intr, *(perf_guest_cbs->handle_intel_pt_intr));
+> > +DEFINE_STATIC_CALL_RET0(x86_guest_handle_intel_pt_intr, unsigned int (*)(void));
+> 
+> FWIW, the param needs to be a raw function, not a function pointer. 
+
+Yeah, I keep making that mistake.. and I wrote the bloody thing :/
+
+I have a 'fix' for that, but I need to finish that and also flag-day
+change :-(
+
+  https://lkml.kernel.org/r/YS+0eIeAJsRRArk4@hirez.programming.kicks-ass.net
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
