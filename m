@@ -3,72 +3,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DADCCC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Sep 2021 10:08:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D17C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Sep 2021 10:24:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5436260F9B
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Sep 2021 10:08:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5436260F9B
+	by mail.kernel.org (Postfix) with ESMTP id 2EBF560FED
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Sep 2021 10:24:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2EBF560FED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8D8C4B0F7;
-	Mon, 20 Sep 2021 06:08:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B32834B0F4;
+	Mon, 20 Sep 2021 06:24:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FEfLC4REw4Wx; Mon, 20 Sep 2021 06:08:34 -0400 (EDT)
+	with ESMTP id 8gcpSjWYsySX; Mon, 20 Sep 2021 06:24:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCD114B0CB;
-	Mon, 20 Sep 2021 06:08:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72D954B0CB;
+	Mon, 20 Sep 2021 06:24:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 28EEC4B09C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Sep 2021 06:08:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 367344B09C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Sep 2021 06:24:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Y0AKtCc0mXb0 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Sep 2021 06:08:32 -0400 (EDT)
+ with ESMTP id rV21fYUmaY-2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Sep 2021 06:24:00 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E83794B08A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Sep 2021 06:08:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBEFD4A49C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Sep 2021 06:23:59 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 0532960F25;
- Mon, 20 Sep 2021 10:08:30 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by mail.kernel.org (Postfix) with ESMTPSA id EBBAC60FED;
+ Mon, 20 Sep 2021 10:23:58 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mSGDs-00Bjgb-1s; Mon, 20 Sep 2021 11:08:28 +0100
-MIME-Version: 1.0
-Date: Mon, 20 Sep 2021 11:08:27 +0100
+ id 1mSGSq-00Bjnp-Un; Mon, 20 Sep 2021 11:23:57 +0100
+Date: Mon, 20 Sep 2021 11:23:56 +0100
+Message-ID: <87y27rv937.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Subject: Re: [PATCH] KVM: arm: add Kbuild FORCE prerequisite for hyp-reloc
-In-Reply-To: <20210920100515.1554788-1-arnd@kernel.org>
-References: <20210920100515.1554788-1-arnd@kernel.org>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <1785d70bf2211832c4640763114d3f8d@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: arnd@kernel.org, catalin.marinas@arm.com, will@kernel.org,
- dbrazdil@google.com, arnd@arndb.de, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, qperret@google.com,
- keescook@chromium.org, samitolvanen@google.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org
+To: Will Deacon <will@kernel.org>
+Subject: Re: REGRESSION: Upgrading host kernel from 5.11 to 5.13 breaks QEMU
+ guests - perf/fw_devlink/kvm
+In-Reply-To: <20210920095656.GA11961@willie-the-truck>
+References: <YUYRKVflRtUytzy5@shell.armlinux.org.uk>
+ <877dfcwutt.wl-maz@kernel.org>
+ <20210920095656.GA11961@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux@armlinux.org.uk,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Sami Tolvanen <samitolvanen@google.com>, Will Deacon <will@kernel.org>,
+Cc: kvm@vger.kernel.org, "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -81,57 +81,109 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-09-20 11:05, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Mon, 20 Sep 2021 10:56:57 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> Commit e1f86d7b4b2a ("kbuild: warn if FORCE is missing for
-> if_changed(_dep,_rule)
-> and filechk") added a helpful check for Kbuild, which now notices
-> that a problem with the hyp-reloc rule:
+> On Sun, Sep 19, 2021 at 02:36:46PM +0100, Marc Zyngier wrote:
+> > From 9c26e3e6bbcbc3a583b3974e7a9017029d31fe29 Mon Sep 17 00:00:00 2001
+> > From: Marc Zyngier <maz@kernel.org>
+> > Date: Sun, 19 Sep 2021 14:09:49 +0100
+> > Subject: [PATCH] KVM: arm64: Fix PMU probe ordering
+> > 
+> > Russell reported that since 5.13, KVM's probing of the PMU has
+> > started to fail on his HW. As it turns out, there is an implicit
+> > ordering dependency between the architectural PMU probing code and
+> > and KVM's own probing. If, due to probe ordering reasons, KVM probes
+> > before the PMU driver, it will fail to detect the PMU and prevent it
+> > from being advertised to guests as well as the VMM.
+> > 
+> > Obviously, this is one probing too many, and we should be able to
+> > deal with any ordering.
+> > 
+> > Add a callback from the PMU code into KVM to advertise the registration
+> > of a host CPU PMU, allowing for any probing order.
+> > 
+> > Fixes: 5421db1be3b1 ("KVM: arm64: Divorce the perf code from oprofile helpers")
+> > Reported-by: "Russell King (Oracle)" <linux@armlinux.org.uk>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Link: https://lore.kernel.org/r/YUYRKVflRtUytzy5@shell.armlinux.org.uk
+> > Cc: stable@vger.kernel.org
+> > ---
+> >  arch/arm64/kvm/perf.c        |  3 ---
+> >  arch/arm64/kvm/pmu-emul.c    | 12 +++++++++++-
+> >  drivers/perf/arm_pmu.c       |  2 ++
+> >  include/kvm/arm_pmu.h        |  3 ---
+> >  include/linux/perf/arm_pmu.h |  6 ++++++
+> >  5 files changed, 19 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+> > index f9bb3b14130e..c84fe24b2ea1 100644
+> > --- a/arch/arm64/kvm/perf.c
+> > +++ b/arch/arm64/kvm/perf.c
+> > @@ -50,9 +50,6 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
+> >  
+> >  int kvm_perf_init(void)
+> >  {
+> > -	if (kvm_pmu_probe_pmuver() != ID_AA64DFR0_PMUVER_IMP_DEF && !is_protected_kvm_enabled())
+> > -		static_branch_enable(&kvm_arm_pmu_available);
+> > -
+> >  	return perf_register_guest_info_callbacks(&kvm_guest_cbs);
+> >  }
+> >  
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index f5065f23b413..588100c52f34 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -740,7 +740,17 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+> >  	kvm_pmu_create_perf_event(vcpu, select_idx);
+> >  }
+> >  
+> > -int kvm_pmu_probe_pmuver(void)
+> > +void kvm_host_pmu_init(struct arm_pmu *pmu)
+> > +{
+> > +	if (pmu->pmuver != 0 &&
+> > +	    pmu->pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
+> > +	    !is_protected_kvm_enabled()) {
+> > +		static_branch_enable(&kvm_arm_pmu_available);
+> > +		kvm_info("PMU detected and enabled\n");
+> > +	}
+> > +}
+> > +
+> > +static int kvm_pmu_probe_pmuver(void)
+> >  {
+> >  	struct perf_event_attr attr = { };
+> >  	struct perf_event *event;
+> > diff --git a/drivers/perf/arm_pmu.c b/drivers/perf/arm_pmu.c
+> > index 3cbc3baf087f..295cc7952d0e 100644
+> > --- a/drivers/perf/arm_pmu.c
+> > +++ b/drivers/perf/arm_pmu.c
+> > @@ -952,6 +952,8 @@ int armpmu_register(struct arm_pmu *pmu)
+> >  		pmu->name, pmu->num_events,
+> >  		has_nmi ? ", using NMIs" : "");
+> >  
+> > +	kvm_host_pmu_init(pmu);
 > 
-> arch/arm64/kvm/hyp/nvhe/Makefile:58: FORCE prerequisite is missing
-> 
-> Do as suggested and add FORCE here.
-> 
-> Fixes: 8c49b5d43d4c ("KVM: arm64: Generate hyp relocation data")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  arch/arm64/kvm/hyp/nvhe/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile 
-> b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index 5df6193fc430..8d741f71377f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -54,7 +54,7 @@ $(obj)/kvm_nvhe.tmp.o: $(obj)/hyp.lds $(addprefix
-> $(obj)/,$(hyp-obj)) FORCE
->  #    runtime. Because the hypervisor is part of the kernel binary, 
-> relocations
->  #    produce a kernel VA. We enumerate relocations targeting hyp at 
-> build time
->  #    and convert the kernel VAs at those positions to hyp VAs.
-> -$(obj)/hyp-reloc.S: $(obj)/kvm_nvhe.tmp.o $(obj)/gen-hyprel
-> +$(obj)/hyp-reloc.S: $(obj)/kvm_nvhe.tmp.o $(obj)/gen-hyprel FORCE
->  	$(call if_changed,hyprel)
-> 
->  # 5) Compile hyp-reloc.S and link it into the existing partially 
-> linked object.
+> Just a nit, but I think this will get called for each PMU we probe
+> on a big.LITTLE system which is probably harmless, but possible not
+> what you want?
 
-I already have queued [1], which does the same thing.
+Yeah, it is a bit ugly, but harmless. In the future, it would be
+useful to track which PMU is used on which CPUs, and this will give us
+a decent hook.
+
+I'll tone the print down though.
 
 Thanks,
 
-         M.
+	M.
 
-[1] https://lore.kernel.org/r/20210907052137.1059-1-yuzenghui@huawei.com
 -- 
-Jazz is not dead. It just smells funny...
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
