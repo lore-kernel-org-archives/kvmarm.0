@@ -3,74 +3,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C82C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Sep 2021 12:30:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B2CC433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Sep 2021 13:15:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A50AE6109E
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Sep 2021 12:30:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A50AE6109E
+	by mail.kernel.org (Postfix) with ESMTP id 12A9B60F26
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Sep 2021 13:15:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 12A9B60F26
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E3E54B0B3;
-	Mon, 20 Sep 2021 08:30:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CAF94A7FD;
+	Mon, 20 Sep 2021 09:15:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FZJJM1m1omfd; Mon, 20 Sep 2021 08:30:46 -0400 (EDT)
+	with ESMTP id yl1TnZahbt-i; Mon, 20 Sep 2021 09:15:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2692F4B0B4;
-	Mon, 20 Sep 2021 08:30:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4744B4B08E;
+	Mon, 20 Sep 2021 09:15:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B4A24B089
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Sep 2021 08:30:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 823264A534
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Sep 2021 09:15:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F+C019NyP7sL for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Sep 2021 08:30:44 -0400 (EDT)
+ with ESMTP id 81aXFaC6OajO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Sep 2021 09:15:10 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48CEE4ACC9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Sep 2021 08:30:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3086402A9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Sep 2021 09:15:09 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 5006D60F58;
- Mon, 20 Sep 2021 12:30:43 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id EE49860FE6;
+ Mon, 20 Sep 2021 13:15:08 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mSIRV-00Bl6C-5r; Mon, 20 Sep 2021 13:30:41 +0100
-Date: Mon, 20 Sep 2021 13:30:40 +0100
-Message-ID: <87sfxzv37z.wl-maz@kernel.org>
+ id 1mSJ8V-00BldR-0B; Mon, 20 Sep 2021 14:15:07 +0100
+Date: Mon, 20 Sep 2021 14:15:06 +0100
+Message-ID: <87pmt3v15x.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v2 1/2] KVM: arm64: vgic: check redist region is not above
- the VM IPA size
-In-Reply-To: <20210910004919.1610709-2-ricarkol@google.com>
-References: <20210910004919.1610709-1-ricarkol@google.com>
- <20210910004919.1610709-2-ricarkol@google.com>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v5 1/8] KVM: arm64: Pass struct kvm to per-EC handlers
+In-Reply-To: <20210827101609.2808181-2-tabba@google.com>
+References: <20210827101609.2808181-1-tabba@google.com>
+ <20210827101609.2808181-2-tabba@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, drjones@redhat.com, eric.auger@redhat.com,
- alexandru.elisei@arm.com, pbonzini@redhat.com, oupton@google.com,
- james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
- jingzhangos@google.com, pshier@google.com, rananta@google.com,
- reijiw@google.com
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com,
+ pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, shuah@kernel.org, pshier@google.com,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,76 +87,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Ricardo,
-
-On Fri, 10 Sep 2021 01:49:18 +0100,
-Ricardo Koller <ricarkol@google.com> wrote:
+On Fri, 27 Aug 2021 11:16:02 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> Verify that the redistributor regions do not extend beyond the
-> VM-specified IPA size (phys_size). This can happen when using
-> KVM_VGIC_V3_ADDR_TYPE_REDIST or KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS
-> with:
+> We need struct kvm to check for protected VMs to be able to pick
+> the right handlers for them.
 > 
->   base + size > phys_size AND base < phys_size
+> Mark the handler functions inline, since some handlers will be
+> called in future code from the protected VM handlers.
 > 
-> Add the missing check into vgic_v3_alloc_redist_region() which is called
-> when setting the regions, and into vgic_v3_check_base() which is called
-> when attempting the first vcpu-run. The vcpu-run check does not apply to
-> KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS because the regions size is known
-> before the first vcpu-run. Finally, this patch also enables some extra
-> tests in vgic_v3_alloc_redist_region() by calculating "size" early for
-> the legacy redist api.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 7 ++++++-
->  arch/arm64/kvm/vgic/vgic-v3.c      | 4 ++++
->  2 files changed, 10 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 16 ++++++++--------
+>  arch/arm64/kvm/hyp/nvhe/switch.c        |  2 +-
+>  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
+>  3 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> index a09cdc0b953c..055671bede85 100644
-> --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-> @@ -796,7 +796,9 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
->  	struct vgic_dist *d = &kvm->arch.vgic;
->  	struct vgic_redist_region *rdreg;
->  	struct list_head *rd_regions = &d->rd_regions;
-> -	size_t size = count * KVM_VGIC_V3_REDIST_SIZE;
-> +	int nr_vcpus = atomic_read(&kvm->online_vcpus);
-> +	size_t size = count ? count * KVM_VGIC_V3_REDIST_SIZE :
-> +			nr_vcpus * KVM_VGIC_V3_REDIST_SIZE;
->  	int ret;
->  
->  	/* cross the end of memory ? */
-> @@ -834,6 +836,9 @@ static int vgic_v3_alloc_redist_region(struct kvm *kvm, uint32_t index,
->  	if (vgic_v3_rdist_overlap(kvm, base, size))
->  		return -EINVAL;
->  
-> +	if (base + size > kvm_phys_size(kvm))
-> +		return -E2BIG;
-> +
->  	rdreg = kzalloc(sizeof(*rdreg), GFP_KERNEL);
->  	if (!rdreg)
->  		return -ENOMEM;
-> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-> index 66004f61cd83..5afd9f6f68f6 100644
-> --- a/arch/arm64/kvm/vgic/vgic-v3.c
-> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
-> @@ -512,6 +512,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
->  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
->  			rdreg->base)
->  			return false;
-> +
-> +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
-> +			kvm_phys_size(kvm))
-> +			return false;
->  	}
->  
->  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 0397606c0951..7cbff0ee59a5 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -163,7 +163,7 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+>   * If FP/SIMD is not implemented, handle the trap and inject an undefined
+>   * instruction exception to the guest. Similarly for trapped SVE accesses.
+>   */
+> -static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +static inline bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
 
-How about vgic-v2? From what I can see, the placement of the
-distributor and CPU interface should be subjected to the same checks
-(see vgic_v2_check_base()).
+No, please don't do that. We already have function pointers for each
+of these, so by doing that you are forcing the compiler to emit the
+code *twice*.
+
+Instead, call into the relevant EC handler by using the base array
+that already does the non-protected handling.
+
+>  {
+>  	bool sve_guest, sve_host;
+>  	u8 esr_ec;
+> @@ -318,7 +318,7 @@ static inline bool esr_is_ptrauth_trap(u32 esr)
+>  
+>  DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+>  
+> -static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +static inline bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+>  	struct kvm_cpu_context *ctxt;
+>  	u64 val;
+> @@ -343,7 +343,7 @@ static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	return true;
+>  }
+>  
+> -static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +static inline bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
+>  	    handle_tx2_tvm(vcpu))
+> @@ -356,7 +356,7 @@ static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	return false;
+>  }
+>  
+> -static bool kvm_hyp_handle_cp15(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +static inline bool kvm_hyp_handle_cp15(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+>  	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
+>  	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
+> @@ -365,7 +365,7 @@ static bool kvm_hyp_handle_cp15(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	return false;
+>  }
+>  
+> -static bool kvm_hyp_handle_iabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +static inline bool kvm_hyp_handle_iabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+>  	if (!__populate_fault_info(vcpu))
+>  		return true;
+> @@ -373,7 +373,7 @@ static bool kvm_hyp_handle_iabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	return false;
+>  }
+>  
+> -static bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +static inline bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+>  	if (!__populate_fault_info(vcpu))
+>  		return true;
+> @@ -403,7 +403,7 @@ static bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  
+>  typedef bool (*exit_handler_fn)(struct kvm_vcpu *, u64 *);
+>  
+> -static const exit_handler_fn *kvm_get_exit_handler_array(void);
+> +const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm);
+
+Why? What breaks if when this is static? There really shouldn't be
+anything else referencing this array.
 
 Thanks,
 
