@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7DCC433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FD7C4332F
 	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 17:11:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 93393611CE
+	by mail.kernel.org (Postfix) with ESMTP id F197361268
 	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 17:11:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 93393611CE
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F197361268
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 387964B089;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 699294A193;
 	Tue, 21 Sep 2021 13:11:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QZSeo1N7Jj5L; Tue, 21 Sep 2021 13:11:29 -0400 (EDT)
+	with ESMTP id cB03NRCPEWLR; Tue, 21 Sep 2021 13:11:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 333FB4A7FD;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57B1D4A3A5;
 	Tue, 21 Sep 2021 13:11:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24D4649F6C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 13:11:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 129D449F6C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 13:11:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 03M4IcOBygmo for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Sep 2021 13:11:26 -0400 (EDT)
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
- [209.85.160.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4AFA9402DB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 13:11:26 -0400 (EDT)
-Received: by mail-qt1-f201.google.com with SMTP id
- z16-20020ac86b90000000b0029eec160182so219473351qts.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 10:11:26 -0700 (PDT)
+ with ESMTP id wMBbPFhEXVFE for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Sep 2021 13:11:27 -0400 (EDT)
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
+ [209.85.219.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 263944A193
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 13:11:27 -0400 (EDT)
+Received: by mail-qv1-f74.google.com with SMTP id
+ h18-20020ad446f2000000b0037a7b48ba05so167101qvw.19
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 10:11:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=jzWR7Fq+/HAR8FRZ5CmWSQlSyJSKtGaA1okeOYzuzGU=;
- b=SRNa1zbX4Hlo2D0JzsaExaDQ/o+xv5a3XVc2p1Ds3bUplbwmS3q6FzHFGfO6viO3tx
- UryxD6046QZNjR9r+69hcdSw2WNjndojahCKDtDMVFLbsnQLby9zo1kaKVVSvhYZ35Ab
- N1XuaLB9ymwxPiDzOqnDCatr7f+AnGBW/FZ8jw1+tXmchZcorWtKXb7X+iVDB6Lsnw+6
- Dr7bGpQ5U09p+edUYGyTkyxZocA6S25DGmN6ZVbyhQ5KMRM1oJBRrg5DQUDEyg2nDsTl
- TBLDdFnK5k+0atVZS7dXSqIDQ16oPe7jTkoMHF5iu43OgOpq3zC+jP+TJoPPbSPfsvgV
- l6yg==
+ :cc; bh=jbjtkKJClRIdxDxc/X394uGXktg3U8/Y+QRIQienfdo=;
+ b=mWyNrrEh7r2ySTiW4Dae4QnrEPDgY8hXI/P5NufdPFUir6Y5L1t9mujB8p860FHuh1
+ SkaMHh2ZuA1gBH/UCa5MOFmkQh4d6dDm9uxwx/G2ArlH+4Oim4gB5YUHp83i4cMlNyIK
+ 18rU1nqfj0abE/L6uEOAHDD27ah2ztfzg9ixYn08nweN6UI9yBG2sX3EFrUH/vRUJRT+
+ mYKQYyPIk7W0nOqEqZGnfNAakiuSl4Myn4dFO9vmOUe0ckxXrfENjdZuPxFYuDZQ4kV1
+ KcfN2jvnXwIQnQ0MkHp9bYrkYsS9+EMUpup7y93HrhHcrN5jcH7ADq655ZTZFj4qScZH
+ xDfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=jzWR7Fq+/HAR8FRZ5CmWSQlSyJSKtGaA1okeOYzuzGU=;
- b=z/VS6zHUs6Wq8oVji3Q8Nf+HB6Jq8kv4/VRFFlPk8w4WqWkcST/2ARV4mT8RepZgE/
- hJdtA9eqMCLTkp/uQL67a9eYkipUBqm8z259NAdDKOrqvAVdHgY8xDSckH36yYHKzqAd
- xN2OQhjrmZ/sBykNoNMG/V7IudMEfoztjhb1OeKmK+g4s1jVMu/eY40GrB0SskyVTpR2
- xpSElYZpB3uw8IYP3o969cpm9yfc/TClPs53I9H2n59oeoy6P32POpZTGsB5RTgKzzsG
- YTTGo0AE7FrKn7+q1CNAjjApaj/fD0jUDuC48Ns7UCuttCzEi/BtoKyDjvHB3PGH8ema
- tn7Q==
-X-Gm-Message-State: AOAM533gqWKfEeC5VYHZT3Tv/6IX0U4aLQz7Fq+1sXdgPYAaU2iEJs7k
- EOdLu4h8nVZky4h5YDYAwoYxsm23nGk=
-X-Google-Smtp-Source: ABdhPJxTaVdhnf2NYKqOfGZMxyn1rqiFJZMJSy1HY3CHx0lbCdjT7xpbhLQC0Atg6HG9LiGEYTEt9oY+BH8=
+ bh=jbjtkKJClRIdxDxc/X394uGXktg3U8/Y+QRIQienfdo=;
+ b=tQMYIpwT7xYMpxloMOyCrfpf42NFnlNGH3X7wTiA3kd0d2EQ2quU1zu9llOWuVSaBg
+ CpTB8uvWSabR3NLR2IknzhaSjgePbZTZ5jlRT8yd1V3A3LX9v4sQ2LWRjMEWUV0zm5Um
+ cDdDUuvfgCOglmWYcak41g9OW4msq+jsfFjvhrJQKmN80QIC15QfAbWGqiA2qrXIkT05
+ VCpQgENJVms5el8t1e6QbR+wpoMetBLdjpFQ455MqOSgszYAZK4QJEdtbqnc3Y5gC8C+
+ CxFfwHeC4SbGHVZaJHf0idktaH6pk3+BUlAG4Tcls65KYcrb5whV3FqgMkrlSvdztV3B
+ mmZw==
+X-Gm-Message-State: AOAM530DtmBEpl+IhQZOzIKSi7K6BtPBDHLz3gHwZGfklp3DlKqxpjhA
+ eQ0bIZFCCgkmWUe+RulNUDOqz/dy5EE=
+X-Google-Smtp-Source: ABdhPJwfa7oXjKMcTr6hpyAwdrgF4UuepCosJxs3eddjQEmY8Byeb5DZI6myHOWAQLWj8DDqFVtOMt3A/Zw=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:eb0b:: with SMTP id
- d11mr37032784ybs.101.1632244285806; 
- Tue, 21 Sep 2021 10:11:25 -0700 (PDT)
-Date: Tue, 21 Sep 2021 17:11:20 +0000
+ (user=oupton job=sendgmr) by 2002:a25:424a:: with SMTP id
+ p71mr41188110yba.243.1632244286770; 
+ Tue, 21 Sep 2021 10:11:26 -0700 (PDT)
+Date: Tue, 21 Sep 2021 17:11:21 +0000
 In-Reply-To: <20210921171121.2148982-1-oupton@google.com>
-Message-Id: <20210921171121.2148982-2-oupton@google.com>
+Message-Id: <20210921171121.2148982-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20210921171121.2148982-1-oupton@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v2 1/2] selftests: KVM: Fix check for !POLLIN in
- demand_paging_test
+Subject: [PATCH v2 2/2] selftests: KVM: Align SMCCC call with the spec in
+ steal_time
 From: Oliver Upton <oupton@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <maz@kernel.org>, Sean Christopherson <seanjc@google.com>,
@@ -97,30 +97,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The logical not operator applies only to the left hand side of a bitwise
-operator. As such, the check for POLLIN not being set in revents wrong.
-Fix it by adding parentheses around the bitwise expression.
+The SMC64 calling convention passes a function identifier in w0 and its
+parameters in x1-x17. Given this, there are two deviations in the
+SMC64 call performed by the steal_time test: the function identifier is
+assigned to a 64 bit register and the parameter is only 32 bits wide.
 
-Fixes: 4f72180eb4da ("KVM: selftests: Add demand paging content to the demand paging test")
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Align the call with the SMCCC by using a 32 bit register to handle the
+function identifier and increasing the parameter width to 64 bits.
+
+Suggested-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- tools/testing/selftests/kvm/demand_paging_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/steal_time.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index e79c1b64977f..10edae425ab3 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -179,7 +179,7 @@ static void *uffd_handler_thread_fn(void *arg)
- 			return NULL;
- 		}
+diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+index ecec30865a74..aafaa8e38b7c 100644
+--- a/tools/testing/selftests/kvm/steal_time.c
++++ b/tools/testing/selftests/kvm/steal_time.c
+@@ -118,12 +118,12 @@ struct st_time {
+ 	uint64_t st_time;
+ };
  
--		if (!pollfd[0].revents & POLLIN)
-+		if (!(pollfd[0].revents & POLLIN))
- 			continue;
+-static int64_t smccc(uint32_t func, uint32_t arg)
++static int64_t smccc(uint32_t func, uint64_t arg)
+ {
+ 	unsigned long ret;
  
- 		r = read(uffd, &msg, sizeof(msg));
+ 	asm volatile(
+-		"mov	x0, %1\n"
++		"mov	w0, %w1\n"
+ 		"mov	x1, %2\n"
+ 		"hvc	#0\n"
+ 		"mov	%0, x0\n"
 -- 
 2.33.0.464.g1972c5931b-goog
 
