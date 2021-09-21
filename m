@@ -2,98 +2,93 @@ Return-Path: <SRS0=fzUG=OL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134CCC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 18:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A044DC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 18:22:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 84F3861211
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 18:15:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 84F3861211
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 1114761242
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 18:22:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1114761242
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DBD14066E;
-	Tue, 21 Sep 2021 14:15:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 665654B09C;
+	Tue, 21 Sep 2021 14:22:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pWjh88h3JmxS; Tue, 21 Sep 2021 14:15:21 -0400 (EDT)
+	with ESMTP id 79qxtmzgBncK; Tue, 21 Sep 2021 14:22:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB89D40C88;
-	Tue, 21 Sep 2021 14:15:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B60414A19A;
+	Tue, 21 Sep 2021 14:22:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A02A4066E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 14:15:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B69654066E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 14:22:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S8aIoOQ-wAVw for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Sep 2021 14:15:20 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 80F7B40191
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 14:15:20 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1632248120;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7Y+LZFJjnOBJ8l+4LgEza9wG6jZfQeGN1fAATCstXMA=;
- b=C3sFyEF/s7S8P4CMHXb2IK1lf5RKvbjiZXKiJAiDtU0xJ9ajhoazHhA77YIAGIER3aGcQy
- xG/53Y0xMcBgwnOGHLvojij7sukSfRyo1nlJ/TPEWaTR27Aye2QBv/PH4EyomGc4Cidr7Q
- XZuyvU6LDqTyKU60x2pdCT9KNJtSl0s=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-klSdpUpJNdid8oTKIrv0OA-1; Tue, 21 Sep 2021 14:15:18 -0400
-X-MC-Unique: klSdpUpJNdid8oTKIrv0OA-1
-Received: by mail-ed1-f69.google.com with SMTP id
- b7-20020a50e787000000b003d59cb1a923so18995721edn.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 11:15:18 -0700 (PDT)
+ with ESMTP id PTXpePneu655 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Sep 2021 14:22:09 -0400 (EDT)
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com
+ [209.85.166.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7081440191
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 14:22:09 -0400 (EDT)
+Received: by mail-io1-f49.google.com with SMTP id d18so16098579iof.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 11:22:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=9+MHxSXYWf62H1mi1zwglh1AL9XfTUwDuHjSd9t/urI=;
+ b=jyujWDhde9Ijat2B16V/yQFlxPDr13NnlzjpfFtbN/4jk4xVU5OLGyChRGgfFmiXEf
+ 17pwo3aMGu4v0FWTN96FMwOVx0HdSEeCJ+7wkdtk4JUYaDxEQbuf2WnEBLE3qTc6NCEJ
+ 128fHPjCV0jY/+/G0916Bz0MK+UcCJ2RMVLryO23dF42QcZRJtWwLrGq10JGSk37NEhl
+ DYWU+Ew1iSYu8FV2BX4Q7uYsRpPZDyyOnSZzQoqqU4a/74glpc3LlyZ6HtAGwd74hn7I
+ uqByjmnxA/EzblonHNyVc/aN2CZOQ8r+6PY1ZZBNbaNdOYE36rcMq+0gD009RAKIUV0k
+ r51w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=7Y+LZFJjnOBJ8l+4LgEza9wG6jZfQeGN1fAATCstXMA=;
- b=CfisjU8g/whj+ChRWLT64qZ4Jhoqxrk8kgQBMWKsp4lVjWhCJ5xG9oxpEYuP3Pwwne
- zLfXG5FaMX8b1XSra2K5KLH1GsNZZLEkKocYWLu5yAgy22A/rV0HL5duP1ObpidU/GDy
- pNQYSYTks6gJp4CIaB+731UxGZTvLs63rHs0tb5LoFg3zvRWxGZ/N7faIavBCAb+YqNv
- yIIDjhKB/+NGrE6KnDe021PtfOzzuwFqsXhOvgZOcAsFEW9lRNobex8YjYKSheGc/yu9
- klUUd2YBPUGvpkSwfeKNYkOs122LRCI912pzHkz1dx2E8rtkg8yA3WoswJZv1TQGQpTU
- sRrQ==
-X-Gm-Message-State: AOAM533NS7Sy9k+AIm+BFyoZnjAA6JpIeUNN0kJht84omDdbTWd1HxPs
- OJLoBk/c0WxmzrMOAQUO+crToYDqhpf/B89wWxk+QA+EApnzqA/ZKhI9OIMhAicWzBNEQiAA/MX
- 00FWWOywJXeDjYj0I+M+kY1/z
-X-Received: by 2002:a50:bf0f:: with SMTP id f15mr22926554edk.196.1632248117828; 
- Tue, 21 Sep 2021 11:15:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwfHWJ4wAe2ChpPcagdjNe/66n3H1pQckVdJn25bnW5kRCJAWG1M9fYCNrB0/pDsYWHus9+OQ==
-X-Received: by 2002:a50:bf0f:: with SMTP id f15mr22926532edk.196.1632248117560; 
- Tue, 21 Sep 2021 11:15:17 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
- by smtp.gmail.com with ESMTPSA id d15sm6112895ejo.4.2021.09.21.11.15.12
+ bh=9+MHxSXYWf62H1mi1zwglh1AL9XfTUwDuHjSd9t/urI=;
+ b=TmdGv6mffZBQ1K+yKJH9uj/NrGQYANcHFUS7WeH+XbTtaQtmklxGIEBuI9JG8XL1ib
+ B6dKcd9Bt3gap8PJhuh0/tCXNwO0D+RQu+mhZgL5eoGtXgxyzThjbJ1FCftKoxZLmTh+
+ gRB9AjOTKeJfOfI2awag+5IfmxAS382CneGYZynklPX4aOSrNaOa2CP4DuvcdyLVGcRd
+ bzbiZffRu73edMdbbC3FB7TUHUcOqD36TvG40+4r4XnJAq3Irm06yhuJU4AneSsoqjQY
+ JFRi/O4vpOF58Xo6hlushclUj6BAvVUHA47/FzhqjuTgRVIprB7eig36oguxXPg9Gz/z
+ BhTQ==
+X-Gm-Message-State: AOAM531uw4Pvpldmfifr2aqj2s9X9HpC7rvtJfolcje7wPTaS3YvPC9s
+ Fg3huMwYwWzOaX1avLgQi0Bb5A==
+X-Google-Smtp-Source: ABdhPJxbTKfRsy2+nMboYmvHPECb+3i1VPhDhlxB7htZ/MIZ22coBg216qMnOQCeKMbph/gje7gM7Q==
+X-Received: by 2002:a05:6638:2393:: with SMTP id
+ q19mr1249131jat.109.1632248528551; 
+ Tue, 21 Sep 2021 11:22:08 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194])
+ by smtp.gmail.com with ESMTPSA id w4sm3355197iox.25.2021.09.21.11.22.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Sep 2021 11:15:13 -0700 (PDT)
-Date: Tue, 21 Sep 2021 20:15:10 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] selftests: KVM: Gracefully handle missing vCPU features
-Message-ID: <20210921181510.senhdb3itkcjfonb@gator.home>
-References: <20210818212940.1382549-1-oupton@google.com>
- <bd8abbac-925b-ff1e-f494-8f1c21fe7bd1@redhat.com>
+ Tue, 21 Sep 2021 11:22:07 -0700 (PDT)
+Date: Tue, 21 Sep 2021 18:22:04 +0000
+From: Oliver Upton <oupton@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 0/6] KVM: arm64: Implement PSCI SYSTEM_SUSPEND support
+Message-ID: <YUoizIJ+xQTreLtP@google.com>
+References: <20210819223640.3564975-1-oupton@google.com>
+ <87ilzecbkj.wl-maz@kernel.org>
+ <CAOQ_QsgOtufyB6_qGAs4fQf6kd81FSMSj44uiVRgoFQWOf3nRA@mail.gmail.com>
+ <87a6kocmcx.wl-maz@kernel.org>
+ <CAOQ_QshZe8ay03XqCo4DkM6zUaOuEoS5bRbrOy+FsuXaJ=YyKA@mail.gmail.com>
+ <87k0jauurx.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <bd8abbac-925b-ff1e-f494-8f1c21fe7bd1@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <87k0jauurx.wl-maz@kernel.org>
+Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,67 +105,122 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 21, 2021 at 08:00:02PM +0200, Paolo Bonzini wrote:
-> On 18/08/21 23:29, Oliver Upton wrote:
-> > An error of ENOENT for the KVM_ARM_VCPU_INIT ioctl indicates that one of
-> > the requested feature flags is not supported by the kernel/hardware.
-> > Detect the case when KVM doesn't support the requested features and skip
-> > the test rather than failing it.
-> > 
-> > Cc: Andrew Jones <drjones@redhat.com>
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> > Applies to 5.14-rc6. Tested by running all selftests on an Ampere Mt.
-> > Jade system.
-> > 
-> >   .../testing/selftests/kvm/lib/aarch64/processor.c | 15 ++++++++++++++-
-> >   1 file changed, 14 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > index 632b74d6b3ca..b1064a0c5e62 100644
-> > --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> > @@ -216,6 +216,7 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
-> >   {
-> >   	struct kvm_vcpu_init default_init = { .target = -1, };
-> >   	uint64_t sctlr_el1, tcr_el1;
-> > +	int ret;
-> >   	if (!init)
-> >   		init = &default_init;
-> > @@ -226,7 +227,19 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, int vcpuid, struct kvm_vcpu_init *ini
-> >   		init->target = preferred.target;
-> >   	}
-> > -	vcpu_ioctl(vm, vcpuid, KVM_ARM_VCPU_INIT, init);
-> > +	ret = _vcpu_ioctl(vm, vcpuid, KVM_ARM_VCPU_INIT, init);
-> > +
-> > +	/*
-> > +	 * Missing kernel feature support should result in skipping the test,
-> > +	 * not failing it.
-> > +	 */
-> > +	if (ret && errno == ENOENT) {
-> > +		print_skip("requested vCPU features not supported; skipping test.");
-> > +		exit(KSFT_SKIP);
-> > +	}
-> > +
-> > +	TEST_ASSERT(!ret, "KVM_ARM_VCPU_INIT failed, rc: %i errno: %i (%s)",
-> > +		    ret, errno, strerror(errno));
-> >   	/*
-> >   	 * Enable FP/ASIMD to avoid trapping when accessing Q0-Q15
-> > 
-> 
-> Queued, thanks.
-> 
+Hey Marc,
 
-I'd rather we don't queue this. It'd be better, IMO, for the unit test to
-probe for features and then skip the test, if that's what it wants to do,
-when they're not present. I'd rather not have test skipping decisions
-made in the library code, which may not be what the unit test developer
-expects. Anyway, the 'skipping test' substring would be printed twice with
-this patch.
+On Tue, Sep 21, 2021 at 10:45:22AM +0100, Marc Zyngier wrote:
+> > > > > - How do you define which interrupts are actual wake-up events?
+> > > > >   Nothing in the GIC architecture defines what a wake-up is (let alone
+> > > > >   a wake-up event).
+> > > >
+> > > > Good point.
+> > > >
+> > > > One possible implementation of suspend could just be a `WFI` in a
+> > > > higher EL. In this case, KVM could emulate WFI wake up events
+> > > > according to D1.16.2 in DDI 0487G.a. But I agree, it isn't entirely
+> > > > clear what constitutes a wakeup from powered down state.
+> > >
+> > > It isn't, and it is actually IMPDEF (there isn't much in the ARM ARM
+> > > in terms of what constitutes a low power state). And even if you
+> > > wanted to emulate a WFI in userspace, the problem of interrupts that
+> > > have their source in the kernel remains. How to you tell userspace
+> > > that such an event has occurred if the vcpu thread isn't in the
+> > > kernel?
+> > 
+> > Well, are there any objections to saying for the KVM implementation we
+> > observe the WFI wake-up events per the cited section of the ARM ARM?
+> 
+> These are fine. However, what of the GIC, for example? Can any GIC
+> interrupt wake-up the guest? I'm happy to say "yes" to this, but I
+> suspect others will have a different idea, and the thought of
+> introducing an IMPDEF wake-up interrupt controller doesn't fill me
+> with joy.
+>
 
+I'm planning to propose exactly this in the next series; any GIC
+interrupt will wake the guest. I'd argue that if someone wants to do
+anything else, their window of opportunity is the exit to userspace.
+
+[...]
+
+> > Just to check understanding for v2:
+> > 
+> > We agree that an exit to userspace is fine so it has the opportunity
+> > to do something crazy when the guest attempts a suspend. If a VMM does
+> > nothing and immediately re-enters the kernel, we emulate the suspend
+> > there by waiting for some event to fire, which for our purposes we
+> > will say is an interrupt originating from userspace or the kernel
+> > (WFI). In all, the SUSPEND exit type does not indicate that emulation
+> > terminates with the VMM. It only indicates we are about to block in
+> > the kernel.
+> > 
+> > If there is some IMPDEF event specific to the VMM, it should signal
+> > the vCPU thread to kick it out of the kernel, make it runnable, and
+> > re-enter. No need to do anything special from the kernel perspective
+> > for this. This is only for the case where we decide to block in the
+> > kernel.
+> 
+> This looks sensible. One question though: I think there is an implicit
+> requirement that the guest should be "migratable" in that state. How
+> does the above handles it? If the "suspend state" is solely held in
+> the kernel, we need to be able to snapshot it, and I don't like the
+> sound of that...
+> 
+> We could instead keep the "suspend state" in the VMM:
+> 
+> On PSCI_SUSPEND, the guest exits to userspace. If the VMM wants to
+> honour the supend request, it reenters the guest with RUN+SUSPEND,
+> which results in a WFI. On each wake-up, the guest exits to userspace,
+> and it is the VMM responsibility to either perform the wake-up (RUN)
+> or stay in suspend (RUN+SUSPEND).
+> 
+> This ensures that the guest never transitions out of suspend without
+> the VMM knowing, and the VMM can always force a resume by kicking the
+> thread back to userspace.
+> 
+> Thoughts?
+
+Agreed. I was mulling on exactly how to clue in the VMM about the
+suspend state. What if we just encode it in KVM_{GET,SET}_MP_STATE? We'd
+avoid the need for new UAPI that way. We could introduce a new state,
+KVM_MP_STATE_SUSPENDED, which would clue KVM to do the suspend as we've
+discussed. We would exit to userspace with KVM_MP_STATE_RUNNABLE,
+meaning the VMM would need to set the MP state explicitly for the
+in-kernel suspend to work.
+
+[...]
+
+> > > > On the contrary, it is up to KVM's implementation to
+> > > > guarantee caches are clean when servicing the guest request.
+> > >
+> > > This last point is pretty unclear to me. If the guest doesn't clean to
+> > > the PoC (or even to one of the PoPs) when it calls into suspend,
+> > > that's a clear indication that it doesn't care about its data. Why
+> > > should KVM be more conservative here? It shouldn't be in the business
+> > > of working around guest bugs.
+> > 
+> > PSCI is vague on this, sadly. DEN0022D.b, 5.4.8 "Implementation
+> > responsibilities: Cache and coherency management states" that for
+> > CPU_SUSPEND, the PSCI implementation must perform a cache clean
+> > operation before entering the powerdown state. I don't see any reason
+> > why SYSTEM_SUSPEND should be excluded from this requirement.
+> 
+> I'm not sure that's the case. CPU_SUSPEND may not use the resume
+> entry-point if the suspend results is a shallower state than expected
+> (i.e. the call just returns instead of behaving like a CPU boot).
+> 
+> However, a successful SYSTEM_SUSPEND always results in the deepest
+> possible state. The guest should know that. There is also the fact
+> that performing a full clean to the PoC is going to be pretty
+> expensive, and I'd like to avoid that.
+> 
+> I'll try and reach out to some of the ARM folks for clarification on
+> the matter.
+
+That'd be very helpful!
+
+--
 Thanks,
-drew
-
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
