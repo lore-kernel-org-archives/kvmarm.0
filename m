@@ -2,93 +2,79 @@ Return-Path: <SRS0=fzUG=OL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A044DC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 18:22:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F33C9C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 19:45:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1114761242
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 18:22:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1114761242
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 686D961283
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 19:45:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 686D961283
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 665654B09C;
-	Tue, 21 Sep 2021 14:22:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCA384A19A;
+	Tue, 21 Sep 2021 15:45:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 79qxtmzgBncK; Tue, 21 Sep 2021 14:22:11 -0400 (EDT)
+	with ESMTP id dnAokH0e0bhQ; Tue, 21 Sep 2021 15:45:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B60414A19A;
-	Tue, 21 Sep 2021 14:22:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDA4E49E5F;
+	Tue, 21 Sep 2021 15:45:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B69654066E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 14:22:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1816405EE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 15:45:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PTXpePneu655 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Sep 2021 14:22:09 -0400 (EDT)
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com
- [209.85.166.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7081440191
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 14:22:09 -0400 (EDT)
-Received: by mail-io1-f49.google.com with SMTP id d18so16098579iof.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 11:22:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=9+MHxSXYWf62H1mi1zwglh1AL9XfTUwDuHjSd9t/urI=;
- b=jyujWDhde9Ijat2B16V/yQFlxPDr13NnlzjpfFtbN/4jk4xVU5OLGyChRGgfFmiXEf
- 17pwo3aMGu4v0FWTN96FMwOVx0HdSEeCJ+7wkdtk4JUYaDxEQbuf2WnEBLE3qTc6NCEJ
- 128fHPjCV0jY/+/G0916Bz0MK+UcCJ2RMVLryO23dF42QcZRJtWwLrGq10JGSk37NEhl
- DYWU+Ew1iSYu8FV2BX4Q7uYsRpPZDyyOnSZzQoqqU4a/74glpc3LlyZ6HtAGwd74hn7I
- uqByjmnxA/EzblonHNyVc/aN2CZOQ8r+6PY1ZZBNbaNdOYE36rcMq+0gD009RAKIUV0k
- r51w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=9+MHxSXYWf62H1mi1zwglh1AL9XfTUwDuHjSd9t/urI=;
- b=TmdGv6mffZBQ1K+yKJH9uj/NrGQYANcHFUS7WeH+XbTtaQtmklxGIEBuI9JG8XL1ib
- B6dKcd9Bt3gap8PJhuh0/tCXNwO0D+RQu+mhZgL5eoGtXgxyzThjbJ1FCftKoxZLmTh+
- gRB9AjOTKeJfOfI2awag+5IfmxAS382CneGYZynklPX4aOSrNaOa2CP4DuvcdyLVGcRd
- bzbiZffRu73edMdbbC3FB7TUHUcOqD36TvG40+4r4XnJAq3Irm06yhuJU4AneSsoqjQY
- JFRi/O4vpOF58Xo6hlushclUj6BAvVUHA47/FzhqjuTgRVIprB7eig36oguxXPg9Gz/z
- BhTQ==
-X-Gm-Message-State: AOAM531uw4Pvpldmfifr2aqj2s9X9HpC7rvtJfolcje7wPTaS3YvPC9s
- Fg3huMwYwWzOaX1avLgQi0Bb5A==
-X-Google-Smtp-Source: ABdhPJxbTKfRsy2+nMboYmvHPECb+3i1VPhDhlxB7htZ/MIZ22coBg216qMnOQCeKMbph/gje7gM7Q==
-X-Received: by 2002:a05:6638:2393:: with SMTP id
- q19mr1249131jat.109.1632248528551; 
- Tue, 21 Sep 2021 11:22:08 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194])
- by smtp.gmail.com with ESMTPSA id w4sm3355197iox.25.2021.09.21.11.22.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Sep 2021 11:22:07 -0700 (PDT)
-Date: Tue, 21 Sep 2021 18:22:04 +0000
-From: Oliver Upton <oupton@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 0/6] KVM: arm64: Implement PSCI SYSTEM_SUSPEND support
-Message-ID: <YUoizIJ+xQTreLtP@google.com>
-References: <20210819223640.3564975-1-oupton@google.com>
- <87ilzecbkj.wl-maz@kernel.org>
- <CAOQ_QsgOtufyB6_qGAs4fQf6kd81FSMSj44uiVRgoFQWOf3nRA@mail.gmail.com>
- <87a6kocmcx.wl-maz@kernel.org>
- <CAOQ_QshZe8ay03XqCo4DkM6zUaOuEoS5bRbrOy+FsuXaJ=YyKA@mail.gmail.com>
- <87k0jauurx.wl-maz@kernel.org>
+ with ESMTP id hyt2YETAxbtT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Sep 2021 15:45:07 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B634540413
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 15:45:07 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 9BDB961166
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 19:45:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1632253506;
+ bh=TG/Sor91iMlLGQKzaFrGTL6wc9VnOoLST+DeZedZHa0=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=omHIxpIW3eT4kf2aXXTpbZBkJtpwkJXWG6FiY3eVv5ZfRA5wx02Y0qmjlJaDRmF+E
+ SjVitdjtNLVqWQDHNQ2k4VW/LuQmMsmZ/fRU74xqrcmw0NRzbuK7U+JLAw9hBG2mhC
+ lpovLVsKZqW3CtV6AlLQ4q7m1y/iVr+hfSgpatHuSwo7GOf7xVeL7u3IUap6S/cNpI
+ 8q6t7ReEsSBOsgGUekkxKZ74lKAYmlDr+ykmQPuh5KaqmezovKBN3gAF+/8MoEsT0U
+ Z/45mgoZfUWzdruBFzQRsrZtHYr16YAQZfNXhQzcfhLOLrS6O99CV2IOVh2iqWbI+9
+ Ymj8I5NmXNtTg==
+Received: by mail-ed1-f44.google.com with SMTP id v22so578076edd.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 12:45:06 -0700 (PDT)
+X-Gm-Message-State: AOAM53041somq/k50vtZz+EVc78PvdAEuqvG0PikQqrPDogQ7WmhPJw+
+ MKT0y039vvF8ctWLPK34Kd3xkWKShFeFs9kj2A==
+X-Google-Smtp-Source: ABdhPJztD14XM+ABXOQ8afWfcx03LpCn85LuBtodjgJNaa1df1UXoQ8GgYwkn75WV9713c6C+KbGt+a3JQIc3ibERr0=
+X-Received: by 2002:a05:6402:b23:: with SMTP id
+ bo3mr38015381edb.145.1632253505043; 
+ Tue, 21 Sep 2021 12:45:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87k0jauurx.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
- kvmarm@lists.cs.columbia.edu
+References: <20210906041424.115473-1-gshan@redhat.com>
+In-Reply-To: <20210906041424.115473-1-gshan@redhat.com>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 21 Sep 2021 14:44:53 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqLccwTEhzonvdOOox+D6=3gHxbDbtsXTJpqtQfuxA4xvg@mail.gmail.com>
+Message-ID: <CAL_JsqLccwTEhzonvdOOox+D6=3gHxbDbtsXTJpqtQfuxA4xvg@mail.gmail.com>
+Subject: Re: [PATCH] Documentation, dt, numa: Add note to empty NUMA node
+To: Gavin Shan <gshan@redhat.com>
+Cc: devicetree@vger.kernel.org, linux-efi@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ shan.gavin@gmail.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,122 +91,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Marc,
-
-On Tue, Sep 21, 2021 at 10:45:22AM +0100, Marc Zyngier wrote:
-> > > > > - How do you define which interrupts are actual wake-up events?
-> > > > >   Nothing in the GIC architecture defines what a wake-up is (let alone
-> > > > >   a wake-up event).
-> > > >
-> > > > Good point.
-> > > >
-> > > > One possible implementation of suspend could just be a `WFI` in a
-> > > > higher EL. In this case, KVM could emulate WFI wake up events
-> > > > according to D1.16.2 in DDI 0487G.a. But I agree, it isn't entirely
-> > > > clear what constitutes a wakeup from powered down state.
-> > >
-> > > It isn't, and it is actually IMPDEF (there isn't much in the ARM ARM
-> > > in terms of what constitutes a low power state). And even if you
-> > > wanted to emulate a WFI in userspace, the problem of interrupts that
-> > > have their source in the kernel remains. How to you tell userspace
-> > > that such an event has occurred if the vcpu thread isn't in the
-> > > kernel?
-> > 
-> > Well, are there any objections to saying for the KVM implementation we
-> > observe the WFI wake-up events per the cited section of the ARM ARM?
-> 
-> These are fine. However, what of the GIC, for example? Can any GIC
-> interrupt wake-up the guest? I'm happy to say "yes" to this, but I
-> suspect others will have a different idea, and the thought of
-> introducing an IMPDEF wake-up interrupt controller doesn't fill me
-> with joy.
+On Sun, Sep 5, 2021 at 11:16 PM Gavin Shan <gshan@redhat.com> wrote:
 >
+> The empty memory nodes, where no memory resides in, are allowed.
+> For these empty memory nodes, the 'len' of 'reg' property is zero.
+> The NUMA node IDs are still valid and parsed, but memory may be
+> added to them through hotplug afterwards. Currently, QEMU fails
+> to boot when multiple empty memory nodes are specified. It's
+> caused by device-tree population failure and duplicated memory
+> node names.
 
-I'm planning to propose exactly this in the next series; any GIC
-interrupt will wake the guest. I'd argue that if someone wants to do
-anything else, their window of opportunity is the exit to userspace.
+I still don't like the fake addresses. I can't really give suggestions
+on alternative ways to fix this with you just presenting a solution.
 
-[...]
+What is the failure you see? Can we relax the kernel's expectations?
+What about UEFI boot as the memory nodes aren't used (or maybe they
+are for NUMA?) How does this work with ACPI?
 
-> > Just to check understanding for v2:
-> > 
-> > We agree that an exit to userspace is fine so it has the opportunity
-> > to do something crazy when the guest attempts a suspend. If a VMM does
-> > nothing and immediately re-enters the kernel, we emulate the suspend
-> > there by waiting for some event to fire, which for our purposes we
-> > will say is an interrupt originating from userspace or the kernel
-> > (WFI). In all, the SUSPEND exit type does not indicate that emulation
-> > terminates with the VMM. It only indicates we are about to block in
-> > the kernel.
-> > 
-> > If there is some IMPDEF event specific to the VMM, it should signal
-> > the vCPU thread to kick it out of the kernel, make it runnable, and
-> > re-enter. No need to do anything special from the kernel perspective
-> > for this. This is only for the case where we decide to block in the
-> > kernel.
-> 
-> This looks sensible. One question though: I think there is an implicit
-> requirement that the guest should be "migratable" in that state. How
-> does the above handles it? If the "suspend state" is solely held in
-> the kernel, we need to be able to snapshot it, and I don't like the
-> sound of that...
-> 
-> We could instead keep the "suspend state" in the VMM:
-> 
-> On PSCI_SUSPEND, the guest exits to userspace. If the VMM wants to
-> honour the supend request, it reenters the guest with RUN+SUSPEND,
-> which results in a WFI. On each wake-up, the guest exits to userspace,
-> and it is the VMM responsibility to either perform the wake-up (RUN)
-> or stay in suspend (RUN+SUSPEND).
-> 
-> This ensures that the guest never transitions out of suspend without
-> the VMM knowing, and the VMM can always force a resume by kicking the
-> thread back to userspace.
-> 
-> Thoughts?
+> As device-tree specification indicates, the 'unit-address' of
+> these empty memory nodes, part of their names, are the equivalents
+> to 'base-address'. Unfortunately, I finds difficulty to get where
+> the assignment of 'base-address' is properly documented for these
+> empty memory nodes. So lets add a section for empty memory nodes
+> to cover this in NUMA binding document. The 'unit-address',
+> equivalent to 'base-address' in the 'reg' property of these empty
+> memory nodes is specified to be the summation of highest memory
+> address plus the NUMA node ID.
+>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> Acked-by: Randy Dunlap <rdunlap@infradead.org>
+> ---
+>  Documentation/devicetree/bindings/numa.txt | 60 +++++++++++++++++++++-
+>  1 file changed, 59 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/devicetree/bindings/numa.txt b/Documentation/devicetree/bindings/numa.txt
+> index 21b35053ca5a..82f047bc8dd6 100644
+> --- a/Documentation/devicetree/bindings/numa.txt
+> +++ b/Documentation/devicetree/bindings/numa.txt
+> @@ -103,7 +103,65 @@ Example:
+>                 };
+>
+>  ==============================================================================
+> -4 - Example dts
+> +4 - Empty memory nodes
+> +==============================================================================
+> +
+> +Empty memory nodes, which no memory resides in, are allowed. The 'length'
+> +field of the 'reg' property is zero. However, the 'base-address' is a
+> +dummy and invalid address, which is the summation of highest memory address
+> +plus the NUMA node ID. The NUMA node IDs and distance maps are still valid
+> +and memory may be added into them through hotplug afterwards.
+> +
+> +Example:
+> +
+> +       memory@0 {
+> +               device_type = "memory";
+> +               reg = <0x0 0x0 0x0 0x80000000>;
+> +               numa-node-id = <0>;
+> +       };
+> +
+> +       memory@80000000 {
+> +               device_type = "memory";
+> +               reg = <0x0 0x80000000 0x0 0x80000000>;
+> +               numa-node-id = <1>;
+> +       };
+> +
+> +       /* Empty memory node */
+> +       memory@100000002 {
+> +               device_type = "memory";
+> +               reg = <0x1 0x2 0x0 0x0>;
+> +               numa-node-id = <2>;
+> +       };
+> +
+> +       /* Empty memory node */
+> +       memory@100000003 {
+> +               device_type = "memory";
+> +               reg = <0x1 0x3 0x0 0x0>;
+> +               numa-node-id = <3>;
+> +       };
 
-Agreed. I was mulling on exactly how to clue in the VMM about the
-suspend state. What if we just encode it in KVM_{GET,SET}_MP_STATE? We'd
-avoid the need for new UAPI that way. We could introduce a new state,
-KVM_MP_STATE_SUSPENDED, which would clue KVM to do the suspend as we've
-discussed. We would exit to userspace with KVM_MP_STATE_RUNNABLE,
-meaning the VMM would need to set the MP state explicitly for the
-in-kernel suspend to work.
+Do you really need the memory nodes here or just some way to define
+numa node id's 2 and 3 as valid?
 
-[...]
 
-> > > > On the contrary, it is up to KVM's implementation to
-> > > > guarantee caches are clean when servicing the guest request.
-> > >
-> > > This last point is pretty unclear to me. If the guest doesn't clean to
-> > > the PoC (or even to one of the PoPs) when it calls into suspend,
-> > > that's a clear indication that it doesn't care about its data. Why
-> > > should KVM be more conservative here? It shouldn't be in the business
-> > > of working around guest bugs.
-> > 
-> > PSCI is vague on this, sadly. DEN0022D.b, 5.4.8 "Implementation
-> > responsibilities: Cache and coherency management states" that for
-> > CPU_SUSPEND, the PSCI implementation must perform a cache clean
-> > operation before entering the powerdown state. I don't see any reason
-> > why SYSTEM_SUSPEND should be excluded from this requirement.
-> 
-> I'm not sure that's the case. CPU_SUSPEND may not use the resume
-> entry-point if the suspend results is a shallower state than expected
-> (i.e. the call just returns instead of behaving like a CPU boot).
-> 
-> However, a successful SYSTEM_SUSPEND always results in the deepest
-> possible state. The guest should know that. There is also the fact
-> that performing a full clean to the PoC is going to be pretty
-> expensive, and I'd like to avoid that.
-> 
-> I'll try and reach out to some of the ARM folks for clarification on
-> the matter.
-
-That'd be very helpful!
-
---
-Thanks,
-Oliver
+> +
+> +       distance-map {
+> +               compatible = "numa-distance-map-v1";
+> +               distance-matrix = <0 0  10>,
+> +                                 <0 1  20>,
+> +                                 <0 2  40>,
+> +                                 <0 3  20>,
+> +                                 <1 0  20>,
+> +                                 <1 1  10>,
+> +                                 <1 2  20>,
+> +                                 <1 3  40>,
+> +                                 <2 0  40>,
+> +                                 <2 1  20>,
+> +                                 <2 2  10>,
+> +                                 <2 3  20>,
+> +                                 <3 0  20>,
+> +                                 <3 1  40>,
+> +                                 <3 2  20>,
+> +                                 <3 3  10>;
+> +       };
+> +
+> +==============================================================================
+> +5 - Example dts
+>  ==============================================================================
+>
+>  Dual socket system consists of 2 boards connected through ccn bus and
+> --
+> 2.23.0
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
