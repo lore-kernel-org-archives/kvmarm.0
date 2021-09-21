@@ -2,102 +2,108 @@ Return-Path: <SRS0=fzUG=OL=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04458C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 17:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25705C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 17:38:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 69F5A61166
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 17:23:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 69F5A61166
+	by mail.kernel.org (Postfix) with ESMTP id 9379E60FDA
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Sep 2021 17:38:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9379E60FDA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7EB94A3A5;
-	Tue, 21 Sep 2021 13:23:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 000004A5A0;
+	Tue, 21 Sep 2021 13:38:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MC16vQmTwYOY; Tue, 21 Sep 2021 13:23:08 -0400 (EDT)
+	with ESMTP id dN4yV4hJUh8y; Tue, 21 Sep 2021 13:38:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD5C14A193;
-	Tue, 21 Sep 2021 13:23:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E0C44A19A;
+	Tue, 21 Sep 2021 13:38:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EEE249FB7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 13:23:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A6F649FB7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 13:38:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PTT9ZyW8ZL-h for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Sep 2021 13:23:07 -0400 (EDT)
+ with ESMTP id bkpnbUFa0BxJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Sep 2021 13:38:21 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 54E0540667
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 13:23:07 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57AD140667
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 13:38:21 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1632244987;
+ s=mimecast20190719; t=1632245901;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Crx2yXztHF3g4rFcd1goQcNIJRLU07HcReSxyZxd2Qo=;
- b=AIoIxisxrqRT3Y87eSpYFGTUBLNfPGL/SSX0/TFwaD/Dx5tcqL9FcsfJ5qq0SJ5A7z8fXx
- NUnnYlDd8nhYUZkaT4GS+fPG0jO0Tpt8/JRJercb6N18LmZX9urX02N605EVCIXt1rSmPE
- wxdWRYLNNWTjIAo2+lPlN1Hz9HiB7bY=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-2UiXpl9sPjyM7fP5ni0V6w-1; Tue, 21 Sep 2021 13:23:06 -0400
-X-MC-Unique: 2UiXpl9sPjyM7fP5ni0V6w-1
-Received: by mail-ed1-f69.google.com with SMTP id
- e7-20020a50d4c7000000b003d871ecccd8so5797998edj.18
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 10:23:06 -0700 (PDT)
+ bh=Ps7sRkcD6VYl85kI1uxsep0hwsJ0/fdk/o4evC4yU9U=;
+ b=dV54fTW5lIp1Pf8+xCJYuE616EchGA/UdQ9pfM4wMapMOzw1MaNr8h+k7SlhX2QaE7FK4l
+ fJtNh9n6ut9rKNHhOsV0uNcyToN6Z0oEy2EV0Ho31TwBWAhsEGzGeIQFifiX1oJ7NaQIOg
+ jQp/1Y/IjKet0QpSvRkwkG8+2JM2OVs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-JZzoU5BaO4GOJ3UxjS9FSQ-1; Tue, 21 Sep 2021 13:38:19 -0400
+X-MC-Unique: JZzoU5BaO4GOJ3UxjS9FSQ-1
+Received: by mail-ed1-f72.google.com with SMTP id
+ l29-20020a50d6dd000000b003d80214566cso15414606edj.21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 10:38:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Crx2yXztHF3g4rFcd1goQcNIJRLU07HcReSxyZxd2Qo=;
- b=1HbwnfygdOplhAg26I7hS6Dvnh5yY6C3844MHX0WkZC84t+doYg2uicftbKn98wfOC
- cPLhU8ADf2+oKIxA2qDn9EWmOUtc2D2N2LuIWuUspqty6ISnFWajjMlxweetLkmN1+EX
- 0YQfiqSeFcAEjfSLmIFQP/VXLfoc2Bv2lI6p/+diPljH8VVYmZWkJmUltJ7owOgGR3fS
- PQ5hAq0QnVHyiYnPLP07TK7wd0c+lDMFV5C1bvDGILEi47xZHcnXX3QqFbBkvzvMIMfe
- /MALvXExKKm1LBU5SvhoAq7dvThdbHNrSOmUxsXG36gXXfp6NlCsVeoEoq9Yh2GtAFmI
- XfGA==
-X-Gm-Message-State: AOAM530jPJD0ERTA2Y4q4PyITY7N/9BysEPf93QEuFGJysBFqPthro+u
- 7MTXRIfEm5MjPuLuI/WWrNH809wp7bdfcy+cfnlU7mDR3WrUBbwq6iWMYbsB21j2q30SHH5S2NJ
- bXs9pSitAxD76qBpjqsciv9wy
-X-Received: by 2002:a17:906:3e08:: with SMTP id
- k8mr36810590eji.361.1632244984985; 
- Tue, 21 Sep 2021 10:23:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxzxrG1oc6ZNBnXvUP4hiTHEcdtV+vXwmMe3LlCQlBiZU6QBmCkJE3OvUTs/WUzYdBFWgbkmw==
-X-Received: by 2002:a17:906:3e08:: with SMTP id
- k8mr36810570eji.361.1632244984751; 
- Tue, 21 Sep 2021 10:23:04 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
- by smtp.gmail.com with ESMTPSA id j2sm8939392edt.0.2021.09.21.10.23.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 21 Sep 2021 10:23:03 -0700 (PDT)
-Date: Tue, 21 Sep 2021 19:23:01 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v2 2/2] selftests: KVM: Align SMCCC call with the spec in
- steal_time
-Message-ID: <20210921172301.3tkne2ucpev62r6h@gator.home>
-References: <20210921171121.2148982-1-oupton@google.com>
- <20210921171121.2148982-3-oupton@google.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ps7sRkcD6VYl85kI1uxsep0hwsJ0/fdk/o4evC4yU9U=;
+ b=bG5qR8CxauN2QEZdhcuAgyFy8e0TrL00+yDi7+O8mYG7CTd+em26Mj0BjXccIvEZrc
+ eK+WC9rqH/A9Yr4Bs/ICqczeXTToCMmtAvMW0dGU4B6sU9LZbhPIxxPM4vO0pN9+8sfW
+ W7CLUOyPc/uZrk6zjIr3E+zDh1iUxQvH2aDLO299WvFpHDS4t3Nde6Q9HdGqsC8Eu3qS
+ q2SH1nw4lNvpEAsx+3Amkww8O0/qBUAzMhG89iigtMzx8BFEStcLkF1rO+Q+vIxms/4g
+ 40LQ73eI/xJKg4HzfDVuFrxtgyQVcR0FrNE96lXsRkos+vtNB4rBUx9qsmTS6V+rAkFK
+ 2bhw==
+X-Gm-Message-State: AOAM533qLS++649LMlL1IZCSVrIcDHU5Tc9ufAblgkxrdbF1FV7fQ98p
+ nilHjULqoiCFMweyZbYynyq0ykf8f7PYeU8R/nbzVblSZIp6Ujfnd4xFg0xwrqaiztJJF9qW7uZ
+ shtKHJx+Cm/u+TrN4wbsqWnyO
+X-Received: by 2002:a17:906:dbcb:: with SMTP id
+ yc11mr36471898ejb.111.1632245898679; 
+ Tue, 21 Sep 2021 10:38:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyeGPiiIE6s377p1uYluTAIC8tQvILE4GRsSkZJJoDkyFhMyBtQ6u9q0bUlYbHFk0utlKJ7EQ==
+X-Received: by 2002:a17:906:dbcb:: with SMTP id
+ yc11mr36471879ejb.111.1632245898484; 
+ Tue, 21 Sep 2021 10:38:18 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id qc12sm816874ejb.117.2021.09.21.10.38.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 21 Sep 2021 10:38:17 -0700 (PDT)
+Subject: Re: [PATCH 2/2] selftests: KVM: Fix 'asm-operand-width' warnings in
+ steal_time.c
+To: Andrew Jones <drjones@redhat.com>, Oliver Upton <oupton@google.com>
+References: <20210921010120.1256762-1-oupton@google.com>
+ <20210921010120.1256762-3-oupton@google.com>
+ <20210921071904.5irj3q5yiquoubj2@gator.home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b242d9d8-ec1c-bba5-6272-a7a42e2e4011@redhat.com>
+Date: Tue, 21 Sep 2021 19:38:15 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <20210921171121.2148982-3-oupton@google.com>
+In-Reply-To: <20210921071904.5irj3q5yiquoubj2@gator.home>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
+Content-Language: en-US
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
+ Sean Christopherson <seanjc@google.com>, kvmarm@lists.cs.columbia.edu,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -109,50 +115,67 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 21, 2021 at 05:11:21PM +0000, Oliver Upton wrote:
-> The SMC64 calling convention passes a function identifier in w0 and its
-> parameters in x1-x17. Given this, there are two deviations in the
-> SMC64 call performed by the steal_time test: the function identifier is
-> assigned to a 64 bit register and the parameter is only 32 bits wide.
+On 21/09/21 09:19, Andrew Jones wrote:
+> On Tue, Sep 21, 2021 at 01:01:20AM +0000, Oliver Upton wrote:
+>> Building steal_time.c for arm64 with clang throws the following:
+>>
+>>>> steal_time.c:130:22: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
+>>            : "=r" (ret) : "r" (func), "r" (arg) :
+>>                                ^
+>>>> steal_time.c:130:34: error: value size does not match register size specified by the constraint and modifier [-Werror,-Wasm-operand-widths]
+>>            : "=r" (ret) : "r" (func), "r" (arg) :
+>>                                            ^
+>>
+>> Silence by casting operands to 64 bits.
+>>
+>> Signed-off-by: Oliver Upton <oupton@google.com>
+>> ---
+>>   tools/testing/selftests/kvm/steal_time.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+>> index ecec30865a74..eb75b31122c5 100644
+>> --- a/tools/testing/selftests/kvm/steal_time.c
+>> +++ b/tools/testing/selftests/kvm/steal_time.c
+>> @@ -127,7 +127,7 @@ static int64_t smccc(uint32_t func, uint32_t arg)
+>>   		"mov	x1, %2\n"
+>>   		"hvc	#0\n"
+>>   		"mov	%0, x0\n"
+>> -	: "=r" (ret) : "r" (func), "r" (arg) :
+>> +	: "=r" (ret) : "r" ((uint64_t)func), "r" ((uint64_t)arg) :
 > 
-> Align the call with the SMCCC by using a 32 bit register to handle the
-> function identifier and increasing the parameter width to 64 bits.
-> 
-> Suggested-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  tools/testing/selftests/kvm/steal_time.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Actually, I think I'd rather fix this smccc implementation to match the
+> spec, which I think should be done like this
 > 
 > diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-> index ecec30865a74..aafaa8e38b7c 100644
+> index ecec30865a74..7da957259ce4 100644
 > --- a/tools/testing/selftests/kvm/steal_time.c
 > +++ b/tools/testing/selftests/kvm/steal_time.c
 > @@ -118,12 +118,12 @@ struct st_time {
->  	uint64_t st_time;
->  };
->  
+>          uint64_t st_time;
+>   };
+>   
 > -static int64_t smccc(uint32_t func, uint32_t arg)
 > +static int64_t smccc(uint32_t func, uint64_t arg)
->  {
->  	unsigned long ret;
->  
->  	asm volatile(
-> -		"mov	x0, %1\n"
-> +		"mov	w0, %w1\n"
->  		"mov	x1, %2\n"
->  		"hvc	#0\n"
->  		"mov	%0, x0\n"
-> -- 
-> 2.33.0.464.g1972c5931b-goog
->
+>   {
+>          unsigned long ret;
+>   
+>          asm volatile(
+> -               "mov    x0, %1\n"
+> +               "mov    w0, %w1\n"
+>                  "mov    x1, %2\n"
+>                  "hvc    #0\n"
+>                  "mov    %0, x0\n"
+> 
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Agreed, can you send out a patch?  Thanks,
+
+Paolo
 
 _______________________________________________
 kvmarm mailing list
