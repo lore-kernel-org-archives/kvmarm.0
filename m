@@ -2,80 +2,74 @@ Return-Path: <SRS0=n474=OM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC19C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 11:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63CE8C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 11:22:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C605E61050
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 11:05:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C605E61050
+	by mail.kernel.org (Postfix) with ESMTP id D5CE960560
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 11:22:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D5CE960560
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4006D4A524;
-	Wed, 22 Sep 2021 07:05:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DC464B0AC;
+	Wed, 22 Sep 2021 07:22:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 08BDVGQQOMHG; Wed, 22 Sep 2021 07:05:26 -0400 (EDT)
+	with ESMTP id dsH1JXN433ff; Wed, 22 Sep 2021 07:22:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2372E4A500;
-	Wed, 22 Sep 2021 07:05:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3657A4A49C;
+	Wed, 22 Sep 2021 07:22:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14A424A193
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 07:05:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 70B994A49C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 07:22:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CYnCGfgVcgia for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Sep 2021 07:05:23 -0400 (EDT)
+ with ESMTP id cjKumPEMuddX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Sep 2021 07:22:51 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD0244048A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 07:05:23 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9245D6109E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 11:05:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1632308722;
- bh=lKxTtQAI2dVJN/lgVduhPktu2QvJtfw+Vyeet6Wg0kk=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=tx3ksSSLnT10rE/aRMTTfisLEWB1roDYi4W1eVYJ3mwNTPUcFc1xRdYUed30yNnAk
- dqLWXreNv7I3qk+PvSQ2gJp3Z8h/PZgOn6XFkI0CAuxPn3TFxNrVu4C53+I9sDCGWo
- TY++0NtH5Vn2od4tifHGGPAikKWCYnS7qIkUc9IIezTuyojt9DIZ0iPepxsvXmO5rM
- Zz+KmNrft/j2XzhW/lJv+cfExHgPgu+WbV0k3HcAIZ+Rrl1+qrZtM1BByShI2pc7zl
- +1//r9FPD7l0IX/VjD5lOMbC9gdvqF2+cLD1PAHXzpYNENAgDQ+myBQL8NQMuP9Tck
- p4oqNIiezVLKw==
-Received: by mail-oi1-f181.google.com with SMTP id w206so3860541oiw.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 04:05:22 -0700 (PDT)
-X-Gm-Message-State: AOAM531rEkNjUBUgg4Sm7GNiIk+tUwcVvsOvh6VNNfLxilVfNPA/EK7c
- hujIq3GAN4DanZcWjOBQcpQStlfNhpLd/Ay2Q8Q=
-X-Google-Smtp-Source: ABdhPJyqRljhIu3cnaTtcTjBsYyXn04mQxYNKOI8lDMU6oo+6R/HRFtbw4XbqGArYlNafsVzssonf+JD+jJaDgbmRtw=
-X-Received: by 2002:a05:6808:15a2:: with SMTP id
- t34mr7416338oiw.47.1632308721925; 
- Wed, 22 Sep 2021 04:05:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210906041424.115473-1-gshan@redhat.com>
- <CAL_JsqLccwTEhzonvdOOox+D6=3gHxbDbtsXTJpqtQfuxA4xvg@mail.gmail.com>
-In-Reply-To: <CAL_JsqLccwTEhzonvdOOox+D6=3gHxbDbtsXTJpqtQfuxA4xvg@mail.gmail.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 22 Sep 2021 13:05:10 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFgnbuQzqf4rnpzn+Ez-sL3859q=1z_PkE1Mgd3SL19rA@mail.gmail.com>
-Message-ID: <CAMj1kXFgnbuQzqf4rnpzn+Ez-sL3859q=1z_PkE1Mgd3SL19rA@mail.gmail.com>
-Subject: Re: [PATCH] Documentation, dt, numa: Add note to empty NUMA node
-To: Rob Herring <robh@kernel.org>
-Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, linux-efi <linux-efi@vger.kernel.org>,
- Marc Zyngier <maz@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- shan.gavin@gmail.com, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28BCC405A6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 07:22:51 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2D15660560;
+ Wed, 22 Sep 2021 11:22:50 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mT0Ku-00CJGO-5T; Wed, 22 Sep 2021 12:22:48 +0100
+Date: Wed, 22 Sep 2021 12:22:47 +0100
+Message-ID: <87czp0voqg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
+ of arch specific exit reasons
+In-Reply-To: <20210922010851.2312845-3-jingzhangos@google.com>
+References: <20210922010851.2312845-1-jingzhangos@google.com>
+ <20210922010851.2312845-3-jingzhangos@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, will@kernel.org,
+ dmatlack@google.com, pshier@google.com, oupton@google.com, seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: KVM <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,135 +86,125 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 21 Sept 2021 at 21:45, Rob Herring <robh@kernel.org> wrote:
->
-> On Sun, Sep 5, 2021 at 11:16 PM Gavin Shan <gshan@redhat.com> wrote:
-> >
-> > The empty memory nodes, where no memory resides in, are allowed.
-> > For these empty memory nodes, the 'len' of 'reg' property is zero.
-> > The NUMA node IDs are still valid and parsed, but memory may be
-> > added to them through hotplug afterwards. Currently, QEMU fails
-> > to boot when multiple empty memory nodes are specified. It's
-> > caused by device-tree population failure and duplicated memory
-> > node names.
+Hi Jing,
 
-Those memory regions are known in advance, right? So wouldn't it be
-better to use something like 'status = "disabled"' here?
+On Wed, 22 Sep 2021 02:08:51 +0100,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> These logarithmic histogram stats are useful for monitoring performance
+> of handling for different kinds of VCPU exit reasons.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 36 ++++++++++++
+>  arch/arm64/kvm/arm.c              |  4 ++
+>  arch/arm64/kvm/guest.c            | 43 ++++++++++++++
+>  arch/arm64/kvm/handle_exit.c      | 95 +++++++++++++++++++++++++++++++
+>  4 files changed, 178 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4d65de22add3..f1a29ca3d4f3 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -417,6 +417,9 @@ struct kvm_vcpu_arch {
+>  
+>  	/* Arch specific exit reason */
+>  	enum arm_exit_reason exit_reason;
+> +
+> +	/* The timestamp for the last VCPU exit */
+> +	u64 last_exit_time;
+>  };
+>  
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> @@ -605,6 +608,8 @@ struct kvm_vm_stat {
+>  	struct kvm_vm_stat_generic generic;
+>  };
+>  
+> +#define ARM_EXIT_HIST_CNT	64
+> +
+>  struct kvm_vcpu_stat {
+>  	struct kvm_vcpu_stat_generic generic;
+>  	u64 mmio_exit_user;
+> @@ -641,6 +646,36 @@ struct kvm_vcpu_stat {
+>  		u64 exit_fp_asimd;
+>  		u64 exit_pac;
+>  	};
+> +	/* Histogram stats for handling time of arch specific exit reasons */
+> +	struct {
+> +		u64 exit_unknown_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_irq_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_el1_serror_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_hyp_gone_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_il_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_wfi_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_wfe_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp15_32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp15_64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp14_32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp14_ls_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_cp14_64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_hvc32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_smc32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_hvc64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_smc64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_sys64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_sve_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_iabt_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_dabt_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_softstp_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_watchpt_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_breakpt_low_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_bkpt32_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_brk64_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_fp_asimd_hist[ARM_EXIT_HIST_CNT];
+> +		u64 exit_pac_hist[ARM_EXIT_HIST_CNT];
+> +	};
 
->
-> I still don't like the fake addresses. I can't really give suggestions
-> on alternative ways to fix this with you just presenting a solution.
->
+I'm sorry, but I don't think this is right, and I really wish you had
+reached out before putting any effort in this.
 
-Agreed. Please try to explain what the problem is, and why this is the
-best way to solve it. Please include other solutions that were
-considered and rejected if any exist.
+This appears to be as ~13kB per vcpu worth of data that means
+*nothing*. Counting exception syndrome occurrences doesn't say
+anything about how important the associated exception is. A few
+examples:
 
-> What is the failure you see? Can we relax the kernel's expectations?
-> What about UEFI boot as the memory nodes aren't used (or maybe they
-> are for NUMA?) How does this work with ACPI?
->
+- exit_hyp_gone_hist: KVM is gone. We've removed the hypervisor. What
+  is the point of this? How many values do you expect?
 
-The EFI memory map only needs to describe the memory that was present
-at boot. More memory can be represented as ACPI objects, including
-coldplugged memory that is already present at boot. None of this
-involves the memory nodes in DT.
+- exit_dabt_low_hist: page faults. Crucial data, isn't it? Permission,
+  Access, or Translation fault? At which level? Caused by userspace or
+  kernel? Resulted in a page being allocated or not? Read from swap?
+  Successful or not?
 
-> > As device-tree specification indicates, the 'unit-address' of
-> > these empty memory nodes, part of their names, are the equivalents
-> > to 'base-address'. Unfortunately, I finds difficulty to get where
-> > the assignment of 'base-address' is properly documented for these
-> > empty memory nodes. So lets add a section for empty memory nodes
-> > to cover this in NUMA binding document. The 'unit-address',
-> > equivalent to 'base-address' in the 'reg' property of these empty
-> > memory nodes is specified to be the summation of highest memory
-> > address plus the NUMA node ID.
-> >
-> > Signed-off-by: Gavin Shan <gshan@redhat.com>
-> > Acked-by: Randy Dunlap <rdunlap@infradead.org>
-> > ---
-> >  Documentation/devicetree/bindings/numa.txt | 60 +++++++++++++++++++++-
-> >  1 file changed, 59 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/numa.txt b/Documentation/devicetree/bindings/numa.txt
-> > index 21b35053ca5a..82f047bc8dd6 100644
-> > --- a/Documentation/devicetree/bindings/numa.txt
-> > +++ b/Documentation/devicetree/bindings/numa.txt
-> > @@ -103,7 +103,65 @@ Example:
-> >                 };
-> >
-> >  ==============================================================================
-> > -4 - Example dts
-> > +4 - Empty memory nodes
-> > +==============================================================================
-> > +
-> > +Empty memory nodes, which no memory resides in, are allowed. The 'length'
-> > +field of the 'reg' property is zero. However, the 'base-address' is a
-> > +dummy and invalid address, which is the summation of highest memory address
-> > +plus the NUMA node ID. The NUMA node IDs and distance maps are still valid
-> > +and memory may be added into them through hotplug afterwards.
-> > +
-> > +Example:
-> > +
-> > +       memory@0 {
-> > +               device_type = "memory";
-> > +               reg = <0x0 0x0 0x0 0x80000000>;
-> > +               numa-node-id = <0>;
-> > +       };
-> > +
-> > +       memory@80000000 {
-> > +               device_type = "memory";
-> > +               reg = <0x0 0x80000000 0x0 0x80000000>;
-> > +               numa-node-id = <1>;
-> > +       };
-> > +
-> > +       /* Empty memory node */
-> > +       memory@100000002 {
-> > +               device_type = "memory";
-> > +               reg = <0x1 0x2 0x0 0x0>;
-> > +               numa-node-id = <2>;
-> > +       };
-> > +
-> > +       /* Empty memory node */
-> > +       memory@100000003 {
-> > +               device_type = "memory";
-> > +               reg = <0x1 0x3 0x0 0x0>;
-> > +               numa-node-id = <3>;
-> > +       };
->
-> Do you really need the memory nodes here or just some way to define
-> numa node id's 2 and 3 as valid?
->
->
-> > +
-> > +       distance-map {
-> > +               compatible = "numa-distance-map-v1";
-> > +               distance-matrix = <0 0  10>,
-> > +                                 <0 1  20>,
-> > +                                 <0 2  40>,
-> > +                                 <0 3  20>,
-> > +                                 <1 0  20>,
-> > +                                 <1 1  10>,
-> > +                                 <1 2  20>,
-> > +                                 <1 3  40>,
-> > +                                 <2 0  40>,
-> > +                                 <2 1  20>,
-> > +                                 <2 2  10>,
-> > +                                 <2 3  20>,
-> > +                                 <3 0  20>,
-> > +                                 <3 1  40>,
-> > +                                 <3 2  20>,
-> > +                                 <3 3  10>;
-> > +       };
-> > +
-> > +==============================================================================
-> > +5 - Example dts
-> >  ==============================================================================
-> >
-> >  Dual socket system consists of 2 boards connected through ccn bus and
-> > --
-> > 2.23.0
-> >
+- exit_pac_hist, exit_fp_asimd_hist: actually handled early, and only
+  end-up in that part of the hypervisor when there is nothing to do
+  (either there is no corresponding HW or the feature is disabled).
+
+- exit_sys64_hist: System register traps. Which sysreg? With what effect?
+
+Blindly exposing these numbers doesn't result in anything that can be
+used for any sort of useful analysis and bloats the already huge data
+structures. It also affects every single user, most of which do not
+care about this data. It also doesn't scale. Are you going to keep
+adding these counters and histograms every time the architecture (or
+KVM itself) grows some new event?
+
+Frankly, this is a job for BPF and the tracing subsystem, not for some
+hardcoded syndrome accounting. It would allow to extract meaningful
+information, prevent bloat, and crucially make it optional. Even empty
+trace points like the ones used in the scheduler would be infinitely
+better than this (load your own module that hooks into these trace
+points, expose the data you want, any way you want).
+
+As it stands, there is no way I'd be considering merging something
+that looks like this series.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
