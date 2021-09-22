@@ -2,110 +2,96 @@ Return-Path: <SRS0=n474=OM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4D9C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 18:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25121C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 18:16:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A7C8F61038
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 18:11:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A7C8F61038
+	by mail.kernel.org (Postfix) with ESMTP id 9B78360EFF
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 18:16:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9B78360EFF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BF984B0F3;
-	Wed, 22 Sep 2021 14:11:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20E764B0A0;
+	Wed, 22 Sep 2021 14:16:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2kaSnkwvirEd; Wed, 22 Sep 2021 14:11:50 -0400 (EDT)
+	with ESMTP id QU77iPt444JZ; Wed, 22 Sep 2021 14:16:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 439D64B0F1;
-	Wed, 22 Sep 2021 14:11:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB4BC4B0BF;
+	Wed, 22 Sep 2021 14:16:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA7634086F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 10:49:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0082E4B099
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 14:13:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t9GAoH4u19VZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Sep 2021 10:49:02 -0400 (EDT)
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com
- [209.85.210.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 868094079A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 10:49:02 -0400 (EDT)
-Received: by mail-pf1-f176.google.com with SMTP id w19so2875680pfn.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 07:49:02 -0700 (PDT)
+ with ESMTP id 2c+VnKGvYvCE for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Sep 2021 14:13:46 -0400 (EDT)
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com
+ [209.85.215.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7EB340291
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 14:13:45 -0400 (EDT)
+Received: by mail-pg1-f171.google.com with SMTP id g184so3584075pgc.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 11:13:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=0sqc+8Rn23i9NIXRc3rzWglOlIsYoDOCKK+U0vVnVf8=;
- b=i17P/LE0kBMgmTnemIWdlFQzqY0Hs2jbI6I1/q7BOVL5p2dtOUMx0v77u9KgBVc6Wn
- aKV+BPEmJqQFBnpf2JgmIIqtssY8WUcJgn0PyaL+KfSiTDztZbnAplBfnqcfDhlXXfFn
- BjrKCa5IqUkRjskJLByrIP0vUAdGBFoOpGk78YEBagXPKCi9T3kxBnFA97BcpKw7BZcR
- bmLTSv6ivPklBCfoVzjL+iJjEelTUzY+vAJf7MF3MbJsLpnqXAXpI4Q3beusWaRqYBkI
- 4OoNyyAV9qr/c1FTp2tfQsv3gnSyBPHEnLObwapHJkjxKwND1CbJf6lm69JT2lSfnhHf
- qYCA==
+ bh=rEfGQnKC2Rk4coZrfgQQApFk3zR3RiS6MSMlv3roo5E=;
+ b=sdhaf5RnXeZyrzFn+kWJ+zD2MERo/LcZvz+lnC05HI6sgGdFeggPNpkiEuFfzG93Ks
+ dpvXmguIGDD+QE2+Rq/NLT54k5UI0awKo7Ccrhq7GeIQV8Gpyw2UNKc34pQnfqSpzAOX
+ TtSlCKkmNj0xRcvWKRXpptD6NGcYfbjvlbee/xR2rTXL8jtg/Kq5dOlDgi1N8GfANvuf
+ m68Spmgs/aENcmyXomWhmrQRJfimEfPD/e1PhyMJbmKn2FTgOJf7336FiX14i9sAI5xy
+ 8QHgqiS+HlHlEc9hP2Ir1WNeUsmgea0MGXcOhPeVLm7SQWq0rjKJd67WBVtPvjhHmGt9
+ IBeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=0sqc+8Rn23i9NIXRc3rzWglOlIsYoDOCKK+U0vVnVf8=;
- b=wLsYZdU3NII0/DMWB+fWyz1Am54A9i5Zyw7sgnIMz4ZnlddkjwhWiwVyMwLExBcX3l
- GdxwXzOcVid2qdN0ugM5kEVJAW4OaCz1Q2JdDZdxCPWApQB4tgoCNRJLJBIKC1Zzv9lK
- oBRZupeIBnkyPF0E+dWWOuT1xzU9fKiAjLjhj0w+aWifMMvqKXsbSx2aE+BEof3ztoy9
- NVxxEIy+9pTu/yLVUruJ82/wyxvDcBoMGQq2+VJ/LIp3tH6OSrLxOQ4ouE7y1uUBJzH2
- /HLsj37yhqCfRxUSu5vcoR9/aQXM4FsbQWZuLk2r2RSJ/0aUn5yWE5rZcSpsZruF8IRL
- ABfQ==
-X-Gm-Message-State: AOAM531PtMQfoiGUoiObG8VDDvh0oVARr7x0hRHwUgHxdektgRgIuF0T
- /jOc/5Jb3na36w3q76Uxkr8sng==
-X-Google-Smtp-Source: ABdhPJyY3Fv9QcnunPtvdtmn1QYeYqhfMcgkYKWmFqTAaf0DAX+dPQteKaq7uTqZ/uQmOkkrqsksfg==
-X-Received: by 2002:a62:5fc7:0:b0:438:9e3a:b8c0 with SMTP id
- t190-20020a625fc7000000b004389e3ab8c0mr22443pfb.74.1632322141372; 
- Wed, 22 Sep 2021 07:49:01 -0700 (PDT)
+ bh=rEfGQnKC2Rk4coZrfgQQApFk3zR3RiS6MSMlv3roo5E=;
+ b=izu63vT6LYg6KQIK3MCp/ARRLftVokLnAcKXvQ0bSek9le0u2ycNsbQSHITNjBoIms
+ INIgPnbM1wvteLmRpPjN0fP+hHBPhJ8OhEXGvhivZfYDGzxpsSV4yb11kLh1hqe23cAw
+ 1ZK1y56HDpk4Iqdt6FFSqCtZuMgKmpGvZV7TSgcy0Bm+gd9keb+PCodOCxSpcee6aPZN
+ QjJFteowgvzi+h8AP49d0Ur6csh6TCWce1oNBatrnelTXrOWkWoI8qB4PMNHBbL1UwcL
+ WziNWyY6qduejpnJOOyMGT5SZpROG+osq4wKqYwpCBV7z6w8Bv0cS/kIuHi48MoHMXNm
+ Sb/Q==
+X-Gm-Message-State: AOAM532V0AiRBDaEK0IPheC3eS3hIh+A75QrMNiXPy68CIk2+5F6gCe/
+ LfRSVOLkJHXnPvDFhdbn/5wsXQ==
+X-Google-Smtp-Source: ABdhPJzCQmCaSOsJPoQjkK7m7fOPC+A+61MDYsLb7ksgDBveJSxAp8dnM8KJ5912bQZPJ8qftXiMRg==
+X-Received: by 2002:aa7:9f8a:0:b0:43c:39be:23fb with SMTP id
+ z10-20020aa79f8a000000b0043c39be23fbmr172220pfr.57.1632334424775; 
+ Wed, 22 Sep 2021 11:13:44 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id x19sm3250084pgk.37.2021.09.22.07.49.00
+ by smtp.gmail.com with ESMTPSA id ga24sm6331417pjb.41.2021.09.22.11.13.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 22 Sep 2021 07:49:00 -0700 (PDT)
-Date: Wed, 22 Sep 2021 14:48:56 +0000
+ Wed, 22 Sep 2021 11:13:44 -0700 (PDT)
+Date: Wed, 22 Sep 2021 18:13:40 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 08/16] perf: Force architectures to opt-in to guest
- callbacks
-Message-ID: <YUtCWOYJwCUYDYtW@google.com>
-References: <20210922000533.713300-1-seanjc@google.com>
- <20210922000533.713300-9-seanjc@google.com>
- <f2ad98e2-ddfb-c688-65af-7ecbd8bc3b3d@redhat.com>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
+ of arch specific exit reasons
+Message-ID: <YUtyVEpMBityBBNl@google.com>
+References: <20210922010851.2312845-1-jingzhangos@google.com>
+ <20210922010851.2312845-3-jingzhangos@google.com>
+ <87czp0voqg.wl-maz@kernel.org>
+ <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <f2ad98e2-ddfb-c688-65af-7ecbd8bc3b3d@redhat.com>
-X-Mailman-Approved-At: Wed, 22 Sep 2021 14:11:48 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Peter Zijlstra <peterz@infradead.org>, Guo Ren <guoren@kernel.org>,
- linux-riscv@lists.infradead.org, Vincent Chen <deanbo422@gmail.com>,
- Jiri Olsa <jolsa@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- linux-csky@vger.kernel.org,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Ingo Molnar <mingo@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Like Xu <like.xu.linux@gmail.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Zhu Lingshan <lingshan.zhu@intel.com>, Will Deacon <will@kernel.org>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Greentime Hu <green.hu@gmail.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Namhyung Kim <namhyung@kernel.org>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Artem Kashkanov <artem.kashkanov@intel.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Juergen Gross <jgross@suse.com>, Nick Hu <nickhu@andestech.com>,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+In-Reply-To: <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
+X-Mailman-Approved-At: Wed, 22 Sep 2021 14:16:38 -0400
+Cc: Aaron Lewis <aaronlewis@google.com>, KVM <kvm@vger.kernel.org>,
+ Venkatesh Srinivas <venkateshs@google.com>, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Ben Gardon <bgardon@google.com>,
+ David Matlack <dmatlack@google.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -122,26 +108,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 22, 2021, Paolo Bonzini wrote:
-> On 22/09/21 02:05, Sean Christopherson wrote:
-> > @@ -1273,6 +1274,11 @@ static inline unsigned int perf_guest_handle_intel_pt_intr(void)
-> >   }
-> >   extern void perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs);
-> >   extern void perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs);
-> > +#else
-> > +static inline unsigned int perf_guest_state(void)		 { return 0; }
-> > +static inline unsigned long perf_guest_get_ip(void)		 { return 0; }
-> > +static inline unsigned int perf_guest_handle_intel_pt_intr(void) { return 0; }
-> > +#endif /* CONFIG_GUEST_PERF_EVENTS */
-> 
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Having perf_guest_handle_intel_pt_intr in generic code is a bit off.  Of
-> course it has to be in the struct, but the wrapper might be placed in
-> arch/x86/include/asm/perf_event.h as well (applies to patch 7 as well).
++Google folks
 
-Yeah, I went with this option purely to keep everything bundled together.  I have
-no strong opinion.
+On Wed, Sep 22, 2021, Paolo Bonzini wrote:
+> On 22/09/21 13:22, Marc Zyngier wrote:
+> > Frankly, this is a job for BPF and the tracing subsystem, not for some
+> > hardcoded syndrome accounting. It would allow to extract meaningful
+> > information, prevent bloat, and crucially make it optional. Even empty
+> > trace points like the ones used in the scheduler would be infinitely
+> > better than this (load your own module that hooks into these trace
+> > points, expose the data you want, any way you want).
+> 
+> I agree.  I had left out for later the similar series you had for x86, but I
+> felt the same as Marc; even just counting the number of occurrences of each
+> exit reason is a nontrivial amount of memory to spend on each vCPU.
+
+That depends on the use case, environment, etc...  E.g. if the VM is assigned a
+_minimum_ of 4gb per vCPU, then burning even tens of kilobytes of memory per vCPU
+is trivial, or at least completely acceptable.
+
+I do 100% agree this should be optional, be it through an ioctl(), module/kernel
+param, Kconfig, whatever.  The changelogs are also sorely lacking the motivation
+for having dedicated stats; we'll do our best to remedy that for future work.
+
+Stepping back a bit, this is one piece of the larger issue of how to modernize
+KVM for hyperscale usage.  BPF and tracing are great when the debugger has root
+access to the machine and can rerun the failing workload at will.  They're useless
+for identifying trends across large numbers of machines, triaging failures after
+the fact, debugging performance issues with workloads that the debugger doesn't
+have direct access to, etc...
+
+Logging is a similar story, e.g. using _ratelimited() printk to aid debug works
+well when there are a very limited number of VMs and there is a human that can
+react to arbitrary kernel messages, but it's basically useless when there are 10s
+or 100s of VMs and taking action on a kernel message requires a prior knowledge
+of the message.
+
+I'm certainly not expecting other people to solve our challenges, and I fully
+appreciate that there are many KVM users that don't care at all about scalability,
+but I'm hoping we can get the community at large, and especially maintainers and
+reviewers, to also consider at-scale use cases when designing, implementing,
+reviewing, etc...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
