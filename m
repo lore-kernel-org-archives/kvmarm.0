@@ -2,86 +2,86 @@ Return-Path: <SRS0=n474=OM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 500BBC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 01:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FAA3C433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 04:37:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D8F0760F4B
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 01:09:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D8F0760F4B
+	by mail.kernel.org (Postfix) with ESMTP id AFD3261206
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 04:37:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AFD3261206
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BF924A3BF;
-	Tue, 21 Sep 2021 21:09:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 283EF4A173;
+	Wed, 22 Sep 2021 00:37:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id N1NM4R8n7SC2; Tue, 21 Sep 2021 21:09:04 -0400 (EDT)
+	with ESMTP id 8lGlICOaKVj0; Wed, 22 Sep 2021 00:37:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 491B84A49C;
-	Tue, 21 Sep 2021 21:09:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD0834A193;
+	Wed, 22 Sep 2021 00:37:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98B344B0A3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 21:09:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 536A34A00B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 00:37:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iIGPV0koxolB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Sep 2021 21:09:00 -0400 (EDT)
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
- [209.85.160.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F185540573
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 21:08:59 -0400 (EDT)
-Received: by mail-qt1-f202.google.com with SMTP id
- l22-20020a05622a175600b0029d63a970f6so4867554qtk.23
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 18:08:59 -0700 (PDT)
+ with ESMTP id OiCYt-Uaebvt for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Sep 2021 00:37:49 -0400 (EDT)
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
+ [209.85.215.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2244749F6C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 00:37:49 -0400 (EDT)
+Received: by mail-pg1-f178.google.com with SMTP id q68so1341073pga.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 21:37:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=f+eE05PCo8qChOi7C3TCse89XUY8p/e5JYZmdwEBrZo=;
- b=dJPqGgERbK013/94/AiM4dAyiKix1/DKn7frupuhal/2UEb+36tkSAU2QR5HuvuUrP
- I5lfIfz9mix3ljONjQSJPZsqUxztzw7TWpmga75sAbCpjGjAK5UHn8GmdunRx04JBBEa
- OSPrE6uEN4QUVW+aVCib2A81IVnBp5IFyxqGxm6PvXA4MAE2YJQNDMR3/msn9XXHFFW6
- 9X8ORVIypjoWIBFobLZl9reRnKzG6nKCZzWycg2LhY+60z/e3pfcSmkqhxYxDAaDxsvp
- 2eiyr+v4RXb88q/WrE74qS+8EHkrtgmikQdbp6ikP1p8w2pEsPV13MN/vtenr9P9f0qK
- EdAw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=m6kldB4rj/R0WAkH0imKrXheJ5V9FdbCmll402cf/IA=;
+ b=ICo+Qb1xVrXPRSI7NnKutgqIbTVSjHefGoL4UTvWcdLzlKBJcZSOAiv37rrnqZo5Rz
+ jNJVc+p3x+rdeAuuHjiG9hFl/ETgaYUUm8MAeg5KJi1Bk02G1yoSkpeyIWxy2d9wZAtw
+ i8YENzp7fDKb9uovIf0iENUaGw66di9BTbJjh/Zo1wJKNAkzSX4udgaHcybfT3HuiKiF
+ bYitJiAyGbWz/wX/nZy8zut9LS8vOk9eL2QPKDL1xRWvGwwX0T2+e/i/jly2XCsK1cpU
+ sdeeADNM/l3nMY1rLbHvXxjuGnmm38PHeJOlwbdjlTi4jwxwQUNHex7hqfXsEoKMrZH6
+ MkhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=f+eE05PCo8qChOi7C3TCse89XUY8p/e5JYZmdwEBrZo=;
- b=LoPExbdYRZbZE70ITQzA06tfSIQUop7Lmgky0SlpfPgUCc072DvPaXURIFv1cAg9nj
- DXOeIox7tA0tCnbQBieCyfIVp23i/hDP3hDxQocfv7uWdYF+qjHis1Hntkj2T99hEXZu
- sAI0cajqF6Cn2ehtSA3bZF45xTuEINSuaPrTiI426CbxoSa2yx4pZlYn75q273KADbCj
- ejCPt95X+l+PkZkCU8Kj721dlKDkJJgfF+G8MYqWl4/+0ax5u8/nrSXdQCwUDQT1WCnp
- 7pHVdOlthlxQ0JYrYEQXeuTbPTI2sKhjVpAMEiS++fPE8tUQ8DSn0eiG2PNpEA+b81vE
- tSEA==
-X-Gm-Message-State: AOAM532MoOK5tMUuZUhKOF1Xs8Pvr58/TFKhdzpYTduU6zEe674kbT6/
- QSvUcox3ZnxfNKkdtRlQYiUpre92W7Ml8hrb4w==
-X-Google-Smtp-Source: ABdhPJy3KpjeASdvmJujfjGe+YN1WNhBl+SU4AAgG4BY/Um41MpzopZrZLsD49XgUs0vHx6qrAvH2+FIjjqSM5Xoxw==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a0c:e381:: with SMTP id
- a1mr29432178qvl.42.1632272939620; Tue, 21 Sep 2021 18:08:59 -0700 (PDT)
-Date: Wed, 22 Sep 2021 01:08:51 +0000
-In-Reply-To: <20210922010851.2312845-1-jingzhangos@google.com>
-Message-Id: <20210922010851.2312845-3-jingzhangos@google.com>
-Mime-Version: 1.0
-References: <20210922010851.2312845-1-jingzhangos@google.com>
-X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time of
- arch specific exit reasons
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, 
- David Matlack <dmatlack@google.com>, Peter Shier <pshier@google.com>, 
- Oliver Upton <oupton@google.com>, Sean Christopherson <seanjc@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=m6kldB4rj/R0WAkH0imKrXheJ5V9FdbCmll402cf/IA=;
+ b=jNKULsaLCD4VVAXfoPwYume/35GSAf+uoM6WhKBZn02K9CGdZKMlTJrx/KfBi2pd1v
+ 4SG1POXbYxsVsXPM3d3DAixuOyX1g7WcwFJZxTOeSn6qsWC50Advq9LMKJ+pptyPXgtn
+ YFyBYkwgCrBW94QWM4GHP/MVBRC+HbA8vHElbvt0GO/cmrDE76Ugu4W8e5U1L0U7WLbx
+ hSAHrjp3gf6cHpfgcn4nouxXtvKCs2r8ogk+uVgYlWp9xupLv0zUzqllG6hK6mZZ7GkJ
+ dLBX7C1CGVT5yoSHRQPZnFJa5XXYORChJs17V32Ukw3aJEzyOYlXZqq6YpT52f7dRU0x
+ +N8w==
+X-Gm-Message-State: AOAM531sidwYa1GxJlfKAZppJKRUZGNfj1bs5kDDgcHn+S67qm0v7TKT
+ Zu2V9ijWets8+Zrd6CwkwXzAuwspEAN+5z7nyjdY1Q==
+X-Google-Smtp-Source: ABdhPJxyLcmXtJzqXIty5HMyLdZx4wO2ii7Xm2RUsWDJqS7lv9IkDE3r3XN2xqczjqfgfhUPLESfVblUgyopY3T/WXI=
+X-Received: by 2002:a63:f80a:: with SMTP id n10mr30957910pgh.303.1632285467778; 
+ Tue, 21 Sep 2021 21:37:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210916181510.963449-1-oupton@google.com>
+ <20210916181510.963449-3-oupton@google.com>
+In-Reply-To: <20210916181510.963449-3-oupton@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Tue, 21 Sep 2021 21:37:31 -0700
+Message-ID: <CAAeT=Fznwct=D8tk-zRg1SGTa9FqrOrXZ7Boc9yMOnrZ5NPMZw@mail.gmail.com>
+Subject: Re: [PATCH v8 2/8] KVM: arm64: Separate guest/host counter offset
+ values
+To: Oliver Upton <oupton@google.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Sean Christopherson <seanjc@google.com>, Peter Shier <pshier@google.com>,
+ Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,267 +98,157 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-These logarithmic histogram stats are useful for monitoring performance
-of handling for different kinds of VCPU exit reasons.
+Hi Oliver,
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
----
- arch/arm64/include/asm/kvm_host.h | 36 ++++++++++++
- arch/arm64/kvm/arm.c              |  4 ++
- arch/arm64/kvm/guest.c            | 43 ++++++++++++++
- arch/arm64/kvm/handle_exit.c      | 95 +++++++++++++++++++++++++++++++
- 4 files changed, 178 insertions(+)
+On Thu, Sep 16, 2021 at 11:15 AM Oliver Upton <oupton@google.com> wrote:
+>
+> In some instances, a VMM may want to update the guest's counter-timer
+> offset in a transparent manner, meaning that changes to the hardware
+> value do not affect the synthetic register presented to the guest or the
+> VMM through said guest's architectural state. Lay the groundwork to
+> separate guest offset register writes from the hardware values utilized
+> by KVM.
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c  | 42 +++++++++++++++++++++++++++---------
+>  include/kvm/arm_arch_timer.h |  3 +++
+>  2 files changed, 35 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index c0101db75ad4..cf2f4a034dbe 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -84,11 +84,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+>
+>  static u64 timer_get_offset(struct arch_timer_context *ctxt)
+>  {
+> -       struct kvm_vcpu *vcpu = ctxt->vcpu;
+> -
+>         switch(arch_timer_ctx_index(ctxt)) {
+>         case TIMER_VTIMER:
+> -               return __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+> +               return ctxt->host_offset;
+>         default:
+>                 return 0;
+>         }
+> @@ -128,17 +126,33 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
+>
+>  static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+>  {
+> -       struct kvm_vcpu *vcpu = ctxt->vcpu;
+> -
+>         switch(arch_timer_ctx_index(ctxt)) {
+>         case TIMER_VTIMER:
+> -               __vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
+> +               ctxt->host_offset = offset;
+>                 break;
+>         default:
+>                 WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+>         }
+>  }
+>
+> +static void timer_set_guest_offset(struct arch_timer_context *ctxt, u64 offset)
+> +{
+> +       struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +       switch (arch_timer_ctx_index(ctxt)) {
+> +       case TIMER_VTIMER: {
+> +               u64 host_offset = timer_get_offset(ctxt);
+> +
+> +               host_offset += offset - __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+> +               __vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
+> +               timer_set_offset(ctxt, host_offset);
+> +               break;
+> +       }
+> +       default:
+> +               WARN_ONCE(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+> +       }
+> +}
+> +
+>  u64 kvm_phys_timer_read(void)
+>  {
+>         return timecounter->cc->read(timecounter->cc);
+> @@ -749,7 +763,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+>
+>  /* Make offset updates for all timer contexts atomic */
+>  static void update_timer_offset(struct kvm_vcpu *vcpu,
+> -                               enum kvm_arch_timers timer, u64 offset)
+> +                               enum kvm_arch_timers timer, u64 offset,
+> +                               bool guest_visible)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4d65de22add3..f1a29ca3d4f3 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -417,6 +417,9 @@ struct kvm_vcpu_arch {
- 
- 	/* Arch specific exit reason */
- 	enum arm_exit_reason exit_reason;
-+
-+	/* The timestamp for the last VCPU exit */
-+	u64 last_exit_time;
- };
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-@@ -605,6 +608,8 @@ struct kvm_vm_stat {
- 	struct kvm_vm_stat_generic generic;
- };
- 
-+#define ARM_EXIT_HIST_CNT	64
-+
- struct kvm_vcpu_stat {
- 	struct kvm_vcpu_stat_generic generic;
- 	u64 mmio_exit_user;
-@@ -641,6 +646,36 @@ struct kvm_vcpu_stat {
- 		u64 exit_fp_asimd;
- 		u64 exit_pac;
- 	};
-+	/* Histogram stats for handling time of arch specific exit reasons */
-+	struct {
-+		u64 exit_unknown_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_irq_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_el1_serror_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_hyp_gone_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_il_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_wfi_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_wfe_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp15_32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp15_64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp14_32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp14_ls_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_cp14_64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_hvc32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_smc32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_hvc64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_smc64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_sys64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_sve_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_iabt_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_dabt_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_softstp_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_watchpt_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_breakpt_low_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_bkpt32_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_brk64_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_fp_asimd_hist[ARM_EXIT_HIST_CNT];
-+		u64 exit_pac_hist[ARM_EXIT_HIST_CNT];
-+	};
- };
- 
- int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
-@@ -715,6 +750,7 @@ void force_vm_exit(const cpumask_t *mask);
- 
- int handle_exit(struct kvm_vcpu *vcpu, int exception_index);
- void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index);
-+void update_hist_exit_stats(struct kvm_vcpu *vcpu);
- 
- int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu);
- int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fe102cd2e518..156f80b699d3 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -795,6 +795,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 	ret = 1;
- 	run->exit_reason = KVM_EXIT_UNKNOWN;
- 	while (ret > 0) {
-+		/* Update histogram stats for exit reasons */
-+		update_hist_exit_stats(vcpu);
-+
- 		/*
- 		 * Check conditions before entering the guest
- 		 */
-@@ -903,6 +906,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		guest_exit();
- 		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-+		vcpu->arch.last_exit_time = ktime_to_ns(ktime_get());
- 
- 		/* Exit types that need handling before we can be preempted */
- 		handle_exit_early(vcpu, ret);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index abd9327d7110..bbf51578fdec 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -75,6 +75,49 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, exit_brk64),
- 	STATS_DESC_COUNTER(VCPU, exit_fp_asimd),
- 	STATS_DESC_COUNTER(VCPU, exit_pac),
-+	/* Histogram stats for handling time of arch specific exit reasons */
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_unknown_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_irq_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_el1_serror_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_hyp_gone_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_il_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_wfi_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_wfe_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp15_32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp15_64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp14_32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp14_ls_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_cp14_64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_hvc32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_smc32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_hvc64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_smc64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_sys64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_sve_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_iabt_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_dabt_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_softstp_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_watchpt_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_breakpt_low_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_bkpt32_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_brk64_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(
-+			VCPU, exit_fp_asimd_hist, ARM_EXIT_HIST_CNT),
-+	STATS_DESC_LOGHIST_TIME_NSEC(VCPU, exit_pac_hist, ARM_EXIT_HIST_CNT),
- };
- 
- const struct kvm_stats_header kvm_vcpu_stats_header = {
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index e83cd52078b2..5e642a6275c1 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -395,3 +395,98 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%016lx\n",
- 	      spsr, elr_virt, esr, far, hpfar, par, vcpu);
- }
-+
-+void update_hist_exit_stats(struct kvm_vcpu *vcpu)
-+{
-+	u64 val = ktime_to_ns(ktime_get()) - vcpu->arch.last_exit_time;
-+
-+	if (unlikely(!vcpu->arch.last_exit_time))
-+		return;
-+
-+	switch (vcpu->arch.exit_reason) {
-+	case ARM_EXIT_UNKNOWN:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_unknown_hist, val);
-+		break;
-+	case ARM_EXIT_IRQ:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_irq_hist, val);
-+		break;
-+	case ARM_EXIT_EL1_SERROR:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_el1_serror_hist, val);
-+		break;
-+	case ARM_EXIT_HYP_GONE:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_hyp_gone_hist, val);
-+		break;
-+	case ARM_EXIT_IL:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_il_hist, val);
-+		break;
-+	case ARM_EXIT_WFI:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_wfi_hist, val);
-+		break;
-+	case ARM_EXIT_WFE:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_wfe_hist, val);
-+		break;
-+	case ARM_EXIT_CP15_32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp15_32_hist, val);
-+		break;
-+	case ARM_EXIT_CP15_64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp15_64_hist, val);
-+		break;
-+	case ARM_EXIT_CP14_32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp14_32_hist, val);
-+		break;
-+	case ARM_EXIT_CP14_LS:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp14_ls_hist, val);
-+		break;
-+	case ARM_EXIT_CP14_64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_cp14_64_hist, val);
-+		break;
-+	case ARM_EXIT_HVC32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_hvc32_hist, val);
-+		break;
-+	case ARM_EXIT_SMC32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_smc32_hist, val);
-+		break;
-+	case ARM_EXIT_HVC64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_hvc64_hist, val);
-+		break;
-+	case ARM_EXIT_SMC64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_smc64_hist, val);
-+		break;
-+	case ARM_EXIT_SYS64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_sys64_hist, val);
-+		break;
-+	case ARM_EXIT_SVE:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_sve_hist, val);
-+		break;
-+	case ARM_EXIT_IABT_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_iabt_low_hist, val);
-+		break;
-+	case ARM_EXIT_DABT_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_dabt_low_hist, val);
-+		break;
-+	case ARM_EXIT_SOFTSTP_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vcpu->stat.exit_softstp_low_hist, val);
-+		break;
-+	case ARM_EXIT_WATCHPT_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vcpu->stat.exit_watchpt_low_hist, val);
-+		break;
-+	case ARM_EXIT_BREAKPT_LOW:
-+		KVM_STATS_LOG_HIST_UPDATE(
-+				vcpu->stat.exit_breakpt_low_hist, val);
-+		break;
-+	case ARM_EXIT_BKPT32:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_bkpt32_hist, val);
-+		break;
-+	case ARM_EXIT_BRK64:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_brk64_hist, val);
-+		break;
-+	case ARM_EXIT_FP_ASIMD:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_fp_asimd_hist, val);
-+		break;
-+	case ARM_EXIT_PAC:
-+		KVM_STATS_LOG_HIST_UPDATE(vcpu->stat.exit_pac_hist, val);
-+		break;
-+	}
-+}
--- 
-2.33.0.464.g1972c5931b-goog
+The name 'guest_visible' looks confusing to me because it also
+affects the type of the 'offset' that its caller needs to specify.
+(The 'offset' must be an offset from the guest's physical counter
+if 'guest_visible' == true, and an offset from the host's virtual
+counter otherwise.)
+Having said that, I don't have a good alternative name for it though...
+IMHO, 'is_host_offset' would be less confusing because it indicates
+what the caller needs to specify.
 
+
+>  {
+>         int i;
+>         struct kvm *kvm = vcpu->kvm;
+> @@ -758,13 +773,20 @@ static void update_timer_offset(struct kvm_vcpu *vcpu,
+>         lockdep_assert_held(&kvm->lock);
+>
+>         kvm_for_each_vcpu(i, tmp, kvm)
+> -               timer_set_offset(vcpu_get_timer(tmp, timer), offset);
+> +               if (guest_visible)
+> +                       timer_set_guest_offset(vcpu_get_timer(tmp, timer),
+> +                                              offset);
+> +               else
+> +                       timer_set_offset(vcpu_get_timer(tmp, timer), offset);
+>
+>         /*
+>          * When called from the vcpu create path, the CPU being created is not
+>          * included in the loop above, so we just set it here as well.
+>          */
+> -       timer_set_offset(vcpu_get_timer(vcpu, timer), offset);
+> +       if (guest_visible)
+> +               timer_set_guest_offset(vcpu_get_timer(vcpu, timer), offset);
+> +       else
+> +               timer_set_offset(vcpu_get_timer(vcpu, timer), offset);
+>  }
+>
+>  static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
+> @@ -772,7 +794,7 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
+>         struct kvm *kvm = vcpu->kvm;
+>
+>         mutex_lock(&kvm->lock);
+> -       update_timer_offset(vcpu, TIMER_VTIMER, cntvoff);
+> +       update_timer_offset(vcpu, TIMER_VTIMER, cntvoff, true);
+>         mutex_unlock(&kvm->lock);
+>  }
+>
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 51c19381108c..9d65d4a29f81 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -42,6 +42,9 @@ struct arch_timer_context {
+>         /* Duplicated state from arch_timer.c for convenience */
+>         u32                             host_timer_irq;
+>         u32                             host_timer_irq_flags;
+> +
+> +       /* offset relative to the host's physical counter-timer */
+> +       u64                             host_offset;
+>  };
+
+Just out of curiosity, have you considered having 'host_offset'
+in one place (in arch_timer_cpu or somewhere ?) as physical offset
+rather than having them separately for each arch_timer_context ?
+I would think that could simplify the offset calculation code
+and update_ptimer_cntpoff() doesn't need to call update_timer_offset()
+for TIMER_VTIMER.  It would require extra memory accesses for
+timer_get_offset(TIMER_VTIMER) though...
+
+Otherwise,
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+
+Thanks,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
