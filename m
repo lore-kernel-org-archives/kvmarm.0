@@ -2,85 +2,65 @@ Return-Path: <SRS0=n474=OM=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FCC3C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 16:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B31B6C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 16:16:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AF33A61181
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 16:09:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AF33A61181
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 2D8E161168
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 16:16:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2D8E161168
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29F094005D;
-	Wed, 22 Sep 2021 12:09:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C1F54B0C3;
+	Wed, 22 Sep 2021 12:16:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Iij8uhkSXh-p; Wed, 22 Sep 2021 12:09:53 -0400 (EDT)
+	with ESMTP id 2fW48DJ5otZR; Wed, 22 Sep 2021 12:16:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A1314B092;
-	Wed, 22 Sep 2021 12:09:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 299F64B0CD;
+	Wed, 22 Sep 2021 12:16:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 927874B092
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 12:09:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98D534B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 12:16:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ldnq5oxtkXmL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 22 Sep 2021 12:09:50 -0400 (EDT)
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com
- [209.85.217.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88D8649F8F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 12:09:50 -0400 (EDT)
-Received: by mail-vs1-f43.google.com with SMTP id y141so3513017vsy.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 09:09:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Y71TE4uaFkkTCgI01yco6eKbyLn5X7egv/SHBqUCbDo=;
- b=Fp/svNRP11jh2RubcRL/Oc5832VjhwFnu+3VYEPFZpoUrp6FXwgf1FTjEPy+r804Q7
- s4wZd9opxkvaMwWLrEqKHDLVVgvxKog9BQZEVYERP208JtmrYUDflBcm9CeUnT539XVY
- 6Tza5j1HEKMC8ezxC2K4WYRan/BUBy5wEdjbldIyB9k4YGA6y20qQlfIN8oAEmfqCXSp
- P+a50/IeOvLuBpy9+nnYCFtLQSlTMrXupzHEWIyyjVoCQXw6IxMF9hjgcz7TqXNTfyJW
- cwLNpkKiswqF3h6yXa78a6Vg124snU6YXOmO3ccHHKhtVMfZw9eAROHxjp6LFJTUnpIm
- 6x5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Y71TE4uaFkkTCgI01yco6eKbyLn5X7egv/SHBqUCbDo=;
- b=z4kFFHP9569vZps1wVtGyTSbfYx8biqETw4sjYwAB+vjWGBWyF2GVvS4G8syIs7ztY
- lvpp7ARlPxHSCRhT2oa2mzDUGpuptXhP48jarbU1SUmpjzx6/2vkmRIii42t4BWebPmx
- R4kY+AahIZMRiL4BIwQu8jQjEZroSpOrSDrNeOENjd+Ll/f/0DC/bZrwNqB+H/ogtF2V
- nyDFQMxfPygOPw2ejoftQtpPmqOm6NflpW5psJngjG0bX8ZmNFvs74nCJBWhjejfBYzg
- lrSLcITOHqFbfH7YpaPAA3IqEvPOVe5Y2H1mjadFSiOkeYcqz9dv5NSxw5SAWLEVqDNH
- evyg==
-X-Gm-Message-State: AOAM531338SSOhcs5MRRHSNMgIjBq78vgZUgiutn1vXoqkYRo+XgmBi3
- v8Pyo9e+8TA4DHVwDSZH9XUWtrrjFFxfs4+sVrrgBQ==
-X-Google-Smtp-Source: ABdhPJznyi7GhP02meVTv0+DMN8SZQNTAeHvGStQfXfgJg4o8a31GfYpx1CXw7Kxs7dzh7LBST/hYW3FOzdLEJAMlFI=
-X-Received: by 2002:a05:6102:819:: with SMTP id g25mr85488vsb.21.1632326989748; 
- Wed, 22 Sep 2021 09:09:49 -0700 (PDT)
+ with ESMTP id GOHfE+wBc7yL for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Sep 2021 12:16:09 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A8C549DE3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Sep 2021 12:16:08 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B3F5113E;
+ Wed, 22 Sep 2021 09:16:08 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 866393F719;
+ Wed, 22 Sep 2021 09:16:05 -0700 (PDT)
+Message-ID: <138537dc-64ef-ab3b-6977-4cc19de7fee3@arm.com>
+Date: Wed, 22 Sep 2021 17:17:39 +0100
 MIME-Version: 1.0
-References: <20210922010851.2312845-1-jingzhangos@google.com>
- <20210922010851.2312845-3-jingzhangos@google.com>
- <87czp0voqg.wl-maz@kernel.org>
- <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
-In-Reply-To: <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Wed, 22 Sep 2021 09:09:37 -0700
-Message-ID: <CAAdAUtgrwswfX=YDgNSSOVZDQ8n91LdpL5V_80+NL2Gu9X2Vfw@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
- of arch specific exit reasons
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: KVM <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.1
+Subject: Re: [PATCH v8 2/8] KVM: arm64: Separate guest/host counter offset
+ values
+Content-Language: en-US
+To: Oliver Upton <oupton@google.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+References: <20210916181510.963449-1-oupton@google.com>
+ <20210916181510.963449-3-oupton@google.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+In-Reply-To: <20210916181510.963449-3-oupton@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Peter Shier <pshier@google.com>, Sean Christopherson <seanjc@google.com>,
- David Matlack <dmatlack@google.com>, Will Deacon <will@kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,33 +77,162 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc, Paolo,
+Hi Oliver,
 
-On Wed, Sep 22, 2021 at 8:37 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 22/09/21 13:22, Marc Zyngier wrote:
-> > Frankly, this is a job for BPF and the tracing subsystem, not for some
-> > hardcoded syndrome accounting. It would allow to extract meaningful
-> > information, prevent bloat, and crucially make it optional. Even empty
-> > trace points like the ones used in the scheduler would be infinitely
-> > better than this (load your own module that hooks into these trace
-> > points, expose the data you want, any way you want).
->
-> I agree.  I had left out for later the similar series you had for x86,
-> but I felt the same as Marc; even just counting the number of
-> occurrences of each exit reason is a nontrivial amount of memory to
-> spend on each vCPU.
->
-> Paolo
->
-Thanks for the feedback about this. It is actually kind of what I
-expected. The correct way is to add valuable h/w exit reasons which
-have been verified useful for debugging and monitoring purposes
-instead of exposing all of them blindly.
-Will have an internal discussion about the historical reason why those
-are needed in the first place and to see if the reason still exists.
+I don't understand what this patch is trying to achieve, so I'm just going to ask
+some high level questions before I go through the code.
 
-Jing
+On 9/16/21 19:15, Oliver Upton wrote:
+> In some instances, a VMM may want to update the guest's counter-timer
+> offset in a transparent manner, meaning that changes to the hardware
+> value do not affect the synthetic register presented to the guest or the
+> VMM through said guest's architectural state. Lay the groundwork to
+> separate guest offset register writes from the hardware values utilized
+> by KVM.
+
+I find this description very hard to parse. What do you mean by the "register
+presented to the guest or the VMM through said guest's architectural state"?
+
+If I understand the code correctly, what the patch does is to create another copy
+of __vcpu_sys_reg(CNTVOFF_EL2) in vcpu_vtimer(vcpu)->host_offset in a very
+roundabout manner, in the function timer_set_guest_offset() (please correct me if
+I'm wrong). The commit doesn't explain why that is done at all, except for this
+part: "In some instances, a VMM may want to update the guest's counter-timer
+offset in a transparent manner", which looks very cryptic, at least to me.
+
+In the cover letter, you mention adding support for a physical timer offset. I
+think it would make the commits clearer to follow if there was a better
+distinction between changes to the virtual timer offset and physical timer offsets.
+
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c  | 42 +++++++++++++++++++++++++++---------
+>  include/kvm/arm_arch_timer.h |  3 +++
+>  2 files changed, 35 insertions(+), 10 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index c0101db75ad4..cf2f4a034dbe 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -84,11 +84,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
+>  
+>  static u64 timer_get_offset(struct arch_timer_context *ctxt)
+>  {
+> -	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> -
+>  	switch(arch_timer_ctx_index(ctxt)) {
+>  	case TIMER_VTIMER:
+> -		return __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+> +		return ctxt->host_offset;
+>  	default:
+>  		return 0;
+>  	}
+> @@ -128,17 +126,33 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
+>  
+>  static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
+>  {
+> -	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> -
+>  	switch(arch_timer_ctx_index(ctxt)) {
+>  	case TIMER_VTIMER:
+> -		__vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
+> +		ctxt->host_offset = offset;
+>  		break;
+>  	default:
+>  		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+>  	}
+>  }
+>  
+> +static void timer_set_guest_offset(struct arch_timer_context *ctxt, u64 offset)
+> +{
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	switch (arch_timer_ctx_index(ctxt)) {
+> +	case TIMER_VTIMER: {
+> +		u64 host_offset = timer_get_offset(ctxt);
+> +
+> +		host_offset += offset - __vcpu_sys_reg(vcpu, CNTVOFF_EL2);
+> +		__vcpu_sys_reg(vcpu, CNTVOFF_EL2) = offset;
+> +		timer_set_offset(ctxt, host_offset);
+> +		break;
+> +	}
+> +	default:
+> +		WARN_ONCE(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+> +	}
+> +}
+> +
+>  u64 kvm_phys_timer_read(void)
+>  {
+>  	return timecounter->cc->read(timecounter->cc);
+> @@ -749,7 +763,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
+>  
+>  /* Make offset updates for all timer contexts atomic */
+>  static void update_timer_offset(struct kvm_vcpu *vcpu,
+> -				enum kvm_arch_timers timer, u64 offset)
+> +				enum kvm_arch_timers timer, u64 offset,
+> +				bool guest_visible)
+>  {
+>  	int i;
+>  	struct kvm *kvm = vcpu->kvm;
+> @@ -758,13 +773,20 @@ static void update_timer_offset(struct kvm_vcpu *vcpu,
+>  	lockdep_assert_held(&kvm->lock);
+>  
+>  	kvm_for_each_vcpu(i, tmp, kvm)
+> -		timer_set_offset(vcpu_get_timer(tmp, timer), offset);
+> +		if (guest_visible)
+> +			timer_set_guest_offset(vcpu_get_timer(tmp, timer),
+> +					       offset);
+> +		else
+> +			timer_set_offset(vcpu_get_timer(tmp, timer), offset);
+>  
+>  	/*
+>  	 * When called from the vcpu create path, the CPU being created is not
+>  	 * included in the loop above, so we just set it here as well.
+>  	 */
+> -	timer_set_offset(vcpu_get_timer(vcpu, timer), offset);
+> +	if (guest_visible)
+> +		timer_set_guest_offset(vcpu_get_timer(vcpu, timer), offset);
+> +	else
+> +		timer_set_offset(vcpu_get_timer(vcpu, timer), offset);
+>  }
+>  
+>  static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
+> @@ -772,7 +794,7 @@ static void update_vtimer_cntvoff(struct kvm_vcpu *vcpu, u64 cntvoff)
+>  	struct kvm *kvm = vcpu->kvm;
+>  
+>  	mutex_lock(&kvm->lock);
+> -	update_timer_offset(vcpu, TIMER_VTIMER, cntvoff);
+> +	update_timer_offset(vcpu, TIMER_VTIMER, cntvoff, true);
+>  	mutex_unlock(&kvm->lock);
+>  }
+>  
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index 51c19381108c..9d65d4a29f81 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -42,6 +42,9 @@ struct arch_timer_context {
+>  	/* Duplicated state from arch_timer.c for convenience */
+>  	u32				host_timer_irq;
+>  	u32				host_timer_irq_flags;
+> +
+> +	/* offset relative to the host's physical counter-timer */
+> +	u64				host_offset;
+
+I find the name and the comment very confusing. The name makes me think it
+represents the host's virtual timer offset, but that is always 0. Judging from the
+code, host_offset refers to the guest's virtual timer offset. The comment refers
+to the host's physical counter-timer, which makes me believe the opposite, that
+it's the offset from the physical timer.
+
+Thanks,
+
+Alex
+
+>  };
+>  
+>  struct timer_map {
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
