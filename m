@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1CFAC433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 13:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98AE4C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 13:12:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6721161100
-	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 13:12:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6721161100
+	by mail.kernel.org (Postfix) with ESMTP id 4965D61100
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Sep 2021 13:12:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4965D61100
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C11D4B136;
-	Wed, 22 Sep 2021 09:12:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F35DF4B11A;
+	Wed, 22 Sep 2021 09:12:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Jtg21PvhstZQ; Wed, 22 Sep 2021 09:12:05 -0400 (EDT)
+	with ESMTP id IQi4ffVl-WtA; Wed, 22 Sep 2021 09:12:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FA634B1A0;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70EFA4B126;
 	Wed, 22 Sep 2021 09:11:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A470C406E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 20:05:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FDFF4A00B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 20:05:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vFwXTpV+E35L for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Sep 2021 20:05:50 -0400 (EDT)
+ with ESMTP id BbT3VE7y-9Kr for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Sep 2021 20:05:54 -0400 (EDT)
 Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com
  [209.85.219.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99EC1405EE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 20:05:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E4B4C405EE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 20:05:54 -0400 (EDT)
 Received: by mail-qv1-f73.google.com with SMTP id
- h25-20020a0cab19000000b0037a49d15c93so6849150qvb.22
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 17:05:50 -0700 (PDT)
+ h9-20020a05621413a900b0037a2d3eaf8fso7925733qvz.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Sep 2021 17:05:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=WoefsUy8P8uVLjBhkd6fplSxv9zXtwFfZO3aWK09BqE=;
- b=W3dvAswYaFrMhdUxOnj+C5EXMMEyJrI4w2EWKYkJvgEgkHuR8IaKKfSJHg9j0xw5+k
- fgorvfW1/YzGQUtW4RZ95gDG0qA72H/qeIgYOd+4TOG6c+1wocOOu3VRxQzsB6jGSO5g
- yRDdyBni9EhmFEE/PynpUeNnGYgcYXTu6HydYJ60R/86lZ/rosIKMEDAP+lTix9jhUIs
- 1g7+eQ1MkKa4HLPulfOq0mS5b56v1Wn9wTgMBlG9vvFK/yuOUIxbO5OMIO050BN1ziI7
- quI8vYbT72gL4MHo6ScRZ81Wr5yMBwO1kb48G3KB1R6pXXjpQyqrpGzih9Su7JxvCNCF
- qqhg==
+ bh=uGRLtrGbpD3S6B/7zzXt3L9N6QvZuu1UjnfG14mJ8ek=;
+ b=RFIhbvEyvYMragxwcAv1E8u094o6TR3aNC++WUaaLMbpX1lKaGuAbXr4UQ4DnYHp6f
+ 0izeMTfNi3w+g5sbRJ0zA7LvF+2NsrCBFGIUyCyWEOC9wn70vrrhnoT3jtw95SZHu/KS
+ NX/NMJBJ9rL02BAnaFZcMgeOgQTyJ3QXygCXEu9hwHwMFitHgFFJeLNMjteHVUzmBk3C
+ gxJ7A5VIKod2bScVarg0Ti81qTfwhFhcVvMp3krZctVE206zQUgs8jQ7G+Dz7hdiV3WH
+ q42Zv28O4z7mAPyMIHk2g1A40W19Qiluvr7IjkcHSYgiI2bp3YLj+WcuS1yfVh40dAHd
+ TYrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=WoefsUy8P8uVLjBhkd6fplSxv9zXtwFfZO3aWK09BqE=;
- b=lWwQqpRe89pFVD0JC9NSXe/dLAl+C78oMlO3uKdlY88E4MxyQUfkIs/BEIKRRxcYbG
- 2qQPQT+QJ4mPvsJoHWXoGxSinKqANSZHvLMXwauW0Kf4TLlNo8AK4KTuepNp4Hty4nvB
- krTtrJdd2LpKKqXo1wox/ap+u4r5HkjJeM035ZyHYJMlA1/ED5gTQWiKFA+yxOHORd45
- puHK0VOZ3q4mDnD7Ng1esc9Xzozx1cqOOebTNl7wVRzAkNJbjYh7qL3DmHWN6xvB0BfM
- VJZ7RmYAGLSY8dIKOYe66Ou5wZoJF8aEnfoqqbdfU/6ZbMbjf09nkMwCLvVlEeAaeqeU
- 2TpQ==
-X-Gm-Message-State: AOAM531rYBispN2lacceyYAqOmQFmolj3NkMBTzmGp9qkLQ68cc6N5DZ
- AVLFza9+jBQQle6LEjEOU74sEPO9uFk=
-X-Google-Smtp-Source: ABdhPJydgoIIy+PWW+KTdPOq8w+CNl9+TVcl5SdFV/4H0FYG9MktEVuetKxR7qEx7VklEO7jLEzl555CBZg=
+ bh=uGRLtrGbpD3S6B/7zzXt3L9N6QvZuu1UjnfG14mJ8ek=;
+ b=uqrIIi0syId92hxtsZoeo9Qx8IiJ2KsRYY2l60WOeyV5W7vQtA0yeiQ+mDKKYSXQIx
+ B2ONt752Thk2JGWcM9Mh116Un8K/klGqMdbFgYt3OjRGDMZ8Z0Hfj3jlxPiBC2Gd8kag
+ iJhbkqWnSFSeTy2Jb0R7CBn9XrMfwtdHZv52wMG2GyRJIESWf6qQwCvK8s8+6oefNG/E
+ EPMKV3LXNTWduAhvv/Ty2hQOT3dSOkpv11bDOED9CNYILq+DGZLRGZMjvMttPbJaEAZk
+ 9s57bVhiRDn/fE6drF88YITzAZsT+PoA7RbybZf10ZEsSbOAoCo/WhPqukwfflQmPGFH
+ XP6w==
+X-Gm-Message-State: AOAM531HsaMqT9v3Qz07crNsBqdgwrwXUFjsMGBE2E8Dl4X0BOB6LbIG
+ nFHNEgXBG6cFVhsrLSgjvL46AjPge8Q=
+X-Google-Smtp-Source: ABdhPJx1/jRpojAUuj4tkfVy2mNumpkwTOY4qlI3JrC7x6zrnCf19L4LA34wG9xOt6d1Anx3BB/t4F42q7U=
 X-Received: from seanjc798194.pdx.corp.google.com
  ([2620:15c:90:200:b022:92d6:d37b:686c])
- (user=seanjc job=sendgmr) by 2002:a25:2cd6:: with SMTP id
- s205mr42869270ybs.445.1632269150043; 
- Tue, 21 Sep 2021 17:05:50 -0700 (PDT)
-Date: Tue, 21 Sep 2021 17:05:20 -0700
+ (user=seanjc job=sendgmr) by 2002:a05:6214:2e7:: with SMTP id
+ h7mr34209194qvu.39.1632269154568; Tue, 21 Sep 2021 17:05:54 -0700 (PDT)
+Date: Tue, 21 Sep 2021 17:05:22 -0700
 In-Reply-To: <20210922000533.713300-1-seanjc@google.com>
-Message-Id: <20210922000533.713300-4-seanjc@google.com>
+Message-Id: <20210922000533.713300-6-seanjc@google.com>
 Mime-Version: 1.0
 References: <20210922000533.713300-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [PATCH v3 03/16] KVM: x86: Register Processor Trace interrupt hook
- iff PT enabled in guest
+Subject: [PATCH v3 05/16] perf: Drop dead and useless guest "support" from
+ arm, csky, nds32 and riscv
 From: Sean Christopherson <seanjc@google.com>
 To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
  Arnaldo Carvalho de Melo <acme@kernel.org>, Will Deacon <will@kernel.org>,
@@ -119,76 +118,234 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Override the Processor Trace (PT) interrupt handler for guest mode if and
-only if PT is configured for host+guest mode, i.e. is being used
-independently by both host and guest.  If PT is configured for system
-mode, the host fully controls PT and must handle all events.
+Drop "support" for guest callbacks from architctures that don't implement
+the guest callbacks.  Future patches will convert the callbacks to
+static_call; rather than churn a bunch of arch code (that was presumably
+copy+pasted from x86), remove it wholesale as it's useless and at best
+wasting cycles.
 
-Fixes: 8479e04e7d6b ("KVM: x86: Inject PMI for KVM guest")
-Cc: stable@vger.kernel.org
-Cc: Like Xu <like.xu.linux@gmail.com>
-Reported-by: Alexander Shishkin <alexander.shishkin@linux.intel.com>
-Reported-by: Artem Kashkanov <artem.kashkanov@intel.com>
+A future patch will also add a Kconfig to force architcture to opt into
+the callbacks to make it more difficult for uses "support" to sneak in in
+the future.
+
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/vmx/vmx.c          | 1 +
- arch/x86/kvm/x86.c              | 5 ++++-
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ arch/arm/kernel/perf_callchain.c   | 33 ++++-------------------------
+ arch/csky/kernel/perf_callchain.c  | 12 -----------
+ arch/nds32/kernel/perf_event_cpu.c | 34 ++++--------------------------
+ arch/riscv/kernel/perf_callchain.c | 13 ------------
+ 4 files changed, 8 insertions(+), 84 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 09b256db394a..1ea4943a73d7 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1494,6 +1494,7 @@ struct kvm_x86_init_ops {
- 	int (*disabled_by_bios)(void);
- 	int (*check_processor_compatibility)(void);
- 	int (*hardware_setup)(void);
-+	bool (*intel_pt_intr_in_guest)(void);
- 
- 	struct kvm_x86_ops *runtime_ops;
- };
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fada1055f325..f19d72136f77 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7896,6 +7896,7 @@ static struct kvm_x86_init_ops vmx_init_ops __initdata = {
- 	.disabled_by_bios = vmx_disabled_by_bios,
- 	.check_processor_compatibility = vmx_check_processor_compat,
- 	.hardware_setup = hardware_setup,
-+	.intel_pt_intr_in_guest = vmx_pt_mode_is_host_guest,
- 
- 	.runtime_ops = &vmx_x86_ops,
- };
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fb6015f97f9e..ffc6c2d73508 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8305,7 +8305,7 @@ static struct perf_guest_info_callbacks kvm_guest_cbs = {
- 	.is_in_guest		= kvm_is_in_guest,
- 	.is_user_mode		= kvm_is_user_mode,
- 	.get_guest_ip		= kvm_get_guest_ip,
--	.handle_intel_pt_intr	= kvm_handle_intel_pt_intr,
-+	.handle_intel_pt_intr	= NULL,
- };
- 
- #ifdef CONFIG_X86_64
-@@ -11061,6 +11061,8 @@ int kvm_arch_hardware_setup(void *opaque)
- 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
- 	kvm_ops_static_call_update();
- 
-+	if (ops->intel_pt_intr_in_guest && ops->intel_pt_intr_in_guest())
-+		kvm_guest_cbs.handle_intel_pt_intr = kvm_handle_intel_pt_intr;
- 	perf_register_guest_info_callbacks(&kvm_guest_cbs);
- 
- 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
-@@ -11091,6 +11093,7 @@ int kvm_arch_hardware_setup(void *opaque)
- void kvm_arch_hardware_unsetup(void)
+diff --git a/arch/arm/kernel/perf_callchain.c b/arch/arm/kernel/perf_callchain.c
+index 1626dfc6f6ce..bc6b246ab55e 100644
+--- a/arch/arm/kernel/perf_callchain.c
++++ b/arch/arm/kernel/perf_callchain.c
+@@ -62,14 +62,8 @@ user_backtrace(struct frame_tail __user *tail,
+ void
+ perf_callchain_user(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs)
  {
- 	perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
-+	kvm_guest_cbs.handle_intel_pt_intr = NULL;
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	struct frame_tail __user *tail;
  
- 	static_call(kvm_x86_hardware_unsetup)();
+-	if (guest_cbs && guest_cbs->is_in_guest()) {
+-		/* We don't support guest os callchain now */
+-		return;
+-	}
+-
+ 	perf_callchain_store(entry, regs->ARM_pc);
+ 
+ 	if (!current->mm)
+@@ -99,44 +93,25 @@ callchain_trace(struct stackframe *fr,
+ void
+ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry, struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	struct stackframe fr;
+ 
+-	if (guest_cbs && guest_cbs->is_in_guest()) {
+-		/* We don't support guest os callchain now */
+-		return;
+-	}
+-
+ 	arm_get_current_stackframe(regs, &fr);
+ 	walk_stackframe(&fr, callchain_trace, entry);
+ }
+ 
+ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+-
+-	if (guest_cbs && guest_cbs->is_in_guest())
+-		return guest_cbs->get_guest_ip();
+-
+ 	return instruction_pointer(regs);
+ }
+ 
+ unsigned long perf_misc_flags(struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	int misc = 0;
+ 
+-	if (guest_cbs && guest_cbs->is_in_guest()) {
+-		if (guest_cbs->is_user_mode())
+-			misc |= PERF_RECORD_MISC_GUEST_USER;
+-		else
+-			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
+-	} else {
+-		if (user_mode(regs))
+-			misc |= PERF_RECORD_MISC_USER;
+-		else
+-			misc |= PERF_RECORD_MISC_KERNEL;
+-	}
++	if (user_mode(regs))
++		misc |= PERF_RECORD_MISC_USER;
++	else
++		misc |= PERF_RECORD_MISC_KERNEL;
+ 
+ 	return misc;
+ }
+diff --git a/arch/csky/kernel/perf_callchain.c b/arch/csky/kernel/perf_callchain.c
+index 35318a635a5f..92057de08f4f 100644
+--- a/arch/csky/kernel/perf_callchain.c
++++ b/arch/csky/kernel/perf_callchain.c
+@@ -86,13 +86,8 @@ static unsigned long user_backtrace(struct perf_callchain_entry_ctx *entry,
+ void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+ 			 struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	unsigned long fp = 0;
+ 
+-	/* C-SKY does not support virtualization. */
+-	if (guest_cbs && guest_cbs->is_in_guest())
+-		return;
+-
+ 	fp = regs->regs[4];
+ 	perf_callchain_store(entry, regs->pc);
+ 
+@@ -111,15 +106,8 @@ void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+ 			   struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	struct stackframe fr;
+ 
+-	/* C-SKY does not support virtualization. */
+-	if (guest_cbs && guest_cbs->is_in_guest()) {
+-		pr_warn("C-SKY does not support perf in guest mode!");
+-		return;
+-	}
+-
+ 	fr.fp = regs->regs[4];
+ 	fr.lr = regs->lr;
+ 	walk_stackframe(&fr, entry);
+diff --git a/arch/nds32/kernel/perf_event_cpu.c b/arch/nds32/kernel/perf_event_cpu.c
+index f38791960781..a78a879e7ef1 100644
+--- a/arch/nds32/kernel/perf_event_cpu.c
++++ b/arch/nds32/kernel/perf_event_cpu.c
+@@ -1363,7 +1363,6 @@ void
+ perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+ 		    struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	unsigned long fp = 0;
+ 	unsigned long gp = 0;
+ 	unsigned long lp = 0;
+@@ -1372,11 +1371,6 @@ perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+ 
+ 	leaf_fp = 0;
+ 
+-	if (guest_cbs && guest_cbs->is_in_guest()) {
+-		/* We don't support guest os callchain now */
+-		return;
+-	}
+-
+ 	perf_callchain_store(entry, regs->ipc);
+ 	fp = regs->fp;
+ 	gp = regs->gp;
+@@ -1480,13 +1474,8 @@ void
+ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+ 		      struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	struct stackframe fr;
+ 
+-	if (guest_cbs && guest_cbs->is_in_guest()) {
+-		/* We don't support guest os callchain now */
+-		return;
+-	}
+ 	fr.fp = regs->fp;
+ 	fr.lp = regs->lp;
+ 	fr.sp = regs->sp;
+@@ -1495,32 +1484,17 @@ perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+ 
+ unsigned long perf_instruction_pointer(struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+-
+-	/* However, NDS32 does not support virtualization */
+-	if (guest_cbs && guest_cbs->is_in_guest())
+-		return guest_cbs->get_guest_ip();
+-
+ 	return instruction_pointer(regs);
+ }
+ 
+ unsigned long perf_misc_flags(struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	int misc = 0;
+ 
+-	/* However, NDS32 does not support virtualization */
+-	if (guest_cbs && guest_cbs->is_in_guest()) {
+-		if (guest_cbs->is_user_mode())
+-			misc |= PERF_RECORD_MISC_GUEST_USER;
+-		else
+-			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
+-	} else {
+-		if (user_mode(regs))
+-			misc |= PERF_RECORD_MISC_USER;
+-		else
+-			misc |= PERF_RECORD_MISC_KERNEL;
+-	}
++	if (user_mode(regs))
++		misc |= PERF_RECORD_MISC_USER;
++	else
++		misc |= PERF_RECORD_MISC_KERNEL;
+ 
+ 	return misc;
+ }
+diff --git a/arch/riscv/kernel/perf_callchain.c b/arch/riscv/kernel/perf_callchain.c
+index 8ecfc4c128bc..1fc075b8f764 100644
+--- a/arch/riscv/kernel/perf_callchain.c
++++ b/arch/riscv/kernel/perf_callchain.c
+@@ -56,13 +56,8 @@ static unsigned long user_backtrace(struct perf_callchain_entry_ctx *entry,
+ void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+ 			 struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+ 	unsigned long fp = 0;
+ 
+-	/* RISC-V does not support perf in guest mode. */
+-	if (guest_cbs && guest_cbs->is_in_guest())
+-		return;
+-
+ 	fp = regs->s0;
+ 	perf_callchain_store(entry, regs->epc);
+ 
+@@ -79,13 +74,5 @@ static bool fill_callchain(void *entry, unsigned long pc)
+ void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+ 			   struct pt_regs *regs)
+ {
+-	struct perf_guest_info_callbacks *guest_cbs = perf_get_guest_cbs();
+-
+-	/* RISC-V does not support perf in guest mode. */
+-	if (guest_cbs && guest_cbs->is_in_guest()) {
+-		pr_warn("RISC-V does not support perf in guest mode!");
+-		return;
+-	}
+-
+ 	walk_stackframe(NULL, regs, fill_callchain, entry);
  }
 -- 
 2.33.0.464.g1972c5931b-goog
