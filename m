@@ -2,61 +2,83 @@ Return-Path: <SRS0=m3m7=ON=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE075C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 15:11:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C11C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 15:17:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 719D761248
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 15:11:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 719D761248
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 1E36561029
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 15:17:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1E36561029
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8F8E4B0BE;
-	Thu, 23 Sep 2021 11:11:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B63DA4B10C;
+	Thu, 23 Sep 2021 11:17:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id r6UKzVojGIsx; Thu, 23 Sep 2021 11:11:01 -0400 (EDT)
+	with ESMTP id XWN77VqyKWYT; Thu, 23 Sep 2021 11:17:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26C6A4B0E1;
-	Thu, 23 Sep 2021 11:11:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B4104B11E;
+	Thu, 23 Sep 2021 11:17:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B8844B0D0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 11:11:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C29E04B10C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 11:17:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5S9UdIv+ra01 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Sep 2021 11:10:59 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B2894B0BE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 11:10:59 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51AABD6E;
- Thu, 23 Sep 2021 08:10:58 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27EAE3F718;
- Thu, 23 Sep 2021 08:10:57 -0700 (PDT)
-Message-ID: <62a2f16c-3aa0-3d7e-4b35-3a5bad701586@arm.com>
-Date: Thu, 23 Sep 2021 16:12:27 +0100
+ with ESMTP id I-xlt7eLjx21 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Sep 2021 11:17:47 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 56B074B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 11:17:47 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 50882611C6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 15:17:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1632410266;
+ bh=+LNh7lY5UZmTBvOhLwrn3p2agfdPid06GBrbSKCtbak=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=rkuesZAysn26zeA2Q+g5fibFlDj176WFxwQsKYi/KGmv/42w40Q0VPlh4ZbU3v93E
+ x0FyFkrHaWKkn5nHRYXHUgaefDz9mfX2EOGPlSiU7IgGHxiRylxzKtW40m/WFlfRl1
+ I3a7OQR2NT+GMWeSKOBzvnQbFTrGmo8dXHFVsriseO9JfRiijMUsa5NmJMb3pz3Gcj
+ 24rxSF0wW9eio6FU0yKJgGsuZADGTOzoS4UjSEnaL98r4glfxr0q7kC427xC7rQEW8
+ 5WxR8bafn4I+/pR+9duDKkiLK1aSI5u1AErMkKUam9DPs9SkxYFPAOjr9rDx0g6Uyh
+ 1PqoBSZ2y59AQ==
+Received: by mail-ed1-f54.google.com with SMTP id v10so20394067edj.10
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 08:17:46 -0700 (PDT)
+X-Gm-Message-State: AOAM530YLKF2+OHWgG7LafukMkFCn+jTl6ksCu/mITwMrqZvR1sUY1DB
+ dK8J6BqWHsVQrqy3ze9cCk4s0A5GY7ya4twZQg==
+X-Google-Smtp-Source: ABdhPJwfrpCTxDMoj1U4WaIG3mMKEE967XX/SFBREZabwI5YQPoJ2Tw+kfS0jnCxbHvmYAgt//sZYtlLOhNGSLaKRI8=
+X-Received: by 2002:a17:906:abd1:: with SMTP id
+ kq17mr5421409ejb.390.1632410264662; 
+ Thu, 23 Sep 2021 08:17:44 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.1
-Subject: Re: [RFC PATCH v4 00/39] KVM: arm64: Add Statistical Profiling
- Extension (SPE) support
-Content-Language: en-US
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, maz@kernel.org,
- james.morse@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, will@kernel.org, linux-kernel@vger.kernel.org
-References: <20210825161815.266051-1-alexandru.elisei@arm.com>
- <963f68c8-b109-7ebb-751d-14ce46e3cdde@arm.com>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-In-Reply-To: <963f68c8-b109-7ebb-751d-14ce46e3cdde@arm.com>
+References: <20210906041424.115473-1-gshan@redhat.com>
+ <CAL_JsqLccwTEhzonvdOOox+D6=3gHxbDbtsXTJpqtQfuxA4xvg@mail.gmail.com>
+ <CAMj1kXFgnbuQzqf4rnpzn+Ez-sL3859q=1z_PkE1Mgd3SL19rA@mail.gmail.com>
+ <197ced59-49b0-a981-6e04-96405164daba@redhat.com>
+In-Reply-To: <197ced59-49b0-a981-6e04-96405164daba@redhat.com>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 23 Sep 2021 10:17:33 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqLRH_Vn7u7b_yXgC=jBE8sZ2ax_yyueA3umbhQtbjW0TA@mail.gmail.com>
+Message-ID: <CAL_JsqLRH_Vn7u7b_yXgC=jBE8sZ2ax_yyueA3umbhQtbjW0TA@mail.gmail.com>
+Subject: Re: [PATCH] Documentation, dt, numa: Add note to empty NUMA node
+To: Gavin Shan <gshan@redhat.com>
+Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, linux-efi <linux-efi@vger.kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ shan.gavin@gmail.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,118 +90,175 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgU3V6dWtpLAoKVGhhbmsgeW91IGZvciBoYXZpbmcgYSBsb29rIQoKT24gOS8yMi8yMSAxMTox
-MSwgU3V6dWtpIEsgUG91bG9zZSB3cm90ZToKPiBPbiAyNS8wOC8yMDIxIDE3OjE3LCBBbGV4YW5k
-cnUgRWxpc2VpIHdyb3RlOgo+PiBUaGlzIGlzIHY0IG9mIHRoZSBTUEUgc2VyaWVzIHBvc3RlZCBh
-dCBbMV0uIHYyIGNhbiBiZSBmb3VuZCBhdCBbMl0sIGFuZCB0aGUKPj4gb3JpZ2luYWwgc2VyaWVz
-IGF0IFszXS4KPj4KPj4gU3RhdGlzdGljYWwgUHJvZmlsaW5nIEV4dGVuc2lvbiAoU1BFKSBpcyBh
-biBvcHRpb25hbCBmZWF0dXJlIGFkZGVkIGluCj4+IEFSTXY4LjIuIEl0IGFsbG93cyBzYW1wbGlu
-ZyBhdCByZWd1bGFyIGludGVydmFscyBvZiB0aGUgb3BlcmF0aW9ucyBleGVjdXRlZAo+PiBieSB0
-aGUgUEUgYW5kIHN0b3JpbmcgYSByZWNvcmQgb2YgZWFjaCBvcGVyYXRpb24gaW4gYSBtZW1vcnkg
-YnVmZmVyLiBBIGhpZ2gKPj4gbGV2ZWwgb3ZlcnZpZXcgb2YgdGhlIGV4dGVuc2lvbiBpcyBwcmVz
-ZW50ZWQgaW4gYW4gYXJ0aWNsZSBvbiBhcm0uY29tIFs0XS4KPj4KPj4gVGhpcyBpcyBhbm90aGVy
-IGNvbXBsZXRlIHJld3JpdGUgb2YgdGhlIHNlcmllcywgYW5kIG5vdGhpbmcgaXMgc2V0IGluCj4+
-IHN0b25lLiBJZiB5b3UgdGhpbmsgb2YgYSBiZXR0ZXIgd2F5IHRvIGRvIHRoaW5ncywgcGxlYXNl
-IHN1Z2dlc3QgaXQuCj4+Cj4+Cj4+IEZlYXR1cmVzIGFkZGVkCj4+ID09PT09PT09PT09PT09Cj4+
-Cj4+IFRoZSByZXdyaXRlIGVuYWJsZWQgbWUgdG8gYWRkIHN1cHBvcnQgZm9yIHNldmVyYWwgZmVh
-dHVyZXMgbm90Cj4+IHByZXNlbnQgaW4gdGhlIHByZXZpb3VzIGl0ZXJhdGlvbjoKPj4KPj4gLSBT
-dXBwb3J0IGZvciBoZXRlcm9nZW5lb3VzIHN5c3RlbXMsIHdoZXJlIG9ubHkgc29tZSBvZiB0aGUg
-Q1BVcyBzdXBwb3J0IFNQRS4KPj4gwqDCoCBUaGlzIGlzIGFjY29tcGxpc2hlZCB2aWEgdGhlIEtW
-TV9BUk1fVkNQVV9TVVBQT1JURURfQ1BVUyBWQ1BVIGlvY3RsLgo+Pgo+PiAtIFN1cHBvcnQgZm9y
-IFZNIG1pZ3JhdGlvbiB3aXRoIHRoZSBLVk1fQVJNX1ZDUFVfU1BFX0NUUkwoS1ZNX0FSTV9WQ1BV
-X1NQRV9TVE9QKQo+PiDCoMKgIFZDUFUgaW9jdGwuCj4+Cj4+IC0gVGhlIHJlcXVpcmVtZW50IGZv
-ciB1c2Vyc3BhY2UgdG8gbWxvY2soKSB0aGUgZ3Vlc3QgbWVtb3J5IGhhcyBiZWVuIHJlbW92ZWQs
-Cj4+IMKgwqAgYW5kIG5vdyB1c2Vyc3BhY2UgY2FuIG1ha2UgY2hhbmdlcyB0byBtZW1vcnkgY29u
-dGVudHMgYWZ0ZXIgdGhlIG1lbW9yeSBpcwo+PiDCoMKgIG1hcHBlZCBhdCBzdGFnZSAyLgo+Pgo+
-PiAtIEJldHRlciBkZWJ1Z2dpbmcgb2YgZ3Vlc3QgbWVtb3J5IHBpbm5pbmcgYnkgcHJpbnRpbmcg
-YSB3YXJuaW5nIHdoZW4gd2UKPj4gwqDCoCBnZXQgYW4gdW5leHBlY3RlZCByZWFkIG9yIHdyaXRl
-IGZhdWx0LiBUaGlzIGhlbHBlZCBtZSBjYXRjaCBzZXZlcmFsIGJ1Z3MKPj4gwqDCoCBkdXJpbmcg
-ZGV2ZWxvcG1lbnQsIGl0IGhhcyBhbHJlYWR5IHByb3ZlbiB2ZXJ5IHVzZWZ1bC4gTWFueSB0aGFu
-a3MgdG8KPj4gwqDCoCBKYW1lcyB3aG8gc3VnZ2VzdGVkIHdoZW4gcmV2aWV3aW5nIHYzLgo+Pgo+
-Pgo+PiBNaXNzaW5nIGZlYXR1cmVzCj4+ID09PT09PT09PT09PT09PT0KPj4KPj4gSSd2ZSB0cmll
-ZCB0byBrZWVwIHRoZSBzZXJpZXMgYXMgc21hbGwgYXMgcG9zc2libGUgdG8gbWFrZSBpdCBlYXNp
-ZXIgdG8gcmV2aWV3LAo+PiB3aGlsZSBpbXBsZW1lbnRpbmcgdGhlIGNvcmUgZnVuY3Rpb25hbGl0
-eSBuZWVkZWQgZm9yIHRoZSBTUEUgZW11bGF0aW9uLiBBcyBzdWNoLAo+PiBJJ3ZlIGNob3NlbiB0
-byBub3QgaW1wbGVtZW50IHNldmVyYWwgZmVhdHVyZXM6Cj4+Cj4+IC0gSG9zdCBwcm9maWxpbmcg
-YSBndWVzdCB3aGljaCBoYXMgdGhlIFNQRSBmZWF0dXJlIGJpdCBzZXQgKHNlZSBvcGVuCj4+IMKg
-wqAgcXVlc3Rpb25zKS4KPj4KPj4gLSBObyBlcnJhdGEgd29ya2Fyb3VuZHMgaGF2ZSBiZWVuIGlt
-cGxlbWVudGVkIHlldCwgYW5kIHRoZXJlIGFyZSBxdWl0ZSBhIGZldyBvZgo+PiDCoMKgIHRoZW0g
-Zm9yIE5lb3ZlcnNlIE4xIGFuZCBOZW92ZXJzZSBWMS4KPj4KPj4gLSBEaXNhYmxpbmcgQ09ORklH
-X05VTUFfQkFMQU5DSU5HIGlzIGEgaGFjayB0byBnZXQgS1ZNIFNQRSB0byB3b3JrIGFuZCBJIGFt
-Cj4+IMKgwqAgaW52ZXN0aWdhdGluZyBvdGhlciB3YXlzIHRvIGdldCBhcm91bmQgYXV0b21hdGlj
-IG51bWEgYmFsYW5jaW5nLCBsaWtlCj4+IMKgwqAgcmVxdWlyaW5nIHVzZXJzcGFjZSB0byBkaXNh
-YmxlIGl0IHZpYSBzZXRfbWVtcG9saWN5KCkuIEkgYW0gYWxzbyBnb2luZyB0bwo+PiDCoMKgIGxv
-b2sgYXQgaG93IFZGSU8gZ2V0cyBhcm91bmQgaXQuIFN1Z2dlc3Rpb25zIHdlbGNvbWUuCj4+Cj4+
-IC0gVGhlcmUncyBwbGVudHkgb2Ygcm9vbSBmb3Igb3B0aW1pemF0aW9uLiBPZmYgdGhlIHRvcCBv
-ZiBteSBoZWFkLCB1c2luZwo+PiDCoMKgIGJsb2NrIG1hcHBpbmdzIGF0IHN0YWdlIDIsIGJhdGNo
-IHBpbm5pbmcgb2YgcGFnZXMgKHNpbWlsYXIgdG8gd2hhdCBWRklPCj4+IMKgwqAgZG9lcyksIG9w
-dGltaXplIHRoZSB3YXkgS1ZNIGtlZXBzIHRyYWNrIG9mIHBpbm5lZCBwYWdlcyAodXNpbmcgYSBs
-aW5rZWQKPj4gwqDCoCBsaXN0IHRyaXBsZXMgdGhlIG1lbW9yeSB1c2FnZSksIGNvbnRleHQtc3dp
-dGNoIHRoZSBTUEUgcmVnaXN0ZXJzIG9uCj4+IMKgwqAgdmNwdV9sb2FkL3ZjcHVfcHV0IG9uIFZI
-RSBpZiB0aGUgaG9zdCBpcyBub3QgcHJvZmlsaW5nLCBsb2NraW5nCj4+IMKgwqAgb3B0aW1pemF0
-aW9ucywgZXRjLCBldGMuCj4+Cj4+IC0gLi4uYW5kIG90aGVycy4gSSdtIHN1cmUgSSdtIG1pc3Np
-bmcgYXQgbGVhc3QgYSBmZXcgdGhpbmdzIHdoaWNoIGFyZQo+PiDCoMKgIGltcG9ydGFudCBmb3Ig
-c29tZW9uZS4KPj4KPj4KPj4gS25vd24gaXNzdWVzCj4+ID09PT09PT09PT09PQo+Pgo+PiBUaGlz
-IGlzIGFuIFJGQywgc28ga2VlcCBpbiBtaW5kIHRoYXQgYWxtb3N0IGRlZmluaXRlbHkgdGhlcmUg
-d2lsbCBiZSBzY2FyeQo+PiBidWdzLiBGb3IgZXhhbXBsZSwgYmVsb3cgaXMgYSBsaXN0IG9mIGtu
-b3duIGlzc3VlcyB3aGljaCBkb24ndCBhZmZlY3QgdGhlCj4+IGNvcnJlY3RuZXNzIG9mIHRoZSBl
-bXVsYXRpb24sIGFuZCB3aGljaCBJJ20gcGxhbm5pbmcgdG8gZml4IGluIGEgZnV0dXJlCj4+IGl0
-ZXJhdGlvbjoKPj4KPj4gLSBXaXRoIENPTkZJR19QUk9WRV9MT0NLSU5HPXksIGxvY2tkZXAgY29t
-cGxhaW5zIGFib3V0IGxvY2sgY29udGVudGlvbiB3aGVuCj4+IMKgwqAgdGhlIFZDUFUgZXhlY3V0
-ZXMgdGhlIGRjYWNoZSBjbGVhbiBwZW5kaW5nIG9wcy4KPj4KPj4gLSBXaXRoIENPTkZJR19QUk9W
-RV9MT0NLSU5HPXksIEtWTSB3aWxsIGhpdCBhIEJVRyBhdAo+PiDCoMKgIGt2bV9sb2NrX2FsbF92
-Y3B1cygpLT5tdXRleF90cnlsb2NrKCZ2Y3B1LT5tdXRleCkgd2l0aCBtb3JlIHRoYW4gNDgKPj4g
-wqDCoCBWQ1BVcy4KPj4KPj4gVGhpcyBCVUcgc3RhdGVtZW50IGNhbiBhbHNvIGJlIHRyaWdnZXJl
-ZCB3aXRoIG1haW5saW5lLiBUbyByZXByb2R1Y2UgaXQsCj4+IGNvbXBpbGUga3ZtdG9vbCBmcm9t
-IHRoaXMgYnJhbmNoIFs1XSBhbmQgZm9sbG93IHRoZSBpbnN0cnVjdGlvbiBpbiB0aGUKPj4ga3Zt
-dG9vbCBjb21taXQgbWVzc2FnZS4KPj4KPj4gT25lIHdvcmthcm91bmQgY291bGQgYmUgdG8gc3Rv
-cCB0cnlpbmcgdG8gbG9jayBhbGwgVkNQVXMgd2hlbiBsb2NraW5nIGEKPj4gbWVtc2xvdCBhbmQg
-ZG9jdW1lbnQgdGhlIGZhY3QgdGhhdCBpdCBpcyByZXF1aXJlZCB0aGF0IG5vIFZDUFVzIGFyZSBy
-dW4KPj4gYmVmb3JlIHRoZSBpb2N0bCBjb21wbGV0ZXMsIG90aGVyd2lzZSBiYWQgdGhpbmdzIG1p
-Z2h0IGhhcHBlbiB0byB0aGUgVk0uCj4+Cj4+Cj4+IE9wZW4gcXVlc3Rpb25zCj4+ID09PT09PT09
-PT09PT09Cj4+Cj4+IDEuIEltcGxlbWVudGluZyBzdXBwb3J0IGZvciBob3N0IHByb2ZpbGluZyBh
-IGd1ZXN0IHdpdGggdGhlIFNQRSBmZWF0dXJlCj4+IG1lYW5zIHNldHRpbmcgdGhlIHByb2ZpbGlu
-ZyBidWZmZXIgb3duaW5nIHJlZ2ltZSB0byBFTDIuIFdoaWxlIHRoYXQgaXMgaW4KPj4gZWZmZWN0
-LMKgIFBNQklEUl9FTDEuUCB3aWxsIGVxdWFsIDEuIFRoaXMgaGFzIHR3byBjb25zZXF1ZW5jZXM6
-IGlmIHRoZSBndWVzdAo+PiBwcm9iZXMgU1BFIGR1cmluZyB0aGlzIHRpbWUsIHRoZSBkcml2ZXIg
-d2lsbCBmYWlsOyBhbmQgdGhlIGd1ZXN0IHdpbGwgYmUKPj4gYWJsZSB0byBkZXRlcm1pbmUgd2hl
-biBpdCBpcyBwcm9maWxlZC4gSSBzZWUgdHdvIG9wdGlvbnMgaGVyZToKPgo+IFRoaXMgZG9lc24n
-dCBtZWFuIHRoZSBFTDIgaXMgb3duaW5nIHRoZSBTUEUuIEl0IG9ubHkgdGVsbHMgeW91IHRoYXQg
-YQo+IGhpZ2hlciBsZXZlbCBFTCBpcyBvd25pbmcgdGhlIFNQRS4gSXQgY291bGQgYXMgd2VsbCBi
-ZSBFTDMuIChlLmcsIE1EQ1JfRUwzLk5TUEIKPiA9PSAwIG9yIDEpLiBTbyBJIHRoaW5rIHRoaXMg
-aXMgYXJjaGl0ZWN0dXJhbGx5IGNvcnJlY3QsCj4gYXMgbG9uZyBhcyB3ZSB0cmFwIHRoZSBndWVz
-dCBhY2Nlc3MgdG8gb3RoZXIgU1BFIHJlZ2lzdGVycyBhbmQgaW5qZWN0Cj4gYW5kIFVOREVGLgoK
-WW91IGFyZSByaWdodCwgSSB3YXMgd3JvbmcgYWJvdXQgdGhlIHBhcnQgYWJvdXQgdGhlIGd1ZXN0
-IGJlaW5nIGFibGUgdG8gZGV0ZXJtaW5lCndoZW4gaXQgaXMgcHJvZmlsZWQsIEkgZm9yZ290IHRo
-YXQgUE1CSURSX0VMMS5QIGNhbiBhbHNvIGJlIDEgaWYgRUwzIGlzIG93bmluZyB0aGUKYnVmZmVy
-LgoKQnV0IEkgZG9uJ3QgdW5kZXJzdGFuZCB3aHkgeW91IGFyZSBzdWdnZXN0aW5nIHRoYXQgS1ZN
-IGluamVjdHMgVU5ERUYgaW4gdGhpcyBjYXNlLgpJIHdhcyB0aGlua2luZyB0aGF0IHdoZW4gdGhl
-IGhvc3QgaXMgcHJvZmlsaW5nIHRoZSBndWVzdCwgS1ZNIGNhbiBzdG9yZSBndWVzdAp3cml0ZXMg
-dG8gdGhlIFNQRSByZWdpc3RlcnMgdG8gdGhlIHNoYWRvdyBjb3B5IG9mIHRoZSByZWdpc3RlcnMu
-IE9uIGEgd29ybGQgc3dpdGNoCnRvIGd1ZXN0LCBLVk0gd2lsbCBub3QgcmVzdG9yZSB0aGUgcmVn
-aXN0ZXJzIG9udG8gdGhlIGhhcmR3YXJlIGFzIHRvIG5vdCBpbnRlcmZlcmUKd2l0aCB0aGUgcHJv
-ZmlsaW5nIG9wZXJhdGlvbiBwZXJmb3JtZWQgYnkgdGhlIGhvc3QuIFdoZW4gcHJvZmlsaW5nIGVu
-ZHMsIEtWTSBjYW4KdGhlbiBsZXQgdGhlIGd1ZXN0IHVzZSBTUEUgYWdhaW4gYnkgcmVzdG9yaW5n
-IHRoZSBndWVzdCByZWdpc3RlciB2YWx1ZXMgb250byB0aGUKaGFyZHdhcmUgYXQgZXZlcnkgd29y
-bGQgc3dpdGNoIGFuZCBzZXR0aW5nIHRoZSBidWZmZXIgb3duaW5nIHJlZ2ltZSB0byBFTDEgYWdh
-aW4uCgpJIHB1dCB0aGlzIGFzIGFuIG9wZW4gcXVlc3Rpb24gYmVjYXVzZSBpZiB0aGUgZ3Vlc3Qg
-c2VlcyBQTUJJRFJfRUwxLlAgc2V0IHdoZW4gdGhlCmd1ZXN0IFNQRSBkcml2ZXIgcHJvYmVzLCB0
-aGUgZHJpdmVyIHdpbGwgbGlrZWx5IGRlY2lkZSB0aGF0IFNQRSBpcyBub3QgYXZhaWxhYmxlLgpC
-dXQgdGhlIFZNIGhhcyBiZWVuIGNyZWF0ZWQgd2l0aCBTUEUgZW5hYmxlZCBiZWNhdXNlIHRoZSBo
-b3N0IHVzZXJzcGFjZSB3YW50cyB0aGUKZ3Vlc3QgdG8gaGF2ZSBhY2Nlc3MgdG8gU1BFLCBhbmQg
-dGhlIGhvc3QgdXNlcnNwYWNlIG1pZ2h0IG5vdCByZWFsaXplIHRoYXQgdGhlIGFjdApvZiBwcm9m
-aWxpbmcgYSBndWVzdCBjYW4gbWFrZSBTUEUgdW51c2FibGUgYnkgdGhhdCBndWVzdC4gSSBhbSBp
-bmNsaW5lZCBub3cgdG8gbGV0CnRoZSBob3N0J3MgdXNlcnNwYWNlIGRvIHdoYXRldmVyIGl0IHdp
-c2hlcyBhbmQgYWxsb3cgaXQgdG8gcHJvZmlsZSBhIGd1ZXN0IGlmIGl0CnNvIGRlc2lyZXMsIGFu
-ZCBtZW50aW9uIHRoaXMgcG9zc2libGUgc2lkZSBlZmZlY3QgaW4gdGhlIEtWTSBkb2N1bWVudGF0
-aW9uLCBhcyBpdAptaWdodCBiZSBzdXJwcmlzaW5nIGZvciBzb21lb25lIHdobyBpc24ndCBmYW1p
-bGlhciB3aXRoIHRoZSBpbm5lciB3b3JraW5ncyBvZgpLVk0ncyBTUEUgZW11bGF0aW9uLgoKVGhh
-bmtzLAoKQWxleAoKPgo+Cj4gVGhhbmtzCj4gU3V6dWtpCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3Rz
-LmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
-c3RpbmZvL2t2bWFybQo=
+ On Thu, Sep 23, 2021 at 1:32 AM Gavin Shan <gshan@redhat.com> wrote:
+>
+> Hi Rob and Ard,
+>
+> On 9/22/21 9:05 PM, Ard Biesheuvel wrote:
+> > On Tue, 21 Sept 2021 at 21:45, Rob Herring <robh@kernel.org> wrote:
+> >> On Sun, Sep 5, 2021 at 11:16 PM Gavin Shan <gshan@redhat.com> wrote:
+> >>>
+> >>> The empty memory nodes, where no memory resides in, are allowed.
+> >>> For these empty memory nodes, the 'len' of 'reg' property is zero.
+> >>> The NUMA node IDs are still valid and parsed, but memory may be
+> >>> added to them through hotplug afterwards. Currently, QEMU fails
+> >>> to boot when multiple empty memory nodes are specified. It's
+> >>> caused by device-tree population failure and duplicated memory
+> >>> node names.
+> >
+> > Those memory regions are known in advance, right? So wouldn't it be
+> > better to use something like 'status = "disabled"' here?
+> >
+>
+> Yes, these memory regions are known in advance. For the empty nodes,
+> their 'len' property is zero and it's equal to disabled state.
+>
+> >>
+> >> I still don't like the fake addresses. I can't really give suggestions
+> >> on alternative ways to fix this with you just presenting a solution.
+> >>
+> >
+> > Agreed. Please try to explain what the problem is, and why this is the
+> > best way to solve it. Please include other solutions that were
+> > considered and rejected if any exist.
+> >
+> >> What is the failure you see? Can we relax the kernel's expectations?
+> >> What about UEFI boot as the memory nodes aren't used (or maybe they
+> >> are for NUMA?) How does this work with ACPI?
+> >>
+> >
+> > The EFI memory map only needs to describe the memory that was present
+> > at boot. More memory can be represented as ACPI objects, including
+> > coldplugged memory that is already present at boot. None of this
+> > involves the memory nodes in DT.
+> >
+>
+> I'm using the following command line to start a virtual machine (VM).
+> There are 4 NUMA nodes specified, but the last two are empty. In QEMU,
+> the device-tree nodes are populated to represent these 4 NUMA nodes.
+> Unfortunately, QEMU fails to start because of the conflicting names
+> for the empty node are found, as the following error message indicates.
+>
+>     /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64        \
+>     -accel kvm -machine virt,gic-version=host                      \
+>     -cpu host -smp 4,sockets=2,cores=2,threads=1                   \
+>     -m 1024M,slots=16,maxmem=64G                                   \
+>     -object memory-backend-ram,id=mem0,size=512M                   \
+>     -object memory-backend-ram,id=mem1,size=512M                   \
+>     -numa node,nodeid=0,cpus=0-1,memdev=mem0                       \
+>     -numa node,nodeid=1,cpus=2-3,memdev=mem1                       \
+>     -numa node,nodeid=2                                            \
+>     -numa node,nodeid=3                                            \
+>       :
+>     -device virtio-balloon-pci,id=balloon0,free-page-reporting=yes
+>       :
+>       :
+>     qemu-system-aarch64: FDT: Failed to create subnode /memory@80000000: FDT_ERR_EXISTS
+>
+> According to device-tree specification, the memory device-tree node's
+> name is following the format 'memory@base-address'. For the empty
+> NUMA nodes, their base addresses aren't determined. The device-tree
+> specification doesn't indicate what 'base-address' should be assigned
+> for the empty nodes. So I proposed this patch because I think the
+> linux device-tree binding documentation is best place to get this
+> documented.
+
+Why even create the node?
+
+What does IBM pSeries do here. AIUI, those platforms create/remove
+nodes for hotplug. That's the reason CONFIG_OF_DYNAMIC existed
+originally. Unfortunately, that's the extent of my knowledge on that.
+
+> ACPI is different story. The NUMA nodes are represented by SRAT
+> (System Resource Affinity Table). In the above example, there are
+> 4 SRATs. We needn't assign names to the tables and we don't have
+> the conflicting names as we do in device-tree case.
+>
+> By the way, QEMU currently prevents to expose SRATs for empty NUMA
+> nodes. I need submit QEMU patch to break the limitation in future.
+> With the limitation, the hot-added memory is always put into the
+> last NUMA node and it's not exactly customer wants.
+>
+> >>> As device-tree specification indicates, the 'unit-address' of
+> >>> these empty memory nodes, part of their names, are the equivalents
+> >>> to 'base-address'. Unfortunately, I finds difficulty to get where
+> >>> the assignment of 'base-address' is properly documented for these
+> >>> empty memory nodes. So lets add a section for empty memory nodes
+> >>> to cover this in NUMA binding document. The 'unit-address',
+> >>> equivalent to 'base-address' in the 'reg' property of these empty
+> >>> memory nodes is specified to be the summation of highest memory
+> >>> address plus the NUMA node ID.
+> >>>
+> >>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> >>> Acked-by: Randy Dunlap <rdunlap@infradead.org>
+> >>> ---
+> >>>   Documentation/devicetree/bindings/numa.txt | 60 +++++++++++++++++++++-
+> >>>   1 file changed, 59 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/Documentation/devicetree/bindings/numa.txt b/Documentation/devicetree/bindings/numa.txt
+> >>> index 21b35053ca5a..82f047bc8dd6 100644
+> >>> --- a/Documentation/devicetree/bindings/numa.txt
+> >>> +++ b/Documentation/devicetree/bindings/numa.txt
+> >>> @@ -103,7 +103,65 @@ Example:
+> >>>                  };
+> >>>
+> >>>   ==============================================================================
+> >>> -4 - Example dts
+> >>> +4 - Empty memory nodes
+> >>> +==============================================================================
+> >>> +
+> >>> +Empty memory nodes, which no memory resides in, are allowed. The 'length'
+> >>> +field of the 'reg' property is zero. However, the 'base-address' is a
+> >>> +dummy and invalid address, which is the summation of highest memory address
+> >>> +plus the NUMA node ID. The NUMA node IDs and distance maps are still valid
+> >>> +and memory may be added into them through hotplug afterwards.
+> >>> +
+> >>> +Example:
+> >>> +
+> >>> +       memory@0 {
+> >>> +               device_type = "memory";
+> >>> +               reg = <0x0 0x0 0x0 0x80000000>;
+> >>> +               numa-node-id = <0>;
+> >>> +       };
+> >>> +
+> >>> +       memory@80000000 {
+> >>> +               device_type = "memory";
+> >>> +               reg = <0x0 0x80000000 0x0 0x80000000>;
+> >>> +               numa-node-id = <1>;
+> >>> +       };
+> >>> +
+> >>> +       /* Empty memory node */
+> >>> +       memory@100000002 {
+> >>> +               device_type = "memory";
+> >>> +               reg = <0x1 0x2 0x0 0x0>;
+> >>> +               numa-node-id = <2>;
+> >>> +       };
+> >>> +
+> >>> +       /* Empty memory node */
+> >>> +       memory@100000003 {
+> >>> +               device_type = "memory";
+> >>> +               reg = <0x1 0x3 0x0 0x0>;
+> >>> +               numa-node-id = <3>;
+> >>> +       };
+> >>
+> >> Do you really need the memory nodes here or just some way to define
+> >> numa node id's 2 and 3 as valid?
+> >>
+>
+> It's the way to define NUMA node IDs are valid. Besides, the 'reg'
+> property provides 'base-address', which is part of the device-tree
+> node's name, as described in this patch.
+
+The distance-matrix already lists all possible NUMA node IDs. That
+should be enough information for the kernel. If not, fix the kernel.
+
+Rob
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
