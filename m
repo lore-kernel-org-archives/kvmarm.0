@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9C5C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 11:23:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62164C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 11:23:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7107761211
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 11:23:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7107761211
+	by mail.kernel.org (Postfix) with ESMTP id EC0DA611C6
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 11:23:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EC0DA611C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23F114B11A;
-	Thu, 23 Sep 2021 07:23:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0C7D4B0B4;
+	Thu, 23 Sep 2021 07:23:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ko2aemp6Qj58; Thu, 23 Sep 2021 07:23:11 -0400 (EDT)
+	with ESMTP id WG7tuCCuZI7v; Thu, 23 Sep 2021 07:23:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3E7B4B12F;
-	Thu, 23 Sep 2021 07:23:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E54B4B101;
+	Thu, 23 Sep 2021 07:23:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C353A4A19A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 07:23:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CBBD4B132
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 07:23:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KjzMqluAA5G0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Sep 2021 07:23:08 -0400 (EDT)
+ with ESMTP id rYCKzA5Evegk for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Sep 2021 07:23:10 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D22EE4B130
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 07:23:08 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A39B560EC0;
- Thu, 23 Sep 2021 11:23:06 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9AA064B102
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 07:23:10 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 75BEF6121F;
+ Thu, 23 Sep 2021 11:23:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1632396188;
- bh=zTSEoixQnsN3jbLczk6zfspLIXgI2IJ8ZyDChfPcm6s=;
+ s=k20201202; t=1632396189;
+ bh=9XTol94Ae+OoVJE6oULI43J/aM3k1N+7z3owBAICrso=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=fFSg2eCfq7DlcK2X8lz+o8qpNPlQZb3vzjvDAK+6e4fjl+ZAgtnud90Mb5L+VKdU2
- ffXHb/OEgiKumuztfDLE8gILHTcBs/Dq1pLEF2JB8ARcrg3pH80oyIbHDCzv42lfIB
- DZ+7C7MGSrgy6BGo8wrhXY+fvBfy7USZgHc6rDSVzxIb3cAk5k0RZJDBTUmw3WzJpy
- VxKVMMz38G/WBcy+6GBmcK0asTZoojzV90e92cWk9q2iqQzBG/kqtSEBzqYEKbEAuu
- wSX7TXUtDrRVLRhCesU3nGN+XEJ2i64KpmUyxp403TqmGFtv7NF+ITAdesmWU6tBN9
- TcvWAT1j/2n6Q==
+ b=RXMy8DYZ5qgn6LaLVqLH062rIFiZAAAwxgsAQJg2dkYGFmW+c9v1zKYJNJEL8Ncl6
+ /O7Pls6/YD7T2VtlghGoupJg3Vx6DXNs0TTtJ4cYKdvL7SCYHnDliF7m8sDXKIyIKz
+ cfrqah6slI/Ob10r5teEu3UdmaEf97SwgYO0U0+r9qn0OsC/Xe4zZZL45/l2/toZim
+ mbNN+6Tm3zVI6qPrdZUmtUysR76X9+j1RrZXRZ73BdjjJSEv64raFc8syVCHiytAwW
+ hxjA0/AzL29OtgeAXGFmg5yNThvwhDSxpdlmangTe8fuVsf5zcFu5OxTGh6H7sfryn
+ zc82FT5+misCQ==
 From: Will Deacon <will@kernel.org>
 To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 3/5] KVM: arm64: Propagate errors from __pkvm_prot_finalize
- hypercall
-Date: Thu, 23 Sep 2021 12:22:54 +0100
-Message-Id: <20210923112256.15767-4-will@kernel.org>
+Subject: [PATCH 4/5] KVM: arm64: Prevent re-finalisation of pKVM for a given
+ CPU
+Date: Thu, 23 Sep 2021 12:22:55 +0100
+Message-Id: <20210923112256.15767-5-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210923112256.15767-1-will@kernel.org>
 References: <20210923112256.15767-1-will@kernel.org>
@@ -78,69 +78,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-If the __pkvm_prot_finalize hypercall returns an error, we WARN but fail
-to propagate the failure code back to kvm_arch_init().
+__pkvm_prot_finalize() completes the deprivilege of the host when pKVM
+is in use by installing a stage-2 translation table for the calling CPU.
 
-Pass a pointer to a zero-initialised return variable so that failure
-to finalise the pKVM protections on a host CPU can be reported back to
-KVM.
+Issuing the hypercall multiple times for a given CPU makes little sense,
+but in such a case just return early with -EPERM rather than go through
+the whole page-table dance again.
 
 Cc: Marc Zyngier <maz@kernel.org>
 Cc: Quentin Perret <qperret@google.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/arm.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9506cf88fa0e..13bbf35896cd 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1986,9 +1986,25 @@ static int init_hyp_mode(void)
- 	return err;
- }
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index bacd493a4eac..cafe17e5fa8f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -123,6 +123,9 @@ int __pkvm_prot_finalize(void)
+ 	struct kvm_s2_mmu *mmu = &host_kvm.arch.mmu;
+ 	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
  
--static void _kvm_host_prot_finalize(void *discard)
-+static void _kvm_host_prot_finalize(void *arg)
- {
--	WARN_ON(kvm_call_hyp_nvhe(__pkvm_prot_finalize));
-+	int *err = arg;
++	if (params->hcr_el2 & HCR_VM)
++		return -EPERM;
 +
-+	if (WARN_ON(kvm_call_hyp_nvhe(__pkvm_prot_finalize)))
-+		WRITE_ONCE(*err, -EINVAL);
-+}
-+
-+static int pkvm_drop_host_privileges(void)
-+{
-+	int ret = 0;
-+
-+	/*
-+	 * Flip the static key upfront as that may no longer be possible
-+	 * once the host stage 2 is installed.
-+	 */
-+	static_branch_enable(&kvm_protected_mode_initialized);
-+	on_each_cpu(_kvm_host_prot_finalize, &ret, 1);
-+	return ret;
- }
- 
- static int finalize_hyp_mode(void)
-@@ -2002,15 +2018,7 @@ static int finalize_hyp_mode(void)
- 	 * None of other sections should ever be introspected.
- 	 */
- 	kmemleak_free_part(__hyp_bss_start, __hyp_bss_end - __hyp_bss_start);
--
--	/*
--	 * Flip the static key upfront as that may no longer be possible
--	 * once the host stage 2 is installed.
--	 */
--	static_branch_enable(&kvm_protected_mode_initialized);
--	on_each_cpu(_kvm_host_prot_finalize, NULL, 1);
--
--	return 0;
-+	return pkvm_drop_host_privileges();
- }
- 
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
+ 	params->vttbr = kvm_get_vttbr(mmu);
+ 	params->vtcr = host_kvm.arch.vtcr;
+ 	params->hcr_el2 |= HCR_VM;
 -- 
 2.33.0.464.g1972c5931b-goog
 
