@@ -2,72 +2,68 @@ Return-Path: <SRS0=m3m7=ON=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8448C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 12:56:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB44FC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 12:58:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1988C6103D
-	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 12:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1988C6103D
+	by mail.kernel.org (Postfix) with ESMTP id 549C26103D
+	for <kvmarm@archiver.kernel.org>; Thu, 23 Sep 2021 12:58:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 549C26103D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 914BF4B165;
-	Thu, 23 Sep 2021 08:56:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5A8D4B166;
+	Thu, 23 Sep 2021 08:58:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g-wp4bkSqd-w; Thu, 23 Sep 2021 08:56:28 -0400 (EDT)
+	with ESMTP id 26XjnMVIhEmc; Thu, 23 Sep 2021 08:58:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 364614B149;
-	Thu, 23 Sep 2021 08:56:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B6114B156;
+	Thu, 23 Sep 2021 08:58:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAA644B14D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 08:56:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A57BA4B0F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 08:58:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BXnLp23w4l58 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Sep 2021 08:56:25 -0400 (EDT)
+ with ESMTP id j+0BK+b7kU5t for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Sep 2021 08:58:40 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4FF444B149
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 08:56:25 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 483AE60F39;
- Thu, 23 Sep 2021 12:56:24 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mTOH0-00CXDM-CP; Thu, 23 Sep 2021 13:56:22 +0100
-Date: Thu, 23 Sep 2021 13:56:21 +0100
-Message-ID: <87zgs3tpqi.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 65BBE4B0F1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 08:58:40 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 10DB660F43;
+ Thu, 23 Sep 2021 12:58:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1632401919;
+ bh=BEIXGCH5BckmtiISCaPM5m33QFlER0ukVLbDKFBYkrs=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=qG6P7kDfsh6uKtn48XozMnjmUKYMUP0z70teirWUd+FFJ+nMk2J+zG4lIbZX6C4Ba
+ y6fhGdafrhTfJAq0Y2+Xz214DepC2NiZR83fTbe9dvdPcnsTi33+r3fn6D44GBOYAM
+ nJVN+pQLpwW8crA0Zgu3hvKgirv1sGPqJKSwd4sf1ntEkE/diKNzcw5CB5JmLQM6jx
+ OSF2WZ2u6c/OiDrIWXRCBIS0xSvUfZ3xeEY/ZYf0bhs0RryWTjNWlps1DVEEuM/GkL
+ 0Hxn5LjRPWkYBxpKja9b3G8ZcTIYfLUcXX+OQL2AtboGH1R2LJxKS5s0Crx20vTQEq
+ epe2Cxz5jcymw==
+Date: Thu, 23 Sep 2021 13:58:34 +0100
+From: Will Deacon <will@kernel.org>
+To: linux-arm-kernel@lists.infradead.org
 Subject: Re: [PATCH 5/5] KVM: arm64: Disable privileged hypercalls after pKVM
  finalisation
-In-Reply-To: <20210923112256.15767-6-will@kernel.org>
+Message-ID: <20210923125834.GA15934@willie-the-truck>
 References: <20210923112256.15767-1-will@kernel.org>
  <20210923112256.15767-6-will@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org,
- qperret@google.com, catalin.marinas@arm.com, alexandru.elisei@arm.com,
- suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20210923112256.15767-6-will@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,9 +80,7 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 23 Sep 2021 12:22:56 +0100,
-Will Deacon <will@kernel.org> wrote:
-> 
+On Thu, Sep 23, 2021 at 12:22:56PM +0100, Will Deacon wrote:
 > After pKVM has been 'finalised' using the __pkvm_prot_finalize hypercall,
 > the calling CPU will have a Stage-2 translation enabled to prevent access
 > to memory pages owned by EL2.
@@ -106,62 +100,9 @@ Will Deacon <will@kernel.org> wrote:
 >  arch/arm64/include/asm/kvm_asm.h   | 43 ++++++++++++++++--------------
 >  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 26 +++++++++++-------
 >  2 files changed, 39 insertions(+), 30 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index e86045ac43ba..68630fd382c5 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -43,27 +43,30 @@
->  
->  #define KVM_HOST_SMCCC_FUNC(name) KVM_HOST_SMCCC_ID(__KVM_HOST_SMCCC_FUNC_##name)
->  
-> +/* Hypercalls available only prior to pKVM finalisation */
->  #define __KVM_HOST_SMCCC_FUNC___kvm_hyp_init			0
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			1
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		2
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		3
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		4
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		5
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		6
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
-> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config		8
-> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		9
-> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		10
-> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		11
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		12
-> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		13
-> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		14
-> -#define __KVM_HOST_SMCCC_FUNC___pkvm_init			15
-> -#define __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp		16
-> -#define __KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping	17
-> -#define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
-> -#define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
-> -#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			20
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		1
-> +#define __KVM_HOST_SMCCC_FUNC___pkvm_init			2
-> +#define __KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping	3
-> +#define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		4
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			5
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		6
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config		7
-> +#define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		8
-> +
-> +/* Hypercalls available after pKVM finalisation */
-> +#define __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp		9
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			10
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			11
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		12
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		13
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		14
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		15
-> +#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		16
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		17
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		18
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		19
-> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		20
->  
->  #ifndef __ASSEMBLY__
->  
+
+[...]
+
 > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 > index 2da6aa8da868..4120e34288e1 100644
 > --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
@@ -201,32 +142,12 @@ Will Deacon <will@kernel.org> wrote:
 > -	HANDLE_FUNC(__pkvm_host_share_hyp),
 > -	HANDLE_FUNC(__pkvm_create_private_mapping),
 > -	HANDLE_FUNC(__pkvm_prot_finalize),
->  };
->  
->  static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
->  {
->  	DECLARE_REG(unsigned long, id, host_ctxt, 0);
-> +	unsigned long hcall_min = 0;
->  	hcall_t hfn;
->  
-> +	if (static_branch_unlikely(&kvm_protected_mode_initialized))
-> +		hcall_min = __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize;
-> +
->  	id -= KVM_HOST_SMCCC_ID(0);
->  
-> -	if (unlikely(id >= ARRAY_SIZE(host_hcall)))
-> +	if (unlikely(id < hcall_min || id >= ARRAY_SIZE(host_hcall)))
 
-So I can still issue a pkvm_prot_finalize after finalisation? Seems
-odd. As hcall_min has to be inclusive, you probably want it to be set
-to __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp once protected.
+Not that it makes any functional difference, but I was trying to keep this
+in numerical order and evidently didn't manage it after renumbering
+__vgic_v3_get_gic_config. Will fix for v2.
 
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
