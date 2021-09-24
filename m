@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7607C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 12:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93211C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 12:55:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9130E61465
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 12:54:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9130E61465
+	by mail.kernel.org (Postfix) with ESMTP id 44841614C8
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 12:55:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 44841614C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 452634B190;
-	Fri, 24 Sep 2021 08:54:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDCDE4B20F;
+	Fri, 24 Sep 2021 08:55:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iLjK0i+zouuo; Fri, 24 Sep 2021 08:54:54 -0400 (EDT)
+	with ESMTP id fxgNFjHm12YI; Fri, 24 Sep 2021 08:54:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF6344B1FC;
-	Fri, 24 Sep 2021 08:54:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 067F94B211;
+	Fri, 24 Sep 2021 08:54:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D68C4B186
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 08:54:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 203F04B156
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 08:54:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YoNBwRZzybEO for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Sep 2021 08:54:50 -0400 (EDT)
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
- [209.85.222.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3AB874B1B5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 08:54:50 -0400 (EDT)
-Received: by mail-qk1-f201.google.com with SMTP id
- j19-20020a05620a411300b0045dc3262e59so6655320qko.22
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 05:54:50 -0700 (PDT)
+ with ESMTP id FSVHeQzuy7Gi for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Sep 2021 08:54:54 -0400 (EDT)
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
+ [209.85.219.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50A134B186
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 08:54:54 -0400 (EDT)
+Received: by mail-qv1-f74.google.com with SMTP id
+ z8-20020a056214040800b00380dea65c01so31191177qvx.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 05:54:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=ah9gXDd6fJvOzz9kx2O2leuWRmK2UF+FaL+3WFxvTJ8=;
- b=VWQcPIt1vlcNarP43ow3DnD94RzA9qM31BLx/7ufU7rLlWKPLscbJUa1hwytIvKECH
- KyGv1/cyYZsNUp9XXYgMuaT4w7wRqyZE7Xvr9gKadfTjAGm2B3nnm29Lrhl4Hc93kE0D
- +ntHaq8stYGqAO/6okY/E+mBNRenkNvqh244JfNr3K1Rc2gURhFJjsUO3h5RHXIHv1b4
- 8rkalsaPpIIU8Yd5QdW9R93ZSOemAGnVlhMTDGw+ZPnykoTrW8jBQ4FokcJo3BvXf2xL
- hJEk/ZFdtu2bW35QN2sNABKsx62NpxxXmJsrGk8eO6dl3UOR2lzX34pgJUTeLH59Smjp
- Lr4Q==
+ :cc; bh=h7avwCelVLDXrW65ivowhx5L97uC6oG1q5eldj7v03E=;
+ b=HSj7gZGfE1Et2vmg3ht8IP44LkLd1mywKH9lU+M+SaqxPAhQomtoiMQDSdpuE1jlH0
+ VjMgAJVQhNWJ6IR0dBYuKqen9a8e6ZwcErT6sKmrbHkSet6C+kMNx2fpZCShgK7tJ8i5
+ Tfkk+GKBNixa2P/T7o4dn5RBzfOEocv2ZLWrqxfAOv+pXLMVKoRwTppWAkyyYZsYu5JF
+ HdwISigqSEVHD9UFMlP8vbCfGs7HYpwttcpvRskdAZxLkbT4Mu8udkC7KtNx1ZUP139m
+ RIxeaVjv2wRJ0JACk4h1lm/7OGP26Nfp3hla/AqHq6Sdwt8v4aXZ36GDhNxuFubJoe7E
+ mwCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=ah9gXDd6fJvOzz9kx2O2leuWRmK2UF+FaL+3WFxvTJ8=;
- b=tkVOwbw+93mquTdS2OpnKjc563ntYyp7tCQLBnzT7rF/DZkm2BMMw9XrxOdhvYfD21
- yyLQO6wcIScEAucJ0LYFz1R9ZfZyW214wuJDBHxX9n+86jUvkdKUC9pxmwirIuC0nrli
- T/odJ3I5Hfe8rKRCAAExJxJ40rMFINK7soGoMvoGKqpKPga3ktYU8SoKuAd0YGWSmaVn
- 0MAN6otJnbHiNoEJ6Y9G8GwhCP9jitQ6pv7m2bvtcdya/XKGzRmaB7fVNAy7WS74CyTY
- 49mOoxDr6AU5cdgo0KtOgj9SjLbrLgOowlO+M5uC6bxsggM7fsXqgtDmhhLEzRwbjeYH
- BAZA==
-X-Gm-Message-State: AOAM533KKhCNUuWtufv7PNfWMef5e74wWuKbJ+nXYWqDlPDaiskQ6vYz
- QXmBD0zDvOysQsIkrYImdcTmSAgclswsK7a3M1GHNnM7PSVmuFP2xJbG/ZkefG3aR/xZ37IPOlm
- q9QkweBUSD1vTF93eu/EEye+FYGQhtgAGM2ENVKUgRIyVHiMzQZ8MxldoK+kDKfmrl4U=
-X-Google-Smtp-Source: ABdhPJx0MGh1esHygyGmugyNFtFbLjJ17xcPDf/Zl3jsEQ9VM2CtXd7GdNQW4w6TBVnK0kcjEDJ2MCAADA==
+ bh=h7avwCelVLDXrW65ivowhx5L97uC6oG1q5eldj7v03E=;
+ b=R9FUQpt61DkQweBbzZQdQ9FvgJvrHarQjgXws9vJoy0XBByJ+MIjcK8H1y3uuMyKHU
+ +anuVIDP7ZnLuT5Xy6oWAloVV/vnTzMA01dDNARN8f8Z/4LBHisE3gR928qLPuYbWLWO
+ 2S3wpP7jTL/YSOwvvuYZF3ftqDhjeBH7K0HGBCuyRWiModm5PyPThPXHRvDmMzl1YW9J
+ EiufYX3or8MpI8CgxMHfRUDBKbZO84VTb+cdt+w6v9mf8ERIe4I8DCCCJDhMiqNTIXNh
+ CFTZ09R0Eph0ONe7CnqnJi+PqvbO8tf4tLqzmS/Uj0W2GuaT4PJU0kwEp7HdonAPtXoD
+ MgTw==
+X-Gm-Message-State: AOAM532m8EPwX+ds5qWBXIvy63cC24JH93/G2fwdPKJUIRt7vRN3x3aV
+ T39jka4TvH7mucNiJjDRinLUUCGkJ9yIop2cMSKq3Yj0puuZcNaQs2rC/lKzVznvlshNC/ySUh6
+ +tr9K8OlmAC5h1EfBSJ5HuINVtHTR94F0AbiTOOWWKwDDPgiRUTbkZOBdOlWAMvqZFAo=
+X-Google-Smtp-Source: ABdhPJyL0t+coFpdVZMGEPsDbytWRe779HP4gPBcO06ejSv04CQaDTyhghz78sdKCUcnBSSiAMc7iJUGkA==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a0c:914f:: with SMTP id
- q73mr9847672qvq.39.1632488089835; 
- Fri, 24 Sep 2021 05:54:49 -0700 (PDT)
-Date: Fri, 24 Sep 2021 13:53:52 +0100
+ (user=tabba job=sendgmr) by 2002:a0c:d989:: with SMTP id
+ y9mr9535459qvj.67.1632488093954; 
+ Fri, 24 Sep 2021 05:54:53 -0700 (PDT)
+Date: Fri, 24 Sep 2021 13:53:54 +0100
 In-Reply-To: <20210924125359.2587041-1-tabba@google.com>
-Message-Id: <20210924125359.2587041-24-tabba@google.com>
+Message-Id: <20210924125359.2587041-26-tabba@google.com>
 Mime-Version: 1.0
 References: <20210924125359.2587041-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [RFC PATCH v1 23/30] KVM: arm64: COCCI: remove_unused.cocci: remove
- unused ctxt and hypstate variables
+Subject: [RFC PATCH v1 25/30] KVM: arm64: separate kvm_run() for protected VMs
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -98,191 +97,163 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-These local variables were added aggressively. Remove the ones
-that ended up not being used. Also, some of the added variables
-are missing a new line after their definition. Insert that for
-the remaining ones.
+Split kvm_run() for protected and non-protected VMs. Protected
+VMs support fewer features, separating it out will ease the
+refactoring and simplify the code.
 
-This applies the semantic patch with the following command:
-spatch --sp-file cocci_refactor/remove_unused.cocci --dir arch/arm64/kvm/hyp --in-place --include-headers --force-diff
+This patch starts only by replicated the code from the
+non-protected case, to make it easier to diff against future
+patches.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/exception.c             | 5 -----
- arch/arm64/kvm/hyp/include/hyp/switch.h    | 9 ++++-----
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 2 ++
- arch/arm64/kvm/hyp/nvhe/switch.c           | 1 -
- arch/arm64/kvm/hyp/vhe/switch.c            | 3 ---
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 3 ---
- 6 files changed, 6 insertions(+), 17 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 119 ++++++++++++++++++++++++++++++-
+ 1 file changed, 116 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-index a08806efe031..bb0bc1f5568c 100644
---- a/arch/arm64/kvm/hyp/exception.c
-+++ b/arch/arm64/kvm/hyp/exception.c
-@@ -59,31 +59,26 @@ static void __ctxt_write_spsr_und(struct kvm_cpu_context *vcpu_ctxt, u64 val)
- 
- static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- {
--	const struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	return __ctxt_read_sys_reg(&vcpu_ctxt(vcpu), reg);
- }
- 
- static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	__ctxt_write_sys_reg(&vcpu_ctxt(vcpu), val, reg);
- }
- 
- static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	__ctxt_write_spsr(&vcpu_ctxt(vcpu), val);
- }
- 
- static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	__ctxt_write_spsr_abt(&vcpu_ctxt(vcpu), val);
- }
- 
- static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	__ctxt_write_spsr_und(&vcpu_ctxt(vcpu), val);
- }
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 44e76993a9b4..433601f79b94 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -37,6 +37,7 @@ extern struct exception_table_entry __stop___kvm_ex_table;
- static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
-+
- 	/*
- 	 * When the system doesn't support FP/SIMD, we cannot rely on
- 	 * the _TIF_FOREIGN_FPSTATE flag. However, we always inject an
-@@ -55,8 +56,8 @@ static inline bool update_fp_enabled(struct kvm_vcpu *vcpu)
- /* Save the 32-bit only FPSIMD system register state */
- static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
-+
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
-@@ -65,8 +66,6 @@ static inline void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu)
- 
- static inline void __activate_traps_fpsimd32(struct kvm_vcpu *vcpu)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	/*
- 	 * We are about to set CPTR_EL2.TFP to trap all floating point
- 	 * register accesses to EL2, however, the ARM ARM clearly states that
-@@ -220,8 +219,8 @@ static inline void __hyp_sve_save_host(struct kvm_vcpu *vcpu)
- 
- static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
-+
- 	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
- 	__sve_restore_state(vcpu_sve_pffr(vcpu),
- 			    &ctxt_fp_regs(vcpu_ctxt)->fpsr);
-@@ -395,7 +394,6 @@ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	struct kvm_cpu_context *ctxt;
- 	u64 val;
- 
-@@ -428,6 +426,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, struct vgic_dist *vgi
- {
- 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
-+
- 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
- 		hyp_state_fault(vcpu_hyps).esr_el2 = read_sysreg_el2(SYS_ESR);
- 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index df9cd2177e71..b750ff40a604 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -160,6 +160,7 @@ static inline void __sysreg32_save_state(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
-+
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
-@@ -179,6 +180,7 @@ static inline void __sysreg32_restore_state(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
- 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
-+
- 	if (!vcpu_el1_is_32bit(vcpu))
- 		return;
- 
 diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index d9a69e66158c..b90ec8db5864 100644
+index b90ec8db5864..9e79f97ba49e 100644
 --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -37,7 +37,6 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- static void __activate_traps(struct kvm_vcpu *vcpu)
+@@ -119,7 +119,7 @@ static void __hyp_vgic_save_state(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-/* Restore VGICv3 state on non_VEH systems */
++/* Restore VGICv3 state on nVHE systems */
+ static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
+ {
+ 	if (static_branch_unlikely(&kvm_vgic_global_state.gicv3_cpuif)) {
+@@ -166,8 +166,110 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
+ 
+-/* Switch to the guest for legacy non-VHE systems */
+-int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++/* Switch to the non-protected guest */
++static int __kvm_vcpu_run_nvhe(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_hyp_state *vcpu_hyps = &vcpu->arch.hyp_state;
++	struct kvm_cpu_context *vcpu_ctxt = &vcpu->arch.ctxt;
++	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
++	struct vgic_dist *vgic = &kvm->arch.vgic;
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_cpu_context *guest_ctxt;
++	bool pmu_switch_needed;
++	u64 exit_code;
++
++	/*
++	 * Having IRQs masked via PMR when entering the guest means the GIC
++	 * will not signal the CPU of interrupts of lower priority, and the
++	 * only way to get out will be via guest exceptions.
++	 * Naturally, we want to avoid this.
++	 */
++	if (system_uses_irq_prio_masking()) {
++		gic_write_pmr(GIC_PRIO_IRQON | GIC_PRIO_PSR_I_SET);
++		pmr_sync();
++	}
++
++	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
++	set_hyp_running_vcpu(host_ctxt, vcpu);
++	guest_ctxt = &vcpu->arch.ctxt;
++
++	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
++
++	__sysreg_save_state_nvhe(host_ctxt);
++	/*
++	 * We must flush and disable the SPE buffer for nVHE, as
++	 * the translation regime(EL1&0) is going to be loaded with
++	 * that of the guest. And we must do this before we change the
++	 * translation regime to EL2 (via MDCR_EL2_E2PB == 0) and
++	 * before we load guest Stage1.
++	 */
++	__debug_save_host_buffers_nvhe(vcpu);
++
++	kvm_adjust_pc(vcpu_ctxt, vcpu_hyps);
++
++	/*
++	 * We must restore the 32-bit state before the sysregs, thanks
++	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
++	 *
++	 * Also, and in order to be able to deal with erratum #1319537 (A57)
++	 * and #1319367 (A72), we must ensure that all VM-related sysreg are
++	 * restored before we enable S2 translation.
++	 */
++	__sysreg32_restore_state(vcpu);
++	__sysreg_restore_state_nvhe(guest_ctxt);
++
++	__load_guest_stage2(kern_hyp_va(vcpu->arch.hw_mmu));
++	__activate_traps(vcpu);
++
++	__hyp_vgic_restore_state(vcpu);
++	__timer_enable_traps();
++
++	__debug_switch_to_guest(vcpu);
++
++	do {
++		struct kvm_cpu_context *hyp_ctxt = this_cpu_ptr(&kvm_hyp_ctxt);
++		set_hyp_running_vcpu(hyp_ctxt, vcpu);
++
++		/* Jump in the fire! */
++		exit_code = __guest_enter(guest_ctxt);
++
++		/* And we're baaack! */
++	} while (fixup_guest_exit(vcpu, vgic, &exit_code));
++
++	__sysreg_save_state_nvhe(guest_ctxt);
++	__sysreg32_save_state(vcpu);
++	__timer_disable_traps();
++	__hyp_vgic_save_state(vcpu);
++
++	__deactivate_traps(vcpu_hyps);
++	__load_host_stage2();
++
++	__sysreg_restore_state_nvhe(host_ctxt);
++
++	if (hyp_state_flags(vcpu_hyps) & KVM_ARM64_FP_ENABLED)
++		__fpsimd_save_fpexc32(vcpu);
++
++	__debug_switch_to_host(vcpu);
++	/*
++	 * This must come after restoring the host sysregs, since a non-VHE
++	 * system may enable SPE here and make use of the TTBRs.
++	 */
++	__debug_restore_host_buffers_nvhe(vcpu);
++
++	if (pmu_switch_needed)
++		__pmu_switch_to_host(host_ctxt);
++
++	/* Returning to host will clear PSR.I, remask PMR if needed */
++	if (system_uses_irq_prio_masking())
++		gic_write_pmr(GIC_PRIO_IRQOFF);
++
++	set_hyp_running_vcpu(host_ctxt, NULL);
++
++	return exit_code;
++}
++
++/* Switch to the protected guest */
++static int __kvm_vcpu_run_pvm(struct kvm_vcpu *vcpu)
  {
  	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	u64 val;
+ 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
+@@ -268,6 +370,17 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 	return exit_code;
+ }
  
- 	___activate_traps(vcpu_hyps);
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 5039910a7c80..7f926016cebe 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -34,7 +34,6 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- static void __activate_traps(struct kvm_vcpu *vcpu)
++/* Switch to the guest for non-VHE and protected KVM systems */
++int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
++{
++	vcpu = kern_hyp_va(vcpu);
++
++	if (likely(!kvm_vm_is_protected(kern_hyp_va(vcpu->kvm))))
++		return __kvm_vcpu_run_nvhe(vcpu);
++	else
++		return __kvm_vcpu_run_pvm(vcpu);
++}
++
+ void __noreturn hyp_panic(void)
  {
- 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	u64 val;
- 
- 	___activate_traps(vcpu_hyps);
-@@ -168,8 +167,6 @@ NOKPROBE_SYMBOL(__kvm_vcpu_run_vhe);
- 
- int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	int ret;
- 
- 	local_daif_mask();
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index 1571c144e9b0..1ded8be83c5a 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -64,7 +64,6 @@ NOKPROBE_SYMBOL(sysreg_restore_guest_state_vhe);
- void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
- 
-@@ -99,8 +98,6 @@ void kvm_vcpu_load_sysregs_vhe(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_put_sysregs_vhe(struct kvm_vcpu *vcpu)
- {
--	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
--	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
- 	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
- 	struct kvm_cpu_context *host_ctxt;
- 
+ 	u64 spsr = read_sysreg_el2(SYS_SPSR);
 -- 
 2.33.0.685.g46640cef36-goog
 
