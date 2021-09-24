@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B63C43217
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 12:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B01C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 12:54:47 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ACB6F61555
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 12:54:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org ACB6F61555
+	by mail.kernel.org (Postfix) with ESMTP id 5AE666141B
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 12:54:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5AE666141B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 632354B1FD;
-	Fri, 24 Sep 2021 08:54:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FB0C40191;
+	Fri, 24 Sep 2021 08:54:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TT7LrQn9GZJz; Fri, 24 Sep 2021 08:54:44 -0400 (EDT)
+	with ESMTP id 0qQ2iwK612Ri; Fri, 24 Sep 2021 08:54:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B9544B1B5;
-	Fri, 24 Sep 2021 08:54:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 226ED4B1B3;
+	Fri, 24 Sep 2021 08:54:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A4534A7FD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 08:54:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 604174B1C7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 08:54:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G0GVKNXwtU0E for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Sep 2021 08:54:41 -0400 (EDT)
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com
- [209.85.219.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B9FB40191
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 08:54:40 -0400 (EDT)
-Received: by mail-qv1-f74.google.com with SMTP id
- r18-20020a056214069200b0037a291a6081so30130477qvz.18
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 05:54:40 -0700 (PDT)
+ with ESMTP id n+934R6iAePq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Sep 2021 08:54:42 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 554E54B0DE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 08:54:32 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id
+ m1-20020a056000180100b0015e1ec30ac3so7987784wrh.8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 05:54:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=i7uodwfDnDtJuiTS9rXdXYViFWYsjMsbxF8IoeW8/W4=;
- b=qF3Vw4AceYdu1L0PZ66LcU5WQ4Q0vt8paDyr76neaIiU7PKYTbrZLZonVtIrIyRczb
- DU5SbrytlGhkBB1E+t5EqBtBbVrDhV4CyzU/EB8ANPxuMebR0qF/QjT8hLecRLcdlZgw
- A3lfSu8T99yQYr4bozntQ9WdVOsOPmEACfCRd0tfsFq6yXyqa5QjOxnbUZyAZx0Kx8ue
- PsVAFTS6kdE4EA4R/FbZWcnFQc+koZXhZ9EpQ3BLPMpc8IFYdDeyrGBI8gHWC3W4GLB6
- P23Dlf8ES+p3OPOy3TiDL1x4KbFHLYAOvn+XGfAEiu3h6LwChGcFLWCRFl12kwRSLS+3
- ctBg==
+ :cc; bh=iSSWi58NWKOpw0/j/jthgGrijZ2kgwmPgBIUtV8ETrY=;
+ b=YPs8fe54kX7jNCksdMFXe0yl0eg5/mV5V/gzTwhmbgLTmlcb/RfkH5tjD8pG9ykQI7
+ 4qHQSge5XK5NRfCYmF9+FR9qVClA0ZxZvGXQrNRTSlpydveHokALYA9t+7sl2sEi4i8K
+ i6IG06/j1uJFNz94nZsXZIM/NqOhAWYJOW+oBT2D1jNBt/D8sjKIUvaXhfzaK63UDkM6
+ RHekE5GpHYY+vDcJTV32Z70zHzoHPzx/JQD2Px5+LnYr13K0/uaGdyhvCqnCDZs+Ako+
+ LpJP8KUeCbQodUcsenuY6SKU5OuodaMJefDk6yOTBf0RcF38yZgBqYjk0BGysIbgDT26
+ pEug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=i7uodwfDnDtJuiTS9rXdXYViFWYsjMsbxF8IoeW8/W4=;
- b=oYAhvZopPvUj6DSH8EgKIas+r3JVWT58cjfIn3z7TCxaQdYTqjF+T5+Fxv4MH2VXor
- O1dJ55O4SbEXqBVtL62absVmQJKH3KPovhHDLeZXegUKJ4WuXhumb0h2zJM/NrDkn3wv
- dhZ983Ef7mpyP4hoZx2G+rQNs47VGiEBKMmtPiCV85l8oaw8rMYiU2R2PWiWSbuO/y3k
- c42NMY2/wPDpoIY82yXm4aDz4TH1+NRNlZNcVHjfbQNQqgOVI2iw8JNJ2GogVxc3Ll/O
- kLZHgjPLI4p35ZF4GF3hYiOKBWvGQbW71Pof/tUUwjvstXF5xOqCpCqvPRKqD3MOH2D4
- 7K4Q==
-X-Gm-Message-State: AOAM530ehTiWO7iAJ7nnf4IcBusi8XBVZSFHLb4ohD6J+SG7jn/ZsPX+
- vqrWZdUTU+bzhGIkmOqv0KOo2opAVhMcTK5V+UBd8EmUAET3HzAy2GQVEzcQcD5hSFIPw5IFoCh
- Q4p0SVBfQzb8k5Zt+YO6WkZ9MliiuZwsAiGQd85JcIGcnINadg/qeyz7tzljB0+PMcig=
-X-Google-Smtp-Source: ABdhPJyK06uYrGrDSvLnw7I0yxv76y3TWXx+xyK98z+cTJ0e/eyHwuj1vePAtlEsCveTt5zBbE9Rk8ddCA==
+ bh=iSSWi58NWKOpw0/j/jthgGrijZ2kgwmPgBIUtV8ETrY=;
+ b=wTOFJy8UwHUbAbwTSXTczhnS3VZ9MDaTgmA5WGjl7YjA7Uf7jnF+Noncv+0TaiSge4
+ ejMmyh+z3qA/8jt01Otptvba1zlNEkvLSDRkGxT9vJFNLIk2Gf3tkmjD94NprNCjWggj
+ 6ejHEgyA+Ge29qcySuKaA/5HzVCWnURhPtv6b2fJNGhhNcjB4vYdHcFfcObI7TGwjaF5
+ fE6dmz9/qAB3ZhauqNrZoG6ufCiCNnR7+j9koimZNlWvN1AK6Dzd93I5uhS4eqB4HYl+
+ 9/u4cnMcOaKeYyo9+f1U2ZpTz8XJCFUIjjYJYToH5Yo82yKfYfX/GBFGrs7klLvnszro
+ gLCw==
+X-Gm-Message-State: AOAM531tjMihDBhon2XcldEgSL011h0vdbVopHlPyRrpza2rbzg9G7Ru
+ yMK+ZzVLjE/zwEPJ5cvYVBShvNbNqVDcLMgbINftnwG0lMODVJS8GOHuIq2gwReiO+1dp9w5ekX
+ rydjV4n+RXXPN12/CSTzVH4EXOE9/z7AzXzicbRIGFIGhdO5R09hIu+NFLFnnw1aFDCc=
+X-Google-Smtp-Source: ABdhPJwfXwizprVtGpfhH9CMgSvy4oJQcTlOwGhEYh7h/UCWQzWob21fBAkjNrZp9qiNYIRW3sxPzk3w1w==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:ad4:47a3:: with SMTP id
- a3mr9927375qvz.31.1632488079831; 
- Fri, 24 Sep 2021 05:54:39 -0700 (PDT)
-Date: Fri, 24 Sep 2021 13:53:47 +0100
+ (user=tabba job=sendgmr) by 2002:a7b:c405:: with SMTP id
+ k5mr1951606wmi.24.1632488071450; 
+ Fri, 24 Sep 2021 05:54:31 -0700 (PDT)
+Date: Fri, 24 Sep 2021 13:53:43 +0100
 In-Reply-To: <20210924125359.2587041-1-tabba@google.com>
-Message-Id: <20210924125359.2587041-19-tabba@google.com>
+Message-Id: <20210924125359.2587041-15-tabba@google.com>
 Mime-Version: 1.0
 References: <20210924125359.2587041-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [RFC PATCH v1 18/30] KVM: arm64: reduce scope of __guest_exit to only
- depend on kvm_cpu_context
+Subject: [RFC PATCH v1 14/30] KVM: arm64: reduce scope of vgic v2
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -98,71 +97,152 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-__guest_exit only needs kvm_cpu_context (via the offset
-VCPU_CONTEXT). Only pass that to it, and fix it to ensure that it
-only refers to kvm_cpu_context rather than vcpu.
+vgic v2 interface functions are passed vcpu, when the state
+that they need is the vgic distributor, as well as the
+kvm_cpu_context and the recently created vcpu_hyp_state. Reduce
+the scope of its interface functions to these structs.
+
+Pass the vgic distributor to fixup_guest_exit so that it's not
+dependent on struct kvm for the vgic state. NOTE: this change to
+fixup_guest_exit is temporary, and will be tidied up in in a
+subsequent patch in this series.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/entry.S     | 7 ++-----
- arch/arm64/kvm/hyp/hyp-entry.S | 8 ++++----
- 2 files changed, 6 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h         |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h  |  4 ++--
+ arch/arm64/kvm/hyp/nvhe/switch.c         |  4 +++-
+ arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c | 16 ++++++----------
+ arch/arm64/kvm/hyp/vhe/switch.c          |  3 ++-
+ 5 files changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index e831d3dfd50d..996bdc9555da 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -99,15 +99,12 @@ SYM_INNER_LABEL(__guest_exit_panic, SYM_L_GLOBAL)
- 	adr_l	x1, hyp_panic
- 	str	x1, [x0, #CPU_XREG_OFFSET(30)]
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 2737e05a16b2..d9a8872a7efb 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -55,7 +55,7 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+  */
+ #define __kvm_swab32(x)	___constant_swab32(x)
  
--	get_vcpu_ptr	x1, x0
-+	get_vcpu_ctxt_ptr	x1, x0
+-int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
++int __vgic_v2_perform_cpuif_access(struct vgic_dist *vgic, struct kvm_cpu_context *ctxt, struct vcpu_hyp_state *hyps);
  
- SYM_INNER_LABEL(__guest_exit, SYM_L_GLOBAL)
- 	// x0: return code
--	// x1: vcpu
-+	// x1: ctxt
- 	// x2-x29,lr: vcpu regs
--	// vcpu x0-x1 on the stack
--
--	add	x1, x1, #VCPU_CONTEXT
+ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 075719c07009..30fcfe84f609 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -424,7 +424,7 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+  * the guest, false when we should restore the host state and return to the
+  * main run loop.
+  */
+-static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, struct vgic_dist *vgic, u64 *exit_code)
+ {
+ 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
+ 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
+@@ -486,7 +486,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 			!kvm_vcpu_abt_iss1tw(vcpu);
  
- 	ALTERNATIVE(nop, SET_PSTATE_PAN(1), ARM64_HAS_PAN, CONFIG_ARM64_PAN)
+ 		if (valid) {
+-			int ret = __vgic_v2_perform_cpuif_access(vcpu);
++			int ret = __vgic_v2_perform_cpuif_access(vgic, vcpu_ctxt, vcpu_hyps);
  
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 5f49df4ffdd8..704b3388c86a 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -71,17 +71,17 @@ wa_epilogue:
- 	sb
+ 			if (ret == 1)
+ 				goto guest;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index eadbf2ccaf68..164b0f899f7b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -172,6 +172,8 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
+ 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
++	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
++	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	bool pmu_switch_needed;
+@@ -230,7 +232,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		exit_code = __guest_enter(vcpu);
  
- el1_trap:
--	get_vcpu_ptr	x1, x0
-+	get_vcpu_ctxt_ptr	x1, x0
- 	mov	x0, #ARM_EXCEPTION_TRAP
- 	b	__guest_exit
+ 		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
++	} while (fixup_guest_exit(vcpu, vgic, &exit_code));
  
- el1_irq:
--	get_vcpu_ptr	x1, x0
-+	get_vcpu_ctxt_ptr	x1, x0
- 	mov	x0, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
+ 	__sysreg_save_state_nvhe(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+diff --git a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+index acd0d21394e3..787f973af43a 100644
+--- a/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
++++ b/arch/arm64/kvm/hyp/vgic-v2-cpuif-proxy.c
+@@ -34,19 +34,15 @@ static bool __is_be(struct kvm_cpu_context *vcpu_ctxt)
+  *  0: Not a GICV access
+  * -1: Illegal GICV access successfully performed
+  */
+-int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
++int __vgic_v2_perform_cpuif_access(struct vgic_dist *vgic, struct kvm_cpu_context *vcpu_ctxt, struct vcpu_hyp_state *vcpu_hyps)
+ {
+-	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
+-	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
+-	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+-	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	phys_addr_t fault_ipa;
+ 	void __iomem *addr;
+ 	int rd;
  
- el1_error:
--	get_vcpu_ptr	x1, x0
-+	get_vcpu_ctxt_ptr	x1, x0
- 	mov	x0, #ARM_EXCEPTION_EL1_SERROR
- 	b	__guest_exit
+ 	/* Build the full address */
+-	fault_ipa  = kvm_vcpu_get_fault_ipa(vcpu);
+-	fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
++	fault_ipa  = kvm_hyp_state_get_fault_ipa(vcpu_hyps);
++	fault_ipa |= kvm_hyp_state_get_hfar(vcpu_hyps) & GENMASK(11, 0);
  
-@@ -100,7 +100,7 @@ el2_sync:
+ 	/* If not for GICV, move on */
+ 	if (fault_ipa <  vgic->vgic_cpu_base ||
+@@ -54,7 +50,7 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 		return 0;
  
- 1:
- 	/* Let's attempt a recovery from the illegal exception return */
--	get_vcpu_ptr	x1, x0
-+	get_vcpu_ctxt_ptr	x1, x0
- 	mov	x0, #ARM_EXCEPTION_IL
- 	b	__guest_exit
+ 	/* Reject anything but a 32bit access */
+-	if (kvm_vcpu_dabt_get_as(vcpu) != sizeof(u32)) {
++	if (kvm_hyp_state_dabt_get_as(vcpu_hyps) != sizeof(u32)) {
+ 		__kvm_skip_instr(vcpu_ctxt, vcpu_hyps);
+ 		return -1;
+ 	}
+@@ -65,11 +61,11 @@ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu)
+ 		return -1;
+ 	}
+ 
+-	rd = kvm_vcpu_dabt_get_rd(vcpu);
++	rd = kvm_hyp_state_dabt_get_rd(vcpu_hyps);
+ 	addr  = kvm_vgic_global_state.vcpu_hyp_va;
+ 	addr += fault_ipa - vgic->vgic_cpu_base;
+ 
+-	if (kvm_vcpu_dabt_iswrite(vcpu)) {
++	if (kvm_hyp_state_dabt_iswrite(vcpu_hyps)) {
+ 		u32 data = ctxt_get_reg(vcpu_ctxt, rd);
+ 		if (__is_be(vcpu_ctxt)) {
+ 			/* guest pre-swabbed data, undo this for writel() */
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 395274532c20..f315058a50ca 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -111,6 +111,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_hyp_state *vcpu_hyps = &hyp_state(vcpu);
+ 	struct kvm_cpu_context *vcpu_ctxt = &vcpu_ctxt(vcpu);
++	struct vgic_dist *vgic = &vcpu->kvm->arch.vgic;
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+ 	u64 exit_code;
+@@ -145,7 +146,7 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 		exit_code = __guest_enter(vcpu);
+ 
+ 		/* And we're baaack! */
+-	} while (fixup_guest_exit(vcpu, &exit_code));
++	} while (fixup_guest_exit(vcpu, vgic, &exit_code));
+ 
+ 	sysreg_save_guest_state_vhe(guest_ctxt);
  
 -- 
 2.33.0.685.g46640cef36-goog
