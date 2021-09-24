@@ -6,53 +6,53 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1386CC43217
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 08:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4919C4332F
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 08:26:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B8BEE61211
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 08:25:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B8BEE61211
+	by mail.kernel.org (Postfix) with ESMTP id 7841161211
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 08:26:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7841161211
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 653B14B136;
-	Fri, 24 Sep 2021 04:25:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 244934B10A;
+	Fri, 24 Sep 2021 04:26:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sVV4mtajrmxd; Fri, 24 Sep 2021 04:25:58 -0400 (EDT)
+	with ESMTP id k+jGLEZETbvL; Fri, 24 Sep 2021 04:25:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C65FA4B139;
-	Fri, 24 Sep 2021 04:25:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFF004B133;
+	Fri, 24 Sep 2021 04:25:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3B464B09C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 04:25:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EE1F4B09C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 04:25:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Lsfumdf2pbBr for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 0r0FdNVuvTBa for <kvmarm@lists.cs.columbia.edu>;
  Fri, 24 Sep 2021 04:25:54 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99FD84B08D
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50E6E4B0DF
  for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 04:25:54 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id DAABB6124C;
+ by mail.kernel.org (Postfix) with ESMTPSA id 407D361214;
  Fri, 24 Sep 2021 08:25:53 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mTgWm-00ChmL-8w; Fri, 24 Sep 2021 09:25:52 +0100
+ id 1mTgWl-00ChmL-DQ; Fri, 24 Sep 2021 09:25:51 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 4/5] KVM: arm64: vgic-v3: Don't propagate LPI active state
- from LRs into the distributor
-Date: Fri, 24 Sep 2021 09:25:41 +0100
-Message-Id: <20210924082542.2766170-5-maz@kernel.org>
+Subject: [PATCH 1/5] KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a
+ virtual GICv3
+Date: Fri, 24 Sep 2021 09:25:38 +0100
+Message-Id: <20210924082542.2766170-2-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210924082542.2766170-1-maz@kernel.org>
 References: <20210924082542.2766170-1-maz@kernel.org>
@@ -82,44 +82,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Christoffer reported that while LPIs to not have an active state,
-the pseudocode for the vGIC clearly indicates that LPIs injected
-in the LRs do transition via an active state just like any other
-interrupt, and that it is only at the priority drop stage that
-the active state gets cleared. This is probably done for the sake
-of simplicity in the HW, and to trip every single SW developer.
+Until now, we always let ID_AA64PFR0_EL1.GIC reflect the value
+visible on the host, even if we were running a GICv2-enabled VM
+on a GICv3+compat host.
 
-So as it turns out, we can observe an active LPI if the guest
-exits between the read of IAR and the write to EOI. This isn't a
-big deal and nothing breaks (the active LPI is made inactive on
-the next EOI).
+That's fine, but we also now have the case of a host that does not
+expose ID_AA64PFR0_EL1.GIC==1 despite having a vGIC. Yes, this is
+confusing. Thank you M1.
 
-However, this active LPI will occupy a LR at the next entry, which
-is pointless. We could instead ignore this active state and keep
-the distributor blissfully unaware of this oddity. Just do that.
+Let's go back to first principles and expose ID_AA64PFR0_EL1.GIC=1
+when a GICv3 is exposed to the guest. This also hides a GICv4.1
+CPU interface from the guest which has no business knowing about
+the v4.1 extension.
 
-Reported-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index ae59e2580bf5..d281c6a533ee 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -69,9 +69,10 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
- 
- 		raw_spin_lock(&irq->irq_lock);
- 
--		/* Always preserve the active bit, note deactivation */
-+		/* Preserve the active bit for non-LPI, note deactivation */
- 		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
- 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
-+		irq->active &= irq->intid <= VGIC_MAX_SPI;
- 
- 		if (irq->active && is_v2_sgi)
- 			irq->active_source = cpuid;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 1d46e185f31e..0e8fc29df19c 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1075,6 +1075,11 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
+ 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3);
+ 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
++		if (irqchip_in_kernel(vcpu->kvm) &&
++		    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
++			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
++		}
+ 		break;
+ 	case SYS_ID_AA64PFR1_EL1:
+ 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_MTE);
 -- 
 2.30.2
 
