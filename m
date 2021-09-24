@@ -2,100 +2,86 @@ Return-Path: <SRS0=7V6P=OO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF75C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 06:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D11DEC433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 07:20:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DC9EF610D1
-	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 06:47:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DC9EF610D1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 4B1656124D
+	for <kvmarm@archiver.kernel.org>; Fri, 24 Sep 2021 07:20:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4B1656124D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 501E14B10C;
-	Fri, 24 Sep 2021 02:47:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A59A44B0C2;
+	Fri, 24 Sep 2021 03:20:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3pwpkshnAfDa; Fri, 24 Sep 2021 02:47:41 -0400 (EDT)
+	with ESMTP id 3MJyNGQAqlW5; Fri, 24 Sep 2021 03:20:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 109F04B09C;
-	Fri, 24 Sep 2021 02:47:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D8FC4A5A0;
+	Fri, 24 Sep 2021 03:20:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D9054B086
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 02:47:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AFD9B405EE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 03:20:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pfSXkNOPsRVE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Sep 2021 02:47:38 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0280D4A3BF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 02:47:37 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1632466057;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=j2KQr45baQYJYr6dUnfIDkxfbuPODwumfELuFXI+bXM=;
- b=JFr2AYqUFNoTFJzP3tyfjsxVBA68DricjWCc825kiZSSkBkuv/c3qesHCbu43s5LcWTydP
- A+pyl1SuISfvcmPwMAcE0vmmAkq2s/bxvez+wpU8aTgc2R20M8Khw8XJk6tflJW2c4eMJP
- h2Yu5VTfSOnU/BLT1meetIMGCGUwPqk=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-479-SKTm9yDpNW-RQou3HfItXA-1; Fri, 24 Sep 2021 02:47:36 -0400
-X-MC-Unique: SKTm9yDpNW-RQou3HfItXA-1
-Received: by mail-ed1-f70.google.com with SMTP id
- n5-20020a05640206c500b003cf53f7cef2so9241241edy.12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Sep 2021 23:47:36 -0700 (PDT)
+ with ESMTP id t8zuhYH7sV64 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Sep 2021 03:20:48 -0400 (EDT)
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
+ [209.85.216.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F9164048B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 03:20:48 -0400 (EDT)
+Received: by mail-pj1-f54.google.com with SMTP id k23so6384203pji.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 00:20:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oa6c5pdb6GgT+FciQG9zGryGSgSV0wDGRTDly5jSdik=;
+ b=Yb8BC8+W8zNJ2cn6C+2RpR53j2vs6KwDm3Q0f/gzO14zIh5KXkaWH8KHkJLfKvq/Gt
+ Tvd67QkiEuG2mLPoLbndnQmE3KpY+0IqGKcsf6kG5YVEqGkhLSn85eM84xm3e7jZGZIs
+ zHpgI6i+lu05G+eLTl7ihnBzI10EADdGbnS+ZkD2CPbD52aBb5kKgEZdL8exiVx01EPs
+ Rj1gflu+ib3d88jvp7c+KFMw6VgWW8pYfg/3Sk/X5/XrjbmJ1yOouczfljbaFPuNOX9K
+ 76DZQ7y34SwmHbayWrhTeJyUEbosSNA3bxtX1njDRagU+RoNFCgTHy+mW3M2nDxp9vNn
+ HYpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=j2KQr45baQYJYr6dUnfIDkxfbuPODwumfELuFXI+bXM=;
- b=KH7MoDmBQzJB41BuniG51LuLbdcuH4ciP8oUD42wNlWV7Fy6bEeLRBAsGADXpASN7U
- btQtk6XeFXY0PpPxYWyY8z284UpDDjEtcYHlCfHKbXhYwWVw4xTQ4++GggdvTRF/bzLP
- OhNCHiUFPpgkG/NWnumA0oqbFBP02wW9QOZy5WsrehKr5vwXkYPzLFSxXLpxn4K82YNo
- /0LsfYFLzZNVlW18/aAYHN1R7XtuAC/u3mKMsFAwJZbWNumuiapXgR18iTZ7PdQkoKv7
- glo0dmO9r6za5sRNn+8scYWJm7ya4ZydBe8/Awb7DuF3v0f7wQ5bYud8Qs9ASGhs5MS2
- oKiA==
-X-Gm-Message-State: AOAM530OMIIAt2O2+/6UlzaFZ6q/r7eCwUtyuFqWyL7lCEfW7ukRZoOj
- v98Hfh1uBIV7U94uHONnqo6GKilVeeZBhEs1dhUkIrHIqwoTOFfW/sljT1ovC6Ip+cj3PYNoMM0
- ba9Jha3wUKkwbUAchlm/cU2CG
-X-Received: by 2002:aa7:d459:: with SMTP id q25mr3275080edr.62.1632466055109; 
- Thu, 23 Sep 2021 23:47:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzaN40OP+imxKFV5YmCeh+GS/xyWgZCQsY0YIEujkDc+8xVH6Bjx9zUITPQQ59lKIzSrEPQTw==
-X-Received: by 2002:aa7:d459:: with SMTP id q25mr3275065edr.62.1632466054928; 
- Thu, 23 Sep 2021 23:47:34 -0700 (PDT)
-Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
- by smtp.gmail.com with ESMTPSA id z3sm4374149eju.34.2021.09.23.23.47.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 23 Sep 2021 23:47:34 -0700 (PDT)
-Date: Fri, 24 Sep 2021 08:47:32 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH] selftests: KVM: Call ucall_init when setting up in
- rseq_test
-Message-ID: <20210924064732.xqv2xjya3pxgmwr2@gator.home>
-References: <20210923220033.4172362-1-oupton@google.com>
- <YU0XIoeYpfm1Oy0j@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oa6c5pdb6GgT+FciQG9zGryGSgSV0wDGRTDly5jSdik=;
+ b=0GbzDiKTPYtRqazCjpumix8nsV79AFrpVQChDUyGaOOcUEkJHbqNfg5uffLFixRZaO
+ 9RgwwSw2xU04cPcVQIv9Souru+dYxyB13xrvgsO/pZBVWgJvLrbNYyIES+j9cVvLCvSi
+ df+AOCIdKndADcvQj8nUu/ECoWUz4WWDBsxlUh6ComF0FT6zmuRAi3WP2xI0LhDfe0iA
+ nOeBVGgbZqjfoT4bqOpseJvIcSwuw7LTFeoOBusftXoWA6A4ATLWs994NkFUHAwSZOLZ
+ Kqv5+nc9cQ8QPWzULL+yKgKtyuHoVsqHAj6KJQqDmdzcEk6nemurHkduXs2RO65p1j7j
+ H81w==
+X-Gm-Message-State: AOAM5320q6Q3upRfXro/7CcdsDThKsouTpNet4shcC6jBHKvs+GMa2Ze
+ blMC1bcAgWs9OSfLEj2fJMqCNvAFJW378jUCNJD37FeQMxXVQQ==
+X-Google-Smtp-Source: ABdhPJyQE81Xvn5qKelAV4RVuvdM8+D6Sr0NIlWcPD2y3ECryKNkbPx229P43Hc2o82o3mdURpHlbiPyX4ZN9pQ1DwE=
+X-Received: by 2002:a17:90b:a02:: with SMTP id
+ gg2mr161551pjb.110.1632468047511; 
+ Fri, 24 Sep 2021 00:20:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YU0XIoeYpfm1Oy0j@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Jim Mattson <jmattson@google.com>
+References: <20210916181510.963449-1-oupton@google.com>
+ <20210916181510.963449-7-oupton@google.com>
+ <CAAeT=Fwrh5L8FNKVJipOH6a8MohRsPOgmJDhojRw8DkAS4Kk2Q@mail.gmail.com>
+In-Reply-To: <CAAeT=Fwrh5L8FNKVJipOH6a8MohRsPOgmJDhojRw8DkAS4Kk2Q@mail.gmail.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Fri, 24 Sep 2021 00:20:31 -0700
+Message-ID: <CAAeT=FxcW0+cVgfkoU8LWndxM1njC6rDhoWuL+JwXXbPRpYnyg@mail.gmail.com>
+Subject: Re: [PATCH v8 6/8] KVM: arm64: Allow userspace to configure a guest's
+ counter-timer offset
+To: Oliver Upton <oupton@google.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Shier <pshier@google.com>, Marc Zyngier <maz@kernel.org>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,47 +98,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Sep 24, 2021 at 12:09:06AM +0000, Sean Christopherson wrote:
-> On Thu, Sep 23, 2021, Oliver Upton wrote:
-> > While x86 does not require any additional setup to use the ucall
-> > infrastructure, arm64 needs to set up the MMIO address used to signal a
-> > ucall to userspace. rseq_test does not initialize the MMIO address,
-> > resulting in the test spinning indefinitely.
-> > 
-> > Fix the issue by calling ucall_init() during setup.
-> > 
-> > Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/rseq_test.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-> > index 060538bd405a..c5e0dd664a7b 100644
-> > --- a/tools/testing/selftests/kvm/rseq_test.c
-> > +++ b/tools/testing/selftests/kvm/rseq_test.c
-> > @@ -180,6 +180,7 @@ int main(int argc, char *argv[])
-> >  	 * CPU affinity.
-> >  	 */
-> >  	vm = vm_create_default(VCPU_ID, 0, guest_code);
-> > +	ucall_init(vm, NULL);
-> 
-> Any reason not to do this automatically in vm_create()?  There is 0% chance I'm
-> going to remember to add this next time I write a common selftest, arm64 is the
-> oddball here.
->
+Hi Oliver,
 
-Yes, please. But, it'll take more than just adding a ucall_init(vm, NULL)
-call to vm_create. We should also modify aarch64's ucall_init to allow
-a *new* explicit mapping to be made. It already allows an explicit mapping
-when arg != NULL, but we'll need to unmap the default mapping first, now.
-The reason is that a unit test may not be happy with the automatically
-selected address (that hasn't happened yet, but...) and want to set its
-own.
+I have additional questions/comments.
+
+> > +2.2. ATTRIBUTE: KVM_ARM_VCPU_TIMER_PHYS_OFFSET
+> > +-----------------------------------------
+> > +
+> > +:Parameters: in kvm_device_attr.addr the address for the timer offset is a
+> > +             pointer to a __u64
+> > +
+> > +Returns:
+> > +
+> > +        ======= ==================================
+> > +        -EFAULT Error reading/writing the provided
+> > +                parameter address
+> > +        -ENXIO  Timer offsetting not implemented
+> > +        ======= ==================================
+> > +
+> > +Specifies the guest's counter-timer offset from the host's virtual counter.
+> > +The guest's physical counter value is then derived by the following
+> > +equation:
+> > +
+> > +  guest_cntpct = host_cntvct - KVM_ARM_VCPU_TIMER_PHYS_OFFSET
+> > +
+> > +The guest's virtual counter value is derived by the following equation:
+> > +
+> > +  guest_cntvct = host_cntvct - KVM_REG_ARM_TIMER_OFFSET
+> > +                       - KVM_ARM_VCPU_TIMER_PHYS_OFFSET
+
+Although KVM_REG_ARM_TIMER_OFFSET is available only if userspace
+opt-in KVM_CAP_ARM_VTIMER_OFFSET, setting this attribute doesn't
+depend on the capability, correct ?
+
+> > +KVM does not allow the use of varying offset values for different vCPUs;
+> > +the last written offset value will be broadcasted to all vCPUs in a VM.
+
+What if a new vCPU is added after KVM_ARM_VCPU_TIMER_PHYS_OFFSET
+is set (for other existing vCPUs) ?  Don't we want to set the offset for
+the newly created vCPU as well ?
+
+I'm a bit concerned about extra cost during Live Migration of a VM
+that has large number of vCPUs if setting this is done by each vCPU
+because that invokes update_timer_offset(), which sets the offset
+for every vCPU that is owned by the guest holding kvm->lock,
+two times (e.g. for a VM who number of vCPUs is KVM_MAX_VCPUS,
+which is 512, the offset setting is done 524288 times).
+Userspace can be implemented to run this just for single vCPU though.
+
+
+> In my understanding, the offset that the code below specifies
+> to call update_vtimer_cntvoff() is (guest's virtual counter) offset
+> from the host's counter, which is always same as guest's virtual
+> counter offset from the guest's physical counter-timer before this patch.
+>
+> int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+> {
+>         struct arch_timer_context *timer;
+>
+>         switch (regid) {
+>         <...>
+>         case KVM_REG_ARM_TIMER_CNT:
+>                 timer = vcpu_vtimer(vcpu);
+>                 update_vtimer_cntvoff(vcpu, kvm_phys_timer_read() - value);
+>                 break;
+>         <...>
+>
+> With this patch, since the guest's counter-timer offset from the host's
+> counter can be set by userspace, doesn't the code need to specify
+> guest's virtual counter offset (from guest's physical counter-timer) ?
+
 
 Thanks,
-drew
-
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
