@@ -2,71 +2,84 @@ Return-Path: <SRS0=Rd7Q=OP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77993C433F5
-	for <kvmarm@archiver.kernel.org>; Sat, 25 Sep 2021 06:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7040C433F5
+	for <kvmarm@archiver.kernel.org>; Sat, 25 Sep 2021 09:50:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D4A3361260
-	for <kvmarm@archiver.kernel.org>; Sat, 25 Sep 2021 06:46:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D4A3361260
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 2E1FE6127C
+	for <kvmarm@archiver.kernel.org>; Sat, 25 Sep 2021 09:50:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2E1FE6127C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 467784B086;
-	Sat, 25 Sep 2021 02:46:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AADF4B0BD;
+	Sat, 25 Sep 2021 05:50:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l0S6c7Wkie8O; Sat, 25 Sep 2021 02:46:00 -0400 (EDT)
+	with ESMTP id Q1MqaQBSD1Ku; Sat, 25 Sep 2021 05:50:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 392AB4B0C0;
-	Sat, 25 Sep 2021 02:46:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CC9E4A49C;
+	Sat, 25 Sep 2021 05:50:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A12B4B086
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Sep 2021 02:45:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA8334086D
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Sep 2021 05:50:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id krviAzY020UI for <kvmarm@lists.cs.columbia.edu>;
- Sat, 25 Sep 2021 02:45:56 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63BF44031F
- for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Sep 2021 02:45:56 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id y28so49577684lfb.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Sep 2021 23:45:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=mime-version:from:date:message-id:subject:to;
- bh=vpAqGeF5KwkRU7JzE5gc6oNJiu5n0YK8Gc3qiLExMmw=;
- b=ce/Ine+l4S6DEP+NFcW0iMNLFlgoBmkfNBBTRRaeDlZFB2mCbwMmM4beFA03i1OAm8
- gPkrC+tGUniL7diNAmuaSzejcn9z5wPgljU83ZGqEKCpOiAzhmc/tJPiYA31lTp2V7cc
- NKb0iTVJwW75AdoPXEB/ZNFlmq5PJF9tpvbnY9uYBH5JGi4wcFaylNZcAaIBCYw0Z8nw
- lP111bfEw1taDkpkNt9cSLgxNBlExG5RB1YOJO448knJRsx7O3bhKYzul2aLbAS3jr4o
- FMf9OcphJ7bedo1VlojIG/qrNcu2j0X2Oab/G4NE06b1nRubzNUlpVahzNSJyFK/TnD7
- 4TJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=vpAqGeF5KwkRU7JzE5gc6oNJiu5n0YK8Gc3qiLExMmw=;
- b=uurVzsY0FJgUJ0lNpc1VVkbk8uipo195o8ic0+9pUFTFOVXdXbCxS3TuXOdLm3wrDb
- FXYfxlmpJmWO10FLsgkBjWvRzbdIzhnsAVZm6Vro29ufJ+Uawz8qsWowytQUgpGh8jwU
- W36kCKrDhJnEp0hwOg0R8TbQ+AN5mlufc8bGuWFFBLUtyeAXtQoParAJVtsj0gDRfvmW
- If//DU+wTLoz4zO7btmVThkBFpaRiIb1ok/TOqwITZidjCJIKm8RDvw4z8uzjfjiFddf
- Ae80xxeqZ4Hh7NzClDUTXrjOWh8j43X1C8aAZLdq9EQT+J2MtOHUKhojBVukLgKDVkBJ
- NuPA==
-X-Gm-Message-State: AOAM533TuMqscExE3A875mRjdKxjD9tOhhvC1AsTMHNMn/ABhby7btMt
- HUUog5RlJeSqkT0Z8zysxM8s6uyNMBPmbzASDbb/VCegB0F3TQ==
-X-Google-Smtp-Source: ABdhPJzsQ3ae+IC4iH1Y/6V/rzRH2Jn0SoBLSiwhNOck0Y+Zzm3ynbxKkQjK3iXKOkX/rh94qQAgiec518zpUjTjD4Y=
-X-Received: by 2002:a05:6512:a92:: with SMTP id
- m18mr13195740lfu.608.1632552355030; 
- Fri, 24 Sep 2021 23:45:55 -0700 (PDT)
-MIME-Version: 1.0
-From: Chenxu Wang <irakatz51@gmail.com>
-Date: Sat, 25 Sep 2021 14:45:44 +0800
-Message-ID: <CAFLP=uCvQ=xLaMmaSReWWYHC_EBf_k5tf1akp4GLOym9RVRCkw@mail.gmail.com>
-Subject: Execute "SMC" instruction in Guest OS
-To: kvmarm@lists.cs.columbia.edu
+ with ESMTP id uFQZ-mUeBLEq for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 25 Sep 2021 05:50:09 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99767407D1
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 25 Sep 2021 05:50:09 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 441BD61279;
+ Sat, 25 Sep 2021 09:50:08 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mU4Jq-00Cuoe-EB; Sat, 25 Sep 2021 10:50:06 +0100
+Date: Sat, 25 Sep 2021 10:50:05 +0100
+Message-ID: <878rzlass2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is
+ successful
+In-Reply-To: <20210925005528.1145584-8-seanjc@google.com>
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <20210925005528.1145584-8-seanjc@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, chenhuacai@kernel.org,
+ aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org, borntraeger@de.ibm.com,
+ frankja@linux.ibm.com, pbonzini@redhat.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, david@redhat.com,
+ cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com,
+ wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dmatlack@google.com, jingzhangos@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+ Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
+ Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, kvm-ppc@vger.kernel.org,
+ David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,60 +91,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============8244416286989577084=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============8244416286989577084==
-Content-Type: multipart/alternative; boundary="00000000000032eb5805cccc375c"
+On Sat, 25 Sep 2021 01:55:21 +0100,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> Invoke the arch hooks for block+unblock if and only if KVM actually
+> attempts to block the vCPU.  The only non-nop implementation is on arm64,
+> and if halt-polling is successful, there is no need for arm64 to put/load
+> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
 
---00000000000032eb5805cccc375c
-Content-Type: text/plain; charset="UTF-8"
+This doesn't mean that there is no requirement for any state
+change. The put/load on GICv4 is crucial for performance, and the VMCR
+resync is a correctness requirement.
 
-Hi all,
+> 
+> The primary motivation is to allow future cleanup to split out "block"
+> from "halt", but this is also likely a small performance boost on arm64
+> when halt-polling is successful.
+> 
+> Adjust the post-block path to update "cur" after unblocking, i.e. include
+> vGIC load time in halt_wait_ns and halt_wait_hist, so that the behavior
+> is consistent.  Moving just the pre-block arch hook would result in only
+> the vGIC put latency being included in the halt_wait stats.  There is no
+> obvious evidence that one way or the other is correct, so just ensure KVM
+> is consistent.
 
-I want the Guest OS to use the Arm-TF service in Host OS (It is the same as
-using Trusted Application in OP-TEE). So I should provide some parameters
-and call SMC instruction.
+This effectively reverts 07ab0f8d9a12 ("KVM: Call
+kvm_arch_vcpu_blocking early into the blocking sequence"), which was a
+huge gain on arm64, not to mention a correctness fix.
 
-But it returns an "Undefined Instruction" in my Linux v4.9.51.
-I find that KVM calls a " kvm_inject_undefined(vcpu);" when handling the
-SMC instruction.
+Without this, a GICv4 machine will always pay for the full poll
+penalty, going into schedule(), and only then get a doorbell interrupt
+signalling telling the kernel that there was an interrupt.
 
-So, if I want the Guest OS to use the "Arm-TF service" or "TA", should I
-simply change the kvm_inject_undefined() as "SMC #0", and carefully handle
-the input parameters? What else should I do?
+On a non-GICv4 machine, it means that interrupts injected by another
+thread during the pooling will be evaluated with an outdated priority
+mask, which can result in either a spurious wake-up or a missed
+wake-up.
 
-Sincerely,
-Wang Chenxu
+If it means introducing a new set of {pre,post}-poll arch-specific
+hooks, so be it. But I don't think this change is acceptable as is.
 
---00000000000032eb5805cccc375c
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Thanks,
 
-<div dir=3D"ltr">Hi all,<div><br></div><div>I want the Guest OS to use the =
-Arm-TF service in Host OS (It is the same as using Trusted Application in O=
-P-TEE). So I should provide some parameters and call SMC instruction.</div>=
-<div><br></div><div>But it returns an &quot;Undefined Instruction&quot; in =
-my Linux v4.9.51.</div><div>I find that KVM calls a &quot;	kvm_inject_undef=
-ined(vcpu);&quot; when handling the SMC instruction.=C2=A0</div><div><br></=
-div><div>So, if I want the Guest OS to use the &quot;Arm-TF service&quot; o=
-r &quot;TA&quot;, should I simply change the kvm_inject_undefined() as &quo=
-t;SMC #0&quot;, and carefully handle the input parameters? What else should=
- I do?<br></div><div><br></div><div>Sincerely,</div><div>Wang Chenxu</div><=
-/div>
+	M.
 
---00000000000032eb5805cccc375c--
-
---===============8244416286989577084==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============8244416286989577084==--
