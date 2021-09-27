@@ -2,84 +2,106 @@ Return-Path: <SRS0=UlWN=OR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CEE9C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 16:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6CC0C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 17:25:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 17B0F6113D
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 16:40:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 17B0F6113D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 558DA6108E
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 17:25:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 558DA6108E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 862AE4A3A5;
-	Mon, 27 Sep 2021 12:40:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B153B4B0C5;
+	Mon, 27 Sep 2021 13:25:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sjj9a1BYTzpm; Mon, 27 Sep 2021 12:40:09 -0400 (EDT)
+	with ESMTP id KRQbxqOcpJiK; Mon, 27 Sep 2021 13:25:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AA7C40762;
-	Mon, 27 Sep 2021 12:40:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA51149F5F;
+	Mon, 27 Sep 2021 13:25:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34F1740762
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 12:40:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A94FF4083E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 13:25:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x644mJgmY9O7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Sep 2021 12:40:07 -0400 (EDT)
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com
- [209.85.221.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2BDF94057F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 12:40:07 -0400 (EDT)
-Received: by mail-wr1-f43.google.com with SMTP id u18so53084247wrg.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 09:40:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=uBxEi6AYAf/IDfN1v8J251RrBh4CFzk1e5mArk5PNvU=;
- b=ShmHcW7/EwN9y31VztAl5sWbgy+qbrOKhzAJBDeQTwUbLr3EqJa1zCP54fk27oJaHN
- nX+uDlhxuiJm3MuzUgDfp71rKNZvZ/NtJgJoIXrNrdO1oET1vtkPUCJFKKuxcfL8Kd9r
- 9pXlnfVc5BbCh9f1BDvaKpeLDgurgmakIcGdrEJt87/+j7UM2g/CJGgDD7aJQz60TKkw
- D2LnDAOLUSm1coZM2D8JKP+EklxtaxFNBRJkjvZzmhDBc8X374FhqrUFYc/mz4WbES3t
- YNN1I+kET1+Jp/qfcCwCE5u8Mu+wX/3NCdC6+iqAiUdPwtk043eGTxBDETr8YPgo4a85
- +beg==
+ with ESMTP id DfzVzRi8m9fh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Sep 2021 13:25:09 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97460406E7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 13:25:09 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1632763509;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=kNKGhtUzyDvvasjBG+sOupwAerMdbRFrkMWzt1aAAJI=;
+ b=NzPFSILRn3+n/MA8Yj37irH2PINx2BoHPciay6QK/gaNz2uGPUuEq2USjARuQwNjfZOQ6q
+ sl3bvdxZR0ctjM6akZit9KpiW3paU7YaUbve0omh3a4bJaS607Qi35/OwMmiEt3qRJ7vSg
+ mO+kT57TfZoG73o2akyRbt+M1HAoY8E=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-p0wYa2vrMmGr5yFLKOqpzg-1; Mon, 27 Sep 2021 13:25:05 -0400
+X-MC-Unique: p0wYa2vrMmGr5yFLKOqpzg-1
+Received: by mail-pg1-f200.google.com with SMTP id
+ t28-20020a63461c000000b00252078b83e4so13328306pga.15
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 10:25:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=uBxEi6AYAf/IDfN1v8J251RrBh4CFzk1e5mArk5PNvU=;
- b=dgaKUuAeMdPlnygbeUtTpTBe2DfHF6U8Nsm4HTvSLTNo19XqnKqlxt61HSMzmHYQhN
- D+YJJhUsq67eecwxwdkRFkNe8QYnQ8GxulR1oBHKkYja/9olWE6xVfYsgCWkgd/V80Wz
- LL1ahPuzDCwE3WyqOQ0QouhU1wQXa0q+ggrO+MC7GVYk4be7BzBywdHMDGSdGf19lRUt
- tvu9kHJBU1Nf26jMwE2jlKlPju/oTstWXLkCcAIuvccVMPNkgWY1PmEyfVNJhYh9xbxv
- f8OBCeB7sapWzx8UMXczBgTcJboCGlTL7TMKRsdq8CAEbCcelBQawNjcq2Pjc9mEsBNZ
- LSyw==
-X-Gm-Message-State: AOAM532ekKrnHX9hdAkEsxn64W0aja1mIFeUIh6zn44i3VOZXDCOBvtq
- Z5UNijgMaLkhwcuTGdq432+5kQ==
-X-Google-Smtp-Source: ABdhPJxeIsgFjgYqOUquyC+YdPRjFg7ImEHfUd+nnFiThBHOZhs4dFClXfQIVL5NXC3K9mRijFdtDA==
-X-Received: by 2002:adf:f48b:: with SMTP id l11mr977771wro.254.1632760806108; 
- Mon, 27 Sep 2021 09:40:06 -0700 (PDT)
-Received: from google.com ([2a00:79e0:d:210:fa68:b369:184:c5a])
- by smtp.gmail.com with ESMTPSA id x4sm18967wmi.22.2021.09.27.09.40.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Sep 2021 09:40:05 -0700 (PDT)
-Date: Mon, 27 Sep 2021 17:40:03 +0100
-From: Quentin Perret <qperret@google.com>
-To: Fuad Tabba <tabba@google.com>
-Subject: Re: [RFC PATCH v1 12/30] KVM: arm64: COCCI: add_hypstate.cocci
- use_hypstate.cocci: Reduce scope of functions to hyp_state
-Message-ID: <YVHz48IuvHsHRaiG@google.com>
-References: <20210924125359.2587041-1-tabba@google.com>
- <20210924125359.2587041-13-tabba@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=kNKGhtUzyDvvasjBG+sOupwAerMdbRFrkMWzt1aAAJI=;
+ b=NizS/o/UE5UzWCgvb/pquFtwS7sihi+JziDwiYm8/BrELDnpbukeoxBWOb/vxAiUCY
+ jyIAlzE2CdmMKlYqtGbJXar3IJiYXaGPymAMLV2nIHCXb6lHXGN+1o21TUuthYttC+c4
+ nN56WirsC9rwdz0z1WDjGirIxwmIyN+wEs/m06SB8m6OvAgEkG5v1eScT8p7l0LeN9Ni
+ WQ2ZQsa1dv0CNFDZ0erYMmb7IqwSUrKpOleyof5QrAIVtyWglK7Piez8CLn58m2hUHNh
+ rG5xxIjACjZITnkXaYZ4irQ3LgeOmLwmB8Ke0Ac43GzfGjOESjNsFCU7GX/mL5pxzPbs
+ NH6Q==
+X-Gm-Message-State: AOAM532HEb5xsIdXy7ZzbUQ/ULHA3ZFF0YF83Zdyk+oUEgt2VIDZKCto
+ btMlCOYh7MFKK0Il3gD7M3FGlQTa/TV3BIEOzK12QsafsQe5E2YaVw0DKQJaukPyjn04NnixKgQ
+ gfIMtNJ2LGQi49YhglUCL7FM6isbRCkLA+Jo7tlng
+X-Received: by 2002:a17:902:e752:b0:13b:7e90:af8b with SMTP id
+ p18-20020a170902e75200b0013b7e90af8bmr1093617plf.12.1632763503578; 
+ Mon, 27 Sep 2021 10:25:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwnpQIKn1XEdvXS3sloEadlAQlrcu/KIkFx7e5cSy37I6kVkSfvfoO+V88kOShJrVeyAcUnkFvhI3opAAyj/w8=
+X-Received: by 2002:a17:902:e752:b0:13b:7e90:af8b with SMTP id
+ p18-20020a170902e75200b0013b7e90af8bmr1093572plf.12.1632763503267; Mon, 27
+ Sep 2021 10:25:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210924125359.2587041-13-tabba@google.com>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20210925005528.1145584-1-seanjc@google.com>
+ <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
+ <YVHcY6y1GmvGJnMg@google.com>
+ <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
+ <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
+In-Reply-To: <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 27 Sep 2021 19:24:52 +0200
+Message-ID: <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
+Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
+ Halt-polling fixes, cleanups and a new stat)
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
+ David Hildenbrand <david@redhat.com>, "Kernel Mailing List,
+ Linux" <linux-kernel@vger.kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ KVM ARM <kvmarm@lists.cs.columbia.edu>, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Jon Cargille <jcargill@google.com>, kvm-ppc <kvm-ppc@vger.kernel.org>,
+ David Matlack <dmatlack@google.com>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ "open list:MIPS" <linux-mips@vger.kernel.org>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,29 +118,22 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Friday 24 Sep 2021 at 13:53:41 (+0100), Fuad Tabba wrote:
-> Many functions don't need access to the vcpu structure, but only
-> the hyp_state. Reduce their scope.
-> 
-> This applies the semantic patches with the following commands:
-> FILES="$(find arch/arm64/kvm/hyp -name "*.[ch]" ! -name "debug-sr*") arch/arm64/include/asm/kvm_hyp.h"
-> spatch --sp-file cocci_refactor/add_hypstate.cocci $FILES --in-place
-> spatch --sp-file cocci_refactor/use_hypstate.cocci $FILES --in-place
-> 
-> This patch adds variables that may be unused. These will be
-> removed at the end of this patch series.
+On Mon, Sep 27, 2021 at 5:17 PM Christian Borntraeger
+<borntraeger@de.ibm.com> wrote:
+> > So I think there are two possibilities that makes sense:
+> >
+> > * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
+>
+> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
 
-I'm guessing you decided to separate things out to make sure this patch
-is purely the result of a coccinelle run w/o manual changes?
+Yes, that's what I meant.  David pointed out that doesn't allow you to
+disable halt polling altogether, but for that you can always ask each
+VM's userspace one by one, or just not use KVM_CAP_HALT_POLL. (Also, I
+don't know about Google's usecase, but mine was actually more about
+using KVM_CAP_HALT_POLL to *disable* halt polling on some VMs!).
 
-It looks like the patch to remove the unused variables is a 'COCCI'
-patch too, so maybe it would make sense to run it here directly after
-the first coccinelle run, and squash the result into this patch? The
-resulting patch would still be entirely auto-generated, and wouldn't
-have these somewhat odd unused variables. Thoughts?
+Paolo
 
-Thanks,
-Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
