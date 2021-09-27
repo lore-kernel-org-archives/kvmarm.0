@@ -2,103 +2,90 @@ Return-Path: <SRS0=UlWN=OR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26A71C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 17:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E75C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 18:02:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8F9D360E09
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 17:33:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8F9D360E09
+	by mail.kernel.org (Postfix) with ESMTP id E581060F4F
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 18:02:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E581060F4F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC15B4A98B;
-	Mon, 27 Sep 2021 13:33:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 560C54B0C5;
+	Mon, 27 Sep 2021 14:02:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xOk0bL3OPTVg; Mon, 27 Sep 2021 13:33:48 -0400 (EDT)
+	with ESMTP id KD9JhfVqbZQa; Mon, 27 Sep 2021 14:02:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D48234A7FD;
-	Mon, 27 Sep 2021 13:33:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 363304B0A0;
+	Mon, 27 Sep 2021 14:02:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A5934A7FD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 13:33:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ED88440C88
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 12:59:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f2hiBYvietZh for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Sep 2021 13:33:46 -0400 (EDT)
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com
- [209.85.216.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8BC8849F8F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 13:33:46 -0400 (EDT)
-Received: by mail-pj1-f43.google.com with SMTP id
- lb1-20020a17090b4a4100b001993f863df2so603878pjb.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 10:33:46 -0700 (PDT)
+ with ESMTP id 3HtaPCEudci5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Sep 2021 12:59:19 -0400 (EDT)
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com
+ [209.85.167.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BCA874086F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 12:59:19 -0400 (EDT)
+Received: by mail-lf1-f49.google.com with SMTP id u8so79267333lff.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 09:59:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=QVPOqaNlq7I3lDhzzEE0LSlmqb5BJv1DMZ8alEx/1nI=;
- b=d285SG2vMoj7fWGLcc6kCiR/YbFmwFZ0r8FCUF/olwvOpdIeZoqHfRZvaCPNzDsw+I
- DXfTdpdYvY1o3+xwclpJFqsOx9rx8gXxXILEPFDMXqDFGp4BJoLLTpbwH1u1XP+r1Qam
- 5szAUX8Uoct9SyiacXSLIaEMZeN1EKkEAgcpyL12gNGSfsGKRyH2m+hvt+6VnU5P+65Q
- 0VTTYCcD9hk6ReQ9O9Swq7+ugPD0ecGhrBD3WfyuwTtr/uZVPNTBMwKAB7m8BgvxcC2+
- 1ahXM7yNRUThnsg8QBfYfkaFmzHfumEXxhUu0VeZLeiCqPy+iDDU2pSUPBkNE2SVw6+C
- hGgg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=boyhOy7c3Zv3+YHD3yPMRV9jTZZHINKXKipnorJKcwg=;
+ b=EFsgbbFE2kAt7wByLaFcasmCsfVIgNxk/m8G/nDr+HQQCPZquhtvMBtAa+Duc5+kXQ
+ UtY1CeMLlZTD94anpjzQv4K2YgUm9xVsItVLuyYt7PzuN+o60dJjWiO6ZURLbhkP7mzD
+ l/1wphgAzzIFt+bnAvBUh1vmO0XgUCFQbkR5nyhNqwPHp4lRcD3QYQpAbbn7KH5W/ysv
+ OQmlCYcjYrF8BVfGjUkclx0OrNnd/IdHMhsMfPOv7/HS8Qxd6WyABtIhI1iDB0FR5uaE
+ W0Ua9w0Kzy0A9r7i69bL0pt1y0fFyfV6OwYtL3O/7ZJwWx+dXki0Z+PUBsXBMwLQP/I9
+ ShZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=QVPOqaNlq7I3lDhzzEE0LSlmqb5BJv1DMZ8alEx/1nI=;
- b=zppHQfTk/ilaVS490ZljxfhjyP7rmKBgnVq6Tq/dAxR/hbLm8xKkTXbe+SpQMhIudw
- FXpp3kS8EpBEJxTc5JEbUZW/ofHAwNlQCCWnocgGcQAvhyTcyLr0QpbRc5CR2hy8o8L4
- 6R1ieLhDD1GsuSCEzJmoPMjWE9LzDBLNDa09YXHvh6D3jij9q377wXqMta+AxW4ux+Wv
- lySThboFmwOzH5+udTuISD5H6TOZOivdPgMfdXLqx5puYs7+vF0qaeV0fzA5gbE6cmOc
- 5SMF9GTfaG9oifdxqcPsQ35A1V0vsogK/cED37C4UVi12RzTpV48tATCw4Fqj36PB/rk
- F89A==
-X-Gm-Message-State: AOAM531bhUz2wy0uqq9VdkDecQaGxZWw5n0S8oEZ/2WKcvVroe+TtgzL
- qlhCpS7vqLvRmS0WIHRep9hKPg==
-X-Google-Smtp-Source: ABdhPJyGE9PssoIO8hd/mc9M/bvKl7HfH1PbwL6q6ROscf2AvxLZZUXzLqFUTTNdwUlFUFuHe69vkw==
-X-Received: by 2002:a17:90b:224b:: with SMTP id
- hk11mr253513pjb.231.1632764025351; 
- Mon, 27 Sep 2021 10:33:45 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id o17sm18385346pfp.126.2021.09.27.10.33.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Sep 2021 10:33:44 -0700 (PDT)
-Date: Mon, 27 Sep 2021 17:33:41 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
- Halt-polling fixes, cleanups and a new stat)
-Message-ID: <YVIAdVxc+q2UWB+J@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=boyhOy7c3Zv3+YHD3yPMRV9jTZZHINKXKipnorJKcwg=;
+ b=uA2naR7OsIE/Hy8lYn3aObkmZymJ9p5JfnnIjumZjL+DCxUucLn2s9G7Onqo/mzlvQ
+ JCRIZxHdGvaTfzbkUeCPGU85gLVLd1MSHqzwJysHyRSGIMnTjtudwNOw6HUq52ZjoL0v
+ gmb+fwcmgfhmtjOQOiRIhEMR53t5RI3K+XdiY/Px0IArJsPaVA10jg+snoNUyiGJrVa9
+ 6pDlMPdwQIazz7cb6NRLb+AsrEFYkQFDBr5VT/khoJKkgvb98wE5QfDiS7FPiq6/8TCm
+ y1xJiKak0dI7HN54xtoS1j/4vOKeEYdZwx9gSXyZqn+OPJcYsmdbTnxhilo9kSl4LMzk
+ p3VQ==
+X-Gm-Message-State: AOAM533txBJElSvIwz+FWk8lJqIpzFhkhHlvs0KN+ceSiGhq01PYnBpp
+ KUPPcXJa6vV2t7LOWKOXgS8d3x3EQoHS7i5ibel4Uw==
+X-Google-Smtp-Source: ABdhPJyvrc2iIXbcC8YaiVkzYO41Psj9zevIrEPYYOmLf26TIPB4wujR7R6xkm6OJn238QJWJUKaISQGVYiRf4/ylng=
+X-Received: by 2002:a19:c349:: with SMTP id t70mr843112lff.102.1632761958145; 
+ Mon, 27 Sep 2021 09:59:18 -0700 (PDT)
+MIME-Version: 1.0
 References: <20210925005528.1145584-1-seanjc@google.com>
  <03f2f5ab-e809-2ba5-bd98-3393c3b843d2@de.ibm.com>
  <YVHcY6y1GmvGJnMg@google.com>
  <f37ab68c-61ce-b6fb-7a49-831bacfc7424@redhat.com>
  <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
- <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CABgObfYtS6wiQe=BhF3t5usr7J6q4PWE4=rwZMMukfC9wT_6fA@mail.gmail.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
- David Hildenbrand <david@redhat.com>, "Kernel Mailing List,
- Linux" <linux-kernel@vger.kernel.org>, Paul Mackerras <paulus@ozlabs.org>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- KVM ARM <kvmarm@lists.cs.columbia.edu>, Janosch Frank <frankja@linux.ibm.com>,
+In-Reply-To: <43e42f5c-9d9f-9e8b-3a61-9a053a818250@de.ibm.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 27 Sep 2021 09:58:51 -0700
+Message-ID: <CALzav=cxeYieTkKJhT0kFZOjdv6k5eCZXKWs=ZQGCJg0x-oFjQ@mail.gmail.com>
+Subject: Re: disabling halt polling broken? (was Re: [PATCH 00/14] KVM:
+ Halt-polling fixes, cleanups and a new stat)
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+X-Mailman-Approved-At: Mon, 27 Sep 2021 14:02:49 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm list <kvm@vger.kernel.org>,
+ David Hildenbrand <david@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
+ Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>, Janosch Frank <frankja@linux.ibm.com>,
  Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
  Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Jon Cargille <jcargill@google.com>, kvm-ppc <kvm-ppc@vger.kernel.org>,
- David Matlack <dmatlack@google.com>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- "open list:MIPS" <linux-mips@vger.kernel.org>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+ Jon Cargille <jcargill@google.com>, KVMPPC <kvm-ppc@vger.kernel.org>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Cornelia Huck <cohuck@redhat.com>, LinuxMIPS <linux-mips@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -115,53 +102,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 27, 2021, Paolo Bonzini wrote:
-> On Mon, Sep 27, 2021 at 5:17 PM Christian Borntraeger
-> <borntraeger@de.ibm.com> wrote:
-> > > So I think there are two possibilities that makes sense:
-> > >
-> > > * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
+On Mon, Sep 27, 2021 at 8:17 AM Christian Borntraeger
+<borntraeger@de.ibm.com> wrote:
+>
+>
+>
+> Am 27.09.21 um 17:03 schrieb Paolo Bonzini:
+> > On 27/09/21 16:59, Sean Christopherson wrote:
+> >>> commit acd05785e48c01edb2c4f4d014d28478b5f19fb5
+> >>> Author:     David Matlack<dmatlack@google.com>
+> >>> AuthorDate: Fri Apr 17 15:14:46 2020 -0700
+> >>> Commit:     Paolo Bonzini<pbonzini@redhat.com>
+> >>> CommitDate: Fri Apr 24 12:53:17 2020 -0400
+> >>>
+> >>>      kvm: add capability for halt polling
+> >>>
+> >>> broke the possibility for an admin to disable halt polling for already running KVM guests.
+> >>> In past times doing
+> >>> echo 0 > /sys/module/kvm/parameters/halt_poll_ns
+> >>>
+> >>> stopped polling system wide.
+> >>> Now all KVM guests will use the halt_poll_ns value that was active during
+> >>> startup - even those that do not use KVM_CAP_HALT_POLL.
+> >>>
+> >>> I guess this was not intended?
 > >
-> > what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
-> 
-> Yes, that's what I meant.  David pointed out that doesn't allow you to
-> disable halt polling altogether, but for that you can always ask each
-> VM's userspace one by one, or just not use KVM_CAP_HALT_POLL. (Also, I
-> don't know about Google's usecase, but mine was actually more about
-> using KVM_CAP_HALT_POLL to *disable* halt polling on some VMs!).
+> > No, but...
+> >
+> >> I would go so far as to say that halt_poll_ns should be a hard limit on
+> >> the capability
+> >
+> > ... this would not be a good idea I think.  Anything that wants to do a lot of polling can just do "for (;;)".
 
-I kinda like the idea if special-casing halt_poll_ns=0, e.g. for testing or
-in-the-field mitigation if halt-polling is broken.  It'd be trivial to support, e.g.
+I agree. It would also be a maintenance burden and subtle "gotcha" to
+have to increase halt_poll_ns anytime one wants to increase
+KVM_CAP_HALT_POLL.
 
-@@ -3304,19 +3304,23 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
-                update_halt_poll_stats(vcpu, start, poll_end, !waited);
+> >
+> > So I think there are two possibilities that makes sense:
+> >
+> > * track what is using KVM_CAP_HALT_POLL, and make writes to halt_poll_ns follow that
+>
+> what about using halt_poll_ns for those VMs that did not uses KVM_CAP_HALT_POLL and the private number for those that did.
 
-        if (halt_poll_allowed) {
-+               max_halt_poll_ns = vcpu->kvm->max_halt_poll_ns;
-+               if (!max_halt_poll_ns || !halt_poll_ns)  <------ squish the max if halt_poll_ns==0
-+                       max_halt_poll_ns = halt_poll_ns;
-+
-                if (!vcpu_valid_wakeup(vcpu)) {
-                        shrink_halt_poll_ns(vcpu);
--               } else if (vcpu->kvm->max_halt_poll_ns) {
-+               } else if (max_halt_poll_ns) {
-                        if (halt_ns <= vcpu->halt_poll_ns)
-                                ;
-                        /* we had a long block, shrink polling */
-                        else if (vcpu->halt_poll_ns &&
--                                halt_ns > vcpu->kvm->max_halt_poll_ns)
-+                                halt_ns > max_halt_poll_ns)
-                                shrink_halt_poll_ns(vcpu);
-                        /* we had a short halt and our poll time is too small */
--                       else if (vcpu->halt_poll_ns < vcpu->kvm->max_halt_poll_ns &&
--                                halt_ns < vcpu->kvm->max_halt_poll_ns)
--                               grow_halt_poll_ns(vcpu);
-+                       else if (vcpu->halt_poll_ns < max_halt_poll_ns &&
-+                                halt_ns < max_halt_poll_ns)
-+                               grow_halt_poll_ns(vcpu, max_halt_poll_ns);
-                } else {
-                        vcpu->halt_poll_ns = 0;
-                }
+None of these options would cover Christian's original use-case
+though. (Write to module to disable halt-polling system-wide.)
+
+What about adding a writable "enable_halt_polling" module parameter
+that affects all VMs? Once that is in place we could also consider
+getting rid of halt_poll_ns entirely.
+
+> >
+> > * just make halt_poll_ns read-only.
+> >
+> > Paolo
+> >
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
