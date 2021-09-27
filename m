@@ -2,81 +2,80 @@ Return-Path: <SRS0=UlWN=OR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B518C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 15:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 068E8C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 15:57:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 87A2660F94
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 15:50:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 87A2660F94
+	by mail.kernel.org (Postfix) with ESMTP id 730106108E
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 15:57:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 730106108E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D02644B0E2;
-	Mon, 27 Sep 2021 11:50:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E106E4B0DB;
+	Mon, 27 Sep 2021 11:57:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uSwwq7aJ2CZH; Mon, 27 Sep 2021 11:50:55 -0400 (EDT)
+	with ESMTP id ZV5Z3CQ7KYIA; Mon, 27 Sep 2021 11:57:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2F744B0C5;
-	Mon, 27 Sep 2021 11:50:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA9044B0C2;
+	Mon, 27 Sep 2021 11:57:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EED94B0A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 11:50:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC6844B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 11:57:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bQymA81osx5p for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Sep 2021 11:50:53 -0400 (EDT)
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
- [209.85.221.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C23D406E0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 11:50:53 -0400 (EDT)
-Received: by mail-wr1-f45.google.com with SMTP id u18so52828774wrg.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 08:50:53 -0700 (PDT)
+ with ESMTP id ME1u7VF-VB93 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Sep 2021 11:57:54 -0400 (EDT)
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com
+ [209.85.128.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A1E29406E0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 11:57:54 -0400 (EDT)
+Received: by mail-wm1-f42.google.com with SMTP id b192so931885wmb.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 08:57:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=bD2SU81ByuO8RLJO5RDrMC/8VFdSNtKnthXXLJULzNc=;
- b=KPdnEoeTKth8fMdTKgIpFSy869w3KC5nA4MquQVHTHDJxdBR+mmpeme/Bio+k5fsct
- y2gPk7IU4/ekMyVwex+F4Igu19Nrh2wt6I7SyCvDTksgnK629UvITvv4bAX7ih7lcWRM
- 7vuLfw5Ud7dNIApDLbNWlF1iGhWp67OsxOuMh7y13EiDfuRQB0XZ8i4wNWXULuygFEXt
- EHU0OkVvFJrwiZ6sBCasDhCoxTGRa6ctE6Iif7gQjbrBo3+p4lXVp+mNIZDYSD2h/McX
- oDXAoGzI0/emAX7x0ZxznathRbF+53ohnySmo1yOu+MF275OQKIHA4Wyyq5/+2uDhzJ3
- mf/A==
+ bh=JR35HuKzGthWvmv9CEqJPefKanPo+GUZ6dckwUpLigk=;
+ b=gih3EnHFCTKeAfABxRU6h6OIaW3q6XxmnJ7BB2hoX0s9KrPfdg/GLhAyjl1bGNr/9E
+ +7PDztufqi8UOCdexyXc2otuZIynneBVwdEz3bQFX2f2C1kmNsODnwN5y2rPtJ0/Wi+i
+ TNIKY6HJjSeFhDvJUdUaY6F4eOq/DqKG8wWgg+p9ggcm4B+aFKpdJXxEPPXC7IIm0FDL
+ UUXOFGU2nfYtOlJw+rTYRI2Wtq/XfOXl2fzP6ILhLQ+RdLKbahBjx3Mxn8PCB+EkBgc+
+ QO3saRNehYAIwCEP8oZjJufcp7lttIx3YvfLCWv75QDRiLUAJeYg3/s8aWMN/Y0Vrj1a
+ u+uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=bD2SU81ByuO8RLJO5RDrMC/8VFdSNtKnthXXLJULzNc=;
- b=zG4E3SGplYw8+7NvmlJvguWAK6N/SY7qNtW1O96eHDJVoIPaSm+m712pW7bZG8Kp+8
- zX8LEyNdaOe6YgkHVX9VgpuDftSI0gjp6iRkevvBILezPiMjKaoNl0Jjo+sFIO9leaUj
- fSOTiR2PdkmaZjJI+Uc0wY23R3QaRrCsdyvw2FQwMOnygwWDdcoyXWV8ISrfgtTKu2E2
- zNDn1NL9uYOLzS32gGCZD029c/14mGbOgfSiiTi9LaSEx0TBTB79Zo8tnmPaz2l6rlYO
- feucaaJKcOEwiURv8UpzZIqwbupUdvYj1ELSy549sW3mf6thyuZVn9w8MA+xM63Ds8jt
- v19Q==
-X-Gm-Message-State: AOAM533jROxDrwZl8IxBaD0SXnw2GzEN5BgLQWlNtJgweXBHb6NK13Xs
- yKU+U1KcNcpEj8+lSxSgjxbVFw==
-X-Google-Smtp-Source: ABdhPJwk7UodlbcmeCXvgKd8A7K3G5BMhG4Ur82WbOKNPVZPKso9e2mYyfKX7AMU2xjSrywlN10B7w==
-X-Received: by 2002:a5d:648f:: with SMTP id o15mr664308wri.338.1632757852232; 
- Mon, 27 Sep 2021 08:50:52 -0700 (PDT)
+ bh=JR35HuKzGthWvmv9CEqJPefKanPo+GUZ6dckwUpLigk=;
+ b=sbESMscol1nAgTRA03qrNAHag9DNwZuFV/IZUHo36Vjk82yzZ5irN9dESAI/ms8l/p
+ EUk3iLZpyrIXKBx5GCM5nfIfMseT2UaJnvmk/dBGGfJA3J0Nk2YgBQOCPzYt6GPG7wyJ
+ 0X84jg1FESnUKScKsiIwVHu0SGDbtXf+FwCmrYSFetZ/CKyLzLyGSSNHbZRxBQpLrNDf
+ je0kABoUCVmte3yOWTdmfe5FoY2RAeV4zyEexxFSvEdJ8SaumkT/oJzNnDqMZxe84T8A
+ ElaQruFKTLQZtS+OhLSoWztaC+b47LsCGhdKMdA6ZPD8toxdVjIbKIhZ9H5BYvj4yEfi
+ t4qQ==
+X-Gm-Message-State: AOAM530olFxNg0QgO3U5gE+SPl+Tcw9857E6qlEpdsFwZKDwN3CKsY4M
+ 3ND2E6/sP65ch0ZdGKHdQ3v4qg==
+X-Google-Smtp-Source: ABdhPJyRdPlCVLYtYfKxxPD3CfGn+QmcYz7W2HksgyRTiXomX+tB+0JxkqXAM8syfEH3XlcesX3ELQ==
+X-Received: by 2002:a1c:1d92:: with SMTP id d140mr8232533wmd.17.1632758273549; 
+ Mon, 27 Sep 2021 08:57:53 -0700 (PDT)
 Received: from google.com ([2a00:79e0:d:210:fa68:b369:184:c5a])
- by smtp.gmail.com with ESMTPSA id 8sm6619875wmo.47.2021.09.27.08.50.51
+ by smtp.gmail.com with ESMTPSA id l18sm682277wrp.56.2021.09.27.08.57.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 27 Sep 2021 08:50:51 -0700 (PDT)
-Date: Mon, 27 Sep 2021 16:50:49 +0100
+ Mon, 27 Sep 2021 08:57:53 -0700 (PDT)
+Date: Mon, 27 Sep 2021 16:57:50 +0100
 From: Quentin Perret <qperret@google.com>
 To: Fuad Tabba <tabba@google.com>
-Subject: Re: [RFC PATCH v1 01/30] KVM: arm64: placeholder to check if VM is
- protected
-Message-ID: <YVHoWbPXSHt07Ooq@google.com>
+Subject: Re: [RFC PATCH v1 05/30] KVM: arm64: add accessors for kvm_cpu_context
+Message-ID: <YVHp/sbRuCYyroz5@google.com>
 References: <20210924125359.2587041-1-tabba@google.com>
- <20210924125359.2587041-2-tabba@google.com>
+ <20210924125359.2587041-6-tabba@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210924125359.2587041-2-tabba@google.com>
+In-Reply-To: <20210924125359.2587041-6-tabba@google.com>
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
  will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -96,41 +95,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Fuad,
-
-On Friday 24 Sep 2021 at 13:53:30 (+0100), Fuad Tabba wrote:
-> Add a function to check whether a VM is protected (under pKVM).
-> Since the creation of protected VMs isn't enabled yet, this is a
-> placeholder that always returns false. The intention is for this
-> to become a check for protected VMs in the future (see Will's RFC).
-> 
-> No functional change intended.
-> 
-> Acked-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> 
-> Link: https://lore.kernel.org/kvmarm/20210603183347.1695-1-will@kernel.org/
-> ---
->  arch/arm64/include/asm/kvm_host.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 7cd7d5c8c4bc..adb21a7f0891 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -763,6 +763,11 @@ void kvm_arch_free_vm(struct kvm *kvm);
->  
->  int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
->  
-> +static inline bool kvm_vm_is_protected(struct kvm *kvm)
+On Friday 24 Sep 2021 at 13:53:34 (+0100), Fuad Tabba wrote:
+> +static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
 > +{
-> +	return false;
+> +	__ctxt_write_spsr(&vcpu_ctxt(vcpu), val);
 > +}
+> +
+> +static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
+> +{
+> +	__ctxt_write_spsr_abt(&vcpu_ctxt(vcpu), val);
+> +}
+> +
+> +static void __vcpu_write_spsr_und(struct kvm_vcpu *vcpu, u64 val)
+> +{
+> +	__ctxt_write_spsr_und(&vcpu_ctxt(vcpu), val);
+>  }
 
-Nit: this isn't used before patch 25 I think, so maybe move to a later
-point in the series? That confused me a tiny bit :)
+I think you remove those at a later point in the series, do we really
+need to add them here?
 
-Thanks,
+Cheers,
 Quentin
 _______________________________________________
 kvmarm mailing list
