@@ -1,89 +1,92 @@
-Return-Path: <SRS0=xQSp=OQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=UlWN=OR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A3EC433EF
-	for <kvmarm@archiver.kernel.org>; Sun, 26 Sep 2021 09:02:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B305BC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 01:16:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BB98861029
-	for <kvmarm@archiver.kernel.org>; Sun, 26 Sep 2021 09:02:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BB98861029
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 2650760F5D
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 01:16:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2650760F5D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4156B4086D;
-	Sun, 26 Sep 2021 05:02:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DADF407F1;
+	Sun, 26 Sep 2021 21:16:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pP1omsSCYS13; Sun, 26 Sep 2021 05:02:35 -0400 (EDT)
+	with ESMTP id NyJVI0mfX9Ic; Sun, 26 Sep 2021 21:16:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AA294B0B6;
-	Sun, 26 Sep 2021 05:02:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11C0D4B08E;
+	Sun, 26 Sep 2021 21:16:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC45F4B0B6
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Sep 2021 05:02:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D86574B089
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Sep 2021 21:16:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 08wRIFV03kW0 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 26 Sep 2021 05:02:32 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 830804086D
- for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Sep 2021 05:02:32 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id VFB0OF8zjBUb for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 26 Sep 2021 21:16:47 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62BA7407F1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 26 Sep 2021 21:16:47 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1632705407;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rzY8M8YXu+iYLKxkUwpPuQgNMZXmHBvkZNhdt51C1c8=;
+ b=Vks+ScZhF+CPRwx8BAUzjIz2ryGpYst+8s8O1XDQ7/GH0DdY2dDV0wUL+36IMQNr+mNmhk
+ DtY4A7A004zQ+m7TNe1kD4YW10SexeLTXMpWV0JFIT+25rKEZqk0eXJrRz2ZlIUK9kf036
+ 5EQEE0bhLwKWhbk15LAgSs2luzhgJJw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-QfnfAssDNqOUHVJTHwCbxg-1; Sun, 26 Sep 2021 21:16:45 -0400
+X-MC-Unique: QfnfAssDNqOUHVJTHwCbxg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6F4DC60FC1;
- Sun, 26 Sep 2021 09:02:31 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mUQ3J-00D1iV-6U; Sun, 26 Sep 2021 10:02:29 +0100
-Date: Sun, 26 Sep 2021 10:02:28 +0100
-Message-ID: <877df3btgb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 07/14] KVM: Don't block+unblock when halt-polling is
- successful
-In-Reply-To: <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
-References: <20210925005528.1145584-1-seanjc@google.com>
- <20210925005528.1145584-8-seanjc@google.com>
- <878rzlass2.wl-maz@kernel.org>
- <80d90ee6-0d43-3735-5c26-be8c3d72d493@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com,
- chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org,
- borntraeger@de.ibm.com, frankja@linux.ibm.com, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, david@redhat.com,
- cohuck@redhat.com, imbrenda@linux.ibm.com, vkuznets@redhat.com,
- wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
- linux-kernel@vger.kernel.org, dmatlack@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
- Paul Mackerras <paulus@ozlabs.org>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, kvm-ppc@vger.kernel.org,
- David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- linux-mips@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A2A1802C88;
+ Mon, 27 Sep 2021 01:16:43 +0000 (UTC)
+Received: from [10.64.54.16] (vpn2-54-16.bne.redhat.com [10.64.54.16])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7243060C13;
+ Mon, 27 Sep 2021 01:16:36 +0000 (UTC)
+Subject: Re: [PATCH] Documentation, dt, numa: Add note to empty NUMA node
+To: Rob Herring <robh@kernel.org>
+References: <20210906041424.115473-1-gshan@redhat.com>
+ <CAL_JsqLccwTEhzonvdOOox+D6=3gHxbDbtsXTJpqtQfuxA4xvg@mail.gmail.com>
+ <CAMj1kXFgnbuQzqf4rnpzn+Ez-sL3859q=1z_PkE1Mgd3SL19rA@mail.gmail.com>
+ <197ced59-49b0-a981-6e04-96405164daba@redhat.com>
+ <CAL_JsqLRH_Vn7u7b_yXgC=jBE8sZ2ax_yyueA3umbhQtbjW0TA@mail.gmail.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <6aa8dd66-7910-4227-709a-8d0bbc2939ee@redhat.com>
+Date: Mon, 27 Sep 2021 11:16:30 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <CAL_JsqLRH_Vn7u7b_yXgC=jBE8sZ2ax_yyueA3umbhQtbjW0TA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Cc: "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, linux-efi <linux-efi@vger.kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ shan.gavin@gmail.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -92,76 +95,197 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 26 Sep 2021 07:27:28 +0100,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+Hi Rob,
+
+> On 9/24/21 1:17 AM, Rob Herring wrote:
+> On Thu, Sep 23, 2021 at 1:32 AM Gavin Shan <gshan@redhat.com> wrote:
+>> On 9/22/21 9:05 PM, Ard Biesheuvel wrote:
+>>> On Tue, 21 Sept 2021 at 21:45, Rob Herring <robh@kernel.org> wrote:
+>>>> On Sun, Sep 5, 2021 at 11:16 PM Gavin Shan <gshan@redhat.com> wrote:
+>>>>>
+>>>>> The empty memory nodes, where no memory resides in, are allowed.
+>>>>> For these empty memory nodes, the 'len' of 'reg' property is zero.
+>>>>> The NUMA node IDs are still valid and parsed, but memory may be
+>>>>> added to them through hotplug afterwards. Currently, QEMU fails
+>>>>> to boot when multiple empty memory nodes are specified. It's
+>>>>> caused by device-tree population failure and duplicated memory
+>>>>> node names.
+>>>
+>>> Those memory regions are known in advance, right? So wouldn't it be
+>>> better to use something like 'status = "disabled"' here?
+>>>
+>>
+>> Yes, these memory regions are known in advance. For the empty nodes,
+>> their 'len' property is zero and it's equal to disabled state.
+>>
+>>>>
+>>>> I still don't like the fake addresses. I can't really give suggestions
+>>>> on alternative ways to fix this with you just presenting a solution.
+>>>>
+>>>
+>>> Agreed. Please try to explain what the problem is, and why this is the
+>>> best way to solve it. Please include other solutions that were
+>>> considered and rejected if any exist.
+>>>
+>>>> What is the failure you see? Can we relax the kernel's expectations?
+>>>> What about UEFI boot as the memory nodes aren't used (or maybe they
+>>>> are for NUMA?) How does this work with ACPI?
+>>>>
+>>>
+>>> The EFI memory map only needs to describe the memory that was present
+>>> at boot. More memory can be represented as ACPI objects, including
+>>> coldplugged memory that is already present at boot. None of this
+>>> involves the memory nodes in DT.
+>>>
+>>
+>> I'm using the following command line to start a virtual machine (VM).
+>> There are 4 NUMA nodes specified, but the last two are empty. In QEMU,
+>> the device-tree nodes are populated to represent these 4 NUMA nodes.
+>> Unfortunately, QEMU fails to start because of the conflicting names
+>> for the empty node are found, as the following error message indicates.
+>>
+>>      /home/gavin/sandbox/qemu.main/build/qemu-system-aarch64        \
+>>      -accel kvm -machine virt,gic-version=host                      \
+>>      -cpu host -smp 4,sockets=2,cores=2,threads=1                   \
+>>      -m 1024M,slots=16,maxmem=64G                                   \
+>>      -object memory-backend-ram,id=mem0,size=512M                   \
+>>      -object memory-backend-ram,id=mem1,size=512M                   \
+>>      -numa node,nodeid=0,cpus=0-1,memdev=mem0                       \
+>>      -numa node,nodeid=1,cpus=2-3,memdev=mem1                       \
+>>      -numa node,nodeid=2                                            \
+>>      -numa node,nodeid=3                                            \
+>>        :
+>>      -device virtio-balloon-pci,id=balloon0,free-page-reporting=yes
+>>        :
+>>        :
+>>      qemu-system-aarch64: FDT: Failed to create subnode /memory@80000000: FDT_ERR_EXISTS
+>>
+>> According to device-tree specification, the memory device-tree node's
+>> name is following the format 'memory@base-address'. For the empty
+>> NUMA nodes, their base addresses aren't determined. The device-tree
+>> specification doesn't indicate what 'base-address' should be assigned
+>> for the empty nodes. So I proposed this patch because I think the
+>> linux device-tree binding documentation is best place to get this
+>> documented.
 > 
-> On 25/09/21 11:50, Marc Zyngier wrote:
-> >> there is no need for arm64 to put/load
-> >> the vGIC as KVM hasn't relinquished control of the vCPU in any way.
-> > 
-> > This doesn't mean that there is no requirement for any state
-> > change. The put/load on GICv4 is crucial for performance, and the VMCR
-> > resync is a correctness requirement.
+> Why even create the node?
 > 
-> I wouldn't even say it's crucial for performance: halt polling cannot
-> work and is a waste of time without (the current implementation of)
-> put/load.
+> What does IBM pSeries do here. AIUI, those platforms create/remove
+> nodes for hotplug. That's the reason CONFIG_OF_DYNAMIC existed
+> originally. Unfortunately, that's the extent of my knowledge on that.
+> 
 
-Not quite. A non-V{LPI,SGI} could still be used as the a wake-up from
-WFI (which is the only reason we end-up on this path). Only LPIs (and
-SGIs on GICv4.1) can be directly injected, meaning that SPIs and PPIs
-still follow the standard SW injection model.
+It has been long time that I didn't read pSeries related code. I
+spent some time on that and you're correct. On pSeries, the device-tree
+node is added dynamically. However, the IBM private nodes or properties,
+whose names start with "ibm", are used for the memory hotplug. So
+ARM64 can't follow without adaption.
 
-However, there is still the ICH_VMCR_EL2 requirement (to get the
-up-to-date priority mask and group enable bits) for SW-injected
-interrupt wake-up to work correctly, and I really don't want to save
-that one eagerly on each shallow exit.
+I agree on your suggestion, which will be reflected in v2:
 
-> However, is activating the doorbell necessary?  If possible, polling
-> the VGIC directly for pending VLPIs without touching the ITS (for
-> example by emulating IAR reads) may make sense.  IIUC that must be
-> done at EL2 though, so maybe it would even make sense to move all of
-> halt polling to EL2 for the nVHE case.  It all depends on benchmark
-> results, of course.
+(a) the memory device-tree nodes are added and removed on memory hot
+     add and removal.
+(b) the supported NUMA nodes, including the empty ones, are identified
+     through "numa-distance-map" compatible device-tree node. It's
+     exactly same to what you suggested below.
 
-No, there is no architectural way to observe the VLPI state. EL2
-cannot impersonate the guest an read ICV_IAR1_EL1 (because it
-conveniently has the same encoding as ICC_IAR1_EL1), and if it could,
-it would be *destructive* (not what you want). The equivalent of the
-LR that is used to hold the highest priority VLPI presented to the
-virtual CPU interface is not visible to SW at all.
+In this way, we won't have the issue of the conflicting memory node
+names, introduced by the empty NUMA nodes.
 
-There are exactly two ways for the hypervisor to get a hint about the
-VLPI state (and that's only a hint, as everything can be spurious):
+>> ACPI is different story. The NUMA nodes are represented by SRAT
+>> (System Resource Affinity Table). In the above example, there are
+>> 4 SRATs. We needn't assign names to the tables and we don't have
+>> the conflicting names as we do in device-tree case.
+>>
+>> By the way, QEMU currently prevents to expose SRATs for empty NUMA
+>> nodes. I need submit QEMU patch to break the limitation in future.
+>> With the limitation, the hot-added memory is always put into the
+>> last NUMA node and it's not exactly customer wants.
+>>
+>>>>> As device-tree specification indicates, the 'unit-address' of
+>>>>> these empty memory nodes, part of their names, are the equivalents
+>>>>> to 'base-address'. Unfortunately, I finds difficulty to get where
+>>>>> the assignment of 'base-address' is properly documented for these
+>>>>> empty memory nodes. So lets add a section for empty memory nodes
+>>>>> to cover this in NUMA binding document. The 'unit-address',
+>>>>> equivalent to 'base-address' in the 'reg' property of these empty
+>>>>> memory nodes is specified to be the summation of highest memory
+>>>>> address plus the NUMA node ID.
+>>>>>
+>>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>>>> Acked-by: Randy Dunlap <rdunlap@infradead.org>
+>>>>> ---
+>>>>>    Documentation/devicetree/bindings/numa.txt | 60 +++++++++++++++++++++-
+>>>>>    1 file changed, 59 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/Documentation/devicetree/bindings/numa.txt b/Documentation/devicetree/bindings/numa.txt
+>>>>> index 21b35053ca5a..82f047bc8dd6 100644
+>>>>> --- a/Documentation/devicetree/bindings/numa.txt
+>>>>> +++ b/Documentation/devicetree/bindings/numa.txt
+>>>>> @@ -103,7 +103,65 @@ Example:
+>>>>>                   };
+>>>>>
+>>>>>    ==============================================================================
+>>>>> -4 - Example dts
+>>>>> +4 - Empty memory nodes
+>>>>> +==============================================================================
+>>>>> +
+>>>>> +Empty memory nodes, which no memory resides in, are allowed. The 'length'
+>>>>> +field of the 'reg' property is zero. However, the 'base-address' is a
+>>>>> +dummy and invalid address, which is the summation of highest memory address
+>>>>> +plus the NUMA node ID. The NUMA node IDs and distance maps are still valid
+>>>>> +and memory may be added into them through hotplug afterwards.
+>>>>> +
+>>>>> +Example:
+>>>>> +
+>>>>> +       memory@0 {
+>>>>> +               device_type = "memory";
+>>>>> +               reg = <0x0 0x0 0x0 0x80000000>;
+>>>>> +               numa-node-id = <0>;
+>>>>> +       };
+>>>>> +
+>>>>> +       memory@80000000 {
+>>>>> +               device_type = "memory";
+>>>>> +               reg = <0x0 0x80000000 0x0 0x80000000>;
+>>>>> +               numa-node-id = <1>;
+>>>>> +       };
+>>>>> +
+>>>>> +       /* Empty memory node */
+>>>>> +       memory@100000002 {
+>>>>> +               device_type = "memory";
+>>>>> +               reg = <0x1 0x2 0x0 0x0>;
+>>>>> +               numa-node-id = <2>;
+>>>>> +       };
+>>>>> +
+>>>>> +       /* Empty memory node */
+>>>>> +       memory@100000003 {
+>>>>> +               device_type = "memory";
+>>>>> +               reg = <0x1 0x3 0x0 0x0>;
+>>>>> +               numa-node-id = <3>;
+>>>>> +       };
+>>>>
+>>>> Do you really need the memory nodes here or just some way to define
+>>>> numa node id's 2 and 3 as valid?
+>>>>
+>>
+>> It's the way to define NUMA node IDs are valid. Besides, the 'reg'
+>> property provides 'base-address', which is part of the device-tree
+>> node's name, as described in this patch.
+> 
+> The distance-matrix already lists all possible NUMA node IDs. That
+> should be enough information for the kernel. If not, fix the kernel.
+> 
 
-- Make the vPE non resident and use GICR_VPENDBASER.PendingLast bit to
-  find out whether there are pending VLPIs
+Thanks, Rob. An extra patch will address the issue in v2.
 
-- Make the vPE non resident and get a doorbell interrupt
+Thanks,
+Gavin
 
-See the common pattern?
-
-There is no polling mechanism, and the only way to flush the VLPI
-state to memory is to destroy the GIC view of the vPE, which is a bit
-counter-productive. It also only work on GICv4.1, and not GICv4 (which
-is why we don't support live migration on GICv4).
-
-> Sorry for the many stupid questions I'm asking lately, but I'm trying
-> to pay more attention to ARM and understand the VGIC and EL1/EL2 split
-> better.
-
-Feel free to ask any question. The more people understand how the
-architecture works, the better.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
