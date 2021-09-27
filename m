@@ -2,52 +2,76 @@ Return-Path: <SRS0=UlWN=OR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3668C4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 12:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8378C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 14:49:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5597561074
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 12:48:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5597561074
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 6601360FD7
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Sep 2021 14:49:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6601360FD7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A3584B0BD;
-	Mon, 27 Sep 2021 08:48:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B01074A524;
+	Mon, 27 Sep 2021 10:49:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MP7JsxB0JRRy; Mon, 27 Sep 2021 08:48:01 -0400 (EDT)
+	with ESMTP id NNK-Nc11YMV6; Mon, 27 Sep 2021 10:49:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F0594B0B6;
-	Mon, 27 Sep 2021 08:48:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A16474A534;
+	Mon, 27 Sep 2021 10:49:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A7AE407D1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 08:48:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AEB64A524
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 10:49:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nSRENzsyoypH for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Sep 2021 08:47:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C44A24083E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 08:47:57 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6CAE111FB;
- Mon, 27 Sep 2021 05:47:57 -0700 (PDT)
-Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1494B3F718;
- Mon, 27 Sep 2021 05:47:55 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 2/2] KVM: arm64: Use get_raz_reg() for userspace reads of
- PMSWINC_EL0
-Date: Mon, 27 Sep 2021 13:49:11 +0100
-Message-Id: <20210927124911.191729-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20210927124911.191729-1-alexandru.elisei@arm.com>
-References: <20210927124911.191729-1-alexandru.elisei@arm.com>
+ with ESMTP id FYuuZg4VhUfN for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Sep 2021 10:49:44 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B3944A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 10:49:44 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 48EAA60FED
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 14:49:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1632754183;
+ bh=nlm+GXqBOJFgPGuqH4ktEyVp0rZXsByzVCpaKGKn9Pw=;
+ h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+ b=CtSY0hs0nhLxHyr6ErsvWuAR1cv3yUK5t2GqYnY79ud/jOLtgMBvrFATh1DTQk5Wr
+ emdDTnPAPoArKZsQl3de5W+/e+Ei/O8rV7O0zRGuu/hG2q+3r5n400glzNY3fMncfY
+ bSsFfTIP/pPxAJ9T2baDtHFfCMU6qXpUwXfEghNuIyrGlhOP79telufsEH0MrhRfuR
+ Uon1rEsEJDFbGdqfsvYSUDQgTmmfQCqiOuqp47yPXAUHLS0DodF2zvxGFADDNU45P8
+ 6QyNaDEy01x74UUZCCMh3Joul+V3W09gvDMPW/qq0YTwZdYKRkrNasv7R6CLNsnUDn
+ QI/RyzqUaefig==
+Received: by mail-ed1-f50.google.com with SMTP id g7so10896145edv.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 07:49:43 -0700 (PDT)
+X-Gm-Message-State: AOAM533B89LH6hqWaF5JDF7RIBCGe6mJ1Naf7Y1REQZ+Ld+p6rNf4neS
+ T/+se0UbmvKR6xN686+M43/XuwzkKU5w6m7vZg==
+X-Google-Smtp-Source: ABdhPJwAdi6VamHHELYSAbPUEIJOXg9VYm6jMbUqTQD67z8h2BqyDUn/kOFm4ji2hkz/vqnJ2ZIn0ddX0WT5DJGrUCg=
+X-Received: by 2002:a17:906:7250:: with SMTP id
+ n16mr449630ejk.147.1632754181882; 
+ Mon, 27 Sep 2021 07:49:41 -0700 (PDT)
 MIME-Version: 1.0
+References: <20210927064119.127285-1-gshan@redhat.com>
+ <20210927064119.127285-3-gshan@redhat.com>
+In-Reply-To: <20210927064119.127285-3-gshan@redhat.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 27 Sep 2021 09:49:30 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqL8+_Q690-c3J4TS6LBF-mCUBxbhTfr994=Fwffqab0_w@mail.gmail.com>
+Message-ID: <CAL_JsqL8+_Q690-c3J4TS6LBF-mCUBxbhTfr994=Fwffqab0_w@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] of,
+ numa: Fetch empty NUMA node ID from distance map
+To: Gavin Shan <gshan@redhat.com>
+Cc: devicetree@vger.kernel.org, linux-efi <linux-efi@vger.kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Randy Dunlap <rdunlap@infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ shan.gavin@gmail.com, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,59 +88,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-PMSWINC_EL0 is a write-only register and was initially part of the VCPU
-register state, but was later removed in commit 7a3ba3095a32 ("KVM:
-arm64: Remove PMSWINC_EL0 shadow register"). To prevent regressions, the
-register was kept accessible from userspace as Read-As-Zero (RAZ).
+On Mon, Sep 27, 2021 at 1:42 AM Gavin Shan <gshan@redhat.com> wrote:
+>
+> There is no device node for the empty NUMA node. However, the
+> corresponding NUMA node ID and distance map is still valid in
+> "numa-distance-map-v1" compatible device node.
+>
+> This fetches the NUMA node ID and distance map for these empty
+> NUMA node from "numa-distance-map-v1" compatible device node.
 
-The read function that is used to handle userspace reads of this
-register is get_raz_id_reg(), which, while technically correct, as it
-returns 0, it is not semantically correct, as PMSWINC_EL0 is not an ID
-register as the function name suggests.
+This is much nicer.
 
-Add a new function, get_raz_reg(), to use it as the accessor for
-PMSWINC_EL0, as to not conflate get_raz_id_reg() to handle other types
-of registers.
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  drivers/of/of_numa.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/of/of_numa.c b/drivers/of/of_numa.c
+> index fe6b13608e51..5949829a1b00 100644
+> --- a/drivers/of/of_numa.c
+> +++ b/drivers/of/of_numa.c
+> @@ -111,6 +111,8 @@ static int __init of_numa_parse_distance_map_v1(struct device_node *map)
+>                         return -EINVAL;
+>                 }
+>
+> +               node_set(nodea, numa_nodes_parsed);
+> +
 
-No functional change intended.
+With this, couldn't we remove of_numa_parse_cpu_nodes() as the only
+thing it does is node_set()?
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4adda8bf3168..1be827740f87 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1285,6 +1285,15 @@ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	return __set_id_reg(vcpu, rd, uaddr, true);
- }
- 
-+static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-+		       const struct kvm_one_reg *reg, void __user *uaddr)
-+{
-+	const u64 id = sys_reg_to_index(rd);
-+	const u64 val = 0;
-+
-+	return reg_to_user(uaddr, &val, id);
-+}
-+
- static int set_wi_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 		      const struct kvm_one_reg *reg, void __user *uaddr)
- {
-@@ -1647,7 +1656,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	 * previously (and pointlessly) advertised in the past...
- 	 */
- 	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
--	  .get_user = get_raz_id_reg, .set_user = set_wi_reg,
-+	  .get_user = get_raz_reg, .set_user = set_wi_reg,
- 	  .access = access_pmswinc, .reset = NULL },
- 	{ PMU_SYS_REG(SYS_PMSELR_EL0),
- 	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
--- 
-2.33.0
-
+>                 numa_set_distance(nodea, nodeb, distance);
+>
+>                 /* Set default distance of node B->A same as A->B */
+> --
+> 2.23.0
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
