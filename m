@@ -2,145 +2,82 @@ Return-Path: <SRS0=Tw+U=OS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134D5C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 09:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5565FC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 14:58:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 799CE60FBF
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 09:37:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 799CE60FBF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=nvidia.com
+	by mail.kernel.org (Postfix) with ESMTP id B85BD61215
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 14:58:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B85BD61215
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D360A4B0ED;
-	Tue, 28 Sep 2021 05:37:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F05A4B108;
+	Tue, 28 Sep 2021 10:58:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@nvidia.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6s90EoBIFq2h; Tue, 28 Sep 2021 05:37:26 -0400 (EDT)
+	with ESMTP id lFH7y4SVkTN9; Tue, 28 Sep 2021 10:58:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2C1A4B0B3;
-	Tue, 28 Sep 2021 05:37:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E3CB4A3A5;
+	Tue, 28 Sep 2021 10:58:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9AA74A98B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 17:18:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9BCD40C88
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 10:58:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aTi6VIm3w5A7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Sep 2021 17:17:59 -0400 (EDT)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com
- (mail-bn8nam11on2070.outbound.protection.outlook.com [40.107.236.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 881254B086
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 17:17:59 -0400 (EDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GJoJxTD98ynnerUW6M1DAbK82VbD3WEpdz9K2ZhTl6URjVzPdm7+Wdgx1nDrqxF2wcqkxk9tmZ8VbH/h/H9NNx0HZt2f9xznftta09hhCm8jwXim6V3TgGekDy8bU3Zb5uPHimAFGXMJpHQmQFjsxuVcRqVmhAG7sybXh0irzuB7vMiOUNsCzCnpYiNKDW8NcHNEKZwBOKPXAtq+6TJdAzm7UDdzYzR/RpGck19nW8sedP7/YuUvyVBYvlnYub1Ew9MQFflHFUTyuNc6V/Tj2bFWqCjGzyH30qwtG+BhtjG3LRDUm69rieKKy6hR7LSu2C6GMaxvsxPhjhVzXJwwjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version; 
- bh=KXJKXO7aCP1ZaNstUxrXrlmW773SZvHodmQeBZ/1xcI=;
- b=Bk3tIvcPYXK+MH05hgdQT+oyqGMKza3qNW/q5qm1Fi5EqhxwX5i+V2izKs/uWE4Vhsop221Phdd2UxO9zstHQEb8JwEruTqqMhjtAsuCXMG8nFVzvStF1pkzBMq1hZoScc8eWx5+khQ9oBBvZDRJCdvc73h+eSr/2ENyJkzbb+bDdGnx/tvNkU1e7tMCaXtnagigle3c+JcRWB5L84+tef5/opztffCByzZ9G5Zi+T2fAPj3kv2I42NlUu2o8j8kJhZ4E/M1Lp/xeLD1JWSW//9Dh5o4RhNhSJYZYl1cBMaGycwrmLDTOf3MsyRzyZpqqR+u9jHS/65dJCZBMVnLfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KXJKXO7aCP1ZaNstUxrXrlmW773SZvHodmQeBZ/1xcI=;
- b=jnxQIJk3OLH4S/FYE09BYxcsJxvRZRtKTzNJWT15g2wSjFv47+4vyXwyyiKPVRtUKPbTmCgwm1eAD0P70cn4uMoG6FQsnNYgcSLWtgszsSvLsRONMpjP8CZthZYz5trp7LxPJQue/ui1UthwkzwuLn23lH7qoO85p+pgIaKZwefsnEC3LbtS0gJkNThxsF8ehuOtmhSurqZDGIc2ZdaPV5M3Aeg7dtSWyOswj1ve5nkmfmflHk7hxGlORfCk9v6wHnCm+NYQWk4n9P+yf8Vm7TYjmEWrEXQkgyhZv7+em9VnPFj939BPHRMSZo1L1ExeXuIUAMB6JR9niks63VCDxg==
-Received: from BY5PR12MB3764.namprd12.prod.outlook.com (2603:10b6:a03:1ac::17)
- by BY5PR12MB4950.namprd12.prod.outlook.com (2603:10b6:a03:1d9::11)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4544.20; Mon, 27 Sep
- 2021 21:17:56 +0000
-Received: from BY5PR12MB3764.namprd12.prod.outlook.com
- ([fe80::1d09:e72:91fd:ef05]) by BY5PR12MB3764.namprd12.prod.outlook.com
- ([fe80::1d09:e72:91fd:ef05%7]) with mapi id 15.20.4544.021; Mon, 27 Sep 2021
- 21:17:56 +0000
-From: Krishna Reddy <vdumpa@nvidia.com>
-To: Eric Auger <eric.auger@redhat.com>, "eric.auger.pro@gmail.com"
- <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org"
- <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "will@kernel.org" <will@kernel.org>, "maz@kernel.org" <maz@kernel.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>, "joro@8bytes.org"
- <joro@8bytes.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, 
- "tn@semihalf.com" <tn@semihalf.com>, "zhukeqian1@huawei.com"
- <zhukeqian1@huawei.com>
-Subject: RE: [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part)
-Thread-Topic: [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part)
-Thread-Index: AQHXLsOhPIy4yfhMckeIjXIKtBMRG6u5a1sQ
-Date: Mon, 27 Sep 2021 21:17:56 +0000
-Message-ID: <BY5PR12MB37640C26FEBC8AC6E3EDF40BB3A79@BY5PR12MB3764.namprd12.prod.outlook.com>
-References: <20210411111228.14386-1-eric.auger@redhat.com>
-In-Reply-To: <20210411111228.14386-1-eric.auger@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3c005d6c-1a94-4ddd-599d-08d981fc467e
-x-ms-traffictypediagnostic: BY5PR12MB4950:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR12MB495083C7E96B53C231859EA5B3A79@BY5PR12MB4950.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Cu/2mMwCOGEYEmLkBvHMuU7xqFiQi1U1VBgAAo5vz9BxqOZQVEl+z1Bh1Vfo5IFY9UUZ1YE0zbGDJbIlF79bUUVNeXTQEC7nUm/fpw5PugRKiR4xTR9tIR1VgEL+wIDjuFA51coeTHVqNUuQTjHdSTbGzqpG2cXbkDlSuhmQRf5Vh2NgXiC+/xWemBDrWarfaj+ckXJakISGCbEy2J733w4o3NIcb1qU+VJc1c5YLImYwLcFQVtItbP5lr1qngJnshep/uKG0NrIgsSeh3pT3cUkwQ+psrL+HrtPwH2WNUD3P1gI8khNEhomiAHEGJgJ6U+iDJDzGI+aXp/PnqDGUD3ZxPz3mjYkMpKiPrTjHNy/FXsdKKY0id8hwBXVPcJhsG3bjHLKdCk32CVeLgvH9oFuPfkIRgMCd/8Cf30eacv+G7D1lzoMQmY9ArPjzeqKU3kIsA8/+NU1JrJyoikEAbRkT/YDhIdGzaXCY7DyrsZCc9zbA93Y1/k/6+MFRrPCpDzwqzeHWJintRwaniExsNhBQj+6k+kQ7jV9Ouhm6cSNvkGqCYDh4Tj+aHokWru6BF4HebHRCGQRajSyi5paFH3l7eSKHTEcSpbWWIJrQROZ/knDlJxMyEtVplxzafiO45ZCWI9RbCJR2d2mpEztYCGJFp4kU88RZTrUUJPuhc28hejvuFZSWcuSGXbqUdKKIq0jkWDu9ANGlrE59dnkvrBPn5OmQNpMnyGi0GvreRZAjYAfqN6lnQPdOhFtuOVZagxpGEE03FE0gioHCihD5adv/qwwrw8LTeU2ubJtKIA=
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:BY5PR12MB3764.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(52536014)(5660300002)(76116006)(110136005)(8676002)(54906003)(508600001)(316002)(9686003)(4326008)(8936002)(66946007)(26005)(66446008)(2906002)(64756008)(66556008)(66476007)(7416002)(55016002)(186003)(33656002)(7696005)(38070700005)(71200400001)(966005)(122000001)(86362001)(921005)(6506007)(38100700002)(4744005);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Ypv8R93JZLG4spc4z1S4nCItxENoHjn2+YQeOs0VVjeNtnBzdbd3/RB7/9+2?=
- =?us-ascii?Q?1/DgDcVovoGgDzCJYlke2rFD60ZVMuXsjX174/h+A3d0n863Xua3gMrfVgJV?=
- =?us-ascii?Q?5dNgtmUcK0Y+ihPj9EdQuCN0qBKdEyCBhi4dHQKel5cn/H1b4koYnX7SfpWO?=
- =?us-ascii?Q?0B0uq+o0pXMA1PVqk+iety3dd9EMK1gnk7lvd75R6RXV3DRwsLTyYW1HWApu?=
- =?us-ascii?Q?wZGS+yL30bLlXopn7veWnMr6d9my5lNLwNVrSiCB0Exb0QwvL78GhspJic9y?=
- =?us-ascii?Q?Pln3RnLRdHiJP/qK8CjFpG2p2OewkWz2YWL8QX8faI7NScuk0GU+1f18ueuQ?=
- =?us-ascii?Q?Q8miUhOvd0hVOVAgFLU+yi0DkDpHhi5+8IoAKMgcyyN1ypPqLnbeKnswJt6Y?=
- =?us-ascii?Q?+Bado/JwxR9uVclnkHp+4uDjnHtSpqdSDxn0eKlDlykglYpcIYl4qzd8mkNU?=
- =?us-ascii?Q?ONg5wB5HrfE4bfnL7WY69UPUJbAAuYU+yfB1b6jV+f0NXW1YMCPCNDprz1uO?=
- =?us-ascii?Q?F2PZ5Vmctus7GkVB0gX+qfQO2R33b7Z8laznCdY+71EYK9/jIiJxk/SfwwQV?=
- =?us-ascii?Q?8CI7XlP0DqSU/TLjERnJIKXWaJBWg1BibokveBPi5+NTH1odQs7T7se5J2UK?=
- =?us-ascii?Q?ErqdScTP24T0aEKhBZklgfEz79L/hwc5aYSYW2O0XmZahncVLMpRZMVe+Q4b?=
- =?us-ascii?Q?H4GwNClYCE/Kne7qB5M50KDEpR9ucxHPEB5WPILL94lvT1t7vw6rtdnJcalC?=
- =?us-ascii?Q?RaXzj7i8NSGPz8kYvl8YK0bEPUxOSVgWKLzSEXo74YD7FKPFaokvPwSSm8F7?=
- =?us-ascii?Q?mKPQ9DyXOaz8zFH0/RkExBb7iUT9Bnqud5OzKRye61MNUVanslU1Ir6bo1xj?=
- =?us-ascii?Q?tvqfSqJlXXjPoLJ+Fl8AnF6L2scMBtLru6dLa957GJL8R/zECDrP3afqgk8k?=
- =?us-ascii?Q?+lZEafkrc4M3E850prCtf7L3PDni0iPS/YIyL2snswbwclKlwrdlAmNiHTGT?=
- =?us-ascii?Q?WBa/yN4/UnGT79vuooISxFMqQBDkanL8JkClbLv4bFFk+fwLrErN0sDEEj2p?=
- =?us-ascii?Q?ZhEAUzOWPzx2Ek1dOUU4aqvUtLakGqXIMzcC0Br9XPDh7wKf/SJSfEmb5vH9?=
- =?us-ascii?Q?H7Gg3N6QtSJxoHXsgRuBJ+4KEns8FwGSz5AG9qlCv2+4uek3KL1ynLUqNPTH?=
- =?us-ascii?Q?outczxiz0yiwsvdy54EddbD3XkJPLN3g66//7k6DZDdcfV1F0pqWLsbNBuSn?=
- =?us-ascii?Q?c8kSiLOz0VoFe38t59A++97pO60OQUDvwdhpYX0dg9XRgObFTXQ0BXyvqJV5?=
- =?us-ascii?Q?O0+6eg8Gcr0uJOkcsCTalHd9?=
+ with ESMTP id VHaZO7F5SNzy for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Sep 2021 10:58:14 -0400 (EDT)
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
+ [209.85.128.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9FCB4086C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 10:58:14 -0400 (EDT)
+Received: by mail-wm1-f52.google.com with SMTP id j27so3754513wms.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 07:58:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=QW/iGDRyZchN8Mm3Lgfi04v5R4JX67d3vWd6I5nvOfo=;
+ b=FvlIwZje7r3p4KVXKgsdwTakffjTJxcd4A9dlfMHkXtKs7DHBGoAvR8MW+KJ9f/hw2
+ 6Tut5KjpHd2FMxSXkoZTVrsglrVf2C/S98s+ca3WF2S7w/Vbw6acGa2JMSDs5nchXV5A
+ CLIW6COY/gSYlO4B5aNuaPAXuzOxcC3FpDwEXWm6bhC+nENuW1x2aP/+T6Y0qckbS2Q8
+ H0ytpN5VGVN6urXXLIIyQ7RSljWlhjuBqld1d9qCOWzfsPALe4kQ0dT7dIvbQuIt4yBx
+ d2fDN5qZ2+7fPl1KAPFf5tvR4TxyVTEqVt4UaZjSO1GeCVEzcawSYUle2SD8VJBxqW06
+ uTLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=QW/iGDRyZchN8Mm3Lgfi04v5R4JX67d3vWd6I5nvOfo=;
+ b=bSNzkQME54AVzhPozIzPuebnug9zaxehdyzyd+jq83Zsjb4jP7/hycwIwDRcRq2Zwv
+ K4iKKFZMvMT53eiBeR/IqhCW64OVJeUYuOAUfjp0Y3JE1Cb68hGsslyLCU5b7EjQDbQH
+ kGLpaSeBO/cscxcLntI7m0TIQissfqjWRKPybRnhGO4c03FeOgZ2DkaOortYzzD8d1tM
+ zdLNjmAqI0KwEEcNp4ezQbktnEhy/V306/kvY2Q4glizIgeneTCHhpRA+Aw8D+mYyWsB
+ 3Z1PWb/w5UoYhx7YUWJHUWRYlvr9JhRTM/twooKgYfdFe7TeCmBKrbB5lJIkYt5bXAha
+ woHg==
+X-Gm-Message-State: AOAM531s2XCyPH540tDh2FLRK88cxe8nLvspuevyePr0PEbhXYPc4ji+
+ jvMddhtOd/qB8G+WI/c1+TJ1Yw==
+X-Google-Smtp-Source: ABdhPJyAA3f06QGMTVpZuEqToVOc8cuAiYcICGxkpGqBtD1I5r+gyQ+DGMhDjtEeRgVh9SnNFt+29w==
+X-Received: by 2002:a7b:ca58:: with SMTP id m24mr1846215wml.0.1632841093668;
+ Tue, 28 Sep 2021 07:58:13 -0700 (PDT)
+Received: from google.com (216.131.76.34.bc.googleusercontent.com.
+ [34.76.131.216])
+ by smtp.gmail.com with ESMTPSA id y18sm19438837wrq.6.2021.09.28.07.58.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Sep 2021 07:58:12 -0700 (PDT)
+Date: Tue, 28 Sep 2021 14:58:08 +0000
+From: David Brazdil <dbrazdil@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Allow KVM to be disabled from the command line
+Message-ID: <YVMtgBw+qG713+4k@google.com>
+References: <20210903091652.985836-1-maz@kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR12MB3764.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c005d6c-1a94-4ddd-599d-08d981fc467e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Sep 2021 21:17:56.3733 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: yF27nB9jPxKNNPvx/xuAT/gkbt7Zkui37ZRGKkN1hS6uK2IoezKy6+sTgBKYxHD0dv1LJ6SoUgfxVeQCu1x+dw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4950
-X-Mailman-Approved-At: Tue, 28 Sep 2021 05:37:24 -0400
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- "wangxingang5@huawei.com" <wangxingang5@huawei.com>,
- "lushenming@huawei.com" <lushenming@huawei.com>,
- "chenxiang66@hisilicon.com" <chenxiang66@hisilicon.com>,
- "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
- "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>, Vikram Sethi <vsethi@nvidia.com>,
- "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
+Content-Disposition: inline
+In-Reply-To: <20210903091652.985836-1-maz@kernel.org>
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -157,17 +94,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-> This is based on Jean-Philippe's
-> [PATCH v14 00/10] iommu: I/O page faults for SMMUv3
-> https://www.spinics.net/lists/arm-kernel/msg886518.html
-> (including the patches that were not pulled for 5.13)
->
+Hey Marc,
+that all makes sense:
 
-Jean's patches have been merged to v5.14.
-Do you anticipate IOMMU/VFIO part patches getting into upstream kernel soon?
+Reviewed-by: David Brazdil <dbrazdil@google.com>
 
--KR
+> @@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
+>  		return 0;
+>  	}
+>  
+> -	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
+> +	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+> +		kvm_mode = KVM_MODE_DEFAULT;
+>  		return 0;
+> +	}
+> +
+> +	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+nit: I noticed we check is_kernel_in_hyp_mode here for nvhe/none but for
+protected it is checked in is_kvm_protected_mode. May be worth unifying?
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
