@@ -2,83 +2,83 @@ Return-Path: <SRS0=UAPk=OT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22429C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30488C4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C8BB76137E
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C8BB76137E
+	by mail.kernel.org (Postfix) with ESMTP id D55B66137A
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D55B66137A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62BCE4B14C;
-	Wed, 29 Sep 2021 03:12:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85D594B104;
+	Wed, 29 Sep 2021 03:12:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1M2oDUzk7o90; Wed, 29 Sep 2021 03:12:49 -0400 (EDT)
+	with ESMTP id CdUP2+XU93Ik; Wed, 29 Sep 2021 03:12:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FAF84B163;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41A424B168;
 	Wed, 29 Sep 2021 03:12:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58FAB4086C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 18:12:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B63804057F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 18:15:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RDsgX0KjS3fV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Sep 2021 18:12:56 -0400 (EDT)
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com
- [209.85.215.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4269940191
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 18:12:56 -0400 (EDT)
-Received: by mail-pg1-f172.google.com with SMTP id 66so125773pgc.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 15:12:56 -0700 (PDT)
+ with ESMTP id yq9jGgNkqx1q for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Sep 2021 18:14:59 -0400 (EDT)
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com
+ [209.85.215.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3E724031F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 18:14:59 -0400 (EDT)
+Received: by mail-pg1-f171.google.com with SMTP id g184so545401pgc.6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 15:14:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=mlGjiTQKkKxj4KcXOOnDVYyCs2ZSFatBALPcwummKQM=;
- b=jNRMWegrFCxfd1N3NSKKno4QA4WsToa8zhOgjhCTO9pYDJCneH2oOgqg6dFx8DO9WF
- fwg1HEPb3KvCAeF3bRE0/7Ymnd8Dfky61i04gYYvZL7w8j6q8Y/ySOjvayDVBN4iOWxC
- +FGF2ioFURjwyLWgi9QR0Ok/CwEElNFeuVoB9sT6QJJNTKVvZ0sDmvGthThk9iVZyaDD
- F1ZENnMgH4SFf4Va3ys/kvLX4q8l6AVlrCj4ZEeSj63wNA0C7PdNfwD7gNXfs0xY8fuO
- bpPRJE2F3EWvgtBjP8eZIeX/TGj2enUv06ukSy0MfjiC+Vq77zG/0ySvIBOJhAHJ8ZTc
- 80iA==
+ bh=oDTEp4uXq7wouuQuWuPnWVQXCIo6P8LpvQajseAha48=;
+ b=BnufAkDaSqbvE0tuVagV8WXp+XHOA8rRfAQGH7v7vq47FtDaVwPb2gV3pg84col7Jn
+ wiWxSJtOhRHOZ1OnBfK1IusCBeqHNprdHmkCTk9hwy1TjpFLJ2o37qhbCK64RU58wR+/
+ NVNuIOjncjEgaNz1Aji8RAKlyT10kUNAthNYDNVDkepM7EAAeST1QgAUJgZz9JV6W8pQ
+ Ga3dyZRVb1TCTPcNFYt7tNYB7fChJLmzpTPIY1149VIXRC09i0vUfJF6BV+ql+c0RWWW
+ CLk/XS24h5X+HgfBHwpw+x6pOo0ByCwKeOnP2OHqWK6fByzx9dwNkhyWHGw0eQ1hWxHI
+ bubg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=mlGjiTQKkKxj4KcXOOnDVYyCs2ZSFatBALPcwummKQM=;
- b=haxKozDdvXdN8V89wfkr7xf9kAL8nPOmzxwELxzdJIzd2985LAAWYSAOLpzx13CuKn
- 2mFq7YFlhhzxS79AJAhsvkp62pNPRr94UyC29agLe/AFgkxMwLLqW7wLjlVinbBMBjVJ
- EEpDUYZnBje3wkb1xSPUwU9+iqzYbShv1W1eQ/tGjkM0D+BdTDyDfHAnarRa4At5gUwO
- 8H4drYet8l33nt9l+hw+HpOSssM0PYpksHwGC4yVMv00Deoku6HxbeWTKDV7S0ln/qf2
- fIksa+CDAlKGCigv4CDZQtvYlLqERigvjUR7PAzbxlKKy6g9FZUyQqMcIMfbwzgHAgUA
- xSww==
-X-Gm-Message-State: AOAM531XITpzqJnIvnwtF7dRAdCXlD9PxX/5rZxSQq3nXxKZ0foHaZPI
- KwxMoZDWfKjScbo30WRq7YZOnA==
-X-Google-Smtp-Source: ABdhPJwMJ6PXu1iYzvoK+xsmZtCnYCHuS4ke1upsonClun/Rtn4gUyNzkh7CQWduaPHweqPWa/7aGA==
-X-Received: by 2002:aa7:83c4:0:b0:44b:bc59:1a46 with SMTP id
- j4-20020aa783c4000000b0044bbc591a46mr2781583pfn.77.1632867175070; 
- Tue, 28 Sep 2021 15:12:55 -0700 (PDT)
+ bh=oDTEp4uXq7wouuQuWuPnWVQXCIo6P8LpvQajseAha48=;
+ b=6jZVPd33LSUu10e/XGZx0EohYlPwK/PRmcjnd3XCGCMwzS7tMB51j179RReFZzNHeh
+ N4kFB6s7t2pcqL9VvJkAfMWK0/2PhQDrZEZ0ZXsRWf/Ft2AsE98qyyfy9ygNwsO3dSQx
+ N1iK8BLNMl3fWZEqf8yfTaZ2Cp7t28Llau38KvETfUn7eKmRyg6grdg0Uh0E3kjfN1dX
+ mvByf2H6QgEwQoa5Ldo292rwmfDRz/yAcRqhLJlaI2rfGUq4Zojdcbm58FclpIV4YDDW
+ 4D+Bb/EKU4ezfOKtfB1aXPynhxDoCRaaFh/i0X8kNKSs5dbnvxoBBPuJpWzDcY5Id/St
+ PuHw==
+X-Gm-Message-State: AOAM530mmSL2u9WIMB0p5Ve1u6ca8E7u/NegUYONT2t2T071mdidxUwj
+ rj2jOBS2YPd8MiuHAm/WHdSuTA==
+X-Google-Smtp-Source: ABdhPJxBJllV/6MHwH/O4bupLMykTY/L8aml4vOWRLyRzjZbQcPh2xbpVAvFMm0QwWZGt6UvJ4KliA==
+X-Received: by 2002:a62:dd0a:0:b0:44b:bd85:9387 with SMTP id
+ w10-20020a62dd0a000000b0044bbd859387mr2015835pff.49.1632867298411; 
+ Tue, 28 Sep 2021 15:14:58 -0700 (PDT)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com.
  [34.82.80.254])
- by smtp.gmail.com with ESMTPSA id q6sm104284pjd.26.2021.09.28.15.12.53
+ by smtp.gmail.com with ESMTPSA id d7sm142548pfq.43.2021.09.28.15.14.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Sep 2021 15:12:54 -0700 (PDT)
-Date: Tue, 28 Sep 2021 22:12:50 +0000
+ Tue, 28 Sep 2021 15:14:57 -0700 (PDT)
+Date: Tue, 28 Sep 2021 22:14:54 +0000
 From: David Matlack <dmatlack@google.com>
 To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 13/14] KVM: x86: Directly block (instead of "halting")
- UNINITIALIZED vCPUs
-Message-ID: <YVOTYk9aSl72hCmX@google.com>
+Subject: Re: [PATCH 14/14] KVM: x86: Invoke kvm_vcpu_block() directly for
+ non-HALTED wait states
+Message-ID: <YVOT3gj1ulBTNSw3@google.com>
 References: <20210925005528.1145584-1-seanjc@google.com>
- <20210925005528.1145584-14-seanjc@google.com>
+ <20210925005528.1145584-15-seanjc@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210925005528.1145584-14-seanjc@google.com>
+In-Reply-To: <20210925005528.1145584-15-seanjc@google.com>
 X-Mailman-Approved-At: Wed, 29 Sep 2021 03:12:40 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
@@ -107,38 +107,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Sep 24, 2021 at 05:55:27PM -0700, Sean Christopherson wrote:
-> Go directly to kvm_vcpu_block() when handling the case where userspace
-> attempts to run an UNINITIALIZED vCPU.  The vCPU isn't halted and its time
-> spent in limbo arguably should not be factored into halt-polling as the
-> behavior of the VM at this point is not at all indicative of the behavior
-> of the VM once it is up and running, i.e. executing HLT in idle tasks.
+On Fri, Sep 24, 2021 at 05:55:28PM -0700, Sean Christopherson wrote:
+> Call kvm_vcpu_block() directly for all wait states except HALTED so that
+> kvm_vcpu_halt() is no longer a misnomer on x86.
 > 
-> Note, because this case is encountered only on the first run of an AP vCPU,
-> vcpu->halt_poll_ns is guaranteed to be '0', and so KVM will not attempt
-> halt-polling, i.e. this really only affects the post-block bookkeeping.
+> Functionally, this means KVM will never attempt halt-polling or adjust
+> vcpu->halt_poll_ns for INIT_RECEIVED (a.k.a. Wait-For-SIPI (WFS)) or
+> AP_RESET_HOLD; UNINITIALIZED is handled in kvm_arch_vcpu_ioctl_run(),
+> and x86 doesn't use any other "wait" states.
+> 
+> As mentioned above, the motivation of this is purely so that "halt" isn't
+> overloaded on x86, e.g. in KVM's stats.  Skipping halt-polling for WFS
+> (and RESET_HOLD) has no meaningful effect on guest performance as there
+> are typically single-digit numbers of INIT-SIPI sequences per AP vCPU,
+> per boot, versus thousands of HLTs just to boot to console.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: David Matlack <dmatlack@google.com>
 
 > ---
->  arch/x86/kvm/x86.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/x86.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0d71c73a61bb..b444f9315766 100644
+> index b444f9315766..a0f313c4bc49 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -10127,7 +10127,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  			r = -EINTR;
->  			goto out;
->  		}
+> @@ -9893,7 +9893,10 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+>  	if (!kvm_arch_vcpu_runnable(vcpu) &&
+>  	    (!kvm_x86_ops.pre_block || static_call(kvm_x86_pre_block)(vcpu) == 0)) {
+>  		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
 > -		kvm_vcpu_halt(vcpu);
-> +		kvm_vcpu_block(vcpu);
->  		if (kvm_apic_accept_events(vcpu) < 0) {
->  			r = 0;
->  			goto out;
+> +		if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
+> +			kvm_vcpu_halt(vcpu);
+> +		else
+> +			kvm_vcpu_block(vcpu);
+>  		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+>  
+>  		if (kvm_x86_ops.post_block)
 > -- 
 > 2.33.0.685.g46640cef36-goog
 > 
