@@ -2,83 +2,83 @@ Return-Path: <SRS0=UAPk=OT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5789C433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22429C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7BA0A6137E
+	by mail.kernel.org (Postfix) with ESMTP id C8BB76137E
 	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7BA0A6137E
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C8BB76137E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27A214B0F1;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62BCE4B14C;
 	Wed, 29 Sep 2021 03:12:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1FfJSIqNuXtK; Wed, 29 Sep 2021 03:12:48 -0400 (EDT)
+	with ESMTP id 1M2oDUzk7o90; Wed, 29 Sep 2021 03:12:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 024604B15E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FAF84B163;
 	Wed, 29 Sep 2021 03:12:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 779994048A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 18:08:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58FAB4086C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 18:12:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id URRBhaZWcfax for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Sep 2021 18:08:38 -0400 (EDT)
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com
- [209.85.210.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7BB3640191
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 18:08:38 -0400 (EDT)
-Received: by mail-pf1-f170.google.com with SMTP id w19so185787pfn.12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 15:08:38 -0700 (PDT)
+ with ESMTP id RDsgX0KjS3fV for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Sep 2021 18:12:56 -0400 (EDT)
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com
+ [209.85.215.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4269940191
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 18:12:56 -0400 (EDT)
+Received: by mail-pg1-f172.google.com with SMTP id 66so125773pgc.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 15:12:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=7rZGZtXj4Kjef8XTrbQn+IEWHZmecIVKI32pSog3bGg=;
- b=Gu0/C+e+W8WPTJ9kWJuQrZyoELFPICJgw72WckzL3ovfDopNe/Y4j2IPagVtUNhWwr
- 9Qjfpn7SXH4wDFaqEdg5HJLXeLxphcPK9HcAugMDnWCpp68Xe6/ys1kzGwvSk+KcGCM4
- H64DJ7Tp5uRS7wp3aWTm1GhwRjDkRVaP2QPSIltqiZGDJzmU5Y11dt/buGH/9lHZ3SWJ
- bNi0rTAatQvQMs/Fb32BQ7aRL6utqOVWshzHxUOyBU70FP8VoWG62/RzZsJ4kBiRc9ua
- EQxp57U7HkBAHrtePs5fCEn33r7qnlM/POKA5AQ8Js4rYnMiBHo1lKgjrUm4AiUxx6TO
- BFlA==
+ bh=mlGjiTQKkKxj4KcXOOnDVYyCs2ZSFatBALPcwummKQM=;
+ b=jNRMWegrFCxfd1N3NSKKno4QA4WsToa8zhOgjhCTO9pYDJCneH2oOgqg6dFx8DO9WF
+ fwg1HEPb3KvCAeF3bRE0/7Ymnd8Dfky61i04gYYvZL7w8j6q8Y/ySOjvayDVBN4iOWxC
+ +FGF2ioFURjwyLWgi9QR0Ok/CwEElNFeuVoB9sT6QJJNTKVvZ0sDmvGthThk9iVZyaDD
+ F1ZENnMgH4SFf4Va3ys/kvLX4q8l6AVlrCj4ZEeSj63wNA0C7PdNfwD7gNXfs0xY8fuO
+ bpPRJE2F3EWvgtBjP8eZIeX/TGj2enUv06ukSy0MfjiC+Vq77zG/0ySvIBOJhAHJ8ZTc
+ 80iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=7rZGZtXj4Kjef8XTrbQn+IEWHZmecIVKI32pSog3bGg=;
- b=gwjDO9wXllbwRiNwCW2EvnCXuQLRNbrK4cs72kb0ulyFY8KOJJdUB7nhGAGBnmyHth
- lsvanqmNwBLmiFGgbRg3sr9eC6lSPuN8oQbbrOwKjAGnXE6MwE9TdSXNrv0y6HJSO3o6
- eyUdgIEck2MCZ2VC8LvNdyBPkCZ4OMuYCAx4bvJUCu7tCY64bhI0X3yZ78CCpFJqrWhi
- wQ8fIvedTiFPyCuviEekzLvzuYVuBmgiyy/0SrNj0ttSgYlpCmqVxjsQaDK0TUc4Ylem
- HFLIAFn5ePMHPQYwhfwS2cUGYZW/SMB1llap7lmx3Aj6dB4CbtOhNN7ATrH+ZDngsIky
- nNFA==
-X-Gm-Message-State: AOAM5301BQx6I/MIja5QGr8yyJdnso0HD5A1O0Kt6KnCITqJRFLCgsXC
- OH0lFT36jcXmh6TPSAHwZBca9Q==
-X-Google-Smtp-Source: ABdhPJzadyVUO8UyxBHsA0YYc+iUIbEvRB9U2t+kYPdczvOjLMgOq7SgcZR4mYDt3YnbOWn2xcwTMQ==
-X-Received: by 2002:a05:6a00:26cc:b0:440:51c6:fa38 with SMTP id
- p12-20020a056a0026cc00b0044051c6fa38mr7862566pfw.45.1632866917363; 
- Tue, 28 Sep 2021 15:08:37 -0700 (PDT)
+ bh=mlGjiTQKkKxj4KcXOOnDVYyCs2ZSFatBALPcwummKQM=;
+ b=haxKozDdvXdN8V89wfkr7xf9kAL8nPOmzxwELxzdJIzd2985LAAWYSAOLpzx13CuKn
+ 2mFq7YFlhhzxS79AJAhsvkp62pNPRr94UyC29agLe/AFgkxMwLLqW7wLjlVinbBMBjVJ
+ EEpDUYZnBje3wkb1xSPUwU9+iqzYbShv1W1eQ/tGjkM0D+BdTDyDfHAnarRa4At5gUwO
+ 8H4drYet8l33nt9l+hw+HpOSssM0PYpksHwGC4yVMv00Deoku6HxbeWTKDV7S0ln/qf2
+ fIksa+CDAlKGCigv4CDZQtvYlLqERigvjUR7PAzbxlKKy6g9FZUyQqMcIMfbwzgHAgUA
+ xSww==
+X-Gm-Message-State: AOAM531XITpzqJnIvnwtF7dRAdCXlD9PxX/5rZxSQq3nXxKZ0foHaZPI
+ KwxMoZDWfKjScbo30WRq7YZOnA==
+X-Google-Smtp-Source: ABdhPJwMJ6PXu1iYzvoK+xsmZtCnYCHuS4ke1upsonClun/Rtn4gUyNzkh7CQWduaPHweqPWa/7aGA==
+X-Received: by 2002:aa7:83c4:0:b0:44b:bc59:1a46 with SMTP id
+ j4-20020aa783c4000000b0044bbc591a46mr2781583pfn.77.1632867175070; 
+ Tue, 28 Sep 2021 15:12:55 -0700 (PDT)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com.
  [34.82.80.254])
- by smtp.gmail.com with ESMTPSA id v6sm132638pfv.83.2021.09.28.15.08.36
+ by smtp.gmail.com with ESMTPSA id q6sm104284pjd.26.2021.09.28.15.12.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 28 Sep 2021 15:08:36 -0700 (PDT)
-Date: Tue, 28 Sep 2021 22:08:33 +0000
+ Tue, 28 Sep 2021 15:12:54 -0700 (PDT)
+Date: Tue, 28 Sep 2021 22:12:50 +0000
 From: David Matlack <dmatlack@google.com>
 To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 12/14] KVM: Don't redo ktime_get() when calculating
- halt-polling stop/deadline
-Message-ID: <YVOSYaNx0vd4SYHk@google.com>
+Subject: Re: [PATCH 13/14] KVM: x86: Directly block (instead of "halting")
+ UNINITIALIZED vCPUs
+Message-ID: <YVOTYk9aSl72hCmX@google.com>
 References: <20210925005528.1145584-1-seanjc@google.com>
- <20210925005528.1145584-13-seanjc@google.com>
+ <20210925005528.1145584-14-seanjc@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210925005528.1145584-13-seanjc@google.com>
+In-Reply-To: <20210925005528.1145584-14-seanjc@google.com>
 X-Mailman-Approved-At: Wed, 29 Sep 2021 03:12:40 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
@@ -107,37 +107,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Sep 24, 2021 at 05:55:26PM -0700, Sean Christopherson wrote:
-> Calculate the halt-polling "stop" time using "cur" instead of redoing
-> ktime_get().  In the happy case where hardware correctly predicts
-> do_halt_poll, "cur" is only a few cycles old.  And if the branch is
-> mispredicted, arguably that extra latency should count toward the
-> halt-polling time.
+On Fri, Sep 24, 2021 at 05:55:27PM -0700, Sean Christopherson wrote:
+> Go directly to kvm_vcpu_block() when handling the case where userspace
+> attempts to run an UNINITIALIZED vCPU.  The vCPU isn't halted and its time
+> spent in limbo arguably should not be factored into halt-polling as the
+> behavior of the VM at this point is not at all indicative of the behavior
+> of the VM once it is up and running, i.e. executing HLT in idle tasks.
 > 
-> In all likelihood, the numbers involved are in the noise and either
-> approach is perfectly ok.
+> Note, because this case is encountered only on the first run of an AP vCPU,
+> vcpu->halt_poll_ns is guaranteed to be '0', and so KVM will not attempt
+> halt-polling, i.e. this really only affects the post-block bookkeeping.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: David Matlack <dmatlack@google.com>
 
 > ---
->  virt/kvm/kvm_main.c | 2 +-
+>  arch/x86/kvm/x86.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2980d2b88559..80f78daa6b8d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3267,7 +3267,7 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
->  
->  	start = cur = poll_end = ktime_get();
->  	if (do_halt_poll) {
-> -		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
-> +		ktime_t stop = ktime_add_ns(cur, vcpu->halt_poll_ns);
->  
->  		do {
->  			/*
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 0d71c73a61bb..b444f9315766 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -10127,7 +10127,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  			r = -EINTR;
+>  			goto out;
+>  		}
+> -		kvm_vcpu_halt(vcpu);
+> +		kvm_vcpu_block(vcpu);
+>  		if (kvm_apic_accept_events(vcpu) < 0) {
+>  			r = 0;
+>  			goto out;
 > -- 
 > 2.33.0.685.g46640cef36-goog
 > 
