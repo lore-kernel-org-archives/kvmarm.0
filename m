@@ -2,76 +2,77 @@ Return-Path: <SRS0=Tw+U=OS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6766FC433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 18:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC8D9C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 18:48:18 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 06EE561209
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 18:48:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 06EE561209
+	by mail.kernel.org (Postfix) with ESMTP id 8F9C160F9D
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 18:48:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8F9C160F9D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B38D4B0F5;
-	Tue, 28 Sep 2021 14:48:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D1EC4B13E;
+	Tue, 28 Sep 2021 14:48:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z1b-w39whPlW; Tue, 28 Sep 2021 14:48:15 -0400 (EDT)
+	with ESMTP id 9FWAnRTLtVRS; Tue, 28 Sep 2021 14:48:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0855B4B10A;
-	Tue, 28 Sep 2021 14:48:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F53E4B0E2;
+	Tue, 28 Sep 2021 14:48:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33BA04B0F1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 14:48:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 641A74B0DF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 14:48:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5kYjugTdwMSp for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Sep 2021 14:48:12 -0400 (EDT)
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
- [209.85.160.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49C114B0E2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 14:48:12 -0400 (EDT)
-Received: by mail-qt1-f201.google.com with SMTP id
- n19-20020ac81e13000000b0029f679691eeso101742469qtl.20
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 11:48:12 -0700 (PDT)
+ with ESMTP id HwLh-50aGHcI for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Sep 2021 14:48:15 -0400 (EDT)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D3BF4B0F5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 14:48:14 -0400 (EDT)
+Received: by mail-pg1-f202.google.com with SMTP id
+ j4-20020a654d44000000b00287a16a3519so23003pgt.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 11:48:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=SRAJJGG3Meq60fJArI5V58NqIezmfGYq9oG//j0UJy4=;
- b=gz2f1clVsINkVP6NIRdH73tTk/+NC1lndVFY8Ks8c/mZOEVqy7lrdZZMeNIZHOfqsR
- QcU3QjumkuT98r6uzQTnO1MpoK+AMep01FJUZ2WhP0Z7b+n/9k6BglSNBHT3yNJxmQyV
- V57QtyAImWfetwVF8+qmYsLpRQzTbqrPVIKHNbcHpvup/TAHuBFRlhMHiHgZ8T+kVapS
- 0P78ZcNTCt0nnTTcCRoD8dINcAfsRc+g7GtnNO5bwNDA9FqQw2KPsfnt47PfGhtKffrE
- wKHw0dOq7DzE1vRFmDPZX66JAxHzIgv1XdPoPiRqNhTQX+uaFCRneTxei85Dypb1QGVm
- AuKw==
+ :cc; bh=8STNvO/W+/tH6mis7cVRJ3Dc57rX86y55WPHAXp51vA=;
+ b=Lav0bpVUN4Oquga0REUXCMujWYzDDRnjAT62pSHmfoEUa2PIvfp5F1Kg5ACJCpAnD4
+ FEZ/u0KXIJBayfxa6jngfiCpFXBZUcXykEXCfoh7PXPN41Qq7vRH2/ReasumUTEaWYdI
+ mNoM+eXzdtyivAAja4vueOaveB5fw8w7VHhOM3Kf4cSAOpQakJydLynyPsdi9C6oZkXQ
+ TZUeOKehykE2VXamGR/qCyEXKALLGpkm17079iaWStaKFhhMpRVJX8ObbSNn5QFlPeJ9
+ /QQCSCi3J4lmBixTTGe30U5Geh+CA5mU4u1bEr4HzLZcvBgROIvE0+LDV/sXEEqQI7qF
+ dNTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=SRAJJGG3Meq60fJArI5V58NqIezmfGYq9oG//j0UJy4=;
- b=FNJZB5Cbstm7O6zzX7iMXWybgDVao55gXGTbjHI2PtQTsh6bXv7IAFFX5Idsv0iqIo
- FtvXNtxz4IgAaeAT62UJPtxGwZvShBQKPBiqkmyZlI6XePGprlqHitoa+FtneGR9zARl
- CVA+lxHlVJiyr3kEIpov94JOXnvT1/lwfVFt2MbaM+DhKlunPm4abH+mgaCoZbffx5Vx
- JjUMiZ/w1YYrdFqRSVBQO4IxcVDRDcFnC2rRiQkf/zI2Be4nxm8KH/hDAJ/ZjBSyYmd7
- jePfXTypnJz0EvtEDMUVHhItcvnQs8ullaWWxP3aUZfAGAD2Bj+Glu9MtSt+5huetVuv
- 9bDw==
-X-Gm-Message-State: AOAM531tPAC+ghrjpsKNt41MYGZxoJgzxuIoIq7rzQBjxx3MSg0GPINW
- 94oPSmjbCGYL+ZJMHr8olnP8G9e6l32hqg==
-X-Google-Smtp-Source: ABdhPJzP3Fh4vY9K3xp2ukBeuRRfH9cOkSP8HPXbiCcgsIo9+m8jiJA3CBwtrricg5KcU+UwN+TiqVzb93a/Uw==
+ bh=8STNvO/W+/tH6mis7cVRJ3Dc57rX86y55WPHAXp51vA=;
+ b=b9TKqZj36v4eXqVWXGrKP9JopIqol0b4isBHNwjihBy72H7kXgZaVkG7HckEnVBDT/
+ qBuWgCoJ33bEM8lEp2+XjgGsAHrqkcF/g6yz4GDNKfkspOM/6xCJM6WJBg2rul4Rcc/h
+ XAcEUzEYLe6QJQOiDtmBAV5UMUOJV42YxsF/A4j7/dH33L84RZqIPjdCSRB4DcF9zexv
+ w+xsHJojlRknTlMGzekU9gwWgZ26OpfZjeKLqgUUpu33L8gprVfQvZ9V+ulJ8bASBRCP
+ aVSWEoHRF1mmtTkfHMlKIMSLChkbxfVCCLiMw+M7mp4Et2BoDRA8RC8zJTOmZu0LsUcc
+ 3INg==
+X-Gm-Message-State: AOAM532HRrI3A5UGkyseJ1YDT5LAHomjEsRhfrByF3Cl+4WKVELBBiFc
+ 5Dx5wbni9E/XmzDLtGP429PQV+jPy6RDxQ==
+X-Google-Smtp-Source: ABdhPJxUvKbejiUbAT4D+8m44/T92Bf4fwoQkvcqyb2zCtR582bmgXPXtYeU7QXWaMMliTmrlAoIrINN/fDsIQ==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6214:732:: with SMTP id
- c18mr7310791qvz.9.1632854891937; Tue, 28 Sep 2021 11:48:11 -0700 (PDT)
-Date: Tue, 28 Sep 2021 11:47:57 -0700
+ (user=ricarkol job=sendgmr) by 2002:a05:6a00:16c6:b029:32d:e190:9dd0 with
+ SMTP id l6-20020a056a0016c6b029032de1909dd0mr7029829pfc.70.1632854893435;
+ Tue, 28 Sep 2021 11:48:13 -0700 (PDT)
+Date: Tue, 28 Sep 2021 11:47:58 -0700
 In-Reply-To: <20210928184803.2496885-1-ricarkol@google.com>
-Message-Id: <20210928184803.2496885-4-ricarkol@google.com>
+Message-Id: <20210928184803.2496885-5-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20210928184803.2496885-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [PATCH v3 03/10] KVM: arm64: vgic-v2: Check cpu interface region is
- not above the VM IPA size
+Subject: [PATCH v3 04/10] KVM: arm64: vgic-v3: Check ITS region is not above
+ the VM IPA size
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu, 
  drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
@@ -92,63 +93,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Verify that the GICv2 CPU interface does not extend beyond the
-VM-specified IPA range (phys_size).
+Verify that the ITS region does not extend beyond the VM-specified IPA
+range (phys_size).
 
   base + size > phys_size AND base < phys_size
 
-Add the missing check into kvm_vgic_addr() which is called when setting
-the region. This patch also enables some superfluous checks for the
-distributor (vgic_check_ioaddr was enough as alignment == size for the
-distributors).
+Add the missing check into vgic_its_set_attr() which is called when
+setting the region.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index f714aded67b2..b379eb81fddb 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -79,7 +79,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- {
- 	int r = 0;
- 	struct vgic_dist *vgic = &kvm->arch.vgic;
--	phys_addr_t *addr_ptr, alignment;
-+	phys_addr_t *addr_ptr, alignment, size;
- 	u64 undef_value = VGIC_ADDR_UNDEF;
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 61728c543eb9..321743b87002 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2710,8 +2710,8 @@ static int vgic_its_set_attr(struct kvm_device *dev,
+ 		if (copy_from_user(&addr, uaddr, sizeof(addr)))
+ 			return -EFAULT;
  
- 	mutex_lock(&kvm->lock);
-@@ -88,16 +88,19 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
- 		addr_ptr = &vgic->vgic_dist_base;
- 		alignment = SZ_4K;
-+		size = KVM_VGIC_V2_DIST_SIZE;
- 		break;
- 	case KVM_VGIC_V2_ADDR_TYPE_CPU:
- 		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
- 		addr_ptr = &vgic->vgic_cpu_base;
- 		alignment = SZ_4K;
-+		size = KVM_VGIC_V2_CPU_SIZE;
- 		break;
- 	case KVM_VGIC_V3_ADDR_TYPE_DIST:
- 		r = vgic_check_type(kvm, KVM_DEV_TYPE_ARM_VGIC_V3);
- 		addr_ptr = &vgic->vgic_dist_base;
- 		alignment = SZ_64K;
-+		size = KVM_VGIC_V3_DIST_SIZE;
- 		break;
- 	case KVM_VGIC_V3_ADDR_TYPE_REDIST: {
- 		struct vgic_redist_region *rdreg;
-@@ -162,7 +165,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 		goto out;
+-		ret = vgic_check_ioaddr(dev->kvm, &its->vgic_its_base,
+-					addr, SZ_64K);
++		ret = vgic_check_iorange(dev->kvm, &its->vgic_its_base,
++					 addr, SZ_64K, KVM_VGIC_V3_ITS_SIZE);
+ 		if (ret)
+ 			return ret;
  
- 	if (write) {
--		r = vgic_check_ioaddr(kvm, addr_ptr, *addr, alignment);
-+		r = vgic_check_iorange(kvm, addr_ptr, *addr, alignment, size);
- 		if (!r)
- 			*addr_ptr = *addr;
- 	} else {
 -- 
 2.33.0.685.g46640cef36-goog
 
