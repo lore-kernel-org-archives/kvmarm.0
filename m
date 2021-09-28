@@ -2,121 +2,102 @@ Return-Path: <SRS0=Tw+U=OS=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24B07C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 06:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D829AC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 07:24:19 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9F17161159
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 06:25:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9F17161159
+	by mail.kernel.org (Postfix) with ESMTP id 422D561058
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Sep 2021 07:24:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 422D561058
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BF5A4B0DF;
-	Tue, 28 Sep 2021 02:25:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C3BC4B0EC;
+	Tue, 28 Sep 2021 03:24:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kpoKG4VSuC8T; Tue, 28 Sep 2021 02:25:43 -0400 (EDT)
+	with ESMTP id 9Q6P4ydCE27i; Tue, 28 Sep 2021 03:24:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 078034B0FC;
-	Tue, 28 Sep 2021 02:25:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C6714A19F;
+	Tue, 28 Sep 2021 03:24:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CEDF4B0B6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 02:25:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A5D24A19F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 03:24:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MS2zVfY7Du7V for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Sep 2021 02:25:40 -0400 (EDT)
+ with ESMTP id X6D6Gtxh4dzK for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Sep 2021 03:24:15 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEFAE4B0A3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 02:25:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF97240762
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 03:24:14 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1632810340;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ s=mimecast20190719; t=1632813854;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=9wq1dVPtAXDMCZC9S+u92KoCxHpT0A4H8ulsqFHsRII=;
- b=iYzpm3mCwn7BhzwGwrV3Xa1Cl9lIvXZLjLoRo4i4C5Qq3d8EwsXeHSTv2zAdEuFAVHliFF
- /7xDikWMziL3YkE0lKdEuz/D9hVDcrxCqRHpLhQNvqI4NO9uihVnZzYYYzwLsknQzRmaWK
- ygWPqrbrQpP6UFhYe3p5SvHp0Jzr3oA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-tLVHS_NfNtKPVXrwRx0NTw-1; Tue, 28 Sep 2021 02:25:37 -0400
-X-MC-Unique: tLVHS_NfNtKPVXrwRx0NTw-1
-Received: by mail-wr1-f70.google.com with SMTP id
- f7-20020a5d50c7000000b0015e288741a4so14718464wrt.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Sep 2021 23:25:37 -0700 (PDT)
+ bh=bWGC7oTmfGjxKcdKJd504L6aMYPeDx74J8LvM7PKm0s=;
+ b=UXBo4Vt/JmParNzdvclNOlkKETqIKNyFTWuwxu3pVmo4OFfvkgo2VjvF0GIZm1G1GYKWNZ
+ lSXVg92tivzGbB6sNWbLvM/tN8U+e+ip1pfFCASlKlepE00ORvFo7FM1SSGsAuupxEu8X5
+ Pfs/RHRrMdlDxkEQPY+M0v2eRdw2P2A=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-568-DXRZQwoiOqixlgcozkqGHg-1; Tue, 28 Sep 2021 03:24:13 -0400
+X-MC-Unique: DXRZQwoiOqixlgcozkqGHg-1
+Received: by mail-ed1-f72.google.com with SMTP id
+ s12-20020a05640217cc00b003cde58450f1so20808957edy.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 00:24:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:reply-to:subject:to:cc:references:from
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-transfer-encoding:content-language;
- bh=9wq1dVPtAXDMCZC9S+u92KoCxHpT0A4H8ulsqFHsRII=;
- b=VLONYk0nam99W9tyKKrV65l0ycZDN5oceOET2VSlGwPmn/UzbeGQSsWjVrc0lwyv+R
- dQ7pdRKpqxB89hXgnfNp7wUDwWALG2kSFLYT17XJfaU7H1CG3TUls728wNulYjr+tR0N
- mG3wRHzXMswjjoXa6XeI5OusyP2Vf50eHFzQVLAjtEkAQmswmf8/wiSNArGQ+KaE9LDz
- ZCVyeGwY9ET9PxFzJqVI5MRTOmsn3PrYa/bXXnYGK8WTo5sdbpGNio2vYO7/aHFWZwZE
- uZBTDUpwoqFx3yMXtlGrgFAgYUdHJnIMk6YMl0jl+vsHjPQybYQMkbBPQocAUJhDlh30
- ajkQ==
-X-Gm-Message-State: AOAM532NIRsKskDILkQ4IvUJyk49wQ8xgp0kYbqlPVajMXCF2cN+K89N
- THAfZ5JrnwvrjHYzQM8+RuwYN1k3TbBY4mWNtINhjvp3LlA2vX1Ra1UvYGBrJ309+7SrN/Cu6M4
- u9ikBaYtIk+Uc18T/axm6cEaG
-X-Received: by 2002:a5d:64cf:: with SMTP id f15mr4278522wri.284.1632810336264; 
- Mon, 27 Sep 2021 23:25:36 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzqSUu50iJ95OWE4UOFTINQsxuRK/ueiYpb9FlWfdG9FdcSiC/DUJ4GzrvCnuOU9QL4gLjBUA==
-X-Received: by 2002:a5d:64cf:: with SMTP id f15mr4278495wri.284.1632810336011; 
- Mon, 27 Sep 2021 23:25:36 -0700 (PDT)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id l10sm1663709wmq.42.2021.09.27.23.25.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 27 Sep 2021 23:25:35 -0700 (PDT)
-Subject: Re: [PATCH v15 00/12] SMMUv3 Nested Stage Setup (IOMMU part)
-To: Krishna Reddy <vdumpa@nvidia.com>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "will@kernel.org" <will@kernel.org>, "maz@kernel.org" <maz@kernel.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "tn@semihalf.com" <tn@semihalf.com>,
- "zhukeqian1@huawei.com" <zhukeqian1@huawei.com>
-References: <20210411111228.14386-1-eric.auger@redhat.com>
- <BY5PR12MB37640C26FEBC8AC6E3EDF40BB3A79@BY5PR12MB3764.namprd12.prod.outlook.com>
-From: Eric Auger <eric.auger@redhat.com>
-Message-ID: <c3fcc2fb-3173-af83-2b30-423c2c1ab83d@redhat.com>
-Date: Tue, 28 Sep 2021 08:25:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=bWGC7oTmfGjxKcdKJd504L6aMYPeDx74J8LvM7PKm0s=;
+ b=NbEavWjojoFlOZNLVYnI1rCzCFw0D7Hm55KE5yJMY6gB4jrDFMYJRIjly7SfQYHqUH
+ XFyaSXCY+NIRjBy5/KsrPfo59C2qo2PEEJ7GCgu9OaMaACVwpZtlNN0/TgKyMMa2n0GA
+ UWQ/xWGakx+MZJEwgN3XLVMX5IXPWdGpH6+Tsxf65iCdZkcjlOvCpOlJGCI6Wxnwy3tl
+ WYxP9RvueTEDt9nw+xUcU0uljdojg5xvpnrvA/UKMV8z2uFjmHDyJL5kpqOMd5xwrWo5
+ EKk+3h51PW/e0oOVq8KJYS9//+MCVQxLfiE7cnm+6irEMncR634hslms4aXk/C3pdPy3
+ JpwA==
+X-Gm-Message-State: AOAM530p3GcXBrRAJbEbh1p+l5oPrnb0B8VmkU4ZqdwaLemWJw9NU324
+ oeSNvhm12Pg+YGWix2ooVRJCKMrNiKuxe/hk1BE8Qv4uwA2h0bTslBVzU39zPeX8ByGVvU0BH4u
+ oCeYb74vz+dfl3Qll4zgFhJRv
+X-Received: by 2002:a17:906:6c83:: with SMTP id
+ s3mr5124256ejr.13.1632813852137; 
+ Tue, 28 Sep 2021 00:24:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxAUxOXAqxe7tw2Hl4EfMfwGMkveziu4koresAVxFaRgDKbcZMqmqP/pKKJj5b+3QAkJO8dxg==
+X-Received: by 2002:a17:906:6c83:: with SMTP id
+ s3mr5124236ejr.13.1632813851955; 
+ Tue, 28 Sep 2021 00:24:11 -0700 (PDT)
+Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
+ by smtp.gmail.com with ESMTPSA id q12sm9791038ejs.58.2021.09.28.00.24.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Sep 2021 00:24:11 -0700 (PDT)
+Date: Tue, 28 Sep 2021 09:24:09 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH] selftests: KVM: Call ucall_init when setting up in
+ rseq_test
+Message-ID: <20210928072409.ks6b6u3rs7qngije@gator.home>
+References: <20210923220033.4172362-1-oupton@google.com>
+ <YU0XIoeYpfm1Oy0j@google.com>
+ <20210924064732.xqv2xjya3pxgmwr2@gator.home>
+ <YVIj+gExrHrjlQEm@google.com>
 MIME-Version: 1.0
-In-Reply-To: <BY5PR12MB37640C26FEBC8AC6E3EDF40BB3A79@BY5PR12MB3764.namprd12.prod.outlook.com>
+In-Reply-To: <YVIj+gExrHrjlQEm@google.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- "wangxingang5@huawei.com" <wangxingang5@huawei.com>,
- "lushenming@huawei.com" <lushenming@huawei.com>,
- "chenxiang66@hisilicon.com" <chenxiang66@hisilicon.com>,
- "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
- "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
- "yi.l.liu@intel.com" <yi.l.liu@intel.com>, Vikram Sethi <vsethi@nvidia.com>,
- "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -130,32 +111,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Krishna,
-
-On 9/27/21 11:17 PM, Krishna Reddy wrote:
-> Hi Eric,
->> This is based on Jean-Philippe's
->> [PATCH v14 00/10] iommu: I/O page faults for SMMUv3
->> https://www.spinics.net/lists/arm-kernel/msg886518.html
->> (including the patches that were not pulled for 5.13)
->>
-> Jean's patches have been merged to v5.14.
-> Do you anticipate IOMMU/VFIO part patches getting into upstream kernel soon?
-
-I am going to respin the smmu part rebased on v5.15. As for the VFIO
-part, this needs to be totally redesigned based on /dev/iommu (see
-[RFC 00/20] Introduce /dev/iommu for userspace I/O address space
-management).
-
-I will provide some updated kernel and qemu branches for testing purpose
-only.
-
-Thanks
-
-Eric
+On Mon, Sep 27, 2021 at 08:05:14PM +0000, Sean Christopherson wrote:
+> On Fri, Sep 24, 2021, Andrew Jones wrote:
+> > On Fri, Sep 24, 2021 at 12:09:06AM +0000, Sean Christopherson wrote:
+> > > On Thu, Sep 23, 2021, Oliver Upton wrote:
+> > > > While x86 does not require any additional setup to use the ucall
+> > > > infrastructure, arm64 needs to set up the MMIO address used to signal a
+> > > > ucall to userspace. rseq_test does not initialize the MMIO address,
+> > > > resulting in the test spinning indefinitely.
+> > > > 
+> > > > Fix the issue by calling ucall_init() during setup.
+> > > > 
+> > > > Fixes: 61e52f1630f5 ("KVM: selftests: Add a test for KVM_RUN+rseq to detect task migration bugs")
+> > > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > > ---
+> > > >  tools/testing/selftests/kvm/rseq_test.c | 1 +
+> > > >  1 file changed, 1 insertion(+)
+> > > > 
+> > > > diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+> > > > index 060538bd405a..c5e0dd664a7b 100644
+> > > > --- a/tools/testing/selftests/kvm/rseq_test.c
+> > > > +++ b/tools/testing/selftests/kvm/rseq_test.c
+> > > > @@ -180,6 +180,7 @@ int main(int argc, char *argv[])
+> > > >  	 * CPU affinity.
+> > > >  	 */
+> > > >  	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> > > > +	ucall_init(vm, NULL);
+> > > 
+> > > Any reason not to do this automatically in vm_create()?  There is 0% chance I'm
+> > > going to remember to add this next time I write a common selftest, arm64 is the
+> > > oddball here.
+> 
+> Ugh, reading through arm64's ucall_init(), moving this to vm_create() is a bad
+> idea.  If a test creates memory regions at hardcoded address, the test could
+> randomly fail if ucall_init() selects a conflicting address.  More below.
+> 
+> > Yes, please. But, it'll take more than just adding a ucall_init(vm, NULL)
+> > call to vm_create. We should also modify aarch64's ucall_init to allow
+> > a *new* explicit mapping to be made. It already allows an explicit mapping
+> > when arg != NULL, but we'll need to unmap the default mapping first, now.
+> > The reason is that a unit test may not be happy with the automatically
+> > selected address (that hasn't happened yet, but...) and want to set its
+> > own.
+> 
+> My vote would be to rework arm64's ucall_init() as a prep patch and drop the param
+> in the process.  There are zero tests that provide a non-NULL value, but that's
+> likely because tests that care deliberately defer ucall_init() until after memory
+> regions and page tables have been configured.
+> 
+> IMO, arm64's approach is unnecessarily complex (that's a common theme for KVM's
+> selftests...).  The code attempts to avoid magic numbers by not hardcoding the MMIO
+> range, but in doing so makes the end result even more magical, e.g. starting at
+> 5/8ths of min(MAX_PA, MAX_VA).
+> 
+> E.g. why not put the ucall MMIO range immediately after the so called "default"
+> memory region added at the end of vm_create()?  That way the location of the ucall
+> range is completely predictable, and while still arbitrary, less magical.
 >
-> -KR
->
+
+While we do hardcode zero as the guest physical base address, we don't
+require tests to use DEFAULT_GUEST_PHY_PAGES for slot0. They only get
+that if they use vm_create_default* to create the vm. While trying to
+keep the framework flexible for the unit tests does lead to complexity,
+I think the ucall mmio address really needs to be something that can move.
+It's not part of the test setup, i.e. whatever the unit test wants to
+test, it's just part of the framework. It needs to stay out of the way.
+
+You're right that we can't improve things by adding ucall_init to
+vm_create though, even if we added my suggestion of changing ucall_init
+to be an unmap-old, map-new type of thing, since we'd still always need
+the deferred ucall_init call to be sure we got it right.
+
+We could replace the mmio address search with a hardcoded default address
+though, probably the start address of the search (most likely that's the
+one that's always used). Then, if there's a problem with that address,
+an explicit ucall_init with its optional argument would need to be
+provided in the unit test, along with a comment explaining why it's
+there to ensure nobody removes it.
+
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
