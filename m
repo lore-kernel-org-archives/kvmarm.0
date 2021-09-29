@@ -2,103 +2,79 @@ Return-Path: <SRS0=UAPk=OT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E02BC433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 11:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E6CC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 13:33:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11A886140A
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 11:20:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 11A886140A
+	by mail.kernel.org (Postfix) with ESMTP id C974B6142A
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 13:33:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C974B6142A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8445E4B11C;
-	Wed, 29 Sep 2021 07:20:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 370294B11F;
+	Wed, 29 Sep 2021 09:33:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e+slR5b5A9d8; Wed, 29 Sep 2021 07:20:38 -0400 (EDT)
+	with ESMTP id JtZvMo75ShRQ; Wed, 29 Sep 2021 09:33:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75F564B116;
-	Wed, 29 Sep 2021 07:20:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D3124B12C;
+	Wed, 29 Sep 2021 09:33:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83F7B4B10C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 07:20:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 465C44B11F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 09:33:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5OxP6-sht7e8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Sep 2021 07:20:36 -0400 (EDT)
+ with ESMTP id aK9tZrMz7qj8 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Sep 2021 09:33:34 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 779524B10B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 07:20:36 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 616794B11C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 09:33:34 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1632914436;
+ s=mimecast20190719; t=1632922414;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QT1rFRDBhzmSS+/lGbt19+2aAndXLLtwvTkh1G4vaX8=;
- b=Cswm0QeTk1WyNE2MH8WI8CGhXf65dnA/VfUHKIf2ze+V5LPhmLiXdgR2ruGoAq5US1Kddo
- qJPXiNc9wzcWTXGBrkl9wce/0sk4BPwxN10ZqX+5sGEUqc39tJ49lULzqjRKqot4v3ilTP
- OOI+GYCqUQKmmVUsJ8hfRC19DKBvUGI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-51-TeWkpCvxOAGM0zJkKSc71A-1; Wed, 29 Sep 2021 07:20:34 -0400
-X-MC-Unique: TeWkpCvxOAGM0zJkKSc71A-1
-Received: by mail-ed1-f72.google.com with SMTP id
- j26-20020a508a9a000000b003da84aaa5c5so2036036edj.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 04:20:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=QT1rFRDBhzmSS+/lGbt19+2aAndXLLtwvTkh1G4vaX8=;
- b=HGNnoH3qvwTdxPd/pTY0nVpNhn93nj8f6Nr9hoIw+MnlnVfnbRiKey2TMy9VOkGq5O
- 277YOFw/DAkxbhcNRjz14DIT71ACKZWkEmhvOnNjGQClSfsBeYFWn2Trf528hYVDNtZr
- mR487rRq814rohPZPg+99vJ+aVWKG15QXMd7oStoqGpuo5P0Vl48l0K3eBDmCpnnNvuV
- BvFxxQPkuRFJBAQDh1j6+6GDtra+sRy+vpTWTbPgU5enJst6UegNnjJ6fIn4yCtyagMf
- +SctdXP/Z1O73iRcWv4IcwGjcy9pwXi2d/sG1pK4SCbjsk5R5rL/98okzbeIBBLNoref
- WO0w==
-X-Gm-Message-State: AOAM530ZNXwolkxZxRVo7vYKcvqk81jYlPonQsXf18/+PhwrUhh4huec
- ZGU3mCRn1FxjUmnZ7gFnzWmCiU3isNaDPwAhx6UbQvMJJ1TZhvjix/nBgfwlp+Ye/foEx3+F4Ge
- u6bEv/B+X+CCQRMbI29mHNROU
-X-Received: by 2002:a50:d9cc:: with SMTP id x12mr14222027edj.44.1632914433670; 
- Wed, 29 Sep 2021 04:20:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyGsZ/Prx5O98qPZ8PyofLqYoLSSiZlZikvftKjUT4ZzCknxR+J5Y+KhHMLF54Y/OqTNkUIVA==
-X-Received: by 2002:a50:d9cc:: with SMTP id x12mr14221990edj.44.1632914433453; 
- Wed, 29 Sep 2021 04:20:33 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id l16sm1352795eds.46.2021.09.29.04.20.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 29 Sep 2021 04:20:32 -0700 (PDT)
-Message-ID: <b352c9db-6d1d-ceb9-e313-b96794f8b82f@redhat.com>
-Date: Wed, 29 Sep 2021 13:20:31 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
- KVM_GET_CLOCK
-To: Marcelo Tosatti <mtosatti@redhat.com>, Oliver Upton <oupton@google.com>
+ bh=Dp0Dog3coHxj0QgucUNcGEsig+2bXpk05DYt8z5lf/4=;
+ b=KXpdxL9pEDsB5J7nAcgz2b4wGk3ZtQ8Lqn+A8UEN3s49Z0wJPailuHpiiRUHHZh+hJKTat
+ iYJgMJtDqlNW/fVRo7dYm6jar5xdRc9ZrLDbKj6usyyrugiinanF8PsRo1JgtBE3dsK/g/
+ k6v2dFz1pgF5fkg3rmRs6KN3UuQDXhI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-OXt1m0ehMUuS71XL86bDog-1; Wed, 29 Sep 2021 09:33:31 -0400
+X-MC-Unique: OXt1m0ehMUuS71XL86bDog-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51C2B1B2C980;
+ Wed, 29 Sep 2021 13:33:25 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C26219C79;
+ Wed, 29 Sep 2021 13:33:24 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+ id 0A35F416CE5D; Wed, 29 Sep 2021 10:33:21 -0300 (-03)
+Date: Wed, 29 Sep 2021 10:33:21 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v8 3/7] KVM: x86: Fix potential race in KVM_GET_CLOCK
+Message-ID: <20210929133320.GA10977@fuller.cnet>
 References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-5-oupton@google.com>
- <20210928185343.GA97247@fuller.cnet>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20210928185343.GA97247@fuller.cnet>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
+ <20210916181538.968978-4-oupton@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20210916181538.968978-4-oupton@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
- Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,24 +86,24 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 28/09/21 20:53, Marcelo Tosatti wrote:
->> +KVM_CLOCK_HOST_TSC.  If set, the `host_tsc` field in the kvm_clock_data
->> +structure is populated with the value of the host's timestamp counter (TSC)
->> +at the instant when KVM_GET_CLOCK was called. If clear, the `host_tsc` field
->> +does not contain a value.
-> If the host TSCs are not stable, then KVM_CLOCK_HOST_TSC bit (and
-> host_tsc field) are ambiguous. Shouldnt exposing them be conditional on
-> stable TSC for the host ?
+On Thu, Sep 16, 2021 at 06:15:34PM +0000, Oliver Upton wrote:
+> Sean noticed that KVM_GET_CLOCK was checking kvm_arch.use_master_clock
+> outside of the pvclock sync lock. This is problematic, as the clock
+> value written to the user may or may not actually correspond to a stable
+> TSC.
 > 
+> Fix the race by populating the entire kvm_clock_data structure behind
+> the pvclock_gtod_sync_lock.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
 
-Yes, good point.
-
-Paolo
+ACK patches 1-3, still reviewing the remaining ones...
 
 _______________________________________________
 kvmarm mailing list
