@@ -2,85 +2,61 @@ Return-Path: <SRS0=UAPk=OT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF1D1C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D24CFC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 10:28:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 821426137E
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 07:12:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 821426137E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id 4404C613A7
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 10:28:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4404C613A7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E8AC4B0C5;
-	Wed, 29 Sep 2021 03:12:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8A9F4B12E;
+	Wed, 29 Sep 2021 06:28:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IlNbcYBXNzzN; Wed, 29 Sep 2021 03:12:56 -0400 (EDT)
+	with ESMTP id MtCdRc8bCmP6; Wed, 29 Sep 2021 06:28:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE8D94B12C;
-	Wed, 29 Sep 2021 03:12:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEB2B4B130;
+	Wed, 29 Sep 2021 06:28:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 697F2405EE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 00:29:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D90ED4B12E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 06:28:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iA1tprzoC-F9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Sep 2021 00:29:51 -0400 (EDT)
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com
- [209.85.216.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 621934048B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 00:29:51 -0400 (EDT)
-Received: by mail-pj1-f41.google.com with SMTP id pg10so250979pjb.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Sep 2021 21:29:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=bA6NN/73uMxgRf2do26zZix4NIbIajvF9h0MlhypsP0=;
- b=D0DhDCankrqgNpGj/wZQ1bIG5lFpI686lVV9x5x7cV5N+TTyY6WG29/QP3px1+RW2E
- qkDXyIM7HJuu7S2dzfC6MbZIJyGpSQFXEArdEgLZLzeDhs9Fxl+nCbS+mIb+M1NN/nsX
- 2IiV0ctP8MYuEYzwCB0TW+zCzwm3c2ngkt59k=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=bA6NN/73uMxgRf2do26zZix4NIbIajvF9h0MlhypsP0=;
- b=dF15TTTMvUb/j9h3CLMsDf27fR+PeELk7O7rrzREVPGtukUdfEdYKByrGvX+L+4Yxf
- uZLvHL+saaokvXTIuQ95qQtkgg1Iaq8kpp6TYYuzHYa1kM17K3L1rSXgtGw+GkcUaVZl
- DR5rH4clVf5A5FIs7suHWTdJqOULeWJKNSsG0RLxDtCYeZvy8Sa6EDtPr1EAMJh4NRr/
- Co3oRux/nxJvQ1JzHHGYdZ4O1M/z0xOX3WLEfNODIWoO1yHy8wX3JxdAZV1gPZXkix60
- Vhpg10VnF+YiOzr8R4RHewuNP4FAeD+SQeGly7MR38YO8uet5PClH3P2qGRGFrv7Pecw
- vpcg==
-X-Gm-Message-State: AOAM533yGy8Dt4/3OQHeIiM+pjKf5fm4B/NgPr+ba5b5M2/mwWL7MsQB
- Z7F69MOMU3JbUT7TmURUDI2kBg==
-X-Google-Smtp-Source: ABdhPJxDITqPEpm4RXGmxbl4ubLf862UOuk9hpD6Czqg5k8tUb7xT3tmlnO8vUsHmwXIgQt1huUhKw==
-X-Received: by 2002:a17:90a:f98f:: with SMTP id
- cq15mr4146513pjb.74.1632889790661; 
- Tue, 28 Sep 2021 21:29:50 -0700 (PDT)
-Received: from localhost ([2401:fa00:8f:203:f818:368:93ef:fa36])
- by smtp.gmail.com with UTF8SMTPSA id c206sm652324pfc.220.2021.09.28.21.29.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 28 Sep 2021 21:29:50 -0700 (PDT)
-From: David Stevens <stevensd@chromium.org>
-X-Google-Original-From: David Stevens <stevensd@google.com>
-To: Marc Zyngier <maz@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v4 4/4] KVM: mmu: remove over-aggressive warnings
-Date: Wed, 29 Sep 2021 13:29:08 +0900
-Message-Id: <20210929042908.1313874-5-stevensd@google.com>
-X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-In-Reply-To: <20210929042908.1313874-1-stevensd@google.com>
-References: <20210929042908.1313874-1-stevensd@google.com>
+ with ESMTP id 53wj6cEtBnu6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Sep 2021 06:28:39 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21A154B126
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 06:28:39 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6DE04613A5;
+ Wed, 29 Sep 2021 10:28:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1632911318;
+ bh=38W4+E7XmZj6LdI0NjZ184grtf29Qd/YWJcOFsY7XlU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=s3oPKMoutgasFHaIKQPk4Npg6PF2e4bD+Bc2eWht+hP3eyeMfCb7jpgyRR/gaGQ95
+ vUfnBx+fRhNFoIXgxRgvwuTxnkZlFa34a9R81ir/MQi5iy5ZDFiPJlOpiQWBQZvP2B
+ 36EVVBvobQt6g0Xj/wgk5VqUgZ+bFJjXIfIpWe7wJVvVGwHFmYQFZ7Q16JjWO5GS4D
+ 88fTfgsMuxiJci6e4Vq0Q9s8tzFoHjvxi2zHa3EpzdokMUJ8DhzSLZWSnZD9nKsojL
+ BvvAINMsHcfmxvxt0dLpk5zGsl7Z5OMLFcAh8d+P2bY3GOPdoLZQS7/cipIrnIZDTM
+ Afla3FdpKjAWg==
+Date: Wed, 29 Sep 2021 11:28:33 +0100
+From: Will Deacon <will@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Allow KVM to be disabled from the command line
+Message-ID: <20210929102832.GD21057@willie-the-truck>
+References: <20210903091652.985836-1-maz@kernel.org>
 MIME-Version: 1.0
-X-Mailman-Approved-At: Wed, 29 Sep 2021 03:12:40 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- linux-kernel@vger.kernel.org, David Stevens <stevensd@chromium.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+Content-Disposition: inline
+In-Reply-To: <20210903091652.985836-1-maz@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,51 +73,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: David Stevens <stevensd@chromium.org>
+On Fri, Sep 03, 2021 at 10:16:52AM +0100, Marc Zyngier wrote:
+> Although KVM can be compiled out of the kernel, it cannot be disabled
+> at runtime. Allow this possibility by introducing a new mode that
+> will prevent KVM from initialising.
+> 
+> This is useful in the (limited) circumstances where you don't want
+> KVM to be available (what is wrong with you?), or when you want
+> to install another hypervisor instead (good luck with that).
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  Documentation/admin-guide/kernel-parameters.txt |  3 +++
+>  arch/arm64/include/asm/kvm_host.h               |  1 +
+>  arch/arm64/kernel/idreg-override.c              |  1 +
+>  arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
+>  4 files changed, 18 insertions(+), 1 deletion(-)
 
-Remove two warnings that require ref counts for pages to be non-zero, as
-mapped pfns from follow_pfn may not have an initialized ref count.
+Acked-by: Will Deacon <will@kernel.org>
 
-Signed-off-by: David Stevens <stevensd@chromium.org>
----
- arch/x86/kvm/mmu/mmu.c | 7 -------
- virt/kvm/kvm_main.c    | 2 +-
- 2 files changed, 1 insertion(+), 8 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 5a1adcc9cfbc..3b469df63bcf 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -617,13 +617,6 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
- 
- 	pfn = spte_to_pfn(old_spte);
- 
--	/*
--	 * KVM does not hold the refcount of the page used by
--	 * kvm mmu, before reclaiming the page, we should
--	 * unmap it from mmu first.
--	 */
--	WARN_ON(!kvm_is_reserved_pfn(pfn) && !page_count(pfn_to_page(pfn)));
--
- 	if (is_accessed_spte(old_spte))
- 		kvm_set_pfn_accessed(pfn);
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 421146bd1360..c72ad995a359 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -168,7 +168,7 @@ bool kvm_is_zone_device_pfn(kvm_pfn_t pfn)
- 	 * the device has been pinned, e.g. by get_user_pages().  WARN if the
- 	 * page_count() is zero to help detect bad usage of this helper.
- 	 */
--	if (!pfn_valid(pfn) || WARN_ON_ONCE(!page_count(pfn_to_page(pfn))))
-+	if (!pfn_valid(pfn) || !page_count(pfn_to_page(pfn)))
- 		return false;
- 
- 	return is_zone_device_page(pfn_to_page(pfn));
--- 
-2.33.0.685.g46640cef36-goog
-
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
