@@ -2,80 +2,81 @@ Return-Path: <SRS0=UAPk=OT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6600C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 18:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2CAC433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 19:02:08 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3420361505
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 18:22:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3420361505
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 9E68861505
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 19:02:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9E68861505
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4F8F4B0B4;
-	Wed, 29 Sep 2021 14:22:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C9374B0A3;
+	Wed, 29 Sep 2021 15:02:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ch97c4OAUzxe; Wed, 29 Sep 2021 14:22:21 -0400 (EDT)
+	with ESMTP id jM1qFOyABHZt; Wed, 29 Sep 2021 15:02:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67C2D4B08E;
-	Wed, 29 Sep 2021 14:22:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE14D4B0B4;
+	Wed, 29 Sep 2021 15:02:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF0944B08E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 14:22:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1924A4A7FD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 15:02:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8sr8UQkq4+KQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Sep 2021 14:22:18 -0400 (EDT)
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com
- [209.85.167.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CC234A4BE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 14:22:18 -0400 (EDT)
-Received: by mail-lf1-f44.google.com with SMTP id i25so14482406lfg.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 11:22:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Qtfpl4QD2zskjNpgRMOv1rx5s1LAJUZnW7UP8LdwoyI=;
- b=jNO8noc6wU0vBuBuA5SgzKDJSdjcJtQzSu6NU2uxa8ZSMdSU0rBu5zmLhm+/yKCjoy
- ef+9UZO7RcYlfw89pWUi7lY4xnn8me2aZdS3wY5HXVu5P3KcRiAQQ6flwJa5W7D9nNWE
- +vtTRXVJPaeLOhyI/rzF4EWfzApnPvO8UWRG2sY1OU74NZvn/66Z2/yMf3454os4jWBw
- iQT+Gwy5fTV072sCo8419n5yroRDCEbVmOY6QLwxGPPPnFv8scUz0XuRBI51kwyt2WTW
- 3VWE5RJiCfA+/3QrFCWXNZWBAWYucDnltzpZp8V3SPSuPmWyMavydbnEeT8F6fDR5ZBi
- midQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Qtfpl4QD2zskjNpgRMOv1rx5s1LAJUZnW7UP8LdwoyI=;
- b=agqdWiMgYUhE+FAHAfTFIbn20MOPJrBRLGK4+0a9TTloOvLw+wC84jdpyKBIscv2XC
- taWYbR1dUlFSJUJYFanPBlTjKAtobdupoUmrKCwySTtxvDrCaysDeuw+sb+bpEY4rice
- qnhIAW3jFqhfD3Lk2z4ymCxulS+ssxOeoblJCQ9ePXfRy0EfU9B7/ZA9VKPgRTCCIll8
- vrXYWOhIJJgeyuqI7OkZzHupg1KvboDnMw4oLY2GHbdtXiHDdWJcuVsbnSx/f9XTCK28
- 1gL9ct5v5muHSdB+CJSRLhR51MFDBLMdWAOD6Hus8+POdXDDSFdkuCxj1Jy/XtmZVh5m
- iMyg==
-X-Gm-Message-State: AOAM533HvFvPKgvAo2u1IASzzjLXg06ez7hZQGjT+4zHt8+Zh44oplO5
- LK3WW2gRrMp8icaEt+pTvo7ZNPNgRMF/Oe+mx8CBug==
-X-Google-Smtp-Source: ABdhPJzaUBqKkCyaK9Fbh1Rz2z0TQHkOtkLi8JOjPmgJpuI5lcxIdv+YXlRfj2naCQ46/v6CbxB5cMwrUmzNFTnMYlI=
-X-Received: by 2002:ac2:4217:: with SMTP id y23mr1086804lfh.361.1632939736699; 
- Wed, 29 Sep 2021 11:22:16 -0700 (PDT)
+ with ESMTP id qKFIS41EQsvq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Sep 2021 15:02:03 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E9864A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 15:02:03 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1632942123;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=D8U60ISq1y5SlUXr1QirjUex5im4CPJVjD57FbSFIbw=;
+ b=cTQUR/wBJuvngaWLU0BCRuC9pxYpwpNaI192OS8rLkhkYIjE78rRb9heNX+DXWFIoJGgDR
+ U/fHtp4kRjUGuxW0eAGCrlM5vseF1l3aCiu8s8Y992nv5okTC/inww8CxDKG9e6vuHufof
+ kfM3wmI7I9Kmp3Nto+iXM0u6KWhpHDI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-eSy049SlOQ2v_6f24bHcQQ-1; Wed, 29 Sep 2021 15:02:01 -0400
+X-MC-Unique: eSy049SlOQ2v_6f24bHcQQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8654824FB3;
+ Wed, 29 Sep 2021 19:01:58 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-3.gru2.redhat.com [10.97.112.3])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 254C51009962;
+ Wed, 29 Sep 2021 19:01:58 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+ id 9593F416CE79; Wed, 29 Sep 2021 15:56:29 -0300 (-03)
+Date: Wed, 29 Sep 2021 15:56:29 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
+ KVM_GET_CLOCK
+Message-ID: <20210929185629.GA10933@fuller.cnet>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-5-oupton@google.com>
 MIME-Version: 1.0
-References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
- <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
- <87fsuxq049.wl-maz@kernel.org> <20210825150713.5rpwzm4grfn7akcw@gator.home>
- <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
- <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
- <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
-In-Reply-To: <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
-From: Oliver Upton <oupton@google.com>
-Date: Wed, 29 Sep 2021 11:22:05 -0700
-Message-ID: <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, pshier@google.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20210916181538.968978-5-oupton@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,119 +93,241 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Aug 27, 2021 at 12:40 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Thu, Aug 26, 2021 at 06:49:27PM +0000, Oliver Upton wrote:
-> > On Thu, Aug 26, 2021 at 09:37:42AM +0100, Marc Zyngier wrote:
-> > > On Wed, 25 Aug 2021 19:14:59 +0100,
-> > > Oliver Upton <oupton@google.com> wrote:
-> > > >
-> > > > On Wed, Aug 25, 2021 at 8:07 AM Andrew Jones <drjones@redhat.com> wrote:
-> > >
-> > > [...]
-> > >
-> > > > > Thanks for including me Marc. I think you've mentioned all the examples
-> > > > > of why we don't generally expect N+1 -> N migrations to work that I
-> > > > > can think of. While some of the examples like get-reg-list could
-> > > > > eventually be eliminated if we had CPU models to tighten our machine type
-> > > > > state, I think N+1 -> N migrations will always be best effort at most.
-> > > > >
-> > > > > I agree with giving userspace control over the exposer of the hypercalls
-> > > > > though. Using pseudo-registers for that purpose rather than a pile of
-> > > > > CAPs also seems reasonable to me.
-> > > > >
-> > > > > And, while I don't think this patch is going to proceed, I thought I'd
-> > > > > point out that the opt-out approach doesn't help much with expanding
-> > > > > our migration support unless we require the VMM to be upgraded first.
-> > > > >
-> > > > > And, even then, the (N_kern, N+1_vmm) -> (N+1_kern, N_vmm) case won't
-> > > > > work as expected, since the source enforce opt-out, but the destination
-> > > > > won't.
-> > > >
-> > > > Right, there's going to need to be a fence in both kernel and VMM
-> > > > versions. Before the fence, you can't rollback with either component.
-> > > > Once on the other side of the fence, the user may freely migrate
-> > > > between kernel + VMM combinations.
-> > > >
-> > > > > Also, since the VMM doesn't key off the kernel version, for the
-> > > > > most part N+1 VMMs won't know when they're supposed to opt-out or not,
-> > > > > leaving it to the user to ensure they consider everything. opt-in
-> > > > > usually only needs the user to consider what machine type they want to
-> > > > > launch.
-> > > >
-> > > > Going the register route will implicitly require opt-out for all old
-> > > > hypercalls. We exposed them unconditionally to the guest before, and
-> > > > we must uphold that behavior. The default value for the bitmap will
-> > > > have those features set. Any hypercalls added after that register
-> > > > interface will then require explicit opt-in from userspace.
-> > >
-> > > I disagree here. This makes the ABI inconsistent, and means that no
-> > > feature can be implemented without changing userspace. If you can deal
-> > > with the existing features, you should be able to deal with the next
-> > > lot.
-> > >
-> > > > With regards to the pseudoregister interface, how would a VMM discover
-> > > > new bits? From my perspective, you need to have two bitmaps that the
-> > > > VMM can get at: the set of supported feature bits and the active
-> > > > bitmap of features for a running guest.
-> > >
-> > > My proposal is that we have a single pseudo-register exposing the list
-> > > of implemented by the kernel. Clear the bits you don't want, and write
-> > > back the result. As long as you haven't written anything, you have the
-> > > full feature set. That's pretty similar to the virtio feature
-> > > negotiation.
-> >
-> > Ah, yes I agree. Thinking about it more we will not need something
-> > similar to KVM_GET_SUPPORTED_CPUID.
-> >
-> > So then, for any register where userspace/KVM need to negotiate
-> > features, the default value will return the maximum feature set that is
-> > supported. If userspace wants to constrain features, read out the
-> > register, make sure everything you want is there, and write it back
-> > blowing away the superfluous bits. Given this should we enforce ordering
-> > on feature registers, such that a VMM can only write to the registers
-> > before a VM is started?
->
-> That's a good idea. KVM_REG_ARM64_SVE_VLS has this type of constraint so
-> we can model the feature register control off that.
->
-> >
-> > Also, Reiji is working on making the identity registers writable for the
-> > sake of feature restriction. The suggested negotiation interface would
-> > be applicable there too, IMO.
->
-> This this interesting news. I'll look forward to the posting.
->
-> >
-> > Many thanks to both you and Drew for working this out with me.
-> >
->
-> Thanks,
-> drew
->
+Oliver,
 
-Hey folks,
+Do you have any numbers for the improvement in guests CLOCK_REALTIME
+accuracy across migration, when this is in place?
 
-I have some lingering thoughts on this subject since we last spoke and
-wanted to discuss.
+On Thu, Sep 16, 2021 at 06:15:35PM +0000, Oliver Upton wrote:
+> Handling the migration of TSCs correctly is difficult, in part because
+> Linux does not provide userspace with the ability to retrieve a (TSC,
+> realtime) clock pair for a single instant in time. In lieu of a more
+> convenient facility, KVM can report similar information in the kvm_clock
+> structure.
+> 
+> Provide userspace with a host TSC & realtime pair iff the realtime clock
+> is based on the TSC. If userspace provides KVM_SET_CLOCK with a valid
+> realtime value, advance the KVM clock by the amount of elapsed time. Do
+> not step the KVM clock backwards, though, as it is a monotonic
+> oscillator.
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/api.rst  | 42 ++++++++++++++++++++++++++-------
+>  arch/x86/include/asm/kvm_host.h |  3 +++
+>  arch/x86/kvm/x86.c              | 36 +++++++++++++++++++++-------
+>  include/uapi/linux/kvm.h        |  7 +++++-
+>  4 files changed, 70 insertions(+), 18 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a6729c8cf063..d0b9c986cf6c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -993,20 +993,34 @@ such as migration.
+>  When KVM_CAP_ADJUST_CLOCK is passed to KVM_CHECK_EXTENSION, it returns the
+>  set of bits that KVM can return in struct kvm_clock_data's flag member.
+>  
+> -The only flag defined now is KVM_CLOCK_TSC_STABLE.  If set, the returned
+> -value is the exact kvmclock value seen by all VCPUs at the instant
+> -when KVM_GET_CLOCK was called.  If clear, the returned value is simply
+> -CLOCK_MONOTONIC plus a constant offset; the offset can be modified
+> -with KVM_SET_CLOCK.  KVM will try to make all VCPUs follow this clock,
+> -but the exact value read by each VCPU could differ, because the host
+> -TSC is not stable.
+> +FLAGS:
+> +
+> +KVM_CLOCK_TSC_STABLE.  If set, the returned value is the exact kvmclock
+> +value seen by all VCPUs at the instant when KVM_GET_CLOCK was called.
+> +If clear, the returned value is simply CLOCK_MONOTONIC plus a constant
+> +offset; the offset can be modified with KVM_SET_CLOCK.  KVM will try
+> +to make all VCPUs follow this clock, but the exact value read by each
+> +VCPU could differ, because the host TSC is not stable.
+> +
+> +KVM_CLOCK_REALTIME.  If set, the `realtime` field in the kvm_clock_data
+> +structure is populated with the value of the host's real time
+> +clocksource at the instant when KVM_GET_CLOCK was called. If clear,
+> +the `realtime` field does not contain a value.
+> +
+> +KVM_CLOCK_HOST_TSC.  If set, the `host_tsc` field in the kvm_clock_data
+> +structure is populated with the value of the host's timestamp counter (TSC)
+> +at the instant when KVM_GET_CLOCK was called. If clear, the `host_tsc` field
+> +does not contain a value.
+>  
+>  ::
+>  
+>    struct kvm_clock_data {
+>  	__u64 clock;  /* kvmclock current value */
+>  	__u32 flags;
+> -	__u32 pad[9];
+> +	__u32 pad0;
+> +	__u64 realtime;
+> +	__u64 host_tsc;
+> +	__u32 pad[4];
+>    };
+>  
+>  
+> @@ -1023,12 +1037,22 @@ Sets the current timestamp of kvmclock to the value specified in its parameter.
+>  In conjunction with KVM_GET_CLOCK, it is used to ensure monotonicity on scenarios
+>  such as migration.
+>  
+> +FLAGS:
+> +
+> +KVM_CLOCK_REALTIME.  If set, KVM will compare the value of the `realtime` field
+> +with the value of the host's real time clocksource at the instant when
+> +KVM_SET_CLOCK was called. The difference in elapsed time is added to the final
+> +kvmclock value that will be provided to guests.
+> +
+>  ::
+>  
+>    struct kvm_clock_data {
+>  	__u64 clock;  /* kvmclock current value */
+>  	__u32 flags;
+> -	__u32 pad[9];
+> +	__u32 pad0;
+> +	__u64 realtime;
+> +	__u64 host_tsc;
+> +	__u32 pad[4];
+>    };
+>  
+>  
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index be6805fc0260..9c34b5b63e39 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1936,4 +1936,7 @@ int kvm_cpu_dirty_log_size(void);
+>  
+>  int alloc_all_memslots_rmaps(struct kvm *kvm);
+>  
+> +#define KVM_CLOCK_VALID_FLAGS						\
+> +	(KVM_CLOCK_TSC_STABLE | KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC)
+> +
+>  #endif /* _ASM_X86_KVM_HOST_H */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 523c4e5c109f..cb5d5cad5124 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2815,10 +2815,20 @@ static void get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
+>  	get_cpu();
+>  
+>  	if (__this_cpu_read(cpu_tsc_khz)) {
+> +#ifdef CONFIG_X86_64
+> +		struct timespec64 ts;
+> +
+> +		if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
+> +			data->realtime = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
+> +			data->flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
+> +		} else
+> +#endif
+> +		data->host_tsc = rdtsc();
+> +
+>  		kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
+>  				   &hv_clock.tsc_shift,
+>  				   &hv_clock.tsc_to_system_mul);
+> -		data->clock = __pvclock_read_cycles(&hv_clock, rdtsc());
+> +		data->clock = __pvclock_read_cycles(&hv_clock, data->host_tsc);
+>  	} else {
+>  		data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
+>  	}
+> @@ -4062,7 +4072,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  		r = KVM_SYNC_X86_VALID_FIELDS;
+>  		break;
+>  	case KVM_CAP_ADJUST_CLOCK:
+> -		r = KVM_CLOCK_TSC_STABLE;
+> +		r = KVM_CLOCK_VALID_FLAGS;
+>  		break;
+>  	case KVM_CAP_X86_DISABLE_EXITS:
+>  		r |=  KVM_X86_DISABLE_EXITS_HLT | KVM_X86_DISABLE_EXITS_PAUSE |
+> @@ -5859,12 +5869,12 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_arch *ka = &kvm->arch;
+>  	struct kvm_clock_data data;
+> -	u64 now_ns;
+> +	u64 now_raw_ns;
+>  
+>  	if (copy_from_user(&data, argp, sizeof(data)))
+>  		return -EFAULT;
+>  
+> -	if (data.flags)
+> +	if (data.flags & ~KVM_CLOCK_REALTIME)
+>  		return -EINVAL;
+>  
+>  	kvm_hv_invalidate_tsc_page(kvm);
+> @@ -5878,11 +5888,21 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
+>  	 * is slightly ahead) here we risk going negative on unsigned
+>  	 * 'system_time' when 'data.clock' is very small.
+>  	 */
+> -	if (kvm->arch.use_master_clock)
+> -		now_ns = ka->master_kernel_ns;
+> +	if (data.flags & KVM_CLOCK_REALTIME) {
+> +		u64 now_real_ns = ktime_get_real_ns();
+> +
+> +		/*
+> +		 * Avoid stepping the kvmclock backwards.
+> +		 */
+> +		if (now_real_ns > data.realtime)
+> +			data.clock += now_real_ns - data.realtime;
+> +	}
 
-I'm having a hard time figuring out how a VMM should handle a new
-hypercall identity register introduced on a newer kernel. In order to
-maintain guest ABI, the VMM would need to know about that register and
-zero it when restoring an older guest.
+Forward jumps can also cause problems, for example:
 
-Perhaps instead we could reserve a range of firmware registers as the
-'hypercall identity' registers. Implement all of them as RAZ/WI by
-default, encouraging userspace to zero these registers away for older
-VMs but still allowing an old userspace to pick up new KVM features.
-Doing so would align the hypercall identity registers with the feature
-ID registers from the architecture.
+* Kernel watchdogs
 
-Thoughts?
+* https://patchwork.ozlabs.org/project/qemu-devel/patch/20130618233825.GA19042@amt.cnet/
 
---
-Thanks,
-Oliver
+So perhaps limiting the amount of forward jump that is allowed 
+would be a good thing? (which can happen if the two hosts realtime
+clocks are off).
+
+Now by how much, i am not sure.
+
+Or, as mentioned earlier, only enable KVM_CLOCK_REALTIME if userspace
+KVM code checks clock synchronization.
+
+Thomas, CC'ed, has deeper understanding of problems with 
+forward time jumps than I do. Thomas, any comments?
+
+As a note: this makes it not OK to use KVM_CLOCK_REALTIME flag 
+for either vm pause / vm resume (well, if paused for long periods of time) 
+or savevm / restorevm.
+
+> +	if (ka->use_master_clock)
+> +		now_raw_ns = ka->master_kernel_ns;
+>  	else
+> -		now_ns = get_kvmclock_base_ns();
+> -	ka->kvmclock_offset = data.clock - now_ns;
+> +		now_raw_ns = get_kvmclock_base_ns();
+> +	ka->kvmclock_offset = data.clock - now_raw_ns;
+>  	kvm_end_pvclock_update(kvm);
+>  	return 0;
+>  }
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index a067410ebea5..d228bf394465 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1223,11 +1223,16 @@ struct kvm_irqfd {
+>  
+>  /* Do not use 1, KVM_CHECK_EXTENSION returned it before we had flags.  */
+>  #define KVM_CLOCK_TSC_STABLE		2
+> +#define KVM_CLOCK_REALTIME		(1 << 2)
+> +#define KVM_CLOCK_HOST_TSC		(1 << 3)
+>  
+>  struct kvm_clock_data {
+>  	__u64 clock;
+>  	__u32 flags;
+> -	__u32 pad[9];
+> +	__u32 pad0;
+> +	__u64 realtime;
+> +	__u64 host_tsc;
+> +	__u32 pad[4];
+>  };
+>  
+>  /* For KVM_CAP_SW_TLB */
+> -- 
+> 2.33.0.309.g3052b89438-goog
+> 
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
