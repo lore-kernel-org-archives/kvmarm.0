@@ -2,86 +2,69 @@ Return-Path: <SRS0=UAPk=OT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C78E0C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 15:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ECFDC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 16:05:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 373DA60FA0
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 15:56:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 373DA60FA0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id A9780617E6
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 16:05:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A9780617E6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B73A24B135;
-	Wed, 29 Sep 2021 11:56:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30E464B132;
+	Wed, 29 Sep 2021 12:05:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QybR9tu-uz-t; Wed, 29 Sep 2021 11:56:20 -0400 (EDT)
+	with ESMTP id ZYiVLq6hhi99; Wed, 29 Sep 2021 12:05:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BAFE34B12C;
-	Wed, 29 Sep 2021 11:56:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 004AC4B12E;
+	Wed, 29 Sep 2021 12:05:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 94A854B0EC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 11:56:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05AD34B11F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 12:05:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jZ7s8nythmh7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Sep 2021 11:56:18 -0400 (EDT)
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
- [209.85.214.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 636BF4B0DF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 11:56:18 -0400 (EDT)
-Received: by mail-pl1-f175.google.com with SMTP id j4so364514plx.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 08:56:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=QXqhrOe99SMkwy7xOUQxSfO26TmAo7lLUFFlJf608N0=;
- b=Tv8zIpJ1xnCFM6xhqdlL4/vIvDrFT70hpY7YZvbNRnBVFOG4552p58wruczMQgdZKK
- eeSXc9vgKvRWFa2wZKncJtuoLccB/SQD0lZb373whHXgP0hN/syk+1YESmAJ6Ckzumcc
- NhvyhMJ3gxZLYVgkzClSHDzRrlf9ZGze6PJb4Rjp/jG+ril8oNOXTXLsWT1pRrkPtmqL
- 4PUV0yFNHSQKSen8HonJ/GYpFyC1hMu/UjTjUXDwstRpbzIuCAqm2crgOGwYwr7WvZkG
- XmVQ1BpAVbDup/q/pmVYh+eI2ZnBlN5C050/HolusT4O+D/tiDJeb9Jde5hqcWLG1a89
- ivNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=QXqhrOe99SMkwy7xOUQxSfO26TmAo7lLUFFlJf608N0=;
- b=qSynkPJb2lGp0iLOpCna6R/Qzd+TmyqMPNCC6yJpDyLBuq/4ZUq5QFaAbie7ax1CqX
- TJNRbRNWO3HPXEphzKS2ya+bZYbaYZKm3OFBIRqeckvDUYUUqkSkHWLSH5sAGcTP+HXt
- VN+h8G5XD8/pgiVlf7cvPMklF3tf/K9TwxunYCZgf1j9uo/aAj7CGsWtPo88JSPVRnXg
- 4PG0GmzlyLiYoSxcmUjAgYIjHMckCDylrwqD+VteQ7TJ9axueEN47Gb+prus6TpUJVrW
- E8iL2YrVZG9sXPt4FWJypEFN0Jd1l1rZy6IwobjLJjDmouvGPN+S7Xq34Gq5qtJR6mmJ
- t+Ww==
-X-Gm-Message-State: AOAM530cAUQRykzLZPBvd+VAAi0Sy3TFYGaizGlVkHdQq1ZAMwZyEgaJ
- mfE+vebuVB6+99Ls3i8bFS9skw==
-X-Google-Smtp-Source: ABdhPJyyJ63l3Jgn/wkbO4utLpV1s4Zsct68SOclwmSTKlsnuKe6K74rJe7GIbs8jNqvwhk7Zjw+fQ==
-X-Received: by 2002:a17:90a:8b82:: with SMTP id
- z2mr423618pjn.216.1632930977189; 
- Wed, 29 Sep 2021 08:56:17 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id p16sm242556pfq.95.2021.09.29.08.56.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 29 Sep 2021 08:56:16 -0700 (PDT)
-Date: Wed, 29 Sep 2021 15:56:12 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/2] KVM: arm64: Depend on HAVE_KVM => OF instead of
- directly on OF
-Message-ID: <YVSMnE8vJFdj7J+N@google.com>
-References: <20210921222231.518092-1-seanjc@google.com>
- <20210921222231.518092-3-seanjc@google.com>
- <20210929155328.GD22029@willie-the-truck>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210929155328.GD22029@willie-the-truck>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id OTd1djwb3XH7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Sep 2021 12:05:02 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 166304B0DF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 12:05:02 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 48CE6617E3;
+ Wed, 29 Sep 2021 16:05:00 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mVc4o-00DlkD-AC; Wed, 29 Sep 2021 17:04:58 +0100
+Date: Wed, 29 Sep 2021 17:04:57 +0100
+Message-ID: <87k0iztljq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 1/5] KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing
+ a virtual GICv3
+In-Reply-To: <7fe293a6-16af-929f-33b1-aa89675197b0@arm.com>
+References: <20210924082542.2766170-1-maz@kernel.org>
+ <20210924082542.2766170-2-maz@kernel.org>
+ <7fe293a6-16af-929f-33b1-aa89675197b0@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, eric.auger@redhat.com, christoffer.dall@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -99,43 +82,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 29, 2021, Will Deacon wrote:
-> On Tue, Sep 21, 2021 at 03:22:31PM -0700, Sean Christopherson wrote:
-> > Select HAVE_KVM if the KVM dependency is met (OF / Open Firmware), and
-> > make KVM depend on HAVE_KVM instead of directly on OF.  This fixes the
-> > oddity where arm64 configs can end up with KVM=y and HAVE_KVM=n, and will
-> > hopefully prevent breakage if there are future users of HAVE_KVM.
-> > 
-> > Note, arm64 unconditionally selects OF, and has always done so (see
-> > commit 8c2c3df31e3b ("arm64: Build infrastructure").  Keep the somewhat
-> > pointless HAVE_KVM dependency on OF to document that KVM requires Open
-> > Firmware support.
-> > 
-> > No functional change intended.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/arm64/Kconfig     | 1 +
-> >  arch/arm64/kvm/Kconfig | 2 +-
-> >  2 files changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> > index b5b13a932561..38c0f36a5ed4 100644
-> > --- a/arch/arm64/Kconfig
-> > +++ b/arch/arm64/Kconfig
-> > @@ -187,6 +187,7 @@ config ARM64
-> >  	select HAVE_GCC_PLUGINS
-> >  	select HAVE_HW_BREAKPOINT if PERF_EVENTS
-> >  	select HAVE_IRQ_TIME_ACCOUNTING
-> > +	select HAVE_KVM if OF
+Hi Alex,
+
+On Wed, 29 Sep 2021 16:29:09 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Honestly, I'd just drop the 'if OF' here. We select it unconditionally a
-> few lines below and so I think it's more confusing to have the check.
+> Hi Marc,
+> 
+> On 9/24/21 09:25, Marc Zyngier wrote:
+> > Until now, we always let ID_AA64PFR0_EL1.GIC reflect the value
+> > visible on the host, even if we were running a GICv2-enabled VM
+> > on a GICv3+compat host.
+> >
+> > That's fine, but we also now have the case of a host that does not
+> > expose ID_AA64PFR0_EL1.GIC==1 despite having a vGIC. Yes, this is
+> > confusing. Thank you M1.
+> >
+> > Let's go back to first principles and expose ID_AA64PFR0_EL1.GIC=1
+> > when a GICv3 is exposed to the guest. This also hides a GICv4.1
+> > CPU interface from the guest which has no business knowing about
+> > the v4.1 extension.
+> 
+> Had a look at the gic-v3 driver, and as far as I can tell it does
+> not check that a GICv3 is advertised in ID_AA64PFR0_EL1. If I didn't
+> get this wrong, then this patch is to ensure architectural
+> compliance for a guest even if the hardware is not necessarily
+> compliant, right?
 
-Work for me.  I all but flipped a coin when deciding whether or not to keep the
-OF dependency.
+Indeed. Not having this made some of my own tests fail on M1 as they
+rely on ID_AA64PFR0_EL1.GIC being correct. I also pondered setting it
+to 0 when emulating a GICv2, but that'd be a change in behaviour, and
+I want to think a bit more about the effects of that.
 
-Thanks!
+> 
+> GICv4.1 is an extension to GICv4 (which itself was an extension to
+> GICv3) to add support for virtualization features (virtual SGIs), so
+> I don't see any harm in hiding it from the guest, since the guest
+> cannot virtual SGIs.
+
+Indeed. The guest already has another way to look into this by
+checking whether the distributor allows active-less SGIs.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
