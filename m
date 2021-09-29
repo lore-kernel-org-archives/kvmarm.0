@@ -2,81 +2,88 @@ Return-Path: <SRS0=UAPk=OT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2CAC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 19:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E08F1C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 21:10:55 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9E68861505
-	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 19:02:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9E68861505
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 61F2561504
+	for <kvmarm@archiver.kernel.org>; Wed, 29 Sep 2021 21:10:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 61F2561504
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C9374B0A3;
-	Wed, 29 Sep 2021 15:02:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE85F4B0D9;
+	Wed, 29 Sep 2021 17:10:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jM1qFOyABHZt; Wed, 29 Sep 2021 15:02:05 -0400 (EDT)
+	with ESMTP id fWt+Uu5RtGjn; Wed, 29 Sep 2021 17:10:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE14D4B0B4;
-	Wed, 29 Sep 2021 15:02:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE6A54B090;
+	Wed, 29 Sep 2021 17:10:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1924A4A7FD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 15:02:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3EF94A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 17:10:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qKFIS41EQsvq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Sep 2021 15:02:03 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E9864A4BE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 15:02:03 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1632942123;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=D8U60ISq1y5SlUXr1QirjUex5im4CPJVjD57FbSFIbw=;
- b=cTQUR/wBJuvngaWLU0BCRuC9pxYpwpNaI192OS8rLkhkYIjE78rRb9heNX+DXWFIoJGgDR
- U/fHtp4kRjUGuxW0eAGCrlM5vseF1l3aCiu8s8Y992nv5okTC/inww8CxDKG9e6vuHufof
- kfM3wmI7I9Kmp3Nto+iXM0u6KWhpHDI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-eSy049SlOQ2v_6f24bHcQQ-1; Wed, 29 Sep 2021 15:02:01 -0400
-X-MC-Unique: eSy049SlOQ2v_6f24bHcQQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8654824FB3;
- Wed, 29 Sep 2021 19:01:58 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-3.gru2.redhat.com [10.97.112.3])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 254C51009962;
- Wed, 29 Sep 2021 19:01:58 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
- id 9593F416CE79; Wed, 29 Sep 2021 15:56:29 -0300 (-03)
-Date: Wed, 29 Sep 2021 15:56:29 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
- KVM_GET_CLOCK
-Message-ID: <20210929185629.GA10933@fuller.cnet>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-5-oupton@google.com>
+ with ESMTP id yZEoLltDJ0B9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Sep 2021 17:10:50 -0400 (EDT)
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com
+ [209.85.216.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFF524A3A5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 17:10:50 -0400 (EDT)
+Received: by mail-pj1-f43.google.com with SMTP id
+ oa12-20020a17090b1bcc00b0019f2d30c08fso3072362pjb.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Sep 2021 14:10:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to;
+ bh=eSi8jRqHCChCbRdByu+31RRuSb+xYsMKHrZgy6977k4=;
+ b=qdfcMPpGzhf3bE3tkqdDAuk6qOvlx0ioEDswRc0v/ON2CoOSIN0QidqCNo5Ikwf/pl
+ Q94+bOtcHV8wi+UslP2QhMR4URMwzzIHWGWr4DW1+vKJn0MPAUDcEh3T0bW+s6BWWbu3
+ 8akzG2wlbKhGSt4xoYoZMX1MfOSzmSm20mjgAZIIcRDXCeOp+lUtjYyXYCwA8sTzkg+Q
+ 9CaO7kCq2gVrGQcCtkq31MJU7DcXKlB+ZE/pDpJqluHW8guzlIG4PzaKIXHFAlc1Ixcj
+ iRU6fOv3iH7P4Oieu811mJVU+EbZKBLTx/ouiVh48jR3CQ1GmRe3HKEazaSFpd7iTwr7
+ J8Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=eSi8jRqHCChCbRdByu+31RRuSb+xYsMKHrZgy6977k4=;
+ b=MeoxNplKlZb2ev5+rl61r8NYrqKuFTCeHHP2EBM0SJ5nLtdWIlom7UBz4OCoJt5z3F
+ 7cSkvdG4YO2zFqeC3j5go1znvCw9sObLkzP5h8wQCPOGhKVLjtYWtfbcrQs/dvy+L8Ko
+ 0p1bTANrC/Bqrq4efl0SDZ7YPisSGI1aWtwv8LYEMxFcJ7JjyY64RCObdE7Y99QdAV9B
+ R11fJ7tCgYYBB1iVG/27mOp7EsvjKSXxWbroEbgo1wLwV8f7vv8Gxqql3dwNr7FO1DYU
+ 9w3PHdQULiq9pIFcSbmxsFMnQmIyplRLvC/XUjwOAiaFD/5Ce7BwkRY0nEttnQGtilfF
+ dv4A==
+X-Gm-Message-State: AOAM5316aJpAsxo4cDlzsPzzl/XbAjVAEmPWKy9OUfjMZs49C4TbLwDh
+ MBbp89PsZ1oqkt4nuBIa9jjteQ==
+X-Google-Smtp-Source: ABdhPJwXGd6YAz7NLKLEG9FaWIn3fO6ClLr2KS8DOXFDCqX+t+Q0Fl8tO14XGQ9yUacMtvRgVp7aew==
+X-Received: by 2002:a17:902:dac4:b0:13d:acee:cacc with SMTP id
+ q4-20020a170902dac400b0013daceecaccmr755277plx.0.1632949849474; 
+ Wed, 29 Sep 2021 14:10:49 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150])
+ by smtp.gmail.com with ESMTPSA id n26sm678894pfo.19.2021.09.29.14.10.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 29 Sep 2021 14:10:48 -0700 (PDT)
+Date: Wed, 29 Sep 2021 14:10:45 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [PATCH v3 02/10] KVM: arm64: vgic-v3: Check redist region is not
+ above the VM IPA size
+Message-ID: <YVTWVf26yYNUUx2L@google.com>
+References: <20210928184803.2496885-1-ricarkol@google.com>
+ <20210928184803.2496885-3-ricarkol@google.com>
+ <01a03d81-e98b-a504-f4b7-e4a56ffa78d5@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20210916181538.968978-5-oupton@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+In-Reply-To: <01a03d81-e98b-a504-f4b7-e4a56ffa78d5@redhat.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, shuah@kernel.org, pshier@google.com,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,245 +95,121 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Oliver,
+Hi Eric,
 
-Do you have any numbers for the improvement in guests CLOCK_REALTIME
-accuracy across migration, when this is in place?
+On Wed, Sep 29, 2021 at 06:23:04PM +0200, Eric Auger wrote:
+> Hi Ricardo,
+> =
 
-On Thu, Sep 16, 2021 at 06:15:35PM +0000, Oliver Upton wrote:
-> Handling the migration of TSCs correctly is difficult, in part because
-> Linux does not provide userspace with the ability to retrieve a (TSC,
-> realtime) clock pair for a single instant in time. In lieu of a more
-> convenient facility, KVM can report similar information in the kvm_clock
-> structure.
-> 
-> Provide userspace with a host TSC & realtime pair iff the realtime clock
-> is based on the TSC. If userspace provides KVM_SET_CLOCK with a valid
-> realtime value, advance the KVM clock by the amount of elapsed time. Do
-> not step the KVM clock backwards, though, as it is a monotonic
-> oscillator.
-> 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  Documentation/virt/kvm/api.rst  | 42 ++++++++++++++++++++++++++-------
->  arch/x86/include/asm/kvm_host.h |  3 +++
->  arch/x86/kvm/x86.c              | 36 +++++++++++++++++++++-------
->  include/uapi/linux/kvm.h        |  7 +++++-
->  4 files changed, 70 insertions(+), 18 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index a6729c8cf063..d0b9c986cf6c 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -993,20 +993,34 @@ such as migration.
->  When KVM_CAP_ADJUST_CLOCK is passed to KVM_CHECK_EXTENSION, it returns the
->  set of bits that KVM can return in struct kvm_clock_data's flag member.
->  
-> -The only flag defined now is KVM_CLOCK_TSC_STABLE.  If set, the returned
-> -value is the exact kvmclock value seen by all VCPUs at the instant
-> -when KVM_GET_CLOCK was called.  If clear, the returned value is simply
-> -CLOCK_MONOTONIC plus a constant offset; the offset can be modified
-> -with KVM_SET_CLOCK.  KVM will try to make all VCPUs follow this clock,
-> -but the exact value read by each VCPU could differ, because the host
-> -TSC is not stable.
-> +FLAGS:
-> +
-> +KVM_CLOCK_TSC_STABLE.  If set, the returned value is the exact kvmclock
-> +value seen by all VCPUs at the instant when KVM_GET_CLOCK was called.
-> +If clear, the returned value is simply CLOCK_MONOTONIC plus a constant
-> +offset; the offset can be modified with KVM_SET_CLOCK.  KVM will try
-> +to make all VCPUs follow this clock, but the exact value read by each
-> +VCPU could differ, because the host TSC is not stable.
-> +
-> +KVM_CLOCK_REALTIME.  If set, the `realtime` field in the kvm_clock_data
-> +structure is populated with the value of the host's real time
-> +clocksource at the instant when KVM_GET_CLOCK was called. If clear,
-> +the `realtime` field does not contain a value.
-> +
-> +KVM_CLOCK_HOST_TSC.  If set, the `host_tsc` field in the kvm_clock_data
-> +structure is populated with the value of the host's timestamp counter (TSC)
-> +at the instant when KVM_GET_CLOCK was called. If clear, the `host_tsc` field
-> +does not contain a value.
->  
->  ::
->  
->    struct kvm_clock_data {
->  	__u64 clock;  /* kvmclock current value */
->  	__u32 flags;
-> -	__u32 pad[9];
-> +	__u32 pad0;
-> +	__u64 realtime;
-> +	__u64 host_tsc;
-> +	__u32 pad[4];
->    };
->  
->  
-> @@ -1023,12 +1037,22 @@ Sets the current timestamp of kvmclock to the value specified in its parameter.
->  In conjunction with KVM_GET_CLOCK, it is used to ensure monotonicity on scenarios
->  such as migration.
->  
-> +FLAGS:
-> +
-> +KVM_CLOCK_REALTIME.  If set, KVM will compare the value of the `realtime` field
-> +with the value of the host's real time clocksource at the instant when
-> +KVM_SET_CLOCK was called. The difference in elapsed time is added to the final
-> +kvmclock value that will be provided to guests.
-> +
->  ::
->  
->    struct kvm_clock_data {
->  	__u64 clock;  /* kvmclock current value */
->  	__u32 flags;
-> -	__u32 pad[9];
-> +	__u32 pad0;
-> +	__u64 realtime;
-> +	__u64 host_tsc;
-> +	__u32 pad[4];
->    };
->  
->  
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index be6805fc0260..9c34b5b63e39 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1936,4 +1936,7 @@ int kvm_cpu_dirty_log_size(void);
->  
->  int alloc_all_memslots_rmaps(struct kvm *kvm);
->  
-> +#define KVM_CLOCK_VALID_FLAGS						\
-> +	(KVM_CLOCK_TSC_STABLE | KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC)
-> +
->  #endif /* _ASM_X86_KVM_HOST_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 523c4e5c109f..cb5d5cad5124 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2815,10 +2815,20 @@ static void get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
->  	get_cpu();
->  
->  	if (__this_cpu_read(cpu_tsc_khz)) {
-> +#ifdef CONFIG_X86_64
-> +		struct timespec64 ts;
-> +
-> +		if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
-> +			data->realtime = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
-> +			data->flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
-> +		} else
-> +#endif
-> +		data->host_tsc = rdtsc();
-> +
->  		kvm_get_time_scale(NSEC_PER_SEC, __this_cpu_read(cpu_tsc_khz) * 1000LL,
->  				   &hv_clock.tsc_shift,
->  				   &hv_clock.tsc_to_system_mul);
-> -		data->clock = __pvclock_read_cycles(&hv_clock, rdtsc());
-> +		data->clock = __pvclock_read_cycles(&hv_clock, data->host_tsc);
->  	} else {
->  		data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
->  	}
-> @@ -4062,7 +4072,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		r = KVM_SYNC_X86_VALID_FIELDS;
->  		break;
->  	case KVM_CAP_ADJUST_CLOCK:
-> -		r = KVM_CLOCK_TSC_STABLE;
-> +		r = KVM_CLOCK_VALID_FLAGS;
->  		break;
->  	case KVM_CAP_X86_DISABLE_EXITS:
->  		r |=  KVM_X86_DISABLE_EXITS_HLT | KVM_X86_DISABLE_EXITS_PAUSE |
-> @@ -5859,12 +5869,12 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
->  {
->  	struct kvm_arch *ka = &kvm->arch;
->  	struct kvm_clock_data data;
-> -	u64 now_ns;
-> +	u64 now_raw_ns;
->  
->  	if (copy_from_user(&data, argp, sizeof(data)))
->  		return -EFAULT;
->  
-> -	if (data.flags)
-> +	if (data.flags & ~KVM_CLOCK_REALTIME)
->  		return -EINVAL;
->  
->  	kvm_hv_invalidate_tsc_page(kvm);
-> @@ -5878,11 +5888,21 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
->  	 * is slightly ahead) here we risk going negative on unsigned
->  	 * 'system_time' when 'data.clock' is very small.
->  	 */
-> -	if (kvm->arch.use_master_clock)
-> -		now_ns = ka->master_kernel_ns;
-> +	if (data.flags & KVM_CLOCK_REALTIME) {
-> +		u64 now_real_ns = ktime_get_real_ns();
-> +
-> +		/*
-> +		 * Avoid stepping the kvmclock backwards.
-> +		 */
-> +		if (now_real_ns > data.realtime)
-> +			data.clock += now_real_ns - data.realtime;
-> +	}
+> On 9/28/21 8:47 PM, Ricardo Koller wrote:
+> > Verify that the redistributor regions do not extend beyond the
+> > VM-specified IPA range (phys_size). This can happen when using
+> > KVM_VGIC_V3_ADDR_TYPE_REDIST or KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS
+> > with:
+> >
+> >   base + size > phys_size AND base < phys_size
+> >
+> > Add the missing check into vgic_v3_alloc_redist_region() which is called
+> > when setting the regions, and into vgic_v3_check_base() which is called
+> > when attempting the first vcpu-run. The vcpu-run check does not apply to
+> > KVM_VGIC_V3_ADDR_TYPE_REDIST_REGIONS because the regions size is known
+> > before the first vcpu-run. Note that using the REDIST_REGIONS API
+> > results in a different check, which already exists, at first vcpu run:
+> > that the number of redist regions is enough for all vcpus.
+> >
+> > Finally, this patch also enables some extra tests in
+> > vgic_v3_alloc_redist_region() by calculating "size" early for the legacy
+> > redist api: like checking that the REDIST region can fit all the already
+> > created vcpus.
+> >
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  arch/arm64/kvm/vgic/vgic-mmio-v3.c | 6 ++++--
+> >  arch/arm64/kvm/vgic/vgic-v3.c      | 4 ++++
+> >  2 files changed, 8 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/v=
+gic-mmio-v3.c
+> > index a09cdc0b953c..9be02bf7865e 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+> > @@ -796,7 +796,9 @@ static int vgic_v3_alloc_redist_region(struct kvm *=
+kvm, uint32_t index,
+> >  	struct vgic_dist *d =3D &kvm->arch.vgic;
+> >  	struct vgic_redist_region *rdreg;
+> >  	struct list_head *rd_regions =3D &d->rd_regions;
+> > -	size_t size =3D count * KVM_VGIC_V3_REDIST_SIZE;
+> > +	int nr_vcpus =3D atomic_read(&kvm->online_vcpus);
+> > +	size_t size =3D count ? count * KVM_VGIC_V3_REDIST_SIZE
+> > +			    : nr_vcpus * KVM_VGIC_V3_REDIST_SIZE;
+> =
 
-Forward jumps can also cause problems, for example:
+> This actually fixes the=A0 vgic_dist_overlap(kvm, base, size=3D0)
+> =
 
-* Kernel watchdogs
+> in case the number of online-vcpus at that time is less than the final
+> one (1st run), if count=3D0 (legacy API) do we ever check that the RDIST
+> (with accumulated vcpu rdists) does not overlap with dist.
+> in other words shouldn't we call vgic_dist_overlap(kvm, base, size)
+> again in vgic_v3_check_base().
+> =
 
-* https://patchwork.ozlabs.org/project/qemu-devel/patch/20130618233825.GA19042@amt.cnet/
 
-So perhaps limiting the amount of forward jump that is allowed 
-would be a good thing? (which can happen if the two hosts realtime
-clocks are off).
+I think we're good; that's checked by vgic_v3_rdist_overlap(dist_base)
+in vgic_v3_check_base(). This function uses the only region (legacy
+case) using a size based on the online_vcpus (in
+vgic_v3_rd_region_size()).  This exact situation is tested by
+test_vgic_then_vcpus() in the vgic_init selftest.
 
-Now by how much, i am not sure.
+Thanks,
+Ricardo
 
-Or, as mentioned earlier, only enable KVM_CLOCK_REALTIME if userspace
-KVM code checks clock synchronization.
+> Thanks
+> =
 
-Thomas, CC'ed, has deeper understanding of problems with 
-forward time jumps than I do. Thomas, any comments?
+> Eric
+> =
 
-As a note: this makes it not OK to use KVM_CLOCK_REALTIME flag 
-for either vm pause / vm resume (well, if paused for long periods of time) 
-or savevm / restorevm.
+> >  	int ret;
+> >  =
 
-> +	if (ka->use_master_clock)
-> +		now_raw_ns = ka->master_kernel_ns;
->  	else
-> -		now_ns = get_kvmclock_base_ns();
-> -	ka->kvmclock_offset = data.clock - now_ns;
-> +		now_raw_ns = get_kvmclock_base_ns();
-> +	ka->kvmclock_offset = data.clock - now_raw_ns;
->  	kvm_end_pvclock_update(kvm);
->  	return 0;
->  }
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index a067410ebea5..d228bf394465 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1223,11 +1223,16 @@ struct kvm_irqfd {
->  
->  /* Do not use 1, KVM_CHECK_EXTENSION returned it before we had flags.  */
->  #define KVM_CLOCK_TSC_STABLE		2
-> +#define KVM_CLOCK_REALTIME		(1 << 2)
-> +#define KVM_CLOCK_HOST_TSC		(1 << 3)
->  
->  struct kvm_clock_data {
->  	__u64 clock;
->  	__u32 flags;
-> -	__u32 pad[9];
-> +	__u32 pad0;
-> +	__u64 realtime;
-> +	__u64 host_tsc;
-> +	__u32 pad[4];
->  };
->  
->  /* For KVM_CAP_SW_TLB */
-> -- 
-> 2.33.0.309.g3052b89438-goog
-> 
-> 
+> >  	/* cross the end of memory ? */
+> > @@ -840,7 +842,7 @@ static int vgic_v3_alloc_redist_region(struct kvm *=
+kvm, uint32_t index,
+> >  =
+
+> >  	rdreg->base =3D VGIC_ADDR_UNDEF;
+> >  =
+
+> > -	ret =3D vgic_check_ioaddr(kvm, &rdreg->base, base, SZ_64K);
+> > +	ret =3D vgic_check_iorange(kvm, &rdreg->base, base, SZ_64K, size);
+> >  	if (ret)
+> >  		goto free;
+> >  =
+
+> > diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v=
+3.c
+> > index 21a6207fb2ee..27ee674631b3 100644
+> > --- a/arch/arm64/kvm/vgic/vgic-v3.c
+> > +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+> > @@ -486,6 +486,10 @@ bool vgic_v3_check_base(struct kvm *kvm)
+> >  		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) <
+> >  			rdreg->base)
+> >  			return false;
+> > +
+> > +		if (rdreg->base + vgic_v3_rd_region_size(kvm, rdreg) >
+> > +			kvm_phys_size(kvm))
+> > +			return false;
+> >  	}
+> >  =
+
+> >  	if (IS_VGIC_ADDR_UNDEF(d->vgic_dist_base))
+> =
 
 _______________________________________________
 kvmarm mailing list
