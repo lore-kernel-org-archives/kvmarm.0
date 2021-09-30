@@ -2,64 +2,76 @@ Return-Path: <SRS0=H8K6=OU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22F57C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 13:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C31C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 14:04:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 93AC5619E4
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 13:36:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 93AC5619E4
+	by mail.kernel.org (Postfix) with ESMTP id F0F92619EB
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 14:04:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F0F92619EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FCBC4B0EC;
-	Thu, 30 Sep 2021 09:36:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83CD249F6C;
+	Thu, 30 Sep 2021 10:04:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UUGa9oX1FTtH; Thu, 30 Sep 2021 09:36:06 -0400 (EDT)
+	with ESMTP id v8DUOX4hfTbe; Thu, 30 Sep 2021 10:04:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B81694B0D7;
-	Thu, 30 Sep 2021 09:36:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E4024B0BF;
+	Thu, 30 Sep 2021 10:04:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB4364A534
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 09:36:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 981224086C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 10:04:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 04goPZ2ZFg36 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Sep 2021 09:36:04 -0400 (EDT)
+ with ESMTP id lPgyK+uMqSS1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Sep 2021 10:04:26 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 897144A4BE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 09:36:04 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 23E6961440;
- Thu, 30 Sep 2021 13:36:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1633008963;
- bh=pjrc9VhsJkOrDhWGJxTk9nMm3AOBxD3Ofrhgi6/53qk=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=HA4bAYfs8MfLop6TpMlT4qc+pOilOHs6jcLMT7k0cyfHNYYd44L34nO3w1h1vTcQC
- UckW2CTk+YbCisOCwe8zzh/1SPZXVogipmoR7Dso3w1JtUsMunW3l4tVkCAsAPOx8o
- NGVwKd8UDCEkIqrvwGppgoyKKOxl9Pvkct1D+COc7dgB+LLVTMOV46kFrE4EDz8IFp
- OjkXLiCjJPj668vQQ0m+CVGWStdfzXc5iMQ5RwIRSoLidMfteDfg4XWFZdkQMG5J/+
- GljbocoGzdOo2PrtdgjkWnA1n/LhZYkB91eyHJhiJ4RQFdvN9u8upZbljsvHr2oAcj
- 0J4Qk3xMiX04A==
-Date: Thu, 30 Sep 2021 14:35:57 +0100
-From: Will Deacon <will@kernel.org>
-To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v6 03/12] KVM: arm64: Move early handlers to per-EC
- handlers
-Message-ID: <20210930133444.GC23809@willie-the-truck>
-References: <20210922124704.600087-1-tabba@google.com>
- <20210922124704.600087-4-tabba@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210922124704.600087-4-tabba@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BFBB4B091
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 10:04:26 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id AFB8361440;
+ Thu, 30 Sep 2021 14:04:23 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mVwfd-00E0Ac-T4; Thu, 30 Sep 2021 15:04:22 +0100
+Date: Thu, 30 Sep 2021 15:04:21 +0100
+Message-ID: <87zgrurwgq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
+ of arch specific exit reasons
+In-Reply-To: <CALzav=cuzT=u6G0TCVZUfEgAKOCKTSCDE8x2v5qc-Gd_NL-pzg@mail.gmail.com>
+References: <20210922010851.2312845-1-jingzhangos@google.com>
+ <20210922010851.2312845-3-jingzhangos@google.com>
+ <87czp0voqg.wl-maz@kernel.org>
+ <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
+ <YUtyVEpMBityBBNl@google.com> <875yusv3vm.wl-maz@kernel.org>
+ <CALzav=cuzT=u6G0TCVZUfEgAKOCKTSCDE8x2v5qc-Gd_NL-pzg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, seanjc@google.com, pbonzini@redhat.com,
+ jingzhangos@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, pshier@google.com, oupton@google.com, jmattson@google.com,
+ bgardon@google.com, aaronlewis@google.com, venkateshs@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Aaron Lewis <aaronlewis@google.com>, KVM <kvm@vger.kernel.org>,
+ Venkatesh Srinivas <venkateshs@google.com>, Peter Shier <pshier@google.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -76,109 +88,106 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 22, 2021 at 01:46:55PM +0100, Fuad Tabba wrote:
-> From: Marc Zyngier <maz@kernel.org>
+On Thu, 23 Sep 2021 00:22:12 +0100,
+David Matlack <dmatlack@google.com> wrote:
 > 
-> Simplify the early exception handling by slicing the gigantic decoding
-> tree into a more manageable set of functions, similar to what we have
-> in handle_exit.c.
+> On Wed, Sep 22, 2021 at 11:53 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Wed, 22 Sep 2021 19:13:40 +0100,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > > Stepping back a bit, this is one piece of the larger issue of how to
+> > > modernize KVM for hyperscale usage.  BPF and tracing are great when
+> > > the debugger has root access to the machine and can rerun the
+> > > failing workload at will.  They're useless for identifying trends
+> > > across large numbers of machines, triaging failures after the fact,
+> > > debugging performance issues with workloads that the debugger
+> > > doesn't have direct access to, etc...
+> >
+> > Which is why I suggested the use of trace points as kernel module
+> > hooks to perform whatever accounting you require. This would give you
+> > the same level of detail this series exposes.
 > 
-> This will also make the structure reusable for pKVM's own early exit
-> handling.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 160 ++++++++++++++----------
->  arch/arm64/kvm/hyp/nvhe/switch.c        |  17 +++
->  arch/arm64/kvm/hyp/vhe/switch.c         |  17 +++
->  3 files changed, 126 insertions(+), 68 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index 54abc8298ec3..0397606c0951 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -136,16 +136,7 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
->  
->  static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
->  {
-> -	u8 ec;
-> -	u64 esr;
-> -
-> -	esr = vcpu->arch.fault.esr_el2;
-> -	ec = ESR_ELx_EC(esr);
-> -
-> -	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
-> -		return true;
-> -
-> -	return __get_fault_info(esr, &vcpu->arch.fault);
-> +	return __get_fault_info(vcpu->arch.fault.esr_el2, &vcpu->arch.fault);
->  }
->  
->  static inline void __hyp_sve_save_host(struct kvm_vcpu *vcpu)
-> @@ -166,8 +157,13 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
->  	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
->  }
->  
-> -/* Check for an FPSIMD/SVE trap and handle as appropriate */
-> -static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
-> +/*
-> + * We trap the first access to the FP/SIMD to save the host context and
-> + * restore the guest context lazily.
-> + * If FP/SIMD is not implemented, handle the trap and inject an undefined
-> + * instruction exception to the guest. Similarly for trapped SVE accesses.
-> + */
-> +static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
->  {
->  	bool sve_guest, sve_host;
->  	u8 esr_ec;
-> @@ -185,9 +181,6 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
->  	}
->  
->  	esr_ec = kvm_vcpu_trap_get_class(vcpu);
-> -	if (esr_ec != ESR_ELx_EC_FP_ASIMD &&
-> -	    esr_ec != ESR_ELx_EC_SVE)
-> -		return false;
->  
->  	/* Don't handle SVE traps for non-SVE vcpus here: */
->  	if (!sve_guest && esr_ec != ESR_ELx_EC_FP_ASIMD)
-> @@ -325,7 +318,7 @@ static inline bool esr_is_ptrauth_trap(u32 esr)
->  
->  DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
->  
-> -static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
-> +static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
->  {
->  	struct kvm_cpu_context *ctxt;
->  	u64 val;
-> @@ -350,6 +343,87 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
->  	return true;
->  }
->  
-> +static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
-> +{
-> +	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
-> +	    handle_tx2_tvm(vcpu))
-> +		return true;
-> +
-> +	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
-> +	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
-> +static bool kvm_hyp_handle_cp15(struct kvm_vcpu *vcpu, u64 *exit_code)
-> +{
-> +	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
-> +	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
-> +		return true;
+> How would a kernel module (or BPF program) get the data to userspace?
+> The KVM stats interface that Jing added requires KVM to know how to
+> get the data when handling the read() syscall.
 
-I think you're now calling this for the 64-bit CP15 access path, which I
-don't think is correct. Maybe have separate handlers for 32-bit v4 64-bit
-accesses?
+I don't think it'd be that hard to funnel stats generated in a module
+through the same read interface.
 
-Will
+> > And I'm all for adding these hooks where it matters as long as they
+> > are not considered ABI and don't appear in /sys/debug/tracing (in
+> > general, no userspace visibility).
+> >
+> > The scheduler is a interesting example of this, as it exposes all sort
+> > of hooks for people to look under the hood. No user of the hook? No
+> > overhead, no additional memory used. I may have heard that Android
+> > makes heavy use of this.
+> >
+> > Because I'm pretty sure that whatever stat we expose, every cloud
+> > vendor will want their own variant, so we may just as well put the
+> > matter in their own hands.
+> 
+> I think this can be mitigated by requiring sufficient justification
+> when adding a new stat to KVM. There has to be a real use-case and it
+> has to be explained in the changelog. If a stat has a use-case for one
+> cloud provider, it will likely be useful to other cloud providers as
+> well.
+
+My (limited) personal experience is significantly different. The
+diversity of setups make the set of relevant stats pretty hard to
+guess (there isn't much in common if you use KVM to strictly partition
+a system vs oversubscribing it).
+
+> 
+> >
+> > I also wouldn't discount BPF as a possibility. You could perfectly
+> > have permanent BPF programs running from the moment you boot the
+> > system, and use that to generate your histograms. This isn't necessary
+> > a one off, debug only solution.
+> >
+> > > Logging is a similar story, e.g. using _ratelimited() printk to aid
+> > > debug works well when there are a very limited number of VMs and
+> > > there is a human that can react to arbitrary kernel messages, but
+> > > it's basically useless when there are 10s or 100s of VMs and taking
+> > > action on a kernel message requires a prior knowledge of the
+> > > message.
+> >
+> > I'm not sure logging is remotely the same. For a start, the kernel
+> > should not log anything unless something has oopsed (and yes, I still
+> > have some bits to clean on the arm64 side). I'm not even sure what you
+> > would want to log. I'd like to understand the need here, because I
+> > feel like I'm missing something.
+> >
+> > > I'm certainly not expecting other people to solve our challenges,
+> > > and I fully appreciate that there are many KVM users that don't care
+> > > at all about scalability, but I'm hoping we can get the community at
+> > > large, and especially maintainers and reviewers, to also consider
+> > > at-scale use cases when designing, implementing, reviewing, etc...
+> >
+> > My take is that scalability has to go with flexibility. Anything that
+> > gets hardcoded will quickly become a burden: I definitely regret
+> > adding the current KVM trace points, as they don't show what I need,
+> > and I can't change them as they are ABI.
+> 
+> This brings up a good discussion topic: To what extent are the KVM
+> stats themselves an ABI? I don't think this is documented anywhere.
+> The API itself is completely dynamic and does not hardcode a list of
+> stats or metadata about them. Userspace has to read stats fd to see
+> what's there.
+> 
+> Fwiw we just deleted the lpages stat without any drama.
+
+Maybe the new discoverable interface makes dropping some stats
+easier. But it still remains that what is useless for someone has the
+potential of being crucial for someone else. I wouldn't be surprised
+if someone would ask for this stat back once they upgrade to a recent
+host kernel, probably in a couple of years from now.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
