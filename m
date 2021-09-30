@@ -2,55 +2,55 @@ Return-Path: <SRS0=H8K6=OU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDB4C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 10:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F5D9C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 12:29:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8B6FB619E0
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 10:50:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8B6FB619E0
+	by mail.kernel.org (Postfix) with ESMTP id 03939613A5
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 12:29:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 03939613A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 088894B0B4;
-	Thu, 30 Sep 2021 06:50:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84F8140642;
+	Thu, 30 Sep 2021 08:29:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id H9pbTwdF0YmI; Thu, 30 Sep 2021 06:50:23 -0400 (EDT)
+	with ESMTP id J9OeWIvvZSvs; Thu, 30 Sep 2021 08:29:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AA03E4A534;
-	Thu, 30 Sep 2021 06:50:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 100A44B099;
+	Thu, 30 Sep 2021 08:29:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D3014A1B0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 06:50:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6745C4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 08:29:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iUP2+wXEhj5q for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Sep 2021 06:50:21 -0400 (EDT)
+ with ESMTP id k0u+f2O8LfNu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Sep 2021 08:29:51 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 296F249FE6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 06:50:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA6B640642
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 08:29:51 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 983976120D;
- Thu, 30 Sep 2021 10:50:18 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 962066137A;
+ Thu, 30 Sep 2021 12:29:50 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mVtdo-00Dxeh-Oj; Thu, 30 Sep 2021 11:50:16 +0100
-Date: Thu, 30 Sep 2021 11:50:15 +0100
-Message-ID: <878rzetk0o.wl-maz@kernel.org>
+ id 1mVvC8-00Dylk-JN; Thu, 30 Sep 2021 13:29:48 +0100
+Date: Thu, 30 Sep 2021 13:29:47 +0100
+Message-ID: <877deytfes.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v2 05/11] KVM: arm64: Defer WFI emulation as a requested
- event
-In-Reply-To: <20210923191610.3814698-6-oupton@google.com>
+Subject: Re: [PATCH v2 06/11] KVM: arm64: Add support for SYSTEM_SUSPEND PSCI
+ call
+In-Reply-To: <20210923191610.3814698-7-oupton@google.com>
 References: <20210923191610.3814698-1-oupton@google.com>
- <20210923191610.3814698-6-oupton@google.com>
+ <20210923191610.3814698-7-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -81,115 +81,273 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 23 Sep 2021 20:16:04 +0100,
+Hi Oliver,
+
+On Thu, 23 Sep 2021 20:16:05 +0100,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> The emulation of WFI-like instructions (WFI, PSCI CPU_SUSPEND) is done
-> by calling kvm_vcpu_block() directly from the respective exit handlers.
-> A subsequent change to KVM will allow userspace to request a vCPU be
-> suspended on the next KVM_RUN, necessitating a deferral mechanism for
-> WFI emulation.
+> ARM DEN0022D 5.19 "SYSTEM_SUSPEND" describes a PSCI call that may be
+> used to request a system be suspended. This is optional for PSCI v1.0
+> and to date KVM has elected to not implement the call. However, a
+> VMM/operator may wish to provide their guests with the ability to
+> suspend/resume, necessitating this PSCI call.
 > 
-> Refactor such that there is a single WFI implementation which may be
-> requested with KVM_REQ_SUSPEND. Request WFI emulation from the
-> aforementioned handlers by making this request.
+> Implement support for SYSTEM_SUSPEND according to the prescribed
+> behavior in the specification. Add a new system event exit type,
+> KVM_SYSTEM_EVENT_SUSPEND, to notify userspace when a VM has requested a
+> system suspend. Make KVM_MP_STATE_HALTED a valid state on arm64.
+
+KVM_MP_STATE_HALTED is a per-CPU state on x86 (it denotes HLT). Does
+it make really sense to hijack this for something that is more of a
+VM-wide state? I can see that it is tempting to do so as we're using
+the WFI semantics (which are close to HLT's, in a twisted kind of
+way), but I'm also painfully aware that gluing x86 expectations on
+arm64 rarely leads to a palatable result.
+
+> Userspace can set this to request an in-kernel emulation of the suspend.
 > 
 > Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 1 +
->  arch/arm64/kvm/arm.c              | 9 +++++++++
->  arch/arm64/kvm/handle_exit.c      | 3 +--
->  arch/arm64/kvm/psci.c             | 4 +---
->  4 files changed, 12 insertions(+), 5 deletions(-)
+>  Documentation/virt/kvm/api.rst    |  6 ++++
+>  arch/arm64/include/asm/kvm_host.h |  3 ++
+>  arch/arm64/kvm/arm.c              |  8 +++++
+>  arch/arm64/kvm/psci.c             | 60 +++++++++++++++++++++++++++++++
+>  include/uapi/linux/kvm.h          |  2 ++
+>  5 files changed, 79 insertions(+)
+
+This patch needs splitting. PSCI interface in one, mpstate stuff in
+another, userspace management last.
+
 > 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a6729c8cf063..361a57061b8f 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5656,6 +5656,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
+>    #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+>    #define KVM_SYSTEM_EVENT_RESET          2
+>    #define KVM_SYSTEM_EVENT_CRASH          3
+> +  #define KVM_SYSTEM_EVENT_SUSPEND        4
+>  			__u32 type;
+>  			__u64 flags;
+>  		} system_event;
+> @@ -5680,6 +5681,11 @@ Valid values for 'type' are:
+>     has requested a crash condition maintenance. Userspace can choose
+>     to ignore the request, or to gather VM memory core dump and/or
+>     reset/shutdown of the VM.
+> + - KVM_SYSTEM_EVENT_SUSPEND -- the guest has requested that the VM
+> +   suspends. Userspace is not obliged to honor this, and may call KVM_RUN
+> +   again. Doing so will cause the guest to resume at its requested entry
+> +   point. For ARM64, userspace can request in-kernel suspend emulation
+> +   by setting the vCPU's MP state to KVM_MP_STATE_HALTED.
+>  
+>  ::
+>  
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f8be56d5342b..1beda1189a15 100644
+> index 1beda1189a15..441eb6fa7adc 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -47,6 +47,7 @@
->  #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->  #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
->  #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
-> +#define KVM_REQ_SUSPEND		KVM_ARCH_REQ(6)
+> @@ -137,6 +137,9 @@ struct kvm_arch {
 >  
->  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
->  				     KVM_DIRTY_LOG_INITIALLY_SET)
+>  	/* Memory Tagging Extension enabled for the guest */
+>  	bool mte_enabled;
+> +
+> +	/* PSCI SYSTEM_SUSPEND call enabled for the guest */
+> +	bool suspend_enabled;
+>  };
+>  
+>  struct kvm_vcpu_fault_info {
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 3d4acd354f94..f1a375648e25 100644
+> index f1a375648e25..d875d3bcf3c5 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -670,6 +670,12 @@ static void kvm_vcpu_sleep(struct kvm_vcpu *vcpu)
->  	smp_rmb();
->  }
->  
-> +static void kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> @@ -101,6 +101,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		}
+>  		mutex_unlock(&kvm->lock);
+>  		break;
+> +	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+> +		r = 0;
+> +		kvm->arch.suspend_enabled = true;
 
-Bike-shed alert: I would really prefer this to have 'wfi' in the
-function name, because we implement suspend in terms of WFI rather
-than the other way around.
+I don't really fancy adding another control here. Given that we now
+have the PSCI version being controlled by a firmware pseudo-register,
+I'd rather have that there.
 
-> +{
-> +	kvm_vcpu_block(vcpu);
-> +	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-> +}
-> +
->  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
->  {
->  	return vcpu->arch.target >= 0;
-> @@ -681,6 +687,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->  		if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
->  			kvm_vcpu_sleep(vcpu);
+And if we do that, I wonder whether there would be any benefit in
+bumping the PSCI version to 1.1.
+
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  		break;
+> @@ -215,6 +219,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_SET_GUEST_DEBUG:
+>  	case KVM_CAP_VCPU_ATTRIBUTES:
+>  	case KVM_CAP_PTP_KVM:
+> +	case KVM_CAP_ARM_SYSTEM_SUSPEND:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_SET_GUEST_DEBUG2:
+> @@ -470,6 +475,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+>  	int ret = 0;
 >  
-> +		if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
-> +			kvm_vcpu_suspend(vcpu);
-> +
->  		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
->  			kvm_reset_vcpu(vcpu);
->  
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 275a27368a04..5e5ef9ff4fba 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -95,8 +95,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
->  	} else {
->  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
->  		vcpu->stat.wfi_exit_stat++;
-> -		kvm_vcpu_block(vcpu);
-> -		kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+>  	switch (mp_state->mp_state) {
+> +	case KVM_MP_STATE_HALTED:
 > +		kvm_make_request(KVM_REQ_SUSPEND, vcpu);
->  	}
->  
->  	kvm_incr_pc(vcpu);
-
-This is a change in behaviour. At the point where the blocking
-happens, PC will have already been incremented. I'd rather you don't
-do that. Instead, make the helper available and call into it directly,
-preserving the current semantics.
-
-It is also likely to clash with Sean's kvm_vcpu_block() rework, but we
-can work around that.
+> +		fallthrough;
+>  	case KVM_MP_STATE_RUNNABLE:
+>  		vcpu->arch.power_off = false;
+>  		break;
 
 > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index bb59b692998b..d453666ddb83 100644
+> index d453666ddb83..cf869f1f8615 100644
 > --- a/arch/arm64/kvm/psci.c
 > +++ b/arch/arm64/kvm/psci.c
-> @@ -46,9 +46,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
->  	 * specification (ARM DEN 0022A). This means all suspend states
->  	 * for KVM will preserve the register state.
->  	 */
-> -	kvm_vcpu_block(vcpu);
-> -	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
-> -
-> +	kvm_make_request(KVM_REQ_SUSPEND, vcpu);
->  	return PSCI_RET_SUCCESS;
+> @@ -203,6 +203,46 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+>  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
 >  }
+>  
+> +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> +{
+> +	unsigned long entry_addr, context_id;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	unsigned long psci_ret = 0;
+> +	struct kvm_vcpu *tmp;
+> +	int ret = 0;
+> +	int i;
+> +
+> +	/*
+> +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
+> +	 * calling vCPU) be in an OFF state, as determined by the
+> +	 * implementation.
+> +	 *
+> +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
+> +	 */
+> +	mutex_lock(&kvm->lock);
+> +	kvm_for_each_vcpu(i, tmp, kvm) {
+> +		if (tmp != vcpu && !tmp->arch.power_off) {
+> +			psci_ret = PSCI_RET_DENIED;
+> +			ret = 1;
+> +			goto out;
+> +		}
+> +	}
+> +
+> +	entry_addr = smccc_get_arg1(vcpu);
+> +	context_id = smccc_get_arg2(vcpu);
+> +
+> +	kvm_psci_vcpu_request_reset(vcpu, entry_addr, context_id,
+> +				    kvm_vcpu_is_be(vcpu));
 
-I have similar feelings about this one, although things only breaks
-once you enable NV (SMC is trapped and subject to PC adjustments).
+So even if userspace doesn't want to honor the suspend request, the
+CPU ends up resetting? That's not wrong, but maybe a bit surprising.
+
+> +
+> +	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
+> +	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SUSPEND;
+> +	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+
+Consider spinning out a helper common to this and kvm_prepare_system_event().
+
+> +out:
+> +	mutex_unlock(&kvm->lock);
+> +	smccc_set_retval(vcpu, psci_ret, 0, 0, 0);
+> +	return ret;
+> +}
+> +
+>  static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
+>  {
+>  	int i;
+> @@ -223,6 +263,14 @@ static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32
+>  	if ((fn & PSCI_0_2_64BIT) && vcpu_mode_is_32bit(vcpu))
+>  		return PSCI_RET_NOT_SUPPORTED;
+>  
+> +	switch (fn) {
+> +	case PSCI_1_0_FN_SYSTEM_SUSPEND:
+> +	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
+> +		if (!vcpu->kvm->arch.suspend_enabled)
+> +			return PSCI_RET_NOT_SUPPORTED;
+> +		break;
+> +	}
+> +
+>  	return 0;
+>  }
+>  
+> @@ -316,6 +364,10 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+>  	unsigned long val;
+>  	int ret = 1;
+>  
+> +	val = kvm_psci_check_allowed_function(vcpu, psci_fn);
+> +	if (val)
+> +		goto out;
+> +
+>  	switch(psci_fn) {
+>  	case PSCI_0_2_FN_PSCI_VERSION:
+>  		val = KVM_ARM_PSCI_1_0;
+> @@ -339,6 +391,8 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+>  		case PSCI_0_2_FN_SYSTEM_OFF:
+>  		case PSCI_0_2_FN_SYSTEM_RESET:
+>  		case PSCI_1_0_FN_PSCI_FEATURES:
+> +		case PSCI_1_0_FN_SYSTEM_SUSPEND:
+> +		case PSCI_1_0_FN64_SYSTEM_SUSPEND:
+>  		case ARM_SMCCC_VERSION_FUNC_ID:
+>  			val = 0;
+>  			break;
+> @@ -347,10 +401,16 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
+>  			break;
+>  		}
+>  		break;
+> +	case PSCI_1_0_FN_SYSTEM_SUSPEND:
+> +		kvm_psci_narrow_to_32bit(vcpu);
+> +		fallthrough;
+> +	case PSCI_1_0_FN64_SYSTEM_SUSPEND:
+> +		return kvm_psci_system_suspend(vcpu);
+>  	default:
+>  		return kvm_psci_0_2_call(vcpu);
+>  	}
+>  
+> +out:
+>  	smccc_set_retval(vcpu, val, 0, 0, 0);
+>  	return ret;
+>  }
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index a067410ebea5..052b0e717b08 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -433,6 +433,7 @@ struct kvm_run {
+>  #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+>  #define KVM_SYSTEM_EVENT_RESET          2
+>  #define KVM_SYSTEM_EVENT_CRASH          3
+> +#define KVM_SYSTEM_EVENT_SUSPEND        4
+>  			__u32 type;
+>  			__u64 flags;
+>  		} system_event;
+> @@ -1112,6 +1113,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_BINARY_STATS_FD 203
+>  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+>  #define KVM_CAP_ARM_MTE 205
+> +#define KVM_CAP_ARM_SYSTEM_SUSPEND 206
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+
+I think there is an additional feature we need, which is to give
+control back to userspace every time a wake-up condition occurs (I did
+touch on that in [1]). This would give the opportunity to the VMM to
+do whatever it needs to perform.
+
+A typical use case would be to implement wake-up from certain
+interrupts only (mask non-wake-up IRQs on suspend request, return to
+the guest for WFI, wake-up returns to the VMM to restore the previous
+interrupt configuration, resume).
+
+Userspace would be free to clear the suspend state and resume the
+guest, or to reenter WFI.
 
 Thanks,
 
 	M.
+
+[1] https://lkml.kernel.org/kvm/87k0jauurx.wl-maz@kernel.org/
 
 -- 
 Without deviation from the norm, progress is not possible.
