@@ -2,82 +2,78 @@ Return-Path: <SRS0=H8K6=OU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BCCC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 17:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DCAC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 17:33:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 30325617E5
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 17:24:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 30325617E5
+	by mail.kernel.org (Postfix) with ESMTP id 024BB613D1
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 17:33:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 024BB613D1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A52774B105;
-	Thu, 30 Sep 2021 13:24:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BDDE49DE3;
+	Thu, 30 Sep 2021 13:33:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9zGl5r4sQsyQ; Thu, 30 Sep 2021 13:24:39 -0400 (EDT)
+	with ESMTP id jGDWcx83hCzn; Thu, 30 Sep 2021 13:33:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 329B64B0ED;
-	Thu, 30 Sep 2021 13:24:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C08B49FB7;
+	Thu, 30 Sep 2021 13:33:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2323D4B0E6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 13:24:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 361B3407ED
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 13:33:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6c2ezzX04BAc for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Sep 2021 13:24:36 -0400 (EDT)
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com
- [209.85.167.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF7D74B0E2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 13:24:36 -0400 (EDT)
-Received: by mail-lf1-f44.google.com with SMTP id y26so28591598lfa.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 10:24:36 -0700 (PDT)
+ with ESMTP id Ev9tYxrF2gtu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Sep 2021 13:33:02 -0400 (EDT)
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com
+ [209.85.167.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB59340762
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 13:33:01 -0400 (EDT)
+Received: by mail-lf1-f52.google.com with SMTP id b20so28775893lfv.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 10:33:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=IOus6RZAODeflkitNKNtNRm/hVuYigDJWYb8TVA+haU=;
- b=D2uC1NpXnCez3Ytp4VABnJkvuhi+0CS1VaFTV4avogW3x4OrLuLLvWQMiRKr1WKS4j
- PTcaPWmLAuGANDqHrTiVVzKCY9yfkwlb8WF6Tf+gfa3rZe5IEYkji7+xmGl3rOEYvXJW
- b5Sk2IDU4tM0PNkXD2K9uOT9iGAlVWXGtu/xvJUhdVEf1oEVw79VV3xiqTZJ6GPco5Hj
- qI41SIPc3djWuAzkAyNJtK2/wFu3txyPfUazgTIrYiidLHB31U5f7cuCCV1DDN0mNPyT
- Ayftn5S5JLoPEABEMCy6hvZqZX0QfyiS0qtlyoTlroaVcP740VEQqqWnj8H9ezw/JFos
- Z8IQ==
+ :cc; bh=iKfk6HbG6TObfzRUE4EIW/odvNzsG1SnwK5+/9/zkj0=;
+ b=FZRkwMcuX90szqNm8YFb+9IVR7uiAeZo8r7TCRXR3IDZfCNFSlSfMMhs/4798maVNE
+ eNU1fPnAEMfL3RKUFRSjECHb286st1nKKy6Q2PA3fRGGfggOVmy7coNju0QA7C157LJa
+ XvFraoQx4x64Rww3mHpMWwfFF1ixtkG3dVgr/l2iAv/YJAIqMZCFin3oW6uQeOH2KOqF
+ NQoxJq8LAvdo0J7SOXyJ6xMUyrE8fRAxgmKVixVYkUCdr9bcniWqFe/GP+fNCU4uU8cG
+ u8GocJ0vHGdAEfCQhL4DrmOH6gHADQYm+8pAFClVByMFLRyOEs716JBCAZ0c+R2rLiJy
+ Hf5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=IOus6RZAODeflkitNKNtNRm/hVuYigDJWYb8TVA+haU=;
- b=oJDgJojW+SqEUYWlnbTQds8gsAkQvNN6vNHp4EFrhUN2UReo0lA2AKInljE4AduP8x
- MErImWm/kkA4E4Xx2hC86hDbgVkITbxJPjOf5W/36q93AjBNEnIhxR42cozK0V9ydFg8
- LHAzJIv3R6kKj10JsuB4SMMrjVq5kSvpFQ5k+DbdOSaKsnEIi/mtd778OyPpQspT+kg2
- MkjyOSflUM8ubAyb9+Bxexnfc6tXesL6o2UJVDvbJLhQ+7l/dnEz/h1a66l6yqVtgbkB
- h8RoNLqDdNKI/yrzPYDeJJsdBRpZcElP2V4qai1zFvzHf/iq2by4eobEWBu89xjeQFur
- URdA==
-X-Gm-Message-State: AOAM5331OOZqAr0WJqG9xNncLUQrJv2kyXb7cGMP7KGy6TK9FOj0xVlJ
- mgkl/5jEgvPhrWItn3NPeicigv76tdeKrAz31StCOA==
-X-Google-Smtp-Source: ABdhPJwfSVC7//d6/e+fZoayLkD2H1zJPhp0sz/K7FbaHBHjYfcsEHPJ7CByH+JJAViNtjzQ2spoMMRGnDDx4TU0YSE=
-X-Received: by 2002:a2e:95cc:: with SMTP id y12mr7165903ljh.337.1633022674911; 
- Thu, 30 Sep 2021 10:24:34 -0700 (PDT)
+ bh=iKfk6HbG6TObfzRUE4EIW/odvNzsG1SnwK5+/9/zkj0=;
+ b=jpbxnJbcqHf/sSwdqUIfaIJWcedqhH59tfeHl8PlhZ/nP5DUekX36hQIJD5V6QAcQf
+ rdsoAzX/U5Kv30joirZ3oPSY0lqczIp6RpRAbh//osz9WkCev0Qia4B0EWa/owHbwAEv
+ U9FnRiiuJVoJjgx01wE/yJWtmInHCgHwW6uIRsgrDDkYVClRW8CmVuWUZIaIW7+MgRdn
+ Io6qLmid0Ck7qK8EeyzYSHqiToAAow9MwxQcXIcHOKypcB0C0x5n9UsrnNUw0K7enWS2
+ Aw5DiX7WVeT1T120RJ+jpPAKnc/qrmaZjeyqqYv+bNSelBrQjGKQV4jTSCmTI/wCYc0F
+ 1lSQ==
+X-Gm-Message-State: AOAM532zBgcZI8lrgQRrrMCJyTIMHU0J+mV4oWaggGbkWsJSYFD8j4A6
+ 49e4XAwvJKj9kjLd6mbdgpm7PBaQzgtIan9bVHPCgw==
+X-Google-Smtp-Source: ABdhPJzq/VatrgxhazbFBsyW1Zf46+5YaQA0HtXNK2rb6j4UxNfmN8UeiVWKq+G80yaEkN4sKybzTxB+SboJZ9UvAR4=
+X-Received: by 2002:a2e:719:: with SMTP id 25mr7561449ljh.251.1633023180023;
+ Thu, 30 Sep 2021 10:33:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
- <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
- <87fsuxq049.wl-maz@kernel.org> <20210825150713.5rpwzm4grfn7akcw@gator.home>
- <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
- <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
- <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
- <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
- <87ilyitt6e.wl-maz@kernel.org>
-In-Reply-To: <87ilyitt6e.wl-maz@kernel.org>
+References: <20210923191610.3814698-1-oupton@google.com>
+ <20210923191610.3814698-6-oupton@google.com>
+ <878rzetk0o.wl-maz@kernel.org> <YVXvM2kw8PDou4qO@google.com>
+In-Reply-To: <YVXvM2kw8PDou4qO@google.com>
 From: Oliver Upton <oupton@google.com>
-Date: Thu, 30 Sep 2021 10:24:23 -0700
-Message-ID: <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Date: Thu, 30 Sep 2021 10:32:49 -0700
+Message-ID: <CAOQ_QsjXs8sF+QY0NrSVBvO4xump7CttBU3et6V3O_hNYmCSig@mail.gmail.com>
+Subject: Re: [PATCH v2 05/11] KVM: arm64: Defer WFI emulation as a requested
+ event
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,77 +90,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Marc,
-
-On Thu, Sep 30, 2021 at 12:32 AM Marc Zyngier <maz@kernel.org> wrote:
+On Thu, Sep 30, 2021 at 10:09 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Hi Oliver,
+> On Thu, Sep 30, 2021, Marc Zyngier wrote:
+> > On Thu, 23 Sep 2021 20:16:04 +0100, Oliver Upton <oupton@google.com> wrote:
+> > > @@ -681,6 +687,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > >             if (kvm_check_request(KVM_REQ_SLEEP, vcpu))
+> > >                     kvm_vcpu_sleep(vcpu);
+> > >
+> > > +           if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> > > +                   kvm_vcpu_suspend(vcpu);
+> > > +
 >
-> On Wed, 29 Sep 2021 19:22:05 +0100,
-> Oliver Upton <oupton@google.com> wrote:
+> ...
+>
+> > > diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> > > index 275a27368a04..5e5ef9ff4fba 100644
+> > > --- a/arch/arm64/kvm/handle_exit.c
+> > > +++ b/arch/arm64/kvm/handle_exit.c
+> > > @@ -95,8 +95,7 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+> > >     } else {
+> > >             trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
+> > >             vcpu->stat.wfi_exit_stat++;
+> > > -           kvm_vcpu_block(vcpu);
+> > > -           kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+> > > +           kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> > >     }
+> > >
+> > >     kvm_incr_pc(vcpu);
 > >
-> > I have some lingering thoughts on this subject since we last spoke and
-> > wanted to discuss.
-> >
-> > I'm having a hard time figuring out how a VMM should handle a new
-> > hypercall identity register introduced on a newer kernel. In order to
-> > maintain guest ABI, the VMM would need to know about that register and
-> > zero it when restoring an older guest.
+> > This is a change in behaviour. At the point where the blocking
+> > happens, PC will have already been incremented. I'd rather you don't
+> > do that. Instead, make the helper available and call into it directly,
+> > preserving the current semantics.
 >
-> Just as it would need to be able to discover any new system register
-> exposed by default, as it happens at all times. Which is why we have a
-> way to discover all the registers, architected or not.
+> Is there architectural behavior that KVM can emulate?  E.g. if you were to probe a
+> physical CPU while it's waiting, would you observe the pre-WFI PC, or the post-WFI
+> PC?  Following arch behavior would be ideal because it eliminates subjectivity.
+> Regardless of the architectural behavior, changing KVM's behavior should be
+> done explicitly in a separate patch.
 >
-> > Perhaps instead we could reserve a range of firmware registers as the
-> > 'hypercall identity' registers. Implement all of them as RAZ/WI by
-> > default, encouraging userspace to zero these registers away for older
-> > VMs but still allowing an old userspace to pick up new KVM features.
-> > Doing so would align the hypercall identity registers with the feature
-> > ID registers from the architecture.
+> Irrespective of PC behavior, I would caution against using a request for handling
+> WFI.  Deferring the WFI opens up the possibility for all sorts of ordering
+> oddities, e.g. if KVM exits to userspace between here and check_vcpu_requests(),
+> then KVM can end up with a "spurious" pending KVM_REQ_SUSPEND if maniupaltes vCPU
+> state.  I highly doubt that userspace VMMs would actually do that, as it would
+> basically require a signal from userspace, but it's not impossible, and at the
+> very least the pending request is yet another thing to worry about in the future.
 >
-> The range already exists in the form of the "coprocessor" 0x14. I
-> don't see the need to expose it as RAZ/WI, however. If userspace
-> doesn't know about how this pseudo-register works, it won't be able to
-> program it anyway.
->
-> I don't buy the parallel with the ID-regs either. They are RAZ/WI by
-> default so that they don't UNDEF at runtime. The meaning of a RAZ
-> id-register is also well defined (feature not implemented), and the
-> CPU cannot write to them. In a way, the ID-regs *are* the enumeration
-> mechanism.
->
-> Our firmware registers don't follow the same rules. Userspace can
-> write to them, and there is no such "not implemented" rule (case in
-> point, PSCI). We also have a separate enumeration mechanism
-> (GET_ONE_REG), which is (more or less) designed for userspace to find
-> what is implemented.
->
-> For these reasons, I don't immediately see the point of advertising a
-> set of registers ahead of time, before userspace grows an
-> understanding of what these registers mean.
+> Unlike PSCI power-off, WFI isn't cross-vCPU, thus there's no hard requirement
+> for using a request.  And KVM_REQ_SLEEP also has an additional guard in that it
+> doesn't enter rcuwait if power_off (or pause) was cleared after the request was
+> made, e.g. if userspace stuffed vCPU state and set the vCPU RUNNABLE.
 
-Supposing we don't preallocate some hypercall ID registers, how can we
-safely migrate a guest from an older kernel to newer kernel? Ideally,
-we would preserve the hypercall feature set across the migration which
-could work for a while with the first set of registers that get
-defined, but whenever a new hypercall firmware register comes along
-then the VMM will be clueless to the new ABI.
+Yeah, I don't think the punt is necessary for anything but the case
+where userspace sets the MP state to request WFI behavior. A helper
+method amongst all WFI cases is sufficient, and using the deferral for
+everything is a change in behavior.
 
-Fundamentally, I don't think userspace should need a patch to preserve
-ABI on a newer kernel. Despite that, it would seem that userspace will
-need to learn of any firmware registers that control hypercall
-features which come after the initial set that gets proposed. If
-KVM_GET_REG_LIST were to disambiguate between ID registers (hypercall,
-architectural feature ID registers) from other parts of the vCPU
-state, it would be clear to what registers to zero on a newer kernel.
-Apologies if it is distracting to mention the feature ID registers
-here, but both are on my mind currently and want to make sure there is
-some consistency in how features get handled on newer kernels,
-architected or not.
+> > It is also likely to clash with Sean's kvm_vcpu_block() rework, but we
+> > can work around that.
+>
+> Ya.  Oliver, can you Cc me on future patches?  I'll try to keep my eyeballs on this
+> series.
 
---
-Thanks,
-Oliver
+Sure thing :)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
