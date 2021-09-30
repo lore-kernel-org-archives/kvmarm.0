@@ -2,55 +2,66 @@ Return-Path: <SRS0=H8K6=OU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F9AC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 09:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F93EC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 10:23:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 47B4B61131
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 09:47:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 47B4B61131
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 8AA9F61884
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 10:23:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8AA9F61884
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5CA049F5F;
-	Thu, 30 Sep 2021 05:47:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C33240762;
+	Thu, 30 Sep 2021 06:23:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tu6-7J-1qXzj; Thu, 30 Sep 2021 05:47:22 -0400 (EDT)
+	with ESMTP id l08FmW5RSpY6; Thu, 30 Sep 2021 06:23:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CB624B091;
-	Thu, 30 Sep 2021 05:47:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E08FC4A3A5;
+	Thu, 30 Sep 2021 06:23:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D84D49F5F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 05:47:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4582049FB7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 06:23:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OG0j9WB0bS9t for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Sep 2021 05:47:19 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A1D87406E7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 05:47:19 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14B2FD6E;
- Thu, 30 Sep 2021 02:47:19 -0700 (PDT)
-Received: from [192.168.0.110] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8DD8C3F793;
- Thu, 30 Sep 2021 02:47:17 -0700 (PDT)
-Message-ID: <acd37032-b07f-c30c-f65f-d40cd85d2e74@arm.com>
-Date: Thu, 30 Sep 2021 10:48:50 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.1
-Subject: Re: [PATCH 1/5] KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing
- a virtual GICv3
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-References: <20210924082542.2766170-1-maz@kernel.org>
- <20210924082542.2766170-2-maz@kernel.org>
- <7fe293a6-16af-929f-33b1-aa89675197b0@arm.com> <87k0iztljq.wl-maz@kernel.org>
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-In-Reply-To: <87k0iztljq.wl-maz@kernel.org>
+ with ESMTP id UCatGhhAryYh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Sep 2021 06:23:02 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BBEC40762
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 06:23:02 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4821661881;
+ Thu, 30 Sep 2021 10:23:01 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mVtDP-00DxDc-3r; Thu, 30 Sep 2021 11:22:59 +0100
+Date: Thu, 30 Sep 2021 11:22:58 +0100
+Message-ID: <87bl4atla5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Brazdil <dbrazdil@google.com>
+Subject: Re: [PATCH] KVM: arm64: Allow KVM to be disabled from the command line
+In-Reply-To: <YVMtgBw+qG713+4k@google.com>
+References: <20210903091652.985836-1-maz@kernel.org>
+ <YVMtgBw+qG713+4k@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dbrazdil@google.com, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, ascull@google.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -69,58 +80,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi David,
 
-On 9/29/21 17:04, Marc Zyngier wrote:
-> Hi Alex,
->
-> On Wed, 29 Sep 2021 16:29:09 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
->> Hi Marc,
->>
->> On 9/24/21 09:25, Marc Zyngier wrote:
->>> Until now, we always let ID_AA64PFR0_EL1.GIC reflect the value
->>> visible on the host, even if we were running a GICv2-enabled VM
->>> on a GICv3+compat host.
->>>
->>> That's fine, but we also now have the case of a host that does not
->>> expose ID_AA64PFR0_EL1.GIC==1 despite having a vGIC. Yes, this is
->>> confusing. Thank you M1.
->>>
->>> Let's go back to first principles and expose ID_AA64PFR0_EL1.GIC=1
->>> when a GICv3 is exposed to the guest. This also hides a GICv4.1
->>> CPU interface from the guest which has no business knowing about
->>> the v4.1 extension.
->> Had a look at the gic-v3 driver, and as far as I can tell it does
->> not check that a GICv3 is advertised in ID_AA64PFR0_EL1. If I didn't
->> get this wrong, then this patch is to ensure architectural
->> compliance for a guest even if the hardware is not necessarily
->> compliant, right?
-> Indeed. Not having this made some of my own tests fail on M1 as they
-> rely on ID_AA64PFR0_EL1.GIC being correct. I also pondered setting it
-> to 0 when emulating a GICv2, but that'd be a change in behaviour, and
-> I want to think a bit more about the effects of that.
->
->> GICv4.1 is an extension to GICv4 (which itself was an extension to
->> GICv3) to add support for virtualization features (virtual SGIs), so
->> I don't see any harm in hiding it from the guest, since the guest
->> cannot virtual SGIs.
-> Indeed. The guest already has another way to look into this by
-> checking whether the distributor allows active-less SGIs.
+On Tue, 28 Sep 2021 15:58:08 +0100,
+David Brazdil <dbrazdil@google.com> wrote:
+> 
+> Hey Marc,
+> that all makes sense:
+> 
+> Reviewed-by: David Brazdil <dbrazdil@google.com>
+> 
+> > @@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
+> >  		return 0;
+> >  	}
+> >  
+> > -	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
+> > +	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+> > +		kvm_mode = KVM_MODE_DEFAULT;
+> >  		return 0;
+> > +	}
+> > +
+> > +	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+> nit: I noticed we check is_kernel_in_hyp_mode here for nvhe/none but for
+> protected it is checked in is_kvm_protected_mode. May be worth unifying?
 
-Thank you for the clarification, the patch looks good to me:
+is_kvm_protected_mode() drives a capability (as we rely on the
+associated static key), and we don't need this with either 'nvhe' nor
+'none'.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+So I'm unsure what we can unify, to be honest. Can you suggest a
+patch?
 
 Thanks,
 
-Alex
+	M.
 
->
-> Thanks,
->
-> 	M.
->
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
