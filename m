@@ -2,78 +2,93 @@ Return-Path: <SRS0=H8K6=OU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A06DC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 17:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A68AC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 18:05:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8A824619EE
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 17:41:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8A824619EE
+	by mail.kernel.org (Postfix) with ESMTP id BD5C661A2F
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 18:05:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BD5C661A2F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF58840762;
-	Thu, 30 Sep 2021 13:41:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1739C4B099;
+	Thu, 30 Sep 2021 14:05:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yAmCLtvDe3a2; Thu, 30 Sep 2021 13:41:00 -0400 (EDT)
+	with ESMTP id es9+iEdXnTem; Thu, 30 Sep 2021 14:05:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62C064A534;
-	Thu, 30 Sep 2021 13:41:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CEDC4B0B6;
+	Thu, 30 Sep 2021 14:05:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 15B114A1B0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 13:40:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A28004A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 14:05:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TPMe145KrwmR for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Sep 2021 13:40:57 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AEAC40762
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 13:40:57 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id y26so28772075lfa.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 10:40:57 -0700 (PDT)
+ with ESMTP id mWQ7dGnQBbui for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Sep 2021 14:05:53 -0400 (EDT)
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com
+ [209.85.216.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3949549F5F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 14:05:53 -0400 (EDT)
+Received: by mail-pj1-f41.google.com with SMTP id oj16so1493154pjb.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 11:05:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WfYS2qC2BUxBFwaeuNq9CBr5/hOzTpoKNHPOYb/kb0U=;
- b=JKOucH0Du6brC9cHP3/TotgojGp8LvQ0DMjfh+4pMkJa8EDUlrn4MCuup217MRnbtM
- UnmffJdlH1fl2YlbuvzNR+9444tEuDfLh+qCZG+WWSdE8WzYDD/VStajkRwRwwb5Tr6B
- VmGZXLRZn0LuEnninqKhQHYwjOa60lkiQWgL7OTVZEW72Mhma+VjGwfDTQZ6ob1NibV6
- TdkjDFFZMyynHJyKSZjOmG8levpV02JLMKZq1dI0EEsV0Dj/yaGxczKT/I3dtlX/g0WN
- e1RdYYuGRdJLlCn1j9YQ4CEhBlxLhGp7TCRplUHrZgs+qRKZEFUqNX5ABhJ2I4zMgLC5
- APmQ==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=YuOwAQkWjXznFXi6rLlMpeEj3pgnoZUS9VAR7tSyz6I=;
+ b=YrTTbAhpXtued6yk9uC6PVSQ+GtYLJbkKmrVpJPwt3QklBL2b+uNE8TXilaT/DYofo
+ 5Ie58IWMhHlTNlQUvr7bSKpZ4Aa9nSPeW3uWcc/UuVk0lQbxlk3eJ11vqlcKtW19ePN7
+ lchqwiACnk5e+wUAyBPi+5vGCjBm/OxlsGLpIycw3GkLAK09z9PlzZoJEmx1oQEM6dV1
+ 19E/sIT5irQ0E7EzW6WXQe0lQ1D3N+hdvAy2L6Bgmic7wWu17g+KtGSqKjf5bqbqS3w5
+ XlqGr/D7HrR5xosTtqV7kalARiXpUXKIvqeCM3brW1ojq5kJl3g06KI6uzgAPbnqOKXS
+ KkZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WfYS2qC2BUxBFwaeuNq9CBr5/hOzTpoKNHPOYb/kb0U=;
- b=J+0n1NbOgWwLQnCOGNF+YFPSWDseRxsObIlf4fmTyY2KCcu1v8CCsUVNDU3HuQmHhR
- gW9EBAQueUXzjEsdxumoZCAmGshSCGAJMGiX3OAyZ/ShSjGPgF0WexHdmp5biguAeraf
- r94y/Iu4Wn+rNGfpvwnBkqT/nSIwIJxpoNymR5j82j7zsvEhZ817iZyGCExO7saY2Ver
- tX8dglpFVeBinXzxl8sXGNg+qeQw7QqddUntaF1hzwKTTnVhgmBOqofasUBvyqKYc0Hx
- 8SBJPRCnHXZBYQ817Wh34U9CEcEK3SjOoKQZmbMMCFRtlqHOFQx/jndqkKqlBFl1a0H3
- qnlA==
-X-Gm-Message-State: AOAM530xCBUwe+cNZ0t3qW+rS7LfKLrA3V7zyl8LzGOII9kcgRIwvNTK
- oy92dDft+wErEiRvX0LcCf0whlIfWPPOxZMoAVqQBQ==
-X-Google-Smtp-Source: ABdhPJzWA0qKlJoVZVk1oBbIoYZxtKHd4J6jrwGqjgUe48P4FMnSxdWiBL7ysJHErdOjAZyPxzB9ODFI8q09GafGkHI=
-X-Received: by 2002:a2e:5c88:: with SMTP id q130mr7096148ljb.170.1633023654249; 
- Thu, 30 Sep 2021 10:40:54 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210923191610.3814698-1-oupton@google.com>
- <20210923191610.3814698-7-oupton@google.com>
- <877deytfes.wl-maz@kernel.org>
-In-Reply-To: <877deytfes.wl-maz@kernel.org>
-From: Oliver Upton <oupton@google.com>
-Date: Thu, 30 Sep 2021 10:40:43 -0700
-Message-ID: <CAOQ_QsjjhTg5usW3DS1P+Uin4ApjvbHwwpmXyEo0bzHe6RGL5g@mail.gmail.com>
-Subject: Re: [PATCH v2 06/11] KVM: arm64: Add support for SYSTEM_SUSPEND PSCI
- call
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=YuOwAQkWjXznFXi6rLlMpeEj3pgnoZUS9VAR7tSyz6I=;
+ b=eE9m5XPx5E/Rda1yEhUf9Xf+24J8dMRaglczE0nSFaCukMsspisl4MUmbVSe+yHUYa
+ OCt5Z1axFkXuHn+oRDlG1GYJzKl5QczXCbFBFwFp1gtaTX8ohGuPU6ZcuB8fS0oMnUGB
+ xGsXYSBrRfuyOc94VLHeXmk3e7nyuYYSKJc0x/5lie76cf26eFV69nUiBnKqjsmQRU1g
+ vP1il/iu+2pAd2JxG2PgiLsnZizhhR813EQvdTuv0+Gcs1m+RwGd5LuisIDR9QkhE6LA
+ PMtm20J0qIUlfj4QnNAMl4uMXSqADXciK9covgOjUQyIH7OgMxlGnbrydhYc/ffSCVbm
+ rkhA==
+X-Gm-Message-State: AOAM532CFr9jI2XF6o7WWVTcxsaoIRuSk03U5CNCtrfRmS67KunbYSUs
+ 1HzKNyd6Wx0nMZ3R1E0q/xdu4A==
+X-Google-Smtp-Source: ABdhPJwHSsswlwCvX1kziArEs9ci87GuqE1qECOm/i/AFl04pgRGM/ROFtbputz8GVgxVVVUBnO7CA==
+X-Received: by 2002:a17:902:868d:b0:13d:dfa7:f3f2 with SMTP id
+ g13-20020a170902868d00b0013ddfa7f3f2mr5590566plo.30.1633025151825; 
+ Thu, 30 Sep 2021 11:05:51 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id n66sm3845886pfd.21.2021.09.30.11.05.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 30 Sep 2021 11:05:51 -0700 (PDT)
+Date: Thu, 30 Sep 2021 18:05:47 +0000
+From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
- kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v1 3/3] KVM: arm64: Add histogram stats for handling time
+ of arch specific exit reasons
+Message-ID: <YVX8e6GdLhhkoZh3@google.com>
+References: <20210922010851.2312845-1-jingzhangos@google.com>
+ <20210922010851.2312845-3-jingzhangos@google.com>
+ <87czp0voqg.wl-maz@kernel.org>
+ <d16ecbd2-2bc9-2691-a21d-aef4e6f007b9@redhat.com>
+ <YUtyVEpMBityBBNl@google.com> <875yusv3vm.wl-maz@kernel.org>
+ <CALzav=cuzT=u6G0TCVZUfEgAKOCKTSCDE8x2v5qc-Gd_NL-pzg@mail.gmail.com>
+ <87zgrurwgq.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <87zgrurwgq.wl-maz@kernel.org>
+Cc: Aaron Lewis <aaronlewis@google.com>, KVM <kvm@vger.kernel.org>,
+ Venkatesh Srinivas <venkateshs@google.com>, Peter Shier <pshier@google.com>,
+ Ben Gardon <bgardon@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,280 +105,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 30, 2021 at 5:29 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> Hi Oliver,
->
-> On Thu, 23 Sep 2021 20:16:05 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-> >
-> > ARM DEN0022D 5.19 "SYSTEM_SUSPEND" describes a PSCI call that may be
-> > used to request a system be suspended. This is optional for PSCI v1.0
-> > and to date KVM has elected to not implement the call. However, a
-> > VMM/operator may wish to provide their guests with the ability to
-> > suspend/resume, necessitating this PSCI call.
-> >
-> > Implement support for SYSTEM_SUSPEND according to the prescribed
-> > behavior in the specification. Add a new system event exit type,
-> > KVM_SYSTEM_EVENT_SUSPEND, to notify userspace when a VM has requested a
-> > system suspend. Make KVM_MP_STATE_HALTED a valid state on arm64.
->
-> KVM_MP_STATE_HALTED is a per-CPU state on x86 (it denotes HLT). Does
-> it make really sense to hijack this for something that is more of a
-> VM-wide state? I can see that it is tempting to do so as we're using
-> the WFI semantics (which are close to HLT's, in a twisted kind of
-> way), but I'm also painfully aware that gluing x86 expectations on
-> arm64 rarely leads to a palatable result.
->
-> > Userspace can set this to request an in-kernel emulation of the suspend.
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  Documentation/virt/kvm/api.rst    |  6 ++++
-> >  arch/arm64/include/asm/kvm_host.h |  3 ++
-> >  arch/arm64/kvm/arm.c              |  8 +++++
-> >  arch/arm64/kvm/psci.c             | 60 +++++++++++++++++++++++++++++++
-> >  include/uapi/linux/kvm.h          |  2 ++
-> >  5 files changed, 79 insertions(+)
->
-> This patch needs splitting. PSCI interface in one, mpstate stuff in
-> another, userspace management last.
->
-> >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index a6729c8cf063..361a57061b8f 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -5656,6 +5656,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
-> >    #define KVM_SYSTEM_EVENT_SHUTDOWN       1
-> >    #define KVM_SYSTEM_EVENT_RESET          2
-> >    #define KVM_SYSTEM_EVENT_CRASH          3
-> > +  #define KVM_SYSTEM_EVENT_SUSPEND        4
-> >                       __u32 type;
-> >                       __u64 flags;
-> >               } system_event;
-> > @@ -5680,6 +5681,11 @@ Valid values for 'type' are:
-> >     has requested a crash condition maintenance. Userspace can choose
-> >     to ignore the request, or to gather VM memory core dump and/or
-> >     reset/shutdown of the VM.
-> > + - KVM_SYSTEM_EVENT_SUSPEND -- the guest has requested that the VM
-> > +   suspends. Userspace is not obliged to honor this, and may call KVM_RUN
-> > +   again. Doing so will cause the guest to resume at its requested entry
-> > +   point. For ARM64, userspace can request in-kernel suspend emulation
-> > +   by setting the vCPU's MP state to KVM_MP_STATE_HALTED.
-> >
-> >  ::
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 1beda1189a15..441eb6fa7adc 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -137,6 +137,9 @@ struct kvm_arch {
-> >
-> >       /* Memory Tagging Extension enabled for the guest */
-> >       bool mte_enabled;
-> > +
-> > +     /* PSCI SYSTEM_SUSPEND call enabled for the guest */
-> > +     bool suspend_enabled;
-> >  };
-> >
-> >  struct kvm_vcpu_fault_info {
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index f1a375648e25..d875d3bcf3c5 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -101,6 +101,10 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >               }
-> >               mutex_unlock(&kvm->lock);
-> >               break;
-> > +     case KVM_CAP_ARM_SYSTEM_SUSPEND:
-> > +             r = 0;
-> > +             kvm->arch.suspend_enabled = true;
->
-> I don't really fancy adding another control here. Given that we now
-> have the PSCI version being controlled by a firmware pseudo-register,
-> I'd rather have that there.
->
-> And if we do that, I wonder whether there would be any benefit in
-> bumping the PSCI version to 1.1.
->
-> > +             break;
-> >       default:
-> >               r = -EINVAL;
-> >               break;
-> > @@ -215,6 +219,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >       case KVM_CAP_SET_GUEST_DEBUG:
-> >       case KVM_CAP_VCPU_ATTRIBUTES:
-> >       case KVM_CAP_PTP_KVM:
-> > +     case KVM_CAP_ARM_SYSTEM_SUSPEND:
-> >               r = 1;
-> >               break;
-> >       case KVM_CAP_SET_GUEST_DEBUG2:
-> > @@ -470,6 +475,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-> >       int ret = 0;
-> >
-> >       switch (mp_state->mp_state) {
-> > +     case KVM_MP_STATE_HALTED:
-> > +             kvm_make_request(KVM_REQ_SUSPEND, vcpu);
-> > +             fallthrough;
-> >       case KVM_MP_STATE_RUNNABLE:
-> >               vcpu->arch.power_off = false;
-> >               break;
->
-> > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > index d453666ddb83..cf869f1f8615 100644
-> > --- a/arch/arm64/kvm/psci.c
-> > +++ b/arch/arm64/kvm/psci.c
-> > @@ -203,6 +203,46 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
-> >       kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
-> >  }
-> >
-> > +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
-> > +{
-> > +     unsigned long entry_addr, context_id;
-> > +     struct kvm *kvm = vcpu->kvm;
-> > +     unsigned long psci_ret = 0;
-> > +     struct kvm_vcpu *tmp;
-> > +     int ret = 0;
-> > +     int i;
-> > +
-> > +     /*
-> > +      * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
-> > +      * calling vCPU) be in an OFF state, as determined by the
-> > +      * implementation.
-> > +      *
-> > +      * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
-> > +      */
-> > +     mutex_lock(&kvm->lock);
-> > +     kvm_for_each_vcpu(i, tmp, kvm) {
-> > +             if (tmp != vcpu && !tmp->arch.power_off) {
-> > +                     psci_ret = PSCI_RET_DENIED;
-> > +                     ret = 1;
-> > +                     goto out;
-> > +             }
-> > +     }
-> > +
-> > +     entry_addr = smccc_get_arg1(vcpu);
-> > +     context_id = smccc_get_arg2(vcpu);
-> > +
-> > +     kvm_psci_vcpu_request_reset(vcpu, entry_addr, context_id,
-> > +                                 kvm_vcpu_is_be(vcpu));
->
-> So even if userspace doesn't want to honor the suspend request, the
-> CPU ends up resetting? That's not wrong, but maybe a bit surprising.
->
-> > +
-> > +     memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
-> > +     vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SUSPEND;
-> > +     vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->
-> Consider spinning out a helper common to this and kvm_prepare_system_event().
->
-> > +out:
-> > +     mutex_unlock(&kvm->lock);
-> > +     smccc_set_retval(vcpu, psci_ret, 0, 0, 0);
-> > +     return ret;
-> > +}
-> > +
-> >  static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
-> >  {
-> >       int i;
-> > @@ -223,6 +263,14 @@ static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32
-> >       if ((fn & PSCI_0_2_64BIT) && vcpu_mode_is_32bit(vcpu))
-> >               return PSCI_RET_NOT_SUPPORTED;
-> >
-> > +     switch (fn) {
-> > +     case PSCI_1_0_FN_SYSTEM_SUSPEND:
-> > +     case PSCI_1_0_FN64_SYSTEM_SUSPEND:
-> > +             if (!vcpu->kvm->arch.suspend_enabled)
-> > +                     return PSCI_RET_NOT_SUPPORTED;
-> > +             break;
-> > +     }
-> > +
-> >       return 0;
-> >  }
-> >
-> > @@ -316,6 +364,10 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
-> >       unsigned long val;
-> >       int ret = 1;
-> >
-> > +     val = kvm_psci_check_allowed_function(vcpu, psci_fn);
-> > +     if (val)
-> > +             goto out;
-> > +
-> >       switch(psci_fn) {
-> >       case PSCI_0_2_FN_PSCI_VERSION:
-> >               val = KVM_ARM_PSCI_1_0;
-> > @@ -339,6 +391,8 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
-> >               case PSCI_0_2_FN_SYSTEM_OFF:
-> >               case PSCI_0_2_FN_SYSTEM_RESET:
-> >               case PSCI_1_0_FN_PSCI_FEATURES:
-> > +             case PSCI_1_0_FN_SYSTEM_SUSPEND:
-> > +             case PSCI_1_0_FN64_SYSTEM_SUSPEND:
-> >               case ARM_SMCCC_VERSION_FUNC_ID:
-> >                       val = 0;
-> >                       break;
-> > @@ -347,10 +401,16 @@ static int kvm_psci_1_0_call(struct kvm_vcpu *vcpu)
-> >                       break;
-> >               }
-> >               break;
-> > +     case PSCI_1_0_FN_SYSTEM_SUSPEND:
-> > +             kvm_psci_narrow_to_32bit(vcpu);
-> > +             fallthrough;
-> > +     case PSCI_1_0_FN64_SYSTEM_SUSPEND:
-> > +             return kvm_psci_system_suspend(vcpu);
-> >       default:
-> >               return kvm_psci_0_2_call(vcpu);
-> >       }
-> >
-> > +out:
-> >       smccc_set_retval(vcpu, val, 0, 0, 0);
-> >       return ret;
-> >  }
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index a067410ebea5..052b0e717b08 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -433,6 +433,7 @@ struct kvm_run {
-> >  #define KVM_SYSTEM_EVENT_SHUTDOWN       1
-> >  #define KVM_SYSTEM_EVENT_RESET          2
-> >  #define KVM_SYSTEM_EVENT_CRASH          3
-> > +#define KVM_SYSTEM_EVENT_SUSPEND        4
-> >                       __u32 type;
-> >                       __u64 flags;
-> >               } system_event;
-> > @@ -1112,6 +1113,7 @@ struct kvm_ppc_resize_hpt {
-> >  #define KVM_CAP_BINARY_STATS_FD 203
-> >  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
-> >  #define KVM_CAP_ARM_MTE 205
-> > +#define KVM_CAP_ARM_SYSTEM_SUSPEND 206
-> >
-> >  #ifdef KVM_CAP_IRQ_ROUTING
-> >
->
-> I think there is an additional feature we need, which is to give
-> control back to userspace every time a wake-up condition occurs (I did
-> touch on that in [1]). This would give the opportunity to the VMM to
-> do whatever it needs to perform.
->
-> A typical use case would be to implement wake-up from certain
-> interrupts only (mask non-wake-up IRQs on suspend request, return to
-> the guest for WFI, wake-up returns to the VMM to restore the previous
-> interrupt configuration, resume).
->
-> Userspace would be free to clear the suspend state and resume the
-> guest, or to reenter WFI.
+On Thu, Sep 30, 2021, Marc Zyngier wrote:
+> On Thu, 23 Sep 2021 00:22:12 +0100, David Matlack <dmatlack@google.com> wrote:
+> > 
+> > On Wed, Sep 22, 2021 at 11:53 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > And I'm all for adding these hooks where it matters as long as they
+> > > are not considered ABI and don't appear in /sys/debug/tracing (in
+> > > general, no userspace visibility).
 
-Yeah, this is definitely needed for the series.
+On our side (GCP), we very much want these to be ABI so that upgrading the
+kernel/KVM doesn't break the userspace collection of stats.
 
-Just to make sure it's clear, what should the default behavior be if
-userspace doesn't touch state at all and it calls KVM_RUN again? It
-would seem to me that we should resume the guest by default, much like
-we would do for the SUSPEND event exit.
+> > > The scheduler is a interesting example of this, as it exposes all sort
+> > > of hooks for people to look under the hood. No user of the hook? No
+> > > overhead, no additional memory used. I may have heard that Android
+> > > makes heavy use of this.
+> > >
+> > > Because I'm pretty sure that whatever stat we expose, every cloud
+> > > vendor will want their own variant, so we may just as well put the
+> > > matter in their own hands.
+> > 
+> > I think this can be mitigated by requiring sufficient justification
+> > when adding a new stat to KVM. There has to be a real use-case and it
+> > has to be explained in the changelog. If a stat has a use-case for one
+> > cloud provider, it will likely be useful to other cloud providers as
+> > well.
+> 
+> My (limited) personal experience is significantly different. The
+> diversity of setups make the set of relevant stats pretty hard to
+> guess (there isn't much in common if you use KVM to strictly partition
+> a system vs oversubscribing it).
 
---
-Thanks,
-Oliver
+To some extent that's true for GCP and x86[*].  I think our position can be
+succinctly described as a shotgun approach; we don't know exactly which stats will
+be useful when, so grab as many as we can within reason.  As mentioned earlier,
+burning 8kb+ of stats per vCPU is perfectly ok for our use cases because it's more
+or less negligible compared to the amount of memory assigned to VMs.
+
+This is why I think we should explore an approach that allows for enabling/disabling
+groups of stats at compile time. 
+
+[*] For x86 specifically, I think it's a bit easier to predict which stats are
+    useful because KVM x86 is responsible for a smaller set of functionality compared
+    to arm64, e.g. nearly everything at the system/platform level is handled by
+    userspace, and so there are natural exit points to userspace for many of the
+    intersesting touch points.  The places where we need stats are where userspace
+    doesn't have any visibility into what KVM is doing.
+
+> > > I also wouldn't discount BPF as a possibility. You could perfectly
+> > > have permanent BPF programs running from the moment you boot the
+> > > system, and use that to generate your histograms. This isn't necessary
+> > > a one off, debug only solution.
+> > >
+> > > > Logging is a similar story, e.g. using _ratelimited() printk to aid
+> > > > debug works well when there are a very limited number of VMs and
+> > > > there is a human that can react to arbitrary kernel messages, but
+> > > > it's basically useless when there are 10s or 100s of VMs and taking
+> > > > action on a kernel message requires a prior knowledge of the
+> > > > message.
+> > >
+> > > I'm not sure logging is remotely the same. For a start, the kernel
+> > > should not log anything unless something has oopsed (and yes, I still
+> > > have some bits to clean on the arm64 side). I'm not even sure what you
+> > > would want to log. I'd like to understand the need here, because I
+> > > feel like I'm missing something.
+
+I think we're generally on the same page: kernel logging bad.  x86 has historically
+used printks to "alert" userspace to notable behavior, e.g. when KVM knowingly
+emulates an instruction incorrectly, or when the guest crashes.  The incorrect
+instruction emulation isn't all that interesting since we're well aware of KVM's
+shortcomings, but guest crashes are an instance where "logging" _to userspace_ is
+very desirable, e.g. so that we can identify trends that may be due to bugs in
+the host, or to provide the customer with additional data to help them figure out
+what's wrong on their end.
+
+"logging" in quotes because it doesn't necessarily have to be traditional logging,
+e.g. for the crash cases, KVM already exits to userspace so the "hook" is there,
+what's lacking is a way for KVM to dump additional information about the crash.
+
+I brought up logging here purely to highlight that KVM, at least on the x86 side,
+lacks infrastructure for running at scale, likely because it hasn't been needed in
+the past.
+
+> > > > I'm certainly not expecting other people to solve our challenges,
+> > > > and I fully appreciate that there are many KVM users that don't care
+> > > > at all about scalability, but I'm hoping we can get the community at
+> > > > large, and especially maintainers and reviewers, to also consider
+> > > > at-scale use cases when designing, implementing, reviewing, etc...
+> > >
+> > > My take is that scalability has to go with flexibility. Anything that
+> > > gets hardcoded will quickly become a burden: I definitely regret
+> > > adding the current KVM trace points, as they don't show what I need,
+> > > and I can't change them as they are ABI.
+> > 
+> > This brings up a good discussion topic: To what extent are the KVM
+> > stats themselves an ABI? I don't think this is documented anywhere.
+> > The API itself is completely dynamic and does not hardcode a list of
+> > stats or metadata about them. Userspace has to read stats fd to see
+> > what's there.
+> > 
+> > Fwiw we just deleted the lpages stat without any drama.
+> 
+> Maybe the new discoverable interface makes dropping some stats
+> easier. But it still remains that what is useless for someone has the
+> potential of being crucial for someone else. I wouldn't be surprised
+> if someone would ask for this stat back once they upgrade to a recent
+> host kernel, probably in a couple of years from now.
+
+lpages is bad example, it wasn't deleted so much as it was replaced by stats for
+each page size (4kb, 2mb, 1gb).
+
+I don't think x86 has any (recent) examples of a stat being truly dropped (though
+there definitely some that IMO are quite useless).
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
