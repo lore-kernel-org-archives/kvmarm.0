@@ -2,80 +2,75 @@ Return-Path: <SRS0=H8K6=OU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE37FC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 21:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD7C5C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 23:02:30 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 35E7361A02
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 21:57:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 35E7361A02
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 2F02161A61
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 23:02:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2F02161A61
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linutronix.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8745C4B091;
-	Thu, 30 Sep 2021 17:57:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 994C94A19F;
+	Thu, 30 Sep 2021 19:02:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linutronix.de
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(invalid, unsupported algorithm ed25519-sha256)
+	header.i=@linutronix.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I+rmj-h+iWbD; Thu, 30 Sep 2021 17:57:25 -0400 (EDT)
+	with ESMTP id AJxmVWl6e2WC; Thu, 30 Sep 2021 19:02:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50E004B099;
-	Thu, 30 Sep 2021 17:57:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BEC34A3A5;
+	Thu, 30 Sep 2021 19:02:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0BEC4083E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 17:57:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67E764A19F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 19:02:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qipr1yRA6zmK for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Sep 2021 17:57:22 -0400 (EDT)
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com
- [209.85.167.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB36240667
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 17:57:22 -0400 (EDT)
-Received: by mail-lf1-f53.google.com with SMTP id x27so31135693lfu.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 14:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1VJrgIZzgtxa6YpK70z/m29SP7Hw5UszTAKK7fc3/DA=;
- b=A5QE5aV4FIKYCFm4FmQJcVJLo3lzWAM2HM8tjo7vFO3aObQQQ6S1vDpJQNxxmaRfQb
- NV84RP6IXgMoedcU3jSVFTm7rWCTWZ3jDyux6m+dsVXjQfvMstMsaaywrhjpRc8WIMyC
- 9VnoFr868cR1XBqTKlANmDLBnmPd9EqeljHG9vP8jv06ft+yU53GPjvX9cr+yQ7jK7Jh
- 6vrar2o/0bvLjjcXancx3vxwwXyw4j7FjxmniEHSiMqyinpIEajGEjylyZpLzrqBskgp
- 2KNOzYBGd24afmcU9Y57qwZed6D5lqOJJcVxsrYl0Z1WQkYfFAvKAXivvQUac0HuGbx2
- YwkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1VJrgIZzgtxa6YpK70z/m29SP7Hw5UszTAKK7fc3/DA=;
- b=IWkqfsWoba2bOKmRBcG5wZ+4xK8xBmka+uS7dBPu5F7bgIpOJ1SUVlx4NZ6TIEERQs
- S+61+4ko/ax6YLv9OBiYAAp+cNGjm+PLPUqFeOXl4F8gEpAuQ13RRSiFrvgEfHQAyUus
- rZvlhgAFq/dneihSAvOaAp45GHCEjDHw8Fqerv2MoQAMrfNouSQigABbWG7yvB0zZpVD
- 7AC+CWqk4PBPALbR92I7ayOrrjU4eNXoZBgqjFuPWTHhB5KheASPS1amFn91QpWanAMu
- RIDlzs54VfCUXm71Si72NjfCONXeghVZHuBgvaoRr7ORH/m9LRTSyg/pxynm5FoICfiy
- YWsQ==
-X-Gm-Message-State: AOAM532SC2AYKJBu7eDFMosuqWk7wnE7t9PvxszQOU5PWqKS6HbM75lA
- WNBK8iQZg6Y2WgRjRAjgLw72UaLhRtq1duJYfrG8Bw==
-X-Google-Smtp-Source: ABdhPJwNjZ1Ft7Rzgz1bsFFoRB4MAZdYHAhGAclXUZdIGmyqv+o7vcKq3MEtf03pMU0UI0S/+P5WJEKkm/8e6nprZTQ=
-X-Received: by 2002:a2e:719:: with SMTP id 25mr8749326ljh.251.1633039041032;
- Thu, 30 Sep 2021 14:57:21 -0700 (PDT)
+ with ESMTP id zGDFt7-kUPOy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Sep 2021 19:02:26 -0400 (EDT)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E82754079A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 19:02:25 -0400 (EDT)
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+ s=2020; t=1633042944;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=aleerACiGlPLwzVtk/B1tjYHOmPxqoYPlz9VPbhU1zg=;
+ b=f3YZlCl+ncZJeCnHbUAMI3Hly6FBQOrY5J+xmZRee/mK0xXN6dudy2ijkNTJTVxJs2DVy2
+ khFPSZX3W3b9S4hx5UAkiQZjupSAExQoDooa3nW9b5pchM7hlGp+93kgeOOjP7vudaz/mF
+ QW0Mt/uKXqjrenRCjxz/dNm7lHGRRcedvJFOdKfoUHINmzxksTGwbZlmFAN6L348BjT6oY
+ EZJNetMjQEhPvxNweE/BEt2D72KWmPlc1YG4yNAEKmAZxo2Bk1HRiGkHW1qwOibT8jxNUJ
+ zyRvpzf3oYcj499+e2CCR5nAlsAl+v/n3ALy417XYr10mEFPzXHaisWWudWtEw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+ s=2020e; t=1633042944;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=aleerACiGlPLwzVtk/B1tjYHOmPxqoYPlz9VPbhU1zg=;
+ b=ytW4IkUve0WFFt51OHnVUbHpXv6lmIXT/DHOOBVcEd2tZGV9DLSz9/pD2iXSuLznusAwPx
+ WCNi8N5j86kaJXDQ==
+To: Marcelo Tosatti <mtosatti@redhat.com>, Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
+ KVM_GET_CLOCK
+In-Reply-To: <20210930192107.GB19068@fuller.cnet>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-5-oupton@google.com>
+ <20210929185629.GA10933@fuller.cnet> <20210930192107.GB19068@fuller.cnet>
+Date: Fri, 01 Oct 2021 01:02:23 +0200
+Message-ID: <871r557jls.ffs@tglx>
 MIME-Version: 1.0
-References: <20210923191610.3814698-1-oupton@google.com>
- <20210923191610.3814698-6-oupton@google.com>
- <878rzetk0o.wl-maz@kernel.org> <YVXvM2kw8PDou4qO@google.com>
- <CAOQ_QsjXs8sF+QY0NrSVBvO4xump7CttBU3et6V3O_hNYmCSig@mail.gmail.com>
- <YVX9IOb1vyoJowQl@google.com>
-In-Reply-To: <YVX9IOb1vyoJowQl@google.com>
-From: Oliver Upton <oupton@google.com>
-Date: Thu, 30 Sep 2021 14:57:10 -0700
-Message-ID: <CAOQ_QshZsDEt6T2=EwyzwUi-hPoz5u-BnjOnuOj=ufmRWUB=0A@mail.gmail.com>
-Subject: Re: [PATCH v2 05/11] KVM: arm64: Defer WFI emulation as a requested
- event
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,29 +87,229 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Sep 30, 2021 at 11:08 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Sep 30, 2021, Oliver Upton wrote:
-> > On Thu, Sep 30, 2021 at 10:09 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > Unlike PSCI power-off, WFI isn't cross-vCPU, thus there's no hard requirement
-> > > for using a request.  And KVM_REQ_SLEEP also has an additional guard in that it
-> > > doesn't enter rcuwait if power_off (or pause) was cleared after the request was
-> > > made, e.g. if userspace stuffed vCPU state and set the vCPU RUNNABLE.
-> >
-> > Yeah, I don't think the punt is necessary for anything but the case
-> > where userspace sets the MP state to request WFI behavior. A helper
-> > method amongst all WFI cases is sufficient, and using the deferral for
-> > everything is a change in behavior.
->
-> Is there an actual use case for letting userspace request WFI behavior?
+Marcelo,
 
-So for the system event exits we say that userspace can ignore them
-and call KVM_RUN again. Running the guest after the suspend exit
-should appear to the guest as though it had resumed. Userspace could
-do something fancy to handle the suspend (save the VM, wait for an
-implementation defined event) or ask the kernel to do it. To that end,
-the MP state is needed to tell KVM to WFI instead of starting the
-guest immediately.
+On Thu, Sep 30 2021 at 16:21, Marcelo Tosatti wrote:
+> On Wed, Sep 29, 2021 at 03:56:29PM -0300, Marcelo Tosatti wrote:
+>> On Thu, Sep 16, 2021 at 06:15:35PM +0000, Oliver Upton wrote:
+>> 
+>> Thomas, CC'ed, has deeper understanding of problems with 
+>> forward time jumps than I do. Thomas, any comments?
+>
+> Based on the earlier discussion about the problems of synchronizing
+> the guests clock via a notification to the NTP/Chrony daemon 
+> (where there is a window where applications can read the stale
+> value of the clock), a possible solution would be triggering
+> an NMI on the destination (so that it runs ASAP, with higher
+> priority than application/kernel).
+>
+> What would this NMI do, exactly?
+
+Nothing. You cannot do anything time related in an NMI.
+
+You might queue irq work which handles that, but that would still not
+prevent user space or kernel space from observing the stale time stamp
+depending on the execution state from where it resumes.
+
+>> As a note: this makes it not OK to use KVM_CLOCK_REALTIME flag 
+>> for either vm pause / vm resume (well, if paused for long periods of time) 
+>> or savevm / restorevm.
+>
+> Maybe with the NMI above, it would be possible to use
+> the realtime clock as a way to know time elapsed between
+> events and advance guest clock without the current 
+> problematic window.
+
+As much duct tape you throw at the problem, it cannot be solved ever
+because it's fundamentally broken. All you can do is to make the
+observation windows smaller, but that's just curing the symptom.
+
+The problem is that the guest is paused/resumed without getting any
+information about that and the execution of the guest is stopped at an
+arbitrary instruction boundary from which it resumes after migration or
+restore. So there is no way to guarantee that after resume all vCPUs are
+executing in a state which can handle that.
+
+But even if that would be the case, then what prevents the stale time
+stamps to be visible? Nothing:
+
+T0:    t = now();
+         -> pause
+         -> resume
+         -> magic "fixup"
+T1:    dostuff(t);
+
+But that's not a fundamental problem because every preemptible or
+interruptible code has the same issue:
+
+T0:    t = now();
+         -> preemption or interrupt
+T1:    dostuff(t);
+
+Which is usually not a problem, but It becomes a problem when T1 - T0 is
+greater than the usual expectations which can obviously be trivially
+achieved by guest migration or a savevm, restorevm cycle.
+
+But let's go a step back and look at the clocks and their expectations:
+
+CLOCK_MONOTONIC:
+
+  Monotonically increasing clock which counts unless the system
+  is in suspend. On resume it continues counting without jumping
+  forward.
+
+  That's the reference clock for everything else and therefore it
+  is important that it does _not_ jump around.
+
+  The reasons why CLOCK_MONOTONIC stops during suspend is
+  historical and any attempt to change that breaks the world and
+  some more because making it jump forward will trigger all sorts
+  of timeouts, watchdogs and whatever. The last attempt to make
+  CLOCK_MONOTONIC behave like CLOCK_BOOTTIME was reverted within 3
+  weeks. It's not going to be attempted again. See a3ed0e4393d6
+  ("Revert: Unify CLOCK_MONOTONIC and CLOCK_BOOTTIME") for
+  details.
+
+  Now the proposed change is creating exactly the same problem:
+
+  >> > +	if (data.flags & KVM_CLOCK_REALTIME) {
+  >> > +		u64 now_real_ns = ktime_get_real_ns();
+  >> > +
+  >> > +		/*
+  >> > +		 * Avoid stepping the kvmclock backwards.
+  >> > +		 */
+  >> > +		if (now_real_ns > data.realtime)
+  >> > +			data.clock += now_real_ns - data.realtime;
+  >> > +	}
+
+  IOW, it takes the time between pause and resume into account and
+  forwards the underlying base clock which makes CLOCK_MONOTONIC
+  jump forward by exactly that amount of time.
+
+  So depending on the size of the delta you are running into exactly the
+  same problem as the final failed attempt to unify CLOCK_MONOTONIC and
+  CLOCK_BOOTTIME which btw. would have been a magic cure for virt.
+
+  Too bad, not going to happen ever unless you fix all affected user
+  space and kernel side issues.
+
+
+CLOCK_BOOTTIME:
+
+  CLOCK_MONOTONIC + time spent in suspend
+
+
+CLOCK_REALTIME/TAI:
+
+  CLOCK_MONOTONIC + offset
+
+  The offset is established by reading RTC at boot time and can be
+  changed by clock_settime(2) and adjtimex(2). The latter is used
+  by NTP/PTP.
+
+  Any user of CLOCK_REALTIME has to be prepared for it to jump in
+  both directions, but of course NTP/PTP daemons have expectations
+  vs. such time jumps.
+
+  They rightfully assume on a properly configured and administrated
+  system that there are only two things which can make CLOCK_REALTIME
+  jump:
+
+  1) NTP/PTP daemon controlled
+  2) Suspend/resume related updates by the kernel
+
+
+Just for the record, these assumptions predate virtualization.
+
+So now virt came along and created a hard to solve circular dependency
+problem:
+
+   - If CLOCK_MONOTONIC stops for too long then NTP/PTP gets out of
+     sync, but everything else is happy.
+     
+   - If CLOCK_MONOTONIC jumps too far forward, then all hell breaks
+     lose, but NTP/PTP is happy.
+
+IOW, you are up a creek without a paddle and you have to chose one evil.
+
+That's simply a design fail because there has been no design for this
+from day one. But I'm not surprised at all by that simply because
+virtualization followed the hardware design fails vs. time and
+timekeeping which keep us entertained for the past 20 years on various
+architectures but most prominently on X86 which is the uncontended
+master of disaster in that regard.
+
+Of course virt follows the same approach of hardware by ignoring the
+problem and coming up with more duct tape and the assumption that lack
+of design can be "fixed in software". Just the timeframe is slightly
+different: We're discussing this only for about 10 years now.
+
+Seriously? All you folks can come up with in 10 years is piling duct
+tape on duct tape instead of sitting down and fixing the underlying root
+cause once and forever?
+
+I'm aware that especially chrony has tried to deal with this nonsense
+more gracefully, but that still does not make it great and it still gets
+upset.
+
+The reason why suspend/resume works perfectly fine is that it's fully
+coordinated and NTP state is cleared on resume which makes it easy for
+the deamon to accomodate.
+
+So again and I'm telling this for a decade now:
+
+ 1) Stop pretending that you can fix the lack of design with duct tape
+    engineering
+
+ 2) Accept the fundamental properties of Linux time keeping as they are
+    not going to change as explained above
+
+ 3) Either accept that CLOCK_REALTIME is off and jumping around which
+    confuses NTP/PTP or get your act together and design and implement a
+    proper synchronization mechanism for this:
+
+    - Notify the guest about the intended "pause" or "savevm" event
+
+    - Let the guest go into a lightweight freeze similar to S2IDLE
+
+    - Save the VM for later resume or migrate the saved state
+
+    - Watch everything working as expected on resume
+
+    - Have the benefit that pause/resume and savevm/restorevm have
+      exactly the same behaviour
+
+That won't solve the problem for frankenkernels and !paravirt setups,
+but that's unsolvable and you can keep the pieces by chosing one of two
+evils. While I do not care at all, I still recommend to chose
+CLOCK_MONOTONIC correctness for obvious reasons.
+
+The frankenkernel/legacy problem aside, I know you are going to tell me
+that this is too much overhead and has VM customer visible impact. It's
+your choice, really:
+
+  Either you chose correctness or you decide to ignore correctness for
+  whatever reason.
+
+  There is no middle ground simply because you _cannot_ guarantee that
+  your migration time is within the acceptable limits of the
+  CLOCK_MONOTONIC or the CLOCK_REALTIME expectations.
+
+  You can limit the damage somehow by making some arbitrary cutoff of
+  how much you forward CLOCK_MONOTONIC, but don't ask me about the right
+  value.
+
+If you decide that correctness is overrated, then please document it
+clearly instead of trying to pretend being correct.
+
+I'm curious whether the hardware people or the virt folks come to senses
+first, but honestly I'm not expecting this to happen before I retire.
+
+Thanks,
+
+        tglx
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
