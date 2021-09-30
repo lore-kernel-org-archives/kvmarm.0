@@ -2,87 +2,89 @@ Return-Path: <SRS0=H8K6=OU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5E7C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 13:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3BEC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 13:29:25 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id EF17E61278
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 13:22:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EF17E61278
+	by mail.kernel.org (Postfix) with ESMTP id 113B7615A2
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Sep 2021 13:29:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 113B7615A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 671CA4B0DF;
-	Thu, 30 Sep 2021 09:22:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8620149DE3;
+	Thu, 30 Sep 2021 09:29:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gC2ydJVwu33K; Thu, 30 Sep 2021 09:22:16 -0400 (EDT)
+	with ESMTP id stQbh2xLx+Uh; Thu, 30 Sep 2021 09:29:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 815D54B0CC;
-	Thu, 30 Sep 2021 09:22:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 601A64B0BA;
+	Thu, 30 Sep 2021 09:29:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F67B4B0C0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 09:22:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BA614B090
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 09:29:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DzA43qi053tD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Sep 2021 09:22:11 -0400 (EDT)
+ with ESMTP id w7KOZYPGaStd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Sep 2021 09:29:21 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C692049DE3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 09:22:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2343A4B0B6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 09:29:21 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633008131;
+ s=mimecast20190719; t=1633008561;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=6ckZ1pppA29wAm+9rfiJ1n/Mo/PrqlcBv4nOphRPsTU=;
- b=bgoUezSBdcbSFe8dYmIp32yOXQf+Np7LDWovTfzFQU0JjDDqNvDaYT8cGhtWwClCIPKaVC
- LJYjznrBXdfZ000QEQzcKWpaTAp+E0YcXvluR4dRteAiwthjEan2wEyOyR+FMJ3VjLTICj
- 5hIih4E1JDgvw1q2Ma46o+WCz4bPuWc=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-BTX9GaDFNg2oG4hndA7dyQ-1; Thu, 30 Sep 2021 09:22:08 -0400
-X-MC-Unique: BTX9GaDFNg2oG4hndA7dyQ-1
-Received: by mail-qk1-f199.google.com with SMTP id
- t2-20020a05620a450200b0045e34e4f9c7so13265400qkp.18
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 06:22:08 -0700 (PDT)
+ bh=Isl/b69bzCC4NRdxJvMAiKAJHzi4T9gPXKhGDEYhYsE=;
+ b=beO732YWXoy1rvk8gy6FYYzc7WYRIDAz/WQbCxq5wAImq3xWm18SasVTASTmGprxp+SPTQ
+ EyWIkcNjh38liKGF/qgd3HdbDXcFZctD8r6QW3zOIz/o2KQdays3vJAQHUf0JEC/chYvkl
+ Xo9zFcX0LfWrzJH2H0zVLjFSl1KEgWM=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-nmcU0wZ4OSmpZ3a7j5GzNA-1; Thu, 30 Sep 2021 09:29:19 -0400
+X-MC-Unique: nmcU0wZ4OSmpZ3a7j5GzNA-1
+Received: by mail-qt1-f198.google.com with SMTP id
+ b20-20020ac87fd4000000b002a69ee90efbso11780530qtk.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Sep 2021 06:29:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=6ckZ1pppA29wAm+9rfiJ1n/Mo/PrqlcBv4nOphRPsTU=;
- b=elmrpyOKL65wkgOqG3SOyvBK/BJ6a0UUwXabJcJKinX2xTSUc6z5OSrFuwt3u6CQjc
- 4oKlA+7pqMkVAwKpJXONlXFdTcJI1A5UQjed+SF8kQHXrItuCn13ulPaIbNZRuVjpV91
- AU0w7bDn7EbP8hFws4j1Y4BXWxpsM20OSLCV37NrXIv4FeKGzhd6FoaL0nJq5dkXm3rr
- INXXa/yS7NdMwWGguLN5MuEqjCEW5A5khqdzsWdI8z9kK0x0LxZzVckqahqgD5j2mRm8
- vVdHL/X3DU8gMh1MWqco04JUkZZ0A1/E5HM30+AxFOQe5sKet8cMu1haB3BDAZRyYdf9
- JZUQ==
-X-Gm-Message-State: AOAM530DeE8or1fixwPo1wVm+Q8yuVuj3UmQE0+cI45tw+acDiPW4uUT
- QGylf0T2Ix6Xfqb/j3gtIguBgSfZ5l3hBGy+pb9lHkJ4VZzgrhahlJkAMFPLdbVygl5NUasJoUQ
- ArXkKoPggc2Ye49qWjoq2ycmc
-X-Received: by 2002:a37:d82:: with SMTP id 124mr4751622qkn.299.1633008128508; 
- Thu, 30 Sep 2021 06:22:08 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJygLLhtXJjxjuaO0dACez2L3lInr7k748BHulrSq78dll6LEjGrJO1fGfBl8yf2p3YtMw287A==
-X-Received: by 2002:a37:d82:: with SMTP id 124mr4751602qkn.299.1633008128329; 
- Thu, 30 Sep 2021 06:22:08 -0700 (PDT)
+ bh=Isl/b69bzCC4NRdxJvMAiKAJHzi4T9gPXKhGDEYhYsE=;
+ b=N2pUeuRZvQIrAmwkPSrKCft2FIbkOWssWvg/0t1/s0Lt8ZeXIOmzm4J4ZOxw94t4xI
+ 2gw6LPgXqwNa8RKSirDhshu3FyAJdm5Wfqz7AOyo+gwjwXvxHGCTSPeyW/Aaw+TRk6Lo
+ UOujpRAGIkn0Y+DXAfslhzmpsjh1QJwdoNv25Mt+6cTmra3skX62jrg/W8fbfB/xLFEd
+ LdoeRMpvoUrdNFAlO1v/f8w15yqINMen0Y417N34Z/L/AySf8yxecPB0NAUD2WA6qmtE
+ 6ur0GrBnqvunkFLXqb4+8Q0dNmQO38C/L/H2tvKPqbCrDeQ8QQ4pzU+ITs95CoLxJpMX
+ /VyA==
+X-Gm-Message-State: AOAM530JaFbl9FERd++kd7020IGzFfxxKf0b9wSFepTIYbxE6cCGQxsv
+ TZZDzgaWb5stVJyPNJFBwnXYexlynNh2EiIGXEPpmXyaK8iJGXuHfl+aB8sdULxgyarm5yLxy4P
+ IuMF8T1CV0FnBYDphOFkFb/Je
+X-Received: by 2002:a05:6214:393:: with SMTP id
+ l19mr5390440qvy.8.1633008559122; 
+ Thu, 30 Sep 2021 06:29:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwFnirPv4PoNfVoyAlW5rSeeodnWwuclzJETP5skeYr77i7Uavc83v1bilffS7/xWhNPosu5g==
+X-Received: by 2002:a05:6214:393:: with SMTP id
+ l19mr5390424qvy.8.1633008558909; 
+ Thu, 30 Sep 2021 06:29:18 -0700 (PDT)
 Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
- by smtp.gmail.com with ESMTPSA id h4sm1586843qtb.67.2021.09.30.06.22.06
+ by smtp.gmail.com with ESMTPSA id w11sm1627246qts.9.2021.09.30.06.29.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Sep 2021 06:22:07 -0700 (PDT)
-Date: Thu, 30 Sep 2021 15:22:04 +0200
+ Thu, 30 Sep 2021 06:29:18 -0700 (PDT)
+Date: Thu, 30 Sep 2021 15:29:15 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Return early from read_id_reg() if
- register is RAZ
-Message-ID: <20210930132204.m7l4tdzzenllnr6h@gator>
+Subject: Re: [PATCH 2/2] KVM: arm64: Use get_raz_reg() for userspace reads of
+ PMSWINC_EL0
+Message-ID: <20210930132915.cpfzxdlws2zlou47@gator>
 References: <20210927124911.191729-1-alexandru.elisei@arm.com>
- <20210927124911.191729-2-alexandru.elisei@arm.com>
+ <20210927124911.191729-3-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20210927124911.191729-2-alexandru.elisei@arm.com>
+In-Reply-To: <20210927124911.191729-3-alexandru.elisei@arm.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -106,53 +108,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Sep 27, 2021 at 01:49:10PM +0100, Alexandru Elisei wrote:
-> If read_id_reg() is called for an ID register which is Read-As-Zero
-> (RAZ), it initializes the return value to zero, then goes through a list
-> of registers which require special handling.
+On Mon, Sep 27, 2021 at 01:49:11PM +0100, Alexandru Elisei wrote:
+> PMSWINC_EL0 is a write-only register and was initially part of the VCPU
+> register state, but was later removed in commit 7a3ba3095a32 ("KVM:
+> arm64: Remove PMSWINC_EL0 shadow register"). To prevent regressions, the
+> register was kept accessible from userspace as Read-As-Zero (RAZ).
 > 
-> By not returning as soon as it tests if the register is RAZ, it creates
-> the opportunity for bugs, if a patch changes a register to RAZ (like has
-> happened with PMSWINC_EL0 in commit 11663111cd49), but doesn't remove the
-> special handling from read_id_reg(); or if a register is RAZ in certain
-> situations, and readable in others.
+> The read function that is used to handle userspace reads of this
+> register is get_raz_id_reg(), which, while technically correct, as it
+> returns 0, it is not semantically correct, as PMSWINC_EL0 is not an ID
+> register as the function name suggests.
 > 
-> Return early as to make it impossible for a RAZ register to be anything
-> other than zero.
+> Add a new function, get_raz_reg(), to use it as the accessor for
+> PMSWINC_EL0, as to not conflate get_raz_id_reg() to handle other types
+> of registers.
+> 
+> No functional change intended.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/sys_regs.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1d46e185f31e..4adda8bf3168 100644
+> index 4adda8bf3168..1be827740f87 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1064,7 +1064,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  		struct sys_reg_desc const *r, bool raz)
->  {
->  	u32 id = reg_to_encoding(r);
-> -	u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
-> +	u64 val;
-> +
-> +	if (raz)
-> +		return 0;
-> +
-> +	val = read_sanitised_ftr_reg(id);
+> @@ -1285,6 +1285,15 @@ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  	return __set_id_reg(vcpu, rd, uaddr, true);
+>  }
 >  
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
+> +static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+> +		       const struct kvm_one_reg *reg, void __user *uaddr)
+> +{
+> +	const u64 id = sys_reg_to_index(rd);
+> +	const u64 val = 0;
+> +
+> +	return reg_to_user(uaddr, &val, id);
+> +}
+> +
+>  static int set_wi_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  		      const struct kvm_one_reg *reg, void __user *uaddr)
+>  {
+> @@ -1647,7 +1656,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	 * previously (and pointlessly) advertised in the past...
+>  	 */
+>  	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
+> -	  .get_user = get_raz_id_reg, .set_user = set_wi_reg,
+> +	  .get_user = get_raz_reg, .set_user = set_wi_reg,
+>  	  .access = access_pmswinc, .reset = NULL },
+>  	{ PMU_SYS_REG(SYS_PMSELR_EL0),
+>  	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
 > -- 
 > 2.33.0
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 >
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+What about replacing get_raz_id_reg() with this new function? Do really need
+both?
+
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
