@@ -2,81 +2,77 @@ Return-Path: <SRS0=fGD+=OV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0D92C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 10:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 304FBC433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 11:43:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 25B9761A81
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 10:33:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 25B9761A81
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 9565E61A6F
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 11:43:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9565E61A6F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D7D5407D1;
-	Fri,  1 Oct 2021 06:33:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EEF049FE6;
+	Fri,  1 Oct 2021 07:43:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2we1MALd6k2t; Fri,  1 Oct 2021 06:33:57 -0400 (EDT)
+	with ESMTP id 0dHES0nvZM7l; Fri,  1 Oct 2021 07:43:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8219D4A98B;
-	Fri,  1 Oct 2021 06:33:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 013194A3BF;
+	Fri,  1 Oct 2021 07:43:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3921A407D1
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 06:33:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D02349FE6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 07:43:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2ysQfkx7mTSA for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Oct 2021 06:33:55 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4549F40630
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 06:33:55 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633084435;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=QSuR70xnv39bycvobYUkYW+O6E+zsW6wFcCu0xUN0TI=;
- b=dJjWDDu6WBBKGG1EMXtRTnejaAf4tZHKObdmyBmeFnhZz1pva5ZYOSv17LhMHyEU711/X+
- 0j1H0vK99RSP0MyYNjRR8naBcm1uie/gPaai883FG/B3KRPs8vAkMeKnz7iDXh9bAsf6p+
- 7MgwJGT+onkr4sPfYmFR2k5cRLEtBpI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-584-QXwW9Tt8MzW1jONRM1vepQ-1; Fri, 01 Oct 2021 06:33:53 -0400
-X-MC-Unique: QXwW9Tt8MzW1jONRM1vepQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id Bc7F1HEW6rGq for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Oct 2021 07:43:42 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF06D4083E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 07:43:42 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74D621927800;
- Fri,  1 Oct 2021 10:33:51 +0000 (UTC)
-Received: from fuller.cnet (ovpn-112-4.gru2.redhat.com [10.97.112.4])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 93B5A18AD4;
- Fri,  1 Oct 2021 10:33:50 +0000 (UTC)
-Received: by fuller.cnet (Postfix, from userid 1000)
- id 3FC70416CE5D; Fri,  1 Oct 2021 07:32:00 -0300 (-03)
-Date: Fri, 1 Oct 2021 07:32:00 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
-Message-ID: <20211001103200.GA39746@fuller.cnet>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-8-oupton@google.com>
- <20210930191416.GA19068@fuller.cnet>
- <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Peter Shier <pshier@google.com>, Marc Zyngier <maz@kernel.org>,
- David Matlack <dmatlack@google.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+ by mail.kernel.org (Postfix) with ESMTPSA id 7EF1B61A6F;
+ Fri,  1 Oct 2021 11:43:41 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mWGx1-00EBYd-DA; Fri, 01 Oct 2021 12:43:39 +0100
+Date: Fri, 01 Oct 2021 12:43:38 +0100
+Message-ID: <87lf3drmvp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
+ <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+ <87fsuxq049.wl-maz@kernel.org>
+ <20210825150713.5rpwzm4grfn7akcw@gator.home>
+ <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
+ <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
+ <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
+ <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
+ <87ilyitt6e.wl-maz@kernel.org>
+ <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, drjones@redhat.com,
+ kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com,
+ rananta@google.com, reijiw@google.com, jingzhangos@google.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,58 +89,108 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Oct 01, 2021 at 11:17:33AM +0200, Paolo Bonzini wrote:
-> On 30/09/21 21:14, Marcelo Tosatti wrote:
-> > > +   new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
+On Thu, 30 Sep 2021 18:24:23 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Hey Marc,
+> 
+> On Thu, Sep 30, 2021 at 12:32 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
 > > Hi Oliver,
-> > 
-> > This won't advance the TSC values themselves, right?
+> >
+> > On Wed, 29 Sep 2021 19:22:05 +0100,
+> > Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > I have some lingering thoughts on this subject since we last spoke and
+> > > wanted to discuss.
+> > >
+> > > I'm having a hard time figuring out how a VMM should handle a new
+> > > hypercall identity register introduced on a newer kernel. In order to
+> > > maintain guest ABI, the VMM would need to know about that register and
+> > > zero it when restoring an older guest.
+> >
+> > Just as it would need to be able to discover any new system register
+> > exposed by default, as it happens at all times. Which is why we have a
+> > way to discover all the registers, architected or not.
+> >
+> > > Perhaps instead we could reserve a range of firmware registers as the
+> > > 'hypercall identity' registers. Implement all of them as RAZ/WI by
+> > > default, encouraging userspace to zero these registers away for older
+> > > VMs but still allowing an old userspace to pick up new KVM features.
+> > > Doing so would align the hypercall identity registers with the feature
+> > > ID registers from the architecture.
+> >
+> > The range already exists in the form of the "coprocessor" 0x14. I
+> > don't see the need to expose it as RAZ/WI, however. If userspace
+> > doesn't know about how this pseudo-register works, it won't be able to
+> > program it anyway.
+> >
+> > I don't buy the parallel with the ID-regs either. They are RAZ/WI by
+> > default so that they don't UNDEF at runtime. The meaning of a RAZ
+> > id-register is also well defined (feature not implemented), and the
+> > CPU cannot write to them. In a way, the ID-regs *are* the enumeration
+> > mechanism.
+> >
+> > Our firmware registers don't follow the same rules. Userspace can
+> > write to them, and there is no such "not implemented" rule (case in
+> > point, PSCI). We also have a separate enumeration mechanism
+> > (GET_ONE_REG), which is (more or less) designed for userspace to find
+> > what is implemented.
+> >
+> > For these reasons, I don't immediately see the point of advertising a
+> > set of registers ahead of time, before userspace grows an
+> > understanding of what these registers mean.
 > 
-> Why not?  It affects the TSC offset in the vmcs, so the TSC in the VM is
-> advanced too.
-> 
-> Paolo
+> Supposing we don't preallocate some hypercall ID registers, how can we
+> safely migrate a guest from an older kernel to newer kernel? Ideally,
+> we would preserve the hypercall feature set across the migration which
+> could work for a while with the first set of registers that get
+> defined, but whenever a new hypercall firmware register comes along
+> then the VMM will be clueless to the new ABI.
 
-+4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
-+   (k_0) and realtime nanoseconds (r_0) in their respective fields.
-+   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
-+   structure. KVM will advance the VM's kvmclock to account for elapsed
-+   time since recording the clock values.
+My expectations were that whenever userspace writes a set of firmware
+register, all the defaults are invalidated. For example say that
+host-A know about a single hypercall register, while host-B knows
+about two. Upon writing to the first register, the host would clear
+the set of available services in the second one. If userspace
+eventually writes there, the value would stick if valid.
 
-You can't advance both kvmclock (kvmclock_offset variable) and the TSCs,
-which would be double counting.
+Also, remember that pseudo-registers don't have to be 64bit. We could
+define a new class of hypercall-specific registers that would be much
+wider, and thus have a larger write granularity (KVM supports anything
+from 8 to 2048 bits). This would make it pretty easy to implement the
+above.
 
-So you have to either add the elapsed realtime (1) between KVM_GET_CLOCK
-to kvmclock (which this patch is doing), or to the TSCs. If you do both, there
-is double counting. Am i missing something?
+> Fundamentally, I don't think userspace should need a patch to preserve
+> ABI on a newer kernel. Despite that, it would seem that userspace will
+> need to learn of any firmware registers that control hypercall
+> features which come after the initial set that gets proposed. If
+> KVM_GET_REG_LIST were to disambiguate between ID registers (hypercall,
+> architectural feature ID registers) from other parts of the vCPU
+> state, it would be clear to what registers to zero on a newer kernel.
+> Apologies if it is distracting to mention the feature ID registers
+> here, but both are on my mind currently and want to make sure there is
+> some consistency in how features get handled on newer kernels,
+> architected or not.
 
-To make it clearer: TSC clocksource is faster than kvmclock source, so
-we'd rather use when possible, which is achievable with TSC scaling 
-support on HW.
+The problem I see is that we will always need to grow the HC register
+space one way or another, no matter how many we reserve. Your approach
+only works if we don't exceed that particular range. Maybe it will
+never be a problem, but it remains that this is not scalable.
 
-1: As mentioned earlier, just using the realtime clock delta between
-hosts can introduce problems. So need a scheme to:
+If we wanted to be safe, we'd reserve the whole of the possible space
+as defined by the SMCCC spec. Given that we currently have two HC
+spaces (the ARM-controlled one, and the KVM-specific one), the
+function space being 16bits in each case, that's 16kB worth of zeroes
+that userspace has to save/restore at all times... I'm not overly
+enthusiastic.
 
-	- Find the offset between host clocks, with upper and lower
-	  bounds on error.
-	- Take appropriate actions based on that (for example,
-	  do not use KVM_CLOCK_REALTIME flag on KVM_SET_CLOCK
-	  if the delta between hosts is large).
+Thanks,
 
-Which can be done in userspace or kernel space... (hum, but maybe
-delegating this to userspace will introduce different solutions
-of the same problem?).
+	M.
 
-> > This (advancing the TSC values by the realtime elapsed time) would be
-> > awesome because TSC clock_gettime() vdso is faster, and some
-> > applications prefer to just read from TSC directly.
-> > See "x86: kvmguest: use TSC clocksource if invariant TSC is exposed".
-> > 
-> > The advancement with this patchset only applies to kvmclock.
-> > 
-> 
-> 
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
