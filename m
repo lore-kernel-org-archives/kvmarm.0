@@ -2,63 +2,83 @@ Return-Path: <SRS0=fGD+=OV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE9EC433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 17:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAA19C433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 19:11:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 218D761AEC
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 17:06:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 218D761AEC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 1CAEC61A56
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 19:11:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1CAEC61A56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3B304B0BD;
-	Fri,  1 Oct 2021 13:06:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C0594B0F7;
+	Fri,  1 Oct 2021 15:11:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PU537bRdIzo7; Fri,  1 Oct 2021 13:06:14 -0400 (EDT)
+	with ESMTP id 4t620NxZThL6; Fri,  1 Oct 2021 15:11:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD3434B090;
-	Fri,  1 Oct 2021 13:06:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CBB44B0B6;
+	Fri,  1 Oct 2021 15:11:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E91A14A4BE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 13:06:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 42A8E4B08E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 15:11:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pDLoVTDLCI2M for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Oct 2021 13:06:12 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BEA794057F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 13:06:12 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id PyaPrboELDTy for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Oct 2021 15:11:28 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C7224A98B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 15:11:28 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1633115488;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=4VseeF8bJPVtH4lSfVIDZ7rsne7LGF8fM7tEHcwb28Q=;
+ b=F5J5oXj9pye/UPtxFuI8BlYGpeIlumO1dTXmB0JyKPCeXOSaRP4dbquxgSicFQR7zQVCZr
+ OceDgQMu8Cc/g6Fgv1QGuWBzDyVvGLJYEL4AwfUn8hvnut9Y4yi6fMt6zoHZrwHrcujEm5
+ BAgzVs9adJnjjEH5pi7Ex2B5Mo/1K3o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-LDLXc03cMbO7GTlskT3zsQ-1; Fri, 01 Oct 2021 15:11:24 -0400
+X-MC-Unique: LDLXc03cMbO7GTlskT3zsQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9DC9561AD1;
- Fri,  1 Oct 2021 17:06:11 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mWLz7-00EF74-O9; Fri, 01 Oct 2021 18:06:09 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2] KVM: arm64: Allow KVM to be disabled from the command line
-Date: Fri,  1 Oct 2021 18:05:53 +0100
-Message-Id: <20211001170553.3062988-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7282F18D6A31;
+ Fri,  1 Oct 2021 19:11:22 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C01E45C1B4;
+ Fri,  1 Oct 2021 19:11:21 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+ id DED68416CE5D; Fri,  1 Oct 2021 16:11:17 -0300 (-03)
+Date: Fri, 1 Oct 2021 16:11:17 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
+Message-ID: <20211001191117.GA69579@fuller.cnet>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-8-oupton@google.com>
+ <20210930191416.GA19068@fuller.cnet>
+ <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
+ <20211001103200.GA39746@fuller.cnet>
+ <7901cb84-052d-92b6-1e6a-028396c2c691@redhat.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com,
- dbrazdil@google.com, will@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Will Deacon <will@kernel.org>, kernel-team@android.com
+Content-Disposition: inline
+In-Reply-To: <7901cb84-052d-92b6-1e6a-028396c2c691@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Peter Shier <pshier@google.com>, Marc Zyngier <maz@kernel.org>,
+ David Matlack <dmatlack@google.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,90 +95,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Although KVM can be compiled out of the kernel, it cannot be disabled
-at runtime. Allow this possibility by introducing a new mode that
-will prevent KVM from initialising.
+On Fri, Oct 01, 2021 at 05:12:20PM +0200, Paolo Bonzini wrote:
+> On 01/10/21 12:32, Marcelo Tosatti wrote:
+> > > +1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0), +
+> > > kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0). + [...]
+> > >  +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock
+> > > nanoseconds +   (k_0) and realtime nanoseconds (r_0) in their
+> > > respective fields. +   Ensure that the KVM_CLOCK_REALTIME flag is
+> > > set in the provided +   structure. KVM will advance the VM's
+> > > kvmclock to account for elapsed +   time since recording the clock
+> > > values.
+> > 
+> > You can't advance both kvmclock (kvmclock_offset variable) and the
+> > TSCs, which would be double counting.
+> > 
+> > So you have to either add the elapsed realtime (1) between
+> > KVM_GET_CLOCK to kvmclock (which this patch is doing), or to the
+> > TSCs. If you do both, there is double counting. Am i missing
+> > something?
+> 
+> Probably one of these two (but it's worth pointing out both of them):
+> 
+> 1) the attribute that's introduced here *replaces*
+> KVM_SET_MSR(MSR_IA32_TSC), so the TSC is not added.
+> 
+> 2) the adjustment formula later in the algorithm does not care about how
+> much time passed between step 1 and step 4.  It just takes two well
+> known (TSC, kvmclock) pairs, and uses them to ensure the guest TSC is
+> the same on the destination as if the guest was still running on the
+> source.  It is irrelevant that one of them is before migration and one
+> is after, all it matters is that one is on the source and one is on the
+> destination.
 
-This is useful in the (limited) circumstances where you don't want
-KVM to be available (what is wrong with you?), or when you want
-to install another hypervisor instead (good luck with that).
+OK, so it still relies on NTPd daemon to fix the CLOCK_REALTIME delay 
+which is introduced during migration (which is what i would guess is
+the lower hanging fruit) (for guests using TSC).
 
-Reviewed-by: David Brazdil <dbrazdil@google.com>
-Acked-by: Will Deacon <will@kernel.org>
-Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
+My point was that, by advancing the _TSC value_ by:
 
-Notes:
-    v2: Dropped the id_aa64mmfr1_vh=0 setting so that KVM can be disabled
-        and yet stay in VHE mode on platforms that require it.
-        I kept the AB/RB's, but please shout if you disagree!
+T0. stop guest vcpus	(source)
+T1. KVM_GET_CLOCK	(source)
+T2. KVM_SET_CLOCK	(destination)
+T3. Write guest TSCs	(destination)
+T4. resume guest	(destination)
 
- Documentation/admin-guide/kernel-parameters.txt |  2 ++
- arch/arm64/include/asm/kvm_host.h               |  1 +
- arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
- 3 files changed, 16 insertions(+), 1 deletion(-)
+new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 91ba391f9b32..f268731a3d4d 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2365,6 +2365,8 @@
- 	kvm-arm.mode=
- 			[KVM,ARM] Select one of KVM/arm64's modes of operation.
- 
-+			none: Forcefully disable KVM.
-+
- 			nvhe: Standard nVHE-based mode, without support for
- 			      protected guests.
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f8be56d5342b..019490c67976 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -58,6 +58,7 @@
- enum kvm_mode {
- 	KVM_MODE_DEFAULT,
- 	KVM_MODE_PROTECTED,
-+	KVM_MODE_NONE,
- };
- enum kvm_mode kvm_get_mode(void);
- 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fe102cd2e518..658171231af9 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -2064,6 +2064,11 @@ int kvm_arch_init(void *opaque)
- 		return -ENODEV;
- 	}
- 
-+	if (kvm_get_mode() == KVM_MODE_NONE) {
-+		kvm_info("KVM disabled from command line\n");
-+		return -ENODEV;
-+	}
-+
- 	in_hyp_mode = is_kernel_in_hyp_mode();
- 
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
-@@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
- 		return 0;
- 	}
- 
--	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
-+	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
-+		kvm_mode = KVM_MODE_DEFAULT;
- 		return 0;
-+	}
-+
-+	if (strcmp(arg, "none") == 0) {
-+		kvm_mode = KVM_MODE_NONE;
-+		return 0;
-+	}
- 
- 	return -EINVAL;
- }
--- 
-2.30.2
+t_0:    host TSC at KVM_GET_CLOCK time.
+off_n:  TSC offset at vcpu-n (as long as no guest TSC writes are performed,
+TSC offset is fixed).
+...
+
++4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
++   (k_0) and realtime nanoseconds (r_0) in their respective fields.
++   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
++   structure. KVM will advance the VM's kvmclock to account for elapsed
++   time since recording the clock values.
+
+Only kvmclock is advanced (by passing r_0). But a guest might not use kvmclock
+(hopefully modern guests on modern hosts will use TSC clocksource,
+whose clock_gettime is faster... some people are using that already).
+
+At some point QEMU should enable invariant TSC flag by default?
+
+That said, the point is: why not advance the _TSC_ values
+(instead of kvmclock nanoseconds), as doing so would reduce 
+the "the CLOCK_REALTIME delay which is introduced during migration"
+for both kvmclock users and modern tsc clocksource users.
+
+So yes, i also like this patchset, but would like it even more
+if it fixed the case above as well (and not sure whether adding
+the migration delta to KVMCLOCK makes it harder to fix TSC case
+later).
+
+> Perhaps we can add to step 6 something like:
+> 
+> > +6. Adjust the guest TSC offsets for every vCPU to account for (1)
+> > time +   elapsed since recording state and (2) difference in TSCs
+> > between the +   source and destination machine: + +   new_off_n = t_0
+> > + off_n + (k_1 - k_0) * freq - t_1 +
+> 
+> "off + t - k * freq" is the guest TSC value corresponding to a time of 0
+> in kvmclock.  The above formula ensures that it is the same on the
+> destination as it was on the source.
+> 
+> Also, the names are a bit hard to follow.  Perhaps
+> 
+> 	t_0		tsc_src
+> 	t_1		tsc_dest
+> 	k_0		guest_src
+> 	k_1		guest_dest
+> 	r_0		host_src
+> 	off_n		ofs_src[i]
+> 	new_off_n	ofs_dest[i]
+> 
+> Paolo
+> 
+> 
 
 _______________________________________________
 kvmarm mailing list
