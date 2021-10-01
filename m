@@ -2,82 +2,78 @@ Return-Path: <SRS0=fGD+=OV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1121DC433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 15:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67170C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 16:10:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6D25A61268
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 15:40:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6D25A61268
+	by mail.kernel.org (Postfix) with ESMTP id CB07D61A0A
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 16:10:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CB07D61A0A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0BBB407E7;
-	Fri,  1 Oct 2021 11:40:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C86F4B090;
+	Fri,  1 Oct 2021 12:10:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9ZnLAuvwoBQN; Fri,  1 Oct 2021 11:40:12 -0400 (EDT)
+	with ESMTP id WLi7eUWmQABC; Fri,  1 Oct 2021 12:10:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACFAD4083E;
-	Fri,  1 Oct 2021 11:40:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDFE14B0A3;
+	Fri,  1 Oct 2021 12:10:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E537406E7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 11:40:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06E224B090
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 12:10:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q6WgkHrNTsac for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Oct 2021 11:40:10 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2399F405EE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 11:40:10 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id z24so40430278lfu.13
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Oct 2021 08:40:10 -0700 (PDT)
+ with ESMTP id GG4vEt0fK9KA for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Oct 2021 12:10:27 -0400 (EDT)
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com
+ [209.85.167.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 993F04B08A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 12:10:27 -0400 (EDT)
+Received: by mail-lf1-f43.google.com with SMTP id i25so40646340lfg.6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Oct 2021 09:10:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iOLU+PCShJG7mENHHZDmXfBtA4qSABTxjGLw2vfUX2M=;
- b=FTPMXgWBWfgF0X587P8+s1ivBN5zQ86AEsMZsPqUhkAqpZfSYc01006geCHMsZrYSS
- /BlxSbkGJ2vpnZ+l+ytY+WRa6dTr09YIVuzOENTgTGtsDXx+3BrNnUV1if8FkhPXh1CX
- Epao7cmUnjwYPTQLUyKy2S7Dfg+J7Fsb6JY7sEuAP6soByMYDsDn4c/n31GS6u+/40/X
- SPmXvA4hFk37oLYnJI/xMnWxUdgKOQYPVH6zASRx+HECat6x0G8GV2JrS4PdBqBwiB1/
- Qralg04VhqUHVAMGM+7ur0MoRrKfP5OB3J6LpSrEgQDkfc/jQrFwocXgzQjTOUj0tGRM
- PAJQ==
+ :cc; bh=AOjdVs0gLzgwiu5uLvm60KP3Mb7LDeQaYun407G8UYQ=;
+ b=QOQt7xquMrri75hr+imb6/l8b9yxLVWyvzdFTCV3kBQpUZFH76Kl0MhtBP9IRq9Kht
+ TfHFJxRAqzYiM//zRd4rKptDVQ0V2Qk5Lq+2+B4RwI4A+AaIiEEJ+9RjQhGHo8ROPpmO
+ cp0Rbql5jMhnzgdFrRwGN1azeecrigwFwNlCVMdK+vkWwwqrhpEq8CfgqQkdGclvE9Z9
+ QkpqZ3jO0oD7WJOYkrgqOrkrP4rpqmDni8U1zb+rWTz7sy5Ic+y9gppw+9dQFVMfrT7z
+ hzLgurXI1N0QRvG1h2+B1qLnU7mD6seEB7cJZwBMW1OPukWuZVh7QbYaqPc1DVSkEClE
+ SWQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=iOLU+PCShJG7mENHHZDmXfBtA4qSABTxjGLw2vfUX2M=;
- b=Ztntwxrxe6zS3Jmw1vZzblvYRt65G70CrqJI225jYbywBX5fHTEGLVlG0ACN8x3OtC
- aB98YrF3MxUixwwaiM3DVIIIXaMQPQQHx2MnAJTTDOCFwIdPR3VxEHEA4MfEBrUngkFq
- QR0YwRYDe6tvBBgJMqaNSkISvs7VzJJ8qJqAOYoxiaojFyoCUVNsy2m3QA0E4u78lFLW
- wNTHyK1PGaGEYKKEf2vnsc0ldKphlitKdc9HFVBS4AhS5kNPA1+IxgT8kNOryWU1SjPv
- QQXJqdRIzqV4SlzP14+GAQh859lH/bYYf4TsTWYSOq7qwcca7cOqWg0zGJnCyXNwawpu
- F5Ow==
-X-Gm-Message-State: AOAM5325XR+QGhkkqgqaaDlwiVjSqc86L/3npWVMC8onWD4KeIRY5RPV
- i4VLLjEmsJrH59iRTUrutgriGNT3tRp/qmGWxVX4Iw==
-X-Google-Smtp-Source: ABdhPJyIyzUImniAS1WPH/aukNvZr9uNqVUOpo4zsi5GOyk1J8bsugXgDuozoLPp9qcCmCzvYTBMvavb9Z+NJVInTA4=
-X-Received: by 2002:a2e:95cc:: with SMTP id y12mr12643770ljh.337.1633102808495; 
- Fri, 01 Oct 2021 08:40:08 -0700 (PDT)
+ bh=AOjdVs0gLzgwiu5uLvm60KP3Mb7LDeQaYun407G8UYQ=;
+ b=zhalGqLGR07oustKwBvzrJXidmaxG+hb48ESSGUMP6FUoX7gnPeWqwI8F4qaXLZMpM
+ 8WYfE5ZKMrnYVI6r2qmuu0WsUlFurwFjOu8BrSj5TTSd3YoKB9L6nIuodBxg2FyGPOI4
+ M/0l++G7Gj9zlNLqtjiIbU7tb4rX1hpH92dJ+z1MhO1JSDwyDw0CpCz34zFjti01ykyk
+ afuK5fp2VN+tWieqJp3Vbavn9q8pUmXlMoVUxyr0ZdnNrDijdlzYhDUx6q7/uS0642OH
+ QWVmaIV+MMMeZb6obHxx3oxDuDraTYEIkajLmGOsaQLgdh8CXsT/6KXodra1MitWjo7c
+ fvPg==
+X-Gm-Message-State: AOAM530kFtuRxbbVhQ4f+O0EUQDl7eTxneeeRKortY8sdjFjflpI4t69
+ 6B6EppnCrHC61qSzVPLGKw2ajRq1bb3z58SE4qnYRw==
+X-Google-Smtp-Source: ABdhPJxmcZrlAnqTaxaqtK7S3tGDT1MORYk1ITq+wYAf6E76frJZ61t721fneGrclV0Yf3qXB9NhlV9UtDXstD5epgI=
+X-Received: by 2002:ac2:4a6e:: with SMTP id q14mr6360221lfp.685.1633104625244; 
+ Fri, 01 Oct 2021 09:10:25 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-5-oupton@google.com>
- <d88dae38-6e03-9d93-95fc-8c064e6fbb98@redhat.com>
- <746cfc82-ee7c-eba2-4443-7faf53baf083@redhat.com>
-In-Reply-To: <746cfc82-ee7c-eba2-4443-7faf53baf083@redhat.com>
+References: <20210923191610.3814698-1-oupton@google.com>
+ <20210923191610.3814698-4-oupton@google.com>
+ <CAAeT=FxXsJdnrQCr4m-LcADr=WX5pKEa2OdeTf3bRGM08iC3Uw@mail.gmail.com>
+In-Reply-To: <CAAeT=FxXsJdnrQCr4m-LcADr=WX5pKEa2OdeTf3bRGM08iC3Uw@mail.gmail.com>
 From: Oliver Upton <oupton@google.com>
-Date: Fri, 1 Oct 2021 08:39:57 -0700
-Message-ID: <CAOQ_QsgmpsjKD7SVzX4ftOUkDtMF+egorOyNwG8wpYqw2h44pw@mail.gmail.com>
-Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
- KVM_GET_CLOCK
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
- Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+Date: Fri, 1 Oct 2021 09:10:14 -0700
+Message-ID: <CAOQ_QshHDWWEw5BEu-uudFttP1pfJcKuQ-0D_xAkoHJRqYLq8Q@mail.gmail.com>
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Encapsulate reset request logic in a
+ helper function
+To: Reiji Watanabe <reijiw@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,26 +90,118 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Oct 1, 2021 at 7:41 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Sep 30, 2021 at 11:05 PM Reiji Watanabe <reijiw@google.com> wrote:
 >
-> On 01/10/21 16:39, Paolo Bonzini wrote:
-> > On 16/09/21 20:15, Oliver Upton wrote:
-> >> +    if (data.flags & ~KVM_CLOCK_REALTIME)
-> >>           return -EINVAL;
+> On Thu, Sep 23, 2021 at 12:16 PM Oliver Upton <oupton@google.com> wrote:
 > >
-> > Let's accept KVM_CLOCK_HOST_TSC here even though it's not used; there
-> > may be programs that expect to send back to KVM_SET_CLOCK whatever they
-> > got from KVM_GET_CLOCK.
+> > In its implementation of the PSCI function, KVM needs to request that a
+> > target vCPU resets before its next entry into the guest. Wrap the logic
+> > for requesting a reset in a function for later use by other implemented
+> > PSCI calls.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> >  arch/arm64/kvm/psci.c | 59 +++++++++++++++++++++++++------------------
+> >  1 file changed, 35 insertions(+), 24 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > index 310b9cb2b32b..bb59b692998b 100644
+> > --- a/arch/arm64/kvm/psci.c
+> > +++ b/arch/arm64/kvm/psci.c
+> > @@ -64,9 +64,40 @@ static inline bool kvm_psci_valid_affinity(unsigned long affinity)
+> >         return !(affinity & ~MPIDR_HWID_BITMASK);
+> >  }
+> >
+> > -static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > +static void kvm_psci_vcpu_request_reset(struct kvm_vcpu *vcpu,
+> > +                                       unsigned long entry_addr,
+> > +                                       unsigned long context_id,
+> > +                                       bool big_endian)
+> >  {
+> >         struct vcpu_reset_state *reset_state;
+> > +
+> > +       lockdep_assert_held(&vcpu->kvm->lock);
+> > +
+> > +       reset_state = &vcpu->arch.reset_state;
+> > +       reset_state->pc = entry_addr;
+> > +
+> > +       /* Propagate caller endianness */
+> > +       reset_state->be = big_endian;
+> > +
+> > +       /*
+> > +        * NOTE: We always update r0 (or x0) because for PSCI v0.1
+> > +        * the general purpose registers are undefined upon CPU_ON.
+> > +        */
+> > +       reset_state->r0 = context_id;
+> > +
+> > +       WRITE_ONCE(reset_state->reset, true);
+> > +       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+> > +
+> > +       /*
+> > +        * Make sure the reset request is observed if the change to
+> > +        * power_state is observed.
+> > +        */
+> > +       smp_wmb();
+> > +       vcpu->arch.power_off = false;
+> > +}
+> > +
+> > +static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > +{
+> >         struct kvm *kvm = source_vcpu->kvm;
+> >         struct kvm_vcpu *vcpu = NULL;
+> >         unsigned long cpu_id;
+> > @@ -90,29 +121,9 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> >                         return PSCI_RET_INVALID_PARAMS;
+> >         }
+> >
+> > -       reset_state = &vcpu->arch.reset_state;
+> > -
+> > -       reset_state->pc = smccc_get_arg2(source_vcpu);
+> > -
+> > -       /* Propagate caller endianness */
+> > -       reset_state->be = kvm_vcpu_is_be(source_vcpu);
+> > -
+> > -       /*
+> > -        * NOTE: We always update r0 (or x0) because for PSCI v0.1
+> > -        * the general purpose registers are undefined upon CPU_ON.
+> > -        */
+> > -       reset_state->r0 = smccc_get_arg3(source_vcpu);
+> > -
+> > -       WRITE_ONCE(reset_state->reset, true);
+> > -       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+> > -
+> > -       /*
+> > -        * Make sure the reset request is observed if the change to
+> > -        * power_state is observed.
+> > -        */
+> > -       smp_wmb();
+> > -
+> > -       vcpu->arch.power_off = false;
+> > +       kvm_psci_vcpu_request_reset(vcpu, smccc_get_arg2(source_vcpu),
+> > +                                   smccc_get_arg3(source_vcpu),
+> > +                                   kvm_vcpu_is_be(source_vcpu));
+> >         kvm_vcpu_wake_up(vcpu);
+> >
+> >         return PSCI_RET_SUCCESS;
+> > --
+> > 2.33.0.685.g46640cef36-goog
 >
-> Nevermind, KVM_SET_CLOCK is already rejecting KVM_CLOCK_TSC_STABLE so no
-> need to do that!
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+>
+> Not directly related to the patch, but the (original) code doesn't
+> do any sanity checking for the entry address although the PSCI spec says:
+>
+> "INVALID_ADDRESS is returned when the entry point address is known
+> by the implementation to be invalid, because it is in a range that
+> is known not to be available to the caller."
 
-Yeah, I don't know the story on the interface but it is really odd
-that userspace needs to blow away flags to successfully write the
-clock structure.
+Right, I had noticed the same but was a tad too lazy to address in
+this series :) Thanks for the review, Reji!
 
 --
-Thanks,
+Best,
 Oliver
 _______________________________________________
 kvmarm mailing list
