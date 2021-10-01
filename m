@@ -2,102 +2,55 @@ Return-Path: <SRS0=fGD+=OV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C75C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 09:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BAD1C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 09:27:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CC18A61A81
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 09:17:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CC18A61A81
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id CFDC7619EC
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 09:27:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CFDC7619EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CF834B0A3;
-	Fri,  1 Oct 2021 05:17:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42CC849DE3;
+	Fri,  1 Oct 2021 05:27:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bott2wJXN2O8; Fri,  1 Oct 2021 05:17:47 -0400 (EDT)
+	with ESMTP id cC0Mmcjcqa2k; Fri,  1 Oct 2021 05:27:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BA714B0B4;
-	Fri,  1 Oct 2021 05:17:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0AB04B0AC;
+	Fri,  1 Oct 2021 05:27:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9B244B0A3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 05:17:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B160249DE3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 05:27:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J0BL0q8trLku for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Oct 2021 05:17:44 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DB6BF49DE7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 05:17:44 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633079864;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DGyCDTmKE3Puz9hbd1Bqa93m33TW7tkrO1GY0BEiFrw=;
- b=G8Jl4WIKybM+gbcJax7zMZCw3ZEU2m9u551hCKS16JVEO7DJOd0IsOiVp9aJMUdjrrHgJT
- MszqJ/XlzOn3w9bdqN+qvjwLLnJ8WNDgr/+1lRE25I4ENeneZAmE1JgDKJv69vRf4NkY0I
- 2HIAmdhQZAawn6qQcfiyhuxGF8DTAI0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-jmgli2xbOwyiX08n5KR03w-1; Fri, 01 Oct 2021 05:17:43 -0400
-X-MC-Unique: jmgli2xbOwyiX08n5KR03w-1
-Received: by mail-wr1-f71.google.com with SMTP id
- j15-20020a5d564f000000b00160698bf7e9so2601067wrw.13
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Oct 2021 02:17:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=DGyCDTmKE3Puz9hbd1Bqa93m33TW7tkrO1GY0BEiFrw=;
- b=RO5xAA99vDqC7GHqyxSkvUWxqHUr8si8d2/GBsKFiN8stPW9ztB6ELFg0tYx1HBX5O
- UnzWW+PbUo+XbXBQZmeLlqfFaWK7wjjgcDbJ0KYNwRe92AXcB7NRobMThi0Rdlw4UjzG
- 2gW1iQm0LnjKFou5Y4TzqOnawTA5DEWd4sMDnIpTtBZqQrjlWHnOhepFqJm5K7+fWUS4
- ZonNSI8R9cHaDoBfDXpef+sHi8kMGYVBkHz6wFWcdnyYppRwRP7wYHjbGd2VYN4UgSYB
- tigNcNNsbF9hjLKu7Ub7DvOPo5Iu/vxI9LUJo7lrDfB/1LJuFEoB7ghMMQdaUwPrpWzg
- glDA==
-X-Gm-Message-State: AOAM5310qVN2C7+F9YTgY9RW2RFzCAJdAqj73MGUoUp8gVR5ENamT5jC
- g74t0mczNs0bohltpBhYbyyOInNKsGMwWV832e43cIYYBYFN4N7Cmpv+9uRVYNCzkoocmxfWjZj
- vZarQBbrzH7t5F/Ce/GsJgTbk
-X-Received: by 2002:a5d:50cf:: with SMTP id f15mr11412196wrt.237.1633079862450; 
- Fri, 01 Oct 2021 02:17:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJykQN7F6N2QxuVMMTUM6KC2ZEoYFdxkECApzvn9zqqq6yIts+XecYdFr57VC3hfX4SQo9I9wA==
-X-Received: by 2002:a5d:50cf:: with SMTP id f15mr11412163wrt.237.1633079862215; 
- Fri, 01 Oct 2021 02:17:42 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045?
- ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
- by smtp.gmail.com with ESMTPSA id n186sm7166424wme.31.2021.10.01.02.17.39
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 01 Oct 2021 02:17:41 -0700 (PDT)
-Message-ID: <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
-Date: Fri, 1 Oct 2021 11:17:33 +0200
+ with ESMTP id YzvyYTrhhRsc for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Oct 2021 05:27:21 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7FE540630
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 05:27:21 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 50D24101E;
+ Fri,  1 Oct 2021 02:27:21 -0700 (PDT)
+Received: from [10.57.72.173] (unknown [10.57.72.173])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DE4CA3F70D;
+ Fri,  1 Oct 2021 02:27:19 -0700 (PDT)
+Subject: Re: [PATCH] KVM: arm64: Allow KVM to be disabled from the command line
+To: Marc Zyngier <maz@kernel.org>
+References: <20210903091652.985836-1-maz@kernel.org>
+ <5bc623f2-e4c1-cc9c-683c-2f95648f1a68@arm.com> <87a6jutkyq.wl-maz@kernel.org>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Message-ID: <e80b2454-45c3-19a3-7a96-dcb484f9e2f5@arm.com>
+Date: Fri, 1 Oct 2021 10:27:18 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.14.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
-To: Marcelo Tosatti <mtosatti@redhat.com>, Oliver Upton <oupton@google.com>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-8-oupton@google.com>
- <20210930191416.GA19068@fuller.cnet>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20210930191416.GA19068@fuller.cnet>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
- Marc Zyngier <maz@kernel.org>, David Matlack <dmatlack@google.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+In-Reply-To: <87a6jutkyq.wl-maz@kernel.org>
+Content-Language: en-GB
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -114,25 +67,123 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 30/09/21 21:14, Marcelo Tosatti wrote:
->> +   new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
-> Hi Oliver,
+On 30/09/2021 11:29, Marc Zyngier wrote:
+> On Wed, 29 Sep 2021 11:35:46 +0100,
+> Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+>>
+>> On 03/09/2021 10:16, Marc Zyngier wrote:
+>>> Although KVM can be compiled out of the kernel, it cannot be disabled
+>>> at runtime. Allow this possibility by introducing a new mode that
+>>> will prevent KVM from initialising.
+>>>
+>>> This is useful in the (limited) circumstances where you don't want
+>>> KVM to be available (what is wrong with you?), or when you want
+>>> to install another hypervisor instead (good luck with that).
+>>>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>    Documentation/admin-guide/kernel-parameters.txt |  3 +++
+>>>    arch/arm64/include/asm/kvm_host.h               |  1 +
+>>>    arch/arm64/kernel/idreg-override.c              |  1 +
+>>>    arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
+>>>    4 files changed, 18 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+>>> index 91ba391f9b32..cc5f68846434 100644
+>>> --- a/Documentation/admin-guide/kernel-parameters.txt
+>>> +++ b/Documentation/admin-guide/kernel-parameters.txt
+>>> @@ -2365,6 +2365,9 @@
+>>>    	kvm-arm.mode=
+>>>    			[KVM,ARM] Select one of KVM/arm64's modes of operation.
+>>>    +			none: Forcefully disable KVM and run in nVHE
+>>> mode,
+>>> +			      preventing KVM from ever initialising.
+>>> +
+>>>    			nvhe: Standard nVHE-based mode, without support for
+>>>    			      protected guests.
+>>>    diff --git a/arch/arm64/include/asm/kvm_host.h
+>>> b/arch/arm64/include/asm/kvm_host.h
+>>> index f8be56d5342b..019490c67976 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -58,6 +58,7 @@
+>>>    enum kvm_mode {
+>>>    	KVM_MODE_DEFAULT,
+>>>    	KVM_MODE_PROTECTED,
+>>> +	KVM_MODE_NONE,
+>>>    };
+>>>    enum kvm_mode kvm_get_mode(void);
+>>>    diff --git a/arch/arm64/kernel/idreg-override.c
+>>> b/arch/arm64/kernel/idreg-override.c
+>>> index d8e606fe3c21..57013c1b6552 100644
+>>> --- a/arch/arm64/kernel/idreg-override.c
+>>> +++ b/arch/arm64/kernel/idreg-override.c
+>>> @@ -95,6 +95,7 @@ static const struct {
+>>>    	char	alias[FTR_ALIAS_NAME_LEN];
+>>>    	char	feature[FTR_ALIAS_OPTION_LEN];
+>>>    } aliases[] __initconst = {
+>>> +	{ "kvm-arm.mode=none",		"id_aa64mmfr1.vh=0" },
+>>>    	{ "kvm-arm.mode=nvhe",		"id_aa64mmfr1.vh=0" },
+>>>    	{ "kvm-arm.mode=protected",	"id_aa64mmfr1.vh=0" },
+>>>    	{ "arm64.nobti",		"id_aa64pfr1.bt=0" },
+>>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>>> index fe102cd2e518..cdc70e238316 100644
+>>> --- a/arch/arm64/kvm/arm.c
+>>> +++ b/arch/arm64/kvm/arm.c
+>>> @@ -2064,6 +2064,11 @@ int kvm_arch_init(void *opaque)
+>>>    		return -ENODEV;
+>>>    	}
+>>>    +	if (kvm_get_mode() == KVM_MODE_NONE) {
+>>> +		kvm_info("KVM disabled from command line\n");
+>>> +		return -ENODEV;
+>>> +	}
+>>> +
+>>>    	in_hyp_mode = is_kernel_in_hyp_mode();
+>>>      	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE)
+>>> ||
+>>> @@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
+>>>    		return 0;
+>>>    	}
+>>>    -	if (strcmp(arg, "nvhe") == 0 &&
+>>> !WARN_ON(is_kernel_in_hyp_mode()))
+>>> +	if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+>>> +		kvm_mode = KVM_MODE_DEFAULT;
+>>>    		return 0;
+>>> +	}
+>>> +
+>>> +	if (strcmp(arg, "none") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+>>
+>> nit: Does this really need to WARN here ? Unlike the "nvhe" case, if the
+>> user wants to keep the KVM out of the picture for, say debugging
+>> something, it is perfectly Ok to allow the kernel to be running at EL2
+>> without having to change the Firmware to alter the landing EL for the
+>> kernel ?
 > 
-> This won't advance the TSC values themselves, right?
+> Well, the doc says "run in nVHE mode" and the option forces
+> id_aa64mmfr1.vh=0. The WARN_ON() will only fires on broken^Wfruity HW
+> that is VHE only. Note that this doesn't rely on any firmware change
+> (we drop from EL2 to EL1 and stay there).
 
-Why not?  It affects the TSC offset in the vmcs, so the TSC in the VM is 
-advanced too.
+Ah, ok. So the "none" is in fact "nvhe + no-kvm". Thats the bit I
+missed. TBH, that name to me sounds like "no KVM" at all, which is what
+we want. The question is, do we really need "none" to force vh == 0 ? I
+understand this is only a problem on a rare set of HWs. But the generic
+option looks deceiving.
 
-Paolo
+That said, I am happy to leave this as is and the doc says so.
 
-> This (advancing the TSC values by the realtime elapsed time) would be
-> awesome because TSC clock_gettime() vdso is faster, and some
-> applications prefer to just read from TSC directly.
-> See "x86: kvmguest: use TSC clocksource if invariant TSC is exposed".
 > 
-> The advancement with this patchset only applies to kvmclock.
-> 
+> We could add another option (none-vhe?) that stays at EL2 and still
+> disables KVM if there is an appetite for it.
 
+Na. Don't think that is necessary.
+
+> 
+>> Otherwise,
+>>
+>> Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+
+Suzuki
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
