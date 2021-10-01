@@ -2,83 +2,75 @@ Return-Path: <SRS0=fGD+=OV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A76C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 19:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92239C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 19:59:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6B43061AF9
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 19:33:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6B43061AF9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 0E7C261AD1
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Oct 2021 19:59:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0E7C261AD1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linutronix.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC9714B103;
-	Fri,  1 Oct 2021 15:33:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 706E64B101;
+	Fri,  1 Oct 2021 15:59:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linutronix.de
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(invalid, unsupported algorithm ed25519-sha256)
+	header.i=@linutronix.de
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aVRiqmwYoDIP; Fri,  1 Oct 2021 15:33:44 -0400 (EDT)
+	with ESMTP id a2uKTgmjBBW9; Fri,  1 Oct 2021 15:59:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96B9D4B108;
-	Fri,  1 Oct 2021 15:33:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E2F84B104;
+	Fri,  1 Oct 2021 15:59:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 611054B103
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 15:33:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C6CB4B0A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 15:59:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gB0b5QtJohmz for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Oct 2021 15:33:42 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E45644A98B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 15:33:41 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id j5so37883961lfg.8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Oct 2021 12:33:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lii4irCWuescdgJ8qHne5ganrtx81N8HthbF9dME2UM=;
- b=h1rHeVjKjeLEj8nGjof49Pd0T2ie4OmSkMTfgALjI5Gcernl+YZjCCuobSOgsdFgc3
- j8dNkCsydm1fsBYbesTaViMtqL2yGxR5evbon0tMz6H1xbxXcZJesqo/m7c3dK+BoyT4
- 4dPGdbvi7CIH4BalIV8bDBVqB9ospaBvuw4hxVJqE/FTt6BvYEZE5tmPvN8/16Vr2OaE
- 4hWnW+uL3Yvb4sE35q72t5/FxZWCUtnrhmxpRoz594iyROR/W9PpDckHb9hmpXDOEC2Y
- L8Kph7DALD0JvkM/lNVQjGjtv8rsgrXkbMDc2Z+bJDgO5SMf+4hGocrKpEDtXGoQSYdz
- Fv0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=lii4irCWuescdgJ8qHne5ganrtx81N8HthbF9dME2UM=;
- b=nVPDeKBWcw8fboHj9+EFBWBSfrG5y4nrdlqeads9YbGSd+g4zabbUxyzYMTm0jPByY
- gRGMOP2I4JugtnWwT+HLUBSN2J1zEM4gwyACBPWXPIPjYJKiJi9gwy5Ce3Mpv211N1N4
- JUxMWMyM9ZW+xT2GLAN9WHUmNa4GN85pn1UlKuKCoTrcxtT+kvVCTtR3BOsuILwnLtbm
- mJjEEM8Xy2Vr+L1RmChVpDUhvJlr6OWbkQtZTvv9aEy4y/WSKmHefYbLtn7R8nZ5r9or
- bzgjGM3eV7EpOrG3dkQ21XNE90kFS1Jw5H0ao0+SKAQp5UwAdGwsffXoEv31m8/PGPyh
- UfGw==
-X-Gm-Message-State: AOAM530Zcd48XN/5y82rkaGeSq312ioBmJhnS8EHdSuQ2IqFGJ+zS7Pj
- eqpzIGADgJwn1OJmh3eXIO2iHsRLfOym7e12aASDaQ==
-X-Google-Smtp-Source: ABdhPJw+Z01osONV6J5L1RS3jy7EKpHAdiP4X9TWYz7i69dZ0Te0HCclKlzbP9IDkAvJszp37qVwwCaOu6pLSTJ9OSQ=
-X-Received: by 2002:a2e:b88c:: with SMTP id r12mr14315182ljp.479.1633116820090; 
- Fri, 01 Oct 2021 12:33:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-8-oupton@google.com>
- <20210930191416.GA19068@fuller.cnet>
- <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
- <20211001103200.GA39746@fuller.cnet>
- <7901cb84-052d-92b6-1e6a-028396c2c691@redhat.com>
- <20211001191117.GA69579@fuller.cnet>
-In-Reply-To: <20211001191117.GA69579@fuller.cnet>
-From: Oliver Upton <oupton@google.com>
-Date: Fri, 1 Oct 2021 12:33:28 -0700
-Message-ID: <CAOQ_Qsj9ObSakmqgFQf598VscQWDh_Cq3WFqF7EpKqe2+RRgVg@mail.gmail.com>
-Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
+ with ESMTP id uhZgQDBk2LB6 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Oct 2021 15:59:28 -0400 (EDT)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AFAD44B086
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Oct 2021 15:59:28 -0400 (EDT)
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+ s=2020; t=1633118367;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=tRAIlcEEJZVysiJv4SYaZZ2qA/sm4dvQ1Zi2vUF4Xzc=;
+ b=2aMhS6jeVE2n90XIKeN47DGDf5FQ1yK32beWgJ9j9/xS7WfqUFNhV9HKvPr6x032udNAuu
+ HC2LiWtsbnoEkN34L3SYoN/rJRIQRjlZXq7a/y/jigGu2elxEhW3hYgEWv39y97sWWPRZp
+ bjLnxsreivRBz/aSsZzBrCkObsp9moaMRS/5ynHrcGwISA0UmwfkdB/W8EDu+X0iQfSvNJ
+ ZFQycPtH1KFH7AE9q/WL2JZ3IxAwRjHeUGCzq6FXChglR9sAcyxyjuCIMerOmJwR1gdnP6
+ Cr1eu+68aC7d9EVk1CACcliHZgDyR5rmoQ82sXXpeetUo0JN4UljO3sye069Wg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+ s=2020e; t=1633118367;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=tRAIlcEEJZVysiJv4SYaZZ2qA/sm4dvQ1Zi2vUF4Xzc=;
+ b=gzevmohru7/BMPKfeBRLN+A4CtQVR9jD0az7kYHWw+iHYyZs+jE+81wgotG6DlFJ0kH/on
+ 8CEAvFWSk3nY5SBg==
 To: Marcelo Tosatti <mtosatti@redhat.com>
+Subject: Re: [PATCH v8 4/7] KVM: x86: Report host tsc and realtime values in
+ KVM_GET_CLOCK
+In-Reply-To: <20211001120527.GA43086@fuller.cnet>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-5-oupton@google.com>
+ <20210929185629.GA10933@fuller.cnet> <20210930192107.GB19068@fuller.cnet>
+ <871r557jls.ffs@tglx> <20211001120527.GA43086@fuller.cnet>
+Date: Fri, 01 Oct 2021 21:59:26 +0200
+Message-ID: <87ilyg4iu9.ffs@tglx>
+MIME-Version: 1.0
 Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -98,138 +90,162 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Marcelo,
 
-On Fri, Oct 1, 2021 at 12:11 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
+On Fri, Oct 01 2021 at 09:05, Marcelo Tosatti wrote:
+> On Fri, Oct 01, 2021 at 01:02:23AM +0200, Thomas Gleixner wrote:
+>> But even if that would be the case, then what prevents the stale time
+>> stamps to be visible? Nothing:
+>> 
+>> T0:    t = now();
+>>          -> pause
+>>          -> resume
+>>          -> magic "fixup"
+>> T1:    dostuff(t);
 >
-> On Fri, Oct 01, 2021 at 05:12:20PM +0200, Paolo Bonzini wrote:
-> > On 01/10/21 12:32, Marcelo Tosatti wrote:
-> > > > +1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0), +
-> > > > kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0). + [...]
-> > > >  +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock
-> > > > nanoseconds +   (k_0) and realtime nanoseconds (r_0) in their
-> > > > respective fields. +   Ensure that the KVM_CLOCK_REALTIME flag is
-> > > > set in the provided +   structure. KVM will advance the VM's
-> > > > kvmclock to account for elapsed +   time since recording the clock
-> > > > values.
-> > >
-> > > You can't advance both kvmclock (kvmclock_offset variable) and the
-> > > TSCs, which would be double counting.
-> > >
-> > > So you have to either add the elapsed realtime (1) between
-> > > KVM_GET_CLOCK to kvmclock (which this patch is doing), or to the
-> > > TSCs. If you do both, there is double counting. Am i missing
-> > > something?
-> >
-> > Probably one of these two (but it's worth pointing out both of them):
-> >
-> > 1) the attribute that's introduced here *replaces*
-> > KVM_SET_MSR(MSR_IA32_TSC), so the TSC is not added.
-> >
-> > 2) the adjustment formula later in the algorithm does not care about how
-> > much time passed between step 1 and step 4.  It just takes two well
-> > known (TSC, kvmclock) pairs, and uses them to ensure the guest TSC is
-> > the same on the destination as if the guest was still running on the
-> > source.  It is irrelevant that one of them is before migration and one
-> > is after, all it matters is that one is on the source and one is on the
-> > destination.
+> Yes.
 >
-> OK, so it still relies on NTPd daemon to fix the CLOCK_REALTIME delay
-> which is introduced during migration (which is what i would guess is
-> the lower hanging fruit) (for guests using TSC).
+> BTW, you could have a userspace notification (then applications 
+> could handle this if desired).
 
-The series gives userspace the ability to modify the guest's
-perception of the TSC in whatever way it sees fit. The algorithm in
-the documentation provides a suggestion to userspace on how to do
-exactly that. I kept that advancement logic out of the kernel because
-IMO it is an implementation detail: users have differing opinions on
-how clocks should behave across a migration and KVM shouldn't have any
-baked-in rules around it.
+Well, we have that via timerfd with TFD_TIMER_CANCEL_ON_SET for
+CLOCK_REALTIME. That's what applications which are sensitive to clock
+REALTIME jumps use today.
 
-At the same time, userspace can choose to _not_ jump the TSC and use
-the available interfaces to just migrate the existing state of the
-TSCs.
+>>   Now the proposed change is creating exactly the same problem:
+>> 
+>>   >> > +	if (data.flags & KVM_CLOCK_REALTIME) {
+>>   >> > +		u64 now_real_ns = ktime_get_real_ns();
+>>   >> > +
+>>   >> > +		/*
+>>   >> > +		 * Avoid stepping the kvmclock backwards.
+>>   >> > +		 */
+>>   >> > +		if (now_real_ns > data.realtime)
+>>   >> > +			data.clock += now_real_ns - data.realtime;
+>>   >> > +	}
+>> 
+>>   IOW, it takes the time between pause and resume into account and
+>>   forwards the underlying base clock which makes CLOCK_MONOTONIC
+>>   jump forward by exactly that amount of time.
+>
+> Well, it is assuming that the
+>
+>  T0:    t = now();
+>  T1:    pause vm()
+>  T2:	finish vm migration()
+>  T3:    dostuff(t);
+>
+> Interval between T1 and T2 is small (and that the guest
+> clocks are synchronized up to a given boundary).
 
-When I had initially proposed this series upstream, Paolo astutely
-pointed out that there was no good way to get a (CLOCK_REALTIME, TSC)
-pairing, which is critical for the TSC advancement algorithm in the
-documentation. Google's best way to get (CLOCK_REALTIME, TSC) exists
-in userspace [1], hence the missing kvm clock changes. So, in all, the
-spirit of the KVM clock changes is to provide missing UAPI around the
-clock/TSC, with the side effect of changing the guest-visible value.
+Yes, I understand that, but it's an assumption and there is no boundary
+for the time jump in the proposed patches, which rings my alarm bells :)
 
-[1] https://cloud.google.com/spanner/docs/true-time-external-consistency
+> But i suppose adding a limit to the forward clock advance 
+> (in the migration case) is useful:
+>
+> 	1) If migration (well actually, only the final steps
+> 	   to finish migration, the time between when guest is paused
+> 	   on source and is resumed on destination) takes too long,
+> 	   then too bad: fix it to be shorter if you want the clocks
+> 	   to have close to zero change to realtime on migration.
+>
+> 	2) Avoid the other bugs in case of large forward advance.
+>
+> Maybe having it configurable, with a say, 1 minute maximum by default
+> is a good choice?
 
-> My point was that, by advancing the _TSC value_ by:
->
-> T0. stop guest vcpus    (source)
-> T1. KVM_GET_CLOCK       (source)
-> T2. KVM_SET_CLOCK       (destination)
-> T3. Write guest TSCs    (destination)
-> T4. resume guest        (destination)
->
-> new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
->
-> t_0:    host TSC at KVM_GET_CLOCK time.
-> off_n:  TSC offset at vcpu-n (as long as no guest TSC writes are performed,
-> TSC offset is fixed).
-> ...
->
-> +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
-> +   (k_0) and realtime nanoseconds (r_0) in their respective fields.
-> +   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
-> +   structure. KVM will advance the VM's kvmclock to account for elapsed
-> +   time since recording the clock values.
->
-> Only kvmclock is advanced (by passing r_0). But a guest might not use kvmclock
-> (hopefully modern guests on modern hosts will use TSC clocksource,
-> whose clock_gettime is faster... some people are using that already).
->
+Don't know what 1 minute does in terms of applications etc. You have to
+do some experiments on that.
 
-Hopefully the above explanation made it clearer how the TSCs are
-supposed to get advanced, and why it isn't done in the kernel.
+> An alternative would be to advance only the guests REALTIME clock, from 
+> data about how long steps T1-T2 took.
 
-> At some point QEMU should enable invariant TSC flag by default?
->
-> That said, the point is: why not advance the _TSC_ values
-> (instead of kvmclock nanoseconds), as doing so would reduce
-> the "the CLOCK_REALTIME delay which is introduced during migration"
-> for both kvmclock users and modern tsc clocksource users.
->
-> So yes, i also like this patchset, but would like it even more
-> if it fixed the case above as well (and not sure whether adding
-> the migration delta to KVMCLOCK makes it harder to fix TSC case
-> later).
->
-> > Perhaps we can add to step 6 something like:
-> >
-> > > +6. Adjust the guest TSC offsets for every vCPU to account for (1)
-> > > time +   elapsed since recording state and (2) difference in TSCs
-> > > between the +   source and destination machine: + +   new_off_n = t_0
-> > > + off_n + (k_1 - k_0) * freq - t_1 +
-> >
-> > "off + t - k * freq" is the guest TSC value corresponding to a time of 0
-> > in kvmclock.  The above formula ensures that it is the same on the
-> > destination as it was on the source.
-> >
-> > Also, the names are a bit hard to follow.  Perhaps
-> >
-> >       t_0             tsc_src
-> >       t_1             tsc_dest
-> >       k_0             guest_src
-> >       k_1             guest_dest
-> >       r_0             host_src
-> >       off_n           ofs_src[i]
-> >       new_off_n       ofs_dest[i]
-> >
-> > Paolo
-> >
+Yes, that's what would happen in the cooperative S2IDLE or S3 case when
+the guest resumes.
 
-Yeah, sounds good to me. Shall I respin the whole series from what you
-have in kvm/queue, or just send you the bits and pieces that ought to
-be applied?
+>> So now virt came along and created a hard to solve circular dependency
+>> problem:
+>> 
+>>    - If CLOCK_MONOTONIC stops for too long then NTP/PTP gets out of
+>>      sync, but everything else is happy.
+>>      
+>>    - If CLOCK_MONOTONIC jumps too far forward, then all hell breaks
+>>      lose, but NTP/PTP is happy.
+>
+> One must handle the
+>
+>  T0:    t = now();
+>           -> pause
+>           -> resume
+>           -> magic "fixup"
+>  T1:    dostuff(t);
+>
+> fact if one is going to use savevm/restorevm anyway, so...
+> (it is kind of unfixable, unless you modify your application
+> to accept notifications to redo any computation based on t, isnt it?).
 
---
+Well yes, but what applications can deal with is CLOCK_REALTIME jumping
+because that's a property of it. Not so much the CLOCK_MONOTONIC part.
+
+>> If you decide that correctness is overrated, then please document it
+>> clearly instead of trying to pretend being correct.
+>
+> Based on the above, advancing only CLOCK_REALTIME (and not CLOCK_MONOTONIC)
+> would be correct, right? And its probably not very hard to do.
+
+Time _is_ hard to get right. 
+
+So you might experiment with something like this as a stop gap:
+
+  Provide the guest something like this:
+
+          u64		   migration_seq;
+          u64      	   realtime_delta_ns;
+
+  in the shared clock page
+
+  Do not forward jump clock MONOTONIC.
+
+  On resume kick an IPI where the guest handler does:
+
+         if (clock_data->migration_seq == migration_seq)
+         	return;
+
+         migration_seq = clock_data->migration_seq;
+
+         ts64 = { 0, 0 };
+         timespec64_add_ns(&ts64, clock_data->realtime_delta_ns);
+         timekeeping_inject_sleeptime64(&ts64);
+
+  Make sure that the IPI completes before you migrate the guest another
+  time or implement it slightly smarter, but you get the idea :)
+
+That's what we use for suspend time injection, but it should just work
+without frozen tasks as well. It will forward clock REALTIME by the
+amount of time spent during migration. It'll also modify the BOOTTIME
+offset by the same amount, but that's not a tragedy.
+
+The function will also reset NTP state so the NTP/PTP daemon knows that
+there was a kernel initiated time jump and it can work out easily what
+to do like it does on resume from an actual suspend. It will also
+invoke clock_was_set() which makes all the other time related updates
+trigger and wakeup tasks which have a timerfd with
+TFD_TIMER_CANCEL_ON_SET armed.
+
+This will obviously not work when the guest is in S2IDLE or S3, but for
+initial experimentation you can ignore that and just avoid to do that in
+the guest. :)
+
+That still is worse than a cooperative S2IDLE/S3, but it's way more
+sensible than the other two evils you have today.
+
+> Thanks very much for the detailed information! Its a good basis
+> for the document you ask.
+
+I volunteer to review that documentation once it materializes :)
+
 Thanks,
-Oliver
+
+        tglx
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
