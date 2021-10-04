@@ -2,93 +2,95 @@ Return-Path: <SRS0=Wuko=OY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9133C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 12:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4A4FC433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 12:23:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 520106136F
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 12:00:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 520106136F
+	by mail.kernel.org (Postfix) with ESMTP id 547536124C
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 12:23:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 547536124C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D504A4B283;
-	Mon,  4 Oct 2021 08:00:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C26014B289;
+	Mon,  4 Oct 2021 08:23:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uj043PyikcgI; Mon,  4 Oct 2021 08:00:28 -0400 (EDT)
+	with ESMTP id vANQswdxAH76; Mon,  4 Oct 2021 08:23:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1B024B279;
-	Mon,  4 Oct 2021 08:00:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3F9D4B279;
+	Mon,  4 Oct 2021 08:23:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D58B4B279
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 08:00:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0275D4B276
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 08:23:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DzE+sLK4D1ez for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 08:00:26 -0400 (EDT)
+ with ESMTP id zq6E3IcvE0ph for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 08:23:45 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11BF84B278
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 08:00:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E913F4B26D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 08:23:45 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633348825;
+ s=mimecast20190719; t=1633350225;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Szh1sZdd2NA++7VzE8dfvZgPCeKZLBpLUKEMevzbR2c=;
- b=OCh2rWS6JEVzBAEPP2cpylcumjxb6M93vOCxnLT5WKf7qVoijo7QPI07rU+3SxJ0+CykDd
- NYge2UQc5KCaQqKrLrZyip2metEE75hZGZhmwWJEMdEAXPJdHxF2pHoTV8Vo6Ks7qfWY6X
- LJaGiTbxHxzDAFYiHSNM1wgOW3+S2Bs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-536-n4OEST2AN0icXsiEF6VUCg-1; Mon, 04 Oct 2021 08:00:24 -0400
-X-MC-Unique: n4OEST2AN0icXsiEF6VUCg-1
-Received: by mail-wr1-f70.google.com with SMTP id
- k2-20020adfc702000000b0016006b2da9bso4567547wrg.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 05:00:24 -0700 (PDT)
+ bh=Wl7ICQODkHW0YfDfZWHTQGFAOQQBlguFC3IFpZqYzao=;
+ b=bZYcqv9ZABKO/NIvZXNHmDf6zcYS/6x3VmDDF6fRnfjuy0XsPDFpNDnTXDUuiBbNdT0VpH
+ u/v7yBDnLWduOBE7DyC69Zts0jYOxCGtD3sLJsoeN5MOOC1cw24zDqYr1YvAj0fn9Y7Q/+
+ PIIWO0lkAtuT7SFxvckz3+1LUve3v1U=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-458-vP__lr2ZPM23p4VEe1UH7w-1; Mon, 04 Oct 2021 08:23:44 -0400
+X-MC-Unique: vP__lr2ZPM23p4VEe1UH7w-1
+Received: by mail-wm1-f72.google.com with SMTP id
+ u3-20020a7bcb03000000b0030d5228cbbdso4129251wmj.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 05:23:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:subject:to:cc:references:from
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-transfer-encoding:content-language;
- bh=Szh1sZdd2NA++7VzE8dfvZgPCeKZLBpLUKEMevzbR2c=;
- b=1VHmV9j+XF/1Q5KCREhGAuyDP9iNIlQS8Hn+Mt5VaUP8qnL2mqFn8KBscX7VduBF1Y
- 7ilXhrOaccjVib5p1wjU7VkGOQ7zg1uVtR2vNR0bzX3nzVNcfflUG4gjMzpZoqcwWkzS
- mX3dzDoipwP29G36CoC+X3fhjt7TlX3lTaZacPSp8jlff8II/exprI9YsOMyaqHLC6Ji
- CDryf49sDbm1Y+5BlpSLEnFUzDDhKWo2uspiTUlf5eDTeFcmv3MSfTxMnhX8+fNi2qCx
- qw+MvzC1bPPSEIvb7VfdTwl1hC1DstfPA+vlHAE+GBqp1CTGrWmJw9rRcJGwA/5I0N+3
- 3HuQ==
-X-Gm-Message-State: AOAM532LjcKaTEx1mE2o8Kc84MuJ6bnsiZG4Nk0FprDn27ybfOo9MnTN
- 06f04StLqOXQx9+Zip03vtP793Q6gqJosNDZ+KOUGpnFDx4JFA1qEUPTjWqIQT5nru+KPFtmFWO
- E/pBBI9A5+dYlpeERJ67uvhfo
-X-Received: by 2002:adf:a45e:: with SMTP id e30mr12058138wra.269.1633348823445; 
- Mon, 04 Oct 2021 05:00:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxHUUsSuliMbaWMUJfOxhomX+YqGVSB+h6Tbvc9XMFwkt9wv5ln2ZOsJjF3r/t46K2PWn19YQ==
-X-Received: by 2002:adf:a45e:: with SMTP id e30mr12058101wra.269.1633348823180; 
- Mon, 04 Oct 2021 05:00:23 -0700 (PDT)
+ bh=Wl7ICQODkHW0YfDfZWHTQGFAOQQBlguFC3IFpZqYzao=;
+ b=ZbyUgTetjg/SK4th2wMM4Kzi+QMF174JkpwR0hXUr2IjDdL1PKX4/4ZW09HGmq0oq9
+ BatpzXaV44o+9Udw5xzkvhQHvmnIS6hWHR0mD0t5E905LP9JPPQxLOSHVhaaok4HUziB
+ dsCRGAUXLVORTHV0Pyp+BTUsi9olrqNdPA6U42VuiXeA8oV0IcqwBpaOA0P5pRTvNPId
+ Jqvpvm5gPNm8GCA9oUp4W3UoE2uuHFkgH9SDOSLX/h7PXe+/tls2RIOu/NKzwFu5qWdj
+ kQEbTKRGfkC0sQXEU/9wrJMON4B/dcEH59AwNimzk3QtXAOX7YxFrEQ6f5IaJJDPnkC6
+ kJaQ==
+X-Gm-Message-State: AOAM531izZSdbyWdg4uONYj+QWbIThh9QUq+nlavSCx7gVblBcF2yr4J
+ hN8vjS3rubqSDNscGX0P4AyJmidBwDssF4M2elisSXZqsd5+UxgGwlzORQxsbhJxb15xgHkxaUD
+ XsE4up7VhFcNwZCkAF6PVTKt3
+X-Received: by 2002:a05:600c:aca:: with SMTP id
+ c10mr18225427wmr.174.1633350223577; 
+ Mon, 04 Oct 2021 05:23:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxitcIwPYb5MpA3gCLqjGct65p9PyV+TzRYqXfXifFRuJt7/5ttvdPSHfIcdPnoBpfMalndPA==
+X-Received: by 2002:a05:600c:aca:: with SMTP id
+ c10mr18225400wmr.174.1633350223347; 
+ Mon, 04 Oct 2021 05:23:43 -0700 (PDT)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
  ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id j27sm16609782wms.6.2021.10.04.05.00.22
+ by smtp.gmail.com with ESMTPSA id f19sm14674493wmf.11.2021.10.04.05.23.42
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 Oct 2021 05:00:22 -0700 (PDT)
-Subject: Re: [PATCH v2 1/5] hw/arm/virt: Key enablement of highmem PCIe on
- highmem_ecam
+ Mon, 04 Oct 2021 05:23:42 -0700 (PDT)
+Subject: Re: [PATCH v2 3/5] hw/arm/virt: Honor highmem setting when computing
+ the memory map
 To: Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
 References: <20211003164605.3116450-1-maz@kernel.org>
- <20211003164605.3116450-2-maz@kernel.org>
+ <20211003164605.3116450-4-maz@kernel.org>
 From: Eric Auger <eric.auger@redhat.com>
-Message-ID: <dbe883ca-880e-7f2b-1de7-4b2d3361545d@redhat.com>
-Date: Mon, 4 Oct 2021 14:00:21 +0200
+Message-ID: <b36a602e-a8f4-c8ac-bd4b-95fd6d426736@redhat.com>
+Date: Mon, 4 Oct 2021 14:23:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20211003164605.3116450-2-maz@kernel.org>
+In-Reply-To: <20211003164605.3116450-4-maz@kernel.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -107,97 +109,52 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 10/3/21 6:46 PM, Marc Zyngier wrote:
-> Currently, the highmem PCIe region is oddly keyed on the highmem
-> attribute instead of highmem_ecam. Move the enablement of this PCIe
-> region over to highmem_ecam.
->
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  hw/arm/virt-acpi-build.c | 10 ++++------
->  hw/arm/virt.c            |  4 ++--
->  2 files changed, 6 insertions(+), 8 deletions(-)
->
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 037cc1fd82..d7bef0e627 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -157,10 +157,9 @@ static void acpi_dsdt_add_virtio(Aml *scope,
->  }
->  
->  static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-> -                              uint32_t irq, bool use_highmem, bool highmem_ecam,
-> -                              VirtMachineState *vms)
-> +                              uint32_t irq, VirtMachineState *vms)
->  {
-> -    int ecam_id = VIRT_ECAM_ID(highmem_ecam);
-> +    int ecam_id = VIRT_ECAM_ID(vms->highmem_ecam);
->      struct GPEXConfig cfg = {
->          .mmio32 = memmap[VIRT_PCIE_MMIO],
->          .pio    = memmap[VIRT_PCIE_PIO],
-> @@ -169,7 +168,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->          .bus    = vms->bus,
->      };
->  
-> -    if (use_highmem) {
-> +    if (vms->highmem_ecam) {
-highmem_ecam is more restrictive than use_highmem:
-vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
-
-If I remember correctly there was a problem using highmem ECAM with 32b
-AAVMF FW.
-
-However 5125f9cd2532 ("hw/arm/virt: Add high MMIO PCI region, 512G in
-size") introduced high MMIO PCI region without this constraint.
-
-So to me we should keep vms->highmem here
-
-Eric
-
->          cfg.mmio64 = memmap[VIRT_HIGH_PCIE_MMIO];
->      }
->  
-> @@ -712,8 +711,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
->      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
->                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
-> -    acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
-> -                      vms->highmem, vms->highmem_ecam, vms);
-> +    acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE), vms);
->      if (vms->acpi_dev) {
->          build_ged_aml(scope, "\\_SB."GED_DEVICE,
->                        HOTPLUG_HANDLER(vms->acpi_dev),
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 7170aaacd5..8021d545c3 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1362,7 +1362,7 @@ static void create_pcie(VirtMachineState *vms)
->                               mmio_reg, base_mmio, size_mmio);
->      memory_region_add_subregion(get_system_memory(), base_mmio, mmio_alias);
->  
-> -    if (vms->highmem) {
-> +    if (vms->highmem_ecam) {
->          /* Map high MMIO space */
->          MemoryRegion *high_mmio_alias = g_new0(MemoryRegion, 1);
->  
-> @@ -1416,7 +1416,7 @@ static void create_pcie(VirtMachineState *vms)
->      qemu_fdt_setprop_sized_cells(ms->fdt, nodename, "reg",
->                                   2, base_ecam, 2, size_ecam);
->  
-> -    if (vms->highmem) {
-> +    if (vms->highmem_ecam) {
->          qemu_fdt_setprop_sized_cells(ms->fdt, nodename, "ranges",
->                                       1, FDT_PCI_RANGE_IOPORT, 2, 0,
->                                       2, base_pio, 2, size_pio,
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKCk9uIDEwLzMvMjEgNjo0NiBQTSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+IEV2ZW4g
+d2hlbiB0aGUgVk0gaXMgY29uZmlndXJlZCB3aXRoIGhpZ2htZW09b2ZmLCB0aGUgaGlnaGVzdF9n
+cGEKPiBmaWVsZCBpbmNsdWRlcyBkZXZpY2VzIHRoYXQgYXJlIGFib3ZlIHRoZSA0R2lCIGxpbWl0
+Lgo+IFNpbWlsYXJpbHksIG5vdGhpbmcgc2VlbSB0byBjaGVjayB0aGF0IHRoZSBtZW1vcnkgaXMg
+d2l0aGluCj4gdGhlIGxpbWl0IHNldCBieSB0aGUgaGlnaG1lbT1vZmYgb3B0aW9uLgo+Cj4gVGhp
+cyBsZWFkcyB0byBmYWlsdXJlcyBpbiB2aXJ0X2t2bV90eXBlKCkgb24gc3lzdGVtcyB0aGF0IGhh
+dmUKPiBhIGNyaXBwbGVkIElQQSByYW5nZSwgYXMgdGhlIHJlcG9ydGVkIElQQSBzcGFjZSBpcyBs
+YXJnZXIgdGhhbgo+IHdoYXQgaXQgc2hvdWxkIGJlLgo+Cj4gSW5zdGVhZCwgaG9ub3IgdGhlIHVz
+ZXItc3BlY2lmaWVkIGxpbWl0IHRvIG9ubHkgdXNlIHRoZSBkZXZpY2VzCj4gYXQgdGhlIGxvd2Vz
+dCBlbmQgb2YgdGhlIHNwZWN0cnVtLCBhbmQgZmFpbCBpZiB3ZSBoYXZlIG1lbW9yeQo+IGNyb3Nz
+aW5nIHRoZSA0R2lCIGxpbWl0Lgo+Cj4gU2lnbmVkLW9mZi1ieTogTWFyYyBaeW5naWVyIDxtYXpA
+a2VybmVsLm9yZz4KPiAtLS0KPiAgaHcvYXJtL3ZpcnQuYyB8IDkgKysrKysrKystCj4gIDEgZmls
+ZSBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPgo+IGRpZmYgLS1naXQg
+YS9ody9hcm0vdmlydC5jIGIvaHcvYXJtL3ZpcnQuYwo+IGluZGV4IGJjZjU4ZjY3N2QuLjlkMmFi
+ZGJkNWYgMTAwNjQ0Cj4gLS0tIGEvaHcvYXJtL3ZpcnQuYwo+ICsrKyBiL2h3L2FybS92aXJ0LmMK
+PiBAQCAtMTYyOCw2ICsxNjI4LDExIEBAIHN0YXRpYyB2b2lkIHZpcnRfc2V0X21lbW1hcChWaXJ0
+TWFjaGluZVN0YXRlICp2bXMpCj4gICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOwo+ICAgICAg
+fQo+ICAKPiArICAgIGlmICghdm1zLT5oaWdobWVtICYmCj4gKyAgICAgICAgdm1zLT5tZW1tYXBb
+VklSVF9NRU1dLmJhc2UgKyBtcy0+bWF4cmFtX3NpemUgPiA0ICogR2lCKSB7Cj4gKyAgICAgICAg
+ZXJyb3JfcmVwb3J0KCJoaWdobWVtPW9mZiwgYnV0IG1lbW9yeSBjcm9zc2VzIHRoZSA0R2lCIGxp
+bWl0XG4iKTsKPiArICAgICAgICBleGl0KEVYSVRfRkFJTFVSRSk7Cj4gKyAgICB9Cj4gICAgICAv
+Kgo+ICAgICAgICogV2UgY29tcHV0ZSB0aGUgYmFzZSBvZiB0aGUgaGlnaCBJTyByZWdpb24gZGVw
+ZW5kaW5nIG9uIHRoZQo+ICAgICAgICogYW1vdW50IG9mIGluaXRpYWwgYW5kIGRldmljZSBtZW1v
+cnkuIFRoZSBkZXZpY2UgbWVtb3J5IHN0YXJ0L3NpemUKPiBAQCAtMTY1Nyw3ICsxNjYyLDkgQEAg
+c3RhdGljIHZvaWQgdmlydF9zZXRfbWVtbWFwKFZpcnRNYWNoaW5lU3RhdGUgKnZtcykKPiAgICAg
+ICAgICB2bXMtPm1lbW1hcFtpXS5zaXplID0gc2l6ZTsKPiAgICAgICAgICBiYXNlICs9IHNpemU7
+Cj4gICAgICB9Cj4gLSAgICB2bXMtPmhpZ2hlc3RfZ3BhID0gYmFzZSAtIDE7Cj4gKyAgICB2bXMt
+PmhpZ2hlc3RfZ3BhID0gKHZtcy0+aGlnaG1lbSA/Cj4gKyAgICAgICAgICAgICAgICAgICAgICAg
+IGJhc2UgOgo+ICsgICAgICAgICAgICAgICAgICAgICAgICB2bXMtPm1lbW1hcFtWSVJUX01FTV0u
+YmFzZSArIG1zLT5tYXhyYW1fc2l6ZSkgLSAxOwpJIHRoaW5rIEkgd291bGQgaGF2ZSBwcmVmZXJy
+ZWQgdG8gaGF2ZQoKaWYgKHZtcy0+aGlnaG1lbSkgewrCoMKgIGZvciAoaSA9IFZJUlRfTE9XTUVN
+TUFQX0xBU1Q7IGkgPCBBUlJBWV9TSVpFKGV4dGVuZGVkX21lbW1hcCk7IGkrKykgewrCoMKgwqDC
+oMKgwqDCoCBod2FkZHIgc2l6ZSA9IGV4dGVuZGVkX21lbW1hcFtpXS5zaXplOwoKwqDCoMKgwqDC
+oMKgwqAgYmFzZSA9IFJPVU5EX1VQKGJhc2UsIHNpemUpOwrCoMKgwqDCoMKgwqDCoCB2bXMtPm1l
+bW1hcFtpXS5iYXNlID0gYmFzZTsKwqDCoMKgwqDCoMKgwqAgdm1zLT5tZW1tYXBbaV0uc2l6ZSA9
+IHNpemU7CsKgwqDCoMKgwqDCoMKgIGJhc2UgKz0gc2l6ZTsKwqDCoMKgIH0KfQphcyBpdCBpcyB1
+c2VsZXNzIHRvIGV4ZWN1dGUgdGhhdCBjb2RlIGFuZCBjcmVhdGUgbmV3IG1lbW1hcCBlbnRyaWVz
+IGluCmNhc2Ugb2YgIWhpZ2htZW0uCgpCdXQgbmV2ZXJ0aGVsZXNzLCB0aGlzIGxvb2tzIGNvcnJl
+Y3QKCkVyaWMKPiAgICAgIGlmIChkZXZpY2VfbWVtb3J5X3NpemUgPiAwKSB7Cj4gICAgICAgICAg
+bXMtPmRldmljZV9tZW1vcnkgPSBnX21hbGxvYzAoc2l6ZW9mKCptcy0+ZGV2aWNlX21lbW9yeSkp
+Owo+ICAgICAgICAgIG1zLT5kZXZpY2VfbWVtb3J5LT5iYXNlID0gZGV2aWNlX21lbW9yeV9iYXNl
+OwoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJt
+IG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
