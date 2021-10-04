@@ -2,94 +2,70 @@ Return-Path: <SRS0=Wuko=OY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69EECC433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 09:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B648C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 09:55:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 02B2F61181
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 09:44:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 02B2F61181
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id BF8F761350
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 09:55:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BF8F761350
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6BA74B201;
-	Mon,  4 Oct 2021 05:44:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A8704B27A;
+	Mon,  4 Oct 2021 05:55:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EfzabRT7ByOD; Mon,  4 Oct 2021 05:44:37 -0400 (EDT)
+	with ESMTP id Wi6-5VOV8Jpu; Mon,  4 Oct 2021 05:55:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B67644B252;
-	Mon,  4 Oct 2021 05:44:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B1074B256;
+	Mon,  4 Oct 2021 05:55:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61A704B201
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 05:44:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0468D4B256
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 05:55:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DV-5ObY54S44 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 05:44:35 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71C2B4B234
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 05:44:35 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633340675;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=SoUkTtOv9XP49TsrzDlI8hEqaw7q+N7J/SxBu7RAHCQ=;
- b=fHBHGlAQcH7HITOeeZSlw+Af8RP5uM/cjf3Wr82ThRUhaX6roe/OO4zVUFT3q4U9gjVfZ8
- uLFSbjKMy801VJu4JI9lwHfk1e5ULduBITt5HHWEprWmDnOoC7zAMWK0ve8aRpd0tEPwWR
- LtaCGYNqH3jl2HlmlYihGg2xAy86dzI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-fOb3_5rHOhmZUpoENWQksw-1; Mon, 04 Oct 2021 05:44:34 -0400
-X-MC-Unique: fOb3_5rHOhmZUpoENWQksw-1
-Received: by mail-wr1-f69.google.com with SMTP id
- r16-20020adfbb10000000b00160958ed8acso2682940wrg.16
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 02:44:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=SoUkTtOv9XP49TsrzDlI8hEqaw7q+N7J/SxBu7RAHCQ=;
- b=1ajqmBS9+sBMXbwExh05xSX4DegGnd9oMMy2Ct6bhEQO5TbVOo/5wMfC30v2ygJa0F
- xIfn108L/yWll68uf2prvKYrKK41d7UesgfAONA4XoCdrIWkU16JVAeOmakovfAgPkfY
- ueNn9p2w56is223GQvv9s1FYiypcLBxaljsu04TQ9WGcoYCm0jZzTKbw07j9bmzbsxPr
- CLxmnBLxZXKM2aSUrEIDmf8GhcVcpc/EHrTjQrGW/b28uTG3xYyu3CTyCBPg/HSy5/AK
- qNTNkGvWODJw98NyxBVSFRYpLgopPsFiDAwNRLRQhy7GYJUcoI4ggqLquQsNVYneMsY4
- 44nA==
-X-Gm-Message-State: AOAM530pEZr7/XgPNKool3jp91nOW0Wy0xdU0MoQ+fame+1abJ3LOaUO
- oCLqKkSYnF3uZWOdkCTsMHe842DkNJeaGVpH59XoHGYTmfTCF7AHx6KxOll3qv7M8+Ca7kpChRa
- vqw5Bye1x8wN0iB0rOeh8Azi6
-X-Received: by 2002:adf:9bc4:: with SMTP id e4mr13142425wrc.257.1633340673325; 
- Mon, 04 Oct 2021 02:44:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2LrCY7HSrjxs2GPwETmmHaFihgfaSnx78iosQ5U6+ikTJPgF0cMge7tL/mMpTCWF7VZGUEw==
-X-Received: by 2002:adf:9bc4:: with SMTP id e4mr13142407wrc.257.1633340673145; 
- Mon, 04 Oct 2021 02:44:33 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
- by smtp.gmail.com with ESMTPSA id n17sm6794152wrw.16.2021.10.04.02.44.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 Oct 2021 02:44:32 -0700 (PDT)
-Date: Mon, 4 Oct 2021 11:44:31 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 3/5] hw/arm/virt: Honor highmem setting when computing
- the memory map
-Message-ID: <20211004094431.2dewqj3hf2vjiil7@gator>
-References: <20211003164605.3116450-1-maz@kernel.org>
- <20211003164605.3116450-4-maz@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20211003164605.3116450-4-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id DRcyPtdjlY6S for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 05:55:16 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B95454B253
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 05:55:16 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id BBA336128A;
+ Mon,  4 Oct 2021 09:55:15 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mXKgj-00EaLM-Na; Mon, 04 Oct 2021 10:55:13 +0100
+Date: Mon, 04 Oct 2021 10:55:13 +0100
+Message-ID: <87bl45ru66.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Fix host stage-2 PGD refcount
+In-Reply-To: <20211004090328.540941-2-qperret@google.com>
+References: <20211004090328.540941-1-qperret@google.com>
+ <20211004090328.540941-2-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, tabba@google.com, dbrazdil@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,58 +82,107 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Oct 03, 2021 at 05:46:03PM +0100, Marc Zyngier wrote:
-> Even when the VM is configured with highmem=off, the highest_gpa
-> field includes devices that are above the 4GiB limit.
-> Similarily, nothing seem to check that the memory is within
-> the limit set by the highmem=off option.
+Hi Quentin,
+
+On Mon, 04 Oct 2021 10:03:13 +0100,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> This leads to failures in virt_kvm_type() on systems that have
-> a crippled IPA range, as the reported IPA space is larger than
-> what it should be.
+> The KVM page-table library refcounts the pages of concatenated stage-2
+> PGDs individually. However, the host's stage-2 PGD is currently managed
+> by EL2 as a single high-order compound page, which can cause the
+> refcount of the tail pages to reach 0 when they really shouldn't, hence
+> corrupting the page-table.
+
+nit: this comment only applies to the protected mode, right? As far as
+I can tell, 'classic' KVM is just fine.
+
 > 
-> Instead, honor the user-specified limit to only use the devices
-> at the lowest end of the spectrum, and fail if we have memory
-> crossing the 4GiB limit.
+> Fix this by introducing a new hyp_split_page() helper in the EL2 page
+> allocator (matching EL1's split_page() function), and make use of it
+
+uber nit: split_page() is not an EL1 function. more of a standard
+kernel function.
+
+> from host_s2_zalloc_page().
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Fixes: 1025c8c0c6ac ("KVM: arm64: Wrap the host with a stage 2")
+> Suggested-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  hw/arm/virt.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/hyp/include/nvhe/gfp.h |  1 +
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c |  6 +++++-
+>  arch/arm64/kvm/hyp/nvhe/page_alloc.c  | 14 ++++++++++++++
+>  3 files changed, 20 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index bcf58f677d..9d2abdbd5f 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1628,6 +1628,11 @@ static void virt_set_memmap(VirtMachineState *vms)
->          exit(EXIT_FAILURE);
->      }
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+> index fb0f523d1492..0a048dc06a7d 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+> @@ -24,6 +24,7 @@ struct hyp_pool {
 >  
-> +    if (!vms->highmem &&
-> +        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
-> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
-> +        exit(EXIT_FAILURE);
-> +    }
->      /*
->       * We compute the base of the high IO region depending on the
->       * amount of initial and device memory. The device memory start/size
-> @@ -1657,7 +1662,9 @@ static void virt_set_memmap(VirtMachineState *vms)
->          vms->memmap[i].size = size;
->          base += size;
->      }
-> -    vms->highest_gpa = base - 1;
-> +    vms->highest_gpa = (vms->highmem ?
-> +                        base :
-> +                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
->      if (device_memory_size > 0) {
->          ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
->          ms->device_memory->base = device_memory_base;
-> -- 
-> 2.30.2
->
+>  /* Allocation */
+>  void *hyp_alloc_pages(struct hyp_pool *pool, unsigned short order);
+> +void hyp_split_page(struct hyp_page *page);
+>  void hyp_get_page(struct hyp_pool *pool, void *addr);
+>  void hyp_put_page(struct hyp_pool *pool, void *addr);
+>  
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index bacd493a4eac..93a79736c283 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -35,7 +35,11 @@ const u8 pkvm_hyp_id = 1;
+>  
+>  static void *host_s2_zalloc_pages_exact(size_t size)
+>  {
+> -	return hyp_alloc_pages(&host_s2_pool, get_order(size));
+> +	void *addr = hyp_alloc_pages(&host_s2_pool, get_order(size));
+> +
+> +	hyp_split_page(hyp_virt_to_page(addr));
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+The only reason this doesn't lead to a subsequent memory leak is that
+concatenated page tables are always a power of two, right?
 
+If so, that deserves a comment, because I don't think this works in
+the general case unless you actively free the pages that are between
+size and (1 << order).
+
+> +
+> +	return addr;
+>  }
+>  
+>  static void *host_s2_zalloc_page(void *pool)
+> diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> index 41fc25bdfb34..a6e874e61a40 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+> @@ -193,6 +193,20 @@ void hyp_get_page(struct hyp_pool *pool, void *addr)
+>  	hyp_spin_unlock(&pool->lock);
+>  }
+>  
+> +void hyp_split_page(struct hyp_page *p)
+> +{
+> +	unsigned short order = p->order;
+> +	unsigned int i;
+> +
+> +	p->order = 0;
+> +	for (i = 1; i < (1 << order); i++) {
+> +		struct hyp_page *tail = p + i;
+> +
+> +		tail->order = 0;
+> +		hyp_set_page_refcounted(tail);
+> +	}
+> +}
+> +
+>  void *hyp_alloc_pages(struct hyp_pool *pool, unsigned short order)
+>  {
+>  	unsigned short i = order;
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
