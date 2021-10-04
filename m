@@ -2,52 +2,53 @@ Return-Path: <SRS0=Wuko=OY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA26C4332F
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 17:57:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1CDC4332F
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 17:57:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C26036126A
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 17:57:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C26036126A
+	by mail.kernel.org (Postfix) with ESMTP id 0B67E61213
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 17:57:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0B67E61213
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 703634B2A7;
-	Mon,  4 Oct 2021 13:57:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B49E44B2B2;
+	Mon,  4 Oct 2021 13:57:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jIYquw95RTNg; Mon,  4 Oct 2021 13:57:11 -0400 (EDT)
+	with ESMTP id 6pnisjenvurP; Mon,  4 Oct 2021 13:57:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D2824B2C2;
-	Mon,  4 Oct 2021 13:57:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BAB54B2AA;
+	Mon,  4 Oct 2021 13:57:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED2AE4B26B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 13:57:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 419C44B2A7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 13:57:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4GLIFD9ZQFMO for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 13:57:09 -0400 (EDT)
+ with ESMTP id mCQHcQTB3pp2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 13:57:11 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BBFE4B299
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 13:57:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85E8B4B268
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 13:57:10 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9125D61216;
- Mon,  4 Oct 2021 17:57:07 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id C6EDE61269;
+ Mon,  4 Oct 2021 17:57:09 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mXS5I-00EhBv-9N; Mon, 04 Oct 2021 18:49:04 +0100
+ id 1mXS5G-00EhBv-MO; Mon, 04 Oct 2021 18:49:02 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 14/16] arm64: Enroll into KVM's MMIO guard if required
-Date: Mon,  4 Oct 2021 18:48:47 +0100
-Message-Id: <20211004174849.2831548-15-maz@kernel.org>
+Subject: [PATCH v2 10/16] KVM: arm64: Add some documentation for the MMIO
+ guard feature
+Date: Mon,  4 Oct 2021 18:48:43 +0100
+Message-Id: <20211004174849.2831548-11-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211004174849.2831548-1-maz@kernel.org>
 References: <20211004174849.2831548-1-maz@kernel.org>
@@ -82,125 +83,104 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Should a guest desire to enroll into the MMIO guard, allow it to
-do so with a command-line option.
+Document the hypercalls user for the MMIO guard infrastructure.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- .../admin-guide/kernel-parameters.txt         |  3 ++
- arch/arm64/Kconfig                            |  1 +
- arch/arm64/include/asm/hypervisor.h           |  1 +
- arch/arm64/kernel/setup.c                     |  6 +++
- arch/arm64/mm/ioremap.c                       | 38 +++++++++++++++++++
- 5 files changed, 49 insertions(+)
+ Documentation/virt/kvm/arm/index.rst      |  1 +
+ Documentation/virt/kvm/arm/mmio-guard.rst | 74 +++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
+ create mode 100644 Documentation/virt/kvm/arm/mmio-guard.rst
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 91ba391f9b32..62bb25b412a7 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2076,6 +2076,9 @@
- 			1 - Bypass the IOMMU for DMA.
- 			unset - Use value of CONFIG_IOMMU_DEFAULT_PASSTHROUGH.
- 
-+	ioremap_guard	[ARM64] enable the KVM MMIO guard functionality
-+			if available.
+diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
+index 78a9b670aafe..e77a0ee2e2d4 100644
+--- a/Documentation/virt/kvm/arm/index.rst
++++ b/Documentation/virt/kvm/arm/index.rst
+@@ -11,3 +11,4 @@ ARM
+    psci
+    pvtime
+    ptp_kvm
++   mmio-guard
+diff --git a/Documentation/virt/kvm/arm/mmio-guard.rst b/Documentation/virt/kvm/arm/mmio-guard.rst
+new file mode 100644
+index 000000000000..8b3c852c5d92
+--- /dev/null
++++ b/Documentation/virt/kvm/arm/mmio-guard.rst
+@@ -0,0 +1,74 @@
++.. SPDX-License-Identifier: GPL-2.0
 +
- 	io7=		[HW] IO7 for Marvel-based Alpha systems
- 			See comment before marvel_specify_io7 in
- 			arch/alpha/kernel/core_marvel.c.
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 5c7ae4c3954b..4982d21d3c47 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -25,6 +25,7 @@ config ARM64
- 	select ARCH_HAS_FORTIFY_SOURCE
- 	select ARCH_HAS_GCOV_PROFILE_ALL
- 	select ARCH_HAS_GIGANTIC_PAGE
-+	select ARCH_HAS_IOREMAP_PHYS_HOOKS
- 	select ARCH_HAS_KCOV
- 	select ARCH_HAS_KEEPINITRD
- 	select ARCH_HAS_MEMBARRIER_SYNC_CORE
-diff --git a/arch/arm64/include/asm/hypervisor.h b/arch/arm64/include/asm/hypervisor.h
-index 8e77f411903f..b130c7b82eaa 100644
---- a/arch/arm64/include/asm/hypervisor.h
-+++ b/arch/arm64/include/asm/hypervisor.h
-@@ -7,5 +7,6 @@
- void kvm_init_hyp_services(void);
- bool kvm_arm_hyp_service_available(u32 func_id);
- void kvm_arm_init_hyp_services(void);
-+void kvm_init_ioremap_services(void);
- 
- #endif
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index be5f85b0a24d..c325647f675f 100644
---- a/arch/arm64/kernel/setup.c
-+++ b/arch/arm64/kernel/setup.c
-@@ -49,6 +49,7 @@
- #include <asm/tlbflush.h>
- #include <asm/traps.h>
- #include <asm/efi.h>
-+#include <asm/hypervisor.h>
- #include <asm/xen/hypervisor.h>
- #include <asm/mmu_context.h>
- 
-@@ -445,3 +446,8 @@ static int __init register_arm64_panic_block(void)
- 	return 0;
- }
- device_initcall(register_arm64_panic_block);
++==============
++KVM MMIO guard
++==============
 +
-+void kvm_arm_init_hyp_services(void)
-+{
-+	kvm_init_ioremap_services();
-+}
-diff --git a/arch/arm64/mm/ioremap.c b/arch/arm64/mm/ioremap.c
-index 5334cbdc9f64..62b715ea31e5 100644
---- a/arch/arm64/mm/ioremap.c
-+++ b/arch/arm64/mm/ioremap.c
-@@ -30,6 +30,44 @@ static DEFINE_STATIC_KEY_FALSE(ioremap_guard_key);
- static DEFINE_XARRAY(ioremap_guard_array);
- static DEFINE_MUTEX(ioremap_guard_lock);
- 
-+static bool ioremap_guard;
-+static int __init ioremap_guard_setup(char *str)
-+{
-+	ioremap_guard = true;
++KVM implements device emulation by handling translation faults to any
++IPA range that is not contained in a memory slot. Such a translation
++fault is in most cases passed on to userspace (or in rare cases to the
++host kernel) with the address, size and possibly data of the access
++for emulation.
 +
-+	return 0;
-+}
-+early_param("ioremap_guard", ioremap_guard_setup);
++Should the guest exit with an address that is not one that corresponds
++to an emulatable device, userspace may take measures that are not the
++most graceful as far as the guest is concerned (such as terminating it
++or delivering a fatal exception).
 +
-+void kvm_init_ioremap_services(void)
-+{
-+	struct arm_smccc_res res;
++There is also an element of trust: by forwarding the request to
++userspace, the kernel assumes that the guest trusts userspace to do
++the right thing.
 +
-+	if (!ioremap_guard)
-+		return;
++The KVM MMIO guard offers a way to mitigate this last point: a guest
++can request that only certain regions of the IPA space are valid as
++MMIO. Only these regions will be handled as an MMIO, and any other
++will result in an exception being delivered to the guest.
 +
-+	/* We need all the functions to be implemented */
-+	if (!kvm_arm_hyp_service_available(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO) ||
-+	    !kvm_arm_hyp_service_available(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL) ||
-+	    !kvm_arm_hyp_service_available(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP) ||
-+	    !kvm_arm_hyp_service_available(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP))
-+		return;
++This relies on a set of hypercalls defined in the KVM-specific range,
++using the HVC64 calling convention.
 +
-+	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID,
-+			     &res);
-+	if (res.a0 != PAGE_SIZE)
-+		return;
++* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO
 +
-+	arm_smccc_1_1_invoke(ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID,
-+			     &res);
-+	if (res.a0 == SMCCC_RET_SUCCESS) {
-+		static_branch_enable(&ioremap_guard_key);
-+		pr_info("Using KVM MMIO guard for ioremap\n");
-+	} else {
-+		pr_warn("KVM MMIO guard registration failed (%ld)\n", res.a0);
-+	}
-+}
++    ==============    ========    ================================
++    Function ID:      (uint32)    0xC6000002
++    Arguments:        none
++    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
++                      (uint64)    Protection Granule (PG) size in
++                                  bytes (r0)
++    ==============    ========    ================================
 +
- void ioremap_phys_range_hook(phys_addr_t phys_addr, size_t size, pgprot_t prot)
- {
- 	if (!static_branch_unlikely(&ioremap_guard_key))
++* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL
++
++    ==============    ========    ==============================
++    Function ID:      (uint32)    0xC6000003
++    Arguments:        none
++    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
++                                  RET_SUCCESS(0) (r0)
++    ==============    ========    ==============================
++
++* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP
++
++    ==============    ========    ====================================
++    Function ID:      (uint32)    0xC6000004
++    Arguments:        (uint64)    The base of the PG-sized IPA range
++                                  that is allowed to be accessed as
++                                  MMIO. Must be aligned to the PG size
++                                  (r1)
++                      (uint64)    Index in the MAIR_EL1 register
++		                  providing the memory attribute that
++				  is used by the guest (r2)
++    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
++                                  RET_SUCCESS(0) (r0)
++    ==============    ========    ====================================
++
++* ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP
++
++    ==============    ========    ======================================
++    Function ID:      (uint32)    0xC6000005
++    Arguments:        (uint64)    PG-sized IPA range aligned to the PG
++                                  size which has been previously mapped.
++                                  Must be aligned to the PG size and
++                                  have been previously mapped (r1)
++    Return Values:    (int64)     NOT_SUPPORTED(-1) on error, or
++                                  RET_SUCCESS(0) (r0)
++    ==============    ========    ======================================
 -- 
 2.30.2
 
