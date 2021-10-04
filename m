@@ -2,70 +2,85 @@ Return-Path: <SRS0=Wuko=OY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D93E9C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 13:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E19C433FE
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 14:30:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 31F2D60F39
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 13:25:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 31F2D60F39
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 106B36137D
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 14:30:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 106B36137D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF5524B2A4;
-	Mon,  4 Oct 2021 09:25:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F0404B259;
+	Mon,  4 Oct 2021 10:30:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YwcI8wqDeomC; Mon,  4 Oct 2021 09:25:21 -0400 (EDT)
+	with ESMTP id b2nkQAGcsW7f; Mon,  4 Oct 2021 10:30:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FEEA4B29C;
-	Mon,  4 Oct 2021 09:25:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42BBF4B261;
+	Mon,  4 Oct 2021 10:30:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B14E4B296
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 09:25:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F99E4B259
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 10:30:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iY86rhFMDP+t for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 09:25:15 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E2AC4B293
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 09:25:15 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id 95fJOUhW2jnB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 10:30:22 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BDA54B251
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 10:30:22 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1633357821;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=4VYFPa55D97zDtyLRl+yLgiIp27xlAa5QykhLUO/Whc=;
+ b=Ibl04MK1dg+rZR6Q4XNWPQZzokXaPh9HIvAFfdmYOhlu+bKYmt9Z531FzkXDY1wwKtFKOq
+ fHCcd7KK/wxOKEKEhQHIMg1eajGia1vEWL68QcYmAump1kaKXVDkD+vfJQfyj8fuQ5onzO
+ WnYsQLBGsaF0GNRz5kPezhunVLPpIvg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-Eg805yp2MUmJKwHZSsIvdg-1; Mon, 04 Oct 2021 10:30:19 -0400
+X-MC-Unique: Eg805yp2MUmJKwHZSsIvdg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7190A61131;
- Mon,  4 Oct 2021 13:25:14 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mXNxw-00EdEV-ET; Mon, 04 Oct 2021 14:25:12 +0100
-Date: Mon, 04 Oct 2021 14:25:12 +0100
-Message-ID: <8735pgsz0n.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 2/5] KVM: arm64: Work around GICv3 locally generated
- SErrors
-In-Reply-To: <6e50193e-95c4-e1fa-8287-1b909a714ebd@arm.com>
-References: <20210924082542.2766170-1-maz@kernel.org>
- <20210924082542.2766170-3-maz@kernel.org>
- <6e50193e-95c4-e1fa-8287-1b909a714ebd@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- suzuki.poulose@arm.com, eric.auger@redhat.com, christoffer.dall@arm.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DDAB1966320;
+ Mon,  4 Oct 2021 14:30:17 +0000 (UTC)
+Received: from fuller.cnet (ovpn-112-2.gru2.redhat.com [10.97.112.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DF29910016FB;
+ Mon,  4 Oct 2021 14:30:16 +0000 (UTC)
+Received: by fuller.cnet (Postfix, from userid 1000)
+ id EDC6B416CE5D; Mon,  4 Oct 2021 11:30:11 -0300 (-03)
+Date: Mon, 4 Oct 2021 11:30:11 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
+Message-ID: <20211004143011.GA72593@fuller.cnet>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-8-oupton@google.com>
+ <20210930191416.GA19068@fuller.cnet>
+ <48151d08-ee29-2b98-b6e1-f3c8a1ff26bc@redhat.com>
+ <20211001103200.GA39746@fuller.cnet>
+ <7901cb84-052d-92b6-1e6a-028396c2c691@redhat.com>
+ <20211001191117.GA69579@fuller.cnet>
+ <CAOQ_Qsj9ObSakmqgFQf598VscQWDh_Cq3WFqF7EpKqe2+RRgVg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <CAOQ_Qsj9ObSakmqgFQf598VscQWDh_Cq3WFqF7EpKqe2+RRgVg@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,88 +97,147 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On Mon, 04 Oct 2021 12:23:41 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Fri, Oct 01, 2021 at 12:33:28PM -0700, Oliver Upton wrote:
+> Marcelo,
 > 
-> Hi Marc,
-> 
-> On 9/24/21 09:25, Marc Zyngier wrote:
-> > The infamous M1 has a feature nobody else ever implemented,
-> > in the form of the "GIC locally generated SError interrupts",
-> > also known as SEIS for short.
+> On Fri, Oct 1, 2021 at 12:11 PM Marcelo Tosatti <mtosatti@redhat.com> wrote:
 > >
-> > These SErrors are generated when a guest does something that violates
-> > the GIC state machine. It would have been simpler to just *ignore*
-> > the damned thing, but that's not what this HW does. Oh well.
+> > On Fri, Oct 01, 2021 at 05:12:20PM +0200, Paolo Bonzini wrote:
+> > > On 01/10/21 12:32, Marcelo Tosatti wrote:
+> > > > > +1. Invoke the KVM_GET_CLOCK ioctl to record the host TSC (t_0), +
+> > > > > kvmclock nanoseconds (k_0), and realtime nanoseconds (r_0). + [...]
+> > > > >  +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock
+> > > > > nanoseconds +   (k_0) and realtime nanoseconds (r_0) in their
+> > > > > respective fields. +   Ensure that the KVM_CLOCK_REALTIME flag is
+> > > > > set in the provided +   structure. KVM will advance the VM's
+> > > > > kvmclock to account for elapsed +   time since recording the clock
+> > > > > values.
+> > > >
+> > > > You can't advance both kvmclock (kvmclock_offset variable) and the
+> > > > TSCs, which would be double counting.
+> > > >
+> > > > So you have to either add the elapsed realtime (1) between
+> > > > KVM_GET_CLOCK to kvmclock (which this patch is doing), or to the
+> > > > TSCs. If you do both, there is double counting. Am i missing
+> > > > something?
+> > >
+> > > Probably one of these two (but it's worth pointing out both of them):
+> > >
+> > > 1) the attribute that's introduced here *replaces*
+> > > KVM_SET_MSR(MSR_IA32_TSC), so the TSC is not added.
+> > >
+> > > 2) the adjustment formula later in the algorithm does not care about how
+> > > much time passed between step 1 and step 4.  It just takes two well
+> > > known (TSC, kvmclock) pairs, and uses them to ensure the guest TSC is
+> > > the same on the destination as if the guest was still running on the
+> > > source.  It is irrelevant that one of them is before migration and one
+> > > is after, all it matters is that one is on the source and one is on the
+> > > destination.
 > >
-> > This part of of the architecture is also amazingly under-specified.
-> > There is a whole 10 lines that describe the feature in a spec that
-> > is 930 pages long, and some of these lines are factually wrong.
-> > Oh, and it is deprecated, so the insentive to clarify it is low.
+> > OK, so it still relies on NTPd daemon to fix the CLOCK_REALTIME delay
+> > which is introduced during migration (which is what i would guess is
+> > the lower hanging fruit) (for guests using TSC).
+> 
+> The series gives userspace the ability to modify the guest's
+> perception of the TSC in whatever way it sees fit. The algorithm in
+> the documentation provides a suggestion to userspace on how to do
+> exactly that. I kept that advancement logic out of the kernel because
+> IMO it is an implementation detail: users have differing opinions on
+> how clocks should behave across a migration and KVM shouldn't have any
+> baked-in rules around it.
+
+Ok, was just trying to visualize how this would work with QEMU Linux guests.
+
+> 
+> At the same time, userspace can choose to _not_ jump the TSC and use
+> the available interfaces to just migrate the existing state of the
+> TSCs.
+> 
+> When I had initially proposed this series upstream, Paolo astutely
+> pointed out that there was no good way to get a (CLOCK_REALTIME, TSC)
+> pairing, which is critical for the TSC advancement algorithm in the
+> documentation. Google's best way to get (CLOCK_REALTIME, TSC) exists
+> in userspace [1], hence the missing kvm clock changes. So, in all, the
+> spirit of the KVM clock changes is to provide missing UAPI around the
+> clock/TSC, with the side effect of changing the guest-visible value.
+> 
+> [1] https://cloud.google.com/spanner/docs/true-time-external-consistency
+> 
+> > My point was that, by advancing the _TSC value_ by:
 > >
-> > Now, the spec says that this should be a *virtual* SError when
-> > HCR_EL2.AMO is set. As it turns out, that's not always the case
-> > on this CPU, and the SError sometimes fires on the host as a
-> > physical SError. Goodbye, cruel world. This clearly is a HW bug,
-> > and it means that a guest can easily take the host down, on demand.
+> > T0. stop guest vcpus    (source)
+> > T1. KVM_GET_CLOCK       (source)
+> > T2. KVM_SET_CLOCK       (destination)
+> > T3. Write guest TSCs    (destination)
+> > T4. resume guest        (destination)
 > >
-> > Thankfully, we have seen systems that were just as broken in the
-> > past, and we have the perfect vaccine for it.
+> > new_off_n = t_0 + off_n + (k_1 - k_0) * freq - t_1
 > >
-> > Apple M1, please meet the Cavium ThunderX workaround. All your
-> > GIC accesses will be trapped, sanitised, and emulated. Only the
-> > signalling aspect of the HW will be used. It won't be super speedy,
-> > but it will at least be safe. You're most welcome.
+> > t_0:    host TSC at KVM_GET_CLOCK time.
+> > off_n:  TSC offset at vcpu-n (as long as no guest TSC writes are performed,
+> > TSC offset is fixed).
+> > ...
 > >
-> > Given that this has only ever been seen on this single implementation,
-> > that the spec is unclear at best and that we cannot trust it to ever
-> > be implemented correctly, gate the workaround solely on ICH_VTR_EL2.SEIS
-> > being set.
+> > +4. Invoke the KVM_SET_CLOCK ioctl, providing the kvmclock nanoseconds
+> > +   (k_0) and realtime nanoseconds (r_0) in their respective fields.
+> > +   Ensure that the KVM_CLOCK_REALTIME flag is set in the provided
+> > +   structure. KVM will advance the VM's kvmclock to account for elapsed
+> > +   time since recording the clock values.
+> >
+> > Only kvmclock is advanced (by passing r_0). But a guest might not use kvmclock
+> > (hopefully modern guests on modern hosts will use TSC clocksource,
+> > whose clock_gettime is faster... some people are using that already).
+> >
 > 
-> I grepped for system error in Arm IHI 0069F, and turns out there's a number of
-> ways to make the GIC generate one:
+> Hopefully the above explanation made it clearer how the TSCs are
+> supposed to get advanced, and why it isn't done in the kernel.
 > 
-> - When programming the ITS
+> > At some point QEMU should enable invariant TSC flag by default?
+> >
+> > That said, the point is: why not advance the _TSC_ values
+> > (instead of kvmclock nanoseconds), as doing so would reduce
+> > the "the CLOCK_REALTIME delay which is introduced during migration"
+> > for both kvmclock users and modern tsc clocksource users.
+> >
+> > So yes, i also like this patchset, but would like it even more
+> > if it fixed the case above as well (and not sure whether adding
+> > the migration delta to KVMCLOCK makes it harder to fix TSC case
+> > later).
+> >
+> > > Perhaps we can add to step 6 something like:
+> > >
+> > > > +6. Adjust the guest TSC offsets for every vCPU to account for (1)
+> > > > time +   elapsed since recording state and (2) difference in TSCs
+> > > > between the +   source and destination machine: + +   new_off_n = t_0
+> > > > + off_n + (k_1 - k_0) * freq - t_1 +
+> > >
+> > > "off + t - k * freq" is the guest TSC value corresponding to a time of 0
+> > > in kvmclock.  The above formula ensures that it is the same on the
+> > > destination as it was on the source.
+> > >
+> > > Also, the names are a bit hard to follow.  Perhaps
+> > >
+> > >       t_0             tsc_src
+> > >       t_1             tsc_dest
+> > >       k_0             guest_src
+> > >       k_1             guest_dest
+> > >       r_0             host_src
+> > >       off_n           ofs_src[i]
+> > >       new_off_n       ofs_dest[i]
+> > >
+> > > Paolo
+> > >
 > 
-> - On a write to ICC_DIR_EL1 (or the corresponding virtual CPU interface register)
-> with split priority drop/interrupt deactivation is not enabled.
+> Yeah, sounds good to me. Shall I respin the whole series from what you
+> have in kvm/queue, or just send you the bits and pieces that ought to
+> be applied?
 > 
-> - On a write to GICV_AEOIR or GICC_DIR.
+> --
+> Thanks,
+> Oliver
 > 
-> ITS and the legacy GICv2 interface is memory mapped, so I am going
-> to trust that KVM emulates that correctly and avoids putting the GIC
-> into a state that triggers the SErrors.
-
-And to be clear, if the host kernel was doing the wrong thing, it
-would take a *physical* SError. And on the M1, it really doesn't
-matter as there is no physical GIC.
-
-> The CPU interface registers are accessed directly by the guest, then
-> changing that to trap-and-emulate looks like the only way to avoid
-> the guest from crashing the host with an SError.
 > 
-> As for making the trap-and-emulate depend on the ICH_VTR_EL2.SEIS
-> being set, that sounds reasonable to me, considering that there were
-> no reports so far of this being implemented. And if it turns out
-> that there are device which implement GIC generated SErrors
-> *correctly* and the trap-and-emulate cost is too much, then we can
-> always get an errata number from Apple and have the trapping depend
-> on that, right?
 
-I have very little hope that we can get Apple to give us anything
-here. The CPU doesn't even advertise that it has a vGIC, so we're in
-uncharted territories. But we could definitely key that on the MIDR.
-
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks!
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
