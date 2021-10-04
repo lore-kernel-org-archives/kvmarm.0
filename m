@@ -2,56 +2,53 @@ Return-Path: <SRS0=Wuko=OY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F776C433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 17:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C38C433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 17:49:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 19E9261206
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 17:49:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 19E9261206
+	by mail.kernel.org (Postfix) with ESMTP id 30674611F0
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 17:49:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 30674611F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C457C4B2E3;
-	Mon,  4 Oct 2021 13:49:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9DE14B2B4;
+	Mon,  4 Oct 2021 13:49:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q8L+b6FqnvmH; Mon,  4 Oct 2021 13:49:08 -0400 (EDT)
+	with ESMTP id 9bym5WHCyKv9; Mon,  4 Oct 2021 13:49:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F4FC4B2CF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 272C94B2D6;
 	Mon,  4 Oct 2021 13:49:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44F464B2AA
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67ABD4B2A1
  for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 13:49:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DxfkpgNfA6CL for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 13:49:03 -0400 (EDT)
+ with ESMTP id Zb8qU0EcvoZL for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 13:49:02 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3AA014B29B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 13:49:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DBCD64B262
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 13:49:01 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7B85461244;
- Mon,  4 Oct 2021 17:49:02 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id D3F2F61154;
+ Mon,  4 Oct 2021 17:49:00 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mXS5E-00EhBv-SD; Mon, 04 Oct 2021 18:49:00 +0100
+ id 1mXS5C-00EhBv-PZ; Mon, 04 Oct 2021 18:48:59 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 05/16] KVM: arm64: Plumb MMIO checking into the fault
- handling
-Date: Mon,  4 Oct 2021 18:48:38 +0100
-Message-Id: <20211004174849.2831548-6-maz@kernel.org>
+Subject: [PATCH v2 00/16]  KVM: arm64: MMIO guard PV services
+Date: Mon,  4 Oct 2021 18:48:33 +0100
+Message-Id: <20211004174849.2831548-1-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211004174849.2831548-1-maz@kernel.org>
-References: <20211004174849.2831548-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
@@ -83,57 +80,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Plumb the MMIO checking code into the MMIO fault handling code.
-Nothing allows a region to be registered yet, so there should be
-no funtional change either.
+This is the second version of this series initially posted at [1] that
+aims at letting a guest express what it considers as MMIO, and only
+let this through to userspace. Together with the guest memory made
+(mostly) inaccessible to the host kernel and userspace, this allows an
+implementation of a hardened IO subsystem.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/mmio.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+A lot has been fixed/revamped/improved since the initial posting,
+although I am still not pleased with the ioremap plugging on the guest
+side. I'll take any idea to get rid of it!
 
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index 3dd38a151d2a..dfa375823264 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -6,6 +6,7 @@
- 
- #include <linux/kvm_host.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_mmu.h>
- #include <trace/events/kvm.h>
- 
- #include "trace.h"
-@@ -135,6 +136,13 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	 * volunteered to do so, and bail out otherwise.
- 	 */
- 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
-+		/* With MMIO guard enabled, the guest should know better */
-+		if (test_bit(KVM_ARCH_FLAG_MMIO_GUARD,
-+			     &vcpu->kvm->arch.flags)) {
-+			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-+			return 1;
-+		}
-+
- 		if (test_bit(KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER,
- 			     &vcpu->kvm->arch.flags)) {
- 			run->exit_reason = KVM_EXIT_ARM_NISV;
-@@ -156,6 +164,15 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	len = kvm_vcpu_dabt_get_as(vcpu);
- 	rt = kvm_vcpu_dabt_get_rd(vcpu);
- 
-+	/* Check failed? Return to the guest for debriefing... */
-+	if (!kvm_check_ioguard_page(vcpu, fault_ipa))
-+		return 1;
-+
-+	/* If we cross a page boundary, check that too... */
-+	if (((fault_ipa + len - 1) & PAGE_MASK) != (fault_ipa & PAGE_MASK) &&
-+	    !kvm_check_ioguard_page(vcpu, fault_ipa + len - 1))
-+		return 1;
-+
- 	if (is_write) {
- 		data = vcpu_data_guest_to_host(vcpu, vcpu_get_reg(vcpu, rt),
- 					       len);
+The series is based on 5.15-rc3.
+
+[1] https://lore.kernel.org/kvmarm/20210715163159.1480168-1-maz@kernel.org
+
+Marc Zyngier (16):
+  KVM: arm64: Generalise VM features into a set of flags
+  KVM: arm64: Check for PTE valitity when checking for
+    executable/cacheable
+  KVM: arm64: Turn kvm_pgtable_stage2_set_owner into
+    kvm_pgtable_stage2_annotate
+  KVM: arm64: Add MMIO checking infrastructure
+  KVM: arm64: Plumb MMIO checking into the fault handling
+  KVM: arm64: Force a full unmap on vpcu reinit
+  KVM: arm64: Wire MMIO guard hypercalls
+  KVM: arm64: Add tracepoint for failed MMIO guard check
+  KVM: arm64: Advertise a capability for MMIO guard
+  KVM: arm64: Add some documentation for the MMIO guard feature
+  firmware/smccc: Call arch-specific hook on discovering KVM services
+  mm/vmalloc: Add arch-specific callbacks to track io{remap,unmap}
+    physical pages
+  arm64: Implement ioremap/iounmap hooks calling into KVM's MMIO guard
+  arm64: Enroll into KVM's MMIO guard if required
+  arm64: Add a helper to retrieve the PTE of a fixmap
+  arm64: Register earlycon fixmap with the MMIO guard
+
+ .../admin-guide/kernel-parameters.txt         |   3 +
+ Documentation/virt/kvm/arm/index.rst          |   1 +
+ Documentation/virt/kvm/arm/mmio-guard.rst     |  74 ++++++++
+ arch/arm/include/asm/hypervisor.h             |   1 +
+ arch/arm64/Kconfig                            |   1 +
+ arch/arm64/include/asm/fixmap.h               |   2 +
+ arch/arm64/include/asm/hypervisor.h           |   2 +
+ arch/arm64/include/asm/kvm_host.h             |  14 +-
+ arch/arm64/include/asm/kvm_mmu.h              |   5 +
+ arch/arm64/include/asm/kvm_pgtable.h          |  12 +-
+ arch/arm64/kernel/setup.c                     |   6 +
+ arch/arm64/kvm/arm.c                          |  30 ++--
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  11 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  10 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |  29 ++--
+ arch/arm64/kvm/hypercalls.c                   |  38 ++++
+ arch/arm64/kvm/mmio.c                         |  20 ++-
+ arch/arm64/kvm/mmu.c                          | 111 ++++++++++++
+ arch/arm64/kvm/psci.c                         |   8 +
+ arch/arm64/kvm/trace_arm.h                    |  17 ++
+ arch/arm64/mm/ioremap.c                       | 162 ++++++++++++++++++
+ arch/arm64/mm/mmu.c                           |  15 ++
+ drivers/firmware/smccc/kvm_guest.c            |   4 +
+ include/linux/arm-smccc.h                     |  28 +++
+ include/linux/io.h                            |   2 +
+ include/uapi/linux/kvm.h                      |   1 +
+ mm/Kconfig                                    |   5 +
+ mm/vmalloc.c                                  |  12 +-
+ 29 files changed, 575 insertions(+), 51 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/mmio-guard.rst
+
 -- 
 2.30.2
 
