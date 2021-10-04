@@ -2,84 +2,62 @@ Return-Path: <SRS0=Wuko=OY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F91DC433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 09:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B06C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 09:39:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D09D96139F
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 09:04:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D09D96139F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 5E59361248
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 09:39:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5E59361248
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 852704B26D;
-	Mon,  4 Oct 2021 05:04:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1FE14B27B;
+	Mon,  4 Oct 2021 05:39:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id r4Nrg-boUMjA; Mon,  4 Oct 2021 05:04:15 -0400 (EDT)
+	with ESMTP id 3nSwqEsGARbx; Mon,  4 Oct 2021 05:39:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9850B4B236;
-	Mon,  4 Oct 2021 05:04:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B52494B1F2;
+	Mon,  4 Oct 2021 05:39:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E8FB4B236
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 05:04:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C05A64B1ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 05:39:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fPLZOwgu79nP for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 05:04:13 -0400 (EDT)
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
- [209.85.222.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B46A4B211
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 05:04:13 -0400 (EDT)
-Received: by mail-qk1-f201.google.com with SMTP id
- m1-20020a05620a290100b0045e5e0b11e6so23226837qkp.23
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 02:04:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=wkyuiZINwNBLMyCf2gjjqTHN+Go0IESaSFToIb6F4Fw=;
- b=TMjOfQHcr/Buzl+oIVWhFVyiArxE1cZ3vpKMWyLANeP2U9TxY8SYN5pke9uBTQYz+U
- RIB1ZRrnPZHnfENtF9YmVzL5b2dsm+8nezApYrkcELyYsTgIxCXqXNO1hgtl+kxWOHqt
- YYimqCXssd0CsMUdzG3aiDaPHuW0jO1FRRSQN9CmPVoQKROHZ0soqL+iSp+ePqyxkxJ4
- aBBfUHuRZy/2zMpYKVQ68s/iuanxLmWb85P3CroP0EVlbrCmCoq91Okjk9cJ5jEAWbgt
- MbAZGlaksbCy17axlm5ayqNk85VH9Kb4lIdjYPdiad/U6IoxI4yhM1WcNa0iTDKHwSHP
- B1ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=wkyuiZINwNBLMyCf2gjjqTHN+Go0IESaSFToIb6F4Fw=;
- b=20vHxaXB7zi3UYYoY8RrqN7rUhl8SGfxZgyOm0g+vMnqNHMMwtUdwg3SE1dvA/KhHT
- JwX7Ov3HwU6pJdejRThqULLZ30A3eJLK8Bouw/KbIC9YUW+yiBflCheKHf3lFMPaB+U0
- /dPgwcpQvirUeVI57k1yncYcX97ZWiDTw5nI3qQEdNZu6dxy5Nka0BYL2ZW9VMgw8+97
- cmMqsuUkR0ouF4u6NeJEbZcqKv2lsU2Dcae3N15YXKrnq5Xz5vx/rlvAEImzAgKj+t4w
- Mn2gK/l+kvrpwM1VsPRErh4cXdnybAvDQWkVMHnXAfisbdK6+KO4rBZcZbTs35FgBa24
- orjQ==
-X-Gm-Message-State: AOAM530RRDlkyrG54oeuLHXmHkwgghMmF3yh9BwcwGGUcsX1wshn3ACU
- LJUkB6k7yzrTE+eBWMiZ/wdWGAe2wTL2
-X-Google-Smtp-Source: ABdhPJz17Z7ue1W7hq3hrv29ed/PiZ+fLhUfwKMW5antWu0eaJWy3bZ4lxRPpDIEYNfIk8cbjwcuEEkEbV4g
-X-Received: from luke.lon.corp.google.com
- ([2a00:79e0:d:210:669b:5b16:60b7:a3d4])
- (user=qperret job=sendgmr) by 2002:a0c:85e6:: with SMTP id
- o93mr21326866qva.16.1633338253264; Mon, 04 Oct 2021 02:04:13 -0700 (PDT)
-Date: Mon,  4 Oct 2021 10:03:14 +0100
-In-Reply-To: <20211004090328.540941-1-qperret@google.com>
-Message-Id: <20211004090328.540941-3-qperret@google.com>
-Mime-Version: 1.0
+ with ESMTP id C5IM+3pD5RnF for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 05:39:32 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A608F4B1E3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 05:39:32 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 875C861248;
+ Mon,  4 Oct 2021 09:39:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1633340371;
+ bh=ACHTWCiGRKZUussKStZLPz6zNs0ZnZlfOvpnSP7UEz0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ZBuKwEx/5jekVA5HNDujvF+MpORB7ZNTwtrv6fNgQzbzm0pXDORAXXfledrfHQJXe
+ aPqWYxuc8z5oDR704QfsCoTS5lM+q5fzkTWG6kttorq7k8R7DkNIn37H9Nf6dMSZL5
+ jRou0a+c2SJ1h9Akgs0/TsNLeVdEpXqNWFjMFxdHEJCLHJ35GIMZa4TtT/jjMoRNxF
+ Tx8auSM4QwLCyAm74JEnxYZ0+Pmrd//qa/aIyRTA4dz+3zQ5VVyv2Um5JW9bpOPOR/
+ AgJumuMbuok5f6GqmITJykhmX9NTDCamwN/vsKHxQUAq6/f7LmlZ1KqE9tUwLXRlrc
+ kjLjglefYoaog==
+Date: Mon, 4 Oct 2021 10:39:26 +0100
+From: Will Deacon <will@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 0/2] A couple of EL2 refcounts fixes
+Message-ID: <20211004093925.GA27173@willie-the-truck>
 References: <20211004090328.540941-1-qperret@google.com>
-X-Mailer: git-send-email 2.33.0.800.g4c38ced690-goog
-Subject: [PATCH 2/2] KVM: arm64: Report corrupted refcount at EL2
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
- Quentin Perret <qperret@google.com>, Fuad Tabba <tabba@google.com>, 
- David Brazdil <dbrazdil@google.com>, linux-arm-kernel@lists.infradead.org, 
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
-Cc: kernel-team@android.com
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20211004090328.540941-1-qperret@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,32 +74,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Some of the refcount manipulation helpers used at EL2 are instrumented
-to catch a corrupt state, but not all of them are treated equally. Let's
-make things more consistent by instrumenting hyp_page_ref_dec_and_test()
-as well.
+On Mon, Oct 04, 2021 at 10:03:12AM +0100, Quentin Perret wrote:
+> This addresses a couple of issues Will has found with the refcounting of
+> page-tables at EL2. Patch 01 fixes a nasty bug, and probably wants to go
+> in -stable. Patch 02 fixes a small inconsistency which made it harder to
+> find refcount-related bugs at EL2.
+> 
+> Feedback welcome !
 
-Suggested-by: Will Deacon <will@kernel.org>
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/kvm/hyp/nvhe/page_alloc.c | 1 +
- 1 file changed, 1 insertion(+)
+For both patches:
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-index a6e874e61a40..0bd7701ad1df 100644
---- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-+++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
-@@ -152,6 +152,7 @@ static inline void hyp_page_ref_inc(struct hyp_page *p)
- 
- static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
- {
-+	BUG_ON(!p->refcount);
- 	p->refcount--;
- 	return (p->refcount == 0);
- }
--- 
-2.33.0.800.g4c38ced690-goog
+Acked-by: Will Deacon <will@kernel.org>
 
+Thanks!
+
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
