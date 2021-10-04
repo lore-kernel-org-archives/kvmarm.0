@@ -2,88 +2,70 @@ Return-Path: <SRS0=Wuko=OY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9989AC433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 15:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6327DC433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 15:49:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 19E5C61360
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 15:48:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 19E5C61360
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id E53D86137C
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Oct 2021 15:49:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E53D86137C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88D404B2A7;
-	Mon,  4 Oct 2021 11:48:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B2524B288;
+	Mon,  4 Oct 2021 11:49:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7d5B70LPSkVQ; Mon,  4 Oct 2021 11:48:53 -0400 (EDT)
+	with ESMTP id LSQAoVJ3Zeiw; Mon,  4 Oct 2021 11:48:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 838AB4B2A6;
-	Mon,  4 Oct 2021 11:48:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A89EF4B2A6;
+	Mon,  4 Oct 2021 11:48:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D300B4B2A5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 11:48:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE8694B288
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 11:48:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JNs+ruAmdDHH for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 11:48:50 -0400 (EDT)
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com
- [209.85.215.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC47A4B2A8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 11:48:50 -0400 (EDT)
-Received: by mail-pg1-f172.google.com with SMTP id q201so4288508pgq.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 08:48:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=2+QVME3jGaX4i+4s06oICt3IEB5F1SLw8aq76ldkx6M=;
- b=UMra/6DAPUEGVAl64opwRUJGSDSURdpDW8J1XYpxrQHqkqPa79+2Epym9qE4NswufM
- iSJYfb1NZ7WrTHW16xrNcj/koM+2VFUNKlA4pGoUjxAE3Dom2sZbGjj2tDSNvtrXlwgd
- 2pYWIGYVjHmgK7y22qCZkA9rWxjTopKCCH223DH8UYnJ+GH+1xdmVFvJfflKYl682hXu
- DGgxVrODnzoPicd7sAsTOt+1qsbhCrUEP2FMEW27hRe1q65hHS13+/1fmc2gWftcdpFb
- rrBSz7PtQV83LINwFcG/4+uRzrbT/CyVTlqbsCuwtx3czddxnrl3Ua0bsl0vufCNiH0q
- rUnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=2+QVME3jGaX4i+4s06oICt3IEB5F1SLw8aq76ldkx6M=;
- b=ivWRfLzWWnpLLZ3KRl3wXIpSwnBc7BSBPPs9VUje21MQQVJZzeGiJjdFaXIivYcPui
- GYHz6uGreHTfhrm7+V8iOGQ33I4Fqbit2LX1zoeBViGbzEZuJH+YxZqUrYZ2Em2GuZbT
- d448YxyR1I3BfISkq8naW/KDhQw4fRF3/d19QMSqR/cs8q9B8AMIux9llWn3VWDRDKD4
- EkatSrAF8a5h+rQmMAnFm14UotWm6KWnBAHXiBecPxEesV1ufnJBwGiKDjYNoC7E8NnH
- u1DGmIlRol8ySpdJqTcs20TGhHzxQghFg2+VsB1Vc5hEvo6MrHUjaaoGJxGCESSmuf52
- Ac6w==
-X-Gm-Message-State: AOAM531nCi9O6aXQ+A+p7V0uBIiIsLmTWqQQc6E3AzLhEdyf5ncZQ62j
- haMi3IU2a5+HewoToCvD0S2dYQ==
-X-Google-Smtp-Source: ABdhPJxJsWjoIvrmIZg9ung+Ty/mnWFZBl04uc7InBbcLjywVlqeNBL2YDyrTzIOAh/1YDgsXq/ovA==
-X-Received: by 2002:a05:6a00:c8c:b0:447:bddb:c83 with SMTP id
- a12-20020a056a000c8c00b00447bddb0c83mr26862283pfv.1.1633362529436; 
- Mon, 04 Oct 2021 08:48:49 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id h4sm4880532pjm.14.2021.10.04.08.48.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 Oct 2021 08:48:48 -0700 (PDT)
-Date: Mon, 4 Oct 2021 08:48:45 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 01/10] kvm: arm64: vgic: Introduce vgic_check_iorange
-Message-ID: <YVsiXYFKSG/C4dGD@google.com>
-References: <20210928184803.2496885-1-ricarkol@google.com>
- <20210928184803.2496885-2-ricarkol@google.com>
- <4ab60884-e006-723a-c026-b3e8c0ccb349@redhat.com>
- <YVTX1L8u8NMxHAyE@google.com>
- <1613b54f-2c4b-a57a-d4ba-92e866c5ff1f@redhat.com>
- <YVYp1E7bqIFttXF+@google.com> <87k0iwsxce.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87k0iwsxce.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, shuah@kernel.org, pshier@google.com,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id 3AH9XcGoalOK for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 11:48:56 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7FF04B299
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 11:48:56 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0304461360;
+ Mon,  4 Oct 2021 15:48:56 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mXQD0-00Efkt-2c; Mon, 04 Oct 2021 16:48:54 +0100
+Date: Mon, 04 Oct 2021 16:48:53 +0100
+Message-ID: <87zgrordsq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Lukas =?UTF-8?B?SsO8bmdlcg==?= <lukas.juenger@ice.rwth-aachen.de>
+Subject: Re: KVM userspace GICv2 IRQ controller on platform with GICv3
+In-Reply-To: <098ec673-c28f-d793-eae9-d6aa2147d61f@ice.rwth-aachen.de>
+References: <c3cff3de-61f6-0e19-6825-02c934dfbb76@ice.rwth-aachen.de>
+ <877detrstj.wl-maz@kernel.org>
+ <90101279-8099-7a77-bf73-5c8bdce2d51b@ice.rwth-aachen.de>
+ <875yudrr1v.wl-maz@kernel.org>
+ <6543a1d2-eeff-913a-021a-912d07bb4255@ice.rwth-aachen.de>
+ <874k9xrl2p.wl-maz@kernel.org>
+ <098ec673-c28f-d793-eae9-d6aa2147d61f@ice.rwth-aachen.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: lukas.juenger@ice.rwth-aachen.de,
+ kvmarm@lists.cs.columbia.edu, will@kernel.org, catalin.marinas@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,81 +77,28 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Oct 01, 2021 at 02:12:17PM +0100, Marc Zyngier wrote:
-> On Thu, 30 Sep 2021 22:19:16 +0100,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > On Thu, Sep 30, 2021 at 09:02:12AM +0200, Eric Auger wrote:
-> > > Hi,
-> > > 
-> > > On 9/29/21 11:17 PM, Ricardo Koller wrote:
-> > > > On Wed, Sep 29, 2021 at 06:29:21PM +0200, Eric Auger wrote:
-> > > >> Hi Ricardo,
-> > > >>
-> > > >> On 9/28/21 8:47 PM, Ricardo Koller wrote:
-> > > >>> Add the new vgic_check_iorange helper that checks that an iorange is
-> > > >>> sane: the start address and size have valid alignments, the range is
-> > > >>> within the addressable PA range, start+size doesn't overflow, and the
-> > > >>> start wasn't already defined.
-> > > >>>
-> > > >>> No functional change.
-> > > >>>
-> > > >>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > > >>> ---
-> > > >>>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 22 ++++++++++++++++++++++
-> > > >>>  arch/arm64/kvm/vgic/vgic.h            |  4 ++++
-> > > >>>  2 files changed, 26 insertions(+)
-> > > >>>
-> > > >>> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > > >>> index 7740995de982..f714aded67b2 100644
-> > > >>> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > > >>> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-> > > >>> @@ -29,6 +29,28 @@ int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
-> > > >>>  	return 0;
-> > > >>>  }
-> > > >>>  
-> > > >>> +int vgic_check_iorange(struct kvm *kvm, phys_addr_t *ioaddr,
-> > > >>> +		       phys_addr_t addr, phys_addr_t alignment,
-> > > >>> +		       phys_addr_t size)
-> > > >>> +{
-> > > >>> +	int ret;
-> > > >>> +
-> > > >>> +	ret = vgic_check_ioaddr(kvm, ioaddr, addr, alignment);
-> > > >> nit: not related to this patch but I am just wondering why we are
-> > > >> passing phys_addr_t *ioaddr downto vgic_check_ioaddr and thus to
-> > > >>
-> > > >> vgic_check_iorange()? This must be a leftover of some old code?
-> > > >>
-> > > > It's used to check that the base of a region is not already set.
-> > > > kvm_vgic_addr() uses it to make that check;
-> > > > vgic_v3_alloc_redist_region() does not:
-> > > >
-> > > >   rdreg->base = VGIC_ADDR_UNDEF; // so the "not already defined" check passes
-> > > >   ret = vgic_check_ioaddr(kvm, &rdreg->base, base, SZ_64K);
-> > > Yes but I meant why a pointer?
-> > 
-> > I can't think of any good reason. It must be some leftover as you said.
-> 
-> It definitely is. Please have a patch to fix that. Also, it doesn't
-> look like vgic_check_ioaddr() has any other user at the end of the
-> series. Worth getting rid of.
-
-ACK fixing that and getting rid of vgic_check_ioaddr().
-
-Thanks,
-Ricardo
-
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gTW9uLCAwNCBPY3QgMjAyMSAxNToxNToyNSArMDEwMCwKTHVrYXMgSsO8bmdlciA8bHVrYXMu
+anVlbmdlckBpY2Uucnd0aC1hYWNoZW4uZGU+IHdyb3RlOgoKUGxlYXNlIGNvbnNpZGVyIHN1YnNj
+cmliaW5nIHRvIGt2bWFybSBpbnN0ZWFkIG9mIHBvc3RpbmcgYXMgYQpub24tc3Vic2NyaWJlci4g
+SXQgZm9yY2VzIG1lIHRvIG1hbnVhbGx5IGFsbG93IGVhY2ggYW5kIGV2ZXJ5IGVtYWlsCnlvdSBy
+ZXBseSB0bywgd2hpY2ggZ2V0cyB0aXJpbmcgaW4gdGhlIGxvbmcgcnVuLgoKPiA+IFNvIGVpdGhl
+ciB5b3UgcnVuIHNvbWV0aGluZyB0aGF0IGlzIHByZXR0eSBvbGQgYW5kIGJ1Z2d5IChhbmQgSSdk
+IGxpa2UKPiA+IHRvIGtub3cgd2hhdCksIG9yIHlvdSBoYXZlIHVuY292ZXJlZCBhIGJ1ZyBhbmQg
+SSB3b3VsZCBuZWVkIHlvdSB0bwo+ID4gdHJhY2Ugd2hlbiB2Z2ljX3NyZSBnZXRzIHNldC4KPiBP
+a2F5LiBJJ20gcnVubmluZyBvbiBOMS1TRFAgd2l0aCB0aGUgbGF0ZXN0IHJlbGVhc2UgMjAyMS4w
+NS4yNi4KPiB1bmFtZSAtYSBnaXZlczoKPiAKPiBMaW51eCBuMXNkcCA1LjEwLjEyKyAjMSBTTVAg
+RnJpIE9jdCAxIDExOjUwOjA1IFVUQyAyMDIxIGFhcmNoNjQKPiBhYXJjaDY0IGFhcmNoNjQgR05V
+L0xpbnV4Cj4gCj4gCj4gSXMgdGhlcmUgYSB3YXkgdG8gZGVidWcgdGhpcyB3aXRob3V0IGEgaGFy
+ZHdhcmUgZGVidWdnZXIvSlRBRz8KClN1cmUsIHlvdSBjYW4gYWx3YXlzIGhhY2sgdGhlIGtlcm5l
+bCAoSSBhc3N1bWUgeW91IGtub3cgaG93IHRvIGJvb3QgYQpmcmVzaCBrZXJuZWwpLiBQdXQgc29t
+ZSB0cmFjZXMgaW4gdmdpY192M19lbmFibGUoKSwgYW5kIGZpbmQgb3V0IHdoeQp2Z2ljX3NyZSBp
+cyBub24temVyby4KClRoYW5rcywKCglNLgoKLS0gCldpdGhvdXQgZGV2aWF0aW9uIGZyb20gdGhl
+IG5vcm0sIHByb2dyZXNzIGlzIG5vdCBwb3NzaWJsZS4KX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
+dGluZm8va3ZtYXJtCg==
