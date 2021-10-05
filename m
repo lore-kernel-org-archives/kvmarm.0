@@ -2,66 +2,78 @@ Return-Path: <SRS0=da30=OZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26414C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 13:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3710C433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 14:54:20 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A0F056152B
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 13:51:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A0F056152B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 2EC9761371
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 14:54:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2EC9761371
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 437504B30B;
-	Tue,  5 Oct 2021 09:51:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A1C04B2F3;
+	Tue,  5 Oct 2021 10:54:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kdRtMrPUb555; Tue,  5 Oct 2021 09:51:03 -0400 (EDT)
+	with ESMTP id FLxMZpBR1BDY; Tue,  5 Oct 2021 10:54:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35DD54B2E9;
-	Tue,  5 Oct 2021 09:51:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2294D4B2F9;
+	Tue,  5 Oct 2021 10:54:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 264D34B2BC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 09:51:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2149B4B2F3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 10:54:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G7TwIY8lMkR1 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Oct 2021 09:50:58 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 024C14B2B6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 09:50:57 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id D1D82617E3;
- Tue,  5 Oct 2021 13:50:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1633441856;
- bh=+Zz8nIxHkcfBTCM4F23ZXRh80YwkMvyTTEPJ/v4wdQg=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=l0WiQV/JEjVkh19uSlGKjmsuuRfkR2JKMOoXPmF1y50Y9AvGqU7A1dy9nUBUv0Yws
- j3TMwm9myuX9LxigKZs8Pj3nVUrrRq23GrbCVW9n68qWuGRUflfjsvlC4/rrEQNPZD
- EaezPF0JnUOgD7ykVWpbmEdb3FVew9H3olwGWzxbHXuEt10ksfXLgg4ncI+E+FVMns
- /WOMEQpIKQoItIAoFfVCDrF/OpweOBoTxYkk9awSTw//C//dSohqcZzl8q/5rH+9V/
- bpTEz9iZnlAbriSsxffos9QwoxwsVqPeZYUnP7m1fmg3tt+bZlfIULf1YYIjKxKaZe
- NyR8WMbS/jU6w==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.14 16/40] KVM: arm64: nvhe: Fix missing FORCE for
- hyp-reloc.S build rule
-Date: Tue,  5 Oct 2021 09:49:55 -0400
-Message-Id: <20211005135020.214291-16-sashal@kernel.org>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211005135020.214291-1-sashal@kernel.org>
-References: <20211005135020.214291-1-sashal@kernel.org>
+ with ESMTP id CyLgfFHQABeJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Oct 2021 10:54:16 -0400 (EDT)
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com
+ [209.85.167.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C14E94B2D1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 10:54:15 -0400 (EDT)
+Received: by mail-lf1-f43.google.com with SMTP id y15so21616506lfk.7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 07:54:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=oeEs3eMOlEupf6UUcoQibPqVHwuKrUKDBy8LbYPEqoA=;
+ b=aAdD3HDLKufLpxvfw0oGt+CD/52iSjYVFKTbMfXrcgeIWKy/ANG/EOvtDTstbiZjUD
+ vHOWVCtkQiIVyOCjDOLKNQ9WRTDkTnW7pDJ8UuAmqg1CHUT16Xsmu0KoHfWZFvM+iuzN
+ t8K7TSc5VrhuLZ76BwUsl54GmSEKEY3JVH/dze9QJSUviRrlxt4XKyzW4xsXjhqlT0Rf
+ goG9zd8VWIGLcYdzg9gN7j2qPqssd5HfnKCj5jgv3HBDeA/+PE928o1AOtWyRAnCwxDZ
+ nK/seETkoeRizucnfoDV+m96VScxwz1vVpiW3ajBDelpeQrufEGwu0B8DV5DL4ToNRzx
+ yBeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=oeEs3eMOlEupf6UUcoQibPqVHwuKrUKDBy8LbYPEqoA=;
+ b=h9Iyd5lwt78Satmr1lpXKxprZFqVivT8DKqEUdOR1BkCwysIjB3BvOcZEoOy026GcD
+ iZDOTwVTw+tuLnHEgWvYYh9N18qLlLklWi5LMB5tB0aTFzLG7oaDPBQsgtCHClMtaacd
+ ilGm9jhHLy3gI7O05muRb7lP2QkRz72J66KIfaDMl2aDdllmDaQjlLIlUDZ32K6NFr+w
+ wdg+ZECOZ2aqAISxZHJ7Yu1GOOyu14/hcVTr1S7885mgwS/re823e4iPf4K+Wbk0BJJT
+ tDY/LjB6h2KLR/3Ge4jq8giusPlqRGtPzhJquVKuyw8x+dtCio98GJbvFmO9LXynH3BR
+ H+Qg==
+X-Gm-Message-State: AOAM533znPL5/e9o2XYKyI5xraHnyWCEole0AEQMxXAsRqSbI0OYULF1
+ Zsy3lymZ2ORYSTHv2jQS6NTKkQkjbFtRH2qPa5kA1w==
+X-Google-Smtp-Source: ABdhPJyMTR6su6M9JlR0TJe8fr8yMC+jDLWW2Ybj4JUSc+O7b6KU84U7G8Up+QrZwUDi/aCBdOK6JBGjZtL/iGUTRlg=
+X-Received: by 2002:ac2:4217:: with SMTP id y23mr3879463lfh.361.1633445653503; 
+ Tue, 05 Oct 2021 07:54:13 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Cc: Sasha Levin <sashal@kernel.org>, keescook@chromium.org,
- Marc Zyngier <maz@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>,
- samitolvanen@google.com, catalin.marinas@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20210923191610.3814698-1-oupton@google.com>
+ <20210923191610.3814698-11-oupton@google.com>
+ <20211005134539.s7kzhqlg2pykfcam@gator.home>
+In-Reply-To: <20211005134539.s7kzhqlg2pykfcam@gator.home>
+From: Oliver Upton <oupton@google.com>
+Date: Tue, 5 Oct 2021 07:54:01 -0700
+Message-ID: <CAOQ_QsjQ28b8OXLR1o8QD=M8dsBKtPLyB-QRyd=D1UVMGy6o0w@mail.gmail.com>
+Subject: Re: [PATCH v2 10/11] selftests: KVM: Refactor psci_test to make it
+ amenable to new tests
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,44 +90,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Zenghui Yu <yuzenghui@huawei.com>
+Hi Drew,
 
-[ Upstream commit a49b50a3c1c3226d26e1dd11e8b763f27e477623 ]
+On Tue, Oct 5, 2021 at 6:45 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Thu, Sep 23, 2021 at 07:16:09PM +0000, Oliver Upton wrote:
+> > Split up the current test into several helpers that will be useful to
+> > subsequent test cases added to the PSCI test suite.
+> >
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> >  .../testing/selftests/kvm/aarch64/psci_test.c | 68 ++++++++++++-------
+> >  1 file changed, 45 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > index 8d043e12b137..90312be335da 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > @@ -45,7 +45,7 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
+> >       return res.a0;
+> >  }
+> >
+> > -static void guest_main(uint64_t target_cpu)
+> > +static void guest_test_cpu_on(uint64_t target_cpu)
+> >  {
+> >       GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
+> >       uint64_t target_state;
+> > @@ -69,12 +69,10 @@ static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
+> >       vcpu_set_mp_state(vm, vcpuid, &mp_state);
+> >  }
+> >
+> > -int main(void)
+> > +static struct kvm_vm *setup_vm(void *guest_code)
+> >  {
+> > -     uint64_t target_mpidr, obs_pc, obs_x0;
+> >       struct kvm_vcpu_init init;
+> >       struct kvm_vm *vm;
+> > -     struct ucall uc;
+> >
+> >       vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
+> >       kvm_vm_elf_load(vm, program_invocation_name);
+> > @@ -83,31 +81,28 @@ int main(void)
+> >       vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> >       init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
+> >
+> > -     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
+> > -     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
+> > +     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_code);
+> > +     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_code);
+> >
+> > -     /*
+> > -      * make sure the target is already off when executing the test.
+> > -      */
+> > -     vcpu_power_off(vm, VCPU_ID_TARGET);
+> > +     return vm;
+> > +}
+> >
+> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
+> > -     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
+> > -     vcpu_run(vm, VCPU_ID_SOURCE);
+> > +static void enter_guest(struct kvm_vm *vm, uint32_t vcpuid)
+> > +{
+> > +     struct ucall uc;
+> >
+> > -     switch (get_ucall(vm, VCPU_ID_SOURCE, &uc)) {
+> > -     case UCALL_DONE:
+> > -             break;
+> > -     case UCALL_ABORT:
+> > +     vcpu_run(vm, vcpuid);
+> > +     if (get_ucall(vm, vcpuid, &uc) == UCALL_ABORT)
+> >               TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__,
+> >                         uc.args[1]);
+> > -             break;
+> > -     default:
+> > -             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
+> > -     }
+> > +}
+> >
+> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.pc), &obs_pc);
+> > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
+> > +static void assert_vcpu_reset(struct kvm_vm *vm, uint32_t vcpuid)
+> > +{
+> > +     uint64_t obs_pc, obs_x0;
+> > +
+> > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &obs_pc);
+> > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
+> >
+> >       TEST_ASSERT(obs_pc == CPU_ON_ENTRY_ADDR,
+> >                   "unexpected target cpu pc: %lx (expected: %lx)",
+> > @@ -115,7 +110,34 @@ int main(void)
+> >       TEST_ASSERT(obs_x0 == CPU_ON_CONTEXT_ID,
+> >                   "unexpected target context id: %lx (expected: %lx)",
+> >                   obs_x0, CPU_ON_CONTEXT_ID);
+> > +}
+> >
+> > +static void host_test_cpu_on(void)
+> > +{
+> > +     uint64_t target_mpidr;
+> > +     struct kvm_vm *vm;
+> > +     struct ucall uc;
+> > +
+> > +     vm = setup_vm(guest_test_cpu_on);
+> > +
+> > +     /*
+> > +      * make sure the target is already off when executing the test.
+> > +      */
+> > +     vcpu_power_off(vm, VCPU_ID_TARGET);
+> > +
+> > +     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
+> > +     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
+> > +     enter_guest(vm, VCPU_ID_SOURCE);
+> > +
+> > +     if (get_ucall(vm, VCPU_ID_SOURCE, &uc) != UCALL_DONE)
+> > +             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
+> > +
+> > +     assert_vcpu_reset(vm, VCPU_ID_TARGET);
+> >       kvm_vm_free(vm);
+> > +}
+> > +
+> > +int main(void)
+> > +{
+> > +     host_test_cpu_on();
+> >       return 0;
+> >  }
+> > --
+> > 2.33.0.685.g46640cef36-goog
+> >
+>
+> Hard to read diff, but I think the refactoring comes out right.
 
-Add FORCE so that if_changed can detect the command line change.
+Yeah, this one's nasty, sorry about that. Thanks for parsing it out, heh.
 
-We'll otherwise see a compilation warning since commit e1f86d7b4b2a
-("kbuild: warn if FORCE is missing for if_changed(_dep,_rule) and
-filechk").
+> Please do this refactoring before adding the new test in the next revision, though.
+>
 
-arch/arm64/kvm/hyp/nvhe/Makefile:58: FORCE prerequisite is missing
+This is 10/11 in the series, and the test is 11/11. I'm not seeing any
+context belonging to the last patch, but perhaps I'm missing something
+obvious.
 
-Cc: David Brazdil <dbrazdil@google.com>
-Cc: Masahiro Yamada <masahiroy@kernel.org>
-Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20210907052137.1059-1-yuzenghui@huawei.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/arm64/kvm/hyp/nvhe/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index 5df6193fc430..8d741f71377f 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -54,7 +54,7 @@ $(obj)/kvm_nvhe.tmp.o: $(obj)/hyp.lds $(addprefix $(obj)/,$(hyp-obj)) FORCE
- #    runtime. Because the hypervisor is part of the kernel binary, relocations
- #    produce a kernel VA. We enumerate relocations targeting hyp at build time
- #    and convert the kernel VAs at those positions to hyp VAs.
--$(obj)/hyp-reloc.S: $(obj)/kvm_nvhe.tmp.o $(obj)/gen-hyprel
-+$(obj)/hyp-reloc.S: $(obj)/kvm_nvhe.tmp.o $(obj)/gen-hyprel FORCE
- 	$(call if_changed,hyprel)
- 
- # 5) Compile hyp-reloc.S and link it into the existing partially linked object.
--- 
-2.33.0
+Thanks!
 
+--
+Best,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
