@@ -2,76 +2,76 @@ Return-Path: <SRS0=da30=OZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 602F6C433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 01:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA95BC433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 01:19:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0DA4E61507
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 01:19:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0DA4E61507
+	by mail.kernel.org (Postfix) with ESMTP id 60A2D6154B
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 01:19:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 60A2D6154B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8A144B2A7;
-	Mon,  4 Oct 2021 21:19:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15AE44B2B2;
+	Mon,  4 Oct 2021 21:19:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hHzoDBBe9bd3; Mon,  4 Oct 2021 21:19:38 -0400 (EDT)
+	with ESMTP id bL3efRrcVAk1; Mon,  4 Oct 2021 21:19:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 621FA4B277;
-	Mon,  4 Oct 2021 21:19:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 777434B2B9;
+	Mon,  4 Oct 2021 21:19:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB0B94B2D8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 21:19:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 475194B26A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 21:19:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9itVogL0Wysb for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 21:19:35 -0400 (EDT)
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
- [209.85.222.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1095E4B29C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 21:19:35 -0400 (EDT)
-Received: by mail-qk1-f202.google.com with SMTP id
- v17-20020ae9e311000000b0045ecf8d62fdso1551921qkf.22
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 18:19:35 -0700 (PDT)
+ with ESMTP id r5gyOPNnWvGB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 21:19:36 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A156A4B2E3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 21:19:36 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ b9-20020a5b07890000b0290558245b7eabso25943879ybq.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 18:19:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=rCtk0QZvGtJNNX968ZJI39G337e0fJGVp+XxoDUDdkE=;
- b=SXQnZ9JXeCK/1KvyKnaXPDby0VXKeDZEHG83sFNEnLHoS6OcJX0esOtEx5UMCaWA3J
- zem2hpT8tL7nMrmUE/AHs/Ca7QgecZZMCnQQM14JF8pvPu/A2gzcZpEUYXp1KTIFnFrB
- +KSWoCZHwa1ncWJ4jU9hGJFAXRg+hrXPJmAh5F9TwV2YCJiGgtFfqYpLav8FQQvNjgOW
- v4GkOJ2G48Iz8fIQHrzjM6TGFdZtUMX2bTzWzZih+UfpYlxcZDPKE5o7cyu/Z2gOfVnV
- /JvM8dLQzXMoCoqCg38MR2rOTpe+3CWa4yc7GCKWtTYQ5himxyksTSdxZnaGFjkjtgla
- oWlQ==
+ :cc; bh=xZ3lpAQvqvEeyK874ekrhdyFJaFrtuodkxZuQJWmclc=;
+ b=jgZT1Lggck69qe6woDJ0WTw1urdpeGjzK3yYEYJULq1ZsKqtfYNe0hkSjvtjFxy3JV
+ aAiL9OZTv2WA0JaITcIu3c4MU807tUIb9ZG0YiVzcNCWJU/ZZJDZZmoAEvWQqru8kGqV
+ zQ6SMe80Ds841k7BSsck/jrTNXbKce3qabnTwZKBb7FES3n+N2kivohi2luqh+2E45DW
+ IXsCEkuZ4iKC8GYxwUedf9DpSzHosJzi8inbjq0rG8PIPaH1S9CG549Qq1epj05z2D8P
+ NhkEE1sB7ekIjDtwhKUhG6OjKngT1kACs72kX2ACpuYIlxIVFiGjcoNDBEV0Y/YMydwU
+ BeDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=rCtk0QZvGtJNNX968ZJI39G337e0fJGVp+XxoDUDdkE=;
- b=6x+Bs2luNDGemSyPAytaydKUItx8jYJ8jfJa9Z87V8aGZyPEndTyMTMUq4mpXRAOG2
- G25xq/7y0h/in1l/mjc0A3WG1kIxEFyiDeBD8GGm/1bD8ALO+fooObr66nBdPKsTAaGX
- 9lSJfkwHhZBx0N/BMHJWkQRuW7GsIMsWzqTTH2NLxiZFEuaTU9Oio9QKE0VC5kVosXw3
- mfTDIHd1gJauVa/Ah/gDWc+2aC3DoVxJYLnhb0x2bfhUMSQVxb1MBXiq9bLMOaQNvWh4
- QJB2TTbFV3A0rPWee9cFWVxrVkjvzRTirGAsu4rvJiqT8vz3fNWJ3wYct4SEiXgSL4tj
- o5/w==
-X-Gm-Message-State: AOAM5319Naz5fFMjdt59rGZoYOf2bhTesv/utPA0F2P7P2rQsPCrisEX
- 4dAe9LXccB5P2CEMj+0Uqgletg+ITfhxzA==
-X-Google-Smtp-Source: ABdhPJyCZCbvLGaSOMLBNe3BbAg0ASeNDo4wRQXjlyaPDuVIvUAXFBLjEBfIfBt3sWnzogbCLGnR6iAx5B0baQ==
+ bh=xZ3lpAQvqvEeyK874ekrhdyFJaFrtuodkxZuQJWmclc=;
+ b=kESZJUWvw5EvuA+J1W8SEaE7U5XWRIj3G4xvvINGUWuFjq87cA6TChmpwIEtKel8cV
+ +Ogpu8LfTHza9dYemvpGQ82WpBu71BJnhxstWDyho/OcX8SP0IhOIuYOPVV9EvG4YaVT
+ ZDAIK6I3MSNE1U7YxiQR1dkOU8WiWKcqL+MzjI0wzLaVB1wbe6nMkTRwYm3LVtitktIR
+ /9XkTAvZhdWlg8xfTlFsUZmzh5Hvzs5TibxAl8ec0ktXge6dYcIHgKxcUPZQ0JmGcQOg
+ 2DZPD1fRY4FDPewYU+JSaWlZsQ4QjbpXRd4bkgAeXMzyzieX+x/jSvCXQ25l71hMvhr/
+ 32Pg==
+X-Gm-Message-State: AOAM532wqN0hKgMB696ssZS4dRdlVyuxtnidOJ++awu3Q9QmyWdbuYfy
+ HPy/SA6XT1FpFhaYJ3/c1FYoiK6wX1iJyQ==
+X-Google-Smtp-Source: ABdhPJxQzuNxg9iNW+ZJGfZqm2MUI5dcNt8rKxttbtIEU4oUWm8qSH7TZUi5okLbCXgyrCgYEoxcL227cXvoYA==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6214:528:: with SMTP id
- x8mr24810755qvw.30.1633396774726; Mon, 04 Oct 2021 18:19:34 -0700 (PDT)
-Date: Mon,  4 Oct 2021 18:19:17 -0700
+ (user=ricarkol job=sendgmr) by 2002:a25:7ec4:: with SMTP id
+ z187mr18936928ybc.35.1633396776240; Mon, 04 Oct 2021 18:19:36 -0700 (PDT)
+Date: Mon,  4 Oct 2021 18:19:18 -0700
 In-Reply-To: <20211005011921.437353-1-ricarkol@google.com>
-Message-Id: <20211005011921.437353-8-ricarkol@google.com>
+Message-Id: <20211005011921.437353-9-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20211005011921.437353-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.33.0.800.g4c38ced690-goog
-Subject: [PATCH v4 07/11] KVM: arm64: selftests: Make vgic_init/vm_gic_create
- version agnostic
+Subject: [PATCH v4 08/11] KVM: arm64: selftests: Add some tests for GICv2 in
+ vgic_init
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu, 
  drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
@@ -92,92 +92,213 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Make vm_gic_create GIC version agnostic in the vgic_init test. Also
-add a nr_vcpus arg into it instead of defaulting to NR_VCPUS.
+Add some GICv2 tests: general KVM device tests and DIST/CPUIF overlap
+tests.  Do this by making test_vcpus_then_vgic and test_vgic_then_vcpus
+in vgic_init GIC version agnostic.
 
-No functional change.
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../testing/selftests/kvm/aarch64/vgic_init.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 111 +++++++++++++-----
+ 1 file changed, 79 insertions(+), 32 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index 896a29f2503d..7521dc80cf23 100644
+index 7521dc80cf23..cb69e195ad1d 100644
 --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
 +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -28,6 +28,7 @@
- struct vm_gic {
- 	struct kvm_vm *vm;
- 	int gic_fd;
-+	uint32_t gic_dev_type;
- };
- 
- static int max_ipa_bits;
-@@ -61,12 +62,13 @@ static int run_vcpu(struct kvm_vm *vm, uint32_t vcpuid)
- 	return 0;
+@@ -79,74 +79,120 @@ static void vm_gic_destroy(struct vm_gic *v)
+ 	kvm_vm_free(v->vm);
  }
  
--static struct vm_gic vm_gic_v3_create(void)
-+static struct vm_gic vm_gic_create_with_vcpus(uint32_t gic_dev_type, uint32_t nr_vcpus)
++struct vgic_region_attr {
++	uint64_t attr;
++	uint64_t size;
++	uint64_t alignment;
++};
++
++struct vgic_region_attr gic_v3_dist_region = {
++	.attr = KVM_VGIC_V3_ADDR_TYPE_DIST,
++	.size = 0x10000,
++	.alignment = 0x10000,
++};
++
++struct vgic_region_attr gic_v3_redist_region = {
++	.attr = KVM_VGIC_V3_ADDR_TYPE_REDIST,
++	.size = NR_VCPUS * 0x20000,
++	.alignment = 0x10000,
++};
++
++struct vgic_region_attr gic_v2_dist_region = {
++	.attr = KVM_VGIC_V2_ADDR_TYPE_DIST,
++	.size = 0x1000,
++	.alignment = 0x1000,
++};
++
++struct vgic_region_attr gic_v2_cpu_region = {
++	.attr = KVM_VGIC_V2_ADDR_TYPE_CPU,
++	.size = 0x2000,
++	.alignment = 0x1000,
++};
++
+ /**
+- * Helper routine that performs KVM device tests in general and
+- * especially ARM_VGIC_V3 ones. Eventually the ARM_VGIC_V3
+- * device gets created, a legacy RDIST region is set at @0x0
+- * and a DIST region is set @0x60000
++ * Helper routine that performs KVM device tests in general. Eventually the
++ * ARM_VGIC (GICv2 or GICv3) device gets created with an overlapping
++ * DIST/REDIST (or DIST/CPUIF for GICv2). Assumption is 4 vcpus are going to be
++ * used hence the overlap. In the case of GICv3, A RDIST region is set at @0x0
++ * and a DIST region is set @0x70000. The GICv2 case sets a CPUIF @0x0 and a
++ * DIST region @0x1000.
+  */
+-static void subtest_v3_dist_rdist(struct vm_gic *v)
++static void subtest_dist_rdist(struct vm_gic *v)
  {
- 	struct vm_gic v;
+ 	int ret;
+ 	uint64_t addr;
++	struct vgic_region_attr rdist; /* CPU interface in GICv2*/
++	struct vgic_region_attr dist;
++
++	rdist = VGIC_DEV_IS_V3(v->gic_dev_type) ? gic_v3_redist_region
++						: gic_v2_cpu_region;
++	dist = VGIC_DEV_IS_V3(v->gic_dev_type) ? gic_v3_dist_region
++						: gic_v2_dist_region;
  
--	v.vm = vm_create_default_with_vcpus(NR_VCPUS, 0, 0, guest_code, NULL);
--	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-+	v.gic_dev_type = gic_dev_type;
-+	v.vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
-+	v.gic_fd = kvm_create_device(v.vm, gic_dev_type, false);
+ 	/* Check existing group/attributes */
+ 	kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-			      KVM_VGIC_V3_ADDR_TYPE_DIST);
++			      dist.attr);
  
- 	return v;
+ 	kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-			      KVM_VGIC_V3_ADDR_TYPE_REDIST);
++			      rdist.attr);
+ 
+ 	/* check non existing attribute */
+-	ret = _kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR, 0);
++	ret = _kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR, -1);
+ 	TEST_ASSERT(ret && errno == ENXIO, "attribute not supported");
+ 
+ 	/* misaligned DIST and REDIST address settings */
+-	addr = 0x1000;
++	addr = dist.alignment / 0x10;
+ 	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-				 KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
+-	TEST_ASSERT(ret && errno == EINVAL, "GICv3 dist base not 64kB aligned");
++				 dist.attr, &addr, true);
++	TEST_ASSERT(ret && errno == EINVAL, "GIC dist base not aligned");
+ 
++	addr = rdist.alignment / 0x10;
+ 	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+-	TEST_ASSERT(ret && errno == EINVAL, "GICv3 redist base not 64kB aligned");
++				 rdist.attr, &addr, true);
++	TEST_ASSERT(ret && errno == EINVAL, "GIC redist/cpu base not aligned");
+ 
+ 	/* out of range address */
+ 	if (max_ipa_bits) {
+ 		addr = 1ULL << max_ipa_bits;
+ 		ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-					 KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
++					 dist.attr, &addr, true);
+ 		TEST_ASSERT(ret && errno == E2BIG, "dist address beyond IPA limit");
+ 
+ 		ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-					 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
++					 rdist.attr, &addr, true);
+ 		TEST_ASSERT(ret && errno == E2BIG, "redist address beyond IPA limit");
+ 	}
+ 
+ 	/* set REDIST base address @0x0*/
+ 	addr = 0x00000;
+ 	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-			  KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
++			  rdist.attr, &addr, true);
+ 
+ 	/* Attempt to create a second legacy redistributor region */
+ 	addr = 0xE0000;
+ 	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
+-	TEST_ASSERT(ret && errno == EEXIST, "GICv3 redist base set again");
++				 rdist.attr, &addr, true);
++	TEST_ASSERT(ret && errno == EEXIST, "GIC redist base set again");
+ 
+-	/* Attempt to mix legacy and new redistributor regions */
+-	addr = REDIST_REGION_ATTR_ADDR(NR_VCPUS, 0x100000, 0, 0);
+-	ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+-				 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION, &addr, true);
+-	TEST_ASSERT(ret && errno == EINVAL, "attempt to mix GICv3 REDIST and REDIST_REGION");
++	ret = _kvm_device_check_attr(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++				     KVM_VGIC_V3_ADDR_TYPE_REDIST);
++	if (!ret) {
++		/* Attempt to mix legacy and new redistributor regions */
++		addr = REDIST_REGION_ATTR_ADDR(NR_VCPUS, 0x100000, 0, 0);
++		ret = _kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++					 KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION,
++					 &addr, true);
++		TEST_ASSERT(ret && errno == EINVAL,
++			    "attempt to mix GICv3 REDIST and REDIST_REGION");
++	}
+ 
+ 	/*
+ 	 * Set overlapping DIST / REDIST, cannot be detected here. Will be detected
+ 	 * on first vcpu run instead.
+ 	 */
+-	addr = 3 * 2 * 0x10000;
+-	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR, KVM_VGIC_V3_ADDR_TYPE_DIST,
+-			  &addr, true);
++	addr = rdist.size - rdist.alignment;
++	kvm_device_access(v->gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  dist.attr, &addr, true);
  }
-@@ -257,8 +259,7 @@ static void test_v3_vgic_then_vcpus(uint32_t gic_dev_type)
+ 
+ /* Test the new REDIST region API */
+@@ -254,14 +300,14 @@ static void subtest_v3_redist_regions(struct vm_gic *v)
+  * VGIC KVM device is created and initialized before the secondary CPUs
+  * get created
+  */
+-static void test_v3_vgic_then_vcpus(uint32_t gic_dev_type)
++static void test_vgic_then_vcpus(uint32_t gic_dev_type)
+ {
  	struct vm_gic v;
  	int ret, i;
  
--	v.vm = vm_create_default(0, 0, guest_code);
--	v.gic_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-+	v = vm_gic_create_with_vcpus(gic_dev_type, 1);
+ 	v = vm_gic_create_with_vcpus(gic_dev_type, 1);
  
- 	subtest_v3_dist_rdist(&v);
+-	subtest_v3_dist_rdist(&v);
++	subtest_dist_rdist(&v);
  
-@@ -278,7 +279,7 @@ static void test_v3_vcpus_then_vgic(uint32_t gic_dev_type)
+ 	/* Add the rest of the VCPUs */
+ 	for (i = 1; i < NR_VCPUS; ++i)
+@@ -274,14 +320,14 @@ static void test_v3_vgic_then_vcpus(uint32_t gic_dev_type)
+ }
+ 
+ /* All the VCPUs are created before the VGIC KVM device gets initialized */
+-static void test_v3_vcpus_then_vgic(uint32_t gic_dev_type)
++static void test_vcpus_then_vgic(uint32_t gic_dev_type)
+ {
  	struct vm_gic v;
  	int ret;
  
--	v = vm_gic_v3_create();
-+	v = vm_gic_create_with_vcpus(gic_dev_type, NR_VCPUS);
+ 	v = vm_gic_create_with_vcpus(gic_dev_type, NR_VCPUS);
  
- 	subtest_v3_dist_rdist(&v);
+-	subtest_v3_dist_rdist(&v);
++	subtest_dist_rdist(&v);
  
-@@ -295,7 +296,7 @@ static void test_v3_new_redist_regions(void)
- 	uint64_t addr;
- 	int ret;
+ 	ret = run_vcpu(v.vm, 3);
+ 	TEST_ASSERT(ret == -EINVAL, "dist/rdist overlap detected on 1st vcpu run");
+@@ -550,9 +596,10 @@ int test_kvm_device(uint32_t gic_dev_type)
  
--	v = vm_gic_v3_create();
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
- 	subtest_v3_redist_regions(&v);
- 	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
- 			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-@@ -306,7 +307,7 @@ static void test_v3_new_redist_regions(void)
- 
- 	/* step2 */
- 
--	v = vm_gic_v3_create();
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
- 	subtest_v3_redist_regions(&v);
- 
- 	addr = REDIST_REGION_ATTR_ADDR(1, 0x280000, 0, 2);
-@@ -320,7 +321,7 @@ static void test_v3_new_redist_regions(void)
- 
- 	/* step 3 */
- 
--	v = vm_gic_v3_create();
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
- 	subtest_v3_redist_regions(&v);
- 
- 	_kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
+ void run_tests(uint32_t gic_dev_type)
+ {
++	test_vcpus_then_vgic(gic_dev_type);
++	test_vgic_then_vcpus(gic_dev_type);
++
+ 	if (VGIC_DEV_IS_V3(gic_dev_type)) {
+-		test_v3_vcpus_then_vgic(gic_dev_type);
+-		test_v3_vgic_then_vcpus(gic_dev_type);
+ 		test_v3_new_redist_regions();
+ 		test_v3_typer_accesses();
+ 		test_v3_last_bit_redist_regions();
 -- 
 2.33.0.800.g4c38ced690-goog
 
