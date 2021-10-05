@@ -2,91 +2,91 @@ Return-Path: <SRS0=da30=OZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC703C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 19:02:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 106E1C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 19:05:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 30D5761354
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 19:02:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 30D5761354
+	by mail.kernel.org (Postfix) with ESMTP id 7C2CF61371
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 19:05:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7C2CF61371
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C6C44B2E0;
-	Tue,  5 Oct 2021 15:02:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9DF14B2F3;
+	Tue,  5 Oct 2021 15:05:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Yr5nHlwDzgsM; Tue,  5 Oct 2021 15:02:00 -0400 (EDT)
+	with ESMTP id KxNCnQ9olac3; Tue,  5 Oct 2021 15:05:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B2784B2A5;
-	Tue,  5 Oct 2021 15:02:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2B564B297;
+	Tue,  5 Oct 2021 15:05:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6694A4B297
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 15:01:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B38F94B279
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 15:05:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6IZ9oOzc5o5L for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Oct 2021 15:01:58 -0400 (EDT)
+ with ESMTP id 2K2JJFIyiBE8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Oct 2021 15:05:41 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F7F74B288
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 15:01:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F0294B1D1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 15:05:41 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633460518;
+ s=mimecast20190719; t=1633460741;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=pks3z+IN34uKEcJiugoE2qCaJ8Ch2RkxBo7zygTxWDE=;
- b=bYt0Bui4c5KWz9uuEG3Pd8UxPAmLzmKq5TaysP1uJGv6vtTmPB0/8+J+5ei9WIO6LOYie3
- dMp8kdktpv3iSyYE6tvdp5GqI92wxW16s5yt0ASawMGOMbFPhhxYO/3OwHVpfqiTcQJ8fW
- nsBEFGLG71Ken2a4/dHffACrXQz7GTU=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-xET9OqhuNpKTMZQyZ9My3w-1; Tue, 05 Oct 2021 15:01:57 -0400
-X-MC-Unique: xET9OqhuNpKTMZQyZ9My3w-1
-Received: by mail-ed1-f72.google.com with SMTP id
- r11-20020aa7cfcb000000b003d4fbd652b9so146623edy.14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 12:01:56 -0700 (PDT)
+ bh=Dl3aTJvWqGu6seveycGfN6caamqhyrUPV6cp3PR6dwA=;
+ b=FuoPmGcKNuv6sdWeuO/hMMI6VQEYGQQPjVXda6SHs2gxtWLte1f776D71JQTYnSDS0L9Ts
+ 6vs1XRh2nuVlHTrxHaSapZp82m5HqAgWlxI3ZRwJ4sO6CGwe70eJInRr+fxmrNMC/lTiPl
+ 3o2CIbnRNTRMw/Ob6DKgfi+/h7NPNtQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-492-dX3jjKquOey5qWd9QhuN8A-1; Tue, 05 Oct 2021 15:05:39 -0400
+X-MC-Unique: dX3jjKquOey5qWd9QhuN8A-1
+Received: by mail-ed1-f70.google.com with SMTP id
+ g28-20020a50d0dc000000b003dae69dfe3aso188474edf.7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 12:05:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=pks3z+IN34uKEcJiugoE2qCaJ8Ch2RkxBo7zygTxWDE=;
- b=BdizEnULfUGfVv4cqd/wacNe5P+8qOXjk4pspB3hE3U/aSGusfsrReLOecvlNpEkg/
- UHkcQ9U5Ks1F4TOj93+XPF+HDDnG9eBHymL+4hbiMEFGfPpaRfyL1oIzIB3c2KZIJ17w
- MTXFk14kCmjn5JDYNHIofO0JQvp00NhVfkjKbb+iaVzAm+IApBhg1DR+IrOjOYtgZk7x
- Pg7nig6WfziXziu8x6fcyM257TYXvw9chW4tDeNYyRycNsHpcLGLKEHTNlJWw60w6EEj
- T51wAug9zSngQyB5Y4oCu0rpBoYxuShEavvIduml2bjMHw8e+gLvSH2vpBfLBBVspSz9
- o41Q==
-X-Gm-Message-State: AOAM531Tb0rKeAb1aBn+uOaD53rZFKbeBRlwkrJDbU4KgbIdiuOAA2IU
- AkVmAqta7fwpfan+2eeixEzJgxgH7i8wWpkTrUCY8gEjM9ssXxBfOd8ixeDqAKbHN3iCpyUA+YJ
- HLTjH4VpOHn2UDtJq2YwxHmZn
-X-Received: by 2002:a50:a402:: with SMTP id u2mr7001814edb.164.1633460515756; 
- Tue, 05 Oct 2021 12:01:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwONHgv+rzWdOUDOp3pb03VLVgZb0u2aMFk5wZLbXeJGvkerMM7eHV4Ej3ChBcS+hGx+yWW0Q==
-X-Received: by 2002:a50:a402:: with SMTP id u2mr7001789edb.164.1633460515538; 
- Tue, 05 Oct 2021 12:01:55 -0700 (PDT)
+ bh=Dl3aTJvWqGu6seveycGfN6caamqhyrUPV6cp3PR6dwA=;
+ b=F3XuEsfCAaKhk3iij9oJvW2tdK9NLj0zzCmA5HPd2vPjL47MAO9nDZjhAjJ41614PP
+ rybFukYFjgiN8ci6jMg7rIUbPp0UN5QvhDvdzhMKSpAE5hqty+QQ2N05DU5fwN5wXXi7
+ AEjdo13/TWIvOOM+7Zi34MxnsSH95IYSpm+q3uoVsCrtu7ruQ2sd+YRQoYdE8cQnca7+
+ 6cN4jpV/yZEAmAn539pC9VENnUTDVczQstFQp52ktBbD0V/PiO8ZSz6xaeQttjMyRhTs
+ owm+EOrOZAlHr4B8zciXX2VlUXgcPr74Mo3joeH1Ds8aaqyu4K0BRiITNCFOI1vrss0G
+ 5a+g==
+X-Gm-Message-State: AOAM531El9xydx7urx6DFXtPQwoY7ivnes2v838GXJtm8dGNWDrYUW7O
+ jODqXPSXhb/fyor8l2eYeNfnUHDmVp9MwUEHR+0mcYam0+NpbRnqRUllRr5jC2hTYuVOBXmNfzu
+ 6z+jrwH6ODi0QwUHTGIPbocO8
+X-Received: by 2002:a17:907:3e03:: with SMTP id
+ hp3mr26025560ejc.183.1633460738408; 
+ Tue, 05 Oct 2021 12:05:38 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyF8eNT+AVYZrVXza6mM5jC46JOKIEFUXE9ObrEwpUyLiPwySHkyfYF0utBleIoX6+4pNLMYw==
+X-Received: by 2002:a17:907:3e03:: with SMTP id
+ hp3mr26025507ejc.183.1633460738047; 
+ Tue, 05 Oct 2021 12:05:38 -0700 (PDT)
 Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
- by smtp.gmail.com with ESMTPSA id 21sm7981028ejv.54.2021.10.05.12.01.54
+ by smtp.gmail.com with ESMTPSA id z8sm8114401ejd.94.2021.10.05.12.05.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 05 Oct 2021 12:01:54 -0700 (PDT)
-Date: Tue, 5 Oct 2021 21:01:53 +0200
+ Tue, 05 Oct 2021 12:05:37 -0700 (PDT)
+Date: Tue, 5 Oct 2021 21:05:35 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v2 03/11] KVM: arm64: Encapsulate reset request logic in
- a helper function
-Message-ID: <20211005190153.dc2befzcisvznxq5@gator.home>
+Subject: Re: [PATCH v2 10/11] selftests: KVM: Refactor psci_test to make it
+ amenable to new tests
+Message-ID: <20211005190535.mxk6do6sbpf4j2c7@gator.home>
 References: <20210923191610.3814698-1-oupton@google.com>
- <20210923191610.3814698-4-oupton@google.com>
- <CAAeT=FxXsJdnrQCr4m-LcADr=WX5pKEa2OdeTf3bRGM08iC3Uw@mail.gmail.com>
- <CAOQ_QshHDWWEw5BEu-uudFttP1pfJcKuQ-0D_xAkoHJRqYLq8Q@mail.gmail.com>
- <20211005133335.y4k5qv7d3g74nnzx@gator.home>
- <CAOQ_QsgwK=qyeaUtNJeZ1OWQwaFUAQcy6uopnDuyDA3Qyt7gmw@mail.gmail.com>
+ <20210923191610.3814698-11-oupton@google.com>
+ <20211005134539.s7kzhqlg2pykfcam@gator.home>
+ <CAOQ_QsjQ28b8OXLR1o8QD=M8dsBKtPLyB-QRyd=D1UVMGy6o0w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOQ_QsgwK=qyeaUtNJeZ1OWQwaFUAQcy6uopnDuyDA3Qyt7gmw@mail.gmail.com>
+In-Reply-To: <CAOQ_QsjQ28b8OXLR1o8QD=M8dsBKtPLyB-QRyd=D1UVMGy6o0w@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -110,139 +110,165 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Oct 05, 2021 at 08:05:02AM -0700, Oliver Upton wrote:
-> Hi folks,
+On Tue, Oct 05, 2021 at 07:54:01AM -0700, Oliver Upton wrote:
+> Hi Drew,
 > 
-> On Tue, Oct 5, 2021 at 6:33 AM Andrew Jones <drjones@redhat.com> wrote:
+> On Tue, Oct 5, 2021 at 6:45 AM Andrew Jones <drjones@redhat.com> wrote:
 > >
-> > On Fri, Oct 01, 2021 at 09:10:14AM -0700, Oliver Upton wrote:
-> > > On Thu, Sep 30, 2021 at 11:05 PM Reiji Watanabe <reijiw@google.com> wrote:
-> > > >
-> > > > On Thu, Sep 23, 2021 at 12:16 PM Oliver Upton <oupton@google.com> wrote:
-> > > > >
-> > > > > In its implementation of the PSCI function, KVM needs to request that a
-> > > > > target vCPU resets before its next entry into the guest. Wrap the logic
-> > > > > for requesting a reset in a function for later use by other implemented
-> > > > > PSCI calls.
-> > > > >
-> > > > > No functional change intended.
-> > > > >
-> > > > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > > > ---
-> > > > >  arch/arm64/kvm/psci.c | 59 +++++++++++++++++++++++++------------------
-> > > > >  1 file changed, 35 insertions(+), 24 deletions(-)
-> > > > >
-> > > > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > > > > index 310b9cb2b32b..bb59b692998b 100644
-> > > > > --- a/arch/arm64/kvm/psci.c
-> > > > > +++ b/arch/arm64/kvm/psci.c
-> > > > > @@ -64,9 +64,40 @@ static inline bool kvm_psci_valid_affinity(unsigned long affinity)
-> > > > >         return !(affinity & ~MPIDR_HWID_BITMASK);
-> > > > >  }
-> > > > >
-> > > > > -static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > > > +static void kvm_psci_vcpu_request_reset(struct kvm_vcpu *vcpu,
-> > > > > +                                       unsigned long entry_addr,
-> > > > > +                                       unsigned long context_id,
-> > > > > +                                       bool big_endian)
-> > > > >  {
-> > > > >         struct vcpu_reset_state *reset_state;
-> > > > > +
-> > > > > +       lockdep_assert_held(&vcpu->kvm->lock);
-> > > > > +
-> > > > > +       reset_state = &vcpu->arch.reset_state;
-> > > > > +       reset_state->pc = entry_addr;
-> > > > > +
-> > > > > +       /* Propagate caller endianness */
-> > > > > +       reset_state->be = big_endian;
-> > > > > +
-> > > > > +       /*
-> > > > > +        * NOTE: We always update r0 (or x0) because for PSCI v0.1
-> > > > > +        * the general purpose registers are undefined upon CPU_ON.
-> > > > > +        */
-> > > > > +       reset_state->r0 = context_id;
-> > > > > +
-> > > > > +       WRITE_ONCE(reset_state->reset, true);
-> > > > > +       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
-> > > > > +
-> > > > > +       /*
-> > > > > +        * Make sure the reset request is observed if the change to
-> > > > > +        * power_state is observed.
-> > > > > +        */
-> > > > > +       smp_wmb();
-> > > > > +       vcpu->arch.power_off = false;
-> > > > > +}
-> > > > > +
-> > > > > +static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > > > +{
-> > > > >         struct kvm *kvm = source_vcpu->kvm;
-> > > > >         struct kvm_vcpu *vcpu = NULL;
-> > > > >         unsigned long cpu_id;
-> > > > > @@ -90,29 +121,9 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > > > >                         return PSCI_RET_INVALID_PARAMS;
-> > > > >         }
-> > > > >
-> > > > > -       reset_state = &vcpu->arch.reset_state;
-> > > > > -
-> > > > > -       reset_state->pc = smccc_get_arg2(source_vcpu);
-> > > > > -
-> > > > > -       /* Propagate caller endianness */
-> > > > > -       reset_state->be = kvm_vcpu_is_be(source_vcpu);
-> > > > > -
-> > > > > -       /*
-> > > > > -        * NOTE: We always update r0 (or x0) because for PSCI v0.1
-> > > > > -        * the general purpose registers are undefined upon CPU_ON.
-> > > > > -        */
-> > > > > -       reset_state->r0 = smccc_get_arg3(source_vcpu);
-> > > > > -
-> > > > > -       WRITE_ONCE(reset_state->reset, true);
-> > > > > -       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
-> > > > > -
-> > > > > -       /*
-> > > > > -        * Make sure the reset request is observed if the change to
-> > > > > -        * power_state is observed.
-> > > > > -        */
-> > > > > -       smp_wmb();
-> > > > > -
-> > > > > -       vcpu->arch.power_off = false;
-> > > > > +       kvm_psci_vcpu_request_reset(vcpu, smccc_get_arg2(source_vcpu),
-> > > > > +                                   smccc_get_arg3(source_vcpu),
-> > > > > +                                   kvm_vcpu_is_be(source_vcpu));
-> > > > >         kvm_vcpu_wake_up(vcpu);
-> > > > >
-> > > > >         return PSCI_RET_SUCCESS;
-> > > > > --
-> > > > > 2.33.0.685.g46640cef36-goog
-> > > >
-> > > > Reviewed-by: Reiji Watanabe <reijiw@google.com>
-> > > >
-> > > > Not directly related to the patch, but the (original) code doesn't
-> > > > do any sanity checking for the entry address although the PSCI spec says:
-> > > >
-> > > > "INVALID_ADDRESS is returned when the entry point address is known
-> > > > by the implementation to be invalid, because it is in a range that
-> > > > is known not to be available to the caller."
+> > On Thu, Sep 23, 2021 at 07:16:09PM +0000, Oliver Upton wrote:
+> > > Split up the current test into several helpers that will be useful to
+> > > subsequent test cases added to the PSCI test suite.
 > > >
-> > > Right, I had noticed the same but was a tad too lazy to address in
-> > > this series :) Thanks for the review, Reji!
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+> > >  .../testing/selftests/kvm/aarch64/psci_test.c | 68 ++++++++++++-------
+> > >  1 file changed, 45 insertions(+), 23 deletions(-)
 > > >
-> >
-> > KVM doesn't reserve any subrange within [0 - max_ipa), afaik. So all
-> > we need to do is check 'entry_addr < max_ipa', right?
-> >
-> 
-> We could be a bit more pedantic and check if the IPA exists in a
-> memory slot, seems like kvm_vcpu_is_visible_gfn() should do the trick.
-> 
-> Thoughts?
+> > > diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > > index 8d043e12b137..90312be335da 100644
+> > > --- a/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > > +++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
+> > > @@ -45,7 +45,7 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
+> > >       return res.a0;
+> > >  }
+> > >
+> > > -static void guest_main(uint64_t target_cpu)
+> > > +static void guest_test_cpu_on(uint64_t target_cpu)
+> > >  {
+> > >       GUEST_ASSERT(!psci_cpu_on(target_cpu, CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID));
+> > >       uint64_t target_state;
+> > > @@ -69,12 +69,10 @@ static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
+> > >       vcpu_set_mp_state(vm, vcpuid, &mp_state);
+> > >  }
 
-Are we sure that all emulated devices, nvram, etc. will always use a
-memslot for regions that contain executable code? If there's any doubt,
-then we can't be sure about non-memslot regions within the max_ipa range.
-That'd be up to userspace.
+Context from last patch.
+
+> > >
+> > > -int main(void)
+> > > +static struct kvm_vm *setup_vm(void *guest_code)
+> > >  {
+> > > -     uint64_t target_mpidr, obs_pc, obs_x0;
+> > >       struct kvm_vcpu_init init;
+> > >       struct kvm_vm *vm;
+> > > -     struct ucall uc;
+> > >
+> > >       vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
+> > >       kvm_vm_elf_load(vm, program_invocation_name);
+> > > @@ -83,31 +81,28 @@ int main(void)
+> > >       vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+> > >       init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
+> > >
+> > > -     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
+> > > -     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
+> > > +     aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_code);
+> > > +     aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_code);
+
+Context from last patch.
+
+> > >
+> > > -     /*
+> > > -      * make sure the target is already off when executing the test.
+> > > -      */
+> > > -     vcpu_power_off(vm, VCPU_ID_TARGET);
+> > > +     return vm;
+> > > +}
+> > >
+> > > -     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
+> > > -     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
+> > > -     vcpu_run(vm, VCPU_ID_SOURCE);
+> > > +static void enter_guest(struct kvm_vm *vm, uint32_t vcpuid)
+> > > +{
+> > > +     struct ucall uc;
+> > >
+> > > -     switch (get_ucall(vm, VCPU_ID_SOURCE, &uc)) {
+> > > -     case UCALL_DONE:
+> > > -             break;
+> > > -     case UCALL_ABORT:
+> > > +     vcpu_run(vm, vcpuid);
+> > > +     if (get_ucall(vm, vcpuid, &uc) == UCALL_ABORT)
+> > >               TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0], __FILE__,
+> > >                         uc.args[1]);
+> > > -             break;
+> > > -     default:
+> > > -             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
+> > > -     }
+> > > +}
+> > >
+> > > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.pc), &obs_pc);
+> > > -     get_reg(vm, VCPU_ID_TARGET, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
+> > > +static void assert_vcpu_reset(struct kvm_vm *vm, uint32_t vcpuid)
+> > > +{
+> > > +     uint64_t obs_pc, obs_x0;
+> > > +
+> > > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.pc), &obs_pc);
+> > > +     get_reg(vm, vcpuid, ARM64_CORE_REG(regs.regs[0]), &obs_x0);
+> > >
+> > >       TEST_ASSERT(obs_pc == CPU_ON_ENTRY_ADDR,
+> > >                   "unexpected target cpu pc: %lx (expected: %lx)",
+> > > @@ -115,7 +110,34 @@ int main(void)
+> > >       TEST_ASSERT(obs_x0 == CPU_ON_CONTEXT_ID,
+> > >                   "unexpected target context id: %lx (expected: %lx)",
+> > >                   obs_x0, CPU_ON_CONTEXT_ID);
+> > > +}
+> > >
+> > > +static void host_test_cpu_on(void)
+> > > +{
+> > > +     uint64_t target_mpidr;
+> > > +     struct kvm_vm *vm;
+> > > +     struct ucall uc;
+> > > +
+> > > +     vm = setup_vm(guest_test_cpu_on);
+> > > +
+> > > +     /*
+> > > +      * make sure the target is already off when executing the test.
+> > > +      */
+> > > +     vcpu_power_off(vm, VCPU_ID_TARGET);
+> > > +
+> > > +     get_reg(vm, VCPU_ID_TARGET, ARM64_SYS_REG(MPIDR_EL1), &target_mpidr);
+> > > +     vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
+> > > +     enter_guest(vm, VCPU_ID_SOURCE);
+> > > +
+> > > +     if (get_ucall(vm, VCPU_ID_SOURCE, &uc) != UCALL_DONE)
+> > > +             TEST_FAIL("Unhandled ucall: %lu", uc.cmd);
+> > > +
+> > > +     assert_vcpu_reset(vm, VCPU_ID_TARGET);
+> > >       kvm_vm_free(vm);
+> > > +}
+> > > +
+> > > +int main(void)
+> > > +{
+> > > +     host_test_cpu_on();
+> > >       return 0;
+> > >  }
+> > > --
+> > > 2.33.0.685.g46640cef36-goog
+> > >
+> >
+> > Hard to read diff, but I think the refactoring comes out right.
+> 
+> Yeah, this one's nasty, sorry about that. Thanks for parsing it out, heh.
+> 
+> > Please do this refactoring before adding the new test in the next revision, though.
+> >
+> 
+> This is 10/11 in the series, and the test is 11/11. I'm not seeing any
+> context belonging to the last patch, but perhaps I'm missing something
+> obvious.
+
+It's not much, but nicer to have none.
 
 Thanks,
 drew
+
+> 
+> > Reviewed-by: Andrew Jones <drjones@redhat.com>
+> 
+> Thanks!
+> 
+> --
+> Best,
+> Oliver
+> 
 
 _______________________________________________
 kvmarm mailing list
