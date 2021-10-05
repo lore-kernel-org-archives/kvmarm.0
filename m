@@ -2,83 +2,106 @@ Return-Path: <SRS0=da30=OZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F37C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 07:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE67C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 07:56:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 702BA61507
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 07:21:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 702BA61507
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id CE91360FE8
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 07:56:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CE91360FE8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB8DC4B2DA;
-	Tue,  5 Oct 2021 03:21:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 595C34B2BC;
+	Tue,  5 Oct 2021 03:56:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2g5N-EI-qpb2; Tue,  5 Oct 2021 03:21:21 -0400 (EDT)
+	with ESMTP id eUpb9KZ-kCh2; Tue,  5 Oct 2021 03:56:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78F134B2A1;
-	Tue,  5 Oct 2021 03:21:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 46DA74B2AD;
+	Tue,  5 Oct 2021 03:56:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13E954B287
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 03:21:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 916FB4B286
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 03:56:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dXtcxnsunHwR for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Oct 2021 03:21:18 -0400 (EDT)
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com
- [209.85.167.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7FBB4B284
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 03:21:18 -0400 (EDT)
-Received: by mail-oi1-f172.google.com with SMTP id t189so25030330oie.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 00:21:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=t50iClouvR5wNCpxVuPLY/4woxgBaeq2YJxilfcBxqQ=;
- b=J+94v5pHqshDYiJxv8ZiKIUzq3WoDzxQ6USi+tcv2o8XFm3vczBmpRbsSeFYCnJifN
- odYbvqEwPcw/FPG1AFa9lzP83y7WHTj44NOsOKcvDNOrt2eCJoT2mBTa5fSD6OywWwkC
- BLd7H+8rRl2+Lwb/+0bqWau6yYX/qXemovS3VeePF1IlgOw3eT/n5V6CRfkBKxWwDH33
- xjAQEJ8nofWJ/EhrEhdWzEWOmkshYoBVfFgwubbO+qfY472Fn1Tyjq55esDuKfg2RSYF
- eNPLDGRBuL7G2AIaQ5t8esAthukpMn5VdNjxBaRw4SCuYZB0dtrvgP3p/lfO7xDze8VS
- 4Z1g==
+ with ESMTP id z9rhCZWXmytB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Oct 2021 03:56:30 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C6DC4B26D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 03:56:30 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1633420590;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uxcsc9+/ALGMdXirECAEtPRw+buxJ+mONYYMojv18BA=;
+ b=G+OFhBmEDJbeM0vpZeMeZzSr36n3CsueGYchkxTgdr10zwrZkE4HoK6NNvRZeoT7zQ2Ec1
+ gGHe9GW7arkA/ptIRR5E27sxU9i/B/MX3FitlsE5IS5SODOnifWKOh30xYX9XyPsaRi+Rv
+ z35j6YqCf1ehNlsga/dLzb/iCP3JnWE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-166-zlXea4r5NJCbCfFBFkXp3A-1; Tue, 05 Oct 2021 03:56:28 -0400
+X-MC-Unique: zlXea4r5NJCbCfFBFkXp3A-1
+Received: by mail-wm1-f70.google.com with SMTP id
+ p63-20020a1c2942000000b0030ccf0767baso944621wmp.6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 00:56:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=t50iClouvR5wNCpxVuPLY/4woxgBaeq2YJxilfcBxqQ=;
- b=BBfVYv2ZAZ6cLfoeKRmlfycS1MypVQY989TYloisz3hgGGGL2231p0/pCB4RdmFAWW
- QJvhSPzthrEOHczm6ms/UAdfUS3cY8e6uUMqCxWP8YGmAyAIlMdiskV93PvuDlYidGiK
- YYf/ac3JAtSrD68FiNjYOhV7RE+0B3ROwC6H7fTj6V8TqDwAlaUmegEvG9TtUEJIPET4
- N9SQI5PAlQWa3FKez6hgUE2cnhv6TGE0vLg3BBpbBfwI6Z8K8+1FHuxbXHTnigC1u13T
- 0/RzgAbtubOvZR1yvfInh83fHVBo+HOahNHGtIqXMyUvUOLyn/vyXUWPUJntWo3Kedeq
- q3nw==
-X-Gm-Message-State: AOAM533GdcVrGuO0UOQLgsIZyc67uFMrmGpY0VxkHbkHr6dm4j5SKbx0
- BYN/UbG9Am8dAWMSNSs5BdsfvvDIFWVpHjGB0Es2pw==
-X-Google-Smtp-Source: ABdhPJxEaJp7LF/gYfQZpn3JIvXZDIElO6AVcWj+FJM4+9kwneOgxH1YTpeV0ZXlGKdCSSn4gfibW+UcW15ckdXKP6o=
-X-Received: by 2002:a05:6808:1641:: with SMTP id
- az1mr1237774oib.67.1633418477949; 
- Tue, 05 Oct 2021 00:21:17 -0700 (PDT)
+ h=x-gm-message-state:reply-to:subject:to:cc:references:from
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-transfer-encoding:content-language;
+ bh=uxcsc9+/ALGMdXirECAEtPRw+buxJ+mONYYMojv18BA=;
+ b=dnU1Zo0pNSo1IhZTvZ1M1IZSpvr846RYQV/68z8UP24A3zkTA/SoP+lXCou4xv/sGs
+ fO5C/hdMmWhb0Og7SmsPBOEi0UqQFY7PqMSIL/CbhnQzPS6f9z8jV/pG7ZDpQW0JEunZ
+ lLZMO4QrE3r8hM/pM0yQpGJgsMqHAA3DMOj4/YHpozXcuExDoOksigOQhoQAJg64C4u2
+ yBo5ZLWaznFr4PzLagsshTwBP9bKgb7KTBWciwLZ6sxH3+Wo3/VhrWE/zmF66ekDSnEL
+ 84nwKjvwDdlCs1w9IGeru+m+iSrvBm3Uvprcob92qB+wCRl26BEddWUf/p/y7uIOtUxs
+ R8UA==
+X-Gm-Message-State: AOAM533cgZmNdDjJOoVMAEIBozqFVX4RyhwW6oIMK9uYqgJ2/U+IWBmV
+ mlBrPAUDy2aGYOfjrd8MC6xi+fKMjmeOVuoD6SeoOFhDH1wQ8DyAcXWKaiO77vNf8zpfTXQZmLl
+ TiyMBdXxhqS4uLwIXyFH8Cxxv
+X-Received: by 2002:a05:600c:1553:: with SMTP id
+ f19mr1867651wmg.66.1633420587310; 
+ Tue, 05 Oct 2021 00:56:27 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwq2lzHQkf14bsNcBYPLOhdihVC1Vma+u2W+yn9GkssSn4fsp8+uC08Zbe0RKlILdRfGdfvBA==
+X-Received: by 2002:a05:600c:1553:: with SMTP id
+ f19mr1867634wmg.66.1633420587115; 
+ Tue, 05 Oct 2021 00:56:27 -0700 (PDT)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id l17sm16929611wrx.24.2021.10.05.00.56.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 05 Oct 2021 00:56:26 -0700 (PDT)
+Subject: Re: [PATCH v4 05/11] KVM: arm64: vgic: Drop vgic_check_ioaddr()
+To: Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+ maz@kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com,
+ alexandru.elisei@arm.com
+References: <20211005011921.437353-1-ricarkol@google.com>
+ <20211005011921.437353-6-ricarkol@google.com>
+From: Eric Auger <eric.auger@redhat.com>
+Message-ID: <a6a69648-0fc3-3d94-0e65-dc82693ce4c7@redhat.com>
+Date: Tue, 5 Oct 2021 09:56:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-References: <20210922124704.600087-1-tabba@google.com>
- <20210922124704.600087-12-tabba@google.com>
- <87tuhwr98w.wl-maz@kernel.org>
-In-Reply-To: <87tuhwr98w.wl-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 5 Oct 2021 08:20:41 +0100
-Message-ID: <CA+EHjTxH4MhqrO1G_YmYSEwLceG6xxMe4SSRbSHVtmXSSSpy4A@mail.gmail.com>
-Subject: Re: [PATCH v6 11/12] KVM: arm64: Trap access to pVM restricted
- features
-To: Marc Zyngier <maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, pbonzini@redhat.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20211005011921.437353-6-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: pshier@google.com, Paolo Bonzini <pbonzini@redhat.com>, shuah@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -92,181 +115,83 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Ricardo,
 
-On Mon, Oct 4, 2021 at 6:27 PM Marc Zyngier <maz@kernel.org> wrote:
+On 10/5/21 3:19 AM, Ricardo Koller wrote:
+> There are no more users of vgic_check_ioaddr(). Move its checks to
+> vgic_check_iorange() and then remove it.
 >
-> Hi Fuad,
->
-> On Wed, 22 Sep 2021 13:47:03 +0100,
-> Fuad Tabba <tabba@google.com> wrote:
-> >
-> > Trap accesses to restricted features for VMs running in protected
-> > mode.
-> >
-> > Access to feature registers are emulated, and only supported
-> > features are exposed to protected VMs.
-> >
-> > Accesses to restricted registers as well as restricted
-> > instructions are trapped, and an undefined exception is injected
-> > into the protected guests, i.e., with EC = 0x0 (unknown reason).
-> > This EC is the one used, according to the Arm Architecture
-> > Reference Manual, for unallocated or undefined system registers
-> > or instructions.
-> >
-> > Only affects the functionality of protected VMs. Otherwise,
-> > should not affect non-protected VMs when KVM is running in
-> > protected mode.
-> >
-> > Signed-off-by: Fuad Tabba <tabba@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/nvhe/switch.c | 60 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 60 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > index 49080c607838..2bf5952f651b 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> > @@ -20,6 +20,7 @@
-> >  #include <asm/kprobes.h>
-> >  #include <asm/kvm_asm.h>
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_fixed_config.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  #include <asm/fpsimd.h>
-> > @@ -28,6 +29,7 @@
-> >  #include <asm/thread_info.h>
-> >
-> >  #include <nvhe/mem_protect.h>
-> > +#include <nvhe/sys_regs.h>
-> >
-> >  /* Non-VHE specific context */
-> >  DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
-> > @@ -158,6 +160,49 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
-> >               write_sysreg(pmu->events_host, pmcntenset_el0);
-> >  }
-> >
-> > +/**
-> > + * Handler for protected VM restricted exceptions.
-> > + *
-> > + * Inject an undefined exception into the guest and return true to indicate that
-> > + * the hypervisor has handled the exit, and control should go back to the guest.
-> > + */
-> > +static bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +{
-> > +     __inject_undef64(vcpu);
-> > +     return true;
-> > +}
-> > +
-> > +/**
-> > + * Handler for protected VM MSR, MRS or System instruction execution in AArch64.
-> > + *
-> > + * Returns true if the hypervisor has handled the exit, and control should go
-> > + * back to the guest, or false if it hasn't.
-> > + */
-> > +static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +{
-> > +     if (kvm_handle_pvm_sysreg(vcpu, exit_code))
-> > +             return true;
-> > +     else
-> > +             return kvm_hyp_handle_sysreg(vcpu, exit_code);
->
-> nit: drop the else.
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Will do.
-
-> I wonder though: what if there is an overlap between between the pVM
-> handling and the normal KVM stuff? Are we guaranteed that there is
-> none?
+Eric
+> ---
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 26 ++++----------------------
+>  arch/arm64/kvm/vgic/vgic.h            |  3 ---
+>  2 files changed, 4 insertions(+), 25 deletions(-)
 >
-> For example, ESR_ELx_EC_SYS64 is used when working around some bugs
-> (see the TX2 TVM handling). What happens if you return early and don't
-> let it happen? This has a huge potential for some bad breakage.
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> index 08ae34b1a986..0d000d2fe8d2 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> @@ -14,38 +14,20 @@
+>  
+>  /* common helpers */
+>  
+> -int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+> -		      phys_addr_t addr, phys_addr_t alignment)
+> -{
+> -	if (addr & ~kvm_phys_mask(kvm))
+> -		return -E2BIG;
+> -
+> -	if (!IS_ALIGNED(addr, alignment))
+> -		return -EINVAL;
+> -
+> -	if (!IS_VGIC_ADDR_UNDEF(*ioaddr))
+> -		return -EEXIST;
+> -
+> -	return 0;
+> -}
+> -
+>  int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
+>  		       phys_addr_t addr, phys_addr_t alignment,
+>  		       phys_addr_t size)
+>  {
+> -	int ret;
+> -
+> -	ret = vgic_check_ioaddr(kvm, &ioaddr, addr, alignment);
+> -	if (ret)
+> -		return ret;
+> +	if (!IS_VGIC_ADDR_UNDEF(ioaddr))
+> +		return -EEXIST;
+>  
+> -	if (!IS_ALIGNED(size, alignment))
+> +	if (!IS_ALIGNED(addr, alignment) || !IS_ALIGNED(size, alignment))
+>  		return -EINVAL;
+>  
+>  	if (addr + size < addr)
+>  		return -EINVAL;
+>  
+> -	if (addr + size > kvm_phys_size(kvm))
+> +	if (addr & ~kvm_phys_mask(kvm) || addr + size > kvm_phys_size(kvm))
+>  		return -E2BIG;
+>  
+>  	return 0;
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 4be01c38e8f1..3fd6c86a7ef3 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -172,9 +172,6 @@ void vgic_kick_vcpus(struct kvm *kvm);
+>  void vgic_irq_handle_resampling(struct vgic_irq *irq,
+>  				bool lr_deactivated, bool lr_pending);
+>  
+> -int vgic_check_ioaddr(struct kvm *kvm, phys_addr_t *ioaddr,
+> -		      phys_addr_t addr, phys_addr_t alignment);
+> -
+>  int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
+>  		       phys_addr_t addr, phys_addr_t alignment,
+>  		       phys_addr_t size);
 
-This is a tough one. Especially because it's dealing with bugs, there
-is no guarantee really. I think that for the TVM handling there is no
-overlap and the TVM handling code in kvm_hyp_handle_sysreg() will be
-invoked. However, workarounds could always be added, and if that
-happens, we need to make sure that they're on all paths. One solution
-is to make sure that such code is in a common function called by both
-paths. Not sure how we could enforce that other than by documenting
-it.
-
-What do you think?
-
-> > +}
-> > +
-> > +/**
-> > + * Handler for protected floating-point and Advanced SIMD accesses.
-> > + *
-> > + * Returns true if the hypervisor has handled the exit, and control should go
-> > + * back to the guest, or false if it hasn't.
-> > + */
-> > +static bool kvm_handle_pvm_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > +{
-> > +     /* Linux guests assume support for floating-point and Advanced SIMD. */
-> > +     BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_FP),
-> > +                             PVM_ID_AA64PFR0_ALLOW));
-> > +     BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_ASIMD),
-> > +                             PVM_ID_AA64PFR0_ALLOW));
-> > +
-> > +     return kvm_hyp_handle_fpsimd(vcpu, exit_code);
-> > +}
-> > +
-> >  static const exit_handler_fn hyp_exit_handlers[] = {
-> >       [0 ... ESR_ELx_EC_MAX]          = NULL,
-> >       [ESR_ELx_EC_CP15_32]            = kvm_hyp_handle_cp15,
-> > @@ -170,8 +215,23 @@ static const exit_handler_fn hyp_exit_handlers[] = {
-> >       [ESR_ELx_EC_PAC]                = kvm_hyp_handle_ptrauth,
-> >  };
-> >
-> > +static const exit_handler_fn pvm_exit_handlers[] = {
-> > +     [0 ... ESR_ELx_EC_MAX]          = NULL,
-> > +     [ESR_ELx_EC_CP15_32]            = kvm_hyp_handle_cp15,
-> > +     [ESR_ELx_EC_CP15_64]            = kvm_hyp_handle_cp15,
->
-> Heads up, this one was bogus, and I removed it in my patches[1].
->
-> But it really begs the question: given that you really don't want to
-> handle any AArch32 for protected VMs, why handling anything at all the
-> first place? You really should let the exit happen and let the outer
-> run loop deal with it.
-
-Good point. Will fix this.
-
-Cheers,
-/fuad
-
-> > +     [ESR_ELx_EC_SYS64]              = kvm_handle_pvm_sys64,
-> > +     [ESR_ELx_EC_SVE]                = kvm_handle_pvm_restricted,
-> > +     [ESR_ELx_EC_FP_ASIMD]           = kvm_handle_pvm_fpsimd,
-> > +     [ESR_ELx_EC_IABT_LOW]           = kvm_hyp_handle_iabt_low,
-> > +     [ESR_ELx_EC_DABT_LOW]           = kvm_hyp_handle_dabt_low,
-> > +     [ESR_ELx_EC_PAC]                = kvm_hyp_handle_ptrauth,
-> > +};
-> > +
-> >  static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
-> >  {
-> > +     if (unlikely(kvm_vm_is_protected(kvm)))
-> > +             return pvm_exit_handlers;
-> > +
-> >       return hyp_exit_handlers;
-> >  }
-> >
-> > --
-> > 2.33.0.464.g1972c5931b-goog
-> >
-> >
->
-> Thanks,
->
->         M.
->
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/early-ec-handlers&id=f84ff369795ed47f2cd5e556170166ee8b3a988f
->
-> --
-> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
