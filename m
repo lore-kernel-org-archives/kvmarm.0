@@ -2,76 +2,76 @@ Return-Path: <SRS0=da30=OZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 769EFC433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 01:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6159C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 01:19:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2AFCF6140B
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 01:19:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2AFCF6140B
+	by mail.kernel.org (Postfix) with ESMTP id 60676615A4
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 01:19:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 60676615A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D23CA4B2EC;
-	Mon,  4 Oct 2021 21:19:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 179554B2DA;
+	Mon,  4 Oct 2021 21:19:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y1ot56ayNRag; Mon,  4 Oct 2021 21:19:42 -0400 (EDT)
+	with ESMTP id ZpmlmbhtNBtB; Mon,  4 Oct 2021 21:19:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A936E4B2DE;
-	Mon,  4 Oct 2021 21:19:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D11784B2D8;
+	Mon,  4 Oct 2021 21:19:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 640E64B2D1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 21:19:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CC0D4B2C8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 21:19:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1bi95Ic+L78f for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Oct 2021 21:19:40 -0400 (EDT)
+ with ESMTP id qO8r0CJpc0bf for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Oct 2021 21:19:41 -0400 (EDT)
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
  [209.85.214.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1411A4B2CE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 21:19:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 897964B2D1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Oct 2021 21:19:41 -0400 (EDT)
 Received: by mail-pl1-f202.google.com with SMTP id
- w4-20020a1709029a8400b00138e222b06aso833398plp.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 18:19:40 -0700 (PDT)
+ f9-20020a1709028609b0290128bcba6be7so820315plo.18
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Oct 2021 18:19:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=LALo9JihRPRBkG1fYYMRtr74GhwkziudPmPUGtI9Fw4=;
- b=hLp0tj96F1OWP6HZwu3DGIrMazfL6bcOfnvTYKxYCIBaSh7ob8veeFJ1cVziBgXiNu
- bqDrG6sf6VCe/KsbjSR1p681zdh/F+klgPr6dB1bTJk/a4PtAI6cijGq+E9agkE4aFia
- Cz7Eh7XfwNv1k3E3mcPqWnhYUmyBjKyzPC1NH5IRoVCNFnkLS09HpMcftjRF+Yi8698c
- YrHRxITfEQOixXsbTKe7pNCA/4goHDQf2kL5LCTSXPQKvj61JXw5DWKR+L4y0qXYfaoL
- qk6JF+TDk4oO40MLI0Zjx2Ls1zHqiuP21PrRPIgk/+99jerLdZ4m2+nKG/47fiu8X3t3
- C0Pg==
+ :cc; bh=ebBYyYb0auVU2YwhpjKMMCWgRzY2PJI9/2w5/quPrGs=;
+ b=nnff9YiUi6n1ZXyRJwhfFa6RWAeI0wcpnPssLqmBzAlrRBcjFTQuzDYAjwhxx0tlOq
+ e+S5uaB88ivXuMxCX8mLqcIxGLvJF0V0OgaJn+sutt6n3gSl0AMpkFhY5mvQYmX5ew+D
+ WI5qVOypc6GBHMoJ6nmlJlq3ZzygfPXlMg/tlTJA1W3D9pghl6JYJB8QCS8actNnmxEH
+ gpEXsFZyynm2ozl0zbOPO6kP0yJ+/Dd4eq1ppv3Z4wAoJhWULYv6Ab7hmS6ncnX9p3JE
+ ETbTYxijY0mT28Xuh1/n2HOfAvYiMaaq70PB0zVzfsXQ57Q6XK+yfungcx56nOHn9I0/
+ XKTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=LALo9JihRPRBkG1fYYMRtr74GhwkziudPmPUGtI9Fw4=;
- b=V+h9/djc2Es3pkfwJfaWpAy2QVLzNDP5KMzhG8Fmmf6Mg0oMK9fobEQrk4HeA0CqpN
- mynLTMquC99zAzoCyJP7QMAJU8Gd0BeRXOhF9CiEZ6NRMxodcTyYy7HfYOpMQvTOnqu4
- lhNMsqfOYHFqYgMXarrY2fLb84aWueJsPydiO8eIJISePCq07X5Uzfb4Aux7EypE6V42
- D+s3q/AG8rP4pbsrzcWZckSYFKVgbGsF63Gvr6CsyC1HIT3MF8GjrgNhN4D/MZ6W0gXt
- fZW62hbRErYDfhQnGeQtHNl1shphacpgzpSU0Wr7BuG59ojhcXxSUPj6FqNfw07Xowc0
- QyJA==
-X-Gm-Message-State: AOAM530CpLAhdD3Ju4QqE0LZ5+r/Ku0EPJH5Vh+QSky0h6K8+n3lvZjP
- rGuslHzKYeSlXrhWvgAjuUOaDJy4MOek7Q==
-X-Google-Smtp-Source: ABdhPJzUUkZEXh0YtKOvuw4kldQta6Fk0jXOVYU6rXgMHyhp34IKvaz+CMANxBajmBBPTWnz+esVVsUyc0CDoQ==
+ bh=ebBYyYb0auVU2YwhpjKMMCWgRzY2PJI9/2w5/quPrGs=;
+ b=MObSImCdiatYgyw+v8csAqQDgHBlv+sA2ofoaVUL4lOLk3tV1cZbsZn+2N2IlK5BG9
+ A2gjK8P/v6erLpv4WZDWcYmaWfqMdKwIHAT+uCiKAo+qT8KDk7F6nuhpsLGnVjfJmSBS
+ XBaRzqYs5/YWmZuH4jqyCSa7QS/sQCLZwDCz1Lpyu08Y+A+90Db+C3N2uP3SBpGA9v7p
+ RZ3S8QF89Vr9BCKENjLF5Q8X5ppRgnrSugCFwWXfmQ0ObjpWSIekKYgSs2llMTL1u+Ru
+ uIFoNcciJ1Dyza4L1W7nfu4dmpHpXnL/GjWxZnzBa9QMWfH3PLO1mVGQBI+sgHsb5ZT9
+ /FEw==
+X-Gm-Message-State: AOAM530f6+WQYC3yi+xddg0PY581WQx2n6je7mx0v3jTv0HKA5mqyiBX
+ JB74dpMg4u+cqN2rFXzeaTN36Tp+SJigLg==
+X-Google-Smtp-Source: ABdhPJxSvUsBKjgUTRIyeKoK/lGVqGBvu8uO5Dr1jcgTFqQndyorWtPI9bFQSzNvrMxfbls15hUJ0mio4/S5Vg==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90b:1804:: with SMTP id
- lw4mr383225pjb.174.1633396779303; Mon, 04 Oct 2021 18:19:39 -0700 (PDT)
-Date: Mon,  4 Oct 2021 18:19:20 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:902:7e88:b0:13e:91ec:4114 with SMTP
+ id z8-20020a1709027e8800b0013e91ec4114mr2606928pla.30.1633396780779; Mon, 04
+ Oct 2021 18:19:40 -0700 (PDT)
+Date: Mon,  4 Oct 2021 18:19:21 -0700
 In-Reply-To: <20211005011921.437353-1-ricarkol@google.com>
-Message-Id: <20211005011921.437353-11-ricarkol@google.com>
+Message-Id: <20211005011921.437353-12-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20211005011921.437353-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.33.0.800.g4c38ced690-goog
-Subject: [PATCH v4 10/11] KVM: arm64: selftests: Add test for legacy GICv3
- REDIST base partially above IPA range
+Subject: [PATCH v4 11/11] KVM: arm64: selftests: Add init ITS device test
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu, 
  drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
@@ -92,71 +92,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new test into vgic_init which checks that the first vcpu fails to
-run if there is not sufficient REDIST space below the addressable IPA
-range.  This only applies to the KVM_VGIC_V3_ADDR_TYPE_REDIST legacy API
-as the required REDIST space is not know when setting the DIST region.
+Add some ITS device init tests: general KVM device tests (address not
+defined already, address aligned) and tests for the ITS region being
+within the addressable IPA range.
 
-Note that using the REDIST_REGION API results in a different check at
-first vcpu run: that the number of redist regions is enough for all
-vcpus. And there is already a test for that case in, the first step of
-test_v3_new_redist_regions.
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../testing/selftests/kvm/aarch64/vgic_init.c | 34 +++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ .../testing/selftests/kvm/aarch64/vgic_init.c | 42 +++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index eadd448b3a96..80be1940d2ad 100644
+index 80be1940d2ad..c563489ff760 100644
 --- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
 +++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -565,6 +565,39 @@ static void test_v3_last_bit_single_rdist(void)
+@@ -598,6 +598,47 @@ static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
  	vm_gic_destroy(&v);
  }
  
-+/* Uses the legacy REDIST region API. */
-+static void test_v3_redist_ipa_range_check_at_vcpu_run(void)
++static void test_v3_its_region(void)
 +{
 +	struct vm_gic v;
-+	int ret, i;
 +	uint64_t addr;
++	int its_fd, ret;
 +
-+	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, 1);
++	v = vm_gic_create_with_vcpus(KVM_DEV_TYPE_ARM_VGIC_V3, NR_VCPUS);
++	its_fd = kvm_create_device(v.vm, KVM_DEV_TYPE_ARM_VGIC_ITS, false);
 +
-+	/* Set space for 3 redists, we have 1 vcpu, so this succeeds. */
-+	addr = max_phys_size - (3 * 2 * 0x10000);
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+				 KVM_VGIC_V3_ADDR_TYPE_REDIST, &addr, true);
-+
-+	addr = 0x00000;
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
-+			KVM_VGIC_V3_ADDR_TYPE_DIST, &addr, true);
-+
-+	/* Add the rest of the VCPUs */
-+	for (i = 1; i < NR_VCPUS; ++i)
-+		vm_vcpu_add_default(v.vm, i, guest_code);
-+
-+	kvm_device_access(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+			  KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true);
-+
-+	/* Attempt to run a vcpu without enough redist space. */
-+	ret = run_vcpu(v.vm, 2);
++	addr = 0x401000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
 +	TEST_ASSERT(ret && errno == EINVAL,
-+		"redist base+size above PA range detected on 1st vcpu run");
++		"ITS region with misaligned address");
 +
++	addr = max_phys_size;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == E2BIG,
++		"register ITS region with base address beyond IPA range");
++
++	addr = max_phys_size - 0x10000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == E2BIG,
++		"Half of ITS region is beyond IPA range");
++
++	/* This one succeeds setting the ITS base */
++	addr = 0x400000;
++	kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++
++	addr = 0x300000;
++	ret = _kvm_device_access(its_fd, KVM_DEV_ARM_VGIC_GRP_ADDR,
++			  KVM_VGIC_ITS_ADDR_TYPE, &addr, true);
++	TEST_ASSERT(ret && errno == EEXIST, "ITS base set again");
++
++	close(its_fd);
 +	vm_gic_destroy(&v);
 +}
 +
  /*
   * Returns 0 if it's possible to create GIC device of a given type (V2 or V3).
   */
-@@ -616,6 +649,7 @@ void run_tests(uint32_t gic_dev_type)
- 		test_v3_typer_accesses();
+@@ -650,6 +691,7 @@ void run_tests(uint32_t gic_dev_type)
  		test_v3_last_bit_redist_regions();
  		test_v3_last_bit_single_rdist();
-+		test_v3_redist_ipa_range_check_at_vcpu_run();
+ 		test_v3_redist_ipa_range_check_at_vcpu_run();
++		test_v3_its_region();
  	}
  }
  
