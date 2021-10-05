@@ -2,88 +2,104 @@ Return-Path: <SRS0=da30=OZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF3AC433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 15:22:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2BCC433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 15:37:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BF53D61502
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 15:22:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BF53D61502
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 4CB6F61159
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 15:37:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4CB6F61159
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 37FE24B32B;
-	Tue,  5 Oct 2021 11:22:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C11B74B30C;
+	Tue,  5 Oct 2021 11:37:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id fA31+tuI0hHQ; Tue,  5 Oct 2021 11:22:47 -0400 (EDT)
+	with ESMTP id PoccH5PhK4gN; Tue,  5 Oct 2021 11:37:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E2BB4B30F;
-	Tue,  5 Oct 2021 11:22:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A29384B2DB;
+	Tue,  5 Oct 2021 11:37:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 590A34B305
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 11:22:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 066544B2D9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 11:37:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4Y2a+BSU-efa for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Oct 2021 11:22:44 -0400 (EDT)
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com
- [209.85.215.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35AEF4B2A1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 11:22:44 -0400 (EDT)
-Received: by mail-pg1-f182.google.com with SMTP id h3so9453094pgb.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 08:22:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to;
- bh=jsoEJt9R8crAH2RcsfBnQLCdcmXo4iVFPCHH8skN9hQ=;
- b=Ed27JI5WdcMBjzCmHglgYbPkFapHRW8VivzST0erYb/L/PV6Fx0rpTBNDt1223jRVb
- eQ5IVgSRDi5VCqGDiJM5A7rbcPMvwg6w1jg0wDhDNxogy7g8tXHb5gAQu3MkQZ4aTk9Q
- D+35shvAdiTeBDH9W72MNR7F3tUnMUT8t+zTm8lCHdonVdqfrCyFpDQ97vP6AwGRNn/X
- GOqBrTVYIjZiBhdOV7etEqYr4+lx5qlCy7z4mzvugVDQwWWAnXWWM9Dac9u4kMeqF4o0
- q66/1KN+gVVuBQ71H+9jz7Qi8kNlcIq5g+ueK+T83d6rxeradLUvtNWie9PUJyUcAjyk
- VesA==
+ with ESMTP id UTiRoCsQ5xBA for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Oct 2021 11:37:42 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F247B4B2A1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 11:37:41 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1633448261;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=g8VaQsv47xGVpNOlqz6W/3BMiLvJlFlGBCWNXnGhzpc=;
+ b=OSnc3tGHmU1Y94wT5+2Fd0B0erDNm+MfhVbuwHzAm2bd8lo1uGiT9eOfJ5BR356ltipo78
+ aiP62tKWnf80OeFP/E/CK1gCSWXaNH9Ugf7I7KRff1zrkb4CC4EO9aNKWm3Nwn/dUFhODd
+ dHcP90st3ozWoGAP6LXlW1Y/mgUASCY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-209-_9EdL-iCNsKXOLsa7_4hhQ-1; Tue, 05 Oct 2021 11:37:38 -0400
+X-MC-Unique: _9EdL-iCNsKXOLsa7_4hhQ-1
+Received: by mail-wm1-f71.google.com with SMTP id
+ o22-20020a1c7516000000b0030d6f9c7f5fso1938915wmc.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 08:37:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=jsoEJt9R8crAH2RcsfBnQLCdcmXo4iVFPCHH8skN9hQ=;
- b=VbbMKi2HkSc7rRKO7CRFBvavkkXbNqUubQn0+U/y3Gtf87WI57j2tk6BXrrFbB1/WT
- m+eWO3GefoqQUV8LGZOYUi8kxpNrE7LhkQ8Z9Y83sTxFykXKNdN9SGJyVwSSqTJJxwnn
- qu4jL54jzBkym1k/ABGTqVV2HvNNDCLlNlYrQgVw5MmQpwA2k9EEbxSGvRgfMbivm6+g
- b8792ad7/dO/BNXYMSb8iOlykWzwTXiHsv3aq/cu37ptwG/cDh0h/xZFB6dmBPwcSdk6
- tNbYN9/r7SZLJePGXBZ2eJjMxFuQ4P0nlm8ZXRD9VC4c8jaJUnfcLDEFKa1+IcNv1aAM
- 19fQ==
-X-Gm-Message-State: AOAM531zfatvCCVzQ81/pUGYhWygHRX+78+jd7sdUZssr/lsXdzl45b+
- Vn80ShRI6FKZCryUE0ilxsUCrA==
-X-Google-Smtp-Source: ABdhPJyd+BrY951cMRvWU+Hdnw02yUD1081dLTCog2uFgukEdDRDWflW+t6MGsO3nWUcqCgRuybMcw==
-X-Received: by 2002:a62:b50d:0:b0:44b:b81f:a956 with SMTP id
- y13-20020a62b50d000000b0044bb81fa956mr30655368pfe.27.1633447363159; 
- Tue, 05 Oct 2021 08:22:43 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id z2sm6907837pfe.210.2021.10.05.08.22.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 05 Oct 2021 08:22:42 -0700 (PDT)
-Date: Tue, 5 Oct 2021 15:22:39 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
-Message-ID: <YVxtvx3IJ5g1SG+x@google.com>
-References: <20210916181538.968978-1-oupton@google.com>
- <20210916181538.968978-8-oupton@google.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=g8VaQsv47xGVpNOlqz6W/3BMiLvJlFlGBCWNXnGhzpc=;
+ b=4Mv2B8FToDEW/RXoWquj/ym9bUpI+a2YWIeHy1OGGTXla1tnw8ewDx5dYfX1TLQPRD
+ vE3AHCoUOKG/WxmG328QnO0daLVHhWeGCHMxXwKvdbRj4cYL3CZaKf1RGdEZrIzK82kU
+ 5oj2ZapB1i9WHtJx9NaRipKdDw1qex7EJuu7O2npLf1HcBC07l9HwnLmRmA0KkBGfSz4
+ +/1Pm5oRRaG4Xx7tQNi7HSkx8Ys7jYVvkpTMzaieZJ93WD7WPTRfkiCo5rLm6Z63bdf6
+ 6xpokjGwQX2mjISCo03D+DTFDvUSuVC/t1vOvVm0GIEkxUKoukVG/KJTIdJrmIHPbikF
+ Xtrg==
+X-Gm-Message-State: AOAM533G44ewm465/911EsfEHlB8aOauroCShbUbs5CWlU9CtW92VyRR
+ pFnHkI8rW7+EEosL/wuVaaNqnrXQclNHUbLP+WVD+mUk8G+wjr6GIHujdJTEanXwNaHAd4JUGl/
+ 18/2i0WBJW46OKpZRKsEzFhkZ
+X-Received: by 2002:a05:600c:288:: with SMTP id
+ 8mr4208694wmk.172.1633448257732; 
+ Tue, 05 Oct 2021 08:37:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwGIBdCendc78IIq3oVK8zaOmi7VNd1+Th3HZcWbj0tcqdqRU7djnn+V2pkLvsYwDZTZmSOXw==
+X-Received: by 2002:a05:600c:288:: with SMTP id
+ 8mr4208665wmk.172.1633448257534; 
+ Tue, 05 Oct 2021 08:37:37 -0700 (PDT)
+Received: from thuth.remote.csb (p549bb2bd.dip0.t-ipconnect.de.
+ [84.155.178.189])
+ by smtp.gmail.com with ESMTPSA id l21sm2237622wmh.31.2021.10.05.08.37.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 05 Oct 2021 08:37:37 -0700 (PDT)
+Subject: Re: [kvm-unit-tests PATCH v2 4/5] Use report_fail(...) instead of
+ report(0/false, ...)
+To: Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+ Andrew Jones <drjones@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20211005090921.1816373-1-scgl@linux.ibm.com>
+ <20211005090921.1816373-5-scgl@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f8bbb6e4-da89-59a3-1826-d87979177f1c@redhat.com>
+Date: Tue, 5 Oct 2021 17:37:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210916181538.968978-8-oupton@google.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org,
- Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+In-Reply-To: <20211005090921.1816373-5-scgl@linux.ibm.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,53 +111,33 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVGh1LCBTZXAgMTYsIDIwMjEsIE9saXZlciBVcHRvbiB3cm90ZToKPiArc3RhdGljIGludCBr
-dm1fYXJjaF90c2NfZ2V0X2F0dHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+ICsJCQkJIHN0cnVj
-dCBrdm1fZGV2aWNlX2F0dHIgKmF0dHIpCj4gK3sKPiArCXU2NCBfX3VzZXIgKnVhZGRyID0gKHU2
-NCBfX3VzZXIgKilhdHRyLT5hZGRyOwoKLi4uCgo+ICtzdGF0aWMgaW50IGt2bV9hcmNoX3RzY19z
-ZXRfYXR0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gKwkJCQkgc3RydWN0IGt2bV9kZXZpY2Vf
-YXR0ciAqYXR0cikKPiArewo+ICsJdTY0IF9fdXNlciAqdWFkZHIgPSAodTY0IF9fdXNlciAqKWF0
-dHItPmFkZHI7CgpUaGVzZSBjYXN0cyBicmVhayAzMi1iaXQgYnVpbGRzIGJlY2F1c2Ugb2YgdHJ1
-bmNhdGluZyBhdHRyLT5hZGRyIGZyb20gNjQtYml0IGludAp0byBhIDMyLWJpdCBwb2ludGVyLiAg
-VGhlIGFkZHJlc3Mgc2hvdWxkIGFsc28gYmUgY2hlY2tlZCB0byB2ZXJpZnkgYml0cyA2MzozMiBh
-cmUKbm90IHNldCBvbiAzMi1iaXQga2VybmVscy4KCmFyY2gveDg2L2t2bS94ODYuYzogSW4gZnVu
-Y3Rpb24g4oCYa3ZtX2FyY2hfdHNjX2dldF9hdHRy4oCZOgphcmNoL3g4Ni9rdm0veDg2LmM6NDk0
-NzoyMjogZXJyb3I6IGNhc3QgdG8gcG9pbnRlciBmcm9tIGludGVnZXIgb2YgZGlmZmVyZW50IHNp
-emUgWy1XZXJyb3I9aW50LXRvLXBvaW50ZXItY2FzdF0KIDQ5NDcgfCAgdTY0IF9fdXNlciAqdWFk
-ZHIgPSAodTY0IF9fdXNlciAqKWF0dHItPmFkZHI7CiAgICAgIHwgICAgICAgICAgICAgICAgICAg
-ICAgXgphcmNoL3g4Ni9rdm0veDg2LmM6IEluIGZ1bmN0aW9uIOKAmGt2bV9hcmNoX3RzY19zZXRf
-YXR0cuKAmToKYXJjaC94ODYva3ZtL3g4Ni5jOjQ5Njc6MjI6IGVycm9yOiBjYXN0IHRvIHBvaW50
-ZXIgZnJvbSBpbnRlZ2VyIG9mIGRpZmZlcmVudCBzaXplIFstV2Vycm9yPWludC10by1wb2ludGVy
-LWNhc3RdCiA0OTY3IHwgIHU2NCBfX3VzZXIgKnVhZGRyID0gKHU2NCBfX3VzZXIgKilhdHRyLT5h
-ZGRyOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgIF4KCgpOb3Qgc3VyZSBpZiB0aGVyZSdz
-IGEgbW9yZSBlbGVnYW50IGFwcHJvYWNoIHRoYW4gY2FzdHMgZ2Fsb3JlPwoKZGlmZiAtLWdpdCBh
-L2FyY2gveDg2L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYwppbmRleCA4ZTVlNDYyZmZk
-NjUuLjM5MzBlNWRjZGYwZSAxMDA2NDQKLS0tIGEvYXJjaC94ODYva3ZtL3g4Ni5jCisrKyBiL2Fy
-Y2gveDg2L2t2bS94ODYuYwpAQCAtNDk0NCw5ICs0OTQ0LDEyIEBAIHN0YXRpYyBpbnQga3ZtX2Fy
-Y2hfdHNjX2hhc19hdHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIHN0YXRpYyBpbnQga3ZtX2Fy
-Y2hfdHNjX2dldF9hdHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgc3RydWN0IGt2bV9kZXZpY2VfYXR0ciAqYXR0cikKIHsKLSAgICAgICB1
-NjQgX191c2VyICp1YWRkciA9ICh1NjQgX191c2VyICopYXR0ci0+YWRkcjsKKyAgICAgICB1NjQg
-X191c2VyICp1YWRkciA9ICh1NjQgX191c2VyICopKHVuc2lnbmVkIGxvbmcpYXR0ci0+YWRkcjsK
-ICAgICAgICBpbnQgcjsKCisgICAgICAgaWYgKCh1NjQpKHVuc2lnbmVkIGxvbmcpdWFkZHIgIT0g
-YXR0ci0+YWRkcikKKyAgICAgICAgICAgICAgIHJldHVybiAtRUZBVUxUOworCiAgICAgICAgc3dp
-dGNoIChhdHRyLT5hdHRyKSB7CiAgICAgICAgY2FzZSBLVk1fVkNQVV9UU0NfT0ZGU0VUOgogICAg
-ICAgICAgICAgICAgciA9IC1FRkFVTFQ7CkBAIC00OTY0LDEwICs0OTY3LDEzIEBAIHN0YXRpYyBp
-bnQga3ZtX2FyY2hfdHNjX2dldF9hdHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIHN0YXRpYyBp
-bnQga3ZtX2FyY2hfdHNjX3NldF9hdHRyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IGt2bV9kZXZpY2VfYXR0ciAqYXR0cikKIHsK
-LSAgICAgICB1NjQgX191c2VyICp1YWRkciA9ICh1NjQgX191c2VyICopYXR0ci0+YWRkcjsKKyAg
-ICAgICB1NjQgX191c2VyICp1YWRkciA9ICh1NjQgX191c2VyICopKHVuc2lnbmVkIGxvbmcpYXR0
-ci0+YWRkcjsKICAgICAgICBzdHJ1Y3Qga3ZtICprdm0gPSB2Y3B1LT5rdm07CiAgICAgICAgaW50
-IHI7CgorICAgICAgIGlmICgodTY0KSh1bnNpZ25lZCBsb25nKXVhZGRyICE9IGF0dHItPmFkZHIp
-CisgICAgICAgICAgICAgICByZXR1cm4gLUVGQVVMVDsKKwogICAgICAgIHN3aXRjaCAoYXR0ci0+
-YXR0cikgewogICAgICAgIGNhc2UgS1ZNX1ZDUFVfVFNDX09GRlNFVDogewogICAgICAgICAgICAg
-ICAgdTY0IG9mZnNldCwgdHNjLCBuczsKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
-aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
-YXJtCg==
+On 05/10/2021 11.09, Janis Schoetterl-Glausch wrote:
+> Whitespace is kept consistent with the rest of the file.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
+>   lib/s390x/css_lib.c |  30 ++++----
+>   x86/vmx.h           |  25 ++++---
+>   arm/psci.c          |   2 +-
+>   arm/timer.c         |   2 +-
+>   s390x/css.c         |  18 ++---
+>   s390x/spec_ex.c     |   7 +-
+>   x86/asyncpf.c       |   4 +-
+>   x86/hyperv_stimer.c |   6 +-
+>   x86/hyperv_synic.c  |   2 +-
+>   x86/svm_tests.c     | 163 ++++++++++++++++++++++----------------------
+>   x86/vmx.c           |  17 +++--
+>   x86/vmx_tests.c     | 136 ++++++++++++++++++------------------
+>   12 files changed, 200 insertions(+), 212 deletions(-)
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
