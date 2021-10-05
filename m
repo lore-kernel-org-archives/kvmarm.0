@@ -2,75 +2,75 @@ Return-Path: <SRS0=da30=OZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D70DC433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 09:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE558C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 09:03:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 101AA6137C
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 09:02:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 101AA6137C
+	by mail.kernel.org (Postfix) with ESMTP id 4B58C61251
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 09:03:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4B58C61251
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A62B04B2F7;
-	Tue,  5 Oct 2021 05:02:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE1924B2F7;
+	Tue,  5 Oct 2021 05:03:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, body has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QBK6HkvXY21a; Tue,  5 Oct 2021 05:02:51 -0400 (EDT)
+	with ESMTP id HjqrYrw5Cfg6; Tue,  5 Oct 2021 05:03:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CF9C4B2B4;
-	Tue,  5 Oct 2021 05:02:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBEA74B2B4;
+	Tue,  5 Oct 2021 05:03:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8505B4B2A7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 05:02:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 333D64B2AC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 05:03:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zZdkeebLWVRP for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Oct 2021 05:02:49 -0400 (EDT)
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
- [209.85.160.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8ADBF4B267
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 05:02:49 -0400 (EDT)
-Received: by mail-qt1-f202.google.com with SMTP id
- k1-20020ac80201000000b002a7200b449eso10965766qtg.18
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 02:02:49 -0700 (PDT)
+ with ESMTP id jVSDKxmrNr5x for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Oct 2021 05:03:06 -0400 (EDT)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D9524B267
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 05:03:06 -0400 (EDT)
+Received: by mail-wr1-f74.google.com with SMTP id
+ c2-20020adfa302000000b0015e4260febdso5475161wrb.20
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 02:03:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=BRCd6xIpsgQc9eCz6F1JrzlncYMqd0ZDK8+iJvlZVJo=;
- b=eoms1aGPDoZgsVnFaKlK88PDymci86vDBDF+xpLuhD4qRv4yjbK6MS+XMDcxmX2mhT
- fgbaP9dV4z9gdlvq+7Qnj7zD1fNCJvMC5gBV1BQ5bQj+CJg/A5BDHLJfzKr7juldFle5
- tqsKSX4WAyBid12mJRJ5+InxIOS9kOaooUAC7ZFDWD6MaU/IdxKsjHTHteTc/0qdf7CF
- yDapp7qFLhC2XJRz2ybl+Gu9J1TAiKjekb85hy6ruk7XqutZ/OFku32TSh39dY0ycTpk
- nrfZWm0ri8fofKVYDANqtE9KNlYx3xv7i4BOgCgUTMMSdNZYhGPd5rXVs+GA4fnKlIUG
- 1Zww==
+ :cc; bh=Zg+gUiu3ox2wHV7TW+7r/xAJBwKqffZp8cWRWiJTXrY=;
+ b=ethTiy3lTzcSneIbLwawi+5olik16z23jgqCFT9E6S+igJ69OtJ1TPMCM3LUeMuDWh
+ kwcRJn93q32+YoPQuqYwcmM2DdY9Fe9IYJKgK+GXLbcXpWzMDJRW3LbNqRmKiJUsc6DC
+ CebD0o+l0nqeRevVQD1bAdXZQHBHCWfG8Rcoy58tJcFsFAxUPA0SJI81RMitxFI9xF+C
+ YxiAvhisoF3VIur01ICFsq3MrvN2eqrXvL8fZNMl/vG0AqdzcjPWDTaTqFZDJuk+h9ab
+ QCMcSvBsSTabymd8vvOKuV6YemDU3oBdSpPn6xfZo8O6vSq3YJh46dvt7fuELrY2dzVh
+ x/ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=BRCd6xIpsgQc9eCz6F1JrzlncYMqd0ZDK8+iJvlZVJo=;
- b=u1pad5vApvCqlKORLsL6rYMdOSTADaiER9wFHYjmbaS1cFQ1w05amcc0+FO0lWvw9j
- W9fDcUI61U6ZZHnzEtYcVLEpnmckPGDsH02pGTH8KkWLMUfQrMP9KqZ8q/WM7oFnhD9f
- 8fQzQ0dtdbxdHU4IdQFSw9Z+QpXJ9195sV7P/CjHUtm0kC9dD/kI1ZbVBDyrWqGWU9LY
- IIP0st91regc6egJdXI5sG99Swpe5AXdZ24/4RC8LLDdLPKr3p7CcXBQkkMLhmatooUI
- XLV0w68jzzKAE0EcSowi3HgIKMoFz2smGUITpH6drOTNqH0ssNCTTBC8IrvDbEZvBRvH
- HQpw==
-X-Gm-Message-State: AOAM530wXzThE7Nb5eeMgazIxOZgppfH7PVRAPwE/zqjH/x7DdD3umMI
- CXU4bgwOVhiTI+3rYpoZBarvuGdXrjui
-X-Google-Smtp-Source: ABdhPJxxbyIyPiVtJmWA8AbltOJZ3/N/M8K+WP9ITkiGix8jD8rU+MjhGEj3spZgJYPGfDeZ5XI8MbtDYdpe
+ bh=Zg+gUiu3ox2wHV7TW+7r/xAJBwKqffZp8cWRWiJTXrY=;
+ b=TDto+myDry4TlQv1auvnVjwlCUFwZZ5W+yHIPzK3x6CqajUWnicWJylIEUCQZMSQs+
+ 4Xrk7VZWNm2lyHEL8AheTPopNBif+ZJmnvTdbesN30O3aigfcq4lTdoTCHJx3P4jleXt
+ iEBzTX/rUsA48cQm3PuC0uylsNCQdTc0qDp7UEQfirIa7ch968Uk8eh2B6TiKr1iLshf
+ +p+uFDyg4BZnBNAk3C8talwncNZMt43z+BoEmRqpOfEoj+jNOPrBstnB5wp3bDhMQMro
+ zZec6c3+LkuEPNTV+qYFWkajDlhXCELrVfdZuSJH24+8y+eEhIYpxeas5bhUWy7Xi5MX
+ H0eQ==
+X-Gm-Message-State: AOAM532Py9Exeug2N80tph7uio7l/GCUFGuXETtpCDsaS9J9lgTMpfDH
+ sy00hlcwRpsu3PEd8ilX6PWyomTSvhAk
+X-Google-Smtp-Source: ABdhPJxUSKr1FTBsupYcr01qanV2kSzxpxGMspE323G2ZVQjyutuN9ik2CBJcXODTdTUv+X78VCL5yV8AtM/
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:5700:9128:3106:b389])
- (user=qperret job=sendgmr) by 2002:a05:6214:11a5:: with SMTP id
- u5mr6027804qvv.39.1633424569158; Tue, 05 Oct 2021 02:02:49 -0700 (PDT)
-Date: Tue,  5 Oct 2021 10:01:40 +0100
+ (user=qperret job=sendgmr) by 2002:adf:a45e:: with SMTP id
+ e30mr18268872wra.269.1633424585068; Tue, 05 Oct 2021 02:03:05 -0700 (PDT)
+Date: Tue,  5 Oct 2021 10:01:41 +0100
 In-Reply-To: <20211005090155.734578-1-qperret@google.com>
-Message-Id: <20211005090155.734578-4-qperret@google.com>
+Message-Id: <20211005090155.734578-5-qperret@google.com>
 Mime-Version: 1.0
 References: <20211005090155.734578-1-qperret@google.com>
 X-Mailer: git-send-email 2.33.0.800.g4c38ced690-goog
-Subject: [PATCH v2 0/2] A couple of EL2 refcounts fixes
+Subject: [PATCH v2 1/2] KVM: arm64: Fix host stage-2 PGD refcount
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
  Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -96,33 +96,87 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi all,
+The KVM page-table library refcounts the pages of concatenated stage-2
+PGDs individually. However, when running KVM in protected mode, the
+host's stage-2 PGD is currently managed by EL2 as a single high-order
+compound page, which can cause the refcount of the tail pages to reach 0
+when they shouldn't, hence corrupting the page-table.
 
-This is v2 of the series previously posted here:
+Fix this by introducing a new hyp_split_page() helper in the EL2 page
+allocator (matching the kernel's split_page() function), and make use of
+it from host_s2_zalloc_pages_exact().
 
-https://lore.kernel.org/kvmarm/20211004090328.540941-1-qperret@google.com/
-
-This addresses a couple of issues Will has found with the refcounting of
-page-tables at EL2. Patch 01 fixes a nasty bug, and probably wants to go
-in -stable. Patch 02 fixes a small inconsistency which made it harder to
-find refcount-related bugs at EL2.
-
-Changes since v1:
- - applied Acked-by from Will;
- - better comment + commit message for patch 01 (Marc).
-
-Thanks!
-Quentin
-
-Quentin Perret (2):
-  KVM: arm64: Fix host stage-2 PGD refcount
-  KVM: arm64: Report corrupted refcount at EL2
-
+Fixes: 1025c8c0c6ac ("KVM: arm64: Wrap the host with a stage 2")
+Acked-by: Will Deacon <will@kernel.org>
+Suggested-by: Will Deacon <will@kernel.org>
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
  arch/arm64/kvm/hyp/include/nvhe/gfp.h |  1 +
  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 13 ++++++++++++-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c  | 15 +++++++++++++++
- 3 files changed, 28 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c  | 14 ++++++++++++++
+ 3 files changed, 27 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/gfp.h b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+index fb0f523d1492..0a048dc06a7d 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/gfp.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/gfp.h
+@@ -24,6 +24,7 @@ struct hyp_pool {
+ 
+ /* Allocation */
+ void *hyp_alloc_pages(struct hyp_pool *pool, unsigned short order);
++void hyp_split_page(struct hyp_page *page);
+ void hyp_get_page(struct hyp_pool *pool, void *addr);
+ void hyp_put_page(struct hyp_pool *pool, void *addr);
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index bacd493a4eac..34eeb524b686 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -35,7 +35,18 @@ const u8 pkvm_hyp_id = 1;
+ 
+ static void *host_s2_zalloc_pages_exact(size_t size)
+ {
+-	return hyp_alloc_pages(&host_s2_pool, get_order(size));
++	void *addr = hyp_alloc_pages(&host_s2_pool, get_order(size));
++
++	hyp_split_page(hyp_virt_to_page(addr));
++
++	/*
++	 * The size of concatenated PGDs is always a power of two of PAGE_SIZE,
++	 * so there should be no need to free any of the tail pages to make the
++	 * allocation exact.
++	 */
++	WARN_ON(size != (PAGE_SIZE << get_order(size)));
++
++	return addr;
+ }
+ 
+ static void *host_s2_zalloc_page(void *pool)
+diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+index 41fc25bdfb34..a6e874e61a40 100644
+--- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
++++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+@@ -193,6 +193,20 @@ void hyp_get_page(struct hyp_pool *pool, void *addr)
+ 	hyp_spin_unlock(&pool->lock);
+ }
+ 
++void hyp_split_page(struct hyp_page *p)
++{
++	unsigned short order = p->order;
++	unsigned int i;
++
++	p->order = 0;
++	for (i = 1; i < (1 << order); i++) {
++		struct hyp_page *tail = p + i;
++
++		tail->order = 0;
++		hyp_set_page_refcounted(tail);
++	}
++}
++
+ void *hyp_alloc_pages(struct hyp_pool *pool, unsigned short order)
+ {
+ 	unsigned short i = order;
 -- 
 2.33.0.800.g4c38ced690-goog
 
