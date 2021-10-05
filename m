@@ -2,79 +2,79 @@ Return-Path: <SRS0=da30=OZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A850C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 16:44:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7B8C433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 16:49:46 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DBF84611C5
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 16:44:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DBF84611C5
+	by mail.kernel.org (Postfix) with ESMTP id 099B361381
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Oct 2021 16:49:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 099B361381
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BF9E4B2FA;
-	Tue,  5 Oct 2021 12:44:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C92A4B2F5;
+	Tue,  5 Oct 2021 12:49:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id slbjISV9cYOU; Tue,  5 Oct 2021 12:44:39 -0400 (EDT)
+	with ESMTP id HRWj0v6Q1Cuc; Tue,  5 Oct 2021 12:49:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 195C04B2EE;
-	Tue,  5 Oct 2021 12:44:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D78D04B2B4;
+	Tue,  5 Oct 2021 12:49:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D54A44B29B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 12:44:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BE224B29B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 12:49:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NywP1as1ZC8s for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Oct 2021 12:44:35 -0400 (EDT)
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com
- [209.85.167.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD4C34B248
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 12:44:35 -0400 (EDT)
-Received: by mail-oi1-f181.google.com with SMTP id o4so32646oia.10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 09:44:35 -0700 (PDT)
+ with ESMTP id vN9ikKigrleB for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Oct 2021 12:49:38 -0400 (EDT)
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com
+ [209.85.210.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D33944B262
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Oct 2021 12:49:38 -0400 (EDT)
+Received: by mail-ot1-f50.google.com with SMTP id
+ c26-20020a056830349a00b0054d96d25c1eso26637398otu.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Oct 2021 09:49:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VfPaK2u7X6jgdQ7emoJDQz+g7NsnGXGWip34S5ul4SQ=;
- b=fIir9M8w3vr7t2B06SopGl/qMZtUa0HTRe++lkLUBazog/a7sa8a1oNQDFEElc9Me3
- k1Qu9gz6YXBbiS9a93ZXp7HE+MbdmiatOVSwdOiyQ/Np/3j14G/t8nKDj2MR3c9B8FkC
- lnplP+S+WNsEDTTfeNxs33abgHw0FrU6RiIYSly2i66tBGKCFBK0xV/+lxBLGhyXdhHi
- pn9t8FRMeP7oYwVtJ8qryFnEuT9LtYPGo7Ju/WWdSmfUUetijAftlsEHicJ3ThgwVpIU
- raig0g9jlWMSBER/aeonYONUQIc39m+oXcdMoh8BF3dtVk1YVa17/piRJZoCPT/Jtdju
- BSaQ==
+ :cc; bh=Fdh2v9yqhGN6IiDs2ZyKj17Gi2s17+RNJVv+sOmi24A=;
+ b=LFe8c+zS/rcWWV1Xb8XRY2BpWg8aErNPDqjOthj20si3Bz0mc9KXFZETRYWUwhn9ky
+ DfVduVTXqGEDibINhYbOAsMkz6ZHkd28wWgcpiCIN3WUDEdcaciGsP1coczJ9yjKvrBX
+ CeEOqg/tPkxELjFZKhLN1wCt4bS1mw7/AU6haDIgvjOiNYE+QYE8ollwNuGU5TideAGh
+ 6q9k4zq4ouooW3y85SPdEW2VyPiFgfiR/dmHeca2CwqtSxmUZQz6dObXdIfiZC54EqN4
+ cZ5d1++ChY9jHO4J2I7GFvrArVd2CufBC7MmaxySBgyuySDQF+8bA9LM74X3NAOF8QF9
+ JlxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=VfPaK2u7X6jgdQ7emoJDQz+g7NsnGXGWip34S5ul4SQ=;
- b=u+QuSFIiwV5veUf9YnnrkpBjAVNsfMHixYbh3vEBYihtBudLUGm9OuH2LcoQAWatbz
- oTN3ZpJwM18njP3kLLGs1AEht7o9Z3eeBcWzbtnIii2T1btbVrNx9tTk9AcxtWi0G8Gz
- 2isJCybAAss7GDzaDcy5IwdbtLscJHSNILfDwUsPv4WCJdH431QyeUrX8GOTRjghlxJo
- KC0hU1TWOpQin1OhMpeYO7412AJsBqNB3jZeJdE82Q3UZm1aEnL6vsvesqx+3vwEGCDo
- zsp7T/Vou3vFl+6NbyWv+oLdXDG95lGsR3FU9SN5aMlAo68g6BTxEeIWF2VPL0mC3Sp5
- vQsA==
-X-Gm-Message-State: AOAM532KRoqzvYiQ9tGJUSKcNaqRfHAeSEIIaI9qFZknYiujwgzZc+3e
- s0AYyk4inCi7DXZmRxUXegJYUoTbIDbU/rTb6TUE6Q==
-X-Google-Smtp-Source: ABdhPJw+usz/YeVXGiB+wu1OhcDELEvoRIa5bOKH+gYMf3kj1EeyAlxC4DZp3mHFJkRfVF1Mdea3G2JelZtcyQ1YQFU=
-X-Received: by 2002:a05:6808:1641:: with SMTP id
- az1mr3311023oib.67.1633452274536; 
- Tue, 05 Oct 2021 09:44:34 -0700 (PDT)
+ bh=Fdh2v9yqhGN6IiDs2ZyKj17Gi2s17+RNJVv+sOmi24A=;
+ b=ONMczRbCrwTd+r9tfAC5iG+wDe8C8AhAWVoqMv4VwxEBEhUvbBZWaCb/kwwhtAkm5V
+ b2UW0fgg3yhr4Nq/uaHf3lrdIqqj+hPqj6B04OJtFBgOAx0U6Ergxp9ZUqdGbmfcHX3W
+ lJQCOk8PkuKbO69bkWlgPy4NRjOl0rmujWrGkxd4WxMNpCVqiSr1AaCr4elSy4D4AN9D
+ nqF5B0FHvTdZsHKs78XPrIyzFkY5yLJ36CdgdXit3hCb0u1gFcOfGM6l5V/VKCcotxIb
+ /3GyF2HsgFXVINxB30YBmsVDua/4jOwzl9kDwJJumP7RrxZs/+/NAiI1Y4tRBWEkGXZ3
+ tk4Q==
+X-Gm-Message-State: AOAM5324yW9uQB6vVdcoegK6ZpkZzValr4MjcCMEpBtur98XLyBiwhOY
+ l7+0u4tS23T718oEP3t0hgC3pI3/zFqSvenD+f2rRQ==
+X-Google-Smtp-Source: ABdhPJwR1R/6ptVZvgfVgYIM48U/PVlKK+w7tRIhGoXA2rXHAi8tYPuhaP8J5tbLHeo2+qJanX3VqIiM8URkSMlwBlY=
+X-Received: by 2002:a9d:4702:: with SMTP id a2mr14981075otf.271.1633452577830; 
+ Tue, 05 Oct 2021 09:49:37 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210922124704.600087-1-tabba@google.com>
  <20210922124704.600087-9-tabba@google.com>
- <20211005085249.hywbc7wqggxdgw5u@gator.home>
-In-Reply-To: <20211005085249.hywbc7wqggxdgw5u@gator.home>
+ <87pmsjre4s.wl-maz@kernel.org>
+In-Reply-To: <87pmsjre4s.wl-maz@kernel.org>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 5 Oct 2021 17:43:58 +0100
-Message-ID: <CA+EHjTxFBBz71VjRyS5JTvVBXsVM_yJ_HZzsHbeaHC3xcF_dBA@mail.gmail.com>
+Date: Tue, 5 Oct 2021 17:49:01 +0100
+Message-ID: <CA+EHjTysQvo_ko9Z5XALQhHM7oAsA-xc2=qRCM3yYVU8aBasPA@mail.gmail.com>
 Subject: Re: [PATCH v6 08/12] KVM: arm64: Add handlers for protected VM System
  Registers
-To: Andrew Jones <drjones@redhat.com>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- pbonzini@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+To: Marc Zyngier <maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -92,11 +92,13 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
+Hi Marc,
 
-On Tue, Oct 5, 2021 at 9:53 AM Andrew Jones <drjones@redhat.com> wrote:
+On Tue, Oct 5, 2021 at 10:54 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> On Wed, Sep 22, 2021 at 01:47:00PM +0100, Fuad Tabba wrote:
+> On Wed, 22 Sep 2021 13:47:00 +0100,
+> Fuad Tabba <tabba@google.com> wrote:
+> >
 > > Add system register handlers for protected VMs. These cover Sys64
 > > registers (including feature id registers), and debug.
 > >
@@ -430,6 +432,11 @@ On Tue, Oct 5, 2021 at 9:53 AM Andrew Jones <drjones@redhat.com> wrote:
 > > +u64 id_aa64mmfr2_el1_sys_val;
 > > +
 > > +static inline void inject_undef64(struct kvm_vcpu *vcpu)
+>
+> Please drop the inline. The compiler will sort it out.
+
+Sure.
+
 > > +{
 > > +     u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
 > > +
@@ -453,6 +460,13 @@ On Tue, Oct 5, 2021 at 9:53 AM Andrew Jones <drjones@redhat.com> wrote:
 > > +     *vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
 > > +
 > > +     inject_undef64(vcpu);
+>
+> The naming is odd. __blah() is usually a primitive for blah(), while
+> you have it the other way around.
+
+I agree, and I thought so too but I was following the same pattern as
+__kvm_skip_instr, which invokes kvm_skip_instr in a similar manner.
+
 > > +
 > > +     write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
 > > +     write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
@@ -467,6 +481,14 @@ On Tue, Oct 5, 2021 at 9:53 AM Andrew Jones <drjones@redhat.com> wrote:
 > > +{
 > > +     __inject_undef64(vcpu);
 > > +     return false;
+>
+> An access exception is the result of a memory access. undef_access
+> makes my head spin because you are conflating two unrelated terms.
+>
+> I suggest you merge all three functions in a single inject_undef64().
+
+Sure.
+
 > > +}
 > > +
 > > +/*
@@ -584,12 +606,6 @@ On Tue, Oct 5, 2021 at 9:53 AM Andrew Jones <drjones@redhat.com> wrote:
 > > +     BUILD_BUG_ON(PVM_ID_AA64AFR1_ALLOW != 0ULL);
 > > +     return 0;
 > > +}
->
-> Reading the same function five times make me wonder if a generator macro
-> wouldn't be better for these.
-
-I think so too. I'll do that.
-
 > > +
 > > +u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu)
 > > +{
@@ -664,22 +680,8 @@ I think so too. I'll do that.
 > > +             /*
 > > +              * Should never happen because all cases are covered in
 > > +              * pvm_sys_reg_descs[] below.
->
-> I'd drop the 'below' word. It's not overly helpful and since code gets
-> moved it can go out of date.
-
-Will fix.
-
 > > +              */
 > > +             WARN_ON(1);
->
-> The above cases could also be generated by a macro. And I wonder if we can
-> come up with something that makes sure these separate lists stay
-> consistent with macros and build bugs in order to better avoid these
-> "should never happen" situations.
-
-Which ties in to Marc's comment for this patch. I'll handle this.
-
 > > +             break;
 > > +     }
 > > +
@@ -880,6 +882,16 @@ Which ties in to Marc's comment for this patch. I'll handle this.
 > > +     HOST_HANDLED(SYS_IFSR32_EL2),
 > > +     HOST_HANDLED(SYS_FPEXC32_EL2),
 > > +};
+>
+> It would be good if you had something that checks the ordering of this
+> array at boot time. It is incredibly easy to screw up the ordering,
+> and then everything goes subtly wrong.
+
+Yes. I'll do something like check_sysreg_table().
+
+Thanks,
+/fuad
+
 > > +
 > > +/*
 > > + * Handler for protected VM MSR, MRS or System instruction execution.
@@ -918,26 +930,13 @@ Which ties in to Marc's comment for this patch. I'll handle this.
 > > +
 > > +     return true;
 > > +}
-> > --
-> > 2.33.0.464.g1972c5931b-goog
-> >
 >
-> Other than the nits and suggestion to try and build in some register list
-> consistency checks, this looks good to me. I don't know what pKVM
-> should / should not expose, but I like the approach this takes, so,
-> FWIW,
->
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-Thank you,
-/fuad
-
 > Thanks,
-> drew
+>
+>         M.
 >
 > --
-> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
->
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
