@@ -2,90 +2,88 @@ Return-Path: <SRS0=qtHs=O2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 550EEC433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Oct 2021 11:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C69D2C4332F
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Oct 2021 11:38:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CB1766117A
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Oct 2021 11:22:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CB1766117A
+	by mail.kernel.org (Postfix) with ESMTP id 3DB1A61184
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Oct 2021 11:38:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3DB1A61184
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DB8B4B2B9;
-	Wed,  6 Oct 2021 07:22:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB1624B2B8;
+	Wed,  6 Oct 2021 07:37:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iTZRu59Z0s0D; Wed,  6 Oct 2021 07:22:29 -0400 (EDT)
+	with ESMTP id x484MGP5UkBV; Wed,  6 Oct 2021 07:37:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D579E4B2B2;
-	Wed,  6 Oct 2021 07:22:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 927CE4B29C;
+	Wed,  6 Oct 2021 07:37:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AC534B2AA
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Oct 2021 07:22:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82DB04B29C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Oct 2021 07:37:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id F-JbGyfCcMAI for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Oct 2021 07:22:27 -0400 (EDT)
+ with ESMTP id IzxH2JYi9ZEi for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Oct 2021 07:37:56 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 347AA4B2A6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Oct 2021 07:22:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 755C44B297
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Oct 2021 07:37:56 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633519347;
+ s=mimecast20190719; t=1633520276;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=jWX5sU8D1+Ly4mm1f35q3sYrq7WIwVRiVd8SgiHRgOs=;
- b=JJozpYtc+lht4K+GR9dJN5iVdGpxBjbKn7W+xoieRxxQ8phKA4tZS2P8GEffRp5wvYpdCU
- SxZhMU+0m/ogneH6G953wzBOFfdZS4zdZbfYmzmV+0y3bbjtJiuxBF6cAZTYXDdA26zSeS
- 9AR6TvwvluTsM0a+vcwiYZgNpBinv8g=
+ bh=tLSJ+0G6GaESS3A8wROTGiXCvt9MmKxGWQIQfuIzv50=;
+ b=PZou4TXLbMlhmkMfilag7ylf2LfKZGSdyyLP/c8Vu4YWo2uDFF2ZyUo1ukbm2A0g92uspw
+ 2ySyjkKTNGyaLY8YcyiCZSSl0AuYVKBVotlQ2S+neFPddyEfaO+JJq6yYZKv7YuFe4NIX/
+ eSzUYZiW2/iu1Ge9uDFeILc99YYX7N4=
 Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
  [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-x03OyaDaNq60ALP5o6LIKg-1; Wed, 06 Oct 2021 07:22:26 -0400
-X-MC-Unique: x03OyaDaNq60ALP5o6LIKg-1
+ us-mta-590-TngOT7_oPVWeyNLLlcHIHg-1; Wed, 06 Oct 2021 07:37:55 -0400
+X-MC-Unique: TngOT7_oPVWeyNLLlcHIHg-1
 Received: by mail-ed1-f71.google.com with SMTP id
- v2-20020a50f082000000b003db24e28d59so2345054edl.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Oct 2021 04:22:25 -0700 (PDT)
+ w6-20020a50d786000000b003dabc563406so2324846edi.17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Oct 2021 04:37:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=jWX5sU8D1+Ly4mm1f35q3sYrq7WIwVRiVd8SgiHRgOs=;
- b=DuPyoyJ5oih80v89kRA8KywizijLjtieHOJLCkAG2vNhVFRxolp3M5DunVCrHP1Gd4
- 1iwBu3ntZw2cvoB8d/NHgkrS5BygB2tBhVfA8OhwVbNIpYlgHNpitSTw/wRhl9IXzs8J
- I+6zkeklOwC4Rz2vPFDqs+dk2X+kfzyHf2bg928lPzIKk0ri9WxFLRnMofpcnSijiR1q
- Aueb/IHYye1JJKUoTL7WApzR0ICpmb8czvj0UG37YliBcB3LXCQ8dd+ZT8rC/9tcd905
- vCVqt/jR1rUl6gjIWvzlfI5bPQ+uhcU6Af2UFCQAOTNLCpO48kUPoVEKvWD5uNlbWoV/
- AaCA==
-X-Gm-Message-State: AOAM532jVktohXxo3+gBgK93CCptpIZwYwOKOOW3sioAfmRsp2TkoNjP
- xIhJ3xrdfPI0QShmjnL2h3Mz56Z7psIIZ8djGobGiXHgfhYRP7pbzhu/v4LzjFCMOQK+9jVXrfU
- FlwRZGHBYxzdXeAwqGhxC9nqB
-X-Received: by 2002:a17:906:4f82:: with SMTP id
- o2mr31730782eju.10.1633519344866; 
- Wed, 06 Oct 2021 04:22:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwIBjVZ1NUXsGTtniMInafdYKeFUjjcDRuQOp+LY5ONfLP3y1FH0sVTnhS2J3YnXmmsoLjhGg==
-X-Received: by 2002:a17:906:4f82:: with SMTP id
- o2mr31730745eju.10.1633519344572; 
- Wed, 06 Oct 2021 04:22:24 -0700 (PDT)
+ bh=tLSJ+0G6GaESS3A8wROTGiXCvt9MmKxGWQIQfuIzv50=;
+ b=J8qtmNnpodv4IBNyYHQ25TeWpWKdc3K8zeApWldsjOIgLADHyOia14T9Tm3ybQY4LE
+ wrJYYw8JjQLgSKz71+ywM13OxhKk3YOJHqlf6rnFk4WhiSzqcr+gi6Hno5KIf9FbqJov
+ WA8z5k/u2Q02maYQXIsGbstwnMeyfkPHssPHqA+GFFOqgdLMtpsSe8o01QN9K9Y2SzsC
+ YXqRXnhVf7zs63XD4Ee9dDa/E35I99hxrkXaBdmGfyPjwcugkX7GJs6wLXTSduvPz7iE
+ UOGffIqpGlb3iKWAML9ntrS/GiLdozjws/e+ZwJZQYnBuJnEciH65Xbd2k7a159v/Bfg
+ pztg==
+X-Gm-Message-State: AOAM530Ne3RNEJ66Tw5l41+Di7oHE6Sa8v1f3i5OKUs373te0kzniCy8
+ PJD+wz2gLwgU04TWOisDKVpOxmBPu+GZ7/QWeraBGSZmKhpNWD0SjjEj9x03zX6KWeaLKHS4JWl
+ Ip3HslV7HNyrMWYb7zK35Oxrm
+X-Received: by 2002:a17:907:628d:: with SMTP id
+ nd13mr32691153ejc.7.1633520274160; 
+ Wed, 06 Oct 2021 04:37:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyEEcX7nQiCt05CZwz558uZNZfwfw1lYcM5ACjQLLwDhsTkZqZlZFhhEMl7qA8+8LcuiVSErA==
+X-Received: by 2002:a17:907:628d:: with SMTP id
+ nd13mr32691131ejc.7.1633520273957; 
+ Wed, 06 Oct 2021 04:37:53 -0700 (PDT)
 Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
- by smtp.gmail.com with ESMTPSA id u4sm1158745edj.33.2021.10.06.04.22.23
+ by smtp.gmail.com with ESMTPSA id dh16sm9840424edb.63.2021.10.06.04.37.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Oct 2021 04:22:24 -0700 (PDT)
-Date: Wed, 6 Oct 2021 13:22:22 +0200
+ Wed, 06 Oct 2021 04:37:53 -0700 (PDT)
+Date: Wed, 6 Oct 2021 13:37:51 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 03/16] KVM: arm64: Turn kvm_pgtable_stage2_set_owner
- into kvm_pgtable_stage2_annotate
-Message-ID: <20211006112222.ahfhtkhamdi3svm5@gator.home>
+Subject: Re: [PATCH v2 04/16] KVM: arm64: Add MMIO checking infrastructure
+Message-ID: <20211006113751.damskwaz7akpk5fc@gator.home>
 References: <20211004174849.2831548-1-maz@kernel.org>
- <20211004174849.2831548-4-maz@kernel.org>
- <20211006110211.y6kzmjlzgardmwif@gator.home>
+ <20211004174849.2831548-5-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20211006110211.y6kzmjlzgardmwif@gator.home>
+In-Reply-To: <20211004174849.2831548-5-maz@kernel.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -112,100 +110,204 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Oct 06, 2021 at 01:02:11PM +0200, Andrew Jones wrote:
-> On Mon, Oct 04, 2021 at 06:48:36PM +0100, Marc Zyngier wrote:
-> > kvm_pgtable_stage2_set_owner() could be generalised into a way
-> > to store up to 63 bits in the page tables, as long as we don't
-> > set bit 0.
-> > 
-> > Let's just do that.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_pgtable.h          | 12 ++++++-----
-> >  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  2 +-
-> >  arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 11 ++++------
-> >  arch/arm64/kvm/hyp/nvhe/setup.c               | 10 +++++++++-
-> >  arch/arm64/kvm/hyp/pgtable.c                  | 20 ++++++-------------
-> >  5 files changed, 27 insertions(+), 28 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> > index 027783829584..d4d3ae0b5edb 100644
-> > --- a/arch/arm64/include/asm/kvm_pgtable.h
-> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> > @@ -329,14 +329,16 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> >  			   void *mc);
-> >  
-> >  /**
-> > - * kvm_pgtable_stage2_set_owner() - Unmap and annotate pages in the IPA space to
-> > - *				    track ownership.
-> > + * kvm_pgtable_stage2_annotate() - Unmap and annotate pages in the IPA space
-> > + *				   to track ownership (and more).
-> >   * @pgt:	Page-table structure initialised by kvm_pgtable_stage2_init*().
-> >   * @addr:	Base intermediate physical address to annotate.
-> >   * @size:	Size of the annotated range.
-> >   * @mc:		Cache of pre-allocated and zeroed memory from which to allocate
-> >   *		page-table pages.
-> > - * @owner_id:	Unique identifier for the owner of the page.
-> > + * @annotation:	A 63 bit value that will be stored in the page tables.
-> > + *		@annotation[0] must be 0, and @annotation[63:1] is stored
-> > + *		in the page tables.
-> >   *
-> >   * By default, all page-tables are owned by identifier 0. This function can be
-> >   * used to mark portions of the IPA space as owned by other entities. When a
-> > @@ -345,8 +347,8 @@ int kvm_pgtable_stage2_map(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> >   *
-> >   * Return: 0 on success, negative error code on failure.
-> >   */
-> > -int kvm_pgtable_stage2_set_owner(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > -				 void *mc, u8 owner_id);
-> > +int kvm_pgtable_stage2_annotate(struct kvm_pgtable *pgt, u64 addr, u64 size,
-> > +				void *mc, kvm_pte_t annotation);
-> >  
-> >  /**
-> >   * kvm_pgtable_stage2_unmap() - Remove a mapping from a guest stage-2 page-table.
-> > diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > index b58c910babaf..9d2ca173ea9a 100644
-> > --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> > @@ -53,7 +53,7 @@ int __pkvm_host_share_hyp(u64 pfn);
-> >  
-> >  bool addr_is_memory(phys_addr_t phys);
-> >  int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
-> > -int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id);
-> > +int host_stage2_annotate_locked(phys_addr_t addr, u64 size, kvm_pte_t owner_id);
-> >  int kvm_host_prepare_stage2(void *pgt_pool_base);
-> >  void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt);
-> >  
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > index bacd493a4eac..8cd0c3bdb911 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-> > @@ -286,17 +286,14 @@ static int host_stage2_adjust_range(u64 addr, struct kvm_mem_range *range)
-> >  int host_stage2_idmap_locked(phys_addr_t addr, u64 size,
-> >  			     enum kvm_pgtable_prot prot)
-> >  {
-> > -	hyp_assert_lock_held(&host_kvm.lock);
-> > -
-> >  	return host_stage2_try(__host_stage2_idmap, addr, addr + size, prot);
-> >  }
-> >  
-> > -int host_stage2_set_owner_locked(phys_addr_t addr, u64 size, u8 owner_id)
-> > +int host_stage2_annotate_locked(phys_addr_t addr, u64 size,
-> > +				kvm_pte_t annotation)
-> >  {
-> > -	hyp_assert_lock_held(&host_kvm.lock);
+On Mon, Oct 04, 2021 at 06:48:37PM +0100, Marc Zyngier wrote:
+> Introduce the infrastructure required to identify an IPA region
+> that is expected to be used as an MMIO window.
 > 
-> Hi Marc,
+> This include mapping, unmapping and checking the regions. Nothing
+> calls into it yet, so no expected functional change.
 > 
-> Why are the lock asserts getting dropped?
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |   2 +
+>  arch/arm64/include/asm/kvm_mmu.h  |   5 ++
+>  arch/arm64/kvm/mmu.c              | 109 ++++++++++++++++++++++++++++++
+>  3 files changed, 116 insertions(+)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f63ca8fb4e58..ba9781eb84d6 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -125,6 +125,8 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+>  	/* Memory Tagging Extension enabled for the guest */
+>  #define KVM_ARCH_FLAG_MTE_ENABLED			1
+> +	/* Gues has bought into the MMIO guard extension */
+> +#define KVM_ARCH_FLAG_MMIO_GUARD			2
+>  	unsigned long flags;
+>  
+>  	/*
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 02d378887743..454a6265d45d 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -170,6 +170,11 @@ phys_addr_t kvm_mmu_get_httbr(void);
+>  phys_addr_t kvm_get_idmap_vector(void);
+>  int kvm_mmu_init(u32 *hyp_va_bits);
+>  
+> +/* MMIO guard */
+> +bool kvm_install_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
+> +bool kvm_remove_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
+> +bool kvm_check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa);
+> +
+>  static inline void *__kvm_vector_slot2addr(void *base,
+>  					   enum arm64_hyp_spectre_vector slot)
+>  {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 1a94a7ca48f2..2470a55ca675 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1172,6 +1172,115 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
+>  		kvm_set_pfn_accessed(pte_pfn(pte));
+>  }
+>  
+> +/* Replace this with something more structured once day */
 
-Ah, I see. host_stage2_try already has the same assert.
+one day
+
+> +#define MMIO_NOTE	(('M' << 24 | 'M' << 16 | 'I' << 8 | 'O') << 1)
+
+Would it be better to have kvm_pgtable_stage2_annotate() shift its
+inputs (<< 1) instead of requiring all annotations to remember that
+requirement? Although the owner id is shifted 2 bits, but I'm not
+sure why.
+
+> +
+> +bool kvm_install_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
+> +{
+> +	struct kvm_mmu_memory_cache *memcache;
+> +	struct kvm_memory_slot *memslot;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	int ret, idx;
+> +
+> +	if (!test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &kvm->arch.flags))
+> +		return false;
+> +
+> +	/* Must be page-aligned */
+> +	if (ipa & ~PAGE_MASK)
+> +		return false;
+> +
+> +	/*
+> +	 * The page cannot be in a memslot. At some point, this will
+> +	 * have to deal with device mappings though.
+> +	 */
+> +	idx = srcu_read_lock(&kvm->srcu);
+> +	mutex_lock(&kvm->slots_arch_lock);
+> +	memslot = gfn_to_memslot(kvm, ipa >> PAGE_SHIFT);
+> +	if (memslot) {
+> +		ret = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	/* Guest has direct access to the GICv2 virtual CPU interface */
+> +	if (irqchip_in_kernel(kvm) &&
+> +	    kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
+> +	    ipa == kvm->arch.vgic.vgic_cpu_base) {
+> +		ret = 0;
+> +		goto out;
+> +	}
+> +
+> +	memcache = &vcpu->arch.mmu_page_cache;
+> +	if (kvm_mmu_topup_memory_cache(memcache,
+> +				       kvm_mmu_cache_min_pages(kvm))) {
+> +		ret = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	spin_lock(&kvm->mmu_lock);
+> +	ret = kvm_pgtable_stage2_annotate(vcpu->arch.hw_mmu->pgt,
+> +					  ipa, PAGE_SIZE, memcache,
+> +					  MMIO_NOTE);
+> +	spin_unlock(&kvm->mmu_lock);
+> +
+> +out:
+> +	mutex_unlock(&kvm->slots_arch_lock);
+> +	srcu_read_unlock(&kvm->srcu, idx);
+> +	return ret == 0;
+
+I guess the callers need this to return a boolean? Just seems odd that
+pains were taken above to set ret to EINVAL/ENOMEM just to translate
+that to true/false here though.
+
+> +}
+> +
+> +static bool __check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
+> +{
+> +	kvm_pte_t pte = 0;
+> +	u32 level = 0;
+> +	int ret;
+> +
+> +	lockdep_assert_held(&vcpu->kvm->mmu_lock);
+> +
+> +	ret = kvm_pgtable_get_leaf(vcpu->arch.hw_mmu->pgt, ipa, &pte, &level);
+> +	VM_BUG_ON(ret);
+> +	VM_BUG_ON(level >= KVM_PGTABLE_MAX_LEVELS);
+> +
+> +	/* Must be a PAGE_SIZE mapping with our annotation */
+> +	return (BIT(ARM64_HW_PGTABLE_LEVEL_SHIFT(level)) == PAGE_SIZE &&
+> +		pte == MMIO_NOTE);
+> +}
+> +
+> +bool kvm_remove_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
+> +{
+> +	bool ret;
+> +
+> +	if (!test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
+> +		return false;
+> +
+> +	/* Keep the PT locked across the two walks */
+> +	spin_lock(&vcpu->kvm->mmu_lock);
+> +
+> +	ret = __check_ioguard_page(vcpu, ipa);
+> +	if (ret)		/* Drop the annotation */
+> +		kvm_pgtable_stage2_unmap(vcpu->arch.hw_mmu->pgt,
+> +					 ALIGN_DOWN(ipa, PAGE_SIZE), PAGE_SIZE);
+
+How about
+
+ if (ret) {
+         /* Drop the annotation */
+         kvm_pgtable_stage2_unmap(vcpu->arch.hw_mmu->pgt,
+                                  ALIGN_DOWN(ipa, PAGE_SIZE), PAGE_SIZE);
+ }
+
+to be a bit easier to read.
+
+> +
+> +	spin_unlock(&vcpu->kvm->mmu_lock);
+> +	return ret;
+> +}
+> +
+> +bool kvm_check_ioguard_page(struct kvm_vcpu *vcpu, gpa_t ipa)
+> +{
+> +	bool ret;
+> +
+> +	if (!test_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
+> +		return true;
+> +
+> +	spin_lock(&vcpu->kvm->mmu_lock);
+> +	ret = __check_ioguard_page(vcpu, ipa & PAGE_MASK);
+> +	spin_unlock(&vcpu->kvm->mmu_lock);
+> +
+> +	if (!ret)
+> +		kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+> +
+> +	return ret;
+> +}
+> +
+>  /**
+>   * kvm_handle_guest_abort - handles all 2nd stage aborts
+>   * @vcpu:	the VCPU pointer
+> -- 
+> 2.30.2
+>
+
+Besides the nits
 
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
-drew
+drew 
 
 _______________________________________________
 kvmarm mailing list
