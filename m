@@ -2,88 +2,86 @@ Return-Path: <SRS0=Cc05=O3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B5DEC433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 13:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12522C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 13:53:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DBF83613A9
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 13:49:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DBF83613A9
+	by mail.kernel.org (Postfix) with ESMTP id 88DA861283
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 13:53:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 88DA861283
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52EB84B311;
-	Thu,  7 Oct 2021 09:49:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13BBF4B2AC;
+	Thu,  7 Oct 2021 09:53:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4rVjjELpSqif; Thu,  7 Oct 2021 09:49:32 -0400 (EDT)
+	with ESMTP id cyJwQsRmKnSR; Thu,  7 Oct 2021 09:53:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 555C94B2AB;
-	Thu,  7 Oct 2021 09:49:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D42E34B2AE;
+	Thu,  7 Oct 2021 09:53:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6C6B4B2AB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 09:49:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 059C54B271
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 09:53:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9fXF3SiYMtEv for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Oct 2021 09:49:29 -0400 (EDT)
+ with ESMTP id IvZBvRiigmWW for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Oct 2021 09:53:09 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E33234B26C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 09:49:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7D9C4B137
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 09:53:09 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633614569;
+ s=mimecast20190719; t=1633614789;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=YV63mS4RpYRoGQSZMwqbE1CRZKLm8qRI0uKOruLtURg=;
- b=F4YyzwurdE862x64FRlDPlf4WTcock3bXoRRZolzp40WDGLJGPaBPQqWOUHiSxSK1i+W6E
- J8P1D6zeHltnuvlbS1jSlBGR2u548SFQr4GeSKkjDhkYlygbTP68fNiy3L0WDa+Gn7rjdV
- BUfhHQXRqkn8AJfMXQVKn3pB0e/MktM=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-d2h-_ZZGPjydyYlJ0UYBHQ-1; Thu, 07 Oct 2021 09:49:27 -0400
-X-MC-Unique: d2h-_ZZGPjydyYlJ0UYBHQ-1
-Received: by mail-qv1-f71.google.com with SMTP id
- q17-20020ad45491000000b003832299965bso3187378qvy.18
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Oct 2021 06:49:27 -0700 (PDT)
+ bh=OCnUFCDFWcoWZv9I+WDnAKonvZ48CTfwyEqTI4QgXnI=;
+ b=EBYggZydUhRC/sYoZaoNgBzZmTFPALxtqF4tb4HENA04iM6j5aDmAereF9kQJJ6xh8IxyV
+ sJb11lvoAjTsWkQdlgQsUdiEimEcwoBfmWlFEnk6OLZN/qzd9eOCM48cpqyUErS7IJnU0x
+ brlPE5VJOJDsf4+CliTyYM5Iv7LCUr8=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-233-I_P0635uNQ-AN30j_e6bYQ-1; Thu, 07 Oct 2021 09:53:08 -0400
+X-MC-Unique: I_P0635uNQ-AN30j_e6bYQ-1
+Received: by mail-qv1-f70.google.com with SMTP id
+ m10-20020ad4448a000000b003833687f674so960639qvt.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Oct 2021 06:53:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=YV63mS4RpYRoGQSZMwqbE1CRZKLm8qRI0uKOruLtURg=;
- b=Dc7YOuQwbV8yFMDhC+t6L6nfGwZpi8Y2wROj/tYPFTEc8SegAr3muN2+SWxfZ2SBzR
- kIM9A1XSpm4CLsVOnBNGsHQ6MIkWLCdAEgqfyxGT8hHqoMtbwqBDdr/xcWR/R8Z/G8tf
- Xecc4IcrzrWoxHJ9WcKgSIXPnjxCvZk+UAWLDnr+tlYF7pUzF/3l+JhSDvXEjY7l8ygb
- YfJFXuzLjxePd5PqFZxkuJelVqxbXQZ/Crg9P09z23a6T1R48BW3f8/Y+ONFCsPKKWjw
- hqYvXIertUzG/NDFp7rYgX+dSahh+wfnJ7U/uzVsSuo50Ua7Puq39JOuDwDXkNduhd0C
- VlYg==
-X-Gm-Message-State: AOAM533d4DO5rdTaknXZL8lJ2oYrljL+ve9U/jTkO4kIqmwJfL68fBL2
- HCeUBq1YJcGJO/+zWI2livV8cVqKSziGwyh8P5jQkjcyi9L7Jlct2y57dG5LOfn1mX0aZB1Hazz
- So7H3C0HHYf3xvWR+e+s2jZiM
-X-Received: by 2002:a05:6214:a4d:: with SMTP id
- ee13mr4121153qvb.6.1633614567253; 
- Thu, 07 Oct 2021 06:49:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzfq2RpXF9UQXSj5gVtwkRFV+YzKin4ZaeJ2Zs5710CY4R+6CVe48FzPtRwNTqzbSzHN22NJA==
-X-Received: by 2002:a05:6214:a4d:: with SMTP id
- ee13mr4121130qvb.6.1633614567050; 
- Thu, 07 Oct 2021 06:49:27 -0700 (PDT)
+ bh=OCnUFCDFWcoWZv9I+WDnAKonvZ48CTfwyEqTI4QgXnI=;
+ b=PcL+ZbRqVOg+QIuasI8Xj4GJ5GFEyaWnv9BoVsoqMq/fB+22/0bYYbFdYybqionWrz
+ Y4K7H7k5WbrbMNuA8W+ICQXprSjqSImj1fTR3GuBiOKGKAmyZz1n8zbnvXr6qGiJ2rDE
+ dWvO5m0u3RtsQZMTIKPshUNp3+oF6Hre2BNVteclQzTubfQtiNFQF2snzPnVVr1sWIys
+ CX2UYO2ukKPOzq0TpJY6HpxNMv3HdxNdXeqg3luvRjw8D7+aQ/V4poZYp26/7TMjm5Jv
+ NnUvEKG2tuoYA2nOHcEU3tNGdGFATbktVOkFEBTB5yxMzUgoM2SGTLIe+2lGrbzGLEzF
+ 8uDA==
+X-Gm-Message-State: AOAM533gVQziz465gTQEPQYZfew1SLqQzZ3GHPH5VC/qQshz97vsvYy/
+ rGxPDg6WQnJ2w4hbsP89rUzWr9vvpqkaMSb1DuPrxF65lyfUkBESnd1byNx4dQgPQg/W+Q7BXuY
+ A6Me4rQR3vQf8NULo6h2Hk0q2
+X-Received: by 2002:ac8:404f:: with SMTP id j15mr5067190qtl.361.1633614788500; 
+ Thu, 07 Oct 2021 06:53:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwQr9CRm+JNFfKdbw14ykOPjUDm4MfkE8BuAkCsB288O/A4ZkxEiEofqmPBzACzDam2GSnZUg==
+X-Received: by 2002:ac8:404f:: with SMTP id j15mr5067165qtl.361.1633614788323; 
+ Thu, 07 Oct 2021 06:53:08 -0700 (PDT)
 Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
- by smtp.gmail.com with ESMTPSA id n123sm633770qke.36.2021.10.07.06.49.24
+ by smtp.gmail.com with ESMTPSA id x79sm13881345qkb.65.2021.10.07.06.53.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 Oct 2021 06:49:26 -0700 (PDT)
-Date: Thu, 7 Oct 2021 15:49:22 +0200
+ Thu, 07 Oct 2021 06:53:07 -0700 (PDT)
+Date: Thu, 7 Oct 2021 15:53:03 +0200
 From: Andrew Jones <drjones@redhat.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 06/16] KVM: arm64: Force a full unmap on vpcu reinit
-Message-ID: <20211007134922.sg3b3egpwc2izbi2@gator>
+Subject: Re: [PATCH v2 07/16] KVM: arm64: Wire MMIO guard hypercalls
+Message-ID: <20211007135303.rbyvltetm3h4sqyy@gator>
 References: <20211004174849.2831548-1-maz@kernel.org>
- <20211004174849.2831548-7-maz@kernel.org>
+ <20211004174849.2831548-8-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20211004174849.2831548-7-maz@kernel.org>
+In-Reply-To: <20211004174849.2831548-8-maz@kernel.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -110,50 +108,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Oct 04, 2021 at 06:48:39PM +0100, Marc Zyngier wrote:
-> As we now keep information in the S2PT, we must be careful not
-> to keep it across a VM reboot, which could otherwise lead to
-> interesting problems.
-> 
-> Make sure that the S2 is completely discarded on reset of
-> a vcpu, and remove the flag that enforces the MMIO check.
+On Mon, Oct 04, 2021 at 06:48:40PM +0100, Marc Zyngier wrote:
+> Plumb in the hypercall interface to allow a guest to discover,
+> enroll, map and unmap MMIO regions.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->  arch/arm64/kvm/psci.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  arch/arm64/kvm/hypercalls.c | 28 ++++++++++++++++++++++++++++
+>  include/linux/arm-smccc.h   | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 56 insertions(+)
 > 
-> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> index 74c47d420253..6c9cb041f764 100644
-> --- a/arch/arm64/kvm/psci.c
-> +++ b/arch/arm64/kvm/psci.c
-> @@ -12,6 +12,7 @@
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 30da78f72b3b..c39aab55ecae 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -5,6 +5,7 @@
+>  #include <linux/kvm_host.h>
 >  
->  #include <asm/cputype.h>
 >  #include <asm/kvm_emulate.h>
 > +#include <asm/kvm_mmu.h>
 >  
->  #include <kvm/arm_psci.h>
 >  #include <kvm/arm_hypercalls.h>
-> @@ -180,6 +181,13 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
->  		tmp->arch.power_off = true;
->  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+>  #include <kvm/arm_psci.h>
+> @@ -129,10 +130,37 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  	case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
+>  		val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
+>  		val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
+> +		/* Only advertise MMIO guard to 64bit guests */
+> +		if (!vcpu_mode_is_32bit(vcpu)) {
+> +			val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO);
+> +			val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL);
+> +			val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP);
+> +			val[0] |= BIT(ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP);
+> +		}
+>  		break;
+>  	case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
+>  		kvm_ptp_get_time(vcpu, val);
+>  		break;
+> +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID:
+> +		if (!vcpu_mode_is_32bit(vcpu))
+> +			val[0] = PAGE_SIZE;
+> +		break;
+> +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID:
+> +		if (!vcpu_mode_is_32bit(vcpu)) {
+> +			set_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags);
+> +			val[0] = SMCCC_RET_SUCCESS;
+> +		}
+> +		break;
+> +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_MAP_FUNC_ID:
+> +		if (!vcpu_mode_is_32bit(vcpu) &&
+> +		    kvm_install_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
+> +			val[0] = SMCCC_RET_SUCCESS;
+> +		break;
+> +	case ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_UNMAP_FUNC_ID:
+> +		if (!vcpu_mode_is_32bit(vcpu) &&
+> +		    kvm_remove_ioguard_page(vcpu, vcpu_get_reg(vcpu, 1)))
+> +			val[0] = SMCCC_RET_SUCCESS;
+> +		break;
+
+Since these are all ARM_SMCCC_SMC_64 calls, can we do some sort of
+refactoring first, similar to Oliver's "KVM: arm64: Clean up SMC64 PSCI
+filtering for AArch32 guests", which would avoid the need for all the
+!vcpu_mode_is_32bit's?
+
+>  	case ARM_SMCCC_TRNG_VERSION:
+>  	case ARM_SMCCC_TRNG_FEATURES:
+>  	case ARM_SMCCC_TRNG_GET_UUID:
+> diff --git a/include/linux/arm-smccc.h b/include/linux/arm-smccc.h
+> index 7d1cabe15262..4aab2078d8d3 100644
+> --- a/include/linux/arm-smccc.h
+> +++ b/include/linux/arm-smccc.h
+> @@ -107,6 +107,10 @@
+>  /* KVM "vendor specific" services */
+>  #define ARM_SMCCC_KVM_FUNC_FEATURES		0
+>  #define ARM_SMCCC_KVM_FUNC_PTP			1
+> +#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO	2
+> +#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL	3
+> +#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP	4
+> +#define ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP	5
+>  #define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
+>  #define ARM_SMCCC_KVM_NUM_FUNCS			128
 >  
-> +	/*
-> +	 * If the MMIO guard was enabled, we pay the price of a full
-> +	 * unmap to get back to a sane state (and clear the flag).
-> +	 */
-> +	if (test_and_clear_bit(KVM_ARCH_FLAG_MMIO_GUARD, &vcpu->kvm->arch.flags))
-> +		stage2_unmap_vm(vcpu->kvm);
+> @@ -133,6 +137,30 @@
+>  #define KVM_PTP_VIRT_COUNTER			0
+>  #define KVM_PTP_PHYS_COUNTER			1
+>  
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_INFO_FUNC_ID		\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_64,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD_INFO)
 > +
->  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
->  	vcpu->run->system_event.type = type;
->  	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_ENROLL_FUNC_ID		\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_64,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD_ENROLL)
+> +
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_MAP_FUNC_ID			\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_64,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD_MAP)
+> +
+> +#define ARM_SMCCC_VENDOR_HYP_KVM_MMIO_GUARD_UNMAP_FUNC_ID		\
+> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
+> +			   ARM_SMCCC_SMC_64,				\
+> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
+> +			   ARM_SMCCC_KVM_FUNC_MMIO_GUARD_UNMAP)
+> +
+>  /* Paravirtualised time calls (defined by ARM DEN0057A) */
+>  #define ARM_SMCCC_HV_PV_TIME_FEATURES				\
+>  	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
 > -- 
 > 2.30.2
 >
 
+Besides the refactoring suggestion,
+
 Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
