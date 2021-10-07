@@ -1,57 +1,68 @@
-Return-Path: <SRS0=qtHs=O2=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=Cc05=O3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA75C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Oct 2021 15:34:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A8B8C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 12:56:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8518E61154
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Oct 2021 15:34:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8518E61154
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id A248A610A2
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 12:56:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A248A610A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 128674B2AB;
-	Wed,  6 Oct 2021 11:34:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 319964B2EE;
+	Thu,  7 Oct 2021 08:56:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PXz513UZVpDu; Wed,  6 Oct 2021 11:34:24 -0400 (EDT)
+	with ESMTP id 7oS1LmMgs47L; Thu,  7 Oct 2021 08:56:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 718014B299;
-	Wed,  6 Oct 2021 11:34:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74C0F4B2AC;
+	Thu,  7 Oct 2021 08:56:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 917D84B278
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Oct 2021 11:34:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28D294B2AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 08:56:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3ivbDwqYJANV for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Oct 2021 11:34:22 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 39D8E4B277
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Oct 2021 11:34:22 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CFD106D;
- Wed,  6 Oct 2021 08:34:21 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E93213F66F;
- Wed,  6 Oct 2021 08:34:20 -0700 (PDT)
-Date: Wed, 6 Oct 2021 16:35:55 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: Use get_raz_reg() for userspace reads of
- PMSWINC_EL0
-Message-ID: <YV3CR0RABZY15kvN@monolith.localdoman>
-References: <20210927124911.191729-1-alexandru.elisei@arm.com>
- <20210927124911.191729-3-alexandru.elisei@arm.com>
- <20210930132915.cpfzxdlws2zlou47@gator>
- <YV23b6On4YrW+4en@monolith.localdoman>
- <20211006152302.2tmih2vx5x7xipml@gator.home>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211006152302.2tmih2vx5x7xipml@gator.home>
-Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id nzGg4O3hqfEO for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Oct 2021 08:56:50 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C146C4B279
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 08:56:50 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 9253F61053;
+ Thu,  7 Oct 2021 12:56:49 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mYSx5-00FJgy-Jl; Thu, 07 Oct 2021 13:56:47 +0100
+Date: Thu, 07 Oct 2021 13:56:47 +0100
+Message-ID: <877depq9gw.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 5/5] KVM: arm64: Disable privileged hypercalls after
+ pKVM finalisation
+In-Reply-To: <20211005113721.29441-6-will@kernel.org>
+References: <20211005113721.29441-1-will@kernel.org>
+ <20211005113721.29441-6-will@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ qperret@google.com, catalin.marinas@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, mark.rutland@arm.com, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -69,98 +80,175 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Drew,
-
-On Wed, Oct 06, 2021 at 05:23:02PM +0200, Andrew Jones wrote:
-> On Wed, Oct 06, 2021 at 03:49:19PM +0100, Alexandru Elisei wrote:
-> > Hi Drew,
-> > 
-> > Thank you for the review!
-> > 
-> > On Thu, Sep 30, 2021 at 03:29:15PM +0200, Andrew Jones wrote:
-> > > On Mon, Sep 27, 2021 at 01:49:11PM +0100, Alexandru Elisei wrote:
-> > > > PMSWINC_EL0 is a write-only register and was initially part of the VCPU
-> > > > register state, but was later removed in commit 7a3ba3095a32 ("KVM:
-> > > > arm64: Remove PMSWINC_EL0 shadow register"). To prevent regressions, the
-> > > > register was kept accessible from userspace as Read-As-Zero (RAZ).
-> > > > 
-> > > > The read function that is used to handle userspace reads of this
-> > > > register is get_raz_id_reg(), which, while technically correct, as it
-> > > > returns 0, it is not semantically correct, as PMSWINC_EL0 is not an ID
-> > > > register as the function name suggests.
-> > > > 
-> > > > Add a new function, get_raz_reg(), to use it as the accessor for
-> > > > PMSWINC_EL0, as to not conflate get_raz_id_reg() to handle other types
-> > > > of registers.
-> > > > 
-> > > > No functional change intended.
-> > > > 
-> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > ---
-> > > >  arch/arm64/kvm/sys_regs.c | 11 ++++++++++-
-> > > >  1 file changed, 10 insertions(+), 1 deletion(-)
-> > > > 
-> > > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > > index 4adda8bf3168..1be827740f87 100644
-> > > > --- a/arch/arm64/kvm/sys_regs.c
-> > > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > > @@ -1285,6 +1285,15 @@ static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> > > >  	return __set_id_reg(vcpu, rd, uaddr, true);
-> > > >  }
-> > > >  
-> > > > +static int get_raz_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> > > > +		       const struct kvm_one_reg *reg, void __user *uaddr)
-> > > > +{
-> > > > +	const u64 id = sys_reg_to_index(rd);
-> > > > +	const u64 val = 0;
-> > > > +
-> > > > +	return reg_to_user(uaddr, &val, id);
-> > > > +}
-> > > > +
-> > > >  static int set_wi_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> > > >  		      const struct kvm_one_reg *reg, void __user *uaddr)
-> > > >  {
-> > > > @@ -1647,7 +1656,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> > > >  	 * previously (and pointlessly) advertised in the past...
-> > > >  	 */
-> > > >  	{ PMU_SYS_REG(SYS_PMSWINC_EL0),
-> > > > -	  .get_user = get_raz_id_reg, .set_user = set_wi_reg,
-> > > > +	  .get_user = get_raz_reg, .set_user = set_wi_reg,
-> > > >  	  .access = access_pmswinc, .reset = NULL },
-> > > >  	{ PMU_SYS_REG(SYS_PMSELR_EL0),
-> > > >  	  .access = access_pmselr, .reset = reset_pmselr, .reg = PMSELR_EL0 },
-> > > > -- 
-> > > > 2.33.0
-> > > >
-> > > 
-> > > What about replacing get_raz_id_reg() with this new function? Do really need
-> > > both?
-> > 
-> > I thought about that when writing this patch. I ultimately decided against it
-> > because changing the get_user accessor to be get_raz_reg() instead of
-> > get_raz_id_reg() would break the symmetry with set_user, which needs to stay
-> > set_raz_id_reg(), and cannot be substituted with set_wi_reg() because that would
-> > be a change in behaviour (set_raz_id_reg() checks that val == 0, set_wi_reg()
-> > doesn't).
-> > 
-> > I do agree that get_raz_id_reg() does the exact same thing as get_raz_reg(), but
-> > in a more roundabout manner. So if you still feel that I should use
-> > get_raz_reg() instead, I'll do that for the next iteration of the series. What
-> > do you think?
+On Tue, 05 Oct 2021 12:37:21 +0100,
+Will Deacon <will@kernel.org> wrote:
 > 
-> I'd prefer we avoid maintaining two implementations of the same
-> functionality. If we want to keep the symmetry with set_raz_id_reg,
-> then we could implement get_raz_id_reg as 'return get_raz_reg()'.
-
-Agreed, I'll replace get_raz_id_reg() with get_raz_reg().
-
-Thanks,
-Alex
-
+> After pKVM has been 'finalised' using the __pkvm_prot_finalize hypercall,
+> the calling CPU will have a Stage-2 translation enabled to prevent access
+> to memory pages owned by EL2.
 > 
-> Thanks,
-> drew
+> Although this forms a significant part of the process to deprivilege the
+> host kernel, we also need to ensure that the hypercall interface is
+> reduced so that the EL2 code cannot, for example, be re-initialised using
+> a new set of vectors.
 > 
+> Re-order the hypercalls so that only a suffix remains available after
+> finalisation of pKVM.
+> 
+> Cc: Marc Zyngier <maz@kernel.org>
+> Cc: Quentin Perret <qperret@google.com>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_asm.h   | 43 ++++++++++++++++--------------
+>  arch/arm64/kvm/hyp/nvhe/hyp-main.c | 37 +++++++++++++++++--------
+>  2 files changed, 49 insertions(+), 31 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index e86045ac43ba..68630fd382c5 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -43,27 +43,30 @@
+>  
+>  #define KVM_HOST_SMCCC_FUNC(name) KVM_HOST_SMCCC_ID(__KVM_HOST_SMCCC_FUNC_##name)
+>  
+> +/* Hypercalls available only prior to pKVM finalisation */
+>  #define __KVM_HOST_SMCCC_FUNC___kvm_hyp_init			0
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			1
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		2
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		3
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		4
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		5
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		6
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
+> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config		8
+> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		9
+> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		10
+> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		11
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		12
+> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		13
+> -#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		14
+> -#define __KVM_HOST_SMCCC_FUNC___pkvm_init			15
+> -#define __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp		16
+> -#define __KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping	17
+> -#define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
+> -#define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
+> -#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			20
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		1
+> +#define __KVM_HOST_SMCCC_FUNC___pkvm_init			2
+> +#define __KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping	3
+> +#define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		4
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			5
+> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		6
+> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config		7
+> +#define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		8
+> +
+> +/* Hypercalls available after pKVM finalisation */
+> +#define __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp		9
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			10
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			11
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		12
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		13
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		14
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		15
+> +#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		16
+> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		17
+> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		18
+> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		19
+> +#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		20
+
+This is no helping with the above, but can we *please* try to get rid
+of this #define insanity before moving things around? I came up with
+the following, which seems to build.
+
+Thoughts?
+
+	M.
+
+From 8a50c98489220d2ebaf02d4ffdbef3cf0d6634ee Mon Sep 17 00:00:00 2001
+From: Marc Zyngier <maz@kernel.org>
+Date: Thu, 7 Oct 2021 13:18:29 +0100
+Subject: [PATCH] KVM: arm64: Turn __KVM_HOST_SMCCC_FUNC_* into an enum
+ (mostly)
+
+__KVM_HOST_SMCCC_FUNC_* is a royal pain, as there is a fair amount
+of churn around these #defines, and we avoid making it an enum
+only for the sake of the early init, low level code that requires
+__KVM_HOST_SMCCC_FUNC___kvm_hyp_init to be usable from assembly.
+
+Let's be brave and turn everything but this symbol into an enum,
+using a bit of arithmetic to avoid any overlap.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_asm.h | 44 +++++++++++++++++---------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index e86045ac43ba..43b5e213ae43 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -44,31 +44,35 @@
+ #define KVM_HOST_SMCCC_FUNC(name) KVM_HOST_SMCCC_ID(__KVM_HOST_SMCCC_FUNC_##name)
+ 
+ #define __KVM_HOST_SMCCC_FUNC___kvm_hyp_init			0
+-#define __KVM_HOST_SMCCC_FUNC___kvm_vcpu_run			1
+-#define __KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context		2
+-#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa		3
+-#define __KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid		4
+-#define __KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context		5
+-#define __KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff		6
+-#define __KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs			7
+-#define __KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config		8
+-#define __KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr		9
+-#define __KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr		10
+-#define __KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs		11
+-#define __KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2		12
+-#define __KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs		13
+-#define __KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs		14
+-#define __KVM_HOST_SMCCC_FUNC___pkvm_init			15
+-#define __KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp		16
+-#define __KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping	17
+-#define __KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector		18
+-#define __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize		19
+-#define __KVM_HOST_SMCCC_FUNC___kvm_adjust_pc			20
+ 
+ #ifndef __ASSEMBLY__
+ 
+ #include <linux/mm.h>
+ 
++enum __kvm_host_smccc_func {
++	/* __KVM_HOST_SMCCC_FUNC___kvm_hyp_init */
++	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run = __KVM_HOST_SMCCC_FUNC___kvm_hyp_init + 1,
++	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
++	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
++	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
++	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
++	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
++	__KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
++	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
++	__KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr,
++	__KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr,
++	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
++	__KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2,
++	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
++	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs,
++	__KVM_HOST_SMCCC_FUNC___pkvm_init,
++	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
++	__KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping,
++	__KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector,
++	__KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
++	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
++};
++
+ #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
+ #define DECLARE_KVM_NVHE_SYM(sym)	extern char kvm_nvhe_sym(sym)[]
+ 
+-- 
+2.30.2
+
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
