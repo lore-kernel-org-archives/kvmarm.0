@@ -2,94 +2,76 @@ Return-Path: <SRS0=Cc05=O3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CC9AC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 15:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0F0C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 16:59:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A28406113E
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 15:52:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A28406113E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 5466C61261
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 16:59:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5466C61261
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BDC64B2D3;
-	Thu,  7 Oct 2021 11:52:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD66C4B2E3;
+	Thu,  7 Oct 2021 12:59:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 92rK0VDZOUxi; Thu,  7 Oct 2021 11:52:55 -0400 (EDT)
+	with ESMTP id KgK2X6sDpTY3; Thu,  7 Oct 2021 12:59:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0939C4B2E0;
-	Thu,  7 Oct 2021 11:52:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9111A4B312;
+	Thu,  7 Oct 2021 12:59:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 75B164B268
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 11:52:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EBC74B2D6
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 12:59:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iurkJI5AyicS for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Oct 2021 11:52:53 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 412824B267
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 11:52:53 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633621973;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=mki5wTjxXGr+IGNPFHM4xHf+VH4JglD76WJd/mMOISs=;
- b=ZW4NS9yiYE4RatWENqfxdIrdexBE5IuyMYLpDtyjwrKc9vRjnSADKsPFvzAA5DAQGjnXeH
- FtUYzyh0WKIuTO9Bnw8ZDq8ORN8pZc1SRkc5QSVFV538/KEo6dBG2x/FzbujCfFklzDG0r
- RpD512sTJRv9mGDWMOpr1c4lRR/OI0s=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-lAyka312Mg-Pr4eK4rcgWA-1; Thu, 07 Oct 2021 11:52:52 -0400
-X-MC-Unique: lAyka312Mg-Pr4eK4rcgWA-1
-Received: by mail-wr1-f71.google.com with SMTP id
- r16-20020adfbb10000000b00160958ed8acso5055911wrg.16
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Oct 2021 08:52:51 -0700 (PDT)
+ with ESMTP id 0qG5bVbVSSgR for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Oct 2021 12:59:34 -0400 (EDT)
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com
+ [209.85.160.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A03E4B2B3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 12:59:34 -0400 (EDT)
+Received: by mail-qt1-f178.google.com with SMTP id b16so6802898qtt.7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Oct 2021 09:59:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yStGYIpZvygpVOizwmrRBKxJSbCuOoEwX5b/Zb25tt0=;
+ b=mppNOVAEN+ki/T08o63WMJV4P8udEmtmkGOlQa6mcKWowODcCyB3XLnyzMlrqUi1Xt
+ wI5mcrEfQgBS+oGPU0FZqxVZwv1pUgMA+7RUVAVU2d+8TzfnfzZQIZtxJh39WKdtcldj
+ Knt//D+OuRT2vJoa9q9ajNmswldyLCfxFDP+dd+PID4/BFfOvM70p/DLM9Ue3wAs/k+b
+ D8BcOwYQoTXdBHESPulEEW54QXng020cd88Q70TiLf4EESkmarwkLX4bds7s5k9kpbYd
+ LOerYpEUJPxMKvXsHykqqKe/fw58OaS1iRAfvMpAHR4rwb/lfsX9NzgcnLw6uPeJCqkB
+ crOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=mki5wTjxXGr+IGNPFHM4xHf+VH4JglD76WJd/mMOISs=;
- b=iHpgoI0LvhU70I1uYIfIuuZgrpcv5iIqKbxDGmZTgo7UjvAG7wv8VuNYaS+c2tpohB
- hhZ+gOPoikh3iKECe6ssJ9a8wpkJZOobvng2Hj/xLO0UpKHrC7lBmY9bUcLR/stauqqA
- sXtP0+VHsoXn0roBepKhBaAjk1CEti5X+K7Qgu7VsF1JaPzyGnAZ7KI6/ERbuPwdrLSZ
- ukLs6g7ul0/YWDYf3v2SiUoXWR2EimCDkNou5u4/XfEpRwFCORFtjzrWebRcBOQMexgr
- 7N7MHOcAm4/89AnypujCb1YEIRu9y7v1gobWT4C0sOnAbdx6nzbBnyam11SV/298qMue
- jU3g==
-X-Gm-Message-State: AOAM531o7FoVVs6b3RR9XDPRRMTFPeMt28ZeTcK0ZSdRKFKTZk4CGPt7
- 4lmQ+rr7knWdwMyrWA1woq8/nbejwxkah89PgWJblwx5vHhupNPW7s6l7x8GZ+ndtmJNnmU4DhG
- fPPEuahKCnd4wf7IA3B5uRyFt
-X-Received: by 2002:adf:9b97:: with SMTP id d23mr6386618wrc.53.1633621970915; 
- Thu, 07 Oct 2021 08:52:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxxS9zzcdO8gEa8I10rZOiZ3zEoCv1L5U3v+lF61OvcEjd+iZrkvzPdw2F8ibmZvXvAL8shTg==
-X-Received: by 2002:adf:9b97:: with SMTP id d23mr6386598wrc.53.1633621970756; 
- Thu, 07 Oct 2021 08:52:50 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
- by smtp.gmail.com with ESMTPSA id i92sm13012wri.28.2021.10.07.08.52.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 Oct 2021 08:52:50 -0700 (PDT)
-Date: Thu, 7 Oct 2021 17:52:48 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 00/16]  KVM: arm64: MMIO guard PV services
-Message-ID: <20211007155248.ejwclkwnnsaunmc6@gator>
-References: <20211004174849.2831548-1-maz@kernel.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yStGYIpZvygpVOizwmrRBKxJSbCuOoEwX5b/Zb25tt0=;
+ b=RZy5i3p/oodjHMMUOqtR5Lld+CKNWufdzFAgaLpb9KR7Wh4kjRP7643lvp31UnR0Ig
+ 52saSNR8i9MQYcKNosMt55ZTI/jg+1ebhXqfkq0Q8+A4RsZm5jnNrK6049xvzxIHaDR3
+ i0d/fJOWdtgXXNh6Bes55zvbRK/1tdh0xnsnIlwJyMEWClCBRp6VZI4oM+EUlSfPFmrS
+ anaJccV+Jepem+7M1wj0Ugt7RnRKb+ZU4NXSANww75VUZg9cEXgBUDcx+BWB3JOgysn0
+ fpqdHvGD+Jn3lXZjldeCdZ8eL8B/03536CIZDBaBng3PjEjtb5X3ffkSqCqArgPN8zg2
+ R6WQ==
+X-Gm-Message-State: AOAM533BBx8XZ+ttjHdIm+ySBZ1gGwYL4V247gR+UyeICUrwwuJdcddS
+ FKjW4E8G3NnQcpBWfj1es7vSeROhN6SUhCwCjinABQ==
+X-Google-Smtp-Source: ABdhPJxTAXIl5n2x/wQHnws8o08Z9GMfP8GXDvCZvrxTPvhcRyUVX7c5KZ+qz0KRjOEopqc7sNJRocOee/a0NptbvdQ=
+X-Received: by 2002:a05:622a:4d4:: with SMTP id
+ q20mr6376969qtx.57.1633625973690; 
+ Thu, 07 Oct 2021 09:59:33 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20211004174849.2831548-1-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Srivatsa Vaddagiri <vatsa@codeaurora.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>,
- Shanker R Donthineni <sdonthineni@nvidia.com>, will@kernel.org,
+References: <20211001170553.3062988-1-maz@kernel.org>
+In-Reply-To: <20211001170553.3062988-1-maz@kernel.org>
+From: Andrew Scull <ascull@google.com>
+Date: Thu, 7 Oct 2021 17:59:22 +0100
+Message-ID: <CADcWuH0S2-WVN073VkZ1tTf76xemKsbZyjNyC1hBjY+n09dZWQ@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: arm64: Allow KVM to be disabled from the command
+ line
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kernel-team@android.com, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -107,41 +89,99 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Oct 04, 2021 at 06:48:33PM +0100, Marc Zyngier wrote:
-> This is the second version of this series initially posted at [1] that
-> aims at letting a guest express what it considers as MMIO, and only
-> let this through to userspace. Together with the guest memory made
-> (mostly) inaccessible to the host kernel and userspace, this allows an
-> implementation of a hardened IO subsystem.
-> 
-> A lot has been fixed/revamped/improved since the initial posting,
-> although I am still not pleased with the ioremap plugging on the guest
-> side. I'll take any idea to get rid of it!
+Reviewed-by: Andrew Scull <ascull@google.com>
+
+
+On Fri, 1 Oct 2021 at 18:06, Marc Zyngier <maz@kernel.org> wrote:
 >
-
-Pros/cons of the hooks
-
-Pros:
- 1) VM only needs to have a kernel that supports the feature (and a
-    kernel command line that enables it)
- 2) All the ioremapped MMIO ranges are permitted immediately, rather than
-    deferring until some other event (which would probably be too late in
-    many cases)
-
-Cons:
- 1) Having to have hooks, which is never pretty
- 2) Adding the hypcalls to each ioremap, which adds some overhead
- 3) Having to reference count all the mappings, which adds even more overhead
- 4) Not giving the owner of the VM control over what MMIO is permitted
-    (Well, maybe the VM owner just needs to blacklist drivers for anything
-     that it doesn't want.)
-
-I don't think any of the Con's are too bad and probably Pro-2 more or less
-makes the hooks a necessity.
-
-Thanks,
-drew
-
+> Although KVM can be compiled out of the kernel, it cannot be disabled
+> at runtime. Allow this possibility by introducing a new mode that
+> will prevent KVM from initialising.
+>
+> This is useful in the (limited) circumstances where you don't want
+> KVM to be available (what is wrong with you?), or when you want
+> to install another hypervisor instead (good luck with that).
+>
+> Reviewed-by: David Brazdil <dbrazdil@google.com>
+> Acked-by: Will Deacon <will@kernel.org>
+> Acked-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>
+> Notes:
+>     v2: Dropped the id_aa64mmfr1_vh=0 setting so that KVM can be disabled
+>         and yet stay in VHE mode on platforms that require it.
+>         I kept the AB/RB's, but please shout if you disagree!
+>
+>  Documentation/admin-guide/kernel-parameters.txt |  2 ++
+>  arch/arm64/include/asm/kvm_host.h               |  1 +
+>  arch/arm64/kvm/arm.c                            | 14 +++++++++++++-
+>  3 files changed, 16 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 91ba391f9b32..f268731a3d4d 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -2365,6 +2365,8 @@
+>         kvm-arm.mode=
+>                         [KVM,ARM] Select one of KVM/arm64's modes of operation.
+>
+> +                       none: Forcefully disable KVM.
+> +
+>                         nvhe: Standard nVHE-based mode, without support for
+>                               protected guests.
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f8be56d5342b..019490c67976 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -58,6 +58,7 @@
+>  enum kvm_mode {
+>         KVM_MODE_DEFAULT,
+>         KVM_MODE_PROTECTED,
+> +       KVM_MODE_NONE,
+>  };
+>  enum kvm_mode kvm_get_mode(void);
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index fe102cd2e518..658171231af9 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -2064,6 +2064,11 @@ int kvm_arch_init(void *opaque)
+>                 return -ENODEV;
+>         }
+>
+> +       if (kvm_get_mode() == KVM_MODE_NONE) {
+> +               kvm_info("KVM disabled from command line\n");
+> +               return -ENODEV;
+> +       }
+> +
+>         in_hyp_mode = is_kernel_in_hyp_mode();
+>
+>         if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
+> @@ -2137,8 +2142,15 @@ static int __init early_kvm_mode_cfg(char *arg)
+>                 return 0;
+>         }
+>
+> -       if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode()))
+> +       if (strcmp(arg, "nvhe") == 0 && !WARN_ON(is_kernel_in_hyp_mode())) {
+> +               kvm_mode = KVM_MODE_DEFAULT;
+>                 return 0;
+> +       }
+> +
+> +       if (strcmp(arg, "none") == 0) {
+> +               kvm_mode = KVM_MODE_NONE;
+> +               return 0;
+> +       }
+>
+>         return -EINVAL;
+>  }
+> --
+> 2.30.2
+>
+> --
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
