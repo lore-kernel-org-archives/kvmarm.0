@@ -1,86 +1,95 @@
-Return-Path: <SRS0=Cc05=O3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=WrEh=O4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7280DC433F5
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 23:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C2DC433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 06:29:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1EC2161076
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Oct 2021 23:35:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1EC2161076
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 3CBF860FF2
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 06:29:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3CBF860FF2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEB2E4B269;
-	Thu,  7 Oct 2021 19:35:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 882324B0E6;
+	Fri,  8 Oct 2021 02:29:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 52UxwcDu+ZGB; Thu,  7 Oct 2021 19:35:27 -0400 (EDT)
+	with ESMTP id ft2gFHV05YNp; Fri,  8 Oct 2021 02:29:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD3B34B285;
-	Thu,  7 Oct 2021 19:35:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 232204B0ED;
+	Fri,  8 Oct 2021 02:29:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 493514B25C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 19:35:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C56184B0D6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 02:29:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2VD8MXiEcbBu for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Oct 2021 19:35:24 -0400 (EDT)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13E054B238
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Oct 2021 19:35:24 -0400 (EDT)
-Received: by mail-pg1-f201.google.com with SMTP id
- p19-20020a634f53000000b002877a03b293so582072pgl.10
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Oct 2021 16:35:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=eHWmwL/DdyUes1cHwvQEsD28E8ip/Y4KwKGrDHcA804=;
- b=GM0m7+E0VNGzbrc5pxJMbf1durKLRA8Y5N0Bzcu2SBWiEps3zwM/BBFF/W+nceQB+q
- basLN4ax9bOBrjbrNilou1jshsUoqDA/LYJMiS8Z1BfQl/R4im5dytZiUIQbJkY5t+ev
- xZxu4jLHdqUmWvdQfqR7LIOZ0D9/khwutmcqg1Yps2Px0xTy6qTSyiBlDj06XyCK/HrR
- xy414nG63WpuaSZUFLLo0dpZvSL8L6HiTdFWroVTEWgithKOD0VXo+6VF+UGAKYSObkC
- 7rhtqLwweVfip0Is/7LhgtzynhwyIX1a/yuSsaIB3BQ5ZnBkP97E7w5bnKCH+xvTJc73
- t6yw==
+ with ESMTP id SlZlbRkK+XvB for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Oct 2021 02:29:00 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 89BF24B0D0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 02:29:00 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1633674540;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=66bdpyzPAZfft1eFWrlXRX9Ag9oSCJ0WcnS1e0+91qA=;
+ b=IsbWfz3wGI9zUWQiEL7Plf+tdjbPEmwEp8lTtTzUakn/hrIWE4gaCmk4C2NkZ1JYuKmIEL
+ zO31mIdeKi027LOdHOVeTtZ7vpM/iJGjhN8hiwZGqXxsBmp4U0R0I5wMl00oCHN4yqi1dM
+ pWP1el6Hm5oQLsy8y06XNZSN0seOxtc=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-462-YW7t0enzNUGW7Kpz1MhF8A-1; Fri, 08 Oct 2021 02:28:58 -0400
+X-MC-Unique: YW7t0enzNUGW7Kpz1MhF8A-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ t28-20020a508d5c000000b003dad7fc5caeso8188981edt.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Oct 2021 23:28:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=eHWmwL/DdyUes1cHwvQEsD28E8ip/Y4KwKGrDHcA804=;
- b=SBzRz1ZjRf9XCejOKu1dqyjs2GwYSJVIAkQU2F3EiYT11L2iqM9qbPduXbPVyTJVS2
- qdohHbgQwPMFXC7mL5LchG0A9FBaIKoknIQ0/XeF6PfDUzI3JpnomBkq2vjtNqF11ZAw
- Czg13r8Z1xbw4GvxAoqA5L6fCw1p7UCXcwR/MnA5oUnbHvySCBqkN9l7GEuOShTqFVaU
- pfNUU0rSuYElZ19W3oUQX+LPuGpg97ktJOqtuzVBAqxVR/XwuW6b/We0qGzOIcF82apa
- I52biauLxMOkTcUoJ+OIoj4sRtYWjEb7eCvDwxh4oLCnaP7KNAkUwh8OQM95+G3F/Qru
- jW8g==
-X-Gm-Message-State: AOAM5302ov96kJiUe/X97oh4SJ/sHooSPqDyQcXDUJwenbxAbTR9VYX7
- ankzOFSIsICht6+s2rYMytQxFlc4+N86
-X-Google-Smtp-Source: ABdhPJya7wHmSzDAkPeQZPGH6y7bHL4W+57qAOc5GKUf8g8bb6ZIYHwjPwQ0n4Op+YXyw8+5O2zSGlsxvvqz
-X-Received: from rananta-virt.c.googlers.com
- ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a17:90a:3ee4:: with SMTP id
- k91mr179113pjc.1.1633649722638; Thu, 07 Oct 2021 16:35:22 -0700 (PDT)
-Date: Thu,  7 Oct 2021 23:34:39 +0000
-In-Reply-To: <20211007233439.1826892-1-rananta@google.com>
-Message-Id: <20211007233439.1826892-16-rananta@google.com>
-Mime-Version: 1.0
-References: <20211007233439.1826892-1-rananta@google.com>
-X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v8 15/15] KVM: arm64: selftests: arch_timer: Support vCPU
- migration
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
- Andrew Jones <drjones@redhat.com>, James Morse <james.morse@arm.com>, 
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=66bdpyzPAZfft1eFWrlXRX9Ag9oSCJ0WcnS1e0+91qA=;
+ b=f36rdYDr0DW2YhflzKAevzcHzqLbchl9/zYnRBeASbKuRjQl1YzUbID2BcSiSJRtY6
+ PlF4W8mZW4ocB7p3YXwwklbw1ABJITlHHs6eeKWQxcmZiixzM+ocDG/fakAgHyc2hB/l
+ 32alT9USbqNHIKMyA+Qg3fQPsZcmYgpDNURh8aJiKT4P5BGfO2jjnh619GHUJaYIAPGX
+ wvJoe0HGHgslM45cHE5ySF0kyZgIewOT1T5jQjCm7zkllOEn5IDrChS5rzp3+dy38QPg
+ NWCag9P51XrS1YB8Ifiljrg1YyhCG7sTOOAhoh1BSey9YOgY/AiT2mNS/zSLuCfsMSEs
+ mP4Q==
+X-Gm-Message-State: AOAM530fsSFvWV4jBNOty2qptDd4IeIA/RcEj9WN2WrXxoI/RUoj3G+V
+ zqMtEfU08YG8djun/lF066Hsi9Nv+UF3SeqDodBm/mx+3F65um2xAiQ4uxY4/ZbHDfNBX9srIoX
+ Sxh6VYyyvBSILbhytYv1J5vhC
+X-Received: by 2002:a17:906:1184:: with SMTP id
+ n4mr1993364eja.87.1633674537435; 
+ Thu, 07 Oct 2021 23:28:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxJyExn0FhyzPo+C2Jqjvn16Uv3O8XDMg4nsVAS9tztBxtKjG/slYlHcTGscY/joHF7R/qWPA==
+X-Received: by 2002:a17:906:1184:: with SMTP id
+ n4mr1993350eja.87.1633674537256; 
+ Thu, 07 Oct 2021 23:28:57 -0700 (PDT)
+Received: from gator.home (cst2-174-28.cust.vodafone.cz. [31.30.174.28])
+ by smtp.gmail.com with ESMTPSA id d25sm609109edt.51.2021.10.07.23.28.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 07 Oct 2021 23:28:56 -0700 (PDT)
+Date: Fri, 8 Oct 2021 08:28:55 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: Add mmio_addr arg to arm/micro-bench
+Message-ID: <20211008062855.3g34sxevl6w3gn6h@gator.home>
+References: <20211007183230.2637929-1-ricarkol@google.com>
+MIME-Version: 1.0
+In-Reply-To: <20211007183230.2637929-1-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,238 +106,146 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since the timer stack (hardware and KVM) is per-CPU, there
-are potential chances for races to occur when the scheduler
-decides to migrate a vCPU thread to a different physical CPU.
-Hence, include an option to stress-test this part as well by
-forcing the vCPUs to migrate across physical CPUs in the
-system at a particular rate.
+On Thu, Oct 07, 2021 at 11:32:30AM -0700, Ricardo Koller wrote:
+> Add a command line arg to arm/micro-bench to set the mmio_addr to other
+> values besides the default QEMU one. Default to the QEMU value if no arg
+> is passed. Also, the <NUM> in mmio_addr=<NUM> can't be a hex.
 
-Originally, the bug for the fix with commit 3134cc8beb69d0d
-("KVM: arm64: vgic: Resample HW pending state on deactivation")
-was discovered using arch_timer test with vCPU migrations and
-can be easily reproduced.
+I'll send this patch
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
----
- .../selftests/kvm/aarch64/arch_timer.c        | 115 +++++++++++++++++-
- 1 file changed, 114 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 3b6ea6a462f4..bf6a45b0b8dc 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -14,6 +14,8 @@
-  *
-  * The test provides command-line options to configure the timer's
-  * period (-p), number of vCPUs (-n), and iterations per stage (-i).
-+ * To stress-test the timer stack even more, an option to migrate the
-+ * vCPUs across pCPUs (-m), at a particular rate, is also provided.
-  *
-  * Copyright (c) 2021, Google LLC.
+diff --git a/lib/util.c b/lib/util.c
+index a90554138952..682ca2db09e6 100644
+--- a/lib/util.c
++++ b/lib/util.c
+@@ -4,6 +4,7 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
   */
-@@ -24,6 +26,8 @@
- #include <pthread.h>
- #include <linux/kvm.h>
- #include <linux/sizes.h>
-+#include <linux/bitmap.h>
-+#include <sys/sysinfo.h>
+ #include <libcflat.h>
++#include <stdlib.h>
+ #include "util.h"
  
- #include "kvm_util.h"
- #include "processor.h"
-@@ -36,17 +40,20 @@
- #define NR_TEST_ITERS_DEF		5
- #define TIMER_TEST_PERIOD_MS_DEF	10
- #define TIMER_TEST_ERR_MARGIN_US	100
-+#define TIMER_TEST_MIGRATION_FREQ_MS	2
+ int parse_keyval(char *s, long *val)
+@@ -14,6 +15,6 @@ int parse_keyval(char *s, long *val)
+        if (!p)
+                return -1;
  
- struct test_args {
- 	int nr_vcpus;
- 	int nr_iter;
- 	int timer_period_ms;
-+	int migration_freq_ms;
- };
- 
- static struct test_args test_args = {
- 	.nr_vcpus = NR_VCPUS_DEF,
- 	.nr_iter = NR_TEST_ITERS_DEF,
- 	.timer_period_ms = TIMER_TEST_PERIOD_MS_DEF,
-+	.migration_freq_ms = TIMER_TEST_MIGRATION_FREQ_MS,
- };
- 
- #define msecs_to_usecs(msec)		((msec) * 1000LL)
-@@ -80,6 +87,9 @@ static struct test_vcpu_shared_data vcpu_shared_data[KVM_MAX_VCPUS];
- 
- static int vtimer_irq, ptimer_irq;
- 
-+static unsigned long *vcpu_done_map;
-+static pthread_mutex_t vcpu_done_map_lock;
-+
- static void
- guest_configure_timer_action(struct test_vcpu_shared_data *shared_data)
- {
-@@ -215,6 +225,11 @@ static void *test_vcpu_run(void *arg)
- 
- 	vcpu_run(vm, vcpuid);
- 
-+	/* Currently, any exit from guest is an indication of completion */
-+	pthread_mutex_lock(&vcpu_done_map_lock);
-+	set_bit(vcpuid, vcpu_done_map);
-+	pthread_mutex_unlock(&vcpu_done_map_lock);
-+
- 	switch (get_ucall(vm, vcpuid, &uc)) {
- 	case UCALL_SYNC:
- 	case UCALL_DONE:
-@@ -233,9 +248,78 @@ static void *test_vcpu_run(void *arg)
- 	return NULL;
+-       *val = atol(p+1);
++       *val = strtol(p+1, NULL, 0);
+        return p - s;
  }
- 
-+static uint32_t test_get_pcpu(void)
-+{
-+	uint32_t pcpu;
-+	unsigned int nproc_conf;
-+	cpu_set_t online_cpuset;
-+
-+	nproc_conf = get_nprocs_conf();
-+	sched_getaffinity(0, sizeof(cpu_set_t), &online_cpuset);
-+
-+	/* Randomly find an available pCPU to place a vCPU on */
-+	do {
-+		pcpu = rand() % nproc_conf;
-+	} while (!CPU_ISSET(pcpu, &online_cpuset));
-+
-+	return pcpu;
-+}
-+
-+static int test_migrate_vcpu(struct test_vcpu *vcpu)
-+{
-+	int ret;
-+	cpu_set_t cpuset;
-+	uint32_t new_pcpu = test_get_pcpu();
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(new_pcpu, &cpuset);
-+
-+	pr_debug("Migrating vCPU: %u to pCPU: %u\n", vcpu->vcpuid, new_pcpu);
-+
-+	ret = pthread_setaffinity_np(vcpu->pt_vcpu_run,
-+					sizeof(cpuset), &cpuset);
-+
-+	/* Allow the error where the vCPU thread is already finished */
-+	TEST_ASSERT(ret == 0 || ret == ESRCH,
-+			"Failed to migrate the vCPU:%u to pCPU: %u; ret: %d\n",
-+			vcpu->vcpuid, new_pcpu, ret);
-+
-+	return ret;
-+}
-+
-+static void *test_vcpu_migration(void *arg)
-+{
-+	unsigned int i, n_done;
-+	bool vcpu_done;
-+
-+	do {
-+		usleep(msecs_to_usecs(test_args.migration_freq_ms));
-+
-+		for (n_done = 0, i = 0; i < test_args.nr_vcpus; i++) {
-+			pthread_mutex_lock(&vcpu_done_map_lock);
-+			vcpu_done = test_bit(i, vcpu_done_map);
-+			pthread_mutex_unlock(&vcpu_done_map_lock);
-+
-+			if (vcpu_done) {
-+				n_done++;
-+				continue;
-+			}
-+
-+			test_migrate_vcpu(&test_vcpu[i]);
-+		}
-+	} while (test_args.nr_vcpus != n_done);
-+
-+	return NULL;
-+}
-+
- static void test_run(struct kvm_vm *vm)
- {
- 	int i, ret;
-+	pthread_t pt_vcpu_migration;
-+
-+	pthread_mutex_init(&vcpu_done_map_lock, NULL);
-+	vcpu_done_map = bitmap_zalloc(test_args.nr_vcpus);
-+	TEST_ASSERT(vcpu_done_map, "Failed to allocate vcpu done bitmap\n");
- 
- 	for (i = 0; i < test_args.nr_vcpus; i++) {
- 		ret = pthread_create(&test_vcpu[i].pt_vcpu_run, NULL,
-@@ -243,8 +327,23 @@ static void test_run(struct kvm_vm *vm)
- 		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
- 	}
- 
-+	/* Spawn a thread to control the vCPU migrations */
-+	if (test_args.migration_freq_ms) {
-+		srand(time(NULL));
-+
-+		ret = pthread_create(&pt_vcpu_migration, NULL,
-+					test_vcpu_migration, NULL);
-+		TEST_ASSERT(!ret, "Failed to create the migration pthread\n");
-+	}
-+
-+
- 	for (i = 0; i < test_args.nr_vcpus; i++)
- 		pthread_join(test_vcpu[i].pt_vcpu_run, NULL);
-+
-+	if (test_args.migration_freq_ms)
-+		pthread_join(pt_vcpu_migration, NULL);
-+
-+	bitmap_free(vcpu_done_map);
- }
- 
- static void test_init_timer_irq(struct kvm_vm *vm)
-@@ -301,6 +400,8 @@ static void test_print_help(char *name)
- 		NR_TEST_ITERS_DEF);
- 	pr_info("\t-p: Periodicity (in ms) of the guest timer (default: %u)\n",
- 		TIMER_TEST_PERIOD_MS_DEF);
-+	pr_info("\t-m: Frequency (in ms) of vCPUs to migrate to different pCPU. 0 to turn off (default: %u)\n",
-+		TIMER_TEST_MIGRATION_FREQ_MS);
- 	pr_info("\t-h: print this help screen\n");
- }
- 
-@@ -308,7 +409,7 @@ static bool parse_args(int argc, char *argv[])
- {
- 	int opt;
- 
--	while ((opt = getopt(argc, argv, "hn:i:p:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:i:p:m:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			test_args.nr_vcpus = atoi(optarg);
-@@ -335,6 +436,13 @@ static bool parse_args(int argc, char *argv[])
- 				goto err;
- 			}
- 			break;
-+		case 'm':
-+			test_args.migration_freq_ms = atoi(optarg);
-+			if (test_args.migration_freq_ms < 0) {
-+				pr_info("0 or positive value needed for -m\n");
-+				goto err;
-+			}
-+			break;
- 		case 'h':
- 		default:
- 			goto err;
-@@ -358,6 +466,11 @@ int main(int argc, char *argv[])
- 	if (!parse_args(argc, argv))
- 		exit(KSFT_SKIP);
- 
-+	if (test_args.migration_freq_ms && get_nprocs() < 2) {
-+		print_skip("At least two physical CPUs needed for vCPU migration");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	vm = test_vm_create();
- 	test_run(vm);
- 	kvm_vm_free(vm);
--- 
-2.33.0.882.g93a45727a2-goog
+
+
+which ought to improve that.
+
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arm/micro-bench.c | 33 +++++++++++++++++++++++++++------
+>  1 file changed, 27 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+> index 8e1d4ab..2c08813 100644
+> --- a/arm/micro-bench.c
+> +++ b/arm/micro-bench.c
+> @@ -19,16 +19,19 @@
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+>  #include <libcflat.h>
+> +#include <util.h>
+>  #include <asm/gic.h>
+>  #include <asm/gic-v3-its.h>
+>  #include <asm/timer.h>
+>  
+> -#define NS_5_SECONDS (5 * 1000 * 1000 * 1000UL)
+> +#define NS_5_SECONDS		(5 * 1000 * 1000 * 1000UL)
+> +#define QEMU_MMIO_ADDR		0x0a000008
+>  
+>  static u32 cntfrq;
+>  
+>  static volatile bool irq_ready, irq_received;
+>  static int nr_ipi_received;
+> +static unsigned long mmio_addr = QEMU_MMIO_ADDR;
+>  
+>  static void *vgic_dist_base;
+>  static void (*write_eoir)(u32 irqstat);
+> @@ -278,12 +281,10 @@ static void *userspace_emulated_addr;
+>  static bool mmio_read_user_prep(void)
+>  {
+>  	/*
+> -	 * FIXME: Read device-id in virtio mmio here in order to
+> -	 * force an exit to userspace. This address needs to be
+> -	 * updated in the future if any relevant changes in QEMU
+> -	 * test-dev are made.
+
+I think the FIXME is still relavent, even with the user given control over
+the address. The FIXME text could be improved though, because it's not
+clear what it's trying to say, which is
+
+ /*
+  * FIXME: We need an MMIO address that we can safely read to test
+  * exits to userspace. Ideally, the test-dev would provide us this
+  * address (and one we could write to too), but until it does we
+  * use a virtio-mmio transport address. FIXME2: We should be getting
+  * this address (and the future test-dev address) from the devicetree,
+  * but so far we lazily hardcode it.
+  */
+
+> +	 * Read device-id in virtio mmio here in order to
+> +	 * force an exit to userspace.
+>  	 */
+> -	userspace_emulated_addr = (void*)ioremap(0x0a000008, sizeof(u32));
+> +	userspace_emulated_addr = (void *)ioremap(mmio_addr, sizeof(u32));
+>  	return true;
+>  }
+>  
+> @@ -378,10 +379,30 @@ static void loop_test(struct exit_test *test)
+>  		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
+>  }
+>  
+> +static void parse_args(int argc, char **argv)
+> +{
+> +	int i, len;
+> +	long val;
+> +
+> +	for (i = 0; i < argc; ++i) {
+                 ^ should be 1, since we know argv[0] is prognam
+
+> +		len = parse_keyval(argv[i], &val);
+> +		if (len == -1)
+> +			continue;
+> +
+> +		argv[i][len] = '\0';
+
+Not nice to write to the global args, especially when we're not yet sure
+if this arg is the one we care about.
+
+> +		if (strcmp(argv[i], "mmio-addr") == 0) {
+
+Can use strncmp to avoid the not nice args write,
+
+ strncmp(argv[i], "mmio-addr", len)
+
+> +			mmio_addr = val;
+> +			report_info("found mmio_addr=0x%lx", mmio_addr);
+> +		}
+> +	}
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>  	int i;
+>  
+> +	parse_args(argc, argv);
+> +
+>  	if (!test_init())
+>  		return 1;
+>  
+> -- 
+> 2.33.0.882.g93a45727a2-goog
+>
+
+Thanks,
+drew 
 
 _______________________________________________
 kvmarm mailing list
