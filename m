@@ -2,61 +2,77 @@ Return-Path: <SRS0=WrEh=O4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA15C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 13:59:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A04C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 15:58:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 69A1761056
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 13:59:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 69A1761056
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 7279A6101A
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 15:58:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7279A6101A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 204804B0BE;
-	Fri,  8 Oct 2021 09:59:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5A584B129;
+	Fri,  8 Oct 2021 11:58:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sRbyFJStlr7x; Fri,  8 Oct 2021 09:59:04 -0400 (EDT)
+	with ESMTP id pcg93gIRUMRy; Fri,  8 Oct 2021 11:58:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C55CC4B149;
-	Fri,  8 Oct 2021 09:59:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A77714B10E;
+	Fri,  8 Oct 2021 11:58:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A1EA94B175
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 09:59:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C8CA4B0DE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 11:58:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 83J6nnqlqdOK for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Oct 2021 09:59:02 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 52F5F4B18A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 09:59:02 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 05C2061042;
- Fri,  8 Oct 2021 13:58:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1633701541;
- bh=JTv2hBMDVb25nVPPPEEoEpoPB6xSLc/jUtJnXV0tdVQ=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=jZnrC7Gk+glAbDKycPWsmETvhrpPe47c8jrns35zukWVGjdziwzckCHd5BUVOM/ik
- YP4GjWUemj95E1y7zEh10eE1S7Er1H5ox734i0PZHDbh0xxtziaUKtJ9zVglifuKBF
- LXdchp+8W3ruKiBr0VeMpnW6RaxqUv8bqEHKgdAzaabN4Th41ulNpyRbvX+dcNb587
- +fX4ogzTnjrqhFfH5z2ylJdKBZH7xD/hVNpWIpogQ/xvJe9ziyWkbrpImacdZ8Dyjz
- hrs5tDcvaMJM/u6Bxw83e0DVeiMOXi/X+EYUmyiEgGrQoz6Ao8KVleL7o1VX52FCuP
- fy0X6rm0eQ7LA==
-From: Will Deacon <will@kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v3 6/6] KVM: arm64: Disable privileged hypercalls after pKVM
- finalisation
-Date: Fri,  8 Oct 2021 14:58:39 +0100
-Message-Id: <20211008135839.1193-7-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20211008135839.1193-1-will@kernel.org>
-References: <20211008135839.1193-1-will@kernel.org>
-MIME-Version: 1.0
-Cc: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id SKW9dTw31YSy for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Oct 2021 11:58:36 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83E344B0D6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 11:58:35 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ z2-20020a254c02000000b005b68ef4fe24so13043713yba.11
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 08:58:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=OhGTFF+wvS+RHrDxBXMcls6M7hE9mvNcy5n5nxdlojY=;
+ b=UhDbVer3yTzCQuEnCVNCCwOJxroBSjeGrerPZQUnL9cSLTLWZM3WcLmHKtjpnB9H42
+ 4+MLmNwhYgZLSfRYqHvwMdpkPmhxPa0wHy03c+jxdQpFlGn/qfuRE6+r+AXnoqOj8+4e
+ vbW8EjUhfr23GdmxGkqXMAEdxEylEw/4lSVq9KsaNs9IFfJyBemq5uVCgHnZHwwIlrgR
+ 3dR7J6sZkD7Dryb1tIb+9atF3DgzOcXpejRI2P/LT4BP/ftKIDUkkxMrp1QsH2aVR5c3
+ qf+KjTx6Is/FLnOUPigUaJyHzddnzRFVNxlidDe4gzrGvYWQEs5u/MYkOCax/EABYnHo
+ 7pKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=OhGTFF+wvS+RHrDxBXMcls6M7hE9mvNcy5n5nxdlojY=;
+ b=Gpx+MW/YMR1xGW0XgEF2d4ey3lD9uHkv5aqkoctosawxQkpe2HAwUlqv9kRuDncdxT
+ 8DZDYd2dqAKQfbl7ddUvLjPGKzQtpXREdYUrs2zyoBLPW+qV0KHReam4WrnToesrjwNZ
+ o0MzzPAsCryJeiU1vZb7pxUe+5dO2lDksCjNEHsJbwks4G3KKEAraoLSN8ODD67YvUUS
+ QC68E/3NB/Qv5MglCdsOvTJH4E2vk84kQ6+uVKWouP+pDSlYsHyXcjcvDFN5z1QonD/i
+ N8ndGH5QSOiHOCvurPmLl0LZRrPeoiSnLxS8KLpvUkOkXMCQHnoQ6eS72rQzPw2A5Ehh
+ GcPg==
+X-Gm-Message-State: AOAM5303cFpo3AX01gDBvp67bMgGPOqZPkA+REPQR27s1gsfu6K16dcc
+ jld/ABtvSkGzWmyUy7VgMFpGTLCD0Ll7Lyzmb6DXlNaznfb/iPAz2Rsru19VfCoo7YeGqv/zgFE
+ W606FuOcq6nKYGdSVWYY9rxgLsBLWM5WxK5Pns+9jN6d+4rrRSN9y81pPrRw6c9LczZA=
+X-Google-Smtp-Source: ABdhPJwSkEhANAXQ5JCD2NdWSpZq4SqWrw57ULj9YsrCO0+8ltUiACfmbzS/Tq1J1B3VPevPEONoAIAjbA==
+X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
+ (user=tabba job=sendgmr) by 2002:a25:6e06:: with SMTP id
+ j6mr4604257ybc.311.1633708714429; 
+ Fri, 08 Oct 2021 08:58:34 -0700 (PDT)
+Date: Fri,  8 Oct 2021 16:58:21 +0100
+Message-Id: <20211008155832.1415010-1-tabba@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [PATCH v7 00/11] KVM: arm64: Fixed features for protected VMs
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
+ pbonzini@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,139 +89,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-After pKVM has been 'finalised' using the __pkvm_prot_finalize hypercall,
-the calling CPU will have a Stage-2 translation enabled to prevent access
-to memory pages owned by EL2.
+Hi,
 
-Although this forms a significant part of the process to deprivilege the
-host kernel, we also need to ensure that the hypercall interface is
-reduced so that the EL2 code cannot, for example, be re-initialised using
-a new set of vectors.
+Changes since v6 [1]:
+- Rebase on 5.15-rc4
+- Include Marc's updated early exception handlers in the series
+- Refactoring and fixes (Drew, Marc)
 
-Re-order the hypercalls so that only a suffix remains available after
-finalisation of pKVM.
+This patch series adds support for restricting CPU features for protected VMs
+in KVM (pKVM). For more background, please refer to the previous series [2].
 
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Quentin Perret <qperret@google.com>
-Signed-off-by: Will Deacon <will@kernel.org>
----
- arch/arm64/include/asm/kvm_asm.h   | 25 +++++++++++---------
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 37 +++++++++++++++++++++---------
- 2 files changed, 40 insertions(+), 22 deletions(-)
+This series is based on 5.15-rc4. You can find the applied series here [3].
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 43b5e213ae43..4654d27fd221 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -50,27 +50,30 @@
- #include <linux/mm.h>
- 
- enum __kvm_host_smccc_func {
-+	/* Hypercalls available only prior to pKVM finalisation */
- 	/* __KVM_HOST_SMCCC_FUNC___kvm_hyp_init */
--	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run = __KVM_HOST_SMCCC_FUNC___kvm_hyp_init + 1,
-+	__KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2 = __KVM_HOST_SMCCC_FUNC___kvm_hyp_init + 1,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_init,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector,
-+	__KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
-+	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
-+	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
-+	__KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
-+
-+	/* Hypercalls available after pKVM finalisation */
-+	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
-+	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
-+	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
--	__KVM_HOST_SMCCC_FUNC___kvm_enable_ssbs,
--	__KVM_HOST_SMCCC_FUNC___vgic_v3_get_gic_config,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_read_vmcr,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_write_vmcr,
--	__KVM_HOST_SMCCC_FUNC___vgic_v3_init_lrs,
--	__KVM_HOST_SMCCC_FUNC___kvm_get_mdcr_el2,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_save_aprs,
- 	__KVM_HOST_SMCCC_FUNC___vgic_v3_restore_aprs,
--	__KVM_HOST_SMCCC_FUNC___pkvm_init,
--	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
--	__KVM_HOST_SMCCC_FUNC___pkvm_create_private_mapping,
--	__KVM_HOST_SMCCC_FUNC___pkvm_cpu_set_vector,
--	__KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize,
--	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
- };
- 
- #define DECLARE_KVM_VHE_SYM(sym)	extern char sym[]
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 2da6aa8da868..8566805ef62c 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -165,36 +165,51 @@ typedef void (*hcall_t)(struct kvm_cpu_context *);
- #define HANDLE_FUNC(x)	[__KVM_HOST_SMCCC_FUNC_##x] = (hcall_t)handle_##x
- 
- static const hcall_t host_hcall[] = {
--	HANDLE_FUNC(__kvm_vcpu_run),
-+	/* ___kvm_hyp_init */
-+	HANDLE_FUNC(__kvm_get_mdcr_el2),
-+	HANDLE_FUNC(__pkvm_init),
-+	HANDLE_FUNC(__pkvm_create_private_mapping),
-+	HANDLE_FUNC(__pkvm_cpu_set_vector),
-+	HANDLE_FUNC(__kvm_enable_ssbs),
-+	HANDLE_FUNC(__vgic_v3_init_lrs),
-+	HANDLE_FUNC(__vgic_v3_get_gic_config),
-+	HANDLE_FUNC(__pkvm_prot_finalize),
-+
-+	HANDLE_FUNC(__pkvm_host_share_hyp),
- 	HANDLE_FUNC(__kvm_adjust_pc),
-+	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
--	HANDLE_FUNC(__kvm_enable_ssbs),
--	HANDLE_FUNC(__vgic_v3_get_gic_config),
- 	HANDLE_FUNC(__vgic_v3_read_vmcr),
- 	HANDLE_FUNC(__vgic_v3_write_vmcr),
--	HANDLE_FUNC(__vgic_v3_init_lrs),
--	HANDLE_FUNC(__kvm_get_mdcr_el2),
- 	HANDLE_FUNC(__vgic_v3_save_aprs),
- 	HANDLE_FUNC(__vgic_v3_restore_aprs),
--	HANDLE_FUNC(__pkvm_init),
--	HANDLE_FUNC(__pkvm_cpu_set_vector),
--	HANDLE_FUNC(__pkvm_host_share_hyp),
--	HANDLE_FUNC(__pkvm_create_private_mapping),
--	HANDLE_FUNC(__pkvm_prot_finalize),
- };
- 
- static void handle_host_hcall(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(unsigned long, id, host_ctxt, 0);
-+	unsigned long hcall_min = 0;
- 	hcall_t hfn;
- 
-+	/*
-+	 * If pKVM has been initialised then reject any calls to the
-+	 * early "privileged" hypercalls. Note that we cannot reject
-+	 * calls to __pkvm_prot_finalize for two reasons: (1) The static
-+	 * key used to determine initialisation must be toggled prior to
-+	 * finalisation and (2) finalisation is performed on a per-CPU
-+	 * basis. This is all fine, however, since __pkvm_prot_finalize
-+	 * returns -EPERM after the first call for a given CPU.
-+	 */
-+	if (static_branch_unlikely(&kvm_protected_mode_initialized))
-+		hcall_min = __KVM_HOST_SMCCC_FUNC___pkvm_prot_finalize;
-+
- 	id -= KVM_HOST_SMCCC_ID(0);
- 
--	if (unlikely(id >= ARRAY_SIZE(host_hcall)))
-+	if (unlikely(id < hcall_min || id >= ARRAY_SIZE(host_hcall)))
- 		goto inval;
- 
- 	hfn = host_hcall[id];
+Cheers,
+/fuad
+
+[1] https://lore.kernel.org/kvmarm/20210922124704.600087-1-tabba@google.com/
+
+[2] https://lore.kernel.org/kvmarm/20210827101609.2808181-1-tabba@google.com/
+
+[3] https://android-kvm.googlesource.com/linux/+/refs/heads/tabba/el2_fixed_feature_v7
+
+Fuad Tabba (8):
+  KVM: arm64: Pass struct kvm to per-EC handlers
+  KVM: arm64: Add missing field descriptor for MDCR_EL2
+  KVM: arm64: Simplify masking out MTE in feature id reg
+  KVM: arm64: Add handlers for protected VM System Registers
+  KVM: arm64: Initialize trap registers for protected VMs
+  KVM: arm64: Move sanitized copies of CPU features
+  KVM: arm64: Trap access to pVM restricted features
+  KVM: arm64: Handle protected guests at 32 bits
+
+Marc Zyngier (3):
+  KVM: arm64: Move __get_fault_info() and co into their own include file
+  KVM: arm64: Don't include switch.h into nvhe/kvm-main.c
+  KVM: arm64: Move early handlers to per-EC handlers
+
+ arch/arm64/include/asm/kvm_arm.h              |   1 +
+ arch/arm64/include/asm/kvm_asm.h              |   1 +
+ arch/arm64/include/asm/kvm_fixed_config.h     | 195 +++++++
+ arch/arm64/include/asm/kvm_host.h             |   2 +
+ arch/arm64/include/asm/kvm_hyp.h              |   5 +
+ arch/arm64/kvm/arm.c                          |  13 +
+ arch/arm64/kvm/hyp/include/hyp/fault.h        |  75 +++
+ arch/arm64/kvm/hyp/include/hyp/switch.h       | 221 ++++----
+ arch/arm64/kvm/hyp/include/nvhe/sys_regs.h    |  29 +
+ .../arm64/kvm/hyp/include/nvhe/trap_handler.h |   2 +
+ arch/arm64/kvm/hyp/nvhe/Makefile              |   2 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  11 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |   8 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                | 185 +++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c               |   3 +
+ arch/arm64/kvm/hyp/nvhe/switch.c              | 108 ++++
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c            | 498 ++++++++++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c               |  16 +
+ arch/arm64/kvm/sys_regs.c                     |  10 +-
+ 19 files changed, 1240 insertions(+), 145 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_fixed_config.h
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/fault.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/pkvm.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+
+
+base-commit: 1da38549dd64c7f5dd22427f12dfa8db3d8a722b
 -- 
 2.33.0.882.g93a45727a2-goog
 
