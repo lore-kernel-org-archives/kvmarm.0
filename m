@@ -2,76 +2,77 @@ Return-Path: <SRS0=WrEh=O4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10764C433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 15:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 324B2C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 15:58:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9DC7C6101A
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 15:58:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9DC7C6101A
+	by mail.kernel.org (Postfix) with ESMTP id BA4976101E
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 15:58:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BA4976101E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B3AD4B11C;
-	Fri,  8 Oct 2021 11:58:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 551814B11A;
+	Fri,  8 Oct 2021 11:58:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XNk-2tcGbgF8; Fri,  8 Oct 2021 11:58:41 -0400 (EDT)
+	with ESMTP id JvRLVOXvYa2F; Fri,  8 Oct 2021 11:58:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1FCD4B121;
-	Fri,  8 Oct 2021 11:58:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC4824B14C;
+	Fri,  8 Oct 2021 11:58:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A50D54B0DE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 11:58:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAC734B11A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 11:58:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Gf8iwSqEnYiJ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Oct 2021 11:58:37 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A215F4B0FB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 11:58:37 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id
- a10-20020a5d508a000000b00160723ce588so7659426wrt.23
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 08:58:37 -0700 (PDT)
+ with ESMTP id NEe1REilIlJJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Oct 2021 11:58:40 -0400 (EDT)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E6BC34B0DE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 11:58:39 -0400 (EDT)
+Received: by mail-wr1-f74.google.com with SMTP id
+ p12-20020adfc38c000000b00160d6a7e293so5177972wrf.18
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 08:58:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=AF4eoE9nmTsCT0Js3LBGybKDMs//CEnYD1ixUfZLO5A=;
- b=HrX/tXZNkaeFiS/Yr9pl1oq1+0zeuOqeAHJGn2qe8JO4G/wLuWNBfMYAYIKenUyhFF
- kuwgap7uYGwB9lbgRTrrzFvBRfc5GTp6gDn2p2ZkQg4OQQ6CbUVYhINNQTUbE6CG1x+u
- VgtL9rvo7JkyvdIWsWzR64tUymk331Q9gHfbuO+LMpGfDgMnY4iwRqJrNDC5yB2Pp0B/
- 6USPoZ3qlRxMFyOYzTijyqhdDGEZRlbjdUHyXukJsF38lLpIl0EUCHe51fzZMHYzQueY
- SIHL+z8spXeDqMeZlzE955t3JhWu1va8sSstpC0nHZ44ivcmnYXON/3XDDBtTNoBf7V+
- dVOQ==
+ :cc; bh=2yxyszH2o0l7PmvxhJ6rJ+q2kN5pLUdYHnvLPGFqiZk=;
+ b=J7ojB2L/g6easuNtOb22T/bQnMBxvkq3yUNrthr9utdVDUVUQvrpyTfNFPqwVu2eNS
+ 4fvbnv3QwvHgJJCEN1reAisHNn3uROCmL4+zKkTv1zf/x431NyReyFWKolpcKmG85ExA
+ 1DGKgEJQ3md+BSdcLbo8Bx5UHXABjwMwPbkgsY7SEGMRiI7YcbLHUg7GqzxbzoJ8BiW4
+ dK0x+od77qfQ6LvIMcXTTaXtjqeDwOTPItHT+czA5cDDunOoXl6VicpvULiF55DuXn2h
+ to/la/+v+M1gJThoSI6bKe3P2gBDxju2tQGS71CmPsvK+uhxXyofScxX0HQlMT13zeWy
+ kACA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=AF4eoE9nmTsCT0Js3LBGybKDMs//CEnYD1ixUfZLO5A=;
- b=rdtFt+B37kJxhPjuJSig6QbwFAVcTwfNTYkZLw7FRyIMumsU0k0NK4CZJy5k0ljyzK
- xxDoY9/FsB+Rq4cMhNAb/BZekV7x04/rr6mvNSGoTADg+IMicKgCQ0AjdPrPHHE2Lqo2
- ptTnlk+IoYTxqx3SfX3jFDfXUW37EdlTL4dOLoRvoo56MWjTDpGwOMcOL/p+kNxVZci6
- S2eF6YmKJyGn5zYMS8t9a99enCQ5vf1gIgWIk0yG4w9Lzbgll0aSrQn8FK1h05NRNXvC
- Eug+GdU3i+RhIQydJ4BGuiFD5bFENza+6PoAQapvyv1YDF1oGVIxq9XmQdWL5byO0iwJ
- flWA==
-X-Gm-Message-State: AOAM531KBFv1lFL4tPTQm0bjoMPpQKHy6GjyEeP2EtrxE27fbDeC8WAQ
- uvY1hiX49O2HwQPBq99V5pekZdZidDkOkP51Ybt5NCvWbCpe/mpgdDMHJzqHnNf6YS63S+zollA
- 2pPywyUVk0NBE0NiTNTdo7tt7KAF2wmpjTjMeVKlHrkbNEIjdJBJu0bMNwbVUCAYA5+0=
-X-Google-Smtp-Source: ABdhPJw3j88fx7mXkHrzClQzYUDvVzNXlo/iyFzAMOjG+H/NnjBAl4bNhcg6VI+X9rIoncK+E3JLXUWlyw==
+ bh=2yxyszH2o0l7PmvxhJ6rJ+q2kN5pLUdYHnvLPGFqiZk=;
+ b=L0x2MLuNzEiKDy0pdBGRlPvQCxbOxBbpMwR7EebMPPps7cz2NFly2Vlv6tVBjDPhsf
+ XOVYrbI1+dbTUyz+NKH7vpmwFQ2wHjyx6ThzO8Im4KS2JexXUEQ9CFC7GnF6FMa6xSSc
+ LRmFCpA/QPUNJamYgaaljC5XQFiRT7WSStM6N2e2Jox/WgtH9eC8O47PHHqEiklt2ROG
+ kdeoEyOX2X7yPxzLFLfN5A1ktIugnNgjsUMPgBJxKr5zGmvpleYBR5H4sXiXktBL764m
+ 0sLl9I3U/yHgg6fduOI8xKH5tpBrUaMfgSLOI1hZFr48E9+mTOQumSTu4kNMsxYhIKL9
+ 7NDw==
+X-Gm-Message-State: AOAM532yNc7NlP6Ef+xe6+m2pdQV1rHZUsOG4bRJjS4XxO7Ck6uklNzM
+ /xD8JsOBi7kXxSpKpfTQB1b1+oC5+7FZebSb8WshAG/zK55sumkYNkU3by4Ian6Rdzp23FXdZwL
+ TTYGbK3hHK3Zt1PwfWLsHipXu5Dg9jYczkyKA5O0UyI4nGJe9udASI+Vy+e0Cc6q81uU=
+X-Google-Smtp-Source: ABdhPJyu2z910e5hVmwkJoNrLtH1WXLkELfPaK2bV3KGfSoooZdoGdTRArUTVIRMq5kDX+ZAV2ffP5h4Dg==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a05:600c:1911:: with SMTP id
- j17mr4361730wmq.149.1633708716599; Fri, 08 Oct 2021 08:58:36 -0700 (PDT)
-Date: Fri,  8 Oct 2021 16:58:22 +0100
+ (user=tabba job=sendgmr) by 2002:a1c:e906:: with SMTP id
+ q6mr4515684wmc.126.1633708718952; 
+ Fri, 08 Oct 2021 08:58:38 -0700 (PDT)
+Date: Fri,  8 Oct 2021 16:58:23 +0100
 In-Reply-To: <20211008155832.1415010-1-tabba@google.com>
-Message-Id: <20211008155832.1415010-2-tabba@google.com>
+Message-Id: <20211008155832.1415010-3-tabba@google.com>
 Mime-Version: 1.0
 References: <20211008155832.1415010-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v7 01/11] KVM: arm64: Move __get_fault_info() and co into
- their own include file
+Subject: [PATCH v7 02/11] KVM: arm64: Don't include switch.h into
+ nvhe/kvm-main.c
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -94,192 +95,28 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Marc Zyngier <maz@kernel.org>
 
-In order to avoid including the whole of the switching helpers
-in unrelated files, move the __get_fault_info() and related helpers
-into their own include file.
+hyp-main.c includes switch.h while it only requires adjust-pc.h.
+Fix it to remove an unnecessary dependency.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/include/hyp/fault.h  | 75 +++++++++++++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 61 +-------------------
- arch/arm64/kvm/hyp/nvhe/mem_protect.c   |  2 +-
- 3 files changed, 77 insertions(+), 61 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/include/hyp/fault.h
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-new file mode 100644
-index 000000000000..1b8a2dcd712f
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-@@ -0,0 +1,75 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2015 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ */
-+
-+#ifndef __ARM64_KVM_HYP_FAULT_H__
-+#define __ARM64_KVM_HYP_FAULT_H__
-+
-+#include <asm/kvm_asm.h>
-+#include <asm/kvm_emulate.h>
-+#include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
-+
-+static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
-+{
-+	u64 par, tmp;
-+
-+	/*
-+	 * Resolve the IPA the hard way using the guest VA.
-+	 *
-+	 * Stage-1 translation already validated the memory access
-+	 * rights. As such, we can use the EL1 translation regime, and
-+	 * don't have to distinguish between EL0 and EL1 access.
-+	 *
-+	 * We do need to save/restore PAR_EL1 though, as we haven't
-+	 * saved the guest context yet, and we may return early...
-+	 */
-+	par = read_sysreg_par();
-+	if (!__kvm_at("s1e1r", far))
-+		tmp = read_sysreg_par();
-+	else
-+		tmp = SYS_PAR_EL1_F; /* back to the guest */
-+	write_sysreg(par, par_el1);
-+
-+	if (unlikely(tmp & SYS_PAR_EL1_F))
-+		return false; /* Translation failed, back to guest */
-+
-+	/* Convert PAR to HPFAR format */
-+	*hpfar = PAR_TO_HPFAR(tmp);
-+	return true;
-+}
-+
-+static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
-+{
-+	u64 hpfar, far;
-+
-+	far = read_sysreg_el2(SYS_FAR);
-+
-+	/*
-+	 * The HPFAR can be invalid if the stage 2 fault did not
-+	 * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
-+	 * bit is clear) and one of the two following cases are true:
-+	 *   1. The fault was due to a permission fault
-+	 *   2. The processor carries errata 834220
-+	 *
-+	 * Therefore, for all non S1PTW faults where we either have a
-+	 * permission fault or the errata workaround is enabled, we
-+	 * resolve the IPA using the AT instruction.
-+	 */
-+	if (!(esr & ESR_ELx_S1PTW) &&
-+	    (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
-+	     (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
-+		if (!__translate_far_to_hpfar(far, &hpfar))
-+			return false;
-+	} else {
-+		hpfar = read_sysreg(hpfar_el2);
-+	}
-+
-+	fault->far_el2 = far;
-+	fault->hpfar_el2 = hpfar;
-+	return true;
-+}
-+
-+#endif
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index a0e78a6027be..54abc8298ec3 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -8,6 +8,7 @@
- #define __ARM64_KVM_HYP_SWITCH_H__
- 
- #include <hyp/adjust_pc.h>
-+#include <hyp/fault.h>
- 
- #include <linux/arm-smccc.h>
- #include <linux/kvm_host.h>
-@@ -133,66 +134,6 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
--{
--	u64 par, tmp;
--
--	/*
--	 * Resolve the IPA the hard way using the guest VA.
--	 *
--	 * Stage-1 translation already validated the memory access
--	 * rights. As such, we can use the EL1 translation regime, and
--	 * don't have to distinguish between EL0 and EL1 access.
--	 *
--	 * We do need to save/restore PAR_EL1 though, as we haven't
--	 * saved the guest context yet, and we may return early...
--	 */
--	par = read_sysreg_par();
--	if (!__kvm_at("s1e1r", far))
--		tmp = read_sysreg_par();
--	else
--		tmp = SYS_PAR_EL1_F; /* back to the guest */
--	write_sysreg(par, par_el1);
--
--	if (unlikely(tmp & SYS_PAR_EL1_F))
--		return false; /* Translation failed, back to guest */
--
--	/* Convert PAR to HPFAR format */
--	*hpfar = PAR_TO_HPFAR(tmp);
--	return true;
--}
--
--static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
--{
--	u64 hpfar, far;
--
--	far = read_sysreg_el2(SYS_FAR);
--
--	/*
--	 * The HPFAR can be invalid if the stage 2 fault did not
--	 * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
--	 * bit is clear) and one of the two following cases are true:
--	 *   1. The fault was due to a permission fault
--	 *   2. The processor carries errata 834220
--	 *
--	 * Therefore, for all non S1PTW faults where we either have a
--	 * permission fault or the errata workaround is enabled, we
--	 * resolve the IPA using the AT instruction.
--	 */
--	if (!(esr & ESR_ELx_S1PTW) &&
--	    (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
--	     (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
--		if (!__translate_far_to_hpfar(far, &hpfar))
--			return false;
--	} else {
--		hpfar = read_sysreg(hpfar_el2);
--	}
--
--	fault->far_el2 = far;
--	fault->hpfar_el2 = hpfar;
--	return true;
--}
--
- static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
- {
- 	u8 ec;
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index bacd493a4eac..2a07d63b8498 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -11,7 +11,7 @@
- #include <asm/kvm_pgtable.h>
- #include <asm/stage2_pgtable.h>
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 2da6aa8da868..8ca1104f4774 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -4,7 +4,7 @@
+  * Author: Andrew Scull <ascull@google.com>
+  */
  
 -#include <hyp/switch.h>
-+#include <hyp/fault.h>
++#include <hyp/adjust_pc.h>
  
- #include <nvhe/gfp.h>
- #include <nvhe/memory.h>
+ #include <asm/pgtable-types.h>
+ #include <asm/kvm_asm.h>
 -- 
 2.33.0.882.g93a45727a2-goog
 
