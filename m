@@ -2,80 +2,75 @@ Return-Path: <SRS0=WrEh=O4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6CCFC433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 15:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A49C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 17:40:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 8F6D26101A
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 15:59:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8F6D26101A
+	by mail.kernel.org (Postfix) with ESMTP id 09C9B6101A
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Oct 2021 17:40:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 09C9B6101A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42C824B16E;
-	Fri,  8 Oct 2021 11:59:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FB3A4B0A3;
+	Fri,  8 Oct 2021 13:40:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OXAOceaO06iT; Fri,  8 Oct 2021 11:59:02 -0400 (EDT)
+	with ESMTP id 7svL7EHhNa-M; Fri,  8 Oct 2021 13:40:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 233634B0B3;
-	Fri,  8 Oct 2021 11:59:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A4654B0B6;
+	Fri,  8 Oct 2021 13:40:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD5494B13E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 11:59:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE2704B093
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 13:40:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sMqCgXX6Lc2j for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Oct 2021 11:58:59 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 450304B152
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 11:58:59 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id
- r16-20020adfbb10000000b00160958ed8acso7663086wrg.16
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 08:58:59 -0700 (PDT)
+ with ESMTP id r5F-PHnl8FL2 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Oct 2021 13:40:27 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E0D6B405A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 13:40:27 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ b9-20020a5b07890000b0290558245b7eabso13420875ybq.10
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 10:40:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=0Epvk7fyUEu9mwVCJWkvWNY079YeUJZah0Cu5fJzAEQ=;
- b=bkkZXWvHXy0SOvqcTVfyEyTMLdSxme3xzkLNnyVMQIKtMfHOw9o7FMlaTNpoQbHd0l
- 573fiZ7H6X+7w+Zvl0W1v4/zGGqX39Q83L4+hHRwBUywjjLL+i3JCoXI7V8XbSF1aWhf
- ag8Oow9SDCDz1pgQydp+eSPRLes0FCw9tuQ9WxdZ54V97xvUXFjOMrP2pbEP0LCyDRxq
- 9EclHHjs8AVhqZckZsrNoICEACHtA/8MD0Ad5RtMPFZy/jVWZ1VRSxSAGy21y04wS9Ae
- EoOqh7x8+FzLEca90tftm7wz37rkPaI/OSV0/ekAUba4EhWtlctBVWCMPEM1mUNiz8HH
- EwyQ==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=S8FBbl6lmGnPBVMI8VNGPJDiN+mj3/gpo0KwKgQSUK0=;
+ b=qP6aS0hp2202u33t77wMPCFTdcTl3UJGnUlf8F+uwXTszHWfGIxA+ejlgc2EszEayd
+ Q5k442RcV8byW8GFezjWQStprHq/mrBDuc/fhFbqdlMRC1JBlDLeSE7gKWdT4kMwbcE/
+ GiZ3tNGPWjQLia1W2UcaoYRbfq28YZmHCNhDisme7PPSDX+LMRIF0aYTwel3WezFxChy
+ GNS8ca+uB+AYE6RycMBO4ouXizikGggu09YuYAUzs6KVyufLJfeVQB6eAA4fSZNn/W8y
+ jqlfT8WSGjNG67favmpYGPaus3GjOEIPSdSnoA/ozHC8h1GGZjrpRx3lcvCcigw3SN8l
+ cLMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=0Epvk7fyUEu9mwVCJWkvWNY079YeUJZah0Cu5fJzAEQ=;
- b=VKeC8mGgn1KWAse0CLiCSyWMkMHBxjlkGDTypwotmSfzhCj7M7kZacdVn3Z1nJereF
- O17Opf5l5yUnZNw7g1BTsK7jiBTr75mu6bQs2o9fSWxmLb/4kUv+5C3zPGwdb051XG65
- 4tzZJ2cmsPYT/AKTFt69TLkZGMk93dKNXXHdNhw9NZkflxG+0eYPR5tQ6dMUULOp7iql
- XJ+EkHgJelLh8Davamu7qx2noXLtoSdfTl0TOqmm2pv8Dxg/GnEXAyRhaA+e2jDBLRbo
- moCTq99RAuqvocha0Cac8v4byAJ2ZiMcWceEcXF5AFu2LEE+gfWDkRb674a4rokZq3N3
- KW8Q==
-X-Gm-Message-State: AOAM531guNdoa71Q4+gbYg19eu97yslC/fSXCafKPf9vn4MCAc43nyXM
- ZPTjXJlz0zkKG5lR0hi0KiQpvKnbJ12zbeUF7Dr7X10OaeLYSZV6Wpn90CekQkjS/cDGEV1Ab4k
- wTIclxXSKLrN49Mlf1yx8JugFy8fs+waGHVkdr6TpjsQzoGaj7W7T2Phv1/EYCc9xjns=
-X-Google-Smtp-Source: ABdhPJzU2h0ROk8Sq5UVDfvGO63XxvZxMKDO7VXZYWh/Ma9TOAK9WxoCj7FEDSVF/rrNof7KlIJt0t4MTg==
-X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a5d:5250:: with SMTP id
- k16mr5225506wrc.82.1633708738469; 
- Fri, 08 Oct 2021 08:58:58 -0700 (PDT)
-Date: Fri,  8 Oct 2021 16:58:32 +0100
-In-Reply-To: <20211008155832.1415010-1-tabba@google.com>
-Message-Id: <20211008155832.1415010-12-tabba@google.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=S8FBbl6lmGnPBVMI8VNGPJDiN+mj3/gpo0KwKgQSUK0=;
+ b=oSSKFTMu7bSDC39JOuRbM4nwcDtV/scaQ82V15g2dGwUE96j5jUF6fGhsK67MUCtc2
+ w1PBz1QrwrT6wstAGuuUo2l0c7X8UzxdXBFcB1obuwqhzX0t0Ecrt74HL7SyrXNKjyIr
+ 5u6nOFP5S2xwYS864zGSKDhmduTUSOEjKI7Pm+UaACsmKC+fuvYGcV5nkUHVnLMVCRAz
+ DFG37Uol5FN7VQR/zkHBIQXlsE2ShPDDn0SHzzwvPgZsl6sIHoH1driXnrnEpdE5yoFl
+ MFYJpsRnQzvZGUoJps1maih/4jXn2pTpQEkcPPa2phEpH5HRfx/kuaSHp1RAvkYQ30GX
+ yHlw==
+X-Gm-Message-State: AOAM532JvUPpZEQEDTtNPA/yYitlCSRCYBj8DZVe4NX1/IrrtZSlLPUV
+ ObwazjnKu2G8TxCRJbAaSMMl3Z/DvArQOA==
+X-Google-Smtp-Source: ABdhPJwMjy9k6BstIagSN5//XDryWlcz664ABmmd/chGimhmfE/yUQZn+HiHpd+cLcIO82rS5B+TmIMNOebU5g==
+X-Received: from ricarkol2.c.googlers.com
+ ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a05:6902:114a:: with SMTP id
+ p10mr5254440ybu.234.1633714825228; Fri, 08 Oct 2021 10:40:25 -0700 (PDT)
+Date: Fri,  8 Oct 2021 10:40:22 -0700
+Message-Id: <20211008174022.3028983-1-ricarkol@google.com>
 Mime-Version: 1.0
-References: <20211008155832.1415010-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v7 11/11] KVM: arm64: Handle protected guests at 32 bits
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
- pbonzini@redhat.com, will@kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [kvm-unit-tests PATCH v2] arm64: Add mmio_addr arg to arm/micro-bench
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,76 +87,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Protected KVM does not support protected AArch32 guests. However,
-it is possible for the guest to force run AArch32, potentially
-causing problems. Add an extra check so that if the hypervisor
-catches the guest doing that, it can prevent the guest from
-running again by resetting vcpu->arch.target and returning
-ARM_EXCEPTION_IL.
+Add a command line arg to arm/micro-bench to set the mmio_addr to other
+values besides the default QEMU one. Default to the QEMU value if no arg
+is passed.
 
-If this were to happen, The VMM can try and fix it by re-
-initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
-likely not possible for protected VMs.
-
-Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
-AArch32 systems")
-
-Signed-off-by: Fuad Tabba <tabba@google.com>
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/switch.c | 34 ++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ arm/micro-bench.c | 36 ++++++++++++++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 2c72c31e516e..f97e3012ef60 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -232,6 +232,37 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
- 	return hyp_exit_handlers;
+diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+index 8e1d4ab..c731b1d 100644
+--- a/arm/micro-bench.c
++++ b/arm/micro-bench.c
+@@ -19,16 +19,19 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+ #include <libcflat.h>
++#include <util.h>
+ #include <asm/gic.h>
+ #include <asm/gic-v3-its.h>
+ #include <asm/timer.h>
+ 
+-#define NS_5_SECONDS (5 * 1000 * 1000 * 1000UL)
++#define NS_5_SECONDS		(5 * 1000 * 1000 * 1000UL)
++#define QEMU_MMIO_ADDR		0x0a000008
+ 
+ static u32 cntfrq;
+ 
+ static volatile bool irq_ready, irq_received;
+ static int nr_ipi_received;
++static unsigned long mmio_addr = QEMU_MMIO_ADDR;
+ 
+ static void *vgic_dist_base;
+ static void (*write_eoir)(u32 irqstat);
+@@ -278,12 +281,14 @@ static void *userspace_emulated_addr;
+ static bool mmio_read_user_prep(void)
+ {
+ 	/*
+-	 * FIXME: Read device-id in virtio mmio here in order to
+-	 * force an exit to userspace. This address needs to be
+-	 * updated in the future if any relevant changes in QEMU
+-	 * test-dev are made.
++	 * FIXME: We need an MMIO address that we can safely read to test
++	 * exits to userspace. Ideally, the test-dev would provide us this
++	 * address (and one we could write to too), but until it does we
++	 * use a virtio-mmio transport address. FIXME2: We should be getting
++	 * this address (and the future test-dev address) from the devicetree,
++	 * but so far we lazily hardcode it.
+ 	 */
+-	userspace_emulated_addr = (void*)ioremap(0x0a000008, sizeof(u32));
++	userspace_emulated_addr = (void *)ioremap(mmio_addr, sizeof(u32));
+ 	return true;
  }
  
-+/*
-+ * Some guests (e.g., protected VMs) are not be allowed to run in AArch32.
-+ * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
-+ * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
-+ * hypervisor spots a guest in such a state ensure it is handled, and don't
-+ * trust the host to spot or fix it.  The check below is based on the one in
-+ * kvm_arch_vcpu_ioctl_run().
-+ *
-+ * Returns false if the guest ran in AArch32 when it shouldn't have, and
-+ * thus should exit to the host, or true if a the guest run loop can continue.
-+ */
-+static bool handle_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
+@@ -378,10 +383,29 @@ static void loop_test(struct exit_test *test)
+ 		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
+ }
+ 
++static void parse_args(int argc, char **argv)
 +{
-+	const struct kvm *kvm = kern_hyp_va(vcpu->kvm);
++	int i, len;
++	long val;
 +
-+	if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu)) {
-+		/*
-+		 * As we have caught the guest red-handed, decide that it isn't
-+		 * fit for purpose anymore by making the vcpu invalid. The VMM
-+		 * can try and fix it by re-initializing the vcpu with
-+		 * KVM_ARM_VCPU_INIT, however, this is likely not possible for
-+		 * protected VMs.
-+		 */
-+		vcpu->arch.target = -1;
-+		*exit_code = ARM_EXCEPTION_IL;
-+		return false;
++	for (i = 1; i < argc; ++i) {
++		len = parse_keyval(argv[i], &val);
++		if (len == -1)
++			continue;
++
++		if (strncmp(argv[i], "mmio-addr", len) == 0) {
++			mmio_addr = val;
++			report_info("found mmio_addr=0x%lx", mmio_addr);
++		}
 +	}
-+
-+	return true;
 +}
 +
- /* Switch to the guest for legacy non-VHE systems */
- int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ int main(int argc, char **argv)
  {
-@@ -294,6 +325,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
- 		/* Jump in the fire! */
- 		exit_code = __guest_enter(vcpu);
+ 	int i;
  
-+		if (unlikely(!handle_aarch32_guest(vcpu, &exit_code)))
-+			break;
++	parse_args(argc, argv);
 +
- 		/* And we're baaack! */
- 	} while (fixup_guest_exit(vcpu, &exit_code));
+ 	if (!test_init())
+ 		return 1;
  
 -- 
 2.33.0.882.g93a45727a2-goog
