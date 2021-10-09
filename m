@@ -2,78 +2,78 @@ Return-Path: <SRS0=FNOB=O5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B59D0C433F5
-	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2876C433F5
+	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:13:52 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6C42260FD9
-	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:13:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6C42260FD9
+	by mail.kernel.org (Postfix) with ESMTP id 6CF1060FD7
+	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:13:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6CF1060FD7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7804B168;
-	Fri,  8 Oct 2021 22:13:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24B864B0DD;
+	Fri,  8 Oct 2021 22:13:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UUTVmnrLV354; Fri,  8 Oct 2021 22:13:49 -0400 (EDT)
+	with ESMTP id B690afyp1hDa; Fri,  8 Oct 2021 22:13:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C67554B16F;
-	Fri,  8 Oct 2021 22:13:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6D3D4B190;
+	Fri,  8 Oct 2021 22:13:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD314B190
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:13:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C3434B191
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:13:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J0e0gyHm9jCq for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Oct 2021 22:13:47 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67E7F4B11B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:13:46 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id
- s6-20020a254506000000b005b6b6434cd6so14971831yba.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 19:13:46 -0700 (PDT)
+ with ESMTP id NCxp2fnvLPuE for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Oct 2021 22:13:48 -0400 (EDT)
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
+ [209.85.222.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B07CA4B11B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:13:48 -0400 (EDT)
+Received: by mail-qk1-f201.google.com with SMTP id
+ m6-20020a05620a24c600b004338e8a5a3cso9786050qkn.10
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 19:13:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=va765MwNV8lkPK+fPa+/nQPV7Q6ICFe76wXLuhKBR7k=;
- b=B5oLyIOK5DCmxdgNe+Nl5/eUZ+1dZvr28zFbfb0yUmRDrQAn6gFu0meDWGbooWcwf+
- l+waGmWoLOHDfWujUlJgTIfXQBGxvJYpWrTevNrJNk5M8uz1livq3G0CbLqGnwGl0JPm
- sNTwBIZ8vWCCI3dUoTv7AkcFha93KYIamIUHSTRqHBmzceqRPtYmNYOCGYVyZvVn3Np/
- TL6ymtR5bZm6u0h37kbtwh2/3um/F6VSleLNBRjXkJxQwQ6Tl5usknG2mBtpFmrzjKYA
- RfxJYCWymoaofgRtrejK3tfUhsfLqLitFSkmp9z1zLeMTRzswrj10R8lRDFv/A07PTzr
- ihYQ==
+ bh=wjQtX4Ec6wZvrLi6PMkrNqIQ2oyMcPdDf1m/MoA8d+0=;
+ b=Lnm/cjPXbd272GpMZC0UeDF+UHTqiJU1haGCknMr5AmNFQOxgzVQrkCrFXx8cCosZZ
+ vhad/H/bU6EtWHdiaGljqq6NEDe4jYwnagw1hmypkZVWw7KopTXWbIioXhrKeB9WZIoL
+ ReDT+1R5eLOhM0x5my19UH6pmlRFdnAMJjCjW90ue2a+3KqjCQ5KVltKsfzvFJct3Or4
+ f9Oft1KiecdRxszaICFl0MAY6x3TalLjCr4OG45jGmzTw8bdrlGkucMOEXd/i271jan6
+ 0hz+LH0reRdSJS/sNXpSqjCOVK3W+uTEL9F4YDHRKI7A05LpPRMlHE+Kaw+W+rV3UGa5
+ UrVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=va765MwNV8lkPK+fPa+/nQPV7Q6ICFe76wXLuhKBR7k=;
- b=HW0avurLET9MrGPKmowjiVcer15y/URUBPNUMK59haje0Dk/X2c/YpJ2uhuyzgw+M4
- sAtOOQ8Zqpy2hf1WLt78uJ6g/6acSeF4noLIz/q96vUVqKDscoAuSPPu3hrKTk9xljAF
- AT22iYFsME7OvZhnHnIa6mXNlY2gV6X6VpekmVSoUfZxxgkA3tgHNWQ7p1iJMCj+On2n
- vjGBPCJ/8KmfCCOJzahwKppBSf0BssY1R2MoC1hyAxAf7JdXGDo1G8wcobtzraGqcszS
- oOqrWUG4ArWDLCyjr8OzHRIuDCSaUt4Pc43UIf8g0E2z77zlxIq8wXkoOB+4vzow68jw
- WyLg==
-X-Gm-Message-State: AOAM531UFIZOpOwMl0JKIu7qtVjDCABqApTN2C07f1epmdkp3uNWksff
- aU8XFo5VXAt2N5grcKSBt0jXxdRfEJk=
-X-Google-Smtp-Source: ABdhPJxNwqY1vJaMvOgnvL3+QcSM5HrN4+PYEJxKTsdN858kzlppD8XZ0WLvzzYX6ErETJg0fQvQs2GFQ5w=
+ bh=wjQtX4Ec6wZvrLi6PMkrNqIQ2oyMcPdDf1m/MoA8d+0=;
+ b=HTg5P3ix5M4YRaUAdehqp/lUo1C6wp0Yklbl1EsEuZ9viVZgDoYRnIg0Bu1oFI4eGS
+ PB44/tiTFPPNfdAsDlDNadCY+NDBPuFE+MP94hQYlZ0shZ6EXHmVZbVlOcp+P+f6x9SI
+ qhTmkfUnToNsJAKSY+uKuda8wgvqgGuYCYw1pzgnjKzE6cVbD13SdZ6YXcGoEsY8Vw1k
+ 0Gigw3ty//s94nUxzWnpXT56llAg2uSnhtOLZNFYBPl+yMqHKld6oPXp8EDTUZP4zuok
+ xvKmPKcyflPnOI4FnqmWsRrNDVLC5oLAj21RHRHQsVtW6IpLAxQ18Z+A6cIHn83jLB65
+ wa7w==
+X-Gm-Message-State: AOAM5318cChmBbCuqb/xN3Jh6+88fEyzi6s6Dzay6CGXYpsPQc+4hmPi
+ 4HYx9RlnxCTfWkZZvHwiVPKHr7COJ1Y=
+X-Google-Smtp-Source: ABdhPJzf4lH44KnogukwF+1XfgXVpbO4vnuwdh3pwX1cj7Z8+jmbGSLZhM6YPlZ7b6MhcrCUeQd2OdsxOQw=
 X-Received: from seanjc798194.pdx.corp.google.com
  ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:a25:69c7:: with SMTP id
- e190mr6678164ybc.334.1633745625928; 
- Fri, 08 Oct 2021 19:13:45 -0700 (PDT)
-Date: Fri,  8 Oct 2021 19:12:19 -0700
+ (user=seanjc job=sendgmr) by 2002:ac8:6113:: with SMTP id
+ a19mr1849269qtm.307.1633745628357; 
+ Fri, 08 Oct 2021 19:13:48 -0700 (PDT)
+Date: Fri,  8 Oct 2021 19:12:20 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-27-seanjc@google.com>
+Message-Id: <20211009021236.4122790-28-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 26/43] KVM: VMX: Read Posted Interrupt "control" exactly
- once per loop iteration
+Subject: [PATCH v2 27/43] KVM: VMX: Move Posted Interrupt ndst computation out
+ of write loop
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -108,48 +108,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use READ_ONCE() when loading the posted interrupt descriptor control
-field to ensure "old" and "new" have the same base value.  If the
-compiler emits separate loads, and loads into "new" before "old", KVM
-could theoretically drop the ON bit if it were set between the loads.
+Hoist the CPU => APIC ID conversion for the Posted Interrupt descriptor
+out of the loop to write the descriptor, preemption is disabled so the
+CPU won't change, and if the APIC ID changes KVM has bigger problems.
 
-Fixes: 28b835d60fcc ("KVM: Update Posted-Interrupts Descriptor when vCPU is preempted")
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/posted_intr.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/kvm/vmx/posted_intr.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 414ea6972b5c..fea343dcc011 100644
+index fea343dcc011..2b2206339174 100644
 --- a/arch/x86/kvm/vmx/posted_intr.c
 +++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -53,7 +53,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+@@ -51,17 +51,15 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+ 		goto after_clear_sn;
+ 	}
  
- 	/* The full case.  */
+-	/* The full case.  */
++	/* The full case.  Set the new destination and clear SN. */
++	dest = cpu_physical_id(cpu);
++	if (!x2apic_mode)
++		dest = (dest << 8) & 0xFF00;
++
  	do {
--		old.control = new.control = pi_desc->control;
-+		old.control = new.control = READ_ONCE(pi_desc->control);
+ 		old.control = new.control = READ_ONCE(pi_desc->control);
  
- 		dest = cpu_physical_id(cpu);
- 
-@@ -104,7 +104,7 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+-		dest = cpu_physical_id(cpu);
+-
+-		if (x2apic_mode)
+-			new.ndst = dest;
+-		else
+-			new.ndst = (dest << 8) & 0xFF00;
+-
++		new.ndst = dest;
+ 		new.sn = 0;
+ 	} while (cmpxchg64(&pi_desc->control, old.control,
+ 			   new.control) != old.control);
+@@ -103,15 +101,14 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+ 	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
  	     "Wakeup handler not enabled while the vCPU was blocking");
  
++	dest = cpu_physical_id(vcpu->cpu);
++	if (!x2apic_mode)
++		dest = (dest << 8) & 0xFF00;
++
  	do {
--		old.control = new.control = pi_desc->control;
-+		old.control = new.control = READ_ONCE(pi_desc->control);
+ 		old.control = new.control = READ_ONCE(pi_desc->control);
  
- 		dest = cpu_physical_id(vcpu->cpu);
+-		dest = cpu_physical_id(vcpu->cpu);
+-
+-		if (x2apic_mode)
+-			new.ndst = dest;
+-		else
+-			new.ndst = (dest << 8) & 0xFF00;
++		new.ndst = dest;
  
-@@ -160,7 +160,7 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
- 	     "Posted Interrupt Suppress Notification set before blocking");
- 
- 	do {
--		old.control = new.control = pi_desc->control;
-+		old.control = new.control = READ_ONCE(pi_desc->control);
- 
- 		/* set 'NV' to 'wakeup vector' */
- 		new.nv = POSTED_INTR_WAKEUP_VECTOR;
+ 		/* set 'NV' to 'notification vector' */
+ 		new.nv = POSTED_INTR_VECTOR;
 -- 
 2.33.0.882.g93a45727a2-goog
 
