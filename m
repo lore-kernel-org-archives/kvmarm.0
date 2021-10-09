@@ -2,78 +2,77 @@ Return-Path: <SRS0=FNOB=O5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5AEFC433EF
-	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1287C433EF
+	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:14:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 77BDF60FD9
-	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:14:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 77BDF60FD9
+	by mail.kernel.org (Postfix) with ESMTP id 803F061038
+	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:14:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 803F061038
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C3A94B121;
-	Fri,  8 Oct 2021 22:14:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36ABD4B1BF;
+	Fri,  8 Oct 2021 22:14:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6fKHc+VLg7TP; Fri,  8 Oct 2021 22:14:11 -0400 (EDT)
+	with ESMTP id xNvY6+E4qzCx; Fri,  8 Oct 2021 22:14:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0449C4B1B6;
-	Fri,  8 Oct 2021 22:14:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 260A94B1BC;
+	Fri,  8 Oct 2021 22:14:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C145E4B1B5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:14:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 150924B1B5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:14:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VhW9d6c65Hbc for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Oct 2021 22:14:08 -0400 (EDT)
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com
- [209.85.222.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44DB74B11E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:14:08 -0400 (EDT)
-Received: by mail-qk1-f201.google.com with SMTP id
- r5-20020a05620a298500b0045dac5fb940so9784622qkp.17
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 19:14:08 -0700 (PDT)
+ with ESMTP id SoDOYbBa628X for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Oct 2021 22:14:11 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CAEB34B199
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:14:10 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ z130-20020a256588000000b005b6b4594129so15101150ybb.15
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 19:14:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=vARluonyUKpRy8G9DjKrfNHNdAc1HGSYAf2sHJRtsxE=;
- b=dDNQpdZfL83I4Xoa9PZ3E5EsYnabe1TnFcUqC0GiE/0/lo3YBI4SgbGlytEWdsCvOf
- LL61F+TPG4wVAi+hBDwL0hYJr0Sf/hDhYBcY7jqTws2bL+a5fPjX5OLlspq9+auO8uLB
- LlWM6ttM2AIBOgSzLaGHfzimLEgh21na9pO5BUmiCsH43tkGQwDiPq/uFgoyBvKjufM1
- qqm6SRzQMrUy4KCFfX/YOo+AIQIUXaJKY/DR/AD2RJh1k/DEWqufdKKiBjO5+vKlBr1h
- rts7eeL0kCC8yhrzj1lM+laL06N4oAUmGKJnSLoqoH7hEPeImUfW3S7INsYE4a0g/dn5
- bbFQ==
+ bh=6xwGp+yCPRNZeLMFXXBjBMcyDDhJc3kOdh7+GdwoBtU=;
+ b=O3uyycCB0m4rETPo/2EXg7KzDS0Kxxd5QSMOgN5++pIlRXIKx8d0yrsAd7IRsknDXU
+ jfPpfSaBpR+vzVZLfe2k/aYazJeb1V2OYVJeM9zHGQGZhxYlUVKxD+cBCI62fGJRZVEl
+ yp3sVQ08Q330CkbJTchqmDuBifPyeL6Ww3QjU3eQOha0KDm0IBJuDzOMnyesSyo+q+I/
+ lJ8xG8ZB8d3AYNpLPtB4eWA/pyqYaGmh5tBZ/8rId9AshkSUfwuM0AAs41HY+kSD+IsV
+ W4/ngk/MxUvX4B342qXh08T69yL8VAymitYL9u6x/enfR2SkDRVs3Yd1g27SdUPXsZPn
+ 0GRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=vARluonyUKpRy8G9DjKrfNHNdAc1HGSYAf2sHJRtsxE=;
- b=4KHawSwSC5TF0exiCyGfLMp6K14Bkmux7Joofw8kbaaQ1ixmZ/j0pFO60U1slqGR6m
- U8U8U/aKSQ0FV4fqeDVgspdCEBY0LbwUkywbDZ6XAhJU2YohH7gaHUPDe7coIARIwBOl
- GSWbhm8B05DTb7iSVTGBBT2sJ1Zq7UV+13tNReNkopa+HpV8sTXvlt7mGCoA4UTRR8A9
- 6oav/LCAUfDIz08XPI2LXQuptkClsADT9mF1q2KZCNUmuhj8y0A1GJUeCvU88aSPkLA9
- hSOzwCuzQcw7KMxZYAhnA8oYXVuc9czOeBFjEBf2/K1Uq87SsiYibn/Y7BYzmqFPMD+E
- 6Fbw==
-X-Gm-Message-State: AOAM531d1ZNwJCRQ6NClpKbauxeotrNypjI2b1209Otw9+ih3CyXX17k
- zSOfib7gPnwxRaUzTtcgrSmU001OfCo=
-X-Google-Smtp-Source: ABdhPJz6N4BKMo0pT3bkNnK0CxX1fpn8ACkILDo1YTK4hK+oppBaD3kzEAa1dfJV1AQiV4D0k1Eht0uMACM=
+ bh=6xwGp+yCPRNZeLMFXXBjBMcyDDhJc3kOdh7+GdwoBtU=;
+ b=8Odi2119LWpR0wcX/ltQwIbZoHl+TGr3pCWTjKsaLV0T1xr+E0Ks5Y4XV0w0ZjzN+G
+ 9j68iMzMBoOl/omD5YM3fgUgpPOuJufCbemfsIdfSzNP3sAYiHDHGplbGONo4I4HXSZ/
+ cSTt3UwVemt820rYJGMj8IFurwB2XyLbqQ4zNE8T2LvwSlbqYvQDfe6COd6AjPQKQDgs
+ TSmvaAotCudBVIM2v3kkjti37Q73RBuYH+rywHKy8xYXI2d7R843kT4GT/Lh/PqbDsdx
+ QZ65m3chgqipgvCO5LhHZQSSxOPcqeVO+7gjAj/aJcmvsagIuoRixuOxoNUA2MkGCSnN
+ cGXg==
+X-Gm-Message-State: AOAM533k5/CwzjWZqSUQzmqG1pDNnL20SAEaysuDyRE57m+AkT83H3NG
+ JLRYUth0tTVR9I4CLXaOA++ozVf3TYw=
+X-Google-Smtp-Source: ABdhPJxGMQ2uf1Tp63zXiZ9a6+eAt9/mXxTl51gnqbi9PaWar+CNyJX66rPwqvsO9Gv4EvKTMkdMfFkjiGQ=
 X-Received: from seanjc798194.pdx.corp.google.com
  ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:ac8:7010:: with SMTP id
- x16mr1970027qtm.136.1633745647867; 
- Fri, 08 Oct 2021 19:14:07 -0700 (PDT)
-Date: Fri,  8 Oct 2021 19:12:28 -0700
+ (user=seanjc job=sendgmr) by 2002:a05:6902:154f:: with SMTP id
+ r15mr8259463ybu.379.1633745650411; Fri, 08 Oct 2021 19:14:10 -0700 (PDT)
+Date: Fri,  8 Oct 2021 19:12:29 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-36-seanjc@google.com>
+Message-Id: <20211009021236.4122790-37-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in guest
- mode
+Subject: [PATCH v2 36/43] KVM: SVM: Don't bother checking for "running" AVIC
+ when kicking for IPIs
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -108,50 +107,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Signal the AVIC doorbell iff the vCPU is running in the guest.  If the vCPU
-is not IN_GUEST_MODE, it's guaranteed to pick up any pending IRQs on the
-next VMRUN, which unconditionally processes the vIRR.
+Drop the avic_vcpu_is_running() check when waking vCPUs in response to a
+VM-Exit due to incomplete IPI delivery.  The check isn't wrong per se, but
+it's not 100% accurate in the sense that it doesn't guarantee that the vCPU
+was one of the vCPUs that didn't receive the IPI.
 
-Add comments to document the logic.
+The check isn't required for correctness as blocking == !running in this
+context.
+
+From a performance perspective, waking a live task is not expensive as the
+only moderately costly operation is a locked operation to temporarily
+disable preemption.  And if that is indeed a performance issue,
+kvm_vcpu_is_blocking() would be a better check than poking into the AVIC.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ arch/x86/kvm/svm/avic.c | 15 +++++++++------
+ arch/x86/kvm/svm/svm.h  | 11 -----------
+ 2 files changed, 9 insertions(+), 17 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 208c5c71e827..cbf02e7e20d0 100644
+index cbf02e7e20d0..b43b05610ade 100644
 --- a/arch/x86/kvm/svm/avic.c
 +++ b/arch/x86/kvm/svm/avic.c
-@@ -674,7 +674,12 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
- 	kvm_lapic_set_irr(vec, vcpu->arch.apic);
- 	smp_mb__after_atomic();
+@@ -295,13 +295,16 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
+ 	struct kvm_vcpu *vcpu;
+ 	int i;
  
--	if (avic_vcpu_is_running(vcpu)) {
 +	/*
-+	 * Signal the doorbell to tell hardware to inject the IRQ if the vCPU
-+	 * is in the guest.  If the vCPU is not in the guest, hardware will
-+	 * automatically process AVIC interrupts at VMRUN.
++	 * Wake any target vCPUs that are blocking, i.e. waiting for a wake
++	 * event.  There's no need to signal doorbells, as hardware has handled
++	 * vCPUs that were in guest at the time of the IPI, and vCPUs that have
++	 * since entered the guest will have processed pending IRQs at VMRUN.
 +	 */
-+	if (vcpu->mode == IN_GUEST_MODE) {
- 		int cpu = READ_ONCE(vcpu->cpu);
- 
- 		/*
-@@ -687,8 +692,13 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
- 		if (cpu != get_cpu())
- 			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
- 		put_cpu();
--	} else
-+	} else {
-+		/*
-+		 * Wake the vCPU if it was blocking.  KVM will then detect the
-+		 * pending IRQ when checking if the vCPU has a wake event.
-+		 */
- 		kvm_vcpu_wake_up(vcpu);
-+	}
- 
- 	return 0;
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		bool m = kvm_apic_match_dest(vcpu, source,
+-					     icrl & APIC_SHORT_MASK,
+-					     GET_APIC_DEST_FIELD(icrh),
+-					     icrl & APIC_DEST_MASK);
+-
+-		if (m && !avic_vcpu_is_running(vcpu))
++		if (kvm_apic_match_dest(vcpu, source, icrl & APIC_SHORT_MASK,
++					GET_APIC_DEST_FIELD(icrh),
++					icrl & APIC_DEST_MASK))
+ 			kvm_vcpu_wake_up(vcpu);
+ 	}
  }
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 0d7bbe548ac3..7f5b01bbee29 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -509,17 +509,6 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
+ 
+ #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
+ 
+-static inline bool avic_vcpu_is_running(struct kvm_vcpu *vcpu)
+-{
+-	struct vcpu_svm *svm = to_svm(vcpu);
+-	u64 *entry = svm->avic_physical_id_cache;
+-
+-	if (!entry)
+-		return false;
+-
+-	return (READ_ONCE(*entry) & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
+-}
+-
+ int avic_ga_log_notifier(u32 ga_tag);
+ void avic_vm_destroy(struct kvm *kvm);
+ int avic_vm_init(struct kvm *kvm);
 -- 
 2.33.0.882.g93a45727a2-goog
 
