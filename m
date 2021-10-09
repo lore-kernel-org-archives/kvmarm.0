@@ -2,78 +2,78 @@ Return-Path: <SRS0=FNOB=O5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9092CC433F5
-	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:14:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E67C433F5
+	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:14:29 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 47D0760F51
-	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:14:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 47D0760F51
+	by mail.kernel.org (Postfix) with ESMTP id 4802261038
+	for <kvmarm@archiver.kernel.org>; Sat,  9 Oct 2021 02:14:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4802261038
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E16C54B1DC;
-	Fri,  8 Oct 2021 22:14:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F01E74B1F0;
+	Fri,  8 Oct 2021 22:14:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oKOLcVxPiiSH; Fri,  8 Oct 2021 22:14:25 -0400 (EDT)
+	with ESMTP id bk3HDboSu1lu; Fri,  8 Oct 2021 22:14:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7F804B1E7;
-	Fri,  8 Oct 2021 22:14:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06B3B4B118;
+	Fri,  8 Oct 2021 22:14:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F138E4B1D3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:14:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34FDB4B13D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:14:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nj7AK+R+d89K for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Oct 2021 22:14:23 -0400 (EDT)
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
- [209.85.222.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7819D4B10B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:14:22 -0400 (EDT)
-Received: by mail-qk1-f202.google.com with SMTP id
- g25-20020a05620a219900b0045f31ac2119so3717088qka.20
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 19:14:22 -0700 (PDT)
+ with ESMTP id ahYayRrNgMiN for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Oct 2021 22:14:25 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 433DA4B1E3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Oct 2021 22:14:25 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ t7-20020a258387000000b005b6d7220c79so14967223ybk.16
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Oct 2021 19:14:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=7AydOUvkdJYa6Wlt5e9uwNZNJAdbyWC8Cf+8opg/Yr0=;
- b=F5A5ElVe2ZOpGelCD8RXcxlzS2YdsbWMTlTzwP14Z0DgtKolFahczSuhBXhCWiB7eh
- NnELj9ZTA5ErFZ1Ow79fstlN9c4/ZtbMRM8599X4XIGaWCtKgIyOuh7Lbv+UbYZ/PPbM
- g0ulVkl+iFczbzGTKrUUo2glF7/M3yo4REhhrKmsbxkn4vfC9KbCtghZums5FtWbQOo8
- OtycXlioPw/pt6DxmpIj+7wp94P9in0FjxK37sJ1NDuAXa4Qi5RgxPsIzjtUPPY238Sh
- 7lWK+16G09Mmx1LZ71fHA4gr7m6egsSTAl0SJJ8FILJHRjlZrGakxe80P1e6/VbXoR38
- UNGQ==
+ bh=AlVgPkgkFYp3mdA0c8FeIFPE9R3iQYYLs6SQdF7DS7Y=;
+ b=iyDWCxyALAJzTmrUWpKD0hm+MQGe0JbvQFQ+gPVY/mUdPcOBuJRTdijBOEaFZ+LAAb
+ SDTgJ4oxCKVVc0nNYZIMuAMtCs0uQECNKotNLEWLcodTtHGOERifCGz75XQaYTAh1vxX
+ neHo9EJwZRaNOXzY5g4EMe8hM39Md1Iy0bRnoPVZCfJilexl2bbxOCi5VnE5sdolV6eU
+ NSIZQhgHuO3ZxoxUovFoBRAFe5hP7ZvZYuCsNm5sISOiG6xvPYGa1WB0B6RyfZX8HQo6
+ K97euHgjPX8JD6ljBA2834wXcBVVic3DkNPl89wT3euIRZ1CjF3KG79BaaaEoSx95D/a
+ coZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=7AydOUvkdJYa6Wlt5e9uwNZNJAdbyWC8Cf+8opg/Yr0=;
- b=mg9O1zyqb/Y1mCnTyhDJkWX+F1aDYz3alxXFu88MWdWA02uqdUdx9D7j67QcWtGj6H
- bc0JEcYOmtyWNOgTz/kW0/1BirBYCKPA9RMF0CSt8OJCP1tN3m3T9MX8qUd+TPyJMdcj
- AwiAXGw14+H5M5jSQge6gpl74dfg099tnzgd4r12WBO0gWhzyPWQOnQVv+19TFZpvRM1
- TDRgohJ+3i756s+k9OIaWK76NaGYQ2nhSakRqgcFgV+gFKeEGqX2fU7ugT/KsSnxHMO8
- eRw5dtP7bUcTCn9u3c586nZr1xjSxRXyimOd1Jn0ZL0c8YfAoflxTTq56OA7CCsymc3V
- 3ulw==
-X-Gm-Message-State: AOAM533b5AGgrk6Sk6dvMOmgenJqyBGRKs6buSEjWXubuSgjm4giQXoL
- tvlGlCquijyQQTx+rd+nmYAo1FrboMo=
-X-Google-Smtp-Source: ABdhPJys/1e5AWMBDntWj2WGnMrdS/6sXLvUM0X/SLQ0w9S9Xln2c4Up5CedikQUSxYJYOlRRBW1NpJbvEU=
+ bh=AlVgPkgkFYp3mdA0c8FeIFPE9R3iQYYLs6SQdF7DS7Y=;
+ b=Pzs4P1QhBANPRXOjGzZgL6QhLioRxWAj7K75WiKlhlc/bPU3Q4PSjb31qTOjagVRKI
+ 8zIAV+jXAqK9BpOs+g8mPa7cM7EltCPNhWx7NRBRtvcRSbD96oyMXqPrIiemFV9+clSw
+ emq3iqFofEZdU1vKYTtoEKtlNhk5HcX25I3ZXWpE46V8QmqqJS1PvvaK2lWhusXKBSbZ
+ 6FMU3l9lycWAHh9+bvr6HHNhSZBipTlFebffXUFkSrKvJnBDqOl0GO7HuZM13hY5pUy3
+ yVBYkIOCFH8jnAhPrAN5lTJxJOvGHOKCCa3DLRXIT0Fq5TvuYuD9zc+4eLp/cshUK54h
+ v0Ug==
+X-Gm-Message-State: AOAM532yk+0SoO1/c8uHdFARn6JasJQmIJoXfiyPwukqsWLUnwVjiMuB
+ TnhRCPL5GGudnL7mmsZHxpvpbpDP+0Q=
+X-Google-Smtp-Source: ABdhPJwCGOH/vSNpBFtQULwIni84FKIaJWE8Z3rFyAmS2+NcdTac9rCKWh3u0VdnxrDvnUeBFYVQOv64tnI=
 X-Received: from seanjc798194.pdx.corp.google.com
  ([2620:15c:90:200:e39b:6333:b001:cb])
- (user=seanjc job=sendgmr) by 2002:ac8:594b:: with SMTP id
- 11mr1929826qtz.191.1633745662114; 
- Fri, 08 Oct 2021 19:14:22 -0700 (PDT)
-Date: Fri,  8 Oct 2021 19:12:34 -0700
+ (user=seanjc job=sendgmr) by 2002:a25:6908:: with SMTP id
+ e8mr6568722ybc.337.1633745664741; 
+ Fri, 08 Oct 2021 19:14:24 -0700 (PDT)
+Date: Fri,  8 Oct 2021 19:12:35 -0700
 In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
-Message-Id: <20211009021236.4122790-42-seanjc@google.com>
+Message-Id: <20211009021236.4122790-43-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211009021236.4122790-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v2 41/43] KVM: VMX: Pass desired vector instead of bool for
- triggering posted IRQ
+Subject: [PATCH v2 42/43] KVM: VMX: Fold fallback path into triggering posted
+ IRQ helper
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -108,51 +108,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Refactor the posted interrupt helper to take the desired notification
-vector instead of a bool so that the callers are self-documenting.
+Move the fallback "wake_up" path into the helper to trigger posted
+interrupt helper now that the nested and non-nested paths are identical.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 78c8bc7f1b3b..f505fee3cf5c 100644
+index f505fee3cf5c..b0d97cf18c34 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3928,11 +3928,9 @@ static void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
+@@ -3927,7 +3927,7 @@ static void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
+ 	pt_update_intercept_for_msr(vcpu);
  }
  
- static inline bool kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
--						     bool nested)
-+						     int pi_vec)
+-static inline bool kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
++static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+ 						     int pi_vec)
  {
  #ifdef CONFIG_SMP
--	int pi_vec = nested ? POSTED_INTR_NESTED_VECTOR : POSTED_INTR_VECTOR;
--
- 	if (vcpu->mode == IN_GUEST_MODE) {
- 		/*
- 		 * The vector of interrupt to be delivered to vcpu had
-@@ -3986,7 +3984,7 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+@@ -3958,10 +3958,15 @@ static inline bool kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+ 		 */
+ 
+ 		apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
+-		return true;
++		return;
+ 	}
+ #endif
+-	return false;
++	/*
++	 * The vCPU isn't in the guest; wake the vCPU in case it is blocking,
++	 * otherwise do nothing as KVM will grab the highest priority pending
++	 * IRQ via ->sync_pir_to_irr() in vcpu_enter_guest().
++	 */
++	kvm_vcpu_wake_up(vcpu);
+ }
+ 
+ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+@@ -3984,8 +3989,7 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
  		 */
  		kvm_make_request(KVM_REQ_EVENT, vcpu);
  		/* the PIR and ON have been set by L1. */
--		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, true))
-+		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_NESTED_VECTOR))
- 			kvm_vcpu_wake_up(vcpu);
+-		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_NESTED_VECTOR))
+-			kvm_vcpu_wake_up(vcpu);
++		kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_NESTED_VECTOR);
  		return 0;
  	}
-@@ -4024,7 +4022,7 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+ 	return -1;
+@@ -4022,9 +4026,7 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
  	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
  	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
  	 */
--	if (!kvm_vcpu_trigger_posted_interrupt(vcpu, false))
-+	if (!kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR))
- 		kvm_vcpu_wake_up(vcpu);
- 
+-	if (!kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR))
+-		kvm_vcpu_wake_up(vcpu);
+-
++	kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR);
  	return 0;
+ }
+ 
 -- 
 2.33.0.882.g93a45727a2-goog
 
