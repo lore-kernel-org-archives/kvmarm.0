@@ -2,76 +2,76 @@ Return-Path: <SRS0=9Ttc=O6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 890F4C433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 14:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18115C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 14:57:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 42AF560F5B
-	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 14:57:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 42AF560F5B
+	by mail.kernel.org (Postfix) with ESMTP id BE7B960C4D
+	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 14:57:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BE7B960C4D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E95274B0CE;
-	Sun, 10 Oct 2021 10:57:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AE0B40C88;
+	Sun, 10 Oct 2021 10:57:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7QZIgNga4g0J; Sun, 10 Oct 2021 10:57:01 -0400 (EDT)
+	with ESMTP id t22Ytanlo8Uj; Sun, 10 Oct 2021 10:57:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AD984B133;
-	Sun, 10 Oct 2021 10:57:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B20A24B0F7;
+	Sun, 10 Oct 2021 10:57:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5001F4B11B
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 10:57:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BF6F4A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 10:57:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j3rTz626M8V9 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 10 Oct 2021 10:56:59 -0400 (EDT)
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
- [209.85.221.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 04C9E49FB7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 10:56:59 -0400 (EDT)
-Received: by mail-wr1-f74.google.com with SMTP id
- e12-20020a056000178c00b001606927de88so11160661wrg.10
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 07:56:58 -0700 (PDT)
+ with ESMTP id eOgJvimYQv4i for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 10 Oct 2021 10:57:01 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CE5A4B102
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 10:57:01 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id
+ d13-20020adf9b8d000000b00160a94c235aso11193921wrc.2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 07:57:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=NjmzICmgs/1/SRU9S1PIoFoU/QO2NcwvWdQNYWVlfS8=;
- b=qJXoTWLIck34aUq2vWI+yRaH1p2dPNKc5RilSQ2TjF15hJYVdQuO5LFwBiwz2+s7qL
- qxbP45kiEkCMKWlfQnu0m2Ry0UozRA/bQwdyQBMnYT2sR9IB7G/hdRavPrAKAzpQ1wLk
- mCYRuz3EEmXPvrUPcSUfqr4t9T97djcmNdiProPKbbscCqxiiSgwL7Ov9itNNYvmbuVy
- RaLpTyex5ZZ8iJc6mYhQaB8nfl44lpN2GSxh5GKhsI9iQtd9zOI1xXGC7Oh7EimAOYif
- AdVJAh6lq2JOqJuQW0F5Gx9eKRg76zaPBFYIdO9frERP5eKgKLoEgc7b36X5DA1/8/Gl
- nFzg==
+ :cc; bh=wJJszilA4UjK4AVsoFrSiurMN2NLV1CPui7ahB+b56k=;
+ b=Ow5SKrzHi5KMDQpSvK1KHntWnfWS6myL/6y9xdSh1m6R/DWZ1eRdqgTSKPYAgsfnAx
+ OpQTYkvyjAdwdeXBAMwATpF/MsyXpZCpx/uagnVUtK6MWlyFl+dluZ9wg6DUz6k3vn6y
+ XSfLM/GETYlCxwiWvtr8D5PdSQ5++Exmc+T5GNuH27MhVNIFA4NxZLjqlJF6W8KW5g2w
+ fOCX/KWYV0nHOShCZ7hh6LAkq6U/Ch1E+8daVXbpTYbl7Lu8Nu995QJ9HIVWXPBtDXvl
+ WzbuXfYNdVHH75mRS09WF3kHHBcfTtWWDDLMsqKnN5BL2jm287j33R/pHVMhH6byiHHh
+ MHMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=NjmzICmgs/1/SRU9S1PIoFoU/QO2NcwvWdQNYWVlfS8=;
- b=iAqyQruG5a15hS7Cgk17mk7JkaotSm7bW+L+eIIMqmbqK8EjU32aRg5UgcNE0EWfd+
- B2Wyn/zgyNGrVlZKsXrHmEm5j1hyKoaEJteW95f61DvFBewWb/R7Xity8eKY26kM1R8h
- Ix3HMR0iR7ON+2RFesnqps2duAO5i57VAPs8GMz7Tl+7au8R0UO2jSQdKWsMkgIPTzzn
- p0rYBguPpQLmm02GDQK/UG2T6SzaTK6n5rrZqtP0CwQsZuuT7PTsHvzmgwlr5+sdty2v
- vXckwIJwLWuP+RaQ+OALP1zuJhk+FMTd8rNXzFKJyVm6ktpyBFUScFEKfdXoVMjitH5g
- 8CWg==
-X-Gm-Message-State: AOAM530gvC4emocub5XsIVXrAdiRgCOEq52G6spuBLsrVyEXjzdZ4lRt
- 4EB+NNy6JUbFNhOyXhpj/qoEMze97DHVh59rzF/166zf0UOn6CzciKVxc3C29FTiwShLPQ7qjG8
- HlEg6TDCgLA4zDa14dfmJtP/wCzUrgO7PB+q8FkwHnmH/KA8bxhzvuLJfPaI4OfSVPLI=
-X-Google-Smtp-Source: ABdhPJyaRIw2i8Vmfc3FxfbM4wwoieTXOLpMnD+P+7LcGqnctSEbohnVUEjCI/49CwnkqLd//Ok/pbYkGw==
+ bh=wJJszilA4UjK4AVsoFrSiurMN2NLV1CPui7ahB+b56k=;
+ b=0HpobM5wNOyWe44qrDI52BM/HUJr0Pt11hTMvZmk/r9poSSeiFvS8aUEMelONcOTc/
+ H2x3wnF2IqjY5XwSnCaEMU9KFBxJIcn5oPRWvO8Bzs9bnO0hVSQkvwQPOlRiCReC9Ppn
+ HwUyu60d5X3JAO7qfV7Un9Qrpvv4QJI0aknnfPDNhE6VJTtqsZlV4zQ7hSo9v8txMaAs
+ CcAkRRiIzmCDqHEVbIFtukHLSdgvqEfzGdvfe4BWwIhB3SC06lUphFnO7aOMYKn2/r9Q
+ wA5cd98LwgERekjOBuUoYgHB5ZiEiN/3TkodLQ/aFC0BZEs+yggUOXcYGpjMts/BlSD6
+ qmoA==
+X-Gm-Message-State: AOAM531FKi3hCkzVMI3m9gdBUxk3q1O82gtHi1Op8QBhN4/QE++9PytG
+ 5Ng9M2/xRGHZA4WffFV90vuo+5dtA5Xk0hYhmI4M/L8uE7b2LGq9dF4MvPUy9nqLADZqMk0oEGJ
+ EQV0BOy7ADrsnWcbbncWuejWhPzYCo90rQ0ASjW15AiAnxxlqF8lnY4jVob5FVjvCWEo=
+X-Google-Smtp-Source: ABdhPJwvTl9Wcky+c5OAdYZqVghTezWFoe2hGlafMlweZuHYVdQl8lMVeo4zq56ls1vQDJ2SAjw04f/lhQ==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a1c:19c4:: with SMTP id
- 187mr15371722wmz.149.1633877817910; 
- Sun, 10 Oct 2021 07:56:57 -0700 (PDT)
-Date: Sun, 10 Oct 2021 15:56:34 +0100
+ (user=tabba job=sendgmr) by 2002:a5d:54cc:: with SMTP id
+ x12mr6892549wrv.343.1633877820327; 
+ Sun, 10 Oct 2021 07:57:00 -0700 (PDT)
+Date: Sun, 10 Oct 2021 15:56:35 +0100
 In-Reply-To: <20211010145636.1950948-1-tabba@google.com>
-Message-Id: <20211010145636.1950948-10-tabba@google.com>
+Message-Id: <20211010145636.1950948-11-tabba@google.com>
 Mime-Version: 1.0
 References: <20211010145636.1950948-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v8 09/11] KVM: arm64: Move sanitized copies of CPU features
+Subject: [PATCH v8 10/11] KVM: arm64: Trap access to pVM restricted features
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -92,49 +92,112 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Move the sanitized copies of the CPU feature registers to the
-recently created sys_regs.c. This consolidates all copies in a
-more relevant file.
+Trap accesses to restricted features for VMs running in protected
+mode.
 
-No functional change intended.
+Access to feature registers are emulated, and only supported
+features are exposed to protected VMs.
 
-Acked-by: Will Deacon <will@kernel.org>
+Accesses to restricted registers as well as restricted
+instructions are trapped, and an undefined exception is injected
+into the protected guests, i.e., with EC = 0x0 (unknown reason).
+This EC is the one used, according to the Arm Architecture
+Reference Manual, for unallocated or undefined system registers
+or instructions.
+
+Only affects the functionality of protected VMs. Otherwise,
+should not affect non-protected VMs when KVM is running in
+protected mode.
+
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 6 ------
- arch/arm64/kvm/hyp/nvhe/sys_regs.c    | 2 ++
- 2 files changed, 2 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 57 ++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 2a07d63b8498..f6d96e60b323 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -25,12 +25,6 @@ struct host_kvm host_kvm;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 17d1a9512507..2c72c31e516e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -20,6 +20,7 @@
+ #include <asm/kprobes.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_fixed_config.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/fpsimd.h>
+@@ -159,6 +160,49 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
  
- static struct hyp_pool host_s2_pool;
++/**
++ * Handler for protected VM restricted exceptions.
++ *
++ * Inject an undefined exception into the guest and return true to indicate that
++ * the hypervisor has handled the exit, and control should go back to the guest.
++ */
++static bool kvm_handle_pvm_restricted(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	inject_undef64(vcpu);
++	return true;
++}
++
++/**
++ * Handler for protected VM MSR, MRS or System instruction execution in AArch64.
++ *
++ * Returns true if the hypervisor has handled the exit, and control should go
++ * back to the guest, or false if it hasn't.
++ */
++static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (kvm_handle_pvm_sysreg(vcpu, exit_code))
++		return true;
++
++	return kvm_hyp_handle_sysreg(vcpu, exit_code);
++}
++
++/**
++ * Handler for protected floating-point and Advanced SIMD accesses.
++ *
++ * Returns true if the hypervisor has handled the exit, and control should go
++ * back to the guest, or false if it hasn't.
++ */
++static bool kvm_handle_pvm_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	/* Linux guests assume support for floating-point and Advanced SIMD. */
++	BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_FP),
++				PVM_ID_AA64PFR0_ALLOW));
++	BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_ASIMD),
++				PVM_ID_AA64PFR0_ALLOW));
++
++	return kvm_hyp_handle_fpsimd(vcpu, exit_code);
++}
++
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+@@ -170,8 +214,21 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
+ };
  
--/*
-- * Copies of the host's CPU features registers holding sanitized values.
-- */
--u64 id_aa64mmfr0_el1_sys_val;
--u64 id_aa64mmfr1_el1_sys_val;
--
- const u8 pkvm_hyp_id = 1;
++static const exit_handler_fn pvm_exit_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
++	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
++	[ESR_ELx_EC_FP_ASIMD]		= kvm_handle_pvm_fpsimd,
++	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
++	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
++	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
++};
++
+ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
+ {
++	if (unlikely(kvm_vm_is_protected(kvm)))
++		return pvm_exit_handlers;
++
+ 	return hyp_exit_handlers;
+ }
  
- static void *host_s2_zalloc_pages_exact(size_t size)
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 6e3ea49af302..6bde2dc5205c 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -21,6 +21,8 @@ u64 id_aa64pfr0_el1_sys_val;
- u64 id_aa64pfr1_el1_sys_val;
- u64 id_aa64isar0_el1_sys_val;
- u64 id_aa64isar1_el1_sys_val;
-+u64 id_aa64mmfr0_el1_sys_val;
-+u64 id_aa64mmfr1_el1_sys_val;
- u64 id_aa64mmfr2_el1_sys_val;
- 
- /*
 -- 
 2.33.0.882.g93a45727a2-goog
 
