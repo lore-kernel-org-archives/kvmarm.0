@@ -2,60 +2,60 @@ Return-Path: <SRS0=9Ttc=O6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C11C433EF
-	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 00:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62AA7C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 01:53:17 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B1EA560F6D
-	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 00:44:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B1EA560F6D
+	by mail.kernel.org (Postfix) with ESMTP id 64D2460EE7
+	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 01:53:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 64D2460EE7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 266594B0F5;
-	Sat,  9 Oct 2021 20:44:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B579B4B0BE;
+	Sat,  9 Oct 2021 21:53:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id o7zNQSLK8GRP; Sat,  9 Oct 2021 20:44:12 -0400 (EDT)
+	with ESMTP id FxGcQmUK5+9A; Sat,  9 Oct 2021 21:53:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 673A04B0E6;
-	Sat,  9 Oct 2021 20:44:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75EB54B0BF;
+	Sat,  9 Oct 2021 21:53:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED8914B0DF
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Oct 2021 20:44:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A21E4B0BF
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Oct 2021 21:53:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H2M7tRe9rrN9 for <kvmarm@lists.cs.columbia.edu>;
- Sat,  9 Oct 2021 20:44:08 -0400 (EDT)
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5204049F8F
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Oct 2021 20:44:08 -0400 (EDT)
-X-IronPort-AV: E=McAfee;i="6200,9189,10132"; a="226654554"
+ with ESMTP id uDkHDRt9JgRS for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  9 Oct 2021 21:53:11 -0400 (EDT)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C8074B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Oct 2021 21:53:10 -0400 (EDT)
+X-IronPort-AV: E=McAfee;i="6200,9189,10132"; a="250076683"
 X-IronPort-AV: E=Sophos;i="5.85,361,1624345200"; 
- d="gz'50?scan'50,208,50";a="226654554"
+ d="gz'50?scan'50,208,50";a="250076683"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 09 Oct 2021 17:44:06 -0700
+ by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 09 Oct 2021 18:53:08 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,361,1624345200"; 
- d="gz'50?scan'50,208,50";a="479386882"
+ d="gz'50?scan'50,208,50";a="479397500"
 Received: from lkp-server02.sh.intel.com (HELO 08b2c502c3de) ([10.239.97.151])
- by orsmga007.jf.intel.com with ESMTP; 09 Oct 2021 17:44:03 -0700
+ by orsmga007.jf.intel.com with ESMTP; 09 Oct 2021 18:53:04 -0700
 Received: from kbuild by 08b2c502c3de with local (Exim 4.92)
  (envelope-from <lkp@intel.com>)
- id 1mZMwc-0000km-MC; Sun, 10 Oct 2021 00:44:02 +0000
-Date: Sun, 10 Oct 2021 08:43:41 +0800
+ id 1mZO1Q-0000no-33; Sun, 10 Oct 2021 01:53:04 +0000
+Date: Sun, 10 Oct 2021 09:52:41 +0800
 From: kernel test robot <lkp@intel.com>
 To: Fuad Tabba <tabba@google.com>, kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH v7 07/11] KVM: arm64: Add handlers for protected VM
- System Registers
-Message-ID: <202110100815.3OAl08g4-lkp@intel.com>
-References: <20211008155832.1415010-8-tabba@google.com>
+Subject: Re: [PATCH v7 08/11] KVM: arm64: Initialize trap registers for
+ protected VMs
+Message-ID: <202110100927.n9QkBefv-lkp@intel.com>
+References: <20211008155832.1415010-9-tabba@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="qDbXVdCdHGoSgWSk"
+Content-Type: multipart/mixed; boundary="IJpNTDwzlM2Ie8A6"
 Content-Disposition: inline
-In-Reply-To: <20211008155832.1415010-8-tabba@google.com>
+In-Reply-To: <20211008155832.1415010-9-tabba@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Cc: kbuild-all@lists.01.org, maz@kernel.org, pbonzini@redhat.com,
  will@kernel.org
@@ -74,7 +74,7 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---qDbXVdCdHGoSgWSk
+--IJpNTDwzlM2Ie8A6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -91,10 +91,10 @@ compiler: aarch64-linux-gcc (GCC) 11.2.0
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/59df1c9264ed417b7662e7520143c3d7b9ecad25
+        # https://github.com/0day-ci/linux/commit/f14adcaece33553b25f943648a9a4ef40f58d257
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Fuad-Tabba/KVM-arm64-Fixed-features-for-protected-VMs/20211009-000118
-        git checkout 59df1c9264ed417b7662e7520143c3d7b9ecad25
+        git checkout f14adcaece33553b25f943648a9a4ef40f58d257
         # save the attached .config to linux build tree
         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross ARCH=arm64 
 
@@ -103,244 +103,29 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:28:6: warning: no previous prototype for 'inject_undef64' [-Wmissing-prototypes]
-      28 | void inject_undef64(struct kvm_vcpu *vcpu)
-         |      ^~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:81:5: warning: no previous prototype for 'get_pvm_id_aa64pfr0' [-Wmissing-prototypes]
-      81 | u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:102:5: warning: no previous prototype for 'get_pvm_id_aa64pfr1' [-Wmissing-prototypes]
-     102 | u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:113:5: warning: no previous prototype for 'get_pvm_id_aa64zfr0' [-Wmissing-prototypes]
-     113 | u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:123:5: warning: no previous prototype for 'get_pvm_id_aa64dfr0' [-Wmissing-prototypes]
-     123 | u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:133:5: warning: no previous prototype for 'get_pvm_id_aa64dfr1' [-Wmissing-prototypes]
-     133 | u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:143:5: warning: no previous prototype for 'get_pvm_id_aa64afr0' [-Wmissing-prototypes]
-     143 | u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:153:5: warning: no previous prototype for 'get_pvm_id_aa64afr1' [-Wmissing-prototypes]
-     153 | u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:163:5: warning: no previous prototype for 'get_pvm_id_aa64isar0' [-Wmissing-prototypes]
-     163 | u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:168:5: warning: no previous prototype for 'get_pvm_id_aa64isar1' [-Wmissing-prototypes]
-     168 | u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:181:5: warning: no previous prototype for 'get_pvm_id_aa64mmfr0' [-Wmissing-prototypes]
-     181 | u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:191:5: warning: no previous prototype for 'get_pvm_id_aa64mmfr1' [-Wmissing-prototypes]
-     191 | u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:196:5: warning: no previous prototype for 'get_pvm_id_aa64mmfr2' [-Wmissing-prototypes]
-     196 | u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
-         |     ^~~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:448:5: warning: no previous prototype for 'kvm_check_pvm_sysreg_table' [-Wmissing-prototypes]
-     448 | int kvm_check_pvm_sysreg_table(void)
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~~~
->> arch/arm64/kvm/hyp/nvhe/sys_regs.c:466:6: warning: no previous prototype for 'kvm_handle_pvm_sysreg' [-Wmissing-prototypes]
-     466 | bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
-         |      ^~~~~~~~~~~~~~~~~~~~~
+>> arch/arm64/kvm/hyp/nvhe/pkvm.c:177:6: warning: no previous prototype for '__pkvm_vcpu_init_traps' [-Wmissing-prototypes]
+     177 | void __pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
+         |      ^~~~~~~~~~~~~~~~~~~~~~
 
 
-vim +/inject_undef64 +28 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+vim +/__pkvm_vcpu_init_traps +177 arch/arm64/kvm/hyp/nvhe/pkvm.c
 
-    23	
-    24	/*
-    25	 * Inject an unknown/undefined exception to an AArch64 guest while most of its
-    26	 * sysregs are live.
-    27	 */
-  > 28	void inject_undef64(struct kvm_vcpu *vcpu)
-    29	{
-    30		u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-    31	
-    32		*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
-    33		*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
-    34	
-    35		vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1 |
-    36				     KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
-    37				     KVM_ARM64_PENDING_EXCEPTION);
-    38	
-    39		__kvm_adjust_pc(vcpu);
-    40	
-    41		write_sysreg_el1(esr, SYS_ESR);
-    42		write_sysreg_el1(read_sysreg_el2(SYS_ELR), SYS_ELR);
-    43		write_sysreg_el2(*vcpu_pc(vcpu), SYS_ELR);
-    44		write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
-    45	}
-    46	
-    47	/*
-    48	 * Returns the restricted features values of the feature register based on the
-    49	 * limitations in restrict_fields.
-    50	 * A feature id field value of 0b0000 does not impose any restrictions.
-    51	 * Note: Use only for unsigned feature field values.
-    52	 */
-    53	static u64 get_restricted_features_unsigned(u64 sys_reg_val,
-    54						    u64 restrict_fields)
-    55	{
-    56		u64 value = 0UL;
-    57		u64 mask = GENMASK_ULL(ARM64_FEATURE_FIELD_BITS - 1, 0);
-    58	
-    59		/*
-    60		 * According to the Arm Architecture Reference Manual, feature fields
-    61		 * use increasing values to indicate increases in functionality.
-    62		 * Iterate over the restricted feature fields and calculate the minimum
-    63		 * unsigned value between the one supported by the system, and what the
-    64		 * value is being restricted to.
-    65		 */
-    66		while (sys_reg_val && restrict_fields) {
-    67			value |= min(sys_reg_val & mask, restrict_fields & mask);
-    68			sys_reg_val &= ~mask;
-    69			restrict_fields &= ~mask;
-    70			mask <<= ARM64_FEATURE_FIELD_BITS;
-    71		}
-    72	
-    73		return value;
-    74	}
-    75	
-    76	/*
-    77	 * Functions that return the value of feature id registers for protected VMs
-    78	 * based on allowed features, system features, and KVM support.
-    79	 */
-    80	
-  > 81	u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
-    82	{
-    83		const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
-    84		u64 set_mask = 0;
-    85		u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
-    86	
-    87		if (!vcpu_has_sve(vcpu))
-    88			allow_mask &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-    89	
-    90		set_mask |= get_restricted_features_unsigned(id_aa64pfr0_el1_sys_val,
-    91			PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
-    92	
-    93		/* Spectre and Meltdown mitigation in KVM */
-    94		set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2),
-    95				       (u64)kvm->arch.pfr0_csv2);
-    96		set_mask |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3),
-    97				       (u64)kvm->arch.pfr0_csv3);
-    98	
-    99		return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
-   100	}
-   101	
- > 102	u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
-   103	{
-   104		const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
-   105		u64 allow_mask = PVM_ID_AA64PFR1_ALLOW;
-   106	
-   107		if (!kvm_has_mte(kvm))
-   108			allow_mask &= ~ARM64_FEATURE_MASK(ID_AA64PFR1_MTE);
-   109	
-   110		return id_aa64pfr1_el1_sys_val & allow_mask;
-   111	}
-   112	
- > 113	u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
-   114	{
-   115		/*
-   116		 * No support for Scalable Vectors, therefore, hyp has no sanitized
-   117		 * copy of the feature id register.
-   118		 */
-   119		BUILD_BUG_ON(PVM_ID_AA64ZFR0_ALLOW != 0ULL);
-   120		return 0;
-   121	}
-   122	
- > 123	u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
-   124	{
-   125		/*
-   126		 * No support for debug, including breakpoints, and watchpoints,
-   127		 * therefore, pKVM has no sanitized copy of the feature id register.
-   128		 */
-   129		BUILD_BUG_ON(PVM_ID_AA64DFR0_ALLOW != 0ULL);
-   130		return 0;
-   131	}
-   132	
- > 133	u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
-   134	{
-   135		/*
-   136		 * No support for debug, therefore, hyp has no sanitized copy of the
-   137		 * feature id register.
-   138		 */
-   139		BUILD_BUG_ON(PVM_ID_AA64DFR1_ALLOW != 0ULL);
-   140		return 0;
-   141	}
-   142	
- > 143	u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
-   144	{
-   145		/*
-   146		 * No support for implementation defined features, therefore, hyp has no
-   147		 * sanitized copy of the feature id register.
-   148		 */
-   149		BUILD_BUG_ON(PVM_ID_AA64AFR0_ALLOW != 0ULL);
-   150		return 0;
-   151	}
-   152	
- > 153	u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
-   154	{
-   155		/*
-   156		 * No support for implementation defined features, therefore, hyp has no
-   157		 * sanitized copy of the feature id register.
-   158		 */
-   159		BUILD_BUG_ON(PVM_ID_AA64AFR1_ALLOW != 0ULL);
-   160		return 0;
-   161	}
-   162	
- > 163	u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu)
-   164	{
-   165		return id_aa64isar0_el1_sys_val & PVM_ID_AA64ISAR0_ALLOW;
-   166	}
-   167	
- > 168	u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
-   169	{
-   170		u64 allow_mask = PVM_ID_AA64ISAR1_ALLOW;
-   171	
-   172		if (!vcpu_has_ptrauth(vcpu))
-   173			allow_mask &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR1_APA) |
-   174					ARM64_FEATURE_MASK(ID_AA64ISAR1_API) |
-   175					ARM64_FEATURE_MASK(ID_AA64ISAR1_GPA) |
-   176					ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI));
-   177	
-   178		return id_aa64isar1_el1_sys_val & allow_mask;
-   179	}
-   180	
- > 181	u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
-   182	{
-   183		u64 set_mask;
-   184	
-   185		set_mask = get_restricted_features_unsigned(id_aa64mmfr0_el1_sys_val,
-   186			PVM_ID_AA64MMFR0_RESTRICT_UNSIGNED);
-   187	
-   188		return (id_aa64mmfr0_el1_sys_val & PVM_ID_AA64MMFR0_ALLOW) | set_mask;
-   189	}
-   190	
- > 191	u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu)
-   192	{
-   193		return id_aa64mmfr1_el1_sys_val & PVM_ID_AA64MMFR1_ALLOW;
-   194	}
-   195	
- > 196	u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
-   197	{
-   198		return id_aa64mmfr2_el1_sys_val & PVM_ID_AA64MMFR2_ALLOW;
-   199	}
-   200	
+   173	
+   174	/*
+   175	 * Initialize trap register values for protected VMs.
+   176	 */
+ > 177	void __pkvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---qDbXVdCdHGoSgWSk
+--IJpNTDwzlM2Ie8A6
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICAEtYmEAAy5jb25maWcAnDxZc+M20u/5FarkJXnIrC57PPWVH0ASJBHxGgCUZL+wtB7N
+H4sICFc5YmEAAy5jb25maWcAnDxZc+M20u/5FarkJXnIrC57PPWVH0ASJBHxGgCUZL+wtB7N
 xLU+srKdZP79dgM8ABDUTL5UKrG6G1ej0Rca/OmHn2bk7fX58fB6f3d4ePg6+3J8Op4Or8dP
 s8/3D8f/m0XlrCjljEZMvgPi7P7p7e9/HU6Pl+vZxbvFxbv5r6e79WxzPD0dH2bh89Pn+y9v
 0P7++emHn34IyyJmSROGzZZywcqikXQvr388HE53v1+uf33A3n79cnc3+zkJw19mi8W75bv5
@@ -1375,7 +1160,7 @@ gdRazqZnFUDbPR3OpRuduKdz8IEC64pCl1H0dT7aKq3x5B74K81Z0PAG6knfZrm5LeMyBUGv
 pyO1B+Ce9vAH/2a2Ks8ZrC8SPWPTvGfGwC4SCJi1vYWgnM/w5SaTfoDydKDi63C8GM2AIBtE
 W2fCbYLvpIDeSDqeDPTF0f8DZ1nmpYDSAwA=
 
---qDbXVdCdHGoSgWSk
+--IJpNTDwzlM2Ie8A6
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -1386,4 +1171,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---qDbXVdCdHGoSgWSk--
+--IJpNTDwzlM2Ie8A6--
