@@ -2,53 +2,56 @@ Return-Path: <SRS0=9Ttc=O6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC51DC43217
-	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 15:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BBFC433EF
+	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 15:09:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 886CA60F6E
-	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 15:09:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 886CA60F6E
+	by mail.kernel.org (Postfix) with ESMTP id 0A21861058
+	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 15:09:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0A21861058
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CEAF4B0A0;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B47BE4B0CE;
 	Sun, 10 Oct 2021 11:09:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EfpCeUvxoETE; Sun, 10 Oct 2021 11:09:29 -0400 (EDT)
+	with ESMTP id PDEmtSzXnXQ0; Sun, 10 Oct 2021 11:09:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06DB94B0C0;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D7FF4B0F4;
 	Sun, 10 Oct 2021 11:09:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E920A4B0BE
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 11:09:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B1C64B0B8
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 11:09:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t3WaHa8MwGyu for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Wwl0Iz-9Pv6U for <kvmarm@lists.cs.columbia.edu>;
  Sun, 10 Oct 2021 11:09:25 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB2414B091
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9F1C4B08D
  for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 11:09:25 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id AD94760ED4;
+ by mail.kernel.org (Postfix) with ESMTPSA id F02C260F6E;
  Sun, 10 Oct 2021 15:09:24 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mZaS2-00FrmD-Eu; Sun, 10 Oct 2021 16:09:22 +0100
+ id 1mZaS3-00FrmD-4y; Sun, 10 Oct 2021 16:09:23 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 0/5] KVM: arm64: Assorted vgic-v3 fixes
-Date: Sun, 10 Oct 2021 16:09:05 +0100
-Message-Id: <20211010150910.2911495-1-maz@kernel.org>
+Subject: [PATCH v2 2/5] KVM: arm64: vgic-v3: Work around GICv3 locally
+ generated SErrors
+Date: Sun, 10 Oct 2021 16:09:07 +0100
+Message-Id: <20211010150910.2911495-3-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211010150910.2911495-1-maz@kernel.org>
+References: <20211010150910.2911495-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -75,56 +78,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Here's a bunch of vgic-v3 fixes I have been sitting on for some
-time. None of them are critical, though some are rather entertaining.
+The infamous M1 has a feature nobody else ever implemented,
+in the form of the "GIC locally generated SError interrupts",
+also known as SEIS for short.
 
-The first one is a leftover from the initial Apple-M1 enablement,
-which doesn't advertise the GIC support via ID_AA64PFR0_EL1 (which is
-expected, as it only has half a GIC...). We address it by forcefully
-advertising the feature if the guest has a GICv3.
+These SErrors are generated when a guest does something that violates
+the GIC state machine. It would have been simpler to just *ignore*
+the damned thing, but that's not what this HW does. Oh well.
 
-The second patch is really fun, and shows how things can go wrong when
-they are badly specified. The gist of it is that on systems that
-advertise ICH_VTR_EL2.SEIS, we need to fallback to the full GICv3
-cpuif emulation. The third patch is an good optimisation on the
-previous one, and the fourth a direct consequence of the whole thing.
+This part of of the architecture is also amazingly under-specified.
+There is a whole 10 lines that describe the feature in a spec that
+is 930 pages long, and some of these lines are factually wrong.
+Oh, and it is deprecated, so the insentive to clarify it is low.
 
-The last patch are more of a harmless oddity: virtual LPIs happen to
-have an active state buried into the pseudocode (and only there). Fun!
-Nothing goes wrong with that, but we need to align the emulation to
-match the pseudocode.
+Now, the spec says that this should be a *virtual* SError when
+HCR_EL2.AMO is set. As it turns out, that's not always the case
+on this CPU, and the SError sometimes fires on the host as a
+physical SError. Goodbye, cruel world. This clearly is a HW bug,
+and it means that a guest can easily take the host down, on demand.
 
-All of this is only targeting 5.16, and I don't plan to backport any
-of it.
+Thankfully, we have seen systems that were just as broken in the
+past, and we have the perfect vaccine for it.
 
-* From v1 [1]:
+Apple M1, please meet the Cavium ThunderX workaround. All your
+GIC accesses will be trapped, sanitised, and emulated. Only the
+signalling aspect of the HW will be used. It won't be super speedy,
+but it will at least be safe. You're most welcome.
 
-  - Dropped the patch that tried to optimise what to do with an active
-    LPI. There is unfortunately a bad corner case in the pseudocode
-    that prevents it. Oh well.
-    
-  - Added an extra patch to help in the case where ICH_HCR_EL2.TDS is
-    supported, and that we can use that instead of ICH_HCR_EL2.TC to
-    trap only ICC_DIR_EL1. Given the performance improvement, it was
-    too hard to ignore it.
+Given that this has only ever been seen on this single implementation,
+that the spec is unclear at best and that we cannot trust it to ever
+be implemented correctly, gate the workaround solely on ICH_VTR_EL2.SEIS
+being set.
 
-[1] https://lore.kernel.org/r/20210924082542.2766170-1-maz@kernel.org
+Tested-by: Joey Gouly <joey.gouly@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-v3.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Marc Zyngier (5):
-  KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3
-  KVM: arm64: vgic-v3: Work around GICv3 locally generated SErrors
-  KVM: arm64: vgic-v3: Reduce common group trapping to ICV_DIR_EL1 when
-    possible
-  KVM: arm64: vgic-v3: Don't advertise ICC_CTLR_EL1.SEIS
-  KVM: arm64: vgic-v3: Align emulated cpuif LPI state machine with the
-    pseudocode
-
- arch/arm64/include/asm/sysreg.h |  3 +++
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 22 ++++++++--------------
- arch/arm64/kvm/sys_regs.c       |  5 +++++
- arch/arm64/kvm/vgic/vgic-v3.c   | 21 ++++++++++++++++++---
- 4 files changed, 34 insertions(+), 17 deletions(-)
-
+diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+index 21a6207fb2ee..ae59e2580bf5 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-v3.c
+@@ -671,6 +671,14 @@ int vgic_v3_probe(const struct gic_kvm_info *info)
+ 		group1_trap = true;
+ 	}
+ 
++	if (kvm_vgic_global_state.ich_vtr_el2 & ICH_VTR_SEIS_MASK) {
++		kvm_info("GICv3 with locally generated SEI\n");
++
++		group0_trap = true;
++		group1_trap = true;
++		common_trap = true;
++	}
++
+ 	if (group0_trap || group1_trap || common_trap) {
+ 		kvm_info("GICv3 sysreg trapping enabled ([%s%s%s], reduced performance)\n",
+ 			 group0_trap ? "G0" : "",
 -- 
 2.30.2
 
