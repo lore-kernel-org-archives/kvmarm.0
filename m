@@ -2,77 +2,76 @@ Return-Path: <SRS0=9Ttc=O6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 105D6C433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 14:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE188C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 14:56:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 998A8610C7
-	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 14:56:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 998A8610C7
+	by mail.kernel.org (Postfix) with ESMTP id 9E14A61058
+	for <kvmarm@archiver.kernel.org>; Sun, 10 Oct 2021 14:56:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9E14A61058
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49B4B4B0C2;
-	Sun, 10 Oct 2021 10:56:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 50FED49F5F;
+	Sun, 10 Oct 2021 10:56:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6j0g9-IwFGx6; Sun, 10 Oct 2021 10:56:46 -0400 (EDT)
+	with ESMTP id LfRfpVSUU7rv; Sun, 10 Oct 2021 10:56:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A8674B0DB;
-	Sun, 10 Oct 2021 10:56:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4F444B0D6;
+	Sun, 10 Oct 2021 10:56:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F5BF49F5F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 10:56:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08F3B4B08F
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 10:56:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WpZxZDd5eMgv for <kvmarm@lists.cs.columbia.edu>;
- Sun, 10 Oct 2021 10:56:43 -0400 (EDT)
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com
- [209.85.160.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F7994B0D0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 10:56:43 -0400 (EDT)
-Received: by mail-qt1-f201.google.com with SMTP id
- t15-20020ac8588f000000b002a777ee14d0so4341512qta.14
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 07:56:43 -0700 (PDT)
+ with ESMTP id yfwVcIfM5qGd for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 10 Oct 2021 10:56:46 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EC244A500
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 10:56:45 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ y16-20020a2586d0000000b005b752db8f97so19668396ybm.18
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Oct 2021 07:56:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=2yxyszH2o0l7PmvxhJ6rJ+q2kN5pLUdYHnvLPGFqiZk=;
- b=T1apfSHiw0BEncB76X8A+leVkZjV5dDbjRgeJHlBhIbdjj2bwXGzl8IWHzCFzzg8FD
- tJyqCZ0TXhV1qEqmZ2+ldqCD6ABEh8d6In2njfTxPpEV5PJw8TA17PBGyCYqIBcKnTiT
- viT3TiZb/hUlhXGayVK5f9K0fTWc4MAzb8tCI/uVcmNFeTJ56BoWIUMpIHCad8UAWeO7
- kMVy6jmhuOKR+sP6odiKul8y/ToG3qSw2IEGC7GdcgcHg1/52z7eC1+R0/3bh14+m6YD
- s6HvrTz2NXnD5f0CenqdeA4ewPA81LYej1N3zS+AvIZ0hLag6ag1YvEZcFdEYxRw1C6n
- ZTDg==
+ :cc; bh=ggCms3/HNX7c/KS1nwwEKEZy7phtvlo/XJOcqPY/Coc=;
+ b=pOHT9YeqtNWE9kWJyQ8xguGxrkPWqy43O912NmZrchZXQbeLhHFT9Qj+56h0dGFdPx
+ PRfwaomAdmmssH2mAWr0qoh2y9UYK6TkLtI8VL5hp5J/0ZOC2IR05wFAfAohcrHgjOGv
+ fM0OGhHgmrGqNo2TH5BRfg+3fDpr0/+t8ZsTug8VHHOI/BjzQ8N5ymJCHlH1GCImZ38M
+ JGPWagGqAFOuYk1Qz8pwcdlIhXkoMcvhjnFKzPol6VumX7y2kqvo7tTAD7YGIJCg9cwz
+ AsWkhC/AJnIqGCBj23yzyD+7VB4RkCIm5xntJmHDbZEXbQpeIozSSLpGL0X872Uox/XB
+ JN7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=2yxyszH2o0l7PmvxhJ6rJ+q2kN5pLUdYHnvLPGFqiZk=;
- b=2bgsWbN7zEjrxuRX4DlQs5+20wH7nOAKeilFV3Aj0De+yQL67pH28zW1PWTmZHXJ9S
- jB0QS0ywSFCmJWGgN54ph+18HzJHGJkF6HQbL7wqcM85aarj1Ush4ijsjK6b9U0T6MZX
- 6/Lu3Mh2Va6n39rJ+pto68FjjV91caNtmOBaWTOsYWsgeRPg8hvxMbetO9JgBxxmEHKh
- G+rg1Q6eitXWCl+L9fwDBKeD6peBvjyoYfT2G5cU9PNloevRqCC93biHLkqKwDFNgkqZ
- mtVDQCR60+RJPkoPWL6I8lxia7K4AWSVTfyxM26ZOk1bjrjWL5HuW2rOIy8d1P5qNc9Q
- 5vNA==
-X-Gm-Message-State: AOAM533czcgbmGKBxDvQZUqq0tltmXMqVvVJapommyrx+B+VTxpH7xd4
- V0BfWk7Rhb6O5vqqyROOANAO4lZYP8jlb4Lxqfee8u4UIskyk7rppQ2ibVeBDQRfBlkdNr5C/lV
- LCSpjwVGo+ujFcCHiKj0CW+wpYapqK6Dg0bzGy4DkFqkbxwW4jb3O3GPC3BdlNr0lM5o=
-X-Google-Smtp-Source: ABdhPJzj3B4OpNfjLvAOsVB/XzS3C09XWa44/mwOZkz7b4EAq/m+irtZsK0VzwPEfzObqrs9x98Hz993Ow==
+ bh=ggCms3/HNX7c/KS1nwwEKEZy7phtvlo/XJOcqPY/Coc=;
+ b=fDv/30di9VE7Ne33slvYCEiQETFL8LF85F5iDCRdnobNLhMdybXVWMY1yAdthFvwGz
+ oy2wNw73truyOp6nZPxVByXWCB+G23PMwjqCANsRwlFYPG3rYwfQ5mL9HgxfKYehq4K6
+ YqMAWmGpXT6CwtPG5DANKbHNPkfNf1Dt9ap7qVHylIatW0xHWOWvIxiYf8NyT+IGglem
+ LUlHpr+gMNUhYfqyov0hPlSpsnk6g30+rUQvJQXThhz7N0h9WI5UUHORTa/x/ejrqnbX
+ 4b6r5iyQPa/rRrXVYFoODFQrOG8GdEe4iF1PF1lUoXzEwddVBLmWfzHuxSKaxiIktY29
+ CUDg==
+X-Gm-Message-State: AOAM533eURMYvwM3umR6ciJ82Hdb1pJYTwSjfcKI5NMPPAYlMi+XbdBs
+ p3fo8ziVKJooKYeOCD+ox592NOS/eywMFMHHB2x7hg5h0i+j7uxHwVIsbL4cPVI7IRzUUBxomo7
+ /xaO+dazxdLPdDxYzmG7hRkSIjt6tUGDByJWihvnhNTOWEQrT5pwd5qzKJnGDxSeKR6A=
+X-Google-Smtp-Source: ABdhPJzrtLZxqhoO1ON6XB+XtprU3PLpoL8ilY3/SoaiDd0gHlfYXc4+xSenYiD1v6Vw9Z3qxcRdw34YKw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:ac8:5bcf:: with SMTP id
- b15mr9860202qtb.178.1633877802740; 
- Sun, 10 Oct 2021 07:56:42 -0700 (PDT)
-Date: Sun, 10 Oct 2021 15:56:27 +0100
+ (user=tabba job=sendgmr) by 2002:a25:3491:: with SMTP id
+ b139mr15596552yba.229.1633877804854; 
+ Sun, 10 Oct 2021 07:56:44 -0700 (PDT)
+Date: Sun, 10 Oct 2021 15:56:28 +0100
 In-Reply-To: <20211010145636.1950948-1-tabba@google.com>
-Message-Id: <20211010145636.1950948-3-tabba@google.com>
+Message-Id: <20211010145636.1950948-4-tabba@google.com>
 Mime-Version: 1.0
 References: <20211010145636.1950948-1-tabba@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH v8 02/11] KVM: arm64: Don't include switch.h into
- nvhe/kvm-main.c
+Subject: [PATCH v8 03/11] KVM: arm64: Move early handlers to per-EC handlers
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, kvm@vger.kernel.org, maz@kernel.org,
@@ -95,28 +94,282 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Marc Zyngier <maz@kernel.org>
 
-hyp-main.c includes switch.h while it only requires adjust-pc.h.
-Fix it to remove an unnecessary dependency.
+Simplify the early exception handling by slicing the gigantic decoding
+tree into a more manageable set of functions, similar to what we have
+in handle_exit.c.
+
+This will also make the structure reusable for pKVM's own early exit
+handling.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 160 ++++++++++++++----------
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  16 +++
+ arch/arm64/kvm/hyp/vhe/switch.c         |  16 +++
+ 3 files changed, 124 insertions(+), 68 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 2da6aa8da868..8ca1104f4774 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -4,7 +4,7 @@
-  * Author: Andrew Scull <ascull@google.com>
-  */
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 54abc8298ec3..1e4177322be7 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -136,16 +136,7 @@ static inline void ___deactivate_traps(struct kvm_vcpu *vcpu)
  
--#include <hyp/switch.h>
-+#include <hyp/adjust_pc.h>
+ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
+ {
+-	u8 ec;
+-	u64 esr;
+-
+-	esr = vcpu->arch.fault.esr_el2;
+-	ec = ESR_ELx_EC(esr);
+-
+-	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
+-		return true;
+-
+-	return __get_fault_info(esr, &vcpu->arch.fault);
++	return __get_fault_info(vcpu->arch.fault.esr_el2, &vcpu->arch.fault);
+ }
  
- #include <asm/pgtable-types.h>
- #include <asm/kvm_asm.h>
+ static inline void __hyp_sve_save_host(struct kvm_vcpu *vcpu)
+@@ -166,8 +157,13 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+ 	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
+ }
+ 
+-/* Check for an FPSIMD/SVE trap and handle as appropriate */
+-static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
++/*
++ * We trap the first access to the FP/SIMD to save the host context and
++ * restore the guest context lazily.
++ * If FP/SIMD is not implemented, handle the trap and inject an undefined
++ * instruction exception to the guest. Similarly for trapped SVE accesses.
++ */
++static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	bool sve_guest, sve_host;
+ 	u8 esr_ec;
+@@ -185,9 +181,6 @@ static inline bool __hyp_handle_fpsimd(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	esr_ec = kvm_vcpu_trap_get_class(vcpu);
+-	if (esr_ec != ESR_ELx_EC_FP_ASIMD &&
+-	    esr_ec != ESR_ELx_EC_SVE)
+-		return false;
+ 
+ 	/* Don't handle SVE traps for non-SVE vcpus here: */
+ 	if (!sve_guest && esr_ec != ESR_ELx_EC_FP_ASIMD)
+@@ -325,7 +318,7 @@ static inline bool esr_is_ptrauth_trap(u32 esr)
+ 
+ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ 
+-static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
++static bool kvm_hyp_handle_ptrauth(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	struct kvm_cpu_context *ctxt;
+ 	u64 val;
+@@ -350,6 +343,87 @@ static inline bool __hyp_handle_ptrauth(struct kvm_vcpu *vcpu)
+ 	return true;
+ }
+ 
++static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
++	    handle_tx2_tvm(vcpu))
++		return true;
++
++	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
++	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
++		return true;
++
++	return false;
++}
++
++static bool kvm_hyp_handle_cp15_32(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
++	    __vgic_v3_perform_cpuif_access(vcpu) == 1)
++		return true;
++
++	return false;
++}
++
++static bool kvm_hyp_handle_iabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (!__populate_fault_info(vcpu))
++		return true;
++
++	return false;
++}
++
++static bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (!__populate_fault_info(vcpu))
++		return true;
++
++	if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
++		bool valid;
++
++		valid = kvm_vcpu_trap_get_fault_type(vcpu) == FSC_FAULT &&
++			kvm_vcpu_dabt_isvalid(vcpu) &&
++			!kvm_vcpu_abt_issea(vcpu) &&
++			!kvm_vcpu_abt_iss1tw(vcpu);
++
++		if (valid) {
++			int ret = __vgic_v2_perform_cpuif_access(vcpu);
++
++			if (ret == 1)
++				return true;
++
++			/* Promote an illegal access to an SError.*/
++			if (ret == -1)
++				*exit_code = ARM_EXCEPTION_EL1_SERROR;
++		}
++	}
++
++	return false;
++}
++
++typedef bool (*exit_handler_fn)(struct kvm_vcpu *, u64 *);
++
++static const exit_handler_fn *kvm_get_exit_handler_array(void);
++
++/*
++ * Allow the hypervisor to handle the exit with an exit handler if it has one.
++ *
++ * Returns true if the hypervisor handled the exit, and control should go back
++ * to the guest, or false if it hasn't.
++ */
++static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	const exit_handler_fn *handlers = kvm_get_exit_handler_array();
++	exit_handler_fn fn;
++
++	fn = handlers[kvm_vcpu_trap_get_class(vcpu)];
++
++	if (fn)
++		return fn(vcpu, exit_code);
++
++	return false;
++}
++
+ /*
+  * Return true when we were able to fixup the guest exit and should return to
+  * the guest, false when we should restore the host state and return to the
+@@ -384,59 +458,9 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	if (*exit_code != ARM_EXCEPTION_TRAP)
+ 		goto exit;
+ 
+-	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
+-	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 &&
+-	    handle_tx2_tvm(vcpu))
++	/* Check if there's an exit handler and allow it to handle the exit. */
++	if (kvm_hyp_handle_exit(vcpu, exit_code))
+ 		goto guest;
+-
+-	/*
+-	 * We trap the first access to the FP/SIMD to save the host context
+-	 * and restore the guest context lazily.
+-	 * If FP/SIMD is not implemented, handle the trap and inject an
+-	 * undefined instruction exception to the guest.
+-	 * Similarly for trapped SVE accesses.
+-	 */
+-	if (__hyp_handle_fpsimd(vcpu))
+-		goto guest;
+-
+-	if (__hyp_handle_ptrauth(vcpu))
+-		goto guest;
+-
+-	if (!__populate_fault_info(vcpu))
+-		goto guest;
+-
+-	if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
+-		bool valid;
+-
+-		valid = kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW &&
+-			kvm_vcpu_trap_get_fault_type(vcpu) == FSC_FAULT &&
+-			kvm_vcpu_dabt_isvalid(vcpu) &&
+-			!kvm_vcpu_abt_issea(vcpu) &&
+-			!kvm_vcpu_abt_iss1tw(vcpu);
+-
+-		if (valid) {
+-			int ret = __vgic_v2_perform_cpuif_access(vcpu);
+-
+-			if (ret == 1)
+-				goto guest;
+-
+-			/* Promote an illegal access to an SError.*/
+-			if (ret == -1)
+-				*exit_code = ARM_EXCEPTION_EL1_SERROR;
+-
+-			goto exit;
+-		}
+-	}
+-
+-	if (static_branch_unlikely(&vgic_v3_cpuif_trap) &&
+-	    (kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_SYS64 ||
+-	     kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_CP15_32)) {
+-		int ret = __vgic_v3_perform_cpuif_access(vcpu);
+-
+-		if (ret == 1)
+-			goto guest;
+-	}
+-
+ exit:
+ 	/* Return to the host kernel and handle the exit */
+ 	return false;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index a34b01cc8ab9..4f3992a1aabd 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -158,6 +158,22 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+ 		write_sysreg(pmu->events_host, pmcntenset_el0);
+ }
+ 
++static const exit_handler_fn hyp_exit_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
++	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
++	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
++	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
++	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
++	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
++	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
++};
++
++static const exit_handler_fn *kvm_get_exit_handler_array(void)
++{
++	return hyp_exit_handlers;
++}
++
+ /* Switch to the guest for legacy non-VHE systems */
+ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index ded2c66675f0..9aedc8afc8b9 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -96,6 +96,22 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps_common(vcpu);
+ }
+ 
++static const exit_handler_fn hyp_exit_handlers[] = {
++	[0 ... ESR_ELx_EC_MAX]		= NULL,
++	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
++	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
++	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
++	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
++	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
++	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
++	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
++};
++
++static const exit_handler_fn *kvm_get_exit_handler_array(void)
++{
++	return hyp_exit_handlers;
++}
++
+ /* Switch to the guest for VHE systems running in EL2 */
+ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ {
 -- 
 2.33.0.882.g93a45727a2-goog
 
