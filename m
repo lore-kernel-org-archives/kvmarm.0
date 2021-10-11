@@ -2,52 +2,72 @@ Return-Path: <SRS0=aM0J=O7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F3AC433FE
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 10:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58051C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 11:39:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D10D560EB4
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 10:57:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D10D560EB4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id C318960F21
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 11:39:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C318960F21
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E63D4B11E;
-	Mon, 11 Oct 2021 06:57:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 491854B0AC;
+	Mon, 11 Oct 2021 07:39:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id l-1ckxdyYaOu; Mon, 11 Oct 2021 06:57:22 -0400 (EDT)
+	with ESMTP id vpgdMOlJnp0x; Mon, 11 Oct 2021 07:39:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33F9D4B0E1;
-	Mon, 11 Oct 2021 06:57:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A8744B0B9;
+	Mon, 11 Oct 2021 07:39:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C3224B0A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 06:57:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 854AE4B0AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 07:39:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZYkcNU891NMp for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Oct 2021 06:57:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 234A94B0B6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 06:57:19 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C682BED1;
- Mon, 11 Oct 2021 03:57:18 -0700 (PDT)
-Received: from monolith.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A8B53F66F;
- Mon, 11 Oct 2021 03:57:17 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- drjones@redhat.com
-Subject: [PATCH v2 3/3] KVM: arm64: Replace get_raz_id_reg() with get_raz_reg()
-Date: Mon, 11 Oct 2021 11:58:40 +0100
-Message-Id: <20211011105840.155815-4-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211011105840.155815-1-alexandru.elisei@arm.com>
-References: <20211011105840.155815-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
+ with ESMTP id FfisXZiAcieq for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Oct 2021 07:39:48 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3ED584B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 07:39:48 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1EDE060EE2;
+ Mon, 11 Oct 2021 11:39:47 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mZtei-00Fzw0-Ty; Mon, 11 Oct 2021 12:39:45 +0100
+Date: Mon, 11 Oct 2021 12:39:44 +0100
+Message-ID: <87pmsbpz7j.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v8 07/11] KVM: arm64: Add handlers for protected VM System
+ Registers
+In-Reply-To: <20211010145636.1950948-8-tabba@google.com>
+References: <20211010145636.1950948-1-tabba@google.com>
+ <20211010145636.1950948-8-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com,
+ pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,57 +84,245 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Reading a RAZ ID register isn't different from reading any other RAZ
-register, so get rid of get_raz_id_reg() and replace it with get_raz_reg(),
-which does the same thing, but does it without going through two layers of
-indirection.
+On Sun, 10 Oct 2021 15:56:32 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Add system register handlers for protected VMs. These cover Sys64
+> registers (including feature id registers), and debug.
+> 
+> No functional change intended as these are not hooked in yet to
+> the guest exit handlers introduced earlier. So when trapping is
+> triggered, the exit handlers let the host handle it, as before.
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 
-No functional change.
+[...]
 
-Suggested-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+> +/*
+> + * Architected system registers.
+> + * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> + *
+> + * NOTE: Anything not explicitly listed here is *restricted by default*, i.e.,
+> + * it will lead to injecting an exception into the guest.
+> + */
+> +static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+> +	/* Cache maintenance by set/way operations are restricted. */
+> +
+> +	/* Debug and Trace Registers are restricted. */
+> +
+> +	/* AArch64 mappings of the AArch32 ID registers */
+> +	/* CRm=1 */
+> +	AARCH32(SYS_ID_PFR0_EL1),
+> +	AARCH32(SYS_ID_PFR1_EL1),
+> +	AARCH32(SYS_ID_DFR0_EL1),
+> +	AARCH32(SYS_ID_AFR0_EL1),
+> +	AARCH32(SYS_ID_MMFR0_EL1),
+> +	AARCH32(SYS_ID_MMFR1_EL1),
+> +	AARCH32(SYS_ID_MMFR2_EL1),
+> +	AARCH32(SYS_ID_MMFR3_EL1),
+> +
+> +	/* CRm=2 */
+> +	AARCH32(SYS_ID_ISAR0_EL1),
+> +	AARCH32(SYS_ID_ISAR1_EL1),
+> +	AARCH32(SYS_ID_ISAR2_EL1),
+> +	AARCH32(SYS_ID_ISAR3_EL1),
+> +	AARCH32(SYS_ID_ISAR4_EL1),
+> +	AARCH32(SYS_ID_ISAR5_EL1),
+> +	AARCH32(SYS_ID_MMFR4_EL1),
+> +	AARCH32(SYS_ID_ISAR6_EL1),
+> +
+> +	/* CRm=3 */
+> +	AARCH32(SYS_MVFR0_EL1),
+> +	AARCH32(SYS_MVFR1_EL1),
+> +	AARCH32(SYS_MVFR2_EL1),
+> +	AARCH32(SYS_ID_PFR2_EL1),
+> +	AARCH32(SYS_ID_DFR1_EL1),
+> +	AARCH32(SYS_ID_MMFR5_EL1),
+> +
+> +	/* AArch64 ID registers */
+> +	/* CRm=4 */
+> +	AARCH64(SYS_ID_AA64PFR0_EL1),
+> +	AARCH64(SYS_ID_AA64PFR1_EL1),
+> +	AARCH64(SYS_ID_AA64ZFR0_EL1),
+> +	AARCH64(SYS_ID_AA64DFR0_EL1),
+> +	AARCH64(SYS_ID_AA64DFR1_EL1),
+> +	AARCH64(SYS_ID_AA64AFR0_EL1),
+> +	AARCH64(SYS_ID_AA64AFR1_EL1),
+> +	AARCH64(SYS_ID_AA64ISAR0_EL1),
+> +	AARCH64(SYS_ID_AA64ISAR1_EL1),
+> +	AARCH64(SYS_ID_AA64MMFR0_EL1),
+> +	AARCH64(SYS_ID_AA64MMFR1_EL1),
+> +	AARCH64(SYS_ID_AA64MMFR2_EL1),
+> +
+> +	HOST_HANDLED(SYS_SCTLR_EL1),
+> +	HOST_HANDLED(SYS_ACTLR_EL1),
+> +	HOST_HANDLED(SYS_CPACR_EL1),
+> +
+> +	HOST_HANDLED(SYS_RGSR_EL1),
+> +	HOST_HANDLED(SYS_GCR_EL1),
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1be827740f87..3aff06aafd0c 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1273,12 +1273,6 @@ static int set_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	return __set_id_reg(vcpu, rd, uaddr, raz);
- }
- 
--static int get_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
--			  const struct kvm_one_reg *reg, void __user *uaddr)
--{
--	return __get_id_reg(vcpu, rd, uaddr, true);
--}
--
- static int set_raz_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 			  const struct kvm_one_reg *reg, void __user *uaddr)
- {
-@@ -1402,7 +1396,7 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- #define ID_UNALLOCATED(crm, op2) {			\
- 	Op0(3), Op1(0), CRn(0), CRm(crm), Op2(op2),	\
- 	.access = access_raz_id_reg,			\
--	.get_user = get_raz_id_reg,			\
-+	.get_user = get_raz_reg,			\
- 	.set_user = set_raz_id_reg,			\
- }
- 
-@@ -1414,7 +1408,7 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- #define ID_HIDDEN(name) {			\
- 	SYS_DESC(SYS_##name),			\
- 	.access = access_raz_id_reg,		\
--	.get_user = get_raz_id_reg,		\
-+	.get_user = get_raz_reg,		\
- 	.set_user = set_raz_id_reg,		\
- }
- 
+What is the expected semantics of this handling? These registers are
+free to use by the guest unless MTE is disabled. Either the guest
+accesses them directly (no trap), accesses them while MTE is disabled
+(trap), or access them when MTE doesn't exist.
+
+The first and last cases are invisible to EL2. For the second case,
+why should we go back to EL1 rather than injecting an UNDEF directly?
+
+> +
+> +	/* Scalable Vector Registers are restricted. */
+> +
+> +	HOST_HANDLED(SYS_TTBR0_EL1),
+> +	HOST_HANDLED(SYS_TTBR1_EL1),
+> +	HOST_HANDLED(SYS_TCR_EL1),
+
+None of these should normally trap unless we are handling an erratum
+(such as Cavium 219) or that we have HCR_EL2.TVM set. The former is
+handled at EL2, and I don't expect any Set/Way emulation to require
+the latter.
+
+> +
+> +	HOST_HANDLED(SYS_APIAKEYLO_EL1),
+> +	HOST_HANDLED(SYS_APIAKEYHI_EL1),
+> +	HOST_HANDLED(SYS_APIBKEYLO_EL1),
+> +	HOST_HANDLED(SYS_APIBKEYHI_EL1),
+> +	HOST_HANDLED(SYS_APDAKEYLO_EL1),
+> +	HOST_HANDLED(SYS_APDAKEYHI_EL1),
+> +	HOST_HANDLED(SYS_APDBKEYLO_EL1),
+> +	HOST_HANDLED(SYS_APDBKEYHI_EL1),
+> +	HOST_HANDLED(SYS_APGAKEYLO_EL1),
+> +	HOST_HANDLED(SYS_APGAKEYHI_EL1),
+
+This is debatable too. If the guest has started using PtrAuth and that
+we haven't handled things in fixup_guest_exit(), why returning to the
+host? This should directly UNDEF.
+
+> +
+> +	HOST_HANDLED(SYS_AFSR0_EL1),
+> +	HOST_HANDLED(SYS_AFSR1_EL1),
+> +	HOST_HANDLED(SYS_ESR_EL1),
+
+Same as TTBR*/TCR.
+
+> +
+> +	HOST_HANDLED(SYS_ERRIDR_EL1),
+> +	HOST_HANDLED(SYS_ERRSELR_EL1),
+> +	HOST_HANDLED(SYS_ERXFR_EL1),
+> +	HOST_HANDLED(SYS_ERXCTLR_EL1),
+> +	HOST_HANDLED(SYS_ERXSTATUS_EL1),
+> +	HOST_HANDLED(SYS_ERXADDR_EL1),
+> +	HOST_HANDLED(SYS_ERXMISC0_EL1),
+> +	HOST_HANDLED(SYS_ERXMISC1_EL1),
+
+This really should be handled as RAZ/WI at EL2.
+
+> +
+> +	HOST_HANDLED(SYS_TFSR_EL1),
+> +	HOST_HANDLED(SYS_TFSRE0_EL1),
+
+Same as RCSR/GSR.
+
+> +
+> +	HOST_HANDLED(SYS_FAR_EL1),
+
+Same as TTBR
+
+> +	HOST_HANDLED(SYS_PAR_EL1),
+
+Does not trap in the absence of FGT (which we don't use yet).
+
+> +
+> +	/* Performance Monitoring Registers are restricted. */
+> +
+> +	HOST_HANDLED(SYS_MAIR_EL1),
+> +	HOST_HANDLED(SYS_AMAIR_EL1),
+
+Same as TTBR.
+
+> +
+> +	/* Limited Ordering Regions Registers are restricted. */
+> +
+> +	HOST_HANDLED(SYS_VBAR_EL1),
+
+Doesn't trap in the absence of FGT.
+
+> +	HOST_HANDLED(SYS_DISR_EL1),
+
+If RAS exists, a DISR_EL1 access is routed to VDISR_EL2. If RAS isn't
+present, this UNDEFs. In any case, there is no trap.
+
+> +
+> +	/* GIC CPU Interface registers are restricted. */
+
+Err... Does this include ICC_SGI*R_EL1/ICC_SRE_EL1? Not going to work
+if you don't let EL1 dealing with this.
+
+> +
+> +	HOST_HANDLED(SYS_CONTEXTIDR_EL1),
+
+Same as TTBR.
+
+> +	HOST_HANDLED(SYS_TPIDR_EL1),
+
+Doesn't trap in the absence of FGT.
+
+> +
+> +	HOST_HANDLED(SYS_SCXTNUM_EL1),
+
+Should UNDEF at EL2 until we actually enable FEAT_CSV2_2.
+
+> +
+> +	HOST_HANDLED(SYS_CNTKCTL_EL1),
+
+Never traps.
+
+> +
+> +	HOST_HANDLED(SYS_CCSIDR_EL1),
+> +	HOST_HANDLED(SYS_CLIDR_EL1),
+> +	HOST_HANDLED(SYS_CSSELR_EL1),
+> +	HOST_HANDLED(SYS_CTR_EL0),
+
+Eventually, we should expose a synthetic version of these at EL2.
+
+> +
+> +	/* Performance Monitoring Registers are restricted. */
+> +
+> +	HOST_HANDLED(SYS_TPIDR_EL0),
+> +	HOST_HANDLED(SYS_TPIDRRO_EL0),
+
+Do not trap in the absence of FGT.
+
+> +
+> +	HOST_HANDLED(SYS_SCXTNUM_EL0),
+
+Should UNDEF at EL2 until we actually enable FEAT_CSV2_2.
+
+> +
+> +	/* Activity Monitoring Registers are restricted. */
+> +
+> +	HOST_HANDLED(SYS_CNTP_TVAL_EL0),
+> +	HOST_HANDLED(SYS_CNTP_CTL_EL0),
+> +	HOST_HANDLED(SYS_CNTP_CVAL_EL0),
+> +
+> +	/* Performance Monitoring Registers are restricted. */
+> +
+> +	HOST_HANDLED(SYS_DACR32_EL2),
+> +	HOST_HANDLED(SYS_IFSR32_EL2),
+> +	HOST_HANDLED(SYS_FPEXC32_EL2),
+
+I don't understand the presence of these registers here. As the name
+indicates, they are 32bit only.
+
+We need a complete overhaul of this table. I'm going to go through the
+rest of the patches, and we can then fix this.
+
+Thanks,
+
+	M.
+
 -- 
-2.33.0
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
