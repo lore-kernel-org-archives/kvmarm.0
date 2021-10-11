@@ -2,95 +2,70 @@ Return-Path: <SRS0=aM0J=O7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D72C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 12:45:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B36EDC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 13:11:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DDD4A60F3A
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 12:45:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DDD4A60F3A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 295B860EE7
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 13:11:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 295B860EE7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 827624B0B8;
-	Mon, 11 Oct 2021 08:45:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB4ED4B0F7;
+	Mon, 11 Oct 2021 09:11:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2jJyG4vCcyV0; Mon, 11 Oct 2021 08:45:55 -0400 (EDT)
+	with ESMTP id ijZbdO2o0Xj3; Mon, 11 Oct 2021 09:11:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A3374B0BD;
-	Mon, 11 Oct 2021 08:45:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CA294B0C5;
+	Mon, 11 Oct 2021 09:11:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 157DF4B0BD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 08:45:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD15F4B0C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 09:11:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T7-jQR4Ie8nw for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Oct 2021 08:45:53 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D2BA4B0B8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 08:45:53 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633956353;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=HLQTlu/zNNIUvc/JMMQ+IXkLoOHLj3d35ae3vo+SDqM=;
- b=S3tAMZdKAev320J7mPdD6f2BKgVml86fVNTqZ90iz02BzWTKmn67166i5mYdrsDJjkSLLj
- K5+ulJoQkJTGbhaKUyBPIrHEfdRE1fOWpli20IPAFkxMXsYHYmjyYs531x123aPRLklrGR
- UdW11+S57Nf7jPHuXI7421MNkcp0AL0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-604-YbtKPo2uMYSo3LIQEu3MiQ-1; Mon, 11 Oct 2021 08:45:52 -0400
-X-MC-Unique: YbtKPo2uMYSo3LIQEu3MiQ-1
-Received: by mail-wr1-f71.google.com with SMTP id
- f11-20020adfc98b000000b0015fedc2a8d4so13226542wrh.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 05:45:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=HLQTlu/zNNIUvc/JMMQ+IXkLoOHLj3d35ae3vo+SDqM=;
- b=FW7iORSKxQ6c7M5Rot8NsA0vzoOpsmQazuq4FaUq7Yi95L7JagWX8RGnLerHZZ2ZXT
- qpRsegMLkgSvKfBsJNtaGeb/1NPWksGhZRsYOx1E8cBx4GpPQFN63P1gOl0n58U+F43i
- 7X4dGaH0TAKq9A0NbiqRD6p327yzfT+eqZUHvc6zpJRQqfkb8VQir+tUeVVVl/ngcvzX
- KWhwjn1i6zaD/zFjgkQZHNxlY2Dzk3tNye/O2modNTmaH+AY87f2ubqboRveSTmYa3H9
- SkqcskkCoHqQmm7vKb/1pjS5SBUeNuUXBihT5hSbj+c152c/U+xBdRxlvSBnAduErXDC
- jO7A==
-X-Gm-Message-State: AOAM531bjUYjZ5pPdJJ3rbLfh7lSxSUKshoYdFQRbK1T/j7EqdlVzinR
- 0XKMN2hiuSpvcidaGoCURJX5WtfJirsHarA0xo9dtxWmIbFtw6AyJIqpf6Nef4IiVzkmgllYmhO
- UWm4tEbMPwDbExWlSVCn7TK4m
-X-Received: by 2002:a05:6000:154b:: with SMTP id
- 11mr2699302wry.422.1633956350974; 
- Mon, 11 Oct 2021 05:45:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz8MvAutDCZCeoaqhsVZYtxlzZFMh6u60EhMSoLVe/183YCy9wLAIjPrPbKXmZuEd0G6NB6Nw==
-X-Received: by 2002:a05:6000:154b:: with SMTP id
- 11mr2699283wry.422.1633956350872; 
- Mon, 11 Oct 2021 05:45:50 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
- by smtp.gmail.com with ESMTPSA id 143sm21226770wma.37.2021.10.11.05.45.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 Oct 2021 05:45:50 -0700 (PDT)
-Date: Mon, 11 Oct 2021 14:45:49 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Replace get_raz_id_reg() with
- get_raz_reg()
-Message-ID: <20211011124549.z5xhyicyfoptfayy@gator>
-References: <20211011105840.155815-1-alexandru.elisei@arm.com>
- <20211011105840.155815-4-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-In-Reply-To: <20211011105840.155815-4-alexandru.elisei@arm.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id 0wlFZm1FODcP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Oct 2021 09:11:05 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EBA8407ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 09:11:05 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 08D9160EE7;
+ Mon, 11 Oct 2021 13:11:04 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mZv53-00G0qm-Mh; Mon, 11 Oct 2021 14:11:01 +0100
+Date: Mon, 11 Oct 2021 14:11:01 +0100
+Message-ID: <87o87vpuze.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v8 11/11] KVM: arm64: Handle protected guests at 32 bits
+In-Reply-To: <20211010145636.1950948-12-tabba@google.com>
+References: <20211010145636.1950948-1-tabba@google.com>
+ <20211010145636.1950948-12-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, mark.rutland@arm.com, christoffer.dall@arm.com,
+ pbonzini@redhat.com, drjones@redhat.com, oupton@google.com, qperret@google.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -108,23 +83,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Oct 11, 2021 at 11:58:40AM +0100, Alexandru Elisei wrote:
-> Reading a RAZ ID register isn't different from reading any other RAZ
-> register, so get rid of get_raz_id_reg() and replace it with get_raz_reg(),
-> which does the same thing, but does it without going through two layers of
-> indirection.
+On Sun, 10 Oct 2021 15:56:36 +0100,
+Fuad Tabba <tabba@google.com> wrote:
 > 
-> No functional change.
+> Protected KVM does not support protected AArch32 guests. However,
+> it is possible for the guest to force run AArch32, potentially
+> causing problems. Add an extra check so that if the hypervisor
+> catches the guest doing that, it can prevent the guest from
+> running again by resetting vcpu->arch.target and returning
+> ARM_EXCEPTION_IL.
 > 
-> Suggested-by: Andrew Jones <drjones@redhat.com>
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> If this were to happen, The VMM can try and fix it by re-
+> initializing the vcpu with KVM_ARM_VCPU_INIT, however, this is
+> likely not possible for protected VMs.
+> 
+> Adapted from commit 22f553842b14 ("KVM: arm64: Handle Asymmetric
+> AArch32 systems")
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
->
+>  arch/arm64/kvm/hyp/nvhe/switch.c | 34 ++++++++++++++++++++++++++++++++
+>  1 file changed, 34 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 2c72c31e516e..f25b6353a598 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -232,6 +232,37 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm *kvm)
+>  	return hyp_exit_handlers;
+>  }
+>  
+> +/*
+> + * Some guests (e.g., protected VMs) are not be allowed to run in AArch32.
+> + * The ARMv8 architecture does not give the hypervisor a mechanism to prevent a
+> + * guest from dropping to AArch32 EL0 if implemented by the CPU. If the
+> + * hypervisor spots a guest in such a state ensure it is handled, and don't
+> + * trust the host to spot or fix it.  The check below is based on the one in
+> + * kvm_arch_vcpu_ioctl_run().
+> + *
+> + * Returns false if the guest ran in AArch32 when it shouldn't have, and
+> + * thus should exit to the host, or true if a the guest run loop can continue.
+> + */
+> +static bool handle_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +{
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> +
+> +	if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu)) {
+> +		/*
+> +		 * As we have caught the guest red-handed, decide that it isn't
+> +		 * fit for purpose anymore by making the vcpu invalid. The VMM
+> +		 * can try and fix it by re-initializing the vcpu with
+> +		 * KVM_ARM_VCPU_INIT, however, this is likely not possible for
+> +		 * protected VMs.
+> +		 */
+> +		vcpu->arch.target = -1;
+> +		*exit_code = ARM_EXCEPTION_IL;
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Aren't we losing a potential SError here, which the original commit
+doesn't need to handle? I'd expect something like:
 
+		*exit_code &= BIT(ARM_EXIT_WITH_SERROR_BIT);
+		*exit_code |= ARM_EXCEPTION_IL;
+
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  /* Switch to the guest for legacy non-VHE systems */
+>  int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  {
+> @@ -294,6 +325,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  		/* Jump in the fire! */
+>  		exit_code = __guest_enter(vcpu);
+>  
+> +		if (unlikely(!handle_aarch32_guest(vcpu, &exit_code)))
+> +			break;
+> +
+>  		/* And we're baaack! */
+>  	} while (fixup_guest_exit(vcpu, &exit_code));
+>  
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
