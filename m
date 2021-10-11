@@ -2,93 +2,102 @@ Return-Path: <SRS0=aM0J=O7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E5CC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 14:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D28C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 14:46:37 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 88E2160EB1
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 14:44:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 88E2160EB1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id DC5C8603E9
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 14:46:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DC5C8603E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F14E749FB7;
-	Mon, 11 Oct 2021 10:44:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41AF94B0DB;
+	Mon, 11 Oct 2021 10:46:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3dT254wz3WmK; Mon, 11 Oct 2021 10:44:36 -0400 (EDT)
+	with ESMTP id ZaCF4PyW2B1H; Mon, 11 Oct 2021 10:46:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CED9D4B0D7;
-	Mon, 11 Oct 2021 10:44:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E1A5407D1;
+	Mon, 11 Oct 2021 10:46:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82DB84B089
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 10:44:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67CC5407D1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 10:46:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Bp2AT5xtbSL5 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Oct 2021 10:44:34 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3787249FB7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 10:44:34 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1633963473;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=7Vj8W7APBY2fyggKtVX8y6tenS0g5ttledn1kYzTma0=;
- b=RhvqJL7pkJVx2PpAI4jaWzTCvgEioD/pcwfYR7b9woYch8FhIHIxVarTrQzLqwVSj7/yPM
- xR2w0u8k4w1WAKfXujXzX2UQC/nZXzkdastkpu22hNSTrj7zedkTNszSewz2hTfScf9zY1
- Ew40o2xT6iKEvtfD/b6boVNJZAHBKao=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-501-5MmgN94fMbqh8PfnkjY7GA-1; Mon, 11 Oct 2021 10:44:32 -0400
-X-MC-Unique: 5MmgN94fMbqh8PfnkjY7GA-1
-Received: by mail-wr1-f71.google.com with SMTP id
- r16-20020adfb1d0000000b00160bf8972ceso13472967wra.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 07:44:32 -0700 (PDT)
+ with ESMTP id 74NSKYScIT-d for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Oct 2021 10:46:32 -0400 (EDT)
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
+ [209.85.215.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54A8E40642
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 10:46:32 -0400 (EDT)
+Received: by mail-pg1-f181.google.com with SMTP id a73so11091720pge.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 07:46:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=DBJ7ew0y4wvSmKi4WuGSAOH7oUWp7VGZaMnxUGUZnug=;
+ b=WUgGM/f+tuPQ7vGNX0cNBBwPv0afu/Zf4dQxhALEj1CWce6SG/QX3MDYljf0Gbuor/
+ sj1ONxiUie1VuDLeZqyzP3U8wgCb5jI5/lPjBFHrG3lQw2dxyh3W+h6mZVvyEvJz8G7y
+ 1nEPJR+H3CxD/4MNWxAGoi6oKI9swc9dOAfsAmuD9ToN3kvenxSiEM2lWlzMHV2o9VoH
+ KyJiDN0gZI6nT02ZPzo0daWaK+RTn7Ob4pOSdy5AEMo6f68pgZs/vQbuhgd7TqLjMpzx
+ 27dHqDzBC8kH05vyX+/CHU4byC6ZoMfjoSir4u7rmWajgW3NJ9i2O+wJZUYyUoDZl7A9
+ 85aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=7Vj8W7APBY2fyggKtVX8y6tenS0g5ttledn1kYzTma0=;
- b=hrdY6i5q2rGiWbqr/Hh1YFiBBkZF4KroJm3DyotDpyMROZs728mT4PVFgQkXU2WEJ9
- RoAS6Fm371n9hzL7ribftgyMR4GmS2yTWeW0o+AZZ8Bs3t+kh/jRCqxeAemnscEW7dbO
- I9229r8ugISoZvN+eIk5djQ2197WghxtC0WwxB2H7KKOq9lVNo0lq76dRSZ1SwFTm700
- H3gH7tlcdo97vd/TeoEA/TYjWl99dVVx4hmGRSGOGHUom3ZNAtS+XaEYHw0wN5QfPU5y
- azcBomyheMq6XG4XRmQXL/W1pDmbM4OP+ixjzccQKjyLW0CBjPjOaFIdm9n4SnF+BTFg
- GBfw==
-X-Gm-Message-State: AOAM5300JiK+8e/6hIPqdzVBt84EXcXF426dDoiwlylyUETBSNXPhc6w
- D3Xw5h1RRaLoMwtZPGvKZBBW7Nm98UkTpWEHFJJxl+rl25GCXTByElX53DvOcH76Z7+kOPsrqd3
- OE5BroTxWYtN7yzyIJVQjdCkn
-X-Received: by 2002:a7b:cd90:: with SMTP id y16mr13094957wmj.146.1633963471456; 
- Mon, 11 Oct 2021 07:44:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzmedNib3+ZpDnLKlxj3BpgqbufyGqCa7JQZrW0+0LhmbffbNezRzXKtVLjHQgbYRWhOqo6HA==
-X-Received: by 2002:a7b:cd90:: with SMTP id y16mr13094938wmj.146.1633963471217; 
- Mon, 11 Oct 2021 07:44:31 -0700 (PDT)
-Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
- by smtp.gmail.com with ESMTPSA id k17sm7884449wrc.93.2021.10.11.07.44.30
+ bh=DBJ7ew0y4wvSmKi4WuGSAOH7oUWp7VGZaMnxUGUZnug=;
+ b=ps+iOAd7LAEeUFciUMoxZKbZeEHqQ+oY+C48Y7zpU0ZGzoJIE1UVMakEdWLspF9OQO
+ RZPlz6gi3Cd9wkp05aM7LxRhqyH4K3FGQZ1OJOPwFABEgzLXMOMMq19zIflpJDTPLhiL
+ /82zEKSjajnwBqYOK555AicYBdlSmr9HlCujW7Iy5XfKeHu8TleGhfdFxDLMmXPrmzuO
+ RewDUOIg8x0qiqKYs66fkYE5DyoAt855ljW1+3Aep3i44Nl4GnN51MA614a3qZihwAHU
+ ZUOb9KLjGjyk40wtfxAeXFkiff46keRb12/0AMQzCLNK+bKiKr3sB1hW/+spzQFp64so
+ PLnQ==
+X-Gm-Message-State: AOAM533l+dGIX90Irz6UflvIDgi3iMyJ3tZA8k+xj54+HkccwsoDQHYJ
+ VOMTXmezI28HbDFfa5bYAF1FKw==
+X-Google-Smtp-Source: ABdhPJy9JeaIFsaMhzjKrm4gRLnqTQlHrSTvgGmlHsrREml2i4T5hhC4ZlLxJitHkoHCOL8HD11SpQ==
+X-Received: by 2002:a63:c:: with SMTP id 12mr18698297pga.477.1633963591022;
+ Mon, 11 Oct 2021 07:46:31 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id x129sm8062008pfc.140.2021.10.11.07.46.30
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 Oct 2021 07:44:30 -0700 (PDT)
-Date: Mon, 11 Oct 2021 16:44:29 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [kvm-unit-tests PATCH v2] arm64: Add mmio_addr arg to
- arm/micro-bench
-Message-ID: <20211011144429.26hn2tpeczbffwcs@gator>
-References: <20211008174022.3028983-1-ricarkol@google.com>
+ Mon, 11 Oct 2021 07:46:30 -0700 (PDT)
+Date: Mon, 11 Oct 2021 14:46:25 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 12/16] KVM: Move x86's perf guest info callbacks to
+ generic KVM
+Message-ID: <YWROQSGPuPf3wfC9@google.com>
+References: <20210922000533.713300-1-seanjc@google.com>
+ <20210922000533.713300-13-seanjc@google.com>
+ <87wnmjq4y3.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20211008174022.3028983-1-ricarkol@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+In-Reply-To: <87wnmjq4y3.wl-maz@kernel.org>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Peter Zijlstra <peterz@infradead.org>, Guo Ren <guoren@kernel.org>,
+ linux-riscv@lists.infradead.org, Vincent Chen <deanbo422@gmail.com>,
+ Jiri Olsa <jolsa@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
+ Will Deacon <will@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ linux-csky@vger.kernel.org,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Ingo Molnar <mingo@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Like Xu <like.xu.linux@gmail.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Zhu Lingshan <lingshan.zhu@intel.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>, Greentime Hu <green.hu@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Namhyung Kim <namhyung@kernel.org>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Artem Kashkanov <artem.kashkanov@intel.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Juergen Gross <jgross@suse.com>, Nick Hu <nickhu@andestech.com>,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,100 +114,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Oct 08, 2021 at 10:40:22AM -0700, Ricardo Koller wrote:
-> Add a command line arg to arm/micro-bench to set the mmio_addr to other
-> values besides the default QEMU one. Default to the QEMU value if no arg
-> is passed.
+On Mon, Oct 11, 2021, Marc Zyngier wrote:
+> On Wed, 22 Sep 2021 01:05:29 +0100, Sean Christopherson <seanjc@google.com> wrote:
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index ed940aec89e0..828b6eaa2c56 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -673,6 +673,14 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa);
+> >  void kvm_perf_init(void);
+> >  void kvm_perf_teardown(void);
+> >  
+> > +#ifdef CONFIG_GUEST_PERF_EVENTS
+> > +static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arm/micro-bench.c | 36 ++++++++++++++++++++++++++++++------
->  1 file changed, 30 insertions(+), 6 deletions(-)
+> Pardon my x86 ignorance, what is PMI? PMU Interrupt?
+
+Ya, Performance Monitoring Interrupt.  I didn't realize the term wasn't common
+perf terminology.  Maybe kvm_arch_perf_events_in_guest() to be less x86-centric?
+
+> > +{
+> > +	/* Any callback while a vCPU is loaded is considered to be in guest. */
+> > +	return !!vcpu;
+> > +}
+> > +#endif
 > 
-> diff --git a/arm/micro-bench.c b/arm/micro-bench.c
-> index 8e1d4ab..c731b1d 100644
-> --- a/arm/micro-bench.c
-> +++ b/arm/micro-bench.c
-> @@ -19,16 +19,19 @@
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
->  #include <libcflat.h>
-> +#include <util.h>
->  #include <asm/gic.h>
->  #include <asm/gic-v3-its.h>
->  #include <asm/timer.h>
->  
-> -#define NS_5_SECONDS (5 * 1000 * 1000 * 1000UL)
-> +#define NS_5_SECONDS		(5 * 1000 * 1000 * 1000UL)
-> +#define QEMU_MMIO_ADDR		0x0a000008
->  
->  static u32 cntfrq;
->  
->  static volatile bool irq_ready, irq_received;
->  static int nr_ipi_received;
-> +static unsigned long mmio_addr = QEMU_MMIO_ADDR;
->  
->  static void *vgic_dist_base;
->  static void (*write_eoir)(u32 irqstat);
-> @@ -278,12 +281,14 @@ static void *userspace_emulated_addr;
->  static bool mmio_read_user_prep(void)
->  {
->  	/*
-> -	 * FIXME: Read device-id in virtio mmio here in order to
-> -	 * force an exit to userspace. This address needs to be
-> -	 * updated in the future if any relevant changes in QEMU
-> -	 * test-dev are made.
-> +	 * FIXME: We need an MMIO address that we can safely read to test
-> +	 * exits to userspace. Ideally, the test-dev would provide us this
-> +	 * address (and one we could write to too), but until it does we
-> +	 * use a virtio-mmio transport address. FIXME2: We should be getting
-> +	 * this address (and the future test-dev address) from the devicetree,
-> +	 * but so far we lazily hardcode it.
->  	 */
-> -	userspace_emulated_addr = (void*)ioremap(0x0a000008, sizeof(u32));
-> +	userspace_emulated_addr = (void *)ioremap(mmio_addr, sizeof(u32));
->  	return true;
->  }
->  
-> @@ -378,10 +383,29 @@ static void loop_test(struct exit_test *test)
->  		test->name, total_ns.ns, total_ns.ns_frac, avg_ns.ns, avg_ns.ns_frac);
->  }
->  
-> +static void parse_args(int argc, char **argv)
-> +{
-> +	int i, len;
-> +	long val;
-> +
-> +	for (i = 1; i < argc; ++i) {
-> +		len = parse_keyval(argv[i], &val);
-> +		if (len == -1)
-> +			continue;
-> +
-> +		if (strncmp(argv[i], "mmio-addr", len) == 0) {
-> +			mmio_addr = val;
-> +			report_info("found mmio_addr=0x%lx", mmio_addr);
-> +		}
-> +	}
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->  	int i;
->  
-> +	parse_args(argc, argv);
-> +
->  	if (!test_init())
->  		return 1;
->  
-> -- 
-> 2.33.0.882.g93a45727a2-goog
->
+> Do you really need this #ifdef?
 
-Pushed
+Nope, should compile fine without it, though simply dropping the #ifdef would make
+make the semantics of the function wrong, even if nothing consumes it.  Tweak it
+to use IS_ENABLED()?
 
-Thanks,
-drew 
-
+	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
