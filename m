@@ -2,54 +2,55 @@ Return-Path: <SRS0=aM0J=O7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 971A8C433FE
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 09:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5DB2C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 09:45:07 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1297560F43
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 09:38:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1297560F43
+	by mail.kernel.org (Postfix) with ESMTP id 2748661038
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 09:45:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2748661038
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 96F1A4B0D9;
-	Mon, 11 Oct 2021 05:38:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9758E4B090;
+	Mon, 11 Oct 2021 05:45:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ygTXeAV7Q0I5; Mon, 11 Oct 2021 05:38:55 -0400 (EDT)
+	with ESMTP id sfRJsMQlZtOC; Mon, 11 Oct 2021 05:45:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 706964B090;
-	Mon, 11 Oct 2021 05:38:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64539405A6;
+	Mon, 11 Oct 2021 05:45:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E1C949FB7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 05:38:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96B3D4B08D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 05:45:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CeR5emrnhK81 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Oct 2021 05:38:53 -0400 (EDT)
+ with ESMTP id 9OYE64XXyODp for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Oct 2021 05:45:02 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 264B9407ED
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 05:38:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 57AF3405A6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 05:45:02 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 29D5660231;
- Mon, 11 Oct 2021 09:38:52 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id F3FEA60F43;
+ Mon, 11 Oct 2021 09:45:00 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mZrli-00FySl-62; Mon, 11 Oct 2021 10:38:50 +0100
-Date: Mon, 11 Oct 2021 10:38:49 +0100
-Message-ID: <87v923q4t2.wl-maz@kernel.org>
+ id 1mZrrf-00FyZ3-2U; Mon, 11 Oct 2021 10:44:59 +0100
+Date: Mon, 11 Oct 2021 10:44:58 +0100
+Message-ID: <87tuhnq4it.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v3 14/16] KVM: arm64: Convert to the generic perf callbacks
-In-Reply-To: <20210922000533.713300-15-seanjc@google.com>
+Subject: Re: [PATCH v3 15/16] KVM: arm64: Drop perf.c and fold its tiny bits
+ of code into arm.c / pmu.c
+In-Reply-To: <20210922000533.713300-16-seanjc@google.com>
 References: <20210922000533.713300-1-seanjc@google.com>
- <20210922000533.713300-15-seanjc@google.com>
+ <20210922000533.713300-16-seanjc@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -107,69 +108,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 22 Sep 2021 01:05:31 +0100,
+On Wed, 22 Sep 2021 01:05:32 +0100,
 Sean Christopherson <seanjc@google.com> wrote:
 > 
-> Drop arm64's version of the callbacks in favor of the callbacks provided
-> by generic KVM, which are semantically identical.
+> Call KVM's (un)register perf callbacks helpers directly from arm.c, and
+> move the PMU bits into pmu.c and rename the related helper accordingly.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/arm64/kvm/perf.c | 34 ++--------------------------------
->  1 file changed, 2 insertions(+), 32 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  3 ---
+>  arch/arm64/kvm/Makefile           |  2 +-
+>  arch/arm64/kvm/arm.c              |  6 ++++--
+>  arch/arm64/kvm/perf.c             | 27 ---------------------------
+>  arch/arm64/kvm/pmu.c              |  8 ++++++++
+>  include/kvm/arm_pmu.h             |  1 +
+>  6 files changed, 14 insertions(+), 33 deletions(-)
+>  delete mode 100644 arch/arm64/kvm/perf.c
 > 
-> diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
-> index 3e99ac4ab2d6..0b902e0d5b5d 100644
-> --- a/arch/arm64/kvm/perf.c
-> +++ b/arch/arm64/kvm/perf.c
-> @@ -13,45 +13,15 @@
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 828b6eaa2c56..f141ac65f4f1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -670,9 +670,6 @@ unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
+>  int kvm_handle_mmio_return(struct kvm_vcpu *vcpu);
+>  int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa);
 >  
->  DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
->  
-> -static unsigned int kvm_guest_state(void)
-> -{
-> -	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> -	unsigned int state;
+> -void kvm_perf_init(void);
+> -void kvm_perf_teardown(void);
 > -
-> -	if (!vcpu)
-> -		return 0;
-> -
-> -	state = PERF_GUEST_ACTIVE;
-> -	if (!vcpu_mode_priv(vcpu))
-> -		state |= PERF_GUEST_USER;
-> -
-> -	return state;
-> -}
-> -
-> -static unsigned long kvm_get_guest_ip(void)
-> -{
-> -	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> -
-> -	if (WARN_ON_ONCE(!vcpu))
-> -		return 0;
-> -
-> -	return *vcpu_pc(vcpu);
-> -}
-> -
-> -static struct perf_guest_info_callbacks kvm_guest_cbs = {
-> -	.state		= kvm_guest_state,
-> -	.get_ip		= kvm_get_guest_ip,
-> -};
-> -
->  void kvm_perf_init(void)
+>  #ifdef CONFIG_GUEST_PERF_EVENTS
+>  static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
 >  {
->  	if (kvm_pmu_probe_pmuver() != 0xf && !is_protected_kvm_enabled())
->  		static_branch_enable(&kvm_arm_pmu_available);
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 989bb5dad2c8..0bcc378b7961 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -12,7 +12,7 @@ obj-$(CONFIG_KVM) += hyp/
 >  
-> -	perf_register_guest_info_callbacks(&kvm_guest_cbs);
+>  kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+>  	 $(KVM)/vfio.o $(KVM)/irqchip.o $(KVM)/binary_stats.o \
+> -	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
+> +	 arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  	 inject_fault.o va_layout.o handle_exit.o \
+>  	 guest.o debug.o reset.o sys_regs.o \
+>  	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 2b542fdc237e..48f89d80f464 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1744,7 +1744,9 @@ static int init_subsystems(void)
+>  	if (err)
+>  		goto out;
+>  
+> -	kvm_perf_init();
+> +	kvm_pmu_init();
 > +	kvm_register_perf_callbacks(NULL);
->  }
+> +
+>  	kvm_sys_reg_table_init();
 >  
->  void kvm_perf_teardown(void)
+>  out:
+> @@ -2160,7 +2162,7 @@ int kvm_arch_init(void *opaque)
+>  /* NOP: Compiling as a module not supported */
+>  void kvm_arch_exit(void)
 >  {
-> -	perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
+> -	kvm_perf_teardown();
 > +	kvm_unregister_perf_callbacks();
 >  }
+>  
+>  static int __init early_kvm_mode_cfg(char *arg)
+> diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+> deleted file mode 100644
+> index 0b902e0d5b5d..000000000000
+> --- a/arch/arm64/kvm/perf.c
+> +++ /dev/null
+> @@ -1,27 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-only
+> -/*
+> - * Based on the x86 implementation.
+> - *
+> - * Copyright (C) 2012 ARM Ltd.
+> - * Author: Marc Zyngier <marc.zyngier@arm.com>
+> - */
+> -
+> -#include <linux/perf_event.h>
+> -#include <linux/kvm_host.h>
+> -
+> -#include <asm/kvm_emulate.h>
+> -
+> -DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
+> -
+> -void kvm_perf_init(void)
+> -{
+> -	if (kvm_pmu_probe_pmuver() != 0xf && !is_protected_kvm_enabled())
+> -		static_branch_enable(&kvm_arm_pmu_available);
+> -
+> -	kvm_register_perf_callbacks(NULL);
+> -}
+> -
+> -void kvm_perf_teardown(void)
+> -{
+> -	kvm_unregister_perf_callbacks();
+> -}
+> diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
+> index 03a6c1f4a09a..d98b57a17043 100644
+> --- a/arch/arm64/kvm/pmu.c
+> +++ b/arch/arm64/kvm/pmu.c
+> @@ -7,6 +7,14 @@
+>  #include <linux/perf_event.h>
+>  #include <asm/kvm_hyp.h>
+>  
+> +DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
+> +
+> +void kvm_pmu_init(void)
+> +{
+> +	if (kvm_pmu_probe_pmuver() != 0xf && !is_protected_kvm_enabled())
+> +		static_branch_enable(&kvm_arm_pmu_available);
+> +}
+> +
+>  /*
+>   * Given the perf event attributes and system type, determine
+>   * if we are going to need to switch counters at guest entry/exit.
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 864b9997efb2..42270676498d 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -14,6 +14,7 @@
+>  #define ARMV8_PMU_MAX_COUNTER_PAIRS	((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
+>  
+>  DECLARE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
+> +void kvm_pmu_init(void);
+>  
+>  static __always_inline bool kvm_arm_support_pmu_v3(void)
+>  {
+
+Note that this patch is now conflicting with e840f42a4992 ("KVM:
+arm64: Fix PMU probe ordering"), which was merged in -rc4. Moving the
+static key definition to arch/arm64/kvm/pmu-emul.c and getting rid of
+kvm_pmu_init() altogether should be enough to resolve it.
+
+With that,
 
 Reviewed-by: Marc Zyngier <maz@kernel.org>
 
