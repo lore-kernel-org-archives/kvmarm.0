@@ -2,77 +2,74 @@ Return-Path: <SRS0=aM0J=O7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C6AC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 06:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB5EC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 08:15:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CD29D60F21
-	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 06:06:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CD29D60F21
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 06F3D60EFE
+	for <kvmarm@archiver.kernel.org>; Mon, 11 Oct 2021 08:15:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 06F3D60EFE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9F44B11E;
-	Mon, 11 Oct 2021 02:06:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 881A84B0D0;
+	Mon, 11 Oct 2021 04:15:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wer4JOPAr5eX; Mon, 11 Oct 2021 02:06:37 -0400 (EDT)
+	with ESMTP id 3kA1my16ZKd2; Mon, 11 Oct 2021 04:15:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D07654B0F5;
-	Mon, 11 Oct 2021 02:06:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D6C14B091;
+	Mon, 11 Oct 2021 04:15:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6F674B0F5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 02:06:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 69F9E4AC78
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 04:15:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qWeXZnUG--pb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Oct 2021 02:06:34 -0400 (EDT)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
- [185.176.79.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1D70A49F6C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 02:06:34 -0400 (EDT)
-Received: from fraeml741-chm.china.huawei.com (unknown [172.18.147.201])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HSSsS2m3yz67n97;
- Mon, 11 Oct 2021 14:03:40 +0800 (CST)
-Received: from lhreml711-chm.china.huawei.com (10.201.108.62) by
- fraeml741-chm.china.huawei.com (10.206.15.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Mon, 11 Oct 2021 08:06:31 +0200
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml711-chm.china.huawei.com (10.201.108.62) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.8; Mon, 11 Oct 2021 07:06:30 +0100
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.008; Mon, 11 Oct 2021 07:06:30 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Will Deacon <will@kernel.org>
-Subject: RE: [PATCH v3 4/4] KVM: arm64: Clear active_vmids on vCPU schedule out
-Thread-Topic: [PATCH v3 4/4] KVM: arm64: Clear active_vmids on vCPU schedule
- out
-Thread-Index: AQHXhGar1JrryboKrU+7h+yU/0K2/6thny2AgAAaZCCAACXigIAMKHhQgF+6M6A=
-Date: Mon, 11 Oct 2021 06:06:30 +0000
-Message-ID: <4e5ef4842f1e4895bfde456bde06c6cf@huawei.com>
-References: <20210729104009.382-1-shameerali.kolothum.thodi@huawei.com>
- <20210729104009.382-5-shameerali.kolothum.thodi@huawei.com>
- <20210803114034.GB30853@willie-the-truck>
- <ee2863107d614ef8a36006b5aa912eca@huawei.com>
- <20210803153036.GA31125@willie-the-truck> 
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.25.32]
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
- "maz@kernel.org" <maz@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Linuxarm <linuxarm@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>,
- "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id Ar5or6CQMRoM for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Oct 2021 04:15:17 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6AA084079A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 04:15:17 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5F02A60ED4;
+ Mon, 11 Oct 2021 08:15:16 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mZqSo-00FxTa-3C; Mon, 11 Oct 2021 09:15:14 +0100
+Date: Mon, 11 Oct 2021 09:15:13 +0100
+Message-ID: <87y270ou3y.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v8 03/15] KVM: arm64: selftests: Use read/write
+ definitions from sysreg.h
+In-Reply-To: <20211007233439.1826892-4-rananta@google.com>
+References: <20211007233439.1826892-1-rananta@google.com>
+ <20211007233439.1826892-4-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, pbonzini@redhat.com, drjones@redhat.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, pshier@google.com,
+ ricarkol@google.com, oupton@google.com, reijiw@google.com,
+ jingzhangos@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,146 +86,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Raghavendra,
 
+On Fri, 08 Oct 2021 00:34:27 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
+> 
+> Make use of the register read/write definitions from
+> sysreg.h, instead of the existing definitions. A syntax
+> correction is needed for the files that use write_sysreg()
+> to make it compliant with the new (kernel's) syntax.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Oliver Upton <oupton@google.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  .../selftests/kvm/aarch64/debug-exceptions.c  | 28 +++++++++----------
+>  .../selftests/kvm/include/aarch64/processor.h | 13 +--------
+>  2 files changed, 15 insertions(+), 26 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> index e5e6c92b60da..11fd23e21cb4 100644
+> --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> @@ -34,16 +34,16 @@ static void reset_debug_state(void)
+>  {
+>  	asm volatile("msr daifset, #8");
+>  
+> -	write_sysreg(osdlr_el1, 0);
+> -	write_sysreg(oslar_el1, 0);
+> +	write_sysreg(0, osdlr_el1);
+> +	write_sysreg(0, oslar_el1);
 
-> -----Original Message-----
-> From: Shameerali Kolothum Thodi
-> Sent: 11 August 2021 09:48
-> To: 'Will Deacon' <will@kernel.org>
-> Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> linux-kernel@vger.kernel.org; maz@kernel.org; catalin.marinas@arm.com;
-> james.morse@arm.com; julien.thierry.kdev@gmail.com;
-> suzuki.poulose@arm.com; jean-philippe@linaro.org;
-> Alexandru.Elisei@arm.com; qperret@google.com; Linuxarm
-> <linuxarm@huawei.com>
-> Subject: RE: [PATCH v3 4/4] KVM: arm64: Clear active_vmids on vCPU
-> schedule out
-> 
-> Hi Will,
-> 
-> > -----Original Message-----
-> > From: Will Deacon [mailto:will@kernel.org]
-> > Sent: 03 August 2021 16:31
-> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> > linux-kernel@vger.kernel.org; maz@kernel.org; catalin.marinas@arm.com;
-> > james.morse@arm.com; julien.thierry.kdev@gmail.com;
-> > suzuki.poulose@arm.com; jean-philippe@linaro.org;
-> > Alexandru.Elisei@arm.com; qperret@google.com; Linuxarm
-> > <linuxarm@huawei.com>
-> > Subject: Re: [PATCH v3 4/4] KVM: arm64: Clear active_vmids on vCPU
-> > schedule out
-> 
-> [...]
-> 
-> > I think we have to be really careful not to run into the "suspended
-> > animation" problem described in ae120d9edfe9 ("ARM: 7767/1: let the ASID
-> > allocator handle suspended animation") if we go down this road.
-> >
-> > Maybe something along the lines of:
-> >
-> > ROLLOVER
-> >
-> >   * Take lock
-> >   * Inc generation
-> >     => This will force everybody down the slow path
-> >   * Record active VMIDs
-> >   * Broadcast TLBI
-> >     => Only active VMIDs can be dirty
-> >     => Reserve active VMIDs and mark as allocated
-> >
-> > VCPU SCHED IN
-> >
-> >   * Set active VMID
-> >   * Check generation
-> >   * If mismatch then:
-> >         * Take lock
-> >         * Try to match a reserved VMID
-> >         * If no reserved VMID, allocate new
-> >
-> > VCPU SCHED OUT
-> >
-> >   * Clear active VMID
-> >
-> > but I'm not daft enough to think I got it right first time. I think it
-> > needs both implementing *and* modelling in TLA+ before we merge it!
-> 
-> I attempted to implement the above algo as below. It seems to be
-> working in both 16-bit vmid and 4-bit vmid test setup. 
+The previous patch has obviously introduced significant breakage which
+this patch is now fixing. In the interval, the build is broken, which
+isn't great.
 
-It is not :(. I did an extended, overnight test run and it fails.
-It looks to me in my below implementation there is no synchronization
-on setting the active VMID and a concurrent rollover. I will have another go.
+You can either rework this series to work around the issue, or I can
+squash patches #2 and #3 together.
 
 Thanks,
-Shameer
 
-Though I am
-> not quite sure this Is exactly what you had in mind above and covers
-> all corner cases.
-> 
-> Please take a look and let me know.
-> (The diff below is against this v3 series)
-> 
-> Thanks,
-> Shameer
-> 
-> --->8<----
-> 
-> --- a/arch/arm64/kvm/vmid.c
-> +++ b/arch/arm64/kvm/vmid.c
-> @@ -43,7 +43,7 @@ static void flush_context(void)
->         bitmap_clear(vmid_map, 0, NUM_USER_VMIDS);
-> 
->         for_each_possible_cpu(cpu) {
-> -               vmid = atomic64_xchg_relaxed(&per_cpu(active_vmids,
-> cpu), 0);
-> +               vmid = atomic64_read(&per_cpu(active_vmids, cpu));
-> 
->                 /* Preserve reserved VMID */
->                 if (vmid == 0)
-> @@ -125,32 +125,17 @@ void kvm_arm_vmid_clear_active(void)
->  void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid)
->  {
->         unsigned long flags;
-> -       u64 vmid, old_active_vmid;
-> +       u64 vmid;
-> 
->         vmid = atomic64_read(&kvm_vmid->id);
-> -
-> -       /*
-> -        * Please refer comments in check_and_switch_context() in
-> -        * arch/arm64/mm/context.c.
-> -        */
-> -       old_active_vmid = atomic64_read(this_cpu_ptr(&active_vmids));
-> -       if (old_active_vmid && vmid_gen_match(vmid) &&
-> -           atomic64_cmpxchg_relaxed(this_cpu_ptr(&active_vmids),
-> -                                    old_active_vmid, vmid))
-> +       if (vmid_gen_match(vmid)) {
-> +               atomic64_set(this_cpu_ptr(&active_vmids), vmid);
->                 return;
-> -
-> -       raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
-> -
-> -       /* Check that our VMID belongs to the current generation. */
-> -       vmid = atomic64_read(&kvm_vmid->id);
-> -       if (!vmid_gen_match(vmid)) {
-> -               vmid = new_vmid(kvm_vmid);
-> -               atomic64_set(&kvm_vmid->id, vmid);
->         }
-> 
-> -
-> +       raw_spin_lock_irqsave(&cpu_vmid_lock, flags);
-> +       vmid = new_vmid(kvm_vmid);
-> +       atomic64_set(&kvm_vmid->id, vmid);
->         atomic64_set(this_cpu_ptr(&active_vmids), vmid);
->         raw_spin_unlock_irqrestore(&cpu_vmid_lock, flags);
->  }
-> --->8<----
-> 
-> 
-> 
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
