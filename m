@@ -2,74 +2,76 @@ Return-Path: <SRS0=Zoam=PA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6B2C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Oct 2021 04:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A801C433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Oct 2021 04:36:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 51C2360EE2
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Oct 2021 04:36:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 51C2360EE2
+	by mail.kernel.org (Postfix) with ESMTP id 0B12D61039
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Oct 2021 04:36:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0B12D61039
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C224F4B0B8;
-	Tue, 12 Oct 2021 00:36:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A29B64B0BD;
+	Tue, 12 Oct 2021 00:36:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZJp6tbpZtdxq; Tue, 12 Oct 2021 00:36:00 -0400 (EDT)
+	with ESMTP id F7HXpq62fpHw; Tue, 12 Oct 2021 00:36:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FCEC4B091;
-	Tue, 12 Oct 2021 00:36:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EDE94B092;
+	Tue, 12 Oct 2021 00:36:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 565034A531
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 00:35:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 69D744048B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 00:36:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yXpWnRxxTFKn for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Oct 2021 00:35:57 -0400 (EDT)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B7A74402A9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 00:35:57 -0400 (EDT)
-Received: by mail-pf1-f202.google.com with SMTP id
- j22-20020a62b616000000b0044d091c3999so2999772pff.16
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 21:35:57 -0700 (PDT)
+ with ESMTP id WUU7r1kYREQG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Oct 2021 00:36:11 -0400 (EDT)
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com
+ [209.85.222.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59D76402A9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 00:36:11 -0400 (EDT)
+Received: by mail-qk1-f202.google.com with SMTP id
+ c16-20020a05620a0cf000b0045f1d55407aso11356497qkj.22
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 21:36:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=ARkaHXR2eWubzBw8IR0BEjfGZOpO8HzRAR4xytV+aUY=;
- b=rJEX/4vo6+sN+Pcdup+t6VgohqTOZFeSMVj0l6L/LilgI7Rrt4bZo03FgfK/KuMjh2
- CE6XlVtq+h//Eud6aJP/+OmS28Nk0Q6aRATCpBbLtKPVC8fv/vr6cxu9JvIsaaxO2DAS
- ApVsOat8Q/zdFbMJ1qECDB5z8MEwPnIORYVTVB9RT9PxtCXgny/iRpvEHJtPxvpKTAvs
- +KaYJqs8ntc8Cp6REyFGpTuXvwzImbeEAPvbzZF9IeVMZ+BHzjDWD1BcPnwmj1TBTYaC
- Ml7R9O595LgYgYX2NMUlkmSXIgSfYK7lAGdTOw/VDTVfMlsrNU+yvJoRRDx0LfIgfwKh
- IQNQ==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=MgUI8dr71wiUF9Cg1eutjpaNE80Sfg4+1lD1k7gsd/M=;
+ b=VuhEW5SxS1LqbD1y6W2u5fujsSWvlKITcaC+DfzF+nbgthQHFlCdofRA8Pi8vjahVC
+ zj5zQtHgIuUulE5UV8fh2IwmG0qfPMjxzv4Je1fkjXzNToQ1TIi+isd08BO+cHpf5mov
+ GmjnInH4aCSFrGLvvSDPH1qi1c0JUrr9tj+w/BIlW7hXWPzqtAYmhtej7Tn4nhbt1g2L
+ /0kQzyKo+7Q8e5Igsao58iALORgjb0FH2nN+mof+i0fYRMQZ6jHwDhydsKPpT3TPWrqi
+ beLVi1ReaNB51oUSUxAxWkT0IUBzCucR/GAogYdticZGdaMWLM519PKt+Oh3nLkuZcym
+ 8cWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=ARkaHXR2eWubzBw8IR0BEjfGZOpO8HzRAR4xytV+aUY=;
- b=1d0xCEKRRbIPMEv8prWgC+oHRtiqoYdBwlMLtA0IwJENf9CTQxBsSOyH6Lwkptsby7
- 8dPRWjQj/KlwBMTUXkaMN8yBoGFd0l4LjiThvqSEBV8plf+n11yo61wSYTiixUObxPy3
- NF/xWUEwySdYrnGWlBXLcdS7r+/1JM9eqx9DeNJ9Dt/woShhYLQVDIBilEnDdltfb9yj
- vZngSBzkP1tp3vTp/vTEqHvCJeJcsQL64HobbGc1Ek99ruKEKSaxyjYXLrG0JaQ5vkY6
- RiOz5ItBWvk+ycXvXINxQwzYOJiJd2c+4v3iypa1OP5WvI0jzHg/K0xNJ2HSrB5Uexcw
- GtLA==
-X-Gm-Message-State: AOAM530ExbqY+O62owWc8x5Uv2alDRKP8deWniNRJgx6aW5XgLWcQqFr
- iF5ay09CBIPzICZ9tm+GXS21FNxhD5o=
-X-Google-Smtp-Source: ABdhPJzusAZuOFWODA8MBmn37mWBO6zsyEPE7bFvBaG1kzFFfGhoSLSD7AEwe6dtIKVigbydAi7NZbAdl6I=
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=MgUI8dr71wiUF9Cg1eutjpaNE80Sfg4+1lD1k7gsd/M=;
+ b=kxpMu/E9vNQrMEeswgg0YKYWrv8jtef5RFQJLxauzCqJyh4tubLDPRu7Z9VJIYthoN
+ DRt6wKt/o14cMTEi+aLvKVAgTdi/vYzdsohr/qZBNafkSI8LGHi5woC/N7HWETlp0mYL
+ QnCZtDbdiwWf7UDhqDPm5o8VlE+xh+EysvxVgQ5nJeJCH3FiYf73UOWIy88f5YTy2cHJ
+ u/URKOMN21QfCWVQJjHeyc37mJV3KxMRQ8h6SCNqxZhcMk9M/zwpXGGbbfWZ3tCHR0X/
+ /63dllE8RlL3oa8wZfxjOGy4CODQ8WrxWo9FvqR4+DkVLdEWxQrtGJSPB5/fTml2UF0l
+ uFSw==
+X-Gm-Message-State: AOAM531/IR21uDPiMhN28aNTSR46MEuR0OOr8aZpJp9OnvpOpiR1SVy5
+ MbWILWZ4OckMPXQMt2pDAsM04EwLORY=
+X-Google-Smtp-Source: ABdhPJy2iKOySRcH3Ml4eFC4AOnvEXGxnJDRyYb6ehxJKmextSbm1vjwq+zjkblu6svI8PlWaI/8labARB4=
 X-Received: from reiji-vws.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:15a3])
- (user=reijiw job=sendgmr) by 2002:aa7:91c2:0:b0:44c:a5a4:43d4 with SMTP id
- z2-20020aa791c2000000b0044ca5a443d4mr29252166pfa.20.1634013356858; Mon, 11
- Oct 2021 21:35:56 -0700 (PDT)
-Date: Mon, 11 Oct 2021 21:35:10 -0700
-Message-Id: <20211012043535.500493-1-reijiw@google.com>
+ (user=reijiw job=sendgmr) by 2002:ac8:202:: with SMTP id
+ k2mr20117332qtg.398.1634013370868; 
+ Mon, 11 Oct 2021 21:36:10 -0700 (PDT)
+Date: Mon, 11 Oct 2021 21:35:11 -0700
+In-Reply-To: <20211012043535.500493-1-reijiw@google.com>
+Message-Id: <20211012043535.500493-2-reijiw@google.com>
 Mime-Version: 1.0
+References: <20211012043535.500493-1-reijiw@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [RFC PATCH 00/25] KVM: arm64: Make CPU ID registers writable by
- userspace
+Subject: [RFC PATCH 01/25] KVM: arm64: Add has_reset_once flag for vcpu
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -91,133 +93,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In KVM/arm64, values of ID registers for a guest are mostly same as
-its host's values except for bits for feature that KVM doesn't support
-and for opt-in features that userspace didn't configure.  Userspace
-can use KVM_SET_ONE_REG to a set ID register value, but it fails
-if userspace attempts to modify the register value.
+Introduce 'has_reset_once' flag in kvm_vcpu_arch, which indicates
+if the vCPU reset has been done once, for later use.
 
-This patch series adds support to allow userspace to modify a value of
-ID registers (as long as KVM can support features that are indicated
-in the registers) so userspace can have more control of configuring
-and unconfiguring features for guests.
-The patch series affects both VHE or non-VHE including protected VMs
-for now but should be changed not to affect for protected VMs, which
-will have a different way of configuring ID registers [1] based on
-its different requirements.
-There was a patch series that tried to achieve the same thing [2].
-A few snippets of codes in this series were inspired by or came from [2].
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 2 ++
+ arch/arm64/kvm/reset.c            | 4 ++++
+ 2 files changed, 6 insertions(+)
 
-Since an initial value of ID registers will be the host value with bits
-cleared for unsupported features and for opt-in features that were not
-configured, the initial value userspace can see (via KVM_GET_ONE_REG) is
-the upper limit that can be set for the register.  Any requests to change
-the value that conflicts with opt-in features' configuration will fail.
-
-When a guest tries to use a CPU feature that is not exposed to the guest,
-trapping it (to emulate a real CPU's behavior) would generally be a
-desirable behavior (when it's possible with no or little side effects).
-The later patches in the series add codes for this.  Only features that
-can be trapped independently will be trapped by this series though.
-
-The series is based on 5.15-rc5 with the patch series [3] applied.
-
-Patch 01 introduces 'has_reset_once' flag for a vCPU to indicate if the
-vCPU reset has been done once.  This is used to initialize ID registers
-only at the first vCPU reset.
-
-Patch 02 extends sys_regs[] of kvm_cpu_context to save values of ID
-registers for the vCPU. For now, the sanitized host's values are saved
-in the array at the first vCPU reset.
-
-Patch 03 introduces arm64_check_features(), which will do a common
-validation checking for ID registers.
-
-Patch 04 introduces structure id_reg_info to manage the ID register
-specific control of the register value for the guest.
-
-Patch 05 introduces a function to keep consistency of ID register values
-between vCPUs at the first KVM_RUN. Also, the patch adds code to prevent
-userspace from changing ID register value after the first KVM_RUN.
-
-Patches 06-12 add id_reg_info for ID registers to make them
-writable with some specific handling for the registers.
-
-Patch 13 changes KVM_SET_ONE_REG behavior for ID registers to
-allow userspace to change ID registers that don't have id_reg_info.
-
-Patch 14 introduces validity checking of feature fractional
-fields of ID registers at the first KVM_RUN.
-
-Patch 15 introduces a new capability KVM_CAP_ARM_ID_REG_WRITABLE
-to identify that ID registers are writable by userspace.
-
-Patches 16-17 changes the way of using vcpu->arch.cptr_el2/mdcr_el2 to
-track certain bits of cptr_el2/mdcr_el2 in the vcpu->arch fields and use
-them when setting them for the guest.  The following patches will update
-the vcpu->arch fields based on available features for the guest.
-
-Patch 18 introduces struct feature_config_ctrl and some utility
-functions to enable trapping of features that are disabled for a guest.
-
-Patches 19-23 add feature_config_ctrl for CPU features, which are
-used to program configuration registers to trap each feature.
-
-Patch 24 enables trapping CPU features that are disabled for the
-guest based on feature_config_ctrl that were added by patch 18-23.
-
-Patch 25 adds a selftest to validate reading/writing ID registers.
-
-[1] https://lore.kernel.org/kvmarm/20211010145636.1950948-1-tabba@google.com/
-[2] https://lore.kernel.org/kvm/20201102033422.657391-1-liangpeng10@huawei.com/
-[3] https://lore.kernel.org/kvmarm/20211007233439.1826892-1-rananta@google.com/
-
-Reiji Watanabe (25):
-  KVM: arm64: Add has_reset_once flag for vcpu
-  KVM: arm64: Save ID registers' sanitized value per vCPU
-  KVM: arm64: Introduce a validation function for an ID register
-  KVM: arm64: Introduce struct id_reg_info
-  KVM: arm64: Keep consistency of ID registers between vCPUs
-  KVM: arm64: Make ID_AA64PFR0_EL1 writable
-  KVM: arm64: Make ID_AA64PFR1_EL1 writable
-  KVM: arm64: Make ID_AA64ISAR0_EL1 writable
-  KVM: arm64: Make ID_AA64ISAR1_EL1 writable
-  KVM: arm64: Make ID_AA64DFR0_EL1 writable
-  KVM: arm64: Make ID_DFR0_EL1 writable
-  KVM: arm64: Make MVFR1_EL1 writable
-  KVM: arm64: Make ID registers without id_reg_info writable
-  KVM: arm64: Add consistency checking for frac fields of ID registers
-  KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_WRITABLE capability
-  KVM: arm64: Use vcpu->arch cptr_el2 to track value of cptr_el2 for VHE
-  KVM: arm64: Use vcpu->arch.mdcr_el2 to track value of mdcr_el2
-  KVM: arm64: Introduce framework to trap disabled features
-  KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
-  KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
-  KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
-  KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
-  KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
-  KVM: arm64: Activate trapping of disabled CPU features for the guest
-  KVM: arm64: selftests: Introduce id_reg_test
-
- Documentation/virt/kvm/api.rst                |    8 +
- arch/arm64/include/asm/cpufeature.h           |    1 +
- arch/arm64/include/asm/kvm_arm.h              |   32 +
- arch/arm64/include/asm/kvm_host.h             |   18 +-
- arch/arm64/include/asm/sysreg.h               |    1 +
- arch/arm64/kernel/cpufeature.c                |   26 +
- arch/arm64/kvm/arm.c                          |   30 +-
- arch/arm64/kvm/debug.c                        |   13 +-
- arch/arm64/kvm/hyp/vhe/switch.c               |   14 +-
- arch/arm64/kvm/reset.c                        |    4 +
- arch/arm64/kvm/sys_regs.c                     | 1010 +++++++++++--
- include/uapi/linux/kvm.h                      |    1 +
- tools/arch/arm64/include/asm/sysreg.h         |    1 +
- tools/testing/selftests/kvm/.gitignore        |    1 +
- tools/testing/selftests/kvm/Makefile          |    1 +
- .../selftests/kvm/aarch64/id_reg_test.c       | 1296 +++++++++++++++++
- 16 files changed, 2306 insertions(+), 151 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f8be56d5342b..9b5e7a3b6011 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -384,6 +384,7 @@ struct kvm_vcpu_arch {
+ 		u64 last_steal;
+ 		gpa_t base;
+ 	} steal;
++	bool has_reset_once;
+ };
+ 
+ /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+@@ -449,6 +450,7 @@ struct kvm_vcpu_arch {
+ 
+ #define vcpu_has_sve(vcpu) (system_supports_sve() &&			\
+ 			    ((vcpu)->arch.flags & KVM_ARM64_GUEST_HAS_SVE))
++#define	vcpu_has_reset_once(vcpu) ((vcpu)->arch.has_reset_once)
+ 
+ #ifdef CONFIG_ARM64_PTR_AUTH
+ #define vcpu_has_ptrauth(vcpu)						\
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 5ce36b0a3343..4d34e5c1586c 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -305,6 +305,10 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	if (loaded)
+ 		kvm_arch_vcpu_load(vcpu, smp_processor_id());
+ 	preempt_enable();
++
++	if (!ret && !vcpu->arch.has_reset_once)
++		vcpu->arch.has_reset_once = true;
++
+ 	return ret;
+ }
+ 
 -- 
 2.33.0.882.g93a45727a2-goog
 
