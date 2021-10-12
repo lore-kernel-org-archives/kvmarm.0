@@ -2,77 +2,77 @@ Return-Path: <SRS0=Zoam=PA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04341C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAFFC433EF
 	for <kvmarm@archiver.kernel.org>; Tue, 12 Oct 2021 04:37:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ACD1F6108F
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Oct 2021 04:37:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org ACD1F6108F
+	by mail.kernel.org (Postfix) with ESMTP id 81DA16108F
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Oct 2021 04:37:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 81DA16108F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61D7C4048A;
-	Tue, 12 Oct 2021 00:37:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 334F54B08F;
+	Tue, 12 Oct 2021 00:37:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TbN7MxkDoaWB; Tue, 12 Oct 2021 00:36:59 -0400 (EDT)
+	with ESMTP id ga-QeWX2XUbh; Tue, 12 Oct 2021 00:37:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 756F04B154;
-	Tue, 12 Oct 2021 00:36:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E5284B173;
+	Tue, 12 Oct 2021 00:36:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 962AD4B130
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 00:36:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E79974B091
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 00:36:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SeQCIz4Egfx9 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Oct 2021 00:36:55 -0400 (EDT)
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
- [209.85.215.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E23E4B128
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 00:36:55 -0400 (EDT)
-Received: by mail-pg1-f202.google.com with SMTP id
- n22-20020a6563d6000000b0029261ffde9bso8020399pgv.22
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 21:36:55 -0700 (PDT)
+ with ESMTP id TIdNj9X85E89 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Oct 2021 00:36:57 -0400 (EDT)
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
+ [209.85.215.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EABF54B128
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 00:36:56 -0400 (EDT)
+Received: by mail-pg1-f201.google.com with SMTP id
+ w185-20020a6362c2000000b0029566b18a88so8034216pgb.15
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Oct 2021 21:36:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=7vo9Jye3iy34d7wxk7g8XLP+SJucgQI7Y2FBb4PVMnw=;
- b=XCT8s0xZr8hIUrdDmvqfnOnxYqMGJEiaoh+nFQ5WhVn0ZRTLWHNTAn+HFJmbjCOnY6
- x5CrPKVbLKHn40TQUW6a7Q7MVzdtVa4bBdMtIBG8yxn4VHVcVH8spAAakxPJeKOiObxk
- 7xAxslDtmuqWhePLlKBtuFovwM6E11QC69B+fMBVFwNCeVZTacs5Lyd0WdW3GE3W7S2I
- Xk+6327uHlA8k24iPB2Rs4HTIpXl7swnhKavBqrVmt7TV46GZ+okhJnmWDSjvxezpDyE
- StUmedw/6Ehw533z4QaBgSx9/KKX3YCeVLKGVZzAXzgfoBIc9HpvhWvm8/2pXkJttqTB
- giJw==
+ :cc; bh=eIUhuChkelcONVLGBJ0a2MPEEEhxwwehMuijtFOAuDI=;
+ b=RuE+yIAI83dgKgc0EI81lpKKKdaCzCn8+SfDwPeU8Fln6xA4/deZlxo2DwtD71VRgy
+ cw6TSj8JyRvn5oKLcvmqRuGF7hVSbUVdrEMEKUojpjZyBBQ+tJ1vSUHBrWlg1IuSMZPv
+ R+rpCZeNhqGRUmc+stVB+dTUWZ147p6Jjc9tP2WejjahKq68g464d/gR3s99oJIo6lWp
+ A/jaKj7gVcm9U7Tzh6Orb4tNznNnOji9vtaNMWche+5EZdUD4rHwml9Y4DQ6LY92/e/n
+ yuPPhMOR//Z2EmHt3/Rk9H1biH/MgK7UmW3yEvDk4dlwnyojLI/KFQPcSc40TnGmCYIW
+ ZXcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=7vo9Jye3iy34d7wxk7g8XLP+SJucgQI7Y2FBb4PVMnw=;
- b=F2ZMaeKkXorh0hkFXVDZA68VObu4EG3CUioWWC/gJOnqmsk+A1wy8YdJAtI/FGe3zn
- sBwUIy8REK0BOEAbyxTjpa/6ocSXWXO/zgvKdwQIs90m+KkrpIIdWFTZy9cPnJNZ540z
- c7Dquu7RyVZ0PLe1sCBFPAPIRx/DBD/PEMTlMP0dh/kzPtonkOt2tulzXhMyly+aRn93
- zExP06iAxT2Uoy6/RYgaWBQ0dtdWfTQ93D8zahqEB1XQM+veeT24EcdAneyWMPxKxjvr
- JuNfbdItkefjSLdHn96YLeNF/ZcnhGjmPEIMZdtUQZifm4f/NINvkP1Y/QHud6Vnk9xq
- zyBQ==
-X-Gm-Message-State: AOAM531Ru9nIvOMc56DiTnrW7ZQNUylCdeKrCertqLX6O7RhnGkvcPYA
- y1SqRecuCgbWrR+kea+N5bYpNsNZLRA=
-X-Google-Smtp-Source: ABdhPJx0SaVYdmsGOHnnA4GhbM5OqxPa33tsX7LZFC6lKXCPshs+pcbFLj6wvFn9yiyMZ22Y3bGPzseV7Jk=
+ bh=eIUhuChkelcONVLGBJ0a2MPEEEhxwwehMuijtFOAuDI=;
+ b=LbJTyeEMG/uXZVJbOlonexE2Yip28BW523SarBLy7DV7amjaMPbivNcPb1RQlmXEPS
+ 204VVVh4mDY25laTDp65oCuiOX2Bby/puPS/dmyzYRBGctd05SFQ8pbIYxBqR37YRL05
+ zbuwpYmwlzl/TShyAhUBKvbn98FeuiUYVFEXr/8I7QK3aqIgSJ5ERLbX0NZdPpXMdKqi
+ SWsfBRfQ3cqZex1N/XEBesgfvHNAR4teXQTOmG4P9BcPWsCCAzld2TTl1C5g+NS3L3ZR
+ YOmHe+ERmrLZME5Ih5VWb6OJJwVJUBoZGOUKwFXFpX85zAZTXa2+Le3ZPNlI1A/tVlIM
+ MJPw==
+X-Gm-Message-State: AOAM533caQIj604BkOHypXjvnKXEESGmNTx0OaqOhFfF+IRh0mwvnC7s
+ Zz8B+cetAPbaPcFJBXt/ocqEQkPbbT8=
+X-Google-Smtp-Source: ABdhPJyTEEEJJ8ULSCGnE5RUuiEtmSCACpElVLQCVz7cpGVyLWG6TLcY5A92rMWKWU0CqVfHfvo0h0Ok6PA=
 X-Received: from reiji-vws.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:15a3])
- (user=reijiw job=sendgmr) by 2002:a17:902:8b8b:b0:13d:e91c:a1b9 with SMTP id
- ay11-20020a1709028b8b00b0013de91ca1b9mr28229688plb.60.1634013414788; Mon, 11
- Oct 2021 21:36:54 -0700 (PDT)
-Date: Mon, 11 Oct 2021 21:35:33 -0700
+ (user=reijiw job=sendgmr) by 2002:a17:902:6ac4:b0:13f:52e1:8840 with SMTP id
+ i4-20020a1709026ac400b0013f52e18840mr1435432plt.15.1634013416153; Mon, 11 Oct
+ 2021 21:36:56 -0700 (PDT)
+Date: Mon, 11 Oct 2021 21:35:34 -0700
 In-Reply-To: <20211012043535.500493-1-reijiw@google.com>
-Message-Id: <20211012043535.500493-24-reijiw@google.com>
+Message-Id: <20211012043535.500493-25-reijiw@google.com>
 Mime-Version: 1.0
 References: <20211012043535.500493-1-reijiw@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [RFC PATCH 23/25] KVM: arm64: Trap disabled features of
- ID_AA64ISAR1_EL1
+Subject: [RFC PATCH 24/25] KVM: arm64: Activate trapping of disabled CPU
+ features for the guest
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -94,81 +94,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add feature_config_ctrl for PTRAUTH, which is indicated in
-ID_AA64ISAR1_EL1, to program configuration register to trap
-guest's using the feature when it is not exposed to the guest.
+Call kvm_vcpu_id_regs_trap_activate() at the first KVM_RUN
+to activate trapping of disabled CPU features.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 41 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ arch/arm64/kvm/arm.c              | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 68df4e4eba05..e74b33741dc4 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -281,6 +281,35 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 	(cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR1_GPI_SHIFT) >= \
- 	 ID_AA64ISAR1_GPI_IMP_DEF)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 691cb6ee0f5c..41f785fdc2e6 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -743,6 +743,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 				struct kvm_arm_copy_mte_tags *copy_tags);
  
-+/*
-+ * Return true if ptrauth needs to be trapped.
-+ * (i.e. if ptrauth is supported on the host but not exposed to the guest)
-+ */
-+static bool vcpu_need_trap_ptrauth(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
-+	unsigned int gpi, gpa, api, apa;
-+	unsigned int generic, address;
-+
-+	if (!system_has_full_ptr_auth())
-+		/* The feature is not supported. */
-+		return false;
-+
-+	val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(SYS_ID_AA64ISAR1_EL1));
-+	gpi = aa64isar1_has_gpi(val);
-+	gpa = aa64isar1_has_gpa(val);
-+	api = aa64isar1_has_api(val);
-+	apa = aa64isar1_has_apa(val);
-+	generic = gpi || gpa;
-+	address = api || apa;
-+	if (generic && address)
-+		/* The feature is available. */
-+		return false;
-+
-+	/* The feature is supported but hidden. */
-+	return true;
-+}
-+
- enum vcpu_config_reg {
- 	VCPU_HCR_EL2 = 1,
- 	VCPU_MDCR_EL2,
-@@ -385,6 +414,14 @@ static struct feature_config_ctrl ftr_ctrl_lor = {
- 	.cfg_val = HCR_TLOR,
- };
+ int kvm_id_regs_consistency_check(const struct kvm_vcpu *vcpu);
++void kvm_vcpu_id_regs_trap_activate(struct kvm_vcpu *vcpu);
  
-+/* For SYS_ID_AA64ISAR1_EL1 */
-+static struct feature_config_ctrl ftr_ctrl_ptrauth = {
-+	.ftr_need_trap = vcpu_need_trap_ptrauth,
-+	.cfg_reg = VCPU_HCR_EL2,
-+	.cfg_mask = (HCR_API | HCR_APK),
-+	.cfg_val = 0,
-+};
-+
- struct id_reg_info {
- 	u32	sys_reg;	/* Register ID */
- 	u64	sys_val;	/* Sanitized system value */
-@@ -763,6 +800,10 @@ static struct id_reg_info id_aa64isar1_el1_info = {
- 	.init = init_id_aa64isar1_el1_info,
- 	.validate = validate_id_aa64isar1_el1,
- 	.get_reset_val = get_reset_id_aa64isar1_el1,
-+	.trap_features = &(const struct feature_config_ctrl *[]) {
-+		&ftr_ctrl_ptrauth,
-+		NULL,
-+	},
- };
+ /* Guest/host FPSIMD coordination helpers */
+ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 38301ddf8372..6b392d7feab7 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -606,6 +606,8 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 	if (kvm_id_regs_consistency_check(vcpu))
+ 		return -EPERM;
  
- static struct id_reg_info id_aa64dfr0_el1_info = {
++	kvm_vcpu_id_regs_trap_activate(vcpu);
++
+ 	return ret;
+ }
+ 
 -- 
 2.33.0.882.g93a45727a2-goog
 
