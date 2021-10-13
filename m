@@ -2,53 +2,53 @@ Return-Path: <SRS0=5TFS=PB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD68C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 12:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EA4C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 12:26:56 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2E9FE60EB4
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 12:04:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2E9FE60EB4
+	by mail.kernel.org (Postfix) with ESMTP id CD71A610E7
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 12:26:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CD71A610E7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D80A24B099;
-	Wed, 13 Oct 2021 08:04:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70DA94B11B;
+	Wed, 13 Oct 2021 08:26:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cgnY7XH6usx9; Wed, 13 Oct 2021 08:04:12 -0400 (EDT)
+	with ESMTP id 1LRNIgxj-HrZ; Wed, 13 Oct 2021 08:26:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 021EC4B131;
-	Wed, 13 Oct 2021 08:04:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E17E54B0D0;
+	Wed, 13 Oct 2021 08:26:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A1704B11E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 08:04:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A80284B08D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 08:26:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WgnX5LDS3LBu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Oct 2021 08:04:01 -0400 (EDT)
+ with ESMTP id x-6ZLYNE5hNq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Oct 2021 08:26:51 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F13BF4B0DB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 08:04:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B7D3F4B08B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 08:26:51 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 22EA9610D0;
- Wed, 13 Oct 2021 12:04:00 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id B990161151;
+ Wed, 13 Oct 2021 12:26:50 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1maczG-00GTgY-Ba; Wed, 13 Oct 2021 13:03:58 +0100
+ id 1maczJ-00GTgY-EP; Wed, 13 Oct 2021 13:04:01 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v9 13/22] KVM: arm64: pkvm: Use a single function to expose
- all id-regs
-Date: Wed, 13 Oct 2021 13:03:37 +0100
-Message-Id: <20211013120346.2926621-3-maz@kernel.org>
+Subject: [PATCH v9 22/22] KVM: arm64: pkvm: Give priority to standard traps
+ over pvm handling
+Date: Wed, 13 Oct 2021 13:03:46 +0100
+Message-Id: <20211013120346.2926621-12-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211013120346.2926621-1-maz@kernel.org>
 References: <20211010145636.1950948-12-tabba@google.com>
@@ -80,225 +80,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Rather than exposing a whole set of helper functions to retrieve
-individual ID registers, use the existing decoding tree and expose
-a single helper instead.
+Checking for pvm handling first means that we cannot handle ptrauth
+traps or apply any of the workarounds (GICv3 or TX2 #219).
 
-This allow a number of functions to be made static, and we now
-have a single entry point to maintain.
+Flip the order around.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/nvhe/sys_regs.h | 14 +-------
- arch/arm64/kvm/hyp/nvhe/pkvm.c             | 10 +++---
- arch/arm64/kvm/hyp/nvhe/sys_regs.c         | 37 ++++++++++++----------
- 3 files changed, 26 insertions(+), 35 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/switch.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h b/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-index 3288128738aa..8adc13227b1a 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/sys_regs.h
-@@ -9,19 +9,7 @@
- 
- #include <asm/kvm_host.h>
- 
--u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu);
--u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 50c7d48e0fa0..c0e3fed26d93 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -167,10 +167,13 @@ static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+  */
+ static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+-	if (kvm_handle_pvm_sysreg(vcpu, exit_code))
+-		return true;
 -
-+u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
- bool kvm_handle_pvm_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code);
- int kvm_check_pvm_sysreg_table(void);
- void inject_undef64(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-index 633547cc1033..62377fa8a4cb 100644
---- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
-@@ -15,7 +15,7 @@
-  */
- static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
- {
--	const u64 feature_ids = get_pvm_id_aa64pfr0(vcpu);
-+	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
- 	u64 hcr_set = HCR_RW;
- 	u64 hcr_clear = 0;
- 	u64 cptr_set = 0;
-@@ -62,7 +62,7 @@ static void pvm_init_traps_aa64pfr0(struct kvm_vcpu *vcpu)
-  */
- static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
- {
--	const u64 feature_ids = get_pvm_id_aa64pfr1(vcpu);
-+	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64PFR1_EL1);
- 	u64 hcr_set = 0;
- 	u64 hcr_clear = 0;
- 
-@@ -81,7 +81,7 @@ static void pvm_init_traps_aa64pfr1(struct kvm_vcpu *vcpu)
-  */
- static void pvm_init_traps_aa64dfr0(struct kvm_vcpu *vcpu)
- {
--	const u64 feature_ids = get_pvm_id_aa64dfr0(vcpu);
-+	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
- 	u64 mdcr_set = 0;
- 	u64 mdcr_clear = 0;
- 	u64 cptr_set = 0;
-@@ -125,7 +125,7 @@ static void pvm_init_traps_aa64dfr0(struct kvm_vcpu *vcpu)
-  */
- static void pvm_init_traps_aa64mmfr0(struct kvm_vcpu *vcpu)
- {
--	const u64 feature_ids = get_pvm_id_aa64mmfr0(vcpu);
-+	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64MMFR0_EL1);
- 	u64 mdcr_set = 0;
- 
- 	/* Trap Debug Communications Channel registers */
-@@ -140,7 +140,7 @@ static void pvm_init_traps_aa64mmfr0(struct kvm_vcpu *vcpu)
-  */
- static void pvm_init_traps_aa64mmfr1(struct kvm_vcpu *vcpu)
- {
--	const u64 feature_ids = get_pvm_id_aa64mmfr1(vcpu);
-+	const u64 feature_ids = pvm_read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
- 	u64 hcr_set = 0;
- 
- 	/* Trap LOR */
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 6bde2dc5205c..f125d6a52880 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -82,7 +82,7 @@ static u64 get_restricted_features_unsigned(u64 sys_reg_val,
-  * based on allowed features, system features, and KVM support.
-  */
- 
--u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
- {
- 	const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
- 	u64 set_mask = 0;
-@@ -103,7 +103,7 @@ u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
- 	return (id_aa64pfr0_el1_sys_val & allow_mask) | set_mask;
+-	return kvm_hyp_handle_sysreg(vcpu, exit_code);
++	/*
++	 * Make sure we handle the exit for workarounds and ptrauth
++	 * before the pKVM handling, as the latter could decide to
++	 * UNDEF.
++	 */
++	return (kvm_hyp_handle_sysreg(vcpu, exit_code) ||
++		kvm_handle_pvm_sysreg(vcpu, exit_code));
  }
  
--u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
- {
- 	const struct kvm *kvm = (const struct kvm *)kern_hyp_va(vcpu->kvm);
- 	u64 allow_mask = PVM_ID_AA64PFR1_ALLOW;
-@@ -114,7 +114,7 @@ u64 get_pvm_id_aa64pfr1(const struct kvm_vcpu *vcpu)
- 	return id_aa64pfr1_el1_sys_val & allow_mask;
- }
- 
--u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * No support for Scalable Vectors, therefore, hyp has no sanitized
-@@ -124,7 +124,7 @@ u64 get_pvm_id_aa64zfr0(const struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * No support for debug, including breakpoints, and watchpoints,
-@@ -134,7 +134,7 @@ u64 get_pvm_id_aa64dfr0(const struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * No support for debug, therefore, hyp has no sanitized copy of the
-@@ -144,7 +144,7 @@ u64 get_pvm_id_aa64dfr1(const struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * No support for implementation defined features, therefore, hyp has no
-@@ -154,7 +154,7 @@ u64 get_pvm_id_aa64afr0(const struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * No support for implementation defined features, therefore, hyp has no
-@@ -164,12 +164,12 @@ u64 get_pvm_id_aa64afr1(const struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64isar0(const struct kvm_vcpu *vcpu)
- {
- 	return id_aa64isar0_el1_sys_val & PVM_ID_AA64ISAR0_ALLOW;
- }
- 
--u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
- {
- 	u64 allow_mask = PVM_ID_AA64ISAR1_ALLOW;
- 
-@@ -182,7 +182,7 @@ u64 get_pvm_id_aa64isar1(const struct kvm_vcpu *vcpu)
- 	return id_aa64isar1_el1_sys_val & allow_mask;
- }
- 
--u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
- {
- 	u64 set_mask;
- 
-@@ -192,22 +192,19 @@ u64 get_pvm_id_aa64mmfr0(const struct kvm_vcpu *vcpu)
- 	return (id_aa64mmfr0_el1_sys_val & PVM_ID_AA64MMFR0_ALLOW) | set_mask;
- }
- 
--u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64mmfr1(const struct kvm_vcpu *vcpu)
- {
- 	return id_aa64mmfr1_el1_sys_val & PVM_ID_AA64MMFR1_ALLOW;
- }
- 
--u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
-+static u64 get_pvm_id_aa64mmfr2(const struct kvm_vcpu *vcpu)
- {
- 	return id_aa64mmfr2_el1_sys_val & PVM_ID_AA64MMFR2_ALLOW;
- }
- 
--/* Read a sanitized cpufeature ID register by its sys_reg_desc. */
--static u64 read_id_reg(const struct kvm_vcpu *vcpu,
--		       struct sys_reg_desc const *r)
-+/* Read a sanitized cpufeature ID register by its encoding */
-+u64 pvm_read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
- {
--	u32 id = reg_to_encoding(r);
--
- 	switch (id) {
- 	case SYS_ID_AA64PFR0_EL1:
- 		return get_pvm_id_aa64pfr0(vcpu);
-@@ -245,6 +242,12 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
-+static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-+		       struct sys_reg_desc const *r)
-+{
-+	return pvm_read_id_reg(vcpu, reg_to_encoding(r));
-+}
-+
- /*
-  * Accessor for AArch32 feature id registers.
-  *
+ /**
 -- 
 2.30.2
 
