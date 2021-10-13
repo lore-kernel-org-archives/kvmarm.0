@@ -2,87 +2,83 @@ Return-Path: <SRS0=5TFS=PB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5F9C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 00:02:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0565DC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 04:48:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 965ED60F38
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 00:02:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 965ED60F38
+	by mail.kernel.org (Postfix) with ESMTP id 70B8860FDA
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 04:48:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 70B8860FDA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 179534B10C;
-	Tue, 12 Oct 2021 20:02:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2FA14B0E1;
+	Wed, 13 Oct 2021 00:48:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TMfypu53HD0w; Tue, 12 Oct 2021 20:02:56 -0400 (EDT)
+	with ESMTP id oSmSSHvorpmC; Wed, 13 Oct 2021 00:48:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1290A4B08F;
-	Tue, 12 Oct 2021 20:02:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7F7B4B0EF;
+	Wed, 13 Oct 2021 00:48:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 312694B08F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 20:02:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA0D84B0E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 00:48:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X8A9+AXuf5jX for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Oct 2021 20:02:53 -0400 (EDT)
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com
- [209.85.214.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 327A14A531
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 20:02:53 -0400 (EDT)
-Received: by mail-pl1-f178.google.com with SMTP id w14so615065pll.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 17:02:53 -0700 (PDT)
+ with ESMTP id LzBlODKotx5d for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Oct 2021 00:48:30 -0400 (EDT)
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
+ [209.85.216.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 610204B0CE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 00:48:30 -0400 (EDT)
+Received: by mail-pj1-f54.google.com with SMTP id k23so1286638pji.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 21:48:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=usOJyi3vWJ+B8xCJglaCM/0JQ+BQoeyBpYldNBu2X7A=;
- b=D+7qhklJPAH83AmBCpAMyIvHcu0UZpGBjD3qo/SjZGhh+cbq/euskkcZ1cSTfJQBVn
- /O1iVvf5S1EpmEm3eXdD+Iy1MRk9RXAc3Vsv2OmxsOGZOSZ8rnucKpDfyFfonUYD2tXH
- yPvY1qAKvZm0T1UKwE9E+wGryzPZyFnkHWud+uqljuameF0Hjdgg7MOlmSINGw6Y4Mho
- OzpQK4SqiaZj4+y+/QKrMA8iIIwFough5NTypRJia97qJLAztZNLFYqM+oiQAvKtziEi
- dVg4rQre/vKbe/BJ7N0Yx20BzJbvvVB5pylKWHuw6JAjEndTlIULMwyNwqQ1psdhD2Iz
- KUzw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6UiNjqdn6cQd+ZVgitW5U2ThWAYr+h/7ydwszKNRfeQ=;
+ b=nzwS/la0l10TdQDUpS6EfK4tSOxmnO6gZczOW3XJ5ZU1nIPUAxwDNnB2z9hTGuVAMd
+ mgb1tQ19a6Q+2r5XVqtEliz2FNtZ0rqo+33A4Ivl95sb7AGy+SkTWs65NeWFnsFeMGwQ
+ Gm+fc045nNg6NXAFk81MgVtH5UXeBCqAChSCDJ7lgTot5LlSBW+ltZlSzumx/ddgxa00
+ WETV2eyglYrzjiruF6nPlraZeEumFm71fFy7p4X0qJiFUwjZi6k+fsDlxaW6m5bVCs7Q
+ uUOYlSZB4EzY6iUs0q82EBZOJP/57C1a05fC+DqTMLuOaApLNQJcSnSdg/hb/YuIyv7x
+ 7oYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=usOJyi3vWJ+B8xCJglaCM/0JQ+BQoeyBpYldNBu2X7A=;
- b=g9oD7mNnPccW71Y94lwUAoZM+p1dySvflyk0YJQtJ+zxF2XKBTPQpk8rOm738Cxqcr
- w6JXxjcHoQ2a1vti6FAZz5l88pBjOvb/+viOO3/Zrn7//rkRX/pNgR1VqokYGBSvSDlT
- 2FNGw2h79SjnaqpQS4FAk2GtvTvnnP0aoh6UbiIqQt0N06JzK44FdaAcpqf4CiFk+uP9
- zAgf7MmO/84bm55l/0Bnx8I3JFjVPMpnmgDoOuyy2rz4fyiR8SdO4Ky8n3mbl6vSGCa3
- Wkx8zJvRC4+5sp0vFajbAHXVbRPA6j+UbriCm9Z283LuuI5AH/al5H855TqpoJn2Fv+/
- ew2g==
-X-Gm-Message-State: AOAM531SlKmHckpAU3g6wyy+kGo649POnKXf/bDPc7XYt7uSclk2g2om
- II0mT3gzNMKyXFlV2ecVEvvD0g==
-X-Google-Smtp-Source: ABdhPJxo7HfGHeKdwK3WniLQ9W70SyBtE5TarYga88X1oCtTWRYloyybpHWXgxggwD5S0ICHu+k1DA==
-X-Received: by 2002:a17:90b:17c9:: with SMTP id
- me9mr9626717pjb.197.1634083371829; 
- Tue, 12 Oct 2021 17:02:51 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id b130sm586106pfb.9.2021.10.12.17.02.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 Oct 2021 17:02:51 -0700 (PDT)
-Date: Wed, 13 Oct 2021 00:02:47 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v4 4/4] KVM: mmu: remove over-aggressive warnings
-Message-ID: <YWYiJy1Z7VZ0SxAd@google.com>
-References: <20210929042908.1313874-1-stevensd@google.com>
- <20210929042908.1313874-5-stevensd@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6UiNjqdn6cQd+ZVgitW5U2ThWAYr+h/7ydwszKNRfeQ=;
+ b=DW6Y+Qw3QbAb76u8qwiaqzYffVKa5pIIRkl1csBYuU2tyQJyTA+MhIxTN13wEYYU5q
+ bdijYK7bR+y637t2dGEFWK56tJi9mUaWHjsPkm2g+faoIsOOCY1a2ukjIlhmOkR66hQz
+ gL/ItzBs/b8uB6krTsqIHxL9TPUn9HGy8ksm7DIGfds50I4Rn0daqXc/IdS71oeW5MOD
+ 3leYvfrtYzJAhDYSo49yooCwvcltiz8LwR+9jjWgBlcXRaQiwVBudr0BbSkeQ6IUhYNz
+ B4oWoIY4qC/I40x/2/6Tx0jbIPpP4Mp3yR5jTR7p2g5gphap/952bks0Omx0Y0x+75FS
+ 19MQ==
+X-Gm-Message-State: AOAM530F4WzIpnIqeQSUygXYRmNyBbE+8ZliTgK6TBDFanC/yEsyJLS6
+ 4brh8Ue0ageY1rFAVesQuoFWHn1n15+v9Aa/cwRSFA==
+X-Google-Smtp-Source: ABdhPJzQV44ZsRub96kp2SNXYmhtc2cOENMwhtRPwrRAakcpX1FISHL38AgFunXCxStCzrda6gvZVrPojmYrDWvjo7Y=
+X-Received: by 2002:a17:90b:38c3:: with SMTP id
+ nn3mr11214221pjb.110.1634100509147; 
+ Tue, 12 Oct 2021 21:48:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210929042908.1313874-5-stevensd@google.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+References: <20210923191610.3814698-1-oupton@google.com>
+ <20210923191610.3814698-4-oupton@google.com>
+ <CAAeT=FxXsJdnrQCr4m-LcADr=WX5pKEa2OdeTf3bRGM08iC3Uw@mail.gmail.com>
+ <CAOQ_QshHDWWEw5BEu-uudFttP1pfJcKuQ-0D_xAkoHJRqYLq8Q@mail.gmail.com>
+ <20211005133335.y4k5qv7d3g74nnzx@gator.home>
+ <CAOQ_QsgwK=qyeaUtNJeZ1OWQwaFUAQcy6uopnDuyDA3Qyt7gmw@mail.gmail.com>
+ <20211005190153.dc2befzcisvznxq5@gator.home>
+In-Reply-To: <20211005190153.dc2befzcisvznxq5@gator.home>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Tue, 12 Oct 2021 21:48:13 -0700
+Message-ID: <CAAeT=FyA8uFK5WyK-_9-V93TzSLEhgmS6nRDg-i=ot1jLy+6bA@mail.gmail.com>
+Subject: Re: [PATCH v2 03/11] KVM: arm64: Encapsulate reset request logic in a
+ helper function
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,44 +95,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Sep 29, 2021, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
-> 
-> Remove two warnings that require ref counts for pages to be non-zero, as
-> mapped pfns from follow_pfn may not have an initialized ref count.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 7 -------
->  virt/kvm/kvm_main.c    | 2 +-
->  2 files changed, 1 insertion(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 5a1adcc9cfbc..3b469df63bcf 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -617,13 +617,6 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
->  
->  	pfn = spte_to_pfn(old_spte);
->  
-> -	/*
-> -	 * KVM does not hold the refcount of the page used by
-> -	 * kvm mmu, before reclaiming the page, we should
-> -	 * unmap it from mmu first.
-> -	 */
-> -	WARN_ON(!kvm_is_reserved_pfn(pfn) && !page_count(pfn_to_page(pfn)));
+On Tue, Oct 5, 2021 at 12:02 PM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Tue, Oct 05, 2021 at 08:05:02AM -0700, Oliver Upton wrote:
+> > Hi folks,
+> >
+> > On Tue, Oct 5, 2021 at 6:33 AM Andrew Jones <drjones@redhat.com> wrote:
+> > >
+> > > On Fri, Oct 01, 2021 at 09:10:14AM -0700, Oliver Upton wrote:
+> > > > On Thu, Sep 30, 2021 at 11:05 PM Reiji Watanabe <reijiw@google.com> wrote:
+> > > > >
+> > > > > On Thu, Sep 23, 2021 at 12:16 PM Oliver Upton <oupton@google.com> wrote:
+> > > > > >
+> > > > > > In its implementation of the PSCI function, KVM needs to request that a
+> > > > > > target vCPU resets before its next entry into the guest. Wrap the logic
+> > > > > > for requesting a reset in a function for later use by other implemented
+> > > > > > PSCI calls.
+> > > > > >
+> > > > > > No functional change intended.
+> > > > > >
+> > > > > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > > > > ---
+> > > > > >  arch/arm64/kvm/psci.c | 59 +++++++++++++++++++++++++------------------
+> > > > > >  1 file changed, 35 insertions(+), 24 deletions(-)
+> > > > > >
+> > > > > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > > > > > index 310b9cb2b32b..bb59b692998b 100644
+> > > > > > --- a/arch/arm64/kvm/psci.c
+> > > > > > +++ b/arch/arm64/kvm/psci.c
+> > > > > > @@ -64,9 +64,40 @@ static inline bool kvm_psci_valid_affinity(unsigned long affinity)
+> > > > > >         return !(affinity & ~MPIDR_HWID_BITMASK);
+> > > > > >  }
+> > > > > >
+> > > > > > -static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > > > > > +static void kvm_psci_vcpu_request_reset(struct kvm_vcpu *vcpu,
+> > > > > > +                                       unsigned long entry_addr,
+> > > > > > +                                       unsigned long context_id,
+> > > > > > +                                       bool big_endian)
+> > > > > >  {
+> > > > > >         struct vcpu_reset_state *reset_state;
+> > > > > > +
+> > > > > > +       lockdep_assert_held(&vcpu->kvm->lock);
+> > > > > > +
+> > > > > > +       reset_state = &vcpu->arch.reset_state;
+> > > > > > +       reset_state->pc = entry_addr;
+> > > > > > +
+> > > > > > +       /* Propagate caller endianness */
+> > > > > > +       reset_state->be = big_endian;
+> > > > > > +
+> > > > > > +       /*
+> > > > > > +        * NOTE: We always update r0 (or x0) because for PSCI v0.1
+> > > > > > +        * the general purpose registers are undefined upon CPU_ON.
+> > > > > > +        */
+> > > > > > +       reset_state->r0 = context_id;
+> > > > > > +
+> > > > > > +       WRITE_ONCE(reset_state->reset, true);
+> > > > > > +       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+> > > > > > +
+> > > > > > +       /*
+> > > > > > +        * Make sure the reset request is observed if the change to
+> > > > > > +        * power_state is observed.
+> > > > > > +        */
+> > > > > > +       smp_wmb();
+> > > > > > +       vcpu->arch.power_off = false;
+> > > > > > +}
+> > > > > > +
+> > > > > > +static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > > > > > +{
+> > > > > >         struct kvm *kvm = source_vcpu->kvm;
+> > > > > >         struct kvm_vcpu *vcpu = NULL;
+> > > > > >         unsigned long cpu_id;
+> > > > > > @@ -90,29 +121,9 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> > > > > >                         return PSCI_RET_INVALID_PARAMS;
+> > > > > >         }
+> > > > > >
+> > > > > > -       reset_state = &vcpu->arch.reset_state;
+> > > > > > -
+> > > > > > -       reset_state->pc = smccc_get_arg2(source_vcpu);
+> > > > > > -
+> > > > > > -       /* Propagate caller endianness */
+> > > > > > -       reset_state->be = kvm_vcpu_is_be(source_vcpu);
+> > > > > > -
+> > > > > > -       /*
+> > > > > > -        * NOTE: We always update r0 (or x0) because for PSCI v0.1
+> > > > > > -        * the general purpose registers are undefined upon CPU_ON.
+> > > > > > -        */
+> > > > > > -       reset_state->r0 = smccc_get_arg3(source_vcpu);
+> > > > > > -
+> > > > > > -       WRITE_ONCE(reset_state->reset, true);
+> > > > > > -       kvm_make_request(KVM_REQ_VCPU_RESET, vcpu);
+> > > > > > -
+> > > > > > -       /*
+> > > > > > -        * Make sure the reset request is observed if the change to
+> > > > > > -        * power_state is observed.
+> > > > > > -        */
+> > > > > > -       smp_wmb();
+> > > > > > -
+> > > > > > -       vcpu->arch.power_off = false;
+> > > > > > +       kvm_psci_vcpu_request_reset(vcpu, smccc_get_arg2(source_vcpu),
+> > > > > > +                                   smccc_get_arg3(source_vcpu),
+> > > > > > +                                   kvm_vcpu_is_be(source_vcpu));
+> > > > > >         kvm_vcpu_wake_up(vcpu);
+> > > > > >
+> > > > > >         return PSCI_RET_SUCCESS;
+> > > > > > --
+> > > > > > 2.33.0.685.g46640cef36-goog
+> > > > >
+> > > > > Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> > > > >
+> > > > > Not directly related to the patch, but the (original) code doesn't
+> > > > > do any sanity checking for the entry address although the PSCI spec says:
+> > > > >
+> > > > > "INVALID_ADDRESS is returned when the entry point address is known
+> > > > > by the implementation to be invalid, because it is in a range that
+> > > > > is known not to be available to the caller."
+> > > >
+> > > > Right, I had noticed the same but was a tad too lazy to address in
+> > > > this series :) Thanks for the review, Reji!
+> > > >
+> > >
+> > > KVM doesn't reserve any subrange within [0 - max_ipa), afaik. So all
+> > > we need to do is check 'entry_addr < max_ipa', right?
+> > >
+> >
+> > We could be a bit more pedantic and check if the IPA exists in a
+> > memory slot, seems like kvm_vcpu_is_visible_gfn() should do the trick.
+> >
+> > Thoughts?
+>
+> Are we sure that all emulated devices, nvram, etc. will always use a
+> memslot for regions that contain executable code? If there's any doubt,
+> then we can't be sure about non-memslot regions within the max_ipa range.
+> That'd be up to userspace.
 
-Have you actually observed false positives with this WARN?  I would expect anything
-without a struct page to get filtered out by !kvm_is_reserved_pfn(pfn).
+I'm sorry for the late response.
+IMHO, I would prefer Andrew's suggestion (check with the max_ipa).
 
-If you have observed false positives, I would strongly prefer we find a way to
-keep the page_count() sanity check, it has proven very helpful in the past in
-finding/debugging bugs during MMU development.
+It looks like instructions must always be in memslot for KVM/ARM looking
+at the current implementation (especially kvm_handle_guest_abort()).
+But, it doesn't necessarily mean the address is not invalid for the
+guest (could be valid for load/store) and it might be changed in
+the future.
 
-> -
->  	if (is_accessed_spte(old_spte))
->  		kvm_set_pfn_accessed(pfn);
->  
+
+Thanks,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
