@@ -2,79 +2,80 @@ Return-Path: <SRS0=5TFS=PB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A480FC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 13:41:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC1FC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 15:58:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 181EC60698
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 13:41:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 181EC60698
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id 5C948611B0
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 15:58:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5C948611B0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 824DD4B0F7;
-	Wed, 13 Oct 2021 09:41:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CABD24B120;
+	Wed, 13 Oct 2021 11:58:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KDV7MSFzqhLa; Wed, 13 Oct 2021 09:41:28 -0400 (EDT)
+	with ESMTP id UbNlEHpfCGVA; Wed, 13 Oct 2021 11:58:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B34D94B101;
-	Wed, 13 Oct 2021 09:41:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1BFE4B108;
+	Wed, 13 Oct 2021 11:58:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14AEE4B0EC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 23:29:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92BA14B0EC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 11:58:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kyf6McBvEnnR for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Oct 2021 23:29:47 -0400 (EDT)
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com
- [209.85.219.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E575D405EE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 23:29:47 -0400 (EDT)
-Received: by mail-yb1-f171.google.com with SMTP id w10so3054046ybt.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Oct 2021 20:29:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=K1V9NDATmu17pUoF4QdYlG/zF1QvhHmXa48+FoG1Ebg=;
- b=V4hO+e2bD1JKo+Av7J5TFNJ1Ayzjepp5lrSlnAALB4jkPnPZEm3JE2msYawjx0E+JD
- tymz1KVCEPIHc7Lb1cN8BmImJcbDMIBN1FhakghcvYzmLRFwru1SX8emTJ2jfivukZrU
- 17T4/dOBCe4YOLTSInLOyPaslkb0C1DApR82U=
+ with ESMTP id mifkMcvwVjM3 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Oct 2021 11:58:35 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 737CE4B092
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 11:58:35 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id
+ l8-20020a5d6d88000000b001611b5de796so2356624wrs.10
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 08:58:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=Eht9NEYnyeNXZ9GC0V0N+PJToFUkivNq3A15CtLZoHQ=;
+ b=MmrT+s8muELqT2L44AG8+lk0AywU/F2urJDOsAWd0K9der7aYqNb7QeEmpJr61jjDJ
+ ktPaVPfr9Um/DkE+sBzpnuPozNyp6CQ+MtznYTvTt4wDgqSdOkw9M3DVjAPywJYCv8V/
+ zflAJefyFMKPyYkjOQMiINYeddoxDo7z6hdWUMN0HOvwQHdW00FFAeG+92esLUP8C1E+
+ zneGPi2fokr5vos/ibfeJwBKG8GSSV9xYqTD3faz8aL7hRURTFEOjeGJufrj7gWmhW2u
+ pYfTxgeNY741mtX6j+fZtTb7vRXRx4KkLWMdK5IbhZnKd9AIAIS/+TedR6F/JZd1rqzO
+ v0Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=K1V9NDATmu17pUoF4QdYlG/zF1QvhHmXa48+FoG1Ebg=;
- b=ktEGpHsGhswY7fbdDjxJEE+l9wiItO63S+/yK9MNN5y6FxhfofH3o2Nq2rJ3yfCvYe
- y4j9lNFr0+HdNM+V+deAk4/Ki9He9Iix9tODDWWdpGQr9KkHT0yggMj7sE/gMqwzwVUh
- 02+hR38tZS4fYYIQovNyAtsJNcJEgZGrW4Ssi9kmol33xuOVX8/9rSkeV7MCjIETayFG
- 0tUyGdAz5C/0oBTJdsnCMR8fssBNe0zl6Sjn0CJ7bBlGBwf33ZaxdIP8S6NlW4yZyai2
- iUppkz76L8Jsux80iBxCGMKb16QN6nf1rsk0cxkXgSlT95TnGRjtwY77vniDZ1y2VRMI
- qQcA==
-X-Gm-Message-State: AOAM530wil0EKnGcKNxyCdHkrWuKALYtmAuTAhj5ANk/+rPELrh0asqw
- Bo96Xp1qWLyQDPsYjv9ixxuOsU5Xxm1twxutxM7D0g==
-X-Google-Smtp-Source: ABdhPJxq87bgca01rLjYkuSh5HTdIgTMzvRne9NDRirxkvsd38A826PPWMoXsd9Iv9DztgPg8Lkfu/gUc5455msojX4=
-X-Received: by 2002:a25:22d7:: with SMTP id
- i206mr34357892ybi.355.1634095787342; 
- Tue, 12 Oct 2021 20:29:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210929042908.1313874-1-stevensd@google.com>
- <20210929042908.1313874-5-stevensd@google.com>
- <YWYiJy1Z7VZ0SxAd@google.com>
-In-Reply-To: <YWYiJy1Z7VZ0SxAd@google.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Wed, 13 Oct 2021 12:29:36 +0900
-Message-ID: <CAD=HUj5HCdBBU2z=yJCCiAhTj0ARj-8XpLqdVbam7Kt9af+SSA@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] KVM: mmu: remove over-aggressive warnings
-To: Sean Christopherson <seanjc@google.com>
-X-Mailman-Approved-At: Wed, 13 Oct 2021 09:41:27 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- open list <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=Eht9NEYnyeNXZ9GC0V0N+PJToFUkivNq3A15CtLZoHQ=;
+ b=v2wZMPlJzNK31ZFOOSTeRdNKLMz/pAASRe8Ea7wCT+miKQmEi2ZU8tuzrU+Q6yg/V6
+ DGwgm12xcBr+4e9ePIbzT0qamgIILL2qQ+2D5KIOvlSBhTzqqCIn72TVVafSohmyxzyR
+ o1dA6PzmViGLkFo7lEMHckl5s9BJLlw3JVDE+jDqwFmZs6quBb9XSpoZ2WCRPbLxTNTR
+ GjkLN20GQqko0pAwo5BPJQHx2WCGgOjZOfSHlbMsQAzSJCwrMr9RWQ46XbE6dxMq7Zkm
+ 8ST/RlOAovS4wH25IJUtToFqg7fSq8zrJQ0fwM4Sy4+W06jCtylOFM/Rfra22eW9h3L8
+ dVAQ==
+X-Gm-Message-State: AOAM5319k8Ztn99OHEdhY0pc4HOHhduAeu1yWh9a/ickqlTWXnF0ana5
+ oCwoeRUxB5gZoWpq3Fw/sWLudEeDXbA2
+X-Google-Smtp-Source: ABdhPJwUVK1oAUnrbwA0NBbH6MgXKCoPORRCUhS/cSQ3NHCwSOfsKuOk9OgrZX4VXp9Bg29A4CFrD6RFznFb
+X-Received: from luke.lon.corp.google.com
+ ([2a00:79e0:d:210:65b5:73d3:1558:b9ae])
+ (user=qperret job=sendgmr) by 2002:a05:600c:1c05:: with SMTP id
+ j5mr141830wms.1.1634140714059; Wed, 13 Oct 2021 08:58:34 -0700 (PDT)
+Date: Wed, 13 Oct 2021 16:58:15 +0100
+Message-Id: <20211013155831.943476-1-qperret@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [PATCH 00/16] KVM: arm64: Implement unshare hypercall for pkvm
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Fuad Tabba <tabba@google.com>, David Brazdil <dbrazdil@google.com>
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,68 +92,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Oct 13, 2021 at 9:02 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Sep 29, 2021, David Stevens wrote:
-> > From: David Stevens <stevensd@chromium.org>
-> >
-> > Remove two warnings that require ref counts for pages to be non-zero, as
-> > mapped pfns from follow_pfn may not have an initialized ref count.
-> >
-> > Signed-off-by: David Stevens <stevensd@chromium.org>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c | 7 -------
-> >  virt/kvm/kvm_main.c    | 2 +-
-> >  2 files changed, 1 insertion(+), 8 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 5a1adcc9cfbc..3b469df63bcf 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -617,13 +617,6 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
-> >
-> >       pfn = spte_to_pfn(old_spte);
-> >
-> > -     /*
-> > -      * KVM does not hold the refcount of the page used by
-> > -      * kvm mmu, before reclaiming the page, we should
-> > -      * unmap it from mmu first.
-> > -      */
-> > -     WARN_ON(!kvm_is_reserved_pfn(pfn) && !page_count(pfn_to_page(pfn)));
->
-> Have you actually observed false positives with this WARN?  I would expect anything
-> without a struct page to get filtered out by !kvm_is_reserved_pfn(pfn).
+Hi all,
 
-Those are the type of pfns that were responsible for CVE-2021-22543
-[1]. One specific example is that amdgpu uses ttm_pool, which makes
-higher order, non-compound allocation. Without the head/tail metadata,
-only the first base page in such an allocation has non-zero
-page_count.
+This series implements an unshare hypercall at EL2 in nVHE protected
+mode, and makes use of it to unmmap guest-specific data-structures from
+EL2 stage-1 during guest tear-down. Crucially, the implementation of the
+share and unshare hypercall implements page refcounts at EL2 to avoid
+accidentally unmapping data-structures that overlap a common page.
 
-[1] https://github.com/google/security-research/security/advisories/GHSA-7wq5-phmq-m584
+This series has two main benefits. Firstly it allows EL2 to track the
+state of shared pages cleanly, as they can now transition from SHARED
+back to OWNED. This will simplify permission checks once e.g. pkvm
+implements a donation hcall to provide memory to protected guests, as
+there should then be no reason for the host to donate a page that is
+currently marked shared. And secondly, it avoids having dangling
+mappings in the hypervisor's stage-1, which should be a good idea from
+a security perspective as the hypervisor is obviously running with
+elevated privileges. And perhaps worth noting is that this also
+refactors the EL2 page-tracking checks in a more scalable way, which
+should allow to implement other memory transitions (host donating memory
+to a guest, a guest sharing back with the host, ...) much more easily in
+the future.
 
-> If you have observed false positives, I would strongly prefer we find a way to
-> keep the page_count() sanity check, it has proven very helpful in the past in
-> finding/debugging bugs during MMU development.
+The series is organized as follows:
 
-When we see a refcount of zero, I think we can look up spte->(gfn,
-slot)->hva->vma and determine whether or not the zero refcount is
-okay, based on vm_flags. That's kind of heavy for a debug check,
-although at least we'd only pay the cost for unusual mappings. But it
-still might make sense to switch to a MMU_WARN_ON, in that case. Or we
-could just ignore the cost, since at least from a superficial reading
-and some basic tests, tdp_mmu doesn't seem to execute this code path.
+ - patches 01-05 refactor the implementation of the existing share
+   hypercall;
 
-Thoughts? I'd lean towards MMU_WARN_ON, but I'd like to know what the
-maintainers' preferences are before sending an updated patch series.
+ - patches 06-10 introduce infrastructure to allow unmapping pages from
+   EL2 stage-1;
 
--David
+ - patches 11-14 allow to refcount pages that are shared more than once
+   with EL2;
 
->
-> > -
-> >       if (is_accessed_spte(old_spte))
-> >               kvm_set_pfn_accessed(pfn);
-> >
+ - patches 15-16 add the unshare hypercall, and make use of it when
+   tearing down guests.
+
+This has been lightly tested on Qemu, by spawning and powering off a
+guest 50 times.
+
+Feedback welcome :) !
+
+Thanks,
+Quentin
+
+Quentin Perret (11):
+  KVM: arm64: Avoid remapping the SVE state in the hyp stage-1
+  KVM: arm64: Introduce kvm_share_hyp()
+  KVM: arm64: Accept page ranges in pkvm share hypercall
+  KVM: arm64: Provide {get,put}_page() stubs for early hyp allocator
+  KVM: arm64: Refcount hyp stage-1 pgtable pages
+  KVM: arm64: Fixup hyp stage-1 refcount
+  KVM: arm64: Back hyp_vmemmap for all of memory
+  KVM: arm64: Move hyp refcount helpers to header files
+  KVM: arm64: Refcount shared pages at EL2
+  KVM: arm64: pkvm: Introduce an unshare hypercall
+  KVM: arm64: pkvm: Unshare guest structs during teardown
+
+Will Deacon (5):
+  KVM: arm64: Introduce do_share() helper for memory sharing between
+    components
+  KVM: arm64: Implement __pkvm_host_share_hyp() using do_share()
+  KVM: arm64: Hook up ->page_count() for hypervisor stage-1 page-table
+  KVM: arm64: Implement kvm_pgtable_hyp_unmap() at EL2
+  KVM: arm64: Move double-sharing logic into hyp-specific function
+
+ arch/arm64/include/asm/kvm_asm.h              |   1 +
+ arch/arm64/include/asm/kvm_host.h             |   2 +
+ arch/arm64/include/asm/kvm_mmu.h              |   2 +
+ arch/arm64/include/asm/kvm_pgtable.h          |  21 +
+ arch/arm64/kvm/arm.c                          |  17 +-
+ arch/arm64/kvm/fpsimd.c                       |  25 +-
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   8 +-
+ arch/arm64/kvm/hyp/include/nvhe/memory.h      |  18 +
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          |  29 +-
+ arch/arm64/kvm/hyp/nvhe/early_alloc.c         |   5 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  12 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 596 ++++++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |  31 +-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c          |  22 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  39 +-
+ arch/arm64/kvm/hyp/pgtable.c                  |  80 ++-
+ arch/arm64/kvm/hyp/reserved_mem.c             |  17 +-
+ arch/arm64/kvm/mmu.c                          |  48 +-
+ arch/arm64/kvm/reset.c                        |  13 +-
+ 19 files changed, 814 insertions(+), 172 deletions(-)
+
+-- 
+2.33.0.882.g93a45727a2-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
