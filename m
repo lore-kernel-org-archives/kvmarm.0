@@ -2,75 +2,75 @@ Return-Path: <SRS0=5TFS=PB=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7957C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 15:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79765C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 15:58:58 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6E8E2611AD
-	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 15:58:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6E8E2611AD
+	by mail.kernel.org (Postfix) with ESMTP id 239F761168
+	for <kvmarm@archiver.kernel.org>; Wed, 13 Oct 2021 15:58:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 239F761168
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21B624B132;
-	Wed, 13 Oct 2021 11:58:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD2AB4B14D;
+	Wed, 13 Oct 2021 11:58:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nVJ9y4qXBFcd; Wed, 13 Oct 2021 11:58:54 -0400 (EDT)
+	with ESMTP id OFMbNA8c6vrz; Wed, 13 Oct 2021 11:58:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0C864B0D9;
-	Wed, 13 Oct 2021 11:58:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBEB34B149;
+	Wed, 13 Oct 2021 11:58:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD1994B14C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 11:58:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E85644B15D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 11:58:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aXXS6xji239e for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Oct 2021 11:58:51 -0400 (EDT)
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com
- [209.85.160.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A03A4B129
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 11:58:51 -0400 (EDT)
-Received: by mail-qt1-f202.google.com with SMTP id
- c19-20020ac81e93000000b002a71180fd3dso2447310qtm.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 08:58:51 -0700 (PDT)
+ with ESMTP id QU+afZLzDuuT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Oct 2021 11:58:54 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DB274B0CB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 11:58:53 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id
+ j19-20020adfb313000000b00160a9de13b3so2359783wrd.8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Oct 2021 08:58:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=ztuYYF9Onc0ZIjngTVEp2z77n51MjY0wGMZOLwDTwhY=;
- b=GVq5GFcw/0eVvulNbba6ktlvmE8YFALwpDIhCJ2/vsiC21sLdLoc9O7Xq36D1lJ5lf
- ZQpif0gOuVc4Y1gCrCxInx9Dy5dbafYfdL55owb7iUdw+pbGb6j7FjBOyhKrHNDwIkvj
- IUagiUdDR+zKO/Ac9HpWerSCBqwNR3R74jb/oiqdXP39kp5RokKJ70PgYiZ7br199OT/
- fxtAXX/51HuCFEYze6DhFLzMABWI4+IwL8WM23aFrRth8DgCQnF6HKbnFhSTNuYZOayb
- PcC6MbtcinQD4fvigVVSdsAf5MhLy6ddmj2xBzYeMb40ITQkrfyGcy+2NPXD9hI6eXPQ
- nvgA==
+ :cc; bh=AEhoESi+JSkIpPsgLf7KV5M6/nV8qQxTUg3eRSjbv/s=;
+ b=NP+XPmDRgtbMk4UIWYD0pQZRkJlQstYb8HVcLmqCidCTYbYQHgdI3Cqdyg2BMtg0E7
+ ZxXptk9cPKAKddslAHjToBYwGC6dKSDDr9i8XsvIRpIAqZgNZspy3rXJluomIH6ikRPq
+ GMD7xgTJYC+p2iKq4nOwt1vtc3aTDy8Q23TqJt8WOdZ/2LNtMpxarqRE3/Usq/0MBwRm
+ F24k7V9pBdz5RsbhTu2S+G4qNUwnwip22wK2jS4gWU/A4VAEAeayNExRA5QBw9pLIcnf
+ 3MZvLAInURcb+xfCjWAMcRLKWeqYTvvi+usmLYswXOEB2/t+ULFEJXEMzeRdLXCgdOA+
+ H7aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=ztuYYF9Onc0ZIjngTVEp2z77n51MjY0wGMZOLwDTwhY=;
- b=0a6cbAPsi9VkQWM4siUNDLK3haewrVqF7cB2sA/sgMBFKNTNdDSwZluJjAr3zZWzIg
- +Lu+GG0OdH+cutkhKnL8n+Pmxz7XuYtWPmsTNj+YA1Xd6arn3DSyr8q1jBBquBeMVCvt
- Zp73Kizgzt0Xu2Wzi9Ob+lgElRk4XWnEwCpVL8Jyw8A0NiGcSBL5SVlDVyGUMBth34Vj
- QcjNDQJs0SzdzZp8Ge1bDU+5kgoELslYJ48DtQqXrxpcoNsS5G0eA3QMxLfMwlI5xyxr
- rXzqTH9h0fMJyT4x//zwFPl3JJPPrVCvNCY2YKsfcwsywtSbK/OLhnzDvCwxUlPJRvhD
- umbg==
-X-Gm-Message-State: AOAM532OzzmUlIXCyJFwtyEHlm8tQ4KhsiRb0yMF6jcQtB8lowRKOusD
- FSSRioGLAXkdhLUsn2XBpZ82+42HuFgl
-X-Google-Smtp-Source: ABdhPJxp1hUAJxs/riqQe2cYJzZaiMjwH6ehh74ltN5CiIrrR1/FVufG6S8GAC+vFxwjhGJSaTXJSPc9xIJG
+ bh=AEhoESi+JSkIpPsgLf7KV5M6/nV8qQxTUg3eRSjbv/s=;
+ b=6QX2q6BBczXcEHezrXSs0VQdQ00PfkP4wHmStpz7PcsqyXB5OFu9w9R1mRRfdnT32M
+ gMYYGZeLK4tbRzUDTRRwXKd7euIUJtfEyQ2i1/cTmXKTOeqRx6wbM7fb/IqstAcqwUd1
+ F5W9V65KxZXrFV6gWOSflZuB3im4A8js3JKM2NSTOgX/oXjjM7jvC2LXXw89ImXqbqK4
+ kMNvl9jGglxPJet54uL5pKkPQ4MeLtC2O57J1UcivDn5sX9eBBa0qejLtduEDbqyKYTN
+ 5/zV+svnelMJz/o+JIDPn4AdpBpvPyk/K2OdXX5fYFrVIUobB26knwRZ9MZI/MEaj2gw
+ WslA==
+X-Gm-Message-State: AOAM531oGAMNMkaLwr0PXN70dfI8heFwiSsaslHouucGG/rPAaMxZjD/
+ gUno+S6/awhUnvRW9whGSFGvc5V4j7n9
+X-Google-Smtp-Source: ABdhPJypaaFzh/P/CSod5M2Uoyrzi+tFUaTYoQ7iBeHY7wDaUM4H3CebTBes5FVoowLKxoASMH9NbGCZR+8e
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:65b5:73d3:1558:b9ae])
- (user=qperret job=sendgmr) by 2002:a05:622a:13c6:: with SMTP id
- p6mr65288qtk.165.1634140730556; Wed, 13 Oct 2021 08:58:50 -0700 (PDT)
-Date: Wed, 13 Oct 2021 16:58:22 +0100
+ (user=qperret job=sendgmr) by 2002:a7b:c76e:: with SMTP id
+ x14mr13634245wmk.47.1634140732732; Wed, 13 Oct 2021 08:58:52 -0700 (PDT)
+Date: Wed, 13 Oct 2021 16:58:23 +0100
 In-Reply-To: <20211013155831.943476-1-qperret@google.com>
-Message-Id: <20211013155831.943476-8-qperret@google.com>
+Message-Id: <20211013155831.943476-9-qperret@google.com>
 Mime-Version: 1.0
 References: <20211013155831.943476-1-qperret@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [PATCH 07/16] KVM: arm64: Refcount hyp stage-1 pgtable pages
+Subject: [PATCH 08/16] KVM: arm64: Fixup hyp stage-1 refcount
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
  Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -95,66 +95,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-To prepare the ground for allowing hyp stage-1 mappings to be removed at
-run-time, update the KVM page-table code to maintain a correct refcount
-using the ->{get,put}_page() function callbacks.
+In nVHE-protected mode, the hyp stage-1 page-table refcount is broken
+due to the lack of refcount support in the early allocator. Fix-up the
+refcount in the finalize walker, once the 'hyp_vmemmap' is up and running.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/setup.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index f8ceebe4982e..768a58835153 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -408,8 +408,10 @@ static bool hyp_map_walker_try_leaf(u64 addr, u64 end, u32 level,
- 		return false;
- 
- 	new = kvm_init_valid_leaf_pte(phys, data->attr, level);
--	if (hyp_pte_needs_update(old, new))
-+	if (hyp_pte_needs_update(old, new)) {
- 		smp_store_release(ptep, new);
-+		data->mm_ops->get_page(ptep);
-+	}
- 
- 	data->phys += granule;
- 	return true;
-@@ -433,6 +435,7 @@ static int hyp_map_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
- 		return -ENOMEM;
- 
- 	kvm_set_table_pte(ptep, childp, mm_ops);
-+	mm_ops->get_page(ptep);
- 	return 0;
- }
- 
-@@ -482,8 +485,16 @@ static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
- 			   enum kvm_pgtable_walk_flags flag, void * const arg)
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 57c27846320f..ad89801dfed7 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -166,12 +166,22 @@ static int finalize_host_mappings_walker(u64 addr, u64 end, u32 level,
  {
- 	struct kvm_pgtable_mm_ops *mm_ops = arg;
-+	kvm_pte_t pte = *ptep;
-+
-+	if (!kvm_pte_valid(pte))
+ 	enum kvm_pgtable_prot prot;
+ 	enum pkvm_page_state state;
++	struct kvm_pgtable_mm_ops *mm_ops = arg;
+ 	kvm_pte_t pte = *ptep;
+ 	phys_addr_t phys;
+ 
+ 	if (!kvm_pte_valid(pte))
+ 		return 0;
+ 
++	/*
++	 * Fix-up the refcount for the page-table pages as the early allocator
++	 * was unable to access the hyp_vmemmap and so the buddy allocator has
++	 * initialised the refcount to '1'.
++	 */
++	mm_ops->get_page(ptep);
++	if (flag != KVM_PGTABLE_WALK_LEAF)
 +		return 0;
 +
-+	mm_ops->put_page(ptep);
-+
-+	if (kvm_pte_table(pte, level))
-+		mm_ops->put_page(kvm_pte_follow(pte, mm_ops));
+ 	if (level != (KVM_PGTABLE_MAX_LEVELS - 1))
+ 		return -EINVAL;
  
--	mm_ops->put_page((void *)kvm_pte_follow(*ptep, mm_ops));
- 	return 0;
- }
- 
-@@ -491,7 +502,7 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt)
+@@ -204,7 +214,8 @@ static int finalize_host_mappings(void)
  {
  	struct kvm_pgtable_walker walker = {
- 		.cb	= hyp_free_walker,
--		.flags	= KVM_PGTABLE_WALK_TABLE_POST,
+ 		.cb	= finalize_host_mappings_walker,
+-		.flags	= KVM_PGTABLE_WALK_LEAF,
 +		.flags	= KVM_PGTABLE_WALK_LEAF | KVM_PGTABLE_WALK_TABLE_POST,
- 		.arg	= pgt->mm_ops,
++		.arg	= pkvm_pgtable.mm_ops,
  	};
  
+ 	return kvm_pgtable_walk(&pkvm_pgtable, 0, BIT(pkvm_pgtable.ia_bits), &walker);
+@@ -229,19 +240,19 @@ void __noreturn __pkvm_init_finalise(void)
+ 	if (ret)
+ 		goto out;
+ 
+-	ret = finalize_host_mappings();
+-	if (ret)
+-		goto out;
+-
+ 	pkvm_pgtable_mm_ops = (struct kvm_pgtable_mm_ops) {
+-		.zalloc_page = hyp_zalloc_hyp_page,
+-		.phys_to_virt = hyp_phys_to_virt,
+-		.virt_to_phys = hyp_virt_to_phys,
+-		.get_page = hpool_get_page,
+-		.put_page = hpool_put_page,
++		.zalloc_page	= hyp_zalloc_hyp_page,
++		.phys_to_virt	= hyp_phys_to_virt,
++		.virt_to_phys	= hyp_virt_to_phys,
++		.get_page	= hpool_get_page,
++		.put_page	= hpool_put_page,
+ 	};
+ 	pkvm_pgtable.mm_ops = &pkvm_pgtable_mm_ops;
+ 
++	ret = finalize_host_mappings();
++	if (ret)
++		goto out;
++
+ out:
+ 	/*
+ 	 * We tail-called to here from handle___pkvm_init() and will not return,
 -- 
 2.33.0.882.g93a45727a2-goog
 
