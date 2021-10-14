@@ -2,60 +2,62 @@ Return-Path: <SRS0=kePE=PC=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A64E7C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Oct 2021 16:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46355C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Oct 2021 16:09:22 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2473C61181
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Oct 2021 16:06:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2473C61181
+	by mail.kernel.org (Postfix) with ESMTP id B45D5610EA
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Oct 2021 16:09:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B45D5610EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 833EF4B11F;
-	Thu, 14 Oct 2021 12:06:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DCEF4B139;
+	Thu, 14 Oct 2021 12:09:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6cXBJQysAbb8; Thu, 14 Oct 2021 12:06:16 -0400 (EDT)
+	with ESMTP id 9ph3K7RwTDaN; Thu, 14 Oct 2021 12:09:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ACC44B120;
-	Thu, 14 Oct 2021 12:06:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E6814B120;
+	Thu, 14 Oct 2021 12:09:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AEBC4B116
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Oct 2021 12:06:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB0784B116
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Oct 2021 12:09:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MshUENuv8aYe for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Oct 2021 12:06:13 -0400 (EDT)
+ with ESMTP id i-C9pXVeevgn for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Oct 2021 12:09:17 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D8584B10E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Oct 2021 12:06:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1AA34B10E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Oct 2021 12:09:17 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 63A3F61056;
- Thu, 14 Oct 2021 16:06:12 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by mail.kernel.org (Postfix) with ESMTPSA id B9870610A0;
+ Thu, 14 Oct 2021 16:09:16 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mb3FC-00GmGg-5G; Thu, 14 Oct 2021 17:06:10 +0100
-MIME-Version: 1.0
-Date: Thu, 14 Oct 2021 17:06:10 +0100
+ id 1mb3IA-00GmKK-HT; Thu, 14 Oct 2021 17:09:14 +0100
+Date: Thu, 14 Oct 2021 17:09:13 +0100
+Message-ID: <878ryvpp06.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v9 17/22] KVM: arm64: pkvm: Handle GICv3 traps as required
-In-Reply-To: <20211014094613.tnx4xwyqrxj4jmnq@gator.home>
+Subject: Re: [PATCH v9 14/22] KVM: arm64: pkvm: Make the ERR/ERX*_EL1
+ registers RAZ/WI
+In-Reply-To: <20211014093220.ylnqb3ohuh5qayps@gator.home>
 References: <20211010145636.1950948-12-tabba@google.com>
  <20211013120346.2926621-1-maz@kernel.org>
- <20211013120346.2926621-7-maz@kernel.org>
- <20211014094613.tnx4xwyqrxj4jmnq@gator.home>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <cba80f95c5df69d9bcea8c6dc30cfbf7@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
+ <20211013120346.2926621-4-maz@kernel.org>
+ <20211014093220.ylnqb3ohuh5qayps@gator.home>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: drjones@redhat.com, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org,
  james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
@@ -78,31 +80,94 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-10-14 10:46, Andrew Jones wrote:
-> On Wed, Oct 13, 2021 at 01:03:41PM +0100, Marc Zyngier wrote:
->> Forward accesses to the ICV_*SGI*_EL1 registers to EL1, and
->> emulate ICV_SRE_EL1 by returning a fixed value.
->> 
->> This should be enough to support GICv3 in a protected guest.
+On Thu, 14 Oct 2021 10:32:20 +0100,
+Andrew Jones <drjones@redhat.com> wrote:
 > 
-> Out of curiosity, has the RVIC work / plans been dropped?
+> On Wed, Oct 13, 2021 at 01:03:38PM +0100, Marc Zyngier wrote:
+> > The ERR*/ERX* registers should be handled as RAZ/WI, and there
+> > should be no need to involve EL1 for that.
+> > 
+> > Add a helper that handles such registers, and repaint the sysreg
+> > table to declare these registers as RAZ/WI.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 33 ++++++++++++++++++++----------
+> >  1 file changed, 22 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > index f125d6a52880..042a1c0be7e0 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+> > @@ -248,6 +248,16 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> >  	return pvm_read_id_reg(vcpu, reg_to_encoding(r));
+> >  }
+> >  
+> > +/* Handler to RAZ/WI sysregs */
+> > +static bool pvm_access_raz_wi(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> > +			      const struct sys_reg_desc *r)
+> > +{
+> > +	if (!p->is_write)
+> > +		p->regval = 0;
+> > +
+> > +	return true;
+> > +}
+> > +
+> >  /*
+> >   * Accessor for AArch32 feature id registers.
+> >   *
+> > @@ -270,9 +280,7 @@ static bool pvm_access_id_aarch32(struct kvm_vcpu *vcpu,
+> >  	BUILD_BUG_ON(FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_EL1),
+> >  		     PVM_ID_AA64PFR0_RESTRICT_UNSIGNED) > ID_AA64PFR0_ELx_64BIT_ONLY);
+> >  
+> > -	/* Use 0 for architecturally "unknown" values. */
+> > -	p->regval = 0;
+> > -	return true;
+> > +	return pvm_access_raz_wi(vcpu, p, r);
+> >  }
+> >  
+> >  /*
+> > @@ -301,6 +309,9 @@ static bool pvm_access_id_aarch64(struct kvm_vcpu *vcpu,
+> >  /* Mark the specified system register as an AArch64 feature id register. */
+> >  #define AARCH64(REG) { SYS_DESC(REG), .access = pvm_access_id_aarch64 }
+> >  
+> > +/* Mark the specified system register as Read-As-Zero/Write-Ignored */
+> > +#define RAZ_WI(REG) { SYS_DESC(REG), .access = pvm_access_raz_wi }
+> > +
+> >  /* Mark the specified system register as not being handled in hyp. */
+> >  #define HOST_HANDLED(REG) { SYS_DESC(REG), .access = NULL }
+> >  
+> > @@ -388,14 +399,14 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+> >  	HOST_HANDLED(SYS_AFSR1_EL1),
+> >  	HOST_HANDLED(SYS_ESR_EL1),
+> >  
+> > -	HOST_HANDLED(SYS_ERRIDR_EL1),
+> > -	HOST_HANDLED(SYS_ERRSELR_EL1),
+> > -	HOST_HANDLED(SYS_ERXFR_EL1),
+> > -	HOST_HANDLED(SYS_ERXCTLR_EL1),
+> > -	HOST_HANDLED(SYS_ERXSTATUS_EL1),
+> > -	HOST_HANDLED(SYS_ERXADDR_EL1),
+> > -	HOST_HANDLED(SYS_ERXMISC0_EL1),
+> > -	HOST_HANDLED(SYS_ERXMISC1_EL1),
+> > +	RAZ_WI(SYS_ERRIDR_EL1),
+> 
+> This is a read-only register. Is write-ignore correct? I'd expect we to
+> inject an exception.
 
-ARM has dropped the architecture, and it makes no sense
-to move KVM to support non-architectural stuff.
+The HW will do it for us, as the MSR instruction doesn't exist for
+this register.
 
-Which means we will eventually have to harden the guest itself
-to cope with the fact that it cannot trust the interrupt controller.
+Thanks,
 
-Yes, this is crap.
+	M.
 
-         M.
 -- 
-Jazz is not dead. It just smells funny...
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
