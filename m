@@ -2,53 +2,53 @@ Return-Path: <SRS0=poro=PD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 360BDC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Oct 2021 09:10:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 498E8C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Oct 2021 09:10:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D330461108
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Oct 2021 09:10:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D330461108
+	by mail.kernel.org (Postfix) with ESMTP id E13D861151
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Oct 2021 09:10:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E13D861151
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88D534B15C;
-	Fri, 15 Oct 2021 05:10:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9582E4B13D;
+	Fri, 15 Oct 2021 05:10:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VNwPvI5BBeCm; Fri, 15 Oct 2021 05:10:19 -0400 (EDT)
+	with ESMTP id ngtYcHxivh2V; Fri, 15 Oct 2021 05:10:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49B004B135;
-	Fri, 15 Oct 2021 05:10:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 792334B165;
+	Fri, 15 Oct 2021 05:10:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27C844B0C5
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D01864B13D
  for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Oct 2021 05:10:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xhXQ8vf-U-65 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id wvO+EiaLmR7o for <kvmarm@lists.cs.columbia.edu>;
  Fri, 15 Oct 2021 05:10:16 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E4854B0BE
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30C874B135
  for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Oct 2021 05:10:16 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 96ED2611CC;
- Fri, 15 Oct 2021 09:10:14 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2338C611C2;
+ Fri, 15 Oct 2021 09:10:15 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mbJEC-00GvHX-Sb; Fri, 15 Oct 2021 10:10:12 +0100
+ id 1mbJED-00GvHX-CD; Fri, 15 Oct 2021 10:10:13 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 2/5] KVM: arm64: Move kvm_arch_vcpu_run_pid_change() out of
- line
-Date: Fri, 15 Oct 2021 10:08:19 +0100
-Message-Id: <20211015090822.2994920-3-maz@kernel.org>
+Subject: [PATCH 4/5] KVM: arm64: Restructure the point where has_run_once is
+ advertised
+Date: Fri, 15 Oct 2021 10:08:21 +0100
+Message-Id: <20211015090822.2994920-5-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211015090822.2994920-1-maz@kernel.org>
 References: <20211015090822.2994920-1-maz@kernel.org>
@@ -78,50 +78,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Having kvm_arch_vcpu_run_pid_change() inline doesn't bring anything
-to the table. Move it next to kvm_vcpu_first_run_init(), which will
-be convenient for what is next to come.
+Restructure kvm_arch_vcpu_run_pid_change() to set the has_run_once
+flag after having completed all the "run once" activities.
+
+This includes moving the flip of the userspace irqchip static key
+to a point where nothing can fail (the current code could end-up
+in a bizarre state in a few error cases).
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h | 7 +------
- arch/arm64/kvm/arm.c              | 5 +++++
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/arm.c | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index f8be56d5342b..d7107d627c54 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -748,12 +748,7 @@ static inline bool kvm_pmu_counter_deferred(struct perf_event_attr *attr)
- void kvm_arch_vcpu_load_debug_state_flags(struct kvm_vcpu *vcpu);
- void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
- 
--#ifdef CONFIG_KVM /* Avoid conflicts with core headers if CONFIG_KVM=n */
--static inline int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
--{
--	return kvm_arch_vcpu_run_map_fp(vcpu);
--}
--
-+#ifdef CONFIG_KVM
- void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
- void kvm_clr_pmu_events(u32 clr);
- 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index fe102cd2e518..ccb59ac54976 100644
+index 30692497c4ea..5bcdf8073854 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -583,6 +583,11 @@ static void update_vmid(struct kvm_vmid *vmid)
- 	spin_unlock(&kvm_vmid_lock);
- }
+@@ -603,8 +603,6 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 	if (likely(vcpu->arch.has_run_once))
+ 		return 0;
  
-+int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
-+{
-+	return kvm_arch_vcpu_run_map_fp(vcpu);
-+}
+-	vcpu->arch.has_run_once = true;
+-
+ 	kvm_arm_vcpu_init_debug(vcpu);
+ 
+ 	if (likely(irqchip_in_kernel(kvm))) {
+@@ -615,12 +613,6 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 		ret = kvm_vgic_map_resources(kvm);
+ 		if (ret)
+ 			return ret;
+-	} else {
+-		/*
+-		 * Tell the rest of the code that there are userspace irqchip
+-		 * VMs in the wild.
+-		 */
+-		static_branch_inc(&userspace_irqchip_in_use);
+ 	}
+ 
+ 	ret = kvm_timer_enable(vcpu);
+@@ -628,6 +620,18 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 		return ret;
+ 
+ 	ret = kvm_arm_pmu_v3_enable(vcpu);
++	if (ret)
++		return ret;
 +
- static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
++	if (!irqchip_in_kernel(kvm)) {
++		/*
++		 * Tell the rest of the code that there are userspace irqchip
++		 * VMs in the wild.
++		 */
++		static_branch_inc(&userspace_irqchip_in_use);
++	}
++
++	vcpu->arch.has_run_once = true;
+ 
+ 	return ret;
+ }
 -- 
 2.30.2
 
