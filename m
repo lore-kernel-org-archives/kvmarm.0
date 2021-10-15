@@ -2,66 +2,95 @@ Return-Path: <SRS0=poro=PD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 283EEC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Oct 2021 09:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45061C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Oct 2021 09:49:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AD25C61151
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Oct 2021 09:10:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AD25C61151
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id B1A3160241
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Oct 2021 09:49:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B1A3160241
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60D514B14D;
-	Fri, 15 Oct 2021 05:10:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 213484B17B;
+	Fri, 15 Oct 2021 05:49:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1uoH+Qs7fLBV; Fri, 15 Oct 2021 05:10:23 -0400 (EDT)
+	with ESMTP id O7GI9EtEhhqI; Fri, 15 Oct 2021 05:49:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8BA14B195;
-	Fri, 15 Oct 2021 05:10:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 213D04B17D;
+	Fri, 15 Oct 2021 05:49:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2443C4B135
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Oct 2021 05:10:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6976C4B134
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Oct 2021 05:49:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KYXxBOxSU7Y0 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Oct 2021 05:10:16 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3209E4B137
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Oct 2021 05:10:16 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D2FD861208;
- Fri, 15 Oct 2021 09:10:14 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mbJED-00GvHX-4o; Fri, 15 Oct 2021 10:10:13 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 3/5] KVM: arm64: Merge kvm_arch_vcpu_run_pid_change() and
- kvm_vcpu_first_run_init()
-Date: Fri, 15 Oct 2021 10:08:20 +0100
-Message-Id: <20211015090822.2994920-4-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211015090822.2994920-1-maz@kernel.org>
+ with ESMTP id bemifLwON1P8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Oct 2021 05:49:06 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 685BE4B0E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Oct 2021 05:49:06 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1634291346;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=TSbEB3BwDLmVM1HNWqG2yqBKy93uV1whZ1iCqAbBG74=;
+ b=HpvHZkPjdaosInKeC4A0s4kyY5dkUsxTYMHg1yAFeZl9u6U5S0ojThgeDa/C8jcudXvNpf
+ ltkfbRZA0jFx5t/ihUJNutPE2sWRl68kud46CpfTs+901Ij5ZgyEfimcHizgw9LL7O9+5T
+ GMfJGCBu9xqcdfRjDdMs5N/oGLI4jBs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-586-r_G_tQohOuCiFi3xIDuOdw-1; Fri, 15 Oct 2021 05:49:03 -0400
+X-MC-Unique: r_G_tQohOuCiFi3xIDuOdw-1
+Received: by mail-wr1-f69.google.com with SMTP id
+ s18-20020adfbc12000000b00160b2d4d5ebso5776442wrg.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Oct 2021 02:49:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=TSbEB3BwDLmVM1HNWqG2yqBKy93uV1whZ1iCqAbBG74=;
+ b=z8yUmyKjOoz78XV4DMTjv3fCWGGXICeOBx57QvX8KayTRxdtBMD+WJ2+KfZ5GAxv5M
+ Y+aPqWY9U9PEBg54kYkPezDBPzTJJyng/M7gFmF7nZGDvkAV4h8QCgfaj+rL+r1Q0ZPY
+ hDcxbrMre5/ov+tB+vhOab5aFbZEbLdRLac//ZNou0O5PP/NbfayKz5ADQdwu/f00j++
+ o7asQyHFnRu4IACWFh45MGmJwEev885DwOTQMQeaZ9NP0kRg48n43mafZkGRMRz69F7C
+ uftq5IKrrsYqpdA1HqBc+DmAcbcJOdPClbQfs50d+5vr2BzmAbuCqrgIQIjNkx7rxxeQ
+ D7xg==
+X-Gm-Message-State: AOAM531Tc+qfffTjL8tkxi/g5/DOTrduLk9+p0V+MKOpdBV0cesbcYaS
+ u8KFDgj+Yms9qSnWZRBtQwpnLwQUS0VhxBiRUboCpVPDi9L7Y5EZ7aGpwSsqAtEGfWkEVe1nRc3
+ nLA15vEeoGLpLpnBiL8lWE4Ci
+X-Received: by 2002:a05:600c:19cd:: with SMTP id
+ u13mr24821929wmq.148.1634291342645; 
+ Fri, 15 Oct 2021 02:49:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz/ogUflpwRDRS8wet8Xt6zPTdVYv1xkvcDCuaGAdghDK+81/p8M1BGu38LZ6JUi9aJYEj8Iw==
+X-Received: by 2002:a05:600c:19cd:: with SMTP id
+ u13mr24821913wmq.148.1634291342470; 
+ Fri, 15 Oct 2021 02:49:02 -0700 (PDT)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+ by smtp.gmail.com with ESMTPSA id a127sm9710231wme.40.2021.10.15.02.49.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 15 Oct 2021 02:49:02 -0700 (PDT)
+Date: Fri, 15 Oct 2021 11:49:00 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 0/5] KVM: arm64: Reorganise vcpu first run
+Message-ID: <20211015094900.pl2gyysitpnszojy@gator>
 References: <20211015090822.2994920-1-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com,
- will@kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Will Deacon <will@kernel.org>, kernel-team@android.com
+In-Reply-To: <20211015090822.2994920-1-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,74 +107,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The kvm_arch_vcpu_run_pid_change() helper gets called on each PID
-change. The kvm_vcpu_first_run_init() helper gets run on the...
-first run(!) of a vcpu.
+On Fri, Oct 15, 2021 at 10:08:17AM +0100, Marc Zyngier wrote:
+> KVM/arm64 relies heavily on a bunch of things to be done on the first
+> run of the vcpu. We also do a bunch of things on PID change. It turns
+> out that these two things are pretty similar (the first PID change is
+> also the first run).
+> 
+> This small series aims at simplifying all that, and to get rid of the
+> vcpu->arch.has_run_once state.
+> 
+> Marc Zyngier (5):
+>   KVM: arm64: Move SVE state mapping at HYP to finalize-time
+>   KVM: arm64: Move kvm_arch_vcpu_run_pid_change() out of line
+>   KVM: arm64: Merge kvm_arch_vcpu_run_pid_change() and
+>     kvm_vcpu_first_run_init()
+>   KVM: arm64: Restructure the point where has_run_once is advertised
 
-As it turns out, the first run of a vcpu also triggers a PID change
-event (vcpu->pid is initially NULL).
+Maybe do the restructuring before the merging in order to avoid the
+potential for bizarre states?
 
-Use this property to merge these two helpers and get rid of another
-arm64-specific oddity.
+>   KVM: arm64: Drop vcpu->arch.has_run_once for vcpu->pid
+> 
+>  arch/arm64/include/asm/kvm_host.h | 12 +++------
+>  arch/arm64/kvm/arm.c              | 43 ++++++++++++++++++-------------
+>  arch/arm64/kvm/fpsimd.c           | 11 --------
+>  arch/arm64/kvm/reset.c            | 11 +++++++-
+>  arch/arm64/kvm/vgic/vgic-init.c   |  2 +-
+>  5 files changed, 39 insertions(+), 40 deletions(-)
+> 
+> -- 
+> 2.30.2
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/arm.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+For the series
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ccb59ac54976..30692497c4ea 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -583,22 +583,26 @@ static void update_vmid(struct kvm_vmid *vmid)
- 	spin_unlock(&kvm_vmid_lock);
- }
- 
-+/*
-+ * Handle both the initialisation that is being done when the vcpu is
-+ * run for the first time, as well as the updates that must be
-+ * performed each time we get a new thread dealing with this vcpu.
-+ */
- int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
--{
--	return kvm_arch_vcpu_run_map_fp(vcpu);
--}
--
--static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
--	int ret = 0;
--
--	if (likely(vcpu->arch.has_run_once))
--		return 0;
-+	int ret;
- 
- 	if (!kvm_arm_vcpu_is_finalized(vcpu))
- 		return -EPERM;
- 
-+	ret = kvm_arch_vcpu_run_map_fp(vcpu);
-+	if (ret)
-+		return ret;
-+
-+	if (likely(vcpu->arch.has_run_once))
-+		return 0;
-+
- 	vcpu->arch.has_run_once = true;
- 
- 	kvm_arm_vcpu_init_debug(vcpu);
-@@ -778,10 +782,6 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 	if (unlikely(!kvm_vcpu_initialized(vcpu)))
- 		return -ENOEXEC;
- 
--	ret = kvm_vcpu_first_run_init(vcpu);
--	if (ret)
--		return ret;
--
- 	if (run->exit_reason == KVM_EXIT_MMIO) {
- 		ret = kvm_handle_mmio_return(vcpu);
- 		if (ret)
--- 
-2.30.2
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
