@@ -2,55 +2,55 @@ Return-Path: <SRS0=NFrk=PE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3895C433F5
-	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 13:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96496C433EF
+	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 13:55:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 23D3A61181
-	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 13:51:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 23D3A61181
+	by mail.kernel.org (Postfix) with ESMTP id 0549F611AF
+	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 13:55:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0549F611AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B00949F6C;
-	Sat, 16 Oct 2021 09:51:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84F6B4B168;
+	Sat, 16 Oct 2021 09:55:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0LDRW5vDLPtG; Sat, 16 Oct 2021 09:51:02 -0400 (EDT)
+	with ESMTP id g+NayzFyyPlp; Sat, 16 Oct 2021 09:54:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54F9B407E7;
-	Sat, 16 Oct 2021 09:51:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE23E4B11C;
+	Sat, 16 Oct 2021 09:54:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BC06407E7
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 09:51:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C304C4B11F
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 09:54:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KRRYqrCNvBuT for <kvmarm@lists.cs.columbia.edu>;
- Sat, 16 Oct 2021 09:50:59 -0400 (EDT)
+ with ESMTP id 3klZFdJ9V95D for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 16 Oct 2021 09:54:58 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1951406E7
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 09:50:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE4BF4B119
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 09:54:57 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 34238600EF;
- Sat, 16 Oct 2021 13:50:57 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id DB0B660698;
+ Sat, 16 Oct 2021 13:54:56 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mbk5P-00HCS4-5k; Sat, 16 Oct 2021 14:50:55 +0100
-Date: Sat, 16 Oct 2021 14:50:54 +0100
-Message-ID: <87bl3pulhd.wl-maz@kernel.org>
+ id 1mbk9G-00HCTW-Ld; Sat, 16 Oct 2021 14:54:54 +0100
+Date: Sat, 16 Oct 2021 14:54:54 +0100
+Message-ID: <87a6j9ulap.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: James Morse <james.morse@arm.com>
-Subject: Re: [RFC PATCH 4/7] arm64: cpufeature: Enable PBHA bits for stage1
-In-Reply-To: <20211015161416.2196-5-james.morse@arm.com>
+Subject: Re: [RFC PATCH 0/7] arm64: mm: Prototype to allow drivers to request
+ PBHA values
+In-Reply-To: <20211015161416.2196-1-james.morse@arm.com>
 References: <20211015161416.2196-1-james.morse@arm.com>
- <20211015161416.2196-5-james.morse@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,136 +79,26 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 15 Oct 2021 17:14:13 +0100,
+Hi James,
+
+On Fri, 15 Oct 2021 17:14:09 +0100,
 James Morse <james.morse@arm.com> wrote:
 > 
-> If the CPUs support HPDS2, and there is a DT description of PBHA values
-> that only affect performance, enable those bits for both TTBR0 and TTBR1.
+> Hello!
 > 
-> Enabling PBHA requires the hierarchical-permissions to be disabled.
-> Commit 87143f404f33 ("arm64: mm: use XN table mapping attributes for
-> the linear region") used these, but only as an optimisation.
+> Do you have hardware that uses PBHA? If so, what does the SoC do in
+> response to which bits, and what workload needs that behaviour?
 > 
-> Only the necessary PBHA bits are enabled to reduce the risk of an
-> unsafe bit/value being used by accident.
-> 
-> Signed-off-by: James Morse <james.morse@arm.com>
-> ---
->  arch/arm64/Kconfig                     | 13 +++++
->  arch/arm64/include/asm/pgtable-hwdef.h |  4 ++
->  arch/arm64/kernel/cpufeature.c         | 81 ++++++++++++++++++++++++++
->  arch/arm64/tools/cpucaps               |  1 +
->  4 files changed, 99 insertions(+)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 077f2ec4eeb2..9196bb932aba 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1461,6 +1461,19 @@ config ARM64_CNP
->  	  at runtime, and does not affect PEs that do not implement
->  	  this feature.
->  
-> +config ARM64_PBHA
-> +	bool "Enable support for Page Based Hardware Attributes (PBHA)"
-> +	default n
-> +	help
-> +	  Page Based Hardware Attributes (PBHA) allow the SoC hardware to
-> +	  change behaviour depending on which mapping was used to access
-> +	  a page of memory. e.g. access via one mapping may always result
-> +	  in the data being cached, whereas using another mapping of the same
-> +	  physical memory.
-> +
-> +	  The behaviour of each PBHA bit is not defined. Say no unless you
-> +	  are very sure you want this
-> +
->  endmenu
->  
->  menu "ARMv8.3 architectural features"
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index 40085e53f573..3d41242c52b0 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -268,6 +268,10 @@
->  #define TCR_TBI1		(UL(1) << 38)
->  #define TCR_HA			(UL(1) << 39)
->  #define TCR_HD			(UL(1) << 40)
-> +#define TCR_HPD0		(UL(1) << 41)
-> +#define TCR_HPD1		(UL(1) << 42)
-> +#define TCR_HWU0nn_MASK		(UL(0xf) << 43)
-> +#define TCR_HWU1nn_MASK		(UL(0xf) << 47)
->  #define TCR_TBID1		(UL(1) << 52)
->  #define TCR_NFD0		(UL(1) << 53)
->  #define TCR_NFD1		(UL(1) << 54)
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index 8694f9dec5e5..548c6f96a878 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -71,6 +71,7 @@
->  #include <linux/types.h>
->  #include <linux/minmax.h>
->  #include <linux/mm.h>
-> +#include <linux/of.h>
->  #include <linux/cpu.h>
->  #include <linux/kasan.h>
->  #include <asm/cpu.h>
-> @@ -110,6 +111,8 @@ DECLARE_BITMAP(boot_capabilities, ARM64_NPATCHABLE);
->  bool arm64_use_ng_mappings = false;
->  EXPORT_SYMBOL(arm64_use_ng_mappings);
->  
-> +unsigned long __ro_after_init arm64_pbha_perf_only_values;
-> +
->  /*
->   * Permit PER_LINUX32 and execve() of 32-bit binaries even if not all CPUs
->   * support it?
-> @@ -1676,6 +1679,71 @@ static bool has_hw_dbm(const struct arm64_cpu_capabilities *cap,
->  
->  #endif
->  
-> +#ifdef CONFIG_ARM64_PBHA
-> +static u8 pbha_stage1_enable_bits;
-> +
-> +static bool plat_can_use_pbha_stage1(const struct arm64_cpu_capabilities *cap,
-> +				     int scope)
-> +{
-> +	u8 val;
-> +	struct device_node *cpus;
-> +	const u8 *perf_only_vals;
-> +	int num_perf_only_vals, i;
-> +
-> +	if (!has_cpuid_feature(cap, scope))
-> +		return false;
-> +
-> +	/*
-> +	 * Calls with scope == SCOPE_LOCAL_CPU need only testing whether this
-> +	 * cpu has the feature. A later 'system' scope call will check for a
-> +	 * firmware description.
-> +	 */
-> +	if (scope == SCOPE_LOCAL_CPU)
-> +		return true;
-> +
-> +	cpus = of_find_node_by_path("/cpus");
-> +	if (!cpus)
-> +		goto done;
-> +
-> +	perf_only_vals = of_get_property(cpus, "arm,pbha-performance-only",
-> +					 &num_perf_only_vals);
-> +	if (!perf_only_vals)
-> +		goto done;
-> +
-> +	/* any listed value is usable at stage 1 */
-> +	for (i = 0 ; i < num_perf_only_vals; i++) {
-> +		val = perf_only_vals[i];
-> +		if (val > 0xf)
-> +			continue;
-> +
-> +		pbha_stage1_enable_bits |= val;
-> +		set_bit(val, &arm64_pbha_perf_only_values);
-> +	}
+> This series is a start at trying to work out what linux needs to
+> support to makeuse of existing SoCs using PBHA.
 
-Somehow, this would need to be exposed to userspace so that a VMM
-could tell a guest what it can use.
+Thanks for starting this.
 
-Thanks,
+I think one part that is missing here is the device side of things.
+How do these attributes get used by the SMMU, how do we convey them to
+the DMA layer, and what is the expected behaviour when we have SVA?
+Not having any guidance form the architecture means that we're walking
+on very thin ice...
 
 	M.
 
