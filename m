@@ -2,70 +2,72 @@ Return-Path: <SRS0=NFrk=PE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3DAAC433EF
-	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 12:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 809A5C433EF
+	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 12:25:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 448B6604E9
-	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 12:21:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 448B6604E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id F0D4161164
+	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 12:25:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org F0D4161164
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B017B4B17C;
-	Sat, 16 Oct 2021 08:21:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 802884B101;
+	Sat, 16 Oct 2021 08:25:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DGViESZt+E8W; Sat, 16 Oct 2021 08:21:15 -0400 (EDT)
+	with ESMTP id leDZVjWX8mhH; Sat, 16 Oct 2021 08:25:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 983524B163;
-	Sat, 16 Oct 2021 08:21:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BC114B104;
+	Sat, 16 Oct 2021 08:25:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C1934B161
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 08:21:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E1C84B104
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 08:25:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0vhGKLGQEKV2 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 16 Oct 2021 08:21:13 -0400 (EDT)
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
- [209.85.167.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F2E94B101
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 08:21:13 -0400 (EDT)
-Received: by mail-lf1-f48.google.com with SMTP id g36so37187875lfv.3
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 05:21:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=mime-version:from:date:message-id:subject:to;
- bh=iUsr9p51Ie9nTNReJyDuQVS1DebemxHDbn7P2Mm5pXs=;
- b=RVWgKFLdjFF1i2II4GFThAAPdzf0tRhrhJEbMk5xQBNoG6l+4NHNqTIzSF5u6h5w1j
- s4HIiO5RJIRk31vIgWt3WzY3+AQhy6sTx06CER8vkBKOKzd5TK8tfx5/xkuOZAedVHfq
- OytyyWDpuK2nfyhK6fcioymNognHgUyEhG2GKzKFpMiYxRFcqGweKro7aNbZhpLmhYAU
- RA4uqXf/AsQ9VEx4Ghct4MurPAYYLKuOOuCLegzrZRUErm1SL7z3neplxsVXN+sNqhmx
- lyK91HCV25k+C8sItCRoXqXNyWh17ehmjN6h1daQGFIBOzhQyN5CqbIoYOjkatRYqXd5
- 5zIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=iUsr9p51Ie9nTNReJyDuQVS1DebemxHDbn7P2Mm5pXs=;
- b=4b3I0vwmBwP6TYRGjvXVqNkrBd/2XQlWOBd739xffC05Vs6UYT5dgW4M4Ly/8Y0h5M
- hjqdP+xvZvLyeC95sXB1/KtQ1Tc60GtA4+9ZEzeddzVNUoY7vSj/2vvOKDgkO/iLsf12
- VTUgf4yqVFSTdhdB2VG2I4BXXnY6cbHwmokB2rDw1FY3oMXrnvYxO7Iq5IGRft1L2UbU
- G5kcXADY3AFa0SyBAdXRAE5Aome3wlHR9Gvd0TBEXuqoMVh/VU99KvIxG9o7cpRqOOy6
- /gMhqfNhQnTbKbjxCd2EAcR+dK8cD+40m0BGUR7jYSC27ULYygMFtHvUxuLCTNllYvIn
- gr5g==
-X-Gm-Message-State: AOAM530L0rvnQdEvbRJAoOt44IbER/bjmaAwSMBb7qlFpXNRHlaemhv1
- DA06GQZ7LolyJ3TVao6o6O0ctT9vaL8CyUdqRsxkKhm/AcA=
-X-Google-Smtp-Source: ABdhPJyNMw87cIluDBDWmb3yyIKbAtITw2OWYhw1bqS5MUEqPXPxcdmhPx6OaDoCWTcXDgbUxtuqHxNpL4qo5HwezQ0=
-X-Received: by 2002:ac2:5934:: with SMTP id v20mr18095497lfi.605.1634386871931; 
- Sat, 16 Oct 2021 05:21:11 -0700 (PDT)
-MIME-Version: 1.0
-From: Chenxu Wang <irakatz51@gmail.com>
-Date: Sat, 16 Oct 2021 20:21:01 +0800
-Message-ID: <CAFLP=uDhb8Zq5pAnTbvXi_OU047Uw3WRkw2YJsYNEsCkdHzkJQ@mail.gmail.com>
-Subject: Problems about Stage-2 translation
-To: kvmarm@lists.cs.columbia.edu
+ with ESMTP id jAq9fQMxJzGC for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 16 Oct 2021 08:25:49 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3C184B101
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 08:25:48 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id E85736115C;
+ Sat, 16 Oct 2021 12:25:47 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mbikz-00HBy2-UM; Sat, 16 Oct 2021 13:25:46 +0100
+Date: Sat, 16 Oct 2021 13:25:45 +0100
+Message-ID: <87h7dhupfa.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH 16/16] KVM: arm64: pkvm: Unshare guest structs during
+ teardown
+In-Reply-To: <20211013155831.943476-17-qperret@google.com>
+References: <20211013155831.943476-1-qperret@google.com>
+ <20211013155831.943476-17-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qperret@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, tabba@google.com, dbrazdil@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,73 +79,105 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4513698973765541506=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
---===============4513698973765541506==
-Content-Type: multipart/alternative; boundary="000000000000ed561d05ce77583f"
+On Wed, 13 Oct 2021 16:58:31 +0100,
+Quentin Perret <qperret@google.com> wrote:
+> 
+> Make use of the newly introduced unshare hypercall during guest teardown
+> to unmap guest-related data structures from the hyp stage-1.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 ++
+>  arch/arm64/include/asm/kvm_mmu.h  |  1 +
+>  arch/arm64/kvm/arm.c              |  2 ++
+>  arch/arm64/kvm/fpsimd.c           | 10 ++++++++--
+>  arch/arm64/kvm/mmu.c              | 16 ++++++++++++++++
+>  arch/arm64/kvm/reset.c            | 13 ++++++++++++-
+>  6 files changed, 41 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f8be56d5342b..8b61cdcd1b29 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -322,6 +322,8 @@ struct kvm_vcpu_arch {
+>  
+>  	struct thread_info *host_thread_info;	/* hyp VA */
+>  	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
+> +	struct thread_info *kern_thread_info;
+> +	struct user_fpsimd_state *kern_fpsimd_state;
+>  
+>  	struct {
+>  		/* {Break,watch}point registers */
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 185d0f62b724..81839e9a8a24 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -151,6 +151,7 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+>  #include <asm/stage2_pgtable.h>
+>  
+>  int kvm_share_hyp(void *from, void *to);
+> +void kvm_unshare_hyp(void *from, void *to);
+>  int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
+>  int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>  			   void __iomem **kaddr,
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f2e74635332b..f11c51db6fe6 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -188,6 +188,8 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  		}
+>  	}
+>  	atomic_set(&kvm->online_vcpus, 0);
+> +
+> +	kvm_unshare_hyp(kvm, kvm + 1);
+>  }
+>  
+>  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> index 2fe1128d9f3d..67059daf4d26 100644
+> --- a/arch/arm64/kvm/fpsimd.c
+> +++ b/arch/arm64/kvm/fpsimd.c
+> @@ -28,23 +28,29 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+>  {
+>  	int ret;
+>  
+> -	struct thread_info *ti = &current->thread_info;
+> -	struct user_fpsimd_state *fpsimd = &current->thread.uw.fpsimd_state;
+> +	struct thread_info *ti = vcpu->arch.kern_thread_info;
+> +	struct user_fpsimd_state *fpsimd = vcpu->arch.kern_fpsimd_state;
+>  
+>  	/*
+>  	 * Make sure the host task thread flags and fpsimd state are
+>  	 * visible to hyp:
+>  	 */
+> +	kvm_unshare_hyp(ti, ti + 1);
 
---000000000000ed561d05ce77583f
-Content-Type: text/plain; charset="UTF-8"
+At this stage, the old thread may have been destroyed and the memory
+recycled. What happens if, in the interval, that memory gets shared
+again in another context? My guts feeling is that either the sharing
+fails, or the unshare above breaks something else (the refcounting
+doesn't save us if the sharing is not with HYP).
 
-Hi all,
+In any case, I wonder whether we need a notification from the core
+code that a thread for which we have a HYP mapping is gone so that we
+can mop up the mapping at that point. That's similar to what we have
+for MMU notifiers and S2 PTs.
 
-I am facing two problems with the Stage-2 translation in KVM.
+This is doable by hooking into fpsimd_release_task() and extending
+thread_struct to track the sharing with HYP.
 
-(1)
-I reserve a memory region (e.g., 0xa000_0000 ~ 0xa020_0000) from DRAM space
-of HostOS, and fill it with some values. Then ask a GuestVM to access this
-region.
+Thanks,
 
-void __iomem *region=ioremap(0xa0000000, 0x1000);
-uint32_t val=ioread32(region);
+	M.
 
-But I get value 0, which is not the expected value.
-I guess the reason is that the Stage-2 translation of the GuestVM does not
-map the reserved region, but it should return a translation fault, rather
-than 0. So I feel confused, could you provide some helpful explanation?
-
-(2)
-I consider mapping a region with the Stage-2 translation. I find that KVM
-create the stage-2 table with kvm_alloc_stage2_pgd(). But I could not find
-a function that can "arbitrarily add a stage-2 mapping to the physical
-address in HostOS" when the VM is activated.
-
-Could you provide such functions?
-
---000000000000ed561d05ce77583f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi all,<div><br></div><div>I am facing two problems with t=
-he Stage-2 translation in KVM.=C2=A0</div><div><br></div><div>(1)</div><div=
->I reserve a memory region (e.g., 0xa000_0000 ~ 0xa020_0000) from DRAM spac=
-e of HostOS, and fill it with some values. Then ask a GuestVM to access thi=
-s region.<br></div><div><br></div><div>void __iomem *region=3Dioremap(0xa00=
-00000, 0x1000);<br>uint32_t val=3Dioread32(region);<br></div><div><br></div=
-><div>But I get value 0, which is not the expected value.</div><div>I guess=
- the reason is that the Stage-2 translation of the GuestVM does not map the=
- reserved region, but it should return a translation fault, rather than 0. =
-So I feel confused, could you provide some helpful explanation?</div><div><=
-br></div><div>(2)</div><div>I consider mapping a region with the Stage-2 tr=
-anslation. I find that KVM create the stage-2 table with=C2=A0kvm_alloc_sta=
-ge2_pgd(). But I could not find a function that=C2=A0can &quot;arbitrarily =
-add a stage-2 mapping to the physical address in HostOS&quot; when the VM i=
-s activated.=C2=A0</div><div><br></div><div>Could you provide such function=
-s?</div></div>
-
---000000000000ed561d05ce77583f--
-
---===============4513698973765541506==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4513698973765541506==--
