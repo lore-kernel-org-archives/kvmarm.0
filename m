@@ -2,55 +2,55 @@ Return-Path: <SRS0=NFrk=PE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60277C433EF
-	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 13:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CADAC433EF
+	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 13:47:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C687C61181
-	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 13:27:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C687C61181
+	by mail.kernel.org (Postfix) with ESMTP id BF1C760EB4
+	for <kvmarm@archiver.kernel.org>; Sat, 16 Oct 2021 13:47:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BF1C760EB4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FAFD4B178;
-	Sat, 16 Oct 2021 09:27:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47C9B4B14C;
+	Sat, 16 Oct 2021 09:47:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 82xU4OUfgWqp; Sat, 16 Oct 2021 09:27:38 -0400 (EDT)
+	with ESMTP id oq16rMtrkSmm; Sat, 16 Oct 2021 09:47:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0700B4B152;
-	Sat, 16 Oct 2021 09:27:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F6D4B152;
+	Sat, 16 Oct 2021 09:47:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A39494B136
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 09:27:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3A564B152
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 09:47:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 27ZQHCg5lcVz for <kvmarm@lists.cs.columbia.edu>;
- Sat, 16 Oct 2021 09:27:35 -0400 (EDT)
+ with ESMTP id re6MnYNm+Xnr for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 16 Oct 2021 09:46:59 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53FF34B0D9
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 09:27:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D4FA4B14C
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 09:46:59 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4C1D56108B;
- Sat, 16 Oct 2021 13:27:34 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 0313461181;
+ Sat, 16 Oct 2021 13:46:58 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mbjim-00HCJk-99; Sat, 16 Oct 2021 14:27:32 +0100
-Date: Sat, 16 Oct 2021 14:27:31 +0100
-Message-ID: <87ee8lumkc.wl-maz@kernel.org>
+ id 1mbk1X-00HCQn-JG; Sat, 16 Oct 2021 14:46:55 +0100
+Date: Sat, 16 Oct 2021 14:46:55 +0100
+Message-ID: <87czo5ulo0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: James Morse <james.morse@arm.com>
-Subject: Re: [RFC PATCH 1/7] KVM: arm64: Detect and enable PBHA for stage2
-In-Reply-To: <20211015161416.2196-2-james.morse@arm.com>
+Subject: Re: [RFC PATCH 6/7] KVM: arm64: Configure PBHA bits for stage2
+In-Reply-To: <20211015161416.2196-7-james.morse@arm.com>
 References: <20211015161416.2196-1-james.morse@arm.com>
- <20211015161416.2196-2-james.morse@arm.com>
+ <20211015161416.2196-7-james.morse@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,145 +79,301 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi James,
-
-On Fri, 15 Oct 2021 17:14:10 +0100,
+On Fri, 15 Oct 2021 17:14:15 +0100,
 James Morse <james.morse@arm.com> wrote:
 > 
-> Page Based Hardware Attributes (PBHA, aka HPDS2) allow a page table entry
-> to specify up to four bits that can be used by the hardware for some
-> implementation defined purpose.
+> There are two conflicting use-cases for PBHA at stage2. We could copy
+> the stage1 PBHA bits to stage2, this would ensure the VMMs memory is
+> exactly reproduced for the guest, including the PBHA bits. The problem
+> here is how the VMM's memory is allocated with the PBHA bits set.
 > 
-> This is a problem for KVM guests as the host may swap guest memory using
-> a different combination of PBHA bits than the guest used when writing the
-> data. Without knowing what the PBHA bits do, its not possible to know if
-> this will corrupt the guest's data.
+> The other is allowing the guest to configure PBHA directly. This would
+> allow guest device drivers to map memory with the appropriate PBHA bits.
+> This would only be safe if the guest can be trusted to only generate
+> PBHA values that only affect performance.
 > 
-> The arm-arm doesn't describe how the PBHA bits are combined between stage1
-> and stage2. Arm's Cortex CPUs appear to all do the same thing: stage2 wins.
+> The arm-arm doesn't describe how the stage1 and stage2 bits are combined.
+> Arm's implementations appear to all have the same behaviour, according
+> to the TRM: stage2 wins.
 > 
-> Enable PBHA for stage2, where the configured value is zero. This has no
-> effect if PBHA isn't in use. On Cortex cores that have the 'stage2 wins'
-> behaviour, this disables whatever the guest may be doing. For any other
-> core with a sensible combination policy, it should be harmless.
-
-So the other side of the above is whether it has the potential to be
-harmful on systems that combine PBHA bits differently. Specially if
-they use VTCR_EL2.PBHA bits as a indication that they can OR S1 and S2
-instead of a direct S2 override, thus letting the S1 bits that would
-otherwise not being conveyed outside of the core.
-
-I guess we have no way to know until someone reports really bad memory
-corruption and loss of data. The architecture is totally broken here.
-
+> For these CPUs, we can allow a guest to use a PBHA bit by disabling it
+> in VTCR_EL2. We just need to know which bits...
+> 
+> The DT describes the values that only affect performance, but if value-5
+> is safe for use, we can't prevent the guest from using value-1 and value-4.
+> These 'decomposed' values would also need to be listed as only affecting
+> performance.
+> 
+> Add a cpufeature for CPUs that have this 'stage2 wins' behaviour.
+> Decompose each performance-only value (5 -> 5, 4, 1), and check each of
+> these values is listed as only affecting performance. If so, the bits
+> of the original value (5) can be used by the guest at stage1. (by clearing
+> the bits from VTCR_EL2)
 > 
 > Signed-off-by: James Morse <james.morse@arm.com>
 > ---
-> I've checked the TRMs for Neoverse-N1, and Cortexs: A76, A77, A78 and X1.
-> They all have this 'stage2 wins' behaviour. The behaviour isn't documented
-> by A510 or A710's TRM.
+> I've checked the TRMs for the listed CPUs.
+> There are more, I've asked for the TRMs to always describe this.
 > ---
->  arch/arm64/include/asm/kvm_arm.h     | 1 +
->  arch/arm64/include/asm/kvm_pgtable.h | 9 +++++++++
->  arch/arm64/kernel/cpufeature.c       | 9 +++++++++
->  arch/arm64/kvm/hyp/pgtable.c         | 9 +++++++++
->  arch/arm64/tools/cpucaps             | 1 +
->  5 files changed, 29 insertions(+)
+>  arch/arm64/include/asm/cpufeature.h |   1 +
+>  arch/arm64/include/asm/cputype.h    |   4 ++
+>  arch/arm64/kernel/cpufeature.c      | 105 ++++++++++++++++++++++++++++
+>  arch/arm64/kernel/image-vars.h      |   3 +
+>  arch/arm64/kvm/hyp/pgtable.c        |   8 ++-
+>  arch/arm64/tools/cpucaps            |   1 +
+>  6 files changed, 120 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 327120c0089f..bab7f0ad3724 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -126,6 +126,7 @@
->  #define VTCR_EL2_VS_SHIFT	19
->  #define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
->  #define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
-> +#define VTCR_EL2_PBHA_MASK	GENMASK(28, 25)
->  
->  #define VTCR_EL2_T0SZ(x)	TCR_T0SZ(x)
->  
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 027783829584..678bff4bfd7f 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -125,6 +125,10 @@ enum kvm_pgtable_stage2_flags {
->   * @KVM_PGTABLE_PROT_SW1:	Software bit 1.
->   * @KVM_PGTABLE_PROT_SW2:	Software bit 2.
->   * @KVM_PGTABLE_PROT_SW3:	Software bit 3.
-> + * @KVM_PGTABLE_PROT_PBHA0:	Page-Based Hardware Attribute 0.
-> + * @KVM_PGTABLE_PROT_PBHA1:	Page-Based Hardware Attribute 1.
-> + * @KVM_PGTABLE_PROT_PBHA2:	Page-Based Hardware Attribute 2.
-> + * @KVM_PGTABLE_PROT_PBHA3:	Page-Based Hardware Attribute 3.
->   */
->  enum kvm_pgtable_prot {
->  	KVM_PGTABLE_PROT_X			= BIT(0),
-> @@ -137,6 +141,11 @@ enum kvm_pgtable_prot {
->  	KVM_PGTABLE_PROT_SW1			= BIT(56),
->  	KVM_PGTABLE_PROT_SW2			= BIT(57),
->  	KVM_PGTABLE_PROT_SW3			= BIT(58),
-> +
-> +	KVM_PGTABLE_PROT_PBHA0			= BIT(59),
-> +	KVM_PGTABLE_PROT_PBHA1			= BIT(60),
-> +	KVM_PGTABLE_PROT_PBHA2			= BIT(61),
-> +	KVM_PGTABLE_PROT_PBHA3			= BIT(62),
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index ef6be92b1921..ec800ce15308 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -101,6 +101,7 @@ struct arm64_ftr_reg {
 >  };
 >  
->  #define KVM_PGTABLE_PROT_RW	(KVM_PGTABLE_PROT_R | KVM_PGTABLE_PROT_W)
+>  extern struct arm64_ftr_reg arm64_ftr_reg_ctrel0;
+> +extern unsigned long arm64_pbha_stage2_safe_bits;
+>  
+>  /*
+>   * CPU capabilities:
+> diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+> index 6231e1f0abe7..4d7f18749d23 100644
+> --- a/arch/arm64/include/asm/cputype.h
+> +++ b/arch/arm64/include/asm/cputype.h
+> @@ -73,6 +73,8 @@
+>  #define ARM_CPU_PART_CORTEX_A76		0xD0B
+>  #define ARM_CPU_PART_NEOVERSE_N1	0xD0C
+>  #define ARM_CPU_PART_CORTEX_A77		0xD0D
+> +#define ARM_CPU_PART_CORTEX_A78		0xD41
+> +#define ARM_CPU_PART_CORTEX_X1		0xD44
+>  
+>  #define APM_CPU_PART_POTENZA		0x000
+>  
+> @@ -113,6 +115,8 @@
+>  #define MIDR_CORTEX_A76	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A76)
+>  #define MIDR_NEOVERSE_N1 MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_NEOVERSE_N1)
+>  #define MIDR_CORTEX_A77	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A77)
+> +#define MIDR_CORTEX_A78	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_A78)
+> +#define MIDR_CORTEX_X1	MIDR_CPU_MODEL(ARM_CPU_IMP_ARM, ARM_CPU_PART_CORTEX_X1)
+>  #define MIDR_THUNDERX	MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX)
+>  #define MIDR_THUNDERX_81XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_81XX)
+>  #define MIDR_THUNDERX_83XX MIDR_CPU_MODEL(ARM_CPU_IMP_CAVIUM, CAVIUM_CPU_PART_THUNDERX_83XX)
 > diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index f8a3067d10c6..8694f9dec5e5 100644
+> index 88f0f805b938..ad2b3b179ab1 100644
 > --- a/arch/arm64/kernel/cpufeature.c
 > +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -2328,6 +2328,15 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
->  		.matches = has_cpuid_feature,
->  		.min_field_value = 1,
->  	},
-> +	{
-> +		.capability = ARM64_HAS_PBHA,
-> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-> +		.sys_reg = SYS_ID_AA64MMFR1_EL1,
-> +		.sign = FTR_UNSIGNED,
-> +		.field_pos = ID_AA64MMFR1_HPD_SHIFT,
-> +		.matches = has_cpuid_feature,
-> +		.min_field_value = 2,
-> +	},
->  	{},
->  };
+> @@ -77,6 +77,7 @@
+>  #include <asm/cpu.h>
+>  #include <asm/cpufeature.h>
+>  #include <asm/cpu_ops.h>
+> +#include <asm/cputype.h>
+>  #include <asm/fpsimd.h>
+>  #include <asm/insn.h>
+>  #include <asm/kvm_host.h>
+> @@ -113,6 +114,7 @@ EXPORT_SYMBOL(arm64_use_ng_mappings);
 >  
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index f8ceebe4982e..7bd90ea1c61f 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -540,6 +540,15 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
->  	 */
->  	vtcr |= VTCR_EL2_HA;
+>  unsigned long __ro_after_init arm64_pbha_perf_only_values;
+>  EXPORT_SYMBOL(arm64_pbha_perf_only_values);
+> +unsigned long __ro_after_init arm64_pbha_stage2_safe_bits;
+>  
+>  /*
+>   * Permit PER_LINUX32 and execve() of 32-bit binaries even if not all CPUs
+> @@ -1680,13 +1682,50 @@ static bool has_hw_dbm(const struct arm64_cpu_capabilities *cap,
+>  
+>  #endif
+>  
+> +
+>  #ifdef CONFIG_ARM64_PBHA
+>  static u8 pbha_stage1_enable_bits;
+> +static DEFINE_SPINLOCK(pbha_dt_lock);
+> +
+> +/* For the value 5, return a bitmap with bits 5, 4, and 1 set. */
+> +static unsigned long decompose_pbha_values(u8 val)
+> +{
+> +	int i;
+> +	unsigned long mask = 0;
+> +
+> +	for (i = 1; i <= 15; i++) {
+> +		if ((i & val) == i)
+> +			set_bit(i, &mask);
+> +	}
+> +
+> +	return mask;
+> +}
+> +
+> +/*
+> + * The bits of a value are safe if all values that can be built from those
+> + * enabled bits are listed as only affecting performance.
+> + * e.g. 5 would also need 1 and 4 to be listed.
+> + *
+> + * When there is a conflict with the bits already enabled, the new value is
+> + * skipped.
+> + * e.g. if 5 already caused bit-0 and bit-2 to be enabled, adding 3 to the list
+> + * would need to test 7 as bit-2 is already enabled. If 7 is not listed, 3 is
+> + * skipped and bit-1 is not enabled.
+> + */
+> +static void stage2_test_pbha_value(u8 val)
+> +{
+> +	unsigned long mask;
+> +
+> +	mask = decompose_pbha_values(val | arm64_pbha_stage2_safe_bits);
+> +	if ((arm64_pbha_perf_only_values & mask) == mask)
+> +		arm64_pbha_stage2_safe_bits |= val;
+> +}
+>  
+>  static bool plat_can_use_pbha_stage1(const struct arm64_cpu_capabilities *cap,
+>  				     int scope)
+>  {
+>  	u8 val;
+> +	static bool dt_check_done;
+>  	struct device_node *cpus;
+>  	const u8 *perf_only_vals;
+>  	int num_perf_only_vals, i;
+> @@ -1702,6 +1741,10 @@ static bool plat_can_use_pbha_stage1(const struct arm64_cpu_capabilities *cap,
+>  	if (scope == SCOPE_LOCAL_CPU)
+>  		return true;
+>  
+> +	spin_lock(&pbha_dt_lock);
+> +	if (dt_check_done)
+> +		goto out_unlock;
+> +
+>  	cpus = of_find_node_by_path("/cpus");
+>  	if (!cpus)
+>  		goto done;
+> @@ -1721,9 +1764,24 @@ static bool plat_can_use_pbha_stage1(const struct arm64_cpu_capabilities *cap,
+>  		set_bit(val, &arm64_pbha_perf_only_values);
+>  	}
 >  
 > +	/*
-> +	 * Enable PBHA for stage2 on systems that support it. The configured
-> +	 * value will always be 0, which is defined as the safe default
-> +	 * setting. On Cortex cores, enabling PBHA for stage2 effectively
-> +	 * disables it for stage1.
+> +	 * for stage2 the values are collapsed back to 4 bits that can only
+> +	 * enable values in the arm64_pbha_perf_only_values mask.
 > +	 */
-> +	if (cpus_have_final_cap(ARM64_HAS_PBHA))
-> +		vtcr = FIELD_PREP(VTCR_EL2_PBHA_MASK, 0xf);
+> +	for (i = 0 ; i < num_perf_only_vals; i++) {
+> +		val = perf_only_vals[i];
+> +		if (val > 0xf)
+> +			continue;
+> +
+> +		stage2_test_pbha_value(val);
+> +	}
+> +
+>  done:
+>  	of_node_put(cpus);
+> +	dt_check_done = true;
+>  
+> +out_unlock:
+> +	spin_unlock(&pbha_dt_lock);
+>  	return !!pbha_stage1_enable_bits;
+>  }
+>  
+> @@ -1743,6 +1801,47 @@ static void cpu_enable_pbha(struct arm64_cpu_capabilities const *cap)
+>  	isb();
+>  	local_flush_tlb_all();
+>  }
+> +
+> +/*
+> + * PBHA's behaviour is implementation defined, as is the way it combines
+> + * stage1 and stage2 attributes. If the kernel has KVM supported, and booted
+> + * at EL2, only these CPUs can allow PBHA in a guest, as KVM knows how the PBHA
+> + * bits are combined. This prevents the host being affected by some
+> + * implementation defined behaviour from the guest.
+> + *
+> + * The TRM for these CPUs describe stage2 as overriding stage1.
+> + */
+> +static const struct midr_range pbha_stage2_wins[] = {
+> +	MIDR_ALL_VERSIONS(MIDR_NEOVERSE_N1),
+> +	MIDR_ALL_VERSIONS(MIDR_CORTEX_A76),
+> +	MIDR_ALL_VERSIONS(MIDR_CORTEX_A77),
+> +	MIDR_ALL_VERSIONS(MIDR_CORTEX_A78),
+> +	{},
+> +};
+> +
+> +static bool plat_can_use_pbha_stage2(const struct arm64_cpu_capabilities *cap,
+> +				     int scope)
+> +{
+> +	/*  Booted at EL2? */
+> +	if (!is_hyp_mode_available() && !is_kernel_in_hyp_mode())
+> +		return false;
+> +
+> +	if (!is_midr_in_range_list(read_cpuid_id(), cap->midr_range_list))
+> +		return false;
+> +
+> +	/*
+> +	 * Calls with scope == SCOPE_LOCAL_CPU need only testing whether this
+> +	 * cpu has the feature. A later 'system' scope call will check for a
+> +	 * firmware description.
+> +	 */
+> +	if (scope == SCOPE_LOCAL_CPU)
+> +		return true;
+> +
+> +	if (!__system_matches_cap(ARM64_HAS_PBHA_STAGE1))
+> +		return false;
+> +
+> +	return !!arm64_pbha_stage2_safe_bits;
+> +}
+>  #endif /* CONFIG_ARM64_PBHA */
+>  
+>  #ifdef CONFIG_ARM64_AMU_EXTN
+> @@ -2418,6 +2517,12 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+>  		.min_field_value = 2,
+>  		.cpu_enable = cpu_enable_pbha,
+>  	},
+> +	{
+> +		.capability = ARM64_HAS_PBHA_STAGE2,
+> +		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+> +		.matches = plat_can_use_pbha_stage2,
+> +		.midr_range_list = pbha_stage2_wins,
+> +	},
+>  #endif
+>  	{},
+>  };
+> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+> index c96a9a0043bf..d6abdc53f4d9 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -134,6 +134,9 @@ KVM_NVHE_ALIAS(__hyp_rodata_end);
+>  /* pKVM static key */
+>  KVM_NVHE_ALIAS(kvm_protected_mode_initialized);
+>  
+> +/* PBHA bits for stage2 */
+> +KVM_NVHE_ALIAS(arm64_pbha_stage2_safe_bits);
 
-Err... Surely you mean 'vtcr |= FIELD_PREP(...)' here, right?
+I'm not totally keen on this, see below.
 
 > +
->  	/* Set the vmid bits */
->  	vtcr |= (get_vmid_bits(mmfr1) == 16) ?
->  		VTCR_EL2_VS_16BIT :
-> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
-> index 49305c2e6dfd..132596d8b518 100644
-> --- a/arch/arm64/tools/cpucaps
-> +++ b/arch/arm64/tools/cpucaps
-> @@ -28,6 +28,7 @@ HAS_LSE_ATOMICS
->  HAS_NO_FPSIMD
->  HAS_NO_HW_PREFETCH
->  HAS_PAN
-> +HAS_PBHA
->  HAS_RAS_EXTN
->  HAS_RNG
->  HAS_SB
+>  #endif /* CONFIG_KVM */
+>  
+>  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 7bd90ea1c61f..c0bfef55a1ff 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -520,7 +520,7 @@ struct stage2_map_data {
+>  u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  {
+>  	u64 vtcr = VTCR_EL2_FLAGS;
+> -	u8 lvls;
+> +	u8 lvls, pbha = 0xf;
+>  
+>  	vtcr |= kvm_get_parange(mmfr0) << VTCR_EL2_PS_SHIFT;
+>  	vtcr |= VTCR_EL2_T0SZ(phys_shift);
+> @@ -545,9 +545,13 @@ u64 kvm_get_vtcr(u64 mmfr0, u64 mmfr1, u32 phys_shift)
+>  	 * value will always be 0, which is defined as the safe default
+>  	 * setting. On Cortex cores, enabling PBHA for stage2 effectively
+>  	 * disables it for stage1.
+> +	 * When the HAS_PBHA_STAGE2 feature is supported, clear the 'safe'
+> +	 * bits to allow the guest's stage1 to use these bits.
+>  	 */
+> +	if (cpus_have_final_cap(ARM64_HAS_PBHA_STAGE2))
+> +		pbha = pbha ^ arm64_pbha_stage2_safe_bits;
+>  	if (cpus_have_final_cap(ARM64_HAS_PBHA))
+> -		vtcr = FIELD_PREP(VTCR_EL2_PBHA_MASK, 0xf);
+> +		vtcr = FIELD_PREP(VTCR_EL2_PBHA_MASK, pbha);
+
+ORing bug aside, this isn't great in the protected case, where we
+ultimately don't want to trust a value that is under EL1 control for
+page tables.
+
+I'd suggest reusing the hack we have for things like kimage_voffset,
+where we generate the value as an immediate that gets inlined.
 
 Thanks,
 
