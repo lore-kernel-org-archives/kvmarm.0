@@ -2,77 +2,75 @@ Return-Path: <SRS0=PgOR=PF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D5AC4332F
-	for <kvmarm@archiver.kernel.org>; Sun, 17 Oct 2021 00:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C1BC433FE
+	for <kvmarm@archiver.kernel.org>; Sun, 17 Oct 2021 04:44:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 77F0660F8F
-	for <kvmarm@archiver.kernel.org>; Sun, 17 Oct 2021 00:43:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 77F0660F8F
+	by mail.kernel.org (Postfix) with ESMTP id BD51E610E8
+	for <kvmarm@archiver.kernel.org>; Sun, 17 Oct 2021 04:44:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BD51E610E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE89B4B168;
-	Sat, 16 Oct 2021 20:43:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 351144B119;
+	Sun, 17 Oct 2021 00:44:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xq1hWexKzbJU; Sat, 16 Oct 2021 20:43:18 -0400 (EDT)
+	with ESMTP id Xe+g7jM-Y7Zk; Sun, 17 Oct 2021 00:44:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2F734B133;
-	Sat, 16 Oct 2021 20:43:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F37A84B0F7;
+	Sun, 17 Oct 2021 00:44:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22F814B0C2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 20:43:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB3DD4B0E1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Oct 2021 00:44:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ro4OT9N5vFI0 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 16 Oct 2021 20:43:16 -0400 (EDT)
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com
- [209.85.216.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CED3E4B0BF
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 20:43:16 -0400 (EDT)
-Received: by mail-pj1-f44.google.com with SMTP id
- ez7-20020a17090ae14700b001a132a1679bso2140170pjb.0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 17:43:16 -0700 (PDT)
+ with ESMTP id CL7295yQjm1u for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 17 Oct 2021 00:44:09 -0400 (EDT)
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com
+ [209.85.214.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A00C24B0DF
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Oct 2021 00:44:09 -0400 (EDT)
+Received: by mail-pl1-f182.google.com with SMTP id 21so8994828plo.13
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 Oct 2021 21:44:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=IiOWGy8tMQRLpDn+eCyybilmmSR1ckxWs2pDq5ZT9Ik=;
- b=J5xRJ0dTlgDAo6yty9GlaenUpAjwcXiT5oAi/nRczSdBoQ1YfioXV8pJzIE1inx+R1
- bnAdW7YP3yQYbSpaM7oITWrY8xWWOZXlo2JDfOIxmNm82FYWUga28yAjcyqsPbD9nuGA
- zoguHRuJCrjfiz2INl3V0sOonzQoOg5LBF3nGQNraadXGRufsogZvhLfKKHsh1860x4M
- ukAvDjoqL/ygxmozeQkX67z8BAlu3aiKQrgUF+YvX/wQ/nQDV59tKkBKtolmcO2d4Ex5
- 4ZtILO5dr+NF/7f3wt/ML06pi4Qhg/NyNN6kgixBQPpG1AUHu0GJcCvSVQCA6LdsgxiC
- +/9Q==
+ :cc; bh=Y8hxkkjC59Lk20UqzTDUhRF4a3QLCPerXoGaMuMIfbA=;
+ b=T+yExjczlNVce32AnKsOADeGvIvc9/hmv9tJkGiZ38+EWDlFw7dH0wi3W76abD1qyo
+ 0kK2PgXS2Xxrlf4mC8oqUQNcm5dP5/Iq115Yus8QGdF+vhFKhVAFMffRLbv25M4OkojR
+ QQfbYmm86orFpJ5wuDeeOqL9fhlXeXzK89Ijh2BW2FmI1a7X4LE1Wd8/XVSlQkDtXrhB
+ /BWkmbswgoRE7nvPdb4MT129rJo0JtNFdJFEX40I2JxfBD5lPbWusu3UbbZGTRuyl1sD
+ Mcl+oaeIjpHFsSe75mZFb12Gh8kP6yV+xCQxQVU3+LwC655JurIhP8Ygg8T+qGAkT9Kd
+ akIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=IiOWGy8tMQRLpDn+eCyybilmmSR1ckxWs2pDq5ZT9Ik=;
- b=pYMGjXzZFuIUGtWFEuJMvNZatQARMcxlhS71geTfPZjxNqxGdzCJ0TXY1EzyHWgdTi
- DqohocYECvDMEwfcNk1n5CGaTM8kIu4RUnng60W//MXmkzOktAcgq3QQMFACAB29TsbQ
- o6+y3y671NakHowQOTs03a1n1JguRNw5uJuBX+Gfh780tVKb33+CzZBusHSswMnrD2si
- HlDCIaEmfY/OR4Ai+6ZTsF4wqwoJWR+7NJvkdm6B4irF2zPZBYh92pZ3q5PN3WrmpYGv
- eiSX3gS/OJnHIFcS66QNlDgx3KDQFzH1FrYZYpxiII+MsTVFjqmACgniAhY/tSeHmAep
- ukJg==
-X-Gm-Message-State: AOAM5300QdJUdd+geyPkt1qj/aa2PvNGihSpvLDsijWoq0n0E1x1Qerp
- DPn3f+z6vgNm1mD+x497D4I3/NcAhckZvNy4yokQ6w==
-X-Google-Smtp-Source: ABdhPJy3v+acwe/IavlDvDOFJQAd8YtLrwYt9/b1dEsWw7zjJKe6J06bBCxOm0YQ7+Br5VTgSCTFV1eWn36o+7szWcc=
-X-Received: by 2002:a17:902:c402:b0:13f:1c07:5a25 with SMTP id
- k2-20020a170902c40200b0013f1c075a25mr18688367plk.38.1634431395551; Sat, 16
- Oct 2021 17:43:15 -0700 (PDT)
+ bh=Y8hxkkjC59Lk20UqzTDUhRF4a3QLCPerXoGaMuMIfbA=;
+ b=dqFJk/KYO8o5bkGTd0H+ZZaRMhNa3kz+H0qRppWs5051AnU2WdiAhLnJwX2wffcLAr
+ K053v5VIaFAz9D9Pw2iGTUFESqXqm8LhObcZ3KqjYpMGlmRst/A53jpsxP0YHFJQAY1r
+ DgHBWm6eZ/kVKElx4Swhn7ZY8b4xszCAIc6TwU29R1vBhMuhWBWVHW9494pa+0YmH08j
+ KIpPX4wgvRpPMbmzsXxKDayD2GAWo3M+wCIdArXcwKx99AhX3n+qtOvbwyi/mSTEvLtp
+ tY/6P5id1VIedn89jIFMeZiiRCY2vNDQ6kkrMFuDc1zLGqJzAtWf99GfWwzvWt6I5bBV
+ ucSA==
+X-Gm-Message-State: AOAM533Z8R5PmtUdADyNs4NcIsia9X+tIEua6XArpJLKenCnWaiq76+b
+ hkWHXcwnBytipDzODXootK+g4H1wsQNZG7rYf7hYzA==
+X-Google-Smtp-Source: ABdhPJyKMiTmY39aaGR53moXzMQSfsCG990gr+68UwPJI39g1bF/oHnDrzgDbR9D57bdYzAnc0v/bWSYRHrmATRzOTM=
+X-Received: by 2002:a17:90b:38c3:: with SMTP id
+ nn3mr25207656pjb.110.1634445848472; 
+ Sat, 16 Oct 2021 21:44:08 -0700 (PDT)
 MIME-Version: 1.0
 References: <20211012043535.500493-1-reijiw@google.com>
- <20211012043535.500493-3-reijiw@google.com>
- <20211015130918.ezlygga73doepbw6@gator>
-In-Reply-To: <20211015130918.ezlygga73doepbw6@gator>
+ <20211012043535.500493-5-reijiw@google.com>
+ <20211015134741.b7jahdmypu6tqkt2@gator>
+In-Reply-To: <20211015134741.b7jahdmypu6tqkt2@gator>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Sat, 16 Oct 2021 17:42:59 -0700
-Message-ID: <CAAeT=Fx9zUet2HvFe8dwhXjyozuggn+qcQBoyb_8hUGJNKFNTQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 02/25] KVM: arm64: Save ID registers' sanitized value
- per vCPU
+Date: Sat, 16 Oct 2021 21:43:52 -0700
+Message-ID: <CAAeT=Fw-ECM0n1C1HvtiiNEm-xhcK2-R0fWbA7hd38BJge+2RQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/25] KVM: arm64: Introduce struct id_reg_info
 To: Andrew Jones <drjones@redhat.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
@@ -94,166 +92,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Oct 15, 2021 at 6:09 AM Andrew Jones <drjones@redhat.com> wrote:
->
-> On Mon, Oct 11, 2021 at 09:35:12PM -0700, Reiji Watanabe wrote:
-> > Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
-> > registers' sanitized value in the array for the vCPU at the first
-> > vCPU reset. Use the saved ones when ID registers are read by
-> > userspace (via KVM_GET_ONE_REG) or the guest.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
-> >  arch/arm64/kvm/sys_regs.c         | 26 ++++++++++++++++++--------
-> >  2 files changed, 28 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 9b5e7a3b6011..0cd351099adf 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -145,6 +145,14 @@ struct kvm_vcpu_fault_info {
-> >       u64 disr_el1;           /* Deferred [SError] Status Register */
-> >  };
-> >
-> > +/*
-> > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> > + * where 0<=crm<8, 0<=op2<8.
->
-> crm is 4 bits, so this should be 0 <= crm < 16 and...
->
-> > + */
-> > +#define KVM_ARM_ID_REG_MAX_NUM 64
->
-> ...this should be 128. Or am I missing something?
-
-Registers with (3, 0, 0, 0<=crm<8, op2) are defined/allocated including
-reserved (RAZ) ones (please see Table D12-2 in ARM DDI 0487G.b),
-and the code supports those only for now.
-
-I understand that registers with crm >= 8 could be defined in the future
-(I'm not so sure if they will be really ID registers though),
-but then we can include them later as needed.
-
-> > +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
-> > +#define IDREG_SYS_IDX(id)    (ID_REG_BASE + IDREG_IDX(id))
-> > +
-> >  enum vcpu_sysreg {
-> >       __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
-> >       MPIDR_EL1,      /* MultiProcessor Affinity Register */
-> > @@ -209,6 +217,8 @@ enum vcpu_sysreg {
-> >       CNTP_CVAL_EL0,
-> >       CNTP_CTL_EL0,
-> >
-> > +     ID_REG_BASE,
-> > +     ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
-> >       /* Memory Tagging Extension registers */
-> >       RGSR_EL1,       /* Random Allocation Tag Seed Register */
-> >       GCR_EL1,        /* Tag Control Register */
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 1d46e185f31e..72ca518e7944 100644
 > > --- a/arch/arm64/kvm/sys_regs.c
 > > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -273,7 +273,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
-> >                         struct sys_reg_params *p,
-> >                         const struct sys_reg_desc *r)
-> >  {
-> > -     u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > +     u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(SYS_ID_AA64MMFR1_EL1));
-> >       u32 sr = reg_to_encoding(r);
-> >
-> >       if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
-> > @@ -1059,12 +1059,11 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
-> >       return true;
+> > @@ -263,6 +263,76 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+> >               return read_zero(vcpu, p);
 > >  }
 > >
-> > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> >  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> >               struct sys_reg_desc const *r, bool raz)
-> >  {
-> >       u32 id = reg_to_encoding(r);
-> > -     u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
-> > +     u64 val = raz ? 0 : __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
-> >
-> >       switch (id) {
-> >       case SYS_ID_AA64PFR0_EL1:
-> > @@ -1174,6 +1173,16 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
-> >       return REG_HIDDEN;
-> >  }
-> >
-> > +static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+> > +struct id_reg_info {
+> > +     u32     sys_reg;        /* Register ID */
+> > +     u64     sys_val;        /* Sanitized system value */
+> > +
+> > +     /*
+> > +      * Limit value of the register for a vcpu. The value is sys_val
+> > +      * with bits cleared for unsupported features for the guest.
+> > +      */
+> > +     u64     vcpu_limit_val;
 >
-> Since not all ID registers will use this, then maybe name it
-> reset_sanitised_id_reg?
+> Maybe I'll see a need for both later, but at the moment I'd think we only
+> need sys_val with the bits cleared for disabled features.
 
-Thank you for the suggestion.
-
-I named it 'reset_id_reg' according to the naming conventions of
-set_id_reg, get_id_reg, and access_id_reg which are used for the same
-set of ID registers (ID_SANITISED ones) as reset_id_reg.
-I would think it's better to use consistent names for all of them.
-So, I am a bit reluctant to change only the name of reset_id_reg.
-
-What do you think about the names of those other three functions ?
+Uh, yes, sys_val is used in patch-15 and I should have introduced
+the field in the patch.  I will fix it in v2.
 
 
-> > +{
-> > +     u32 id = reg_to_encoding(rd);
-> > +
-> > +     if (vcpu_has_reset_once(vcpu))
-> > +             return;
->
-> Ah, I see my kvm_vcpu_initialized() won't work since vcpu->arch.target is
-> set before the first reset. While vcpu->arch.target is only being used
-> like a "is_initialized" boolean at this time, I guess we better keep it
-> in case we ever want to implement CPU models (which this series gets us a
-> step closer to).
-
-Thank you for sharing your thoughts and I agree with you.
-
-
-> > +
-> > +     __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id)) = read_sanitised_ftr_reg(id);
-> > +}
-> > +
-> >  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> >                              const struct sys_reg_desc *rd,
-> >                              const struct kvm_one_reg *reg, void __user *uaddr)
-> > @@ -1219,9 +1228,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> >  /*
-> >   * cpufeature ID register user accessors
-> >   *
-> > - * For now, these registers are immutable for userspace, so no values
-> > - * are stored, and for set_id_reg() we don't allow the effective value
-> > - * to be changed.
-> > + * We don't allow the effective value to be changed.
-> >   */
-> >  static int __get_id_reg(const struct kvm_vcpu *vcpu,
+> > -static int __set_id_reg(const struct kvm_vcpu *vcpu,
+> > +static int __set_id_reg(struct kvm_vcpu *vcpu,
 > >                       const struct sys_reg_desc *rd, void __user *uaddr,
-> > @@ -1375,6 +1382,7 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
-> >  #define ID_SANITISED(name) {                 \
-> >       SYS_DESC(SYS_##name),                   \
-> >       .access = access_id_reg,                \
-> > +     .reset  = reset_id_reg,                 \
-> >       .get_user = get_id_reg,                 \
-> >       .set_user = set_id_reg,                 \
-> >       .visibility = id_visibility,            \
-> > @@ -1830,8 +1838,10 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
-> >       if (p->is_write) {
-> >               return ignore_write(vcpu, p);
-> >       } else {
-> > -             u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> > -             u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> > +             u64 dfr = __vcpu_sys_reg(vcpu,
-> > +                                      IDREG_SYS_IDX(SYS_ID_AA64DFR0_EL1));
-> > +             u64 pfr = __vcpu_sys_reg(vcpu,
-> > +                                      IDREG_SYS_IDX(SYS_ID_AA64PFR0_EL1));
+> >                       bool raz)
+> >  {
+> >       const u64 id = sys_reg_to_index(rd);
+> > +     u32 encoding = reg_to_encoding(rd);
+> >       int err;
+> >       u64 val;
+> >
+> > @@ -1252,10 +1327,18 @@ static int __set_id_reg(const struct kvm_vcpu *vcpu,
+> >       if (err)
+> >               return err;
+> >
+> > -     /* This is what we mean by invariant: you can't change it. */
+> > -     if (val != read_id_reg(vcpu, rd, raz))
+> > +     /* Don't allow to change the reg unless the reg has id_reg_info */
+> > +     if (val != read_id_reg(vcpu, rd, raz) && !GET_ID_REG_INFO(encoding))
+> >               return -EINVAL;
+> >
+> > +     if (raz)
+> > +             return (val == 0) ? 0 : -EINVAL;
 >
-> Please avoid these ugly line breaks when we're well under Linux's max
-> length, which is 100.
+> This is already covered by the val != read_id_reg(vcpu, rd, raz) check.
 
-Yes, I will fix them (as well as all other similar line breaks
-for other patches in my series).
+Yes, it can simply return 0 for raz case in this patch.
+I will fix this in v2.
+
+
+> > +     err = validate_id_reg(vcpu, rd, val);
+> > +     if (err)
+> > +             return err;
+> > +
+> > +     __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(encoding)) = val;
+> >       return 0;
+> >  }
+> >
+> > @@ -2818,6 +2901,23 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+> >       return write_demux_regids(uindices);
+> >  }
+> >
+> > +static void id_reg_info_init_all(void)
+> > +{
+> > +     int i;
+> > +     struct id_reg_info *id_reg;
+> > +
+> > +     for (i = 0; i < ARRAY_SIZE(id_reg_info_table); i++) {
+> > +             id_reg = (struct id_reg_info *)id_reg_info_table[i];
+> > +             if (!id_reg)
+> > +                     continue;
+> > +
+> > +             if (id_reg->init)
+> > +                     id_reg->init(id_reg);
+> > +             else
+> > +                     id_reg_info_init(id_reg);
+>
+> Maybe call id_reg->init(id_reg) from within id_reg_info_init() in case we
+> wanted to apply some common id register initialization at some point?
+
+Thank you for the nice suggestion.
+That sounds like a better idea. I'll look into fixing it in v2.
 
 Thanks,
 Reiji
