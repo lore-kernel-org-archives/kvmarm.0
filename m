@@ -2,55 +2,78 @@ Return-Path: <SRS0=YGC0=PG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A812FC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 17:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 724A7C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 19:01:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 480C460EE9
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 17:27:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 480C460EE9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id CED1661283
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 19:01:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CED1661283
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAF374B1F8;
-	Mon, 18 Oct 2021 13:27:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47FBD4B1F8;
+	Mon, 18 Oct 2021 15:01:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id L+SK4VmqFdlV; Mon, 18 Oct 2021 13:27:03 -0400 (EDT)
+	with ESMTP id zYkVQqb83Gcu; Mon, 18 Oct 2021 15:01:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 450D84B24B;
-	Mon, 18 Oct 2021 13:27:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3564B4B242;
+	Mon, 18 Oct 2021 15:01:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B38E4B1F8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 13:27:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 069014B236
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 15:01:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FlkbUylpscHm for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Oct 2021 13:27:01 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 243694B1DD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 13:27:01 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CC7D92F;
- Mon, 18 Oct 2021 10:27:00 -0700 (PDT)
-Received: from [10.1.196.28] (eglon.cambridge.arm.com [10.1.196.28])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 203F53F694;
- Mon, 18 Oct 2021 10:27:00 -0700 (PDT)
-Subject: Re: [RFC PATCH 4/7] arm64: cpufeature: Enable PBHA bits for stage1
-To: Marc Zyngier <maz@kernel.org>
-References: <20211015161416.2196-1-james.morse@arm.com>
- <20211015161416.2196-5-james.morse@arm.com> <87bl3pulhd.wl-maz@kernel.org>
-From: James Morse <james.morse@arm.com>
-Message-ID: <40dfabe4-47aa-49be-a37d-f17a47028c1e@arm.com>
-Date: Mon, 18 Oct 2021 18:26:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+ with ESMTP id 9yOb3E+FT5T0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Oct 2021 15:01:36 -0400 (EDT)
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com
+ [209.85.167.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DCCAD4B1FD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 15:01:35 -0400 (EDT)
+Received: by mail-lf1-f52.google.com with SMTP id x27so1837638lfa.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 12:01:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fwx/Jdsb71I9qqjyP9iwj3S7LzNPiAYBS7CN0/ADUFg=;
+ b=C/xWv8z4hO/zAwymhxR1GYxdOfWIW/k70z0EoQAsQUgS6plpkTb9SDaWe57WmLT5Wv
+ xMu+xyq++TvjIo0EhXlZKlUySxKWa6SG04Fdq3v5yBr8fwV8fVSy5RGjhMItAa8bPf9F
+ 9fwAdordg6ZOTd3ErvjOXfmc/HCMrqKf6kgi+rISJSKwexR9AmLdglugJA7x8B5rfoir
+ zQYlbld4wW9qENYRr/bawhjI65QflFY5jYx7gdjgKv5d1F24AhCpm5CfZXnoBL5NrqsY
+ H3FubHqFzfaEVxQ04QCHq1RGvhzNlPMMz3viqIXk6HB/EeiDfvOX6WC3Dp9synfXjOxs
+ iMFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fwx/Jdsb71I9qqjyP9iwj3S7LzNPiAYBS7CN0/ADUFg=;
+ b=IfvmI+xQMPNxMFkLnNpAHHnGRFtLNqmZQwERpT69XzLR16+PTfacPgqwfkY5+0RYus
+ LvG/39o8wY2BUup9n3XU6w74ltkNZwgT/eNR4LBhxDUbHNrM8Z8ZpvVA9IIPakKTUAJS
+ +otthfSekTNu7GhnDJBp9j3yxsi15lGxaLj5dYekMBx4JrYgW9BXfqY4+RoEjn3HoNdc
+ 5Hl6K2YdAfVRtbmS2L7RkOUDS8usAtIo3RkkWlV8HkWk7KA93Fv1lVgBow+bJxshlmTI
+ z0nkYPLTA3oMt14SPaHXDI1tH7NvE/dsZKB8xgee7/jzv8Nisxoz5xzc+4z5T8B1tLgU
+ FNKQ==
+X-Gm-Message-State: AOAM532fb+6pX43SQxDMvjvgWoWgpI6Ugx4o8KQDuVr6u3YAEJea3kdf
+ v5xoOgxTa3WWEmmVQ79txdk0QREvS/PDMXXMZF0=
+X-Google-Smtp-Source: ABdhPJzEGBBUSrJdDL9mUUf2Nc7Kkma7mIEYspmFkkS23uekdiqVod6zQGmaf3ZFRMgdCQlkDPEvCOAEuxMrKtDiuGI=
+X-Received: by 2002:ac2:5dd4:: with SMTP id x20mr1437374lfq.313.1634583694297; 
+ Mon, 18 Oct 2021 12:01:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87bl3pulhd.wl-maz@kernel.org>
-Content-Language: en-GB
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <CAFLP=uDhb8Zq5pAnTbvXi_OU047Uw3WRkw2YJsYNEsCkdHzkJQ@mail.gmail.com>
+ <877decvf9x.wl-maz@kernel.org>
+ <CAFLP=uDY-Eh6gvA2UvAtd=u1wa61tg9TAmdnqiJGZE+Yan8PpA@mail.gmail.com>
+ <87zgr6odec.wl-maz@kernel.org>
+In-Reply-To: <87zgr6odec.wl-maz@kernel.org>
+From: Chenxu Wang <irakatz51@gmail.com>
+Date: Tue, 19 Oct 2021 03:01:23 +0800
+Message-ID: <CAFLP=uDAvg_6m3NLgOXnAYLtZe74nqhv_bOJdTwX=iZCrwXs0A@mail.gmail.com>
+Subject: Re: Problems about Stage-2 translation
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -62,85 +85,42 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 16/10/2021 14:50, Marc Zyngier wrote:
-> On Fri, 15 Oct 2021 17:14:13 +0100,
-> James Morse <james.morse@arm.com> wrote:
->>
->> If the CPUs support HPDS2, and there is a DT description of PBHA values
->> that only affect performance, enable those bits for both TTBR0 and TTBR1.
->>
->> Enabling PBHA requires the hierarchical-permissions to be disabled.
->> Commit 87143f404f33 ("arm64: mm: use XN table mapping attributes for
->> the linear region") used these, but only as an optimisation.
->>
->> Only the necessary PBHA bits are enabled to reduce the risk of an
->> unsafe bit/value being used by accident.
-
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->> index 8694f9dec5e5..548c6f96a878 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
-
->> @@ -1676,6 +1679,71 @@ static bool has_hw_dbm(const struct arm64_cpu_capabilities *cap,
-
->> +static bool plat_can_use_pbha_stage1(const struct arm64_cpu_capabilities *cap,
->> +				     int scope)
->> +{
->> +	u8 val;
->> +	struct device_node *cpus;
->> +	const u8 *perf_only_vals;
->> +	int num_perf_only_vals, i;
->> +
->> +	if (!has_cpuid_feature(cap, scope))
->> +		return false;
->> +
->> +	/*
->> +	 * Calls with scope == SCOPE_LOCAL_CPU need only testing whether this
->> +	 * cpu has the feature. A later 'system' scope call will check for a
->> +	 * firmware description.
->> +	 */
->> +	if (scope == SCOPE_LOCAL_CPU)
->> +		return true;
->> +
->> +	cpus = of_find_node_by_path("/cpus");
->> +	if (!cpus)
->> +		goto done;
->> +
->> +	perf_only_vals = of_get_property(cpus, "arm,pbha-performance-only",
->> +					 &num_perf_only_vals);
->> +	if (!perf_only_vals)
->> +		goto done;
->> +
->> +	/* any listed value is usable at stage 1 */
->> +	for (i = 0 ; i < num_perf_only_vals; i++) {
->> +		val = perf_only_vals[i];
->> +		if (val > 0xf)
->> +			continue;
->> +
->> +		pbha_stage1_enable_bits |= val;
->> +		set_bit(val, &arm64_pbha_perf_only_values);
->> +	}
-
-> Somehow, this would need to be exposed to userspace so that a VMM
-> could tell a guest what it can use.
-
-I'm assuming any user is very soc-specific... but it would help the VMM to know.
-
-I guess KVM could return the bitmap as KVM_CAP_PBHA. There is no way to tell the VMM what
-the bits do, as that is imp-def...
-
-
-Thanks,
-
-James
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyYywKClNvcnJ5LCBidXQgSSBjb3VsZCBub3QgZmluZCB0aGUgYm90dG9tIHBvc3Rpbmcg
+bW9kZSBpbiBHbWFpbC4KCkFsc28sIHRoYW5rcyBmb3IgeW91ciByZXBseSwgSSBjb250aW51ZSB0
+byBkaXNjb3ZlciBob3cgdGhlIFN0YWdlLTIKdHJhbnNsYXRpb24gd29ya3MgaW4gS1ZNLgpCdXQs
+IHdoZW4gSSByZWFkIHRoZSBIQ1JfRUwyIHJlZ2lzdGVyIGluIEhvc3QgIChpdCBpcyB2NS4zLjAp
+ICwgaXRzCnZhbHVlIGlzIDB4NF84ODAwXzAwMDAuIFNvCigxKSBJIGFtIGluIFZIRSBtb2RlLgoo
+MikgVGhlIFN0YWdlLTIgdHJhbnNsYXRpb24gaXMgZGlzYWJsZWQuCgpJIGFtIHN1cmUgdGhhdCBJ
+IGhhdmUgcnVuIGEgTm9uLVNlY3VyZSBWTSB3aXRoIFFFTVUsIHNvIGlzIGl0IGNvcnJlY3QKdGhh
+dCB0aGUgUy0yIHRyYW5zbGF0aW9uIGlzIGRpc2FibGVkIGluIFZIRSBtb2RlPyBJZiBzbywgaG93
+IGl0CmhhbmRsZXMgdGhlIG1lbW9yeSBtYW5hZ2VtZW50IGZvciBHdWVzdD8KCgpDb25mdXNlZCwK
+V2FuZwoKCk1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+IOS6jjIwMjHlubQxMOaciDE45pel
+5ZGo5LiAIOS4i+WNiDY6MDblhpnpgZPvvJoKPgo+IFdhbmcsCj4KPiBQbGVhc2UgZG9uJ3QgdG9w
+LXBvc3QsIGFuZCBzdGljayB0byBwbGFpbiB0ZXh0IGluc3RlYWQgb2YgSFRNTC4KPgo+IE9uIE1v
+biwgMTggT2N0IDIwMjEgMDk6MzY6MDUgKzAxMDAsCj4gQ2hlbnh1IFdhbmcgPGlyYWthdHo1MUBn
+bWFpbC5jb20+IHdyb3RlOgo+ID4KPiA+IEhpIE1hcmMsCj4gPgo+ID4gVGhhbmtzIGZvciB5b3Vy
+IGhlbHAuIEkgc3R1ZGllZCB0aGUga3ZtX2hhbmRsZV9ndWVzdF9hYm9ydCgpIGhhbmRsZXIsIGFu
+ZAo+ID4gYmFzaWNhbGx5IGtub3cgdGhlIHJlYXNvbiBmb3IgInJldHVybiAwIi4KPiA+IEJ1dCBJ
+IHN0aWxsIGNhbm5vdCBzb2x2ZSB0aGUgbWFwcGluZyBwcm9ibGVtLgo+ID4KPiA+IEkgd2FudCB0
+byBmaW5kIGEgZnVuY3Rpb24gb3IgQVBJcywgd2hvc2UgaW5wdXQgcGFyYW1ldGVycyBhcmUgKDEp
+IHJlZ2lvbgo+ID4gYmFzZSBJUEEgYW5kIHNpemUgKDIpIG1hcHBlZCBQQSBpbiBIb3N0IChpZiBJ
+UEE9UEEsIGl0IGNvdWxkIGJlIGJldHRlcikgKDMpCj4gPiBSL1cvWCBhdHRyaWJ1dGVzLgo+ID4g
+VGhlbiwgd2hlbiBJIGNhbGwgdGhlIGZ1bmMoSVBBIHN0YXJ0LCBJUEEgZW5kLCBQQSBzdGFydCwg
+YXR0ciksIEkgY2FuIGdldAo+ID4gdGhlIG1hcC4KPgo+IFRoZXJlIGlzIG5vIHN1Y2ggZnVuY3Rp
+b24sIGJlY2F1c2UgdGhhdCdzIG5vdCBob3cgS1ZNIHdvcmtzLgo+Cj4gPiBXaGVyZSBzaG91bGQg
+SSBmb2xsb3c/IFNob3VsZCBJIGZvbGxvdyB0aGUgInRyYW5zbGF0aW9uIGZhdWx0IHBhdGgiIGFn
+YWluPwo+ID4gT3IgY3JlYXRlIHRoZSBtYXBwaW5nIGZ1bmN0aW9uIGJ5IG15c2VsZj8KPgo+IE5l
+aXRoZXIuIFlvdSBjYW5ub3QgZGlyZWN0bHkgbWFwIHJhbmRvbSBwaHlzaWNhbCByYW5nZXMgaW50
+byBhIFZNLgo+IE1lbW9yeSB0aGF0IGdldHMgbWFwcGVkIGludG8gYSBWTSBuZWVkcyB0byBiZSBl
+eHBvc2VkIGJ5IHVzZXJzcGFjZSBpbgo+IHRoZSBmb3JtIG9mIGEgbWVtc2xvdC4gS1ZNIHdpbGwg
+dGhlbiBtYXAgdGhhdCBtZW1vcnkgb24gZGVtYW5kIGFzIHRoZQo+IGd1ZXN0IGFjY2Vzc2VzIGl0
+Lgo+Cj4gVGhhbmtzLAo+Cj4gICAgICAgICBNLgo+Cj4gLS0KPiBXaXRob3V0IGRldmlhdGlvbiBm
+cm9tIHRoZSBub3JtLCBwcm9ncmVzcyBpcyBub3QgcG9zc2libGUuCl9fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWls
+bWFuL2xpc3RpbmZvL2t2bWFybQo=
