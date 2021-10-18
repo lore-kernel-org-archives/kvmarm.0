@@ -2,68 +2,68 @@ Return-Path: <SRS0=YGC0=PG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D6D4C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 16:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C349EC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 16:40:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 1231360E74
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 16:37:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 1231360E74
+	by mail.kernel.org (Postfix) with ESMTP id 32AA661077
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 16:40:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 32AA661077
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9049B4B207;
-	Mon, 18 Oct 2021 12:37:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2D2A4B207;
+	Mon, 18 Oct 2021 12:40:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ptISY9wIxvxB; Mon, 18 Oct 2021 12:37:14 -0400 (EDT)
+	with ESMTP id dL5Kpu-O+0N6; Mon, 18 Oct 2021 12:40:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69D8D4B22C;
-	Mon, 18 Oct 2021 12:37:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA21D4B25A;
+	Mon, 18 Oct 2021 12:40:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D5C44B207
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 12:37:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 751844B250
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 12:40:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EzPQEp05GjRN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Oct 2021 12:37:12 -0400 (EDT)
+ with ESMTP id UpukVKJ-KsoC for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Oct 2021 12:40:02 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2248E4B203
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 12:37:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79FDC4B207
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 12:40:02 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 02E8260E0C;
- Mon, 18 Oct 2021 16:37:11 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 715726108E;
+ Mon, 18 Oct 2021 16:40:01 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mcVdM-0001We-Pq; Mon, 18 Oct 2021 17:37:08 +0100
+ id 1mcVg7-0001a3-9H; Mon, 18 Oct 2021 17:39:59 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Subject: Re: [PATCH v9 00/22] KVM: arm64: Fixed features for protected VMs
-Date: Mon, 18 Oct 2021 17:37:02 +0100
-Message-Id: <163457498602.1692816.17093273443605618000.b4-ty@kernel.org>
+To: kvmarm@lists.cs.columbia.edu,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v8 00/11] KVM: arm64: Fixed features for protected VMs
+Date: Mon, 18 Oct 2021 17:39:56 +0100
+Message-Id: <163457515280.1693002.15246533081868685262.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211013120346.2926621-1-maz@kernel.org>
-References: <20211010145636.1950948-12-tabba@google.com>
- <20211013120346.2926621-1-maz@kernel.org>
+In-Reply-To: <20211010145636.1950948-1-tabba@google.com>
+References: <20211010145636.1950948-1-tabba@google.com>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: maz@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alexandru.elisei@arm.com,
- qperret@google.com, mark.rutland@arm.com, tabba@google.com,
- pbonzini@redhat.com, will@kernel.org, suzuki.poulose@arm.com,
- oupton@google.com, james.morse@arm.com, drjones@redhat.com,
- kernel-team@android.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, tabba@google.com,
+ alexandru.elisei@arm.com, will@kernel.org, oupton@google.com,
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
+ christoffer.dall@arm.com, suzuki.poulose@arm.com, james.morse@arm.com,
+ kvm@vger.kernel.org, drjones@redhat.com, qperret@google.com,
+ mark.rutland@arm.com, pbonzini@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, pbonzini@redhat.com, will@kernel.org
+Cc: kvm@vger.kernel.org, kernel-team@android.com, pbonzini@redhat.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,40 +80,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 13 Oct 2021 13:03:35 +0100, Marc Zyngier wrote:
-> This is an update on Fuad's series[1].
+On Sun, 10 Oct 2021 15:56:25 +0100, Fuad Tabba wrote:
+> Changes since v7 [1]:
+> - Fix build warnings
 > 
-> Instead of going going back and forth over a series that has seen a
-> fair few versions, I've opted for simply writing a set of fixes on
-> top, hopefully greatly simplifying the handling of most registers, and
-> moving things around to suit my own taste (just because I can).
+> This patch series adds support for restricting CPU features for protected VMs
+> in KVM (pKVM). For more background, please refer to the previous series [2].
+> 
+> This series is based on 5.15-rc4. You can find the applied series here [3].
 > 
 > [...]
 
 Applied to next, thanks!
 
-[12/22] KVM: arm64: Fix early exit ptrauth handling
-        commit: 8a049862c38f0c78b0e01ab5d36db1bffc832675
-[13/22] KVM: arm64: pkvm: Use a single function to expose all id-regs
-        commit: ce75916749b8cb5ec795f1157a5c426f6765a48c
-[14/22] KVM: arm64: pkvm: Make the ERR/ERX*_EL1 registers RAZ/WI
-        commit: 8ffb41888334c1247bd9b4d6ff6c092a90e8d0b8
-[15/22] KVM: arm64: pkvm: Drop AArch32-specific registers
-        commit: 3c90cb15e2e66bcc526d25133747b2af747f6cd8
-[16/22] KVM: arm64: pkvm: Drop sysregs that should never be routed to the host
-        commit: f3d5ccabab20c1be5838831f460f320a12e5e2c9
-[17/22] KVM: arm64: pkvm: Handle GICv3 traps as required
-        commit: cbca19738472be8156d854663ed724b01255c932
-[18/22] KVM: arm64: pkvm: Preserve pending SError on exit from AArch32
-        commit: 271b7286058da636ab6f5f47722e098ca3a0478b
-[19/22] KVM: arm64: pkvm: Consolidate include files
-        commit: 3061725d162cad0589b012fc6413c9dd0da8f02a
-[20/22] KVM: arm64: pkvm: Move kvm_handle_pvm_restricted around
-        commit: 746bdeadc53b0d58fddea6442591f5ec3eeabe7d
-[21/22] KVM: arm64: pkvm: Pass vpcu instead of kvm to kvm_get_exit_handler_array()
-        commit: 0c7639cc838263b6e38b3af76755d574f15cdf41
-[22/22] KVM: arm64: pkvm: Give priority to standard traps over pvm handling
-        commit: 07305590114af81817148d181f1eb0af294e40d6
+[01/11] KVM: arm64: Move __get_fault_info() and co into their own include file
+        commit: 7dd9b5a157485ae8c48f76f087b1867ace016613
+[02/11] KVM: arm64: Don't include switch.h into nvhe/kvm-main.c
+        commit: cc1e6fdfa92b82902883b70dafa729d3bd427b80
+[03/11] KVM: arm64: Move early handlers to per-EC handlers
+        commit: 8fb2046180a0ad347f2e5bcae760dca67e65aa73
+[04/11] KVM: arm64: Pass struct kvm to per-EC handlers
+        commit: 3b1a690eda0dc1891e8fc93991b122bff6fabf8c
+[05/11] KVM: arm64: Add missing field descriptor for MDCR_EL2
+        commit: 53868390778270f2890621f4498a53587719a3ff
+[06/11] KVM: arm64: Simplify masking out MTE in feature id reg
+        commit: 16dd1fbb12f72effcd3539561c2a94aed3ab6581
+[07/11] KVM: arm64: Add handlers for protected VM System Registers
+        commit: 6c30bfb18d0b7d09593f204c936493cfcd153956
+[08/11] KVM: arm64: Initialize trap registers for protected VMs
+        commit: 2a0c343386ae1a6826e1b9d751bfc14f4711c2de
+[09/11] KVM: arm64: Move sanitized copies of CPU features
+        commit: 72e1be120eaaf82a58c81fcf173cdb1d7a5dcfbb
+[10/11] KVM: arm64: Trap access to pVM restricted features
+        commit: 1423afcb411780c7a6a68f801fdcfb6920ad6f06
+[11/11] KVM: arm64: Handle protected guests at 32 bits
+        commit: 5f39efc42052b042c4d7ba6fd77934e8de43e10c
 
 Cheers,
 
