@@ -2,54 +2,98 @@ Return-Path: <SRS0=YGC0=PG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F06EC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 14:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D082C433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 14:30:51 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 11EEA60EFE
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 14:07:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 11EEA60EFE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id EDFE660FED
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Oct 2021 14:30:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EDFE660FED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 907F94B24B;
-	Mon, 18 Oct 2021 10:07:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68A3C4B28D;
+	Mon, 18 Oct 2021 10:30:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NkzCfuyqlyyk; Mon, 18 Oct 2021 10:07:49 -0400 (EDT)
+	with ESMTP id KbYLCdrP-noP; Mon, 18 Oct 2021 10:30:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 342A34B25A;
-	Mon, 18 Oct 2021 10:07:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C2AD4B1B6;
+	Mon, 18 Oct 2021 10:30:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA16C4B277
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 10:07:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D3EA4B1B6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 10:30:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id acta5yu8sJZj for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Oct 2021 10:07:46 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA6C04B25A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 10:07:46 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4C8382F;
- Mon, 18 Oct 2021 07:07:46 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 044F63F73D;
- Mon, 18 Oct 2021 07:07:44 -0700 (PDT)
-Date: Mon, 18 Oct 2021 15:09:28 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: Re: [RFC PATCH v4 02/39] KVM: arm64: Add lock/unlock memslot user API
-Message-ID: <YW2AGKEdoTFVhPNJ@monolith.localdoman>
-References: <20210825161815.266051-1-alexandru.elisei@arm.com>
- <20210825161815.266051-3-alexandru.elisei@arm.com>
- <480ab754-dd07-1f24-4721-ccfdf0991d53@arm.com>
+ with ESMTP id 4LLEkKqh3suP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Oct 2021 10:30:46 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20B564B1B4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 10:30:46 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1634567445;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=16lgWy6r2ijeFvmyYBWNBFj6OUleKDb2cTJh8BDi66E=;
+ b=HtHzxpFH7TVwDwzFfjKl2+U62Z5IhPIkhLHMVriKOuULu8SUBFPiU1RWPSJOPB/7uIbPeW
+ 7dDcMHgxfMtfqAkAArEZcsrYvjNyb7gKXJVnMVCek4uANRJLCkOxyou8S3ffnfSnvWWkHZ
+ EbvJyofzaVAZXeDVMyYYrlIUIu33Jb4=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-bIHj4FtVNqSp90VrLKdUkA-1; Mon, 18 Oct 2021 10:30:44 -0400
+X-MC-Unique: bIHj4FtVNqSp90VrLKdUkA-1
+Received: by mail-ed1-f72.google.com with SMTP id
+ i7-20020a50d747000000b003db0225d219so9924057edj.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Oct 2021 07:30:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=16lgWy6r2ijeFvmyYBWNBFj6OUleKDb2cTJh8BDi66E=;
+ b=wn4tw3GJDoS52iI4bnCFgHB1euWpVLdJgDaZhdVtg4InWUHNlnfDiHTGz+BQYgq8Pg
+ rAvyKujfO1DBEnM0KAoKDR0NyOZsVTX10DrMJOcR/5q3u4BLdcW/vGLy/zomxDXgXnca
+ Me94H0QaE7kgH5fOh2+pWkfcZ+ywdJksSMviMnYZjGKi+swQzupsgjA1xNqO6epPNunm
+ /+4Pf1W/Hhgz9linfclUWXrAr5+N2h9TL0SG0m2LZAFu1asDudv+c3nPiOGyEUyiv2+j
+ Ajs9p0AC2XvCRF8PA3kF9SmnI3nIpF8KPFP3aAiYSHgPdAcvJCcMOTJ+iT/cQ8QDwWIy
+ C66Q==
+X-Gm-Message-State: AOAM53024G1DXP88YzbZGBqQSvBDuFNZI88L42gwZR4IlCxGuu1BuR1W
+ WfK+cbaGKpkgtH9dfFev8m4paFzchiQwb1ZotQKULonKsr61dwKK7EYLnYvclXtuvjHh7yrllNy
+ gJnqFqm0U2fQ5mNILxo4r4szB
+X-Received: by 2002:aa7:cd8b:: with SMTP id x11mr45193816edv.384.1634567443443; 
+ Mon, 18 Oct 2021 07:30:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzOPhN4B7GDbBSZ7+1OX/c4MoxhYUWo11/O3rb3LVvmuMXMvo3tDY2r0PmKoGrxiNYc9rNOlg==
+X-Received: by 2002:aa7:cd8b:: with SMTP id x11mr45193777edv.384.1634567443091; 
+ Mon, 18 Oct 2021 07:30:43 -0700 (PDT)
+Received: from gator.home (cst2-174-2.cust.vodafone.cz. [31.30.174.2])
+ by smtp.gmail.com with ESMTPSA id jg21sm5789033ejc.14.2021.10.18.07.30.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 Oct 2021 07:30:42 -0700 (PDT)
+Date: Mon, 18 Oct 2021 16:30:40 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [RFC PATCH 02/25] KVM: arm64: Save ID registers' sanitized value
+ per vCPU
+Message-ID: <20211018143040.nhkv67cxni6ind6k@gator.home>
+References: <20211012043535.500493-1-reijiw@google.com>
+ <20211012043535.500493-3-reijiw@google.com>
+ <20211015130918.ezlygga73doepbw6@gator>
+ <CAAeT=Fx9zUet2HvFe8dwhXjyozuggn+qcQBoyb_8hUGJNKFNTQ@mail.gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <CAAeT=Fx9zUet2HvFe8dwhXjyozuggn+qcQBoyb_8hUGJNKFNTQ@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-In-Reply-To: <480ab754-dd07-1f24-4721-ccfdf0991d53@arm.com>
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,155 +110,120 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Suzuki,
+On Sat, Oct 16, 2021 at 05:42:59PM -0700, Reiji Watanabe wrote:
+> On Fri, Oct 15, 2021 at 6:09 AM Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > On Mon, Oct 11, 2021 at 09:35:12PM -0700, Reiji Watanabe wrote:
+> > > Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
+> > > registers' sanitized value in the array for the vCPU at the first
+> > > vCPU reset. Use the saved ones when ID registers are read by
+> > > userspace (via KVM_GET_ONE_REG) or the guest.
+> > >
+> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h | 10 ++++++++++
+> > >  arch/arm64/kvm/sys_regs.c         | 26 ++++++++++++++++++--------
+> > >  2 files changed, 28 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 9b5e7a3b6011..0cd351099adf 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -145,6 +145,14 @@ struct kvm_vcpu_fault_info {
+> > >       u64 disr_el1;           /* Deferred [SError] Status Register */
+> > >  };
+> > >
+> > > +/*
+> > > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> > > + * where 0<=crm<8, 0<=op2<8.
+> >
+> > crm is 4 bits, so this should be 0 <= crm < 16 and...
+> >
+> > > + */
+> > > +#define KVM_ARM_ID_REG_MAX_NUM 64
+> >
+> > ...this should be 128. Or am I missing something?
+> 
+> Registers with (3, 0, 0, 0<=crm<8, op2) are defined/allocated including
+> reserved (RAZ) ones (please see Table D12-2 in ARM DDI 0487G.b),
+> and the code supports those only for now.
+> 
+> I understand that registers with crm >= 8 could be defined in the future
+> (I'm not so sure if they will be really ID registers though),
+> but then we can include them later as needed.
 
-On Mon, Oct 18, 2021 at 10:04:37AM +0100, Suzuki K Poulose wrote:
-> On 25/08/2021 17:17, Alexandru Elisei wrote:
-> > Stage 2 faults triggered by the profiling buffer attempting to write to
-> > memory are reported by the SPE hardware by asserting a buffer management
-> > event interrupt. Interrupts are by their nature asynchronous, which means
-> > that the guest might have changed its stage 1 translation tables since the
-> > attempted write. SPE reports the guest virtual address that caused the data
-> > abort, not the IPA, which means that KVM would have to walk the guest's
-> > stage 1 tables to find the IPA. Using the AT instruction to walk the
-> > guest's tables in hardware is not an option because it doesn't report the
-> > IPA in the case of a stage 2 fault on a stage 1 table walk.
-> > 
-> > Avoid both issues by pre-mapping the guest memory at stage 2. This is being
-> > done by adding a capability that allows the user to pin the memory backing
-> > a memslot. The same capability can be used to unlock a memslot, which
-> > unpins the pages associated with the memslot, but doesn't unmap the IPA
-> > range from stage 2; in this case, the addresses will be unmapped from stage
-> > 2 via the MMU notifiers when the process' address space changes.
-> > 
-> > For now, the capability doesn't actually do anything other than checking
-> > that the usage is correct; the memory operations will be added in future
-> > patches.
-> > 
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >   Documentation/virt/kvm/api.rst   | 56 +++++++++++++++++++++++
-> >   arch/arm64/include/asm/kvm_mmu.h |  3 ++
-> >   arch/arm64/kvm/arm.c             | 42 ++++++++++++++++--
-> >   arch/arm64/kvm/mmu.c             | 76 ++++++++++++++++++++++++++++++++
-> >   include/uapi/linux/kvm.h         |  8 ++++
-> >   5 files changed, 181 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index dae68e68ca23..741327ef06b0 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -6682,6 +6682,62 @@ MAP_SHARED mmap will result in an -EINVAL return.
-> >   When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
-> >   perform a bulk copy of tags to/from the guest.
-> > +7.29 KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-> > +----------------------------------------
-> > +
-> > +:Architectures: arm64
-> > +:Target: VM
-> > +:Parameters: flags is one of KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK or
-> > +                     KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
-> > +             args[0] is the slot number
-> > +             args[1] specifies the permisions when the memslot is locked or if
-> > +                     all memslots should be unlocked
-> > +
-> > +The presence of this capability indicates that KVM supports locking the memory
-> > +associated with the memslot, and unlocking a previously locked memslot.
-> > +
-> > +The 'flags' parameter is defined as follows:
-> > +
-> > +7.29.1 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK
-> > +-------------------------------------------------
-> > +
-> > +:Capability: 'flags' parameter to KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-> > +:Architectures: arm64
-> > +:Target: VM
-> > +:Parameters: args[0] contains the memory slot number
-> > +             args[1] contains the permissions for the locked memory:
-> > +                     KVM_ARM_LOCK_MEMORY_READ (mandatory) to map it with
-> > +                     read permissions and KVM_ARM_LOCK_MEMORY_WRITE
-> > +                     (optional) with write permissions
-> > +:Returns: 0 on success; negative error code on failure
-> > +
-> > +Enabling this capability causes the memory described by the memslot to be
-> > +pinned in the process address space and the corresponding stage 2 IPA range
-> > +mapped at stage 2. The permissions specified in args[1] apply to both
-> > +mappings. The memory pinned with this capability counts towards the max
-> > +locked memory limit for the current process.
-> > +
-> > +The capability must be enabled before any VCPUs have run. The virtual memory
-> > +range described by the memslot must be mapped in the userspace process without
-> > +any gaps. It is considered an error if write permissions are specified for a
-> > +memslot which logs dirty pages.
-> > +
-> > +7.29.2 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
-> > +---------------------------------------------------
-> > +
-> > +:Capability: 'flags' parameter to KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-> > +:Architectures: arm64
-> > +:Target: VM
-> > +:Parameters: args[0] contains the memory slot number
-> > +             args[1] optionally contains the flag KVM_ARM_UNLOCK_MEM_ALL,
-> > +                     which unlocks all previously locked memslots.
-> > +:Returns: 0 on success; negative error code on failure
-> > +
-> > +Enabling this capability causes the memory pinned when locking the memslot
-> > +specified in args[0] to be unpinned, or, optionally, the memory associated
-> > +with all locked memslots, to be unpinned. The IPA range is not unmapped
-> > +from stage 2.
-> > +
-> >   8. Other capabilities.
-> >   ======================
-> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> > index b52c5c4b9a3d..ef079b5eb475 100644
-> > --- a/arch/arm64/include/asm/kvm_mmu.h
-> > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> > @@ -216,6 +216,9 @@ static inline void __invalidate_icache_guest_page(void *va, size_t size)
-> >   void kvm_set_way_flush(struct kvm_vcpu *vcpu);
-> >   void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
-> > +int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags);
-> > +int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags);
-> > +
-> >   static inline unsigned int kvm_get_vmid_bits(void)
-> >   {
-> >   	int reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index ddace63528f1..57ac97b30b3d 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -80,16 +80,43 @@ int kvm_arch_check_processor_compat(void *opaque)
-> >   	return 0;
-> >   }
-> > +static int kvm_arm_lock_memslot_supported(void)
-> > +{
-> > +	return 0;
-> > +}
-> > +
-> > +static int kvm_lock_user_memory_region_ioctl(struct kvm *kvm,
-> > +					     struct kvm_enable_cap *cap)
-> > +{
-> > +	u64 slot, flags;
-> > +	u32 action;
-> > +
-> > +	if (cap->args[2] || cap->args[3])
-> > +		return -EINVAL;
-> > +
-> > +	slot = cap->args[0];
-> > +	flags = cap->args[1];
-> 
-> nit: ^^ Please could we rename "flags" => "perm" (ission) ?
-> 
-> > +	action = cap->flags;
-> 
-> We already have cap->flags, and using arg[1] as flags ( which indeed
-> is permission by definition) is confusing.
+Oh, I see. Thanks. Looking at the table I see CRm=0,op2={1,2,3,4,7} are
+also missing, but it certainly doesn't matter that we allocate a few
+unused entries, especially since we also allocate entries for all the
+RAZ ones.
 
-Yes, that's a good idea, will do.
+> 
+> > > +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> > > +#define IDREG_SYS_IDX(id)    (ID_REG_BASE + IDREG_IDX(id))
+> > > +
+> > >  enum vcpu_sysreg {
+> > >       __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+> > >       MPIDR_EL1,      /* MultiProcessor Affinity Register */
+> > > @@ -209,6 +217,8 @@ enum vcpu_sysreg {
+> > >       CNTP_CVAL_EL0,
+> > >       CNTP_CTL_EL0,
+> > >
+> > > +     ID_REG_BASE,
+> > > +     ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
+> > >       /* Memory Tagging Extension registers */
+> > >       RGSR_EL1,       /* Random Allocation Tag Seed Register */
+> > >       GCR_EL1,        /* Tag Control Register */
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 1d46e185f31e..72ca518e7944 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -273,7 +273,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+> > >                         struct sys_reg_params *p,
+> > >                         const struct sys_reg_desc *r)
+> > >  {
+> > > -     u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > > +     u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(SYS_ID_AA64MMFR1_EL1));
+> > >       u32 sr = reg_to_encoding(r);
+> > >
+> > >       if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
+> > > @@ -1059,12 +1059,11 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+> > >       return true;
+> > >  }
+> > >
+> > > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> > >  static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > >               struct sys_reg_desc const *r, bool raz)
+> > >  {
+> > >       u32 id = reg_to_encoding(r);
+> > > -     u64 val = raz ? 0 : read_sanitised_ftr_reg(id);
+> > > +     u64 val = raz ? 0 : __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
+> > >
+> > >       switch (id) {
+> > >       case SYS_ID_AA64PFR0_EL1:
+> > > @@ -1174,6 +1173,16 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+> > >       return REG_HIDDEN;
+> > >  }
+> > >
+> > > +static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+> >
+> > Since not all ID registers will use this, then maybe name it
+> > reset_sanitised_id_reg?
+> 
+> Thank you for the suggestion.
+> 
+> I named it 'reset_id_reg' according to the naming conventions of
+> set_id_reg, get_id_reg, and access_id_reg which are used for the same
+> set of ID registers (ID_SANITISED ones) as reset_id_reg.
+> I would think it's better to use consistent names for all of them.
+> So, I am a bit reluctant to change only the name of reset_id_reg.
+> 
+> What do you think about the names of those other three functions ?
+
+I think I like the shorter names, so please disregard my suggestion.
 
 Thanks,
-Alex
-> 
-> Suzuki
+drew
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
