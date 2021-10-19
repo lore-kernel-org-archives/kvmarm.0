@@ -2,76 +2,76 @@ Return-Path: <SRS0=DvdR=PH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1C1C433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Oct 2021 12:13:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5EFC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Oct 2021 12:13:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7E9D861373
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Oct 2021 12:13:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7E9D861373
+	by mail.kernel.org (Postfix) with ESMTP id B27C96135E
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Oct 2021 12:13:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B27C96135E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 338574B0DF;
-	Tue, 19 Oct 2021 08:13:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 662CD4B1A3;
+	Tue, 19 Oct 2021 08:13:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WqB2wB13dMGq; Tue, 19 Oct 2021 08:13:38 -0400 (EDT)
+	with ESMTP id uVrWbBaPwCRl; Tue, 19 Oct 2021 08:13:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 281CA4B0F5;
-	Tue, 19 Oct 2021 08:13:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E8ED4B0F7;
+	Tue, 19 Oct 2021 08:13:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC7384ACC9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 08:13:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2710F4B093
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 08:13:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id abJExiYheVzx for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Oct 2021 08:13:35 -0400 (EDT)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7BD4B4B0EF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 08:13:35 -0400 (EDT)
-Received: by mail-wm1-f73.google.com with SMTP id
- n9-20020a1c7209000000b0030da7d466b8so1072945wmc.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 05:13:35 -0700 (PDT)
+ with ESMTP id FKB4uOmIvNyH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Oct 2021 08:13:39 -0400 (EDT)
+Received: from mail-lj1-f202.google.com (mail-lj1-f202.google.com
+ [209.85.208.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78DC74B0EF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 08:13:38 -0400 (EDT)
+Received: by mail-lj1-f202.google.com with SMTP id
+ n11-20020a2ebd0b000000b001f9ebdc2b7aso821945ljq.6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 05:13:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Ck8KqbWWMae7AkcYUcDJVvLhTKwYixox75Gde7aqwnI=;
- b=N1X0+fMmX2ELYVHNfvnYshgrGY1QPYHtzxD2UrOgV3PkeCujsVtLhyaC7O9FoW3Ppl
- P8iizGRJTkEPDqs+zvQodXLZP/nhkcLJMA3ySJ5DA+FpQO+nginrBfDiSj8Rlk/nN/fM
- N4LAy5E8anFDzGfCbnMUmYZ6lfUnSJ/2ZfVreeRN2N+0ISdPuQVD+D+UKKuv1JBaTw5r
- XqUgHq8AR/wKJDtRW06u51EP+Kn92ZF/THtMU+7kA83TRHin40ZyxcHcjiHA+Cc+vxIv
- gBtq+0o5RQNM5lgPUZIBuKx8nZQ+bZEZoDmWh2yHB1Z7soqQzthwhUMjoF9Re2+qw2Ha
- 2PXg==
+ :cc; bh=ISeivE4VJePhwCDFvsBtzOVIerKBvyMpPq/U4suJ8Dg=;
+ b=pMTyZ0Vbl+u7Dlf64iUAHAL8iII5oExKlGMnTMHZaH1N3KOh6pszIEURsP71VOA8zm
+ YmAfLbs73BpmIWiQFsAwuQdZch7d1aBX0VE1dqPVlo4MR+Iv3SEIvK1dzqA44YUBqokQ
+ 3BWhGEojgqF2KRv1G62YRc39Vn8Nnjta2ATq8LApIpEt7DGix0abtEW9pGr56bx76kdj
+ 22z6U+fFymB5GMOz4WZX6L7B8vnwJ+yGDZM1gxOHNZEdOyXICg/04hJWqSYDUUhm5VGZ
+ 8XPgn1dhN12ntFAgc27i+8EKZxW4j4Rv26/Vjwmr2QvI0pNoKwfj6Pef3gBLMRK7blQh
+ duHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=Ck8KqbWWMae7AkcYUcDJVvLhTKwYixox75Gde7aqwnI=;
- b=p5b6g68lu9GHZVHd4egavbInpXCL78wvYv2i7uGHrp8N8IFXxzWIdQjxHJ63jRBBcO
- +7gSQYtvhZajrnkxEdCpHYXGBtZ8Q06pP67KqCKDZ59mvZ0JZfYPqGreGsIdx4LErwvQ
- GoEAIjcE42dom4lVONEjDSC1XcB85KZvdgipEvqILE2KtXOwBMDGAKUiKc0PndV6ecnE
- 6Iblst0AyzkCQGwPuqsaZZA8Er8BfsBsGQojesSafSuAqjteMCDYHmcbJmnxQv77SHx8
- dZAIHW2Du4mcbrqcCWJK/tFFtRKFzpSy764eLifurL456BKEhSgFo3B4ZL/A0iccEfh/
- py1w==
-X-Gm-Message-State: AOAM530xPoCcB7v2jKntYVZ3pyBHllcYBX29KvU6o3Bs/G1iQRXqTzVs
- 3q5H8zMb+p2fDP0R4uhou71v4+NofmjE
-X-Google-Smtp-Source: ABdhPJwuoB1vbPKcvGKMvoxjhGJXSCqivwYwRjiSn+hagjA4deHJDWh9elWq7/kmk5iywJnzibKQqL+7r11H
+ bh=ISeivE4VJePhwCDFvsBtzOVIerKBvyMpPq/U4suJ8Dg=;
+ b=bl8ztmkjLlxMeDljdLVxx4a62wiHv/jh5hVLdq/jS6MOjeaqkbsOOu44a/V3TS+nst
+ FQRpZ6peFN6BzM5ZH+yesTuyOmnEXzWbWZyuHcvZm/e7Z3t2Pmk8prkjgaTaPRsiIuWD
+ iriMGCdVYWrUUOZQquJjavEFZzJL8G1GF0xDf5n0gR1nhLTe0sQndxEj4BTc2RDlNE3/
+ wYuzjmlqplnJZRuB2yKqprbDOPD8pSy4muEsZyOQWYSLqWtQ5pi/rvic5gsNkLF8Fb8l
+ IXsdo0ckwBWYmm40QRkK1BBvymmVHhGgYwv95i6Y/Y3Q3kCz00S8EMdQcLIs45zKa6Rj
+ pPCA==
+X-Gm-Message-State: AOAM533uAw4kFTT+IT6dHMy+STpFN6ZIgelGSltlFjoWLR5/iBNtkF39
+ QEvOd9lFlxofkuVZmgmwCDNdIgHQWgVv
+X-Google-Smtp-Source: ABdhPJwgKkmhxiB5XvxU66pG49kdREnEBCBJUkS8jWIoTxJjPaFPdF/auvzHlo/liyhgODAIlIOug/KJN2Yd
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:59ca:401f:83a8:de6d])
- (user=qperret job=sendgmr) by 2002:adf:f10c:: with SMTP id
- r12mr31956400wro.298.1634645614634; Tue, 19 Oct 2021 05:13:34 -0700 (PDT)
-Date: Tue, 19 Oct 2021 13:13:01 +0100
+ (user=qperret job=sendgmr) by 2002:a2e:7816:: with SMTP id
+ t22mr6884979ljc.133.1634645617143; Tue, 19 Oct 2021 05:13:37 -0700 (PDT)
+Date: Tue, 19 Oct 2021 13:13:02 +0100
 In-Reply-To: <20211019121304.2732332-1-qperret@google.com>
-Message-Id: <20211019121304.2732332-13-qperret@google.com>
+Message-Id: <20211019121304.2732332-14-qperret@google.com>
 Mime-Version: 1.0
 References: <20211019121304.2732332-1-qperret@google.com>
 X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
-Subject: [PATCH v2 12/15] KVM: arm64: Implement __pkvm_host_share_hyp() using
- do_share()
+Subject: [PATCH v2 13/15] KVM: arm64: Implement do_unshare() helper for
+ unsharing memory
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
  Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -99,156 +99,173 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Will Deacon <will@kernel.org>
 
-__pkvm_host_share_hyp() shares memory between the host and the
-hypervisor so implement it as an invocation of the new do_share()
-mechanism.
+Tearing down a previously shared memory region results in the borrower
+losing access to the underlying pages and returning them to the "owned"
+state in the owner.
 
-Note that double-sharing is no longer permitted (as this allows us to
-reduce the number of page-table walks significantly), but is thankfully
-no longer relied upon by the host.
+Implement a do_unshare() helper, along the same lines as do_share(), to
+provide this functionality for the host-to-hyp case.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 121 +++++++-------------------
- 1 file changed, 33 insertions(+), 88 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 115 ++++++++++++++++++++++++++
+ 1 file changed, 115 insertions(+)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index d87cdd53dd21..ab1732c38b3b 100644
+index ab1732c38b3b..205616c9f107 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -359,94 +359,6 @@ static int host_stage2_idmap(u64 addr)
- 	return ret;
+@@ -474,6 +474,16 @@ static int host_request_owned_transition(u64 *completer_addr,
+ 	return __host_check_page_state_range(addr, size, PKVM_PAGE_OWNED);
  }
  
--static inline bool check_prot(enum kvm_pgtable_prot prot,
--			      enum kvm_pgtable_prot required,
--			      enum kvm_pgtable_prot denied)
--{
--	return (prot & (required | denied)) == required;
--}
--
--int __pkvm_host_share_hyp(u64 pfn)
--{
--	phys_addr_t addr = hyp_pfn_to_phys(pfn);
--	enum kvm_pgtable_prot prot, cur;
--	void *virt = __hyp_va(addr);
--	enum pkvm_page_state state;
--	kvm_pte_t pte;
--	int ret;
--
--	if (!addr_is_memory(addr))
--		return -EINVAL;
--
--	host_lock_component();
--	hyp_lock_component();
--
--	ret = kvm_pgtable_get_leaf(&host_kvm.pgt, addr, &pte, NULL);
--	if (ret)
--		goto unlock;
--	if (!pte)
--		goto map_shared;
--
--	/*
--	 * Check attributes in the host stage-2 PTE. We need the page to be:
--	 *  - mapped RWX as we're sharing memory;
--	 *  - not borrowed, as that implies absence of ownership.
--	 * Otherwise, we can't let it got through
--	 */
--	cur = kvm_pgtable_stage2_pte_prot(pte);
--	prot = pkvm_mkstate(0, PKVM_PAGE_SHARED_BORROWED);
--	if (!check_prot(cur, PKVM_HOST_MEM_PROT, prot)) {
--		ret = -EPERM;
--		goto unlock;
--	}
--
--	state = pkvm_getstate(cur);
--	if (state == PKVM_PAGE_OWNED)
--		goto map_shared;
--
--	/*
--	 * Tolerate double-sharing the same page, but this requires
--	 * cross-checking the hypervisor stage-1.
--	 */
--	if (state != PKVM_PAGE_SHARED_OWNED) {
--		ret = -EPERM;
--		goto unlock;
--	}
--
--	ret = kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)virt, &pte, NULL);
--	if (ret)
--		goto unlock;
--
--	/*
--	 * If the page has been shared with the hypervisor, it must be
--	 * already mapped as SHARED_BORROWED in its stage-1.
--	 */
--	cur = kvm_pgtable_hyp_pte_prot(pte);
--	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
--	if (!check_prot(cur, prot, ~prot))
--		ret = -EPERM;
--	goto unlock;
--
--map_shared:
--	/*
--	 * If the page is not yet shared, adjust mappings in both page-tables
--	 * while both locks are held.
--	 */
--	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
--	ret = pkvm_create_mappings_locked(virt, virt + PAGE_SIZE, prot);
--	BUG_ON(ret);
--
--	prot = pkvm_mkstate(PKVM_HOST_MEM_PROT, PKVM_PAGE_SHARED_OWNED);
--	ret = host_stage2_idmap_locked(addr, PAGE_SIZE, prot);
--	BUG_ON(ret);
--
--unlock:
--	hyp_unlock_component();
--	host_unlock_component();
--
--	return ret;
--}
--
- void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
++static int host_request_unshare(u64 *completer_addr,
++				const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++	u64 addr = tx->initiator.addr;
++
++	*completer_addr = tx->initiator.host.completer_addr;
++	return __host_check_page_state_range(addr, size, PKVM_PAGE_SHARED_OWNED);
++}
++
+ static int host_initiate_share(u64 *completer_addr,
+ 			       const struct pkvm_mem_transition *tx)
  {
- 	struct kvm_vcpu_fault_info fault;
-@@ -697,3 +609,36 @@ static int do_share(struct pkvm_mem_share *share)
+@@ -484,6 +494,16 @@ static int host_initiate_share(u64 *completer_addr,
+ 	return __host_set_page_state_range(addr, size, PKVM_PAGE_SHARED_OWNED);
+ }
  
++static int host_initiate_unshare(u64 *completer_addr,
++				 const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++	u64 addr = tx->initiator.addr;
++
++	*completer_addr = tx->initiator.host.completer_addr;
++	return __host_set_page_state_range(addr, size, PKVM_PAGE_OWNED);
++}
++
+ static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte)
+ {
+ 	if (!kvm_pte_valid(pte))
+@@ -524,6 +544,17 @@ static int hyp_ack_share(u64 addr, const struct pkvm_mem_transition *tx,
+ 	return __hyp_check_page_state_range(addr, size, PKVM_NOPAGE);
+ }
+ 
++static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++
++	if (__hyp_ack_skip_pgtable_check(tx))
++		return 0;
++
++	return __hyp_check_page_state_range(addr, size,
++					    PKVM_PAGE_SHARED_BORROWED);
++}
++
+ static int hyp_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
+ 			      enum kvm_pgtable_prot perms)
+ {
+@@ -534,6 +565,14 @@ static int hyp_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
+ 	return pkvm_create_mappings_locked(start, end, prot);
+ }
+ 
++static int hyp_complete_unshare(u64 addr, const struct pkvm_mem_transition *tx)
++{
++	u64 size = tx->nr_pages * PAGE_SIZE;
++	int ret = kvm_pgtable_hyp_unmap(&pkvm_pgtable, addr, size);
++
++	return (ret != size) ? -EFAULT : 0;
++}
++
+ static int check_share(struct pkvm_mem_share *share)
+ {
+ 	const struct pkvm_mem_transition *tx = &share->tx;
+@@ -610,6 +649,82 @@ static int do_share(struct pkvm_mem_share *share)
  	return WARN_ON(__do_share(share));
  }
-+
-+int __pkvm_host_share_hyp(u64 pfn)
+ 
++static int check_unshare(struct pkvm_mem_share *share)
 +{
++	const struct pkvm_mem_transition *tx = &share->tx;
++	u64 completer_addr;
 +	int ret;
-+	u64 host_addr = hyp_pfn_to_phys(pfn);
-+	u64 hyp_addr = (u64)__hyp_va(host_addr);
-+	struct pkvm_mem_share share = {
-+		.tx	= {
-+			.nr_pages	= 1,
-+			.initiator	= {
-+				.id	= PKVM_ID_HOST,
-+				.addr	= host_addr,
-+				.host	= {
-+					.completer_addr = hyp_addr,
-+				},
-+			},
-+			.completer	= {
-+				.id	= PKVM_ID_HYP,
-+			},
-+		},
-+		.prot	= PAGE_HYP,
-+	};
 +
-+	host_lock_component();
-+	hyp_lock_component();
++	switch (tx->initiator.id) {
++	case PKVM_ID_HOST:
++		ret = host_request_unshare(&completer_addr, tx);
++		break;
++	default:
++		ret = -EINVAL;
++	}
 +
-+	ret = do_share(&share);
++	if (ret)
++		return ret;
 +
-+	hyp_unlock_component();
-+	host_unlock_component();
++	switch (tx->completer.id) {
++	case PKVM_ID_HYP:
++		ret = hyp_ack_unshare(completer_addr, tx);
++		break;
++	default:
++		ret = -EINVAL;
++	}
 +
 +	return ret;
 +}
++
++static int __do_unshare(struct pkvm_mem_share *share)
++{
++	const struct pkvm_mem_transition *tx = &share->tx;
++	u64 completer_addr;
++	int ret;
++
++	switch (tx->initiator.id) {
++	case PKVM_ID_HOST:
++		ret = host_initiate_unshare(&completer_addr, tx);
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
++	if (ret)
++		return ret;
++
++	switch (tx->completer.id) {
++	case PKVM_ID_HYP:
++		ret = hyp_complete_unshare(completer_addr, tx);
++		break;
++	default:
++		ret = -EINVAL;
++	}
++
++	return ret;
++}
++
++/*
++ * do_unshare():
++ *
++ * The page owner revokes access from another component for a range of
++ * pages which were previously shared using do_share().
++ *
++ * Initiator: SHARED_OWNED	=> OWNED
++ * Completer: SHARED_BORROWED	=> NOPAGE
++ */
++static int do_unshare(struct pkvm_mem_share *share)
++{
++	int ret;
++
++	ret = check_unshare(share);
++	if (ret)
++		return ret;
++
++	return WARN_ON(__do_unshare(share));
++}
++
+ int __pkvm_host_share_hyp(u64 pfn)
+ {
+ 	int ret;
 -- 
 2.33.0.1079.g6e70778dc9-goog
 
