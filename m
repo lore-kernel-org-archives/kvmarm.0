@@ -1,86 +1,88 @@
-Return-Path: <SRS0=DvdR=PH=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=uoKB=PI=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15F0CC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Oct 2021 21:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A871C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Oct 2021 13:52:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 857756134F
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Oct 2021 21:18:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 857756134F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 93F056128E
+	for <kvmarm@archiver.kernel.org>; Wed, 20 Oct 2021 13:52:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 93F056128E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0FF54B133;
-	Tue, 19 Oct 2021 17:17:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20D6F4B0C3;
+	Wed, 20 Oct 2021 09:52:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tmo4WzJMeFta; Tue, 19 Oct 2021 17:17:58 -0400 (EDT)
+	with ESMTP id jOKWiCNyOlmL; Wed, 20 Oct 2021 09:52:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C514B0B4;
-	Tue, 19 Oct 2021 17:17:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 560DC4B0CE;
+	Wed, 20 Oct 2021 09:52:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A7134B0B4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 17:17:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FF684B0C3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Oct 2021 09:52:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kU1-huPdcTCS for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Oct 2021 17:17:56 -0400 (EDT)
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
- [209.85.215.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 623CD4B0AC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 17:17:56 -0400 (EDT)
-Received: by mail-pg1-f181.google.com with SMTP id t184so7568667pgd.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Oct 2021 14:17:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Oc0/+tVwK7K9nmz3ZCCVI0OnaV+/2goNVxH4SiWbdQY=;
- b=n/KgdwdBsIwUUylWrPRFshJHpCoQZrnOOHfYOc5/rMLQ8wuZKohdWeupQF1jMimzvb
- AIDP/6JoNxEWdsFJeXJQ9n1E/nR84Bvb4GS9Ron8aQSE5SlChfI/McpudJFpBiEAiq7u
- c0LTUpn88XqeZZR68Twh6qRkL90+VSMsQVD5a6UonW4RyfY/ps6p3bnnZc2jPb+i4xsZ
- +b6aOS+mevs/Ziu1ZT6F6eC/NCRz8ClKtNcfTJZcLh539e9ABJEpFtCnyvQO7g8/BfN5
- 10QS+xNtPDeW5t5ZzyTWZDyR2BFDpnVn8/cMWxvdpCg8cfiiifFozI6/vPMmy+/4t1Os
- mfvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Oc0/+tVwK7K9nmz3ZCCVI0OnaV+/2goNVxH4SiWbdQY=;
- b=00MjXDKRbMYwPUOKsArEJ4vB1fB8Xm2hu2K6zn7eMvsF8OX/AU6+o7P4e+KYV5xFOb
- nJ1+gYOK5RhojkPxAwyI9Mp1xShK5yRAvvLOmiPDW16ByMnScdv/hLDYxp5cc+UU8XOx
- 0gXaAA4PnMcJjWBjTcr3XOIqhsZ9fehxg8JjMaXQ+DqgbTmfgIxS9EZY08BKh2G6DLa7
- YMCJox/Y8Zi/LPj1bUjgQleLQChjgBu0p7rBMV2mpz1ZXTWqSf1P9KOs0EOnUYuw9cpO
- LAH7Mu0JtjdDN3gpb+PSnFoN01gbQyTYO+SmGpmmjdX1UMoXUXZHT4T2oHTr6OE/uDdN
- m+aA==
-X-Gm-Message-State: AOAM531u6i8rq7BWMm8FT+lkeGdOgRz88OMF7+3TkFHntPX6DAo6Df7x
- 4DE8v5pI6noHNqLtVDPWW19v7Q==
-X-Google-Smtp-Source: ABdhPJx97+XMR9DaIQZAIqX4jy+cJjWfmQD3Dd0awGykaOoZQzlV7bhMqYiRM0qW49c0pxK2/TRSlQ==
-X-Received: by 2002:a05:6a00:2311:b0:431:c19f:2a93 with SMTP id
- h17-20020a056a00231100b00431c19f2a93mr2263470pfh.11.1634678275358; 
- Tue, 19 Oct 2021 14:17:55 -0700 (PDT)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id nv5sm95571pjb.10.2021.10.19.14.17.54
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 19 Oct 2021 14:17:54 -0700 (PDT)
-Date: Tue, 19 Oct 2021 14:17:51 -0700
-From: Ricardo Koller <ricarkol@google.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 0/2] KVM: selftests: enable the memslot tests in ARM64
-Message-ID: <YW81/4/DiAgELq09@google.com>
-References: <20210907180957.609966-1-ricarkol@google.com>
- <20210907181737.jrg35l3d342zgikt@gator.home>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20210907181737.jrg35l3d342zgikt@gator.home>
-Cc: kvm@vger.kernel.org, maz@kernel.org, pshier@google.com,
- Paolo Bonzini <pbonzini@redhat.com>, maciej.szmigiero@oracle.com,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id yAFF5b7fDoVQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Oct 2021 09:52:37 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA5694B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Oct 2021 09:52:36 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 097B161052;
+ Wed, 20 Oct 2021 13:52:34 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mdC19-000RjV-SP; Wed, 20 Oct 2021 14:52:31 +0100
+Date: Wed, 20 Oct 2021 14:52:31 +0100
+Message-ID: <874k9bdcrk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Hikaru Nishida <hikalium@chromium.org>
+Subject: Re: [RFC PATCH v3 0/5] x86/kvm: Virtual suspend time injection support
+In-Reply-To: <20211020120431.776494-1-hikalium@chromium.org>
+References: <20211020120431.776494-1-hikalium@chromium.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: hikalium@chromium.org, linux-kernel@vger.kernel.org,
+ dme@dme.org, tglx@linutronix.de, mlevitsk@redhat.com, linux@roeck-us.net,
+ pbonzini@redhat.com, vkuznets@redhat.com, will@kernel.org, suleiman@google.com,
+ senozhatsky@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, luto@kernel.org, arnd@arndb.de,
+ bp@alien8.de, dave.hansen@linux.intel.com, geert@linux-m68k.org, hpa@zytor.com,
+ mingo@kernel.org, mingo@redhat.com, jmattson@google.com, joro@8bytes.org,
+ john.stultz@linaro.org, corbet@lwn.net, jgross@suse.com, keescook@chromium.org,
+ laijs@linux.alibaba.com, linus.walleij@linaro.org, peterz@infradead.org,
+ seanjc@google.com, sboyd@kernel.org, wanpengli@tencent.com,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org, x86@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ senozhatsky@google.com, will@kernel.org, Ingo Molnar <mingo@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Jonathan Corbet <corbet@lwn.net>,
+ Joerg Roedel <joro@8bytes.org>, x86@kernel.org, mlevitsk@redhat.com,
+ Ingo Molnar <mingo@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>,
+ suleiman@google.com, linux@roeck-us.net, John Stultz <john.stultz@linaro.org>,
+ Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, dme@dme.org,
+ Lai Jiangshan <laijs@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
+ Andy Lutomirski <luto@kernel.org>, tglx@linutronix.de,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Juergen Gross <jgross@suse.com>, Stephen Boyd <sboyd@kernel.org>,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,41 +99,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Sep 07, 2021 at 08:17:37PM +0200, Andrew Jones wrote:
-> On Tue, Sep 07, 2021 at 11:09:55AM -0700, Ricardo Koller wrote:
-> > Enable memslot_modification_stress_test and memslot_perf_test in ARM64
-> > (second patch). memslot_modification_stress_test builds and runs in
-> > aarch64 without any modification. memslot_perf_test needs some nits
-> > regarding ucalls (first patch).
-> > 
-> > Can anybody try these two tests in s390, please?
-> > 
-> > Changes:
-> > v2: Makefile tests in the right order (from Andrew).
-> 
-> Hi Ricardo,
-> 
-> You could have collected all the r-b's too.
-> 
-> Thanks,
-> drew
-> 
+Hi Hikaru,
 
-Friendly ping on this one, please.
-
-> > 
-> > Ricardo Koller (2):
-> >   KVM: selftests: make memslot_perf_test arch independent
-> >   KVM: selftests: build the memslot tests for arm64
-> > 
-> >  tools/testing/selftests/kvm/Makefile          |  2 +
-> >  .../testing/selftests/kvm/memslot_perf_test.c | 56 +++++++++++--------
-> >  2 files changed, 36 insertions(+), 22 deletions(-)
-> > 
-> > -- 
-> > 2.33.0.153.gba50c8fa24-goog
-> > 
+On Wed, 20 Oct 2021 13:04:25 +0100,
+Hikaru Nishida <hikalium@chromium.org> wrote:
 > 
+> 
+> Hi,
+> 
+> This patch series adds virtual suspend time injection support to KVM.
+> It is an updated version of the following series:
+> v2:
+> https://lore.kernel.org/kvm/20210806100710.2425336-1-hikalium@chromium.org/
+> v1:
+> https://lore.kernel.org/kvm/20210426090644.2218834-1-hikalium@chromium.org/
+> 
+> Please take a look again.
+> 
+> To kvm/arm64 folks:
+> I'm going to implement this mechanism to ARM64 as well but not
+> sure which function should be used to make an IRQ (like kvm_apic_set_irq
+> in x86) and if it is okay to use kvm_gfn_to_hva_cache /
+> kvm_write_guest_cached for sharing the suspend duration.
+
+Before we discuss interrupt injection, I want to understand what this
+is doing, and how this is doing it. And more precisely, I want to find
+out how you solve the various problems described by Thomas here [1].
+
+Assuming you solve these, you should model the guest memory access
+similarly to what we do for stolen time. As for injecting an
+interrupt, why can't this be a userspace thing?
+
+Thanks,
+
+	M.
+
+[1] https://lore.kernel.org/all/871r557jls.ffs@tglx
+
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
