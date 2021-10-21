@@ -2,66 +2,63 @@ Return-Path: <SRS0=/McF=PJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CFFC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Oct 2021 12:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB11EC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Oct 2021 15:11:40 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 86C4C60FE8
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Oct 2021 12:47:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 86C4C60FE8
+	by mail.kernel.org (Postfix) with ESMTP id 4194460F57
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Oct 2021 15:11:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4194460F57
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 179A64B128;
-	Thu, 21 Oct 2021 08:47:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB7064B126;
+	Thu, 21 Oct 2021 11:11:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oWCnJQYohh76; Thu, 21 Oct 2021 08:47:37 -0400 (EDT)
+	with ESMTP id DyQnT+sD2sAs; Thu, 21 Oct 2021 11:11:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD3BF4B168;
-	Thu, 21 Oct 2021 08:47:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F31924B1AB;
+	Thu, 21 Oct 2021 11:11:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88EA34B165
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Oct 2021 08:47:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FF214B161
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Oct 2021 11:11:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cNIS+WU2-yy7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Oct 2021 08:47:35 -0400 (EDT)
+ with ESMTP id Qkdc7lkTCLlY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Oct 2021 11:11:34 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8823C4B128
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Oct 2021 08:47:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D79F14B119
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Oct 2021 11:11:34 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 8B66760F56;
- Thu, 21 Oct 2021 12:47:34 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5916A611C7;
+ Thu, 21 Oct 2021 15:11:32 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mdXTo-000hRj-AN; Thu, 21 Oct 2021 13:47:32 +0100
+ id 1mdZj8-000jKD-64; Thu, 21 Oct 2021 16:11:30 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v2 0/2] KVM: selftests: enable the memslot tests in ARM64
-Date: Thu, 21 Oct 2021 13:47:28 +0100
-Message-Id: <163482044194.2203130.6587124513364503568.b4-ty@kernel.org>
+ linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 0/4] KVM: arm64: Stop mapping current thread_info at EL2
+Date: Thu, 21 Oct 2021 16:11:20 +0100
+Message-Id: <20211021151124.3098113-1-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210907180957.609966-1-ricarkol@google.com>
-References: <20210907180957.609966-1-ricarkol@google.com>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- ricarkol@google.com, jingzhangos@google.com, maciej.szmigiero@oracle.com,
- reijiw@google.com, oupton@google.com, drjones@redhat.com, pbonzini@redhat.com,
- pshier@google.com, rananta@google.com
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com,
+ will@kernel.org, broonie@kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: pshier@google.com, Paolo Bonzini <pbonzini@redhat.com>,
- maciej.szmigiero@oracle.com
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>, broonie@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,29 +75,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 7 Sep 2021 11:09:55 -0700, Ricardo Koller wrote:
-> Enable memslot_modification_stress_test and memslot_perf_test in ARM64
-> (second patch). memslot_modification_stress_test builds and runs in
-> aarch64 without any modification. memslot_perf_test needs some nits
-> regarding ucalls (first patch).
-> 
-> Can anybody try these two tests in s390, please?
-> 
-> [...]
+It recently became apparent that we are mapping each vcpu thread's
+thread_info structure at EL2 for the sole purpose of checking on the
+TIF_FOREIGN_FPSTATE flag.
 
-Applied to next, thanks!
+Given that this looks like a slightly over-engineered way of sharing a
+single bit of information, let's move to a slightly more obvious
+implementation by maintaining a vcpu-private shadow flag that
+represents the same state.
 
-[1/2] KVM: selftests: make memslot_perf_test arch independent
-      commit: ffb4ce3c49366f02f1c064fbe2e66a96ab5f98b8
-[2/2] KVM: selftests: build the memslot tests for arm64
-      commit: 358928fd5264f069b9758f8b29297c7bff2a06de
+I also take this opportunity to add what looks like a missing, and
+nonetheless crucial piece of information to the FPSIMD code regarding
+the way KVM (ab)uses the TIF_FOREIGN_FPSTATE.
 
-Cheers,
+Lightly tested on an A53 box with a bunch of paranoia instances
+running in both host and guests.
 
-	M.
+Marc Zyngier (4):
+  KVM: arm64: Reorder vcpu flag definitions
+  KVM: arm64: Introduce flag shadowing TIF_FOREIGN_FPSTATE
+  KVM: arm64: Stop mapping current thread_info at EL2
+  arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE by KVM
+
+ arch/arm64/include/asm/kvm_host.h       | 28 ++++++++++++-------------
+ arch/arm64/kernel/fpsimd.c              |  5 ++++-
+ arch/arm64/kvm/arm.c                    |  1 +
+ arch/arm64/kvm/fpsimd.c                 | 20 ++++++++----------
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  3 +--
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  1 -
+ arch/arm64/kvm/hyp/vhe/switch.c         |  1 -
+ 7 files changed, 29 insertions(+), 30 deletions(-)
+
 -- 
-Without deviation from the norm, progress is not possible.
-
+2.30.2
 
 _______________________________________________
 kvmarm mailing list
