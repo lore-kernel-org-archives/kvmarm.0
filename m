@@ -2,59 +2,59 @@ Return-Path: <SRS0=/McF=PJ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2720FC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Oct 2021 15:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD34C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Oct 2021 15:57:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 9C06F60C49
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Oct 2021 15:24:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9C06F60C49
+	by mail.kernel.org (Postfix) with ESMTP id C661A61056
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Oct 2021 15:57:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C661A61056
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F7A84B17C;
-	Thu, 21 Oct 2021 11:24:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67DDC4B08B;
+	Thu, 21 Oct 2021 11:57:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HmYO9diugE0Z; Thu, 21 Oct 2021 11:24:31 -0400 (EDT)
+	with ESMTP id Ixw3faF7pUa5; Thu, 21 Oct 2021 11:57:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB4F74B15E;
-	Thu, 21 Oct 2021 11:24:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C19A4B165;
+	Thu, 21 Oct 2021 11:57:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 423134B159
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Oct 2021 11:24:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A4D74B08B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Oct 2021 11:57:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9mhSA7AFXsSV for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Oct 2021 11:24:30 -0400 (EDT)
+ with ESMTP id KicUDiad08vB for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Oct 2021 11:57:19 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21D2249FB7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Oct 2021 11:24:30 -0400 (EDT)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A1C4161183;
- Thu, 21 Oct 2021 15:24:28 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D90634A7FD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Oct 2021 11:57:18 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4B91A61056;
+ Thu, 21 Oct 2021 15:57:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1634829869;
- bh=tUrSTzrgcnXRxuolPC5YiqjKQYQV19z+OKGtoBE//Ew=;
+ s=k20201202; t=1634831837;
+ bh=thJx0ql4zsrQ3ldjl2tC3lMokz2U/gzzD30/9U8kz/c=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=pEad02ay6+Bct21u4Vr3aCBZdjlooRsUJnBfQvsnjOD7ouqCLu2106vDuZdol0SI9
- CXD6az+sk29AOvUuVipq6vF9bGcBcU6mEv43pCJwPUx1uRGndrx14G7P7sKLiuczJV
- xFjHPuLwzKyr0YYKOvKy7lLEPLxjrPRnnbyA1p9z6wv6nUagqIzBaxw0n+8uY7aLyG
- 5rgzto4O73JpcwCWJjRrecfjMxUR7idrJ2lPtI1OfeisTMkjmxi5fduCdKwFTbhFfw
- QLNo56f+Nakx3mmfJuDqZgudQ9cidMlkk9aD4+/opn2bt73Mk09p/91U9Y+bd8JJ++
- y3fs+t0nYtnYQ==
-Date: Thu, 21 Oct 2021 16:24:26 +0100
+ b=HONkM9N7y+63m80uXk6oJMy3DWWv8D4t1Lj0tv5+bqUpIvORBrFvWI6agd8TPeZIq
+ BPs9tFFTDlZDwYoS7fgpy2qfPHofu9XIATLjdjSoVlij85MvHlNSrusXefBsGbinzL
+ QbevuOpdSqt4VgorJOMj4Gfieou5bPNuLAi40y1JlEA0lKiiHPZ5P0qJw0rz2Q7NNL
+ y9R0azVeYjwaBgWqoKDgPMMQhcliuiXg5n5O43XMlvgLy1GxPNZvkBq/dUsfjq0TSx
+ 4Qx4bjUufFxriAPvdFnpFesnNwu/ZrhLjNs505mSZOanWw9DM+T5jVYN9EsQGonI7/
+ K0NdgguyUzn/w==
+Date: Thu, 21 Oct 2021 16:57:15 +0100
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 2/4] KVM: arm64: Introduce flag shadowing
- TIF_FOREIGN_FPSTATE
-Message-ID: <YXGGKkQw27YiMBeP@sirena.org.uk>
+Subject: Re: [PATCH 4/4] arm64/fpsimd: Document the use of
+ TIF_FOREIGN_FPSTATE by KVM
+Message-ID: <YXGN26tHnRyWkWns@sirena.org.uk>
 References: <20211021151124.3098113-1-maz@kernel.org>
- <20211021151124.3098113-3-maz@kernel.org>
+ <20211021151124.3098113-5-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20211021151124.3098113-3-maz@kernel.org>
+In-Reply-To: <20211021151124.3098113-5-maz@kernel.org>
 X-Cookie: I program, therefore I am.
 Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -69,49 +69,83 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============5445180050178714997=="
+Content-Type: multipart/mixed; boundary="===============0330782139320405102=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---===============5445180050178714997==
+--===============0330782139320405102==
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="L8Wd2CqiPfVWhZp9"
+	protocol="application/pgp-signature"; boundary="IeDufIOZPw7Arkzk"
 Content-Disposition: inline
 
 
---L8Wd2CqiPfVWhZp9
+--IeDufIOZPw7Arkzk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 21, 2021 at 04:11:22PM +0100, Marc Zyngier wrote:
-> We currently have to maintain a mapping the thread_info structure
-> at EL2 in order to be able to check the TIF_FOREIGN_FPSTATE flag.
+On Thu, Oct 21, 2021 at 04:11:24PM +0100, Marc Zyngier wrote:
+> The bit of documentation that talks about TIF_FOREIGN_FPSTATE
+> does not mention the ungodly tricks that KVM plays with this flag.
 >=20
-> In order to eventually get rid of this, start with a vcpu flag that
-> shadows the thread flag on each entry into the hypervisor.
+> Try and document this for the posterity.
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Yes, more documentation here would definitely be helpful - it's pretty
+hard to follow what KVM is doing here.
 
---L8Wd2CqiPfVWhZp9
+>   * CPU currently contain the most recent userland FPSIMD state of the cu=
+rrent
+> - * task.
+> + * task *or* the state of the corresponding KVM vcpu if userspace is beh=
+aving
+> + * as a VMM and that the vcpu has used FP during its last run. In the la=
+tter
+> + * case, KVM will set TIF_FOREIGN_FPSTATE on kvm_vcpu_put(). For all int=
+ents
+> + * and purposes, the vcpu FP state is treated identically to userspace's.
+
+I'm not able to find a kvm_vcpu_put() function in upstream, just
+kvm_cpu_put_sysregs_vhe().  There's kvm_arch_vcpu_put() which is called
+=66rom the vcpu_put() function in generic KVM code but they don't show up
+until you start mangling the name in that comment.  It'd be good to
+mention what vcpu_put() is actually doing and a bit more about the
+general model, KVM is behaving differently here AFAICT in that it flags
+the current state as invalid when it saves the context to memory rather
+than when an event happens that requires that the context be reloaded.
+There's no problem there but it's a bit surprising due the difference
+and worth highlighting.
+
+I think I'd also be inclined to restructure this to foreground the fact
+that it's the state of the current task but that task may be a VMM.  So
+something more like
+
+	...contain the most recent FPSIMD state of the current userspace
+	task.  If the task is behaving as a VMM then this will be
+	managed by KVM which will...
+
+making it a bit easier to follow (assuming my understanding of what's
+going on is correct, if not then I guess something else needs
+clarifying!).
+
+--IeDufIOZPw7Arkzk
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmFxhikACgkQJNaLcl1U
-h9BEwQf/esARvjGvexFVvEy7ZJkEtcEGWDwcI7fFBSYm35mVfsJxUU/14LDIPmci
-EOzcELKvXBXccR+fJ+DdxtOkJJV/rB6vl1Iyg4ikNaNYbFENyYkkz0gyOtlXSkoH
-nc9fUiPu4/i1+re6CB+n1Fam4qzuavZ71WK7fXwo5hNwB+vc0GAKRKwD8fCyMlcQ
-7f/0JC25VkFkxpdY82tSo2RRRC/m5E6CXJtj0WnSM/q1yfKI/w75j4lDiO78w8+x
-S3IRKg0aZSyiW/Kv05IfRFcO/xNXiOuLwRQ/+7+VuL34njdcA+UmASrJWmTBwV+T
-wPCL4eMWVSK3O8SD6oohjJ/I3LOrRA==
-=z7rI
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmFxjdoACgkQJNaLcl1U
+h9A4wgf/dZ00LwDAdKbmHEpnXv8/wNofkka0/fogNjInmTdPmd23jPG2rP3KZ/yC
+t7YubXwU8NRBAlxIG7570hCwq5PuOfaw3DYpb+vzrkgJaHuM4OUFlsUqZj2PqZDX
+4cPa+zOkdR4bPABHHKkvMArt8CgfF20qeV+MjJTyksG8GNhpaLC+xbQMFzSTxx/8
+j4CK8DtfI12HzqH6VP29HkXjZJhjc+y+goTCJdm+IK91wkdG/bcDaz5hauC9rjsO
+77FcO+oedQsdOdsxxUZZ+4zQ0w8htwq62JF+gorJyDZLdSY85hT9B9+zPXTRcWZm
+0zmnxUJCvu9ggcIxpllmZ1vjqjbn/A==
+=mdJ2
 -----END PGP SIGNATURE-----
 
---L8Wd2CqiPfVWhZp9--
+--IeDufIOZPw7Arkzk--
 
---===============5445180050178714997==
+--===============0330782139320405102==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -122,4 +156,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============5445180050178714997==--
+--===============0330782139320405102==--
