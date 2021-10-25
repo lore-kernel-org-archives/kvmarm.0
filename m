@@ -2,89 +2,87 @@ Return-Path: <SRS0=qWZ6=PN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDD2C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Oct 2021 14:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D536C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Oct 2021 15:05:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 495EC60F4F
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Oct 2021 14:35:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 495EC60F4F
+	by mail.kernel.org (Postfix) with ESMTP id 052C160D43
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Oct 2021 15:05:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 052C160D43
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C26C04B108;
-	Mon, 25 Oct 2021 10:35:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68EB94B102;
+	Mon, 25 Oct 2021 11:05:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QIqWqI+b9Jac; Mon, 25 Oct 2021 10:35:01 -0400 (EDT)
+	with ESMTP id Zspey4N6t0su; Mon, 25 Oct 2021 11:05:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FBB44B0DF;
-	Mon, 25 Oct 2021 10:35:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B56944B0B3;
+	Mon, 25 Oct 2021 11:05:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F7264B0B8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 10:34:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58E974005D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 11:05:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C+b8NL2tJjbU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Oct 2021 10:34:57 -0400 (EDT)
+ with ESMTP id RxIKk8xBl6TX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Oct 2021 11:05:27 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2287405A6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 10:34:57 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 254374A19A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 11:05:27 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635172497;
+ s=mimecast20190719; t=1635174326;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gyRr+oxbdq+D1XVZyshzBJhdWV6eJMpRCL2oDxsSBbM=;
- b=SQBkGLBaOxog2hLaf6YXCS+UY/ndEWjokIqxk8Ws8KqvyTEE0Co3Z7LtBTIp697U1HlcgV
- DbTijGyr0ZSgkptCt4zGUrPXkUOcf8Ijn+i1BCLw8Bp7+I2iJW+Lhv0qI9q2PEV85OkVUT
- aMLTaFhNymZBkzU0xhx83l44CfHd3SE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-Kt8_rBF5OzO0cyX1WeKU4Q-1; Mon, 25 Oct 2021 10:34:56 -0400
-X-MC-Unique: Kt8_rBF5OzO0cyX1WeKU4Q-1
-Received: by mail-ed1-f69.google.com with SMTP id
- z1-20020a05640235c100b003dcf0fbfbd8so10115959edc.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 07:34:56 -0700 (PDT)
+ bh=17YKkfI8G+c9Iih6iy4QvMoudnAtBOzRU5Sn0sW8tZE=;
+ b=aUowJOSEezruPAV5aYjmQ+lYK4PnUPZm2rdY0GZqKxlRyLjdAP8jYom4/YgWe9sjL8zZ+v
+ L3KR9DA0JY8x+SfbqhPtmpp/557AsSNAybKVKckopLoiKnXSjsfAyqGfRwkyfSg/iN8ynJ
+ R8xOs0MQVRjRt5Mnl0wbHjoPgnBwGg8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-nOh08Y5bOoS_RYsy_Ch6Cg-1; Mon, 25 Oct 2021 11:05:25 -0400
+X-MC-Unique: nOh08Y5bOoS_RYsy_Ch6Cg-1
+Received: by mail-wr1-f72.google.com with SMTP id
+ n14-20020a5d420e000000b00167c303d862so3323086wrq.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 08:05:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
  :content-language:to:cc:references:from:in-reply-to
  :content-transfer-encoding;
- bh=gyRr+oxbdq+D1XVZyshzBJhdWV6eJMpRCL2oDxsSBbM=;
- b=BC00LvlOH4vzxocRKcJTwCNiXCC3bDJ4SoKCSwO2lTMBRukvRwarcxwPqrMZcLePVq
- tNjAVHNiG3FZo8sDPLHWD55gn+RD1MVJjgo20XYyHPC6BV7LzQc1rc5ne6Q1rX3+ck5q
- eKJoD0G4w5/Hgy/7dwRDUzX32bOlt6C7s9vzns6lgEtd1kzdoBSrb1a+Onzh0a1zkkYT
- F9VtEwQzjr0M3AE4wR3cLsOQyyxi0YiPqdnMLXqQsf2ceDTi4Cdl3C1Ar5HTUrpdhpE5
- wL0VGmyRn0kJMybNEqXP8J+qsAZQv5K5ZAolUMdjG5iAM7g+ozRapPmyXKAuJkq5PMdU
- QqRg==
-X-Gm-Message-State: AOAM530eD8LHUjoA0z5ouhlkniRU7na8U0GbiOc6SUry9ja3iR0KTmX1
- rjho+Z/lkshDEDss6LoYy1/+xgPBfwb5uiTCHTigY+JSJvM5HyTFRIAxqLPM5YiTHKP2pHrqJEh
- WjLxyXv/Lm0DTa8qP4lcPuTHf
-X-Received: by 2002:a05:6402:5112:: with SMTP id
- m18mr26543457edd.101.1635172494814; 
- Mon, 25 Oct 2021 07:34:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1PVpqtFTaT+fZx+ngmF47w1xHlBRHe6pB6EMZ006WM53WXRFnHCfF7AOxx4PQB6o6e4saOQ==
-X-Received: by 2002:a05:6402:5112:: with SMTP id
- m18mr26543421edd.101.1635172494578; 
- Mon, 25 Oct 2021 07:34:54 -0700 (PDT)
+ bh=17YKkfI8G+c9Iih6iy4QvMoudnAtBOzRU5Sn0sW8tZE=;
+ b=uDURGIvC77mkFMrtDXK6gx1Q4E/TWqAsSOvvjLl0GQUxM1RgksjNW2S05x19p0SM0X
+ XpuDRrAkkCOU/cTIOo0w/jF/AHA3qSKd+cf5C8Dl0DEIMHcGKse3PRkgipYJAQ2E5jbl
+ u/m+T5yXXJzs2tTa/vIPJhI3axEuKsRF1NfReq66WpF8Q3pLhBrHhfr5vgMTML4II51v
+ fN096fZltacOQ/tynGnG8gkz+Rm7zkyxdOydorqOwIDdE5F9YrMOKjqUqgNGFufBIamr
+ SGvSCRhfam3c0+VmGj60DU65yc+dLmlq4c9nWNemCZOx+ONKeE/KHLH2FrcZd9MGYP0J
+ Qx+A==
+X-Gm-Message-State: AOAM530gru3FQNyU7vRfa9+zHp73dMkafbgAWeFeYEqNqLgLvFJ6QCoM
+ U5k8pVnJQU1yoi0WPNZKLGr4As1vJkl17uiPUhXwH73PvjZAHgLpH2fS3dig9NuAKsR6HHrmO/I
+ 7yXe9JzotqQ5NODb4gWxylnum
+X-Received: by 2002:adf:b1d7:: with SMTP id r23mr24328031wra.145.1635174324218; 
+ Mon, 25 Oct 2021 08:05:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNexQuzHRq+jpnX8KTr0omvqAmOMBdWB1dnxyBAmmWnxN2QzlfyX1PUJV+JR7ASMMz0R8mMg==
+X-Received: by 2002:adf:b1d7:: with SMTP id r23mr24327978wra.145.1635174323914; 
+ Mon, 25 Oct 2021 08:05:23 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
  ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id m15sm10124432edd.5.2021.10.25.07.34.44
+ by smtp.gmail.com with ESMTPSA id w10sm9256784wrp.25.2021.10.25.08.05.21
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 25 Oct 2021 07:34:53 -0700 (PDT)
-Message-ID: <335822ac-b98b-1eec-4911-34e4d0e99907@redhat.com>
-Date: Mon, 25 Oct 2021 16:34:43 +0200
+ Mon, 25 Oct 2021 08:05:23 -0700 (PDT)
+Message-ID: <a2a4e076-edb8-2cb5-5cb2-6825a1a4559a@redhat.com>
+Date: Mon, 25 Oct 2021 17:05:19 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v2 39/43] KVM: VMX: Don't do full kick when triggering
- posted interrupt "fails"
+Subject: Re: [PATCH v2 40/43] KVM: VMX: Wake vCPU when delivering posted IRQ
+ even if vCPU == this vCPU
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Huacai Chen <chenhuacai@kernel.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -94,9 +92,9 @@ To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-40-seanjc@google.com>
+ <20211009021236.4122790-41-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211009021236.4122790-40-seanjc@google.com>
+In-Reply-To: <20211009021236.4122790-41-seanjc@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -128,48 +126,14 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 09/10/21 04:12, Sean Christopherson wrote:
-> +		/*
-> +		 * The smp_wmb() in kvm_make_request() pairs with the smp_mb_*()
-> +		 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU
-> +		 * is guaranteed to see the event request if triggering a posted
-> +		 * interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+> 
+> Lastly, this aligns the non-nested and nested usage of triggering posted
+> interrupts, and will allow for additional cleanups.
 
-This explanation doesn't make much sense to me.  This is just the usual 
-request/kick pattern explained in 
-Documentation/virt/kvm/vcpu-requests.rst; except that we don't bother 
-with a "kick" out of guest mode because the entry always goes through 
-kvm_check_request (in the nVMX case) or sync_pir_to_irr (if non-nested) 
-and completes the delivery itself.
-
-In other word, it is a similar idea as patch 43/43.
-
-What this smp_wmb() pair with, is the smp_mb__after_atomic in 
-kvm_check_request(KVM_REQ_EVENT, vcpu).  Setting the interrupt in the 
-PIR orders before kvm_make_request in this thread, and orders after 
-kvm_make_request in the vCPU thread.
-
-Here, instead:
-
-> +	/*
-> +	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
-> +	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
-> +	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
-> +	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
-> +	 */
->  	if (vcpu != kvm_get_running_vcpu() &&
->  	    !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
-> -		kvm_vcpu_kick(vcpu);
-> +		kvm_vcpu_wake_up(vcpu);
->  
-
-it pairs with the smp_mb__after_atomic in vmx_sync_pir_to_irr().  As 
-explained again in vcpu-requests.rst, the ON bit has the same function 
-as vcpu->request in the previous case.
+It also aligns with SVM a little bit more (especially given patch 35), 
+doesn't it?
 
 Paolo
-
-> +		 */
->   		kvm_make_request(KVM_REQ_EVENT, vcpu);
 
 _______________________________________________
 kvmarm mailing list
