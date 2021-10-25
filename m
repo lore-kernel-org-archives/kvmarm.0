@@ -2,112 +2,98 @@ Return-Path: <SRS0=qWZ6=PN=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D536C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Oct 2021 15:05:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E24C433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Oct 2021 15:48:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 052C160D43
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Oct 2021 15:05:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 052C160D43
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id CFFF560F70
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Oct 2021 15:48:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CFFF560F70
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68EB94B102;
-	Mon, 25 Oct 2021 11:05:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42E9C4B11E;
+	Mon, 25 Oct 2021 11:48:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Zspey4N6t0su; Mon, 25 Oct 2021 11:05:29 -0400 (EDT)
+	with ESMTP id MlqZzFO6ibiZ; Mon, 25 Oct 2021 11:48:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B56944B0B3;
-	Mon, 25 Oct 2021 11:05:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA7F44B0EC;
+	Mon, 25 Oct 2021 11:48:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58E974005D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 11:05:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC2014B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 11:48:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RxIKk8xBl6TX for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Oct 2021 11:05:27 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 254374A19A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 11:05:27 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635174326;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=17YKkfI8G+c9Iih6iy4QvMoudnAtBOzRU5Sn0sW8tZE=;
- b=aUowJOSEezruPAV5aYjmQ+lYK4PnUPZm2rdY0GZqKxlRyLjdAP8jYom4/YgWe9sjL8zZ+v
- L3KR9DA0JY8x+SfbqhPtmpp/557AsSNAybKVKckopLoiKnXSjsfAyqGfRwkyfSg/iN8ynJ
- R8xOs0MQVRjRt5Mnl0wbHjoPgnBwGg8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-nOh08Y5bOoS_RYsy_Ch6Cg-1; Mon, 25 Oct 2021 11:05:25 -0400
-X-MC-Unique: nOh08Y5bOoS_RYsy_Ch6Cg-1
-Received: by mail-wr1-f72.google.com with SMTP id
- n14-20020a5d420e000000b00167c303d862so3323086wrq.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 08:05:25 -0700 (PDT)
+ with ESMTP id sTtAlG5jiqIL for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Oct 2021 11:48:30 -0400 (EDT)
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com
+ [209.85.214.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A000406E0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 11:48:30 -0400 (EDT)
+Received: by mail-pl1-f170.google.com with SMTP id n11so8227696plf.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Oct 2021 08:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=0lZC/4YVNiq6m54gciVPWUG9HJx9IWHvMOAiOdASGoo=;
+ b=QyfrOXYXYzIEyrLD44pl5e5qrBHvKskln3PRReuWzpAgV2++kLJzI050rqe2oVwX2v
+ /YSSz3klIowpfUugVLMls4E5ALzM885A+JjaGYEd8dI6xPFGzSKWWGCwhTUoU1wJJ2+4
+ q6QXjhMZdsCR4vmwSFpvR/7/SOjlriEKOoj6W/QPj/mWp9yfleITVSt3gv9SSl80X7Ip
+ BvJTrYEOJKTHV3pbSlO8IHWn3hT4T3KR9LJVANxEXG1UOo91F4D+Bcp+BL0MB5OCLaKP
+ Mo/ai6V2iZC0VqjsN2MnwKzxW/qxPY5ehn5rtVsOHSmvZ7PywSIV88EiySKFBzouQ+tc
+ 9/iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=17YKkfI8G+c9Iih6iy4QvMoudnAtBOzRU5Sn0sW8tZE=;
- b=uDURGIvC77mkFMrtDXK6gx1Q4E/TWqAsSOvvjLl0GQUxM1RgksjNW2S05x19p0SM0X
- XpuDRrAkkCOU/cTIOo0w/jF/AHA3qSKd+cf5C8Dl0DEIMHcGKse3PRkgipYJAQ2E5jbl
- u/m+T5yXXJzs2tTa/vIPJhI3axEuKsRF1NfReq66WpF8Q3pLhBrHhfr5vgMTML4II51v
- fN096fZltacOQ/tynGnG8gkz+Rm7zkyxdOydorqOwIDdE5F9YrMOKjqUqgNGFufBIamr
- SGvSCRhfam3c0+VmGj60DU65yc+dLmlq4c9nWNemCZOx+ONKeE/KHLH2FrcZd9MGYP0J
- Qx+A==
-X-Gm-Message-State: AOAM530gru3FQNyU7vRfa9+zHp73dMkafbgAWeFeYEqNqLgLvFJ6QCoM
- U5k8pVnJQU1yoi0WPNZKLGr4As1vJkl17uiPUhXwH73PvjZAHgLpH2fS3dig9NuAKsR6HHrmO/I
- 7yXe9JzotqQ5NODb4gWxylnum
-X-Received: by 2002:adf:b1d7:: with SMTP id r23mr24328031wra.145.1635174324218; 
- Mon, 25 Oct 2021 08:05:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzNexQuzHRq+jpnX8KTr0omvqAmOMBdWB1dnxyBAmmWnxN2QzlfyX1PUJV+JR7ASMMz0R8mMg==
-X-Received: by 2002:adf:b1d7:: with SMTP id r23mr24327978wra.145.1635174323914; 
- Mon, 25 Oct 2021 08:05:23 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id w10sm9256784wrp.25.2021.10.25.08.05.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 25 Oct 2021 08:05:23 -0700 (PDT)
-Message-ID: <a2a4e076-edb8-2cb5-5cb2-6825a1a4559a@redhat.com>
-Date: Mon, 25 Oct 2021 17:05:19 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 40/43] KVM: VMX: Wake vCPU when delivering posted IRQ
- even if vCPU == this vCPU
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paul Mackerras <paulus@ozlabs.org>, Anup Patel <anup.patel@wdc.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=0lZC/4YVNiq6m54gciVPWUG9HJx9IWHvMOAiOdASGoo=;
+ b=yCJGU970hcTcOh7JQia9VwI847+v7glyMzb0TpTduKO56rddOuHSvHH9huBgIv7yc4
+ 9RCBsgQWagVRCqS7ChdTZKij/lxHEnlPhdY26rf8AHGfwT/j1UGJRtogw4HZ/YHahJN+
+ uAgC1oyBh2HoBP3GRGl6iBQVEB0MgQdkChkC7b7p9OIkk5rJuMHdd9rUTC6kNXiTkbqN
+ ydA5SeInZo9+ov/1IfGdXKpi0l9NnUKhJuxgrwoi94O1zfn86d+J2bOzNt802mJwV4V1
+ Rwael9C8R5kEARZ2GZf7xP0dWbayapPm17C/xHCDtXieadHAi4RQJAFJJqB1BJAn6M+q
+ o+aQ==
+X-Gm-Message-State: AOAM530kcNdP0kW4YYaSJY0U3WmV4LHGc63Qscx51q7Lutg0gvNsYTZE
+ ovTmy2VIa8WHbirECD8HmM2vVQ==
+X-Google-Smtp-Source: ABdhPJxrKJ5kv/isPaW6TJ/VoEghKiV6FVNK9Q5PXIGPB6cKE19gMMU7U+s4ZFt4KBH5EHg4mjv+Qw==
+X-Received: by 2002:a17:90a:bf0e:: with SMTP id
+ c14mr5921807pjs.180.1635176908950; 
+ Mon, 25 Oct 2021 08:48:28 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id g5sm11457677pfc.65.2021.10.25.08.48.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 25 Oct 2021 08:48:28 -0700 (PDT)
+Date: Mon, 25 Oct 2021 15:48:24 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 37/43] KVM: SVM: Unconditionally mark AVIC as running
+ on vCPU load (with APICv)
+Message-ID: <YXbRyMQgMpHVQa3G@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-41-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211009021236.4122790-41-seanjc@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+ <20211009021236.4122790-38-seanjc@google.com>
+ <acea3c6d-49f4-ab5e-d9fe-6c6a8a665a46@redhat.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <acea3c6d-49f4-ab5e-d9fe-6c6a8a665a46@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
  Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
  Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Joerg Roedel <joro@8bytes.org>, kvm-ppc@vger.kernel.org,
- David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
+ Paul Walmsley <paul.walmsley@sifive.com>, David Matlack <dmatlack@google.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Anup Patel <anup.patel@wdc.com>, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
  Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -120,21 +106,19 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 09/10/21 04:12, Sean Christopherson wrote:
+On Mon, Oct 25, 2021, Paolo Bonzini wrote:
+> On 09/10/21 04:12, Sean Christopherson wrote:
+> > +	/* TODO: Document why the unblocking path checks for updates. */
 > 
-> Lastly, this aligns the non-nested and nested usage of triggering posted
-> interrupts, and will allow for additional cleanups.
+> Is that a riddle or what? :)
 
-It also aligns with SVM a little bit more (especially given patch 35), 
-doesn't it?
-
-Paolo
-
+Yes?  I haven't been able to figure out why the unblocking path explicitly
+checks and handles an APICv update.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
