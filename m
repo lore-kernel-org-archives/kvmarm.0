@@ -2,76 +2,99 @@ Return-Path: <SRS0=G0pq=PO=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 509E0C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Oct 2021 15:41:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D734BC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Oct 2021 16:12:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C572C610A4
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Oct 2021 15:41:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C572C610A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 5813660527
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Oct 2021 16:12:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5813660527
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45181407D1;
-	Tue, 26 Oct 2021 11:41:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8A144B0D0;
+	Tue, 26 Oct 2021 12:12:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TblobBXfJ-dA; Tue, 26 Oct 2021 11:41:13 -0400 (EDT)
+	with ESMTP id bVNo8tCuK3vJ; Tue, 26 Oct 2021 12:12:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 236F34B0AC;
-	Tue, 26 Oct 2021 11:41:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A5AD4A534;
+	Tue, 26 Oct 2021 12:12:24 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BD044AC78
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Oct 2021 11:41:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 256DE4A49C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Oct 2021 12:12:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ahYjERXBz4kr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Oct 2021 11:41:10 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6336D407D1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Oct 2021 11:41:10 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9634460EFF;
- Tue, 26 Oct 2021 15:41:08 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mfOZW-001iWu-7f; Tue, 26 Oct 2021 16:41:06 +0100
-Date: Tue, 26 Oct 2021 16:41:05 +0100
-Message-ID: <875ytjbxpq.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
+ with ESMTP id 35WlOvfB+fyL for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Oct 2021 12:12:21 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC67A4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Oct 2021 12:12:21 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1635264741;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=y/8qPSuga2nSdD4ObnPRjMzoPwBrPBTCysCx0s1aic4=;
+ b=HXeh27CV8hJRaETDK6hQOpnP45k3CVN3SmEZGClNq7UYeHDti1sMQE40Q9KP2PP6tyaQ2I
+ orJVQXxUk8U1XN2n6u+a3epp9C/dCkhT5MuzOp8x/Js6W5Za41+LrdIs+yGwZJjYq0362v
+ 79f1/BmEa6EFyJMmnSf2RTCKnOJQnls=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-w5TawSx-MziT0siX2VBZhw-1; Tue, 26 Oct 2021 12:12:20 -0400
+X-MC-Unique: w5TawSx-MziT0siX2VBZhw-1
+Received: by mail-ed1-f70.google.com with SMTP id
+ k28-20020a508adc000000b003dd5e21da4bso5905230edk.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Oct 2021 09:12:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=y/8qPSuga2nSdD4ObnPRjMzoPwBrPBTCysCx0s1aic4=;
+ b=AJgmPsb8TE/jM+1mZDJ1npUXKx98uek3dApKGd2/QwbLDNrRZLmfR/hvtimiQqYVt7
+ gWKDdIVTyJOhCom7bRTWpsMAPZ4QizouXQfDBjSRQFKHQ70DtVFUXTdoCMbFnZxSNz6k
+ kXS5T5gbVaqzrkvbRZ/01FRCQHkjC5n/zpXvWFr976u5ZP7HbsAIiuPOg6LhYd9LiYG+
+ pRY++JqJW+/1ozt5NTPZESPHTn2y8NZTAsYpkcJ+pbV3EaZUPPZE2ntrpVO5a1SGGD6e
+ EcTiPyrz1t+hxL7hLCIxnH17LGIDtJVHr2j1/30XswqxV5yxspN0Xc9v7GqTaAxbWRFX
+ JsOg==
+X-Gm-Message-State: AOAM533Mu8w8fRdhaq5Tm4jmicp8U1sWDIF0nsbV2RUJByjmA30uFSMD
+ dxFUyh8bhiq5oSdNiNaXfpeHPbWDNUU8VyQS1aoIC0kenkuxFcrlHatc4em4YRUMLGj4y2VnajS
+ MyCFJ0PJDoTY+jUvBcul1b5bG
+X-Received: by 2002:aa7:da84:: with SMTP id q4mr36991777eds.371.1635264738790; 
+ Tue, 26 Oct 2021 09:12:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwASeQAxYa4SVxx7fzZJcK2OTnFNOTNNHLf+PErJyPRemx/Rf7LwxYWqAfn33dB1Qf24eGGDw==
+X-Received: by 2002:aa7:da84:: with SMTP id q4mr36991714eds.371.1635264738510; 
+ Tue, 26 Oct 2021 09:12:18 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id n1sm4753815edf.45.2021.10.26.09.12.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 26 Oct 2021 09:12:17 -0700 (PDT)
+Message-ID: <be1cf8c7-ed87-b8eb-1bca-0a6c7505d7f8@redhat.com>
+Date: Tue, 26 Oct 2021 18:12:06 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
 Subject: Re: [PATCH v2 10/43] KVM: arm64: Move vGIC v4 handling for WFI out
  arch callback hook
-In-Reply-To: <9236e715-c471-e1c8-6117-6f37b908a6bd@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20211009021236.4122790-1-seanjc@google.com>
  <20211009021236.4122790-11-seanjc@google.com>
  <9236e715-c471-e1c8-6117-6f37b908a6bd@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com,
- chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, paulus@ozlabs.org,
- anup.patel@wdc.com, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, borntraeger@de.ibm.com, frankja@linux.ibm.com,
- james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- atish.patra@wdc.com, david@redhat.com, cohuck@redhat.com,
- imbrenda@linux.ibm.com, vkuznets@redhat.com, wanpengli@tencent.com,
- jmattson@google.com, joro@8bytes.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org,
- kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- dmatlack@google.com, oupton@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <875ytjbxpq.wl-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <875ytjbxpq.wl-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
  kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
  linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
@@ -98,66 +121,32 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 25 Oct 2021 14:31:48 +0100,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> On 09/10/21 04:12, Sean Christopherson wrote:
-> > Move the put and reload of the vGIC out of the block/unblock callbacks
-> > and into a dedicated WFI helper.  Functionally, this is nearly a nop as
-> > the block hook is called at the very beginning of kvm_vcpu_block(), and
-> > the only code in kvm_vcpu_block() after the unblock hook is to update the
-> > halt-polling controls, i.e. can only affect the next WFI.
-> > 
-> > Back when the arch (un)blocking hooks were added by commits 3217f7c25bca
-> > ("KVM: Add kvm_arch_vcpu_{un}blocking callbacks) and d35268da6687
-> > ("arm/arm64: KVM: arch_timer: Only schedule soft timer on vcpu_block"),
-> > the hooks were invoked only when KVM was about to "block", i.e. schedule
-> > out the vCPU.  The use case at the time was to schedule a timer in the
-> > host based on the earliest timer in the guest in order to wake the
-> > blocking vCPU when the emulated guest timer fired.  Commit accb99bcd0ca
-> > ("KVM: arm/arm64: Simplify bg_timer programming") reworked the timer
-> > logic to be even more precise, by waiting until the vCPU was actually
-> > scheduled out, and so move the timer logic from the (un)blocking hooks to
-> > vcpu_load/put.
-> > 
-> > In the meantime, the hooks gained usage for enabling vGIC v4 doorbells in
-> > commit df9ba95993b9 ("KVM: arm/arm64: GICv4: Use the doorbell interrupt
-> > as an unblocking source"), and added related logic for the VMCR in commit
-> > 5eeaf10eec39 ("KVM: arm/arm64: Sync ICH_VMCR_EL2 back when about to block").
-> > 
-> > Finally, commit 07ab0f8d9a12 ("KVM: Call kvm_arch_vcpu_blocking early
-> > into the blocking sequence") hoisted the (un)blocking hooks so that they
-> > wrapped KVM's halt-polling logic in addition to the core "block" logic.
-> > 
-> > In other words, the original need for arch hooks to take action _only_
-> > in the block path is long since gone.
-> > 
-> > Cc: Oliver Upton <oupton@google.com>
-> > Cc: Marc Zyngier <maz@kernel.org>
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> 
-> This needs a word on why kvm_psci_vcpu_suspend does not need the
-> hooks.  Or it needs to be changed to also use kvm_vcpu_wfi in the PSCI
-> code, I don't know.
-> 
-> Marc, can you review and/or advise?
+On 26/10/21 17:41, Marc Zyngier wrote:
+>> This needs a word on why kvm_psci_vcpu_suspend does not need the
+>> hooks.  Or it needs to be changed to also use kvm_vcpu_wfi in the PSCI
+>> code, I don't know.
+>>
+>> Marc, can you review and/or advise?
+> I was looking at that over the weekend, and that's a pre-existing
+> bug. I would have addressed it independently, but it looks like you
+> already have queued the patch.
 
-I was looking at that over the weekend, and that's a pre-existing
-bug. I would have addressed it independently, but it looks like you
-already have queued the patch.
+I have "queued" it, but that's just my queue - it's not on kernel.org 
+and it's not going to be in 5.16, at least not in the first batch.
 
-I guess I'll have to revisit this once the whole thing lands
-somewhere.
+There's plenty of time for me to rebase on top of a fix, if you want to 
+send the fix through your kvm-arm pull request.  Just Cc me so that I 
+understand what's going on.
 
-	M.
+Thanks,
 
--- 
-Without deviation from the norm, progress is not possible.
+Paolo
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
