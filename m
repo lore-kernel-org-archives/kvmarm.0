@@ -2,83 +2,99 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E11B5C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 14:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 803CBC433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 14:57:14 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5C2B3610FC
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 14:41:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5C2B3610FC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id E70BF60724
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 14:57:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E70BF60724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA7784B1A4;
-	Wed, 27 Oct 2021 10:41:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67FFD4B172;
+	Wed, 27 Oct 2021 10:57:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id moL2cAUp9P+q; Wed, 27 Oct 2021 10:41:36 -0400 (EDT)
+	with ESMTP id D-9Alsn-G0PC; Wed, 27 Oct 2021 10:57:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D67424B18F;
-	Wed, 27 Oct 2021 10:41:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D3394B183;
+	Wed, 27 Oct 2021 10:57:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 627684B15A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 10:41:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 428464B121
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 10:57:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4I5nfxSRmGsr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 10:41:35 -0400 (EDT)
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com
- [209.85.216.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F64F4B09C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 10:41:35 -0400 (EDT)
-Received: by mail-pj1-f41.google.com with SMTP id
- n11-20020a17090a2bcb00b001a1e7a0a6a6so5349615pje.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 07:41:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=6OXSnlnR0rRr4zd42xResiJ3HjI4vG4520z7JUuMyYs=;
- b=BjRC0MDFBU5q9E3Xn8qZmMldFXyvZ//eySha9xAzB0jmoDoGvnBh5rZJNDCpSwdREy
- 9EoAYcD7qkeaNtvcOM9mdpbf0o5Zx8GfPrl52oPVsVupbvte1MAYXeh2gVgPvsjmKTcr
- OvG3N8s6IdOwoiORDWmu79MSfTC8tCdjVwsKVWNIZ01jMG+JmYVN7Tn36JxeYZuyLkmP
- l/68I6qwCJelKOJxW8ZO7A5e+myyHTZHJETfMvox2BFMDLmdkBWjqGYYnYuVXEvP/t+D
- dTunWvGIgVZuDjHHD1Ty/XEe2DuBSz3CLrLeXdA9pKLBh6KsJK0Pre9s46e4k0Dr+ooy
- 7X+A==
+ with ESMTP id tINoOjQd7qvE for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 10:57:09 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4088B4A4BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 10:57:09 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1635346629;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=1kiv1BZf6xFogujw6ml5Mx2cj+xKDQFeYDEEPX1GMOs=;
+ b=A/5DhUG7viz9Q20XNQp3R6VBeocsmcHHxyZnXNKlXb2LeOhxQD3FBuD/IHfg64yyzpTE88
+ Yd8E9nyDnQNDrL+TNML6kaLLWBbIi9CoNgujO3/B3q1sUlM+l6HfFeY3ZfaIrwEUtixyJM
+ rsyKtuYm24TO6HmYojVtsAYztUdbfaM=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-10-5Dimra96PXuPKvU3ewk6Qg-1; Wed, 27 Oct 2021 10:57:07 -0400
+X-MC-Unique: 5Dimra96PXuPKvU3ewk6Qg-1
+Received: by mail-ed1-f72.google.com with SMTP id
+ h16-20020a05640250d000b003dd8167857aso2631179edb.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 07:57:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=6OXSnlnR0rRr4zd42xResiJ3HjI4vG4520z7JUuMyYs=;
- b=MuMctsuDs6JYwhaFsV3GbrrwF4SbBalV8uoogfCyxTMUNsktEZu5sqVszkbw8khBDZ
- nmXxATDoVZ6z5uNg+oJ91eXl3ccjd9+zO9zrkMfDme4/dEfCEuKvSRaLFwi86NtFmBNr
- DHb3YDnri27yRrNYPgo7nNoPBqksQJymiNPD+IwEGU25NkyCEqtYmYjnK02aeZKRPKLP
- X8PXCn1rwvVLBzchYo5DTR8vrZAU+h8QYaDY5CQZtiTvKA7fScB3GX0wEi5z7Hg094xT
- nTx3NNkMHQYnOt17P0/SczQk66Za1jnXHMKiO0yJtn76UBdB41wn9uEDgq37qubmI4R5
- cIAg==
-X-Gm-Message-State: AOAM531filAC9PKJPA+iE5Z1GSkGaa9YUQlPh2LtQVTcxaX3RS/K4VX9
- EmjbFWyhzfngLCk2p3lnJQ8AtQ==
-X-Google-Smtp-Source: ABdhPJwpvrRMvTZfA8g36IWigq/Ddl2lTxPKT07H9cOHEBI6XhDgd4CVWZEorIKgU9/kACcZuDTlgw==
-X-Received: by 2002:a17:902:e812:b0:13f:3be8:b15a with SMTP id
- u18-20020a170902e81200b0013f3be8b15amr27601253plg.49.1635345693861; 
- Wed, 27 Oct 2021 07:41:33 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id e9sm203521pfv.189.2021.10.27.07.41.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 Oct 2021 07:41:33 -0700 (PDT)
-Date: Wed, 27 Oct 2021 14:41:29 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=1kiv1BZf6xFogujw6ml5Mx2cj+xKDQFeYDEEPX1GMOs=;
+ b=3wxxo2QNOwEPdy0b9+//REUAR1hWTy2YwfnD5S8mkJ7eQGriH+Hv128v+9igYaDyud
+ jbKyvuVz/y6qkr0vJX3ANzjGS8Fm+EFm9Rz5GUKl30dzOwC47NZ/DnSm9X9iDkQ8kp5y
+ A/TuOaa3nftNKQJoIk/jGaugJ1KEJmjjFGP/gNPh9S44r/89cf2jkH4Qkz6rdy/reejS
+ I+yFeVCHJsOLDLKxrnHNJwgWdNt9BNToKFBtWQzCeg6oqeUvLK8nortXIrPSHepda5l/
+ j7FMbTD8BHgBVN2lAvNM6jayJTIo2TGkAjMw9MadDKCUxevIJjeQ2RoJFH0g3Ucx7Hir
+ IsJA==
+X-Gm-Message-State: AOAM533Xwd+W9PvJiLsx2MoJxObThBqOuAUC+zt07U0ra10XYODptj07
+ CHVELMRrYmpze7hiiSW1cTnPoSfV9EC7SdgzxQ2py0Df6SUHVfRT7R7uxIl1xzmnYRLB7ao9/eu
+ xabPClHSjsvqPtVuS9u8iyBzf
+X-Received: by 2002:a17:907:7d94:: with SMTP id
+ oz20mr38999419ejc.98.1635346626741; 
+ Wed, 27 Oct 2021 07:57:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJytn7bu+kBLh9LVQ/1pex7gMJDdz0Rr/buTYBO2a2VZJzJDbs6skZyshVLbERw1F1K5YyM70Q==
+X-Received: by 2002:a17:907:7d94:: with SMTP id
+ oz20mr38999381ejc.98.1635346626512; 
+ Wed, 27 Oct 2021 07:57:06 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id t15sm67707ejx.75.2021.10.27.07.57.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 27 Oct 2021 07:57:05 -0700 (PDT)
+Message-ID: <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
+Date: Wed, 27 Oct 2021 16:57:00 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
 Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
-Message-ID: <YXllGfrjPX1pVUx6@google.com>
+To: Sean Christopherson <seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
  <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
+ <YXllGfrjPX1pVUx6@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YXllGfrjPX1pVUx6@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
  kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
  linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
@@ -105,38 +121,25 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Oct 25, 2021, Paolo Bonzini wrote:
-> On 09/10/21 04:11, Sean Christopherson wrote:
-> Queued 1-20 and 22-28.  Initially I skipped 21 because I didn't receive it,
-> but I have to think more about whether I agree with it.
+On 27/10/21 16:41, Sean Christopherson wrote:
+> The other thing I don't like about having the WARN in the loop is that it suggests
+> that something other than the vCPU can modify the NDST and SN fields, which is
+> wrong and confusing (for me).
 
-https://lkml.kernel.org/r/20211009021236.4122790-22-seanjc@google.com
+Yeah, I can agree with that.  Can you add it in a comment above the 
+cmpxchg loop, it can be as simple as
 
-> In reality the CMPXCHG loops can really fail just once, because they only
-> race with the processor setting ON=1.  But if the warnings were to trigger
-> at all, it would mean that something iffy is happening in the
-> pi_desc->control state machine, and having the check on every iteration is
-> (very marginally) more effective.
+	/* The processor can set ON concurrently.  */
 
-Yeah, the "very marginally" caveat is essentially my argument.  The WARNs are
-really there to ensure that the vCPU itself did the correct setup/clean before
-and after blocking.  Because IRQs are disabled, a failure on iteration>0 but not
-iteration=0 would mean that a different CPU or a device modified the PI descriptor.
-If that happens, (a) something is wildly wrong and (b) as you noted, the odds of
-the WARN firing in the tiny window between iteration=0 and iteration=1 are really,
-really low.
+when you respin patch 21 and the rest of the series?
 
-The other thing I don't like about having the WARN in the loop is that it suggests
-that something other than the vCPU can modify the NDST and SN fields, which is
-wrong and confusing (for me).  The WARNs in the loops made more sense when the
-loops ran with IRQs enabled prior to commit 8b306e2f3c41 ("KVM: VMX: avoid
-double list add with VT-d posted interrupts").  Then it would be at least plausible
-that a vCPU could mess up its own descriptor while being scheduled out/in.
+Paolo
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
