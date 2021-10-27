@@ -2,96 +2,96 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3CE2C4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 15:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC989C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 15:38:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7F9D9610C8
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 15:36:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7F9D9610C8
+	by mail.kernel.org (Postfix) with ESMTP id 4FE1760FBF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 15:38:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4FE1760FBF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB71B4B177;
-	Wed, 27 Oct 2021 11:36:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0EAB4B106;
+	Wed, 27 Oct 2021 11:38:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D9uTW8aw16aE; Wed, 27 Oct 2021 11:36:33 -0400 (EDT)
+	with ESMTP id v3UI0cJBOzGH; Wed, 27 Oct 2021 11:38:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65CC14B164;
-	Wed, 27 Oct 2021 11:36:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE5CA4B11E;
+	Wed, 27 Oct 2021 11:38:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C3974B106
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 11:36:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AF8D4B105
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 11:38:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 50eHpDXjY0ny for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 11:36:31 -0400 (EDT)
+ with ESMTP id f2castJNNxbj for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 11:38:00 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9973A4B105
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 11:36:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EB1E4B09C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 11:38:00 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635348991;
+ s=mimecast20190719; t=1635349080;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5uRyMZIN45jCj2VKDrWR2a9G78BQWuHGJKl7OtHJZ6k=;
- b=e2dR+en+X1RDREBLLt64xZsmtbn2gJbApYWO5LX8Vut55CfpXVAk81mSZdLNxqHu/Ho85b
- ubVa4Dq6esUrtQxHn2He/jDyHvGeNyRITA+GUK+2vIMqB8clziqaw2gtKhvjWKphvPlBXg
- 387CZYQIr/IItEkZlX7eLGEgp9R0xts=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-547-wey1WAZPPPWz4x9Si6SaFQ-1; Wed, 27 Oct 2021 11:36:30 -0400
-X-MC-Unique: wey1WAZPPPWz4x9Si6SaFQ-1
-Received: by mail-ed1-f72.google.com with SMTP id
- k28-20020a508adc000000b003dd5e21da4bso2684238edk.11
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 08:36:29 -0700 (PDT)
+ bh=bSqxXsSY7PzPPy6E5Cy05Nx/OdmHcN1STcnBEYyHdIs=;
+ b=MbMxbXAupMhsOj7n1ORnzGUbt2FJk9mfhs1WY97br91xQhy2gI1grOuvQnxEp6LE0pzRZZ
+ 1ueNqOMlSarkjIx3XpEKw+UEb5n1ek2asuexqFwukbmOUCbHmkd+mobwHsmwa1bWXKCwn1
+ 2CRz2Zv9n8TOyxe7u0sslDWf0CgTm/E=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-iugz8AH7OouCC77moaBZ5w-1; Wed, 27 Oct 2021 11:37:58 -0400
+X-MC-Unique: iugz8AH7OouCC77moaBZ5w-1
+Received: by mail-ed1-f71.google.com with SMTP id
+ o22-20020a056402439600b003dd4f228451so2671634edc.16
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 08:37:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
  :content-language:to:cc:references:from:in-reply-to
  :content-transfer-encoding;
- bh=5uRyMZIN45jCj2VKDrWR2a9G78BQWuHGJKl7OtHJZ6k=;
- b=vZbdgGvZ3NFhwCWVSkfeGqCAAIIWogQAkGHtarENOOgtNrOliJCiTz4gAjLskzuBHX
- ezIH5UlDx1I5A98Xjno26+fJJX5f5yuH1Nmf6pqK652RnqGQLliZjWlb1TiOdvmueWT4
- 58Zm8trMphD+SuttZamCtQTsXMzJZmjQsO4/AUaWtdpEeYZ/qz4ruYdD5wlJlD5JTY1n
- yktZ370eZ+9TMHvIHT1ENq55VfiNn9seF9zO6Ey+UAKuhRATtmXvgmHNIs6GcUxg1/Xy
- TItnRJ2/DkrBW4crEgX1xB1H9Uhpg75hou874a+YSxdqNo/r8lr8y7FHiPTJFDj1j5yA
- +7Sg==
-X-Gm-Message-State: AOAM531ahlbaT7vab5aqY2mwPOEOuhUAoYIvg54sh9PUPgAk0yn+Syir
- sfBFjOPRLz8VmhKnUHpsp7g5FsBKnJ8wrWVmx/tgvKZ7RzNTPWMyCOyl+SjXtH/a/SLOfE8Z74H
- PTiJawYMCZ0t4nI4eNMZ6QOw5
-X-Received: by 2002:a17:907:72d4:: with SMTP id
- du20mr27123533ejc.324.1635348988856; 
- Wed, 27 Oct 2021 08:36:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwlnTQW53CgmXIn8to0kDTGFp7NuPe5vIqIt10aS0tdUzKBzxmlSrEKcMCaMlb8sNDTKtez8Q==
-X-Received: by 2002:a17:907:72d4:: with SMTP id
- du20mr27123484ejc.324.1635348988605; 
- Wed, 27 Oct 2021 08:36:28 -0700 (PDT)
+ bh=bSqxXsSY7PzPPy6E5Cy05Nx/OdmHcN1STcnBEYyHdIs=;
+ b=slDkcjT5QnxZjEqjbQWKmPLBZwKvYpssKUt/3sAd5ZA2dnaiUgXiD9kFFe3X7MQKlY
+ CmJYkhLYLvUgLh+Xx7iA1zVPM4g+Z9BbCd/fTjFLtliZtqzyFTLbnNa+JmMdwRtcDMx+
+ Kul+2B6VgwNe/UrZH1/Id3+EvJQtjS6IqsEB3IPOiWzNUxtTecSPhf1RAwGgEexACvpS
+ sRcIbcoyD5bp0SodWYLtolB2/U7uFILXYwM0opvBBV8xX0dEbvkiwDrCFNZY3lgi8ToJ
+ kFt8s+B0Rf6JoCdhpfl/fmhoMfmYeU9ShC493gvGoUaRWVUzLGlpN4T+/OHuyH03iltj
+ 8aPQ==
+X-Gm-Message-State: AOAM5303LmAfNkIm9OyA2y1RIMYPKPi6NLceGZXV+/Hrs5ZqYQTtU/nF
+ iL33V/QpxkA/L9SnUNr2KpOSwsjoj+hESOx+/Q1FEAuebVtSih/yZKh1oKMY45b3p4UVUBmAoZ1
+ gkvlO+ZZMS9PnTFCeAPnt/ei8
+X-Received: by 2002:a05:6402:520f:: with SMTP id
+ s15mr19650578edd.376.1635349077541; 
+ Wed, 27 Oct 2021 08:37:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxcV3ajcrSuCCBMr6jO83QbO8KNKYMvLx5Z90JLfoEGGYsQl7acheIlREFbLHWM9uSofWHX3A==
+X-Received: by 2002:a05:6402:520f:: with SMTP id
+ s15mr19650552edd.376.1635349077353; 
+ Wed, 27 Oct 2021 08:37:57 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
  ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id dx2sm110885ejb.125.2021.10.27.08.36.23
+ by smtp.gmail.com with ESMTPSA id h7sm218074edt.37.2021.10.27.08.37.48
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 27 Oct 2021 08:36:26 -0700 (PDT)
-Message-ID: <185502d7-861e-fa5c-b225-419710fe77ed@redhat.com>
-Date: Wed, 27 Oct 2021 17:36:18 +0200
+ Wed, 27 Oct 2021 08:37:56 -0700 (PDT)
+Message-ID: <5b8f554b-5bbc-e257-12d0-800ec82489d0@redhat.com>
+Date: Wed, 27 Oct 2021 17:37:47 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in
- guest mode
+Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
 To: Sean Christopherson <seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-36-seanjc@google.com>
- <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
- <YXlrEWmBohaDXmqL@google.com>
+ <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
+ <YXllGfrjPX1pVUx6@google.com>
+ <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
+ <YXlwH2vWILFS9QOG@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YXlrEWmBohaDXmqL@google.com>
+In-Reply-To: <YXlwH2vWILFS9QOG@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -128,21 +128,30 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 27/10/21 17:06, Sean Christopherson wrote:
->> Does this still need to check the "running" flag?  That should be a strict
->> superset of vcpu->mode == IN_GUEST_MODE.
->
-> No.  Signalling the doorbell when "running" is set but the vCPU is not in the
-> guest is just an expensive nop.  So even if KVM were to rework its handling of
-> "running" to set the flag immediately before VMRUN and clear it immediately after,
-> keying off IN_GUEST_MODE and not "running" would not be wrong, just sub-optimal.
+On 27/10/21 17:28, Sean Christopherson wrote:
+> On Wed, Oct 27, 2021, Paolo Bonzini wrote:
+>> On 27/10/21 16:41, Sean Christopherson wrote:
+>>> The other thing I don't like about having the WARN in the loop is that it suggests
+>>> that something other than the vCPU can modify the NDST and SN fields, which is
+>>> wrong and confusing (for me).
+>>
+>> Yeah, I can agree with that.  Can you add it in a comment above the cmpxchg
+>> loop, it can be as simple as
+>>
+>> 	/* The processor can set ON concurrently.  */
+>>
+>> when you respin patch 21 and the rest of the series?
 > 
-> I doubt KVM will ever make the "running" flag super precise, because keeping the
-> flag set when the vCPU is loaded avoids VM-Exits on other vCPUs due to undelivered
-> IPIs.
+> I can definitely add a comment, but I think that comment is incorrect.
 
-Right, so should we drop the "if (running)" check in this patch, at the 
-same time as it's adding the IN_GUEST_MODE check?
+It's completely backwards indeed.  I first had "the hardware" and then 
+shut down my brain for a second to replace it.
+
+> So something like this?
+> 
+> 	/* ON can be set concurrently by a different vCPU or by hardware. */
+
+Yes, of course.
 
 Paolo
 
