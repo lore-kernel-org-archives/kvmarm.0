@@ -2,70 +2,89 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 424B0C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 11:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBFD1C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 12:23:53 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B19E66109E
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 11:26:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B19E66109E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 69F8B610A0
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 12:23:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 69F8B610A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39B524B105;
-	Wed, 27 Oct 2021 07:26:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA1334B16E;
+	Wed, 27 Oct 2021 08:23:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1BRaj3eHUPOW; Wed, 27 Oct 2021 07:26:40 -0400 (EDT)
+	with ESMTP id tkdt9cqfCCcx; Wed, 27 Oct 2021 08:23:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 878FF4B153;
-	Wed, 27 Oct 2021 07:26:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 868114B15E;
+	Wed, 27 Oct 2021 08:23:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45A864A5A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 07:26:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB8AB4B106
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:57:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z3heBoWfsri1 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 07:26:38 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD4A74A534
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 07:26:37 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ with ESMTP id StFh62ut9ACD for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 06:57:03 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EACD14B102
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:57:03 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1635332223;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=q0cqoEHWoafdN/neNzYUeAZhdEpkcTz/8jBJYOGEWjQ=;
+ b=MjdPA2i37KSVL9JuUpe6F7hgc2uCocfLNY70l6lcl73NMAR5ff33SIiH6q26C3k0MMbEWX
+ kagjt6DZ97rfTYViECwQwDfGQSNWQ/9PxYSLtGFkTmQJXrfeNS6nHkMlPKzd9BoCk2B2vL
+ VUYjxkYgeqFK5mtEUxXF8mZf/kssvn4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-528-yDgbhhxWNqOR-mR8eneedg-1; Wed, 27 Oct 2021 06:57:00 -0400
+X-MC-Unique: yDgbhhxWNqOR-mR8eneedg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 00B8D60E73;
- Wed, 27 Oct 2021 11:26:36 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mfh4j-001tTL-SX; Wed, 27 Oct 2021 12:26:34 +0100
-Date: Wed, 27 Oct 2021 12:26:33 +0100
-Message-ID: <8735ombtee.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH 4/4] arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE
- by KVM
-In-Reply-To: <YXGN26tHnRyWkWns@sirena.org.uk>
-References: <20211021151124.3098113-1-maz@kernel.org>
- <20211021151124.3098113-5-maz@kernel.org>
- <YXGN26tHnRyWkWns@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com,
- will@kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAFF59F92B;
+ Wed, 27 Oct 2021 10:56:56 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BEBD457CA5;
+ Wed, 27 Oct 2021 10:56:44 +0000 (UTC)
+Message-ID: <4acc8c7fb3751be07953322a8334be140c2b153e.camel@redhat.com>
+Subject: Re: [PATCH v2 06/43] KVM: Refactor and document halt-polling stats
+ update helper
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+ Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
+ <aleksandar.qemu.devel@gmail.com>, Paul Mackerras <paulus@ozlabs.org>, Anup
+ Patel <anup.patel@wdc.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
+ <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 27 Oct 2021 13:56:43 +0300
+In-Reply-To: <20211009021236.4122790-7-seanjc@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-7-seanjc@google.com>
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mailman-Approved-At: Wed, 27 Oct 2021 08:23:51 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+ Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
+ Joerg Roedel <joro@8bytes.org>, kvm-ppc@vger.kernel.org,
+ David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,65 +101,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 21 Oct 2021 16:57:15 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Fri, 2021-10-08 at 19:11 -0700, Sean Christopherson wrote:
+> Add a comment to document that halt-polling is considered successful even
+> if the polling loop itself didn't detect a wake event, i.e. if a wake
+> event was detect in the final kvm_vcpu_check_block().  Invert the param
+> to update helper so that the helper is a dumb function that is "told"
+> whether or not polling was successful, as opposed to determining success
+> based on blocking behavior.
 > 
-> [1  <text/plain; us-ascii (quoted-printable)>]
-> On Thu, Oct 21, 2021 at 04:11:24PM +0100, Marc Zyngier wrote:
-> > The bit of documentation that talks about TIF_FOREIGN_FPSTATE
-> > does not mention the ungodly tricks that KVM plays with this flag.
-> > 
-> > Try and document this for the posterity.
+> Opportunistically tweak the params to the update helper to reduce the
+> line length for the call site so that it fits on a single line, and so
+> that the prototype conforms to the more traditional kernel style.
 > 
-> Yes, more documentation here would definitely be helpful - it's pretty
-> hard to follow what KVM is doing here.
+> No functional change intended.
 > 
-> >   * CPU currently contain the most recent userland FPSIMD state of the current
-> > - * task.
-> > + * task *or* the state of the corresponding KVM vcpu if userspace is behaving
-> > + * as a VMM and that the vcpu has used FP during its last run. In the latter
-> > + * case, KVM will set TIF_FOREIGN_FPSTATE on kvm_vcpu_put(). For all intents
-> > + * and purposes, the vcpu FP state is treated identically to userspace's.
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 20 +++++++++++++-------
+>  1 file changed, 13 insertions(+), 7 deletions(-)
 > 
-> I'm not able to find a kvm_vcpu_put() function in upstream, just
-> kvm_cpu_put_sysregs_vhe().  There's kvm_arch_vcpu_put() which is called
-> from the vcpu_put() function in generic KVM code but they don't show up
-> until you start mangling the name in that comment.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 6156719bcbbc..4dfcd736b274 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3201,13 +3201,15 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
+>  	return ret;
+>  }
+>  
+> -static inline void
+> -update_halt_poll_stats(struct kvm_vcpu *vcpu, u64 poll_ns, bool waited)
+> +static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
+> +					  ktime_t end, bool success)
+>  {
+> -	if (waited)
+> -		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
+> -	else
+> +	u64 poll_ns = ktime_to_ns(ktime_sub(end, start));
+> +
+> +	if (success)
+>  		vcpu->stat.generic.halt_poll_success_ns += poll_ns;
+> +	else
+> +		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
+>  }
+>  
+>  /*
+> @@ -3277,9 +3279,13 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  	kvm_arch_vcpu_unblocking(vcpu);
+>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+>  
+> +	/*
+> +	 * Note, halt-polling is considered successful so long as the vCPU was
+> +	 * never actually scheduled out, i.e. even if the wake event arrived
+> +	 * after of the halt-polling loop itself, but before the full wait.
+> +	 */
+>  	if (do_halt_poll)
+> -		update_halt_poll_stats(
+> -			vcpu, ktime_to_ns(ktime_sub(poll_end, start)), waited);
+> +		update_halt_poll_stats(vcpu, start, poll_end, !waited);
+>  
+>  	if (halt_poll_allowed) {
+>  		if (!vcpu_valid_wakeup(vcpu)) {
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-You, vcpu_put() is the one I had in mind.
+Best regards,
+	Maxim Levitsky
 
-> It'd be good to
-> mention what vcpu_put() is actually doing and a bit more about the
-> general model, KVM is behaving differently here AFAICT in that it flags
-> the current state as invalid when it saves the context to memory rather
-> than when an event happens that requires that the context be reloaded.
-> There's no problem there but it's a bit surprising due the difference
-> and worth highlighting.
-
-There is a bit more to it: KVM flags the userspace state as invalid,
-but also ties the guest state to the current task via
-fpsimd_bind_state_to_cpu() so that the state can be saved on
-vcpu_put() via fpsimd_save_and_flush_cpu_state(), or if we end-up
-running kernel_neon_begin() because of some softirq handling.
-
-> I think I'd also be inclined to restructure this to foreground the fact
-> that it's the state of the current task but that task may be a VMM.  So
-> something more like
-> 
-> 	...contain the most recent FPSIMD state of the current userspace
-> 	task.  If the task is behaving as a VMM then this will be
-> 	managed by KVM which will...
-> 
-> making it a bit easier to follow (assuming my understanding of what's
-> going on is correct, if not then I guess something else needs
-> clarifying!).
-
-I'll have a go at rewriting this.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
