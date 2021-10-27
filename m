@@ -2,70 +2,70 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B3EC433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 238A5C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:45:33 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 232CF61052
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:45:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 232CF61052
+	by mail.kernel.org (Postfix) with ESMTP id B8E3B6109E
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:45:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B8E3B6109E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B77344B152;
-	Wed, 27 Oct 2021 06:45:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4967D4B08B;
+	Wed, 27 Oct 2021 06:45:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R8l+n7nAo-wD; Wed, 27 Oct 2021 06:45:05 -0400 (EDT)
+	with ESMTP id LCiz8V1Y0dn8; Wed, 27 Oct 2021 06:45:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A6EB4B156;
-	Wed, 27 Oct 2021 06:45:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 828614B092;
+	Wed, 27 Oct 2021 06:45:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 673BF4B152
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:45:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 460C84A19A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:45:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0eZsDXPI-xqp for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 06:45:03 -0400 (EDT)
+ with ESMTP id kzSNIpVA+BgR for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 06:45:28 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 200C14B15C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:45:03 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0434A4A3BF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:45:27 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635331502;
+ s=mimecast20190719; t=1635331527;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dsTW88JLxmgtPXVjSysbobchSF9Z8lO6SXfy0oNtT3s=;
- b=cCVVbAVJRbTounO52FfqsmKjVShy41xLOjfuRkD8V+kos2M6MoIOwYdSZiTzFZEjw6Bkux
- jowqfHgoffGPRIQLCbJ3RN/eUKPoRpkPCsjZ0E3g6UVhRNrkFC/rvrqS5U6W9eWLiiD72q
- ixDSzVwOSYlDlCNOFdIGCaV80WJkwoY=
+ bh=dqSepvb2YiqoeKHY293Z6dXyQ5qrifJdEOlDVnVYd+E=;
+ b=O4b0Bktxp1U7zoBGQ5GpjZhAv6iVBDQEeoOo7eEd7vQdB5FQs++jx1iYzEpfpF4nTu4LmP
+ aWMozMnyg/3BBMtubj+7e9d53jt7+DXX0k6vKdmYN0KcV3WMt17tUr0aZ8IEKiuQ3+jjQi
+ O8nJ3hfzLwxmA50aXaFRKAHY7w+XBGw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-SwsB4E-xMYmszDiSO5eE_A-1; Wed, 27 Oct 2021 06:44:59 -0400
-X-MC-Unique: SwsB4E-xMYmszDiSO5eE_A-1
+ us-mta-73-1XhAUh16NcaPLx3qAevXIg-1; Wed, 27 Oct 2021 06:45:24 -0400
+X-MC-Unique: 1XhAUh16NcaPLx3qAevXIg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2C7610A8E00;
- Wed, 27 Oct 2021 10:44:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D4DA80A5C1;
+ Wed, 27 Oct 2021 10:45:20 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.39.193.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 216A0100238C;
- Wed, 27 Oct 2021 10:44:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5315F10016FE;
+ Wed, 27 Oct 2021 10:45:10 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
  iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
  kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
  will@kernel.org, robin.murphy@arm.com, jean-philippe@linaro.org,
  zhukeqian1@huawei.com
-Subject: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
-Date: Wed, 27 Oct 2021 12:44:20 +0200
-Message-Id: <20211027104428.1059740-2-eric.auger@redhat.com>
+Subject: [RFC v16 3/9] iommu/smmuv3: Allow s1 and s2 configs to coexist
+Date: Wed, 27 Oct 2021 12:44:22 +0200
+Message-Id: <20211027104428.1059740-4-eric.auger@redhat.com>
 In-Reply-To: <20211027104428.1059740-1-eric.auger@redhat.com>
 References: <20211027104428.1059740-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -92,250 +92,165 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In virtualization use case, when a guest is assigned
-a PCI host device, protected by a virtual IOMMU on the guest,
-the physical IOMMU must be programmed to be consistent with
-the guest mappings. If the physical IOMMU supports two
-translation stages it makes sense to program guest mappings
-onto the first stage/level (ARM/Intel terminology) while the host
-owns the stage/level 2.
+In true nested mode, both s1_cfg and s2_cfg will coexist.
+Let's remove the union and add a "set" field in each
+config structure telling whether the config is set and needs
+to be applied when writing the STE. In legacy nested mode,
+only the second stage is used. In true nested mode, both stages
+are used and the S1 config is "set" when the guest passes
+its pasid table.
 
-In that case, it is mandated to trap on guest configuration
-settings and pass those to the physical iommu driver.
+No functional change intended.
 
-This patch adds a new API to the iommu subsystem that allows
-to set/unset the pasid table information.
-
-A generic iommu_pasid_table_config struct is introduced in
-a new iommu.h uapi header. This is going to be used by the VFIO
-user API.
-
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-Signed-off-by: Ashok Raj <ashok.raj@intel.com>
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
 ---
 
 v13 -> v14:
-- export iommu_attach_pasid_table
-- add dummy iommu_uapi_attach_pasid_table
-- swap base_ptr and format in iommu_pasid_table_config
+- slight reword of the commit message
 
 v12 -> v13:
-- Fix config check
-
-v11 -> v12:
-- add argsz, name the union
+- does not dynamically allocate s1-cfg and s2_cfg anymore. Add
+  the set field
 ---
- drivers/iommu/iommu.c      | 69 ++++++++++++++++++++++++++++++++++++++
- include/linux/iommu.h      | 27 +++++++++++++++
- include/uapi/linux/iommu.h | 54 +++++++++++++++++++++++++++++
- 3 files changed, 150 insertions(+)
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 43 +++++++++++++--------
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  8 ++--
+ 2 files changed, 31 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 3303d707bab4..6033c263c6e6 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -2236,6 +2236,75 @@ int iommu_uapi_sva_unbind_gpasid(struct iommu_domain *domain, struct device *dev
- }
- EXPORT_SYMBOL_GPL(iommu_uapi_sva_unbind_gpasid);
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index 61477853a536..b8384a834552 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -1254,8 +1254,8 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+ 	u64 val = le64_to_cpu(dst[0]);
+ 	bool ste_live = false;
+ 	struct arm_smmu_device *smmu = NULL;
+-	struct arm_smmu_s1_cfg *s1_cfg = NULL;
+-	struct arm_smmu_s2_cfg *s2_cfg = NULL;
++	struct arm_smmu_s1_cfg *s1_cfg;
++	struct arm_smmu_s2_cfg *s2_cfg;
+ 	struct arm_smmu_domain *smmu_domain = NULL;
+ 	struct arm_smmu_cmdq_ent prefetch_cmd = {
+ 		.opcode		= CMDQ_OP_PREFETCH_CFG,
+@@ -1270,13 +1270,24 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+ 	}
  
-+int iommu_attach_pasid_table(struct iommu_domain *domain,
-+			     struct iommu_pasid_table_config *cfg)
-+{
-+	if (unlikely(!domain->ops->attach_pasid_table))
-+		return -ENODEV;
+ 	if (smmu_domain) {
++		s1_cfg = &smmu_domain->s1_cfg;
++		s2_cfg = &smmu_domain->s2_cfg;
 +
-+	return domain->ops->attach_pasid_table(domain, cfg);
-+}
-+EXPORT_SYMBOL_GPL(iommu_attach_pasid_table);
-+
-+int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
-+				  void __user *uinfo)
-+{
-+	struct iommu_pasid_table_config pasid_table_data = { 0 };
-+	u32 minsz;
-+
-+	if (unlikely(!domain->ops->attach_pasid_table))
-+		return -ENODEV;
-+
-+	/*
-+	 * No new spaces can be added before the variable sized union, the
-+	 * minimum size is the offset to the union.
-+	 */
-+	minsz = offsetof(struct iommu_pasid_table_config, vendor_data);
-+
-+	/* Copy minsz from user to get flags and argsz */
-+	if (copy_from_user(&pasid_table_data, uinfo, minsz))
-+		return -EFAULT;
-+
-+	/* Fields before the variable size union are mandatory */
-+	if (pasid_table_data.argsz < minsz)
-+		return -EINVAL;
-+
-+	/* PASID and address granu require additional info beyond minsz */
-+	if (pasid_table_data.version != PASID_TABLE_CFG_VERSION_1)
-+		return -EINVAL;
-+	if (pasid_table_data.format == IOMMU_PASID_FORMAT_SMMUV3 &&
-+	    pasid_table_data.argsz <
-+		offsetofend(struct iommu_pasid_table_config, vendor_data.smmuv3))
-+		return -EINVAL;
-+
-+	/*
-+	 * User might be using a newer UAPI header which has a larger data
-+	 * size, we shall support the existing flags within the current
-+	 * size. Copy the remaining user data _after_ minsz but not more
-+	 * than the current kernel supported size.
-+	 */
-+	if (copy_from_user((void *)&pasid_table_data + minsz, uinfo + minsz,
-+			   min_t(u32, pasid_table_data.argsz, sizeof(pasid_table_data)) - minsz))
-+		return -EFAULT;
-+
-+	/* Now the argsz is validated, check the content */
-+	if (pasid_table_data.config < IOMMU_PASID_CONFIG_TRANSLATE ||
-+	    pasid_table_data.config > IOMMU_PASID_CONFIG_ABORT)
-+		return -EINVAL;
-+
-+	return domain->ops->attach_pasid_table(domain, &pasid_table_data);
-+}
-+EXPORT_SYMBOL_GPL(iommu_uapi_attach_pasid_table);
-+
-+void iommu_detach_pasid_table(struct iommu_domain *domain)
-+{
-+	if (unlikely(!domain->ops->detach_pasid_table))
-+		return;
-+
-+	domain->ops->detach_pasid_table(domain);
-+}
-+EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
-+
- static void __iommu_detach_device(struct iommu_domain *domain,
- 				  struct device *dev)
+ 		switch (smmu_domain->stage) {
+ 		case ARM_SMMU_DOMAIN_S1:
+-			s1_cfg = &smmu_domain->s1_cfg;
++			s1_cfg->set = true;
++			s2_cfg->set = false;
+ 			break;
+ 		case ARM_SMMU_DOMAIN_S2:
++			s1_cfg->set = false;
++			s2_cfg->set = true;
++			break;
+ 		case ARM_SMMU_DOMAIN_NESTED:
+-			s2_cfg = &smmu_domain->s2_cfg;
++			/*
++			 * Actual usage of stage 1 depends on nested mode:
++			 * legacy (2d stage only) or true nested mode
++			 */
++			s2_cfg->set = true;
+ 			break;
+ 		default:
+ 			break;
+@@ -1303,7 +1314,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+ 	val = STRTAB_STE_0_V;
+ 
+ 	/* Bypass/fault */
+-	if (!smmu_domain || !(s1_cfg || s2_cfg)) {
++	if (!smmu_domain || !(s1_cfg->set || s2_cfg->set)) {
+ 		if (!smmu_domain && disable_bypass)
+ 			val |= FIELD_PREP(STRTAB_STE_0_CFG, STRTAB_STE_0_CFG_ABORT);
+ 		else
+@@ -1322,7 +1333,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+ 		return;
+ 	}
+ 
+-	if (s1_cfg) {
++	if (s1_cfg->set) {
+ 		u64 strw = smmu->features & ARM_SMMU_FEAT_E2H ?
+ 			STRTAB_STE_1_STRW_EL2 : STRTAB_STE_1_STRW_NSEL1;
+ 
+@@ -1344,7 +1355,7 @@ static void arm_smmu_write_strtab_ent(struct arm_smmu_master *master, u32 sid,
+ 			FIELD_PREP(STRTAB_STE_0_S1FMT, s1_cfg->s1fmt);
+ 	}
+ 
+-	if (s2_cfg) {
++	if (s2_cfg->set) {
+ 		BUG_ON(ste_live);
+ 		dst[2] = cpu_to_le64(
+ 			 FIELD_PREP(STRTAB_STE_2_S2VMID, s2_cfg->vmid) |
+@@ -2036,23 +2047,23 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
  {
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index d2f3435e7d17..e34a1b1c805b 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -232,6 +232,8 @@ struct iommu_iotlb_gather {
-  * @cache_invalidate: invalidate translation caches
-  * @sva_bind_gpasid: bind guest pasid and mm
-  * @sva_unbind_gpasid: unbind guest pasid and mm
-+ * @attach_pasid_table: attach a pasid table
-+ * @detach_pasid_table: detach the pasid table
-  * @def_domain_type: device default domain type, return value:
-  *		- IOMMU_DOMAIN_IDENTITY: must use an identity domain
-  *		- IOMMU_DOMAIN_DMA: must use a dma domain
-@@ -297,6 +299,9 @@ struct iommu_ops {
- 				      void *drvdata);
- 	void (*sva_unbind)(struct iommu_sva *handle);
- 	u32 (*sva_get_pasid)(struct iommu_sva *handle);
-+	int (*attach_pasid_table)(struct iommu_domain *domain,
-+				  struct iommu_pasid_table_config *cfg);
-+	void (*detach_pasid_table)(struct iommu_domain *domain);
+ 	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+ 	struct arm_smmu_device *smmu = smmu_domain->smmu;
++	struct arm_smmu_s1_cfg *s1_cfg = &smmu_domain->s1_cfg;
++	struct arm_smmu_s2_cfg *s2_cfg = &smmu_domain->s2_cfg;
  
- 	int (*page_response)(struct device *dev,
- 			     struct iommu_fault_event *evt,
-@@ -430,6 +435,11 @@ extern int iommu_uapi_sva_unbind_gpasid(struct iommu_domain *domain,
- 					struct device *dev, void __user *udata);
- extern int iommu_sva_unbind_gpasid(struct iommu_domain *domain,
- 				   struct device *dev, ioasid_t pasid);
-+extern int iommu_attach_pasid_table(struct iommu_domain *domain,
-+				    struct iommu_pasid_table_config *cfg);
-+extern int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
-+					 void __user *udata);
-+extern void iommu_detach_pasid_table(struct iommu_domain *domain);
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-@@ -1035,6 +1045,23 @@ iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev)
- 	return -ENODEV;
- }
+ 	free_io_pgtable_ops(smmu_domain->pgtbl_ops);
  
-+static inline
-+int iommu_attach_pasid_table(struct iommu_domain *domain,
-+			     struct iommu_pasid_table_config *cfg)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline
-+int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
-+				  void __user *uinfo)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline
-+void iommu_detach_pasid_table(struct iommu_domain *domain) {}
-+
- static inline struct iommu_sva *
- iommu_sva_bind_device(struct device *dev, struct mm_struct *mm, void *drvdata)
- {
-diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-index 59178fc229ca..8c079a78dfec 100644
---- a/include/uapi/linux/iommu.h
-+++ b/include/uapi/linux/iommu.h
-@@ -339,4 +339,58 @@ struct iommu_gpasid_bind_data {
- 	} vendor;
+ 	/* Free the CD and ASID, if we allocated them */
+-	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+-		struct arm_smmu_s1_cfg *cfg = &smmu_domain->s1_cfg;
+-
++	if (s1_cfg->set) {
+ 		/* Prevent SVA from touching the CD while we're freeing it */
+ 		mutex_lock(&arm_smmu_asid_lock);
+-		if (cfg->cdcfg.cdtab)
++		if (s1_cfg->cdcfg.cdtab)
+ 			arm_smmu_free_cd_tables(smmu_domain);
+-		arm_smmu_free_asid(&cfg->cd);
++		arm_smmu_free_asid(&s1_cfg->cd);
+ 		mutex_unlock(&arm_smmu_asid_lock);
+-	} else {
+-		struct arm_smmu_s2_cfg *cfg = &smmu_domain->s2_cfg;
+-		if (cfg->vmid)
+-			arm_smmu_bitmap_free(smmu->vmid_map, cfg->vmid);
++	}
++	if (s2_cfg->set) {
++		if (s2_cfg->vmid)
++			arm_smmu_bitmap_free(smmu->vmid_map, s2_cfg->vmid);
+ 	}
+ 
+ 	kfree(smmu_domain);
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+index 4cb136f07914..db1a84d24e30 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h
+@@ -597,12 +597,14 @@ struct arm_smmu_s1_cfg {
+ 	struct arm_smmu_ctx_desc	cd;
+ 	u8				s1fmt;
+ 	u8				s1cdmax;
++	bool				set;
  };
  
-+/**
-+ * struct iommu_pasid_smmuv3 - ARM SMMUv3 Stream Table Entry stage 1 related
-+ *     information
-+ * @version: API version of this structure
-+ * @s1fmt: STE s1fmt (format of the CD table: single CD, linear table
-+ *         or 2-level table)
-+ * @s1dss: STE s1dss (specifies the behavior when @pasid_bits != 0
-+ *         and no PASID is passed along with the incoming transaction)
-+ * @padding: reserved for future use (should be zero)
-+ *
-+ * The PASID table is referred to as the Context Descriptor (CD) table on ARM
-+ * SMMUv3. Please refer to the ARM SMMU 3.x spec (ARM IHI 0070A) for full
-+ * details.
-+ */
-+struct iommu_pasid_smmuv3 {
-+#define PASID_TABLE_SMMUV3_CFG_VERSION_1 1
-+	__u32	version;
-+	__u8	s1fmt;
-+	__u8	s1dss;
-+	__u8	padding[2];
-+};
-+
-+/**
-+ * struct iommu_pasid_table_config - PASID table data used to bind guest PASID
-+ *     table to the host IOMMU
-+ * @argsz: User filled size of this data
-+ * @version: API version to prepare for future extensions
-+ * @base_ptr: guest physical address of the PASID table
-+ * @format: format of the PASID table
-+ * @pasid_bits: number of PASID bits used in the PASID table
-+ * @config: indicates whether the guest translation stage must
-+ *          be translated, bypassed or aborted.
-+ * @padding: reserved for future use (should be zero)
-+ * @vendor_data.smmuv3: table information when @format is
-+ * %IOMMU_PASID_FORMAT_SMMUV3
-+ */
-+struct iommu_pasid_table_config {
-+	__u32	argsz;
-+#define PASID_TABLE_CFG_VERSION_1 1
-+	__u32	version;
-+	__u64	base_ptr;
-+#define IOMMU_PASID_FORMAT_SMMUV3	1
-+	__u32	format;
-+	__u8	pasid_bits;
-+#define IOMMU_PASID_CONFIG_TRANSLATE	1
-+#define IOMMU_PASID_CONFIG_BYPASS	2
-+#define IOMMU_PASID_CONFIG_ABORT	3
-+	__u8	config;
-+	__u8    padding[2];
-+	union {
-+		struct iommu_pasid_smmuv3 smmuv3;
-+	} vendor_data;
-+};
-+
- #endif /* _UAPI_IOMMU_H */
+ struct arm_smmu_s2_cfg {
+ 	u16				vmid;
+ 	u64				vttbr;
+ 	u64				vtcr;
++	bool				set;
+ };
+ 
+ struct arm_smmu_strtab_cfg {
+@@ -716,10 +718,8 @@ struct arm_smmu_domain {
+ 	atomic_t			nr_ats_masters;
+ 
+ 	enum arm_smmu_domain_stage	stage;
+-	union {
+-		struct arm_smmu_s1_cfg	s1_cfg;
+-		struct arm_smmu_s2_cfg	s2_cfg;
+-	};
++	struct arm_smmu_s1_cfg	s1_cfg;
++	struct arm_smmu_s2_cfg	s2_cfg;
+ 
+ 	struct iommu_domain		domain;
+ 
 -- 
 2.26.3
 
