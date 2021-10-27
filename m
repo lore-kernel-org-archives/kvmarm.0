@@ -2,64 +2,64 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F620C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC19C433FE
 	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:49:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 891C260F6F
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:49:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 891C260F6F
+	by mail.kernel.org (Postfix) with ESMTP id 2C3596103C
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:49:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2C3596103C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFCEA4B176;
-	Wed, 27 Oct 2021 06:49:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6BAC4B190;
+	Wed, 27 Oct 2021 06:49:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 14JzWRcVwux5; Wed, 27 Oct 2021 06:49:42 -0400 (EDT)
+	with ESMTP id 5WM9lAELAJ8T; Wed, 27 Oct 2021 06:49:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 525834B09C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FDCC4B15E;
 	Wed, 27 Oct 2021 06:49:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 157BB4A534
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 05:51:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DD814B11E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:18:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id o67L-Bx9wsAT for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 05:51:23 -0400 (EDT)
+ with ESMTP id pJabFyTkWZgO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 06:18:53 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11281406E7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 05:51:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BA914B090
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:18:53 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635328282;
+ s=mimecast20190719; t=1635329933;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OLKZI82hmPisWACp/QMd/03BQs+RHKrDBliqptWWYzE=;
- b=JlGCLXib6mP67nqrMVKEdro08E7es/nLdFS9D05/GNFiNHY9ph7aXU44AK/fU+Dc/IGRMP
- s1/6NQ0khHHN6yWVIGN7Mar4ykVEAYFpyoZICsyvfOTvkwAwHCz3AOpA2RuUuWUi00+Ck7
- WdpGR1IytQ8EAYqoQ3leHhSI7Y9SORs=
+ bh=0f27XW5ipOgXyw7srO4b+jUX50VuAlw+C7sxFBFkpEA=;
+ b=Z4xywkau7qK0Pa6XDZcZ14UI/7PrtgD9YDOHNSg5tYFg5d/88pFRakzhidvff6NyyCoF+U
+ UDZYk0YkczFVpynDIUCugpAIiwewCx6UJfWFEu3GTMfnycj77uYUuJFsVKazk/uNMNNdhc
+ FzPOv7pWxTVcTnUvnq/+cO3NTe7tYHw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-4gOjCQ60OwesHHSXcF-XSQ-1; Wed, 27 Oct 2021 05:51:19 -0400
-X-MC-Unique: 4gOjCQ60OwesHHSXcF-XSQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-578-NX_vwU-ZN9SDSZWcd7uWxg-1; Wed, 27 Oct 2021 06:18:50 -0400
+X-MC-Unique: NX_vwU-ZN9SDSZWcd7uWxg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD15980A5C0;
- Wed, 27 Oct 2021 09:51:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2879100C661;
+ Wed, 27 Oct 2021 10:18:45 +0000 (UTC)
 Received: from starship (unknown [10.40.194.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 401B019D9F;
- Wed, 27 Oct 2021 09:50:31 +0000 (UTC)
-Message-ID: <aa1656c01ea5d46dd22c66da4a5eaa27f58810a2.camel@redhat.com>
-Subject: Re: [PATCH v2 02/43] KVM: SVM: Ensure target pCPU is read once when
- signalling AVIC doorbell
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EC5315BAE0;
+ Wed, 27 Oct 2021 10:18:25 +0000 (UTC)
+Message-ID: <d13520b7a5a78b26ec994ec66d2fea6deddad40a.camel@redhat.com>
+Subject: Re: [PATCH v2 05/43] KVM: Update halt-polling stats if and only if
+ halt-polling was attempted
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
@@ -68,13 +68,13 @@ To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
  Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
  <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 27 Oct 2021 12:50:30 +0300
-In-Reply-To: <20211009021236.4122790-3-seanjc@google.com>
+Date: Wed, 27 Oct 2021 13:18:24 +0300
+In-Reply-To: <20211009021236.4122790-6-seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-3-seanjc@google.com>
+ <20211009021236.4122790-6-seanjc@google.com>
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mailman-Approved-At: Wed, 27 Oct 2021 06:49:40 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
@@ -102,58 +102,56 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, 2021-10-08 at 19:11 -0700, Sean Christopherson wrote:
-> Ensure vcpu->cpu is read once when signalling the AVIC doorbell.  If the
-> compiler rereads the field and the vCPU is migrated between the check and
-> writing the doorbell, KVM would signal the wrong physical CPU.
-
-Since vcpu->cpu can change any moment anyway, adding READ_ONCE I think can't really fix anything
-but I do agree that it makes this more readable.
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-
-
+> Don't update halt-polling stats if halt-polling wasn't attempted.  This
+> is a nop as @poll_ns is guaranteed to be '0' (poll_end == start), but it
+> will allow a future patch to move the histogram stats into the helper to
+> resolve a discrepancy in what is considered a "successful" halt-poll.
 > 
-> Functionally, signalling the wrong CPU in this case is not an issue as
-> task migration means the vCPU has exited and will pick up any pending
-> interrupts on the next VMRUN.  Add the READ_ONCE() purely to clean up the
-> code.
+> No functional change intended.
 > 
-> Opportunistically add a comment explaining the task migration behavior,
-> and rename cpuid=>cpu to avoid conflating the CPU number with KVM's more
-> common usage of CPUID.
-> 
+> Reviewed-by: David Matlack <dmatlack@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/svm/avic.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+>  virt/kvm/kvm_main.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 8052d92069e0..208c5c71e827 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -675,10 +675,17 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
->  	smp_mb__after_atomic();
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 5d4a90032277..6156719bcbbc 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3217,6 +3217,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  {
+>  	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+>  	bool halt_poll_allowed = !kvm_arch_no_poll(vcpu);
+> +	bool do_halt_poll = halt_poll_allowed && vcpu->halt_poll_ns;
+>  	ktime_t start, cur, poll_end;
+>  	bool waited = false;
+>  	u64 block_ns;
+> @@ -3224,7 +3225,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  	kvm_arch_vcpu_blocking(vcpu);
 >  
->  	if (avic_vcpu_is_running(vcpu)) {
-> -		int cpuid = vcpu->cpu;
-> +		int cpu = READ_ONCE(vcpu->cpu);
+>  	start = cur = poll_end = ktime_get();
+> -	if (vcpu->halt_poll_ns && halt_poll_allowed) {
+> +	if (do_halt_poll) {
+>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
 >  
-> -		if (cpuid != get_cpu())
-> -			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpuid));
-> +		/*
-> +		 * Note, the vCPU could get migrated to a different pCPU at any
-> +		 * point, which could result in signalling the wrong/previous
-> +		 * pCPU.  But if that happens the vCPU is guaranteed to do a
-> +		 * VMRUN (after being migrated) and thus will process pending
-> +		 * interrupts, i.e. a doorbell is not needed (and the spurious)
-> +		 */
-> +		if (cpu != get_cpu())
-> +			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
->  		put_cpu();
->  	} else
->  		kvm_vcpu_wake_up(vcpu);
+>  		++vcpu->stat.generic.halt_attempted_poll;
+> @@ -3276,8 +3277,9 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  	kvm_arch_vcpu_unblocking(vcpu);
+>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+>  
+> -	update_halt_poll_stats(
+> -		vcpu, ktime_to_ns(ktime_sub(poll_end, start)), waited);
+> +	if (do_halt_poll)
+> +		update_halt_poll_stats(
+> +			vcpu, ktime_to_ns(ktime_sub(poll_end, start)), waited);
+>  
+>  	if (halt_poll_allowed) {
+>  		if (!vcpu_valid_wakeup(vcpu)) {
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
+Best regards,
+	Maxim Levitsky
 
 _______________________________________________
 kvmarm mailing list
