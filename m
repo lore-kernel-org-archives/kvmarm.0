@@ -2,84 +2,84 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 961F4C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 15:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC08C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 15:28:41 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 0FEFC60EFF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 15:07:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0FEFC60EFF
+	by mail.kernel.org (Postfix) with ESMTP id 706A5610C8
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 15:28:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 706A5610C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 84A984B159;
-	Wed, 27 Oct 2021 11:07:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F10284B0C0;
+	Wed, 27 Oct 2021 11:28:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VZIOo+vCnOEg; Wed, 27 Oct 2021 11:07:06 -0400 (EDT)
+	with ESMTP id UleLDu7YPSbc; Wed, 27 Oct 2021 11:28:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B7234B175;
-	Wed, 27 Oct 2021 11:07:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 328D34B161;
+	Wed, 27 Oct 2021 11:28:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DF3C4B168
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 11:07:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B95874B136
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 11:28:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dBoK0ao8Uo3z for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 11:07:03 -0400 (EDT)
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com
- [209.85.210.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E858D4B15C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 11:07:02 -0400 (EDT)
-Received: by mail-pf1-f179.google.com with SMTP id m26so3014631pff.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 08:07:02 -0700 (PDT)
+ with ESMTP id KGyodbZBfrcV for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 11:28:36 -0400 (EDT)
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com
+ [209.85.215.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33F424B0F4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 11:28:36 -0400 (EDT)
+Received: by mail-pg1-f172.google.com with SMTP id r2so3230333pgl.10
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 08:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=O5lEF3hXOuOGQ36jWeA5WrZK+395dTI4kUNN+CFJhtE=;
- b=GJjlg8jJfw+Bt9Zd0zP4mtqcSM31wSFBYCetU17CHbzQQW4kiFtHDgsZBVvEH8887p
- yw/Js4mEDuANgaxd1QymvaNpmXbEvaNRm2HNB868WPSRynugBhM6LN65l++VZht0g2X0
- XFMEItNS+WJlFOOOZlwyo5ghqOI0eoYdx8EfG7dg89d25ghzdUn9Jr0jTft3rzInpzui
- t+nhlFj3SyV2ez0xA0qiaGWyaH3JZAU5KHIJMn2b+NEmBeF/xDfhUhjIDnEt41PMETob
- dNlEs4TAu5VbQ+MRxeaG1Cc4kLdotzXGkh/U5A20JnxHgI8kyVG06UiAaMfvZtmJbPiD
- c4pA==
+ bh=jluBW5yA9LvugmQi8oyfDy8/cabbakiUXPqo4utsaB8=;
+ b=IXIkAF60iwH8Ca28unKtkkjCxMxH4jsRE7rdlyRpHRKxqRH5DKvzKzXeE1xZpeP67E
+ xwOJxCxtNAW/vuRZ9/cA++xLC0bu82EJesdjjIouYVg3x2VESqFJeksK7bKKBVif038n
+ GNlri9Hc+F1u7CW4lPLn9JPRn52da4aBC4xsr93HTbSLq1yGzKbznkaiM+WfpWPTb1nX
+ 8Hjyo7QQx66GQF0REMEMDncs7WF5cqEgNENljeKIdAyawTn2njGp/q6Q7uPOzyYDFpEX
+ mqf5isD4pvLAp694w88H9zUwbgY74QXFwiejeE2dZlhZt757K0HlOnfUIVAivKet6eGr
+ 4Dpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=O5lEF3hXOuOGQ36jWeA5WrZK+395dTI4kUNN+CFJhtE=;
- b=ZvzDkO5F6rAPnqssubrOz1BgZsrjcwUSgNBveHqiPwinLdb8Vkopta45AgS6YGvTug
- +fepe05D/UjgQQQYXmaJtJms0Xa8nnLEHyAmDLF30kNBxTAhD271h2kq3ZL3xOcnth7n
- Xt+ZwuTZeSQiUpkr8z33MzgLbq+iGH0Wcaup0XZHocrDwB/+AuB8N+tMwUOyVblyTijP
- oRU+DAclvmNKF7qtcvwnkTA/flnh/W3XBofUG/dR7XPowzCQD0cARDSCeTbmn9N9Gp+9
- 5YMr8xZF5j41K+i++mj6xb5fDTNC/Yv1tDBpsVRprPV02hqlnRmjoeLryUyp1Gy5suGi
- 06lw==
-X-Gm-Message-State: AOAM532XCIDlQDcFfm0cxdsxrW+iR3howX1/Z3ynbJ4GAB5x3QXNVwBK
- kPJMk7wZTmCavBMJe3teJYA3Cw==
-X-Google-Smtp-Source: ABdhPJyFiG0oaOa31Ni2mfE2COsoLS8wTaHHbwW9HjhwNmX9PoY62hBCx/P2f3tKT436xIXd6QXjiA==
-X-Received: by 2002:a05:6a00:15c9:b0:44c:a998:b50d with SMTP id
- o9-20020a056a0015c900b0044ca998b50dmr33155514pfu.49.1635347221673; 
- Wed, 27 Oct 2021 08:07:01 -0700 (PDT)
+ bh=jluBW5yA9LvugmQi8oyfDy8/cabbakiUXPqo4utsaB8=;
+ b=pInBTfZnRMr8tAU5KUuQnihjJlLO6PXdZPQ+hzhZ74s2YnqvlsCJMLMaetPd4KYAfe
+ WhP+VQEhyH5xWsDfoAUanEJomCRNnu3JHB3FSoha9hQmRMs6vdnjwgTJ8vQK8j6xG0N4
+ uWpGw2u3bqWFQ0KHeXAYbLVlZDlWO68a8JLL3kN9+TQvxpUPDkzg+ffcdoZqyVB8XRzn
+ CIWPlPU3QiotF/hSVKHwL5rB4ghn3vpCiftBD0bNVudS/CXzsID5Bc7wBFu7EoIRmb7D
+ ebmdN+axnOqQwUHnL++zXr6VE1H7OZ4vU7DCQwOzfftKM7GDceO0LXbtIeSMhWyEHNAz
+ PGZQ==
+X-Gm-Message-State: AOAM533DYTXqFtBE5A4Oa2Z0F+0XBel2c/oI8TKTnzI9w9LMP6ZgojlE
+ OcR7ixHp4TLV2/J6QK5A8SBmnQ==
+X-Google-Smtp-Source: ABdhPJxibfpJFn220g32tVsxXXYwD2JThHpi8b5HJLrZMbbjn5Hu0UDQk4ZV4kEcRQbC7q9gao3DeQ==
+X-Received: by 2002:a05:6a00:2405:b0:44c:1ec3:8dbe with SMTP id
+ z5-20020a056a00240500b0044c1ec38dbemr33619608pfh.33.1635348515143; 
+ Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id x15sm310904pfp.30.2021.10.27.08.07.00
+ by smtp.gmail.com with ESMTPSA id y19sm340714pfn.23.2021.10.27.08.28.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 Oct 2021 08:07:00 -0700 (PDT)
-Date: Wed, 27 Oct 2021 15:06:57 +0000
+ Wed, 27 Oct 2021 08:28:34 -0700 (PDT)
+Date: Wed, 27 Oct 2021 15:28:31 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in
- guest mode
-Message-ID: <YXlrEWmBohaDXmqL@google.com>
+Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
+Message-ID: <YXlwH2vWILFS9QOG@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-36-seanjc@google.com>
- <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
+ <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
+ <YXllGfrjPX1pVUx6@google.com>
+ <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
+In-Reply-To: <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
 Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
  kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
  linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
@@ -111,43 +111,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Oct 25, 2021, Paolo Bonzini wrote:
-> On 09/10/21 04:12, Sean Christopherson wrote:
-> > +	 */
-> > +	if (vcpu->mode == IN_GUEST_MODE) {
-> >   		int cpu = READ_ONCE(vcpu->cpu);
-> >   		/*
-> > @@ -687,8 +692,13 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
-> >   		if (cpu != get_cpu())
-> >   			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
-> >   		put_cpu();
-> > -	} else
-> > +	} else {
-> > +		/*
-> > +		 * Wake the vCPU if it was blocking.  KVM will then detect the
-> > +		 * pending IRQ when checking if the vCPU has a wake event.
-> > +		 */
-> >   		kvm_vcpu_wake_up(vcpu);
-> > +	}
+On Wed, Oct 27, 2021, Paolo Bonzini wrote:
+> On 27/10/21 16:41, Sean Christopherson wrote:
+> > The other thing I don't like about having the WARN in the loop is that it suggests
+> > that something other than the vCPU can modify the NDST and SN fields, which is
+> > wrong and confusing (for me).
 > 
-> Does this still need to check the "running" flag?  That should be a strict
-> superset of vcpu->mode == IN_GUEST_MODE.
+> Yeah, I can agree with that.  Can you add it in a comment above the cmpxchg
+> loop, it can be as simple as
+> 
+> 	/* The processor can set ON concurrently.  */
+> 
+> when you respin patch 21 and the rest of the series?
 
-No.  Signalling the doorbell when "running" is set but the vCPU is not in the
-guest is just an expensive nop.  So even if KVM were to rework its handling of
-"running" to set the flag immediately before VMRUN and clear it immediately after,
-keying off IN_GUEST_MODE and not "running" would not be wrong, just sub-optimal.
+I can definitely add a comment, but I think that comment is incorrect.  AIUI,
+the CPU is the one thing in the system that _doesn't_ set ON, at least not without
+IPI virtualization (haven't read that spec yet).  KVM (software) sets it when
+emulating IPIs, and the IOMMU (hardware) sets it for "real" posted interrupts,
+but the CPU (sans IPI virtualization) only clears ON when processing an IRQ on
+the notification vector.
 
-I doubt KVM will ever make the "running" flag super precise, because keeping the
-flag set when the vCPU is loaded avoids VM-Exits on other vCPUs due to undelivered
-IPIs.  But the flip side is that it means the flag has terrible granularity, and
-is arguably inaccurate when viewed from a software perspective.  Anyways, if the
-treatment of "running" were ever changed, then this code should also be changed
-to essentially revert this commit since vcpu->mode would then be redundant.
+So something like this?
 
-And IMO, it makes sense to intentionally separate KVM's delivery of interrupts
-from hardware's delivery of interrupts.  I.e. use the same core rules as
-kvm_vcpu_kick() for when to send interrupts and when to wake for the AVIC.
+	/* ON can be set concurrently by a different vCPU or by hardware. */
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
