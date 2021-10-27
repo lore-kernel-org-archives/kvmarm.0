@@ -1,116 +1,88 @@
-Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4FD9C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 22:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E00EC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 09:58:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 444AA60240
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 22:09:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 444AA60240
+	by mail.kernel.org (Postfix) with ESMTP id CAE6B61039
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 09:58:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CAE6B61039
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BDDB4B16F;
-	Wed, 27 Oct 2021 18:09:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DA354B1C0;
+	Thu, 28 Oct 2021 05:58:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jDb7A+b3v-nw; Wed, 27 Oct 2021 18:09:53 -0400 (EDT)
+	with ESMTP id LhyA0NRQTUF4; Thu, 28 Oct 2021 05:58:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B8694B172;
-	Wed, 27 Oct 2021 18:09:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C28404B1AC;
+	Thu, 28 Oct 2021 05:58:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE7C44B163
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 18:09:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF7494B154
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 15:28:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y9B3-xHZL-iz for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 18:09:49 -0400 (EDT)
+ with ESMTP id 0fQYqXU5ZYP9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 15:28:11 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 18C8E4B150
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 18:09:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 947E74B17C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 15:28:11 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635372588;
+ s=mimecast20190719; t=1635362891;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vPTDsq9RY16fTCCoMhEcqKhkYxR/hT5AGgzHMhJ6ojY=;
- b=QcVXeKEmQ69d40jmh2rSlNCMAvXOH8wEQoTteJ2ZCqaUPE4nawlaLMza2KM3ogSDNOdNQb
- oeaI2FD7I3OqFzJ4HzDzFD70xp76Q0GpA6eYqCtDeKeky1jkdGvhqa2AErGIdMdRegP/TC
- kn9G2knclNOUrf26owqjCl4DcZczWE0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-DyDWeTxqOqKQ2yoavIaRYA-1; Wed, 27 Oct 2021 18:09:45 -0400
-X-MC-Unique: DyDWeTxqOqKQ2yoavIaRYA-1
-Received: by mail-ed1-f69.google.com with SMTP id
- g6-20020a056402424600b003dd2b85563bso3656252edb.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 15:09:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=vPTDsq9RY16fTCCoMhEcqKhkYxR/hT5AGgzHMhJ6ojY=;
- b=aD6hdjHxPKuijGUOAd0HVKyFZ7iYnlZOprmMvygyCLoPKaUYDr3+ldRHvhCNWoBk/K
- DvXh0iMjq/Oq8CGy+E0HMJy9s9yrciKvrTrVjd5O7I/irGf5gHbhUZeF5fp4XLCOYlS7
- dRZS1gNq0SD7kBFS0Bra3oV22I2f6bMeJfNvyrq2+V7BDj3EKQwKWikPzIoOrHQJN+eJ
- HGwukd66oWMCx5aJchre8VuN7YNrolNuLmdpcaV39uWbjPtZsNICcWSSpBVinU0eRR1d
- K+TJjspRBNRxDt20NcI7lNwRGplQG5xRDUtZ8ZeTfQiEgC0l+E/Tw63YELOOqtzdVCgO
- rKdw==
-X-Gm-Message-State: AOAM530VXoL0QLZSDARoyZN47T0U2rgW82pg/scb0w9mn/5LKCMdqmEZ
- jgbYkBtkuElA2SQiw0Cny3czTNyx606zuDOa1K7dJYesVsi8cBJlpSaG3RZyf097w7kVD9fYup7
- mSdnlPP64oE2AinfxSYentbfR
-X-Received: by 2002:a17:906:3f95:: with SMTP id
- b21mr341853ejj.368.1635372584298; 
- Wed, 27 Oct 2021 15:09:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxoBx4vKjR30o+Kgjfdb4KsDUE6yjTUINxxdU8F5+6sRGk01DyvRy4bEl13EnJPgWSCV29mNQ==
-X-Received: by 2002:a17:906:3f95:: with SMTP id
- b21mr341810ejj.368.1635372584078; 
- Wed, 27 Oct 2021 15:09:44 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e?
- ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
- by smtp.gmail.com with ESMTPSA id a9sm675279edm.31.2021.10.27.15.09.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 27 Oct 2021 15:09:43 -0700 (PDT)
-Message-ID: <fdf90c2f-81c8-513b-2e06-a90959f4cd89@redhat.com>
-Date: Thu, 28 Oct 2021 00:09:25 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 39/43] KVM: VMX: Don't do full kick when triggering
- posted interrupt "fails"
-To: Sean Christopherson <seanjc@google.com>
+ bh=Wylhzf4CyCl3uScvUg3UWqXTSn56cxOkW4GodPhaZEk=;
+ b=gmt/ooFxQQ/Z8BmanF7aZcWOJLaO/Sr3UMARvfPwsz6785U2h0xMKHnRivjpqucJLaOhjx
+ YaVwJxyEZ2BxKKg+RrCE70PzyL/symcjykeEl6gIqCTpZBdeVtv63rYH68eT1sv4/xDW9m
+ A2A5zyAdkyQH2D07s3h1tsf/SkMmXxU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-589-6XBNbbgXN7iWziBFLLfjYg-1; Wed, 27 Oct 2021 15:28:07 -0400
+X-MC-Unique: 6XBNbbgXN7iWziBFLLfjYg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3230C5074B;
+ Wed, 27 Oct 2021 19:28:03 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F2E20171FF;
+ Wed, 27 Oct 2021 19:27:23 +0000 (UTC)
+Message-ID: <495f9106220b87ffa9eaf15fcf39b950628adee1.camel@redhat.com>
+Subject: Re: [PATCH v2 19/43] KVM: Add helpers to wake/query blocking vCPU
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+ Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
+ <aleksandar.qemu.devel@gmail.com>, Paul Mackerras <paulus@ozlabs.org>, Anup
+ Patel <anup.patel@wdc.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
+ <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 27 Oct 2021 22:27:22 +0300
+In-Reply-To: <20211009021236.4122790-20-seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-40-seanjc@google.com>
- <335822ac-b98b-1eec-4911-34e4d0e99907@redhat.com>
- <YXl4mK7CyUBnPaQV@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YXl4mK7CyUBnPaQV@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ <20211009021236.4122790-20-seanjc@google.com>
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mailman-Approved-At: Thu, 28 Oct 2021 05:58:55 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
  Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
  Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
- Paul Walmsley <paul.walmsley@sifive.com>, David Matlack <dmatlack@google.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Anup Patel <anup.patel@wdc.com>, linux-mips@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ Joerg Roedel <joro@8bytes.org>, kvm-ppc@vger.kernel.org,
+ David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
  Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -123,49 +95,143 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 27/10/21 18:04, Sean Christopherson wrote:
->>> +		/*
->>> +		 * The smp_wmb() in kvm_make_request() pairs with the smp_mb_*()
->>> +		 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU
->>> +		 * is guaranteed to see the event request if triggering a posted
->>> +		 * interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
->>
->> What this smp_wmb() pair with, is the smp_mb__after_atomic in
->> kvm_check_request(KVM_REQ_EVENT, vcpu).
->
-> I don't think that's correct.  There is no kvm_check_request() in the relevant path.
-> kvm_vcpu_exit_request() uses kvm_request_pending(), which is just a READ_ONCE()
-> without a barrier.
+On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> Add helpers to wake and query a blocking vCPU.  In addition to providing
+> nice names, the helpers reduce the probability of KVM neglecting to use
+> kvm_arch_vcpu_get_wait().
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c |  3 +--
+>  arch/arm64/kvm/arm.c        |  2 +-
+>  arch/x86/kvm/lapic.c        |  2 +-
+>  include/linux/kvm_host.h    | 14 ++++++++++++++
+>  virt/kvm/async_pf.c         |  2 +-
+>  virt/kvm/kvm_main.c         |  8 ++------
+>  6 files changed, 20 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 7e8396f74010..addd53b6eba6 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -649,7 +649,6 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+>  	struct timer_map map;
+> -	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+>  
+>  	if (unlikely(!timer->enabled))
+>  		return;
+> @@ -672,7 +671,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
+>  	if (map.emul_ptimer)
+>  		soft_timer_cancel(&map.emul_ptimer->hrtimer);
+>  
+> -	if (rcuwait_active(wait))
+> +	if (kvm_vcpu_is_blocking(vcpu))
+>  		kvm_timer_blocking(vcpu);
+>  
+>  	/*
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 268b1e7bf700..9ff0e85a9f16 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -622,7 +622,7 @@ void kvm_arm_resume_guest(struct kvm *kvm)
+>  
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		vcpu->arch.pause = false;
+> -		rcuwait_wake_up(kvm_arch_vcpu_get_wait(vcpu));
+> +		__kvm_vcpu_wake_up(vcpu);
+>  	}
+>  }
+>  
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 76fb00921203..0cd7ed21b205 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -1931,7 +1931,7 @@ void kvm_lapic_expired_hv_timer(struct kvm_vcpu *vcpu)
+>  	/* If the preempt notifier has already run, it also called apic_timer_expired */
+>  	if (!apic->lapic_timer.hv_timer_in_use)
+>  		goto out;
+> -	WARN_ON(rcuwait_active(&vcpu->wait));
+> +	WARN_ON(kvm_vcpu_is_blocking(vcpu));
+>  	apic_timer_expired(apic, false);
+>  	cancel_hv_timer(apic);
+>  
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index bdaa0e70b060..1fa38dc00b87 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1151,6 +1151,20 @@ static inline struct rcuwait *kvm_arch_vcpu_get_wait(struct kvm_vcpu *vcpu)
+>  #endif
+>  }
+>  
+> +/*
+> + * Wake a vCPU if necessary, but don't do any stats/metadata updates.  Returns
+> + * true if the vCPU was blocking and was awakened, false otherwise.
+> + */
+> +static inline bool __kvm_vcpu_wake_up(struct kvm_vcpu *vcpu)
+> +{
+> +	return !!rcuwait_wake_up(kvm_arch_vcpu_get_wait(vcpu));
+> +}
+> +
+> +static inline bool kvm_vcpu_is_blocking(struct kvm_vcpu *vcpu)
+> +{
+> +	return rcuwait_active(kvm_arch_vcpu_get_wait(vcpu));
+> +}
+> +
+>  #ifdef __KVM_HAVE_ARCH_INTC_INITIALIZED
+>  /*
+>   * returns true if the virtual interrupt controller is initialized and
+> diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
+> index ccb35c22785e..9bfe1d6f6529 100644
+> --- a/virt/kvm/async_pf.c
+> +++ b/virt/kvm/async_pf.c
+> @@ -85,7 +85,7 @@ static void async_pf_execute(struct work_struct *work)
+>  
+>  	trace_kvm_async_pf_completed(addr, cr2_or_gpa);
+>  
+> -	rcuwait_wake_up(kvm_arch_vcpu_get_wait(vcpu));
+> +	__kvm_vcpu_wake_up(vcpu);
+>  
+>  	mmput(mm);
+>  	kvm_put_kvm(vcpu->kvm);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 481e8178b43d..c870cae7e776 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3332,10 +3332,7 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_halt);
+>  
+>  bool kvm_vcpu_wake_up(struct kvm_vcpu *vcpu)
+>  {
+> -	struct rcuwait *waitp;
+> -
+> -	waitp = kvm_arch_vcpu_get_wait(vcpu);
+> -	if (rcuwait_wake_up(waitp)) {
+> +	if (__kvm_vcpu_wake_up(vcpu)) {
+>  		WRITE_ONCE(vcpu->ready, true);
+>  		++vcpu->stat.generic.halt_wakeup;
+>  		return true;
+> @@ -3490,8 +3487,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
+>  				continue;
+>  			if (vcpu == me)
+>  				continue;
+> -			if (rcuwait_active(kvm_arch_vcpu_get_wait(vcpu)) &&
+> -			    !vcpu_dy_runnable(vcpu))
+> +			if (kvm_vcpu_is_blocking(vcpu) && !vcpu_dy_runnable(vcpu))
+>  				continue;
+>  			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
+>  			    !kvm_arch_dy_has_pending_interrupt(vcpu) &&
 
-Ok, we are talking about two different set of barriers.  This is mine:
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-- smp_wmb() in kvm_make_request() pairs with the smp_mb__after_atomic() in
-kvm_check_request(); it ensures that everything before the request
-(in this case, pi_pending = true) is seen by inject_pending_event.
 
-- pi_test_and_set_on() orders the write to ON after the write to PIR,
-pairing with vmx_sync_pir_to_irr and ensuring that the bit in the PIR is
-seen.
-
-And this is yours:
-
-- pi_test_and_set_on() _also_ orders the write to ON before the read of
-vcpu->mode, pairing with vcpu_enter_guest()
-
-- kvm_make_request() however does _not_ order the write to
-vcpu->requests before the read of vcpu->mode, even though it's needed.
-Usually that's handled by kvm_vcpu_exiting_guest_mode(), but in this case
-vcpu->mode is read in kvm_vcpu_trigger_posted_interrupt.
-
-So vmx_deliver_nested_posted_interrupt() is missing a smp_mb__after_atomic().
-It's documentation only for x86, but still easily done in v3.
-
-Paolo
 
 _______________________________________________
 kvmarm mailing list
