@@ -2,88 +2,98 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD89C433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 12:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC097C433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 14:26:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7DCB4610A0
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 12:23:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7DCB4610A0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 3B20260F9B
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 14:26:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3B20260F9B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30A274B14C;
-	Wed, 27 Oct 2021 08:23:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A0444B1A0;
+	Wed, 27 Oct 2021 10:26:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rM7l00zOQhkq; Wed, 27 Oct 2021 08:23:53 -0400 (EDT)
+	with ESMTP id Q9ztcA51miUK; Wed, 27 Oct 2021 10:26:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A44934B165;
-	Wed, 27 Oct 2021 08:23:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 009C24B15A;
+	Wed, 27 Oct 2021 10:26:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAC584B0A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 07:30:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FE1C4B154
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 10:26:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 96P0corXetYu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 07:30:12 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 50C974A524
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 07:30:12 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635334212;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6755i8Ev1p/V649+fKWbCguz7hafsCtx6KF7gf1uorY=;
- b=TX/V5o7c9HZn0ZYo1Stbn5UuRW1GQ4TLUWo1UuB7pNERiGnFNu87TCgocVolnSwZws3Ly0
- McB8kWSV8zufJ0S2j5l9cGSYABg9A2udHCTxhp7HgKb+bsB9vhLVkYGONA5Vah5BRrPu9j
- lvJFsPddbHDevsHwOr3pgLk5y/5Y4Gk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-SCV0Ypy_PSae9_O3yFoh6Q-1; Wed, 27 Oct 2021 07:30:07 -0400
-X-MC-Unique: SCV0Ypy_PSae9_O3yFoh6Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B14A3100C66D;
- Wed, 27 Oct 2021 11:30:03 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A291C101E591;
- Wed, 27 Oct 2021 11:29:47 +0000 (UTC)
-Message-ID: <62231cec8a62db6bf2baba24cc55e0ec2515d0b1.camel@redhat.com>
-Subject: Re: [PATCH v2 07/43] KVM: Reconcile discrepancies in halt-polling
- stats
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
- Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
- <aleksandar.qemu.devel@gmail.com>, Paul Mackerras <paulus@ozlabs.org>, Anup
- Patel <anup.patel@wdc.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
- <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 27 Oct 2021 14:29:46 +0300
-In-Reply-To: <20211009021236.4122790-8-seanjc@google.com>
+ with ESMTP id ggSjUklmBFzD for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 10:26:44 -0400 (EDT)
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com
+ [209.85.214.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0CD9B4B136
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 10:26:44 -0400 (EDT)
+Received: by mail-pl1-f173.google.com with SMTP id v20so2114824plo.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 07:26:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=LMqODRZlF8nHhJs02sWnsNzJB8DCwjwV772Lcvk4X9o=;
+ b=iWwrbnSH9Fky5OxBApAzRFVpTKOaMHDs7Xrzkqa4bfHRvpB9pNrmqtwX5XStYSbIol
+ NG6pr6of1LmRK/X8yeBvBQ0Fz8uYI6sCKWIvgmckbalOjA8rZIStxifaaVVG+5EdlLz8
+ 2ckfTI/AHFWKc1rHQsrwcPVdrkLnqwK/drtGVgppY9agtMGjOEk436kI8PMz0SqSkGNT
+ dkWDCvrzCBVDPIbGEr6AdGS2sCg8RuoXUFOHg6zS7uI1OSE10fKTNRuuwKsMoNZNiFkf
+ iPVMGJAgypYBjZDhK8mjFm7rCt98R0DWG7pkzdEiPhkk3mMy819HFjaZfkrakLKQ8KAR
+ Wy0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=LMqODRZlF8nHhJs02sWnsNzJB8DCwjwV772Lcvk4X9o=;
+ b=cajBOknmmaOQiEd2AmoQqKc8jg89If9Eha9Dg5Is6sC6CrY3dS1DR8+mU2Pw3HfMrw
+ SL1o6hKso21U6DPOxEvQH+xSsEGVvif/G00T3iUIpE4HbJys5HXexpdBwazlAfv/68iD
+ ZYGTFGkickJik7AuMJYolRZ8T3QftDSah3AJZSftdNes58c8kHItk/rNtGLharlN89+k
+ 7kvNaQrvUSjWFT4S3U6r8CgC7ov7a9fXjFX+ZXemHG99YDvXeoYBAPXuvRDm01JehpMQ
+ A2POBFWFNknxGnBiieEFVuXW0Eoy5riibMXNU6UPMbnTP+PIsp0XBxLOg69YIzdfy0Cp
+ MiFg==
+X-Gm-Message-State: AOAM5301+3M6AUjyWRnXIJxBdawhMo0SyKpx1nw5wM6o/D/0T0lklgS5
+ gyo+n3+CSF8mFORyrK8qoHxQ/w==
+X-Google-Smtp-Source: ABdhPJzNj2nhULmp/RR7LS0ShzDRkQdxHUhFj7X33pr1fS/jZmoi4Y5oDiGoEdEWKdZH8tXcKWxvmw==
+X-Received: by 2002:a17:90b:11c2:: with SMTP id
+ gv2mr5997881pjb.133.1635344802985; 
+ Wed, 27 Oct 2021 07:26:42 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id n12sm37080pgh.55.2021.10.27.07.26.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 Oct 2021 07:26:42 -0700 (PDT)
+Date: Wed, 27 Oct 2021 14:26:38 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 24/43] KVM: VMX: Drop pointless PI.NDST update when
+ blocking
+Message-ID: <YXlhnkp4/XJCCO0R@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-8-seanjc@google.com>
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ <20211009021236.4122790-25-seanjc@google.com>
+ <18e6a656-f583-0ad4-6770-9678be3f5cf4@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mailman-Approved-At: Wed, 27 Oct 2021 08:23:51 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+Content-Disposition: inline
+In-Reply-To: <18e6a656-f583-0ad4-6770-9678be3f5cf4@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
  Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
  Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Joerg Roedel <joro@8bytes.org>, kvm-ppc@vger.kernel.org,
- David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
+ Paul Walmsley <paul.walmsley@sifive.com>, David Matlack <dmatlack@google.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Anup Patel <anup.patel@wdc.com>, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
  Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -101,101 +111,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Move the halt-polling "success" and histogram stats update into the
-> dedicated helper to fix a discrepancy where the success/fail "time" stats
-> consider polling successful so long as the wait is avoided, but the main
-> "success" and histogram stats consider polling successful if and only if
-> a wake event was detected by the halt-polling loop.
+On Mon, Oct 25, 2021, Paolo Bonzini wrote:
+> On 09/10/21 04:12, Sean Christopherson wrote:
+> > Don't update Posted Interrupt's NDST, a.k.a. the target pCPU, in the
+> > pre-block path, as NDST is guaranteed to be up-to-date.  The comment
+> > about the vCPU being preempted during the update is simply wrong, as the
+> > update path runs with IRQs disabled (from before snapshotting vcpu->cpu,
+> > until after the update completes).
 > 
-> Move halt_attempted_poll to the helper as well so that all the stats are
-> updated in a single location.  While it's a bit odd to update the stat
-> well after the fact, practically speaking there's no meaningful advantage
-> to updating before polling.
+> Right, it didn't as of commit bf9f6ac8d74969690df1485b33b7c238ca9f2269 (when
+> VT-d posted interrupts were introduced).
 > 
-> Note, there is a functional change in addition to the success vs. fail
-> change.  The histogram updates previously called ktime_get() instead of
-> using "cur".  But that change is desirable as it means all the stats are
-> now updated with the same polling time, and avoids the extra ktime_get(),
-> which isn't expensive but isn't free either.
+> The interrupt disable/enable pair was added in the same commit that
+> motivated the introduction of the sanity checks:
+
+Ya, I found that commit when digging around for different commit in the series
+and forgot to come back to this changelog.  I'll incorporate this info into the
+next version.
+
+>     commit 8b306e2f3c41939ea528e6174c88cfbfff893ce1
+>     Author: Paolo Bonzini <pbonzini@redhat.com>
+>     Date:   Tue Jun 6 12:57:05 2017 +0200
 > 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/kvm_main.c | 35 ++++++++++++++++-------------------
->  1 file changed, 16 insertions(+), 19 deletions(-)
+>     KVM: VMX: avoid double list add with VT-d posted interrupts
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4dfcd736b274..1292c7876d3f 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3204,12 +3204,23 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
->  static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
->  					  ktime_t end, bool success)
->  {
-> +	struct kvm_vcpu_stat_generic *stats = &vcpu->stat.generic;
->  	u64 poll_ns = ktime_to_ns(ktime_sub(end, start));
->  
-> -	if (success)
-> -		vcpu->stat.generic.halt_poll_success_ns += poll_ns;
-> -	else
-> -		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
-> +	++vcpu->stat.generic.halt_attempted_poll;
-> +
-> +	if (success) {
-> +		++vcpu->stat.generic.halt_successful_poll;
-> +
-> +		if (!vcpu_valid_wakeup(vcpu))
-> +			++vcpu->stat.generic.halt_poll_invalid;
-> +
-> +		stats->halt_poll_success_ns += poll_ns;
-> +		KVM_STATS_LOG_HIST_UPDATE(stats->halt_poll_success_hist, poll_ns);
-> +	} else {
-> +		stats->halt_poll_fail_ns += poll_ns;
-> +		KVM_STATS_LOG_HIST_UPDATE(stats->halt_poll_fail_hist, poll_ns);
-> +	}
->  }
->  
->  /*
-> @@ -3230,30 +3241,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->  	if (do_halt_poll) {
->  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
->  
-> -		++vcpu->stat.generic.halt_attempted_poll;
->  		do {
->  			/*
->  			 * This sets KVM_REQ_UNHALT if an interrupt
->  			 * arrives.
->  			 */
-> -			if (kvm_vcpu_check_block(vcpu) < 0) {
-> -				++vcpu->stat.generic.halt_successful_poll;
-> -				if (!vcpu_valid_wakeup(vcpu))
-> -					++vcpu->stat.generic.halt_poll_invalid;
-> -
-> -				KVM_STATS_LOG_HIST_UPDATE(
-> -				      vcpu->stat.generic.halt_poll_success_hist,
-> -				      ktime_to_ns(ktime_get()) -
-> -				      ktime_to_ns(start));
-> +			if (kvm_vcpu_check_block(vcpu) < 0)
->  				goto out;
-> -			}
->  			cpu_relax();
->  			poll_end = cur = ktime_get();
->  		} while (kvm_vcpu_can_poll(cur, stop));
-> -
-> -		KVM_STATS_LOG_HIST_UPDATE(
-> -				vcpu->stat.generic.halt_poll_fail_hist,
-> -				ktime_to_ns(ktime_get()) - ktime_to_ns(start));
->  	}
->  
->  
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky
-
-
+>     In some cases, for example involving hot-unplug of assigned
+>     devices, pi_post_block can forget to remove the vCPU from the
+>     blocked_vcpu_list.  When this happens, the next call to
+>     pi_pre_block corrupts the list.
+> 
+>     Fix this in two ways.  First, check vcpu->pre_pcpu in pi_pre_block
+>     and WARN instead of adding the element twice in the list.  Second,
+>     always do the list removal in pi_post_block if vcpu->pre_pcpu is
+>     set (not -1).
+> 
+>     The new code keeps interrupts disabled for the whole duration of
+>     pi_pre_block/pi_post_block.  This is not strictly necessary, but
+>     easier to follow.  For the same reason, PI.ON is checked only
+>     after the cmpxchg, and to handle it we just call the post-block
+>     code.  This removes duplication of the list removal code.
+> 
+> At the time, I didn't notice the now useless NDST update.
+> 
+> Paolo
+> 
+> > The vCPU can get preempted_before_  the update starts, but not during.
+> > And if the vCPU is preempted before, vmx_vcpu_pi_load() is responsible
+> > for updating NDST when the vCPU is scheduled back in.  In that case, the
+> > check against the wakeup vector in vmx_vcpu_pi_load() cannot be true as
+> > that would require the notification vector to have been set to the wakeup
+> > vector_before_  blocking.
+> > 
+> > Opportunistically switch to using vcpu->cpu for the list/lock lookups,
+> > which presumably used pre_pcpu only for some phantom preemption logic.
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
