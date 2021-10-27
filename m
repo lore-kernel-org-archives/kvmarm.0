@@ -2,117 +2,88 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 634A9C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 16:14:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E87C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 16:50:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D5CDA60F38
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 16:14:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D5CDA60F38
+	by mail.kernel.org (Postfix) with ESMTP id 92DD1610C7
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 16:49:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 92DD1610C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DA6E4B14C;
-	Wed, 27 Oct 2021 12:14:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 211A14B1A2;
+	Wed, 27 Oct 2021 12:49:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XrEI7LmY4oaq; Wed, 27 Oct 2021 12:14:52 -0400 (EDT)
+	with ESMTP id 5hD7NNWKfjhe; Wed, 27 Oct 2021 12:49:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0204B11E;
-	Wed, 27 Oct 2021 12:14:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D63334B1A3;
+	Wed, 27 Oct 2021 12:49:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CADA34B11E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 12:14:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 356C84B121
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 09:41:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uYdXRaL8kNvq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Oct 2021 12:14:49 -0400 (EDT)
+ with ESMTP id tE6IAAR6NWxb for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 09:41:03 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DC044B106
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 12:14:49 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [216.205.24.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E82F64A49C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 09:41:03 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635351289;
+ s=mimecast20190719; t=1635342063;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YJ1AvjILyDHE6A0xH65m+vjqkknvkqBvDuAHk95niU8=;
- b=NNZezK5I92wtIcPstDA/xymm972gQZ9WtIC5LNxfA9/cKxuo+jbIJpAKxG+WhoLmdVV01i
- NfPQgaZ9mJOfSB0HBcNLWZgEKlOhbZu9FMixihVNRp0ciu5gnbRZwRTQfUaUFD0slfDuBp
- DgWNhhGjuOT8NzyXPJVCkv+W8CekUrs=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-Ij5myqF5N8GpHIAlrkhmmQ-1; Wed, 27 Oct 2021 12:14:48 -0400
-X-MC-Unique: Ij5myqF5N8GpHIAlrkhmmQ-1
-Received: by mail-ed1-f71.google.com with SMTP id
- z1-20020a05640235c100b003dcf0fbfbd8so2826361edc.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 09:14:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=YJ1AvjILyDHE6A0xH65m+vjqkknvkqBvDuAHk95niU8=;
- b=cMsHBMQZbk1piKg0p0W4Di5Bjav872LwQvSZpDM5o4JqSEMTZIPUi0qLRC09wnctpR
- 1nSq7G6PXRkeq+i2PtMkKnLMSudpwDn3qswDOjR0C9cpa0OEIBjFNWCaM/PMvWAqw/Sj
- 37VMAAFUHnyPlCvu6XDUB6vJwgoh6AZMLoBycViyFjY6tpbIZXsAJ590b3ANHMkAExaZ
- 65+zU3IDKIQw2OWsEoVeNKMG20X0pYGz9MWOtIOSw58UeQMUkD/UL7bN40XapXp1D49H
- Q+j4rloWTrwOg7WWiTkHP+oHyDdgFsWvHBOxnI7lWn/46kAvQJlsBFXWM6Ed4t+kGEZD
- 5PfA==
-X-Gm-Message-State: AOAM531+y5nsMlMD9+gOZmmMSmUn7fzyIOVZXbDJxsBn9oS3REy7yJDu
- 2QwBeSWIy7n+tc9I+dSoBgx7LPM0NstrwAert0dPDiTa89jdVBW7gPAdeuI96Ax0KhZjsmTkNyG
- 7rkdEj601wjOdQKhHBQporwre
-X-Received: by 2002:a17:907:16a7:: with SMTP id
- hc39mr22891307ejc.214.1635351287160; 
- Wed, 27 Oct 2021 09:14:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzO/QgQ5GMyh0vFS/oBYQIX6qwD3vL9k6RGrSUIXFucShmCvNWLSsmfmRBNY3o+Ac+4bg3ipQ==
-X-Received: by 2002:a17:907:16a7:: with SMTP id
- hc39mr22891269ejc.214.1635351286915; 
- Wed, 27 Oct 2021 09:14:46 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id sb30sm195562ejc.45.2021.10.27.09.14.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 27 Oct 2021 09:14:46 -0700 (PDT)
-Message-ID: <d0746ea4-06e9-f65d-6e45-72b1b0dea29b@redhat.com>
-Date: Wed, 27 Oct 2021 18:14:44 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in
- guest mode
-To: Sean Christopherson <seanjc@google.com>
+ bh=/no10Aa/zZ1ucVFb2s+gZiK3uB9pJ6W+0T89aCEE3wg=;
+ b=RmBfWDu3pVpLjIC1L1s4KhAomSyoAjv2zH3pjoDSN+CU0IyqADAcmAajIBkxSec5+uPi+a
+ drKZFAe7T60vGxEBrG/UycPuoq5xl5yJvcT19tcSSNia2PD2YAsPf6wfHn9EwePnqPl7QL
+ WASAb4FumbVOKWkr/YAcxs8f/f9obgQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-SCIw7oS_OWK-BwM7oLJx0w-1; Wed, 27 Oct 2021 09:40:58 -0400
+X-MC-Unique: SCIw7oS_OWK-BwM7oLJx0w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F7711966320;
+ Wed, 27 Oct 2021 13:40:54 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4809F5DF35;
+ Wed, 27 Oct 2021 13:40:41 +0000 (UTC)
+Message-ID: <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
+Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
+ successful
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
+ Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
+ <aleksandar.qemu.devel@gmail.com>, Paul Mackerras <paulus@ozlabs.org>, Anup
+ Patel <anup.patel@wdc.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
+ <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 27 Oct 2021 16:40:40 +0300
+In-Reply-To: <20211009021236.4122790-12-seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-36-seanjc@google.com>
- <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
- <YXlrEWmBohaDXmqL@google.com>
- <185502d7-861e-fa5c-b225-419710fe77ed@redhat.com>
- <YXl5anv0Lyjx1cws@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YXl5anv0Lyjx1cws@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ <20211009021236.4122790-12-seanjc@google.com>
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mailman-Approved-At: Wed, 27 Oct 2021 12:49:56 -0400
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
  Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
  Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
- Paul Walmsley <paul.walmsley@sifive.com>, David Matlack <dmatlack@google.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Anup Patel <anup.patel@wdc.com>, linux-mips@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ Joerg Roedel <joro@8bytes.org>, kvm-ppc@vger.kernel.org,
+ David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
+ linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
  Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -125,31 +96,87 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 27/10/21 18:08, Sean Christopherson wrote:
->> Right, so should we drop the "if (running)" check in this patch, at the same
->> time as it's adding the IN_GUEST_MODE check?
-> LOL, I think we have a Three^WTwo Stooges routine going on.  This patch does
-> remove avic_vcpu_is_running() and replaces it with the vcpu->mode check.  Or am
-> I completely misunderstanding what your referring to?
+On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> Invoke the arch hooks for block+unblock if and only if KVM actually
+> attempts to block the vCPU.  The only non-nop implementation is on x86,
+> specifically SVM's AVIC, and there is no need to put the AVIC prior to
+> halt-polling as KVM x86's kvm_vcpu_has_events() will scour the full vIRR
+> to find pending IRQs regardless of whether the AVIC is loaded/"running".
 > 
-> -       if (avic_vcpu_is_running(vcpu)) {
-> +       /*
-> +        * Signal the doorbell to tell hardware to inject the IRQ if the vCPU
-> +        * is in the guest.  If the vCPU is not in the guest, hardware will
-> +        * automatically process AVIC interrupts at VMRUN.
-> +        */
-> +       if (vcpu->mode == IN_GUEST_MODE) {
->                  int cpu = READ_ONCE(vcpu->cpu);
+> The primary motivation is to allow future cleanup to split out "block"
+> from "halt", but this is also likely a small performance boost on x86 SVM
+> when halt-polling is successful.
+> 
+> Adjust the post-block path to update "cur" after unblocking, i.e. include
+> AVIC load time in halt_wait_ns and halt_wait_hist, so that the behavior
+> is consistent.  Moving just the pre-block arch hook would result in only
+> the AVIC put latency being included in the halt_wait stats.  There is no
+> obvious evidence that one way or the other is correct, so just ensure KVM
+> is consistent.
+> 
+> Note, x86 has two separate paths for handling APICv with respect to vCPU
+> blocking.  VMX uses hooks in x86's vcpu_block(), while SVM uses the arch
+> hooks in kvm_vcpu_block().  Prior to this path, the two paths were more
+> or less functionally identical.  That is very much not the case after
+> this patch, as the hooks used by VMX _must_ fire before halt-polling.
+> x86's entire mess will be cleaned up in future patches.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index f90b3ed05628..227f6bbe0716 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -3235,8 +3235,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  	bool waited = false;
+>  	u64 block_ns;
+>  
+> -	kvm_arch_vcpu_blocking(vcpu);
+> -
+>  	start = cur = poll_end = ktime_get();
+>  	if (do_halt_poll) {
+>  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
+> @@ -3253,6 +3251,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  		} while (kvm_vcpu_can_poll(cur, stop));
+>  	}
+>  
+> +	kvm_arch_vcpu_blocking(vcpu);
+>  
+>  	prepare_to_rcuwait(wait);
+>  	for (;;) {
+> @@ -3265,6 +3264,9 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  		schedule();
+>  	}
+>  	finish_rcuwait(wait);
+> +
+> +	kvm_arch_vcpu_unblocking(vcpu);
+> +
+>  	cur = ktime_get();
+>  	if (waited) {
+>  		vcpu->stat.generic.halt_wait_ns +=
+> @@ -3273,7 +3275,6 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  				ktime_to_ns(cur) - ktime_to_ns(poll_end));
+>  	}
+>  out:
+> -	kvm_arch_vcpu_unblocking(vcpu);
+>  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
+>  
+>  	/*
 
-Nevermind, I confused svm_deliver_avic_intr with avic_kick_target_vcpus, 
-which anyway you are handling in patch 36.
+Makes sense.
 
-Paolo
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
 
 _______________________________________________
 kvmarm mailing list
