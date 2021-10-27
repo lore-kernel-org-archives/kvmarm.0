@@ -2,70 +2,77 @@ Return-Path: <SRS0=suDQ=PP=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBCECC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 07:54:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EF9C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:45:04 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4DA14610E6
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 07:54:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4DA14610E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	by mail.kernel.org (Postfix) with ESMTP id 9504560F6F
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Oct 2021 10:45:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9504560F6F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFFC44B102;
-	Wed, 27 Oct 2021 03:54:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B6874B163;
+	Wed, 27 Oct 2021 06:45:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@quicinc.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Pwvwts2iPMcc; Wed, 27 Oct 2021 03:54:36 -0400 (EDT)
+	with ESMTP id e8UjsmK2TBT6; Wed, 27 Oct 2021 06:45:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C3574B131;
-	Wed, 27 Oct 2021 03:54:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24E8B4B152;
+	Wed, 27 Oct 2021 06:45:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78A0A4A193
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Oct 2021 22:42:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AE5D34B152
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:44:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pw6xFm1TAFmh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Oct 2021 22:42:43 -0400 (EDT)
-Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 059E340068
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Oct 2021 22:42:42 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1635302563; x=1666838563;
- h=from:to:cc:subject:date:message-id:mime-version:
- content-transfer-encoding;
- bh=L/uG5CU2gMtP7B26JcOoa7vhnzcIoGWSJZKXSNZS4YA=;
- b=Z5via2TlWI2HKk1xp0dP9jwBxF21BzS/BCpofwe5nsOCZNX1D4X2vGxs
- ayGeUdi7wTZ8UmGmJMXDKlEaEsqq7nNffvPofRKlRYZ8KS5fforwyzcoo
- E5qVyUE/RWujZTQBbIUHuqHcFBF9xKh2wXflVZt2kgl2lrrVC4Rw51mn9 8=;
-Received: from ironmsg07-lv.qualcomm.com ([10.47.202.151])
- by alexa-out.qualcomm.com with ESMTP; 26 Oct 2021 19:42:41 -0700
-X-QCInternal: smtphost
-Received: from nalasex01a.na.qualcomm.com ([10.47.209.196])
- by ironmsg07-lv.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Oct 2021 19:42:41 -0700
-Received: from qian-HP-Z2-SFF-G5-Workstation.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.922.7; 
- Tue, 26 Oct 2021 19:42:39 -0700
-From: Qian Cai <quic_qiancai@quicinc.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: [PATCH] KVM: arm64: Avoid shadowing a previous local
-Date: Tue, 26 Oct 2021 22:42:12 -0400
-Message-ID: <20211027024212.64842-1-quic_qiancai@quicinc.com>
-X-Mailer: git-send-email 2.30.2
+ with ESMTP id tlCIR2SXQIJp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Oct 2021 06:44:58 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C56B4B105
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Oct 2021 06:44:58 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1635331498;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=J5wkNJA4/lA1zpS1Ea7vtbcReRVBjOp0e4WxjwmsxNM=;
+ b=Q9a1UPZCKaCZFmVUfK5RIJfbJxCqzL6/Li1SVHPUZH0ipBRFQNvpgsr9bg1R7AgUNVapXU
+ A46Y+KYHjs+WIiBYw7kkn/yYtzVNXQbKQ3t4Tz2KZnjJPHKr02CweAm9IDE5tzOtMGw7W+
+ 6Y1c5y1lYz9m+lOp+DWJLIp2eA6jUuo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-596-kAK16uk_N5C6alI-CsSs_g-1; Wed, 27 Oct 2021 06:44:52 -0400
+X-MC-Unique: kAK16uk_N5C6alI-CsSs_g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCC5A19200C0;
+ Wed, 27 Oct 2021 10:44:48 +0000 (UTC)
+Received: from laptop.redhat.com (unknown [10.39.193.154])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 95422100E12D;
+ Wed, 27 Oct 2021 10:44:32 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+ will@kernel.org, robin.murphy@arm.com, jean-philippe@linaro.org,
+ zhukeqian1@huawei.com
+Subject: [RFC v16 0/9] SMMUv3 Nested Stage Setup (IOMMU part)
+Date: Wed, 27 Oct 2021 12:44:19 +0200
+Message-Id: <20211027104428.1059740-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-Mailman-Approved-At: Wed, 27 Oct 2021 03:54:34 -0400
-Cc: Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Qian Cai <quic_qiancai@quicinc.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
+ chenxiang66@hisilicon.com, maz@kernel.org, vdumpa@nvidia.com,
+ nicoleotsuka@gmail.com, vivek.gautam@arm.com, alex.williamson@redhat.com,
+ yi.l.liu@intel.com, nicolinc@nvidia.com, vsethi@nvidia.com,
+ zhangfei.gao@linaro.org, sumitg@nvidia.com, lushenming@huawei.com,
+ wangxingang5@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,54 +89,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-It is less-prone to have a different variable name from the one in a wider
-scope. This is also flagged by GCC (W=2):
+This series brings the IOMMU part of HW nested paging support
+in the SMMUv3.
 
-In file included from ./include/linux/kvm_host.h:39,
-                 from arch/arm64/kvm/arm.c:12:
-arch/arm64/kvm/arm.c: In function 'kvm_arch_vcpu_ioctl_run':
-./arch/arm64/include/asm/kvm_host.h:638:26: warning: declaration of 'ret' shadows a previous local [-Wshadow]
-  638 |   typeof(f(__VA_ARGS__)) ret;    \
-      |                          ^~~
-arch/arm64/kvm/arm.c:852:9: note: in expansion of macro 'kvm_call_hyp_ret'
-  852 |   ret = kvm_call_hyp_ret(__kvm_vcpu_run, vcpu);
-      |         ^~~~~~~~~~~~~~~~
-arch/arm64/kvm/arm.c:773:6: note: shadowed declaration is here
-  773 |  int ret;
-      |      ^~~
+The SMMUv3 driver is adapted to support 2 nested stages.
 
-Signed-off-by: Qian Cai <quic_qiancai@quicinc.com>
----
- arch/arm64/include/asm/kvm_host.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+The IOMMU API is extended to convey the guest stage 1
+configuration and the hook is implemented in the SMMUv3 driver.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4be8486042a7..4693d84ccd95 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -635,16 +635,16 @@ void kvm_arm_resume_guest(struct kvm *kvm);
- 
- #define kvm_call_hyp_ret(f, ...)					\
- 	({								\
--		typeof(f(__VA_ARGS__)) ret;				\
-+		typeof(f(__VA_ARGS__)) __ret;				\
- 									\
- 		if (has_vhe()) {					\
--			ret = f(__VA_ARGS__);				\
-+			__ret = f(__VA_ARGS__);				\
- 			isb();						\
- 		} else {						\
--			ret = kvm_call_hyp_nvhe(f, ##__VA_ARGS__);	\
-+			__ret = kvm_call_hyp_nvhe(f, ##__VA_ARGS__);	\
- 		}							\
- 									\
--		ret;							\
-+		__ret;							\
- 	})
- #else /* __KVM_NVHE_HYPERVISOR__ */
- #define kvm_call_hyp(f, ...) f(__VA_ARGS__)
+This allows the guest to own the stage 1 tables and context
+descriptors (so-called PASID table) while the host owns the
+stage 2 tables and main configuration structures (STE).
+
+This work mainly is provided for test purpose as the upper
+layer integration is under rework and bound to be based on
+/dev/iommu instead of VFIO tunneling. In this version we also get
+rid of the MSI BINDING ioctl, assuming the guest enforces
+flat mapping of host IOVAs used to bind physical MSI doorbells.
+In the current QEMU integration this is achieved by exposing
+RMRs to the guest, using Shameer's series [1]. This approach
+is RFC as the IORT spec is not really meant to do that
+(single mapping flag limitation).
+
+Best Regards
+
+Eric
+
+This series (Host) can be found at:
+https://github.com/eauger/linux/tree/v5.15-rc7-nested-v16
+This includes a rebased VFIO integration (although not meant
+to be upstreamed)
+
+Guest kernel branch can be found at:
+https://github.com/eauger/linux/tree/shameer_rmrr_v7
+featuring [1]
+
+QEMU integration (still based on VFIO and exposing RMRs)
+can be found at:
+https://github.com/eauger/qemu/tree/v6.1.0-rmr-v2-nested_smmuv3_v10
+(use iommu=nested-smmuv3 ARM virt option)
+
+Guest dependency:
+[1] [PATCH v7 0/9] ACPI/IORT: Support for IORT RMR node
+
+History:
+
+v15 -> v16:
+- guest RIL must support RIL
+- additional checks in the cache invalidation hook
+- removal of the MSI BINDING ioctl (tentative replacement
+  by RMRs)
+
+
+Eric Auger (9):
+  iommu: Introduce attach/detach_pasid_table API
+  iommu: Introduce iommu_get_nesting
+  iommu/smmuv3: Allow s1 and s2 configs to coexist
+  iommu/smmuv3: Get prepared for nested stage support
+  iommu/smmuv3: Implement attach/detach_pasid_table
+  iommu/smmuv3: Allow stage 1 invalidation with unmanaged ASIDs
+  iommu/smmuv3: Implement cache_invalidate
+  iommu/smmuv3: report additional recoverable faults
+  iommu/smmuv3: Disallow nested mode in presence of HW MSI regions
+
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 383 ++++++++++++++++++--
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.h |  14 +-
+ drivers/iommu/arm/arm-smmu/arm-smmu.c       |   8 +
+ drivers/iommu/intel/iommu.c                 |  13 +
+ drivers/iommu/iommu.c                       |  79 ++++
+ include/linux/iommu.h                       |  35 ++
+ include/uapi/linux/iommu.h                  |  54 +++
+ 7 files changed, 548 insertions(+), 38 deletions(-)
+
 -- 
-2.30.2
+2.26.3
 
 _______________________________________________
 kvmarm mailing list
