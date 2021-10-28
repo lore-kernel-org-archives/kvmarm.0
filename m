@@ -2,89 +2,98 @@ Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C02EBC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 14:48:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB96C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 15:34:31 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 34B2C6108F
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 14:48:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 34B2C6108F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 7F803610CF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 15:34:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7F803610CF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A37FA4B1C9;
-	Thu, 28 Oct 2021 10:48:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFBB24B175;
+	Thu, 28 Oct 2021 11:34:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 18BvZCZdMthj; Thu, 28 Oct 2021 10:48:26 -0400 (EDT)
+	with ESMTP id s1hy9ClNC5VK; Thu, 28 Oct 2021 11:34:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F105C4B1AF;
-	Thu, 28 Oct 2021 10:48:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E16794B1E3;
+	Thu, 28 Oct 2021 11:34:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1337C4B195
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 10:36:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B1584B1DF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 11:34:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g7WQMznGyfNr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 10:36:27 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E293C4B162
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 10:36:27 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635431787;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rIPy/P0MkwnX24RiVT8XHV56FyrWxedIt/Yy+pyq4E4=;
- b=WZIK73/v8gtIMM85IbcPP5JeGfmcVer9KDkhfDQPvVkG1+J0EMceWAPFcv8lB7gEKPc1xo
- XEK/sBwtPg+2+0p2nhqb8uSaAHAMa0AskpzbochAX5zKX1VRXRCUO4n7yKoOzTlqJ2ZCE2
- iCy11UR8aIx7qIJw3WU4YA+dYzZf8lQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-LuCRe9MpMnC4avaZ8uFX4w-1; Thu, 28 Oct 2021 10:36:24 -0400
-X-MC-Unique: LuCRe9MpMnC4avaZ8uFX4w-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE73C10A8E01;
- Thu, 28 Oct 2021 14:36:19 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 18EDF100EA05;
- Thu, 28 Oct 2021 14:36:03 +0000 (UTC)
-Message-ID: <33860db1f4951386347913d126ef7c8bc1655440.camel@redhat.com>
-Subject: Re: [PATCH v2 22/43] KVM: VMX: Drop unnecessary PI logic to handle
- impossible conditions
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
- Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
- <aleksandar.qemu.devel@gmail.com>, Paul Mackerras <paulus@ozlabs.org>, Anup
- Patel <anup.patel@wdc.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
- <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Oct 2021 17:36:02 +0300
-In-Reply-To: <20211009021236.4122790-23-seanjc@google.com>
+ with ESMTP id we-iu9lbz2Ry for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Oct 2021 11:34:26 -0400 (EDT)
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com
+ [209.85.215.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E4364B1DA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 11:34:26 -0400 (EDT)
+Received: by mail-pg1-f169.google.com with SMTP id c4so6717144pgv.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 08:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=ObU0mLn8cgLGt35bHM9Ve7PBUotjGGEWKnNtAqnV8Y0=;
+ b=Dh2oRVWq7FNB4VxeeBx+DY+B7J6W36/D0YFmfA4JinPWULNj2JAyVIdGN5W95l+d90
+ 4Uu/ZwJdWUivmqUAxVTynE14t1JCgr4B8VIlvCnfQRBjV/9sZBN9FbtVQViBrcsIkfKk
+ FKX6ULIrvBdeMPobrWIP7p55k83rg/EH2wU4GD4W9e2j7rIISQUbKASJH6T77kFM7m0Z
+ Qtlmy8wjfeMDEMJrWpV2K5PFqGDN6VxYLPZtUxrtHEs4QyogxcvUebO7UVfiBHutG04k
+ U0NkfKu6Je8Pt6shzy+xbyjZteg84KZAIk3v/fR91ZfKR/MAff+MA9k1aMrDIiCOqEqs
+ s/bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ObU0mLn8cgLGt35bHM9Ve7PBUotjGGEWKnNtAqnV8Y0=;
+ b=L5BXbm46P2lrcEGqgPHhh0biyE/rQlVIo+SjIWsCEpReX1LLfQsF5KA3TRicEkujox
+ vEcJXds8TgZ0CSKBDLoMcRkNVWUY9cRwgBpVEhTC5rbQ1iJEXPpGR5q0MJUligEwML+P
+ NAivVGZy2gQtYICPQLTYs/3AFd6xbGZXr8uHyqxEIzktIGXm+xMqa6OdBcZSYSfiKo42
+ 2/9VK/xnRBaeC6uYKF3thvcdRRFTHxynbBuPZ8iHFNdCIuB0UTOht8MYhm5gSxZHUevR
+ CijcM9qO6it7Nk3E5zNlfFTzYXEaymPeGYuJTaGH53CcBkTi0BTsdz2HEfpAb/qqwNra
+ GI3g==
+X-Gm-Message-State: AOAM533sCTmGK+Eb/Ciu/yf4P5NsrM23oH50zkZbG745sCDcyc29n1td
+ H+eMISQfXvOjrihUwrYxAQ9J3g==
+X-Google-Smtp-Source: ABdhPJz6jdrYVfnN/6E/mwaWkSEy+zhYc5xKvC8pKY4AVCJGv9Uh9d4/rKPGgqsum0tyEq6Ye9Z/qw==
+X-Received: by 2002:aa7:9427:0:b0:47c:3b8e:5253 with SMTP id
+ y7-20020aa79427000000b0047c3b8e5253mr5166508pfo.69.1635435265242; 
+ Thu, 28 Oct 2021 08:34:25 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id p12sm4586055pfh.52.2021.10.28.08.34.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 28 Oct 2021 08:34:24 -0700 (PDT)
+Date: Thu, 28 Oct 2021 15:34:21 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH v2 21/43] KVM: VMX: Clean up PI pre/post-block WARNs
+Message-ID: <YXrC/X6b+tgn6cJ9@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-23-seanjc@google.com>
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ <20211009021236.4122790-22-seanjc@google.com>
+ <6b2bdfad87e268e861b6cc331d25790dade8e27b.camel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mailman-Approved-At: Thu, 28 Oct 2021 10:48:24 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+Content-Disposition: inline
+In-Reply-To: <6b2bdfad87e268e861b6cc331d25790dade8e27b.camel@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
  Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
  Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Joerg Roedel <joro@8bytes.org>, kvm-ppc@vger.kernel.org,
- David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Cornelia Huck <cohuck@redhat.com>,
- linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
+ Paul Walmsley <paul.walmsley@sifive.com>, David Matlack <dmatlack@google.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Anup Patel <anup.patel@wdc.com>, linux-mips@vger.kernel.org,
+ Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,69 +110,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Drop sanity checks on the validity of the previous pCPU when handling
-> vCPU block/unlock for posted interrupts.  Barring a code bug or memory
-> corruption, the sanity checks will never fire, and any code bug that does
-> trip the WARN is all but guaranteed to completely break posted interrupts,
-> i.e. should never get anywhere near production.
+On Thu, Oct 28, 2021, Maxim Levitsky wrote:
+> On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> > Move the WARN sanity checks out of the PI descriptor update loop so as
+> > not to spam the kernel log if the condition is violated and the update
+> > takes multiple attempts due to another writer.  This also eliminates a
+> > few extra uops from the retry path.
+> > 
+> > Technically not checking every attempt could mean KVM will now fail to
+> > WARN in a scenario that would have failed before, but any such failure
+> > would be inherently racy as some other agent (CPU or device) would have
+> > to concurrent modify the PI descriptor.
+
+...
+
+> Don't know for sure if this is desired. I'll would just use WARN_ON_ONCE instead
+> if the warning spams the log.
 > 
-> This is the first of several steps toward eliminating kvm_vcpu.pre_cpu.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/posted_intr.c | 24 ++++++++++--------------
->  1 file changed, 10 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index 67cbe6ab8f66..6c2110d91b06 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -118,12 +118,10 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
->  	} while (cmpxchg64(&pi_desc->control, old.control,
->  			   new.control) != old.control);
->  
-> -	if (!WARN_ON_ONCE(vcpu->pre_pcpu == -1)) {
-> -		spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> -		list_del(&vcpu->blocked_vcpu_list);
-> -		spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> -		vcpu->pre_pcpu = -1;
-> -	}
-> +	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> +	list_del(&vcpu->blocked_vcpu_list);
-> +	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> +	vcpu->pre_pcpu = -1;
->  }
->  
->  /*
-> @@ -153,14 +151,12 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
->  
->  	WARN_ON(irqs_disabled());
->  	local_irq_disable();
-> -	if (!WARN_ON_ONCE(vcpu->pre_pcpu != -1)) {
-> -		vcpu->pre_pcpu = vcpu->cpu;
-> -		spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> -		list_add_tail(&vcpu->blocked_vcpu_list,
-> -			      &per_cpu(blocked_vcpu_on_cpu,
-> -				       vcpu->pre_pcpu));
-> -		spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> -	}
-> +
-> +	vcpu->pre_pcpu = vcpu->cpu;
-> +	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> +	list_add_tail(&vcpu->blocked_vcpu_list,
-> +		      &per_cpu(blocked_vcpu_on_cpu, vcpu->pre_pcpu));
-> +	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
->  
->  	WARN(pi_desc->sn == 1,
->  	     "Posted Interrupt Suppress Notification set before blocking");
+> If there is a race I would rather want to catch it even if rare.
 
+Paolo had similar concerns[*].  I copied the most relevant part of the discussion
+below, let me know if you object to the outcome.
 
+Thanks for the reviews!
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+[*] https://lore.kernel.org/all/YXllGfrjPX1pVUx6@google.com/T/#u
 
-
-
+On Wed, Oct 27, 2021 at 8:38 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 27/10/21 17:28, Sean Christopherson wrote:
+> > On Wed, Oct 27, 2021, Paolo Bonzini wrote:
+> > > On 27/10/21 16:41, Sean Christopherson wrote:
+> > > > The other thing I don't like about having the WARN in the loop is that it suggests
+> > > > that something other than the vCPU can modify the NDST and SN fields, which is
+> > > > wrong and confusing (for me).
+> > >
+> > > Yeah, I can agree with that.  Can you add it in a comment above the cmpxchg
+> > > loop, it can be as simple as
+> > >
+> > > 	/* The processor can set ON concurrently.  */
+> > >
+> > > when you respin patch 21 and the rest of the series?
+> >
+> > I can definitely add a comment, but I think that comment is incorrect.
+>
+> It's completely backwards indeed.  I first had "the hardware" and then
+> shut down my brain for a second to replace it.
+>
+> > So something like this?
+> >
+> > 	/* ON can be set concurrently by a different vCPU or by hardware. */
+>
+> Yes, of course.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
