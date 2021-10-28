@@ -2,53 +2,56 @@ Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7866C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BECC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:16:59 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6585161106
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:16:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6585161106
+	by mail.kernel.org (Postfix) with ESMTP id 673D4610FF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:16:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 673D4610FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15ABF4B1B0;
-	Thu, 28 Oct 2021 07:16:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 106FB4B1BC;
+	Thu, 28 Oct 2021 07:16:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jszt8nPxYFMB; Thu, 28 Oct 2021 07:16:55 -0400 (EDT)
+	with ESMTP id 3kgHqzeK-ZCZ; Thu, 28 Oct 2021 07:16:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17A1B4B1DB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F4EE4B1DD;
 	Thu, 28 Oct 2021 07:16:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 04D6E4B1AB
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 809E44B1AB
  for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 07:16:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4MJ7MBYPOILu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 07:16:48 -0400 (EDT)
+ with ESMTP id gAgoc4iiHznj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Oct 2021 07:16:49 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 755A84B1B0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 07:16:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EA524B1BA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 07:16:49 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D07FB610F8;
- Thu, 28 Oct 2021 11:16:45 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 1089E6112E;
+ Thu, 28 Oct 2021 11:16:47 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mg3Ol-002BtD-I6; Thu, 28 Oct 2021 12:16:43 +0100
+ id 1mg3On-002BtD-6b; Thu, 28 Oct 2021 12:16:45 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 0/5] KVM: arm64: Rework FPSIMD/SVE tracking
-Date: Thu, 28 Oct 2021 12:16:35 +0100
-Message-Id: <20211028111640.3663631-1-maz@kernel.org>
+Subject: [PATCH v2 5/5] arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE
+ by KVM
+Date: Thu, 28 Oct 2021 12:16:40 +0100
+Message-Id: <20211028111640.3663631-6-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211028111640.3663631-1-maz@kernel.org>
+References: <20211028111640.3663631-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -75,53 +78,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This is v2 of this series aiming at simplifying the FP handling.
+The bit of documentation that talks about TIF_FOREIGN_FPSTATE
+does not mention the ungodly tricks that KVM plays with this flag.
 
-It recently became apparent that we are mapping each vcpu thread's
-thread_info structure at EL2 for the sole purpose of checking on the
-TIF_FOREIGN_FPSTATE flag.
+Try and document this for the posterity.
 
-Given that this looks like a slightly over-engineered way of sharing a
-single bit of information, let's move to a slightly more obvious
-implementation by maintaining a vcpu-private shadow flag that
-represents the same state.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kernel/fpsimd.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-In the same vein, it appears that the code that deals with saving the
-host SVE state when used by the guest can never run, and that's by
-construction. This is actually a good thing, because it be guaranteed
-to explode on nVHE. Let's get rid of it.
-
-I also take this opportunity to add what looks like a missing, and
-nonetheless crucial piece of information to the FPSIMD code regarding
-the way KVM (ab)uses the TIF_FOREIGN_FPSTATE.
-
-Lightly tested on an A53 box with a bunch of paranoia instances
-running in both host and guests, and more heavily on a FVP to check
-the SVE behaviour (using the sve-test selftest running in both host
-and guest at the same time).
-
-* From v1 [1]:
-  - New patch getting rid of the host SVE save code
-  - Reworded the documentation update patch
-
-[1] https://lore.kernel.org/r/20211021151124.3098113-1-maz@kernel.org
-
-Marc Zyngier (5):
-  KVM: arm64: Reorder vcpu flag definitions
-  KVM: arm64: Get rid of host SVE tracking/saving
-  KVM: arm64: Introduce flag shadowing TIF_FOREIGN_FPSTATE
-  KVM: arm64: Stop mapping current thread_info at EL2
-  arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE by KVM
-
- arch/arm64/include/asm/kvm_host.h       | 29 ++++++++++---------
- arch/arm64/kernel/fpsimd.c              |  6 +++-
- arch/arm64/kvm/arm.c                    |  1 +
- arch/arm64/kvm/fpsimd.c                 | 37 ++++++++++---------------
- arch/arm64/kvm/hyp/include/hyp/switch.h | 30 +++-----------------
- arch/arm64/kvm/hyp/nvhe/switch.c        |  1 -
- arch/arm64/kvm/hyp/vhe/switch.c         |  1 -
- 7 files changed, 38 insertions(+), 67 deletions(-)
-
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index ff4962750b3d..1fbd6ba7dbac 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -78,7 +78,11 @@
+  * indicate whether or not the userland FPSIMD state of the current task is
+  * present in the registers. The flag is set unless the FPSIMD registers of this
+  * CPU currently contain the most recent userland FPSIMD state of the current
+- * task.
++ * task. If the task is behaving as a VMM, then this is will be managed by
++ * KVM which will clear it to indicate that the vcpu FPSIMD state is currently
++ * loaded on the CPU, allowing the state to be saved if a FPSIMD-aware
++ * softirq kicks in. Upon vcpu_put(), KVM will save the vcpu FP state and
++ * flag the register state as invalid.
+  *
+  * In order to allow softirq handlers to use FPSIMD, kernel_neon_begin() may
+  * save the task's FPSIMD context back to task_struct from softirq context.
 -- 
 2.30.2
 
