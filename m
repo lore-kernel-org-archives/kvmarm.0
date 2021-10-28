@@ -2,53 +2,52 @@ Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5BECC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73DBCC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:17:01 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 673D4610FF
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:16:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 673D4610FF
+	by mail.kernel.org (Postfix) with ESMTP id 27CCF610FF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:17:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 27CCF610FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 106FB4B1BC;
-	Thu, 28 Oct 2021 07:16:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C68D94B1C0;
+	Thu, 28 Oct 2021 07:17:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3kgHqzeK-ZCZ; Thu, 28 Oct 2021 07:16:57 -0400 (EDT)
+	with ESMTP id W-YfuKRvlnIA; Thu, 28 Oct 2021 07:16:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F4EE4B1DD;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 445654B1E1;
 	Thu, 28 Oct 2021 07:16:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 809E44B1AB
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F6344B1B0
  for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 07:16:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gAgoc4iiHznj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 07:16:49 -0400 (EDT)
+ with ESMTP id UMS04WNs6fZz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Oct 2021 07:16:48 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EA524B1BA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 07:16:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 705F84B19A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 07:16:48 -0400 (EDT)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 1089E6112E;
- Thu, 28 Oct 2021 11:16:47 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 837C361108;
+ Thu, 28 Oct 2021 11:16:46 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mg3On-002BtD-6b; Thu, 28 Oct 2021 12:16:45 +0100
+ id 1mg3Om-002BtD-OQ; Thu, 28 Oct 2021 12:16:44 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 5/5] arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE
- by KVM
-Date: Thu, 28 Oct 2021 12:16:40 +0100
-Message-Id: <20211028111640.3663631-6-maz@kernel.org>
+Subject: [PATCH v2 4/5] KVM: arm64: Stop mapping current thread_info at EL2
+Date: Thu, 28 Oct 2021 12:16:39 +0100
+Message-Id: <20211028111640.3663631-5-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211028111640.3663631-1-maz@kernel.org>
 References: <20211028111640.3663631-1-maz@kernel.org>
@@ -78,33 +77,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The bit of documentation that talks about TIF_FOREIGN_FPSTATE
-does not mention the ungodly tricks that KVM plays with this flag.
-
-Try and document this for the posterity.
+Now that we can track an equivalent of TIF_FOREIGN_FPSTATE, drop
+the mapping of current's thread_info at EL2.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/fpsimd.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h       |  2 --
+ arch/arm64/kvm/fpsimd.c                 | 12 +-----------
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  1 -
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  1 -
+ arch/arm64/kvm/hyp/vhe/switch.c         |  1 -
+ 5 files changed, 1 insertion(+), 16 deletions(-)
 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index ff4962750b3d..1fbd6ba7dbac 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -78,7 +78,11 @@
-  * indicate whether or not the userland FPSIMD state of the current task is
-  * present in the registers. The flag is set unless the FPSIMD registers of this
-  * CPU currently contain the most recent userland FPSIMD state of the current
-- * task.
-+ * task. If the task is behaving as a VMM, then this is will be managed by
-+ * KVM which will clear it to indicate that the vcpu FPSIMD state is currently
-+ * loaded on the CPU, allowing the state to be saved if a FPSIMD-aware
-+ * softirq kicks in. Upon vcpu_put(), KVM will save the vcpu FP state and
-+ * flag the register state as invalid.
-  *
-  * In order to allow softirq handlers to use FPSIMD, kernel_neon_begin() may
-  * save the task's FPSIMD context back to task_struct from softirq context.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 0db523e447a5..da4a82d8ce5d 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -26,7 +26,6 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
+-#include <asm/thread_info.h>
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+ 
+@@ -320,7 +319,6 @@ struct kvm_vcpu_arch {
+ 	struct kvm_guest_debug_arch vcpu_debug_state;
+ 	struct kvm_guest_debug_arch external_debug_state;
+ 
+-	struct thread_info *host_thread_info;	/* hyp VA */
+ 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
+ 
+ 	struct {
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index f464db2e9e47..f54d6a1eaff6 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -7,7 +7,6 @@
+  */
+ #include <linux/irqflags.h>
+ #include <linux/sched.h>
+-#include <linux/thread_info.h>
+ #include <linux/kvm_host.h>
+ #include <asm/fpsimd.h>
+ #include <asm/kvm_asm.h>
+@@ -28,17 +27,9 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+ {
+ 	int ret;
+ 
+-	struct thread_info *ti = &current->thread_info;
+ 	struct user_fpsimd_state *fpsimd = &current->thread.uw.fpsimd_state;
+ 
+-	/*
+-	 * Make sure the host task thread flags and fpsimd state are
+-	 * visible to hyp:
+-	 */
+-	ret = create_hyp_mappings(ti, ti + 1, PAGE_HYP);
+-	if (ret)
+-		goto error;
+-
++	/* Make sure the host task fpsimd state is visible to hyp: */
+ 	ret = create_hyp_mappings(fpsimd, fpsimd + 1, PAGE_HYP);
+ 	if (ret)
+ 		goto error;
+@@ -54,7 +45,6 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+ 			goto error;
+ 	}
+ 
+-	vcpu->arch.host_thread_info = kern_hyp_va(ti);
+ 	vcpu->arch.host_fpsimd_state = kern_hyp_va(fpsimd);
+ error:
+ 	return ret;
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index d49b1b3725f5..d2d7b72de84a 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -28,7 +28,6 @@
+ #include <asm/fpsimd.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/processor.h>
+-#include <asm/thread_info.h>
+ 
+ extern struct exception_table_entry __start___kvm_ex_table;
+ extern struct exception_table_entry __stop___kvm_ex_table;
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index a34b01cc8ab9..012890c2af1b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -25,7 +25,6 @@
+ #include <asm/fpsimd.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/processor.h>
+-#include <asm/thread_info.h>
+ 
+ #include <nvhe/mem_protect.h>
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index ded2c66675f0..c7fc04b11673 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -24,7 +24,6 @@
+ #include <asm/fpsimd.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/processor.h>
+-#include <asm/thread_info.h>
+ 
+ /* VHE specific context */
+ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
 -- 
 2.30.2
 
