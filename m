@@ -2,65 +2,61 @@ Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73DBCC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C4DC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 13:03:02 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 27CCF610FF
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 11:17:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 27CCF610FF
+	by mail.kernel.org (Postfix) with ESMTP id 888ED60FC4
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 13:03:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 888ED60FC4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C68D94B1C0;
-	Thu, 28 Oct 2021 07:17:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A35D4B153;
+	Thu, 28 Oct 2021 09:03:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W-YfuKRvlnIA; Thu, 28 Oct 2021 07:16:58 -0400 (EDT)
+	with ESMTP id X+YGCVxqjz+b; Thu, 28 Oct 2021 09:02:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 445654B1E1;
-	Thu, 28 Oct 2021 07:16:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BEC84B162;
+	Thu, 28 Oct 2021 09:02:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F6344B1B0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 07:16:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 084E14B10D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 09:02:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UMS04WNs6fZz for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 07:16:48 -0400 (EDT)
+ with ESMTP id CZvVQV5D59yS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Oct 2021 09:02:56 -0400 (EDT)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 705F84B19A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 07:16:48 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 837C361108;
- Thu, 28 Oct 2021 11:16:46 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mg3Om-002BtD-OQ; Thu, 28 Oct 2021 12:16:44 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 4/5] KVM: arm64: Stop mapping current thread_info at EL2
-Date: Thu, 28 Oct 2021 12:16:39 +0100
-Message-Id: <20211028111640.3663631-5-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211028111640.3663631-1-maz@kernel.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 451444B104
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 09:02:56 -0400 (EDT)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3F34960F02;
+ Thu, 28 Oct 2021 13:02:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1635426175;
+ bh=HS3bqWpOjF2gD6b9ws2zfTWy7XJxCId1PuTDK2PG8SQ=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=AAQ/6Gy8cTjxo00NXScYPV7aekKaW9wpGTKrOhUxLOyWoNk5aj4Ou3/1XYJ4aSkWz
+ pV5U+1HsFarcxnzjYdZQTuEGgJ5uSG3tRR+B9jEEZDYBte3o7EydK7oTwrtMXtxxsv
+ qUUcMPuvP36l6pkJY2Kj/0hFbhtE0NUtMebbnz6aVZAuJkAV9nzF7H5yGxrernMuXw
+ sPLUkf6g/v0WDvaNTLqfhqsqyIOoFn9PE6OWASWLyeGq0z5s/FwLF/khqeBKr7eyiw
+ Db3TxEmGH6es3BvbblqT5lAZa7Ml06xNZ7xUNQyKhnSluzHKcXgJcxUoZrIJrZX87y
+ 25LvV03aLK5bQ==
+Date: Thu, 28 Oct 2021 14:02:50 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Get rid of host SVE tracking/saving
+Message-ID: <YXqfegqTu80ruUPP@sirena.org.uk>
 References: <20211028111640.3663631-1-maz@kernel.org>
+ <20211028111640.3663631-3-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com,
- will@kernel.org, broonie@kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>, broonie@kernel.org
+In-Reply-To: <20211028111640.3663631-3-maz@kernel.org>
+X-Cookie: try again
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,122 +68,80 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============6426438814811146574=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that we can track an equivalent of TIF_FOREIGN_FPSTATE, drop
-the mapping of current's thread_info at EL2.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h       |  2 --
- arch/arm64/kvm/fpsimd.c                 | 12 +-----------
- arch/arm64/kvm/hyp/include/hyp/switch.h |  1 -
- arch/arm64/kvm/hyp/nvhe/switch.c        |  1 -
- arch/arm64/kvm/hyp/vhe/switch.c         |  1 -
- 5 files changed, 1 insertion(+), 16 deletions(-)
+--===============6426438814811146574==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="iTgLDb21f45sENgM"
+Content-Disposition: inline
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 0db523e447a5..da4a82d8ce5d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -26,7 +26,6 @@
- #include <asm/fpsimd.h>
- #include <asm/kvm.h>
- #include <asm/kvm_asm.h>
--#include <asm/thread_info.h>
- 
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
- 
-@@ -320,7 +319,6 @@ struct kvm_vcpu_arch {
- 	struct kvm_guest_debug_arch vcpu_debug_state;
- 	struct kvm_guest_debug_arch external_debug_state;
- 
--	struct thread_info *host_thread_info;	/* hyp VA */
- 	struct user_fpsimd_state *host_fpsimd_state;	/* hyp VA */
- 
- 	struct {
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index f464db2e9e47..f54d6a1eaff6 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -7,7 +7,6 @@
-  */
- #include <linux/irqflags.h>
- #include <linux/sched.h>
--#include <linux/thread_info.h>
- #include <linux/kvm_host.h>
- #include <asm/fpsimd.h>
- #include <asm/kvm_asm.h>
-@@ -28,17 +27,9 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
- {
- 	int ret;
- 
--	struct thread_info *ti = &current->thread_info;
- 	struct user_fpsimd_state *fpsimd = &current->thread.uw.fpsimd_state;
- 
--	/*
--	 * Make sure the host task thread flags and fpsimd state are
--	 * visible to hyp:
--	 */
--	ret = create_hyp_mappings(ti, ti + 1, PAGE_HYP);
--	if (ret)
--		goto error;
--
-+	/* Make sure the host task fpsimd state is visible to hyp: */
- 	ret = create_hyp_mappings(fpsimd, fpsimd + 1, PAGE_HYP);
- 	if (ret)
- 		goto error;
-@@ -54,7 +45,6 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
- 			goto error;
- 	}
- 
--	vcpu->arch.host_thread_info = kern_hyp_va(ti);
- 	vcpu->arch.host_fpsimd_state = kern_hyp_va(fpsimd);
- error:
- 	return ret;
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index d49b1b3725f5..d2d7b72de84a 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -28,7 +28,6 @@
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
--#include <asm/thread_info.h>
- 
- extern struct exception_table_entry __start___kvm_ex_table;
- extern struct exception_table_entry __stop___kvm_ex_table;
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index a34b01cc8ab9..012890c2af1b 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -25,7 +25,6 @@
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
--#include <asm/thread_info.h>
- 
- #include <nvhe/mem_protect.h>
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index ded2c66675f0..c7fc04b11673 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -24,7 +24,6 @@
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
--#include <asm/thread_info.h>
- 
- /* VHE specific context */
- DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
--- 
-2.30.2
+
+--iTgLDb21f45sENgM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Thu, Oct 28, 2021 at 12:16:37PM +0100, Marc Zyngier wrote:
+> The SVE host tracking in KVM is pretty involved. It relies on a
+> set of flags tracking the ownership of the SVE register, as well
+> as that of the EL0 access.
+
+> It is also pretty scary: __hyp_sve_save_host() computes
+> a thread_struct pointer and obtains a sve_state which gets directly
+> accessed without further ado, even on nVHE. How can this even work?
+
+> The answer to that is that it doesn't, and that this is mostly dead
+> code. Closer examination shows that on executing a syscall, userspace
+> loses its SVE state entirely. This is part of the ABI. Another
+> thing to notice is that although the kernel provides helpers such as
+> kernel_neon_begin()/end(), they only deal with the FP/NEON state,
+> and not SVE.
+
+> Given that you can only execute a guest as the result of a syscall,
+> and that the kernel cannot use SVE by itself, it becomes pretty
+> obvious that there is never any host SVE state to save, and that
+> this code is only there to increase confusion.
+
+Ah, this explains a lot and does in fact make life a lot easier, though
+we're going to get some of the fun back for SME since the ABI does not
+invalidate ZA on syscall.  That said there we have a register we can
+check to see if the state is live rather than having to track what's
+going on with TIF.  I've also currently got changes in the SME patch set
+which do mean that we won't clear TIF_SVE on syscall entry while SME is
+active, however I can rework that to fit in with this change easily
+enough which given the simplifications introduced seems like it is
+clearly the right thing to do so:
+
+Reviewed-by: Mark Brown <broonie@kernel.org>
+
+--iTgLDb21f45sENgM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmF6n3kACgkQJNaLcl1U
+h9DsCQf9EFvV/AS5kqg1XCjZtSOxwVpUegl7BRhkzM0GAp+XZVvQhhe3+1WZ923E
+7GFNl6LlJST3Ey6ZwpwpR956TJPk20on7q/v31194sRtikdoZhFsgRq55hDnD9vi
+591aPeInRI5K61V83HJExubBHm24HHlE1t2nk7sJylWKfSP0qjeLeOvA6IABskJf
+bsRDvysWc7KiuQKJUQ1BFW9RWGn4ItD0eawIQfG+iEFMjdr3rA0U500eFc+5DBa3
+v31nrJA4a9aRnl2TgWozh+t7wzqkMcDZb06QvxhXDiNYKAqtcgVOq6Nkn10vbQYc
+Zm2aPpB82LAyPzfPFjHgRb2cjuxL4w==
+=Bf9h
+-----END PGP SIGNATURE-----
+
+--iTgLDb21f45sENgM--
+
+--===============6426438814811146574==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============6426438814811146574==--
