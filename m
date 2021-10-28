@@ -2,64 +2,64 @@ Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55072C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB47C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:16:06 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E7429610E5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:16:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E7429610E5
+	by mail.kernel.org (Postfix) with ESMTP id EE015610C8
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:16:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org EE015610C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A3A84B1D4;
-	Thu, 28 Oct 2021 13:16:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FC134B126;
+	Thu, 28 Oct 2021 13:16:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wUjrPOHcIDTK; Thu, 28 Oct 2021 13:16:03 -0400 (EDT)
+	with ESMTP id TOnQB1I30FuT; Thu, 28 Oct 2021 13:16:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8885D4B1F1;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4A864B1FB;
 	Thu, 28 Oct 2021 13:16:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 114CB4B1DF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 11:34:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D53E4B164
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 11:46:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5YTVwB3uoiQr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 11:33:59 -0400 (EDT)
+ with ESMTP id EWyUia9GTbWJ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Oct 2021 11:46:08 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2D24B1DA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 11:33:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E81E74B1A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 11:46:08 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635435239;
+ s=mimecast20190719; t=1635435968;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QNmDdkecq8SKnVGFVDimL3g8xbus4hzEhU0dnSsqlkw=;
- b=gnM2uVNPgGm3sJhy5TE11B7tZXgcElx7U4vo9js/OP8b9u2RM5ejv4MIs/PofdaZkJvn98
- 9fcNo6NaE0jRxL2H0d1Q0d1pECmmqukOCtWEcrLvIMb04I8ZFlcFSlZqLU0RxNGHJgdXKR
- Q9dvMmCxhZPTu1b38D2aW0X9WCZSuuY=
+ bh=F4tMjT47BZ3DwbmAEWq81W0GAGbuRTe5m3IotIof8YU=;
+ b=gWFysqyj8zZtvoJR4obbTaw2QCpBs1sFglKd5SqxwmReJJoY/iZDzGDsc3ki9ei8QvaGkX
+ iRCimidQsaRYmyaK0poCzMZ0Sz/fX7HOun2bQ44tJrFSHX9Ab+Vr+zE9Sxy6XQ9FPCl1Gi
+ 2a80P0wHJbWhY0WDaMWZawtfkAsVk9k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-542-ePtPTvZLPR-5P1TjiMfLTA-1; Thu, 28 Oct 2021 11:33:55 -0400
-X-MC-Unique: ePtPTvZLPR-5P1TjiMfLTA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-192-HPiuQd71NyeJUfJbOWNqdw-1; Thu, 28 Oct 2021 11:46:07 -0400
+X-MC-Unique: HPiuQd71NyeJUfJbOWNqdw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 48699EC1A0;
- Thu, 28 Oct 2021 15:33:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F02CB19251A0;
+ Thu, 28 Oct 2021 15:46:02 +0000 (UTC)
 Received: from starship (unknown [10.40.194.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C0A7F60BF1;
- Thu, 28 Oct 2021 15:33:38 +0000 (UTC)
-Message-ID: <eea801ba765679e34a7a94a947ae7340a5cad796.camel@redhat.com>
-Subject: Re: [PATCH v2 31/43] KVM: Move x86 VMX's posted interrupt list_head
- to vcpu_vmx
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9106C5DA61;
+ Thu, 28 Oct 2021 15:45:15 +0000 (UTC)
+Message-ID: <06ed37a510347fdc7c6f7ce46fd98ce5b9ff7554.camel@redhat.com>
+Subject: Re: [PATCH v2 32/43] KVM: VMX: Move preemption timer <=> hrtimer
+ dance to common x86
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
@@ -68,13 +68,13 @@ To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
  Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
  <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Oct 2021 18:33:37 +0300
-In-Reply-To: <20211009021236.4122790-32-seanjc@google.com>
+Date: Thu, 28 Oct 2021 18:45:14 +0300
+In-Reply-To: <20211009021236.4122790-33-seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-32-seanjc@google.com>
+ <20211009021236.4122790-33-seanjc@google.com>
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mailman-Approved-At: Thu, 28 Oct 2021 13:15:59 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
@@ -102,181 +102,97 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Move the seemingly generic block_vcpu_list from kvm_vcpu to vcpu_vmx, and
-> rename the list and all associated variables to clarify that it tracks
-> the set of vCPU that need to be poked on a posted interrupt to the wakeup
-> vector.  The list is not used to track _all_ vCPUs that are blocking, and
-> the term "blocked" can be misleading as it may refer to a blocking
-> condition in the host or the guest, where as the PI wakeup case is
-> specifically for the vCPUs that are actively blocking from within the
-> guest.
+> Handle the switch to/from the hypervisor/software timer when a vCPU is
+> blocking in common x86 instead of in VMX.  Even though VMX is the only
+> user of a hypervisor timer, the logic and all functions involved are
+> generic x86 (unless future CPUs do something completely different and
+> implement a hypervisor timer that runs regardless of mode).
 > 
-> No functional change intended.
+> Handling the switch in common x86 will allow for the elimination of the
+> pre/post_blocks hooks, and also lets KVM switch back to the hypervisor
+> timer if and only if it was in use (without additional params).  Add a
+> comment explaining why the switch cannot be deferred to kvm_sched_out()
+> or kvm_vcpu_block().
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/vmx/posted_intr.c | 39 +++++++++++++++++-----------------
->  arch/x86/kvm/vmx/vmx.c         |  2 ++
->  arch/x86/kvm/vmx/vmx.h         |  3 +++
->  include/linux/kvm_host.h       |  2 --
->  virt/kvm/kvm_main.c            |  2 --
->  5 files changed, 25 insertions(+), 23 deletions(-)
+>  arch/x86/kvm/vmx/vmx.c |  6 +-----
+>  arch/x86/kvm/x86.c     | 21 +++++++++++++++++++++
+>  2 files changed, 22 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index d2b3d75c57d1..f1bcf8c32b6d 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -18,7 +18,7 @@
->   * wake the target vCPUs.  vCPUs are removed from the list and the notification
->   * vector is reset when the vCPU is scheduled in.
->   */
-> -static DEFINE_PER_CPU(struct list_head, blocked_vcpu_on_cpu);
-> +static DEFINE_PER_CPU(struct list_head, wakeup_vcpus_on_cpu);
-This looks good, you can disregard my comment on this variable from previous patch
-where I nitpicked about it.
-
->  /*
->   * Protect the per-CPU list with a per-CPU spinlock to handle task migration.
->   * When a blocking vCPU is awakened _and_ migrated to a different pCPU, the
-> @@ -26,7 +26,7 @@ static DEFINE_PER_CPU(struct list_head, blocked_vcpu_on_cpu);
->   * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock will
->   * occur if a wakeup IRQ arrives and attempts to acquire the lock.
->   */
-> -static DEFINE_PER_CPU(spinlock_t, blocked_vcpu_on_cpu_lock);
-> +static DEFINE_PER_CPU(spinlock_t, wakeup_vcpus_on_cpu_lock);
->  
->  static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
->  {
-> @@ -36,6 +36,7 @@ static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
->  void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
->  {
->  	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	struct pi_desc old, new;
->  	unsigned long flags;
->  	unsigned int dest;
-> @@ -71,9 +72,9 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
->  	 * current pCPU if the task was migrated.
->  	 */
->  	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
-> -		spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->cpu));
-> -		list_del(&vcpu->blocked_vcpu_list);
-> -		spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->cpu));
-> +		spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-> +		list_del(&vmx->pi_wakeup_list);
-> +		spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
->  	}
->  
->  	dest = cpu_physical_id(cpu);
-> @@ -121,15 +122,16 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
->  static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
->  {
->  	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
-> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
->  	struct pi_desc old, new;
->  	unsigned long flags;
->  
->  	local_irq_save(flags);
->  
-> -	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->cpu));
-> -	list_add_tail(&vcpu->blocked_vcpu_list,
-> -		      &per_cpu(blocked_vcpu_on_cpu, vcpu->cpu));
-> -	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->cpu));
-> +	spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
-> +	list_add_tail(&vmx->pi_wakeup_list,
-> +		      &per_cpu(wakeup_vcpus_on_cpu, vcpu->cpu));
-> +	spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu));
->  
->  	WARN(pi_desc->sn, "PI descriptor SN field set before blocking");
->  
-> @@ -182,24 +184,23 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
->   */
->  void pi_wakeup_handler(void)
->  {
-> -	struct kvm_vcpu *vcpu;
->  	int cpu = smp_processor_id();
-> +	struct vcpu_vmx *vmx;
->  
-> -	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> -	list_for_each_entry(vcpu, &per_cpu(blocked_vcpu_on_cpu, cpu),
-> -			blocked_vcpu_list) {
-> -		struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
-> +	spin_lock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
-> +	list_for_each_entry(vmx, &per_cpu(wakeup_vcpus_on_cpu, cpu),
-> +			    pi_wakeup_list) {
->  
-> -		if (pi_test_on(pi_desc))
-> -			kvm_vcpu_kick(vcpu);
-> +		if (pi_test_on(&vmx->pi_desc))
-> +			kvm_vcpu_kick(&vmx->vcpu);
->  	}
-> -	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> +	spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
->  }
->  
->  void __init pi_init_cpu(int cpu)
->  {
-> -	INIT_LIST_HEAD(&per_cpu(blocked_vcpu_on_cpu, cpu));
-> -	spin_lock_init(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> +	INIT_LIST_HEAD(&per_cpu(wakeup_vcpus_on_cpu, cpu));
-> +	spin_lock_init(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
->  }
->  
->  bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu)
 > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 26ed8cd1a1f2..b3bb2031a7ac 100644
+> index b3bb2031a7ac..a24f19874716 100644
 > --- a/arch/x86/kvm/vmx/vmx.c
 > +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6848,6 +6848,8 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
->  	BUILD_BUG_ON(offsetof(struct vcpu_vmx, vcpu) != 0);
->  	vmx = to_vmx(vcpu);
+> @@ -7464,16 +7464,12 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
 >  
-> +	INIT_LIST_HEAD(&vmx->pi_wakeup_list);
-> +
->  	err = -ENOMEM;
->  
->  	vmx->vpid = allocate_vpid();
-> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> index 592217fd7d92..d1a720be9a64 100644
-> --- a/arch/x86/kvm/vmx/vmx.h
-> +++ b/arch/x86/kvm/vmx/vmx.h
-> @@ -298,6 +298,9 @@ struct vcpu_vmx {
->  	/* Posted interrupt descriptor */
->  	struct pi_desc pi_desc;
->  
-> +	/* Used if this vCPU is waiting for PI notification wakeup. */
-> +	struct list_head pi_wakeup_list;
-> +
->  	/* Support for a guest hypervisor (nested VMX) */
->  	struct nested_vmx nested;
->  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 87996b22e681..c5961a361c73 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -304,8 +304,6 @@ struct kvm_vcpu {
->  	u64 requests;
->  	unsigned long guest_debug;
->  
-> -	struct list_head blocked_vcpu_list;
+>  static int vmx_pre_block(struct kvm_vcpu *vcpu)
+>  {
+> -	if (kvm_lapic_hv_timer_in_use(vcpu))
+> -		kvm_lapic_switch_to_sw_timer(vcpu);
 > -
->  	struct mutex mutex;
->  	struct kvm_run *run;
+>  	return 0;
+>  }
 >  
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2bbf5c9d410f..c1850b60f38b 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -426,8 +426,6 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
->  #endif
->  	kvm_async_pf_vcpu_init(vcpu);
+>  static void vmx_post_block(struct kvm_vcpu *vcpu)
+>  {
+> -	if (kvm_x86_ops.set_hv_timer)
+> -		kvm_lapic_switch_to_hv_timer(vcpu);
+> +
+>  }
 >  
-> -	INIT_LIST_HEAD(&vcpu->blocked_vcpu_list);
-> -
->  	kvm_vcpu_set_in_spin_loop(vcpu, false);
->  	kvm_vcpu_set_dy_eligible(vcpu, false);
->  	vcpu->preempted = false;
+>  static void vmx_setup_mce(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e0219acfd9cf..909e932a7ae7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9896,8 +9896,21 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  
+>  static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+>  {
+> +	bool hv_timer;
+> +
+>  	if (!kvm_arch_vcpu_runnable(vcpu) &&
+>  	    (!kvm_x86_ops.pre_block || static_call(kvm_x86_pre_block)(vcpu) == 0)) {
+> +		/*
+> +		 * Switch to the software timer before halt-polling/blocking as
+> +		 * the guest's timer may be a break event for the vCPU, and the
+> +		 * hypervisor timer runs only when the CPU is in guest mode.
+> +		 * Switch before halt-polling so that KVM recognizes an expired
+> +		 * timer before blocking.
+> +		 */
 
+I didn't knew about this until now but it all makes sense. The comment is very good.
+
+> +		hv_timer = kvm_lapic_hv_timer_in_use(vcpu);
+> +		if (hv_timer)
+> +			kvm_lapic_switch_to_sw_timer(vcpu);
+> +
+>  		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+>  		if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
+>  			kvm_vcpu_halt(vcpu);
+> @@ -9905,6 +9918,9 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+>  			kvm_vcpu_block(vcpu);
+>  		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+>  
+> +		if (hv_timer)
+> +			kvm_lapic_switch_to_hv_timer(vcpu);
+> +
+>  		if (kvm_x86_ops.post_block)
+>  			static_call(kvm_x86_post_block)(vcpu);
+>  
+> @@ -10136,6 +10152,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  			r = -EINTR;
+>  			goto out;
+>  		}
+> +		/*
+> +		 * It should be impossible for the hypervisor timer to be in
+> +		 * use before KVM has ever run the vCPU.
+> +		 */
+> +		WARN_ON_ONCE(kvm_lapic_hv_timer_in_use(vcpu));
+>  		kvm_vcpu_block(vcpu);
+>  		if (kvm_apic_accept_events(vcpu) < 0) {
+>  			r = 0;
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
