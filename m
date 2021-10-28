@@ -2,64 +2,64 @@ Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55452C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:16:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2D6C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:16:09 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id ED4B6610E5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:16:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org ED4B6610E5
+	by mail.kernel.org (Postfix) with ESMTP id 26D36610E5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:16:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 26D36610E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FA094B104;
-	Thu, 28 Oct 2021 13:16:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD6F94B1E4;
+	Thu, 28 Oct 2021 13:16:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Uj5Q2xD-t2XI; Thu, 28 Oct 2021 13:16:06 -0400 (EDT)
+	with ESMTP id KAKQrpqIsRol; Thu, 28 Oct 2021 13:16:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7C264B202;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F03234B205;
 	Thu, 28 Oct 2021 13:16:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E96B84B15E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 11:47:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6676F4B175
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 12:10:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vxajnzQxEqQa for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 11:47:05 -0400 (EDT)
+ with ESMTP id d9kyZWVtKzwH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Oct 2021 12:10:00 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 372954B0D7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 11:47:05 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D51A4B14C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 12:10:00 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635436025;
+ s=mimecast20190719; t=1635437400;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CbmNsSUrvGPtUZE+MWwRLOXXOyUhB+AbdYKB6eOYzgI=;
- b=Y3WxijuaKfiaIu0APqEtTdSU6Yf4oqezv+Qd10pAJZWjc0/D1NijsBlbcYovSjjqAF9Dak
- 3OgygD6QBHDA71IN/3kYI0/n/Dn/CW9Ni4KHxLoSWZzFHSiBw/bmSK9HTaymgQ4nphJGTm
- DeP2dzfjhd4xLrxDQK88DUVsFLSbUf4=
+ bh=RPIozLU8n1iGsiSzHPyPa84e4ejX/UYwSJJGhpw0Bzs=;
+ b=EN22D5+rckM0+dVsDEOd5Um7waQihRqPh6Q4A52PQWPPu9B2miQoDBM3ruy/ofFKtnNF9z
+ yzDMab8E6co1fGe7aWPQ5+CCtCouJ9EwcsJ60U65VIEWhBffXlWMULKuYLdKg6GoPyrhGf
+ EzqV6Hax5Zc2nbL9RtMSLqbY7Or8wcQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-qmR5zb0kMGqaJpP-fhah4A-1; Thu, 28 Oct 2021 11:47:01 -0400
-X-MC-Unique: qmR5zb0kMGqaJpP-fhah4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-46-PimS6ymnOV-UnZZtG5v5zw-1; Thu, 28 Oct 2021 12:09:56 -0400
+X-MC-Unique: PimS6ymnOV-UnZZtG5v5zw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00705802682;
- Thu, 28 Oct 2021 15:46:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E21580A5C0;
+ Thu, 28 Oct 2021 16:09:52 +0000 (UTC)
 Received: from starship (unknown [10.40.194.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 193772637D;
- Thu, 28 Oct 2021 15:46:48 +0000 (UTC)
-Message-ID: <412931e082b33403c8778cae7376325871ab0d54.camel@redhat.com>
-Subject: Re: [PATCH v2 34/43] KVM: x86: Remove defunct pre_block/post_block
- kvm_x86_ops hooks
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 79BD660843;
+ Thu, 28 Oct 2021 16:09:42 +0000 (UTC)
+Message-ID: <5769bb700d94c3828bdef57963a3fe9422e801e7.camel@redhat.com>
+Subject: Re: [PATCH v2 27/43] KVM: VMX: Move Posted Interrupt ndst
+ computation out of write loop
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
@@ -68,13 +68,14 @@ To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
  Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
  <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Oct 2021 18:46:11 +0300
-In-Reply-To: <20211009021236.4122790-35-seanjc@google.com>
+Date: Thu, 28 Oct 2021 19:09:41 +0300
+In-Reply-To: <643d9c249b5863f04290a6f047ea1a2d98bd75f9.camel@redhat.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-35-seanjc@google.com>
+ <20211009021236.4122790-28-seanjc@google.com>
+ <643d9c249b5863f04290a6f047ea1a2d98bd75f9.camel@redhat.com>
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mailman-Approved-At: Thu, 28 Oct 2021 13:15:59 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
@@ -101,115 +102,87 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Drop kvm_x86_ops' pre/post_block() now that all implementations are nops.
+On Thu, 2021-10-28 at 14:28 +0300, Maxim Levitsky wrote:
+> On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> > Hoist the CPU => APIC ID conversion for the Posted Interrupt descriptor
+> > out of the loop to write the descriptor, preemption is disabled so the
+> > CPU won't change, and if the APIC ID changes KVM has bigger problems.
+> > 
+> > No functional change intended.
 > 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  2 --
->  arch/x86/include/asm/kvm_host.h    | 12 ------------
->  arch/x86/kvm/vmx/vmx.c             | 13 -------------
->  arch/x86/kvm/x86.c                 |  6 +-----
->  4 files changed, 1 insertion(+), 32 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index cefe1d81e2e8..c2b007171abd 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -96,8 +96,6 @@ KVM_X86_OP(handle_exit_irqoff)
->  KVM_X86_OP_NULL(request_immediate_exit)
->  KVM_X86_OP(sched_in)
->  KVM_X86_OP_NULL(update_cpu_dirty_logging)
-> -KVM_X86_OP_NULL(pre_block)
-> -KVM_X86_OP_NULL(post_block)
->  KVM_X86_OP_NULL(vcpu_blocking)
->  KVM_X86_OP_NULL(vcpu_unblocking)
->  KVM_X86_OP_NULL(update_pi_irte)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 328103a520d3..76a8dddc1a48 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1445,18 +1445,6 @@ struct kvm_x86_ops {
->  	const struct kvm_pmu_ops *pmu_ops;
->  	const struct kvm_x86_nested_ops *nested_ops;
->  
-> -	/*
-> -	 * Architecture specific hooks for vCPU blocking due to
-> -	 * HLT instruction.
-> -	 * Returns for .pre_block():
-> -	 *    - 0 means continue to block the vCPU.
-> -	 *    - 1 means we cannot block the vCPU since some event
-> -	 *        happens during this period, such as, 'ON' bit in
-> -	 *        posted-interrupts descriptor is set.
-> -	 */
-> -	int (*pre_block)(struct kvm_vcpu *vcpu);
-> -	void (*post_block)(struct kvm_vcpu *vcpu);
-> -
->  	void (*vcpu_blocking)(struct kvm_vcpu *vcpu);
->  	void (*vcpu_unblocking)(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index a24f19874716..13e732a818f3 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7462,16 +7462,6 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
->  		secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_ENABLE_PML);
->  }
->  
-> -static int vmx_pre_block(struct kvm_vcpu *vcpu)
-> -{
-> -	return 0;
-> -}
-> -
-> -static void vmx_post_block(struct kvm_vcpu *vcpu)
-> -{
-> -
-> -}
-> -
->  static void vmx_setup_mce(struct kvm_vcpu *vcpu)
->  {
->  	if (vcpu->arch.mcg_cap & MCG_LMCE_P)
-> @@ -7665,9 +7655,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->  	.cpu_dirty_log_size = PML_ENTITY_NUM,
->  	.update_cpu_dirty_logging = vmx_update_cpu_dirty_logging,
->  
-> -	.pre_block = vmx_pre_block,
-> -	.post_block = vmx_post_block,
-> -
->  	.pmu_ops = &intel_pmu_ops,
->  	.nested_ops = &vmx_nested_ops,
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 909e932a7ae7..9643f23c28c7 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9898,8 +9898,7 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
->  {
->  	bool hv_timer;
->  
-> -	if (!kvm_arch_vcpu_runnable(vcpu) &&
-> -	    (!kvm_x86_ops.pre_block || static_call(kvm_x86_pre_block)(vcpu) == 0)) {
-> +	if (!kvm_arch_vcpu_runnable(vcpu)) {
->  		/*
->  		 * Switch to the software timer before halt-polling/blocking as
->  		 * the guest's timer may be a break event for the vCPU, and the
-> @@ -9921,9 +9920,6 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
->  		if (hv_timer)
->  			kvm_lapic_switch_to_hv_timer(vcpu);
->  
-> -		if (kvm_x86_ops.post_block)
-> -			static_call(kvm_x86_post_block)(vcpu);
-> -
->  		if (!kvm_check_request(KVM_REQ_UNHALT, vcpu))
->  			return 1;
->  	}
+> Is preemption always disabled in vmx_vcpu_pi_load? vmx_vcpu_pi_load is called from vmx_vcpu_load,
+> which is called indirectly from vcpu_load which is called from many ioctls,
+> which userspace does. In these places I don't think that preemption is disabled.
+
+You can disregard this, I missed the fact that we have 'int cpu = get_cpu();'
+which disables preemption in 'vcpu_load'
+
+Thus,
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
+
 Best regards,
 	Maxim Levitsky
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/vmx/posted_intr.c | 25 +++++++++++--------------
+> >  1 file changed, 11 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> > index fea343dcc011..2b2206339174 100644
+> > --- a/arch/x86/kvm/vmx/posted_intr.c
+> > +++ b/arch/x86/kvm/vmx/posted_intr.c
+> > @@ -51,17 +51,15 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+> >  		goto after_clear_sn;
+> >  	}
+> >  
+> > -	/* The full case.  */
+> > +	/* The full case.  Set the new destination and clear SN. */
+> > +	dest = cpu_physical_id(cpu);
+> > +	if (!x2apic_mode)
+> > +		dest = (dest << 8) & 0xFF00;
+> > +
+> >  	do {
+> >  		old.control = new.control = READ_ONCE(pi_desc->control);
+> >  
+> > -		dest = cpu_physical_id(cpu);
+> > -
+> > -		if (x2apic_mode)
+> > -			new.ndst = dest;
+> > -		else
+> > -			new.ndst = (dest << 8) & 0xFF00;
+> > -
+> > +		new.ndst = dest;
+> >  		new.sn = 0;
+> >  	} while (cmpxchg64(&pi_desc->control, old.control,
+> >  			   new.control) != old.control);
+> > @@ -103,15 +101,14 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+> >  	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
+> >  	     "Wakeup handler not enabled while the vCPU was blocking");
+> >  
+> > +	dest = cpu_physical_id(vcpu->cpu);
+> > +	if (!x2apic_mode)
+> > +		dest = (dest << 8) & 0xFF00;
+> > +
+> >  	do {
+> >  		old.control = new.control = READ_ONCE(pi_desc->control);
+> >  
+> > -		dest = cpu_physical_id(vcpu->cpu);
+> > -
+> > -		if (x2apic_mode)
+> > -			new.ndst = dest;
+> > -		else
+> > -			new.ndst = (dest << 8) & 0xFF00;
+> > +		new.ndst = dest;
+> >  
+> >  		/* set 'NV' to 'notification vector' */
+> >  		new.nv = POSTED_INTR_VECTOR;
+
 
 _______________________________________________
 kvmarm mailing list
