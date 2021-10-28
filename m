@@ -2,64 +2,64 @@ Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A6EC4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7BDC43217
 	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 09:59:00 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A4FE861039
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 09:58:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A4FE861039
+	by mail.kernel.org (Postfix) with ESMTP id 22991610D2
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 09:59:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 22991610D2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 47E684B12E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C07D14B1B5;
 	Thu, 28 Oct 2021 05:58:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Mq4ezWUPFsPU; Thu, 28 Oct 2021 05:58:58 -0400 (EDT)
+	with ESMTP id Be-WxJiCL1bg; Thu, 28 Oct 2021 05:58:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E10614B1B5;
-	Thu, 28 Oct 2021 05:58:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 090C04B1C8;
+	Thu, 28 Oct 2021 05:58:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57A314A193
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 02:06:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 29F3A4B15E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 05:12:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mUIApCUjDJ4v for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 02:06:29 -0400 (EDT)
+ with ESMTP id q5DFbihNd2MD for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Oct 2021 05:12:44 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D08A4083E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 02:06:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 53E3E4B126
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 05:12:44 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635401189;
+ s=mimecast20190719; t=1635412363;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QW1VwJpwnVmxxU7z0qT05ZJcs1uisimu/KzjDIJrxzY=;
- b=YeUC4xU3uGU0Gli7HlwrbCjdXO3seIOYnYGWK6TKjnHilLx8jkKDozXwc1KRO8hFI8/axX
- kpAHztnPk0FrFvQZtQuj4NW+MGul4Yd9GOVLxXc7rRU6TDYSpAeFqxzO19RaRYk429arEu
- hnpzlE2SFWCnp10Zcyns6XJYMlJQig8=
+ bh=l1MWdjra8eZcIIlx8zcoZvMR0jtyOa/xjrbhOVDWvpc=;
+ b=WywqvnrFTYkLtUSeQ/iRa9W2PIlFGAfjP9Gf/493Ftda1l/I7ySjwth1XQ/nnoqAa9IRsC
+ meiefUgcCyasnehZWpFq5q/cpcxyXMNoAfua03PSEBnPyTAN3aOcZKIWQhWfUoXORs6YyX
+ aTJjddpiwf+xhUKRw3bde8X47WRd5Fk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-575-FpD08W43OridSh2IluPe8g-1; Thu, 28 Oct 2021 02:06:25 -0400
-X-MC-Unique: FpD08W43OridSh2IluPe8g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-547-sp4eSFtgN52tnt6kECXjIQ-1; Thu, 28 Oct 2021 05:12:40 -0400
+X-MC-Unique: sp4eSFtgN52tnt6kECXjIQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2367679EEF;
- Thu, 28 Oct 2021 06:06:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE71D1966321;
+ Thu, 28 Oct 2021 09:12:36 +0000 (UTC)
 Received: from starship (unknown [10.40.194.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9A8DC70953;
- Thu, 28 Oct 2021 06:05:36 +0000 (UTC)
-Message-ID: <49c6c208841a85dbcb397acdc7f20b81402e71fb.camel@redhat.com>
-Subject: Re: [PATCH v2 23/43] KVM: VMX: Use boolean returns for Posted
- Interrupt "test" helpers
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4625A5F707;
+ Thu, 28 Oct 2021 09:12:15 +0000 (UTC)
+Message-ID: <c6c19d79bc8c7747d91a9dba1c1e671e9d138761.camel@redhat.com>
+Subject: Re: [PATCH v2 20/43] KVM: VMX: Skip Posted Interrupt updates if
+ APICv is hard disabled
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
  Huacai Chen <chenhuacai@kernel.org>, Aleksandar Markovic
@@ -68,13 +68,13 @@ To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
  Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
  Christian Borntraeger <borntraeger@de.ibm.com>, Janosch Frank
  <frankja@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 28 Oct 2021 09:05:35 +0300
-In-Reply-To: <20211009021236.4122790-24-seanjc@google.com>
+Date: Thu, 28 Oct 2021 12:12:13 +0300
+In-Reply-To: <20211009021236.4122790-21-seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-24-seanjc@google.com>
+ <20211009021236.4122790-21-seanjc@google.com>
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mailman-Approved-At: Thu, 28 Oct 2021 05:58:55 -0400
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
@@ -102,73 +102,40 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Return bools instead of ints for the posted interrupt "test" helpers.
-> The bit position of the flag being test does not matter to the callers,
-> and is in fact lost by virtue of test_bit() itself returning a bool.
-> 
-> Returning ints is potentially dangerous, e.g. "pi_test_on(pi_desc) == 1"
-> is safe-ish because ON is bit 0 and thus any sane implementation of
-> pi_test_on() will work, but for SN (bit 1), checking "== 1" would rely on
-> pi_test_on() to return 0 or 1, a.k.a. bools, as opposed to 0 or 2 (the
-> positive bit position).
+> Explicitly skip posted interrupt updates if APICv is disabled in all of
+> KVM, or if the guest doesn't have an in-kernel APIC.  The PI descriptor
+> is kept up-to-date if APICv is inhibited, e.g. so that re-enabling APICv
+> doesn't require a bunch of updates, but neither the module param nor the
+> APIC type can be changed on-the-fly.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/vmx/posted_intr.c | 4 ++--
->  arch/x86/kvm/vmx/posted_intr.h | 6 +++---
->  2 files changed, 5 insertions(+), 5 deletions(-)
+>  arch/x86/kvm/vmx/posted_intr.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index 6c2110d91b06..1688f8dc535a 100644
+> index 3263056784f5..351666c41bbc 100644
 > --- a/arch/x86/kvm/vmx/posted_intr.c
 > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -185,7 +185,7 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
->  			   new.control) != old.control);
+> @@ -28,11 +28,14 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+>  	unsigned int dest;
 >  
->  	/* We should not block the vCPU if an interrupt is posted for it.  */
-> -	if (pi_test_on(pi_desc) == 1)
-> +	if (pi_test_on(pi_desc))
->  		__pi_post_block(vcpu);
+>  	/*
+> -	 * In case of hot-plug or hot-unplug, we may have to undo
+> -	 * vmx_vcpu_pi_put even if there is no assigned device.  And we
+> -	 * always keep PI.NDST up to date for simplicity: it makes the
+> -	 * code easier, and CPU migration is not a fast path.
+> +	 * To simplify hot-plug and dynamic toggling of APICv, keep PI.NDST and
+> +	 * PI.SN up-to-date even if there is no assigned device or if APICv is
+> +	 * deactivated due to a dynamic inhibit bit, e.g. for Hyper-V's SyncIC.
+>  	 */
+> +	if (!enable_apicv || !lapic_in_kernel(vcpu))
+> +		return;
+> +
+> +	/* Nothing to do if PI.SN==0 and the vCPU isn't being migrated. */
+>  	if (!pi_test_sn(pi_desc) && vcpu->cpu == cpu)
+>  		return;
 >  
->  	local_irq_enable();
-> @@ -216,7 +216,7 @@ void pi_wakeup_handler(void)
->  			blocked_vcpu_list) {
->  		struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
->  
-> -		if (pi_test_on(pi_desc) == 1)
-> +		if (pi_test_on(pi_desc))
->  			kvm_vcpu_kick(vcpu);
->  	}
->  	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, cpu));
-> diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
-> index 7f7b2326caf5..36ae035f14aa 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.h
-> +++ b/arch/x86/kvm/vmx/posted_intr.h
-> @@ -40,7 +40,7 @@ static inline bool pi_test_and_clear_on(struct pi_desc *pi_desc)
->  			(unsigned long *)&pi_desc->control);
->  }
->  
-> -static inline int pi_test_and_set_pir(int vector, struct pi_desc *pi_desc)
-> +static inline bool pi_test_and_set_pir(int vector, struct pi_desc *pi_desc)
->  {
->  	return test_and_set_bit(vector, (unsigned long *)pi_desc->pir);
->  }
-> @@ -74,13 +74,13 @@ static inline void pi_clear_sn(struct pi_desc *pi_desc)
->  		(unsigned long *)&pi_desc->control);
->  }
->  
-> -static inline int pi_test_on(struct pi_desc *pi_desc)
-> +static inline bool pi_test_on(struct pi_desc *pi_desc)
->  {
->  	return test_bit(POSTED_INTR_ON,
->  			(unsigned long *)&pi_desc->control);
->  }
->  
-> -static inline int pi_test_sn(struct pi_desc *pi_desc)
-> +static inline bool pi_test_sn(struct pi_desc *pi_desc)
->  {
->  	return test_bit(POSTED_INTR_SN,
->  			(unsigned long *)&pi_desc->control);
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
