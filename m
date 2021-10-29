@@ -2,80 +2,67 @@ Return-Path: <SRS0=gNwE=PR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27200C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Oct 2021 00:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD47C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Oct 2021 09:35:32 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A978D610F8
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Oct 2021 00:32:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A978D610F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 883C6610A0
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Oct 2021 09:35:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 883C6610A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45C624B15C;
-	Thu, 28 Oct 2021 20:32:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D59F4B190;
+	Fri, 29 Oct 2021 05:35:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Evc9opFL-N03; Thu, 28 Oct 2021 20:32:50 -0400 (EDT)
+	with ESMTP id K3aresbQi8RV; Fri, 29 Oct 2021 05:35:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B6754B19A;
-	Thu, 28 Oct 2021 20:32:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33E4A4B19A;
+	Fri, 29 Oct 2021 05:35:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4356E4B172
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 20:32:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 572D74B175
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Oct 2021 05:35:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z0fb84wYTcZQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 20:32:44 -0400 (EDT)
-Received: from mail-ot1-f73.google.com (mail-ot1-f73.google.com
- [209.85.210.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6D3F4B160
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 20:32:43 -0400 (EDT)
-Received: by mail-ot1-f73.google.com with SMTP id
- r3-20020a056830236300b0054d43b72ba5so4348916oth.17
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 17:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=8jHkcukOGs60Vh8sqIk5PEDCEkQaDcCSTeMEW1ZoThU=;
- b=JdhR5KgizbNUUTAjmlYRxJx0EtRpzClBjN8sNGCA4JJO4HHHb6OXPbkGWVWsexwurl
- kRU/OrYOvFTWusWVmdojV2LmmS3eksr37DnFEYydJYDaWiHjFtnAErqEYg97xPlTHxHn
- nLUvfSd9uIXXDeEqhI/d07olbwebG44JjMzSvnmAiFv9ny7vqeJmJcMZCzv9Txyee4A1
- AH50A4MUa8rJlxoiWXiA/FNFIrwGua22jIX3diDsCegQ2R353dFwc0iVF1Ubi2YZ4UDY
- m1tQpzc7VBbKbCWLZcVd52Qs91rPh+JGCvqvxhTGc6bQlM+BZoafUHzt0/wQE/NVWNBr
- 1N3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=8jHkcukOGs60Vh8sqIk5PEDCEkQaDcCSTeMEW1ZoThU=;
- b=temF4CuwD1wUIaPCRbU2PBc5gGdX8TVt3xEFKbHAU0lRV+vRc/4AdCB3JGYlFBaePw
- QRlLeh6zdWuPzVVu7Gp4xvWL1HtSdcfGLPsMkWdgTTnkLwdxznEMVdNamMY39EwXMGsQ
- +noabz9MBX+dTK09jTojCmQZUooBM/aywTWJo2VlZ4NIzCLZs3Y8Ef4/DOH1bFlK3kRL
- TssPccLNM0U/i7WI4xA2aGpnhwmNV7uRO7Bj9Ek9dISaypdcap0ACT32Fu3wfKUejrb8
- BznZ7QVDSFZFDSIKSJsETbhNSmmV6qBEihRbuqlWJOKTJsTdDd5cYQ3JlRq56DZCtCP6
- aTbQ==
-X-Gm-Message-State: AOAM531m73bQsSbVBKPYrui8W4pdVb/4GOee7eN6jhq0mqvklqz79xaV
- z4/GYiU+JiS9j/CiORNf+Ee1jKBEIEUDE7RBEcrnBrCByBOGPqk2Ta8seQ+GiK5ls/dCSiQ1ujD
- w+ivYZeW/IX8wzarj14HSc20OcQSrQ0rb9O7Yxc0s0EDecUhSXfFgHlY4Z4UUTazRdrFhBw==
-X-Google-Smtp-Source: ABdhPJyaxDFxxmg122WEeWbg/RrVAHJJLIJnz/MlGJ2fjJIs/pCIhzGPDOjoXFCCGLJwb76Yre8ULKN1ULY=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:aca:3e86:: with SMTP id
- l128mr11380539oia.120.1635467563254; 
- Thu, 28 Oct 2021 17:32:43 -0700 (PDT)
-Date: Fri, 29 Oct 2021 00:32:01 +0000
-In-Reply-To: <20211029003202.158161-1-oupton@google.com>
-Message-Id: <20211029003202.158161-3-oupton@google.com>
-Mime-Version: 1.0
-References: <20211029003202.158161-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH 2/3] KVM: arm64: Allow the guest to change the OS Lock status
-From: Oliver Upton <oupton@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-arm-kernel@lists.infradead.org
+ with ESMTP id 44GLcSlrmBMj for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Oct 2021 05:35:26 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88C254B14C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Oct 2021 05:35:26 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 591D860F93;
+ Fri, 29 Oct 2021 09:35:25 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mgOIF-002O2i-3C; Fri, 29 Oct 2021 10:35:23 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [GIT PULL] KVM/arm64 updates for 5.16
+Date: Fri, 29 Oct 2021 10:35:10 +0100
+Message-Id: <20211029093510.3682241-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
+ drjones@redhat.com, ascull@google.com, dbrazdil@google.com,
+ eric.auger@redhat.com, tabba@google.com, justin.he@arm.com, joey.gouly@arm.com,
+ oupton@google.com, qperret@google.com, rananta@google.com, reijiw@google.com,
+ ricarkol@google.com, seanjc@google.com, suzuki.poulose@arm.com,
+ will@kernel.org, james.morse@arm.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: linux-arm-kernel@lists.infradead.org, Jia He <justin.he@arm.com>,
+ kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,96 +79,227 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM diverges from the architecture in the way it handles the OSLAR_EL1
-register. While the architecture requires that the register be WO and
-that the OSLK bit is 1 out of reset, KVM implements the register as
-RAZ/WI.
+Hi Paolo,
 
-Align KVM with the architecture by permitting writes to OSLAR_EL1. Since
-the register is WO, stash the OS Lock status bit in OSLSR_EL1 and
-context switch the status between host/guest. Additionally, change the
-reset value of the OSLK bit to 1.
+Here's the bulk of KVM/arm64 updates for 5.16. The changes are more or
+less equaly split between new features (more pKVM stuff trickling in
+as it gets written), a bunch of new selftests (timer, vgic), and bug
+fixes.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  5 +++++
- arch/arm64/kvm/sys_regs.c                  | 22 +++++++++++++++++++---
- 2 files changed, 24 insertions(+), 3 deletions(-)
+Please pull,
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index de7e14c862e6..a65dab34f85b 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -65,6 +65,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
- 	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
- 	ctxt_sys_reg(ctxt, SPSR_EL1)	= read_sysreg_el1(SYS_SPSR);
-+
-+	ctxt_sys_reg(ctxt, OSLSR_EL1)	= read_sysreg(oslsr_el1);
- }
- 
- static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
-@@ -149,6 +151,9 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg(ctxt_sys_reg(ctxt, SP_EL1),	sp_el1);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL1),	SYS_ELR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
-+
-+	/* restore OSLSR_EL1 by writing the OSLK bit to OSLAR_EL1 */
-+	write_sysreg((ctxt_sys_reg(ctxt, OSLSR_EL1) >> 1) & 1, oslar_el1);
- }
- 
- static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 0eb03e7508fe..0840ae081290 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -298,6 +298,22 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+static bool trap_oslar_el1(struct kvm_vcpu *vcpu,
-+			   struct sys_reg_params *p,
-+			   const struct sys_reg_desc *r)
-+{
-+	u64 oslsr;
-+
-+	if (!p->is_write)
-+		return read_zero(vcpu, p);
-+
-+	/* preserve all but the OSLK bit */
-+	oslsr = vcpu_read_sys_reg(vcpu, OSLSR_EL1) & ~0x2ull;
-+	vcpu_write_sys_reg(vcpu, OSLSR_EL1, oslsr | ((p->regval & 1) << 1));
-+	return true;
-+}
-+
-+
- static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
- 				   struct sys_reg_params *p,
- 				   const struct sys_reg_desc *r)
-@@ -1439,8 +1455,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	DBG_BCR_BVR_WCR_WVR_EL1(15),
- 
- 	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1, 0x00000008 },
-+	{ SYS_DESC(SYS_OSLAR_EL1), trap_oslar_el1 },
-+	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1, 0x0000000A },
- 	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
- 	{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
- 	{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
-@@ -1912,7 +1928,7 @@ static const struct sys_reg_desc cp14_regs[] = {
- 
- 	DBGBXVR(0),
- 	/* DBGOSLAR */
--	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_raz_wi },
-+	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_oslar_el1 },
- 	DBGBXVR(1),
- 	/* DBGOSLSR */
- 	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1, NULL, OSLSR_EL1 },
--- 
-2.33.0.1079.g6e70778dc9-goog
+	M.
 
+The following changes since commit 9e1ff307c779ce1f0f810c7ecce3d95bbae40896:
+
+  Linux 5.15-rc4 (2021-10-03 14:08:47 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.16
+
+for you to fetch changes up to 5a2acbbb0179a7ffbb5440b9fa46689f619705ac:
+
+  Merge branch kvm/selftests/memslot into kvmarm-master/next (2021-10-21 11:40:03 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 updates for Linux 5.16
+
+- More progress on the protected VM front, now with the full
+  fixed feature set as well as the limitation of some hypercalls
+  after initialisation.
+
+- Cleanup of the RAZ/WI sysreg handling, which was pointlessly
+  complicated
+
+- Fixes for the vgic placement in the IPA space, together with a
+  bunch of selftests
+
+- More memcg accounting of the memory allocated on behalf of a guest
+
+- Timer and vgic selftests
+
+- Workarounds for the Apple M1 broken vgic implementation
+
+- KConfig cleanups
+
+- New kvmarm.mode=none option, for those who really dislike us
+
+----------------------------------------------------------------
+Alexandru Elisei (4):
+      KVM: arm64: Return early from read_id_reg() if register is RAZ
+      KVM: arm64: Use get_raz_reg() for userspace reads of PMSWINC_EL0
+      KVM: arm64: Replace get_raz_id_reg() with get_raz_reg()
+      Documentation: admin-guide: Document side effects when pKVM is enabled
+
+Fuad Tabba (8):
+      KVM: arm64: Pass struct kvm to per-EC handlers
+      KVM: arm64: Add missing field descriptor for MDCR_EL2
+      KVM: arm64: Simplify masking out MTE in feature id reg
+      KVM: arm64: Add handlers for protected VM System Registers
+      KVM: arm64: Initialize trap registers for protected VMs
+      KVM: arm64: Move sanitized copies of CPU features
+      KVM: arm64: Trap access to pVM restricted features
+      KVM: arm64: Handle protected guests at 32 bits
+
+Jia He (2):
+      KVM: arm64: vgic: Add memcg accounting to vgic allocations
+      KVM: arm64: Add memcg accounting to KVM allocations
+
+Marc Zyngier (33):
+      KVM: arm64: Turn __KVM_HOST_SMCCC_FUNC_* into an enum (mostly)
+      Merge branch kvm-arm64/pkvm/restrict-hypercalls into kvmarm-master/next
+      Merge branch kvm-arm64/vgic-ipa-checks into kvmarm-master/next
+      KVM: arm64: Allow KVM to be disabled from the command line
+      Merge branch kvm-arm64/misc-5.16 into kvmarm-master/next
+      Merge branch kvm-arm64/raz-sysregs into kvmarm-master/next
+      KVM: arm64: Move __get_fault_info() and co into their own include file
+      KVM: arm64: Don't include switch.h into nvhe/kvm-main.c
+      KVM: arm64: Move early handlers to per-EC handlers
+      Merge branch kvm-arm64/pkvm/restrict-hypercalls into kvmarm-master/next
+      KVM: arm64: Fix reporting of endianess when the access originates at EL0
+      Merge branch kvm-arm64/misc-5.16 into kvmarm-master/next
+      KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3
+      KVM: arm64: vgic-v3: Work around GICv3 locally generated SErrors
+      KVM: arm64: vgic-v3: Reduce common group trapping to ICV_DIR_EL1 when possible
+      KVM: arm64: vgic-v3: Don't advertise ICC_CTLR_EL1.SEIS
+      KVM: arm64: vgic-v3: Align emulated cpuif LPI state machine with the pseudocode
+      Merge branch kvm-arm64/vgic-fixes-5.16 into kvmarm-master/next
+      Merge branch kvm-arm64/selftest/timer into kvmarm-master/next
+      Merge branch kvm-arm64/memory-accounting into kvmarm-master/next
+      KVM: arm64: Fix early exit ptrauth handling
+      KVM: arm64: pkvm: Use a single function to expose all id-regs
+      KVM: arm64: pkvm: Make the ERR/ERX*_EL1 registers RAZ/WI
+      KVM: arm64: pkvm: Drop AArch32-specific registers
+      KVM: arm64: pkvm: Drop sysregs that should never be routed to the host
+      KVM: arm64: pkvm: Handle GICv3 traps as required
+      KVM: arm64: pkvm: Preserve pending SError on exit from AArch32
+      KVM: arm64: pkvm: Consolidate include files
+      KVM: arm64: pkvm: Move kvm_handle_pvm_restricted around
+      KVM: arm64: pkvm: Pass vpcu instead of kvm to kvm_get_exit_handler_array()
+      KVM: arm64: pkvm: Give priority to standard traps over pvm handling
+      Merge branch kvm-arm64/pkvm/fixed-features into kvmarm-master/next
+      Merge branch kvm/selftests/memslot into kvmarm-master/next
+
+Raghavendra Rao Ananta (14):
+      KVM: arm64: selftests: Add MMIO readl/writel support
+      tools: arm64: Import sysreg.h
+      KVM: arm64: selftests: Introduce ARM64_SYS_KVM_REG
+      KVM: arm64: selftests: Add support for cpu_relax
+      KVM: arm64: selftests: Add basic support for arch_timers
+      KVM: arm64: selftests: Add basic support to generate delays
+      KVM: arm64: selftests: Add support to disable and enable local IRQs
+      KVM: arm64: selftests: Maintain consistency for vcpuid type
+      KVM: arm64: selftests: Add guest support to get the vcpuid
+      KVM: arm64: selftests: Add light-weight spinlock support
+      KVM: arm64: selftests: Add basic GICv3 support
+      KVM: arm64: selftests: Add host support for vGIC
+      KVM: arm64: selftests: Add arch_timer test
+      KVM: arm64: selftests: arch_timer: Support vCPU migration
+
+Ricardo Koller (13):
+      kvm: arm64: vgic: Introduce vgic_check_iorange
+      KVM: arm64: vgic-v3: Check redist region is not above the VM IPA size
+      KVM: arm64: vgic-v2: Check cpu interface region is not above the VM IPA size
+      KVM: arm64: vgic-v3: Check ITS region is not above the VM IPA size
+      KVM: arm64: vgic: Drop vgic_check_ioaddr()
+      KVM: arm64: selftests: Make vgic_init gic version agnostic
+      KVM: arm64: selftests: Make vgic_init/vm_gic_create version agnostic
+      KVM: arm64: selftests: Add some tests for GICv2 in vgic_init
+      KVM: arm64: selftests: Add tests for GIC redist/cpuif partially above IPA range
+      KVM: arm64: selftests: Add test for legacy GICv3 REDIST base partially above IPA range
+      KVM: arm64: selftests: Add init ITS device test
+      KVM: selftests: Make memslot_perf_test arch independent
+      KVM: selftests: Build the memslot tests for arm64
+
+Sean Christopherson (2):
+      KVM: arm64: Unconditionally include generic KVM's Kconfig
+      KVM: arm64: Depend on HAVE_KVM instead of OF
+
+Will Deacon (5):
+      arm64: Prevent kexec and hibernation if is_protected_kvm_enabled()
+      KVM: arm64: Reject stub hypercalls after pKVM has been initialised
+      KVM: arm64: Propagate errors from __pkvm_prot_finalize hypercall
+      KVM: arm64: Prevent re-finalisation of pKVM for a given CPU
+      KVM: arm64: Disable privileged hypercalls after pKVM finalisation
+
+ Documentation/admin-guide/kernel-parameters.txt    |    6 +-
+ arch/arm64/Kconfig                                 |    1 +
+ arch/arm64/include/asm/kvm_arm.h                   |    1 +
+ arch/arm64/include/asm/kvm_asm.h                   |   48 +-
+ arch/arm64/include/asm/kvm_emulate.h               |    5 +-
+ arch/arm64/include/asm/kvm_host.h                  |    3 +
+ arch/arm64/include/asm/kvm_hyp.h                   |    5 +
+ arch/arm64/include/asm/sysreg.h                    |    3 +
+ arch/arm64/kernel/smp.c                            |    3 +-
+ arch/arm64/kvm/Kconfig                             |   10 +-
+ arch/arm64/kvm/arm.c                               |   94 +-
+ arch/arm64/kvm/hyp/include/hyp/fault.h             |   75 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |  235 ++--
+ arch/arm64/kvm/hyp/include/nvhe/fixed_config.h     |  200 +++
+ arch/arm64/kvm/hyp/include/nvhe/trap_handler.h     |    2 +
+ arch/arm64/kvm/hyp/nvhe/Makefile                   |    2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S                     |   26 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |   48 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c              |   11 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  185 +++
+ arch/arm64/kvm/hyp/nvhe/setup.c                    |    3 +
+ arch/arm64/kvm/hyp/nvhe/switch.c                   |   99 ++
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c                 |  487 ++++++++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c                    |   22 +-
+ arch/arm64/kvm/hyp/vhe/switch.c                    |   16 +
+ arch/arm64/kvm/mmu.c                               |    2 +-
+ arch/arm64/kvm/pmu-emul.c                          |    2 +-
+ arch/arm64/kvm/reset.c                             |    2 +-
+ arch/arm64/kvm/sys_regs.c                          |   41 +-
+ arch/arm64/kvm/vgic/vgic-init.c                    |    2 +-
+ arch/arm64/kvm/vgic/vgic-irqfd.c                   |    2 +-
+ arch/arm64/kvm/vgic/vgic-its.c                     |   18 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c              |   25 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |    8 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                      |   27 +-
+ arch/arm64/kvm/vgic/vgic-v4.c                      |    2 +-
+ arch/arm64/kvm/vgic/vgic.h                         |    5 +-
+ tools/arch/arm64/include/asm/sysreg.h              | 1296 ++++++++++++++++++++
+ tools/testing/selftests/kvm/.gitignore             |    1 +
+ tools/testing/selftests/kvm/Makefile               |    5 +-
+ tools/testing/selftests/kvm/aarch64/arch_timer.c   |  479 ++++++++
+ .../selftests/kvm/aarch64/debug-exceptions.c       |   30 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c       |    2 +-
+ tools/testing/selftests/kvm/aarch64/vgic_init.c    |  369 ++++--
+ .../selftests/kvm/include/aarch64/arch_timer.h     |  142 +++
+ .../testing/selftests/kvm/include/aarch64/delay.h  |   25 +
+ tools/testing/selftests/kvm/include/aarch64/gic.h  |   21 +
+ .../selftests/kvm/include/aarch64/processor.h      |   90 +-
+ .../selftests/kvm/include/aarch64/spinlock.h       |   13 +
+ tools/testing/selftests/kvm/include/aarch64/vgic.h |   20 +
+ tools/testing/selftests/kvm/include/kvm_util.h     |    2 +
+ tools/testing/selftests/kvm/lib/aarch64/gic.c      |   95 ++
+ .../selftests/kvm/lib/aarch64/gic_private.h        |   21 +
+ tools/testing/selftests/kvm/lib/aarch64/gic_v3.c   |  240 ++++
+ tools/testing/selftests/kvm/lib/aarch64/gic_v3.h   |   70 ++
+ .../testing/selftests/kvm/lib/aarch64/processor.c  |   24 +-
+ tools/testing/selftests/kvm/lib/aarch64/spinlock.c |   27 +
+ tools/testing/selftests/kvm/lib/aarch64/vgic.c     |   70 ++
+ tools/testing/selftests/kvm/memslot_perf_test.c    |   56 +-
+ 59 files changed, 4373 insertions(+), 451 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/fault.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/pkvm.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+ create mode 100644 tools/arch/arm64/include/asm/sysreg.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/delay.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_private.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
