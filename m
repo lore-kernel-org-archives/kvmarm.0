@@ -1,101 +1,78 @@
-Return-Path: <SRS0=pYg6=PQ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=gNwE=PR=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61449C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E5CC433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Oct 2021 00:32:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D5F18610FC
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Oct 2021 17:19:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D5F18610FC
+	by mail.kernel.org (Postfix) with ESMTP id 3BA3261107
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Oct 2021 00:32:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3BA3261107
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ECA94B1DC;
-	Thu, 28 Oct 2021 13:19:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD7074B15B;
+	Thu, 28 Oct 2021 20:32:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rneKcaJ5-O-8; Thu, 28 Oct 2021 13:19:43 -0400 (EDT)
+	with ESMTP id tOfYUe-4Orlp; Thu, 28 Oct 2021 20:32:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90BD34B172;
-	Thu, 28 Oct 2021 13:19:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A48174B162;
+	Thu, 28 Oct 2021 20:32:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49F984B0DF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 13:19:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 46A324B160
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 20:32:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g1-91eTIim-F for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Oct 2021 13:19:40 -0400 (EDT)
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
- [209.85.216.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9AFF94B0DD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 13:19:40 -0400 (EDT)
-Received: by mail-pj1-f53.google.com with SMTP id
- lx5-20020a17090b4b0500b001a262880e99so5286339pjb.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 10:19:40 -0700 (PDT)
+ with ESMTP id Wl-qvV3i+J1U for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Oct 2021 20:32:42 -0400 (EDT)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E4099407E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 20:32:41 -0400 (EDT)
+Received: by mail-yb1-f201.google.com with SMTP id
+ m78-20020a252651000000b005c1f44d3c7bso4056579ybm.22
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Oct 2021 17:32:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=q4iJG3ZW7obL4DMmrtDt5ktj041PvD+dEvmTQN+uKyY=;
- b=mnkWkJlsD3Efv+dhabg9XRW3VcAMBFLrAWU0a5kq4aSl4p3OkuIs64Ri3PE1R6G45W
- WWX1srIjeyGp7bl0JwXP4EsqbWo0C7Rq7LlpprSwJJDhP6Z9C4BlGZ6pF0W6uFPVwJd6
- newuZGIp7fi3S1LWbDnukcAYyKzMEUnwUDvBD8yhO2TaY/ppfXW+LzQN7N/3ahTyR+Xa
- EoqLzmvlkN3t1dBGcUsabuqlQMThWwYqrYkPzmYbFq4TCGSH1FBWF6bLFrKhvfl+wIkg
- myDgbOosQ39NTrE5GkyLOk3F2ofMqkvjX3mEfa4Ds01sxY6mlbwLLtW+SYgm0DJ0rLj4
- pK7g==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=vw5IElLY3kB8cY1L2Z+7D5wanBys4JUHwDM1VncqKoI=;
+ b=PCh1M803lS/Kd65Q8t89i5Nu8M1/0FfLF3gOxRVpd9H5ySYjaVIlKhrcBmAAZHAvHL
+ v1TsKipc2dhUgHXNlPnV6jTdmV8k9F46xup3BxToefljw/OFIXB7jePY2Cm5XrOxHzi1
+ s8M6HeWExB082mLRIgrKgNPhssfGoXV53P/km8PJih9ZFR6rbrcbCAS6w32AIVYPYJgJ
+ jkreVHIwHpBpbmFJP36xIPd7JbRl7aE/2xUzNuumQ+Q8H5dY5ooxCypcZIgwXw/K8JHp
+ PkbLJ/g8MvaXOZdsUClyOyvB5EZXIMWrkgMJezJ2FuSquxP6Vg4Umm2GNRVIu2mPTA1R
+ K2DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=q4iJG3ZW7obL4DMmrtDt5ktj041PvD+dEvmTQN+uKyY=;
- b=2wQwcZ8XPKsBkBZV9GzzfrDQaXGNtVHPQLJbIqsFFkEKHORoMwVLvWzCB3yDSRGU9Q
- 44r2YiPG5peVR0N2oD3yQFTuuolid6mVLDsDH2cEv8PblyngoXjHIxbbSvNI14vaxqJc
- SQ5/XjaaWpci28LhPn2BwTsJSb0lkU1FgQ1aGmk/jJhMTWsgC4jVaLq/+pNPc6OfxF8s
- 8SHgMQ/inJ0vsFgLtSLOHaKcCxfrLJzrPjROC8ChpingGs1gFUZCLdAq4T3xUR90EC/B
- DE+vysjHUA4W7w4r7AddACgP00GJW4lEZvMy1wk6LgZ7DqcvpoBObW0q7xSgFQCIZgPx
- 58nA==
-X-Gm-Message-State: AOAM530QcpzqyPghOzXYqvDkv6KeZZ6Ql7cgEnoRmdBZi4gIzvuH/AZo
- VzY9bZRytSZyIiJbq8cqKLdJiQ==
-X-Google-Smtp-Source: ABdhPJybd062Z7dZdlv5Ua0y9WgXsZDlcpD/ngOKZtR+XtlO0zPIxbocuXwUccJIVKZ7ltOnF8e4MQ==
-X-Received: by 2002:a17:90a:b105:: with SMTP id
- z5mr5854314pjq.181.1635441579540; 
- Thu, 28 Oct 2021 10:19:39 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id d24sm3945465pfn.62.2021.10.28.10.19.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 Oct 2021 10:19:38 -0700 (PDT)
-Date: Thu, 28 Oct 2021 17:19:34 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 28/43] KVM: VMX: Remove vCPU from PI wakeup list
- before updating PID.NV
-Message-ID: <YXrbpvHG7YD0MNO2@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-29-seanjc@google.com>
- <558e7e4c36e649709837079a25c2f56fc5609fbe.camel@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <558e7e4c36e649709837079a25c2f56fc5609fbe.camel@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
- Paul Walmsley <paul.walmsley@sifive.com>, David Matlack <dmatlack@google.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Anup Patel <anup.patel@wdc.com>, linux-mips@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=vw5IElLY3kB8cY1L2Z+7D5wanBys4JUHwDM1VncqKoI=;
+ b=P5Zh/JkC5eMRLRglgt48QDP2lrjHkZSS/mY66XaX/7mNVdJLPIAaID5IEz6xu9ItgB
+ 8ly58h4pOiIgqr7qVnYTp+E+d9KZF3iKdT1JTRZkgLRtjisOPdT34DrZGsmkxYWnF5W0
+ duJa7IGZZjm+4rgDaN1A36QkDvOnSwe6hR3Pu6AXpJzALpZqc91K90SgOccsYrMfb4AR
+ jf0mc6qf7TWTtFP7jXAAImmVb1ZO7ZE18VwyZZiG0OuYr+JBWxbHN3V0no/FOTlnn4Xi
+ Ui6+JGw2T5f5OLfrgWgsBMUyDyPBd5OFA847m4Rhxp8/dKWY2rXvEZP68/3kwqoCIcsa
+ zDdw==
+X-Gm-Message-State: AOAM530ghXVHWP9v5FKicQx5nGdtcZQv7GmqM47ZQr88nm5ryKPmoens
+ DzZs6Q3yZrN70fSVSmQMRwSXxgJiFf0kyjJqv86OVXhRzXmZz+gwzOg3BRrAy8TYpvKeHTgu2Wk
+ eB7hz3J5oxqVJ/b6T0GWRREJyGw08XL+A33I6ViD6wzC+eM2BXlDWEd+rrYCKybN9PthYww==
+X-Google-Smtp-Source: ABdhPJxAz30X4IhyMRe9T1OY/gwd77ukFMDfy0+meau5n4bTd35B4sOyPkxXfMVZntXji4d0V4ISRBJUilI=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a25:aac8:: with SMTP id
+ t66mr8949989ybi.238.1635467561151; 
+ Thu, 28 Oct 2021 17:32:41 -0700 (PDT)
+Date: Fri, 29 Oct 2021 00:31:59 +0000
+Message-Id: <20211029003202.158161-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
+Subject: [PATCH 0/3] KVM: arm64: Fixes for the exposed debug architecture
+From: Oliver Upton <oupton@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,120 +89,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Oct 28, 2021, Maxim Levitsky wrote:
-> On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> > Remove the vCPU from the wakeup list before updating the notification
-> > vector in the posted interrupt post-block helper.  There is no need to
-> > wake the current vCPU as it is by definition not blocking.  Practically
-> > speaking this is a nop as it only shaves a few meager cycles in the
-> > unlikely case that the vCPU was migrated and the previous pCPU gets a
-> > wakeup IRQ right before PID.NV is updated.  The real motivation is to
-> > allow for more readable code in the future, when post-block is merged
-> > with vmx_vcpu_pi_load(), at which point removal from the list will be
-> > conditional on the old notification vector.
-> > 
-> > Opportunistically add comments to document why KVM has a per-CPU spinlock
-> > that, at first glance, appears to be taken only on the owning CPU.
-> > Explicitly call out that the spinlock must be taken with IRQs disabled, a
-> > detail that was "lost" when KVM switched from spin_lock_irqsave() to
-> > spin_lock(), with IRQs disabled for the entirety of the relevant path.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/kvm/vmx/posted_intr.c | 49 +++++++++++++++++++++++-----------
-> >  1 file changed, 33 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> > index 2b2206339174..901b7a5f7777 100644
-> > --- a/arch/x86/kvm/vmx/posted_intr.c
-> > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> > @@ -10,10 +10,22 @@
-> >  #include "vmx.h"
-> >  
-> >  /*
-> > - * We maintain a per-CPU linked-list of vCPU, so in wakeup_handler() we
-> > - * can find which vCPU should be waken up.
-> > + * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_handler()
-> Nit: While at it, it would be nice to rename this to pi_wakeup_hanlder() so
-> that it can be more easilly found.
+I had a conversation with Marc about some of the quirks around the debug
+architecture on KVM and incorporated some of his suggestions into a
+series here. Of course, any glaring mistakes/choices made in this series
+is on me :-)
 
-Ah, good catch.
+Anyhow:
 
-> > + * when a WAKEUP_VECTOR interrupted is posted.  vCPUs are added to the list when
-> > + * the vCPU is scheduled out and is blocking (e.g. in HLT) with IRQs enabled.
-> s/interrupted/interrupt ?
-> 
-> Isn't that comment incorrect? As I see, the PI hardware is setup to use the WAKEUP_VECTOR
-> when vcpu blocks (in pi_pre_block) and then that vcpu is added to the list.
-> The pi_wakeup_hanlder just goes over the list and wakes up all vcpus on the lsit.
+KVM's implementation of the debug architecture is a bit deviant as it
+stands. For one, KVM handles the OS Lock as RAZ/WI, even though the
+architecture mandates it. Additionally, KVM advertises more than it can
+actually support: FEAT_DoubleLock is exposed as implemented to the
+guest, though OSDLR_EL1 is handled as RAZ/WI too.
 
-Doh, yes.  This patch is predicting the future.  The comment becomes correct as of 
+Only v8.2+ revisions of the debug architecture permit implementations to
+omit DoubleLock. Fortunately, the delta between v8.0 and v8.2 is
+entirely focused on external debug, a feature that KVM does not support
+and likely never will. So, there isn't much of a hurdle to bump KVM's
+reported DebugVer to v8.2, thereby allowing KVM to omit DoubleLock from
+ID_AA64DFR0_EL1. Of the remaining bits of external debug visible to the
+guest, the only additional thing to address is the OSLAR_EL1 issue by
+simply context switching the host/guest values.
 
-  KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
+Patch 1 changes the way KVM backs OSLSR_EL1 in the sys reg table.
+Instead of returning a static value from its handler, stash a copy of it
+in kvm_cpu_context and return that when read.
 
-but as of this patch the "scheduled out" piece doesn't hold true.
- 
-> > + * The vCPUs posted interrupt descriptor is updated at the same time to set its
-> > + * notification vector to WAKEUP_VECTOR, so that posted interrupt from devices
-> > + * wake the target vCPUs.  vCPUs are removed from the list and the notification
-> > + * vector is reset when the vCPU is scheduled in.
-> >   */
-> >  static DEFINE_PER_CPU(struct list_head, blocked_vcpu_on_cpu);
-> Also while at it, why not to rename this to 'blocked_vcpu_list'?
-> to explain that this is list of blocked vcpus. Its a per-cpu variable
-> so 'on_cpu' suffix isn't needed IMHO.
+Patch 2 makes the material change of allowing a guest to actually toggle
+the OSLK bit by redirecting writes to OSLAR_EL1.OSLK to OSLSR_EL1.OSLK.
+When saving context, simply stash the value of OSLSR_EL1. On resume,
+apply OSLSR_EL1.OSLK to OSLAR_EL1.OSLK.
 
-As you noted, addressed in a future patch.
+Finally, Patch 3 raises the KVM debug architecture to v8.2 and exposes
+FEAT_DoubleLock as NI to the guest. With the changes to OSLAR_EL1 in
+this series, KVM now does what it says on the tin.
 
-> > +/*
-> > + * Protect the per-CPU list with a per-CPU spinlock to handle task migration.
-> > + * When a blocking vCPU is awakened _and_ migrated to a different pCPU, the
-> > + * ->sched_in() path will need to take the vCPU off the list of the _previous_
-> > + * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock will
-> > + * occur if a wakeup IRQ arrives and attempts to acquire the lock.
-> > + */
-> >  static DEFINE_PER_CPU(spinlock_t, blocked_vcpu_on_cpu_lock);
-> >  
-> >  static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
-> > @@ -101,23 +113,28 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
-> >  	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
-> >  	     "Wakeup handler not enabled while the vCPU was blocking");
-> >  
-> > -	dest = cpu_physical_id(vcpu->cpu);
-> > -	if (!x2apic_mode)
-> > -		dest = (dest << 8) & 0xFF00;
-> > -
-> > -	do {
-> > -		old.control = new.control = READ_ONCE(pi_desc->control);
-> > -
-> > -		new.ndst = dest;
-> > -
-> > -		/* set 'NV' to 'notification vector' */
-> > -		new.nv = POSTED_INTR_VECTOR;
-> > -	} while (cmpxchg64(&pi_desc->control, old.control,
-> > -			   new.control) != old.control);
-> > -
-> > +	/*
-> > +	 * Remove the vCPU from the wakeup list of the _previous_ pCPU, which
-> > +	 * will not be the same as the current pCPU if the task was migrated.
-> > +	 */
-> >  	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> >  	list_del(&vcpu->blocked_vcpu_list);
-> >  	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> > +
-> > +	dest = cpu_physical_id(vcpu->cpu);
-> > +	if (!x2apic_mode)
-> > +		dest = (dest << 8) & 0xFF00;
-> It would be nice to have a function for this, this appears in this file twice.
-> Maybe there is a function already somewhere?
+This series applies cleanly to 5.15-rc4, and was (lightly) tested by
+booting 5.15-rc4 as a kvmtool guest on this kernel.
 
-The second instance does go away by the aforementioned:
+Oliver Upton (3):
+  KVM: arm64: Stash OSLSR_EL1 in the cpu context
+  KVM: arm64: Allow the guest to change the OS Lock status
+  KVM: arm64: Raise KVM's reported debug architecture to v8.2
 
-  KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
+ arch/arm64/include/asm/kvm_host.h          |  1 +
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  5 +++
+ arch/arm64/kvm/sys_regs.c                  | 42 ++++++++++++++++------
+ 3 files changed, 37 insertions(+), 11 deletions(-)
 
-I'm inclined to say we don't want a helper because there should only ever be one
-path that changes PI.ndst.  But a comment would definitely help to explain the
-difference between xAPIC and x2APIC IDs.
+-- 
+2.33.0.1079.g6e70778dc9-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
