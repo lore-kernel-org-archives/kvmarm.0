@@ -1,101 +1,72 @@
-Return-Path: <SRS0=4uwO=PT=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=q2PC=PU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9ECC433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 31 Oct 2021 06:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F231C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Nov 2021 10:21:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id BFCD160F93
-	for <kvmarm@archiver.kernel.org>; Sun, 31 Oct 2021 06:30:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org BFCD160F93
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 9F50460FC4
+	for <kvmarm@archiver.kernel.org>; Mon,  1 Nov 2021 10:21:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9F50460FC4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B47C4B11A;
-	Sun, 31 Oct 2021 02:30:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 170A74B0F5;
+	Mon,  1 Nov 2021 06:21:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4n0BzTrYrliX; Sun, 31 Oct 2021 02:30:50 -0400 (EDT)
+	with ESMTP id GcD64ECpA7QQ; Mon,  1 Nov 2021 06:21:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28EE44B11E;
-	Sun, 31 Oct 2021 02:30:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E79514B101;
+	Mon,  1 Nov 2021 06:21:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DE474B11A
- for <kvmarm@lists.cs.columbia.edu>; Sun, 31 Oct 2021 02:30:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B9594B101
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Nov 2021 06:21:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R+-dyHMjbBrg for <kvmarm@lists.cs.columbia.edu>;
- Sun, 31 Oct 2021 02:30:47 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F3E04B10D
- for <kvmarm@lists.cs.columbia.edu>; Sun, 31 Oct 2021 02:30:47 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635661847;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UuMUoN3DNgMNQuGO47M8OlVwO//v5SsV/9a4qP2ja2s=;
- b=IjxHk3ZTnGhm+BX+KtfXVHrz8+ySDmnZ1GKNv2bqLiGaL8M6rc/bBiSiw6uKURHNFdvSni
- MRHvrEcyQPJ0+eyguSnIqE+JkVshDpT+uYnLYVTJ1Aam0Vp/G0SQgiErISzA/VyG87e64w
- NdTARKrjMkxYkOGLl4ABSsaxeKBXaBQ=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-bsF0C521NUGt5X2l2cJBOg-1; Sun, 31 Oct 2021 02:30:45 -0400
-X-MC-Unique: bsF0C521NUGt5X2l2cJBOg-1
-Received: by mail-ed1-f69.google.com with SMTP id
- c25-20020a056402143900b003dc19782ea8so12879817edx.3
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Oct 2021 23:30:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=UuMUoN3DNgMNQuGO47M8OlVwO//v5SsV/9a4qP2ja2s=;
- b=VwUUOn4V/ZejMJUDU9Z+u/K7Hz++JBz4C0/A1Baq4YVILsCy7IVItEmdPKab/ldafs
- zSlb2N/24vHSll/3R0AZ44bbIEjFC2ahzTY3ML0bVEVVHgvqX0lW4k4yoI+uOz5zBzDZ
- vN7lxnPjQTBiGOw7sN9kmhglUz8sm+P0/cIsLih66B733kfPr4ROaP9bhM1JD7cYy7hC
- 3Bx6i2NsdimhpR37coWjMZuvVgxUbQ3UnxkI7YfWV9UjadmSsO60LLZfwHnz/1KOCLH/
- rj04nDe5Ya3iiEieyt0X8jymbh25jHsIZZyIh2vcTqg2JL+uFXpC3sy83bV6X7eINMSe
- 6WJQ==
-X-Gm-Message-State: AOAM531CpQsQRTb5hQwikRVQKXNobdO3dqxr6gCojXOcoRsIzqJ0zsY+
- 9YHjhJ7mWlKVuJg48XbK6Z2VQgIskIzbK04P8UqeRbFKRzD6i5zuQwxNe0aYz3yVgz2ePGsP490
- vi22gh8z0akjAJGLZIuHz/OKx
-X-Received: by 2002:a17:907:9810:: with SMTP id
- ji16mr7345906ejc.373.1635661843954; 
- Sat, 30 Oct 2021 23:30:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwYR8/w3iMBcLwPHxc1ndn6etLor4iw6lD26BqfNQfkVxlJyFTmd+iZCakiFuTDetnIrtSR4w==
-X-Received: by 2002:a17:907:9810:: with SMTP id
- ji16mr7345886ejc.373.1635661843735; 
- Sat, 30 Oct 2021 23:30:43 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e?
- ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
- by smtp.gmail.com with ESMTPSA id s3sm5194685ejm.49.2021.10.30.23.30.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 30 Oct 2021 23:30:42 -0700 (PDT)
-Message-ID: <cfd722b9-7b18-232e-b2c7-65806b8d05ff@redhat.com>
-Date: Sun, 31 Oct 2021 07:30:35 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [GIT PULL] KVM/arm64 updates for 5.16
-To: Marc Zyngier <maz@kernel.org>
-References: <20211029093510.3682241-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211029093510.3682241-1-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: linux-arm-kernel@lists.infradead.org, Jia He <justin.he@arm.com>,
- kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Joey Gouly <joey.gouly@arm.com>, kvmarm@lists.cs.columbia.edu
+ with ESMTP id 2pqkvWeu6FBh for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Nov 2021 06:21:28 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5115D4B092
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Nov 2021 06:21:28 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 77EDF60EFF;
+ Mon,  1 Nov 2021 10:21:26 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mhURQ-002qIs-AA; Mon, 01 Nov 2021 10:21:24 +0000
+Date: Mon, 01 Nov 2021 10:21:23 +0000
+Message-ID: <87bl349nx8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Raise KVM's reported debug architecture
+ to v8.2
+In-Reply-To: <CAOQ_QshjMXMFK2uHVDxYbFkVJApGxhT4M4NbMNY+qX3QvPe5_A@mail.gmail.com>
+References: <20211029003202.158161-1-oupton@google.com>
+ <20211029003202.158161-4-oupton@google.com>
+ <87k0hw9iez.wl-maz@kernel.org>
+ <CAOQ_QshjMXMFK2uHVDxYbFkVJApGxhT4M4NbMNY+qX3QvPe5_A@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, james.morse@arm.com, Alexandru.Elisei@arm.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ drjones@redhat.com, pshier@google.com, ricarkol@google.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -107,18 +78,56 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 29/10/21 11:35, Marc Zyngier wrote:
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.16
+On Fri, 29 Oct 2021 19:18:13 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Hey Marc,
+> 
+> On Fri, Oct 29, 2021 at 4:31 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Fri, 29 Oct 2021 01:32:02 +0100,
+> > Oliver Upton <oupton@google.com> wrote:
+> [...]
+> > >       case SYS_ID_AA64DFR0_EL1:
+> > > -             /* Limit debug to ARMv8.0 */
+> > > +             /* Limit debug to ARMv8.2 */
+> > >               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
+> > > -             val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
+> > > +             val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 8);
+> > > +
+> > > +             /* Hide DoubleLock from guests */
+> > > +             val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK);
+> > > +             val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK), 0CF);
+> > > +
+> >
+> > One issue with that is that this will break migration from an older
+> > kernel (DFR0 will be different between source and destination).
+> >
+> > You'll need a set_user handler and deal with it in a similar way to
+> > CSV2/CSV3.
+> 
+> Yeah, definitely so. In that case, unless we're strongly motivated to
+> expose these changes soon, I'll just punt the ID register changes
+> until Reiji's series [1] lands, as anything I add for a writable DFR0
+> will invariably be scrapped in favor of his work.
 
-Pulled, thanks!
+Yeah, I think that's a sensible thing to do. I need to find the
+bandwidth to look into these patches...
 
-Paolo
+> I'll post v2 of this series folding in your feedback (thx for quick
+> review, btw), less this patch.
 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
