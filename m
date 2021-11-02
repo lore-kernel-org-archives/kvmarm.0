@@ -2,77 +2,68 @@ Return-Path: <SRS0=ULe9=PV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A4E8C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Nov 2021 09:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B40B5C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Nov 2021 11:09:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CB25B60C41
-	for <kvmarm@archiver.kernel.org>; Tue,  2 Nov 2021 09:51:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CB25B60C41
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 2E31D60EE9
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Nov 2021 11:09:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2E31D60EE9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5799C4B12E;
-	Tue,  2 Nov 2021 05:51:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1F3E4B19D;
+	Tue,  2 Nov 2021 07:09:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Tp02fT9UHrqV; Tue,  2 Nov 2021 05:51:38 -0400 (EDT)
+	with ESMTP id EnE9wjjRxt60; Tue,  2 Nov 2021 07:09:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F9564B150;
-	Tue,  2 Nov 2021 05:51:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D4BA4B187;
+	Tue,  2 Nov 2021 07:09:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CD624B11C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Nov 2021 05:51:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0439A4B17C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Nov 2021 07:09:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x0vATYDc-Nzb for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Nov 2021 05:51:35 -0400 (EDT)
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com
- [209.85.208.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E8ED4B104
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Nov 2021 05:51:34 -0400 (EDT)
-Received: by mail-lj1-f177.google.com with SMTP id 1so28021643ljv.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Nov 2021 02:51:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ltDk5JK6z+dHqY8fdueOIJnXFQ9epuN/VTXpT5MWcbo=;
- b=dB1O/eAqNcHN1R5TtXUb4Ium887EbOkxo37AnK/8BMd9z/JGifaE1xNVkrSWa5LMMh
- 07YxdoVTS/OIMoHQHPutCkgiq9L1DjLVN+3aiQGnfasgaMJZT2JkrdBiej0auqMzj4Zq
- SeM4ASzdOt0EEDJw+/4W7DextFsZHaW0Y9fWezHvThGjnSv7/G41wW+7dEqC1oG/ACET
- 9Xzc6fMqSJpq/raOpG4T5jn7IdAUg68R+0iuy8UNcVa7NUOJWFTXwhVdThdLVwusOjhS
- D85uaZLFHrfRqn23fuXjUwJw7svEl6TUbgIJCuE0CD5xCubi44JJLNS7JXRWSf49glWD
- xPUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ltDk5JK6z+dHqY8fdueOIJnXFQ9epuN/VTXpT5MWcbo=;
- b=ewtlc0fwipT4tkpCD5CfSTjdBkjJTNSRF4ufL3Pet8l62zGUzz8nRbm7GWRTeeVJlK
- jt9/FPReErmN/jygw0/Y2P2+/xkISSVMwWLIgUKMK6EB5/1RoPXRRik3j0XccP0yY6vy
- V6NtPnh1VWXk/07JDTw4T4bhOACiiDq2QrTcqjG1SIFrkVDDWHqUNlp0HCppLIKpT8b0
- AFtIIR1BHJ7/3gwNUDRLJvh0nzjcF7SimHxudUrgEewi1wk6UooplVamQf+mLz6P3/Pp
- J/X36IY+DE3fpeqgN9hUJrzEWfT/xYfsM4fd+WOdT7WTitGxPh81XPyKwxOd2QA3mJzs
- o/vw==
-X-Gm-Message-State: AOAM532zbDfRIqsozzFS6tTZdRvm/Bdvwq7VaxYWXToRV+N3bX8GSYvg
- KQY9fE78jKuTmIGZna7K8biO6U0CAV9S2UPQ0n3JzH6MKZy1Qw==
-X-Google-Smtp-Source: ABdhPJzlG6VNtE7PqaH0TRioe9leU6UmH/EsyksQvloUt4hUzw+AxRflWPdOgJuKeeHnODlRb4wS9kPqVoBnzRwawEU=
-X-Received: by 2002:a05:651c:556:: with SMTP id
- q22mr24142315ljp.374.1635846692565; 
- Tue, 02 Nov 2021 02:51:32 -0700 (PDT)
-MIME-Version: 1.0
+ with ESMTP id AmWQVUDl0GxD for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Nov 2021 07:09:40 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DF344B176
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Nov 2021 07:09:40 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id A183B60C41;
+ Tue,  2 Nov 2021 11:09:39 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mhrfd-0032WN-EO; Tue, 02 Nov 2021 11:09:37 +0000
+Date: Tue, 02 Nov 2021 11:09:37 +0000
+Message-ID: <875ytaak5q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v2 6/6] selftests: KVM: Test OS lock behavior
+In-Reply-To: <20211102094651.2071532-7-oupton@google.com>
 References: <20211102094651.2071532-1-oupton@google.com>
- <20211102094651.2071532-3-oupton@google.com>
-In-Reply-To: <20211102094651.2071532-3-oupton@google.com>
-From: Oliver Upton <oupton@google.com>
-Date: Tue, 2 Nov 2021 02:51:21 -0700
-Message-ID: <CAOQ_QsgqLVVwzOhC5QeRm4qvWA-OXPB+bA=JJk4ffAavO5KMqQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] KVM: arm64: Stash OSLSR_EL1 in the cpu context
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-arm-kernel@lists.infradead.org
+ <20211102094651.2071532-7-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ drjones@redhat.com, pshier@google.com, ricarkol@google.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,36 +80,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Nov 2, 2021 at 2:47 AM Oliver Upton <oupton@google.com> wrote:
->
-> An upcoming change to KVM will context switch the OS Lock status between
-> guest/host. Add OSLSR_EL1 to the cpu context and handle guest reads
-> using the stored value.
->
-> Wire up a custom handler for writes from userspace and prevent any of
-> the invariant bits from changing.
->
+Hi Oliver,
+
+On Tue, 02 Nov 2021 09:46:51 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> KVM now correctly handles the OS Lock for its guests. When set, KVM
+> blocks all debug exceptions originating from the guest. Add test cases
+> to the debug-exceptions test to assert that software breakpoint,
+> hardware breakpoint, watchpoint, and single-step exceptions are in fact
+> blocked.
+> 
 > Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/kvm/sys_regs.c         | 31 ++++++++++++++++++++++++-------
->  2 files changed, 25 insertions(+), 7 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f8be56d5342b..c98f65c4a1f7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -172,6 +172,7 @@ enum vcpu_sysreg {
->         MDSCR_EL1,      /* Monitor Debug System Control Register */
->         MDCCINT_EL1,    /* Monitor Debug Comms Channel Interrupt Enable Reg */
->         DISR_EL1,       /* Deferred Interrupt Status Register */
-> +       OSLSR_EL1,      /* OS Lock Status Register */
+>  .../selftests/kvm/aarch64/debug-exceptions.c  | 58 ++++++++++++++++++-
+>  1 file changed, 56 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> index e5e6c92b60da..6b6ff81cdd23 100644
+> --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> @@ -23,7 +23,7 @@
+>  #define SPSR_D		(1 << 9)
+>  #define SPSR_SS		(1 << 21)
+>  
+> -extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
+> +extern unsigned char sw_bp, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
+>  static volatile uint64_t sw_bp_addr, hw_bp_addr;
+>  static volatile uint64_t wp_addr, wp_data_addr;
+>  static volatile uint64_t svc_addr;
+> @@ -47,6 +47,14 @@ static void reset_debug_state(void)
+>  	isb();
+>  }
+>  
+> +static void enable_os_lock(void)
+> +{
+> +	write_sysreg(oslar_el1, 1);
+> +	isb();
+> +
+> +	GUEST_ASSERT(read_sysreg(oslsr_el1) & 2);
+> +}
+> +
+>  static void install_wp(uint64_t addr)
+>  {
+>  	uint32_t wcr;
+> @@ -99,6 +107,7 @@ static void guest_code(void)
+>  	GUEST_SYNC(0);
+>  
+>  	/* Software-breakpoint */
+> +	reset_debug_state();
+>  	asm volatile("sw_bp: brk #0");
+>  	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp));
+>  
+> @@ -152,6 +161,51 @@ static void guest_code(void)
+>  	GUEST_ASSERT_EQ(ss_addr[1], PC(ss_start) + 4);
+>  	GUEST_ASSERT_EQ(ss_addr[2], PC(ss_start) + 8);
+>  
+> +	GUEST_SYNC(6);
+> +
+> +	/* OS Lock blocking software-breakpoint */
+> +	reset_debug_state();
+> +	enable_os_lock();
+> +	sw_bp_addr = 0;
+> +	asm volatile("brk #0");
+> +	GUEST_ASSERT_EQ(sw_bp_addr, 0);
 
-Sorry Marc, forgot to move this up per your suggestion on the last
-series. Only caught it once the patch went out the door.
+I haven't had a change to properly review the series, but this one
+definitely caught my eye. My expectations are that BRK is *not*
+affected by the OS Lock. The ARMv8 ARM goes as far as saying:
 
---
-Oliver
+<quote>
+Breakpoint Instruction exceptions are enabled regardless of the state
+of the OS Lock and the OS Double Lock.
+</quote>
+
+as well as:
+
+<quote>
+There is no enable control for Breakpoint Instruction exceptions. They
+are always enabled, and cannot be masked.
+</quote>
+
+I wonder how your test succeeds, though.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
