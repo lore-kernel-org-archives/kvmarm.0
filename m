@@ -1,92 +1,83 @@
-Return-Path: <SRS0=q2PC=PU=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=ULe9=PV=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B513C433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Nov 2021 21:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7B4C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Nov 2021 00:22:26 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id DA80760F36
-	for <kvmarm@archiver.kernel.org>; Mon,  1 Nov 2021 21:40:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DA80760F36
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 86F8760F56
+	for <kvmarm@archiver.kernel.org>; Tue,  2 Nov 2021 00:22:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 86F8760F56
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C5354B23B;
-	Mon,  1 Nov 2021 17:40:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E79704B204;
+	Mon,  1 Nov 2021 20:22:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FHKNO1KQrZ7H; Mon,  1 Nov 2021 17:40:25 -0400 (EDT)
+	with ESMTP id OsrwNWd8HSq6; Mon,  1 Nov 2021 20:22:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F25B4B26E;
-	Mon,  1 Nov 2021 17:40:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDDB24B1F6;
+	Mon,  1 Nov 2021 20:22:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F24544B12C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 31 Oct 2021 18:53:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4EF54B1D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Nov 2021 20:22:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bsreNnTyhLmu for <kvmarm@lists.cs.columbia.edu>;
- Sun, 31 Oct 2021 18:53:14 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A2B574B129
- for <kvmarm@lists.cs.columbia.edu>; Sun, 31 Oct 2021 18:53:14 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1635720794;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZziS6A0PLOF59zuYLA0PLPaHEKD4d3OXJ9lmaNmprf8=;
- b=EPUvT+0WsmhA13QTwfLUXNyxpx3hKo6PHw5vjRaH2xruBfdVs0NrU9j9x6QI6h9XUL03He
- CkktIAgBJLGLHf7a36tlOAdRCtFovSn66h0J0yvnEZnXDIsgWxGxfexO0oloOGCcdqr5aQ
- wUlK8LKOCkQ1ehNbrjgwCpdvNuXabro=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-IImPJGOmM_6WIOZi84VP9g-1; Sun, 31 Oct 2021 18:53:11 -0400
-X-MC-Unique: IImPJGOmM_6WIOZi84VP9g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9FA010A8E00;
- Sun, 31 Oct 2021 22:53:07 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7AC0019C59;
- Sun, 31 Oct 2021 22:52:56 +0000 (UTC)
-Message-ID: <b03c61ae0fa7e9531db8115569ef1c201c1aecef.camel@redhat.com>
-Subject: Re: [PATCH v2 28/43] KVM: VMX: Remove vCPU from PI wakeup list
- before updating PID.NV
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 01 Nov 2021 00:52:55 +0200
-In-Reply-To: <YXrbpvHG7YD0MNO2@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-29-seanjc@google.com>
- <558e7e4c36e649709837079a25c2f56fc5609fbe.camel@redhat.com>
- <YXrbpvHG7YD0MNO2@google.com>
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mailman-Approved-At: Mon, 01 Nov 2021 17:40:12 -0400
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
- Paul Walmsley <paul.walmsley@sifive.com>, David Matlack <dmatlack@google.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Anup Patel <anup.patel@wdc.com>, linux-mips@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ with ESMTP id xCtf59HK-WNV for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Nov 2021 20:22:20 -0400 (EDT)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66CB04B102
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Nov 2021 20:22:20 -0400 (EDT)
+Received: by mail-pg1-f202.google.com with SMTP id
+ x14-20020a63cc0e000000b002a5bc462947so9389150pgf.20
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Nov 2021 17:22:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=0q1tLc0oeztZBZsXvvPTzof7ayB7Bik3/teaxGikVwA=;
+ b=M9RyMn9NtpqtxZRq6dzqh0AmQGmFRmQFCx0PnDS2BS3EfbwgzHnzMPoUT2VW2baznj
+ s/4fI0vdhHNI76oo0fmgPbIBhoai9JINiRpWpJUOG2dlyqm6CqqJR5kWP5ZUv+dsnVIV
+ V6vOssewxpAsmnUIyrtJ1cuEd+jTbQVSJf+572afB4Bhyl/o6D41fSZK1n/iV2T7a/f7
+ YlsTaWYn0UvkbjeKDIifzJna5+4mnIo+8UdBYC6+VQyTnS+Y0lkbYcoXGQVMjW4r7Cqj
+ OV+FXdbxhJC+XuK8NFkZPJ+UG5ZcHG5ePMrx+yZEseXk7KjEywWzFJvgXxvVq5zrPO2P
+ Wp/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=0q1tLc0oeztZBZsXvvPTzof7ayB7Bik3/teaxGikVwA=;
+ b=FSNnVdBLQQY/42GCSg7BsEaD401siaKmb1KhzgfTB4K6e/cpaU/1G5qZnZFZbupLgq
+ DvS29UW22YE3nPzUF3YmRlFLufT4ZRLsMl8/6BniJeFsUTee93Y70vDtT8+sF8GU/qbN
+ P2YfpMVPELMCXHDlUP/D8zil9l+wiJVm6TrrZ163hPR8By1wO0AvS8NPZRulvS/6iAIO
+ yxgp0l8ac50ANPydq11khv4zsUnT3ta9AergSxnXXNIA7QY4+vfPZ377/OXKXxqRE4he
+ OEFoBSwtf2tqPHQTM8RNKt2L+XnR7uqpGt1ybjPHdJdlrNE1MS7+1eARaOCBLFaPdfnq
+ z9AA==
+X-Gm-Message-State: AOAM532EZiIbu/iOYENJolzSzjnEqXxozUCCjvlFb9YuTZ0BmtBqWk5D
+ RZg2Qnf3J02JD5iG1BMWKzY2fP52N7Ka
+X-Google-Smtp-Source: ABdhPJxNMFUzGq4vVDxdHLg1Zowo37UyC15esk5w81Yj2K1hViKi29lRAuknRKEVUhuJwiI85y6JmFLNHLAH
+X-Received: from rananta-virt.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a17:902:6bc8:b0:13f:8a54:1188 with SMTP id
+ m8-20020a1709026bc800b0013f8a541188mr27979352plt.49.1635812539339; Mon, 01
+ Nov 2021 17:22:19 -0700 (PDT)
+Date: Tue,  2 Nov 2021 00:21:55 +0000
+Message-Id: <20211102002203.1046069-1-rananta@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
+Subject: [RFC PATCH 0/8] KVM: arm64: Add support for hypercall services
+ selection
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>, 
+ James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,130 +94,122 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 2021-10-28 at 17:19 +0000, Sean Christopherson wrote:
-> On Thu, Oct 28, 2021, Maxim Levitsky wrote:
-> > On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> > > Remove the vCPU from the wakeup list before updating the notification
-> > > vector in the posted interrupt post-block helper.  There is no need to
-> > > wake the current vCPU as it is by definition not blocking.  Practically
-> > > speaking this is a nop as it only shaves a few meager cycles in the
-> > > unlikely case that the vCPU was migrated and the previous pCPU gets a
-> > > wakeup IRQ right before PID.NV is updated.  The real motivation is to
-> > > allow for more readable code in the future, when post-block is merged
-> > > with vmx_vcpu_pi_load(), at which point removal from the list will be
-> > > conditional on the old notification vector.
-> > > 
-> > > Opportunistically add comments to document why KVM has a per-CPU spinlock
-> > > that, at first glance, appears to be taken only on the owning CPU.
-> > > Explicitly call out that the spinlock must be taken with IRQs disabled, a
-> > > detail that was "lost" when KVM switched from spin_lock_irqsave() to
-> > > spin_lock(), with IRQs disabled for the entirety of the relevant path.
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/posted_intr.c | 49 +++++++++++++++++++++++-----------
-> > >  1 file changed, 33 insertions(+), 16 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> > > index 2b2206339174..901b7a5f7777 100644
-> > > --- a/arch/x86/kvm/vmx/posted_intr.c
-> > > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> > > @@ -10,10 +10,22 @@
-> > >  #include "vmx.h"
-> > >  
-> > >  /*
-> > > - * We maintain a per-CPU linked-list of vCPU, so in wakeup_handler() we
-> > > - * can find which vCPU should be waken up.
-> > > + * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_handler()
-> > Nit: While at it, it would be nice to rename this to pi_wakeup_hanlder() so
-> > that it can be more easilly found.
-> 
-> Ah, good catch.
-> 
-> > > + * when a WAKEUP_VECTOR interrupted is posted.  vCPUs are added to the list when
-> > > + * the vCPU is scheduled out and is blocking (e.g. in HLT) with IRQs enabled.
-> > s/interrupted/interrupt ?
-> > 
-> > Isn't that comment incorrect? As I see, the PI hardware is setup to use the WAKEUP_VECTOR
-> > when vcpu blocks (in pi_pre_block) and then that vcpu is added to the list.
-> > The pi_wakeup_hanlder just goes over the list and wakes up all vcpus on the lsit.
-> 
-> Doh, yes.  This patch is predicting the future.  The comment becomes correct as of 
-> 
->   KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
-> 
-> but as of this patch the "scheduled out" piece doesn't hold true.
->  
-> > > + * The vCPUs posted interrupt descriptor is updated at the same time to set its
-> > > + * notification vector to WAKEUP_VECTOR, so that posted interrupt from devices
-> > > + * wake the target vCPUs.  vCPUs are removed from the list and the notification
-> > > + * vector is reset when the vCPU is scheduled in.
-> > >   */
-> > >  static DEFINE_PER_CPU(struct list_head, blocked_vcpu_on_cpu);
-> > Also while at it, why not to rename this to 'blocked_vcpu_list'?
-> > to explain that this is list of blocked vcpus. Its a per-cpu variable
-> > so 'on_cpu' suffix isn't needed IMHO.
-> 
-> As you noted, addressed in a future patch.
-> 
-> > > +/*
-> > > + * Protect the per-CPU list with a per-CPU spinlock to handle task migration.
-> > > + * When a blocking vCPU is awakened _and_ migrated to a different pCPU, the
-> > > + * ->sched_in() path will need to take the vCPU off the list of the _previous_
-> > > + * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock will
-> > > + * occur if a wakeup IRQ arrives and attempts to acquire the lock.
-> > > + */
-> > >  static DEFINE_PER_CPU(spinlock_t, blocked_vcpu_on_cpu_lock);
-> > >  
-> > >  static inline struct pi_desc *vcpu_to_pi_desc(struct kvm_vcpu *vcpu)
-> > > @@ -101,23 +113,28 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
-> > >  	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
-> > >  	     "Wakeup handler not enabled while the vCPU was blocking");
-> > >  
-> > > -	dest = cpu_physical_id(vcpu->cpu);
-> > > -	if (!x2apic_mode)
-> > > -		dest = (dest << 8) & 0xFF00;
-> > > -
-> > > -	do {
-> > > -		old.control = new.control = READ_ONCE(pi_desc->control);
-> > > -
-> > > -		new.ndst = dest;
-> > > -
-> > > -		/* set 'NV' to 'notification vector' */
-> > > -		new.nv = POSTED_INTR_VECTOR;
-> > > -	} while (cmpxchg64(&pi_desc->control, old.control,
-> > > -			   new.control) != old.control);
-> > > -
-> > > +	/*
-> > > +	 * Remove the vCPU from the wakeup list of the _previous_ pCPU, which
-> > > +	 * will not be the same as the current pCPU if the task was migrated.
-> > > +	 */
-> > >  	spin_lock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> > >  	list_del(&vcpu->blocked_vcpu_list);
-> > >  	spin_unlock(&per_cpu(blocked_vcpu_on_cpu_lock, vcpu->pre_pcpu));
-> > > +
-> > > +	dest = cpu_physical_id(vcpu->cpu);
-> > > +	if (!x2apic_mode)
-> > > +		dest = (dest << 8) & 0xFF00;
-> > It would be nice to have a function for this, this appears in this file twice.
-> > Maybe there is a function already somewhere?
-> 
-> The second instance does go away by the aforementioned:
+Hello,
 
-Then no need for a helper.
+Continuing the discussion from [1], the series tries to add support
+for the user-space to elect the hypercall services that it wishes
+to expose to the guest, rather than the guest discovering them
+unconditionally. The idea employed by the series was taken from
+[1] as suggested by Marc Z.
 
-> 
->   KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
-> 
-> I'm inclined to say we don't want a helper because there should only ever be one
-> path that changes PI.ndst.  But a comment would definitely help to explain the
-> difference between xAPIC and x2APIC IDs.
-> 
+In a broad sense, the idea is similar to the current implementation
+of PSCI interface- create a 'psuedo-firmware register' to handle the
+firmware revisions. The series extends this idea to all the other
+hypercalls such as TRNG (True Random Number Generator), PV_TIME
+(Paravirtualized Time), and PTP (Precision Time protocol).
 
-Makes sense!
+For better categorization and future scaling, firmware registers
+are introduced based on the SMCCC service call owner (standard secure
+service, standard hypervisor service, and vendor specific hypervisor
+service). Each of these registers exposes the features employed in
+the form of a bitmap and are enveloped into a generic interface (for
+future expansion).
 
-Best regards,
-	Maxim Levitsky
+Upon VM creation, all the features supported by each owner type are
+enabled. User-space/VMM can learn about the services currently enabled
+via GET_ONE_REG and can manipulate them via SET_ONE_REG interfaces.
+These 'writes' directly effect the bitmap, which is further checked
+when the guest tries to issue the hypercall and a decision is taken
+weather or not the hypercall is accessable to the guest. The interface
+works well across live-migrations where the VMM can simply save/restore
+these firmware registers using the existing IOCTL interfaces.
+
+Upon VM start (at least one vCPU runs), the registers become read-only
+and cannot be manupulated by the VMM. This is just to avoid providing
+conflicting views of the services to the guests.
+
+One of the problems that the series need to address is the enablement
+of the features carried by a firmware register, whose existance is
+not known to the VMM yet. A couple of ideas were discussed to handle this:
+
+    1) Upon the first SET_ONE_REG, clear all the firmware registers
+    implicitly. It's the responsibility of the VMM to make sure that it
+    configures all the registers that's known to it.
+
+    2) Contrary to #1, which implicitly clears all the registers, introduce
+    a new capability to handle this explicitly. That is, the after learning
+    about the services supported by the host, the VMM writes to the
+    capability to explictly clear the registers.
+
+The series currently employs #1 just for the sake of completion, but is
+open for further discussion.
+
+The patches are based off of kvmarm-next 5.15-rc4, with the selftest
+patches from [2] applied.
+
+Patch-1 factors out the non-PSCI related interface from psci.c to
+hypercalls.c, as the series would extend the list in the upcoming
+patches.
+
+Patch-2 sets up a base environment to handle the 'writes' of firmware
+register- clear all the registers upon first 'write' and block 'writes'
+to the registers upon VM start.
+
+Patch-3 introduces the firmware register, KVM_REG_ARM_STD, which holds
+the standard secure services (such as TRNG).
+
+Patch-4 introduces the firmware register, KVM_REG_ARM_STD_HYP, which holds
+the standard hypervisor services (such as PV_TIME).
+
+Patch-5 introduces the firmware register, KVM_REG_ARM_VENDOR_HYP, which holds
+the vendor specific hypercall services.
+
+Patch-6 imports the firmware registers' UAPI definitions into tools/ for
+further use in selftests.
+
+Patch-7 imports the SMCCC definitions from linux/arm-smccc.h into tools/
+for further use in selftests.
+
+Patch-8 adds the selftest to test the guest (using 'hvc') and VMM
+interfaces (SET/GET_ONE_REG).
+
+[1]: https://lore.kernel.org/kvmarm/874kbcpmlq.wl-maz@kernel.org/T/
+[2]: https://lore.kernel.org/kvmarm/YUzgdbYk8BeCnHyW@google.com/
+
+Raghavendra Rao Ananta (8):
+  KVM: arm64: Factor out firmware register handling from psci.c
+  KVM: arm64: Setup base for hypercall firmware registers
+  KVM: arm64: Add standard secure service calls firmware register
+  KVM: arm64: Add standard hypervisor service calls firmware register
+  KVM: arm64: Add vendor hypervisor service calls firmware register
+  tools: Import the firmware registers
+  tools: Import ARM SMCCC definitions
+  selftests: KVM: aarch64: Introduce hypercall ABI test
+
+ .../virt/kvm/arm/{psci.rst => hypercalls.rst} |  59 ++-
+ Documentation/virt/kvm/arm/index.rst          |   2 +-
+ arch/arm64/include/asm/kvm_host.h             |  12 +
+ arch/arm64/include/uapi/asm/kvm.h             |  18 +
+ arch/arm64/kvm/arm.c                          |  17 +
+ arch/arm64/kvm/guest.c                        |   2 +-
+ arch/arm64/kvm/hypercalls.c                   | 339 ++++++++++++++++-
+ arch/arm64/kvm/psci.c                         | 167 +--------
+ arch/arm64/kvm/pvtime.c                       |   3 +
+ arch/arm64/kvm/trng.c                         |   9 +-
+ include/kvm/arm_hypercalls.h                  |  18 +
+ include/kvm/arm_psci.h                        |   8 +-
+ tools/arch/arm64/include/uapi/asm/kvm.h       |  18 +
+ tools/include/linux/arm-smccc.h               | 188 ++++++++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/hypercalls.c        | 340 ++++++++++++++++++
+ 17 files changed, 1018 insertions(+), 184 deletions(-)
+ rename Documentation/virt/kvm/arm/{psci.rst => hypercalls.rst} (57%)
+ create mode 100644 tools/include/linux/arm-smccc.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
+
+-- 
+2.33.1.1089.g2158813163f-goog
 
 _______________________________________________
 kvmarm mailing list
