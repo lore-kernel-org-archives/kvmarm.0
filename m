@@ -2,78 +2,78 @@ Return-Path: <SRS0=oZIB=PX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4579EC433F5
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CC7C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D260C611EE
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D260C611EE
+	by mail.kernel.org (Postfix) with ESMTP id E13CF611CA
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E13CF611CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8159C4B0B8;
-	Wed,  3 Nov 2021 20:26:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91F9D4A3A5;
+	Wed,  3 Nov 2021 20:26:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xflKJ0QZIMq3; Wed,  3 Nov 2021 20:26:08 -0400 (EDT)
+	with ESMTP id tIzxTqERXSiY; Wed,  3 Nov 2021 20:26:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC58A4A3A5;
-	Wed,  3 Nov 2021 20:26:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D68064B18F;
+	Wed,  3 Nov 2021 20:26:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E0974B08F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 112024B13E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ro9x1tHS1kJm for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Nov 2021 20:26:03 -0400 (EDT)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE7C24B0A3
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:03 -0400 (EDT)
-Received: by mail-pg1-f201.google.com with SMTP id
- i25-20020a631319000000b002cce0a43e94so2443778pgl.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Nov 2021 17:26:03 -0700 (PDT)
+ with ESMTP id VDDFzjsfcMYf for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Nov 2021 20:26:06 -0400 (EDT)
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
+ [209.85.210.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9666E4B0BA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:05 -0400 (EDT)
+Received: by mail-pf1-f202.google.com with SMTP id
+ l7-20020a622507000000b00494608c84a4so262440pfl.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Nov 2021 17:26:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=uUiF2cCeyvLcomA71gNb8UtnumiDOcYwDfMiXjWen6E=;
- b=oTQ7zxZOtJdIWwrRYuqPf1zjANoRXpGs4d18yx/1uFcULOqfGSPv/eGnnTHt2OaFXl
- Fw2Ja9jpx42JTWA+4xQHXaSDJzaLjB39qn72mpFaq/+8Pgyy1WE+Sui5ukzf7K0T1tch
- WQUzSIOcUqQ4RYGuYqINyp9t2Du3YpUpxuubgXkNzI9EfzqleZjWAUTMgOc4YeGCZQie
- KXx3n4rodQ4x96mmNgtB9r6T1WA9dTicsSrUIx+if+mPJuWUWAF+djp3CD78xEHLczgf
- /8ph947YIr/9EVIDN0A2sn1MabQLXDCtd3nrNdsi57mxIxM3VfxgHreQqgiovSN/aw02
- N1Uw==
+ bh=E63+zcqes7aObPmDEJrvowSyb7WASC2+JFrjiGuoOMk=;
+ b=G1EofX3RvsgDocbJ2WdlZIxLPrRqCOY3yk9dCpHXn3BrotBTcINoCOIdoZtnGuqNkz
+ XjduJywdhEpzM76x4KoUTmOMqDWGTwqBcR9WlCLJ/Ixo7OZNiFzolIn6uGeuv97Lynv7
+ ddl94QsCyWYRP1cDpWTxGlOfLjkpa9JMyPhL71/QGQqzOCEiWBc8/ntYod6VDaOBqRIS
+ X353qmmShX/kJORUwjw2weuKuQNgd6XS84Jwff3SPGUNlABXgf8tKjegkYwWGGN3YZ/S
+ LGQAetSmsnJyG5LH2Wdt7/WsV81v8KEKNpq61Fts5PSRMZc9eqQNsC0W+vLYcBCTaqSh
+ tOqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=uUiF2cCeyvLcomA71gNb8UtnumiDOcYwDfMiXjWen6E=;
- b=4F6k78fHdgtRMty41saZPRARxvN6skkc799vTCqD61BhaY/zTZF/WLzV1omWA8b+Gk
- rUtcfoOI0HY63qDJ5ufCIOG6eLS4FA1GmLMQ014T6xU7r977cI/oeF1LrUWeMrvM2YWR
- G/Pm4e/INlKJ6ZmtYFPrVKXpJxwww/CybFwskD457apaD2aTshLaTP9visYeDSq13os3
- GKyEDo5N3V6ozBCxlnDu5yEm5lj8W/Ve9m7uanpV60KNFX/5iA1B7rI43A6Kg2b7z1Pk
- /K02nHLj2s5JNg/QH8S0P4pkCPtu0LffhS6u/0kv857xa8xTqLl7zIz9hzeOLHja/Ujj
- 8kkQ==
-X-Gm-Message-State: AOAM532wIYtByZ64N+q/nUge9C6xyqoyTS2EO/nKowBkhLpW5PcuV5zE
- Z9HrJeuqLARoOvVo4PqkcnptKskHuvg=
-X-Google-Smtp-Source: ABdhPJzS1sKm1vihVbRPixin8ADPxwIwiRu+sSSO0iFE9jTmdDmiJb4scGZK4H9WqPr37m1ISOQPandeoog=
+ bh=E63+zcqes7aObPmDEJrvowSyb7WASC2+JFrjiGuoOMk=;
+ b=nfsTMC02X12vKBgnbsvyhPDRvz20eN1zR7Dzv4Mrhwx8m2I4/XeUt0fGhPzheYCqsQ
+ vVMS6XbeKfTIGV7zHW/ImXDOslyQGVfu8yoqxPZ7STnc49DM3JVQ/irE5HwPnZBWHJCa
+ IeJMHPjIxQwJVYh9a9XiBYSLPWN9PgGz1oDg0FyJW2tQsS2178B8jeWZUiy1frhoUl/D
+ mTUV98u3RNgz+l3rUWuGI+yKbptupkhGVs4gpoCZJLPZJhlV05oVmlXF5PgPjqWyqpiL
+ ERe+diIHkHLIW2fI5agWIzHaWBRnsTOx2qZL2efzSYUtxCdDiTL2Nd80hj2Z5fRfNRWL
+ Zqsw==
+X-Gm-Message-State: AOAM533VqYJSSoforxjCg1AGmkaSzkMMGLzbk+XDWuKBo2uEAsRXQfWT
+ ebY/NKSgUQwXPtSHoVi8Il6nRxASCCU=
+X-Google-Smtp-Source: ABdhPJyxb/nQ01mzKYX4m8bfp03Ule2nAlwfJSHz9a05yqoefRBI+SnT6XPXcdLf6g/xUstLGwYZnueYC+Q=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2181:b0:44c:f4bc:2f74
- with SMTP id
- h1-20020a056a00218100b0044cf4bc2f74mr47622932pfi.68.1635985562987; Wed, 03
- Nov 2021 17:26:02 -0700 (PDT)
-Date: Thu,  4 Nov 2021 00:25:04 +0000
+ (user=seanjc job=sendgmr) by 2002:a62:1b8e:0:b0:44c:9318:f6e1 with
+ SMTP id
+ b136-20020a621b8e000000b0044c9318f6e1mr48578653pfb.84.1635985564791; Wed, 03
+ Nov 2021 17:26:04 -0700 (PDT)
+Date: Thu,  4 Nov 2021 00:25:05 +0000
 In-Reply-To: <20211104002531.1176691-1-seanjc@google.com>
-Message-Id: <20211104002531.1176691-4-seanjc@google.com>
+Message-Id: <20211104002531.1176691-5-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211104002531.1176691-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH v5.5 03/30] KVM: Require total number of memslot pages to fit
- in an unsigned long
+Subject: [PATCH v5.5 04/30] KVM: Open code kvm_delete_memslot() into its only
+ caller
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -109,101 +109,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Explicitly disallow creating more memslot pages than can fit in an
-unsigned long, KVM doesn't correctly handle a total number of memslot
-pages that doesn't fit in an unsigned long and remedying that would be a
-waste of time.
+Fold kvm_delete_memslot() into __kvm_set_memory_region() to free up the
+"kvm_delete_memslot()" name for use in a future helper.  The delete logic
+isn't so complex/long that it truly needs a helper, and it will be
+simplified a wee bit further in upcoming commits.
 
-For a 64-bit kernel, this is a nop as memslots are not allowed to overlap
-in the gfn address space.
-
-With a 32-bit kernel, userspace can at most address 3gb of virtual memory,
-whereas wrapping the total number of pages would require 4tb+ of guest
-physical memory.  Even with x86's second address space for SMM, userspace
-would need to alias all of guest memory more than one _thousand_ times.
-And on older x86 hardware with MAXPHYADDR < 43, the guest couldn't
-actually access any of those aliases even if userspace lied about
-guest.MAXPHYADDR.
-
-On 390 and arm64, this is a nop as they don't support 32-bit hosts.
-
-On x86, practically speaking this is simply acknowledging reality as the
-existing kvm_mmu_calculate_default_mmu_pages() assumes the total number
-of pages fits in an "unsigned long".
-
-On PPC, this is likely a nop as every flavor of PPC KVM assumes gfns (and
-gpas!) fit in unsigned long.  arch/powerpc/kvm/book3s_32_mmu_host.c goes
-a step further and fails the build if CONFIG_PTE_64BIT=y, which
-presumably means that it does't support 64-bit physical addresses.
-
-On MIPS, this is also likely a nop as the core MMU helpers assume gpas
-fit in unsigned long, e.g. see kvm_mips_##name##_pte.
-
-And finally, RISC-V is a "don't care" as it doesn't exist in any release,
-i.e. there is no established ABI to break.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/kvm_host.h |  1 +
- virt/kvm/kvm_main.c      | 19 +++++++++++++++++++
- 2 files changed, 20 insertions(+)
+ virt/kvm/kvm_main.c | 42 +++++++++++++++++-------------------------
+ 1 file changed, 17 insertions(+), 25 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 60a35d9fe259..d8e92d4a78d8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -551,6 +551,7 @@ struct kvm {
- 	 */
- 	struct mutex slots_arch_lock;
- 	struct mm_struct *mm; /* userspace tied to this vm */
-+	unsigned long nr_memslot_pages;
- 	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
- 	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
- 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 83287730389f..264c4b16520b 100644
+index 264c4b16520b..6171ddb3e31c 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1623,6 +1623,15 @@ static int kvm_set_memslot(struct kvm *kvm,
- 	update_memslots(slots, new, change);
- 	slots = install_new_memslots(kvm, as_id, slots);
+@@ -1653,29 +1653,6 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	return r;
+ }
  
-+	/*
-+	 * Update the total number of memslot pages before calling the arch
-+	 * hook so that architectures can consume the result directly.
-+	 */
-+	if (change == KVM_MR_DELETE)
-+		kvm->nr_memslot_pages -= old.npages;
-+	else if (change == KVM_MR_CREATE)
-+		kvm->nr_memslot_pages += new->npages;
-+
- 	kvm_arch_commit_memory_region(kvm, mem, &old, new, change);
+-static int kvm_delete_memslot(struct kvm *kvm,
+-			      const struct kvm_userspace_memory_region *mem,
+-			      struct kvm_memory_slot *old, int as_id)
+-{
+-	struct kvm_memory_slot new;
+-
+-	if (!old->npages)
+-		return -EINVAL;
+-
+-	if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
+-		return -EIO;
+-
+-	memset(&new, 0, sizeof(new));
+-	new.id = old->id;
+-	/*
+-	 * This is only for debugging purpose; it should never be referenced
+-	 * for a removed memslot.
+-	 */
+-	new.as_id = as_id;
+-
+-	return kvm_set_memslot(kvm, mem, &new, as_id, KVM_MR_DELETE);
+-}
+-
+ /*
+  * Allocate some memory and give it an address in the guest physical address
+  * space.
+@@ -1732,8 +1709,23 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		old.id = id;
+ 	}
  
- 	/* Free the old memslot's metadata.  Note, this is the full copy!!! */
-@@ -1653,6 +1662,9 @@ static int kvm_delete_memslot(struct kvm *kvm,
- 	if (!old->npages)
- 		return -EINVAL;
- 
-+	if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
-+		return -EIO;
-+
- 	memset(&new, 0, sizeof(new));
- 	new.id = old->id;
- 	/*
-@@ -1736,6 +1748,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	if (!old.npages) {
- 		change = KVM_MR_CREATE;
- 		new.dirty_bitmap = NULL;
-+
-+		/*
-+		 * To simplify KVM internals, the total number of pages across
-+		 * all memslots must fit in an unsigned long.
-+		 */
-+		if ((kvm->nr_memslot_pages + new.npages) < kvm->nr_memslot_pages)
+-	if (!mem->memory_size)
+-		return kvm_delete_memslot(kvm, mem, &old, as_id);
++	if (!mem->memory_size) {
++		if (!old.npages)
 +			return -EINVAL;
- 	} else { /* Modify an existing slot. */
- 		if ((new.userspace_addr != old.userspace_addr) ||
- 		    (new.npages != old.npages) ||
++
++		if (WARN_ON_ONCE(kvm->nr_memslot_pages < old.npages))
++			return -EIO;
++
++		memset(&new, 0, sizeof(new));
++		new.id = id;
++		/*
++		 * This is only for debugging purpose; it should never be
++		 * referenced for a removed memslot.
++		 */
++		new.as_id = as_id;
++
++		return kvm_set_memslot(kvm, mem, &new, as_id, KVM_MR_DELETE);
++	}
+ 
+ 	new.as_id = as_id;
+ 	new.id = id;
 -- 
 2.33.1.1089.g2158813163f-goog
 
