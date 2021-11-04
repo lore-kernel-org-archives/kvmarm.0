@@ -2,78 +2,76 @@ Return-Path: <SRS0=oZIB=PX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E685FC433F5
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F5BC433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:21 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 83C2B611CA
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 83C2B611CA
+	by mail.kernel.org (Postfix) with ESMTP id C68CA611CA
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C68CA611CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3521D4B10D;
-	Wed,  3 Nov 2021 20:26:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 77E6A4B131;
+	Wed,  3 Nov 2021 20:26:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id txCxHjQAWjyn; Wed,  3 Nov 2021 20:26:18 -0400 (EDT)
+	with ESMTP id tqA5Jup84c0a; Wed,  3 Nov 2021 20:26:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 781964B19F;
-	Wed,  3 Nov 2021 20:26:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 975844B159;
+	Wed,  3 Nov 2021 20:26:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 903B54B12E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ADA84B0C2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uGFByQSdVXMI for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Nov 2021 20:26:14 -0400 (EDT)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A09D34B0C2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:12 -0400 (EDT)
-Received: by mail-pl1-f201.google.com with SMTP id
- k9-20020a170902c40900b001421e921ccaso1431977plk.22
- for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Nov 2021 17:26:12 -0700 (PDT)
+ with ESMTP id YNKORXnMZPRT for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Nov 2021 20:26:15 -0400 (EDT)
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
+ [209.85.215.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E5CE94B16E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:14 -0400 (EDT)
+Received: by mail-pg1-f201.google.com with SMTP id
+ w13-20020a63934d000000b002a2935891daso2363369pgm.15
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Nov 2021 17:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=tLQvwVMFuRU1rudmVd+Ot8DGDwWCKV2XWE4z9OvxcSI=;
- b=aidjRg109rDQhcbEOaDvYUP/J6xeFiJXWQHPB/9inpIU47CGJj4EB+RwhcIG070Mie
- lVHTfvEeNG2Brzpgw8EZNdAVeUVZ4nNqCUo0Ix5XLJ0H18oJo/2rFOKMzl6fWLSJY191
- J6xXKGp+3siToXIqVebLKzjgDI+yAMnV78lg50hWKNPX/pVq2TrOflawSIczG+Lqobke
- Z0ZzafsHPcdo8PEDuhw/rn2m58dsopFaT3sRkFsFmilo83Ii5s7nnixu4BD3y0cdffxJ
- kzs8TJbXMv5IItYIkJSv/EhZBtHn1F5Yu5VOIhoRSGmVNkoq+MSSDwRM5budJwMaPSM5
- i1ew==
+ bh=8x8y6LCkLptxfKHX5+pDaTNp73wBECOiN1YdxqMK+rA=;
+ b=Kwf8l4ALLidbOCnsA8IZb7EGVbQY2I/GyIc70v/xPgAN2uNZmJzzLzZJfwAX2uOOCO
+ bOK9U8USa/+T5EGJ5WM+xo1wGM21VgQud3S9i76kNITLTzwA0wNdnUr/fJDAgqhSvhap
+ Yw0ASqeY//wjIN0mhEQ3qwyRthBADSpw3C4ZFZ4+KorPOGjjv9GHHalj2Z0JVLcN7rKX
+ 1aJXnhddEMDTeyAz0wqrWJZzkxWK24hOVug2NjMIF6/CfNf9YTCoQnGyCXWnO5Qwes4j
+ g5HbrauvOLkXEcvWsWbG0nodw7IIljy/H4UiUpBEQUah5lbLSlwy7/6wMiTLEuWxciTS
+ tAtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=tLQvwVMFuRU1rudmVd+Ot8DGDwWCKV2XWE4z9OvxcSI=;
- b=VJSRQXNUE8fPNEhsoRVdkAwBXHuJY4pyIDjGWqejEKB1Us78Ccr02/vGMs0LuweaXx
- wJa4t1KGzcQNgWM4xfLoKbGFDP+yyG3+SjQVOo169KOllzf37b7qeCQdcWwaRBRK9QY5
- lNVGgoGi6vaeEIDESprL/HDi8kePQ619lZL3+BOLWOYvq1YKZ2kzNREQbXN5ieHyoUMJ
- FB870NMBkb9P9Pk0+Y6bFck+25Gt4rSpPFkiB8ofCUTcooOxvY7OILe4yLdfPprUt+nW
- DFtsiJzPPh8TpEu9xGJqYAuW+5EO13HPUdXbLw3llku4dYiARqr/ZXOiALlbIaOImEIP
- RQ1Q==
-X-Gm-Message-State: AOAM532LrrDawDuPLsZ9wwWV1HvKkQvtuTfnHUY610HUuUS5jxuep4v0
- k1Sv91W5jLMcMaJcXomeQ07WOucl+EI=
-X-Google-Smtp-Source: ABdhPJwCsMzZuRxv6iw0pTuYU4/wjVIfD1uNyeuH4Gna3eUrPsMPSwpB1c5wUSrPuzkGj84qqgXi63hO2s0=
+ bh=8x8y6LCkLptxfKHX5+pDaTNp73wBECOiN1YdxqMK+rA=;
+ b=Ng3oSMNHITe8efR3aYdmBtMhhLFoPmSBV4GJoHjLx2VVh31+BSIQsLnqJRXncwTs9y
+ +T35oT1MQ7hvJSqpO/o4uN4IlNIprKb3oSJzqytOa4qBlluTC4AO/0GDI3P3e7/xpc/c
+ yYHdnzuaHe11BMtUJ2JgTq0NoIV6RHWCatn8rV95rPP2GHy/dLw2fgtRBj5VuwToYFcZ
+ HYH2tw1dyvLz8I23jPSQ+z1l1Q0VIG3M2SrVPQ3eTSpoJMSRkdn4DoxKaIndaOvgq616
+ lUo8Spkc5CznYz0riMZMnbmXT5QW09GPcJS2XHTUSX+FgB4/zJTEHl/1J0oAt3vNymvw
+ 7tgw==
+X-Gm-Message-State: AOAM533nGes/156QOdz3AITLdlMsy57x28po9R+JzYmfhHRh1ARIESUp
+ KFpdam+MMOJI7W62gFVWgkE6w8MVlBA=
+X-Google-Smtp-Source: ABdhPJxsJ29Wj32AtuAm6joDY8iQebT4Rnu7/phTa+MfeSdX22KfADwkK1eYIPGppvLFyQSyOgzQ6GfE4Fg=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1484:b0:48c:2e58:8d39
- with SMTP id
- v4-20020a056a00148400b0048c2e588d39mr11085289pfu.13.1635985571770; Wed, 03
- Nov 2021 17:26:11 -0700 (PDT)
-Date: Thu,  4 Nov 2021 00:25:09 +0000
+ (user=seanjc job=sendgmr) by 2002:a17:90a:5285:: with SMTP id
+ w5mr261308pjh.1.1635985573544; Wed, 03 Nov 2021 17:26:13 -0700 (PDT)
+Date: Thu,  4 Nov 2021 00:25:10 +0000
 In-Reply-To: <20211104002531.1176691-1-seanjc@google.com>
-Message-Id: <20211104002531.1176691-9-seanjc@google.com>
+Message-Id: <20211104002531.1176691-10-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211104002531.1176691-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH v5.5 08/30] KVM: arm64: Use "new" memslot instead of userspace
- memory region
+Subject: [PATCH v5.5 09/30] KVM: MIPS: Drop pr_debug from memslot commit to
+ avoid using "mem"
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -109,61 +107,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Get the slot ID, hva, etc... from the "new" memslot instead of the
-userspace memory region when preparing/committing a memory region.  This
-will allow a future commit to drop @mem from the prepare/commit hooks
-once all architectures convert to using "new".
+Remove an old (circa 2012) kvm_debug from kvm_arch_commit_memory_region()
+to print basic information when committing a memslot change.  The primary
+motivation for removing the kvm_debug is to avoid using @mem, the user
+memory region, so that said param can be removed.
 
-Opportunistically wait to get the hva begin+end until after filtering out
-the DELETE case in anticipation of a future commit passing NULL for @new
-when deleting a memslot.
+Alternatively, the debug message could be converted to use @new, but that
+would require synthesizing select state to play nice with the DELETED
+case, which will pass NULL for @new in the future.  And there's no
+argument to be had for dumping generic information in an arch callback,
+i.e. if there's a good reason for the debug message, then it belongs in
+common KVM code where all architectures can benefit.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/mmu.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ arch/mips/kvm/mips.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index cc41eadfbbf4..21213cba7c47 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1473,14 +1473,14 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
- 	 * memory slot is write protected.
- 	 */
--	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-+	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
- 		/*
- 		 * If we're with initial-all-set, we don't need to write
- 		 * protect any pages because they're all reported as dirty.
- 		 * Huge pages and normal pages will be write protect gradually.
- 		 */
- 		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
--			kvm_mmu_wp_memory_region(kvm, mem->slot);
-+			kvm_mmu_wp_memory_region(kvm, new->id);
- 		}
- 	}
- }
-@@ -1491,8 +1491,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index 8c94cd4093af..b7aa8fa4a5fb 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -249,10 +249,6 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
  {
--	hva_t hva = mem->userspace_addr;
--	hva_t reg_end = hva + mem->memory_size;
-+	hva_t hva, reg_end;
- 	int ret = 0;
+ 	int needs_flush;
  
- 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
-@@ -1506,6 +1505,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	if ((new->base_gfn + new->npages) > (kvm_phys_size(kvm) >> PAGE_SHIFT))
- 		return -EFAULT;
- 
-+	hva = new->userspace_addr;
-+	reg_end = hva + (new->npages << PAGE_SHIFT);
-+
- 	mmap_read_lock(current->mm);
+-	kvm_debug("%s: kvm: %p slot: %d, GPA: %llx, size: %llx, QVA: %llx\n",
+-		  __func__, kvm, mem->slot, mem->guest_phys_addr,
+-		  mem->memory_size, mem->userspace_addr);
+-
  	/*
- 	 * A memory region could potentially cover multiple VMAs, and any holes
+ 	 * If dirty page logging is enabled, write protect all pages in the slot
+ 	 * ready for dirty logging.
 -- 
 2.33.1.1089.g2158813163f-goog
 
