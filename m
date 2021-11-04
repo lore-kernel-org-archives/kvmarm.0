@@ -2,77 +2,77 @@ Return-Path: <SRS0=oZIB=PX=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C83C4C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C9BC433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:54 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7D7C4611C7
-	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7D7C4611C7
+	by mail.kernel.org (Postfix) with ESMTP id 0D9F3611C7
+	for <kvmarm@archiver.kernel.org>; Thu,  4 Nov 2021 00:26:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0D9F3611C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DC744B119;
-	Wed,  3 Nov 2021 20:26:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB66C4B1FA;
+	Wed,  3 Nov 2021 20:26:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fsq+JkHrO6tg; Wed,  3 Nov 2021 20:26:51 -0400 (EDT)
+	with ESMTP id F+S1aMhavksy; Wed,  3 Nov 2021 20:26:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04F334B0DB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 210F64B1B3;
 	Wed,  3 Nov 2021 20:26:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C90D4B1A4
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FCA74B1BD
  for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PMu42K0-bfiD for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Nov 2021 20:26:47 -0400 (EDT)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DC5F4B0A0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:46 -0400 (EDT)
-Received: by mail-pl1-f201.google.com with SMTP id
- m17-20020a170902db1100b001421cb34857so1662037plx.15
- for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Nov 2021 17:26:46 -0700 (PDT)
+ with ESMTP id wEhIUwkcyDqh for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Nov 2021 20:26:48 -0400 (EDT)
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
+ [209.85.215.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF2064B1DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Nov 2021 20:26:47 -0400 (EDT)
+Received: by mail-pg1-f201.google.com with SMTP id
+ x14-20020a63cc0e000000b002a5bc462947so2350471pgf.20
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 03 Nov 2021 17:26:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=WFKHlikOkpZJpdiLsH4aJihxblDmBHivJrGM8NlUt9c=;
- b=CRXCwBEqUdB8xBBWvbn9rvEyj5xPoJz0Yiq4O9bYP8Cnw9QN2e+/rU9Z5zno6u5DVK
- hNycH7Nu/XPtuVsGfPUbSSTGueoe3SJ6D/+uQvX8yXVdBR6JZwONNcY2XuE+tNblfPrg
- DzYe3VWSE9iz+kLrReWCKtPXc8mvDFxOyEZwsrJmqEqT2dddKgFB7DSFo4206QBqUe3l
- k94nG8IGw8Qk397gTW+mXweZuq2D9/OlhQu3qaAukGk74Ifow4G0x6SSEWRb7kyDOXHM
- mtFt8FUjKSwLn45cNEc6CmGXWE+Jks8EonoUKThzOIBSyaz6+hVlcyMpoJKcO82sckqF
- 5Fzw==
+ bh=eDJLgTwa4Mq+pfIoYabE+ramu2f6Q5nSW9TL6LbQQsI=;
+ b=AwZyd1OGNd2jGC9KPlXvy0oV+JkIiHs9n78p1LAJEXYu3abpzCJ4C2qjD9WEdimC8h
+ /U06PEKK8296gAr9y+mGJ7YU/AYB7mMLshQmjbfJT2JjYIs1QGfBkPinN0rTDsM0mJ8v
+ y1VXf6q7OT9SnMxtkJVPvG6qnljmv27pg/hk28jYo+otmvhiKA+XTi2uKknvqQboocCi
+ bNfT4/DvRM5KrXSU8LLRMexndgtLytkukMKS+6YJqn2ZlSHrKvNjmLuH6tB44y+OnCgy
+ GssafhzFt1xigLvtK4LdQ29M/UL2+eLN8sYzUERpdj2aCM8q7wJx2XZ+IzRmu3TIf4VS
+ eNLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=WFKHlikOkpZJpdiLsH4aJihxblDmBHivJrGM8NlUt9c=;
- b=vx5TeeDghd8l8fiGKKxKpWdQtwY84+fW5GED05A5GkwdfJy8L2U8j44G6NeSmWBtrw
- U8GTxXOP9oGQiMYh0dAGeFmuvJPCW66xyJTp0cegdCboYn6f7O0ITq2/m3t+q8U2339z
- LsMu2iyhV8eDoAja9ZUkOfkkEWYWIsb4wfrE17f7ws67uazR/yZ6PF7O4vtNWW7gpo6U
- BKpzQbUGwK7ZkTdOEdpXwI07TEPO8MuU71p6+y7USltwnfT8zsS0mcGIAMfi1uvRK7/y
- iYF0czT8sxlniLlbmku/MQFGJe9zjBJIFyY4T5TH0RYS1e+3OqPk5Kgmx92QocBJilMO
- AGpw==
-X-Gm-Message-State: AOAM531UW5tAfRCjc4gur0xW/Mwkvz2wkBFHR+BplA3bnaYbmAFMcdTR
- CXh09RDzyixUWcm6PuEhsgt9Gke9FUA=
-X-Google-Smtp-Source: ABdhPJxoDZvqdkusy2MitxT+1dAwOu5YXFxH0crl6GBFlwKLx55yi8xQIaLV4Wu5oujGScgLca++ESEBh4I=
+ bh=eDJLgTwa4Mq+pfIoYabE+ramu2f6Q5nSW9TL6LbQQsI=;
+ b=qG+/TJeD7dfDQxIgOer936lms0IP+cmLEJI+ToHuH+V/eb/q9urPDgW1wY9soubRlT
+ 1CeR+omxyCkGU6xMzlklAZmnZVsr/HDSS3H55FBBoB4hwGeaDh7hdZ0fyJ5cPE+zrKKR
+ fbXoxuMUCg5Xstxo9ApzDhPo/PQtezI+ZZ6AIrIAxG51G8LPETV23kc6mDEQEV93UyN3
+ q5CuhRtI9oGkyWarKu5ubeKhGVaDqK6Zl6p4Dql0omc9k4IvKvLCZs3PYeBu0ZeBrdQF
+ MuhZpVGI0rr5TEW9JjzI/fFnUAiHgMZ7NDm+FrL4pzq31Nv70CF6f/7xGHwBVTYs4Kdw
+ RJWw==
+X-Gm-Message-State: AOAM532L3HOqMBERsjxanpuMkpC8ShHIR0rQzZlQWUXynuhWwVFX7+nd
+ oV5lD9j8VHzhQUS3lo69EXGh+W64YGk=
+X-Google-Smtp-Source: ABdhPJyj4rUoqs2915nhSyoqX9YGWRaiikX568lnB/vn8bpIGUoxqu2M9ISziOOEMnXgiMyENpFmkaA/Mco=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1994:b0:47e:64e5:a1b3
+ (user=seanjc job=sendgmr) by 2002:a17:902:ab50:b0:13f:4c70:9322
  with SMTP id
- d20-20020a056a00199400b0047e64e5a1b3mr42939171pfl.64.1635985605387; Wed, 03
- Nov 2021 17:26:45 -0700 (PDT)
-Date: Thu,  4 Nov 2021 00:25:28 +0000
+ ij16-20020a170902ab5000b0013f4c709322mr41332797plb.89.1635985607093; Wed, 03
+ Nov 2021 17:26:47 -0700 (PDT)
+Date: Thu,  4 Nov 2021 00:25:29 +0000
 In-Reply-To: <20211104002531.1176691-1-seanjc@google.com>
-Message-Id: <20211104002531.1176691-28-seanjc@google.com>
+Message-Id: <20211104002531.1176691-29-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211104002531.1176691-1-seanjc@google.com>
 X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH v5.5 27/30] KVM: Optimize gfn lookup in kvm_zap_gfn_range()
+Subject: [PATCH v5.5 28/30] KVM: Optimize overlapping memslots check
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>, 
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -110,135 +110,99 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 
-Introduce a memslots gfn upper bound operation and use it to optimize
-kvm_zap_gfn_range().
-This way this handler can do a quick lookup for intersecting gfns and won't
-have to do a linear scan of the whole memslot set.
+Do a quick lookup for possibly overlapping gfns when creating or moving
+a memslot instead of performing a linear scan of the whole memslot set.
 
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-Not-signed-off-by: Sean Christopherson <seanjc@google.com>
+[sean: tweaked params to avoid churn in future cleanup]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c   | 11 +++++--
- include/linux/kvm_host.h | 69 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 78 insertions(+), 2 deletions(-)
+ virt/kvm/kvm_main.c | 46 +++++++++++++++++++++++++++++++--------------
+ 1 file changed, 32 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 09ff0ccaa203..14e41278c069 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5714,16 +5714,20 @@ static bool __kvm_zap_rmaps(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- {
- 	const struct kvm_memory_slot *memslot;
- 	struct kvm_memslots *slots;
-+	struct rb_node *node;
- 	bool flush = false;
- 	gfn_t start, end;
--	int i, bkt;
-+	int i, idx;
- 
- 	if (!kvm_memslots_have_rmaps(kvm))
- 		return flush;
- 
- 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
- 		slots = __kvm_memslots(kvm, i);
--		kvm_for_each_memslot(memslot, bkt, slots) {
-+		idx = slots->node_idx;
-+
-+		kvm_for_each_memslot_in_gfn_range(node, slots, gfn_start, gfn_end) {
-+			memslot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
- 			start = max(gfn_start, memslot->base_gfn);
- 			end = min(gfn_end, memslot->base_gfn + memslot->npages);
- 			if (start >= end)
-@@ -5747,6 +5751,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	bool flush;
- 	int i;
- 
-+	if (WARN_ON_ONCE(gfn_end <= gfn_start))
-+		return;
-+
- 	write_lock(&kvm->mmu_lock);
- 
- 	kvm_inc_notifier_count(kvm, gfn_start, gfn_end);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 6888f3c2e04b..810a5b958697 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -832,6 +832,75 @@ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
- 	return NULL;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d095e01838bf..d22e40225703 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1800,6 +1800,29 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	return 0;
  }
  
-+static inline
-+struct rb_node *kvm_memslots_gfn_upper_bound(struct kvm_memslots *slots, gfn_t gfn)
++static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
++				      gfn_t start, gfn_t end)
 +{
 +	int idx = slots->node_idx;
-+	struct rb_node *node, *result = NULL;
-+
-+	for (node = slots->gfn_tree.rb_node; node; ) {
-+		struct kvm_memory_slot *slot;
-+
-+		slot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
-+		if (gfn < slot->base_gfn) {
-+			result = node;
-+			node = node->rb_left;
-+		} else
-+			node = node->rb_right;
-+	}
-+
-+	return result;
-+}
-+
-+static inline
-+struct rb_node *kvm_for_each_in_gfn_first(struct kvm_memslots *slots, gfn_t start)
-+{
 +	struct rb_node *node;
 +
-+	/*
-+	 * Find the slot with the lowest gfn that can possibly intersect with
-+	 * the range, so we'll ideally have slot start <= range start
-+	 */
-+	node = kvm_memslots_gfn_upper_bound(slots, start);
-+	if (node) {
-+		struct rb_node *pnode;
++	kvm_for_each_memslot_in_gfn_range(node, slots, start, end) {
++		struct kvm_memory_slot *cslot;
++		gfn_t cend;
 +
-+		/*
-+		 * A NULL previous node means that the very first slot
-+		 * already has a higher start gfn.
-+		 * In this case slot start > range start.
-+		 */
-+		pnode = rb_prev(node);
-+		if (pnode)
-+			node = pnode;
-+	} else {
-+		/* a NULL node below means no slots */
-+		node = rb_last(&slots->gfn_tree);
++		cslot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
++		cend = cslot->base_gfn + cslot->npages;
++		if (cslot->id == id)
++			continue;
++
++		/* kvm_for_each_in_gfn_no_more() guarantees that cslot->base_gfn < nend */
++		if (cend > start)
++			return true;
 +	}
 +
-+	return node;
++	return false;
 +}
-+
-+static inline
-+bool kvm_for_each_in_gfn_no_more(struct kvm_memslots *slots, struct rb_node *node, gfn_t end)
-+{
-+	struct kvm_memory_slot *memslot;
-+
-+	memslot = container_of(node, struct kvm_memory_slot, gfn_node[slots->node_idx]);
-+
-+	/*
-+	 * If this slot starts beyond or at the end of the range so does
-+	 * every next one
-+	 */
-+	return memslot->base_gfn >= end;
-+}
-+
-+/* Iterate over each memslot *possibly* intersecting [start, end) range */
-+#define kvm_for_each_memslot_in_gfn_range(node, slots, start, end)	\
-+	for (node = kvm_for_each_in_gfn_first(slots, start);		\
-+	     node && !kvm_for_each_in_gfn_no_more(slots, node, end);	\
-+	     node = rb_next(node))					\
 +
  /*
-  * KVM_SET_USER_MEMORY_REGION ioctl allows the following operations:
-  * - create a new memory slot
+  * Allocate some memory and give it an address in the guest physical address
+  * space.
+@@ -1811,8 +1834,9 @@ static int kvm_set_memslot(struct kvm *kvm,
+ int __kvm_set_memory_region(struct kvm *kvm,
+ 			    const struct kvm_userspace_memory_region *mem)
+ {
+-	struct kvm_memory_slot *old, *tmp;
++	struct kvm_memory_slot *old;
+ 	struct kvm_memory_slot new;
++	struct kvm_memslots *slots;
+ 	enum kvm_mr_change change;
+ 	int as_id, id;
+ 	int r;
+@@ -1841,11 +1865,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+ 		return -EINVAL;
+ 
++	slots = __kvm_memslots(kvm, as_id);
++
+ 	/*
+ 	 * Note, the old memslot (and the pointer itself!) may be invalidated
+ 	 * and/or destroyed by kvm_set_memslot().
+ 	 */
+-	old = id_to_memslot(__kvm_memslots(kvm, as_id), id);
++	old = id_to_memslot(slots, id);
+ 
+ 	if (!mem->memory_size) {
+ 		if (!old || !old->npages)
+@@ -1894,18 +1920,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 			return 0;
+ 	}
+ 
+-	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
+-		int bkt;
+-
+-		/* Check for overlaps */
+-		kvm_for_each_memslot(tmp, bkt, __kvm_memslots(kvm, as_id)) {
+-			if (tmp->id == id)
+-				continue;
+-			if (!((new.base_gfn + new.npages <= tmp->base_gfn) ||
+-			      (new.base_gfn >= tmp->base_gfn + tmp->npages)))
+-				return -EEXIST;
+-		}
+-	}
++	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
++	    kvm_check_memslot_overlap(slots, id, new.base_gfn,
++				      new.base_gfn + new.npages))
++		return -EEXIST;
+ 
+ 	return kvm_set_memslot(kvm, old, &new, change);
+ }
 -- 
 2.33.1.1089.g2158813163f-goog
 
