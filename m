@@ -2,83 +2,83 @@ Return-Path: <SRS0=hs0s=PY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CCFC433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 20:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87CF3C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 20:12:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id CBC6861183
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 20:04:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CBC6861183
+	by mail.kernel.org (Postfix) with ESMTP id 013FF60FC2
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 20:12:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 013FF60FC2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C8BE4A1B0;
-	Fri,  5 Nov 2021 16:04:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 783064B16E;
+	Fri,  5 Nov 2021 16:12:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0zMf8mq3u4WV; Fri,  5 Nov 2021 16:04:03 -0400 (EDT)
+	with ESMTP id o6-wG0zxwx54; Fri,  5 Nov 2021 16:12:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 028E54B163;
-	Fri,  5 Nov 2021 16:04:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01A5C4B10C;
+	Fri,  5 Nov 2021 16:12:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 780F84A1B0
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 16:04:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACDE24B0DB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 16:12:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BEwcVliflLRX for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Nov 2021 16:03:59 -0400 (EDT)
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com
- [209.85.210.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 916094B160
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 16:03:59 -0400 (EDT)
-Received: by mail-pf1-f171.google.com with SMTP id g11so9808080pfv.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 05 Nov 2021 13:03:59 -0700 (PDT)
+ with ESMTP id PDM+jFTV2c1S for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Nov 2021 16:12:18 -0400 (EDT)
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com
+ [209.85.214.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 057044A193
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 16:12:17 -0400 (EDT)
+Received: by mail-pl1-f178.google.com with SMTP id n8so11755594plf.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 05 Nov 2021 13:12:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=PN/lxoi+e5tCVO5pPjxKDOBewixY35Ifh+V+MQmKh2Y=;
- b=f5rhbj9pb5GgTT0825+tujieonyli7SwThgHMXaD3NP3Mog1A094HPsqZZlkGOJ/Q+
- r3ZJnNzRBB3NhkN8VE/G5vrgRKhdENk2u9DuDgAERoqocOOeFGdBNvbmuevHRGuv/PzT
- 2oM9e8uLyVHxjP0SBflIjCbS2YVvFiGTQPV4FXb1yFhkAV2Dwb/b8vz1V1fKzExBfVLb
- Xj15HqIIyyCqzeQTYv54iKEeMFkAbdprvcVA6NgVuqrrvC5EFRz5/vl/ehO9cRPXvPHn
- fwuRS81bHhHxNVlMCQCaLVr17+7bYqD4G5MIyYU1T+K/ui2sRBFDHO8DZRxHvFM9pN8W
- 0Kfw==
+ bh=qri/F8nrhMHPEDYa4uQBt3JEMiHHv9C5/Jmdnno/6TE=;
+ b=cIEyP8aWcsIt4l1x4nbkEBmKTwuf4VKIqebtH0CamXLLrZvDTlRgHn6uwPaIY1qdYN
+ Fgiy/kNzJgL6/SmGcy37HITOWEPVyIdCiclDP5nOj+WydYi2O63mGY95RUeOrxL9PvWh
+ Gfm1SPQHjJDMZsGGN4DcnnN4SM2ODaCqT/kJ/VZE7yvR3zhk2fJEFqV9YFGRTqZ+jsnj
+ Pgh/W1HeccTmRVlizmn2ItiqkKcXfVUFRASIjGOCbR0SyLm177P2qgIaXEww6aWSnQar
+ T5v/4lUFkU6kuCFZ6hk4p9nBXBYb6gEsGdXh01NXvay8YV3v3E29TKauFH/h+FbOOdHd
+ GGHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=PN/lxoi+e5tCVO5pPjxKDOBewixY35Ifh+V+MQmKh2Y=;
- b=rvs0mepdsaATwE+No4Po1f2buxzEt+Iu2my29n+tLuxj8pxjB3UBOHuA3ahHVM2KAc
- rukbX1RiH7VKaAKU63MB+fud8MZSl+1h1C19NphJM3TOqs/U3eFa+UxIabv00u/FpZ0O
- 3lsuN1a0gv3J+TYKfujyYN7Jgg+LiJ8MkXKEmB49v/Q9X06Rhzfo3AvlxYIpEj4gClQ5
- jIvQkm2yW2PsQM5bjBGRhFCOks3S1f2lp/LNg461vJLStVtKKFbjMglTX8bGKWX185GJ
- oDetUhTFFNgZ/ry1mgJJiHzjORC6VLa0WvQG5OFOWvKitY3LGjhg+7jE5TIjE+wD9Trs
- wveQ==
-X-Gm-Message-State: AOAM5319809vuntMKaIFgoaDWkA2TNJ/TpOBVFA7pXzhEXdNv/PdYtfG
- DLohxusRNmgDUFqP1wfrEv16IQ==
-X-Google-Smtp-Source: ABdhPJyd4QYc+InpdUIun9J0aiQkUM13aDBr60E6YJVxeHTQZZxRXWXSmp46OuKH+1B6vf2ZVsVbyQ==
-X-Received: by 2002:a05:6a00:22d1:b0:494:72c5:803b with SMTP id
- f17-20020a056a0022d100b0049472c5803bmr10239284pfj.84.1636142638330; 
- Fri, 05 Nov 2021 13:03:58 -0700 (PDT)
+ bh=qri/F8nrhMHPEDYa4uQBt3JEMiHHv9C5/Jmdnno/6TE=;
+ b=pZRUILnh2FcjB0gP+pRwgk3rTkJmF23RKveIUol41feIhmTfPy2xKAD9WZLuuirsyQ
+ ff3UP41KBfEEGjqQoHThal499QcoB0rNq8pfo2XE1gmQ8RmuChZo0Tsf64tHJaa7M3qr
+ eWIO5OAv48ncGoncR2rB7tAj1LqKT0lR2uXzoKwccUBu8WgyLpE0Suyb9Xjc3I/IW/rH
+ ag7yKWXbElksy3qIxLyH2/GlDPAts/SUFXNNKoS8Ag+h7f11k9EASUID+9s3tVdmp9Qb
+ aYboV9xRUS/oqinSHzLc0C85ot1KsHWC7ARq+ZnHS1r9u0CNx5ZIWkydqSfLb0h+eM/7
+ iyfw==
+X-Gm-Message-State: AOAM5332kvDHaTAebHIdRy+b7fXqgDJPbMspd3wRnriRmpx04vta1Nq/
+ MlASTHD7++jbAKz6Iv3+rVNpoA==
+X-Google-Smtp-Source: ABdhPJw8Bn6P+IE+Qzeo9KqPziiJGvYCB1J6tl8vP7MYz520ZFYD+Cv/5edLbN+g+nahR9ZSMbCUMA==
+X-Received: by 2002:a17:902:758b:b0:13e:8b1:e49f with SMTP id
+ j11-20020a170902758b00b0013e08b1e49fmr53627978pll.6.1636143136683; 
+ Fri, 05 Nov 2021 13:12:16 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id c198sm6639870pga.6.2021.11.05.13.03.57
+ by smtp.gmail.com with ESMTPSA id a20sm7760762pff.57.2021.11.05.13.12.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Nov 2021 13:03:57 -0700 (PDT)
-Date: Fri, 5 Nov 2021 20:03:53 +0000
+ Fri, 05 Nov 2021 13:12:16 -0700 (PDT)
+Date: Fri, 5 Nov 2021 20:12:12 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 4/5] KVM: x86: Use kvm_get_vcpu() instead of open-coded
- access
-Message-ID: <YYWOKTYHhJywwCRk@google.com>
+Subject: Re: [PATCH 1/5] KVM: Move wiping of the kvm->vcpus array to common
+ code
+Message-ID: <YYWQHBwD4nBLo9qi@google.com>
 References: <20211105192101.3862492-1-maz@kernel.org>
- <20211105192101.3862492-5-maz@kernel.org>
+ <20211105192101.3862492-2-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20211105192101.3862492-5-maz@kernel.org>
+In-Reply-To: <20211105192101.3862492-2-maz@kernel.org>
 Cc: Juergen Gross <jgross@suse.com>, Anup Patel <anup.patel@wdc.com>,
  Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
  Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -106,67 +106,37 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, Nov 05, 2021, Marc Zyngier wrote:
-> As we are about to change the way vcpus are allocated, mandate
-> the use of kvm_get_vcpu() instead of open-coding the access.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/x86/kvm/vmx/posted_intr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index 5f81ef092bd4..82a49720727d 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -272,7 +272,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
->  
->  	if (!kvm_arch_has_assigned_device(kvm) ||
->  	    !irq_remapping_cap(IRQ_POSTING_CAP) ||
-> -	    !kvm_vcpu_apicv_active(kvm->vcpus[0]))
-> +	    !kvm_vcpu_apicv_active(kvm_get_vcpu(kvm, 0)))
+> All architectures have similar loops iterating over the vcpus,
+> freeing one vcpu at a time, and eventually wiping the reference
+> off the vcpus array. They are also inconsistently taking
+> the kvm->lock mutex when wiping the references from the array.
 
-Huh.  The existing code is decidedly odd.  I think it might even be broken, as
-it's not obvious that vCPU0 _must_ be created when e.g. kvm_arch_irq_bypass_add_producer()
-is called.
+...
 
-An equivalent, safe check would be:
+> +void kvm_destroy_vcpus(struct kvm *kvm)
+> +{
+> +	unsigned int i;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm)
+> +		kvm_vcpu_destroy(vcpu);
+> +
+> +	mutex_lock(&kvm->lock);
 
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 5f81ef092bd4..a3100591a9ca 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -272,7 +272,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
+But why is kvm->lock taken here?  Unless I'm overlooking an arch, everyone calls
+this from kvm_arch_destroy_vm(), in which case this is the only remaining reference
+to @kvm.  And if there's some magic path for which that's not true, I don't see how
+it can possibly be safe to call kvm_vcpu_destroy() without holding kvm->lock, or
+how this would guarantee that all vCPUs have actually been destroyed before nullifying
+the array.
 
-        if (!kvm_arch_has_assigned_device(kvm) ||
-            !irq_remapping_cap(IRQ_POSTING_CAP) ||
--           !kvm_vcpu_apicv_active(kvm->vcpus[0]))
-+           !kvm_apicv_activated(kvm))
-                return 0;
-
-        idx = srcu_read_lock(&kvm->irq_srcu);
-
-
-But I think even that is flawed, as APICv can be dynamically deactivated and
-re-activated while the VM is running, and I don't see a path that re-updates
-the IRTE when APICv is re-activated.  So I think a more conservative check is
-needed, e.g.
-
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 5f81ef092bd4..6cf5b2e86118 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -272,7 +272,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
-
-        if (!kvm_arch_has_assigned_device(kvm) ||
-            !irq_remapping_cap(IRQ_POSTING_CAP) ||
--           !kvm_vcpu_apicv_active(kvm->vcpus[0]))
-+           !irqchip_in_kernel(kvm) || !enable_apicv)
-                return 0;
-
-        idx = srcu_read_lock(&kvm->irq_srcu);
-
-
-Paolo, am I missing something?
+> +	for (i = 0; i < atomic_read(&kvm->online_vcpus); i++)
+> +		kvm->vcpus[i] = NULL;
+> +
+> +	atomic_set(&kvm->online_vcpus, 0);
+> +	mutex_unlock(&kvm->lock);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_destroy_vcpus);
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
