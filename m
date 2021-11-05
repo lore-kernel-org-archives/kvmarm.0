@@ -2,77 +2,93 @@ Return-Path: <SRS0=hs0s=PY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B036FC433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 19:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CCFC433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 20:04:05 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 4F1BE61052
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 19:21:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 4F1BE61052
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id CBC6861183
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 20:04:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org CBC6861183
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECCE04B18A;
-	Fri,  5 Nov 2021 15:21:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C8BE4A1B0;
+	Fri,  5 Nov 2021 16:04:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id F9oqG+OT52YJ; Fri,  5 Nov 2021 15:21:40 -0400 (EDT)
+	with ESMTP id 0zMf8mq3u4WV; Fri,  5 Nov 2021 16:04:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CC3A4B1C7;
-	Fri,  5 Nov 2021 15:21:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 028E54B163;
+	Fri,  5 Nov 2021 16:04:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F6924B0F7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 15:21:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 780F84A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 16:04:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nmPtZRuU1QPw for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Nov 2021 15:21:32 -0400 (EDT)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 804564B15B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 15:21:32 -0400 (EDT)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C91E761263;
- Fri,  5 Nov 2021 19:21:31 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mj4mH-003ig2-Ut; Fri, 05 Nov 2021 19:21:30 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org, linux-mips@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 5/5] KVM: Convert the kvm->vcpus array to a xarray
-Date: Fri,  5 Nov 2021 19:21:01 +0000
-Message-Id: <20211105192101.3862492-6-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211105192101.3862492-1-maz@kernel.org>
+ with ESMTP id BEwcVliflLRX for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Nov 2021 16:03:59 -0400 (EDT)
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com
+ [209.85.210.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 916094B160
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 16:03:59 -0400 (EDT)
+Received: by mail-pf1-f171.google.com with SMTP id g11so9808080pfv.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 05 Nov 2021 13:03:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=PN/lxoi+e5tCVO5pPjxKDOBewixY35Ifh+V+MQmKh2Y=;
+ b=f5rhbj9pb5GgTT0825+tujieonyli7SwThgHMXaD3NP3Mog1A094HPsqZZlkGOJ/Q+
+ r3ZJnNzRBB3NhkN8VE/G5vrgRKhdENk2u9DuDgAERoqocOOeFGdBNvbmuevHRGuv/PzT
+ 2oM9e8uLyVHxjP0SBflIjCbS2YVvFiGTQPV4FXb1yFhkAV2Dwb/b8vz1V1fKzExBfVLb
+ Xj15HqIIyyCqzeQTYv54iKEeMFkAbdprvcVA6NgVuqrrvC5EFRz5/vl/ehO9cRPXvPHn
+ fwuRS81bHhHxNVlMCQCaLVr17+7bYqD4G5MIyYU1T+K/ui2sRBFDHO8DZRxHvFM9pN8W
+ 0Kfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=PN/lxoi+e5tCVO5pPjxKDOBewixY35Ifh+V+MQmKh2Y=;
+ b=rvs0mepdsaATwE+No4Po1f2buxzEt+Iu2my29n+tLuxj8pxjB3UBOHuA3ahHVM2KAc
+ rukbX1RiH7VKaAKU63MB+fud8MZSl+1h1C19NphJM3TOqs/U3eFa+UxIabv00u/FpZ0O
+ 3lsuN1a0gv3J+TYKfujyYN7Jgg+LiJ8MkXKEmB49v/Q9X06Rhzfo3AvlxYIpEj4gClQ5
+ jIvQkm2yW2PsQM5bjBGRhFCOks3S1f2lp/LNg461vJLStVtKKFbjMglTX8bGKWX185GJ
+ oDetUhTFFNgZ/ry1mgJJiHzjORC6VLa0WvQG5OFOWvKitY3LGjhg+7jE5TIjE+wD9Trs
+ wveQ==
+X-Gm-Message-State: AOAM5319809vuntMKaIFgoaDWkA2TNJ/TpOBVFA7pXzhEXdNv/PdYtfG
+ DLohxusRNmgDUFqP1wfrEv16IQ==
+X-Google-Smtp-Source: ABdhPJyd4QYc+InpdUIun9J0aiQkUM13aDBr60E6YJVxeHTQZZxRXWXSmp46OuKH+1B6vf2ZVsVbyQ==
+X-Received: by 2002:a05:6a00:22d1:b0:494:72c5:803b with SMTP id
+ f17-20020a056a0022d100b0049472c5803bmr10239284pfj.84.1636142638330; 
+ Fri, 05 Nov 2021 13:03:58 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id c198sm6639870pga.6.2021.11.05.13.03.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 05 Nov 2021 13:03:57 -0700 (PDT)
+Date: Fri, 5 Nov 2021 20:03:53 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 4/5] KVM: x86: Use kvm_get_vcpu() instead of open-coded
+ access
+Message-ID: <YYWOKTYHhJywwCRk@google.com>
 References: <20211105192101.3862492-1-maz@kernel.org>
+ <20211105192101.3862492-5-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-mips@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
- chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com,
- atish.patra@wdc.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
- david@redhat.com, imbrenda@linux.ibm.com, pbonzini@redhat.com, jgross@suse.com,
- npiggin@gmail.com, seanjc@google.com, paulus@samba.org, mpe@ellerman.id.au,
- james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Juergen Gross <jgross@suse.com>, Huacai Chen <chenhuacai@kernel.org>,
- Janosch Frank <frankja@linux.ibm.com>,
+Content-Disposition: inline
+In-Reply-To: <20211105192101.3862492-5-maz@kernel.org>
+Cc: Juergen Gross <jgross@suse.com>, Anup Patel <anup.patel@wdc.com>,
+ Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
  Christian Borntraeger <borntraeger@de.ibm.com>,
- Anup Patel <anup.patel@wdc.com>, David Hildenbrand <david@redhat.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Huacai Chen <chenhuacai@kernel.org>,
+ David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
  Nicholas Piggin <npiggin@gmail.com>, Atish Patra <atish.patra@wdc.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, kernel-team@android.com,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
+ Paul Mackerras <paulus@samba.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ kernel-team@android.com, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,106 +105,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-At least on arm64 and x86, the vcpus array is pretty huge (512 entries),
-and is mostly empty in most cases (running 512 vcpu VMs is not that
-common). This mean that we end-up with a 4kB block of unused memory
-in the middle of the kvm structure.
+On Fri, Nov 05, 2021, Marc Zyngier wrote:
+> As we are about to change the way vcpus are allocated, mandate
+> the use of kvm_get_vcpu() instead of open-coding the access.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/x86/kvm/vmx/posted_intr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> index 5f81ef092bd4..82a49720727d 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.c
+> +++ b/arch/x86/kvm/vmx/posted_intr.c
+> @@ -272,7 +272,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
+>  
+>  	if (!kvm_arch_has_assigned_device(kvm) ||
+>  	    !irq_remapping_cap(IRQ_POSTING_CAP) ||
+> -	    !kvm_vcpu_apicv_active(kvm->vcpus[0]))
+> +	    !kvm_vcpu_apicv_active(kvm_get_vcpu(kvm, 0)))
 
-Instead of wasting away this memory, let's use an xarray instead,
-which gives us almost the same flexibility as a normal array, but
-with a reduced memory usage with smaller VMs.
+Huh.  The existing code is decidedly odd.  I think it might even be broken, as
+it's not obvious that vCPU0 _must_ be created when e.g. kvm_arch_irq_bypass_add_producer()
+is called.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- include/linux/kvm_host.h |  5 +++--
- virt/kvm/kvm_main.c      | 15 +++++++++------
- 2 files changed, 12 insertions(+), 8 deletions(-)
+An equivalent, safe check would be:
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 36967291b8c6..3933d825e28b 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -29,6 +29,7 @@
- #include <linux/refcount.h>
- #include <linux/nospec.h>
- #include <linux/notifier.h>
-+#include <linux/xarray.h>
- #include <asm/signal.h>
- 
- #include <linux/kvm.h>
-@@ -552,7 +553,7 @@ struct kvm {
- 	struct mutex slots_arch_lock;
- 	struct mm_struct *mm; /* userspace tied to this vm */
- 	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
--	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
-+	struct xarray vcpu_array;
- 
- 	/* Used to wait for completion of MMU notifiers.  */
- 	spinlock_t mn_invalidate_lock;
-@@ -693,7 +694,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
- 
- 	/* Pairs with smp_wmb() in kvm_vm_ioctl_create_vcpu.  */
- 	smp_rmb();
--	return kvm->vcpus[i];
-+	return xa_load(&kvm->vcpu_array, i);
- }
- 
- #define kvm_for_each_vcpu(idx, vcpup, kvm) \
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d83553eeea21..4c18d7911fa5 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -461,7 +461,7 @@ void kvm_destroy_vcpus(struct kvm *kvm)
- 
- 	mutex_lock(&kvm->lock);
- 	for (i = 0; i < atomic_read(&kvm->online_vcpus); i++)
--		kvm->vcpus[i] = NULL;
-+		xa_erase(&kvm->vcpu_array, i);
- 
- 	atomic_set(&kvm->online_vcpus, 0);
- 	mutex_unlock(&kvm->lock);
-@@ -1066,6 +1066,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
- 	mutex_init(&kvm->slots_arch_lock);
- 	spin_lock_init(&kvm->mn_invalidate_lock);
- 	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
-+	xa_init(&kvm->vcpu_array);
- 
- 	INIT_LIST_HEAD(&kvm->devices);
- 
-@@ -3661,7 +3662,10 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	}
- 
- 	vcpu->vcpu_idx = atomic_read(&kvm->online_vcpus);
--	BUG_ON(kvm->vcpus[vcpu->vcpu_idx]);
-+	r = xa_insert(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, GFP_KERNEL_ACCOUNT);
-+	BUG_ON(r == -EBUSY);
-+	if (r)
-+		goto unlock_vcpu_destroy;
- 
- 	/* Fill the stats id string for the vcpu */
- 	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
-@@ -3671,15 +3675,14 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 	kvm_get_kvm(kvm);
- 	r = create_vcpu_fd(vcpu);
- 	if (r < 0) {
-+		xa_erase(&kvm->vcpu_array, vcpu->vcpu_idx);
- 		kvm_put_kvm_no_destroy(kvm);
- 		goto unlock_vcpu_destroy;
- 	}
- 
--	kvm->vcpus[vcpu->vcpu_idx] = vcpu;
--
- 	/*
--	 * Pairs with smp_rmb() in kvm_get_vcpu.  Write kvm->vcpus
--	 * before kvm->online_vcpu's incremented value.
-+	 * Pairs with smp_rmb() in kvm_get_vcpu.  Store the vcpu
-+	 * pointer before kvm->online_vcpu's incremented value.
- 	 */
- 	smp_wmb();
- 	atomic_inc(&kvm->online_vcpus);
--- 
-2.30.2
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 5f81ef092bd4..a3100591a9ca 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -272,7 +272,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
 
+        if (!kvm_arch_has_assigned_device(kvm) ||
+            !irq_remapping_cap(IRQ_POSTING_CAP) ||
+-           !kvm_vcpu_apicv_active(kvm->vcpus[0]))
++           !kvm_apicv_activated(kvm))
+                return 0;
+
+        idx = srcu_read_lock(&kvm->irq_srcu);
+
+
+But I think even that is flawed, as APICv can be dynamically deactivated and
+re-activated while the VM is running, and I don't see a path that re-updates
+the IRTE when APICv is re-activated.  So I think a more conservative check is
+needed, e.g.
+
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 5f81ef092bd4..6cf5b2e86118 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -272,7 +272,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
+
+        if (!kvm_arch_has_assigned_device(kvm) ||
+            !irq_remapping_cap(IRQ_POSTING_CAP) ||
+-           !kvm_vcpu_apicv_active(kvm->vcpus[0]))
++           !irqchip_in_kernel(kvm) || !enable_apicv)
+                return 0;
+
+        idx = srcu_read_lock(&kvm->irq_srcu);
+
+
+Paolo, am I missing something?
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
