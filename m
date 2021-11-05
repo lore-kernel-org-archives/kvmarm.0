@@ -2,61 +2,82 @@ Return-Path: <SRS0=hs0s=PY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 040E6C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 01:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4F7C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 01:34:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6F2286044F
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 01:32:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6F2286044F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 79A8061245
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 01:34:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 79A8061245
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C92374B0D0;
-	Thu,  4 Nov 2021 21:32:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0380C4B0BF;
+	Thu,  4 Nov 2021 21:34:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Er3Yy8SUzCk9; Thu,  4 Nov 2021 21:32:03 -0400 (EDT)
+	with ESMTP id bblC9qsQ65DA; Thu,  4 Nov 2021 21:34:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 395B34A5A0;
-	Thu,  4 Nov 2021 21:32:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E4124B0BE;
+	Thu,  4 Nov 2021 21:34:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B56214A5A0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Nov 2021 21:32:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F21A54B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Nov 2021 21:34:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mdJUt-3swSa4 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Nov 2021 21:31:59 -0400 (EDT)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B078C49FB7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Nov 2021 21:31:58 -0400 (EDT)
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
- by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Hljbt6SdRz1DJB8;
- Fri,  5 Nov 2021 09:29:46 +0800 (CST)
-Received: from dggema769-chm.china.huawei.com (10.1.198.211) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2308.15; Fri, 5 Nov 2021 09:31:41 +0800
-Received: from localhost (10.174.179.215) by dggema769-chm.china.huawei.com
- (10.1.198.211) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2308.15; Fri, 5
- Nov 2021 09:31:41 +0800
-From: YueHaibing <yuehaibing@huawei.com>
-To: <maz@kernel.org>, <james.morse@arm.com>, <alexandru.elisei@arm.com>,
- <suzuki.poulose@arm.com>, <catalin.marinas@arm.com>, <will@kernel.org>
-Subject: [PATCH -next] KVM: arm64: change the return type of
- kvm_vcpu_preferred_target()
-Date: Fri, 5 Nov 2021 09:15:00 +0800
-Message-ID: <20211105011500.16280-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+ with ESMTP id dHYUK2HJ2dP8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Nov 2021 21:34:10 -0400 (EDT)
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com
+ [209.85.208.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DAE74A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Nov 2021 21:34:10 -0400 (EDT)
+Received: by mail-lj1-f181.google.com with SMTP id t11so12492658ljh.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Nov 2021 18:34:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=WmJtXBkg7pd+AkHNmF/OOE0ZCZ7A0DUPGQ3AraUyTKE=;
+ b=PZE9AjSPOY3ehFs177/vcSypOeEzbZbOjJTIP6cW52S5WQTctkopZtXJ8ZzGpp4Ftk
+ X7/NIPtm/J/5VDoXx/Rk8S8UZL1YO1x3EzWDIGTtxRfd4KPeefDpEsG1u8daXYp9AqG+
+ ERm34LdXlTc1oMG4MjN/+ZedoSmn6HMU7WNncJ0a8GhiBg++YuGmkY7sgeVTR00j4RQ0
+ O6F1zstzgn2wLez4WTmwyygFlygy6VJXxNUKxBD5N1w99YYS1i9l6C4f3/9/BZXVXFJQ
+ TBdoEpu2mzZovHHUC9PY1QP0DRbm7upXKQkmiBMSgs9gUyFpby5JJ0PbegWFoAG8mCC9
+ tFUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WmJtXBkg7pd+AkHNmF/OOE0ZCZ7A0DUPGQ3AraUyTKE=;
+ b=0mtlE3tkjFkJ5lhEbUS4/j1EE73t2mQ8Ir8iSVbLE21uIV+BF0RAYYVQ5kLNFiYrWy
+ R4HTjWKIAFlISXNq6tjBX3z8D4oof80F5QlhF2ynuMGzLxMrt4OXx6m+4XSu/u30uCb7
+ 4jNKbBtK8jZcJAlpsxGYllHE2TgJ65+EAOYHhChAYbN62qtvnC8g0YmROQwqsUWwyKEg
+ NhF3DIo7ajV2OBeG0UL1BHjyiiU4kdulrh/q4EuKnKS/JNzEGsnaj83biX/EhdY7RmCY
+ y2XOyJvSSzDdBxwP7XrEFZee8U4gwm+AeNEFntQ/hcmXpU0jmsDeN0rN2QkUkwhQlunI
+ onXw==
+X-Gm-Message-State: AOAM531+G7UefEKF/uHQul6pUXzKuEnnuQQq3zRyX2hqe8HDorwF8ERN
+ Q+P8hsxxkWh30W5bjeUzeBzZbVn9nnPMZzg9QjwKMg==
+X-Google-Smtp-Source: ABdhPJyewwZhYvIK3ydA+zOEsxVMwLZ6je5RssWrC6icEv9NcYFD1E5ThOQun0PMv8mV+NBDOBTesnHzih36VdxT/oQ=
+X-Received: by 2002:a05:651c:984:: with SMTP id
+ b4mr8397659ljq.170.1636076049067; 
+ Thu, 04 Nov 2021 18:34:09 -0700 (PDT)
 MIME-Version: 1.0
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggema769-chm.china.huawei.com (10.1.198.211)
-X-CFilter-Loop: Reflected
-Cc: YueHaibing <yuehaibing@huawei.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20211103062520.1445832-1-reijiw@google.com>
+ <20211103062520.1445832-3-reijiw@google.com>
+ <YYQG6fxRVEsJ9w2d@google.com>
+ <CAAeT=FzTxpmnGJ4a=eGiE1xxvbQR2HqrtRA3vymwdJobN99eQA@mail.gmail.com>
+In-Reply-To: <CAAeT=FzTxpmnGJ4a=eGiE1xxvbQR2HqrtRA3vymwdJobN99eQA@mail.gmail.com>
+From: Oliver Upton <oupton@google.com>
+Date: Thu, 4 Nov 2021 18:33:58 -0700
+Message-ID: <CAOQ_QsjNDct2C8mrz4aezEu4hPU6RH8_1vLMq=RjngABu0qVjA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 02/28] KVM: arm64: Save ID registers' sanitized
+ value per vCPU
+To: Reiji Watanabe <reijiw@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,78 +94,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_vcpu_preferred_target() always return 0 because kvm_target_cpu()
-never returns a negative error code.
+On Thu, Nov 4, 2021 at 2:39 PM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Hi Oliver,
+>
+> On Thu, Nov 4, 2021 at 9:14 AM Oliver Upton <oupton@google.com> wrote:
+> >
+> > Hi Reiji,
+> >
+> > On Tue, Nov 02, 2021 at 11:24:54PM -0700, Reiji Watanabe wrote:
+> > > Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
+> > > registers' sanitized value in the array for the vCPU at the first
+> > > vCPU reset. Use the saved ones when ID registers are read by
+> > > userspace (via KVM_GET_ONE_REG) or the guest.
+> >
+> > Based on my understanding of the series, it appears that we require the
+> > CPU identity to be the same amongst all vCPUs in a VM. Is there any
+> > value in keeping a single copy in kvm_arch?
+>
+> Yes, that's a good point.
+> It reminded me that the idea bothered me after we discussed a similar
+> case about your counter offset patches, but I didn't seriously
+> consider that.
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/arm.c              | 5 +----
- arch/arm64/kvm/guest.c            | 7 +------
- 3 files changed, 3 insertions(+), 11 deletions(-)
+Yeah, it was a good suggestion for the counter offsetting series, and
+one that I plan to adopt once I get back to that set :)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4be8486042a7..2a5f7f38006f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -584,7 +584,7 @@ struct kvm_vcpu_stat {
- 	u64 exits;
- };
- 
--int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
-+void kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
- unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
- int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index f5490afe1ebf..2f03cbfefe67 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1389,12 +1389,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 		return kvm_vm_ioctl_set_device_addr(kvm, &dev_addr);
- 	}
- 	case KVM_ARM_PREFERRED_TARGET: {
--		int err;
- 		struct kvm_vcpu_init init;
- 
--		err = kvm_vcpu_preferred_target(&init);
--		if (err)
--			return err;
-+		kvm_vcpu_preferred_target(&init);
- 
- 		if (copy_to_user(argp, &init, sizeof(init)))
- 			return -EFAULT;
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 5ce26bedf23c..e116c7767730 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -869,13 +869,10 @@ u32 __attribute_const__ kvm_target_cpu(void)
- 	return KVM_ARM_TARGET_GENERIC_V8;
- }
- 
--int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
-+void kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
- {
- 	u32 target = kvm_target_cpu();
- 
--	if (target < 0)
--		return -ENODEV;
--
- 	memset(init, 0, sizeof(*init));
- 
- 	/*
-@@ -885,8 +882,6 @@ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
- 	 * target type.
- 	 */
- 	init->target = (__u32)target;
--
--	return 0;
- }
- 
- int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
--- 
-2.17.1
-
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
