@@ -2,93 +2,75 @@ Return-Path: <SRS0=hs0s=PY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0869BC433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 17:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD2EC433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 19:21:35 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 7B6DE61216
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 17:03:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7B6DE61216
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id C92B26127A
+	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 19:21:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C92B26127A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8A654B16E;
-	Fri,  5 Nov 2021 13:03:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EFF24B15B;
+	Fri,  5 Nov 2021 15:21:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GhrDgqBgy+Qx; Fri,  5 Nov 2021 13:02:59 -0400 (EDT)
+	with ESMTP id ji5EHLU06It5; Fri,  5 Nov 2021 15:21:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2BFC4B178;
-	Fri,  5 Nov 2021 13:02:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04FCB4B0C3;
+	Fri,  5 Nov 2021 15:21:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F7E84B0DB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Nov 2021 17:28:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CFC74B168
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 15:21:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oOn2EPE7rwq1 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Nov 2021 17:28:11 -0400 (EDT)
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com
- [209.85.166.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BAEA849F5D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Nov 2021 17:28:11 -0400 (EDT)
-Received: by mail-io1-f47.google.com with SMTP id z206so8613742iof.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Nov 2021 14:28:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=kT59fOFXGdqG57cxSFiBCbx9dcYetqnRywW1gdZNmeY=;
- b=gT4nzQq0x89i6Vp5dNWtSZrRbMe0W3qbbXwW9NXWgaRs8fYbXvHzdlEGUK48g0ajas
- uHVv10bVNkjhWr3B3MYTi44+qGBwBfoBwhj+2jrlWAsr2slc13bc4BseaXy2AoLJs6t8
- xRBsjkLiRiH+rEZC9bjYDRvB0cKfRmGxlddQQ74lKlIH3DSIbhZURrg/4JSes8eUaatv
- 4YcLz57IesgJy0I2f7nby9V0UuPZTikaQqcNEzddlw13/ibFXy00E0dEkzMok1oNoZqt
- ZDIYGh1maMM5k3AvqVuUpAr6S+JkIrJwFta52d8TDhA2FBg5X1Xits9o/XjdmWUTRl4X
- pAhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=kT59fOFXGdqG57cxSFiBCbx9dcYetqnRywW1gdZNmeY=;
- b=kVmVdvtoo3RfRhTHmfwCKPi6rbw94LcVV4yH+Ljo2Q6MxauTB1t6jqQbXN/kZYrM58
- XxiZgOM7acoGhqq9Iil4SOW/DNFOKNbASBMk3LpFnNfmu0aPHxEGdIlUpIneyNle8o5R
- Wog8NoaBB4JOJi5tFqNFCOqIbtt1iSN8loe2oiUpabD88au6EF6Zgl0qLjUI3gTkOUtQ
- DzOecd1UV7Aw1ngsMe86IuZex//A7fuqPvkj55hCiqycfKEiQ/HB7MlslucD/5795aaL
- 39z6VQoh3XZAdPLVuvBuMAJEhtSSZ7nSJLiecPiqAZd4mvtXPL8NGA/fjqFH+h6+41Eu
- 9v7w==
-X-Gm-Message-State: AOAM532Jb6XfMBDpOXJNhgoAJZJohuL34VaQGsJ0A2HLSIuBXrw9jpYD
- xIKUIBDmRQizjiEorXtXVsPmoWfuqIdfq1Q8ifOpxw==
-X-Google-Smtp-Source: ABdhPJyMIoxuukzQc6rukS1CsN0VzOsX5g2manzJn1KGK69DmvdVJ1f5vqR2wNyFb/XiaX/LmgNI1ppfR5uwGseVoTo=
-X-Received: by 2002:a05:6602:1612:: with SMTP id
- x18mr282554iow.37.1636061290880; 
- Thu, 04 Nov 2021 14:28:10 -0700 (PDT)
+ with ESMTP id 4fq7gbs0UcP8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Nov 2021 15:21:31 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E62D64B126
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 15:21:30 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id C280D61051;
+ Fri,  5 Nov 2021 19:21:29 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mj4mF-003ig2-FT; Fri, 05 Nov 2021 19:21:27 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH 0/5] KVM: Turn the vcpu array into an xarray
+Date: Fri,  5 Nov 2021 19:20:56 +0000
+Message-Id: <20211105192101.3862492-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20211104002531.1176691-1-seanjc@google.com>
- <20211104002531.1176691-2-seanjc@google.com>
-In-Reply-To: <20211104002531.1176691-2-seanjc@google.com>
-From: Ben Gardon <bgardon@google.com>
-Date: Thu, 4 Nov 2021 14:27:59 -0700
-Message-ID: <CANgfPd-uuPFjAHk5kVNom2Qs=UU_GX6CQ0xDLg1h_iL8t8S2aQ@mail.gmail.com>
-Subject: Re: [PATCH v5.5 01/30] KVM: Ensure local memslot copies operate on
- up-to-date arch-specific data
-To: Sean Christopherson <seanjc@google.com>
-X-Mailman-Approved-At: Fri, 05 Nov 2021 13:02:59 -0400
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
+ chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com,
+ atish.patra@wdc.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+ david@redhat.com, imbrenda@linux.ibm.com, pbonzini@redhat.com, jgross@suse.com,
+ npiggin@gmail.com, seanjc@google.com, paulus@samba.org, mpe@ellerman.id.au,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Juergen Gross <jgross@suse.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Janosch Frank <frankja@linux.ibm.com>,
  Christian Borntraeger <borntraeger@de.ibm.com>,
+ Anup Patel <anup.patel@wdc.com>, David Hildenbrand <david@redhat.com>,
+ Nicholas Piggin <npiggin@gmail.com>, Atish Patra <atish.patra@wdc.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
- Paul Walmsley <paul.walmsley@sifive.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Anup Patel <anup.patel@wdc.com>,
- linux-mips@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>,
- kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+ Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Paolo Bonzini <pbonzini@redhat.com>, kernel-team@android.com,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,164 +87,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Nov 3, 2021 at 5:26 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> When modifying memslots, snapshot the "old" memslot and copy it to the
-> "new" memslot's arch data after (re)acquiring slots_arch_lock.  x86 can
-> change a memslot's arch data while memslot updates are in-progress so
-> long as it holds slots_arch_lock, thus snapshotting a memslot without
-> holding the lock can result in the consumption of stale data.
->
-> Fixes: b10a038e84d1 ("KVM: mmu: Add slots_arch_lock for memslot arch fields")
-> Cc: stable@vger.kernel.org
-> Cc: Ben Gardon <bgardon@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/kvm_main.c | 47 ++++++++++++++++++++++++++++++---------------
->  1 file changed, 31 insertions(+), 16 deletions(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 3f6d450355f0..99e69375c4c9 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1531,11 +1531,10 @@ static struct kvm_memslots *kvm_dup_memslots(struct kvm_memslots *old,
->
->  static int kvm_set_memslot(struct kvm *kvm,
->                            const struct kvm_userspace_memory_region *mem,
-> -                          struct kvm_memory_slot *old,
->                            struct kvm_memory_slot *new, int as_id,
->                            enum kvm_mr_change change)
->  {
-> -       struct kvm_memory_slot *slot;
-> +       struct kvm_memory_slot *slot, old;
->         struct kvm_memslots *slots;
->         int r;
->
-> @@ -1566,7 +1565,7 @@ static int kvm_set_memslot(struct kvm *kvm,
->                  * Note, the INVALID flag needs to be in the appropriate entry
->                  * in the freshly allocated memslots, not in @old or @new.
->                  */
-> -               slot = id_to_memslot(slots, old->id);
-> +               slot = id_to_memslot(slots, new->id);
+The kvm structure is pretty large. A large portion of it is the vcpu
+array, which is 4kB on x86_64 and arm64 as they deal with 512 vcpu
+VMs. Of course, hardly anyone runs VMs this big, so this is often a
+net waste of memory and cache locality.
 
-Since new is guaranteed to have the same id as old (at least prior to
-this change) this is a no-op change, so no problem here.
-This could be a separate commit which would have no functional change
-but only worth extracting if you send a v2.
+A possible approach is to turn the fixed-size array into an xarray,
+which results in a net code deletion after a bit of cleanup.
 
->                 slot->flags |= KVM_MEMSLOT_INVALID;
->
->                 /*
-> @@ -1597,6 +1596,26 @@ static int kvm_set_memslot(struct kvm *kvm,
->                 kvm_copy_memslots(slots, __kvm_memslots(kvm, as_id));
->         }
->
-> +       /*
-> +        * Make a full copy of the old memslot, the pointer will become stale
-> +        * when the memslots are re-sorted by update_memslots(), and the old
-> +        * memslot needs to be referenced after calling update_memslots(), e.g.
-> +        * to free its resources and for arch specific behavior.  This needs to
-> +        * happen *after* (re)acquiring slots_arch_lock.
-> +        */
-> +       slot = id_to_memslot(slots, new->id);
-> +       if (slot) {
-> +               old = *slot;
-> +       } else {
-> +               WARN_ON_ONCE(change != KVM_MR_CREATE);
-> +               memset(&old, 0, sizeof(old));
-> +               old.id = new->id;
-> +               old.as_id = as_id;
-> +       }
-> +
-> +       /* Copy the arch-specific data, again after (re)acquiring slots_arch_lock. */
-> +       memcpy(&new->arch, &old.arch, sizeof(old.arch));
-> +
+This series is on top of the current linux/master as it touches the
+RISC-V implementation. Only tested on arm64.
 
-Is new->arch not initialized before this function is called? Does this
-need to be here, or could it be moved above into the first branch of
-the if statement?
-Oh I see you removed the memset below and replaced it with this. I
-think this is fine, but it might be easier to reason about if we left
-the memset and moved the memcopy into the if.
-No point in doing a memcpy of zeros here.
+Marc Zyngier (5):
+  KVM: Move wiping of the kvm->vcpus array to common code
+  KVM: mips: Use kvm_get_vcpu() instead of open-coded access
+  KVM: s390: Use kvm_get_vcpu() instead of open-coded access
+  KVM: x86: Use kvm_get_vcpu() instead of open-coded access
+  KVM: Convert the kvm->vcpus array to a xarray
 
->         r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
->         if (r)
->                 goto out_slots;
-> @@ -1604,14 +1623,18 @@ static int kvm_set_memslot(struct kvm *kvm,
->         update_memslots(slots, new, change);
->         slots = install_new_memslots(kvm, as_id, slots);
->
-> -       kvm_arch_commit_memory_region(kvm, mem, old, new, change);
-> +       kvm_arch_commit_memory_region(kvm, mem, &old, new, change);
-> +
-> +       /* Free the old memslot's metadata.  Note, this is the full copy!!! */
-> +       if (change == KVM_MR_DELETE)
-> +               kvm_free_memslot(kvm, &old);
->
->         kvfree(slots);
->         return 0;
->
->  out_slots:
->         if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
-> -               slot = id_to_memslot(slots, old->id);
-> +               slot = id_to_memslot(slots, new->id);
->                 slot->flags &= ~KVM_MEMSLOT_INVALID;
->                 slots = install_new_memslots(kvm, as_id, slots);
->         } else {
-> @@ -1626,7 +1649,6 @@ static int kvm_delete_memslot(struct kvm *kvm,
->                               struct kvm_memory_slot *old, int as_id)
->  {
->         struct kvm_memory_slot new;
-> -       int r;
->
->         if (!old->npages)
->                 return -EINVAL;
-> @@ -1639,12 +1661,7 @@ static int kvm_delete_memslot(struct kvm *kvm,
->          */
->         new.as_id = as_id;
->
-> -       r = kvm_set_memslot(kvm, mem, old, &new, as_id, KVM_MR_DELETE);
-> -       if (r)
-> -               return r;
-> -
-> -       kvm_free_memslot(kvm, old);
-> -       return 0;
-> +       return kvm_set_memslot(kvm, mem, &new, as_id, KVM_MR_DELETE);
->  }
->
->  /*
-> @@ -1718,7 +1735,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
->         if (!old.npages) {
->                 change = KVM_MR_CREATE;
->                 new.dirty_bitmap = NULL;
-> -               memset(&new.arch, 0, sizeof(new.arch));
->         } else { /* Modify an existing slot. */
->                 if ((new.userspace_addr != old.userspace_addr) ||
->                     (new.npages != old.npages) ||
-> @@ -1732,9 +1748,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
->                 else /* Nothing to change. */
->                         return 0;
->
-> -               /* Copy dirty_bitmap and arch from the current memslot. */
-> +               /* Copy dirty_bitmap from the current memslot. */
->                 new.dirty_bitmap = old.dirty_bitmap;
-> -               memcpy(&new.arch, &old.arch, sizeof(new.arch));
->         }
->
->         if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
-> @@ -1760,7 +1775,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
->                         bitmap_set(new.dirty_bitmap, 0, new.npages);
->         }
->
-> -       r = kvm_set_memslot(kvm, mem, &old, &new, as_id, change);
-> +       r = kvm_set_memslot(kvm, mem, &new, as_id, change);
->         if (r)
->                 goto out_bitmap;
->
-> --
-> 2.33.1.1089.g2158813163f-goog
->
+ arch/arm64/kvm/arm.c           | 10 +---------
+ arch/mips/kvm/loongson_ipi.c   |  4 ++--
+ arch/mips/kvm/mips.c           | 23 ++---------------------
+ arch/powerpc/kvm/powerpc.c     | 10 +---------
+ arch/riscv/kvm/vm.c            | 10 +---------
+ arch/s390/kvm/kvm-s390.c       | 26 ++++++--------------------
+ arch/x86/kvm/vmx/posted_intr.c |  2 +-
+ arch/x86/kvm/x86.c             |  9 +--------
+ include/linux/kvm_host.h       |  7 ++++---
+ virt/kvm/kvm_main.c            | 33 ++++++++++++++++++++++++++-------
+ 10 files changed, 45 insertions(+), 89 deletions(-)
+
+-- 
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
