@@ -1,83 +1,74 @@
-Return-Path: <SRS0=hs0s=PY=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=jse9=PZ=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00007C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 20:21:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 707D9C4332F
+	for <kvmarm@archiver.kernel.org>; Sat,  6 Nov 2021 11:17:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 69873611C4
-	for <kvmarm@archiver.kernel.org>; Fri,  5 Nov 2021 20:21:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 69873611C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id DA3A36124A
+	for <kvmarm@archiver.kernel.org>; Sat,  6 Nov 2021 11:17:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DA3A36124A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF2094B16E;
-	Fri,  5 Nov 2021 16:21:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EAD04B1B2;
+	Sat,  6 Nov 2021 07:17:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Uc15bRLbyPdR; Fri,  5 Nov 2021 16:21:44 -0400 (EDT)
+	with ESMTP id q4+AwG-qi-g4; Sat,  6 Nov 2021 07:17:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 140554B164;
-	Fri,  5 Nov 2021 16:21:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07E1F4B1A3;
+	Sat,  6 Nov 2021 07:17:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF9B74B10C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 16:21:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D9EB4B1A3
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Nov 2021 07:17:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NMannwojpHc0 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Nov 2021 16:21:41 -0400 (EDT)
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com
- [209.85.210.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73FE04A3BF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Nov 2021 16:21:41 -0400 (EDT)
-Received: by mail-pf1-f180.google.com with SMTP id x131so4666036pfc.12
- for <kvmarm@lists.cs.columbia.edu>; Fri, 05 Nov 2021 13:21:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=FChUXutBpeRG92vMItY2zirb2KiX64mqNa6lRjXS4/o=;
- b=XhJq67XOVehGKyOlop0ZgXHOTZHwcQNzObFkCi6/KagxRodpEZ8yllo88wcXd9u5A4
- JyHn3eOSHm71QE0Ho4vu+PMzSC+hk/kpLn0XoWAl+sEDJCXJH8yRiSGn+WDU3uzo/0Jz
- vKuoP+xD9+dM6PIdOwrxBIcZiSTMvIRnKJ1ZTnCiCFNuTdGdR0au4APz76smsdf0FTJU
- MNMzCzzdiPQ0CIWIuM2KFOvXL49l2ImI8P3640AzVXeG075F7RRRDlC4KR+jmtTfyE56
- DSWnC2bV/xJ5K5cAgxAaKeJQrMHJdJxDe+n/OzOHw9DBQw6HJa62AhCnvmDdn0hwLrnK
- Xi4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=FChUXutBpeRG92vMItY2zirb2KiX64mqNa6lRjXS4/o=;
- b=grq7pMkSZhfZubUgYbcBghaxtXIu8VaV4B7YZ4AoF+4dtXpuOQvLCgVUN0bivm/v7R
- qe4RpNoKTdBPKmJ4p96P6DYyz+Wh25hPs6mtPvm9un9cXDN5/EDMuOZRg1kMOB6pQp3y
- yF70riaJxJYfs0PK3X/nSo6fnLyOr+W/8cnmrWmR97hc9RXhHGrrN/KiNHuPGH7X7ijJ
- MVuzEKZm/+HJwtF04CSGuP0KELYN2E2fvzWN/w+hIvFwG9W+S9rLeU3JRCoukoF7JMPO
- oZDUuSrVxjmo7i2rNrgDFNgXEeBi8hJt4L6K1gLZX0DpiMqQ4voOTFN6mhJC1Mjw1Ff4
- m54A==
-X-Gm-Message-State: AOAM531jaaAG2TqYKQ+AhjZO9QbYPHx8CwHmojIrB7T91hP/HQRVO2sx
- S6rconvq4vy6MiEfg51cAScQQg==
-X-Google-Smtp-Source: ABdhPJwJsyZkhGzgEWjIobCpYAvoWgic/EqtGUxZtysje8E+26IpZ1/HH08l9V0rneyI5sI9Ep2Vgg==
-X-Received: by 2002:a05:6a00:c8f:b0:481:20a8:7c61 with SMTP id
- a15-20020a056a000c8f00b0048120a87c61mr32575696pfv.8.1636143700318; 
- Fri, 05 Nov 2021 13:21:40 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id c12sm5054054pfm.50.2021.11.05.13.21.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 05 Nov 2021 13:21:39 -0700 (PDT)
-Date: Fri, 5 Nov 2021 20:21:36 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 5/5] KVM: Convert the kvm->vcpus array to a xarray
-Message-ID: <YYWSUJ1qzhfqjQow@google.com>
+ with ESMTP id Oeamc7mZn8Ry for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  6 Nov 2021 07:17:52 -0400 (EDT)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D15084A531
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  6 Nov 2021 07:17:51 -0400 (EDT)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id BD2F160ED5;
+ Sat,  6 Nov 2021 11:17:50 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mjJhk-003oLQ-Fj; Sat, 06 Nov 2021 11:17:48 +0000
+Date: Sat, 06 Nov 2021 11:17:41 +0000
+Message-ID: <87o86xednu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [PATCH 1/5] KVM: Move wiping of the kvm->vcpus array to common
+ code
+In-Reply-To: <YYWQHBwD4nBLo9qi@google.com>
 References: <20211105192101.3862492-1-maz@kernel.org>
- <20211105192101.3862492-6-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211105192101.3862492-6-maz@kernel.org>
+ <20211105192101.3862492-2-maz@kernel.org>
+ <YYWQHBwD4nBLo9qi@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: seanjc@google.com, kvm@vger.kernel.org,
+ linux-mips@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linuxppc-dev@lists.ozlabs.org, chenhuacai@kernel.org,
+ aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com, atish.patra@wdc.com,
+ borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+ imbrenda@linux.ibm.com, pbonzini@redhat.com, jgross@suse.com,
+ npiggin@gmail.com, paulus@samba.org, mpe@ellerman.id.au, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: Juergen Gross <jgross@suse.com>, Anup Patel <anup.patel@wdc.com>,
  Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
  Christian Borntraeger <borntraeger@de.ibm.com>,
@@ -104,39 +95,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Nov 05, 2021, Marc Zyngier wrote:
-> At least on arm64 and x86, the vcpus array is pretty huge (512 entries),
-> and is mostly empty in most cases (running 512 vcpu VMs is not that
-> common). This mean that we end-up with a 4kB block of unused memory
-> in the middle of the kvm structure.
-
-Heh, x86 is now up to 1024 entries.
- 
-> Instead of wasting away this memory, let's use an xarray instead,
-> which gives us almost the same flexibility as a normal array, but
-> with a reduced memory usage with smaller VMs.
+On Fri, 05 Nov 2021 20:12:12 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
-> @@ -693,7 +694,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
->  
->  	/* Pairs with smp_wmb() in kvm_vm_ioctl_create_vcpu.  */
->  	smp_rmb();
-> -	return kvm->vcpus[i];
-> +	return xa_load(&kvm->vcpu_array, i);
->  }
+> On Fri, Nov 05, 2021, Marc Zyngier wrote:
+> > All architectures have similar loops iterating over the vcpus,
+> > freeing one vcpu at a time, and eventually wiping the reference
+> > off the vcpus array. They are also inconsistently taking
+> > the kvm->lock mutex when wiping the references from the array.
+> 
+> ...
+> 
+> > +void kvm_destroy_vcpus(struct kvm *kvm)
+> > +{
+> > +	unsigned int i;
+> > +	struct kvm_vcpu *vcpu;
+> > +
+> > +	kvm_for_each_vcpu(i, vcpu, kvm)
+> > +		kvm_vcpu_destroy(vcpu);
+> > +
+> > +	mutex_lock(&kvm->lock);
+> 
+> But why is kvm->lock taken here?  Unless I'm overlooking an arch,
+> everyone calls this from kvm_arch_destroy_vm(), in which case this
+> is the only remaining reference to @kvm.  And if there's some magic
+> path for which that's not true, I don't see how it can possibly be
+> safe to call kvm_vcpu_destroy() without holding kvm->lock, or how
+> this would guarantee that all vCPUs have actually been destroyed
+> before nullifying the array.
 
-It'd be nice for this series to convert kvm_for_each_vcpu() to use xa_for_each()
-as well.  Maybe as a patch on top so that potential explosions from that are
-isolated from the initiali conversion?
+I asked myself the same question two years ago, and couldn't really
+understand the requirement. However, x86 does just that, so I
+preserved the behaviour.
 
-Or maybe even use xa_for_each_range() to cap at online_vcpus?  That's technically
-a functional change, but IMO it's easier to reason about iterating over a snapshot
-of vCPUs as opposed to being able to iterate over vCPUs as their being added.  In
-practice I doubt it matters.
+If you too believe that this is just wrong, I'm happy to drop the
+locking altogether. If that breaks someone's flow, they'll shout soon
+enough.
 
-#define kvm_for_each_vcpu(idx, vcpup, kvm) \
-	xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0, atomic_read(&kvm->online_vcpus))
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
