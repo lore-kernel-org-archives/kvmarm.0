@@ -2,121 +2,81 @@ Return-Path: <SRS0=McOM=P3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1344C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 13:30:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1F6C4332F
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 15:46:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 6AEA2611C0
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 13:30:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 6AEA2611C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTP id 268006128B
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 15:46:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 268006128B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CC0F4B224;
-	Mon,  8 Nov 2021 08:30:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69BBE4B22B;
+	Mon,  8 Nov 2021 10:46:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@ibm.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OnSPJwvNnqKO; Mon,  8 Nov 2021 08:30:29 -0500 (EST)
+	with ESMTP id 0HCnYdS2QUuS; Mon,  8 Nov 2021 10:46:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 563B94B228;
-	Mon,  8 Nov 2021 08:30:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87C7A4B227;
+	Mon,  8 Nov 2021 10:46:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF0514B1BD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 08:19:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A71484B209
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 10:46:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JSMq7JOGAChk for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Nov 2021 08:19:41 -0500 (EST)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com
- [148.163.156.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 640824B173
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 08:19:41 -0500 (EST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1A8D0W5g012144; 
- Mon, 8 Nov 2021 13:19:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=K9foN8Lvj5O8jm4NUPzsOuC7zoZaxFx6joxD5/38mz0=;
- b=nDZG+wDsmMWAb1T5z+R7YQEfhI8VRjOVHHEeuGsT+a3kuXp1uDXubXWRS8zuWRq+DlNx
- kP14MAwL8J5q9mFla538n4u//TVm0tBkLg3IEH3b7JAmcl0hUlXWawBQPEyWEqUqlif6
- /pGHrb+m7VzYdNXH6OdiiHNnKstb+ajUWhpAnqbgcSmz7fWQDFW1N/oVUxQiEtloYkJd
- 3aCqndwTzF+1PpUl61bpVYSOqiKCHtX59MnyP6EXQM700ucQn2jtI4HeJxhfg70E2x+3
- BznNoSxRF2V3sDLjb8+aVxsFZtBGS0YCKog2r27h4TmoaT+jUx0qDYo1r0Xj0aNCxoJZ Gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3c641sj7hp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 08 Nov 2021 13:19:24 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1A8Bw7UQ005024;
- Mon, 8 Nov 2021 13:19:23 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 3c641sj7gm-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 08 Nov 2021 13:19:22 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1A8DDlcL007476;
- Mon, 8 Nov 2021 13:19:19 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma03ams.nl.ibm.com with ESMTP id 3c5hb9xbt8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 08 Nov 2021 13:19:19 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 1A8DJGSH53674486
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 8 Nov 2021 13:19:16 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4D88242059;
- Mon,  8 Nov 2021 13:19:16 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2A11B42041;
- Mon,  8 Nov 2021 13:19:15 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.11.147])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  8 Nov 2021 13:19:15 +0000 (GMT)
-Date: Mon, 8 Nov 2021 13:13:48 +0100
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 3/5] KVM: s390: Use kvm_get_vcpu() instead of open-coded
- access
-Message-ID: <20211108131348.7710f10a@p-imbrenda>
-In-Reply-To: <20211105192101.3862492-4-maz@kernel.org>
-References: <20211105192101.3862492-1-maz@kernel.org>
- <20211105192101.3862492-4-maz@kernel.org>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 2Tpsr6ax-14v0tvGNWvY_Xz22aRe4-xQ
-X-Proofpoint-ORIG-GUID: AyI-d3SVtgl34O6n5RGX5d0X8rNJXf0F
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-08_05,2021-11-08_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0
- bulkscore=0 clxscore=1015 mlxscore=0 malwarescore=0 impostorscore=0
- mlxlogscore=999 priorityscore=1501 adultscore=0 lowpriorityscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111080082
-X-Mailman-Approved-At: Mon, 08 Nov 2021 08:30:26 -0500
-Cc: Juergen Gross <jgross@suse.com>, Anup Patel <anup.patel@wdc.com>,
- Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Huacai Chen <chenhuacai@kernel.org>, David Hildenbrand <david@redhat.com>,
- linux-mips@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>,
- Atish Patra <atish.patra@wdc.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, kernel-team@android.com,
- linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu
+ with ESMTP id 1fxeq-EHiFy1 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Nov 2021 10:46:40 -0500 (EST)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61C684B1AF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 10:46:40 -0500 (EST)
+Received: by mail-wr1-f74.google.com with SMTP id
+ z5-20020a5d6405000000b00182083d7d2aso4168443wru.13
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Nov 2021 07:46:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=AKApMG+OBphO2mXMNWEAzsKBITa8c+pAso67pj90vC8=;
+ b=tG6WMOy8dE74seq/qZL5tl10JmW8g5oPqehlE/OLFpxU36Ysf7ZW95dwBXeXgmcMF8
+ YEWHUhQQOWRykLtNUx2WTgIx8tOmvq9soy+zWO4U29ZLZD7+5I4VvJqbdW+/vmnwr2Yk
+ EItavDge61Azr5p7RdHNoJnde9HhafcPYYeub9RMPClQthw6TRcpLY1/asXTnzDBLc2S
+ gjUAanJK6ajTf+rC+yFSGDXgHiK0pGx10EvBgimhWb8xAuX55XDt4mQpFt/ixoE4aqS5
+ nMqKwSAKLLTPKuKelYGlJmiQ9rtga1sjS0ipfi403/FpDqPaupXIs/M8wJpSQnJwwxRU
+ YtIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=AKApMG+OBphO2mXMNWEAzsKBITa8c+pAso67pj90vC8=;
+ b=W8E3PLorZkw9XMtZdolKumQ11gaqRESp4Nc2rf6M3ldDfGyX9oiqlQguPY5ogOTf+Z
+ aFyp2GbCalfcyFaiWhJeFY+KeST8Gmh77MHs7VFMEUkV3ZJZtX73kWYsyhLF8BQWmYMG
+ 68vKFmpDHeoo+2Wv/Z8qj8UhZvtqJUBRxZKgTjzrfzTOAt85vOJHcl0v6NNvxu13Ak/G
+ vi19S0CCVtrvsPF9Vce2mNvT2K/6ohkd3gWRw2Iw6t/l5Nf/mPeGKDlW69ubTsWFI3jo
+ cEdyug1SQQfXKyFl+bL2ZZEoS5QcW9vlsgPZtKwm9UzUckyuQeXKFXAS4uJnHmq7fPuo
+ 6+TQ==
+X-Gm-Message-State: AOAM532nTKOqwM/wPNj9wL92+nMnhffwXyciSyj4XF0Cm+BqDxv991x0
+ 9c9RMjgkdkx78d1BYRXgs/nlEVgu2CZ0
+X-Google-Smtp-Source: ABdhPJwzJyzbAG53O2weMHNNmNKKDpLhMyRm0Wi+7RXoQ9dLo6WBHGjX8UZ98cpkXILxFN6jSDpOUH0xoW/G
+X-Received: from luke.lon.corp.google.com
+ ([2a00:79e0:d:210:909f:3aba:7f9a:3a93])
+ (user=qperret job=sendgmr) by 2002:a05:600c:3ba5:: with SMTP id
+ n37mr36644382wms.168.1636386399156; Mon, 08 Nov 2021 07:46:39 -0800 (PST)
+Date: Mon,  8 Nov 2021 15:46:32 +0000
+Message-Id: <20211108154636.393384-1-qperret@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
+Subject: [PATCH] KVM: arm64: Fix host stage-2 finalization
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Fuad Tabba <tabba@google.com>, 
+ Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, 
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -133,49 +93,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri,  5 Nov 2021 19:20:59 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+We currently walk the hypervisor stage-1 page-table towards the end of
+hyp init in nVHE protected mode and adjust the host page ownership
+attributes in its stage-2 in order to get a consistent state from both
+point of views. The walk is done on the entire hyp VA space, and expects
+to only ever find page-level mappings. While this expectation is
+reasonable in the half of hyp VA space that maps memory with a fixed
+offset (see the loop in pkvm_create_mappings_locked()), it can be
+incorrect in the other half where nothing prevents the usage of block
+mappings. For instance, on systems where memory is physically aligned at
+an address that happens to maps to a PMD aligned VA in the hyp_vmemmap,
+kvm_pgtable_hyp_map() will install block mappings when backing the
+hyp_vmemmap, which will later cause finalize_host_mappings() to fail.
+Furthermore, it should be noted that all pages backing the hyp_vmemmap
+are also mapped in the 'fixed offset range' of the hypervisor, which
+implies that finalize_host_mappings() will walk both aliases and update
+the host stage-2 attributes twice. The order in which this happens is
+unpredictable, though, since the hyp VA layout is highly dependent on
+the position of the idmap page, hence resulting in a fragile mess at
+best.
 
-> As we are about to change the way vcpus are allocated, mandate
-> the use of kvm_get_vcpu() instead of open-coding the access.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+In order to fix all of this, let's restrict the finalization walk to
+only cover memory regions in the 'fixed-offset range' of the hyp VA
+space and nothing else. This not only fixes a correctness issue, but
+will also result in a slighlty faster hyp initialization overall.
 
-makes sense
+Fixes: 2c50166c62ba ("KVM: arm64: Mark host bss and rodata section as shared")
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/setup.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> ---
->  arch/s390/kvm/kvm-s390.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 7af53b8788fa..4a0f62b03964 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4572,7 +4572,7 @@ int kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
->  	}
->  
->  	for (i = 0; i < online_vcpus; i++) {
-> -		if (!is_vcpu_stopped(vcpu->kvm->vcpus[i]))
-> +		if (!is_vcpu_stopped(kvm_get_vcpu(vcpu->kvm, i)))
->  			started_vcpus++;
->  	}
->  
-> @@ -4634,9 +4634,11 @@ int kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
->  	__disable_ibs_on_vcpu(vcpu);
->  
->  	for (i = 0; i < online_vcpus; i++) {
-> -		if (!is_vcpu_stopped(vcpu->kvm->vcpus[i])) {
-> +		struct kvm_vcpu *tmp = kvm_get_vcpu(vcpu->kvm, i);
-> +
-> +		if (!is_vcpu_stopped(tmp)) {
->  			started_vcpus++;
-> -			started_vcpu = vcpu->kvm->vcpus[i];
-> +			started_vcpu = tmp;
->  		}
->  	}
->  
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 862c7b514e20..578f71798c2e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -178,7 +178,7 @@ static int finalize_host_mappings_walker(u64 addr, u64 end, u32 level,
+ 
+ 	phys = kvm_pte_to_phys(pte);
+ 	if (!addr_is_memory(phys))
+-		return 0;
++		return -EINVAL;
+ 
+ 	/*
+ 	 * Adjust the host stage-2 mappings to match the ownership attributes
+@@ -207,8 +207,18 @@ static int finalize_host_mappings(void)
+ 		.cb	= finalize_host_mappings_walker,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF,
+ 	};
++	int i, ret;
++
++	for (i = 0; i < hyp_memblock_nr; i++) {
++		struct memblock_region *reg = &hyp_memory[i];
++		u64 start = (u64)hyp_phys_to_virt(reg->base);
++
++		ret = kvm_pgtable_walk(&pkvm_pgtable, start, reg->size, &walker);
++		if (ret)
++			return ret;
++	}
+ 
+-	return kvm_pgtable_walk(&pkvm_pgtable, 0, BIT(pkvm_pgtable.ia_bits), &walker);
++	return 0;
+ }
+ 
+ void __noreturn __pkvm_init_finalise(void)
+-- 
+2.34.0.rc0.344.g81b53c2807-goog
 
 _______________________________________________
 kvmarm mailing list
