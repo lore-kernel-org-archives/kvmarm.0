@@ -2,54 +2,65 @@ Return-Path: <SRS0=McOM=P3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D637C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 10:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4B1C433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 10:46:03 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id D897A61357
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 10:26:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D897A61357
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 01D5F61360
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 10:46:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 01D5F61360
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 399774B1DA;
-	Mon,  8 Nov 2021 05:26:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 838494B120;
+	Mon,  8 Nov 2021 05:46:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xqTQjEdNk24R; Mon,  8 Nov 2021 05:26:42 -0500 (EST)
+	with ESMTP id 7ehH+wrw-Idd; Mon,  8 Nov 2021 05:46:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F8AE4B1D7;
-	Mon,  8 Nov 2021 05:26:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8FF64B125;
+	Mon,  8 Nov 2021 05:46:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DFC04B1D1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 05:26:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 089074B0BD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 05:46:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bv7qj6udCnWO for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Nov 2021 05:26:39 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C645A4B1D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 05:26:39 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14DE9D6E;
- Mon,  8 Nov 2021 02:26:39 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7133B3F800;
- Mon,  8 Nov 2021 02:26:37 -0800 (PST)
-Date: Mon, 8 Nov 2021 10:28:25 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: YueHaibing <yuehaibing@huawei.com>
-Subject: Re: [PATCH -next] KVM: arm64: change the return type of
- kvm_vcpu_preferred_target()
-Message-ID: <YYj7yZ6+N3NA15Hj@monolith.localdoman>
-References: <20211105011500.16280-1-yuehaibing@huawei.com>
+ with ESMTP id fjBQqpSudUwU for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Nov 2021 05:45:59 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DDE754B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 05:45:58 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id DD98361360;
+ Mon,  8 Nov 2021 10:45:57 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mk29z-00482K-Ns; Mon, 08 Nov 2021 10:45:55 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH] arm64: kvm/hyp/nvhe: fix a non-kernel-doc comment
+Date: Mon,  8 Nov 2021 10:45:52 +0000
+Message-Id: <163636833368.2539547.13494193613344382138.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211106032529.15057-1-rdunlap@infradead.org>
+References: <20211106032529.15057-1-rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211105011500.16280-1-yuehaibing@huawei.com>
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-kernel@vger.kernel.org, rdunlap@infradead.org,
+ kvmarm@lists.cs.columbia.edu, lkp@intel.com,
+ linux-arm-kernel@lists.infradead.org, tabba@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kernel test robot <lkp@intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,91 +77,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On Fri, Nov 05, 2021 at 09:15:00AM +0800, YueHaibing wrote:
-> kvm_vcpu_preferred_target() always return 0 because kvm_target_cpu()
-> never returns a negative error code.
+On Fri, 5 Nov 2021 20:25:29 -0700, Randy Dunlap wrote:
+> Do not use kernel-doc "/**" notation when the comment is not in
+> kernel-doc format.
 > 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h | 2 +-
->  arch/arm64/kvm/arm.c              | 5 +----
->  arch/arm64/kvm/guest.c            | 7 +------
->  3 files changed, 3 insertions(+), 11 deletions(-)
+> Fixes this docs build warning:
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 4be8486042a7..2a5f7f38006f 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -584,7 +584,7 @@ struct kvm_vcpu_stat {
->  	u64 exits;
->  };
->  
-> -int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
-> +void kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
->  unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
->  int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
->  int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index f5490afe1ebf..2f03cbfefe67 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1389,12 +1389,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  		return kvm_vm_ioctl_set_device_addr(kvm, &dev_addr);
->  	}
->  	case KVM_ARM_PREFERRED_TARGET: {
-> -		int err;
->  		struct kvm_vcpu_init init;
->  
-> -		err = kvm_vcpu_preferred_target(&init);
-> -		if (err)
-> -			return err;
-> +		kvm_vcpu_preferred_target(&init);
->  
->  		if (copy_to_user(argp, &init, sizeof(init)))
->  			return -EFAULT;
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index 5ce26bedf23c..e116c7767730 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -869,13 +869,10 @@ u32 __attribute_const__ kvm_target_cpu(void)
->  	return KVM_ARM_TARGET_GENERIC_V8;
->  }
->  
-> -int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
-> +void kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
->  {
->  	u32 target = kvm_target_cpu();
+> arch/arm64/kvm/hyp/nvhe/sys_regs.c:478: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+>     * Handler for protected VM restricted exceptions.
 
-Checked and kvm_target_cpu() never returns a negative value (the target values
-are from 0 to 5, inclusive), which matches the type of the return value from the
-function, which is unsigned. The patch look correct to me:
+Applied to next, thanks!
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+[1/1] arm64: kvm/hyp/nvhe: fix a non-kernel-doc comment
+      commit: deacd669e18a51cb2085450c56d851aef72b3256
 
-Thanks,
-Alex
+Cheers,
 
->  
-> -	if (target < 0)
-> -		return -ENODEV;
-> -
->  	memset(init, 0, sizeof(*init));
->  
->  	/*
-> @@ -885,8 +882,6 @@ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
->  	 * target type.
->  	 */
->  	init->target = (__u32)target;
-> -
-> -	return 0;
->  }
->  
->  int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
-> -- 
-> 2.17.1
-> 
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
