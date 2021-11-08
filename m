@@ -2,80 +2,54 @@ Return-Path: <SRS0=McOM=P3=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35209C433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 08:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D637C433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 10:26:45 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id AEDF861265
-	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 08:23:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org AEDF861265
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id D897A61357
+	for <kvmarm@archiver.kernel.org>; Mon,  8 Nov 2021 10:26:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D897A61357
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3201B4B125;
-	Mon,  8 Nov 2021 03:23:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 399774B1DA;
+	Mon,  8 Nov 2021 05:26:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Mo2mrBxzts6g; Mon,  8 Nov 2021 03:23:29 -0500 (EST)
+	with ESMTP id xqTQjEdNk24R; Mon,  8 Nov 2021 05:26:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C1854B136;
-	Mon,  8 Nov 2021 03:23:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F8AE4B1D7;
+	Mon,  8 Nov 2021 05:26:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E2A684B125
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 03:23:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DFC04B1D1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 05:26:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IC0odTQPJAtK for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Nov 2021 03:23:22 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97E9F4B10B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 03:23:22 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 972326124D;
- Mon,  8 Nov 2021 08:23:21 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mjzvz-0046FA-EY; Mon, 08 Nov 2021 08:23:19 +0000
+ with ESMTP id bv7qj6udCnWO for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Nov 2021 05:26:39 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C645A4B1D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 05:26:39 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 14DE9D6E;
+ Mon,  8 Nov 2021 02:26:39 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7133B3F800;
+ Mon,  8 Nov 2021 02:26:37 -0800 (PST)
+Date: Mon, 8 Nov 2021 10:28:25 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: YueHaibing <yuehaibing@huawei.com>
+Subject: Re: [PATCH -next] KVM: arm64: change the return type of
+ kvm_vcpu_preferred_target()
+Message-ID: <YYj7yZ6+N3NA15Hj@monolith.localdoman>
+References: <20211105011500.16280-1-yuehaibing@huawei.com>
 MIME-Version: 1.0
-Date: Mon, 08 Nov 2021 08:23:19 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 5/5] KVM: Convert the kvm->vcpus array to a xarray
-In-Reply-To: <87mtmhec88.wl-maz@kernel.org>
-References: <20211105192101.3862492-1-maz@kernel.org>
- <20211105192101.3862492-6-maz@kernel.org> <YYWSUJ1qzhfqjQow@google.com>
- <87mtmhec88.wl-maz@kernel.org>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <8400fc5dfa13c89c8786bfc809011a54@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: seanjc@google.com, kvm@vger.kernel.org,
- linux-mips@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linuxppc-dev@lists.ozlabs.org, chenhuacai@kernel.org,
- aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com, atish.patra@wdc.com,
- borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com,
- imbrenda@linux.ibm.com, pbonzini@redhat.com, jgross@suse.com,
- npiggin@gmail.com, paulus@samba.org, mpe@ellerman.id.au, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Juergen Gross <jgross@suse.com>, Anup Patel <anup.patel@wdc.com>,
- Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Huacai Chen <chenhuacai@kernel.org>,
- David Hildenbrand <david@redhat.com>, linux-mips@vger.kernel.org,
- Nicholas Piggin <npiggin@gmail.com>, Atish Patra <atish.patra@wdc.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paul Mackerras <paulus@samba.org>, Paolo Bonzini <pbonzini@redhat.com>,
- kernel-team@android.com, Claudio Imbrenda <imbrenda@linux.ibm.com>,
- linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <20211105011500.16280-1-yuehaibing@huawei.com>
+Cc: maz@kernel.org, linux-kernel@vger.kernel.org, catalin.marinas@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,75 +61,96 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2021-11-06 11:48, Marc Zyngier wrote:
-> On Fri, 05 Nov 2021 20:21:36 +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
->> 
->> On Fri, Nov 05, 2021, Marc Zyngier wrote:
->> > At least on arm64 and x86, the vcpus array is pretty huge (512 entries),
->> > and is mostly empty in most cases (running 512 vcpu VMs is not that
->> > common). This mean that we end-up with a 4kB block of unused memory
->> > in the middle of the kvm structure.
->> 
->> Heh, x86 is now up to 1024 entries.
-> 
-> Humph. I don't want to know whether people are actually using that in
-> practice. The only time I create VMs with 512 vcpus is to check
-> whether it still works...
-> 
->> 
->> > Instead of wasting away this memory, let's use an xarray instead,
->> > which gives us almost the same flexibility as a normal array, but
->> > with a reduced memory usage with smaller VMs.
->> >
->> > Signed-off-by: Marc Zyngier <maz@kernel.org>
->> > ---
->> > @@ -693,7 +694,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
->> >
->> >  	/* Pairs with smp_wmb() in kvm_vm_ioctl_create_vcpu.  */
->> >  	smp_rmb();
->> > -	return kvm->vcpus[i];
->> > +	return xa_load(&kvm->vcpu_array, i);
->> >  }
->> 
->> It'd be nice for this series to convert kvm_for_each_vcpu() to use
->> xa_for_each() as well.  Maybe as a patch on top so that potential
->> explosions from that are isolated from the initiali conversion?
->> 
->> Or maybe even use xa_for_each_range() to cap at online_vcpus?
->> That's technically a functional change, but IMO it's easier to
->> reason about iterating over a snapshot of vCPUs as opposed to being
->> able to iterate over vCPUs as their being added.  In practice I
->> doubt it matters.
->> 
->> #define kvm_for_each_vcpu(idx, vcpup, kvm) \
->> 	xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0, 
->> atomic_read(&kvm->online_vcpus))
->> 
-> 
-> I think that's already the behaviour of this iterator (we stop at the
-> first empty slot capped to online_vcpus. The only change in behaviour
-> is that vcpup currently holds a pointer to the last vcpu in no empty
-> slot has been encountered. xa_for_each{,_range}() would set the
-> pointer to NULL at all times.
-> 
-> I doubt anyone relies on that, but it is probably worth eyeballing
-> some of the use cases...
+Hi,
 
-This turned out to be an interesting exercise, as we always use an
-int for the index, and the xarray iterators insist on an unsigned
-long (and even on a pointer to it). On the other hand, I couldn't
-spot any case where we'd rely on the last value of the vcpu pointer.
+On Fri, Nov 05, 2021 at 09:15:00AM +0800, YueHaibing wrote:
+> kvm_vcpu_preferred_target() always return 0 because kvm_target_cpu()
+> never returns a negative error code.
+> 
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 2 +-
+>  arch/arm64/kvm/arm.c              | 5 +----
+>  arch/arm64/kvm/guest.c            | 7 +------
+>  3 files changed, 3 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 4be8486042a7..2a5f7f38006f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -584,7 +584,7 @@ struct kvm_vcpu_stat {
+>  	u64 exits;
+>  };
+>  
+> -int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
+> +void kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
+>  unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
+>  int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
+>  int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f5490afe1ebf..2f03cbfefe67 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1389,12 +1389,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  		return kvm_vm_ioctl_set_device_addr(kvm, &dev_addr);
+>  	}
+>  	case KVM_ARM_PREFERRED_TARGET: {
+> -		int err;
+>  		struct kvm_vcpu_init init;
+>  
+> -		err = kvm_vcpu_preferred_target(&init);
+> -		if (err)
+> -			return err;
+> +		kvm_vcpu_preferred_target(&init);
+>  
+>  		if (copy_to_user(argp, &init, sizeof(init)))
+>  			return -EFAULT;
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 5ce26bedf23c..e116c7767730 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -869,13 +869,10 @@ u32 __attribute_const__ kvm_target_cpu(void)
+>  	return KVM_ARM_TARGET_GENERIC_V8;
+>  }
+>  
+> -int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
+> +void kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
+>  {
+>  	u32 target = kvm_target_cpu();
 
-I'll repost the series once we have a solution for patch #4, and
-we can then decide whether we want the iterator churn.
--- 
-Jazz is not dead. It just smells funny...
+Checked and kvm_target_cpu() never returns a negative value (the target values
+are from 0 to 5, inclusive), which matches the type of the return value from the
+function, which is unsigned. The patch look correct to me:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
+
+>  
+> -	if (target < 0)
+> -		return -ENODEV;
+> -
+>  	memset(init, 0, sizeof(*init));
+>  
+>  	/*
+> @@ -885,8 +882,6 @@ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
+>  	 * target type.
+>  	 */
+>  	init->target = (__u32)target;
+> -
+> -	return 0;
+>  }
+>  
+>  int kvm_arch_vcpu_ioctl_get_fpu(struct kvm_vcpu *vcpu, struct kvm_fpu *fpu)
+> -- 
+> 2.17.1
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
