@@ -2,75 +2,76 @@ Return-Path: <SRS0=lFky=P4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB2DC433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Nov 2021 02:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0225C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Nov 2021 02:39:36 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E5F49619EC
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Nov 2021 02:39:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E5F49619EC
+	by mail.kernel.org (Postfix) with ESMTP id A19F4619E4
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Nov 2021 02:39:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A19F4619E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A22B4A3A5;
-	Mon,  8 Nov 2021 21:39:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 526684B1F8;
+	Mon,  8 Nov 2021 21:39:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0KvkyWx66I9x; Mon,  8 Nov 2021 21:39:32 -0500 (EST)
+	with ESMTP id BJOdWxzvFl8t; Mon,  8 Nov 2021 21:39:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D863A4B20E;
-	Mon,  8 Nov 2021 21:39:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0320E4B1BD;
+	Mon,  8 Nov 2021 21:39:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E37FA4B1D7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 21:39:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E9DC4B1DB
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 21:39:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H84JvU1-aTLN for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Nov 2021 21:39:30 -0500 (EST)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 46FF04B1DB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 21:39:28 -0500 (EST)
-Received: by mail-pg1-f201.google.com with SMTP id
- 70-20020a630149000000b002da385ceffaso3257651pgb.17
- for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Nov 2021 18:39:28 -0800 (PST)
+ with ESMTP id H+vONcnW5X9Y for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Nov 2021 21:39:31 -0500 (EST)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8F9E4B1F5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 21:39:29 -0500 (EST)
+Received: by mail-pl1-f202.google.com with SMTP id
+ b23-20020a170902d89700b001415444f5a6so7705385plz.7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Nov 2021 18:39:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=7PZd0x6lPt+COIUe7s6j5utQGrhaF5ukxN/0RXAhVWo=;
- b=KkxlOHxbD8sX4/BavdqqOCubN6USToniJ7DdIIAxOUptOkCQavMqqZXwLDQ47hcYxP
- JFyldCgg3BC3Q6ZzfJ6TjKHhFJ0nr/Xp4z6O1LxiDizBwHCYUSvyC5kmEZgOE4IyjR4T
- BicOJ+yQdSq9NtYqEyWBjh0Al+TzfTBWifD1N3o5770pW9r2oJBsxgn4fX1O1pAQt7L/
- CVo7PvNm8WBKi9+pCuA7lNNGYOgvyBdSlTIXdsDue7T4JhIVJ4Gn5yS46ro0tJHlg6zB
- qbZS5P5P7EZSI9N/LZNV+VSRUKdXOjmp/K+hR6AD+DBQQ9TmlOpEc7Cc0sCon22wj9Wt
- 6srg==
+ :cc; bh=LozXdBeHm1wVJM1zXtUi3Myaa0mOvHQ8f6t6MIK9jqk=;
+ b=c2JYScEky9XAjrfUtUpSg0+Ds/y5sqhLsY4MTjk1ZRyQ5jTN+xr18kK5ALfBIkdJGl
+ BeTxqMZXPXkFlv4W77QPonZYelqiEfHTUeYu01+VAXEyh4srKCMpNR+w2H9ZSisj6hju
+ 7jgBEmL+2HSlqRH1z1zJQ/QAV2sdf8sCUkO+o8EsS4uAsJECUV0vi3YBRAl3UAKJH0EA
+ HBq6OmaB1EQtEJAPCRn1DJ4qj1NMNQsGDGLtfDzdCihW10n5RBHQl7TDLI5YCYIwKtq3
+ O2rmB73ClJb40oSoNLany273Jisyaex1z4lIO4QMIMxDWU4lmLzAfD71VVa6calQR9Z3
+ 3BMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=7PZd0x6lPt+COIUe7s6j5utQGrhaF5ukxN/0RXAhVWo=;
- b=hu8qbV7xLCrBT/bT4xN4DaiJf5JsExHcMfcPxTvP8RwagbjmlqvmhZyiS3GxpfD2yb
- Cxo8coGvRubjvBPhmyLS7p8HwfTMAhGaXVmLctV8gipJc67OHy6WSYXTcLRxC5IMknm1
- C/WgdBdaY3tvX11zs9JQxNFUzCNyY/GgXvirudgV2VX2osegJQyoU7H2sHnzK+bfgePk
- hPZzaUkdYfPQl/nvt6WsEA5lk23BH7ePsoL0fICuNiu2TG6WqwtolXRppOZQo8gab0qw
- omM0KEke5wThFRRBQsmGZk85T2UGQaMfzF9ruVkCuhbvX9gdzR0OHwJGYqIPV48HZ6JF
- PzmQ==
-X-Gm-Message-State: AOAM531H0IPkgQCxxd3jtCb6vibQQhHZ12WLxfYF7Gp1dIiwUehCefyv
- XBzOzZJVA9W04qHvT5lS2qgAZ/wgxgZ9BQ==
-X-Google-Smtp-Source: ABdhPJyZeUY1gD4uhMncXTUXTVCynHHQyEClaB3J19aVo94b9xq6INrEPKCtUNuTetOpfR96X8W9qAtSLlzsKA==
+ bh=LozXdBeHm1wVJM1zXtUi3Myaa0mOvHQ8f6t6MIK9jqk=;
+ b=l1lPIDnTZBiYk4vVNFx3R9+54RcJ06O3loZbfl0Deo2/yeInDvF+oK+KinVTSQINZ7
+ UFjSYefCFldG6TwhdT2XvWPN3ZTN7Q16wsJhMEIvzLOiNliAbSSKBBrq8nVPVFjHdors
+ GuTVypuNpWexbMXzZgGmZA276/wpYOhepEnFBIiwGxYrGma7O3neLl8oqY8n3/CrjyE5
+ 0K1Q6RFJ8C0I0Enlxj7/x+sTYb7H59qPTV9+rF0WJwSV5Afhr5FTxSi14Fm+kbhthF2a
+ X4nDebn2/7p/lE9eQ9cj9+5+31Ek8+S5gYrKLaPLhMAZ/KGCNqk9JNqtuTw0L54jnm/Y
+ dWHg==
+X-Gm-Message-State: AOAM531o+WSQ7t4anmgvwuvGXJ0yOSehBrIusBeEXpzeoLuUEmQDm0RV
+ PrAzl1+/r2NqEHgY250nMmZnlltut9bZCw==
+X-Google-Smtp-Source: ABdhPJyd3cmlccdsr0jYFtsQ/AxEtNcZxg4ERBnu9kTbLsShBB+WnJdZ2O9U6SlWXTQFEJZRY28W/+iC5/C0mQ==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
- p15mr137439pjf.1.1636425567125; Mon, 08 Nov 2021 18:39:27 -0800 (PST)
-Date: Mon,  8 Nov 2021 18:38:58 -0800
+ (user=ricarkol job=sendgmr) by 2002:aa7:8755:0:b0:494:67a6:1c84 with SMTP id
+ g21-20020aa78755000000b0049467a61c84mr37627084pfo.26.1636425569082; Mon, 08
+ Nov 2021 18:39:29 -0800 (PST)
+Date: Mon,  8 Nov 2021 18:38:59 -0800
 In-Reply-To: <20211109023906.1091208-1-ricarkol@google.com>
-Message-Id: <20211109023906.1091208-10-ricarkol@google.com>
+Message-Id: <20211109023906.1091208-11-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20211109023906.1091208-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
-Subject: [PATCH 09/17] KVM: selftests: aarch64: cmdline arg to set EOI mode in
+Subject: [PATCH 10/17] KVM: selftests: aarch64: add preemption tests in
  vgic_irq
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu, 
@@ -92,165 +93,139 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new cmdline arg to set the EOI mode for all vgic_irq tests.  This
-specifies whether a write to EOIR will deactivate IRQs or not.
+Add tests for IRQ preemption (having more than one activated IRQ at the
+same time).  This test injects multiple concurrent IRQs and handles them
+without handling the actual exceptions.  This is done by masking
+interrupts for the whole test.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../testing/selftests/kvm/aarch64/vgic_irq.c  | 58 ++++++++++++++++---
- 1 file changed, 50 insertions(+), 8 deletions(-)
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  | 91 ++++++++++++++++++-
+ 1 file changed, 90 insertions(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-index 0b89a29dfe79..3e18fa224280 100644
+index 3e18fa224280..b9080aa75a14 100644
 --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
 +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-@@ -29,6 +29,7 @@
+@@ -41,6 +41,7 @@ struct test_args {
   */
- struct test_args {
- 	uint32_t nr_irqs; /* number of KVM supported IRQs. */
-+	bool eoi_split; /* 1 is eoir+dir, 0 is eoir only */
- };
- 
- /*
-@@ -112,7 +113,7 @@ static uint64_t gic_read_ap1r0(void)
- 	return reg;
+ #define KVM_NUM_PRIOS		32
+ #define KVM_PRIO_SHIFT		3 /* steps of 8 = 1 << 3 */
++#define KVM_PRIO_STEPS		(1 << KVM_PRIO_SHIFT) /* 8 */
+ #define LOWEST_PRIO		(KVM_NUM_PRIOS - 1)
+ #define CPU_PRIO_MASK		(LOWEST_PRIO << KVM_PRIO_SHIFT)	/* 0xf8 */
+ #define IRQ_DEFAULT_PRIO	(LOWEST_PRIO - 1)
+@@ -212,6 +213,74 @@ static void guest_inject(struct test_args *args,
+ 	reset_priorities(args);
  }
  
--static void guest_irq_handler(struct ex_regs *regs)
-+static void guest_irq_generic_handler(bool eoi_split)
- {
- 	uint32_t intid = gic_get_and_ack_irq();
- 
-@@ -129,6 +130,8 @@ static void guest_irq_handler(struct ex_regs *regs)
- 
- 	gic_set_eoi(intid);
- 	GUEST_ASSERT_EQ(gic_read_ap1r0(), 0);
-+	if (eoi_split)
-+		gic_set_dir(intid);
- 
- 	GUEST_ASSERT(!gic_irq_get_active(intid));
- 	GUEST_ASSERT(!gic_irq_get_pending(intid));
-@@ -151,6 +154,24 @@ do { 										\
- 	GUEST_ASSERT(_intid == 0 || _intid == IAR_SPURIOUS);			\
- } while (0)
- 
-+#define CAT_HELPER(a, b) a ## b
-+#define CAT(a, b) CAT_HELPER(a, b)
-+#define PREFIX guest_irq_handler_
-+#define GUEST_IRQ_HANDLER_NAME(split) CAT(PREFIX, split)
-+#define GENERATE_GUEST_IRQ_HANDLER(split)					\
-+static void CAT(PREFIX, split)(struct ex_regs *regs)				\
-+{										\
-+	guest_irq_generic_handler(split);					\
++/*
++ * Polls the IAR until it's not a spurious interrupt.
++ *
++ * This function should only be used in test_inject_preemption (with IRQs
++ * masked).
++ */
++static uint32_t wait_for_and_activate_irq(void)
++{
++	uint32_t intid;
++
++	do {
++		asm volatile("wfi" : : : "memory");
++		intid = gic_get_and_ack_irq();
++	} while (intid == IAR_SPURIOUS);
++
++	return intid;
 +}
 +
-+GENERATE_GUEST_IRQ_HANDLER(0);
-+GENERATE_GUEST_IRQ_HANDLER(1);
++/*
++ * Inject multiple concurrent IRQs (num IRQs starting at first_intid) and
++ * handle them without handling the actual exceptions.  This is done by masking
++ * interrupts for the whole test.
++ */
++static void test_inject_preemption(struct test_args *args,
++		uint32_t first_intid, int num,
++		kvm_inject_cmd cmd)
++{
++	uint32_t intid, prio, step = KVM_PRIO_STEPS;
++	int i;
 +
-+static void (*guest_irq_handlers[2])(struct ex_regs *) = {
-+	GUEST_IRQ_HANDLER_NAME(0),
-+	GUEST_IRQ_HANDLER_NAME(1),
-+};
-+
- static void reset_priorities(struct test_args *args)
- {
- 	int i;
-@@ -220,6 +241,8 @@ static void guest_code(struct test_args args)
- 	for (i = 0; i < nr_irqs; i++)
- 		gic_irq_enable(i);
- 
-+	gic_set_eoi_split(args.eoi_split);
-+
- 	reset_priorities(&args);
- 	gic_set_priority_mask(CPU_PRIO_MASK);
- 
-@@ -268,10 +291,11 @@ static void kvm_inject_get_call(struct kvm_vm *vm, struct ucall *uc,
- 
- static void print_args(struct test_args *args)
- {
--	printf("nr-irqs=%d\n", args->nr_irqs);
-+	printf("nr-irqs=%d eoi-split=%d\n",
-+			args->nr_irqs, args->eoi_split);
- }
- 
--static void test_vgic(uint32_t nr_irqs)
-+static void test_vgic(uint32_t nr_irqs, bool eoi_split)
- {
- 	struct ucall uc;
- 	int gic_fd;
-@@ -280,6 +304,7 @@ static void test_vgic(uint32_t nr_irqs)
- 
- 	struct test_args args = {
- 		.nr_irqs = nr_irqs,
-+		.eoi_split = eoi_split,
- 	};
- 
- 	print_args(&args);
-@@ -297,7 +322,7 @@ static void test_vgic(uint32_t nr_irqs)
- 			GICD_BASE_GPA, GICR_BASE_GPA);
- 
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
--			guest_irq_handler);
-+			guest_irq_handlers[args.eoi_split]);
- 
- 	while (1) {
- 		vcpu_run(vm, VCPU_ID);
-@@ -328,8 +353,11 @@ static void help(const char *name)
- {
- 	printf(
- 	"\n"
--	"usage: %s [-n num_irqs]\n", name);
--	printf(" -n: specify the number of IRQs to configure the vgic with.\n");
-+	"usage: %s [-n num_irqs] [-e eoi_split]\n", name);
-+	printf(" -n: specify the number of IRQs to configure the vgic with. "
-+		"It has to be a multiple of 32 and between 64 and 1024.\n");
-+	printf(" -e: if 1 then EOI is split into a write to DIR on top "
-+		"of writing EOI.\n");
- 	puts("");
- 	exit(1);
- }
-@@ -337,18 +365,24 @@ static void help(const char *name)
- int main(int argc, char **argv)
- {
- 	uint32_t nr_irqs = 64;
-+	bool default_args = true;
- 	int opt;
-+	bool eoi_split = false;
- 
- 	/* Tell stdout not to buffer its content */
- 	setbuf(stdout, NULL);
- 
--	while ((opt = getopt(argc, argv, "hg:n:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hn:e:")) != -1) {
- 		switch (opt) {
- 		case 'n':
- 			nr_irqs = atoi(optarg);
- 			if (nr_irqs > 1024 || nr_irqs % 32)
- 				help(argv[0]);
- 			break;
-+		case 'e':
-+			eoi_split = (bool)atoi(optarg);
-+			default_args = false;
-+			break;
- 		case 'h':
- 		default:
- 			help(argv[0]);
-@@ -356,7 +390,15 @@ int main(int argc, char **argv)
- 		}
- 	}
- 
--	test_vgic(nr_irqs);
-+	/* If the user just specified nr_irqs and/or gic_version, then run all
-+	 * combinations.
++	/* Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
++	 * in descending order, so intid+1 can preempt intid.
 +	 */
-+	if (default_args) {
-+		test_vgic(nr_irqs, false /* eoi_split */);
-+		test_vgic(nr_irqs, true /* eoi_split */);
-+	} else {
-+		test_vgic(nr_irqs, eoi_split);
++	for (i = 0, prio = (num - 1) * step; i < num; i++, prio -= step) {
++		GUEST_ASSERT(prio >= 0);
++		intid = i + first_intid;
++		gic_set_priority(intid, prio);
++	}
++
++	local_irq_disable();
++
++	for (i = 0; i < num; i++) {
++		uint32_t tmp;
++		intid = i + first_intid;
++		kvm_inject_call(cmd, intid, 1);
++		/* Each successive IRQ will preempt the previous one. */
++		tmp = wait_for_and_activate_irq();
++		GUEST_ASSERT_EQ(tmp, intid);
++	}
++
++	/* finish handling the IRQs starting with the highest priority one. */
++	for (i = 0; i < num; i++) {
++		intid = num - i - 1 + first_intid;
++		gic_set_eoi(intid);
++		if (args->eoi_split)
++			gic_set_dir(intid);
++	}
++
++	local_irq_enable();
++
++	for (i = 0; i < num; i++)
++		GUEST_ASSERT(!gic_irq_get_active(i + first_intid));
++	GUEST_ASSERT_EQ(gic_read_ap1r0(), 0);
++	GUEST_ASSERT_IAR_EMPTY();
++
++	reset_priorities(args);
++}
++
+ static void test_injection(struct test_args *args, struct kvm_inject_desc *f)
+ {
+ 	uint32_t nr_irqs = args->nr_irqs;
+@@ -231,6 +300,24 @@ static void test_injection(struct test_args *args, struct kvm_inject_desc *f)
+ 	}
+ }
+ 
++static void test_preemption(struct test_args *args, struct kvm_inject_desc *f)
++{
++	/*
++	 * Test up to 4 levels of preemption. The reason is that KVM doesn't
++	 * currently implement the ability to have more than the number-of-LRs
++	 * number of concurrently active IRQs. The number of LRs implemented is
++	 * IMPLEMENTATION DEFINED, however, it seems that most implement 4.
++	 */
++	if (f->sgi)
++		test_inject_preemption(args, MIN_SGI, 4, f->cmd);
++
++	if (f->ppi)
++		test_inject_preemption(args, MIN_PPI, 4, f->cmd);
++
++	if (f->spi)
++		test_inject_preemption(args, MIN_SPI, 4, f->cmd);
++}
++
+ static void guest_code(struct test_args args)
+ {
+ 	uint32_t i, nr_irqs = args.nr_irqs;
+@@ -249,8 +336,10 @@ static void guest_code(struct test_args args)
+ 	local_irq_enable();
+ 
+ 	/* Start the tests. */
+-	for_each_inject_fn(inject_edge_fns, f)
++	for_each_inject_fn(inject_edge_fns, f) {
+ 		test_injection(&args, f);
++		test_preemption(&args, f);
 +	}
  
- 	return 0;
+ 	GUEST_DONE();
  }
 -- 
 2.34.0.rc0.344.g81b53c2807-goog
