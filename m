@@ -2,77 +2,77 @@ Return-Path: <SRS0=lFky=P4=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0225C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Nov 2021 02:39:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E77C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Nov 2021 02:39:38 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id A19F4619E4
-	for <kvmarm@archiver.kernel.org>; Tue,  9 Nov 2021 02:39:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A19F4619E4
+	by mail.kernel.org (Postfix) with ESMTP id 474E2619EC
+	for <kvmarm@archiver.kernel.org>; Tue,  9 Nov 2021 02:39:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 474E2619EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 526684B1F8;
-	Mon,  8 Nov 2021 21:39:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED5664B218;
+	Mon,  8 Nov 2021 21:39:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BJOdWxzvFl8t; Mon,  8 Nov 2021 21:39:35 -0500 (EST)
+	with ESMTP id iPERyTBaeOAN; Mon,  8 Nov 2021 21:39:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0320E4B1BD;
-	Mon,  8 Nov 2021 21:39:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19E2E4B223;
+	Mon,  8 Nov 2021 21:39:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E9DC4B1DB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 21:39:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CAFC4B209
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 21:39:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H+vONcnW5X9Y for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Nov 2021 21:39:31 -0500 (EST)
+ with ESMTP id CpMxvCrk926c for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Nov 2021 21:39:32 -0500 (EST)
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
  [209.85.214.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8F9E4B1F5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 21:39:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BABC4B1CC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Nov 2021 21:39:31 -0500 (EST)
 Received: by mail-pl1-f202.google.com with SMTP id
- b23-20020a170902d89700b001415444f5a6so7705385plz.7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Nov 2021 18:39:29 -0800 (PST)
+ f16-20020a170902ce9000b001436ba39b2bso1006502plg.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Nov 2021 18:39:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=LozXdBeHm1wVJM1zXtUi3Myaa0mOvHQ8f6t6MIK9jqk=;
- b=c2JYScEky9XAjrfUtUpSg0+Ds/y5sqhLsY4MTjk1ZRyQ5jTN+xr18kK5ALfBIkdJGl
- BeTxqMZXPXkFlv4W77QPonZYelqiEfHTUeYu01+VAXEyh4srKCMpNR+w2H9ZSisj6hju
- 7jgBEmL+2HSlqRH1z1zJQ/QAV2sdf8sCUkO+o8EsS4uAsJECUV0vi3YBRAl3UAKJH0EA
- HBq6OmaB1EQtEJAPCRn1DJ4qj1NMNQsGDGLtfDzdCihW10n5RBHQl7TDLI5YCYIwKtq3
- O2rmB73ClJb40oSoNLany273Jisyaex1z4lIO4QMIMxDWU4lmLzAfD71VVa6calQR9Z3
- 3BMg==
+ :cc; bh=gm/CRNjGjObMWonwa5W/nHZic3GC4NyZisHGpLvhyc8=;
+ b=jg7R31HslzvC6WTkqWsMFWssSX7fbPtphmW/TRdpNjnirQ3H99s7xKyNOZ84ofrMcA
+ QpzHH9Cnji7GWRlIXp5JGEXTzog5Ltq+nEEdlmq3pH52nHBYgbImdsAhud0GiRPcxIrp
+ GQ6kMjr+G4MAaUcouPEpkQjVe+psk0N6A2x7FVfiPL2Vsz3dH1+q1PeS0Rzby9GAj8UQ
+ OFkP6t6z9bLLEY/KiwlpXBSVlnFku9LBL/hnuXBFaA3/MF2CRRxgBfXhYDmKzT1GS510
+ TSUzPjuVYH6j4ad9bPukukVLRzpAM8BtvsTIltCKPNBzh7kk0ECuiTKO8OweVkj57dou
+ D3uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=LozXdBeHm1wVJM1zXtUi3Myaa0mOvHQ8f6t6MIK9jqk=;
- b=l1lPIDnTZBiYk4vVNFx3R9+54RcJ06O3loZbfl0Deo2/yeInDvF+oK+KinVTSQINZ7
- UFjSYefCFldG6TwhdT2XvWPN3ZTN7Q16wsJhMEIvzLOiNliAbSSKBBrq8nVPVFjHdors
- GuTVypuNpWexbMXzZgGmZA276/wpYOhepEnFBIiwGxYrGma7O3neLl8oqY8n3/CrjyE5
- 0K1Q6RFJ8C0I0Enlxj7/x+sTYb7H59qPTV9+rF0WJwSV5Afhr5FTxSi14Fm+kbhthF2a
- X4nDebn2/7p/lE9eQ9cj9+5+31Ek8+S5gYrKLaPLhMAZ/KGCNqk9JNqtuTw0L54jnm/Y
- dWHg==
-X-Gm-Message-State: AOAM531o+WSQ7t4anmgvwuvGXJ0yOSehBrIusBeEXpzeoLuUEmQDm0RV
- PrAzl1+/r2NqEHgY250nMmZnlltut9bZCw==
-X-Google-Smtp-Source: ABdhPJyd3cmlccdsr0jYFtsQ/AxEtNcZxg4ERBnu9kTbLsShBB+WnJdZ2O9U6SlWXTQFEJZRY28W/+iC5/C0mQ==
+ bh=gm/CRNjGjObMWonwa5W/nHZic3GC4NyZisHGpLvhyc8=;
+ b=dflNxqw3r21afeUJ2GEOIIE0VmEwciuN1rbrLNl7c/1Ea5Mkx9AS8goyyv6UxfsF+7
+ H745CKA159ubOLQJWpgVLgPUehw5r3r3R5M8Lp7o0/lHKCSMgeTCXt31NS6dJ+JdSQsC
+ HUu2mz5jKmVViyfMFkDoPbILru36wadEGB4zO6iSxgIUtD0N5w6AoXzDblxdlD5GCbzC
+ BnptjWDWbXp1sK0fMeW95KIT0YuawItRzBGAagx3D/jr/T6KMxymAlLK0KI/YCoOXk6e
+ 7HEfPr59sWw9HVRPOBaxEINeajgn7KrOeGxXLajzlT4zFVIuYlg/6+QCxAvnlcR6QR7Z
+ 56hQ==
+X-Gm-Message-State: AOAM532/qE8EKaqcyNK5RLv6gRwhENlBMmrwKnXNzZFUuFVxdwyWZes2
+ aHl3iIyVNa+9E5AsaZNzIys7HqgVFGOiwA==
+X-Google-Smtp-Source: ABdhPJzhJP7M/gay4oj9KOwF1d5OYBITCKFBVyKsSkoXq9DGjtvLfZlQXywp8op82b7ujQciv32QjtD4lcLrIw==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:aa7:8755:0:b0:494:67a6:1c84 with SMTP id
- g21-20020aa78755000000b0049467a61c84mr37627084pfo.26.1636425569082; Mon, 08
- Nov 2021 18:39:29 -0800 (PST)
-Date: Mon,  8 Nov 2021 18:38:59 -0800
+ (user=ricarkol job=sendgmr) by 2002:a17:902:e806:b0:142:830:eaa4 with SMTP id
+ u6-20020a170902e80600b001420830eaa4mr3808196plg.16.1636425570433; Mon, 08 Nov
+ 2021 18:39:30 -0800 (PST)
+Date: Mon,  8 Nov 2021 18:39:00 -0800
 In-Reply-To: <20211109023906.1091208-1-ricarkol@google.com>
-Message-Id: <20211109023906.1091208-11-ricarkol@google.com>
+Message-Id: <20211109023906.1091208-12-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20211109023906.1091208-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
-Subject: [PATCH 10/17] KVM: selftests: aarch64: add preemption tests in
- vgic_irq
+Subject: [PATCH 11/17] KVM: selftests: aarch64: level-sensitive interrupts
+ tests in vgic_irq
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu, 
  drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
@@ -93,140 +93,324 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add tests for IRQ preemption (having more than one activated IRQ at the
-same time).  This test injects multiple concurrent IRQs and handles them
-without handling the actual exceptions.  This is done by masking
-interrupts for the whole test.
+Add a cmdline arg for using level-sensitive interrupts (vs the default
+edge-triggered). Then move the handler into a generic handler function
+that takes the type of interrupt (level vs. edge) as an arg.  When
+handling line-sensitive interrupts it sets the line to low after
+acknowledging the IRQ.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- .../testing/selftests/kvm/aarch64/vgic_irq.c  | 91 ++++++++++++++++++-
- 1 file changed, 90 insertions(+), 1 deletion(-)
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  | 118 +++++++++++++-----
+ 1 file changed, 86 insertions(+), 32 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-index 3e18fa224280..b9080aa75a14 100644
+index b9080aa75a14..a20d225367a1 100644
 --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
 +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-@@ -41,6 +41,7 @@ struct test_args {
-  */
- #define KVM_NUM_PRIOS		32
- #define KVM_PRIO_SHIFT		3 /* steps of 8 = 1 << 3 */
-+#define KVM_PRIO_STEPS		(1 << KVM_PRIO_SHIFT) /* 8 */
- #define LOWEST_PRIO		(KVM_NUM_PRIOS - 1)
- #define CPU_PRIO_MASK		(LOWEST_PRIO << KVM_PRIO_SHIFT)	/* 0xf8 */
- #define IRQ_DEFAULT_PRIO	(LOWEST_PRIO - 1)
-@@ -212,6 +213,74 @@ static void guest_inject(struct test_args *args,
- 	reset_priorities(args);
+@@ -30,6 +30,7 @@
+ struct test_args {
+ 	uint32_t nr_irqs; /* number of KVM supported IRQs. */
+ 	bool eoi_split; /* 1 is eoir+dir, 0 is eoir only */
++	bool level_sensitive; /* 1 is level, 0 is edge */
+ };
+ 
+ /*
+@@ -57,27 +58,31 @@ static void *redist = (void *)GICR_BASE_GPA;
+ 
+ typedef enum {
+ 	KVM_INJECT_EDGE_IRQ_LINE = 1,
++	KVM_SET_IRQ_LINE,
++	KVM_SET_IRQ_LINE_HIGH,
+ } kvm_inject_cmd;
+ 
+ struct kvm_inject_args {
+ 	kvm_inject_cmd cmd;
+ 	uint32_t first_intid;
+ 	uint32_t num;
++	int level;
+ };
+ 
+ /* Used on the guest side to perform the hypercall. */
+-static void kvm_inject_call(kvm_inject_cmd cmd, uint32_t first_intid, uint32_t num);
+-
+-#define KVM_INJECT(cmd, intid)							\
+-	kvm_inject_call(cmd, intid, 1)
+-
+-#define KVM_INJECT_MULTI(cmd, intid, num)					\
+-	kvm_inject_call(cmd, intid, num)
++static void kvm_inject_call(kvm_inject_cmd cmd, uint32_t first_intid,
++			uint32_t num, int level);
+ 
+ /* Used on the host side to get the hypercall info. */
+ static void kvm_inject_get_call(struct kvm_vm *vm, struct ucall *uc,
+ 		struct kvm_inject_args *args);
+ 
++#define KVM_INJECT(cmd, intid)							\
++	kvm_inject_call(cmd, intid, 1, -1 /* not used */)
++
++#define KVM_INJECT_MULTI(cmd, intid, num)					\
++	kvm_inject_call(cmd, intid, num, -1 /* not used */)
++
+ struct kvm_inject_desc {
+ 	kvm_inject_cmd cmd;
+ 	/* can inject PPIs, PPIs, and/or SPIs. */
+@@ -90,6 +95,12 @@ static struct kvm_inject_desc inject_edge_fns[] = {
+ 	{ 0, },
+ };
+ 
++static struct kvm_inject_desc inject_level_fns[] = {
++	/*                                      sgi    ppi    spi */
++	{ KVM_SET_IRQ_LINE_HIGH,		false, true,  true },
++	{ 0, },
++};
++
+ #define for_each_inject_fn(t, f)						\
+ 	for ((f) = (t); (f)->cmd; (f)++)
+ 
+@@ -114,7 +125,9 @@ static uint64_t gic_read_ap1r0(void)
+ 	return reg;
  }
  
-+/*
-+ * Polls the IAR until it's not a spurious interrupt.
-+ *
-+ * This function should only be used in test_inject_preemption (with IRQs
-+ * masked).
-+ */
-+static uint32_t wait_for_and_activate_irq(void)
-+{
-+	uint32_t intid;
+-static void guest_irq_generic_handler(bool eoi_split)
++static void guest_set_irq_line(uint32_t intid, uint32_t level);
 +
-+	do {
-+		asm volatile("wfi" : : : "memory");
-+		intid = gic_get_and_ack_irq();
-+	} while (intid == IAR_SPURIOUS);
-+
-+	return intid;
-+}
-+
-+/*
-+ * Inject multiple concurrent IRQs (num IRQs starting at first_intid) and
-+ * handle them without handling the actual exceptions.  This is done by masking
-+ * interrupts for the whole test.
-+ */
-+static void test_inject_preemption(struct test_args *args,
-+		uint32_t first_intid, int num,
-+		kvm_inject_cmd cmd)
-+{
-+	uint32_t intid, prio, step = KVM_PRIO_STEPS;
-+	int i;
-+
-+	/* Set the priorities of the first (KVM_NUM_PRIOS - 1) IRQs
-+	 * in descending order, so intid+1 can preempt intid.
-+	 */
-+	for (i = 0, prio = (num - 1) * step; i < num; i++, prio -= step) {
-+		GUEST_ASSERT(prio >= 0);
-+		intid = i + first_intid;
-+		gic_set_priority(intid, prio);
-+	}
-+
-+	local_irq_disable();
-+
-+	for (i = 0; i < num; i++) {
-+		uint32_t tmp;
-+		intid = i + first_intid;
-+		kvm_inject_call(cmd, intid, 1);
-+		/* Each successive IRQ will preempt the previous one. */
-+		tmp = wait_for_and_activate_irq();
-+		GUEST_ASSERT_EQ(tmp, intid);
-+	}
-+
-+	/* finish handling the IRQs starting with the highest priority one. */
-+	for (i = 0; i < num; i++) {
-+		intid = num - i - 1 + first_intid;
-+		gic_set_eoi(intid);
-+		if (args->eoi_split)
-+			gic_set_dir(intid);
-+	}
-+
-+	local_irq_enable();
-+
-+	for (i = 0; i < num; i++)
-+		GUEST_ASSERT(!gic_irq_get_active(i + first_intid));
-+	GUEST_ASSERT_EQ(gic_read_ap1r0(), 0);
-+	GUEST_ASSERT_IAR_EMPTY();
-+
-+	reset_priorities(args);
-+}
-+
- static void test_injection(struct test_args *args, struct kvm_inject_desc *f)
++static void guest_irq_generic_handler(bool eoi_split, bool level_sensitive)
  {
- 	uint32_t nr_irqs = args->nr_irqs;
-@@ -231,6 +300,24 @@ static void test_injection(struct test_args *args, struct kvm_inject_desc *f)
- 	}
+ 	uint32_t intid = gic_get_and_ack_irq();
+ 
+@@ -123,7 +136,11 @@ static void guest_irq_generic_handler(bool eoi_split)
+ 
+ 	GUEST_ASSERT(gic_irq_get_active(intid));
+ 
+-	GUEST_ASSERT(!gic_irq_get_pending(intid));
++	if (!level_sensitive)
++		GUEST_ASSERT(!gic_irq_get_pending(intid));
++
++	if (level_sensitive)
++		guest_set_irq_line(intid, 0);
+ 
+ 	GUEST_ASSERT(intid < MAX_SPI);
+ 	irqnr_received[intid] += 1;
+@@ -138,12 +155,14 @@ static void guest_irq_generic_handler(bool eoi_split)
+ 	GUEST_ASSERT(!gic_irq_get_pending(intid));
  }
  
-+static void test_preemption(struct test_args *args, struct kvm_inject_desc *f)
+-static void kvm_inject_call(kvm_inject_cmd cmd, uint32_t first_intid, uint32_t num)
++static void kvm_inject_call(kvm_inject_cmd cmd, uint32_t first_intid,
++			uint32_t num, int level)
+ {
+ 	struct kvm_inject_args args = {
+ 		.cmd = cmd,
+ 		.first_intid = first_intid,
+ 		.num = num,
++		.level = level,
+ 	};
+ 	GUEST_SYNC(&args);
+ }
+@@ -158,19 +177,21 @@ do { 										\
+ #define CAT_HELPER(a, b) a ## b
+ #define CAT(a, b) CAT_HELPER(a, b)
+ #define PREFIX guest_irq_handler_
+-#define GUEST_IRQ_HANDLER_NAME(split) CAT(PREFIX, split)
+-#define GENERATE_GUEST_IRQ_HANDLER(split)					\
+-static void CAT(PREFIX, split)(struct ex_regs *regs)				\
++#define GUEST_IRQ_HANDLER_NAME(split, lev) CAT(PREFIX, CAT(split, lev))
++#define GENERATE_GUEST_IRQ_HANDLER(split, lev)					\
++static void CAT(PREFIX, CAT(split, lev))(struct ex_regs *regs)			\
+ {										\
+-	guest_irq_generic_handler(split);					\
++	guest_irq_generic_handler(split, lev);					\
+ }
+ 
+-GENERATE_GUEST_IRQ_HANDLER(0);
+-GENERATE_GUEST_IRQ_HANDLER(1);
++GENERATE_GUEST_IRQ_HANDLER(0, 0);
++GENERATE_GUEST_IRQ_HANDLER(0, 1);
++GENERATE_GUEST_IRQ_HANDLER(1, 0);
++GENERATE_GUEST_IRQ_HANDLER(1, 1);
+ 
+-static void (*guest_irq_handlers[2])(struct ex_regs *) = {
+-	GUEST_IRQ_HANDLER_NAME(0),
+-	GUEST_IRQ_HANDLER_NAME(1),
++static void (*guest_irq_handlers[2][2])(struct ex_regs *) = {
++	{GUEST_IRQ_HANDLER_NAME(0, 0), GUEST_IRQ_HANDLER_NAME(0, 1),},
++	{GUEST_IRQ_HANDLER_NAME(1, 0), GUEST_IRQ_HANDLER_NAME(1, 1),},
+ };
+ 
+ static void reset_priorities(struct test_args *args)
+@@ -181,6 +202,11 @@ static void reset_priorities(struct test_args *args)
+ 		gic_set_priority(i, IRQ_DEFAULT_PRIO_REG);
+ }
+ 
++static void guest_set_irq_line(uint32_t intid, uint32_t level)
 +{
-+	/*
-+	 * Test up to 4 levels of preemption. The reason is that KVM doesn't
-+	 * currently implement the ability to have more than the number-of-LRs
-+	 * number of concurrently active IRQs. The number of LRs implemented is
-+	 * IMPLEMENTATION DEFINED, however, it seems that most implement 4.
-+	 */
-+	if (f->sgi)
-+		test_inject_preemption(args, MIN_SGI, 4, f->cmd);
-+
-+	if (f->ppi)
-+		test_inject_preemption(args, MIN_PPI, 4, f->cmd);
-+
-+	if (f->spi)
-+		test_inject_preemption(args, MIN_SPI, 4, f->cmd);
++	kvm_inject_call(KVM_SET_IRQ_LINE, intid, 1, level);
 +}
 +
+ static void guest_inject(struct test_args *args,
+ 		uint32_t first_intid, uint32_t num,
+ 		kvm_inject_cmd cmd)
+@@ -257,10 +283,12 @@ static void test_inject_preemption(struct test_args *args,
+ 	for (i = 0; i < num; i++) {
+ 		uint32_t tmp;
+ 		intid = i + first_intid;
+-		kvm_inject_call(cmd, intid, 1);
++		KVM_INJECT(cmd, intid);
+ 		/* Each successive IRQ will preempt the previous one. */
+ 		tmp = wait_for_and_activate_irq();
+ 		GUEST_ASSERT_EQ(tmp, intid);
++		if (args->level_sensitive)
++			guest_set_irq_line(intid, 0);
+ 	}
+ 
+ 	/* finish handling the IRQs starting with the highest priority one. */
+@@ -321,22 +349,29 @@ static void test_preemption(struct test_args *args, struct kvm_inject_desc *f)
  static void guest_code(struct test_args args)
  {
  	uint32_t i, nr_irqs = args.nr_irqs;
-@@ -249,8 +336,10 @@ static void guest_code(struct test_args args)
+-	struct kvm_inject_desc *f;
++	bool level_sensitive = args.level_sensitive;
++	struct kvm_inject_desc *f, *inject_fns;
+ 
+ 	gic_init(GIC_V3, 1, dist, redist);
+ 
+ 	for (i = 0; i < nr_irqs; i++)
+ 		gic_irq_enable(i);
+ 
++	for (i = MIN_SPI; i < nr_irqs; i++)
++		gic_irq_set_config(i, !args.level_sensitive);
++
+ 	gic_set_eoi_split(args.eoi_split);
+ 
+ 	reset_priorities(&args);
+ 	gic_set_priority_mask(CPU_PRIO_MASK);
+ 
++	inject_fns  = level_sensitive ? inject_level_fns
++				      : inject_edge_fns;
++
  	local_irq_enable();
  
  	/* Start the tests. */
--	for_each_inject_fn(inject_edge_fns, f)
-+	for_each_inject_fn(inject_edge_fns, f) {
+-	for_each_inject_fn(inject_edge_fns, f) {
++	for_each_inject_fn(inject_fns, f) {
  		test_injection(&args, f);
-+		test_preemption(&args, f);
-+	}
+ 		test_preemption(&args, f);
+ 	}
+@@ -351,6 +386,7 @@ static void run_guest_cmd(struct kvm_vm *vm, int gic_fd,
+ 	kvm_inject_cmd cmd = inject_args->cmd;
+ 	uint32_t intid = inject_args->first_intid;
+ 	uint32_t num = inject_args->num;
++	int level = inject_args->level;
+ 	uint32_t i;
  
- 	GUEST_DONE();
+ 	assert(intid < UINT_MAX - num);
+@@ -362,6 +398,14 @@ static void run_guest_cmd(struct kvm_vm *vm, int gic_fd,
+ 		for (i = intid; i < intid + num; i++)
+ 			kvm_arm_irq_line(vm, i, 0);
+ 		break;
++	case KVM_SET_IRQ_LINE:
++		for (i = intid; i < intid + num; i++)
++			kvm_arm_irq_line(vm, i, level);
++		break;
++	case KVM_SET_IRQ_LINE_HIGH:
++		for (i = intid; i < intid + num; i++)
++			kvm_arm_irq_line(vm, i, 1);
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -380,11 +424,12 @@ static void kvm_inject_get_call(struct kvm_vm *vm, struct ucall *uc,
+ 
+ static void print_args(struct test_args *args)
+ {
+-	printf("nr-irqs=%d eoi-split=%d\n",
+-			args->nr_irqs, args->eoi_split);
++	printf("nr-irqs=%d level-sensitive=%d eoi-split=%d\n",
++			args->nr_irqs, args->level_sensitive,
++			args->eoi_split);
  }
+ 
+-static void test_vgic(uint32_t nr_irqs, bool eoi_split)
++static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
+ {
+ 	struct ucall uc;
+ 	int gic_fd;
+@@ -393,6 +438,7 @@ static void test_vgic(uint32_t nr_irqs, bool eoi_split)
+ 
+ 	struct test_args args = {
+ 		.nr_irqs = nr_irqs,
++		.level_sensitive = level_sensitive,
+ 		.eoi_split = eoi_split,
+ 	};
+ 
+@@ -411,7 +457,7 @@ static void test_vgic(uint32_t nr_irqs, bool eoi_split)
+ 			GICD_BASE_GPA, GICR_BASE_GPA);
+ 
+ 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
+-			guest_irq_handlers[args.eoi_split]);
++		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
+ 
+ 	while (1) {
+ 		vcpu_run(vm, VCPU_ID);
+@@ -442,11 +488,12 @@ static void help(const char *name)
+ {
+ 	printf(
+ 	"\n"
+-	"usage: %s [-n num_irqs] [-e eoi_split]\n", name);
+-	printf(" -n: specify the number of IRQs to configure the vgic with. "
++	"usage: %s [-n num_irqs] [-e eoi_split] [-l level_sensitive]\n", name);
++	printf(" -n: specify number of IRQs to setup the vgic with. "
+ 		"It has to be a multiple of 32 and between 64 and 1024.\n");
+ 	printf(" -e: if 1 then EOI is split into a write to DIR on top "
+ 		"of writing EOI.\n");
++	printf(" -l: specify whether the IRQs are level-sensitive (1) or not (0).");
+ 	puts("");
+ 	exit(1);
+ }
+@@ -455,13 +502,14 @@ int main(int argc, char **argv)
+ {
+ 	uint32_t nr_irqs = 64;
+ 	bool default_args = true;
++	bool level_sensitive = false;
+ 	int opt;
+ 	bool eoi_split = false;
+ 
+ 	/* Tell stdout not to buffer its content */
+ 	setbuf(stdout, NULL);
+ 
+-	while ((opt = getopt(argc, argv, "hn:e:")) != -1) {
++	while ((opt = getopt(argc, argv, "hn:e:l:")) != -1) {
+ 		switch (opt) {
+ 		case 'n':
+ 			nr_irqs = atoi(optarg);
+@@ -472,6 +520,10 @@ int main(int argc, char **argv)
+ 			eoi_split = (bool)atoi(optarg);
+ 			default_args = false;
+ 			break;
++		case 'l':
++			level_sensitive = (bool)atoi(optarg);
++			default_args = false;
++			break;
+ 		case 'h':
+ 		default:
+ 			help(argv[0]);
+@@ -483,10 +535,12 @@ int main(int argc, char **argv)
+ 	 * combinations.
+ 	 */
+ 	if (default_args) {
+-		test_vgic(nr_irqs, false /* eoi_split */);
+-		test_vgic(nr_irqs, true /* eoi_split */);
++		test_vgic(nr_irqs, false /* level */, false /* eoi_split */);
++		test_vgic(nr_irqs, false /* level */, true /* eoi_split */);
++		test_vgic(nr_irqs, true /* level */, false /* eoi_split */);
++		test_vgic(nr_irqs, true /* level */, true /* eoi_split */);
+ 	} else {
+-		test_vgic(nr_irqs, eoi_split);
++		test_vgic(nr_irqs, level_sensitive, eoi_split);
+ 	}
+ 
+ 	return 0;
 -- 
 2.34.0.rc0.344.g81b53c2807-goog
 
