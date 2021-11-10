@@ -2,93 +2,91 @@ Return-Path: <SRS0=+uR8=P5=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2091BC433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Nov 2021 17:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 227F3C4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Nov 2021 17:03:43 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 875C161267
-	for <kvmarm@archiver.kernel.org>; Wed, 10 Nov 2021 17:00:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 875C161267
+	by mail.kernel.org (Postfix) with ESMTP id 9827B6124D
+	for <kvmarm@archiver.kernel.org>; Wed, 10 Nov 2021 17:03:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9827B6124D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C52214B22C;
-	Wed, 10 Nov 2021 12:00:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EA9F4B235;
+	Wed, 10 Nov 2021 12:03:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PXt-7-WUS6Bn; Wed, 10 Nov 2021 12:00:27 -0500 (EST)
+	with ESMTP id aPWRBar2c-Nk; Wed, 10 Nov 2021 12:03:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 204FB4B204;
-	Wed, 10 Nov 2021 12:00:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A78F14B212;
+	Wed, 10 Nov 2021 12:03:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 844794B1EF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 12:00:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 339804B206
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 12:03:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WK32XTeL1jI3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Nov 2021 12:00:20 -0500 (EST)
+ with ESMTP id 4HrdxX1AU6ZT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Nov 2021 12:03:38 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 812714B1ED
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 12:00:20 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08BC94B204
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 12:03:38 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1636563620;
+ s=mimecast20190719; t=1636563817;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j4pYydCf5K8wTsOHmFWFndJrj56wgud3cb8m0v50g38=;
- b=cJkE5DasWvfT2s7xPKgOqnV6dCshD4s41mXkfQU7rdnS780HVBgNTy35dKbNmoilEwWcbt
- TtydiY8FACzy5Z2OaMiGF7GxD1t5LipGZRMPlRNwCnS7Xhu4WugZUUocgFJW4Il8dlI6dU
- RlqlvILpJ/G6AUFj2GZ0pu0NCYUoZwA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-593-DY7n6p9NPYmcAlU0APtLWA-1; Wed, 10 Nov 2021 12:00:17 -0500
-X-MC-Unique: DY7n6p9NPYmcAlU0APtLWA-1
-Received: by mail-wm1-f71.google.com with SMTP id
- l4-20020a05600c1d0400b00332f47a0fa3so1429083wms.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 09:00:16 -0800 (PST)
+ bh=FQBQ5GV6gdxpV3LZ1YIPdhUG1JWyAiTVUj8IYWvvfMw=;
+ b=afLcOD3BhFQy8Syr3vv5idnYSn1dzEw0+usQXgrbSdxvwVZNMr+I2B7nRbyjs13c5wr5IH
+ 1beGPIrjdCnEb9bDgvuKUy/92yrsvUKjD5xcZBT+5DNSMeP3e53sy/cmXdp+bDUCq5wic4
+ Hn/2zqY0LTgOyLUZJzNak1c3GgDcnaQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-255-TujrwpQOOLKYmLwOARsHkQ-1; Wed, 10 Nov 2021 12:03:36 -0500
+X-MC-Unique: TujrwpQOOLKYmLwOARsHkQ-1
+Received: by mail-wr1-f69.google.com with SMTP id
+ v17-20020adfedd1000000b0017c5e737b02so556389wro.18
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 09:03:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=j4pYydCf5K8wTsOHmFWFndJrj56wgud3cb8m0v50g38=;
- b=OTLMYz2NBMbAP57+FWQd8oVsqGaaUVUOUrM5rt1Tp5eybj2O1d9EoQ/0/oN087lHT9
- 1ZXngYAI5XDYABZv8UT7RJQWdQvnVj2iALRwa9GLXdjIHoI46s+4XF3NTjZZj+nlFqvr
- dVmO6NNUmqSHsu0TAVSG3Ge3q/viNvKlxUmVo3nWb4hVOQKsuMxMUPRNoaPYTbZdA+4g
- MPI8KCyxOrhRF28dlWrHxKIevrp7p5bKYME9u1u0aFO9G03l4JKSFUEeZyyuFTEL00DP
- BWiSlCevnCpCYAgaLPiT+l3SPz4rMwgqZage7Bv1CGzXKR0WuPvp7igX9vaUhUdFkuru
- +Nmw==
-X-Gm-Message-State: AOAM533hOlFRXqqXRMVlmT7VCHyozzNj9PkuVZ1PTsXm3Pfum/j6l4Fi
- wFNWcACoIHKTWQZigjb2tR14WyDZZ3L11He1FTquUN357Gxz/BGGR1WOrJl1W/EIO6tZvB9Rsgn
- wMjf9vrxiPThnQwmF+00qbiK+
-X-Received: by 2002:a1c:43c1:: with SMTP id
- q184mr18128557wma.153.1636563615737; 
- Wed, 10 Nov 2021 09:00:15 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzI55jyDNoSB30zudIHtQh+iKpj0BpgPN8b1JOQeacltE6fInNdbDMoAUO3wu73arG51UEabg==
-X-Received: by 2002:a1c:43c1:: with SMTP id
- q184mr18128529wma.153.1636563615493; 
- Wed, 10 Nov 2021 09:00:15 -0800 (PST)
+ bh=FQBQ5GV6gdxpV3LZ1YIPdhUG1JWyAiTVUj8IYWvvfMw=;
+ b=n+uuDTom8InEVc6BKMbj4XRlfw2UvQc4ZLbIOLZ/Owi46zs66PxUBrFq7guaJQqD87
+ xOnPw9Do0XJP+qkhG60uU6gZeL/etyps/ZSgJredLoBTr7STRZiDOzyuWKyc/AfhQTSY
+ ImsGpXW0u2xlW+O2OXH6iL2fNmIAy2JQRQVwbTeT2IZ4mi8qjS0j0/i3SFZzoHXPR/Tx
+ aNHry8jwsHT9/mYned6ZfJ3T9EQRnQMEqJvGTNdJk6e/ow2Ir4DxCM9PIfYtH97XzWcj
+ vxxXJtHBnzT1+nJN9+sIpBsc6HDpr6SrFHC+eizvucyxfeEt+oG3fXWKGVgcssSpT34b
+ cXBQ==
+X-Gm-Message-State: AOAM530FrsjVjsazlCD7Ju4WYWLpegjgohIjoWvUlUJcYFzKvrZwQcub
+ TvBMyx+OOvfzjDCOE93VI/YKpBSbdjCjQyjB9rLELtnq8ZlseHVo8OaGeYczAqJkPBviGaQiclm
+ M0mhV7dzH6r7mEAH6lvdYT12B
+X-Received: by 2002:adf:ce0e:: with SMTP id p14mr551587wrn.423.1636563814676; 
+ Wed, 10 Nov 2021 09:03:34 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyrsIiuV6DLoUx3vhu7fe0Z8vzAwRCp5SwwfYqbhWvnsnUeDV0lvT6ihmH7onVoe32Y3qScgA==
+X-Received: by 2002:adf:ce0e:: with SMTP id p14mr551532wrn.423.1636563814405; 
+ Wed, 10 Nov 2021 09:03:34 -0800 (PST)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
  ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id z6sm434734wmp.1.2021.11.10.09.00.13
+ by smtp.gmail.com with ESMTPSA id p2sm6723185wmq.23.2021.11.10.09.03.31
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 10 Nov 2021 09:00:14 -0800 (PST)
-Subject: Re: [PATCH v4 03/15] KVM: async_pf: Make GFN slot management generic
+ Wed, 10 Nov 2021 09:03:33 -0800 (PST)
+Subject: Re: [PATCH v4 04/15] KVM: x86: Use generic async PF slot management
 To: Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu
 References: <20210815005947.83699-1-gshan@redhat.com>
- <20210815005947.83699-4-gshan@redhat.com>
+ <20210815005947.83699-5-gshan@redhat.com>
 From: Eric Auger <eauger@redhat.com>
-Message-ID: <06cb06c0-13e7-906b-9b88-543a58bb5590@redhat.com>
-Date: Wed, 10 Nov 2021 18:00:12 +0100
+Message-ID: <a3b0e70a-eddd-9a85-2c9c-ba5446ac542b@redhat.com>
+Date: Wed, 10 Nov 2021 18:03:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20210815005947.83699-4-gshan@redhat.com>
+In-Reply-To: <20210815005947.83699-5-gshan@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -116,203 +114,217 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Gavin,
 
 On 8/15/21 2:59 AM, Gavin Shan wrote:
-> It's not allowed to fire duplicate notification for same GFN on
-> x86 platform, with help of a hash table. This mechanism is going
-s/, with help of a hash table/this is achieved through a hash table
-> to be used by arm64 and this makes the code generic and shareable
-s/and this makes/.\n Turn the code generic
-> by multiple platforms.
+> This uses the generic slot management mechanism for asynchronous
+Now we have moved the hash table management in the generic code, Use
+this latter ...
+> page fault by enabling CONFIG_KVM_ASYNC_PF_SLOT because the private
+> implementation is totally duplicate to the generic one.
 > 
->    * As this mechanism isn't needed by all platforms, a new kernel
->      config option (CONFIG_ASYNC_PF_SLOT) is introduced so that it
->      can be disabled at compiling time.
-compile time
-> 
->    * The code is basically copied from x86 platform and the functions
->      are renamed to reflect the fact: (a) the input parameters are
->      vCPU and GFN. 
-not for reset
-(b) The operations are resetting, searching, adding
->      and removing.
-find, add, remove ops are renamed with _slot suffix
-> 
->    * Helper stub is also added on !CONFIG_KVM_ASYNC_PF because we're
->      going to use IS_ENABLED() instead of #ifdef on arm64 when the
->      asynchronous page fault is supported.
-> 
-> This is preparatory work to use the newly introduced functions on x86
-> platform and arm64 in subsequent patches.
+> The changes introduced by this is pretty mechanical and shouldn't
+> cause any logical changes.
+suggest: No functional change intended.
 > 
 > Signed-off-by: Gavin Shan <gshan@redhat.com>
 > ---
->  include/linux/kvm_host.h | 18 +++++++++
->  virt/kvm/Kconfig         |  3 ++
->  virt/kvm/async_pf.c      | 85 ++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 106 insertions(+)
+>  arch/x86/include/asm/kvm_host.h |  2 -
+>  arch/x86/kvm/Kconfig            |  1 +
+>  arch/x86/kvm/mmu/mmu.c          |  2 +-
+>  arch/x86/kvm/x86.c              | 86 +++------------------------------
+>  4 files changed, 8 insertions(+), 83 deletions(-)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index a5f990f6dc35..a9685c2b2250 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -298,6 +298,9 @@ struct kvm_vcpu {
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 974cbfb1eefe..409c1e7137cd 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -810,7 +810,6 @@ struct kvm_vcpu_arch {
 >  
->  #ifdef CONFIG_KVM_ASYNC_PF
 >  	struct {
-> +#ifdef CONFIG_KVM_ASYNC_PF_SLOT
-> +		gfn_t gfns[ASYNC_PF_PER_VCPU];
-> +#endif
->  		u32 queued;
->  		struct list_head queue;
->  		struct list_head done;
-> @@ -339,6 +342,13 @@ struct kvm_async_pf {
->  	bool				notpresent_injected;
->  };
+>  		bool halted;
+> -		gfn_t gfns[ASYNC_PF_PER_VCPU];
+>  		struct gfn_to_hva_cache data;
+>  		u64 msr_en_val; /* MSR_KVM_ASYNC_PF_EN */
+>  		u64 msr_int_val; /* MSR_KVM_ASYNC_PF_INT */
+> @@ -1878,7 +1877,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
+>  			       struct kvm_async_pf *work);
+>  void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu);
+>  bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
+> -extern bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
 >  
-> +#ifdef CONFIG_KVM_ASYNC_PF_SLOT
-> +void kvm_async_pf_reset_slot(struct kvm_vcpu *vcpu);
-this does not reset a "slot" but the whole hash table. So to me this
-shouldn't be renamed with _slot suffix. reset_hash or reset_all_slots?
-> +void kvm_async_pf_add_slot(struct kvm_vcpu *vcpu, gfn_t gfn);
-> +void kvm_async_pf_remove_slot(struct kvm_vcpu *vcpu, gfn_t gfn);
-> +bool kvm_async_pf_find_slot(struct kvm_vcpu *vcpu, gfn_t gfn);
-> +#endif
-> +
->  static inline bool kvm_check_async_pf_completion_queue(struct kvm_vcpu *vcpu)
+>  int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu);
+>  int kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err);
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index ac69894eab88..53a6ef30b6ee 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -32,6 +32,7 @@ config KVM
+>  	select HAVE_KVM_IRQ_ROUTING
+>  	select HAVE_KVM_EVENTFD
+>  	select KVM_ASYNC_PF
+> +	select KVM_ASYNC_PF_SLOT
+>  	select USER_RETURN_NOTIFIER
+>  	select KVM_MMIO
+>  	select SCHED_INFO
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c4f4fa23320e..cd8aaa662ac2 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3799,7 +3799,7 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+>  
+>  	if (!prefault && kvm_can_do_async_pf(vcpu)) {
+>  		trace_kvm_try_async_get_page(cr2_or_gpa, gfn);
+> -		if (kvm_find_async_pf_gfn(vcpu, gfn)) {
+> +		if (kvm_async_pf_find_slot(vcpu, gfn)) {
+>  			trace_kvm_async_pf_doublefault(cr2_or_gpa, gfn);
+>  			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
+>  			return true;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 7f35d9324b99..a5f7d6122178 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -332,13 +332,6 @@ static struct kmem_cache *kvm_alloc_emulator_cache(void)
+>  
+>  static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt);
+>  
+> -static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
+> -{
+> -	int i;
+> -	for (i = 0; i < ASYNC_PF_PER_VCPU; i++)
+> -		vcpu->arch.apf.gfns[i] = ~0;
+> -}
+> -
+>  static void kvm_on_user_return(struct user_return_notifier *urn)
 >  {
->  	return !list_empty_careful(&vcpu->async_pf.done);
-> @@ -350,6 +360,14 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  			unsigned long hva, struct kvm_arch_async_pf *arch);
->  int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
->  #else
-> +static inline void kvm_async_pf_reset_slot(struct kvm_vcpu *vcpu) { }
-> +static inline void kvm_async_pf_add_slot(struct kvm_vcpu *vcpu, gfn_t gfn) { }
-> +static inline void kvm_async_pf_remove_slot(struct kvm_vcpu *vcpu, gfn_t gfn) { }
-> +static inline bool kvm_async_pf_find_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
-> +{
-> +	return false;
-> +}
-> +
->  static inline bool kvm_check_async_pf_completion_queue(struct kvm_vcpu *vcpu)
+>  	unsigned slot;
+> @@ -854,7 +847,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
 >  {
->  	return false;
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 62b39149b8c8..59b518c8c205 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -23,6 +23,9 @@ config KVM_MMIO
->  config KVM_ASYNC_PF
->         bool
+>  	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
+>  		kvm_clear_async_pf_completion_queue(vcpu);
+> -		kvm_async_pf_hash_reset(vcpu);
+> +		kvm_async_pf_reset_slot(vcpu);
+>  	}
 >  
-> +config KVM_ASYNC_PF_SLOT
-> +	bool
-> +
->  # Toggle to switch between direct notification and batch job
->  config KVM_ASYNC_PF_SYNC
->         bool
-> diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
-> index d145a61a046a..0d1fdb2932af 100644
-> --- a/virt/kvm/async_pf.c
-> +++ b/virt/kvm/async_pf.c
-> @@ -13,12 +13,97 @@
->  #include <linux/module.h>
->  #include <linux/mmu_context.h>
->  #include <linux/sched/mm.h>
-> +#ifdef CONFIG_KVM_ASYNC_PF_SLOT
-> +#include <linux/hash.h>
-> +#endif
+>  	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS)
+> @@ -3118,7 +3111,7 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
 >  
->  #include "async_pf.h"
->  #include <trace/events/kvm.h>
+>  	if (!kvm_pv_async_pf_enabled(vcpu)) {
+>  		kvm_clear_async_pf_completion_queue(vcpu);
+> -		kvm_async_pf_hash_reset(vcpu);
+> +		kvm_async_pf_reset_slot(vcpu);
+>  		return 0;
+>  	}
 >  
->  static struct kmem_cache *async_pf_cache;
+> @@ -10704,7 +10697,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
 >  
-> +#ifdef CONFIG_KVM_ASYNC_PF_SLOT
-> +static inline u32 kvm_async_pf_hash(gfn_t gfn)
-> +{
-> +	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
-> +
-> +	return hash_32(gfn & 0xffffffff, order_base_2(ASYNC_PF_PER_VCPU));
-> +}
-> +
-> +static inline u32 kvm_async_pf_next_slot(u32 key)
-> +{
-> +	return (key + 1) & (ASYNC_PF_PER_VCPU - 1);
-> +}
-> +
-> +static u32 kvm_async_pf_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
-> +{
-> +	u32 key = kvm_async_pf_hash(gfn);
-> +	int i;
-> +
-> +	for (i = 0; i < ASYNC_PF_PER_VCPU &&
-> +		(vcpu->async_pf.gfns[key] != gfn &&
-> +		vcpu->async_pf.gfns[key] != ~0); i++)
-> +		key = kvm_async_pf_next_slot(key);
-> +
-> +	return key;
-> +}
-> +
-> +void kvm_async_pf_reset_slot(struct kvm_vcpu *vcpu)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < ASYNC_PF_PER_VCPU; i++)
-> +		vcpu->async_pf.gfns[i] = ~0;
-> +}
-> +
-> +void kvm_async_pf_add_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
-> +{
-> +	u32 key = kvm_async_pf_hash(gfn);
-> +
-> +	while (vcpu->async_pf.gfns[key] != ~0)
-> +		key = kvm_async_pf_next_slot(key);
-> +
-> +	vcpu->async_pf.gfns[key] = gfn;
-> +}
-> +
-> +void kvm_async_pf_remove_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
-> +{
-> +	u32 i, j, k;
-> +
-> +	i = j = kvm_async_pf_slot(vcpu, gfn);
-> +
-> +	if (WARN_ON_ONCE(vcpu->async_pf.gfns[i] != gfn))
-> +		return;
-> +
-> +	while (true) {
-> +		vcpu->async_pf.gfns[i] = ~0;
-> +
-> +		do {
-> +			j = kvm_async_pf_next_slot(j);
-> +			if (vcpu->async_pf.gfns[j] == ~0)
-> +				return;
-> +
-> +			k = kvm_async_pf_hash(vcpu->async_pf.gfns[j]);
-> +			/*
-> +			 * k lies cyclically in ]i,j]
-> +			 * |    i.k.j |
-> +			 * |....j i.k.| or  |.k..j i...|
-> +			 */
-> +		} while ((i <= j) ? (i < k && k <= j) : (i < k || k <= j));
-> +
-> +		vcpu->async_pf.gfns[i] = vcpu->async_pf.gfns[j];
-> +		i = j;
-> +	}
-> +}
-> +
-> +bool kvm_async_pf_find_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
-> +{
-> +	u32 key = kvm_async_pf_slot(vcpu, gfn);
-> +
-> +	return vcpu->async_pf.gfns[key] == gfn;
-> +}
-> +#endif /* CONFIG_KVM_ASYNC_PF_SLOT */
-> +
->  int kvm_async_pf_init(void)
+>  	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
+>  
+> -	kvm_async_pf_hash_reset(vcpu);
+> +	kvm_async_pf_reset_slot(vcpu);
+>  	kvm_pmu_init(vcpu);
+>  
+>  	vcpu->arch.pending_external_vector = -1;
+> @@ -10828,7 +10821,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	kvmclock_reset(vcpu);
+>  
+>  	kvm_clear_async_pf_completion_queue(vcpu);
+> -	kvm_async_pf_hash_reset(vcpu);
+> +	kvm_async_pf_reset_slot(vcpu);
+>  	vcpu->arch.apf.halted = false;
+>  
+>  	if (vcpu->arch.guest_fpu && kvm_mpx_supported()) {
+> @@ -11737,73 +11730,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
+>  }
+>  
+> -static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
+> -{
+> -	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
+> -
+> -	return hash_32(gfn & 0xffffffff, order_base_2(ASYNC_PF_PER_VCPU));
+> -}
+> -
+> -static inline u32 kvm_async_pf_next_probe(u32 key)
+> -{
+> -	return (key + 1) & (ASYNC_PF_PER_VCPU - 1);
+> -}
+> -
+> -static void kvm_add_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
+> -{
+> -	u32 key = kvm_async_pf_hash_fn(gfn);
+> -
+> -	while (vcpu->arch.apf.gfns[key] != ~0)
+> -		key = kvm_async_pf_next_probe(key);
+> -
+> -	vcpu->arch.apf.gfns[key] = gfn;
+> -}
+> -
+> -static u32 kvm_async_pf_gfn_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
+> -{
+> -	int i;
+> -	u32 key = kvm_async_pf_hash_fn(gfn);
+> -
+> -	for (i = 0; i < ASYNC_PF_PER_VCPU &&
+> -		     (vcpu->arch.apf.gfns[key] != gfn &&
+> -		      vcpu->arch.apf.gfns[key] != ~0); i++)
+> -		key = kvm_async_pf_next_probe(key);
+> -
+> -	return key;
+> -}
+> -
+> -bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
+> -{
+> -	return vcpu->arch.apf.gfns[kvm_async_pf_gfn_slot(vcpu, gfn)] == gfn;
+> -}
+> -
+> -static void kvm_del_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
+> -{
+> -	u32 i, j, k;
+> -
+> -	i = j = kvm_async_pf_gfn_slot(vcpu, gfn);
+> -
+> -	if (WARN_ON_ONCE(vcpu->arch.apf.gfns[i] != gfn))
+> -		return;
+> -
+> -	while (true) {
+> -		vcpu->arch.apf.gfns[i] = ~0;
+> -		do {
+> -			j = kvm_async_pf_next_probe(j);
+> -			if (vcpu->arch.apf.gfns[j] == ~0)
+> -				return;
+> -			k = kvm_async_pf_hash_fn(vcpu->arch.apf.gfns[j]);
+> -			/*
+> -			 * k lies cyclically in ]i,j]
+> -			 * |    i.k.j |
+> -			 * |....j i.k.| or  |.k..j i...|
+> -			 */
+> -		} while ((i <= j) ? (i < k && k <= j) : (i < k || k <= j));
+> -		vcpu->arch.apf.gfns[i] = vcpu->arch.apf.gfns[j];
+> -		i = j;
+> -	}
+> -}
+> -
+>  static inline int apf_put_user_notpresent(struct kvm_vcpu *vcpu)
 >  {
->  	async_pf_cache = KMEM_CACHE(kvm_async_pf, 0);
+>  	u32 reason = KVM_PV_REASON_PAGE_NOT_PRESENT;
+> @@ -11867,7 +11793,7 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
+>  	struct x86_exception fault;
+>  
+>  	trace_kvm_async_pf_not_present(work->arch.token, work->cr2_or_gpa);
+> -	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
+> +	kvm_async_pf_add_slot(vcpu, work->arch.gfn);
+>  
+>  	if (kvm_can_deliver_async_pf(vcpu) &&
+>  	    !apf_put_user_notpresent(vcpu)) {
+> @@ -11904,7 +11830,7 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
+>  	if (work->wakeup_all)
+>  		work->arch.token = ~0; /* broadcast wakeup */
+>  	else
+> -		kvm_del_async_pf_gfn(vcpu, work->arch.gfn);
+> +		kvm_async_pf_remove_slot(vcpu, work->arch.gfn);
+>  	trace_kvm_async_pf_ready(work->arch.token, work->cr2_or_gpa);
+>  
+>  	if ((work->wakeup_all || work->notpresent_injected) &&
 > 
-Thanks
+Looks good to me
 
 Eric
 
