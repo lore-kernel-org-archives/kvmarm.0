@@ -2,121 +2,101 @@ Return-Path: <SRS0=nF4w=P6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE03C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 07:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC535C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 10:39:57 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 14C4B60F21
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 07:27:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 14C4B60F21
+	by mail.kernel.org (Postfix) with ESMTP id 58E1E61002
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 10:39:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 58E1E61002
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A6244B1EF;
-	Thu, 11 Nov 2021 02:27:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF38F4B1F6;
+	Thu, 11 Nov 2021 05:39:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HbyjRtJ2DXqe; Thu, 11 Nov 2021 02:27:07 -0500 (EST)
+	with ESMTP id YcrhioQMHXhT; Thu, 11 Nov 2021 05:39:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AF424B1E4;
-	Thu, 11 Nov 2021 02:27:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94A524B1E4;
+	Thu, 11 Nov 2021 05:39:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 306424B1D4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 02:27:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EF094B1B4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 05:39:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zMc1o5buxhd3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Nov 2021 02:27:05 -0500 (EST)
+ with ESMTP id iCa-1OIoP9R6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Nov 2021 05:39:51 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [216.205.24.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 15EF54B116
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 02:27:05 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6E934B192
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 05:39:51 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1636615624;
+ s=mimecast20190719; t=1636627191;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kKrJW8F5NToX1nYO957BayIs9Dq3P1qwVdj4d8BfHuc=;
- b=KX7dwZt4rk5U+bifIG0mWIYvzYJDhb4OJXc/IYQYS83JMR2gclDJk2z51HvUEXs1Pmkkj/
- Wa1gbs0LGDsZKipxreJGER3aPB8IJUGAoFyil3ElRee/eIJiscL6K8Aa5Vcng4c0Ph/dlW
- SBZk9mjSKe8VQxseRxMWl8i0LADH2pk=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-463-kuQbPxufOz2HFbQ3zW_8dw-1; Thu, 11 Nov 2021 02:27:03 -0500
-X-MC-Unique: kuQbPxufOz2HFbQ3zW_8dw-1
-Received: by mail-ed1-f69.google.com with SMTP id
- v9-20020a50d849000000b003dcb31eabaaso4642869edj.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 23:27:03 -0800 (PST)
+ bh=3GsoHxG6tbN9F1JDRhurToiafQZa+kQvGVSVSX20JIs=;
+ b=c80azBnlmrqZbSESRAbkz+iE26a8jd8rTR82JlScxnb7wWxdV9Lgu2huMgvvPVU0UO7FY/
+ g6dsVNcUQNfnS1iC/9sjp4bN/c5jfRBoXuFyrB2FeTIc4gfvimIED0HgtP3bA9yBICHune
+ c9dqUteeLTxsk9xx88ipf2LASNRZ+pI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-361-6yQZtK-BObuqA4Rk1ho2kQ-1; Thu, 11 Nov 2021 05:39:50 -0500
+X-MC-Unique: 6yQZtK-BObuqA4Rk1ho2kQ-1
+Received: by mail-wm1-f69.google.com with SMTP id
+ 145-20020a1c0197000000b0032efc3eb9bcso4614376wmb.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 02:39:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=kKrJW8F5NToX1nYO957BayIs9Dq3P1qwVdj4d8BfHuc=;
- b=xCfBIbX8nCjuI/RU3/MrKz+nrjfjkz/GSIVZtHouCS0l7ZvLlqiaW+N9wnlt5O3a+z
- alSoKv+6uoM8DJj+qxLU9n068qIsZRYm1yUU1mYDpDnTpH4GxpjTHhRecnS7IHSvzpYk
- GQYRfyvqmqJoB96NV1etkpqZUr/qgfZJRSilS3LXcyUV5A8RUdtY0bkrp6pxXHWq3DOu
- h0B49bgaRi6mK5/d7AqrfaxEbEzj08uBdBw6E9WYignLCkupou2XhLiMwFSMhpF+9JkW
- UxE0I+XetcSeHo4zzOVacd1eKiiXf148qLyEEuxaQyCojsU7mq6zOBb58GgafhFBjLZg
- nbFA==
-X-Gm-Message-State: AOAM532ET31T6Iw6EOb4BTm0fYLB+AHaW1CQRV+djuD/YEl4AxoFYVKp
- lKkBISPfFSxEK32guUoD91/NwRHoqG23QHU41EVIpR5165HO/xJ1NGIethV78p37IFdOvaJAs+L
- Y5l5D7a1AtDnf2A+9TRHoPM+k
-X-Received: by 2002:a05:6402:4403:: with SMTP id
- y3mr7124327eda.163.1636615622054; 
- Wed, 10 Nov 2021 23:27:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzTpHPtJJgKdf3a1EjIi+ncJMYWN6M7NH5BDLr0bfrPMJpGogO5RDb023uvqL0d//3hxKxDnQ==
-X-Received: by 2002:a05:6402:4403:: with SMTP id
- y3mr7124294eda.163.1636615621811; 
- Wed, 10 Nov 2021 23:27:01 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e?
- ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
- by smtp.gmail.com with ESMTPSA id r22sm821651ejd.109.2021.11.10.23.26.59
+ bh=3GsoHxG6tbN9F1JDRhurToiafQZa+kQvGVSVSX20JIs=;
+ b=cgfRzoHDIQ5u8USGUXXhMu+k4xEQWWyzUunrbpPAq5zU+TJ67muGJ5ERA39NabltSS
+ vF9LpUvxqmE7Grlnj5Cp2XMbiiJi98X9aogHd9gvKqaXRIoObG3mvGI2grUmRwjVe20R
+ J2N3b1EKbk4GZy5vyB0As7JjhwVRbipYf517caD5VGCE9NVk61iV6dZJTqJ1IHJLcNAE
+ BV3J6ZVdw4/xp1KIXdebCZyeX/DdhHHLCBxcgic36ecCzV7tHCwsZlWRbG9ybHr5gtU7
+ tbQ77Ef8fZuDmKc0Y26MtV0MFJtyfQr9QVSSQ1b6O2jv7SvxPPl/lh7NcR3oIcEJMVyg
+ a5Ww==
+X-Gm-Message-State: AOAM531QfF2JxyX3tAhudYLmx+LlA69uR5plyf3tUqOQcpG2/xvjUxdp
+ P5AKOcOemjByG4QmYlSy4VkxLuDqjvaNkvjrGUE6h1PhmoIk4veHcPrIhAp56vH07jKU7jn2BKJ
+ 4DQqS7oiZI5BaoH0WYBcduqVz
+X-Received: by 2002:a05:600c:4e94:: with SMTP id
+ f20mr6926072wmq.77.1636627188887; 
+ Thu, 11 Nov 2021 02:39:48 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwTYMHTkSN+BIGJqDL7NN5zIg2PBR9XWifP9uLbTro4v0wXHfWDmPWNeawdlFQiQ6RIVcQ3ZQ==
+X-Received: by 2002:a05:600c:4e94:: with SMTP id
+ f20mr6926042wmq.77.1636627188579; 
+ Thu, 11 Nov 2021 02:39:48 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id u14sm2539907wrt.49.2021.11.11.02.39.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 10 Nov 2021 23:27:01 -0800 (PST)
-Message-ID: <d784dc27-72d0-d64f-e1f4-a2b9a5f86dd4@redhat.com>
-Date: Thu, 11 Nov 2021 08:26:58 +0100
+ Thu, 11 Nov 2021 02:39:48 -0800 (PST)
+Subject: Re: [PATCH v4 15/15] KVM: arm64: Add async PF document
+To: Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu
+References: <20210815005947.83699-1-gshan@redhat.com>
+ <20210815005947.83699-16-gshan@redhat.com>
+From: Eric Auger <eauger@redhat.com>
+Message-ID: <8505a820-9a67-fc8e-46e2-7f261a4501a3@redhat.com>
+Date: Thu, 11 Nov 2021 11:39:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v4 01/17] perf: Protect perf_guest_cbs with RCU
-To: Sean Christopherson <seanjc@google.com>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Will Deacon <will@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Russell King <linux@armlinux.org.uk>,
- Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Guo Ren <guoren@kernel.org>, Nick Hu <nickhu@andestech.com>,
- Greentime Hu <green.hu@gmail.com>, Vincent Chen <deanbo422@gmail.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Thomas Gleixner <tglx@linutronix.de>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>
-References: <20211111020738.2512932-1-seanjc@google.com>
- <20211111020738.2512932-2-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211111020738.2512932-2-seanjc@google.com>
+In-Reply-To: <20210815005947.83699-16-gshan@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, linux-riscv@lists.infradead.org,
- Jiri Olsa <jolsa@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Stefano Stabellini <sstabellini@kernel.org>, Like Xu <like.xu@linux.intel.com>,
- Joerg Roedel <joro@8bytes.org>, linux-csky@vger.kernel.org,
- xen-devel@lists.xenproject.org, Zhu Lingshan <lingshan.zhu@intel.com>,
- Namhyung Kim <namhyung@kernel.org>,
- Artem Kashkanov <artem.kashkanov@intel.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Like Xu <like.xu.linux@gmail.com>, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
+ vkuznets@redhat.com, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -128,91 +108,231 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/11/21 03:07, Sean Christopherson wrote:
-> Protect perf_guest_cbs with RCU to fix multiple possible errors.  Luckily,
-> all paths that read perf_guest_cbs already require RCU protection, e.g. to
-> protect the callback chains, so only the direct perf_guest_cbs touchpoints
-> need to be modified.
+Hi Gavin,
+
+On 8/15/21 2:59 AM, Gavin Shan wrote:
+> This adds document to explain the interface for asynchronous page
+> fault and how it works in general.
 > 
-> Bug #1 is a simple lack of WRITE_ONCE/READ_ONCE behavior to ensure
-> perf_guest_cbs isn't reloaded between a !NULL check and a dereference.
-> Fixed via the READ_ONCE() in rcu_dereference().
-> 
-> Bug #2 is that on weakly-ordered architectures, updates to the callbacks
-> themselves are not guaranteed to be visible before the pointer is made
-> visible to readers.  Fixed by the smp_store_release() in
-> rcu_assign_pointer() when the new pointer is non-NULL.
-> 
-> Bug #3 is that, because the callbacks are global, it's possible for
-> readers to run in parallel with an unregisters, and thus a module
-> implementing the callbacks can be unloaded while readers are in flight,
-> resulting in a use-after-free.  Fixed by a synchronize_rcu() call when
-> unregistering callbacks.
-> 
-> Bug #1 escaped notice because it's extremely unlikely a compiler will
-> reload perf_guest_cbs in this sequence.  perf_guest_cbs does get reloaded
-> for future derefs, e.g. for ->is_user_mode(), but the ->is_in_guest()
-> guard all but guarantees the consumer will win the race, e.g. to nullify
-> perf_guest_cbs, KVM has to completely exit the guest and teardown down
-> all VMs before KVM start its module unload / unregister sequence.  This
-> also makes it all but impossible to encounter bug #3.
-> 
-> Bug #2 has not been a problem because all architectures that register
-> callbacks are strongly ordered and/or have a static set of callbacks.
-> 
-> But with help, unloading kvm_intel can trigger bug #1 e.g. wrapping
-> perf_guest_cbs with READ_ONCE in perf_misc_flags() while spamming
-> kvm_intel module load/unload leads to:
-> 
->    BUG: kernel NULL pointer dereference, address: 0000000000000000
->    #PF: supervisor read access in kernel mode
->    #PF: error_code(0x0000) - not-present page
->    PGD 0 P4D 0
->    Oops: 0000 [#1] PREEMPT SMP
->    CPU: 6 PID: 1825 Comm: stress Not tainted 5.14.0-rc2+ #459
->    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->    RIP: 0010:perf_misc_flags+0x1c/0x70
->    Call Trace:
->     perf_prepare_sample+0x53/0x6b0
->     perf_event_output_forward+0x67/0x160
->     __perf_event_overflow+0x52/0xf0
->     handle_pmi_common+0x207/0x300
->     intel_pmu_handle_irq+0xcf/0x410
->     perf_event_nmi_handler+0x28/0x50
->     nmi_handle+0xc7/0x260
->     default_do_nmi+0x6b/0x170
->     exc_nmi+0x103/0x130
->     asm_exc_nmi+0x76/0xbf
-> 
-> Fixes: 39447b386c84 ("perf: Enhance perf to allow for guest statistic collection from host")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
 > ---
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-One nit:
-
->   EXPORT_SYMBOL_GPL(perf_register_guest_info_callbacks);
->   
->   int perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
->   {
-> -	perf_guest_cbs = NULL;
-> +	if (WARN_ON_ONCE(rcu_access_pointer(perf_guest_cbs) != cbs))
-> +		return -EINVAL;
+>  Documentation/virt/kvm/arm/apf.rst   | 143 +++++++++++++++++++++++++++
+>  Documentation/virt/kvm/arm/index.rst |   1 +
+>  2 files changed, 144 insertions(+)
+>  create mode 100644 Documentation/virt/kvm/arm/apf.rst
+> 
+> diff --git a/Documentation/virt/kvm/arm/apf.rst b/Documentation/virt/kvm/arm/apf.rst
+> new file mode 100644
+> index 000000000000..4f5c01b6699f
+> --- /dev/null
+> +++ b/Documentation/virt/kvm/arm/apf.rst
+> @@ -0,0 +1,143 @@
+> +.. SPDX-License-Identifier: GPL-2.0
 > +
-> +	rcu_assign_pointer(perf_guest_cbs, NULL);
-> +	synchronize_rcu();
-This technically could be RCU_INIT_POINTER but it's not worth a respin.
-There are dozens of other occurrences, and if somebody wanted they
-could use Coccinelle to fix all of them.
+> +Asynchronous Page Fault Support for arm64
+> +=========================================
+> +
+> +There are two stages of page faults when KVM module is enabled as accelerator
+> +to the guest. The guest is responsible for handling the stage-1 page faults,
+> +while the host handles the stage-2 page faults. During the period of handling
+> +the stage-2 page faults, the guest is suspended until the requested page is
+> +ready. It could take several milliseconds, even hundreds of milliseconds in
+ s/It could take several milliseconds, even hundreds of milliseconds/It
+could take up to hundreds of milliseconds
+> +extreme situations because I/O might be required to move the requested page
+> +from disk to DRAM. The guest does not do any work when it is suspended. The
+> +feature (Asynchronous Page Fault) is introduced to take advantage of the
+s/The feature (Asynchronous Page Fault)/ The Asynchronous Page Fault
+feature allows to improve the overall performance by allowing the guest
+to reschedule ... ?
+> +suspending period and to improve the overall performance.
+> +
+> +There are two paths in order to fulfil the asynchronous page fault, called
+> +as control path and data path.
+The asynchronous page fault is implemented upon a control path and a
+data path?
+ The control path allows the VMM or guest to
+> +configure the functionality, while the notifications are delivered in data
+> +path. The notifications are classified into page-not-present and page-ready
+> +notifications.
+> +
+> +Data Path
+> +---------
+> +
+> +There are two types of notifications delivered from host to guest in the
+> +data path: page-not-present and page-ready notification. They are delivered
+> +through SDEI event and (PPI) interrupt separately.
+s/separately/respectively
+ Besides, there is a shared
+> +buffer between host and guest to indicate the reason and sequential token,
+s/to indicate/that indicates
+Can you clarify 'reason'?
+Also a sequential token is used ...
+> +which is used to identify the asynchronous page fault. The reason and token
+> +resident in the shared buffer is written by host, read and cleared by guest.
+s/is/are
+> +An asynchronous page fault is delivered and completed as below.
+> +
+> +(1) When an asynchronous page fault starts, a (workqueue) worker is created
+> +    and queued to the vCPU's pending queue. The worker makes the requested
+> +    page ready and resident to DRAM in the background. The shared buffer is
+> +    updated with reason and sequential token. After that, SDEI event is sent
+> +    to guest as page-not-present notification.
+This gives the impression the SDEI event is sent after the worker
+completes the job. I think you should rephrase.
+> +
+> +(2) When the SDEI event is received on guest, the current process is tagged
+> +    with TIF_ASYNC_PF and associated with a wait queue. The process is ready
+> +    to keep rescheduling itself on switching from kernel to user mode. After
+above sentence sounds a bit cryptic to me: ~ waits for being rescheduled
+later?
+> +    that, a reschedule IPI is sent to current CPU and the received SDEI event
+> +    is acknowledged. Note that the IPI is delivered when the acknowledgment
+> +    on the SDEI event is received on host.
+> +
+> +(3) On the host, the worker is dequeued from the vCPU's pending queue and
+> +    enqueued to its completion queue when the requested page becomes ready.
+> +    In the mean while, KVM_REQ_ASYNC_PF request is sent the vCPU if the
+in the meanwhile here and below
+> +    worker is the first element enqueued to the completion queue.
+I think you should remind what is the intent of this KVM_REQ_ASYNC_PF
+request, ie. notify that the page is ready.
+> +
+> +(4) With pending KVM_REQ_ASYNC_PF request, the first worker in the completion
+> +    queue is dequeued and destroyed. In the mean while, a (PPI) interrupt is
 
-Paolo
+> +    sent to guest with updated reason and token in the shared buffer.
+> +
+> +(5) When the (PPI) interrupt is received on guest, the affected process is
+> +    located using the token and waken up after its TIF_ASYNC_PF tag is cleared.
+> +    After that, the interrupt is acknowledged through SMCCC interface. The
+> +    workers in the completion queue is dequeued and destroyed if any workers
+the worker
+Isn't it destroyed even if no other worker exist?
+> +    exist, and another (PPI) interrupt is sent to the guest.
+
+I think you should briefly remind the motivation of SDEI and PPI
+mechanism for both synchros. Maybe by doing an analogy with x86
+implementation?
+> +
+> +Control Path
+> +------------
+> +
+> +The configurations are passed through SMCCC or ioctl interface. The SDEI
+> +event and (PPI) interrupt are owned by VMM, so the SDEI event and interrupt
+> +numbers are configured through ioctl command on per-vCPU basis.
+The "owned" terminology looks weird here. Do you mean the SDEI event
+number and the PPI ID are defined by the VMM userspace?
+
+ Besides,
+> +the functionality might be enabled and configured through ioctl interface
+> +by VMM during migration:
+> +
+> +   * KVM_ARM_ASYNC_PF_CMD_GET_VERSION
+> +
+> +     Returns the current version of the feature, supported by the host. It is
+> +     made up of major, minor and revision fields. Each field is one byte in
+> +     length.
+> +
+> +   * KVM_ARM_ASYNC_PF_CMD_GET_SDEI:
+> +
+> +     Retrieve the SDEI event number, used for page-not-present notification,
+> +     so that it can be configured on destination VM in the scenario of
+> +     migration.
+> +
+> +   * KVM_ARM_ASYNC_PF_GET_IRQ:
+> +
+> +     Retrieve the IRQ (PPI) number, used for page-ready notification, so that
+> +     it can be configured on destination VM in the scenario of migration.
+> +
+> +   * KVM_ARM_ASYNC_PF_CMD_GET_CONTROL
+> +
+> +     Retrieve the address of control block, so that it can be configured on
+> +     destination VM in the scenario of migration.
+> +
+> +   * KVM_ARM_ASYNC_PF_CMD_SET_SDEI:
+> +
+> +     Used by VMM to configure number of SDEI event, which is used to deliver
+> +     page-not-present notification by host. This is used when VM is started
+> +     or migrated.
+> +
+> +   * KVM_ARM_ASYNC_PF_CMD_SET_IRQ
+> +
+> +     Used by VMM to configure number of (PPI) interrupt, which is used to
+> +     deliver page-ready notification by host. This is used when VM is started
+> +     or migrated.
+> +
+> +   * KVM_ARM_ASYNC_PF_CMD_SET_CONTROL
+> +
+> +     Set the control block on the destination VM in the scenario of migration.
+What is the size of this control block?
+> +
+> +The other configurations are passed through SMCCC interface. The host exports
+> +the capability through KVM vendor specific service, which is identified by
+> +ARM_SMCCC_KVM_FUNC_ASYNC_PF_FUNC_ID. There are several functions defined for
+> +this:
+> +
+> +   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_VERSION
+> +
+> +     Returns the current version of the feature, supported by the host. It is
+> +     made up of major, minor and revision fields. Each field is one byte in
+> +     length.
+> +
+> +   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_SLOTS
+> +
+> +     Returns the size of the hashed GFN table. It is used by guest to set up
+by the guest
+> +     the capacity of waiting process table.
+> +
+> +   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_SDEI
+> +   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ
+> +
+> +     Used by the guest to retrieve the SDEI event and (PPI) interrupt number
+> +     that are configured by VMM.
+How does the guest recognize which SDEI event num it shall register.
+Same question for PPI? What if we were to expose the guest with several
+SDEIs?
+> +
+> +   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_ENABLE
+> +
+> +     Used by the guest to enable or disable the feature on the specific vCPU.
+> +     The argument is made up of shared buffer and flags. The shared buffer
+> +     is written by host to indicate the reason about the delivered asynchronous
+> +     page fault and token (sequence number) to identify that. There are two
+> +     flags are supported: KVM_ASYNC_PF_ENABLED is used to enable or disable
+> +     the feature. KVM_ASYNC_PF_SEND_ALWAYS allows to deliver page-not-present
+> +     notification regardless of the guest's state. Otherwise, the notification
+> +     is delivered only when the guest is in user mode.
+> +
+> +   * ARM_SMCCC_KVM_FUNC_ASYNC_PF_IRQ_ACK
+
+How does it compare to x86? I mean there are a huger number of IOCTLs
+and SMCCC calls to achieve the functionaly. Was the x86 implementation
+as invasive as this implementation?
+
+Thanks
+
+Eric
+> +
+> +     Used by the guest to acknowledge the completion of page-ready notification.
+> diff --git a/Documentation/virt/kvm/arm/index.rst b/Documentation/virt/kvm/arm/index.rst
+> index 78a9b670aafe..f43b5fe25f61 100644
+> --- a/Documentation/virt/kvm/arm/index.rst
+> +++ b/Documentation/virt/kvm/arm/index.rst
+> @@ -7,6 +7,7 @@ ARM
+>  .. toctree::
+>     :maxdepth: 2
+>  
+> +   apf
+>     hyp-abi
+>     psci
+>     pvtime
+> 
 
 _______________________________________________
 kvmarm mailing list
