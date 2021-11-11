@@ -2,121 +2,198 @@ Return-Path: <SRS0=9vag=P7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BACCC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Nov 2021 07:55:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67294C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Nov 2021 08:42:48 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C684161038
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Nov 2021 07:55:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C684161038
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id D099E60462
+	for <kvmarm@archiver.kernel.org>; Fri, 12 Nov 2021 08:42:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D099E60462
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D7694B235;
-	Fri, 12 Nov 2021 02:55:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 476BD4B26D;
+	Fri, 12 Nov 2021 03:42:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@oracle.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@oracle.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id njAjDohWOQy8; Fri, 12 Nov 2021 02:55:44 -0500 (EST)
+	with ESMTP id 0aXVFCNYDhAZ; Fri, 12 Nov 2021 03:42:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC9754B213;
-	Fri, 12 Nov 2021 02:55:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D5334B24E;
+	Fri, 12 Nov 2021 03:42:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36C794B210
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 02:55:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 072E54B162
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 18:52:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UwXBHHBv8piA for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Nov 2021 02:55:42 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 25DE94B20E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 02:55:42 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1636703741;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lF7lzRoeZrlEIt3gHEFyVsRoWpbej1ntDFwYNAiQdJI=;
- b=S6A/GlnSpDzjNW679UfW03taT2ANpf1+QVkTv90xFzlXyD9qhmp3Bfq1yt6m12HW5vT5so
- XEJZTEkL889uu4T4jUYgKh/o5vHn1J4MhFfJvlgy3haalKiVWWCD20dn4Azf1myGmzHoAw
- 4lshvNz3yoegOCHCCtEsHvsVg+IrS3w=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-oBYC2gNROlyxnSteoyQrDw-1; Fri, 12 Nov 2021 02:55:38 -0500
-X-MC-Unique: oBYC2gNROlyxnSteoyQrDw-1
-Received: by mail-ed1-f72.google.com with SMTP id
- l15-20020a056402124f00b003e57269ab87so930656edw.6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 23:55:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=lF7lzRoeZrlEIt3gHEFyVsRoWpbej1ntDFwYNAiQdJI=;
- b=UFAMNDzg8RwxcGGEODrkdFvbikhuC0Jmb1QJgHK9VhIoVwC/fgSheSGf8PID7frhkV
- VwWx5iROozNVTBAfTVL8P3HcJugRmfRgfIFe6d5q1W6IyXnqoKKm1jPgTbcyjep0M1iR
- CPoNKAnsfr7F5CJVk7WCfQfyxUnWLIrdZjOndxa8vrWXlMPPHMvLIiy0AgOY+fYuZ2bz
- jn7n/S0E5IkVrfduOGM1v6Md7I9XW8NRJ1XRx+EaJMMK3MLqCPG99LmC9+eIdokmuWMn
- lfjaly5sYt0zYLpUM34l33metnECujPFkZOE06BNAK/3hCw9BassCk/knNxiyEo2TXK+
- V3xQ==
-X-Gm-Message-State: AOAM532KdCwc1xXm/71x8kit4YXrLzDi6YLn4BNidj0yq79sBPNwWZbT
- MccmZAiWjW5/amPPp6dDE1grx373bWuVQVZmI4BXMtMZ8ys43aWXfaln/9LE9J/JFjdGp1sSmqD
- Xauy0YC1BQjkdoiL4vVpp39Kr
-X-Received: by 2002:a17:907:6e10:: with SMTP id
- sd16mr17768033ejc.158.1636703737517; 
- Thu, 11 Nov 2021 23:55:37 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzVTSyaI9bwf+cK3HRTYkkEGrfXsl4Cvt+Fkmz/7JDyaorMKEA4Mec75P9Nt6V8a8edl3Ld8g==
-X-Received: by 2002:a17:907:6e10:: with SMTP id
- sd16mr17767982ejc.158.1636703737318; 
- Thu, 11 Nov 2021 23:55:37 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e?
- ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
- by smtp.gmail.com with ESMTPSA id n1sm2700678edf.45.2021.11.11.23.55.32
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 11 Nov 2021 23:55:36 -0800 (PST)
-Message-ID: <016d5b91-6910-2aca-0db1-a65079449454@redhat.com>
-Date: Fri, 12 Nov 2021 08:55:31 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v4 01/17] perf: Protect perf_guest_cbs with RCU
-To: Peter Zijlstra <peterz@infradead.org>
-References: <20211111020738.2512932-1-seanjc@google.com>
- <20211111020738.2512932-2-seanjc@google.com>
- <d784dc27-72d0-d64f-e1f4-a2b9a5f86dd4@redhat.com>
- <YYz03fcDRV9NZnyA@hirez.programming.kicks-ass.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YYz03fcDRV9NZnyA@hirez.programming.kicks-ass.net>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ with ESMTP id 7LQHKQMZW2AH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Nov 2021 18:52:16 -0500 (EST)
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com
+ [205.220.165.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 068094B13D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 18:52:15 -0500 (EST)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+ by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ABKrTik015505; 
+ Thu, 11 Nov 2021 23:52:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : subject : to :
+ cc : references : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=9uMky55qYR1OlOvOuUkW0GNg+c41F8Ev4u264bm5eZY=;
+ b=MXsyP8aX+3D6VXCuVpFB98ZlnFcsvMfnHuVyAUiIzhvutBiH9Jhjyk6WMAMbC+HGtxij
+ tjCEtIU6VydAZheX9fv7lynbJ41GL6pYhZK4GQuKCY97+cmXF5jJIG3A1xq+rVvkU/Vx
+ KhS6E8Vy03kQyLaCiA98wGuQ9UshdWgez5POeGObVx3my0CSUNpmEhbYo4fzeZ798AQh
+ XoRImLhvg2x3bUK+vTjMG6tG5IzhmCkLEapA8zlBAj/Nv0RNAeIyPGZWbjYRZGz6DKUh
+ XCPnyDBYy9yayEMnqrioDRBzVTEsDSIdnIfBo/8rtY80HhB2GVbm09iWfdZqb3/aKcH4 KA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by mx0b-00069f02.pphosted.com with ESMTP id 3c7yq7nswj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 11 Nov 2021 23:52:00 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1ABNo9CI037350;
+ Thu, 11 Nov 2021 23:51:59 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com
+ (mail-dm6nam12lp2168.outbound.protection.outlook.com [104.47.59.168])
+ by aserp3030.oracle.com with ESMTP id 3c5frhpgxk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 11 Nov 2021 23:51:59 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j/lsZrvD7G6+c9DIqitWD++VAfFMr1Oy4EUfgCu/k4U7fAseDCENkWuU0lH+F7t057xMLIQhc0qYE/TUq+DQomLSKDNhkPvGVMqEbmqh2Nc4jb5o3Tua1Oy0xfwSU8QrilcheoZ6sthFe32Q5sMb4tpM6opf4xcQ1zDnfeP5gJCoYyAdnHq6uN6X9AoxG20VJJo1FFI3WwcB0l+trbrPvwXrS4hNk1EzTfk3/8PhPSiAHuq/iZ588IOI85hjmY75AWOHp+z8Kcg/ZjmE8fsIsxMlmiARi+coH7jMx2sS950Vn5j28+7MHoA4U9nT8fAn56PqmY7c4sb/EOY1YCxFmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9uMky55qYR1OlOvOuUkW0GNg+c41F8Ev4u264bm5eZY=;
+ b=QKHbuaEpadlmzTlJAQr4rUtppnwOAaAu8o/zOYDFPzTYCazsqkbGMBuF8DIWa+eHCx/e0lcuU+wWM/AKNAQxaK8pec3UcSetU68SxNOC7RUd51G/xtx7P3/eEIuBL3UdUfCx7Ey9dVQAqT0rGHb/1f7MBRlnGAxGirDG8H0LEchRCR7mNMH18v3Ma71cQdUq3PheUAd+4HBBYrj6ZkuwXQuAbfHZAsx+YnVV4ZXdaEpa5sqeKHDErpod2agqWNQMWnCAyF6ISun5LVajfVoOpxFHNbaBzhLHjgqgNCnLWNfSNoCQ0YGscNqTbd7Db8iNzIOEq88PWsi2cEj8O4lh8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9uMky55qYR1OlOvOuUkW0GNg+c41F8Ev4u264bm5eZY=;
+ b=fFZ6iNIrRBxY61ROxQixMlpja0tlcVK/rqMLE17MK8aJFOwDomj0Em/qoWRsnWuTIE/a8TbLY6VQpEXFl0hPEUwbzXU2bW5olMc6Amn+vIZyNiAEiJalGhg3mpbQU6KgSIw5C9HUGHNs+bFWvq+COjWW2+52ZbO5JSYgndidZzw=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=oracle.com;
+Received: from CH2PR10MB4008.namprd10.prod.outlook.com (2603:10b6:610:c::22)
+ by CH0PR10MB4938.namprd10.prod.outlook.com (2603:10b6:610:c4::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.11; Thu, 11 Nov
+ 2021 23:51:57 +0000
+Received: from CH2PR10MB4008.namprd10.prod.outlook.com
+ ([fe80::74b8:818d:18e5:e6c6]) by CH2PR10MB4008.namprd10.prod.outlook.com
+ ([fe80::74b8:818d:18e5:e6c6%6]) with mapi id 15.20.4669.016; Thu, 11 Nov 2021
+ 23:51:57 +0000
+From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Subject: Re: [PATCH v5.5 23/30] KVM: Resolve memslot ID via a hash table
+ instead of via a static array
+To: Sean Christopherson <seanjc@google.com>
+References: <20211104002531.1176691-1-seanjc@google.com>
+ <20211104002531.1176691-24-seanjc@google.com>
+Message-ID: <f0b364ed-bf9e-5de9-0449-6d7ba3682405@oracle.com>
+Date: Fri, 12 Nov 2021 00:51:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <20211104002531.1176691-24-seanjc@google.com>
 Content-Language: en-US
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, Guo Ren <guoren@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, linux-riscv@lists.infradead.org,
- Vincent Chen <deanbo422@gmail.com>, Will Deacon <will@kernel.org>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
- Russell King <linux@armlinux.org.uk>, linux-csky@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, Ingo Molnar <mingo@redhat.com>,
- Like Xu <like.xu.linux@gmail.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Zhu Lingshan <lingshan.zhu@intel.com>, Jiri Olsa <jolsa@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Borislav Petkov <bp@alien8.de>,
- Greentime Hu <green.hu@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Artem Kashkanov <artem.kashkanov@intel.com>,
+X-ClientProxiedBy: AM6P195CA0100.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:209:86::41) To CH2PR10MB4008.namprd10.prod.outlook.com
+ (2603:10b6:610:c::22)
+MIME-Version: 1.0
+Received: from [172.20.10.2] (37.248.219.146) by
+ AM6P195CA0100.EURP195.PROD.OUTLOOK.COM (2603:10a6:209:86::41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4690.16 via Frontend Transport; Thu, 11 Nov 2021 23:51:51 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e30843d1-daba-4a47-4b8b-08d9a56e3ee9
+X-MS-TrafficTypeDiagnostic: CH0PR10MB4938:
+X-Microsoft-Antispam-PRVS: <CH0PR10MB493890AC552149BB75427D04FF949@CH0PR10MB4938.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: JciQytw7+zzssvnSnYhp/qteD3tWEqjPFfP9TDZZ9lkk+k/3fjGrfY2/HPHF9tInNqiSP4l6fE6jI+SLUGae3gNE5QWNzqLvjUp0m3K59CPp6EZN8cVFUxWbSLnkbaDWs/47qY6VWs0HNVSq9IJuN/QuMEU78FKIKlmnI3tMF0jMzDHiwheZAXui91eaIwjuIbKDHZQv7BKrtAZN9mACy7oM5jPrdBmBdT5dcH1cBn40u1tcsl4K9kJvfW5l9ozGWrRzGEn1eguoYeV1rt7mKWaryxKmDAHwDcU7E5+vuyyuwtBT9y11+QvKWaWIda1mmZtplt2/koKWGUzKJ4PPwzrV/tXJAbDlTtRWP2d9kXYYbh7R7W1vUmaP9HRoi/gRt07JeFVcxHwg1hFNT9fBkgqpzsN/aEt/T3SW9HVarWDuXjsPwiFmZMHmfukb2iR3sBuqxW///vQuUnCzjYeiDEaMQX5rRxC9mitgveUCaNODCxaPe8ffAEI1Qwr+5HjmU38ZHQxXXMrKAiggIFrvArkWVP1odwLbt0vxsK5ilzvGch7fkpQymxLHrdTUb/YMAiEsc4DtDT6HAX4+fAMrb8dSYW6XuqqXo2+1wqm5eIeoLh2B1wCwzbwiVsjPBU0mlJc08EhiuoXN+hHg8488jQ99TJv8mGHcVn12bXkvl33SkVLJ4PGsSs8UkZrsR+x1UmE4i1pxrTk/xeGfA5fA0FFNdTtE34NMyyJB/vyI4cc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:CH2PR10MB4008.namprd10.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(366004)(53546011)(86362001)(36756003)(8676002)(6666004)(16576012)(5660300002)(2906002)(316002)(38100700002)(956004)(83380400001)(6486002)(508600001)(7406005)(4326008)(31686004)(26005)(2616005)(8936002)(6916009)(186003)(31696002)(54906003)(66476007)(66556008)(7416002)(66946007)(45980500001)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V3ZKWlBYWjdNL2g1Y1ZUWnZPTUxXQ0tuR3REK1cvOExEYzlJTCtkMTNJeWdR?=
+ =?utf-8?B?TlNheFpQWitaUHMrYWd2Z3QxWkdIbWcxUUxUNzFYWHFKdmtMcUFLQ2Fxcytp?=
+ =?utf-8?B?QW1WQXBVakRvYzJRU0pMWWVjTlljYU13YTlpV0xrZE9ZT2UxMTJKSXpDQWIw?=
+ =?utf-8?B?NExwbm1DWHo1anh2OExxako2Z3BCYnNObnh3U2VOcEdWUmY2Mk5MVE1TUlpj?=
+ =?utf-8?B?S2tZVC9WcUNMUzlGSktUMUJ0NC9CUEwxSTFVak1ZcHRnUGQ3Ky92N2FoQlQz?=
+ =?utf-8?B?cFlKemlHSHMvK2toYk1hVG1SekxqdExhVGlnbzFmMHVsS253L3M3VGN2V05G?=
+ =?utf-8?B?SEd3dDlXTVFRVlpGR0J3am5LWkp4QURhV0I3M1lnUHZnOG8yNytmQnVGbnFs?=
+ =?utf-8?B?eE42c0FOdDRGRzFIbFJDY1FiRlVJU01ZcThEYjlPeTdncWk5M2E0ekkvdlNp?=
+ =?utf-8?B?NUZ5N1FVSWFBS1piT0FhMTUxYWJnSkhlYzhEaVJqa29JeVlIWWlWa2UwM2Vq?=
+ =?utf-8?B?M0YrbGFFc2pHK0NJUk9jendHWWpUTk1PU0k3cFh4SXRDczR5dWZtcHVNcEty?=
+ =?utf-8?B?N0JFWjZuZjRnczRxbjNsL2x0Z1JGakhkQVVPRGRkMG92ZDZ4VTFXd3d4MGVL?=
+ =?utf-8?B?ZExkdEQwUmJZdW5ML0pzTWFsdHdqL0RrRnpRV0piZHZmYWNPWVRyZlNqVGp4?=
+ =?utf-8?B?aiswL1FqdkxBN0tQeXBybmtCN1R3K2hxeHZJTjBOejkyVTJ1cUtBd29KRmxM?=
+ =?utf-8?B?czloUGpSUXFPU1FiWEExQlZJSjBuRTNGTUwrV1oralE1WFRnUzVkZjdJM21W?=
+ =?utf-8?B?RGRyeFptaWdGK0tmeko2RW9qTnorN21wNTFieWtVUytINTArc0FneVNhYlpZ?=
+ =?utf-8?B?aFZyelIyMEozTTl4NWpwenhjWTh2emtBdEpEb3JJYkJnK3JQYkdWTE1qSUdE?=
+ =?utf-8?B?ZjBTbFd6VFlzOG5BNnFHdVRhbjQ2ZzRBMjAyMDlTbC9jbEtNL1VKU2cwSWRZ?=
+ =?utf-8?B?MkJaWnRKWld6WHFxOTJBRFNjYWpocVlSajNrWDYxUjhjMGtTRkdwRTdmM0RE?=
+ =?utf-8?B?Yys5bFBSbnp3eGszSW94YlFNMk8xWjVrR08zUXN3ZHU1dFFtTkRNN3NnSjlV?=
+ =?utf-8?B?dkdJcUFmK2VtS2M3V1ZUaDI5VFhOdGFKaTFacU82TXF0TXVVQWJJTkxUT3RW?=
+ =?utf-8?B?SG04Nll2Vmpsb3NvSCtDZ1NpRWF2bmhPM3MyazhvN0RCRTNHQ1dlbTUxTzFu?=
+ =?utf-8?B?ZFVNZ3hsbTE1cVV0ako0ekdHZWZvTy9WQ0JmaC9ldHNUSkR3cERoNWZ6SXhy?=
+ =?utf-8?B?d05NS1ZHV2tOejFwcGV2U1B4RzRrcUg3TUxKOHMvRXYxRkVBTFBBRjlKeEZs?=
+ =?utf-8?B?d3JocTJFR29KRGhrdDRkTSszbjVBczBpa010TCtpZk1aTkxTWXJqN0hvOGlh?=
+ =?utf-8?B?Z2xLUDdQb05NVGlia0VsdnhQYlNMR2YxV25PWFlJWk0wdjJDUzY4dHlqa2tD?=
+ =?utf-8?B?NVM0NnF5ckhoM1BVMnZKVnIvaFlqMHNjUk5BT2RZV1pjaGpYUDIraG10NGhw?=
+ =?utf-8?B?QTlMSUwwYk9ud1B6MlJ0RmNRUTRhV2FwR3V1RWJiaHRHa1hxRkpwdExaS2l5?=
+ =?utf-8?B?c20rZ2prOUhxeHB5bWVlamE0ekFoMi9IeCs4SUNIVERyUW54T3JnSDFRMnZp?=
+ =?utf-8?B?eEt1QklFbzd0anpFc0Q0WFdxRTJweXhENEkrU0JvZnB5NTdISytjVGgzUklW?=
+ =?utf-8?B?SVl0OU1LY3RFN3NCaUlRRDZENnNnc2lRUGRWaXl0cENJcFNIVG5RODdrNmw5?=
+ =?utf-8?B?b1gxMUJYbkhzTml5Rm0yQU5zOTBlVEQrdVlNUUh3U3ZucDRzNEJrVGd4VE5o?=
+ =?utf-8?B?SDBnKy9CcDY0dy96bmVzMXNGSVo2SVYvelR2N1JPRlRYb1c4WjQyMGR6WU4r?=
+ =?utf-8?B?MitVanBKUGRZeFEzaFo0dHpuT3p5T3Y4OHBqdGozRGdST2JRWmp1NDZoRVdJ?=
+ =?utf-8?B?MXVhQytGbHo5ZVArckthSVZOOXlxaTRDdG8xSVhTQ201QXp2WmY0bjZ2bDNm?=
+ =?utf-8?B?WDVvM2h2T3FUeFZmRFd0MnhGMTAvMTVqRE9iZTl2Sy9oaytFa3lvRkUyMHpJ?=
+ =?utf-8?B?RmQySDZJc0pkWVB4Nm9uMWZ2QW1RYWdkNnRTT2hTT0FoRVVOS1h3SjRPYVZ0?=
+ =?utf-8?B?QzlEdWptQmtFYWNGQlhSK2lDVUlhVW43T0FBUkprZENRNW5RQlVTZy8xZUVp?=
+ =?utf-8?B?M0J0NGI1ckdydXpZNFIzaGNjM0xBPT0=?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e30843d1-daba-4a47-4b8b-08d9a56e3ee9
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4008.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2021 23:51:57.1817 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: azHd9qj+0UtomEB0BWYqo11FcyS5MZnu9lMA8tXIJkhL2+eIjlyMNI3sAVX8THhszztWCIlpvLqeHZRSGh84H5axOusSWNy7AuuA6zuZins=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB4938
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10165
+ signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ mlxscore=0
+ suspectscore=0 bulkscore=0 spamscore=0 phishscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111110121
+X-Proofpoint-GUID: hVGcF-rOAkFRn2UikYu4Yw-pb0p-cly9
+X-Proofpoint-ORIG-GUID: hVGcF-rOAkFRn2UikYu4Yw-pb0p-cly9
+X-Mailman-Approved-At: Fri, 12 Nov 2021 03:42:45 -0500
+Cc: Anup Patel <anup.patel@wdc.com>, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
+ linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
+ Atish Patra <atish.patra@wdc.com>, Ben Gardon <bgardon@google.com>,
+ linux-riscv@lists.infradead.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ kvm-ppc@vger.kernel.org, Paul Walmsley <paul.walmsley@sifive.com>,
  linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Juergen Gross <jgross@suse.com>, Like Xu <like.xu@linux.intel.com>,
- Nick Hu <nickhu@andestech.com>, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>,
+ Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
  Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -134,22 +211,63 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/11/21 11:47, Peter Zijlstra wrote:
->> This technically could be RCU_INIT_POINTER but it's not worth a respin.
->> There are dozens of other occurrences, and if somebody wanted they
->> could use Coccinelle to fix all of them.
-> I've been pushing the other way, trying to get rid of RCU_INIT_POINTER()
-> since rcu_assign_pointer(, NULL) actualy DTRT per __builtin_constant_p()
-> etc.
-
-Oh, that's pretty cool to know, thanks!
-
-Paolo
-
-> There's a very few sites where we use RCU_INIT_POINTER() with a !NULL
-> argument, and those are 'special'.
+On 04.11.2021 01:25, Sean Christopherson wrote:
+> From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 > 
+> Memslot ID to the corresponding memslot mappings are currently kept as
+> indices in static id_to_index array.
+> The size of this array depends on the maximum allowed memslot count
+> (regardless of the number of memslots actually in use).
+> 
+> This has become especially problematic recently, when memslot count cap was
+> removed, so the maximum count is now full 32k memslots - the maximum
+> allowed by the current KVM API.
+> 
+> Keeping these IDs in a hash table (instead of an array) avoids this
+> problem.
+> 
+> Resolving a memslot ID to the actual memslot (instead of its index) will
+> also enable transitioning away from an array-based implementation of the
+> whole memslots structure in a later commit.
+> 
+> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   include/linux/kvm_host.h | 16 +++----
+>   virt/kvm/kvm_main.c      | 96 +++++++++++++++++++++++++++++++---------
+>   2 files changed, 84 insertions(+), 28 deletions(-)
+> 
+(..)
+> @@ -1259,17 +1257,49 @@ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
+>   	return 0;
+>   }
+>   
+> +static void kvm_replace_memslot(struct kvm_memslots *slots,
+> +				struct kvm_memory_slot *old,
+> +				struct kvm_memory_slot *new)
+> +{
+> +	/*
+> +	 * Remove the old memslot from the hash list, copying the node data
+> +	 * would corrupt the list.
+> +	 */
+> +	if (old) {
+> +		hash_del(&old->id_node);
+> +
+> +		if (!new)
+> +			return;
+> +	}
+> +
+> +	/* Copy the source *data*, not the pointer, to the destination. */
+> +	if (old)
+> +		*new = *old;
 
+This way of writing it (that, is re-checking whether "old" is not-NULL)
+suggests that it could have been set to NULL inside the previous block
+(since the last check), which isn't true.
+
+Thanks,
+Maciej
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
