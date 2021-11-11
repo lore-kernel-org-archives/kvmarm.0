@@ -2,77 +2,78 @@ Return-Path: <SRS0=nF4w=P6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D0EBC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 02:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB51AC4321E
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 02:08:13 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E164D619A6
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 02:08:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E164D619A6
+	by mail.kernel.org (Postfix) with ESMTP id 8C946619E1
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 02:08:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 8C946619E1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 967454B25D;
-	Wed, 10 Nov 2021 21:08:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F55E4B23A;
+	Wed, 10 Nov 2021 21:08:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wjeTHqno5t8X; Wed, 10 Nov 2021 21:08:10 -0500 (EST)
+	with ESMTP id jmDi9cdY+QU8; Wed, 10 Nov 2021 21:08:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF72D4B263;
-	Wed, 10 Nov 2021 21:08:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DEA7D4B284;
+	Wed, 10 Nov 2021 21:08:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D277D4B24E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 21:08:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F31864B25C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 21:08:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KXqkr5RvkC60 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Nov 2021 21:08:06 -0500 (EST)
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
- [209.85.216.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85D124B259
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 21:08:04 -0500 (EST)
-Received: by mail-pj1-f73.google.com with SMTP id
- pg9-20020a17090b1e0900b001a689204b52so2282452pjb.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 18:08:04 -0800 (PST)
+ with ESMTP id OF7g8Knub38Y for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Nov 2021 21:08:07 -0500 (EST)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2EC0B4B1EF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 21:08:06 -0500 (EST)
+Received: by mail-pg1-f202.google.com with SMTP id
+ f7-20020a63f107000000b002db96febb74so2501211pgi.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Nov 2021 18:08:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=reply-to:date:in-reply-to:message-id:mime-version:references
  :subject:from:to:cc;
- bh=mw+8kRBMaigpdPoQg441qk6T9IEU8krLENLSjCCr4zw=;
- b=SrMofVJY/GjIpbuhbq5Q0NchE90Iee1Zg/DXzrBAL+84O+9mkb6Cvy4kbuTgC9NQoK
- tBqW8VuJ90++OLutVCiS1ya3l32W+JKb2BOUzxT4CfsJTbL/puTXQsav1euvT3+gukG2
- yS7t4ZuH8QzI7fhcSd7lINxxYvVsKg3i3FXbG+Q8gteNmUbpj11OvRbe8kbh++awXIwA
- lQ4l1HocfEVizMh2041kgc72dvgbUqXNAgsThfb0ZWYRAHAJLmF2dzBFcQYmNC3B4SgG
- os87bSDOwQmR/d7G3NMYHAuPjpmsSI+LJUHPF3mp7ZDo3cMuuRvUGMBLZ8TO5A0n/acG
- yo8w==
+ bh=/YIqAIDcHFuwAQfZoGFGpCQkR+bed1xlNZgqyVQf28E=;
+ b=e7isaWxZT/WwPXJW8Qx7YWkAPbx8+WwYXnyULWOmnQdcxssVcaIQUjV7l9ocfrzj/1
+ z1dBSLWak0xiQCBEw4pQBZlvDqmdEqTRJUP+Z40PCX/NEachrYFN0ukP1ZGzNNDz6hC8
+ ypXPhlkEqsMB53P1s/G0Q8Dg2n01FI0WXWYQbrYIvGu6VNt899fuhgkx/Wx+L0fumdK0
+ DgUKSgQ9NGEeMAWRcQat/qxuE6PEmuWNOgqyoFgMMRQ8e+j8axNSLg3wwL/mVfqWCfju
+ QtZrvT4+EtSeFefALo6da9zs6M611OWSowxrRuYjpqYPmBtDlX0Y/PjaKJe2gSlYH6Gm
+ X8tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:date:in-reply-to:message-id
  :mime-version:references:subject:from:to:cc;
- bh=mw+8kRBMaigpdPoQg441qk6T9IEU8krLENLSjCCr4zw=;
- b=XQGFQTxvPo2tdeNlkUZVlIdUYakZmgoOnXsPUcft4ZFnABq3r01dyyMLefKFaLj2i+
- ADDe/x4vpwhBnSJo7T2AvBUGi41xuWyl8M2ewZ7yOBfzZtUk7JcOCAMVKIlCLRki2iuT
- urxGlyZkRbqIWTxBslWDraFR4gaU+HUXTVtxE/TwdVm5KyDnRR4DwprrSruby+khoPCM
- 4bxPBInkuDP6OSiV2grjuy9xG9nIlxGQjpC5zlsrDzRiGAlIBYoKhX6O1N/B7nvc0vbj
- 6lX4xcgW+bCSwJQL1b5gB1Rn2t9+/I602+wad+iVfczLtob1SPc7pkLJRmNtyMtx1HKJ
- EI3Q==
-X-Gm-Message-State: AOAM531H2BhtI8qj8UUm7leqEBzEa3jSQ/Hi4HnsXN0JJwRohE9UKFEg
- hCEdpRC73UIyuUilmRJ1CwfB/kqRHOE=
-X-Google-Smtp-Source: ABdhPJz67wmixiDyySBDTYDOJ0Ka4b7LxO+H1fUSrGnT0BW1K6fuhepd8JhPlaHMI6pEBAJMacMWw56NTRg=
+ bh=/YIqAIDcHFuwAQfZoGFGpCQkR+bed1xlNZgqyVQf28E=;
+ b=rCBmY28Q+CGjW0Gry5uqcrWl2TqDRZ2HsuWbDoIGf7/mRTkMmb6f5m8WloyDVK4L+C
+ BrDz12/7bK/IAHkttYiRIaM4OeLhdYPn9Xrw7miVuVAr3DNlIhgg/kD5rGWtX8ef9fRD
+ xjJE7HIhZhvqqNKk3nnnJl3DiGmahHMHvpUM5I8lPaW8Qa5Y7X4ovfTWp3EKIB7asavd
+ BylckUwdWsQZ7dn8R7XjsWkHIqcCsSbDa5FoKT9RWAYXdD1TrtkP2EkRdGya7+LeTSgc
+ NSZUjrPUHPI87hHzvYcZ6fwTylPxOpTu8e9DxsixmLGkkXcJsHh0YVDSY55nsA/jQZTG
+ 9ISA==
+X-Gm-Message-State: AOAM5304J0yWWyEGJ/VhcLm6b8qlrdKF3GqPlkYFeKiIW2Ill0DawrQC
+ Pla6Tfk/fBpv7Rj2x+zQBVNF2wyvxiw=
+X-Google-Smtp-Source: ABdhPJzNTXRg0manAu6ukUacQ/aIuXahOUAgZ+nsuAEIEEiY7jrc1n1CQ1z/uBehVd+2Ly8STcnpos0K1ss=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:e789:b0:140:801:1262
+ (user=seanjc job=sendgmr) by 2002:a17:902:e88a:b0:141:dfde:eed7
  with SMTP id
- cp9-20020a170902e78900b0014008011262mr4254554plb.42.1636596483663; Wed, 10
- Nov 2021 18:08:03 -0800 (PST)
-Date: Thu, 11 Nov 2021 02:07:35 +0000
+ w10-20020a170902e88a00b00141dfdeeed7mr4246270plg.17.1636596485366; Wed, 10
+ Nov 2021 18:08:05 -0800 (PST)
+Date: Thu, 11 Nov 2021 02:07:36 +0000
 In-Reply-To: <20211111020738.2512932-1-seanjc@google.com>
-Message-Id: <20211111020738.2512932-15-seanjc@google.com>
+Message-Id: <20211111020738.2512932-16-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211111020738.2512932-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
-Subject: [PATCH v4 14/17] KVM: arm64: Convert to the generic perf callbacks
+Subject: [PATCH v4 15/17] KVM: arm64: Hide kvm_arm_pmu_available behind
+ CONFIG_HW_PERF_EVENTS=y
 From: Sean Christopherson <seanjc@google.com>
 To: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, 
  Arnaldo Carvalho de Melo <acme@kernel.org>, Will Deacon <will@kernel.org>,
@@ -116,64 +117,103 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Drop arm64's version of the callbacks in favor of the callbacks provided
-by generic KVM, which are semantically identical.
+Move the definition of kvm_arm_pmu_available to pmu-emul.c and, out of
+"necessity", hide it behind CONFIG_HW_PERF_EVENTS.  Provide a stub for
+the key's wrapper, kvm_arm_support_pmu_v3().  Moving the key's definition
+out of perf.c will allow a future commit to delete perf.c entirely.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/arm64/kvm/perf.c | 34 ++--------------------------------
- 1 file changed, 2 insertions(+), 32 deletions(-)
+ arch/arm64/kernel/image-vars.h |  2 ++
+ arch/arm64/kvm/perf.c          |  2 --
+ arch/arm64/kvm/pmu-emul.c      |  2 ++
+ include/kvm/arm_pmu.h          | 19 ++++++++++++-------
+ 4 files changed, 16 insertions(+), 9 deletions(-)
 
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index c96a9a0043bf..7eaf1f7c4168 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -102,7 +102,9 @@ KVM_NVHE_ALIAS(__stop___kvm_ex_table);
+ KVM_NVHE_ALIAS(kvm_arm_hyp_percpu_base);
+ 
+ /* PMU available static key */
++#ifdef CONFIG_HW_PERF_EVENTS
+ KVM_NVHE_ALIAS(kvm_arm_pmu_available);
++#endif
+ 
+ /* Position-independent library routines */
+ KVM_NVHE_ALIAS_HYP(clear_page, __pi_clear_page);
 diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
-index dfa9bce8559e..374c496a3f1d 100644
+index 374c496a3f1d..52cfab253c65 100644
 --- a/arch/arm64/kvm/perf.c
 +++ b/arch/arm64/kvm/perf.c
-@@ -13,42 +13,12 @@
+@@ -11,8 +11,6 @@
  
- DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
+ #include <asm/kvm_emulate.h>
  
--static unsigned int kvm_guest_state(void)
--{
--	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
--	unsigned int state;
--
--	if (!vcpu)
--		return 0;
--
--	state = PERF_GUEST_ACTIVE;
--	if (!vcpu_mode_priv(vcpu))
--		state |= PERF_GUEST_USER;
--
--	return state;
--}
--
--static unsigned long kvm_get_guest_ip(void)
--{
--	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
--
--	if (WARN_ON_ONCE(!vcpu))
--		return 0;
--
--	return *vcpu_pc(vcpu);
--}
--
--static struct perf_guest_info_callbacks kvm_guest_cbs = {
--	.state		= kvm_guest_state,
--	.get_ip		= kvm_get_guest_ip,
--};
+-DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
 -
  void kvm_perf_init(void)
  {
--	perf_register_guest_info_callbacks(&kvm_guest_cbs);
-+	kvm_register_perf_callbacks(NULL);
- }
+ 	kvm_register_perf_callbacks(NULL);
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index a5e4bbf5e68f..3308ceefa129 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -14,6 +14,8 @@
+ #include <kvm/arm_pmu.h>
+ #include <kvm/arm_vgic.h>
  
- void kvm_perf_teardown(void)
- {
--	perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
-+	kvm_unregister_perf_callbacks();
- }
++DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
++
+ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+ static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx);
+ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 90f21898aad8..f9ed4c171d7b 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -13,13 +13,6 @@
+ #define ARMV8_PMU_CYCLE_IDX		(ARMV8_PMU_MAX_COUNTERS - 1)
+ #define ARMV8_PMU_MAX_COUNTER_PAIRS	((ARMV8_PMU_MAX_COUNTERS + 1) >> 1)
+ 
+-DECLARE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
+-
+-static __always_inline bool kvm_arm_support_pmu_v3(void)
+-{
+-	return static_branch_likely(&kvm_arm_pmu_available);
+-}
+-
+ #ifdef CONFIG_HW_PERF_EVENTS
+ 
+ struct kvm_pmc {
+@@ -36,6 +29,13 @@ struct kvm_pmu {
+ 	struct irq_work overflow_work;
+ };
+ 
++DECLARE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
++
++static __always_inline bool kvm_arm_support_pmu_v3(void)
++{
++	return static_branch_likely(&kvm_arm_pmu_available);
++}
++
+ #define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+@@ -65,6 +65,11 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu);
+ struct kvm_pmu {
+ };
+ 
++static inline bool kvm_arm_support_pmu_v3(void)
++{
++	return false;
++}
++
+ #define kvm_arm_pmu_irq_initialized(v)	(false)
+ static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+ 					    u64 select_idx)
 -- 
 2.34.0.rc0.344.g81b53c2807-goog
 
