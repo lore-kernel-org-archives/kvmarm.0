@@ -2,91 +2,67 @@ Return-Path: <SRS0=nF4w=P6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4362BC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 11:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF048C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 21:12:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id B46F2611F2
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 11:20:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org B46F2611F2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	by mail.kernel.org (Postfix) with ESMTP id 30B1C61037
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 21:12:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 30B1C61037
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4053D4B176;
-	Thu, 11 Nov 2021 06:20:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA4414B174;
+	Thu, 11 Nov 2021 16:12:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3Cx6KofGjU-B; Thu, 11 Nov 2021 06:20:04 -0500 (EST)
+	with ESMTP id GePWHzpKuf8h; Thu, 11 Nov 2021 16:12:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A0554B20A;
-	Thu, 11 Nov 2021 06:20:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE9D04B1CB;
+	Thu, 11 Nov 2021 16:12:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5ECD4B209
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 06:20:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60DA84B20E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 16:12:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rpzyLMkepVWJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Nov 2021 06:20:01 -0500 (EST)
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 850F04B176
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 06:20:01 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
- References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=Rwfbmkoas7VebHdsAPeFky9gQjs68+546BvuzLh8KOw=; b=nYW2D8WwDzTJBO/3hqaCnKl+rG
- Juv9WqI4u6yj05w2X63ioSsTn5cEdV6jDA351V4/q9yydOsa7FW1hSEMYTFCpYM+34h+eLD05vIuf
- aJw4KwauVgbsmZhkliH2C6iKJqojPUXuWEPcd38B1dtT88o84f5Sp/oMWfV8h9DaHJOesh+0xGqtP
- n4R4aYuGwPrCobAnDwuTl24Bkv/pjQsvWW5g0gG3sYG1rBE7VdaHTNsjeZ1KJKR5jtxxyS54nzBQU
- j+XeoDvq2JxdCtTPVCSG+YQMQo1n/omY8trwJKb2fdS0v2mWaEEA6whxFBt8nI2ZCCfGYmM487YiO
- s2UIUTPg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100]
- helo=noisy.programming.kicks-ass.net)
- by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1ml873-002g98-8m; Thu, 11 Nov 2021 11:19:26 +0000
-Received: from hirez.programming.kicks-ass.net
- (hirez.programming.kicks-ass.net [192.168.1.225])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits))
- (Client did not present a certificate)
- by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 627DF3000D5;
- Thu, 11 Nov 2021 12:19:22 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
- id 304F0201EC1CF; Thu, 11 Nov 2021 12:19:21 +0100 (CET)
-Date: Thu, 11 Nov 2021 12:19:21 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v4 00/17] perf: KVM: Fix, optimize, and clean up callbacks
-Message-ID: <YYz8OTWtkcFUkvbZ@hirez.programming.kicks-ass.net>
-References: <20211111020738.2512932-1-seanjc@google.com>
+ with ESMTP id YDErPoEG-yeZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Nov 2021 16:12:19 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F5FA4B1CB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 16:12:19 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6483260EFD;
+ Thu, 11 Nov 2021 21:12:17 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mlHMl-004tjr-7y; Thu, 11 Nov 2021 21:12:15 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH 0/4] KVM/arm64 fixes for 5.16, take #1
+Date: Thu, 11 Nov 2021 21:11:31 +0000
+Message-Id: <20211111211135.3991240-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211111020738.2512932-1-seanjc@google.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
+ catalin.marinas@arm.com, tabba@google.com, james.morse@arm.com,
+ mark.rutland@arm.com, qperret@google.com, rdunlap@infradead.org,
+ suzuki.poulose@arm.com, will@kernel.org, yuehaibing@huawei.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, Guo Ren <guoren@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, linux-riscv@lists.infradead.org,
- Vincent Chen <deanbo422@gmail.com>, Will Deacon <will@kernel.org>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
- Russell King <linux@armlinux.org.uk>, linux-csky@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, Ingo Molnar <mingo@redhat.com>,
- Like Xu <like.xu.linux@gmail.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Zhu Lingshan <lingshan.zhu@intel.com>, Jiri Olsa <jolsa@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Borislav Petkov <bp@alien8.de>,
- Greentime Hu <green.hu@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Artem Kashkanov <artem.kashkanov@intel.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Juergen Gross <jgross@suse.com>, Like Xu <like.xu@linux.intel.com>,
- Nick Hu <nickhu@andestech.com>, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+ Randy Dunlap <rdunlap@infradead.org>, YueHaibing <yuehaibing@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,35 +79,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Nov 11, 2021 at 02:07:21AM +0000, Sean Christopherson wrote:
+Paolo,
 
-> Like Xu (1):
->   perf/core: Rework guest callbacks to prepare for static_call support
-> 
-> Sean Christopherson (16):
->   perf: Protect perf_guest_cbs with RCU
->   KVM: x86: Register perf callbacks after calling vendor's
->     hardware_setup()
->   KVM: x86: Register Processor Trace interrupt hook iff PT enabled in
->     guest
->   perf: Stop pretending that perf can handle multiple guest callbacks
->   perf: Drop dead and useless guest "support" from arm, csky, nds32 and
->     riscv
->   perf: Add wrappers for invoking guest callbacks
->   perf: Force architectures to opt-in to guest callbacks
->   perf/core: Use static_call to optimize perf_guest_info_callbacks
->   KVM: x86: Drop current_vcpu for kvm_running_vcpu + kvm_arch_vcpu
->     variable
->   KVM: x86: More precisely identify NMI from guest when handling PMI
->   KVM: Move x86's perf guest info callbacks to generic KVM
->   KVM: x86: Move Intel Processor Trace interrupt handler to vmx.c
->   KVM: arm64: Convert to the generic perf callbacks
->   KVM: arm64: Hide kvm_arm_pmu_available behind CONFIG_HW_PERF_EVENTS=y
->   KVM: arm64: Drop perf.c and fold its tiny bits of code into arm.c
->   perf: Drop guest callback (un)register stubs
+Here's the first set of fixes for 5.16. The main items are a fix for a
+host S2 issue for protected VM, as well as a correctness fix when
+extracting the exception class from assembly code. The rest is
+strictly cosmetic.
 
-Thanks!, I'll queue them up and push them into tip/perf/core once -rc1
-happens.
+Please pull,
+
+	M.
+
+The following changes since commit 5a2acbbb0179a7ffbb5440b9fa46689f619705ac:
+
+  Merge branch kvm/selftests/memslot into kvmarm-master/next (2021-10-21 11:40:03 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.16-1
+
+for you to fetch changes up to 50a8d3315960c74095c59e204db44abd937d4b5d:
+
+  KVM: arm64: Fix host stage-2 finalization (2021-11-08 18:07:48 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.16, take #1
+
+- Fix the host S2 finalization by solely iterating over the memblocks
+  instead of the whole IPA space
+
+- Tighten the return value of kvm_vcpu_preferred_target() now that
+  32bit support is long gone
+
+- Make sure the extraction of ESR_ELx.EC is limited to the architected
+  bits
+
+- Comment fixups
+
+----------------------------------------------------------------
+Mark Rutland (1):
+      KVM: arm64: Extract ESR_ELx.EC only
+
+Quentin Perret (1):
+      KVM: arm64: Fix host stage-2 finalization
+
+Randy Dunlap (1):
+      KVM: arm64: nvhe: Fix a non-kernel-doc comment
+
+YueHaibing (1):
+      KVM: arm64: Change the return type of kvm_vcpu_preferred_target()
+
+ arch/arm64/include/asm/esr.h       |  1 +
+ arch/arm64/include/asm/kvm_host.h  |  2 +-
+ arch/arm64/kvm/arm.c               |  5 +----
+ arch/arm64/kvm/guest.c             |  7 +------
+ arch/arm64/kvm/hyp/hyp-entry.S     |  2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S     |  2 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c    | 14 ++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c |  2 +-
+ 8 files changed, 19 insertions(+), 16 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
