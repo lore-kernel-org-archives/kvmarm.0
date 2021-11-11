@@ -2,51 +2,51 @@ Return-Path: <SRS0=nF4w=P6=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 004F5C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619D0C433FE
 	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 21:12:27 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 89A5C61057
-	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 21:12:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 89A5C61057
+	by mail.kernel.org (Postfix) with ESMTP id 0574961057
+	for <kvmarm@archiver.kernel.org>; Thu, 11 Nov 2021 21:12:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 0574961057
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9604B204;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A943F4B1F8;
 	Thu, 11 Nov 2021 16:12:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 55bvSNK+6Hjb; Thu, 11 Nov 2021 16:12:24 -0500 (EST)
+	with ESMTP id La2oGdeEiazn; Thu, 11 Nov 2021 16:12:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 108F14B22C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27BF04B232;
 	Thu, 11 Nov 2021 16:12:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E088B4B1E3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 16:12:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D5134B1E3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 16:12:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VHrpsVijDFOU for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id BUAA7EVrkZ3B for <kvmarm@lists.cs.columbia.edu>;
  Thu, 11 Nov 2021 16:12:19 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E1E84B18A
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7039C4B1E4
  for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Nov 2021 16:12:19 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 6A0B961057;
- Thu, 11 Nov 2021 21:12:17 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 97BE561037;
+ Thu, 11 Nov 2021 21:12:18 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mlHMl-004tjr-LI; Thu, 11 Nov 2021 21:12:15 +0000
+ id 1mlHMm-004tjr-OU; Thu, 11 Nov 2021 21:12:16 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 1/4] KVM: arm64: Extract ESR_ELx.EC only
-Date: Thu, 11 Nov 2021 21:11:32 +0000
-Message-Id: <20211111211135.3991240-2-maz@kernel.org>
+Subject: [PATCH 4/4] KVM: arm64: Fix host stage-2 finalization
+Date: Thu, 11 Nov 2021 21:11:35 +0000
+Message-Id: <20211111211135.3991240-5-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211111211135.3991240-1-maz@kernel.org>
 References: <20211111211135.3991240-1-maz@kernel.org>
@@ -57,15 +57,14 @@ X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
  mark.rutland@arm.com, qperret@google.com, rdunlap@infradead.org,
  suzuki.poulose@arm.com, will@kernel.org, yuehaibing@huawei.com,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org, stable@vger.kernel.org
+ kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>,
  Randy Dunlap <rdunlap@infradead.org>, YueHaibing <yuehaibing@huawei.com>,
- stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,86 +81,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+From: Quentin Perret <qperret@google.com>
 
-Since ARMv8.0 the upper 32 bits of ESR_ELx have been RES0, and recently
-some of the upper bits gained a meaning and can be non-zero. For
-example, when FEAT_LS64 is implemented, ESR_ELx[36:32] contain ISS2,
-which for an ST64BV or ST64BV0 can be non-zero. This can be seen in ARM
-DDI 0487G.b, page D13-3145, section D13.2.37.
+We currently walk the hypervisor stage-1 page-table towards the end of
+hyp init in nVHE protected mode and adjust the host page ownership
+attributes in its stage-2 in order to get a consistent state from both
+point of views. The walk is done on the entire hyp VA space, and expects
+to only ever find page-level mappings. While this expectation is
+reasonable in the half of hyp VA space that maps memory with a fixed
+offset (see the loop in pkvm_create_mappings_locked()), it can be
+incorrect in the other half where nothing prevents the usage of block
+mappings. For instance, on systems where memory is physically aligned at
+an address that happens to maps to a PMD aligned VA in the hyp_vmemmap,
+kvm_pgtable_hyp_map() will install block mappings when backing the
+hyp_vmemmap, which will later cause finalize_host_mappings() to fail.
+Furthermore, it should be noted that all pages backing the hyp_vmemmap
+are also mapped in the 'fixed offset range' of the hypervisor, which
+implies that finalize_host_mappings() will walk both aliases and update
+the host stage-2 attributes twice. The order in which this happens is
+unpredictable, though, since the hyp VA layout is highly dependent on
+the position of the idmap page, hence resulting in a fragile mess at
+best.
 
-Generally, we must not rely on RES0 bit remaining zero in future, and
-when extracting ESR_ELx.EC we must mask out all other bits.
+In order to fix all of this, let's restrict the finalization walk to
+only cover memory regions in the 'fixed-offset range' of the hyp VA
+space and nothing else. This not only fixes a correctness issue, but
+will also result in a slighlty faster hyp initialization overall.
 
-All C code uses the ESR_ELx_EC() macro, which masks out the irrelevant
-bits, and therefore no alterations are required to C code to avoid
-consuming irrelevant bits.
-
-In a couple of places the KVM assembly extracts ESR_ELx.EC using LSR on
-an X register, and so could in theory consume previously RES0 bits. In
-both cases this is for comparison with EC values ESR_ELx_EC_HVC32 and
-ESR_ELx_EC_HVC64, for which the upper bits of ESR_ELx must currently be
-zero, but this could change in future.
-
-This patch adjusts the KVM vectors to use UBFX rather than LSR to
-extract ESR_ELx.EC, ensuring these are robust to future additions to
-ESR_ELx.
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Will Deacon <will@kernel.org>
-Acked-by: Will Deacon <will@kernel.org>
+Fixes: 2c50166c62ba ("KVM: arm64: Mark host bss and rodata section as shared")
+Signed-off-by: Quentin Perret <qperret@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20211103110545.4613-1-mark.rutland@arm.com
+Link: https://lore.kernel.org/r/20211108154636.393384-1-qperret@google.com
 ---
- arch/arm64/include/asm/esr.h   | 1 +
- arch/arm64/kvm/hyp/hyp-entry.S | 2 +-
- arch/arm64/kvm/hyp/nvhe/host.S | 2 +-
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/setup.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 29f97eb3dad4..8f59bbeba7a7 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -68,6 +68,7 @@
- #define ESR_ELx_EC_MAX		(0x3F)
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 862c7b514e20..578f71798c2e 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -178,7 +178,7 @@ static int finalize_host_mappings_walker(u64 addr, u64 end, u32 level,
  
- #define ESR_ELx_EC_SHIFT	(26)
-+#define ESR_ELx_EC_WIDTH	(6)
- #define ESR_ELx_EC_MASK		(UL(0x3F) << ESR_ELx_EC_SHIFT)
- #define ESR_ELx_EC(esr)		(((esr) & ESR_ELx_EC_MASK) >> ESR_ELx_EC_SHIFT)
+ 	phys = kvm_pte_to_phys(pte);
+ 	if (!addr_is_memory(phys))
+-		return 0;
++		return -EINVAL;
  
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 9aa9b73475c9..b6b6801d96d5 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -44,7 +44,7 @@
- el1_sync:				// Guest trapped into EL2
+ 	/*
+ 	 * Adjust the host stage-2 mappings to match the ownership attributes
+@@ -207,8 +207,18 @@ static int finalize_host_mappings(void)
+ 		.cb	= finalize_host_mappings_walker,
+ 		.flags	= KVM_PGTABLE_WALK_LEAF,
+ 	};
++	int i, ret;
++
++	for (i = 0; i < hyp_memblock_nr; i++) {
++		struct memblock_region *reg = &hyp_memory[i];
++		u64 start = (u64)hyp_phys_to_virt(reg->base);
++
++		ret = kvm_pgtable_walk(&pkvm_pgtable, start, reg->size, &walker);
++		if (ret)
++			return ret;
++	}
  
- 	mrs	x0, esr_el2
--	lsr	x0, x0, #ESR_ELx_EC_SHIFT
-+	ubfx	x0, x0, #ESR_ELx_EC_SHIFT, #ESR_ELx_EC_WIDTH
- 	cmp	x0, #ESR_ELx_EC_HVC64
- 	ccmp	x0, #ESR_ELx_EC_HVC32, #4, ne
- 	b.ne	el1_trap
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 0c6116d34e18..3d613e721a75 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -141,7 +141,7 @@ SYM_FUNC_END(__host_hvc)
- .L__vect_start\@:
- 	stp	x0, x1, [sp, #-16]!
- 	mrs	x0, esr_el2
--	lsr	x0, x0, #ESR_ELx_EC_SHIFT
-+	ubfx	x0, x0, #ESR_ELx_EC_SHIFT, #ESR_ELx_EC_WIDTH
- 	cmp	x0, #ESR_ELx_EC_HVC64
- 	b.eq	__host_hvc
- 	b	__host_exit
+-	return kvm_pgtable_walk(&pkvm_pgtable, 0, BIT(pkvm_pgtable.ia_bits), &walker);
++	return 0;
+ }
+ 
+ void __noreturn __pkvm_init_finalise(void)
 -- 
 2.30.2
 
