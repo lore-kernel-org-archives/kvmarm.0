@@ -2,76 +2,75 @@ Return-Path: <SRS0=3yKf=QA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E46E6C433FE
-	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:23:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7692C4332F
+	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:23:12 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 99AA2610A5
-	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:23:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 99AA2610A5
+	by mail.kernel.org (Postfix) with ESMTP id 5EF0B610A2
+	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:23:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5EF0B610A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 495E34B2EF;
-	Fri, 12 Nov 2021 20:23:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11D834B337;
+	Fri, 12 Nov 2021 20:23:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hUK5E8eUeGTF; Fri, 12 Nov 2021 20:23:09 -0500 (EST)
+	with ESMTP id wUuOxU0qfXW5; Fri, 12 Nov 2021 20:23:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35E154B332;
-	Fri, 12 Nov 2021 20:23:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51CCC4B352;
+	Fri, 12 Nov 2021 20:23:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F050D4B332
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:23:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 057DC4B2F2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:23:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FS8k188UvDIm for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Nov 2021 20:23:05 -0500 (EST)
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
- [209.85.215.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECAAD4B2A6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:23:01 -0500 (EST)
-Received: by mail-pg1-f202.google.com with SMTP id
- u5-20020a63d3450000b029023a5f6e6f9bso5610046pgi.21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 17:23:01 -0800 (PST)
+ with ESMTP id q1j8bBVodaXZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Nov 2021 20:23:06 -0500 (EST)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A033B4B2E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:23:06 -0500 (EST)
+Received: by mail-pf1-f201.google.com with SMTP id
+ x14-20020a627c0e000000b0049473df362dso6577004pfc.12
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 17:23:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=g3+aox7fzytzBAtVqJz8rKFvz5lbt92AaNYPgpLVkEY=;
- b=NiFli5Y+14kem70XbljlK2MHcjurgn6MPuwKPmXSd7rGWvYOQRIvwfcEd+tRcZvodI
- WZoTfZ6Hr6DXe8PBAGKo9bD6SDnf/NSBbbgnM63/yllW2rduAKr2314Pb1Q7Z5PnknJ/
- Qx1O+HpfnX2lRKhqPnMWf6RLvEA/HpSqE2lmaXhKUEuX5qErIKC55+VxNLIbnmHl7QZA
- TvVZv/V1hhdxdQ20nNW12eEPgRMmAOago5mzHjDem5lVhK7DHRB34qnbSZNghdjojCB4
- rpTs330JDOwgMyQYEbVXeTjodxncPNmB/SYMPPLrBurYsuHWjTUdrFCUQHyluAgiBfvF
- g0IA==
+ :cc; bh=1CZoQf4R3Llwe7QOwZRwWahGVK4YcdZ2JDH+KcdbSp8=;
+ b=Lk6+LX2rdro7XyHoAWr+atN/6MF8Do4h2M3iOLUzn1v5EDRAcOH3jLBMoQDpO6JK4P
+ OC5gHkh3PHEAFV4caOBAS3GNIcbVfB/rthVZzy/E/YVF3QFp8cec9PHcjulQGkUTylH7
+ 03MBwSMnP0vf9rH+o7kZKXVgza3mAQt4evdHAyGR/jDtTtiLVjyMQnq3zGpnj95mBRNF
+ 431oBygQgmltw1VBKu1J42xKbnPkXf3N2BGbuceB0muITZP1AoeKy9emJUl9V0+g+vol
+ 6A4diwprhSWKDJ52wdg57H0F2q+sgaxU7qaIeN6xrTM3T9wvhmWKc5yrh0ealjO+iZSW
+ Wi2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=g3+aox7fzytzBAtVqJz8rKFvz5lbt92AaNYPgpLVkEY=;
- b=ocJhe0bQqJ5SlRrnCM5Tg6tRcpQI0rVeQvjUsfqSkkfqSSPzsFAldc3is+NCf67DWj
- aNAElLN2GVIdQ/9aAjyjTgyTA3IIiA0BTwcCcz11NisBsQTeQ/Ws+nV69z40/mAPw8BG
- tZhn3e6lZ7nirF+RF6lUve0ce3Tht+PIPuQFYalaYy6g1hSTrotvyBPKA6D9XmYe0Lgj
- Xl5Hq1jJTVKw9Ipc0/yporHkeNV8r98bW+EicQZ4kkS+itGL9vtZl2puolVCyFFFgU1c
- 55mjNpHs28OfmCY2UE/PgOCZyW0sTEeTErbphBr1+WhlaYmmEx/WVpkpKl1YEZT8t9Q/
- M6vA==
-X-Gm-Message-State: AOAM530CwJk1HoOCdLCF2C65G/ugjKIwiWzln9A+z1Sj3dnW9kU+Q0VK
- blwCje91tSZsOIbTQMUKwC/9fg9FIO96
-X-Google-Smtp-Source: ABdhPJw6EZS2Qj/BRyr/pJRFu4I87U2GEaFJToIWpSRiGeVJhc0MJgA1bcNg7gzyDPzhMD5DBksKCxhbzwlF
+ bh=1CZoQf4R3Llwe7QOwZRwWahGVK4YcdZ2JDH+KcdbSp8=;
+ b=mEie4AkUtQTT5jmLm6oEzweM04R3tqplIbIZhr7kZQ1VxpyH/WHLOLppiVRouJkFRR
+ ZxFgE7XiQsfTsYxixL0RkKMmQLAgNfDFTNW6Y8ud8DCDRTKpJnZOTl+UqDONKPK8IHao
+ MbPlbrZJ2gwx6YNIss9SShLbWRPmK5C2pT6ZO270xRXNf9hwiZDR0JPn8bCbC0MTVUgI
+ 6hfUmbiVONPeUKeZk2TE7bX9nkaX+ysXPYVw0dfpFaz+/ulykrIWwxG2wgzpwY5fskMt
+ xHDqftNMAjEMUrT9SHTf8SoKHxom2F0ecmx7+KWH9juFsSrsUcZjOrSS3J8hrYEO0g49
+ 9W2A==
+X-Gm-Message-State: AOAM530wb9o7+O4X4y+wLjtHlB6V/QEWR0WJNjMLFV49kVztWKR4fLNw
+ fipqgjpgG3ajpetzRlA59uUD0KaITEFj
+X-Google-Smtp-Source: ABdhPJyyFvtg2j3LS+2nufHjQcH5Iu/XxqiSnxAytU7b9mbEFemfzUIZ0QHFzKO4nRMgEeLKJYEJO/fMZRdB
 X-Received: from rananta-virt.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a17:90a:3905:: with SMTP id
- y5mr141745pjb.0.1636766580759; Fri, 12 Nov 2021 17:23:00 -0800 (PST)
-Date: Sat, 13 Nov 2021 01:22:30 +0000
+ (user=rananta job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
+ p15mr141461pjf.1.1636766585473; Fri, 12 Nov 2021 17:23:05 -0800 (PST)
+Date: Sat, 13 Nov 2021 01:22:32 +0000
 In-Reply-To: <20211113012234.1443009-1-rananta@google.com>
-Message-Id: <20211113012234.1443009-8-rananta@google.com>
+Message-Id: <20211113012234.1443009-10-rananta@google.com>
 Mime-Version: 1.0
 References: <20211113012234.1443009-1-rananta@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [RFC PATCH v2 07/11] Docs: KVM: Add doc for the bitmap firmware
- registers
+Subject: [RFC PATCH v2 09/11] tools: Import ARM SMCCC definitions
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>, 
  James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -96,168 +95,208 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-- Add documentation for the capability, KVM_CAP_ARM_HVC_FW_REG_BMAP,
-  in KVM's api.rst.
-
-- Add the documentation for the bitmap firmware registers in
-  psci.rst. This includes the details for KVM_REG_ARM_STD_BMAP,
-  KVM_REG_ARM_STD_HYP_BMAP, and KVM_REG_ARM_VENDOR_HYP_BMAP
-  registers.
+Import the standard SMCCC definitions from include/linux/arm-smccc.h.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- Documentation/virt/kvm/api.rst      | 23 ++++++++
- Documentation/virt/kvm/arm/psci.rst | 89 +++++++++++++++++++++++------
- 2 files changed, 95 insertions(+), 17 deletions(-)
+ tools/include/linux/arm-smccc.h | 188 ++++++++++++++++++++++++++++++++
+ 1 file changed, 188 insertions(+)
+ create mode 100644 tools/include/linux/arm-smccc.h
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 3b093d6dbe22..7d88567feaa7 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6911,6 +6911,29 @@ MAP_SHARED mmap will result in an -EINVAL return.
- When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
- perform a bulk copy of tags to/from the guest.
- 
-+7.29 KVM_CAP_ARM_HVC_FW_REG_BMAP
-+--------------------------------
+diff --git a/tools/include/linux/arm-smccc.h b/tools/include/linux/arm-smccc.h
+new file mode 100644
+index 000000000000..a11c0bbabd5b
+--- /dev/null
++++ b/tools/include/linux/arm-smccc.h
+@@ -0,0 +1,188 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Copyright (c) 2015, Linaro Limited
++ */
++#ifndef __LINUX_ARM_SMCCC_H
++#define __LINUX_ARM_SMCCC_H
 +
-+:Architecture: arm64
-+:Parameters: none
++#include <linux/const.h>
 +
-+This capability indicates that KVM for arm64 supports the psuedo-firmware
-+register bitmap extension. It must be explicitly enabled. Once enabled,
-+KVM allows access to the firmware registers that hold the bitmap of the
-+hypercall services that should be exposed to the guest.
++/*
++ * This file provides common defines for ARM SMC Calling Convention as
++ * specified in
++ * https://developer.arm.com/docs/den0028/latest
++ *
++ * This code is up-to-date with version DEN 0028 C
++ */
 +
-+By default, the registers are set with the upper-limit of the features
-+exposed to the guest. User-space can discover them via the GET_ONE_REG
-+interface. If unsatisfied with the configuration, it can write-back the
-+bitmap that it sees fit for the guest via SET_ONE_REG interface. The
-+registers that are never accessed by the user-space (read/write) are
-+by default cleared just before the vCPU runs. This is to make sure that
-+the features are not accidentally exposed to the guest without the
-+consent of user-space.
++#define ARM_SMCCC_STD_CALL	        _AC(0,U)
++#define ARM_SMCCC_FAST_CALL	        _AC(1,U)
++#define ARM_SMCCC_TYPE_SHIFT		31
 +
-+Note that the capability has to be enabled before running any vCPU. Also,
-+the capability cannot be disabled. The VM has to be restarted for that.
++#define ARM_SMCCC_SMC_32		0
++#define ARM_SMCCC_SMC_64		1
++#define ARM_SMCCC_CALL_CONV_SHIFT	30
 +
- 8. Other capabilities.
- ======================
- 
-diff --git a/Documentation/virt/kvm/arm/psci.rst b/Documentation/virt/kvm/arm/psci.rst
-index d52c2e83b5b8..f6306b91168d 100644
---- a/Documentation/virt/kvm/arm/psci.rst
-+++ b/Documentation/virt/kvm/arm/psci.rst
-@@ -1,32 +1,32 @@
- .. SPDX-License-Identifier: GPL-2.0
- 
--=========================================
--Power State Coordination Interface (PSCI)
--=========================================
-+=======================
-+ARM Hypercall Interface
-+=======================
- 
--KVM implements the PSCI (Power State Coordination Interface)
--specification in order to provide services such as CPU on/off, reset
--and power-off to the guest.
-+KVM handles the hypercall services as requested by the guests. New hypercall
-+services are regularly made available by the ARM specification or by KVM (as
-+vendor services) if they make sense from a virtualization point of view.
- 
--The PSCI specification is regularly updated to provide new features,
--and KVM implements these updates if they make sense from a virtualization
--point of view.
--
--This means that a guest booted on two different versions of KVM can
--observe two different "firmware" revisions. This could cause issues if
--a given guest is tied to a particular PSCI revision (unlikely), or if
--a migration causes a different PSCI version to be exposed out of the
--blue to an unsuspecting guest.
-+This means that a guest booted on two different versions of KVM can observe
-+two different "firmware" revisions. This could cause issues if a given guest
-+is tied to a particular version of a hypercall service, or if a migration
-+causes a different version to be exposed out of the blue to an unsuspecting
-+guest.
- 
- In order to remedy this situation, KVM exposes a set of "firmware
- pseudo-registers" that can be manipulated using the GET/SET_ONE_REG
--interface. These registers can be saved/restored by userspace, and set
-+interface. These registers can be saved/restored by user-space, and set
- to a convenient value if required.
- 
--The following register is defined:
-+The following registers are defined:
- 
- * KVM_REG_ARM_PSCI_VERSION:
- 
-+  KVM implements the PSCI (Power State Coordination Interface)
-+  specification in order to provide services such as CPU on/off, reset
-+  and power-off to the guest.
++#define ARM_SMCCC_OWNER_MASK		0x3F
++#define ARM_SMCCC_OWNER_SHIFT		24
 +
-   - Only valid if the vcpu has the KVM_ARM_VCPU_PSCI_0_2 feature set
-     (and thus has already been initialized)
-   - Returns the current PSCI version on GET_ONE_REG (defaulting to the
-@@ -74,4 +74,59 @@ The following register is defined:
-     KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
-       The workaround is always active on this vCPU or it is not needed.
- 
-+Contrary to the above registers, the following registers exposes the hypercall
-+services in the form of a feature-bitmap. This bitmap is translated to the
-+services that are exposed to the guest. There is a register defined per service
-+call owner and can be accessed via GET/SET_ONE_REG interface.
++#define ARM_SMCCC_FUNC_MASK		0xFFFF
 +
-+A new KVM capability, KVM_CAP_ARM_HVC_FW_REG_BMAP, is introduced to let
-+user-space know of this extension. It has to explicitly enable the capability
-+to get access to these registers. If the capability is enabled, a 'read' of
-+these registers will simply expose the upper-limit of all features supported
-+by the corresponding service call owner in the form of a bitmap. If the
-+user-space is unhappy with the arrangement, it can 'write-back' the bitmap
-+that it wishes to expose.
++#define ARM_SMCCC_IS_FAST_CALL(smc_val)	\
++	((smc_val) & (ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT))
++#define ARM_SMCCC_IS_64(smc_val) \
++	((smc_val) & (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT))
++#define ARM_SMCCC_FUNC_NUM(smc_val)	((smc_val) & ARM_SMCCC_FUNC_MASK)
++#define ARM_SMCCC_OWNER_NUM(smc_val) \
++	(((smc_val) >> ARM_SMCCC_OWNER_SHIFT) & ARM_SMCCC_OWNER_MASK)
 +
-+If a register is not accessed (either read/write), KVM will assume that the
-+user-space is unaware of its existence. In such a case, KVM would simply
-+clear all the bits of that register just before starting the VM. This way
-+no new features are accidentally exposed to the guest.
++#define ARM_SMCCC_CALL_VAL(type, calling_convention, owner, func_num) \
++	(((type) << ARM_SMCCC_TYPE_SHIFT) | \
++	((calling_convention) << ARM_SMCCC_CALL_CONV_SHIFT) | \
++	(((owner) & ARM_SMCCC_OWNER_MASK) << ARM_SMCCC_OWNER_SHIFT) | \
++	((func_num) & ARM_SMCCC_FUNC_MASK))
 +
-+The psuedo-firmware bitmap register are as follows:
++#define ARM_SMCCC_OWNER_ARCH		0
++#define ARM_SMCCC_OWNER_CPU		1
++#define ARM_SMCCC_OWNER_SIP		2
++#define ARM_SMCCC_OWNER_OEM		3
++#define ARM_SMCCC_OWNER_STANDARD	4
++#define ARM_SMCCC_OWNER_STANDARD_HYP	5
++#define ARM_SMCCC_OWNER_VENDOR_HYP	6
++#define ARM_SMCCC_OWNER_TRUSTED_APP	48
++#define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
++#define ARM_SMCCC_OWNER_TRUSTED_OS	50
++#define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
 +
-+* KVM_REG_ARM_STD_BMAP:
-+    Controls the bitmap of the ARM Standard Secure Service Calls.
++#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
 +
-+  The following bits are accepted:
++#define ARM_SMCCC_QUIRK_NONE		0
++#define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
 +
-+  KVM_REG_ARM_STD_BIT_TRNG_V1_0:
-+    The bit represents the services offered under v1.0 of ARM True Random
-+    Number Generator (TRNG) specification, ARM DEN0098.
++#define ARM_SMCCC_VERSION_1_0		0x10000
++#define ARM_SMCCC_VERSION_1_1		0x10001
++#define ARM_SMCCC_VERSION_1_2		0x10002
++#define ARM_SMCCC_VERSION_1_3		0x10003
 +
-+* KVM_REG_ARM_STD_HYP_BMAP:
-+    Controls the bitmap of the ARM Standard Hypervisor Service Calls.
++#define ARM_SMCCC_1_3_SVE_HINT		0x10000
 +
-+  The following bits are accepted:
++#define ARM_SMCCC_VERSION_FUNC_ID					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 0)
 +
-+  KVM_REG_ARM_STD_HYP_BIT_PV_TIME:
-+    The bit represents the Paravirtualized Time service as represented by
-+    ARM DEN0057A.
++#define ARM_SMCCC_ARCH_FEATURES_FUNC_ID					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 1)
 +
-+* KVM_REG_ARM_VENDOR_HYP_BMAP:
-+    Controls the bitmap of the Vendor specific Hypervisor Service Calls.
++#define ARM_SMCCC_ARCH_SOC_ID						\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 2)
 +
-+  The following bits are accepted:
++#define ARM_SMCCC_ARCH_WORKAROUND_1					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 0x8000)
 +
-+  KVM_REG_ARM_VENDOR_HYP_BIT_PTP:
-+    The bit represents the Precision Time Protocol KVM service.
++#define ARM_SMCCC_ARCH_WORKAROUND_2					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   0, 0x7fff)
 +
-+Errors:
++#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
 +
-+    =======  =============================================================
-+    -ENOENT   Register accessed (read/write) without enabling
-+              KVM_CAP_ARM_HVC_FW_REG_BMAP.
-+    -EBUSY    Attempt a 'write' to the register after the VM has started.
-+    -EINVAL   Invalid bitmap written to the register.
-+    =======  =============================================================
++/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
++#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
 +
- .. [1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
++/* KVM "vendor specific" services */
++#define ARM_SMCCC_KVM_FUNC_FEATURES		0
++#define ARM_SMCCC_KVM_FUNC_PTP			1
++#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
++#define ARM_SMCCC_KVM_NUM_FUNCS			128
++
++#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_FEATURES)
++
++#define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
++
++/*
++ * ptp_kvm is a feature used for time sync between vm and host.
++ * ptp_kvm module in guest kernel will get service from host using
++ * this hypercall ID.
++ */
++#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
++			   ARM_SMCCC_SMC_32,				\
++			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
++			   ARM_SMCCC_KVM_FUNC_PTP)
++
++/* ptp_kvm counter type ID */
++#define KVM_PTP_VIRT_COUNTER			0
++#define KVM_PTP_PHYS_COUNTER			1
++
++/* Paravirtualised time calls (defined by ARM DEN0057A) */
++#define ARM_SMCCC_HV_PV_TIME_FEATURES				\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_64,			\
++			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
++			   0x20)
++
++#define ARM_SMCCC_HV_PV_TIME_ST					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_64,			\
++			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
++			   0x21)
++
++/* TRNG entropy source calls (defined by ARM DEN0098) */
++#define ARM_SMCCC_TRNG_VERSION					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x50)
++
++#define ARM_SMCCC_TRNG_FEATURES					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x51)
++
++#define ARM_SMCCC_TRNG_GET_UUID					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x52)
++
++#define ARM_SMCCC_TRNG_RND32					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_32,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x53)
++
++#define ARM_SMCCC_TRNG_RND64					\
++	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
++			   ARM_SMCCC_SMC_64,			\
++			   ARM_SMCCC_OWNER_STANDARD,		\
++			   0x53)
++
++/*
++ * Return codes defined in ARM DEN 0070A
++ * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
++ */
++#define SMCCC_RET_SUCCESS			0
++#define SMCCC_RET_NOT_SUPPORTED			-1
++#define SMCCC_RET_NOT_REQUIRED			-2
++#define SMCCC_RET_INVALID_PARAMETER		-3
++
++#endif /*__LINUX_ARM_SMCCC_H*/
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
