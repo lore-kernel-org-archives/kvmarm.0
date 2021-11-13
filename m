@@ -1,68 +1,83 @@
-Return-Path: <SRS0=9vag=P7=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=3yKf=QA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50CB2C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Nov 2021 15:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E37BC433EF
+	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:22:49 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id C15C661027
-	for <kvmarm@archiver.kernel.org>; Fri, 12 Nov 2021 15:37:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org C15C661027
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 9B278610A1
+	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:22:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 9B278610A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 505E14B2DF;
-	Fri, 12 Nov 2021 10:37:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F191A4B2F6;
+	Fri, 12 Nov 2021 20:22:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4Vo4V0WE184s; Fri, 12 Nov 2021 10:37:31 -0500 (EST)
+	with ESMTP id hqAn6Xg5rEGm; Fri, 12 Nov 2021 20:22:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9079A4B300;
-	Fri, 12 Nov 2021 10:37:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D18E4B2AE;
+	Fri, 12 Nov 2021 20:22:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 231ED4B2DF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 10:37:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 127844B297
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:22:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xMVZZY8mj--J for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Nov 2021 10:37:28 -0500 (EST)
-Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC00D4B2B3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 10:37:28 -0500 (EST)
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id D4A2A60F41;
- Fri, 12 Nov 2021 15:37:27 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mlYcH-0053Av-KL; Fri, 12 Nov 2021 15:37:25 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 5.16, take #1
-Date: Fri, 12 Nov 2021 15:37:22 +0000
-Message-Id: <20211112153722.4010408-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
- catalin.marinas@arm.com, tabba@google.com, james.morse@arm.com,
- mark.rutland@arm.com, qperret@google.com, rdunlap@infradead.org,
- suzuki.poulose@arm.com, will@kernel.org, yuehaibing@huawei.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Randy Dunlap <rdunlap@infradead.org>, YueHaibing <yuehaibing@huawei.com>,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+ with ESMTP id hgZmT9BbbUs8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Nov 2021 20:22:43 -0500 (EST)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9270A4B295
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:22:43 -0500 (EST)
+Received: by mail-pf1-f201.google.com with SMTP id
+ 134-20020a62198c000000b0047bf0981003so6596657pfz.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 17:22:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=2Fl+E7cG54UAD1z/Snstpjzha6PMILzmNdpT7gA3XpY=;
+ b=kObfQ+3XAG09c7i5PoZKbrnoG/eHfjcW3oAmPgKbxnoWhQ1/kFp0530IM35uyyMV87
+ ZtPq8IdHd9jo79z0GPpm/nbTx7W3/AcKg7Ug4csla8MmTxjojlX2gokq5q5aW7aT2Vn5
+ oOUaiDuzm+BehTbdFhfndQhsd2yGlbSJQUapGYrNHhQHDAlr8KgWym2QlL2QG+qLnWyz
+ KDNqmtyGqHnBz3SgmyripUOBlvxDv3gSnI1Ix25nclPuqdUP01N9hznuc5ikuwehke/j
+ H3F7DcenpZNgmQiirp9gedpzrXuh6HVYdIljr9d8llkvlGsvyu+22b/R0fJ2WBCpoI9M
+ inFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=2Fl+E7cG54UAD1z/Snstpjzha6PMILzmNdpT7gA3XpY=;
+ b=TTTtLqb/qknuEacfhRbdAGR1C9MIvN82BgcoBX9Ay5wmh1DKP4Y7hwkrnzFxA4ph4j
+ WCRm/GEoWlxExWjUq88dgGfUP5Dyv9+8AcJ8eIjMmWT0EdwsR8JsdG5KYXWMp0KA2zxy
+ ImI2QcZ3lJAu0QWsGBErb4DRGKnqiiqBg1XFC/19c6U5YDK42TP0M0t9f5dGAKt16mT0
+ bOdPJ6DkYT3NwuFD7SUypJfEuwY+8YzOr96ZoWtKeQ01XNl7EwPofIL8e49K+uNKzRIK
+ aL1FioEDyN9TakcFpjwsZtJObLX5nDK/eFiy3ivruhvKnP+V15pilH2otWlqIlXrYHAt
+ II7w==
+X-Gm-Message-State: AOAM531uFeK5gUL2yegxNdGFkC7m82j508RdS8iWXc+ucTh+nqrdDnee
+ TasPXW5xAzYE2WTv3AH1XiR66EmqNzbF
+X-Google-Smtp-Source: ABdhPJx/Kep9Vxyfgt6R4bTxREUyHFoIGgs6339f+KoFG+ERTel8M5+SwsteJA1j0NYJpHiZSWoYJmoEhV7V
+X-Received: from rananta-virt.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a17:902:b20b:b0:141:a92c:a958 with SMTP id
+ t11-20020a170902b20b00b00141a92ca958mr13276516plr.24.1636766562577; Fri, 12
+ Nov 2021 17:22:42 -0800 (PST)
+Date: Sat, 13 Nov 2021 01:22:23 +0000
+Message-Id: <20211113012234.1443009-1-rananta@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
+Subject: [RFC PATCH v2 00/11] KVM: arm64: Add support for hypercall services
+ selection
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>, 
+ James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,67 +94,154 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-[this went out as a series instead of a PR yesterday, my bad]
+Hello,
 
-Paolo,
+Continuing the discussion from [1], the series tries to add support
+for the user-space to elect the hypercall services that it wishes
+to expose to the guest, rather than the guest discovering them
+unconditionally. The idea employed by the series was taken from
+[1] as suggested by Marc Z.
 
-Here's the first set of fixes for 5.16. The main items are a fix for a
-host S2 issue for protected VM, as well as a correctness fix when
-extracting the exception class from assembly code. The rest is
-strictly cosmetic.
+In a broad sense, the idea is similar to the current implementation
+of PSCI interface- create a 'firmware psuedo-register' to handle the
+firmware revisions. The series extends this idea to all the other
+hypercalls such as TRNG (True Random Number Generator), PV_TIME
+(Paravirtualized Time), and PTP (Precision Time protocol).
 
-Please pull,
+For better categorization and future scaling, these firmware registers
+are categorized based on the service call owners, but unlike the
+existing firmware psuedo-registers, they hold the features supported
+in the form of a bitmap. During VM (vCPU) initialization, the registers
+shows an upper-limit of the features supported by the corresponding
+registers. The VMM can simply use GET_ONE_REG to discover the features.
+If it's unhappy with any of the features, it can simply write-back the
+desired feature bitmap using SET_ONE_REG.
 
-	M.
+KVM allows these modification only until a VM has started. KVM also
+assumes that the VMM is unaware of a register if a register remains
+unaccessed (read/write), and would simply clear all the bits of the
+registers such that the guest accidently doesn't get exposed to the
+features. Finally, the set of bitmaps from all the registers are the
+services that are exposed to the guest.
 
-The following changes since commit 5a2acbbb0179a7ffbb5440b9fa46689f619705ac:
+In order to provide backward compatibility with already existing VMMs,
+a new capability, KVM_CAP_ARM_HVC_FW_REG_BMAP, is introduced. To enable
+the bitmap firmware registers extension, the capability must be
+explicitly enabled. If not, the behavior is similar to the previous
+setup.
 
-  Merge branch kvm/selftests/memslot into kvmarm-master/next (2021-10-21 11:40:03 +0100)
+The patches are based off of mainline kernel 5.15, with the selftest
+patches from [2] applied.
 
-are available in the Git repository at:
+Patch-1 factors out the non-PSCI related interface from psci.c to
+hypercalls.c, as the series would extend the list in the upcoming
+patches.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.16-1
+Patches-2,3 introduces core KVM functions, kvm_vcpu_has_run_once()
+and kvm_vm_has_run_once() to be used in upcoming patches.
 
-for you to fetch changes up to 50a8d3315960c74095c59e204db44abd937d4b5d:
+Patch-4 sets up the framework for the bitmap firmware psuedo-registers.
+This includes introducing the capability, KVM_CAP_ARM_HVC_FW_REG_BMAP,
+read/write helpers for the registers, helper to sanitize the regsiters
+before VM start, and another helper to check if a particular hypercall
+service is supported for the guest.
+It also adds the register KVM_REG_ARM_STD_HYP_BMAP to support ARM's
+standard secure services.
 
-  KVM: arm64: Fix host stage-2 finalization (2021-11-08 18:07:48 +0000)
+Patch-5 introduces the firmware register, KVM_REG_ARM_STD_HYP_BMAP,
+which holds the standard hypervisor services (such as PV_TIME).
 
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.16, take #1
+Patch-6 introduces the firmware register, KVM_REG_ARM_VENDOR_HYP_BMAP,
+which holds the vendor specific hypercall services.
 
-- Fix the host S2 finalization by solely iterating over the memblocks
-  instead of the whole IPA space
+Patch-7,8 Add the necessary documentation for the newly added capability
+and firmware registers.
 
-- Tighten the return value of kvm_vcpu_preferred_target() now that
-  32bit support is long gone
+Patch-9 imports the SMCCC definitions from linux/arm-smccc.h into tools/
+for further use in selftests.
 
-- Make sure the extraction of ESR_ELx.EC is limited to the architected
-  bits
+Patch-10 adds the selftest to test the guest (using 'hvc') and VMM
+interfaces (SET/GET_ONE_REG).
 
-- Comment fixups
+Patch-11 adds these firmware registers into the get-reg-list selftest.
 
-----------------------------------------------------------------
-Mark Rutland (1):
-      KVM: arm64: Extract ESR_ELx.EC only
+[1]: https://lore.kernel.org/kvmarm/874kbcpmlq.wl-maz@kernel.org/T/
+[2]: https://lore.kernel.org/kvmarm/YUzgdbYk8BeCnHyW@google.com/
 
-Quentin Perret (1):
-      KVM: arm64: Fix host stage-2 finalization
+Regards,
+Raghavendra
 
-Randy Dunlap (1):
-      KVM: arm64: nvhe: Fix a non-kernel-doc comment
+v1 -> v2
 
-YueHaibing (1):
-      KVM: arm64: Change the return type of kvm_vcpu_preferred_target()
+Addressed comments by Oliver (thanks!):
 
- arch/arm64/include/asm/esr.h       |  1 +
- arch/arm64/include/asm/kvm_host.h  |  2 +-
- arch/arm64/kvm/arm.c               |  5 +----
- arch/arm64/kvm/guest.c             |  7 +------
- arch/arm64/kvm/hyp/hyp-entry.S     |  2 +-
- arch/arm64/kvm/hyp/nvhe/host.S     |  2 +-
- arch/arm64/kvm/hyp/nvhe/setup.c    | 14 ++++++++++++--
- arch/arm64/kvm/hyp/nvhe/sys_regs.c |  2 +-
- 8 files changed, 19 insertions(+), 16 deletions(-)
+- Introduced kvm_vcpu_has_run_once() and kvm_vm_has_run_once() in the
+  core kvm code, rather than relying on ARM specific vcpu->arch.has_run_once.
+- Writing to KVM_REG_ARM_PSCI_VERSION is done in hypercalls.c itself,
+  rather than separating out to psci.c.
+- Introduced KVM_CAP_ARM_HVC_FW_REG_BMAP to enable the extension.
+- Tracks the register accesses from VMM to decide whether to sanitize
+  a register or not, as opposed to sanitizing upon the first 'write'
+  in v1.
+- kvm_hvc_call_supported() is implemented using a direct switch-case
+  statement, instead of looping over all the registers to pick the
+  register for the function-id.
+- Replaced the register bit definitions with #defines, instead of enums.
+- Removed the patch v1-06/08 that imports the firmware register
+  definitions as it's not needed.
+- Separated out the documentations in its own patch, and the renaming
+  of hypercalls.rst to psci.rst into another patch.
+- Add the new firmware registers to get-reg-list KVM selftest.
+
+v1: https://lore.kernel.org/kvmarm/20211102002203.1046069-1-rananta@google.com/
+
+Raghavendra Rao Ananta (11):
+  KVM: arm64: Factor out firmware register handling from psci.c
+  KVM: Introduce kvm_vcpu_has_run_once
+  KVM: Introduce kvm_vm_has_run_once
+  KVM: arm64: Setup a framework for hypercall bitmap firmware registers
+  KVM: arm64: Add standard hypervisor firmware register
+  KVM: arm64: Add vendor hypervisor firmware register
+  Docs: KVM: Add doc for the bitmap firmware registers
+  Docs: KVM: Rename psci.rst to hypercalls.rst
+  tools: Import ARM SMCCC definitions
+  selftests: KVM: aarch64: Introduce hypercall ABI test
+  selftests: KVM: aarch64: Add the bitmap firmware registers to
+    get-reg-list
+
+ Documentation/virt/kvm/api.rst                |  23 +
+ Documentation/virt/kvm/arm/hypercalls.rst     | 132 ++++++
+ Documentation/virt/kvm/arm/psci.rst           |  77 ---
+ arch/arm64/include/asm/kvm_host.h             |  21 +-
+ arch/arm64/include/uapi/asm/kvm.h             |  12 +
+ arch/arm64/kvm/arm.c                          |  31 +-
+ arch/arm64/kvm/guest.c                        |   2 +-
+ arch/arm64/kvm/hypercalls.c                   | 437 +++++++++++++++++-
+ arch/arm64/kvm/psci.c                         | 166 -------
+ arch/arm64/kvm/pvtime.c                       |   3 +
+ arch/arm64/kvm/trng.c                         |   9 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |   2 +-
+ arch/riscv/include/asm/kvm_host.h             |   3 -
+ arch/riscv/kvm/vcpu.c                         |   7 +-
+ include/kvm/arm_hypercalls.h                  |  20 +
+ include/kvm/arm_psci.h                        |   7 -
+ include/linux/kvm_host.h                      |   9 +
+ include/uapi/linux/kvm.h                      |   1 +
+ tools/include/linux/arm-smccc.h               | 188 ++++++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/get-reg-list.c      |  35 ++
+ .../selftests/kvm/aarch64/hypercalls.c        | 367 +++++++++++++++
+ virt/kvm/kvm_main.c                           |  18 +
+ 24 files changed, 1291 insertions(+), 281 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/hypercalls.rst
+ delete mode 100644 Documentation/virt/kvm/arm/psci.rst
+ create mode 100644 tools/include/linux/arm-smccc.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
+
+-- 
+2.34.0.rc1.387.gb447b232ab-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
