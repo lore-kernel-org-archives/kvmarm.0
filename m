@@ -2,76 +2,76 @@ Return-Path: <SRS0=3yKf=QA=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F9CC4332F
-	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E46E6C433FE
+	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:23:11 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 74C866115A
-	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:23:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 74C866115A
+	by mail.kernel.org (Postfix) with ESMTP id 99AA2610A5
+	for <kvmarm@archiver.kernel.org>; Sat, 13 Nov 2021 01:23:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 99AA2610A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 247374B340;
-	Fri, 12 Nov 2021 20:23:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 495E34B2EF;
+	Fri, 12 Nov 2021 20:23:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ibvsDYMtDWNi; Fri, 12 Nov 2021 20:23:08 -0500 (EST)
+	with ESMTP id hUK5E8eUeGTF; Fri, 12 Nov 2021 20:23:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19CEE4B26B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35E154B332;
 	Fri, 12 Nov 2021 20:23:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 721004B2E5
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F050D4B332
  for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:23:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zsGB916170Bl for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id FS8k188UvDIm for <kvmarm@lists.cs.columbia.edu>;
  Fri, 12 Nov 2021 20:23:05 -0500 (EST)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 107334B322
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:23:04 -0500 (EST)
-Received: by mail-pf1-f202.google.com with SMTP id
- x25-20020aa79199000000b0044caf0d1ba8so6613961pfa.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 17:23:04 -0800 (PST)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ECAAD4B2A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 20:23:01 -0500 (EST)
+Received: by mail-pg1-f202.google.com with SMTP id
+ u5-20020a63d3450000b029023a5f6e6f9bso5610046pgi.21
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Nov 2021 17:23:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Q7GrWuTY0VLlfBXSVo/l1AbRU3c932xDVsXpIdGJOrQ=;
- b=Qmzc0naE2HLfLu5C2KfMiITU+UJiTaXnpCuFgySBcgb58yGhXt/fTDiojjVpCSj2E7
- jIYeXWI43Mlupul7TfFnith9qWXSb/JWu9NvAQq21lHSzusJ1WVCxxpLuI9ftGeD/FLj
- AXxNCkeI8yA+FJ+odDw+8Yx60MOcHICOIGSaETOI2q9GsL++lJUuG9X1BY5TNG/pRWYH
- TzP5x6ZXpeiyibR6glYKFyx+v7Sod8MrhMPNOwyOMc0ccYYcp8tKq8j7516kKiXGo+0e
- z02V/ThWb4O2kALL4Ayv6zetGqgPT1sQQW14SJ4i37TYo0VO6zNOyOnGm28ClqVuX/Nb
- fMFQ==
+ :cc; bh=g3+aox7fzytzBAtVqJz8rKFvz5lbt92AaNYPgpLVkEY=;
+ b=NiFli5Y+14kem70XbljlK2MHcjurgn6MPuwKPmXSd7rGWvYOQRIvwfcEd+tRcZvodI
+ WZoTfZ6Hr6DXe8PBAGKo9bD6SDnf/NSBbbgnM63/yllW2rduAKr2314Pb1Q7Z5PnknJ/
+ Qx1O+HpfnX2lRKhqPnMWf6RLvEA/HpSqE2lmaXhKUEuX5qErIKC55+VxNLIbnmHl7QZA
+ TvVZv/V1hhdxdQ20nNW12eEPgRMmAOago5mzHjDem5lVhK7DHRB34qnbSZNghdjojCB4
+ rpTs330JDOwgMyQYEbVXeTjodxncPNmB/SYMPPLrBurYsuHWjTUdrFCUQHyluAgiBfvF
+ g0IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=Q7GrWuTY0VLlfBXSVo/l1AbRU3c932xDVsXpIdGJOrQ=;
- b=yzMksOquhSa0Q2H+dEo6Dnw0nW5Lk3Xpy+YBHxvBSeLiJIONUNPattUkPC/0nMvG0U
- eOqHBP9OEhZSpnZB1HmMWG9xAUP337kd3mElH7UMMTx5oOHoiv6yExCTGJWwb8dV6CYN
- dgUpcdlDc9/I4z2+RZ4zrB1+hGmhLg33c1WHyESEoUNQ4UUEWV58ZZbca3RT0zo04BTg
- B+ldzlNfBySTuLfmNx/pckreU2sbrAli+z8mJHqrns9vCYffPE1Vzf9xSckItRvOazCF
- ZudqTCSN3gJlYfsAKlDNsdVrkdFaEv+/gyhEztjkd4SLp9nUZABEqL+ukzRuKfraNxyK
- 9ENA==
-X-Gm-Message-State: AOAM530XGo8YlJo0C3799n/qiQfucO8AYTQ03H2FfCUiDpwce7aUBE28
- UJyVRoARtW7N3FulDT7lzdL5SHLnsi15
-X-Google-Smtp-Source: ABdhPJzq7F0HIvX+HNKivSfbV1x5ZTlVJPloR1co4VbUadyRLqRwx5DRYLGw8MvzuMhDYyd7Cv5Zq3lt07td
+ bh=g3+aox7fzytzBAtVqJz8rKFvz5lbt92AaNYPgpLVkEY=;
+ b=ocJhe0bQqJ5SlRrnCM5Tg6tRcpQI0rVeQvjUsfqSkkfqSSPzsFAldc3is+NCf67DWj
+ aNAElLN2GVIdQ/9aAjyjTgyTA3IIiA0BTwcCcz11NisBsQTeQ/Ws+nV69z40/mAPw8BG
+ tZhn3e6lZ7nirF+RF6lUve0ce3Tht+PIPuQFYalaYy6g1hSTrotvyBPKA6D9XmYe0Lgj
+ Xl5Hq1jJTVKw9Ipc0/yporHkeNV8r98bW+EicQZ4kkS+itGL9vtZl2puolVCyFFFgU1c
+ 55mjNpHs28OfmCY2UE/PgOCZyW0sTEeTErbphBr1+WhlaYmmEx/WVpkpKl1YEZT8t9Q/
+ M6vA==
+X-Gm-Message-State: AOAM530CwJk1HoOCdLCF2C65G/ugjKIwiWzln9A+z1Sj3dnW9kU+Q0VK
+ blwCje91tSZsOIbTQMUKwC/9fg9FIO96
+X-Google-Smtp-Source: ABdhPJw6EZS2Qj/BRyr/pJRFu4I87U2GEaFJToIWpSRiGeVJhc0MJgA1bcNg7gzyDPzhMD5DBksKCxhbzwlF
 X-Received: from rananta-virt.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a17:902:c643:b0:141:cf6b:6999 with SMTP id
- s3-20020a170902c64300b00141cf6b6999mr13246105pls.80.1636766583281; Fri, 12
- Nov 2021 17:23:03 -0800 (PST)
-Date: Sat, 13 Nov 2021 01:22:31 +0000
+ (user=rananta job=sendgmr) by 2002:a17:90a:3905:: with SMTP id
+ y5mr141745pjb.0.1636766580759; Fri, 12 Nov 2021 17:23:00 -0800 (PST)
+Date: Sat, 13 Nov 2021 01:22:30 +0000
 In-Reply-To: <20211113012234.1443009-1-rananta@google.com>
-Message-Id: <20211113012234.1443009-9-rananta@google.com>
+Message-Id: <20211113012234.1443009-8-rananta@google.com>
 Mime-Version: 1.0
 References: <20211113012234.1443009-1-rananta@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [RFC PATCH v2 08/11] Docs: KVM: Rename psci.rst to hypercalls.rst
+Subject: [RFC PATCH v2 07/11] Docs: KVM: Add doc for the bitmap firmware
+ registers
 From: Raghavendra Rao Ananta <rananta@google.com>
 To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>, 
  James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -96,20 +96,168 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since the doc now covers more of general hypercalls'
-details, rather than just PSCI, rename the file to a
-more appropriate name- hypercalls.rst.
+- Add documentation for the capability, KVM_CAP_ARM_HVC_FW_REG_BMAP,
+  in KVM's api.rst.
+
+- Add the documentation for the bitmap firmware registers in
+  psci.rst. This includes the details for KVM_REG_ARM_STD_BMAP,
+  KVM_REG_ARM_STD_HYP_BMAP, and KVM_REG_ARM_VENDOR_HYP_BMAP
+  registers.
 
 Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 ---
- Documentation/virt/kvm/arm/{psci.rst => hypercalls.rst} | 0
- 1 file changed, 0 insertions(+), 0 deletions(-)
- rename Documentation/virt/kvm/arm/{psci.rst => hypercalls.rst} (100%)
+ Documentation/virt/kvm/api.rst      | 23 ++++++++
+ Documentation/virt/kvm/arm/psci.rst | 89 +++++++++++++++++++++++------
+ 2 files changed, 95 insertions(+), 17 deletions(-)
 
-diff --git a/Documentation/virt/kvm/arm/psci.rst b/Documentation/virt/kvm/arm/hypercalls.rst
-similarity index 100%
-rename from Documentation/virt/kvm/arm/psci.rst
-rename to Documentation/virt/kvm/arm/hypercalls.rst
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 3b093d6dbe22..7d88567feaa7 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6911,6 +6911,29 @@ MAP_SHARED mmap will result in an -EINVAL return.
+ When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
+ perform a bulk copy of tags to/from the guest.
+ 
++7.29 KVM_CAP_ARM_HVC_FW_REG_BMAP
++--------------------------------
++
++:Architecture: arm64
++:Parameters: none
++
++This capability indicates that KVM for arm64 supports the psuedo-firmware
++register bitmap extension. It must be explicitly enabled. Once enabled,
++KVM allows access to the firmware registers that hold the bitmap of the
++hypercall services that should be exposed to the guest.
++
++By default, the registers are set with the upper-limit of the features
++exposed to the guest. User-space can discover them via the GET_ONE_REG
++interface. If unsatisfied with the configuration, it can write-back the
++bitmap that it sees fit for the guest via SET_ONE_REG interface. The
++registers that are never accessed by the user-space (read/write) are
++by default cleared just before the vCPU runs. This is to make sure that
++the features are not accidentally exposed to the guest without the
++consent of user-space.
++
++Note that the capability has to be enabled before running any vCPU. Also,
++the capability cannot be disabled. The VM has to be restarted for that.
++
+ 8. Other capabilities.
+ ======================
+ 
+diff --git a/Documentation/virt/kvm/arm/psci.rst b/Documentation/virt/kvm/arm/psci.rst
+index d52c2e83b5b8..f6306b91168d 100644
+--- a/Documentation/virt/kvm/arm/psci.rst
++++ b/Documentation/virt/kvm/arm/psci.rst
+@@ -1,32 +1,32 @@
+ .. SPDX-License-Identifier: GPL-2.0
+ 
+-=========================================
+-Power State Coordination Interface (PSCI)
+-=========================================
++=======================
++ARM Hypercall Interface
++=======================
+ 
+-KVM implements the PSCI (Power State Coordination Interface)
+-specification in order to provide services such as CPU on/off, reset
+-and power-off to the guest.
++KVM handles the hypercall services as requested by the guests. New hypercall
++services are regularly made available by the ARM specification or by KVM (as
++vendor services) if they make sense from a virtualization point of view.
+ 
+-The PSCI specification is regularly updated to provide new features,
+-and KVM implements these updates if they make sense from a virtualization
+-point of view.
+-
+-This means that a guest booted on two different versions of KVM can
+-observe two different "firmware" revisions. This could cause issues if
+-a given guest is tied to a particular PSCI revision (unlikely), or if
+-a migration causes a different PSCI version to be exposed out of the
+-blue to an unsuspecting guest.
++This means that a guest booted on two different versions of KVM can observe
++two different "firmware" revisions. This could cause issues if a given guest
++is tied to a particular version of a hypercall service, or if a migration
++causes a different version to be exposed out of the blue to an unsuspecting
++guest.
+ 
+ In order to remedy this situation, KVM exposes a set of "firmware
+ pseudo-registers" that can be manipulated using the GET/SET_ONE_REG
+-interface. These registers can be saved/restored by userspace, and set
++interface. These registers can be saved/restored by user-space, and set
+ to a convenient value if required.
+ 
+-The following register is defined:
++The following registers are defined:
+ 
+ * KVM_REG_ARM_PSCI_VERSION:
+ 
++  KVM implements the PSCI (Power State Coordination Interface)
++  specification in order to provide services such as CPU on/off, reset
++  and power-off to the guest.
++
+   - Only valid if the vcpu has the KVM_ARM_VCPU_PSCI_0_2 feature set
+     (and thus has already been initialized)
+   - Returns the current PSCI version on GET_ONE_REG (defaulting to the
+@@ -74,4 +74,59 @@ The following register is defined:
+     KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
+       The workaround is always active on this vCPU or it is not needed.
+ 
++Contrary to the above registers, the following registers exposes the hypercall
++services in the form of a feature-bitmap. This bitmap is translated to the
++services that are exposed to the guest. There is a register defined per service
++call owner and can be accessed via GET/SET_ONE_REG interface.
++
++A new KVM capability, KVM_CAP_ARM_HVC_FW_REG_BMAP, is introduced to let
++user-space know of this extension. It has to explicitly enable the capability
++to get access to these registers. If the capability is enabled, a 'read' of
++these registers will simply expose the upper-limit of all features supported
++by the corresponding service call owner in the form of a bitmap. If the
++user-space is unhappy with the arrangement, it can 'write-back' the bitmap
++that it wishes to expose.
++
++If a register is not accessed (either read/write), KVM will assume that the
++user-space is unaware of its existence. In such a case, KVM would simply
++clear all the bits of that register just before starting the VM. This way
++no new features are accidentally exposed to the guest.
++
++The psuedo-firmware bitmap register are as follows:
++
++* KVM_REG_ARM_STD_BMAP:
++    Controls the bitmap of the ARM Standard Secure Service Calls.
++
++  The following bits are accepted:
++
++  KVM_REG_ARM_STD_BIT_TRNG_V1_0:
++    The bit represents the services offered under v1.0 of ARM True Random
++    Number Generator (TRNG) specification, ARM DEN0098.
++
++* KVM_REG_ARM_STD_HYP_BMAP:
++    Controls the bitmap of the ARM Standard Hypervisor Service Calls.
++
++  The following bits are accepted:
++
++  KVM_REG_ARM_STD_HYP_BIT_PV_TIME:
++    The bit represents the Paravirtualized Time service as represented by
++    ARM DEN0057A.
++
++* KVM_REG_ARM_VENDOR_HYP_BMAP:
++    Controls the bitmap of the Vendor specific Hypervisor Service Calls.
++
++  The following bits are accepted:
++
++  KVM_REG_ARM_VENDOR_HYP_BIT_PTP:
++    The bit represents the Precision Time Protocol KVM service.
++
++Errors:
++
++    =======  =============================================================
++    -ENOENT   Register accessed (read/write) without enabling
++              KVM_CAP_ARM_HVC_FW_REG_BMAP.
++    -EBUSY    Attempt a 'write' to the register after the VM has started.
++    -EINVAL   Invalid bitmap written to the register.
++    =======  =============================================================
++
+ .. [1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
