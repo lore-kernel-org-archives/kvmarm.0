@@ -2,54 +2,54 @@ Return-Path: <SRS0=+NXu=QD=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F01C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Nov 2021 16:04:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 031B6C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Nov 2021 16:04:23 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 5D6176321A
-	for <kvmarm@archiver.kernel.org>; Tue, 16 Nov 2021 16:04:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 5D6176321A
+	by mail.kernel.org (Postfix) with ESMTP id A9C5661AD2
+	for <kvmarm@archiver.kernel.org>; Tue, 16 Nov 2021 16:04:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org A9C5661AD2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 021AB4B1A9;
-	Tue, 16 Nov 2021 11:04:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AD464B0C5;
+	Tue, 16 Nov 2021 11:04:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FWMWIuZQclaz; Tue, 16 Nov 2021 11:04:16 -0500 (EST)
+	with ESMTP id Jk+FYTt-fepe; Tue, 16 Nov 2021 11:04:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 685134B0CE;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B97AD4B186;
 	Tue, 16 Nov 2021 11:04:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4B9B4B13E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Nov 2021 11:04:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B90E4B086
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Nov 2021 11:04:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xyLR3+lSbg59 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Nov 2021 11:04:13 -0500 (EST)
+ with ESMTP id EoBOs4cjM754 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Nov 2021 11:04:14 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7B254B137
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB75F4B131
  for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Nov 2021 11:04:13 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 900D561929;
+ by mail.kernel.org (Postfix) with ESMTPSA id 1DD2D619FA;
  Tue, 16 Nov 2021 16:04:13 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mn0wN-005sTB-P0; Tue, 16 Nov 2021 16:04:11 +0000
+ id 1mn0wN-005sTB-4l; Tue, 16 Nov 2021 16:04:11 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvm@vger.kernel.org, linux-mips@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
  Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 3/7] KVM: s390: Use kvm_get_vcpu() instead of open-coded
+Subject: [PATCH v2 2/7] KVM: mips: Use kvm_get_vcpu() instead of open-coded
  access
-Date: Tue, 16 Nov 2021 16:03:59 +0000
-Message-Id: <20211116160403.4074052-4-maz@kernel.org>
+Date: Tue, 16 Nov 2021 16:03:58 +0000
+Message-Id: <20211116160403.4074052-3-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211116160403.4074052-1-maz@kernel.org>
 References: <20211116160403.4074052-1-maz@kernel.org>
@@ -86,51 +86,39 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As we are about to change the way vcpus are allocated, mandate
-the use of kvm_get_vcpu() instead of open-coding the access.
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/s390/kvm/kvm-s390.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 7af53b8788fa..4a0f62b03964 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4572,7 +4572,7 @@ int kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
- 	}
- 
- 	for (i = 0; i < online_vcpus; i++) {
--		if (!is_vcpu_stopped(vcpu->kvm->vcpus[i]))
-+		if (!is_vcpu_stopped(kvm_get_vcpu(vcpu->kvm, i)))
- 			started_vcpus++;
- 	}
- 
-@@ -4634,9 +4634,11 @@ int kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
- 	__disable_ibs_on_vcpu(vcpu);
- 
- 	for (i = 0; i < online_vcpus; i++) {
--		if (!is_vcpu_stopped(vcpu->kvm->vcpus[i])) {
-+		struct kvm_vcpu *tmp = kvm_get_vcpu(vcpu->kvm, i);
-+
-+		if (!is_vcpu_stopped(tmp)) {
- 			started_vcpus++;
--			started_vcpu = vcpu->kvm->vcpus[i];
-+			started_vcpu = tmp;
- 		}
- 	}
- 
--- 
-2.30.2
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+QXMgd2UgYXJlIGFib3V0IHRvIGNoYW5nZSB0aGUgd2F5IHZjcHVzIGFyZSBhbGxvY2F0ZWQsIG1h
+bmRhdGUKdGhlIHVzZSBvZiBrdm1fZ2V0X3ZjcHUoKSBpbnN0ZWFkIG9mIG9wZW4tY29kaW5nIHRo
+ZSBhY2Nlc3MuCgpSZXZpZXdlZC1ieTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPGY0YnVnQGFt
+c2F0Lm9yZz4KU2lnbmVkLW9mZi1ieTogTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4KLS0t
+CiBhcmNoL21pcHMva3ZtL2xvb25nc29uX2lwaS5jIHwgNCArKy0tCiBhcmNoL21pcHMva3ZtL21p
+cHMuYyAgICAgICAgIHwgMiArLQogMiBmaWxlcyBjaGFuZ2VkLCAzIGluc2VydGlvbnMoKyksIDMg
+ZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvYXJjaC9taXBzL2t2bS9sb29uZ3Nvbl9pcGkuYyBi
+L2FyY2gvbWlwcy9rdm0vbG9vbmdzb25faXBpLmMKaW5kZXggMzY4MWZjOGZiYTM4Li41ZDUzZjMy
+ZDgzN2MgMTAwNjQ0Ci0tLSBhL2FyY2gvbWlwcy9rdm0vbG9vbmdzb25faXBpLmMKKysrIGIvYXJj
+aC9taXBzL2t2bS9sb29uZ3Nvbl9pcGkuYwpAQCAtMTIwLDcgKzEyMCw3IEBAIHN0YXRpYyBpbnQg
+bG9vbmdzb25fdmlwaV93cml0ZShzdHJ1Y3QgbG9vbmdzb25fa3ZtX2lwaSAqaXBpLAogCQlzLT5z
+dGF0dXMgfD0gZGF0YTsKIAkJaXJxLmNwdSA9IGlkOwogCQlpcnEuaXJxID0gNjsKLQkJa3ZtX3Zj
+cHVfaW9jdGxfaW50ZXJydXB0KGt2bS0+dmNwdXNbaWRdLCAmaXJxKTsKKwkJa3ZtX3ZjcHVfaW9j
+dGxfaW50ZXJydXB0KGt2bV9nZXRfdmNwdShrdm0sIGlkKSwgJmlycSk7CiAJCWJyZWFrOwogCiAJ
+Y2FzZSBDT1JFMF9DTEVBUl9PRkY6CkBAIC0xMjgsNyArMTI4LDcgQEAgc3RhdGljIGludCBsb29u
+Z3Nvbl92aXBpX3dyaXRlKHN0cnVjdCBsb29uZ3Nvbl9rdm1faXBpICppcGksCiAJCWlmICghcy0+
+c3RhdHVzKSB7CiAJCQlpcnEuY3B1ID0gaWQ7CiAJCQlpcnEuaXJxID0gLTY7Ci0JCQlrdm1fdmNw
+dV9pb2N0bF9pbnRlcnJ1cHQoa3ZtLT52Y3B1c1tpZF0sICZpcnEpOworCQkJa3ZtX3ZjcHVfaW9j
+dGxfaW50ZXJydXB0KGt2bV9nZXRfdmNwdShrdm0sIGlkKSwgJmlycSk7CiAJCX0KIAkJYnJlYWs7
+CiAKZGlmZiAtLWdpdCBhL2FyY2gvbWlwcy9rdm0vbWlwcy5jIGIvYXJjaC9taXBzL2t2bS9taXBz
+LmMKaW5kZXggY2VhY2NhNzRmODA4Li42MjI4YmYzOTZkNjMgMTAwNjQ0Ci0tLSBhL2FyY2gvbWlw
+cy9rdm0vbWlwcy5jCisrKyBiL2FyY2gvbWlwcy9rdm0vbWlwcy5jCkBAIC00NzksNyArNDc5LDcg
+QEAgaW50IGt2bV92Y3B1X2lvY3RsX2ludGVycnVwdChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCiAJ
+aWYgKGlycS0+Y3B1ID09IC0xKQogCQlkdmNwdSA9IHZjcHU7CiAJZWxzZQotCQlkdmNwdSA9IHZj
+cHUtPmt2bS0+dmNwdXNbaXJxLT5jcHVdOworCQlkdmNwdSA9IGt2bV9nZXRfdmNwdSh2Y3B1LT5r
+dm0sIGlycS0+Y3B1KTsKIAogCWlmIChpbnRyID09IDIgfHwgaW50ciA9PSAzIHx8IGludHIgPT0g
+NCB8fCBpbnRyID09IDYpIHsKIAkJa3ZtX21pcHNfY2FsbGJhY2tzLT5xdWV1ZV9pb19pbnQoZHZj
+cHUsIGlycSk7Ci0tIAoyLjMwLjIKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
