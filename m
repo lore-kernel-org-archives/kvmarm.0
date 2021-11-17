@@ -2,52 +2,89 @@ Return-Path: <SRS0=Jx+E=QE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A25E0C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 15:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC5CC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 18:11:24 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 52DC261BFA
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 15:42:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 52DC261BFA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 7238B61BF4
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 18:11:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 7238B61BF4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07FA54B231;
-	Wed, 17 Nov 2021 10:42:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E52C44B1A5;
+	Wed, 17 Nov 2021 13:11:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W9oeJkAAI-5R; Wed, 17 Nov 2021 10:42:22 -0500 (EST)
+	with ESMTP id oAh0yWZ9zAZM; Wed, 17 Nov 2021 13:11:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D105E4B230;
-	Wed, 17 Nov 2021 10:42:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C5FA4B0A0;
+	Wed, 17 Nov 2021 13:11:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC2964B1E4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 10:42:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6B434B0A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 13:11:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I2vyL6OiUkX8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Nov 2021 10:42:19 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E8EA24B222
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 10:42:18 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8072911B3;
- Wed, 17 Nov 2021 07:42:18 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 91E7D3F5A1;
- Wed, 17 Nov 2021 07:42:16 -0800 (PST)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Subject: [RFC PATCH v5 kvmtool 4/4] arm64: Add SPE support
-Date: Wed, 17 Nov 2021 15:43:56 +0000
-Message-Id: <20211117154356.303039-5-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211117154356.303039-1-alexandru.elisei@arm.com>
-References: <20211117154356.303039-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
-Cc: Andrew Murray <andrew.murray@arm.com>, Sudeep Holla <sudeep.holla@arm.com>
+ with ESMTP id tnCspk9uxxGC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Nov 2021 13:11:17 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E8A81407ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 13:11:16 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id D008961BC1;
+ Wed, 17 Nov 2021 18:11:15 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mnPOr-00699w-Ot; Wed, 17 Nov 2021 18:11:13 +0000
+Date: Wed, 17 Nov 2021 18:11:13 +0000
+Message-ID: <87sfvu7iv2.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Subject: Re: [PATCH v3 07/12] KVM: arm64: Use Makefile.kvm for common files
+In-Reply-To: <20211117174003.297096-8-dwmw2@infradead.org>
+References: <20211117174003.297096-1-dwmw2@infradead.org>
+ <20211117174003.297096-8-dwmw2@infradead.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dwmw2@infradead.org, pbonzini@redhat.com,
+ kvm@vger.kernel.org, boris.ostrovsky@oracle.com, joao.m.martins@oracle.com,
+ jmattson@google.com, wanpengli@tencent.com, seanjc@google.com,
+ vkuznets@redhat.com, mtosatti@redhat.com, joro@8bytes.org, karahmed@amazon.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org,
+ aleksandar.qemu.devel@gmail.com, mpe@ellerman.id.au, benh@kernel.crashing.org,
+ anup.patel@wdc.com, borntraeger@de.ibm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Anup Patel <anup.patel@wdc.com>,
+ "wanpengli @ tencent . com" <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Joao Martins <joao.m.martins@oracle.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Michael Ellerman <mpe@ellerman.id.au>, "joro @ 8bytes . org" <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, karahmed@amazon.com,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ "jmattson @ google . com" <jmattson@google.com>,
+ "mtosatti @ redhat . com" <mtosatti@redhat.com>, linux-mips@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
+ "vkuznets @ redhat . com" <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,302 +101,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Sudeep Holla <sudeep.holla@arm.com>
+On Wed, 17 Nov 2021 17:39:58 +0000,
+David Woodhouse <dwmw2@infradead.org> wrote:
+> 
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>  arch/arm64/kvm/Makefile | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 989bb5dad2c8..04a53f71a6b6 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -5,14 +5,12 @@
+>  
+>  ccflags-y += -I $(srctree)/$(src)
+>  
+> -KVM=../../../virt/kvm
+> +include $(srctree)/virt/kvm/Makefile.kvm
+>  
+>  obj-$(CONFIG_KVM) += kvm.o
+>  obj-$(CONFIG_KVM) += hyp/
+>  
+> -kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+> -	 $(KVM)/vfio.o $(KVM)/irqchip.o $(KVM)/binary_stats.o \
+> -	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
+> +kvm-y += arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
+>  	 inject_fault.o va_layout.o handle_exit.o \
+>  	 guest.o debug.o reset.o sys_regs.o \
+>  	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
 
-Add a runtime configurable for kvmtool to enable SPE (Statistical
-Profiling Extensions) for each vcpu and to create a corresponding DT node.
-SPE is enabled at runtime with the --spe option.
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-SPE is last to be initialized because it requires the VGIC to be
-initialized, which is done late in the initialization process.
+	M.
 
-[ Andrew M: Add SPE to init features ]
-[ Alexandru E: Reworked patch ]
-
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- Makefile                                  |   1 +
- arm/aarch64/arm-cpu.c                     |   2 +
- arm/aarch64/include/kvm/kvm-config-arch.h |   2 +
- arm/aarch64/include/kvm/spe.h             |   7 ++
- arm/aarch64/kvm-cpu.c                     |   5 +
- arm/aarch64/kvm.c                         |  13 +++
- arm/aarch64/spe.c                         | 129 ++++++++++++++++++++++
- arm/include/arm-common/kvm-config-arch.h  |   1 +
- arm/kvm-cpu.c                             |   4 +
- 9 files changed, 164 insertions(+)
- create mode 100644 arm/aarch64/include/kvm/spe.h
- create mode 100644 arm/aarch64/spe.c
-
-diff --git a/Makefile b/Makefile
-index 313fdc3c0201..3c53a5784f45 100644
---- a/Makefile
-+++ b/Makefile
-@@ -181,6 +181,7 @@ ifeq ($(ARCH), arm64)
- 	OBJS		+= arm/aarch64/arm-cpu.o
- 	OBJS		+= arm/aarch64/kvm-cpu.o
- 	OBJS		+= arm/aarch64/kvm.o
-+	OBJS		+= arm/aarch64/spe.o
- 	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
- 	ARCH_INCLUDE	+= -Iarm/aarch64/include
- 
-diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-index d7572b7790b1..d3a03161e961 100644
---- a/arm/aarch64/arm-cpu.c
-+++ b/arm/aarch64/arm-cpu.c
-@@ -1,6 +1,7 @@
- #include "kvm/fdt.h"
- #include "kvm/kvm.h"
- #include "kvm/kvm-cpu.h"
-+#include "kvm/spe.h"
- #include "kvm/util.h"
- 
- #include "arm-common/gic.h"
-@@ -17,6 +18,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- 	pmu__generate_fdt_nodes(fdt, kvm);
-+	spe__generate_fdt_nodes(fdt, kvm);
- }
- 
- static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43dfa9b2..9f618cd9d2c1 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -6,6 +6,8 @@
- 			"Run AArch32 guest"),				\
- 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
- 			"Create PMUv3 device"),				\
-+	OPT_BOOLEAN('\0', "spe", &(cfg)->has_spe,			\
-+			"Create SPE device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
- 			"Layout Randomization (KASLR)"),
-diff --git a/arm/aarch64/include/kvm/spe.h b/arm/aarch64/include/kvm/spe.h
-new file mode 100644
-index 000000000000..c9814270321f
---- /dev/null
-+++ b/arm/aarch64/include/kvm/spe.h
-@@ -0,0 +1,7 @@
-+#ifndef KVM__KVM_SPE_H
-+#define KVM__KVM_SPE_H
-+
-+#define KVM_ARM_SPE_IRQ	21
-+
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm);
-+#endif /* KVM__KVM_SPE_H */
-diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-index 9f3e8586880c..9b67c5f1d2e2 100644
---- a/arm/aarch64/kvm-cpu.c
-+++ b/arm/aarch64/kvm-cpu.c
-@@ -140,6 +140,11 @@ void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init)
- 	/* Enable SVE if available */
- 	if (kvm__supports_extension(kvm, KVM_CAP_ARM_SVE))
- 		init->features[0] |= 1UL << KVM_ARM_VCPU_SVE;
-+
-+	/* Enable SPE if requested */
-+	if (kvm->cfg.arch.has_spe &&
-+	    kvm__supports_extension(kvm, KVM_CAP_ARM_SPE))
-+		init->features[0] |= 1UL << KVM_ARM_VCPU_SPE;
- }
- 
- int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index a61266e32085..bdfc8238fea1 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -1,4 +1,5 @@
- #include "kvm/kvm.h"
-+#include "kvm/spe.h"
- 
- #include <asm/image.h>
- #include <sys/mman.h>
-@@ -85,5 +86,17 @@ int kvm__get_vm_type(struct kvm *kvm)
- 
- void kvm__arch_delete_ram(struct kvm *kvm)
- {
-+	struct kvm_enable_cap unlock_mem = {
-+		.cap = KVM_CAP_ARM_LOCK_USER_MEMORY_REGION,
-+		.flags = KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK,
-+		.args[1] = KVM_ARM_UNLOCK_MEM_ALL,
-+	};
-+	int ret;
-+
-+	if (kvm->cfg.arch.has_spe) {
-+		ret = ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &unlock_mem);
-+		if (ret == -1)
-+			perror("KVM_CAP_ARM_LOCK_USER_MEMORY_REGION");
-+	}
- 	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
- }
-diff --git a/arm/aarch64/spe.c b/arm/aarch64/spe.c
-new file mode 100644
-index 000000000000..a3f9947ce3b2
---- /dev/null
-+++ b/arm/aarch64/spe.c
-@@ -0,0 +1,129 @@
-+#include <stdio.h>
-+
-+#include <sys/resource.h>
-+
-+#include <linux/kvm.h>
-+#include <linux/list.h>
-+
-+#include "kvm/fdt.h"
-+#include "kvm/kvm.h"
-+#include "kvm/kvm-cpu.h"
-+#include "kvm/spe.h"
-+#include "kvm/util.h"
-+
-+#include "arm-common/gic.h"
-+
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm)
-+{
-+	const char compatible[] = "arm,statistical-profiling-extension-v1";
-+	int irq = KVM_ARM_SPE_IRQ;
-+
-+	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
-+		       & GIC_FDT_IRQ_PPI_CPU_MASK;
-+	u32 irq_prop[] = {
-+		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-+		cpu_to_fdt32(irq - 16),
-+		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH),
-+	};
-+
-+	if (!kvm->cfg.arch.has_spe)
-+		return;
-+
-+	_FDT(fdt_begin_node(fdt, "spe"));
-+	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-+	_FDT(fdt_end_node(fdt));
-+}
-+
-+static void spe_set_vcpu_ctrl_attr(struct kvm_cpu *vcpu, u64 attr, void *addr)
-+{
-+	struct kvm_device_attr spe_attr = {
-+		.group	= KVM_ARM_VCPU_SPE_CTRL,
-+		.addr	= (u64)addr,
-+		.attr	= attr,
-+	};
-+	int ret;
-+
-+	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &spe_attr);
-+	if (ret < 0)
-+		die_perror("SPE KVM_HAS_DEVICE_ATTR");
-+
-+	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &spe_attr);
-+	if (ret < 0)
-+		die_perror("SPE KVM_SET_DEVICE_ATTR");
-+}
-+
-+static void spe_try_increase_mlock_limit(struct kvm *kvm)
-+{
-+	u64 size = kvm->ram_size;
-+	struct rlimit mlock_limit, new_limit;
-+
-+	if (getrlimit(RLIMIT_MEMLOCK, &mlock_limit)) {
-+		perror("getrlimit(RLIMIT_MEMLOCK)");
-+		return;
-+	}
-+
-+	if (mlock_limit.rlim_cur > size)
-+		return;
-+
-+	new_limit.rlim_cur = size;
-+	new_limit.rlim_max = max((rlim_t)size, mlock_limit.rlim_max);
-+	/* Requires CAP_SYS_RESOURCE capability. */
-+	setrlimit(RLIMIT_MEMLOCK, &new_limit);
-+}
-+
-+static void spe_lock_memory(struct kvm *kvm)
-+{
-+	struct kvm_mem_bank *bank;
-+	struct kvm_enable_cap lock_mem = {
-+		.cap = KVM_CAP_ARM_LOCK_USER_MEMORY_REGION,
-+		.flags = KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK,
-+		.args[1] = KVM_ARM_LOCK_MEM_READ | KVM_ARM_LOCK_MEM_WRITE,
-+	};
-+	u64 slot;
-+	int ret;
-+
-+	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_LOCK_USER_MEMORY_REGION))
-+		die("KVM_CAP_ARM_LOCK_USER_MEMORY_REGION not supported");
-+
-+	slot = (u64)-1;
-+	list_for_each_entry(bank, &kvm->mem_banks, list) {
-+		if (bank->host_addr == kvm->ram_start) {
-+			BUG_ON(bank->type != KVM_MEM_TYPE_RAM);
-+			slot = bank->slot;
-+			break;
-+		}
-+	}
-+
-+	if (slot == (u64)-1)
-+		die("RAM bank not found");
-+
-+	spe_try_increase_mlock_limit(kvm);
-+
-+	lock_mem.args[0] = slot;
-+	ret = ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &lock_mem);
-+	if (ret == -1)
-+		die_perror("KVM_CAP_ARM_LOCK_USER_MEMORY_REGION");
-+
-+}
-+
-+static int spe__init(struct kvm *kvm)
-+{
-+	int irq = KVM_ARM_SPE_IRQ;
-+	struct kvm_cpu *vcpu;
-+	int i;
-+
-+	if (!kvm->cfg.arch.has_spe)
-+		return 0;
-+
-+	spe_lock_memory(kvm);
-+
-+	for (i = 0; i < kvm->nrcpus; i++) {
-+		vcpu = kvm->cpus[i];
-+		spe_set_vcpu_ctrl_attr(vcpu, KVM_ARM_VCPU_SPE_IRQ, &irq);
-+		spe_set_vcpu_ctrl_attr(vcpu, KVM_ARM_VCPU_SPE_INIT, NULL);
-+	}
-+
-+	return 0;
-+}
-+last_init(spe__init);
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46ab9e6..08d8bfd3f7e0 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -9,6 +9,7 @@ struct kvm_config_arch {
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
-+	bool		has_spe;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 6a2408c632df..2c0189fec622 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -54,6 +54,10 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	    !kvm__supports_extension(kvm, KVM_CAP_ARM_PMU_V3))
- 		die("PMUv3 is not supported");
- 
-+	if (kvm->cfg.arch.has_spe &&
-+	    !kvm__supports_extension(kvm, KVM_CAP_ARM_SPE))
-+		die("SPE is not supported");
-+
- 	vcpu = calloc(1, sizeof(struct kvm_cpu));
- 	if (!vcpu)
- 		return NULL;
 -- 
-2.33.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
