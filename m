@@ -2,53 +2,54 @@ Return-Path: <SRS0=Jx+E=QE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF73C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 15:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B161C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 15:37:44 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 39FF761BFE
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 15:37:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 39FF761BFE
+	by mail.kernel.org (Postfix) with ESMTP id E4F2261AA3
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 15:37:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E4F2261AA3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E17B14B131;
-	Wed, 17 Nov 2021 10:37:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 969484B0EC;
+	Wed, 17 Nov 2021 10:37:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Wss-UNN8tLk6; Wed, 17 Nov 2021 10:37:39 -0500 (EST)
+	with ESMTP id o4YmL2TUMyx8; Wed, 17 Nov 2021 10:37:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 667194B17C;
-	Wed, 17 Nov 2021 10:37:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FD6E4B176;
+	Wed, 17 Nov 2021 10:37:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C66E4B15E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 10:37:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0299D4B131
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 10:37:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SR2NbfKBAo63 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Nov 2021 10:37:36 -0500 (EST)
+ with ESMTP id KpsbKkdln1iF for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Nov 2021 10:37:38 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C131B4B160
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 10:37:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8F404B18A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 10:37:36 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E57CED1;
- Wed, 17 Nov 2021 07:37:34 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 767251FB;
+ Wed, 17 Nov 2021 07:37:36 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1F8F03F5A1;
- Wed, 17 Nov 2021 07:37:32 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D04FB3F5A1;
+ Wed, 17 Nov 2021 07:37:34 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  will@kernel.org, mark.rutland@arm.com
-Subject: [RFC PATCH v5 19/38] KVM: arm64: Do not run a VCPU on a CPU without
- SPE
-Date: Wed, 17 Nov 2021 15:38:23 +0000
-Message-Id: <20211117153842.302159-20-alexandru.elisei@arm.com>
+Subject: [RFC PATCH v5 20/38] KVM: arm64: Add a new VCPU device control group
+ for SPE
+Date: Wed, 17 Nov 2021 15:38:24 +0000
+Message-Id: <20211117153842.302159-21-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211117153842.302159-1-alexandru.elisei@arm.com>
 References: <20211117153842.302159-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
+Cc: Sudeep Holla <sudeep.holla@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -65,96 +66,151 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The kernel allows heterogeneous systems where FEAT_SPE is not present on
-all CPUs. This presents a challenge for KVM, as it will have to touch the
-SPE registers when emulating SPE for a guest, and those accesses will cause
-an undefined exception if SPE is not present on the CPU.
+From: Sudeep Holla <sudeep.holla@arm.com>
 
-Avoid this situation by keeping a cpumask of CPUs that the VCPU is
-allowed run on, which for SPE is the reunion of all CPUs that support
-SPE, and refuse to run the VCPU on a CPU which is not part of the
-cpumask.
+Add a new VCPU device control group to control various aspects of KVM's SPE
+emulation. Functionality will be added in later patches.
 
+[ Alexandru E: Rewrote patch ]
+
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/arm.c              | 15 +++++++++++++++
- arch/arm64/kvm/spe.c              |  2 ++
- 3 files changed, 20 insertions(+)
+ Documentation/virt/kvm/devices/vcpu.rst |  5 +++++
+ arch/arm64/include/asm/kvm_spe.h        | 20 ++++++++++++++++++++
+ arch/arm64/include/uapi/asm/kvm.h       |  1 +
+ arch/arm64/kvm/guest.c                  | 10 ++++++++++
+ arch/arm64/kvm/spe.c                    | 15 +++++++++++++++
+ 5 files changed, 51 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 8b3faed48914..96ce98f6135d 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -405,6 +405,9 @@ struct kvm_vcpu_arch {
- 		u64 last_steal;
- 		gpa_t base;
- 	} steal;
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+index 60a29972d3f1..c200545d4950 100644
+--- a/Documentation/virt/kvm/devices/vcpu.rst
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -231,3 +231,8 @@ From the destination VMM process:
+ 
+ 7. Write the KVM_VCPU_TSC_OFFSET attribute for every vCPU with the
+    respective value derived in the previous step.
 +
-+	cpumask_var_t supported_cpus;
-+	bool cpu_not_supported;
- };
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index b2997b919be2..8a7c01d1df58 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -351,6 +351,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
- 
-+	if (!zalloc_cpumask_var(&vcpu->arch.supported_cpus, GFP_KERNEL))
-+		return -ENOMEM;
++5. GROUP: KVM_ARM_VCPU_SPE_CTRL
++===============================
 +
- 	/* Set up the timer */
- 	kvm_timer_vcpu_init(vcpu);
- 
-@@ -378,6 +381,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
- 		static_branch_dec(&userspace_irqchip_in_use);
- 
-+	free_cpumask_var(vcpu->arch.supported_cpus);
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_pmu_vcpu_destroy(vcpu);
-@@ -456,6 +460,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (vcpu_has_ptrauth(vcpu))
- 		vcpu_ptrauth_disable(vcpu);
- 	kvm_arch_vcpu_load_debug_state_flags(vcpu);
-+
-+	if (!cpumask_empty(vcpu->arch.supported_cpus) &&
-+	    !cpumask_test_cpu(smp_processor_id(), vcpu->arch.supported_cpus))
-+		vcpu->arch.cpu_not_supported = true;
++:Architectures: ARM64
+diff --git a/arch/arm64/include/asm/kvm_spe.h b/arch/arm64/include/asm/kvm_spe.h
+index d33a46a74f78..6443f9b66e4c 100644
+--- a/arch/arm64/include/asm/kvm_spe.h
++++ b/arch/arm64/include/asm/kvm_spe.h
+@@ -15,6 +15,10 @@ static __always_inline bool kvm_supports_spe(void)
  }
  
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-@@ -893,6 +901,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		 */
- 		preempt_disable();
- 
-+		if (unlikely(vcpu->arch.cpu_not_supported)) {
-+			vcpu->arch.cpu_not_supported = false;
-+			ret = -ENOEXEC;
-+			preempt_enable();
-+			continue;
-+		}
+ int kvm_spe_vcpu_enable_spe(struct kvm_vcpu *vcpu);
 +
- 		kvm_pmu_flush_hwstate(vcpu);
++int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
++int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
++int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+ #else
+ #define kvm_supports_spe()	(false)
  
- 		local_irq_disable();
-diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-index 7c6f94358cc1..f3863728bab6 100644
---- a/arch/arm64/kvm/spe.c
-+++ b/arch/arm64/kvm/spe.c
-@@ -40,5 +40,7 @@ int kvm_spe_vcpu_enable_spe(struct kvm_vcpu *vcpu)
- 	if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT))
- 		return -EINVAL;
- 
-+	cpumask_copy(vcpu->arch.supported_cpus, &supported_cpus);
-+
+@@ -22,6 +26,22 @@ static inline int kvm_spe_vcpu_enable_spe(struct kvm_vcpu *vcpu)
+ {
  	return 0;
  }
++
++static inline int kvm_spe_set_attr(struct kvm_vcpu *vcpu,
++				   struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++static inline int kvm_spe_get_attr(struct kvm_vcpu *vcpu,
++				   struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++static inline int kvm_spe_has_attr(struct kvm_vcpu *vcpu,
++				   struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
+ #endif /* CONFIG_KVM_ARM_SPE */
+ 
+ #endif /* __ARM64_KVM_SPE_H__ */
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 9f0a8ea50ea9..7159a1e23da2 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -368,6 +368,7 @@ struct kvm_arm_copy_mte_tags {
+ #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+ #define KVM_ARM_VCPU_PVTIME_CTRL	2
+ #define   KVM_ARM_VCPU_PVTIME_IPA	0
++#define KVM_ARM_VCPU_SPE_CTRL		3
+ 
+ /* KVM_IRQ_LINE irq field index values */
+ #define KVM_ARM_IRQ_VCPU2_SHIFT		28
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index e116c7767730..d5b961a80592 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -24,6 +24,7 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/kvm_spe.h>
+ #include <asm/sigcontext.h>
+ 
+ #include "trace.h"
+@@ -954,6 +955,9 @@ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+ 	case KVM_ARM_VCPU_PVTIME_CTRL:
+ 		ret = kvm_arm_pvtime_set_attr(vcpu, attr);
+ 		break;
++	case KVM_ARM_VCPU_SPE_CTRL:
++		ret = kvm_spe_set_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+@@ -977,6 +981,9 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+ 	case KVM_ARM_VCPU_PVTIME_CTRL:
+ 		ret = kvm_arm_pvtime_get_attr(vcpu, attr);
+ 		break;
++	case KVM_ARM_VCPU_SPE_CTRL:
++		ret = kvm_spe_get_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+@@ -1000,6 +1007,9 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ 	case KVM_ARM_VCPU_PVTIME_CTRL:
+ 		ret = kvm_arm_pvtime_has_attr(vcpu, attr);
+ 		break;
++	case KVM_ARM_VCPU_SPE_CTRL:
++		ret = kvm_spe_has_attr(vcpu, attr);
++		break;
+ 	default:
+ 		ret = -ENXIO;
+ 		break;
+diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
+index f3863728bab6..e3f82be398a6 100644
+--- a/arch/arm64/kvm/spe.c
++++ b/arch/arm64/kvm/spe.c
+@@ -44,3 +44,18 @@ int kvm_spe_vcpu_enable_spe(struct kvm_vcpu *vcpu)
+ 
+ 	return 0;
+ }
++
++int kvm_spe_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++int kvm_spe_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++int kvm_spe_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
 -- 
 2.33.1
 
