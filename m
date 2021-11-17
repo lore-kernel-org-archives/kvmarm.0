@@ -2,83 +2,51 @@ Return-Path: <SRS0=Jx+E=QE=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE784C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 11:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68329C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 15:37:10 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 2815761A89
-	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 11:14:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 2815761A89
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	by mail.kernel.org (Postfix) with ESMTP id DACB461BE1
+	for <kvmarm@archiver.kernel.org>; Wed, 17 Nov 2021 15:37:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org DACB461BE1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 652804A19A;
-	Wed, 17 Nov 2021 06:14:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32DB24B125;
+	Wed, 17 Nov 2021 10:37:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 633tvAMy6xdv; Wed, 17 Nov 2021 06:14:27 -0500 (EST)
+	with ESMTP id 1b1E1X9ceKP2; Wed, 17 Nov 2021 10:37:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 758944B0EC;
-	Wed, 17 Nov 2021 06:14:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36A434B10E;
+	Wed, 17 Nov 2021 10:37:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 515F54B0FB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Nov 2021 14:14:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81D834B10B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 10:37:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UIzxgAJp7pC0 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Nov 2021 14:14:32 -0500 (EST)
-Received: from bombadil.infradead.org (bombadil.infradead.org
- [198.137.202.133])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0BE364B108
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Nov 2021 14:14:31 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
- In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=DLyALt0XIOXMPxKoM5/ha+DJRQFy+AoDIdDL5ZG6Mog=; b=tvmzetM+zsZNARo6mBvkHf6FJM
- UWGwvpqb2lB8SsR8n6DFI/rXefSIBM8Q+ms43jJZD/QTFXCzjdCMzHiH57J/KBtENQSPC6XHeKmDB
- Cw4bKjKoW8NjBACAHeg2adr+XRhdnG2tJ8YWdFc/BiZQYhWrMxQFGcwtRBzIAoLJcJthPmR6my1Xm
- Bjg9ltp8L0OeTazVTp884NfqmIDXhPLYizBqVdfhYTyux3SRrlEyPN0F4TV11Ps4NE71xN7Zi4MoH
- psBP2GOMRiVFPHVvIVIjffAmxBoSlkBxW83i1wDKKcn66jtalhr4nm/ESxKUSAmjjZUB1oEWjk2pI
- IRRcW1hA==;
-Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625]
- (helo=u3832b3a9db3152.ant.amazon.com)
- by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1mn3tu-002clg-Lw; Tue, 16 Nov 2021 19:13:51 +0000
-Message-ID: <b26e62070c0a3e5c4b0179772006474402ec32f8.camel@infradead.org>
-Subject: Re: [PATCH 6/7] KVM: powerpc: Use Makefile.kvm for common files
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 16 Nov 2021 19:13:45 +0000
-In-Reply-To: <YZP76Un0mip17E1K@google.com>
-References: <5047c2591310e503491850ef683f251395247d50.camel@infradead.org>
- <20211116115051.119956-1-dwmw2@infradead.org>
- <20211116115051.119956-6-dwmw2@infradead.org> <YZP76Un0mip17E1K@google.com>
-User-Agent: Evolution 3.36.5-0ubuntu1 
+ with ESMTP id zIBUhmDbw9hT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Nov 2021 10:37:02 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 207C64B0EC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Nov 2021 10:37:02 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 820B01FB;
+ Wed, 17 Nov 2021 07:37:01 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C24C53F5A1;
+ Wed, 17 Nov 2021 07:36:59 -0800 (PST)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, mark.rutland@arm.com
+Subject: [RFC PATCH v5 00/38] KVM: arm64: Add Statistical Profiling Extension
+ (SPE) support
+Date: Wed, 17 Nov 2021 15:38:04 +0000
+Message-Id: <20211117153842.302159-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by
- bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Mailman-Approved-At: Wed, 17 Nov 2021 06:14:26 -0500
-Cc: Anup Patel <anup.patel@wdc.com>,
- "wanpengli @ tencent . com" <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- Joao Martins <joao.m.martins@oracle.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>, "joro @ 8bytes . org" <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, karahmed@amazon.com,
- Catalin Marinas <catalin.marinas@arm.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- "jmattson @ google . com" <jmattson@google.com>,
- "mtosatti @ redhat . com" <mtosatti@redhat.com>, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "vkuznets @ redhat . com" <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,197 +58,263 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============3899271410859399796=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+The series is based on v5.16-rc1 can be found on gitlab at [1]. kvmtool
+support is needed to create a VM with SPE enabled; a branch with the
+necessary changes can be found at [2].
 
---===============3899271410859399796==
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-0YkHNPNcOgQMbjKGiB9G"
+v4 of the patches can be found at [3]. v3 can be found at [4], and the
+original series at [5].
 
+Introduction
+============
 
---=-0YkHNPNcOgQMbjKGiB9G
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Statistical Profiling Extension (SPE) is an optional feature added in
+ARMv8.2. It allows sampling at regular intervals of the operations executed
+by the PE and storing a record of each operation in a memory buffer. A high
+level overview of the extension is presented in an article on arm.com [4].
 
-On Tue, 2021-11-16 at 18:43 +0000, Sean Christopherson wrote:
-> On Tue, Nov 16, 2021, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > It's all fairly baroque but in the end, I don't think there's any reaso=
-n
-> > for $(KVM)/irqchip.o to have been handled differently, as they all end
-> > up in $(kvm-y) in the end anyway, regardless of whether they get there
-> > via $(common-objs-y) and the CPU-specific object lists.
-> >=20
-> > The generic Makefile.kvm uses HAVE_KVM_IRQCHIP for irqchip.o instead of
-> > HAVE_KVM_IRQ_ROUTING. That change is fine (and arguably correct) becaus=
-e
-> > they are both set together for KVM_MPIC, or neither is set.
->=20
-> Nope.
->=20
->   Symbol: HAVE_KVM_IRQCHIP [=3Dy]
->   Type  : bool
->   Defined at virt/kvm/Kconfig:7
->   Selected by [m]:
->     - KVM_XICS [=3Dy] && VIRTUALIZATION [=3Dy] && KVM_BOOK3S_64 [=3Dm] &&=
- !KVM_MPIC [=3Dn]
->   Selected by [n]:
->     - KVM_MPIC [=3Dn] && VIRTUALIZATION [=3Dy] && KVM [=3Dy] && E500 [=3D=
-n]
->=20
-> leads to this and a whole pile of other errors
->=20
-> arch/powerpc/kvm/../../../virt/kvm/irqchip.c: In function =E2=80=98kvm_ir=
-q_map_gsi=E2=80=99:
-> arch/powerpc/kvm/../../../virt/kvm/irqchip.c:31:35: error: invalid use of=
- undefined type =E2=80=98struct kvm_irq_routing_table=E2=80=99
->    31 |         if (irq_rt && gsi < irq_rt->nr_rt_entries) {
->       |                                   ^~
->=20
+More information about how I implemented the SPE emulation and why can be
+found in the cover letter for version 3 of the series [4].
 
-Hm, perhaps it should have been like this then (incremental):
+Changes from v4
+===============
 
-+++ b/virt/kvm/Makefile.kvm
-@@ -9,6 +9,6 @@ kvm-y :=3D $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary=
-_stats.o
- kvm-$(CONFIG_KVM_VFIO) +=3D $(KVM)/vfio.o
- kvm-$(CONFIG_KVM_MMIO) +=3D $(KVM)/coalesced_mmio.o
- kvm-$(CONFIG_KVM_ASYNC_PF) +=3D $(KVM)/async_pf.o
--kvm-$(CONFIG_HAVE_KVM_IRQCHIP) +=3D $(KVM)/irqchip.o
-+kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) +=3D $(KVM)/irqchip.o
- kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) +=3D $(KVM)/dirty_ring.o
- kvm-$(CONFIG_HAVE_KVM_PFNCACHE) +=3D $(KVM)/pfncache.o
+Mostly fixes, but some small features were added too:
 
+- Implemented review comments, many thanks!
 
-> Side topic, please don't post a new version/series in-reply-to a differen=
-t series.
-> b4 also gets confused in this case, e.g. it tried to grab the original pa=
-tch.  b4
-> has also made me really lazy, heaven forbid I actually had to manually gr=
-ab these
-> from mutt :-)
+- Reworked heterogeneous support, because probing was broken on systems
+  which had more than one SPE instance.
 
-Sorry ;)
+- Allow locking a memslot after the VCPU has run to make it possible for
+  the VMM to cancel migration, as migration requires unlocking the memslots
+  before it is initiated.
 
-I think that one might even be a new series in reply to what was
-already a second series on top of what I was *actually* trying to do
-when I first started shaving this yak. Or maybe what I was originally
-trying to implement has already been lost in the noise :)
+- Unmap the memory from stage 2 if a memslot is unlocked before any of the
+  VCPUs have run. This is so KVM can perform the needed dcache maintenance
+  operations in the stage 2 abort handler (details in patch #7 "KVM: arm64:
+  Unmap unlocked memslot from stage 2 if kvm_mmu_has_pending_ops()").
 
---=-0YkHNPNcOgQMbjKGiB9G
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+- Dropped the KVM_ARM_SUPPORTED_CPUS ioctl in favor of KVM setting the
+  cpumask of allowed CPUs implicitly when the SPE VCPU feature is set.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MTE2MTkxMzQ1WjAvBgkqhkiG9w0BCQQxIgQgC9UB2Ob8J6Ca6cRVAkjb6/wQeWZA7nODvXJq9d61
-FDswgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBALKcHGObTFx71olpGqEsnGppsouTyHapyFhbcGpptwBrNd5KWknR0tDHI4/yfW/A
-B/QAvTfD1bQNVK+7rW/V+aSuWGnY+QqKN6+0tmkZ8Cmrtcq97WpHNfu8biQ+pDgddyc5GRMlwhvj
-R3shFH/BFwJ0bT7rCI+MdSpgjpvOjCKWdQgC6n1XCeSb5psFIw+IEyzO1DdnscOA8xqWkJINuMsN
-957xL+oPpte3G5OcROgoLFRa1a6TvVwescM74eZdLrZjTcOLcwVGCKBvKsm+Tul1cwv5pUE6uful
-xZmNMs7w70AHKU8INHj7VX9QuZoxxa6u3WQwRj7kfWWH2tTA+ZMAAAAAAAA=
+Missing features
+================
 
+Although it might look like it, I've tried to keep the series as small as
+possible to make it easier to review, while implementing the core
+functionality needed for the SPE emulation. As such, I've chosen to not
+implement several features:
 
---=-0YkHNPNcOgQMbjKGiB9G--
+- Host profiling a guest which has the SPE feature bit set.
 
+- No errata workarounds impacting SPE have been implemented yet.
 
---===============3899271410859399796==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+- Disabling CONFIG_NUMA_BALANCING is a hack to get KVM SPE to work and I am
+  investigating other ways to get around automatic numa balancing, like
+  requiring userspace to disable it via set_mempolicy(). I am also going to
+  look at how VFIO gets around it. Suggestions welcome.
+
+- There's plenty of room for optimization. Off the top of my head, using
+  block mappings at stage 2, batch pinning of pages (similar to what VFIO
+  does), optimize the way KVM keeps track of pinned pages (using a linked
+  list triples the memory usage), context-switch the SPE registers on
+  vcpu_load/vcpu_put on VHE if the host is not profiling, improving the
+  locking scheme, especially when a memslot is locked, etc, etc
+
+- ...and others. I'm sure I'm missing at least a few things which are
+  important for someone.
+
+Known issues
+============
+
+This is an RFC, so keep in mind that almost definitely there will be scary
+bugs. For example, below is a list of known issues which don't affect the
+correctness of the emulation, and which I'm planning to fix in a future
+iteration:
+
+- With CONFIG_PROVE_LOCKING=y, lockdep complains about lock contention when
+  the VCPU executes the dcache clean pending ops.
+
+- With CONFIG_PROVE_LOCKING=y, KVM will hit a BUG at
+  kvm_lock_all_vcpus()->mutex_trylock(&vcpu->mutex) with 47 or more VCPUs.
+
+This BUG is bening and can also be triggered with mainline; it can be made
+to go away by increasing MAX_LOCK_DEPTH. I've hacked kvmtool to to
+reproduce the splat with a mainline kernel, which can be found at [6]
+(instructions in the commit message).
+
+Open questions
+==============
+
+1. Userspace is not allowed to profile a CPU event (not bound to a task) is
+!perf_allow_cpu(). It is my understanding that this is because of security
+reasons, as we don't want a task to profile another task. Because a VM
+will only be able to profile itself, I don't think it's necessary to
+restrict the VM in any way based on perf_allow_cpu(), like we do with
+perfmon_capable() and physical timer timestamps.
+
+2. How to handle guest triggered SPE errors. By error I mean all syndromes
+reported by the PMSBR_EL1 register other than buffer full and stage 1
+fault (because those can and should be handled by the guest). The SPE
+driver disables profiling when it encounters a buffer syndrome other than
+buffer full. I see several options here:
+
+a. KVM can do the same thing as the SPE driver and disable SPE emulation
+for that guest.
+
+b. KVM returns an error from KVM_RUN.
+
+c. KVM allows the guest direct access to the buffer register (they aren't
+trapped anymore), but, because the guest can trigger a maintenance
+interrupt with a write to PMBSR_EL1, KVM will ignore all syndromes,
+including SError or stage 2 fault.
+
+3. Related to 2, SPE can report an SError. The SPE driver doesn't treat
+this separately from the other syndromes. Should KVM treat it like any
+other syndrome? Should KVM do more?
+
+At the moment, KVM injects an external abort when it encounters an error
+syndrome, and for a Stage 2 fault, prints a warning. The warning has proved
+very useful for testing and debugging.
+
+Testing
+=======
+
+Testing was done on Altra server with two sockets, both populated. The
+patches are based on v5.16-rc1.
+
+For testing, I've used a version of kvmtool with SPE support [2].  SPE_STOP
+API, I used a special version of kvmtool which starts the guest in one of
+the stopped states; that can be found at [7] (compile from a different
+commit if a different state and/or transition is desired).
+
+Finally, in the VM I used defconfig Linux guest compiled from v5.15-rc5 and
+kvm-unit-tests patches which I wrote to test SPE [8].
+
+All tests were run twice times: once with VHE enabled, once in NVHE mode
+(kvm-arm.mode=nvhe).
+
+The first test that I ran was the kvm-unit-tests test. This is also the
+test that I used to check that KVM_ARM_VCPU_SPE_STOP_{TRAP,EXIT,RESUME}
+works correctly with kvmtool.
+
+Then I profiled iperf3 in the guest (32 VCPUs to limit the size of
+perf.data, 32GiB memory), while concurrently profiling in the host. This is
+the command that I used:
+
+# perf record -ae arm_spe/ts_enable=1,pa_enable=1,pct_enable=1/ -- iperf3 -c 127.0.0.1 -t 30
+
+Everything looked right to me and I didn't see any kernel warnings or bugs.
+
+[1] https://gitlab.arm.com/linux-arm/linux-ae/-/tree/kvm-spe-v5
+[2] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/kvm-spe-v5
+[3] https://www.spinics.net/lists/arm-kernel/msg917220.html
+[4] https://lore.kernel.org/linux-arm-kernel/20201027172705.15181-1-alexandru.elisei@arm.com/
+[5] https://www.spinics.net/lists/arm-kernel/msg776228.html
+[6] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/vgic-lock-all-vcpus-lockdep-bug-v1
+[7] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/kvm-spe-v5-stop-tests
+[8] https://gitlab.arm.com/linux-arm/kvm-unit-tests-ae/-/tree/kvm-spe-v4
+
+Alexandru Elisei (35):
+  KVM: arm64: Make lock_all_vcpus() available to the rest of KVM
+  KVM: arm64: Add lock/unlock memslot user API
+  KVM: arm64: Implement the memslot lock/unlock functionality
+  KVM: arm64: Defer CMOs for locked memslots until a VCPU is run
+  KVM: arm64: Perform CMOs on locked memslots when userspace resets
+    VCPUs
+  KVM: arm64: Delay tag scrubbing for locked memslots until a VCPU runs
+  KVM: arm64: Unmap unlocked memslot from stage 2 if
+    kvm_mmu_has_pending_ops()
+  KVM: arm64: Unlock memslots after stage 2 tables are freed
+  KVM: arm64: Deny changes to locked memslots
+  KVM: Add kvm_warn{,_ratelimited} macros
+  KVM: arm64: Print a warning for unexpected faults on locked memslots
+  KVM: arm64: Allow userspace to lock and unlock memslots
+  KVM: arm64: Add CONFIG_KVM_ARM_SPE Kconfig option
+  KVM: arm64: Add SPE capability and VCPU feature
+  perf: arm_spe_pmu: Move struct arm_spe_pmu to a separate header file
+  KVM: arm64: Allow SPE emulation when the SPE hardware is present
+  KVM: arm64: Allow userspace to set the SPE feature only if SPE is
+    present
+  KVM: arm64: Expose SPE version to guests
+  KVM: arm64: Do not run a VCPU on a CPU without SPE
+  KVM: arm64: debug: Configure MDCR_EL2 when a VCPU has SPE
+  KVM: arm64: Move accesses to MDCR_EL2 out of
+    __{activate,deactivate}_traps_common
+  KVM: arm64: VHE: Change MDCR_EL2 at world switch if VCPU has SPE
+  KVM: arm64: Add SPE system registers to VCPU context
+  KVM: arm64: nVHE: Save PMSCR_EL1 to the host context
+  KVM: arm64: Rename DEBUG_STATE_SAVE_SPE -> DEBUG_SAVE_SPE_BUFFER flags
+  KVM: arm64: nVHE: Context switch SPE state if VCPU has SPE
+  KVM: arm64: VHE: Context switch SPE state if VCPU has SPE
+  KVM: arm64: Save/restore PMSNEVFR_EL1 on VCPU put/load
+  KVM: arm64: Allow guest to use physical timestamps if
+    perfmon_capable()
+  KVM: arm64: Emulate SPE buffer management interrupt
+  KVM: arm64: Add an userspace API to stop a VCPU profiling
+  KVM: arm64: Implement userspace API to stop a VCPU profiling
+  KVM: arm64: Add PMSIDR_EL1 to the SPE register context
+  KVM: arm64: Make CONFIG_KVM_ARM_SPE depend on !CONFIG_NUMA_BALANCING
+  KVM: arm64: Allow userspace to enable SPE for guests
+
+Sudeep Holla (3):
+  KVM: arm64: Add a new VCPU device control group for SPE
+  KVM: arm64: Add SPE VCPU device attribute to set the interrupt number
+  KVM: arm64: Add SPE VCPU device attribute to initialize SPE
+
+ Documentation/virt/kvm/api.rst          |  69 ++++
+ Documentation/virt/kvm/devices/vcpu.rst |  76 ++++
+ arch/arm64/include/asm/kvm_arm.h        |   1 +
+ arch/arm64/include/asm/kvm_host.h       |  75 +++-
+ arch/arm64/include/asm/kvm_hyp.h        |  49 ++-
+ arch/arm64/include/asm/kvm_mmu.h        |   8 +
+ arch/arm64/include/asm/kvm_spe.h        | 103 ++++++
+ arch/arm64/include/asm/sysreg.h         |   3 +
+ arch/arm64/include/uapi/asm/kvm.h       |  11 +
+ arch/arm64/kvm/Kconfig                  |   8 +
+ arch/arm64/kvm/Makefile                 |   1 +
+ arch/arm64/kvm/arm.c                    | 120 ++++++-
+ arch/arm64/kvm/debug.c                  |  55 ++-
+ arch/arm64/kvm/guest.c                  |  10 +
+ arch/arm64/kvm/hyp/include/hyp/spe-sr.h |  32 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  16 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile        |   1 +
+ arch/arm64/kvm/hyp/nvhe/debug-sr.c      |  24 +-
+ arch/arm64/kvm/hyp/nvhe/spe-sr.c        | 133 +++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  35 +-
+ arch/arm64/kvm/hyp/vhe/Makefile         |   1 +
+ arch/arm64/kvm/hyp/vhe/spe-sr.c         | 193 ++++++++++
+ arch/arm64/kvm/hyp/vhe/switch.c         |  21 ++
+ arch/arm64/kvm/mmu.c                    | 444 +++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c                  |   8 +
+ arch/arm64/kvm/spe.c                    | 383 ++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c               |  77 +++-
+ arch/arm64/kvm/vgic/vgic-init.c         |   4 +-
+ arch/arm64/kvm/vgic/vgic-its.c          |   8 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c   |  50 +--
+ arch/arm64/kvm/vgic/vgic.h              |   3 -
+ drivers/perf/arm_spe_pmu.c              |  31 +-
+ include/linux/kvm_host.h                |   4 +
+ include/linux/perf/arm_spe_pmu.h        |  55 +++
+ include/uapi/linux/kvm.h                |   9 +
+ 35 files changed, 1968 insertions(+), 153 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_spe.h
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/spe-sr.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/spe-sr.c
+ create mode 100644 arch/arm64/kvm/hyp/vhe/spe-sr.c
+ create mode 100644 arch/arm64/kvm/spe.c
+ create mode 100644 include/linux/perf/arm_spe_pmu.h
+
+-- 
+2.33.1
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============3899271410859399796==--
-
