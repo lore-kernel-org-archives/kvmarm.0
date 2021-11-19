@@ -2,81 +2,89 @@ Return-Path: <SRS0=LYRx=QG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAFDC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Nov 2021 04:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F80FC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Nov 2021 10:16:15 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id 3C42B61B30
-	for <kvmarm@archiver.kernel.org>; Fri, 19 Nov 2021 04:48:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3C42B61B30
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id D9BC761A7D
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Nov 2021 10:16:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org D9BC761A7D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 828A24B15C;
-	Thu, 18 Nov 2021 23:48:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 426BF4B08D;
+	Fri, 19 Nov 2021 05:16:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7nwhZi3O0hFS; Thu, 18 Nov 2021 23:48:13 -0500 (EST)
+	with ESMTP id toU-Ep58tlyx; Fri, 19 Nov 2021 05:16:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDD3D4B10E;
-	Thu, 18 Nov 2021 23:48:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 485D14B104;
+	Fri, 19 Nov 2021 05:16:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B39AB4B10C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 23:48:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C4414B116
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Nov 2021 04:24:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1BoBnbQEoiLe for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Nov 2021 23:48:11 -0500 (EST)
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com
- [209.85.216.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F8B84B108
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 23:48:11 -0500 (EST)
-Received: by mail-pj1-f48.google.com with SMTP id
- gx15-20020a17090b124f00b001a695f3734aso7859709pjb.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 20:48:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QoHMt8LQUTb/w8rEtIXtkstD7X6Wu7UF3Mkd4lNy0LM=;
- b=f6mE+4ldYjvX5BJjmShvzZEMh3rnrUBTxlm+JT423a5ncMdZ/VrE6xWERj1wVvZnJg
- 3Dfv0OYWvbNcdNKK/07mp7loX0QW0l6uNlZQ2zbPRIg39ZIzpo6j1nciS5cIaLwP/mvq
- 2S+8fUbR1sU8bLfFd8BDRuwdNc1Oorz1g64qaS1ZyhaHIt50GgGG3amMgonK7S4A98yH
- 5+fd22zdHRWrceTvR+mA2diDl5QuPtJJuYDmMkohPdNGKcsN53vP8w+ukpPuvel2Ps7J
- qB5HM/E5a16x+LEjZrc+by6RwXaQFsw9/aOfvXzHkSuNI2TAyIy4I2J0Ca+BZKSFOfQ7
- CNsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QoHMt8LQUTb/w8rEtIXtkstD7X6Wu7UF3Mkd4lNy0LM=;
- b=O27b+YmxLI5MjZVsOxvdwqQPWucQW74kIpRDctBOOuCjIp5dRIjtRbzXvDV/g8FeJl
- 41Shq/jrGxoVBC1k1NIep2YQN+dbUuQjwVJh/qYW9H9RFZwhamOAdDmsVykYstJSxKLj
- F4/U9YB9gGIhj2uvTvfwwottiiH1V+3x92xweMbY2A9FUJKbvYkIUjKb1t/ayObVTnh6
- 8FY9AbwFaZp/btFse0MZwk7H3txn7ue/jq6TU7wxsDrAnYvi126GnBXemSXOFyPEKK5T
- jG+7/QoYANghDr2iRV0c4iLjLMB5T+NqSuHQ90JB4cImieVQgxBzzrOE3RjWtY2U6/Ed
- EZUA==
-X-Gm-Message-State: AOAM533LwErn0uKPscCcBYacJFUi4BZkCrbbhxeJpANyizCALT42tNsF
- Oj+vgZ3mOtDjl3Uc+NVeI1X8mqoDPkR2dKD/vpXv8Q==
-X-Google-Smtp-Source: ABdhPJycAlRxaIvHJJXbqCGSK0+HzBRgJ+ZDhfwoA9cw6lmE0XvsRNi8m9y30tvBRIhyXpjjclu41pp0XPEkOGMUgRU=
-X-Received: by 2002:a17:902:d703:b0:144:e012:d550 with SMTP id
- w3-20020a170902d70300b00144e012d550mr7302851ply.38.1637297289775; Thu, 18 Nov
- 2021 20:48:09 -0800 (PST)
+ with ESMTP id BtdhrFEkdrJ7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Nov 2021 04:24:22 -0500 (EST)
+Received: from bombadil.infradead.org (bombadil.infradead.org
+ [198.137.202.133])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 31DF24B0FC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Nov 2021 04:24:22 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
+ In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description;
+ bh=s69dtZTPtWdn4nuXhO5u8qh8vqOiDAUWW2VvLvwoldU=; b=wNvYamDoPaQC8pMtQwoV7gojWQ
+ suDorKgPjTpvmHWDm7SHcr3n74C4FV7ACFp3L0p1jYwLc+3f24tcVugZzVrols+ZR3t/8DsMGIKlf
+ IKzoprKdVpWE8uhGnvCTrRhQcxc/xnV4nmufR1j916s+egIWWDdtPxBVkqJg1rcNsZ5b4YKj5+ARf
+ T4RACuqeGJWqt0LqzR+S6xyS8pR7311g6WBVdOBCnHBwUcuSxiwnn93PNrp9Y73cxDnY60z7/ZvM+
+ +S1RzC5LJe1B8MmbOzszDpl/ZRGaxUk44TjGIa1hxBmZlxkyAj5IqUwujOISgKuh3i0xSHQ7nVWtp
+ iEsLbg4Q==;
+Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625]
+ (helo=u3832b3a9db3152.ant.amazon.com)
+ by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+ id 1mo07L-009xIr-Us; Fri, 19 Nov 2021 09:23:36 +0000
+Message-ID: <0d8cd126fb15488ae1b523f799fe749f02c4cc8c.camel@infradead.org>
+Subject: Re: [PATCH v3 08/12] KVM: Propagate vcpu explicitly to
+ mark_page_dirty_in_slot()
+From: David Woodhouse <dwmw2@infradead.org>
+To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 19 Nov 2021 09:23:29 +0000
+In-Reply-To: <YZatsB3oadj6dgb8@google.com>
+References: <20211117174003.297096-1-dwmw2@infradead.org>
+ <20211117174003.297096-9-dwmw2@infradead.org>
+ <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org>
+ <4c48546b-eb4a-dff7-cc38-5df54f73f5d4@redhat.com>
+ <20b5952e76c54a3a5dfe5a898e3b835404ac6fb1.camel@infradead.org>
+ <YZaeL5YztL3p1nLM@google.com> <YZagjzYUsixbFre9@google.com>
+ <35AEC3FD-B46A-451D-B7D5-4B1BDD5407BD@infradead.org>
+ <YZatsB3oadj6dgb8@google.com>
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-4-reijiw@google.com>
- <d3fd9d6c-c96c-d7a0-b78d-af36430dbf3f@redhat.com>
-In-Reply-To: <d3fd9d6c-c96c-d7a0-b78d-af36430dbf3f@redhat.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 18 Nov 2021 20:47:53 -0800
-Message-ID: <CAAeT=FyzvGaksi+-WidHObrGYcqs4vR73ChCGpo8AFuin6UbYw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
-To: Eric Auger <eauger@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by
+ bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Mailman-Approved-At: Fri, 19 Nov 2021 05:16:11 -0500
+Cc: Anup Patel <anup.patel@wdc.com>,
+ "wanpengli @ tencent . com" <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ Joao Martins <joao.m.martins@oracle.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Michael Ellerman <mpe@ellerman.id.au>, "joro @ 8bytes . org" <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, karahmed@amazon.com,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+ "jmattson @ google . com" <jmattson@google.com>,
+ "mtosatti @ redhat . com" <mtosatti@redhat.com>, linux-mips@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "vkuznets @ redhat . com" <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,275 +96,191 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============7325338821498618665=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
 
-On Thu, Nov 18, 2021 at 12:36 PM Eric Auger <eauger@redhat.com> wrote:
->
-> Hi Reiji,
->
-> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > This patch lays the groundwork to make ID registers writable.
-> >
-> > Introduce struct id_reg_info for an ID register to manage the
-> > register specific control of its value for the guest, and provide set
-> > of functions commonly used for ID registers to make them writable.
-> >
-> > The id_reg_info is used to do register specific initialization,
-> > validation of the ID register and etc.  Not all ID registers must
-> > have the id_reg_info. ID registers that don't have the id_reg_info
-> > are handled in a common way that is applied to all ID registers.
-> >
-> > At present, changing an ID register from userspace is allowed only
-> > if the ID register has the id_reg_info, but that will be changed
-> > by the following patches.
-> >
-> > No ID register has the structure yet and the following patches
-> > will add the id_reg_info for some ID registers.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/include/asm/sysreg.h |   1 +
-> >  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
-> >  2 files changed, 218 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 16b3f1a1d468..597609f26331 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -1197,6 +1197,7 @@
-> >  #define ICH_VTR_TDS_MASK     (1 << ICH_VTR_TDS_SHIFT)
-> >
-> >  #define ARM64_FEATURE_FIELD_BITS     4
-> > +#define ARM64_FEATURE_FIELD_MASK     ((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
-> >
-> >  /* Create a mask for the feature bits of the specified feature. */
-> >  #define ARM64_FEATURE_MASK(x)        (GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 5608d3410660..1552cd5581b7 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
-> >               return read_zero(vcpu, p);
-> >  }
-> >
-> > +/*
-> > + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
-> > + * ftr_check_types of id_reg_info.
-> > + */
-> > +enum feature_check_type {
-> > +     FCT_LOWER_SAFE = 0,
-> > +     FCT_HIGHER_SAFE,
-> > +     FCT_HIGHER_OR_ZERO_SAFE,
-> > +     FCT_EXACT,
-> > +     FCT_EXACT_OR_ZERO_SAFE,
-> > +     FCT_IGNORE,     /* Don't check (any value is fine) */
-> Maybe you can remove the _SAFE suffix (EXACT does not have it).
+--===============7325338821498618665==
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-xmDH/MHbX/vObHZ+w1qZ"
 
-I am inclined to keep 'SAFE' (otherwise, I am likely to forget
-if lower is safe or not).
 
-> s/EXACT/EQUAL ?
+--=-xmDH/MHbX/vObHZ+w1qZ
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I will fix that FCT_EXACT to FCT_EQUAL_SAFE.
+On Thu, 2021-11-18 at 19:46 +0000, Sean Christopherson wrote:
+> It is sufficient for the current physical CPU to have an active vCPU, whi=
+ch is
+> generally guaranteed in the MMU code because, with a few exceptions, popu=
+lating
+> SPTEs is done in vCPU context.
+>=20
+> mmap() will never directly trigger SPTE creation, KVM first requires a vC=
+PU to
+> fault on the new address.  munmap() is a pure zap flow, i.e. won't create=
+ a
+> present SPTE and trigger the writeback of the dirty bit.
 
-> > +};
-> > +
-> > +static int arm64_check_feature_one(enum feature_check_type type, int val,
-> > +                                int limit)
-> > +{
-> > +     bool is_safe = false;
-> > +
-> > +     if (val == limit)
-> > +             return 0;
-> even if the type is unexpected?
+OK, thanks.
 
-I will remove it.
+> That's also why I dislike using kvm_get_running_vcpu(); when it's needed,=
+ there's
+> a valid vCPU from the caller, but it deliberately gets dropped and indire=
+ctly
+> picked back up.
 
-> > +
-> > +     switch (type) {
-> > +     case FCT_LOWER_SAFE:
-> > +             is_safe = (val <= limit);
-> > +             break;
-> > +     case FCT_HIGHER_OR_ZERO_SAFE:
-> > +             if (val == 0) {
-> > +                     is_safe = true;
-> > +                     break;
-> > +             }
-> > +             fallthrough;
-> > +     case FCT_HIGHER_SAFE:
-> > +             is_safe = (val >= limit);
-> > +             break;
-> > +     case FCT_EXACT:
-> > +             break;
-> > +     case FCT_EXACT_OR_ZERO_SAFE:
-> > +             is_safe = (val == 0);
-> > +             break;
-> > +     case FCT_IGNORE:
-> > +             is_safe = true;
-> > +             break;
-> > +     default:
-> > +             WARN_ONCE(1, "Unexpected feature_check_type (%d)\n", type);
-> > +             break;
-> > +     }
-> > +
-> > +     return is_safe ? 0 : -1;
-> > +}
-> > +
-> > +#define      FCT_TYPE_MASK           0x7
-> > +#define      FCT_TYPE_SHIFT          1
-> > +#define      FCT_SIGN_MASK           0x1
-> > +#define      FCT_SIGN_SHIFT          0
-> > +#define      FCT_TYPE(val)   ((val >> FCT_TYPE_SHIFT) & FCT_TYPE_MASK)
-> > +#define      FCT_SIGN(val)   ((val >> FCT_SIGN_SHIFT) & FCT_SIGN_MASK)
-> > +
-> > +#define      MAKE_FCT(shift, type, sign)                             \
-> > +     ((u64)((((type) & FCT_TYPE_MASK) << FCT_TYPE_SHIFT) |   \
-> > +            (((sign) & FCT_SIGN_MASK) << FCT_SIGN_SHIFT)) << (shift))
-> > +
-> > +/* For signed field */
-> > +#define      S_FCT(shift, type)      MAKE_FCT(shift, type, 1)
-> > +/* For unigned field */
-> > +#define      U_FCT(shift, type)      MAKE_FCT(shift, type, 0)
-> > +
-> > +/*
-> > + * @val and @lim are both a value of the ID register. The function checks
-> > + * if all features indicated in @val can be supported for guests on the host,
-> > + * which supports features indicated in @lim. @check_types indicates how> + * features in the ID register needs to be checked.
-> > + * See comments for id_reg_info's ftr_check_types field for more detail.
-> What about RES0 fields which may exist? add a comment to reassure about
-> the fact they are properly handled if there are?
+Yeah. So as things stand we have a kvm_write_guest() function which
+takes a 'struct kvm *', as well as a kvm_vcpu_write_guest() function
+which takes a 'struct kvm_vcpu *'.
 
-Any fields including RES0 should be checked based on check_types.
-I will explicitly state that in the comment.
+But it is verboten to *use* the kvm_write_guest() or mark_page_dirty()
+functions unless you actually *do* have an active vCPU. Do so, and the
+kernel might just crash; not even a graceful failure mode.
 
-> > + */
-> > +static int arm64_check_features(u64 check_types, u64 val, u64 lim)
-> > +{
-> > +     int i;
-> > +
-> > +     for (i = 0; i < 64; i += ARM64_FEATURE_FIELD_BITS) {
-> > +             u8 ftr_check = (check_types >> i) & ARM64_FEATURE_FIELD_MASK;
-> > +             bool is_sign = FCT_SIGN(ftr_check);
-> > +             enum feature_check_type fctype = FCT_TYPE(ftr_check);
-> > +             int fval, flim, ret;
-> > +
-> > +             fval = cpuid_feature_extract_field(val, i, is_sign);
-> > +             flim = cpuid_feature_extract_field(lim, i, is_sign);
-> > +
-> > +             ret = arm64_check_feature_one(fctype, fval, flim);
-> > +             if (ret)
-> > +                     return -E2BIG;
-> > +     }
-> > +     return 0;
-> > +}
-> > +
-> > +struct id_reg_info {
-> > +     u32     sys_reg;        /* Register ID */
-> use struct kernel-doc comments instead?
-> > +
-> > +     /*
-> > +      * Limit value of the register for a vcpu. The value is the sanitized
-> > +      * system value with bits cleared for unsupported features for the
-> > +      * guest.
-> > +      */
-> > +     u64     vcpu_limit_val;
-> > +
-> > +     /*
-> > +      * The ftr_check_types is comprised of a set of 4 bits fields.
-> nit: s/bits field/bit field here and below
+That's a fairly awful bear trap that has now caught me *twice*. I'm
+kind of amused that in all my hairy inline asm and pinning and crap for
+guest memory access, the thing that's been *broken* is where I just
+used the *existing* kvm_write_wall_clock() which does the simple
+kvm_write_guest() thing.
 
-I will fix them.
+I think at the very least perhaps we should do something like this in
+mark_page_dirty_in_slot():
 
-> > +      * Each 4 bits field is for a feature indicated by the same bits
-> > +      * field of the ID register and indicates how the feature support
-> > +      * for guests needs to be checked.
-> > +      * The bit 0 indicates that the corresponding ID register field
-> > +      * is signed(1) or unsigned(0).
-> > +      * The bits [3:1] hold feature_check_type for the field.
-> > +      * If all zero, all features in the ID register are treated as unsigned
-> > +      * fields and checked based on Principles of the ID scheme for fields
-> > +      * in ID registers (FCT_LOWER_SAFE of feature_check_type).
-> values set by the guest are checked against host ID field values
-> according to FCT_LOWER_SAFE test? You do not actually explicitly explain
-> what the check is about although this may be obvious for you?
+ WARN_ON_ONCE(!kvm_get_running_vcpu() || kvm_get_running_vcpu()->kvm !=3D k=
+vm);
 
-How about this ?
+(For illustration only; I'd actually use a local vcpu variable *and*
+pass that vcpu to kvm_dirty_ring_get())
 
-        /*
-         * The ftr_check_types is comprised of a set of 4 bit fields.
-         * Each 4 bit field is for a feature indicated by the same bit field
-         * of the ID register and indicates how the field needs to be checked
-         * (by arm64_check_feature_one) against the host's ID field when
-         * userspace tries to set the register.
-         * The bit 0 indicates that the corresponding ID register field is
-         * signed(1) or unsigned(0). The bits [3:1] hold feature_check_type
-         * for the field (FCT_LOWER_SAFE == 0, etc).
-         * e.g. for ID_AA64PFR0_EL1.SVE(bits [35:32]), bits[35:32] of
-         * ftr_check_types for the register should be 0. It means the SVE
-         * field is treated as an unsigned field, and userspace can set the
-         * field to a equal or lower value than the host's ID field value.
-         */
+On propagating the caller's vcpu through and killing off the non-vCPU
+versions of the functions, I'm torn... because even if we insist on *a*
+vCPU being passed, it might be *the* vCPU, and that's just setting a
+more subtle trap (which would have bitten my GPC invalidate code, for
+example).
 
-> > +      */
-> > +     u64     ftr_check_types;
-> > +
-> > +     /* Initialization function of the id_reg_info */
-> > +     void (*init)(struct id_reg_info *id_reg);
-> > +
-> > +     /* Register specific validation function */
-> validation callback? it does not register anything. We have check
-> customization means already in ftr_check_types so it is difficult to
-> guess at that point why this cb is needed, all the more so it applies
-> after the ftr_checks.
+There are other more complex approaches like adding an extra ring, with
+spinlocks, for the 'not from a vCPU' cases. But I think that's
+overkill.
 
-I am going to add the following comment. Does it look clear enough for you ?
 
-        /*
-         * This is an optional ID register specific validation function.
-         * When userspace tries to set the ID register, arm64_check_features()
-         * will check if the requested value indicates any features that cannot
-         * be supported by KVM on the host.  But, some ID register fields need
-         * a special checking and this function can be used for such fields.
-         * e.g. KVM_CREATE_DEVICE must be used to configure GICv3 for a guest.
-         * ID_AA64PFR0_EL1.GIC shouldn't be set to 1 unless GICv3 is configured.
-         * The validation function for ID_AA64PFR0_EL1 could be used to check
-         * the field is consistent with GICv3 configuration.
-         */
 
-> > +     int (*validate)(struct kvm_vcpu *vcpu, const struct id_reg_info *id_reg,
-> > +                     u64 val);
-> > +
-> > +     /* Return the reset value of the register for the vCPU */
-> > +     u64 (*get_reset_val)(struct kvm_vcpu *vcpu,
-> > +                          const struct id_reg_info *id_reg);
-> > +};
-> > +
-> > +static void id_reg_info_init(struct id_reg_info *id_reg)
-> > +{
-> > +     id_reg->vcpu_limit_val = read_sanitised_ftr_reg(id_reg->sys_reg);
-> > +     if (id_reg->init)
-> > +             id_reg->init(id_reg);
-> > +}
-> > +
-> > +/*
-> > + * An ID register that needs special handling to control the value for the
-> > + * guest must have its own id_reg_info in id_reg_info_table.
-> > + * (i.e. the reset value is different from the host's sanitized value,
-> > + * the value is affected by opt-in features, some fields needs specific
-> s/needs/need
 
-I will fix it.
 
-Thank you for your review !
 
-Regards
-Reiji
+
+--=-xmDH/MHbX/vObHZ+w1qZ
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MTE5MDkyMzI5WjAvBgkqhkiG9w0BCQQxIgQgYBPnOfezXAI1Dz5ZIzzHmzK6Tix24bzqjA6w6fcr
+80Qwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAJkAuuqmZfjnN/z7/Qz5/AZcufBNujk/j0m6tIbcYwlAehdBCuQoYVIqOdYqbyz1
+j6fr1kqYb8L/RbwbgbkGiaQYVr1zCihUxCRhod1IrxwSFxuzE5ZscqSey9Pe+hj2FLdpzmWGisZI
+ask6dQLyY3fuDrojgJlZ3eExbuKAOyfNPpfI6hH8VU5LpGnLpy/w+17wiIAmKKMpmbmDtlDbf5mc
+dS6b3vAEoIxJcxHNUK/1rUzA6/4QmzBo8ZgzbbTEgfV+/1X4QUTPQwYshqMjEF9wf0U5a7DDXjjo
++60jAPWFapK41pjV4W5WnC1FUB/3N0An+J85h5+5dEgqx4dNyRsAAAAAAAA=
+
+
+--=-xmDH/MHbX/vObHZ+w1qZ--
+
+
+--===============7325338821498618665==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7325338821498618665==--
+
