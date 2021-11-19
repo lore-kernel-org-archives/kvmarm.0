@@ -1,76 +1,77 @@
-Return-Path: <SRS0=+5+0=QF=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
+Return-Path: <SRS0=LYRx=QG=lists.cs.columbia.edu=kvmarm-bounces@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7AAC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Nov 2021 22:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAFDC433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Nov 2021 04:48:16 +0000 (UTC)
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by mail.kernel.org (Postfix) with ESMTP id E18CA61AA2
-	for <kvmarm@archiver.kernel.org>; Thu, 18 Nov 2021 22:00:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org E18CA61AA2
+	by mail.kernel.org (Postfix) with ESMTP id 3C42B61B30
+	for <kvmarm@archiver.kernel.org>; Fri, 19 Nov 2021 04:48:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 mail.kernel.org 3C42B61B30
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=lists.cs.columbia.edu
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53FCC4B25E;
-	Thu, 18 Nov 2021 17:00:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 828A24B15C;
+	Thu, 18 Nov 2021 23:48:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qr4A6BZ83wpd; Thu, 18 Nov 2021 17:00:22 -0500 (EST)
+	with ESMTP id 7nwhZi3O0hFS; Thu, 18 Nov 2021 23:48:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC54E4B248;
-	Thu, 18 Nov 2021 17:00:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDD3D4B10E;
+	Thu, 18 Nov 2021 23:48:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 850344B1F3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 17:00:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B39AB4B10C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 23:48:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5qBRr2ebBoa7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Nov 2021 17:00:20 -0500 (EST)
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com
- [209.85.215.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B25B24B16C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 17:00:20 -0500 (EST)
-Received: by mail-pg1-f181.google.com with SMTP id g28so6704699pgg.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 14:00:20 -0800 (PST)
+ with ESMTP id 1BoBnbQEoiLe for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Nov 2021 23:48:11 -0500 (EST)
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com
+ [209.85.216.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F8B84B108
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 23:48:11 -0500 (EST)
+Received: by mail-pj1-f48.google.com with SMTP id
+ gx15-20020a17090b124f00b001a695f3734aso7859709pjb.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Nov 2021 20:48:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=EpdJi3HYgLc5zwKM/z1Fkk+LrQE+K6mTNDKahwPRN+Q=;
- b=akQ9hotq/NIJFU7aF5TgnIKJNyCnEcDMpW5ZtN6EzU8z9873Ze+lsfJAepUwTdRkPm
- QVtg3sfjkzqWMCtitRktzbgzCpnEzTHNWAluqme/o+QYJpgcK+5UCQVcOHX77mEX8ZFA
- hrzCME8n3ul8ykXPDoTLJjnbWfsjxVjwQizOYDNhN4p9acchsHk4xxntouONdNg1NBhR
- ExQT2cAlzF6RaGaGyKrG1XYK1RjDU+PKeF4DYCc4nHiaqT4ngsdBHTPrLfAyJZjA8Bbb
- pT5UpJ7bUSEShC6Yn0o/YosxpFZ1kGhV2jKyzlp7er1mWeXXFFmiZxBkPQeQyEim3K17
- /uhg==
+ :cc; bh=QoHMt8LQUTb/w8rEtIXtkstD7X6Wu7UF3Mkd4lNy0LM=;
+ b=f6mE+4ldYjvX5BJjmShvzZEMh3rnrUBTxlm+JT423a5ncMdZ/VrE6xWERj1wVvZnJg
+ 3Dfv0OYWvbNcdNKK/07mp7loX0QW0l6uNlZQ2zbPRIg39ZIzpo6j1nciS5cIaLwP/mvq
+ 2S+8fUbR1sU8bLfFd8BDRuwdNc1Oorz1g64qaS1ZyhaHIt50GgGG3amMgonK7S4A98yH
+ 5+fd22zdHRWrceTvR+mA2diDl5QuPtJJuYDmMkohPdNGKcsN53vP8w+ukpPuvel2Ps7J
+ qB5HM/E5a16x+LEjZrc+by6RwXaQFsw9/aOfvXzHkSuNI2TAyIy4I2J0Ca+BZKSFOfQ7
+ CNsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=EpdJi3HYgLc5zwKM/z1Fkk+LrQE+K6mTNDKahwPRN+Q=;
- b=HBfUluT05o4dR6UjQacKjxghOOPjW7tuk5F4fP5gOCTAEryHMK5J40q0Bdw42ZzzrX
- gRuwPJE+d+hMYS76l4sQZEry+fZxDMEX/RPD70OZTsRY9G2Mai5XlIGnEm2/SZzftfE5
- qd4CT5W/HWiNwrMNFcX9Xy1LZNtM5V7zmOReAQdHwRQttv0y+GehZdrYu4MJRRHc87au
- 8bl3Dvy/WOpJaMfwfozvdrp7nqQWgIpwkVad3ihNm4kq2G1QLhwVro/LoPlLiGvkt2zZ
- LyhlTZL+U5MRv0YxSXxhFl6xAY6Gv8cj4MEPkYL1eFDSXVZZ01vuw4QJNFh3YDdDO4im
- lEyw==
-X-Gm-Message-State: AOAM530mBhqZg7Aoy0MDU+lflmERcnc7EaMy2NlMIItn3oOQUP9OrUao
- VhxN1kZWVd7LQdKhV3OiKw6M8XgQu583iqWP3i/R5w==
-X-Google-Smtp-Source: ABdhPJzL2sawh7KxRB9k5qoNwKnO6wsjrcsjdgXf7XIV8VeKfPMFfbCAThDnxgeJ16+XkOhTt+8FzOqG77GQGJZPL3c=
-X-Received: by 2002:a63:c158:: with SMTP id p24mr13526679pgi.53.1637272819548; 
- Thu, 18 Nov 2021 14:00:19 -0800 (PST)
+ bh=QoHMt8LQUTb/w8rEtIXtkstD7X6Wu7UF3Mkd4lNy0LM=;
+ b=O27b+YmxLI5MjZVsOxvdwqQPWucQW74kIpRDctBOOuCjIp5dRIjtRbzXvDV/g8FeJl
+ 41Shq/jrGxoVBC1k1NIep2YQN+dbUuQjwVJh/qYW9H9RFZwhamOAdDmsVykYstJSxKLj
+ F4/U9YB9gGIhj2uvTvfwwottiiH1V+3x92xweMbY2A9FUJKbvYkIUjKb1t/ayObVTnh6
+ 8FY9AbwFaZp/btFse0MZwk7H3txn7ue/jq6TU7wxsDrAnYvi126GnBXemSXOFyPEKK5T
+ jG+7/QoYANghDr2iRV0c4iLjLMB5T+NqSuHQ90JB4cImieVQgxBzzrOE3RjWtY2U6/Ed
+ EZUA==
+X-Gm-Message-State: AOAM533LwErn0uKPscCcBYacJFUi4BZkCrbbhxeJpANyizCALT42tNsF
+ Oj+vgZ3mOtDjl3Uc+NVeI1X8mqoDPkR2dKD/vpXv8Q==
+X-Google-Smtp-Source: ABdhPJycAlRxaIvHJJXbqCGSK0+HzBRgJ+ZDhfwoA9cw6lmE0XvsRNi8m9y30tvBRIhyXpjjclu41pp0XPEkOGMUgRU=
+X-Received: by 2002:a17:902:d703:b0:144:e012:d550 with SMTP id
+ w3-20020a170902d70300b00144e012d550mr7302851ply.38.1637297289775; Thu, 18 Nov
+ 2021 20:48:09 -0800 (PST)
 MIME-Version: 1.0
 References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-3-reijiw@google.com>
- <dad16d0f-a0fa-cd8e-fdd0-0bbdf38af791@redhat.com>
-In-Reply-To: <dad16d0f-a0fa-cd8e-fdd0-0bbdf38af791@redhat.com>
+ <20211117064359.2362060-4-reijiw@google.com>
+ <d3fd9d6c-c96c-d7a0-b78d-af36430dbf3f@redhat.com>
+In-Reply-To: <d3fd9d6c-c96c-d7a0-b78d-af36430dbf3f@redhat.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 18 Nov 2021 14:00:03 -0800
-Message-ID: <CAAeT=FyUjwJDLw=6u_ocgQ_974+vD4w0n2=WCYXLsH4cf+dxOw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 02/29] KVM: arm64: Save ID registers' sanitized
- value per vCPU
+Date: Thu, 18 Nov 2021 20:47:53 -0800
+Message-ID: <CAAeT=FyzvGaksi+-WidHObrGYcqs4vR73ChCGpo8AFuin6UbYw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
 To: Eric Auger <eauger@redhat.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -94,181 +95,267 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Eric,
 
-On Thu, Nov 18, 2021 at 12:37 PM Eric Auger <eauger@redhat.com> wrote:
+On Thu, Nov 18, 2021 at 12:36 PM Eric Auger <eauger@redhat.com> wrote:
 >
 > Hi Reiji,
 >
 > On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
-> > registers' sanitized value in the array for the vCPU at the first
-> > vCPU reset. Use the saved ones when ID registers are read by
-> > userspace (via KVM_GET_ONE_REG) or the guest.
+> > This patch lays the groundwork to make ID registers writable.
+> >
+> > Introduce struct id_reg_info for an ID register to manage the
+> > register specific control of its value for the guest, and provide set
+> > of functions commonly used for ID registers to make them writable.
+> >
+> > The id_reg_info is used to do register specific initialization,
+> > validation of the ID register and etc.  Not all ID registers must
+> > have the id_reg_info. ID registers that don't have the id_reg_info
+> > are handled in a common way that is applied to all ID registers.
+> >
+> > At present, changing an ID register from userspace is allowed only
+> > if the ID register has the id_reg_info, but that will be changed
+> > by the following patches.
+> >
+> > No ID register has the structure yet and the following patches
+> > will add the id_reg_info for some ID registers.
 > >
 > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_host.h | 10 +++++++
-> >  arch/arm64/kvm/sys_regs.c         | 43 +++++++++++++++++++------------
-> >  2 files changed, 37 insertions(+), 16 deletions(-)
+> >  arch/arm64/include/asm/sysreg.h |   1 +
+> >  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
+> >  2 files changed, 218 insertions(+), 9 deletions(-)
 > >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index edbe2cb21947..72db73c79403 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -146,6 +146,14 @@ struct kvm_vcpu_fault_info {
-> >       u64 disr_el1;           /* Deferred [SError] Status Register */
-> >  };
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 16b3f1a1d468..597609f26331 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -1197,6 +1197,7 @@
+> >  #define ICH_VTR_TDS_MASK     (1 << ICH_VTR_TDS_SHIFT)
 > >
-> > +/*
-> > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> > + * where 0<=crm<8, 0<=op2<8.
-> > + */
-> > +#define KVM_ARM_ID_REG_MAX_NUM 64
-> > +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
-> > +#define IDREG_SYS_IDX(id)    (ID_REG_BASE + IDREG_IDX(id))
-> > +
-> >  enum vcpu_sysreg {
-> >       __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
-> >       MPIDR_EL1,      /* MultiProcessor Affinity Register */
-> > @@ -210,6 +218,8 @@ enum vcpu_sysreg {
-> >       CNTP_CVAL_EL0,
-> >       CNTP_CTL_EL0,
+> >  #define ARM64_FEATURE_FIELD_BITS     4
+> > +#define ARM64_FEATURE_FIELD_MASK     ((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
 > >
-> > +     ID_REG_BASE,
-> > +     ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
-> >       /* Memory Tagging Extension registers */
-> >       RGSR_EL1,       /* Random Allocation Tag Seed Register */
-> >       GCR_EL1,        /* Tag Control Register */
+> >  /* Create a mask for the feature bits of the specified feature. */
+> >  #define ARM64_FEATURE_MASK(x)        (GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
 > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index e3ec1a44f94d..5608d3410660 100644
+> > index 5608d3410660..1552cd5581b7 100644
 > > --- a/arch/arm64/kvm/sys_regs.c
 > > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -33,6 +33,8 @@
+> > @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+> >               return read_zero(vcpu, p);
+> >  }
 > >
-> >  #include "trace.h"
-> >
-> > +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+> > +/*
+> > + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
+> > + * ftr_check_types of id_reg_info.
+> > + */
+> > +enum feature_check_type {
+> > +     FCT_LOWER_SAFE = 0,
+> > +     FCT_HIGHER_SAFE,
+> > +     FCT_HIGHER_OR_ZERO_SAFE,
+> > +     FCT_EXACT,
+> > +     FCT_EXACT_OR_ZERO_SAFE,
+> > +     FCT_IGNORE,     /* Don't check (any value is fine) */
+> Maybe you can remove the _SAFE suffix (EXACT does not have it).
+
+I am inclined to keep 'SAFE' (otherwise, I am likely to forget
+if lower is safe or not).
+
+> s/EXACT/EQUAL ?
+
+I will fix that FCT_EXACT to FCT_EQUAL_SAFE.
+
+> > +};
 > > +
-> >  /*
-> >   * All of this file is extremely similar to the ARM coproc.c, but the
-> >   * types are different. My gut feeling is that it should be pretty
-> > @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
-> >                         struct sys_reg_params *p,
-> >                         const struct sys_reg_desc *r)
-> >  {
-> > -     u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > +     u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
-> >       u32 sr = reg_to_encoding(r);
-> >
-> >       if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
-> > @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
-> >       return true;
-> >  }
-> >
-> > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> > -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> > -             struct sys_reg_desc const *r, bool raz)
-> > +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> >  {
-> > -     u32 id = reg_to_encoding(r);
-> > -     u64 val;
-> > -
-> > -     if (raz)
-> > -             return 0;
-> > -
-> > -     val = read_sanitised_ftr_reg(id);
-> > +     u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
-> >
-> >       switch (id) {
-> >       case SYS_ID_AA64PFR0_EL1:
-> > @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> >       return val;
-> >  }
-> >
-> > +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> > +                    struct sys_reg_desc const *r, bool raz)
+> > +static int arm64_check_feature_one(enum feature_check_type type, int val,
+> > +                                int limit)
 > > +{
-> > +     u32 id = reg_to_encoding(r);
+> > +     bool is_safe = false;
 > > +
-> > +     return raz ? 0 : __read_id_reg(vcpu, id);
+> > +     if (val == limit)
+> > +             return 0;
+> even if the type is unexpected?
+
+I will remove it.
+
+> > +
+> > +     switch (type) {
+> > +     case FCT_LOWER_SAFE:
+> > +             is_safe = (val <= limit);
+> > +             break;
+> > +     case FCT_HIGHER_OR_ZERO_SAFE:
+> > +             if (val == 0) {
+> > +                     is_safe = true;
+> > +                     break;
+> > +             }
+> > +             fallthrough;
+> > +     case FCT_HIGHER_SAFE:
+> > +             is_safe = (val >= limit);
+> > +             break;
+> > +     case FCT_EXACT:
+> > +             break;
+> > +     case FCT_EXACT_OR_ZERO_SAFE:
+> > +             is_safe = (val == 0);
+> > +             break;
+> > +     case FCT_IGNORE:
+> > +             is_safe = true;
+> > +             break;
+> > +     default:
+> > +             WARN_ONCE(1, "Unexpected feature_check_type (%d)\n", type);
+> > +             break;
+> > +     }
+> > +
+> > +     return is_safe ? 0 : -1;
 > > +}
 > > +
-> >  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
-> >                                 const struct sys_reg_desc *r)
-> >  {
-> > @@ -1178,6 +1180,16 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
-> >       return REG_HIDDEN;
-> >  }
-> >
-> > +static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+> > +#define      FCT_TYPE_MASK           0x7
+> > +#define      FCT_TYPE_SHIFT          1
+> > +#define      FCT_SIGN_MASK           0x1
+> > +#define      FCT_SIGN_SHIFT          0
+> > +#define      FCT_TYPE(val)   ((val >> FCT_TYPE_SHIFT) & FCT_TYPE_MASK)
+> > +#define      FCT_SIGN(val)   ((val >> FCT_SIGN_SHIFT) & FCT_SIGN_MASK)
+> > +
+> > +#define      MAKE_FCT(shift, type, sign)                             \
+> > +     ((u64)((((type) & FCT_TYPE_MASK) << FCT_TYPE_SHIFT) |   \
+> > +            (((sign) & FCT_SIGN_MASK) << FCT_SIGN_SHIFT)) << (shift))
+> > +
+> > +/* For signed field */
+> > +#define      S_FCT(shift, type)      MAKE_FCT(shift, type, 1)
+> > +/* For unigned field */
+> > +#define      U_FCT(shift, type)      MAKE_FCT(shift, type, 0)
+> > +
+> > +/*
+> > + * @val and @lim are both a value of the ID register. The function checks
+> > + * if all features indicated in @val can be supported for guests on the host,
+> > + * which supports features indicated in @lim. @check_types indicates how> + * features in the ID register needs to be checked.
+> > + * See comments for id_reg_info's ftr_check_types field for more detail.
+> What about RES0 fields which may exist? add a comment to reassure about
+> the fact they are properly handled if there are?
+
+Any fields including RES0 should be checked based on check_types.
+I will explicitly state that in the comment.
+
+> > + */
+> > +static int arm64_check_features(u64 check_types, u64 val, u64 lim)
 > > +{
-> > +     u32 id = reg_to_encoding(rd);
+> > +     int i;
 > > +
-> > +     if (vcpu_has_reset_once(vcpu))
-> > +             return;
+> > +     for (i = 0; i < 64; i += ARM64_FEATURE_FIELD_BITS) {
+> > +             u8 ftr_check = (check_types >> i) & ARM64_FEATURE_FIELD_MASK;
+> > +             bool is_sign = FCT_SIGN(ftr_check);
+> > +             enum feature_check_type fctype = FCT_TYPE(ftr_check);
+> > +             int fval, flim, ret;
 > > +
-> > +     __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id)) = read_sanitised_ftr_reg(id);
+> > +             fval = cpuid_feature_extract_field(val, i, is_sign);
+> > +             flim = cpuid_feature_extract_field(lim, i, is_sign);
+> > +
+> > +             ret = arm64_check_feature_one(fctype, fval, flim);
+> > +             if (ret)
+> > +                     return -E2BIG;
+> > +     }
+> > +     return 0;
 > > +}
 > > +
-> >  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> >                              const struct sys_reg_desc *rd,
-> >                              const struct kvm_one_reg *reg, void __user *uaddr)
-> > @@ -1223,9 +1235,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> >  /*
-> >   * cpufeature ID register user accessors
-> >   *
-> > - * For now, these registers are immutable for userspace, so no values
-> > - * are stored, and for set_id_reg() we don't allow the effective value
-> > - * to be changed.
-> > + * We don't allow the effective value to be changed.
-> This change may be moved to a subsequent patch as this patch does not
-> change the behavior yet.
+> > +struct id_reg_info {
+> > +     u32     sys_reg;        /* Register ID */
+> use struct kernel-doc comments instead?
+> > +
+> > +     /*
+> > +      * Limit value of the register for a vcpu. The value is the sanitized
+> > +      * system value with bits cleared for unsupported features for the
+> > +      * guest.
+> > +      */
+> > +     u64     vcpu_limit_val;
+> > +
+> > +     /*
+> > +      * The ftr_check_types is comprised of a set of 4 bits fields.
+> nit: s/bits field/bit field here and below
 
-Thank you for the review.
+I will fix them.
 
-There are three main parts in the original comments.
+> > +      * Each 4 bits field is for a feature indicated by the same bits
+> > +      * field of the ID register and indicates how the feature support
+> > +      * for guests needs to be checked.
+> > +      * The bit 0 indicates that the corresponding ID register field
+> > +      * is signed(1) or unsigned(0).
+> > +      * The bits [3:1] hold feature_check_type for the field.
+> > +      * If all zero, all features in the ID register are treated as unsigned
+> > +      * fields and checked based on Principles of the ID scheme for fields
+> > +      * in ID registers (FCT_LOWER_SAFE of feature_check_type).
+> values set by the guest are checked against host ID field values
+> according to FCT_LOWER_SAFE test? You do not actually explicitly explain
+> what the check is about although this may be obvious for you?
 
- (A) these registers are immutable for userspace
- (B) no values are stored
- (C) we don't allow the effective value to be changed
+How about this ?
 
-This patch stores ID register values in sys_regs[].
-So, I don't think (B) should be there, and I removed (B).
-Since (A) is essentially the same as (C), I removed (A)
-(and left (C)).
+        /*
+         * The ftr_check_types is comprised of a set of 4 bit fields.
+         * Each 4 bit field is for a feature indicated by the same bit field
+         * of the ID register and indicates how the field needs to be checked
+         * (by arm64_check_feature_one) against the host's ID field when
+         * userspace tries to set the register.
+         * The bit 0 indicates that the corresponding ID register field is
+         * signed(1) or unsigned(0). The bits [3:1] hold feature_check_type
+         * for the field (FCT_LOWER_SAFE == 0, etc).
+         * e.g. for ID_AA64PFR0_EL1.SVE(bits [35:32]), bits[35:32] of
+         * ftr_check_types for the register should be 0. It means the SVE
+         * field is treated as an unsigned field, and userspace can set the
+         * field to a equal or lower value than the host's ID field value.
+         */
 
-Do you think it is better to leave (A) in this patch, too ?
+> > +      */
+> > +     u64     ftr_check_types;
+> > +
+> > +     /* Initialization function of the id_reg_info */
+> > +     void (*init)(struct id_reg_info *id_reg);
+> > +
+> > +     /* Register specific validation function */
+> validation callback? it does not register anything. We have check
+> customization means already in ftr_check_types so it is difficult to
+> guess at that point why this cb is needed, all the more so it applies
+> after the ftr_checks.
 
-Thanks,
+I am going to add the following comment. Does it look clear enough for you ?
+
+        /*
+         * This is an optional ID register specific validation function.
+         * When userspace tries to set the ID register, arm64_check_features()
+         * will check if the requested value indicates any features that cannot
+         * be supported by KVM on the host.  But, some ID register fields need
+         * a special checking and this function can be used for such fields.
+         * e.g. KVM_CREATE_DEVICE must be used to configure GICv3 for a guest.
+         * ID_AA64PFR0_EL1.GIC shouldn't be set to 1 unless GICv3 is configured.
+         * The validation function for ID_AA64PFR0_EL1 could be used to check
+         * the field is consistent with GICv3 configuration.
+         */
+
+> > +     int (*validate)(struct kvm_vcpu *vcpu, const struct id_reg_info *id_reg,
+> > +                     u64 val);
+> > +
+> > +     /* Return the reset value of the register for the vCPU */
+> > +     u64 (*get_reset_val)(struct kvm_vcpu *vcpu,
+> > +                          const struct id_reg_info *id_reg);
+> > +};
+> > +
+> > +static void id_reg_info_init(struct id_reg_info *id_reg)
+> > +{
+> > +     id_reg->vcpu_limit_val = read_sanitised_ftr_reg(id_reg->sys_reg);
+> > +     if (id_reg->init)
+> > +             id_reg->init(id_reg);
+> > +}
+> > +
+> > +/*
+> > + * An ID register that needs special handling to control the value for the
+> > + * guest must have its own id_reg_info in id_reg_info_table.
+> > + * (i.e. the reset value is different from the host's sanitized value,
+> > + * the value is affected by opt-in features, some fields needs specific
+> s/needs/need
+
+I will fix it.
+
+Thank you for your review !
+
+Regards
 Reiji
-
-
-> >   */
-> >  static int __get_id_reg(const struct kvm_vcpu *vcpu,
-> >                       const struct sys_reg_desc *rd, void __user *uaddr,
-> > @@ -1382,6 +1392,7 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
-> >  #define ID_SANITISED(name) {                 \
-> >       SYS_DESC(SYS_##name),                   \
-> >       .access = access_id_reg,                \
-> > +     .reset  = reset_id_reg,                 \
-> >       .get_user = get_id_reg,                 \
-> >       .set_user = set_id_reg,                 \
-> >       .visibility = id_visibility,            \
-> > @@ -1837,8 +1848,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
-> >       if (p->is_write) {
-> >               return ignore_write(vcpu, p);
-> >       } else {
-> > -             u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> > -             u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> > +             u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
-> > +             u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
-> >               u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
-> >
-> >               p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
-> >
-> Thanks
->
-> Eric
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
