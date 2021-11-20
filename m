@@ -2,52 +2,52 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D3FC433EF
-	for <kvmarm@archiver.kernel.org>; Sat, 20 Nov 2021 10:36:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A997AC433F5
+	for <kvmarm@archiver.kernel.org>; Sat, 20 Nov 2021 10:36:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1240E4B15C;
-	Sat, 20 Nov 2021 05:36:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6605C4B162;
+	Sat, 20 Nov 2021 05:36:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id p-N6fwViL7-T; Sat, 20 Nov 2021 05:36:13 -0500 (EST)
+	with ESMTP id cvq-qP95r3Xl; Sat, 20 Nov 2021 05:36:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75FEF4B1AB;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 961824B1AF;
 	Sat, 20 Nov 2021 05:36:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C3774A98B
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4EAB4B130
  for <kvmarm@lists.cs.columbia.edu>; Sat, 20 Nov 2021 05:29:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1cbRqr7Et-EU for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id R0Z-0bsSBhXf for <kvmarm@lists.cs.columbia.edu>;
  Sat, 20 Nov 2021 05:29:12 -0500 (EST)
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F35ED4B14D
- for <kvmarm@lists.cs.columbia.edu>; Sat, 20 Nov 2021 05:29:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 704184B129
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 20 Nov 2021 05:29:12 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
  MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
  Reply-To:Content-Type:Content-ID:Content-Description;
- bh=KJPYZZ7YbxCF8e4lw5Q63h+vhx2Z6IkGAc4ioCPd1zc=; b=gLQJt1MqY/7pf6bpVXzcjk7eg6
- qDjzpgOK5B8Jd9QTZ5iFQOkfISKTTMoyeZGl9ImlZlYWvqwBt5rShPHJcE9Ct4xj5kE0RgXLZsL3c
- knipbPPDRckV0hfzsdWV8t2YZMy5EfXj8REINmtrys8/c9PmXLEBBKD+ToVn7LzCKaeMGlYzUaG2W
- pYGz5LNNrsqSmqfVbpMyurSV0naXfIrpjapd0JSzu4+TinGP90pC+FwXjNsCvnBiAWEFkP3wsFZ2m
- vvuI/z/5TLMd8X/J0SWSrn5W29orp/tsEmbjknXrPuoa9u8XJD5hQJshDLx2d5ebYgY02G6+IR0jy
- YQctaICA==;
+ bh=qgYU5vzDBKxIUC/iB5UVJS4/0uLVrDIq5zuDRSYxPkA=; b=daDQzc5oGDfad5+NKPDSrDpM4X
+ cAqWgP5VKWinhpOPDwzbeYHFwrx4ADs//HTG4TQvaE9bRMOd69jyfBiGwEdq9fgoKd/9+OgIWBVPw
+ 4aySqw4km3vAcEpT94FhXQlIUay9aWr9QZ9iu+7ePenRpP3x2ZXVxrtM1lJBoVZmGkanPqqNWY6Bo
+ nqf4j997VOabnPEztdc5xzeH0gXmqLKnw+lMVUFjxOo59h5C1YvSrsCRSoxSNrpmPzJomv2IilH3Z
+ /GgsQY6saFhb0m0fzccgyg7Nn0CQCSyNLZHgdZVv/x0UbEpTQXgS6lToXbt3LL8wLos5trD5nfeoF
+ VAMTBGDw==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
  by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1moNbQ-00AUNH-W3; Sat, 20 Nov 2021 10:28:13 +0000
+ id 1moNbQ-00AUNJ-Vp; Sat, 20 Nov 2021 10:28:13 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red
- Hat Linux)) id 1moNbQ-0002KK-JA; Sat, 20 Nov 2021 10:28:12 +0000
+ Hat Linux)) id 1moNbQ-0002K5-7B; Sat, 20 Nov 2021 10:28:12 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm <kvm@vger.kernel.org>
-Subject: [PATCH v4 06/11] KVM: powerpc: Use Makefile.kvm for common files
-Date: Sat, 20 Nov 2021 10:28:05 +0000
-Message-Id: <20211120102810.8858-7-dwmw2@infradead.org>
+Subject: [PATCH v4 01/11] KVM: Introduce CONFIG_HAVE_KVM_DIRTY_RING
+Date: Sat, 20 Nov 2021 10:28:00 +0000
+Message-Id: <20211120102810.8858-2-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211120102810.8858-1-dwmw2@infradead.org>
 References: <20211120102810.8858-1-dwmw2@infradead.org>
@@ -89,42 +89,100 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-It's all fairly baroque but in the end, I don't think there's any reason
-for $(KVM)/irqchip.o to have been handled differently, as they all end
-up in $(kvm-y) in the end anyway, regardless of whether they get there
-via $(common-objs-y) and the CPU-specific object lists.
+I'd like to make the build include dirty_ring.c based on whether the
+arch wants it or not. That's a whole lot simpler if there's a config
+symbol instead of doing it implicitly on KVM_DIRTY_LOG_PAGE_OFFSET
+being set to something non-zero.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 ---
- arch/powerpc/kvm/Makefile | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ arch/x86/kvm/Kconfig           | 1 +
+ include/linux/kvm_dirty_ring.h | 8 ++++----
+ virt/kvm/Kconfig               | 3 +++
+ virt/kvm/kvm_main.c            | 4 ++--
+ 4 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/arch/powerpc/kvm/Makefile b/arch/powerpc/kvm/Makefile
-index 583c14ef596e..245f59118413 100644
---- a/arch/powerpc/kvm/Makefile
-+++ b/arch/powerpc/kvm/Makefile
-@@ -4,11 +4,8 @@
- #
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 619186138176..d7fa0a42ac25 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -27,6 +27,7 @@ config KVM
+ 	select MMU_NOTIFIER
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQFD
++	select HAVE_KVM_DIRTY_RING
+ 	select IRQ_BYPASS_MANAGER
+ 	select HAVE_KVM_IRQ_BYPASS
+ 	select HAVE_KVM_IRQ_ROUTING
+diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
+index fb0fa18878e2..906f899813dc 100644
+--- a/include/linux/kvm_dirty_ring.h
++++ b/include/linux/kvm_dirty_ring.h
+@@ -27,9 +27,9 @@ struct kvm_dirty_ring {
+ 	int index;
+ };
  
- ccflags-y := -Ivirt/kvm -Iarch/powerpc/kvm
--KVM := ../../../virt/kvm
+-#if (KVM_DIRTY_LOG_PAGE_OFFSET == 0)
++#ifndef CONFIG_HAVE_KVM_DIRTY_RING
+ /*
+- * If KVM_DIRTY_LOG_PAGE_OFFSET not defined, kvm_dirty_ring.o should
++ * If CONFIG_HAVE_HVM_DIRTY_RING not defined, kvm_dirty_ring.o should
+  * not be included as well, so define these nop functions for the arch.
+  */
+ static inline u32 kvm_dirty_ring_get_rsvd_entries(void)
+@@ -69,7 +69,7 @@ static inline bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring)
+ 	return true;
+ }
  
--common-objs-y = $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
--common-objs-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
--common-objs-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
-+include $(srctree)/virt/kvm/Makefile.kvm
+-#else /* KVM_DIRTY_LOG_PAGE_OFFSET == 0 */
++#else /* CONFIG_HAVE_KVM_DIRTY_RING */
  
- common-objs-y += powerpc.o emulate_loadstore.o
- obj-$(CONFIG_KVM_EXIT_TIMING) += timing.o
-@@ -125,7 +122,6 @@ kvm-book3s_32-objs := \
- kvm-objs-$(CONFIG_KVM_BOOK3S_32) := $(kvm-book3s_32-objs)
+ u32 kvm_dirty_ring_get_rsvd_entries(void);
+ int kvm_dirty_ring_alloc(struct kvm_dirty_ring *ring, int index, u32 size);
+@@ -92,6 +92,6 @@ struct page *kvm_dirty_ring_get_page(struct kvm_dirty_ring *ring, u32 offset);
+ void kvm_dirty_ring_free(struct kvm_dirty_ring *ring);
+ bool kvm_dirty_ring_soft_full(struct kvm_dirty_ring *ring);
  
- kvm-objs-$(CONFIG_KVM_MPIC) += mpic.o
--kvm-objs-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
+-#endif /* KVM_DIRTY_LOG_PAGE_OFFSET == 0 */
++#endif /* CONFIG_HAVE_KVM_DIRTY_RING */
  
- kvm-objs := $(kvm-objs-m) $(kvm-objs-y)
+ #endif	/* KVM_DIRTY_RING_H */
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index 62b39149b8c8..97cf5413ac25 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -13,6 +13,9 @@ config HAVE_KVM_IRQFD
+ config HAVE_KVM_IRQ_ROUTING
+        bool
  
++config HAVE_KVM_DIRTY_RING
++       bool
++
+ config HAVE_KVM_EVENTFD
+        bool
+        select EVENTFD
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 72c6453bcef4..8eb8c962838d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3432,7 +3432,7 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_on_spin);
+ 
+ static bool kvm_page_in_dirty_ring(struct kvm *kvm, unsigned long pgoff)
+ {
+-#if KVM_DIRTY_LOG_PAGE_OFFSET > 0
++#ifdef CONFIG_HAVE_KVM_DIRTY_RING
+ 	return (pgoff >= KVM_DIRTY_LOG_PAGE_OFFSET) &&
+ 	    (pgoff < KVM_DIRTY_LOG_PAGE_OFFSET +
+ 	     kvm->dirty_ring_size / PAGE_SIZE);
+@@ -4135,7 +4135,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ 	case KVM_CAP_NR_MEMSLOTS:
+ 		return KVM_USER_MEM_SLOTS;
+ 	case KVM_CAP_DIRTY_LOG_RING:
+-#if KVM_DIRTY_LOG_PAGE_OFFSET > 0
++#ifdef CONFIG_HAVE_KVM_DIRTY_RING
+ 		return KVM_DIRTY_RING_MAX_ENTRIES * sizeof(struct kvm_dirty_gfn);
+ #else
+ 		return 0;
 -- 
 2.31.1
 
