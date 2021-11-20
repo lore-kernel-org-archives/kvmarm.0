@@ -2,57 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CB0C4332F
-	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 21:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0234C433FE
+	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 21:13:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 224974B1C5;
-	Sun, 21 Nov 2021 16:13:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54BF54B176;
+	Sun, 21 Nov 2021 16:13:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QN+RDAVDqQaX; Sun, 21 Nov 2021 16:13:34 -0500 (EST)
+	with ESMTP id mEfTuv0Vmfcp; Sun, 21 Nov 2021 16:13:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CE2C4B1BF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFB164B1CF;
 	Sun, 21 Nov 2021 16:13:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8512A4B0F5
- for <kvmarm@lists.cs.columbia.edu>; Sat, 20 Nov 2021 11:22:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 663824B134
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 20 Nov 2021 12:02:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UA4zC+bo8qp9 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 20 Nov 2021 11:22:28 -0500 (EST)
+ with ESMTP id xza9phTaASls for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 20 Nov 2021 12:02:44 -0500 (EST)
 Received: from bombadil.infradead.org (bombadil.infradead.org
  [198.137.202.133])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E54EB4B0EF
- for <kvmarm@lists.cs.columbia.edu>; Sat, 20 Nov 2021 11:22:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1506A4B132
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 20 Nov 2021 12:02:44 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
  In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
  Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=1EYRCRfqtCD3pc0bs8CFOKfA8gMeEbdznWcazXSRxE4=; b=HHSZZcj/mPW+ts7Ns2CcEB3KPi
- 3bD5pxPOT7HNsL5yJv8ClRshHmauIQN0oTA+cV12aWlLI4DSgmWf01oUPh7KXXi28s9dOR8+2WeaV
- rwGN5Hknjfg6iqWqIDv3zTR/E0RmjpiiKruJu8VyOarRZlK0w+XMTq6kF0WFyJtMGvnLAdzHSrKZU
- a/IIgre00iHlz2/LvMvOlZxs3XubtXgOBrGyXczhMCfKHPlarrz0iMuY71SopWoq4ae1nmWwThfxT
- slzV7NYPr63ytc5dmvkJCDlmECaEg5KDaAEaVkNmJJ8n/MBtaYNcDufiBjwGorcgsQWH1Svq+YB2Y
- ei1qyb4g==;
+ bh=1djqxICSM9IYACohxCK/TatYXA+vpDHPuX47RR/2pVo=; b=eRJpUrg7QqrPDst2i5G+Wq/wlz
+ oDnChP+5KKyQM5dvW4Psx2kpJ+IIHBXD22EJH7/FdV1g+birlaTtwSPRTSAoln6pYUSEStJH76Z5L
+ CNfuJH70eBaAElTFKmK78NUx6OFzTigk5WNsIlrCCsEe7F4Ueb/QJ+IYTMUHSLRXswY30kqbqHUFp
+ e87JUEut76RykPQ3aa+2l54wTQdHrfpEvwMItb1KtPbEH4vEhw4fFMj5QWPLYYJOWrbZyhNWr/ugd
+ l4VJgcVU05qPR4MXdu1f35AExZ+CnP5WYa1vq3MTCnct9LmZFT65cEtsausZl1XkYkCzqsWxr+gdK
+ VsTsJDeQ==;
 Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625]
  (helo=u3832b3a9db3152.ant.amazon.com)
  by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1moT7N-00ChT2-Py; Sat, 20 Nov 2021 16:21:34 +0000
-Message-ID: <8f434989aebd257a36cafcb414edcc5906c02728.camel@infradead.org>
+ id 1moTkf-00CkGg-Gi; Sat, 20 Nov 2021 17:02:09 +0000
+Message-ID: <df87f7e828f403013f30c2c8d77ea2694b49292e.camel@infradead.org>
 Subject: Re: [PATCH v4 11/11] KVM: x86: First attempt at converting nested
  virtual APIC page to gpc
 From: David Woodhouse <dwmw2@infradead.org>
 To: Mika =?ISO-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>, Paolo
  Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Date: Sat, 20 Nov 2021 16:21:27 +0000
-In-Reply-To: <d87de1ec-8be7-3967-87b2-c8906c1ab1b3@nextfour.com>
+Date: Sat, 20 Nov 2021 17:02:03 +0000
+In-Reply-To: <b806de35-167a-4c7c-f143-cff3ec279491@nextfour.com>
 References: <20211120102810.8858-1-dwmw2@infradead.org>
  <20211120102810.8858-12-dwmw2@infradead.org>
  <d87de1ec-8be7-3967-87b2-c8906c1ab1b3@nextfour.com>
+ <8f434989aebd257a36cafcb414edcc5906c02728.camel@infradead.org>
+ <b806de35-167a-4c7c-f143-cff3ec279491@nextfour.com>
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by
@@ -85,45 +87,66 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4144503709254580685=="
+Content-Type: multipart/mixed; boundary="===============3923323531311398644=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---===============4144503709254580685==
+--===============3923323531311398644==
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-Qez2LLVfBSL1PpQzsble"
+	boundary="=-4SL7/aYUfCZQHkl1DXdk"
 
 
---=-Qez2LLVfBSL1PpQzsble
+--=-4SL7/aYUfCZQHkl1DXdk
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, 2021-11-20 at 17:48 +0200, Mika Penttil=C3=A4 wrote:
-> > @@ -9785,6 +9787,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcp=
-u)
-> >        local_irq_disable();
-> >        vcpu->mode =3D IN_GUEST_MODE;
-> >   =20
-> > +     /*
-> > +      * If the guest requires direct access to mapped L1 pages, check
-> > +      * the caches are valid. Will raise KVM_REQ_GET_NESTED_STATE_PAGE=
-S
-> > +      * to go and revalidate them, if necessary.
-> > +      */
-> > +     if (is_guest_mode(vcpu) && kvm_x86_ops.nested_ops->check_guest_ma=
-ps)
-> > +             kvm_x86_ops.nested_ops->check_guest_maps(vcpu);
+On Sat, 2021-11-20 at 18:30 +0200, Mika Penttil=C3=A4 wrote:
 >=20
-> But KVM_REQ_GET_NESTED_STATE_PAGES is not check until next=20
-> vcpu_enter_guest() entry ?
+> On 20.11.2021 18.21, David Woodhouse wrote:
+> > On Sat, 2021-11-20 at 17:48 +0200, Mika Penttil=C3=A4 wrote:
+> > > > @@ -9785,6 +9787,14 @@ static int vcpu_enter_guest(struct kvm_vcpu =
+*vcpu)
+> > > >         local_irq_disable();
+> > > >         vcpu->mode =3D IN_GUEST_MODE;
+> > > >    =20
+> > > > +     /*
+> > > > +      * If the guest requires direct access to mapped L1 pages, ch=
+eck
+> > > > +      * the caches are valid. Will raise KVM_REQ_GET_NESTED_STATE_=
+PAGES
+> > > > +      * to go and revalidate them, if necessary.
+> > > > +      */
+> > > > +     if (is_guest_mode(vcpu) && kvm_x86_ops.nested_ops->check_gues=
+t_maps)
+> > > > +             kvm_x86_ops.nested_ops->check_guest_maps(vcpu);
+> > >
+> > > But KVM_REQ_GET_NESTED_STATE_PAGES is not check until next
+> > > vcpu_enter_guest() entry ?
+> >
+> > Sure, but that's why this call to ->check_guest_maps() comes just a few
+> > lines *before* the 'if (kvm_cpu_exit_request(vcpu))' that will bounce
+> > us back out so that we go through vcpu_enter_guest() from the start
+> > again?
+>
+> Yes, I had forgotten that...=3D
 
-Sure, but that's why this call to ->check_guest_maps() comes just a few
-lines *before* the 'if (kvm_cpu_exit_request(vcpu))' that will bounce
-us back out so that we go through vcpu_enter_guest() from the start
-again?
+Having said that, I think Paolo was rightly trying to persuade me that
+we don't need the check there at all anyway. Because the *invalidation*
+will raise KVM_REQ_GPC_INVALIDATE, and that's sufficient to bounce us
+out of IN_GUEST_MODE without us having to check the GPC explicitly.
 
---=-Qez2LLVfBSL1PpQzsble
+We do need to ensure that we are up to date with memslots changes, but
+that's a bit simpler, and we have kvm_arch_memslots_changed() waking us
+for that too.
+
+So yeah, with sufficient thought I think we can be entirely event-
+driven instead of having to have an explicit *check* on entry.
+
+
+
+
+--=-4SL7/aYUfCZQHkl1DXdk
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -206,25 +229,25 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MTIwMTYyMTI3WjAvBgkqhkiG9w0BCQQxIgQgkiJdzR6f7QszGtFREtNPO7qlUo5V1OtDs1G5JhdZ
-Ksowgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MTIwMTcwMjAzWjAvBgkqhkiG9w0BCQQxIgQgDqdeOluGL8F7SQA0wK4ljjjYPGRqgR8Bt/078X0J
+K5swgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAI8wklPjYQu1FOYmWbCkBe+hgPR7eLqU2Vl2yHCprHisff7dxe170ahyWoYecbNP
-WqR1rwNTS1uhShcre5tIMxcowyPFFObExnXFdONnM9gkIPlTS611Xu66We3yNSbvdi0T0hvwhK79
-pUZIZHcurPTFKogYwpk6tX54xuae1Egh+UgEu1uZkXmY7xwHD5bOUe8juzMuUb3Zzcr+V7lqMwIe
-p8gOTc7p2o7XHg0BzzSKl4BDaPFWo+vxLPL2PVFiBLsVkry86xqWTHZUiMMkFaRnd/vOZxqZ+SEB
-cX0igjRnk3Av1yxovcB3N3AaGDXx4JIVqCB4ngio4/G1GtLXAZAAAAAAAAA=
+DQEBAQUABIIBAHFCQtRj8bB81RnB2WzhXzi4BdWVU/QAWbWV1GoeN5K4kRYNLMjj/fWtIpHHL+7B
+q/u9Fcn5OJJVWs56zNjQU/3TWT9N8cU8kPL0kjLtikmOWgMuB14M3LqbAgKCMaEwagLGBiRSpL5b
+EgmhBo7jYRsDhvl7YGEKvjdx2+iMKcM9vhGrnRMrzT2562D+/v79wxUzvL3i2sMOQG7+g9aub7wJ
+uWOFAX+p1rY0uEJ3fydLr1c0/HzBmUU717KAgSNkvvhwMoalwyTroYQ7M/pIz9ZIP/21J+Es4N4b
+VRHfRlw/gTrZFBbqmdW1vn8hoSTsgaCY1x4cjYSl03y+/z/xhxkAAAAAAAA=
 
 
---=-Qez2LLVfBSL1PpQzsble--
+--=-4SL7/aYUfCZQHkl1DXdk--
 
 
---===============4144503709254580685==
+--===============3923323531311398644==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -235,5 +258,5 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============4144503709254580685==--
+--===============3923323531311398644==--
 
