@@ -2,48 +2,50 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7D9C433EF
-	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 12:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F72C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 18:46:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA43E4B1CC;
-	Sun, 21 Nov 2021 07:37:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 666814B15E;
+	Sun, 21 Nov 2021 13:46:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id N2Rh3VRs6-Kz; Sun, 21 Nov 2021 07:37:35 -0500 (EST)
+	with ESMTP id MA7CnkzRc03G; Sun, 21 Nov 2021 13:46:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF3114B1AD;
-	Sun, 21 Nov 2021 07:37:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81C454B14D;
+	Sun, 21 Nov 2021 13:46:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C44E84B1A5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:37:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 83A434B13D
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 13:46:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UTMCaJUB82rt for <kvmarm@lists.cs.columbia.edu>;
- Sun, 21 Nov 2021 07:37:33 -0500 (EST)
+ with ESMTP id peqbcfXiWuSG for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 21 Nov 2021 13:46:46 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5342F4B14D
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:37:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9FEC34B139
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 13:46:46 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 72CE460555;
- Sun, 21 Nov 2021 12:37:32 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 59516601FF;
+ Sun, 21 Nov 2021 18:46:45 +0000 (UTC)
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mom66-006sRS-BV; Sun, 21 Nov 2021 12:37:30 +0000
-Date: Sun, 21 Nov 2021 12:37:30 +0000
-Message-ID: <87h7c5sn05.wl-maz@kernel.org>
+ id 1morrO-006vG1-V2; Sun, 21 Nov 2021 18:46:43 +0000
+Date: Sun, 21 Nov 2021 18:46:41 +0000
+Message-ID: <87fsrps5wu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [RFC PATCH v3 04/29] KVM: arm64: Make ID_AA64PFR0_EL1 writable
-In-Reply-To: <20211117064359.2362060-5-reijiw@google.com>
-References: <20211117064359.2362060-1-reijiw@google.com>	<20211117064359.2362060-5-reijiw@google.com>
+Subject: Re: [RFC PATCH v3 21/29] KVM: arm64: Introduce framework to trap
+ disabled features
+In-Reply-To: <20211117064359.2362060-22-reijiw@google.com>
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-22-reijiw@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -77,169 +79,212 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 17 Nov 2021 06:43:34 +0000,
+On Wed, 17 Nov 2021 06:43:51 +0000,
 Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> This patch adds id_reg_info for ID_AA64PFR0_EL1 to make it writable by
-> userspace.
+> When a CPU feature that is supported on the host is not exposed to
+> its guest, emulating a real CPU's behavior (by trapping or disabling
+> guest's using the feature) is generally a desirable behavior (when
+> it's possible without any or little side effect).
 > 
-> The CSV2/CSV3 fields of the register were already writable and values
-> that were written for them affected all vCPUs before. Now they only
-> affect the vCPU.
-> Return an error if userspace tries to set SVE/GIC field of the register
-> to a value that conflicts with SVE/GIC configuration for the guest.
-> SIMD/FP/SVE fields of the requested value are validated according to
-> Arm ARM.
+> Introduce feature_config_ctrl structure, which manages feature
+> information to program configuration register to trap or disable
+> the feature when the feature is not exposed to the guest, and
+> functions that uses the structure to activate trapping the feature.
+> 
+> At present, no feature has feature_config_ctrl yet and the following
+> patches will add the feature_config_ctrl for several features.
 > 
 > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 159 ++++++++++++++++++++++++--------------
->  1 file changed, 103 insertions(+), 56 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 121 +++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 120 insertions(+), 1 deletion(-)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1552cd5581b7..35400869067a 100644
+> index 2f96103fc0d2..501de08dacb7 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -401,6 +401,92 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
->  		id_reg->init(id_reg);
->  }
+> @@ -376,8 +376,38 @@ static int arm64_check_features(u64 check_types, u64 val, u64 lim)
+>  	(cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR1_GPI_SHIFT) >= \
+>  	 ID_AA64ISAR1_GPI_IMP_DEF)
 >  
-> +#define	kvm_has_gic3(kvm)		\
-> +	(irqchip_in_kernel(kvm) &&	\
-> +	 (kvm)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> +enum vcpu_config_reg {
+> +	VCPU_HCR_EL2 = 1,
+> +	VCPU_MDCR_EL2,
+> +	VCPU_CPTR_EL2,
+> +};
 > +
-> +static int validate_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> +				    const struct id_reg_info *id_reg, u64 val)
-> +{
-> +	int fp, simd;
-> +	bool vcpu_has_sve = vcpu_has_sve(vcpu);
-> +	bool pfr0_has_sve = id_aa64pfr0_sve(val);
-> +	int gic;
-> +
-> +	simd = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_ASIMD_SHIFT);
-> +	fp = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_FP_SHIFT);
-> +	if (simd != fp)
-> +		return -EINVAL;
-> +
-> +	/* fp must be supported when sve is supported */
-> +	if (pfr0_has_sve && (fp < 0))
-> +		return -EINVAL;
-> +
-> +	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
-> +	if (vcpu_has_sve ^ pfr0_has_sve)
-> +		return -EPERM;
-> +
-> +	gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
-> +	if ((gic > 0) ^ kvm_has_gic3(vcpu->kvm))
-> +		return -EPERM;
-> +
-> +	return 0;
-> +}
-> +
-> +static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
-> +{
-> +	u64 limit = id_reg->vcpu_limit_val;
-> +	unsigned int gic;
-> +
-> +	limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
-> +	if (!system_supports_sve())
-> +		limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
+> +/*
+> + * Feature information to program configuration register to trap or disable
+> + * guest's using a feature when the feature is not exposed to the guest.
+> + */
+> +struct feature_config_ctrl {
+> +	/* ID register/field for the feature */
+> +	u32	ftr_reg;	/* ID register */
+> +	bool	ftr_signed;	/* Is the feature field signed ? */
+> +	u8	ftr_shift;	/* Field of ID register for the feature */
+> +	s8	ftr_min;	/* Min value that indicate the feature */
 > +
 > +	/*
-> +	 * The default is to expose CSV2 == 1 and CSV3 == 1 if the HW
-> +	 * isn't affected.  Userspace can override this as long as it
-> +	 * doesn't promise the impossible.
+> +	 * Function to check trapping is needed. This is used when the above
+> +	 * fields are not enough to determine if trapping is needed.
 > +	 */
-> +	limit &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2) |
-> +		   ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3));
+> +	bool	(*ftr_need_trap)(struct kvm_vcpu *vcpu);
 > +
-> +	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
-> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), 1);
-> +	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
-> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), 1);
-> +
-> +	gic = cpuid_feature_extract_unsigned_field(limit, ID_AA64PFR0_GIC_SHIFT);
-> +	if (gic > 1) {
-> +		/* Limit to GICv3.0/4.0 */
-> +		limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
-> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
-> +	}
-> +	id_reg->vcpu_limit_val = limit;
-> +}
-> +
-> +static u64 get_reset_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> +				     const struct id_reg_info *idr)
-> +{
-> +	u64 val = idr->vcpu_limit_val;
-> +
-> +	if (!vcpu_has_sve(vcpu))
-> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> +
-> +	if (!kvm_has_gic3(vcpu->kvm))
-> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
+> +	/* Configuration register information to trap the feature. */
+> +	enum vcpu_config_reg cfg_reg;	/* Configuration register */
+> +	u64	cfg_mask;	/* Field of the configuration register */
+> +	u64	cfg_val;	/* Value that are set for the field */
 
-No. As I said in a previous email, this breaks migration, and
-advertising a GICv3 CPU interface doesn't mean it is usable (the guest
-OS must check that it can actually enable ICC_SRE_EL1.SRE -- see what
-the Linux GICv3 driver does for an example).
+Although this probably works for the use cases you have in mind, some
+trap bits are actually working the other way around (clear to trap).
+So you probably want to turn this into cfg_set and add a cfg_clear for
+a good measure, dropping cfg_mask in the process.
 
-> +
-> +	return val;
-> +}
-> +
-> +static struct id_reg_info id_aa64pfr0_el1_info = {
-> +	.sys_reg = SYS_ID_AA64PFR0_EL1,
-> +	.ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
-> +			   S_FCT(ID_AA64PFR0_FP_SHIFT, FCT_LOWER_SAFE),
-> +	.init = init_id_aa64pfr0_el1_info,
-> +	.validate = validate_id_aa64pfr0_el1,
-> +	.get_reset_val = get_reset_id_aa64pfr0_el1,
+That being said, the current trend is to move to FGT, meaning that a
+single register is unlikely to cut it in the long run. I'd rather you
+simply have a configuration function here (and the helper you already
+have is probably enough).
+
 > +};
+> +
+>  struct id_reg_info {
+>  	u32	sys_reg;	/* Register ID */
+> +	u64	sys_val;	/* Sanitized system value */
+>  
+>  	/*
+>  	 * Limit value of the register for a vcpu. The value is the sanitized
+> @@ -410,11 +440,15 @@ struct id_reg_info {
+>  	/* Return the reset value of the register for the vCPU */
+>  	u64 (*get_reset_val)(struct kvm_vcpu *vcpu,
+>  			     const struct id_reg_info *id_reg);
+> +
+> +	/* Information to trap features that are disabled for the guest */
+> +	const struct feature_config_ctrl *(*trap_features)[];
+>  };
+>  
+>  static void id_reg_info_init(struct id_reg_info *id_reg)
+>  {
+> -	id_reg->vcpu_limit_val = read_sanitised_ftr_reg(id_reg->sys_reg);
+> +	id_reg->sys_val = read_sanitised_ftr_reg(id_reg->sys_reg);
+> +	id_reg->vcpu_limit_val = id_reg->sys_val;
+>  	if (id_reg->init)
+>  		id_reg->init(id_reg);
+>  }
+> @@ -952,6 +986,47 @@ static int validate_id_reg(struct kvm_vcpu *vcpu,
+>  	return err;
+>  }
+>  
+> +static void feature_trap_activate(struct kvm_vcpu *vcpu,
+> +				  const struct feature_config_ctrl *config)
+> +{
+> +	u64 *reg_ptr, reg_val;
+> +
+> +	switch (config->cfg_reg) {
+> +	case VCPU_HCR_EL2:
+> +		reg_ptr = &vcpu->arch.hcr_el2;
+> +		break;
+> +	case VCPU_MDCR_EL2:
+> +		reg_ptr = &vcpu->arch.mdcr_el2;
+> +		break;
+> +	case VCPU_CPTR_EL2:
+> +		reg_ptr = &vcpu->arch.cptr_el2;
+> +		break;
+> +	}
+> +
+> +	/* Update cfg_mask fields with cfg_val */
+> +	reg_val = (*reg_ptr & ~config->cfg_mask);
+> +	reg_val |= config->cfg_val;
+> +	*reg_ptr = reg_val;
+> +}
+> +
+> +static inline bool feature_avail(const struct feature_config_ctrl *ctrl,
+> +				 u64 id_val)
+> +{
+> +	int field_val = cpuid_feature_extract_field(id_val,
+> +				ctrl->ftr_shift, ctrl->ftr_signed);
+> +
+> +	return (field_val >= ctrl->ftr_min);
+> +}
+> +
+> +static inline bool vcpu_feature_is_available(struct kvm_vcpu *vcpu,
+> +					const struct feature_config_ctrl *ctrl)
+> +{
+> +	u64 val;
+> +
+> +	val = __read_id_reg(vcpu, ctrl->ftr_reg);
+> +	return feature_avail(ctrl, val);
+> +}
 > +
 >  /*
->   * An ID register that needs special handling to control the value for the
->   * guest must have its own id_reg_info in id_reg_info_table.
-> @@ -409,7 +495,9 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
->   * validation, etc.)
->   */
->  #define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
-> -static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {};
-> +static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
-> +	[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
-> +};
+>   * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
+>   * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
+> @@ -1831,6 +1906,42 @@ static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
+>  static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
+>  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
 >  
->  static int validate_id_reg(struct kvm_vcpu *vcpu,
->  			   const struct sys_reg_desc *rd, u64 val)
-> @@ -1239,20 +1327,22 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
->  	u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
-> +	u64 lim, gic, gic_lim;
-> +	const struct id_reg_info *id_reg;
+> +static void id_reg_features_trap_activate(struct kvm_vcpu *vcpu,
+> +					  const struct id_reg_info *id_reg)
+> +{
+> +	u64 val;
+> +	int i = 0;
+> +	const struct feature_config_ctrl **ctrlp_array, *ctrl;
+> +
+> +	if (!id_reg || !id_reg->trap_features)
+> +		/* No information to trap a feature */
+> +		return;
+> +
+> +	val = __read_id_reg(vcpu, id_reg->sys_reg);
+> +	if (val == id_reg->sys_val)
+> +		/* No feature needs to be trapped (no feature is disabled). */
+> +		return;
+> +
+> +	ctrlp_array = *id_reg->trap_features;
+> +	while ((ctrl = ctrlp_array[i++]) != NULL) {
+> +		if (ctrl->ftr_need_trap && ctrl->ftr_need_trap(vcpu)) {
+> +			feature_trap_activate(vcpu, ctrl);
+> +			continue;
+> +		}
+> +
+> +		if (!feature_avail(ctrl, id_reg->sys_val))
+> +			/* The feature is not supported on the host. */
+> +			continue;
+> +
+> +		if (feature_avail(ctrl, val))
+> +			/* The feature is enabled for the guest. */
+> +			continue;
+> +
+> +		/* The feature is supported but disabled. */
+> +		feature_trap_activate(vcpu, ctrl);
+> +	}
+> +}
+> +
+>  /* Visibility overrides for SVE-specific control registers */
+>  static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+>  				   const struct sys_reg_desc *rd)
+> @@ -3457,6 +3568,14 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+>  	return write_demux_regids(uindices);
+>  }
 >  
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
-> -		if (!vcpu_has_sve(vcpu))
-> -			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2);
-> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3);
-> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
-> -		if (irqchip_in_kernel(vcpu->kvm) &&
-> -		    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> -			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
-> -			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
-> +		gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
-> +		if (kvm_has_gic3(vcpu->kvm) && (gic == 0)) {
-> +			/*
-> +			 * This is a case where userspace configured gic3 after
-> +			 * the vcpu was created, and then it didn't set
-> +			 * ID_AA64PFR0_EL1.
-> +			 */
+> +void kvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
 
-Shouldn't that be done at the point where a GICv3 is created, rather
-than after the fact?
+Who is going to call this? At which point? Please document the use
+constraints on this.
+
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(id_reg_info_table); i++)
+> +		id_reg_features_trap_activate(vcpu, id_reg_info_table[i]);
+> +}
+> +
+>  /* ID register's fractional field information with its feature field. */
+>  struct feature_frac {
+>  	u32	id;
+> -- 
+> 2.34.0.rc1.387.gb447b232ab-goog
+> 
+> 
 
 Thanks,
 
