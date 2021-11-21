@@ -2,54 +2,56 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A7CC4332F
-	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 21:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E04C433EF
+	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 21:13:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1A624B13A;
-	Sun, 21 Nov 2021 16:13:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E436F4B13D;
+	Sun, 21 Nov 2021 16:13:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id N3U43pk+pang; Sun, 21 Nov 2021 16:13:40 -0500 (EST)
+	with ESMTP id Wf-Hq1ju8bHW; Sun, 21 Nov 2021 16:13:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00C104B1DA;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16AC34B1DD;
 	Sun, 21 Nov 2021 16:13:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 822474B1AC
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:55:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41E3C4B1AC
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:55:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VeLWG1SevRSb for <kvmarm@lists.cs.columbia.edu>;
- Sun, 21 Nov 2021 07:55:49 -0500 (EST)
+ with ESMTP id OlpNlgKcNSRr for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 21 Nov 2021 07:55:46 -0500 (EST)
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 34B324B1AF
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:55:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5C624B1AB
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:55:46 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
- Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:
- Content-ID:Content-Description:In-Reply-To:References;
- bh=IgNSXNY2TpIuc5DjPBel8XiPwVYxmuy/OdeenPYbteI=; b=Vu9vRhXy7bRTzRn551qpp2Sl2x
- zCtr/gMJ4DW8RwOHmzxJxzo7vDlzWes4Hqvf8OhYVQvu8TgUnPYAkp+B7dwWJGxd4qa98SoZOYuWV
- 5bhHnd4moc54T+xIGj//+Ct1psMVjPk+Pdg32UPn83uTEm30Y2xWCWDUWG7zzQA8A9jiya3kArabf
- lHB8fd0S9GhuLNI6EX6C0akf58/mnAKpVwdY1c0zqvxOiNqI8W9eVWQtmP2IMzGzdVo5+UUmKjlgh
- pghg+NjWVpziG/dkvqPqodD+6axkmt7LKPKsHXKEoxT0UziAnHuI2HqKcy6sNMq8iwkWYu+xYx/tX
- kWDa6thg==;
+ MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+ Reply-To:Content-Type:Content-ID:Content-Description;
+ bh=IfbXBLcHeWZHq+5A42s+4njkLDBChLSdUtGn+UkVmsE=; b=n06+60Z1Aci9GR34kqZYZjskk5
+ McBYkGtBR4AWAzOTpWOxVShLS7rpDUUIZmnAw4t3lfj+7YJNzhRiYqgjcsKvHpgZ9jSlC2wcfYuaY
+ Srja01PZy8hn3w1iEuB9ZqG7vEwUm4xkzZ/hcM9vfVmSj2vvQkTXBXM/2xxJrdbR/msiDPkARb2Ck
+ EUSBgdTLPh1xb9VvhWPCCK42JQdmoHWbxk+YNcJLfUrh7w3V9NptxoRG59yy6Vas6riSvBeWu707s
+ KFhORRrIF45bKx12gGpdHU2ndGHBjf0L8vefbJwfMdwKIvruLqTZFA1R9980FQX6iQse4vF5j4JTK
+ J06y810g==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
  by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1momMv-00C3xt-Mo; Sun, 21 Nov 2021 12:54:54 +0000
+ id 1momMw-00C3y0-Rq; Sun, 21 Nov 2021 12:54:55 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red
- Hat Linux)) id 1momMv-0002Vv-R2; Sun, 21 Nov 2021 12:54:53 +0000
+ Hat Linux)) id 1momMx-0002Xw-1g; Sun, 21 Nov 2021 12:54:55 +0000
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	kvm <kvm@vger.kernel.org>
-Subject: [PATCH v5 00/12] KVM: x86/xen: Add in-kernel Xen event channel
- delivery
-Date: Sun, 21 Nov 2021 12:54:39 +0000
-Message-Id: <20211121125451.9489-1-dwmw2@infradead.org>
+Subject: [PATCH v5 12/12] KVM: x86: First attempt at converting nested virtual
+ APIC page to gpc
+Date: Sun, 21 Nov 2021 12:54:51 +0000
+Message-Id: <20211121125451.9489-13-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211121125451.9489-1-dwmw2@infradead.org>
+References: <20211121125451.9489-1-dwmw2@infradead.org>
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by
  casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -82,84 +84,245 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SW50cm9kdWNlIHRoZSBiYXNpYyBjb25jZXB0IG9mIDIgbGV2ZWwgZXZlbnQgY2hhbm5lbHMgZm9y
-IGtlcm5lbCBkZWxpdmVyeSwKd2hpY2ggaXMganVzdCBhIHNpbXBsZSBtYXR0ZXIgb2YgYSBmZXcg
-dGVzdF9hbmRfc2V0X2JpdCBjYWxscyBvbiBhIG1hcHBlZApzaGFyZWQgaW5mbyBwYWdlLgoKVGhp
-cyBjYW4gYmUgdXNlZCBmb3Igcm91dGluZyBNU0kgb2YgcGFzc3Rocm91Z2ggZGV2aWNlcyB0byBQ
-SVJRIGV2ZW50CmNoYW5uZWxzIGluIGEgWGVuIGd1ZXN0LCBhbmQgd2UgY2FuIGJ1aWxkIG9uIGl0
-IGZvciBkZWxpdmVyaW5nIElQSXMgYW5kCnRpbWVycyBkaXJlY3RseSBmcm9tIHRoZSBrZXJuZWwg
-dG9vLgoKdjE6IFVzZSBrdm1fbWFwX2dmbigpIGFsdGhvdWdoIEkgZGlkbid0IHF1aXRlIHNlZSBo
-b3cgaXQgd29ya3MuCgp2MjogQXZvaWQga3ZtX21hcF9nZm4oKSBhbmQgaW1wbGVtZW50IGEgc2Fm
-ZSBtYXBwaW5nIHdpdGggaW52YWxpZGF0aW9uCiAgICBzdXBwb3J0IGZvciBteXNlbGYuCgp2Mzog
-UmVpbnZlbnQgZ2ZuX3RvX3Bmbl9jYWNoZSB3aXRoIHNhbmUgaW52YWxpZGF0aW9uIHNlbWFudGlj
-cywgZm9yIG15CiAgICB1c2UgY2FzZSBhcyB3ZWxsIGFzIG5lc3RpbmcuCgp2NDogUmV3b3JrIGRp
-cnR5IGhhbmRsaW5nLCBhcyBpdCBiZWNhbWUgYXBwYXJlbnRseSB0aGF0IHdlIG5lZWQgYW4gYWN0
-aXZlCiAgICB2Q1BVIGNvbnRleHQgdG8gbWFyayBwYWdlcyBkaXJ0eSBzbyBpdCBjYW4ndCBiZSBk
-b25lIGZyb20gdGhlIE1NVQogICAgbm90aWZpZXIgZHVpbmcgdGhlIGludmFsaWRhdGlvbjsgaXQg
-aGFzIHRvIGhhcHBlbiBvbiB1bm1hcC4KCnY1OiBGaXggc3BhcnNlIHdhcm5pbmdzIHJlcG9ydGVk
-IGJ5IGtlcm5lbCB0ZXN0IHJvYm90IDxsa3BAaW50ZWwuY29tPi4KCiAgICBGaXggcmV2YWxpZGF0
-aW9uIHdoZW4gbWVtc2xvdHMgY2hhbmdlIGJ1dCB0aGUgcmVzdWx0aW5nIEhWQSBzdGF5cwogICAg
-dGhlIHNhbWUuIFdlIGNhbiB1c2UgdGhlIHNhbWUga2VybmVsIG1hcHBpbmcgaW4gdGhhdCBjYXNl
-LCBpZiB0aGUKICAgIEhWQSDihpIgUEZOIHRyYW5zbGF0aW9uIHdhcyB2YWxpZCBiZWZvcmUuIFNv
-IHRoYXQgcHJvYmFibHkgbWVhbnMgd2UKICAgIHNob3VsZG4ndCB1bm1hcCB0aGUgIm9sZF9odmEi
-LiBBdWdtZW50IHRoZSB0ZXN0IGNhc2UgdG8gZXhlcmNpc2UKICAgIHRoYXQgb25lIHRvby4KCiAg
-ICBJbmNsdWRlIHRoZSBmaXggZm9yIHRoZSBkaXJ0eSByaW5nIHZzLiBYZW4gc2hpbmZvIG9vcHMg
-cmVwb3J0ZWQKICAgIGJ5IGJ1dHQzcmZseWg0Y2sgPGJ1dHRlcmZseWh1YW5neHhAZ21haWwuY29t
-Pi4KCgpBcyBpbiB0aGUgcHJldmlvdXMgdHdvIHJvdW5kcywgdGhlIGxhc3QgcGF0Y2ggKHRoaXMg
-dGltZSBwYXRjaCAxMikgaXMKaW5jbHVkZWQgYXMgaWxsdXN0cmF0aW9uIG9mIGhvdyB3ZSAqbWln
-aHQqIHVzZSB0aGlzIGZvciBmaXhpbmcgdGhlIFVBRgpidWdzIGluIG5lc3RpbmcsIGJ1dCBpc24n
-dCBpbnRlbmRlZCB0byBiZSBhcHBsaWVkIGFzLWlzLiBQYXRjaGVzIDEtMTEgYXJlLgoKCgpEYXZp
-ZCBXb29kaG91c2UgKDEyKToKICAgICAgS1ZNOiBJbnRyb2R1Y2UgQ09ORklHX0hBVkVfS1ZNX0RJ
-UlRZX1JJTkcKICAgICAgS1ZNOiBBZGQgTWFrZWZpbGUua3ZtIGZvciBjb21tb24gZmlsZXMsIHVz
-ZSBpdCBmb3IgeDg2CiAgICAgIEtWTTogczM5MDogVXNlIE1ha2VmaWxlLmt2bSBmb3IgY29tbW9u
-IGZpbGVzCiAgICAgIEtWTTogbWlwczogVXNlIE1ha2VmaWxlLmt2bSBmb3IgY29tbW9uIGZpbGVz
-CiAgICAgIEtWTTogUklTQy1WOiBVc2UgTWFrZWZpbGUua3ZtIGZvciBjb21tb24gZmlsZXMKICAg
-ICAgS1ZNOiBwb3dlcnBjOiBVc2UgTWFrZWZpbGUua3ZtIGZvciBjb21tb24gZmlsZXMKICAgICAg
-S1ZNOiBhcm02NDogVXNlIE1ha2VmaWxlLmt2bSBmb3IgY29tbW9uIGZpbGVzCiAgICAgIEtWTTog
-UmVpbnN0YXRlIGdmbl90b19wZm5fY2FjaGUgd2l0aCBpbnZhbGlkYXRpb24gc3VwcG9ydAogICAg
-ICBLVk06IHg4Ni94ZW46IE1haW50YWluIHZhbGlkIG1hcHBpbmcgb2YgWGVuIHNoYXJlZF9pbmZv
-IHBhZ2UKICAgICAgS1ZNOiB4ODYveGVuOiBBZGQgS1ZNX0lSUV9ST1VUSU5HX1hFTl9FVlRDSE4g
-YW5kIGV2ZW50IGNoYW5uZWwgZGVsaXZlcnkKICAgICAgS1ZNOiB4ODY6IEZpeCB3YWxsIGNsb2Nr
-IHdyaXRlcyBpbiBYZW4gc2hhcmVkX2luZm8gbm90IHRvIG1hcmsgcGFnZSBkaXJ0eQogICAgICBL
-Vk06IHg4NjogRmlyc3QgYXR0ZW1wdCBhdCBjb252ZXJ0aW5nIG5lc3RlZCB2aXJ0dWFsIEFQSUMg
-cGFnZSB0byBncGMKCiBEb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QgICAgICAgICAgICAg
-ICAgICAgICB8ICAzMyArKwogYXJjaC9hcm02NC9rdm0vTWFrZWZpbGUgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgfCAgIDYgKy0KIGFyY2gvbWlwcy9rdm0vTWFrZWZpbGUgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHwgICAzICstCiBhcmNoL3Bvd2VycGMva3ZtL01ha2VmaWxlICAgICAg
-ICAgICAgICAgICAgICAgICAgICB8ICAgNiArLQogYXJjaC9yaXNjdi9rdm0vTWFrZWZpbGUgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDYgKy0KIGFyY2gvczM5MC9rdm0vTWFrZWZpbGUg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgICA2ICstCiBhcmNoL3g4Ni9pbmNsdWRlL2Fz
-bS9rdm1faG9zdC5oICAgICAgICAgICAgICAgICAgICB8ICAgNCArLQogYXJjaC94ODYva3ZtL0tj
-b25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDIgKwogYXJjaC94ODYva3Zt
-L01ha2VmaWxlICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgIDcgKy0KIGFyY2gveDg2
-L2t2bS9pcnFfY29tbS5jICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEyICsKIGFyY2gv
-eDg2L2t2bS92bXgvbmVzdGVkLmMgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDUwICsrLQog
-YXJjaC94ODYva3ZtL3ZteC92bXguYyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTIg
-Ky0KIGFyY2gveDg2L2t2bS92bXgvdm14LmggICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwg
-ICAyICstCiBhcmNoL3g4Ni9rdm0veDg2LmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICB8ICAxNSArLQogYXJjaC94ODYva3ZtL3g4Ni5oICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgfCAgIDEgLQogYXJjaC94ODYva3ZtL3hlbi5jICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgfCAzNDEgKysrKysrKysrKysrKysrKysrKy0tCiBhcmNoL3g4Ni9rdm0veGVuLmgg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgOSArCiBpbmNsdWRlL2xpbnV4L2t2
-bV9kaXJ0eV9yaW5nLmggICAgICAgICAgICAgICAgICAgICB8ICAgOCArLQogaW5jbHVkZS9saW51
-eC9rdm1faG9zdC5oICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAxMTAgKysrKysrKwogaW5j
-bHVkZS9saW51eC9rdm1fdHlwZXMuaCAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMTggKysK
-IGluY2x1ZGUvdWFwaS9saW51eC9rdm0uaCAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDEx
-ICsKIC4uLi90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0veDg2XzY0L3hlbl9zaGluZm9fdGVzdC5jIHwg
-MTg0ICsrKysrKysrKystCiB2aXJ0L2t2bS9LY29uZmlnICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICB8ICAgNiArCiB2aXJ0L2t2bS9NYWtlZmlsZS5rdm0gICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICB8ICAxNCArCiB2aXJ0L2t2bS9kaXJ0eV9yaW5nLmMgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICB8ICAgMiArLQogdmlydC9rdm0va3ZtX21haW4uYyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAgMTYgKy0KIHZpcnQva3ZtL2t2bV9tbS5oICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHwgIDQ0ICsrKwogdmlydC9rdm0vbW11X2xvY2suaCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCAgMjMgLS0KIHZpcnQva3ZtL3BmbmNhY2hl
-LmMgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMzIzICsrKysrKysrKysrKysrKysr
-KysKIDI5IGZpbGVzIGNoYW5nZWQsIDExNzMgaW5zZXJ0aW9ucygrKSwgMTAxIGRlbGV0aW9ucygt
-KQoKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFy
-bSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3Rz
-LmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+From: David Woodhouse <dwmw@amazon.co.uk>
+
+This is what evolved during the discussion at
+https://lore.kernel.org/kvm/960E233F-EC0B-4FB5-BA2E-C8D2CCB38B12@infradead.org/T/#m11d75fcfe2da357ec1dabba0d0e3abb91fd13665
+
+As discussed, an alternative approach might be to augment
+kvm_arch_memslots_updated() to raise KVM_REQ_GET_NESTED_STATE_PAGES to
+each vCPU (and make that req only do anything on a given vCPU if that
+vCPU is actually in L2 guest mode).
+
+That would mean the reload gets actively triggered even on memslot
+changes rather than only on MMU notifiers as is the case now. It could
+*potentially* mean we can drop the new 'check_guest_maps' function.
+
+The 'check_guest_maps' function could be a lot simpler than it is,
+though. It only really needs to get kvm->memslots->generation, then
+check each gpc->generation against that, and each gpc->valid.
+
+Also I suspect we *shouldn't* destroy the virtual_apic_cache in
+nested_vmx_vmexit(). We can just leave it there for next time the
+vCPU enters guest mode. If it happens to get invalidated in the
+meantime, that's fine and we'll refresh it on the way back in.
+We probably *would* want to actively do something on memslot changes
+in that case though, to ensure that even if the vCPU isn't in guest
+mode any more, we *release* the cached page.
+
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/vmx/nested.c       | 50 ++++++++++++++++++++++++++++-----
+ arch/x86/kvm/vmx/vmx.c          | 12 +++++---
+ arch/x86/kvm/vmx/vmx.h          |  2 +-
+ arch/x86/kvm/x86.c              | 10 +++++++
+ 5 files changed, 63 insertions(+), 12 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6ea2446ab851..24f6f3e2de47 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1511,6 +1511,7 @@ struct kvm_x86_nested_ops {
+ 	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
+ 			    uint16_t *vmcs_version);
+ 	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
++	void (*check_guest_maps)(struct kvm_vcpu *vcpu);
+ };
+ 
+ struct kvm_x86_init_ops {
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 1e2f66951566..01bfabcfbbce 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -309,7 +309,7 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 		kvm_release_page_clean(vmx->nested.apic_access_page);
+ 		vmx->nested.apic_access_page = NULL;
+ 	}
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
++	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vmx->nested.virtual_apic_cache);
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+ 	vmx->nested.pi_desc = NULL;
+ 
+@@ -3179,10 +3179,12 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
+-		map = &vmx->nested.virtual_apic_map;
++		struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
+ 
+-		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->virtual_apic_page_addr), map)) {
+-			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(map->pfn));
++ 		if (!kvm_gfn_to_pfn_cache_init(vcpu->kvm, gpc, vcpu, true, true,
++					       vmcs12->virtual_apic_page_addr,
++					       PAGE_SIZE, true)) {
++			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(gpc->pfn));
+ 		} else if (nested_cpu_has(vmcs12, CPU_BASED_CR8_LOAD_EXITING) &&
+ 		           nested_cpu_has(vmcs12, CPU_BASED_CR8_STORE_EXITING) &&
+ 			   !nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
+@@ -3207,6 +3209,9 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 	if (nested_cpu_has_posted_intr(vmcs12)) {
+ 		map = &vmx->nested.pi_desc_map;
+ 
++		if (kvm_vcpu_mapped(map))
++			kvm_vcpu_unmap(vcpu, map, true);
++
+ 		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->posted_intr_desc_addr), map)) {
+ 			vmx->nested.pi_desc =
+ 				(struct pi_desc *)(((void *)map->hva) +
+@@ -3251,6 +3256,29 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ 	return true;
+ }
+ 
++static void nested_vmx_check_guest_maps(struct kvm_vcpu *vcpu)
++{
++	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	struct gfn_to_pfn_cache *gpc;
++
++	int valid;
++
++	if (nested_cpu_has_posted_intr(vmcs12)) {
++		gpc = &vmx->nested.virtual_apic_cache;
++
++		read_lock(&gpc->lock);
++		valid = kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc,
++						   vmcs12->virtual_apic_page_addr,
++						   PAGE_SIZE);
++		read_unlock(&gpc->lock);
++		if (!valid) {
++			kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
++			return;
++		}
++	}
++}
++
+ static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
+ {
+ 	struct vmcs12 *vmcs12;
+@@ -3749,9 +3777,15 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+ 
+ 	max_irr = find_last_bit((unsigned long *)vmx->nested.pi_desc->pir, 256);
+ 	if (max_irr != 256) {
+-		vapic_page = vmx->nested.virtual_apic_map.hva;
+-		if (!vapic_page)
++		struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
++
++		read_lock(&gpc->lock);
++		if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE)) {
++			read_unlock(&gpc->lock);
+ 			goto mmio_needed;
++		}
++
++		vapic_page = gpc->khva;
+ 
+ 		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
+ 			vapic_page, &max_irr);
+@@ -3761,6 +3795,7 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+ 			status |= (u8)max_irr;
+ 			vmcs_write16(GUEST_INTR_STATUS, status);
+ 		}
++		read_unlock(&gpc->lock);
+ 	}
+ 
+ 	nested_mark_vmcs12_pages_dirty(vcpu);
+@@ -4581,7 +4616,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
+ 		kvm_release_page_clean(vmx->nested.apic_access_page);
+ 		vmx->nested.apic_access_page = NULL;
+ 	}
+-	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
++	kvm_gfn_to_pfn_cache_unmap(vcpu->kvm, &vmx->nested.virtual_apic_cache);
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
+ 	vmx->nested.pi_desc = NULL;
+ 
+@@ -6756,4 +6791,5 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
+ 	.write_log_dirty = nested_vmx_write_pml_buffer,
+ 	.enable_evmcs = nested_enable_evmcs,
+ 	.get_evmcs_version = nested_get_evmcs_version,
++	.check_guest_maps = nested_vmx_check_guest_maps,
+ };
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index ba66c171d951..6c61faef86d3 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3839,19 +3839,23 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
+ static bool vmx_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	void *vapic_page;
++	struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
+ 	u32 vppr;
+ 	int rvi;
+ 
+ 	if (WARN_ON_ONCE(!is_guest_mode(vcpu)) ||
+ 		!nested_cpu_has_vid(get_vmcs12(vcpu)) ||
+-		WARN_ON_ONCE(!vmx->nested.virtual_apic_map.gfn))
++		WARN_ON_ONCE(gpc->gpa == GPA_INVALID))
+ 		return false;
+ 
+ 	rvi = vmx_get_rvi();
+ 
+-	vapic_page = vmx->nested.virtual_apic_map.hva;
+-	vppr = *((u32 *)(vapic_page + APIC_PROCPRI));
++	read_lock(&gpc->lock);
++	if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE))
++		vppr = *((u32 *)(gpc->khva + APIC_PROCPRI));
++	else
++		vppr = 0xff;
++	read_unlock(&gpc->lock);
+ 
+ 	return ((rvi & 0xf0) > (vppr & 0xf0));
+ }
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 4df2ac24ffc1..8364e7fc92a0 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -195,7 +195,7 @@ struct nested_vmx {
+ 	 * pointers, so we must keep them pinned while L2 runs.
+ 	 */
+ 	struct page *apic_access_page;
+-	struct kvm_host_map virtual_apic_map;
++	struct gfn_to_pfn_cache virtual_apic_cache;
+ 	struct kvm_host_map pi_desc_map;
+ 
+ 	struct kvm_host_map msr_bitmap_map;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 6cb022d0afab..d8f1d2169b45 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9739,6 +9739,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 
+ 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
+ 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
++		if (kvm_check_request(KVM_REQ_GPC_INVALIDATE, vcpu))
++			; /* Nothing to do. It just wanted to wake us */
+ 	}
+ 
+ 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
+@@ -9785,6 +9787,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	local_irq_disable();
+ 	vcpu->mode = IN_GUEST_MODE;
+ 
++	/*
++	 * If the guest requires direct access to mapped L1 pages, check
++	 * the caches are valid. Will raise KVM_REQ_GET_NESTED_STATE_PAGES
++	 * to go and revalidate them, if necessary.
++	 */
++	if (is_guest_mode(vcpu) && kvm_x86_ops.nested_ops->check_guest_maps)
++		kvm_x86_ops.nested_ops->check_guest_maps(vcpu);
++
+ 	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+ 
+ 	/*
+-- 
+2.31.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
