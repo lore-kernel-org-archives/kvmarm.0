@@ -2,49 +2,50 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B77C433EF
-	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 19:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7827C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 19:35:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 242E54083E;
-	Sun, 21 Nov 2021 14:11:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 33F8F4B0CE;
+	Sun, 21 Nov 2021 14:35:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OE-Of20KIuAK; Sun, 21 Nov 2021 14:11:35 -0500 (EST)
+	with ESMTP id 7F71xBebwfjW; Sun, 21 Nov 2021 14:35:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C222F4A7FD;
-	Sun, 21 Nov 2021 14:11:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C5624B0DB;
+	Sun, 21 Nov 2021 14:35:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A33DD4083E
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 14:11:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B64834B0CE
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 14:35:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jFFI6H6acYSI for <kvmarm@lists.cs.columbia.edu>;
- Sun, 21 Nov 2021 14:11:33 -0500 (EST)
+ with ESMTP id u0I2Ejmd+UBm for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 21 Nov 2021 14:35:16 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEB3C4079A
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 14:11:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D952407F1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 14:35:16 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C688560698;
- Sun, 21 Nov 2021 19:11:31 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 7DDD2600CC;
+ Sun, 21 Nov 2021 19:35:15 +0000 (UTC)
 Received: from 82-132-235-208.dab.02.net ([82.132.235.208]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mosFN-006vRk-HW; Sun, 21 Nov 2021 19:11:29 +0000
-Date: Sun, 21 Nov 2021 19:11:30 +0000
-Message-ID: <87czmts4rh.wl-maz@kernel.org>
+ id 1moscK-006vZC-SX; Sun, 21 Nov 2021 19:35:13 +0000
+Date: Sun, 21 Nov 2021 19:35:13 +0000
+Message-ID: <87bl2ds3ny.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU attribute
-In-Reply-To: <20211115165041.194884-4-alexandru.elisei@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: Refuse to run VCPU if the PMU doesn't
+ match the physical CPU
+In-Reply-To: <20211115165041.194884-5-alexandru.elisei@arm.com>
 References: <20211115165041.194884-1-alexandru.elisei@arm.com>
- <20211115165041.194884-4-alexandru.elisei@arm.com>
+ <20211115165041.194884-5-alexandru.elisei@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -75,138 +76,153 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 15 Nov 2021 16:50:40 +0000,
+On Mon, 15 Nov 2021 16:50:41 +0000,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> When KVM creates an event and there are more than one PMUs present on the
-> system, perf_init_event() will go through the list of available PMUs and
-> will choose the first one that can create the event. The order of the PMUs
-> in the PMU list depends on the probe order, which can change under various
-> circumstances, for example if the order of the PMU nodes change in the DTB
-> or if asynchronous driver probing is enabled on the kernel command line
-> (with the driver_async_probe=armv8-pmu option).
+> Userspace can assign a PMU to a VCPU with the KVM_ARM_VCPU_PMU_V3_SET_PMU
+> device ioctl. If the VCPU is scheduled on a physical CPU which has a
+> different PMU, the perf events needed to emulate a guest PMU won't be
+> scheduled in and the guest performance counters will stop counting. Treat
+> it as an userspace error and refuse to run the VCPU in this situation.
 > 
-> Another consequence of this approach is that, on heteregeneous systems,
-> all virtual machines that KVM creates will use the same PMU. This might
-> cause unexpected behaviour for userspace: when a VCPU is executing on
-> the physical CPU that uses this PMU, PMU events in the guest work
-> correctly; but when the same VCPU executes on another CPU, PMU events in
-> the guest will suddenly stop counting.
-> 
-> Fortunately, perf core allows user to specify on which PMU to create an
-> event by using the perf_event_attr->type field, which is used by
-> perf_init_event() as an index in the radix tree of available PMUs.
-> 
-> Add the KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU
-> attribute to allow userspace to specify the arm_pmu that KVM will use when
-> creating events for that VCPU. KVM will make no attempt to run the VCPU on
-> the physical CPUs that share this PMU, leaving it up to userspace to
-> manage the VCPU threads' affinity accordingly.
-> 
+> The VCPU is flagged as being scheduled on the wrong CPU in vcpu_load(), but
+> the flag is cleared when the KVM_RUN enters the non-preemptible section
+> instead of in vcpu_put(); this has been done on purpose so the error
+> condition is communicated as soon as possible to userspace, otherwise
+> vcpu_load() on the wrong CPU followed by a vcpu_put() could clear the flag.
+
+Can we make this something orthogonal to the PMU, and get userspace to
+pick an affinity mask independently of instantiating a PMU? I can
+imagine this would also be useful for SPE on asymmetric systems.
+
+> Suggested-by: Marc Zyngier <maz@kernel.org>
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  Documentation/virt/kvm/devices/vcpu.rst | 25 ++++++++++++++++++++
->  arch/arm64/include/uapi/asm/kvm.h       |  1 +
->  arch/arm64/kvm/pmu-emul.c               | 31 +++++++++++++++++++++++--
->  include/kvm/arm_pmu.h                   |  1 +
->  tools/arch/arm64/include/uapi/asm/kvm.h |  1 +
->  5 files changed, 57 insertions(+), 2 deletions(-)
+>  Documentation/virt/kvm/api.rst          |  5 +++--
+>  Documentation/virt/kvm/devices/vcpu.rst |  3 ++-
+>  arch/arm64/include/asm/kvm_host.h       |  3 +++
+>  arch/arm64/kvm/arm.c                    | 15 +++++++++++++++
+>  arch/arm64/kvm/pmu-emul.c               |  1 +
+>  5 files changed, 24 insertions(+), 3 deletions(-)
 > 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index aeeb071c7688..5bbad8318ea5 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -396,8 +396,9 @@ Errors:
+>  
+>    =======    ==============================================================
+>    EINTR      an unmasked signal is pending
+> -  ENOEXEC    the vcpu hasn't been initialized or the guest tried to execute
+> -             instructions from device memory (arm64)
+> +  ENOEXEC    the vcpu hasn't been initialized, the guest tried to execute
+> +             instructions from device memory (arm64) or the vcpu PMU is
+> +             different from the physical cpu PMU (arm64).
+>    ENOSYS     data abort outside memslots with no syndrome info and
+>               KVM_CAP_ARM_NISV_TO_USER not enabled (arm64)
+>    EPERM      SVE feature set but not finalized (arm64)
 > diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index 60a29972d3f1..59ac382af59a 100644
+> index 59ac382af59a..ca0da34da889 100644
 > --- a/Documentation/virt/kvm/devices/vcpu.rst
 > +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -104,6 +104,31 @@ hardware event. Filtering event 0x1E (CHAIN) has no effect either, as it
->  isn't strictly speaking an event. Filtering the cycle counter is possible
->  using event 0x11 (CPU_CYCLES).
+> @@ -128,7 +128,8 @@ systems where there are at least two PMUs on the system.
 >  
-> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_SET_PMU
-> +------------------------------------------
-> +
-> +:Parameters: in kvm_device_attr.addr the address to an int representing the PMU
-> +             identifier.
-> +
-> +:Returns:
-> +
-> +	 =======  ===============================================
-> +	 -EBUSY   PMUv3 already initialized
-> +	 -EFAULT  Error accessing the PMU identifier
-> +	 -EINVAL  PMU not found or PMU name longer than PAGE_SIZE
-> +	 -ENODEV  PMUv3 not supported or GIC not initialized
-> +	 -ENOMEM  Could not allocate memory
-> +	 =======  ===============================================
-> +
-> +Request that the VCPU uses the specified hardware PMU when creating guest events
-> +for the purpose of PMU emulation. The PMU identifier can be read from the "type"
-> +file for the desired PMU instance under /sys/devices (or, equivalent,
-> +/sys/bus/even_source). This attribute is particularly useful on heterogeneous
-> +systems where there are at least two PMUs on the system.
-
-nit: CPU PMUs. A number of systems have 'uncore' PMUs which KVM
-totally ignores.
-
-> +
-> +Note that KVM will not make any attempts to run the VCPU on the physical CPUs
-> +associated with the PMU specified by this attribute. This is entirely left to
-> +userspace.
+>  Note that KVM will not make any attempts to run the VCPU on the physical CPUs
+>  associated with the PMU specified by this attribute. This is entirely left to
+> -userspace.
+> +userspace. However, if the VCPU is scheduled on a CPU which has a different PMU,
+> +then KVM_RUN will return with the error code ENOEXEC.
 >  
 >  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
 >  =================================
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index b3edde68bc3e..1d0a0a2a9711 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -362,6 +362,7 @@ struct kvm_arm_copy_mte_tags {
->  #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
->  #define   KVM_ARM_VCPU_PMU_V3_INIT	1
->  #define   KVM_ARM_VCPU_PMU_V3_FILTER	2
-> +#define   KVM_ARM_VCPU_PMU_V3_SET_PMU	3
->  #define KVM_ARM_VCPU_TIMER_CTRL		1
->  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
->  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index dab335d17409..53cedeb5dbf6 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -602,6 +602,7 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
->  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  {
->  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct arm_pmu *arm_pmu = pmu->arm_pmu;
->  	struct kvm_pmc *pmc;
->  	struct perf_event *event;
->  	struct perf_event_attr attr;
-> @@ -637,8 +638,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  		return;
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2a5f7f38006f..ae2083b41d8a 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -385,6 +385,9 @@ struct kvm_vcpu_arch {
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
+> +
+> +	cpumask_var_t supported_cpus;
+> +	bool cpu_not_supported;
+
+Can this just be made a vcpu flag instead?
+
+>  };
 >  
->  	memset(&attr, 0, sizeof(struct perf_event_attr));
-> -	attr.type = PERF_TYPE_RAW;
-> -	attr.size = sizeof(attr);
-> +	attr.type = arm_pmu ? arm_pmu->pmu.type : PERF_TYPE_RAW;
->  	attr.pinned = 1;
->  	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, pmc->idx);
->  	attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
-> @@ -941,6 +941,23 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
->  	return true;
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 2f03cbfefe67..5dbfd18c4e37 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -320,6 +320,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  
+>  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>  
+> +	if (!zalloc_cpumask_var(&vcpu->arch.supported_cpus, GFP_KERNEL))
+> +		return -ENOMEM;
+> +
+>  	/* Set up the timer */
+>  	kvm_timer_vcpu_init(vcpu);
+>  
+> @@ -347,6 +350,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
+>  		static_branch_dec(&userspace_irqchip_in_use);
+>  
+> +	free_cpumask_var(vcpu->arch.supported_cpus);
+>  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+>  	kvm_timer_vcpu_terminate(vcpu);
+>  	kvm_pmu_vcpu_destroy(vcpu);
+> @@ -425,6 +429,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	if (vcpu_has_ptrauth(vcpu))
+>  		vcpu_ptrauth_disable(vcpu);
+>  	kvm_arch_vcpu_load_debug_state_flags(vcpu);
+> +
+> +	if (!cpumask_empty(vcpu->arch.supported_cpus) &&
+
+How about initialising the cpumask to cpu_possible_mask, avoiding the
+cpumask_empty check?
+
+> +	    !cpumask_test_cpu(smp_processor_id(), vcpu->arch.supported_cpus))
+> +		vcpu->arch.cpu_not_supported = true;
+
+I have the feeling this would actually better be implemented as a
+request, but there may be some surgery required for this.
+
 >  }
 >  
-> +static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
-> +{
-> +	struct kvm_pmu *kvm_pmu = &vcpu->arch.pmu;
-> +	struct arm_pmu_entry *entry;
-> +	struct arm_pmu *arm_pmu;
-> +
-> +	list_for_each_entry(entry, &arm_pmus, entry) {
-> +		arm_pmu = entry->arm_pmu;
-> +		if (arm_pmu->pmu.type == pmu_id) {
-> +			kvm_pmu->arm_pmu = arm_pmu;
-> +			return 0;
-> +		}
-> +	}
+>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> @@ -815,6 +823,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		 */
+>  		preempt_disable();
+>  
+> +		if (unlikely(vcpu->arch.cpu_not_supported)) {
+> +			vcpu->arch.cpu_not_supported = false;
+> +			ret = -ENOEXEC;
+> +			preempt_enable();
 
-How does this work when a new CPU gets hotplugged on, bringing a new
-PMU type along? It doesn't seem safe to parse this list without any
-locking.
+How about populating run->fail_entry with some information? I bet this
+would be useful, if only as a debugging tool.
+
+> +			continue;
+> +		}
+> +
+>  		kvm_pmu_flush_hwstate(vcpu);
+>  
+>  		local_irq_disable();
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 53cedeb5dbf6..957a6d0cfa56 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -951,6 +951,7 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+>  		arm_pmu = entry->arm_pmu;
+>  		if (arm_pmu->pmu.type == pmu_id) {
+>  			kvm_pmu->arm_pmu = arm_pmu;
+> +			cpumask_copy(vcpu->arch.supported_cpus, &arm_pmu->supported_cpus);
+>  			return 0;
+>  		}
+>  	}
 
 Thanks,
 
