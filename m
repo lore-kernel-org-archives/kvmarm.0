@@ -2,48 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D579C433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 12:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7768C433EF
+	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 12:37:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4F6A4B187;
-	Sun, 21 Nov 2021 07:36:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 483A04B13A;
+	Sun, 21 Nov 2021 07:37:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fk6CI2XAnHhO; Sun, 21 Nov 2021 07:36:52 -0500 (EST)
+	with ESMTP id qhquADVBboiJ; Sun, 21 Nov 2021 07:37:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C1FD4A49C;
-	Sun, 21 Nov 2021 07:36:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 631A74B14D;
+	Sun, 21 Nov 2021 07:37:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 200FD4064F
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:36:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EE0E4064F
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:37:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KrXHMUV-KDfh for <kvmarm@lists.cs.columbia.edu>;
- Sun, 21 Nov 2021 07:36:48 -0500 (EST)
+ with ESMTP id b4e2kekHrUln for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 21 Nov 2021 07:37:02 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71F1740630
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:36:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E2634B13A
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:37:02 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 3F97A60E54;
- Sun, 21 Nov 2021 12:36:47 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 5894660555;
+ Sun, 21 Nov 2021 12:37:01 +0000 (UTC)
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mom5N-006sPV-0P; Sun, 21 Nov 2021 12:36:45 +0000
-Date: Sun, 21 Nov 2021 12:36:38 +0000
-Message-ID: <87mtlxsn1l.wl-maz@kernel.org>
+ id 1mom5b-006sPz-6Z; Sun, 21 Nov 2021 12:36:59 +0000
+Date: Sun, 21 Nov 2021 12:36:58 +0000
+Message-ID: <87lf1hsn11.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [RFC PATCH v3 01/29] KVM: arm64: Add has_reset_once flag for vcpu
-In-Reply-To: <20211117064359.2362060-2-reijiw@google.com>
-References: <20211117064359.2362060-1-reijiw@google.com>	<20211117064359.2362060-2-reijiw@google.com>
+Subject: Re: [RFC PATCH v3 02/29] KVM: arm64: Save ID registers' sanitized
+ value per vCPU
+In-Reply-To: <20211117064359.2362060-3-reijiw@google.com>
+References: <20211117064359.2362060-1-reijiw@google.com>	<20211117064359.2362060-3-reijiw@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -77,36 +78,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 17 Nov 2021 06:43:31 +0000,
+On Wed, 17 Nov 2021 06:43:32 +0000,
 Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> Introduce 'has_reset_once' flag in kvm_vcpu_arch, which indicates
-> if the vCPU reset has been done once, for later use.
-
-It would be nice if you could at least hint at what this flag is going
-to be used for, as being able to reset a vcpu as often as userspace
-wants it is part of the KVM ABI.
-
+> Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
+> registers' sanitized value in the array for the vCPU at the first
+> vCPU reset. Use the saved ones when ID registers are read by
+> userspace (via KVM_GET_ONE_REG) or the guest.
 > 
 > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> Reviewed-by: Oliver Upton <oupton@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 2 ++
->  arch/arm64/kvm/reset.c            | 4 ++++
->  2 files changed, 6 insertions(+)
+>  arch/arm64/include/asm/kvm_host.h | 10 +++++++
+>  arch/arm64/kvm/sys_regs.c         | 43 +++++++++++++++++++------------
+>  2 files changed, 37 insertions(+), 16 deletions(-)
 > 
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2a5f7f38006f..edbe2cb21947 100644
+> index edbe2cb21947..72db73c79403 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -385,6 +385,7 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +	bool has_reset_once;
+> @@ -146,6 +146,14 @@ struct kvm_vcpu_fault_info {
+>  	u64 disr_el1;		/* Deferred [SError] Status Register */
+>  };
+>  
+> +/*
+> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> + * where 0<=crm<8, 0<=op2<8.
+> + */
+> +#define KVM_ARM_ID_REG_MAX_NUM 64
+> +#define IDREG_IDX(id)		((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> +#define IDREG_SYS_IDX(id)	(ID_REG_BASE + IDREG_IDX(id))
+> +
+>  enum vcpu_sysreg {
+>  	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+>  	MPIDR_EL1,	/* MultiProcessor Affinity Register */
+> @@ -210,6 +218,8 @@ enum vcpu_sysreg {
+>  	CNTP_CVAL_EL0,
+>  	CNTP_CTL_EL0,
+>  
+> +	ID_REG_BASE,
+> +	ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
 
-Why can't this be a new flag (part of the vcpu->arch.flags set) rather
-than a discrete bool?
+It is rather unclear to me why we want these registers to be
+replicated on a per-CPU basis. Yes, this fits the architecture, but
+that's also a total waste of memory if you have more than a single
+CPU, because we make a point in only exposing homogeneous properties
+to the VM (I don't think anyone intends to support vcpu asymmetry in a
+VM, and 64 registers per vcpu is not an insignificant memory usage).
+
+If there are no reasons for this to be per-CPU, please move it to be
+global to the VM. This also mean that once a vcpu has reset, it
+shouldn't be possible to affect the registers. This shouldn't affect
+the userspace API though.
 
 Thanks,
 
