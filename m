@@ -2,76 +2,132 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B568C433FE
-	for <kvmarm@archiver.kernel.org>; Sun, 21 Nov 2021 21:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E81C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Nov 2021 10:38:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 567B74A531;
-	Sun, 21 Nov 2021 16:13:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F2BF4B19D;
+	Mon, 22 Nov 2021 05:38:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@infradead.org
+	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yhIY86c43GLf; Sun, 21 Nov 2021 16:13:55 -0500 (EST)
+	with ESMTP id DPEaYrBH8Bdh; Mon, 22 Nov 2021 05:38:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2AE44B202;
-	Sun, 21 Nov 2021 16:13:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61F5C4B1B2;
+	Mon, 22 Nov 2021 05:38:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B88B4B1B3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:55:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 71DB14B175
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 04:58:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KaM26yQ9xs+H for <kvmarm@lists.cs.columbia.edu>;
- Sun, 21 Nov 2021 07:55:56 -0500 (EST)
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C1354B1AF
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Nov 2021 07:55:56 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
- Reply-To:Content-Type:Content-ID:Content-Description;
- bh=q7VGHKinevDsRFWG1p27WCAPowIobtShfo12HVfpNfo=; b=bZMSpfLoLpQoq+/alSiCy+yR3J
- Gsu/EUIb49vWBpnPdxKrQL8/NxDTrAKyeyS3q+FeHbOwLBav8eJGOppa7BAoFnLz6EETVocQ4wLVK
- egVL6N4dMe9Di01FOUcd3odS9krAjJ+UrEqmTiedc0Ef8uEXX0bsO4kTzse1o+lFztSovHHDC4QPA
- 5Da3oYV1GXN3478yD3/ZUCBz9LXP8KeYFT0/7WgTYSHGLtlm6cTi82twZLcMxBh0UZwQDcAmWR4DH
- wX/do7w3YoUm6i0laOxpKIcHoaGLsWrECQ82hfLh3jK+0BLO6JtZAJtKi2Yl70XmDGYba3NwQyCP9
- jkrDVWvg==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
- by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1momMw-00HIgF-Ri; Sun, 21 Nov 2021 12:54:55 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red
- Hat Linux)) id 1momMw-0002WM-G5; Sun, 21 Nov 2021 12:54:54 +0000
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	kvm <kvm@vger.kernel.org>
-Subject: [PATCH v5 07/12] KVM: arm64: Use Makefile.kvm for common files
-Date: Sun, 21 Nov 2021 12:54:46 +0000
-Message-Id: <20211121125451.9489-8-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211121125451.9489-1-dwmw2@infradead.org>
-References: <20211121125451.9489-1-dwmw2@infradead.org>
+ with ESMTP id yea2esG5NM-0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Nov 2021 04:58:30 -0500 (EST)
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com
+ (mail-sn1anam02on2139.outbound.protection.outlook.com [40.107.96.139])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 137A84B168
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 04:58:30 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Nu1pR/ynFx2B6N/mCgReWH307YJl01t2bExOnqS/HElKtzzDx2BceFzk9Ofwu+0OPKqal2TzNAGkWWjnrcz/76ym3qW9PvqzV4ZCERSXslACRmX+50G20tDW5j7aaaFl9o9DMjt4mFDjY3LGiyWpyl930kpqQFjMT7EBOyFiPLm+785nHJ3PkR/oftMsBfhROBwBvkOiIYPaDPBLISsNSNapP32R5ikUKkMjT32GAnGTT6PZE4CB2OxXo4p2x3Z5KW7sBFijkAzUkbp+GpYquY88AhZijkRaixzKgPTQOFdHK2IYE5KJuDVIxZYwPK5fTaJfzdNN8ysPbyykQ6gQBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=q6w2twpPnagrSxB5MM4chrn+n0NuzzZQBeRhFxWaAyA=;
+ b=lJCXzEp71e8WIV+F+Sdp90amTWzLbO/yP/ud3696jOWFwSSMBJJkl6hexsEluaN8DMv/k+Iu0KvW30+/sjFItvxMGEptK9c1PfbHrseair240lf87SyeEIKxcZVowgU9ZPjB0dSlIjK7SptaFbJcyqCNfgApVTujo3WiX1o2OurL5w7Vdi3RkWp4Sl7TvegO4VCDdZ4js11X65NcBiR0mx4pufABiXl/XGVUwbjOlMIwIpMa+hMGG6Vq/PVlSU5XgKfOqXtJJH71BqVfLSsTpUPSkvomHFar71fucxvdUsTu5qnBav6dGLJ8GE7B1nMdJ6crHN3RJi0cUoGlK/rBlg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q6w2twpPnagrSxB5MM4chrn+n0NuzzZQBeRhFxWaAyA=;
+ b=Lx+Kw6XEqe0mtM1s4YHdEYSNNPTulLe3tuQIoZwDFLmCiL4fCL66lPpuWyZPMd8t4gs5ariP/0AHtehfLqB+NpVk/FVaVEpUibrWGlRgaHZb4tFln1TnZ6dkeBz8ftgXjRAMWqJdvk/TpZt4VxvmM33iPyVIPYiSlKCiHxAaQAc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ DM6PR01MB4122.prod.exchangelabs.com (2603:10b6:5:29::27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4713.22; Mon, 22 Nov 2021 09:58:27 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::ec55:306:a75d:8529]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::ec55:306:a75d:8529%9]) with mapi id 15.20.4713.025; Mon, 22 Nov 2021
+ 09:58:27 +0000
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+To: maz@kernel.org
+Subject: [PATCH 0/2] KVM: arm64: nv: Fix issue with Stage 2 MMU init for
+ Nested case.
+Date: Mon, 22 Nov 2021 01:58:01 -0800
+Message-Id: <20211122095803.28943-1-gankulkarni@os.amperecomputing.com>
+X-Mailer: git-send-email 2.30.1
+X-ClientProxiedBy: CH2PR05CA0056.namprd05.prod.outlook.com
+ (2603:10b6:610:38::33) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by
- desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Mailman-Approved-At: Sun, 21 Nov 2021 16:13:30 -0500
-Cc: Anup Patel <anup.patel@wdc.com>,
- "wanpengli @ tencent . com" <wanpengli@tencent.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Joao Martins <joao.m.martins@oracle.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>, "joro @ 8bytes . org" <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, karahmed@amazon.com,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- butt3rflyh4ck <butterflyhuangxx@gmail.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- "jmattson @ google . com" <jmattson@google.com>,
- "mtosatti @ redhat . com" <mtosatti@redhat.com>, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- "vkuznets @ redhat . com" <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
+Received: from engdev025.amperecomputing.com (4.28.12.214) by
+ CH2PR05CA0056.namprd05.prod.outlook.com (2603:10b6:610:38::33) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4734.13 via Frontend Transport; Mon, 22 Nov 2021 09:58:25 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f8814b70-6262-4ec4-58d1-08d9ad9ea110
+X-MS-TrafficTypeDiagnostic: DM6PR01MB4122:
+X-Microsoft-Antispam-PRVS: <DM6PR01MB412220170FB1C78EB2272D999C9F9@DM6PR01MB4122.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6K4MNWPBxsTHok6z6jAGFfcpyESg8lJvAI9Rxn2QcxzxOI0t7cgRgdpkKRk5Dhqd5luLJMhOw0+ziMEyYk3UVgOOmZDRfiFlNVy48/TfuuvCS6eHSeXRsZM3xDBw1OwHisoNnGw7l7R4FQFPk0r4PNla5ZEIbeomBJLycgMjdqrJaIpdJm0G6AeXjXJ2OZfr7+hWjxEQWCG5Zk+NZselzjdicrKZqLHTqsXMS3l8y7u5OPb0l8U/A3ZqbOODcCfKF9Adu1jjlk+MensUhCZkd7p++xYyzDpAbAB0rp3szFSxyvjqk1IyBAFccHltV8hSY7u6nMaQK8V4xeOulo7WlQn5dZ5XrdBFD1gLUN4YzzkUC2TLNYOk/Cx3d2fBuI/0nl1drHecZxMCGJII9seyhIIhj0uvZV+LYXDd4fvSd6LnMLKxFv/AOebUmu3JlRMEsmDVXKgaWf2gy+zdJ8s/rouftZc2LqFP8UElkkYIijQVqHLtYp2Oq/D6tuIQJQzpITmQmhw1O+5e6PaVgow4ObyG01ueofRv5St6hu7Oy/1I3SVD/GafJytZ1LzUYcYRBMbL+OnCl4bI7KH/OQBLsCh9g+tLGT5kD8MPCch4KfEwbbGWUZg4+AUj/pIphtFTt0wED6UKQEyvTltvfGqKKh7B8opTgmWK+rASTyYZthM1sNSKRv7e7//Nk7VvNLyH30mIuwqCizVOlXA+sPHpBbP68oJrBqLoC3jVywaxQFicMmsDxvT9Js7wAJtNAG3Pw2KCok35yJqXHFCYzH3WyhYZyOrtO+p/cJ+niNvQ5HU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(4326008)(6512007)(1076003)(8936002)(6486002)(186003)(4744005)(316002)(38350700002)(66556008)(5660300002)(66476007)(83380400001)(8676002)(26005)(966005)(66946007)(6666004)(52116002)(956004)(2616005)(508600001)(2906002)(6916009)(38100700002)(107886003)(86362001)(6506007);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TJr2xyNU1CvI+E8VSng2SAkYcLsnFmcJw9xkqIVR8km52NKVYDQ1ufBf4QnW?=
+ =?us-ascii?Q?4XOLNGqxX0J/VQ5c9gAAhhcRsmUB+xkdHwLMSxey/e1gV7k3Eyx6jV/5VsVa?=
+ =?us-ascii?Q?pE4NWJRRY2za4+KUt4Kny0vR+NYrdLqDB/16t+KlV4r2DBI/wDu8YFCl5bVP?=
+ =?us-ascii?Q?rVU+i+qb+x17FmcPR5dlMbmHY8p54hS6guAM1RIm2xsqBPUzoQu8IPpgSnn9?=
+ =?us-ascii?Q?bjCC1OdIBLZeyP2zMrB2Y+MkMNHcSlnOKzEADf6XZTXzHafmO9zcRIUTMwmi?=
+ =?us-ascii?Q?q9XkGzcwkyIU1v26uz5jt3v8osywP87JVS+mcTVbBKWJ6gRzcj8YaGe3cN6U?=
+ =?us-ascii?Q?hLGzvj0yvzL6iUrWgQvX8D0l+QtHuFUV4jMQpWTsC+fAxl3jYqnyjTXdpODa?=
+ =?us-ascii?Q?WQL59g1qYRzzhuTWH2fxSJXEh2t0+r454/Q2A4oWln7Sq0G4U5A0I/Nzt5W+?=
+ =?us-ascii?Q?3iwaHE63Ig+kt1IfLi8OZYQ3xEbIOoTckbfmZe9P7z47alhxPHGc5J+i2L0v?=
+ =?us-ascii?Q?jfZ6XWMaGLDX0OUy2hntMJFPGMLgL3rRb+Vfg+EirdFZzDNNmbfNkCuNp841?=
+ =?us-ascii?Q?L/FGbndh7kSEIgECz4VzTk+2ttfwP5YatZvugYKF5CI4pthUTi/Dh7fJMoO8?=
+ =?us-ascii?Q?OML4afrS/7/5usegQVt8r6IRRjzPWo/ywqJEqOtYLPkH0SPDST2RBiJ2g/D6?=
+ =?us-ascii?Q?kg2FyTRUd4ObMkf/i94+Ty5sZwU3pjbXBBfOdgazu8LBE2FoJsAX8i2b2SbH?=
+ =?us-ascii?Q?UbBnkIUJ+N74BC2yRVq8pvY8aS8EdOQZ+aQqrNCUAjMm1vVNQL4Dg/837orb?=
+ =?us-ascii?Q?r/c4YW5F+WqcbAAr3CSau4yW4xXo/X0A9skhG4oP15Cd98qcUip5TguE+b7b?=
+ =?us-ascii?Q?30gHimpe3OnOrhwvQPq/gWgdVYKD6KlXRfqhVaP7U20bNXTYDXLJUjgG4jks?=
+ =?us-ascii?Q?yXPeNTX4id04d0bnhnR+OMYqog5moORfpDjApHdhVQWHyUTG8+lkKoHkKOAA?=
+ =?us-ascii?Q?QKkyUikBhyaJKopTnRApnEYr1JNcZ8vb/WZxllA7zMsNfVPq+ByhVyqYBCOq?=
+ =?us-ascii?Q?rX9lwni1aukcSQxP+5iXBl0ezVbW/rxA6Bg+fihZoYi1ySLGAcXMaHE83CQ/?=
+ =?us-ascii?Q?2RqTtVmJNcYkcNj8zOns0I2SuFKnpJ+5V9g6U8yN86DAyq/bqrvl+BKjbuG6?=
+ =?us-ascii?Q?SQJ1vwAzDxa1mQvEjeQmGo3ll4JifaOLjCxXvmMaI5Ankmtuishfq/kGPyh6?=
+ =?us-ascii?Q?Cnj7+358cJn0psAcbfqeDlw1LEMs1hlDadZHUpZZi92qHZM5In7fYS5lkhfG?=
+ =?us-ascii?Q?84liL/Z4a5mi7LXRxZX5lcBZYu7t7Zt3p/YGZbeYJP/g8u35MkntHnZsVymH?=
+ =?us-ascii?Q?wg04THRtbAt/LQ/DHMvy9TV0sAAoEtvFBcDlqevccMFnzuJWKw6Zo722ef9g?=
+ =?us-ascii?Q?XEwMbOGLUxiZtCsLl4SNLodsO2KB7CIfg/4brMtJHaEDrGSTogljLOjm7t8z?=
+ =?us-ascii?Q?zDhpDASLhUZvhqSI1uRcLQ+gVSWDigkwQlXfzI8SYIBhWtERlbiZLYKe4V8Y?=
+ =?us-ascii?Q?YSdnJ5Un+ACdUPzpWEDbYqZtdngLms2+NAAaWXW5boZuF2LLs68hdeH5VYp9?=
+ =?us-ascii?Q?zg0wTkuDD1BL83OCcSnbvmhL0WNCBpVHgc94v0/UHjoK+6cm1bpbdrTB8aL0?=
+ =?us-ascii?Q?H7dJ8y2L2aCG+pEVV6z60eWHzwIqUusBbTU1avQXEQcAHFcr1pFX2ECPuUMh?=
+ =?us-ascii?Q?k5+6MjTwvw=3D=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8814b70-6262-4ec4-58d1-08d9ad9ea110
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2021 09:58:27.0895 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: J9m54DqkzmvPHSUpVShFa4pLHZTHPqAOkIGor0xmb/pVz4mvab7WYvgmqVVjFCVv46Zbd3H+aqEzbovbp1LEiSXhRBe3ufYY6T/iGOgA8piVbmkAcz0yYourzVHYc8uK
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB4122
+X-Mailman-Approved-At: Mon, 22 Nov 2021 05:38:57 -0500
+Cc: d.scott.phillips@amperecomputing.com, kvm@vger.kernel.org,
+ catalin.marinas@arm.com, darren@os.amperecomputing.com, andre.przywara@arm.com,
+ gankulkarni@os.amperecomputing.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,37 +144,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+The Guest Hypervisor stage 2 mmu table was used while creating map
+and subsequent tlb flush for Nested VM. This resulted in unresolvable
+stage 2 fault for Nested VM since tlb was invalidated with
+Guest-Hypervisor VMID.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Acked-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/Makefile | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Patch 1/2 should be applied before the NV patchset[1].
+Patch 2/2 can be squashed in to Commit 1776c91346b6 ("KVM: arm64: nv:
+Support multiple nested Stage-2 mmu structures")[2].
 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 989bb5dad2c8..04a53f71a6b6 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -5,14 +5,12 @@
- 
- ccflags-y += -I $(srctree)/$(src)
- 
--KVM=../../../virt/kvm
-+include $(srctree)/virt/kvm/Makefile.kvm
- 
- obj-$(CONFIG_KVM) += kvm.o
- obj-$(CONFIG_KVM) += hyp/
- 
--kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
--	 $(KVM)/vfio.o $(KVM)/irqchip.o $(KVM)/binary_stats.o \
--	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
-+kvm-y += arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
- 	 inject_fault.o va_layout.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+[1] https://lore.kernel.org/kvmarm/20210510165920.1913477-1-maz@kernel.org/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/
+branch kvm-arm64/nv-5.13
+
+Ganapatrao Kulkarni (2):
+  KVM: arm64: Use appropriate mmu pointer in stage2 page table init.
+  KVM: arm64: nv: fixup! Support multiple nested Stage-2 mmu structures
+
+ arch/arm64/include/asm/kvm_pgtable.h  | 6 ++++--
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c | 2 +-
+ arch/arm64/kvm/hyp/pgtable.c          | 3 ++-
+ arch/arm64/kvm/mmu.c                  | 2 +-
+ arch/arm64/kvm/nested.c               | 9 +++++++++
+ 5 files changed, 17 insertions(+), 5 deletions(-)
+
 -- 
-2.31.1
+2.27.0
 
 _______________________________________________
 kvmarm mailing list
