@@ -2,134 +2,48 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3446C4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Nov 2021 10:39:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD41C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Nov 2021 11:27:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65C694B1DA;
-	Mon, 22 Nov 2021 05:39:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78A7E4B1AD;
+	Mon, 22 Nov 2021 06:27:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Uridu7qLEbDI; Mon, 22 Nov 2021 05:38:59 -0500 (EST)
+	with ESMTP id uyM+U5KYZ625; Mon, 22 Nov 2021 06:27:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F44D4B1C5;
-	Mon, 22 Nov 2021 05:38:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0508C4B175;
+	Mon, 22 Nov 2021 06:27:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 653594B16F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 04:58:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 44FCB4B16C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 06:27:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7URHeCeeZ9pk for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Nov 2021 04:58:32 -0500 (EST)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com
- (mail-bn8nam11on2122.outbound.protection.outlook.com [40.107.236.122])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C08EB4B178
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 04:58:32 -0500 (EST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ui+YOdN6jbxFoj1ZzTA+sSC7gzr9cFsy2XHynu5Mi/6xmyGSV1kZKE7XO8mEqDfIPHcB8552CfKQvxPUkfuKZ5vv80iNiT+XqYoZ/sBDZKLKegx6yoPzYbwV+zqgJqa2Yr2kwE8RlICBbMJX9uCw7Xxnf9ACiGBAzFkLU4VcuTHJzf7bDfo0M0kl7b1gD1HTYPXTPM6KWkZu1R6qzg3Io2PUedMg3BG7c6He7K3vqNsNRat3ZwZh7PBldop1genJrsDGLaSDrq/zFYK26g9sTqcep063a0xxBwREKfHAHqO84uDeuZ3u+fBcibz+vJb33/YltkOkqw/n1F1NXcYLAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3DJreqAjXHLWdWpJd1RYObTOLVCDMK3Rp3GPJBL2cXk=;
- b=dbObIsVWCdjOMv3Q58iA1gzeKpBW/aAfs5Z6/94yw9dsrJzGjTmMZRcN2Br6zLy6OIP/MYvFEA7uk/7/tpWXQIrxuVhHiyLxcwayxUiOidcNDPTVnNpnOb0m0wsTUjWrhV9FWVshY1uPStYWOd5RZNn/OJFUP4LGeUF8kME/XX4HfVWQICo06N4ZzKwNcfrrsU7FwDTkStb0ONYFcntfX0OEnTNyI4oBwZStHh78hHhqTVM/qzdOvWxtM4tAPS/4n+ldjKCToZg7gF1rAdwUy/PrvL7eN6ztuZ30T2quzHX5ya/4e7tBTpd56NYYuJrztFEP5a1mYz00NmnSayL9uw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3DJreqAjXHLWdWpJd1RYObTOLVCDMK3Rp3GPJBL2cXk=;
- b=ijd+IeGmcjxHR7/XBTvphYsQnoGRTk29JZ/MxD9n4KVhSouQrHbleYqYbHbDq0VBDYhTBeEgdmcgZY+LAI0FoMmq9ZaOExI9PTcowOhOYVcfqliYyeozzyLx4nBbWY7IEdRpTkT60+EVBoB55EqWXdAzBDHI2PgtxoSGrRAU9jI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- DM6PR01MB4124.prod.exchangelabs.com (2603:10b6:5:1d::23) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4713.24; Mon, 22 Nov 2021 09:58:29 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::ec55:306:a75d:8529]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::ec55:306:a75d:8529%9]) with mapi id 15.20.4713.025; Mon, 22 Nov 2021
- 09:58:29 +0000
-From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-To: maz@kernel.org
-Subject: [PATCH 2/2] KVM: arm64: nv: fixup! Support multiple nested Stage-2
- mmu structures
-Date: Mon, 22 Nov 2021 01:58:03 -0800
-Message-Id: <20211122095803.28943-3-gankulkarni@os.amperecomputing.com>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20211122095803.28943-1-gankulkarni@os.amperecomputing.com>
-References: <20211122095803.28943-1-gankulkarni@os.amperecomputing.com>
-X-ClientProxiedBy: CH2PR05CA0056.namprd05.prod.outlook.com
- (2603:10b6:610:38::33) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+ with ESMTP id d85cEn7WL-zY for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Nov 2021 06:27:47 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD8F4B13A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 06:27:47 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 751391042;
+ Mon, 22 Nov 2021 03:27:46 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9BCC03F73B;
+ Mon, 22 Nov 2021 03:27:44 -0800 (PST)
+Date: Mon, 22 Nov 2021 11:29:36 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU attribute
+Message-ID: <YZt/IBwJvsIbmMpH@monolith.localdoman>
+References: <20211115165041.194884-1-alexandru.elisei@arm.com>
+ <20211115165041.194884-4-alexandru.elisei@arm.com>
+ <87czmts4rh.wl-maz@kernel.org>
 MIME-Version: 1.0
-Received: from engdev025.amperecomputing.com (4.28.12.214) by
- CH2PR05CA0056.namprd05.prod.outlook.com (2603:10b6:610:38::33) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4734.13 via Frontend Transport; Mon, 22 Nov 2021 09:58:28 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c13fac82-feca-4e22-0f16-08d9ad9ea2b1
-X-MS-TrafficTypeDiagnostic: DM6PR01MB4124:
-X-Microsoft-Antispam-PRVS: <DM6PR01MB4124C00ECC692C105EB177F99C9F9@DM6PR01MB4124.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: R/P9f9ti+LNpX1prLXg7YxW9u8RcvdSlVpgTDZ37NSHfTxejy8NojEh1waTnwow26Z3WM5Hfp5/YB9hwt6idUJOTUcH69DAKbkQG9pj+rg4vyf42B73Ewiz8TXuvzPuhbxhDODz3F7smYK817YIpoROUeFdPEzcJRIcoJnAqGiZt2gliLcXqNgP5ntsqS7asjsEKv3qBCbffoy8wjRjQeL4qF+G3f9fl5jUR+t6emL6ClHJptynjDYHS45og8PUMArhGYI4tlUD4qALjgiEK5k1x7pZq3rjlpZtioUqIw5tpJGxejYCYPQp3b/WX4RmL7obBZdAJ7+1zqX7yIyVwvuknQaVm2ywDmdT6dMOnMA+/Fqc7+e7P2PfHTEvORPDrBqiCW7Jakj6s29B6i7tFKfSCHd+5pNNqbPSQepzQ4TAcdLtE9R7gR4lFTU3LiyqGdCAOluARSoqZA08xlgX+oG4tXvhsJDDR0aOOfgGrNBaygq/24dSB1qnQE1EEfEnGSXXQP7JV7Zf2bo/Qr47Lc3VNqejTTk5k9llIPNShqcxVxIR+TVkgOT11CwxTC3Co0S9/SVLsWTLy1MJYE0kCk0kLGkNH/cTmOd9N95tVb6ZSDl9/k3iMDlwknMpsP1SW3DNHPkEt2b+SICL5VuMpTNbnkWwAyDecmoiYMfJgCA4KUpNuU/hpoQHwpnmVorD7Q1NyiFJZ7zv3kQdCE/03LtMtBf2d4zRx9PTcgoDrLKbtbp8gT93X5MzxQ/KJmExJqJ9k6QM0mkhX20c7gZwjr+mEj1KFgTSg6A9WcgqVw3Y=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(86362001)(6506007)(6512007)(316002)(6486002)(66946007)(1076003)(6916009)(5660300002)(966005)(8936002)(6666004)(2906002)(38350700002)(4326008)(66556008)(66476007)(956004)(2616005)(83380400001)(107886003)(38100700002)(508600001)(26005)(186003)(52116002)(8676002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?W6rNEJzUg8iXb7BUThK4U9/GgEXvrHRtD+6avgGJvGruinNVvBjM8Dz0xhuR?=
- =?us-ascii?Q?9JLQ2EuwoKp6AFrUcY/9zd32Nby1tqAhGYzC/Vyo1ZavYnqYbznpAjV3WF9I?=
- =?us-ascii?Q?FTa/t0hlBaMYUp6uoodloWjGjy1d4wPep+yssHomQfqHEGldoxNU+ZOwSmnr?=
- =?us-ascii?Q?HJPcLv+y7MGK+pJy5CQluZ4o1NcMFGPOfp/ZSO2+NlZSD+QHK63eF9LsDR7q?=
- =?us-ascii?Q?Lzr79auCZ7W9obItDq184ONRN74Hs28Bl9liDi9Z842RxFZlkuuC0XQ9w22n?=
- =?us-ascii?Q?BP16KtR5i1aK7nF4YkKG1Hqp/RxwFKh9ezhghBWV/yUxRt1HOjxUQ/iG2IxY?=
- =?us-ascii?Q?6nqGkl9TwzJWH9Anjn7rO8Rgb4yuXy7Hi3G4S28gqOSiphKnls7IIgIf/gto?=
- =?us-ascii?Q?Q3GlSwSneOxlg309s9E0R+5KB2LfkO/jgZ/BojT8CRczrc0O1vZh8imyIXbg?=
- =?us-ascii?Q?8l7pvgABoLgpgQylmJW8hWYpJFSsv12WxpfpnkN4wXfrICWKbd6Fi9emZwEy?=
- =?us-ascii?Q?Wfh89HpUBLjvCgjCd0rcpd9gWgSYEHh2eEB6vCgwMnFza37yt2ab3LFtIqEv?=
- =?us-ascii?Q?uXPXFwpteIeYs8LAREJTD7mktSloK8eAv5Q8bVpq24f+vT9k9I2+MMJnQtjK?=
- =?us-ascii?Q?4xFBnyYu1bBatLmi87hBbey5AjbBnG7+GURr411v1vosYwHT1ckzrgz0t+Cd?=
- =?us-ascii?Q?Be6GQu6rby9NiO4B/YqZ0KeGKTM5oLloDdhYiSFWFTfSzeiFz3CaOB1ZjdSE?=
- =?us-ascii?Q?8oIbEftKBZJg6y36uBF0nSO8Ef1Y43E27Oz9adWPzShE/x04QyUifK5gpMpm?=
- =?us-ascii?Q?QWCuihJj3qjDWnGrvd3gU+s32WEfpPj6u0T8hBbVrAlM7cTuBJYUoVwNfwfC?=
- =?us-ascii?Q?s1WLmc09DA5652tIRoB1QnNdZmD84LEVeCrQYLVfUNciA+2mGV6E7wh+vuXb?=
- =?us-ascii?Q?5GlS170mkkK4HaviPYf5iyiyMepd6JlOWj971p1I4VHbXe8N73ac+JXXYgT3?=
- =?us-ascii?Q?rLWm8YeGhY8rJCOmYptGRbv2ljGlnU1pyWHoPZqPTXcLKGSTRE7Bwx7BWotS?=
- =?us-ascii?Q?/pAULe5d+nwnDUKBUCTtZPuKHCyc2Re1z6bPdTS22e93NvAYY3VOTJtXDRrK?=
- =?us-ascii?Q?aiNb2i9+ksg3yl/PPq0Qpe6NyD6pvK/COY0SLw6e68LiNTTdxbr9/IHqhQaE?=
- =?us-ascii?Q?Kdz6EzIGL638PjR/kk4DK8dfb/v9bCof3Ip0IQHsX9BGz13cj6vn1Ojs6zdA?=
- =?us-ascii?Q?yueHfKwm8SoUdEjPprAFKig61e3dtEbxljUEfpwy120RBMV16/b9Fy3148YG?=
- =?us-ascii?Q?uLafCAS/PMAGxbJtZ9Eo6+5xET686rK1+S67n3PNopYcjTMvslBwuF3nXuhd?=
- =?us-ascii?Q?0lHFk5Tv7yxZJmxNVBYk/oan1l13lcdDLbHhjzwcSV/QxARYdHmjZHPcdcq5?=
- =?us-ascii?Q?9bOBMX5eHdDhGELNNYuew7YU38DZfYFdn54cGFUfM9k8JCRm4OJf5W/qoHYB?=
- =?us-ascii?Q?vaLT4DwZykACnwPmmXKWCduWCzvYRYly0LI6BMmCrnpGj1o0rDNIR1hJX2Bh?=
- =?us-ascii?Q?fPm8s8DczeqJQ7QpxZxz7F3cCZdzBoOcdAOlBjAAtnA3h4gjujkqxBg0+51+?=
- =?us-ascii?Q?JE14Z4CgXfa5bVKrmUuwiStgsrrXWwtBkAUh3LYoZeCkwRbgo1JEnNgLrx48?=
- =?us-ascii?Q?RuDoVcfE1GIaV9blClEpYz0tFJNiWr7Yh+wDS1ShM/978CVJaVbaCk8/QeZr?=
- =?us-ascii?Q?n5B/3e8Jxw=3D=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c13fac82-feca-4e22-0f16-08d9ad9ea2b1
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2021 09:58:29.7528 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UxRXn+9qtOQ8j8YzkwfbNH/ozF1xX5uhbQ9O4LHj+9VxWG9p7Ar10tibzfYXKyuI7yl4pxQoxoxXVja4C4dt4VNS/enh8RodZS6IBI/MOwNNLkeLv1i2TxEJBC7QGcgJ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB4124
-X-Mailman-Approved-At: Mon, 22 Nov 2021 05:38:57 -0500
-Cc: d.scott.phillips@amperecomputing.com, kvm@vger.kernel.org,
- catalin.marinas@arm.com, darren@os.amperecomputing.com, andre.przywara@arm.com,
- gankulkarni@os.amperecomputing.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <87czmts4rh.wl-maz@kernel.org>
+Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -146,51 +60,159 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Commit 1776c91346b6 ("KVM: arm64: nv: Support multiple nested Stage-2 mmu
-structures")[1] added a function kvm_vcpu_init_nested which expands the
-stage-2 mmu structures array when ever a new vCPU is created. The array
-is expanded using krealloc() and results in a stale mmu address pointer
-in pgt->mmu. Adding a fix to update the pointer with the new address after
-successful krealloc.
+Hi Marc,
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/
-branch kvm-arm64/nv-5.13
+Thanks for having a look!
 
-Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
----
- arch/arm64/kvm/nested.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+On Sun, Nov 21, 2021 at 07:11:30PM +0000, Marc Zyngier wrote:
+> On Mon, 15 Nov 2021 16:50:40 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > When KVM creates an event and there are more than one PMUs present on the
+> > system, perf_init_event() will go through the list of available PMUs and
+> > will choose the first one that can create the event. The order of the PMUs
+> > in the PMU list depends on the probe order, which can change under various
+> > circumstances, for example if the order of the PMU nodes change in the DTB
+> > or if asynchronous driver probing is enabled on the kernel command line
+> > (with the driver_async_probe=armv8-pmu option).
+> > 
+> > Another consequence of this approach is that, on heteregeneous systems,
+> > all virtual machines that KVM creates will use the same PMU. This might
+> > cause unexpected behaviour for userspace: when a VCPU is executing on
+> > the physical CPU that uses this PMU, PMU events in the guest work
+> > correctly; but when the same VCPU executes on another CPU, PMU events in
+> > the guest will suddenly stop counting.
+> > 
+> > Fortunately, perf core allows user to specify on which PMU to create an
+> > event by using the perf_event_attr->type field, which is used by
+> > perf_init_event() as an index in the radix tree of available PMUs.
+> > 
+> > Add the KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU
+> > attribute to allow userspace to specify the arm_pmu that KVM will use when
+> > creating events for that VCPU. KVM will make no attempt to run the VCPU on
+> > the physical CPUs that share this PMU, leaving it up to userspace to
+> > manage the VCPU threads' affinity accordingly.
+> > 
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  Documentation/virt/kvm/devices/vcpu.rst | 25 ++++++++++++++++++++
+> >  arch/arm64/include/uapi/asm/kvm.h       |  1 +
+> >  arch/arm64/kvm/pmu-emul.c               | 31 +++++++++++++++++++++++--
+> >  include/kvm/arm_pmu.h                   |  1 +
+> >  tools/arch/arm64/include/uapi/asm/kvm.h |  1 +
+> >  5 files changed, 57 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> > index 60a29972d3f1..59ac382af59a 100644
+> > --- a/Documentation/virt/kvm/devices/vcpu.rst
+> > +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> > @@ -104,6 +104,31 @@ hardware event. Filtering event 0x1E (CHAIN) has no effect either, as it
+> >  isn't strictly speaking an event. Filtering the cycle counter is possible
+> >  using event 0x11 (CPU_CYCLES).
+> >  
+> > +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_SET_PMU
+> > +------------------------------------------
+> > +
+> > +:Parameters: in kvm_device_attr.addr the address to an int representing the PMU
+> > +             identifier.
+> > +
+> > +:Returns:
+> > +
+> > +	 =======  ===============================================
+> > +	 -EBUSY   PMUv3 already initialized
+> > +	 -EFAULT  Error accessing the PMU identifier
+> > +	 -EINVAL  PMU not found or PMU name longer than PAGE_SIZE
+> > +	 -ENODEV  PMUv3 not supported or GIC not initialized
+> > +	 -ENOMEM  Could not allocate memory
+> > +	 =======  ===============================================
+> > +
+> > +Request that the VCPU uses the specified hardware PMU when creating guest events
+> > +for the purpose of PMU emulation. The PMU identifier can be read from the "type"
+> > +file for the desired PMU instance under /sys/devices (or, equivalent,
+> > +/sys/bus/even_source). This attribute is particularly useful on heterogeneous
+> > +systems where there are at least two PMUs on the system.
+> 
+> nit: CPU PMUs. A number of systems have 'uncore' PMUs which KVM
+> totally ignores.
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 4ffbc14d0245..57ad8d8f4ee5 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -68,6 +68,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 		       num_mmus * sizeof(*kvm->arch.nested_mmus),
- 		       GFP_KERNEL | __GFP_ZERO);
- 	if (tmp) {
-+		int i;
-+
- 		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
- 		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
- 			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
-@@ -80,6 +82,13 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
- 		}
- 
- 		kvm->arch.nested_mmus = tmp;
-+
-+		/* Fixup pgt->mmu after krealloc */
-+		for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+			struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+			mmu->pgt->mmu = mmu;
-+		}
- 	}
- 
- 	mutex_unlock(&kvm->lock);
--- 
-2.27.0
+Sure, will change.
 
+> 
+> > +
+> > +Note that KVM will not make any attempts to run the VCPU on the physical CPUs
+> > +associated with the PMU specified by this attribute. This is entirely left to
+> > +userspace.
+> >  
+> >  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+> >  =================================
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index b3edde68bc3e..1d0a0a2a9711 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -362,6 +362,7 @@ struct kvm_arm_copy_mte_tags {
+> >  #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+> >  #define   KVM_ARM_VCPU_PMU_V3_INIT	1
+> >  #define   KVM_ARM_VCPU_PMU_V3_FILTER	2
+> > +#define   KVM_ARM_VCPU_PMU_V3_SET_PMU	3
+> >  #define KVM_ARM_VCPU_TIMER_CTRL		1
+> >  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+> >  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index dab335d17409..53cedeb5dbf6 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -602,6 +602,7 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  {
+> >  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> > +	struct arm_pmu *arm_pmu = pmu->arm_pmu;
+> >  	struct kvm_pmc *pmc;
+> >  	struct perf_event *event;
+> >  	struct perf_event_attr attr;
+> > @@ -637,8 +638,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> >  		return;
+> >  
+> >  	memset(&attr, 0, sizeof(struct perf_event_attr));
+> > -	attr.type = PERF_TYPE_RAW;
+> > -	attr.size = sizeof(attr);
+> > +	attr.type = arm_pmu ? arm_pmu->pmu.type : PERF_TYPE_RAW;
+> >  	attr.pinned = 1;
+> >  	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, pmc->idx);
+> >  	attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
+> > @@ -941,6 +941,23 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+> >  	return true;
+> >  }
+> >  
+> > +static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+> > +{
+> > +	struct kvm_pmu *kvm_pmu = &vcpu->arch.pmu;
+> > +	struct arm_pmu_entry *entry;
+> > +	struct arm_pmu *arm_pmu;
+> > +
+> > +	list_for_each_entry(entry, &arm_pmus, entry) {
+> > +		arm_pmu = entry->arm_pmu;
+> > +		if (arm_pmu->pmu.type == pmu_id) {
+> > +			kvm_pmu->arm_pmu = arm_pmu;
+> > +			return 0;
+> > +		}
+> > +	}
+> 
+> How does this work when a new CPU gets hotplugged on, bringing a new
+> PMU type along? It doesn't seem safe to parse this list without any
+> locking.
+
+It wouldn't work at all. I missed the fact that hotplogging a CPU means
+writing to the list of PMUs after the initial driver probing which happens
+at boot. This needs to be protected against concurrent writes, I will fix
+it.
+
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
