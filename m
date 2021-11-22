@@ -2,47 +2,48 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F73C433FE
-	for <kvmarm@archiver.kernel.org>; Mon, 22 Nov 2021 12:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC772C4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 22 Nov 2021 12:19:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10B064B186;
-	Mon, 22 Nov 2021 07:19:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F154B195;
+	Mon, 22 Nov 2021 07:19:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id m3zxI9Xd00Ah; Mon, 22 Nov 2021 07:19:25 -0500 (EST)
+	with ESMTP id QzaBvDf48Uln; Mon, 22 Nov 2021 07:19:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FD0D4B17C;
-	Mon, 22 Nov 2021 07:19:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 736E14B17C;
+	Mon, 22 Nov 2021 07:19:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E5C924B154
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 07:19:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C5B74B165
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 07:19:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a3C1XZ0lmspe for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Nov 2021 07:19:22 -0500 (EST)
+ with ESMTP id pPPYmejcSLP6 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Nov 2021 07:19:30 -0500 (EST)
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
  [185.176.79.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E04A4B13E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 07:19:22 -0500 (EST)
-Received: from fraeml743-chm.china.huawei.com (unknown [172.18.147.206])
- by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HyRC46N3Dz6GDKL;
- Mon, 22 Nov 2021 20:18:56 +0800 (CST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DDE8B4B164
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Nov 2021 07:19:30 -0500 (EST)
+Received: from fraeml742-chm.china.huawei.com (unknown [172.18.147.207])
+ by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4HyRBc4KRDz6H7jW;
+ Mon, 22 Nov 2021 20:18:32 +0800 (CST)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- fraeml743-chm.china.huawei.com (10.206.15.224) with Microsoft SMTP Server
+ fraeml742-chm.china.huawei.com (10.206.15.223) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 22 Nov 2021 13:19:21 +0100
+ 15.1.2308.20; Mon, 22 Nov 2021 13:19:29 +0100
 Received: from A2006125610.china.huawei.com (10.202.227.178) by
  lhreml710-chm.china.huawei.com (10.201.108.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Mon, 22 Nov 2021 12:19:14 +0000
+ 15.1.2308.20; Mon, 22 Nov 2021 12:19:22 +0000
 From: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 To: <linux-arm-kernel@lists.infradead.org>, <kvmarm@lists.cs.columbia.edu>,
  <linux-kernel@vger.kernel.org>
-Subject: [PATCH v4 1/4] KVM: arm64: Introduce a new VMID allocator for KVM
-Date: Mon, 22 Nov 2021 12:18:41 +0000
-Message-ID: <20211122121844.867-2-shameerali.kolothum.thodi@huawei.com>
+Subject: [PATCH v4 2/4] KVM: arm64: Make VMID bits accessible outside of
+ allocator
+Date: Mon, 22 Nov 2021 12:18:42 +0000
+Message-ID: <20211122121844.867-3-shameerali.kolothum.thodi@huawei.com>
 X-Mailer: git-send-email 2.12.0.windows.1
 In-Reply-To: <20211122121844.867-1-shameerali.kolothum.thodi@huawei.com>
 References: <20211122121844.867-1-shameerali.kolothum.thodi@huawei.com>
@@ -64,119 +65,66 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-QSBuZXcgVk1JRCBhbGxvY2F0b3IgZm9yIGFybTY0IEtWTSB1c2UuIFRoaXMgaXMgYmFzZWQgb24K
-YXJtNjQgQVNJRCBhbGxvY2F0b3IgYWxnb3JpdGhtLgoKT25lIG1ham9yIGRldmlhdGlvbiBmcm9t
-IHRoZSBBU0lEIGFsbG9jYXRvciBpcyB0aGUgd2F5IHdlCmZsdXNoIHRoZSBjb250ZXh0LiBVbmxp
-a2UgQVNJRCBhbGxvY2F0b3IsIHdlIGV4cGVjdCBsZXNzCmZyZXF1ZW50IHJvbGxvdmVyIGluIHRo
-ZSBjYXNlIG9mIFZNSURzLiBIZW5jZSwgaW5zdGVhZCBvZgptYXJraW5nIHRoZSBDUFUgYXMgZmx1
-c2hfcGVuZGluZyBhbmQgaXNzdWluZyBhIGxvY2FsIGNvbnRleHQKaW52YWxpZGF0aW9uIG9uIHRo
-ZSBuZXh0IGNvbnRleHQgc3dpdGNoLCB3ZSDCoGJyb2FkY2FzdCBUTEIKZmx1c2ggKyBJLWNhY2hl
-IGludmFsaWRhdGlvbiBvdmVyIHRoZSBpbm5lciBzaGFyZWFibGUgZG9tYWluCm9uIHJvbGxvdmVy
-LgoKU2lnbmVkLW9mZi1ieTogU2hhbWVlciBLb2xvdGh1bSA8c2hhbWVlcmFsaS5rb2xvdGh1bS50
-aG9kaUBodWF3ZWkuY29tPgotLS0KIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8
-ICAgNCArCiBhcmNoL2FybTY0L2t2bS92bWlkLmMgICAgICAgICAgICAgfCAxNzcgKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrCiAyIGZpbGVzIGNoYW5nZWQsIDE4MSBpbnNlcnRpb25zKCsp
-CiBjcmVhdGUgbW9kZSAxMDA2NDQgYXJjaC9hcm02NC9rdm0vdm1pZC5jCgpkaWZmIC0tZ2l0IGEv
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2Fz
-bS9rdm1faG9zdC5oCmluZGV4IDJhNWY3ZjM4MDA2Zi4uZjRhODZhNzllYTRhIDEwMDY0NAotLS0g
-YS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKKysrIGIvYXJjaC9hcm02NC9pbmNs
-dWRlL2FzbS9rdm1faG9zdC5oCkBAIC02OTAsNiArNjkwLDEwIEBAIGludCBrdm1fYXJtX3B2dGlt
-ZV9nZXRfYXR0cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCiBpbnQga3ZtX2FybV9wdnRpbWVfaGFz
-X2F0dHIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAogCQkJICAgIHN0cnVjdCBrdm1fZGV2aWNlX2F0
-dHIgKmF0dHIpOwogCitpbnQga3ZtX2FybV92bWlkX2FsbG9jX2luaXQodm9pZCk7Cit2b2lkIGt2
-bV9hcm1fdm1pZF9hbGxvY19mcmVlKHZvaWQpOwordm9pZCBrdm1fYXJtX3ZtaWRfdXBkYXRlKHN0
-cnVjdCBrdm1fdm1pZCAqa3ZtX3ZtaWQpOworCiBzdGF0aWMgaW5saW5lIHZvaWQga3ZtX2FybV9w
-dnRpbWVfdmNwdV9pbml0KHN0cnVjdCBrdm1fdmNwdV9hcmNoICp2Y3B1X2FyY2gpCiB7CiAJdmNw
-dV9hcmNoLT5zdGVhbC5iYXNlID0gR1BBX0lOVkFMSUQ7CmRpZmYgLS1naXQgYS9hcmNoL2FybTY0
-L2t2bS92bWlkLmMgYi9hcmNoL2FybTY0L2t2bS92bWlkLmMKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-aW5kZXggMDAwMDAwMDAwMDAwLi5hYTAxYzk3ZjdkZjAKLS0tIC9kZXYvbnVsbAorKysgYi9hcmNo
-L2FybTY0L2t2bS92bWlkLmMKQEAgLTAsMCArMSwxNzcgQEAKKy8vIFNQRFgtTGljZW5zZS1JZGVu
-dGlmaWVyOiBHUEwtMi4wCisvKgorICogVk1JRCBhbGxvY2F0b3IuCisgKgorICogQmFzZWQgb24g
-QXJtNjQgQVNJRCBhbGxvY2F0b3IgYWxnb3JpdGhtLgorICogUGxlYXNlIHJlZmVyIGFyY2gvYXJt
-NjQvbW0vY29udGV4dC5jIGZvciBkZXRhaWxlZAorICogY29tbWVudHMgb24gYWxnb3JpdGhtLgor
-ICoKKyAqIENvcHlyaWdodCAoQykgMjAwMi0yMDAzIERlZXAgQmx1ZSBTb2x1dGlvbnMgTHRkLCBh
-bGwgcmlnaHRzIHJlc2VydmVkLgorICogQ29weXJpZ2h0IChDKSAyMDEyIEFSTSBMdGQuCisgKi8K
-KworI2luY2x1ZGUgPGxpbnV4L2JpdGZpZWxkLmg+CisjaW5jbHVkZSA8bGludXgvYml0b3BzLmg+
-CisKKyNpbmNsdWRlIDxhc20va3ZtX2FzbS5oPgorI2luY2x1ZGUgPGFzbS9rdm1fbW11Lmg+CisK
-K3N0YXRpYyB1bnNpZ25lZCBpbnQga3ZtX2FybV92bWlkX2JpdHM7CitzdGF0aWMgREVGSU5FX1JB
-V19TUElOTE9DSyhjcHVfdm1pZF9sb2NrKTsKKworc3RhdGljIGF0b21pYzY0X3Qgdm1pZF9nZW5l
-cmF0aW9uOworc3RhdGljIHVuc2lnbmVkIGxvbmcgKnZtaWRfbWFwOworCitzdGF0aWMgREVGSU5F
-X1BFUl9DUFUoYXRvbWljNjRfdCwgYWN0aXZlX3ZtaWRzKTsKK3N0YXRpYyBERUZJTkVfUEVSX0NQ
-VSh1NjQsIHJlc2VydmVkX3ZtaWRzKTsKKworI2RlZmluZSBWTUlEX01BU0sJCSh+R0VOTUFTSyhr
-dm1fYXJtX3ZtaWRfYml0cyAtIDEsIDApKQorI2RlZmluZSBWTUlEX0ZJUlNUX1ZFUlNJT04JKDFV
-TCA8PCBrdm1fYXJtX3ZtaWRfYml0cykKKworI2RlZmluZSBOVU1fVVNFUl9WTUlEUwkJVk1JRF9G
-SVJTVF9WRVJTSU9OCisjZGVmaW5lIHZtaWQyaWR4KHZtaWQpCQkoKHZtaWQpICYgflZNSURfTUFT
-SykKKyNkZWZpbmUgaWR4MnZtaWQoaWR4KQkJdm1pZDJpZHgoaWR4KQorCisjZGVmaW5lIHZtaWRf
-Z2VuX21hdGNoKHZtaWQpIFwKKwkoISgoKHZtaWQpIF4gYXRvbWljNjRfcmVhZCgmdm1pZF9nZW5l
-cmF0aW9uKSkgPj4ga3ZtX2FybV92bWlkX2JpdHMpKQorCitzdGF0aWMgdm9pZCBmbHVzaF9jb250
-ZXh0KHZvaWQpCit7CisJaW50IGNwdTsKKwl1NjQgdm1pZDsKKworCWJpdG1hcF9jbGVhcih2bWlk
-X21hcCwgMCwgTlVNX1VTRVJfVk1JRFMpOworCisJZm9yX2VhY2hfcG9zc2libGVfY3B1KGNwdSkg
-eworCQl2bWlkID0gYXRvbWljNjRfeGNoZ19yZWxheGVkKCZwZXJfY3B1KGFjdGl2ZV92bWlkcywg
-Y3B1KSwgMCk7CisKKwkJLyogUHJlc2VydmUgcmVzZXJ2ZWQgVk1JRCAqLworCQlpZiAodm1pZCA9
-PSAwKQorCQkJdm1pZCA9IHBlcl9jcHUocmVzZXJ2ZWRfdm1pZHMsIGNwdSk7CisJCV9fc2V0X2Jp
-dCh2bWlkMmlkeCh2bWlkKSwgdm1pZF9tYXApOworCQlwZXJfY3B1KHJlc2VydmVkX3ZtaWRzLCBj
-cHUpID0gdm1pZDsKKwl9CisKKwkvKgorCSAqIFVubGlrZSBBU0lEIGFsbG9jYXRvciwgd2UgZXhw
-ZWN0IGxlc3MgZnJlcXVlbnQgcm9sbG92ZXIgaW4KKwkgKiBjYXNlIG9mIFZNSURzLiBIZW5jZSwg
-aW5zdGVhZCBvZiBtYXJraW5nIHRoZSBDUFUgYXMKKwkgKiBmbHVzaF9wZW5kaW5nIGFuZCBpc3N1
-aW5nIGEgbG9jYWwgY29udGV4dCBpbnZhbGlkYXRpb24gb24KKwkgKiB0aGUgbmV4dCBjb250ZXh0
-LXN3aXRjaCwgd2UgYnJvYWRjYXN0IFRMQiBmbHVzaCArIEktY2FjaGUKKwkgKiBpbnZhbGlkYXRp
-b24gb3ZlciB0aGUgaW5uZXIgc2hhcmVhYmxlIGRvbWFpbiBvbiByb2xsb3Zlci4KKwkgKi8KKwkg
-a3ZtX2NhbGxfaHlwKF9fa3ZtX2ZsdXNoX3ZtX2NvbnRleHQpOworfQorCitzdGF0aWMgYm9vbCBj
-aGVja191cGRhdGVfcmVzZXJ2ZWRfdm1pZCh1NjQgdm1pZCwgdTY0IG5ld3ZtaWQpCit7CisJaW50
-IGNwdTsKKwlib29sIGhpdCA9IGZhbHNlOworCisJLyoKKwkgKiBJdGVyYXRlIG92ZXIgdGhlIHNl
-dCBvZiByZXNlcnZlZCBWTUlEcyBsb29raW5nIGZvciBhIG1hdGNoCisJICogYW5kIHVwZGF0ZSB0
-byB1c2UgbmV3dm1pZCAoaS5lLiB0aGUgc2FtZSBWTUlEIGluIHRoZSBjdXJyZW50CisJICogZ2Vu
-ZXJhdGlvbikuCisJICovCisJZm9yX2VhY2hfcG9zc2libGVfY3B1KGNwdSkgeworCQlpZiAocGVy
-X2NwdShyZXNlcnZlZF92bWlkcywgY3B1KSA9PSB2bWlkKSB7CisJCQloaXQgPSB0cnVlOworCQkJ
-cGVyX2NwdShyZXNlcnZlZF92bWlkcywgY3B1KSA9IG5ld3ZtaWQ7CisJCX0KKwl9CisKKwlyZXR1
-cm4gaGl0OworfQorCitzdGF0aWMgdTY0IG5ld192bWlkKHN0cnVjdCBrdm1fdm1pZCAqa3ZtX3Zt
-aWQpCit7CisJc3RhdGljIHUzMiBjdXJfaWR4ID0gMTsKKwl1NjQgdm1pZCA9IGF0b21pYzY0X3Jl
-YWQoJmt2bV92bWlkLT5pZCk7CisJdTY0IGdlbmVyYXRpb24gPSBhdG9taWM2NF9yZWFkKCZ2bWlk
-X2dlbmVyYXRpb24pOworCisJaWYgKHZtaWQgIT0gMCkgeworCQl1NjQgbmV3dm1pZCA9IGdlbmVy
-YXRpb24gfCAodm1pZCAmIH5WTUlEX01BU0spOworCisJCWlmIChjaGVja191cGRhdGVfcmVzZXJ2
-ZWRfdm1pZCh2bWlkLCBuZXd2bWlkKSkgeworCQkJYXRvbWljNjRfc2V0KCZrdm1fdm1pZC0+aWQs
-IG5ld3ZtaWQpOworCQkJcmV0dXJuIG5ld3ZtaWQ7CisJCX0KKworCQlpZiAoIV9fdGVzdF9hbmRf
-c2V0X2JpdCh2bWlkMmlkeCh2bWlkKSwgdm1pZF9tYXApKSB7CisJCQlhdG9taWM2NF9zZXQoJmt2
-bV92bWlkLT5pZCwgbmV3dm1pZCk7CisJCQlyZXR1cm4gbmV3dm1pZDsKKwkJfQorCX0KKworCXZt
-aWQgPSBmaW5kX25leHRfemVyb19iaXQodm1pZF9tYXAsIE5VTV9VU0VSX1ZNSURTLCBjdXJfaWR4
-KTsKKwlpZiAodm1pZCAhPSBOVU1fVVNFUl9WTUlEUykKKwkJZ290byBzZXRfdm1pZDsKKworCS8q
-IFdlJ3JlIG91dCBvZiBWTUlEcywgc28gaW5jcmVtZW50IHRoZSBnbG9iYWwgZ2VuZXJhdGlvbiBj
-b3VudCAqLworCWdlbmVyYXRpb24gPSBhdG9taWM2NF9hZGRfcmV0dXJuX3JlbGF4ZWQoVk1JRF9G
-SVJTVF9WRVJTSU9OLAorCQkJCQkJICZ2bWlkX2dlbmVyYXRpb24pOworCWZsdXNoX2NvbnRleHQo
-KTsKKworCS8qIFdlIGhhdmUgbW9yZSBWTUlEcyB0aGFuIENQVXMsIHNvIHRoaXMgd2lsbCBhbHdh
-eXMgc3VjY2VlZCAqLworCXZtaWQgPSBmaW5kX25leHRfemVyb19iaXQodm1pZF9tYXAsIE5VTV9V
-U0VSX1ZNSURTLCAxKTsKKworc2V0X3ZtaWQ6CisJX19zZXRfYml0KHZtaWQsIHZtaWRfbWFwKTsK
-KwljdXJfaWR4ID0gdm1pZDsKKwl2bWlkID0gaWR4MnZtaWQodm1pZCkgfCBnZW5lcmF0aW9uOwor
-CWF0b21pYzY0X3NldCgma3ZtX3ZtaWQtPmlkLCB2bWlkKTsKKwlyZXR1cm4gdm1pZDsKK30KKwor
-dm9pZCBrdm1fYXJtX3ZtaWRfdXBkYXRlKHN0cnVjdCBrdm1fdm1pZCAqa3ZtX3ZtaWQpCit7CisJ
-dW5zaWduZWQgbG9uZyBmbGFnczsKKwl1NjQgdm1pZCwgb2xkX2FjdGl2ZV92bWlkOworCisJdm1p
-ZCA9IGF0b21pYzY0X3JlYWQoJmt2bV92bWlkLT5pZCk7CisKKwkvKgorCSAqIFBsZWFzZSByZWZl
-ciBjb21tZW50cyBpbiBjaGVja19hbmRfc3dpdGNoX2NvbnRleHQoKSBpbgorCSAqIGFyY2gvYXJt
-NjQvbW0vY29udGV4dC5jLgorCSAqLworCW9sZF9hY3RpdmVfdm1pZCA9IGF0b21pYzY0X3JlYWQo
-dGhpc19jcHVfcHRyKCZhY3RpdmVfdm1pZHMpKTsKKwlpZiAob2xkX2FjdGl2ZV92bWlkICYmIHZt
-aWRfZ2VuX21hdGNoKHZtaWQpICYmCisJICAgIGF0b21pYzY0X2NtcHhjaGdfcmVsYXhlZCh0aGlz
-X2NwdV9wdHIoJmFjdGl2ZV92bWlkcyksCisJCQkJICAgICBvbGRfYWN0aXZlX3ZtaWQsIHZtaWQp
-KQorCQlyZXR1cm47CisKKwlyYXdfc3Bpbl9sb2NrX2lycXNhdmUoJmNwdV92bWlkX2xvY2ssIGZs
-YWdzKTsKKworCS8qIENoZWNrIHRoYXQgb3VyIFZNSUQgYmVsb25ncyB0byB0aGUgY3VycmVudCBn
-ZW5lcmF0aW9uLiAqLworCXZtaWQgPSBhdG9taWM2NF9yZWFkKCZrdm1fdm1pZC0+aWQpOworCWlm
-ICghdm1pZF9nZW5fbWF0Y2godm1pZCkpCisJCXZtaWQgPSBuZXdfdm1pZChrdm1fdm1pZCk7CisK
-KwlhdG9taWM2NF9zZXQodGhpc19jcHVfcHRyKCZhY3RpdmVfdm1pZHMpLCB2bWlkKTsKKwlyYXdf
-c3Bpbl91bmxvY2tfaXJxcmVzdG9yZSgmY3B1X3ZtaWRfbG9jaywgZmxhZ3MpOworfQorCisvKgor
-ICogSW5pdGlhbGl6ZSB0aGUgVk1JRCBhbGxvY2F0b3IKKyAqLworaW50IGt2bV9hcm1fdm1pZF9h
-bGxvY19pbml0KHZvaWQpCit7CisJa3ZtX2FybV92bWlkX2JpdHMgPSBrdm1fZ2V0X3ZtaWRfYml0
-cygpOworCisJLyoKKwkgKiBFeHBlY3QgYWxsb2NhdGlvbiBhZnRlciByb2xsb3ZlciB0byBmYWls
-IGlmIHdlIGRvbid0IGhhdmUKKwkgKiBhdCBsZWFzdCBvbmUgbW9yZSBWTUlEIHRoYW4gQ1BVcy4g
-Vk1JRCAjMCBpcyBhbHdheXMgcmVzZXJ2ZWQuCisJICovCisJV0FSTl9PTihOVU1fVVNFUl9WTUlE
-UyAtIDEgPD0gbnVtX3Bvc3NpYmxlX2NwdXMoKSk7CisJYXRvbWljNjRfc2V0KCZ2bWlkX2dlbmVy
-YXRpb24sIFZNSURfRklSU1RfVkVSU0lPTik7CisJdm1pZF9tYXAgPSBrY2FsbG9jKEJJVFNfVE9f
-TE9OR1MoTlVNX1VTRVJfVk1JRFMpLAorCQkJICAgc2l6ZW9mKCp2bWlkX21hcCksIEdGUF9LRVJO
-RUwpOworCWlmICghdm1pZF9tYXApCisJCXJldHVybiAtRU5PTUVNOworCisJcmV0dXJuIDA7Cit9
-CisKK3ZvaWQga3ZtX2FybV92bWlkX2FsbG9jX2ZyZWUodm9pZCkKK3sKKwlrZnJlZSh2bWlkX21h
-cCk7Cit9Ci0tIAoyLjE3LjEKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVk
-dQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Since we already set the kvm_arm_vmid_bits in the VMID allocator
+init function, make it accessible outside as well so that it can
+be used in the subsequent patch.
+
+Suggested-by: Will Deacon <will@kernel.org>
+Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ arch/arm64/kernel/image-vars.h    | 3 +++
+ arch/arm64/kvm/vmid.c             | 2 +-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f4a86a79ea4a..51af17e16115 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -690,6 +690,7 @@ int kvm_arm_pvtime_get_attr(struct kvm_vcpu *vcpu,
+ int kvm_arm_pvtime_has_attr(struct kvm_vcpu *vcpu,
+ 			    struct kvm_device_attr *attr);
+ 
++extern unsigned int kvm_arm_vmid_bits;
+ int kvm_arm_vmid_alloc_init(void);
+ void kvm_arm_vmid_alloc_free(void);
+ void kvm_arm_vmid_update(struct kvm_vmid *kvm_vmid);
+diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+index c96a9a0043bf..c12963c3a055 100644
+--- a/arch/arm64/kernel/image-vars.h
++++ b/arch/arm64/kernel/image-vars.h
+@@ -79,6 +79,9 @@ KVM_NVHE_ALIAS(__hyp_stub_vectors);
+ /* Kernel symbol used by icache_is_vpipt(). */
+ KVM_NVHE_ALIAS(__icache_flags);
+ 
++/* VMID bits set by the KVM VMID allocator */
++KVM_NVHE_ALIAS(kvm_arm_vmid_bits);
++
+ /* Kernel symbols needed for cpus_have_final/const_caps checks. */
+ KVM_NVHE_ALIAS(arm64_const_caps_ready);
+ KVM_NVHE_ALIAS(cpu_hwcap_keys);
+diff --git a/arch/arm64/kvm/vmid.c b/arch/arm64/kvm/vmid.c
+index aa01c97f7df0..9aff692b6b7d 100644
+--- a/arch/arm64/kvm/vmid.c
++++ b/arch/arm64/kvm/vmid.c
+@@ -16,7 +16,7 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
+ 
+-static unsigned int kvm_arm_vmid_bits;
++unsigned int kvm_arm_vmid_bits;
+ static DEFINE_RAW_SPINLOCK(cpu_vmid_lock);
+ 
+ static atomic64_t vmid_generation;
+-- 
+2.17.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
