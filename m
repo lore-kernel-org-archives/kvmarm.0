@@ -2,53 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 262D4C43219
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 16:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACFDC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 16:37:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A31D04B20E;
-	Tue, 23 Nov 2021 11:36:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 365714B1AD;
+	Tue, 23 Nov 2021 11:37:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ARfZCRQpoupv; Tue, 23 Nov 2021 11:36:52 -0500 (EST)
+	with ESMTP id ojMPKq7hwTXP; Tue, 23 Nov 2021 11:37:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AAC94B1B2;
-	Tue, 23 Nov 2021 11:36:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF1634B1CA;
+	Tue, 23 Nov 2021 11:37:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B05F4B172
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:36:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B07B4B1CA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:37:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1FP74PwFMKlr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Nov 2021 11:36:50 -0500 (EST)
+ with ESMTP id FybmXGx1ebfw for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Nov 2021 11:37:03 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 261214B126
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:36:50 -0500 (EST)
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2E04C60F5D;
- Tue, 23 Nov 2021 16:36:48 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6402C4B1AD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:37:03 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 925F560F90;
+ Tue, 23 Nov 2021 16:37:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1637685409;
- bh=plK5J/t7M/GlW86iF1TJCxPLnyKdb3OQjKr63ahMX9M=;
+ s=k20201202; t=1637685422;
+ bh=ph8ObFbS8FOqN0/4yg+iMdjHcoQg5c5WDq4v+jpLOoM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=gL+JfqMn4zmSYTLx2l+OXc+j6OKAqMORXivtQvMguOjH7gWVn7AklM7Sa3jVHaVxT
- Ju4PJp7tl280dwFY/Rpj5Ij4XImwQ+rOt7onZ6rUaiEsu2sqQ6gxTZIl+EkBqAwtAE
- RX/EFRUzIzdf29cldJIcYM7j9VBulAmH1RlAr1l0Mv0eov4JiOBD/EXdiJhb6B1B0S
- M3x7lEdmwsip5gXgKoJaWsut1KIuIaCRoX7xlgB71iL0jKw0QOxS2Vl6nntwXStLhc
- Mx9Axbg9USK/tBnuZkQSIKPOWO/rkG7GEpDoZk9fdlLp4SzF6mihaQgftQnI+Eg+JR
- AoFu+LNY6lX9A==
+ b=Flo0GOrE6WQx5Vuq80BoHrdHWeNNgVfMRrcsSik9BLffxNINWA9xPBRczZrtS2XEn
+ OdOIhPk+HLeOAz6vGAi1zJaVyM3oS3WiKILvWJiG4tRhaKEjDj6lWwviopuBOJKIeg
+ 9ttXuc4DJtYQVleoBWEV9jfHO1Mk4KTZGvhTLI6FBOfGKJG3lKsTq2p4CQEowMQCcN
+ fLDj11o6TqxrjaFCPB1o9Q+w08UU3s+hg/x+m29OjpKolt7G4kYC3LLuj7wV2mlfMV
+ vGyVeT2c20DjLJfIig3k0L7DmV0/SInFO7RmeYN0Vg2Eb8Todz+DBN7tDN940oNiTz
+ vXF684/NWumuA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH MANUALSEL 5.15 8/8] KVM: arm64: Cap KVM_CAP_NR_VCPUS by
+Subject: [PATCH MANUALSEL 5.10 5/5] KVM: arm64: Cap KVM_CAP_NR_VCPUS by
  kvm_arm_default_max_vcpus()
-Date: Tue, 23 Nov 2021 11:36:30 -0500
-Message-Id: <20211123163630.289306-8-sashal@kernel.org>
+Date: Tue, 23 Nov 2021 11:36:49 -0500
+Message-Id: <20211123163652.289483-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211123163630.289306-1-sashal@kernel.org>
-References: <20211123163630.289306-1-sashal@kernel.org>
+In-Reply-To: <20211123163652.289483-1-sashal@kernel.org>
+References: <20211123163652.289483-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -95,10 +95,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9b328bb05596a..1ed82b6d5e8db 100644
+index 5bc978be80434..7737a10ba735f 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -223,7 +223,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+@@ -204,7 +204,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
  		r = 1;
  		break;
  	case KVM_CAP_NR_VCPUS:
