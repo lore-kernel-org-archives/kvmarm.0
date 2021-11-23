@@ -2,89 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C34CCC4332F
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 09:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56710C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 10:03:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0303A4B11B;
-	Tue, 23 Nov 2021 04:12:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C846D4B190;
+	Tue, 23 Nov 2021 05:03:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@brainfault-org.20210112.gappssmtp.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AKgY8K01uBlI; Tue, 23 Nov 2021 04:12:37 -0500 (EST)
+	with ESMTP id UXOlrAosayzJ; Tue, 23 Nov 2021 05:03:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82C244B129;
-	Tue, 23 Nov 2021 04:12:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71ED74B176;
+	Tue, 23 Nov 2021 05:03:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40D2C4B11B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 04:12:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9531D4B0C3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 05:03:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id liXmH7Z0oTkk for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Nov 2021 04:12:34 -0500 (EST)
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com
- [209.85.221.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5AA64B0F7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 04:12:34 -0500 (EST)
-Received: by mail-wr1-f42.google.com with SMTP id c4so37659274wrd.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 01:12:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=brainfault-org.20210112.gappssmtp.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HYs1wzwF6+J9dSOANXB9y6loDw9qWfCXBI2HZhWySNA=;
- b=wltUiAygiHWsBEmc25AjNkPWeRE3z9px4T/cVrqarPBht3N5GOBcMj472TjSJxLh+F
- 0GPEkZ82ElidOxCepsH3qkVpZpghdJFzn6w8QY0bBYX7GfBGAa5PebvvpwYx1AMsWy+/
- Hy0tXtM5hguM8ULFAxaSFY9L9pHflRmc5oBmZlGzdmDGxSVWLmJgoXyeLvirR3+EDdYc
- x6uL63V8O6CZSV6meLPQPSVnuq81aNx6LBTQbWdIxp70MyirIsOfKBJ+3yy5wRokBv7P
- ZHDdSS5XrKlSNk/fVqI4v77GmiM6rni3n8Pmp1gAXvY2q32B2g9mUwyOWVLBU2DWazev
- nV6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HYs1wzwF6+J9dSOANXB9y6loDw9qWfCXBI2HZhWySNA=;
- b=JHRUBVRM6rutsodwM1Hf6txr3XjqmNgzx+iaYwgrnRLrVeC5OyXwXdHcrjJuCBWJzZ
- lQguWG/Hp3tvC0N9IX/72QAHGbe5cJ+u8tgCXM7JCc7Ei2HjCh2rmkofy0OslN4kvBFU
- dcNmjXzyaClXw//dxao/WtWxEg/6P8vBOR/0wK9X3QpyVufqCXEtLUEk/qK8EtZ0RteN
- rOXGOrnm49FK8kaJTzfl9lGAPW3RrKZaeyStmQ5M7a0HZFDzYil0FZebUd/udtScW3bs
- gVH8vKpIqkAxevGhV0iWrRT3twvDM8laOeNOBki49VPzkfGmeuS+hWi2WjIcN8tDHVKz
- E2IQ==
-X-Gm-Message-State: AOAM533HvVfi/462L37tYjbzJJYLcp/jeS3SJnC3VgKaa0GgoTJloRSc
- BiE+vfQPKvxGC8WRjx+cULjwbKcpk6ZRqmnVQFwfWw==
-X-Google-Smtp-Source: ABdhPJw3107qjhtYHlg0VKfoxcrKNwhATIgpuvcrTNAjZTbcT3w/UYNbeW1BEW91PyajE9x5O252/D9Dk01cQ3/AShU=
-X-Received: by 2002:a05:6000:1a45:: with SMTP id
- t5mr5400365wry.306.1637658753498; 
- Tue, 23 Nov 2021 01:12:33 -0800 (PST)
-MIME-Version: 1.0
-References: <20211121125451.9489-1-dwmw2@infradead.org>
- <20211121125451.9489-6-dwmw2@infradead.org>
-In-Reply-To: <20211121125451.9489-6-dwmw2@infradead.org>
-From: Anup Patel <anup@brainfault.org>
-Date: Tue, 23 Nov 2021 14:42:21 +0530
-Message-ID: <CAAhSdy307DqNuQEFCu2ze2jXJ7taDE6y6SwY9nHGA8yNPfggiQ@mail.gmail.com>
-Subject: Re: [PATCH v5 05/12] KVM: RISC-V: Use Makefile.kvm for common files
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Anup Patel <anup.patel@wdc.com>,
- "wanpengli @ tencent . com" <wanpengli@tencent.com>, kvm <kvm@vger.kernel.org>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- Joao Martins <joao.m.martins@oracle.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>, "joro @ 8bytes . org" <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, karahmed@amazon.com,
- Catalin Marinas <catalin.marinas@arm.com>,
- butt3rflyh4ck <butterflyhuangxx@gmail.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- "jmattson @ google . com" <jmattson@google.com>,
- "mtosatti @ redhat . com" <mtosatti@redhat.com>, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "vkuznets @ redhat . com" <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
+ with ESMTP id FqtkTv7PZw9l for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Nov 2021 05:03:43 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2290C4B186
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 05:03:43 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 2CEB46102A;
+ Tue, 23 Nov 2021 10:03:42 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mpSeJ-007FJe-Lw; Tue, 23 Nov 2021 10:03:39 +0000
+Date: Tue, 23 Nov 2021 10:03:39 +0000
+Message-ID: <87o86bchok.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [RFC PATCH v3 02/29] KVM: arm64: Save ID registers' sanitized
+ value per vCPU
+In-Reply-To: <CAAeT=Fxcd9ExAXP-c6N-LYAT8_SGYUMHHeGO5dCW8=K+m=WTMQ@mail.gmail.com>
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-3-reijiw@google.com>
+ <87lf1hsn11.wl-maz@kernel.org>
+ <CAAeT=Fxcd9ExAXP-c6N-LYAT8_SGYUMHHeGO5dCW8=K+m=WTMQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ will@kernel.org, drjones@redhat.com, liangpeng10@huawei.com, pshier@google.com,
+ ricarkol@google.com, oupton@google.com, jingzhangos@google.com,
+ rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,48 +80,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Nov 21, 2021 at 6:25 PM David Woodhouse <dwmw2@infradead.org> wrote:
->
-> From: David Woodhouse <dwmw@amazon.co.uk>
->
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+On Tue, 23 Nov 2021 04:39:27 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> On Sun, Nov 21, 2021 at 4:37 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Wed, 17 Nov 2021 06:43:32 +0000,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > >
+> > > Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
+> > > registers' sanitized value in the array for the vCPU at the first
+> > > vCPU reset. Use the saved ones when ID registers are read by
+> > > userspace (via KVM_GET_ONE_REG) or the guest.
+> > >
+> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h | 10 +++++++
+> > >  arch/arm64/kvm/sys_regs.c         | 43 +++++++++++++++++++------------
+> > >  2 files changed, 37 insertions(+), 16 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index edbe2cb21947..72db73c79403 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -146,6 +146,14 @@ struct kvm_vcpu_fault_info {
+> > >       u64 disr_el1;           /* Deferred [SError] Status Register */
+> > >  };
+> > >
+> > > +/*
+> > > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> > > + * where 0<=crm<8, 0<=op2<8.
+> > > + */
+> > > +#define KVM_ARM_ID_REG_MAX_NUM 64
+> > > +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> > > +#define IDREG_SYS_IDX(id)    (ID_REG_BASE + IDREG_IDX(id))
+> > > +
+> > >  enum vcpu_sysreg {
+> > >       __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+> > >       MPIDR_EL1,      /* MultiProcessor Affinity Register */
+> > > @@ -210,6 +218,8 @@ enum vcpu_sysreg {
+> > >       CNTP_CVAL_EL0,
+> > >       CNTP_CTL_EL0,
+> > >
+> > > +     ID_REG_BASE,
+> > > +     ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
+> >
+> > It is rather unclear to me why we want these registers to be
+> > replicated on a per-CPU basis. Yes, this fits the architecture, but
+> > that's also a total waste of memory if you have more than a single
+> > CPU, because we make a point in only exposing homogeneous properties
+> > to the VM (I don't think anyone intends to support vcpu asymmetry in a
+> > VM, and 64 registers per vcpu is not an insignificant memory usage).
+> >
+> > If there are no reasons for this to be per-CPU, please move it to be
+> > global to the VM. This also mean that once a vcpu has reset, it
+> > shouldn't be possible to affect the registers. This shouldn't affect
+> > the userspace API though.
+> 
+> 
+> Currently, userspace can configure different CPU features for each vCPU
+> with KVM_ARM_VCPU_INIT, which indirectly affect ID registers.
+> I'm not sure if anyone actually does that though.
 
-Looks good to me.
+But the way the ID regs are affected is always global AFAICT. For
+example, if you instantiate a PMU, you do so on all vcpus, even of the
+architecture allows you to build something completely asymmetric.
 
-For KVM RISC-V,
-Acked-by: Anup Patel <anup.patel@wdc.com>
-Reviewed-by: Anup Patel <anup.patel@wdc.com>
+> Since I personally thought having ID registers per vCPU more naturally
+> fits the behavior of KVM_ARM_VCPU_INIT and makes more straightforward
+> behavior of KVM_SET_ONE_REG, I chose that.
 
-Thanks,
-Anup
+I agree that this is the logical approach from an architectural PoV.
 
-> ---
->  arch/riscv/kvm/Makefile | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
->
-> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> index 30cdd1df0098..300590225348 100644
-> --- a/arch/riscv/kvm/Makefile
-> +++ b/arch/riscv/kvm/Makefile
-> @@ -5,14 +5,10 @@
->
->  ccflags-y += -I $(srctree)/$(src)
->
-> -KVM := ../../../virt/kvm
-> +include $(srctree)/virt/kvm/Makefile.kvm
->
->  obj-$(CONFIG_KVM) += kvm.o
->
-> -kvm-y += $(KVM)/kvm_main.o
-> -kvm-y += $(KVM)/coalesced_mmio.o
-> -kvm-y += $(KVM)/binary_stats.o
-> -kvm-y += $(KVM)/eventfd.o
->  kvm-y += main.o
->  kvm-y += vm.o
->  kvm-y += vmid.o
-> --
-> 2.31.1
->
+> (That would be also better in terms of vCPUs scalability for live migration
+>  considering a case where userspace tries to restore ID registers for
+>  many vCPUs in parallel during live migration.  Userspace could avoid that,
+>  and there are ways for KVM to mitigate that though.)
+
+I think these are orthogonal things. We can expose a per-vcpu view,
+but there is no need to have per-vcpu storage and to allow asymmetric
+VMs. If I have anything to say about the future of KVM/arm64, it will
+be that I don't want to support this at all.
+
+> Having ID registers per-VM is of course feasible even while maintaining
+> the current behavior of KVM_ARM_VCPU_INIT though.
+
+Exactly. per-VM storage, and per-vcpu visibility. It will prevent all
+sort of odd behaviours.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
