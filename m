@@ -2,73 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD459C433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 18:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E04D2C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 21:01:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C1524B1D2;
-	Tue, 23 Nov 2021 13:48:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 422BE4B12C;
+	Tue, 23 Nov 2021 16:01:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z2a3j4OpukHT; Tue, 23 Nov 2021 13:48:35 -0500 (EST)
+	with ESMTP id zePLjzVGmYO5; Tue, 23 Nov 2021 16:01:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E1F24B20C;
-	Tue, 23 Nov 2021 13:48:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31E144B11C;
+	Tue, 23 Nov 2021 16:01:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 653CC4B20C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 13:48:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1CA64B10C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 16:01:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hmEg18TXEeFI for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Nov 2021 13:48:33 -0500 (EST)
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com
- [209.85.219.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 258964B207
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 13:48:33 -0500 (EST)
-Received: by mail-yb1-f181.google.com with SMTP id v7so283964ybq.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 10:48:33 -0800 (PST)
+ with ESMTP id i340JLl3LGLT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Nov 2021 16:01:16 -0500 (EST)
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com
+ [209.85.166.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD03F4A531
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 16:01:16 -0500 (EST)
+Received: by mail-io1-f73.google.com with SMTP id
+ a12-20020a056602148c00b005e7052734adso127543iow.20
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 13:01:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=f0cDGU3aBL/JtvFU6Lqj9TIEFTKrrsLTWwNQVeTfm7s=;
- b=UJ+RaSYUdCuTpsCZQj9E3Oh9qJbvyuGy/4UukrBI48rk2Nj58gRp22Q5xYhb4vPTYQ
- S836CgyDfUSjbbUntu1fu6hwQgtOU+NNXS/hpd+ZkuuL5OGlxrNQooDduy8It3MuFzWg
- gzVzhOfTT8FoN4wNgjAdm4R5OlALjGaiHZfAconX1StgxWhu+iNLBHUfAnl5n86L7fsx
- xugVpbFgqEXK+5rIKSzhKsDpTeR+iYDBDYjBvthud8qfespy38O0nRnjyHMQZkeXPBYz
- KmDQil4XmOWKq9l38u9bPGnUPDJhIpUvifcD2bTWFK+f+zh+qcZC+ere/4WKN9vvBo6n
- 7EgQ==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=4Jy9ZNvtLqSyNCGaQe67LiBMWweegmq5EAtgAYXEIo8=;
+ b=C6+YVcqTvJAgK9Pcl8zQs362VGJn34iwhdZwoWTiSLIHyIQO2DA/U9jsP7Bw+gdDJn
+ 5mPcJu8ToV4+GJTv22tFCrKLWcTpiIC5UCeUGZp9dYHBbjDP7og23OZ7gHYtceljUV37
+ hcj2can/fRzWsv7caiHv5f11NX8YsrzLALvI07GD031eEIQnMU1iFKBUOtmTU4CG+sxI
+ nIkOusBb6IcF7bZLrQSIOCSG2L+wMbXDDQPfYIdTXlKgXA7jBVSc/cOwNcql8WDXLKN1
+ vq3PZA3BvLpGk9f30GuuFEckK0MqjOjZYjuoxSn6Uhn2ckFg3GG6oxlLPjCQ9HRb3OtD
+ SAxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=f0cDGU3aBL/JtvFU6Lqj9TIEFTKrrsLTWwNQVeTfm7s=;
- b=LgZxzHSXPH1BEDq4I09BopuXqM7DSuvU9UXTP4wgwVB6ssQSf0nvfY/baoUkShtRRd
- kOcAibwHTTqJoMWswEWFF2uGSC8lEzcZ7jBc4GaRIAuIki1J9laCNFxYcAR9TDgvJjOt
- pyHBN26CNE8w+zScTj3hLs57gxNuDrW2fFMm24c0nbXzA6iKxJRPXTUMG316rIHt/VVA
- M/9df4K0/NUMh56u3Nq048bxaaJFkKP4ndT+kE6Fv14yaPJx+qp24h7nVr+B5mgDyX5v
- ilP3hvvtI4ISI9UNdLQUn1GX9Ta8ryGDa4mAq/FLRykL2uBQRC4KcdXoW69VLW8UKh5n
- ubgA==
-X-Gm-Message-State: AOAM532jaR7FATuGWp/CdF9/6VuZMZgCVcgw4ySXMAeA6b0SeJvywfJK
- sIkKj+5urcjs/VZvdtca3kRqtIcImlVSGZ3wld364A==
-X-Google-Smtp-Source: ABdhPJzU9v6xYxlXR916SwfBpEwyCUWNGSP479wu5nIbbs9AwafRNm4AxCs/8CG3O42oR0mI9qJxiWj7/+VUFrV8ogU=
-X-Received: by 2002:a25:a169:: with SMTP id z96mr8003600ybh.491.1637693312457; 
- Tue, 23 Nov 2021 10:48:32 -0800 (PST)
-MIME-Version: 1.0
-References: <20211113012234.1443009-1-rananta@google.com>
- <20211113012234.1443009-4-rananta@google.com>
- <87y25gcfti.wl-maz@kernel.org>
-In-Reply-To: <87y25gcfti.wl-maz@kernel.org>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 23 Nov 2021 10:48:21 -0800
-Message-ID: <CAJHc60yF6BbeQGsYsSLMKd_A1SAVBiZLXBdWMO9NFH1Y2h4JRg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 03/11] KVM: Introduce kvm_vm_has_run_once
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=4Jy9ZNvtLqSyNCGaQe67LiBMWweegmq5EAtgAYXEIo8=;
+ b=q4GT9APom86Qow7GG4qstJBVIIEQDjtlZj3p4Z16g0f5hQtQ+4jFj/MFthjZbwY1ks
+ MQD5eaIkU0bzbq6g3I9NC4g83UtQ2yKpUgbVVCgy8dssJwkxABZISDKdfiji74nfNIDJ
+ ZxpiTBjHMxvvjLExC5d88jf2MPzIiOktrQH2223OuoQr00r0b0eVgxeU+E1e7ODhA1S3
+ Fd+jDKDT62iJOlkdUwgBaX1tR14HYEH5CClX+YZTV/3ch4IX8aA5DLpnJ/KEOFEC5MxK
+ ZhAmLXfWIaBzbLX66HEYlSFvliXDXWOtGvO4W5bi+ay5bfe/ttxglu26pVUiFEmd9cNS
+ qAXw==
+X-Gm-Message-State: AOAM531XTMG4YsEL4wGYlEGv5d3uu949PLuaLOFyGSNewWJdsZavAMap
+ 9DUSJftdqUhVmEVFZeii8qmbXXWfhZJI3+bvcUUuY5Wde+EjwNEvO+COMXiL8RHrXvJxYRWf+FW
+ s/mm4qYyahIBfCPUXVnm8eQh8ByESl/yGefRlbqM54WdJbXAKIqK+SX3S9oXLXNdniwle+A==
+X-Google-Smtp-Source: ABdhPJwseHjr6oKumnq1kaHVtftmYAstQdQZxGpG32BJhANLhxR/L06sDCbf1VsVsCjLO3yQPf8BUbhcFVg=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a05:6e02:1b8a:: with SMTP id
+ h10mr7719477ili.14.1637701276051; Tue, 23 Nov 2021 13:01:16 -0800 (PST)
+Date: Tue, 23 Nov 2021 21:01:03 +0000
+Message-Id: <20211123210109.1605642-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
+Subject: [PATCH v3 0/6] KVM: arm64: Emulate the OS lock
+From: Oliver Upton <oupton@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,77 +82,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Nov 22, 2021 at 8:31 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Sat, 13 Nov 2021 01:22:26 +0000,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > The upcoming patches need a way to detect if the VM, as
-> > a whole, has started. Hence, unionize kvm_vcpu_has_run_once()
-> > of all the vcpus of the VM and build kvm_vm_has_run_once()
-> > to achieve the functionality.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  include/linux/kvm_host.h |  2 ++
-> >  virt/kvm/kvm_main.c      | 17 +++++++++++++++++
-> >  2 files changed, 19 insertions(+)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index b373929c71eb..102e00c0e21c 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1854,4 +1854,6 @@ static inline bool kvm_vcpu_has_run_once(struct kvm_vcpu *vcpu)
-> >       return vcpu->has_run_once;
-> >  }
-> >
-> > +bool kvm_vm_has_run_once(struct kvm *kvm);
-> > +
-> >  #endif
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 1ec8a8e959b2..3d8d96e8f61d 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4339,6 +4339,23 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
-> >       return fd;
-> >  }
-> >
-> > +bool kvm_vm_has_run_once(struct kvm *kvm)
-> > +{
-> > +     int i, ret = false;
-> > +     struct kvm_vcpu *vcpu;
-> > +
-> > +     mutex_lock(&kvm->lock);
-> > +
-> > +     kvm_for_each_vcpu(i, vcpu, kvm) {
-> > +             ret = kvm_vcpu_has_run_once(vcpu);
-> > +             if (ret)
-> > +                     break;
-> > +     }
-> > +
-> > +     mutex_unlock(&kvm->lock);
-> > +     return ret;
-> > +}
->
-> This is horribly racy. Nothing prevents a vcpu from running behind
-> your back. If you want any sort of guarantee, look at what we do in
-> kvm_vgic_create(). Alexandru has patches that extract it to make it
-> generally available (at least for arm64).
->
-Yes, I looked into kvm_lock_all_vcpus(), but the fact that the series
-would call the function with the current vcpu lock held caused me to
-back off..
-Perhaps I can come up with a similar function, kvm_lock_all_vcpus_except(vcpu) ?
+KVM does not implement the debug architecture to the letter of the
+specification. One such issue is the fact that KVM treats the OS Lock as
+RAZ/WI, rather than emulating its behavior on hardware. This series adds
+emulation support for the OS Lock to KVM. Emulation is warranted as the
+OS Lock affects debug exceptions taken from all ELs, and is not limited
+to only the context of the guest.
 
-Regards,
-Raghavendra
+The 1st patch is a correctness fix for the OSLSR register, ensuring
+the trap handler actually is written to suggest WO behavior. Note that
+the changed code should never be reached on a correct implementation, as
+hardware should generate the undef, not KVM.
 
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+The 2nd patch adds the necessary context to track guest values of the
+OS Lock bit and exposes the value to userspace for the sake of
+migration.
+
+The 3rd patch makes the OSLK bit writable in OSLAR_EL1 (from the guest)
+and OSLSR_EL1 (from userspace), but does nothing with its value.
+
+The 4th patch actually implements the OS Lock behavior, disabling all
+debug exceptions (except breakpoint instructions) from the perspective
+of the guest. This is done by disabling MDE and SS in MDSCR_EL1.
+
+The 5th patch asserts that OSLSR_EL1 is exposed by KVM to userspace
+through the KVM_GET_REG_LIST ioctl. Lastly, the 6th patch asserts that
+no debug exceptions are routed to the guest when the OSLK bit is set.
+
+This series applies cleanly to 5.16-rc2. Tested on an Ampere Altra
+machine with the included selftests patches.
+
+Oliver Upton (6):
+  KVM: arm64: Correctly treat writes to OSLSR_EL1 as undefined
+  KVM: arm64: Stash OSLSR_EL1 in the cpu context
+  KVM: arm64: Allow guest to set the OSLK bit
+  KVM: arm64: Emulate the OS Lock
+  selftests: KVM: Add OSLSR_EL1 to the list of blessed regs
+  selftests: KVM: Test OS lock behavior
+
+ arch/arm64/include/asm/kvm_host.h             |  6 ++
+ arch/arm64/include/asm/sysreg.h               |  6 ++
+ arch/arm64/kvm/debug.c                        | 27 +++++--
+ arch/arm64/kvm/sys_regs.c                     | 70 ++++++++++++++-----
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 58 ++++++++++++++-
+ .../selftests/kvm/aarch64/get-reg-list.c      |  1 +
+ 6 files changed, 145 insertions(+), 23 deletions(-)
+
+-- 
+2.34.0.rc2.393.gf8c9666880-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
