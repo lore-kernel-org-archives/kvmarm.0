@@ -2,41 +2,41 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE71DC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 15:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07111C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 16:25:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D18A4B118;
-	Tue, 23 Nov 2021 10:59:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76E0A4B19D;
+	Tue, 23 Nov 2021 11:25:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yOJp0tHIQiPm; Tue, 23 Nov 2021 10:59:03 -0500 (EST)
+	with ESMTP id Vg43ub25dJ+6; Tue, 23 Nov 2021 11:25:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3773E4B1D8;
-	Tue, 23 Nov 2021 10:59:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0022E4B20A;
+	Tue, 23 Nov 2021 11:25:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D1274B1CA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 10:59:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 264E44B19D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:25:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HltnL9u5Q36T for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Nov 2021 10:59:00 -0500 (EST)
+ with ESMTP id z534kAZKGHJd for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Nov 2021 11:25:52 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BC7D4B1A5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 10:59:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BAE54B153
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:25:52 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4E98C1FB;
- Tue, 23 Nov 2021 07:58:59 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F38931FB;
+ Tue, 23 Nov 2021 08:25:51 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6261A3F5A1;
- Tue, 23 Nov 2021 07:58:56 -0800 (PST)
-Date: Tue, 23 Nov 2021 16:00:48 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A3C73F5A1;
+ Tue, 23 Nov 2021 08:25:48 -0800 (PST)
+Date: Tue, 23 Nov 2021 16:27:41 +0000
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: Reiji Watanabe <reijiw@google.com>
 Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
  by userspace
-Message-ID: <YZ0QMK1QFjw/uznl@monolith.localdoman>
+Message-ID: <YZ0WfQDGT5d8+6i1@monolith.localdoman>
 References: <20211117064359.2362060-1-reijiw@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
@@ -63,8 +63,40 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Reiji,
 
-I started reviewing the series, but I ended up being very confused, see
-below.
+The API documentation for KVM_ARM_VCPU_INIT states:
+
+"Userspace can call this function multiple times for a given vcpu,
+including after the vcpu has been run. This will reset the vcpu to its
+initial state. All calls to this function after the initial call must use
+the same target and same set of feature flags, otherwise EINVAL will be
+returned."
+
+The consequences of that, according to my understanding:
+
+1. Any changes to the VCPU features made by KVM are observable by
+userspace.
+
+2. The features in KVM weren't designed and implemented to be disabled
+after being enabled.
+
+With that in mind, I have two questions:
+
+1. What happens when userspace disables a feature via the ID registers
+which is set in vcpu->arch.features? Does the feature bit get cleared from
+vcpu->arch.features? Does it stay set? If it gets cleared, is it now
+possible for userspace to call KVM_ARM_VCPU_INIT again with a different set
+of VCPU features (it doesn't look possible to me after looking at the
+code). If it stays set, what does it mean when userspace calls
+KVM_ARM_VCPU_INIT with a different set of features enabled than what is
+present in the ID registers? Should the ID registers be changed to match
+the features that userspace set in the last KVM_ARM_VCPU_INIT call (it
+looks to me that the ID registers are not changed)?
+
+2. What happens to vcpu->arch.features when userspace enables a feature via
+the ID registers which is not present in the bitmap?
+
+Thanks,
+Alex
 
 On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
 > In KVM/arm64, values of ID registers for a guest are mostly same as
@@ -77,18 +109,6 @@ On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
 > ID registers (as long as KVM can support features that are indicated
 > in the registers) so userspace can have more control of configuring
 > and unconfiguring features for guests.
-
-What not use VCPU features? Isn't that why the field
-kvm_vcpu_init->features exists in the first place? This cover letter does
-nothing to explaing why any changes are needed.
-
-Do you require finer grained control over certain feature that you cannot
-get with the 32 * 7 = 224 feature flag bits from kvm_vcpu_init? Does using
-the ID registers simplify certain aspects of the implementation?
-
-Thanks,
-Alex
-
 > 
 > The patch series is for both VHE and non-VHE, except for protected VMs,
 > which have a different way of configuring ID registers based on its
