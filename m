@@ -2,71 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF53C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 21:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F0FCC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 21:01:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6912F4B125;
-	Tue, 23 Nov 2021 16:01:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 153274B165;
+	Tue, 23 Nov 2021 16:01:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id q5KM3OQbyuD7; Tue, 23 Nov 2021 16:01:24 -0500 (EST)
+	with ESMTP id NUmMlp7Gh-uu; Tue, 23 Nov 2021 16:01:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B55554B16C;
-	Tue, 23 Nov 2021 16:01:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9C504B17B;
+	Tue, 23 Nov 2021 16:01:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 96BF84B129
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 16:01:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64C084B125
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 16:01:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X+P+-VAR5Yy2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Nov 2021 16:01:21 -0500 (EST)
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com
- [209.85.166.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C0CA04B11B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 16:01:21 -0500 (EST)
-Received: by mail-il1-f202.google.com with SMTP id
- i8-20020a056e021d0800b0029e81787af1so192890ila.20
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 13:01:21 -0800 (PST)
+ with ESMTP id q4NjJxKrYcBx for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Nov 2021 16:01:24 -0500 (EST)
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com
+ [209.85.166.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA61D4B15A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 16:01:22 -0500 (EST)
+Received: by mail-il1-f201.google.com with SMTP id
+ m14-20020a92870e000000b0027586f7fb06so236420ild.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 13:01:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=BwedrBbB5HTyTT2p4mXfIz5QYgjh9yNsR4b4hzDoNcc=;
- b=Qaaf+qNAHsw9kOiocwlPyQ0uu8vL8UJhBqb8PdL3yfi+rhltZxP2GUdFo8KKxXIF2y
- 6IZ/uxBz0Ahn+4GR5yWfCfWrL5FHSvGty4CvmlOR4qAkUXmWWSnW2VS4HHgxJF3nAYup
- 8230IweKBYk0p9mch3LGMraTTxEIO/uKA/L4wA8eXpXuoz23U2AkmV39GFksQQCQ8DhE
- WnE0rEBRBf4zorX53WPARK1svet5e8XOn3nqGqDjANt/uI7PgRy/KuUil9dGh1ZiLL9D
- IZnfjhI6ieihzJ92jh8EwquSdmAAvY8mdCwlu/6dhLJundiUSd5Dy3HfdQnBwv7ny618
- ZOIQ==
+ :cc; bh=QovEQZReWLCATlIewYReLSWnyKrpm0FAX1JqfLYj0ZU=;
+ b=GvxugeqPapYQXmol2OKna0PSxEK0dRKHL03g/3jvj+NM5Zo7aVD2DG0NvLay0HO677
+ u37OJrSwS3hYQkPMeG9OPNDK3f5YlepZsarr5VR5FXJ3GzdgcA1WLud2TXRThVIwB3O3
+ uFBaAR9z5ybAU8wVwhudaNSob5oTY6HD3FYTLzAkAA2v/HWOLuQIbQ00MfSI5rHIwb4U
+ EQj3zNf2Yu9oKJfDoHW9KOcpcgKFoky0D6I8y/cOXeR9TlfzGc8dOAO6BTNHDfvAobT6
+ S3wQ5KluJYABG0zyuDuLXmdYh2Zph6J0bzlLmR0vuXQ70MJkP1SXgy8ttvxpcqa7sHwQ
+ 8IkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=BwedrBbB5HTyTT2p4mXfIz5QYgjh9yNsR4b4hzDoNcc=;
- b=tb6/i8BBKKwvnsi/e41i94jdMGPz2CyB1hpRj3FQ2QuDNNRy9NwxmEocy+2eGSZFl4
- 9szCOZu+tJDxtfPGr6z7av6rcQVeL1njiZe8QYCTMrKOXwxF+ibFYMyrN03ixDOcHRxV
- cl/fGzru+IN6K4jqP37EEs5yAN4Yiiqu+5AcjEj28Kbu7bRVhEfVZQ+rrzpTIfre5xaW
- pebdMhvBr4KiJ/oGQbIvqXKmKac3hpN/cWux4FP/2MhnxcTvnlaNBIFAhGsENhoFwdVG
- w7yiGAnYTEGJk4MhfEAg8Em7SQudae0ZP0TN42DTTOJMu8CWTGgU82XGh10453y2KKgt
- O3Iw==
-X-Gm-Message-State: AOAM53070j0ZNcB7Qv4GSWO4/j8xBTYzYc9ZeCIeEw4PlCdcZl9Gao//
- CmM8Ka+55zMOQLGlCE0wni6TSpNlTvtdmIgHfS368dQQ0aeWx8fSp8v/xuTA5fr8+LCYbK9lHCn
- Oi/yobFuXwYKNUz2wB0/EEXHUCIAxkUs+ibpQc8JXswOKr0yZHSuJFwwF4jJjuS2SYsZLrQ==
-X-Google-Smtp-Source: ABdhPJzaYhRodYov80jU9UDbdbd9k79+gVGKWsjAcZxXmdtDiHN7YN7VKm1c4GS5SZfFz37xFHlrrmZumXw=
+ bh=QovEQZReWLCATlIewYReLSWnyKrpm0FAX1JqfLYj0ZU=;
+ b=aUiOYV/VF0g/hTkAVjRjQsq4wpK+KGOyCT2QmTtDMJ+T8jUKS8T5H/mIX/BwdWtOzc
+ aw0SyEHx7gGOTLxsFtaxi7ar19yQgtLSi8uBLxx1HGeog2xRuoNw15+ld5FovLCCHgKM
+ 3gsmM/N/vc6xgTdEElZ0OenBqnTSPEuks+Gkk9M1YUQKCcUzmR/sD4qN2FJoaSQeZ3rd
+ 7vbQ0Dc5v0ZFTd1ldODmLmMdqOPSHeXISj6Va2S4B7XdNMrWHn229exgeP+1o6v/aXCz
+ y5Hsv6soQPGlSWqMRH/tqheXHpDEuYpffrWY3BLSvoDq8s1QyJqTR6m/9enWKI8mi/my
+ Nd/w==
+X-Gm-Message-State: AOAM5300yO1ynVgbX7hs/DgeFEECwI2oc+66+z0FtliDWX2Jobv/wkYz
+ w8QYYguawxkGKDmVl9W8O5sHykdSzpP/PxgxczNlzTek0h1KtRiqBAiYNh67C1px+YBhObyaqLf
+ bniS/iSXiTpoi8CJsB8BuTKjTVqRndUua974RlgO+ai9ocn6XuRXQj3eSvMxnQAaDs7tLWw==
+X-Google-Smtp-Source: ABdhPJwTgu9XjIzS0u9PqlLGX0GOMfjHnkXYfd2F5tiYZIseel2tjBlN9HerYxahKvrn7lMiFo9d0WYzcmE=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a6b:8bc2:: with SMTP id
- n185mr8931449iod.174.1637701281216; 
- Tue, 23 Nov 2021 13:01:21 -0800 (PST)
-Date: Tue, 23 Nov 2021 21:01:08 +0000
+ (user=oupton job=sendgmr) by 2002:a02:ba8b:: with SMTP id
+ g11mr9410034jao.128.1637701282229; 
+ Tue, 23 Nov 2021 13:01:22 -0800 (PST)
+Date: Tue, 23 Nov 2021 21:01:09 +0000
 In-Reply-To: <20211123210109.1605642-1-oupton@google.com>
-Message-Id: <20211123210109.1605642-6-oupton@google.com>
+Message-Id: <20211123210109.1605642-7-oupton@google.com>
 Mime-Version: 1.0
 References: <20211123210109.1605642-1-oupton@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH v3 5/6] selftests: KVM: Add OSLSR_EL1 to the list of blessed
- regs
+Subject: [PATCH v3 6/6] selftests: KVM: Test OS lock behavior
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -87,26 +86,114 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-OSLSR_EL1 is now part of the visible system register state. Add it to
-the get-reg-list selftest to ensure we keep it that way.
+KVM now correctly handles the OS Lock for its guests. When set, KVM
+blocks all debug exceptions originating from the guest. Add test cases
+to the debug-exceptions test to assert that software breakpoint,
+hardware breakpoint, watchpoint, and single-step exceptions are in fact
+blocked.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 1 +
- 1 file changed, 1 insertion(+)
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 58 ++++++++++++++++++-
+ 1 file changed, 56 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index cc898181faab..0c7c39a16b3f 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -761,6 +761,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(2, 0, 0, 15, 6),
- 	ARM64_SYS_REG(2, 0, 0, 15, 7),
- 	ARM64_SYS_REG(2, 4, 0, 7, 0),	/* DBGVCR32_EL2 */
-+	ARM64_SYS_REG(2, 0, 1, 1, 4),	/* OSLSR_EL1 */
- 	ARM64_SYS_REG(3, 0, 0, 0, 5),	/* MPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 0, 1, 0),	/* ID_PFR0_EL1 */
- 	ARM64_SYS_REG(3, 0, 0, 1, 1),	/* ID_PFR1_EL1 */
+diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+index ea189d83abf7..63b2178210c4 100644
+--- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
++++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+@@ -23,7 +23,7 @@
+ #define SPSR_D		(1 << 9)
+ #define SPSR_SS		(1 << 21)
+ 
+-extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
++extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
+ static volatile uint64_t sw_bp_addr, hw_bp_addr;
+ static volatile uint64_t wp_addr, wp_data_addr;
+ static volatile uint64_t svc_addr;
+@@ -47,6 +47,14 @@ static void reset_debug_state(void)
+ 	isb();
+ }
+ 
++static void enable_os_lock(void)
++{
++	write_sysreg(1, oslar_el1);
++	isb();
++
++	GUEST_ASSERT(read_sysreg(oslsr_el1) & 2);
++}
++
+ static void install_wp(uint64_t addr)
+ {
+ 	uint32_t wcr;
+@@ -99,6 +107,7 @@ static void guest_code(void)
+ 	GUEST_SYNC(0);
+ 
+ 	/* Software-breakpoint */
++	reset_debug_state();
+ 	asm volatile("sw_bp: brk #0");
+ 	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp));
+ 
+@@ -152,6 +161,51 @@ static void guest_code(void)
+ 	GUEST_ASSERT_EQ(ss_addr[1], PC(ss_start) + 4);
+ 	GUEST_ASSERT_EQ(ss_addr[2], PC(ss_start) + 8);
+ 
++	GUEST_SYNC(6);
++
++	/* OS Lock does not block software-breakpoint */
++	reset_debug_state();
++	enable_os_lock();
++	sw_bp_addr = 0;
++	asm volatile("sw_bp2: brk #0");
++	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp2));
++
++	GUEST_SYNC(7);
++
++	/* OS Lock blocking hardware-breakpoint */
++	reset_debug_state();
++	enable_os_lock();
++	install_hw_bp(PC(hw_bp2));
++	hw_bp_addr = 0;
++	asm volatile("hw_bp2: nop");
++	GUEST_ASSERT_EQ(hw_bp_addr, 0);
++
++	GUEST_SYNC(8);
++
++	/* OS Lock blocking watchpoint */
++	reset_debug_state();
++	enable_os_lock();
++	write_data = '\0';
++	wp_data_addr = 0;
++	install_wp(PC(write_data));
++	write_data = 'x';
++	GUEST_ASSERT_EQ(write_data, 'x');
++	GUEST_ASSERT_EQ(wp_data_addr, 0);
++
++	GUEST_SYNC(9);
++
++	/* OS Lock blocking single-step */
++	reset_debug_state();
++	enable_os_lock();
++	ss_addr[0] = 0;
++	install_ss();
++	ss_idx = 0;
++	asm volatile("mrs x0, esr_el1\n\t"
++		     "add x0, x0, #1\n\t"
++		     "msr daifset, #8\n\t"
++		     : : : "x0");
++	GUEST_ASSERT_EQ(ss_addr[0], 0);
++
+ 	GUEST_DONE();
+ }
+ 
+@@ -223,7 +277,7 @@ int main(int argc, char *argv[])
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+ 				ESR_EC_SVC64, guest_svc_handler);
+ 
+-	for (stage = 0; stage < 7; stage++) {
++	for (stage = 0; stage < 11; stage++) {
+ 		vcpu_run(vm, VCPU_ID);
+ 
+ 		switch (get_ucall(vm, VCPU_ID, &uc)) {
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
