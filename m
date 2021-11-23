@@ -2,49 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07111C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 16:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 262D4C43219
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 16:36:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76E0A4B19D;
-	Tue, 23 Nov 2021 11:25:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A31D04B20E;
+	Tue, 23 Nov 2021 11:36:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Vg43ub25dJ+6; Tue, 23 Nov 2021 11:25:55 -0500 (EST)
+	with ESMTP id ARfZCRQpoupv; Tue, 23 Nov 2021 11:36:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0022E4B20A;
-	Tue, 23 Nov 2021 11:25:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AAC94B1B2;
+	Tue, 23 Nov 2021 11:36:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 264E44B19D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:25:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B05F4B172
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:36:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z534kAZKGHJd for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Nov 2021 11:25:52 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BAE54B153
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:25:52 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F38931FB;
- Tue, 23 Nov 2021 08:25:51 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0A3C73F5A1;
- Tue, 23 Nov 2021 08:25:48 -0800 (PST)
-Date: Tue, 23 Nov 2021 16:27:41 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
- by userspace
-Message-ID: <YZ0WfQDGT5d8+6i1@monolith.localdoman>
-References: <20211117064359.2362060-1-reijiw@google.com>
+ with ESMTP id 1FP74PwFMKlr for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Nov 2021 11:36:50 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 261214B126
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 11:36:50 -0500 (EST)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 2E04C60F5D;
+ Tue, 23 Nov 2021 16:36:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1637685409;
+ bh=plK5J/t7M/GlW86iF1TJCxPLnyKdb3OQjKr63ahMX9M=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=gL+JfqMn4zmSYTLx2l+OXc+j6OKAqMORXivtQvMguOjH7gWVn7AklM7Sa3jVHaVxT
+ Ju4PJp7tl280dwFY/Rpj5Ij4XImwQ+rOt7onZ6rUaiEsu2sqQ6gxTZIl+EkBqAwtAE
+ RX/EFRUzIzdf29cldJIcYM7j9VBulAmH1RlAr1l0Mv0eov4JiOBD/EXdiJhb6B1B0S
+ M3x7lEdmwsip5gXgKoJaWsut1KIuIaCRoX7xlgB71iL0jKw0QOxS2Vl6nntwXStLhc
+ Mx9Axbg9USK/tBnuZkQSIKPOWO/rkG7GEpDoZk9fdlLp4SzF6mihaQgftQnI+Eg+JR
+ AoFu+LNY6lX9A==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH MANUALSEL 5.15 8/8] KVM: arm64: Cap KVM_CAP_NR_VCPUS by
+ kvm_arm_default_max_vcpus()
+Date: Tue, 23 Nov 2021 11:36:30 -0500
+Message-Id: <20211123163630.289306-8-sashal@kernel.org>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20211123163630.289306-1-sashal@kernel.org>
+References: <20211123163630.289306-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211117064359.2362060-1-reijiw@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-stable: review
+X-Patchwork-Hint: Ignore
+Cc: Sasha Levin <sashal@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ catalin.marinas@arm.com, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -61,174 +72,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Reiji,
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-The API documentation for KVM_ARM_VCPU_INIT states:
+[ Upstream commit f60a00d7295057cb4baea5a321501efc72794453 ]
 
-"Userspace can call this function multiple times for a given vcpu,
-including after the vcpu has been run. This will reset the vcpu to its
-initial state. All calls to this function after the initial call must use
-the same target and same set of feature flags, otherwise EINVAL will be
-returned."
+Generally, it doesn't make sense to return the recommended maximum number
+of vCPUs which exceeds the maximum possible number of vCPUs.
 
-The consequences of that, according to my understanding:
+Note: ARM64 is special as the value returned by KVM_CAP_MAX_VCPUS differs
+depending on whether it is a system-wide ioctl or a per-VM one. Previously,
+KVM_CAP_NR_VCPUS didn't have this difference and it seems preferable to
+keep the status quo. Cap KVM_CAP_NR_VCPUS by kvm_arm_default_max_vcpus()
+which is what gets returned by system-wide KVM_CAP_MAX_VCPUS.
 
-1. Any changes to the VCPU features made by KVM are observable by
-userspace.
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Message-Id: <20211116163443.88707-2-vkuznets@redhat.com>
+Acked-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ arch/arm64/kvm/arm.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-2. The features in KVM weren't designed and implemented to be disabled
-after being enabled.
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9b328bb05596a..1ed82b6d5e8db 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -223,7 +223,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_NR_VCPUS:
+-		r = num_online_cpus();
++		/*
++		 * ARM64 treats KVM_CAP_NR_CPUS differently from all other
++		 * architectures, as it does not always bound it to
++		 * KVM_CAP_MAX_VCPUS. It should not matter much because
++		 * this is just an advisory value.
++		 */
++		r = min_t(unsigned int, num_online_cpus(),
++			  kvm_arm_default_max_vcpus());
+ 		break;
+ 	case KVM_CAP_MAX_VCPUS:
+ 	case KVM_CAP_MAX_VCPU_ID:
+-- 
+2.33.0
 
-With that in mind, I have two questions:
-
-1. What happens when userspace disables a feature via the ID registers
-which is set in vcpu->arch.features? Does the feature bit get cleared from
-vcpu->arch.features? Does it stay set? If it gets cleared, is it now
-possible for userspace to call KVM_ARM_VCPU_INIT again with a different set
-of VCPU features (it doesn't look possible to me after looking at the
-code). If it stays set, what does it mean when userspace calls
-KVM_ARM_VCPU_INIT with a different set of features enabled than what is
-present in the ID registers? Should the ID registers be changed to match
-the features that userspace set in the last KVM_ARM_VCPU_INIT call (it
-looks to me that the ID registers are not changed)?
-
-2. What happens to vcpu->arch.features when userspace enables a feature via
-the ID registers which is not present in the bitmap?
-
-Thanks,
-Alex
-
-On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
-> In KVM/arm64, values of ID registers for a guest are mostly same as
-> its host's values except for bits for feature that KVM doesn't support
-> and for opt-in features that userspace didn't configure.  Userspace
-> can use KVM_SET_ONE_REG to a set ID register value, but it fails
-> if userspace attempts to modify the register value.
-> 
-> This patch series adds support to allow userspace to modify a value of
-> ID registers (as long as KVM can support features that are indicated
-> in the registers) so userspace can have more control of configuring
-> and unconfiguring features for guests.
-> 
-> The patch series is for both VHE and non-VHE, except for protected VMs,
-> which have a different way of configuring ID registers based on its
-> different requirements [1].
-> There was a patch series that tried to achieve the same thing [2].
-> A few snippets of codes in this series were inspired by or came from [2].
-> 
-> The initial value of ID registers for a vCPU will be the host's value
-> with bits cleared for unsupported features and for opt-in features that
-> were not configured. So, the initial value userspace can see (via
-> KVM_GET_ONE_REG) is the upper limit that can be set for the register.
-> Any requests to change the value that conflicts with opt-in features'
-> configuration will fail.
-> 
-> When a guest tries to use a CPU feature that is not exposed to the guest,
-> trapping it (to emulate a real CPU's behavior) would generally be a
-> desirable behavior (when it is possible with no or little side effects).
-> The later patches in the series add codes for this.  Only features that
-> can be trapped independently will be trapped by this series though.
-> 
-> This series adds kunit tests for new functions in sys_regs.c (except for
-> trivial ones), and these tests are enabled with a new configuration
-> option 'CONFIG_KVM_KUNIT_TEST'.
-> 
-> The series is based on v5.16-rc1.
-> 
-> v3:
->   - Remove ID register consistency checking across vCPUs [Oliver]
->   - Change KVM_CAP_ARM_ID_REG_WRITABLE to
->     KVM_CAP_ARM_ID_REG_CONFIGURABLE [Oliver]
->   - Add KUnit testing for ID register validation and trap initialization.
->   - Change read_id_reg() to take care of ID_AA64PFR0_EL1.GIC
->   - Add a helper of read_id_reg() (__read_id_reg()) and use the helper
->     instead of directly using __vcpu_sys_reg()
->   - Change not to run kvm_id_regs_consistency_check() and
->     kvm_vcpu_init_traps() for protected VMs.
->   - Update selftest to remove test cases for ID register consistency
->     checking across vCPUs and to add test cases for ID_AA64PFR0_EL1.GIC.
-> 
-> v2: https://lore.kernel.org/all/20211103062520.1445832-1-reijiw@google.com/
->   - Remove unnecessary line breaks. [Andrew]
->   - Use @params for comments. [Andrew]
->   - Move arm64_check_features to arch/arm64/kvm/sys_regs.c and
->     change that KVM specific feature check function.  [Andrew]
->   - Remove unnecessary raz handling from __set_id_reg. [Andrew]
->   - Remove sys_val field from the initial id_reg_info and add it
->     in the later patch. [Andrew]
->   - Call id_reg->init() from id_reg_info_init(). [Andrew]
->   - Fix cpuid_feature_cap_perfmon_field() to convert 0xf to 0x0
->     (and use it in the following patches).
->   - Change kvm_vcpu_first_run_init to set has_run_once to false
->     when kvm_id_regs_consistency_check() fails.
->   - Add a patch to introduce id_reg_info for ID_AA64MMFR0_EL1,
->     which requires special validity checking for TGran*_2 fields.
->   - Add patches to introduce id_reg_info for ID_DFR1_EL1 and
->     ID_MMFR0_EL1, which are required due to arm64_check_features
->     implementation change.
->   - Add a new argument, which is a pointer to id_reg_info, for
->     id_reg_info's validate()
-> 
-> v1: https://lore.kernel.org/all/20211012043535.500493-1-reijiw@google.com/
-> 
-> [1] https://lore.kernel.org/kvmarm/20211010145636.1950948-1-tabba@google.com/
-> [2] https://lore.kernel.org/kvm/20201102033422.657391-1-liangpeng10@huawei.com/
-> 
-> Reiji Watanabe (29):
->   KVM: arm64: Add has_reset_once flag for vcpu
->   KVM: arm64: Save ID registers' sanitized value per vCPU
->   KVM: arm64: Introduce struct id_reg_info
->   KVM: arm64: Make ID_AA64PFR0_EL1 writable
->   KVM: arm64: Make ID_AA64PFR1_EL1 writable
->   KVM: arm64: Make ID_AA64ISAR0_EL1 writable
->   KVM: arm64: Make ID_AA64ISAR1_EL1 writable
->   KVM: arm64: Make ID_AA64MMFR0_EL1 writable
->   KVM: arm64: Hide IMPLEMENTATION DEFINED PMU support for the guest
->   KVM: arm64: Make ID_AA64DFR0_EL1 writable
->   KVM: arm64: Make ID_DFR0_EL1 writable
->   KVM: arm64: Make ID_DFR1_EL1 writable
->   KVM: arm64: Make ID_MMFR0_EL1 writable
->   KVM: arm64: Make MVFR1_EL1 writable
->   KVM: arm64: Make ID registers without id_reg_info writable
->   KVM: arm64: Add consistency checking for frac fields of ID registers
->   KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE capability
->   KVM: arm64: Add kunit test for ID register validation
->   KVM: arm64: Use vcpu->arch cptr_el2 to track value of cptr_el2 for VHE
->   KVM: arm64: Use vcpu->arch.mdcr_el2 to track value of mdcr_el2
->   KVM: arm64: Introduce framework to trap disabled features
->   KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
->   KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
->   KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
->   KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
->   KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
->   KVM: arm64: Initialize trapping of disabled CPU features for the guest
->   KVM: arm64: Add kunit test for trap initialization
->   KVM: arm64: selftests: Introduce id_reg_test
-> 
->  Documentation/virt/kvm/api.rst                |    8 +
->  arch/arm64/include/asm/cpufeature.h           |    2 +-
->  arch/arm64/include/asm/kvm_arm.h              |   32 +
->  arch/arm64/include/asm/kvm_host.h             |   15 +
->  arch/arm64/include/asm/sysreg.h               |    2 +
->  arch/arm64/kvm/Kconfig                        |   11 +
->  arch/arm64/kvm/arm.c                          |   12 +-
->  arch/arm64/kvm/debug.c                        |   13 +-
->  arch/arm64/kvm/hyp/vhe/switch.c               |   14 +-
->  arch/arm64/kvm/reset.c                        |    4 +
->  arch/arm64/kvm/sys_regs.c                     | 1265 +++++++++++++++--
->  arch/arm64/kvm/sys_regs_test.c                | 1109 +++++++++++++++
->  include/uapi/linux/kvm.h                      |    1 +
->  tools/arch/arm64/include/asm/sysreg.h         |    1 +
->  tools/testing/selftests/kvm/.gitignore        |    1 +
->  tools/testing/selftests/kvm/Makefile          |    1 +
->  .../selftests/kvm/aarch64/id_reg_test.c       | 1128 +++++++++++++++
->  17 files changed, 3488 insertions(+), 131 deletions(-)
->  create mode 100644 arch/arm64/kvm/sys_regs_test.c
->  create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
-> 
-> -- 
-> 2.34.0.rc1.387.gb447b232ab-goog
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
