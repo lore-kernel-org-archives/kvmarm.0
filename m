@@ -2,184 +2,65 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AB0C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 14:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01FC2C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 23 Nov 2021 15:06:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E4594B200;
-	Tue, 23 Nov 2021 09:49:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A32E14B1B4;
+	Tue, 23 Nov 2021 10:06:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@oracle.com
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@oracle.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LV6YG9E8anut; Tue, 23 Nov 2021 09:49:42 -0500 (EST)
+	with ESMTP id GvYfjgDA+JPJ; Tue, 23 Nov 2021 10:06:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 196A54B1F1;
-	Tue, 23 Nov 2021 09:49:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7117F4B1F0;
+	Tue, 23 Nov 2021 10:06:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 525154B1F0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 09:44:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A36F4B1C5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 10:06:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aYb4OJW7TPHW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Nov 2021 09:44:24 -0500 (EST)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com
- [205.220.165.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DDA834B168
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 09:44:23 -0500 (EST)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
- by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ANE6qn8004389; 
- Tue, 23 Nov 2021 14:44:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : subject : to :
- cc : references : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=p76DA36z/rVXjTA4bh4mm+3JzCOWdEhJ5+VeV1OUNg8=;
- b=Vpdk3tOSTAxQxBv9A3g9podUKp/uP1pjEgbAt5S53s+YjfWDmYF9vyIv9opEf1Vuvlrg
- gRDQn8gUKXKJ2v0PJU8PA3+wB9Da+tMiGjV/MY0ftRRj1MY/3lrVUH29BEOb4dhX0tOV
- f7e9sNeG2U98yM+ol+88TROIorMCdKRHcMO+u68Jatc7uL1FkiyQFjq8CNGXlwdqnC/2
- 7FkCiFtur+hldgn1MsR62HNeYC5GY3YBErdo5n+LSiRK5ifl1VBHSsKzd/ueLUh2kWJ8
- C19D8PpmLLhU0Zv7ANP/4ET/gy76IHJwycglFoDIMzMSyv88PZPQDXdQztIP8Mwbt0Jp EQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by mx0b-00069f02.pphosted.com with ESMTP id 3cg3059gr8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Nov 2021 14:44:20 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1ANELQDS072777;
- Tue, 23 Nov 2021 14:43:01 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com
- (mail-dm3nam07lp2046.outbound.protection.outlook.com [104.47.56.46])
- by userp3020.oracle.com with ESMTP id 3cfassme0s-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 23 Nov 2021 14:43:01 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lUHzvtJjcgdd9XVb5hudm6sEgm/y5hkgj2DUWMTAGQ2Od0GRu7C6bRmdWBH3FzYZlzMpwxeda823pZczVT/c66vlBP5E7Jw2TMAJa0av1o5l/ovsPls6cZh9TkJdTh+OVk4I/ZeyN/S9UPbur4GHws3agiD4xtR1sJCL8CNCUYHqIaLax9U4x9+0MN8k9UbAWsj5SoppfvyUqfZtdCc8m7fHg7hsF2DeZTCHs8BaFgb8UMptcPEX3/vSjKbyf9vdsjAV3lhz/4dAmcquOJ5CasRCTYDpJ+U0S0/gKS3M9Ad/qSYF+ZeDiKMR8THwfRFJY1hxAM1BWmL7wBQUuYfV0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=p76DA36z/rVXjTA4bh4mm+3JzCOWdEhJ5+VeV1OUNg8=;
- b=Hf9V13YB2GaxzNum50spBmhkAxdUisBD6IeMYxAwHfIHQqCs7K540Li8RWTqFTEsxYfpv6xb6Wb/o6QCU+7xl8/tKgeUZFfzvTFBGfRiWdkAnNvSEkzNciAcqs+/aOWKJhIVxiz3AnjAtEbQa9p3vmpsuriAb/15DF+3+Z/MR+fuz7pna5hIG/tfSB6shU8krkXQMij7dMG7LqdJEieX1AAqmc+quspTedxx2xCvVtk6ZFdxjSSWlcVmAWycL1zHemDr3TeIREMpJTDV7DkOHVmdX74WIucxn28xQH0UqjJUQkKoAQOnBOMuFJ7ku+6zpqjmyzwmDQJ9lNTGSb4wiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p76DA36z/rVXjTA4bh4mm+3JzCOWdEhJ5+VeV1OUNg8=;
- b=qsTVuijfz1vbdW2a1uBBzrKuQQNiKHYeMClbcIcrJfuFU1iRTLrou1/oUYecYiz3rfwnuC79C2LYhpYiC8+ifvHIyCSG8Ewa8iYBmHaL3xAtBSYMiLclt6J5Dwi0TTzhkNO99K2/OxYAAuNwjAzqKNVa1Q7N+8dDUgtvFiLJH6Q=
-Received: from CH2PR10MB4008.namprd10.prod.outlook.com (2603:10b6:610:c::22)
- by CH2PR10MB4165.namprd10.prod.outlook.com (2603:10b6:610:a5::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.21; Tue, 23 Nov
- 2021 14:42:59 +0000
-Received: from CH2PR10MB4008.namprd10.prod.outlook.com
- ([fe80::dd4c:c1ef:d6ad:12da]) by CH2PR10MB4008.namprd10.prod.outlook.com
- ([fe80::dd4c:c1ef:d6ad:12da%4]) with mapi id 15.20.4713.025; Tue, 23 Nov 2021
- 14:42:59 +0000
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: Re: [PATCH v5.5 00/30] KVM: Scalable memslots implementation
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <20211104002531.1176691-1-seanjc@google.com>
- <cb4f5d6e-9535-dd57-d8ee-3b593a81f3a6@oracle.com>
- <YYnNA5lZNXXdX/ig@google.com>
- <f3bc3bfc-37c3-bbfd-25b4-ef0a72e534ba@oracle.com>
-Message-ID: <5129f02d-7c0e-8e88-797f-95e8d968df88@oracle.com>
-Date: Tue, 23 Nov 2021 15:42:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <f3bc3bfc-37c3-bbfd-25b4-ef0a72e534ba@oracle.com>
-Content-Language: en-US
-X-ClientProxiedBy: AS9PR06CA0335.eurprd06.prod.outlook.com
- (2603:10a6:20b:466::34) To CH2PR10MB4008.namprd10.prod.outlook.com
- (2603:10b6:610:c::22)
-MIME-Version: 1.0
-Received: from [172.20.10.2] (37.248.170.208) by
- AS9PR06CA0335.eurprd06.prod.outlook.com (2603:10a6:20b:466::34) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.22 via Frontend
- Transport; Tue, 23 Nov 2021 14:42:55 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3a542391-d0a3-4262-d303-08d9ae8f8ae9
-X-MS-TrafficTypeDiagnostic: CH2PR10MB4165:
-X-Microsoft-Antispam-PRVS: <CH2PR10MB4165ECB424D817FDD36D72B0FF609@CH2PR10MB4165.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fDjOwuq3GQ8hSJO/6vMiP3iHhDuvIdKmDyKYd4XGP7MxLmR6wx1pF7MWjrFuxU7hutPKqO0+HBZVx6k4oT6O/cEH/oQvROBkv/XeZXRf4IAXU0s6J26leuVBmLTApFhajoA4a16tJssMN6xxKWt81hCdjWYYP2zmipdE7FcSzM7SqFZSkNdqdWmNOMFlYxc3beJf+FcyJ/BZz3n2cUClh0x1ow/AINMlJAKPE5QY8DoObRO4h9rOaZVqw/RbzVAq5kHhXWdaeeoWnyUiWIKk54hKUX0/Zo2IfoJFGaeaQwud6bJLPnkVx+PC6+720eJx2oue8Mo/2nhfQbBbpj4xUdeA+In5K0uPjWCBqP37zcno+mC+adzB/MWHwmPwOe4AkykHBlRyfMwg5FK7QkRCj/wWlUnp7QZEn97MziD6O1icRcXwA3SNMX9jyERo+5Pz5gQ9L9NVi0mCXnDBjOaPmGr0x500sfjPhmNxtVRxhXMDTCIlBE+aVFCbjEdJaWWpN6tFqe2kyd67FeAPQFK6A6zB2V5tZDkJ+42lj1fQuO7UNN5SnYZ2isKi1jvoCNOnZRSe6jPPa8cxLEe1aurXkP/CL7OEGQUCjibX1xFzbsHpUmP2eP5NzuNpriBdlKpixPocIoosWze1+knOI1aciWNvfwAQwnlJTR7MRAN+gu1as4aCEDIQUhsrHR+0i0VDSqZBswfD6m866ZdzXFjnSQJ7/eUaBm6aADhd5XYiZKM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:CH2PR10MB4008.namprd10.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(366004)(66556008)(66476007)(316002)(8936002)(2906002)(31696002)(2616005)(83380400001)(66946007)(7416002)(5660300002)(558084003)(956004)(6486002)(38100700002)(26005)(508600001)(186003)(6916009)(31686004)(54906003)(86362001)(8676002)(16576012)(6666004)(36756003)(4326008)(45980500001)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?djQwUkQ2ZTdOSnFKMFA2VU9LS280M0F1ZDI5WVc0c1UrN2I2WiszdVJDaUlx?=
- =?utf-8?B?QkxLeUJPNG1Gc2ZrWS9BZUZ6QS9OY041VVU1ZmpTRTk3eXB1eUx1NVY3bWRI?=
- =?utf-8?B?aWVMTEFTRU40MVJuM3ZHTzIvcGN4ejBRRjRlSk12a3dPY3I1bTlObjFGUldj?=
- =?utf-8?B?K01jaldVdzVINmpVR0xKdzYvRmJ1L3gwT3BRQmYxeWFBU2grQ2V5VFR0dTg4?=
- =?utf-8?B?V2RBZVk3T1I3VzlEa2c2RGlaVTd2QXZNcEpHa1VKWm9vL3F2SGRud25nVUV2?=
- =?utf-8?B?MDlCT1QwS0tSemppYmFaWVJHZDdxOHBnVlhlR1A2KzFXcDdwWmJ3bTZBT0Vw?=
- =?utf-8?B?QlE0bTJZK0p6dDh6KzZQVUwraFhNSWw1ZER3MHVyeGVES2JUV243Y21ubnBF?=
- =?utf-8?B?RERTYTFnREtDT0V5aytpb3pTNiswTmNmak5NaEVoWlNDdC9Qalgrck1tbUZn?=
- =?utf-8?B?alJIN21DS3dzRmo2dFRPTTA0Nk1ia2x6R1dBZmRzOUZIK3JtZUJvaVo4SS9Q?=
- =?utf-8?B?S3hmaUdpa205T2tsZURTS3Y0UzZmK2drNEJBN2ZSOWRUOVVMZWNFbFZBeDlL?=
- =?utf-8?B?Z0VMbTNqdU1CcWpkMjBYVWxDbFdpRHdaTU5IYmoycFZTR2EySlBtaXR5RG1h?=
- =?utf-8?B?Rnd1R0wyMEdweElLWkJjOUd1S2RhSXJzQ09oclR3RzFUNHZtamU2MHhQSWNM?=
- =?utf-8?B?TzlRRmlSd2hlUFVsZ2FkUXhVYVlFNEh1c25IYWwrbU9iRlVlWDZMUDY2WDNs?=
- =?utf-8?B?RG5VY2Jyaklpdks2c1Q1RDFRTmxGQXZ2cDlJVEY4cVZrT2xLZENYNm5tZXFI?=
- =?utf-8?B?U3RvR3k2VDJ1U2diUkFKeUtrZ1hsKzhVNHNUUHBpQVZHVk1OQkVBMnZiMkZT?=
- =?utf-8?B?ZFdFKzM3Slo0SGIwMWtBcmxGdGlLNUJZYTZMZnRObEttRjRXeEhDdC9YTjQ1?=
- =?utf-8?B?Unp5eC9JdHBqcTBuNG9OKzhmWjh1MDRwMWkxa2tNQmxjSnRuMW1WOWZZcDRH?=
- =?utf-8?B?TVBITHJNTjlaUDJVcGZ6clRjNWxXeGhYRjRkWUZHMjQrZ0ZRL0lDZCtoZjY5?=
- =?utf-8?B?RUtNZzJIRXdNNEFOeXJEOHRWU2p1ek5MSk82K0ZYNUIvdWhucE5ERWdCZEpj?=
- =?utf-8?B?b1B5U1hyVlRJTFYzM0xjV2ZDSWMyb2dvL1JuSUx6Y1NnaVBPak9SM2J6UzdJ?=
- =?utf-8?B?UHdCWmZDUUc5K2RwQWdhcWlXb001WFluY1pMK1pRVXRCNTFxTlJERk91SThp?=
- =?utf-8?B?WmhrSkswMS90UU1ISjJ3ODJtMHpzZ3Zhb0RTWUhsMTE5bk9TNytjODU3UkxB?=
- =?utf-8?B?V2Jub2FqMzRGakc3MGRVSVhHSHR3WnpLekM2dDB1eEpGdGVCanJQcWJsSHlx?=
- =?utf-8?B?UHo5VytNd0s4aVVpNFJzK0ptMWZVdkZtcm9zYjVlM3FQYVFXeitoLzBlbWlx?=
- =?utf-8?B?d0RFOGh0Z24vU0Q2SnJibFpYWFlvbThLWGtyQzNVeUcvelg2Y0drbXRmdEI4?=
- =?utf-8?B?bEg2eWsvbjhJUWI2T2NsaGZDME9EZU9vSWdybjdsckl1RERhMFVQamxmYnd2?=
- =?utf-8?B?ejdQQnFTSDQvNm1KRjdWOVRwMVdmc0xxOWhRaklCbW1FZ1dpaklPSW42WmFr?=
- =?utf-8?B?ckVnZERkUHVoSit3SHVJczNSM2tza0ZPUU5najN3aHROdDFRK3hTTzJWcncy?=
- =?utf-8?B?QmJBM2tDN0JLTFB1bnNFZ1pKYkxYNnZaVDUyNTdKUnFsTkJLUENGSE9LbUJm?=
- =?utf-8?B?aXpIZm5QdEdJSHNvbHhDeVNEclVYWTZSNGRlUVBSSXJCTUhUdVJLM3orS1Vv?=
- =?utf-8?B?MjB2Y3pMaFUxNGJLb3NUbnAwaTV5c3dIQXNGVURIQXFuNFpYdzR5VnNJVW1H?=
- =?utf-8?B?SDZRU2JZM2ptMlR6bWMyaEhJVlFGajdoR1hCVWQ5RE5BQmcvYlhkZHpacUFR?=
- =?utf-8?B?VjIzT3k5ZkdraTVvaW1ha0lxMFM0cUlDVzAwVW9LY3ZHK3l3Q1NxWll6YzZh?=
- =?utf-8?B?Qm5ZTjdXZmhiNXpUeC9qTlF0bmk4Z0pvZUx4dVlla3hUK3UyNmFpR2JRcytx?=
- =?utf-8?B?MjFFekxBc2twZ21IVittNjlMNm1EOXRuV2xOMWcvWGR0SGtXSkRvaFA0Mi9P?=
- =?utf-8?B?SUtlM016NHFmQ0xoNEN1dTFKUW0xNGwwUGMvVzJHbmMzODNqREkzcnA2MDZS?=
- =?utf-8?B?ZU5LeXNxZ2tudzMrTFhGNnRIU2d2bXdLQStJekJnUzJWZ050SWZQTFB0VjdS?=
- =?utf-8?B?RDJqSmxWYysvNHdpTjR5UVpiU09RPT0=?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3a542391-d0a3-4262-d303-08d9ae8f8ae9
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4008.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2021 14:42:58.9008 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ImrN6l0cjzLUCztuJf4UslFZ9fmgIwbq0e+9YbpIo9h6mtyWTa30iIzSxidFhsII5KoVlqdEFq0nt7/pyrLP4em/ntuR+6sSMtXCC+PVwjQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4165
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10176
- signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
- adultscore=0 phishscore=0
- bulkscore=0 suspectscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2111230078
-X-Proofpoint-GUID: 6fkbzw79O1UlqaUStVDEnP2azUQMJIwF
-X-Proofpoint-ORIG-GUID: 6fkbzw79O1UlqaUStVDEnP2azUQMJIwF
-X-Mailman-Approved-At: Tue, 23 Nov 2021 09:49:40 -0500
-Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org,
- Ben Gardon <bgardon@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+ with ESMTP id LOl6eWaLmK+P for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Nov 2021 10:06:12 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3208A4B1AD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 10:06:12 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 34BBB60C49;
+ Tue, 23 Nov 2021 15:06:11 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mpXN2-007JJp-QT; Tue, 23 Nov 2021 15:06:08 +0000
+Date: Tue, 23 Nov 2021 15:06:08 +0000
+Message-ID: <87h7c2di8v.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH 02/17] KVM: selftests: aarch64: add function for accessing
+ GICv3 dist and redist registers
+In-Reply-To: <20211109023906.1091208-3-ricarkol@google.com>
+References: <20211109023906.1091208-1-ricarkol@google.com>
+ <20211109023906.1091208-3-ricarkol@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, drjones@redhat.com, eric.auger@redhat.com,
+ alexandru.elisei@arm.com, pbonzini@redhat.com, oupton@google.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+ jingzhangos@google.com, pshier@google.com, rananta@google.com,
+ reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, shuah@kernel.org, pshier@google.com,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -191,21 +72,139 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Paolo,
+On Tue, 09 Nov 2021 02:38:51 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> Add a generic library function for reading and writing GICv3 distributor
+> and redistributor registers. Then adapt some functions to use it; more
+> will come and use it in the next commit.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../selftests/kvm/lib/aarch64/gic_v3.c        | 124 ++++++++++++++----
+>  1 file changed, 101 insertions(+), 23 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> index 2dbf3339b62e..00e944fd8148 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> @@ -19,7 +19,8 @@ struct gicv3_data {
+>  	unsigned int nr_spis;
+>  };
+>  
+> -#define sgi_base_from_redist(redist_base) (redist_base + SZ_64K)
+> +#define sgi_base_from_redist(redist_base) 	(redist_base + SZ_64K)
+> +#define DIST_BIT				(1U << 31)
+>  
+>  enum gicv3_intid_range {
+>  	SGI_RANGE,
+> @@ -50,6 +51,14 @@ static void gicv3_gicr_wait_for_rwp(void *redist_base)
+>  	}
+>  }
+>  
+> +static void gicv3_wait_for_rwp(uint32_t cpu_or_dist)
+> +{
+> +	if (cpu_or_dist & DIST_BIT)
+> +		gicv3_gicd_wait_for_rwp();
+> +	else
+> +		gicv3_gicr_wait_for_rwp(gicv3_data.redist_base[cpu_or_dist]);
+> +}
+> +
+>  static enum gicv3_intid_range get_intid_range(unsigned int intid)
+>  {
+>  	switch (intid) {
+> @@ -81,39 +90,108 @@ static void gicv3_write_eoir(uint32_t irq)
+>  	isb();
+>  }
+>  
+> -static void
+> -gicv3_config_irq(unsigned int intid, unsigned int offset)
+> +uint32_t gicv3_reg_readl(uint32_t cpu_or_dist, uint64_t offset)
+> +{
+> +	void *base = cpu_or_dist & DIST_BIT ? gicv3_data.dist_base
+> +		: sgi_base_from_redist(gicv3_data.redist_base[cpu_or_dist]);
+> +	return readl(base + offset);
+> +}
+> +
+> +void gicv3_reg_writel(uint32_t cpu_or_dist, uint64_t offset, uint32_t reg_val)
+> +{
+> +	void *base = cpu_or_dist & DIST_BIT ? gicv3_data.dist_base
+> +		: sgi_base_from_redist(gicv3_data.redist_base[cpu_or_dist]);
+> +	writel(reg_val, base + offset);
+> +}
+> +
+> +uint32_t gicv3_getl_fields(uint32_t cpu_or_dist, uint64_t offset, uint32_t mask)
+> +{
+> +	return gicv3_reg_readl(cpu_or_dist, offset) & mask;
+> +}
+> +
+> +void gicv3_setl_fields(uint32_t cpu_or_dist, uint64_t offset,
+> +		uint32_t mask, uint32_t reg_val)
+> +{
+> +	uint32_t tmp = gicv3_reg_readl(cpu_or_dist, offset) & ~mask;
+> +
+> +	tmp |= (reg_val & mask);
+> +	gicv3_reg_writel(cpu_or_dist, offset, tmp);
+> +}
+> +
+> +/*
+> + * We use a single offset for the distributor and redistributor maps as they
+> + * have the same value in both. The only exceptions are registers that only
+> + * exist in one and not the other, like GICR_WAKER that doesn't exist in the
+> + * distributor map. Such registers are conveniently marked as reserved in the
+> + * map that doesn't implement it; like GICR_WAKER's offset of 0x0014 being
+> + * marked as "Reserved" in the Distributor map.
+> + */
+> +static void gicv3_access_reg(uint32_t intid, uint64_t offset,
+> +		uint32_t reg_bits, uint32_t bits_per_field,
+> +		bool write, uint32_t *val)
+>  {
+>  	uint32_t cpu = guest_get_vcpuid();
+> -	uint32_t mask = 1 << (intid % 32);
+>  	enum gicv3_intid_range intid_range = get_intid_range(intid);
+> -	void *reg;
+> -
+> -	/* We care about 'cpu' only for SGIs or PPIs */
+> -	if (intid_range == SGI_RANGE || intid_range == PPI_RANGE) {
+> -		GUEST_ASSERT(cpu < gicv3_data.nr_cpus);
+> -
+> -		reg = sgi_base_from_redist(gicv3_data.redist_base[cpu]) +
+> -			offset;
+> -		writel(mask, reg);
+> -		gicv3_gicr_wait_for_rwp(gicv3_data.redist_base[cpu]);
+> -	} else if (intid_range == SPI_RANGE) {
+> -		reg = gicv3_data.dist_base + offset + (intid / 32) * 4;
+> -		writel(mask, reg);
+> -		gicv3_gicd_wait_for_rwp();
+> -	} else {
+> -		GUEST_ASSERT(0);
+> -	}
+> +	uint32_t fields_per_reg, index, mask, shift;
+> +	uint32_t cpu_or_dist;
+> +
+> +	GUEST_ASSERT(bits_per_field <= reg_bits);
+> +	GUEST_ASSERT(*val < (1U << bits_per_field));
+> +	/* Some registers like IROUTER are 64 bit long. Those are currently not
+> +	 * supported by readl nor writel, so just asserting here until then.
+> +	 */
+> +	GUEST_ASSERT(reg_bits == 32);
 
-I see that you have merged the whole series to kvm/queue, even though it
-still needed some changes and, most importantly, a good round of testing.
+IROUTER *does* support 32bit accesses. There are no 64bit MMIO
+registers in the GIC architecture that do not support 32bit accesses,
+if only because there is no guarantee about the width of the MMIO bus
+itself (not to mention the existence of 32bit CPUs!).
 
-Does this mean you want all these changes as a separate patch set on top
-of the already-merged series?
+See 12.1.3 ("GIC memory-mapped register access") in the GICv3 arch
+spec.
+	M.
 
-Thanks,
-Maciej
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
