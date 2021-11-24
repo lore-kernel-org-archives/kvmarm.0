@@ -2,100 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5208C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 18:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06183C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 18:09:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30FE04B1D0;
-	Wed, 24 Nov 2021 13:09:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B490C4B1D2;
+	Wed, 24 Nov 2021 13:09:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ttpas1WGhfKs; Wed, 24 Nov 2021 13:09:00 -0500 (EST)
+	with ESMTP id Nj1WO8+KaFUU; Wed, 24 Nov 2021 13:09:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BC974B174;
-	Wed, 24 Nov 2021 13:09:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 790DE4B0F1;
+	Wed, 24 Nov 2021 13:09:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EAB44B0F1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 13:08:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0DC14B0B9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 13:09:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q9Y+71kH0Ujt for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 13:08:57 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA7424B0B9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 13:08:57 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1637777337;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1U6pHOdjTzqLr+UPekAI7w6u+A8bWKUlBWhhw9r2+iQ=;
- b=Ciu7vUavN9G1q7CslnHSjC6ydW0Ytnf5qodN2Z61CedXtqKL2NE17ad6B40v+8RKYq2Q1M
- YPsAZ2l1L1kizWecjy23O98NNNZlN7rOvl5RBsfisKSMi24Pj7dNCqA9rNvsK/pRJ5VPHl
- HOg63ThqBlH/OrP725U4iqvXWVRiVeg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-80-6z4r63puP6ecPs8R6fRMmQ-1; Wed, 24 Nov 2021 13:08:56 -0500
-X-MC-Unique: 6z4r63puP6ecPs8R6fRMmQ-1
-Received: by mail-wm1-f70.google.com with SMTP id
- k25-20020a05600c1c9900b00332f798ba1dso3409075wms.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 10:08:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1U6pHOdjTzqLr+UPekAI7w6u+A8bWKUlBWhhw9r2+iQ=;
- b=wQXpugnmXxNuGePTFd5R3u859oBcACAAeNJtDEPn6WN9C/+T44cle7pV19AGew7D5t
- vYdg74qxBEZUk1cIDHQMRroz+zTNOGOQLDwu9tWSiKM+efWWsYJGvd6mG5ryUtqOgJ6L
- gbDUQHtP+O9f8IQnqFxLQu78kGHcEDoV0a2R1RC6EmgHu8mZIqFK37iTyxD+FNe0GiG5
- uJOsWeSqMB5WgWwnBhnV1furjYIMlHlv68HgL9EAmjzCOYNfFsiDXRGK54ye3jKt5Zz5
- Gr6mSRNqM+X5p5mBHfNcc8/V9+DgR9Pxh6rMA1ww2G1JpZ6/xN3jf1vsShkP5Bn2Y5Zh
- L6JQ==
-X-Gm-Message-State: AOAM531gI2yu42eOu64TC46Rcf2B5G1AohbX8do5aXo6xuCJLfpP2JVD
- zsAm3/p1AaZ/PlnTztrT8MtjCLcCht/xD+zcDsegms79LJCqD8E9CW4TKW44fvJfWHlsSJ1lIRY
- wHeEhiKoVOtahxCPeo82jqw2m
-X-Received: by 2002:a05:6000:1141:: with SMTP id
- d1mr21415765wrx.342.1637777335101; 
- Wed, 24 Nov 2021 10:08:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx26wuW9BzebF4e9Wvpg/UOAPXdq55mOMjSx/2pn674sZDA0jSUK6O9ANjx+8U8K2xw1sK2ag==
-X-Received: by 2002:a05:6000:1141:: with SMTP id
- d1mr21415709wrx.342.1637777334754; 
- Wed, 24 Nov 2021 10:08:54 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id p2sm6221778wmq.23.2021.11.24.10.08.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 24 Nov 2021 10:08:53 -0800 (PST)
-Subject: Re: [RFC PATCH v3 02/29] KVM: arm64: Save ID registers' sanitized
- value per vCPU
-To: Reiji Watanabe <reijiw@google.com>
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-3-reijiw@google.com>
- <dad16d0f-a0fa-cd8e-fdd0-0bbdf38af791@redhat.com>
- <CAAeT=FyUjwJDLw=6u_ocgQ_974+vD4w0n2=WCYXLsH4cf+dxOw@mail.gmail.com>
-From: Eric Auger <eauger@redhat.com>
-Message-ID: <4193e1b3-3cc2-7e9a-e249-75ef71495398@redhat.com>
-Date: Wed, 24 Nov 2021 19:08:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <CAAeT=FyUjwJDLw=6u_ocgQ_974+vD4w0n2=WCYXLsH4cf+dxOw@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id fNMJPDzLl6g9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 13:09:24 -0500 (EST)
+Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 266254B0F1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 13:09:24 -0500 (EST)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
+ [51.254.78.96])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 6100C60FE8;
+ Wed, 24 Nov 2021 18:09:22 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mpwhn-007dLK-9U; Wed, 24 Nov 2021 18:09:15 +0000
+Date: Wed, 24 Nov 2021 18:09:14 +0000
+Message-ID: <87czmpcto5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Tyler Baicar <baicar@os.amperecomputing.com>
+Subject: Re: [PATCH 1/2] ACPI/AEST: Initial AEST driver
+In-Reply-To: <20211124170708.3874-2-baicar@os.amperecomputing.com>
+References: <20211124170708.3874-1-baicar@os.amperecomputing.com>
+ <20211124170708.3874-2-baicar@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: baicar@os.amperecomputing.com, patches@amperecomputing.com,
+ abdulhamid@os.amperecomputing.com, darren@os.amperecomputing.com,
+ catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, lorenzo.pieralisi@arm.com,
+ guohanjun@huawei.com, sudeep.holla@arm.com, rafael@kernel.org, lenb@kernel.org,
+ tony.luck@intel.com, bp@alien8.de, mark.rutland@arm.com,
+ anshuman.khandual@arm.com, vincenzo.frascino@arm.com, tabba@google.com,
+ marcan@marcan.st, keescook@chromium.org, jthierry@redhat.com,
+ masahiroy@kernel.org, samitolvanen@google.com, john.garry@huawei.com,
+ daniel.lezcano@linaro.org, gor@linux.ibm.com, zhangshaokun@hisilicon.com,
+ tmricht@linux.ibm.com, dchinner@redhat.com, tglx@linutronix.de,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org,
+ linux-edac@vger.kernel.org, ishii.shuuichir@fujitsu.com,
+ Vineeth.Pillai@microsoft.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: abdulhamid@os.amperecomputing.com, daniel.lezcano@linaro.org,
+ rafael@kernel.org, catalin.marinas@arm.com, ishii.shuuichir@fujitsu.com,
+ guohanjun@huawei.com, vincenzo.frascino@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, lorenzo.pieralisi@arm.com, masahiroy@kernel.org,
+ linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ samitolvanen@google.com, patches@amperecomputing.com, lenb@kernel.org,
+ keescook@chromium.org, gor@linux.ibm.com, anshuman.khandual@arm.com,
+ john.garry@huawei.com, zhangshaokun@hisilicon.com,
+ Vineeth.Pillai@microsoft.com, bp@alien8.de, darren@os.amperecomputing.com,
+ dchinner@redhat.com, tglx@linutronix.de, linux-edac@vger.kernel.org,
+ tony.luck@intel.com, jthierry@redhat.com, marcan@marcan.st,
+ linux-kernel@vger.kernel.org, sudeep.holla@arm.com, tmricht@linux.ibm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,192 +95,88 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Reiji,
+On Wed, 24 Nov 2021 17:07:07 +0000,
+Tyler Baicar <baicar@os.amperecomputing.com> wrote:
+> 
+> Add support for parsing the ARM Error Source Table and basic handling of
+> errors reported through both memory mapped and system register interfaces.
+> 
+> Assume system register interfaces are only registered with private
+> peripheral interrupts (PPIs); otherwise there is no guarantee the
+> core handling the error is the core which took the error and has the
+> syndrome info in its system registers.
+> 
+> Add logging for all detected errors and trigger a kernel panic if there is
+> any uncorrected error present.
+> 
+> Signed-off-by: Tyler Baicar <baicar@os.amperecomputing.com>
+> ---
+>  MAINTAINERS                     |   1 +
+>  arch/arm64/include/asm/ras.h    |  52 ++++
+>  arch/arm64/include/asm/sysreg.h |   2 +
+>  arch/arm64/kernel/Makefile      |   1 +
+>  arch/arm64/kernel/ras.c         | 125 +++++++++
+>  arch/arm64/kvm/sys_regs.c       |   2 +
+>  drivers/acpi/arm64/Kconfig      |   3 +
+>  drivers/acpi/arm64/Makefile     |   1 +
+>  drivers/acpi/arm64/aest.c       | 450 ++++++++++++++++++++++++++++++++
+>  include/linux/acpi_aest.h       |  50 ++++
+>  include/linux/cpuhotplug.h      |   1 +
+>  11 files changed, 688 insertions(+)
+>  create mode 100644 arch/arm64/include/asm/ras.h
+>  create mode 100644 arch/arm64/kernel/ras.c
+>  create mode 100644 drivers/acpi/arm64/aest.c
+>  create mode 100644 include/linux/acpi_aest.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5250298d2817..aa0483726606 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -382,6 +382,7 @@ ACPI FOR ARM64 (ACPI/arm64)
+>  M:	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+>  M:	Hanjun Guo <guohanjun@huawei.com>
+>  M:	Sudeep Holla <sudeep.holla@arm.com>
+> +R:	Tyler Baicar <baicar@os.amperecomputing.com>
+>  L:	linux-acpi@vger.kernel.org
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  S:	Maintained
 
-On 11/18/21 11:00 PM, Reiji Watanabe wrote:
-> Hi Eric,
-> 
-> On Thu, Nov 18, 2021 at 12:37 PM Eric Auger <eauger@redhat.com> wrote:
->>
->> Hi Reiji,
->>
->> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
->>> Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
->>> registers' sanitized value in the array for the vCPU at the first
->>> vCPU reset. Use the saved ones when ID registers are read by
->>> userspace (via KVM_GET_ONE_REG) or the guest.
->>>
->>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
->>> ---
->>>  arch/arm64/include/asm/kvm_host.h | 10 +++++++
->>>  arch/arm64/kvm/sys_regs.c         | 43 +++++++++++++++++++------------
->>>  2 files changed, 37 insertions(+), 16 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> index edbe2cb21947..72db73c79403 100644
->>> --- a/arch/arm64/include/asm/kvm_host.h
->>> +++ b/arch/arm64/include/asm/kvm_host.h
->>> @@ -146,6 +146,14 @@ struct kvm_vcpu_fault_info {
->>>       u64 disr_el1;           /* Deferred [SError] Status Register */
->>>  };
->>>
->>> +/*
->>> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
->>> + * where 0<=crm<8, 0<=op2<8.
->>> + */
->>> +#define KVM_ARM_ID_REG_MAX_NUM 64
->>> +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
->>> +#define IDREG_SYS_IDX(id)    (ID_REG_BASE + IDREG_IDX(id))
->>> +
->>>  enum vcpu_sysreg {
->>>       __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
->>>       MPIDR_EL1,      /* MultiProcessor Affinity Register */
->>> @@ -210,6 +218,8 @@ enum vcpu_sysreg {
->>>       CNTP_CVAL_EL0,
->>>       CNTP_CTL_EL0,
->>>
->>> +     ID_REG_BASE,
->>> +     ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
->>>       /* Memory Tagging Extension registers */
->>>       RGSR_EL1,       /* Random Allocation Tag Seed Register */
->>>       GCR_EL1,        /* Tag Control Register */
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index e3ec1a44f94d..5608d3410660 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -33,6 +33,8 @@
->>>
->>>  #include "trace.h"
->>>
->>> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
->>> +
->>>  /*
->>>   * All of this file is extremely similar to the ARM coproc.c, but the
->>>   * types are different. My gut feeling is that it should be pretty
->>> @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
->>>                         struct sys_reg_params *p,
->>>                         const struct sys_reg_desc *r)
->>>  {
->>> -     u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
->>> +     u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
->>>       u32 sr = reg_to_encoding(r);
->>>
->>>       if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
->>> @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->>>       return true;
->>>  }
->>>
->>> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
->>> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->>> -             struct sys_reg_desc const *r, bool raz)
->>> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->>>  {
->>> -     u32 id = reg_to_encoding(r);
->>> -     u64 val;
->>> -
->>> -     if (raz)
->>> -             return 0;
->>> -
->>> -     val = read_sanitised_ftr_reg(id);
->>> +     u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
->>>
->>>       switch (id) {
->>>       case SYS_ID_AA64PFR0_EL1:
->>> @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->>>       return val;
->>>  }
->>>
->>> +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->>> +                    struct sys_reg_desc const *r, bool raz)
->>> +{
->>> +     u32 id = reg_to_encoding(r);
->>> +
->>> +     return raz ? 0 : __read_id_reg(vcpu, id);
->>> +}
->>> +
->>>  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->>>                                 const struct sys_reg_desc *r)
->>>  {
->>> @@ -1178,6 +1180,16 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
->>>       return REG_HIDDEN;
->>>  }
->>>
->>> +static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
->>> +{
->>> +     u32 id = reg_to_encoding(rd);
->>> +
->>> +     if (vcpu_has_reset_once(vcpu))
->>> +             return;
->>> +
->>> +     __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id)) = read_sanitised_ftr_reg(id);
->>> +}
->>> +
->>>  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->>>                              const struct sys_reg_desc *rd,
->>>                              const struct kvm_one_reg *reg, void __user *uaddr)
->>> @@ -1223,9 +1235,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->>>  /*
->>>   * cpufeature ID register user accessors
->>>   *
->>> - * For now, these registers are immutable for userspace, so no values
->>> - * are stored, and for set_id_reg() we don't allow the effective value
->>> - * to be changed.
->>> + * We don't allow the effective value to be changed.
->> This change may be moved to a subsequent patch as this patch does not
->> change the behavior yet.
-> 
-> Thank you for the review.
-> 
-> There are three main parts in the original comments.
-> 
->  (A) these registers are immutable for userspace
->  (B) no values are stored
->  (C) we don't allow the effective value to be changed
-> 
-> This patch stores ID register values in sys_regs[].
-> So, I don't think (B) should be there, and I removed (B).
-> Since (A) is essentially the same as (C), I removed (A)
-> (and left (C)).
-> 
-> Do you think it is better to leave (A) in this patch, too ?
-yes I think I would leave 'for now,  these registers are immutable for
-userspace'
+Isn't this a bit premature? This isn't even mentioned in the commit
+message, only in passing in the cover letter.
 
-Eric
-> 
-> Thanks,
-> Reiji
-> 
-> 
->>>   */
->>>  static int __get_id_reg(const struct kvm_vcpu *vcpu,
->>>                       const struct sys_reg_desc *rd, void __user *uaddr,
->>> @@ -1382,6 +1392,7 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->>>  #define ID_SANITISED(name) {                 \
->>>       SYS_DESC(SYS_##name),                   \
->>>       .access = access_id_reg,                \
->>> +     .reset  = reset_id_reg,                 \
->>>       .get_user = get_id_reg,                 \
->>>       .set_user = set_id_reg,                 \
->>>       .visibility = id_visibility,            \
->>> @@ -1837,8 +1848,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
->>>       if (p->is_write) {
->>>               return ignore_write(vcpu, p);
->>>       } else {
->>> -             u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
->>> -             u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
->>> +             u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
->>> +             u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
->>>               u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
->>>
->>>               p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
->>>
->> Thanks
->>
->> Eric
->>
-> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 16b3f1a1d468..6bbed061d835 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -230,6 +230,8 @@
+>  #define SYS_ERXADDR_EL1			sys_reg(3, 0, 5, 4, 3)
+>  #define SYS_ERXMISC0_EL1		sys_reg(3, 0, 5, 5, 0)
+>  #define SYS_ERXMISC1_EL1		sys_reg(3, 0, 5, 5, 1)
+> +#define SYS_ERXMISC2_EL1		sys_reg(3, 0, 5, 5, 2)
+> +#define SYS_ERXMISC3_EL1		sys_reg(3, 0, 5, 5, 3)
+>  #define SYS_TFSR_EL1			sys_reg(3, 0, 5, 6, 0)
+>  #define SYS_TFSRE0_EL1			sys_reg(3, 0, 5, 6, 1)
+>  
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e3ec1a44f94d..dc15e9896db4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1573,6 +1573,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_ERXADDR_EL1), trap_raz_wi },
+>  	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
+>  	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXMISC2_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXMISC3_EL1), trap_raz_wi },
+>
 
+This looks like a fix that would deserve its own patch.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
