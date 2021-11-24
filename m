@@ -2,72 +2,93 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA5EC433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 06:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8177C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 09:51:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D5AF4B173;
-	Wed, 24 Nov 2021 01:12:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 305B74B19D;
+	Wed, 24 Nov 2021 04:51:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dZwFKRGfkEDo; Wed, 24 Nov 2021 01:12:08 -0500 (EST)
+	with ESMTP id Ztfda+jRVMYj; Wed, 24 Nov 2021 04:51:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB3C14B164;
-	Wed, 24 Nov 2021 01:12:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3CDE4B118;
+	Wed, 24 Nov 2021 04:51:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DFAD4B0D0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 01:12:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD8C84B164
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 04:45:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yPsNQE75G6Gy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 01:12:06 -0500 (EST)
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com
- [209.85.210.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2AAB94B10E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 01:12:06 -0500 (EST)
-Received: by mail-pf1-f170.google.com with SMTP id 8so1661697pfo.4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 22:12:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=bSm7tAjnjETjcXp7DjTp7DvZMdzTKvggHz7077B/Mtc=;
- b=ZEJ07Ne0rV/g1K3moNbswR98QFjCI70BcjD7zPzJzXi3am1/8h7wL7YY+Qln32XMJU
- omyFdpNec1iloQRWHhERHiryffU0iGzNydGfsnYOb7zb8dGiDedBlKMVocodQKU6PEkC
- UITgcre9SHnJNwBo3idZXEG64yZGzrZaKRc295Dgcf5KXpsYypiBy/kq3ArZ//8Ql1rN
- YOxhSsQTI/RF9txlmwuNAgMQ+6b6zaNNByzIg2kutC/9CjbkHAg9Ashlrff8I8CrFQMP
- SOunFnAFbgP/ZH+lty8JkXlfZlXCnQCMG/rp2jvQ4bRqiW94LPLCg0BdygKEk+Gr7xss
- ON2A==
+ with ESMTP id dlMNSJPoTnKy for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 04:45:48 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 915EE406E0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 04:45:48 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1637747148;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=/ocPRPURvuCP4fzE5T0eVQSQIxy0gRmJcpuXxwEQtHM=;
+ b=UqQJ2Z6JnRTP7Gw0KZ6sMAFwJKwHJhOf0Dxfk2JwPXEKawIU9Im1PuqqG/oCgDaCUqAPvt
+ AoeRuICMZ5ovjYpy+0CMP09ohaCJsDdUmnXwqdemqw99rbX+MfP154poeFVqoeOQP7bLs+
+ ayWoaolUuSl0GF/xC3axPA0BKd0S3ds=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-509-frpx6wo-MEG-iJBtAkp8vg-1; Wed, 24 Nov 2021 04:45:46 -0500
+X-MC-Unique: frpx6wo-MEG-iJBtAkp8vg-1
+Received: by mail-wm1-f70.google.com with SMTP id
+ z138-20020a1c7e90000000b003319c5f9164so2700551wmc.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 01:45:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=bSm7tAjnjETjcXp7DjTp7DvZMdzTKvggHz7077B/Mtc=;
- b=ct8lWQ80isS6mGBtPcae5xxrMGt0ChEUHh7043ufvmuSZqqEZxawV/PVs65fPVqFth
- 8UwpQ985y7UuM7fzS+yjLmNTWHJMbvs/PRKL54vKjQPY1DyQkwoS4W3BuVtPWmM0B6l5
- 23OmPk/IC+Jeu0CpZ0lyBsUVXZDYv4DDraXR9PJrA41yjvz3lUaKym+b6UxFS5MxXM9n
- xT4OQGVbptBLJnSPQvWBfp79exV1dnFrOMRhIIqwIIfbAN8OgJTOaKtUhafIFglr0SBP
- KdQjZ6D61JErcQ7u1kU43GO5iY6Bo0nfL97O+J4/VRNU0iTTcglPf5ech8dgZ4ZgQCyW
- KSbQ==
-X-Gm-Message-State: AOAM530Fjt3cTUKJ0mvBrNmh2/L96EtMIXz0E1pPi9RopmsMgxmWsW+L
- +OPJqEbJ3FmB1E8tabJtHgt+PZIBaaL68P5JBOLYOQ==
-X-Google-Smtp-Source: ABdhPJyiyxPCkG38X5eKSzVgjrjbwU8syqnUiFLwj/t/o+9pmchksr2bNK+WVAjCchFGoGuVXHs9Y6xd0HUQ875mCOA=
-X-Received: by 2002:aa7:9438:0:b0:4a2:c941:9ac4 with SMTP id
- y24-20020aa79438000000b004a2c9419ac4mr3633208pfo.12.1637734325078; Tue, 23
- Nov 2021 22:12:05 -0800 (PST)
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :references:user-agent:mime-version:content-transfer-encoding;
+ bh=/ocPRPURvuCP4fzE5T0eVQSQIxy0gRmJcpuXxwEQtHM=;
+ b=x3F/09+EFQeKFMLUUkcb7DdWc+PG0yX7XKYIAJ/4sDvM8k2U+hFMtgQDeDDkz3DEL/
+ b424q6HuwqWAm58fA9kLWxg8rYMEUFaVXf4sKab2yLXum2cJQuMzt7mvzfjVcD3jx6z5
+ swMO5EN02dZ0AIEeuZIYXwmHxbLPliuwp7ttwI63mLQuMdYnSCO1+22edFpUjLkVEK3J
+ jiIoJ6dT8SlHtGCdyREZHjbpTSseIdEhoRbuFN3hTof318g27Y1kbLVpasI7kW3MFOa+
+ 4m3XRrRzPlKWQG0jptG7KGlP+nmZLTiZK3FYF2XXky6nUu8yWuEfHIo5BN8Q2LqQ6DUv
+ zoYA==
+X-Gm-Message-State: AOAM531sODEwT95K5xqyAXHsvMrhnKpPBXSX7awpBx+xmU1ZL5L6X11O
+ 9m7zNqcr4/lGgKeEx9W1LhgjyMC1KlrpgFt2s/Wxr7luZkL4fAFcXXeghAJJCnbZrtB+Aa8Q/gs
+ K7WKPDD+ud2e8SEZLbwzctLxN
+X-Received: by 2002:a5d:58f9:: with SMTP id f25mr17470508wrd.206.1637747145635; 
+ Wed, 24 Nov 2021 01:45:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwP0zHgPBVMJ6rnPoEJ8gNRRURG0BefwNCQkWdV/Pp5YgDYW6ukSyMMP2OQX0rFvd7bFyHeUw==
+X-Received: by 2002:a5d:58f9:: with SMTP id f25mr17470474wrd.206.1637747145442; 
+ Wed, 24 Nov 2021 01:45:45 -0800 (PST)
+Received: from ?IPv6:2a0c:5a80:3c10:3400:3c70:6643:6e71:7eae?
+ ([2a0c:5a80:3c10:3400:3c70:6643:6e71:7eae])
+ by smtp.gmail.com with ESMTPSA id a10sm4350726wmq.27.2021.11.24.01.45.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 24 Nov 2021 01:45:45 -0800 (PST)
+Message-ID: <482c55bc52b17c4ddf113a75acaca73a0c0a7b9b.camel@redhat.com>
+Subject: Re: [RFC PATCH 1/2] arm64/tracing: add cntvct based trace clock
+From: Nicolas Saenz Julienne <nsaenzju@redhat.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Date: Wed, 24 Nov 2021 10:45:44 +0100
+In-Reply-To: <20211122095735.2340f38f@gandalf.local.home>
+References: <20211119102117.22304-1-nsaenzju@redhat.com>
+ <20211119102117.22304-2-nsaenzju@redhat.com>
+ <20211122095735.2340f38f@gandalf.local.home>
+User-Agent: Evolution 3.42.1 (3.42.1-1.fc35)
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-5-reijiw@google.com>
- <87h7c5sn05.wl-maz@kernel.org>
-In-Reply-To: <87h7c5sn05.wl-maz@kernel.org>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 23 Nov 2021 22:11:49 -0800
-Message-ID: <CAAeT=Fz9CWhp8ym4hWHW7r-6eGJiNZ6_M8151aq9WT5g66vdEg@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 04/29] KVM: arm64: Make ID_AA64PFR0_EL1 writable
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=nsaenzju@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+X-Mailman-Approved-At: Wed, 24 Nov 2021 04:51:26 -0500
+Cc: Linux Trace Devel <linux-trace-devel@vger.kernel.org>, will@kernel.org,
+ maz@kernel.org, mtosatti@redhat.com, linux-kernel@vger.kernel.org,
+ mingo@redhat.com, catalin.marinas@arm.com, nilal@redhat.com,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -80,185 +101,36 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Nov 21, 2021 at 4:37 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 17 Nov 2021 06:43:34 +0000,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > This patch adds id_reg_info for ID_AA64PFR0_EL1 to make it writable by
-> > userspace.
-> >
-> > The CSV2/CSV3 fields of the register were already writable and values
-> > that were written for them affected all vCPUs before. Now they only
-> > affect the vCPU.
-> > Return an error if userspace tries to set SVE/GIC field of the register
-> > to a value that conflicts with SVE/GIC configuration for the guest.
-> > SIMD/FP/SVE fields of the requested value are validated according to
-> > Arm ARM.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 159 ++++++++++++++++++++++++--------------
-> >  1 file changed, 103 insertions(+), 56 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 1552cd5581b7..35400869067a 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -401,6 +401,92 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
-> >               id_reg->init(id_reg);
-> >  }
-> >
-> > +#define      kvm_has_gic3(kvm)               \
-> > +     (irqchip_in_kernel(kvm) &&      \
-> > +      (kvm)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> > +
-> > +static int validate_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> > +                                 const struct id_reg_info *id_reg, u64 val)
-> > +{
-> > +     int fp, simd;
-> > +     bool vcpu_has_sve = vcpu_has_sve(vcpu);
-> > +     bool pfr0_has_sve = id_aa64pfr0_sve(val);
-> > +     int gic;
-> > +
-> > +     simd = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_ASIMD_SHIFT);
-> > +     fp = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_FP_SHIFT);
-> > +     if (simd != fp)
-> > +             return -EINVAL;
-> > +
-> > +     /* fp must be supported when sve is supported */
-> > +     if (pfr0_has_sve && (fp < 0))
-> > +             return -EINVAL;
-> > +
-> > +     /* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
-> > +     if (vcpu_has_sve ^ pfr0_has_sve)
-> > +             return -EPERM;
-> > +
-> > +     gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
-> > +     if ((gic > 0) ^ kvm_has_gic3(vcpu->kvm))
-> > +             return -EPERM;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
-> > +{
-> > +     u64 limit = id_reg->vcpu_limit_val;
-> > +     unsigned int gic;
-> > +
-> > +     limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
-> > +     if (!system_supports_sve())
-> > +             limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> > +
-> > +     /*
-> > +      * The default is to expose CSV2 == 1 and CSV3 == 1 if the HW
-> > +      * isn't affected.  Userspace can override this as long as it
-> > +      * doesn't promise the impossible.
-> > +      */
-> > +     limit &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2) |
-> > +                ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3));
-> > +
-> > +     if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
-> > +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), 1);
-> > +     if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
-> > +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), 1);
-> > +
-> > +     gic = cpuid_feature_extract_unsigned_field(limit, ID_AA64PFR0_GIC_SHIFT);
-> > +     if (gic > 1) {
-> > +             /* Limit to GICv3.0/4.0 */
-> > +             limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
-> > +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
-> > +     }
-> > +     id_reg->vcpu_limit_val = limit;
-> > +}
-> > +
-> > +static u64 get_reset_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> > +                                  const struct id_reg_info *idr)
-> > +{
-> > +     u64 val = idr->vcpu_limit_val;
-> > +
-> > +     if (!vcpu_has_sve(vcpu))
-> > +             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> > +
-> > +     if (!kvm_has_gic3(vcpu->kvm))
-> > +             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
->
-> No. As I said in a previous email, this breaks migration, and
-> advertising a GICv3 CPU interface doesn't mean it is usable (the guest
-> OS must check that it can actually enable ICC_SRE_EL1.SRE -- see what
-> the Linux GICv3 driver does for an example).
-
-Yes, I understand. I will remove that code.
-
-> > +     return val;
-> > +}
-> > +
-> > +static struct id_reg_info id_aa64pfr0_el1_info = {
-> > +     .sys_reg = SYS_ID_AA64PFR0_EL1,
-> > +     .ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
-> > +                        S_FCT(ID_AA64PFR0_FP_SHIFT, FCT_LOWER_SAFE),
-> > +     .init = init_id_aa64pfr0_el1_info,
-> > +     .validate = validate_id_aa64pfr0_el1,
-> > +     .get_reset_val = get_reset_id_aa64pfr0_el1,
-> > +};
-> > +
-> >  /*
-> >   * An ID register that needs special handling to control the value for the
-> >   * guest must have its own id_reg_info in id_reg_info_table.
-> > @@ -409,7 +495,9 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
-> >   * validation, etc.)
-> >   */
-> >  #define      GET_ID_REG_INFO(id)     (id_reg_info_table[IDREG_IDX(id)])
-> > -static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {};
-> > +static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
-> > +     [IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
-> > +};
-> >
-> >  static int validate_id_reg(struct kvm_vcpu *vcpu,
-> >                          const struct sys_reg_desc *rd, u64 val)
-> > @@ -1239,20 +1327,22 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
-> >  static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
-> >  {
-> >       u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
-> > +     u64 lim, gic, gic_lim;
-> > +     const struct id_reg_info *id_reg;
-> >
-> >       switch (id) {
-> >       case SYS_ID_AA64PFR0_EL1:
-> > -             if (!vcpu_has_sve(vcpu))
-> > -                     val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> > -             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
-> > -             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2);
-> > -             val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
-> > -             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3);
-> > -             val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
-> > -             if (irqchip_in_kernel(vcpu->kvm) &&
-> > -                 vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> > -                     val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
-> > -                     val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
-> > +             gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
-> > +             if (kvm_has_gic3(vcpu->kvm) && (gic == 0)) {
-> > +                     /*
-> > +                      * This is a case where userspace configured gic3 after
-> > +                      * the vcpu was created, and then it didn't set
-> > +                      * ID_AA64PFR0_EL1.
-> > +                      */
->
-> Shouldn't that be done at the point where a GICv3 is created, rather
-> than after the fact?
-
-I will look into having it done at the point where a GICv3 is created.
-(I originally chose this way because I wanted to avoid access to
-other vCPUs' ID registers if possible)
-
-Thanks,
-Reiji
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gTW9uLCAyMDIxLTExLTIyIGF0IDA5OjU3IC0wNTAwLCBTdGV2ZW4gUm9zdGVkdCB3cm90ZToK
+PiBPbiBGcmksIDE5IE5vdiAyMDIxIDExOjIxOjE3ICswMTAwCj4gTmljb2xhcyBTYWVueiBKdWxp
+ZW5uZSA8bnNhZW56anVAcmVkaGF0LmNvbT4gd3JvdGU6Cj4gCj4gPiArLyogU1BEWC1MaWNlbnNl
+LUlkZW50aWZpZXI6IEdQTC0yLjAgKi8KPiA+ICsjaWZuZGVmIF9BU01fQVJNNjRfVFJBQ0VfQ0xP
+Q0tfSAo+ID4gKyNkZWZpbmUgX0FTTV9BUk02NF9UUkFDRV9DTE9DS19ICj4gPiArCj4gPiArI2lu
+Y2x1ZGUgPGxpbnV4L3R5cGVzLmg+Cj4gPiArCj4gPiArZXh0ZXJuIHU2NCBub3RyYWNlIHRyYWNl
+X2Nsb2NrX2FybTY0X2NudHZjdCh2b2lkKTsKPiA+ICsKPiA+ICsjIGRlZmluZSBBUkNIX1RSQUNF
+X0NMT0NLUyBcCj4gPiArCXsgdHJhY2VfY2xvY2tfYXJtNjRfY250dmN0LCAiY250dmN0IiwgLmlu
+X25zID0gMCB9LAo+ID4gKwo+ID4gKyNlbmRpZiAgLyogX0FTTV9BUk02NF9UUkFDRV9DTE9DS19I
+ICovCj4gCj4gU28gdGhpcyB3aWxsIGFwcGVhciBhcyBhIHVzYWJsZSBjbG9jayBpbiB0cmFjZS1j
+bWQuCj4gCj4gQW5kIHNpbmNlIHRoaXMgd2lsbCBiZSB1c2VkIHRvIHN5bmNocm9uaXplIGJldHdl
+ZW4gaG9zdCBhbmQgZ3Vlc3QgbGlrZSB0aGUKPiB4ODZfdHNjIGlzIHVzZWQsIHRoYXQgbWVhbnMg
+dGhhdCB0cmFjZS1jbWQgbmVlZHMgdG8ga25vdyB0aGF0IHRoaXMgaXMgdGhlCj4gYW4gYXJjaCAi
+Q1BVIiBjbG9jay4gSSB3b25kZXIgaWYgd2Ugc2hvdWxkIHJlbmFtZSB4ODZfY2xvY2sgKG9yIGF0
+IGxlYXN0Cj4gbWFrZSBpdCBhbiBhbGlhcykgdG8gImt2bV9jbG9jayIuIFRoZW4gd2UgY2FuIGhh
+dmUgdHJhY2UtY21kIHVzZQo+ICJrdm1fY2xvY2siIGFzIHRoZSBjbG9jayBmb3Igc3luY2hyb25p
+emF0aW9uIGJldHdlZW4gaG9zdCBhbmQgZ3Vlc3RzIGZvcgo+IGFsbCBhcmNoaXRlY3R1cmVzPwo+
+Cj4gVGhpbmtpbmcgYWJvdXQgdGhpcywgaW5zdGVhZCBvZiByZW5hbWluZyBpdCwgSSdsbCBhZGQg
+Y29kZSB0byBjcmVhdGUgYW4KPiBhbGlhcyB0byB0aGVzZSBjbG9ja3MuIFRoZW4gZXZlcnkgYXJj
+aCBjYW4gcGljayB3aGF0IGNsb2NrIGlzIHVzZWQgdGhhdCBpcwo+IHRoZSBzYW1lIGJldHdlZW4g
+aG9zdHMgYW5kIGd1ZXN0cyBzdWNoIHRoYXQgdXNlciBzcGFjZSB0b29saW5nIGRvZXNuJ3QgaGF2
+ZQo+IHRvIGtlZXAgYSBkYXRhYmFzZSBvZiB3aGF0IGNsb2NrcyBhcmUgdXNlZCBmb3Igc3luY2hy
+b25pemF0aW9uIGJldHdlZW4KPiBob3N0cyBhbmQgZ3Vlc3RzIGZvciBlYWNoIGFyY2guCj4gCj4g
+SSdsbCBnbyBhZGQgc29tZSBjb2RlIDstKQoKSSByZWFsbHkgbGlrZSB0aGUgaWRlYSwgcGxlYXNl
+IGtlZXAgbWUgaW4gdGhlIGxvb3AgaWYgeW91IHNlbmQgc29tZXRoaW5nCnVwc3RyZWFtLgoKLS0g
+Ck5pY29sw6FzIFPDoWVuegoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
