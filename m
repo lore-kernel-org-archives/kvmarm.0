@@ -2,67 +2,67 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A7EC433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 05:13:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A508C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 05:49:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 681214B0DE;
-	Wed, 24 Nov 2021 00:13:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D6EB4B164;
+	Wed, 24 Nov 2021 00:49:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XV8QzCq-fYau; Wed, 24 Nov 2021 00:13:47 -0500 (EST)
+	with ESMTP id Nep98v60reIs; Wed, 24 Nov 2021 00:49:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7F1C4B0F1;
-	Wed, 24 Nov 2021 00:13:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DCF14B15C;
+	Wed, 24 Nov 2021 00:49:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 70A434B0D6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 00:13:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CFE7E4B108
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 00:49:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RTR+rNdsxpBn for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 00:13:44 -0500 (EST)
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com
- [209.85.215.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F4C84B0BA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 00:13:44 -0500 (EST)
-Received: by mail-pg1-f182.google.com with SMTP id m15so1061117pgu.11
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 21:13:44 -0800 (PST)
+ with ESMTP id 8odT6oy8cWhO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 00:49:20 -0500 (EST)
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com
+ [209.85.214.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E318A4B0E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 00:49:19 -0500 (EST)
+Received: by mail-pl1-f177.google.com with SMTP id y8so960958plg.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Nov 2021 21:49:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=e1dzqsYgP1AOU3wSeDrdX/w4s62HxZ9tSYror2UqHsg=;
- b=Vosw69fUhO15RMMhi8w93lj7tX+6o2sgctmKWvVNdY5HmcUhOjO4KEePVuh2y3kBN7
- feWeYgUy8xfghytaQ39DsHDkKGwTZSJhJQP5QLKRpQAiEdTDJOgC0KAvphqQQ6Fu7Qhp
- hTesiOHPgGm/Og3cUdWEacwbjpkWBT28hOr2IGB7JFrqpOBjwauIeId3+8+krBcNaNhq
- mgjxOC1/yWuiVXvmLfEhWqWbhxz97ahtnUyEaV7HljLpaVywdsnGhc+KKd+ZmzxZ+0s4
- 1JXzWdIMfUW7vcH2JiGeipvNpABfGcKpzdyWRO+p9x7PNo8BPDgyiTXO+Xy2puf8XrHi
- vfKg==
+ :cc; bh=1fKAu0gabcfxHmH3nc8SLSbctQh/mX8LVUgzfwNVf0I=;
+ b=C4q08bNoOkWxvXiw0wQFQ0kNFxfHQeK/CRUMQDrWHuqVtJNXuP08yRq6UJ/a2hiaiB
+ iIfXR0r4y+8OXPQLxyGd9Ov5TJUncl0QeC2HA/cdEaVM6nZa6Aijip3T5BPJnNTRE+6c
+ ZCQhfhol6EJ0YE7ZrPKDj7SxGwZdazAOv0hAgZOf/InTXPMY/+z6ucZDCg+q5gA3V02V
+ b3DZOJyftS4Uiw29Vca4kPHhwH892YtrZj3FqgLErmP9c28fI7pYaIBaSBdY+QuJqAVM
+ xxB7eFIErGIlAlq8rnFwstloDidxPnK23q1V73lTcuWwnqegB6qiN/0dsAaE5DpH+yhZ
+ xE0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=e1dzqsYgP1AOU3wSeDrdX/w4s62HxZ9tSYror2UqHsg=;
- b=QHT/SOR5bV5TrkxsdM9cBW92nEdW3AxdfaKF+KM4sriFdVzTnXt/24tY6WQXRmau25
- UUFh7K/aX/B224BiCbCA4F0AgbRk5tIuOjKcENpER4wQVRrShAydhiucbmDQlmm9MoKh
- f9GJ3mFMRKuXl7mFp0WG/ZKORlChHxsaoRJBe96aNOBMgAKhjKD8jKqngjcwe1hLMDDO
- A4EpOTd5Hj8/lhJb2TuaQkmv/UxZEb0PpRZAs3PiUaz60VRp1+v6yaZQWVafwNDBX9/K
- klhGumrn00XBJxcGi6Spc8htPn9xCmGd70LbBUBy4nEHq1qQIMcgadHoY4zXqc8ePb63
- w80w==
-X-Gm-Message-State: AOAM532xdrgI7cVQ9bF3uYoWuMLofQksa0xf69MCwiYkzfA+pyETRX2E
- iQ9wwNCihA2WP6LJwO8L+x69RFtE8Uk74BVbAGuT+Q==
-X-Google-Smtp-Source: ABdhPJyvokOAgCXpC9DVsZl7yuHWNZAyv4IA9VRFby5H56KFnxxSyU3prkd4d0LB9u5pSW8jts1Phe00+k31dTnEvl0=
-X-Received: by 2002:aa7:8198:0:b0:44b:e191:7058 with SMTP id
- g24-20020aa78198000000b0044be1917058mr3161845pfi.39.1637730822945; Tue, 23
- Nov 2021 21:13:42 -0800 (PST)
+ bh=1fKAu0gabcfxHmH3nc8SLSbctQh/mX8LVUgzfwNVf0I=;
+ b=tC7w9Ci7LTWLDsi+L1pxGMvN5XeUl9QZD2flLKcMSnMDi5RqXogcx+Xl456k/FeTap
+ DB80ncjKgx/32ULsGCIJBDbeDrrJF/8f7zeY4ODdSDJeL/oJDghU9LqFcKky7GXvFYGF
+ ZN99wA/KTd6I8ls0ZPpZSstgLjufDo+3H0m0KUq3sNLdwkItjzxJdyQWtBkX5pMnvcsf
+ 7aHQ7fWjgZuL92qdEsY/s6Zrcq4RjUZHu3Txtp1ICNf8d8fc1cjBv61KNcSIK2xuEWkJ
+ x0ukOzaAG9Vcky7MUWXR08MnsEIWy/pRps968y8haAYIucYdFX4m/ZyiPbk3q0E2gYXE
+ 8tkg==
+X-Gm-Message-State: AOAM530nqbl97+Vcy1tHXxfrZrqdYxKVXfZjwfr2XSzqOHLtmkEEJKvO
+ lmJzlVpJLdJweIAVS9ygo8KR6Al8EbKKDVDVXp+ry9GiGC9wpW6i
+X-Google-Smtp-Source: ABdhPJydhWOvuJDnIMYqeeeDMTToKzMOfxMKgR7Re5ZnGAS7Km93k1zcKD9xp9yWrFsit0u3nU1zMxPl16wtjfXmPoI=
+X-Received: by 2002:a17:902:ab47:b0:141:95b2:7eaf with SMTP id
+ ij7-20020a170902ab4700b0014195b27eafmr14440560plb.40.1637732958710; Tue, 23
+ Nov 2021 21:49:18 -0800 (PST)
 MIME-Version: 1.0
 References: <20211117064359.2362060-1-reijiw@google.com>
- <YZ0QMK1QFjw/uznl@monolith.localdoman>
-In-Reply-To: <YZ0QMK1QFjw/uznl@monolith.localdoman>
+ <YZ0WfQDGT5d8+6i1@monolith.localdoman>
+In-Reply-To: <YZ0WfQDGT5d8+6i1@monolith.localdoman>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 23 Nov 2021 21:13:27 -0800
-Message-ID: <CAAeT=FxeXmgM3Pyt_brYRdehMrKHQwZut5xTbHOv-9um7anhYw@mail.gmail.com>
+Date: Tue, 23 Nov 2021 21:49:02 -0800
+Message-ID: <CAAeT=FwTrWts=jdO2SzAECKKp5-1gGc5UR22Mf=xpx_8qOcbHw@mail.gmail.com>
 Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
  by userspace
 To: Alexandru Elisei <alexandru.elisei@arm.com>
@@ -86,15 +86,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-HI Alex,
+Hi Alex,
 
-On Tue, Nov 23, 2021 at 7:59 AM Alexandru Elisei
+On Tue, Nov 23, 2021 at 8:25 AM Alexandru Elisei
 <alexandru.elisei@arm.com> wrote:
 >
 > Hi Reiji,
 >
-> I started reviewing the series, but I ended up being very confused, see
-> below.
+> The API documentation for KVM_ARM_VCPU_INIT states:
+>
+> "Userspace can call this function multiple times for a given vcpu,
+> including after the vcpu has been run. This will reset the vcpu to its
+> initial state. All calls to this function after the initial call must use
+> the same target and same set of feature flags, otherwise EINVAL will be
+> returned."
+>
+> The consequences of that, according to my understanding:
+>
+> 1. Any changes to the VCPU features made by KVM are observable by
+> userspace.
+>
+> 2. The features in KVM weren't designed and implemented to be disabled
+> after being enabled.
+>
+> With that in mind, I have two questions:
+>
+> 1. What happens when userspace disables a feature via the ID registers
+> which is set in vcpu->arch.features? Does the feature bit get cleared from
+> vcpu->arch.features? Does it stay set? If it gets cleared, is it now
+> possible for userspace to call KVM_ARM_VCPU_INIT again with a different set
+> of VCPU features (it doesn't look possible to me after looking at the
+> code). If it stays set, what does it mean when userspace calls
+> KVM_ARM_VCPU_INIT with a different set of features enabled than what is
+> present in the ID registers? Should the ID registers be changed to match
+> the features that userspace set in the last KVM_ARM_VCPU_INIT call (it
+> looks to me that the ID registers are not changed)?
+
+KVM will not allow userspace to set the ID register value that conflicts
+with CPU features that are configured by the initial KVM_ARM_VCPU_INIT
+(or there are a few more APIs).
+KVM_SET_ONE_REG for such requests will fail.
+
+
+> 2. What happens to vcpu->arch.features when userspace enables a feature via
+> the ID registers which is not present in the bitmap?
+
+The answer for this question is basically the same as above.
+Userspace is not allowed to enable a feature via the ID registers
+which is not present in the bit map.
+
+The cover lever included a brief explanation of this, but I will
+try to improve the explanation:-)
+
+Regards,
+Reiji
+
+>
+> Thanks,
+> Alex
 >
 > On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
 > > In KVM/arm64, values of ID registers for a guest are mostly same as
@@ -107,32 +156,6 @@ On Tue, Nov 23, 2021 at 7:59 AM Alexandru Elisei
 > > ID registers (as long as KVM can support features that are indicated
 > > in the registers) so userspace can have more control of configuring
 > > and unconfiguring features for guests.
->
-> What not use VCPU features? Isn't that why the field
-> kvm_vcpu_init->features exists in the first place? This cover letter does
-> nothing to explaing why any changes are needed.
->
-> Do you require finer grained control over certain feature that you cannot
-> get with the 32 * 7 = 224 feature flag bits from kvm_vcpu_init? Does using
-> the ID registers simplify certain aspects of the implementation?
-
-Since some features are not binary in nature (e.g. AA64DFR0_EL1.BRPs
-fields indicate number of breakpoints minus 1), using
-kvm_vcpu_init->features to configure such features is inconvenient.
-
-One of the reasons why we want the finer grained control is that
-we want to expose a uniform set/level of features for a group of
-guests on systems with different ARM CPUs.
-
-I will update the cover letter.
-
-Thanks,
-Reiji
-
->
-> Thanks,
-> Alex
->
 > >
 > > The patch series is for both VHE and non-VHE, except for protected VMs,
 > > which have a different way of configuring ID registers based on its
