@@ -2,76 +2,144 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D245C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 17:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F45C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 17:41:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B858E4B1AB;
-	Wed, 24 Nov 2021 12:01:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5AE24B1FC;
+	Wed, 24 Nov 2021 12:41:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Kv3d-66no-v2; Wed, 24 Nov 2021 12:00:59 -0500 (EST)
+	with ESMTP id JWqBigNqUbsU; Wed, 24 Nov 2021 12:41:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42C1C4B1D8;
-	Wed, 24 Nov 2021 12:00:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC1204B1E3;
+	Wed, 24 Nov 2021 12:41:31 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C74D4B1A3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 12:00:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 246954B1BF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 12:07:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UUL5vMMAJ+TM for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 12:00:57 -0500 (EST)
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
- [209.85.214.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2AC3D4B15C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 12:00:57 -0500 (EST)
-Received: by mail-pl1-f175.google.com with SMTP id y7so2397078plp.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 09:00:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ccD0ntUVVYkwYlyadNBt1sjxaVIrP/hx7EjWxQNG1N8=;
- b=GOWk964Yosu4ck30FptZ70D1KfKid+USBLbkj8qHTGA21vV6GE7GYqSTOdM2HFjGeW
- 2SxyiSkj0+IfbN3/2320KZDe3R7YEgaSwjdsvCkNh6MfmUBbb9k4SZ0rPYhB4qCeCqMb
- t/ZHRtkalvm2Q23Mu0NnH41nyx2BZihuqFVmuuUbsg3TWXJiz66zbOwFC/14Xb0PLQI+
- 9FhNtTngAmj5DY4E/DkWHD40NtKCuujkZtfK2C8PahXspP61IoOPNfbRsBJ5mkj9dFFh
- lSYRq5586zAHmDgxQR8/n35KSbN2KVgpG0/QkTPRAHlbLz1CWRdIr9ou8r5QwD9PLIcQ
- Y29Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ccD0ntUVVYkwYlyadNBt1sjxaVIrP/hx7EjWxQNG1N8=;
- b=VRxhJ/wCRxwdZpa9wuooPddgIFGlkhYjoPwo77uihSyBfmR2CZtOtX/mviUR9YAwms
- yhxvPHLY/fCYTuXyznuheekWrPgOwfC78X3MbvvEan9MVWThvryS63YrKsC5rtxTDP5g
- PKq5DPma1IXmZF5ji2D2OJ2PuTKaz80hqkggvTgYxSAyZ52cxQjLMZyn4+S22TuIvPse
- 5z+QtYi5pACegKSfUE8SZcfq2HpPylMhKVJg/VGbIwfCvJcTo93HDmTxoCDrOeDrc+nq
- NBZcR4bG59OxJxqBvRL++aWm4tRbMwzYXlvGKB3yaqie0bePznTntqKXoa1IN5VA2qKP
- +ocA==
-X-Gm-Message-State: AOAM530CIn1G7WGqpbF1jfCq+e/Uq673hX1R/NoYi24DXvD1MEYkI7WA
- /b+zS87HShD5m1ZYIvSy3kb2dh+d2lMv4JfnjPGwGA==
-X-Google-Smtp-Source: ABdhPJx4hHfvg7PjcL9qHntLsSw4S293Gegpji2gVZVbaMxcedLFto0w5R8opTR+gtpycaYJ0aXlQUScJRfPuAzPG2I=
-X-Received: by 2002:a17:902:d703:b0:144:e012:d550 with SMTP id
- w3-20020a170902d70300b00144e012d550mr19489170ply.38.1637773256073; Wed, 24
- Nov 2021 09:00:56 -0800 (PST)
+ with ESMTP id vv2zPr9S9-1P for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 12:07:40 -0500 (EST)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com
+ (mail-bn8nam11on2137.outbound.protection.outlook.com [40.107.236.137])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE6574B1AF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 12:07:40 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PsaIWMDecQgEDbu9gVaf35MzkXJZeu0DtZJ3bqCj5+bmu48d1oL6e4PKICMS34Wh6OobCypyKWVxI6RKdnFJ9GIfLpQj/dWb+Qkg8PZqB1vt+BU1RhG4gUjS82iRHUPlRIKpq9Hwr7xN7tOXvol1h0Az0xEiXeIq7vCEhLwkNXKfDFGwXqaQbIUD9Nn1dqSq3EUwy5a7X4yvZt+7HM3psPEURPt4UnAm/PmP/XedXnprPaeK0VqgLNYZKGOmFUmq8flBvMU94x4fBPN1unwKBGF7TTKRfVFim6JGoA783uH3jZ3ow059GQfq59xgeIbhK+ErGqT44GhK35LgkQgotQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eN3DiGe/OqHzaeafYbHBKY90pounLG7evoBvx1bsayY=;
+ b=cTOjiQOdWRupMlATysuChGT6j2CpzX4Pf+w9fvY4QP0VT5u6mmOtZoreT1SkuxQxY9El9fwkngZzco28qp/hEalp3yLLSHnpKus+08f6SK/XgrroGjC2huLMioQyj1fBuuH5FXHX10NCvjJPRitpHFSnGu9Eaf6aBH+5X+yKWd9PKm42JaN0KugZxArm8REOjoThPBFj6y8YU0HFeqIq3rVz9uodv1UXhK2rwaUALpipo05y8vpfCGK8Dsbt1h/7GneeYkYHLMmC9EHzJpSWlSAojcUj5v1vrxEs7nushDPQCrnnM/sVGyUu2MsvgylLXzhWzBWCpgk9bGn1EMO+VA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eN3DiGe/OqHzaeafYbHBKY90pounLG7evoBvx1bsayY=;
+ b=Mnwp0Gic4dKkecGhYxUjLnaPvFsHoDC+Uo6bhMKx9zSH7g/wFgVyEownGf2deEBxeBMXikwABmImjzxR7LDYCnawX21yD7jpD4WKwezS+/gT8w1KO0f6f48Wl4aFIeSsQ4F+kxwjFzkWwKmPL8+Yvifw2ndsRGtbTFYgiAoXBi8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from CH0PR01MB7033.prod.exchangelabs.com (2603:10b6:610:107::16) by
+ CH2PR01MB5654.prod.exchangelabs.com (2603:10b6:610:2f::20) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4713.22; Wed, 24 Nov 2021 17:07:36 +0000
+Received: from CH0PR01MB7033.prod.exchangelabs.com
+ ([fe80::1dc1:27e5:9fb6:f13d]) by CH0PR01MB7033.prod.exchangelabs.com
+ ([fe80::1dc1:27e5:9fb6:f13d%9]) with mapi id 15.20.4734.022; Wed, 24 Nov 2021
+ 17:07:36 +0000
+From: Tyler Baicar <baicar@os.amperecomputing.com>
+To: patches@amperecomputing.com, abdulhamid@os.amperecomputing.com,
+ darren@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org,
+ maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, lorenzo.pieralisi@arm.com, guohanjun@huawei.com,
+ sudeep.holla@arm.com, rafael@kernel.org, lenb@kernel.org,
+ tony.luck@intel.com, bp@alien8.de, mark.rutland@arm.com,
+ anshuman.khandual@arm.com, vincenzo.frascino@arm.com, tabba@google.com,
+ marcan@marcan.st, keescook@chromium.org, jthierry@redhat.com,
+ masahiroy@kernel.org, samitolvanen@google.com, john.garry@huawei.com,
+ daniel.lezcano@linaro.org, gor@linux.ibm.com, zhangshaokun@hisilicon.com,
+ tmricht@linux.ibm.com, dchinner@redhat.com, tglx@linutronix.de,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org,
+ linux-edac@vger.kernel.org, ishii.shuuichir@fujitsu.com,
+ Vineeth.Pillai@microsoft.com
+Subject: [PATCH 0/2] ARM Error Source Table Support
+Date: Wed, 24 Nov 2021 12:07:06 -0500
+Message-Id: <20211124170708.3874-1-baicar@os.amperecomputing.com>
+X-Mailer: git-send-email 2.33.1
+X-ClientProxiedBy: CH2PR05CA0059.namprd05.prod.outlook.com
+ (2603:10b6:610:38::36) To CH0PR01MB7033.prod.exchangelabs.com
+ (2603:10b6:610:107::16)
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com>
- <YZ0QMK1QFjw/uznl@monolith.localdoman>
- <CAAeT=FxeXmgM3Pyt_brYRdehMrKHQwZut5xTbHOv-9um7anhYw@mail.gmail.com>
- <YZ4Y/r8BM2hnrlYQ@monolith.localdoman>
-In-Reply-To: <YZ4Y/r8BM2hnrlYQ@monolith.localdoman>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 24 Nov 2021 09:00:39 -0800
-Message-ID: <CAAeT=FzhCmBTF2QpCdNVjtVT_Ct0mo2_05uTny73U4B3fTyVZg@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
- by userspace
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Received: from sut04sys-r242-0330002bj0sa.scc-lab.amperecomputing.com
+ (4.28.12.214) by CH2PR05CA0059.namprd05.prod.outlook.com
+ (2603:10b6:610:38::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.6 via Frontend
+ Transport; Wed, 24 Nov 2021 17:07:33 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2ec46937-4874-4489-db75-08d9af6ce948
+X-MS-TrafficTypeDiagnostic: CH2PR01MB5654:
+X-Microsoft-Antispam-PRVS: <CH2PR01MB5654EDB83CF22829CF5D8C92E3619@CH2PR01MB5654.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: guQoQczoengmbyQlqOtYK2CjpZ7RcytG5QdjbKOQwsdHIIUlf2GxeAa4fA/HvQ42/irZ4kz0NK+fsYKVbfymPYzk+F5/Aiv5k2HFbSin1w5U4AvN4GXbmVY0JLr3EDyYdFkgFHyYzz5wVNDIgrRzs2ychuDL7JZL9oltpI/IUX5+DuNR6iedj5+HY2GbidcsRM9Octl4vIodz1GBgPgZcYfqAW/rrmHhylfqmAgWiDh5lzgUsAlpziXjziY6XMKq3mVDicpmz3kAsqbDwJlLIkw0J5aBCkLwJcDc8nBRbvU/cJrlfJG1thB8uo0ki9kbp/BOHYQVoCa45U0W3ryLCjdUER3Zy4/IR6BLCWYvH3dI8lpwYblJu1i6xLNVNqmB/FO7wqiPUkDSQH7dWPUctX3ssI6OH0qbEUae3dsjZmi8P3tgS4MnJF+f4ncSxxGkUHRwV6ly838yMqcXXdcRDJm7K0R/A3C03OQdfQbwPdcFxD+MFeWcxQfR8B0Y2Ezpwc8f0Adf2c4EONMlNNsumXxSIYkYR80nW6L2qo9Tfh4aAxT1UXyViXL0z+x7Jn1tE4SJI+pq+gahhkOxxkB/2mmIG/SXwjgP9vZKHiTTkUA6naHQ7V0+MsYMbuMHwQf/gHBtjQBCO3Wph+Der21+LgFUV7MOqWEN/vq0I9QJaBdLpyhnIA3l8aB1h3s0o0MLpMX5nnYpBo2dWHClcjbJ+yc+j+mFFUNX4WPwzkKA61gNszXi5G+DNeG6zMqu0zVupieE6KhhEx7cfIss6TehZvKXG/2uSe+ZOeAnOSp9FxqvdxAK6ocjpSDtFkq+nKXM
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:CH0PR01MB7033.prod.exchangelabs.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(8936002)(186003)(38100700002)(1076003)(38350700002)(5660300002)(316002)(66476007)(83380400001)(66556008)(921005)(52116002)(4326008)(7406005)(508600001)(86362001)(66946007)(26005)(966005)(6486002)(6666004)(956004)(7416002)(2906002)(107886003)(2616005)(6512007)(6506007)(8676002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g4bBv1oXKX17GHI21KZGqjZ00iEBz+7OuNtiM2QebsbJ0WXqd2slrR/tloon?=
+ =?us-ascii?Q?ZdIOKW8yPM2AXoO36icQTrCbfRBDqQcd+Eew3XmJPX795+cxt7LKBZ4Dy/TI?=
+ =?us-ascii?Q?MIngsji40qYyVI1YdyLGqXs1W0d2DsBEecDkCpCxoCbf0jqKYcUTcg5nupCQ?=
+ =?us-ascii?Q?oyRiRJLahZz+nCvOxJwu82R/DSo6EeADptak9Y2NG0Tm7NbXMh8xGISwfWV9?=
+ =?us-ascii?Q?7ZBmovkgTc9LsN1iv56iA5kbqp9SSxqqcGFIa2qORNzYgy/uQrveZgeHyhX7?=
+ =?us-ascii?Q?NwAven5z//4ImXYNttiULFXwdk+GhV91yRtFAYOhK6onrPVJb1gedtvCr4wR?=
+ =?us-ascii?Q?rWPPkh8jZYhPoX2NdTAyut70JpgH/1MELKYaJNHxdrpvdKdmBGClY3+vJv3L?=
+ =?us-ascii?Q?3W/fahgalAuGyXMSKJ1nsITApPcY5V5oT0vbYxvnPdEyDMt9b8pgj2Bdc+tS?=
+ =?us-ascii?Q?cM3CBka4e/WVODA3LubxoskZgxOEjArZ250iQa9xUl2OGelBf0g7O4BkeeQZ?=
+ =?us-ascii?Q?psuH2vZyCdiALvvrZhTewPGx2109HiHfHvbQA6VmhZMgexK0Pa3BUIvjdQAD?=
+ =?us-ascii?Q?zWr7oClQhwK409kwAYdL7fJVBhQieaTGnC1tsHxjtpRXriXOH2SjQPH6jmxy?=
+ =?us-ascii?Q?N1RdsDFueseuT0PFyRSwxHCNGjQfZRDNQtBSqTx5d2eh5eSiX+GaCd/pngy3?=
+ =?us-ascii?Q?84Cm4MsM6Isomajp2zkKQr7UT+ZJ2simwIpigonAZ/R+rcEoTxHKXWJ+EWWJ?=
+ =?us-ascii?Q?tNp1SCIYP0doyE35/Wpck+D6IXr/+1K84wNh9WGJCTND/eggqW4rVyIGdE4l?=
+ =?us-ascii?Q?s6hwAXBgrdR5unO7wNcK6XYNEFB2TAakA08r0lWQDL21cfHB5zaLjswnL4Ac?=
+ =?us-ascii?Q?huTeO18U9e83Jpsh+P9BDcy4rKRMF73VqwEKAa6qPTpRj9YpdeUMcOkPpU02?=
+ =?us-ascii?Q?A20duLt8o3osI3eydcjg7SDPa1873iZct8pjsyOtRtXL+NRtAkghwYw+J0L2?=
+ =?us-ascii?Q?NCzr939xYfOfLFrPFf7kulRD5+A2VTlIFtVg6ZgFitKDHTkBdok+2nDD4EVo?=
+ =?us-ascii?Q?N3G8iJDXuej3idN8WCEONmfkhiOyiZxfn/yiZjzjpOpm5Ggt0nBOEWKeJTMJ?=
+ =?us-ascii?Q?v/4t1L2K6a/YsoolKzTLhWm5ffpRpkab4DGhOwpyAfUSgQtfDZ+2IxlR1rQJ?=
+ =?us-ascii?Q?Qn2WxH6iMU1k87BInQ6r1Dyf/Wy4jTFlKYPTU7hoMjopNWjd1UszpyoscSth?=
+ =?us-ascii?Q?AjJac/6qh+YLCkBgV1dUwxjtcJMUU95Wm7eyROnLOsJQifl5rm5ys44EqkEm?=
+ =?us-ascii?Q?/uFRPkaHtb4hjXUFConiqdBGP0pPh+2ANR8P5x4HvKa+JFsQJSE0gtO06uhN?=
+ =?us-ascii?Q?uSzpoom2EzQwTnibB6z6ZI7ERN+paS2mt1D3XGCuBl8AUAUONvd6Z/UoiB6s?=
+ =?us-ascii?Q?k2K1L8SoNj+WejiSzgGpDwvY9OsF1CRxdsIRGqISTWDMgbJbWw9kJdp1pCij?=
+ =?us-ascii?Q?k9E3sML4nRo/qJRFbUaZPDd/GRibfNFMZcKxTi36OMw3ypPI90FUx06HflN4?=
+ =?us-ascii?Q?hysrGz8YCKBwVpaj8st/DDa5TzSYQuWTb+S+fK3AECLlRUAagEOKER5oiFvX?=
+ =?us-ascii?Q?esh3NsRqW53EwLaGK+aOwIgkFhC5SLtamoXTT4fp+pfuUTPzrPiz4OgZp1oG?=
+ =?us-ascii?Q?CtuY/NpyUWCMIi02vQzYycAzHKWE3lVSTOhev2iuA+lkQZhjAPlgbsz8CIn2?=
+ =?us-ascii?Q?MXY+LbuvRQ=3D=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ec46937-4874-4489-db75-08d9af6ce948
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR01MB7033.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2021 17:07:35.9450 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5V/ZYq+BRZX5WnagWQQuLTolbxtvmY5d1AyCGHfA4OGp126fuye6xjpDA1GPj3W3ZL3VAgfDRwDM4Koimb+pSkOd2TW4/JZviKQA5A2XTo5GcXF+TA2hPYl/no84cOBF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR01MB5654
+X-Mailman-Approved-At: Wed, 24 Nov 2021 12:41:30 -0500
+Cc: Tyler Baicar <baicar@os.amperecomputing.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,54 +156,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
+This series adds support for the ARM Error Source Table (AEST) based on
+the latest version of ACPI for the Armv8 RAS Extensions [0].
 
-> > > I started reviewing the series, but I ended up being very confused, see
-> > > below.
-> > >
-> > > On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
-> > > > In KVM/arm64, values of ID registers for a guest are mostly same as
-> > > > its host's values except for bits for feature that KVM doesn't support
-> > > > and for opt-in features that userspace didn't configure.  Userspace
-> > > > can use KVM_SET_ONE_REG to a set ID register value, but it fails
-> > > > if userspace attempts to modify the register value.
-> > > >
-> > > > This patch series adds support to allow userspace to modify a value of
-> > > > ID registers (as long as KVM can support features that are indicated
-> > > > in the registers) so userspace can have more control of configuring
-> > > > and unconfiguring features for guests.
-> > >
-> > > What not use VCPU features? Isn't that why the field
-> > > kvm_vcpu_init->features exists in the first place? This cover letter does
-> > > nothing to explaing why any changes are needed.
-> > >
-> > > Do you require finer grained control over certain feature that you cannot
-> > > get with the 32 * 7 = 224 feature flag bits from kvm_vcpu_init? Does using
-> > > the ID registers simplify certain aspects of the implementation?
-> >
-> > Since some features are not binary in nature (e.g. AA64DFR0_EL1.BRPs
-> > fields indicate number of breakpoints minus 1), using
-> > kvm_vcpu_init->features to configure such features is inconvenient.
->
-> I see, this makes a lot of sense and this looks like a nice solution to
-> that problem.
->
-> >
-> > One of the reasons why we want the finer grained control is that
-> > we want to expose a uniform set/level of features for a group of
-> > guests on systems with different ARM CPUs.
->
-> So here you are talking specifically about KVM not checking that all VCPUs
-> have the same feature bits set in vcpu->arch.features, which makes it
-> possible for userspace to set different features for different VCPUs,
-> right?
+The AEST driver supports both memory mapped and system register interfaces.
+This series assumes system register interfaces are only registered with
+private peripheral interrupts (PPIs); otherwise there is no guarantee the
+core handling the error is the core which took the error and has the
+syndrome info in it's system registers.
 
-Yes, that is correct.  For features that can be configured by
-KVM_ARM_VCPU_INIT, userspace can configure different features
-for different vCPUs by using KVM_ARM_VCPU_INIT as before.
+This is meant to be initial support for AEST to address the current gaps
+with systems that support ARMv8 RAS extensions but don't have
+firmware-first support. This series simply logs all the errors it finds
+and triggers a kernel panic if there is an UE present.
 
-Thanks,
-Reiji
+I have tested this series on Ampere Altra using processor errors to
+exercise PPI handling with system register interface and memory errors
+to exercise SPI handling with MMIO interface. Both corrected and
+uncorrected errors were tested to verify the non-fatal vs fatal
+scenarios.
+
+Future work:
+- UER handling to avoid panic
+- Looping through all external abort capable (ERR<n>FR.UE != 0) error
+   nodes in SEA/SEI handling
+
+Changes from RFC patch series [1]:
+- Updated for latest AEST spec
+- Utilize ACPICA header defines of AEST structures
+- Added support for ARMv8.4 RAS extension
+- Dropped the SEA/SEI dumping of SR RAS registers
+- Removed unused defines
+- Unified RAS extension register printing to a single function
+- Updated trace event with additional fields
+- Addressed other feedback from RFC series
+- Added myself to ARM64 ACPI MAINTAINERS as a reviewer
+
+[0] https://developer.arm.com/documentation/den0085/latest
+[1] https://lkml.org/lkml/2019/7/2/781
+
+Tyler Baicar (2):
+  ACPI/AEST: Initial AEST driver
+  trace, ras: add ARM RAS extension trace event
+
+ MAINTAINERS                     |   1 +
+ arch/arm64/include/asm/ras.h    |  52 ++++
+ arch/arm64/include/asm/sysreg.h |   2 +
+ arch/arm64/kernel/Makefile      |   1 +
+ arch/arm64/kernel/ras.c         | 129 +++++++++
+ arch/arm64/kvm/sys_regs.c       |   2 +
+ drivers/acpi/arm64/Kconfig      |   3 +
+ drivers/acpi/arm64/Makefile     |   1 +
+ drivers/acpi/arm64/aest.c       | 455 ++++++++++++++++++++++++++++++++
+ include/linux/acpi_aest.h       |  50 ++++
+ include/linux/cpuhotplug.h      |   1 +
+ include/ras/ras_event.h         |  55 ++++
+ 12 files changed, 752 insertions(+)
+ create mode 100644 arch/arm64/include/asm/ras.h
+ create mode 100644 arch/arm64/kernel/ras.c
+ create mode 100644 drivers/acpi/arm64/aest.c
+ create mode 100644 include/linux/acpi_aest.h
+
+-- 
+2.33.1
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
