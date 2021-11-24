@@ -2,97 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61049C433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 13:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72EB1C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 16:15:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2BB44B1AD;
-	Wed, 24 Nov 2021 08:46:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B194C4B1DB;
+	Wed, 24 Nov 2021 11:15:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xgsQf77VMEL7; Wed, 24 Nov 2021 08:46:14 -0500 (EST)
+	with ESMTP id Fl8EXzDs+JrN; Wed, 24 Nov 2021 11:15:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F4F04B168;
-	Wed, 24 Nov 2021 08:46:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D97F4B1DD;
+	Wed, 24 Nov 2021 11:15:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B2284B165
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 08:46:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A76304B1DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 11:14:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rhfbntJjsMkY for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 08:46:11 -0500 (EST)
+ with ESMTP id cDgSG41Y4CAf for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 11:14:58 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DB8FC4B160
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 08:46:11 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AB974B1CC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 11:14:58 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1637761571;
+ s=mimecast20190719; t=1637770498;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OtRl2DIeR6fkYgUP++XZmn9F5k5GX+nWQIi0KKjrOO4=;
- b=CUGXx1mneI9QnNiSzjR9gay98Lq6te7wrzBrNsoRUfZ+mE+vf3mZJ7/AhJjEJhvZhoy8hu
- sIhh8gFpAfaJFSYa9PmiGDPj1FH2PmtpdK1hGMHLirwsMv/mH5+4DUIKTKXXEI6MIk1FED
- 8Myvd70DTX1lQkeijjrTJvtRPIEMgkQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=mJrAXo0yOwYDhqzWJltPdXBtYsqn5jxXKwheMp22Ick=;
+ b=avdladGihBr7aE8k9duo47r8wmBBuVxuJH1YPrWy3mRvA0Ue0vVUShKvauVCGlUMAHb26T
+ NYGhu6zoBKFI5q5sDDVuFk66FyjvGsQiH+lXT2VEeS7jnyf/fOZ5y0GbtgfaiC6Gxn59nx
+ 2ieIc7EOOunNk7BILK/HZiml11z61Ls=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-324-DZxi5j-7NuGiEaAWvIKKMA-1; Wed, 24 Nov 2021 08:46:10 -0500
-X-MC-Unique: DZxi5j-7NuGiEaAWvIKKMA-1
-Received: by mail-wr1-f72.google.com with SMTP id
- d18-20020adfe852000000b001985d36817cso502766wrn.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 05:46:10 -0800 (PST)
+ us-mta-423-AYH3O1XJORiX97qdKuz_5g-1; Wed, 24 Nov 2021 11:14:56 -0500
+X-MC-Unique: AYH3O1XJORiX97qdKuz_5g-1
+Received: by mail-wm1-f71.google.com with SMTP id
+ r6-20020a1c4406000000b0033119c22fdbso1563572wma.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 08:14:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OtRl2DIeR6fkYgUP++XZmn9F5k5GX+nWQIi0KKjrOO4=;
- b=ScAf6e5++JkD8iP/SsTbVEr9+JMgAL9CdylCNjvIiSOB78B6cwPqb3MKyqnYx3u1f1
- UHpNwBh53CsByP+IgDgzWlfzBZWwrB8h5SB9RSoUeHFYsgUzNXCuA+kabc0l7l7ViUi2
- 9EjcoJhjOhFjMgNPKQDcf6vYzx7uhLGoDt6T4ApCmE6FNnkEL4nTDCE9+DLHsPN2AbTR
- Jrxbg9qtTsDEGCKg/9Fw0GFobLsW2wt0apYOeXKLmO5uwt5nHmNLfN9TqxufRpMhQ3lN
- tNRjnXw77ujq4sGNqSeYrN3DR5IbTqyX76Qq2d1RXY2LbVbULJGZg2le5te9b0J8ERdg
- pbnQ==
-X-Gm-Message-State: AOAM530Gf2V5mT/7OXIaeL3A1hKkkuIqZ6uyWuTlekMRCuxPNT7MK4ph
- ZkeCi5ZhBsB0fP+IBUj7YdvbiNLYyZFSAQ7hMlUYghHqymJJ0STrtaJt77Ic3LxZrrO0e68maav
- 953PgGKlKV6zhPxZz0E/9WgA5
-X-Received: by 2002:a05:600c:19c8:: with SMTP id
- u8mr15160961wmq.155.1637761569292; 
- Wed, 24 Nov 2021 05:46:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzwKOp/eXh78FWh0Lz/OPIavW3bbflloOckEelksALsyukTUhRiaUa5Q6OjguOoC1UT9wglgw==
-X-Received: by 2002:a05:600c:19c8:: with SMTP id
- u8mr15160919wmq.155.1637761569079; 
- Wed, 24 Nov 2021 05:46:09 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id d7sm14680732wrw.87.2021.11.24.05.46.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 24 Nov 2021 05:46:08 -0800 (PST)
-From: Eric Auger <eauger@redhat.com>
-Subject: Re: [RFC PATCH v3 11/29] KVM: arm64: Make ID_DFR0_EL1 writable
-To: Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
- kvmarm@lists.cs.columbia.edu
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-12-reijiw@google.com>
-Message-ID: <cda3eb28-1cf6-da6e-1769-104c29f81d4a@redhat.com>
-Date: Wed, 24 Nov 2021 14:46:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=mJrAXo0yOwYDhqzWJltPdXBtYsqn5jxXKwheMp22Ick=;
+ b=0TeR4KXM7UIcgdUAGcEn/4A2+zifKwTcdonleNGfk0QQU6Z7TIVqOqnyQ/LyzXYIQ1
+ DMxMlCM4Z/s1o82QObKAg+nLideHo5pR8ORF9QzwIeCNbG7sakcO4COyVMRfPWmBUjlG
+ tMSYQalNDfu1rt+lFJuWYR1vk7pU9MnuTAgjhulEetyY2uIXvhg5ZOdQFVtUMEakvTH4
+ XglD0nD8x4yxJ+nKceM1zljitB/4w8gA7rtx1atzS8yVdOLIGdBdhT19DNPAAVzJ0DDw
+ kg6GVZo4ETeGGjgyQGm3hzUVpTXy/dUY9E7ub8noW2Pxabm4t2iVuDktXIDn0KPsWaKt
+ SXjg==
+X-Gm-Message-State: AOAM530XQzWPXiBadDg2D+J6fVEvHi7FRiYLRyu4u8559QEMupUxo9VD
+ WoR0c6w7IFSwY8WzVmQKM4vJ1+fZquKNqXbA6g7VN+9EgVSLtkQlI65t5Oj/9LdNiGMyRYWieAn
+ 4mNWEkoyO5I59Vvw2S7Rj5YCE
+X-Received: by 2002:a1c:448b:: with SMTP id r133mr17043662wma.85.1637770495398; 
+ Wed, 24 Nov 2021 08:14:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJymmCc+u6oBfH4XVYWnBhwOgHSX0hlfUcbUYa1AN2TAUKehwrKpAWg2/27EFWQM986LicPmXg==
+X-Received: by 2002:a1c:448b:: with SMTP id r133mr17043615wma.85.1637770495102; 
+ Wed, 24 Nov 2021 08:14:55 -0800 (PST)
+Received: from gator (nat-pool-brq-u.redhat.com. [213.175.37.12])
+ by smtp.gmail.com with ESMTPSA id b6sm5303470wmq.45.2021.11.24.08.14.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 24 Nov 2021 08:14:54 -0800 (PST)
+Date: Wed, 24 Nov 2021 17:14:53 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [kvm-unit-tests PATCH v8 08/10] arm/barrier-litmus-tests: add
+ simple mp and sal litmus tests
+Message-ID: <20211124161453.aqkcykcfq5gphvzw@gator>
+References: <20211118184650.661575-1-alex.bennee@linaro.org>
+ <20211118184650.661575-9-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20211117064359.2362060-12-reijiw@google.com>
+In-Reply-To: <20211118184650.661575-9-alex.bennee@linaro.org>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, maz@kernel.org, idan.horowitz@gmail.com,
+ qemu-arm@nongnu.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -104,130 +99,154 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Reiji,
+On Thu, Nov 18, 2021 at 06:46:48PM +0000, Alex Benn=E9e wrote:
+> This adds a framework for adding simple barrier litmus tests against
+> ARM. The litmus tests aren't as comprehensive as the academic exercises
+> which will attempt to do all sorts of things to keep racing CPUs synced
+> up. These tests do honour the "sync" parameter to do a poor-mans
+> equivalent.
+> =
 
-On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> This patch adds id_reg_info for ID_DFR0_EL1 to make it writable
-> by userspace.
-> 
-> Return an error if userspace tries to set PerfMon field of the
-> register to a value that conflicts with the PMU configuration.
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> The two litmus tests are:
+>   - message passing
+>   - store-after-load
+> =
+
+> They both have case that should fail (although won't on single-threaded
+> TCG setups). If barriers aren't working properly the store-after-load
+> test will fail even on an x86 backend as x86 allows re-ording of non
+> aliased stores.
+> =
+
+> I've imported a few more of the barrier primatives from the Linux source
+> tree so we consistently use macros.
+> =
+
+> The arm64 barrier primitives trip up on -Wstrict-aliasing so this is
+> disabled in the Makefile.
+> =
+
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> CC: Will Deacon <will@kernel.org>
+> =
+
 > ---
->  arch/arm64/kvm/sys_regs.c | 52 ++++++++++++++++++++++++++++++++++-----
->  1 file changed, 46 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 0faf458b0efb..fbd335ac5e6b 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -665,6 +665,27 @@ static int validate_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +static int validate_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> +				const struct id_reg_info *id_reg, u64 val)
-> +{
-> +	bool vcpu_pmu, dfr0_pmu;
-> +	unsigned int perfmon;
-> +
-> +	perfmon = cpuid_feature_extract_unsigned_field(val, ID_DFR0_PERFMON_SHIFT);
-> +	if (perfmon == 1 || perfmon == 2)
-> +		/* PMUv1 or PMUv2 is not allowed on ARMv8. */
-> +		return -EINVAL;
-> +
-> +	vcpu_pmu = kvm_vcpu_has_pmu(vcpu);
-> +	dfr0_pmu = id_reg_has_pmu(val, ID_DFR0_PERFMON_SHIFT, ID_DFR0_PERFMON_8_0);
-> +
-> +	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
-> +	if (vcpu_pmu ^ dfr0_pmu)
-> +		return -EPERM;
-This breaks the migration on ThunderX v2 as vcpu_pmu == true and
-dfr0_pmu == false
+> v8
+>   - move to mttcgtests.cfg
+>   - fix checkpatch issues
+>   - fix report usage
+> v7
+>   - merge in store-after-load
+>   - clean-up sync-up code
+>   - use new counter api
+>   - fix xfail for sal test
+> v6
+>   - add a unittest.cfg
+>   - -fno-strict-aliasing
+> ---
+>  arm/Makefile.common       |   1 +
+>  lib/arm/asm/barrier.h     |  61 ++++++
+>  lib/arm64/asm/barrier.h   |  50 +++++
+>  arm/barrier-litmus-test.c | 450 ++++++++++++++++++++++++++++++++++++++
+>  arm/mttcgtests.cfg        |  33 +++
+>  5 files changed, 595 insertions(+)
+>  create mode 100644 arm/barrier-litmus-test.c
+> =
 
-Thanks
+> diff --git a/arm/Makefile.common b/arm/Makefile.common
+> index f905971..861e5c7 100644
+> --- a/arm/Makefile.common
+> +++ b/arm/Makefile.common
+> @@ -13,6 +13,7 @@ tests-common +=3D $(TEST_DIR)/sieve.flat
+>  tests-common +=3D $(TEST_DIR)/pl031.flat
+>  tests-common +=3D $(TEST_DIR)/tlbflush-code.flat
+>  tests-common +=3D $(TEST_DIR)/locking-test.flat
+> +tests-common +=3D $(TEST_DIR)/barrier-litmus-test.flat
+>  =
 
-Eric
-> +
-> +	return 0;
-> +}
-> +
->  static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
->  {
->  	u64 limit = id_reg->vcpu_limit_val;
-> @@ -725,6 +746,15 @@ static void init_id_aa64dfr0_el1_info(struct id_reg_info *id_reg)
->  	id_reg->vcpu_limit_val = limit;
->  }
->  
-> +static void init_id_dfr0_el1_info(struct id_reg_info *id_reg)
-> +{
-> +	/* Limit guests to PMUv3 for ARMv8.4 */
-> +	id_reg->vcpu_limit_val =
-> +		cpuid_feature_cap_perfmon_field(id_reg->vcpu_limit_val,
-> +						ID_DFR0_PERFMON_SHIFT,
-> +						ID_DFR0_PERFMON_8_4);
-> +}
-> +
->  static u64 get_reset_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  				     const struct id_reg_info *idr)
->  {
-> @@ -762,6 +792,14 @@ static u64 get_reset_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
->  	       (idr->vcpu_limit_val & ~(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER)));
->  }
->  
-> +static u64 get_reset_id_dfr0_el1(struct kvm_vcpu *vcpu,
-> +				 const struct id_reg_info *idr)
-> +{
-> +	return kvm_vcpu_has_pmu(vcpu) ?
-> +	       idr->vcpu_limit_val :
-> +	       (idr->vcpu_limit_val & ~(ARM64_FEATURE_MASK(ID_DFR0_PERFMON)));
-> +}
-> +
->  static struct id_reg_info id_aa64pfr0_el1_info = {
->  	.sys_reg = SYS_ID_AA64PFR0_EL1,
->  	.ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
-> @@ -814,6 +852,13 @@ static struct id_reg_info id_aa64dfr0_el1_info = {
->  	.get_reset_val = get_reset_id_aa64dfr0_el1,
->  };
->  
-> +static struct id_reg_info id_dfr0_el1_info = {
-> +	.sys_reg = SYS_ID_DFR0_EL1,
-> +	.init = init_id_dfr0_el1_info,
-> +	.validate = validate_id_dfr0_el1,
-> +	.get_reset_val = get_reset_id_dfr0_el1,
-> +};
-> +
->  /*
->   * An ID register that needs special handling to control the value for the
->   * guest must have its own id_reg_info in id_reg_info_table.
-> @@ -823,6 +868,7 @@ static struct id_reg_info id_aa64dfr0_el1_info = {
+>  tests-all =3D $(tests-common) $(tests)
+>  all: directories $(tests-all)
+> diff --git a/lib/arm/asm/barrier.h b/lib/arm/asm/barrier.h
+> index 7f86831..2870080 100644
+> --- a/lib/arm/asm/barrier.h
+> +++ b/lib/arm/asm/barrier.h
+> @@ -8,6 +8,8 @@
+>   * This work is licensed under the terms of the GNU GPL, version 2.
 >   */
->  #define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
->  static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
-> +	[IDREG_IDX(SYS_ID_DFR0_EL1)] = &id_dfr0_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
-> @@ -1677,12 +1723,6 @@ static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), gic_lim);
->  		}
->  		break;
-> -	case SYS_ID_DFR0_EL1:
-> -		/* Limit guests to PMUv3 for ARMv8.4 */
-> -		val = cpuid_feature_cap_perfmon_field(val,
-> -						      ID_DFR0_PERFMON_SHIFT,
-> -						      kvm_vcpu_has_pmu(vcpu) ? ID_DFR0_PERFMON_8_4 : 0);
-> -		break;
->  	}
->  
->  	return val;
-> 
+>  =
+
+> +#include <stdint.h>
+> +
+>  #define sev()		asm volatile("sev" : : : "memory")
+>  #define wfe()		asm volatile("wfe" : : : "memory")
+>  #define wfi()		asm volatile("wfi" : : : "memory")
+> @@ -25,4 +27,63 @@
+>  #define smp_rmb()	smp_mb()
+>  #define smp_wmb()	dmb(ishst)
+>  =
+
+> +extern void abort(void);
+> +
+> +static inline void __write_once_size(volatile void *p, void *res, int si=
+ze)
+> +{
+> +	switch (size) {
+> +	case 1: *(volatile uint8_t *)p =3D *(uint8_t *)res; break;
+> +	case 2: *(volatile uint16_t *)p =3D *(uint16_t *)res; break;
+> +	case 4: *(volatile uint32_t *)p =3D *(uint32_t *)res; break;
+> +	case 8: *(volatile uint64_t *)p =3D *(uint64_t *)res; break;
+> +	default:
+> +		/* unhandled case */
+> +		abort();
+> +	}
+> +}
+> +
+> +#define WRITE_ONCE(x, val) \
+> +({							\
+> +	union { typeof(x) __val; char __c[1]; } __u =3D	\
+> +		{ .__val =3D (typeof(x)) (val) }; \
+> +	__write_once_size(&(x), __u.__c, sizeof(x));	\
+> +	__u.__val;					\
+> +})
+> +
+> +#define smp_store_release(p, v)						\
+> +do {									\
+> +	smp_mb();							\
+> +	WRITE_ONCE(*p, v);						\
+> +} while (0)
+> +
+> +
+> +static inline
+> +void __read_once_size(const volatile void *p, void *res, int size)
+> +{
+> +	switch (size) {
+> +	case 1: *(uint8_t *)res =3D *(volatile uint8_t *)p; break;
+> +	case 2: *(uint16_t *)res =3D *(volatile uint16_t *)p; break;
+> +	case 4: *(uint32_t *)res =3D *(volatile uint32_t *)p; break;
+> +	case 8: *(uint64_t *)res =3D *(volatile uint64_t *)p; break;
+> +	default:
+> +		/* unhandled case */
+> +		abort();
+> +	}
+> +}
+> +
+> +#define READ_ONCE(x)							\
+> +({									\
+> +	union { typeof(x) __val; char __c[1]; } __u;			\
+> +	__read_once_size(&(x), __u.__c, sizeof(x));			\
+> +	__u.__val;							\
+> +})
+
+
+WRITE_ONCE and READ_ONCE are already defined in lib/linux/compiler.h
+
+Thanks,
+drew
 
 _______________________________________________
 kvmarm mailing list
