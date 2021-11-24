@@ -2,39 +2,39 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F45C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 17:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D7F6C433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 17:41:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5AE24B1FC;
-	Wed, 24 Nov 2021 12:41:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 240D64B11A;
+	Wed, 24 Nov 2021 12:41:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JWqBigNqUbsU; Wed, 24 Nov 2021 12:41:31 -0500 (EST)
+	with ESMTP id MKQkDJA1z6zr; Wed, 24 Nov 2021 12:41:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC1204B1E3;
-	Wed, 24 Nov 2021 12:41:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34E064B1EC;
+	Wed, 24 Nov 2021 12:41:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 246954B1BF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 12:07:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 217F94B1AF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 12:07:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vv2zPr9S9-1P for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 12:07:40 -0500 (EST)
+ with ESMTP id TRoXgq38qeQc for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 12:07:43 -0500 (EST)
 Received: from NAM11-BN8-obe.outbound.protection.outlook.com
- (mail-bn8nam11on2137.outbound.protection.outlook.com [40.107.236.137])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE6574B1AF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 12:07:40 -0500 (EST)
+ (mail-bn8nam11on2109.outbound.protection.outlook.com [40.107.236.109])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBB1A4B1BF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 12:07:42 -0500 (EST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PsaIWMDecQgEDbu9gVaf35MzkXJZeu0DtZJ3bqCj5+bmu48d1oL6e4PKICMS34Wh6OobCypyKWVxI6RKdnFJ9GIfLpQj/dWb+Qkg8PZqB1vt+BU1RhG4gUjS82iRHUPlRIKpq9Hwr7xN7tOXvol1h0Az0xEiXeIq7vCEhLwkNXKfDFGwXqaQbIUD9Nn1dqSq3EUwy5a7X4yvZt+7HM3psPEURPt4UnAm/PmP/XedXnprPaeK0VqgLNYZKGOmFUmq8flBvMU94x4fBPN1unwKBGF7TTKRfVFim6JGoA783uH3jZ3ow059GQfq59xgeIbhK+ErGqT44GhK35LgkQgotQ==
+ b=Nq50gnd2po+tQXFWzq3ochY1LmCgjynmeZRjIn+is97XP8ts1UFktAAL9E79CRkLo2CEnTeiKZ0OAfOdLA+417yHywZbkKyhfWkhtnJB3Bt8h1DUBlidJPnCaeDAM0/tC+7adtY9QhOJEriBFy9XbZd1a/RV7eq4MD+uWs5rsC73urzsOd74E9ct7ZzrJHorABbmNy51pLQftxJb2EPB6DlbdjiEape+DZGGraZ2IiFeJok2hdmC1Gw5+tVaY3qZJF6J+miVQJyc9E4PVO+2Gffjj+eiDqYnaIpaa+PKahEC96Z07+ie1i3zQJCtQ3uCJJpQ0NZnKay4hoTgsnESxQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eN3DiGe/OqHzaeafYbHBKY90pounLG7evoBvx1bsayY=;
- b=cTOjiQOdWRupMlATysuChGT6j2CpzX4Pf+w9fvY4QP0VT5u6mmOtZoreT1SkuxQxY9El9fwkngZzco28qp/hEalp3yLLSHnpKus+08f6SK/XgrroGjC2huLMioQyj1fBuuH5FXHX10NCvjJPRitpHFSnGu9Eaf6aBH+5X+yKWd9PKm42JaN0KugZxArm8REOjoThPBFj6y8YU0HFeqIq3rVz9uodv1UXhK2rwaUALpipo05y8vpfCGK8Dsbt1h/7GneeYkYHLMmC9EHzJpSWlSAojcUj5v1vrxEs7nushDPQCrnnM/sVGyUu2MsvgylLXzhWzBWCpgk9bGn1EMO+VA==
+ bh=6YCVELxkKYYFXEFdWfYu2TIPOub5t6l3xA3DgPdBk6Q=;
+ b=aIPoShhbA1HabeCzwIsC9jiXJfWDjhMkkkvJrQJuvCbZsI57cWDQxq/LVgYvEDs+POmIc30REPclFeEFLgoETrHomUwqEnEradyRABAM6tvUaGPKpKNACTLnMIkVv6JHRXc23dayvrMtZqsXRbm8kyaKJn89cQ7bazdwY18SZNC3qxAHGcMo6GjO1o1NBUfYHGbLktbXO1q+3KlbVLRJJQkMef0ngHb24ZLZ+tFl57JsuGSB1mRzn/Apb0ffGUZ2OXhyZkSlyPlj0uBcfK19nadAivQbKiOtnk1MMkUX9suVNvUCzRIB733ZgjRsS1YtNCeLcdz6tbnuL6chSmpiwg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -42,19 +42,19 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eN3DiGe/OqHzaeafYbHBKY90pounLG7evoBvx1bsayY=;
- b=Mnwp0Gic4dKkecGhYxUjLnaPvFsHoDC+Uo6bhMKx9zSH7g/wFgVyEownGf2deEBxeBMXikwABmImjzxR7LDYCnawX21yD7jpD4WKwezS+/gT8w1KO0f6f48Wl4aFIeSsQ4F+kxwjFzkWwKmPL8+Yvifw2ndsRGtbTFYgiAoXBi8=
+ bh=6YCVELxkKYYFXEFdWfYu2TIPOub5t6l3xA3DgPdBk6Q=;
+ b=Jfz7G5Jz0fsoYihisaKa+z5LnhXIi+c1IS4mkeVFueRwhkzAf5aDXZl9TYyu0MckGF1JXcUm8ouV9qmZzm2310H8kB9EROGPGB7m0p8xmdda8ZEp17vrbr6W1P9EOdDk++5U1kGmhye3FzV4jt0WNQgP7TRUYk/F6PToSSKchNo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from CH0PR01MB7033.prod.exchangelabs.com (2603:10b6:610:107::16) by
  CH2PR01MB5654.prod.exchangelabs.com (2603:10b6:610:2f::20) with
  Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4713.22; Wed, 24 Nov 2021 17:07:36 +0000
+ 15.20.4713.22; Wed, 24 Nov 2021 17:07:41 +0000
 Received: from CH0PR01MB7033.prod.exchangelabs.com
  ([fe80::1dc1:27e5:9fb6:f13d]) by CH0PR01MB7033.prod.exchangelabs.com
  ([fe80::1dc1:27e5:9fb6:f13d%9]) with mapi id 15.20.4734.022; Wed, 24 Nov 2021
- 17:07:36 +0000
+ 17:07:41 +0000
 From: Tyler Baicar <baicar@os.amperecomputing.com>
 To: patches@amperecomputing.com, abdulhamid@os.amperecomputing.com,
  darren@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org,
@@ -71,10 +71,12 @@ To: patches@amperecomputing.com, abdulhamid@os.amperecomputing.com,
  kvmarm@lists.cs.columbia.edu, linux-acpi@vger.kernel.org,
  linux-edac@vger.kernel.org, ishii.shuuichir@fujitsu.com,
  Vineeth.Pillai@microsoft.com
-Subject: [PATCH 0/2] ARM Error Source Table Support
-Date: Wed, 24 Nov 2021 12:07:06 -0500
-Message-Id: <20211124170708.3874-1-baicar@os.amperecomputing.com>
+Subject: [PATCH 2/2] trace, ras: add ARM RAS extension trace event
+Date: Wed, 24 Nov 2021 12:07:08 -0500
+Message-Id: <20211124170708.3874-3-baicar@os.amperecomputing.com>
 X-Mailer: git-send-email 2.33.1
+In-Reply-To: <20211124170708.3874-1-baicar@os.amperecomputing.com>
+References: <20211124170708.3874-1-baicar@os.amperecomputing.com>
 X-ClientProxiedBy: CH2PR05CA0059.namprd05.prod.outlook.com
  (2603:10b6:610:38::36) To CH0PR01MB7033.prod.exchangelabs.com
  (2603:10b6:610:107::16)
@@ -83,60 +85,60 @@ Received: from sut04sys-r242-0330002bj0sa.scc-lab.amperecomputing.com
  (4.28.12.214) by CH2PR05CA0059.namprd05.prod.outlook.com
  (2603:10b6:610:38::36) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.6 via Frontend
- Transport; Wed, 24 Nov 2021 17:07:33 +0000
+ Transport; Wed, 24 Nov 2021 17:07:38 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2ec46937-4874-4489-db75-08d9af6ce948
+X-MS-Office365-Filtering-Correlation-Id: 1b534dea-95d7-47db-fbdb-08d9af6cecc0
 X-MS-TrafficTypeDiagnostic: CH2PR01MB5654:
-X-Microsoft-Antispam-PRVS: <CH2PR01MB5654EDB83CF22829CF5D8C92E3619@CH2PR01MB5654.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <CH2PR01MB5654FA3FAA3CC50F0476C1DEE3619@CH2PR01MB5654.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: guQoQczoengmbyQlqOtYK2CjpZ7RcytG5QdjbKOQwsdHIIUlf2GxeAa4fA/HvQ42/irZ4kz0NK+fsYKVbfymPYzk+F5/Aiv5k2HFbSin1w5U4AvN4GXbmVY0JLr3EDyYdFkgFHyYzz5wVNDIgrRzs2ychuDL7JZL9oltpI/IUX5+DuNR6iedj5+HY2GbidcsRM9Octl4vIodz1GBgPgZcYfqAW/rrmHhylfqmAgWiDh5lzgUsAlpziXjziY6XMKq3mVDicpmz3kAsqbDwJlLIkw0J5aBCkLwJcDc8nBRbvU/cJrlfJG1thB8uo0ki9kbp/BOHYQVoCa45U0W3ryLCjdUER3Zy4/IR6BLCWYvH3dI8lpwYblJu1i6xLNVNqmB/FO7wqiPUkDSQH7dWPUctX3ssI6OH0qbEUae3dsjZmi8P3tgS4MnJF+f4ncSxxGkUHRwV6ly838yMqcXXdcRDJm7K0R/A3C03OQdfQbwPdcFxD+MFeWcxQfR8B0Y2Ezpwc8f0Adf2c4EONMlNNsumXxSIYkYR80nW6L2qo9Tfh4aAxT1UXyViXL0z+x7Jn1tE4SJI+pq+gahhkOxxkB/2mmIG/SXwjgP9vZKHiTTkUA6naHQ7V0+MsYMbuMHwQf/gHBtjQBCO3Wph+Der21+LgFUV7MOqWEN/vq0I9QJaBdLpyhnIA3l8aB1h3s0o0MLpMX5nnYpBo2dWHClcjbJ+yc+j+mFFUNX4WPwzkKA61gNszXi5G+DNeG6zMqu0zVupieE6KhhEx7cfIss6TehZvKXG/2uSe+ZOeAnOSp9FxqvdxAK6ocjpSDtFkq+nKXM
+X-Microsoft-Antispam-Message-Info: CHI0uLFSQ84aJLH6YELxyIrsWCfZ5iffWbWJZowSgVPeCGq0sJg49n7UqoXT2wFxFpMe+B9a5NOBUJx0P9i4sAZvZ3HX1iRdnEQDtuiIUCA9F1y3Ohc+PuISh9vVSH1Y/E/eGtWeg0TE7ZW9tpax/QeXul9fiiuQetgEsDDzM5yDOLyfIa+nKmcY4iLgytjr6HXfP/0aCeWlB4yR39NP2NfvkT5WzYiGGG/kUJD4JqkrkIf/CplMeylYNxmDjiefcxhpUmgBxT64XYVHtJ+G2kUg4Pnlrd7X3NccDziM6/SC3z0GQr5oSTJRibgwFSMUrJEFQfRaZX9DSMwEERxJeUwcPWIcIFQzRue3zISYDlGsd+FyghPLXoY+3cH3EnmDSsFj/rwr2x2wj/FnHDOysCkm/OrPTmZeT74UEDzafdQsIFuNN/LzNNzypV+h15dZOa9fhr9DiaRYZn0F8PIAoLjK1+9julT+PKJFX6ANIKxjwAgymu46bTMlww1fCLgKFqxOdSNzq42T4NiBXe1sxlHEdzm9W5mm5ACKjnS5VnhPqN1k95ObHlcK9PbuF9ZLfrhyR6qTaGD19aJtFAVDSIgp4Jz9pwtblxI9NktMpMsvfbRTQsNz9wGnq/IVHn01NCDg3xMMxWCmxkjORR5dJqsuPlxbsRQDjiL2ndocJnzM7Y0HEUkfV2TYzCOVOFoImDCX/vtPoEw1kuZmwJTgG233YUnjqrOPlJUE3xx7EnM=
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:CH0PR01MB7033.prod.exchangelabs.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(8936002)(186003)(38100700002)(1076003)(38350700002)(5660300002)(316002)(66476007)(83380400001)(66556008)(921005)(52116002)(4326008)(7406005)(508600001)(86362001)(66946007)(26005)(966005)(6486002)(6666004)(956004)(7416002)(2906002)(107886003)(2616005)(6512007)(6506007)(8676002);
+ SFS:(4636009)(366004)(8936002)(186003)(38100700002)(1076003)(38350700002)(5660300002)(316002)(66476007)(83380400001)(66556008)(921005)(52116002)(4326008)(7406005)(508600001)(86362001)(66946007)(26005)(6486002)(6666004)(956004)(7416002)(2906002)(107886003)(2616005)(6512007)(6506007)(8676002);
  DIR:OUT; SFP:1102; 
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g4bBv1oXKX17GHI21KZGqjZ00iEBz+7OuNtiM2QebsbJ0WXqd2slrR/tloon?=
- =?us-ascii?Q?ZdIOKW8yPM2AXoO36icQTrCbfRBDqQcd+Eew3XmJPX795+cxt7LKBZ4Dy/TI?=
- =?us-ascii?Q?MIngsji40qYyVI1YdyLGqXs1W0d2DsBEecDkCpCxoCbf0jqKYcUTcg5nupCQ?=
- =?us-ascii?Q?oyRiRJLahZz+nCvOxJwu82R/DSo6EeADptak9Y2NG0Tm7NbXMh8xGISwfWV9?=
- =?us-ascii?Q?7ZBmovkgTc9LsN1iv56iA5kbqp9SSxqqcGFIa2qORNzYgy/uQrveZgeHyhX7?=
- =?us-ascii?Q?NwAven5z//4ImXYNttiULFXwdk+GhV91yRtFAYOhK6onrPVJb1gedtvCr4wR?=
- =?us-ascii?Q?rWPPkh8jZYhPoX2NdTAyut70JpgH/1MELKYaJNHxdrpvdKdmBGClY3+vJv3L?=
- =?us-ascii?Q?3W/fahgalAuGyXMSKJ1nsITApPcY5V5oT0vbYxvnPdEyDMt9b8pgj2Bdc+tS?=
- =?us-ascii?Q?cM3CBka4e/WVODA3LubxoskZgxOEjArZ250iQa9xUl2OGelBf0g7O4BkeeQZ?=
- =?us-ascii?Q?psuH2vZyCdiALvvrZhTewPGx2109HiHfHvbQA6VmhZMgexK0Pa3BUIvjdQAD?=
- =?us-ascii?Q?zWr7oClQhwK409kwAYdL7fJVBhQieaTGnC1tsHxjtpRXriXOH2SjQPH6jmxy?=
- =?us-ascii?Q?N1RdsDFueseuT0PFyRSwxHCNGjQfZRDNQtBSqTx5d2eh5eSiX+GaCd/pngy3?=
- =?us-ascii?Q?84Cm4MsM6Isomajp2zkKQr7UT+ZJ2simwIpigonAZ/R+rcEoTxHKXWJ+EWWJ?=
- =?us-ascii?Q?tNp1SCIYP0doyE35/Wpck+D6IXr/+1K84wNh9WGJCTND/eggqW4rVyIGdE4l?=
- =?us-ascii?Q?s6hwAXBgrdR5unO7wNcK6XYNEFB2TAakA08r0lWQDL21cfHB5zaLjswnL4Ac?=
- =?us-ascii?Q?huTeO18U9e83Jpsh+P9BDcy4rKRMF73VqwEKAa6qPTpRj9YpdeUMcOkPpU02?=
- =?us-ascii?Q?A20duLt8o3osI3eydcjg7SDPa1873iZct8pjsyOtRtXL+NRtAkghwYw+J0L2?=
- =?us-ascii?Q?NCzr939xYfOfLFrPFf7kulRD5+A2VTlIFtVg6ZgFitKDHTkBdok+2nDD4EVo?=
- =?us-ascii?Q?N3G8iJDXuej3idN8WCEONmfkhiOyiZxfn/yiZjzjpOpm5Ggt0nBOEWKeJTMJ?=
- =?us-ascii?Q?v/4t1L2K6a/YsoolKzTLhWm5ffpRpkab4DGhOwpyAfUSgQtfDZ+2IxlR1rQJ?=
- =?us-ascii?Q?Qn2WxH6iMU1k87BInQ6r1Dyf/Wy4jTFlKYPTU7hoMjopNWjd1UszpyoscSth?=
- =?us-ascii?Q?AjJac/6qh+YLCkBgV1dUwxjtcJMUU95Wm7eyROnLOsJQifl5rm5ys44EqkEm?=
- =?us-ascii?Q?/uFRPkaHtb4hjXUFConiqdBGP0pPh+2ANR8P5x4HvKa+JFsQJSE0gtO06uhN?=
- =?us-ascii?Q?uSzpoom2EzQwTnibB6z6ZI7ERN+paS2mt1D3XGCuBl8AUAUONvd6Z/UoiB6s?=
- =?us-ascii?Q?k2K1L8SoNj+WejiSzgGpDwvY9OsF1CRxdsIRGqISTWDMgbJbWw9kJdp1pCij?=
- =?us-ascii?Q?k9E3sML4nRo/qJRFbUaZPDd/GRibfNFMZcKxTi36OMw3ypPI90FUx06HflN4?=
- =?us-ascii?Q?hysrGz8YCKBwVpaj8st/DDa5TzSYQuWTb+S+fK3AECLlRUAagEOKER5oiFvX?=
- =?us-ascii?Q?esh3NsRqW53EwLaGK+aOwIgkFhC5SLtamoXTT4fp+pfuUTPzrPiz4OgZp1oG?=
- =?us-ascii?Q?CtuY/NpyUWCMIi02vQzYycAzHKWE3lVSTOhev2iuA+lkQZhjAPlgbsz8CIn2?=
- =?us-ascii?Q?MXY+LbuvRQ=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?PBDN04zL2AMGX2PtCwjO0W0xqqBcnICjMJsiP2G3XDzCA/93YQmFmrNCGaxI?=
+ =?us-ascii?Q?U6jVt/mujP0YPHIN34aeOUou9tm0vGH4W16FSB/I5ABG2f+cjOMj98nIJAbD?=
+ =?us-ascii?Q?9gSaPeLNLnT1m7qPXVlhylOyMAoHQckMGCmLg5i+MhW0h9h2eSwP9HcwxpOi?=
+ =?us-ascii?Q?kQYCkqavq1vAguhTjF8p4Xu05n3JkdGiRIzO0elT86yfyC1VRRQI1zzzd5qW?=
+ =?us-ascii?Q?OX3+WMVAg6J6g1FQCzTRcdWRjLkDSwvlxlHTRPQxEOSW2k/qHl6fv3HCfpo6?=
+ =?us-ascii?Q?xNfXRVuKStuShZyTYJLG0sGQxLNrJvG447Cy9tNWlPjsxUJO0yZkzvzf9EVV?=
+ =?us-ascii?Q?KYIigZGybksZTFHkibi9mBXfKTOEnJP/xMX/YILv5RkP84PC7d/iUy3+omur?=
+ =?us-ascii?Q?4+Gq6Q1hjltN5wCo446+NAnI3B6kZNyHzSSDy85mCmhuNSsY3ALl2ihvGA0C?=
+ =?us-ascii?Q?pbbqXFPI6xjcOOUZLhSargKHUmyEZ6TV1JPYHU/V/mOUkGXkgpTYrI2PVlQs?=
+ =?us-ascii?Q?ytgM6fkYKC7muT2k8mfjk79wyifF/+XR8LBowaPdgm+fUi3MyIfCO2t2X5Nx?=
+ =?us-ascii?Q?N4ScsLTujhqxt17JdS5TuKgX4ZHAWFsClb6+rnf81AIJzX//Yy+JN16kKkaA?=
+ =?us-ascii?Q?4AHgPGbzDu61yczjvC1GDbxskPjhO3jFTjxC9WRrA18xP+WptOYgJj/UkwvA?=
+ =?us-ascii?Q?/wR8zkjMO2vXqOSYZfETqcE1DDT9n0lMzFhgizjlcKEP/sfOxD8FvhH8APv+?=
+ =?us-ascii?Q?QUaD4uLb2vnyNv6M4tp6cWmpKBJR6DvZdCOGTM1T0ozHyvRz9KNnwyuDu1qn?=
+ =?us-ascii?Q?tgjYRws08bkYMZqblf2Lu99AiOqydil16ovUkLd9N3S1Q1fSJhu9nT73KVyc?=
+ =?us-ascii?Q?J1Z3VUYYNCE729P/2Jqxt1+YnccZ3yPQ6OAQrgl5UY7k3gL1zIEJlAhtyORV?=
+ =?us-ascii?Q?V611n3YVjHZH19R5PECjbdwMoofGYIf4P1Rx7GR7EVgsefL/49dMf4EGrL3C?=
+ =?us-ascii?Q?DAX7kVjfyJ6si0QzZW1VXT6Nl5yGFhE/z/zSOFkwXB/Zbb/xzGEvcqe3JB3U?=
+ =?us-ascii?Q?UYAEiEcVEjpssX2dovQb54H9AgVfMjrX4U72ESaC9+8A4WVi4qC0Uqf3Le8l?=
+ =?us-ascii?Q?PNsIvLfvL/wtZ+wnbSVGNzVOkG88J4fH1oDmf5eYaRMfwYfmcltE9hh2KEhq?=
+ =?us-ascii?Q?/fYnCoQSSUpncRJdWJThOZP8cXmFPDvEI8avJEfXCh/hbCJ+4EoyUo5ijatg?=
+ =?us-ascii?Q?uSImtIcd4dgiTk0jRcugskHPoq+/kn0J/Knq1Q4LLGpNUyd4arEeFd00Xu1O?=
+ =?us-ascii?Q?VGLEhJ58wbtc3URBRV04n67GCNJLsokW7egmjWQXCs7NWzc2A0ypN6uJQiSl?=
+ =?us-ascii?Q?sO/tdUNY50ymHmthghQleksKg4+rY/Wcx+AGcNHrO6i5fA6RxeG/cCOmsWg6?=
+ =?us-ascii?Q?B/xjkZlvLwYhhNozyMvZ2o6Ri7EicvrjzN4MIpqwYzDsT6jMUhlCVoN3RzlS?=
+ =?us-ascii?Q?WD4lDhdM3OdHE30KwyWoUdWoQfpVOwIYfvrNUltOnbZ5mmxGr6BrxmrZieOm?=
+ =?us-ascii?Q?YGveRWIaNmJv1F3z3Enq8K6MZiktaomtUcJFe34e3xwxq0i936CnIo7kMCr2?=
+ =?us-ascii?Q?UsSoIkjWoW88DvQpHK6fBhoMACYnZ6TKzxs9KzkRqjVXKYlavjKSdBiL0s0i?=
+ =?us-ascii?Q?U0TuHvnHznQBrpjezupIGkGl26NavO7EEWq6od26ZlzTmT8dxRVZuyehgYnJ?=
+ =?us-ascii?Q?E+gAqHnlSQ=3D=3D?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ec46937-4874-4489-db75-08d9af6ce948
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b534dea-95d7-47db-fbdb-08d9af6cecc0
 X-MS-Exchange-CrossTenant-AuthSource: CH0PR01MB7033.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2021 17:07:35.9450 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Nov 2021 17:07:41.5972 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5V/ZYq+BRZX5WnagWQQuLTolbxtvmY5d1AyCGHfA4OGp126fuye6xjpDA1GPj3W3ZL3VAgfDRwDM4Koimb+pSkOd2TW4/JZviKQA5A2XTo5GcXF+TA2hPYl/no84cOBF
+X-MS-Exchange-CrossTenant-UserPrincipalName: RWLYZ76EDX2/qzbiNZRc1rRVzOkjd81GousT+NeRY6p+NTSenwAzsEuenqcESNkM1mp6JiWKzPwhK6X8jSswAWMjmqkvdEEhfZt1rGxMDUyVrsA3ymAA9H8EQXNie8zc
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR01MB5654
 X-Mailman-Approved-At: Wed, 24 Nov 2021 12:41:30 -0500
 Cc: Tyler Baicar <baicar@os.amperecomputing.com>
@@ -156,67 +158,127 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This series adds support for the ARM Error Source Table (AEST) based on
-the latest version of ACPI for the Armv8 RAS Extensions [0].
+Add a trace event for hardware errors reported by the ARMv8
+RAS extension registers.
 
-The AEST driver supports both memory mapped and system register interfaces.
-This series assumes system register interfaces are only registered with
-private peripheral interrupts (PPIs); otherwise there is no guarantee the
-core handling the error is the core which took the error and has the
-syndrome info in it's system registers.
+Signed-off-by: Tyler Baicar <baicar@os.amperecomputing.com>
+---
+ arch/arm64/kernel/ras.c   |  4 +++
+ drivers/acpi/arm64/aest.c |  5 ++++
+ include/ras/ras_event.h   | 55 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 64 insertions(+)
 
-This is meant to be initial support for AEST to address the current gaps
-with systems that support ARMv8 RAS extensions but don't have
-firmware-first support. This series simply logs all the errors it finds
-and triggers a kernel panic if there is an UE present.
-
-I have tested this series on Ampere Altra using processor errors to
-exercise PPI handling with system register interface and memory errors
-to exercise SPI handling with MMIO interface. Both corrected and
-uncorrected errors were tested to verify the non-fatal vs fatal
-scenarios.
-
-Future work:
-- UER handling to avoid panic
-- Looping through all external abort capable (ERR<n>FR.UE != 0) error
-   nodes in SEA/SEI handling
-
-Changes from RFC patch series [1]:
-- Updated for latest AEST spec
-- Utilize ACPICA header defines of AEST structures
-- Added support for ARMv8.4 RAS extension
-- Dropped the SEA/SEI dumping of SR RAS registers
-- Removed unused defines
-- Unified RAS extension register printing to a single function
-- Updated trace event with additional fields
-- Addressed other feedback from RFC series
-- Added myself to ARM64 ACPI MAINTAINERS as a reviewer
-
-[0] https://developer.arm.com/documentation/den0085/latest
-[1] https://lkml.org/lkml/2019/7/2/781
-
-Tyler Baicar (2):
-  ACPI/AEST: Initial AEST driver
-  trace, ras: add ARM RAS extension trace event
-
- MAINTAINERS                     |   1 +
- arch/arm64/include/asm/ras.h    |  52 ++++
- arch/arm64/include/asm/sysreg.h |   2 +
- arch/arm64/kernel/Makefile      |   1 +
- arch/arm64/kernel/ras.c         | 129 +++++++++
- arch/arm64/kvm/sys_regs.c       |   2 +
- drivers/acpi/arm64/Kconfig      |   3 +
- drivers/acpi/arm64/Makefile     |   1 +
- drivers/acpi/arm64/aest.c       | 455 ++++++++++++++++++++++++++++++++
- include/linux/acpi_aest.h       |  50 ++++
- include/linux/cpuhotplug.h      |   1 +
- include/ras/ras_event.h         |  55 ++++
- 12 files changed, 752 insertions(+)
- create mode 100644 arch/arm64/include/asm/ras.h
- create mode 100644 arch/arm64/kernel/ras.c
- create mode 100644 drivers/acpi/arm64/aest.c
- create mode 100644 include/linux/acpi_aest.h
-
+diff --git a/arch/arm64/kernel/ras.c b/arch/arm64/kernel/ras.c
+index 31e2036a4c70..18071790b2a3 100644
+--- a/arch/arm64/kernel/ras.c
++++ b/arch/arm64/kernel/ras.c
+@@ -6,6 +6,8 @@
+ #include <asm/cpufeature.h>
+ #include <asm/ras.h>
+ 
++#include <ras/ras_event.h>
++
+ static bool ras_extn_v1p1(void)
+ {
+ 	unsigned long fld, reg = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+@@ -95,6 +97,8 @@ void arch_arm_ras_report_error(u64 implemented, bool clear_misc)
+ 
+ 		arch_arm_ras_print_error(&regs, i, misc23_present);
+ 
++		trace_arm_ras_ext_event(0, cpu_num, 0, i, &regs);
++
+ 		/*
+ 		 * In the future, we will treat UER conditions as potentially
+ 		 * recoverable.
+diff --git a/drivers/acpi/arm64/aest.c b/drivers/acpi/arm64/aest.c
+index 2df4f2377e51..7ef1750f91b3 100644
+--- a/drivers/acpi/arm64/aest.c
++++ b/drivers/acpi/arm64/aest.c
+@@ -14,6 +14,8 @@
+ 
+ #include <asm/ras.h>
+ 
++#include <ras/ras_event.h>
++
+ #undef pr_fmt
+ #define pr_fmt(fmt) "ACPI AEST: " fmt
+ 
+@@ -126,6 +128,9 @@ static void aest_proc(struct aest_node_data *data)
+ 
+ 		aest_print(data, regs, i, misc23_present);
+ 
++		trace_arm_ras_ext_event(data->node_type, data->data.vendor.acpi_hid,
++					data->data.vendor.acpi_uid, i, &regs);
++
+ 		if (regs.err_status & ERR_STATUS_UE)
+ 			fatal = true;
+ 
+diff --git a/include/ras/ras_event.h b/include/ras/ras_event.h
+index 0bdbc0d17d2f..27b2be9f950d 100644
+--- a/include/ras/ras_event.h
++++ b/include/ras/ras_event.h
+@@ -338,6 +338,61 @@ TRACE_EVENT(aer_event,
+ 			"Not available")
+ );
+ 
++/*
++ * ARM RAS Extension Events Report
++ *
++ * This event is generated when an error reported by the ARM RAS extension
++ * hardware is detected.
++ */
++
++#ifdef CONFIG_ARM64_RAS_EXTN
++#include <asm/ras.h>
++TRACE_EVENT(arm_ras_ext_event,
++
++	TP_PROTO(u8 type, u32 id0, u32 id1, u32 index, struct ras_ext_regs *regs),
++
++	TP_ARGS(type, id0, id1, index, regs),
++
++	TP_STRUCT__entry(
++		__field(u8,  type)
++		__field(u32, id0)
++		__field(u32, id1)
++		__field(u32, index)
++		__field(u64, err_fr)
++		__field(u64, err_ctlr)
++		__field(u64, err_status)
++		__field(u64, err_addr)
++		__field(u64, err_misc0)
++		__field(u64, err_misc1)
++		__field(u64, err_misc2)
++		__field(u64, err_misc3)
++	),
++
++	TP_fast_assign(
++		__entry->type = type;
++		__entry->id0 = id0;
++		__entry->id1 = id1;
++		__entry->index = index;
++		__entry->err_fr = regs->err_fr;
++		__entry->err_ctlr = regs->err_ctlr;
++		__entry->err_status = regs->err_status;
++		__entry->err_addr = regs->err_addr;
++		__entry->err_misc0 = regs->err_misc0;
++		__entry->err_misc1 = regs->err_misc1;
++		__entry->err_misc2 = regs->err_misc2;
++		__entry->err_misc3 = regs->err_misc3;
++	),
++
++	TP_printk("type: %d; id0: %d; id1: %d; index: %d; ERR_FR: %llx; ERR_CTLR: %llx; "
++		  "ERR_STATUS: %llx; ERR_ADDR: %llx; ERR_MISC0: %llx; ERR_MISC1: %llx; "
++		  "ERR_MISC2: %llx; ERR_MISC3: %llx",
++		  __entry->type, __entry->id0, __entry->id1, __entry->index, __entry->err_fr,
++		  __entry->err_ctlr, __entry->err_status, __entry->err_addr,
++		  __entry->err_misc0, __entry->err_misc1, __entry->err_misc2,
++		  __entry->err_misc3)
++);
++#endif
++
+ /*
+  * memory-failure recovery action result event
+  *
 -- 
 2.33.1
 
