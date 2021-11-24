@@ -2,82 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21644C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 11:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F99C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 13:09:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FB594A7FD;
-	Wed, 24 Nov 2021 06:40:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D9B54B0C3;
+	Wed, 24 Nov 2021 08:09:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Mck6FMwgf-8W; Wed, 24 Nov 2021 06:40:53 -0500 (EST)
+	with ESMTP id AMKo9HcrgO52; Wed, 24 Nov 2021 08:09:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ECAB4B090;
-	Wed, 24 Nov 2021 06:40:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BD494B1A5;
+	Wed, 24 Nov 2021 08:09:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27BD84A500
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 06:40:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A9BA4B1A3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 08:09:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id opNq0aRO78Rc for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 06:40:50 -0500 (EST)
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
- [209.85.221.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B73554A49C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 06:40:50 -0500 (EST)
-Received: by mail-wr1-f45.google.com with SMTP id s13so3672234wrb.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 03:40:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:date:in-reply-to
- :message-id:mime-version:content-transfer-encoding;
- bh=2K0wsomzgh65pxyMR01YlCbXKdEx0pDcUxqUMns577k=;
- b=Sfu3deC8QPpKw8RLoNIOunpBhi3wbkvbFEAU+b9GYNCt65IE6wMyF0nKcKxYURkLrx
- soFCapY8m7USXq0UN+WYlLeRLD0eaTXatpamAnvWMwbHO9OuOK1xNfUMZu1W06lVD0tr
- CLN81fGb9GJ9GCAEKJ6v1Gry2ZtYPxptuFJb0X9QIKZG2SpDnOg5B1le82M/xY+Us8vT
- j26x8aszNuzSWVHUq5QOGd6kUFPV12AchtaNke+GsasuY9/1g1RTCHpf8lHzALPFvk6A
- FCGmm5lWE++dvYOzTiISAG1TaXugAddQC1DPVS9VJsxCAoulnBROZxWlPTFqM5zRR8Pg
- bsdg==
+ with ESMTP id rzVVyrEmrqyX for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 08:09:00 -0500 (EST)
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com
+ [209.85.167.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 06E214B0CE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 08:08:59 -0500 (EST)
+Received: by mail-oi1-f178.google.com with SMTP id n66so5187082oia.9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 05:08:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1rvmNxp+ZtA3HbUdsVCZv4Nlqvs5Xp/+S8TXy0ecUM0=;
+ b=pl/FfakhouFer+0yVcn+lqB8MhZkiNrWzu3kYkf5qnxnJqtGJSIs4PYBZfPz2TD4vP
+ l6N0I7MlQDR0L+5RYQ2pPRcbMCcJOObJKlv1TwjAeqeR5ZQ2QIHK6uC+kfCCwExqX+ef
+ 7qxrz0adF7nAZuWapS7EUhelX6F3A8P8KislRj4qV4ey7KJEhASK28fFfEz8N4MSX6zw
+ gn7VKGg342BuZ3GquHXcFojbeTege8EanA9l7BvkHPKf+pOehvz3FE58xZvEffVXdku9
+ TnWo8TNgn4WtWOGJJgr1Tuik0NzcKARfVrYny+xL/r1NDnoeoItfUSp7PmDZ8HcUOket
+ W/pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
- :in-reply-to:message-id:mime-version:content-transfer-encoding;
- bh=2K0wsomzgh65pxyMR01YlCbXKdEx0pDcUxqUMns577k=;
- b=2n+vMrjRU9VXY5AbenHA0rfd0VhhCqllqrEIx2txxlOKk/3gF4Ec1Sjfv5E3Nnukpn
- S4WY6HZeWjghHq1HLi676g7jfd8bhGQiLhFC3s7JxF/vVs28ve0NhsioTokSsvRt82SS
- Gk+DMuYToybTv6FcNUZvkL2htO+E9qiVG8MBPApFtkTMkerb3AVQVHhTWFslg1F/Y8AF
- 6GxPRaJY6b2KupLqDvm2nNsmwMs/xRHA/oyLKVfiTJUQX3PR2SZ+8S5eVj6vqJUtdoWp
- uWEWWBJLEXM7NusYH7rnBbMinW9MLnM89XjaDLiiKaxNVaQgoRMkh4iDGg0fEJozZyud
- FzMA==
-X-Gm-Message-State: AOAM530l9OMaPN+y1+WYHKqg/2jZnd2n8e4bxn9qHA74szo7wUIw+Irf
- ilyp3AlBTuSWsLp4ijGsBU5iuQ==
-X-Google-Smtp-Source: ABdhPJzRW8uzG46gcBI49r340DNmx92ia6YGcRI1t9MGnAGV8eyVJJHrLIBpiKqfjwlrVEr9f+/oug==
-X-Received: by 2002:adf:e0d0:: with SMTP id m16mr17852876wri.74.1637754049648; 
- Wed, 24 Nov 2021 03:40:49 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z14sm15521995wrp.70.2021.11.24.03.40.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Nov 2021 03:40:48 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id DB9DE1FF96;
- Wed, 24 Nov 2021 11:40:47 +0000 (GMT)
-References: <20211118184650.661575-1-alex.bennee@linaro.org>
- <20211118184650.661575-2-alex.bennee@linaro.org>
- <20211124110659.jhjuuzez6ij5v7g7@gator.home>
-User-agent: mu4e 1.7.5; emacs 28.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v8 01/10] docs: mention checkpatch in the
- README
-Date: Wed, 24 Nov 2021 11:38:16 +0000
-In-reply-to: <20211124110659.jhjuuzez6ij5v7g7@gator.home>
-Message-ID: <87y25dhjcw.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1rvmNxp+ZtA3HbUdsVCZv4Nlqvs5Xp/+S8TXy0ecUM0=;
+ b=KmQneDPZn4Zb9MbqJ6VOU8k9pBQKBsBvksOyN+K6RQ/yhhYN1lVX85aThKCpVgPQbH
+ oF/gHGgf2m8cyfZpj+aZgRWRcNxM4OUR57Rtqrj26VMsRB9eddMVp/0//qCZOvQeZLU9
+ qGU/O6IgPi3I7Bz39dpl0sCj6+sfjG5QxU1k9OWZ2BTLyQOHbMJOqguUzTtYTSYiEM/x
+ drWSkAA1uve+7tSYjxdmIspXjfjc3uS0iu6burRBu9YId1HOYRVHcMWUTigzG7N5edNj
+ ZtGcKwP7Lp2XoRxzc6KKXuxHqZg7xtdStnSaie17wX5m9o586DxWL7P+OxQOFNwXFhBf
+ jRfA==
+X-Gm-Message-State: AOAM533dg/cd9GeJeU/jfv0k9TfF2tR34n47VxWYu27k6hzd8vctzr6y
+ SDgTsn5WXDFVVKSi8Wrh0sSMitnzQwlP54pINQsMjg==
+X-Google-Smtp-Source: ABdhPJyTVHnCyxx52YxNwzJrYF43Uk3OQDtKuXCZO7KVCqWd190uR7WGLd+soVX2N6327m8SSW4aKEgqDjPt01EJeRQ=
+X-Received: by 2002:a05:6808:485:: with SMTP id
+ z5mr5828262oid.96.1637759339134; 
+ Wed, 24 Nov 2021 05:08:59 -0800 (PST)
 MIME-Version: 1.0
-Cc: kvm@vger.kernel.org, maz@kernel.org, qemu-arm@nongnu.org,
- idan.horowitz@gmail.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20211123142247.62532-1-maz@kernel.org>
+ <20211123142247.62532-2-maz@kernel.org>
+In-Reply-To: <20211123142247.62532-2-maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 24 Nov 2021 13:08:23 +0000
+Message-ID: <CA+EHjTx1i0jEhhBJx6T=6sjkj_hpy5FnkkJqFuY0td83d6C08A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Save PSTATE early on exit
+To: Marc Zyngier <maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,44 +78,89 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IE9uIFRodSwgTm92
-IDE4LCAyMDIxIGF0IDA2OjQ2OjQxUE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gU2ln
-bmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+PiAtLS0K
-Pj4gIFJFQURNRS5tZCB8IDIgKysKPj4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykK
-Pj4gCj4+IGRpZmYgLS1naXQgYS9SRUFETUUubWQgYi9SRUFETUUubWQKPj4gaW5kZXggYjQ5OGFh
-Zi4uNWRiNDhlNSAxMDA2NDQKPj4gLS0tIGEvUkVBRE1FLm1kCj4+ICsrKyBiL1JFQURNRS5tZAo+
-PiBAQCAtMTgyLDMgKzE4Miw1IEBAIHRoZSBjb2RlIGZpbGVzLiAgV2UgYWxzbyBzdGFydCB3aXRo
-IGNvbW1vbiBjb2RlIGFuZCBmaW5pc2ggd2l0aCB1bml0IHRlc3QKPj4gIGNvZGUuIGdpdC1kaWZm
-J3Mgb3JkZXJGaWxlIGZlYXR1cmUgYWxsb3dzIHVzIHRvIHNwZWNpZnkgdGhlIG9yZGVyIGluIGEK
-Pj4gIGZpbGUuICBUaGUgb3JkZXJGaWxlIHdlIHVzZSBpcyBgc2NyaXB0cy9naXQuZGlmZm9yZGVy
-YDsgYWRkaW5nIHRoZSBjb25maWcKPj4gIHdpdGggYGdpdCBjb25maWcgZGlmZi5vcmRlckZpbGUg
-c2NyaXB0cy9naXQuZGlmZm9yZGVyYCBlbmFibGVzIGl0Lgo+PiArCj4+ICtQbGVhc2UgcnVuIHRo
-ZSBrZXJuZWwncyAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCBvbiBuZXcgcGF0Y2hlcwo+Cj4gVGhp
-cyBpcyBhIGJpdCBvZiBhIHByb2JsZW0gZm9yIGt2bS11bml0LXRlc3RzIGNvZGUgd2hpY2ggc3Rp
-bGwgaGFzIGEgbWl4Cj4gb2Ygc3R5bGVzIHNpbmNlIGl0IHdhcyBvcmlnaW5hbGx5IHdyaXR0ZW4g
-d2l0aCBhIHN0cmFuZ2UgdGFiIGFuZCBzcGFjZQo+IG1peGVkIHN0eWxlLiBJZiBzb21lYm9keSBp
-cyBwYXRjaGluZyBvbmUgb2YgdGhvc2UgZmlsZXMgd2UndmUgdXN1YWxseQo+IHRyaWVkIHRvIG1h
-aW50YWluIHRoZSBvcmlnaW5hbCBzdHlsZSByYXRoZXIgdGhhbiByZWZvcm1hdCB0aGUgd2hvbGUK
-PiB0aGluZyAoaW4gaGluZHNpZ2h0IG1heWJlIHdlIHNob3VsZCBoYXZlIGp1c3QgcmVmb3JtYXR0
-ZWQpLiBXZSdyZSBhbHNvCj4gbW9yZSBmbGV4aWJsZSB3aXRoIGxpbmUgbGVuZ3RoIHRoYW4gTGlu
-dXgsIGFsdGhvdWdoIExpbnV4IG5vdyBvbmx5IHdhcm5zCj4gZm9yIGFueXRoaW5nIG92ZXIgODAg
-YXMgbG9uZyBhcyBpdCdzIHVuZGVyIDEwMCwgd2hpY2ggaXMgcHJvYmFibHkgZ29vZAo+IGVub3Vn
-aCBmb3IgdXMgdG9vLiBBbnl3YXksIGxldCdzIHNlZSB3aGF0IFBhb2xvIGFuZCBUaG9tYXMgc2F5
-LiBQZXJzb25hbGx5Cj4gSSB3b3VsZG4ndCBtaW5kIGFkZGluZyB0aGlzIGxpbmUgdG8gdGhlIGRv
-Y3VtZW50YXRpb24sIHNvIEknbGwgYWNrIGl0Lgo+IEFueXdheSwgd2UgY2FuIGFsc28gaWdub3Jl
-IG91ciBvd24gYWR2aXNlIHdoZW4gaXQgc3VpdHMgdXMgOi0pCj4KPiBBY2tlZC1ieTogQW5kcmV3
-IEpvbmVzIDxkcmpvbmVzQHJlZGhhdC5jb20+CgpJIGNhbiBtYWtlIHRoZSB3b3JkaW5nIG1vcmUg
-d2Vhc2VsbHk6CgogV2Ugc3RyaXZlIHRvIGZvbGxvdyB0aGUgTGludXgga2VybmVscyBjb2Rpbmcg
-c3R5bGUgc28gaXQncyByZWNvbW1lbmRlZAogdG8gcnVuIHRoZSBrZXJuZWwncyAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCBvbiBuZXcgcGF0Y2hlcy4KCkkgYWRkZWQgdGhpcyByZWZlcmVuY2UgYmVj
-YXVzZSBvbiB0aGUgb2xkZXIgaXRlcmF0aW9ucyBvZiB0aGVzZSB0ZXN0CmRpdmVyZ2VuY2UgZnJv
-bSB0aGUga2VybmVsIGNvZGluZyBzdHlsZSB3YXMgcG9pbnRlZCBvdXQgYW5kIEkndmUgZml4ZWQK
-dGhlbSBpbiB0aGlzIGl0ZXJhdGlvbi4KCj4KPiBUaGFua3MsCj4gZHJldwoKCi0tIApBbGV4IEJl
-bm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3Zt
-YXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlz
-dHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Marc,
+
+
+
+On Tue, Nov 23, 2021 at 2:23 PM Marc Zyngier <maz@kernel.org> wrote:
+>
+> In order to be able to use promitives such as vcpu_mode_is_32bit(),
+> we need to synchronize the guest PSTATE. However, this is currently
+> done deep imto the bowels of the world-switch code, and we do have
+> helpers evaluating this much earlier (__vgic_v3_perform_cpuif_access
+> and handle_aarch32_guest, for example).
+
+Couple of nits:
+s/promitives/primitives
+s/imto/into
+
+>
+> Move the saving of the guest pstate into the early fixups, which
+> cures the first issue. The second one will be addressed separately.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h    | 6 ++++++
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 7 ++++++-
+>  2 files changed, 12 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 7a0af1d39303..d79fd101615f 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -429,6 +429,12 @@ static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>   */
+>  static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+> +       /*
+> +        * Save PSTATE early so that we can evaluate the vcpu mode
+> +        * early on.
+> +        */
+> +       vcpu->arch.ctxt.regs.pstate = read_sysreg_el2(SYS_SPSR);
+> +
+>         if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+>                 vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
+>
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> index de7e14c862e6..7ecca8b07851 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -70,7 +70,12 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+>  static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+>  {
+>         ctxt->regs.pc                   = read_sysreg_el2(SYS_ELR);
+> -       ctxt->regs.pstate               = read_sysreg_el2(SYS_SPSR);
+> +       /*
+> +        * Guest PSTATE gets saved at guest fixup time in all
+> +        * cases. We still need to handle the nVHE host side here.
+> +        */
+> +       if (!has_vhe() && ctxt->__hyp_running_vcpu)
+> +               ctxt->regs.pstate       = read_sysreg_el2(SYS_SPSR);
+>
+>         if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+>                 ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
+> --
+> 2.30.2
+>
+
+I see that now that you're storing pstate early at the guest exit, and
+therefore no need for vhe path to check for it for the guest when saving
+the return state. Going through the various possibilities, I think
+that all cases are covered.
+
+I tested this code as well and it ran fine.
+
+Tested-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Thanks,
+/fuad
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
