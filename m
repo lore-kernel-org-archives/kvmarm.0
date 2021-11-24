@@ -2,97 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E24EAC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 18:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5747C433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 24 Nov 2021 18:51:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 509284B128;
-	Wed, 24 Nov 2021 13:22:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 425AF49FB7;
+	Wed, 24 Nov 2021 13:51:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4+AiJ5ZzSgJh; Wed, 24 Nov 2021 13:22:38 -0500 (EST)
+	with ESMTP id FwQ16EbQnZSV; Wed, 24 Nov 2021 13:51:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38C294B125;
-	Wed, 24 Nov 2021 13:22:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C18004A500;
+	Wed, 24 Nov 2021 13:51:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49DE64B104
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 13:22:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 929174A1B0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 13:51:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z4T9LPlaAF7f for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 13:22:35 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E89E24B0B9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 13:22:35 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1637778155;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eA81Z7xGs8LCf8jSsFcx8Ft2QCQQsGCmMWnjLeVDns4=;
- b=DFGmtkPEbPed8CJweYwjqOC0p2XPrOFRrQ9VWPNOmIMu0+3jqa44CFcUnD5tOmH/PXwvCw
- 8edUPeUdWNwx2RSmZ0ckhtiyMUedznOdqtGG0BOofKQmJM62X50NJ1hrERK56kLi9zxIr8
- NIwLxgZKGXnMAOgDZfsTYg3kWZabfos=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-329-4oUPo4RPN6GVJlR0TnlGtA-1; Wed, 24 Nov 2021 13:22:34 -0500
-X-MC-Unique: 4oUPo4RPN6GVJlR0TnlGtA-1
-Received: by mail-wr1-f72.google.com with SMTP id
- k15-20020adfe8cf000000b00198d48342f9so696212wrn.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 10:22:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=eA81Z7xGs8LCf8jSsFcx8Ft2QCQQsGCmMWnjLeVDns4=;
- b=ZjYA18Bgo2jhR4N2jX9ZaoGEYAMfHT2z/lxXRn8+oaIDG32dKEPmPX7sbVWfVsH1gM
- Cc3jvYSmr53L7M2eLzTzHp9iCGmV25NbRdMG07jBh7E0SsoYMR96K+K5jYU6/ueIRHfu
- J/S56fB00/rCKOLU96aMOl56wbkki3miptS9SRRSdGLkOqs0eyqvPVcayxOVlHwSOEXE
- 6punAyVn1C4olVDr/9a8YiFrhvy2/B9mxMABgSJgg3KMURL4a8cdxxZTXQjsa0SaVM6f
- 9wAhnBKlDfTk0jaePQ02AjNTbR4gSZFkCoAbCqtq+FELxkm6EjcCSulmiIzr3r/0+sdI
- C2ow==
-X-Gm-Message-State: AOAM532i0a9sfDWTiVXipXEfWBmbrbBlpkbzgt9q+kdpcy63ZFTIrkco
- /8Sb+MwaouCSCT4RM0TdAV7gIETrMHDX0Lrkg9vb2NZ0SkVKJ7n/gRSZB36HlhTZ7Y7JTN7SWMy
- FtFOubkLN4BI034rU2WqCNbfi
-X-Received: by 2002:a7b:c119:: with SMTP id w25mr17906469wmi.70.1637778152973; 
- Wed, 24 Nov 2021 10:22:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxN2CJF7kM7+lRzXWcKKC+12rHg/JZvqdShXjKpY5mfJsfOUi67s26vQ83CDPz0UOfRi7hWwg==
-X-Received: by 2002:a7b:c119:: with SMTP id w25mr17906413wmi.70.1637778152615; 
- Wed, 24 Nov 2021 10:22:32 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id k13sm522706wri.6.2021.11.24.10.22.31
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 24 Nov 2021 10:22:32 -0800 (PST)
-Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
-To: Reiji Watanabe <reijiw@google.com>
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-4-reijiw@google.com>
- <d3fd9d6c-c96c-d7a0-b78d-af36430dbf3f@redhat.com>
- <CAAeT=FyzvGaksi+-WidHObrGYcqs4vR73ChCGpo8AFuin6UbYw@mail.gmail.com>
-From: Eric Auger <eauger@redhat.com>
-Message-ID: <c377f63b-89e8-351f-2c95-c98deb51ecda@redhat.com>
-Date: Wed, 24 Nov 2021 19:22:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id shbB4M7hRt6H for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 13:51:36 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9984949FB7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 13:51:36 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E6FB31FB;
+ Wed, 24 Nov 2021 10:51:35 -0800 (PST)
+Received: from lakrids (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6BF913F66F;
+ Wed, 24 Nov 2021 10:51:31 -0800 (PST)
+Date: Wed, 24 Nov 2021 18:51:23 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Tyler Baicar <baicar@os.amperecomputing.com>
+Subject: Re: [PATCH 1/2] ACPI/AEST: Initial AEST driver
+Message-ID: <YZ6Jq39Z9dIUqcfO@lakrids>
+References: <20211124170708.3874-1-baicar@os.amperecomputing.com>
+ <20211124170708.3874-2-baicar@os.amperecomputing.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAeT=FyzvGaksi+-WidHObrGYcqs4vR73ChCGpo8AFuin6UbYw@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20211124170708.3874-2-baicar@os.amperecomputing.com>
+Cc: abdulhamid@os.amperecomputing.com, daniel.lezcano@linaro.org,
+ rafael@kernel.org, catalin.marinas@arm.com, ishii.shuuichir@fujitsu.com,
+ guohanjun@huawei.com, vincenzo.frascino@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, lorenzo.pieralisi@arm.com, maz@kernel.org,
+ masahiroy@kernel.org, linux-acpi@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, samitolvanen@google.com,
+ patches@amperecomputing.com, lenb@kernel.org, keescook@chromium.org,
+ gor@linux.ibm.com, anshuman.khandual@arm.com, john.garry@huawei.com,
+ zhangshaokun@hisilicon.com, Vineeth.Pillai@microsoft.com, bp@alien8.de,
+ darren@os.amperecomputing.com, dchinner@redhat.com, tglx@linutronix.de,
+ linux-edac@vger.kernel.org, tony.luck@intel.com, jthierry@redhat.com,
+ marcan@marcan.st, linux-kernel@vger.kernel.org, sudeep.holla@arm.com,
+ tmricht@linux.ibm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -109,280 +70,321 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Reiji,
+Hi,
 
-On 11/19/21 5:47 AM, Reiji Watanabe wrote:
-> Hi Eric,
-> 
-> On Thu, Nov 18, 2021 at 12:36 PM Eric Auger <eauger@redhat.com> wrote:
->>
->> Hi Reiji,
->>
->> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
->>> This patch lays the groundwork to make ID registers writable.
->>>
->>> Introduce struct id_reg_info for an ID register to manage the
->>> register specific control of its value for the guest, and provide set
->>> of functions commonly used for ID registers to make them writable.
->>>
->>> The id_reg_info is used to do register specific initialization,
->>> validation of the ID register and etc.  Not all ID registers must
->>> have the id_reg_info. ID registers that don't have the id_reg_info
->>> are handled in a common way that is applied to all ID registers.
->>>
->>> At present, changing an ID register from userspace is allowed only
->>> if the ID register has the id_reg_info, but that will be changed
->>> by the following patches.
->>>
->>> No ID register has the structure yet and the following patches
->>> will add the id_reg_info for some ID registers.
->>>
->>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
->>> ---
->>>  arch/arm64/include/asm/sysreg.h |   1 +
->>>  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
->>>  2 files changed, 218 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->>> index 16b3f1a1d468..597609f26331 100644
->>> --- a/arch/arm64/include/asm/sysreg.h
->>> +++ b/arch/arm64/include/asm/sysreg.h
->>> @@ -1197,6 +1197,7 @@
->>>  #define ICH_VTR_TDS_MASK     (1 << ICH_VTR_TDS_SHIFT)
->>>
->>>  #define ARM64_FEATURE_FIELD_BITS     4
->>> +#define ARM64_FEATURE_FIELD_MASK     ((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
->>>
->>>  /* Create a mask for the feature bits of the specified feature. */
->>>  #define ARM64_FEATURE_MASK(x)        (GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 5608d3410660..1552cd5581b7 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
->>>               return read_zero(vcpu, p);
->>>  }
->>>
->>> +/*
->>> + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
->>> + * ftr_check_types of id_reg_info.
->>> + */
->>> +enum feature_check_type {
->>> +     FCT_LOWER_SAFE = 0,
->>> +     FCT_HIGHER_SAFE,
->>> +     FCT_HIGHER_OR_ZERO_SAFE,
->>> +     FCT_EXACT,
->>> +     FCT_EXACT_OR_ZERO_SAFE,
->>> +     FCT_IGNORE,     /* Don't check (any value is fine) */
->> Maybe you can remove the _SAFE suffix (EXACT does not have it).
-> 
-> I am inclined to keep 'SAFE' (otherwise, I am likely to forget
-> if lower is safe or not).
-> 
->> s/EXACT/EQUAL ?
-> 
-> I will fix that FCT_EXACT to FCT_EQUAL_SAFE.
-> 
->>> +};
->>> +
->>> +static int arm64_check_feature_one(enum feature_check_type type, int val,
->>> +                                int limit)
->>> +{
->>> +     bool is_safe = false;
->>> +
->>> +     if (val == limit)
->>> +             return 0;
->> even if the type is unexpected?
-> 
-> I will remove it.
-then you need to modify the handling of FCT_EXACT*.
-> 
->>> +
->>> +     switch (type) {
->>> +     case FCT_LOWER_SAFE:
->>> +             is_safe = (val <= limit);
->>> +             break;
->>> +     case FCT_HIGHER_OR_ZERO_SAFE:
->>> +             if (val == 0) {
->>> +                     is_safe = true;
->>> +                     break;
->>> +             }
->>> +             fallthrough;
->>> +     case FCT_HIGHER_SAFE:
->>> +             is_safe = (val >= limit);
->>> +             break;
->>> +     case FCT_EXACT:
->>> +             break;
->>> +     case FCT_EXACT_OR_ZERO_SAFE:
->>> +             is_safe = (val == 0);
->>> +             break;
->>> +     case FCT_IGNORE:
->>> +             is_safe = true;
->>> +             break;
->>> +     default:
->>> +             WARN_ONCE(1, "Unexpected feature_check_type (%d)\n", type);
->>> +             break;
->>> +     }
->>> +
->>> +     return is_safe ? 0 : -1;
->>> +}
->>> +
->>> +#define      FCT_TYPE_MASK           0x7
->>> +#define      FCT_TYPE_SHIFT          1
->>> +#define      FCT_SIGN_MASK           0x1
->>> +#define      FCT_SIGN_SHIFT          0
->>> +#define      FCT_TYPE(val)   ((val >> FCT_TYPE_SHIFT) & FCT_TYPE_MASK)
->>> +#define      FCT_SIGN(val)   ((val >> FCT_SIGN_SHIFT) & FCT_SIGN_MASK)
->>> +
->>> +#define      MAKE_FCT(shift, type, sign)                             \
->>> +     ((u64)((((type) & FCT_TYPE_MASK) << FCT_TYPE_SHIFT) |   \
->>> +            (((sign) & FCT_SIGN_MASK) << FCT_SIGN_SHIFT)) << (shift))
->>> +
->>> +/* For signed field */
->>> +#define      S_FCT(shift, type)      MAKE_FCT(shift, type, 1)
->>> +/* For unigned field */
->>> +#define      U_FCT(shift, type)      MAKE_FCT(shift, type, 0)
->>> +
->>> +/*
->>> + * @val and @lim are both a value of the ID register. The function checks
->>> + * if all features indicated in @val can be supported for guests on the host,
->>> + * which supports features indicated in @lim. @check_types indicates how> + * features in the ID register needs to be checked.
->>> + * See comments for id_reg_info's ftr_check_types field for more detail.
->> What about RES0 fields which may exist? add a comment to reassure about
->> the fact they are properly handled if there are?
-> 
-> Any fields including RES0 should be checked based on check_types.
-> I will explicitly state that in the comment.
-> 
->>> + */
->>> +static int arm64_check_features(u64 check_types, u64 val, u64 lim)
->>> +{
->>> +     int i;
->>> +
->>> +     for (i = 0; i < 64; i += ARM64_FEATURE_FIELD_BITS) {
->>> +             u8 ftr_check = (check_types >> i) & ARM64_FEATURE_FIELD_MASK;
->>> +             bool is_sign = FCT_SIGN(ftr_check);
->>> +             enum feature_check_type fctype = FCT_TYPE(ftr_check);
->>> +             int fval, flim, ret;
->>> +
->>> +             fval = cpuid_feature_extract_field(val, i, is_sign);
->>> +             flim = cpuid_feature_extract_field(lim, i, is_sign);
->>> +
->>> +             ret = arm64_check_feature_one(fctype, fval, flim);
->>> +             if (ret)
->>> +                     return -E2BIG;
->>> +     }
->>> +     return 0;
->>> +}
->>> +
->>> +struct id_reg_info {
->>> +     u32     sys_reg;        /* Register ID */
->> use struct kernel-doc comments instead?
->>> +
->>> +     /*
->>> +      * Limit value of the register for a vcpu. The value is the sanitized
->>> +      * system value with bits cleared for unsupported features for the
->>> +      * guest.
->>> +      */
->>> +     u64     vcpu_limit_val;
->>> +
->>> +     /*
->>> +      * The ftr_check_types is comprised of a set of 4 bits fields.
->> nit: s/bits field/bit field here and below
-> 
-> I will fix them.
-> 
->>> +      * Each 4 bits field is for a feature indicated by the same bits
->>> +      * field of the ID register and indicates how the feature support
->>> +      * for guests needs to be checked.
->>> +      * The bit 0 indicates that the corresponding ID register field
->>> +      * is signed(1) or unsigned(0).
->>> +      * The bits [3:1] hold feature_check_type for the field.
->>> +      * If all zero, all features in the ID register are treated as unsigned
->>> +      * fields and checked based on Principles of the ID scheme for fields
->>> +      * in ID registers (FCT_LOWER_SAFE of feature_check_type).
->> values set by the guest are checked against host ID field values
->> according to FCT_LOWER_SAFE test? You do not actually explicitly explain
->> what the check is about although this may be obvious for you?
-> 
-> How about this ?
-> 
->         /*
->          * The ftr_check_types is comprised of a set of 4 bit fields.
->          * Each 4 bit field is for a feature indicated by the same bit field
->          * of the ID register and indicates how the field needs to be checked
->          * (by arm64_check_feature_one) against the host's ID field when
->          * userspace tries to set the register.
->          * The bit 0 indicates that the corresponding ID register field is
->          * signed(1) or unsigned(0). The bits [3:1] hold feature_check_type
->          * for the field (FCT_LOWER_SAFE == 0, etc).
->          * e.g. for ID_AA64PFR0_EL1.SVE(bits [35:32]), bits[35:32] of
->          * ftr_check_types for the register should be 0. It means the SVE
->          * field is treated as an unsigned field, and userspace can set the
->          * field to a equal or lower value than the host's ID field value.
->          */
-yep sounds clearer to me.
-> 
->>> +      */
->>> +     u64     ftr_check_types;
->>> +
->>> +     /* Initialization function of the id_reg_info */
->>> +     void (*init)(struct id_reg_info *id_reg);
->>> +
->>> +     /* Register specific validation function */
->> validation callback? it does not register anything. We have check
->> customization means already in ftr_check_types so it is difficult to
->> guess at that point why this cb is needed, all the more so it applies
->> after the ftr_checks.
-> 
-> I am going to add the following comment. Does it look clear enough for you ?
-> 
->         /*
->          * This is an optional ID register specific validation function.
->          * When userspace tries to set the ID register, arm64_check_features()
->          * will check if the requested value indicates any features that cannot
->          * be supported by KVM on the host.  But, some ID register fields need
->          * a special checking and this function can be used for such fields.
->          * e.g. KVM_CREATE_DEVICE must be used to configure GICv3 for a guest.
->          * ID_AA64PFR0_EL1.GIC shouldn't be set to 1 unless GICv3 is configured.
->          * The validation function for ID_AA64PFR0_EL1 could be used to check
->          * the field is consistent with GICv3 configuration.
->          */
-> 
->>> +     int (*validate)(struct kvm_vcpu *vcpu, const struct id_reg_info *id_reg,
->>> +                     u64 val);
->>> +
->>> +     /* Return the reset value of the register for the vCPU */
->>> +     u64 (*get_reset_val)(struct kvm_vcpu *vcpu,
->>> +                          const struct id_reg_info *id_reg);
->>> +};
->>> +
->>> +static void id_reg_info_init(struct id_reg_info *id_reg)
->>> +{
->>> +     id_reg->vcpu_limit_val = read_sanitised_ftr_reg(id_reg->sys_reg);
->>> +     if (id_reg->init)
->>> +             id_reg->init(id_reg);
->>> +}
->>> +
->>> +/*
->>> + * An ID register that needs special handling to control the value for the
->>> + * guest must have its own id_reg_info in id_reg_info_table.
->>> + * (i.e. the reset value is different from the host's sanitized value,
->>> + * the value is affected by opt-in features, some fields needs specific
->> s/needs/need
-> 
-> I will fix it.
-> 
-> Thank you for your review !
-> 
-> Regards
-> Reiji
-> 
+I haven't looked at this in great detail, but I spotted a few issues
+from an initial scan.
 
-Thanks
+On Wed, Nov 24, 2021 at 12:07:07PM -0500, Tyler Baicar wrote:
+> Add support for parsing the ARM Error Source Table and basic handling of
+> errors reported through both memory mapped and system register interfaces.
+> 
+> Assume system register interfaces are only registered with private
+> peripheral interrupts (PPIs); otherwise there is no guarantee the
+> core handling the error is the core which took the error and has the
+> syndrome info in its system registers.
 
-Eric
+Can we actually assume that? What does the specification mandate?
 
+> Add logging for all detected errors and trigger a kernel panic if there is
+> any uncorrected error present.
+
+Has this been tested on any hardware or software platform?
+
+[...]
+
+> +#define ERRDEVARCH_REV_SHIFT	0x16
+
+IIUC This should be 16, not 0x16 (i.e. 22).
+
+> +#define ERRDEVARCH_REV_MASK	0xf
+> +
+> +#define RAS_REV_v1_1		0x1
+> +
+> +struct ras_ext_regs {
+> +	u64 err_fr;
+> +	u64 err_ctlr;
+> +	u64 err_status;
+> +	u64 err_addr;
+> +	u64 err_misc0;
+> +	u64 err_misc1;
+> +	u64 err_misc2;
+> +	u64 err_misc3;
+> +};
+
+These last four might be better an an array.
+
+[...]
+
+> +static bool ras_extn_v1p1(void)
+> +{
+> +	unsigned long fld, reg = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> +
+> +	fld = cpuid_feature_extract_unsigned_field(reg, ID_AA64PFR0_RAS_SHIFT);
+> +
+> +	return fld >= ID_AA64PFR0_RAS_V1P1;
+> +}
+
+I suspect it'd be better to pass this value around directly as
+`version`, rather than dropping this into a `misc23_present` temporary
+variable, as that would be a little clearer, and future-proof if/when
+more registers get added.
+
+[...]
+
+> +void arch_arm_ras_report_error(u64 implemented, bool clear_misc)
+> +{
+> +	struct ras_ext_regs regs = {0};
+> +	unsigned int i, cpu_num;
+> +	bool misc23_present;
+> +	bool fatal = false;
+> +	u64 num_records;
+> +
+> +	if (!this_cpu_has_cap(ARM64_HAS_RAS_EXTN))
+> +		return;
+> +
+> +	cpu_num = get_cpu();
+
+Why get_cpu() here? Do you just need smp_processor_id()?
+
+The commit message explained that this would be PE-local (e.g. in a PPI
+handler), and we've already checked this_cpu_has_cap() which assumes
+we're not preemptible.
+
+So I don't see why we should use get_cpu() here -- any time it would
+have a difference implies something has already gone wrong.
+
+> +	num_records = read_sysreg_s(SYS_ERRIDR_EL1) & ERRIDR_NUM_MASK;
+> +
+> +	for (i = 0; i < num_records; i++) {
+> +		if (!(implemented & BIT(i)))
+> +			continue;
+> +
+> +		write_sysreg_s(i, SYS_ERRSELR_EL1);
+> +		isb();
+> +		regs.err_status = read_sysreg_s(SYS_ERXSTATUS_EL1);
+> +
+> +		if (!(regs.err_status & ERR_STATUS_V))
+> +			continue;
+> +
+> +		pr_err("error from processor 0x%x\n", cpu_num);
+
+Why in hex? We normally print 'cpu%d' or 'CPU%d', since this is a
+logical ID anyway.
+
+> +
+> +		if (regs.err_status & ERR_STATUS_AV)
+> +			regs.err_addr = read_sysreg_s(SYS_ERXADDR_EL1);
+> +
+> +		misc23_present = ras_extn_v1p1();
+
+As above, I reckon it's better to have this as 'version' or
+'ras_version', and have the checks below be:
+
+	if (version >= ID_AA64PFR0_RAS_V1P1) {
+		// poke SYS_ERXMISC2_EL1
+		// poke SYS_ERXMISC3_EL1
+	}
+
+> +
+> +		if (regs.err_status & ERR_STATUS_MV) {
+> +			regs.err_misc0 = read_sysreg_s(SYS_ERXMISC0_EL1);
+> +			regs.err_misc1 = read_sysreg_s(SYS_ERXMISC1_EL1);
+> +
+> +			if (misc23_present) {
+> +				regs.err_misc2 = read_sysreg_s(SYS_ERXMISC2_EL1);
+> +				regs.err_misc3 = read_sysreg_s(SYS_ERXMISC3_EL1);
+> +			}
+> +		}
+> +
+> +		arch_arm_ras_print_error(&regs, i, misc23_present);
+> +
+> +		/*
+> +		 * In the future, we will treat UER conditions as potentially
+> +		 * recoverable.
+> +		 */
+> +		if (regs.err_status & ERR_STATUS_UE)
+> +			fatal = true;
+> +
+> +		regs.err_status = arch_arm_ras_get_status_clear_value(regs.err_status);
+> +		write_sysreg_s(regs.err_status, SYS_ERXSTATUS_EL1);
+> +
+> +		if (clear_misc) {
+> +			write_sysreg_s(0x0, SYS_ERXMISC0_EL1);
+> +			write_sysreg_s(0x0, SYS_ERXMISC1_EL1);
+> +
+> +			if (misc23_present) {
+> +				write_sysreg_s(0x0, SYS_ERXMISC2_EL1);
+> +				write_sysreg_s(0x0, SYS_ERXMISC3_EL1);
+> +			}
+> +		}
+
+Any reason not to clear when we read, above? e.g.
+
+#define READ_CLEAR_MISC(nr, clear)					\
+({									\
+	unsigned long __val = read_sysreg_s(SYS_ERXMISC##nr##_EL1);	\
+	if (clear);							\
+		write_sysreg_s(0, SYS_ERXMISC##nr##_EL1);		\
+	__val;								\
+})
+
+if (regs.err_status & ERR_STATUS_MV) {
+	regs.err_misc0 = READ_CLEAR_MISC(0, clear_misc);
+	regs.err_misc1 = READ_CLEAR_MISC(1, clear_misc);
+
+	if (version >= ID_AA64PFR0_RAS_V1P1) {
+		regs.err_misc2 = READ_CLEAR_MISC(2, clear_misc);
+		regs.err_misc3 = READ_CLEAR_MISC(3, clear_misc);
+	}
+
+}
+
+... why does the clearing need to be conditional?
+
+> +
+> +		isb();
+> +	}
+> +
+> +	if (fatal)
+> +		panic("ARM RAS: uncorrectable error encountered");
+> +
+> +	put_cpu();
+> +}
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e3ec1a44f94d..dc15e9896db4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1573,6 +1573,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_ERXADDR_EL1), trap_raz_wi },
+>  	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
+>  	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXMISC2_EL1), trap_raz_wi },
+> +	{ SYS_DESC(SYS_ERXMISC3_EL1), trap_raz_wi },
+
+This should be a preparatory patch; this is preumably a latent bug in
+KVM.
+
+[...]
+
+> +static struct aest_node_data __percpu **ppi_data;
+> +static int ppi_irqs[AEST_MAX_PPI];
+> +static u8 num_ppi;
+> +static u8 ppi_idx;
+
+As above, do we have any guarantee these are actually PPIs?
+
+> +static bool aest_mmio_ras_misc23_present(u64 base_addr)
+> +{
+> +	u32 val;
+> +
+> +	val = readl((void *) (base_addr + ERRDEVARCH_OFFSET));
+> +	val <<= ERRDEVARCH_REV_SHIFT;
+> +	val &= ERRDEVARCH_REV_MASK;
+> +
+> +	return val >= RAS_REV_v1_1;
+> +}
+
+Is the shift the wrong way around?
+
+Above we have:
+
+	#define ERRDEVARCH_REV_SHIFT 0x16
+	#define ERRDEVARCH_REV_MASK  0xf
+
+	#define RAS_REV_v1_1         0x1
+
+.. so this is:
+
+	val <<= 0x16;
+	val &= 0xf;		// val[0x15:0] == 0, so this is 0
+
+	return val >= 0x1;	// false
+
+It'd be nicer to use FIELD_GET() here.
+
+As above, I also think it would be better to retrun the value of the
+field, and check that explciitly, for future proofing.
+
+[...]
+
+> +static void aest_proc(struct aest_node_data *data)
+> +{
+> +	struct ras_ext_regs *regs_p, regs = {0};
+> +	bool misc23_present;
+> +	bool fatal = false;
+> +	u64 errgsr = 0;
+> +	int i;
+> +
+> +	/*
+> +	 * Currently SR based handling is done through the architected
+> +	 * discovery exposed through SRs. That may change in the future
+> +	 * if there is supplemental information in the AEST that is
+> +	 * needed.
+> +	 */
+> +	if (data->interface.type == ACPI_AEST_NODE_SYSTEM_REGISTER) {
+> +		arch_arm_ras_report_error(data->interface.implemented,
+> +					  data->interface.flags & AEST_INTERFACE_CLEAR_MISC);
+> +		return;
+> +	}
+> +
+> +	regs_p = data->interface.regs;
+> +	errgsr = readq((void *) (((u64) regs_p) + ERRGSR_OFFSET));
+> +
+> +	for (i = data->interface.start; i < data->interface.end; i++) {
+> +		if (!(data->interface.implemented & BIT(i)))
+> +			continue;
+> +
+> +		if (!(data->interface.status_reporting & BIT(i)) && !(errgsr & BIT(i)))
+> +			continue;
+> +
+> +		regs.err_status = readq(&regs_p[i].err_status);
+> +		if (!(regs.err_status & ERR_STATUS_V))
+> +			continue;
+> +
+> +		if (regs.err_status & ERR_STATUS_AV)
+> +			regs.err_addr = readq(&regs_p[i].err_addr);
+> +
+> +		regs.err_fr = readq(&regs_p[i].err_fr);
+> +		regs.err_ctlr = readq(&regs_p[i].err_ctlr);
+> +
+> +		if (regs.err_status & ERR_STATUS_MV) {
+> +			misc23_present = aest_mmio_ras_misc23_present((u64) regs_p);
+> +			regs.err_misc0 = readq(&regs_p[i].err_misc0);
+> +			regs.err_misc1 = readq(&regs_p[i].err_misc1);
+> +
+> +			if (misc23_present) {
+> +				regs.err_misc2 = readq(&regs_p[i].err_misc2);
+> +				regs.err_misc3 = readq(&regs_p[i].err_misc3);
+> +			}
+> +		}
+> +
+> +		aest_print(data, regs, i, misc23_present);
+> +
+> +		if (regs.err_status & ERR_STATUS_UE)
+> +			fatal = true;
+> +
+> +		regs.err_status = arch_arm_ras_get_status_clear_value(regs.err_status);
+> +		writeq(regs.err_status, &regs_p[i].err_status);
+> +
+> +		if (data->interface.flags & AEST_INTERFACE_CLEAR_MISC) {
+> +			writeq(0x0, &regs_p[i].err_misc0);
+> +			writeq(0x0, &regs_p[i].err_misc1);
+> +
+> +			if (misc23_present) {
+> +				writeq(0x0, &regs_p[i].err_misc2);
+> +				writeq(0x0, &regs_p[i].err_misc3);
+> +			}
+> +		}
+> +	}
+> +
+> +	if (fatal)
+> +		panic("AEST: uncorrectable error encountered");
+
+Why don't we call panic() as soon as we realise an error is fatal?
+
+Thanks,
+Mark.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
