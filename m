@@ -2,95 +2,96 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5FD8C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Nov 2021 20:30:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A144FC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Nov 2021 20:30:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FD374B162;
-	Thu, 25 Nov 2021 15:30:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DF594B0CE;
+	Thu, 25 Nov 2021 15:30:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tAlRZsx+y1eq; Thu, 25 Nov 2021 15:30:45 -0500 (EST)
+	with ESMTP id ewx1vlMH7o5i; Thu, 25 Nov 2021 15:30:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FA304B129;
-	Thu, 25 Nov 2021 15:30:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F44E4B134;
+	Thu, 25 Nov 2021 15:30:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 386F24B15C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 15:30:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 208CF4B0CE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 15:30:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id m19Xg0CrzHLe for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Nov 2021 15:30:42 -0500 (EST)
+ with ESMTP id G2tnLEzpojMj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Nov 2021 15:30:54 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6864F4B15A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 15:30:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 164324B0C5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 15:30:54 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1637872241;
+ s=mimecast20190719; t=1637872253;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2ShhUEy+E07PE6bTnG2bcJwf8K2GrtR8GlOvuCWDf3g=;
- b=N6DrpoWKxZV1Ofg2+KXPchcnyvdfBEc2qRphVMTWWdzExXD6U7kwz6XBL0+RJIZr+WXQyc
- UU66NuZw+no3+mWbHPYFNLQF2ou4rONw8jpIrU5jqyUZgnrMbYcBec0KY1FznoTiyQ/XtC
- c6wgu7LZWoNqkLbL4P7CrCbC6HzCQd8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=dEpF0Ya03y+5CSbJ4wmHYDmPmNwCt74NIwf3iLZqZgg=;
+ b=UBG5+HEPWvuaq32Vd1sMJvFDlWdt49r34Hi5FQAxzhWfAut+my2ywnkD8ujPZpcRQAtOJx
+ 6u5BaNuyyGgjAsj4NZojQBBD50Cj1wbjkpvSoYtNIjv5lHcOQysLD6hkoZUJzMwSYDRVU8
+ oux8d1LCCYJE+i+EqH8tKYE4SpU7bnU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-518-gviWlHmEOi6svctWQgpY-g-1; Thu, 25 Nov 2021 15:30:40 -0500
-X-MC-Unique: gviWlHmEOi6svctWQgpY-g-1
-Received: by mail-wm1-f71.google.com with SMTP id
- g11-20020a1c200b000000b003320d092d08so3752040wmg.9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 12:30:39 -0800 (PST)
+ us-mta-376-UMQXP9wsNqG2W_5A4vTzhQ-1; Thu, 25 Nov 2021 15:30:52 -0500
+X-MC-Unique: UMQXP9wsNqG2W_5A4vTzhQ-1
+Received: by mail-wm1-f72.google.com with SMTP id
+ 138-20020a1c0090000000b00338bb803204so3773181wma.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 12:30:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=2ShhUEy+E07PE6bTnG2bcJwf8K2GrtR8GlOvuCWDf3g=;
- b=qEHL5TjfraBHJQyMHFqILAyBeU83oPoHBEqK7XLA/TZB4+HGedlDOkhL6zyAwF81lx
- J3C3+OovunL5PtUjSCp1fXJKzVKe7jZXUxyaj6T5nXvA1nhbuVQd8os+hAipCcHQ70LP
- S7vuebT63E65cpXQC034qQkE8HmMCjtkc6JAo/TtKa41nrYWI2LTOH5mjal2lB3uRYuN
- 5jxXmXf5fT9QO0IZ3mhK8lBIZ4MJaBz27oPI9fMMxPSI5/2dxehk73tCe0by1NsjnWeY
- pj85FAN4otW/00YD8qCSn3tAX7HVTB1ghKqSD3bMK6b+WJX1Ed6nL0ayQ1SttrehHSaz
- 6qrA==
-X-Gm-Message-State: AOAM531yTj7j1GXG72z7lB0N0dWl+ckucUZoRmjwCei/9nCOJYxu98gq
- xXYNFOzNveDeK8OFnuF8oNYTszzSvwF07wYnKAiuCm8SpoI4lplZqSgDM9ONbNvcrtzFRSnBpbP
- eTkCvRRRC8zQY6FcVZIuyMVGz
-X-Received: by 2002:adf:dd0a:: with SMTP id a10mr9806985wrm.60.1637872238937; 
- Thu, 25 Nov 2021 12:30:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxoQfLwsVNStdvgHx055e1d9E4GwQpVIsWLlaEilliddpDqSQaqHalFf+ziOP3Fem0ERY7sCw==
-X-Received: by 2002:adf:dd0a:: with SMTP id a10mr9806937wrm.60.1637872238693; 
- Thu, 25 Nov 2021 12:30:38 -0800 (PST)
+ bh=dEpF0Ya03y+5CSbJ4wmHYDmPmNwCt74NIwf3iLZqZgg=;
+ b=n9o05XxefiuzZ5xOqtA8jjHlYZNSdwTj3TOu7Duq44teU6uh70lleMVN3+mEKsrxlM
+ 9tJo9fuPvxpriTFLQAT2wBg+ldtBZjFMzHoyWAEyXLtqPX9Xd7ySvokWxrxo7CrHiiOJ
+ N3l9bR8zgQnIlxWEarRXZvnU4CeUYRIVTcpcvx5x3j+um+eWJwj/ei0DjF2408tsZv3M
+ xt37W72XTBZrYtEWJte60jAcF9eSu45T53TbrxLR+hMwYCfjVr1+uQpCML5FzbiGaaLq
+ LaXf8DMZp8iArvElw3um6C7OZG+aW01YbDId392d5+ywJCqPwp+nEGh5Jcx0sChakt5Y
+ OtuQ==
+X-Gm-Message-State: AOAM533ktm/1Ut48PNb/wsEFjiGRBjTjdMwnPOjXIPM4Grt2yCTUNru8
+ b4N6JLV8zeCn20bdWGOq+GlvB0K/meRwnpsa49yxo8x/hyj4rUrPteG8Uf9Rlr8EthhD64gp8c7
+ fq02uJeSlisFEpNSKrbXdOB1G
+X-Received: by 2002:a5d:6312:: with SMTP id i18mr10186653wru.475.1637872251640; 
+ Thu, 25 Nov 2021 12:30:51 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx0gaKevT6dubAbNdgl8Mlg1Ca3d8cwo7W4YwZVK8nM2ffYuZwM+HX5qjU1mVul0Cey+e9psA==
+X-Received: by 2002:a5d:6312:: with SMTP id i18mr10186629wru.475.1637872251479; 
+ Thu, 25 Nov 2021 12:30:51 -0800 (PST)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
  ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id d8sm3719945wrm.76.2021.11.25.12.30.37
+ by smtp.gmail.com with ESMTPSA id h2sm3566055wrz.23.2021.11.25.12.30.50
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 25 Nov 2021 12:30:38 -0800 (PST)
-Subject: Re: [RFC PATCH v3 12/29] KVM: arm64: Make ID_DFR1_EL1 writable
+ Thu, 25 Nov 2021 12:30:50 -0800 (PST)
+Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
+ support for the guest
 To: Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
  kvmarm@lists.cs.columbia.edu
 References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-13-reijiw@google.com>
+ <20211117064359.2362060-10-reijiw@google.com>
 From: Eric Auger <eauger@redhat.com>
-Message-ID: <44073484-639e-3d23-2068-ae5c2cac3276@redhat.com>
-Date: Thu, 25 Nov 2021 21:30:36 +0100
+Message-ID: <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
+Date: Thu, 25 Nov 2021 21:30:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20211117064359.2362060-13-reijiw@google.com>
+In-Reply-To: <20211117064359.2362060-10-reijiw@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org
+Cc: Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,41 +111,39 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Reiji,
 
 On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> This patch adds id_reg_info for ID_DFR1_EL1 to make it writable
-> by userspace.
+> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
+> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
+> expose the value for the guest as it is.  Since KVM doesn't support
+> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
+> exopse 0x0 (PMU is not implemented) instead.
+s/exopse/expose
 > 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index fbd335ac5e6b..dda7001959f6 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -859,6 +859,11 @@ static struct id_reg_info id_dfr0_el1_info = {
->  	.get_reset_val = get_reset_id_dfr0_el1,
->  };
->  
-> +static struct id_reg_info id_dfr1_el1_info = {
-> +	.sys_reg = SYS_ID_DFR1_EL1,
-> +	.ftr_check_types = S_FCT(ID_DFR1_MTPMU_SHIFT, FCT_LOWER_SAFE),
-what about the 0xF value which indicates the MTPMU is not implemented?
+> Change cpuid_feature_cap_perfmon_field() to update the field value
+> to 0x0 when it is 0xf.
+is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+guest should not use it as a PMUv3?
 
 Eric
-> +};
-> +
->  /*
->   * An ID register that needs special handling to control the value for the
->   * guest must have its own id_reg_info in id_reg_info_table.
-> @@ -869,6 +874,7 @@ static struct id_reg_info id_dfr0_el1_info = {
->  #define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
->  static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
->  	[IDREG_IDX(SYS_ID_DFR0_EL1)] = &id_dfr0_el1_info,
-> +	[IDREG_IDX(SYS_ID_DFR1_EL1)] = &id_dfr1_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
+> 
+> Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/cpufeature.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index ef6be92b1921..fd7ad8193827 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
+>  
+>  	/* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
+>  	if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
+> -		val = 0;
+> +		return (features & ~mask);
+>  
+>  	if (val > cap) {
+>  		features &= ~mask;
 > 
 
 _______________________________________________
