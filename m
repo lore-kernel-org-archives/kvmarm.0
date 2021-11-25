@@ -2,49 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1E2C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Nov 2021 13:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99451C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Nov 2021 14:23:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02FF74B150;
-	Thu, 25 Nov 2021 08:50:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2355D4B172;
+	Thu, 25 Nov 2021 09:23:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dOEMiBNRjfzq; Thu, 25 Nov 2021 08:50:09 -0500 (EST)
+	with ESMTP id 8Oe4UJ9+GwAw; Thu, 25 Nov 2021 09:23:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE6534B164;
-	Thu, 25 Nov 2021 08:50:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0281E4B1A4;
+	Thu, 25 Nov 2021 09:23:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 804824B11A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 08:50:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 625F34B172
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 09:23:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hwctD0GNp+d6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Nov 2021 08:50:03 -0500 (EST)
+ with ESMTP id Xp5YXB6bcrsA for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Nov 2021 09:23:05 -0500 (EST)
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5782D4B126
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 08:50:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35BBB4B16C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Nov 2021 09:23:05 -0500 (EST)
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
  [51.254.78.96])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 4CAFE60EB5;
- Thu, 25 Nov 2021 13:50:02 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 3D198610CA;
+ Thu, 25 Nov 2021 14:23:04 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mqF8R-007oqV-So; Thu, 25 Nov 2021 13:50:00 +0000
-Date: Thu, 25 Nov 2021 13:49:59 +0000
-Message-ID: <87bl28cpko.wl-maz@kernel.org>
+ id 1mqFeQ-007pBz-5g; Thu, 25 Nov 2021 14:23:02 +0000
+Date: Thu, 25 Nov 2021 14:23:01 +0000
+Message-ID: <877dcwco1m.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: Use appropriate mmu pointer in stage2
- page table init.
-In-Reply-To: <20211122095803.28943-2-gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: nv: fixup! Support multiple nested
+ Stage-2 mmu structures
+In-Reply-To: <20211122095803.28943-3-gankulkarni@os.amperecomputing.com>
 References: <20211122095803.28943-1-gankulkarni@os.amperecomputing.com>
- <20211122095803.28943-2-gankulkarni@os.amperecomputing.com>
+ <20211122095803.28943-3-gankulkarni@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -53,8 +53,7 @@ X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com,
  will@kernel.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com,
- qperret@google.com
+ darren@os.amperecomputing.com, d.scott.phillips@amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -78,42 +77,84 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-[+ Quentin]
-
-Hi Ganapatro,
-
-On Mon, 22 Nov 2021 09:58:02 +0000,
+On Mon, 22 Nov 2021 09:58:03 +0000,
 Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> The kvm_pgtable_stage2_init/kvm_pgtable_stage2_init_flags function
-> assume arch->mmu is same across all stage 2 mmu and initializes
-> the pgt(page table) using arch->mmu.
-> Using armc->mmu is not appropriate when nested virtualization is enabled
-> since there are multiple stage 2 mmu tables are initialized to manage
-> Guest-Hypervisor as well as Nested VM for the same vCPU.
+> Commit 1776c91346b6 ("KVM: arm64: nv: Support multiple nested Stage-2 mmu
+> structures")[1] added a function kvm_vcpu_init_nested which expands the
+> stage-2 mmu structures array when ever a new vCPU is created. The array
+> is expanded using krealloc() and results in a stale mmu address pointer
+> in pgt->mmu. Adding a fix to update the pointer with the new address after
+> successful krealloc.
 > 
-> Add a mmu argument to kvm_pgtable_stage2_init that can be used during
-> initialization. This patch is a preparatory patch for the
-> nested virtualization series and no functional changes.
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/
+> branch kvm-arm64/nv-5.13
+> 
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> ---
+>  arch/arm64/kvm/nested.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 4ffbc14d0245..57ad8d8f4ee5 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -68,6 +68,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>  		       num_mmus * sizeof(*kvm->arch.nested_mmus),
+>  		       GFP_KERNEL | __GFP_ZERO);
+>  	if (tmp) {
+> +		int i;
+> +
+>  		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
+>  		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+>  			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+> @@ -80,6 +82,13 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+>  		}
+>  
+>  		kvm->arch.nested_mmus = tmp;
+> +
+> +		/* Fixup pgt->mmu after krealloc */
+> +		for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> +			struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> +
+> +			mmu->pgt->mmu = mmu;
+> +		}
+>  	}
+>  
+>  	mutex_unlock(&kvm->lock);
 
-Thanks for having had a look, and for the analysis. This is obviously
-a result of a hasty conversion to the 'new' page table code, and a
-total oversight on my part.
+Another good catch. I've tweaked a bit to avoid some unnecessary
+repainting, see below.
 
-I'm however not particularly thrilled with the approach you have taken
-though, as carrying both the kvm->arch pointer *and* the mmu pointer
-seems totally redundant (the mmu structure already has a backpointer
-to kvm->arch or its pkvm equivalent). All we need is to rework the
-initialisation for this pointer to be correct at the point of where we
-follow it first.
-
-I've pushed out my own version of this[1]. Please have a look.
-
-Thanks,
+Thanks again,
 
 	M.
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/nv-5.16-WIP&id=21790a24d88c3ed37989533709dad3d40905f5c3
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index a4dfffa1dae0..92b225db59ac 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -66,8 +66,19 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
+ 	tmp = krealloc(kvm->arch.nested_mmus,
+ 		       num_mmus * sizeof(*kvm->arch.nested_mmus),
+-		       GFP_KERNEL | __GFP_ZERO);
++		       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+ 	if (tmp) {
++		/*
++		 * If we went through a realocation, adjust the MMU
++		 * back-pointers in the pg_table structures.
++		 */
++		if (kvm->arch.nested_mmus != tmp) {
++			int i;
++
++			for (i = 0; i < num_mms - 2; i++)
++				tmp[i].pgt->mmu = &tmp[i];
++		}
++
+ 		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
+ 		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+ 			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
 
 -- 
 Without deviation from the norm, progress is not possible.
