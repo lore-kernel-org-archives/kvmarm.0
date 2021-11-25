@@ -2,80 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38646C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 25 Nov 2021 01:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2268C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 25 Nov 2021 02:23:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A6F414B0EC;
-	Wed, 24 Nov 2021 20:55:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 636434B177;
+	Wed, 24 Nov 2021 21:23:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OGc-liA1z3nJ; Wed, 24 Nov 2021 20:55:19 -0500 (EST)
+	with ESMTP id 5tc4aH1Eglc2; Wed, 24 Nov 2021 21:23:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A7194B116;
-	Wed, 24 Nov 2021 20:55:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F8854B15C;
+	Wed, 24 Nov 2021 21:23:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 053BC4B0EC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 20:55:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CD914B12E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 21:23:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eMZaUzxksW2o for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Nov 2021 20:55:16 -0500 (EST)
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
- [209.85.216.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6123C4B090
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 20:55:16 -0500 (EST)
-Received: by mail-pj1-f53.google.com with SMTP id
- gx15-20020a17090b124f00b001a695f3734aso4419526pjb.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 17:55:16 -0800 (PST)
+ with ESMTP id GAblsf9PmDWc for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Nov 2021 21:23:48 -0500 (EST)
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com
+ [209.85.216.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45D924B129
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 21:23:48 -0500 (EST)
+Received: by mail-pj1-f43.google.com with SMTP id
+ fv9-20020a17090b0e8900b001a6a5ab1392so4443568pjb.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Nov 2021 18:23:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=c6JAlrZHfEjkcfiYPHPoUF5Sz3yt7SCN1Z5kI93GJfA=;
- b=LUxcfNNzvDpzSvbqDZXVol5gajSAppzPjwydHI3cHD5x6j1VTUX3wiN1fouxMcLxNd
- ER23oTlHk9cRRqZjZb6EZJmEi0fy+qbj8/n/VTpYHBOjNKqPjAX+OLt7X54fTKgofIRM
- 9t87TR/iRYetbEPgcUty35RZ5i38pmePgecZ8N9IWReKxmGU36ykt7KRMjfXma2X+7w1
- buAlPQJ6StMAtg4Upr42Hjv5F+S8TY1M7TN/xheOvOTbuBhEoRvmluf4fwA3qR3x7lrN
- NKj3s94AeepRMWBJ9YsTXI35DhArkE2HH4zbofZCuLn44KtNmPXX/67sy2Ix6wzmPZbi
- IFTA==
+ bh=xFLS5Osf0Yq9hrh1R+jPqQbxrd4QeHBJiKo15Rlwxss=;
+ b=gt+CnbIhXSWZFRXO+JyoFnk7WgmjKBbkUkhF9Hto5JtuBqgdv4VEkkEN7LTIMqcNo3
+ fJa3lV7sl7T6tVrE5Qxf/hDkbDePK91LPbOxfpI8k9AvkVK5KzLK/K1Weiax6SB0wkdF
+ 3n14xLxD1mBRl6dFCKL6GdrGNaTItauZtatK0NnbKxrMw/oyNH8TWvWdSL2IQuAI5IhY
+ roZLPPRcMD3QsruezRFnclk5QhgurJim6oRq3veff6G+nYO6JhYAURzFW3Xf4kb8ylz5
+ KvfgIDali36j+6mqKA/FEpC+Lltqm0xWo0zxvRLD4yPKz8Brr0r8j62VYQoWqHsL4RAv
+ j4Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=c6JAlrZHfEjkcfiYPHPoUF5Sz3yt7SCN1Z5kI93GJfA=;
- b=Xjw1vVNjG+oJ3EmlYWUTwGsN8S9IH3m1oef9MpdPgKtHM0nVMFmBF4zNDKL5owbgbT
- jrThFo2xOngr1Y2QLvSWgnqM5r44VIAP++2ATEQ2X1sm5xNrwtbIJ7D3QANwb2gSdBMJ
- /7lCn2c8WwfhpjG552WyL34RS4JQiAzBSURAi3uRa+wPnwWWLychWgd6eu3asOyawU7/
- Tay8wjhT4DOYVcg6g9JT5kZAJTxGepabO2Q/O41+PnbJXSBGaSXEmPZNeoU0fIoAEfcI
- Tsl2zXa+067u+BQ2y0Zyw1qF0lJOlz7L7f3J8alGflawSGnwJoAfAZWjelvmTyvYJAXf
- reMg==
-X-Gm-Message-State: AOAM5329fXoWUD/2n0bGB8duzMDcqMMra/eM6Beg9Iy/C2mminH7610p
- rZdbWdZrIJ7U/Sy1fF5VApNuTw==
-X-Google-Smtp-Source: ABdhPJwB7t1ABtFFgKue35rS8q/aX1FW34F5h96gFuTw5nPMllIGBJgfpruJneGLXCGEeBa3Sw4yUg==
-X-Received: by 2002:a17:90b:4c03:: with SMTP id
- na3mr2465064pjb.62.1637805315282; 
- Wed, 24 Nov 2021 17:55:15 -0800 (PST)
+ bh=xFLS5Osf0Yq9hrh1R+jPqQbxrd4QeHBJiKo15Rlwxss=;
+ b=TaZrvi1X7K+oEfaqE5DKDU1gNIDzlUP15/EnsfaooC1X8ZpOrPO6c8HgBP4hHlxCHw
+ BLltN9U5Qb7jDk8JGD10ICaG/WSTtK5XkPD0qu4flM3FiKnFtqOTvqatHsnhM4VvvNK1
+ cbdw+yGZLtgzD2IHLBglZ6+QonMvt45mYMX1Pvk+RT5PuA+QlQ6/fdwNRhmdpOS6fNLj
+ BHZFlLcdWNN7SJSaPXT9eJRIw02AZ+sGVr2ip2TeoebSEQ7l9WocS3cGbs6PZrgZpALQ
+ 842yvnFVpO0wkZwNp4ddSxWpVGl+C9DMXcpKu3x904ocUT/EZjUWH0LjXUIsQq/BFlPQ
+ SYOg==
+X-Gm-Message-State: AOAM532/mcJCcTgZl3yErlOXs5Wn27KWJyowMMViCZzlJNcLscN4+io7
+ DnNWZ9WnMIpz0gGNK1PSM2p6Ww==
+X-Google-Smtp-Source: ABdhPJyFZuUHjsN9HP6H4qPfFRhjwow47Wx9NzNMHdvs7iUWMDG4eO/Sk4e4+s2lEUImw4f5MDk9ww==
+X-Received: by 2002:a17:90b:1e49:: with SMTP id
+ pi9mr2597640pjb.232.1637807026679; 
+ Wed, 24 Nov 2021 18:23:46 -0800 (PST)
 Received: from google.com (150.12.83.34.bc.googleusercontent.com.
  [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id h22sm698106pgl.79.2021.11.24.17.55.14
+ by smtp.gmail.com with ESMTPSA id z19sm1032446pfe.181.2021.11.24.18.23.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 24 Nov 2021 17:55:14 -0800 (PST)
-Date: Wed, 24 Nov 2021 17:55:11 -0800
+ Wed, 24 Nov 2021 18:23:46 -0800 (PST)
+Date: Wed, 24 Nov 2021 18:23:42 -0800
 From: Ricardo Koller <ricarkol@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 02/17] KVM: selftests: aarch64: add function for
- accessing GICv3 dist and redist registers
-Message-ID: <YZ7s/xeQ1IviLQfp@google.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 00/17] KVM: selftests: aarch64: Test userspace IRQ
+ injection
+Message-ID: <YZ7zruK4ox/Qge90@google.com>
 References: <20211109023906.1091208-1-ricarkol@google.com>
- <20211109023906.1091208-3-ricarkol@google.com>
- <87h7c2di8v.wl-maz@kernel.org>
+ <20211123142524.4bjhdvw5pkx3g5ct@gator.home>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87h7c2di8v.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, shuah@kernel.org, pshier@google.com,
+In-Reply-To: <20211123142524.4bjhdvw5pkx3g5ct@gator.home>
+Cc: shuah@kernel.org, kvm@vger.kernel.org, maz@kernel.org, pshier@google.com,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -93,143 +92,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Nov 23, 2021 at 03:06:08PM +0000, Marc Zyngier wrote:
-> On Tue, 09 Nov 2021 02:38:51 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
+On Tue, Nov 23, 2021 at 03:25:24PM +0100, Andrew Jones wrote:
+> On Mon, Nov 08, 2021 at 06:38:49PM -0800, Ricardo Koller wrote:
+> > This series adds a new test, aarch64/vgic-irq, that validates the injection of
+> > different types of IRQs from userspace using various methods and configurations
+> > (when applicable):
 > > 
-> > Add a generic library function for reading and writing GICv3 distributor
-> > and redistributor registers. Then adapt some functions to use it; more
-> > will come and use it in the next commit.
+> >     Intid        Method     |       |          Configuration
+> >                             |       |
+> >                IRQ_LINE     |       |
+> >     SGI        LEVEL_INFO   |       |
+> >     PPI    x   IRQFD        |   x   | level-sensitive  x  EOIR + DIR
+> >     SPI        ISPENDR      |       | edge-triggered      EOIR only
+> >     bogus      ISACTIVER    |       |
+> >                             |       |
 > > 
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> >  .../selftests/kvm/lib/aarch64/gic_v3.c        | 124 ++++++++++++++----
-> >  1 file changed, 101 insertions(+), 23 deletions(-)
+> > vgic-irq is implemented by having a single vcpu started in any of the 4 (2x2)
+> > configurations above.  The guest then "asks" userspace to inject all intids of
+> > a given IRQ type using each applicable method via a GUEST_SYNC call.  The
+> > applicable methods and intids for a given configuration are specified in tables
+> > like this one:
 > > 
-> > diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
-> > index 2dbf3339b62e..00e944fd8148 100644
-> > --- a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
-> > +++ b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
-> > @@ -19,7 +19,8 @@ struct gicv3_data {
-> >  	unsigned int nr_spis;
-> >  };
-> >  
-> > -#define sgi_base_from_redist(redist_base) (redist_base + SZ_64K)
-> > +#define sgi_base_from_redist(redist_base) 	(redist_base + SZ_64K)
-> > +#define DIST_BIT				(1U << 31)
-> >  
-> >  enum gicv3_intid_range {
-> >  	SGI_RANGE,
-> > @@ -50,6 +51,14 @@ static void gicv3_gicr_wait_for_rwp(void *redist_base)
-> >  	}
-> >  }
-> >  
-> > +static void gicv3_wait_for_rwp(uint32_t cpu_or_dist)
-> > +{
-> > +	if (cpu_or_dist & DIST_BIT)
-> > +		gicv3_gicd_wait_for_rwp();
-> > +	else
-> > +		gicv3_gicr_wait_for_rwp(gicv3_data.redist_base[cpu_or_dist]);
-> > +}
-> > +
-> >  static enum gicv3_intid_range get_intid_range(unsigned int intid)
-> >  {
-> >  	switch (intid) {
-> > @@ -81,39 +90,108 @@ static void gicv3_write_eoir(uint32_t irq)
-> >  	isb();
-> >  }
-> >  
-> > -static void
-> > -gicv3_config_irq(unsigned int intid, unsigned int offset)
-> > +uint32_t gicv3_reg_readl(uint32_t cpu_or_dist, uint64_t offset)
-> > +{
-> > +	void *base = cpu_or_dist & DIST_BIT ? gicv3_data.dist_base
-> > +		: sgi_base_from_redist(gicv3_data.redist_base[cpu_or_dist]);
-> > +	return readl(base + offset);
-> > +}
-> > +
-> > +void gicv3_reg_writel(uint32_t cpu_or_dist, uint64_t offset, uint32_t reg_val)
-> > +{
-> > +	void *base = cpu_or_dist & DIST_BIT ? gicv3_data.dist_base
-> > +		: sgi_base_from_redist(gicv3_data.redist_base[cpu_or_dist]);
-> > +	writel(reg_val, base + offset);
-> > +}
-> > +
-> > +uint32_t gicv3_getl_fields(uint32_t cpu_or_dist, uint64_t offset, uint32_t mask)
-> > +{
-> > +	return gicv3_reg_readl(cpu_or_dist, offset) & mask;
-> > +}
-> > +
-> > +void gicv3_setl_fields(uint32_t cpu_or_dist, uint64_t offset,
-> > +		uint32_t mask, uint32_t reg_val)
-> > +{
-> > +	uint32_t tmp = gicv3_reg_readl(cpu_or_dist, offset) & ~mask;
-> > +
-> > +	tmp |= (reg_val & mask);
-> > +	gicv3_reg_writel(cpu_or_dist, offset, tmp);
-> > +}
-> > +
-> > +/*
-> > + * We use a single offset for the distributor and redistributor maps as they
-> > + * have the same value in both. The only exceptions are registers that only
-> > + * exist in one and not the other, like GICR_WAKER that doesn't exist in the
-> > + * distributor map. Such registers are conveniently marked as reserved in the
-> > + * map that doesn't implement it; like GICR_WAKER's offset of 0x0014 being
-> > + * marked as "Reserved" in the Distributor map.
-> > + */
-> > +static void gicv3_access_reg(uint32_t intid, uint64_t offset,
-> > +		uint32_t reg_bits, uint32_t bits_per_field,
-> > +		bool write, uint32_t *val)
-> >  {
-> >  	uint32_t cpu = guest_get_vcpuid();
-> > -	uint32_t mask = 1 << (intid % 32);
-> >  	enum gicv3_intid_range intid_range = get_intid_range(intid);
-> > -	void *reg;
-> > -
-> > -	/* We care about 'cpu' only for SGIs or PPIs */
-> > -	if (intid_range == SGI_RANGE || intid_range == PPI_RANGE) {
-> > -		GUEST_ASSERT(cpu < gicv3_data.nr_cpus);
-> > -
-> > -		reg = sgi_base_from_redist(gicv3_data.redist_base[cpu]) +
-> > -			offset;
-> > -		writel(mask, reg);
-> > -		gicv3_gicr_wait_for_rwp(gicv3_data.redist_base[cpu]);
-> > -	} else if (intid_range == SPI_RANGE) {
-> > -		reg = gicv3_data.dist_base + offset + (intid / 32) * 4;
-> > -		writel(mask, reg);
-> > -		gicv3_gicd_wait_for_rwp();
-> > -	} else {
-> > -		GUEST_ASSERT(0);
-> > -	}
-> > +	uint32_t fields_per_reg, index, mask, shift;
-> > +	uint32_t cpu_or_dist;
-> > +
-> > +	GUEST_ASSERT(bits_per_field <= reg_bits);
-> > +	GUEST_ASSERT(*val < (1U << bits_per_field));
-> > +	/* Some registers like IROUTER are 64 bit long. Those are currently not
-> > +	 * supported by readl nor writel, so just asserting here until then.
-> > +	 */
-> > +	GUEST_ASSERT(reg_bits == 32);
+> >     /* edge-triggered */
+> >     static struct kvm_inject_desc inject_edge_fns[] = {
+> >             /*                            sgi    ppi    spi */
+> >             { KVM_IRQ_LINE,               false, false, true },
+> >             { IRQFD,                      false, false, true },
+> >             { ISPENDR,                    true,  false, true },
+> >     };
+> > 
+> > Based on the (example) table above, a guest running in an edge-triggered
+> > configuration will try injecting SGIs and SPIs.  The specific methods are also
+> > given in the table, e.g.: SGIs are injected from userspace by writing into the
+> > ISPENDR register.
+> > 
+> > This test also adds some extra edge tests like: IRQ preemption, restoring
+> > active IRQs, trying to inject bogus intid's (e.g., above the configured KVM
+> > nr_irqs).
+> > 
+> > Note that vgic-irq is currently limited to a single vcpu, GICv3, and does not
+> > test the vITS (no MSIs).
+> > 
+> > - Commits 1-3 add some GICv3 library functions on the guest side, e.g.: set the
+> >   priority of an IRQ.
+> > - Commits 4-5 add some vGICv3 library functions on the userspace side, e.g.: a
+> >   wrapper for KVM_IRQ_LINE.
+> > - Commit 6 adds the basic version of this test: inject an SPI using
+> >   KVM_IRQ_LINE.
+> > - Commits 7-17 add other IRQs types, methods and configurations.
+> >
 > 
-> IROUTER *does* support 32bit accesses. There are no 64bit MMIO
-> registers in the GIC architecture that do not support 32bit accesses,
-> if only because there is no guarantee about the width of the MMIO bus
-> itself (not to mention the existence of 32bit CPUs!).
+> Hi Ricardo,
 > 
-> See 12.1.3 ("GIC memory-mapped register access") in the GICv3 arch
-> spec.
+> I didn't review this in detail, but it looks good and quite thorough.
 
-I see, thanks for the pointer. Will update the comment in v2. Although I
-might keep the assert as this function doesn't support 64bit accesses
-(yet).
+Thanks Andrew!
+
+> Out
+> of curiosity did thoroughness come from attempting to get coverage on KVM
+> code?
+
+Yes, that was the main reason. Although, keep in mind that there are a
+lot of features not covered, like routing and the ITS.
+
+> I.e were you running some sort of code coverage tool on KVM with
+> these tests?
+
+No, not really. It would be nice to know how much coverage (and
+distribution) we are getting from all tests (selftests and KUT) at the
+moment and maybe use that to decide on future tests.
+
+> 
+> Unfortunately I probably won't have a chance to look much closer than the
+> scan I just did, so FWIW
+> 
+> For the series
+> 
+> Acked-by: Andrew Jones <drjones@redhat.com>
+> 
+> Thanks,
+> drew
+> 
 
 Thanks,
 Ricardo
-
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
