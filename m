@@ -2,95 +2,148 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71CD0C433F5
-	for <kvmarm@archiver.kernel.org>; Sat, 27 Nov 2021 17:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E99C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 28 Nov 2021 11:44:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B96614B252;
-	Sat, 27 Nov 2021 12:27:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B5074B268;
+	Sun, 28 Nov 2021 06:44:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AJmZsLGiH3SP; Sat, 27 Nov 2021 12:27:29 -0500 (EST)
+	with ESMTP id bZl0VJB4MZVA; Sun, 28 Nov 2021 06:43:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BD5C4B259;
-	Sat, 27 Nov 2021 12:27:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B244B26D;
+	Sun, 28 Nov 2021 06:43:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 030054B252
- for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Nov 2021 12:27:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F022B4B12C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Nov 2021 11:51:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5Hlq0rm4c4J4 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 27 Nov 2021 12:27:26 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13ECB4B21C
- for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Nov 2021 12:27:26 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1638034045;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=zQkcR9i5clHeNsrtOztHmizggbBo17IKKNg3wYL/MF8=;
- b=huLJyfuhZeIF64faoUM8cwqvHbhXJh6/vNz7gFxfkzoNK/XzjkM/0Tbm/NC31xlf/NVixg
- wlmzfrstVTmNBqlT7V/R7u08Up2DhKIg6ht9gwCFKUcNKSP+q5QzTQRUQKqvdt1U9W689G
- rzwPfSGbdBTeF5yP4TUiqB/i9oNixao=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-298-MXvRPL9fNiOiRjMbPvKjoA-1; Sat, 27 Nov 2021 12:27:24 -0500
-X-MC-Unique: MXvRPL9fNiOiRjMbPvKjoA-1
-Received: by mail-ed1-f71.google.com with SMTP id
- p4-20020aa7d304000000b003e7ef120a37so10251178edq.16
- for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Nov 2021 09:27:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=zQkcR9i5clHeNsrtOztHmizggbBo17IKKNg3wYL/MF8=;
- b=YSXVo3IGKFj4ZHW7RGJIUgv6IFaGTVnqUfih1do2sLKq5iiwLNiIgCuQR+IJ5Aj7H5
- ZK61MoteXbnpCZJI4AyjdKInw1nyz3+xL4mIbpDMEPHZEdFVxvZ4WshnqsqnkDDu1Vpk
- Qg+5JAHHFGjbXuuaLu+69HiQzrA6G7jlll/DmYTp5zUnXVbxYzCkyXRpX7Wssl8yqEU6
- RAgRTK2wZkZokN972zBitjiHO1OT7vPzBkh7lpAPsEB/npMD24BI0rn8wYe9nMM7PZwC
- iFGlag7hR6VnYNblcLimzc8Gcm4CAgR9iHwblimrntwBOcU5TZJi6cHkjo6ZsohU9F+y
- Lajw==
-X-Gm-Message-State: AOAM530D23g9EXECPRuACZEQw5fWfm28th1HQABYdccullDLScmQt5Zb
- BJmC10R3MqxXVs9pslMhODeokAr7/34ogWQ/RJc7J52pEn0yLMYPq4SAGe2v0mMQlKQtiRx7xZU
- 3mC6WP4ohZHmKbd+xHJ5z3lYz
-X-Received: by 2002:a05:6402:6d2:: with SMTP id
- n18mr57419266edy.210.1638034043073; 
- Sat, 27 Nov 2021 09:27:23 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJytLtoKh7WUSMD7CfwDREP8JjUQlvCtlwQbJa6dQEbUdPHTgSMZDAvdxnXvttVwBzigk1UUmA==
-X-Received: by 2002:a05:6402:6d2:: with SMTP id
- n18mr57419219edy.210.1638034042845; 
- Sat, 27 Nov 2021 09:27:22 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
- by smtp.gmail.com with ESMTPSA id jg36sm5154065ejc.44.2021.11.27.09.27.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 27 Nov 2021 09:27:22 -0800 (PST)
-Date: Sat, 27 Nov 2021 18:27:20 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [RFC PATCH v2 04/11] KVM: arm64: Setup a framework for hypercall
- bitmap firmware registers
-Message-ID: <20211127172720.zte6wfdguoyi3gd6@gator.home>
-References: <20211113012234.1443009-1-rananta@google.com>
- <20211113012234.1443009-5-rananta@google.com>
- <87wnl0cdfn.wl-maz@kernel.org>
- <CAJHc60ydffBkqqb6xyObiK-66psaPODsOo0DpLFv7thx=zHjZw@mail.gmail.com>
+ with ESMTP id 59DOgDc0fhBe for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Nov 2021 11:51:48 -0500 (EST)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com
+ (mail-co1nam11on2100.outbound.protection.outlook.com [40.107.220.100])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F8D04B129
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Nov 2021 11:51:48 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mKDoYe2sQbVNE8keD/0EhSNmCb+PtDbrKIClye13ohTnzZqIBmNNYl7PVLJYmjD066Ca2R9WSHh+iuLhuFHBQUCL4UOKdvKH2B9TJEwOqeZMBrFrgcmBPXtLwSmWMO7iRXX8lpp8h0o5LnHm/52nEEeG76WbWFo+6Qyu5PA97LmE1kjFTU+ol0a94TqlSGeU+9VKqvDAk8Ooul5jCRgpalrNf07QfJn5hh6QJZTYHkHnxMqgiXmQFj3F/qlYv45t2xQmCTbULdjiLRL5fLEyz3FNlx9nZbZfZdEieqalq7TPZU90/LWqPOHACRdhsOkPygeTesjSm2uhNXs7PSN/wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NV5tN6AUfcx7qy7UluC2Z5zXYVtzihGr6T4lqYhw5Ew=;
+ b=W3ofCDc1IyPYdmJ84YqpIZv4viCqArSXyWp2Mqrgw/IxnYSCFJFLsJrNDmIJ7TKxUgLH84piRAVK3X0gIOJqNVWUR1qheZOQD//nnXJTDfqpxGkYz0m+xiU/utOQJe7K7end9desrPDUcKFCmbBwtZY7+GgEFevmr+AwvzSw7QkhSqQNcqAtYUh1oaugPdw6uDo6ANUDbtSBw5ybLUneYCoTAMbXxub6fLjBwxzyUPZIvCqYDIhKlnlDUAnqiAzuGctFBD91yAAQjzz5JbV8NCk3CRe7XdE8MXtN7yj8bxu5wf5qOaEI9Vb5H1eoBRX6dE495rrsNaKyPXO9oKEsWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NV5tN6AUfcx7qy7UluC2Z5zXYVtzihGr6T4lqYhw5Ew=;
+ b=Ve8XDJHV9r/HUedIq/PQfUGSiXwK05kH5Q6d4SYyL80StzyqXqM5JMoUoAK4ZcMSxqvINoVSyWoDHHdimOUeKHWT+LP/G+U44TsVP6jfDN2u9Wop8RAuM5cOm1dMHnbF1gmALkmuY41nmPH/NB8rozMvKIAJNbQGeUY+ekoNGZE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ DM6PR01MB4010.prod.exchangelabs.com (2603:10b6:5:1d::15) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4713.22; Fri, 26 Nov 2021 16:51:40 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::ec55:306:a75d:8529]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::ec55:306:a75d:8529%7]) with mapi id 15.20.4734.023; Fri, 26 Nov 2021
+ 16:51:39 +0000
+Message-ID: <73ca09b8-189a-eea7-15d7-b17a8d07cb60@os.amperecomputing.com>
+Date: Fri, 26 Nov 2021 22:21:32 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Subject: Re: [PATCH 1/2] KVM: arm64: Use appropriate mmu pointer in stage2
+ page table init.
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+References: <20211122095803.28943-1-gankulkarni@os.amperecomputing.com>
+ <20211122095803.28943-2-gankulkarni@os.amperecomputing.com>
+ <87bl28cpko.wl-maz@kernel.org>
+ <84b7602f-93c1-74e3-bebf-23ed9e795b9b@os.amperecomputing.com>
+ <875ysfchrg.wl-maz@kernel.org>
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <875ysfchrg.wl-maz@kernel.org>
+X-ClientProxiedBy: CY5P221CA0104.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:930:9::32) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
 MIME-Version: 1.0
-In-Reply-To: <CAJHc60ydffBkqqb6xyObiK-66psaPODsOo0DpLFv7thx=zHjZw@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+Received: from [192.168.1.22] (122.177.58.155) by
+ CY5P221CA0104.NAMP221.PROD.OUTLOOK.COM (2603:10b6:930:9::32) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4734.23 via Frontend Transport; Fri, 26 Nov 2021 16:51:35 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 35e52057-4fc1-46dc-d788-08d9b0fd03c9
+X-MS-TrafficTypeDiagnostic: DM6PR01MB4010:
+X-Microsoft-Antispam-PRVS: <DM6PR01MB4010045DBC0A7E37B2A90A619C639@DM6PR01MB4010.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7hA4HP69AykZxlVXRYfWbZUlIIdVILNpUlR7+GdYS5h+5Q828zrbuoA8dC1SZQ9QzJESeWjyNOEBbDmkiTQUySjKbt3mc+GDeNS1weRv63YSirhEjuPqoIQK3Ww8nPguwE7hEjDfLMKfVAdzGIgMPBEHDqVzwTiXKs1amyY7QCl/kYoK/lMLabDFws+sgV8d8c5vbl1dw1z4l/2rsY5UwvEiLmSlTy6iGbRTSqPnDQXDLPbmjEtc71FGrSlTlwFnZgCDdgY+guiNemHTKatLxQV6r2IfBT0O7VEHg+3IDD5adwHZkf5l20nAYE8RZIl/s31gLs5X9phto89DecGZjV/9lczXPH1FRZOk50E4Di7qhnnPf1B0e1r6mYKfLQYcCiAFcOZXZp/Qu+YQfNcNKEdULqob0FHBQVfjyxeR5zkJCOnUwl4JKUlFJDrpr6pjgTJheweoKlyizkK4OnPqRtWpKLUfnnqeUI59fK83MpIPMY01WP64B/JHPwpojFQMvOMBKh/T6mIyTVnjWBad2krHqx16Glg617BYx41ha7QEaYeo6UpTBVK/sv2fWEvY+nYkxwrvzjRbvdq8rarItPqzIfF2edv+9p2fKM8EcmSt55eWtBIlGAfMVIYa7Lblkx49Bl+cj2t38hoPkBx2ef/Da33CaKqSnD4+Po6GWPbVwiHgfXBdotqAuOLRhx4dueJouZginYFPBlRalEA5AC/y0qHdEuQf71nOXdbaGaqrX0o+KzoGkFOBAqaT8aRQebwengiH8YiqjWUVNvC/Xs0ZrtcRyV7W+8r9vcIpEU6QmExG9z/B2rIFyYtsHuixCP3IDq/LDBBxdhq8ZcH0i5yC4T9RjWAwIZmWAq1cqPM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(55236004)(52116002)(26005)(53546011)(54906003)(38350700002)(16576012)(107886003)(31686004)(2906002)(956004)(6916009)(508600001)(2616005)(6486002)(66476007)(966005)(186003)(5660300002)(86362001)(6666004)(8676002)(316002)(83380400001)(38100700002)(66556008)(8936002)(4326008)(66946007)(31696002)(43740500002)(45980500001);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Qkg5R2lEa1UzbDJQQ0JxT2N5WncrZHlZd1djbnhNYmRtcVBSeXBzbFhla1Ay?=
+ =?utf-8?B?TzgyTFRmY2xuOEM2V3l5YUtTNU9lN3QwbGJDOHBEMENMVENQek9Od2xEODJL?=
+ =?utf-8?B?a3JIK0lEMDNEZXFEMjdnZTNNYyt4N1VQb1N3VzhUQ3RkWVU5b25Vd3RDaGZV?=
+ =?utf-8?B?WVdDTHFpd1U1djFyZEJtM0dvS3hVTDZ1Zk5renVNSnFvRUd0OS9UVllwQzc5?=
+ =?utf-8?B?RGE2ZVh0UDNDR3JwQnQ1KzZBUmdJeXkyVnFObE9Mbk9OVHpNaTkwVmJzM2dF?=
+ =?utf-8?B?Qit2aVJNV0hqN0svNndCWElub1Z4SUVtRDRQdnFZT0JpVnVsQVJlQXdPam90?=
+ =?utf-8?B?R2t4ZGVITEhTWldZVDNZb2NqaGFTM0ZLTEo1MDBXb1FBekpud1Btdy9IZzIw?=
+ =?utf-8?B?eGQwV2JEWCttUXlQMGNpa2pyK1hrSE1QRnVqSmJ0L0ljTWlPKzNXNnFpMUN6?=
+ =?utf-8?B?WXhwUTdTV1Mzb3p0NDBPalEySjVldWRDVnpiYUw3TDBFM25mMmJkR2F4ekZX?=
+ =?utf-8?B?eno2R1ovQzNzU01hNkFjb1Z6dXRLYVhubmpyeFNTWlMxeXBMZFp0NzRuTXpX?=
+ =?utf-8?B?R0JWUTVGV3hNMHZuaTBtQXFaRVVzbDlsMzJ4a2VudnBFalYwOG9qeVFibSs2?=
+ =?utf-8?B?b1p3Vm1oYlM0clBsdmc2ZXgzL28rSkd1a1hKeUppT1grM1h2bjdxMld3MTBi?=
+ =?utf-8?B?T0xXREppaXVhWmVoZUpJMExsWXZxZXZVdXAwRUlYSTdaYVJWVVMzQVNzMnA1?=
+ =?utf-8?B?NE9mbVY0MFg0STdCV1dxbTNvNGhxSWYzY0pDNzlHVEk4OXEyK3dMaWVEREl4?=
+ =?utf-8?B?VVJBaFNiNlVrRUQ1clkwU1ZyY01VTS9qYkh2dmxKSU9QT1FsWEo4QmRuTFlR?=
+ =?utf-8?B?aUsxR1pxYTZwcGpxNXpNL3lQa2M5amNBbEEvZHFIMjFwemxoWkJXOTJ1a2Zx?=
+ =?utf-8?B?RHJCS3pWbDE2Y1QzRlhmQTZkNUNVKzlDUGVYNGdXamJNNU9IWlZ3YkcxdkZX?=
+ =?utf-8?B?MDNjVi9oclpVSlZzUTBka0hqUVlHNDhuejdtYkV1ak1FVDQwQ1plTFVpenk4?=
+ =?utf-8?B?d01MRmNhcUJpWXNoL2plZVJNeURxUlYrNWZOVHBXVVUwamtURVdvc3ExVVNV?=
+ =?utf-8?B?U211TXd2TEtybVllUHN6Ynd0S1pPVnM3cmtUckcrZzZ5dXQzb21DMVpGR3ps?=
+ =?utf-8?B?emo0L0VldE1zV0toWWhCTVdqNitzTVE4bzZuaUd3bnhyU0YrWkxybFo4NDhM?=
+ =?utf-8?B?NVJKMTRLd1BLQ0NKMXlKbFNjTC80WkdzWlF4QzI2cTlXbVp4UWZiVlBja2lE?=
+ =?utf-8?B?am82Qkp4WmNwQXRPTmZXZXJySzNJOTlyZFdxZExRcW11YmdNMCt3YjJPQVN6?=
+ =?utf-8?B?ejMwNHRrUUFuTFl4b1lwS1IvYnNIMlA2L3RmVkZHU3FMNzZ3WnJFSkRQSlBx?=
+ =?utf-8?B?czE0NWdvMitTZC9yTitHUG5JUW5LeXBVSzFYa0hjTWRlaVVTUDdQck9YUGVZ?=
+ =?utf-8?B?UjVoN295cUpxUWFiVmZqYU9DQUpwRCt4bDhQRlZ4OHRxS3hQUzZBUmlBazh5?=
+ =?utf-8?B?VXo4QkVROXBVK1hFSjNKa0YwdTh4ZkdXRkFnUVZvS29pZlh6aXJPcEhhMysz?=
+ =?utf-8?B?NnNNOHBlSFIzMzdYVEt1OFZQcDB2dzF3ZnJOR0xaS3NacitQWHErTXI5QzIw?=
+ =?utf-8?B?WDBTRTM4MFV2amZPM3hCWkpjV0s0L29nN1RjRHhldHhrUjBXdDNQVkxyNi94?=
+ =?utf-8?B?THpjREZ0UnhrZmlHTjQ0Tk40MEZPNEpuSUszWFVrSWRwMFQ5bjNIbGhVUDMx?=
+ =?utf-8?B?R0FMRmNNZ0twZExrb05FMVBYRVh4dUcydGsxdDdjREpQazdzaWdXMWNvMmdh?=
+ =?utf-8?B?clMvY01BOHliY1BsVGZ4Z1RFOU1QcTJpZUd4TllrbG9oam5TbHp0am1JczRU?=
+ =?utf-8?B?bGpYZDZ3alNIeWdycnhQVXd2UnhGMjRlVkx2UWtXa25OV045aXlaMWZaVk5U?=
+ =?utf-8?B?UVEzVVVkdmh3a0VBTzV0eHdNc2tLSmg4Qkdnci93UXdMditqeDhRYkY2cUJN?=
+ =?utf-8?B?TUNuVVRWVnAzQzROMlJNU1pJTnRhMWdpa2ltTUsxWjQvc0ZXZysxZ2xJQysz?=
+ =?utf-8?B?M0x1RUQ3c1NkUFlZcDkyTWYrQnFNRm1SMmZVM09wWW5WekMzbnhuVVR2cXdR?=
+ =?utf-8?B?eFBqa2FpS210ODN6UmpXamt3NXBtUERNcUxJbFVTck9zNVUwYTBZMzc2cG14?=
+ =?utf-8?B?b0NtTVA0dkc2YWQ5ODQ0Tm5VU2xUQ0tqNEZtNkhOK3JXLy9SOFA1NzVueS9O?=
+ =?utf-8?B?UlFYV05ya1lobW43NVFvWUc3M2cvZHRZbEVxMzdmQTdXOW00dVovUT09?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35e52057-4fc1-46dc-d788-08d9b0fd03c9
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Nov 2021 16:51:38.8361 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OJJLYEvrzO0XdTq4FlD3Rvxlvk0VKXMzk0sUvsPWIkrc4IeglDLFCay7B5nsgmf4lzuLaNH4qqe7j2i+zYKsfmxYsHTlO6v0E005QBZVlXOtfhggjV0jXTrqjZV2AZz6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB4010
+X-Mailman-Approved-At: Sun, 28 Nov 2021 06:43:58 -0500
+Cc: D Scott Phillips <scott@os.amperecomputing.com>, kvm@vger.kernel.org,
+ catalin.marinas@arm.com, darren@os.amperecomputing.com, andre.przywara@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -103,87 +156,95 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Nov 23, 2021 at 10:34:23AM -0800, Raghavendra Rao Ananta wrote:
-> On Mon, Nov 22, 2021 at 9:23 AM Marc Zyngier <maz@kernel.org> wrote:
-> > I keep being baffled by this. Why should we track the VMM accesses or
-> > the VMM writeback? This logic doesn't seem to bring anything useful as
-> > far as I can tell. All we need to ensure is that what is written to
-> > the pseudo-register is an acceptable subset of the previous value, and
-> > I cannot see why this can't be done at write-time.
-> >
-> > If you want to hide this behind a capability, fine (although my guts
-> > feeling is that we don't need that either). But I really want to be
-> > convinced about all this tracking.
-> >
-> The tracking of each owner register is necessary here to safe-guard
-> the possibility that the user-space may not be aware of a newly
-> introduced register, and hence, hasn't accessed it. If it had at least
-> read the register, but not write-back, we assume that the user-space
-> is happy with the configuration. But the fact that the register has
-> not even been read would state that user-space is unaware of the
-> existence of this new register. In such a case, if we don't sanitize
-> (clear all the bits) this register, the features will be exposed
-> unconditionally to the guest.
+
+
+On 26-11-2021 04:20 pm, Marc Zyngier wrote:
+> Hi Ganapatro,
 > 
-> The capability is introduced here to make sure that this new
-> infrastructure is backward compatible with old VMMs. If the VMMs don't
-> enable this capability, they are probably unaware of this, and this
-> will work as it always has- expose new services to the guest
-> unconditionally as and when they are introduced.
+> On Fri, 26 Nov 2021 05:45:26 +0000,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>>
+>> Hi Marc,
+>>
+>>
+>> On 25-11-2021 07:19 pm, Marc Zyngier wrote:
+>>> [+ Quentin]
+>>>
+>>> Hi Ganapatro,
+>>>
+>>> On Mon, 22 Nov 2021 09:58:02 +0000,
+>>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>>>>
+>>>> The kvm_pgtable_stage2_init/kvm_pgtable_stage2_init_flags function
+>>>> assume arch->mmu is same across all stage 2 mmu and initializes
+>>>> the pgt(page table) using arch->mmu.
+>>>> Using armc->mmu is not appropriate when nested virtualization is enabled
+>>>> since there are multiple stage 2 mmu tables are initialized to manage
+>>>> Guest-Hypervisor as well as Nested VM for the same vCPU.
+>>>>
+>>>> Add a mmu argument to kvm_pgtable_stage2_init that can be used during
+>>>> initialization. This patch is a preparatory patch for the
+>>>> nested virtualization series and no functional changes.
+>>>
+>>> Thanks for having had a look, and for the analysis. This is obviously
+>>> a result of a hasty conversion to the 'new' page table code, and a
+>>> total oversight on my part.
+>>>
+>>> I'm however not particularly thrilled with the approach you have taken
+>>> though, as carrying both the kvm->arch pointer *and* the mmu pointer
+>>> seems totally redundant (the mmu structure already has a backpointer
+>>> to kvm->arch or its pkvm equivalent). All we need is to rework the
+>>> initialisation for this pointer to be correct at the point of where we
+>>> follow it first.
+>>>
+>>> I've pushed out my own version of this[1]. Please have a look.
+>>>
+>>> Thanks,
+>>>
+>>> 	M.
+>>>
+>>> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/nv-5.16-WIP&id=21790a24d88c3ed37989533709dad3d40905f5c3
+>>>
+>>
+>> Thanks for the rework and rebasing to 5.16.
+>>
+>> I went through the patch, the gist of the patch seems to me same.
+>> Please free feel to add,
+>> Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> 
+> Thanks!
+> 
+>> Looks like kvm-arm64/nv-5.16-WIP branch is broken for NV.
+>> I tried booting Guest hypervisor using lkvm and the vcpu init from
+>> lkvm is failing(Fatal: Unable to initialise vcpu). Did not dig/debug
+>> more in to the issue yet.
+> 
+> I'm still trying to iron a few issues, but you should be able to boot
+> a NV guest. However, the way it is enabled has changed: you need to
+> pass 'kvm-arm.mode=nested' to the command line instead of the previous
+> 'kvm-arm.nested=1' which I have got rid of. That could well be the
+> issue.
+> 
+> With the current state of the tree (I just pushed another fix), you
+> should be able to boot a L1 guest hypervisor and a L2 guest. I'm
+> getting a crash at the point where the L2 guest reaches userspace
+> though, so something is broken in the PSTATE or ERET tracking, I'd
+> expect.
 
-Hi Raghavendra,
-
-I don't think we need a CAP that has to be enabled or to make any
-assumptions or policy decisions in the kernel. I think we just need to
-provide a bit more information to the VMM when it checks if KVM has the
-CAP. If KVM would tell the VMM how may pseudo registers there are, which
-can be done with the return value of the CAP, then the VMM code could be
-something like this
-
-  r = check_cap(KVM_CAP_ARM_HVC_FW_REG_BMAP);
-  if (r) {
-    num_regs = r;
-
-    for (idx = 0; idx < num_regs; ++idx) {
-      reg = hvc_fw_reg(idx);
-
-      if (idx > vmm_last_known_idx) {
-        ...
-      } else {
-        ...
-      }
-    }
-  }
-
-With this, the VMM is free to decide if it wants to clear all registers
-greater than the last index it was aware of or if it wants to let those
-registers just get exposed to the guest without knowing what's getting
-exposed. Along with documenting that by default everything gets exposed
-by KVM, which is the backwards compatible thing to do, then the VMM has
-been warned and given everything it needs to manage its guests.
-
-Another thing that might be nice is giving userspace control of how many
-pseudo registers show up in get-reg-list. In order to migrate from a host
-with a more recent KVM to a host with an older KVM[*] we should only
-expose the number of pseudo registers that the older host is aware of.
-The VMM would zero these registers out anyway, in order to be compatible
-for migration, but that's not enough when they also show up in the list
-(at least not with QEMU that aborts migration when the destination
-expects less registers than what get-reg-list provides)
-
-[*] This isn't a great idea, but it'd be nice if we can make it work,
-because users may want to rollback upgrades or, after migrating to a
-host with a newer kernel, they may want to migrate back to where they
-started.
+Thanks Marc.
+It is booting now, i could boot L1/Guest-Hypervisor and L2(NestedVM) as 
+well.
+> 
+> 	M.
+> 
 
 Thanks,
-drew
-
+Ganapat
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
