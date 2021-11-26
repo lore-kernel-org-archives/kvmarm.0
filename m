@@ -2,79 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0840FC433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 26 Nov 2021 12:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C130C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 26 Nov 2021 19:20:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AF194B0D0;
-	Fri, 26 Nov 2021 07:34:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A9F04B13A;
+	Fri, 26 Nov 2021 14:20:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id waIbRgkqxITm; Fri, 26 Nov 2021 07:34:00 -0500 (EST)
+	with ESMTP id GiLOV9fKvNlG; Fri, 26 Nov 2021 14:20:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E1B94B0DB;
-	Fri, 26 Nov 2021 07:34:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76A984B10C;
+	Fri, 26 Nov 2021 14:20:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 07AC84B0B4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Nov 2021 07:33:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5EFF4B10C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Nov 2021 14:20:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Sec41yko8znB for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Nov 2021 07:33:57 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F08D4B08E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Nov 2021 07:33:57 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1637930037;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VPzVgc0AYP+sKhBkiolAFzffLls+sRar8XWgazVePtA=;
- b=WD3Mw0tTVQ5GpDSlQewA62FEaVliiY2PNT2H0bPa4QVHl1ncbBKlKbFp7qThesrEx65L4H
- VDzNVwRaj/MyBv6JGuT2+zueUEHGSKsULDlotGcz94dlTfxrlH9hsyWVLOYkHh0minnYsx
- neWiCWbReor072FA/2TLA77YMofYDyE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-494-lecbiigyPvSggTsjaZoCPA-1; Fri, 26 Nov 2021 07:33:53 -0500
-X-MC-Unique: lecbiigyPvSggTsjaZoCPA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id 8U9BXBuL193c for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Nov 2021 14:20:35 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFEBC4B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Nov 2021 14:20:34 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4AAA81CCB7;
- Fri, 26 Nov 2021 12:33:51 +0000 (UTC)
-Received: from [10.39.195.16] (unknown [10.39.195.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 467C55D6B1;
- Fri, 26 Nov 2021 12:33:40 +0000 (UTC)
-Message-ID: <086c9553-6ba1-411b-43db-b51670798938@redhat.com>
-Date: Fri, 26 Nov 2021 13:33:39 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v5.5 00/30] KVM: Scalable memslots implementation
-Content-Language: en-US
-To: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-References: <20211104002531.1176691-1-seanjc@google.com>
- <cb4f5d6e-9535-dd57-d8ee-3b593a81f3a6@oracle.com>
- <YYnNA5lZNXXdX/ig@google.com>
- <f3bc3bfc-37c3-bbfd-25b4-ef0a72e534ba@oracle.com>
- <5129f02d-7c0e-8e88-797f-95e8d968df88@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <5129f02d-7c0e-8e88-797f-95e8d968df88@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Cc: kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
- kvm-ppc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org,
- Ben Gardon <bgardon@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 2B9136228F;
+ Fri, 26 Nov 2021 19:20:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AC0CC9305B;
+ Fri, 26 Nov 2021 19:20:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1637954433;
+ bh=b4ceXi12eQFeD9SQyB33k+v/3V5HDj3nrFEEY/5rQ7Q=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=mur7Eb9no6YVYgVXz4a4eopodX5xLPlShGoFLKct7JKiR8Mn8/LI4+BdMh+XZr1vq
+ USOoNQFp7bitbLZD5w+Wi4dU2ZeASanoNRy5EO0dOxxo+YD0RxdaszjHhoYjWuP6S9
+ ZVLzCDdVcTrWRQcfnrU8BvVhpw1bK7FBCj8N8wmF/GQX0Ncgayj0m2kdnkjP4rnv1g
+ 15CH79SpS1UzMz7+nVMQTLgBht4O+XgLYHgXV18Kq8xt8/EPW/isfy+CljZsKp+EnD
+ TaXY3NkleeeDrHq7jQ8qHa/CTSYUebVD8kvL1NkKLKQsDV4P56pFACLvJjBP/AVuv+
+ QjFZ+WyLMlUpA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mqglr-008BAX-F7; Fri, 26 Nov 2021 19:20:31 +0000
+Date: Fri, 26 Nov 2021 19:20:31 +0000
+Message-ID: <87bl26bu68.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: nv: fixup! Support multiple nested
+ Stage-2 mmu structures
+In-Reply-To: <a32b4390-a735-783f-9351-a71334d67572@os.amperecomputing.com>
+References: <20211122095803.28943-1-gankulkarni@os.amperecomputing.com>
+ <20211122095803.28943-3-gankulkarni@os.amperecomputing.com>
+ <877dcwco1m.wl-maz@kernel.org>
+ <a32b4390-a735-783f-9351-a71334d67572@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com,
+ will@kernel.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ darren@os.amperecomputing.com, scott@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: D Scott Phillips <scott@os.amperecomputing.com>, kvm@vger.kernel.org,
+ catalin.marinas@arm.com, darren@os.amperecomputing.com, andre.przywara@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,26 +87,126 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 11/23/21 15:42, Maciej S. Szmigiero wrote:
-> Paolo,
+[resending after having sorted my email config]
+
+On Fri, 26 Nov 2021 05:59:00 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> I see that you have merged the whole series to kvm/queue, even though it
-> still needed some changes and, most importantly, a good round of testing.
+> Hi Marc,
 > 
-> Does this mean you want all these changes as a separate patch set on top
-> of the already-merged series?
+> On 25-11-2021 07:53 pm, Marc Zyngier wrote:
+> > On Mon, 22 Nov 2021 09:58:03 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> Commit 1776c91346b6 ("KVM: arm64: nv: Support multiple nested Stage-2 mmu
+> >> structures")[1] added a function kvm_vcpu_init_nested which expands the
+> >> stage-2 mmu structures array when ever a new vCPU is created. The array
+> >> is expanded using krealloc() and results in a stale mmu address pointer
+> >> in pgt->mmu. Adding a fix to update the pointer with the new address after
+> >> successful krealloc.
+> >> 
+> >> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/
+> >> branch kvm-arm64/nv-5.13
+> >> 
+> >> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> >> ---
+> >>   arch/arm64/kvm/nested.c | 9 +++++++++
+> >>   1 file changed, 9 insertions(+)
+> >> 
+> >> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> >> index 4ffbc14d0245..57ad8d8f4ee5 100644
+> >> --- a/arch/arm64/kvm/nested.c
+> >> +++ b/arch/arm64/kvm/nested.c
+> >> @@ -68,6 +68,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >>   		       num_mmus * sizeof(*kvm->arch.nested_mmus),
+> >>   		       GFP_KERNEL | __GFP_ZERO);
+> >>   	if (tmp) {
+> >> +		int i;
+> >> +
+> >>   		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
+> >>   		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+> >>   			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+> >> @@ -80,6 +82,13 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >>   		}
+> >>     		kvm->arch.nested_mmus = tmp;
+> >> +
+> >> +		/* Fixup pgt->mmu after krealloc */
+> >> +		for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> >> +			struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> >> +
+> >> +			mmu->pgt->mmu = mmu;
+> >> +		}
+> >>   	}
+> >>     	mutex_unlock(&kvm->lock);
+> > 
+> > Another good catch. I've tweaked a bit to avoid some unnecessary
+> > repainting, see below.
+> > 
+> > Thanks again,
+> > 
+> > 	M.
+> > 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index a4dfffa1dae0..92b225db59ac 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -66,8 +66,19 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >   	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
+> >   	tmp = krealloc(kvm->arch.nested_mmus,
+> >   		       num_mmus * sizeof(*kvm->arch.nested_mmus),
+> > -		       GFP_KERNEL | __GFP_ZERO);
+> > +		       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> >   	if (tmp) {
+> > +		/*
+> > +		 * If we went through a realocation, adjust the MMU
+> 
+> Is it more precise to say?
+> > +		 * back-pointers in the pg_table structures.
+> * back-pointers in the pg_table structures of previous inits.
 
-Hi Maciej,
+Yes. I have added something along those lines.
 
-you can squash your changes and post a v6.
+> > +		 */
+> > +		if (kvm->arch.nested_mmus != tmp) {
+> > +			int i;
+> > +
+> > +			for (i = 0; i < num_mms - 2; i++)
+> > +				tmp[i].pgt->mmu = &tmp[i];
+> > +		}
+> 
+> Thanks for this optimization, it saves 2 redundant iterations.
+> > +
+> >   		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
+> >   		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+> >   			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+> > 
+> 
+> Feel free to add,
+> Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 
-Paolo
+Given that this was a fixup, I haven't taken this tag. I will Cc you
+on the whole series, and you can give you tag on the whole patch if
+you are happy with it.
 
+BTW, I have now fixed the bug that was preventing L2 userspace from
+running (bad interaction with the pgtable code which was unhappy about
+my use of the SW bits when relaxing the permissions). You should now
+be able to test the whole series.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
