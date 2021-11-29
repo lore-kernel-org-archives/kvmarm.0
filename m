@@ -2,74 +2,144 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 962ADC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Nov 2021 05:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BCA2C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Nov 2021 08:51:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04FAC4B150;
-	Tue, 30 Nov 2021 00:40:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 876AE4B1F2;
+	Tue, 30 Nov 2021 03:51:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bYxlvyN3H4iR; Tue, 30 Nov 2021 00:40:03 -0500 (EST)
+	with ESMTP id 7C8oH4G7QWDE; Tue, 30 Nov 2021 03:51:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AA094B1A3;
-	Tue, 30 Nov 2021 00:40:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 954744B1AB;
+	Tue, 30 Nov 2021 03:51:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 980A84B1F8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 00:40:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D5D824B187
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:39:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YI78OoZs6B10 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Nov 2021 00:40:00 -0500 (EST)
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com
- [209.85.210.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 70F6F4B1F5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 00:40:00 -0500 (EST)
-Received: by mail-pf1-f175.google.com with SMTP id x131so19386148pfc.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 21:40:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2O/hiQ03MFaYbbx3qyaBx+GPTTjxo7NbQIxhjjvNI2w=;
- b=FJaoREo5lr4D3hO1iEHEr3xWdnD0wwrtf7Ef1X1rSs8S4PWjhTbbX6jnw6DBltbsJX
- 6i9Ywnw7JCOsnCL/UwEWjqp17HJkt4EzbZTxyBxuoWJG8/Of+n/SqA6za6RkHdE6SASr
- t6wu10M8KcnN+UXjYsY9yGCelVtKnbGPoQhZ/rPLX3b85pSxj+RB3R/kmxfVxxpG54+m
- FjTcQGEc9YCx64+fwylV3ylCk+0ERgSyEiXZ87vXZfSFh7ajfHECA38JLabu1lYOUZ4J
- 1ktEAlEFRS5l1KibAPtXqfVpQMMEVdyQZjAA9POS4cKpRUN4R8mV+hoW2fGgdNxpid+B
- KG3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2O/hiQ03MFaYbbx3qyaBx+GPTTjxo7NbQIxhjjvNI2w=;
- b=m7XoICpU9jp2NFofCxQ+xX5akuY67vAYqORS0P04/EtnO2X0Id7/oUmsZ9KIcoHh9E
- p0Rkerul8V8ahof/NCDiMmGlwbIJCpwpP5/1yKiTE9nCTHmBSAnUhWD7yjkz8RRcFt7P
- tHDHHR/6wNUR2HMFmdcPuo1Bqt60MR+fLHsi4PYT3G79txmR8AKxSF4nnzvFal2r2Y+U
- /QE51ilELjOj3SoMUvBwQPkpptBIvETaZj2KMXtwNtDR0NS9HuhPDUZyV1PLTXUWQpBO
- LBhBPRT/24jSxyUOaQuEDNzCNpBcUToEkPEnx59QXgYFChP45yA8NY1/ALZBvn3GPAPy
- 8n/Q==
-X-Gm-Message-State: AOAM533DWNwCqQMX3GPLCQV/6HCPxdqDl8ZYjtowRJ81djGRG/3kbow/
- kFWaB0UgD8J9rhqsbzdng9qR4GmpdKW4RduJxKUz8A==
-X-Google-Smtp-Source: ABdhPJzYoUPHGrIYMegTjTSSCO7W+6mHt9oLHSQoSM1blfLYXTNnPxnKfkEzBg1Vu3CUu/4qR3k0I2UA4fV59wak9oI=
-X-Received: by 2002:a63:82c6:: with SMTP id
- w189mr26026217pgd.491.1638250799398; 
- Mon, 29 Nov 2021 21:39:59 -0800 (PST)
+ with ESMTP id T5Nz1qQO4f+q for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Nov 2021 15:39:28 -0500 (EST)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com
+ (mail-bn8nam12on2096.outbound.protection.outlook.com [40.107.237.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 719394B173
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:39:28 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l65i8vLorcSd0Pkhtk6fYpEKEqQkpS+LOiaH6oxHWtZ9OxQJzAAOGi8Y2N7p8Ds6jYcoEPRSqQb6dumVd7jvIklP+AWKbF6ESj66n1Vf3aIzXUoBFP9vg4Zr9BpuIWEbp5nES8eQbAsPlzqsxq+V000KpYoX4/ZDYA0v8VQpP4Vspk/HRjWFrG+5nofNnqA8x5BAX53PIYca1IPMWGGJOXOjZNMc45FDRdmEDaG+ylCSXXS7D4lGAKMacvuuh6u3ZBfQRoEbaFJZ0kIG27MIrd5XYyp0Zbxvc04ZxMrABlrWP1sSIFA0TfjItWVyxYX6VyAMTMDKXC2XNMt6IevnSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/uYaXPk1t0FeEp+SNmz53rFx0Ieq5Q4r7pSBIWfkbR4=;
+ b=X9oMwJpnyB6uSfOY/UZBDBd+w5/QKZ0tMSVtIuKe/p8UjvchCG0tWjnCOuHuC1mjStq2qcHMx4XM+dyyuToji4ZOl3obflS0j5ozL09z4qtNWu97R28TpSyiYgcEIWwBmDPVd3A2qsQH9+5doV6G+CWDrIRj23DihPrzOW9rKKja/yBeqkmhKsFH2+EiyLWh4xx6Cta0GGLNsiyR6s9e+bQLIh4KxtJIcne7pqlagJUhj6/BFNe5zp2H42OnF2OVTkjKxeiJ/IhXDj7gdfNWddw6LOGhlw4L6pv/Av5YzyW5FDJBvUedaXpv93h9OYOVtT6kr5cMA2DUA3/xN3sRJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/uYaXPk1t0FeEp+SNmz53rFx0Ieq5Q4r7pSBIWfkbR4=;
+ b=FI+aPc8TdslG2VYciZvkNC6KuiWIHzdT4WkJNc89gwM9uEKAvh6ubVmR3sgaFuVcZ5tGG3XcG/3pxlkIkogO7elZCkrK8fshRgxHPREAgpJdHYEqohTesEJhDTreD6+hXwO4U4WO2E9/9zpELKQmAVcsmY0nNQvsnM+4NAmRamg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from SA0PR01MB6329.prod.exchangelabs.com (2603:10b6:806:ee::12) by
+ SN6PR01MB4126.prod.exchangelabs.com (2603:10b6:805:a7::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4734.23; Mon, 29 Nov 2021 20:39:25 +0000
+Received: from SA0PR01MB6329.prod.exchangelabs.com
+ ([fe80::64f9:8e27:80ce:5410]) by SA0PR01MB6329.prod.exchangelabs.com
+ ([fe80::64f9:8e27:80ce:5410%9]) with mapi id 15.20.4734.024; Mon, 29 Nov 2021
+ 20:39:25 +0000
+Date: Mon, 29 Nov 2021 12:39:23 -0800
+From: Darren Hart <darren@os.amperecomputing.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/2] ACPI/AEST: Initial AEST driver
+Message-ID: <YaU6eyGM+bX/bEhG@fedora>
+References: <20211124170708.3874-1-baicar@os.amperecomputing.com>
+ <20211124170708.3874-2-baicar@os.amperecomputing.com>
+ <87czmpcto5.wl-maz@kernel.org>
+Content-Disposition: inline
+In-Reply-To: <87czmpcto5.wl-maz@kernel.org>
+X-ClientProxiedBy: MWHPR19CA0087.namprd19.prod.outlook.com
+ (2603:10b6:320:1f::25) To SA0PR01MB6329.prod.exchangelabs.com
+ (2603:10b6:806:ee::12)
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-13-reijiw@google.com>
- <44073484-639e-3d23-2068-ae5c2cac3276@redhat.com>
-In-Reply-To: <44073484-639e-3d23-2068-ae5c2cac3276@redhat.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 29 Nov 2021 21:39:43 -0800
-Message-ID: <CAAeT=FyBaKvof6BpPB021MN6k797BcMP+sPMDeiZ9SR6nvXdCA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 12/29] KVM: arm64: Make ID_DFR1_EL1 writable
-To: Eric Auger <eauger@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Received: from localhost (50.39.132.186) by
+ MWHPR19CA0087.namprd19.prod.outlook.com (2603:10b6:320:1f::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4734.23 via Frontend Transport; Mon, 29 Nov 2021 20:39:25 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 779e5638-7e97-417c-296f-08d9b3785500
+X-MS-TrafficTypeDiagnostic: SN6PR01MB4126:
+X-Microsoft-Antispam-PRVS: <SN6PR01MB4126DDFF769BE9A5D0BB1FDFF7669@SN6PR01MB4126.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bG6BmJ6ucW51r8N9S43lbk+sWKgLOivFVwjk4PjlFIlcSh5l+WPxJi0Q8lNvcM0XWNQmSjnGFeHs3EdJCwCnpihkx6Ax3ZvSbvdBexIEvQe/UYoTvkR2S9SoglUsZkKKiOnVuFhriUVxQUI/bABn84hMVlDeoi9GXpeC34NexPCwRHa+3ZP+a6nIKEdrTxQ34Y+E5IopwTAN4abPrr8uLNHDhK8nhfJ7tLD0YHvhYvFPyPipx2v9PBZ2Xr9iKnlHrHU6KP2cdnVypMO/emHzQNfVE3VtpyhE+/84NxTKBuan/KtQOX0rmjPJ406P+FOBWf1+tynwvXRDgvGol9F9fUDGjzVA8QTOsyhOjjcUooBq2kt3w4OlcIqElicdyQbcJtB7supTLu+SBtDdORL6PSjGcnWDx8IF6HvDxM8Hml6ESYrOQlK7RahuvuTPZ0lMBUG1TB9AjQOXno9KbQpbcDFCAcOKVPXUainN323W/O/Se9kWbAIEjkqyD1hbgFnNrzhsDgm+GOTAtT6yk0obouPGIqs81ecCUT3eh45t5cUlmNDY1BYAdHd6t+9clwHKWe3w8Mz8h0GES86/e53eBgf/NHSxFWl2qD3N1jD+KfuvEJP5dOa+0ZTntfA2+tF+SSi7nVWVvswUjB2d+A4DUqxHFQkpbyYOlWCWX4RnbrlO3+Tr66faRkIz54f60S/BY8kbYQjFjQDWY5bbVe5szw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SA0PR01MB6329.prod.exchangelabs.com; PTR:; CAT:NONE;
+ SFS:(7916004)(4636009)(366004)(66476007)(5660300002)(66556008)(38100700002)(7406005)(38350700002)(33716001)(8936002)(4326008)(316002)(66946007)(83380400001)(86362001)(7416002)(6916009)(6486002)(508600001)(52116002)(956004)(8676002)(26005)(2906002)(6496006)(186003)(9686003);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yu0dHnforDTz2GYvRqzc244tS6QmWjXFOJ7NNmrGpi0vZwiMRz2rWAh9NdRU?=
+ =?us-ascii?Q?gIBS3m3ZXtgB7XFyG8GBakRh4WNHqlFxcBq91lc9DAWYmqjsKfWHRpE4Xzr8?=
+ =?us-ascii?Q?Z7j4Ectovm1blOov0bsWGxJesANVnDXaraAIxK7B4ZBV7Bti0bx4SCQRybYb?=
+ =?us-ascii?Q?ipVKomRpS15twsqZwANrZsjUiJesah72c3BecWY4cul4EgcjzCfF6nHiqGBk?=
+ =?us-ascii?Q?J5GPs1uAnXm6eTDrEx1+B0XEREYOz1q50Ai6/X0EQ0WoF9Q50QctID8MrQG2?=
+ =?us-ascii?Q?m6efB1xoH6KqN1HmOj3RKpddAdVWM7+br0uUVZcCqrfu85Eja5Jflw6rV3bq?=
+ =?us-ascii?Q?DXv+qM9SWP9m75ZOIn8NM50eRPcYTDCblCLipopVpyaAwwXuQnI6KHcbi+JV?=
+ =?us-ascii?Q?lKKIk9nEpBPAvxWmRQEVo5nnDclusYP2GFzFM/Vbje98XWzl7f1UHwUVpNsU?=
+ =?us-ascii?Q?Yu7ZYv3uwyIi5biCgwmA8hckZZGK4y9PAg+mk2A8ZiYTm7mMA7z3VmtplDQW?=
+ =?us-ascii?Q?xpHZXCW6/HhQUYDtZ6mcY1ba89UJ2SgzYokEciww/l/fmChTuMzIAcMnD3V3?=
+ =?us-ascii?Q?NABevUsF/VSulv1croBKoaXjK31YG0LuGL1ZD/Y1fItdNV1vqK04jgsTNP3c?=
+ =?us-ascii?Q?XDpuUg5J3jBxnblkLgUcH1YmVaz9AaVMBm+JbDc+iyY6rf/5ZivjAIxF+pzF?=
+ =?us-ascii?Q?na/gClBVqtQYBK5DTW6PT2BMQ2ySgoqaWZd5zssLgoixmrmqY67Kejx2NnMX?=
+ =?us-ascii?Q?DLve839pjoEBw5KA+cM1S/6CD0912fo+oM+T7mLWN824C3IPgz1dwsNkYoE3?=
+ =?us-ascii?Q?FkHe/719UAp7HuVm90k8dmxdbVlCJNufe5WVzbU4pYdkl6mPfdvdpkR0/OWG?=
+ =?us-ascii?Q?GVcVFPmM/YjXIpO2fpTL/JBpKw7TRxqw9/1pCoC7OvNPlYaRQGjbamxDJZN8?=
+ =?us-ascii?Q?o3e0xINNBD09m7AP1l5kNM3653if3L9RmsTB/VeOOxjIxon/TGcwkpSeLb9Q?=
+ =?us-ascii?Q?d42yNyKUkX9/W/S0O9sXP5VfQPrgFbFYjYx/yWB/HxC4D0u9kZ6U8Udw5Xy3?=
+ =?us-ascii?Q?Lvrr2esZRaqeVZzf97b4v7gZfmoE1eSoikwbrn4EbcwWZ5KeV1Q4iJgxc0eb?=
+ =?us-ascii?Q?2E/501HND5j1bREVggFRTF59AzcEWNCqqDJhkk4x0zkQdEknVWPvpeOOtPOz?=
+ =?us-ascii?Q?9edK1mWDZELLb+opBz4f+K1loRhYTffNVpCuNijs96Ygz+7nO1KQRAR3JZrw?=
+ =?us-ascii?Q?UVFft+4tVFRtgFi2dSv2KGJDn2FqR/WSeOBWVnv2+R1oB8vzY2tW35AkRDo8?=
+ =?us-ascii?Q?lIeDB/AOpOXxdMY/lrsIWTPqI7+Z8k6fjxFYHCYSpoful0Roiy6lFtvzCjQ/?=
+ =?us-ascii?Q?XIAFDYfMteeKTFgEbP6hsGATE8GR7jraiUvnpZgjpUPu2WAUs/9jTPCHlaTO?=
+ =?us-ascii?Q?1s4rNnXo0oLHFfCRC4v2uRAjA3NTm36oDaxhWvUP3uI1yNcSTQdW2lKzdEln?=
+ =?us-ascii?Q?F3MrWwf8i19MpMqp+yhVghKMwAJkRmoI9cjz8waIACvHsG64a6RAz9cZRd+m?=
+ =?us-ascii?Q?jTTqB1mSA626gHLeRUFDDoYRm6IUg6bo5yjMdiEdPCRqAs2pIAlw7dob1kBy?=
+ =?us-ascii?Q?axan057O3Ksk2S3rlC8kklNW6OXljIPuRzRxDREaSge4krrMMD8YMSGbn6VR?=
+ =?us-ascii?Q?eay2OSunVYb6HtS0oMDxMNUZ95bp+lrWbL+DHdmzw8zJ4nEySj2p5DdkCgLd?=
+ =?us-ascii?Q?39o5jXRzXQ=3D=3D?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 779e5638-7e97-417c-296f-08d9b3785500
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6329.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2021 20:39:25.7299 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wN0/s26X7i8TRD+pYyIzzUo2nXbk8iMwpEA2jkFuBDBmwKZLsBVBBwTJREP26XSXQuJCFCgUSBBSgIhQDG75QLS+9nOxCEb1ntGhT/VQKWSiX36xv1gkUIeNob+9Rdvw
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR01MB4126
+X-Mailman-Approved-At: Tue, 30 Nov 2021 03:51:34 -0500
+Cc: abdulhamid@os.amperecomputing.com, daniel.lezcano@linaro.org,
+ rafael@kernel.org, catalin.marinas@arm.com, ishii.shuuichir@fujitsu.com,
+ guohanjun@huawei.com, vincenzo.frascino@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, lorenzo.pieralisi@arm.com, masahiroy@kernel.org,
+ anshuman.khandual@arm.com, linux-acpi@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, samitolvanen@google.com,
+ patches@amperecomputing.com, lenb@kernel.org, keescook@chromium.org,
+ gor@linux.ibm.com, john.garry@huawei.com, zhangshaokun@hisilicon.com,
+ Vineeth.Pillai@microsoft.com, bp@alien8.de, dchinner@redhat.com,
+ tglx@linutronix.de, linux-edac@vger.kernel.org, tony.luck@intel.com,
+ jthierry@redhat.com, marcan@marcan.st, linux-kernel@vger.kernel.org,
+ Tyler Baicar <baicar@os.amperecomputing.com>, sudeep.holla@arm.com,
+ tmricht@linux.ibm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,58 +156,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-
-On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
->
-> Hi Reiji,
->
-> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > This patch adds id_reg_info for ID_DFR1_EL1 to make it writable
-> > by userspace.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+On Wed, Nov 24, 2021 at 06:09:14PM +0000, Marc Zyngier wrote:
+> On Wed, 24 Nov 2021 17:07:07 +0000,
+> Tyler Baicar <baicar@os.amperecomputing.com> wrote:
+> > 
+> > Add support for parsing the ARM Error Source Table and basic handling of
+> > errors reported through both memory mapped and system register interfaces.
+> > 
+> > Assume system register interfaces are only registered with private
+> > peripheral interrupts (PPIs); otherwise there is no guarantee the
+> > core handling the error is the core which took the error and has the
+> > syndrome info in its system registers.
+> > 
+> > Add logging for all detected errors and trigger a kernel panic if there is
+> > any uncorrected error present.
+> > 
+> > Signed-off-by: Tyler Baicar <baicar@os.amperecomputing.com>
 > > ---
-> >  arch/arm64/kvm/sys_regs.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index fbd335ac5e6b..dda7001959f6 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -859,6 +859,11 @@ static struct id_reg_info id_dfr0_el1_info = {
-> >       .get_reset_val = get_reset_id_dfr0_el1,
-> >  };
-> >
-> > +static struct id_reg_info id_dfr1_el1_info = {
-> > +     .sys_reg = SYS_ID_DFR1_EL1,
-> > +     .ftr_check_types = S_FCT(ID_DFR1_MTPMU_SHIFT, FCT_LOWER_SAFE),
-> what about the 0xF value which indicates the MTPMU is not implemented?
+> >  MAINTAINERS                     |   1 +
+> >  arch/arm64/include/asm/ras.h    |  52 ++++
+> >  arch/arm64/include/asm/sysreg.h |   2 +
+> >  arch/arm64/kernel/Makefile      |   1 +
+> >  arch/arm64/kernel/ras.c         | 125 +++++++++
+> >  arch/arm64/kvm/sys_regs.c       |   2 +
+> >  drivers/acpi/arm64/Kconfig      |   3 +
+> >  drivers/acpi/arm64/Makefile     |   1 +
+> >  drivers/acpi/arm64/aest.c       | 450 ++++++++++++++++++++++++++++++++
+> >  include/linux/acpi_aest.h       |  50 ++++
+> >  include/linux/cpuhotplug.h      |   1 +
+> >  11 files changed, 688 insertions(+)
+> >  create mode 100644 arch/arm64/include/asm/ras.h
+> >  create mode 100644 arch/arm64/kernel/ras.c
+> >  create mode 100644 drivers/acpi/arm64/aest.c
+> >  create mode 100644 include/linux/acpi_aest.h
+> > 
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 5250298d2817..aa0483726606 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -382,6 +382,7 @@ ACPI FOR ARM64 (ACPI/arm64)
+> >  M:	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+> >  M:	Hanjun Guo <guohanjun@huawei.com>
+> >  M:	Sudeep Holla <sudeep.holla@arm.com>
+> > +R:	Tyler Baicar <baicar@os.amperecomputing.com>
+> >  L:	linux-acpi@vger.kernel.org
+> >  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+> >  S:	Maintained
+> 
+> Isn't this a bit premature? This isn't even mentioned in the commit
+> message, only in passing in the cover letter.
+> 
 
-The field is treated as a signed field.
-So, 0xf(== -1) is handled correctly.
-(Does it answer your question?)
+Hi Marc,
+
+This was something I encouraged Tyler to add during internal review,
+both in response to the checkpatch.pl warning about adding new drivers
+as well as our interest in reviewing any future changes to the aest
+driver. Since refactoring is common, this level made sense to me - but
+would it be preferable to add a new entry for just the new driver Tyler
+added?
 
 Thanks,
-Reiji
 
->
-> Eric
-> > +};
-> > +
-> >  /*
-> >   * An ID register that needs special handling to control the value for the
-> >   * guest must have its own id_reg_info in id_reg_info_table.
-> > @@ -869,6 +874,7 @@ static struct id_reg_info id_dfr0_el1_info = {
-> >  #define      GET_ID_REG_INFO(id)     (id_reg_info_table[IDREG_IDX(id)])
-> >  static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
-> >       [IDREG_IDX(SYS_ID_DFR0_EL1)] = &id_dfr0_el1_info,
-> > +     [IDREG_IDX(SYS_ID_DFR1_EL1)] = &id_dfr1_el1_info,
-> >       [IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
-> >       [IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
-> >       [IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
-> >
->
+-- 
+Darren Hart
+Ampere Computing / OS and Kernel
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
