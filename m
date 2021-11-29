@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F28C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61409C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:07:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A99EE4B0BE;
-	Mon, 29 Nov 2021 15:07:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18DDB4B1CF;
+	Mon, 29 Nov 2021 15:07:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xxArieWBlTZs; Mon, 29 Nov 2021 15:07:03 -0500 (EST)
+	with ESMTP id XPStbAtJ01pY; Mon, 29 Nov 2021 15:07:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB2424B191;
-	Mon, 29 Nov 2021 15:07:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2742E4B1A0;
+	Mon, 29 Nov 2021 15:07:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F6E84B1A3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:07:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 846B34B0CC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:07:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rdDB1z0ifkiY for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Nov 2021 15:07:01 -0500 (EST)
+ with ESMTP id ibEK+UebX0pp for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Nov 2021 15:07:06 -0500 (EST)
 Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 494AA4B1CA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:07:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B4A44A49C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:07:05 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 095F7CE1410;
- Mon, 29 Nov 2021 20:06:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 617D4C53FCD;
- Mon, 29 Nov 2021 20:06:56 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 2DE3ECE13D8;
+ Mon, 29 Nov 2021 20:07:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C8D6C53FC7;
+ Mon, 29 Nov 2021 20:07:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638216416;
- bh=dOY51q/eJxOeWtmXrkwWBV+MbhitSkeMTqRT3uYhWnU=;
+ s=k20201202; t=1638216421;
+ bh=FGszoEsrzsIxwm4QSb55LvccHTocLIQ9JXX1nNcUxE4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Z281vntSJeVIgGOy8fRirAEx00N1YtmMLE5jOD8c1t9Ty/hA4sgtywYGrIRK+N3sy
- Q+Tn4cM4HqzdK+1tIKZAm9MV3VUBe8c36YHdbGZLEuinEWH95yHm+upgnHNNdznopj
- taaSFi9zT7f6VqpLu4slaiIwiPyvSm7eFW1vv0cIa337+Ugdmvm6/L1MBfbHwE3U2L
- WZCIXaoRlqqwYIjfUUynCHXVGNkWQhoQmAhc5zQW5/kuJjzf6kRMbICaUgMhSksoE8
- j0QE6RvKUtBFp08Oq2M+Hor0GDACzeOWwBHKdsQnkyb0i3CkO5vWhy60iS60tmmFhX
- VZ7t2YjVcXrvA==
+ b=mSfmGy0sMPGIB5fNuLUc6YPgfg87FxUcMQ0+c4ijVhQrSEPM/gr4mdpfoJl0jh82Y
+ GCvjYArYijH9LXX6eDeOcMQze72me/vpMy9vDktaD+C60l45sGbY1fWSzSmgqxQNSo
+ WoCChxkJWZ8UjU7cFscPvLN9mv67G2XpvaPzYKptMGBgEgr3o+MGiWI5G4fteVpG8R
+ Fp8TQwh/iIrXZ8wnxeYOJHIZ9QdfnyVNDLIHIbEmRHO+wV/LBfpcrmxAr9fF7Il3Ci
+ ycdn9oMGHpm29p3IC55IWJMI1MntmFQLQ8bkjew06y56Q5mqqNYnMoN6NW/rOfDoUm
+ /iyUfQlmG8HUw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mrmrB-008gvR-Q6; Mon, 29 Nov 2021 20:02:33 +0000
+ id 1mrmr0-008gvR-UJ; Mon, 29 Nov 2021 20:02:23 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v5 54/69] KVM: arm64: nv: vgic: Allow userland to set VGIC
- maintenance IRQ
-Date: Mon, 29 Nov 2021 20:01:35 +0000
-Message-Id: <20211129200150.351436-55-maz@kernel.org>
+Subject: [PATCH v5 42/69] KVM: arm64: nv: Unmap/flush shadow stage 2 page
+ tables
+Date: Mon, 29 Nov 2021 20:01:23 +0000
+Message-Id: <20211129200150.351436-43-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -88,135 +88,234 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-The VGIC maintenance IRQ signals various conditions about the LRs, when
-the GIC's virtualization extension is used.
-So far we didn't need it, but nested virtualization needs to know about
-this interrupt, so add a userland interface to setup the IRQ number.
-The architecture mandates that it must be a PPI, on top of that this code
-only exports a per-device option, so the PPI is the same on all VCPUs.
+Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
+stage 2 page table for the guest hypervisor.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-[added some bits of documentation]
+Note: A bunch of the code in mmu.c relating to MMU notifiers is
+currently dealt with in an extremely abrupt way, for example by clearing
+out an entire shadow stage-2 table. This will be handled in a more
+efficient way using the reverse mapping feature in a later version of
+the patch series.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- .../virt/kvm/devices/arm-vgic-v3.rst          | 12 +++++++++-
- arch/arm64/include/uapi/asm/kvm.h             |  1 +
- arch/arm64/kvm/vgic/vgic-kvm-device.c         | 22 +++++++++++++++++++
- include/kvm/arm_vgic.h                        |  3 +++
- tools/arch/arm/include/uapi/asm/kvm.h         |  1 +
- 5 files changed, 38 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_mmu.h    |  3 +++
+ arch/arm64/include/asm/kvm_nested.h |  3 +++
+ arch/arm64/kvm/mmu.c                | 31 +++++++++++++++++++----
+ arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++++
+ 4 files changed, 71 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index 51e5e5762571..1901e651cc00 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -284,8 +284,18 @@ Groups:
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 7250594e3d68..63b2eb5f4bcb 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -158,6 +158,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+ 			   void __iomem **haddr);
+ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+ 			     void **haddr);
++void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
++			    phys_addr_t addr, phys_addr_t end);
+ void free_hyp_pgds(void);
  
-   Errors:
--
-     =======  =============================================
-     -EINVAL  vINTID is not multiple of 32 or info field is
- 	     not VGIC_LEVEL_INFO_LINE_LEVEL
-     =======  =============================================
+ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+@@ -166,6 +168,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
++void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end);
+ 
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 3f3d8e10bd99..2987806850f0 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -114,6 +114,9 @@ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+ 				    struct kvm_s2_trans *trans);
+ extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
++extern void kvm_nested_s2_wp(struct kvm *kvm);
++extern void kvm_nested_s2_clear(struct kvm *kvm);
++extern void kvm_nested_s2_flush(struct kvm *kvm);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index d63f60f95abc..a9e743f39bfd 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -190,13 +190,20 @@ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+ 	__unmap_stage2_range(mmu, start, size, true);
+ }
+ 
++void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
++			    phys_addr_t addr, phys_addr_t end)
++{
++	stage2_apply_range_resched(kvm_s2_mmu_to_kvm(mmu), addr, end, kvm_pgtable_stage2_flush);
++}
 +
-+  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
-+   Attributes:
+ static void stage2_flush_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
+ 	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
+ 	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
++	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+ 
+-	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_flush);
++	kvm_stage2_flush_range(mmu, addr, end);
+ }
+ 
+ /**
+@@ -219,6 +226,8 @@ static void stage2_flush_vm(struct kvm *kvm)
+ 	kvm_for_each_memslot(memslot, slots)
+ 		stage2_flush_memslot(kvm, memslot);
+ 
++	kvm_nested_s2_flush(kvm);
 +
-+    The attr field of kvm_device_attr encodes the following values:
+ 	spin_unlock(&kvm->mmu_lock);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+ }
+@@ -621,6 +630,8 @@ void stage2_unmap_vm(struct kvm *kvm)
+ 	kvm_for_each_memslot(memslot, slots)
+ 		stage2_unmap_memslot(kvm, memslot);
+ 
++	kvm_nested_s2_clear(kvm);
 +
-+      bits:     | 31   ....    5 | 4  ....  0 |
-+      values:   |      RES0      |   vINTID   |
+ 	spin_unlock(&kvm->mmu_lock);
+ 	mmap_read_unlock(current->mm);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+@@ -690,12 +701,12 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ }
+ 
+ /**
+- * stage2_wp_range() - write protect stage2 memory region range
++ * kvm_stage2_wp_range() - write protect stage2 memory region range
+  * @mmu:        The KVM stage-2 MMU pointer
+  * @addr:	Start address of range
+  * @end:	End address of range
+  */
+-static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
++void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+ {
+ 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+ 	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_wrprotect);
+@@ -727,7 +738,8 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
+ 	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
+ 
+ 	spin_lock(&kvm->mmu_lock);
+-	stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_nested_s2_wp(kvm);
+ 	spin_unlock(&kvm->mmu_lock);
+ 	kvm_flush_remote_tlbs(kvm);
+ }
+@@ -751,7 +763,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
+ 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+ 
+-	stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
+ }
+ 
+ /*
+@@ -766,6 +778,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 		gfn_t gfn_offset, unsigned long mask)
+ {
+ 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
++	kvm_nested_s2_wp(kvm);
+ }
+ 
+ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+@@ -1405,6 +1418,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			     (range->end - range->start) << PAGE_SHIFT,
+ 			     range->may_block);
+ 
++	kvm_nested_s2_clear(kvm);
+ 	return false;
+ }
+ 
+@@ -1436,6 +1450,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			       PAGE_SIZE, __pfn_to_phys(pfn),
+ 			       KVM_PGTABLE_PROT_R, NULL);
+ 
++	kvm_nested_s2_clear(kvm);
+ 	return false;
+ }
+ 
+@@ -1454,6 +1469,11 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 					range->start << PAGE_SHIFT);
+ 	pte = __pte(kpte);
+ 	return pte_valid(pte) && pte_young(pte);
 +
-+    The vINTID specifies which interrupt is generated when the vGIC
-+    must generate a maintenance interrupt. This must be a PPI.
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 395a4c039bcc..b2811b90fa13 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -346,6 +346,7 @@ struct kvm_arm_copy_mte_tags {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index 0d000d2fe8d2..81b16c52d1bb 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -251,6 +251,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
- 			     VGIC_NR_PRIVATE_IRQS, uaddr);
- 		break;
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++	/*
++	 * TODO: Handle nested_mmu structures here using the reverse mapping in
++	 * a later version of patch series.
++	 */
+ }
+ 
+ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+@@ -1664,6 +1684,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 
+ 	spin_lock(&kvm->mmu_lock);
+ 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
++	kvm_nested_s2_clear(kvm);
+ 	spin_unlock(&kvm->mmu_lock);
+ }
+ 
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index fb748f2b9e87..b7e10f6178b9 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -517,6 +517,45 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
+ 	return kvm_inject_nested_sync(vcpu, esr_el2);
+ }
+ 
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_wp(struct kvm *kvm)
++{
++	int i;
 +
-+		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
-+		break;
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(kvm));
 +	}
- 	}
- 
- 	return r;
-@@ -637,6 +643,21 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
- 		reg = tmp32;
- 		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+		u32 val;
++}
 +
-+		if (get_user(val, uaddr))
-+			return -EFAULT;
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_clear(struct kvm *kvm)
++{
++	int i;
 +
-+		/* Must be a PPI. */
-+		if ((val >= VGIC_NR_PRIVATE_IRQS) || (val < VGIC_NR_SGIS))
-+			return -EINVAL;
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
 +
-+		dev->kvm->arch.vgic.maint_irq = val;
-+
-+		return 0;
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
 +	}
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
- 		int ret;
- 
-@@ -722,6 +743,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 		return vgic_v3_has_attr_regs(dev, attr);
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
- 		return 0;
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
- 		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index a3fc08988a5b..3ffc89c86144 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -238,6 +238,9 @@ struct vgic_dist {
- 
- 	int			nr_spis;
- 
-+	/* The GIC maintenance IRQ for nested hypervisors. */
-+	u32			maint_irq;
++}
 +
- 	/* base addresses in guest physical address space: */
- 	gpa_t			vgic_dist_base;		/* distributor */
- 	union {
-diff --git a/tools/arch/arm/include/uapi/asm/kvm.h b/tools/arch/arm/include/uapi/asm/kvm.h
-index 03cd7c19a683..d5dd96902817 100644
---- a/tools/arch/arm/include/uapi/asm/kvm.h
-+++ b/tools/arch/arm/include/uapi/asm/kvm.h
-@@ -246,6 +246,7 @@ struct kvm_vcpu_events {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_flush(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(kvm));
++	}
++}
++
+ /*
+  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
 -- 
 2.30.2
 
