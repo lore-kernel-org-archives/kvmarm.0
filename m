@@ -2,60 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D0DC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1BCC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:07:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1C0A4B0C3;
-	Mon, 29 Nov 2021 15:07:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E470D4B0BE;
+	Mon, 29 Nov 2021 15:07:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q+ebKAwhcJaj; Mon, 29 Nov 2021 15:07:25 -0500 (EST)
+	with ESMTP id VofAGADngygC; Mon, 29 Nov 2021 15:07:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C4D94B0D7;
-	Mon, 29 Nov 2021 15:07:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 506FE4B1E2;
+	Mon, 29 Nov 2021 15:07:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B4A24B099
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:07:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EF8349F8F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:07:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KrjJo+h7+cv9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Nov 2021 15:07:22 -0500 (EST)
+ with ESMTP id g9cRWtqjGeOa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Nov 2021 15:07:26 -0500 (EST)
 Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 474FB4A49C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:07:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A3854B191
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:07:25 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 04625CE1680;
- Mon, 29 Nov 2021 20:07:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39F8EC53FCF;
- Mon, 29 Nov 2021 20:07:18 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 0B8ECCE167D;
+ Mon, 29 Nov 2021 20:07:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56279C53FD1;
+ Mon, 29 Nov 2021 20:07:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638216438;
- bh=rMT0KBgk12w5iRVerxRsvVEXfThM4QCeR6Jk8Pujwmo=;
+ s=k20201202; t=1638216441;
+ bh=KgGc5JJnyi+xoK5NH4X6bBiIwukmrEnb3nTjfxdMvYs=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=rifcdI6l8WjhlLYjlt/9A6EMsAB9GdnMU4eiuEtIzAO1i/Od2g3mO2w5RNtVwWDmN
- IbgHIgjjF/nnq/AOrbHots+bw1v33BrnB6KkshFZr3oN7U4utMAn1W1fS3MiLo3tJ4
- DdIps38jYXnRL60ZU4nSFdsA54J1lwTHKrbpkWUfDEWTBc0A6FysveNj3NIhwGhapf
- CluvdxALrXbCF49TKgQMIpNo3kIGtT6tOJ0fGGE/h7+F0nHOgeuvNkn0f+99X+384a
- MHBs9P7WgrW2wk2j31MhSTgDAnnqdoxarLwLnBu/w2fbhoMJYf8xyJNK3ZESGxZURK
- HxqdXh7NDbQRg==
+ b=P5/kxhwLYUpTNjFQPl07X15iWM7Puie4W0qXKlsI0nCQIwSm2vNPGG4JXlAPmMbqL
+ leElLrzDLpKJj8clKWKzpBWKLGhjGWMouOK+t71bKIB0+J/Gsh4L0zGOV1MqRvqQiM
+ LwW9Pb116GhM8Bpr4ql6tf3zVXsrYjzgrN627OJkt8uVSyZUKkdKGEQYTaVFUiKSWP
+ NCRnEGHfx61c4ztDdCErsrtapGmKDg10bkTL95O3NTQkb08beSWiDGHmdCITxl2b9W
+ VGzB+gaYA7Xfe54zOrcE0RAUYCAtlDAy+Ip9hqBhki6Fb1LkJNXfvjEFVnH8f+yBkx
+ l/iPWDAWbCROw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mrmqs-008gvR-OK; Mon, 29 Nov 2021 20:02:14 +0000
+ id 1mrmrJ-008gvR-0I; Mon, 29 Nov 2021 20:02:41 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v5 17/69] KVM: arm64: nv: Add non-VHE-EL2->EL1 translation
- helpers
-Date: Mon, 29 Nov 2021 20:00:58 +0000
-Message-Id: <20211129200150.351436-18-maz@kernel.org>
+Subject: [PATCH v5 68/69] KVM: arm64: nv: Fast-track 'InHost' exception returns
+Date: Mon, 29 Nov 2021 20:01:49 +0000
+Message-Id: <20211129200150.351436-69-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -88,87 +87,141 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Some EL2 system registers immediately affect the current execution
-of the system, so we need to use their respective EL1 counterparts.
-For this we need to define a mapping between the two. In general,
-this only affects non-VHE guest hypervisors, as VHE system registers
-are compatible with the EL1 counterparts.
+A significant part of the ARMv8.3-NV extension is to trap ERET
+instructions so that the hypervisor gets a chance to switch
+from a vEL2 L1 guest to an EL1 L2 guest.
 
-These helpers will get used in subsequent patches.
+But this also has the unfortunate consequence of trapping ERET
+in unsuspecting circumstances, such as staying at vEL2 (interrupt
+handling while being in the guest hypervisor), or returning to host
+userspace in the case of a VHE guest.
 
-Co-developed-by: Andre Przywara <andre.przywara@arm.com>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Although we already make some effort to handle these ERET quicker
+by not doing the put/load dance, it is still way too far down the
+line for it to be efficient enough.
+
+For these cases, it would ideal to ERET directly, no question asked.
+Of course, we can't do that. But the next best thing is to do it as
+early as possible, in fixup_guest_exit(), much as we would handle
+FPSIMD exceptions.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 50 +++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ arch/arm64/kvm/emulate-nested.c | 26 ++-----------------
+ arch/arm64/kvm/hyp/vhe/switch.c | 46 +++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 24 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 1028ac65a897..67a2c0d05233 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -2,6 +2,7 @@
- #ifndef __ARM64_KVM_NESTED_H
- #define __ARM64_KVM_NESTED_H
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 5fbf8978acf2..97e26a4539a9 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -52,8 +52,7 @@ bool forward_nv_traps(struct kvm_vcpu *vcpu)
  
-+#include <linux/bitfield.h>
- #include <linux/kvm_host.h>
+ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ {
+-	u64 spsr, elr, mode;
+-	bool direct_eret;
++	u64 spsr, elr;
  
- static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
-@@ -11,4 +12,53 @@ static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
- 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+ 	/*
+ 	 * Forward this trap to the virtual EL2 if the virtual
+@@ -62,31 +61,10 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	if (forward_nv_traps(vcpu))
+ 		return;
+ 
+-	/*
+-	 * Going through the whole put/load motions is a waste of time
+-	 * if this is a VHE guest hypervisor returning to its own
+-	 * userspace, or the hypervisor performing a local exception
+-	 * return. No need to save/restore registers, no need to
+-	 * switch S2 MMU. Just do the canonical ERET.
+-	 */
+-	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+-	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+-
+-	direct_eret  = (mode == PSR_MODE_EL0t &&
+-			vcpu_el2_e2h_is_set(vcpu) &&
+-			vcpu_el2_tge_is_set(vcpu));
+-	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+-
+-	if (direct_eret) {
+-		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
+-		*vcpu_cpsr(vcpu) = spsr;
+-		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
+-		return;
+-	}
+-
+ 	preempt_disable();
+ 	kvm_arch_vcpu_put(vcpu);
+ 
++	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
+ 	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+ 
+ 	trace_kvm_nested_eret(vcpu, elr, spsr);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 5cadda79089a..6cbe6a89dbdb 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -162,6 +162,51 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps_common(vcpu);
  }
  
-+/* Translation helpers from non-VHE EL2 to EL1 */
-+static inline u64 tcr_el2_ips_to_tcr_el1_ps(u64 tcr_el2)
++static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
 +{
-+	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
++	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
++	u64 spsr, mode;
++
++	/*
++	 * Going through the whole put/load motions is a waste of time
++	 * if this is a VHE guest hypervisor returning to its own
++	 * userspace, or the hypervisor performing a local exception
++	 * return. No need to save/restore registers, no need to
++	 * switch S2 MMU. Just do the canonical ERET.
++	 *
++	 * Unless the trap has to be forwarded further down the line,
++	 * of course...
++	 */
++	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
++		return false;
++
++	spsr = read_sysreg_el1(SYS_SPSR);
++	spsr = __fixup_spsr_el2_read(ctxt, spsr);
++	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
++
++	switch (mode) {
++	case PSR_MODE_EL0t:
++		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
++			return false;
++		break;
++	case PSR_MODE_EL2t:
++		mode = PSR_MODE_EL1t;
++		break;
++	case PSR_MODE_EL2h:
++		mode = PSR_MODE_EL1h;
++		break;
++	default:
++		return false;
++	}
++
++	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
++
++	write_sysreg_el2(spsr, SYS_SPSR);
++	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
++
++	return true;
 +}
 +
-+static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
-+{
-+	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
-+	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
-+	       tcr_el2_ips_to_tcr_el1_ps(tcr) |
-+	       (tcr & TCR_EL2_TG0_MASK) |
-+	       (tcr & TCR_EL2_ORGN0_MASK) |
-+	       (tcr & TCR_EL2_IRGN0_MASK) |
-+	       (tcr & TCR_EL2_T0SZ_MASK);
-+}
-+
-+static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
-+{
-+	u64 cpacr_el1 = 0;
-+
-+	if (!(cptr_el2 & CPTR_EL2_TFP))
-+		cpacr_el1 |= CPACR_EL1_FPEN;
-+	if (cptr_el2 & CPTR_EL2_TTA)
-+		cpacr_el1 |= CPACR_EL1_TTA;
-+	if (!(cptr_el2 & CPTR_EL2_TZ))
-+		cpacr_el1 |= CPACR_EL1_ZEN;
-+
-+	return cpacr_el1;
-+}
-+
-+static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 sctlr)
-+{
-+	/* Bit 20 is RES1 in SCTLR_EL1, but RES0 in SCTLR_EL2 */
-+	return sctlr | BIT(20);
-+}
-+
-+static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
-+{
-+	/* Force ASID to 0 (ASID 0 or RES0) */
-+	return ttbr0 & ~GENMASK_ULL(63, 48);
-+}
-+
-+static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
-+{
-+	return ((FIELD_GET(CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN, cnthctl) << 10) |
-+		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
-+}
-+
- #endif /* __ARM64_KVM_NESTED_H */
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+@@ -171,6 +216,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
+ 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
++	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
+ };
+ 
+ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
 -- 
 2.30.2
 
