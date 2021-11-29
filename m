@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F847C4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98384C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54E484B0FC;
-	Mon, 29 Nov 2021 15:06:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EC1A4B178;
+	Mon, 29 Nov 2021 15:06:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id g4ugK6qRz4h8; Mon, 29 Nov 2021 15:06:21 -0500 (EST)
+	with ESMTP id MNcyURGiXQgW; Mon, 29 Nov 2021 15:06:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5B054B137;
-	Mon, 29 Nov 2021 15:06:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 056EE4B105;
+	Mon, 29 Nov 2021 15:06:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B098F49E57
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 243D349E57
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BQXeJtfXzYFc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Nov 2021 15:06:17 -0500 (EST)
+ with ESMTP id QUJuNnoq-wGr for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Nov 2021 15:06:23 -0500 (EST)
 Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E89134B139
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A52574086D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:21 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id DF0BDCE140C;
- Mon, 29 Nov 2021 20:06:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 573BCC53FCD;
- Mon, 29 Nov 2021 20:06:13 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 991D7CE140F;
+ Mon, 29 Nov 2021 20:06:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14815C53FAD;
+ Mon, 29 Nov 2021 20:06:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638216373;
- bh=F5fLWHzkHEzNeL+P76dTE8PtKUva3K+S3mn8YzOplZA=;
+ s=k20201202; t=1638216379;
+ bh=4TJi1kUBu6v9+wzbXvDlDzBwCOCb2L+5EUFbJIjb+NQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=VY38iPV5cjOzyzkjl2e9QEqagKov23ls9BJBhQc7PyAza4TIaeDHyKgVtsUoWjJuR
- /ZtvMtIYu7GXwyKzScHRNjPvM+h2D1AMzETuu8xQWXqFKoOhd/q7facj6ifPTW+idL
- JJkuR1Oel23JX9z9g2WAnV8n7uRLstfSVbrNfiXJh30V2+HDOi9QnvKj7Roz82zrfl
- I+uEzm96jbbb2ACxSKeFD3t7c29OxP+OOfjEVn+cz0uhEpCMyNb6duIGSAeQ7C0QwM
- QCHSsD+HKmh+MA2QV8avIA1SpaQBrGhKYPDrli70FBG6lYEEM60ZzsRYLPfFW5NibQ
- Jftdj4WhUPbGQ==
+ b=VkSRkgJHQr9xrb4whnF2jgDS9//gz7hb68jmqK9tnQkBV5Dskcve3TZwVYfx8eCQN
+ e7CKNBKi2W+S9CeyZAsDYpVby4VmvZNfp78NNxejjMl2K4MgOGrl22RBz/xpXyHxpO
+ qlZm0KaWVxo7etXipoP/bRpSu7KS7NKc0Ury/iPuP/dBBE2CRNuLat30vjvgahzxFO
+ qtGNoDvZskbvW7Ndef+0zGm+ssFYQvfT6WiGkrz/LGxxE22htXErzW1Uko/F1V4CXH
+ +zT5JGINnmZpgqx8aALYBByhDssFK9l9bEletvFM0kTtmfD6RuOm4VGsDTpIhHrYRX
+ +eraax23+If7w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mrmqw-008gvR-Mx; Mon, 29 Nov 2021 20:02:18 +0000
+ id 1mrmqr-008gvR-3Z; Mon, 29 Nov 2021 20:02:13 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v5 29/69] KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit
- setting
-Date: Mon, 29 Nov 2021 20:01:10 +0000
-Message-Id: <20211129200150.351436-30-maz@kernel.org>
+Subject: [PATCH v5 12/69] KVM: arm64: nv: Handle HCR_EL2.NV system register
+ traps
+Date: Mon, 29 Nov 2021 20:00:53 +0000
+Message-Id: <20211129200150.351436-13-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -90,187 +90,273 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-Forward traps due to HCR_EL2.NV bit to the virtual EL2 if they are not
-coming from the virtual EL2 and the virtual HCR_EL2.NV bit is set.
+ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
+this bit is set, accessing EL2 registers in EL1 traps to EL2. In
+addition, executing the following instructions in EL1 will trap to EL2:
+tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
+instructions that trap to EL2 with the NV bit were undef at EL1 prior to
+ARM v8.3. The only instruction that was not undef is eret.
 
-In addition to EL2 register accesses, setting NV bit will also make EL12
-register accesses trap to EL2. To emulate this for the virtual EL2,
-forword traps due to EL12 register accessses to the virtual EL2 if the
-virtual HCR_EL2.NV bit is set.
+This patch sets up a handler for EL2 registers and SP_EL1 register
+accesses at EL1. The host hypervisor keeps those register values in
+memory, and will emulate their behavior.
 
-This is for recursive nested virtualization.
+This patch doesn't set the NV bit yet. It will be set in a later patch
+once nested virtualization support is completed.
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[Moved code to emulate-nested.c]
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+[maz: added SCTLR_EL2 RES0/RES1 handling]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h    |  1 +
- arch/arm64/include/asm/kvm_nested.h |  2 ++
- arch/arm64/kvm/emulate-nested.c     | 27 +++++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c        |  7 +++++++
- arch/arm64/kvm/sys_regs.c           | 24 ++++++++++++++++++++++++
- 5 files changed, 61 insertions(+)
+ arch/arm64/include/asm/sysreg.h |  41 +++++++++++-
+ arch/arm64/kvm/sys_regs.c       | 109 ++++++++++++++++++++++++++++++--
+ 2 files changed, 144 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 2eccf883e8fe..9759bc893a51 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -20,6 +20,7 @@
- #define HCR_AMVOFFEN	(UL(1) << 51)
- #define HCR_FIEN	(UL(1) << 47)
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_NV		(UL(1) << 42)
- #define HCR_API		(UL(1) << 41)
- #define HCR_APK		(UL(1) << 40)
- #define HCR_TEA		(UL(1) << 37)
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 4c2ac9650a3e..26cba7b4d743 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -62,5 +62,7 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
- }
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 615dd6278f8b..c77fe5401826 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -531,10 +531,26 @@
  
- int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
-+extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
-+extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+ #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
  
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 339e8272b01e..8c7f2fe24bc6 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -25,11 +25,38 @@
++#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
++#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
++
+ #define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
++#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
++#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
++#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
++#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
++#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
+ #define SYS_HFGRTR_EL2			sys_reg(3, 4, 1, 1, 4)
+ #define SYS_HFGWTR_EL2			sys_reg(3, 4, 1, 1, 5)
+ #define SYS_HFGITR_EL2			sys_reg(3, 4, 1, 1, 6)
++#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
++
++#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
++#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
++#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
++#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
++#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
++
+ #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+ #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+ #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+@@ -543,14 +559,26 @@
+ #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+ #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+ #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
++#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+ #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
++#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
++#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
+ #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
+ #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
+ #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+ #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
+ #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
  
- #include "trace.h"
+-#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
++#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
++#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
++
++#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
++#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
++
++#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
++#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
++#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
++#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
+ #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+ #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+ #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
+@@ -592,15 +620,24 @@
+ #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+ #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
  
-+bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-+{
-+	bool control_bit_set;
++#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
++#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
 +
-+	if (!nested_virt_in_use(vcpu))
-+		return false;
++#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
++#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
 +
-+	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
-+	if (!vcpu_mode_el2(vcpu) && control_bit_set) {
-+		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
-+		return true;
-+	}
-+	return false;
-+}
+ /* VHE encodings for architectural EL0/1 system registers */
+ #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
+ #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
+ #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
 +
-+bool forward_nv_traps(struct kvm_vcpu *vcpu)
-+{
-+	return forward_traps(vcpu, HCR_NV);
-+}
+ #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+ #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+ #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
 +
- void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- {
- 	u64 spsr, elr, mode;
- 	bool direct_eret;
+ #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+ #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
++
+ #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+ #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+ #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+@@ -618,6 +655,8 @@
+ #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
+ #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
  
-+	/*
-+	 * Forward this trap to the virtual EL2 if the virtual
-+	 * HCR_EL2.NV bit is set and this is coming from !EL2.
-+	 */
-+	if (forward_nv_traps(vcpu))
-+		return;
++#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
 +
- 	/*
- 	 * Going through the whole put/load motions is a waste of time
- 	 * if this is a VHE guest hypervisor returning to its own
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 7721c7c36137..6ff709c124d0 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -64,6 +64,13 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- {
- 	int ret;
- 
-+	/*
-+	 * Forward this trapped smc instruction to the virtual EL2 if
-+	 * the guest has asked for it.
-+	 */
-+	if (forward_traps(vcpu, HCR_TSC))
-+		return 1;
-+
- 	/*
- 	 * "If an SMC instruction executed at Non-secure EL1 is
- 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
+ /* Common SCTLR_ELx flags. */
+ #define SCTLR_ELx_DSSBS	(BIT(44))
+ #define SCTLR_ELx_ATA	(BIT(43))
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6490b0e3dcaf..3468b8df8661 100644
+index e3ec1a44f94d..a23701f29858 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -267,10 +267,19 @@ static u32 get_ccsidr(u32 csselr)
+@@ -105,6 +105,46 @@ static u32 get_ccsidr(u32 csselr)
  	return ccsidr;
  }
  
-+static bool el12_reg(struct sys_reg_params *p)
++static bool access_rw(struct kvm_vcpu *vcpu,
++		      struct sys_reg_params *p,
++		      const struct sys_reg_desc *r)
 +{
-+	/* All *_EL12 registers have Op1=5. */
-+	return (p->Op1 == 5);
++	if (p->is_write)
++		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
++	else
++		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
++
++	return true;
 +}
 +
- static bool access_rw(struct kvm_vcpu *vcpu,
- 		      struct sys_reg_params *p,
- 		      const struct sys_reg_desc *r)
- {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
++static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
++			     struct sys_reg_params *p,
++			     const struct sys_reg_desc *r)
++{
++	if (p->is_write) {
++		u64 val = p->regval;
 +
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
- 	else
-@@ -283,6 +292,9 @@ static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
- 			     struct sys_reg_params *p,
- 			     const struct sys_reg_desc *r)
- {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
++		if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
++			val &= ~(GENMASK_ULL(63,45) | GENMASK_ULL(34, 32) |
++				 BIT_ULL(17) | BIT_ULL(9));
++			val |=  SCTLR_EL1_RES1;
++		} else {
++			val &= ~(GENMASK_ULL(63,45) | BIT_ULL(42) |
++				 GENMASK_ULL(39, 38) | GENMASK_ULL(35, 32) |
++				 BIT_ULL(26) | BIT_ULL(24) | BIT_ULL(20) |
++				 BIT_ULL(17) | GENMASK_ULL(15, 14) |
++				 GENMASK(10, 7));
++			val |=  SCTLR_EL2_RES1;
++		}
 +
- 	if (p->is_write) {
- 		u64 val = p->regval;
++		vcpu_write_sys_reg(vcpu, val, r->reg);
++	} else {
++		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
++	}
++
++	return true;
++}
++
+ /*
+  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+  */
+@@ -263,6 +303,14 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+ 		return read_zero(vcpu, p);
+ }
  
-@@ -367,6 +379,9 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
- 	u64 val, mask, shift;
- 
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
++static bool trap_undef(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *p,
++		       const struct sys_reg_desc *r)
++{
++	kvm_inject_undefined(vcpu);
++	return false;
++}
 +
- 	/* We don't expect TRVM on the host */
- 	BUG_ON(!vcpu_mode_el2(vcpu) && !p->is_write);
- 
-@@ -1664,6 +1679,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
- 		       struct sys_reg_params *p,
- 		       const struct sys_reg_desc *r)
- {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
- 	else
-@@ -1676,6 +1694,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
- 			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
- {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
-+
- 	if (p->is_write)
- 		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
- 	else
-@@ -1688,6 +1709,9 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+ /*
+  * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
+  * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
+@@ -342,12 +390,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
  			    struct sys_reg_params *p,
  			    const struct sys_reg_desc *r)
  {
-+	if (el12_reg(p) && forward_nv_traps(vcpu))
-+		return false;
+-	if (p->is_write) {
+-		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
++	access_rw(vcpu, p, r);
++	if (p->is_write)
+ 		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
+-	} else {
+-		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+-	}
+ 
+ 	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
+ 
+@@ -1411,6 +1456,18 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+ 	.set_user = set_raz_id_reg,		\
+ }
+ 
++static bool access_sp_el1(struct kvm_vcpu *vcpu,
++			  struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		__vcpu_sys_reg(vcpu, SP_EL1) = p->regval;
++	else
++		p->regval = __vcpu_sys_reg(vcpu, SP_EL1);
 +
- 	if (p->is_write)
- 		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
- 	else
++	return true;
++}
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -1825,9 +1882,51 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
+ 	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+ 
++	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
++	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
++
++	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
++	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
++	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
++	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
++	{ SYS_DESC(SYS_CPTR_EL2), access_rw, reset_val, CPTR_EL2, CPTR_EL2_DEFAULT },
++	{ SYS_DESC(SYS_HSTR_EL2), access_rw, reset_val, HSTR_EL2, 0 },
++	{ SYS_DESC(SYS_HACR_EL2), access_rw, reset_val, HACR_EL2, 0 },
++
++	{ SYS_DESC(SYS_TTBR0_EL2), access_rw, reset_val, TTBR0_EL2, 0 },
++	{ SYS_DESC(SYS_TTBR1_EL2), access_rw, reset_val, TTBR1_EL2, 0 },
++	{ SYS_DESC(SYS_TCR_EL2), access_rw, reset_val, TCR_EL2, TCR_EL2_RES1 },
++	{ SYS_DESC(SYS_VTTBR_EL2), access_rw, reset_val, VTTBR_EL2, 0 },
++	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
++
+ 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
++	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
++	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
++	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
++
+ 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
++	{ SYS_DESC(SYS_AFSR0_EL2), access_rw, reset_val, AFSR0_EL2, 0 },
++	{ SYS_DESC(SYS_AFSR1_EL2), access_rw, reset_val, AFSR1_EL2, 0 },
++	{ SYS_DESC(SYS_ESR_EL2), access_rw, reset_val, ESR_EL2, 0 },
+ 	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
++
++	{ SYS_DESC(SYS_FAR_EL2), access_rw, reset_val, FAR_EL2, 0 },
++	{ SYS_DESC(SYS_HPFAR_EL2), access_rw, reset_val, HPFAR_EL2, 0 },
++
++	{ SYS_DESC(SYS_MAIR_EL2), access_rw, reset_val, MAIR_EL2, 0 },
++	{ SYS_DESC(SYS_AMAIR_EL2), access_rw, reset_val, AMAIR_EL2, 0 },
++
++	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
++	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
++	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
++
++	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
++	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
++
++	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
++	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
++
++	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
+ };
+ 
+ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
 -- 
 2.30.2
 
