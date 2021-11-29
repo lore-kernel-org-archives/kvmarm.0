@@ -2,70 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC81C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 08:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD479C433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 08:41:58 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 898304B1FD;
-	Mon, 29 Nov 2021 03:41:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 798ED4B231;
+	Mon, 29 Nov 2021 03:41:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VQuwh24RyWat; Mon, 29 Nov 2021 03:41:55 -0500 (EST)
+	with ESMTP id NPimCZmhwh3s; Mon, 29 Nov 2021 03:41:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C4524B24B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F81B4B252;
 	Mon, 29 Nov 2021 03:41:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C1D6B4B208
- for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Nov 2021 22:43:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C64F44B208
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Nov 2021 22:43:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jzsce8G-7m-R for <kvmarm@lists.cs.columbia.edu>;
- Sun, 28 Nov 2021 22:43:54 -0500 (EST)
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
- [209.85.216.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39B7A4B1FD
- for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Nov 2021 22:43:54 -0500 (EST)
-Received: by mail-pj1-f50.google.com with SMTP id
- n15-20020a17090a160f00b001a75089daa3so14421931pja.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Nov 2021 19:43:54 -0800 (PST)
+ with ESMTP id OOVg+aX53G3Y for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 28 Nov 2021 22:43:58 -0500 (EST)
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com
+ [209.85.210.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E3AC4B1FD
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Nov 2021 22:43:58 -0500 (EST)
+Received: by mail-pf1-f174.google.com with SMTP id i12so15396091pfd.6
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Nov 2021 19:43:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=1E5J112/KKe5nzfIjRapghLBkhpzMa3/YxcaryPQAAY=;
- b=CPZyN1kOZxK9jC2nDgnbHL1qPOcAxvPYZ4/Ldp15ZFP8LQUMl5fThYRqCxYekmI+Ti
- jaGDXmQRNigPBEiMxuYtVffQzOSXSTMZfCgxkkTeXS6mHjhsZzo3h+r10/68GkCXPnC9
- CxPtfq+6DPfEA6ybJRpLeLHrmjDI7ysst1V7c=
+ bh=9Hs2KkuD2RvJU1MuHxuaC5QQB7g97DRylbbix/DEyMM=;
+ b=k6uPJkAreyLqR/oL85kAD76M20sYasXKj1QbtK3CkHo3sgCCQCC4FWtVOblMCLxb/z
+ bPi22S2w7YghmBm3Kka1/UIGGiA8AiUT2+RMrGmqVQlt4EUYiTQn1smbFmUJatk/XJub
+ u6epHvK0KKlesLZEIUpl4jFhfksZXtlcfSic4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=1E5J112/KKe5nzfIjRapghLBkhpzMa3/YxcaryPQAAY=;
- b=lDp6zNw9XzbqeH2pVj3qqwbwOOJaMA4LZrehsbIBRwhu78GVO18WrG2xGQN7fOAKPq
- 4/zmgjgxZg9xFMhGjr1+AJwxJzF9MjO+Z6veltbSKqaw9UT7vUazxw1lABLMO+AVi2gq
- qilfonPpgoIUt7yzObEq0a46kMF4f68YSpl8DsO6S9pWMI3EU0fKkEju14Q8pRtbzHsS
- PM4tsKFSxkSIk+a3Iemy7jKZjgk9QA7GXHuYEZGE8Joemnjdu2r6srl1BESx5SI73KTA
- +UE4PgI07NOVCwWmX6O4/MImLPYkrsOsjmVtvz0cOz12QppdyfRg7EUa0aOwNjDH6MxR
- dPRg==
-X-Gm-Message-State: AOAM530PLsAa5b9nDvZrb3rVxhaWgxI5JKMJbS+79KOexzI73AU3h/sl
- atpMvUvnEgk2PXaR8zfv2z+4PA==
-X-Google-Smtp-Source: ABdhPJzR1mYlqKwgxgr65ZpLjYIw4Q3tENBbFuvuJ6S4uxpSlpvxqFbVGGaQXv+7du9DJSv52f6+mQ==
-X-Received: by 2002:a17:90a:e506:: with SMTP id
- t6mr34337394pjy.9.1638157433470; 
- Sun, 28 Nov 2021 19:43:53 -0800 (PST)
+ bh=9Hs2KkuD2RvJU1MuHxuaC5QQB7g97DRylbbix/DEyMM=;
+ b=ixCc30OclMft1lkgGvcknCJqt3WCDLo4gkNOWN6tTRxuNE+8z2oNHCuYkLQ0rk2ZKe
+ 45s88sIVAuJP7O0Gmr+4I3D7DHjk1L8qqBrJGI/EAH340jbRpIk52BBrGPJ/qP9G7FNt
+ VNSw3yjnSHLBtIgkFOqqKKmAZA0nRXC1FEyzbF6GTmJDD1ZGXO2QCon4obPhd4+91nPa
+ 1ciC1Qnhm7kkRKZeXRt7Hokpi/t+odYuwb9k2/X72KPlvLqpiN0vqcKsLLDnGOjuhkSr
+ uZZhcVDZsBD/b4WQtRFWmdiiMoyuuO7IwsL1w4Ardi+h4nZZQH4bmcRajUQuRrsdBaeE
+ oOYw==
+X-Gm-Message-State: AOAM533j4zkRH4AU6JqVQQj9w5R2PS8IoN2CS3W6r3CRWHlNpdzlA/Io
+ lnCIByjPTrsZdBUbMnTpy6zWliJpWmZ62Q==
+X-Google-Smtp-Source: ABdhPJwtRlhKS2AxEOFgBKvN/CyDcHjbqYa75A4CX+1o9/zI6sOg74qnXMkTRUr57A+X+/j0+SotFg==
+X-Received: by 2002:a63:c044:: with SMTP id z4mr33793003pgi.335.1638157437859; 
+ Sun, 28 Nov 2021 19:43:57 -0800 (PST)
 Received: from localhost ([2401:fa00:8f:203:72d1:80f6:e1c9:ed0a])
- by smtp.gmail.com with UTF8SMTPSA id h13sm14337804pfv.84.2021.11.28.19.43.50
+ by smtp.gmail.com with UTF8SMTPSA id y8sm15439643pfi.56.2021.11.28.19.43.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 28 Nov 2021 19:43:53 -0800 (PST)
+ Sun, 28 Nov 2021 19:43:57 -0800 (PST)
 From: David Stevens <stevensd@chromium.org>
 X-Google-Original-From: David Stevens <stevensd@google.com>
 To: Marc Zyngier <maz@kernel.org>,
 	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v5 3/4] KVM: arm64/mmu: use gfn_to_pfn_page
-Date: Mon, 29 Nov 2021 12:43:16 +0900
-Message-Id: <20211129034317.2964790-4-stevensd@google.com>
+Subject: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
+Date: Mon, 29 Nov 2021 12:43:17 +0900
+Message-Id: <20211129034317.2964790-5-stevensd@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
 In-Reply-To: <20211129034317.2964790-1-stevensd@google.com>
 References: <20211129034317.2964790-1-stevensd@google.com>
@@ -94,101 +92,46 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: David Stevens <stevensd@chromium.org>
 
-Covert usages of the deprecated gfn_to_pfn functions to the new
-gfn_to_pfn_page functions.
+Remove two warnings that require ref counts for pages to be non-zero, as
+mapped pfns from follow_pfn may not have an initialized ref count.
 
 Signed-off-by: David Stevens <stevensd@chromium.org>
 ---
- arch/arm64/kvm/mmu.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 7 -------
+ virt/kvm/kvm_main.c    | 2 +-
+ 2 files changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 326cdfec74a1..197fb8afbb94 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -829,7 +829,7 @@ static bool fault_supports_stage2_huge_mapping(struct kvm_memory_slot *memslot,
- static unsigned long
- transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 			    unsigned long hva, kvm_pfn_t *pfnp,
--			    phys_addr_t *ipap)
-+			    struct page **page, phys_addr_t *ipap)
- {
- 	kvm_pfn_t pfn = *pfnp;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 0626395ff1d9..7c4c7fededf0 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -621,13 +621,6 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
  
-@@ -838,7 +838,8 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 	 * sure that the HVA and IPA are sufficiently aligned and that the
- 	 * block map is contained within the memslot.
+ 	pfn = spte_to_pfn(old_spte);
+ 
+-	/*
+-	 * KVM does not hold the refcount of the page used by
+-	 * kvm mmu, before reclaiming the page, we should
+-	 * unmap it from mmu first.
+-	 */
+-	WARN_ON(!kvm_is_reserved_pfn(pfn) && !page_count(pfn_to_page(pfn)));
+-
+ 	if (is_accessed_spte(old_spte))
+ 		kvm_set_pfn_accessed(pfn);
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 16a8a71f20bf..d81edcb3e107 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -170,7 +170,7 @@ bool kvm_is_zone_device_pfn(kvm_pfn_t pfn)
+ 	 * the device has been pinned, e.g. by get_user_pages().  WARN if the
+ 	 * page_count() is zero to help detect bad usage of this helper.
  	 */
--	if (fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
-+	if (*page &&
-+	    fault_supports_stage2_huge_mapping(memslot, hva, PMD_SIZE) &&
- 	    get_user_mapping_size(kvm, hva) >= PMD_SIZE) {
- 		/*
- 		 * The address we faulted on is backed by a transparent huge
-@@ -859,10 +860,11 @@ transparent_hugepage_adjust(struct kvm *kvm, struct kvm_memory_slot *memslot,
- 		 * page accordingly.
- 		 */
- 		*ipap &= PMD_MASK;
--		kvm_release_pfn_clean(pfn);
-+		put_page(*page);
- 		pfn &= ~(PTRS_PER_PMD - 1);
--		get_page(pfn_to_page(pfn));
- 		*pfnp = pfn;
-+		*page = pfn_to_page(pfn);
-+		get_page(*page);
+-	if (!pfn_valid(pfn) || WARN_ON_ONCE(!page_count(pfn_to_page(pfn))))
++	if (!pfn_valid(pfn) || !page_count(pfn_to_page(pfn)))
+ 		return false;
  
- 		return PMD_SIZE;
- 	}
-@@ -955,6 +957,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	short vma_shift;
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
-+	struct page *page;
- 	bool logging_active = memslot_is_logging(memslot);
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
-@@ -1056,8 +1059,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 */
- 	smp_rmb();
- 
--	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, NULL,
--				   write_fault, &writable, NULL);
-+	pfn = __gfn_to_pfn_page_memslot(memslot, gfn, false, NULL,
-+					write_fault, &writable, NULL, &page);
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
- 		kvm_send_hwpoison_signal(hva, vma_shift);
- 		return 0;
-@@ -1102,7 +1105,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			vma_pagesize = fault_granule;
- 		else
- 			vma_pagesize = transparent_hugepage_adjust(kvm, memslot,
--								   hva, &pfn,
-+								   hva,
-+								   &pfn, &page,
- 								   &fault_ipa);
- 	}
- 
-@@ -1142,14 +1146,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
- 	if (writable && !ret) {
--		kvm_set_pfn_dirty(pfn);
-+		if (page)
-+			kvm_set_pfn_dirty(pfn);
- 		mark_page_dirty_in_slot(kvm, memslot, gfn);
- 	}
- 
- out_unlock:
- 	spin_unlock(&kvm->mmu_lock);
--	kvm_set_pfn_accessed(pfn);
--	kvm_release_pfn_clean(pfn);
-+	if (page) {
-+		kvm_set_pfn_accessed(pfn);
-+		put_page(page);
-+	}
- 	return ret != -EAGAIN ? ret : 0;
- }
- 
+ 	return is_zone_device_page(pfn_to_page(pfn));
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
