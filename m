@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D62F9C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C4EC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9161F4B149;
-	Mon, 29 Nov 2021 15:06:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89AB94B0AC;
+	Mon, 29 Nov 2021 15:06:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1rsAbIG35-+c; Mon, 29 Nov 2021 15:06:35 -0500 (EST)
+	with ESMTP id wIWKSHeV3X0L; Mon, 29 Nov 2021 15:06:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71A084B173;
-	Mon, 29 Nov 2021 15:06:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9526E4B177;
+	Mon, 29 Nov 2021 15:06:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 245A94B0D6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF53C4B149
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6jl1FmrZZd12 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Nov 2021 15:06:30 -0500 (EST)
+ with ESMTP id Fh16KDwcAh4G for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Nov 2021 15:06:35 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 87B914B0AC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CCB04B15A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:34 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id A1E03B815E0;
- Mon, 29 Nov 2021 20:06:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 576C4C53FAD;
- Mon, 29 Nov 2021 20:06:27 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 1A8D5B815E6;
+ Mon, 29 Nov 2021 20:06:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE28BC53FCD;
+ Mon, 29 Nov 2021 20:06:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638216387;
- bh=r0zuLK3lw1N9AgFVnRFi6s6vtDbl4C1MSE/bfxIwS0E=;
+ s=k20201202; t=1638216391;
+ bh=HOZdzEjZoeKGETrJPFOERpPygAZITG+WMe69qICsnxY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=gn/YQhouLH6ioc0jJYvye40Yq8u7cd/dCcA5akegBakhVDo69D0S/i5F11tB71wta
- 4TdYNnquMEbQgQlYnrdH2Y8J9WV2qJQ2IIShfju4T/2ztzG44h6okIOgmeHmHhKw4H
- VKqJOvQeaS9Dyuoot0EFOIhb6+dVywmcUOkuKQ3+e223A+Kpbt23768pCTeHSTxcgH
- N61cefzLhB7gZNe5kqsrcDi6j8SBWNT6C9R5zRlxBGBvdo/kV4U5VVoK3yjYz8SkHs
- 2DXdsMmWKYjlPIhgdHoUeNZwF3tL2HzDegCjEGcKxbqsMQQpjlCdqyrAc4Ur3JLhQs
- rFIqae8O7eVbw==
+ b=Ava+keXKw6IIMzpQUO+tL1qONJ2H21WVoLC4+orWHICkvY+0kswSXgLyDPzkNeN6t
+ yTeJqq3pCyICyTur1hzTP/Bk8TmcCC0wUuUKW6DahMdPzgQaFWifPDt0a4ft/+k5VO
+ k77rKHZBJH8NPMVtp0paNX3W73Su5YoO4SMnQTPOJ3N1KEsJ9GYZXWBvuM3zZtFN4X
+ 65fnN+EoXxVPgXyKzMqrgce87NqIw7r1B8hEI9dwb9zA5Tu+8EnR75ztwJmdnTziAp
+ VINw0fzo/NkineRWz9ZprgZmgCUdVj84Tcbd5g+TDEa6/soWD8csP1n+UMc56wQQ3f
+ 530ctogYlo39A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mrmqu-008gvR-A5; Mon, 29 Nov 2021 20:02:16 +0000
+ id 1mrmqy-008gvR-I8; Mon, 29 Nov 2021 20:02:20 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v5 22/69] KVM: arm64: nv: Emulate PSTATE.M for a guest
- hypervisor
-Date: Mon, 29 Nov 2021 20:01:03 +0000
-Message-Id: <20211129200150.351436-23-maz@kernel.org>
+Subject: [PATCH v5 35/69] KVM: arm64: nv: Only toggle cache for virtual EL2
+ when SCTLR_EL2 changes
+Date: Mon, 29 Nov 2021 20:01:16 +0000
+Message-Id: <20211129200150.351436-36-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -88,109 +88,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-We can no longer blindly copy the VCPU's PSTATE into SPSR_EL2 and return
-to the guest and vice versa when taking an exception to the hypervisor,
-because we emulate virtual EL2 in EL1 and therefore have to translate
-the mode field from EL2 to EL1 and vice versa.
+So far we were flushing almost the entire universe whenever a VM would
+load/unload the SCTLR_EL1 and the two versions of that register had
+different MMU enabled settings.  This turned out to be so slow that it
+prevented forward progress for a nested VM, because a scheduler timer
+tick interrupt would always be pending when we reached the nested VM.
 
-This requires keeping track of the state we enter the guest, for which
-we transiently use a dedicated flag.
+To avoid this problem, we consider the SCTLR_EL2 when evaluating if
+caches are on or off when entering virtual EL2 (because this is the
+value that we end up shadowing onto the hardware EL1 register).
 
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h          |  1 +
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 19 ++++++++++++++++-
- arch/arm64/kvm/hyp/vhe/switch.c            | 24 ++++++++++++++++++++++
- 3 files changed, 43 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_mmu.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 7b6fe18ee450..6a7b13edc5cb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -456,6 +456,7 @@ struct kvm_vcpu_arch {
- #define KVM_ARM64_EXCEPT_MASK		(7 << 9) /* Target EL/MODE */
- #define KVM_ARM64_DEBUG_STATE_SAVE_SPE	(1 << 12) /* Save SPE context if active  */
- #define KVM_ARM64_DEBUG_STATE_SAVE_TRBE	(1 << 13) /* Save TRBE context if active  */
-+#define KVM_ARM64_IN_HYP_CONTEXT	(1 << 14) /* Guest running in HYP context */
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 02d378887743..c018c7b40761 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -115,6 +115,7 @@ alternative_cb_end
+ #include <asm/cache.h>
+ #include <asm/cacheflush.h>
+ #include <asm/mmu_context.h>
++#include <asm/kvm_emulate.h>
  
- #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
- 				 KVM_GUESTDBG_USE_SW_BP | \
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 283f780f5f56..e3689c6ce4cc 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -157,9 +157,26 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
- }
+ void kvm_update_va_mask(struct alt_instr *alt,
+ 			__le32 *origptr, __le32 *updptr, int nr_inst);
+@@ -185,7 +186,10 @@ struct kvm;
  
-+/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
-+static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
-+{
-+	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	switch (mode) {
-+	case PSR_MODE_EL2t:
-+		mode = PSR_MODE_EL1t;
-+		break;
-+	case PSR_MODE_EL2h:
-+		mode = PSR_MODE_EL1h;
-+		break;
-+	}
-+
-+	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-+}
-+
- static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+ static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
  {
--	u64 pstate = ctxt->regs.pstate;
-+	u64 pstate = to_hw_pstate(ctxt);
- 	u64 mode = pstate & PSR_AA32_MODE_MASK;
- 
- 	/*
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index fbb26b93c347..9d5572ceb001 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -114,6 +114,25 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
- 
- static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
-+	/*
-+	 * If we were in HYP context on entry, adjust the PSTATE view
-+	 * so that the usual helpers work correctly.
-+	 */
-+	if (unlikely(vcpu->arch.flags & KVM_ARM64_IN_HYP_CONTEXT)) {
-+		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+		switch (mode) {
-+		case PSR_MODE_EL1t:
-+			mode = PSR_MODE_EL2t;
-+			break;
-+		case PSR_MODE_EL1h:
-+			mode = PSR_MODE_EL2h;
-+			break;
-+		}
-+
-+		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
-+		*vcpu_cpsr(vcpu) |= mode;
-+	}
- }
- 
- /* Switch to the guest for VHE systems running in EL2 */
-@@ -148,6 +167,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
- 	sysreg_restore_guest_state_vhe(guest_ctxt);
- 	__debug_switch_to_guest(vcpu);
- 
-+	if (is_hyp_ctxt(vcpu))
-+		vcpu->arch.flags |= KVM_ARM64_IN_HYP_CONTEXT;
+-	return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
++	if (vcpu_mode_el2(vcpu))
++		return (__vcpu_sys_reg(vcpu, SCTLR_EL2) & 0b101) == 0b101;
 +	else
-+		vcpu->arch.flags &= ~KVM_ARM64_IN_HYP_CONTEXT;
-+
- 	do {
- 		/* Jump in the fire! */
- 		exit_code = __guest_enter(vcpu);
++		return (vcpu_read_sys_reg(vcpu, SCTLR_EL1) & 0b101) == 0b101;
+ }
+ 
+ static inline void __clean_dcache_guest_page(void *va, size_t size)
 -- 
 2.30.2
 
