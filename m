@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF91FC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D794C433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:02:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41C704B0DB;
-	Mon, 29 Nov 2021 15:02:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C6E5F4B0AC;
+	Mon, 29 Nov 2021 15:02:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CUv+DkAtm-wq; Mon, 29 Nov 2021 15:02:17 -0500 (EST)
+	with ESMTP id ked5oUeVj7cf; Mon, 29 Nov 2021 15:02:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0767B4B0DD;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 297E34B0FC;
 	Mon, 29 Nov 2021 15:02:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C815D4B0BF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:02:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02E9C4B0A3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:02:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G2C8OfhEBHLb for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id NTa35ayL9IyZ for <kvmarm@lists.cs.columbia.edu>;
  Mon, 29 Nov 2021 15:02:14 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 695024B0A3
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A9754B0B3
  for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:02:14 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 2A9C9B815D2;
- Mon, 29 Nov 2021 20:02:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9AFBC53FCF;
+ by ams.source.kernel.org (Postfix) with ESMTPS id DD499B815C5;
+ Mon, 29 Nov 2021 20:02:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 989C2C53FCD;
  Mon, 29 Nov 2021 20:02:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1638216131;
- bh=JIlqAddKl/85lpIm3FWWCZ7fbOCEiWhQkqCIpNen/Oo=;
+ bh=m3jPFU3mjJWLueVcfv+mJbvgBUGfUsTVQ0Ctnxxc81o=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=uKxRWBZJtPq2mZZ7uVYc9BHyGwFM+Ms9WGiTI6X+o1PyFZuKEM7EOcPRpoGYrZMXI
- hGM0gaXx+DI+R7M4kHe4k8jamiJW3CIPx/E547crz5BcBbRXTJWsxQLUbM84V1LweL
- +G0y21TZBbM5qxOP3ltoq7t+kybNiduAEwQ9zlYMeA9a3ORuZWp6rhzyfoUm5vomLC
- cRO4e0G+lsFAGsK4gYVHlyzvBNruz4fVoJ8ZGAl6sy+1YrOW7rg4GysCKWW32CUB0i
- A2tA1dYznbyRPePw435Eeg/a55ldEr9Ym9N08fTUJHoQOoOtq7oVoler4/CJ2NtkUA
- kzhasaUXuYyeg==
+ b=pVxsnTUTo9ugk+jioqIluBvc9s7QseHN6CQBngnPBKPXBSEbPLirUB4bP1o0CSGM7
+ Y95rjgy/qM+sDotJrmbzrZY3u2MsPAbybgVytHkobcNIa08arh5JqRojtdC17nyet2
+ t0oN3kW715np5GSJhaQBp3yn/Y1tnT6OZzk5kE33cN3wrWvqKZekr/v6c8Sv5I3CIQ
+ O5nNS4FtST93h8XmPKJMwImHpcJLQUCNXDChE0mi6Yr7h/GRIHyuZWlzRILyKtHxYQ
+ 4lwuq6a3RkEfMh96f/hSqBFr1zibxVUbKqvdYxr2jmavCwLlt8Rupd1xzI78DS/Y23
+ L8toxb4LLEBBg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mrmqo-008gvR-2h; Mon, 29 Nov 2021 20:02:10 +0000
+ id 1mrmqn-008gvR-Ns; Mon, 29 Nov 2021 20:02:09 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v5 03/69] KVM: arm64: Add minimal handling for the ARMv8.7 PMU
-Date: Mon, 29 Nov 2021 20:00:44 +0000
-Message-Id: <20211129200150.351436-4-maz@kernel.org>
+Subject: [PATCH v5 02/69] KVM: arm64: Move pkvm's special 32bit handling into
+ a generic infrastructure
+Date: Mon, 29 Nov 2021 20:00:43 +0000
+Message-Id: <20211129200150.351436-3-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -87,45 +88,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When running a KVM guest hosted on an ARMv8.7 machine, the host
-kernel complains that it doesn't know about the architected number
-of events.
+Protected KVM is trying to turn AArch32 exceptions into an illegal
+exception entry. Unfortunately, it does that in a way that is a bit
+abrupt, and too early for PSTATE to be available.
 
-Fix it by adding the PMUver code corresponding to PMUv3 for ARMv8.7.
+Instead, move it to the fixup code, which is a more reasonable place
+for it. This will also be useful for the NV code.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20211126115533.217903-1-maz@kernel.org
 ---
- arch/arm64/include/asm/sysreg.h | 1 +
- arch/arm64/kvm/pmu-emul.c       | 1 +
- 2 files changed, 2 insertions(+)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 8 ++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c        | 8 +-------
+ arch/arm64/kvm/hyp/vhe/switch.c         | 4 ++++
+ 3 files changed, 13 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 16b3f1a1d468..615dd6278f8b 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -937,6 +937,7 @@
- #define ID_AA64DFR0_PMUVER_8_1		0x4
- #define ID_AA64DFR0_PMUVER_8_4		0x5
- #define ID_AA64DFR0_PMUVER_8_5		0x6
-+#define ID_AA64DFR0_PMUVER_8_7		0x7
- #define ID_AA64DFR0_PMUVER_IMP_DEF	0xf
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index d79fd101615f..96c5f3fb7838 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -403,6 +403,8 @@ typedef bool (*exit_handler_fn)(struct kvm_vcpu *, u64 *);
  
- #define ID_AA64DFR0_PMSVER_8_2		0x1
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index a5e4bbf5e68f..ca92cc5c71c6 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -28,6 +28,7 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
- 	case ID_AA64DFR0_PMUVER_8_1:
- 	case ID_AA64DFR0_PMUVER_8_4:
- 	case ID_AA64DFR0_PMUVER_8_5:
-+	case ID_AA64DFR0_PMUVER_8_7:
- 		return GENMASK(15, 0);
- 	default:		/* Shouldn't be here, just for sanity */
- 		WARN_ONCE(1, "Unknown PMU version %d\n", kvm->arch.pmuver);
+ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu);
+ 
++static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code);
++
+ /*
+  * Allow the hypervisor to handle the exit with an exit handler if it has one.
+  *
+@@ -435,6 +437,12 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 */
+ 	vcpu->arch.ctxt.regs.pstate = read_sysreg_el2(SYS_SPSR);
+ 
++	/*
++	 * Check whether we want to repaint the state one way or
++	 * another.
++	 */
++	early_exit_filter(vcpu, exit_code);
++
+ 	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+ 		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
+ 
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index c0e3fed26d93..d13115a12434 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -233,7 +233,7 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
+  * Returns false if the guest ran in AArch32 when it shouldn't have, and
+  * thus should exit to the host, or true if a the guest run loop can continue.
+  */
+-static bool handle_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
++static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
+ 	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+ 
+@@ -248,10 +248,7 @@ static bool handle_aarch32_guest(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		vcpu->arch.target = -1;
+ 		*exit_code &= BIT(ARM_EXIT_WITH_SERROR_BIT);
+ 		*exit_code |= ARM_EXCEPTION_IL;
+-		return false;
+ 	}
+-
+-	return true;
+ }
+ 
+ /* Switch to the guest for legacy non-VHE systems */
+@@ -316,9 +313,6 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
+ 
+-		if (unlikely(!handle_aarch32_guest(vcpu, &exit_code)))
+-			break;
+-
+ 		/* And we're baaack! */
+ 	} while (fixup_guest_exit(vcpu, &exit_code));
+ 
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 5a2cb5d9bc4b..fbb26b93c347 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -112,6 +112,10 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
+ 	return hyp_exit_handlers;
+ }
+ 
++static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++}
++
+ /* Switch to the guest for VHE systems running in EL2 */
+ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ {
 -- 
 2.30.2
 
