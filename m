@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C13E5C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F93C433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B86E4B129;
-	Mon, 29 Nov 2021 15:06:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E7834B0DD;
+	Mon, 29 Nov 2021 15:06:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IgaEJGKTjOJQ; Mon, 29 Nov 2021 15:06:10 -0500 (EST)
+	with ESMTP id 7IX+Fv5ThGWG; Mon, 29 Nov 2021 15:06:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A9EC4B0F5;
-	Mon, 29 Nov 2021 15:06:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57B094B0B4;
+	Mon, 29 Nov 2021 15:06:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 799FC49E57
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C8B449E57
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0sU8WQVPtAYV for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Nov 2021 15:06:07 -0500 (EST)
+ with ESMTP id ZKfXWMETxQrf for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Nov 2021 15:06:08 -0500 (EST)
 Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CAAD549F8F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E9694B105
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:08 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 22A84CE13DE;
- Mon, 29 Nov 2021 20:06:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35BDEC53FCF;
- Mon, 29 Nov 2021 20:05:58 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id D84E3CE13D8;
+ Mon, 29 Nov 2021 20:06:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D4CEC53FAD;
+ Mon, 29 Nov 2021 20:06:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638216358;
- bh=kF1ZILcXVrn3bd3UFJOtJ+0jVXpzh/pOYlqmtkgNu9k=;
+ s=k20201202; t=1638216364;
+ bh=w8pDdRJcrwVDDb0ewTMpJ1QlCAiVNFEIVQTNnE1IWTc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=b6vFfZjlY4x8ixasujWNjpSGRqR52lKqGqzNlMXIkToQZx2QXWdBR83/NtgvTqLfT
- 12iAAEDuOLuH+rL8vGBfJlTSVuaLOtHUG1hm4Y9LPiCZRzvfVGJD2YD/G0jtz63lDn
- hBCx7QmeBq7xRPBbBIWjW/iP+NeFT96WfL+uN8omDSaIYIcF7UPgJY5fMtfWYhm/CM
- 0JkIJ97iQgaxiqraW23+Yu+OtmseC/G3bbAoicSsHq2tUd018tKm65B5+KEGJl4Lz5
- fdVeprxHzEkldCpr73CTt2zpKGbSRMH1bFh3GCEWV/L3Hu0j4p6jJcVVs81K8hrnUY
- Vf+7/AV5JEKsA==
+ b=EqiG/jKUsdCS5u1CWRDR45FMRsdpYaKxSC3SuLbEhARISuUXRIHK441T/lUVkEDch
+ 7a5pg6R+ZXPzQ3eQ/AL/OmM8YeRk+OkC2n8HAsljIco9DcBzC+v+kEIKAiLxDcBLhR
+ ApD0psLeteODfYwvD+W4EI+Vr8en2MJ1TVk8lhtcjw22P3dr3N/JOU/w4igPeUXKNB
+ FK8TcWSp8WQWzARlzwXVZawUA9yXqZoOeJVJjmdyl4qdyqgfjSPrYdyhQaw2hJm91Y
+ jtH1jRdDHrf906kU02/ax83HJsxW73SMxfL7nUhLomDk6At6970EiYNCaLsc2ml4HV
+ DX77+bloMiZ9Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mrmqz-008gvR-HR; Mon, 29 Nov 2021 20:02:21 +0000
+ id 1mrmqz-008gvR-T5; Mon, 29 Nov 2021 20:02:22 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v5 38/69] KVM: arm64: nv: Support multiple nested Stage-2 mmu
- structures
-Date: Mon, 29 Nov 2021 20:01:19 +0000
-Message-Id: <20211129200150.351436-39-maz@kernel.org>
+Subject: [PATCH v5 39/69] KVM: arm64: nv: Implement nested Stage-2 page table
+ walk logic
+Date: Mon, 29 Nov 2021 20:01:20 +0000
+Message-Id: <20211129200150.351436-40-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -88,483 +88,349 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add Stage-2 mmu data structures for virtual EL2 and for nested guests.
-We don't yet populate shadow Stage-2 page tables, but we now have a
-framework for getting to a shadow Stage-2 pgd.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-We allocate twice the number of vcpus as Stage-2 mmu structures because
-that's sufficient for each vcpu running two translation regimes without
-having to flush the Stage-2 page tables.
+Based on the pseudo-code in the ARM ARM, implement a stage 2 software
+page table walker.
 
-Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[maz: heavily reworked for future ARMv8.4-TTL support]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_host.h   |  29 +++++
- arch/arm64/include/asm/kvm_mmu.h    |   9 ++
- arch/arm64/include/asm/kvm_nested.h |   7 +
- arch/arm64/kvm/arm.c                |  16 ++-
- arch/arm64/kvm/mmu.c                |  29 +++--
- arch/arm64/kvm/nested.c             | 195 ++++++++++++++++++++++++++++
- 6 files changed, 275 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/esr.h        |   1 +
+ arch/arm64/include/asm/kvm_arm.h    |   2 +
+ arch/arm64/include/asm/kvm_nested.h |  13 ++
+ arch/arm64/kvm/nested.c             | 267 ++++++++++++++++++++++++++++
+ 4 files changed, 283 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6a7b13edc5cb..00c3366129b8 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -102,14 +102,43 @@ struct kvm_s2_mmu {
- 	int __percpu *last_vcpu_ran;
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 6835e4231119..206bfb701791 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -130,6 +130,7 @@
+ #define ESR_ELx_CM 		(UL(1) << ESR_ELx_CM_SHIFT)
  
- 	struct kvm_arch *arch;
-+
-+	/*
-+	 * For a shadow stage-2 MMU, the virtual vttbr programmed by the guest
-+	 * hypervisor.  Unused for kvm_arch->mmu. Set to 1 when the structure
-+	 * contains no valid information.
-+	 */
-+	u64	vttbr;
-+
-+	/* true when this represents a nested context where virtual HCR_EL2.VM == 1 */
-+	bool	nested_stage2_enabled;
-+
-+	/*
-+	 *  0: Nobody is currently using this, check vttbr for validity
-+	 * >0: Somebody is actively using this.
-+	 */
-+	atomic_t refcnt;
- };
+ /* ISS field definitions for exceptions taken in to Hyp */
++#define ESR_ELx_FSC_ADDRSZ	(0x00)
+ #define ESR_ELx_CV		(UL(1) << 24)
+ #define ESR_ELx_COND_SHIFT	(20)
+ #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index b8a0d410035b..12f4bc8a805b 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -272,6 +272,8 @@
+ #define VTTBR_VMID_SHIFT  (UL(48))
+ #define VTTBR_VMID_MASK(size) (_AT(u64, (1 << size) - 1) << VTTBR_VMID_SHIFT)
  
-+static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
-+{
-+	return !(mmu->vttbr & 1);
-+}
++#define SCTLR_EE	(UL(1) << 25)
 +
- struct kvm_arch_memory_slot {
- };
+ /* Hyp System Trap Register */
+ #define HSTR_EL2_T(x)	(1 << x)
  
- struct kvm_arch {
- 	struct kvm_s2_mmu mmu;
- 
-+	/*
-+	 * Stage 2 paging stage for VMs with nested virtual using a virtual
-+	 * VMID.
-+	 */
-+	struct kvm_s2_mmu *nested_mmus;
-+	size_t nested_mmus_size;
-+	int nested_mmus_next;
-+
- 	/* VTCR_EL2 value for this VM */
- 	u64    vtcr;
- 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index c018c7b40761..7250594e3d68 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -116,6 +116,7 @@ alternative_cb_end
- #include <asm/cacheflush.h>
- #include <asm/mmu_context.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_nested.h>
- 
- void kvm_update_va_mask(struct alt_instr *alt,
- 			__le32 *origptr, __le32 *updptr, int nr_inst);
-@@ -159,6 +160,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
- 			     void **haddr);
- void free_hyp_pgds(void);
- 
-+void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
- void stage2_unmap_vm(struct kvm *kvm);
- int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
- void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
-@@ -294,5 +296,12 @@ static inline struct kvm *kvm_s2_mmu_to_kvm(struct kvm_s2_mmu *mmu)
- {
- 	return container_of(mmu->arch, struct kvm, arch);
- }
-+
-+static inline u64 get_vmid(u64 vttbr)
-+{
-+	return (vttbr & VTTBR_VMID_MASK(kvm_get_vmid_bits())) >>
-+		VTTBR_VMID_SHIFT;
-+}
-+
- #endif /* __ASSEMBLY__ */
- #endif /* __ARM64_KVM_MMU_H__ */
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 026ddaad972c..473ecd1d60d0 100644
+index 473ecd1d60d0..b784d7891851 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -61,6 +61,13 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
- 		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
- }
+@@ -68,6 +68,19 @@ extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
+ extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
+ extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
  
-+extern void kvm_init_nested(struct kvm *kvm);
-+extern int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu);
-+extern void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu);
-+extern struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr);
-+extern void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu);
-+extern void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu);
++struct kvm_s2_trans {
++	phys_addr_t output;
++	unsigned long block_size;
++	bool writable;
++	bool readable;
++	int level;
++	u32 esr;
++	u64 upper_attr;
++};
++
++extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
++			      struct kvm_s2_trans *result);
 +
  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
  extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
  			    u64 control_bit);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 68da54d58cd0..1dbf63319b99 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -37,6 +37,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_asm.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/kvm_emulate.h>
- #include <asm/sections.h>
- 
-@@ -146,6 +147,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (ret)
- 		return ret;
- 
-+	kvm_init_nested(kvm);
-+
- 	ret = create_hyp_mappings(kvm, kvm + 1, PAGE_HYP);
- 	if (ret)
- 		goto out_free_stage2_pgd;
-@@ -389,6 +392,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	struct kvm_s2_mmu *mmu;
- 	int *last_ran;
- 
-+	if (nested_virt_in_use(vcpu))
-+		kvm_vcpu_load_hw_mmu(vcpu);
-+
- 	mmu = vcpu->arch.hw_mmu;
- 	last_ran = this_cpu_ptr(mmu->last_vcpu_ran);
- 
-@@ -437,6 +443,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	kvm_vgic_put(vcpu);
- 	kvm_vcpu_pmu_restore_host(vcpu);
- 
-+	if (nested_virt_in_use(vcpu))
-+		kvm_vcpu_put_hw_mmu(vcpu);
-+
- 	vcpu->cpu = -1;
- }
- 
-@@ -1088,8 +1097,13 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 
- 	vcpu->arch.target = phys_target;
- 
-+	/* Prepare for nested if required */
-+	ret = kvm_vcpu_init_nested(vcpu);
-+
- 	/* Now we know what it is, we can reset it. */
--	ret = kvm_reset_vcpu(vcpu);
-+	if (!ret)
-+		ret = kvm_reset_vcpu(vcpu);
-+
- 	if (ret) {
- 		vcpu->arch.target = -1;
- 		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 9eec548fccd1..ab1653b8e601 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -162,7 +162,7 @@ static void invalidate_icache_guest_page(void *va, size_t size)
-  * does.
-  */
- /**
-- * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
-+ * __unmap_stage2_range -- Clear stage2 page table entries to unmap a range
-  * @mmu:   The KVM stage-2 MMU pointer
-  * @start: The intermediate physical base address of the range to unmap
-  * @size:  The size of the area to unmap
-@@ -185,7 +185,7 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
- 				   may_block));
- }
- 
--static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
-+void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
- {
- 	__unmap_stage2_range(mmu, start, size, true);
- }
-@@ -507,7 +507,20 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	int cpu, err;
- 	struct kvm_pgtable *pgt;
- 
-+	/*
-+	 * If we already have our page tables in place, and that the
-+	 * MMU context is the canonical one, we have a bug somewhere,
-+	 * as this is only supposed to ever happen once per VM.
-+	 *
-+	 * Otherwise, we're building nested page tables, and that's
-+	 * probably because userspace called KVM_ARM_VCPU_INIT more
-+	 * than once on the same vcpu. Since that's actually legal,
-+	 * don't kick a fuss and leave gracefully.
-+	 */
- 	if (mmu->pgt != NULL) {
-+		if (&kvm->arch.mmu != mmu)
-+			return 0;
-+
- 		kvm_err("kvm_arch already initialized?\n");
- 		return -EINVAL;
- 	}
-@@ -533,6 +546,9 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
- 	mmu->pgt = pgt;
- 	mmu->pgd_phys = __pa(pgt->pgd);
- 	WRITE_ONCE(mmu->vmid.vmid_gen, 0);
-+
-+	kvm_init_nested_s2_mmu(mmu);
-+
- 	return 0;
- 
- out_destroy_pgtable:
-@@ -578,7 +594,7 @@ static void stage2_unmap_memslot(struct kvm *kvm,
- 
- 		if (!(vma->vm_flags & VM_PFNMAP)) {
- 			gpa_t gpa = addr + (vm_start - memslot->userspace_addr);
--			unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
-+			kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
- 		}
- 		hva = vm_end;
- 	} while (hva < reg_end);
-@@ -1556,11 +1572,6 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
- {
- }
- 
--void kvm_arch_flush_shadow_all(struct kvm *kvm)
--{
--	kvm_free_stage2_pgd(&kvm->arch.mmu);
--}
--
- void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot)
- {
-@@ -1568,7 +1579,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 	phys_addr_t size = slot->npages << PAGE_SHIFT;
- 
- 	spin_lock(&kvm->mmu_lock);
--	unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-+	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
- 	spin_unlock(&kvm->mmu_lock);
- }
- 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 19b674983e13..b034a2343374 100644
+index b034a2343374..01c5ee5f3545 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -19,12 +19,189 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
+@@ -87,6 +87,273 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+ 	return ret;
+ }
  
-+#include <asm/kvm_arm.h>
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_mmu.h>
- #include <asm/kvm_nested.h>
- #include <asm/sysreg.h>
- 
- #include "sys_regs.h"
- 
-+void kvm_init_nested(struct kvm *kvm)
++struct s2_walk_info {
++	int	     (*read_desc)(phys_addr_t pa, u64 *desc, void *data);
++	void	     *data;
++	u64	     baddr;
++	unsigned int max_pa_bits;
++	unsigned int pgshift;
++	unsigned int pgsize;
++	unsigned int ps;
++	unsigned int sl;
++	unsigned int t0sz;
++	bool	     be;
++	bool	     el1_aarch32;
++};
++
++static unsigned int ps_to_output_size(unsigned int ps)
 +{
-+	kvm->arch.nested_mmus = NULL;
-+	kvm->arch.nested_mmus_size = 0;
++	switch (ps) {
++	case 0: return 32;
++	case 1: return 36;
++	case 2: return 40;
++	case 3: return 42;
++	case 4: return 44;
++	case 5:
++	default:
++		return 48;
++	}
 +}
 +
-+int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
++static u32 compute_fsc(int level, u32 fsc)
 +{
-+	struct kvm *kvm = vcpu->kvm;
-+	struct kvm_s2_mmu *tmp;
-+	int num_mmus;
-+	int ret = -ENOMEM;
++	return fsc | (level & 0x3);
++}
 +
-+	if (!test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features))
-+		return 0;
++static int check_base_s2_limits(struct s2_walk_info *wi,
++				int level, int input_size, int stride)
++{
++	int start_size;
 +
-+	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-+		return -EINVAL;
-+
-+	mutex_lock(&kvm->lock);
-+
-+	/*
-+	 * Let's treat memory allocation failures as benign: If we fail to
-+	 * allocate anything, return an error and keep the allocated array
-+	 * alive. Userspace may try to recover by intializing the vcpu
-+	 * again, and there is no reason to affect the whole VM for this.
-+	 */
-+	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
-+	tmp = krealloc(kvm->arch.nested_mmus,
-+		       num_mmus * sizeof(*kvm->arch.nested_mmus),
-+		       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+	if (tmp) {
-+		/*
-+		 * If we went through a realocation, adjust the MMU
-+		 * back-pointers in the previously initialised
-+		 * pg_table structures.
-+		 */
-+		if (kvm->arch.nested_mmus != tmp) {
-+			int i;
-+
-+			for (i = 0; i < num_mmus - 2; i++)
-+				tmp[i].pgt->mmu = &tmp[i];
-+		}
-+
-+		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
-+		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
-+			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
-+			kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
-+		} else {
-+			kvm->arch.nested_mmus_size = num_mmus;
-+			ret = 0;
-+		}
-+
-+		kvm->arch.nested_mmus = tmp;
++	/* Check translation limits */
++	switch (wi->pgsize) {
++	case SZ_64K:
++		if (level == 0 || (level == 1 && wi->max_pa_bits <= 42))
++			return -EFAULT;
++		break;
++	case SZ_16K:
++		if (level == 0 || (level == 1 && wi->max_pa_bits <= 40))
++			return -EFAULT;
++		break;
++	case SZ_4K:
++		if (level < 0 || (level == 0 && wi->max_pa_bits <= 42))
++			return -EFAULT;
++		break;
 +	}
 +
-+	mutex_unlock(&kvm->lock);
++	/* Check input size limits */
++	if (input_size > wi->max_pa_bits &&
++	    (!wi->el1_aarch32 || input_size > 40))
++		return -EFAULT;
++
++	/* Check number of entries in starting level table */
++	start_size = input_size - ((3 - level) * stride + wi->pgshift);
++	if (start_size < 1 || start_size > stride + 4)
++		return -EFAULT;
++
++	return 0;
++}
++
++/* Check if output is within boundaries */
++static int check_output_size(struct s2_walk_info *wi, phys_addr_t output)
++{
++	unsigned int output_size = ps_to_output_size(wi->ps);
++
++	if (output_size > wi->max_pa_bits)
++		output_size = wi->max_pa_bits;
++
++	if (output_size != 48 && (output & GENMASK_ULL(47, output_size)))
++		return -1;
++
++	return 0;
++}
++
++/*
++ * This is essentially a C-version of the pseudo code from the ARM ARM
++ * AArch64.TranslationTableWalk  function.  I strongly recommend looking at
++ * that pseudocode in trying to understand this.
++ *
++ * Must be called with the kvm->srcu read lock held
++ */
++static int walk_nested_s2_pgd(phys_addr_t ipa,
++			      struct s2_walk_info *wi, struct kvm_s2_trans *out)
++{
++	int first_block_level, level, stride, input_size, base_lower_bound;
++	phys_addr_t base_addr;
++	unsigned int addr_top, addr_bottom;
++	u64 desc;  /* page table entry */
++	int ret;
++	phys_addr_t paddr;
++
++	switch (wi->pgsize) {
++	case SZ_64K:
++	case SZ_16K:
++		level = 3 - wi->sl;
++		first_block_level = 2;
++		break;
++	case SZ_4K:
++		level = 2 - wi->sl;
++		first_block_level = 1;
++		break;
++	default:
++		/* GCC is braindead */
++		unreachable();
++	}
++
++	stride = wi->pgshift - 3;
++	input_size = 64 - wi->t0sz;
++	if (input_size > 48 || input_size < 25)
++		return -EFAULT;
++
++	ret = check_base_s2_limits(wi, level, input_size, stride);
++	if (WARN_ON(ret))
++		return ret;
++
++	base_lower_bound = 3 + input_size - ((3 - level) * stride +
++			   wi->pgshift);
++	base_addr = wi->baddr & GENMASK_ULL(47, base_lower_bound);
++
++	if (check_output_size(wi, base_addr)) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++		return 1;
++	}
++
++	addr_top = input_size - 1;
++
++	while (1) {
++		phys_addr_t index;
++
++		addr_bottom = (3 - level) * stride + wi->pgshift;
++		index = (ipa & GENMASK_ULL(addr_top, addr_bottom))
++			>> (addr_bottom - 3);
++
++		paddr = base_addr | index;
++		ret = wi->read_desc(paddr, &desc, wi->data);
++		if (ret < 0)
++			return ret;
++
++		/*
++		 * Handle reversedescriptors if endianness differs between the
++		 * host and the guest hypervisor.
++		 */
++		if (wi->be)
++			desc = be64_to_cpu(desc);
++		else
++			desc = le64_to_cpu(desc);
++
++		/* Check for valid descriptor at this point */
++		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
++			out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
++			out->upper_attr = desc;
++			return 1;
++		}
++
++		/* We're at the final level or block translation level */
++		if ((desc & 3) == 1 || level == 3)
++			break;
++
++		if (check_output_size(wi, desc)) {
++			out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++			out->upper_attr = desc;
++			return 1;
++		}
++
++		base_addr = desc & GENMASK_ULL(47, wi->pgshift);
++
++		level += 1;
++		addr_top = addr_bottom - 1;
++	}
++
++	if (level < first_block_level) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
++		out->upper_attr = desc;
++		return 1;
++	}
++
++	/*
++	 * We don't use the contiguous bit in the stage-2 ptes, so skip check
++	 * for misprogramming of the contiguous bit.
++	 */
++
++	if (check_output_size(wi, desc)) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
++		out->upper_attr = desc;
++		return 1;
++	}
++
++	if (!(desc & BIT(10))) {
++		out->esr = compute_fsc(level, ESR_ELx_FSC_ACCESS);
++		out->upper_attr = desc;
++		return 1;
++	}
++
++	/* Calculate and return the result */
++	paddr = (desc & GENMASK_ULL(47, addr_bottom)) |
++		(ipa & GENMASK_ULL(addr_bottom - 1, 0));
++	out->output = paddr;
++	out->block_size = 1UL << ((3 - level) * stride + wi->pgshift);
++	out->readable = desc & (0b01 << 6);
++	out->writable = desc & (0b10 << 6);
++	out->level = level;
++	out->upper_attr = desc & GENMASK_ULL(63, 52);
++	return 0;
++}
++
++static int read_guest_s2_desc(phys_addr_t pa, u64 *desc, void *data)
++{
++	struct kvm_vcpu *vcpu = data;
++
++	return kvm_read_guest(vcpu->kvm, pa, desc, sizeof(*desc));
++}
++
++static void vtcr_to_walk_info(u64 vtcr, struct s2_walk_info *wi)
++{
++	wi->t0sz = vtcr & TCR_EL2_T0SZ_MASK;
++
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		wi->pgshift = 12;	 break;
++	case VTCR_EL2_TG0_16K:
++		wi->pgshift = 14;	 break;
++	case VTCR_EL2_TG0_64K:
++	default:
++		wi->pgshift = 16;	 break;
++	}
++
++	wi->pgsize = 1UL << wi->pgshift;
++	wi->ps = (vtcr & VTCR_EL2_PS_MASK) >> VTCR_EL2_PS_SHIFT;
++	wi->sl = (vtcr & VTCR_EL2_SL0_MASK) >> VTCR_EL2_SL0_SHIFT;
++	wi->max_pa_bits = VTCR_EL2_IPA(vtcr);
++}
++
++int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
++		       struct kvm_s2_trans *result)
++{
++	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
++	struct s2_walk_info wi;
++	int ret;
++
++	result->esr = 0;
++
++	if (!nested_virt_in_use(vcpu))
++		return 0;
++
++	wi.read_desc = read_guest_s2_desc;
++	wi.data = vcpu;
++	wi.baddr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
++
++	vtcr_to_walk_info(vtcr, &wi);
++
++	wi.be = vcpu_read_sys_reg(vcpu, SCTLR_EL2) & SCTLR_EE;
++	wi.el1_aarch32 = vcpu_mode_is_32bit(vcpu);
++
++	ret = walk_nested_s2_pgd(gipa, &wi, result);
++	if (ret)
++		result->esr |= (kvm_vcpu_get_esr(vcpu) & ~ESR_ELx_FSC);
++
 +	return ret;
 +}
 +
-+/* Must be called with kvm->lock held */
-+struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
-+{
-+	bool nested_stage2_enabled = hcr & HCR_VM;
-+	int i;
-+
-+	/* Don't consider the CnP bit for the vttbr match */
-+	vttbr = vttbr & ~VTTBR_CNP_BIT;
-+
-+	/*
-+	 * Two possibilities when looking up a S2 MMU context:
-+	 *
-+	 * - either S2 is enabled in the guest, and we need a context that
-+         *   is S2-enabled and matches the full VTTBR (VMID+BADDR), which
-+         *   makes it safe from a TLB conflict perspective (a broken guest
-+         *   won't be able to generate them),
-+	 *
-+	 * - or S2 is disabled, and we need a context that is S2-disabled
-+         *   and matches the VMID only, as all TLBs are tagged by VMID even
-+         *   if S2 translation is enabled.
-+	 */
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (!kvm_s2_mmu_valid(mmu))
-+			continue;
-+
-+		if (nested_stage2_enabled &&
-+		    mmu->nested_stage2_enabled &&
-+		    vttbr == mmu->vttbr)
-+			return mmu;
-+
-+		if (!nested_stage2_enabled &&
-+		    !mmu->nested_stage2_enabled &&
-+		    get_vmid(vttbr) == get_vmid(mmu->vttbr))
-+			return mmu;
-+	}
-+	return NULL;
-+}
-+
-+static struct kvm_s2_mmu *get_s2_mmu_nested(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	u64 hcr= vcpu_read_sys_reg(vcpu, HCR_EL2);
-+	struct kvm_s2_mmu *s2_mmu;
-+	int i;
-+
-+	s2_mmu = lookup_s2_mmu(kvm, vttbr, hcr);
-+	if (s2_mmu)
-+		goto out;
-+
-+	/*
-+	 * Make sure we don't always search from the same point, or we
-+	 * will always reuse a potentially active context, leaving
-+	 * free contexts unused.
-+	 */
-+	for (i = kvm->arch.nested_mmus_next;
-+	     i < (kvm->arch.nested_mmus_size + kvm->arch.nested_mmus_next);
-+	     i++) {
-+		s2_mmu = &kvm->arch.nested_mmus[i % kvm->arch.nested_mmus_size];
-+
-+		if (atomic_read(&s2_mmu->refcnt) == 0)
-+			break;
-+	}
-+	BUG_ON(atomic_read(&s2_mmu->refcnt)); /* We have struct MMUs to spare */
-+
-+	/* Set the scene for the next search */
-+	kvm->arch.nested_mmus_next = (i + 1) % kvm->arch.nested_mmus_size;
-+
-+	if (kvm_s2_mmu_valid(s2_mmu)) {
-+		/* Clear the old state */
-+		kvm_unmap_stage2_range(s2_mmu, 0, kvm_phys_size(kvm));
-+		if (s2_mmu->vmid.vmid_gen)
-+			kvm_call_hyp(__kvm_tlb_flush_vmid, s2_mmu);
-+	}
-+
-+	/*
-+	 * The virtual VMID (modulo CnP) will be used as a key when matching
-+	 * an existing kvm_s2_mmu.
-+	 */
-+	s2_mmu->vttbr = vttbr & ~VTTBR_CNP_BIT;
-+	s2_mmu->nested_stage2_enabled = hcr & HCR_VM;
-+
-+out:
-+	atomic_inc(&s2_mmu->refcnt);
-+	return s2_mmu;
-+}
-+
-+void kvm_init_nested_s2_mmu(struct kvm_s2_mmu *mmu)
-+{
-+	mmu->vttbr = 1;
-+	mmu->nested_stage2_enabled = false;
-+	atomic_set(&mmu->refcnt, 0);
-+}
-+
-+void kvm_vcpu_load_hw_mmu(struct kvm_vcpu *vcpu)
-+{
-+	if (is_hyp_ctxt(vcpu)) {
-+		vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
-+	} else {
-+		spin_lock(&vcpu->kvm->mmu_lock);
-+		vcpu->arch.hw_mmu = get_s2_mmu_nested(vcpu);
-+		spin_unlock(&vcpu->kvm->mmu_lock);
-+	}
-+}
-+
-+void kvm_vcpu_put_hw_mmu(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu->arch.hw_mmu != &vcpu->kvm->arch.mmu) {
-+		atomic_dec(&vcpu->arch.hw_mmu->refcnt);
-+		vcpu->arch.hw_mmu = NULL;
-+	}
-+}
-+
- /*
-  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
-@@ -43,6 +220,24 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
- 	return -EINVAL;
- }
- 
-+void kvm_arch_flush_shadow_all(struct kvm *kvm)
-+{
-+	int i;
-+
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		WARN_ON(atomic_read(&mmu->refcnt));
-+
-+		if (!atomic_read(&mmu->refcnt))
-+			kvm_free_stage2_pgd(mmu);
-+	}
-+	kfree(kvm->arch.nested_mmus);
-+	kvm->arch.nested_mmus = NULL;
-+	kvm->arch.nested_mmus_size = 0;
-+	kvm_free_stage2_pgd(&kvm->arch.mmu);
-+}
-+
- /*
-  * Our emulated CPU doesn't support all the possible features. For the
-  * sake of simplicity (and probably mental sanity), wipe out a number
+ /* Must be called with kvm->lock held */
+ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+ {
 -- 
 2.30.2
 
