@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 329E8C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D62F9C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E203F4B1A2;
-	Mon, 29 Nov 2021 15:06:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9161F4B149;
+	Mon, 29 Nov 2021 15:06:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zy62rnSURgvI; Mon, 29 Nov 2021 15:06:34 -0500 (EST)
+	with ESMTP id 1rsAbIG35-+c; Mon, 29 Nov 2021 15:06:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D7D24B16F;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71A084B173;
 	Mon, 29 Nov 2021 15:06:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B72004B139
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 245A94B0D6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dXRqpC43LoSE for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 6jl1FmrZZd12 for <kvmarm@lists.cs.columbia.edu>;
  Mon, 29 Nov 2021 15:06:30 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 587464B105
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:28 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 87B914B0AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:29 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 4CF56CE140D;
- Mon, 29 Nov 2021 20:06:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96F66C53FC7;
- Mon, 29 Nov 2021 20:06:24 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A1E03B815E0;
+ Mon, 29 Nov 2021 20:06:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 576C4C53FAD;
+ Mon, 29 Nov 2021 20:06:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638216384;
- bh=hQjYY7dIibxjv8EfQGlPyiMMiLP5soaWxDM3zMZFfu0=;
+ s=k20201202; t=1638216387;
+ bh=r0zuLK3lw1N9AgFVnRFi6s6vtDbl4C1MSE/bfxIwS0E=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=l0bJ9mYp6fYzJKROrE4sSorG38/awt0U0m6AbwzlhTWJtCUU2Rfk5FChhFUdjbXk7
- avdT1DPfCz7WUEvDfxesmId9WC14pE786gCVfiYJAIFYPBO4zRvyAgWV8s00rk6ZsI
- DIpT9EYHSpoWCg55W9kSVmZAj5qUgQSoZuuJ9tXkQHNtc5Kgdg/XfL82V4JpsV598z
- omT0GzedG9Woibkdebcz3WNGbpXX2RZjyceGhOKk9/m8/i8ka/+cNu4mln5JqyunAc
- EY8FcdY2qOCrzs7GLZDmRT78CCXDjVSuStcZvJyu7RsFNL9r7PpTsUPom2GfBZioeg
- zTDOAcxzL3W+g==
+ b=gn/YQhouLH6ioc0jJYvye40Yq8u7cd/dCcA5akegBakhVDo69D0S/i5F11tB71wta
+ 4TdYNnquMEbQgQlYnrdH2Y8J9WV2qJQ2IIShfju4T/2ztzG44h6okIOgmeHmHhKw4H
+ VKqJOvQeaS9Dyuoot0EFOIhb6+dVywmcUOkuKQ3+e223A+Kpbt23768pCTeHSTxcgH
+ N61cefzLhB7gZNe5kqsrcDi6j8SBWNT6C9R5zRlxBGBvdo/kV4U5VVoK3yjYz8SkHs
+ 2DXdsMmWKYjlPIhgdHoUeNZwF3tL2HzDegCjEGcKxbqsMQQpjlCdqyrAc4Ur3JLhQs
+ rFIqae8O7eVbw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mrmrB-008gvR-FG; Mon, 29 Nov 2021 20:02:33 +0000
+ id 1mrmqu-008gvR-A5; Mon, 29 Nov 2021 20:02:16 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v5 53/69] KVM: arm64: nv: vgic: Emulate the HW bit in software
-Date: Mon, 29 Nov 2021 20:01:34 +0000
-Message-Id: <20211129200150.351436-54-maz@kernel.org>
+Subject: [PATCH v5 22/69] KVM: arm64: nv: Emulate PSTATE.M for a guest
+ hypervisor
+Date: Mon, 29 Nov 2021 20:01:03 +0000
+Message-Id: <20211129200150.351436-23-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -89,121 +90,107 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@arm.com>
 
-Should the guest hypervisor use the HW bit in the LRs, we need to
-emulate the deactivation from the L2 guest into the L1 distributor
-emulation, which is handled by L0.
+We can no longer blindly copy the VCPU's PSTATE into SPSR_EL2 and return
+to the guest and vice versa when taking an exception to the hypervisor,
+because we emulate virtual EL2 in EL1 and therefore have to translate
+the mode field from EL2 to EL1 and vice versa.
 
-It's all good fun.
+This requires keeping track of the state we enter the guest, for which
+we transiently use a dedicated flag.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_hyp.h     |  2 ++
- arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic.c           |  6 ++++--
- include/kvm/arm_vgic.h               |  1 +
- 5 files changed, 40 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_host.h          |  1 +
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 19 ++++++++++++++++-
+ arch/arm64/kvm/hyp/vhe/switch.c            | 24 ++++++++++++++++++++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 5afd14ab15b9..0d1bd78c2179 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -57,6 +57,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7b6fe18ee450..6a7b13edc5cb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -456,6 +456,7 @@ struct kvm_vcpu_arch {
+ #define KVM_ARM64_EXCEPT_MASK		(7 << 9) /* Target EL/MODE */
+ #define KVM_ARM64_DEBUG_STATE_SAVE_SPE	(1 << 12) /* Save SPE context if active  */
+ #define KVM_ARM64_DEBUG_STATE_SAVE_TRBE	(1 << 13) /* Save TRBE context if active  */
++#define KVM_ARM64_IN_HYP_CONTEXT	(1 << 14) /* Guest running in HYP context */
  
- int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
- 
-+u64 __gic_v3_get_lr(unsigned int lr);
-+
- void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
- void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 20db2f281cf2..0601d73de11b 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -18,7 +18,7 @@
- #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
- #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
- 
--static u64 __gic_v3_get_lr(unsigned int lr)
-+u64 __gic_v3_get_lr(unsigned int lr)
- {
- 	switch (lr & 0xf) {
- 	case 0:
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index bfe0ccde514f..3ee3438b5e22 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -138,6 +138,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
- 	}
+ #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
+ 				 KVM_GUESTDBG_USE_SW_BP | \
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 283f780f5f56..e3689c6ce4cc 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -157,9 +157,26 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
  }
  
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
++/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
++static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
 +{
-+	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
-+	struct vgic_irq *irq;
-+	int i;
++	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
 +
-+	for (i = 0; i < s_cpu_if->used_lrs; i++) {
-+		u64 lr = cpu_if->vgic_lr[i];
-+		int l1_irq;
-+
-+		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
-+			continue;
-+
-+		/*
-+		 * If we had a HW lr programmed by the guest hypervisor, we
-+		 * need to emulate the HW effect between the guest hypervisor
-+		 * and the nested guest.
-+		 */
-+		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
-+		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
-+		if (!irq)
-+			continue; /* oh well, the guest hyp is broken */
-+
-+		lr = __gic_v3_get_lr(i);
-+		if (!(lr & ICH_LR_STATE))
-+			irq->active = false;
-+
-+		vgic_put_irq(vcpu->kvm, irq);
++	switch (mode) {
++	case PSR_MODE_EL2t:
++		mode = PSR_MODE_EL1t;
++		break;
++	case PSR_MODE_EL2h:
++		mode = PSR_MODE_EL1h;
++		break;
 +	}
++
++	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
 +}
 +
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
  {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 6503aa208c9f..afe415b5f8a0 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -876,9 +876,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	int used_lrs;
+-	u64 pstate = ctxt->regs.pstate;
++	u64 pstate = to_hw_pstate(ctxt);
+ 	u64 mode = pstate & PSR_AA32_MODE_MASK;
  
--	/* If nesting, this is a load/put affair, not flush/sync. */
--	if (vgic_state_is_nested(vcpu))
-+	/* If nesting, emulate the HW effect from L0 to L1 */
-+	if (vgic_state_is_nested(vcpu)) {
-+		vgic_v3_sync_nested(vcpu);
- 		return;
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index fbb26b93c347..9d5572ceb001 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -114,6 +114,25 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
+ 
+ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
++	/*
++	 * If we were in HYP context on entry, adjust the PSTATE view
++	 * so that the usual helpers work correctly.
++	 */
++	if (unlikely(vcpu->arch.flags & KVM_ARM64_IN_HYP_CONTEXT)) {
++		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
++
++		switch (mode) {
++		case PSR_MODE_EL1t:
++			mode = PSR_MODE_EL2t;
++			break;
++		case PSR_MODE_EL1h:
++			mode = PSR_MODE_EL2h;
++			break;
++		}
++
++		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
++		*vcpu_cpsr(vcpu) |= mode;
 +	}
+ }
  
- 	/* An empty ap_list_head implies used_lrs == 0 */
- 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index a0db49e6c781..a3fc08988a5b 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -391,6 +391,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
- void kvm_vgic_put(struct kvm_vcpu *vcpu);
- void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
+ /* Switch to the guest for VHE systems running in EL2 */
+@@ -148,6 +167,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
  
-+void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
++	if (is_hyp_ctxt(vcpu))
++		vcpu->arch.flags |= KVM_ARM64_IN_HYP_CONTEXT;
++	else
++		vcpu->arch.flags &= ~KVM_ARM64_IN_HYP_CONTEXT;
++
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
 -- 
 2.30.2
 
