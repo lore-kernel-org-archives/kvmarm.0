@@ -2,59 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 504E0C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4EE0C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 20:06:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08D144B10E;
-	Mon, 29 Nov 2021 15:06:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F2EE4B119;
+	Mon, 29 Nov 2021 15:06:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OCrwFib0Rl-6; Mon, 29 Nov 2021 15:06:14 -0500 (EST)
+	with ESMTP id oghG1JBjn7HX; Mon, 29 Nov 2021 15:06:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A1D84B13E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 922ED4B173;
 	Mon, 29 Nov 2021 15:06:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A84F64B129
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59BD84B0DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ODPWsG6U9KXc for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id z4HlRY-0roZ7 for <kvmarm@lists.cs.columbia.edu>;
  Mon, 29 Nov 2021 15:06:10 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F383B49F8F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:09 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8167B4B12E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 15:06:10 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id EF2CFCE13DE;
- Mon, 29 Nov 2021 20:06:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 667B5C53FC7;
- Mon, 29 Nov 2021 20:06:06 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id B6AEFB815E0;
+ Mon, 29 Nov 2021 20:06:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7561FC53FC7;
+ Mon, 29 Nov 2021 20:06:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638216366;
- bh=aXOmQCoo+3BavrCGq7viBjKwLUX5oZCvjH/YTIoVHFc=;
+ s=k20201202; t=1638216368;
+ bh=W8ACxOJzCP75ucwzH7CsTdmnHubYK+R9v0dcd/GPhSw=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ZkYMQdIGxDYCyy5+mmC80aKxvFcXXV125SCOG8IFKgyo34KHmrzb5/KSdyZXQdyI3
- +PfVnkIlSfCOFBI/32NUyLZZgPCc0j62ujrWFv1q5Hrnz/JLpyxz10Bivr1Nedximl
- Q1hEIQyUdDWjVcYmJxnDSat+Z3h+nILWOLDaiaHOlHmF+hRfCXgVlpWIdCAzC/vdqw
- IUwZgjlhr7HySNT1EVMuAKC3q5lD3hJO/d1paPIBaNvHX+dBBuG7UL/KmIL2gUUNXN
- clBlz3oH60CQxXOujIU9/FvWiiXqiOHT/rdtr1RQvAX7Io+igapwYx4ifd9vXPbAxS
- epVzE7vExqYgA==
+ b=AAAxQfvfuSSin+Lr0LGBi64vEdPLhrbILnn3s83UQJYS7eLY5JDQqF/WE17sb7eSJ
+ sGS2aibyDgT/GE+9dG39pho5/wP4kxwa8gRpp5icJXZqvBMQc8QaY3gBNY2WGLQXAH
+ Imza7A5oGFuF02rdj4oi0B6bgwWtMeb9dArxn4KPPSA8Q49SUjB+xfSSEtBlcoNS9D
+ CwKQ7dayJwa03wOuO1AzIQ0YdMu4TDzdahV0QgX0E2T1BWv9lQpGqsKPWJ5xLH/Qu1
+ 4Ny6V/iFEsYHzNC2Ls+noAnchOiVaKPo8xe6jM64Z1N0rSM3GjcDUJ31Uqy7IRB/7K
+ 8xGl1o3ZctQow==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mrmrI-008gvR-NK; Mon, 29 Nov 2021 20:02:40 +0000
+ id 1mrmqw-008gvR-1D; Mon, 29 Nov 2021 20:02:18 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v5 67/69] KVM: arm64: nv: Enable ARMv8.4-NV support
-Date: Mon, 29 Nov 2021 20:01:48 +0000
-Message-Id: <20211129200150.351436-68-maz@kernel.org>
+Subject: [PATCH v5 27/69] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+Date: Mon, 29 Nov 2021 20:01:08 +0000
+Message-Id: <20211129200150.351436-28-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -87,113 +87,113 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As all the VNCR-capable system registers are nicely separated
-from the rest of the crowd, let's set HCR_EL2.NV2 on and let
-the ball rolling.
+From: Jintack Lim <jintack.lim@linaro.org>
 
+Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
+
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_arm.h     |  1 +
- arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
- arch/arm64/include/asm/sysreg.h      |  1 +
- arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
- 4 files changed, 28 insertions(+), 11 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  2 ++
+ arch/arm64/kvm/Makefile             |  2 +-
+ arch/arm64/kvm/handle_exit.c        | 11 +++++++-
+ arch/arm64/kvm/nested.c             | 40 +++++++++++++++++++++++++++++
+ 4 files changed, 53 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm64/kvm/nested.c
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index b603466803d2..18c35446249f 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -20,6 +20,7 @@
- #define HCR_AMVOFFEN	(UL(1) << 51)
- #define HCR_FIEN	(UL(1) << 47)
- #define HCR_FWB		(UL(1) << 46)
-+#define HCR_NV2		(UL(1) << 45)
- #define HCR_AT		(UL(1) << 44)
- #define HCR_NV1		(UL(1) << 43)
- #define HCR_NV		(UL(1) << 42)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 1664430be698..f282997e4a4c 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -245,21 +245,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
- 
- static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
- {
--	if (!__vcpu_el2_e2h_is_set(ctxt)) {
--		/*
--		 * Clear the .M field when writing SPSR to the CPU, so that we
--		 * can detect when the CPU clobbered our SPSR copy during a
--		 * local exception.
--		 */
--		val &= ~0xc;
--	}
-+	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
-+
-+	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
-+		return val;
- 
--	return val;
-+	/*
-+	 * Clear the .M field when writing SPSR to the CPU, so that we
-+	 * can detect when the CPU clobbered our SPSR copy during a
-+	 * local exception.
-+	 */
-+	return val &= ~0xc;
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 67a2c0d05233..4c2ac9650a3e 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -61,4 +61,6 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
+ 		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
  }
  
- static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
++int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
++
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 1f602526e9a2..923ee13728b4 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -16,7 +16,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+ 	 inject_fault.o va_layout.o handle_exit.o \
+ 	 guest.o debug.o reset.o sys_regs.o \
+ 	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+-	 arch_timer.o trng.o emulate-nested.o \
++	 arch_timer.o trng.o emulate-nested.o nested.o \
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+ 	 vgic/vgic-v3.o vgic/vgic-v4.o \
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 72b981004b1d..68a9579aa13e 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -119,7 +119,16 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
+  */
+ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
  {
--	if (__vcpu_el2_e2h_is_set(ctxt))
-+	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+-	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
++	bool is_wfe = !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE);
 +
-+	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
- 		return val;
- 
- 	/*
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 71e6a0410e7c..5de90138d0a4 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -550,6 +550,7 @@
- #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
- #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
- #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-+#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
- 
- #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
- #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index ef4488db6dc1..5cadda79089a 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -45,7 +45,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			 * the EL1 virtual memory control register accesses
- 			 * as well as the AT S1 operations.
- 			 */
--			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
-+			if (enhanced_nested_virt_in_use(vcpu)) {
-+				hcr &= ~HCR_TVM;
-+			} else {
-+				hcr |= HCR_TVM | HCR_TRVM | HCR_TTLB;
-+			}
++	if (nested_virt_in_use(vcpu)) {
++		int ret = handle_wfx_nested(vcpu, is_wfe);
 +
-+			hcr |= HCR_AT | HCR_NV1;
- 		} else {
- 			/*
- 			 * For a guest hypervisor on v8.1 (VHE), allow to
-@@ -79,6 +85,12 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 			if (!vcpu_el2_tge_is_set(vcpu))
- 				hcr |= HCR_AT | HCR_TTLB;
- 		}
++		if (ret != -EINVAL)
++			return ret;
++	}
 +
-+		if (enhanced_nested_virt_in_use(vcpu)) {
-+			hcr |= HCR_AT | HCR_TTLB | HCR_NV2;
-+			write_sysreg_s(vcpu->arch.ctxt.vncr_array,
-+				       SYS_VNCR_EL2);
-+		}
- 	} else if (nested_virt_in_use(vcpu)) {
- 		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
- 
++	if (is_wfe) {
+ 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
+ 		vcpu->stat.wfe_exit_stat++;
+ 		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+new file mode 100644
+index 000000000000..42a96c8d2adc
+--- /dev/null
++++ b/arch/arm64/kvm/nested.c
+@@ -0,0 +1,40 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (C) 2017 - Columbia University and Linaro Ltd.
++ * Author: Jintack Lim <jintack.lim@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++
++#include <asm/kvm_emulate.h>
++
++/*
++ * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
++ * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
++ * handle this.
++ */
++int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
++{
++	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++
++	if (vcpu_mode_el2(vcpu))
++		return -EINVAL;
++
++	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
++	return -EINVAL;
++}
 -- 
 2.30.2
 
