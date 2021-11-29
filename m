@@ -2,81 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03742C4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 18:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F31FC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 29 Nov 2021 19:18:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FDC44B13D;
-	Mon, 29 Nov 2021 13:55:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 667144B0DB;
+	Mon, 29 Nov 2021 14:18:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dhLaQJ3yp+L6; Mon, 29 Nov 2021 13:55:22 -0500 (EST)
+	with ESMTP id FlHnfXsNmt+O; Mon, 29 Nov 2021 14:18:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFC4E4B0ED;
-	Mon, 29 Nov 2021 13:55:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E4764B0AC;
+	Mon, 29 Nov 2021 14:18:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 550A54B0DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 13:55:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D9B834B08F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 14:18:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dXQcrswP0ocq for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Nov 2021 13:55:20 -0500 (EST)
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com
- [209.85.214.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF46C4B0B9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 13:55:19 -0500 (EST)
-Received: by mail-pl1-f176.google.com with SMTP id y7so12964392plp.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 10:55:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=TYbgQqCpCmOsVo/Ud6S4W0dWbGKnEHCC/sbfSrxRU2Q=;
- b=V9NdrM9IGQ8TORtVAjZzUck1RI7UtY24/5ryhbIDx46VwTLIEKKddxeNbMrV6TQpIl
- KTCIPozOyBw/wCgOEJPsKU3C9LENDNILuHldgqEm6W55x2AEOVy9zbC+oB0Q8kNXcib2
- utENfqKkezcYzZnD0pmUAjWeJ/cGQai7wseSy0Tb7+ezAyGs24Tiec69FywheOS97WPw
- hiOKPwklIAtqAAVwW+TVa82nOI4oJHItJIs2sHILKArSIy33/Br5zlJSRUemG17TIymQ
- 2z90v41HGfafPsWOqjYsVFIk8gpVXUcAMJTfJevG+nopt2huTRvy9U+7v5siSDcfSs81
- 05ZA==
+ with ESMTP id rRaW+MWMz2+N for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Nov 2021 14:18:54 -0500 (EST)
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com
+ [209.85.208.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A84514B08E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 14:18:54 -0500 (EST)
+Received: by mail-ed1-f46.google.com with SMTP id x6so76050701edr.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 11:18:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=sender:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=b6e11+CJLAryPIw/7DDSWmANxwHaOEFVgPmI0eD1ehw=;
+ b=Yv9EDK6h14i2Dbj+iAIYK0HlvK2JERVyMLo4AC4eEaaM5uGAacc8HtxG8w/Y/N1eKa
+ zoqVyYrJgoymLJ79VszdPFvZOcROHF7XsZML04k5ATYUCAQQQYdmRFM1zliBw5sA+fUR
+ rGCOh7Dkwc25orqYcXeHYn5++zj+NoIkUF+txgA7cbkgTIdSaLJPMhb1GiDwryyn0Wfc
+ MU5Gbh+ysqRcMgmq6XO0rBfKo/INnGwUPA9nBrqjSM7nJ1s+plFGQd3Vr5vlky9IMZdn
+ wkdyjWJAJzkiJ+6yukZdQ5xwMk5wTjTGyWuy1lXhP9nJ6WRZVyGbloAAqLRFAE+sHa2m
+ tnMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=TYbgQqCpCmOsVo/Ud6S4W0dWbGKnEHCC/sbfSrxRU2Q=;
- b=1meoNtkmUFdhtawnbONFZUa7JreFGffsP6MZY743z9IYFWJl9YYh2kg8SrfWjAW7f/
- Sg89ieOF0Pfr5SKwHCD/OLJ4EIMBVy1Ab0AlLN702D9Q8xwYG9aM6PCkvcHNDrLQ3N29
- KgglbdbePj2CXc4heD51t+kFTU9vqxH2a+aFPZBRre8/Pcu0oOA1r7WLqPqh0ACx6ON3
- jsTQ3A766r/KPiVwZ6OK+8lUywT75BwQ5pFY44f29SygGSeZLy3oH2FGSuecTsUw6xXb
- qV8HJhwzzGLBBATuWF+opcuY7PILDyIIBxlkAut1uBXcrM2fcwEugcp3139DQT5zLbme
- 2Q+w==
-X-Gm-Message-State: AOAM532WoZD8ASgoiBzCSuGkUuYqQBxAcuyf60QcS+ys7tOninHaW80H
- J/IXPQttZ2HUFFE3A2PT0loK5Q==
-X-Google-Smtp-Source: ABdhPJzGwlSa9NgpBenMt4CKt9Ftf4k4qsHL0lT0KjuZVEYivrfeFPAQn3AoVSiAs1eAB5ezweh9DQ==
-X-Received: by 2002:a17:90b:2251:: with SMTP id
- hk17mr189639pjb.31.1638212118683; 
- Mon, 29 Nov 2021 10:55:18 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id d17sm17979027pfj.215.2021.11.29.10.55.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 29 Nov 2021 10:55:18 -0800 (PST)
-Date: Mon, 29 Nov 2021 18:55:14 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+ h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+ :subject:content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=b6e11+CJLAryPIw/7DDSWmANxwHaOEFVgPmI0eD1ehw=;
+ b=JX2xTc51cLxAx73uv7WU77rNDulYsCHihPZzi3zlClf7jHol6g7oZghhDHxcHmcFtw
+ iXuFj3EO59YRpIGD2JaeHu95Kp8p6l6lYvsaVbNO5HENFB8eQ+DBTuZEiKWzD6HT/5xa
+ MAByI0iUtHWXFxSPKDuZTph/wOU1aOxFmRj4CuCVKMAW8pFLENCA0wpDRP5gsFL2Axzy
+ zdJcAunUHMN/mA4ze2XG+jlu1+RhnpjCD/QIKDOHfwkWe1LkhbtyW187XS2I07tSyott
+ QM3xdguzUhSEAaa9G43Pn8X007VdqMgAPwDYdNHA5tot6Rxl5wrx3fpRyrW0rNdbKE9D
+ GDeQ==
+X-Gm-Message-State: AOAM5326zXuwB45jaUS6LnxX0eNgLztroF0BB2dAmgG6lgOrM7lo1n9Z
+ ut7bo08HX4WM6Li6ck62A3dRkr4SMII=
+X-Google-Smtp-Source: ABdhPJx2YJ0juUfs4Yk6vuSEcojrZsOKQtVYCvzwUVoRUJT0twH/9lzRN0MjKMCkmooXwTOepr8KsQ==
+X-Received: by 2002:a17:906:c9d2:: with SMTP id
+ hk18mr4315253ejb.523.1638213533689; 
+ Mon, 29 Nov 2021 11:18:53 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e?
+ ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+ by smtp.googlemail.com with ESMTPSA id ch28sm9615535edb.72.2021.11.29.11.18.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 29 Nov 2021 11:18:53 -0800 (PST)
+Message-ID: <880a5727-69d1-72a1-b129-b053781625ad@redhat.com>
+Date: Mon, 29 Nov 2021 20:18:50 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
 Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
  successful
-Message-ID: <YaUiEquKYi5eqWC0@google.com>
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
  <20211009021236.4122790-12-seanjc@google.com>
  <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
  <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
  <YaUNBfJh35WXMV0M@google.com>
  <496c2fc6-26b0-9b5d-32f4-2f9e9dd6a064@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <496c2fc6-26b0-9b5d-32f4-2f9e9dd6a064@redhat.com>
+ <YaUiEquKYi5eqWC0@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YaUiEquKYi5eqWC0@google.com>
 Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
  kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
  linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
@@ -104,39 +109,33 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Nov 29, 2021, Paolo Bonzini wrote:
-> On 11/29/21 18:25, Sean Christopherson wrote:
-> > If a posted interrupt arrives after KVM has done its final search through the vIRR,
-> > but before avic_update_iommu_vcpu_affinity() is called, the posted interrupt will
-> > be set in the vIRR without triggering a host IRQ to wake the vCPU via the GA log.
-> > 
-> > I.e. KVM is missing an equivalent to VMX's posted interrupt check for an outstanding
-> > notification after switching to the wakeup vector.
+On 11/29/21 19:55, Sean Christopherson wrote:
+>> Still it does seem to be a race that happens when IS_RUNNING=true but
+>> vcpu->mode == OUTSIDE_GUEST_MODE.  This patch makes the race easier to
+>> trigger because it moves IS_RUNNING=false later.
 > 
-> BTW Maxim reported that it can break even without assigned devices.
-> 
-> > For now, the least awful approach is sadly to keep the vcpu_(un)blocking() hooks.
-> 
-> I agree that the hooks cannot be dropped but the bug is reproducible with
-> this patch, where the hooks are still there.
+> Oh!  Any chance the bug only repros with preemption enabled?  That would explain
+> why I don't see problems, I'm pretty sure I've only run AVIC with a PREEMPT=n.
 
-...
+Me too.
 
-> Still it does seem to be a race that happens when IS_RUNNING=true but
-> vcpu->mode == OUTSIDE_GUEST_MODE.  This patch makes the race easier to
-> trigger because it moves IS_RUNNING=false later.
+> svm_vcpu_{un}blocking() are called with preemption enabled, and avic_set_running()
+> passes in vcpu->cpu.  If the vCPU is preempted and scheduled in on a different CPU,
+> avic_vcpu_load() will overwrite the vCPU's entry with the wrong CPU info.
 
-Oh!  Any chance the bug only repros with preemption enabled?  That would explain
-why I don't see problems, I'm pretty sure I've only run AVIC with a PREEMPT=n.
+That would make a lot of sense.  avic_vcpu_load() can handle 
+svm->avic_is_running = false, but avic_set_running still needs its body 
+wrapped by preempt_disable/preempt_enable.
 
-svm_vcpu_{un}blocking() are called with preemption enabled, and avic_set_running()
-passes in vcpu->cpu.  If the vCPU is preempted and scheduled in on a different CPU,
-avic_vcpu_load() will overwrite the vCPU's entry with the wrong CPU info.
+Fedora's kernel is CONFIG_PREEMPT_VOLUNTARY, but I know Maxim uses his 
+own build so it would not surprise me if he used CONFIG_PREEMPT=y.
+
+Paolo
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
