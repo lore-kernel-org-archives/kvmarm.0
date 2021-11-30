@@ -2,80 +2,95 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A2BC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Nov 2021 14:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA673C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Nov 2021 14:34:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 693904B18A;
-	Tue, 30 Nov 2021 09:13:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 403D04B128;
+	Tue, 30 Nov 2021 09:34:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UHc6DLbq8RdI; Tue, 30 Nov 2021 09:12:58 -0500 (EST)
+	with ESMTP id Ycxd1Cg0aop2; Tue, 30 Nov 2021 09:34:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C3F44B19D;
-	Tue, 30 Nov 2021 09:12:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AC094B14C;
+	Tue, 30 Nov 2021 09:34:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3FDF4B18A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 09:12:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8356E4B11C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 09:34:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tpeAkqf+suDP for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Nov 2021 09:12:52 -0500 (EST)
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com
- [209.85.128.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 973434B130
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 09:12:52 -0500 (EST)
-Received: by mail-wm1-f49.google.com with SMTP id o29so17579042wms.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 06:12:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:date:in-reply-to
- :message-id:mime-version:content-transfer-encoding;
- bh=8Xn93JXcXYRTtOD7EOYXIoNbaeFJmOBsAiqitoLCgJk=;
- b=ywuB381uBd+1hkeF830EzjJV9PawMLMyPgGheyiUNoGiytxE9CgXK+tu0Xcv2uisGh
- RTRhw0w36uD0f/XK/ILRhM7WJEcb5SL+qJn5P0DLZLzilOOstZS8Kx7s81HK8HEDhv8/
- Z+Simda2xsu44BdPlX3XXhLBt+cv/SdxOCwNdGgaPrzlDFuomkTZkofVEd0g01KNoI+m
- QjEGkdpVfjkvGaDwfemisa30Z4SMegqTCYo+gqm9AK6A/74rUV0xdkzeNmSKIeG3q2ZJ
- Sxw0XnIj2SK8ZvN/J1W/x41xIlUHWJg9TFajZFfsFIbiEb1Myyr5ZjgZXA0a1ikJDoiN
- XLOg==
+ with ESMTP id pxFqEa-bZk3Q for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Nov 2021 09:34:38 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 46CEF4B108
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 09:34:38 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1638282878;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lUXILyRo006H5l+ZcdqOJwD3xK1tyZFHAK4YXmJdU1Y=;
+ b=A/yGFEcAeax/SQmkIq/FR8Gh4EUagWOvMoY1dreAcKi2n74Xr8QB2eXOrT0JehrN2m+2eN
+ OTeY36NsXxgzJX7sKa2/6frLHMBctj1u+d/vSk2yTG/gVVkFrgo35xBL6MnRPzh5we43j1
+ 1chajIT5iCA25JsZDVMevl2zDCsshpU=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-80-qeIz-2BfNzC-4DM89Gd9OQ-1; Tue, 30 Nov 2021 09:34:34 -0500
+X-MC-Unique: qeIz-2BfNzC-4DM89Gd9OQ-1
+Received: by mail-ed1-f72.google.com with SMTP id
+ v22-20020a50a456000000b003e7cbfe3dfeso17090036edb.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 06:34:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
- :in-reply-to:message-id:mime-version:content-transfer-encoding;
- bh=8Xn93JXcXYRTtOD7EOYXIoNbaeFJmOBsAiqitoLCgJk=;
- b=n5gnPUhcIhuOyvANqHu6hHv/ipSMLh3WTVkAWkQPossHY5GT8BtTRRqEh7/dsH0oGN
- GND7NwdDt6gIm6hCZq0qXFT0meGUYFKRxi39ypmnGWnBwEAw6/GLl21r+ek8nVSuNJKa
- nprO+NLrJX1bnUcJB4zr88OHsiiMFrgO3Yy3DOBQsvmMWr9Aez8apOFhUIFHIcSB6iy0
- o5vEb0VSmidBj4o3GPY+ifZZ3qEcJy6VSKsSwZLGGG1ktTB7c6Y82vxaHYovip0i8LYb
- Z4wbyHof+DGuFV7ZEQf2QsTTc2uIbFQ6zW3jAe9x5hDYdQ0WpUfsnivMR5zDzGSmvKzx
- UkcQ==
-X-Gm-Message-State: AOAM530og2BhVGnlDRadrMMP4FSV13D97d2ZqSd/LDpLU4rqXjR1QGoZ
- 3RAcWlg/sFKLskl6FETQ7EpJ3Q==
-X-Google-Smtp-Source: ABdhPJzSykfHQLSLPFOrDvCzXmZApy1OjVhVgAuZ/JmM7o9Bb+dUIPemMJrbmTKFbG6uFli3i/0RRg==
-X-Received: by 2002:a05:600c:294c:: with SMTP id
- n12mr5276099wmd.71.1638281571604; 
- Tue, 30 Nov 2021 06:12:51 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x13sm16592862wrr.47.2021.11.30.06.12.50
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=lUXILyRo006H5l+ZcdqOJwD3xK1tyZFHAK4YXmJdU1Y=;
+ b=ax6l3SLSbVAaamWH8hVNlui7DeLu3OuX+1FV1QH+TVYAa1UGh7NIS3l1+wv0JNtXFQ
+ fH4HOTFVHXOf/u3aBqiRMdD8SvNp05JybLZSpatUhnHDi/fJP1Y7ttexc9oV0dMQSioM
+ GmLCuL9rxNRES4r1WiqRQ14tmTO8bpZXjMILnGYzgDI/i9JPlFGHGorhZRfMkDNehUXW
+ bgzjRqwfIhNPa73Oyssp4KIHEWAakd/Y273k0dIAqsZlk4OdQZseucAcpyxhUtZtwA8Z
+ ctI0UbroS2tf3IpmYVRKH/6ALEZ+uLqiMB6+NmC0dTnOtdbJFtMZ/QHQ7DQxlnMpM87H
+ qNig==
+X-Gm-Message-State: AOAM530+4TihYaCMdyKIyru5bKeJk0YSQE0cZNQx9FNUbBqzsARDuY6B
+ nBy83h6QQPMbObXX+j0y8oL3q9/1B6iXFexVof9c/OcWGObDG5TjMTJPclUfPCK8b19LTMDrwV3
+ 5FEJ0aycsQG9JRqOJW1QL6iHC
+X-Received: by 2002:a17:907:7d86:: with SMTP id
+ oz6mr67730906ejc.312.1638282873389; 
+ Tue, 30 Nov 2021 06:34:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz8H6MTC5V0R+7/9bPSvceggffYmK7PI41bx1rR80Zl9gohq2DRWT7vDe9+IiNWcQObFE6zzQ==
+X-Received: by 2002:a17:907:7d86:: with SMTP id
+ oz6mr67730877ejc.312.1638282873127; 
+ Tue, 30 Nov 2021 06:34:33 -0800 (PST)
+Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+ by smtp.gmail.com with ESMTPSA id g11sm12219088edz.53.2021.11.30.06.34.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 30 Nov 2021 06:12:50 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 1E4681FF96;
- Tue, 30 Nov 2021 14:12:50 +0000 (GMT)
-References: <20211112114734.3058678-1-alex.bennee@linaro.org>
- <20211112132312.qrgmby55mlenj72p@gator.home> <87wnldfoul.fsf@linaro.org>
- <20211112145442.5ktlpwyolwdsxlnx@gator.home> <877dd4umy6.fsf@linaro.org>
- <20211119183059.jwrhb77jfjbv5rbz@gator.home>
-User-agent: mu4e 1.7.5; emacs 28.0.60
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Andrew Jones <drjones@redhat.com>
+ Tue, 30 Nov 2021 06:34:32 -0800 (PST)
+Date: Tue, 30 Nov 2021 15:34:25 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Subject: Re: [kvm-unit-tests PATCH v3 0/3] GIC ITS tests
-Date: Tue, 30 Nov 2021 14:11:34 +0000
-In-reply-to: <20211119183059.jwrhb77jfjbv5rbz@gator.home>
-Message-ID: <87a6hlzq8t.fsf@linaro.org>
+Message-ID: <20211130143425.bh27yy47vpihllvs@gator.home>
+References: <20211112114734.3058678-1-alex.bennee@linaro.org>
+ <20211112132312.qrgmby55mlenj72p@gator.home>
+ <87wnldfoul.fsf@linaro.org>
+ <20211112145442.5ktlpwyolwdsxlnx@gator.home>
+ <877dd4umy6.fsf@linaro.org>
+ <20211119183059.jwrhb77jfjbv5rbz@gator.home>
+ <87a6hlzq8t.fsf@linaro.org>
 MIME-Version: 1.0
+In-Reply-To: <87a6hlzq8t.fsf@linaro.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
 Cc: kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
  qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -90,51 +105,103 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IE9uIEZyaSwgTm92
-IDE5LCAyMDIxIGF0IDA0OjMwOjQ3UE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gCj4+
-IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cj4+IAo+PiA+IE9uIEZy
-aSwgTm92IDEyLCAyMDIxIGF0IDAyOjA4OjAxUE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToK
-Pj4gPj4gCj4+ID4+IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cj4+
-ID4+IAo+PiA+PiA+IE9uIEZyaSwgTm92IDEyLCAyMDIxIGF0IDExOjQ3OjMxQU0gKzAwMDAsIEFs
-ZXggQmVubsOpZSB3cm90ZToKPj4gPj4gPj4gSGksCj4+ID4+ID4+IAo+PiA+PiA+PiBTb3JyeSB0
-aGlzIGhhcyBiZWVuIHNpdHRpbmcgaW4gbXkgdHJlZSBzbyBsb25nLiBUaGUgY2hhbmdlcyBhcmUg
-ZmFpcmx5Cj4+ID4+ID4+IG1pbm9yIGZyb20gdjIuIEkgbm8gbG9uZ2VyIHNwbGl0IHRoZSB0ZXN0
-cyB1cCBpbnRvIFRDRyBhbmQgS1ZNCj4+ID4+ID4+IHZlcnNpb25zIGFuZCBpbnN0ZWFkIGp1c3Qg
-ZW5zdXJlIHRoYXQgRVJSQVRBX0ZPUkNFIGlzIGFsd2F5cyBzZXQgd2hlbgo+PiA+PiA+PiBydW4g
-dW5kZXIgVENHLgo+PiA+PiA+PiAKPj4gPj4gPj4gQWxleCBCZW5uw6llICgzKToKPj4gPj4gPj4g
-ICBhcm02NDogcmVtb3ZlIGludmFsaWQgY2hlY2sgZnJvbSBpdHMtdHJpZ2dlciB0ZXN0Cj4+ID4+
-ID4+ICAgYXJtNjQ6IGVuYWJsZSBpdHMtbWlncmF0aW9uIHRlc3RzIGZvciBUQ0cKPj4gPj4gPj4g
-ICBhcmNoLXJ1bjogZG8gbm90IHByb2Nlc3MgRVJSQVRBIHdoZW4gcnVubmluZyB1bmRlciBUQ0cK
-Pj4gPj4gPj4gCj4+ID4+ID4+ICBzY3JpcHRzL2FyY2gtcnVuLmJhc2ggfCAgNCArKystCj4+ID4+
-ID4+ICBhcm0vZ2ljLmMgICAgICAgICAgICAgfCAxNiArKysrKystLS0tLS0tLS0tCj4+ID4+ID4+
-ICBhcm0vdW5pdHRlc3RzLmNmZyAgICAgfCAgMyAtLS0KPj4gPj4gPj4gIDMgZmlsZXMgY2hhbmdl
-ZCwgOSBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkKPj4gPj4gPj4gCj4+ID4+ID4+IC0t
-IAo+PiA+PiA+PiAyLjMwLjIKPj4gPj4gPj4gCj4+ID4+ID4+IF9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCj4+ID4+ID4+IGt2bWFybSBtYWlsaW5nIGxpc3QK
-Pj4gPj4gPj4ga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQo+PiA+PiA+PiBodHRwczovL2xp
-c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo+PiA+PiA+Cj4+ID4+
-ID4gSGkgQWxleCwKPj4gPj4gPgo+PiA+PiA+IFRoYW5rcyBmb3IgdGhpcy4gSSd2ZSBhcHBsaWVk
-IHRvIGFybS9xdWV1ZSwgYnV0IEkgc2VlIHRoYXQKPj4gPj4gPgo+PiA+PiA+IEZBSUw6IGdpY3Yz
-OiBpdHMtdHJpZ2dlcjogaW52L2ludmFsbDogZGV2Mi9ldmVudGlkPTIwIHBlbmRpbmcgTFBJIGlz
-IHJlY2VpdmVkCj4+ID4+ID4KPj4gPj4gPiBjb25zaXN0ZW50bHkgZmFpbHMgZm9yIG1lLiBJcyB0
-aGF0IGV4cGVjdGVkPyBEb2VzIGl0IHdvcmsgZm9yIHlvdT8KPj4gPj4gCj4+ID4+IGRvaCAtIGxv
-b2tzIGxpa2UgSSBjb2NrZWQgdXAgdGhlIG1lcmdlIGNvbmZsaWN0Li4uCj4+ID4+IAo+PiA+PiBE
-aWQgaXQgZmFpbCBmb3IgVENHIG9yIGZvciBLVk0gKG9yIGJvdGgpPwo+PiA+Cj4+ID4gSnVzdCBU
-Q0csIHdoaWNoIHdhcyB3aHkgSSB3YXMgd29uZGVyaW5nIGlmIGl0IHdhcyBleHBlY3RlZC4gSSd2
-ZSBuZXZlciBydW4KPj4gPiB0aGVzZSB0ZXN0cyB3aXRoIFRDRyBiZWZvcmUuCj4+IAo+PiBIbW0g
-SSB0aGluayBleHBlY3RpbmcgdGhlIElSUSBhdCBhbGwgaXMgYnJva2VuIHNvIEkgdGhpbmsgSSBz
-aG91bGQKPj4gZGVsZXRlIHRoZSB3aG9sZSBwZW5kaW5nIHRlc3QuCj4KPiBGZWVsIGZyZWUgdG8g
-cmVwb3N0LiBJJ2xsIHVwZGF0ZSB0aGUgcGF0Y2hlcyBpbiBhcm0vcXVldWUgYmVmb3JlIG15IG5l
-eHQKPiBNUi4KCkFjdHVhbGx5IEkgdGhpbmsgdGhlIHByb2JsZW0gd2FzIHdpdGggYSByZWdyZXNz
-aW9uIGluIHRoZSBUQ0cgSVRTCnN1cHBvcnQgKG5vdyBmaXhlZCBpbiBtYXN0ZXIpLiBTbyBJIGJl
-bGlldmUgYXMgb2YgdjMgZXZlcnl0aGluZyBpcwpjb3JyZWN0IChhbmQgdjQgc2hvdWxkIGJlIGln
-bm9yZWQpLgoKQXJlIHlvdSBoYXBweSB0byBhcHBseSB0aGlzIHNlcmllcyBvciBkbyB5b3Ugd2Fu
-dCBtZSB0byByZXBvc3QgaXQgYXMgdjU/Cgo+Cj4gVGhhbmtzLAo+IGRyZXcKCgotLSAKQWxleCBC
-ZW5uw6llCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
-bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
-c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Tue, Nov 30, 2021 at 02:11:34PM +0000, Alex Benn=E9e wrote:
+> =
+
+> Andrew Jones <drjones@redhat.com> writes:
+> =
+
+> > On Fri, Nov 19, 2021 at 04:30:47PM +0000, Alex Benn=E9e wrote:
+> >> =
+
+> >> Andrew Jones <drjones@redhat.com> writes:
+> >> =
+
+> >> > On Fri, Nov 12, 2021 at 02:08:01PM +0000, Alex Benn=E9e wrote:
+> >> >> =
+
+> >> >> Andrew Jones <drjones@redhat.com> writes:
+> >> >> =
+
+> >> >> > On Fri, Nov 12, 2021 at 11:47:31AM +0000, Alex Benn=E9e wrote:
+> >> >> >> Hi,
+> >> >> >> =
+
+> >> >> >> Sorry this has been sitting in my tree so long. The changes are =
+fairly
+> >> >> >> minor from v2. I no longer split the tests up into TCG and KVM
+> >> >> >> versions and instead just ensure that ERRATA_FORCE is always set=
+ when
+> >> >> >> run under TCG.
+> >> >> >> =
+
+> >> >> >> Alex Benn=E9e (3):
+> >> >> >>   arm64: remove invalid check from its-trigger test
+> >> >> >>   arm64: enable its-migration tests for TCG
+> >> >> >>   arch-run: do not process ERRATA when running under TCG
+> >> >> >> =
+
+> >> >> >>  scripts/arch-run.bash |  4 +++-
+> >> >> >>  arm/gic.c             | 16 ++++++----------
+> >> >> >>  arm/unittests.cfg     |  3 ---
+> >> >> >>  3 files changed, 9 insertions(+), 14 deletions(-)
+> >> >> >> =
+
+> >> >> >> -- =
+
+> >> >> >> 2.30.2
+> >> >> >> =
+
+> >> >> >> _______________________________________________
+> >> >> >> kvmarm mailing list
+> >> >> >> kvmarm@lists.cs.columbia.edu
+> >> >> >> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> >> >> >
+> >> >> > Hi Alex,
+> >> >> >
+> >> >> > Thanks for this. I've applied to arm/queue, but I see that
+> >> >> >
+> >> >> > FAIL: gicv3: its-trigger: inv/invall: dev2/eventid=3D20 pending L=
+PI is received
+> >> >> >
+> >> >> > consistently fails for me. Is that expected? Does it work for you?
+> >> >> =
+
+> >> >> doh - looks like I cocked up the merge conflict...
+> >> >> =
+
+> >> >> Did it fail for TCG or for KVM (or both)?
+> >> >
+> >> > Just TCG, which was why I was wondering if it was expected. I've nev=
+er run
+> >> > these tests with TCG before.
+> >> =
+
+> >> Hmm I think expecting the IRQ at all is broken so I think I should
+> >> delete the whole pending test.
+> >
+> > Feel free to repost. I'll update the patches in arm/queue before my next
+> > MR.
+> =
+
+> Actually I think the problem was with a regression in the TCG ITS
+> support (now fixed in master). So I believe as of v3 everything is
+> correct (and v4 should be ignored).
+> =
+
+> Are you happy to apply this series or do you want me to repost it as v5?
+
+No need to repost. I'll retest v3 with latest QEMU.
+
+Thanks,
+drew
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
