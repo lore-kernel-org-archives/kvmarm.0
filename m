@@ -2,69 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E00CFC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Nov 2021 05:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D17EC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Nov 2021 05:32:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F6774B132;
-	Tue, 30 Nov 2021 00:22:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9820B4B1F1;
+	Tue, 30 Nov 2021 00:32:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JXTTpm8Fqsda; Tue, 30 Nov 2021 00:22:17 -0500 (EST)
+	with ESMTP id 17-nw8H6NMJK; Tue, 30 Nov 2021 00:32:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D49E54B173;
-	Tue, 30 Nov 2021 00:22:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69FC24B137;
+	Tue, 30 Nov 2021 00:32:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D5D714B13A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 00:22:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F00D4B130
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 00:32:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p4xlgi1Q0pEH for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Nov 2021 00:22:15 -0500 (EST)
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com
- [209.85.215.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A34384B139
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 00:22:15 -0500 (EST)
-Received: by mail-pg1-f175.google.com with SMTP id s137so18525923pgs.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 21:22:15 -0800 (PST)
+ with ESMTP id sGx8VcBnuib0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Nov 2021 00:32:19 -0500 (EST)
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
+ [209.85.214.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 217FD4B11C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 00:32:19 -0500 (EST)
+Received: by mail-pl1-f175.google.com with SMTP id u17so13997286plg.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 21:32:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nMzdk7WdQ8L/HP0hzBLAG2QVUEAIjcUDryoTsnqwXLE=;
- b=j1EfdfUnVBej9nEQbRyBAto+p5BeBeWJB5e/BtcbuTktC5IOpismY9XzOhyKnFuW/G
- CwvztOqzmum15yJxT13kcTqhT4ia1tLNBmSMKuLRFCozTTrtMODetJAZBtw+fnBP/b6X
- NM3yo9jBcjgrtJoUeGv3TlE5GFjizOtXpkzwoEm98Gj6HKnENHmF7KxuU4TVJyTilia9
- H4VcjlkC3x0I4qAjgwJ09Ayiww35c8Lz+oYzSbOyoNwxUq/OePB2UrK7AZG3noeDAdQt
- 1Rv0PbBAxE3NYTCCmtu6qmPeM5Uj+MJ/yzYYDwmiJe8D86fuXEOFKiGn+B+r/T3XwULn
- daww==
+ :cc; bh=QGmUKm3NhxCjFePG5xO2YhN6YsO3FoC7iXWsjnJHwHo=;
+ b=PFdJDx1SbT8kd3PEwcKKljTxVqsslq0DJuyzEOVW3ilQguSRQwcELJjwXCrtM1KNoW
+ qGYTXFUZSmHkKmgbn4wYkGekaiwSOn3Vp8mhRyOrWoqs7pZhWc6h4F74KuBpuZyJFBUO
+ UG3HidICy3RFanV8sAP6OEiIVVdU7i9rLWUFb76Mld/rb5u90CTqpwH3af+fRSYnvzXM
+ /yggRmDPpGDWiNXl9of2CdstKMrNc7wMNEn3J5hHufSI/WUXtSLDgc90XkjxZOJXO9yX
+ 2haM3H/HedA8EEZanDtIAPhjbxL+KMJROzhpvB8csFGXsNSwhAoDFPK2I3rffG6FIxiM
+ Y4BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=nMzdk7WdQ8L/HP0hzBLAG2QVUEAIjcUDryoTsnqwXLE=;
- b=ipc+mxcakz4vOpMb02F1WoG8jECev4cfPHgEiflBpBmK9ghM1pPLk9gJC3H+V37OCA
- EKM+nGdtblpkBlCExTKdzZb6/ld3H2LJPqwzE/93J4gZ0n8OOhGOB74RB7lhyOrit8e8
- xDusSdxi7B9UqA5CqXmvuXf1WbSvT9PoC7dKUKzWue8ZsCylxoE50WXobxQIxNHAoZxO
- 6MaK7aAcPxJUm9wkdYpfS4NhQeSW2Pu06Iafm4BqE+hp9lfm0llfKBg1kcJSKrqRC+nZ
- UjJaLbldH2ZdPKajqnZBGclWrZ6faqK8iyVpHNbzfSfXpKsi+oh+T+rRb5UVS0TAGHzG
- M54A==
-X-Gm-Message-State: AOAM5335nVSldaXOzwtbRddHfj/NKUIjBEHX+zHpvb9e8IrOfDb2Jt+o
- lw8jSHf5/giQ0O7V5yI+r3muCUmMVFLJ07sTbXDPZA==
-X-Google-Smtp-Source: ABdhPJxWZ/PB1tDWrTWrdQnIfBdcsVY7+Ir97BsmQlGLYsjIg2R5RFwEdXK4R9zRLS/FQk9SU8UmlTgMNk2bjt6aIMI=
-X-Received: by 2002:aa7:9d9e:0:b0:4a0:25d0:a06f with SMTP id
- f30-20020aa79d9e000000b004a025d0a06fmr45090946pfq.82.1638249734570; Mon, 29
- Nov 2021 21:22:14 -0800 (PST)
+ bh=QGmUKm3NhxCjFePG5xO2YhN6YsO3FoC7iXWsjnJHwHo=;
+ b=qFL0mnu1T9LbsLLaXoT/69xG+foAMyck1PEINW89jqRJ3jZMh+E6ay83OPGLU1TdQH
+ ItN9wIw5LZH8UGf5w4XMY+XYaUBJTiQim6/dmJVlTscJMiSEuZ1lEkyu9VUj0G9ayNrg
+ iSuPkyoTNCJHjcWvLFnll+wXci4h8CsSyEtvH/SSXJp78EPNn50ipMQ6GzvsONUyvBIL
+ WpMFNTBnSEvIGBmg1EOWz7jHrpx17cy3SRWgRsERBL8DxMJX8XtO9vcf8vsStZme1nGP
+ 2tNaFMBnnEYhX5UJk+qA/g+E3p9FT9jX8wFbGKJwTX9KvmrAFI5cm6cuxKsN0Z20J+do
+ f5Qg==
+X-Gm-Message-State: AOAM530PKP10itl/gMjPWX4ikJCD//BtZ1WTyN00JDly7nxH7co1ggBh
+ uLq5ZGDcowL0Y/HHzJwXhYz1xrSPx9DWVjUKad4QybHsyWmr0A==
+X-Google-Smtp-Source: ABdhPJzi7lZO+A4usdDJUDRkuM27dnjVekY7ejDZrKXSvifVE/ZQ5d0WxjFExBKgXMH0ur+dxWW9YAwhhOSI65DoXdg=
+X-Received: by 2002:a17:902:ab47:b0:141:95b2:7eaf with SMTP id
+ ij7-20020a170902ab4700b0014195b27eafmr64331524plb.40.1638250338059; Mon, 29
+ Nov 2021 21:32:18 -0800 (PST)
 MIME-Version: 1.0
 References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-11-reijiw@google.com>
- <bb557b85-8d28-486e-d22c-b3021888bcf8@redhat.com>
-In-Reply-To: <bb557b85-8d28-486e-d22c-b3021888bcf8@redhat.com>
+ <20211117064359.2362060-10-reijiw@google.com>
+ <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
+In-Reply-To: <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 29 Nov 2021 21:21:58 -0800
-Message-ID: <CAAeT=FwBpc0Ue=rUiCaL=7p7e_SmKPLG=74EK+GZN4kftdJJtA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 10/29] KVM: arm64: Make ID_AA64DFR0_EL1 writable
+Date: Mon, 29 Nov 2021 21:32:02 -0800
+Message-ID: <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
+ support for the guest
 To: Eric Auger <eauger@redhat.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -93,67 +94,57 @@ On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
 > Hi Reiji,
 >
 > On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > This patch adds id_reg_info for ID_AA64DFR0_EL1 to make it writable
-> > by userspace.
+> > When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
+> > means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
+> > expose the value for the guest as it is.  Since KVM doesn't support
+> > IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
+> > exopse 0x0 (PMU is not implemented) instead.
+> s/exopse/expose
 > >
-> > Return an error if userspace tries to set PMUVER field of the
-> > register to a value that conflicts with the PMU configuration.
-> >
-> > Since number of context-aware breakpoints must be no more than number
-> > of supported breakpoints according to Arm ARM, return an error
-> > if userspace tries to set CTX_CMPS field to such value.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 84 ++++++++++++++++++++++++++++++++++-----
-> >  1 file changed, 73 insertions(+), 11 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 772e3d3067b2..0faf458b0efb 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -626,6 +626,45 @@ static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
-> >       return 0;
-> >  }
-> >
-> > +static bool id_reg_has_pmu(u64 val, u64 shift, unsigned int min)
-> I would rename the function as the name currently is misleading. The
-> function validate the val filed @shift againt @min
+> > Change cpuid_feature_cap_perfmon_field() to update the field value
+> > to 0x0 when it is 0xf.
+> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+> guest should not use it as a PMUv3?
 
-Thank you for the comment.
+> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+> guest should not use it as a PMUv3?
 
-The @min is the minimum value that indicates PMUv3 support.
-So, if the field value is >= @min, it means PMUv3 is supported.
-I want the function to check whether or not @val indicates PMUv3 support,
-and that's how the function is used.
-I can see what you meant focusing on the function though.
-But, if we renaming it to xxx_validate, that would be misleading in the
-codes that use the function.
+For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
+Arm ARM says:
+  "IMPLEMENTATION DEFINED form of performance monitors supported,
+   PMUv3 not supported."
 
-> > +{
-> > +     unsigned int pmu = cpuid_feature_extract_unsigned_field(val, shift);
-> > +
-> > +     /*
-> > +      * Treat IMPLEMENTATION DEFINED functionality as unimplemented for
-> > +      * ID_AA64DFR0_EL1.PMUVer/ID_DFR0_EL1.PerfMon.
-> > +      */
-> > +     if (pmu == 0xf)
-> > +             pmu = 0;
-> Shouldn't we simply forbid the userspace to set 0xF?
-
-This function is to check whether or not the field value indicates PMUv3.
-Setting the field to 0xf is forbidden by arm64_check_features().
-Having said that, since arm64_check_features() will be implemented by
-using arm64_ftr_bits, which treats AA64DFR0.PMUVER and DFR0.PERFMON
-as signed fields.
-So, it will be forbidden in a different way in the next version.
+Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
+be exposed to guests (And this patch series doesn't allow userspace
+to set the fields to 0xf for guests).
 
 Thanks,
 Reiji
 
-> > +
-> > +     return (pmu >= min);
-> > +}
+>
+> Eric
+> >
+> > Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/include/asm/cpufeature.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> > index ef6be92b1921..fd7ad8193827 100644
+> > --- a/arch/arm64/include/asm/cpufeature.h
+> > +++ b/arch/arm64/include/asm/cpufeature.h
+> > @@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
+> >
+> >       /* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
+> >       if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
+> > -             val = 0;
+> > +             return (features & ~mask);
+> >
+> >       if (val > cap) {
+> >               features &= ~mask;
+> >
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
