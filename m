@@ -2,89 +2,97 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8EEC433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 30 Nov 2021 08:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FFD7C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 30 Nov 2021 09:46:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3366C4B1B6;
-	Tue, 30 Nov 2021 03:51:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4CDB4B1AD;
+	Tue, 30 Nov 2021 04:45:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id acSC-Gpft3Lk; Tue, 30 Nov 2021 03:51:37 -0500 (EST)
+	with ESMTP id u-EISzMcgWzl; Tue, 30 Nov 2021 04:45:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D19EF4B1D2;
-	Tue, 30 Nov 2021 03:51:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F4A64B1A4;
+	Tue, 30 Nov 2021 04:45:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 422564B0FB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 17:55:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 047404B188
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 04:45:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GOwnYWLRfUAU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Nov 2021 17:55:40 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AA844B0F1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Nov 2021 17:55:40 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1638226539;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=91gZzrlhgmWTQlrjqIVKNYdue6kA0WgX9BjgXgHlzEM=;
- b=Ky/9AmthoXvdn79NQKi2zC+UMgPFhBTpMobUzPpGPu67JdN69v5wfYHWbkYf1pa51Y4iuG
- n0Qq1LgEK357ZNdaU1Z3M6rzkdQVt8nL+O35MOVQu69QC/LcKk+HiyqNAdReUP9CqCxIn4
- +egf4JldBYy8HMeTHC9a6XwO6sCoxok=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-577-axjhAptPNz-_8ATyvN31yg-1; Mon, 29 Nov 2021 17:55:36 -0500
-X-MC-Unique: axjhAptPNz-_8ATyvN31yg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id hRZT-1znnOsR for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Nov 2021 04:45:56 -0500 (EST)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F15B84B187
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Nov 2021 04:45:55 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EB4C190B2A1;
- Mon, 29 Nov 2021 22:55:32 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0EDF745D60;
- Mon, 29 Nov 2021 22:55:18 +0000 (UTC)
-Message-ID: <c04c9854be8fc9493739f17c2cbd26dd240a8465.camel@redhat.com>
-Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
- successful
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>
-Date: Tue, 30 Nov 2021 00:55:17 +0200
-In-Reply-To: <ba8341d6-7ee7-1af1-1385-0a9226bbf952@redhat.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-12-seanjc@google.com>
- <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
- <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
- <YaUNBfJh35WXMV0M@google.com>
- <ba8341d6-7ee7-1af1-1385-0a9226bbf952@redhat.com>
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mailman-Approved-At: Tue, 30 Nov 2021 03:51:34 -0500
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, kvm-ppc@vger.kernel.org,
- Paul Walmsley <paul.walmsley@sifive.com>, David Matlack <dmatlack@google.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Anup Patel <anup.patel@wdc.com>, linux-mips@vger.kernel.org,
- Palmer Dabbelt <palmer@dabbelt.com>, kvm-riscv@lists.infradead.org,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+ by sin.source.kernel.org (Postfix) with ESMTPS id 8AAA0CE1887;
+ Tue, 30 Nov 2021 09:45:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF322C53FC7;
+ Tue, 30 Nov 2021 09:45:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1638265549;
+ bh=Ggg5Q95Lu9hc/6Oo5FScAmVRBJNCnZ2SWaDiu2bMZxk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=f6k8DZdPZx9+szDTwTmzUBHbkVd9XrB6UdSE9As8vXvXo5jPRvWeeMQsv3t32w88n
+ 8OKJKn1bWHIMO7YhxizHMZsm1fVg3Dq2QEax3WJf/0EZs4Zfh1Rlpsao3bGSQzAnoI
+ w78GEcOd5Xq0RmEfwp8CjBqvNqs07PFd3peo8l9giVXX/HZ0MH1y8GEVa4/F3aIYCo
+ k5oVNpopWu+Erj7Tbr/MUnTpQ0MxtJkc6vjZ+2OVYcjfnSLcnH/ibX8F+OrqL0tcpy
+ ta6xhOXwJesJtY9LoqFzzfzhagYWEmTXoynwZGmo4BPKLN+DVCTiFFrYl30tuJLzTy
+ /Q96UVxW5EqMA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mrzhr-008pbj-Ru; Tue, 30 Nov 2021 09:45:48 +0000
+Date: Tue, 30 Nov 2021 09:45:46 +0000
+Message-ID: <87h7bum0xh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Darren Hart <darren@os.amperecomputing.com>
+Subject: Re: [PATCH 1/2] ACPI/AEST: Initial AEST driver
+In-Reply-To: <YaU6eyGM+bX/bEhG@fedora>
+References: <20211124170708.3874-1-baicar@os.amperecomputing.com>
+ <20211124170708.3874-2-baicar@os.amperecomputing.com>
+ <87czmpcto5.wl-maz@kernel.org> <YaU6eyGM+bX/bEhG@fedora>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: darren@os.amperecomputing.com, baicar@os.amperecomputing.com,
+ patches@amperecomputing.com, abdulhamid@os.amperecomputing.com,
+ catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, lorenzo.pieralisi@arm.com,
+ guohanjun@huawei.com, sudeep.holla@arm.com, rafael@kernel.org, lenb@kernel.org,
+ tony.luck@intel.com, bp@alien8.de, mark.rutland@arm.com,
+ anshuman.khandual@arm.com, vincenzo.frascino@arm.com, tabba@google.com,
+ marcan@marcan.st, keescook@chromium.org, masahiroy@kernel.org,
+ samitolvanen@google.com, john.garry@huawei.com, daniel.lezcano@linaro.org,
+ gor@linux.ibm.com, zhangshaokun@hisilicon.com, tmricht@linux.ibm.com,
+ dchinner@redhat.com, tglx@linutronix.de, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-acpi@vger.kernel.org, linux-edac@vger.kernel.org,
+ ishii.shuuichir@fujitsu.com, Vineeth.Pillai@microsoft.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: abdulhamid@os.amperecomputing.com, daniel.lezcano@linaro.org,
+ rafael@kernel.org, catalin.marinas@arm.com, ishii.shuuichir@fujitsu.com,
+ guohanjun@huawei.com, vincenzo.frascino@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, lorenzo.pieralisi@arm.com, masahiroy@kernel.org,
+ anshuman.khandual@arm.com, linux-acpi@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, samitolvanen@google.com,
+ patches@amperecomputing.com, lenb@kernel.org, keescook@chromium.org,
+ gor@linux.ibm.com, john.garry@huawei.com, zhangshaokun@hisilicon.com,
+ Vineeth.Pillai@microsoft.com, bp@alien8.de, dchinner@redhat.com,
+ tglx@linutronix.de, linux-edac@vger.kernel.org, tony.luck@intel.com,
+ marcan@marcan.st, linux-kernel@vger.kernel.org,
+ Tyler Baicar <baicar@os.amperecomputing.com>, sudeep.holla@arm.com,
+ tmricht@linux.ibm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,24 +109,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 2021-11-29 at 18:55 +0100, Paolo Bonzini wrote:
-> On 11/29/21 18:25, Sean Christopherson wrote:
-> > > If I apply though only the patch series up to this patch, my fedora VM seems
-> > > to work fine, but my windows VM still locks up hard when I run 'LatencyTop'
-> > > in it, which doesn't happen without this patch.
+Hi Darren,
+
+On Mon, 29 Nov 2021 20:39:23 +0000,
+Darren Hart <darren@os.amperecomputing.com> wrote:
+> 
+> On Wed, Nov 24, 2021 at 06:09:14PM +0000, Marc Zyngier wrote:
+> > On Wed, 24 Nov 2021 17:07:07 +0000,
+> > >
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index 5250298d2817..aa0483726606 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -382,6 +382,7 @@ ACPI FOR ARM64 (ACPI/arm64)
+> > >  M:	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+> > >  M:	Hanjun Guo <guohanjun@huawei.com>
+> > >  M:	Sudeep Holla <sudeep.holla@arm.com>
+> > > +R:	Tyler Baicar <baicar@os.amperecomputing.com>
+> > >  L:	linux-acpi@vger.kernel.org
+> > >  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+> > >  S:	Maintained
 > > 
-> > Buy "run 'LatencyTop' in it", do you mean running something in the Windows guest?
-> > The only search results I can find for LatencyTop are Linux specific.
+> > Isn't this a bit premature? This isn't even mentioned in the commit
+> > message, only in passing in the cover letter.
+> > 
 > 
-> I think it's LatencyMon, https://www.resplendence.com/latencymon.
+> Hi Marc,
 > 
-> Paolo
-> 
-Yes.
+> This was something I encouraged Tyler to add during internal review,
+> both in response to the checkpatch.pl warning about adding new drivers
+> as well as our interest in reviewing any future changes to the aest
+> driver. Since refactoring is common, this level made sense to me - but
+> would it be preferable to add a new entry for just the new driver Tyler
+> added?
 
-Best regards,
-	Maxim Levitsky
+Adding someone as the co-maintainer/co-reviewer of a whole subsystem
+(ACPI/arm64 in this case) comes, IMO, with a number of pre-requisites:
+has the proposed co-{maintainer,reviewer} contributed and/or reviewed
+a significant number of patches to that subsystem and/or actively
+participated in the public discussions on the design and the
+maintenance of the subsystem, so that their reviewing is authoritative
+enough? I won't be judge of this, but it is definitely something to
+consider.
 
+I don't think preemptively adding someone to the MAINTAINERS entry to
+indicate an interest in a whole subsystem is the right way to do it.
+One could argue that this is what a mailing list is for! ;-) On the
+other hand, an active participation to the review process is the
+perfect way to engage with fellow developers and to grow a profile. It
+is at this stage that adding oneself as an upstream reviewer makes a
+lot of sense.
+
+Alternatively, adding a MAINTAINERS entry for a specific driver is
+definitely helpful and will certainly result in the listed maintainer
+to be Cc'd on changes affecting it. But I would really like this
+maintainer to actively engage with upstream, rather than simply be on
+the receiving end of a stream of changes.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
