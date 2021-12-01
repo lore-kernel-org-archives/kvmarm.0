@@ -2,60 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DFC7C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Dec 2021 12:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7477AC433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Dec 2021 12:04:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16C824B1AA;
-	Wed,  1 Dec 2021 07:04:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C4CA4B1E9;
+	Wed,  1 Dec 2021 07:04:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Dgj5xEB2g20T; Wed,  1 Dec 2021 07:04:54 -0500 (EST)
+	with ESMTP id ouPMLf7wx8YZ; Wed,  1 Dec 2021 07:04:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EFCC4B21A;
-	Wed,  1 Dec 2021 07:04:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A7024B1EF;
+	Wed,  1 Dec 2021 07:04:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4AC84B1F8
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 07:04:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FBE44B209
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 07:04:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cwcG8NooiI5H for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Dec 2021 07:04:48 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83D204B1E9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 07:04:48 -0500 (EST)
+ with ESMTP id 06Qvb7SJDpCt for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Dec 2021 07:04:55 -0500 (EST)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE1204B1F5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 07:04:53 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 29452B81E6A;
- Wed,  1 Dec 2021 12:04:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72751C58321;
- Wed,  1 Dec 2021 12:04:44 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 775A3CE1DBB;
+ Wed,  1 Dec 2021 12:04:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 933F5C53FD5;
+ Wed,  1 Dec 2021 12:04:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638360284;
- bh=mGMA0LdI86boJc0KzjqubEoj0yuCdbIywxvtvcR4UZQ=;
+ s=k20201202; t=1638360283;
+ bh=Y6IbRR56aDBvOEwfHFjAMyQtTO8uqhozFSDwo/ky2ns=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=KBVpPhPnx4WCCeo8UdKJkpMJ1uU1UI/jjwkKwL0olZVAxBn0+6pNJ53yZM2TvYzaE
- b1N2LmKsqSNyIG8ODMFs3AK/XTutaWZj/oZ1XSG/bfLDsjWOk1gG3qI96O1VQHpp3v
- dA8goNAYUOlB3z/t3cxvvQWBEbsNhpoeJV+fzeY4szG/6jpFJO5lB7t3WVJiGY+TAR
- pb5cZe2YNKupZRSLyjAEyzuTIG3cll4MT2zSoWlyf75x8aUJbibFmXBLvJpcQb3KtV
- RAljay7YQ0kFwJTJgxL+HQ6e0XllS8jhmoU16JDKfGZEV2QKzM5uSLvK4aGu9Iurmi
- tnY5zg9BBBtZw==
+ b=YN1GaPrx/T6NoF83PBD2sJAU8axpY/DJNuNmfyPL0k+YK99dj/KanCPPzfzTJZnQT
+ RB8hjrkxWGe6I8rQOnlRzPGkiw4EaBQFC1oIljh9GhVyntlMld7MkyxKygxgHhfb7R
+ dp+8KFkLQPh9Sd/85zeQtT3ANp3OU5S7kLqlXMFrzrOsphjqMVSVEJppiwANhL91n+
+ 4Y1s+wclBSDFuIvYYo++8MV5gE6Klkb/Dh57qDwdyWHbQDsYF9aYf6h4WntHSz4UOO
+ 96b03Kod2LHpKIIGYj8MKqYtp6rjcTUT+MSrfAoxkzGpei7tN0Kr7ekfM6JS0hBpWJ
+ LFsh2kvg98k/Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1msOLq-0097Ab-Jh; Wed, 01 Dec 2021 12:04:42 +0000
+ id 1msOLp-0097Ab-OS; Wed, 01 Dec 2021 12:04:41 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v3 6/6] arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE
- by KVM
-Date: Wed,  1 Dec 2021 12:04:36 +0000
-Message-Id: <20211201120436.389756-7-maz@kernel.org>
+Subject: [PATCH v3 3/6] KVM: arm64: Remove unused __sve_save_state
+Date: Wed,  1 Dec 2021 12:04:33 +0000
+Message-Id: <20211201120436.389756-4-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211201120436.389756-1-maz@kernel.org>
 References: <20211201120436.389756-1-maz@kernel.org>
@@ -86,34 +85,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The bit of documentation that talks about TIF_FOREIGN_FPSTATE
-does not mention the ungodly tricks that KVM plays with this flag.
+Now that we don't have any users left for __sve_save_state, remove
+it altogether. Should we ever need to save the SVE state from the
+hypervisor again, we can always re-introduce it.
 
-Try and document this for the posterity.
-
-Reviewed-by: Mark Brown <broonie@kernel.org>
+Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/fpsimd.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_hyp.h | 1 -
+ arch/arm64/kvm/hyp/fpsimd.S      | 6 ------
+ 2 files changed, 7 deletions(-)
 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index fa244c426f61..6fb361e8bed8 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -78,7 +78,11 @@
-  * indicate whether or not the userland FPSIMD state of the current task is
-  * present in the registers. The flag is set unless the FPSIMD registers of this
-  * CPU currently contain the most recent userland FPSIMD state of the current
-- * task.
-+ * task. If the task is behaving as a VMM, then this is will be managed by
-+ * KVM which will clear it to indicate that the vcpu FPSIMD state is currently
-+ * loaded on the CPU, allowing the state to be saved if a FPSIMD-aware
-+ * softirq kicks in. Upon vcpu_put(), KVM will save the vcpu FP state and
-+ * flag the register state as invalid.
-  *
-  * In order to allow softirq handlers to use FPSIMD, kernel_neon_begin() may
-  * save the task's FPSIMD context back to task_struct from softirq context.
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 5afd14ab15b9..462882f356c7 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -90,7 +90,6 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
+ 
+ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+ void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+-void __sve_save_state(void *sve_pffr, u32 *fpsr);
+ void __sve_restore_state(void *sve_pffr, u32 *fpsr);
+ 
+ #ifndef __KVM_NVHE_HYPERVISOR__
+diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+index e950875e31ce..61e6f3ba7b7d 100644
+--- a/arch/arm64/kvm/hyp/fpsimd.S
++++ b/arch/arm64/kvm/hyp/fpsimd.S
+@@ -25,9 +25,3 @@ SYM_FUNC_START(__sve_restore_state)
+ 	sve_load 0, x1, x2, 3
+ 	ret
+ SYM_FUNC_END(__sve_restore_state)
+-
+-SYM_FUNC_START(__sve_save_state)
+-	mov	x2, #1
+-	sve_save 0, x1, x2, 3
+-	ret
+-SYM_FUNC_END(__sve_save_state)
 -- 
 2.30.2
 
