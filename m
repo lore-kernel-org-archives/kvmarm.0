@@ -2,70 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B4F2C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Dec 2021 17:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E36C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Dec 2021 17:05:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1BA14B253;
-	Wed,  1 Dec 2021 12:05:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DCB44B222;
+	Wed,  1 Dec 2021 12:05:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EutYjhGxKCVJ; Wed,  1 Dec 2021 12:05:10 -0500 (EST)
+	with ESMTP id Qe6JHtmNbCI7; Wed,  1 Dec 2021 12:05:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4FD54B25D;
-	Wed,  1 Dec 2021 12:05:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FAD84B25A;
+	Wed,  1 Dec 2021 12:05:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A2794B102
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 12:05:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FFE64B126
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 12:05:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LM0BWzPIQMwq for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Dec 2021 12:05:03 -0500 (EST)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A97764B126
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 12:05:02 -0500 (EST)
-Received: by mail-wr1-f73.google.com with SMTP id
- q5-20020a5d5745000000b00178abb72486so4461638wrw.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Dec 2021 09:05:02 -0800 (PST)
+ with ESMTP id sl8ZczR0Be5R for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Dec 2021 12:05:11 -0500 (EST)
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
+ [209.85.128.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6625E4B272
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 12:05:10 -0500 (EST)
+Received: by mail-wm1-f73.google.com with SMTP id
+ j25-20020a05600c1c1900b00332372c252dso1208928wms.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Dec 2021 09:05:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=5wiVz7SPfRWryEm8NS78CviZAnf1vSptd9MDigwGN/4=;
- b=dCzRG28Wf9Hc1Tp8I8w9ve3Vw14cFJY4sy6ylndkDIvYcMBINBhYfEJQuT0z5jDNv1
- tGtQIA4ScW62n9Y8NpIUEIAJPgcSiROzIIIoCmndHzXPxCyEyLTWbrESkPqQWrUF0K3p
- 9QOXgt39AuSkMUAbxmR0DvTI8l7eczc4wPKt+PgNh5XCms6IJXMamETMAzof/W4pXV0T
- wnKviJ2j0cYtPfs9cxEqyXVW4TErhwlx3FItlrJ0wzbTGP5qUqcJTqBUJ9hz1JfBV9P4
- ym+hRGvYhdZTese4GXjjv7hVrbAqdUmjbu/PvO4zHWFnvI9MLZYIxoYlqL/MNIHhDMLB
- fBTQ==
+ :cc; bh=HbFxjGh3zL5KJap6QW7mkZZ6VIZaiwXKEnlk6BAwVfU=;
+ b=JtzM0gEDraZHkDaYQXTg0ZV8V0cXC3mNBHZ97J5W0AM9joQ+Tu6jEW6c3fBIQkM6Ib
+ GwAR01pqvQylN5LeKRH5Q7RYcav9puXAvqGGEcceHhNVJtu2fZHSGJ5I0rAaGQRSIYb2
+ um0QpT9MkVgcbMmR6Fe5Gy1YhwIaojgSu8kpYp6Fc99EcuSk/ZUsB6cbr7CyUb/dupU5
+ Gz5vsL1JQx95KAsJyQQyYmsRFPNuLYANb7uJyyiLv4lMWxabM0Cwl9zjdJN6qvIeviEy
+ 3CnwNybnqLkVpaWiFzwQXR0drk5xVz195jgBHNzbI5LpKat6JDQIqFPJtbQdyW+JwiqW
+ 0uQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=5wiVz7SPfRWryEm8NS78CviZAnf1vSptd9MDigwGN/4=;
- b=v4QTOMouUZFNgtBMFc3kQQPkueumUBnq4ROFtcMMjn18eeBdXwc1MxTqhFBuTTYeCn
- De3RInTqNEJpKE3b+EHBRk+u7BszXu8Y2fL1BfpH/15kE7wr2AMizth4oDrMPEWJu9Bf
- kFgidyR11ZITTMl6Tk9QrvbUYGpi/Zc8HT06stRH2j5cIXzgM8wgrGeaHNgNiswc9zcW
- FaswEvlNst6Xk5zUrrWO/4CnGS2I5q5RTVziEYmwYwDFbJkHOmRbu1OLrLBuw1ook1F8
- ZZh4RNx8vsGR6lV1gFqeHD1Uu8rTD5EntPTdrtmLztdBWtBbmAfsbG58aTYayXiXTlQj
- uLKw==
-X-Gm-Message-State: AOAM5327HbZyI+sGU7ACG9trEHQ9wJ2uMQg/N6HKqWv8bjO5BOMLOkEn
- BeLgluMeqqpC4dmUcx3dr6hSEMk+DzOV
-X-Google-Smtp-Source: ABdhPJwwAeEl/fBZkORhX4MxHC0CwsUHrjrNI+Tq88kiP5Hx0+90GQIUxvIJUedAX1Syxs87ImOEfCacsfMj
+ bh=HbFxjGh3zL5KJap6QW7mkZZ6VIZaiwXKEnlk6BAwVfU=;
+ b=JGueNZMwovlsWB+n8+xdv4vgwiXx3g1rd8FSCUPknngOW7+hUw7w4PeHK9b6rbsv1u
+ LyO/4Tb4YbGLImMCngXfnk9r8UJ4WKQrQAle1L0xi1xM1qkRN1MQMJwj7MXKNOycnHeY
+ 7wPP98QLTTGmlU2LDW6GkzLk1r+dk7sngq8KLog7FZ6nS6MZnX68+DB/NZWQNTudYN62
+ dPzve5xO2Y35RAt2C3ljqukfKttg0F/8PPsjLlAxCfxL5KTnvGSQcwq4FBo6bwoSKddh
+ bB6LA21ak3zMoc4Ki7YOphaOD8l33egbRDtUMxUkdHs+DXr+u5869ut9XfPgYiTchMF/
+ ImSQ==
+X-Gm-Message-State: AOAM533kZ5k4IvHGAf9ZOfTqh3N79Mo2Mr1hXLBNqx65FVSOKhs8z5Bh
+ lB7d/NB86o4JNsP6IstuvKCB53ThyzXp
+X-Google-Smtp-Source: ABdhPJwxaQUpa6nGrPntWg01UvZg5ANqj35b7DgPpex7mqDVaKYEMPj2lT/WlosMtvdaA5BJp8zHD3MNtwZE
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:1cab:1a20:2ef1:ddde])
- (user=qperret job=sendgmr) by 2002:adf:ee04:: with SMTP id
- y4mr8657629wrn.0.1638378301567; Wed, 01 Dec 2021 09:05:01 -0800 (PST)
-Date: Wed,  1 Dec 2021 17:04:06 +0000
+ (user=qperret job=sendgmr) by 2002:a5d:508d:: with SMTP id
+ a13mr8350562wrt.41.1638378309381; Wed, 01 Dec 2021 09:05:09 -0800 (PST)
+Date: Wed,  1 Dec 2021 17:04:08 +0000
 In-Reply-To: <20211201170411.1561936-1-qperret@google.com>
-Message-Id: <20211201170411.1561936-13-qperret@google.com>
+Message-Id: <20211201170411.1561936-15-qperret@google.com>
 Mime-Version: 1.0
 References: <20211201170411.1561936-1-qperret@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH v3 12/15] KVM: arm64: Implement __pkvm_host_share_hyp() using
- do_share()
+Subject: [PATCH v3 14/15] KVM: arm64: Expose unshare hypercall to the host
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
  Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -91,125 +90,80 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Will Deacon <will@kernel.org>
 
-__pkvm_host_share_hyp() shares memory between the host and the
-hypervisor so implement it as an invocation of the new do_share()
-mechanism.
-
-Note that double-sharing is no longer permitted (as this allows us to
-reduce the number of page-table walks significantly), but is thankfully
-no longer relied upon by the host.
+Introduce an unshare hypercall which can be used to unmap memory from
+the hypervisor stage-1 in nVHE protected mode. This will be useful to
+update the EL2 ownership state of pages during guest teardown, and
+avoids keeping dangling mappings to unreferenced portions of memory.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/mem_protect.c | 121 +++++++-------------------
- 1 file changed, 33 insertions(+), 88 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h              |  1 +
+ arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c            |  8 +++++
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 33 +++++++++++++++++++
+ 4 files changed, 43 insertions(+)
 
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 50d5e4de244c..d5b0386ef765 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -63,6 +63,7 @@ enum __kvm_host_smccc_func {
+ 
+ 	/* Hypercalls available after pKVM finalisation */
+ 	__KVM_HOST_SMCCC_FUNC___pkvm_host_share_hyp,
++	__KVM_HOST_SMCCC_FUNC___pkvm_host_unshare_hyp,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_adjust_pc,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
+ 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+index 56445586c755..80e99836eac7 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+@@ -55,6 +55,7 @@ extern const u8 pkvm_hyp_id;
+ 
+ int __pkvm_prot_finalize(void);
+ int __pkvm_host_share_hyp(u64 pfn);
++int __pkvm_host_unshare_hyp(u64 pfn);
+ 
+ bool addr_is_memory(phys_addr_t phys);
+ int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index b096bf009144..5e2197db0d32 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -147,6 +147,13 @@ static void handle___pkvm_host_share_hyp(struct kvm_cpu_context *host_ctxt)
+ 	cpu_reg(host_ctxt, 1) = __pkvm_host_share_hyp(pfn);
+ }
+ 
++static void handle___pkvm_host_unshare_hyp(struct kvm_cpu_context *host_ctxt)
++{
++	DECLARE_REG(u64, pfn, host_ctxt, 1);
++
++	cpu_reg(host_ctxt, 1) = __pkvm_host_unshare_hyp(pfn);
++}
++
+ static void handle___pkvm_create_private_mapping(struct kvm_cpu_context *host_ctxt)
+ {
+ 	DECLARE_REG(phys_addr_t, phys, host_ctxt, 1);
+@@ -184,6 +191,7 @@ static const hcall_t host_hcall[] = {
+ 	HANDLE_FUNC(__pkvm_prot_finalize),
+ 
+ 	HANDLE_FUNC(__pkvm_host_share_hyp),
++	HANDLE_FUNC(__pkvm_host_unshare_hyp),
+ 	HANDLE_FUNC(__kvm_adjust_pc),
+ 	HANDLE_FUNC(__kvm_vcpu_run),
+ 	HANDLE_FUNC(__kvm_flush_vm_context),
 diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index 74ca4043b08a..1282cbd6b9b3 100644
+index 43b25e2de780..640234d3896a 100644
 --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
 +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -370,94 +370,6 @@ static int host_stage2_idmap(u64 addr)
+@@ -768,3 +768,36 @@ int __pkvm_host_share_hyp(u64 pfn)
+ 
  	return ret;
  }
- 
--static inline bool check_prot(enum kvm_pgtable_prot prot,
--			      enum kvm_pgtable_prot required,
--			      enum kvm_pgtable_prot denied)
--{
--	return (prot & (required | denied)) == required;
--}
--
--int __pkvm_host_share_hyp(u64 pfn)
--{
--	phys_addr_t addr = hyp_pfn_to_phys(pfn);
--	enum kvm_pgtable_prot prot, cur;
--	void *virt = __hyp_va(addr);
--	enum pkvm_page_state state;
--	kvm_pte_t pte;
--	int ret;
--
--	if (!addr_is_memory(addr))
--		return -EINVAL;
--
--	host_lock_component();
--	hyp_lock_component();
--
--	ret = kvm_pgtable_get_leaf(&host_kvm.pgt, addr, &pte, NULL);
--	if (ret)
--		goto unlock;
--	if (!pte)
--		goto map_shared;
--
--	/*
--	 * Check attributes in the host stage-2 PTE. We need the page to be:
--	 *  - mapped RWX as we're sharing memory;
--	 *  - not borrowed, as that implies absence of ownership.
--	 * Otherwise, we can't let it got through
--	 */
--	cur = kvm_pgtable_stage2_pte_prot(pte);
--	prot = pkvm_mkstate(0, PKVM_PAGE_SHARED_BORROWED);
--	if (!check_prot(cur, PKVM_HOST_MEM_PROT, prot)) {
--		ret = -EPERM;
--		goto unlock;
--	}
--
--	state = pkvm_getstate(cur);
--	if (state == PKVM_PAGE_OWNED)
--		goto map_shared;
--
--	/*
--	 * Tolerate double-sharing the same page, but this requires
--	 * cross-checking the hypervisor stage-1.
--	 */
--	if (state != PKVM_PAGE_SHARED_OWNED) {
--		ret = -EPERM;
--		goto unlock;
--	}
--
--	ret = kvm_pgtable_get_leaf(&pkvm_pgtable, (u64)virt, &pte, NULL);
--	if (ret)
--		goto unlock;
--
--	/*
--	 * If the page has been shared with the hypervisor, it must be
--	 * already mapped as SHARED_BORROWED in its stage-1.
--	 */
--	cur = kvm_pgtable_hyp_pte_prot(pte);
--	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
--	if (!check_prot(cur, prot, ~prot))
--		ret = -EPERM;
--	goto unlock;
--
--map_shared:
--	/*
--	 * If the page is not yet shared, adjust mappings in both page-tables
--	 * while both locks are held.
--	 */
--	prot = pkvm_mkstate(PAGE_HYP, PKVM_PAGE_SHARED_BORROWED);
--	ret = pkvm_create_mappings_locked(virt, virt + PAGE_SIZE, prot);
--	BUG_ON(ret);
--
--	prot = pkvm_mkstate(PKVM_HOST_MEM_PROT, PKVM_PAGE_SHARED_OWNED);
--	ret = host_stage2_idmap_locked(addr, PAGE_SIZE, prot);
--	BUG_ON(ret);
--
--unlock:
--	hyp_unlock_component();
--	host_unlock_component();
--
--	return ret;
--}
--
- void handle_host_mem_abort(struct kvm_cpu_context *host_ctxt)
- {
- 	struct kvm_vcpu_fault_info fault;
-@@ -708,3 +620,36 @@ static int do_share(struct pkvm_mem_share *share)
- 
- 	return WARN_ON(__do_share(share));
- }
 +
-+int __pkvm_host_share_hyp(u64 pfn)
++int __pkvm_host_unshare_hyp(u64 pfn)
 +{
 +	int ret;
 +	u64 host_addr = hyp_pfn_to_phys(pfn);
@@ -234,7 +188,7 @@ index 74ca4043b08a..1282cbd6b9b3 100644
 +	host_lock_component();
 +	hyp_lock_component();
 +
-+	ret = do_share(&share);
++	ret = do_unshare(&share);
 +
 +	hyp_unlock_component();
 +	host_unlock_component();
