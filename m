@@ -2,60 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37503C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Dec 2021 13:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B073AC433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Dec 2021 15:24:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80AE64B1D2;
-	Wed,  1 Dec 2021 08:30:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C9F64B28F;
+	Wed,  1 Dec 2021 10:24:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pYiLiN4NIQLj; Wed,  1 Dec 2021 08:30:16 -0500 (EST)
+	with ESMTP id fXKEQMzWnCq8; Wed,  1 Dec 2021 10:24:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 486274B210;
-	Wed,  1 Dec 2021 08:30:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCD434B288;
+	Wed,  1 Dec 2021 10:24:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB39F4B1D2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 08:30:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8221A4B284
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 10:24:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GOszfILGVd-J for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Dec 2021 08:30:13 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C2264B175
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 08:30:13 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 7D01ACE1D5C;
- Wed,  1 Dec 2021 13:30:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55571C53FAD;
- Wed,  1 Dec 2021 13:30:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638365403;
- bh=03NvP3rtGXIB44jdTVoaqF1hAROkeujLt9oWcwTYciQ=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Aqq8mbqJV9iJlkVO3sm+k+UuMWYsI4cOGf3gf8KnZkpo6n57F3tLHLS5v7+cWwnzZ
- FqTeHFD+vCzhmouOWJiQPeofYPRfvDpflQi1GavRjUbOHbl/k2O2rxL+VojQxs4may
- ZMr46q7oxa9s9ziuxEfJqtRP82txYHYGd7Ky+9AR5yb6fGfHW9sRgKzkBsk3zmmU4q
- +sCqU8n/hDiG+iYb6pMC2FdGdRslLLx0u7iAQ72c2d6Wx3l2sE1+RdERDvAtm8Utay
- tFftn2szDNcJHat9JLSdc3C/as5K+Xao6AuqqU1wrUes8FumBB9xE7CpCClKSkfjVo
- mqffFD16OXxeg==
-Date: Wed, 1 Dec 2021 13:29:58 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 5/6] KVM: arm64: Stop mapping current thread_info at EL2
-Message-ID: <Yad41lTBoUkt8lZi@sirena.org.uk>
-References: <20211201120436.389756-1-maz@kernel.org>
- <20211201120436.389756-6-maz@kernel.org>
+ with ESMTP id Xc+foFKBlYts for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Dec 2021 10:24:49 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24BE14B280
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 10:24:49 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 697DC143B;
+ Wed,  1 Dec 2021 07:24:48 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD2603F766;
+ Wed,  1 Dec 2021 07:24:45 -0800 (PST)
+Date: Wed, 1 Dec 2021 15:24:35 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
+Message-ID: <YaeTs4rUZ9uNNQU7@monolith.localdoman>
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-4-reijiw@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20211201120436.389756-6-maz@kernel.org>
-X-Cookie: All true wisdom is found on T-shirts.
-Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20211117064359.2362060-4-reijiw@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -67,53 +56,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1576163482500335634=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Reiji,
 
---===============1576163482500335634==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cZE6w7K3Kpb3PE91"
-Content-Disposition: inline
+On Tue, Nov 16, 2021 at 10:43:33PM -0800, Reiji Watanabe wrote:
+> This patch lays the groundwork to make ID registers writable.
+> 
+> Introduce struct id_reg_info for an ID register to manage the
+> register specific control of its value for the guest, and provide set
+> of functions commonly used for ID registers to make them writable.
+> 
+> The id_reg_info is used to do register specific initialization,
+> validation of the ID register and etc.  Not all ID registers must
+> have the id_reg_info. ID registers that don't have the id_reg_info
+> are handled in a common way that is applied to all ID registers.
+> 
+> At present, changing an ID register from userspace is allowed only
+> if the ID register has the id_reg_info, but that will be changed
+> by the following patches.
+> 
+> No ID register has the structure yet and the following patches
+> will add the id_reg_info for some ID registers.
+> 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/sysreg.h |   1 +
+>  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
+>  2 files changed, 218 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 16b3f1a1d468..597609f26331 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -1197,6 +1197,7 @@
+>  #define ICH_VTR_TDS_MASK	(1 << ICH_VTR_TDS_SHIFT)
+>  
+>  #define ARM64_FEATURE_FIELD_BITS	4
+> +#define ARM64_FEATURE_FIELD_MASK	((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
+>  
+>  /* Create a mask for the feature bits of the specified feature. */
+>  #define ARM64_FEATURE_MASK(x)	(GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 5608d3410660..1552cd5581b7 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+>  		return read_zero(vcpu, p);
+>  }
+>  
+> +/*
+> + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
+> + * ftr_check_types of id_reg_info.
+> + */
+> +enum feature_check_type {
+> +	FCT_LOWER_SAFE = 0,
+> +	FCT_HIGHER_SAFE,
+> +	FCT_HIGHER_OR_ZERO_SAFE,
+> +	FCT_EXACT,
+> +	FCT_EXACT_OR_ZERO_SAFE,
+> +	FCT_IGNORE,	/* Don't check (any value is fine) */
+> +};
+> +
+> +static int arm64_check_feature_one(enum feature_check_type type, int val,
+> +				   int limit)
+> +{
+> +	bool is_safe = false;
+> +
+> +	if (val == limit)
+> +		return 0;
+> +
+> +	switch (type) {
+> +	case FCT_LOWER_SAFE:
+> +		is_safe = (val <= limit);
+> +		break;
+> +	case FCT_HIGHER_OR_ZERO_SAFE:
+> +		if (val == 0) {
+> +			is_safe = true;
+> +			break;
+> +		}
+> +		fallthrough;
+> +	case FCT_HIGHER_SAFE:
+> +		is_safe = (val >= limit);
+> +		break;
+> +	case FCT_EXACT:
+> +		break;
+> +	case FCT_EXACT_OR_ZERO_SAFE:
+> +		is_safe = (val == 0);
+> +		break;
+> +	case FCT_IGNORE:
 
+What happens if the a new feature is added and the field has a particular
+meaning? How are you going to deal with old userspace implementations that
+use a value here which now is not allowed or it affects the guest?
 
---cZE6w7K3Kpb3PE91
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, Dec 01, 2021 at 12:04:35PM +0000, Marc Zyngier wrote:
-> Now that we can track an equivalent of TIF_FOREIGN_FPSTATE, drop
-> the mapping of current's thread_info at EL2.
-
-Reviwed-by: Mark Brown <broonie@kernel.org>
-
---cZE6w7K3Kpb3PE91
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmGneNUACgkQJNaLcl1U
-h9AhZwf/S6EbpxJbOPrC+y6KTi4WpcMaVfokcHdVC+OM2NfsJ4E/RNW21N+UrB6k
-GOpmtrFQcy5+ww6odUoCv001V+ctHtEv40MOZB3W7t+EccEhKW5LgrD5xsDQ8jbB
-RfInaPSvytz4Zu9JXiovO4doD59+RuK9+kwwP2odeUZ9/g7v6alsKqKFEQwpcOM9
-Y0RjZ0Lf7fgmihm9goswCmfzSliaug0pK0KF7wizybjRkpuSRXEinkla2AT5gJQy
-4+w9/eZrdwVCx3IS9iNqVSqA0esNVZCG3fbIxM3yv30voK34oDdhHhOWZoJKlq40
-zNlJhIuqxJpUQaU7JZosijOMOnrC6Q==
-=nlYP
------END PGP SIGNATURE-----
-
---cZE6w7K3Kpb3PE91--
-
---===============1576163482500335634==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+Thanks,
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============1576163482500335634==--
