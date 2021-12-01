@@ -2,73 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7477AC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  1 Dec 2021 12:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E06FC433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  1 Dec 2021 12:56:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C4CA4B1E9;
-	Wed,  1 Dec 2021 07:04:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B52D54B20B;
+	Wed,  1 Dec 2021 07:56:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ouPMLf7wx8YZ; Wed,  1 Dec 2021 07:04:58 -0500 (EST)
+	with ESMTP id 6SgUlj2QqJNp; Wed,  1 Dec 2021 07:56:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A7024B1EF;
-	Wed,  1 Dec 2021 07:04:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CC904B200;
+	Wed,  1 Dec 2021 07:56:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FBE44B209
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 07:04:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0899C4B1A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 07:56:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 06Qvb7SJDpCt for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Dec 2021 07:04:55 -0500 (EST)
+ with ESMTP id LxPVwK6NphYe for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Dec 2021 07:56:52 -0500 (EST)
 Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE1204B1F5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 07:04:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C83584B19A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 07:56:51 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 775A3CE1DBB;
- Wed,  1 Dec 2021 12:04:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 933F5C53FD5;
- Wed,  1 Dec 2021 12:04:43 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id CB962CE1E64;
+ Wed,  1 Dec 2021 12:56:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADC8AC53FCC;
+ Wed,  1 Dec 2021 12:56:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638360283;
- bh=Y6IbRR56aDBvOEwfHFjAMyQtTO8uqhozFSDwo/ky2ns=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=YN1GaPrx/T6NoF83PBD2sJAU8axpY/DJNuNmfyPL0k+YK99dj/KanCPPzfzTJZnQT
- RB8hjrkxWGe6I8rQOnlRzPGkiw4EaBQFC1oIljh9GhVyntlMld7MkyxKygxgHhfb7R
- dp+8KFkLQPh9Sd/85zeQtT3ANp3OU5S7kLqlXMFrzrOsphjqMVSVEJppiwANhL91n+
- 4Y1s+wclBSDFuIvYYo++8MV5gE6Klkb/Dh57qDwdyWHbQDsYF9aYf6h4WntHSz4UOO
- 96b03Kod2LHpKIIGYj8MKqYtp6rjcTUT+MSrfAoxkzGpei7tN0Kr7ekfM6JS0hBpWJ
- LFsh2kvg98k/Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1msOLp-0097Ab-OS; Wed, 01 Dec 2021 12:04:41 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v3 3/6] KVM: arm64: Remove unused __sve_save_state
-Date: Wed,  1 Dec 2021 12:04:33 +0000
-Message-Id: <20211201120436.389756-4-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211201120436.389756-1-maz@kernel.org>
+ s=k20201202; t=1638363402;
+ bh=cnf6mfxlAvT1EOVOQLzydeQXHEFrZLvejOYfDA/BBzU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=SimVJWW+qLh2pH2sPCh8qp7C4Lli3mx0D3w0p0GxOWg1GIAmJeGsCk/iF7IHk+0mq
+ aqb+L0EpbrdzsL9y9BnjWt7rPEkaxIiaFKMLVfTWuge4JfxPJAZhwppYtddXYqlItd
+ hcVRET9aiMMfOO3Y+DbpOHdjtXSTBSlKtXJkxtW7Z1yO2VKaRCfTTxfOdt80KepEtZ
+ o6tFVxquQg3hUs6eQC7M2VU7x+SI7Ep08kGerYaOsDXvX0/GsCf1hwCZi63kmTzENM
+ YSH8l0NN5vmOxQF/u5ypaiAw8K3CVn96fhRKR8DIgxQT6WExXyp+E60Rl102SPev/K
+ rVbFWP8HfXXpg==
+Date: Wed, 1 Dec 2021 12:56:36 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v3 3/6] KVM: arm64: Remove unused __sve_save_state
+Message-ID: <YadxBLbaSxkBuqaF@sirena.org.uk>
 References: <20211201120436.389756-1-maz@kernel.org>
+ <20211201120436.389756-4-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com,
- will@kernel.org, broonie@kernel.org, yuzenghui@huawei.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>, broonie@kernel.org
+In-Reply-To: <20211201120436.389756-4-maz@kernel.org>
+X-Cookie: All true wisdom is found on T-shirts.
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,52 +67,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============6713360584470576358=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that we don't have any users left for __sve_save_state, remove
-it altogether. Should we ever need to save the SVE state from the
-hypervisor again, we can always re-introduce it.
 
-Suggested-by: Zenghui Yu <yuzenghui@huawei.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_hyp.h | 1 -
- arch/arm64/kvm/hyp/fpsimd.S      | 6 ------
- 2 files changed, 7 deletions(-)
+--===============6713360584470576358==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="SujizcpWR574KISM"
+Content-Disposition: inline
 
-diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-index 5afd14ab15b9..462882f356c7 100644
---- a/arch/arm64/include/asm/kvm_hyp.h
-+++ b/arch/arm64/include/asm/kvm_hyp.h
-@@ -90,7 +90,6 @@ void __debug_restore_host_buffers_nvhe(struct kvm_vcpu *vcpu);
- 
- void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
--void __sve_save_state(void *sve_pffr, u32 *fpsr);
- void __sve_restore_state(void *sve_pffr, u32 *fpsr);
- 
- #ifndef __KVM_NVHE_HYPERVISOR__
-diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
-index e950875e31ce..61e6f3ba7b7d 100644
---- a/arch/arm64/kvm/hyp/fpsimd.S
-+++ b/arch/arm64/kvm/hyp/fpsimd.S
-@@ -25,9 +25,3 @@ SYM_FUNC_START(__sve_restore_state)
- 	sve_load 0, x1, x2, 3
- 	ret
- SYM_FUNC_END(__sve_restore_state)
--
--SYM_FUNC_START(__sve_save_state)
--	mov	x2, #1
--	sve_save 0, x1, x2, 3
--	ret
--SYM_FUNC_END(__sve_save_state)
--- 
-2.30.2
+
+--SujizcpWR574KISM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Wed, Dec 01, 2021 at 12:04:33PM +0000, Marc Zyngier wrote:
+> Now that we don't have any users left for __sve_save_state, remove
+> it altogether. Should we ever need to save the SVE state from the
+> hypervisor again, we can always re-introduce it.
+
+Reviwed-by: Mark Brown <broonie@kernel.org>
+
+--SujizcpWR574KISM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmGncQMACgkQJNaLcl1U
+h9CaowgAgKZUZSBDBwrJAF4oArHVKzIxedIFVD0xv22xdR4NfTcy2Dmv3sbM08Va
+41yJc4LOvrd51ybnaFI6zrhSBk/TKUR+/ayCmKnR/lgchfIdipAyDTYWsR+KXuF3
+TUpo6HlxvvDkYf5VkoM1cBz1l8AX6ooLrT9e0Ndc2FUmBKkpVZS69FasbEw8Odzj
+vzkjUe+ThdgHV1K4lwHZX1vzf78A6XTAE8eqTjM2oF+6XIBGBR0ZKvPGQ6SHij47
+29oGnpXpg9M2v+1hHlffr3oT0XWdelA58Bh1TJifF3fdIOMX1Ys3IkhAVtIJcezT
+HD7ctSuEw7HGwOKl/OYsku062y9QRA==
+=0x81
+-----END PGP SIGNATURE-----
+
+--SujizcpWR574KISM--
+
+--===============6713360584470576358==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============6713360584470576358==--
