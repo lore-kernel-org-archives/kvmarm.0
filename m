@@ -2,103 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F3C3C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Dec 2021 02:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B99DCC433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Dec 2021 04:09:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D2E54B230;
-	Wed,  1 Dec 2021 21:00:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECF6E4086D;
+	Wed,  1 Dec 2021 23:09:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0qW++1VsW+Mn; Wed,  1 Dec 2021 21:00:12 -0500 (EST)
+	with ESMTP id lVFM7yys8fjx; Wed,  1 Dec 2021 23:09:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E7404B1F3;
-	Wed,  1 Dec 2021 21:00:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DC504B191;
+	Wed,  1 Dec 2021 23:09:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C07BE4B1A3
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 21:00:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08A0D4B183
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 23:09:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 007KfwfnKRYz for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Dec 2021 21:00:09 -0500 (EST)
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com
- [209.85.216.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AB0D4B0B3
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 21:00:09 -0500 (EST)
-Received: by mail-pj1-f51.google.com with SMTP id
- fv9-20020a17090b0e8900b001a6a5ab1392so3349973pjb.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Dec 2021 18:00:09 -0800 (PST)
+ with ESMTP id sS6JGxooSmUt for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Dec 2021 23:09:27 -0500 (EST)
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
+ [209.85.216.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B5044086D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Dec 2021 23:09:27 -0500 (EST)
+Received: by mail-pj1-f45.google.com with SMTP id h24so19611133pjq.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Dec 2021 20:09:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to;
- bh=ieez22Xn2l5HWg/32xD5LElmnAc6m+5OIzBSW88ykGA=;
- b=G0z4qsx02gTJpOX+id+WDt87iiCC68/pLc8/RHTHy93ZaRCC/cpz/VtsZ5QLq6NhsC
- pztYoE3cxmb1ab05i+mKIC8ML+IoYX2JvCedMYG/dA5g4rEg3w2gyuXKxfic5SWkfGb+
- LTzmn0ERm4vLCwinV2Q7f64T7CvStCYLOXGIoBC/JED1+H3JdUB9Rafl3aySZq2PFK+D
- j8FA4sR8WNSfp7GYg67MnxS2CunppQgmHJnEXulsOfQJjagvmDJOLOMmlhUfNCfaq2x+
- Msm/OAxbLxPfZ954U2c9p631E4TYd+VGgfnvhf+iALAZ45wlstnB6aDZPFFAYACiiRYn
- 9c3w==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2N85QHtDMNcBqsgUwNly3z4kS+qEOu6OLU80+PIlv/c=;
+ b=Phoo5/g80FaemunXqyG1I+YbjABSqeRplXEqYyMMT7Cvi373UIlpQe61OVvHGotCg+
+ 16pkBNhUK2s3U08jCwz0+3oNImVKoUFceWbyc6XHIMZ9V7GbGhrHWfgqnDQI3IjvqDPT
+ MiiZy7u0ihoL1mw9Q3ajy0QEPGuktRjlbefm9IRX7WEPO7BnxLo4vwgBMyyZp0xBDA8V
+ h0f1xpM/8yZ8mtzNmh3kEv9zAmDL4QVH+Gag1BwOEuAWeQmppgHKgtb5CYAp/vBK8duO
+ sQR309sohYF2q2FWl14qvATrQuRZ+aOQjzgIQxebFthDCoRTd8pn70E5gch8lx3xLwDG
+ Tg9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=ieez22Xn2l5HWg/32xD5LElmnAc6m+5OIzBSW88ykGA=;
- b=kqrDEgbenzcyD4NgXygLiBBYnWl17P5X+KFGkzBqyJCm7hzWax2bo8CPBAaURySxL4
- Ci61PdL+ejQ8fKp7pmAq52ICSNIl052gC5iCdqNd5ylEsZ6sxIaK59+mJgP02PxdC4or
- /2bJNm+iENLFo4TihlSOBqZiFmFH6I9hnt6ZEQWlmU8vJ7xAAUwYdfBg8Ltze56m0tsF
- md278BWPuaOB3oySMRcdknrZkQf/Mw62JE86+xzM5KY/ExQoTy9xy7ztde+RCNsiaUz+
- 6ltNX0Dmr9AF0+gh1CEyoQpg5qEEzs/rskj9QwR82dydqdSyyDoG2uLZa85Sdl366U6d
- KBBQ==
-X-Gm-Message-State: AOAM5331J1Ii9su/2ydPl315vQaEetTjQmYaCPyOxJ/M31vt2C5t0lSw
- nzlQv+OJWFUv18MVzlAM0QA/1Q==
-X-Google-Smtp-Source: ABdhPJxNBM72YGsKSZuE+5oJQdw89IebyEem9LDSzk1Pcg1GjafGCYFG2d6Z2Cymjn7sJ6Jwu52nlQ==
-X-Received: by 2002:a17:90b:3848:: with SMTP id
- nl8mr2408510pjb.221.1638410408016; 
- Wed, 01 Dec 2021 18:00:08 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id lr6sm550689pjb.0.2021.12.01.18.00.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 01 Dec 2021 18:00:07 -0800 (PST)
-Date: Thu, 2 Dec 2021 02:00:03 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
- successful
-Message-ID: <Yagoo7R8P5xVilsj@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-12-seanjc@google.com>
- <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
- <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
- <YaUNBfJh35WXMV0M@google.com>
- <496c2fc6-26b0-9b5d-32f4-2f9e9dd6a064@redhat.com>
- <YaUiEquKYi5eqWC0@google.com>
- <880a5727-69d1-72a1-b129-b053781625ad@redhat.com>
- <458c0819a578ba854f00089bc312c8faa177a81a.camel@redhat.com>
- <32eabe7d270e5a466ba2d9345b4270b8fe27700c.camel@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2N85QHtDMNcBqsgUwNly3z4kS+qEOu6OLU80+PIlv/c=;
+ b=NOeeiOkALYlIKSwj+NQljeV2yFJt6Rhx0BoaeEmnMlOigp2ptBm61A/3rH7CiRndxx
+ PKi/aO5PAniEHcvue6fUWfi0KE8Qlaqs31DJyBRowNcAlDnmWyekq+N9cl9hqFOdLvif
+ DjIRuKz+4FqOaeekwxRbCA0Jhl3Fkm2r7y8uTomTAGa0484qZ8f98loZLyPsRqYAWjLv
+ qNhIMxNew1+J4axCcVT1ghHKcgDJFiNN2/fs3VOwMOuezlnkJeGVtc2ODjzrA4KR47sr
+ GrUK8zxdpWw11qVmiA7PlTOObUxSg3cIrWMiClFT//DvnQ2e5kjSrQw13iRzxAqtwWQ4
+ k1ew==
+X-Gm-Message-State: AOAM533hpAkunYd6mTiv+9bN2ZOkKcglZZrClORA4JWlHWYhSMUGAexZ
+ MAQzqhsB+cLOHp4MWB9DtyGMgPpuDWwIlLxUqW5xcA==
+X-Google-Smtp-Source: ABdhPJxsDlo8TGgs6j5Z1iLI19iMEZz85qkEhEpAtj8o6pHeb9vqLMAXvoMausmI1cxcdMPdMSLuTqlM1DnoGFHZcBA=
+X-Received: by 2002:a17:90a:e506:: with SMTP id t6mr3046830pjy.9.1638418166415; 
+ Wed, 01 Dec 2021 20:09:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <32eabe7d270e5a466ba2d9345b4270b8fe27700c.camel@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Wei Huang <wei.huang2@amd.com>,
- kvm-ppc@vger.kernel.org, Paul Walmsley <paul.walmsley@sifive.com>,
- David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Anup Patel <anup.patel@wdc.com>,
- linux-mips@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>,
- kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-4-reijiw@google.com>
+ <YaeTs4rUZ9uNNQU7@monolith.localdoman>
+In-Reply-To: <YaeTs4rUZ9uNNQU7@monolith.localdoman>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Wed, 1 Dec 2021 20:09:10 -0800
+Message-ID: <CAAeT=FwktER+aKh4tCEHWQTOSeUkHJzmtPgYjhE=Vv5YMid8WQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,48 +80,138 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVGh1LCBEZWMgMDIsIDIwMjEsIE1heGltIExldml0c2t5IHdyb3RlOgo+IE9uIFR1ZSwgMjAy
-MS0xMS0zMCBhdCAwMDo1MyArMDIwMCwgTWF4aW0gTGV2aXRza3kgd3JvdGU6Cj4gPiBPbiBNb24s
-IDIwMjEtMTEtMjkgYXQgMjA6MTggKzAxMDAsIFBhb2xvIEJvbnppbmkgd3JvdGU6Cj4gPiBCYXNp
-Y2FsbHkgd2hhdCBJIHNlZSB0aGF0Cj4gPiAgCj4gPiAxLiB2Q1BVMiBkaXNhYmxlcyBpc19ydW5u
-aW5nIGluIGF2aWMgcGh5c2ljYWwgaWQgY2FjaGUKPiA+IDIuIHZDUFUyIGNoZWNrcyB0aGF0IElS
-UiBpcyBlbXB0eSBhbmQgaXQgaXMKPiA+IDMuIHZDUFUyIGRvZXMgc2NoZWR1bGUoKTsKPiA+ICAK
-PiA+IGFuZCBpdCBrZWVwcyBvbiBzbGVlcGluZyBmb3JldmVyLiBJZiBJIGtpY2sgaXQgdmlhIHNp
-Z25hbCAKPiA+IChsaWtlIGp1c3QgZG9pbmcgJ2luZm8gcmVnaXN0ZXJzJyBxZW11IGhtcCBjb21t
-YW5kCj4gPiBvciBqdXN0IHN0b3AvY29udCBvbiB0aGUgc2FtZSBobXAgaW50ZXJmYWNlLCB0aGUK
-PiA+IHZDUFUgd2FrZXMgdXAgYW5kIG5vdGljZXMgdGhhdCBJUlIgc3VkZGVubHkgaXMgbm90IGVt
-cHR5LAo+ID4gYW5kIHRoZSBWTSBjb21lcyBiYWNrIHRvIGxpZmUgKGFuZCB0aGVuIGhhbmdzIGFm
-dGVyIGEgd2hpbGUgYWdhaW4KPiA+IHdpdGggdGhlIHNhbWUgcHJvYmxlbS4uLi4pLgo+ID4gIAo+
-ID4gQXMgZmFyIGFzIEkgc2VlIGluIHRoZSB0cmFjZXMsIHRoZSBiaXQgaW4gSVJSIGNhbWUgZnJv
-bQo+ID4gYW5vdGhlciBWQ1BVIHdobyBkaWRuJ3QgcmVzcGVjdCB0aGUgaXJfcnVubmluZyBiaXQg
-YW5kIGRpZG4ndCBnZXQgCj4gPiBBVklDX0lOQ09NUExFVEVfSVBJIFZNZXhpdC4KPiA+IEkgY2Fu
-J3QgMTAwJSBwcm92ZSBpdCB5ZXQsIGJ1dCBldmVyeXRoaW5nIGluIHRoZSB0cmFjZSBzaG93cyB0
-aGlzLgoKLi4uCgo+IEkgYW0gbm93IGFsbW9zdCBzdXJlIHRoYXQgdGhpcyBpcyBlcnJhdGEgIzEy
-MzUuCj4gCj4gSSBoYWQgYXR0YWNoZWQgYSBrdm0tdW5pdC10ZXN0IEkgd3JvdGUgKHBhdGNoIGFn
-YWluc3QgbWFzdGVyIG9mCj4gaHR0cHM6Ly9naXRsYWIuY29tL2t2bS11bml0LXRlc3RzL2t2bS11
-bml0LXRlc3RzLmdpdC8pIHdoaWNoIGlzIGFibGUgdG8KPiByZXByb2R1Y2UgdGhlIGlzc3VlIG9u
-IHN0b2NrIDUuMTUuMCBrZXJuZWwgKCpubyBwYXRjaGVzIGFwcGxpZWQgYXQgYWxsKikKPiBhZnRl
-ciBqdXN0IGZldyBzZWNvbmRzLiAgSWYga3ZtIGlzIGxvYWRlZCB3aXRob3V0IGhhbHQtcG9sbGlu
-ZyAodGhhdCBpcwo+IGhhbHRfcG9sbF9ucz0wIGlzIHVzZWQpLgo+IAo+IEhhbHQgcG9sbGluZyBh
-bmQvb3IgU2VhbidzIHBhdGNoIGFyZSBub3QgdG8gYmxhbWUsIGl0IGp1c3QgY2hhbmdlcyB0aW1l
-aW5nLgo+IFdpdGggU2VhbidzIHBhdGNoIEkgZG9uJ3QgbmVlZCB0byBkaXNhYmxlIGhhbGYgcG9s
-bGluZy4KCkhtbSwgdGhhdCBzdWdnZXN0cyB0aGUgYnVnL2VycmF0dW0gaXMgZHVlIHRvIHRoZSBD
-UFUgY29uc3VtaW5nIHN0YWxlIGRhdGEgZnJvbSAjNApmb3IgdGhlIElzUnVubmluZyBjaGVjayBp
-biAjNSwgb3IgcmV0aXJpbmcgdW9wcyBmb3IgdGhlIElzUnVubmluZyBjaGVjayBiZWZvcmUKcmV0
-aXJpbmcgdGhlIHZJUlIgdXBkYXRlLiAgSXQgd291bGQgYmUgaGVscGZ1bCBpZiB0aGUgZXJyYXR1
-bSBhY3R1YWxseSBwcm92aWRlZAppbmZvIG9uIHRoZSAiaGlnaGx5IHNwZWNpZmljIGFuZCBkZXRh
-aWxlZCBzZXQgb2YgaW50ZXJuYWwgdGltaW5nIGNvbmRpdGlvbnMiLiA6LS8KCiAgNC4gTG9va3Vw
-IHRoZSB2QVBJQyBiYWNraW5nIHBhZ2UgYWRkcmVzcyBpbiB0aGUgUGh5c2ljYWwgQVBJQyB0YWJs
-ZSB1c2luZyB0aGUKICAgICBndWVzdCBwaHlzaWNhbCBBUElDIElEIGFzIGFuIGluZGV4IGludG8g
-dGhlIHRhYmxlLgogIDUuIEZvciBldmVyeSB2YWxpZCBkZXN0aW5hdGlvbjoKICAgICAtIEF0b21p
-Y2FsbHkgc2V0IHRoZSBhcHByb3ByaWF0ZSBJUlIgYml0IGluIGVhY2ggb2YgdGhlIGRlc3RpbmF0
-aW9uc+KAmSB2QVBJQwogICAgICAgYmFja2luZyBwYWdlLgogICAgIC0gQ2hlY2sgdGhlIElzUnVu
-bmluZyBzdGF0dXMgb2YgZWFjaCBkZXN0aW5hdGlvbi4KX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
-dGluZm8va3ZtYXJtCg==
+Hi Alex,
+
+On Wed, Dec 1, 2021 at 7:24 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi Reiji,
+>
+> On Tue, Nov 16, 2021 at 10:43:33PM -0800, Reiji Watanabe wrote:
+> > This patch lays the groundwork to make ID registers writable.
+> >
+> > Introduce struct id_reg_info for an ID register to manage the
+> > register specific control of its value for the guest, and provide set
+> > of functions commonly used for ID registers to make them writable.
+> >
+> > The id_reg_info is used to do register specific initialization,
+> > validation of the ID register and etc.  Not all ID registers must
+> > have the id_reg_info. ID registers that don't have the id_reg_info
+> > are handled in a common way that is applied to all ID registers.
+> >
+> > At present, changing an ID register from userspace is allowed only
+> > if the ID register has the id_reg_info, but that will be changed
+> > by the following patches.
+> >
+> > No ID register has the structure yet and the following patches
+> > will add the id_reg_info for some ID registers.
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/include/asm/sysreg.h |   1 +
+> >  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
+> >  2 files changed, 218 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 16b3f1a1d468..597609f26331 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -1197,6 +1197,7 @@
+> >  #define ICH_VTR_TDS_MASK     (1 << ICH_VTR_TDS_SHIFT)
+> >
+> >  #define ARM64_FEATURE_FIELD_BITS     4
+> > +#define ARM64_FEATURE_FIELD_MASK     ((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
+> >
+> >  /* Create a mask for the feature bits of the specified feature. */
+> >  #define ARM64_FEATURE_MASK(x)        (GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 5608d3410660..1552cd5581b7 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+> >               return read_zero(vcpu, p);
+> >  }
+> >
+> > +/*
+> > + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
+> > + * ftr_check_types of id_reg_info.
+> > + */
+> > +enum feature_check_type {
+> > +     FCT_LOWER_SAFE = 0,
+> > +     FCT_HIGHER_SAFE,
+> > +     FCT_HIGHER_OR_ZERO_SAFE,
+> > +     FCT_EXACT,
+> > +     FCT_EXACT_OR_ZERO_SAFE,
+> > +     FCT_IGNORE,     /* Don't check (any value is fine) */
+> > +};
+> > +
+> > +static int arm64_check_feature_one(enum feature_check_type type, int val,
+> > +                                int limit)
+> > +{
+> > +     bool is_safe = false;
+> > +
+> > +     if (val == limit)
+> > +             return 0;
+> > +
+> > +     switch (type) {
+> > +     case FCT_LOWER_SAFE:
+> > +             is_safe = (val <= limit);
+> > +             break;
+> > +     case FCT_HIGHER_OR_ZERO_SAFE:
+> > +             if (val == 0) {
+> > +                     is_safe = true;
+> > +                     break;
+> > +             }
+> > +             fallthrough;
+> > +     case FCT_HIGHER_SAFE:
+> > +             is_safe = (val >= limit);
+> > +             break;
+> > +     case FCT_EXACT:
+> > +             break;
+> > +     case FCT_EXACT_OR_ZERO_SAFE:
+> > +             is_safe = (val == 0);
+> > +             break;
+> > +     case FCT_IGNORE:
+>
+> What happens if the a new feature is added and the field has a particular
+> meaning? How are you going to deal with old userspace implementations that
+> use a value here which now is not allowed or it affects the guest?
+
+With this v3 series, unless KVM is changed for the new field,
+a new feature will be treated as lower safe (that's the default).
+If the field won't fit any of those cases, FCT_IGNORE needs to be
+used for the field, and the ID register specific validation function,
+which will be registered in id_reg_info, needs to validate the field.
+
+Old userspace implementation shouldn't be affected because the default
+values (the values right after the first KVM_ARM_VCPU_INIT) for
+ID registers won't be changed by this series (patch-9 changes
+AA64DFR0.PMUVER/DFR0.PERFMON but it is due to a bug fix), and the
+default value, which is basically same as @limit (or indicates
+less or smaller level of features than @limit for features that
+can be configured by KVM_ARM_VCPU_INIT, etc), is always allowed
+by arm64_check_feature_one().
+
+Having said that, arm64_check_feature_one() will be gone from the next
+version, and the similar checking will be done by a new function in
+arch/arm64/kernel/cpufeature.c that will use arm64_ftr_bits instead.
+
+  https://lore.kernel.org/all/CAAeT=FxwzRF0YZmmoEmq3xRHnhun-BCx_FeEQrOVLgzwseSy4w@mail.gmail.com/
+
+Unless KVM is changed for the new field, it will be validated based
+on arm64_ftr_bits for the field.  If KVM needs to handle the field
+differently, then we will have the new function ignore the field,
+and will have the ID register specific validation function handle
+the field.
+
+Thanks,
+Reiji
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
