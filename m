@@ -2,55 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 120ADC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Dec 2021 17:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23790C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Dec 2021 17:11:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 775F84B220;
-	Thu,  2 Dec 2021 12:11:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B979D4B219;
+	Thu,  2 Dec 2021 12:11:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Y8OOCNfHk6dC; Thu,  2 Dec 2021 12:11:00 -0500 (EST)
+	with ESMTP id qzk3dgzU-suV; Thu,  2 Dec 2021 12:11:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11E3E4B1DA;
-	Thu,  2 Dec 2021 12:11:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 305B74B224;
+	Thu,  2 Dec 2021 12:11:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ECD994B137
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 12:10:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB5654B130
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 12:10:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2EOFQCEAk3sc for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id TQuQfU++g+PH for <kvmarm@lists.cs.columbia.edu>;
  Thu,  2 Dec 2021 12:10:57 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15C414B130
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E5FBE4B195
  for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 12:10:57 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 20370B823FB;
- Thu,  2 Dec 2021 17:10:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 238D7C00446;
- Thu,  2 Dec 2021 17:10:51 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 9B51E624DD;
+ Thu,  2 Dec 2021 17:10:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D80AC53FCF;
+ Thu,  2 Dec 2021 17:10:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638465053;
- bh=FRmookF9nYEAwWkZ31szXn8ae4AuML7H2xC+7J+E65s=;
- h=From:To:Cc:Subject:Date:From;
- b=iv7pD2zcsYSSp9LZtchap81xKi6GfQQM9YZNXP9EyULBnRsMPXrjDhVODSo83Wsbu
- twYAgkvKVxznULux2k5a1f7M0zxzMFWN1f9wq1SXriwhUCbBxLjn2X+ScJUbkLRkkQ
- WrRn3IG2YhZOyFb3WW1WNgH7BZozvDSQh/C0TfISIEFAZIDFp7PJA3TJoM7RGObEol
- qkIHyPzOMypM0wnUl/FMnJTF++zo6f9zDbrYPL3UvGh1tQ8JZ1uUh1AkegIbr54QqJ
- iTWFTgVS8mt3637jYSh1epQ0y6lgQXjEK+yThCKliIfceoAOg5uJKFvP35q8VX1T6P
- +70NtTcYTEyQQ==
+ s=k20201202; t=1638465056;
+ bh=g1EJWBrySQ+lD+cn+Gm8JLLcRf3oBr2bg8d/dO69wDc=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=nTDXeXkFFKk2Nfaqs6qfZr/PA3tOSNM0Uj5gs06/um9kg5goxsKZn0sFOGGkb6sAe
+ 5J7EghA9llGtY08nnBh3iKZL/z7AwFmlgujX8HEBsrw2t/pqOHk7rtoy/6GRjWX9Vi
+ IxofJvA2VQCexFHv+GVtO9coopAe25VJ9kf+mlV2X1lYP8UXvsBd/Syam2PYuAXNjD
+ qZEGlpFq+OpD/Bo/oNCB+c1g8CGlC2H9ta4qBasHIrTdToektouP78pffthiAdjKQH
+ e/dDdcCyk5yarG6B6T87BPZRZnwclM73Ix0h6KHIgQKqyshJI+37AxFyhasRmgJnmn
+ nuBNGGK3uvhFA==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 0/3] KVM: arm64: Keep hyp and host headers separate where
- possible
-Date: Thu,  2 Dec 2021 17:10:45 +0000
-Message-Id: <20211202171048.26924-1-will@kernel.org>
+Subject: [PATCH 1/3] arm64: Add missing include of asm/cpufeature.h to
+ asm/mmu.h
+Date: Thu,  2 Dec 2021 17:10:46 +0000
+Message-Id: <20211202171048.26924-2-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20211202171048.26924-1-will@kernel.org>
+References: <20211202171048.26924-1-will@kernel.org>
 MIME-Version: 1.0
 Cc: Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
  linux-arm-kernel@lists.infradead.org
@@ -70,54 +72,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi folks,
+asm/mmu.h refers to cpus_have_const_cap() in the definition of
+arm64_kernel_unmapped_at_el0() so include asm/cpufeature.h directly
+rather than force all users of the header to do it themselves.
 
-This series tidies up the header file usage for the nvhe hyp object so
-that header files under arch/arm64/kvm/hyp/include are not included by
-host code running at EL1.
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ arch/arm64/include/asm/mmu.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-For definitions that are shared between the host and hypervisor, these
-are either moved to headers under arch/arm64/include/asm/ or are
-generated by kbuild along similar lines to asm-offsets.h. For now, this
-allows us to tidy up some of the pKVM reserved memory handling, but in
-future this will also allow the pKVM EL2 data structures to avoid
-polluting the host namespace.
-
-Cheers,
-
-Will
-
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: James Morse <james.morse@arm.com>
-Cc: Quentin Perret <qperret@google.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Fuad Tabba <tabba@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
-
---->8
-
-Will Deacon (3):
-  arm64: Add missing include of asm/cpufeature.h to asm/mmu.h
-  KVM: arm64: Generate hyp_constants.h for the host
-  KVM: arm64: Move host EL1 code out of hyp/ directory
-
- arch/arm64/include/asm/kvm_pkvm.h             | 71 +++++++++++++++++++
- arch/arm64/include/asm/mmu.h                  |  1 +
- arch/arm64/kvm/.gitignore                     |  2 +
- arch/arm64/kvm/Makefile                       | 18 ++++-
- arch/arm64/kvm/hyp/Makefile                   |  2 +-
- arch/arm64/kvm/hyp/hyp-constants.c            | 10 +++
- arch/arm64/kvm/hyp/include/nvhe/mm.h          | 57 ---------------
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  1 +
- arch/arm64/kvm/hyp/nvhe/mm.c                  |  1 +
- arch/arm64/kvm/hyp/nvhe/setup.c               |  1 +
- arch/arm64/kvm/{hyp/reserved_mem.c => pkvm.c} |  8 +--
- 11 files changed, 109 insertions(+), 63 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_pkvm.h
- create mode 100644 arch/arm64/kvm/.gitignore
- create mode 100644 arch/arm64/kvm/hyp/hyp-constants.c
- rename arch/arm64/kvm/{hyp/reserved_mem.c => pkvm.c} (94%)
-
+diff --git a/arch/arm64/include/asm/mmu.h b/arch/arm64/include/asm/mmu.h
+index e9c30859f80c..48f8466a4be9 100644
+--- a/arch/arm64/include/asm/mmu.h
++++ b/arch/arm64/include/asm/mmu.h
+@@ -15,6 +15,7 @@
+ #ifndef __ASSEMBLY__
+ 
+ #include <linux/refcount.h>
++#include <asm/cpufeature.h>
+ 
+ typedef struct {
+ 	atomic64_t	id;
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
