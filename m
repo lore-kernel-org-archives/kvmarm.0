@@ -2,53 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 175C9C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Dec 2021 17:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B84A9C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Dec 2021 17:11:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8A5C4B20D;
-	Thu,  2 Dec 2021 12:11:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DBCA4B19D;
+	Thu,  2 Dec 2021 12:11:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QIyRxdzZpn+7; Thu,  2 Dec 2021 12:11:04 -0500 (EST)
+	with ESMTP id rrtbcC-lHOae; Thu,  2 Dec 2021 12:11:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E44E4B223;
-	Thu,  2 Dec 2021 12:11:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D4444B226;
+	Thu,  2 Dec 2021 12:11:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B29874B21E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 12:11:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E56644B19D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 12:11:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hyxwV3cFP2R1 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Dec 2021 12:11:01 -0500 (EST)
+ with ESMTP id 9SJHFul7W5rp for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Dec 2021 12:11:03 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E54D4B219
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 12:11:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7C0C4B230
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 12:11:02 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 78CA4B82243;
- Thu,  2 Dec 2021 17:10:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EBC4C53FD1;
- Thu,  2 Dec 2021 17:10:56 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 9D583B82428;
+ Thu,  2 Dec 2021 17:11:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB508C53FCB;
+ Thu,  2 Dec 2021 17:10:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638465058;
- bh=v3zl9mHxxg1HALqob7r/4qFX7wNgjAZhwam6ujRoXYI=;
+ s=k20201202; t=1638465060;
+ bh=SRBdC/8OTcJxtoyQgOXVMr/P8KKoOzMIfY8JKeFSS8A=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=IhMSRBAC31b3M+uR2h6BUgD6dSBtG1h5jvckFUOwNENqL8n76zA2hnSIeclNfhBXb
- 24N1A9Ss8+584XOuZociC2uOnIJKgUS3iu1JRhJ6efa7CFa730fK6cG9amcmggx8Jj
- 61m41BMVHMmb2sf+Z4w9OHdYVQjndSjzbJ4ff2tApzu1ACjz2sCyeMTGLqzI69pcfZ
- MAGqo4U++zEp+70th2kq0jrDS2LQkN3ZHPMLNigLUZqWI5XXvHqwjySd5dtNAVBA+v
- Y7XHquVEX7OcGHW8DXWetBrRF2EzAlpbtXxwpTwn1KebzdtrbMB4muWCEgt3Y6tCJk
- gIeuZYCKTB3Qg==
+ b=E3Rt9sGCebuBJ9wvPFriws/HK6eWxMIGWSrR8T0PqzbzvzwFAEVJPik45O2ENbNTZ
+ PdWE/fsg5TjoacPGVQ99fYA9y9E3fhb3K2POoEZAlsbWv0D200F1TNcD++kxW2zp7J
+ 8dpgOTVfKQgZ0UKTkSogpLx89eWO1XGL0Qnp3EUpSS7wRmxPsF+tFhcdGuYV5a3l7J
+ TJbPvRU0wpss5jHJWr10NGmv06lq0c0N5Kt6bJbwdEuAX21PXAtBKyJnSudqyIYQUW
+ YLlMbth3s09qvfS4L4hWDHqfM4qPxgXAx0inbEIMKwDlsNpMDdI3NQSWFjlRtdpZwO
+ vQmfdv6Q2rx/g==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 2/3] KVM: arm64: Generate hyp_constants.h for the host
-Date: Thu,  2 Dec 2021 17:10:47 +0000
-Message-Id: <20211202171048.26924-3-will@kernel.org>
+Subject: [PATCH 3/3] KVM: arm64: Move host EL1 code out of hyp/ directory
+Date: Thu,  2 Dec 2021 17:10:48 +0000
+Message-Id: <20211202171048.26924-4-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20211202171048.26924-1-will@kernel.org>
 References: <20211202171048.26924-1-will@kernel.org>
@@ -71,67 +71,264 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In order to avoid exposing hypervisor (EL2) data structures directly to
-the host, generate hyp_constants.h to provide constants such as structure
-sizes to the host without dragging in the definitions themselves.
+kvm/hyp/reserved_mem.c contains host code executing at EL1 and is not
+linked into the hypervisor object. Move the file into kvm/pkvm.c and
+rework the headers so that the definitions shared between the host and
+the hypervisor live in asm/kvm_pkvm.h.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/.gitignore          |  2 ++
- arch/arm64/kvm/Makefile            | 16 ++++++++++++++++
- arch/arm64/kvm/hyp/hyp-constants.c | 10 ++++++++++
- 3 files changed, 28 insertions(+)
- create mode 100644 arch/arm64/kvm/.gitignore
- create mode 100644 arch/arm64/kvm/hyp/hyp-constants.c
+ arch/arm64/include/asm/kvm_pkvm.h             | 71 +++++++++++++++++++
+ arch/arm64/kvm/Makefile                       |  2 +-
+ arch/arm64/kvm/hyp/Makefile                   |  2 +-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h          | 57 ---------------
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c         |  1 +
+ arch/arm64/kvm/hyp/nvhe/mm.c                  |  1 +
+ arch/arm64/kvm/hyp/nvhe/setup.c               |  1 +
+ arch/arm64/kvm/{hyp/reserved_mem.c => pkvm.c} |  8 +--
+ 8 files changed, 80 insertions(+), 63 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_pkvm.h
+ rename arch/arm64/kvm/{hyp/reserved_mem.c => pkvm.c} (94%)
 
-diff --git a/arch/arm64/kvm/.gitignore b/arch/arm64/kvm/.gitignore
+diff --git a/arch/arm64/include/asm/kvm_pkvm.h b/arch/arm64/include/asm/kvm_pkvm.h
 new file mode 100644
-index 000000000000..6182aefb8302
+index 000000000000..9f4ad2a8df59
 --- /dev/null
-+++ b/arch/arm64/kvm/.gitignore
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+hyp_constants.h
++++ b/arch/arm64/include/asm/kvm_pkvm.h
+@@ -0,0 +1,71 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2020 - Google LLC
++ * Author: Quentin Perret <qperret@google.com>
++ */
++#ifndef __ARM64_KVM_PKVM_H__
++#define __ARM64_KVM_PKVM_H__
++
++#include <linux/memblock.h>
++#include <asm/kvm_pgtable.h>
++
++#define HYP_MEMBLOCK_REGIONS 128
++
++extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
++extern unsigned int kvm_nvhe_sym(hyp_memblock_nr);
++
++static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
++{
++	unsigned long total = 0, i;
++
++	/* Provision the worst case scenario */
++	for (i = 0; i < KVM_PGTABLE_MAX_LEVELS; i++) {
++		nr_pages = DIV_ROUND_UP(nr_pages, PTRS_PER_PTE);
++		total += nr_pages;
++	}
++
++	return total;
++}
++
++static inline unsigned long __hyp_pgtable_total_pages(void)
++{
++	unsigned long res = 0, i;
++
++	/* Cover all of memory with page-granularity */
++	for (i = 0; i < kvm_nvhe_sym(hyp_memblock_nr); i++) {
++		struct memblock_region *reg = &kvm_nvhe_sym(hyp_memory)[i];
++		res += __hyp_pgtable_max_pages(reg->size >> PAGE_SHIFT);
++	}
++
++	return res;
++}
++
++static inline unsigned long hyp_s1_pgtable_pages(void)
++{
++	unsigned long res;
++
++	res = __hyp_pgtable_total_pages();
++
++	/* Allow 1 GiB for private mappings */
++	res += __hyp_pgtable_max_pages(SZ_1G >> PAGE_SHIFT);
++
++	return res;
++}
++
++static inline unsigned long host_s2_pgtable_pages(void)
++{
++	unsigned long res;
++
++	/*
++	 * Include an extra 16 pages to safely upper-bound the worst case of
++	 * concatenated pgds.
++	 */
++	res = __hyp_pgtable_total_pages() + 16;
++
++	/* Allow 1 GiB for MMIO mappings */
++	res += __hyp_pgtable_max_pages(SZ_1G >> PAGE_SHIFT);
++
++	return res;
++}
++
++#endif	/* __ARM64_KVM_PKVM_H__ */
 diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 989bb5dad2c8..0b561752f8d8 100644
+index 0b561752f8d8..8ca8cf6f5619 100644
 --- a/arch/arm64/kvm/Makefile
 +++ b/arch/arm64/kvm/Makefile
-@@ -25,3 +25,19 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
- 	 vgic/vgic-its.o vgic/vgic-debug.o
+@@ -15,7 +15,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+ 	 arm.o mmu.o mmio.o psci.o perf.o hypercalls.o pvtime.o \
+ 	 inject_fault.o va_layout.o handle_exit.o \
+ 	 guest.o debug.o reset.o sys_regs.o \
+-	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
++	 vgic-sys-reg-v3.o fpsimd.o pmu.o pkvm.o \
+ 	 arch_timer.o trng.o\
+ 	 vgic/vgic.o vgic/vgic-init.o \
+ 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index b726332eec49..687598e41b21 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -10,4 +10,4 @@ subdir-ccflags-y := -I$(incdir)				\
+ 		    -DDISABLE_BRANCH_PROFILING		\
+ 		    $(DISABLE_STACKLEAK_PLUGIN)
  
- kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o
-+
-+always-y := hyp_constants.h hyp-constants.s
-+
-+define rule_gen_hyp_constants
-+	$(call filechk,offsets,__HYP_CONSTANTS_H__)
-+endef
-+
-+CFLAGS_hyp-constants.o = -I $(srctree)/$(src)/hyp/include
-+$(obj)/hyp-constants.s: $(src)/hyp/hyp-constants.c FORCE
-+	$(call if_changed_dep,cc_s_c)
-+
-+$(obj)/hyp_constants.h: $(obj)/hyp-constants.s FORCE
-+	$(call if_changed_rule,gen_hyp_constants)
-+
-+obj-kvm := $(addprefix $(obj)/, $(kvm-y))
-+$(obj-kvm): $(obj)/hyp_constants.h
-diff --git a/arch/arm64/kvm/hyp/hyp-constants.c b/arch/arm64/kvm/hyp/hyp-constants.c
-new file mode 100644
-index 000000000000..b3742a6691e8
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/hyp-constants.c
-@@ -0,0 +1,10 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <linux/kbuild.h>
-+#include <nvhe/memory.h>
-+
-+int main(void)
-+{
-+	DEFINE(STRUCT_HYP_PAGE_SIZE,	sizeof(struct hyp_page));
-+	return 0;
-+}
+-obj-$(CONFIG_KVM) += vhe/ nvhe/ pgtable.o reserved_mem.o
++obj-$(CONFIG_KVM) += vhe/ nvhe/ pgtable.o
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+index c9a8f535212e..ef6a58a04235 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+@@ -10,9 +10,6 @@
+ #include <nvhe/memory.h>
+ #include <nvhe/spinlock.h>
+ 
+-#define HYP_MEMBLOCK_REGIONS 128
+-extern struct memblock_region kvm_nvhe_sym(hyp_memory)[];
+-extern unsigned int kvm_nvhe_sym(hyp_memblock_nr);
+ extern struct kvm_pgtable pkvm_pgtable;
+ extern hyp_spinlock_t pkvm_pgd_lock;
+ extern struct hyp_pool hpool;
+@@ -39,58 +36,4 @@ static inline void hyp_vmemmap_range(phys_addr_t phys, unsigned long size,
+ 	*end = ALIGN(*end, PAGE_SIZE);
+ }
+ 
+-static inline unsigned long __hyp_pgtable_max_pages(unsigned long nr_pages)
+-{
+-	unsigned long total = 0, i;
+-
+-	/* Provision the worst case scenario */
+-	for (i = 0; i < KVM_PGTABLE_MAX_LEVELS; i++) {
+-		nr_pages = DIV_ROUND_UP(nr_pages, PTRS_PER_PTE);
+-		total += nr_pages;
+-	}
+-
+-	return total;
+-}
+-
+-static inline unsigned long __hyp_pgtable_total_pages(void)
+-{
+-	unsigned long res = 0, i;
+-
+-	/* Cover all of memory with page-granularity */
+-	for (i = 0; i < kvm_nvhe_sym(hyp_memblock_nr); i++) {
+-		struct memblock_region *reg = &kvm_nvhe_sym(hyp_memory)[i];
+-		res += __hyp_pgtable_max_pages(reg->size >> PAGE_SHIFT);
+-	}
+-
+-	return res;
+-}
+-
+-static inline unsigned long hyp_s1_pgtable_pages(void)
+-{
+-	unsigned long res;
+-
+-	res = __hyp_pgtable_total_pages();
+-
+-	/* Allow 1 GiB for private mappings */
+-	res += __hyp_pgtable_max_pages(SZ_1G >> PAGE_SHIFT);
+-
+-	return res;
+-}
+-
+-static inline unsigned long host_s2_pgtable_pages(void)
+-{
+-	unsigned long res;
+-
+-	/*
+-	 * Include an extra 16 pages to safely upper-bound the worst case of
+-	 * concatenated pgds.
+-	 */
+-	res = __hyp_pgtable_total_pages() + 16;
+-
+-	/* Allow 1 GiB for MMIO mappings */
+-	res += __hyp_pgtable_max_pages(SZ_1G >> PAGE_SHIFT);
+-
+-	return res;
+-}
+-
+ #endif /* __KVM_HYP_MM_H */
+diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+index c1a90dd022b8..92262e89672d 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
++++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+@@ -9,6 +9,7 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_pgtable.h>
++#include <asm/kvm_pkvm.h>
+ #include <asm/stage2_pgtable.h>
+ 
+ #include <hyp/fault.h>
+diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+index 2fabeceb889a..9e0ff5a700dd 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mm.c
++++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+@@ -8,6 +8,7 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_pgtable.h>
++#include <asm/kvm_pkvm.h>
+ #include <asm/spectre.h>
+ 
+ #include <nvhe/early_alloc.h>
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 578f71798c2e..51e68a040d8a 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -8,6 +8,7 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/kvm_pgtable.h>
++#include <asm/kvm_pkvm.h>
+ 
+ #include <nvhe/early_alloc.h>
+ #include <nvhe/fixed_config.h>
+diff --git a/arch/arm64/kvm/hyp/reserved_mem.c b/arch/arm64/kvm/pkvm.c
+similarity index 94%
+rename from arch/arm64/kvm/hyp/reserved_mem.c
+rename to arch/arm64/kvm/pkvm.c
+index 578670e3f608..ebecb7c045f4 100644
+--- a/arch/arm64/kvm/hyp/reserved_mem.c
++++ b/arch/arm64/kvm/pkvm.c
+@@ -8,10 +8,9 @@
+ #include <linux/memblock.h>
+ #include <linux/sort.h>
+ 
+-#include <asm/kvm_host.h>
++#include <asm/kvm_pkvm.h>
+ 
+-#include <nvhe/memory.h>
+-#include <nvhe/mm.h>
++#include "hyp_constants.h"
+ 
+ static struct memblock_region *hyp_memory = kvm_nvhe_sym(hyp_memory);
+ static unsigned int *hyp_memblock_nr_ptr = &kvm_nvhe_sym(hyp_memblock_nr);
+@@ -82,7 +81,8 @@ void __init kvm_hyp_reserve(void)
+ 	do {
+ 		prev = nr_pages;
+ 		nr_pages = hyp_mem_pages + prev;
+-		nr_pages = DIV_ROUND_UP(nr_pages * sizeof(struct hyp_page), PAGE_SIZE);
++		nr_pages = DIV_ROUND_UP(nr_pages * STRUCT_HYP_PAGE_SIZE,
++					PAGE_SIZE);
+ 		nr_pages += __hyp_pgtable_max_pages(nr_pages);
+ 	} while (nr_pages != prev);
+ 	hyp_mem_pages += nr_pages;
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
