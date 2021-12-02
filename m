@@ -2,62 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E1AC433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Dec 2021 13:46:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED25C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  3 Dec 2021 13:46:46 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E61694B1B4;
-	Fri,  3 Dec 2021 08:46:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D9284B186;
+	Fri,  3 Dec 2021 08:46:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6ixun9fU2PDD; Fri,  3 Dec 2021 08:46:43 -0500 (EST)
+	with ESMTP id i1TBEn79LhJP; Fri,  3 Dec 2021 08:46:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F25B44B17C;
-	Fri,  3 Dec 2021 08:46:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A9BE4B192;
+	Fri,  3 Dec 2021 08:46:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 000F44B162
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 05:21:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C26464B176
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 07:03:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C9tVfnJkL8gy for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Dec 2021 05:21:17 -0500 (EST)
+ with ESMTP id vWOSNIC3jsgw for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Dec 2021 07:03:48 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 374C24B15A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 05:21:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D26A4B162
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 07:03:48 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1638440476;
+ s=mimecast20190719; t=1638446628;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=m4HlULEGQ+u/lfRbooSYsdnXMPgjmp3tTKFINSv7JFM=;
- b=ZLORlFq2dx8J/AbUjS+HqDMeRwbXOS+3jZv9Xbb9NxXuexafY5zboJHqPUIPcne0F96r/t
- +PJ5bwSeuKmRXxRhmm+Mq05xXmnaMFreC8Y8Hh0VLACM5s4HLN/mV3KpVDQn0yz1309B/1
- tjw/iJLkX3DqhaJbricMKefBI86TJJ0=
+ bh=1MmQTgpkeNH8NgIgmQ2Fco6xIavJapp91aJzsxvOixU=;
+ b=JaJ17aZSmLxVrbT8+tmvX9yyEv3hWTp+Huy2Tam6ELfoTTxgjINv6l9m6dVciBN0V5111D
+ SOgy6wiD8meR86vHdaLAQ7jPFG/TSh7ET8cYze8qVmpEMhW428mSrgopiL8ERVix7N9oyh
+ aO2Om+5WpqcSwhxQVbxfi5gjzw2goks=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-590-FTxu8o4JPGuzaC45aDiDWA-1; Thu, 02 Dec 2021 05:21:13 -0500
-X-MC-Unique: FTxu8o4JPGuzaC45aDiDWA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-464-faQPh16CNsuypEtT6k4wfA-1; Thu, 02 Dec 2021 07:03:40 -0500
+X-MC-Unique: faQPh16CNsuypEtT6k4wfA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABDFE81EE60;
- Thu,  2 Dec 2021 10:21:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93E5E81CCB6;
+ Thu,  2 Dec 2021 12:03:36 +0000 (UTC)
 Received: from starship (unknown [10.40.192.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D73445D9CA;
- Thu,  2 Dec 2021 10:20:56 +0000 (UTC)
-Message-ID: <f55056c55892dd42592e5c242fa7a1561c6cee90.camel@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 551DF60622;
+ Thu,  2 Dec 2021 12:02:58 +0000 (UTC)
+Message-ID: <3adb566de918fe2fcc7a8abe7dba5f2c9d292d66.camel@redhat.com>
 Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
  successful
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 02 Dec 2021 12:20:55 +0200
+Date: Thu, 02 Dec 2021 14:02:56 +0200
 In-Reply-To: <YaUNBfJh35WXMV0M@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
  <20211009021236.4122790-12-seanjc@google.com>
@@ -66,7 +66,7 @@ References: <20211009021236.4122790-1-seanjc@google.com>
  <YaUNBfJh35WXMV0M@google.com>
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mailman-Approved-At: Fri, 03 Dec 2021 08:46:41 -0500
 Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
  kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
@@ -114,6 +114,15 @@ On Mon, 2021-11-29 at 17:25 +0000, Sean Christopherson wrote:
 > The hangs are likely due to:
 > 
 >   KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with APICv)
+
+Yes, the other hang I told about which makes all my VMs very laggy, almost impossible
+to use is because of the above patch, but since I reproduced it now again without
+any passed-through device, I also blame the cpu errata on this.
+
+Best regards,
+	Maxim Levitsky
+
+
 > 
 > If a posted interrupt arrives after KVM has done its final search through the vIRR,
 > but before avic_update_iommu_vcpu_affinity() is called, the posted interrupt will
@@ -127,21 +136,6 @@ On Mon, 2021-11-29 at 17:25 +0000, Sean Christopherson wrote:
 > would have to rewalk the vIRR), no easy to signal the current CPU to do wakeup (I
 > don't think KVM even has access to the IRQ used by the owning IOMMU), and there's
 > no simplification of load/put code.
-
-I have an idea.
- 
-Why do we even use/need the GA log?
-Why not, just disable the 'guest mode' in the iommu and let it sent good old normal interrupt
-when a vCPU is not running, just like we do when we inhibit the AVIC?
- 
-GA log makes all devices that share an iommu (there are 4 iommus per package these days,
-some without useful devices) go through a single (!) msi like interrupt,
-which is even for some reason implemented by a threaded IRQ in the linux kernel.
-
- 
-Best regards,
-	Maxim Levitsky
-
 > 
 > If the scheduler were changed to support waking in the sched_out path, then I'd be
 > more inclined to handle this in avic_vcpu_put() by rewalking the vIRR one final
