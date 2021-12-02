@@ -2,106 +2,98 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA60DC433F5
-	for <kvmarm@archiver.kernel.org>; Thu,  2 Dec 2021 10:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC76BC433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  2 Dec 2021 10:57:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CB4C4B1AC;
-	Thu,  2 Dec 2021 05:31:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C74C4B121;
+	Thu,  2 Dec 2021 05:57:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Hqs7qRtMq2+n; Thu,  2 Dec 2021 05:31:43 -0500 (EST)
+	with ESMTP id HwjBeXcJ0Xq0; Thu,  2 Dec 2021 05:57:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2958B4B13D;
-	Thu,  2 Dec 2021 05:31:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 482064B11E;
+	Thu,  2 Dec 2021 05:57:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 777E64B08E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 05:31:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 19DA84B121
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 05:57:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zyQtJOZGoLkJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Dec 2021 05:31:41 -0500 (EST)
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com
- [209.85.208.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD76940256
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 05:31:40 -0500 (EST)
-Received: by mail-ed1-f44.google.com with SMTP id z5so49005068edd.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Dec 2021 02:31:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=sender:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=N6k1dm8k+AuxT/kkINJ2uWzQD41QhKsh8yex3G7gZCI=;
- b=G/KcWY4NdiSiLbGwFVbMpplGKklwuLS8kzHzGur5jlThpat8rYTmvJEuvKnby0ikS5
- iMXoT3JaN8/6uGdTfqTV64IRpBhuVbTwgoqPRIuAnlOPg4YXFHbD8LSvudKuqUlIFuXo
- 1B6vYQLwbiH5PukJHZ2d+B/hG4wyhNqTRUH+WJYFxX/aAnWG5ofBg3HiNT96ZFyJ9nM8
- RMfYqLt3L+O6eWXJQeNtUQxDFA97RXOHZgU97mHvKCkbWJ/oRSQWohVhbpxKbOUFzh4K
- /WIYiCEYMqmZsjs0IaWV39/CdP/UEiDeWQkZevioyJUXTo+ileWjeLZdsdLPjDzl5ytc
- MDlw==
+ with ESMTP id v7vLnm1FGZBi for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Dec 2021 05:57:17 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3B9E4B119
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Dec 2021 05:57:17 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1638442637;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=D2VcVFQrB5DiBW+WXhArOQYyBQnCLPGn334r2cU2z28=;
+ b=GwVfPViKkiuKUdYl5K6nSJx1QTNQ+1IUo7anm1fEkr5/u/tNkiINWG3Oiy+fSyIV9JgVMm
+ tRV9sFpk1iNzjXrhjBuvjNYMIqo5PMEJaBT1k82RNfjXhmYL/A1GnyydjDE1w5UYQMs2r8
+ 6/dBXlXa5FssDc+qbvIZ8zcgxAvrTWI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-99-MYd_vK3eNMubvCXcKsk2Bw-1; Thu, 02 Dec 2021 05:57:14 -0500
+X-MC-Unique: MYd_vK3eNMubvCXcKsk2Bw-1
+Received: by mail-wm1-f71.google.com with SMTP id
+ r129-20020a1c4487000000b00333629ed22dso1488356wma.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Dec 2021 02:57:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
- :subject:content-language:to:cc:references:from:in-reply-to
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=N6k1dm8k+AuxT/kkINJ2uWzQD41QhKsh8yex3G7gZCI=;
- b=Q7iNMXYcDJhniIcwlDSL4+md/Van9NkTnyfFVuK4dHn7dWiQI8EF1VCA+YC7gDD/a4
- pWf6XroyR/9RzAqRhAa6EzZkN/GngFWQH902qgJXVY77OacjIZKDbbWh7axZEmZN0NHi
- ZzpFR5EWeEtZ792aNJ+8y5A9SC/d4TKPSt8Sn/MDSn2DWjof9cMEdUas8QgBeqQoDIX9
- 087uC8xszjHz2XVzBy154wuArECaY/eYBQUYT72cp2zcgLq8+6MZfkOCoCNZAIzXCiZF
- BaibE7bdqnaZn8wetiXA8CJ6+Pv9eZEq9ldrDwUZNmULyIEzsTynKaerb9vqAXv3Bt4Q
- labA==
-X-Gm-Message-State: AOAM533QE08P23G5pvGWBUHL0/1chRgoTsOFOjPBuiTkHKvXYXOCiN4Q
- RnhfF4rbsnkjrydUQDpZ//4=
-X-Google-Smtp-Source: ABdhPJwhpBxx1yFRODBtJrFnn3nCW7H/sTu+w+jLDDEQAemKg7xUPHKBK5f7DJw2WZKCGsUGKU9xRg==
-X-Received: by 2002:a17:906:ce2a:: with SMTP id
- sd10mr14431289ejb.154.1638441099804; 
- Thu, 02 Dec 2021 02:31:39 -0800 (PST)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a?
- ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
- by smtp.googlemail.com with ESMTPSA id w5sm1912110edc.58.2021.12.02.02.31.32
+ bh=D2VcVFQrB5DiBW+WXhArOQYyBQnCLPGn334r2cU2z28=;
+ b=ftrVNMxRS33u9lpm7otcAmL5PWhdUw+7ZUXhWcfdXiHjq2JON/KBne3fb6NnaiN37w
+ fm63z79rXKIqrOHq02HWKAmUTtSYlL69Q5SrH7RZNdYaUK/sMkJCJA7C528JbqzNkDUA
+ O4EXEEjoEg3avnDWGkzZq8EhIrpuSSb58SjzKvmTu0NT0QuUFtNjd7XIPnWdINEmKjdL
+ TbWrZqy6cSrD7clJKXXrrgxj6091iyRMj25oLYEgcjL3p79cDn8dg13Dfea50yOdR4oG
+ z51LjGBtuiMDmExOiUxVaY5jbUyaPDt5jx8fku5JjD+k5VRpz3djEWCphbMJPZ4H00IF
+ D27Q==
+X-Gm-Message-State: AOAM530s385JR8BhO1iV28DBQvj3Fa2OZpSxgyAWGovNc1CYH7/Q4Urj
+ +HrtLWV7EgGSBCISPMNDk3YhdY6XLBLChQ/7QdbX90KRyVQgmWVaaEfw8y083c/Rc7GfBw+R84+
+ VQwnnyx2bfmfEzz+aFHdjvEXm
+X-Received: by 2002:adf:aac5:: with SMTP id i5mr13864062wrc.67.1638442633663; 
+ Thu, 02 Dec 2021 02:57:13 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyX44La4y5VA1cgP3RPzlda8vKuQzx3m3QaQe/i+Qj0upafaYqtzXJF52EratMa3sVUXhqR4g==
+X-Received: by 2002:adf:aac5:: with SMTP id i5mr13864039wrc.67.1638442633487; 
+ Thu, 02 Dec 2021 02:57:13 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id ay21sm1902044wmb.7.2021.12.02.02.57.12
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 02 Dec 2021 02:31:39 -0800 (PST)
-Message-ID: <6200f141-8e6f-fe68-9539-22aa68559cb7@redhat.com>
-Date: Thu, 2 Dec 2021 11:31:28 +0100
+ Thu, 02 Dec 2021 02:57:12 -0800 (PST)
+Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
+ support for the guest
+To: Reiji Watanabe <reijiw@google.com>
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-10-reijiw@google.com>
+ <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
+ <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+From: Eric Auger <eauger@redhat.com>
+Message-ID: <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com>
+Date: Thu, 2 Dec 2021 11:57:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
- successful
+In-Reply-To: <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-12-seanjc@google.com>
- <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
- <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
- <YaUNBfJh35WXMV0M@google.com>
- <496c2fc6-26b0-9b5d-32f4-2f9e9dd6a064@redhat.com>
- <YaUiEquKYi5eqWC0@google.com>
- <880a5727-69d1-72a1-b129-b053781625ad@redhat.com>
- <458c0819a578ba854f00089bc312c8faa177a81a.camel@redhat.com>
- <32eabe7d270e5a466ba2d9345b4270b8fe27700c.camel@redhat.com>
- <Yagoo7R8P5xVilsj@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Yagoo7R8P5xVilsj@google.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>,
- linux-kernel@vger.kernel.org, Paul Mackerras <paulus@ozlabs.org>,
- Atish Patra <atish.patra@wdc.com>, linux-riscv@lists.infradead.org,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvmarm@lists.cs.columbia.edu,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Wei Huang <wei.huang2@amd.com>,
- kvm-ppc@vger.kernel.org, Paul Walmsley <paul.walmsley@sifive.com>,
- David Matlack <dmatlack@google.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Anup Patel <anup.patel@wdc.com>,
- linux-mips@vger.kernel.org, Palmer Dabbelt <palmer@dabbelt.com>,
- kvm-riscv@lists.infradead.org, Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,32 +105,86 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTIvMi8yMSAwMzowMCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToKPiBIbW0sIHRoYXQg
-c3VnZ2VzdHMgdGhlIGJ1Zy9lcnJhdHVtIGlzIGR1ZSB0byB0aGUgQ1BVIGNvbnN1bWluZyBzdGFs
-ZSBkYXRhIGZyb20gIzQKPiBmb3IgdGhlIElzUnVubmluZyBjaGVjayBpbiAjNSwgb3IgcmV0aXJp
-bmcgdW9wcyBmb3IgdGhlIElzUnVubmluZyBjaGVjayBiZWZvcmUKPiByZXRpcmluZyB0aGUgdklS
-UiB1cGRhdGUuCgpZZXMsIHRoaXMgc2VlbXMgdG8gYmUgYW4gZXJyb3IgaW4gdGhlIGltcGxlbWVu
-dGF0aW9uIG9mIHN0ZXAgNS4gIEluIAphc3NlbWJseSwgYXRvbWljIG9wZXJhdGlvbnMgaGF2ZSBp
-bXBsaWNpdCBtZW1vcnkgYmFycmllcnMsIGJ1dCB3aG8ga25vd3MgCndoYXQncyBnb2luZyBvbiBp
-biBtaWNyb2NvZGUuICBTbyBlaXRoZXIgaXQncyB0aGUgZm9ybWVyLCBvciBzb21ldGhpbmcgCmlz
-IGdvaW5nIG9uIHRoYXQncyBzcGVjaWZpYyB0byB0aGUgbWljcm9jb2RlIHNlcXVlbmNlciwgb3Ig
-aXQncyBhIG1vcmUgCm11bmRhbmUgaW1wbGVtZW50YXRpb24gYnVnLgoKSW4gYW55IGNhc2UsIEFW
-SUMgaXMgZGlzYWJsZWQgZm9yIG5vdyBhbmQgd2lsbCBuZWVkIGEgbGlzdCBvZiBtb2RlbCAKd2hl
-cmUgaXQgd29ya3MsIHNvIEknbGwgZ28gb24gYW5kIHF1ZXVlIHRoZSBmaXJzdCBwYXJ0IG9mIHRo
-aXMgc2VyaWVzLgoKUGFvbG8KCj4gSXQgd291bGQgYmUgaGVscGZ1bCBpZiB0aGUgZXJyYXR1bSBh
-Y3R1YWxseSBwcm92aWRlZAo+IGluZm8gb24gdGhlICJoaWdobHkgc3BlY2lmaWMgYW5kIGRldGFp
-bGVkIHNldCBvZiBpbnRlcm5hbCB0aW1pbmcgY29uZGl0aW9ucyIuIDotLwo+IAo+ICAgIDQuIExv
-b2t1cCB0aGUgdkFQSUMgYmFja2luZyBwYWdlIGFkZHJlc3MgaW4gdGhlIFBoeXNpY2FsIEFQSUMg
-dGFibGUgdXNpbmcgdGhlCj4gICAgICAgZ3Vlc3QgcGh5c2ljYWwgQVBJQyBJRCBhcyBhbiBpbmRl
-eCBpbnRvIHRoZSB0YWJsZS4KPiAgICA1LiBGb3IgZXZlcnkgdmFsaWQgZGVzdGluYXRpb246Cj4g
-ICAgICAgLSBBdG9taWNhbGx5IHNldCB0aGUgYXBwcm9wcmlhdGUgSVJSIGJpdCBpbiBlYWNoIG9m
-IHRoZSBkZXN0aW5hdGlvbnPigJkgdkFQSUMKPiAgICAgICAgIGJhY2tpbmcgcGFnZS4KPiAgICAg
-ICAtIENoZWNrIHRoZSBJc1J1bm5pbmcgc3RhdHVzIG9mIGVhY2ggZGVzdGluYXRpb24uCgpfX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGlu
-ZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1
-bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Reiji,
+
+On 11/30/21 6:32 AM, Reiji Watanabe wrote:
+> Hi Eric,
+> 
+> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
+>>
+>> Hi Reiji,
+>>
+>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+>>> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
+>>> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
+>>> expose the value for the guest as it is.  Since KVM doesn't support
+>>> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
+>>> exopse 0x0 (PMU is not implemented) instead.
+>> s/exopse/expose
+>>>
+>>> Change cpuid_feature_cap_perfmon_field() to update the field value
+>>> to 0x0 when it is 0xf.
+>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+>> guest should not use it as a PMUv3?
+> 
+>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+>> guest should not use it as a PMUv3?
+> 
+> For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
+> Arm ARM says:
+>   "IMPLEMENTATION DEFINED form of performance monitors supported,
+>    PMUv3 not supported."
+> 
+> Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
+> be exposed to guests (And this patch series doesn't allow userspace
+> to set the fields to 0xf for guests).
+What I don't get is why this isn't detected before (in kvm_reset_vcpu).
+if the VCPU was initialized with KVM_ARM_VCPU_PMU_V3 can we honor this
+init request if the host pmu is implementation defined?
+
+Thanks
+
+Eric
+> 
+> Thanks,
+> Reiji
+> 
+>>
+>> Eric
+>>>
+>>> Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
+>>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+>>> ---
+>>>  arch/arm64/include/asm/cpufeature.h | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+>>> index ef6be92b1921..fd7ad8193827 100644
+>>> --- a/arch/arm64/include/asm/cpufeature.h
+>>> +++ b/arch/arm64/include/asm/cpufeature.h
+>>> @@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
+>>>
+>>>       /* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
+>>>       if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
+>>> -             val = 0;
+>>> +             return (features & ~mask);
+>>>
+>>>       if (val > cap) {
+>>>               features &= ~mask;
+>>>
+>>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
