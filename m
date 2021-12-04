@@ -2,100 +2,97 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9490C433FE
-	for <kvmarm@archiver.kernel.org>; Sat,  4 Dec 2021 14:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36362C433FE
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Dec 2021 17:30:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1BAA4A193;
-	Sat,  4 Dec 2021 09:14:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BF3E4A4BE;
+	Sat,  4 Dec 2021 12:30:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eXaL4iGTf0ME; Sat,  4 Dec 2021 09:14:09 -0500 (EST)
+	with ESMTP id XBZogCWc-LHI; Sat,  4 Dec 2021 12:30:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D9344A534;
-	Sat,  4 Dec 2021 09:14:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09A4F40C88;
+	Sat,  4 Dec 2021 12:30:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 773AA4A1B0
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Dec 2021 09:14:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B4664057F
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Dec 2021 12:30:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id C-1V8R5JIv6l for <kvmarm@lists.cs.columbia.edu>;
- Sat,  4 Dec 2021 09:14:06 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E89B04A193
- for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Dec 2021 09:14:06 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1638627246;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=g0dO/BpdJD9jOnz6LtLs4iLIZSLA8GKvweu8a6+ian4=;
- b=hS77y2//qwClYiI3sXGTLa2cBsSWEMLmTp5t/VZRQgJ3pv8Xt1ZlOpWzwjrits9qzE9Oru
- dux0CdYAO96eSKbpwuHlzKz42IEuteAkRz0FYn56uYHIu1eAbxClJz5UR82EDpP9g2nqmq
- +lnmsHMOiWbtmyTSHISrvJAHqWAN7Fo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-479-hpz8vVHJMziIcAShbriUgg-1; Sat, 04 Dec 2021 09:14:05 -0500
-X-MC-Unique: hpz8vVHJMziIcAShbriUgg-1
-Received: by mail-wm1-f71.google.com with SMTP id
- 145-20020a1c0197000000b0032efc3eb9bcso5162328wmb.0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 04 Dec 2021 06:14:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=g0dO/BpdJD9jOnz6LtLs4iLIZSLA8GKvweu8a6+ian4=;
- b=eZt4qTe9jj1EwMajALhJrHlWraqcYnKxXgPTY4B1F7zepIKotiTGhV8a5IG4eL768G
- 8Q3n0/3JN9N83cDXRnzSGiUnGJ5D0tpL89foItBcT6OMSFA+fMSwd4+LcWmIP6OrNias
- AvCFoIiuu90YsfBz+Fw7Vk3qAKKWW5kubgSjNzbLYnqwKlv2QLG3U+OemZjEJTaRyr1q
- J/qn8qPiQZ/9rcItaEGjmNa0kwOvgK4r4TEcEM704LiXbDRJ5v4cbbIOIiXRcewAvl6T
- Cp6OE+/wCgVcfrKEvVIvIxaqzax0cLdsXA3x+IryXa7thOt8pA78QazCZPLdmlb+juTp
- dX0A==
-X-Gm-Message-State: AOAM531rgyEWXfAz6vASDc5MOCYMMGyfEMKBzgcV/C2BAGPIJitiVwf0
- TH5+IiINiz98itWITngjkb2/PQR2fdknXYHvw9e8b9THo063x2KY/5aWhHgN3/OjNFbD2mROYjc
- ehJ4qxbw7L8nUrPSXUXEDs/ys
-X-Received: by 2002:a5d:5445:: with SMTP id w5mr30131996wrv.163.1638627244220; 
- Sat, 04 Dec 2021 06:14:04 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwP+cc5bD8j/sZ62eB1LAUdM7vgu+TLoJMaRrRrzwWGIK2bb03aFe0LSJreofrDN5481/3qWw==
-X-Received: by 2002:a5d:5445:: with SMTP id w5mr30131964wrv.163.1638627243963; 
- Sat, 04 Dec 2021 06:14:03 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id d6sm5686326wrx.60.2021.12.04.06.14.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 04 Dec 2021 06:14:03 -0800 (PST)
-Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
- support for the guest
-To: Reiji Watanabe <reijiw@google.com>
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-10-reijiw@google.com>
- <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
- <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
- <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com>
- <CAAeT=FwEogskDQVwwTkZSstYX7-X0r1B+hUUHbZOE5T5o9V=ww@mail.gmail.com>
-From: Eric Auger <eauger@redhat.com>
-Message-ID: <2ed3072b-f83d-1b17-0949-ca38267ba94e@redhat.com>
-Date: Sat, 4 Dec 2021 15:14:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
-MIME-Version: 1.0
-In-Reply-To: <CAAeT=FwEogskDQVwwTkZSstYX7-X0r1B+hUUHbZOE5T5o9V=ww@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id Jbhc6qjvDyWa for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  4 Dec 2021 12:30:06 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 898BC4048A
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  4 Dec 2021 12:30:06 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 3A62EB80D24;
+ Sat,  4 Dec 2021 17:30:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90A64C341C0;
+ Sat,  4 Dec 2021 17:30:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1638639003;
+ bh=DwkAMiWPSSim7I98y5KceSbox18Jr0xqyzxRp2VfsUM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=d55+TIFV18tDmSYppsjXNyN6HBn9PsDenkBdnmA2uQ4FMOFVlpa3v8stooBszNN/l
+ qKW+r/Goip7i50Ll6IYI7mIcZ0wvAwjv46xR8D7hek5aZnQMa5V7SkkUCkVOJn/j5f
+ uQorj2/JGZ/6cVcvIEjuaojy/RdyZSS5pXuST4+fchz5aSpS1YnlCrW4bX/zLbqAL/
+ Rc8/HR8CcSow/ysDw/oPMm5BSoNfpRyo3wxhavxICxFC16PiVohYZCU9en8QdA6oWm
+ Ao+A+MZO/cWfGDiAob3KfKd1/Xdvj9pQEDCszrBF0XXekm/nE03budDm13xVo1OVUF
+ 44jUUShnt1Vdg==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mtYrJ-009rxd-7Q; Sat, 04 Dec 2021 17:30:01 +0000
+Date: Sat, 04 Dec 2021 17:30:05 +0000
+Message-ID: <87zgpgqnvm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Hikaru Nishida <hikalium@chromium.org>
+Subject: Re: [RFC PATCH v3 0/5] x86/kvm: Virtual suspend time injection support
+In-Reply-To: <CACTzKb+vVU0Ymh2Nx5B6kSydBsJ6AgrbQMF39RFvqoHpvL_riw@mail.gmail.com>
+References: <20211020120431.776494-1-hikalium@chromium.org>
+ <874k9bdcrk.wl-maz@kernel.org>
+ <CACTzKb+vVU0Ymh2Nx5B6kSydBsJ6AgrbQMF39RFvqoHpvL_riw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: hikalium@chromium.org, linux-kernel@vger.kernel.org,
+ dme@dme.org, tglx@linutronix.de, mlevitsk@redhat.com, linux@roeck-us.net,
+ pbonzini@redhat.com, vkuznets@redhat.com, will@kernel.org, suleiman@google.com,
+ senozhatsky@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, luto@kernel.org, arnd@arndb.de,
+ bp@alien8.de, dave.hansen@linux.intel.com, geert@linux-m68k.org, hpa@zytor.com,
+ mingo@kernel.org, mingo@redhat.com, jmattson@google.com, joro@8bytes.org,
+ john.stultz@linaro.org, corbet@lwn.net, jgross@suse.com, keescook@chromium.org,
+ laijs@linux.alibaba.com, linus.walleij@linaro.org, peterz@infradead.org,
+ seanjc@google.com, sboyd@kernel.org, wanpengli@tencent.com,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org, x86@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ senozhatsky@google.com, will@kernel.org, Ingo Molnar <mingo@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Jonathan Corbet <corbet@lwn.net>,
+ Joerg Roedel <joro@8bytes.org>, x86@kernel.org, mlevitsk@redhat.com,
+ Ingo Molnar <mingo@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>,
+ suleiman@google.com, linux@roeck-us.net, John Stultz <john.stultz@linaro.org>,
+ Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, dme@dme.org,
+ Lai Jiangshan <laijs@linux.alibaba.com>, Borislav Petkov <bp@alien8.de>,
+ Andy Lutomirski <luto@kernel.org>, tglx@linutronix.de,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Juergen Gross <jgross@suse.com>, Stephen Boyd <sboyd@kernel.org>,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com, vkuznets@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,78 +109,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Reiji,
+Hi Hikaru,
 
-On 12/4/21 2:04 AM, Reiji Watanabe wrote:
-> Hi Eric,
+Apologies for the much delayed reply.
+
+> The problems described by Thomas in the thread was:
+> - User space or kernel space can observe the stale timestamp before
+> the adjustment
+>   - Moving CLOCK_MONOTONIC forward will trigger all sorts of timeouts,
+> watchdogs, etc...
+> - The last attempt to make CLOCK_MONOTONIC behave like CLOCK_BOOTTIME
+> was reverted within 3 weeks. a3ed0e4393d6 ("Revert: Unify
+> CLOCK_MONOTONIC and CLOCK_BOOTTIME")
+>   - CLOCK_MONOTONIC correctness (stops during the suspend) should be maintained.
 > 
-> On Thu, Dec 2, 2021 at 2:57 AM Eric Auger <eauger@redhat.com> wrote:
->>
->> Hi Reiji,
->>
->> On 11/30/21 6:32 AM, Reiji Watanabe wrote:
->>> Hi Eric,
->>>
->>> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
->>>>
->>>> Hi Reiji,
->>>>
->>>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
->>>>> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
->>>>> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
->>>>> expose the value for the guest as it is.  Since KVM doesn't support
->>>>> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
->>>>> exopse 0x0 (PMU is not implemented) instead.
->>>> s/exopse/expose
->>>>>
->>>>> Change cpuid_feature_cap_perfmon_field() to update the field value
->>>>> to 0x0 when it is 0xf.
->>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
->>>> guest should not use it as a PMUv3?
->>>
->>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
->>>> guest should not use it as a PMUv3?
->>>
->>> For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
->>> Arm ARM says:
->>>   "IMPLEMENTATION DEFINED form of performance monitors supported,
->>>    PMUv3 not supported."
->>>
->>> Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
->>> be exposed to guests (And this patch series doesn't allow userspace
->>> to set the fields to 0xf for guests).
->> What I don't get is why this isn't detected before (in kvm_reset_vcpu).
->> if the VCPU was initialized with KVM_ARM_VCPU_PMU_V3 can we honor this
->> init request if the host pmu is implementation defined?
+> I agree with the points above. And, the current CLOCK_MONOTONIC
+> behavior in the KVM guest is not aligned with the statements above.
+> (it advances during the host's suspension.)
+> This causes the problems described above (triggering watchdog
+> timeouts, etc...) so my patches are going to fix this by 2 steps
+> roughly:
+> 1. Stopping the guest's clocks during the host's suspension
+> 2. Adjusting CLOCK_BOOTTIME later
+> This will make the clocks behave like the host does, not making
+> CLOCK_MONOTONIC behave like CLOCK_BOOTTIME.
 > 
-> KVM_ARM_VCPU_INIT with KVM_ARM_VCPU_PMU_V3 will fail in
-> kvm_reset_vcpu() if the host PMU is implementation defined.
-
-OK. This was not obvsious to me.
-
-                if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
-                        ret = -EINVAL;
-                        goto out;
-                }
-
-kvm_perf_init
-+	if (perf_num_counters() > 0)
-+		static_branch_enable(&kvm_arm_pmu_available);
-
-But I believe you ;-), sorry for the noise
-
-Eric
-
+> First one is a bit tricky since the guest can use a timestamp counter
+> in each CPUs (TSC in x86) and we need to adjust it without stale
+> values are observed by the guest kernel to prevent rewinding of
+> CLOCK_MONOTONIC (which is our top priority to make the kernel happy).
+> To achieve this, my patch adjusts TSCs (and a kvm-clock) before the
+> first vcpu runs of each vcpus after the resume.
 > 
-> The AA64DFR0 and DFR0 registers for a vCPU without KVM_ARM_VCPU_PMU_V3
-> indicates IMPLEMENTATION DEFINED PMU support, which is not correct.
-
-
+> Second one is relatively safe: since jumping CLOCK_BOOTTIME forward
+> can happen even before my patches when suspend/resume happens, and
+> that will not break the monotonicity of the clocks, we can do that
+> through IRQ.
 > 
-> Thanks,
-> Reiji
+> [1] shows the flow of the adjustment logic, and [2] shows how the
+> clocks behave in the guest and the host before/after my patches.
+> The numbers on each step in [1] corresponds to the timing shown in [2].
+> The left side of [2] is showing the behavior of the clocks before the
+> patches, and the right side shows after the patches. Also, upper
+> charts show the guest clocks, and bottom charts are host clocks.
 > 
+> Before the patches(left side), CLOCK_MONOTONIC seems to be jumped from
+> the guest's perspective after the host's suspension. As Thomas says,
+> large jumps of CLOCK_MONOTONIC may lead to watchdog timeouts and other
+> bad things that we want to avoid.
+> With the patches(right side), both clocks will be adjusted (t=4,5) as
+> if they are stopped during the suspension. This adjustment is done by
+> the host side and invisible to the guest since it is done before the
+> first vcpu run after the resume. After that, CLOCK_BOOTTIME will be
+> adjusted from the guest side, triggered by the IRQ sent from the host.
+> 
+> [1]: https://hikalium.com/files/kvm_virt_suspend_time_seq.png
+> [2]: https://hikalium.com/files/kvm_virt_suspend_time_clocks.png
 
+Thanks for the very detailed explanation. You obviously have though
+about this, and it makes sense.
+
+My worry is that this looks to be designed for the needs of Linux on
+x86, and does not match the reality of KVM on arm64, where there is no
+KVM clock (there is no need for it, and I have no plan to support it),
+and there is more than a single counter visible to the guest (at least
+two, and up to four with NV, all with various offsets). This also
+deals with concepts that are Linux-specific. How would it work for
+another (arbitrary) guest operating system?
+
+Can we please take a step back and look at what we want to expose from
+a hypervisor PoV? It seems to me that all we want is:
+
+(1) tell the guest that time has moved forward
+(2) tell the guest by how much time has moved forward
+
+In a way, this isn't different from stolen time, only that it affects
+the whole VM and not just a single CPU (and for a much longer quantum
+of time).
+
+How the event is handled by the guest (what it means for its clocks
+and all that) is a guest problem. Why should KVM itself adjust the
+counters? This goes against what the architecture specifies (the
+counter is in an always-on domain that keeps counting when suspended),
+and KVM must preserve the architectural guarantees instead of
+deviating from them.
+
+> > Assuming you solve these, you should model the guest memory access
+> > similarly to what we do for stolen time. As for injecting an
+> > interrupt, why can't this be a userspace thing?
+> 
+> Since CLOCK_BOOTTIME is calculated by adding a gap
+> (tk->monotonic_to_boot) to CLOCK_MONOTONIC, and there are no way to
+> change the value from the outside of the guest kernel, we should
+> implement some mechanism in the kernel to adjust it.
+> (Actually, I tried to add a sysfs interface to modify the gap [3], but
+> I learned that that is not a good idea...)
+
+It is not what I was suggesting.
+
+My suggestion was to have a shared memory between the VMM and the
+guest again, similar to the way we handle stolen time), let the VMM
+expose the drift in this shared memory, and inject an interrupt from
+userspace to signify a wake-up. All this requires is that on suspend,
+you force the vcpus to exit. On resume, the VMM update the guest
+visible drift, posts an interrupt, and let things rip.
+
+This requires very minimal KVM support, and squarely places the logic
+in the guest. Why doesn't this work?
+
+Another question is maybe even more naive: on bare metal, we don't
+need any of this. The system suspends, resumes, and recovers well
+enough. Nobody hides anything, and yet everything works just fine.
+That's because the kernel knows it is being suspended, and it acts
+accordingly. It looks to me that there is some value in following the
+same principles, even if this means that the host suspend has to
+synchronise with the guest being suspended.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
