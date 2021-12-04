@@ -2,86 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE95C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  3 Dec 2021 13:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A0F8C433EF
+	for <kvmarm@archiver.kernel.org>; Sat,  4 Dec 2021 01:04:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 674004B177;
-	Fri,  3 Dec 2021 08:46:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 511BB49F5F;
+	Fri,  3 Dec 2021 20:04:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, body has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PBc6jQNFfo1N; Fri,  3 Dec 2021 08:46:46 -0500 (EST)
+	with ESMTP id W66MfMk+V-TU; Fri,  3 Dec 2021 20:04:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 543DB4B19F;
-	Fri,  3 Dec 2021 08:46:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B6E24064F;
+	Fri,  3 Dec 2021 20:04:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B8A5B4B086
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Dec 2021 07:27:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 886C2405A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Dec 2021 20:04:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UfZELyKXlIRW for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Dec 2021 07:27:49 -0500 (EST)
+ with ESMTP id V9Uv-TFnI0bD for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Dec 2021 20:04:28 -0500 (EST)
 Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com
  [209.85.210.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35AB74AC78
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Dec 2021 07:27:49 -0500 (EST)
-Received: by mail-pf1-f172.google.com with SMTP id x131so2733002pfc.12
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Dec 2021 04:27:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-transfer-encoding:content-language;
- bh=EA1du2e/ZPRzAt8K2DwIBgKjt5fsYwCbvSbLazp7FLA=;
- b=LnM14K0IH4hYWcx02Er5ag2+HMiyqlgR3Q0bBB0hoE/Yc+j2TzxgPYYBQHoDDQVheC
- 2a1bjHXoHd+TLSDN5O7+t0DRX69uBDy1EpyIyLNnxRNBGd2czsiIHVDxr5tuI7xBzqYB
- /zTgw0PRoCeM4qOjNA7MACeNFmJfs7LtjmdeeHv7B+nhBnrKOEMjQtDmTh2gWHD+pkAG
- NCQfOnkp188m9zVsO6H4hFy6PPLm3lptrOhWxNYp//2esTtA4RfdwB6rAbNuhzZmdTJb
- jKTb7az+bf+exKCMGMRr61twCq1sgAWX500Y21LfOvfxR4xiz15JmzzH0kxo7NXy8oup
- Yj5g==
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 421E940573
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Dec 2021 20:04:28 -0500 (EST)
+Received: by mail-pf1-f172.google.com with SMTP id b68so4432298pfg.11
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Dec 2021 17:04:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=XE1lgBHY1qjRhoYofuOFOoV/YwT3xICq/rIHwhXBdqc=;
+ b=LQswGke5VHeD+dcHpM0HR1sTjV718lOri+p9ap3AWxvHaVYqT3z0Qu5HKofsfSmI6l
+ re4YXfADVjvD47PWcqLWzd/yxEe9v87Lqm9Ie4gQbwot+W6VZc+TV59LgVIfQ9t+L8yV
+ V8tA4cGG/dgdNmqCvZiMRffTla8nA09bIk846uLw+nNCMY749ZArqdo2Ot4ZUavI4Vam
+ 7YCqJ//Y7DVs2hxwO/YlvS3ywEuKJ2llxcS2qaYYwXH8ruPRmIQ+y3BpaAdW8ze11Xsc
+ loXwvufLKFrlSb8aWi3kxF0P7fr+n0RS92KO/MpIbI6mBH5lePdPan91H+TAndcmn7i7
+ KG6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-transfer-encoding
- :content-language;
- bh=EA1du2e/ZPRzAt8K2DwIBgKjt5fsYwCbvSbLazp7FLA=;
- b=ndTID0jWYs+X0enZ6KdcbeywlN329uccNLC8a/Gbjj2WseslpIMPJZWQSHVGiDDfb5
- KTHCiARz+3yOjMtf4n6FrXF+f6Vcit5xSuu42oJUcmhSWC09OCNFZ6miiP/ulSKOz0iK
- 72YzcMd6fnuWrjJ35VFB/WYZaWav5950hqVmCywE1cMp3eL8NrR85xs537Sul0Fo9F2e
- EKE+xQ/PdY9dQmgqONenb+okwFc42ZG+/JTrunAhJMdikqB4DmbvSU5leG0MtD9eSJvs
- nCRsur6Ov7795Tr/815yFjo7sIttDlwYXMsFQI62No7OTrzHsJ2dYaL64jAAB0YpHwsh
- OXEw==
-X-Gm-Message-State: AOAM532VNH8INxaa0t06XT7GqM7CBHq8kD/iMJ6YqGuR2N7W8H70jbUz
- Ox24bWhbu3FHjtlbSSogecOeTQ==
-X-Google-Smtp-Source: ABdhPJyrxTUXmZtazjCg/eZ+NyB0KowH4QAVCWqZOWtphbHo3fiDsky8cC6Lf9QHm8d5ncPuLQ4aIg==
-X-Received: by 2002:a63:6687:: with SMTP id a129mr4131270pgc.477.1638534468248; 
- Fri, 03 Dec 2021 04:27:48 -0800 (PST)
-Received: from [10.152.0.6] ([94.177.118.64])
- by smtp.gmail.com with ESMTPSA id mp12sm5226964pjb.39.2021.12.03.04.27.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 03 Dec 2021 04:27:47 -0800 (PST)
-Subject: Re: [RFC v16 0/9] SMMUv3 Nested Stage Setup (IOMMU part)
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
- iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
- will@kernel.org, robin.murphy@arm.com, jean-philippe@linaro.org,
- zhukeqian1@huawei.com
-References: <20211027104428.1059740-1-eric.auger@redhat.com>
-From: Zhangfei Gao <zhangfei.gao@linaro.org>
-Message-ID: <ee119b42-92b1-5744-4321-6356bafb498f@linaro.org>
-Date: Fri, 3 Dec 2021 20:27:39 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=XE1lgBHY1qjRhoYofuOFOoV/YwT3xICq/rIHwhXBdqc=;
+ b=GZFAyMuRTQoMLIVOOUhFScQTWHd9s4vyWJgc67irxL+RAW+MhOYULFxRiiBmORBawm
+ mUgpjpoWgiJKeJgCgmT1Dk0YEGUrnwsqEocc3NiE+Xi1q/mfQDSMp2KBShOLEJ7MkNS3
+ 0Y/M/bGi2cSPPelpfxhR9au4O4bfOLbI7pX0MzS5/mArkEEMrOYfDFeGmkEEajB+kid/
+ 9geaC86gN3J324Ud80jEWsEVDblGsVgYsLiUWCJOUQZTwE5Qnv2YazFm9x+YeXBD5f63
+ 6aRReqI8/K+hE6NqEgOJSnoOhB0K+5GUUVvW4zAO+rlHN/vtCisW5BznzSc6skUTB7zI
+ AC9Q==
+X-Gm-Message-State: AOAM532a9jLknOEsSRPWLSIqdBabJgZLDay9PPbEFGe0LpTAtizIp9Mm
+ 0OlPiPvi8HSQy5nb5UFgS0gUa9CYBr5//UR5IDvJwaZ3YUEQlw==
+X-Google-Smtp-Source: ABdhPJxAmeyiI93S2DwlX8TZyZoxgW2fHpUKvj4k/QXSw5lXDVt0PSll4BikwnO6GpDsx5uU7xiFtMjjJYepa2ojll4=
+X-Received: by 2002:a63:c042:: with SMTP id z2mr951044pgi.491.1638579867102;
+ Fri, 03 Dec 2021 17:04:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20211027104428.1059740-1-eric.auger@redhat.com>
-Content-Language: en-US
-X-Mailman-Approved-At: Fri, 03 Dec 2021 08:46:41 -0500
-Cc: kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
- chenxiang66@hisilicon.com, maz@kernel.org, vdumpa@nvidia.com,
- nicoleotsuka@gmail.com, vivek.gautam@arm.com, alex.williamson@redhat.com,
- yi.l.liu@intel.com, nicolinc@nvidia.com, vsethi@nvidia.com, sumitg@nvidia.com,
- lushenming@huawei.com, wangxingang5@huawei.com
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-10-reijiw@google.com>
+ <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
+ <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+ <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com>
+In-Reply-To: <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Fri, 3 Dec 2021 17:04:11 -0800
+Message-ID: <CAAeT=FwEogskDQVwwTkZSstYX7-X0r1B+hUUHbZOE5T5o9V=ww@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
+ support for the guest
+To: Eric Auger <eauger@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,47 +83,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CkhpLCBFcmljCgpPbiAyMDIxLzEwLzI3IOS4i+WNiDY6NDQsIEVyaWMgQXVnZXIgd3JvdGU6Cj4g
-VGhpcyBzZXJpZXMgYnJpbmdzIHRoZSBJT01NVSBwYXJ0IG9mIEhXIG5lc3RlZCBwYWdpbmcgc3Vw
-cG9ydAo+IGluIHRoZSBTTU1VdjMuCj4KPiBUaGUgU01NVXYzIGRyaXZlciBpcyBhZGFwdGVkIHRv
-IHN1cHBvcnQgMiBuZXN0ZWQgc3RhZ2VzLgo+Cj4gVGhlIElPTU1VIEFQSSBpcyBleHRlbmRlZCB0
-byBjb252ZXkgdGhlIGd1ZXN0IHN0YWdlIDEKPiBjb25maWd1cmF0aW9uIGFuZCB0aGUgaG9vayBp
-cyBpbXBsZW1lbnRlZCBpbiB0aGUgU01NVXYzIGRyaXZlci4KPgo+IFRoaXMgYWxsb3dzIHRoZSBn
-dWVzdCB0byBvd24gdGhlIHN0YWdlIDEgdGFibGVzIGFuZCBjb250ZXh0Cj4gZGVzY3JpcHRvcnMg
-KHNvLWNhbGxlZCBQQVNJRCB0YWJsZSkgd2hpbGUgdGhlIGhvc3Qgb3ducyB0aGUKPiBzdGFnZSAy
-IHRhYmxlcyBhbmQgbWFpbiBjb25maWd1cmF0aW9uIHN0cnVjdHVyZXMgKFNURSkuCj4KPiBUaGlz
-IHdvcmsgbWFpbmx5IGlzIHByb3ZpZGVkIGZvciB0ZXN0IHB1cnBvc2UgYXMgdGhlIHVwcGVyCj4g
-bGF5ZXIgaW50ZWdyYXRpb24gaXMgdW5kZXIgcmV3b3JrIGFuZCBib3VuZCB0byBiZSBiYXNlZCBv
-bgo+IC9kZXYvaW9tbXUgaW5zdGVhZCBvZiBWRklPIHR1bm5lbGluZy4gSW4gdGhpcyB2ZXJzaW9u
-IHdlIGFsc28gZ2V0Cj4gcmlkIG9mIHRoZSBNU0kgQklORElORyBpb2N0bCwgYXNzdW1pbmcgdGhl
-IGd1ZXN0IGVuZm9yY2VzCj4gZmxhdCBtYXBwaW5nIG9mIGhvc3QgSU9WQXMgdXNlZCB0byBiaW5k
-IHBoeXNpY2FsIE1TSSBkb29yYmVsbHMuCj4gSW4gdGhlIGN1cnJlbnQgUUVNVSBpbnRlZ3JhdGlv
-biB0aGlzIGlzIGFjaGlldmVkIGJ5IGV4cG9zaW5nCj4gUk1ScyB0byB0aGUgZ3Vlc3QsIHVzaW5n
-IFNoYW1lZXIncyBzZXJpZXMgWzFdLiBUaGlzIGFwcHJvYWNoCj4gaXMgUkZDIGFzIHRoZSBJT1JU
-IHNwZWMgaXMgbm90IHJlYWxseSBtZWFudCB0byBkbyB0aGF0Cj4gKHNpbmdsZSBtYXBwaW5nIGZs
-YWcgbGltaXRhdGlvbikuCj4KPiBCZXN0IFJlZ2FyZHMKPgo+IEVyaWMKPgo+IFRoaXMgc2VyaWVz
-IChIb3N0KSBjYW4gYmUgZm91bmQgYXQ6Cj4gaHR0cHM6Ly9naXRodWIuY29tL2VhdWdlci9saW51
-eC90cmVlL3Y1LjE1LXJjNy1uZXN0ZWQtdjE2Cj4gVGhpcyBpbmNsdWRlcyBhIHJlYmFzZWQgVkZJ
-TyBpbnRlZ3JhdGlvbiAoYWx0aG91Z2ggbm90IG1lYW50Cj4gdG8gYmUgdXBzdHJlYW1lZCkKPgo+
-IEd1ZXN0IGtlcm5lbCBicmFuY2ggY2FuIGJlIGZvdW5kIGF0Ogo+IGh0dHBzOi8vZ2l0aHViLmNv
-bS9lYXVnZXIvbGludXgvdHJlZS9zaGFtZWVyX3JtcnJfdjcKPiBmZWF0dXJpbmcgWzFdCj4KPiBR
-RU1VIGludGVncmF0aW9uIChzdGlsbCBiYXNlZCBvbiBWRklPIGFuZCBleHBvc2luZyBSTVJzKQo+
-IGNhbiBiZSBmb3VuZCBhdDoKPiBodHRwczovL2dpdGh1Yi5jb20vZWF1Z2VyL3FlbXUvdHJlZS92
-Ni4xLjAtcm1yLXYyLW5lc3RlZF9zbW11djNfdjEwCj4gKHVzZSBpb21tdT1uZXN0ZWQtc21tdXYz
-IEFSTSB2aXJ0IG9wdGlvbikKPgo+IEd1ZXN0IGRlcGVuZGVuY3k6Cj4gWzFdIFtQQVRDSCB2NyAw
-LzldIEFDUEkvSU9SVDogU3VwcG9ydCBmb3IgSU9SVCBSTVIgbm9kZQoKVGhhbmtzIGEgbG90IGZv
-ciB1cGdyYWRpbmcgdGhlc2UgcGF0Y2hlcy4KCkkgaGF2ZSBiYXNpY2FsbHkgdmVyaWZpZWQgdGhl
-c2UgcGF0Y2hlcyBvbiBIaVNpbGljb24gS3VucGVuZzkyMC4KQW5kIGludGVncmF0ZWQgdGhlbSB0
-byB0aGVzZSBicmFuY2hlcy4KaHR0cHM6Ly9naXRodWIuY29tL0xpbmFyby9saW51eC1rZXJuZWwt
-dWFkay90cmVlL3VhY2NlLWRldmVsLTUuMTYKaHR0cHM6Ly9naXRodWIuY29tL0xpbmFyby9xZW11
-L3RyZWUvdjYuMS4wLXJtci12Mi1uZXN0ZWRfc21tdXYzX3YxMAoKVGhvdWdoIHRoZXkgYXJlIHBy
-b3ZpZGVkIGZvciB0ZXN0IHB1cnBvc2UsCgpUZXN0ZWQtYnk6IFpoYW5nZmVpIEdhbyA8emhhbmdm
-ZWkuZ2FvQGxpbmFyby5vcmc+CgpUaGFua3MKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
-dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
-a3ZtYXJtCg==
+Hi Eric,
+
+On Thu, Dec 2, 2021 at 2:57 AM Eric Auger <eauger@redhat.com> wrote:
+>
+> Hi Reiji,
+>
+> On 11/30/21 6:32 AM, Reiji Watanabe wrote:
+> > Hi Eric,
+> >
+> > On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
+> >>
+> >> Hi Reiji,
+> >>
+> >> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+> >>> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
+> >>> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
+> >>> expose the value for the guest as it is.  Since KVM doesn't support
+> >>> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
+> >>> exopse 0x0 (PMU is not implemented) instead.
+> >> s/exopse/expose
+> >>>
+> >>> Change cpuid_feature_cap_perfmon_field() to update the field value
+> >>> to 0x0 when it is 0xf.
+> >> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+> >> guest should not use it as a PMUv3?
+> >
+> >> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+> >> guest should not use it as a PMUv3?
+> >
+> > For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
+> > Arm ARM says:
+> >   "IMPLEMENTATION DEFINED form of performance monitors supported,
+> >    PMUv3 not supported."
+> >
+> > Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
+> > be exposed to guests (And this patch series doesn't allow userspace
+> > to set the fields to 0xf for guests).
+> What I don't get is why this isn't detected before (in kvm_reset_vcpu).
+> if the VCPU was initialized with KVM_ARM_VCPU_PMU_V3 can we honor this
+> init request if the host pmu is implementation defined?
+
+KVM_ARM_VCPU_INIT with KVM_ARM_VCPU_PMU_V3 will fail in
+kvm_reset_vcpu() if the host PMU is implementation defined.
+
+The AA64DFR0 and DFR0 registers for a vCPU without KVM_ARM_VCPU_PMU_V3
+indicates IMPLEMENTATION DEFINED PMU support, which is not correct.
+
+Thanks,
+Reiji
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
