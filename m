@@ -2,56 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E37EC433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Dec 2021 09:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D1BC433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Dec 2021 10:19:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D0E84018F;
-	Mon,  6 Dec 2021 04:52:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3BAA49F5F;
+	Mon,  6 Dec 2021 05:19:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id C-0Kk9pCERjR; Mon,  6 Dec 2021 04:52:11 -0500 (EST)
+	with ESMTP id EPeAWUpsLbGI; Mon,  6 Dec 2021 05:19:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 149914048A;
-	Mon,  6 Dec 2021 04:52:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 816A24A193;
+	Mon,  6 Dec 2021 05:19:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 840BC40162
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Dec 2021 04:52:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78B9349F5F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Dec 2021 05:19:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1qMMi7JvB7bE for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Dec 2021 04:52:08 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7080240068
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Dec 2021 04:52:08 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DDEBA11FB;
- Mon,  6 Dec 2021 01:52:07 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 51E6B3F73D;
- Mon,  6 Dec 2021 01:52:06 -0800 (PST)
-Date: Mon, 6 Dec 2021 09:52:01 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
- support for the guest
-Message-ID: <Ya3dQeXjUxAG8cCJ@monolith.localdoman>
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-10-reijiw@google.com>
- <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
- <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
- <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com>
- <CAAeT=FwEogskDQVwwTkZSstYX7-X0r1B+hUUHbZOE5T5o9V=ww@mail.gmail.com>
- <2ed3072b-f83d-1b17-0949-ca38267ba94e@redhat.com>
- <CAAeT=Fy7JuCQKgy-ZaS9wPe6h93_WRMYmhihovYDjyg2a+BqNw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAAeT=Fy7JuCQKgy-ZaS9wPe6h93_WRMYmhihovYDjyg2a+BqNw@mail.gmail.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Eric Auger <eauger@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id hjng3CUS0dV4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Dec 2021 05:19:36 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EA6B40573
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Dec 2021 05:19:36 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 6B31F61200;
+ Mon,  6 Dec 2021 10:19:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0933C341C2;
+ Mon,  6 Dec 2021 10:19:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1638785974;
+ bh=CHESru7fiKPCoqHQGng/teCdEOUf816K1QwBoo4hH7w=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=JoJS5hb4bDOPlpqvJC3CCga69dKOsvNWmk/pPmjDTSRRgMUzCPwHyheIPYtP4hogt
+ djiHA5PoLu/eBD3b/v+XUnBtrVrMGz6e71Bzh5rgqQAghRWfP4obh/98cDv4U6NLRU
+ pIHOqzmgIaKKHW1bU9UmfNlOcTsuU2a4Bi8l9sZW9bvHSy4YcWd9ijvlCM19pkYa9P
+ /DuGaIw1iPxmzrqJUWhrBa5up1bK6HLwVZyI6m0LgvB3nwZyKBt1GbwAhYB3177mpK
+ TskCMWXjoMjrP+Q/bgZORoyqERadNoclpMAN7i7qTVocgUbk5SIOl0Swi50F+jkSqf
+ mjteMK9uYkTEQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1muB5o-00A8xo-SP; Mon, 06 Dec 2021 10:19:32 +0000
+Date: Mon, 06 Dec 2021 10:15:31 +0000
+Message-ID: <87zgpe11ks.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: Refuse to run VCPU if the PMU doesn't
+ match the physical CPU
+In-Reply-To: <YZushUBHlla+tS+m@monolith.localdoman>
+References: <20211115165041.194884-1-alexandru.elisei@arm.com>
+ <20211115165041.194884-5-alexandru.elisei@arm.com>
+ <87bl2ds3ny.wl-maz@kernel.org>
+ <YZuJIUls8hl85Zia@monolith.localdoman>
+ <871r386zlf.wl-maz@kernel.org>
+ <YZushUBHlla+tS+m@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, will@kernel.org, mark.rutland@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -68,128 +92,87 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Mon, 22 Nov 2021 14:43:17 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, Nov 22, 2021 at 02:21:00PM +0000, Marc Zyngier wrote:
+> > On Mon, 22 Nov 2021 12:12:17 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On Sun, Nov 21, 2021 at 07:35:13PM +0000, Marc Zyngier wrote:
+> > > > On Mon, 15 Nov 2021 16:50:41 +0000,
+> > > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > > > 
+> > > > > Userspace can assign a PMU to a VCPU with the KVM_ARM_VCPU_PMU_V3_SET_PMU
+> > > > > device ioctl. If the VCPU is scheduled on a physical CPU which has a
+> > > > > different PMU, the perf events needed to emulate a guest PMU won't be
+> > > > > scheduled in and the guest performance counters will stop counting. Treat
+> > > > > it as an userspace error and refuse to run the VCPU in this situation.
+> > > > > 
+> > > > > The VCPU is flagged as being scheduled on the wrong CPU in vcpu_load(), but
+> > > > > the flag is cleared when the KVM_RUN enters the non-preemptible section
+> > > > > instead of in vcpu_put(); this has been done on purpose so the error
+> > > > > condition is communicated as soon as possible to userspace, otherwise
+> > > > > vcpu_load() on the wrong CPU followed by a vcpu_put() could clear the flag.
+> > > > 
+> > > > Can we make this something orthogonal to the PMU, and get userspace to
+> > > > pick an affinity mask independently of instantiating a PMU? I can
+> > > > imagine this would also be useful for SPE on asymmetric systems.
+> > > 
+> > > I actually went this way for the latest version of the SPE series [1] and
+> > > dropped the explicit userspace ioctl in favor of this mechanism.
+> > > 
+> > > The expectation is that userspace already knows which CPUs are associated
+> > > with the chosen PMU (or SPE) when setting the PMU for the VCPU, and having
+> > > userspace set it explicitely via an ioctl looks like an unnecessary step to
+> > > me. I don't see other usecases of an explicit ioctl outside of the above
+> > > two situation (if userspace wants a VCPU to run only on specific CPUs, it
+> > > can use thread affinity for that), so I decided to drop it.
+> > 
+> > My problem with that is that if you have (for whatever reason) a set
+> > of affinities that are not strictly identical for both PMU and SPE,
+> > and expose both of these to a guest, what do you choose?
+> > 
+> > As long as you have a single affinity set to take care of, you're
+> > good. It is when you have several ones that it becomes ugly (as with
+> > anything involving asymmetric CPUs).
+> 
+> I thought about it when I decided to do it this way, my solution was to do
+> a cpumask_and() with the existing VCPU cpumask when setting a VCPU feature
+> that requires it, and returning an error if we get an empty cpumask,
+> because userspace is requesting a combination of VCPU features that is not
+> supported by the hardware.
 
-On Sat, Dec 04, 2021 at 09:39:59AM -0800, Reiji Watanabe wrote:
-> Hi Eric,
-> 
-> On Sat, Dec 4, 2021 at 6:14 AM Eric Auger <eauger@redhat.com> wrote:
-> >
-> > Hi Reiji,
-> >
-> > On 12/4/21 2:04 AM, Reiji Watanabe wrote:
-> > > Hi Eric,
-> > >
-> > > On Thu, Dec 2, 2021 at 2:57 AM Eric Auger <eauger@redhat.com> wrote:
-> > >>
-> > >> Hi Reiji,
-> > >>
-> > >> On 11/30/21 6:32 AM, Reiji Watanabe wrote:
-> > >>> Hi Eric,
-> > >>>
-> > >>> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
-> > >>>>
-> > >>>> Hi Reiji,
-> > >>>>
-> > >>>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > >>>>> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
-> > >>>>> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
-> > >>>>> expose the value for the guest as it is.  Since KVM doesn't support
-> > >>>>> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
-> > >>>>> exopse 0x0 (PMU is not implemented) instead.
-> > >>>> s/exopse/expose
-> > >>>>>
-> > >>>>> Change cpuid_feature_cap_perfmon_field() to update the field value
-> > >>>>> to 0x0 when it is 0xf.
-> > >>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-> > >>>> guest should not use it as a PMUv3?
-> > >>>
-> > >>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-> > >>>> guest should not use it as a PMUv3?
-> > >>>
-> > >>> For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
-> > >>> Arm ARM says:
-> > >>>   "IMPLEMENTATION DEFINED form of performance monitors supported,
-> > >>>    PMUv3 not supported."
-> > >>>
-> > >>> Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
-> > >>> be exposed to guests (And this patch series doesn't allow userspace
-> > >>> to set the fields to 0xf for guests).
-> > >> What I don't get is why this isn't detected before (in kvm_reset_vcpu).
-> > >> if the VCPU was initialized with KVM_ARM_VCPU_PMU_V3 can we honor this
-> > >> init request if the host pmu is implementation defined?
-> > >
-> > > KVM_ARM_VCPU_INIT with KVM_ARM_VCPU_PMU_V3 will fail in
-> > > kvm_reset_vcpu() if the host PMU is implementation defined.
-> >
-> > OK. This was not obvsious to me.
-> >
-> >                 if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
-> >                         ret = -EINVAL;
-> >                         goto out;
-> >                 }
-> >
-> > kvm_perf_init
-> > +       if (perf_num_counters() > 0)
-> > +               static_branch_enable(&kvm_arm_pmu_available);
-> >
-> > But I believe you ;-), sorry for the noise
-> 
-> Thank you for the review !
-> 
-> I didn't find the code above in v5.16-rc3, which is the base code of
-> this series.  So, I'm not sure where the code came from (any kvmarm
-> repository branch ??).
-> 
-> What I see in v5.16-rc3 is:
-> ----
-> int kvm_perf_init(void)
-> {
->         return perf_register_guest_info_callbacks(&kvm_guest_cbs);
-> }
-> 
-> void kvm_host_pmu_init(struct arm_pmu *pmu)
-> {
->         if (pmu->pmuver != 0 && pmu->pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
->             !kvm_arm_support_pmu_v3() && !is_protected_kvm_enabled())
->                 static_branch_enable(&kvm_arm_pmu_available);
-> }
-> ----
-> 
-> And I don't find any other code that enables kvm_arm_pmu_available.
+So every new asymetric feature would come with its own potential
+affinity mask, and KVM would track the restriction of that affinity. I
+guess that because it can only converge to zero, this is safe by
+design...
 
-The code was recently changed (in v5.15 I think), I think Eric is looking
-at an older version.
+One thing I want to make sure is that we can evaluate the mask very
+early on, and reduce the overhead of that evaluation.
 
+> Going with the other solution (user sets the cpumask via an ioctl), KVM
+> would still have to check against certain combinations of VCPU features
+> (for SPE it's mandatory, so KVM doesn't trigger an undefined exception, we
+> could skip the check for PMU, but then what do we gain from the ioctl if
+> KVM doesn't check that it matches the PMU?), so I don't think we loose
+> anything by going with the implicit cpumask.
 > 
-> Looking at the KVM's PMUV3 support code for guests in v5.16-rc3,
-> if KVM allows userspace to configure KVM_ARM_VCPU_PMU_V3 even with
-> ID_AA64DFR0_PMUVER_IMP_DEF on the host (, which I don't think it does),
-> I think we should fix that to not allow that.
+> What do you think?
 
-I recently started looking into that too. If there's only one PMU, then the
-guest won't see the value IMP DEF for PMUVer (userspace cannot set the PMU
-feature because !kvm_arm_support_pmu_v3()).
-
-On heterogeneous systems with multiple PMUs, it gets complicated. I don't
-have any such hardware, but what I think will happen is that KVM will
-enable the static branch if there is at least one PMU with
-PMUVer != IMP_DEF, even if there are other PMUs with PMUVer = IMP_DEF. But
-read_sanitised_ftr_reg() will always return 0 for the
-PMUVer field because the field is defined as FTR_EXACT with a safe value of
-0 in cpufeature.c. So the guest ends up seeing PMUVer = 0.
-
-I'm not sure if this is the case because I'm not familiar with the cpu
-features code, but I planning to investigate further.
+OK, fair enough. Please respin the series (I had a bunch of minor
+comments), and I'll have another look.
 
 Thanks,
-Alex
 
-> (I'm not sure how KVM's PMUV3 support code is implemented in the
-> code that you are looking at though)
-> 
-> Thanks,
-> Reiji
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
