@@ -2,71 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 020A3C433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  6 Dec 2021 08:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72145C433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  6 Dec 2021 08:42:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A7154A193;
-	Mon,  6 Dec 2021 03:41:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D43DA4079A;
+	Mon,  6 Dec 2021 03:42:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QKfbfNhSn9hd; Mon,  6 Dec 2021 03:41:41 -0500 (EST)
+	with ESMTP id e2X5khuB-t+k; Mon,  6 Dec 2021 03:42:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C5FF4B093;
-	Mon,  6 Dec 2021 03:41:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85B3B4B08E;
+	Mon,  6 Dec 2021 03:42:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 611EC4B08E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Dec 2021 03:41:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 493C54079A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Dec 2021 03:42:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qxjR9-AEbXIO for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Dec 2021 03:41:39 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 822DF40C88
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Dec 2021 03:41:39 -0500 (EST)
+ with ESMTP id wpfKOuWa82pC for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Dec 2021 03:42:00 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FB324048A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Dec 2021 03:42:00 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 4FACB611A6;
- Mon,  6 Dec 2021 08:41:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB3C3C341C4;
- Mon,  6 Dec 2021 08:41:37 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 9AA22B8103B;
+ Mon,  6 Dec 2021 08:41:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56370C341C1;
+ Mon,  6 Dec 2021 08:41:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638780097;
- bh=N7MFclF8OkmzxofuXcBa7l2alQne5gxGS+q9vaudIRE=;
+ s=k20201202; t=1638780117;
+ bh=4wWOVe2lwPaaXoppKsoOmUrakURNFayKUJcMUbva6IU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=LpGgLdZuafzoB+AS9eU985bLrCSPY32gO3ZUD+fZUhWHz+41eimkq2avP2DZYkWb3
- 6lpMkMoZRzIynwzVYdBFsO/UKMflp8bj4Q2l6/E8b4sZ324aZfiM6s11Bm8vMFd+62
- kiuZ7OpS21h32ENxxPdo6vDve2AOPXoMNEmPIKaoStW4cV8E+KnNTlZPaFEQ9I9yHv
- V4KrthYU7yj/PYkaLVj3MXAjdLTTbQGZlyhJVzInK+zg3cfhT/0OtCVtEzQh5YyzT2
- pSgqifG4Wy0gMkXi0b0mG8s5fOYT7wAb51zgpEyXPAM0uSZuTTri8ZVmyf5XCmRXRh
- GXcLofdS5kKYg==
+ b=E505Cjk/H9JyXpn8eSTt0M7VxC9n2ELL9SuTlBogzn7URcEyR2MmwrOz42w09QquA
+ tQlTtLyH2/0D79pdvuwpep4oIjcgzBMz/x+nM89DHtCWXNkxPlMWw17clnKlVxv6/1
+ BHd04Whjmp1YMA4wEP36ocwSkB7dYEhrJ8jax875Sp3jrrjcDDSQnWvoRFlS3iVMTi
+ NwfHyBU4QFPeU2tpSz20ogc7P0X4QRxZ7r/Kx12hHJn8GvLRcTCD6zGwCj0prMBpbv
+ 9JNfwsFydYUFJwOkMNda02byobWWsth3LQoRl6/jTW7pj7qjEzTp1kdnaQy0g8WjqS
+ dSJPixHPhpRwg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mu9Z1-00A7wB-Jw; Mon, 06 Dec 2021 08:41:35 +0000
+ id 1mu9ZL-00A7wb-Am; Mon, 06 Dec 2021 08:41:55 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>,
-	kvmarm@lists.cs.columbia.edu
-Subject: Re: [PATCH 0/3] KVM: arm64: Keep hyp and host headers separate where
- possible
-Date: Mon,  6 Dec 2021 08:41:31 +0000
-Message-Id: <163878008391.1389659.11356018636519306544.b4-ty@kernel.org>
+To: Rikard Falkeborn <rikard.falkeborn@gmail.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ James Morse <james.morse@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Constify kvm_io_gic_ops
+Date: Mon,  6 Dec 2021 08:41:52 +0000
+Message-Id: <163878010586.1389753.7080973991720885525.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211202171048.26924-1-will@kernel.org>
-References: <20211202171048.26924-1-will@kernel.org>
+In-Reply-To: <20211204213518.83642-1-rikard.falkeborn@gmail.com>
+References: <20211204213518.83642-1-rikard.falkeborn@gmail.com>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Rcpt-To: rikard.falkeborn@gmail.com, suzuki.poulose@arm.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, eric.auger@redhat.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ catalin.marinas@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,28 +89,16 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 2 Dec 2021 17:10:45 +0000, Will Deacon wrote:
-> This series tidies up the header file usage for the nvhe hyp object so
-> that header files under arch/arm64/kvm/hyp/include are not included by
-> host code running at EL1.
-> 
-> For definitions that are shared between the host and hypervisor, these
-> are either moved to headers under arch/arm64/include/asm/ or are
-> generated by kbuild along similar lines to asm-offsets.h. For now, this
-> allows us to tidy up some of the pKVM reserved memory handling, but in
-> future this will also allow the pKVM EL2 data structures to avoid
-> polluting the host namespace.
-> 
-> [...]
+On Sat, 4 Dec 2021 22:35:18 +0100, Rikard Falkeborn wrote:
+> The only usage of kvm_io_gic_ops is to make a comparison with its
+> address and to pass its address to kvm_iodevice_init() which takes a
+> pointer to const kvm_io_device_ops as input. Make it const to allow the
+> compiler to put it in read-only memory.
 
 Applied to next, thanks!
 
-[1/3] arm64: Add missing include of asm/cpufeature.h to asm/mmu.h
-      commit: 7e04f05984dd03edad7daaa4fa97958b7133c62a
-[2/3] KVM: arm64: Generate hyp_constants.h for the host
-      commit: ed4ed15d571065eb66ea718d7f6050553586417d
-[3/3] KVM: arm64: Move host EL1 code out of hyp/ directory
-      commit: 9429f4b0412d05243237c7695c59d0a7b1174492
+[1/1] KVM: arm64: Constify kvm_io_gic_ops
+      commit: 636dcd0204599f94680f8f87b46cef7c66034ac0
 
 Cheers,
 
