@@ -2,104 +2,101 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29128C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  7 Dec 2021 10:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF093C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  7 Dec 2021 10:27:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B0504B0B4;
-	Tue,  7 Dec 2021 05:22:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43DC640667;
+	Tue,  7 Dec 2021 05:27:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9nwixsJvBxdF; Tue,  7 Dec 2021 05:22:38 -0500 (EST)
+	with ESMTP id 77boIs8He-k4; Tue,  7 Dec 2021 05:27:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2F944B0AC;
-	Tue,  7 Dec 2021 05:22:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4B4A49F5F;
+	Tue,  7 Dec 2021 05:27:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CA5974B0A0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Dec 2021 05:22:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3917849F5F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Dec 2021 05:27:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iqBNdUF-GXY9 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Dec 2021 05:22:36 -0500 (EST)
+ with ESMTP id yibsmfDp4-70 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Dec 2021 05:27:51 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47BB14B099
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Dec 2021 05:22:36 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09F0240667
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Dec 2021 05:27:51 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1638872556;
+ s=mimecast20190719; t=1638872870;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vIblGTzXX40hR9szafjbMCGgx30k6YagvsBGLTnN0YI=;
- b=iFfOarRVgI8cZkql5FIvedwBHmGQMBUSQm9tIli7QHA3GTDnYyOOTAcPggbtGO6N0CaPt/
- dJ7YL7YuB9XJxy+YHrGbFo3ns/or5h3nh6kK8RffoKGog6dTlRvluxCkF3tQkCy20jbbLX
- m+kwVVmEh6RNmLw44vz1UHCrKvPIzDk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=WuGNH/dyVygpiGOJkCWGmo3DKhkMVbJWC9pFgiPTsyo=;
+ b=D0iZdz0y1cfknqbh9GRULsU7V9SHmLbBvwHqPiuKgXunx/F6/1m3BIldJ8J7zq1vV5i1Bo
+ k5LZ7nW07hTvE1SCM15OHlHrrn78rOlGiVABKdo+V0p7AphTvrXMzrXpDiGxo3waUJkWzr
+ ZohXaX/0kM+xaBoO40lF/WWzk4YomZo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-403-Z9qAD1qXOnagPS-KXODOqg-1; Tue, 07 Dec 2021 05:22:33 -0500
-X-MC-Unique: Z9qAD1qXOnagPS-KXODOqg-1
-Received: by mail-wm1-f71.google.com with SMTP id
- bg20-20020a05600c3c9400b0033a9300b44bso1171479wmb.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Dec 2021 02:22:33 -0800 (PST)
+ us-mta-520-_kOML7uePhqovr-PuqIH7Q-1; Tue, 07 Dec 2021 05:27:46 -0500
+X-MC-Unique: _kOML7uePhqovr-PuqIH7Q-1
+Received: by mail-wr1-f72.google.com with SMTP id
+ k8-20020a5d5248000000b001763e7c9ce5so2775515wrc.22
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Dec 2021 02:27:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:subject:to:cc:references:from
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-transfer-encoding:content-language;
- bh=vIblGTzXX40hR9szafjbMCGgx30k6YagvsBGLTnN0YI=;
- b=e+SY9Bh1d+tH+QIJ4kYNPIOgQRhbkq1hxCTpCqN1mkSJ5vcM3uR4986FFImlsm4O3N
- f0wcIGjTTnzHNIASJzdWKl+t62Ao9g3PVZeAyhcAnObSlMs1CDGgiwV4/XVq9rIQku/e
- cMhjYjDgsIieIQb6fH+dwIHdT3Drp3NP5l/Diz41YlU7VK09r0BERFds8iTf0D5OWLDz
- FVVlyGyZrUwvxHNbbT0GYTw8/OVYiUihgZ6bcMbHv9UXwP2S53DsdH+ng+V+y9SNp8sf
- U1qZ8kUKqzbzqbwmi9Tq0EDaR5KC6fA7D6/PPZjxBhahVfgcNSZEZSW/D946tYL7+kPp
- eu+Q==
-X-Gm-Message-State: AOAM530x8UG1FPyCoeZvResf2ARVGhR9aX5oomyV/bFRyA547VaB3eiy
- GApBcvsBAWLfqU8PaRsVa2nxIA4otYxtUXe3kY231EOue4p7mX3YuxcaxnSOsQTsfhYdZOZNoOv
- PWP20BSNY4mGnH48+elx2iFaK
-X-Received: by 2002:a05:600c:4f55:: with SMTP id
- m21mr5891544wmq.68.1638872552032; 
- Tue, 07 Dec 2021 02:22:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzOgIcH/ywM872FWWEzo4wI3r37JDW61iH1Cfi/iZw3pSmHii9bhQ9WabrWC9ggWBBYhH9xLg==
-X-Received: by 2002:a05:600c:4f55:: with SMTP id
- m21mr5891493wmq.68.1638872551786; 
- Tue, 07 Dec 2021 02:22:31 -0800 (PST)
+ bh=WuGNH/dyVygpiGOJkCWGmo3DKhkMVbJWC9pFgiPTsyo=;
+ b=YaEdU+1dt5q8KsEdQmVUW61SrNKr3Wni3DI2ZRQh0kaYOzmLYRjRd6UFOYopgwegqm
+ OKZfbR1RoeYLL9aLVGfe5FjOrinSx0n/wEGy4k/kC3y+Nsb6zvI2J6sH7UkeSDHrhHe/
+ /woyNwdKfA5cQhpNyNRZzDb8+4n/oV//hWwkEfOO8vrPUIouD+240kYaA3Occo+qvIAn
+ Gzw3wSPQQiAUauaZrEZ2jdCK/kNRAiecD/7QrWNgi4Ni+BJrZCXPMjirNR2D+RnbPqcU
+ pKAMdKrTeh7Xze1brACkZXLyXvMb7dJtPPrBx2kVjRogvZnIR0MCLbxRYem2BjAu4k7l
+ 4sOA==
+X-Gm-Message-State: AOAM533V7+XSgYTBfORmIFhzrQks9TDAqQSWoXilt60JiZpNUo7TtroW
+ n8CX+RAfWaOqDR0DLM+J3m3Cc2z1098PHkPF8gmKZyUyi+TsoHvmQFwsbs/MOsFs4p28pysYvpf
+ va9rMH96jNOY7vVdsAv38/tGN
+X-Received: by 2002:adf:d22a:: with SMTP id k10mr51871524wrh.80.1638872865076; 
+ Tue, 07 Dec 2021 02:27:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw5SYKxnf/czGLnzekcByHTylqSUw2oDFUY77k108vZsKZFOCs+7tv9nPFdqCwIsIDIRwPszg==
+X-Received: by 2002:adf:d22a:: with SMTP id k10mr51871467wrh.80.1638872864803; 
+ Tue, 07 Dec 2021 02:27:44 -0800 (PST)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
  ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id k8sm13945681wrn.91.2021.12.07.02.22.29
+ by smtp.gmail.com with ESMTPSA id d15sm18622235wri.50.2021.12.07.02.27.42
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Dec 2021 02:22:31 -0800 (PST)
-Subject: Re: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
-To: Joerg Roedel <joro@8bytes.org>
+ Tue, 07 Dec 2021 02:27:43 -0800 (PST)
+Subject: Re: [RFC v16 0/9] SMMUv3 Nested Stage Setup (IOMMU part)
+To: Zhangfei Gao <zhangfei.gao@linaro.org>, eric.auger.pro@gmail.com,
+ iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+ will@kernel.org, robin.murphy@arm.com, jean-philippe@linaro.org,
+ zhukeqian1@huawei.com
 References: <20211027104428.1059740-1-eric.auger@redhat.com>
- <20211027104428.1059740-2-eric.auger@redhat.com>
- <Ya3qd6mT/DpceSm8@8bytes.org>
+ <ee119b42-92b1-5744-4321-6356bafb498f@linaro.org>
 From: Eric Auger <eric.auger@redhat.com>
-Message-ID: <c7e26722-f78c-a93f-c425-63413aa33dde@redhat.com>
-Date: Tue, 7 Dec 2021 11:22:28 +0100
+Message-ID: <7763531a-625d-10c6-c35e-2ce41e75f606@redhat.com>
+Date: Tue, 7 Dec 2021 11:27:41 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <Ya3qd6mT/DpceSm8@8bytes.org>
+In-Reply-To: <ee119b42-92b1-5744-4321-6356bafb498f@linaro.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Language: en-US
-Cc: kvm@vger.kernel.org, vivek.gautam@arm.com, vdumpa@nvidia.com,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com,
- jean-philippe@linaro.org, yi.l.liu@intel.com, ashok.raj@intel.com,
- maz@kernel.org, vsethi@nvidia.com, nicolinc@nvidia.com,
- zhangfei.gao@linaro.org, sumitg@nvidia.com, kevin.tian@intel.com,
- jacob.jun.pan@linux.intel.com, will@kernel.org, nicoleotsuka@gmail.com,
- alex.williamson@redhat.com, wangxingang5@huawei.com, chenxiang66@hisilicon.com,
- linux-kernel@vger.kernel.org, lushenming@huawei.com,
- iommu@lists.linux-foundation.org, robin.murphy@arm.com
+Cc: kevin.tian@intel.com, jacob.jun.pan@linux.intel.com, ashok.raj@intel.com,
+ chenxiang66@hisilicon.com, maz@kernel.org, vdumpa@nvidia.com,
+ nicoleotsuka@gmail.com, vivek.gautam@arm.com, alex.williamson@redhat.com,
+ yi.l.liu@intel.com, nicolinc@nvidia.com, vsethi@nvidia.com, sumitg@nvidia.com,
+ lushenming@huawei.com, wangxingang5@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -112,62 +109,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Joerg,
-
-On 12/6/21 11:48 AM, Joerg Roedel wrote:
-> On Wed, Oct 27, 2021 at 12:44:20PM +0200, Eric Auger wrote:
->> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
->> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
->> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
->> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> This Signed-of-by chain looks dubious, you are the author but the last
-> one in the chain?
-The 1st RFC in Aug 2018
-(https://lists.cs.columbia.edu/pipermail/kvmarm/2018-August/032478.html)
-said this was a generalization of Jacob's patch
-
-
-  [PATCH v5 01/23] iommu: introduce bind_pasid_table API function
-
-
-  https://lists.linuxfoundation.org/pipermail/iommu/2018-May/027647.html
-
-So indeed Jacob should be the author. I guess the multiple rebases got
-this eventually replaced at some point, which is not an excuse. Please
-forgive me for that.
-Now the original patch already had this list of SoB so I don't know if I
-shall simplify it.
-
-
->
->> +int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
->> +				  void __user *uinfo)
->> +{
-> [...]
->
->> +	if (pasid_table_data.format == IOMMU_PASID_FORMAT_SMMUV3 &&
->> +	    pasid_table_data.argsz <
->> +		offsetofend(struct iommu_pasid_table_config, vendor_data.smmuv3))
->> +		return -EINVAL;
-> This check looks like it belongs in driver specific code.
-Indeed, I will fix that in my next respin :-)
-
-Thanks!
-
-Eric
->
-> Regards,
->
-> 	Joerg
->
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgWmhhbmdmZWksCgpPbiAxMi8zLzIxIDE6MjcgUE0sIFpoYW5nZmVpIEdhbyB3cm90ZToKPgo+
+IEhpLCBFcmljCj4KPiBPbiAyMDIxLzEwLzI3IOS4i+WNiDY6NDQsIEVyaWMgQXVnZXIgd3JvdGU6
+Cj4+IFRoaXMgc2VyaWVzIGJyaW5ncyB0aGUgSU9NTVUgcGFydCBvZiBIVyBuZXN0ZWQgcGFnaW5n
+IHN1cHBvcnQKPj4gaW4gdGhlIFNNTVV2My4KPj4KPj4gVGhlIFNNTVV2MyBkcml2ZXIgaXMgYWRh
+cHRlZCB0byBzdXBwb3J0IDIgbmVzdGVkIHN0YWdlcy4KPj4KPj4gVGhlIElPTU1VIEFQSSBpcyBl
+eHRlbmRlZCB0byBjb252ZXkgdGhlIGd1ZXN0IHN0YWdlIDEKPj4gY29uZmlndXJhdGlvbiBhbmQg
+dGhlIGhvb2sgaXMgaW1wbGVtZW50ZWQgaW4gdGhlIFNNTVV2MyBkcml2ZXIuCj4+Cj4+IFRoaXMg
+YWxsb3dzIHRoZSBndWVzdCB0byBvd24gdGhlIHN0YWdlIDEgdGFibGVzIGFuZCBjb250ZXh0Cj4+
+IGRlc2NyaXB0b3JzIChzby1jYWxsZWQgUEFTSUQgdGFibGUpIHdoaWxlIHRoZSBob3N0IG93bnMg
+dGhlCj4+IHN0YWdlIDIgdGFibGVzIGFuZCBtYWluIGNvbmZpZ3VyYXRpb24gc3RydWN0dXJlcyAo
+U1RFKS4KPj4KPj4gVGhpcyB3b3JrIG1haW5seSBpcyBwcm92aWRlZCBmb3IgdGVzdCBwdXJwb3Nl
+IGFzIHRoZSB1cHBlcgo+PiBsYXllciBpbnRlZ3JhdGlvbiBpcyB1bmRlciByZXdvcmsgYW5kIGJv
+dW5kIHRvIGJlIGJhc2VkIG9uCj4+IC9kZXYvaW9tbXUgaW5zdGVhZCBvZiBWRklPIHR1bm5lbGlu
+Zy4gSW4gdGhpcyB2ZXJzaW9uIHdlIGFsc28gZ2V0Cj4+IHJpZCBvZiB0aGUgTVNJIEJJTkRJTkcg
+aW9jdGwsIGFzc3VtaW5nIHRoZSBndWVzdCBlbmZvcmNlcwo+PiBmbGF0IG1hcHBpbmcgb2YgaG9z
+dCBJT1ZBcyB1c2VkIHRvIGJpbmQgcGh5c2ljYWwgTVNJIGRvb3JiZWxscy4KPj4gSW4gdGhlIGN1
+cnJlbnQgUUVNVSBpbnRlZ3JhdGlvbiB0aGlzIGlzIGFjaGlldmVkIGJ5IGV4cG9zaW5nCj4+IFJN
+UnMgdG8gdGhlIGd1ZXN0LCB1c2luZyBTaGFtZWVyJ3Mgc2VyaWVzIFsxXS4gVGhpcyBhcHByb2Fj
+aAo+PiBpcyBSRkMgYXMgdGhlIElPUlQgc3BlYyBpcyBub3QgcmVhbGx5IG1lYW50IHRvIGRvIHRo
+YXQKPj4gKHNpbmdsZSBtYXBwaW5nIGZsYWcgbGltaXRhdGlvbikuCj4+Cj4+IEJlc3QgUmVnYXJk
+cwo+Pgo+PiBFcmljCj4+Cj4+IFRoaXMgc2VyaWVzIChIb3N0KSBjYW4gYmUgZm91bmQgYXQ6Cj4+
+IGh0dHBzOi8vZ2l0aHViLmNvbS9lYXVnZXIvbGludXgvdHJlZS92NS4xNS1yYzctbmVzdGVkLXYx
+Ngo+PiBUaGlzIGluY2x1ZGVzIGEgcmViYXNlZCBWRklPIGludGVncmF0aW9uIChhbHRob3VnaCBu
+b3QgbWVhbnQKPj4gdG8gYmUgdXBzdHJlYW1lZCkKPj4KPj4gR3Vlc3Qga2VybmVsIGJyYW5jaCBj
+YW4gYmUgZm91bmQgYXQ6Cj4+IGh0dHBzOi8vZ2l0aHViLmNvbS9lYXVnZXIvbGludXgvdHJlZS9z
+aGFtZWVyX3JtcnJfdjcKPj4gZmVhdHVyaW5nIFsxXQo+Pgo+PiBRRU1VIGludGVncmF0aW9uIChz
+dGlsbCBiYXNlZCBvbiBWRklPIGFuZCBleHBvc2luZyBSTVJzKQo+PiBjYW4gYmUgZm91bmQgYXQ6
+Cj4+IGh0dHBzOi8vZ2l0aHViLmNvbS9lYXVnZXIvcWVtdS90cmVlL3Y2LjEuMC1ybXItdjItbmVz
+dGVkX3NtbXV2M192MTAKPj4gKHVzZSBpb21tdT1uZXN0ZWQtc21tdXYzIEFSTSB2aXJ0IG9wdGlv
+bikKPj4KPj4gR3Vlc3QgZGVwZW5kZW5jeToKPj4gWzFdIFtQQVRDSCB2NyAwLzldIEFDUEkvSU9S
+VDogU3VwcG9ydCBmb3IgSU9SVCBSTVIgbm9kZQo+Cj4gVGhhbmtzIGEgbG90IGZvciB1cGdyYWRp
+bmcgdGhlc2UgcGF0Y2hlcy4KPgo+IEkgaGF2ZSBiYXNpY2FsbHkgdmVyaWZpZWQgdGhlc2UgcGF0
+Y2hlcyBvbiBIaVNpbGljb24gS3VucGVuZzkyMC4KPiBBbmQgaW50ZWdyYXRlZCB0aGVtIHRvIHRo
+ZXNlIGJyYW5jaGVzLgo+IGh0dHBzOi8vZ2l0aHViLmNvbS9MaW5hcm8vbGludXgta2VybmVsLXVh
+ZGsvdHJlZS91YWNjZS1kZXZlbC01LjE2Cj4gaHR0cHM6Ly9naXRodWIuY29tL0xpbmFyby9xZW11
+L3RyZWUvdjYuMS4wLXJtci12Mi1uZXN0ZWRfc21tdXYzX3YxMAo+Cj4gVGhvdWdoIHRoZXkgYXJl
+IHByb3ZpZGVkIGZvciB0ZXN0IHB1cnBvc2UsCj4KPiBUZXN0ZWQtYnk6IFpoYW5nZmVpIEdhbyA8
+emhhbmdmZWkuZ2FvQGxpbmFyby5vcmc+CgpUaGFuayB5b3UgdmVyeSBtdWNoLiBBcyB5b3UgbWVu
+dGlvbmVkLCB1bnRpbCB3ZSBkbyBub3QgaGF2ZSB0aGUKL2Rldi9pb21tdSBpbnRlZ3JhdGlvbiB0
+aGlzIGlzIG1haW50YWluZWQgZm9yIHRlc3RpbmcgcHVycG9zZS4gVGhlIFNNTVUKY2hhbmdlcyBz
+aG91bGRuJ3QgYmUgbXVjaCBpbXBhY3RlZCB0aG91Z2guClRoZSBhZGRlZCB2YWx1ZSBvZiB0aGlz
+IHJlc3BpbiB3YXMgdG8gcHJvcG9zZSBhbiBNU0kgYmluZGluZyBzb2x1dGlvbgpiYXNlZCBvbiBS
+TVJScyB3aGljaCBzaW1wbGlmeSB0aGluZ3MgYXQga2VybmVsIGxldmVsLgoKVGhhbmtzIQoKRXJp
+Ywo+Cj4gVGhhbmtzCj4KCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpo
+dHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
