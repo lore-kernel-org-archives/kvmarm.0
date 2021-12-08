@@ -2,63 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24116C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 17:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB22C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 19:28:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B03574B12C;
-	Wed,  8 Dec 2021 12:51:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FABF4B10B;
+	Wed,  8 Dec 2021 14:28:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9XvxJDfNvn+V; Wed,  8 Dec 2021 12:51:03 -0500 (EST)
+	with ESMTP id 7xd-paTgQqDH; Wed,  8 Dec 2021 14:28:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B84084B17D;
-	Wed,  8 Dec 2021 12:51:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B0884B125;
+	Wed,  8 Dec 2021 14:28:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0411A4B12C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 12:51:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3910D4B10B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:28:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i-tsVP3H4aDz for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 12:51:02 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F342A4B126
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 12:51:01 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id C284DCE228F;
- Wed,  8 Dec 2021 17:50:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23BB0C00446;
- Wed,  8 Dec 2021 17:50:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638985857;
- bh=xb90MP/qB6HOV2i1jXMu36XCMenmbWiRSkd39nIEmlY=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Ud+CpWXkWyC0eQlPUzIkm8PiPlvtU5DesoGGVTezeiqznlT7eoggyRWIMxEuzAU+Q
- WZg2msTa2KghO/JnLvHJgxWeVkg4ao5NE4J8uBcJFuFFc0SySIaiCiKlfWGY0BJ5GI
- EqxD2xsgkVornOHroFGXZ/eiVoDoSM24hdYnWgB4cBSEJBFSTL2lblJEsMKXsWqTUl
- PBmHBMLWJe9AjEyrSiebEHAWncWHVFnT1HjDN1th/moeOf3OLITKzjyo9iLgkKUWTd
- lHo4pxlbXW1li6ogPTjyK/QIyO4rrQo62fC0nx81kh6WHqnWQkOnx/0LFcz2lg6Thm
- SwG7IKVUEjghA==
-Date: Wed, 8 Dec 2021 17:50:51 +0000
-From: Will Deacon <will@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH 6/6] KVM: arm64: pkvm: Make kvm_host_owns_hyp_mappings()
- robust to VHE
-Message-ID: <20211208175050.GF820@willie-the-truck>
-References: <20211208152300.2478542-1-qperret@google.com>
- <20211208152300.2478542-7-qperret@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211208152300.2478542-7-qperret@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id TkxT6fzYR0Yp for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 14:28:13 -0500 (EST)
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
+ [209.85.128.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2A2C4B090
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:28:12 -0500 (EST)
+Received: by mail-wm1-f73.google.com with SMTP id
+ l4-20020a05600c1d0400b00332f47a0fa3so1721428wms.8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 11:28:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=uFbTewYPIohmdOsJ5vp7sbi30zzOHewDKLeIlU197Fo=;
+ b=I1qKv+eLPwQiFUQsEh47h7AKXKrOT2s/kYR/89wlawfCEiq+pk5dVVroGUDsXWQM3b
+ /lbe2jTw50DrUPzbTOE3V0rfcGKrDRpwbBCHwUnFn/vilaBcBYl1dJxl0U9fkx86Ri4T
+ qPrGyT5K6b+5O79W4p6HV2MqhpU5kO9bkuuuHMiJYzrmJstvtGH4gPRTSFWj6fkFvnGJ
+ 8donjBNUIx+cbaSPZccQGQ93QnFvmP19Zvb62QRKgRZ+C1ADEYPtwOXOu3XYZ7komjK+
+ FDbju9NmaBaMr9a0T6zy6knSoUcNNYjyAPHy/Zw2LLklIfMYXqrYmPbihkwSM8zVp0xv
+ Znnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=uFbTewYPIohmdOsJ5vp7sbi30zzOHewDKLeIlU197Fo=;
+ b=dRIn6jcsyRqH2dFuG+gXMCNmSSzlTh/IyGuSPXUM7DxG233tlwXykIBL0WUAFjuPm7
+ tssY9iz8iYBu78Z3HjtCXZupyidS0w/wHDQqnBp2w6XSmFilPODR205bz0wIjpkO9oqO
+ 3Yz4f/kV795563Y3jg7hPOOyd7e721r4GUS3lw7DRdIhin1/L41uXS5IOHqUOjmQngUU
+ ilYoDYu+hTXus8KzgDaUeazdn84rRVWn1H2rsVJ5bsFV8QYwgHfqcQIOuSkw8xZauayP
+ a6wzo4Pwhw7qzJZePfnI8mTPIV2+/rK0jSuBm3AKiuwEU3nOpzYDlL0/WLGhyGLEJ/Wi
+ 1sow==
+X-Gm-Message-State: AOAM530bmaWMeCseLj/6vo5/49Gr2apDSevXCOfYhPG4loQTL7hjoU5E
+ 4RPagYuFd/87+5he3czBaV8NpMwKAKlffYluJd60RJuuMFy07ep9GEWBorbB/rDL5md0aqWUZCI
+ oyQffZYOh6+5Wm1v0LbaoMAm2Jpb8SU7QXtSiQVEV4Gp43kK0FqmQvtlwNUU94kztUys=
+X-Google-Smtp-Source: ABdhPJxczzY7Z1F5bpB61l4SwAYHgac34yybGImOr/h5YO8e2u/axy2wxHlHoBGPlesTVvlL30qroA3ddg==
+X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
+ (user=tabba job=sendgmr) by 2002:a5d:46d0:: with SMTP id
+ g16mr710895wrs.605.1638991691851; 
+ Wed, 08 Dec 2021 11:28:11 -0800 (PST)
+Date: Wed,  8 Dec 2021 19:28:10 +0000
+Message-Id: <20211208192810.657360-1-tabba@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
+Subject: [PATCH] KVM: arm64: Use defined value for SCTLR_ELx_EE
+From: Fuad Tabba <tabba@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com, maz@kernel.org, will@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,37 +82,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Dec 08, 2021 at 03:22:59PM +0000, Quentin Perret wrote:
-> The kvm_host_owns_hyp_mappings() function should return true if and only
-> if the host kernel is responsible for creating the hypervisor stage-1
-> mappings. That is only possible in standard non-VHE mode, or during boot
-> in protected nVHE mode. But either way, non of this makes sense in VHE,
+Replace the hardcoded value with the existing definition.
 
-Typo: non => none
+No functional change intended.
 
-> so make sure to catch this case as well, hence making the function
-> return sensible values in any context (VHE or not).
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> ---
->  arch/arm64/kvm/mmu.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 605c104eb030..ea840fa223b5 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -239,6 +239,9 @@ void free_hyp_pgds(void)
->  
->  static bool kvm_host_owns_hyp_mappings(void)
->  {
-> +	if (is_kernel_in_hyp_mode())
-> +		return false;
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
+ arch/arm64/include/asm/kvm_emulate.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Acked-by: Will Deacon <will@kernel.org>
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index f4871e47b2d0..cd5fd9b92b04 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -386,7 +386,7 @@ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+ 		*vcpu_cpsr(vcpu) |= PSR_AA32_E_BIT;
+ 	} else {
+ 		u64 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+-		sctlr |= (1 << 25);
++		sctlr |= SCTLR_ELx_EE;
+ 		vcpu_write_sys_reg(vcpu, sctlr, SCTLR_EL1);
+ 	}
+ }
+-- 
+2.34.1.400.ga245620fadb-goog
 
-Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
