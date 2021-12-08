@@ -2,69 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16EF2C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 14:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E41C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 14:57:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80C144086F;
-	Wed,  8 Dec 2021 09:57:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAB374B17B;
+	Wed,  8 Dec 2021 09:57:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MNZCS7+AyIni; Wed,  8 Dec 2021 09:57:21 -0500 (EST)
+	with ESMTP id h1gJkV081ygy; Wed,  8 Dec 2021 09:57:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BC4C4B137;
-	Wed,  8 Dec 2021 09:57:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EE604B150;
+	Wed,  8 Dec 2021 09:57:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE29A4A5A0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 09:57:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 085934B133
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 09:41:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KOdTTp5Ixz3X for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 09:57:19 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E13A4086F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 09:57:19 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 8B33CCE21CE;
- Wed,  8 Dec 2021 14:57:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBA52C00446;
- Wed,  8 Dec 2021 14:57:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638975432;
- bh=HbjjzWyJ2yQZEariRFKC4zJ133uWnlendWBFpL62Ycw=;
- h=From:To:Cc:Subject:Date:From;
- b=vQeX3Eiz/ROimtMpV0WLzZwPchnkRT04BiKmrH0+X2MzXu9TBbO278cIgKxnNFbWN
- TsuYkPgVvVo3uVse9ENCynHVjQCmnhm9olK0PzF6WNaxxV6BgsQoUvmnY6DnYcNCcA
- 1XnEawveKV8e36JGia7BZLp0O0L1JagOVZnl1gsv6HKg1s6rci4ePBEfSm2HiVD1ve
- 4Sm+LOYNkz78TCdNe7kTsLoKsRLswPvS9vUGAtgaig8a90kxXifPiAqP58rClT3e51
- HMe9+DqW9+ODP1Ekp4wZKUSDXKAA9aNpQyKD5/4vidZO2J2rAimtEnLhw4hBV9Tfvq
- utcke+ZRwAl2g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1muyNa-00AnOk-Q6; Wed, 08 Dec 2021 14:57:10 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: Drop unused workaround_flags vcpu field
-Date: Wed,  8 Dec 2021 14:56:52 +0000
-Message-Id: <20211208145652.3071543-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+ with ESMTP id 2gbA3LH8B41U for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 09:41:08 -0500 (EST)
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com
+ [209.85.166.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5CD9B4B132
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 09:41:08 -0500 (EST)
+Received: by mail-io1-f50.google.com with SMTP id k21so3002042ioh.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 06:41:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EifvKO8pkCxjynNmz7PWzO7emHYLJkPJiO8pUS2qQfo=;
+ b=qhudb95dxd2TFju2GrhG2SL1Z1VNnPvllqgHWUOLGfDC5ik0baUOZlzOIqN/xKbIqA
+ yCIPWUl2DLbXQvJeV3xPebpPbsflSRrJsFG4Z9QVI6ny5meKUmX8XvZEFiix/Yt0se5O
+ tPTxP0zp8NDl9wFBqww4sD54seBtEc6PyRqbYe5xdxwPQMeCWqexc4uswyKPJhdS8ev1
+ x3IBBMwQkga8O6DPEgJKM0gz+M1RUWI3v28z7MUB13IHMzkz8Xng+fkCvYkL2KZ4kvjg
+ E+82LoUqvl1ix4Rk41SREpDYqunzR1rWlnryiOuxTl3BwTxAyISK1fN37E7V1YD9xzwr
+ anfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EifvKO8pkCxjynNmz7PWzO7emHYLJkPJiO8pUS2qQfo=;
+ b=yWdOlHEORkhOaTGgw9Dsc3IUKQB8j6AVPiwE7aW+r/FoMjPaMsa23J2kw0kVdWXLSG
+ zMdOT3MQ7rJGcZBbam2XHC+gXbwS4uYUeMKrhT9P5ATacx+dHGubLywQU7SkahG6RZey
+ A13nxym1Gerc9o3CgYSF8jshy0lG2k6Rwg7erdIikgNvzPC8Za9/IIUrXN7tx/8w26dw
+ xDi3lB8LjAzxMdDnFmtIKd7kyaK2iYqSnUwuBf7Id9AQI5wiaI+9gmjxvxIMI5U/wG0F
+ modo4CnFt1BQ4916wc466el1qH2Tx3HCpm01BCh2nAJJCR0674AhwREm9gu2NnH/yDGq
+ +Q9g==
+X-Gm-Message-State: AOAM532YTwdXGrQsqAk/zakfBBJ1cucTexhac9HxbHsSzmxteSmlz3cA
+ XzQEhZWxKZoks0SDGEnO17CAxXNnvqWGAqxoH2qe2g==
+X-Google-Smtp-Source: ABdhPJy1Z52W9BY50LufdzM7SjUxflxMKG+cfNETPfhd4KgizIC94LI3ETFCIYVx59bz5DGr04qcTlzMotGlynMycoI=
+X-Received: by 2002:a05:6638:2191:: with SMTP id
+ s17mr63525834jaj.67.1638974466161; 
+ Wed, 08 Dec 2021 06:41:06 -0800 (PST)
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com
+References: <20211201170411.1561936-1-qperret@google.com>
+ <20211201170411.1561936-7-qperret@google.com>
+ <CA+_y_2EEP5tYbBTd17c1wuOeZ2jSfhgu0M2b=CpGKjKRgU-=gw@mail.gmail.com>
+ <YbCAJZAqUXngvjZ2@google.com>
+In-Reply-To: <YbCAJZAqUXngvjZ2@google.com>
+From: Andrew Walbran <qwandor@google.com>
+Date: Wed, 8 Dec 2021 14:40:54 +0000
+Message-ID: <CA+_y_2GJk-F8ju0yXsMc2iwd_yFRQGOY1LW2YV-8bZLANwfCHQ@mail.gmail.com>
+Subject: Re: [PATCH v3 06/15] KVM: arm64: Implement kvm_pgtable_hyp_unmap() at
+ EL2
+To: Quentin Perret <qperret@google.com>
+X-Mailman-Approved-At: Wed, 08 Dec 2021 09:57:48 -0500
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,47 +89,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-workaround_flags is a leftover from our earlier Spectre-v4 workaround
-implementation, and now serves no purpose.
+On Wed, 8 Dec 2021 at 09:51, Quentin Perret <qperret@google.com> wrote:
+>
+> Hi Andrew,
+>
+> On Tuesday 07 Dec 2021 at 14:47:14 (+0000), Andrew Walbran wrote:
+> > On Wed, 1 Dec 2021 at 17:04, 'Quentin Perret' via kernel-team
+> > <kernel-team@android.com> wrote:
+> > >
+> > > From: Will Deacon <will@kernel.org>
+> > >
+> > > Implement kvm_pgtable_hyp_unmap() which can be used to remove hypervisor
+> > > stage-1 mappings at EL2.
+> > >
+> > > Signed-off-by: Will Deacon <will@kernel.org>
+> > > Signed-off-by: Quentin Perret <qperret@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_pgtable.h | 21 ++++++++++
+> > >  arch/arm64/kvm/hyp/pgtable.c         | 63 ++++++++++++++++++++++++++++
+> > >  2 files changed, 84 insertions(+)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > > index 027783829584..9d076f36401d 100644
+> > > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > > @@ -251,6 +251,27 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt);
+> > >  int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
+> > >                         enum kvm_pgtable_prot prot);
+> > >
+> > > +/**
+> > > + * kvm_pgtable_hyp_unmap() - Remove a mapping from a hypervisor stage-1 page-table.
+> > > + * @pgt:       Page-table structure initialised by kvm_pgtable_hyp_init().
+> > > + * @addr:      Virtual address from which to remove the mapping.
+> > > + * @size:      Size of the mapping.
+> > > + *
+> > > + * The offset of @addr within a page is ignored, @size is rounded-up to
+> > > + * the next page boundary and @phys is rounded-down to the previous page
+> > > + * boundary.
+> > > + *
+> > > + * TLB invalidation is performed for each page-table entry cleared during the
+> > > + * unmapping operation and the reference count for the page-table page
+> > > + * containing the cleared entry is decremented, with unreferenced pages being
+> > > + * freed. The unmapping operation will stop early if it encounters either an
+> > > + * invalid page-table entry or a valid block mapping which maps beyond the range
+> > > + * being unmapped.
+> >
+> > How is the caller expected to break up the block mapping? Why not
+> > handle that within this function?
+>
+> We don't really use block mappings for the hyp stage-1, since pretty
+> much forever (see the loop in pkvm_create_mappings_locked() for ex), so
+> handling it here would be somewhat unnecessary complexity. Handling this
+> in the pgtable code itself (which I assume would mean proactively
+> re-mapping the rest of the range with page-granularity mappings or
+> something along those lines) is tricky because of BBM and concurrency,
+> so I'd rather avoid handling same-level aborts at EL2 and all that mess
+> unless we have a good reason. Is there a use-case where you think that'd
+> be needed?
 
-Get rid of the field and the corresponding asm-offset definition.
-
-Fixes: 29e8910a566a ("KVM: arm64: Simplify handling of ARCH_WORKAROUND_2")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h | 3 ---
- arch/arm64/kernel/asm-offsets.c   | 1 -
- 2 files changed, 4 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 2a5f7f38006f..3811d19e5674 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -298,9 +298,6 @@ struct kvm_vcpu_arch {
- 	/* Exception Information */
- 	struct kvm_vcpu_fault_info fault;
- 
--	/* State of various workarounds, see kvm_asm.h for bit assignment */
--	u64 workaround_flags;
--
- 	/* Miscellaneous vcpu state flags */
- 	u64 flags;
- 
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 6d0c3afd36b8..1197e7679882 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -111,7 +111,6 @@ int main(void)
- #ifdef CONFIG_KVM
-   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
-   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
--  DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
-   DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
-   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
-   DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[RGSR_EL1]));
--- 
-2.30.2
-
+Aha, I didn't realise that block mappings, but it makes sense in that
+case. How about adding a note to the function comment here explaining
+that reasoning? Otherwise it sounds like the caller has to handle it
+somehow.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
