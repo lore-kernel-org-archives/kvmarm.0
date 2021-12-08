@@ -2,78 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 273BEC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 14:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16EF2C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 14:57:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D8DA4B188;
-	Wed,  8 Dec 2021 09:26:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 80C144086F;
+	Wed,  8 Dec 2021 09:57:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JgMG8Ez77L9S; Wed,  8 Dec 2021 09:26:10 -0500 (EST)
+	with ESMTP id MNZCS7+AyIni; Wed,  8 Dec 2021 09:57:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52E2D4B165;
-	Wed,  8 Dec 2021 09:26:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BC4C4B137;
+	Wed,  8 Dec 2021 09:57:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B60A4B14D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 09:26:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE29A4A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 09:57:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sLQl+j+Mgh1o for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 09:26:08 -0500 (EST)
+ with ESMTP id KOdTTp5Ixz3X for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 09:57:19 -0500 (EST)
 Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AE744B12E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 09:26:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E13A4086F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 09:57:19 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id CF4D2CE2047;
- Wed,  8 Dec 2021 14:26:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08EE4C00446;
- Wed,  8 Dec 2021 14:26:01 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 8B33CCE21CE;
+ Wed,  8 Dec 2021 14:57:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBA52C00446;
+ Wed,  8 Dec 2021 14:57:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638973561;
- bh=masfWCtDvMTnKHh0F/3FjTOXmIbksrroGUjVbK7y72w=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=s58d52vV0oOrQdckCJcANhAOiT8RUCWEkAhtlzgH5k+eK4zprIdGddpQCfvaPKqgO
- HKSmu6ikGAv3jt+HJjO0hA929QXmrflVDMFPLUR1dtQGaiuYt7uvOSo5WnIbY2MFvO
- XUD+v/S3IfCTbpDEKvGklLCSyq/Ebbb6FgI0FqHixeNyoRWoR1IybLiTYE+zb1wC1l
- KfdqXNAZPq6qZLs8WC/kgiauxlbpRlczcx+o58VRgA4UbLZwoyvOjcZ8ID6W3Fj7ca
- F3vO/h2oczwNPl4m9wRlTCMdJs4/fKhkfCAJ91Vc2jKHjCssnl4hswyasAc4Hp482K
- dgS0s3mqQW5NA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ s=k20201202; t=1638975432;
+ bh=HbjjzWyJ2yQZEariRFKC4zJ133uWnlendWBFpL62Ycw=;
+ h=From:To:Cc:Subject:Date:From;
+ b=vQeX3Eiz/ROimtMpV0WLzZwPchnkRT04BiKmrH0+X2MzXu9TBbO278cIgKxnNFbWN
+ TsuYkPgVvVo3uVse9ENCynHVjQCmnhm9olK0PzF6WNaxxV6BgsQoUvmnY6DnYcNCcA
+ 1XnEawveKV8e36JGia7BZLp0O0L1JagOVZnl1gsv6HKg1s6rci4ePBEfSm2HiVD1ve
+ 4Sm+LOYNkz78TCdNe7kTsLoKsRLswPvS9vUGAtgaig8a90kxXifPiAqP58rClT3e51
+ HMe9+DqW9+ODP1Ekp4wZKUSDXKAA9aNpQyKD5/4vidZO2J2rAimtEnLhw4hBV9Tfvq
+ utcke+ZRwAl2g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1muxtP-00Amv3-2C; Wed, 08 Dec 2021 14:25:59 +0000
-Date: Wed, 08 Dec 2021 14:25:58 +0000
-Message-ID: <87czm718cp.wl-maz@kernel.org>
+ id 1muyNa-00AnOk-Q6; Wed, 08 Dec 2021 14:57:10 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v2 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU
- attribute
-In-Reply-To: <YbCj0IrjZoBR9dwQ@monolith.localdoman>
-References: <20211206170223.309789-1-alexandru.elisei@arm.com>
- <20211206170223.309789-4-alexandru.elisei@arm.com>
- <CAAeT=Fxeu7vRHyt1P8c1YKZ2sKyUjo6W9tqXeUAGHKn=y09AEg@mail.gmail.com>
- <YbCj0IrjZoBR9dwQ@monolith.localdoman>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Drop unused workaround_flags vcpu field
+Date: Wed,  8 Dec 2021 14:56:52 +0000
+Message-Id: <20211208145652.3071543-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, reijiw@google.com,
- james.morse@arm.com, suzuki.poulose@arm.com, will@kernel.org,
- mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, tglx@linutronix.de, mingo@redhat.com
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: mingo@redhat.com, tglx@linutronix.de, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,25 +81,47 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 08 Dec 2021 12:23:44 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> This makes me wonder. Should KVM enforce having userspace either not
-> setting the PMU for any VCPU, either setting it for all VCPUs? I think this
-> would be a good idea and will reduce complexity in the long run. I also
-> don't see a use case for userspace choosing to set the PMU for a subset of
-> VCPUs, leaving the other VCPUs with the default behaviour.
+workaround_flags is a leftover from our earlier Spectre-v4 workaround
+implementation, and now serves no purpose.
 
-Indeed. As much as I'm happy to expose a PMU to a guest on an
-asymmetric system, I really do not want the asymmetry in the guest
-itself. So this should be an all or nothing behaviour.
+Get rid of the field and the corresponding asm-offset definition.
 
-Thanks,
+Fixes: 29e8910a566a ("KVM: arm64: Simplify handling of ARCH_WORKAROUND_2")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_host.h | 3 ---
+ arch/arm64/kernel/asm-offsets.c   | 1 -
+ 2 files changed, 4 deletions(-)
 
-	M.
-
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 2a5f7f38006f..3811d19e5674 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -298,9 +298,6 @@ struct kvm_vcpu_arch {
+ 	/* Exception Information */
+ 	struct kvm_vcpu_fault_info fault;
+ 
+-	/* State of various workarounds, see kvm_asm.h for bit assignment */
+-	u64 workaround_flags;
+-
+ 	/* Miscellaneous vcpu state flags */
+ 	u64 flags;
+ 
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index 6d0c3afd36b8..1197e7679882 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -111,7 +111,6 @@ int main(void)
+ #ifdef CONFIG_KVM
+   DEFINE(VCPU_CONTEXT,		offsetof(struct kvm_vcpu, arch.ctxt));
+   DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
+-  DEFINE(VCPU_WORKAROUND_FLAGS,	offsetof(struct kvm_vcpu, arch.workaround_flags));
+   DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
+   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
+   DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[RGSR_EL1]));
 -- 
-Without deviation from the norm, progress is not possible.
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
