@@ -2,67 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656F9C433FE
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 19:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23526C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 19:33:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C71674B10E;
-	Wed,  8 Dec 2021 14:33:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD0E34B150;
+	Wed,  8 Dec 2021 14:33:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4rLJCCcdXBrF; Wed,  8 Dec 2021 14:33:02 -0500 (EST)
+	with ESMTP id XKhxXF4GTiE3; Wed,  8 Dec 2021 14:33:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9711406E0;
-	Wed,  8 Dec 2021 14:33:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 17D794B137;
+	Wed,  8 Dec 2021 14:33:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD77E4B10B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:33:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EFCA4B10E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:33:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s+QmJyNFHmsY for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 14:33:01 -0500 (EST)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D99BE406E0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:33:00 -0500 (EST)
-Received: by mail-wm1-f73.google.com with SMTP id
- g11-20020a1c200b000000b003320d092d08so1788177wmg.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 11:33:00 -0800 (PST)
+ with ESMTP id KsHKY7CLDyyn for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 14:33:02 -0500 (EST)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B34874B10B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:33:02 -0500 (EST)
+Received: by mail-wr1-f73.google.com with SMTP id
+ r2-20020adfe682000000b00198af042b0dso654458wrm.23
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 11:33:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=9Ozq1E9fW4dW9xlif6PxBzdPpjCT1vbETE8Iafrn13o=;
- b=ltGFmUPDJi8nIt/HfOa4aeS+LltkLsQ/Qmhh0JtVpvH2eI2Y/Usq0N1+yWxN6iTRtc
- YLbIFlRzjVQfSM42KSbkDf/j7nSzEax58K8Wm8dxQDx+K/ihjlkd73jbPEDGw3vdFY7R
- adLHmxSD8o6DcMcVS2DWSzxuhJrT3PyVjCaUv/VgasXsfH5nCq9rd6OOXMec251pvkv9
- l21HtfSzvyoS4jsNOzrKT2iZz5B+muahrFsy+Sg/hjvcKywIHwnhcAVhQugZSv1BnMEk
- 9aLaooOt5gdcUpd4f+zEDIWAYDKbHLYRZvQsUwMAYe3sAXra92BpDmylQf7Amcc/EkE4
- Vbdg==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=Q0YfZNgWo6o4+Fu8dkShTOfK6wostrwH35kX4SjCrg4=;
+ b=aRG6t0Zr2tDK8U7C6QtNIaqp61Yclsls13jT727Opn01zK4I2hLCeRLLDTx+iKkOVr
+ HMTSG/FAMDfrHB/OcrfqoS4O5gPQLPZQtBjLejUvevkMyj3X6y1FwWkBIawkyHpt9Mkr
+ Lw3gHyan/bLkw/NhJ8FoZmxqjjLTj3ux7r5I1kCfiMuR3n23nEnPLz7MAN5isvTQT4I9
+ CP3yfmo+tqm2LXTu9fuRXwfuAQsYbB5D8P9h3QMp1M26tExUCZuLtSKWALZ1LBMCnS5z
+ z5ZNmF+FXOL9j+oNnuT6NqXoCFAuFHSs5N0Kl+UB7RO6J6Ul17iMr20gTbPEOkfbnUJ9
+ 6Qkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=9Ozq1E9fW4dW9xlif6PxBzdPpjCT1vbETE8Iafrn13o=;
- b=0LMX38LVLSXPWO2r0JLDf9XUGylDNP2zWqgDo6nrgjiNiEmSBMX0jyE11qjja5IOEV
- LsuYy2A0Dnx2lzSIdhwtQCocEGQ0FOoqCBb3YYFs7j/BZuJPOOaFgDfVjswRTHgHmJ3k
- KSKQPflD4bFWLvDylPzQbUeTL1isFRN0bAOHdxx/IvRMI2HkrmntFe7GtRe8T3iHLYva
- 1DKPtNNFOzQgwRfZ0ov/12pEluXQyFJhtuAlZsRx7OusoJRzYFeES9iuL7vEsJXpRUqz
- vfuMw7+dFBCmrGMG5/VNZ7RTo5//Qb+IWrQwBzU2WNcPH4LhMF4TE2gI0CY8RLsqNLaH
- gEXQ==
-X-Gm-Message-State: AOAM532m/lf9tRkjVwxQoRSttjJ3SGCSqLrefGK7YZE91dlI+Eh9lzYg
- uh6rLBOi0ZosUogjitk+Fg80XYs9/GaQXRcWFfZmKIqFSl9/0YHAugkEfE/KJWjTTdQYDy4+WFN
- 5dC0d40j0VGwbn2Jckfa8K1VtyEh7m2aQY7oFIlggeByh+xchTLu6Ey0RerMitjaHfk0=
-X-Google-Smtp-Source: ABdhPJztwn2ZlVWldgEFMPn5nNzizlDmJ5/EF57npKfjLcR9AnY03w4lpd55TC3bPR5Y3DjvvNRX0vRxOw==
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=Q0YfZNgWo6o4+Fu8dkShTOfK6wostrwH35kX4SjCrg4=;
+ b=Ojx8IXVmErEMr5SbrlwBjcG3YDaeMDEz/BIFK0eeiYQrybTBiXQuqZ3jQT5/aD/e5N
+ Bsc7gdCQS2w1Jkbkve+2ZmWUgYeX8488j80QKo/HytwFZYZvlnoU3SOOo6yJkEGaRJgP
+ txsVo6MymFrgW9Q1qeCGctaR3PFFZPFz7Jg+bk4qtccRduw9XPOtshm/DrCUyPojSrCt
+ XEyUmWMOqTGTDZDe6P+NnucfTNhbw2mrBKuosMHwi2JxMKwdf/rvi5OqNUp7wZ7LUJLT
+ /kj94lFbnP3ODij3J3RDdpDfg2Ok5OY+S1Su1li8I7nDiZ7xdRQ7/6+523bUN5VOc+PW
+ tOtw==
+X-Gm-Message-State: AOAM532eE0fc8lyckwK2CetvrNndjsimM+7Id9Q5kxqgohS88r9nqZan
+ WMsflibkYjvKh/6zXyQNgXgpDQjHFINhTfcIFxHljX4HE0yolMtDevupy90C3OwAqLtYYmYMgKU
+ 2p0fDlsVQbCq5W8I41Ck67d8hNt4ADUp6OtdQKw/kQz0f2zeoGSdeuXm71T78HAuCsG4=
+X-Google-Smtp-Source: ABdhPJwpASZMPMew9uRaM69Wni+PtSX9DDd5dHsseQ8rzfrW67TrwXhc+Nd3atqYLsWPzyZwW5AHsryCSw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:adf:f44c:: with SMTP id
- f12mr764093wrp.620.1638991979739; 
- Wed, 08 Dec 2021 11:32:59 -0800 (PST)
-Date: Wed,  8 Dec 2021 19:32:55 +0000
-Message-Id: <20211208193257.667613-1-tabba@google.com>
+ (user=tabba job=sendgmr) by 2002:a05:600c:4e91:: with SMTP id
+ f17mr749715wmq.195.1638991981715; Wed, 08 Dec 2021 11:33:01 -0800 (PST)
+Date: Wed,  8 Dec 2021 19:32:56 +0000
+In-Reply-To: <20211208193257.667613-1-tabba@google.com>
+Message-Id: <20211208193257.667613-2-tabba@google.com>
 Mime-Version: 1.0
+References: <20211208193257.667613-1-tabba@google.com>
 X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH 0/2] KVM: arm64: Fix documentation for PSCI related functions
+Subject: [PATCH 1/2] KVM: arm64: Fix comment for kvm_reset_vcpu()
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, maz@kernel.org, will@kernel.org
@@ -82,24 +84,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+The comment for kvm_reset_vcpu() refers to the sysreg table as
+being the table above, probably because of the code extracted at
+commit f4672752c321ea36 ("arm64: KVM: virtual CPU reset").
 
-This patch series fixes a couple of comments relating to PSCI and the reset
-state that are either typos, or refer to an earlier version of the code.
+Fix the comment to remove the potentially confusing reference.
 
-Thanks,
-/fuad
-
-Fuad Tabba (2):
-  KVM: arm64: Fix comment for kvm_reset_vcpu()
-  KVM: arm64: Fix comment on barrier in kvm_psci_vcpu_on()
-
- arch/arm64/kvm/psci.c  | 2 +-
+Signed-off-by: Fuad Tabba <tabba@google.com>
+---
  arch/arm64/kvm/reset.c | 7 +++----
- 2 files changed, 4 insertions(+), 5 deletions(-)
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-
-base-commit: 1f80d15020d7f130194821feb1432b67648c632d
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 426bd7fbc3fd..2bbfeadeb6ae 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -193,10 +193,9 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+  * kvm_reset_vcpu - sets core registers and sys_regs to reset value
+  * @vcpu: The VCPU pointer
+  *
+- * This function finds the right table above and sets the registers on
+- * the virtual CPU struct to their architecturally defined reset
+- * values, except for registers whose reset is deferred until
+- * kvm_arm_vcpu_finalize().
++ * This function sets the registers on the virtual CPU struct to their
++ * architecturally defined reset values, except for registers whose reset is
++ * deferred until kvm_arm_vcpu_finalize().
+  *
+  * Note: This function can be called from two paths: The KVM_ARM_VCPU_INIT
+  * ioctl or as part of handling a request issued by another VCPU in the PSCI
 -- 
 2.34.1.400.ga245620fadb-goog
 
