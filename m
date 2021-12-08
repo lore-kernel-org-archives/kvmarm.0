@@ -2,69 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D847C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 15:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1395C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 15:23:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E078A4B174;
-	Wed,  8 Dec 2021 10:23:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D6F84B190;
+	Wed,  8 Dec 2021 10:23:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NR90c5n4nyBk; Wed,  8 Dec 2021 10:23:17 -0500 (EST)
+	with ESMTP id 77F7sevQM8fo; Wed,  8 Dec 2021 10:23:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC69C4B186;
-	Wed,  8 Dec 2021 10:23:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CA4B74B17B;
+	Wed,  8 Dec 2021 10:23:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DF654B0DD
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 10:23:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59F604B16E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 10:23:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MJttwNcla0gb for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 10:23:15 -0500 (EST)
+ with ESMTP id DztIhlZiZfZ2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 10:23:19 -0500 (EST)
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
  [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8994D4B166
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 10:23:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8DEC4B1B2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 10:23:18 -0500 (EST)
 Received: by mail-wm1-f73.google.com with SMTP id
- 201-20020a1c04d2000000b003335bf8075fso1483217wme.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 07:23:15 -0800 (PST)
+ 201-20020a1c04d2000000b003335bf8075fso1483286wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 07:23:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=dgTcer4H5x2V6vg1108kd2kvmSCOK/fdrPt0IEA/yAc=;
- b=OO++pgN0LQkRixb3Sq7Hd5w4QXWKTHU22mu8fVnumx/eTq9CxL7X2F8nL4x04jkISf
- kipUAI4bu44wE9v5DHK56LMB2no0ObvfG7M8kGv5bzcym0vpdnDAJ8Lk4yq+49UtdWo3
- bZ8yP9xdUCTiHdkctcvrwAgccOD0TBjeYFZucZKb836bHeZhaqsMS2NSKTW1g1P7/re0
- 9AgPiRniaapcw/g+FhGxeT0goa83px619Dqwd1v+txQWUZTOE5sF8onQT6zmISmitbWL
- 81NrTCgrmHgZ5NfFOREPevSqkUNFg6S1AEJOfg+NXVGsl4K9TjJThlPj455oD1dIYaT3
- +3JQ==
+ :cc; bh=cuQE0YW8UdMGW3rLCo6CNfwjy36MSIxkvZOeV47gVAQ=;
+ b=KUpsl8OdrXa2TfNhJOIs3W3KwuQrGlRyqmoXmUyaJ/yuu4HpfU1Kh6qBx0/DO5VGCW
+ 30J/V6mtYiRAmcRHM+mRVJum30AGeDLlvKOpqxYp+Jet7qFJJ1RdoNIVvktcVDiLDpqZ
+ ehHF9n08W/1YSh/QKI1PIfTOx8lNeNdWFZqFuHY4IbZYhDWrHvWxvuQ+m8SLOOOKopWV
+ Uch7He8l5dVKPrpUzYaPboYyMT/+vk2ZeR+zmJn7QZvuOWKOuoJdoYS5ptXP4LyB1l/u
+ sS5qgHeFSbCTheo3xIpypUgjz9uCkJAgxoYl5uOx5eSw/hZ/dtcTXVGboSUwYK26WUuE
+ AqJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=dgTcer4H5x2V6vg1108kd2kvmSCOK/fdrPt0IEA/yAc=;
- b=Vh8FtUWmJOut/5hHzdRdel9McWGvs7nl6bSY/ySirbSvt93TR8uoYThdFNTdeRpZVx
- ZfosweYyDekpbbtg7kUTwkTIFQ/uVtGGzbMDXkKcotOIFdVCDmlQtUMBwWEwB/6h6SmW
- dSd5GbWHMzxUWzi7P65H1hs7AuPMX/CyjindZtYkYIzBdlGtRLUVwvOwKJ3u3qckHCZb
- b9u9dMUyS9fzQby+OfDDQAMWCMj+c9qSr+7fkHXewg6vcfYpWoofjRQ8dzFGmCCue+k7
- HKMPxDPW+5rTiUYdw/zz9emtBfKWlq9MXrfNCkywpaHiDZml8tmSd3Gd0F9v1F7d8EJo
- wyBw==
-X-Gm-Message-State: AOAM532JUCVOTYWlMUUCG5StyINGL75y7qnmoG790FCdDFQYuwkwYNYA
- gFUIusrLqCvrcDAZorIeUaOu2i2kIbsi
-X-Google-Smtp-Source: ABdhPJzw57yyhlFRsGBdsMP0b1MuPYqG3wH3zEnWZDUhTXBl2eHsIR7+DocFx3KMxHXiRp33Wa8qily/O8bz
+ bh=cuQE0YW8UdMGW3rLCo6CNfwjy36MSIxkvZOeV47gVAQ=;
+ b=c1gh5Og2a9wKR31g5HvT0Nuw2uRgCGmv+LINC3CahCUHYWsxp50XdDsLEsYII1NBbR
+ d+VcYKmyXEz5l6tEMB/LkaYf8YIqT/0Ae3FyFFgCGxd79hpqwn5V2E5DCGFi0dXxzw/w
+ zUHCvMaWr7BKEIvFwMThzOc8SJJ8xX+nn2Rn41ZM97S4u+Pq3h+jWN7ibj+bxaVxqvM5
+ ziHnbneAvZoeVU6g5dRrYambvFzjGsjQdhyfbyBYbfA4BcpROMYgHLP8U8JSTvxcrR6v
+ LRMO2Y+xl9kMsSiQIyCGb1Ee7TBHu6RkuwDn2zQ6+VX1V7q+xPPOyeOa1yX+9Kcbnh5O
+ Tb2g==
+X-Gm-Message-State: AOAM530Zn74BmxkvTOj9v+ZCZLDl8VJzI9iCxq30W996DaAdRrjwqSE1
+ UuJJ/WSz3+YSP9oWmU7cHiFjKtEbG9lE
+X-Google-Smtp-Source: ABdhPJxGsSBocOeLXiSRK4wTT3nM6evq9+M4+nial4TaliEuNBrySS5ScIR8zMauErKeWzLKuaryRYic2Qfw
 X-Received: from luke.lon.corp.google.com
  ([2a00:79e0:d:210:c718:14b8:982a:57d5])
- (user=qperret job=sendgmr) by 2002:a7b:c407:: with SMTP id
- k7mr16929430wmi.35.1638976994756; Wed, 08 Dec 2021 07:23:14 -0800 (PST)
-Date: Wed,  8 Dec 2021 15:22:57 +0000
+ (user=qperret job=sendgmr) by 2002:a05:600c:3506:: with SMTP id
+ h6mr16840889wmq.122.1638976997976; Wed, 08 Dec 2021 07:23:17 -0800 (PST)
+Date: Wed,  8 Dec 2021 15:22:58 +0000
 In-Reply-To: <20211208152300.2478542-1-qperret@google.com>
-Message-Id: <20211208152300.2478542-5-qperret@google.com>
+Message-Id: <20211208152300.2478542-6-qperret@google.com>
 Mime-Version: 1.0
 References: <20211208152300.2478542-1-qperret@google.com>
 X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH 4/6] KVM: arm64: Make __io_map_base static
+Subject: [PATCH 5/6] KVM: arm64: pkvm: Stub io map functions
 From: Quentin Perret <qperret@google.com>
 To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
  Alexandru Elisei <alexandru.elisei@arm.com>,
@@ -88,47 +88,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The __io_map_base variable is used at EL2 to track the end of the
-hypervisor's "private" VA range in nVHE protected mode. However it
-doesn't need to be used outside of mm.c, so let's make it static to keep
-all the hyp VA allocation logic in one place.
+Now that GICv2 is disabled in nVHE protected mode there should be no
+other reason for the host to use create_hyp_io_mappings() or
+kvm_phys_addr_ioremap(). Add sanity checks to make sure that assumption
+remains true looking forward.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/kvm/hyp/include/nvhe/mm.h | 1 -
- arch/arm64/kvm/hyp/nvhe/mm.c         | 3 ++-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/mmu.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 3f60d6cc5368..2d08510c6cc1 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -12,7 +12,6 @@
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 326cdfec74a1..605c104eb030 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -407,6 +407,9 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+ 	unsigned long addr;
+ 	int ret;
  
- extern struct kvm_pgtable pkvm_pgtable;
- extern hyp_spinlock_t pkvm_pgd_lock;
--extern u64 __io_map_base;
- 
- int hyp_create_idmap(u32 hyp_va_bits);
- int hyp_map_vectors(void);
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 9e0ff5a700dd..526a7d6fa86f 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -19,11 +19,12 @@
- 
- struct kvm_pgtable pkvm_pgtable;
- hyp_spinlock_t pkvm_pgd_lock;
--u64 __io_map_base;
- 
- struct memblock_region hyp_memory[HYP_MEMBLOCK_REGIONS];
- unsigned int hyp_memblock_nr;
- 
-+static u64 __io_map_base;
++	if (is_protected_kvm_enabled())
++		return -EPERM;
 +
- static int __pkvm_create_mappings(unsigned long start, unsigned long size,
- 				  unsigned long phys, enum kvm_pgtable_prot prot)
- {
+ 	*kaddr = ioremap(phys_addr, size);
+ 	if (!*kaddr)
+ 		return -ENOMEM;
+@@ -650,6 +653,9 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 				     KVM_PGTABLE_PROT_R |
+ 				     (writable ? KVM_PGTABLE_PROT_W : 0);
+ 
++	if (is_protected_kvm_enabled())
++		return -EPERM;
++
+ 	size += offset_in_page(guest_ipa);
+ 	guest_ipa &= PAGE_MASK;
+ 
 -- 
 2.34.1.400.ga245620fadb-goog
 
