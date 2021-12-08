@@ -2,77 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56244C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 15:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 017DDC433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 15:44:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11DB34B149;
-	Wed,  8 Dec 2021 10:23:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8487C4B19D;
+	Wed,  8 Dec 2021 10:44:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QdNYA6AjXn8K; Wed,  8 Dec 2021 10:23:23 -0500 (EST)
+	with ESMTP id 2ZzrgAPsJXXM; Wed,  8 Dec 2021 10:44:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED4BA4B166;
-	Wed,  8 Dec 2021 10:23:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 609AD407ED;
+	Wed,  8 Dec 2021 10:44:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 741394B165
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 10:23:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6575407ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 10:44:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5VMP5kHZVfz8 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 10:23:22 -0500 (EST)
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
- [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A9B364B16E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 10:23:21 -0500 (EST)
-Received: by mail-wm1-f74.google.com with SMTP id
- 145-20020a1c0197000000b0032efc3eb9bcso3207992wmb.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 07:23:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=uoeb8ZSnDE4o8Pfzcz/JRgpjIAPknsa+43VWqkDL6SE=;
- b=FLyX6GFGnWQE7qMZM26O1O1AIl75kaww4jWCqv4JML5oIxJznYt9gmaqoKEtOluEIA
- KivNJtKKcK5gQqfUIvhnbeRCcIGE4cfZuQ3Z1B5J5RHBhJLgW41frhBZiL+74d5zvtjQ
- YTXVsaTlKCICiUB8KMyDO8wp/JClMuGlKFewIBt3+94HtCTajeFbEV0YelIu3Iuj277W
- 86JPh53Fj2k/kN6UXiqUCcD5vyQdWQhbDDtxGqMl6se8ENYkODZ7oT+K2FS4TsPAAsCZ
- Dcqr8eXGeTQyX4059KSQKZm1fFeKlvhLHrQgxl0ZG1j46Mv7NoPJjwwGbd0clsKGfsfc
- ufJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=uoeb8ZSnDE4o8Pfzcz/JRgpjIAPknsa+43VWqkDL6SE=;
- b=vOHB06HM6G06iFDOtLzeX2VeI9GZcMjQ7f5eNw6sQEnvMTcA25K31XilsiFpZ0zjK6
- YY7riq14ayftG0VrTQCX7WmQmjntc27eVkUuVWuTLRyoVmHgWgExvI1wVgsZOYE/i/wB
- +gB6RvBB0pNAWSWxhDLnLnqwyD2ThqSflSc5Q7HSbCHLOEPnBU7JKNRZUpY2+nKbLhZ8
- wNWqg1zAs1oO76gE0+FudCWBtiX42XscogAD9aEG9D+6elxkt2k5mRDVEDu1p/PpcWCf
- M5dKA8W5a1mGOujZPKC0no8fqu8APr4Cosvk1Aihu14XdazESRxQZDDGEuEhGNUKvpRH
- On8Q==
-X-Gm-Message-State: AOAM531Or6E9TB4eAjC6F6Rm4DYiP2ujE0IMJHnpfQ4rYCzs4yqdgACf
- O8+9PCHT4UkGaR+yaYmDcReKGBmXgueH
-X-Google-Smtp-Source: ABdhPJzw6DIyY3LwITNb68nDRIYXL5b0dyrc0mUWTC50VbADX2UnqIrRkM3tCHlIcHHhMLL5CQqyW4AukkHv
-X-Received: from luke.lon.corp.google.com
- ([2a00:79e0:d:210:c718:14b8:982a:57d5])
- (user=qperret job=sendgmr) by 2002:a7b:cc94:: with SMTP id
- p20mr16347652wma.162.1638977000902; Wed, 08 Dec 2021 07:23:20 -0800 (PST)
-Date: Wed,  8 Dec 2021 15:22:59 +0000
-In-Reply-To: <20211208152300.2478542-1-qperret@google.com>
-Message-Id: <20211208152300.2478542-7-qperret@google.com>
-Mime-Version: 1.0
-References: <20211208152300.2478542-1-qperret@google.com>
-X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH 6/6] KVM: arm64: pkvm: Make kvm_host_owns_hyp_mappings()
- robust to VHE
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+ with ESMTP id OyjQc7F9JWs0 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 10:44:44 -0500 (EST)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E1FFC407E7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 10:44:43 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 54E68CE1FAC;
+ Wed,  8 Dec 2021 15:44:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81B15C00446;
+ Wed,  8 Dec 2021 15:44:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1638978277;
+ bh=olrtr/vutUtS6JAs1JgFn6ixytY6DwMSP+1k5yff+Bc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=sNQRE8fYBtdAkW6v5vVLPIvcEgDD/4zrvKTfLe9BrVPdWkvoZ5Lzzqt2x2UH/4AjD
+ PQWh1QnQUHmqtetoftiij6OYtOMVQ//ipPz46Ee6tx18AMntneYRlFKHqdqJ/N0l6i
+ BVJmr70Sj1nW15a1O8HU1KyAFEeURW6YIuONf1rkk+R9rvD6TOLgAU+QoWOSeBTrMB
+ lfRM69vkDxBHuM/ackki7uC5ypQPBvL4QTttKewz1RMsrt3LHpOyFDZhNFj1XOLVs6
+ oSgQAd8q+nD34GyHhXbbqGzXsAeceAwibiEVCtrdZ60TPqYLj3N0xr9e+eUP2hT0Ry
+ fcI9BtwnLxP1Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1muz7T-00Ao7i-Im; Wed, 08 Dec 2021 15:44:35 +0000
+Date: Wed, 08 Dec 2021 15:44:35 +0000
+Message-ID: <87bl1r14po.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU
+ attribute
+In-Reply-To: <YbDNPrDOriI5FjfS@monolith.localdoman>
+References: <20211206170223.309789-1-alexandru.elisei@arm.com>
+ <20211206170223.309789-4-alexandru.elisei@arm.com>
+ <CAAeT=Fxeu7vRHyt1P8c1YKZ2sKyUjo6W9tqXeUAGHKn=y09AEg@mail.gmail.com>
+ <YbCj0IrjZoBR9dwQ@monolith.localdoman>
+ <87czm718cp.wl-maz@kernel.org>
+ <YbDNPrDOriI5FjfS@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, reijiw@google.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, will@kernel.org,
+ mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, tglx@linutronix.de, mingo@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: mingo@redhat.com, tglx@linutronix.de, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,36 +92,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The kvm_host_owns_hyp_mappings() function should return true if and only
-if the host kernel is responsible for creating the hypervisor stage-1
-mappings. That is only possible in standard non-VHE mode, or during boot
-in protected nVHE mode. But either way, non of this makes sense in VHE,
-so make sure to catch this case as well, hence making the function
-return sensible values in any context (VHE or not).
+On Wed, 08 Dec 2021 15:20:30 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Wed, Dec 08, 2021 at 02:25:58PM +0000, Marc Zyngier wrote:
+> > On Wed, 08 Dec 2021 12:23:44 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > This makes me wonder. Should KVM enforce having userspace either not
+> > > setting the PMU for any VCPU, either setting it for all VCPUs? I think this
+> > > would be a good idea and will reduce complexity in the long run. I also
+> > > don't see a use case for userspace choosing to set the PMU for a subset of
+> > > VCPUs, leaving the other VCPUs with the default behaviour.
+> > 
+> > Indeed. As much as I'm happy to expose a PMU to a guest on an
+> > asymmetric system, I really do not want the asymmetry in the guest
+> > itself. So this should be an all or nothing behaviour.
+> 
+> From what I can tell, the only asymmetry that can be exposed to a guest as
+> a result of the series is the number of events supported on a VCPU.
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Quentin Perret <qperret@google.com>
----
- arch/arm64/kvm/mmu.c | 3 +++
- 1 file changed, 3 insertions(+)
+Not only. It means that the events are counting different things. It
+isn't only about pmuver, which is only about the architectural
+revision implemented by the PMU. If you start assigning two different
+PMUs (in the perf sense) to a guest, you open the Pandora box of
+having to deal with all the subtle nonsense that asymmetric systems
+bring. What about event filtering, for example?
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 605c104eb030..ea840fa223b5 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -239,6 +239,9 @@ void free_hyp_pgds(void)
- 
- static bool kvm_host_owns_hyp_mappings(void)
- {
-+	if (is_kernel_in_hyp_mode())
-+		return false;
-+
- 	if (static_branch_likely(&kvm_protected_mode_initialized))
- 		return false;
- 
+> I don't like the idea of forcing userspace to set the *same* PMU for all
+> VCPUs, as that would severely limit running VMs with PMU on asymmetric
+> systems.
+
+On the contrary, I am *very* happy to limit a VM to a single PMU (and
+thus CPU) type on these systems. Really.
+
+> Even if KVM forces to set a PMU (does not have to be the same PMU) for all
+> VCPUs, that still does not look like the correct solution for me, because
+> userspace can set PMUs with different number of events.
+
+I don't understand what you mean. If you associate a single PMU type
+to the guest, that's all the guest sees.
+
+> What I can try is to make kvm->arch.pmuver the minimum version of all the
+> VCPU PMUs and the implict PMU. I'll give that a go in the next iteration.
+
+I really don't think we need any of this.
+
+	M.
+
 -- 
-2.34.1.400.ga245620fadb-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
