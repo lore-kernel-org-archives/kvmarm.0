@@ -2,50 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF913C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 12:43:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB0EC433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 13:33:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D9944B0CC;
-	Wed,  8 Dec 2021 07:43:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F4B54B10A;
+	Wed,  8 Dec 2021 08:33:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bn2P068fZCYs; Wed,  8 Dec 2021 07:43:19 -0500 (EST)
+	with ESMTP id UTfd6BdWqzut; Wed,  8 Dec 2021 08:33:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D6C94B134;
-	Wed,  8 Dec 2021 07:43:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DA284B106;
+	Wed,  8 Dec 2021 08:33:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAB0A4B0CC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 07:43:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E8FA4B106
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 08:33:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IQyVYVSGakJt for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 07:43:17 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08A824B0C5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 07:43:17 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81ED81042;
- Wed,  8 Dec 2021 04:43:16 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C8DF23F73B;
- Wed,  8 Dec 2021 04:43:14 -0800 (PST)
-Date: Wed, 8 Dec 2021 12:43:13 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v2 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU
- attribute
-Message-ID: <YbCoYQpAiShUzeZw@monolith.localdoman>
-References: <20211206170223.309789-1-alexandru.elisei@arm.com>
- <20211206170223.309789-4-alexandru.elisei@arm.com>
- <CAAeT=Fxeu7vRHyt1P8c1YKZ2sKyUjo6W9tqXeUAGHKn=y09AEg@mail.gmail.com>
- <YbCj0IrjZoBR9dwQ@monolith.localdoman>
+ with ESMTP id 0cUJAHmIDzUQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 08:33:32 -0500 (EST)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8BE514048A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 08:33:31 -0500 (EST)
+Received: from kwepemi500002.china.huawei.com (unknown [172.30.72.56])
+ by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4J8J2M1rlSz1DJwS;
+ Wed,  8 Dec 2021 21:30:35 +0800 (CST)
+Received: from kwepemm600016.china.huawei.com (7.193.23.20) by
+ kwepemi500002.china.huawei.com (7.221.188.171) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 8 Dec 2021 21:33:25 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ kwepemm600016.china.huawei.com (7.193.23.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 8 Dec 2021 21:33:24 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.020; Wed, 8 Dec 2021 13:33:23 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: "eric.auger@redhat.com" <eric.auger@redhat.com>, Zhangfei Gao
+ <zhangfei.gao@linaro.org>, "eric.auger.pro@gmail.com"
+ <eric.auger.pro@gmail.com>, "iommu@lists.linux-foundation.org"
+ <iommu@lists.linux-foundation.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "joro@8bytes.org" <joro@8bytes.org>, "will@kernel.org" <will@kernel.org>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>, "jean-philippe@linaro.org"
+ <jean-philippe@linaro.org>, zhukeqian <zhukeqian1@huawei.com>
+Subject: RE: [RFC v16 0/9] SMMUv3 Nested Stage Setup (IOMMU part)
+Thread-Topic: [RFC v16 0/9] SMMUv3 Nested Stage Setup (IOMMU part)
+Thread-Index: AQHXyx+ynNPh4l6d+UCGL4y4ns48GKwg7BKAgAYnz4CAAAIkgIAACKEAgAG5fXA=
+Date: Wed, 8 Dec 2021 13:33:22 +0000
+Message-ID: <e78864fff56041848eda08c60e694160@huawei.com>
+References: <20211027104428.1059740-1-eric.auger@redhat.com>
+ <ee119b42-92b1-5744-4321-6356bafb498f@linaro.org>
+ <7763531a-625d-10c6-c35e-2ce41e75f606@redhat.com>
+ <c1e9dd67-0000-28b5-81c0-239ceda560ed@linaro.org>
+ <15a9875b-130a-e889-4e13-e063ef2ce4f9@redhat.com>
+In-Reply-To: <15a9875b-130a-e889-4e13-e063ef2ce4f9@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.84.149]
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YbCj0IrjZoBR9dwQ@monolith.localdoman>
-Cc: maz@kernel.org, mingo@redhat.com, tglx@linutronix.de, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-CFilter-Loop: Reflected
+Cc: "kevin.tian@intel.com" <kevin.tian@intel.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "ashok.raj@intel.com" <ashok.raj@intel.com>,
+ "chenxiang \(M\)" <chenxiang66@hisilicon.com>,
+ "maz@kernel.org" <maz@kernel.org>, "vdumpa@nvidia.com" <vdumpa@nvidia.com>,
+ "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
+ "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
+ "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+ "vsethi@nvidia.com" <vsethi@nvidia.com>,
+ "sumitg@nvidia.com" <sumitg@nvidia.com>, wangxingang <wangxingang5@huawei.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -57,255 +90,90 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On Wed, Dec 08, 2021 at 12:23:44PM +0000, Alexandru Elisei wrote:
-> Hi Reiji,
-> 
-> On Tue, Dec 07, 2021 at 07:13:17PM -0800, Reiji Watanabe wrote:
-> > Hi Alex,
-> > 
-> > On Mon, Dec 6, 2021 at 9:02 AM Alexandru Elisei
-> > <alexandru.elisei@arm.com> wrote:
-> > >
-> > > When KVM creates an event and there are more than one PMUs present on the
-> > > system, perf_init_event() will go through the list of available PMUs and
-> > > will choose the first one that can create the event. The order of the PMUs
-> > > in the PMU list depends on the probe order, which can change under various
-> > > circumstances, for example if the order of the PMU nodes change in the DTB
-> > > or if asynchronous driver probing is enabled on the kernel command line
-> > > (with the driver_async_probe=armv8-pmu option).
-> > >
-> > > Another consequence of this approach is that, on heteregeneous systems,
-> > > all virtual machines that KVM creates will use the same PMU. This might
-> > > cause unexpected behaviour for userspace: when a VCPU is executing on
-> > > the physical CPU that uses this PMU, PMU events in the guest work
-> > > correctly; but when the same VCPU executes on another CPU, PMU events in
-> > > the guest will suddenly stop counting.
-> > >
-> > > Fortunately, perf core allows user to specify on which PMU to create an
-> > > event by using the perf_event_attr->type field, which is used by
-> > > perf_init_event() as an index in the radix tree of available PMUs.
-> > >
-> > > Add the KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU
-> > > attribute to allow userspace to specify the arm_pmu that KVM will use when
-> > > creating events for that VCPU. KVM will make no attempt to run the VCPU on
-> > > the physical CPUs that share this PMU, leaving it up to userspace to
-> > > manage the VCPU threads' affinity accordingly.
-> > >
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  Documentation/virt/kvm/devices/vcpu.rst | 25 +++++++++++++++++
-> > >  arch/arm64/include/uapi/asm/kvm.h       |  1 +
-> > >  arch/arm64/kvm/pmu-emul.c               | 37 +++++++++++++++++++++++--
-> > >  include/kvm/arm_pmu.h                   |  1 +
-> > >  tools/arch/arm64/include/uapi/asm/kvm.h |  1 +
-> > >  5 files changed, 63 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> > > index 60a29972d3f1..c82be5cbc268 100644
-> > > --- a/Documentation/virt/kvm/devices/vcpu.rst
-> > > +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> > > @@ -104,6 +104,31 @@ hardware event. Filtering event 0x1E (CHAIN) has no effect either, as it
-> > >  isn't strictly speaking an event. Filtering the cycle counter is possible
-> > >  using event 0x11 (CPU_CYCLES).
-> > >
-> > > +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_SET_PMU
-> > > +------------------------------------------
-> > > +
-> > > +:Parameters: in kvm_device_attr.addr the address to an int representing the PMU
-> > > +             identifier.
-> > > +
-> > > +:Returns:
-> > > +
-> > > +        =======  ===============================================
-> > > +        -EBUSY   PMUv3 already initialized
-> > > +        -EFAULT  Error accessing the PMU identifier
-> > > +        -ENXIO   PMU not found
-> > > +        -ENODEV  PMUv3 not supported or GIC not initialized
-> > > +        -ENOMEM  Could not allocate memory
-> > > +        =======  ===============================================
-> > > +
-> > > +Request that the VCPU uses the specified hardware PMU when creating guest events
-> > > +for the purpose of PMU emulation. The PMU identifier can be read from the "type"
-> > > +file for the desired PMU instance under /sys/devices (or, equivalent,
-> > > +/sys/bus/even_source). This attribute is particularly useful on heterogeneous
-> > > +systems where there are at least two CPU PMUs on the system.
-> > > +
-> > > +Note that KVM will not make any attempts to run the VCPU on the physical CPUs
-> > > +associated with the PMU specified by this attribute. This is entirely left to
-> > > +userspace.
-> > >
-> > >  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
-> > >  =================================
-> > > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > > index b3edde68bc3e..1d0a0a2a9711 100644
-> > > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > > @@ -362,6 +362,7 @@ struct kvm_arm_copy_mte_tags {
-> > >  #define   KVM_ARM_VCPU_PMU_V3_IRQ      0
-> > >  #define   KVM_ARM_VCPU_PMU_V3_INIT     1
-> > >  #define   KVM_ARM_VCPU_PMU_V3_FILTER   2
-> > > +#define   KVM_ARM_VCPU_PMU_V3_SET_PMU  3
-> > >  #define KVM_ARM_VCPU_TIMER_CTRL                1
-> > >  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER                0
-> > >  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER                1
-> > > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > > index eaaad4c06561..618138c5f792 100644
-> > > --- a/arch/arm64/kvm/pmu-emul.c
-> > > +++ b/arch/arm64/kvm/pmu-emul.c
-> > > @@ -603,6 +603,7 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >  {
-> > >         struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> > > +       struct arm_pmu *arm_pmu = pmu->arm_pmu;
-> > >         struct kvm_pmc *pmc;
-> > >         struct perf_event *event;
-> > >         struct perf_event_attr attr;
-> > > @@ -638,8 +639,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >                 return;
-> > >
-> > >         memset(&attr, 0, sizeof(struct perf_event_attr));
-> > > -       attr.type = PERF_TYPE_RAW;
-> > > -       attr.size = sizeof(attr);
-> > > +       attr.type = arm_pmu ? arm_pmu->pmu.type : PERF_TYPE_RAW;
-> > >         attr.pinned = 1;
-> > >         attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, pmc->idx);
-> > >         attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
-> > > @@ -941,6 +941,29 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
-> > >         return true;
-> > >  }
-> > >
-> > > +static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
-> > > +{
-> > > +       struct kvm_pmu *kvm_pmu = &vcpu->arch.pmu;
-> > > +       struct arm_pmu_entry *entry;
-> > > +       struct arm_pmu *arm_pmu;
-> > > +       int ret = -ENXIO;
-> > > +
-> > > +       mutex_lock(&arm_pmus_lock);
-> > > +
-> > > +       list_for_each_entry(entry, &arm_pmus, entry) {
-> > > +               arm_pmu = entry->arm_pmu;
-> > > +               if (arm_pmu->pmu.type == pmu_id) {
-> > > +                       kvm_pmu->arm_pmu = arm_pmu;
-> > 
-> > Shouldn't kvm->arch.pmuver be updated based on the pmu that
-> > is used for the guest ?
-> 
-> As far as I can tell, kvm->arch.pmuver is used in kvm_pmu_event_mask() to
-> get the number of available perf events, which is then used for configuring
-> events (via the PMEVTYPER_EL0) register or for masking out events when the
-> guest reads PMCEID{0,1}_EL0; the events that are masked out are the events
-> that are unsupported by the PMU that perf will choose for creating events.
-> 
-> This series doesn't forbid userspace from setting the PMU for only a subset
-> of VCPUs, leaving the other VCPUs with the default PMU, so setting
-> kvm->arch.pmuver to a particular VCPU's PMU is not correct.
-> 
-> I think the correct fix here would be to have kvm_pmu_event_mask() use the
-> VCPU's PMU PMUVer, and fallback to kvm->arch.pmuver if that isn't set.
-> 
-> This makes me wonder. Should KVM enforce having userspace either not
-> setting the PMU for any VCPU, either setting it for all VCPUs? I think this
-> would be a good idea and will reduce complexity in the long run. I also
-> don't see a use case for userspace choosing to set the PMU for a subset of
-> VCPUs, leaving the other VCPUs with the default behaviour.
-
-I had a look and I don't think there's a way to enforce this, as there are
-no restrictions on when a VCPU can be created. KVM must support only a
-subset of VCPUs having a PMU set.
-
-Thanks,
-Alex
-
-> 
-> Thanks,
-> Alex
-> 
-> > 
-> > Thanks,
-> > Reiji
-> > 
-> > 
-> > > +                       ret = 0;
-> > > +                       goto out_unlock;
-> > > +               }
-> > > +       }
-> > > +
-> > > +out_unlock:
-> > > +       mutex_unlock(&arm_pmus_lock);
-> > > +       return ret;
-> > > +}
-> > > +
-> > >  int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> > >  {
-> > >         if (!kvm_vcpu_has_pmu(vcpu))
-> > > @@ -1027,6 +1050,15 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> > >
-> > >                 return 0;
-> > >         }
-> > > +       case KVM_ARM_VCPU_PMU_V3_SET_PMU: {
-> > > +               int __user *uaddr = (int __user *)(long)attr->addr;
-> > > +               int pmu_id;
-> > > +
-> > > +               if (get_user(pmu_id, uaddr))
-> > > +                       return -EFAULT;
-> > > +
-> > > +               return kvm_arm_pmu_v3_set_pmu(vcpu, pmu_id);
-> > > +       }
-> > >         case KVM_ARM_VCPU_PMU_V3_INIT:
-> > >                 return kvm_arm_pmu_v3_init(vcpu);
-> > >         }
-> > > @@ -1064,6 +1096,7 @@ int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-> > >         case KVM_ARM_VCPU_PMU_V3_IRQ:
-> > >         case KVM_ARM_VCPU_PMU_V3_INIT:
-> > >         case KVM_ARM_VCPU_PMU_V3_FILTER:
-> > > +       case KVM_ARM_VCPU_PMU_V3_SET_PMU:
-> > >                 if (kvm_vcpu_has_pmu(vcpu))
-> > >                         return 0;
-> > >         }
-> > > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> > > index e249c5f172aa..ab3046a8f9bb 100644
-> > > --- a/include/kvm/arm_pmu.h
-> > > +++ b/include/kvm/arm_pmu.h
-> > > @@ -34,6 +34,7 @@ struct kvm_pmu {
-> > >         bool created;
-> > >         bool irq_level;
-> > >         struct irq_work overflow_work;
-> > > +       struct arm_pmu *arm_pmu;
-> > >  };
-> > >
-> > >  struct arm_pmu_entry {
-> > > diff --git a/tools/arch/arm64/include/uapi/asm/kvm.h b/tools/arch/arm64/include/uapi/asm/kvm.h
-> > > index b3edde68bc3e..1d0a0a2a9711 100644
-> > > --- a/tools/arch/arm64/include/uapi/asm/kvm.h
-> > > +++ b/tools/arch/arm64/include/uapi/asm/kvm.h
-> > > @@ -362,6 +362,7 @@ struct kvm_arm_copy_mte_tags {
-> > >  #define   KVM_ARM_VCPU_PMU_V3_IRQ      0
-> > >  #define   KVM_ARM_VCPU_PMU_V3_INIT     1
-> > >  #define   KVM_ARM_VCPU_PMU_V3_FILTER   2
-> > > +#define   KVM_ARM_VCPU_PMU_V3_SET_PMU  3
-> > >  #define KVM_ARM_VCPU_TIMER_CTRL                1
-> > >  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER                0
-> > >  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER                1
-> > > --
-> > > 2.34.1
-> > >
-> > > _______________________________________________
-> > > kvmarm mailing list
-> > > kvmarm@lists.cs.columbia.edu
-> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRXJpYyBBdWdlciBbbWFp
+bHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gU2VudDogMDcgRGVjZW1iZXIgMjAyMSAxMTow
+Ng0KPiBUbzogWmhhbmdmZWkgR2FvIDx6aGFuZ2ZlaS5nYW9AbGluYXJvLm9yZz47IGVyaWMuYXVn
+ZXIucHJvQGdtYWlsLmNvbTsNCj4gaW9tbXVAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmc7IGxp
+bnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGt2bWFy
+bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHU7IGpvcm9AOGJ5dGVzLm9yZzsNCj4gd2lsbEBrZXJuZWwu
+b3JnOyByb2Jpbi5tdXJwaHlAYXJtLmNvbTsgamVhbi1waGlsaXBwZUBsaW5hcm8ub3JnOw0KPiB6
+aHVrZXFpYW4gPHpodWtlcWlhbjFAaHVhd2VpLmNvbT4NCj4gQ2M6IGFsZXgud2lsbGlhbXNvbkBy
+ZWRoYXQuY29tOyBqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbTsNCj4geWkubC5saXVAaW50
+ZWwuY29tOyBrZXZpbi50aWFuQGludGVsLmNvbTsgYXNob2sucmFqQGludGVsLmNvbTsNCj4gbWF6
+QGtlcm5lbC5vcmc7IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsgdml2ZWsuZ2F1dGFtQGFybS5j
+b207DQo+IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0udGhv
+ZGlAaHVhd2VpLmNvbT47DQo+IHdhbmd4aW5nYW5nIDx3YW5neGluZ2FuZzVAaHVhd2VpLmNvbT47
+IGppYW5na3Vua3VuDQo+IDxqaWFuZ2t1bmt1bkBodWF3ZWkuY29tPjsgeXV6ZW5naHVpIDx5dXpl
+bmdodWlAaHVhd2VpLmNvbT47DQo+IG5pY29sZW90c3VrYUBnbWFpbC5jb207IGNoZW54aWFuZyAo
+TSkgPGNoZW54aWFuZzY2QGhpc2lsaWNvbi5jb20+Ow0KPiBzdW1pdGdAbnZpZGlhLmNvbTsgbmlj
+b2xpbmNAbnZpZGlhLmNvbTsgdmR1bXBhQG52aWRpYS5jb207DQo+IHpoYW5nZmVpLmdhb0BnbWFp
+bC5jb207IGx1c2hlbm1pbmdAaHVhd2VpLmNvbTsgdnNldGhpQG52aWRpYS5jb20NCj4gU3ViamVj
+dDogUmU6IFtSRkMgdjE2IDAvOV0gU01NVXYzIE5lc3RlZCBTdGFnZSBTZXR1cCAoSU9NTVUgcGFy
+dCkNCj4gDQo+IEhpIFpoYW5nZmVpLA0KPiANCj4gT24gMTIvNy8yMSAxMTozNSBBTSwgWmhhbmdm
+ZWkgR2FvIHdyb3RlOg0KPiA+DQo+ID4NCj4gPiBPbiAyMDIxLzEyLzcg5LiL5Y2INjoyNywgRXJp
+YyBBdWdlciB3cm90ZToNCj4gPj4gSGkgWmhhbmdmZWksDQo+ID4+DQo+ID4+IE9uIDEyLzMvMjEg
+MToyNyBQTSwgWmhhbmdmZWkgR2FvIHdyb3RlOg0KPiA+Pj4gSGksIEVyaWMNCj4gPj4+DQo+ID4+
+PiBPbiAyMDIxLzEwLzI3IOS4i+WNiDY6NDQsIEVyaWMgQXVnZXIgd3JvdGU6DQo+ID4+Pj4gVGhp
+cyBzZXJpZXMgYnJpbmdzIHRoZSBJT01NVSBwYXJ0IG9mIEhXIG5lc3RlZCBwYWdpbmcgc3VwcG9y
+dA0KPiA+Pj4+IGluIHRoZSBTTU1VdjMuDQo+ID4+Pj4NCj4gPj4+PiBUaGUgU01NVXYzIGRyaXZl
+ciBpcyBhZGFwdGVkIHRvIHN1cHBvcnQgMiBuZXN0ZWQgc3RhZ2VzLg0KPiA+Pj4+DQo+ID4+Pj4g
+VGhlIElPTU1VIEFQSSBpcyBleHRlbmRlZCB0byBjb252ZXkgdGhlIGd1ZXN0IHN0YWdlIDENCj4g
+Pj4+PiBjb25maWd1cmF0aW9uIGFuZCB0aGUgaG9vayBpcyBpbXBsZW1lbnRlZCBpbiB0aGUgU01N
+VXYzIGRyaXZlci4NCj4gPj4+Pg0KPiA+Pj4+IFRoaXMgYWxsb3dzIHRoZSBndWVzdCB0byBvd24g
+dGhlIHN0YWdlIDEgdGFibGVzIGFuZCBjb250ZXh0DQo+ID4+Pj4gZGVzY3JpcHRvcnMgKHNvLWNh
+bGxlZCBQQVNJRCB0YWJsZSkgd2hpbGUgdGhlIGhvc3Qgb3ducyB0aGUNCj4gPj4+PiBzdGFnZSAy
+IHRhYmxlcyBhbmQgbWFpbiBjb25maWd1cmF0aW9uIHN0cnVjdHVyZXMgKFNURSkuDQo+ID4+Pj4N
+Cj4gPj4+PiBUaGlzIHdvcmsgbWFpbmx5IGlzIHByb3ZpZGVkIGZvciB0ZXN0IHB1cnBvc2UgYXMg
+dGhlIHVwcGVyDQo+ID4+Pj4gbGF5ZXIgaW50ZWdyYXRpb24gaXMgdW5kZXIgcmV3b3JrIGFuZCBi
+b3VuZCB0byBiZSBiYXNlZCBvbg0KPiA+Pj4+IC9kZXYvaW9tbXUgaW5zdGVhZCBvZiBWRklPIHR1
+bm5lbGluZy4gSW4gdGhpcyB2ZXJzaW9uIHdlIGFsc28gZ2V0DQo+ID4+Pj4gcmlkIG9mIHRoZSBN
+U0kgQklORElORyBpb2N0bCwgYXNzdW1pbmcgdGhlIGd1ZXN0IGVuZm9yY2VzDQo+ID4+Pj4gZmxh
+dCBtYXBwaW5nIG9mIGhvc3QgSU9WQXMgdXNlZCB0byBiaW5kIHBoeXNpY2FsIE1TSSBkb29yYmVs
+bHMuDQo+ID4+Pj4gSW4gdGhlIGN1cnJlbnQgUUVNVSBpbnRlZ3JhdGlvbiB0aGlzIGlzIGFjaGll
+dmVkIGJ5IGV4cG9zaW5nDQo+ID4+Pj4gUk1ScyB0byB0aGUgZ3Vlc3QsIHVzaW5nIFNoYW1lZXIn
+cyBzZXJpZXMgWzFdLiBUaGlzIGFwcHJvYWNoDQo+ID4+Pj4gaXMgUkZDIGFzIHRoZSBJT1JUIHNw
+ZWMgaXMgbm90IHJlYWxseSBtZWFudCB0byBkbyB0aGF0DQo+ID4+Pj4gKHNpbmdsZSBtYXBwaW5n
+IGZsYWcgbGltaXRhdGlvbikuDQo+ID4+Pj4NCj4gPj4+PiBCZXN0IFJlZ2FyZHMNCj4gPj4+Pg0K
+PiA+Pj4+IEVyaWMNCj4gPj4+Pg0KPiA+Pj4+IFRoaXMgc2VyaWVzIChIb3N0KSBjYW4gYmUgZm91
+bmQgYXQ6DQo+ID4+Pj4gaHR0cHM6Ly9naXRodWIuY29tL2VhdWdlci9saW51eC90cmVlL3Y1LjE1
+LXJjNy1uZXN0ZWQtdjE2DQo+ID4+Pj4gVGhpcyBpbmNsdWRlcyBhIHJlYmFzZWQgVkZJTyBpbnRl
+Z3JhdGlvbiAoYWx0aG91Z2ggbm90IG1lYW50DQo+ID4+Pj4gdG8gYmUgdXBzdHJlYW1lZCkNCj4g
+Pj4+Pg0KPiA+Pj4+IEd1ZXN0IGtlcm5lbCBicmFuY2ggY2FuIGJlIGZvdW5kIGF0Og0KPiA+Pj4+
+IGh0dHBzOi8vZ2l0aHViLmNvbS9lYXVnZXIvbGludXgvdHJlZS9zaGFtZWVyX3JtcnJfdjcNCj4g
+Pj4+PiBmZWF0dXJpbmcgWzFdDQo+ID4+Pj4NCj4gPj4+PiBRRU1VIGludGVncmF0aW9uIChzdGls
+bCBiYXNlZCBvbiBWRklPIGFuZCBleHBvc2luZyBSTVJzKQ0KPiA+Pj4+IGNhbiBiZSBmb3VuZCBh
+dDoNCj4gPj4+Pg0KPiBodHRwczovL2dpdGh1Yi5jb20vZWF1Z2VyL3FlbXUvdHJlZS92Ni4xLjAt
+cm1yLXYyLW5lc3RlZF9zbW11djNfdjEwDQo+ID4+Pj4gKHVzZSBpb21tdT1uZXN0ZWQtc21tdXYz
+IEFSTSB2aXJ0IG9wdGlvbikNCj4gPj4+Pg0KPiA+Pj4+IEd1ZXN0IGRlcGVuZGVuY3k6DQo+ID4+
+Pj4gWzFdIFtQQVRDSCB2NyAwLzldIEFDUEkvSU9SVDogU3VwcG9ydCBmb3IgSU9SVCBSTVIgbm9k
+ZQ0KPiA+Pj4gVGhhbmtzIGEgbG90IGZvciB1cGdyYWRpbmcgdGhlc2UgcGF0Y2hlcy4NCj4gPj4+
+DQo+ID4+PiBJIGhhdmUgYmFzaWNhbGx5IHZlcmlmaWVkIHRoZXNlIHBhdGNoZXMgb24gSGlTaWxp
+Y29uIEt1bnBlbmc5MjAuDQo+ID4+PiBBbmQgaW50ZWdyYXRlZCB0aGVtIHRvIHRoZXNlIGJyYW5j
+aGVzLg0KPiA+Pj4gaHR0cHM6Ly9naXRodWIuY29tL0xpbmFyby9saW51eC1rZXJuZWwtdWFkay90
+cmVlL3VhY2NlLWRldmVsLTUuMTYNCj4gPj4+IGh0dHBzOi8vZ2l0aHViLmNvbS9MaW5hcm8vcWVt
+dS90cmVlL3Y2LjEuMC1ybXItdjItbmVzdGVkX3NtbXV2M192MTANCj4gPj4+DQo+ID4+PiBUaG91
+Z2ggdGhleSBhcmUgcHJvdmlkZWQgZm9yIHRlc3QgcHVycG9zZSwNCj4gPj4+DQo+ID4+PiBUZXN0
+ZWQtYnk6IFpoYW5nZmVpIEdhbyA8emhhbmdmZWkuZ2FvQGxpbmFyby5vcmc+DQo+ID4+IFRoYW5r
+IHlvdSB2ZXJ5IG11Y2guIEFzIHlvdSBtZW50aW9uZWQsIHVudGlsIHdlIGRvIG5vdCBoYXZlIHRo
+ZQ0KPiA+PiAvZGV2L2lvbW11IGludGVncmF0aW9uIHRoaXMgaXMgbWFpbnRhaW5lZCBmb3IgdGVz
+dGluZyBwdXJwb3NlLiBUaGUgU01NVQ0KPiA+PiBjaGFuZ2VzIHNob3VsZG4ndCBiZSBtdWNoIGlt
+cGFjdGVkIHRob3VnaC4NCj4gPj4gVGhlIGFkZGVkIHZhbHVlIG9mIHRoaXMgcmVzcGluIHdhcyB0
+byBwcm9wb3NlIGFuIE1TSSBiaW5kaW5nIHNvbHV0aW9uDQo+ID4+IGJhc2VkIG9uIFJNUlJzIHdo
+aWNoIHNpbXBsaWZ5IHRoaW5ncyBhdCBrZXJuZWwgbGV2ZWwuDQo+ID4NCj4gPiBDdXJyZW50IFJN
+UlIgc29sdXRpb24gcmVxdWlyZXMgdWVmaSBlbmFibGVkLA0KPiA+IGFuZCBRRU1VX0VGSS5mZMKg
+IGhhcyB0byBiZSBwcm92aWRlZCB0byBzdGFydCBxZW11Lg0KPiA+DQo+ID4gQW55IHBsYW4gdG8g
+c3VwcG9ydCBkdGIgYXMgd2VsbCwgd2hpY2ggd2lsbCBiZSBzaW1wbGVyIHNpbmNlIG5vIG5lZWQN
+Cj4gPiBRRU1VX0VGSS5mZCBhbnltb3JlLg0KPiBZZXMgdGhlIHNvbHV0aW9uIGlzIGJhc2VkIG9u
+IEFDUEkgSU9SVCBub2Rlcy4gTm8gY2x1ZSBpZiBzb21lIERUDQo+IGludGVncmF0aW9uIGlzIHVu
+ZGVyIHdvcmsuIFNoYW1lZXI/DQoNClRoZXJlIHdhcyBzb21lIGF0dGVtcHQgaW4gdGhlIHBhc3Qg
+dG8gY3JlYXRlIGlkZW50aXR5IG1hcHBpbmdzIHVzaW5nIERULg0KVGhpcyBpcyB0aGUgbGF0ZXN0
+IEkgY2FuIGZpbmQgb24gaXQsDQpodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1pb21tdS9Z
+VGVsREh4MlJFSUl2ViUyRk5Ab3JvbWUuZnJpdHouYm94L1QvDQoNClRoYW5rcywNClNoYW1lZXIN
+Cg0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJt
+IG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
