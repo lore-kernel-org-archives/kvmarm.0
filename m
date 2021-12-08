@@ -2,106 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA4DC433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 07:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC4A2C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 07:55:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 778554B0EF;
-	Wed,  8 Dec 2021 02:33:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5118C4B11B;
+	Wed,  8 Dec 2021 02:55:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z+153ZgBmVFb; Wed,  8 Dec 2021 02:33:45 -0500 (EST)
+	with ESMTP id jhSJdKOor2jT; Wed,  8 Dec 2021 02:55:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73FD44B11A;
-	Wed,  8 Dec 2021 02:33:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ECD194B106;
+	Wed,  8 Dec 2021 02:55:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FAFC4B0E6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 02:33:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 267C44B0E6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 02:55:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DptkUgih6Er8 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 02:33:42 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65C4F407F1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 02:33:42 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1638948822;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VaQgBFKDWPtyW4rX+GpfnPjaazD4SfZz/ToOHd0Wuzc=;
- b=buSsHXPc8pO1+bpD8kMOfnqkFMGVVD5yL4FTm+hW8Uv1FxHDFtY38fgsDHJCMeeJESBlwk
- HSeUjK0e8BXQqMKO6VXoaYS3KHpFc7Fx7CE68JRr+YUpgmQ5z51g64hZM/tNCGBDVPHPCC
- LP9mQgqDoZ1/Rw1Z4Q5gIuzXtie7aNs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-51-BYNAI6P2O26QGTmgRXdIxA-1; Wed, 08 Dec 2021 02:33:37 -0500
-X-MC-Unique: BYNAI6P2O26QGTmgRXdIxA-1
-Received: by mail-wr1-f72.google.com with SMTP id
- d18-20020adfe852000000b001985d36817cso163282wrn.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Dec 2021 23:33:37 -0800 (PST)
+ with ESMTP id kWiZuU2YhBiP for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 02:55:09 -0500 (EST)
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com
+ [209.85.210.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93D304B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 02:55:09 -0500 (EST)
+Received: by mail-pf1-f180.google.com with SMTP id k64so1729370pfd.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Dec 2021 23:55:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GOsDlvtHUsvpyzAalvvg8x6djpdFspNNz+UIYAsUtvw=;
+ b=dUMiETJ98mq1E0+EgznTrPA29eh7/doFnRuoSdhCaCwazd9p33SFNY5s68sfsUctrE
+ iTnwvm97BOF//xUZaFqMbEKklDaGcRXjyPpR9QS8U0I9x59XoVHZoM0ix/GeRtKYnLcC
+ CdDGXpKA2UyUsqVjKF41+nAGJw6dh0GtVneZ4+vCzkEQ2EObg1ITu1lHTHCtQJNNftP0
+ /Xp8yFJmo3PtgptORWuYRcJdzp16F0DFrQgX9pXVqHd0woVpHLU/O5M8+9k0eeb6KJRF
+ NJ0AVGfDePf4fiBgZrKHrTp41VM5ga1U+nSlmpc/vUhgkq8ShUC3sNAPpU3yarhaiOWi
+ j+0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:reply-to:subject:to:cc:references:from
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-transfer-encoding:content-language;
- bh=VaQgBFKDWPtyW4rX+GpfnPjaazD4SfZz/ToOHd0Wuzc=;
- b=sORGWupAClrjg7Nyah5RYFpBli6J6d7ck6dCMGrZmfNblWsgi8knESS8PHXWpZw76m
- G5cFOzCUSosPIblk02Ke1qq9XlY8wOxcfI5j7VBdfnif3VS/VYdgtvB8W93K0RRTnL+E
- mGPA1qhoY6aiP4/UuSV/iO87hE72AUc0YS2yp87WeeV6CwBge6DNRN+E//O36tVkbUtc
- XBIQbNJix2gXV0tHqTY22TNQiuaecd5Fx6CpxA/yV3U8vrSTuGNRjPJ6lru7MNJJpkOb
- Hqito6kQXctuz2MzkVOnz9BVrpi3Doplsinw8JsCpC3g5WT3ATVfcFmYr1gJJJ2bYkbF
- 8lkA==
-X-Gm-Message-State: AOAM530w9se4LRkQ+4t8KfobPpN+1UK/8IDpqVK9IXjURHfYfIvUrDe5
- 29R+g51+O5IS3qT3vNltR4wQJoa4AvL5gOdJQ+nICgLrtpLzAMVjSCb6sXTPoACCg+yhXkyKU+p
- eY6FhDf/F6oxiE43j4B8tjAT3
-X-Received: by 2002:adf:f708:: with SMTP id r8mr57333483wrp.198.1638948816657; 
- Tue, 07 Dec 2021 23:33:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy7KoV5p8PVF3If5VE3e/tXMfPoPdiN58LX+mhb+Qk/apSQFS8E5N4maEwm2dxUTEGR+YL9hQ==
-X-Received: by 2002:adf:f708:: with SMTP id r8mr57333432wrp.198.1638948816394; 
- Tue, 07 Dec 2021 23:33:36 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id l3sm2033529wmq.46.2021.12.07.23.33.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 07 Dec 2021 23:33:35 -0800 (PST)
-Subject: Re: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
-To: Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>
-References: <20211027104428.1059740-1-eric.auger@redhat.com>
- <20211027104428.1059740-2-eric.auger@redhat.com>
- <Ya3qd6mT/DpceSm8@8bytes.org>
- <c7e26722-f78c-a93f-c425-63413aa33dde@redhat.com>
- <e6733c59-ffcb-74d4-af26-273c1ae8ce68@linux.intel.com>
-From: Eric Auger <eric.auger@redhat.com>
-Message-ID: <fbeabcff-a6d4-dcc5-6687-7b32d6358fe3@redhat.com>
-Date: Wed, 8 Dec 2021 08:33:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GOsDlvtHUsvpyzAalvvg8x6djpdFspNNz+UIYAsUtvw=;
+ b=wJ1kGwVkwTbKA16O0EXab8H3EoJ36un88zWaKhY9RGHVTFSqTxnOIslvzLyKbDqyeY
+ uhlQ4Gp4IZlykAevwTBnn4MYlNXzMuaajBwpUNcfgvAmzGfG15v7O9bcoQrII9toTlUG
+ GiD7TZ86M99ShcN0zJ5OK21g22ryrXEHdCeA1K8NTApauYYCRGSI5B7a6sPiWrFalSXL
+ Es36gEk+ouAjNxn/VC9wNOKCbULaPO5vR5Gnzx80hO0yDurVqcRIu+A2bkTnus5Q1foZ
+ eAqDien4HWVwAC4NbmygWx1qMvwY4yL8hMKy1yGC1wx5NisfqnzSiZ3/gaMgHN3aNwdU
+ Ylfg==
+X-Gm-Message-State: AOAM531VlpxChCFBbxHxJi8JnByqEGBiTKIffpiDdyqur4m+eFEfKVKX
+ xm3swZn4/kJNJectdPe+lLiQ4jJDj8drXGkggTstcQ==
+X-Google-Smtp-Source: ABdhPJyaJnJOFO+jOE2a/eHkGEh0c7/JvTDezfPFhT70gNc87XAq1b5p4EZAgxj8AyonfLyOzZOiInFHbzhQgJ0VsmU=
+X-Received: by 2002:a63:8b42:: with SMTP id j63mr28338313pge.514.1638950108257; 
+ Tue, 07 Dec 2021 23:55:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <e6733c59-ffcb-74d4-af26-273c1ae8ce68@linux.intel.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kevin.tian@intel.com, lushenming@huawei.com, ashok.raj@intel.com,
- kvm@vger.kernel.org, jean-philippe@linaro.org, maz@kernel.org,
- linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
- vsethi@nvidia.com, vivek.gautam@arm.com, alex.williamson@redhat.com,
- Jason Gunthorpe <jgg@nvidia.com>, wangxingang5@huawei.com,
- zhangfei.gao@linaro.org, robin.murphy@arm.com, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
+References: <20211206170223.309789-1-alexandru.elisei@arm.com>
+ <20211206170223.309789-5-alexandru.elisei@arm.com>
+ <Ya9s2HIuMmWYFIQm@monolith.localdoman>
+In-Reply-To: <Ya9s2HIuMmWYFIQm@monolith.localdoman>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Tue, 7 Dec 2021 23:54:51 -0800
+Message-ID: <CAAeT=Fz2D+axfn7-eO1MMO8R3w-C_XhVxb-_upC0zqyFr4D0GQ@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] KVM: arm64: Refuse to run VCPU if the PMU doesn't
+ match the physical CPU
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, mingo@redhat.com, tglx@linutronix.de, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -110,40 +79,236 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgQmFvbHUsCgpPbiAxMi84LzIxIDM6NDQgQU0sIEx1IEJhb2x1IHdyb3RlOgo+IEhpIEVyaWMs
-Cj4KPiBPbiAxMi83LzIxIDY6MjIgUE0sIEVyaWMgQXVnZXIgd3JvdGU6Cj4+IE9uIDEyLzYvMjEg
-MTE6NDggQU0sIEpvZXJnIFJvZWRlbCB3cm90ZToKPj4+IE9uIFdlZCwgT2N0IDI3LCAyMDIxIGF0
-IDEyOjQ0OjIwUE0gKzAyMDAsIEVyaWMgQXVnZXIgd3JvdGU6Cj4+Pj4gU2lnbmVkLW9mZi1ieTog
-SmVhbi1QaGlsaXBwZSBCcnVja2VyPGplYW4tcGhpbGlwcGUuYnJ1Y2tlckBhcm0uY29tPgo+Pj4+
-IFNpZ25lZC1vZmYtYnk6IExpdSwgWWkgTDx5aS5sLmxpdUBsaW51eC5pbnRlbC5jb20+Cj4+Pj4g
-U2lnbmVkLW9mZi1ieTogQXNob2sgUmFqPGFzaG9rLnJhakBpbnRlbC5jb20+Cj4+Pj4gU2lnbmVk
-LW9mZi1ieTogSmFjb2IgUGFuPGphY29iLmp1bi5wYW5AbGludXguaW50ZWwuY29tPgo+Pj4+IFNp
-Z25lZC1vZmYtYnk6IEVyaWMgQXVnZXI8ZXJpYy5hdWdlckByZWRoYXQuY29tPgo+Pj4gVGhpcyBT
-aWduZWQtb2YtYnkgY2hhaW4gbG9va3MgZHViaW91cywgeW91IGFyZSB0aGUgYXV0aG9yIGJ1dCB0
-aGUgbGFzdAo+Pj4gb25lIGluIHRoZSBjaGFpbj8KPj4gVGhlIDFzdCBSRkMgaW4gQXVnIDIwMTgK
-Pj4gKGh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L3BpcGVybWFpbC9rdm1hcm0vMjAxOC1B
-dWd1c3QvMDMyNDc4Lmh0bWwpCj4+IHNhaWQgdGhpcyB3YXMgYSBnZW5lcmFsaXphdGlvbiBvZiBK
-YWNvYidzIHBhdGNoCj4+Cj4+Cj4+IMKgwqAgW1BBVENIIHY1IDAxLzIzXSBpb21tdTogaW50cm9k
-dWNlIGJpbmRfcGFzaWRfdGFibGUgQVBJIGZ1bmN0aW9uCj4+Cj4+Cj4+IMKgwqAKPj4gaHR0cHM6
-Ly9saXN0cy5saW51eGZvdW5kYXRpb24ub3JnL3BpcGVybWFpbC9pb21tdS8yMDE4LU1heS8wMjc2
-NDcuaHRtbAo+Pgo+PiBTbyBpbmRlZWQgSmFjb2Igc2hvdWxkIGJlIHRoZSBhdXRob3IuIEkgZ3Vl
-c3MgdGhlIG11bHRpcGxlIHJlYmFzZXMgZ290Cj4+IHRoaXMgZXZlbnR1YWxseSByZXBsYWNlZCBh
-dCBzb21lIHBvaW50LCB3aGljaCBpcyBub3QgYW4gZXhjdXNlLiBQbGVhc2UKPj4gZm9yZ2l2ZSBt
-ZSBmb3IgdGhhdC4KPj4gTm93IHRoZSBvcmlnaW5hbCBwYXRjaCBhbHJlYWR5IGhhZCB0aGlzIGxp
-c3Qgb2YgU29CIHNvIEkgZG9uJ3Qga25vdyBpZiBJCj4+IHNoYWxsIHNpbXBsaWZ5IGl0Lgo+Cj4g
-QXMgd2UgaGF2ZSBkZWNpZGVkIHRvIG1vdmUgdGhlIG5lc3RlZCBtb2RlIChkdWFsIHN0YWdlcykg
-aW1wbGVtZW50YXRpb24KPiBvbnRvIHRoZSBkZXZlbG9waW5nIGlvbW11ZmQgZnJhbWV3b3JrLCB3
-aGF0J3MgdGhlIHZhbHVlIG9mIGFkZGluZyB0aGlzCj4gaW50byBpb21tdSBjb3JlPwoKVGhlIGlv
-bW11X3VhcGlfYXR0YWNoX3Bhc2lkX3RhYmxlIHVhcGkgc2hvdWxkIGRpc2FwcGVhciBpbmRlZWQg
-YXMgaXQgaXMKaXMgYm91bmQgdG8gYmUgcmVwbGFjZWQgYnkgL2Rldi9pb21tdSBmZWxsb3cgQVBJ
-LgpIb3dldmVyIHVudGlsIEkgY2FuIHJlYmFzZSBvbiAvZGV2L2lvbW11IGNvZGUgSSBhbSBvYmxp
-Z2VkIHRvIGtlZXAgaXQgdG8KbWFpbnRhaW4gdGhpcyBpbnRlZ3JhdGlvbiwgaGVuY2UgdGhlIFJG
-Qy4KClRoYW5rcwoKRXJpYwo+Cj4gQmVzdCByZWdhcmRzLAo+IGJhb2x1Cj4KCl9fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QK
-a3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVk
-dS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi Alex,
+
+On Tue, Dec 7, 2021 at 6:18 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+> On Mon, Dec 06, 2021 at 05:02:23PM +0000, Alexandru Elisei wrote:
+> > Userspace can assign a PMU to a VCPU with the KVM_ARM_VCPU_PMU_V3_SET_PMU
+> > device ioctl. If the VCPU is scheduled on a physical CPU which has a
+> > different PMU, the perf events needed to emulate a guest PMU won't be
+> > scheduled in and the guest performance counters will stop counting. Treat
+> > it as an userspace error and refuse to run the VCPU in this situation.
+> >
+> > The VCPU is flagged as being scheduled on the wrong CPU in vcpu_load(), but
+> > the flag is cleared when the KVM_RUN enters the non-preemptible section
+> > instead of in vcpu_put(); this has been done on purpose so the error
+> > condition is communicated as soon as possible to userspace, otherwise
+> > vcpu_load() on the wrong CPU followed by a vcpu_put() would clear the flag.
+> >
+> > Suggested-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> > I agonized for hours about the best name for the VCPU flag and the
+> > accessors. If someone has a better idea, please tell me and I'll change
+> > them.
+> >
+> >  Documentation/virt/kvm/devices/vcpu.rst |  6 +++++-
+> >  arch/arm64/include/asm/kvm_host.h       | 12 ++++++++++++
+> >  arch/arm64/include/uapi/asm/kvm.h       |  3 +++
+> >  arch/arm64/kvm/arm.c                    | 19 +++++++++++++++++++
+> >  arch/arm64/kvm/pmu-emul.c               |  1 +
+> >  5 files changed, 40 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+> > index c82be5cbc268..9ae47b7c3652 100644
+> > --- a/Documentation/virt/kvm/devices/vcpu.rst
+> > +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> > @@ -128,7 +128,11 @@ systems where there are at least two CPU PMUs on the system.
+> >
+> >  Note that KVM will not make any attempts to run the VCPU on the physical CPUs
+> >  associated with the PMU specified by this attribute. This is entirely left to
+> > -userspace.
+> > +userspace. However, attempting to run the VCPU on a physical CPU not supported
+> > +by the PMU will fail and KVM_RUN will return with
+> > +exit_reason = KVM_EXIT_FAIL_ENTRY and populate the fail_entry struct by setting
+> > +hardare_entry_failure_reason field to KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED and
+> > +the cpu field to the processor id.
+> >
+> >  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
+> >  =================================
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 2a5f7f38006f..0c453f2e48b6 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -385,6 +385,8 @@ struct kvm_vcpu_arch {
+> >               u64 last_steal;
+> >               gpa_t base;
+> >       } steal;
+> > +
+> > +     cpumask_var_t supported_cpus;
+> >  };
+> >
+> >  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> > @@ -420,6 +422,7 @@ struct kvm_vcpu_arch {
+> >  #define KVM_ARM64_EXCEPT_MASK                (7 << 9) /* Target EL/MODE */
+> >  #define KVM_ARM64_DEBUG_STATE_SAVE_SPE       (1 << 12) /* Save SPE context if active  */
+> >  #define KVM_ARM64_DEBUG_STATE_SAVE_TRBE      (1 << 13) /* Save TRBE context if active  */
+> > +#define KVM_ARM64_ON_UNSUPPORTED_CPU (1 << 14) /* Physical CPU not in supported_cpus */
+> >
+> >  #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
+> >                                KVM_GUESTDBG_USE_SW_BP | \
+> > @@ -460,6 +463,15 @@ struct kvm_vcpu_arch {
+> >  #define vcpu_has_ptrauth(vcpu)               false
+> >  #endif
+> >
+> > +#define vcpu_on_unsupported_cpu(vcpu)                                        \
+> > +     ((vcpu)->arch.flags & KVM_ARM64_ON_UNSUPPORTED_CPU)
+> > +
+> > +#define vcpu_set_on_unsupported_cpu(vcpu)                            \
+> > +     ((vcpu)->arch.flags |= KVM_ARM64_ON_UNSUPPORTED_CPU)
+> > +
+> > +#define vcpu_clear_on_unsupported_cpu(vcpu)                          \
+> > +     ((vcpu)->arch.flags &= ~KVM_ARM64_ON_UNSUPPORTED_CPU)
+> > +
+> >  #define vcpu_gp_regs(v)              (&(v)->arch.ctxt.regs)
+> >
+> >  /*
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index 1d0a0a2a9711..d49f714f48e6 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -414,6 +414,9 @@ struct kvm_arm_copy_mte_tags {
+> >  #define KVM_PSCI_RET_INVAL           PSCI_RET_INVALID_PARAMS
+> >  #define KVM_PSCI_RET_DENIED          PSCI_RET_DENIED
+> >
+> > +/* run->fail_entry.hardware_entry_failure_reason codes. */
+> > +#define KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED  (1ULL << 0)
+> > +
+> >  #endif
+> >
+> >  #endif /* __ARM_KVM_H__ */
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index e4727dc771bf..1124c3efdd94 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -327,6 +327,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> >
+> >       vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+> >
+> > +     if (!zalloc_cpumask_var(&vcpu->arch.supported_cpus, GFP_KERNEL))
+> > +             return -ENOMEM;
+
+It appears that vcpu->arch.supported_cpus needs to be freed
+if kvm_arch_vcpu_create() fails after it is allocated.
+(kvm_vgic_vcpu_init() or create_hyp_mappings() might fail)
+
+
+> > +     cpumask_copy(vcpu->arch.supported_cpus, cpu_possible_mask);
+> > +
+> >       /* Set up the timer */
+> >       kvm_timer_vcpu_init(vcpu);
+> >
+> > @@ -354,6 +358,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+> >       if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
+> >               static_branch_dec(&userspace_irqchip_in_use);
+> >
+> > +     free_cpumask_var(vcpu->arch.supported_cpus);
+> >       kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+> >       kvm_timer_vcpu_terminate(vcpu);
+> >       kvm_pmu_vcpu_destroy(vcpu);
+> > @@ -432,6 +437,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> >       if (vcpu_has_ptrauth(vcpu))
+> >               vcpu_ptrauth_disable(vcpu);
+> >       kvm_arch_vcpu_load_debug_state_flags(vcpu);
+> > +
+> > +     if (!cpumask_test_cpu(smp_processor_id(), vcpu->arch.supported_cpus))
+> > +             vcpu_set_on_unsupported_cpu(vcpu);
+> >  }
+> >
+> >  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> > @@ -822,6 +830,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >                */
+> >               preempt_disable();
+> >
+> > +             if (unlikely(vcpu_on_unsupported_cpu(vcpu))) {
+> > +                     vcpu_clear_on_unsupported_cpu(vcpu);
+> > +                     run->exit_reason = KVM_EXIT_FAIL_ENTRY;
+> > +                     run->fail_entry.hardware_entry_failure_reason
+> > +                             = KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED;
+> > +                     run->fail_entry.cpu = smp_processor_id();
+>
+> I just realised that this is wrong for the same reason that KVM doesn't
+> clear the unsupported CPU flag on vcpu_put: a vcpu_put/load that happened
+> after the vcpu_load that set the flag and before preemption is disabled
+> could mean that now the thread is executing on a different physical CPU
+> than the physical CPU that caused the flag to be set. To make things worse,
+> this CPU might even be in supported_cpus, which would be extremely
+> confusing for someone trying to descipher what went wrong.
+>
+> I see three solutions here:
+>
+> 1. Drop setting the fail_entry.cpu field.
+>
+> 2. Make vcpu_put clear the flag, which means that if the flag is set here
+> then the VCPU is definitely executing on the wrong physical CPU and
+> smp_processor_id() will be useful.
+>
+> 3. Carry the unsupported CPU ID information in a new field in struct
+> kvm_vcpu_arch.
+>
+> I honestly don't have a preference. Maybe slightly towards solution number
+> 2, as it makes the code symmetrical and removes the subtletly around when
+> the VCPU flag is cleared. But this would be done at the expense of
+> userspace possibly finding out a lot later (or never) that something went
+> wrong.
+>
+> Thoughts?
+
+IMHO, I would prefer 2, which is symmetrical and straightforward,
+out of those three options.  Unless KVM checks the thread's CPU
+affinity, userspace possibly finds that out a lot later anyway.
+
+BTW, kvm_vcpu_pmu_restore_guest/kvm_vcpu_pmu_restore_host, which
+are (indirectly) called from vcpu_load/vcpu_put, seems to attempt
+to read/writes pmccfiltr_el0, which is present only when FEAT_PMUv3
+is implemented, even if the current CPU does not support FEAT_PMUv3.
+
+Thanks,
+Reiji
+
+
+>
+> > +                     ret = 0;
+> > +                     preempt_enable();
+> > +                     break;
+> > +             }
+> > +
+> >               kvm_pmu_flush_hwstate(vcpu);
+> >
+> >               local_irq_disable();
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index 618138c5f792..471fe0f734ed 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -954,6 +954,7 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+> >               arm_pmu = entry->arm_pmu;
+> >               if (arm_pmu->pmu.type == pmu_id) {
+> >                       kvm_pmu->arm_pmu = arm_pmu;
+> > +                     cpumask_copy(vcpu->arch.supported_cpus, &arm_pmu->supported_cpus);
+> >                       ret = 0;
+> >                       goto out_unlock;
+> >               }
+> > --
+> > 2.34.1
+> >
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
