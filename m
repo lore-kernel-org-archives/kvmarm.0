@@ -2,75 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C277C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 08:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF3BC433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 09:51:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB0C74B11C;
-	Wed,  8 Dec 2021 03:05:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC6064B0F7;
+	Wed,  8 Dec 2021 04:51:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O8xSgP8SHSyi; Wed,  8 Dec 2021 03:05:22 -0500 (EST)
+	with ESMTP id XYdE0-33bemV; Wed,  8 Dec 2021 04:51:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34C624B10A;
-	Wed,  8 Dec 2021 03:05:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 419CB4B106;
+	Wed,  8 Dec 2021 04:51:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F339C4B0E6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 03:05:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CC7D4B08B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 04:51:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DeGwT-ekjjqP for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 03:05:19 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85DDE4B099
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 03:05:19 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id C865DB81FDB;
- Wed,  8 Dec 2021 08:05:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96C26C00446;
- Wed,  8 Dec 2021 08:05:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1638950716;
- bh=KiAE85J9E4RUuyics28Az+nBcidehxYeo/Lbw+wpMQY=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=ObTiW/Vz3YU9qpZmKY/k1mWzpvBI5obIV7BpJjWxDrGUTLpu2T7uPxOJDOrKQwOa4
- tnbDOPwipMkj/0NJu6iKdUlQtW6QU+UkQftQsaCulBsbB0NVcVQH5iz8AtqMkO4s3C
- Fp3s4Fd1ukqWEahHrvBJ8gZ9l5Uzg2Bd+vAr/N6u/kFr8mn+ndy+zfed/bbI2IKoh4
- eoafLHuTBkbaIcFmuNoww57QAcvX//nC/h2lbkHLHrr+DZeS7mKQs2TTn006OJQygL
- ZIm6bTdyjYmoPlnSabfELxY9TyO5fq9wBAyN1JMHt6DFktdWQOQKfVTMfDdzLkyDfU
- mLScl4bVfhjMw==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1murww-00AiF1-Mq; Wed, 08 Dec 2021 08:05:14 +0000
+ with ESMTP id Zee11zOiyMGr for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 04:51:37 -0500 (EST)
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com
+ [209.85.221.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 434494B0B3
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 04:51:37 -0500 (EST)
+Received: by mail-wr1-f44.google.com with SMTP id q3so3046945wru.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 01:51:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=gldA+GhZIOtvn7+srlMnzCuMOvxYrv7KuJt8R9mUOr8=;
+ b=I5USUv0adWNsdFOcjZGJioG32G+/SMDOX9D0A47diifl3032llJ03dZ67rehpoLcCo
+ JjpPRT5bCYVQtH2wnYBwb221+dl1foyrCt+6Jp7wWFty3J06d2XkD5St37KRmlPjvn/s
+ CqYzhyYp9D9nLG6dGbT8Nol8FixWbpt2QLUih88qo78XOqHxkHpPHLSHaGJITiNzabyx
+ F0nmTWFLUYlFNarepQzJirszXMLPerNtjhhGrzZET76OPBMZHuFZb+23iGyq9HG7ZByR
+ s5kL1etsmKS5plFGaEYrteLeuZEd1mr51zyRoE4O2aPaeoRR8l83W/96SxpJR4JrBExi
+ u17g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=gldA+GhZIOtvn7+srlMnzCuMOvxYrv7KuJt8R9mUOr8=;
+ b=C2ckcHN3UtAd8JvlOZzFHwFrfncsEzZMpnI8VGdqBsJV5sMKfhSi2QR44Hl8ZAMYbc
+ hKkFaibaHzY0AphRjkSw7jksMvSXJV/KgHmw9BiQ1boFDds8bQ+TxQ/wve3SGZrFxaGo
+ 2fquLcCERGu3mNqgkSNm+3uh1ndXOWV3yGHU8o9mpMyTMy4vtVhY5SwT1Pt7apXL11Nu
+ /RckBxCOxThhOi9oiFkgxt7iLuYMPXSDtmANDm5dlUEWjC09OwVy54ang3xkaYDxwgRj
+ vENS098mO+IyJqZCwhLHCrZeo6x0VZkDeGmbDjdmrOUA51WWuCiy9ODTWT4u5iv8Jc+W
+ cPcw==
+X-Gm-Message-State: AOAM533S0WFisTUI8bJgKg2U+i67nXNWAd/eOeeDIQcsHNyzkdaTZ+qE
+ W6kkmu7Ppdi6mhVOw9tZS5zO4g==
+X-Google-Smtp-Source: ABdhPJxaWkQKHRy5eAGnuxAI4kVzboOgvmSfrlkZLSE9/5OHNPgsC5xZJ2qp6NyzrRB0QnSt+lERWg==
+X-Received: by 2002:a5d:4312:: with SMTP id h18mr58432938wrq.626.1638957095995; 
+ Wed, 08 Dec 2021 01:51:35 -0800 (PST)
+Received: from google.com ([2a00:79e0:d:210:27b8:d9b2:cac1:a973])
+ by smtp.gmail.com with ESMTPSA id d15sm2940100wri.50.2021.12.08.01.51.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 08 Dec 2021 01:51:35 -0800 (PST)
+Date: Wed, 8 Dec 2021 09:51:33 +0000
+From: Quentin Perret <qperret@google.com>
+To: Andrew Walbran <qwandor@google.com>
+Subject: Re: [PATCH v3 06/15] KVM: arm64: Implement kvm_pgtable_hyp_unmap()
+ at EL2
+Message-ID: <YbCAJZAqUXngvjZ2@google.com>
+References: <20211201170411.1561936-1-qperret@google.com>
+ <20211201170411.1561936-7-qperret@google.com>
+ <CA+_y_2EEP5tYbBTd17c1wuOeZ2jSfhgu0M2b=CpGKjKRgU-=gw@mail.gmail.com>
 MIME-Version: 1.0
-Date: Wed, 08 Dec 2021 08:05:14 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v2 0/4] KVM: arm64: Improve PMU support on heterogeneous
- systems
-In-Reply-To: <CAAeT=FygprcS3YxbVaW+4yUjHBm8=MxZ+j4_iVjq7ie-ppRKRg@mail.gmail.com>
-References: <20211206170223.309789-1-alexandru.elisei@arm.com>
- <CAAeT=FygprcS3YxbVaW+4yUjHBm8=MxZ+j4_iVjq7ie-ppRKRg@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.12
-Message-ID: <addac215bddf0b86bf6850093d500785@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: reijiw@google.com, alexandru.elisei@arm.com,
- james.morse@arm.com, suzuki.poulose@arm.com, will@kernel.org,
- mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, tglx@linutronix.de, mingo@redhat.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: will@kernel.org, mingo@redhat.com, tglx@linutronix.de,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <CA+_y_2EEP5tYbBTd17c1wuOeZ2jSfhgu0M2b=CpGKjKRgU-=gw@mail.gmail.com>
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,77 +87,69 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Reji,
+Hi Andrew,
 
-On 2021-12-08 02:36, Reiji Watanabe wrote:
-> Hi Alex,
+On Tuesday 07 Dec 2021 at 14:47:14 (+0000), Andrew Walbran wrote:
+> On Wed, 1 Dec 2021 at 17:04, 'Quentin Perret' via kernel-team
+> <kernel-team@android.com> wrote:
+> >
+> > From: Will Deacon <will@kernel.org>
+> >
+> > Implement kvm_pgtable_hyp_unmap() which can be used to remove hypervisor
+> > stage-1 mappings at EL2.
+> >
+> > Signed-off-by: Will Deacon <will@kernel.org>
+> > Signed-off-by: Quentin Perret <qperret@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_pgtable.h | 21 ++++++++++
+> >  arch/arm64/kvm/hyp/pgtable.c         | 63 ++++++++++++++++++++++++++++
+> >  2 files changed, 84 insertions(+)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
+> > index 027783829584..9d076f36401d 100644
+> > --- a/arch/arm64/include/asm/kvm_pgtable.h
+> > +++ b/arch/arm64/include/asm/kvm_pgtable.h
+> > @@ -251,6 +251,27 @@ void kvm_pgtable_hyp_destroy(struct kvm_pgtable *pgt);
+> >  int kvm_pgtable_hyp_map(struct kvm_pgtable *pgt, u64 addr, u64 size, u64 phys,
+> >                         enum kvm_pgtable_prot prot);
+> >
+> > +/**
+> > + * kvm_pgtable_hyp_unmap() - Remove a mapping from a hypervisor stage-1 page-table.
+> > + * @pgt:       Page-table structure initialised by kvm_pgtable_hyp_init().
+> > + * @addr:      Virtual address from which to remove the mapping.
+> > + * @size:      Size of the mapping.
+> > + *
+> > + * The offset of @addr within a page is ignored, @size is rounded-up to
+> > + * the next page boundary and @phys is rounded-down to the previous page
+> > + * boundary.
+> > + *
+> > + * TLB invalidation is performed for each page-table entry cleared during the
+> > + * unmapping operation and the reference count for the page-table page
+> > + * containing the cleared entry is decremented, with unreferenced pages being
+> > + * freed. The unmapping operation will stop early if it encounters either an
+> > + * invalid page-table entry or a valid block mapping which maps beyond the range
+> > + * being unmapped.
 > 
-> On Mon, Dec 6, 2021 at 9:02 AM Alexandru Elisei
-> <alexandru.elisei@arm.com> wrote:
->> 
->> (CC'ing Peter Maydell in case this might be of interest to qemu)
->> 
->> The series can be found on a branch at [1], and the kvmtool support at 
->> [2].
->> The kvmtool patches are also on the mailing list [3] and haven't 
->> changed
->> since v1.
->> 
->> Detailed explanation of the issue and symptoms that the patches 
->> attempt to
->> correct can be found in the cover letter for v1 [4].
->> 
->> A brief summary of the problem is that on heterogeneous systems KVM 
->> will
->> always use the same PMU for creating the VCPU events for *all* VCPUs
->> regardless of the physical CPU on which the VCPU is running, leading 
->> to
->> events suddenly stopping and resuming in the guest as the VCPU thread 
->> gets
->> migrated across different CPUs.
->> 
->> This series proposes to fix this behaviour by allowing the user to 
->> specify
->> which physical PMU is used when creating the VCPU events needed for 
->> guest
->> PMU emulation. When the PMU is set, KVM will refuse to the VCPU on a
->> physical which is not part of the supported CPUs for the specified 
->> PMU.
-> 
-> Just to confirm, this series provides an API for userspace to request
-> KVM to detect a wrong affinity setting due to a userspace bug so that
-> userspace can get an error at KVM_RUN instead of leading to events
-> suddenly stopping, correct ?
+> How is the caller expected to break up the block mapping? Why not
+> handle that within this function?
 
-More than that, it allows userspace to select which PMU will be used
-for their guest. The affinity setting is a byproduct of the PMU's own
-affinity.
+We don't really use block mappings for the hyp stage-1, since pretty
+much forever (see the loop in pkvm_create_mappings_locked() for ex), so
+handling it here would be somewhat unnecessary complexity. Handling this
+in the pgtable code itself (which I assume would mean proactively
+re-mapping the rest of the range with page-granularity mappings or
+something along those lines) is tricky because of BBM and concurrency,
+so I'd rather avoid handling same-level aborts at EL2 and all that mess
+unless we have a good reason. Is there a use-case where you think that'd
+be needed?
 
-> 
->> The default behaviour stays the same - without userspace setting the 
->> PMU,
->> events will stop counting if the VCPU is scheduled on the wrong CPU.
-> 
-> Can't we fix the default behavior (in addition to the current fix) ?
-> (Do we need to maintain the default behavior ??)
-
-Of course we do. This is a behaviour that has been exposed to userspace
-for years, and *we don't break userspace*.
-
-> IMHO I feel it is better to prevent userspace from configuring PMU
-> for guests on such heterogeneous systems rather than leading to
-> events suddenly stopping even as the default behavior.
-
-People running KVM on asymmetric systems *strongly* disagree with you.
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Cheers,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
