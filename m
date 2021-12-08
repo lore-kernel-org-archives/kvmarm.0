@@ -2,67 +2,67 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB22C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 19:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656F9C433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  8 Dec 2021 19:33:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FABF4B10B;
-	Wed,  8 Dec 2021 14:28:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C71674B10E;
+	Wed,  8 Dec 2021 14:33:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7xd-paTgQqDH; Wed,  8 Dec 2021 14:28:16 -0500 (EST)
+	with ESMTP id 4rLJCCcdXBrF; Wed,  8 Dec 2021 14:33:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B0884B125;
-	Wed,  8 Dec 2021 14:28:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9711406E0;
+	Wed,  8 Dec 2021 14:33:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3910D4B10B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:28:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD77E4B10B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:33:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TkxT6fzYR0Yp for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Dec 2021 14:28:13 -0500 (EST)
+ with ESMTP id s+QmJyNFHmsY for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Dec 2021 14:33:01 -0500 (EST)
 Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
  [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2A2C4B090
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:28:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D99BE406E0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Dec 2021 14:33:00 -0500 (EST)
 Received: by mail-wm1-f73.google.com with SMTP id
- l4-20020a05600c1d0400b00332f47a0fa3so1721428wms.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 11:28:12 -0800 (PST)
+ g11-20020a1c200b000000b003320d092d08so1788177wmg.9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 08 Dec 2021 11:33:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:message-id:mime-version:subject:from:to:cc;
- bh=uFbTewYPIohmdOsJ5vp7sbi30zzOHewDKLeIlU197Fo=;
- b=I1qKv+eLPwQiFUQsEh47h7AKXKrOT2s/kYR/89wlawfCEiq+pk5dVVroGUDsXWQM3b
- /lbe2jTw50DrUPzbTOE3V0rfcGKrDRpwbBCHwUnFn/vilaBcBYl1dJxl0U9fkx86Ri4T
- qPrGyT5K6b+5O79W4p6HV2MqhpU5kO9bkuuuHMiJYzrmJstvtGH4gPRTSFWj6fkFvnGJ
- 8donjBNUIx+cbaSPZccQGQ93QnFvmP19Zvb62QRKgRZ+C1ADEYPtwOXOu3XYZ7komjK+
- FDbju9NmaBaMr9a0T6zy6knSoUcNNYjyAPHy/Zw2LLklIfMYXqrYmPbihkwSM8zVp0xv
- Znnw==
+ bh=9Ozq1E9fW4dW9xlif6PxBzdPpjCT1vbETE8Iafrn13o=;
+ b=ltGFmUPDJi8nIt/HfOa4aeS+LltkLsQ/Qmhh0JtVpvH2eI2Y/Usq0N1+yWxN6iTRtc
+ YLbIFlRzjVQfSM42KSbkDf/j7nSzEax58K8Wm8dxQDx+K/ihjlkd73jbPEDGw3vdFY7R
+ adLHmxSD8o6DcMcVS2DWSzxuhJrT3PyVjCaUv/VgasXsfH5nCq9rd6OOXMec251pvkv9
+ l21HtfSzvyoS4jsNOzrKT2iZz5B+muahrFsy+Sg/hjvcKywIHwnhcAVhQugZSv1BnMEk
+ 9aLaooOt5gdcUpd4f+zEDIWAYDKbHLYRZvQsUwMAYe3sAXra92BpDmylQf7Amcc/EkE4
+ Vbdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=uFbTewYPIohmdOsJ5vp7sbi30zzOHewDKLeIlU197Fo=;
- b=dRIn6jcsyRqH2dFuG+gXMCNmSSzlTh/IyGuSPXUM7DxG233tlwXykIBL0WUAFjuPm7
- tssY9iz8iYBu78Z3HjtCXZupyidS0w/wHDQqnBp2w6XSmFilPODR205bz0wIjpkO9oqO
- 3Yz4f/kV795563Y3jg7hPOOyd7e721r4GUS3lw7DRdIhin1/L41uXS5IOHqUOjmQngUU
- ilYoDYu+hTXus8KzgDaUeazdn84rRVWn1H2rsVJ5bsFV8QYwgHfqcQIOuSkw8xZauayP
- a6wzo4Pwhw7qzJZePfnI8mTPIV2+/rK0jSuBm3AKiuwEU3nOpzYDlL0/WLGhyGLEJ/Wi
- 1sow==
-X-Gm-Message-State: AOAM530bmaWMeCseLj/6vo5/49Gr2apDSevXCOfYhPG4loQTL7hjoU5E
- 4RPagYuFd/87+5he3czBaV8NpMwKAKlffYluJd60RJuuMFy07ep9GEWBorbB/rDL5md0aqWUZCI
- oyQffZYOh6+5Wm1v0LbaoMAm2Jpb8SU7QXtSiQVEV4Gp43kK0FqmQvtlwNUU94kztUys=
-X-Google-Smtp-Source: ABdhPJxczzY7Z1F5bpB61l4SwAYHgac34yybGImOr/h5YO8e2u/axy2wxHlHoBGPlesTVvlL30qroA3ddg==
+ bh=9Ozq1E9fW4dW9xlif6PxBzdPpjCT1vbETE8Iafrn13o=;
+ b=0LMX38LVLSXPWO2r0JLDf9XUGylDNP2zWqgDo6nrgjiNiEmSBMX0jyE11qjja5IOEV
+ LsuYy2A0Dnx2lzSIdhwtQCocEGQ0FOoqCBb3YYFs7j/BZuJPOOaFgDfVjswRTHgHmJ3k
+ KSKQPflD4bFWLvDylPzQbUeTL1isFRN0bAOHdxx/IvRMI2HkrmntFe7GtRe8T3iHLYva
+ 1DKPtNNFOzQgwRfZ0ov/12pEluXQyFJhtuAlZsRx7OusoJRzYFeES9iuL7vEsJXpRUqz
+ vfuMw7+dFBCmrGMG5/VNZ7RTo5//Qb+IWrQwBzU2WNcPH4LhMF4TE2gI0CY8RLsqNLaH
+ gEXQ==
+X-Gm-Message-State: AOAM532m/lf9tRkjVwxQoRSttjJ3SGCSqLrefGK7YZE91dlI+Eh9lzYg
+ uh6rLBOi0ZosUogjitk+Fg80XYs9/GaQXRcWFfZmKIqFSl9/0YHAugkEfE/KJWjTTdQYDy4+WFN
+ 5dC0d40j0VGwbn2Jckfa8K1VtyEh7m2aQY7oFIlggeByh+xchTLu6Ey0RerMitjaHfk0=
+X-Google-Smtp-Source: ABdhPJztwn2ZlVWldgEFMPn5nNzizlDmJ5/EF57npKfjLcR9AnY03w4lpd55TC3bPR5Y3DjvvNRX0vRxOw==
 X-Received: from tabba.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:482])
- (user=tabba job=sendgmr) by 2002:a5d:46d0:: with SMTP id
- g16mr710895wrs.605.1638991691851; 
- Wed, 08 Dec 2021 11:28:11 -0800 (PST)
-Date: Wed,  8 Dec 2021 19:28:10 +0000
-Message-Id: <20211208192810.657360-1-tabba@google.com>
+ (user=tabba job=sendgmr) by 2002:adf:f44c:: with SMTP id
+ f12mr764093wrp.620.1638991979739; 
+ Wed, 08 Dec 2021 11:32:59 -0800 (PST)
+Date: Wed,  8 Dec 2021 19:32:55 +0000
+Message-Id: <20211208193257.667613-1-tabba@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH] KVM: arm64: Use defined value for SCTLR_ELx_EE
+Subject: [PATCH 0/2] KVM: arm64: Fix documentation for PSCI related functions
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, maz@kernel.org, will@kernel.org
@@ -82,28 +82,24 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Replace the hardcoded value with the existing definition.
+Hi,
 
-No functional change intended.
+This patch series fixes a couple of comments relating to PSCI and the reset
+state that are either typos, or refer to an earlier version of the code.
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/include/asm/kvm_emulate.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks,
+/fuad
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index f4871e47b2d0..cd5fd9b92b04 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -386,7 +386,7 @@ static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
- 		*vcpu_cpsr(vcpu) |= PSR_AA32_E_BIT;
- 	} else {
- 		u64 sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
--		sctlr |= (1 << 25);
-+		sctlr |= SCTLR_ELx_EE;
- 		vcpu_write_sys_reg(vcpu, sctlr, SCTLR_EL1);
- 	}
- }
+Fuad Tabba (2):
+  KVM: arm64: Fix comment for kvm_reset_vcpu()
+  KVM: arm64: Fix comment on barrier in kvm_psci_vcpu_on()
+
+ arch/arm64/kvm/psci.c  | 2 +-
+ arch/arm64/kvm/reset.c | 7 +++----
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+
+
+base-commit: 1f80d15020d7f130194821feb1432b67648c632d
 -- 
 2.34.1.400.ga245620fadb-goog
 
