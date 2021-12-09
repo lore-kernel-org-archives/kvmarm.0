@@ -2,56 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E8B6C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 12:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ABC0C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 12:21:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B78F4B212;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8854F4B205;
 	Fri, 10 Dec 2021 07:21:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id STHq53Tnp3hE; Fri, 10 Dec 2021 07:21:25 -0500 (EST)
+	with ESMTP id uyxcL2-QAUNt; Fri, 10 Dec 2021 07:21:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE3E04B206;
-	Fri, 10 Dec 2021 07:21:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05E6B4B220;
+	Fri, 10 Dec 2021 07:21:24 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F3904B0FB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 15:41:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B76E04B0FB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 17:39:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id H7lfTeHDfNbk for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Dec 2021 15:41:39 -0500 (EST)
+ with ESMTP id KnkXwLIo7hgy for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Dec 2021 17:39:13 -0500 (EST)
 Received: from bombadil.infradead.org (bombadil.infradead.org
  [198.137.202.133])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 815E8405A6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 15:41:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 642FB49FB7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 17:39:13 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
  In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
  Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=uSyJMaW/SvNLnUFnRFZXYo5bhsJ8p/CGtudZrQrj4OQ=; b=qLim/VmXvC7vp7q71i6566MgaE
- iEGThHcNVJgT9xg0Lx3nWKF+fjIm0NwTy4faSGUnkCTBSzTsAVQ1MoYDN0vuni8YbD++MjZSWy9ZH
- znm3vR0hVxSINhDva+MZb3FUGrWNlO7JGMTX3yK+eTwhpE5ltt+I0ifJBvSIrnp1IwbuZhBLXwlJV
- SVR1OwtMg/ugxmR0B3OK7X0m3n3FEK60MCpLiOtluztVKtjgkLyRGfZnh3ElZ0b8KqKWPLGeueDUQ
- 4tBejdGK2z8jgnaRkUsA1LVE96cBD/CIkPWvwoGb+Lg40YIsaNZ2QurShEWh1q16Z4vGjUysRoVwd
- oZpm4SeQ==;
+ bh=1XD47nKd5JrKMzF7ad+2vDLazEFKUf/AxGgSUDMOgJw=; b=sqj0bme+LInUeBJ9fK7uLfIp0F
+ dGBHkbhCOK9ei+M9oOfU70qCe4VXetbmt5xdLCLLNmluj9S00J13Eq4BbhgHouyB3iqTpoY8keVr/
+ /FtQW0keyd5/7xqf84q2gRfeDlet0HWa94nAXmqF/685Epp/EhL9xCeUr59PYZO2EEMKkRo0V7LOi
+ pu/9sX7DbKbyyq64Hwz3cBIKdhzomp6nka9AT6r9Hp0BLQ2G133XjB9dswcSpJtmV6xaTeGVXphWm
+ ng/QF1MdMVX19W1b1AYVEsWRWPoqm8j/wkc+ykYiduuVGfjZY18umBf5391E0U2YP/nCJYTFakA07
+ XJm9kgeA==;
 Received: from 54-240-197-234.amazon.com ([54.240.197.234]
  helo=freeip.amazon.com)
  by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1mvQDn-00HVUV-CH; Thu, 09 Dec 2021 20:40:55 +0000
-Message-ID: <b614d9ae0fe7910cfa72eee0b4077776f8012e5f.camel@infradead.org>
+ id 1mvS3f-000Ifl-TY; Thu, 09 Dec 2021 22:38:36 +0000
+Message-ID: <0a4632fc06af0947c272a9e843e994b2be1bb888.camel@infradead.org>
 Subject: Re: [PATCH v5 08/12] KVM: Reinstate gfn_to_pfn_cache with
  invalidation support
 From: David Woodhouse <dwmw2@infradead.org>
 To: Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Date: Thu, 09 Dec 2021 20:40:48 +0000
-In-Reply-To: <b1bacc6f-be56-4108-6e52-4315a021184b@redhat.com>
+Date: Thu, 09 Dec 2021 22:38:29 +0000
+In-Reply-To: <6cb2cd57-16f3-d0ec-adf6-cb8fdcbae035@redhat.com>
 References: <20211121125451.9489-1-dwmw2@infradead.org>
  <20211121125451.9489-9-dwmw2@infradead.org>
  <b1bacc6f-be56-4108-6e52-4315a021184b@redhat.com>
+ <b614d9ae0fe7910cfa72eee0b4077776f8012e5f.camel@infradead.org>
+ <6cb2cd57-16f3-d0ec-adf6-cb8fdcbae035@redhat.com>
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by
@@ -85,144 +87,37 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============3781469201669956127=="
+Content-Type: multipart/mixed; boundary="===============2712489763783368049=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---===============3781469201669956127==
+--===============2712489763783368049==
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-tGdrPlP/CxoRpyQj0J8H"
+	boundary="=-vGfMoYqdSfMCtPherYOa"
 
 
---=-tGdrPlP/CxoRpyQj0J8H
+--=-vGfMoYqdSfMCtPherYOa
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2021-12-09 at 19:34 +0100, Paolo Bonzini wrote:
-> Sorry for the late review...
+On Thu, 2021-12-09 at 23:34 +0100, Paolo Bonzini wrote:
+> Compared to the review it's missing this hunk:
+>=20
+> @@ -265,7 +265,7 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, stru=
+ct gfn_to_pfn_cache *gpc)
+>=20
+>         gpc->valid =3D false;
+>=20
+> -       old_khva =3D gpc->khva;
+> +       old_khva =3D (void *)((unsigned long)gpc->khva & ~PAGE_MASK);
+>         old_dirty =3D gpc->dirty;
+>         old_gpa =3D gpc->gpa;
+>         old_pfn =3D gpc->pfn;
 
+Ah right, there were two of those. Will fix; thanks.
 
-NP, very useful fixes. Thanks. Incremental patch looks like this. It
-passes the xen_shinfo_test self-test; will test it with real Xen guests
-tomorrow and repost based on your kvm/next tree once it shows up.
-
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index d8c6e1d4a647..9e3c662f815f 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -124,6 +124,33 @@ static void __release_gpc(struct kvm *kvm, kvm_pfn_t p=
-fn, void *khva,
- 	}
- }
-=20
-+static kvm_pfn_t hva_to_pfn_retry(struct kvm *kvm, unsigned long uhva)
-+{
-+	unsigned long mmu_seq;
-+	kvm_pfn_t new_pfn;
-+	int retry;
-+
-+	do {
-+		mmu_seq =3D kvm->mmu_notifier_seq;
-+		smp_rmb();
-+
-+		/* We always request a writeable mapping */
-+		new_pfn =3D hva_to_pfn(uhva, false, NULL, true, NULL);
-+		if (is_error_noslot_pfn(new_pfn))
-+			break;
-+
-+		KVM_MMU_READ_LOCK(kvm);
-+		retry =3D mmu_notifier_retry_hva(kvm, mmu_seq, uhva);
-+		KVM_MMU_READ_UNLOCK(kvm);
-+		if (!retry)
-+			break;
-+
-+		cond_resched();
-+	} while (1);
-+
-+	return new_pfn;
-+}
-+
- int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache =
-*gpc,
- 				 gpa_t gpa, unsigned long len, bool dirty)
- {
-@@ -147,7 +174,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struc=
-t gfn_to_pfn_cache *gpc,
-=20
- 	old_gpa =3D gpc->gpa;
- 	old_pfn =3D gpc->pfn;
--	old_khva =3D gpc->khva;
-+	old_khva =3D (void *)((unsigned long)gpc->khva & ~PAGE_MASK);
- 	old_uhva =3D gpc->uhva;
- 	old_valid =3D gpc->valid;
- 	old_dirty =3D gpc->dirty;
-@@ -178,8 +205,6 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struc=
-t gfn_to_pfn_cache *gpc,
- 	if (!old_valid || old_uhva !=3D gpc->uhva) {
- 		unsigned long uhva =3D gpc->uhva;
- 		void *new_khva =3D NULL;
--		unsigned long mmu_seq;
--		int retry;
-=20
- 		/* Placeholders for "hva is valid but not yet mapped" */
- 		gpc->pfn =3D KVM_PFN_ERR_FAULT;
-@@ -188,28 +213,15 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, str=
-uct gfn_to_pfn_cache *gpc,
-=20
- 		write_unlock_irq(&gpc->lock);
-=20
--	retry_map:
--		mmu_seq =3D kvm->mmu_notifier_seq;
--		smp_rmb();
--
--		/* We always request a writeable mapping */
--		new_pfn =3D hva_to_pfn(uhva, false, NULL, true, NULL);
-+		new_pfn =3D hva_to_pfn_retry(kvm, uhva);
- 		if (is_error_noslot_pfn(new_pfn)) {
- 			ret =3D -EFAULT;
- 			goto map_done;
- 		}
-=20
--		KVM_MMU_READ_LOCK(kvm);
--		retry =3D mmu_notifier_retry_hva(kvm, mmu_seq, uhva);
--		KVM_MMU_READ_UNLOCK(kvm);
--		if (retry) {
--			cond_resched();
--			goto retry_map;
--		}
--
- 		if (gpc->kernel_map) {
- 			if (new_pfn =3D=3D old_pfn) {
--				new_khva =3D (void *)((unsigned long)old_khva - page_offset);
-+				new_khva =3D old_khva;
- 				old_pfn =3D KVM_PFN_ERR_FAULT;
- 				old_khva =3D NULL;
- 			} else if (pfn_valid(new_pfn)) {
-@@ -219,7 +231,9 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struc=
-t gfn_to_pfn_cache *gpc,
- 				new_khva =3D memremap(pfn_to_hpa(new_pfn), PAGE_SIZE, MEMREMAP_WB);
- #endif
- 			}
--			if (!new_khva)
-+			if (new_khva)
-+				new_khva +=3D page_offset;
-+			else
- 				ret =3D -EFAULT;
- 		}
-=20
-@@ -232,7 +246,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struc=
-t gfn_to_pfn_cache *gpc,
- 		} else {
- 			/* At this point, gpc->valid may already have been cleared */
- 			gpc->pfn =3D new_pfn;
--			gpc->khva =3D new_khva + page_offset;
-+			gpc->khva =3D new_khva;
- 		}
- 	} else {
- 		/* If the HVA=E2=86=92PFN mapping was already valid, don't unmap it. */
-
---=-tGdrPlP/CxoRpyQj0J8H
+--=-vGfMoYqdSfMCtPherYOa
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -305,25 +200,25 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MjA5MjA0MDQ4WjAvBgkqhkiG9w0BCQQxIgQgNKR+2FqdFvuYYS5QlSdWvFjgvLdXA/Zk2SF3Qw/T
-GQIwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjA5MjIzODI5WjAvBgkqhkiG9w0BCQQxIgQg9QgH7ySvKE8MIz4556T7BjzBwmblfnbugyql9xpt
+pHowgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBALE2mhhxIH4wj9n5zA1zicXIStKsDJdtlfqqWxmNgfPaTJCXNfnffCKDw9bUMFnM
-bpypluAGM6E9cdxUq18ztElwau4NSqTaI5bgDfcUv8dDORzxSsFTc3jpEcLSrRAYXmaS6z1+XfxL
-Imc8mWmfyAUJJPxA+kkubrUYpPZw5lwnlyFWRhf4rZliWJso7cE2I0AOLCPW+sgrPzP1l8lnyEia
-4O1Af8HmlfeHECLYqpYwcSzJpRQMf42a7f2iIzxa+2tTNN74Eo3NsygW/XhxWnnjqTCfRdqY+GgZ
-ZNUTvjeV5u3iFGEOPPDfIW3I1QQCld+3VIRi73d0iGGsBQzzQRgAAAAAAAA=
+DQEBAQUABIIBAJTe2Hv03fD1PmUwQiwXOVLXC54c1mmzrGLVVAaix4oQ5oGjc4m0IyYYkGzKXa2Y
+ix3KpMPUd6IjMykSkvb360FZ2GKGw3VOaC1GqSUfJQp6fRl5IXoRYXRE6nXSfmxJd+DvvN1V+9zL
+eKRZ9dNaYrmYLwmK89tNp6/LaL5/HHMjeQqgtLH5s6MwoIcAqYhVKbLN5c547DxTuwHeRzc2LAAr
+BSG9s2SJ4eCPpDxnhgNT9HbZGXQB6op8S1/AtxlTXggSeIfCDw/656t1XOFVnX8JePwnB96EXNdf
+LKrRwxe8iDQFofYuSIRAB/riihIyXUpxlx26w65IdlIPXjjF1TgAAAAAAAA=
 
 
---=-tGdrPlP/CxoRpyQj0J8H--
+--=-vGfMoYqdSfMCtPherYOa--
 
 
---===============3781469201669956127==
+--===============2712489763783368049==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -334,5 +229,5 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============3781469201669956127==--
+--===============2712489763783368049==--
 
