@@ -2,80 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA217C433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  9 Dec 2021 17:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 409B8C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  9 Dec 2021 18:07:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB824B128;
-	Thu,  9 Dec 2021 12:59:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9934B4A531;
+	Thu,  9 Dec 2021 13:07:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qCv-2Ik6TIR4; Thu,  9 Dec 2021 12:59:52 -0500 (EST)
+	with ESMTP id 4hWM42l3nmIP; Thu,  9 Dec 2021 13:07:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4D4F4B0B9;
-	Thu,  9 Dec 2021 12:59:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 965684B0B9;
+	Thu,  9 Dec 2021 13:07:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF2544B0B9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 12:59:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 565B0402DB
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 13:07:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8OFFKHpCSxjz for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Dec 2021 12:59:49 -0500 (EST)
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com
- [209.85.208.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 177E640256
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 12:59:49 -0500 (EST)
-Received: by mail-ed1-f54.google.com with SMTP id o20so22416778eds.10
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Dec 2021 09:59:49 -0800 (PST)
+ with ESMTP id uZSIvSLHi3Yh for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Dec 2021 13:07:07 -0500 (EST)
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com
+ [209.85.208.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58F7B40162
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 13:07:07 -0500 (EST)
+Received: by mail-ed1-f49.google.com with SMTP id v1so22499859edx.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Dec 2021 10:07:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
  h=sender:message-id:date:mime-version:user-agent:subject
  :content-language:to:cc:references:from:in-reply-to
  :content-transfer-encoding;
- bh=Al9kg2F9KDqFvq3nxTcebEIzKXlYK2ZMwKvTrLWHJ6E=;
- b=AfxDwo47UvGMhAdm6Rw/BtUIa4RRpUznlxWNvCDi2EwKzRCRrPvpJmh+M2nKrIHif6
- RpHyhRpE97GWx32ojsr+vOQSd5ecRefy6O6Vid8OcOd0+D4p0Q2SoCBgR3rrAmmKahlA
- aUl3wft7sP5QEuN7iSZhH5rkRKaVK1peWM2Os+UDkvDQn533w9x1rcBKjnT9Nokfcqta
- Nef0h+w0lhpcQqN0kBurWFGd8S50Mwadf5HiHCGvZWYCzfgJ7NBAmJnNi6ZglYeTn5YH
- YVCRHEqPF2Ka7FDT6tHNM5M/dGc0icYZIyOfod4j1semrTFhGJ0HeqkSr+p8VomRXS/o
- 2VaA==
+ bh=/BR1/2RGDScqGY9eUb2OeC+8FFb2k7htqUCGVYcL9Ck=;
+ b=Lhbpmm1UKqlpxT/ebiO1Bba267s4bE94yh07WOHh4nJeWCnmE8+23Eg5C12Rhgfpsc
+ 0I4D6URfKKEqBAzSviybZHxAOPOACMyExokRlTYNq44nDkWCuzRtqrXLPqBLh0Q1MX+o
+ Jtx1lpBHXhEr3ddLKS6N/SSGxs76Q2vWnWxLnCwJZn1OqNjqHCU0mb7ID9NFK1G/sQ7f
+ QnXai4TvqSPLltPU5wh6tLAcP4ybsTybXo1I146LDMPVWG7M5ZooS0wo6QoJtRF//8Lt
+ 64rO/CTBMU0ZFk+JY57EO2EnzjUHgznePMSl5XKLuc96fG3MU0lOVX14FEeAcqzIaDIb
+ CLtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
  :subject:content-language:to:cc:references:from:in-reply-to
  :content-transfer-encoding;
- bh=Al9kg2F9KDqFvq3nxTcebEIzKXlYK2ZMwKvTrLWHJ6E=;
- b=tuqpqlsHAUqFesmTTxEqhmvdHPnotLRyGFnkiJuqmeUEaoCX/l1wC77qI2TAQGzJkx
- j2pSvHVLQpCk2lJxQ13p7NqjijE+eTFOByP2I3vGTn31nKitWhnZXxK55pp6upvCaVb8
- 9kvTJQtRHOpZ3c3yTqA2ELAXQmSnTyIsUzqoa17CmrtEeDH5BgGWjCcHYLWi1hDGv1y8
- Kw3LfrpAbcKJNN/TjxqF41oO7jWFWLAolMt064xeR3k0K0q3M3y5fRFQSwBhr+ERlpm8
- 5WM40+4/LSenGDJRyM14ILMhlUN8A98xu9nZRwtszshbItrV7yIEnvh+pNFXVXmG0eJO
- tOJA==
-X-Gm-Message-State: AOAM530qqwLdvHjdV8YcNgskIfIvsm1mUNhSaHL/HhlDgyZqXj+DzIA9
- /1+7HF7yI+rsOcQ5KilsJ6Q=
-X-Google-Smtp-Source: ABdhPJxaGNq1VOGmKW6I6GM+NsKqxWNzc1RuAQMRjvuCk3KwBPxNP9Ur2NQtkE54kPDyjrnXzFPGaA==
-X-Received: by 2002:a17:906:7315:: with SMTP id
- di21mr14270348ejc.193.1639072703169; 
- Thu, 09 Dec 2021 09:58:23 -0800 (PST)
+ bh=/BR1/2RGDScqGY9eUb2OeC+8FFb2k7htqUCGVYcL9Ck=;
+ b=01uLv37c9grLYnG/BQM+bHiUzpSUnyLBYPj3z7aQEaTlANcvA9x/b1+eTBDRjDOVBp
+ oTLPDgWVnl9t0/KGMEPFjuFvOJRM+WXkAUnVQ9Y7QXmY+KNn5e8FQWRCcTMakql8bo8l
+ JDvbuTkmKtuS/cl94cexjJHf8Kg24Z1RcIVBLB3StCUCj6hKiIy29crqO4KHIPVcrFxx
+ uALTqTZ7KkDQnSFhehILuTj2vIhQzhbnhzV+x1XzJpLkIBIziZ7O9UNRir8NSyp4HhSU
+ qDzv23OUjR31DoUy9SAJVOBoMV65aMSCEpJd5yh2FIT5Magxey0bpx5H9s77vNgbPT6G
+ i8ug==
+X-Gm-Message-State: AOAM531rSn6Zcqfse8NcS44ANqux0GP/6cFtLpHqNScArwn2V6sXOUQj
+ D1IMgYeHvQK6mnlttUkoiFk=
+X-Google-Smtp-Source: ABdhPJyCcY7SoPv6aHO9XYFGu1O783sL+OxwRl4LzsOaKHe6HzGM6Aj5sR6vgOMnSD+1083Jrn4srQ==
+X-Received: by 2002:a05:6402:d05:: with SMTP id
+ eb5mr31407913edb.360.1639073154112; 
+ Thu, 09 Dec 2021 10:05:54 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
  ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.googlemail.com with ESMTPSA id hs20sm259690ejc.26.2021.12.09.09.58.19
+ by smtp.googlemail.com with ESMTPSA id og38sm275399ejc.5.2021.12.09.10.05.49
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 09 Dec 2021 09:58:22 -0800 (PST)
-Message-ID: <5549294a-b411-1279-dcd0-3977c19c928e@redhat.com>
-Date: Thu, 9 Dec 2021 18:58:18 +0100
+ Thu, 09 Dec 2021 10:05:52 -0800 (PST)
+Message-ID: <048a1ef6-193a-eb82-0433-70c97e1a03e5@redhat.com>
+Date: Thu, 9 Dec 2021 19:05:48 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH v5 03/12] KVM: s390: Use Makefile.kvm for common files
+Subject: Re: [PATCH v5 06/12] KVM: powerpc: Use Makefile.kvm for common files
 Content-Language: en-US
 To: David Woodhouse <dwmw2@infradead.org>, kvm <kvm@vger.kernel.org>
 References: <20211121125451.9489-1-dwmw2@infradead.org>
- <20211121125451.9489-4-dwmw2@infradead.org>
+ <20211121125451.9489-7-dwmw2@infradead.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211121125451.9489-4-dwmw2@infradead.org>
+In-Reply-To: <20211121125451.9489-7-dwmw2@infradead.org>
 Cc: Anup Patel <anup.patel@wdc.com>,
  "wanpengli @ tencent . com" <wanpengli@tencent.com>,
  Catalin Marinas <catalin.marinas@arm.com>,
@@ -110,14 +110,49 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On 11/21/21 13:54, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> It's all fairly baroque but in the end, I don't think there's any reason
+> for $(KVM)/irqchip.o to have been handled differently, as they all end
+> up in $(kvm-y) in the end anyway, regardless of whether they get there
+> via $(common-objs-y) and the CPU-specific object lists.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+> ---
+>   arch/powerpc/kvm/Makefile | 6 +-----
+>   1 file changed, 1 insertion(+), 5 deletions(-)
+> 
+> diff --git a/arch/powerpc/kvm/Makefile b/arch/powerpc/kvm/Makefile
+> index 583c14ef596e..245f59118413 100644
+> --- a/arch/powerpc/kvm/Makefile
+> +++ b/arch/powerpc/kvm/Makefile
+> @@ -4,11 +4,8 @@
+>   #
 >   
-> -kvm-objs := $(common-objs) kvm-s390.o intercept.o interrupt.o priv.o sigp.o
-> +kvm-objs := kvm-s390.o intercept.o interrupt.o priv.o sigp.o
->   kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o
+>   ccflags-y := -Ivirt/kvm -Iarch/powerpc/kvm
+> -KVM := ../../../virt/kvm
+>   
+> -common-objs-y = $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
+> -common-objs-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
+> -common-objs-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
+> +include $(srctree)/virt/kvm/Makefile.kvm
+>   
+>   common-objs-y += powerpc.o emulate_loadstore.o
+>   obj-$(CONFIG_KVM_EXIT_TIMING) += timing.o
+> @@ -125,7 +122,6 @@ kvm-book3s_32-objs := \
+>   kvm-objs-$(CONFIG_KVM_BOOK3S_32) := $(kvm-book3s_32-objs)
+>   
+>   kvm-objs-$(CONFIG_KVM_MPIC) += mpic.o
+> -kvm-objs-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
+>   
+>   kvm-objs := $(kvm-objs-m) $(kvm-objs-y)
 
-"kvm-y +=" here (for both lines) would be nicer, it's consistent with 
-x86 and avoids the question of what happens if you have both kvm-objs 
-and kvm-y.
+Same here,
+
+kvm-y += $(kvm-objs-m) $(kvm-objs-y)
+
+would be slightly preferrable IMO.
 
 Paolo
 _______________________________________________
