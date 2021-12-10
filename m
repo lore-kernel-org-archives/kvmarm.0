@@ -2,77 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1888C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 14:37:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BFDFC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 14:49:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C2DC4B1C1;
-	Fri, 10 Dec 2021 09:37:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E69A4B1D1;
+	Fri, 10 Dec 2021 09:49:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9ouo017zs-dK; Fri, 10 Dec 2021 09:37:29 -0500 (EST)
+	with ESMTP id Ufj1H33wR1UP; Fri, 10 Dec 2021 09:49:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 083CA4B1D8;
-	Fri, 10 Dec 2021 09:37:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F18AF4B1E2;
+	Fri, 10 Dec 2021 09:49:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B60F44B1C1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 09:37:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 76D284B1D1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 09:48:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6B7IZUABpN6Y for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Dec 2021 09:37:26 -0500 (EST)
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com
- [209.85.128.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E1A34B16C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 09:37:26 -0500 (EST)
-Received: by mail-wm1-f41.google.com with SMTP id
- r9-20020a7bc089000000b00332f4abf43fso7307539wmh.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 06:37:26 -0800 (PST)
+ with ESMTP id H+a2bb97KWHT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Dec 2021 09:48:58 -0500 (EST)
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com
+ [209.85.221.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 104BE4B1C1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 09:48:58 -0500 (EST)
+Received: by mail-wr1-f53.google.com with SMTP id t18so15287636wrg.11
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 06:48:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=iT+nRlkqP8ujdkhR1yHcmqTSB9Hb9nBGvw1m1PwYrU4=;
- b=LJW+Qg/MN2vlQ4hC5d84O4HWpmjzzbl+hwt4dYAELPT880hHpRFAZikcPqMVDWcaW5
- JtAe4D8wz5kZWyjyAB/+4xUZrgpNpozYFtRRLLKkMoU6/EmouGTvY6FPkA77kQoyvs/v
- aFr3sL11apWy0rCQjdfNzXf7eDGBYaG1f36x9tlciYdd8W99tguVUtOddHdFZoXklmgR
- 9YEkIUxD3OWUv4I+T0ggbI7kTKXI2RtL7uOBPtbJhCb7AGimn/5ScmHknajg8CHl0fKD
- arVUYOpYX5UgcPQV8y9cCLcRZwdZQQrt5Sny0Bc2WwyHMnHoqBa3R++EnZ4LEG0SoY/p
- xrXw==
+ bh=XSGjwIt9RpPIjkr6liBZIwGzdNBMMcqErsUs7NKqs3g=;
+ b=eFa+/5A+zfMKqzOSVMBePCnsVCvDiruKqK0HXpczVW9xdUh2bI5XBpZykeV00eoyn0
+ Ps0U7SIG3EJbM2kI0skWEcTnH6lkua7grTJTjDqX4T8jIuSkNqfqNddprnKjZOHHCBOr
+ lAxx8avwGZkdKqJIhrNTAB+UHYQ2NTf1l05If80e5qPJhuhh8x/UU89YQ2EJiE8cor6K
+ O1TOpAxYAh0Omdk6QzNXX51mJBiVH5OGAK5U+h85oIkduoyeNxLMk7CK7/LlxQAb6DOz
+ 9IZqTT8YSfKXYrk4aMHLmYOXa1wCvpRvUVnfICn8/QIi6iSE6JjmwvPvYentz7mJzyTz
+ 084g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=iT+nRlkqP8ujdkhR1yHcmqTSB9Hb9nBGvw1m1PwYrU4=;
- b=XBIFI8HP348TyrOvTdo1wakpjiy9h2SjgNZBBd9pmTepli3f/Pi7RGXuStlzKOtz+s
- LMMyJxBif70PuWVqXzmCncbXhJOQ5URdtv8kLoK3Ul4a7Tb/8g8pCAGDxT13AWugpKJa
- ttrhTV89zFFyp6UmOOA/mNuwPOu39yPOjN/eDcT0pII8UuHNdBafMLtd6NKlEpkIfk/W
- s/H0R2pP+IyijG+RfDuCXfzJ4h1Zl40h2K2J+zgCplzVk9PF6L1HWuG2dAkyh4pujcBR
- QOrJDryz9E0N4asNzR+aZEe4C/2zMyBDEHbenYJMjGePzgUfQR4ATYeKXpYg7bvwJtjU
- 7qwA==
-X-Gm-Message-State: AOAM53364QSCsv1S4Lv8go00hTP6cep0F/wFChywFtgC6adGQikg7vvX
- CViG6GcFvd10mMqXYpmSZ47Tgw==
-X-Google-Smtp-Source: ABdhPJzpmKQ+A4NRlPF6u1SVizDawCpgts4j/A6org/QHTlhW19yx/bTp0VUSDuxuLTJUFIurktC1A==
-X-Received: by 2002:a05:600c:296:: with SMTP id
- 22mr17315115wmk.135.1639147044652; 
- Fri, 10 Dec 2021 06:37:24 -0800 (PST)
+ bh=XSGjwIt9RpPIjkr6liBZIwGzdNBMMcqErsUs7NKqs3g=;
+ b=SgdWIy+glwF71brWO1zwy2FLanVarmsFWkCNozOZZq2mFlQsJJSgaAVI9gO7pjkuxF
+ LjV8BHzfUk32BDpCRiBTSEkm+ozOoGgMYCFSmOdSxIzmUPVnltDRO2KgyDoJIsAoa2TF
+ qBB5F0eegKO6sLwRA8VWQnno3nLzFMq5YWcTkAmKXXwCN5O3/CfQKREB81sRtdQXq5/q
+ anB23AjCOZobDVFfPJPDxpVJHfNbknoMeEFdK7bN8Tvyvm8nGLR66dU4gyzSL7LdNcPx
+ X8uya7iZgYMallN6jjL8GWl1vdrs+cjb6BsimMnxIOKVCW9IzbY8AICaqiW6q6TOBY7j
+ ew/g==
+X-Gm-Message-State: AOAM532eeeaMjqqWHyXBTbV3v51zjHdtiHIoBSv8fFDLHYWJKkV/nXks
+ Fnsj2iflwqa6FCyOgoXPfKcjPg==
+X-Google-Smtp-Source: ABdhPJwvEUvtytgXDIUTqN1i7hPX5BX/gnJ9OxL+n5KP+mAtXq7F0bdSrTa2ut2djOds2sajpum1GA==
+X-Received: by 2002:adf:a412:: with SMTP id d18mr14714578wra.529.1639147736805; 
+ Fri, 10 Dec 2021 06:48:56 -0800 (PST)
 Received: from google.com ([2a00:79e0:d:210:76c1:fb36:1e22:8677])
- by smtp.gmail.com with ESMTPSA id g5sm3758412wri.45.2021.12.10.06.37.24
+ by smtp.gmail.com with ESMTPSA id c4sm2669899wrr.37.2021.12.10.06.48.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 10 Dec 2021 06:37:24 -0800 (PST)
-Date: Fri, 10 Dec 2021 14:37:21 +0000
+ Fri, 10 Dec 2021 06:48:56 -0800 (PST)
+Date: Fri, 10 Dec 2021 14:48:53 +0000
 From: Quentin Perret <qperret@google.com>
 To: Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 07/15] KVM: arm64: Introduce kvm_share_hyp()
-Message-ID: <YbNmIfeRdgaQNf+l@google.com>
+Subject: Re: [PATCH v3 15/15] KVM: arm64: pkvm: Unshare guest structs during
+ teardown
+Message-ID: <YbNo1SBn7ZNf89qL@google.com>
 References: <20211201170411.1561936-1-qperret@google.com>
- <20211201170411.1561936-8-qperret@google.com>
- <20211209111309.GB1912@willie-the-truck>
+ <20211201170411.1561936-16-qperret@google.com>
+ <20211209112233.GD1912@willie-the-truck>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20211209111309.GB1912@willie-the-truck>
+In-Reply-To: <20211209112233.GD1912@willie-the-truck>
 Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -92,55 +91,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thursday 09 Dec 2021 at 11:13:10 (+0000), Will Deacon wrote:
-> On Wed, Dec 01, 2021 at 05:04:01PM +0000, Quentin Perret wrote:
-> > The create_hyp_mappings() function can currently be called at any point
-> > in time. However, its behaviour in protected mode changes widely
-> > depending on when it is being called. Prior to KVM init, it is used to
-> > create the temporary page-table used to bring-up the hypervisor, and
-> > later on it is transparently turned into a 'share' hypercall when the
-> > kernel has lost control over the hypervisor stage-1. In order to prepare
-> > the ground for also unsharing pages with the hypervisor during guest
-> > teardown, introduce a kvm_share_hyp() function to make it clear in which
-> > places a share hypercall should be expected, as we will soon need a
-> > matching unshare hypercall in all those places.
+On Thursday 09 Dec 2021 at 11:22:33 (+0000), Will Deacon wrote:
+> On Wed, Dec 01, 2021 at 05:04:09PM +0000, Quentin Perret wrote:
+> > Make use of the newly introduced unshare hypercall during guest teardown
+> > to unmap guest-related data structures from the hyp stage-1.
 > > 
 > > Signed-off-by: Quentin Perret <qperret@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_mmu.h |  1 +
-> >  arch/arm64/kvm/arm.c             |  4 ++--
-> >  arch/arm64/kvm/fpsimd.c          |  2 +-
-> >  arch/arm64/kvm/mmu.c             | 27 +++++++++++++++++++++------
-> >  arch/arm64/kvm/reset.c           |  2 +-
-> >  5 files changed, 26 insertions(+), 10 deletions(-)
+> >  arch/arm64/include/asm/kvm_host.h |  2 ++
+> >  arch/arm64/include/asm/kvm_mmu.h  |  1 +
+> >  arch/arm64/kvm/arm.c              |  2 ++
+> >  arch/arm64/kvm/fpsimd.c           | 34 ++++++++++++++++++++++---
+> >  arch/arm64/kvm/mmu.c              | 42 +++++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/reset.c            |  8 +++++-
+> >  6 files changed, 85 insertions(+), 4 deletions(-)
 > 
 > [...]
 > 
 > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index f8f1096a297f..fd868fb9d922 100644
+> > index d72566896755..8e506ba8988e 100644
 > > --- a/arch/arm64/kvm/mmu.c
 > > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -299,6 +299,25 @@ static int pkvm_share_hyp(phys_addr_t start, phys_addr_t end)
+> > @@ -344,6 +344,32 @@ static int share_pfn_hyp(u64 pfn)
+> >  	return ret;
+> >  }
+> >  
+> > +static int unshare_pfn_hyp(u64 pfn)
+> > +{
+> > +	struct rb_node **node, *parent;
+> > +	struct hyp_shared_pfn *this;
+> > +	int ret = 0;
+> > +
+> > +	mutex_lock(&hyp_shared_pfns_lock);
+> > +	this = find_shared_pfn(pfn, &node, &parent);
+> > +	if (WARN_ON(!this)) {
+> > +		ret = -EINVAL;
+> 
+> -ENOENT?
+
+Sure.
+
+> > +		goto unlock;
+> > +	}
+> > +
+> > +	this->count--;
+> > +	if (this->count)
+> > +		goto unlock;
+> 
+> Again, if we did an RCU lookup then this could be converted to a refcount_t
+> to take the mutex only when it hits zero. But for now I think it's fine.
+
+No objection to do this in the future, but yeah I think we might as well
+start simple :)
+
+> > +
+> > +	rb_erase(&this->node, &hyp_shared_pfns);
+> > +	kfree(this);
+> > +	ret = kvm_call_hyp_nvhe(__pkvm_host_unshare_hyp, pfn, 1);
+> > +unlock:
+> > +	mutex_unlock(&hyp_shared_pfns_lock);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> >  int kvm_share_hyp(void *from, void *to)
+> >  {
+> >  	phys_addr_t start, end, cur;
+> > @@ -376,6 +402,22 @@ int kvm_share_hyp(void *from, void *to)
 > >  	return 0;
 > >  }
 > >  
-> > +int kvm_share_hyp(void *from, void *to)
+> > +void kvm_unshare_hyp(void *from, void *to)
 > > +{
-> > +	if (is_kernel_in_hyp_mode())
-> > +		return 0;
+> > +	phys_addr_t start, end, cur;
+> > +	u64 pfn;
 > > +
-> > +	/*
-> > +	 * The share hcall maps things in the 'fixed-offset' region of the hyp
-> > +	 * VA space, so we can only share physically contiguous data-structures
-> > +	 * for now.
-> > +	 */
-> > +	if (is_vmalloc_addr(from) || is_vmalloc_addr(to))
-> > +		return -EINVAL;
+> > +	if (is_kernel_in_hyp_mode() || kvm_host_owns_hyp_mappings() || !from)
 > 
-> If we're adding these sanity checks, perhaps is_vmalloc_or_module_addr()
-> would be worth using instead?
+> I don't think you need the is_kernel_in_hyp_mode() check any more not that
+> you've moved that into kvm_host_owns_hyp_mappings().
 
-Ack, I'll fix that up.
+The logic is a little odd, but I think I still do as
+kvm_host_owns_hyp_mappings() will return false if is_kernel_in_hyp_mode()
+is true.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
