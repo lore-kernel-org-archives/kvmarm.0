@@ -2,80 +2,148 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ABC0C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 12:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D26AC433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 13:23:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8854F4B205;
-	Fri, 10 Dec 2021 07:21:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90B474B203;
+	Fri, 10 Dec 2021 08:23:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@infradead.org
+	(fail, message has been altered) header.i=@nvidia.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uyxcL2-QAUNt; Fri, 10 Dec 2021 07:21:26 -0500 (EST)
+	with ESMTP id r9BcD9zBOi95; Fri, 10 Dec 2021 08:23:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05E6B4B220;
-	Fri, 10 Dec 2021 07:21:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DB404B1AF;
+	Fri, 10 Dec 2021 08:23:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B76E04B0FB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 17:39:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 398544B164
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 08:23:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KnkXwLIo7hgy for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Dec 2021 17:39:13 -0500 (EST)
-Received: from bombadil.infradead.org (bombadil.infradead.org
- [198.137.202.133])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 642FB49FB7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Dec 2021 17:39:13 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
- In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=1XD47nKd5JrKMzF7ad+2vDLazEFKUf/AxGgSUDMOgJw=; b=sqj0bme+LInUeBJ9fK7uLfIp0F
- dGBHkbhCOK9ei+M9oOfU70qCe4VXetbmt5xdLCLLNmluj9S00J13Eq4BbhgHouyB3iqTpoY8keVr/
- /FtQW0keyd5/7xqf84q2gRfeDlet0HWa94nAXmqF/685Epp/EhL9xCeUr59PYZO2EEMKkRo0V7LOi
- pu/9sX7DbKbyyq64Hwz3cBIKdhzomp6nka9AT6r9Hp0BLQ2G133XjB9dswcSpJtmV6xaTeGVXphWm
- ng/QF1MdMVX19W1b1AYVEsWRWPoqm8j/wkc+ykYiduuVGfjZY18umBf5391E0U2YP/nCJYTFakA07
- XJm9kgeA==;
-Received: from 54-240-197-234.amazon.com ([54.240.197.234]
- helo=freeip.amazon.com)
- by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1mvS3f-000Ifl-TY; Thu, 09 Dec 2021 22:38:36 +0000
-Message-ID: <0a4632fc06af0947c272a9e843e994b2be1bb888.camel@infradead.org>
-Subject: Re: [PATCH v5 08/12] KVM: Reinstate gfn_to_pfn_cache with
- invalidation support
-From: David Woodhouse <dwmw2@infradead.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Date: Thu, 09 Dec 2021 22:38:29 +0000
-In-Reply-To: <6cb2cd57-16f3-d0ec-adf6-cb8fdcbae035@redhat.com>
-References: <20211121125451.9489-1-dwmw2@infradead.org>
- <20211121125451.9489-9-dwmw2@infradead.org>
- <b1bacc6f-be56-4108-6e52-4315a021184b@redhat.com>
- <b614d9ae0fe7910cfa72eee0b4077776f8012e5f.camel@infradead.org>
- <6cb2cd57-16f3-d0ec-adf6-cb8fdcbae035@redhat.com>
-User-Agent: Evolution 3.36.5-0ubuntu1 
+ with ESMTP id PyhtUvJkAzie for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Dec 2021 08:23:18 -0500 (EST)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com
+ (mail-mw2nam10on2056.outbound.protection.outlook.com [40.107.94.56])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B945E4B10E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 08:23:18 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DjE7sOQSbpQjQczQemZMOF3gDGy9MP56Gp8qFB0FyZmqAaMPucX9u1fl/8DBB0daejTRD1vD7kXn7WGvPvCfDVHyLfhdreLFPQifTw2+Z4zX/K7MzZT0RQ/RpgGQ74zvT//AXdMtsg3PnYRuvR5jeC3hVkXTwC1vA77/+MwdYaDnpkFJ8iFT091N9ca/mrSBusYCObcyZkQruyORW7fi3q/3pvxq0h0wgE56IwscLFbvJZ5pTbleWIcnUg0wmDhTcTr+4kpGwjYvgIVhAB9WZOEbkm1kYSTz6uKAJNeAdG8T9tg1+zgkVKcNU2sQEAupHTdssLej7YwyEpK0ekKmlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=urqHdnT3tN4MsdUDnhi8OuJ2b70wSdyl94R1N2kLvY0=;
+ b=fNI2NS4H7cVRK5ZBL2FAG11mY22ae4rRj/DyHBMf9VLU3+IH0kGkPKU0mBJgoB0Nf9h2UdY4iaweVwdxa47jnvkZLIj1WDCKeIdmduNn5w4dv5uoT364jc4pIOF6oydhA1+bmKh+fQvEnM9sTY/5Q0KU3iIdv+w/GX6R4xhQynaYgPAvGDsSQEDLz20FD00kuF38fl9ce63fZCEYBbzc7cHcECYqivDlLNMWF6011cqggVjNN3GingL/J1lHdNhOf/S+3m3kJw33jgchUprbFBjMEsAvPQVni5cDBnmRc+N3pxXNLgVj1BDelO73HaiM2dt4WULVaVAuKclv6BUQ0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=urqHdnT3tN4MsdUDnhi8OuJ2b70wSdyl94R1N2kLvY0=;
+ b=SGcOGck2CXXpW5NIqd/qXgCPs52U2yWLG6eDmjDG4glF0s9QSklOu6Hwq61b7XiM+O3Y/WrA6oJ03gBRA0WXIKPH9SXpWoosd9SWSVMfMvQ02FXOmQb+F7m/lSYj2dZHiIBgoM2LdRUGIQm73b+HPGFsyl5KjJ+N2KP0DVlYx997MKBIqUMJL1N1y2L31DD5X23rvYBDMK7uTRGPaX/5UWulRduQPLDmI/cCc8HJmg2LnQLEFMLbFQ1DAZVkuvXZDcwvdNzQ7GIU3v+FXEJkYM4XaKs7yt2UiF5nGC4S4db1yFZaoR2gxr67IP8buDv9Glkkj6ZfZBRru8fw8Vc4Ew==
+Received: from BL1PR12MB5127.namprd12.prod.outlook.com (2603:10b6:208:31b::14)
+ by BL1PR12MB5189.namprd12.prod.outlook.com (2603:10b6:208:308::20)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.11; Fri, 10 Dec
+ 2021 13:23:16 +0000
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5127.namprd12.prod.outlook.com (2603:10b6:208:31b::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.19; Fri, 10 Dec
+ 2021 13:23:15 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d8be:e4e4:ce53:6d11]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d8be:e4e4:ce53:6d11%7]) with mapi id 15.20.4778.015; Fri, 10 Dec 2021
+ 13:23:15 +0000
+Date: Fri, 10 Dec 2021 09:23:13 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
+Message-ID: <20211210132313.GG6385@nvidia.com>
+References: <c7e26722-f78c-a93f-c425-63413aa33dde@redhat.com>
+ <e6733c59-ffcb-74d4-af26-273c1ae8ce68@linux.intel.com>
+ <fbeabcff-a6d4-dcc5-6687-7b32d6358fe3@redhat.com>
+ <20211208125616.GN6385@nvidia.com> <YbDpZ0pf7XeZcc7z@myrica>
+ <20211208183102.GD6385@nvidia.com>
+ <BN9PR11MB527624080CB9302481B74C7A8C709@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <BN9PR11MB5276D3B4B181F73A1D62361C8C709@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <20211209160803.GR6385@nvidia.com>
+ <BN9PR11MB527612D1B4E0DC85A442D87D8C719@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB527612D1B4E0DC85A442D87D8C719@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: YT3PR01CA0143.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:83::28) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by
- bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-Mailman-Approved-At: Fri, 10 Dec 2021 07:21:22 -0500
-Cc: Anup Patel <anup.patel@wdc.com>,
- "wanpengli @ tencent . com" <wanpengli@tencent.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Joao Martins <joao.m.martins@oracle.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>, "joro @ 8bytes . org" <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, karahmed@amazon.com,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- butt3rflyh4ck <butterflyhuangxx@gmail.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- "jmattson @ google . com" <jmattson@google.com>,
- "mtosatti @ redhat . com" <mtosatti@redhat.com>, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- "vkuznets @ redhat . com" <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 850eeda8-daa0-4d22-0ef8-08d9bbe0390d
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5127:EE_|BL1PR12MB5189:EE_
+X-Microsoft-Antispam-PRVS: <BL1PR12MB512784F113A0AC3A4DC6B167C2719@BL1PR12MB5127.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gL5HA+JKvkorAe/DUIyg3kM10lIX3xqwzAfb21/gJIS3XeBWy4lj7WAdu+aYEq32J+ZSUalWRxMJczr1dde9d7NlrEcZ34TUIHyDeBrlT7FzCtPbOUztP5MMgYS2V/WqRFRuWaGCFQ/uCTm2WT6B6ytskk8d+17inVrtUjSz7r8F5rtU2eT/imWZf6+DiEOQEngFQhDg2Lf+j50eYOUMJ8zkBxhfa87GAq8dV7Ku2249tKhQW8uoNIZnVWGtiIQfZrrgIFfX0C4T5YGu/W4uasxBWWJMxSxEHv3O+6HfC/3aENzPFcJZlo9dFzUzrhL3KS+W/wuPZVSYoAcKrXAgorlQYKwRG/2BWjyIsEHkX1Zw34WYQvI7VmLbuOtEv7gLgvDva4/bYa9ATq6jad2OKuh5Lhg0/ZOIY9pR49dytDMHJn2BATU5+2bnxnPH4cqCFQPEBhHhGR5WPckj3RHQ8HYQZAERw6HAk7sqi8XHiW3auAyC0nYmcKp7fMOfhV9tf9unXS52bnZK5GNTv9bFZJTY8kGWJ0XxqfvkMAc+9mOyruD5fZmxI7bvtBF2YPPe8Q73p7DufxWKLQ/oseSZ5Lz7u85PAaK7PnqkgzwSGcxLhyPtcKbXKuNWgUQDDKuWjRsN2ln3USGgX7vFumArcg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BL1PR12MB5127.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(6486002)(6916009)(2616005)(5660300002)(2906002)(316002)(8936002)(54906003)(7416002)(83380400001)(508600001)(186003)(66556008)(66946007)(66476007)(26005)(6506007)(1076003)(36756003)(86362001)(6512007)(4326008)(8676002)(33656002)(38100700002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Qot544u0S9hwNqH6aVZKsMPwjdNQ9o/Sg9efrdWs+QI98jLVKS1UCQVIZ2CM?=
+ =?us-ascii?Q?Fr1zbUbrt1NJDkFTCR42gfVLqBRQe/dTPz3ix7gMyqPjwnm7WuN9nVPoBQGe?=
+ =?us-ascii?Q?fUI9hGXbbXKmb8S6XmzFnfIVdSHrKYEysJY5nnAAAdk8UVlI8fZInjJJUY3T?=
+ =?us-ascii?Q?rZ+KxCzUkh53i51lNG9p/YBdccOkylTySLVLIfQzmoJEXypQEH0Gx/0a1U6r?=
+ =?us-ascii?Q?0c+Bm223MkYmjtcxRDP9y/LYILHXejIUAqtx0iqCo3XrEbRABcpt+qnRC93m?=
+ =?us-ascii?Q?Hr6jtCOTlOxNYDXvru687wiQ+8NdrxrnlEuHsHfHwT9DtXB/KCBouNjrbyN6?=
+ =?us-ascii?Q?XPHO5hJ6JrkKF5D9tckt4zYLd3fd4eeSNjCg1A9Gnr9bY/3W+3gTH25+S2wl?=
+ =?us-ascii?Q?DG9Kknxb2ikqAxiqir8hSssLQNTkNPhNJo6Fxhva8Md1/QcPcSNO3fZmQ2Qb?=
+ =?us-ascii?Q?gSSu9+69mOJDfoqJKEXkalCJWYfJKVl34wz02XVhGfjpn2OMPoZP3fNMXtah?=
+ =?us-ascii?Q?5OZ3YGpMi7bLqDwNhjmQFy+9qKGYBzfUac+93U8WQefSHp/2d4JYRcEmZYU1?=
+ =?us-ascii?Q?7zA7T21ju9gDMDyGtl7dc8h3m4rPIYLDbHlyuLb1J6G4lvmy+yMRYE/9uzo4?=
+ =?us-ascii?Q?Z+24+k2RaO4LzXJ3RsPanDvi96vcumIMwdbG251yOgt+Qay186wSDss5pQFp?=
+ =?us-ascii?Q?9LUIBpLY4efX62Lkc+CzhMJwy7A5NgPXzhRU7Kqi04AQlHSg3vCyrW2/XS4p?=
+ =?us-ascii?Q?19+8INKe31W0EiHAlprGtDeW3c1rAdeWjE4ZmtVd9OCE6fA9TYsbFcNOlFK4?=
+ =?us-ascii?Q?CR11c6mJ1ZPG2W6RcZsJAr9J1dhHcFC8a8O81MgCs/DwQ6JC1uPkOnu0K3H8?=
+ =?us-ascii?Q?UdHsVW/U7Zd/jdnLvE4xpIiNX4r84SnANxENKY5FRy2yRShsKC0SIkiIV01D?=
+ =?us-ascii?Q?vSHQ+5EaHiDwjWzrIHbzEY57YaYBGFNlI4eV2WTWbFrkHhPPnu91k2HJoupX?=
+ =?us-ascii?Q?tgN4EloRJXVWttmLwjL+TT7zXIqKIT9flm1YVlL8gxstyo/firHEJRnlmDZf?=
+ =?us-ascii?Q?HwXuQvSgCKIPEtqBpT72/SYE2CFjkxmggOrAnIFdKsjYF5NiikMF2F6Vk40m?=
+ =?us-ascii?Q?YJb/kjUfgQ0U6WQ9AF2FNZWohc50CtlYiyuMhArfkefXE46q/gVZ0EMrgXTt?=
+ =?us-ascii?Q?T5E29r1FtHU/jn3RZBnQoMo25HxLRHi5aJ/gPjQt8UPVBYWrqHxiQvKuH8Mc?=
+ =?us-ascii?Q?Mw+2SvbKIwNiguzdU0CftpY0DjTDvfTmy1UET/D6dfOORB8bBY70VrSDHWbf?=
+ =?us-ascii?Q?vsZLYNlAUeq3mOnC7wSMXEXX+vx7BXSJ8AK/yEk9Q3O6J+u7owzf812kmJSc?=
+ =?us-ascii?Q?Vk2epy4t7KFIOmWdt2gxdzFQxKGEntKQKa8yHrxpRZKmgDRJDX6HFUacSrL5?=
+ =?us-ascii?Q?qop3EMDnQPl24z+3F6cJVnbWvrJH2Rd2GIc7hvBqWC9AsP88vEPQLq9pQxnt?=
+ =?us-ascii?Q?BkBAN8M8dhbb2bjZ4/IuFwTH4VPYg0XPEci1t1rbEoC5UdUEew2O/4wLrzpx?=
+ =?us-ascii?Q?YOdbVsV+nRbM6N/U6Zw=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 850eeda8-daa0-4d22-0ef8-08d9bbe0390d
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2021 13:23:15.5579 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FGy5x8UOI37o/zpv9AARike91CCXYM5lLFPs29dT7C1/yKMigujSt1NxYN/QMIIf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5189
+Cc: "Raj, Ashok" <ashok.raj@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ "maz@kernel.org" <maz@kernel.org>, "will@kernel.org" <will@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "vsethi@nvidia.com" <vsethi@nvidia.com>,
+ "lushenming@huawei.com" <lushenming@huawei.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
+ "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
+ "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
+ "robin.murphy@arm.com" <robin.murphy@arm.com>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "wangxingang5@huawei.com" <wangxingang5@huawei.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,147 +155,88 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============2712489763783368049=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Fri, Dec 10, 2021 at 08:56:56AM +0000, Tian, Kevin wrote:
+> > So, something like vfio pci would implement three uAPI operations:
+> >  - Attach page table to RID
+> >  - Attach page table to PASID
+> >  - Attach page table to RID and all PASIDs
+> >    And here 'page table' is everything below the STE in SMMUv3
+> > 
+> > While mdev can only support:
+> >  - Access emulated page table
+> >  - Attach page table to PASID
+> 
+> mdev is a pci device from user p.o.v, having its vRID and vPASID. From
+> this angle the uAPI is no different from vfio-pci (except the ARM one):
 
---===============2712489763783368049==
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-vGfMoYqdSfMCtPherYOa"
+No, it isn't. The internal operation is completely different, and it
+must call different iommufd APIs than vfio-pci does.
 
+This is user visible - mdev can never be attached to an ARM user page
+table, for instance.
 
---=-vGfMoYqdSfMCtPherYOa
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+For iommufd there is no vRID, vPASID or any confusing stuff like
+that. You'll have an easier time if you stop thinking in these terms.
 
-On Thu, 2021-12-09 at 23:34 +0100, Paolo Bonzini wrote:
-> Compared to the review it's missing this hunk:
->=20
-> @@ -265,7 +265,7 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, stru=
-ct gfn_to_pfn_cache *gpc)
->=20
->         gpc->valid =3D false;
->=20
-> -       old_khva =3D gpc->khva;
-> +       old_khva =3D (void *)((unsigned long)gpc->khva & ~PAGE_MASK);
->         old_dirty =3D gpc->dirty;
->         old_gpa =3D gpc->gpa;
->         old_pfn =3D gpc->pfn;
+We probably end up with three iommufd calls:
+ int iommufd_device_attach(struct iommufd_device *idev, u32 *pt_id, unsigned int flags)
+ int iommufd_device_attach_pasid(struct iommufd_device *idev, u32 *pt_id, unsigned int flags, ioasid_t *pasid)
+ int iommufd_device_attach_sw_iommu(struct iommufd_device *idev, u32 pt_id);
 
-Ah right, there were two of those. Will fix; thanks.
+And the uAPI from VFIO must map onto them.
 
---=-vGfMoYqdSfMCtPherYOa
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+vfio-pci:
+  - 'VFIO_SET_CONTAINER' does
+    iommufd_device_attach(idev, &pt_id, IOMMUFD_FULL_DEVICE);
+    # IOMMU specific if this captures PASIDs or cause them to fail,
+    # but IOMMUFD_FULL_DEVICE will prevent attaching any PASID
+    # later on all iommu's.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MjA5MjIzODI5WjAvBgkqhkiG9w0BCQQxIgQg9QgH7ySvKE8MIz4556T7BjzBwmblfnbugyql9xpt
-pHowgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAJTe2Hv03fD1PmUwQiwXOVLXC54c1mmzrGLVVAaix4oQ5oGjc4m0IyYYkGzKXa2Y
-ix3KpMPUd6IjMykSkvb360FZ2GKGw3VOaC1GqSUfJQp6fRl5IXoRYXRE6nXSfmxJd+DvvN1V+9zL
-eKRZ9dNaYrmYLwmK89tNp6/LaL5/HHMjeQqgtLH5s6MwoIcAqYhVKbLN5c547DxTuwHeRzc2LAAr
-BSG9s2SJ4eCPpDxnhgNT9HbZGXQB6op8S1/AtxlTXggSeIfCDw/656t1XOFVnX8JePwnB96EXNdf
-LKrRwxe8iDQFofYuSIRAB/riihIyXUpxlx26w65IdlIPXjjF1TgAAAAAAAA=
+vfio-mdev:
+  - 'VFIO_SET_CONTAINER' does one of:
+    iommufd_device_attach_pasid(idev, &pt_id, IOMMUFD_ASSIGN_PASID, &pasid);
+    iommufd_device_attach_sw_iommu(idev, pt_id);
 
+That is three of the cases.
 
---=-vGfMoYqdSfMCtPherYOa--
+Then we have new ioctls for the other cases:
 
+vfio-pci:
+  - 'bind only the RID, so we can use PASID'
+    iommufd_device_attach(idev, &pt_id, 0);
+  - 'bind to a specific PASID'
+    iommufd_device_attach_pasid(idev, &pt_id, 0, &pasid);
 
---===============2712489763783368049==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+vfio-mdev:
+  - 'like VFIO_SET_CONTAINER but bind to a specific PASID'
+    iommufd_device_attach_pasid(idev, &pt_id, 0, &pasid);
 
+The iommu driver will block attachments that are incompatible, ie ARM
+user page tables only work with:
+ iommufd_device_attach(idev, &pt_id, IOMMUFD_FULL_DEVICE)
+all other calls fail.
+
+How exactly we put all of this into new ioctls, I'm not sure, but it
+does seem pretty clear this is what the iommufd kAPI will need to look
+like to cover the cases we know about already.
+
+As you can see, userpace needs to understand what mode it is operating
+in. If it does IOMMUFD_FULL_DEVICE and manages PASID somehow in
+userspace, or it doesn't and can use the iommufd_device_attach_pasid()
+paths.
+
+> Is modeling like above considered ambiguous?
+
+You've skipped straight to the ioctls without designing the kernel API
+to meet all the requirements  :)
+
+Jason
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============2712489763783368049==--
-
