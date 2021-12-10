@@ -2,57 +2,57 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC164C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 17:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E745FC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 17:36:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5180E4B1FB;
-	Fri, 10 Dec 2021 12:36:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A04074B200;
+	Fri, 10 Dec 2021 12:36:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@amd.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8k2Lm0FrQ6bL; Fri, 10 Dec 2021 12:36:36 -0500 (EST)
+	with ESMTP id Ro7MPnTFvroT; Fri, 10 Dec 2021 12:36:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 453224B214;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 687354B21E;
 	Fri, 10 Dec 2021 12:36:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83B2040762
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 11:47:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 528454B0CC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 11:47:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gKpSZXGTvP9R for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Dec 2021 11:47:31 -0500 (EST)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com
- (mail-dm6nam12on2040.outbound.protection.outlook.com [40.107.243.40])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC890406E7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 11:47:31 -0500 (EST)
+ with ESMTP id SLUL6AepavOV for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Dec 2021 11:47:53 -0500 (EST)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com
+ (mail-dm3nam07on2069.outbound.protection.outlook.com [40.107.95.69])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16A49406E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 11:47:53 -0500 (EST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dWZ0doW7COeEektDqC7gA/ZCbb25069ahLJ4RAKo5KyPmb+NUAMfjJiM7oLHpp2h3NLfGAxJFbidXjSjMP1PXuH3IayvqUAXPlWprO83GWJL866eRkx/ur/FfcvUZM8pkjjfYePTDyWZrX02wwm/GWC1PRLMzjADeA2wUbtrTwESpZbizJPMT4ODD1qYl2tw6iyQaQ1ilCaxlxdMlbVVW7WbUU8ID8DLUs/YWP2grbn29Pil8by5YkQmvgCpEpz1rGyv0CbLOIro5W6zCj9nWNAJBZkHxMOpS9jrM/KaEFELZP3BZe6ueOdVRF92+D+0Ih5lDCmDNfoNphxdaiOsog==
+ b=V0acFJUId6weqZvWPAUm0du5kE9A2nDwulhL04xPb7JQyPqa4sCwJTEH8PgX9AEs7tKDM/Evcnml1+v1pKjhBWzd1l+nTf30lpl5a7e+5g8ESoi5htuFP/MhmvA+KNvur2MNRPq0QZnHbk9cDva02mhP2z1sWQB4IjuigqxMQhOFSZGwwUtZRg7yKTJH5cqnDKpiJn+kILkAUqX8tzSui3gcekSY/63jCxOS0MIXIcPLCiRkGFLkO9j7YG0gPjsWeKrp0csA+RVb7smtobE9u2aY+xJ/lEwQANXAaKOWP1mfYM0STrIXPIcVzI3W1LjGjhu/sCcPDqowwi+Zetf18A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BVePAZMnyynrWGF7TPR9d4//6tOFHnhk271ltjU1AgA=;
- b=ZYMUlLeyaEfuz0ZAD5Pg7OzmMUxyHYAzuxN8A9Y8qDIkuAMyMTruv34SfmhQPqg8A1a05eccvByx/B2HnTmPg2iulLHiUOlizjM9Jz3WuAHKt435ZHrK7mK/FHPSREJ89T/GuFXhe+a8TQdMY32Qm8JsvI8v08cLbrFo+M/B1tO+BDDD2TEKK+HJ7rxBXbi95D45VNneFwsVGhDdfe8WA690jSmNrHDQTTKkLbO+uRGzPAUKkcGC9wZ6O2eae6aqB3wPntAKCaDokbIsfYPLJRbXoyJV29UaEWw4Fie95d2tScdwck4iOdxWakmbafQ+Cl5UlmlHHngLQl7Z8np6QQ==
+ bh=QuQaYKCvPOEErmoktodgSJ1pfqms9WhM5PkpkYAk2AM=;
+ b=QipYgUu/FooS1U9U9jasjNY6A2JYPf574SCMU/Ep4IBSdaXvBH8GZWBY4I03F+bI9vQxtcC1Gesax6iT4TFmbpCWvW0+Qp6hYLmT8Hu2mBMBIb9pO0KcGFIjOLAfDMO466O/iJ90OOALej7xuz8vTae3XbKQGPa1rnWKi+GlOpTCUaA5l70YpKpfLb8EmmhLL7Tiu6S/2A7M/Ioj7hKmhWDZkub7cYNFyXq19KWdmBCcpP1fJ/lPQmJzC0jfpH+1VNIIJcJnQsHDB6ejLS9WJfP5lJrDSXfQXnTsT3QsLXbbV+Gw8xArghw/mmC3UMBjA26ndjbqWLqvTLzy71iESA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1; 
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BVePAZMnyynrWGF7TPR9d4//6tOFHnhk271ltjU1AgA=;
- b=I35TrDd8iKtEfgcc1PMxeklWPrMQUn6TgGm54ll2b3qkNRy24de2S7yPSpte0tFGJ9kvnTx3UaUcvkBot+UdN+7NTSpkQqWb5lZewivMoV8KqsY2Qbyivua8nCOabd5UTiIKliyNhqqyqfkz31FlgW8YohQaTFb4gcsZsFuswvw=
-Received: from DS7PR03CA0265.namprd03.prod.outlook.com (2603:10b6:5:3b3::30)
- by BL0PR12MB5539.namprd12.prod.outlook.com (2603:10b6:208:1c3::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.11; Fri, 10 Dec
- 2021 16:47:29 +0000
-Received: from DM6NAM11FT060.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3b3:cafe::28) by DS7PR03CA0265.outlook.office365.com
- (2603:10b6:5:3b3::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.21 via Frontend
- Transport; Fri, 10 Dec 2021 16:47:29 +0000
+ bh=QuQaYKCvPOEErmoktodgSJ1pfqms9WhM5PkpkYAk2AM=;
+ b=2xXVFzKIT1Wbg2UdBHOZDOha2X2udzsQBlPUdi0AZl/5AYZ66l4tsyvgA/Erweq6+vmpC0pM1keo4b2yvAWUu9XJbiIGmmzY8QWjXdXCTNlE5NOoAAfoA+x2sjya7YwlL6ZfAXP9xjQdxgFm5I9AyUDVz6ZjHeEc0kFqYqav57g=
+Received: from DM5PR18CA0081.namprd18.prod.outlook.com (2603:10b6:3:3::19) by
+ DM6PR12MB3418.namprd12.prod.outlook.com (2603:10b6:5:116::31) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4755.25; Fri, 10 Dec 2021 16:47:50 +0000
+Received: from DM6NAM11FT066.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:3:cafe::f2) by DM5PR18CA0081.outlook.office365.com
+ (2603:10b6:3:3::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.12 via Frontend
+ Transport; Fri, 10 Dec 2021 16:47:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -60,50 +60,48 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
 Received: from SATLEXMB03.amd.com (165.204.84.17) by
- DM6NAM11FT060.mail.protection.outlook.com (10.13.173.63) with Microsoft SMTP
+ DM6NAM11FT066.mail.protection.outlook.com (10.13.173.179) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4778.13 via Frontend Transport; Fri, 10 Dec 2021 16:47:29 +0000
+ 15.20.4778.13 via Frontend Transport; Fri, 10 Dec 2021 16:47:50 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Fri, 10 Dec
- 2021 10:47:28 -0600
+ 2021 10:47:49 -0600
 From: Michael Roth <michael.roth@amd.com>
 To: <linux-kselftest@vger.kernel.org>
-Subject: [PATCH RFC 10/10] kvm: selftests: add ucall_test to test various
- ucall functionality
-Date: Fri, 10 Dec 2021 10:46:20 -0600
-Message-ID: <20211210164620.11636-11-michael.roth@amd.com>
+Subject: [RFC PATCH 00/10] KVM: selftests: Add support for test-selectable
+ ucall implementations
+Date: Fri, 10 Dec 2021 10:46:10 -0600
+Message-ID: <20211210164620.11636-1-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211210164620.11636-1-michael.roth@amd.com>
-References: <20211210164620.11636-1-michael.roth@amd.com>
 MIME-Version: 1.0
 X-Originating-IP: [10.180.168.240]
 X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB03.amd.com
  (10.181.40.144)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d90dda22-d6ba-4a5d-9f53-08d9bbfcc0e9
-X-MS-TrafficTypeDiagnostic: BL0PR12MB5539:EE_
-X-Microsoft-Antispam-PRVS: <BL0PR12MB55397F28F5AAE9BF9F21B2D595719@BL0PR12MB5539.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:747;
+X-MS-Office365-Filtering-Correlation-Id: d41b73b3-d8c8-4a13-b21d-08d9bbfccd7e
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3418:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3418E90A938A66D088AB9F0295719@DM6PR12MB3418.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IiJkq39z+MDrAfOtDv70LiGPCgMQ2/Vpl2iYAKEGeiNzFPuuyENuoBiH5CHX7lx823MZcXu9aqYmLXNw0dTPLK+oXriZEb2vwS+4TuLTLJnpPIN9vxUUyXFoDXvTu16jALmBz30z9DB5iRPvFl2uAxU++8v0xSLP+yxdGsahi1vTxAHuCDYZg9xd4G4TRDW95/P8cObU7j+J+0W/xQs0+yx06YoONdYQBprvBbklGAL0R2LBK0+egKcJDygETsPsw9H+6GWQy6ee8TSNljDY8CoAD7+qwxIDJvIQ539aJCW4+rvb7Zg4L2oLlKBOfE1kEWBVcvY28Nd6xdcH8MPkjdz8zyiTfl2scX1cqvBeW9BzsxI6+U+r1y23XhDXJ9tAMa4piJPcVVNpeEkX8yM2i3A8A0uL+od4O2kZEbK55UyEoJnuB0dm/ImGCP3YmgE3orZVP6cU43kuD80N4xSVtnVw13XppHfH5BegcGOEhMv5VPyC+lRgzFKzNIjd4CUCz/UNygVgP2epetfBkhRh/1PWxRRQpqJBsAiZcn/LYa4v622hjtDvJ27H3+frt/kZSpP2s8A2WRNpBgRFfJmQjITZk5f8QWx8HA/Ee9z4O5VB/ccpaKePu54Mj4SFw8uxrJkpj1XI34HZ8RRoz34X0m7mAHQJxGs0+t6Ix267wQb6POAYQ/+80E3OZJQnMQIhUYGWKf079P0jzNyiSOMNcueUfl/v4U3SXHvZLsAtcYk684uyme/+a8cqqvgt/112GbhHRwdfSwO1rJSyKC0U1kq/JgK+7JC2LDmfMV1jIdQ=
+X-Microsoft-Antispam-Message-Info: YY05IGuiEYSEsMjqXtFcHmDTmaw1Id0kqHQAX3OjtXvWREvxOExrrjvnJD4tKQstYNl3OVjm9CbfBU2dxsc5WHW4PLYC5Qt8kN5ac5gW4vfQblU7oZah2jZbWL/d8vkt+U2JvyJ337SrkBfuZCosVq5uUoayYjAdmTMLvGnMNNWT6udPaRuHjL8vTv4VnHiGt8Vrq5L2Gc/pF2MSLg4Se/oHJlJS6L7Q6MRDAwtTCLtv0qcMAaOF9mz5g6Y9OSUOSjZpRbghO3jIhFmqVXv/T9aYOcyzpoSYPa24ACYd+FpoAaTvUKVIrp296qMwBrJwmUPgLqgkXrcJFPEaqy79tNfCYwhFDeQMAo08lid28766WmWij4MTu/lTlSa6Q64+/gYsIpMrdmf+733r22QutTMF+v52RQXnqxCYRtUmIPebmHOwQBsiDFPkK2rLvbUR27xI5jtuGffss521wc/xf0URuX41szWGcgxgEKsGkGIdZJl3M0Xr+SmQg0QTTU7yVf/sdosheoB8iT50Fu+j9NIEZAOQw4Nnwh/22AbGpfK7C1EDzp60gBc7w+1PaATtMSOU+Wfa2ceIadD3OrzLeIGVUZoDKx6bbvAwcXMYDfoZlp1/KMZRluvi045f21tgfxMabc2sSMHBsZb+Z2K6v+ldHNhEHFGS7o9CQecu0RMuJVdhy7Uz+Q4qFxmFFlu0NCn5W7WQg0Rzh9FqDybMjSW3kSgFZOyweSzSRwEo3wBOt2uKSaaTKQTeiYEgqb+2sYliHHvGQuSGhn4vWzI4JAlpL0LqpZHKENCVKwEADPgJ5bJgHtjoL9qRy2XL9ClDox7x5te9btgCVAHMyWRUmVO8DRquO1hS7Qq1SnAjuFvo7RYDuq4TD9gOFrcvK9F+V+NlZJ/fU0j3MgQApFgf4jFFZnKMRtcB2oC+kAqo+mY=
 X-Forefront-Antispam-Report: CIP:165.204.84.17; CTRY:US; LANG:en; SCL:1; SRV:;
  IPV:CAL; SFV:NSPM; H:SATLEXMB03.amd.com; PTR:InfoDomainNonexistent; CAT:NONE;
- SFS:(4636009)(46966006)(36840700001)(40470700001)(81166007)(70586007)(47076005)(44832011)(2616005)(54906003)(70206006)(86362001)(36860700001)(508600001)(2906002)(6666004)(7416002)(8676002)(1076003)(26005)(40460700001)(36756003)(82310400004)(16526019)(5660300002)(186003)(426003)(356005)(6916009)(316002)(8936002)(336012)(4326008)(36900700001);
+ SFS:(4636009)(46966006)(36840700001)(40470700001)(2906002)(6666004)(81166007)(356005)(47076005)(26005)(36756003)(186003)(2616005)(4326008)(336012)(16526019)(508600001)(426003)(44832011)(1076003)(316002)(8936002)(8676002)(54906003)(5660300002)(70206006)(86362001)(6916009)(70586007)(966005)(7416002)(40460700001)(82310400004)(83380400001)(36860700001)(36900700001);
  DIR:OUT; SFP:1101; 
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2021 16:47:29.1387 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d90dda22-d6ba-4a5d-9f53-08d9bbfcc0e9
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2021 16:47:50.2327 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d41b73b3-d8c8-4a13-b21d-08d9bbfccd7e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d; Ip=[165.204.84.17];
  Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT060.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT066.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5539
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3418
 X-Mailman-Approved-At: Fri, 10 Dec 2021 12:36:33 -0500
 Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
  David Hildenbrand <david@redhat.com>, Marc Orr <marcorr@google.com>,
@@ -135,258 +133,139 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Tests will initialize the ucall implementation in 3 main ways,
-depending on the test/architecture:
+These patches are based on kvm/next, and are also available at:
 
- 1) by relying on a default ucall implementation being available
-    without the need to do any additional setup
- 2) by calling ucall_init() to initialize the default ucall
-    implementation
- 3) by using ucall_init_ops() to initialize a specific ucall
-    implementation
+  https://github.com/mdroth/linux/commits/sev-selftests-ucall-rfc1
 
-and in each of these cases it may use the ucall implementation to
-execute the standard ucall()/get_ucall() interfaces, or the new
-ucall_shared()/get_ucall_shared() interfaces.
+== BACKGROUND ==
 
-Implement a basic self-test to exercise ucall under all the scenarios
-that are applicable for a particular architecture.
+These patches are a prerequisite for adding selftest support for SEV guests
+and possibly other confidential computing implementations in the future.
+They were motivated by a suggestion Paolo made in response to the initial
+SEV selftest RFC:
 
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- tools/testing/selftests/kvm/.gitignore   |   1 +
- tools/testing/selftests/kvm/Makefile     |   3 +
- tools/testing/selftests/kvm/ucall_test.c | 182 +++++++++++++++++++++++
- 3 files changed, 186 insertions(+)
+  https://lore.kernel.org/lkml/20211025035833.yqphcnf5u3lk4zgg@amd.com/T/#m959b56f9fb4ae6ab973f6ab50fe3ddfacd7c5617
+
+Since the changes touch multiple archs and ended up creating a bit more churn
+than expected, I thought it would be a good idea to carve this out into a
+separate standalone series for reviewers who may be more interested in the
+ucall changes than anything SEV-related.
+
+To summarize, x86 relies on a ucall based on using PIO intructions to generate
+an exit to userspace and provide the GVA of a dynamically-allocated ucall
+struct that resides in guest memory and contains information about how to
+handle/interpret the exit. This doesn't work for SEV guests for 3 main reasons:
+
+  1) The guest memory is generally encrypted during run-time, so the guest
+     needs to ensure the ucall struct is allocated in shared memory.
+  2) The guest page table is also encrypted, so the address would need to be a
+     GPA instead of a GVA.
+  3) The guest vCPU register may also be encrypted in the case of
+     SEV-ES/SEV-SNP, so the approach of examining vCPU register state has
+     additional requirements such as requiring guest code to implement a #VC
+     handler that can provide the appropriate registers via a vmgexit.
+
+To address these issues, the SEV selftest RFC1 patchset introduced a set of new
+SEV-specific interfaces that closely mirrored the functionality of
+ucall()/get_ucall(), but relied on a pre-allocated/static ucall buffer in
+shared guest memory so it that guest code could pass messages/state to the host
+by simply writing to this pre-arranged shared memory region and then generating
+an exit to userspace (via a halt instruction).
+
+Paolo suggested instead implementing support for test/guest-specific ucall
+implementations that could be used as an alternative to the default PIO-based
+ucall implementations as-needed based on test/guest requirements, while still
+allowing for tests to use a common set interfaces like ucall()/get_ucall().
+
+== OVERVIEW ==
+
+This series implements the above functionality by introducing a new ucall_ops
+struct that can be used to register a particular ucall implementation as need,
+then re-implements x86/arm64/s390x in terms of the ucall_ops.
+
+But for the purposes of introducing a new ucall_ops implementation appropriate
+for SEV, there are a couple issues that resulted in the need for some additional
+ucall interfaces as well:
+
+  a) ucall() doesn't take a pointer to the ucall struct it modifies, so to make
+     it work in the case of an implementation that relies a pre-allocated ucall
+     struct in shared guest memory some sort of global lookup functionality
+     would be needed to locate the appropriate ucall struct for a particular
+     VM/vcpu combination, and this would need to be made accessible for use by
+     the guest as well. guests would then need some way of determining what
+     VM/vcpu identifiers they need to use to do the lookup, which to do reliably
+     would likely require seeding the guest with those identifiers in advance,
+     which is possible, but much more easily achievable by simply adding a
+     ucall() alternative that accepts a pointer to the ucall struct for that
+     particular VM/vcpu.
+
+  b) get_ucall() *does* take a pointer to a ucall struct, but currently zeroes
+     it out and uses it to copy the guest's ucall struct into. It *could* be
+     re-purposed to handle the case where the pointer is an actual pointer to
+     the ucall struct in shared guest memory, but that could cause problems
+     since callers would need some idea of what the underlying ucall
+     implementation expects. Ideally the interfaces would be agnostic to the
+     ucall implementation.
+
+So to address those issues, this series also allows ucall implementations to
+optionally be extended to support a set of 'shared' ops that are used in the
+following manner:
+
+  host:
+    uc_gva = ucall_shared_alloc()
+    setup_vm_args(vm, uc_gva)
+
+  guest:
+    ucall_shared(uc_gva, ...)
+
+  host:
+    uget_ucall_shared(uc_gva, ...)
+
+and then implements a new ucall implementation, ucall_ops_halt, based around
+these shared interfaces and halt instructions.
+
+While this doesn't really meet the initial goal of re-using the existing
+ucall interfaces as-is, the hope is that these *_shared interfaces are
+general enough to be re-usable things other than SEV, or at least improve on
+code readability over the initial SEV-specific interfaces.
+
+Any review/comments are greatly appreciated!
+
+----------------------------------------------------------------
+Michael Roth (10):
+      kvm: selftests: move base kvm_util.h declarations to kvm_util_base.h
+      kvm: selftests: move ucall declarations into ucall_common.h
+      kvm: selftests: introduce ucall_ops for test/arch-specific ucall implementations
+      kvm: arm64: selftests: use ucall_ops to define default ucall implementation
+      (COMPILE-TESTED ONLY) kvm: s390: selftests: use ucall_ops to define default ucall implementation
+      kvm: selftests: add ucall interfaces based around shared memory
+      kvm: selftests: add ucall_shared ops for PIO
+      kvm: selftests: introduce ucall implementation based on halt instructions
+      kvm: selftests: add GUEST_SHARED_* macros for shared ucall implementations
+      kvm: selftests: add ucall_test to test various ucall functionality
+
+ tools/testing/selftests/kvm/.gitignore             |   1 +
+ tools/testing/selftests/kvm/Makefile               |   5 +-
+ .../testing/selftests/kvm/include/aarch64/ucall.h  |  18 +
+ tools/testing/selftests/kvm/include/kvm_util.h     | 408 +--------------------
+ .../testing/selftests/kvm/include/kvm_util_base.h  | 368 +++++++++++++++++++
+ tools/testing/selftests/kvm/include/s390x/ucall.h  |  18 +
+ tools/testing/selftests/kvm/include/ucall_common.h | 147 ++++++++
+ tools/testing/selftests/kvm/include/x86_64/ucall.h |  19 +
+ tools/testing/selftests/kvm/lib/aarch64/ucall.c    |  43 +--
+ tools/testing/selftests/kvm/lib/s390x/ucall.c      |  45 +--
+ tools/testing/selftests/kvm/lib/ucall_common.c     | 133 +++++++
+ tools/testing/selftests/kvm/lib/x86_64/ucall.c     |  82 +++--
+ tools/testing/selftests/kvm/ucall_test.c           | 182 +++++++++
+ 13 files changed, 982 insertions(+), 487 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/include/kvm_util_base.h
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/include/ucall_common.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
  create mode 100644 tools/testing/selftests/kvm/ucall_test.c
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 3763105029fb..4a801cba9c62 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -57,3 +57,4 @@
- /steal_time
- /kvm_binary_stats_test
- /system_counter_offset_test
-+/ucall_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 06a02b6fa907..412de8093e6c 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -88,6 +88,7 @@ TEST_GEN_PROGS_x86_64 += set_memory_region_test
- TEST_GEN_PROGS_x86_64 += steal_time
- TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
- TEST_GEN_PROGS_x86_64 += system_counter_offset_test
-+TEST_GEN_PROGS_x86_64 += ucall_test
- 
- TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
-@@ -105,6 +106,7 @@ TEST_GEN_PROGS_aarch64 += rseq_test
- TEST_GEN_PROGS_aarch64 += set_memory_region_test
- TEST_GEN_PROGS_aarch64 += steal_time
- TEST_GEN_PROGS_aarch64 += kvm_binary_stats_test
-+TEST_GEN_PROGS_aarch64 += ucall_test
- 
- TEST_GEN_PROGS_s390x = s390x/memop
- TEST_GEN_PROGS_s390x += s390x/resets
-@@ -116,6 +118,7 @@ TEST_GEN_PROGS_s390x += kvm_page_table_test
- TEST_GEN_PROGS_s390x += rseq_test
- TEST_GEN_PROGS_s390x += set_memory_region_test
- TEST_GEN_PROGS_s390x += kvm_binary_stats_test
-+TEST_GEN_PROGS_s390x += ucall_test
- 
- TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(UNAME_M))
- LIBKVM += $(LIBKVM_$(UNAME_M))
-diff --git a/tools/testing/selftests/kvm/ucall_test.c b/tools/testing/selftests/kvm/ucall_test.c
-new file mode 100644
-index 000000000000..f0e6e4e79786
---- /dev/null
-+++ b/tools/testing/selftests/kvm/ucall_test.c
-@@ -0,0 +1,182 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * ucall interface/implementation tests.
-+ *
-+ * Copyright (C) 2021 Advanced Micro Devices
-+ */
-+#define _GNU_SOURCE /* for program_invocation_short_name */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+#define VCPU_ID			2
-+#define TOTAL_PAGES		512
-+
-+enum uc_test_type {
-+	UC_TEST_WITHOUT_UCALL_INIT,
-+	UC_TEST_WITH_UCALL_INIT,
-+	UC_TEST_WITH_UCALL_INIT_OPS,
-+	UC_TEST_WITH_UCALL_INIT_OPS_SHARED,
-+	UC_TEST_MAX,
-+};
-+
-+struct uc_test_config {
-+	enum uc_test_type type;
-+	const struct ucall_ops *ops;
-+};
-+
-+static void test_ucall(void)
-+{
-+	GUEST_SYNC(1);
-+	GUEST_SYNC(2);
-+	GUEST_DONE();
-+	GUEST_ASSERT(false);
-+}
-+
-+static void check_ucall(struct kvm_vm *vm)
-+{
-+	struct ucall uc_tmp;
-+
-+	vcpu_run(vm, VCPU_ID);
-+	TEST_ASSERT(get_ucall(vm, VCPU_ID, &uc_tmp) == UCALL_SYNC, "sync failed");
-+
-+	vcpu_run(vm, VCPU_ID);
-+	TEST_ASSERT(get_ucall(vm, VCPU_ID, &uc_tmp) == UCALL_SYNC, "sync failed");
-+
-+	vcpu_run(vm, VCPU_ID);
-+	TEST_ASSERT(get_ucall(vm, VCPU_ID, &uc_tmp) == UCALL_DONE, "done failed");
-+
-+	vcpu_run(vm, VCPU_ID);
-+	TEST_ASSERT(get_ucall(vm, VCPU_ID, &uc_tmp) == UCALL_ABORT, "abort failed");
-+}
-+
-+static void test_ucall_shared(struct ucall *uc)
-+{
-+	GUEST_SHARED_SYNC(uc, 1);
-+	GUEST_SHARED_SYNC(uc, 2);
-+	GUEST_SHARED_DONE(uc);
-+	GUEST_SHARED_ASSERT(uc, false);
-+}
-+
-+static void check_ucall_shared(struct kvm_vm *vm, struct ucall *uc)
-+{
-+	vcpu_run(vm, VCPU_ID);
-+	CHECK_SHARED_SYNC(vm, VCPU_ID, uc, 1);
-+
-+	vcpu_run(vm, VCPU_ID);
-+	CHECK_SHARED_SYNC(vm, VCPU_ID, uc, 2);
-+
-+	vcpu_run(vm, VCPU_ID);
-+	CHECK_SHARED_DONE(vm, VCPU_ID, uc);
-+
-+	vcpu_run(vm, VCPU_ID);
-+	CHECK_SHARED_ABORT(vm, VCPU_ID, uc);
-+}
-+
-+static void __attribute__((__flatten__))
-+guest_code(struct ucall *uc)
-+{
-+	if (uc)
-+		test_ucall_shared(uc);
-+	else
-+		test_ucall();
-+}
-+
-+static struct kvm_vm *setup_vm(void)
-+{
-+	struct kvm_vm *vm;
-+
-+	vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-+	vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, 0, 0, TOTAL_PAGES, 0);
-+
-+	/* Set up VCPU and initial guest kernel. */
-+	vm_vcpu_add_default(vm, VCPU_ID, guest_code);
-+	kvm_vm_elf_load(vm, program_invocation_name);
-+
-+	return vm;
-+}
-+
-+static void setup_vm_args(struct kvm_vm *vm, vm_vaddr_t uc_gva)
-+{
-+	vcpu_args_set(vm, VCPU_ID, 1, uc_gva);
-+}
-+
-+static void run_ucall_test(const struct uc_test_config *config)
-+{
-+	struct kvm_vm *vm = setup_vm();
-+	const struct ucall_ops *ops = config->ops;
-+	bool is_default_ops = (!ops || ops == &ucall_ops_default);
-+	bool shared = (config->type == UC_TEST_WITH_UCALL_INIT_OPS_SHARED);
-+
-+	pr_info("Testing ucall%s ops for: %s%s\n",
-+		shared ? "_shared" : "",
-+		ops ? ops->name : "unspecified",
-+		is_default_ops ? " (via default)" : "");
-+
-+	if (config->type == UC_TEST_WITH_UCALL_INIT)
-+		ucall_init(vm, NULL);
-+	else if (config->type == UC_TEST_WITH_UCALL_INIT_OPS ||
-+		 config->type == UC_TEST_WITH_UCALL_INIT_OPS_SHARED)
-+		ucall_init_ops(vm, NULL, config->ops);
-+
-+	if (shared) {
-+		struct ucall *uc;
-+		vm_vaddr_t uc_gva;
-+
-+		/* Set up ucall buffer. */
-+		uc_gva = ucall_shared_alloc(vm, 1);
-+		uc = addr_gva2hva(vm, uc_gva);
-+
-+		setup_vm_args(vm, uc_gva);
-+		check_ucall_shared(vm, uc);
-+	} else {
-+		setup_vm_args(vm, 0);
-+		check_ucall(vm);
-+	}
-+
-+	if (config->type == UC_TEST_WITH_UCALL_INIT)
-+		ucall_uninit(vm);
-+	else if (config->type == UC_TEST_WITH_UCALL_INIT_OPS ||
-+		 config->type == UC_TEST_WITH_UCALL_INIT_OPS_SHARED)
-+		ucall_uninit_ops(vm);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+static const struct uc_test_config test_configs[] = {
-+#if defined(__x86_64__)
-+	{ UC_TEST_WITHOUT_UCALL_INIT,		NULL },
-+	{ UC_TEST_WITH_UCALL_INIT,		NULL },
-+	{ UC_TEST_WITH_UCALL_INIT_OPS,		&ucall_ops_default },
-+	{ UC_TEST_WITH_UCALL_INIT_OPS,		&ucall_ops_pio },
-+	{ UC_TEST_WITH_UCALL_INIT_OPS_SHARED,	&ucall_ops_pio },
-+	{ UC_TEST_WITH_UCALL_INIT_OPS_SHARED,	&ucall_ops_halt },
-+#elif defined(__aarch64__)
-+	{ UC_TEST_WITH_UCALL_INIT,		NULL },
-+	{ UC_TEST_WITH_UCALL_INIT_OPS,		&ucall_ops_default },
-+	{ UC_TEST_WITH_UCALL_INIT_OPS,		&ucall_ops_mmio },
-+#elif defined(__s390x__)
-+	{ UC_TEST_WITHOUT_UCALL_INIT,		NULL },
-+	{ UC_TEST_WITH_UCALL_INIT,		NULL },
-+	{ UC_TEST_WITH_UCALL_INIT_OPS,		&ucall_ops_default },
-+	{ UC_TEST_WITH_UCALL_INIT_OPS,		&ucall_ops_diag501 },
-+#endif
-+	{ UC_TEST_MAX,				NULL },
-+};
-+
-+int main(int argc, char *argv[])
-+{
-+	int i;
-+
-+	for (i = 0; test_configs[i].type != UC_TEST_MAX; i++)
-+		run_ucall_test(&test_configs[i]);
-+
-+	return 0;
-+}
--- 
-2.25.1
 
 _______________________________________________
 kvmarm mailing list
