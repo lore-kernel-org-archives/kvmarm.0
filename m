@@ -2,73 +2,123 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CD1C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 16:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45020C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 17:36:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BFDF4B174;
-	Fri, 10 Dec 2021 11:58:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A45474B23F;
+	Fri, 10 Dec 2021 12:36:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@amd.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I4dGEyhojtLl; Fri, 10 Dec 2021 11:58:20 -0500 (EST)
+	with ESMTP id EzvfLpnbKMH3; Fri, 10 Dec 2021 12:36:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0287C4B1BD;
-	Fri, 10 Dec 2021 11:58:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DDA64B20E;
+	Fri, 10 Dec 2021 12:36:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F34D4B174
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 11:58:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 269F74B0C0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 11:47:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Oyq-z6I+rvM6 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Dec 2021 11:58:17 -0500 (EST)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 119DB4B126
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 11:58:14 -0500 (EST)
-Received: by mail-pg1-f201.google.com with SMTP id
- h23-20020a635757000000b00338aec76502so2050682pgm.6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 08:58:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=eKQesUFjYD5NfEB4UvQVXF1znz9HszyH0XL6Z4lPT7E=;
- b=pLZZPADyNN9UJUo/y6m5A586urPxDvD011OjasTyFvpXgxTNPjOdg4iIuHxKiis28b
- zNXWr9X95dauDgG3SrAnWBEDXRw85qrjzgoryyRAoZs9IDhRNTrUol+9RkTtWpiFZKYd
- JSRVHeBkx7lA35hOQxSuziYZFqaf5O5VjQYuHex/vmZtI3gnG/mXbW0WXAyEARz2KNSF
- Di9yci3dLMjlRZO7xrg/io5jI12uK7rcIAT0ZiomJw0mFuwJeYIm1T+BIMJQn3IwxSBL
- NLVrOVQrkanj5ipPAlHDFA/GrGtvruUASEbJEApUjdtEy2Vw1qvgBKVhh3z+5ssnjgD0
- Ulhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=eKQesUFjYD5NfEB4UvQVXF1znz9HszyH0XL6Z4lPT7E=;
- b=428TJt52Km6cVloCSEX4MHMjq2L0K4SWjIdYNlgQWJa79B6IdGfgT1t14njPIRF1/L
- Sk1lQgZ3BGdUmJtQm3s/4LK3+Pi05vcap5p6rq28gPGE+JdfpGweigqm7eWiX2WBr13w
- sInQ8zqu47OjPCQxpxDCBHVVlWamjMJwOsaDZrmj3Q+nyVkyEkbz/0TRS5E58GDHOYcL
- aahRvHTRgzVZ4peCD+p+97GpUgPUcZbULyIn82Dihx01URYb/Q7x56rc6LfAX6K3Pm/F
- hxkMTOOFH0lbKxQ5csxnhk79GiePo5Jf09pbLb+WipFGCpKLSuK1uySIpnMlP0g4O6CV
- 4kcA==
-X-Gm-Message-State: AOAM5323bjoyQ0aSVLBrhgnCwUSSsg0Oj+43c5O2HucF7Wj6rQ8dEfbm
- 0jeH9KTTdyiTXARQ0m/M1uNkbcfauLjiXA==
-X-Google-Smtp-Source: ABdhPJxrlb29OM6chmNq04VCtKjTZI3T5q3zrOTqQXOnHJ5M/LwUa4Repgd6cICtUvBgVw2HN6RYjaaTq9xQ5g==
-X-Received: from ricarkol2.c.googlers.com
- ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90b:4c4b:: with SMTP id
- np11mr25621615pjb.233.1639155493365; Fri, 10 Dec 2021 08:58:13 -0800 (PST)
-Date: Fri, 10 Dec 2021 08:58:04 -0800
-In-Reply-To: <20211210165804.1623253-1-ricarkol@google.com>
-Message-Id: <20211210165804.1623253-4-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20211210165804.1623253-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [kvm-unit-tests PATCH 3/3] arm64: debug: add a migration test for
- single-step state
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: maz@kernel.org, pshier@google.com, Paolo Bonzini <pbonzini@redhat.com>
+ with ESMTP id CTKAh5BW95Am for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Dec 2021 11:47:10 -0500 (EST)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com
+ (mail-dm6nam11on2058.outbound.protection.outlook.com [40.107.223.58])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D93BA40762
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 11:47:10 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JarbS9qgcRge4szO27zP6B/HrlJ2ziphX4nJlfKbN+9sWqEv8rMa9K4OO66PrBjc2SJi7Ylq4BygYO07gSftFHA8J0xRxJhRhh0Xnm03yuRb+rFCT/a/cpVRs5P6RZG856cMpUD6G7XBUkqBF3yQxexQfZIQ2I++p45fB5x3djT614gi8nAFYeWRSigk15RnZ+IY31jtGZq3wKahLCS8JCLN/x9/B+tGMwDWgTlxTyoEfvMHy7QbKYl6OesgX2lVVA2eA03+ExvUL1NYr1mwSCmYeszga3zGzVFP/AzRFABpvhQ8VHYttmSrraXrlERh0v95gEat6NSX4LgzvjJeBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wFQMga+ozr4yriDnVn5+bwhC0iqbIN5kaimzahgvsgI=;
+ b=YUd7Q1iROxpbZJz3HkemFNiNJq+xi8ByP/BDVleos7zjhWog2WzqIJpq0qvbvRgLLlu6+k6sdzN5Trw5a/5VL8Axgrs3/UG/xGlBkds0tDQSu66uVhN0Qvjc0iv06CpepxN1Z3oRK7nlr9kCTJMzBixWzEAfEaSBDmjyPitePVd3AqXYS6V4dh4bVIO26gE3uM6Ahina603g5lkFXFmg98zY/UhhtJ2+K3Z8FEZ5TREgJysHDB0b2RmlLCVyJrfSHzSpXOtPByAlmlU4aKVx1nqI8VjIubDg9oP54BrgNvFqRjBfl9qVBzAXFFeMHE6X1VXpdh/UV4hkMihOcwrYNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1; 
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wFQMga+ozr4yriDnVn5+bwhC0iqbIN5kaimzahgvsgI=;
+ b=ESBDpsfcNbOUM1BUKfniC5H6cJXBlPJH6y6LduJ0dQlFxzE4E3N/Z/bHe70ob2JsNEUkr87CALLc/Z90ziaa1ZLrizANzWfKrVbTyF9KARlV0sQpEfEQbZv4AIeBlMsfmy0wyLvpmqSGkwHErY07B0VlEkCFiZGs4E27eekmf94=
+Received: from DM6PR02CA0078.namprd02.prod.outlook.com (2603:10b6:5:1f4::19)
+ by SN1PR12MB2352.namprd12.prod.outlook.com (2603:10b6:802:25::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.12; Fri, 10 Dec
+ 2021 16:47:08 +0000
+Received: from DM6NAM11FT042.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:1f4:cafe::cc) by DM6PR02CA0078.outlook.office365.com
+ (2603:10b6:5:1f4::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.11 via Frontend
+ Transport; Fri, 10 Dec 2021 16:47:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ DM6NAM11FT042.mail.protection.outlook.com (10.13.173.165) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4778.13 via Frontend Transport; Fri, 10 Dec 2021 16:47:08 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Fri, 10 Dec
+ 2021 10:47:07 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: <linux-kselftest@vger.kernel.org>
+Subject: [PATCH RFC 09/10] kvm: selftests: add GUEST_SHARED_* macros for
+ shared ucall implementations
+Date: Fri, 10 Dec 2021 10:46:19 -0600
+Message-ID: <20211210164620.11636-10-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20211210164620.11636-1-michael.roth@amd.com>
+References: <20211210164620.11636-1-michael.roth@amd.com>
+MIME-Version: 1.0
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB03.amd.com
+ (10.181.40.144)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b25bd00d-6fb9-44e6-01b0-08d9bbfcb45c
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2352:EE_
+X-Microsoft-Antispam-PRVS: <SN1PR12MB235247FB7B6BD4293A8E004495719@SN1PR12MB2352.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:901;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hs8lobdZJsdc6++dNhKS9nUnDyFZtT2DMFyGh1C6hDj7Lc6MBJ07GELq+/2Ca4uLDZ35HkW90xIbK79KbLdEmvwxsBXTODwr4Jwa7cJ+wfyUW45bpjpDpwmahGwzw/qQUODc9m1dw+cHEGkkdAenSxheKxylgo9by1rQOQtNWhjR2Ulyv4VYbkzZ5I6gM3ULto0xuDkzP0jCxT9F3DTgHLWa36vihoNg8FUFQtARnveRyT2dsuwfVMErcUphE9aCWFQDVm5Q1jpKFUpAixQRAT9rASDiOxgNIBpbUUisohLD1YyBVPKTk/n+NSTPUnhvxa5mp7CzL4VWJyNzd0HpyIeinslxCWgiNQCAnNnxpFCzPHi651uDW8WmkMgSfQlELAjfSTk5uIf8T5Sf4pE8sZ3Pulv2cuYoOF8sY0EbjfSStqZwa1beOpJezF7n7/x1ajLom98CReFuZmHOU+ya7rebVBRuB9T8plfQgHPwvEtIRhRidxjFPJYIUfogutlLb1I66/344vhMosF9PEaohzHuHWeg7RQQVJipyHshjROOGvwTjzdk0GPk/1Jc3jABMQViiEtQcQS2uDJvdEgtxdlweJxceGSxLIxYSQlDfhppSoI1s+M3G68Ed/IPvepPu5zbyUIMPMN9t0aE7BR7CqIDkbRFA05Oj85LRt7KbMdWG0pGjqqqckw9b78/b9bk1oQDx2Tsy4PrsIvw5RdNB0Ew1MTCOvHevgwM8MLaePAoymZQbDhC0y0b4acmV2lgzwp9O0Wgha89lFki6FDNKFmeNBi140f5Z4ZijDpsaZI=
+X-Forefront-Antispam-Report: CIP:165.204.84.17; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:CAL; SFV:NSPM; H:SATLEXMB03.amd.com; PTR:InfoDomainNonexistent; CAT:NONE;
+ SFS:(4636009)(46966006)(36840700001)(40470700001)(2906002)(54906003)(16526019)(316002)(6916009)(186003)(336012)(4326008)(47076005)(8676002)(26005)(7416002)(36860700001)(508600001)(8936002)(36756003)(44832011)(2616005)(86362001)(81166007)(356005)(40460700001)(70206006)(1076003)(5660300002)(426003)(82310400004)(70586007)(6666004)(36900700001);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2021 16:47:08.0311 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b25bd00d-6fb9-44e6-01b0-08d9bbfcb45c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d; Ip=[165.204.84.17];
+ Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT042.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2352
+X-Mailman-Approved-At: Fri, 10 Dec 2021 12:36:33 -0500
+Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Marc Orr <marcorr@google.com>,
+ "H . Peter Anvin" <hpa@zytor.com>, Claudio
+ Imbrenda <imbrenda@linux.ibm.com>, Shuah Khan <shuah@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Nathan Tempelman <natet@google.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, x86@kernel.org, Ingo Molnar <mingo@redhat.com>,
+ Mingwei Zhang <mizhang@google.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>,
+ Thomas Gleixner <tglx@linutronix.de>, Varad Gautam <varad.gautam@suse.com>,
+ Jim Mattson <jmattson@google.com>, Steve
+ Rutherford <srutherford@google.com>, linux-kernel@vger.kernel.org,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, David Woodhouse <dwmw@amazon.co.uk>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,125 +135,105 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Test the migration of single-step state. Setup single-stepping, migrate,
-and check that we are actually single-stepping.
+Introduce GUEST_SHARED_* macros, which are mostly analogous to existing
+GUEST_SYNC/GUEST_ASSERT/etc macros used to simplify guest code that
+uses ucall for host/guest synchronization.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
+There are also some new CHECK_GUEST_SHARED_* macros intended to provide
+similar helpers in the host code that can pair directly with the guest
+versions.
+
+Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arm/debug.c       | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg | 12 ++++++++++++
- 2 files changed, 59 insertions(+)
+ .../selftests/kvm/include/ucall_common.h      | 68 +++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
-diff --git a/arm/debug.c b/arm/debug.c
-index b2240d7..54f059d 100644
---- a/arm/debug.c
-+++ b/arm/debug.c
-@@ -23,8 +23,10 @@
- #define DBGWCR_E		(0x1 << 0)
+diff --git a/tools/testing/selftests/kvm/include/ucall_common.h b/tools/testing/selftests/kvm/include/ucall_common.h
+index ae0e8eec9734..b9b220dbd6c3 100644
+--- a/tools/testing/selftests/kvm/include/ucall_common.h
++++ b/tools/testing/selftests/kvm/include/ucall_common.h
+@@ -48,6 +48,7 @@ vm_vaddr_t ucall_shared_alloc(struct kvm_vm *vm, int count);
+ void ucall_shared(struct ucall *uc, uint64_t cmd, int nargs, ...);
+ uint64_t get_ucall_shared(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc);
  
- #define SPSR_D			(1 << 9)
-+#define SPSR_SS			(1 << 21)
++/* Helpers for host/guest synchronization using ucall_shared */
+ #define GUEST_SYNC_ARGS(stage, arg1, arg2, arg3, arg4)	\
+ 				ucall(UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
+ #define GUEST_SYNC(stage)	ucall(UCALL_SYNC, 2, "hello", stage)
+@@ -76,4 +77,71 @@ uint64_t get_ucall_shared(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
  
- #define ESR_EC_HW_BP_CURRENT    0x31
-+#define ESR_EC_SSTEP_CURRENT    0x33
- #define ESR_EC_WP_CURRENT       0x35
+ #define GUEST_ASSERT_EQ(a, b) __GUEST_ASSERT((a) == (b), #a " == " #b, 2, a, b)
  
- #define ID_AA64DFR0_BRPS_SHIFT	12
-@@ -34,6 +36,7 @@
- 
- static volatile uint64_t hw_bp_idx, hw_bp_addr[16];
- static volatile uint64_t wp_idx, wp_data_addr[16];
-+static volatile uint64_t ss_addr[4], ss_idx;
- 
- static void hw_bp_handler(struct pt_regs *regs, unsigned int esr)
- {
-@@ -47,6 +50,12 @@ static void wp_handler(struct pt_regs *regs, unsigned int esr)
- 	regs->pstate |= SPSR_D;
- }
- 
-+static void ss_handler(struct pt_regs *regs, unsigned int esr)
-+{
-+	ss_addr[ss_idx++] = regs->pc;
-+	regs->pstate |= SPSR_SS;
-+}
++/* Helper macros for ucall synchronization via shared memory/ucall struct. */
++#define GUEST_SHARED_SYNC_ARGS(uc, stage, arg1, arg2, arg3, arg4) \
++	ucall_shared(uc, UCALL_SYNC, 6, "hello", stage, arg1, arg2, arg3, arg4)
++#define GUEST_SHARED_SYNC(uc, stage) \
++	ucall_shared(uc, UCALL_SYNC, 2, "hello", stage)
++#define GUEST_SHARED_DONE(uc) \
++	ucall_shared(uc, UCALL_DONE, 0)
++#define __GUEST_SHARED_ASSERT(uc, _condition, _condstr, _nargs, _args...) do {    \
++	if (!(_condition))                                                        \
++		ucall_shared(uc, UCALL_ABORT, 2 + _nargs,                         \
++			"Failed guest assert: "                                   \
++			_condstr, __LINE__, _args);                               \
++} while (0)
 +
- static int get_num_hw_bp(void)
- {
- 	uint64_t reg = read_sysreg(id_aa64dfr0_el1);
-@@ -344,6 +353,36 @@ static void test_wp(bool migrate)
- 	}
- }
- 
-+static void test_ss(bool migrate)
-+{
-+	extern unsigned char ss_start;
-+	uint32_t mdscr;
++#define GUEST_SHARED_ASSERT(uc, _condition) \
++	__GUEST_SHARED_ASSERT(uc, _condition, #_condition, 0, 0)
 +
-+	install_exception_handler(EL1H_SYNC, ESR_EC_SSTEP_CURRENT, ss_handler);
++#define GUEST_SHARED_ASSERT_1(uc, _condition, arg1) \
++	__GUEST_SHARED_ASSERT(uc, _condition, #_condition, 1, (arg1))
 +
-+	reset_debug_state();
++#define GUEST_SHARED_ASSERT_2(uc, _condition, arg1, arg2) \
++	__GUEST_SHARED_ASSERT(uc, _condition, #_condition, 2, (arg1), (arg2))
 +
-+	ss_idx = 0;
++#define GUEST_SHARED_ASSERT_3(uc, _condition, arg1, arg2, arg3) \
++	__GUEST_SHARED_ASSERT(uc, _condition, #_condition, 3, (arg1), (arg2), (arg3))
 +
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_SS;
-+	write_sysreg(mdscr, mdscr_el1);
-+	isb();
++#define GUEST_SHARED_ASSERT_4(uc, _condition, arg1, arg2, arg3, arg4) \
++	__GUEST_SHARED_ASSERT(uc, _condition, #_condition, 4, (arg1), (arg2), (arg3), (arg4))
 +
-+	if (migrate) {
-+		do_migrate();
-+	}
++#define GUEST_SHARED_ASSERT_EQ(uc, a, b) \
++	__GUEST_SHARED_ASSERT(uc, (a) == (b), #a " == " #b, 2, a, b)
 +
-+	asm volatile("msr daifclr, #8");
++#define __CHECK_SHARED_STATE(uc, uc_cmd, uc_cmd_expected) do {			\
++	if (uc_cmd != uc_cmd_expected) {					\
++		if (uc_cmd == UCALL_ABORT)					\
++			TEST_FAIL("Unexpected guest abort: \"%s\" at %s:%ld",	\
++				  (const char *)uc->args[0], __FILE__,		\
++				  uc->args[1]);					\
++		else								\
++		    TEST_FAIL("Unexpected ucall command/state: %" PRIu64,	\
++			      uc_cmd);						\
++	}									\
++} while (0)
 +
-+	asm volatile("ss_start:\n"
-+			"mrs x0, esr_el1\n"
-+			"add x0, x0, #1\n"
-+			"msr daifset, #8\n"
-+			: : : "x0");
++#define CHECK_SHARED_SYNC(vm, vcpu_id, uc, stage) do {				\
++	uint64_t uc_cmd = get_ucall_shared(vm, vcpu_id, uc);			\
++	TEST_ASSERT(uc_cmd == UCALL_SYNC,					\
++		    "Unexpected ucall command/state: %" PRIu64, uc_cmd);	\
++	TEST_ASSERT(!strcmp((char *)uc->args[0], "hello"),			\
++		    "Invalid ucall signature argument."); 			\
++	TEST_ASSERT(uc->args[1] == stage,					\
++		    "Invalid ucall sync stage: %" PRIu64, uc->args[1]);		\
++} while (0)
 +
-+	report(ss_addr[0] == (uint64_t)&ss_start, "single step");
-+}
++#define CHECK_SHARED_DONE(vm, vcpu_id, uc) do {					\
++	uint64_t uc_cmd = get_ucall_shared(vm, vcpu_id, uc);			\
++	__CHECK_SHARED_STATE(uc, uc_cmd, UCALL_DONE);				\
++	TEST_ASSERT(uc_cmd == UCALL_DONE,					\
++		    "Unexpected ucall command/state: %" PRIu64, uc_cmd);	\
++} while (0)
 +
- int main(int argc, char **argv)
- {
- 	if (argc < 2)
-@@ -365,6 +404,14 @@ int main(int argc, char **argv)
- 		report_prefix_push(argv[1]);
- 		test_wp(true);
- 		report_prefix_pop();
-+	} else if (strcmp(argv[1], "ss") == 0) {
-+		report_prefix_push(argv[1]);
-+		test_ss(false);
-+		report_prefix_pop();
-+	} else if (strcmp(argv[1], "ss-migration") == 0) {
-+		report_prefix_push(argv[1]);
-+		test_ss(true);
-+		report_prefix_pop();
- 	} else {
- 		report_abort("Unknown subtest '%s'", argv[1]);
- 	}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index bca2fad..c8c51d2 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -266,3 +266,15 @@ file = debug.flat
- arch = arm64
- extra_params = -append 'wp-migration'
- groups = debug migration
++#define CHECK_SHARED_ABORT(vm, vcpu_id, uc) do {				\
++	uint64_t uc_cmd = get_ucall_shared(vm, vcpu_id, uc);			\
++	TEST_ASSERT(uc_cmd == UCALL_ABORT,					\
++		    "Unexpected ucall command/state: %" PRIu64, uc_cmd);	\
++} while (0)
 +
-+[debug-sstep]
-+file = debug.flat
-+arch = arm64
-+extra_params = -append 'ss'
-+groups = debug
-+
-+[debug-sstep-migration]
-+file = debug.flat
-+arch = arm64
-+extra_params = -append 'ss-migration'
-+groups = debug migration
+ #endif /* SELFTEST_KVM_UCALL_COMMON_H */
 -- 
-2.34.1.173.g76aa8bc2d0-goog
+2.25.1
 
 _______________________________________________
 kvmarm mailing list
