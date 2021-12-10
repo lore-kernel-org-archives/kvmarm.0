@@ -2,102 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B596C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 14:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D893AC433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 10 Dec 2021 15:08:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B995E4B1E7;
-	Fri, 10 Dec 2021 09:53:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74FE64B1CF;
+	Fri, 10 Dec 2021 10:08:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nmsGIwxbEVuA; Fri, 10 Dec 2021 09:53:20 -0500 (EST)
+	with ESMTP id oiIrExhUSFyo; Fri, 10 Dec 2021 10:08:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0CFD4B1FB;
-	Fri, 10 Dec 2021 09:53:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EF724B1E4;
+	Fri, 10 Dec 2021 10:08:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B51814B1E4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 09:53:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 151AB4B1CF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 10:08:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 91pq5wGW7gbU for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Dec 2021 09:53:18 -0500 (EST)
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com
- [209.85.208.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61D894B1C9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 09:53:18 -0500 (EST)
-Received: by mail-ed1-f48.google.com with SMTP id x10so13437730edd.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 06:53:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=sender:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=ZPopxfZRkg4NTOl+klIySl5FTmEnEGA7/rHJVRlm4p0=;
- b=axcBhrYY5F+b/7Id5o19CVMf16DlNK++Iv+QQkzI9Mnf7ZTRnJCaH9XidNQOFsOBwc
- KF/wXTKGrFlcXFR9QcXh0tmfQaqluH4DlsgXOrJpdK/LJQrYRJUCa1eRc6to96/IwV2B
- BlyqvjvgggseyLJ8qtFA8u7nkulUxlTbfdET3/IxAhjbM4n3l7+In1S5EkRZyqGZl5Ck
- wKgANnRzx+uuEJWvWG98rzsSbQ650jB+d4dvhyUIs42e58MDzXi1cDPbfAvmMlzdfpM0
- BOcEFYO9Tm6j84wjCz2oTA6sCdsavxKcq1hTPn1dIX2c8ATBFG3sdm+KRLTm8NvOgy5R
- pgDw==
+ with ESMTP id 1qKyOhxkblee for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Dec 2021 10:08:47 -0500 (EST)
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com
+ [209.85.166.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96CDE4B1C8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 10:08:47 -0500 (EST)
+Received: by mail-il1-f179.google.com with SMTP id s11so8712523ilv.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Dec 2021 07:08:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IqGfMFMGzZuu2Hv/uD9rOzDxJvikzGWBAyGek2h55DE=;
+ b=lW1C+rDjLspw7SVQAt0vSMM28+yVbcX5DDOIAMj81eboyg8FUcvBswACi9kzsCZ1H9
+ 5LYkmAl+ripLpLeA1JYjDfRVYOfnjhZ6POVxyIYR4Lum49RLzZ5RWdIcix2V6olLEP/9
+ gzbS+aFMeFov/O7/Ut1NTNm3Ha9UNky/dDQ9C4caEsTOP7NocNO5oh3X+wrXcgjMnJZQ
+ T81e6QY9941LqW4DIbK2SAlUbGXIxVpWGWtuWKb/QIycyTmpcjNGtegCxvoq4MRi7lL+
+ cGcQirooM0N9R5XJPxNK6aimO3w+ibnOuRqK/8HTRPz7XKrzXhGUhqnTxmOH+0yVdhsE
+ Nd4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
- :subject:content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=ZPopxfZRkg4NTOl+klIySl5FTmEnEGA7/rHJVRlm4p0=;
- b=zk7XFCBPkW5PLK692dtCZaZyzRoRsPOOKxnf6rjxZaevVF7+pwd/xly7SAGxq3LjjO
- FTAJfkLEeishmK/SN16d6LJMxa7DWOx/LB06a6G92u3X9FWghFhPdjssctYIl1cNsWtn
- qOG1qJytX8beI6DSdWE9/RlM2t9r60xfrmDso7EKaPftp/SkYGcZvOEZJGAg2uL/hNjh
- jiFNR9qcV+GE8R/dKFV9qK5eUcaDayslXR6t1EQ+n9J3gY8TIhYmBVvfTNEXEACuwj14
- v2GKJFVdjQSP1czvdtAECLnpb6OO3K+srF31mScBRRUhjGbsEvatXyoIciDFE/XrllcH
- rhkw==
-X-Gm-Message-State: AOAM533q0Cklsm8NgqbDuKzfLBN5pukiQrVdD4y4hnc1gUwi2NItKTi8
- ayjS5+yNVTDOvlsPk8D61Puyq273C+Q=
-X-Google-Smtp-Source: ABdhPJzHeROj3HC5Sukl5Uto4GX2p0nJsKAKZ5t4nooil+qkn+wpDmJamxHHNUoZnQ1//006tmFgjQ==
-X-Received: by 2002:a50:e003:: with SMTP id e3mr38840536edl.374.1639147986203; 
- Fri, 10 Dec 2021 06:53:06 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:48f9:bea:a04c:3dfe?
- ([2001:b07:6468:f312:48f9:bea:a04c:3dfe])
- by smtp.googlemail.com with ESMTPSA id
- yc24sm1573561ejb.104.2021.12.10.06.53.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 10 Dec 2021 06:53:05 -0800 (PST)
-Message-ID: <2d864e94-1bae-4cc2-7242-676ef102398f@redhat.com>
-Date: Fri, 10 Dec 2021 15:53:04 +0100
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IqGfMFMGzZuu2Hv/uD9rOzDxJvikzGWBAyGek2h55DE=;
+ b=NTfS+pyr7nBma2rBWnpzLQqghrwlr7OYElYBy8ICu84BZzVuL69UVosEdpz9t2uDOV
+ RU0m1tXQaPv3hTW/jUH+lNHz1TuI91IX/6bQs5pz8Yr3udHJKTmF554glg5lU2kX5uYy
+ GXiqGhBfFgUMx9fTQoe9PyJU/XVPwScjNhDrDbWyasWobcpPo3BsUuCCjAKrYH9il464
+ zaH+Mtxd1fquOo/Is2q/1u18oSaDKUWQRNPQBQFy5228MYONWHqjCsngPUIyzskvbvtY
+ KA0Itz7OvcKEiyHLo5cXsmqOxpmzxNG1u5QFk4RxSTERbwkvx0WhcKj+2d+6jxJEU8aL
+ u2GA==
+X-Gm-Message-State: AOAM533oZiAtsOAIMV/ogbOn/5Qs5WY/bHdsY8VlYKlMwUJ2BHowXMv/
+ xYFzTiR3xh5PKDZtotX3iN27PUTViAEGu+5DU7di7A==
+X-Google-Smtp-Source: ABdhPJzVz6WZmrdfRJ0Qz3kVSX2BxRgBQX2vMBYg/p29dzxXYwaz2Oo90oQFzDWBPjHZ1KZSzvLtG/aQF2JhEXs/8M4=
+X-Received: by 2002:a05:6e02:1a2c:: with SMTP id
+ g12mr23925538ile.22.1639148926706; 
+ Fri, 10 Dec 2021 07:08:46 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v5 08/12] KVM: Reinstate gfn_to_pfn_cache with
- invalidation support
-Content-Language: en-US
-To: David Woodhouse <dwmw2@infradead.org>, kvm <kvm@vger.kernel.org>
-References: <20211121125451.9489-1-dwmw2@infradead.org>
- <20211121125451.9489-9-dwmw2@infradead.org>
- <b1bacc6f-be56-4108-6e52-4315a021184b@redhat.com>
- <b614d9ae0fe7910cfa72eee0b4077776f8012e5f.camel@infradead.org>
- <6cb2cd57-16f3-d0ec-adf6-cb8fdcbae035@redhat.com>
- <5d0a68cd0d06884a2a58338aace811144990f8f5.camel@infradead.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <5d0a68cd0d06884a2a58338aace811144990f8f5.camel@infradead.org>
-Cc: Anup Patel <anup.patel@wdc.com>,
- "wanpengli @ tencent . com" <wanpengli@tencent.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Joao Martins <joao.m.martins@oracle.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>, "joro @ 8bytes . org" <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, karahmed@amazon.com,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- butt3rflyh4ck <butterflyhuangxx@gmail.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
- "jmattson @ google . com" <jmattson@google.com>,
- "mtosatti @ redhat . com" <mtosatti@redhat.com>, linux-mips@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- "vkuznets @ redhat . com" <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
+References: <20211201170411.1561936-1-qperret@google.com>
+ <20211201170411.1561936-14-qperret@google.com>
+In-Reply-To: <20211201170411.1561936-14-qperret@google.com>
+From: Andrew Walbran <qwandor@google.com>
+Date: Fri, 10 Dec 2021 15:08:31 +0000
+Message-ID: <CA+_y_2F0KF6WH+uTa4k3p72mCqeDuN1uzPKTx2u2E4bGUGaPJA@mail.gmail.com>
+Subject: Re: [PATCH v3 13/15] KVM: arm64: Implement do_unshare() helper for
+ unsharing memory
+To: Quentin Perret <qperret@google.com>
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -109,38 +81,193 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gMTIvMTAvMjEgMTM6MjUsIERhdmlkIFdvb2Rob3VzZSB3cm90ZToKPiBPbiBUaHUsIDIwMjEt
-MTItMDkgYXQgMjM6MzQgKzAxMDAsIFBhb2xvIEJvbnppbmkgd3JvdGU6Cj4+Cj4+IENvbXBhcmVk
-IHRvIHRoZSByZXZpZXcgaXQncyBtaXNzaW5nIHRoaXMgaHVuazoKPj4KPj4gQEAgLTI2NSw3ICsy
-NjUsNyBAQCB2b2lkIGt2bV9nZm5fdG9fcGZuX2NhY2hlX3VubWFwKHN0cnVjdCBrdm0gKmt2bSwg
-c3RydWN0IGdmbl90b19wZm5fY2FjaGUgKmdwYykKPj4KPj4gICAgICAgICAgZ3BjLT52YWxpZCA9
-IGZhbHNlOwo+Pgo+PiAtICAgICAgIG9sZF9raHZhID0gZ3BjLT5raHZhOwo+PiArICAgICAgIG9s
-ZF9raHZhID0gKHZvaWQgKikoKHVuc2lnbmVkIGxvbmcpZ3BjLT5raHZhICYgflBBR0VfTUFTSyk7
-Cj4+ICAgICAgICAgIG9sZF9kaXJ0eSA9IGdwYy0+ZGlydHk7Cj4gCj4gRG8geW91IGtub3cgd2hh
-dD8gSSBjb3VsZG4ndCBicmluZyBteXNlbGYgdG8gYWRkIHRoYXQgYSBzZWNvbmQgdGltZS4gSQo+
-IG1hbmFnZWQgaXQgb25jZSwgYnV0IGl0IG1hZGUgbWUgc2FkLgo+IAo+IERpZCBpdCBsaWtlIHRo
-aXMgaW5zdGVhZDoKPiAKPiAtICAgICAgIG9sZF9raHZhID0gZ3BjLT5raHZhOwo+ICsgICAgICAg
-b2xkX2todmEgPSBncGMtPmtodmEgLSBvZmZzZXRfaW5fcGFnZShncGMtPmtodmEpOwoKVmVyeSBu
-aWNlLCBhbmQgaXQgd291bGQgaGF2ZSBkZXNlcnZlZCBhIG1hY3JvIGluIGluY2x1ZGUvbGludXgg
-aWYgdGhlcmUgCndhc24ndCBhIGRlY2VudCB3YXkgdG8gd3JpdGUgaXQuCgo+IEkgY2hlY2tlZCB0
-aGF0IGZvciBtZSBhdCBsZWFzdCwgR0NDIGlzIGNsZXZlciBlbm91Z2ggdG8ganVzdCBkbyB0aGUK
-PiBtYXNrLgo+IAo+ICAgICAgICAgIG9sZF9raHZhID0gZ3BjLT5raHZhIC0gb2Zmc2V0X2luX3Bh
-Z2UoZ3BjLT5raHZhKTsKPiAgIDEzMTogICA0OCA4YiA0MyA3OCAgICAgICAgICAgICBtb3YgICAg
-MHg3OCglcmJ4KSwlcmF4Cj4gICAxMzU6ICAgNDggMjUgMDAgZjAgZmYgZmYgICAgICAgYW5kICAg
-ICQweGZmZmZmZmZmZmZmZmYwMDAsJXJheAo+IAo+IAo+IEkgc3RpbGwgZG9uJ3Qgc2VlIHRoZSBw
-cmV2aW91cyBwYXRjaGVzIGluIGt2bS9uZXh0IOKAlCBpcyB0aGF0IGFuCj4gYXV0b21hdGljIHB1
-c2ggYWZ0ZXIgdGVzdGluZyBoYXMgcGFzc2VkLCBvciBpcyB0aGUga2VybmVsLm9yZwo+IGluZnJh
-c3RydWN0dXJlIGp1c3QgKnJlYWxseSogc2xvdz8KCk5vLCBpdCdzIG1lIHJlYWxseSB3YW50aW5n
-IHRvIHNlbmQgb3V0IHRoZSAtcmM1IHB1bGwgcmVxdWVzdCBiZWZvcmUgdGhlIAp3ZWVrZW5kLiAg
-SnVzdCB3YWl0IGZpdmUgbW9yZSBtaW51dGVzLgoKUGFvbG8KCj4gSSd2ZSBwdXNoZWQgYmFzZWQg
-b24gdGhlIGN1cnJlbnRseS12aXNpYmxlIGt2bS9uZXh0IHRvCj4gaHR0cHM6Ly9naXQuaW5mcmFk
-ZWFkLm9yZy91c2Vycy9kd213Mi9saW51eC5naXQvc2hvcnRsb2cvcmVmcy9oZWFkcy94ZW4tZXZ0
-Y2huCj4gYW5kIGNhbiByZXNlbmQgd2hlbiB0aGUgdHJlZSBmaW5hbGx5IHN1cmZhY2VzLgo+IAoK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
-aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Reviewed-by: Andrew Walbran <qwandor@google.com>
+
+
+On Wed, 1 Dec 2021 at 17:05, 'Quentin Perret' via kernel-team
+<kernel-team@android.com> wrote:
+>
+> From: Will Deacon <will@kernel.org>
+>
+> Tearing down a previously shared memory region results in the borrower
+> losing access to the underlying pages and returning them to the "owned"
+> state in the owner.
+>
+> Implement a do_unshare() helper, along the same lines as do_share(), to
+> provide this functionality for the host-to-hyp case.
+>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 115 ++++++++++++++++++++++++++
+>  1 file changed, 115 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index 1282cbd6b9b3..43b25e2de780 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -485,6 +485,16 @@ static int host_request_owned_transition(u64 *completer_addr,
+>         return __host_check_page_state_range(addr, size, PKVM_PAGE_OWNED);
+>  }
+>
+> +static int host_request_unshare(u64 *completer_addr,
+> +                               const struct pkvm_mem_transition *tx)
+> +{
+> +       u64 size = tx->nr_pages * PAGE_SIZE;
+> +       u64 addr = tx->initiator.addr;
+> +
+> +       *completer_addr = tx->initiator.host.completer_addr;
+> +       return __host_check_page_state_range(addr, size, PKVM_PAGE_SHARED_OWNED);
+> +}
+> +
+>  static int host_initiate_share(u64 *completer_addr,
+>                                const struct pkvm_mem_transition *tx)
+>  {
+> @@ -495,6 +505,16 @@ static int host_initiate_share(u64 *completer_addr,
+>         return __host_set_page_state_range(addr, size, PKVM_PAGE_SHARED_OWNED);
+>  }
+>
+> +static int host_initiate_unshare(u64 *completer_addr,
+> +                                const struct pkvm_mem_transition *tx)
+> +{
+> +       u64 size = tx->nr_pages * PAGE_SIZE;
+> +       u64 addr = tx->initiator.addr;
+> +
+> +       *completer_addr = tx->initiator.host.completer_addr;
+> +       return __host_set_page_state_range(addr, size, PKVM_PAGE_OWNED);
+> +}
+> +
+>  static enum pkvm_page_state hyp_get_page_state(kvm_pte_t pte)
+>  {
+>         if (!kvm_pte_valid(pte))
+> @@ -535,6 +555,17 @@ static int hyp_ack_share(u64 addr, const struct pkvm_mem_transition *tx,
+>         return __hyp_check_page_state_range(addr, size, PKVM_NOPAGE);
+>  }
+>
+> +static int hyp_ack_unshare(u64 addr, const struct pkvm_mem_transition *tx)
+> +{
+> +       u64 size = tx->nr_pages * PAGE_SIZE;
+> +
+> +       if (__hyp_ack_skip_pgtable_check(tx))
+> +               return 0;
+> +
+> +       return __hyp_check_page_state_range(addr, size,
+> +                                           PKVM_PAGE_SHARED_BORROWED);
+> +}
+> +
+>  static int hyp_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
+>                               enum kvm_pgtable_prot perms)
+>  {
+> @@ -545,6 +576,14 @@ static int hyp_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
+>         return pkvm_create_mappings_locked(start, end, prot);
+>  }
+>
+> +static int hyp_complete_unshare(u64 addr, const struct pkvm_mem_transition *tx)
+> +{
+> +       u64 size = tx->nr_pages * PAGE_SIZE;
+> +       int ret = kvm_pgtable_hyp_unmap(&pkvm_pgtable, addr, size);
+> +
+> +       return (ret != size) ? -EFAULT : 0;
+> +}
+> +
+>  static int check_share(struct pkvm_mem_share *share)
+>  {
+>         const struct pkvm_mem_transition *tx = &share->tx;
+> @@ -621,6 +660,82 @@ static int do_share(struct pkvm_mem_share *share)
+>         return WARN_ON(__do_share(share));
+>  }
+>
+> +static int check_unshare(struct pkvm_mem_share *share)
+> +{
+> +       const struct pkvm_mem_transition *tx = &share->tx;
+> +       u64 completer_addr;
+> +       int ret;
+> +
+> +       switch (tx->initiator.id) {
+> +       case PKVM_ID_HOST:
+> +               ret = host_request_unshare(&completer_addr, tx);
+> +               break;
+> +       default:
+> +               ret = -EINVAL;
+> +       }
+> +
+> +       if (ret)
+> +               return ret;
+> +
+> +       switch (tx->completer.id) {
+> +       case PKVM_ID_HYP:
+> +               ret = hyp_ack_unshare(completer_addr, tx);
+> +               break;
+> +       default:
+> +               ret = -EINVAL;
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +static int __do_unshare(struct pkvm_mem_share *share)
+> +{
+> +       const struct pkvm_mem_transition *tx = &share->tx;
+> +       u64 completer_addr;
+> +       int ret;
+> +
+> +       switch (tx->initiator.id) {
+> +       case PKVM_ID_HOST:
+> +               ret = host_initiate_unshare(&completer_addr, tx);
+> +               break;
+> +       default:
+> +               ret = -EINVAL;
+> +       }
+> +
+> +       if (ret)
+> +               return ret;
+> +
+> +       switch (tx->completer.id) {
+> +       case PKVM_ID_HYP:
+> +               ret = hyp_complete_unshare(completer_addr, tx);
+> +               break;
+> +       default:
+> +               ret = -EINVAL;
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +/*
+> + * do_unshare():
+> + *
+> + * The page owner revokes access from another component for a range of
+> + * pages which were previously shared using do_share().
+> + *
+> + * Initiator: SHARED_OWNED     => OWNED
+> + * Completer: SHARED_BORROWED  => NOPAGE
+> + */
+> +static int do_unshare(struct pkvm_mem_share *share)
+> +{
+> +       int ret;
+> +
+> +       ret = check_unshare(share);
+> +       if (ret)
+> +               return ret;
+> +
+> +       return WARN_ON(__do_unshare(share));
+> +}
+> +
+>  int __pkvm_host_share_hyp(u64 pfn)
+>  {
+>         int ret;
+> --
+> 2.34.0.rc2.393.gf8c9666880-goog
+>
+> --
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+>
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
