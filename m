@@ -2,76 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5436BC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 13 Dec 2021 12:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A07C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 13 Dec 2021 12:40:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9E614B1CA;
-	Mon, 13 Dec 2021 07:10:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 298384B164;
+	Mon, 13 Dec 2021 07:40:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id anJ6sb-04qsb; Mon, 13 Dec 2021 07:10:36 -0500 (EST)
+	with ESMTP id qPh4DORg5NKW; Mon, 13 Dec 2021 07:40:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2172E4B0F4;
-	Mon, 13 Dec 2021 07:10:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2291C4B1DD;
+	Mon, 13 Dec 2021 07:40:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51DF04B0D6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Dec 2021 07:10:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E7C594B17D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Dec 2021 07:40:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j2zuyYF4vriq for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Dec 2021 07:10:31 -0500 (EST)
+ with ESMTP id hL2+njUarTme for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Dec 2021 07:40:00 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73A7749FE6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Dec 2021 07:10:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C91AB4B164
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Dec 2021 07:40:00 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id C59EFB80ECD;
- Mon, 13 Dec 2021 12:10:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8362FC34602;
- Mon, 13 Dec 2021 12:10:28 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 15D5DB80E11;
+ Mon, 13 Dec 2021 12:39:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B64BBC34602;
+ Mon, 13 Dec 2021 12:39:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1639397428;
- bh=yMQa3L8wUp+YEFZHSRqGtIylXn9x0hmXjW0gYWUos28=;
+ s=k20201202; t=1639399197;
+ bh=SB0jcvOHaTcNlc7s5Hf+IsizApnbitVNk7rxPIE2TQo=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=j4biG25jQ9zDcwlAUgqmxqkmlw1U6hsE36T5T8exJKBbXJGhDNZYRNitnWhXe5Fe4
- w+XLJScCpVu4kJS6rTPHKOSOJblHtlg2hyANWPrlfPFGlpjsr3DRjnz5dMNtdgYcN1
- vJmuIUhGWlTx2dw09npkpmQgX+4W4L9htQwhpIzG3icorY+kFcu7HuXO/6EMBF1rHU
- AChu20gK4jU/sjYgIoGTjbRqmHvQ250vKYPKtYrfa/hTbHXMBSABBcJ0kkn6V0V1Du
- LyGdeclL3a4dcz708XU85RzufRPWYNOiV5nED1iuyhtjbeYn9Fgmrd3Aye8AQi/9eK
- 7k1UyLJTrx3Rw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ b=Vy5p1Wjs8J0LF1PwNRBLB6DgbMuWO+mDZ9z5D1Ph2Ej0wWoFAbFmAWxgHRmf7K64R
+ m0DEDE8e89LvSUkjoeqE9WWDlSfZLjpzWR0vITfono/qk/Y7F/+/ZjHb6+wA2PKfPt
+ YaWt4TP4s3t5XAPw55chjdlBSrg23Ap+ESVsarKsKy5XviTVCV9xup9LLrhE5tAKSb
+ 6BN7O/McztSmDid9eE52AbDm/ha1kn4lQaExhkEiB2axsN7k0wp5MoymYPFMTTJhuc
+ 9ZM6hbebKJCHFr51Tb6+1KbyTW9mkgPksvSRhnFbCaMtvUF1zLhkL/lREeBcEKt0vR
+ LVtfd4a7i4IDQ==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mwk9y-00Bn30-FO; Mon, 13 Dec 2021 12:10:26 +0000
-Date: Mon, 13 Dec 2021 12:10:26 +0000
-Message-ID: <87pmq0k8nh.wl-maz@kernel.org>
+ id 1mwkcV-00BnLp-Lc; Mon, 13 Dec 2021 12:39:55 +0000
+MIME-Version: 1.0
+Date: Mon, 13 Dec 2021 12:39:55 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
-Subject: Re: Configuring the host GIC for guest to guest IPI
-In-Reply-To: <87fsqwn2sd.fsf@linaro.org>
-References: <87fsqwn2sd.fsf@linaro.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alex.bennee@linaro.org, cdall@kernel.org,
- peter.maydell@linaro.org, shashi.mallela@linaro.org,
- vincent.guittot@linaro.org, stratos-dev@op-lists.linaro.org,
- kvmarm@lists.cs.columbia.edu, arnd.bergmann@linaro.org
+To: Chenxu Wang <irakatz51@gmail.com>
+Subject: Re: Some problems about TZASC configuration
+In-Reply-To: <CAFLP=uDtS9fyg4nmA_tXx5dMWDMoT=ABZk_tRLyQS_toxUxZ-A@mail.gmail.com>
+References: <CAFLP=uDtS9fyg4nmA_tXx5dMWDMoT=ABZk_tRLyQS_toxUxZ-A@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.12
+Message-ID: <d6fef1f0986a8b441cd270c29d2a7baa@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: irakatz51@gmail.com, kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Vincent Guittot <vincent.guittot@linaro.org>,
- Christoffer Dall <cdall@kernel.org>, shashi.mallela@linaro.org,
- Arnd Bergmann <arnd.bergmann@linaro.org>, kvmarm@lists.cs.columbia.edu,
- stratos-dev@op-lists.linaro.org
+Cc: kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,40 +76,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgQWxleCwKCk9uIE1vbiwgMTMgRGVjIDIwMjEgMTE6NDA6NDEgKzAwMDAsCkFsZXggQmVubsOp
-ZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4gd3JvdGU6Cj4KPiBIaSBHSUMgZXhwZXJ0cywKPiAK
-PiBUaGlzIGNhbWUgdXAgbGFzdCB3ZWVrIGluIHRoZSBTdHJhdG9zIHN5bmMgY2FsbCB3aGVuIHdl
-IHdlcmUgZGlzY3Vzc2luZwo+IFZpbmNlbnQncyBTQ01JIHNldHVwOgo+IAo+ICAgaHR0cHM6Ly9s
-aW5hcm8uYXRsYXNzaWFuLm5ldC93aWtpL3NwYWNlcy9TVFIvcGFnZXMvMjg2NjU3NDE1MDMvMjAy
-MS0xMi0wOStQcm9qZWN0K1N0cmF0b3MrTWVldGluZytOb3Rlcwo+IAo+IHdpdGggdGhlIHNoYXJl
-ZCBtZW1vcnkgYmV0d2VlbiB0aGUgdHdvIGd1ZXN0cyB0aGUgb25seSByZWFzb24gd2UKPiBjdXJy
-ZW50bHkgZXhpdCB0byB0aGUgZ3Vlc3QgdXNlcnNwYWNlIChRRU1VKSBpcyB0byBmb3J3YXJkIG5v
-dGlmaWNhdGlvbnMKPiBvZiB2aXJ0cXVldWUga2lja3MgZnJvbSBvbmUgZ3Vlc3QgdG8gdGhlIG90
-aGVyLiBJJ20gdmFndWVseSBhd2FyZSBmcm9tCj4gbXkgdGltZSBsb29raW5nIGF0IEdJQyBjb2Rl
-IHRoYXQgaXQgY2FuIGJlIGNvbmZpZ3VyZWQgZm9yIElQSSBJUlFzCj4gYmV0d2VlbiB0d28gY29y
-ZXMuIERvIHdlIGhhdmUgdGhhdCBhYmlsaXR5IGJldHdlZW4gdHdvIHZDUFVzIGZyb20KPiBkaWZm
-ZXJlbnQgZ3Vlc3RzPwo+IAo+IElmIG5vdCB3aGF0IHdvdWxkIGl0IHRha2UgdG8gZW5hYmxlIHN1
-Y2ggYSBmZWF0dXJlPwoKU0dJcyAodGhlIGludGVycnVwdCB0eXBlIHVzZWQgdG8gaW1wbGVtZW50
-IElQSXMpIGFyZSBieSBkZWZpbml0aW9uCmxvY2FsIHRvIGEgc3lzdGVtIChiZSBpdCBwaHlzaWNh
-bCBvciB2aXJ0dWFsKSwgYW5kIHRoZSBpZGVhIG9mIGJlaW5nCmFibGUgdG8gcm91dGUgdGhlc2Ug
-b3V0c2lkZSB0aGUgc3lzdGVtIGRvZXNuJ3QgaG9sZC4KClNvIGFzIGZhciBhcyBLVk0gaXMgY29u
-Y2VybmVkLCB0aGlzIGlzIGEgc3Ryb25nICpuZXZlciouCgpUaGUgcGVyLUNQVSBuYXR1cmUgb2Yg
-dGhlc2UgaW50ZXJydXB0cyBpcyBhbHNvIHByZXR0eSBiYWQuIEl0IG1lYW5zCnRoYXQgdGhlIGd1
-ZXN0IGNhbm5vdCBzdXNwZW5kIHNvbWUgQ1BVcyB3aXRob3V0IGFsc28gbG9zaW5nIGFjY2VzcyB0
-bwp0aGUgZGV2aWNlL3NoYXJlZCBtZW1vcnkuIEJhZC4KCklmIHlvdSB3YW50IHRvIGdlbmVyYXRl
-IGEgc2lnbmFsIHRoYXQgaXMgdXNlZCBiZXR3ZWVuIFZNcywgd2h5IG5vdCB1c2UKYSBnbG9iYWwg
-aW50ZXJydXB0IChTUEkpLCB3aGVyZSBlYWNoIFZNIHRyZWF0cyB0aGUgb3RoZXIgb25lIGFzIGEK
-ZGV2aWNlIHJhdGhlciB0aGFuIGEgcGVlcj8gQXQgbGVhc3QgdGhlIHNlbWFudGljcyBhcmUgbWFu
-YWdlYWJsZSwgYW5kCmFsbCB5b3UgbmVlZCB0byBpbXBsZW1lbnQgaXMgc29tZSBpcnFmZCBwbHVt
-YmluZyBpbiBib3RoIGRpcmVjdGlvbiwKbXVjaCBhbG9uZyB0aGUgbGluZXMgb2Ygd2hhdCB2Zmlv
-IChhbmQgcHJvYmFibHkgdmhvc3QpIGFscmVhZHkgZG9lcwpmb3IgdGhlIGV4YWN0IHNhbWUgcHVy
-cG9zZSAoc2lnbmFsbGluZyBpbi1rZXJuZWwgZXZlbnRzIHRvIGEgVk0pLgoKCU0uCgotLSAKV2l0
-aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
-bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
-b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Wang,
+
+On 2021-12-12 19:52, Chenxu Wang wrote:
+> Hi all,
+> 
+> I have some problems about KVM+QEMU when it runs on a FVP with TZASC
+> and VHE enabled.
+> 
+> If I configure some DRAM region as "secure only", will KVM generate
+> some fault (e.g. SError) when creating a VM?
+
+If the memory ends up being used by NS, then of course you'll get
+a fault.
+
+> 
+> If yes, can we avoid it by restricting the physical memory region for
+> creating a VM?
+> 
+> For example, I configure 0xa0000000-0xafffffff as secure only, then i
+> ask KVM to create VMs in region 0x90000000-0x9fffffff, so no overlap
+> between them.
+
+You need to instruct the kernel that some of the memory isn't usable.
+Usually, that's done by removing the secure memory from the memory
+map altogether.
+
+In general, the NS world has no business knowing about the secure
+memory.
+
+HTH,
+
+         M.
+-- 
+Jazz is not dead. It just smells funny...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
