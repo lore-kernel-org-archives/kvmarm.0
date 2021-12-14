@@ -2,63 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69CABC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 12:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52730C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 12:30:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9A2C4B11A;
-	Tue, 14 Dec 2021 07:28:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D72F94B199;
+	Tue, 14 Dec 2021 07:30:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4Gdo2Jym0lB7; Tue, 14 Dec 2021 07:28:22 -0500 (EST)
+	with ESMTP id I-3gooDSBF28; Tue, 14 Dec 2021 07:30:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAEE04B18A;
-	Tue, 14 Dec 2021 07:28:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82DE94B1BF;
+	Tue, 14 Dec 2021 07:30:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 191F44B162
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 07:28:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B75EA4B18A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 07:30:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qJeng4zwezjc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Dec 2021 07:28:19 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B34EC4B11A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 07:28:19 -0500 (EST)
+ with ESMTP id v1ccmot88N1D for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Dec 2021 07:30:35 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A1CC4B11A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 07:30:35 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 12BA761473;
- Tue, 14 Dec 2021 12:28:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52DC7C34605;
- Tue, 14 Dec 2021 12:28:18 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id E12F0B81912;
+ Tue, 14 Dec 2021 12:30:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E7CC34601;
+ Tue, 14 Dec 2021 12:30:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1639484898;
- bh=95gvBahSRsD5B9BtLn4/2wODmrj1NsjmxAhYBw8olv4=;
+ s=k20201202; t=1639485032;
+ bh=wtqkn9O+s/VxfCoUXrYBoSFj1AmgnfdkmanmczXY5UA=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=lt+dCULN2B+Liu85oGIDYVhDq+gno5jdx1Kuv3HtaAJ/4GRvQPcnOJzEo1hDVJkXD
- TMi3nL4vEfDz7ypbptYM/TQF5hCp4ufk2a1sN4Nvwvi8CskoTGTt/OxibmHByBjPi4
- KfcXsAxiVb9o1qWclsXm6auqs0iMoWfVjtPJgxYKOYCgm6LlItwIUuaX6Onc0ATC9t
- qR+ooHXmBGuxj9VxcEK6AoqoZtPbqE4npiY88JaVjq2hCbp+QaCujVSdQf1vYKyePO
- SunTUt0chy5jQdfyHR3w1fDrDjZq2QuNAqwFCJ/5GkGLjfBWo11eeveIc8dmW50umZ
- M9nWiel5hxW1w==
+ b=p8ksjKphzW5Fj0ZhRCACIEhWExpEqFFLFVnrncjIvijc0Zols3Ri38Zwg/kn/qiJ5
+ i8NobceVI5N7VmqHxOjKXIgNdh38NCmgaSwXGUfFiB5lbFS+J0SyBRSQNfAbZbf+MT
+ JwVBjDcnNEY4jb5PLBqHZuo9cgut4UZMwl3qSTHWSQMl5SvALcydr2Qcv2uW101ZhJ
+ 7fh2yjs0fs5HrwcZTzUImjMhzh703KrkIiPaTDUUBkSKQQ7rGwJxjMmLulXoyqYYdW
+ 7v6wgzSdxn/8K0fli93QsMFH/kcgQC4symLXyWgT53kNW3/12a0VS9UzWuD7xji4SW
+ OZG4ABbvRLRPQ==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mx6um-00C2aa-A8; Tue, 14 Dec 2021 12:28:16 +0000
-Date: Tue, 14 Dec 2021 12:28:15 +0000
-Message-ID: <8735mvjrq8.wl-maz@kernel.org>
+ id 1mx6ww-00C2dH-KR; Tue, 14 Dec 2021 12:30:30 +0000
+Date: Tue, 14 Dec 2021 12:30:30 +0000
+Message-ID: <871r2fjrmh.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU
- attribute
-In-Reply-To: <20211213152309.158462-4-alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 2/4] KVM: arm64: Keep a list of probed PMUs
+In-Reply-To: <20211213152309.158462-3-alexandru.elisei@arm.com>
 References: <20211213152309.158462-1-alexandru.elisei@arm.com>
- <20211213152309.158462-4-alexandru.elisei@arm.com>
+ <20211213152309.158462-3-alexandru.elisei@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -89,269 +88,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 13 Dec 2021 15:23:08 +0000,
+On Mon, 13 Dec 2021 15:23:07 +0000,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> When KVM creates an event and there are more than one PMUs present on the
-> system, perf_init_event() will go through the list of available PMUs and
-> will choose the first one that can create the event. The order of the PMUs
-> in the PMU list depends on the probe order, which can change under various
-> circumstances, for example if the order of the PMU nodes change in the DTB
-> or if asynchronous driver probing is enabled on the kernel command line
-> (with the driver_async_probe=armv8-pmu option).
-> 
-> Another consequence of this approach is that, on heteregeneous systems,
-> all virtual machines that KVM creates will use the same PMU. This might
-> cause unexpected behaviour for userspace: when a VCPU is executing on
-> the physical CPU that uses this PMU, PMU events in the guest work
-> correctly; but when the same VCPU executes on another CPU, PMU events in
-> the guest will suddenly stop counting.
-> 
-> Fortunately, perf core allows user to specify on which PMU to create an
-> event by using the perf_event_attr->type field, which is used by
-> perf_init_event() as an index in the radix tree of available PMUs.
-> 
-> Add the KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU
-> attribute to allow userspace to specify the arm_pmu that KVM will use when
-> creating events for that VCPU. KVM will make no attempt to run the VCPU on
-> the physical CPUs that share this PMU, leaving it up to userspace to
-> manage the VCPU threads' affinity accordingly.
-> 
-> Setting the PMU for a VCPU is an all of nothing affair to avoid exposing an
-> asymmetric system to the guest: either all VCPUs have the same PMU, either
-> none of the VCPUs have a PMU set. Attempting to do something in between
-> will result in an error being returned when doing KVM_ARM_VCPU_PMU_V3_INIT.
+> The ARM PMU driver calls kvm_host_pmu_init() after probing to tell KVM that
+> a hardware PMU is available for guest emulation. Heterogeneous systems can
+> have more than one PMU present, and the callback gets called multiple
+> times, once for each of them. Keep track of all the PMUs available to KVM,
+> as they're going to be needed later.
 > 
 > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
+>  arch/arm64/kvm/pmu-emul.c | 25 +++++++++++++++++++++++--
+>  include/kvm/arm_pmu.h     |  5 +++++
+>  2 files changed, 28 insertions(+), 2 deletions(-)
 > 
-> Checking that all VCPUs have the same PMU is done when the PMU is
-> initialized because setting the VCPU PMU is optional, and KVM cannot know
-> what the user intends until the KVM_ARM_VCPU_PMU_V3_INIT ioctl, which
-> prevents further changes to the VCPU PMU. vcpu->arch.pmu.created has been
-> changed to an atomic variable because changes to the VCPU PMU state now
-> need to be observable by all physical CPUs.
-> 
->  Documentation/virt/kvm/devices/vcpu.rst | 30 ++++++++-
->  arch/arm64/include/uapi/asm/kvm.h       |  1 +
->  arch/arm64/kvm/pmu-emul.c               | 88 ++++++++++++++++++++-----
->  include/kvm/arm_pmu.h                   |  4 +-
->  tools/arch/arm64/include/uapi/asm/kvm.h |  1 +
->  5 files changed, 104 insertions(+), 20 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index 60a29972d3f1..b918669bf925 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-> @@ -49,8 +49,8 @@ Returns:
->  	 =======  ======================================================
->  	 -EEXIST  Interrupt number already used
->  	 -ENODEV  PMUv3 not supported or GIC not initialized
-> -	 -ENXIO   PMUv3 not supported, missing VCPU feature or interrupt
-> -		  number not set
-> +	 -ENXIO   PMUv3 not supported, missing VCPU feature, interrupt
-> +		  number not set or mismatched PMUs set
->  	 -EBUSY   PMUv3 already initialized
->  	 =======  ======================================================
->  
-> @@ -104,6 +104,32 @@ hardware event. Filtering event 0x1E (CHAIN) has no effect either, as it
->  isn't strictly speaking an event. Filtering the cycle counter is possible
->  using event 0x11 (CPU_CYCLES).
->  
-> +1.4 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_SET_PMU
-> +------------------------------------------
-> +
-> +:Parameters: in kvm_device_attr.addr the address to an int representing the PMU
-> +             identifier.
-> +
-> +:Returns:
-> +
-> +	 =======  ===============================================
-> +	 -EBUSY   PMUv3 already initialized
-> +	 -EFAULT  Error accessing the PMU identifier
-> +	 -ENXIO   PMU not found
-> +	 -ENODEV  PMUv3 not supported or GIC not initialized
-> +	 -ENOMEM  Could not allocate memory
-> +	 =======  ===============================================
-> +
-> +Request that the VCPU uses the specified hardware PMU when creating guest events
-> +for the purpose of PMU emulation. The PMU identifier can be read from the "type"
-> +file for the desired PMU instance under /sys/devices (or, equivalent,
-> +/sys/bus/even_source). This attribute is particularly useful on heterogeneous
-> +systems where there are at least two CPU PMUs on the system. All VCPUs must have
-> +the same PMU, otherwise KVM_ARM_VCPU_PMU_V3_INIT will fail.
-> +
-> +Note that KVM will not make any attempts to run the VCPU on the physical CPUs
-> +associated with the PMU specified by this attribute. This is entirely left to
-> +userspace.
->  
->  2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
->  =================================
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index b3edde68bc3e..1d0a0a2a9711 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -362,6 +362,7 @@ struct kvm_arm_copy_mte_tags {
->  #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
->  #define   KVM_ARM_VCPU_PMU_V3_INIT	1
->  #define   KVM_ARM_VCPU_PMU_V3_FILTER	2
-> +#define   KVM_ARM_VCPU_PMU_V3_SET_PMU	3
->  #define KVM_ARM_VCPU_TIMER_CTRL		1
->  #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
->  #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
 > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index eb4be96f144d..8de38d7fa493 100644
+> index a5e4bbf5e68f..eb4be96f144d 100644
 > --- a/arch/arm64/kvm/pmu-emul.c
 > +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -24,9 +24,16 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+> @@ -7,6 +7,7 @@
+>  #include <linux/cpu.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+> +#include <linux/list.h>
+>  #include <linux/perf_event.h>
+>  #include <linux/perf/arm_pmu.h>
+>  #include <linux/uaccess.h>
+> @@ -14,6 +15,9 @@
+>  #include <kvm/arm_pmu.h>
+>  #include <kvm/arm_vgic.h>
 >  
->  #define PERF_ATTR_CFG1_KVM_PMU_CHAINED 0x1
+> +static LIST_HEAD(arm_pmus);
+> +static DEFINE_MUTEX(arm_pmus_lock);
+> +
+>  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
+>  static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx);
+>  static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
+> @@ -742,9 +746,26 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
 >  
-> -static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> +static u32 kvm_pmu_event_mask(struct kvm_vcpu *vcpu)
+>  void kvm_host_pmu_init(struct arm_pmu *pmu)
 >  {
-> -	switch (kvm->arch.pmuver) {
-> +	unsigned int pmuver;
+> -	if (pmu->pmuver != 0 && pmu->pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
+> -	    !kvm_arm_support_pmu_v3() && !is_protected_kvm_enabled())
+> +	struct arm_pmu_entry *entry;
 > +
-> +	if (vcpu->arch.pmu.arm_pmu)
-> +		pmuver = vcpu->arch.pmu.arm_pmu->pmuver;
-> +	else
-> +		pmuver = vcpu->kvm->arch.pmuver;
+> +	if (pmu->pmuver == 0 || pmu->pmuver == ID_AA64DFR0_PMUVER_IMP_DEF ||
+> +	    is_protected_kvm_enabled())
+> +		return;
+> +
+> +	mutex_lock(&arm_pmus_lock);
+> +
+> +	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
+> +	if (!entry)
+> +		goto out_unlock;
+> +
+> +	if (list_empty(&arm_pmus))
+>  		static_branch_enable(&kvm_arm_pmu_available);
 
-This puzzles me throughout the whole patch. Why is the arm_pmu pointer
-a per-CPU thing? I would absolutely expect it to be stored in the kvm
-structure, making the whole thing much simpler.
+I find it slightly dodgy that you switch the static key before
+actually populating the entry. I'd suggest moving it after the
+list_add_tail(), and check on list_is_singular() instead.
 
 > +
-> +	switch (pmuver) {
->  	case ID_AA64DFR0_PMUVER_8_0:
->  		return GENMASK(9, 0);
->  	case ID_AA64DFR0_PMUVER_8_1:
-> @@ -34,7 +41,7 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
->  	case ID_AA64DFR0_PMUVER_8_5:
->  		return GENMASK(15, 0);
->  	default:		/* Shouldn't be here, just for sanity */
-> -		WARN_ONCE(1, "Unknown PMU version %d\n", kvm->arch.pmuver);
-> +		WARN_ONCE(1, "Unknown PMU version %d\n", pmuver);
->  		return 0;
->  	}
+> +	entry->arm_pmu = pmu;
+> +	list_add_tail(&entry->entry, &arm_pmus);
+> +
+> +out_unlock:
+> +	mutex_unlock(&arm_pmus_lock);
 >  }
-> @@ -119,7 +126,7 @@ static bool kvm_pmu_idx_has_chain_evtype(struct kvm_vcpu *vcpu, u64 select_idx)
->  		return false;
 >  
->  	reg = PMEVTYPER0_EL0 + select_idx;
-> -	eventsel = __vcpu_sys_reg(vcpu, reg) & kvm_pmu_event_mask(vcpu->kvm);
-> +	eventsel = __vcpu_sys_reg(vcpu, reg) & kvm_pmu_event_mask(vcpu);
+>  static int kvm_pmu_probe_pmuver(void)
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 90f21898aad8..e249c5f172aa 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -36,6 +36,11 @@ struct kvm_pmu {
+>  	struct irq_work overflow_work;
+>  };
 >  
->  	return eventsel == ARMV8_PMUV3_PERFCTR_CHAIN;
->  }
-> @@ -534,7 +541,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
->  
->  		/* PMSWINC only applies to ... SW_INC! */
->  		type = __vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i);
-> -		type &= kvm_pmu_event_mask(vcpu->kvm);
-> +		type &= kvm_pmu_event_mask(vcpu);
->  		if (type != ARMV8_PMUV3_PERFCTR_SW_INCR)
->  			continue;
->  
-> @@ -602,6 +609,7 @@ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
->  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  {
->  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct arm_pmu *arm_pmu = pmu->arm_pmu;
->  	struct kvm_pmc *pmc;
->  	struct perf_event *event;
->  	struct perf_event_attr attr;
-> @@ -622,7 +630,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  	if (pmc->idx == ARMV8_PMU_CYCLE_IDX)
->  		eventsel = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
->  	else
-> -		eventsel = data & kvm_pmu_event_mask(vcpu->kvm);
-> +		eventsel = data & kvm_pmu_event_mask(vcpu);
->  
->  	/* Software increment event doesn't need to be backed by a perf event */
->  	if (eventsel == ARMV8_PMUV3_PERFCTR_SW_INCR)
-> @@ -637,8 +645,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
->  		return;
->  
->  	memset(&attr, 0, sizeof(struct perf_event_attr));
-> -	attr.type = PERF_TYPE_RAW;
-> -	attr.size = sizeof(attr);
-
-Why is this line removed?
-
-> +	attr.type = arm_pmu ? arm_pmu->pmu.type : PERF_TYPE_RAW;
->  	attr.pinned = 1;
->  	attr.disabled = !kvm_pmu_counter_is_enabled(vcpu, pmc->idx);
->  	attr.exclude_user = data & ARMV8_PMU_EXCLUDE_EL0 ? 1 : 0;
-> @@ -733,7 +740,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  
->  	mask  =  ARMV8_PMU_EVTYPE_MASK;
->  	mask &= ~ARMV8_PMU_EVTYPE_EVENT;
-> -	mask |= kvm_pmu_event_mask(vcpu->kvm);
-> +	mask |= kvm_pmu_event_mask(vcpu);
->  
->  	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
->  	      ? PMCCFILTR_EL0 : PMEVTYPER0_EL0 + select_idx;
-> @@ -836,7 +843,7 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
->  	if (!bmap)
->  		return val;
->  
-> -	nr_events = kvm_pmu_event_mask(vcpu->kvm) + 1;
-> +	nr_events = kvm_pmu_event_mask(vcpu) + 1;
->  
->  	for (i = 0; i < 32; i += 8) {
->  		u64 byte;
-> @@ -857,7 +864,7 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
->  	if (!kvm_vcpu_has_pmu(vcpu))
->  		return 0;
->  
-> -	if (!vcpu->arch.pmu.created)
-> +	if (!atomic_read(&vcpu->arch.pmu.created))
->  		return -EINVAL;
->  
->  	/*
-> @@ -887,15 +894,20 @@ int kvm_arm_pmu_v3_enable(struct kvm_vcpu *vcpu)
->  
->  static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
->  {
-> -	if (irqchip_in_kernel(vcpu->kvm)) {
-> -		int ret;
-> +	struct arm_pmu *arm_pmu = vcpu->arch.pmu.arm_pmu;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	struct kvm_vcpu *v;
-> +	int ret = 0;
-> +	int i;
+> +struct arm_pmu_entry {
+> +	struct list_head entry;
+> +	struct arm_pmu *arm_pmu;
+> +};
 > +
-> +	if (irqchip_in_kernel(kvm)) {
->  
->  		/*
->  		 * If using the PMU with an in-kernel virtual GIC
->  		 * implementation, we require the GIC to be already
->  		 * initialized when initializing the PMU.
->  		 */
-> -		if (!vgic_initialized(vcpu->kvm))
-> +		if (!vgic_initialized(kvm))
->  			return -ENODEV;
->  
->  		if (!kvm_arm_pmu_irq_initialized(vcpu))
-> @@ -910,7 +922,16 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
->  	init_irq_work(&vcpu->arch.pmu.overflow_work,
->  		      kvm_pmu_perf_overflow_notify_vcpu);
->  
-> -	vcpu->arch.pmu.created = true;
-> +	atomic_set(&vcpu->arch.pmu.created, 1);
-> +
-> +	kvm_for_each_vcpu(i, v, kvm) {
-> +		if (!atomic_read(&v->arch.pmu.created))
-> +			continue;
-> +
-> +		if (v->arch.pmu.arm_pmu != arm_pmu)
-> +			return -ENXIO;
-> +	}
-
-If you did store the arm_pmu at the VM level, you wouldn't need this.
-You could detect the discrepancy in the set_pmu ioctl.
+>  #define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+>  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+>  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
 
 Thanks,
 
