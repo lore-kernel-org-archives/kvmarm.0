@@ -2,90 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 386A4C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 13:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5475FC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 14:47:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8200D4B218;
-	Tue, 14 Dec 2021 08:34:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C654A531;
+	Tue, 14 Dec 2021 09:47:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M9XZkQqLzqKz; Tue, 14 Dec 2021 08:34:56 -0500 (EST)
+	with ESMTP id EgQqpL-Ee374; Tue, 14 Dec 2021 09:47:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EDA4407D1;
-	Tue, 14 Dec 2021 08:34:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7FB44B089;
+	Tue, 14 Dec 2021 09:47:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E76BD407D1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 08:34:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0620D4A19A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 09:47:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CnKENV+joavD for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Dec 2021 08:34:53 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B0ECD4079D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 08:34:53 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1639488893;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Ks3M5C8EaCK4GjMRAAKSo6Eyx91OR1oex8ha7Ihy6PQ=;
- b=V1vNl5hxufoW6Uo2LjG2tv68PV21tQwFIrBsADuUJIlUXiK6BPlMOE6lFscN5fABWoH84P
- cRkxncO8CyFxlmjlOxNu1UICHzVQP96/salTnrJd7Tkp0emYf4Q+vXfLx+nCQ9F0emRp+o
- ti7EaAly2sX6NsbA+9XjJkVU0I/YjHE=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-403-Ea5Llcn5MqOYvkP09SjLLQ-1; Tue, 14 Dec 2021 08:34:52 -0500
-X-MC-Unique: Ea5Llcn5MqOYvkP09SjLLQ-1
-Received: by mail-ed1-f72.google.com with SMTP id
- y11-20020a056402358b00b003f7ce63b89eso281376edc.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 05:34:52 -0800 (PST)
+ with ESMTP id FSmdU5l6XJSW for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Dec 2021 09:47:20 -0500 (EST)
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com
+ [209.85.166.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2BB549FE6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 09:47:19 -0500 (EST)
+Received: by mail-io1-f46.google.com with SMTP id z26so24423262iod.10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 06:47:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=MFaTwQNiJAc7a2QN3hWW+V35/FnCiOZBYqAWjbKuIEY=;
+ b=kRnF5ehDIA7oj8ynLN6/ltuRWtbP1Yd+CvSCVe4k9EkbJXvnlglG+1TDjcATPA25Bj
+ Toe5TmW4Ih3plx0uXi1C+1Ey/n9J4MbMoNhiMLaU4INjM6u8fx9yqpd7//siCMT6Gjf3
+ r7mcUYOMJDqa7InKOh1Z6F5/ZGChUydGGme2nU9whTylnLQaSXlkAYLgV34kuL9KwWDY
+ 46N2GfRQ25/g17+mJR2D5cuMR1UHt7jUDDX3m9ByOBl4/LUBJr5pYIPLmeIqjGLH9bFG
+ 0NKZWxrE0q4zHMjQQ9ueSaTozGAKng5dAfbKsRW5U8B1J+1nGB3tKlaADsvVu8Ao0W/3
+ qYNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Ks3M5C8EaCK4GjMRAAKSo6Eyx91OR1oex8ha7Ihy6PQ=;
- b=yJx0D7DhW9iAkuCogVxhyj5Wyptt5IXp4m5TNdL8My4O5HdPW0wEwgEP+jXGfhNdHQ
- NiXUCQ5F8VimkO47WW49sNqmUsbKnPFUrNwvy8eoi3AfFTCVFx+49+bv4bu//BqFK4cc
- YKo6pcpFcSfp9lGe8znsdduFveGsbjCQltgXlTufVUDTDE9PHGQYvTH++sCQqSU2HWQV
- oR1EEhI7PCFzCcY1XniLdF8UjsJwngapNDFNj9i/70KuL+cmWQERcdUu/QTI7A67gPX7
- 8TQohQv9vyTHlnld8wsdLuHJtzDtj+oqDFGqVOY3AlP8wUdVcnAiKswrIucjNRU6BgFY
- zj2g==
-X-Gm-Message-State: AOAM532zA5PNoqGQrcR2I6SBuJ06fU0tgOq3Zsc9d5uYgiTso8IU8Kgc
- y5fkZguu2g/fBu95BFWrXozJB7V49imDtcl9Y3fZiKcKF87eyt/3kziuSc5cA9FsddnsPykO/R2
- nEtHHJ+vSL610tEj+GqL5NK1l
-X-Received: by 2002:a17:907:7f9e:: with SMTP id
- qk30mr5484654ejc.238.1639488891040; 
- Tue, 14 Dec 2021 05:34:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwqM5EYX790yLEJfRzJAdIh/+o6T7TWGGY3j7D/yNFbJe/W4j2ZKaCKFYpB7QwPBGLGQXJupg==
-X-Received: by 2002:a17:907:7f9e:: with SMTP id
- qk30mr5484625ejc.238.1639488890815; 
- Tue, 14 Dec 2021 05:34:50 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
- by smtp.gmail.com with ESMTPSA id sh33sm7367278ejc.56.2021.12.14.05.34.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Dec 2021 05:34:50 -0800 (PST)
-Date: Tue, 14 Dec 2021 14:34:48 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [kvm-unit-tests PATCH 0/3] arm64: debug: add migration tests for
- debug state
-Message-ID: <20211214133448.6yjlbputjfabzftq@gator.home>
-References: <20211210165804.1623253-1-ricarkol@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=MFaTwQNiJAc7a2QN3hWW+V35/FnCiOZBYqAWjbKuIEY=;
+ b=cUfuyvQkg6dSZJS4gAK5aPsigzYpemMlb93/DZgFlpkb7zXkFeNm0dPGZSpusrhrds
+ ovdeTRZPNEMpoVgEdliX+K0WzTMo46TOHtwOvtgvqBJT+jspq8ucq9DoitLa0LRYwMj2
+ vhAB13CWRBwcIVZA5J1pRtXaQDgqT7vaeya1pwrvOy8kNI1HM39WVLgy2EBzRu/Gk4Xk
+ 5Vr4DLeGf36S8q3vsIGgrcWrHT/wkGai3RTWme/HDI1Cj0yLuek+jvmSePBSbMqTq0jG
+ SSYf9dadlSqpYQC1xYiU/EdDXR1Z2JOcLrpk0vS99b8DIX1GSjys9eCrHNh1uGaI8qFa
+ ACdA==
+X-Gm-Message-State: AOAM53042qHmd30v2ZRChsgE+wS2qWwzdo8E+V4pZQkuAO7w9BjtuSgI
+ WZx5PLKn7l05+v2hZ+3U6zgrKPGq18GcU3pI3X9NZw==
+X-Google-Smtp-Source: ABdhPJzTpfUg42dgB93Wl6laSIqoo4VQsY8HvOE1UvakA3FA6F/Os6E0TdbetECxIp+IWdNKdcuksIXKsEXFhJuTcWo=
+X-Received: by 2002:a05:6602:2a44:: with SMTP id
+ k4mr3890265iov.43.1639493238209; 
+ Tue, 14 Dec 2021 06:47:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20211210165804.1623253-1-ricarkol@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, maz@kernel.org, pshier@google.com,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+References: <20211201170411.1561936-1-qperret@google.com>
+ <20211201170411.1561936-10-qperret@google.com>
+In-Reply-To: <20211201170411.1561936-10-qperret@google.com>
+From: Andrew Walbran <qwandor@google.com>
+Date: Tue, 14 Dec 2021 14:47:06 +0000
+Message-ID: <CA+_y_2FssSEiyBVU6D5MVrFw9nhBuoJp-qKWQePOMC6HV+NBCA@mail.gmail.com>
+Subject: Re: [PATCH v3 09/15] KVM: arm64: Extend pkvm_page_state enumeration
+ to handle absent pages
+To: Quentin Perret <qperret@google.com>
+Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,38 +86,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 10, 2021 at 08:58:01AM -0800, Ricardo Koller wrote:
-> Add some tests for checking that we can migrate debug state correctly: setup
-> some breakpoints/watchpoints/single-stepping, migrate, and then check that we
-> get the expected exceptions.
-> 
-> The 3 patches in this series add tests for breakpoints, watchpoints, and
-> single-stepping one patch at a time.  Each patch adds a migration test and a
-> sanity test (to test that debugging works with no migration).
-> 
-> Note that this is limited to 64-bits and a single vcpu. Also note that some of
-> the code, like reset_debug_state, is borrowed from kvm selftests.
-> 
-> Ricardo Koller (3):
->   arm64: debug: add a migration test for breakpoint state
->   arm64: debug: add a migration test for watchpoint state
->   arm64: debug: add a migration test for single-step state
-> 
->  arm/Makefile.arm64 |   1 +
->  arm/debug.c        | 420 +++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg  |  37 ++++
->  3 files changed, 458 insertions(+)
->  create mode 100644 arm/debug.c
-> 
-> -- 
-> 2.34.1.173.g76aa8bc2d0-goog
+On Wed, 1 Dec 2021 at 17:04, 'Quentin Perret' via kernel-team
+<kernel-team@android.com> wrote:
 >
+> From: Will Deacon <will@kernel.org>
+>
+> Explicitly name the combination of SW0 | SW1 as reserved in the pte and
+> introduce a new PKVM_NOPAGE meta-state which, although not directly
+> stored in the software bits of the pte, can be used to represent an
+> entry for which there is no underlying page. This is distinct from an
+> invalid pte, as stage-2 identity mappings for the host are created
+> lazily and so an invalid pte there is the same as a valid mapping for
+> the purposes of ownership information.
+>
+> This state will be used for permission checking during page transitions
+> in later patches.
+>
+> Signed-off-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> index b58c910babaf..56445586c755 100644
+> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
+> @@ -24,6 +24,11 @@ enum pkvm_page_state {
+>         PKVM_PAGE_OWNED                 = 0ULL,
+>         PKVM_PAGE_SHARED_OWNED          = KVM_PGTABLE_PROT_SW0,
+>         PKVM_PAGE_SHARED_BORROWED       = KVM_PGTABLE_PROT_SW1,
+> +       __PKVM_PAGE_RESERVED            = KVM_PGTABLE_PROT_SW0 |
+> +                                         KVM_PGTABLE_PROT_SW1,
+> +
+> +       /* Meta-states which aren't encoded directly in the PTE's SW bits */
+> +       PKVM_NOPAGE,
+>  };
+>
+>  #define PKVM_PAGE_STATE_PROT_MASK      (KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
+> --
+> 2.34.0.rc2.393.gf8c9666880-goog
 
-Applied to https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
-
-Thanks,
-drew 
-
+Reviewed-by: Andrew Walbran <qwandor@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
