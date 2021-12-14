@@ -2,72 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77977C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 07:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 617D8C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 09:34:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA54A4B1F1;
-	Tue, 14 Dec 2021 02:23:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1DBF4B1AF;
+	Tue, 14 Dec 2021 04:34:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id d4sQ5bQH6B+8; Tue, 14 Dec 2021 02:23:54 -0500 (EST)
+	with ESMTP id 6AqaJL65N5uA; Tue, 14 Dec 2021 04:34:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D38734B217;
-	Tue, 14 Dec 2021 02:23:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0D004B204;
+	Tue, 14 Dec 2021 04:34:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11EA24B213
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 02:23:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B0174B1AF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 04:34:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AW+bHc004rLY for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Dec 2021 02:23:51 -0500 (EST)
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
- [209.85.216.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C65DB4B1F5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 02:23:51 -0500 (EST)
-Received: by mail-pj1-f49.google.com with SMTP id
- nh10-20020a17090b364a00b001a69adad5ebso15382205pjb.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Dec 2021 23:23:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Fxfb29GWggGEpzdwEa4V/YjcbFbmZfWcW/7RyGW59oo=;
- b=BZmaX5HEijb0yxVT6+M0Wi/IUyFZEf1LtAynj2B3PqJC/UfeW8zX+xv+OtFRif92Gl
- vRjdcO5jZCwqYLyi0wK1HptNa1U1skLGhwsdppZhCYtyU6YC0mgmQwTyjNnWL+L4Aiin
- Mw2wAxVVeO7+6TS67qNSSFJnMnMvDCfno3Z99QzrgpMiydveiEKCzUXlu8Z/2fAeDFQM
- R+ooTL6KKFPJmLeVqG6Ctowz36JI9IxGVtQsOhRsJvEqM5jNACx5+0dqDoMsTXwODkLL
- DPaWVculpXuQFc78iSPZaRagG5MeQGvfIv24xSs1LXm0RNiXq/pGaC215pMR4ADcUCPt
- psbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Fxfb29GWggGEpzdwEa4V/YjcbFbmZfWcW/7RyGW59oo=;
- b=7YNASmiqjDYPuzaqv23maZlh49OgSv4zY/9WWYXpORo8Ih8Ekv9/44uG2Wb3GbFwmc
- ICDLtdv+KO+MohXbJptNpTExHyqaM0Dfmtv3bsZxuP6QV36o8iJ/hTXdz+d/jKxkqC4i
- 3esk3TSbva8zC8z322LVlRmXKn5QTZXgtRV4NQSENv6w5AYmzPIbmi7wYetaTfUhQ/Jv
- aWF2NqroIjHAdkZtaFe6tEO3es83VyV5q6+ivosGn9ZiAAShAMS5lgK3dLueLY6AhokQ
- mmzoD9UNfcrzdzhgUVNyzWnGM0Zqt2euzvcGupVXBnPz5I44QGayGyLieM712dfKJNPR
- 8/1w==
-X-Gm-Message-State: AOAM531M/2acWiY430Ri2OQEo6vhE3dAwZ/uXwyghoU5RMdpK15z/ycl
- La2M81TPZrkv+71PXujMvMGMF4MOJd/vJMKPBUr8X4hP9Te38Q==
-X-Google-Smtp-Source: ABdhPJyPVMvQ7LNtAMHntKQQIhIHFF7dDEGbB8KAhBFiKcDWLekfOMnek+R9ZWyehwkQIA9M/7k4Pv/iQiAenT9RYqM=
-X-Received: by 2002:a17:90b:380d:: with SMTP id
- mq13mr3780457pjb.110.1639466630716; 
- Mon, 13 Dec 2021 23:23:50 -0800 (PST)
-MIME-Version: 1.0
-References: <20211213152309.158462-1-alexandru.elisei@arm.com>
- <20211213152309.158462-3-alexandru.elisei@arm.com>
-In-Reply-To: <20211213152309.158462-3-alexandru.elisei@arm.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 13 Dec 2021 23:23:34 -0800
-Message-ID: <CAAeT=FyxN015zVC+xJbD8L6iE=zMhXts7_vvOuVLfeN-wF0eLg@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] KVM: arm64: Keep a list of probed PMUs
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: maz@kernel.org, mingo@redhat.com, tglx@linutronix.de, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id LhCbZjEzb28a for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Dec 2021 04:34:22 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A469A4B176
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 04:34:22 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 9F1C861411;
+ Tue, 14 Dec 2021 09:34:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 100C5C34601;
+ Tue, 14 Dec 2021 09:34:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1639474461;
+ bh=z1u6GNeFy14nSurJpEUNEAh3KRzG84qWb8RhIp4MwOA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=mCEKJEY7XHfp4C6goeMpPfyVCodGPwrpBCACX8inECCP4yOWM+EEL91I5KB/TTYRw
+ TsxAmKpXZtHzGr09jogZiO8wAF4xLT74tWt21+tQlcnHfNgHvLWE8bMAIemSgCLsKU
+ Nspo7NT5S66s8VfGYWyx3zb+lvly/Bx4D6xJv8VhHBtXFhEXUbrlzi8HYQXabwQK0h
+ ZCv+qB6I5/PxTHJU+/t2cMTzGROSwQ6Q5cRTL19y0ikuG5Y0QBuBybId9TNhPCqowG
+ badhM/8MSA07n7IKJ4jiwHmVRCOsiFu1iic9Z+gbLFP/Ta0fUF4ieRxYoigkH0TaDq
+ s4VWR0XLC2I6Q==
+Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mx4CR-00C0fR-4E; Tue, 14 Dec 2021 09:34:19 +0000
+Date: Tue, 14 Dec 2021 09:34:18 +0000
+Message-ID: <87fsqvjzs5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Subject: Re: Libvirt on little.BIG ARM systems unable to start guest if no
+ cpuset is provided
+In-Reply-To: <aa407ba2-e9c4-882e-a085-91e7dd724f78@gmx.com>
+References: <70a2f7d6-5ac1-72df-4a88-b1a662d07070@gmx.com>
+ <32bb61a9-0938-d254-0453-18a108bc4b63@redhat.com>
+ <1dc0403b-c61b-b04b-e7fd-f2d66276ba7b@gmx.com>
+ <CAFEAcA-URrpy3w3AtDb8zVfq8fWxvQ8_jtSqEkaeb=3KE99oAQ@mail.gmail.com>
+ <87lf0ojvq2.wl-maz@kernel.org>
+ <aa407ba2-e9c4-882e-a085-91e7dd724f78@gmx.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: quwenruo.btrfs@gmx.com, peter.maydell@linaro.org,
+ libvirt-users@redhat.com, mprivozn@redhat.com, qemu-arm@nongnu.org,
+ kvmarm@lists.cs.columbia.edu, qemu-discuss@nongnu.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Michal =?UTF-8?B?UHLDrXZvem7DrWs=?= <mprivozn@redhat.com>,
+ qemu-discuss@nongnu.org, libvirt-users@redhat.com, qemu-arm@nongnu.org,
+ kvmarm <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -79,114 +88,89 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
-
-On Mon, Dec 13, 2021 at 7:23 AM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> The ARM PMU driver calls kvm_host_pmu_init() after probing to tell KVM that
-> a hardware PMU is available for guest emulation. Heterogeneous systems can
-> have more than one PMU present, and the callback gets called multiple
-> times, once for each of them. Keep track of all the PMUs available to KVM,
-> as they're going to be needed later.
->
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arch/arm64/kvm/pmu-emul.c | 25 +++++++++++++++++++++++--
->  include/kvm/arm_pmu.h     |  5 +++++
->  2 files changed, 28 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index a5e4bbf5e68f..eb4be96f144d 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -7,6 +7,7 @@
->  #include <linux/cpu.h>
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
-> +#include <linux/list.h>
->  #include <linux/perf_event.h>
->  #include <linux/perf/arm_pmu.h>
->  #include <linux/uaccess.h>
-> @@ -14,6 +15,9 @@
->  #include <kvm/arm_pmu.h>
->  #include <kvm/arm_vgic.h>
->
-> +static LIST_HEAD(arm_pmus);
-> +static DEFINE_MUTEX(arm_pmus_lock);
-> +
->  static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx);
->  static void kvm_pmu_update_pmc_chained(struct kvm_vcpu *vcpu, u64 select_idx);
->  static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc);
-> @@ -742,9 +746,26 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->
->  void kvm_host_pmu_init(struct arm_pmu *pmu)
->  {
-> -       if (pmu->pmuver != 0 && pmu->pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
-> -           !kvm_arm_support_pmu_v3() && !is_protected_kvm_enabled())
-> +       struct arm_pmu_entry *entry;
-> +
-> +       if (pmu->pmuver == 0 || pmu->pmuver == ID_AA64DFR0_PMUVER_IMP_DEF ||
-> +           is_protected_kvm_enabled())
-> +               return;
-> +
-> +       mutex_lock(&arm_pmus_lock);
-> +
-> +       entry = kmalloc(sizeof(*entry), GFP_KERNEL);
-> +       if (!entry)
-> +               goto out_unlock;
-
-It might be better to get the lock after the kmalloc above is done ?
-(the kmalloc might sleep, which will make the code hold the lock longer)
-I don't think the current code will cause any problem though.
-
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
-
-Thanks,
-Reiji
-
-
-> +
-> +       if (list_empty(&arm_pmus))
->                 static_branch_enable(&kvm_arm_pmu_available);
-> +
-> +       entry->arm_pmu = pmu;
-> +       list_add_tail(&entry->entry, &arm_pmus);
-> +
-> +out_unlock:
-> +       mutex_unlock(&arm_pmus_lock);
->  }
->
->  static int kvm_pmu_probe_pmuver(void)
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 90f21898aad8..e249c5f172aa 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -36,6 +36,11 @@ struct kvm_pmu {
->         struct irq_work overflow_work;
->  };
->
-> +struct arm_pmu_entry {
-> +       struct list_head entry;
-> +       struct arm_pmu *arm_pmu;
-> +};
-> +
->  #define kvm_arm_pmu_irq_initialized(v) ((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
->  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
->  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
-> --
-> 2.34.1
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVHVlLCAxNCBEZWMgMjAyMSAwMDo0MTowMSArMDAwMCwKUXUgV2VucnVvIDxxdXdlbnJ1by5i
+dHJmc0BnbXguY29tPiB3cm90ZToKPiAKPiAKPiAKPiBPbiAyMDIxLzEyLzE0IDAwOjQ5LCBNYXJj
+IFp5bmdpZXIgd3JvdGU6Cj4gPiBPbiBNb24sIDEzIERlYyAyMDIxIDE2OjA2OjE0ICswMDAwLAo+
+ID4gUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPiB3cm90ZToKPiA+PiAK
+PiA+PiBLVk0gb24gYmlnLmxpdHRsZSBzZXR1cHMgaXMgYSBrZXJuZWwtbGV2ZWwgcXVlc3Rpb24g
+cmVhbGx5OyBJJ3ZlCj4gPj4gY2MnZCB0aGUga3ZtYXJtIGxpc3QuCj4gPiAKPiA+IFRoYW5rcyBQ
+ZXRlciBmb3IgdGhyb3dpbmcgdXMgdW5kZXIgdGhlIGJpZy1saXR0bGUgYnVzISA7LSkKPiA+IAo+
+ID4+IAo+ID4+IE9uIE1vbiwgMTMgRGVjIDIwMjEgYXQgMTU6MDIsIFF1IFdlbnJ1byA8cXV3ZW5y
+dW8uYnRyZnNAZ214LmNvbT4gd3JvdGU6Cj4gPj4+IAo+ID4+PiAKPiA+Pj4gCj4gPj4+IE9uIDIw
+MjEvMTIvMTMgMjE6MTcsIE1pY2hhbCBQcsOtdm96bsOtayB3cm90ZToKPiA+Pj4+IE9uIDEyLzEx
+LzIxIDAyOjU4LCBRdSBXZW5ydW8gd3JvdGU6Cj4gPj4+Pj4gSGksCj4gPj4+Pj4gCj4gPj4+Pj4g
+UmVjZW50bHkgSSBnb3QgbXkgbGlidmlydCBzZXR1cCBvbiBib3RoIFJLMzM5OSAoUm9ja1BybzY0
+KSBhbmQgUlBJIENNNCwKPiA+Pj4+PiB3aXRoIHVwc3RyZWFtIGtlcm5lbHMuCj4gPj4+Pj4gCj4g
+Pj4+Pj4gRm9yIFJQSSBDTTQgaXRzIG1vc3RseSBzbW9vdGggc2FpbCwgYnV0IG9uIFJLMzM5OSBk
+dWUgdG8gaXRzIGxpdHRsZS5CSUcKPiA+Pj4+PiBzZXR1cCAoY29yZSAwLTMgYXJlIDR4IEE1NSBj
+b3JlcywgYW5kIGNvcmUgNC01IGFyZSAyeCBBNzIgY29yZXMpLCBpdAo+ID4+Pj4+IGJyaW5ncyBx
+dWl0ZSBzb21lIHRyb3VibGVzIGZvciBWTXMuCj4gPj4+Pj4gCj4gPj4+Pj4gSW4gc2hvcnQsIHdp
+dGhvdXQgcHJvcGVyIGNwdXNldCB0byBiaW5kIHRoZSBWTSB0byBlaXRoZXIgYWxsIEE3MiBjb3Jl
+cwo+ID4+Pj4+IG9yIGFsbCBBNTUgY29yZXMsIHRoZSBWTSB3aWxsIG1vc3RseSBmYWlsIHRvIGJv
+b3QuCj4gPiAKPiA+IHMvQTU1L0E1My8uIFRoZXJlIHdlcmUgdGhhbmtmdWxseSBubyBBNzIrQTU1
+IGV2ZXIgcHJvZHVjZWQgKGp1c3QgdGhlCj4gPiB0aG91Z2ggb2YgaXQgbWFrZXMgbWUgc2ljayku
+Cj4gPiAKPiA+Pj4+PiAKPiA+Pj4+PiBDdXJyZW50bHkgdGhlIHdvcmtpbmcgeG1sIGlzOgo+ID4+
+Pj4+IAo+ID4+Pj4+ICAgICA8dmNwdSBwbGFjZW1lbnQ9J3N0YXRpYycgY3B1c2V0PSc0LTUnPjI8
+L3ZjcHU+Cj4gPj4+Pj4gICAgIDxjcHUgbW9kZT0naG9zdC1wYXNzdGhyb3VnaCcgY2hlY2s9J25v
+bmUnLz4KPiA+Pj4+PiAKPiA+Pj4+PiBCdXQgZXZlbiB3aXRoIHZjcHVwaW4sIHBpbm5pbmcgZWFj
+aCB2Y3B1IHRvIGVhY2ggcGh5c2ljYWwgY29yZSwgVk0gd2lsbAo+ID4+Pj4+IG1vc3RseSBmYWls
+IHRvIHN0YXJ0IHVwIGR1ZSB0byB2Y3B1IGluaXRpYWxpemF0aW9uIGZhaWxlZCB3aXRoIC1FSU5W
+QUwuCj4gPiAKPiA+IERpc2NsYWltZXI6IEkga25vdyBub3RoaW5nIGFib3V0IGxpYnZpcnQgKGFu
+ZCBubywgSSBkb24ndCB3YW50IHRvCj4gPiBrbm93ISA7LSkuCj4gPiAKPiA+IEhvd2V2ZXIsIGZv
+ciB0aGluZ3MgdG8gYmUgcmVsaWFibGUsIHlvdSBuZWVkIHRvIHRhc2tzZXQgdGhlIHdob2xlIFFF
+TVUKPiA+IHByb2Nlc3MgdG8gdGhlIENQVSB0eXBlIHlvdSBpbnRlbmQgdG8gdXNlLgo+IAo+IFll
+cCwgdGhhdCdzIHdoYXQgSSdtIGRvaW5nLgoKQXJlIHlvdSBzdXJlPyBUaGUgeG1sIGRpcmVjdGl2
+ZSBhYm92ZSBzZWVtIHRvIG9ubHkgYXBwbHkgdG8gdGhlIHZjcHVzLAphbmQgbm8gb3RoZXIgUUVN
+VSB0aHJlYWQuCgo+ID4gVGhhdCdzIGJlY2F1c2UsIEFGQUlDVCwKPiA+IFFFTVUgd2lsbCBzbmFw
+c2hvdCB0aGUgc3lzdGVtIHJlZ2lzdGVycyBvdXRzaWRlIG9mIHRoZSB2Y3B1IHRocmVhZHMsCj4g
+PiBhbmQgYXR0ZW1wdCB0byB1c2UgdGhlIHJlc3VsdCB0byBjb25maWd1cmUgdGhlIGFjdHVhbCB2
+Y3B1IHRocmVhZHMuIElmCj4gPiB0aGV5IGhhcHBlbiB0byBydW4gb24gZGlmZmVyZW50IENQVSB0
+eXBlcywgdGhlIHN5c3JlZ3Mgd2lsbCBkaWZmZXIgaW4KPiA+IGluY29tcGF0aWJsZSB3YXlzIGFu
+ZCBhbiBlcnJvciB3aWxsIGJlIHJldHVybmVkLiBUaGlzIG1heSBvciBtYXkgbm90Cj4gPiBiZSBh
+IGJ1ZywgSSBkb24ndCBrbm93IChJIHNlZSBpdCBhcyBhIGZlYXR1cmUpLgo+IAo+IFRoZW4gdGhp
+cyBicmluZ3MgYW5vdGhlciBxdWVzdGlvbi4KPiAKPiBJZiB3ZSBjYW4gcGluIGVhY2ggdkNQVSB0
+byBlYWNoIHBoeXNpY2FsIGNvcmUgKGJvdGggbGl0dGxlIGFuZCBiaWcpLAo+IHRoZW4gYXMgbG9u
+ZyBhcyB0aGUgcmVnaXN0ZXJzIGFyZSBwZXItdkNQVSBiYXNlZCwgaXQgc2hvdWxkIGJlIGFibGUg
+dG8KPiBwYXNzIGJvdGggYmlnIGFuZCBsaXR0bGUgY29yZXMgdG8gdGhlIFZNLgoKQWJzb2x1dGVs
+eS4gQnV0IHRoYXQncyBub3QgaG93IFFFTVUgd29ya3MuIEl0IGFzc3VtZXMgdGhhdCBpdCBjYW4K
+cmVzdG9yZSB0aGUgKnNhbWUqIHJlZ2lzdGVycyB0byBhbGwgdGhlIHZjcHVzLiBXaGljaCBvZiBj
+b3Vyc2UgZG9lc24ndAp3b3JrICh3ZSBkb24ndCBhbGxvdyB5b3UgdG8gY2hhbmdlIE1JRFJfRUwx
+LCBmb3IgYSBzdGFydCkuCgo+IFllYWgsIEkgdG90YWxseSB1bmRlcnN0YW5kIHRoaXMgc2NyZXcg
+dXAgdGhlIHNjaGVkdWxpbmcsIGJ1dCB0aGF0J3MgYXQKPiBsZWFzdCB3aGF0IChzb21lIGluc2Fu
+ZSkgdXNlcnMgd2FudCAoanVzdCBsaWtlIG1lKS4KClRoYXQncyBmaW5lLCB3ZSBhbGwgaGF2ZSBv
+dXIgb3duIHVzZSBjYXNlcy4KCj4gCj4gPiAKPiA+IElmIHlvdSBhcmUgYW5ub3llZCB3aXRoIHRo
+aXMgYmVoYXZpb3VyLCB5b3UgY2FuIGFsd2F5cyB1c2UgYSBkaWZmZXJlbnQKPiA+IFZNTSB0aGF0
+IHdvbid0IGNhcmUgYWJvdXQgc3VjaCBkaWZmZXJlbmNlIChjcm9zdm0gb3Iga3ZtdG9vbCwgdG8g
+bmFtZQo+ID4gYSBmZXcpLgo+IAo+IFNvdW5kcyBwcmV0dHkgaW50ZXJlc3RpbmcsIGEgbmV3IHdv
+cmxkIGJ1dCB3aXRob3V0IGxpYnZpcnQuLi4KPgo+ID4gSG93ZXZlciwgdGhlIGd1ZXN0IHdpbGwg
+YmUgYWJsZSB0byBvYnNlcnZlIHRoZSBtaWdyYXRpb24gZnJvbQo+ID4gb25lIGNwdSB0eXBlIHRv
+IGFub3RoZXIuIFRoaXMgbWF5IG9yIG1heSBub3QgYWZmZWN0IHlvdXIgZ3Vlc3Qncwo+ID4gYmVo
+YXZpb3VyLgo+IAo+IE5vdCBzdXJlIGlmIGl0J3MgcG9zc2libGUgdG8gcGluIGVhY2ggdkNQVSB0
+aHJlYWQgdG8gZWFjaCBjb3JlLCBidXQgbGV0Cj4gbWUgdHJ5LgoKQWdhaW46IHRoZSBwcm9ibGVt
+IGlzbid0IHRoZSB2Y3B1IHRocmVhZHMsIGJ1dCB0aGUgZHVtbXkgVk0gdGhhdCBRRU1VCmNyZWF0
+ZXMgdG8gc25hcHNob3QgdGhlIHZjcHUgcmVnaXN0ZXJzLgoKPiA+IEkgcGVyc29uYWxseSBmaW5k
+IHRoZSBRRU1VIGJlaGF2aW91ciByZWFzb25hYmxlLiBLVk0vYXJtNjQgbWFrZSBsaXR0bGUKPiA+
+IGVmZm9ydCB0byBzdXBwb3J0IEJMIHZpcnR1YWxpc2F0aW9uIGFzIGRlc2lnbiBjaG9pY2UgKEkg
+dmFsdWUgbXkKPiA+IHNhbml0eSksIGFuZCB1c2Vyc3BhY2UgaXMgc3RpbGwgaW4gY29udHJvbCBv
+ZiB0aGUgcGxhY2VtZW50Lgo+ID4gCj4gPj4+Pj4gVGhpcyBicmluZ3MgYSBwcm9ibGVtLCBpbiB0
+aGVvcnkgUkszMzk5IFNvQyBzaG91bGQgb3V0LXBlcmZvcm0gQkNNMjcxMQo+ID4+Pj4+IGluIG11
+bHRpLWNvcmUgcGVyZm9ybWFuY2UsIGJ1dCBpZiBhIFZNIGNhbiBvbmx5IGJlIGJpbmQgdG8gZWl0
+aGVyIEE3MiBvcgo+ID4+Pj4+IEE1NSBjb3JlcywgdGhlbiB0aGUgcGVyZm9ybWFuY2UgaXMgbm8g
+bG9uZ2VyIGNvbXBldGl0aXZlIGFnYWluc3QKPiA+Pj4+PiBCQ00yNzExLCB3YXN0aW5nIHRoZSBQ
+Q0lFIDIuMCB4NCBjYXBhY2l0eS4KPiA+IAo+ID4gVm90ZSB3aXRoIHlvdXIgbW9uZXkuIElmIHlv
+dSB0b28gdGhpbmsgdGhhdCBCTCBzeXN0ZW1zIGFyZSB1dHRlciBjcmFwLAo+ID4gZG8gbm90IGJ1
+eSB0aGVtISBPciB0cmVhdCB0aGVtIGFzICd0d28gc3lzdGVtcyBpbiBvbmUnLCB3aGljaCBpcyB3
+aGF0Cj4gPiBJIGRvLiBGcm9tIHRoYXQgYW5nbGUsIHRoaXMgaXMgb2YgZ3JlYXQgdmFsdWUhIDst
+KQo+IAo+IEkgZ3Vlc3MgSSdtIHNldHRpbmcgbXkgZXhwZWN0YXRpb24gdG9vIGhpZ2ggZm9yIHJr
+MzM5OSwganVzdCBzZWVpbmcgaXRzCj4gbXVsdGktdGhyZWFkIHBlcmYgYmVhdGluZyBSUEk0IGFu
+ZCBoYXMgYmV0dGVyIElPIGRvZXNuJ3QgbWVhbiBpdCdzIGEKPiBwZXJmZWN0IGZpdCBmb3IgVk0u
+CgpJIGZpbmQgbXkgb3duIHJrMzM5OSBwZXJmZWN0bHkgYWRlcXVhdGUgd2l0aCBRRU1VLgoKSFRI
+LAoKCU0uCgotLSAKV2l0aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMg
+bm90IHBvc3NpYmxlLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0
+cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
