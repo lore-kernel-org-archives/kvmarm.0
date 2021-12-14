@@ -2,90 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 240B8C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 11:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3F4C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 11:57:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0B214B116;
-	Tue, 14 Dec 2021 06:54:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 760374B154;
+	Tue, 14 Dec 2021 06:57:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dEDrb-dl4ERu; Tue, 14 Dec 2021 06:54:14 -0500 (EST)
+	with ESMTP id HYOznSaeiYrT; Tue, 14 Dec 2021 06:57:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C10BF4B18F;
-	Tue, 14 Dec 2021 06:54:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BAC14B12E;
+	Tue, 14 Dec 2021 06:57:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69E7D4B12E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 06:54:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F1B14B12E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 06:57:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6gieak1YC+Gu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Dec 2021 06:54:12 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B1534B116
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 06:54:12 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1639482852;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vFWy//LIJxob/lWiTb+7jlaVoy7eDwB1D/1wX1Vb67M=;
- b=IvthaIQiYWJoGgNwcPqhI7m41bigMc5fBUMqhTfXnqcJiFb/QWrJnYQPNuMNFA/Nsynr+f
- uQw/mwJNSpGW8/E/beND7bsazLv4zK5W0nQ9DOFA1OPly+KKwo1fFPqzgIV04e0IDTmkqW
- 4Q1tYsaMYU5s55wVNoAinmduPXfrK6o=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-447-z0e83HFKOo-jGQGy1PXGvw-1; Tue, 14 Dec 2021 06:54:08 -0500
-X-MC-Unique: z0e83HFKOo-jGQGy1PXGvw-1
-Received: by mail-ed1-f71.google.com with SMTP id
- q17-20020aa7da91000000b003e7c0641b9cso16757894eds.12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 03:54:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=vFWy//LIJxob/lWiTb+7jlaVoy7eDwB1D/1wX1Vb67M=;
- b=sp+tWJ8eDhuRMIXtU9iPl6MsbzjYLoreI0hSEray0zM8sQm89edZ6C/OmIfcic74D0
- MFUhmo/6UPFRmi6EJYMnYxmXw3FVvAik/JMua9gy0VNR4NcCauCrJEaZdN/Tw2uUrOku
- Dl3aAZfTqwu5gZgppPGajjzST8a3KeCpIgt/96BNQaXUX9L11jcHZ1/8AZ+sdfhrf7sW
- 0Fg5WOhhj0uhgyTbxWg9js4Cil0rnD+MG7TgiN24Pn7/BkupvGO3dO6t+oURN6YN3qS3
- v0k95pWpvWXJ1RwbrNnH2B8tWORpNnQFQ1+/HmwwUa/GrnUebl4TWsOJZV5Q3qk28Lqz
- LCrQ==
-X-Gm-Message-State: AOAM533GQ6SMd+elXV0DbPXYPZb5hhcE/WY8xlBNGpJwXvwefXxWY3by
- plsGL6Kvg5yadQEwvMXh+cN0A6L7iGVKQxI1xJXLDgmsvU2jCX+BQ2x755Y/LFj38DcLAos+Swg
- jdU98MXRVW10ZG5R0bJuDSbEe
-X-Received: by 2002:aa7:cb48:: with SMTP id w8mr7389227edt.402.1639482847852; 
- Tue, 14 Dec 2021 03:54:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxLM06eEkb8R3hqpzcN6AfgAcpZ997bUu2u6dHgiRyTJ9K7eZkp9IDJ4EfaILuqE4kwYGoHuQ==
-X-Received: by 2002:aa7:cb48:: with SMTP id w8mr7389206edt.402.1639482847698; 
- Tue, 14 Dec 2021 03:54:07 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
- by smtp.gmail.com with ESMTPSA id t5sm7728720edd.68.2021.12.14.03.54.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 14 Dec 2021 03:54:07 -0800 (PST)
-Date: Tue, 14 Dec 2021 12:54:05 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [kvm-unit-tests PATCH v9 0/9] MTTCG sanity tests for ARM
-Message-ID: <20211214115405.wt4gazkqsvmhqv6w@gator.home>
-References: <20211202115352.951548-1-alex.bennee@linaro.org>
- <20211214115046.kpiboz7uzgymdoci@gator.home>
-MIME-Version: 1.0
-In-Reply-To: <20211214115046.kpiboz7uzgymdoci@gator.home>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: thuth@redhat.com, kvm@vger.kernel.org, maz@kernel.org,
- christoffer.dall@arm.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
+ with ESMTP id 4JiRQ8zqGxaj for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Dec 2021 06:57:02 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 613B44B116
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 06:57:02 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3BF56614A1;
+ Tue, 14 Dec 2021 11:57:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A41EAC34601;
+ Tue, 14 Dec 2021 11:57:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1639483020;
+ bh=FAheOAFVBOjbmeJ7xmDDDgpCkGhFGIolFk++QjIuXr8=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=cpJUazKFcOPowGzUzudZZczu2nt8pB6Wb1aWPK4EIsqlb3T37LIQ5xD99xqod1olO
+ sM+mED4FuNob6zZ3juRRsA6HHntiBXuxB/Uegkx23N4KCCPAQlGVgc/iGJnw5W30bF
+ ho+XHKHnRYvqQEBcmCDZnVKdLFZjMJqPeXMip5BGNC3+lBcM0mRmlCeMxJK8uHLELI
+ lSTtDD2f5svTQC2EeZ/I+1PJT21YVsx8QVrF/D09G0JqTwuv/l8omtSirzvaRB29/M
+ M1Qdc0e0jRFpL/iLmlaQTzLDRNFE68rcYpWnqiLHzy7kqNITKFl9eoMF4cTrw1SkOc
+ NT5vq9eJJvzPg==
+Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mx6QU-00C2AI-BO; Tue, 14 Dec 2021 11:56:58 +0000
+Date: Tue, 14 Dec 2021 11:56:57 +0000
+Message-ID: <874k7bjt6e.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 0/4] KVM: arm64: Improve PMU support on heterogeneous
+ systems
+In-Reply-To: <CAAeT=FxK2F+GUdJ_0z6rb4F5ttjW5ZyD7Sa_eyiaKc=xxDdMkg@mail.gmail.com>
+References: <20211206170223.309789-1-alexandru.elisei@arm.com>
+ <CAAeT=FygprcS3YxbVaW+4yUjHBm8=MxZ+j4_iVjq7ie-ppRKRg@mail.gmail.com>
+ <addac215bddf0b86bf6850093d500785@kernel.org>
+ <CAAeT=Fzz2UGQAWGx_4piJGng5BKpX3FQrZDA7u2PHFcTRD4G4w@mail.gmail.com>
+ <YbcrKAE35GMzPQBt@monolith.localdoman>
+ <CAAeT=FxK2F+GUdJ_0z6rb4F5ttjW5ZyD7Sa_eyiaKc=xxDdMkg@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, alexandru.elisei@arm.com,
+ james.morse@arm.com, suzuki.poulose@arm.com, will@kernel.org,
+ mark.rutland@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, tglx@linutronix.de, mingo@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: will@kernel.org, mingo@redhat.com, tglx@linutronix.de,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -98,76 +88,46 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Dec 14, 2021 at 12:50:46PM +0100, Andrew Jones wrote:
-> On Thu, Dec 02, 2021 at 11:53:43AM +0000, Alex Benn=E9e wrote:
-> > Hi,
-> > =
+On Tue, 14 Dec 2021 06:24:38 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Alex,
+> 
+> On Mon, Dec 13, 2021 at 3:14 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > Also, as VCPUs get migrated from one physical CPU to the other, the
+> > semantics of the microarchitectural events change, even if the event ID is
+> > the same.
+> 
+> Yes, I understand.  As mentioned, this can work only when the
+> CPU affinity is set for vCPU threads appropriately (, which could
+> be done even without changing userspace).
 
-> > Not a great deal has changed from the last posting although I have
-> > dropped the additional unittests.cfg in favour of setting "nodefault"
-> > for the tests. Otherwise the clean-ups are mainly textual (removing
-> > printfs, random newlines and cleaning up comments). As usual the
-> > details are in the commits bellow the ---.
-> > =
+Implicit bindings to random PMUs based on the scheduling seems a
+pretty fragile API to me, and presents no real incentive for userspace
+to start doing the right thing.
 
-> > I've also tweaked .git/config so get_maintainer.pl should ensure
-> > direct delivery of the patches ;-)
-> > =
+I'd prefer not counting events at all when on the wrong CPU (for some
+definition of 'wrong'), rather than accumulating unrelated events.
+Both are admittedly wrong, but between two evils, I'd rather stick
+with the one I know (and that doesn't require any change)...
 
-> > Alex Benn=E9e (9):
-> >   docs: mention checkpatch in the README
-> >   arm/flat.lds: don't drop debug during link
-> =
+Alex's series brings a way to solve this by allowing userspace to pick
+a PMU and make sure userspace is aware of the consequences. It puts
+userspace in charge, and doesn't leave space for ambiguous behaviours.
 
-> >   arm/run: use separate --accel form
-> =
+I definitely find value in this approach.
 
-> I queued these three to arm/queue[1].
-> =
+	M.
 
-> >   Makefile: add GNU global tags support
-> =
-
-> Haven't queued this yet since I think we need .gitignore changes.
-> =
-
-> >   lib: add isaac prng library from CCAN
-> >   arm/tlbflush-code: TLB flush during code execution
-> >   arm/locking-tests: add comprehensive locking test
-> >   arm/barrier-litmus-tests: add simple mp and sal litmus tests
-> >   arm/tcg-test: some basic TCG exercising tests
-> =
-
-> These I've queued to arm/mttcg[2] with a slight change of dropping the
-> 'mttcg' group name from any tests that can also run under kvm and
-> renaming mttcg to to tcg for the tests that require tcg.
-
-Hmm. I also just noticed that we should rename these tests to something
-without the ::  The :: works with standalone, but it isn't all that nice
-of a unix file name.
-
-Thanks,
-drew
-
-> =
-
-> I haven't pushed everything to arm/queue yet since I'm not yet sure
-> I like all the nodefault tests showing up in the logs, even though that
-> was my suggestion... I need to play with it some more.
-> =
-
-> Thanks,
-> drew
-> =
-
-> [1] https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
-> [2] https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/mttcg
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
