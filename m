@@ -2,69 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5475FC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 14:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FCFC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 14 Dec 2021 14:48:46 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C654A531;
-	Tue, 14 Dec 2021 09:47:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 379F04B20D;
+	Tue, 14 Dec 2021 09:48:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EgQqpL-Ee374; Tue, 14 Dec 2021 09:47:21 -0500 (EST)
+	with ESMTP id oyH5EE4zSSRF; Tue, 14 Dec 2021 09:48:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7FB44B089;
-	Tue, 14 Dec 2021 09:47:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E00A4B1BF;
+	Tue, 14 Dec 2021 09:48:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0620D4A19A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 09:47:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B90214B0ED
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 09:48:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FSmdU5l6XJSW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 14 Dec 2021 09:47:20 -0500 (EST)
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com
- [209.85.166.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2BB549FE6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 09:47:19 -0500 (EST)
-Received: by mail-io1-f46.google.com with SMTP id z26so24423262iod.10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 06:47:19 -0800 (PST)
+ with ESMTP id XOtFScBVTVK0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Dec 2021 09:48:42 -0500 (EST)
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com
+ [209.85.166.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F9AA4B0DF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 09:48:42 -0500 (EST)
+Received: by mail-io1-f50.google.com with SMTP id p23so24498000iod.7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Dec 2021 06:48:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=MFaTwQNiJAc7a2QN3hWW+V35/FnCiOZBYqAWjbKuIEY=;
- b=kRnF5ehDIA7oj8ynLN6/ltuRWtbP1Yd+CvSCVe4k9EkbJXvnlglG+1TDjcATPA25Bj
- Toe5TmW4Ih3plx0uXi1C+1Ey/n9J4MbMoNhiMLaU4INjM6u8fx9yqpd7//siCMT6Gjf3
- r7mcUYOMJDqa7InKOh1Z6F5/ZGChUydGGme2nU9whTylnLQaSXlkAYLgV34kuL9KwWDY
- 46N2GfRQ25/g17+mJR2D5cuMR1UHt7jUDDX3m9ByOBl4/LUBJr5pYIPLmeIqjGLH9bFG
- 0NKZWxrE0q4zHMjQQ9ueSaTozGAKng5dAfbKsRW5U8B1J+1nGB3tKlaADsvVu8Ao0W/3
- qYNQ==
+ :cc; bh=GLws1fv1VvQ+JdMbCyDoHLq+rkRsysRGV91MeqRMLdM=;
+ b=eviPoIzpJMZdqH8yuSUhoKHalI4tyZogPyEoK8h12DRJoxZ0Ab7m31ZEODVknuaUcK
+ WvUVetw7Alaz4hJSjVAWjhx7KCT5kx/lOgBR+hC0BcDwiEStS301DAsf2gy4tAmQkiB4
+ WfwWMsaZHzfsY69AxbS9wLCyQZXDDni+SPH8F6ioe13dcus2bBNrG6zAVFu7RocBzMgh
+ +uYvoeYFBRJReekBk/AkCZpxAXDLQPPWrxL4XoZObuiURRFgb0ZcFTgxeZDmPplF+63A
+ owOfqrAQ9Fre27IS9uvk8WtFqJuHNK27IoUeVwcojxXSCUdOROipbAGl10vnihs+9rYV
+ OggA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=MFaTwQNiJAc7a2QN3hWW+V35/FnCiOZBYqAWjbKuIEY=;
- b=cUfuyvQkg6dSZJS4gAK5aPsigzYpemMlb93/DZgFlpkb7zXkFeNm0dPGZSpusrhrds
- ovdeTRZPNEMpoVgEdliX+K0WzTMo46TOHtwOvtgvqBJT+jspq8ucq9DoitLa0LRYwMj2
- vhAB13CWRBwcIVZA5J1pRtXaQDgqT7vaeya1pwrvOy8kNI1HM39WVLgy2EBzRu/Gk4Xk
- 5Vr4DLeGf36S8q3vsIGgrcWrHT/wkGai3RTWme/HDI1Cj0yLuek+jvmSePBSbMqTq0jG
- SSYf9dadlSqpYQC1xYiU/EdDXR1Z2JOcLrpk0vS99b8DIX1GSjys9eCrHNh1uGaI8qFa
- ACdA==
-X-Gm-Message-State: AOAM53042qHmd30v2ZRChsgE+wS2qWwzdo8E+V4pZQkuAO7w9BjtuSgI
- WZx5PLKn7l05+v2hZ+3U6zgrKPGq18GcU3pI3X9NZw==
-X-Google-Smtp-Source: ABdhPJzTpfUg42dgB93Wl6laSIqoo4VQsY8HvOE1UvakA3FA6F/Os6E0TdbetECxIp+IWdNKdcuksIXKsEXFhJuTcWo=
-X-Received: by 2002:a05:6602:2a44:: with SMTP id
- k4mr3890265iov.43.1639493238209; 
- Tue, 14 Dec 2021 06:47:18 -0800 (PST)
+ bh=GLws1fv1VvQ+JdMbCyDoHLq+rkRsysRGV91MeqRMLdM=;
+ b=uXS36um5ApZPSjszWM6utyntMlQLqvvNIAxCy04EhYWIFvZZAXtMm4KjSMAoQZxx6j
+ W7jBEd6mdje/7778j1WI4X21zInK0l4FSjFZkXldi/5dX1pJDiGXLfHRST6UhPL6KCyS
+ f4TWms3NWBgUY251xZTmeaA3W5Iv2aNy0j4Sd46I+CH0Y+yjfxUdMj0mXNmlXHEvucvf
+ EDk1kOvi7xUyA9vnj/E0Oop07yMitE4qLhUSmXMW+YhYjb2CLIdNqrX7KVL5x/jqlQ5o
+ jc6ZSmE9th4Z4daf53QG9OdLC5sAsQAfRwaJ+aBBpmtx+dpaB8p3KElo+KIs61xfk1UG
+ TXQA==
+X-Gm-Message-State: AOAM532Qkta1kDYYdD2r0S3CTXyuR6I9ILFRFlQOA8V/fJl/QyTjZ9j4
+ uVad9/GlyDLnl3j7fqfnoKMLCEvhLdvuNJydp3XdxQ==
+X-Google-Smtp-Source: ABdhPJwDobqQ0ytVa0HxNlcgE4bESeMZUOEn4HcyugZoluHpS2Q4fWuEd3GtI+jUITR45jghm1HTYm2iOEJoB2ew/AQ=
+X-Received: by 2002:a02:6945:: with SMTP id e66mr3303073jac.620.1639493321703; 
+ Tue, 14 Dec 2021 06:48:41 -0800 (PST)
 MIME-Version: 1.0
 References: <20211201170411.1561936-1-qperret@google.com>
- <20211201170411.1561936-10-qperret@google.com>
-In-Reply-To: <20211201170411.1561936-10-qperret@google.com>
+ <20211201170411.1561936-11-qperret@google.com>
+In-Reply-To: <20211201170411.1561936-11-qperret@google.com>
 From: Andrew Walbran <qwandor@google.com>
-Date: Tue, 14 Dec 2021 14:47:06 +0000
-Message-ID: <CA+_y_2FssSEiyBVU6D5MVrFw9nhBuoJp-qKWQePOMC6HV+NBCA@mail.gmail.com>
-Subject: Re: [PATCH v3 09/15] KVM: arm64: Extend pkvm_page_state enumeration
- to handle absent pages
+Date: Tue, 14 Dec 2021 14:48:30 +0000
+Message-ID: <CA+_y_2HKwtm5839QyEY9D8PaZWky_Zvn3msrw2gcR2Z7UZgObQ@mail.gmail.com>
+Subject: Re: [PATCH v3 10/15] KVM: arm64: Introduce wrappers for host and hyp
+ spin lock accessors
 To: Quentin Perret <qperret@google.com>
 Cc: kernel-team@android.com, Marc Zyngier <maz@kernel.org>,
  linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
@@ -91,43 +90,95 @@ On Wed, 1 Dec 2021 at 17:04, 'Quentin Perret' via kernel-team
 >
 > From: Will Deacon <will@kernel.org>
 >
-> Explicitly name the combination of SW0 | SW1 as reserved in the pte and
-> introduce a new PKVM_NOPAGE meta-state which, although not directly
-> stored in the software bits of the pte, can be used to represent an
-> entry for which there is no underlying page. This is distinct from an
-> invalid pte, as stage-2 identity mappings for the host are created
-> lazily and so an invalid pte there is the same as a valid mapping for
-> the purposes of ownership information.
->
-> This state will be used for permission checking during page transitions
-> in later patches.
+> In preparation for adding additional locked sections for manipulating
+> page-tables at EL2, introduce some simple wrappers around the host and
+> hypervisor locks so that it's a bit easier to read and bit more difficult
+> to take the wrong lock (or even take them in the wrong order).
+Looks good, but how does this help prevent taking locks in the wrong order?
+
 >
 > Signed-off-by: Will Deacon <will@kernel.org>
 > Signed-off-by: Quentin Perret <qperret@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/nvhe/mem_protect.h | 5 +++++
->  1 file changed, 5 insertions(+)
+>  arch/arm64/kvm/hyp/nvhe/mem_protect.c | 32 ++++++++++++++++++++++-----
+>  1 file changed, 26 insertions(+), 6 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> index b58c910babaf..56445586c755 100644
-> --- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> +++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-> @@ -24,6 +24,11 @@ enum pkvm_page_state {
->         PKVM_PAGE_OWNED                 = 0ULL,
->         PKVM_PAGE_SHARED_OWNED          = KVM_PGTABLE_PROT_SW0,
->         PKVM_PAGE_SHARED_BORROWED       = KVM_PGTABLE_PROT_SW1,
-> +       __PKVM_PAGE_RESERVED            = KVM_PGTABLE_PROT_SW0 |
-> +                                         KVM_PGTABLE_PROT_SW1,
+> diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> index c1a90dd022b8..757dfefe3aeb 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
+> @@ -27,6 +27,26 @@ static struct hyp_pool host_s2_pool;
+>
+>  const u8 pkvm_hyp_id = 1;
+>
+> +static void host_lock_component(void)
+> +{
+> +       hyp_spin_lock(&host_kvm.lock);
+> +}
 > +
-> +       /* Meta-states which aren't encoded directly in the PTE's SW bits */
-> +       PKVM_NOPAGE,
->  };
+> +static void host_unlock_component(void)
+> +{
+> +       hyp_spin_unlock(&host_kvm.lock);
+> +}
+> +
+> +static void hyp_lock_component(void)
+> +{
+> +       hyp_spin_lock(&pkvm_pgd_lock);
+> +}
+> +
+> +static void hyp_unlock_component(void)
+> +{
+> +       hyp_spin_unlock(&pkvm_pgd_lock);
+> +}
+> +
+>  static void *host_s2_zalloc_pages_exact(size_t size)
+>  {
+>         void *addr = hyp_alloc_pages(&host_s2_pool, get_order(size));
+> @@ -338,14 +358,14 @@ static int host_stage2_idmap(u64 addr)
 >
->  #define PKVM_PAGE_STATE_PROT_MASK      (KVM_PGTABLE_PROT_SW0 | KVM_PGTABLE_PROT_SW1)
+>         prot = is_memory ? PKVM_HOST_MEM_PROT : PKVM_HOST_MMIO_PROT;
+>
+> -       hyp_spin_lock(&host_kvm.lock);
+> +       host_lock_component();
+>         ret = host_stage2_adjust_range(addr, &range);
+>         if (ret)
+>                 goto unlock;
+>
+>         ret = host_stage2_idmap_locked(range.start, range.end - range.start, prot);
+>  unlock:
+> -       hyp_spin_unlock(&host_kvm.lock);
+> +       host_unlock_component();
+>
+>         return ret;
+>  }
+> @@ -369,8 +389,8 @@ int __pkvm_host_share_hyp(u64 pfn)
+>         if (!addr_is_memory(addr))
+>                 return -EINVAL;
+>
+> -       hyp_spin_lock(&host_kvm.lock);
+> -       hyp_spin_lock(&pkvm_pgd_lock);
+> +       host_lock_component();
+> +       hyp_lock_component();
+>
+>         ret = kvm_pgtable_get_leaf(&host_kvm.pgt, addr, &pte, NULL);
+>         if (ret)
+> @@ -432,8 +452,8 @@ int __pkvm_host_share_hyp(u64 pfn)
+>         BUG_ON(ret);
+>
+>  unlock:
+> -       hyp_spin_unlock(&pkvm_pgd_lock);
+> -       hyp_spin_unlock(&host_kvm.lock);
+> +       hyp_unlock_component();
+> +       host_unlock_component();
+>
+>         return ret;
+>  }
 > --
 > 2.34.0.rc2.393.gf8c9666880-goog
-
-Reviewed-by: Andrew Walbran <qwandor@google.com>
+>
+> --
+> To unsubscribe from this group and stop receiving emails from it, send an email to kernel-team+unsubscribe@android.com.
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
