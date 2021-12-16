@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FC5C43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C562C4332F
 	for <kvmarm@archiver.kernel.org>; Thu, 16 Dec 2021 12:31:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A1E74B26C;
-	Thu, 16 Dec 2021 07:31:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 070A94B24E;
+	Thu, 16 Dec 2021 07:31:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 19CblXKmhy1U; Thu, 16 Dec 2021 07:31:43 -0500 (EST)
+	with ESMTP id b9kEgP7pcgfS; Thu, 16 Dec 2021 07:31:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88B234B255;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A649E4B25F;
 	Thu, 16 Dec 2021 07:31:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 956684B222
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96DE84B24D
  for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 07:31:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1lIKKGAaAYgY for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id p6BfRN6QdNy7 for <kvmarm@lists.cs.columbia.edu>;
  Thu, 16 Dec 2021 07:31:41 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 943374B1D1
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97DE14B1D5
  for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 07:31:41 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id AB77361D79;
- Thu, 16 Dec 2021 12:31:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C52EC36AE5;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 211A561DCB;
+ Thu, 16 Dec 2021 12:31:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82E44C36AE4;
  Thu, 16 Dec 2021 12:31:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1639657900;
- bh=4rSkbQHvQNccr16rISKUtR7jY5pFieW8AWzfrNGTbuQ=;
+ bh=kBOiO5yeoWnB+tkXGY+eu1N5qdNCnGtoe3lJ3h1k9ww=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=eGRNOAC7Xn3HzuELEenJ8leZ7alg6aXJK79jHjnyFAQElk80WahKlg2uASA+YCXVj
- zK1uuqVODsjdaGEEg8/5qKAGj7SlCslrwQADGPPtDhgOxibicd2Qt9McGwhqeCB/4v
- Xibt9BVS4Zaz4u0J3WIsgqxJ7cxk1v3afYgANmi2ioSEZZqC5CNJhUliAxM60QkV2O
- ppJ1bCfetwsGnTcu0CfTLWzbIEGFzDFhiaAaEirS5s4lc3yFHD9bswWbHR7//yitdF
- awo5jHJ3lWnT0F5IBNdHMWZ6PY4UEGeDym/9AoKIWedSZub3mRzkkp7c7svpKDuNxm
- 7VattwRsmAHSg==
+ b=I5h2h/+UnYA/I3ORTb4wfkIw42D/HcvLRVMjTf1tKNA1XhWVY9YQEJtPSe03wZieo
+ jG3WEpxBRwf5sBov7HxERfUJt6R+ruRrZQbrRHmqW/IThySX99sppmn5JEmabe/Q2G
+ OjxvnYkMBlbPal33RpMUzaPpefC3Q3ijDh2qof4Gh5u1Jo07nWtDxHSJ3zMeFqWMPq
+ PwwtA2SGKTQW04D7IJYqOCUXZ2RGIOaVcFkEjwdNesaJdxHDLV9jcSPrcJltborrAH
+ d/4OzbHCMPIksSkpnyTpRAXlUi+/1wKe1Vth+v+Oo4GnpGYiWMPDcNCYZjDY0fZiv0
+ rpfac1Z7CE9eA==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mxpv8-00CWIB-6t; Thu, 16 Dec 2021 12:31:38 +0000
+ id 1mxpv8-00CWIB-Kx; Thu, 16 Dec 2021 12:31:38 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Andrew Jones <drjones@redhat.com>
-Subject: [PATCH 1/5] KVM: selftests: Fix vm_compute_max_gfn on !x86
-Date: Thu, 16 Dec 2021 12:31:31 +0000
-Message-Id: <20211216123135.754114-2-maz@kernel.org>
+Subject: [PATCH 3/5] KVM: selftests: arm64: Introduce a variable default IPA
+ size
+Date: Thu, 16 Dec 2021 12:31:33 +0000
+Message-Id: <20211216123135.754114-4-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211216123135.754114-1-maz@kernel.org>
 References: <20211216123135.754114-1-maz@kernel.org>
@@ -80,46 +81,102 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Q29tcGlsaW5nIHRoZSBzZWxmdGVzdHRzIG9uIGFybTY0IGxlYWRzIHRvIHRoaXM6CgpnY2MgLVdh
-bGwgLVdzdHJpY3QtcHJvdG90eXBlcyAtV3VuaW5pdGlhbGl6ZWQgLU8yIC1nIC1zdGQ9Z251OTkg
-LWZuby1zdGFjay1wcm90ZWN0b3IgLWZuby1QSUUgLUkuLi8uLi8uLi8uLi90b29scy9pbmNsdWRl
-IC1JLi4vLi4vLi4vLi4vdG9vbHMvYXJjaC9hcm02NC9pbmNsdWRlIC1JLi4vLi4vLi4vLi4vdXNy
-L2luY2x1ZGUvIC1JaW5jbHVkZSAtSWxpYiAtSWluY2x1ZGUvYWFyY2g2NCAtSS4uICAgLWMgbGli
-L2t2bV91dGlsLmMgLW8gL2hvbWUvbWF6L2FybS1wbGF0Zm9ybXMvdG9vbHMvdGVzdGluZy9zZWxm
-dGVzdHMva3ZtL2xpYi9rdm1fdXRpbC5vCkluIGZpbGUgaW5jbHVkZWQgZnJvbSBsaWIva3ZtX3V0
-aWwuYzoxMDoKaW5jbHVkZS9rdm1fdXRpbC5oOiBJbiBmdW5jdGlvbiDigJh2bV9jb21wdXRlX21h
-eF9nZm7igJk6CmluY2x1ZGUva3ZtX3V0aWwuaDo3OToyMTogZXJyb3I6IGludmFsaWQgdXNlIG9m
-IHVuZGVmaW5lZCB0eXBlIOKAmHN0cnVjdCBrdm1fdm3igJkKICAgNzkgfCAgcmV0dXJuICgoMVVM
-TCA8PCB2bS0+cGFfYml0cykgPj4gdm0tPnBhZ2Vfc2hpZnQpIC0gMTsKICAgICAgfCAgICAgICAg
-ICAgICAgICAgICAgIF5+CmluY2x1ZGUva3ZtX3V0aWwuaDo3OTozNzogZXJyb3I6IGludmFsaWQg
-dXNlIG9mIHVuZGVmaW5lZCB0eXBlIOKAmHN0cnVjdCBrdm1fdm3igJkKICAgNzkgfCAgcmV0dXJu
-ICgoMVVMTCA8PCB2bS0+cGFfYml0cykgPj4gdm0tPnBhZ2Vfc2hpZnQpIC0gMTsKICAgICAgfCAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpbLi4uXQoKVGhpcyBpcyBhbGwg
-YmVjYXVzZSBzdHJ1Y3Qga3ZtX3ZtIGlzIG5vdCBkZWZpbmVkIHlldCAob25seSBkZWNsYXJlZCku
-ClNpZGVzdGVwIHRoZSB3aG9sZSBpc3N1ZSBieSBtYWtpbmcgdm1fY29tcHV0ZV9tYXhfZ2ZuKCkg
-YSBtYWNyby4KCkZpeGVzOiBjOGNjNDNjMWVhZTIgKCJzZWxmdGVzdHM6IEtWTTogYXZvaWQgZmFp
-bHVyZXMgZHVlIHRvIHJlc2VydmVkIEh5cGVyVHJhbnNwb3J0IHJlZ2lvbiIpClNpZ25lZC1vZmYt
-Ynk6IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5vcmc+Ci0tLQogdG9vbHMvdGVzdGluZy9zZWxm
-dGVzdHMva3ZtL2luY2x1ZGUva3ZtX3V0aWwuaCB8IDkgKysrKystLS0tCiAxIGZpbGUgY2hhbmdl
-ZCwgNSBpbnNlcnRpb25zKCspLCA0IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3Rvb2xzL3Rl
-c3Rpbmcvc2VsZnRlc3RzL2t2bS9pbmNsdWRlL2t2bV91dGlsLmggYi90b29scy90ZXN0aW5nL3Nl
-bGZ0ZXN0cy9rdm0vaW5jbHVkZS9rdm1fdXRpbC5oCmluZGV4IGRhMmI3MDJkYTcxYS4uYzc0MjQx
-ZGRmOGIxIDEwMDY0NAotLS0gYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy9rdm0vaW5jbHVkZS9r
-dm1fdXRpbC5oCisrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL2t2bS9pbmNsdWRlL2t2bV91
-dGlsLmgKQEAgLTc0LDEwICs3NCwxMSBAQCBlbnVtIHZtX2d1ZXN0X21vZGUgewogI2lmIGRlZmlu
-ZWQoX194ODZfNjRfXykKIHVuc2lnbmVkIGxvbmcgdm1fY29tcHV0ZV9tYXhfZ2ZuKHN0cnVjdCBr
-dm1fdm0gKnZtKTsKICNlbHNlCi1zdGF0aWMgaW5saW5lIHVuc2lnbmVkIGxvbmcgdm1fY29tcHV0
-ZV9tYXhfZ2ZuKHN0cnVjdCBrdm1fdm0gKnZtKQotewotCXJldHVybiAoKDFVTEwgPDwgdm0tPnBh
-X2JpdHMpID4+IHZtLT5wYWdlX3NoaWZ0KSAtIDE7Ci19CisjZGVmaW5lIHZtX2NvbXB1dGVfbWF4
-X2dmbih2bSkJCQkJCQlcCisJKHsJCQkJCQkJCVwKKwkJc3RydWN0IGt2bV92bSAqX192bSA9IHZt
-OwkJCQlcCisJCSgoMVVMTCA8PCBfX3ZtLT5wYV9iaXRzKSA+PiBfX3ZtLT5wYWdlX3NoaWZ0KSAt
-IDE7CVwKKwl9KQogI2VuZGlmCiAKICNkZWZpbmUgTUlOX1BBR0VfU0laRQkJKDFVIDw8IE1JTl9Q
-QUdFX1NISUZUKQotLSAKMi4zMC4yCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+Contrary to popular belief, there is no such thing as a default
+IPA size on arm64. Anything goes, and implementations are the
+usual Wild West.
+
+The selftest infrastructure default to 40bit IPA, which obviously
+doesn't work for some systems out there.
+
+Turn VM_MODE_DEFAULT from a constant into a variable, and let
+guest_modes_append_default() populate it, depending on what
+the HW can do. In order to preserve the current behaviour, we
+still pick 40bits IPA as the default if it is available, and
+the largest supported IPA space otherwise.
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ .../testing/selftests/kvm/include/kvm_util.h  |  4 ++-
+ tools/testing/selftests/kvm/lib/guest_modes.c | 28 +++++++++++++++++--
+ 2 files changed, 29 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index c74241ddf8b1..d2ba830a1faf 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -53,7 +53,9 @@ enum vm_guest_mode {
+ 
+ #if defined(__aarch64__)
+ 
+-#define VM_MODE_DEFAULT			VM_MODE_P40V48_4K
++extern enum vm_guest_mode vm_mode_default;
++
++#define VM_MODE_DEFAULT			vm_mode_default
+ #define MIN_PAGE_SHIFT			12U
+ #define ptes_per_page(page_size)	((page_size) / 8)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
+index c330f414ef96..fadc99bac69c 100644
+--- a/tools/testing/selftests/kvm/lib/guest_modes.c
++++ b/tools/testing/selftests/kvm/lib/guest_modes.c
+@@ -4,22 +4,46 @@
+  */
+ #include "guest_modes.h"
+ 
++#ifdef __aarch64__
++enum vm_guest_mode vm_mode_default;
++#endif
++
+ struct guest_mode guest_modes[NUM_VM_MODES];
+ 
+ void guest_modes_append_default(void)
+ {
++#ifndef __aarch64__
+ 	guest_mode_append(VM_MODE_DEFAULT, true, true);
+-
++#endif
+ #ifdef __aarch64__
+-	guest_mode_append(VM_MODE_P40V48_64K, true, true);
+ 	{
+ 		unsigned int limit = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
++		int i;
++
++		vm_mode_default = NUM_VM_MODES;
++
+ 		if (limit >= 52)
+ 			guest_mode_append(VM_MODE_P52V48_64K, true, true);
+ 		if (limit >= 48) {
+ 			guest_mode_append(VM_MODE_P48V48_4K, true, true);
+ 			guest_mode_append(VM_MODE_P48V48_64K, true, true);
+ 		}
++		if (limit >= 40) {
++			guest_mode_append(VM_MODE_P40V48_4K, true, true);
++			guest_mode_append(VM_MODE_P40V48_64K, true, true);
++			vm_mode_default = VM_MODE_P40V48_4K;
++		}
++
++		/* Pick the largest supported IPA size */
++		for (i = 0;
++		     vm_mode_default == NUM_VM_MODES && i < NUM_VM_MODES;
++		     i++) {
++			if (guest_modes[i].supported)
++				vm_mode_default = i;
++		}
++
++		TEST_ASSERT(vm_mode_default != NUM_VM_MODES,
++			    "No supported mode!");
+ 	}
+ #endif
+ #ifdef __s390x__
+-- 
+2.30.2
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
