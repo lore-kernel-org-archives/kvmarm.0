@@ -2,148 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA624C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Dec 2021 20:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 356D4C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Dec 2021 23:42:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 300AE4B2E9;
-	Thu, 16 Dec 2021 15:48:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 990034B23A;
+	Thu, 16 Dec 2021 18:42:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@nvidia.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XY22ebBPyGrZ; Thu, 16 Dec 2021 15:48:40 -0500 (EST)
+	with ESMTP id M0NJOUtbGFKj; Thu, 16 Dec 2021 18:42:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 219FA4B2C1;
-	Thu, 16 Dec 2021 15:48:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 437B14B23C;
+	Thu, 16 Dec 2021 18:42:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0CE4B290
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 15:48:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 885E14B1E2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 18:42:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id shLSsics59rb for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Dec 2021 15:48:37 -0500 (EST)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com
- (mail-dm6nam10on2089.outbound.protection.outlook.com [40.107.93.89])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5A7B14B297
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 15:48:37 -0500 (EST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=StzdYPhfGG/88e1+wQiUcrKoDiuNictxGNvl74W8sdAAE0BpSNoub2f1UFTOXc21aAZq9osJAAmt7XJhTbQqEcl/WZ9wAV5hnbKAf55Y4PFaWIC37Iw34mT5wIAEiTzKWIDAwbERA1N5Pu8GmIvRtoYQGiBkOUiNUc8SjsNVv6ohKjyOJu+rBmc6AlC3BlFFMbS1OLiLenV+1uVaaGOpqfgnNJz1l2pDD3IGkJ8bruNjWU9OBUAi92HGB4SQjFW6AJuqErvyC7iY50S0xYnK+r60H5CqqHkc69NVCZRAhNUXS8bxbkS97Pq0J6j23HAezgZHeG1pfpHOGsyWzO7skQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b7K2nLVUQQ9Hu0qy0aoAOQUCeKqqE+Wr5eBqEZTaOqM=;
- b=oa2iNvxwzuRn6TwMr3e7n3Rfu44Dfz6RB0VvBZ/RZJ3FsUmY4lpn3HOFaCD33g83gQWqJP4T1u9WtQeJJGqRlJPCtdFZgTGRixG5gjOix5+UF/nK+1zdrYL3dew4uvlsXja8xn6L/Gdw1FAXUilXI+bdsMbulHorIbkhY4Q3I4jpll2t+gNi54e0ylfslT5wk05Xtoesfv+F6b+a4j9bkT1Mf+3hsBYdGUyK0F1bSJ7vCx23SuHfQWUN3zqiLeWoMZcmJKopLctx80Kegj5iuuAfSI1MOLqW2kcoYcG+++Js1f6u/T6qgQXm9HBVB8xZQIePo6MTJBCbpQ2d3ZAM2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b7K2nLVUQQ9Hu0qy0aoAOQUCeKqqE+Wr5eBqEZTaOqM=;
- b=UYuni7eQ/Fmk2whCgrTRhn+CfK65rJxh7muAh3mn0x0l1KiYR52+rpHax5UM0fgsvl7KsuVgg0nqSBgyQtw4IC8DUlybR2rb/fNMKHrPo+eTatahfciiJNrnCXoTGTwoq7mIv14ekieSRd5EI0yaTcnG2dEMaYP4PL1adtkv5NDHtsUp/NCaejbVRFS5hEGmyd4y25o3HQSekJhBgFQhyaNCMzDzI0og8+uQxM252S8b6pJ9rZXe+DlNQY4g1VcbGRTCs2VRwVPppmuOoZ6I7ENUFrWt2IpMuul7y61Bo5T2vigddHdrgglphhZAyg7qS7GxpFjpdinOtArha/vajw==
-Received: from DM4PR12MB5072.namprd12.prod.outlook.com (2603:10b6:5:38b::22)
- by DM8PR12MB5432.namprd12.prod.outlook.com (2603:10b6:8:32::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.11; Thu, 16 Dec
- 2021 20:48:34 +0000
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB5520.namprd12.prod.outlook.com (2603:10b6:5:208::9) by
- DM4PR12MB5072.namprd12.prod.outlook.com (2603:10b6:5:38b::22) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4755.21; Thu, 16 Dec 2021 20:48:33 +0000
-Received: from DM6PR12MB5520.namprd12.prod.outlook.com
- ([fe80::218e:ede8:15a4:f00d]) by DM6PR12MB5520.namprd12.prod.outlook.com
- ([fe80::218e:ede8:15a4:f00d%4]) with mapi id 15.20.4801.014; Thu, 16 Dec 2021
- 20:48:33 +0000
-Date: Thu, 16 Dec 2021 16:48:31 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Subject: Re: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
-Message-ID: <20211216204831.GD6385@nvidia.com>
-References: <fbeabcff-a6d4-dcc5-6687-7b32d6358fe3@redhat.com>
- <20211208125616.GN6385@nvidia.com> <YbDpZ0pf7XeZcc7z@myrica>
- <20211208183102.GD6385@nvidia.com>
- <BN9PR11MB527624080CB9302481B74C7A8C709@BN9PR11MB5276.namprd11.prod.outlook.com>
- <BN9PR11MB5276D3B4B181F73A1D62361C8C709@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20211209160803.GR6385@nvidia.com>
- <BN9PR11MB527612D1B4E0DC85A442D87D8C719@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20211210132313.GG6385@nvidia.com>
- <BN9PR11MB527694446B401EF9761529738C729@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB527694446B401EF9761529738C729@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR01CA0054.prod.exchangelabs.com (2603:10b6:208:23f::23)
- To DM6PR12MB5520.namprd12.prod.outlook.com
- (2603:10b6:5:208::9)
+ with ESMTP id d0okJqDQrPnM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Dec 2021 18:42:19 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA9274B1A9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 18:42:19 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 479E012FC;
+ Thu, 16 Dec 2021 15:42:19 -0800 (PST)
+Received: from bogus (unknown [10.57.33.218])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B62073F73B;
+ Thu, 16 Dec 2021 15:42:11 -0800 (PST)
+Date: Thu, 16 Dec 2021 23:42:08 +0000
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Tyler Baicar <baicar@amperemail.onmicrosoft.com>,
+ Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/2] ACPI/AEST: Initial AEST driver
+Message-ID: <20211216234208.hszjx5lpurdjmftj@bogus>
+References: <20211124170708.3874-1-baicar@os.amperecomputing.com>
+ <20211124170708.3874-2-baicar@os.amperecomputing.com>
+ <87czmpcto5.wl-maz@kernel.org> <YaU6eyGM+bX/bEhG@fedora>
+ <87h7bum0xh.wl-maz@kernel.org> <YaZUL+cftvNYgx1j@fedora>
+ <addaf134-d5c0-65de-62ca-76950d6460ab@amperemail.onmicrosoft.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d0a952d1-0d78-48f9-0685-08d9c0d56c85
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5072:EE_|DM8PR12MB5432:EE_
-X-Microsoft-Antispam-PRVS: <DM4PR12MB5072F0AE12F1BF0082EE126CC2779@DM4PR12MB5072.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GP2CPa1Ms+WnG/nouYGz8OT4RoNOAQjF3InwSgS4ENfpXNZxkmbQsUmkuPojoOoWLLazloyiuBE2TRGJ4YHPztNX+35VURGX4L8TLFMAwhEVUewABmFcWzoe+oxU+6GdsAbTQgegh93kV/iIk7rFyrHrfgHz6mV3jp1l2niF6UaTsPOCuvn4U+hEHEbP5BR/H9WLkxwc39sM1Dw8/ofUQSqcemJlZCypAO05WYsUU+tSNn68f8MxipP9V1kvnrsKUxvuzNX8BZPIKxV+oNaF6DRtO/9/7w8ea73bR2lpS7+Ern2zMNytFik3yofoM/c841DmgW17bvaYEU8mvxtuzlzNruwDmPUb+9KPaIeI2+1YKk8ML5IrEn+AjSQs+J7dkFCyziJgmrjF7/yvhaNZd77dOKuWmPk2tNG/S85/Z6hlFI+yKJ4hiJKY23XP3GqBhPQ/tzg6M/sQvA0xtMdx2I/OIOTDLsERXUQW1oGPAjBXtbdZAmnz+3Km9PSM3n2hO6FURShkQMqmSVNsPCrXOUHEDs4CusiFGL8E9GyvL7jrFft8SC10K5FxEuxgq//SfY1Ea41RdAGlCfYJlxMtW0kwXFx6hXn5trOWW8dAVVSAugOjElFJDp2NOcT352UoKBJYM5qYJbgyGVqteA5slQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM4PR12MB5072.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(66946007)(2906002)(6916009)(186003)(66476007)(7416002)(36756003)(8676002)(2616005)(54906003)(5660300002)(6506007)(4326008)(8936002)(38100700002)(6512007)(316002)(6486002)(66556008)(86362001)(26005)(1076003)(508600001)(33656002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?3voI1HRBmlTQsO30KWHIWul2hN4moFw13nGWtXDL8vFPv/TR/lvr/XMvyhr+?=
- =?us-ascii?Q?cEX6zvi1Rc5E8BNoqB3SbRl5YvxU3+8Kf6gUBBnN63lGdH39+0Nv2tsyIxcr?=
- =?us-ascii?Q?VBpNjRq/lXkrBx4N2MC72wcRTx7gmRYF3HQNztTNrc4EtrvUCgGjCYAiqFrm?=
- =?us-ascii?Q?IuCfWahdMg2r9qX6Mh3xXARrM8CdyH/F4AqB7dYohRtqEWbOt+iXXmNWHGhO?=
- =?us-ascii?Q?Z2ZlnrdEgA3Wx/a1XTWtZI6z5ZBR2b6/FinDzAgyVY7Mspx59/epZKkH4Lv6?=
- =?us-ascii?Q?UwTFZQcbut84S/9jbJlb6IerASyX+QTcf6csyuqF0co1yBngN5cvGB5uOprG?=
- =?us-ascii?Q?KfTG3L20ffbW7llD+jHOpHqxloO5CJ69gae99hXdx/IyyMX0k3bBKxEx+dGv?=
- =?us-ascii?Q?VjwPQWrsV5vpALNkm1ITEFlqELWa1iS/qAKjOfaYEJy3ezB53pLYKppxX6kD?=
- =?us-ascii?Q?FpmU4EM85VyRSfaGBlFE4UFAzm/pBqgSsqC6hvgZEnbRH8tQlba5n/wkWpXl?=
- =?us-ascii?Q?xzDIJfByONiyPHU+133oDsBjqIhxLhPfxNwoBLHEF4U6GSykIg0t8xtc/6k4?=
- =?us-ascii?Q?Jebyt5v1c23CWuUc/fFQvmA3myBva/gGJ2zlbVUeIJhaEnjFiLcZwSlECuvF?=
- =?us-ascii?Q?8JzSQnaTaXpk7Z3JrGvwWGzJPjXEoGLypYSl7x5A2Tz06hf91j6NclG2waik?=
- =?us-ascii?Q?+lF2MwvGt0HFfCeBvzJAcdP1ITU0/fw8ImpLvHnQmDHCjVcvORyvD3pGcQiw?=
- =?us-ascii?Q?hFGopSWJ3WSzGW7IR/2iFoM9DhUVrjlkKn6j0ABfMWKOak82+IVWnQjSLpq0?=
- =?us-ascii?Q?eZrrjYs4j2g223kW/LYkpsC0UVAUj10MU8tue84DaBiFPmC8oE8A8m0MyUBA?=
- =?us-ascii?Q?2plpzamnHsRPJGaw83HyUUmxw8yNAGmjVjVv7f0+ptrQGFyHca5esJLK9BaA?=
- =?us-ascii?Q?4FfyrMkOnC/WYexaEcBRLSNpu4Uf9yNXkw3zgJEJiguZW1s7i2axEz2NcVSZ?=
- =?us-ascii?Q?JRypjxOPPpLyur0NuhKIKl4ptxPjyL+zUDBjC2mG8PzBqFQI1GoUJ/5VJ92J?=
- =?us-ascii?Q?0EdDR81/9OSoktOmI/KTSkNUc6FMdBmCt4LZLUoF6QHQVo3TH9mYPSKtQUgh?=
- =?us-ascii?Q?rVkEr5mp+2D/TEBPYL6xJp1wZauOepIIKdRF3m3+3F7/g9rDSOn2g9Y7hwYb?=
- =?us-ascii?Q?Kr0vL4xKTpSrtZ1aeE7gmJ0tbS31ZoLs+oihpSPC290xaAgW3R5HQpqioqNK?=
- =?us-ascii?Q?hoDy8WEZnzPcFfFcSVtDhrNyQoQmrqQa2qKVnm9wI70FcO1DxgnmkJ+eC08Q?=
- =?us-ascii?Q?uLEGe0uJwZwpgvM0eKPQzjP7LKI99+aIWfSQClcMNU2yW9M3Aebwg+nOJbNh?=
- =?us-ascii?Q?0jw5vMgM1aE/Zfcb8k1hcpBLEzRT/Z0EmFFg9SU8J/6AOb+J/QgqPUcvOTrz?=
- =?us-ascii?Q?NQmSkd0lknUH5ttPaZk3slt8cOwVUXS7xvYebA51nfGAszcLjHvRbRdx78av?=
- =?us-ascii?Q?UhjyDLuiOkXY2eDZG7cRliSWCzA0r80zhBz72ZF/HS7UuW+H6SN9DhLp7RHi?=
- =?us-ascii?Q?y9J/GLCWRXJ9uP/9B8o=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0a952d1-0d78-48f9-0685-08d9c0d56c85
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5520.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2021 20:48:33.5234 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ulnCX6J1pbW5U6AFXjR74SLAp16OzPGJoA5nNsBIBNflhbXSLYtReI6vg6kY5UNy
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5432
-Cc: "Raj, Ashok" <ashok.raj@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- "maz@kernel.org" <maz@kernel.org>, "will@kernel.org" <will@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "vsethi@nvidia.com" <vsethi@nvidia.com>,
- "lushenming@huawei.com" <lushenming@huawei.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
- "zhangfei.gao@linaro.org" <zhangfei.gao@linaro.org>,
- "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- "wangxingang5@huawei.com" <wangxingang5@huawei.com>
+Content-Disposition: inline
+In-Reply-To: <addaf134-d5c0-65de-62ca-76950d6460ab@amperemail.onmicrosoft.com>
+Cc: abdulhamid@os.amperecomputing.com, daniel.lezcano@linaro.org,
+ rafael@kernel.org, catalin.marinas@arm.com, ishii.shuuichir@fujitsu.com,
+ guohanjun@huawei.com, vincenzo.frascino@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, lorenzo.pieralisi@arm.com, masahiroy@kernel.org,
+ linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ samitolvanen@google.com, patches@amperecomputing.com, lenb@kernel.org,
+ keescook@chromium.org, gor@linux.ibm.com, anshuman.khandual@arm.com,
+ john.garry@huawei.com, zhangshaokun@hisilicon.com,
+ Vineeth.Pillai@microsoft.com, bp@alien8.de,
+ Darren Hart <darren@os.amperecomputing.com>, dchinner@redhat.com,
+ tglx@linutronix.de, linux-edac@vger.kernel.org, tony.luck@intel.com,
+ marcan@marcan.st, linux-kernel@vger.kernel.org,
+ Tyler Baicar <baicar@os.amperecomputing.com>, tmricht@linux.ibm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -160,34 +74,100 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, Dec 11, 2021 at 03:57:45AM +0000, Tian, Kevin wrote:
+On Thu, Dec 16, 2021 at 05:05:15PM -0500, Tyler Baicar wrote:
+> -Moved ACPI for ARM64 maintainers to "to:"
+> 
+> Hi Marc, Darren,
+> 
+> On 11/30/2021 11:41 AM, Darren Hart wrote:
+> > On Tue, Nov 30, 2021 at 09:45:46AM +0000, Marc Zyngier wrote:
+> > > Hi Darren,
+> > > 
+> > > On Mon, 29 Nov 2021 20:39:23 +0000,
+> > > Darren Hart <darren@os.amperecomputing.com> wrote:
+> > > > On Wed, Nov 24, 2021 at 06:09:14PM +0000, Marc Zyngier wrote:
+> > > > > On Wed, 24 Nov 2021 17:07:07 +0000,
+> > > > > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > > > > index 5250298d2817..aa0483726606 100644
+> > > > > > --- a/MAINTAINERS
+> > > > > > +++ b/MAINTAINERS
+> > > > > > @@ -382,6 +382,7 @@ ACPI FOR ARM64 (ACPI/arm64)
+> > > > > >   M:	Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+> > > > > >   M:	Hanjun Guo <guohanjun@huawei.com>
+> > > > > >   M:	Sudeep Holla <sudeep.holla@arm.com>
+> > > > > > +R:	Tyler Baicar <baicar@os.amperecomputing.com>
+> > > > > >   L:	linux-acpi@vger.kernel.org
+> > > > > >   L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+> > > > > >   S:	Maintained
+> > > > > Isn't this a bit premature? This isn't even mentioned in the commit
+> > > > > message, only in passing in the cover letter.
+> > > > > 
+> > > > Hi Marc,
+> > > > 
+> > > > This was something I encouraged Tyler to add during internal review,
+> > > > both in response to the checkpatch.pl warning about adding new drivers
+> > > > as well as our interest in reviewing any future changes to the aest
+> > > > driver. Since refactoring is common, this level made sense to me - but
+> > > > would it be preferable to add a new entry for just the new driver Tyler
+> > > > added?
+> > > Adding someone as the co-maintainer/co-reviewer of a whole subsystem
+> > > (ACPI/arm64 in this case) comes, IMO, with a number of pre-requisites:
+> > > has the proposed co-{maintainer,reviewer} contributed and/or reviewed
+> > > a significant number of patches to that subsystem and/or actively
+> > > participated in the public discussions on the design and the
+> > > maintenance of the subsystem, so that their reviewing is authoritative
+> > > enough? I won't be judge of this, but it is definitely something to
+> > > consider.
+> > Hi Marc,
+> > 
+> > Agreed. I applied similar criteria when considering sub maintainers for
+> > the platform/x86 subsystem while I maintained it.
+> > 
+> > > I don't think preemptively adding someone to the MAINTAINERS entry to
+> > > indicate an interest in a whole subsystem is the right way to do it.
+> > > One could argue that this is what a mailing list is for! ;-) On the
+> > > other hand, an active participation to the review process is the
+> > > perfect way to engage with fellow developers and to grow a profile. It
+> > > is at this stage that adding oneself as an upstream reviewer makes a
+> > > lot of sense.
+> > Also generally agree. In this specific case, our interest was in the
+> > driver itself, and we had to decide between the whole subsystem or
+> > adding another F: entry in MAINTAINERS for the specific driver. Since
+> > drivers/acpi/arm64 only has 3 .c files in it, adding another entry
+> > seemed premature and overly granular. Certainly a subjective thing and
+> > we have no objection to adding the extra line if that's preferred. This
+> > should have been noted in the commit message.
+> 
+> Thank you for the feedback here, I will make sure to add this to the commit
+> message and cover letter in the next version.
 
-> This might be the only open as I still didn't see why we need an
-> explicit flag to claim a 'full device' thing. From kernel p.o.v the
-> ARM case is no different from Intel that both allows an user
-> page table attached to vRID, just with different format and
-> addr width (Intel is 64bit, ARM is 84bit where PASID can be
-> considered a sub-handle in the 84bit address space and not
-> the kernel's business).
+Hi Marc,
 
-I think the difference is intention.
+Thanks for responding and providing all the necessary details.
 
-In one case the kernel is saying 'attach a RID and I intend to use
-PASID' in which case the kernel user can call the PASID APIs.
+> 
+> Hi Lorenzo, Hanjun, Sudeep,
+> 
+> As for adding myself as a reviewer under ACPI for ARM64 or adding another F:
+> entry, do you have a preference or guidance on what I should do here?
+>
 
-The second case is saying 'I will not use PASID'.
+I prefer to start with an entry specific to the $subject driver for all
+the reasons Marc has already stated. It may also add confusion and provide
+misleading reference to others who want to maintain specific drivers like
+this in the future. Further it will result in this list to grow even though
+not all in that will be interested in reviewing or maintaining ARM64
+ACPI subsystem if we take the approach in this patch and more confusion
+to the developers.
 
-They are different things and I think it is a surprising API if the
-kernel user attaches a domain, intends to use PASID and then finds out
-it can't, eg because an ARM user page table was hooked up.
+Ofcourse if you are interested and get engaged in the review of ARM64
+ACPI in the future we can always revisit and update accordingly.
 
-If you imagine the flag as 'I intend to use PASID' I think it makes a
-fair amount of sense from an API design too.
+Hope this helps and provides clarification you are looking for.
 
-We could probably do without it, at least for VFIO and qemu cases, but
-it seems a little bit peculiar to me.
-
-Jason
+-- 
+Regards,
+Sudeep
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
