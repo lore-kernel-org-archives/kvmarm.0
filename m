@@ -2,61 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71523C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 16 Dec 2021 10:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F6DC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 16 Dec 2021 10:45:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D84D74B1FC;
-	Thu, 16 Dec 2021 05:45:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 258BB4B106;
+	Thu, 16 Dec 2021 05:45:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XwAYGAlRiUnw; Thu, 16 Dec 2021 05:45:15 -0500 (EST)
+	with ESMTP id xzeeBfHbFz7j; Thu, 16 Dec 2021 05:45:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D39334B1FD;
-	Thu, 16 Dec 2021 05:45:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 037674B1FB;
+	Thu, 16 Dec 2021 05:45:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E12C24B1FB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 05:45:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C53A74B106
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 05:45:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WIFDIN9qYpVc for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Dec 2021 05:45:13 -0500 (EST)
+ with ESMTP id B4hT9ZSa8Zrd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Dec 2021 05:45:31 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1BD84B1FA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 05:45:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF3704025B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Dec 2021 05:45:31 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id ADE4661D29;
- Thu, 16 Dec 2021 10:45:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BCFCC36AE2;
- Thu, 16 Dec 2021 10:45:12 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 6F80861D27;
+ Thu, 16 Dec 2021 10:45:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6499C36AE2;
+ Thu, 16 Dec 2021 10:45:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1639651512;
- bh=k0sivyjWD6szjwF7EGZwTgDdQ7orNpZ4z/eWXEe5lP4=;
+ s=k20201202; t=1639651530;
+ bh=lsuTIb4QAadkxB8JMSkIQ9kqbNzDrbIGstkl5NzJwos=;
  h=From:To:Cc:Subject:Date:From;
- b=d/RWKPI8UWWAp5WprshmvvrNmHGQsazv9wZDjUQydw4QCzWknLcdlyr+klXfvyhdz
- v+Isb31JYbR2RAhcFLkRNU2ydhKduXWVGMshNlP9Lpwtw5cASQBs4cKPUebubLHVgi
- Ng8afvuGuYgziZmm00YN0xnbblzxhYWumw5GML6xhD5Pz+D80HmHzNCBmHtQnB2hPR
- Bvb7KDdulgett2y0/CMIefxQTMSPpPhz0gRODa5YGywfVtYzcBVVcmBen+rC759Ha/
- i7cX73n9e9TsOKWCkQ2VLGS5u8pwvgBc1az+zdTxUogfwc+QdL0l/WCP6tfkLFwskZ
- TMTwsoHo60Xyg==
+ b=B0qqq+k/zpavypznn4lXvo8eWd3jIvRsOq1wLuNkkcKE2eCwmxsykIfqoV6UB6glQ
+ fXov3G3Bbiw7lvoqb0D1L1QXsoFqcVESCGRd1QmYpkqvm58c4iIwzNM0wA2FZ2BRiB
+ Py9/ydqN86OSU6WumHXwmiVsxQdqzKfYwPiP4/tIB1uRQKtqLnFn8Vb8iYwkcngok0
+ rKUA/g3Gg3H9Y58ZLkxEjrUl1gnnxmmImBznoZO3anypRsLrFwQjLGePJ0UeyUfQtH
+ +T3JOg35lDnxAUlipIfz1KubrL5vRZRXGar7zxdFLdzhKAZNa/uBql/AyL0KnV+NnX
+ 7QNz4dQsP6jSw==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
  helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mxoG6-00CUsg-7H; Thu, 16 Dec 2021 10:45:10 +0000
+ id 1mxoGO-00CUtK-TR; Thu, 16 Dec 2021 10:45:29 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: vgic: Demote userspace-triggered console prints
- to kvm_debug()
-Date: Thu, 16 Dec 2021 10:45:07 +0000
-Message-Id: <20211216104507.1482017-1-maz@kernel.org>
+Subject: [PATCH] KVM: arm64: vgic-v3: Fix vcpu index comparison
+Date: Thu, 16 Dec 2021 10:45:26 +0000
+Message-Id: <20211216104526.1482124-1-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
@@ -83,60 +82,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Running the KVM selftests results in these messages being dumped
-in the kernel console:
+When handling an error at the point where we try and register
+all the redistributors, we unregister all the previously
+registered frames by counting down from the failing index.
 
-[  188.051073] kvm [469]: VGIC redist and dist frames overlap
-[  188.056820] kvm [469]: VGIC redist and dist frames overlap
-[  188.076199] kvm [469]: VGIC redist and dist frames overlap
+However, the way the code is written relies on that index
+being a signed value. Which won't be true once we switch to
+an xarray-based vcpu set.
 
-Being amle to trigger this from userspace is definitely not on,
-so demote these warnings to kvm_debug().
+Since this code is pretty awkward the first place, and that the
+failure mode is hard to spot, rewrite this loop to iterate
+over the vcpus upwards rather than downwards.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v2.c | 4 ++--
- arch/arm64/kvm/vgic/vgic-v3.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 95a18cec14a3..280a708631cd 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -293,12 +293,12 @@ int vgic_v2_map_resources(struct kvm *kvm)
- 
- 	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) ||
- 	    IS_VGIC_ADDR_UNDEF(dist->vgic_cpu_base)) {
--		kvm_err("Need to set vgic cpu and dist addresses first\n");
-+		kvm_debug("Need to set vgic cpu and dist addresses first\n");
- 		return -ENXIO;
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index bf7ec4a78497..9943a3fe1b0a 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -763,10 +763,12 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
  	}
  
- 	if (!vgic_v2_check_base(dist->vgic_dist_base, dist->vgic_cpu_base)) {
--		kvm_err("VGIC CPU and dist frames overlap\n");
-+		kvm_debug("VGIC CPU and dist frames overlap\n");
- 		return -EINVAL;
- 	}
- 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 04f62c4b07fb..97ab7c02e189 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -554,12 +554,12 @@ int vgic_v3_map_resources(struct kvm *kvm)
- 	}
- 
- 	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base)) {
--		kvm_err("Need to set vgic distributor addresses first\n");
-+		kvm_debug("Need to set vgic distributor addresses first\n");
- 		return -ENXIO;
- 	}
- 
- 	if (!vgic_v3_check_base(kvm)) {
--		kvm_err("VGIC redist and dist frames overlap\n");
-+		kvm_debug("VGIC redist and dist frames overlap\n");
- 		return -EINVAL;
- 	}
- 
+ 	if (ret) {
+-		/* The current c failed, so we start with the previous one. */
++		/* The current c failed, so iterate over the previous ones. */
++		int i;
++
+ 		mutex_lock(&kvm->slots_lock);
+-		for (c--; c >= 0; c--) {
+-			vcpu = kvm_get_vcpu(kvm, c);
++		for (i = 0; i < c; i++) {
++			vcpu = kvm_get_vcpu(kvm, i);
+ 			vgic_unregister_redist_iodev(vcpu);
+ 		}
+ 		mutex_unlock(&kvm->slots_lock);
 -- 
 2.30.2
 
