@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 891C4C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE8EC4332F
 	for <kvmarm@archiver.kernel.org>; Sun, 19 Dec 2021 12:12:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C7B34B2D9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A65884B2F4;
 	Sun, 19 Dec 2021 07:12:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TMeTiQdBU-Wd; Sun, 19 Dec 2021 07:12:17 -0500 (EST)
+	with ESMTP id JD6ezhz6yv42; Sun, 19 Dec 2021 07:12:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B82274B2F9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB1144B2FC;
 	Sun, 19 Dec 2021 07:12:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C31B4B2BB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 11:43:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3303F4B343
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 11:45:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M2rvkkbJEd29 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Dec 2021 11:43:49 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 20D5F4B292
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 11:43:49 -0500 (EST)
+ with ESMTP id pPZMFJVUX1JE for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Dec 2021 11:45:37 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 47A9D4B338
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 11:45:37 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 6C7D2B82969;
- Fri, 17 Dec 2021 16:43:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02971C36AE7;
- Fri, 17 Dec 2021 16:43:46 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 230DD622F5;
+ Fri, 17 Dec 2021 16:45:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 875B4C36AE1;
+ Fri, 17 Dec 2021 16:45:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1639759426;
- bh=xkjazaXf9e0HqFX4MjQxPv2BOTPj/MpAXhlPTHttWyk=;
+ s=k20201202; t=1639759535;
+ bh=+Z8HaNORlefmFC0iorPRnnxWsiru7mFwmG4mt8j06g4=;
  h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
- b=YTyCfVjTbg8mkVA2Tl/PRClrCiLA5+/UCpd2WHbEicmlSu1k3xM+dYHodKxffl8b1
- oLAiR6feNwRR4jQoVGH/HJ8fMd5Kq1xMf4rm7gvYH1W7xCCFaaNU8NlGU/rUbBfaIE
- UjAd8hWR1dkLvYeB3mHyP96fW28SU3ai4apASxn63KF/33o/jJN1XtpLoXy1F8m4C4
- BRE9Dgxkf9WqlnBX6gvB9+qFh5atzLePTsxhNhwzgGfqduKE+hzHHS8iVr2ZQ3fy7p
- diHCHPtH7Cdw1rxSh7MA7FvwC34TyKXEoZ2fCr6rB74jgDrY4xQEKd4DxnT2c2Wy+H
- fZ5rTE4xchqqw==
+ b=Uxtf76sJEP4I9ft93wAfQue9vIwowuCrbeQOafQU8q5x25anDEvL/i0tGoheL5fIG
+ UrUvxGSD0HapyDwZ4QB4fN5FUdjRJljktSyF2/kBTSBcVNRWcseC9Vtw0evM/f6Pyy
+ Kx0OZlk5IGVD0g9NdVSJ/9pZKBifhSDE0VEI9m5dzhW0EuJYIyN8CQ2QvywsjjYkaG
+ 1ON6eJPNElI0OVa6p7txk8YagpmccK7Cp104iB2f9i9TX17j2NsvjA8XIyqMzCZYWY
+ 7PxU2dUqKUOA/8r+hXqvGh3aB/xAjxfZlmmc+JQubmkDcrDxUxbFwePVAQvLZO7/9A
+ gps/Rws4WD2ZQ==
 Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
- id AFDCB5C0610; Fri, 17 Dec 2021 08:43:45 -0800 (PST)
-Date: Fri, 17 Dec 2021 08:43:45 -0800
+ id 4AEEA5C0610; Fri, 17 Dec 2021 08:45:35 -0800 (PST)
+Date: Fri, 17 Dec 2021 08:45:35 -0800
 From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Nicolas Saenz Julienne <nsaenzju@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: Possible nohz-full/RCU issue in arm64 KVM
-Message-ID: <20211217164345.GT641268@paulmck-ThinkPad-P17-Gen-1>
+Message-ID: <20211217164535.GU641268@paulmck-ThinkPad-P17-Gen-1>
 References: <d80e440375896f75d45e227d40af60ca7ba24ceb.camel@redhat.com>
  <YbyO40zDW/kvUHEE@FVFF77S0Q05N>
  <70f112072d9496d21901946ea82832d3ed3a8cb2.camel@redhat.com>
  <Ybyg1r/Q6EfeuXGV@FVFF77S0Q05N>
  <9ab8107f-ff41-6a9e-57e1-a261bea93aca@redhat.com>
  <20211217160749.GS641268@paulmck-ThinkPad-P17-Gen-1>
- <27231550b5600072da918aa41c07404dea13590e.camel@redhat.com>
+ <f3d6095a-70aa-3da0-08a6-3caff2638809@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <27231550b5600072da918aa41c07404dea13590e.camel@redhat.com>
+In-Reply-To: <f3d6095a-70aa-3da0-08a6-3caff2638809@redhat.com>
 X-Mailman-Approved-At: Sun, 19 Dec 2021 07:12:12 -0500
 Cc: maz <maz@kernel.org>, frederic <frederic@kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>, rcu <rcu@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-kernel <linux-kernel@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
+ rcu <rcu@vger.kernel.org>, Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+ Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
  linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -84,19 +84,8 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 17, 2021 at 05:20:21PM +0100, Nicolas Saenz Julienne wrote:
-> Hi Paul,
-> 
-> On Fri, 2021-12-17 at 08:07 -0800, Paul E. McKenney wrote:
-> > On Fri, Dec 17, 2021 at 04:54:22PM +0100, Paolo Bonzini wrote:
-> > > On 12/17/21 15:38, Mark Rutland wrote:
-> > > > For example kvm_guest_enter_irqoff() calls guest_enter_irq_off() which calls
-> > > > vtime_account_guest_enter(), but kvm_guest_exit_irqoff() doesn't call
-> > > > guest_exit_irq_off() and the call to vtime_account_guest_exit() is open-coded
-> > > > elsewhere. Also, guest_enter_irq_off() conditionally calls
-> > > > rcu_virt_note_context_switch(), but I can't immediately spot anything on the
-> > > > exit side that corresponded with that, which looks suspicious.
-> > > 
+On Fri, Dec 17, 2021 at 05:34:04PM +0100, Paolo Bonzini wrote:
+> On 12/17/21 17:07, Paul E. McKenney wrote:
 > > > rcu_note_context_switch() is a point-in-time notification; it's not strictly
 > > > necessary, but it may improve performance a bit by avoiding unnecessary IPIs
 > > > from the RCU subsystem.
@@ -107,20 +96,24 @@ On Fri, Dec 17, 2021 at 05:20:21PM +0100, Nicolas Saenz Julienne wrote:
 > > Do scheduling-clock interrupts from guest mode have the "user" parameter
 > > set?  If so, that would keep RCU happy.
 > 
-> Are you referring to the user_mode() check in irqentry_enter()? If so I don't
-> think it'll help, arm64 doesn't use that function. It directly calls
-> enter_from_{user,kernel}_mode() through its custom entry/exit routines.
+> No, thread is in supervisor mode.  But after every interrupt (timer tick or
+> anything), one of three things can happen:
+> 
+> * KVM will go around the execution loop and invoke rcu_note_context_switch()
+> again
+> 
+> * or KVM will go back to user space
 
-I am talking about rcu_sched_clock_irq(), which is called from
-update_process_times(), which is called from various places depending
-on .config.  These call sites pass in either user_mode(regs) or
-user_mode(get_irq_regs()).
+Here "user space" is a user process as opposed to a guest OS?
 
-Huh.  Maybe I should be looking into using user_mode(get_irq_regs())
-in other places within RCU.  Except that I bet the possibility of RCU
-being invoked from NMI handlers makes this a bit tricky.
+> * or the thread will be preempted
+> 
+> and either will keep RCU happy as far as I understand.
 
-							Thanx, Paul
+Regardless of the answer to my question above, yes, these will keep
+RCU happy.  ;-)
+
+						Thanx, Paul
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
