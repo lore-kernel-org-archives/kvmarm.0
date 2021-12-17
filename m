@@ -2,76 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0382C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 17 Dec 2021 17:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A22C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 17 Dec 2021 17:23:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C6694B35A;
-	Fri, 17 Dec 2021 12:02:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60D364B2FF;
+	Fri, 17 Dec 2021 12:23:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EJvTqcoH-PGD; Fri, 17 Dec 2021 12:02:37 -0500 (EST)
+	with ESMTP id iNey-jvSYqqz; Fri, 17 Dec 2021 12:23:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 34F9E4B35B;
-	Fri, 17 Dec 2021 12:02:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F02D4B33A;
+	Fri, 17 Dec 2021 12:23:40 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 165E74B34C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 12:02:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15D2F4B29A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 12:23:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZCltJ48lbF0w for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Dec 2021 12:02:34 -0500 (EST)
+ with ESMTP id 2VA6Y5oNdfRS for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Dec 2021 12:23:38 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B42E4B348
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 12:02:34 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18B1F4B292
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 12:23:38 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1639760554;
+ s=mimecast20190719; t=1639761817;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=58xC6/7sDobq7k3UfPIWPW94AtvXxt+V86z+2iDC+2w=;
- b=Urko740bB9htAI+7p+wyutL2cil/oVdU1hiaI/BR67km2WC42CuxDMCajpH4dK2Vs1t+kp
- IGEeiMGAwZoDWlqWi92wg3i54hhQBiRFNt+1XjytQfZacQcgwVyGJGLf8pDVFJGaOWmLbe
- XIVtrRMV+9txokyNCapc2uTrT8CJFHI=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=2E4moqp/c8I4AQdWLvxljNuUdO0Hkrp+/zBhC2tHogE=;
+ b=CpUDKrSICM8u29mKZKbmqtfvYQZDX0hcv4KoFRaAbelwM7gwPFgqaK6ejMXDKyPW5t+6Mt
+ MNBYaRGl5auRVBZWl3wR7Lc+AKoptl0Z7I/m8QH2NWqQ4RXEl8RHTZInxWCQ2d3mAwOnCC
+ +6IAYEiQ+GynibIuHd0NzQXTAt7h75k=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-465-SirN12meN-SyFKCm8KLArw-1; Fri, 17 Dec 2021 12:02:32 -0500
-X-MC-Unique: SirN12meN-SyFKCm8KLArw-1
-Received: by mail-wm1-f71.google.com with SMTP id
- f202-20020a1c1fd3000000b00344f1cae317so2071582wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 09:02:32 -0800 (PST)
+ us-mta-84-gUhfJlaZOkeZ4FsTy3_yWw-1; Fri, 17 Dec 2021 12:23:36 -0500
+X-MC-Unique: gUhfJlaZOkeZ4FsTy3_yWw-1
+Received: by mail-ed1-f71.google.com with SMTP id
+ g5-20020a056402424500b003f80957bb82so2535321edb.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 09:23:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
  :content-language:to:cc:references:from:in-reply-to
  :content-transfer-encoding;
- bh=58xC6/7sDobq7k3UfPIWPW94AtvXxt+V86z+2iDC+2w=;
- b=2jvHdziOKklD+L+wr053uAYal2jKnzvSKEw22fPh73dIQIteAwpmUulcgtyN118LzQ
- iS3t7orZQgPk41N+WwKKaA4g06LXvp9N8MCtLSAC4jhPwyf8AaKIwGu5zSGCxySZRbD1
- R9JxoMMW6/IBaEFrlRCDHZqUy88NcZQGq6L0XNGEUEaTKfobJM+QuJ4n6m6+/IvmCJPn
- JD7V6dIfyKwH2t1Eq1LQ2X7PG3bWJK21YdOyFQa8WZwuxBtc2pU01tS8mP8hJr0AAlwS
- aznHlhxMjL6HIyH7U/54GFKxtOia9Gmy3LdVIJ935W1hABeKPK1+uNwnddP54uTybk1G
- kIFQ==
-X-Gm-Message-State: AOAM531vipQKEkZkMVNoGz9KzC5Zo93e6umFHAEUuYVYYpZzzYTTiCWV
- y7dgWl2R9tpxtiTcVWRGhzoKad2aMtRqqO0eMPF0Mpnk3BrNuW6iD4QGBwl8M7/1/tWxhHw/zZg
- 2ZjElSPUZe0cdA3X22MULs/2W
-X-Received: by 2002:a5d:50c2:: with SMTP id f2mr1630549wrt.459.1639760551531; 
- Fri, 17 Dec 2021 09:02:31 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxt1I8ke5xrxCT2VayX74T7SOcgRXF4/LpFPypHzz/NgKLPu11J2MlPuURQrtM4+KYAlz3k6Q==
-X-Received: by 2002:a5d:50c2:: with SMTP id f2mr1630536wrt.459.1639760551326; 
- Fri, 17 Dec 2021 09:02:31 -0800 (PST)
+ bh=2E4moqp/c8I4AQdWLvxljNuUdO0Hkrp+/zBhC2tHogE=;
+ b=iq74nfwwRifwmggQvFsW1P995WgDPBR/y+bUnnmt1A6g3kwjyN8Y/uwW2OsHO4p9ij
+ oxxlRUI35xjxRAdEOmPzyi3Po5ODvbAZkauRhN6Qmvpz8E3A0pxU86jjdAwRtzzwtMqr
+ CP9I94aqsgsfmEKCHywDvdCkXfmVvgKkRILqqWpxjVzQD9/mCl7gGzta1oG3/6Fn5lGf
+ 3l3VtF/7rXoMKdFHYr6FLJsvLJTLYe2iiNMRNYhZsAkMz3AozG+u3fhCuFa/+THWRDzJ
+ ewdRTuIV7dJMvkdPdW3XlVKoVctCtQCDbBScISKeHa8E+bhsgNWBKgDdtLFI1hx3odtU
+ mQhA==
+X-Gm-Message-State: AOAM5301LLDt2mXXsLT3NLDHYxqgJT95AogXSQTfvTxYLeDa54XAJh8R
+ dMC3szyVxx9gKamAILsNDPrkzKpMqKsiZGitBtXLvVjMnMQaKbnqQizE1KkCECaFYSHjxp14Try
+ 3SA+Ff5Tzj8THDKa4ynt8RMxo
+X-Received: by 2002:a17:907:2d9f:: with SMTP id
+ gt31mr3276996ejc.353.1639761815437; 
+ Fri, 17 Dec 2021 09:23:35 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwyYaUeLeDwkSn+1UkB3EEbIuMyCeJwU20sBpBLMNBVvm8tzJn+Taaia56Rbt5qT+bN3TbTMg==
+X-Received: by 2002:a17:907:2d9f:: with SMTP id
+ gt31mr3276976ejc.353.1639761815192; 
+ Fri, 17 Dec 2021 09:23:35 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312::ac3? ([2001:b07:6468:f312::ac3])
- by smtp.googlemail.com with ESMTPSA id u14sm8273562wrf.39.2021.12.17.09.02.25
+ by smtp.googlemail.com with ESMTPSA id a16sm1798277ejk.8.2021.12.17.09.23.33
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 17 Dec 2021 09:02:30 -0800 (PST)
-Message-ID: <4c369ca2-2ad0-4a02-90e9-2d82df6c289d@redhat.com>
-Date: Fri, 17 Dec 2021 18:02:23 +0100
+ Fri, 17 Dec 2021 09:23:34 -0800 (PST)
+Message-ID: <24268298-c51f-afcd-72e2-22c39eb002b5@redhat.com>
+Date: Fri, 17 Dec 2021 18:23:32 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
@@ -85,8 +87,10 @@ References: <d80e440375896f75d45e227d40af60ca7ba24ceb.camel@redhat.com>
  <20211217160749.GS641268@paulmck-ThinkPad-P17-Gen-1>
  <f3d6095a-70aa-3da0-08a6-3caff2638809@redhat.com>
  <20211217164535.GU641268@paulmck-ThinkPad-P17-Gen-1>
+ <4c369ca2-2ad0-4a02-90e9-2d82df6c289d@redhat.com>
+ <20211217171218.GV641268@paulmck-ThinkPad-P17-Gen-1>
 From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211217164535.GU641268@paulmck-ThinkPad-P17-Gen-1>
+In-Reply-To: <20211217171218.GV641268@paulmck-ThinkPad-P17-Gen-1>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -113,40 +117,56 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 12/17/21 17:45, Paul E. McKenney wrote:
-> On Fri, Dec 17, 2021 at 05:34:04PM +0100, Paolo Bonzini wrote:
->> On 12/17/21 17:07, Paul E. McKenney wrote:
->>>> rcu_note_context_switch() is a point-in-time notification; it's not strictly
->>>> necessary, but it may improve performance a bit by avoiding unnecessary IPIs
->>>> from the RCU subsystem.
+On 12/17/21 18:12, Paul E. McKenney wrote:
+> On Fri, Dec 17, 2021 at 06:02:23PM +0100, Paolo Bonzini wrote:
+>> On 12/17/21 17:45, Paul E. McKenney wrote:
+>>> On Fri, Dec 17, 2021 at 05:34:04PM +0100, Paolo Bonzini wrote:
+>>>> On 12/17/21 17:07, Paul E. McKenney wrote:
+>>>>>> rcu_note_context_switch() is a point-in-time notification; it's not strictly
+>>>>>> necessary, but it may improve performance a bit by avoiding unnecessary IPIs
+>>>>>> from the RCU subsystem.
+>>>>>>
+>>>>>> There's no benefit from doing it when you're back from the guest, because at
+>>>>>> that point the CPU is just running normal kernel code.
+>>>>>
+>>>>> Do scheduling-clock interrupts from guest mode have the "user" parameter
+>>>>> set?  If so, that would keep RCU happy.
 >>>>
->>>> There's no benefit from doing it when you're back from the guest, because at
->>>> that point the CPU is just running normal kernel code.
+>>>> No, thread is in supervisor mode.  But after every interrupt (timer tick or
+>>>> anything), one of three things can happen:
+>>>>
+>>>> * KVM will go around the execution loop and invoke rcu_note_context_switch()
+>>>> again
+>>>>
+>>>> * or KVM will go back to user space
 >>>
->>> Do scheduling-clock interrupts from guest mode have the "user" parameter
->>> set?  If so, that would keep RCU happy.
+>>> Here "user space" is a user process as opposed to a guest OS?
 >>
->> No, thread is in supervisor mode.  But after every interrupt (timer tick or
->> anything), one of three things can happen:
->>
->> * KVM will go around the execution loop and invoke rcu_note_context_switch()
->> again
->>
->> * or KVM will go back to user space
+>> Yes, that code runs from ioctl(KVM_RUN) and the ioctl will return to the
+>> calling process.
 > 
-> Here "user space" is a user process as opposed to a guest OS?
+> Intriguing.  A user process within the guest OS or a user process outside
+> of any guest OS, that is, within the host?
 
-Yes, that code runs from ioctl(KVM_RUN) and the ioctl will return to the 
-calling process.
+A user process on the host.  The guest vCPU is nothing special: it's 
+just a user thread that occasionally lets the guest run by invoking the 
+KVM_RUN ioctl.  Hopefully, KVM_RUN will be where that user thread will 
+spend most of the time so the guest runs at full steam.  KVM_RUN is the 
+place where you have the code that Nicolas and Mark were discussing.
+
+ From the point of view of the kernel however the thread is always in 
+kernel mode when it runs the guest, because any interrupt will be 
+recognized while still in the ioctl.
+
+(I'll add that from the point of view of the scheduler, there's no 
+difference between a CPU-bound guest and a "normal" CPU-bound process on 
+the host, e.g. wasting time with "for(;;)" or calculating digits of PI 
+is the same no matter if you're doing it in the guest or in the host. 
+Likewise for I/O-bound guests; e.g. doing "hlt" or "wfi" constantly in 
+the guest looks exactly the same to the scheduler as a process that 
+spends its time in the poll() system call).
 
 Paolo
-
->> * or the thread will be preempted
->>
->> and either will keep RCU happy as far as I understand.
-> 
-> Regardless of the answer to my question above, yes, these will keep
-> RCU happy.  ;-)
 
 _______________________________________________
 kvmarm mailing list
