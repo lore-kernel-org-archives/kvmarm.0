@@ -2,64 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 518D1C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Dec 2021 09:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C414AC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Dec 2021 09:39:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC1B84B3F0;
-	Mon, 20 Dec 2021 04:18:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26A1F4B3D4;
+	Mon, 20 Dec 2021 04:39:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KeixSe31458n; Mon, 20 Dec 2021 04:18:10 -0500 (EST)
+	with ESMTP id xeTbHEuAhU3e; Mon, 20 Dec 2021 04:39:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD48B4B3EC;
-	Mon, 20 Dec 2021 04:18:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06CCC4B3D9;
+	Mon, 20 Dec 2021 04:39:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 741034B3EC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 04:18:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 766364B3B7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 04:39:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ncaslsdied1P for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Dec 2021 04:18:08 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 43C354B3B8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 04:18:08 -0500 (EST)
+ with ESMTP id wWvI8zpMYqwO for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Dec 2021 04:39:09 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF0E64B30B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 04:39:09 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id C5322B80E2D;
- Mon, 20 Dec 2021 09:18:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B1CEC36AE5;
- Mon, 20 Dec 2021 09:18:05 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 21A0D60F59;
+ Mon, 20 Dec 2021 09:39:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6BBC36AE8;
+ Mon, 20 Dec 2021 09:39:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1639991885;
- bh=QT8TE5OZg9xFpKPCWQf7/TdMscTgPU04EByEA7AUTnw=;
+ s=k20201202; t=1639993148;
+ bh=8uqK3NceI45AFjqWjabQhkzy6OyB8l6tZbp7LghvIPU=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=rISuHgPlbqDcAqJ8hAMJDPNXGw0Br2+w9sPz1vUDTVIB/X1R5ZaEVVyOXYTlss/0i
- lxLI1s1stXGzKveHpWcwJ1LIUQLLaTk3rMqvvSuNWX65CSCNRNdvZVEumYnCvOzb5p
- xcp6YI/xvqLkyufZyoszFkrQeOssFI30HjzYqI49ngH+OhGxcSw1EC75WFeeGIxuM6
- 2nL8vuFKeXNFwVphPCMSeYgAftG1IG8qnvkMFlO+RHpTdnydZ9wTJaEItr8W7PbTxz
- Rog/2YkUmNHR09KBmIotnoxAzPIu7mQHXXOaeFsgWWdAMfD/0C9bBlXdLGsNwun18y
- 7WdHHHhdUYCRg==
+ b=RX8e5eMEk4RDyeQGulOkOgxMG4kHuZ26vU8V2tfRww7hqIdmjC3pEcL9wLxlw66qI
+ 0/ld8agKowe1G0Dkk+4uCU6FQukTYi3brHqjQQGQGwyyOrRdBkUZ0I5ovUNFztuYJ6
+ xCLepJgI63eTJlODabNrOtGv6qwrw5ohKFbDEIjuLjJdSkY2qIHT2+hm40AzCYb6Xs
+ HWeHaswpxhg94mxJART9fKnUrknTcW/hAcF/7/ugF30nVFlgKAJBgHpH7/Yt39GaUi
+ 9LiGntmonRo3XZkrOjPpijKIuEFhxwd6UqBnDypTTiKvWThJRwrw1HBXT/KttDgfa4
+ ohzUY5iek5AVw==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mzEnz-00DFJn-I5; Mon, 20 Dec 2021 09:18:03 +0000
-Date: Mon, 20 Dec 2021 09:18:03 +0000
-Message-ID: <87k0fzws6s.wl-maz@kernel.org>
+ id 1mzF8M-00DFb8-LE; Mon, 20 Dec 2021 09:39:06 +0000
+Date: Mon, 20 Dec 2021 09:39:06 +0000
+Message-ID: <87ilvjwr7p.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v5 29/69] KVM: arm64: nv: Respect the virtual HCR_EL2.NV
+Subject: Re: [PATCH v5 31/69] KVM: arm64: nv: Respect the virtual HCR_EL2.NV1
  bit setting
-In-Reply-To: <c9e1cae5-ded4-d4e5-e60e-2e2044800ad1@os.amperecomputing.com>
+In-Reply-To: <c43ede47-ef06-96bf-b8c2-af323d244969@os.amperecomputing.com>
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-30-maz@kernel.org>
- <c9e1cae5-ded4-d4e5-e60e-2e2044800ad1@os.amperecomputing.com>
+ <20211129200150.351436-32-maz@kernel.org>
+ <c43ede47-ef06-96bf-b8c2-af323d244969@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -93,37 +93,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 20 Dec 2021 07:11:03 +0000,
+On Mon, 20 Dec 2021 07:18:51 +0000,
 Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> Hi Marc,
+> 
 > 
 > On 30-11-2021 01:31 am, Marc Zyngier wrote:
-> > From: Jintack Lim <jintack.lim@linaro.org>
+> > From: Jintack Lim <jintack@cs.columbia.edu>
 > > 
-> > Forward traps due to HCR_EL2.NV bit to the virtual EL2 if they are not
-> > coming from the virtual EL2 and the virtual HCR_EL2.NV bit is set.
-> > 
-> > In addition to EL2 register accesses, setting NV bit will also make EL12
-> > register accesses trap to EL2. To emulate this for the virtual EL2,
-> > forword traps due to EL12 register accessses to the virtual EL2 if the
+> > Forward ELR_EL1, SPSR_EL1 and VBAR_EL1 traps to the virtual EL2 if the
 > > virtual HCR_EL2.NV bit is set.
 > > 
 > > This is for recursive nested virtualization.
+> > 
+> > Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/include/asm/kvm_arm.h |  1 +
+> >   arch/arm64/kvm/sys_regs.c        | 28 +++++++++++++++++++++++++++-
+> >   2 files changed, 28 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index 9759bc893a51..68af5509e4b0 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -20,6 +20,7 @@
+> >   #define HCR_AMVOFFEN	(UL(1) << 51)
+> >   #define HCR_FIEN	(UL(1) << 47)
+> >   #define HCR_FWB		(UL(1) << 46)
+> > +#define HCR_NV1		(UL(1) << 43)
+> >   #define HCR_NV		(UL(1) << 42)
+> >   #define HCR_API		(UL(1) << 41)
+> >   #define HCR_APK		(UL(1) << 40)
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index e96877fc3b2a..511e06b6f603 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -288,6 +288,22 @@ static bool access_rw(struct kvm_vcpu *vcpu,
+> >   	return true;
+> >   }
+> >   +/* This function is to support the recursive nested
+> > virtualization */
+> > +static bool forward_nv1_traps(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+> > +{
+> > +	return forward_traps(vcpu, HCR_NV1);
+> > +}
+> > +
 > 
-> What is recursive nested virtualization means?
-> Are we going to set NV/NV1/NV2 bits of ID_AA64MMFR2_EL1 of
-> Guest-Hypervisor to support NV in Guest-Hypervisor?
+> Shall we move this helper to emulate-nested.c?
 
-Of course. An implementation of nested virtualisation that would stop
-at L1 would be pretty crap and fail to live up to the 'turtles all the
-way down' paradigm.
-
-Note that the recursive support is still a work in progress, as making
-it work for real in a software model is an exercise in futility (for
-example, we make no effort to make the VNCR_EL2 mapping work past L1).
-
-Once someone sends me a NV-capable box, I'll get it working.
+Sure, that shouldn't be a problem.
 
 	M.
 
