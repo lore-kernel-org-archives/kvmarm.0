@@ -2,39 +2,39 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE77DC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Dec 2021 11:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B3DC433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Dec 2021 11:52:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 456A64B44F;
-	Mon, 20 Dec 2021 06:52:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 298C84B43E;
+	Mon, 20 Dec 2021 06:52:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2g5mSF8uwO6E; Mon, 20 Dec 2021 06:52:45 -0500 (EST)
+	with ESMTP id FcdPpU3Kh150; Mon, 20 Dec 2021 06:52:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F300E4B443;
-	Mon, 20 Dec 2021 06:52:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B50A4B458;
+	Mon, 20 Dec 2021 06:52:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FE854B32D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 01:45:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC13E4B375
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 02:04:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nso7dShAopbP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Dec 2021 01:45:33 -0500 (EST)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com
- (mail-bn7nam10on2107.outbound.protection.outlook.com [40.107.92.107])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3892C4B300
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 01:45:33 -0500 (EST)
+ with ESMTP id qwzEzU1O72Cu for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Dec 2021 02:04:54 -0500 (EST)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com
+ (mail-dm6nam10on2105.outbound.protection.outlook.com [40.107.93.105])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 38B454B373
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 02:04:54 -0500 (EST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b31p78ss0OsWd2jG6eMxDGUptR+yTHJZ7vg1zEfn1PcT/uYEeYi9zPAC0WV3tyqr1TSTh7AGVSlgPVoL+DR1w8CROHMcNXMJdYNOAkRA9Q2X2xljZZ1ug9wAq0psMrcZ+JkV3f++kxyvimJpJfER2x6xSdR3gZlaTRda+C97F9K7h7TxpvIp76eM9+ydYXrC0wmvY8XRYOCwiFvLYOzxN5Y2orVAkxNXQduzSAGUaau23hJFslaIu3BgMJsKX7HryIY0FVyftWICmvr7MFMtdmVZYtZJoQr96vPlZAdsxKQ8XVflaOSVsWCYy121vGeaYFTlApCb7Rx3VPymlQUBWA==
+ b=WPZOCuIRNh7ttWoPzGzraZafhAHF9XL87DR4eAvL29n50kb37OrImceHnGAKAhP+nG3yk3lutuT6IIAgjZswkQsJValN+omYr0Wyr0gH3xOCJb9mNxJn2cM2opqZ7plOekpqjxc4mzz47OOaUwRdaGEHlZN1fxnEE0lyIR8RdzqLNp34gTANAUGOTXUTJ7fs8x0242dIqISMOCQVT98CPeBHlTs+4l77b8bsUohuvjwoUo2q2WOE+yovQMxCwtq0j0ppzH20bgiCfiukmG0C7lPgyg5yrWicyzsZ/U6SPgtJFlQQZk2b7QI1+p/aH+0afWwpEV2Kf4oCFuvJ60ywEA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mf0jZaShyLNXg4NZRhrMIBlqy8rBHufqACV82yU9gXk=;
- b=jmZ3JatEyTFHIJt3yai3DbU5vuQ4VqKnICL0uTiPwj30LfzlT2ddH84V+i6PCW65m3fSxUMhIdMuvqXoew6U2Vwn8B23RVYVr7yc43ZMasK9jpL9T4ogD842q7QmGePxScPQHowtE9SQjL4Q6SEVs5zM2YaG7x+8efGRSL73BG8GpYo0KiNkUKdXngta4YgOr5nwLXBA54Uqd0FsZaqgFnWyvW0IynIYDjydF9W81HDugxEVyfiVDPvEtZYSmSCRu3UQhZ+Fxjfj1OjnXl4/HFzl8WNM7a07t3rboLVm9oLwvX9fc0fPVFd5SvtFSLPI+JbfKZDNK+w46j+kuDrSyQ==
+ bh=dsWjl9QROIdCvHZ+xIHpIMSorgZFCZgorYO/ItOULfo=;
+ b=fqe+v04LUzfR6AKXCG1n/ql4teGvUBQQdn8uUBntFWfvN6jQLCGDbamMvShpocIxgYw3Cdf12yUQUs0MlOnv5KP2khIxo/iFub/QI/fJW0uQQSXILR9KtTFJJdVKfJjXbqdzsaBKfmqpkCcKwVxofeZOYIklxkNChUoVBUvHzqhKFW/5YAakns0Npkj8sbvR37Hi0nBsiOKJnE+A4KPl0iEVpoye/BjmirUV1uFn1wvQ7MdchptZ3P2jP1GORqHxKJt4GuSFHKFjZc65ON2iOjD2W1xjgW3BpNzp9DT+h7S4PENv0QYO0oA/0/si7H21BS6id+3477mADSOsz6Topw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -42,98 +42,98 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mf0jZaShyLNXg4NZRhrMIBlqy8rBHufqACV82yU9gXk=;
- b=qMH1Zv3woxR1X1syh0y5HXaOrYVbcFBnVm/UKYoKttQ15/EWiOjUiyUgX1McZ4l2/sREc5xbLI++gzu3aRRDcP2ORD1Z8yzNDhEfaPnW9I83kxY00jTv/82UBv5A0Nwvt0NqC5AJ98Yw8br5ahmV/BdDgRU7yXb7St+WzKmT3uY=
+ bh=dsWjl9QROIdCvHZ+xIHpIMSorgZFCZgorYO/ItOULfo=;
+ b=DNnM+jezk/SJgznsfewjSuBXaGWb7RX3aVPLF3UCO60B7i4DrKZjm3nPQu1GN+bQjtetLE6mvwR0TUgd40uk/mu3cuPoC2sA9JsQmKTnJTQMiA1e0X2Bf4Q2LMLylLlJTKkkZZP3x3Kd/CG1sPC9sM12BniCdFmfiYtYNa/dobo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- DM6PR01MB6092.prod.exchangelabs.com (2603:10b6:5:204::28) with Microsoft SMTP
+ DM5PR01MB2313.prod.exchangelabs.com (2603:10b6:3:b::15) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4801.15; Mon, 20 Dec 2021 06:45:30 +0000
+ 15.20.4801.17; Mon, 20 Dec 2021 07:04:52 +0000
 Received: from DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::209e:941a:d9f9:354e]) by DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::209e:941a:d9f9:354e%4]) with mapi id 15.20.4801.020; Mon, 20 Dec 2021
- 06:45:30 +0000
-Message-ID: <83f15c99-b785-ac43-e005-0d922ccc536b@os.amperecomputing.com>
-Date: Mon, 20 Dec 2021 12:15:21 +0530
+ 07:04:52 +0000
+Message-ID: <13046e57-b7e5-7f0b-15bd-38c09e21807a@os.amperecomputing.com>
+Date: Mon, 20 Dec 2021 12:34:44 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [PATCH v5 07/69] KVM: arm64: nv: Introduce nested virtualization
- VCPU feature
+Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in
+ vcpu_read/write_sys_reg()
 Content-Language: en-US
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-8-maz@kernel.org>
+ <20211129200150.351436-19-maz@kernel.org>
 From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <20211129200150.351436-8-maz@kernel.org>
-X-ClientProxiedBy: CH2PR14CA0026.namprd14.prod.outlook.com
- (2603:10b6:610:60::36) To DM8PR01MB6824.prod.exchangelabs.com
+In-Reply-To: <20211129200150.351436-19-maz@kernel.org>
+X-ClientProxiedBy: CH0PR13CA0006.namprd13.prod.outlook.com
+ (2603:10b6:610:b1::11) To DM8PR01MB6824.prod.exchangelabs.com
  (2603:10b6:8:23::24)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3de6e132-fd0a-47c2-5f9f-08d9c384501e
-X-MS-TrafficTypeDiagnostic: DM6PR01MB6092:EE_
-X-Microsoft-Antispam-PRVS: <DM6PR01MB6092C35998B8076927CD6F909C7B9@DM6PR01MB6092.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Office365-Filtering-Correlation-Id: ff3d1015-a3a4-4102-a659-08d9c38704e5
+X-MS-TrafficTypeDiagnostic: DM5PR01MB2313:EE_
+X-Microsoft-Antispam-PRVS: <DM5PR01MB2313004CD80E349F2EBFF03F9C7B9@DM5PR01MB2313.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3276;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AAWiKKh0+923lV5nPAxN1iJ14s8MPbGVdXymNLIKlT8CrsWM8xRp+DGZbg4/z6JJ8QttaAyT96+jTswdmhnb8RXvrYNYDUpbCtrOFzIKvZpigvMEp5mXoBbv5ttz6FxdVbh11tsSxqQz0hQZho1hPxsb8fn10lLBGUTj0sRU89jHVZrt0Y2ZeYLSI5KaWp8H73lNWI4tRTIex1W22/aeQyRkAeX+IaxuKDFTMId/UIvUuG4XQYShlDJGqX+zAilvvwZOrYn3oJY47Ob9+TnCCB6QbudeLPGht1JcwbpCGUIn8qQSYy0z9HTLBXVuRhOEbL41MmdlhWmczPtOXs8e3Eytp7wL4IqKMehiNUt7cDjSblxvS46yvBDPtNEwoZqmePRHf8iwEceCt+qVafXN30rH8qr0xR0naMp8xwUZUwoNQajbfCsg5qpNVT9iyP2OprHI+/LIIy8tsiO729A9gMValUhc49Sis5j0+uulM4VWhbZ8tWMDHgadDAqRAL0kN8f9ioSUsLzk/WRiltD3JFPwkCg86QOVlINzJciQ0T7Y5NG9k6uXY969oGh0EVyKLr0kZZYs4AuFPJEpo19Q7myrLQmw9Ve2Da5c6tFj4nWHv2/xEQekcIOWGBay3KworKFAbNxA0/HLAG6zBOAxXHIqm3wMoRmGDXise/ADY1msyj9y2L7hNfk9UfHi3Xr5wcYwq8vu+ZbkbMsVrlxvz4wbcxjbPfsaOVEsHGW1yHo=
+X-Microsoft-Antispam-Message-Info: 6KUZjnweXo5Y06zXKyDrGWmVPVW4SuoKQtUHsuFTB/5xQ+z3Tfg1+FyHbzlk7wHlbYigtjYJ5G/c3y0kC+WTfMLVuh+LW1XgpzNuQa8vmpNxfVDLWLTL8/NqjCqa7GVs4kI0dr2kC92GzBw9rplAfPI8zR3+s+AnXPAUeI5N61kFQfyZTWXuVnn4Ynny0lNj5u9aPnvkDcS7YHhwQulXWNun23zDTukkq1kJrC6HZQKs0p5NkFbmJ55KeGTbIPPuA0YXg3DaL1ktX61fVi/+aYRnbwOJYg5TR9D+9ijHp/g8h62pe4rukHKdOcqUbbp63ke4JkZ49FIxKCb/T2HO5i+lD7wtgLS0QIv0yf6od8hSlEikdwPkggaJzlqdko/TaHwD62Gno4HG6KIKikL0zNOIbvjMEyIwFJ/0ma/ZV2CksOCC6kVaKuYyQ3RbeVQwl5WM6pp+wzEntqOG3Wq2JbCP8tIw4Cr3X3s0KcOBboWj0meY1DAPZmvkKcHZluYTyHt29i+CwPrmrFpx3IFrWaqRXlhSRa7r+/uGbGUuQ+w71OKB9JjfWADEk5j4rZvp3Eep6UK0TotwyVgyRNtzRFVvYA4eUXbLF6vCR/a5Cc/ynZ5nwHI4ZA1RtWE5c0XO2xSjwT7Gb151urZpEYsHZE/jSLNExqzZpjIebpaVEu0RufdIxno7GHUjSUGSxpTSbNRlxUsMDrej5djBUBBDmdObF/Yx7aeubUExgZXDLGmwxWXGTY7Znvk+c507FY4C4L1riS0rZ+PE0XqfgsUPhQsKHrF9M5sIza4LaWo+c3pFLCJYhjetBCONBmQLMhAC
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(66946007)(4326008)(38350700002)(6666004)(38100700002)(31696002)(508600001)(31686004)(66556008)(66476007)(2616005)(316002)(52116002)(6512007)(5660300002)(86362001)(53546011)(6506007)(8936002)(8676002)(54906003)(6486002)(186003)(7416002)(26005)(2906002)(43740500002);
+ SFS:(4636009)(366004)(6666004)(508600001)(66946007)(66476007)(66556008)(26005)(4326008)(5660300002)(6486002)(186003)(2616005)(6512007)(7416002)(52116002)(53546011)(6506007)(31686004)(54906003)(316002)(86362001)(8936002)(2906002)(38100700002)(38350700002)(31696002)(83380400001)(8676002)(43740500002)(357404004);
  DIR:OUT; SFP:1102; 
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a2dIWmRNLzdzVTR0WkNFWE1FQ2N5N01tWTUvMjBvZmFQY2ErUDFWanJTejJL?=
- =?utf-8?B?cWFGT0YzZm1KWFphc1hHZlFvQU8raVFCbkhjZ1BzZWVuU1dtMFBxQ0tNeUpB?=
- =?utf-8?B?WHh6RWYvVFlEMlVOWVg5R1E5Q0U5QmxoWE1zUW1zYUtPN0h4aFl0TlRteGtj?=
- =?utf-8?B?MzhCYTY3ME8yeHNQWHNRdUlVSCtTRWNIaDBSNnRHRWRobW9Uem5YNVk1MGF6?=
- =?utf-8?B?ck5ZOGpZUDRhUzZoT3FadXhNT2hic1J2TE9MUXBrSGVJS1lrb2JlaXBUU3Vi?=
- =?utf-8?B?S1BuT1dhR2FYUlRhUVJXd0x5ekJ4dStRS3BET3JmQThXb2lSSHNKNUNlQXQ2?=
- =?utf-8?B?QmFjYkFKWnc4d0p6eGpQVkFTVTkzMkdJemNpSnRaU3ovdWp5N21pazRHeHh6?=
- =?utf-8?B?cHhhQi9VUmZIbWJNbGhoamZsWCsza3k5aWIyRGtVMU5pSjdkSkJsNUtlY285?=
- =?utf-8?B?OVhHMndIRTNmM3B1Z3gyQ2JvOWR3RXNLaTAyRXcxQ1FQWjFNK2ZrY3hzbVlL?=
- =?utf-8?B?SHJRRWROV3hJUGhoNVV1dXNmRFlGdUI4TEhGY1JyUllTaXVlVXpKZXBxSzZh?=
- =?utf-8?B?T1RsUXRPM3ZNNVFwTWhQZVJmalE3VDBwKzB1bTNkc0paVVZ4SDdQQlVzSVVI?=
- =?utf-8?B?RE9ybWFNbjJkRG5YN25FU3crRDlKSk4yb1BRMUxaL2x4bEVRUGY4SWRnZi96?=
- =?utf-8?B?UU1mMlZKeUFRQ3lVaGp2c0U1VnBEUjAwZktqdmlQa1ZEYTUxVFlQa1VFUkJW?=
- =?utf-8?B?V2F1bzNnYnRhT1h6Q2pVdWc5RzRuUnFRbGFZYzhQL2FhZXpQZUlxUmJsOG02?=
- =?utf-8?B?ZkJvR0Z1OWRIamtFa3kzNkpvUXRmOExBS1NIVFZzRUZyYWpleDJCOEMrNG1I?=
- =?utf-8?B?dEVZemptNVg0bktmajNhWDVUZHFmNVVXVTVoTTFuYlNqc0o2MEQyc0oxUk45?=
- =?utf-8?B?THZlT25QeC9pU09DTXBZZGsybHRtNnhTWUdPdEduYlJVeFZkQVk3aDdLWWNL?=
- =?utf-8?B?bDNrdnJVL3ArREZaVENLbHFMTHpHL3d4YnlJc0k0bHExbHlzeTkzVllqUnMv?=
- =?utf-8?B?YkcrM05kV05sZFoxelJuTHJiWDNRSUpsVlJQb1RyNllMWnorL21RZGZrS05i?=
- =?utf-8?B?VktNMVZLSjJ3TkJ5MmJJRkRkeCtPYWM1YjVZM3lKeUY5RGVQNkNPMlZ2ZWZP?=
- =?utf-8?B?VUZYQXJZVWRDSUp4aVdmZFBaY1h6WWhxOWt4Mm9ISEw1OGovaEJ0Y2I5TEcr?=
- =?utf-8?B?N1dETDZIQkVQQXVsY3pXejVRSFpZbkZBSFd6RE5TaWJGM1lzS1NndklIRHN4?=
- =?utf-8?B?UnJkTjZkdjBGNXduTkU4aVpjTU13UzYzckM4dEFwQ3AvTTQ0b3R6MnNSM1ll?=
- =?utf-8?B?aTEyb0s1MkFJT1UySDFnRS9DNWZWNjdhTjRmbjRnalR4UmM4MXF0N2xRWnVK?=
- =?utf-8?B?YTgxQU4xRS9WVFFNK2hUdjI5MVYvMVJMd0NKYjNBTXRHeHJ2cHZHMGFMTXBG?=
- =?utf-8?B?MVVRYjZsY0xlK3JCRHIzN1g1OFFzd2FFVWxwN1BCV3BXUndRYzhyN3lqdFdr?=
- =?utf-8?B?V1pMSndwMHZHUnRtV3V5cWV6bTNkU004UXgyd01raFJ2cEU5Q09CVEtXbTUw?=
- =?utf-8?B?dDdJbkdIbHd0cjZvTVBZdEUxRkFhc3ZPN3Y3NzRTYXZzR2NDd3ZEYkFRcEFG?=
- =?utf-8?B?NDc0OGJ6UjBsOGNGZTk1dHdEaGU4MmdKV2dhRFRjU0NobDVFNjAyYW9Ta05J?=
- =?utf-8?B?azFpb1NVMm42UGtkWWppT29sc2N0Rm5KejY5WUhwdkdtMW9CMGRjZTE2VUUr?=
- =?utf-8?B?ejVZaThZVjFlQ0kwd3BOcHBGNEFtZmhXZ1lpM0h3YWVVTjF2WXlFVkdaMjla?=
- =?utf-8?B?YWlkSFBscEpBNmZVOW5jRG9tZmtBL05GNlh4dTE3RXJGTkZTcW5la3R2ZWd1?=
- =?utf-8?B?b1hLK0duKzEycEZyMWVPVmRZdWk2VE1JWnIvdURYWTc1K1g1c3lmZ0kwa0Vw?=
- =?utf-8?B?aHgxR2gzc1FzRXE1UHhsSWxWY2xML2x3QThDNUxDSXNkSzRYdTBDV0VvaEhX?=
- =?utf-8?B?QURIWG5oMEpYeVVxVEs3M3BvemVQdnIvL3ltSGhGYUpJLzZTVXdQMkQ2bmFI?=
- =?utf-8?B?QTJhcm91ZTQwNE9HUVdUckwzRUt6QldiRFFIRis4ZkxnQksxNmpQTUNwS3VG?=
- =?utf-8?B?TjB2Uk1EbnFKazZ2NG1Sc3p2UjBnTkVJRXNYZ0hPVm0ySXRaTDVNQnN2Uksv?=
- =?utf-8?B?akx4UWlhNXpIT0VhOVpZSHRTWjFNNGlLY2JNaWJ1K2xFT3hGcFRvL0hwM0Ir?=
- =?utf-8?B?U05tRnFBRkhxK3kwOWlkTUlyLzNGZ3k3MnR4eERqZGpKeHNGbUM0Zz09?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YzhNYmdUWkdIV0FHRVp6OWU3K0ZsS09SSkcrQ0Z0cFBLUkRGbU9xYmp2a0NO?=
+ =?utf-8?B?c1BlcmpoTEdLcFYraHQ4dG03SnBLYkN4bnhONXk0cHpNTWxXVkRPT2psUjF2?=
+ =?utf-8?B?KzBpaGU3bC9tanduNEdyNVZaYmcyNE5pdWd0RGh2T2s1UGNyK2svVldMTTJr?=
+ =?utf-8?B?ckgzNndUUEVEM2hRSnQrNFJLVXB1dzAyMzhsRTQ2bDNpc2hOTmRZR1NjVElY?=
+ =?utf-8?B?REtNZGF2YzBhc1NMZzdtOEtrMEtvRU41QWN3Z29SS3J4b1doeW5Yem15MGxl?=
+ =?utf-8?B?QjRSdzlINHVtWFc0c1VqQzcyanBNUmQxMHB4eFBzM1Uwb2srTnJOdWV0aGxM?=
+ =?utf-8?B?dVRrbndxK3p1QWFhQ1g1Ym41SGx5Z3Z3OEowOVgvODlpdG5BdUJNVWlMcXdw?=
+ =?utf-8?B?aGE2YVo1LzFCTG5aTmxObjhmbDdvRy8vY09JcWFOdk9ML0NsSnZ6UGd0ZTQz?=
+ =?utf-8?B?azNHUGQ2YVUzTWVMUHVkUU91WXRmS1FOT25ZeTMrai90dkNkeXdWWVJIQVo0?=
+ =?utf-8?B?OEkvRmxPbGM4czcyeGQzTy9wbUdheFhkTVZJWGFPNUJ2VUZkSVVhaFl1SzZT?=
+ =?utf-8?B?TDlJMEdhS3Y3bDg1Q3pkZlh5T1RFYXFSTjhYc0doaGw5ZjIvSERtS0dEd0Ru?=
+ =?utf-8?B?L09mNnRxNmpEQnRTU3BqREQyWjJRRXpYZklDMmJhaER0VXY1WExJWVhGRElO?=
+ =?utf-8?B?V3BUVjNlUHp5elVla0g4dUR0TGpDMFhTVGZVcGp4RTlpaytqV0I3L2hON0ZU?=
+ =?utf-8?B?R2x4bnhTVEZjZENOR0xZVWU2OXRXVmY0SWdGaUJ0TGNpNDQ4UmFVeC9GM3Jw?=
+ =?utf-8?B?ZkZHbk85UnIxZ0xIa3VDbUVoWVFQKzBJaVpaUXZLUU42WUg4REJGN1piOVBi?=
+ =?utf-8?B?bnRzOE9icEFSbDNpWjlBT1gxdHhGMVdxWUM2ekErVHhIb09jQ2VBOG8venkr?=
+ =?utf-8?B?cmtiOXAwcmk3ZWpuQ1RsbVQza1hTUHhYblU5cmZCQno4aE0yN2xjbGhsM3pv?=
+ =?utf-8?B?MUx3dTN2MjJZQzQvSG41azczNzJGejdaeGZQclYweWJ0Y3pSM0Zhc0pudjJq?=
+ =?utf-8?B?YVhQODlwbDFUYzFVbGxydlN0dzlrN0c4UGQybE5zVW1yeGpiMWsydFhUU1hy?=
+ =?utf-8?B?V2haLzl4a0ZsSFRLUThYQXIzcWJjQzQ2UmZwUmhYVFNjRUt1aDgwZ0tuZGRM?=
+ =?utf-8?B?ZnNpQ3RBVmMvQ3dPVFp2OTlKSDQ5TlBGV2lUdnB2MUFmOUJkTnB5WFpaTHlr?=
+ =?utf-8?B?Ky9OODVKTjZtNTBxOWxFaFJDZ3hjZ1E1WnJ0YXN6Nk5sWXFyVGpsdjBYT3JV?=
+ =?utf-8?B?am1XNXd5QXltV01JQ0hjaWVXck1vUUYza04vYzNGN1dwWk5vSzFnNXBwWk5v?=
+ =?utf-8?B?ZVJDWG1valVXbUpwWnFSdmZPaUxPQkFWMSt3dURxUTJtajhQSUlURDEzQnpE?=
+ =?utf-8?B?dWZqbWpjeG9waUdtb1dqSHhETjFqdndESFgrM0dOVU1ULzBjUkt5UlpxVmdw?=
+ =?utf-8?B?dE9nTzh5cGZJbys5akx6RDhxNWI1amwyK05pQjVnN0piRUQ3VmdmTkNsZDRl?=
+ =?utf-8?B?VmRlaXA1Q3ZvYkV1S2pJVURIb25lemtESU1kYm5RN2NCV0hxMC9FMUhBcFJB?=
+ =?utf-8?B?N3I3L3YxaDlIdS9SdG9zOVVld21BNEJTYVEvT3h0T3h6bkoxUk9mRDZmVEFV?=
+ =?utf-8?B?dUd2QnB6bFZJN2kyTXR2VWhBZ1c2RXp2Y1BqUW1BUCs4RVA4NTUyZkdacW5a?=
+ =?utf-8?B?QWdEZjkyU01EL0VTNkl3NndsMUl1RHJINWQ5bE5OcU1nMWxnelN2WTVSZXUy?=
+ =?utf-8?B?cGdZMC9DbE1KWmE2c1dONVZrQVpMaEtKSUxPMEliSUtSUnBlMGc5cEMybGMw?=
+ =?utf-8?B?Z2hNemVoU2RBajJUYzV1MzBqUS9JYUkrcStLOWRuSTJzL0ZqZmVjeVVDY3BO?=
+ =?utf-8?B?cUlheFJ5TFhob2RwM0FHRStYNCtCWDNURVp4TE9aY0pMYnhMVkZ6VnJ3RWpm?=
+ =?utf-8?B?S2FUcm5JMUNXQllxSGZ0NDdPNjV2eTRFRWkycUR3WVp6UFQwaEVFR2ZtbkVt?=
+ =?utf-8?B?T0ZYdEJGYks2ZEN4VDQwTDRnTEVMSyt0WkdQYUprY0YxZUR2U2hscWxsZkxy?=
+ =?utf-8?B?eVMvbmg5aXVHREF6VXc3U2hXck13OEFTR1N5VndwK3hyeTVtUS9zTFhNdTFK?=
+ =?utf-8?B?QitMYW0zcFlxejJjaEtleWQxTzQxSWZFUzlEYmJHaVhpTXRNdzdLTTRYSjBq?=
+ =?utf-8?B?NDhWMjV4SFRWQW5mM01hTHplcVh4M2NQeXlTM21zY1hUaWdjZUpzekZjS2RJ?=
+ =?utf-8?B?QzVyYk5DV1c2QTJ2U1htQy8zNUNLcjk1NU0rZElXUERTUnRZL2tJUT09?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3de6e132-fd0a-47c2-5f9f-08d9c384501e
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff3d1015-a3a4-4102-a659-08d9c38704e5
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2021 06:45:29.8152 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2021 07:04:52.0733 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: M470TlMr8lI5PUR16rznc9FJc5StBgIc6gqCfcUhunNh3u33VBZq3uI0a/RBhkziQK4d/tPIdqxwTmlhkpFkcfqyvfu6D2ic8qzL6n/Pw0evMz13WFXVphyRZ07lhCAz
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB6092
+X-MS-Exchange-CrossTenant-UserPrincipalName: hK2ThVKKfXNK+kepWeiWm+EI3Y3k1Hzw0i5u9rlS1D9FC0x/jx4x04jndtjjz4cV0o0tPWAlnn66x9jY2lHDyfUbXmgw3+OcWY6vQ9PLcs4Lprh6cWxWodvCSQ3U7ulE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR01MB2313
 X-Mailman-Approved-At: Mon, 20 Dec 2021 06:52:43 -0500
 Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>
@@ -154,66 +154,219 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
-Hi Marc,
-
 On 30-11-2021 01:30 am, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall@arm.com>
+> KVM internally uses accessor functions when reading or writing the
+> guest's system registers. This takes care of accessing either the stored
+> copy or using the "live" EL1 system registers when the host uses VHE.
 > 
-> Introduce the feature bit and a primitive that checks if the feature is
-> set behind a static key check based on the cpus_have_const_cap check.
-> 
-> Checking nested_virt_in_use() on systems without nested virt enabled
-> should have neglgible overhead.
+> With the introduction of virtual EL2 we add a bunch of EL2 system
+> registers, which now must also be taken care of:
+> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
+>    revert to the stored version of that, and not use the CPU's copy.
+> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
 
-Typo: negligible
+Do we have vEL1? or is it a typo?
 
+>    also use the stored version, since the CPU carries the EL1 copy.
+> - Some EL2 system registers are supposed to affect the current execution
+>    of the system, so we need to put them into their respective EL1
+>    counterparts. For this we need to define a mapping between the two.
+>    This is done using the newly introduced struct el2_sysreg_map.
+> - Some EL2 system registers have a different format than their EL1
+>    counterpart, so we need to translate them before writing them to the
+>    CPU. This is done using an (optional) translate function in the map.
+> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
+>    which need some separate handling (SPSR_EL2 is being handled in a
+>    separate patch).
 > 
-> We don't yet allow userspace to actually set this feature.
+> All of these cases are now wrapped into the existing accessor functions,
+> so KVM users wouldn't need to care whether they access EL2 or EL1
+> registers and also which state the guest is in.
 > 
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> This handles what was formerly known as the "shadow state" dynamically,
+> without requiring a separate copy for each vCPU EL.
+> 
+> Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   arch/arm64/include/asm/kvm_nested.h | 14 ++++++++++++++
->   arch/arm64/include/uapi/asm/kvm.h   |  1 +
->   2 files changed, 15 insertions(+)
->   create mode 100644 arch/arm64/include/asm/kvm_nested.h
+>   arch/arm64/kvm/sys_regs.c | 143 ++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 139 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> new file mode 100644
-> index 000000000000..1028ac65a897
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -0,0 +1,14 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef __ARM64_KVM_NESTED_H
-> +#define __ARM64_KVM_NESTED_H
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 730a24468915..61596355e42d 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -24,6 +24,7 @@
+>   #include <asm/kvm_emulate.h>
+>   #include <asm/kvm_hyp.h>
+>   #include <asm/kvm_mmu.h>
+> +#include <asm/kvm_nested.h>
+>   #include <asm/perf_event.h>
+>   #include <asm/sysreg.h>
+>   
+> @@ -64,23 +65,157 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
+>   	return false;
+>   }
+>   
+> +#define PURE_EL2_SYSREG(el2)						\
+> +	case el2: {							\
+> +		*el1r = el2;						\
+> +		return true;						\
+> +	}
 > +
-> +#include <linux/kvm_host.h>
+> +#define MAPPED_EL2_SYSREG(el2, el1, fn)					\
+> +	case el2: {							\
+> +		*xlate = fn;						\
+> +		*el1r = el1;						\
+> +		return true;						\
+> +	}
 > +
-> +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+> +static bool get_el2_mapping(unsigned int reg,
+> +			    unsigned int *el1r, u64 (**xlate)(u64))
 > +{
-> +	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
-> +		cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
-> +		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+> +	switch (reg) {
+> +		PURE_EL2_SYSREG(  VPIDR_EL2	);
+> +		PURE_EL2_SYSREG(  VMPIDR_EL2	);
+> +		PURE_EL2_SYSREG(  ACTLR_EL2	);
+> +		PURE_EL2_SYSREG(  HCR_EL2	);
+> +		PURE_EL2_SYSREG(  MDCR_EL2	);
+> +		PURE_EL2_SYSREG(  HSTR_EL2	);
+> +		PURE_EL2_SYSREG(  HACR_EL2	);
+> +		PURE_EL2_SYSREG(  VTTBR_EL2	);
+> +		PURE_EL2_SYSREG(  VTCR_EL2	);
+> +		PURE_EL2_SYSREG(  RVBAR_EL2	);
+> +		PURE_EL2_SYSREG(  TPIDR_EL2	);
+> +		PURE_EL2_SYSREG(  HPFAR_EL2	);
+> +		PURE_EL2_SYSREG(  ELR_EL2	);
+> +		PURE_EL2_SYSREG(  SPSR_EL2	);
+> +		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
+> +				  translate_sctlr_el2_to_sctlr_el1	     );
+> +		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,
+> +				  translate_cptr_el2_to_cpacr_el1	     );
+> +		MAPPED_EL2_SYSREG(TTBR0_EL2,   TTBR0_EL1,
+> +				  translate_ttbr0_el2_to_ttbr0_el1	     );
+> +		MAPPED_EL2_SYSREG(TTBR1_EL2,   TTBR1_EL1,   NULL	     );
+> +		MAPPED_EL2_SYSREG(TCR_EL2,     TCR_EL1,
+> +				  translate_tcr_el2_to_tcr_el1		     );
+> +		MAPPED_EL2_SYSREG(VBAR_EL2,    VBAR_EL1,    NULL	     );
+> +		MAPPED_EL2_SYSREG(AFSR0_EL2,   AFSR0_EL1,   NULL	     );
+> +		MAPPED_EL2_SYSREG(AFSR1_EL2,   AFSR1_EL1,   NULL	     );
+> +		MAPPED_EL2_SYSREG(ESR_EL2,     ESR_EL1,     NULL	     );
+> +		MAPPED_EL2_SYSREG(FAR_EL2,     FAR_EL1,     NULL	     );
+> +		MAPPED_EL2_SYSREG(MAIR_EL2,    MAIR_EL1,    NULL	     );
+> +		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
+> +		MAPPED_EL2_SYSREG(CNTHCTL_EL2, CNTKCTL_EL1,
+> +				  translate_cnthctl_el2_to_cntkctl_el1	     );
+> +	default:
+> +		return false;
+> +	}
 > +}
 > +
-> +#endif /* __ARM64_KVM_NESTED_H */
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index b3edde68bc3e..395a4c039bcc 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -106,6 +106,7 @@ struct kvm_regs {
->   #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
->   #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
->   #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-> +#define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
+>   u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>   {
+>   	u64 val = 0x8badf00d8badf00d;
+> +	u64 (*xlate)(u64) = NULL;
+> +	unsigned int el1r;
+> +
+> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> +		goto memory_read;
+> +
+> +	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto memory_read;
+> +
+> +		/*
+> +		 * ELR_EL2 is special cased for now.
+> +		 */
+> +		switch (reg) {
+> +		case ELR_EL2:
+> +			return read_sysreg_el1(SYS_ELR);
+> +		}
+> +
+> +		/*
+> +		 * If this register does not have an EL1 counterpart,
+> +		 * then read the stored EL2 version.
+> +		 */
+> +		if (reg == el1r)
+> +			goto memory_read;
+> +
+> +		/*
+> +		 * If we have a non-VHE guest and that the sysreg
+> +		 * requires translation to be used at EL1, use the
+> +		 * in-memory copy instead.
+> +		 */
+> +		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
+> +			goto memory_read;
+> +
+> +		/* Get the current version of the EL1 counterpart. */
+> +		WARN_ON(!__vcpu_read_sys_reg_from_cpu(el1r, &val));
+> +		return val;
+> +	}
+> +
+> +	/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +	if (unlikely(is_hyp_ctxt(vcpu)))
+> +		goto memory_read;
 >   
->   struct kvm_vcpu_init {
->   	__u32 target;
-
-It looks good to me.
-Please feel free to add.
-Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> -	if (vcpu->arch.sysregs_loaded_on_cpu &&
+> -	    __vcpu_read_sys_reg_from_cpu(reg, &val))
+> +	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
+>   		return val;
+>   
+> +memory_read:
+>   	return __vcpu_sys_reg(vcpu, reg);
+>   }
+>   
+>   void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>   {
+> -	if (vcpu->arch.sysregs_loaded_on_cpu &&
+> -	    __vcpu_write_sys_reg_to_cpu(val, reg))
+> +	u64 (*xlate)(u64) = NULL;
+> +	unsigned int el1r;
+> +
+> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
+> +		goto memory_write;
+> +
+> +	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
+> +		if (!is_hyp_ctxt(vcpu))
+> +			goto memory_write;
+> +
+> +		/*
+> +		 * Always store a copy of the write to memory to avoid having
+> +		 * to reverse-translate virtual EL2 system registers for a
+> +		 * non-VHE guest hypervisor.
+> +		 */
+> +		__vcpu_sys_reg(vcpu, reg) = val;
+> +
+> +		switch (reg) {
+> +		case ELR_EL2:
+> +			write_sysreg_el1(val, SYS_ELR);
+> +			return;
+> +		}
+> +
+> +		/* No EL1 counterpart? We're done here.? */
+> +		if (reg == el1r)
+> +			return;
+> +
+> +		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
+> +			val = xlate(val);
+> +
+> +		/* Redirect this to the EL1 version of the register. */
+> +		WARN_ON(!__vcpu_write_sys_reg_to_cpu(val, el1r));
+> +		return;
+> +	}
+> +
+> +	/* EL1 register can't be on the CPU if the guest is in vEL2. */
+> +	if (unlikely(is_hyp_ctxt(vcpu)))
+> +		goto memory_write;
+> +
+> +	if (__vcpu_write_sys_reg_to_cpu(val, reg))
+>   		return;
+>   
+> +memory_write:
+>   	 __vcpu_sys_reg(vcpu, reg) = val;
+>   }
+>   
 
 Thanks,
 Ganapat
