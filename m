@@ -2,81 +2,141 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BC0DC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 20 Dec 2021 09:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE77DC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Dec 2021 11:52:46 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0209C4B3ED;
-	Mon, 20 Dec 2021 04:56:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 456A64B44F;
+	Mon, 20 Dec 2021 06:52:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id d+-BRSww1h1a; Mon, 20 Dec 2021 04:56:55 -0500 (EST)
+	with ESMTP id 2g5mSF8uwO6E; Mon, 20 Dec 2021 06:52:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87AFB4B413;
-	Mon, 20 Dec 2021 04:56:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F300E4B443;
+	Mon, 20 Dec 2021 06:52:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D4AE44B410
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 04:56:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FE854B32D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 01:45:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id devepOPplBRb for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Dec 2021 04:56:52 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7624D4B40F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 04:56:52 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id EDEB0B80E32;
- Mon, 20 Dec 2021 09:56:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89F1AC36AE2;
- Mon, 20 Dec 2021 09:56:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1639994209;
- bh=hNW52/cQomk8153Nvkt2bQvw/2+OxIdj20bpV1noL10=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=jS0bsY6aPAA4f8eldPtDtGfWe3yOn2aZtt3Gukc2G1PCSpmuxa2sD1vMq0SOWhOYy
- yZiKURf4Q0PMvw3I4Nh+X5opPtGABD4qe3feS2/Q/94xWXwbJ3/q8kYfMp9AnjRpIN
- SCI2RXTgdE55NbGGALq2q4FOYCN9vgkv63bpG3hh0mKnU2V1Qkj8VYR7m2n1cT9JgE
- daB81batBEDjX+W3WamQ+WCYEVklOZDv5DE/kU6V6X8zz0gJYtXetS36fa75akOd2y
- fuOF5yUHWClX4qABN9MZilT1ZWuOEjp6VeuW5g0Hk+Q1Ekw/mw8GAunfId7L3PTN+J
- MxdtfBHsA11Lg==
-Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
- helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1mzFPT-00DFm0-Cu; Mon, 20 Dec 2021 09:56:47 +0000
-Date: Mon, 20 Dec 2021 09:56:46 +0000
-Message-ID: <87h7b3wqe9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v5 36/69] KVM: arm64: nv: Filter out unsupported features
- from ID regs
-In-Reply-To: <e850857c-9cab-8e16-0568-acb513514ae8@os.amperecomputing.com>
+ with ESMTP id nso7dShAopbP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Dec 2021 01:45:33 -0500 (EST)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com
+ (mail-bn7nam10on2107.outbound.protection.outlook.com [40.107.92.107])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3892C4B300
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 01:45:33 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b31p78ss0OsWd2jG6eMxDGUptR+yTHJZ7vg1zEfn1PcT/uYEeYi9zPAC0WV3tyqr1TSTh7AGVSlgPVoL+DR1w8CROHMcNXMJdYNOAkRA9Q2X2xljZZ1ug9wAq0psMrcZ+JkV3f++kxyvimJpJfER2x6xSdR3gZlaTRda+C97F9K7h7TxpvIp76eM9+ydYXrC0wmvY8XRYOCwiFvLYOzxN5Y2orVAkxNXQduzSAGUaau23hJFslaIu3BgMJsKX7HryIY0FVyftWICmvr7MFMtdmVZYtZJoQr96vPlZAdsxKQ8XVflaOSVsWCYy121vGeaYFTlApCb7Rx3VPymlQUBWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mf0jZaShyLNXg4NZRhrMIBlqy8rBHufqACV82yU9gXk=;
+ b=jmZ3JatEyTFHIJt3yai3DbU5vuQ4VqKnICL0uTiPwj30LfzlT2ddH84V+i6PCW65m3fSxUMhIdMuvqXoew6U2Vwn8B23RVYVr7yc43ZMasK9jpL9T4ogD842q7QmGePxScPQHowtE9SQjL4Q6SEVs5zM2YaG7x+8efGRSL73BG8GpYo0KiNkUKdXngta4YgOr5nwLXBA54Uqd0FsZaqgFnWyvW0IynIYDjydF9W81HDugxEVyfiVDPvEtZYSmSCRu3UQhZ+Fxjfj1OjnXl4/HFzl8WNM7a07t3rboLVm9oLwvX9fc0fPVFd5SvtFSLPI+JbfKZDNK+w46j+kuDrSyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mf0jZaShyLNXg4NZRhrMIBlqy8rBHufqACV82yU9gXk=;
+ b=qMH1Zv3woxR1X1syh0y5HXaOrYVbcFBnVm/UKYoKttQ15/EWiOjUiyUgX1McZ4l2/sREc5xbLI++gzu3aRRDcP2ORD1Z8yzNDhEfaPnW9I83kxY00jTv/82UBv5A0Nwvt0NqC5AJ98Yw8br5ahmV/BdDgRU7yXb7St+WzKmT3uY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ DM6PR01MB6092.prod.exchangelabs.com (2603:10b6:5:204::28) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4801.15; Mon, 20 Dec 2021 06:45:30 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::209e:941a:d9f9:354e]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::209e:941a:d9f9:354e%4]) with mapi id 15.20.4801.020; Mon, 20 Dec 2021
+ 06:45:30 +0000
+Message-ID: <83f15c99-b785-ac43-e005-0d922ccc536b@os.amperecomputing.com>
+Date: Mon, 20 Dec 2021 12:15:21 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH v5 07/69] KVM: arm64: nv: Introduce nested virtualization
+ VCPU feature
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-37-maz@kernel.org>
- <e850857c-9cab-8e16-0568-acb513514ae8@os.amperecomputing.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
- jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Andre Przywara <andre.przywara@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ <20211129200150.351436-8-maz@kernel.org>
+From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <20211129200150.351436-8-maz@kernel.org>
+X-ClientProxiedBy: CH2PR14CA0026.namprd14.prod.outlook.com
+ (2603:10b6:610:60::36) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3de6e132-fd0a-47c2-5f9f-08d9c384501e
+X-MS-TrafficTypeDiagnostic: DM6PR01MB6092:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR01MB6092C35998B8076927CD6F909C7B9@DM6PR01MB6092.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AAWiKKh0+923lV5nPAxN1iJ14s8MPbGVdXymNLIKlT8CrsWM8xRp+DGZbg4/z6JJ8QttaAyT96+jTswdmhnb8RXvrYNYDUpbCtrOFzIKvZpigvMEp5mXoBbv5ttz6FxdVbh11tsSxqQz0hQZho1hPxsb8fn10lLBGUTj0sRU89jHVZrt0Y2ZeYLSI5KaWp8H73lNWI4tRTIex1W22/aeQyRkAeX+IaxuKDFTMId/UIvUuG4XQYShlDJGqX+zAilvvwZOrYn3oJY47Ob9+TnCCB6QbudeLPGht1JcwbpCGUIn8qQSYy0z9HTLBXVuRhOEbL41MmdlhWmczPtOXs8e3Eytp7wL4IqKMehiNUt7cDjSblxvS46yvBDPtNEwoZqmePRHf8iwEceCt+qVafXN30rH8qr0xR0naMp8xwUZUwoNQajbfCsg5qpNVT9iyP2OprHI+/LIIy8tsiO729A9gMValUhc49Sis5j0+uulM4VWhbZ8tWMDHgadDAqRAL0kN8f9ioSUsLzk/WRiltD3JFPwkCg86QOVlINzJciQ0T7Y5NG9k6uXY969oGh0EVyKLr0kZZYs4AuFPJEpo19Q7myrLQmw9Ve2Da5c6tFj4nWHv2/xEQekcIOWGBay3KworKFAbNxA0/HLAG6zBOAxXHIqm3wMoRmGDXise/ADY1msyj9y2L7hNfk9UfHi3Xr5wcYwq8vu+ZbkbMsVrlxvz4wbcxjbPfsaOVEsHGW1yHo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(66946007)(4326008)(38350700002)(6666004)(38100700002)(31696002)(508600001)(31686004)(66556008)(66476007)(2616005)(316002)(52116002)(6512007)(5660300002)(86362001)(53546011)(6506007)(8936002)(8676002)(54906003)(6486002)(186003)(7416002)(26005)(2906002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a2dIWmRNLzdzVTR0WkNFWE1FQ2N5N01tWTUvMjBvZmFQY2ErUDFWanJTejJL?=
+ =?utf-8?B?cWFGT0YzZm1KWFphc1hHZlFvQU8raVFCbkhjZ1BzZWVuU1dtMFBxQ0tNeUpB?=
+ =?utf-8?B?WHh6RWYvVFlEMlVOWVg5R1E5Q0U5QmxoWE1zUW1zYUtPN0h4aFl0TlRteGtj?=
+ =?utf-8?B?MzhCYTY3ME8yeHNQWHNRdUlVSCtTRWNIaDBSNnRHRWRobW9Uem5YNVk1MGF6?=
+ =?utf-8?B?ck5ZOGpZUDRhUzZoT3FadXhNT2hic1J2TE9MUXBrSGVJS1lrb2JlaXBUU3Vi?=
+ =?utf-8?B?S1BuT1dhR2FYUlRhUVJXd0x5ekJ4dStRS3BET3JmQThXb2lSSHNKNUNlQXQ2?=
+ =?utf-8?B?QmFjYkFKWnc4d0p6eGpQVkFTVTkzMkdJemNpSnRaU3ovdWp5N21pazRHeHh6?=
+ =?utf-8?B?cHhhQi9VUmZIbWJNbGhoamZsWCsza3k5aWIyRGtVMU5pSjdkSkJsNUtlY285?=
+ =?utf-8?B?OVhHMndIRTNmM3B1Z3gyQ2JvOWR3RXNLaTAyRXcxQ1FQWjFNK2ZrY3hzbVlL?=
+ =?utf-8?B?SHJRRWROV3hJUGhoNVV1dXNmRFlGdUI4TEhGY1JyUllTaXVlVXpKZXBxSzZh?=
+ =?utf-8?B?T1RsUXRPM3ZNNVFwTWhQZVJmalE3VDBwKzB1bTNkc0paVVZ4SDdQQlVzSVVI?=
+ =?utf-8?B?RE9ybWFNbjJkRG5YN25FU3crRDlKSk4yb1BRMUxaL2x4bEVRUGY4SWRnZi96?=
+ =?utf-8?B?UU1mMlZKeUFRQ3lVaGp2c0U1VnBEUjAwZktqdmlQa1ZEYTUxVFlQa1VFUkJW?=
+ =?utf-8?B?V2F1bzNnYnRhT1h6Q2pVdWc5RzRuUnFRbGFZYzhQL2FhZXpQZUlxUmJsOG02?=
+ =?utf-8?B?ZkJvR0Z1OWRIamtFa3kzNkpvUXRmOExBS1NIVFZzRUZyYWpleDJCOEMrNG1I?=
+ =?utf-8?B?dEVZemptNVg0bktmajNhWDVUZHFmNVVXVTVoTTFuYlNqc0o2MEQyc0oxUk45?=
+ =?utf-8?B?THZlT25QeC9pU09DTXBZZGsybHRtNnhTWUdPdEduYlJVeFZkQVk3aDdLWWNL?=
+ =?utf-8?B?bDNrdnJVL3ArREZaVENLbHFMTHpHL3d4YnlJc0k0bHExbHlzeTkzVllqUnMv?=
+ =?utf-8?B?YkcrM05kV05sZFoxelJuTHJiWDNRSUpsVlJQb1RyNllMWnorL21RZGZrS05i?=
+ =?utf-8?B?VktNMVZLSjJ3TkJ5MmJJRkRkeCtPYWM1YjVZM3lKeUY5RGVQNkNPMlZ2ZWZP?=
+ =?utf-8?B?VUZYQXJZVWRDSUp4aVdmZFBaY1h6WWhxOWt4Mm9ISEw1OGovaEJ0Y2I5TEcr?=
+ =?utf-8?B?N1dETDZIQkVQQXVsY3pXejVRSFpZbkZBSFd6RE5TaWJGM1lzS1NndklIRHN4?=
+ =?utf-8?B?UnJkTjZkdjBGNXduTkU4aVpjTU13UzYzckM4dEFwQ3AvTTQ0b3R6MnNSM1ll?=
+ =?utf-8?B?aTEyb0s1MkFJT1UySDFnRS9DNWZWNjdhTjRmbjRnalR4UmM4MXF0N2xRWnVK?=
+ =?utf-8?B?YTgxQU4xRS9WVFFNK2hUdjI5MVYvMVJMd0NKYjNBTXRHeHJ2cHZHMGFMTXBG?=
+ =?utf-8?B?MVVRYjZsY0xlK3JCRHIzN1g1OFFzd2FFVWxwN1BCV3BXUndRYzhyN3lqdFdr?=
+ =?utf-8?B?V1pMSndwMHZHUnRtV3V5cWV6bTNkU004UXgyd01raFJ2cEU5Q09CVEtXbTUw?=
+ =?utf-8?B?dDdJbkdIbHd0cjZvTVBZdEUxRkFhc3ZPN3Y3NzRTYXZzR2NDd3ZEYkFRcEFG?=
+ =?utf-8?B?NDc0OGJ6UjBsOGNGZTk1dHdEaGU4MmdKV2dhRFRjU0NobDVFNjAyYW9Ta05J?=
+ =?utf-8?B?azFpb1NVMm42UGtkWWppT29sc2N0Rm5KejY5WUhwdkdtMW9CMGRjZTE2VUUr?=
+ =?utf-8?B?ejVZaThZVjFlQ0kwd3BOcHBGNEFtZmhXZ1lpM0h3YWVVTjF2WXlFVkdaMjla?=
+ =?utf-8?B?YWlkSFBscEpBNmZVOW5jRG9tZmtBL05GNlh4dTE3RXJGTkZTcW5la3R2ZWd1?=
+ =?utf-8?B?b1hLK0duKzEycEZyMWVPVmRZdWk2VE1JWnIvdURYWTc1K1g1c3lmZ0kwa0Vw?=
+ =?utf-8?B?aHgxR2gzc1FzRXE1UHhsSWxWY2xML2x3QThDNUxDSXNkSzRYdTBDV0VvaEhX?=
+ =?utf-8?B?QURIWG5oMEpYeVVxVEs3M3BvemVQdnIvL3ltSGhGYUpJLzZTVXdQMkQ2bmFI?=
+ =?utf-8?B?QTJhcm91ZTQwNE9HUVdUckwzRUt6QldiRFFIRis4ZkxnQksxNmpQTUNwS3VG?=
+ =?utf-8?B?TjB2Uk1EbnFKazZ2NG1Sc3p2UjBnTkVJRXNYZ0hPVm0ySXRaTDVNQnN2Uksv?=
+ =?utf-8?B?akx4UWlhNXpIT0VhOVpZSHRTWjFNNGlLY2JNaWJ1K2xFT3hGcFRvL0hwM0Ir?=
+ =?utf-8?B?U05tRnFBRkhxK3kwOWlkTUlyLzNGZ3k3MnR4eERqZGpKeHNGbUM0Zz09?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3de6e132-fd0a-47c2-5f9f-08d9c384501e
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2021 06:45:29.8152 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: M470TlMr8lI5PUR16rznc9FJc5StBgIc6gqCfcUhunNh3u33VBZq3uI0a/RBhkziQK4d/tPIdqxwTmlhkpFkcfqyvfu6D2ic8qzL6n/Pw0evMz13WFXVphyRZ07lhCAz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB6092
+X-Mailman-Approved-At: Mon, 20 Dec 2021 06:52:43 -0500
+Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,189 +148,75 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 20 Dec 2021 07:26:50 +0000,
-Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
-> 
-> 
-> Hi Marc,
-> 
-> On 30-11-2021 01:31 am, Marc Zyngier wrote:
-> > As there is a number of features that we either can't support,
-> > or don't want to support right away with NV, let's add some
-> > basic filtering so that we don't advertize silly things to the
-> > EL2 guest.
-> > 
-> > Whilst we are at it, avertize ARMv8.4-TTL as well as ARMv8.5-GTG.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >   arch/arm64/include/asm/kvm_nested.h |   6 ++
-> >   arch/arm64/kvm/nested.c             | 152 ++++++++++++++++++++++++++++
-> >   arch/arm64/kvm/sys_regs.c           |   4 +-
-> >   arch/arm64/kvm/sys_regs.h           |   2 +
-> >   4 files changed, 163 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > index 07c15f51cf86..026ddaad972c 100644
-> > --- a/arch/arm64/include/asm/kvm_nested.h
-> > +++ b/arch/arm64/include/asm/kvm_nested.h
-> > @@ -67,4 +67,10 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
-> >   extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
-> >   extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
-> >   +struct sys_reg_params;
-> > +struct sys_reg_desc;
-> > +
-> > +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
-> > +			  const struct sys_reg_desc *r);
-> > +
-> >   #endif /* __ARM64_KVM_NESTED_H */
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index 42a96c8d2adc..19b674983e13 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -20,6 +20,10 @@
-> >   #include <linux/kvm_host.h>
-> >     #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_nested.h>
-> > +#include <asm/sysreg.h>
-> > +
-> > +#include "sys_regs.h"
-> >     /*
-> >    * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-> > @@ -38,3 +42,151 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
-> >     	return -EINVAL;
-> >   }
-> > +
-> > +/*
-> > + * Our emulated CPU doesn't support all the possible features. For the
-> > + * sake of simplicity (and probably mental sanity), wipe out a number
-> > + * of feature bits we don't intend to support for the time being.
-> > + * This list should get updated as new features get added to the NV
-> > + * support, and new extension to the architecture.
-> > + */
-> > +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
-> > +			  const struct sys_reg_desc *r)
-> > +{
-> > +	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-> > +			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-> > +	u64 val, tmp;
-> > +
-> > +	if (!nested_virt_in_use(v))
-> > +		return;
-> > +
-> > +	val = p->regval;
-> > +
-> > +	switch (id) {
-> > +	case SYS_ID_AA64ISAR0_EL1:
-> > +		/* Support everything but O.S. and Range TLBIs */
-> > +		val &= ~(FEATURE(ID_AA64ISAR0_TLB)	|
-> > +			 GENMASK_ULL(27, 24)		|
-> > +			 GENMASK_ULL(3, 0));
-> > +		break;
-> > +
-> > +	case SYS_ID_AA64ISAR1_EL1:
-> > +		/* Support everything but PtrAuth and Spec Invalidation */
-> > +		val &= ~(GENMASK_ULL(63, 56)		|
-> > +			 FEATURE(ID_AA64ISAR1_SPECRES)	|
-> > +			 FEATURE(ID_AA64ISAR1_GPI)	|
-> > +			 FEATURE(ID_AA64ISAR1_GPA)	|
-> > +			 FEATURE(ID_AA64ISAR1_API)	|
-> > +			 FEATURE(ID_AA64ISAR1_APA));
-> > +		break;
-> > +
-> > +	case SYS_ID_AA64PFR0_EL1:
-> > +		/* No AMU, MPAM, S-EL2, RAS or SVE */
-> > +		val &= ~(GENMASK_ULL(55, 52)		|
-> > +			 FEATURE(ID_AA64PFR0_AMU)	|
-> > +			 FEATURE(ID_AA64PFR0_MPAM)	|
-> > +			 FEATURE(ID_AA64PFR0_SEL2)	|
-> > +			 FEATURE(ID_AA64PFR0_RAS)	|
-> > +			 FEATURE(ID_AA64PFR0_SVE)	|
-> > +			 FEATURE(ID_AA64PFR0_EL3)	|
-> > +			 FEATURE(ID_AA64PFR0_EL2));
-> > +		/* 64bit EL2/EL3 only */
-> > +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), 0b0001);
-> > +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL3), 0b0001);
-> > +		break;
-> > +
-> > +	case SYS_ID_AA64PFR1_EL1:
-> > +		/* Only support SSBS */
-> > +		val &= FEATURE(ID_AA64PFR1_SSBS);
-> > +		break;
-> > +
-> > +	case SYS_ID_AA64MMFR0_EL1:
-> > +		/* Hide ECV, FGT, ExS, Secure Memory */
-> > +		val &= ~(GENMASK_ULL(63, 43)			|
-> > +			 FEATURE(ID_AA64MMFR0_TGRAN4_2)		|
-> > +			 FEATURE(ID_AA64MMFR0_TGRAN16_2)	|
-> > +			 FEATURE(ID_AA64MMFR0_TGRAN64_2)	|
-> > +			 FEATURE(ID_AA64MMFR0_SNSMEM));
-> > +
-> > +		/* Disallow unsupported S2 page sizes */
-> > +		switch (PAGE_SIZE) {
-> > +		case SZ_64K:
-> > +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0001);
-> > +			fallthrough;
-> > +		case SZ_16K:
-> > +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0001);
-> > +			fallthrough;
-> > +		case SZ_4K:
-> > +			/* Support everything */
-> > +			break;
-> > +		}
-> 
-> It seems to me that Host hypervisor(L0) has to boot with 4KB page size
-> to support all (4, 16 and 64KB) page sizes at L1, any specific reason
-> for this restriction?
 
-Well, yes.
+Hi Marc,
 
-If you have a L0 that has booted with (let's say) 64kB page size, how
-do you provide S2 mappings with 4kB granularity so that you can
-implement the permissions that a L1 guest hypervisor can impose on its
-own guest, given that KVM currently mandates S1 and S2 to use the same
-page sizes?
+On 30-11-2021 01:30 am, Marc Zyngier wrote:
+> From: Christoffer Dall <christoffer.dall@arm.com>
+> 
+> Introduce the feature bit and a primitive that checks if the feature is
+> set behind a static key check based on the cpus_have_const_cap check.
+> 
+> Checking nested_virt_in_use() on systems without nested virt enabled
+> should have neglgible overhead.
 
-You can't. That's why we tell the guest hypervisor how much we
-support, and the guest hypervisor can decide to go ahead or not
-depending on what it does.
-
-If one day we can support S2 mappings that are smaller than the host
-page sizes, then we'll be able to allow to advertise all page sizes.
-But I wouldn't hold my breath for this to happen.
+Typo: negligible
 
 > 
-> > +		/* Advertize supported S2 page sizes */
-> > +		switch (PAGE_SIZE) {
-> > +		case SZ_4K:
-> > +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0010);
-> > +			fallthrough;
-> > +		case SZ_16K:
-> > +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0010);
-> > +			fallthrough;
-> > +		case SZ_64K:
-> > +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN64_2), 0b0010);
-> > +			break;
-> > +		}
-> > +		/* Cap PARange to 40bits */
+> We don't yet allow userspace to actually set this feature.
 > 
-> Any specific reasons for the 40 bit cap?
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>   arch/arm64/include/asm/kvm_nested.h | 14 ++++++++++++++
+>   arch/arm64/include/uapi/asm/kvm.h   |  1 +
+>   2 files changed, 15 insertions(+)
+>   create mode 100644 arch/arm64/include/asm/kvm_nested.h
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> new file mode 100644
+> index 000000000000..1028ac65a897
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -0,0 +1,14 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __ARM64_KVM_NESTED_H
+> +#define __ARM64_KVM_NESTED_H
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +static inline bool nested_virt_in_use(const struct kvm_vcpu *vcpu)
+> +{
+> +	return (!__is_defined(__KVM_NVHE_HYPERVISOR__) &&
+> +		cpus_have_final_cap(ARM64_HAS_NESTED_VIRT) &&
+> +		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+> +}
+> +
+> +#endif /* __ARM64_KVM_NESTED_H */
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index b3edde68bc3e..395a4c039bcc 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -106,6 +106,7 @@ struct kvm_regs {
+>   #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
+>   #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
+>   #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
+> +#define KVM_ARM_VCPU_HAS_EL2		7 /* Support nested virtualization */
+>   
+>   struct kvm_vcpu_init {
+>   	__u32 target;
 
-The only platform this currently runs on is a model, and 1TB of
-address space is what it supports. At some point, this will require
-userspace involvement to set it up, but we're not quite ready for that
-either. And given that there is no HW, the urge for changing this is
-extremely limited.
+It looks good to me.
+Please feel free to add.
+Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Ganapat
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
