@@ -2,78 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24DBBC433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 19 Dec 2021 12:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DA2C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 20 Dec 2021 09:10:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D308C4B2D0;
-	Sun, 19 Dec 2021 07:12:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD8554B3F4;
+	Mon, 20 Dec 2021 04:10:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B3o4gVXGnjYd; Sun, 19 Dec 2021 07:12:19 -0500 (EST)
+	with ESMTP id j8QqNOeZVqNH; Mon, 20 Dec 2021 04:10:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C0FE4B301;
-	Sun, 19 Dec 2021 07:12:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A76D74B3E9;
+	Mon, 20 Dec 2021 04:10:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D209B4B316
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 12:47:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1680D4B3E4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 04:10:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LkL5qT0TiIqe for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Dec 2021 12:47:32 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 75C854B30A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Dec 2021 12:47:32 -0500 (EST)
+ with ESMTP id Bl92rszL87tL for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Dec 2021 04:10:44 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E30E44B3CE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Dec 2021 04:10:43 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id DC50DCE2413;
- Fri, 17 Dec 2021 17:47:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1637DC36AE8;
- Fri, 17 Dec 2021 17:47:26 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 35488B80E2B;
+ Mon, 20 Dec 2021 09:10:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA1F2C36AE8;
+ Mon, 20 Dec 2021 09:10:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1639763246;
- bh=wGI+t0gS/hdl+/rz+vVaZZWkZGtQrHWcAbdHNmxiEVw=;
- h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
- b=qfeFqtNSoGdqKHEWsC1tOxLxD+nqSLNiEA7cVVH/qW1sLgxx/GqTADt/k6kekO2vn
- JvwkmrEPf4UQFnx4d5DPI9igP5hDgepKos+O1+8041yZRIPfr8od/MTJDJYS1Y/1r1
- nqzR6L7w97ibIzzL8vJIVTz0z7nfwr53oFoGkFm9moA6AsvPJYbUqwsOUYKv/QEWN1
- wYvMeu5o04gOKboPV5El3dTNl1c6fNYkAZPUjcHP0nU2GT+eBUXb2c1KtFMwqiYVOb
- KSZbDouSbIpovqGusvbPBFJCNl9KzDsAXifpCHuQQ24at3BqtZM6mWjFpoyc7PthCb
- U5KN3B1GEhdyg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
- id C078B5C0610; Fri, 17 Dec 2021 09:47:25 -0800 (PST)
-Date: Fri, 17 Dec 2021 09:47:25 -0800
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Possible nohz-full/RCU issue in arm64 KVM
-Message-ID: <20211217174725.GX641268@paulmck-ThinkPad-P17-Gen-1>
-References: <YbyO40zDW/kvUHEE@FVFF77S0Q05N>
- <70f112072d9496d21901946ea82832d3ed3a8cb2.camel@redhat.com>
- <Ybyg1r/Q6EfeuXGV@FVFF77S0Q05N>
- <9ab8107f-ff41-6a9e-57e1-a261bea93aca@redhat.com>
- <20211217160749.GS641268@paulmck-ThinkPad-P17-Gen-1>
- <f3d6095a-70aa-3da0-08a6-3caff2638809@redhat.com>
- <20211217164535.GU641268@paulmck-ThinkPad-P17-Gen-1>
- <4c369ca2-2ad0-4a02-90e9-2d82df6c289d@redhat.com>
- <20211217171218.GV641268@paulmck-ThinkPad-P17-Gen-1>
- <24268298-c51f-afcd-72e2-22c39eb002b5@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <24268298-c51f-afcd-72e2-22c39eb002b5@redhat.com>
-X-Mailman-Approved-At: Sun, 19 Dec 2021 07:12:12 -0500
-Cc: maz <maz@kernel.org>, frederic <frederic@kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
- rcu <rcu@vger.kernel.org>, Nicolas Saenz Julienne <nsaenzju@redhat.com>,
- Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+ s=k20201202; t=1639991440;
+ bh=EJumnoaZeL0MRLglZLFSP0eOcfo9r/+3WUIOJDJ1E4A=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=qCePg3LrYhG8im9BNU0aClXtAXDhqvEBxQusPxr97oE0DEpZdrhR3bzBFbg8Lu56G
+ yT1/RAnHyex6sbpIwMzq85AbNpv7Jc9/T7+HNYDCEKA9HWEDfaVsLqMAFHSX1Hyulp
+ 7ZX2NuNkwo5wyAHLdMHaZtePlPm+ibE0Su82X+2O/+E9Jnjtm/OoTRcv/7IQ8ilb1c
+ FvEyvjPy7p3sVHo4l7CtvxwFMFoZpynyUyFtYgXNSKHw7unDmUzyChxlM0PFVXSq1/
+ lsXDEZ7H9bghrbLirFPesSHYVcZ1cOiR+8jjHBRwaIHFbi89gP5Idh7uiqed1gMLBQ
+ XOy92uisLw/SA==
+Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
+ helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1mzEgo-00DFGF-Qz; Mon, 20 Dec 2021 09:10:38 +0000
+Date: Mon, 20 Dec 2021 09:10:38 +0000
+Message-ID: <87lf0fwsj5.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in
+ vcpu_read/write_sys_reg()
+In-Reply-To: <13046e57-b7e5-7f0b-15bd-38c09e21807a@os.amperecomputing.com>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-19-maz@kernel.org>
+ <13046e57-b7e5-7f0b-15bd-38c09e21807a@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
+ jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: paulmck@kernel.org
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -87,59 +93,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 17, 2021 at 06:23:32PM +0100, Paolo Bonzini wrote:
-> On 12/17/21 18:12, Paul E. McKenney wrote:
-> > On Fri, Dec 17, 2021 at 06:02:23PM +0100, Paolo Bonzini wrote:
-> > > On 12/17/21 17:45, Paul E. McKenney wrote:
-> > > > On Fri, Dec 17, 2021 at 05:34:04PM +0100, Paolo Bonzini wrote:
-> > > > > On 12/17/21 17:07, Paul E. McKenney wrote:
-> > > > > > > rcu_note_context_switch() is a point-in-time notification; it's not strictly
-> > > > > > > necessary, but it may improve performance a bit by avoiding unnecessary IPIs
-> > > > > > > from the RCU subsystem.
-> > > > > > > 
-> > > > > > > There's no benefit from doing it when you're back from the guest, because at
-> > > > > > > that point the CPU is just running normal kernel code.
-> > > > > > 
-> > > > > > Do scheduling-clock interrupts from guest mode have the "user" parameter
-> > > > > > set?  If so, that would keep RCU happy.
-> > > > > 
-> > > > > No, thread is in supervisor mode.  But after every interrupt (timer tick or
-> > > > > anything), one of three things can happen:
-> > > > > 
-> > > > > * KVM will go around the execution loop and invoke rcu_note_context_switch()
-> > > > > again
-> > > > > 
-> > > > > * or KVM will go back to user space
-> > > > 
-> > > > Here "user space" is a user process as opposed to a guest OS?
-> > > 
-> > > Yes, that code runs from ioctl(KVM_RUN) and the ioctl will return to the
-> > > calling process.
+On Mon, 20 Dec 2021 07:04:44 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> On 30-11-2021 01:30 am, Marc Zyngier wrote:
+> > KVM internally uses accessor functions when reading or writing the
+> > guest's system registers. This takes care of accessing either the stored
+> > copy or using the "live" EL1 system registers when the host uses VHE.
 > > 
-> > Intriguing.  A user process within the guest OS or a user process outside
-> > of any guest OS, that is, within the host?
+> > With the introduction of virtual EL2 we add a bunch of EL2 system
+> > registers, which now must also be taken care of:
+> > - If the guest is running in vEL2, and we access an EL1 sysreg, we must
+> >    revert to the stored version of that, and not use the CPU's copy.
+> > - If the guest is running in vEL1, and we access an EL2 sysreg, we must
 > 
-> A user process on the host.  The guest vCPU is nothing special: it's just a
-> user thread that occasionally lets the guest run by invoking the KVM_RUN
-> ioctl.  Hopefully, KVM_RUN will be where that user thread will spend most of
-> the time so the guest runs at full steam.  KVM_RUN is the place where you
-> have the code that Nicolas and Mark were discussing.
-> 
-> From the point of view of the kernel however the thread is always in kernel
-> mode when it runs the guest, because any interrupt will be recognized while
-> still in the ioctl.
-> 
-> (I'll add that from the point of view of the scheduler, there's no
-> difference between a CPU-bound guest and a "normal" CPU-bound process on the
-> host, e.g. wasting time with "for(;;)" or calculating digits of PI is the
-> same no matter if you're doing it in the guest or in the host. Likewise for
-> I/O-bound guests; e.g. doing "hlt" or "wfi" constantly in the guest looks
-> exactly the same to the scheduler as a process that spends its time in the
-> poll() system call).
+> Do we have vEL1? or is it a typo?
 
-Thank you for the explanation!
+Not a typo, but only a convention (there is no such concept in the
+architecture). vELx denotes the exception level the guest thinks it is
+running at while running at EL1 (as it is the case for both vEL1 and
+vEL2).
 
-							Thanx, Paul
+Depending on the exception level and the running mode (VHE or not) you
+emulate at any given time, you access the sysregs differently: they
+can be either live in the CPU, stored in memory, with or without
+translation. That's why I'm using these 'parallel' exception levels to
+denote which is which...
+
+HTH,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
