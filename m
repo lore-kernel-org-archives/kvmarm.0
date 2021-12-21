@@ -2,66 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F2C7C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Dec 2021 08:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2723CC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 21 Dec 2021 09:10:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A7E64B0D9;
-	Tue, 21 Dec 2021 03:40:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9630A4B0C0;
+	Tue, 21 Dec 2021 04:10:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ef9IrRLx+cmd; Tue, 21 Dec 2021 03:40:08 -0500 (EST)
+	with ESMTP id vpENFrYg9R1Q; Tue, 21 Dec 2021 04:10:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C37D4B0B8;
-	Tue, 21 Dec 2021 03:40:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F9D84B0A3;
+	Tue, 21 Dec 2021 04:10:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64A68499F2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Dec 2021 03:40:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D98F4B08B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Dec 2021 04:10:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zzv+jsgDG-UV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Dec 2021 03:40:05 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF35D4B0C0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Dec 2021 03:40:04 -0500 (EST)
+ with ESMTP id E5IYLi2xq+OS for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 21 Dec 2021 04:10:13 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13EBE49B13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Dec 2021 04:10:13 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 7ECB1B81201;
- Tue, 21 Dec 2021 08:40:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3960DC36AE7;
- Tue, 21 Dec 2021 08:40:02 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 6FBD761335;
+ Tue, 21 Dec 2021 09:10:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B46D1C36AE2;
+ Tue, 21 Dec 2021 09:10:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1640076002;
- bh=6n2t4Pul4m76//01Vv7UUMgTMNHDNpFfmgUjueXm2HQ=;
+ s=k20201202; t=1640077811;
+ bh=dqLnh6PlEXIFrCc8RxbmZ745zfW0n92neTWiPzt+10Q=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Yh73MDKYBgDSAFOHl8LPE0jo1hbbT+H+XTpyY9vfkkipEHCLMAwtET+I4AdXTX9MS
- jLFKgkvjNqT9Q4z7WQngC7ERoMnWnHJN4IPWPboZSkj3b9/k1hKJAGDjzFVmkmsvWT
- S1JqiH/ITg2Yb4c80HZXBV6xJtcIwR37Oj3G4Wd49lJ58qFIYiQ0c7D0hj0jkd6XAP
- JGGfPouX7+DibmySqQvSUg1y9mrvsMv8WZeFAOY8vlHO47hJmIlgSJBX6hn+WrgYk2
- JProUppnsYv5iy/1B/8n3tOYDUNCAeby4Kq59gpLb01lK6iY1KPkkLuq4V72HqeXLR
- 18q6U/4SP9EUw==
+ b=N20IVw2zd5DxpYyhj/s7YCANrGpIzob5Wx470V91m8Gg/FhE/AqsNSwYsVF+96eHl
+ IlSScB4BeifCPnmg5HlUYWTuWpA53shjGkeSygZ9i6m+W/V2kC+FhycXRbQDVhFU24
+ DjdS73VraeWZgw/07/QQVvwrYyjlBkJtVvJzR9vQDLmpmCPPu8N2OdcUchTvtRPRoi
+ dLsZAKMUWbIKyW+HOT+FUjt5rfH7I4SIgj9gBoR7Y/bvADS6lih3T0BoJsveLTVR7I
+ U3wcsXdMciyqMvtMZqqpmHLb8iVHYhj++NUQ8gntZXACfqBXMUg45whzHXsYz2nNvM
+ MvU23c3N+K5Lg==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
  helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1mzagh-00DTu5-EL; Tue, 21 Dec 2021 08:39:59 +0000
-Date: Tue, 21 Dec 2021 08:39:58 +0000
-Message-ID: <871r26wdup.wl-maz@kernel.org>
+ id 1mzb9t-00DUHv-Hn; Tue, 21 Dec 2021 09:10:09 +0000
+Date: Tue, 21 Dec 2021 09:10:09 +0000
+Message-ID: <87zgouuxvy.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
-In-Reply-To: <ccfc064b-55d1-470d-5815-94935e785279@os.amperecomputing.com>
+Subject: Re: [PATCH v5 36/69] KVM: arm64: nv: Filter out unsupported features
+ from ID regs
+In-Reply-To: <ef667048-7fbe-55dc-9856-546fd9d3c690@os.amperecomputing.com>
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-19-maz@kernel.org>
- <13046e57-b7e5-7f0b-15bd-38c09e21807a@os.amperecomputing.com>
- <87lf0fwsj5.wl-maz@kernel.org>
- <ccfc064b-55d1-470d-5815-94935e785279@os.amperecomputing.com>
+ <20211129200150.351436-37-maz@kernel.org>
+ <e850857c-9cab-8e16-0568-acb513514ae8@os.amperecomputing.com>
+ <87h7b3wqe9.wl-maz@kernel.org>
+ <ef667048-7fbe-55dc-9856-546fd9d3c690@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -95,44 +95,194 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 21 Dec 2021 07:12:36 +0000,
+On Tue, 21 Dec 2021 06:03:49 +0000,
 Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
 > 
 > 
-> On 20-12-2021 02:40 pm, Marc Zyngier wrote:
-> > On Mon, 20 Dec 2021 07:04:44 +0000,
+> On 20-12-2021 03:26 pm, Marc Zyngier wrote:
+> > On Mon, 20 Dec 2021 07:26:50 +0000,
 > > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > >> 
 > >> 
-> >> On 30-11-2021 01:30 am, Marc Zyngier wrote:
-> >>> KVM internally uses accessor functions when reading or writing the
-> >>> guest's system registers. This takes care of accessing either the stored
-> >>> copy or using the "live" EL1 system registers when the host uses VHE.
-> >>> 
-> >>> With the introduction of virtual EL2 we add a bunch of EL2 system
-> >>> registers, which now must also be taken care of:
-> >>> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
-> >>>     revert to the stored version of that, and not use the CPU's copy.
-> >>> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
+> >> Hi Marc,
 > >> 
-> >> Do we have vEL1? or is it a typo?
+> >> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+> >>> As there is a number of features that we either can't support,
+> >>> or don't want to support right away with NV, let's add some
+> >>> basic filtering so that we don't advertize silly things to the
+> >>> EL2 guest.
+> >>> 
+> >>> Whilst we are at it, avertize ARMv8.4-TTL as well as ARMv8.5-GTG.
+> >>> 
+> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> >>> ---
+> >>>    arch/arm64/include/asm/kvm_nested.h |   6 ++
+> >>>    arch/arm64/kvm/nested.c             | 152 ++++++++++++++++++++++++++++
+> >>>    arch/arm64/kvm/sys_regs.c           |   4 +-
+> >>>    arch/arm64/kvm/sys_regs.h           |   2 +
+> >>>    4 files changed, 163 insertions(+), 1 deletion(-)
+> >>> 
+> >>> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> >>> index 07c15f51cf86..026ddaad972c 100644
+> >>> --- a/arch/arm64/include/asm/kvm_nested.h
+> >>> +++ b/arch/arm64/include/asm/kvm_nested.h
+> >>> @@ -67,4 +67,10 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+> >>>    extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+> >>>    extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+> >>>    +struct sys_reg_params;
+> >>> +struct sys_reg_desc;
+> >>> +
+> >>> +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+> >>> +			  const struct sys_reg_desc *r);
+> >>> +
+> >>>    #endif /* __ARM64_KVM_NESTED_H */
+> >>> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> >>> index 42a96c8d2adc..19b674983e13 100644
+> >>> --- a/arch/arm64/kvm/nested.c
+> >>> +++ b/arch/arm64/kvm/nested.c
+> >>> @@ -20,6 +20,10 @@
+> >>>    #include <linux/kvm_host.h>
+> >>>      #include <asm/kvm_emulate.h>
+> >>> +#include <asm/kvm_nested.h>
+> >>> +#include <asm/sysreg.h>
+> >>> +
+> >>> +#include "sys_regs.h"
+> >>>      /*
+> >>>     * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+> >>> @@ -38,3 +42,151 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+> >>>      	return -EINVAL;
+> >>>    }
+> >>> +
+> >>> +/*
+> >>> + * Our emulated CPU doesn't support all the possible features. For the
+> >>> + * sake of simplicity (and probably mental sanity), wipe out a number
+> >>> + * of feature bits we don't intend to support for the time being.
+> >>> + * This list should get updated as new features get added to the NV
+> >>> + * support, and new extension to the architecture.
+> >>> + */
+> >>> +void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+> >>> +			  const struct sys_reg_desc *r)
+> >>> +{
+> >>> +	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
+> >>> +			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
+> >>> +	u64 val, tmp;
+> >>> +
+> >>> +	if (!nested_virt_in_use(v))
+> >>> +		return;
+> >>> +
+> >>> +	val = p->regval;
+> >>> +
+> >>> +	switch (id) {
+> >>> +	case SYS_ID_AA64ISAR0_EL1:
+> >>> +		/* Support everything but O.S. and Range TLBIs */
+> >>> +		val &= ~(FEATURE(ID_AA64ISAR0_TLB)	|
+> >>> +			 GENMASK_ULL(27, 24)		|
+> >>> +			 GENMASK_ULL(3, 0));
+> >>> +		break;
+> >>> +
+> >>> +	case SYS_ID_AA64ISAR1_EL1:
+> >>> +		/* Support everything but PtrAuth and Spec Invalidation */
+> >>> +		val &= ~(GENMASK_ULL(63, 56)		|
+> >>> +			 FEATURE(ID_AA64ISAR1_SPECRES)	|
+> >>> +			 FEATURE(ID_AA64ISAR1_GPI)	|
+> >>> +			 FEATURE(ID_AA64ISAR1_GPA)	|
+> >>> +			 FEATURE(ID_AA64ISAR1_API)	|
+> >>> +			 FEATURE(ID_AA64ISAR1_APA));
+> >>> +		break;
+> >>> +
+> >>> +	case SYS_ID_AA64PFR0_EL1:
+> >>> +		/* No AMU, MPAM, S-EL2, RAS or SVE */
+> >>> +		val &= ~(GENMASK_ULL(55, 52)		|
+> >>> +			 FEATURE(ID_AA64PFR0_AMU)	|
+> >>> +			 FEATURE(ID_AA64PFR0_MPAM)	|
+> >>> +			 FEATURE(ID_AA64PFR0_SEL2)	|
+> >>> +			 FEATURE(ID_AA64PFR0_RAS)	|
+> >>> +			 FEATURE(ID_AA64PFR0_SVE)	|
+> >>> +			 FEATURE(ID_AA64PFR0_EL3)	|
+> >>> +			 FEATURE(ID_AA64PFR0_EL2));
+> >>> +		/* 64bit EL2/EL3 only */
+> >>> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), 0b0001);
+> >>> +		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL3), 0b0001);
+> >>> +		break;
+> >>> +
+> >>> +	case SYS_ID_AA64PFR1_EL1:
+> >>> +		/* Only support SSBS */
+> >>> +		val &= FEATURE(ID_AA64PFR1_SSBS);
+> >>> +		break;
+> >>> +
+> >>> +	case SYS_ID_AA64MMFR0_EL1:
+> >>> +		/* Hide ECV, FGT, ExS, Secure Memory */
+> >>> +		val &= ~(GENMASK_ULL(63, 43)			|
+> >>> +			 FEATURE(ID_AA64MMFR0_TGRAN4_2)		|
+> >>> +			 FEATURE(ID_AA64MMFR0_TGRAN16_2)	|
+> >>> +			 FEATURE(ID_AA64MMFR0_TGRAN64_2)	|
+> >>> +			 FEATURE(ID_AA64MMFR0_SNSMEM));
+> >>> +
+> >>> +		/* Disallow unsupported S2 page sizes */
+> >>> +		switch (PAGE_SIZE) {
+> >>> +		case SZ_64K:
+> >>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0001);
+> >>> +			fallthrough;
+> >>> +		case SZ_16K:
+> >>> +			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0001);
+> >>> +			fallthrough;
+> >>> +		case SZ_4K:
+> >>> +			/* Support everything */
+> >>> +			break;
+> >>> +		}
+> >> 
+> >> It seems to me that Host hypervisor(L0) has to boot with 4KB page size
+> >> to support all (4, 16 and 64KB) page sizes at L1, any specific reason
+> >> for this restriction?
 > > 
-> > Not a typo, but only a convention (there is no such concept in the
-> > architecture). vELx denotes the exception level the guest thinks it is
-> > running at while running at EL1 (as it is the case for both vEL1 and
-> > vEL2).
+> > Well, yes.
 > > 
+> > If you have a L0 that has booted with (let's say) 64kB page size, how
+> > do you provide S2 mappings with 4kB granularity so that you can
+> > implement the permissions that a L1 guest hypervisor can impose on its
+> > own guest, given that KVM currently mandates S1 and S2 to use the same
+> > page sizes?
+> > 
+> > You can't. That's why we tell the guest hypervisor how much we
+> > support, and the guest hypervisor can decide to go ahead or not
+> > depending on what it does.
+> > 
+> > If one day we can support S2 mappings that are smaller than the host
+> > page sizes, then we'll be able to allow to advertise all page sizes.
+> > But I wouldn't hold my breath for this to happen.
 > 
-> OK got it, this is to deal with Non-VHE case.
+> Thanks for the detailed explanation!.
+> Can we put one line comment that explains why this manipulation?
+> It would be helpful to see a comment like S2 PAGE_SIZE should be
+> at-least the size of Host PAGE_SIZE?
 
-No, you'd have the exact same thing with a VHE guest itself running an
-EL1 guest. You really cannot distinguish the two cases.
+Can do, but we need to get the terminology straight, because this is
+very quickly becoming confusing. Something like:
 
-In general, you can't really think the NV support in terms of VHE or
-nVHE, or even in terms of guest level. You need to think in terms of a
-single machine with three exception levels, and follow the rules of
-the architecture to the letter.
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 7c9dd1edf011..d35a947f5679 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -850,7 +850,12 @@ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 			/* Support everything */
+ 			break;
+ 		}
+-		/* Advertize supported S2 page sizes */
++		/*
++		 * Since we can't support a guest S2 page size smaller than
++		 * the host's own page size (due to KVM only populating its
++		 * own S2 using the kernel's page size), advertise the
++		 * limitation using FEAT_GTG.
++		 */
+ 		switch (PAGE_SIZE) {
+ 		case SZ_4K:
+ 			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0010);
+
+So not quite a one line comment! ;-)
+
+Ultimately, all there is to know is in the description of FEAT_GTG in
+the ARMv8 ARM.
 
 Thanks,
 
