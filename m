@@ -2,146 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7ADC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 21 Dec 2021 10:54:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C23D7C43217
+	for <kvmarm@archiver.kernel.org>; Wed, 22 Dec 2021 14:46:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E72A4B105;
-	Tue, 21 Dec 2021 05:54:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F58840B87;
+	Wed, 22 Dec 2021 09:46:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@os.amperecomputing.com
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id w5biLAOQ3-2z; Tue, 21 Dec 2021 05:54:08 -0500 (EST)
+	with ESMTP id gT0RCrm92nWE; Wed, 22 Dec 2021 09:46:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40FDC4B0B6;
-	Tue, 21 Dec 2021 05:54:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D835D40F30;
+	Wed, 22 Dec 2021 09:46:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 860B940B41
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Dec 2021 05:12:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CF9040B87
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Dec 2021 09:46:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bFVP23x8j4hQ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 21 Dec 2021 05:12:48 -0500 (EST)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com
- (mail-mw2nam12on2137.outbound.protection.outlook.com [40.107.244.137])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 647EB402DB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 21 Dec 2021 05:12:48 -0500 (EST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TeG5lwkjfAhxIEUIWL4ho2R5tAmI+UlGq/TziKHptisQkVyUGSni+vlrjkiCsgpcR1e8KusWrCeug0tUH0BCNdhKJewYxaU+nGIKzw2tKlGJI2qAFKyQHb56FiGg0hDZkbgJMG/IPzwzE1RQ9KuaKl8gxQrkNLDTgOPTtQ+cU9XtEOilVGRIkWk+F0s7156PhNSoDlgJoQAHEfGsqYON4LojdX/j8uprhN5bthsAtnW+p27WBsOBadTWBlGzCuRFO1Hz7cfGfIhnavq9l/syyhLsWCnxm7/Luzd8w8nqqrrdEf4M4SWQc3/68QEOb/x01zo7JPDjAx/OXo2ELQrC3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PSdnNkB3BFKZ8qoSMdL5FVAHLA2svPbUsRPt0ZnHdss=;
- b=kKHtPS2yTYXqegyJDX4Itthp9EpcZ6lYDrHz8REyMPI8pus2Pabm5cMhICDubevsqE5nUGwaOegTa+6nfq2UE+cQDNPvd7jgV1oSC0vuxbUb9f92nFDxyvw492YYD2T7hSEBMxg9oDjrEXj3P48hZZNiguCPlh5PpQd8DTVEpHLVPnZ3ca0IUNM8dUPsO0w6k6Ugkc/AfQIHb0BXOpnQsd6In89W919myVB/Yiw0XusEbJnfACQUc+MJB+RkdC6KqUhctfl8ylc0B093w0Klw1gai1eUF+4tB9XZTQwWpscddQiAJGmkJq7bxV8CEiRo0f3Czxr8iWHT0GNv+1iaGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PSdnNkB3BFKZ8qoSMdL5FVAHLA2svPbUsRPt0ZnHdss=;
- b=P8I29pYAlfF7Ub2JQVPlH3fENDC2VnsZbq2+vDtklJAbyhA2791wXX0Ld/p9Im300E2b6yWmDW3o/9RvVtsa8uczyts1qeH3M28H36xxU0xMFj8lT7+iuQ9ucBkjSNjWAIp9uCXiDBX47rtPUprRZmlzFNiCvDA71l62N3RLASw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- DM8PR01MB7159.prod.exchangelabs.com (2603:10b6:8:d::16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4801.14; Tue, 21 Dec 2021 10:12:45 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::209e:941a:d9f9:354e]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::209e:941a:d9f9:354e%4]) with mapi id 15.20.4801.020; Tue, 21 Dec 2021
- 10:12:45 +0000
-Message-ID: <26b27c3d-7e05-9784-38b3-a7af944b5625@os.amperecomputing.com>
-Date: Tue, 21 Dec 2021 15:42:39 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>
-References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-19-maz@kernel.org>
- <13046e57-b7e5-7f0b-15bd-38c09e21807a@os.amperecomputing.com>
- <87lf0fwsj5.wl-maz@kernel.org>
- <ccfc064b-55d1-470d-5815-94935e785279@os.amperecomputing.com>
- <871r26wdup.wl-maz@kernel.org>
-From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <871r26wdup.wl-maz@kernel.org>
-X-ClientProxiedBy: CH0PR04CA0118.namprd04.prod.outlook.com
- (2603:10b6:610:75::33) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+ with ESMTP id PL3RjKDf-L6h for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 22 Dec 2021 09:46:27 -0500 (EST)
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com
+ [209.85.208.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6FE4040B59
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Dec 2021 09:46:27 -0500 (EST)
+Received: by mail-ed1-f54.google.com with SMTP id m21so10887681edc.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 22 Dec 2021 06:46:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=sender:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=5iP0cwT3bhm1wv/SCJZNX3eXAec5s+GXcjileA9F27Q=;
+ b=j+iLD08U4k29OZOTR400HLmz2obEtO7D3ChDq2ufdQRwoSee564zTXYkax3kXedW5x
+ iYSAkPWnWh0HmsGCYxgqB6v6rjq1J6RfbA6vdp4LqBhOQgTHCW8SJqXMQZoJdZnduOpd
+ +biLV62u++nkpKm3GHt3Wazm+d406xWf+r6xfrPIs3XFT6PdOANhi9NTNXW2pBEPseDs
+ O8fmCGSqVVXdUxHi/8Yd1osnSYTPPotOKVL37Mpw78cL+ilGurCLByJKVrMSZBrLHbP1
+ yF62XgDREqMBjMkc8HOrWcV5QL4YTGRgWxUVtLVW7P80eWy5Am70dRmng4BwwqDAhZJW
+ LUUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+ :subject:content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=5iP0cwT3bhm1wv/SCJZNX3eXAec5s+GXcjileA9F27Q=;
+ b=KZouFaEfPtNHfM9VOxfrMM586xegiCpLSOeZtpSmlh1uLlZzbRmBO08C7X0Mht3/pM
+ rnvDR4iFp1iXpqpbbaUtrzEfvAnmCaLF54x6oC7z31RM/Y4RfTbmA07ZPuNs7pfCX1Ah
+ sHfKhLkGD2TFkAq4XatVhXlZRfqOD2grBrO2lAjUD451+jSk161JJCJnSLcXao5fiqsq
+ uPIa7e4xMpN+i129tgVulx9fAoERCJSgouDQ8fs8ruKqdya3VyCQleAdbq/wPj4DECPb
+ L4WpVpVRdaQSyxdZboh1dnAjmdDgt6HJf2FufsPkdU4XbPna9G++WxKNi57B6CQEyp0V
+ K+ZA==
+X-Gm-Message-State: AOAM532QU2+P0c4g9wplAowMV2m3B6H7N1H4uMipmU57hhO1JLhMYY+5
+ 5qibKG17hMBa5qjCwCfgHIY=
+X-Google-Smtp-Source: ABdhPJyI+1PK2apwf17miH9QRLuhsilpq9fl9aPP5UQVakVob9Glo6g/RHpSyvLUZIsAbgPzbGdAww==
+X-Received: by 2002:a17:906:1d58:: with SMTP id
+ o24mr2586115ejh.121.1640184386450; 
+ Wed, 22 Dec 2021 06:46:26 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312::4fa? ([2001:b07:6468:f312::4fa])
+ by smtp.googlemail.com with ESMTPSA id l16sm864404edb.3.2021.12.22.06.46.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 22 Dec 2021 06:46:26 -0800 (PST)
+Message-ID: <b651b14f-9ad2-811d-0d16-21d23a65eba4@redhat.com>
+Date: Wed, 22 Dec 2021 15:46:24 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 95461d5f-b3e8-40df-233a-08d9c46a6eb0
-X-MS-TrafficTypeDiagnostic: DM8PR01MB7159:EE_
-X-Microsoft-Antispam-PRVS: <DM8PR01MB71594F6DBBAB708CE9B6BA2E9C7C9@DM8PR01MB7159.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Bgsdu+8METKaLLbtu2+YmYA9Dy09HZGFgI56XZJhN9WGfB1DyEBqEOA9UEDfnnxcVQWSz0j4nE7I7ORfa0RGf7X4mPgUQ0TXjbYPrYdr0AlM2BYUprqpfggAkQcei/haS4JprvIpG+pDA4eqoywlUWoqJjmSCu7Jw1eLkt2TMoSiIBQV5HDkeU7L8blFvZiqN0wswN19TUeiIe9S8/OyjErbEwe/WBTI6mrGvNcXaf2W2MlX28uBMqABohbwH5HqTGxpdp/nVs0d7dyK5Mzv8Yf8JMvEs/gUKmpfUdsGcYeF2zd/PMuwmmi9jKT8fIhT0e5EGMrEJnYkdElby187SeBYA2DH/3XgjUhOz5FruuFhP+9Qa/YNYpdAS83mg4dqUys5s9qj0UF2/FS98RnEZWJinl2bq71vHT2dX6zEjvSzPkxHw9pphDNVBwFRVSrmeh7DS6WbUTV3DD5VermBbyBV0hFK+4LRZsD2aGVPYPw0R11ayzRS2vG5U+QwYvoqgZA1YWoO0pmiGsnPKznBQ5bIUWsF+1yYGcqPn9bcrno9HtjgHHjOTVfw/vCZLidYL+f+kGiCGsxHyocJtuW5EbIXfRQWCNGgqDT3gSu2UMx5FJvrtOm/nIIbENB0EyCsMz3E/Vx6XKCDqeYh2f35eNqlDgdSJX448Ozhn0igulfd1f5Slor90fRZPgPuDQfmNfJrqDmQIQo6DIJXyo10WYM7+lqTwdAdwk2F2vT8uVk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(186003)(31686004)(66556008)(31696002)(54906003)(6486002)(6512007)(7416002)(2906002)(26005)(8936002)(6506007)(55236004)(316002)(6916009)(53546011)(52116002)(66476007)(508600001)(83380400001)(8676002)(66946007)(5660300002)(4326008)(6666004)(38100700002)(38350700002)(2616005)(86362001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TG1yQ3p5czFHL0N4K2VPY09FcDQyYWFGNzd4NEhxVXBmWUk5SkNxK0gxZjUz?=
- =?utf-8?B?eEVYaE5BVkZRS0pZRmJxNCtaTi9SVFJvMjFlMHI5eGdPZlRNcXpwQ0xDOEZU?=
- =?utf-8?B?SzZCUkNJclliZktLRkhycnE0Z1Jad1I0enh1ZlQ3Q2Y1TUZ5WGl4WkQ0MWlh?=
- =?utf-8?B?a3R3N0JyMlNZaEJMQmF5VnV2OGNWV1BUc3R3aUJNVXV4Y2dkYUxMdUhmMmhj?=
- =?utf-8?B?ZnZXeElUVUhRRksrSE43V3QvYTJyOFVCWWdLMk5GVW51WDM2aFpnWWxlekIr?=
- =?utf-8?B?L2JCUkJKVjM2MWg4M3R6YmVlajE5UG5Tb1k4Rk14S2FZZnVCVnBLS3pTdEk1?=
- =?utf-8?B?dWFFd0tSTUpjSlBheHV3MWJKNHhVQXdTa2gwNnhRWUxlQW5yajRiNGJvUHNs?=
- =?utf-8?B?b3ZDWWhNTFM4NU1wSkV3VitLWVRKalhJSzRyazMvSWlZbEJScnk3Zi9IVExv?=
- =?utf-8?B?SzV3THhzUWtnaHBScVBvdUVhTlUxZnltZzB1U2RmT1AybS81MkFxZDhBZjRP?=
- =?utf-8?B?dzU0amZNTVk3WW9WczAyckVITHgwRUNySlczWEVncjNOK2pCSDgwcUR0dGVx?=
- =?utf-8?B?RkpRSytONzhEVEhIbm5jc1FoZTJGT3Y3NHViQ0VWYlB5aVJxNHF4bDNHQzVE?=
- =?utf-8?B?Z29Hekg0M0ZZT0dVOVNOR0Zzelo5VngzNFdGMGc1K2R4RnJoR0pzVHhtR1c4?=
- =?utf-8?B?VTlPUkt4K0NWaFJXcHZmeHBVc3poWHRyZ2RnYThQZnY2elVVbVZXOXlmM2tk?=
- =?utf-8?B?NEhHVXFlYkdBc2cyOFJNL3ZVNUFYMnRELytLUEE0S1dLN3N3MXo5TThRczZk?=
- =?utf-8?B?eHFqQk1NSXBJcStDY3pLZTI1YTdNMTFrSW1EaUdvb2pKcjYvM1pUL3NzVC9y?=
- =?utf-8?B?SnZGeXJjWjYzbmdSN0ZjMDc4WEpOMUNBNUlxQU1EbUViWG0xZW5BOGdXQ2JW?=
- =?utf-8?B?VjBTYUdrVzFVaU5wSkJRTkR3S2hXRzR5bWdXd1NqTUdGdS9qVHhaWWxKNlZE?=
- =?utf-8?B?K0VucUtzOGxsajFNRG5KZTRoYzFkWXQwMld6SlBNcWFiNTJRNVV1SHVQMWlj?=
- =?utf-8?B?NWM5YjNiY3BINEIzWWY1Nmw5S2Z4bkM0U3hXbXRHUDFTeXIzYUM0U2M0cVZC?=
- =?utf-8?B?dGcraWJnNUd0dkFpVXREUHhOTGUwaG8xNjY5UzVhQkprQmVvdUtKTlJGbmpz?=
- =?utf-8?B?VHJZU1dFZ2tzSWRPRC8wdFVUV1JnbmxuSFY3aW02eWRjS0VhZ3VBajRROFBW?=
- =?utf-8?B?SUNya21OVWgwbVRBTzRvMEE0VkFTUmcxZjdBMUZ5TmFiZmNVNFJZcGVZZElG?=
- =?utf-8?B?WlBtR0J4RklGTlRwMVp1OEJDQmJLeUxxU1hNWWJ5Z1dLSktVclh6c2MycWZs?=
- =?utf-8?B?QTFDNEJRbm5wOUtuSHNvWFVkZnJhUnAwc3IzRFNCWHFPbTc5eENmdUs4QnNO?=
- =?utf-8?B?aDcyR3FVQWd1M2JyQXpMYWJBdEpWM20xd3pWM2JRbS9sVzJ4YU1IVVdjc3lT?=
- =?utf-8?B?RURCTW5pSUVrbm8xbytzUVlGdkEvWWgwSDIyV3hZOU5wSFlmS0JoNGdva2Jh?=
- =?utf-8?B?bjk4dUlnaHVsT0NXVUFveVVsK2dYOHdzU0g3enhZM1BNY3htWFlPT1Jhd3Ny?=
- =?utf-8?B?bWgrR2FXQ0ZSblhKR3lPUVhJWFovbnZmZlJ4TS9oeVRESE96NFBOWGJFL3Ns?=
- =?utf-8?B?VXh4c1lXZDJWWFhvdjF4bi8vc0t4cVk4WE9Dc3RjMkRmUllSY0JsZVVGcGJE?=
- =?utf-8?B?ZVhzUC9XQ25nSFNncEV5c2ZSMURISXpwTVcxOWt4OGgweHBPd0EyRTVLUHVs?=
- =?utf-8?B?TGtUUEs2ZlFkbmV5MXdYcVM0TE9vQ0VwUndBZXdhWTFRUloyaGt0RHRiQ0tn?=
- =?utf-8?B?M2FrS2hpYURKZFZlMzBxU1l6RGpYamJlb2YrRjNZR0FwOVYxYVpwUzZIRkZZ?=
- =?utf-8?B?alRqSW0xQXlGdkRDMXhtdDFmY0JmekV5UDdleis4RlN3WkFzZVlMd1dGYm5y?=
- =?utf-8?B?c01BdytRbXptWDFRSU42MU1mMFJaRVZrbllLT1VlUjBUK0VxbWhOSUJSUzBK?=
- =?utf-8?B?L0laTFdLYWlNcXEzck1HeXhkcmpyQzlYckRGZmZDc1c2MWM3SVBaaHdRb0Rh?=
- =?utf-8?B?azJMMWI4bWxQVlJyZXdiZkowL2dSbUoxL2NUV0VUOGpXQThvdGorQzhGTlFq?=
- =?utf-8?B?NklpUjdKQWpFdGp5d1gxR3ZtYkoycStTN0VGMCs3Tk5pUjJPUnR1TUwwTTlB?=
- =?utf-8?B?S2lnUUFqRTVqMlhKa0dCNG9RK3FpMEExRU9IdFpwdmhSYVBoUGFqUGMvQlFV?=
- =?utf-8?B?NEhVL2VCclFiTGZSeldxdTkzU1ZDSTBUMFJGYlFzQmJ2ZHZMNngxZz09?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 95461d5f-b3e8-40df-233a-08d9c46a6eb0
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2021 10:12:45.3500 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V8vTd5H1nI7kOl6UJ2C5GlvjYINI2LatfvHP9xpK9VdmtUSdsdOzWKfIUwGqTOIX5bKN3L8cRcc+97GRl5akPXiggA0r6zGdowwG8m3Qj6J7b8aJVxe5thh1sSwL1oF/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR01MB7159
-X-Mailman-Approved-At: Tue, 21 Dec 2021 05:54:07 -0500
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Andre Przywara <andre.przywara@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH 00/10] KVM: selftests: Add support for test-selectable
+ ucall implementations
+Content-Language: en-US
+To: Michael Roth <michael.roth@amd.com>, linux-kselftest@vger.kernel.org
+References: <20211210164620.11636-1-michael.roth@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211210164620.11636-1-michael.roth@amd.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Marc Orr <marcorr@google.com>,
+ "H . Peter Anvin" <hpa@zytor.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Nathan Tempelman <natet@google.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+ Ingo Molnar <mingo@redhat.com>, Mingwei Zhang <mizhang@google.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>,
+ Thomas Gleixner <tglx@linutronix.de>, Varad Gautam <varad.gautam@suse.com>,
+ Jim Mattson <jmattson@google.com>, Steve Rutherford <srutherford@google.com>,
+ linux-kernel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ David Woodhouse <dwmw@amazon.co.uk>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -158,59 +104,150 @@ Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
-On 21-12-2021 02:09 pm, Marc Zyngier wrote:
-> On Tue, 21 Dec 2021 07:12:36 +0000,
-> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>
->>
->>
->> On 20-12-2021 02:40 pm, Marc Zyngier wrote:
->>> On Mon, 20 Dec 2021 07:04:44 +0000,
->>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>>>
->>>>
->>>> On 30-11-2021 01:30 am, Marc Zyngier wrote:
->>>>> KVM internally uses accessor functions when reading or writing the
->>>>> guest's system registers. This takes care of accessing either the stored
->>>>> copy or using the "live" EL1 system registers when the host uses VHE.
->>>>>
->>>>> With the introduction of virtual EL2 we add a bunch of EL2 system
->>>>> registers, which now must also be taken care of:
->>>>> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
->>>>>      revert to the stored version of that, and not use the CPU's copy.
->>>>> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
->>>>
->>>> Do we have vEL1? or is it a typo?
->>>
->>> Not a typo, but only a convention (there is no such concept in the
->>> architecture). vELx denotes the exception level the guest thinks it is
->>> running at while running at EL1 (as it is the case for both vEL1 and
->>> vEL2).
->>>
->>
->> OK got it, this is to deal with Non-VHE case.
+On 12/10/21 17:46, Michael Roth wrote:
+> These patches are based on kvm/next, and are also available at:
 > 
-> No, you'd have the exact same thing with a VHE guest itself running an
-> EL1 guest. You really cannot distinguish the two cases.
-> 
-Okay understood, thanks.
+>    https://github.com/mdroth/linux/commits/sev-selftests-ucall-rfc1
 
-> In general, you can't really think the NV support in terms of VHE or
-> nVHE, or even in terms of guest level. You need to think in terms of a
-> single machine with three exception levels, and follow the rules of
-> the architecture to the letter.
+Thanks, this is a nice implementation of the concept.  I'll check s390 
+before the next merge window, as I intend to merge this and the SEV 
+tests (which I have already confirmed to work; I haven't yet checked 
+SEV-ES because it's a bit harder for me to install new kernels on the 
+SEV-ES machine I have access to).
 
-OK.
+Paolo
+
+> == BACKGROUND ==
 > 
-> Thanks,
+> These patches are a prerequisite for adding selftest support for SEV guests
+> and possibly other confidential computing implementations in the future.
+> They were motivated by a suggestion Paolo made in response to the initial
+> SEV selftest RFC:
 > 
-> 	M.
+>    https://lore.kernel.org/lkml/20211025035833.yqphcnf5u3lk4zgg@amd.com/T/#m959b56f9fb4ae6ab973f6ab50fe3ddfacd7c5617
+> 
+> Since the changes touch multiple archs and ended up creating a bit more churn
+> than expected, I thought it would be a good idea to carve this out into a
+> separate standalone series for reviewers who may be more interested in the
+> ucall changes than anything SEV-related.
+> 
+> To summarize, x86 relies on a ucall based on using PIO intructions to generate
+> an exit to userspace and provide the GVA of a dynamically-allocated ucall
+> struct that resides in guest memory and contains information about how to
+> handle/interpret the exit. This doesn't work for SEV guests for 3 main reasons:
+> 
+>    1) The guest memory is generally encrypted during run-time, so the guest
+>       needs to ensure the ucall struct is allocated in shared memory.
+>    2) The guest page table is also encrypted, so the address would need to be a
+>       GPA instead of a GVA.
+>    3) The guest vCPU register may also be encrypted in the case of
+>       SEV-ES/SEV-SNP, so the approach of examining vCPU register state has
+>       additional requirements such as requiring guest code to implement a #VC
+>       handler that can provide the appropriate registers via a vmgexit.
+> 
+> To address these issues, the SEV selftest RFC1 patchset introduced a set of new
+> SEV-specific interfaces that closely mirrored the functionality of
+> ucall()/get_ucall(), but relied on a pre-allocated/static ucall buffer in
+> shared guest memory so it that guest code could pass messages/state to the host
+> by simply writing to this pre-arranged shared memory region and then generating
+> an exit to userspace (via a halt instruction).
+> 
+> Paolo suggested instead implementing support for test/guest-specific ucall
+> implementations that could be used as an alternative to the default PIO-based
+> ucall implementations as-needed based on test/guest requirements, while still
+> allowing for tests to use a common set interfaces like ucall()/get_ucall().
+> 
+> == OVERVIEW ==
+> 
+> This series implements the above functionality by introducing a new ucall_ops
+> struct that can be used to register a particular ucall implementation as need,
+> then re-implements x86/arm64/s390x in terms of the ucall_ops.
+> 
+> But for the purposes of introducing a new ucall_ops implementation appropriate
+> for SEV, there are a couple issues that resulted in the need for some additional
+> ucall interfaces as well:
+> 
+>    a) ucall() doesn't take a pointer to the ucall struct it modifies, so to make
+>       it work in the case of an implementation that relies a pre-allocated ucall
+>       struct in shared guest memory some sort of global lookup functionality
+>       would be needed to locate the appropriate ucall struct for a particular
+>       VM/vcpu combination, and this would need to be made accessible for use by
+>       the guest as well. guests would then need some way of determining what
+>       VM/vcpu identifiers they need to use to do the lookup, which to do reliably
+>       would likely require seeding the guest with those identifiers in advance,
+>       which is possible, but much more easily achievable by simply adding a
+>       ucall() alternative that accepts a pointer to the ucall struct for that
+>       particular VM/vcpu.
+> 
+>    b) get_ucall() *does* take a pointer to a ucall struct, but currently zeroes
+>       it out and uses it to copy the guest's ucall struct into. It *could* be
+>       re-purposed to handle the case where the pointer is an actual pointer to
+>       the ucall struct in shared guest memory, but that could cause problems
+>       since callers would need some idea of what the underlying ucall
+>       implementation expects. Ideally the interfaces would be agnostic to the
+>       ucall implementation.
+> 
+> So to address those issues, this series also allows ucall implementations to
+> optionally be extended to support a set of 'shared' ops that are used in the
+> following manner:
+> 
+>    host:
+>      uc_gva = ucall_shared_alloc()
+>      setup_vm_args(vm, uc_gva)
+> 
+>    guest:
+>      ucall_shared(uc_gva, ...)
+> 
+>    host:
+>      uget_ucall_shared(uc_gva, ...)
+> 
+> and then implements a new ucall implementation, ucall_ops_halt, based around
+> these shared interfaces and halt instructions.
+> 
+> While this doesn't really meet the initial goal of re-using the existing
+> ucall interfaces as-is, the hope is that these *_shared interfaces are
+> general enough to be re-usable things other than SEV, or at least improve on
+> code readability over the initial SEV-specific interfaces.
+> 
+> Any review/comments are greatly appreciated!
+> 
+> ----------------------------------------------------------------
+> Michael Roth (10):
+>        kvm: selftests: move base kvm_util.h declarations to kvm_util_base.h
+>        kvm: selftests: move ucall declarations into ucall_common.h
+>        kvm: selftests: introduce ucall_ops for test/arch-specific ucall implementations
+>        kvm: arm64: selftests: use ucall_ops to define default ucall implementation
+>        (COMPILE-TESTED ONLY) kvm: s390: selftests: use ucall_ops to define default ucall implementation
+>        kvm: selftests: add ucall interfaces based around shared memory
+>        kvm: selftests: add ucall_shared ops for PIO
+>        kvm: selftests: introduce ucall implementation based on halt instructions
+>        kvm: selftests: add GUEST_SHARED_* macros for shared ucall implementations
+>        kvm: selftests: add ucall_test to test various ucall functionality
+> 
+>   tools/testing/selftests/kvm/.gitignore             |   1 +
+>   tools/testing/selftests/kvm/Makefile               |   5 +-
+>   .../testing/selftests/kvm/include/aarch64/ucall.h  |  18 +
+>   tools/testing/selftests/kvm/include/kvm_util.h     | 408 +--------------------
+>   .../testing/selftests/kvm/include/kvm_util_base.h  | 368 +++++++++++++++++++
+>   tools/testing/selftests/kvm/include/s390x/ucall.h  |  18 +
+>   tools/testing/selftests/kvm/include/ucall_common.h | 147 ++++++++
+>   tools/testing/selftests/kvm/include/x86_64/ucall.h |  19 +
+>   tools/testing/selftests/kvm/lib/aarch64/ucall.c    |  43 +--
+>   tools/testing/selftests/kvm/lib/s390x/ucall.c      |  45 +--
+>   tools/testing/selftests/kvm/lib/ucall_common.c     | 133 +++++++
+>   tools/testing/selftests/kvm/lib/x86_64/ucall.c     |  82 +++--
+>   tools/testing/selftests/kvm/ucall_test.c           | 182 +++++++++
+>   13 files changed, 982 insertions(+), 487 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/include/aarch64/ucall.h
+>   create mode 100644 tools/testing/selftests/kvm/include/kvm_util_base.h
+>   create mode 100644 tools/testing/selftests/kvm/include/s390x/ucall.h
+>   create mode 100644 tools/testing/selftests/kvm/include/ucall_common.h
+>   create mode 100644 tools/testing/selftests/kvm/include/x86_64/ucall.h
+>   create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
+>   create mode 100644 tools/testing/selftests/kvm/ucall_test.c
+> 
 > 
 
-Thanks,
-Ganapat
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
