@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDC9C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Dec 2021 16:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF962C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Dec 2021 20:13:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36B2D40E3D;
-	Mon, 27 Dec 2021 11:39:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 56F7049E3A;
+	Mon, 27 Dec 2021 15:13:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HOS3HwKQkWyW; Mon, 27 Dec 2021 11:39:08 -0500 (EST)
+	with ESMTP id l7PqLEZZL4Zd; Mon, 27 Dec 2021 15:13:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16A7740F93;
-	Mon, 27 Dec 2021 11:39:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11EFC49E3B;
+	Mon, 27 Dec 2021 15:13:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFDA640E3D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 11:39:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BF1F49E36
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 15:13:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kcMSL85ligTf for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Dec 2021 11:39:05 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B0F540E00
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 11:39:05 -0500 (EST)
+ with ESMTP id U6W58Iq+Ntnz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Dec 2021 15:13:31 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B439749E39
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 15:13:31 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 3625861119;
- Mon, 27 Dec 2021 16:39:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BFADC36AE7;
- Mon, 27 Dec 2021 16:39:03 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id F1DAFB81142;
+ Mon, 27 Dec 2021 20:13:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE192C36AE7;
+ Mon, 27 Dec 2021 20:13:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1640623143;
- bh=WEDbpEQhjoWaU0eAWyDEdcLhrsSzaMog2S29Lw9qtmk=;
+ s=k20201202; t=1640636008;
+ bh=uwbPNY5tEL2J9KworijcI/BzXuaiHuUEjSWMvWKe3MM=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=NtLNIGGxRyIizvSbAaIfsLpFFs/rZX6VaeFRLPoqcQqoMazJzKHgAkEBmEfX4h491
- jTvy1DxYyM2mmJt1LIo0dTQ7fsEXlEIcZ+cWs4XW8SCtKtUtN3KFWcX6XR6pw4dDUr
- Uwg95qbwCJXplo+VqWkimps3L39YkXhn4tbna1elGeNwuC42TGY8I+W1AneODx26w5
- /e6ysrQ5PREY8d+RzpLtC8sVYw9oF4tAntYhPky5gYHFM2bpcxGtEg5/yRI57rIDv6
- 4P74lzUbWSUfq0VsOdLATkkHCF85UIGt5h6ALEtAnkYNLiWhNo0vM7/LqDlIrt25SK
- TW1iF35u2M6bQ==
+ b=G080XVmiH+EjNpkz80n9k88wC37Rl3tmAfbtR7tGsAcT0+til4usH4SA9E3NpBTOx
+ oPzYccOpS04ej7Pol7x5adC6FidLRUFrU7uAa2olJpbl4Bo4r2qgCKD0ujlJySiNYz
+ xHes4kVFrxhqOEmAFtcjrqY+ohEPM2eQzUcvNxQ+MkL2MhV8WluFrzgBeWTiSzrMsE
+ CXEs23JjGM0QaPoG5UVELhc3pTu+bv7TqcCVMgEXDyxVBh3srTdRE7hwIH17N9k1fd
+ Nl8VbcVt7tDHj41/WMqQq4beShmxzTr1A2SLosIMleyggn7aN+7sZkbIlnd4hpEHLr
+ eiRaFwxh28rrA==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1n1t1Z-00Eawq-JP; Mon, 27 Dec 2021 16:39:01 +0000
-Date: Mon, 27 Dec 2021 16:39:01 +0000
-Message-ID: <87o852ypcq.wl-maz@kernel.org>
+ id 1n1wN4-00EcmG-Ic; Mon, 27 Dec 2021 20:13:26 +0000
+Date: Mon, 27 Dec 2021 20:13:25 +0000
+Message-ID: <87mtklztzu.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 3/5] hw/arm/virt: Honor highmem setting when computing
- the memory map
-In-Reply-To: <b36a602e-a8f4-c8ac-bd4b-95fd6d426736@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v2 4/5] hw/arm/virt: Use the PA range to compute the
+ memory map
+In-Reply-To: <20211004101110.imtfcufnrdwhneev@gator>
 References: <20211003164605.3116450-1-maz@kernel.org>
- <20211003164605.3116450-4-maz@kernel.org>
- <b36a602e-a8f4-c8ac-bd4b-95fd6d426736@redhat.com>
+ <20211003164605.3116450-5-maz@kernel.org>
+ <20211004101110.imtfcufnrdwhneev@gator>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, qemu-devel@nongnu.org,
- drjones@redhat.com, peter.maydell@linaro.org, kvmarm@lists.cs.columbia.edu,
+X-SA-Exim-Rcpt-To: drjones@redhat.com, qemu-devel@nongnu.org,
+ eric.auger@redhat.com, peter.maydell@linaro.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
@@ -84,59 +84,143 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gTW9uLCAwNCBPY3QgMjAyMSAxMzoyMzo0MSArMDEwMCwKRXJpYyBBdWdlciA8ZXJpYy5hdWdl
-ckByZWRoYXQuY29tPiB3cm90ZToKPiAKPiBIaSBNYXJjLAo+IAo+IE9uIDEwLzMvMjEgNjo0NiBQ
-TSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+ID4gRXZlbiB3aGVuIHRoZSBWTSBpcyBjb25maWd1cmVk
-IHdpdGggaGlnaG1lbT1vZmYsIHRoZSBoaWdoZXN0X2dwYQo+ID4gZmllbGQgaW5jbHVkZXMgZGV2
-aWNlcyB0aGF0IGFyZSBhYm92ZSB0aGUgNEdpQiBsaW1pdC4KPiA+IFNpbWlsYXJpbHksIG5vdGhp
-bmcgc2VlbSB0byBjaGVjayB0aGF0IHRoZSBtZW1vcnkgaXMgd2l0aGluCj4gPiB0aGUgbGltaXQg
-c2V0IGJ5IHRoZSBoaWdobWVtPW9mZiBvcHRpb24uCj4gPgo+ID4gVGhpcyBsZWFkcyB0byBmYWls
-dXJlcyBpbiB2aXJ0X2t2bV90eXBlKCkgb24gc3lzdGVtcyB0aGF0IGhhdmUKPiA+IGEgY3JpcHBs
-ZWQgSVBBIHJhbmdlLCBhcyB0aGUgcmVwb3J0ZWQgSVBBIHNwYWNlIGlzIGxhcmdlciB0aGFuCj4g
-PiB3aGF0IGl0IHNob3VsZCBiZS4KPiA+Cj4gPiBJbnN0ZWFkLCBob25vciB0aGUgdXNlci1zcGVj
-aWZpZWQgbGltaXQgdG8gb25seSB1c2UgdGhlIGRldmljZXMKPiA+IGF0IHRoZSBsb3dlc3QgZW5k
-IG9mIHRoZSBzcGVjdHJ1bSwgYW5kIGZhaWwgaWYgd2UgaGF2ZSBtZW1vcnkKPiA+IGNyb3NzaW5n
-IHRoZSA0R2lCIGxpbWl0Lgo+ID4KPiA+IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWF6
-QGtlcm5lbC5vcmc+Cj4gPiAtLS0KPiA+ICBody9hcm0vdmlydC5jIHwgOSArKysrKysrKy0KPiA+
-ICAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4gPgo+ID4g
-ZGlmZiAtLWdpdCBhL2h3L2FybS92aXJ0LmMgYi9ody9hcm0vdmlydC5jCj4gPiBpbmRleCBiY2Y1
-OGY2NzdkLi45ZDJhYmRiZDVmIDEwMDY0NAo+ID4gLS0tIGEvaHcvYXJtL3ZpcnQuYwo+ID4gKysr
-IGIvaHcvYXJtL3ZpcnQuYwo+ID4gQEAgLTE2MjgsNiArMTYyOCwxMSBAQCBzdGF0aWMgdm9pZCB2
-aXJ0X3NldF9tZW1tYXAoVmlydE1hY2hpbmVTdGF0ZSAqdm1zKQo+ID4gICAgICAgICAgZXhpdChF
-WElUX0ZBSUxVUkUpOwo+ID4gICAgICB9Cj4gPiAgCj4gPiArICAgIGlmICghdm1zLT5oaWdobWVt
-ICYmCj4gPiArICAgICAgICB2bXMtPm1lbW1hcFtWSVJUX01FTV0uYmFzZSArIG1zLT5tYXhyYW1f
-c2l6ZSA+IDQgKiBHaUIpIHsKPiA+ICsgICAgICAgIGVycm9yX3JlcG9ydCgiaGlnaG1lbT1vZmYs
-IGJ1dCBtZW1vcnkgY3Jvc3NlcyB0aGUgNEdpQiBsaW1pdFxuIik7Cj4gPiArICAgICAgICBleGl0
-KEVYSVRfRkFJTFVSRSk7Cj4gPiArICAgIH0KPiA+ICAgICAgLyoKPiA+ICAgICAgICogV2UgY29t
-cHV0ZSB0aGUgYmFzZSBvZiB0aGUgaGlnaCBJTyByZWdpb24gZGVwZW5kaW5nIG9uIHRoZQo+ID4g
-ICAgICAgKiBhbW91bnQgb2YgaW5pdGlhbCBhbmQgZGV2aWNlIG1lbW9yeS4gVGhlIGRldmljZSBt
-ZW1vcnkgc3RhcnQvc2l6ZQo+ID4gQEAgLTE2NTcsNyArMTY2Miw5IEBAIHN0YXRpYyB2b2lkIHZp
-cnRfc2V0X21lbW1hcChWaXJ0TWFjaGluZVN0YXRlICp2bXMpCj4gPiAgICAgICAgICB2bXMtPm1l
-bW1hcFtpXS5zaXplID0gc2l6ZTsKPiA+ICAgICAgICAgIGJhc2UgKz0gc2l6ZTsKPiA+ICAgICAg
-fQo+ID4gLSAgICB2bXMtPmhpZ2hlc3RfZ3BhID0gYmFzZSAtIDE7Cj4gPiArICAgIHZtcy0+aGln
-aGVzdF9ncGEgPSAodm1zLT5oaWdobWVtID8KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICBi
-YXNlIDoKPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICB2bXMtPm1lbW1hcFtWSVJUX01FTV0u
-YmFzZSArIG1zLT5tYXhyYW1fc2l6ZSkgLSAxOwo+IEkgdGhpbmsgSSB3b3VsZCBoYXZlIHByZWZl
-cnJlZCB0byBoYXZlCj4gCj4gaWYgKHZtcy0+aGlnaG1lbSkgewo+IMKgwqAgZm9yIChpID0gVklS
-VF9MT1dNRU1NQVBfTEFTVDsgaSA8IEFSUkFZX1NJWkUoZXh0ZW5kZWRfbWVtbWFwKTsgaSsrKSB7
-Cj4gwqDCoMKgwqDCoMKgwqAgaHdhZGRyIHNpemUgPSBleHRlbmRlZF9tZW1tYXBbaV0uc2l6ZTsK
-PiAKPiDCoMKgwqDCoMKgwqDCoCBiYXNlID0gUk9VTkRfVVAoYmFzZSwgc2l6ZSk7Cj4gwqDCoMKg
-wqDCoMKgwqAgdm1zLT5tZW1tYXBbaV0uYmFzZSA9IGJhc2U7Cj4gwqDCoMKgwqDCoMKgwqAgdm1z
-LT5tZW1tYXBbaV0uc2l6ZSA9IHNpemU7Cj4gwqDCoMKgwqDCoMKgwqAgYmFzZSArPSBzaXplOwo+
-IMKgwqDCoCB9Cj4gfQo+IGFzIGl0IGlzIHVzZWxlc3MgdG8gZXhlY3V0ZSB0aGF0IGNvZGUgYW5k
-IGNyZWF0ZSBuZXcgbWVtbWFwIGVudHJpZXMgaW4KPiBjYXNlIG9mICFoaWdobWVtLgoKSSBhZ3Jl
-ZSB0aGF0IGl0IGlzIGEgYml0IHVzZWxlc3Mgd2hlbiB3ZSBvbmx5IGhhdmUgaGlnaG1lbS4gQnV0
-IHdlCnJlYWxseSB3YW50IHRvIGRlYWwgd2l0aCBhcmJpdHJhcnkgSVBBIHNwYWNlcyAoc2VlIGhv
-dyB0aGlzIGNoYW5nZXMgaW4KdGhlIGZvbGxvdy11cCBwYXRjaGVzKSwgYW5kIHdlIG5lZWQgdG8g
-Y2hlY2sgdGhhdCBldmVyeXRoaW5nIGZpdHMgaW4KdGhlIElQQSBzcGFjZSAoYW5kIGZpeCB0aGlu
-Z3MgdXAgaWYgdGhleSBkb24ndCkuCgo+IAo+IEJ1dCBuZXZlcnRoZWxlc3MsIHRoaXMgbG9va3Mg
-Y29ycmVjdAoKVGhhbmtzLAoKCU0uCgotLSAKV2l0aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9y
-bSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
-b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
-by9rdm1hcm0K
+On Mon, 04 Oct 2021 11:11:10 +0100,
+Andrew Jones <drjones@redhat.com> wrote:
+> 
+> On Sun, Oct 03, 2021 at 05:46:04PM +0100, Marc Zyngier wrote:
+> > The highmem attribute is nothing but another way to express the
+> > PA range of a VM. To support HW that has a smaller PA range then
+> > what QEMU assumes, pass this PA range to the virt_set_memmap()
+> > function, allowing it to correctly exclude highmem devices
+> > if they are outside of the PA range.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  hw/arm/virt.c | 46 +++++++++++++++++++++++++++++++++++-----------
+> >  1 file changed, 35 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index 9d2abdbd5f..a572e0c9d9 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -1610,10 +1610,10 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+> >      return arm_cpu_mp_affinity(idx, clustersz);
+> >  }
+> >  
+> > -static void virt_set_memmap(VirtMachineState *vms)
+> > +static void virt_set_memmap(VirtMachineState *vms, int pa_bits)
+> >  {
+> >      MachineState *ms = MACHINE(vms);
+> > -    hwaddr base, device_memory_base, device_memory_size;
+> > +    hwaddr base, device_memory_base, device_memory_size, memtop;
+> >      int i;
+> >  
+> >      vms->memmap = extended_memmap;
+> > @@ -1628,9 +1628,12 @@ static void virt_set_memmap(VirtMachineState *vms)
+> >          exit(EXIT_FAILURE);
+> >      }
+> >  
+> > -    if (!vms->highmem &&
+> > -        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
+> > -        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+> > +    if (!vms->highmem)
+> > +	    pa_bits = 32;
+> > +
+> > +    if (vms->memmap[VIRT_MEM].base + ms->maxram_size > BIT_ULL(pa_bits)) {
+> > +	    error_report("Addressing limited to %d bits, but memory exceeds it by %llu bytes\n",
+> > +			 pa_bits, vms->memmap[VIRT_MEM].base + ms->maxram_size - BIT_ULL(pa_bits));
+> >          exit(EXIT_FAILURE);
+> >      }
+> >      /*
+> > @@ -1645,7 +1648,7 @@ static void virt_set_memmap(VirtMachineState *vms)
+> >      device_memory_size = ms->maxram_size - ms->ram_size + ms->ram_slots * GiB;
+> >  
+> >      /* Base address of the high IO region */
+> > -    base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> > +    memtop = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> >      if (base < device_memory_base) {
+> >          error_report("maxmem/slots too huge");
+> >          exit(EXIT_FAILURE);
+> > @@ -1662,9 +1665,17 @@ static void virt_set_memmap(VirtMachineState *vms)
+> >          vms->memmap[i].size = size;
+> >          base += size;
+> >      }
+> > -    vms->highest_gpa = (vms->highmem ?
+> > -                        base :
+> > -                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
+> > +
+> > +    /*
+> > +     * If base fits within pa_bits, all good. If it doesn't, limit it
+> > +     * to the end of RAM, which is guaranteed to fit within pa_bits.
+> 
+> We tested that
+> 
+>   vms->memmap[VIRT_MEM].base + ms->maxram_size
+> 
+> fits within pa_bits, but here we're setting highest_gpa to
+> 
+>   ROUND_UP(vms->memmap[VIRT_MEM].base + ms->ram_size, GiB) +
+>   ROUND_UP(ms->maxram_size - ms->ram_size + ms->ram_slots * GiB, GiB)
+> 
+> which will be larger. Shouldn't we test memtop instead to make this
+> guarantee?
+
+Yes, well spotted.
+
+> 
+> 
+> > +     */
+> > +    if (base <= BIT_ULL(pa_bits)) {
+> > +        vms->highest_gpa = base -1;
+> > +    } else {
+> > +        vms->highest_gpa = memtop - 1;
+> > +    }
+> > +
+> >      if (device_memory_size > 0) {
+> >          ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+> >          ms->device_memory->base = device_memory_base;
+> > @@ -1860,7 +1871,20 @@ static void machvirt_init(MachineState *machine)
+> >       * to create a VM with the right number of IPA bits.
+> >       */
+> >      if (!vms->memmap) {
+> > -        virt_set_memmap(vms);
+> > +        ARMCPU *armcpu = ARM_CPU(first_cpu);
+> 
+> 
+> I think it's too early to use first_cpu here (although, I'll admit I'm
+> always confused as to what gets initialized when...) Assuming we need to
+> realize the cpus first, then we don't do that until a bit further down
+> in this function. I wonder if it's possible to delay this memmap setup
+> until after cpu realization. I see the memmap getting used prior when
+> calculating virt_max_cpus, but that looks like it needs to be updated
+> anyway to take highmem into account as to whether or not we should
+> consider the high gicv3 redist region in the calculation.
+
+OK, this is nothing short of total hell. You can't create the memory
+map later, as MTE and the secure world both get in the way (they
+really want a valid memory map). And as you pointed out, using
+first_cpu is not appropriate here (obviously, I didn't test this
+nearly enough). I could split the creation of the CPUs in two
+sequences with the memory map creation in between, but this quickly
+becomes quite invasive.
+
+My current approach is to keep the current flow, but to create a
+temporary CPU, find whatever I need to know about it, and free
+it. Yes, this is a bit overkill, but it solves the chicken and egg
+issue simply enough.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
