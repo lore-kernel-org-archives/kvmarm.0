@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAFEC4321E
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Dec 2021 12:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FAF6C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Dec 2021 12:49:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E7E249E20;
-	Mon, 27 Dec 2021 07:49:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2825849E18;
+	Mon, 27 Dec 2021 07:49:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0kN+63+ohjEH; Mon, 27 Dec 2021 07:49:04 -0500 (EST)
+	with ESMTP id d1FiAvhRFH2s; Mon, 27 Dec 2021 07:49:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B72F49E34;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6441349E3B;
 	Mon, 27 Dec 2021 07:49:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20EAF49B08
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B5D340D0B
  for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 07:49:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vYUzAyRb5kOQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Dec 2021 07:49:01 -0500 (EST)
+ with ESMTP id I1AigBWPLHEk for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Dec 2021 07:49:02 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0052040F93
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 04A2C41174
  for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 07:49:00 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id E598AB81031;
+ by ams.source.kernel.org (Postfix) with ESMTPS id 6676EB8102B;
  Mon, 27 Dec 2021 12:48:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBF88C36AEE;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CA69C36AEB;
  Mon, 27 Dec 2021 12:48:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1640609338;
- bh=dw2y5W7EH5jbARdPP11DxN+f3tE8XerxHplNIvE1lng=;
+ bh=ffbdeZ5bQPyh8MTqynKoFo8gtfzkNyhGOr52LWv3kkA=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=uuUiWAdU1bZtDNnJ+MkSU4OgTVIB8lqi9Eyc2zjJIHhqVj/ANSPYo3lEhLvyZT7Uw
- w+oaBPX5ZYdbTUV5IQbtHa+YXcJ1xTqWvlevpFz+lkYxFYZSVi9Uh7ngs8/1VaAmSb
- XzcI5uCvHvzw2+LI3ohqbb65U3TG70ELolc06LSCw5esugD2NuV+kdZvTP+6nZ6Tsc
- Ugam+tgc2uRnEArPIu2Y0yxfK9GXT/aIr6coEI8cdteMzcNG0p5i0+/lXz+YfiRcA9
- Am1Ha3YnPsEX7QO7Xc4AoCWkYl52mEKTnTjfgEHtu+OPooUzrTNmKfhTal7/tQCnKs
- NxMAI7CCVDW+g==
+ b=PvNMjf0hvJ7DNKX69BVUF9vI35GaPiULQwrldc0WNqJhLjhXYakaWJ603+ruZq7UX
+ +zBr8aZvjqE7gwIhGv9VqS4RpT/9d2SDK8fOvozgZ3M/Xxrrriu9GgnQ2mrbXjcZlz
+ mP/SIDuVL2eiTvq/BDEkL083Yb9734it3WNeLvewJE/BICAxCs/Gys5ztd0uO2tbmG
+ 0R8iVog71+mTB7nOLinA7K3CX4K7o5KsTvAfgHcfdn15V740PTG9XYj+Pc4Zm3HMBJ
+ LoKwy20OLoGtlqfd891ouZdJ/IXJiHknPiCm/ruB1RLhadllUFyQm9RVoSFUNQ4h6T
+ vSMwYSj6CJq8g==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1n1pQu-00EYBY-UW; Mon, 27 Dec 2021 12:48:57 +0000
+ id 1n1pQu-00EYBY-Az; Mon, 27 Dec 2021 12:48:56 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Andrew Jones <drjones@redhat.com>
-Subject: [PATCH v2 5/6] KVM: selftests: arm64: Add support for
- VM_MODE_P36V48_{4K, 64K}
-Date: Mon, 27 Dec 2021 12:48:08 +0000
-Message-Id: <20211227124809.1335409-6-maz@kernel.org>
+Subject: [PATCH v2 2/6] KVM: selftests: arm64: Introduce a variable default
+ IPA size
+Date: Mon, 27 Dec 2021 12:48:05 +0000
+Message-Id: <20211227124809.1335409-3-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211227124809.1335409-1-maz@kernel.org>
 References: <20211227124809.1335409-1-maz@kernel.org>
@@ -86,112 +86,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Some of the arm64 systems out there have an IPA space that is
-positively tiny. Nonetheless, they make great KVM hosts.
+Contrary to popular belief, there is no such thing as a default
+IPA size on arm64. Anything goes, and implementations are the
+usual Wild West.
 
-Add support for 36bit IPA support with 4kB pages, which makes
-some of the fruity machines happy. Whilst we're at it, add support
-for 64kB pages as well, though these boxes have no support for it.
+The selftest infrastructure default to 40bit IPA, which obviously
+doesn't work for some systems out there.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Turn VM_MODE_DEFAULT from a constant into a variable, and let
+guest_modes_append_default() populate it, depending on what
+the HW can do. In order to preserve the current behaviour, we
+still pick 40bits IPA as the default if it is available, and
+the largest supported IPA space otherwise.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- tools/testing/selftests/kvm/include/kvm_util.h      | 2 ++
- tools/testing/selftests/kvm/lib/aarch64/processor.c | 6 ++++++
- tools/testing/selftests/kvm/lib/guest_modes.c       | 4 ++++
- tools/testing/selftests/kvm/lib/kvm_util.c          | 6 ++++++
- 4 files changed, 18 insertions(+)
+ .../testing/selftests/kvm/include/kvm_util.h  |  4 ++-
+ tools/testing/selftests/kvm/lib/guest_modes.c | 30 +++++++++++++++++--
+ 2 files changed, 30 insertions(+), 4 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-index 7fa0a93d7526..fd1397fc7ad5 100644
+index 2d62edc49d67..7fa0a93d7526 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-@@ -48,6 +48,8 @@ enum vm_guest_mode {
- 	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
- 	VM_MODE_P47V64_4K,
- 	VM_MODE_P44V64_4K,
-+	VM_MODE_P36V48_4K,
-+	VM_MODE_P36V48_64K,
- 	NUM_VM_MODES,
- };
+@@ -53,7 +53,9 @@ enum vm_guest_mode {
  
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index d005543aa3e2..70395c777ea4 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -249,10 +249,12 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_vcpu_init
- 	case VM_MODE_P52V48_64K:
- 	case VM_MODE_P48V48_64K:
- 	case VM_MODE_P40V48_64K:
-+	case VM_MODE_P36V48_64K:
- 		tcr_el1 |= 1ul << 14; /* TG0 = 64KB */
- 		break;
- 	case VM_MODE_P48V48_4K:
- 	case VM_MODE_P40V48_4K:
-+	case VM_MODE_P36V48_4K:
- 		tcr_el1 |= 0ul << 14; /* TG0 = 4KB */
- 		break;
- 	default:
-@@ -272,6 +274,10 @@ void aarch64_vcpu_setup(struct kvm_vm *vm, uint32_t vcpuid, struct kvm_vcpu_init
- 	case VM_MODE_P40V48_64K:
- 		tcr_el1 |= 2ul << 32; /* IPS = 40 bits */
- 		break;
-+	case VM_MODE_P36V48_4K:
-+	case VM_MODE_P36V48_64K:
-+		tcr_el1 |= 1ul << 32; /* IPS = 36 bits */
-+		break;
- 	default:
- 		TEST_FAIL("Unknown guest mode, mode: 0x%x", vm->mode);
- 	}
+ #if defined(__aarch64__)
+ 
+-#define VM_MODE_DEFAULT			VM_MODE_P40V48_4K
++extern enum vm_guest_mode vm_mode_default;
++
++#define VM_MODE_DEFAULT			vm_mode_default
+ #define MIN_PAGE_SHIFT			12U
+ #define ptes_per_page(page_size)	((page_size) / 8)
+ 
 diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
-index 67144fdac433..240f2d2e2d23 100644
+index c330f414ef96..5e3fdbd992fd 100644
 --- a/tools/testing/selftests/kvm/lib/guest_modes.c
 +++ b/tools/testing/selftests/kvm/lib/guest_modes.c
-@@ -37,6 +37,10 @@ void guest_modes_append_default(void)
- 			if (ps4k)
- 				vm_mode_default = VM_MODE_P40V48_4K;
- 		}
-+		if (limit >= 36) {
-+			guest_mode_append(VM_MODE_P36V48_4K, ps4k, ps4k);
-+			guest_mode_append(VM_MODE_P36V48_64K, ps64k, ps64k);
-+		}
+@@ -4,22 +4,46 @@
+  */
+ #include "guest_modes.h"
  
- 		/*
- 		 * Pick the first supported IPA size if the default
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 53d2b5d04b82..9da71e27cd84 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -172,6 +172,8 @@ const char *vm_guest_mode_string(uint32_t i)
- 		[VM_MODE_PXXV48_4K]	= "PA-bits:ANY, VA-bits:48,  4K pages",
- 		[VM_MODE_P47V64_4K]	= "PA-bits:47,  VA-bits:64,  4K pages",
- 		[VM_MODE_P44V64_4K]	= "PA-bits:44,  VA-bits:64,  4K pages",
-+		[VM_MODE_P36V48_4K]	= "PA-bits:36,  VA-bits:48,  4K pages",
-+		[VM_MODE_P36V48_64K]	= "PA-bits:36,  VA-bits:48, 64K pages",
- 	};
- 	_Static_assert(sizeof(strings)/sizeof(char *) == NUM_VM_MODES,
- 		       "Missing new mode strings?");
-@@ -191,6 +193,8 @@ const struct vm_guest_mode_params vm_guest_mode_params[] = {
- 	[VM_MODE_PXXV48_4K]	= {  0,  0,  0x1000, 12 },
- 	[VM_MODE_P47V64_4K]	= { 47, 64,  0x1000, 12 },
- 	[VM_MODE_P44V64_4K]	= { 44, 64,  0x1000, 12 },
-+	[VM_MODE_P36V48_4K]	= { 36, 48,  0x1000, 12 },
-+	[VM_MODE_P36V48_64K]	= { 36, 48, 0x10000, 16 },
- };
- _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
- 	       "Missing new mode params?");
-@@ -252,9 +256,11 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
- 		vm->pgtable_levels = 3;
- 		break;
- 	case VM_MODE_P40V48_4K:
-+	case VM_MODE_P36V48_4K:
- 		vm->pgtable_levels = 4;
- 		break;
- 	case VM_MODE_P40V48_64K:
-+	case VM_MODE_P36V48_64K:
- 		vm->pgtable_levels = 3;
- 		break;
- 	case VM_MODE_PXXV48_4K:
++#ifdef __aarch64__
++enum vm_guest_mode vm_mode_default;
++#endif
++
+ struct guest_mode guest_modes[NUM_VM_MODES];
+ 
+ void guest_modes_append_default(void)
+ {
++#ifndef __aarch64__
+ 	guest_mode_append(VM_MODE_DEFAULT, true, true);
+-
+-#ifdef __aarch64__
+-	guest_mode_append(VM_MODE_P40V48_64K, true, true);
++#else
+ 	{
+ 		unsigned int limit = kvm_check_cap(KVM_CAP_ARM_VM_IPA_SIZE);
++		int i;
++
++		vm_mode_default = NUM_VM_MODES;
++
+ 		if (limit >= 52)
+ 			guest_mode_append(VM_MODE_P52V48_64K, true, true);
+ 		if (limit >= 48) {
+ 			guest_mode_append(VM_MODE_P48V48_4K, true, true);
+ 			guest_mode_append(VM_MODE_P48V48_64K, true, true);
+ 		}
++		if (limit >= 40) {
++			guest_mode_append(VM_MODE_P40V48_4K, true, true);
++			guest_mode_append(VM_MODE_P40V48_64K, true, true);
++			vm_mode_default = VM_MODE_P40V48_4K;
++		}
++
++		/*
++		 * Pick the first supported IPA size if the default
++		 * isn't available.
++		 */
++		for (i = 0; vm_mode_default == NUM_VM_MODES && i < NUM_VM_MODES; i++) {
++			if (guest_modes[i].supported && guest_modes[i].enabled)
++				vm_mode_default = i;
++		}
++
++		TEST_ASSERT(vm_mode_default != NUM_VM_MODES,
++			    "No supported mode!");
+ 	}
+ #endif
+ #ifdef __s390x__
 -- 
 2.30.2
 
