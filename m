@@ -2,64 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 228F4C433FE
-	for <kvmarm@archiver.kernel.org>; Mon, 27 Dec 2021 15:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDC9C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 27 Dec 2021 16:39:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 83AE249E08;
-	Mon, 27 Dec 2021 10:54:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36B2D40E3D;
+	Mon, 27 Dec 2021 11:39:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jnSWTbjgeaMm; Mon, 27 Dec 2021 10:54:01 -0500 (EST)
+	with ESMTP id HOS3HwKQkWyW; Mon, 27 Dec 2021 11:39:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B41F40D23;
-	Mon, 27 Dec 2021 10:54:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16A7740F93;
+	Mon, 27 Dec 2021 11:39:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88C604024F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 10:54:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DFDA640E3D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 11:39:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NmXPsJESxaaD for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Dec 2021 10:53:59 -0500 (EST)
+ with ESMTP id kcMSL85ligTf for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Dec 2021 11:39:05 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 678AC40162
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 10:53:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8B0F540E00
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Dec 2021 11:39:05 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 98A136104C;
- Mon, 27 Dec 2021 15:53:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F10BC36AE7;
- Mon, 27 Dec 2021 15:53:58 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3625861119;
+ Mon, 27 Dec 2021 16:39:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BFADC36AE7;
+ Mon, 27 Dec 2021 16:39:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1640620438;
- bh=JfRjJBbke0t9wYrDsjzgGQyQfybfI1k8I701E5RWL4o=;
+ s=k20201202; t=1640623143;
+ bh=WEDbpEQhjoWaU0eAWyDEdcLhrsSzaMog2S29Lw9qtmk=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=bRW3Glt/AiVN5Cj0LDfujV33Ts6ZRmBt9Zz9Q3HxK/3qs1kXf1/SaqYVrNVeVehqe
- b17VHwf0LUkVczPE0G8sMirI6G6ySw4L+d9vpGIvP8lFLwTeevSC9+qmmdhoyIijP2
- DFxVgzmQoojf7cw5ZUEu//o7BO+K7wU6FrdWvrHInKay+nTjES6XKkXA3NqUwseBQR
- q++Q3RHmxQ56NJkPMNMSm0c8pZEyKmV4eCSIxUEY6w+CmlZSpT8HKwl/ElcQHi/GrK
- a0j3FoKJ7gH4VFBUC/zZl1cORVVclEIR4ztPG6tGTlNwrRYLKGZwc8KRntD7zXsAG1
- GDErb8QuzeLzw==
+ b=NtLNIGGxRyIizvSbAaIfsLpFFs/rZX6VaeFRLPoqcQqoMazJzKHgAkEBmEfX4h491
+ jTvy1DxYyM2mmJt1LIo0dTQ7fsEXlEIcZ+cWs4XW8SCtKtUtN3KFWcX6XR6pw4dDUr
+ Uwg95qbwCJXplo+VqWkimps3L39YkXhn4tbna1elGeNwuC42TGY8I+W1AneODx26w5
+ /e6ysrQ5PREY8d+RzpLtC8sVYw9oF4tAntYhPky5gYHFM2bpcxGtEg5/yRI57rIDv6
+ 4P74lzUbWSUfq0VsOdLATkkHCF85UIGt5h6ALEtAnkYNLiWhNo0vM7/LqDlIrt25SK
+ TW1iF35u2M6bQ==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1n1sJw-00Ea9t-5p; Mon, 27 Dec 2021 15:53:56 +0000
-Date: Mon, 27 Dec 2021 15:53:55 +0000
-Message-ID: <87pmpiyrfw.wl-maz@kernel.org>
+ id 1n1t1Z-00Eawq-JP; Mon, 27 Dec 2021 16:39:01 +0000
+Date: Mon, 27 Dec 2021 16:39:01 +0000
+Message-ID: <87o852ypcq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 1/5] hw/arm/virt: Key enablement of highmem PCIe on
- highmem_ecam
-In-Reply-To: <dbe883ca-880e-7f2b-1de7-4b2d3361545d@redhat.com>
+Subject: Re: [PATCH v2 3/5] hw/arm/virt: Honor highmem setting when computing
+ the memory map
+In-Reply-To: <b36a602e-a8f4-c8ac-bd4b-95fd6d426736@redhat.com>
 References: <20211003164605.3116450-1-maz@kernel.org>
- <20211003164605.3116450-2-maz@kernel.org>
- <dbe883ca-880e-7f2b-1de7-4b2d3361545d@redhat.com>
+ <20211003164605.3116450-4-maz@kernel.org>
+ <b36a602e-a8f4-c8ac-bd4b-95fd6d426736@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -84,80 +84,59 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-
-Picking this up again after a stupidly long time...
-
-On Mon, 04 Oct 2021 13:00:21 +0100,
-Eric Auger <eric.auger@redhat.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 10/3/21 6:46 PM, Marc Zyngier wrote:
-> > Currently, the highmem PCIe region is oddly keyed on the highmem
-> > attribute instead of highmem_ecam. Move the enablement of this PCIe
-> > region over to highmem_ecam.
-> >
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  hw/arm/virt-acpi-build.c | 10 ++++------
-> >  hw/arm/virt.c            |  4 ++--
-> >  2 files changed, 6 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > index 037cc1fd82..d7bef0e627 100644
-> > --- a/hw/arm/virt-acpi-build.c
-> > +++ b/hw/arm/virt-acpi-build.c
-> > @@ -157,10 +157,9 @@ static void acpi_dsdt_add_virtio(Aml *scope,
-> >  }
-> >  
-> >  static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-> > -                              uint32_t irq, bool use_highmem, bool highmem_ecam,
-> > -                              VirtMachineState *vms)
-> > +                              uint32_t irq, VirtMachineState *vms)
-> >  {
-> > -    int ecam_id = VIRT_ECAM_ID(highmem_ecam);
-> > +    int ecam_id = VIRT_ECAM_ID(vms->highmem_ecam);
-> >      struct GPEXConfig cfg = {
-> >          .mmio32 = memmap[VIRT_PCIE_MMIO],
-> >          .pio    = memmap[VIRT_PCIE_PIO],
-> > @@ -169,7 +168,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-> >          .bus    = vms->bus,
-> >      };
-> >  
-> > -    if (use_highmem) {
-> > +    if (vms->highmem_ecam) {
-> highmem_ecam is more restrictive than use_highmem:
-> vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
-> 
-> If I remember correctly there was a problem using highmem ECAM with 32b
-> AAVMF FW.
->
-> However 5125f9cd2532 ("hw/arm/virt: Add high MMIO PCI region, 512G in
-> size") introduced high MMIO PCI region without this constraint.
-
-Then I really don't understand the point of this highmem_ecam. We only
-register the highmem version if highmem_ecam is set (see the use of
-VIRT_ECAM_ID() to pick the right ECAM window).
-
-So keying this on highmem makes it expose a device that may not be
-there the first place since, as you pointed out that highmem_ecam can
-be false in cases where highmem is true.
-
-> So to me we should keep vms->highmem here
-
-I really must be missing how this is supposed to work.
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gTW9uLCAwNCBPY3QgMjAyMSAxMzoyMzo0MSArMDEwMCwKRXJpYyBBdWdlciA8ZXJpYy5hdWdl
+ckByZWRoYXQuY29tPiB3cm90ZToKPiAKPiBIaSBNYXJjLAo+IAo+IE9uIDEwLzMvMjEgNjo0NiBQ
+TSwgTWFyYyBaeW5naWVyIHdyb3RlOgo+ID4gRXZlbiB3aGVuIHRoZSBWTSBpcyBjb25maWd1cmVk
+IHdpdGggaGlnaG1lbT1vZmYsIHRoZSBoaWdoZXN0X2dwYQo+ID4gZmllbGQgaW5jbHVkZXMgZGV2
+aWNlcyB0aGF0IGFyZSBhYm92ZSB0aGUgNEdpQiBsaW1pdC4KPiA+IFNpbWlsYXJpbHksIG5vdGhp
+bmcgc2VlbSB0byBjaGVjayB0aGF0IHRoZSBtZW1vcnkgaXMgd2l0aGluCj4gPiB0aGUgbGltaXQg
+c2V0IGJ5IHRoZSBoaWdobWVtPW9mZiBvcHRpb24uCj4gPgo+ID4gVGhpcyBsZWFkcyB0byBmYWls
+dXJlcyBpbiB2aXJ0X2t2bV90eXBlKCkgb24gc3lzdGVtcyB0aGF0IGhhdmUKPiA+IGEgY3JpcHBs
+ZWQgSVBBIHJhbmdlLCBhcyB0aGUgcmVwb3J0ZWQgSVBBIHNwYWNlIGlzIGxhcmdlciB0aGFuCj4g
+PiB3aGF0IGl0IHNob3VsZCBiZS4KPiA+Cj4gPiBJbnN0ZWFkLCBob25vciB0aGUgdXNlci1zcGVj
+aWZpZWQgbGltaXQgdG8gb25seSB1c2UgdGhlIGRldmljZXMKPiA+IGF0IHRoZSBsb3dlc3QgZW5k
+IG9mIHRoZSBzcGVjdHJ1bSwgYW5kIGZhaWwgaWYgd2UgaGF2ZSBtZW1vcnkKPiA+IGNyb3NzaW5n
+IHRoZSA0R2lCIGxpbWl0Lgo+ID4KPiA+IFNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWF6
+QGtlcm5lbC5vcmc+Cj4gPiAtLS0KPiA+ICBody9hcm0vdmlydC5jIHwgOSArKysrKysrKy0KPiA+
+ICAxIGZpbGUgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4gPgo+ID4g
+ZGlmZiAtLWdpdCBhL2h3L2FybS92aXJ0LmMgYi9ody9hcm0vdmlydC5jCj4gPiBpbmRleCBiY2Y1
+OGY2NzdkLi45ZDJhYmRiZDVmIDEwMDY0NAo+ID4gLS0tIGEvaHcvYXJtL3ZpcnQuYwo+ID4gKysr
+IGIvaHcvYXJtL3ZpcnQuYwo+ID4gQEAgLTE2MjgsNiArMTYyOCwxMSBAQCBzdGF0aWMgdm9pZCB2
+aXJ0X3NldF9tZW1tYXAoVmlydE1hY2hpbmVTdGF0ZSAqdm1zKQo+ID4gICAgICAgICAgZXhpdChF
+WElUX0ZBSUxVUkUpOwo+ID4gICAgICB9Cj4gPiAgCj4gPiArICAgIGlmICghdm1zLT5oaWdobWVt
+ICYmCj4gPiArICAgICAgICB2bXMtPm1lbW1hcFtWSVJUX01FTV0uYmFzZSArIG1zLT5tYXhyYW1f
+c2l6ZSA+IDQgKiBHaUIpIHsKPiA+ICsgICAgICAgIGVycm9yX3JlcG9ydCgiaGlnaG1lbT1vZmYs
+IGJ1dCBtZW1vcnkgY3Jvc3NlcyB0aGUgNEdpQiBsaW1pdFxuIik7Cj4gPiArICAgICAgICBleGl0
+KEVYSVRfRkFJTFVSRSk7Cj4gPiArICAgIH0KPiA+ICAgICAgLyoKPiA+ICAgICAgICogV2UgY29t
+cHV0ZSB0aGUgYmFzZSBvZiB0aGUgaGlnaCBJTyByZWdpb24gZGVwZW5kaW5nIG9uIHRoZQo+ID4g
+ICAgICAgKiBhbW91bnQgb2YgaW5pdGlhbCBhbmQgZGV2aWNlIG1lbW9yeS4gVGhlIGRldmljZSBt
+ZW1vcnkgc3RhcnQvc2l6ZQo+ID4gQEAgLTE2NTcsNyArMTY2Miw5IEBAIHN0YXRpYyB2b2lkIHZp
+cnRfc2V0X21lbW1hcChWaXJ0TWFjaGluZVN0YXRlICp2bXMpCj4gPiAgICAgICAgICB2bXMtPm1l
+bW1hcFtpXS5zaXplID0gc2l6ZTsKPiA+ICAgICAgICAgIGJhc2UgKz0gc2l6ZTsKPiA+ICAgICAg
+fQo+ID4gLSAgICB2bXMtPmhpZ2hlc3RfZ3BhID0gYmFzZSAtIDE7Cj4gPiArICAgIHZtcy0+aGln
+aGVzdF9ncGEgPSAodm1zLT5oaWdobWVtID8KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICBi
+YXNlIDoKPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICB2bXMtPm1lbW1hcFtWSVJUX01FTV0u
+YmFzZSArIG1zLT5tYXhyYW1fc2l6ZSkgLSAxOwo+IEkgdGhpbmsgSSB3b3VsZCBoYXZlIHByZWZl
+cnJlZCB0byBoYXZlCj4gCj4gaWYgKHZtcy0+aGlnaG1lbSkgewo+IMKgwqAgZm9yIChpID0gVklS
+VF9MT1dNRU1NQVBfTEFTVDsgaSA8IEFSUkFZX1NJWkUoZXh0ZW5kZWRfbWVtbWFwKTsgaSsrKSB7
+Cj4gwqDCoMKgwqDCoMKgwqAgaHdhZGRyIHNpemUgPSBleHRlbmRlZF9tZW1tYXBbaV0uc2l6ZTsK
+PiAKPiDCoMKgwqDCoMKgwqDCoCBiYXNlID0gUk9VTkRfVVAoYmFzZSwgc2l6ZSk7Cj4gwqDCoMKg
+wqDCoMKgwqAgdm1zLT5tZW1tYXBbaV0uYmFzZSA9IGJhc2U7Cj4gwqDCoMKgwqDCoMKgwqAgdm1z
+LT5tZW1tYXBbaV0uc2l6ZSA9IHNpemU7Cj4gwqDCoMKgwqDCoMKgwqAgYmFzZSArPSBzaXplOwo+
+IMKgwqDCoCB9Cj4gfQo+IGFzIGl0IGlzIHVzZWxlc3MgdG8gZXhlY3V0ZSB0aGF0IGNvZGUgYW5k
+IGNyZWF0ZSBuZXcgbWVtbWFwIGVudHJpZXMgaW4KPiBjYXNlIG9mICFoaWdobWVtLgoKSSBhZ3Jl
+ZSB0aGF0IGl0IGlzIGEgYml0IHVzZWxlc3Mgd2hlbiB3ZSBvbmx5IGhhdmUgaGlnaG1lbS4gQnV0
+IHdlCnJlYWxseSB3YW50IHRvIGRlYWwgd2l0aCBhcmJpdHJhcnkgSVBBIHNwYWNlcyAoc2VlIGhv
+dyB0aGlzIGNoYW5nZXMgaW4KdGhlIGZvbGxvdy11cCBwYXRjaGVzKSwgYW5kIHdlIG5lZWQgdG8g
+Y2hlY2sgdGhhdCBldmVyeXRoaW5nIGZpdHMgaW4KdGhlIElQQSBzcGFjZSAoYW5kIGZpeCB0aGlu
+Z3MgdXAgaWYgdGhleSBkb24ndCkuCgo+IAo+IEJ1dCBuZXZlcnRoZWxlc3MsIHRoaXMgbG9va3Mg
+Y29ycmVjdAoKVGhhbmtzLAoKCU0uCgotLSAKV2l0aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9y
+bSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
+b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
+by9rdm1hcm0K
