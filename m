@@ -2,70 +2,89 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A36C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 28 Dec 2021 12:14:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 326D9C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 28 Dec 2021 15:49:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 739FD49F1F;
-	Tue, 28 Dec 2021 07:14:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99F8240712;
+	Tue, 28 Dec 2021 10:49:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5cz6IaJVDOOt; Tue, 28 Dec 2021 07:14:23 -0500 (EST)
+	with ESMTP id 4dqau9aYEyAo; Tue, 28 Dec 2021 10:49:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5191A49F21;
-	Tue, 28 Dec 2021 07:14:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A86640D74;
+	Tue, 28 Dec 2021 10:49:22 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EEA5149F1F
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Dec 2021 07:14:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D95840712
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Dec 2021 10:49:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3Cz+yCyVahku for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Dec 2021 07:14:20 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD1CF49F1D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Dec 2021 07:14:20 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 17C7961161;
- Tue, 28 Dec 2021 12:14:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79FE1C36AE7;
- Tue, 28 Dec 2021 12:14:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1640693659;
- bh=dC2K7UYn0C5HLYz6aHEjkd2hSiUU/BCOy54X/ouxHuo=;
- h=From:To:Cc:Subject:Date:From;
- b=B16JMu0f3re31lMirqT1+cqjEjfuGoNeME9f3UL12m23z41aEmxIpXQHZzG8Ypl+K
- +7DKSXuGbwzGWWUnT3LdK1NgFnbAx4CkItXJBya/O7ufLwnhj3GAqanQG4n6/TYSLN
- 8CRoWszCov3DTtcO9Xy76nDEFegzY0dNai4ggbUsdiUi4piy0EiZf5Pw8m+ZiKZIVm
- wBA3oDEHMYl6iFKXpEJKgXpQjhE34Q7G1e+8BeUF9hD7VYfbITA+i9zNy7/3PaLdMJ
- nhLWK14KBJpp8baWrq2T3nwZ7XcA3F+fSGSQBOD44fDFzvEs9vcJQhrPwLAz3pHu/q
- DevKrEjdmy/7w==
-Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64]
- helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1n2BMv-00EiLp-Gj; Tue, 28 Dec 2021 12:14:17 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH] KVM: arm64: selftests: get-reg-list: Add pauth configuration
-Date: Tue, 28 Dec 2021 12:14:14 +0000
-Message-Id: <20211228121414.1013250-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+ with ESMTP id 5FQfuDTvLEHQ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Dec 2021 10:49:20 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18FA7400D1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Dec 2021 10:49:20 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1640706559;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=ycaX1I6cQki2ElBFoIZec501uCWjSCGIAPC5v/9/3KM=;
+ b=PofkWOqSgs5DfVM7YcE1g8xysggMfrAB1t6a3mZNJZ1Pv4B7oQQzt7kLK+AkzKLtS4Vdm8
+ HlbLzeTuxNvzsxEsfCQpzX+lWMSxP4zr8k0nUTqXoPvC2yWVUDX7YW3MMRVngCG2eGhDLY
+ atb0efDKXht6XH/e1aoVmQz4mm3spcQ=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-269-t3wIj-S2NE6w4V_BiueF1w-1; Tue, 28 Dec 2021 10:49:17 -0500
+X-MC-Unique: t3wIj-S2NE6w4V_BiueF1w-1
+Received: by mail-ed1-f72.google.com with SMTP id
+ b8-20020a056402350800b003f8f42a883dso6142152edd.16
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Dec 2021 07:49:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ycaX1I6cQki2ElBFoIZec501uCWjSCGIAPC5v/9/3KM=;
+ b=FRt9owgsiRrbH0XsLvEHoOaAju56toFAzzb5ZQLP8ZmJvHzaXU9vz69gO5IwCgBI5M
+ 6D4BDS1KzonifnlpSRIBE6tHJWtwVZ4HPWteHnkBnZrJLvDBKIJzLHgIZ/csvehZeOEm
+ x9DIa8sn+P1NDeVQaYsn4pu9FDVehlnaeI6REtuaGOnMjSXF0yzNGYt9ZB568+JD1Xh4
+ xQ2yY51d2Zgeien2KlSzKpTueVO0VDrgevmaPgnxYItZ4x/ychNjMcHTMKx7JZCcNbJc
+ UcYuINvaloRhToPHd4WNc6KmeWW0aL2dYA2ISDmsGm9MFhfI6vRseiJHjgnn7wpocY4X
+ KZeA==
+X-Gm-Message-State: AOAM533d6InFbbF8DiBqDSUX8RqpX5FUqnUKY3vJSM6cAxJ8WxPZAdpJ
+ XebLEHzGO70ZcfLIT/cX1AcBd4+qefagy25gJNqUYI9ZlNFY2NM4Scze/7blu41AK5gBakViUaX
+ x4ls/YAycg1Hd5gDv8X47oNN3
+X-Received: by 2002:a17:907:6218:: with SMTP id
+ ms24mr18128807ejc.520.1640706556805; 
+ Tue, 28 Dec 2021 07:49:16 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzVRlq/tAOI51DmzhyS+1JIQQzYL0mPFufqb3TGKXiXLeqn5H3FF3YL0ZuyyqD7t5ua4Rx5Qw==
+X-Received: by 2002:a17:907:6218:: with SMTP id
+ ms24mr18128788ejc.520.1640706556555; 
+ Tue, 28 Dec 2021 07:49:16 -0800 (PST)
+Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+ by smtp.gmail.com with ESMTPSA id c7sm96339ejc.208.2021.12.28.07.49.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 28 Dec 2021 07:49:16 -0800 (PST)
+Date: Tue, 28 Dec 2021 16:49:09 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: selftests: get-reg-list: Add pauth
+ configuration
+Message-ID: <20211228154909.sig5ltzn6ziolfil@gator.home>
+References: <20211228121414.1013250-1-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- drjones@redhat.com, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com
+In-Reply-To: <20211228121414.1013250-1-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,99 +101,20 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The get-reg-list test ignores the Pointer Authentication features,
-which is a shame now that we have relatively common HW with this feature.
+On Tue, Dec 28, 2021 at 12:14:14PM +0000, Marc Zyngier wrote:
+> The get-reg-list test ignores the Pointer Authentication features,
+> which is a shame now that we have relatively common HW with this feature.
+> 
+> Define two new configurations (with and without PMU) that exercise the
+> KVM capabilities.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  .../selftests/kvm/aarch64/get-reg-list.c      | 50 +++++++++++++++++++
+>  1 file changed, 50 insertions(+)
+>
 
-Define two new configurations (with and without PMU) that exercise the
-KVM capabilities.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- .../selftests/kvm/aarch64/get-reg-list.c      | 50 +++++++++++++++++++
- 1 file changed, 50 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index cc898181faab..f769fc6cd927 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -1014,6 +1014,22 @@ static __u64 sve_rejects_set[] = {
- 	KVM_REG_ARM64_SVE_VLS,
- };
- 
-+static __u64 pauth_addr_regs[] = {
-+	ARM64_SYS_REG(3, 0, 2, 1, 0),	/* APIAKEYLO_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 1, 1),	/* APIAKEYHI_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 1, 2),	/* APIBKEYLO_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 1, 3),	/* APIBKEYHI_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 2, 0),	/* APDAKEYLO_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 2, 1),	/* APDAKEYHI_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 2, 2),	/* APDBKEYLO_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 2, 3)	/* APDBKEYHI_EL1 */
-+};
-+
-+static __u64 pauth_generic_regs[] = {
-+	ARM64_SYS_REG(3, 0, 2, 3, 0),	/* APGAKEYLO_EL1 */
-+	ARM64_SYS_REG(3, 0, 2, 3, 1),	/* APGAKEYHI_EL1 */
-+};
-+
- #define BASE_SUBLIST \
- 	{ "base", .regs = base_regs, .regs_n = ARRAY_SIZE(base_regs), }
- #define VREGS_SUBLIST \
-@@ -1025,6 +1041,21 @@ static __u64 sve_rejects_set[] = {
- 	{ "sve", .capability = KVM_CAP_ARM_SVE, .feature = KVM_ARM_VCPU_SVE, .finalize = true, \
- 	  .regs = sve_regs, .regs_n = ARRAY_SIZE(sve_regs), \
- 	  .rejects_set = sve_rejects_set, .rejects_set_n = ARRAY_SIZE(sve_rejects_set), }
-+#define PAUTH_SUBLIST							\
-+	{								\
-+		.name 		= "pauth_address",			\
-+		.capability	= KVM_CAP_ARM_PTRAUTH_ADDRESS,		\
-+		.feature	= KVM_ARM_VCPU_PTRAUTH_ADDRESS,		\
-+		.regs		= pauth_addr_regs,			\
-+		.regs_n		= ARRAY_SIZE(pauth_addr_regs),		\
-+	},								\
-+	{								\
-+		.name 		= "pauth_generic",			\
-+		.capability	= KVM_CAP_ARM_PTRAUTH_GENERIC,		\
-+		.feature	= KVM_ARM_VCPU_PTRAUTH_GENERIC,		\
-+		.regs		= pauth_generic_regs,			\
-+		.regs_n		= ARRAY_SIZE(pauth_generic_regs),	\
-+	}
- 
- static struct vcpu_config vregs_config = {
- 	.sublists = {
-@@ -1056,11 +1087,30 @@ static struct vcpu_config sve_pmu_config = {
- 	{0},
- 	},
- };
-+static struct vcpu_config pauth_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	VREGS_SUBLIST,
-+	PAUTH_SUBLIST,
-+	{0},
-+	},
-+};
-+static struct vcpu_config pauth_pmu_config = {
-+	.sublists = {
-+	BASE_SUBLIST,
-+	VREGS_SUBLIST,
-+	PAUTH_SUBLIST,
-+	PMU_SUBLIST,
-+	{0},
-+	},
-+};
- 
- static struct vcpu_config *vcpu_configs[] = {
- 	&vregs_config,
- 	&vregs_pmu_config,
- 	&sve_config,
- 	&sve_pmu_config,
-+	&pauth_config,
-+	&pauth_pmu_config,
- };
- static int vcpu_configs_n = ARRAY_SIZE(vcpu_configs);
--- 
-2.30.2
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 _______________________________________________
 kvmarm mailing list
