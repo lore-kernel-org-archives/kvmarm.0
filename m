@@ -2,76 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49123C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Dec 2021 19:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A25AC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 30 Dec 2021 19:46:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5E7A49EBD;
-	Thu, 30 Dec 2021 14:31:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 688C040C58;
+	Thu, 30 Dec 2021 14:46:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pBuYTJZmHfMZ; Thu, 30 Dec 2021 14:31:02 -0500 (EST)
+	with ESMTP id MojzTy2YDnSV; Thu, 30 Dec 2021 14:46:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A7FD149EB3;
-	Thu, 30 Dec 2021 14:31:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30FEF49E16;
+	Thu, 30 Dec 2021 14:46:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F07FA49E43
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 14:31:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E30F240C58
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 14:46:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mKnxxNZm8CUc for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Dec 2021 14:31:01 -0500 (EST)
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com
- [209.85.214.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08A4C49E16
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 14:31:00 -0500 (EST)
-Received: by mail-pl1-f171.google.com with SMTP id l16so6773593plg.10
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 11:31:00 -0800 (PST)
+ with ESMTP id FbbHqtq7IJVe for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Dec 2021 14:46:01 -0500 (EST)
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com
+ [209.85.210.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9865240B85
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 14:46:01 -0500 (EST)
+Received: by mail-pf1-f181.google.com with SMTP id u20so22100322pfi.12
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 11:46:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=FYXvglbGqKa6MDTBbtApQcpspIcGTQNntrmktbwch7M=;
- b=q+u3LGjWTXF+/UkU1WEUFXFDVgUnuMGd98HfbtIuFtaohdCzdt1lUbN5XmbY/5A0Pc
- WkRa2/FXd9RP0uvpVenO/q7UTfL3MvHmp68TxNYmX5Atjg7huB0qoxS5800TvmF9hSVW
- MwnYHcWP5TdHI/YuNnMDpFJre/nJor6vhNEolXtYcWFd6zItCBwlOkZ4IOk4eydXyIJr
- jZ6R4cWla/pN3Fy8kjX/bxMwmotBloLDhJnjpNoys5aLPq/kXc5XYv3AeY6QH2IEUzGt
- k7oDX0VR+ABhKp3CynFnyI8H1hVvLh9uM+P/IujXOn6FqcxljG7ZnnXju7UJKLUUcrUk
- NyKw==
+ bh=SSv7+eW+5rb6ctufcvm45xC/oNc4xjIbljO0x/RtzOU=;
+ b=gN3IhbGgjqJ1Z7FKEniA+ftsJK2fXR/ZfOh1xON8D8zybp6rVWmXnz4KpuggFQIG9y
+ 5Kmhl0UEGLQxEbS6yMCud6PJZR0VV9zsF/Exo+eo1Qjlk5tKIVn8eiw/wEcQ97pgCp/7
+ uf1eSNUh4K2hQfNsa4CU5tS1RcaaG6U8j9K2cuD6QFyEa8IdtYRL7dtZ34C05+Q3PVfr
+ DMLw7q4o6sVNmZbSCHE2TdyjTJC5QoF7KOfwYaOB5W7+iSbXVH5ANYfA8vDNTNSfKQkk
+ Dozb7nN1VPjHFTsJV8LbT0PPrvUXHqrrMB7G1BK7KIFQaoZhDiWZvGDYbaOkcMrtg8+0
+ 5wQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=FYXvglbGqKa6MDTBbtApQcpspIcGTQNntrmktbwch7M=;
- b=BtSdy8xreMmJ34OXf2IIp+a5tz6msjAjSuc7xcuu2J4rIQvWqVI37KaYRGOHbKoF5p
- jrDjkcMYgPwmkoOTBw4z2wvmYoD27t0sA4FDGm6/rEQVCgkNECSlTQQwHIz1fGLuddfA
- A7GqfozQ4q79UnVfpaMu0arq67kGiO+BKHcrWdhHKZvviZ2gyC/eJaoy5ynD7f95HvNb
- uD/X2AhzQ8E1tN8ebqQ5YEz5Hega3bEhuyL9YdAxsAb22lAw7JoczNf4cYBtPKdq6gvn
- W5WWLnynwQnNnk2uRuji77TzmfXx4K3BrLUVEQbZ3Y3ipCsPGjnGnS9arEGonlIj+X/v
- egVw==
-X-Gm-Message-State: AOAM533kcADZWbQ/1I9SjhtRNM0VCV9D7988j2QE4k1U4t9CGeMlvUUy
- t55QUbSVlOzWOUV+HMvhxuUqBA==
-X-Google-Smtp-Source: ABdhPJyYaGGC1njX1Al9c7/uvjjSt874CgyQ2TX9yQVKQldZnTwzxV1a5jQ+vjYlCk1TOSPZQNh8HA==
-X-Received: by 2002:a17:90b:20b:: with SMTP id
- fy11mr39658469pjb.238.1640892659992; 
- Thu, 30 Dec 2021 11:30:59 -0800 (PST)
+ bh=SSv7+eW+5rb6ctufcvm45xC/oNc4xjIbljO0x/RtzOU=;
+ b=7Sgo8pp2Yyr0jxHrmHq8f7qzju1oVuq6IPGfS95TQt+Xm+d9wPecoS0ncOJfHwHg4Q
+ 2jrtQwG4Uv8GRxnED/qae1+AUJjy5ra3kl2eKAq1qx+0P2wtq5SL93j0/wxQHGQfhMuG
+ ONwHLwuObFFcoyG2KaofYSDNafQYPIex4bgiuqXbIzlxRA6rNo2pGGUM2oJkCSjLp2mq
+ oHTf/OpCl/OHMSQL2v0eFAaOwa3Rdnh+41vJb6Rn9Gk5QqW7GIvUpX8EkOTCtvC4V7tS
+ hAyfD8vf8S3baNjDYN8+gWduTdmk5HBun7qjRhE14kRloHuM1AZRW6w/PDrvwv7tefrf
+ xOqw==
+X-Gm-Message-State: AOAM530kgiqrC+WvaJcLSfYacnL30JArHDsiJuTcG5QvCjF3ugL6C2Ux
+ FRgha3M/oWesdwARWIfall64IA==
+X-Google-Smtp-Source: ABdhPJzzclyRHQDfHvRvsZwsyUuzImkT7Z6KSZUcIcPdvMc0Stk+mbpQag6OFzQJCD9h2IBLQyVEEQ==
+X-Received: by 2002:a63:8342:: with SMTP id h63mr29243410pge.443.1640893560420; 
+ Thu, 30 Dec 2021 11:46:00 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id e9sm23554274pgp.39.2021.12.30.11.30.59
+ by smtp.gmail.com with ESMTPSA id x25sm25440480pfu.113.2021.12.30.11.45.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Dec 2021 11:30:59 -0800 (PST)
-Date: Thu, 30 Dec 2021 19:30:56 +0000
+ Thu, 30 Dec 2021 11:45:59 -0800 (PST)
+Date: Thu, 30 Dec 2021 19:45:56 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v5 2/4] KVM: x86/mmu: use gfn_to_pfn_page
-Message-ID: <Yc4I8DNgQjomsfrc@google.com>
+Subject: Re: [PATCH v5 3/4] KVM: arm64/mmu: use gfn_to_pfn_page
+Message-ID: <Yc4MdFREYW98mzMs@google.com>
 References: <20211129034317.2964790-1-stevensd@google.com>
- <20211129034317.2964790-3-stevensd@google.com>
+ <20211129034317.2964790-4-stevensd@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20211129034317.2964790-3-stevensd@google.com>
+In-Reply-To: <20211129034317.2964790-4-stevensd@google.com>
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
  linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -94,48 +93,112 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Mon, Nov 29, 2021, David Stevens wrote:
-> From: David Stevens <stevensd@chromium.org>
-> 
-> Covert usages of the deprecated gfn_to_pfn functions to the new
-> gfn_to_pfn_page functions.
-> 
-> Signed-off-by: David Stevens <stevensd@chromium.org>
-> ---
->  arch/x86/kvm/mmu.h             |  1 +
->  arch/x86/kvm/mmu/mmu.c         | 18 +++++++++++-------
->  arch/x86/kvm/mmu/paging_tmpl.h |  9 ++++++---
->  arch/x86/kvm/x86.c             |  6 ++++--
->  4 files changed, 22 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-> index 9ae6168d381e..97d94a9612b6 100644
-> --- a/arch/x86/kvm/mmu.h
-> +++ b/arch/x86/kvm/mmu.h
-> @@ -164,6 +164,7 @@ struct kvm_page_fault {
->  	/* Outputs of kvm_faultin_pfn.  */
->  	kvm_pfn_t pfn;
->  	hva_t hva;
-> +	struct page *page;
->  	bool map_writable;
->  };
+> @@ -1142,14 +1146,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
 >  
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 04c00c34517e..0626395ff1d9 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2891,6 +2891,9 @@ void kvm_mmu_hugepage_adjust(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	if (unlikely(fault->max_level == PG_LEVEL_4K))
->  		return;
->  
-> +	if (!fault->page)
-> +		return;
-> +
->  	if (is_error_noslot_pfn(fault->pfn) || kvm_is_reserved_pfn(fault->pfn))
+>  	/* Mark the page dirty only if the fault is handled successfully */
+>  	if (writable && !ret) {
+> -		kvm_set_pfn_dirty(pfn);
+> +		if (page)
+> +			kvm_set_pfn_dirty(pfn);
 
-These two checks can go away as they're made obsolete by the new !fault->page check.
+If kvm_set_page_dirty() is changed to be less dumb:
 
->  		return;
+		if (page)
+			kvm_set_page_dirty(page);
+
+>  		mark_page_dirty_in_slot(kvm, memslot, gfn);
+>  	}
 >  
+>  out_unlock:
+>  	spin_unlock(&kvm->mmu_lock);
+> -	kvm_set_pfn_accessed(pfn);
+> -	kvm_release_pfn_clean(pfn);
+> +	if (page) {
+> +		kvm_set_pfn_accessed(pfn);
+> +		put_page(page);
+
+Oof, KVM's helpers are stupid.  Take a page, convert it to a pfn, then convert it
+back to a page, just to mark it dirty or put a ref.  Can you fold the below 
+(completely untested) patch in before the x86/arm64 patches?  That way this code
+can be:
+
+	if (page)
+		kvm_release_page_accessed(page);
+
+and x86 can do:
+
+	if (fault->page)
+		kvm_release_page_clean(page);
+
+instead of open-coding put_page().
+
+
+From a8af0c60d7f6e77bbc7310d898211c43ae075cf8 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 30 Dec 2021 11:40:58 -0800
+Subject: [PATCH] KVM: Clean up and enhance helpers for releasing pages/pfns
+
+Tweak kvm_release_page_clean() and kvm_release_page_dirty() to avoid
+pointlessly converting to a pfn and back to a page, and add an "accessed"
+variant that will be used in a future arm64 patch.
+
+No functional change intended.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/kvm_main.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 8eb0f762a82c..f75129f641e9 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2876,29 +2876,37 @@ void kvm_release_page_clean(struct page *page)
+ {
+ 	WARN_ON(is_error_page(page));
+
+-	kvm_release_pfn_clean(page_to_pfn(page));
++	put_page(page);
+ }
+ EXPORT_SYMBOL_GPL(kvm_release_page_clean);
+
+ void kvm_release_pfn_clean(kvm_pfn_t pfn)
+ {
+ 	if (!is_error_noslot_pfn(pfn) && !kvm_is_reserved_pfn(pfn))
+-		put_page(pfn_to_page(pfn));
++		kvm_release_page_clean(page);
+ }
+ EXPORT_SYMBOL_GPL(kvm_release_pfn_clean);
+
++void kvm_release_page_accessed(struct page *page)
++{
++	mark_page_accessed(page);
++
++	kvm_release_page_clean(page);
++}
++EXPORT_SYMBOL_GPL(kvm_release_page_accessed);
++
+ void kvm_release_page_dirty(struct page *page)
+ {
+-	WARN_ON(is_error_page(page));
++	SetPageDirty(page);
+
+-	kvm_release_pfn_dirty(page_to_pfn(page));
++	kvm_release_page_clean(page);
+ }
+ EXPORT_SYMBOL_GPL(kvm_release_page_dirty);
+
+ void kvm_release_pfn_dirty(kvm_pfn_t pfn)
+ {
+-	kvm_set_pfn_dirty(pfn);
+-	kvm_release_pfn_clean(pfn);
++	if (!kvm_is_reserved_pfn(pfn) && !kvm_is_zone_device_pfn(pfn))
++		kvm_release_page_dirty(pfn_to_page(pfn));
+ }
+ EXPORT_SYMBOL_GPL(kvm_release_pfn_dirty);
+
+--
+2.34.1.448.ga2b2bfdf31-goog
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
