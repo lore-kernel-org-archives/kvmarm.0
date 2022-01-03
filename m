@@ -2,91 +2,89 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D1AC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 30 Dec 2021 21:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3379FC433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  3 Jan 2022 13:46:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68EB749EE3;
-	Thu, 30 Dec 2021 16:11:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 97C9E4B15B;
+	Mon,  3 Jan 2022 08:46:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pWW55aEm1aOi; Thu, 30 Dec 2021 16:11:20 -0500 (EST)
+	with ESMTP id vC4uEvY3IdRX; Mon,  3 Jan 2022 08:46:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3110549EE4;
-	Thu, 30 Dec 2021 16:11:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 167DD4B10C;
+	Mon,  3 Jan 2022 08:46:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA5F849EE2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 16:11:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73EA04B0B6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jan 2022 08:46:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q0lF3CWtILuD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Dec 2021 16:11:17 -0500 (EST)
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com
- [209.85.216.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4C6E49EE1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 16:11:17 -0500 (EST)
-Received: by mail-pj1-f46.google.com with SMTP id
- v13-20020a17090a088d00b001b0e3a74cf7so16975529pjc.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Dec 2021 13:11:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=O9uAq6UJmnKzmV+AWu/IPUz6QsaX0JwW2QgMuru4++U=;
- b=CR4zvhEs4RsBKFZ7BYEUqjel7zmQtmB3npeTQLUP+BfmXKQ9xRKBBkzRMgmgwKiF9D
- oh7vh5kiHIlthNs5NuhIt8S+Tuv5Cktq6JLPKx6+QJKOpe9m2uOjqkBS+4Xpn7epigC3
- llMpxjWOr/MAiNBbpJu1FHx0yh+t0b1sITMewEYFI+Q323OnWlHiozlj/tIGiEdSDaQ/
- mcJTC/DEXV2Gp1IHgYvVEYb6R5lB87OMRV65kKvBIjh0c7rRAe1yozPo/Snp+/Ajru+i
- DhFUAbKoTz7iUm12rOYwWetKdrT2yJun3970QXsteW/DuWUwtFRKOuPRgIJ/U958N1s/
- 8ZhQ==
+ with ESMTP id eWqE0Tkeycmq for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  3 Jan 2022 08:46:07 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3CF64B0B4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Jan 2022 08:46:06 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1641217566;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=m9tKNmguGwQHV4c8HM4LhwbPDmiYg4NQViyqROyOzb0=;
+ b=L3hOtSionFEfTPNxBmuoZzscNCdTBN6rypF/tPSLb0uIP39Ik3nlLU2CbyFcvQDi/atIIt
+ zVpLpMLRoFru/MIYImqyv0lgBkwexB7HRj+x0EgTY0VidxFwBVgATKIB0cKMuvI4yoQVaY
+ pTLixuM0q2vFjTaCteVa0oWGresFVtE=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-587-TkblVRIgMZOuVfP6e6Xgwg-1; Mon, 03 Jan 2022 08:46:05 -0500
+X-MC-Unique: TkblVRIgMZOuVfP6e6Xgwg-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ b8-20020a056402350800b003f8f42a883dso15664788edd.16
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 03 Jan 2022 05:46:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=O9uAq6UJmnKzmV+AWu/IPUz6QsaX0JwW2QgMuru4++U=;
- b=V1RON6SFNbmPHE2G3SDL/9iYg/TtAoefs8ArzFBUfaL621PyY+vJfvg+GZMnHio8T4
- 1m5/q6zs+FGYO0RQ57Cq+ywYiCDeqhTXpEVP7mJtqDZcB+WdnSFCLk86DdyKNcS6vscL
- g5uPtS9NvaZifbt+3Wa9B61R99U8cuuMiio3z6KceUbxMCLVk2qn5pa0DSYhtcnnWU9Z
- l4Xo6pV4x5OgC+fg3VvuTu+YvAj6Vj4TVc6HM2eyAjqufLfNsDRUffOQIiVbSvkOdFUA
- werjzOXgpXhgU/x7dVQ5F2RctEk8C4+2dnGFUJ3uAKfsFMmfAUWXHt8k5U/Tze3sM4S1
- t/gg==
-X-Gm-Message-State: AOAM531zL4U6dykWGmzL93zPTxdfzJcOOD1vyTs9UjIK7wD0GrE/1RJ+
- AWm5E5fDyJ3vCh6C23Q8ZUsXjQ==
-X-Google-Smtp-Source: ABdhPJx+cx79RAtXdUYF67GlhN1QHB5cXYw3p1t/cfWfSRpNCjl5aI0OKLoaNRWR8P1NzXt24TTVdA==
-X-Received: by 2002:a17:902:bc82:b0:148:eb68:f6dd with SMTP id
- bb2-20020a170902bc8200b00148eb68f6ddmr32472643plb.98.1640898676281; 
- Thu, 30 Dec 2021 13:11:16 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id e7sm7345204pfv.9.2021.12.30.13.11.15
+ bh=m9tKNmguGwQHV4c8HM4LhwbPDmiYg4NQViyqROyOzb0=;
+ b=RfNAuSWvI5kLEoTl7K21ovF0vnNW9rD5qbSHttuYqUypx7yqjl7aYNA8Sinq/6G1ly
+ UiXTVuNf6HkRIzEDzBkRnur0amSpoMQ4wMB59KKmc+25ySdn4udb7d+gNmHyAIG9uZHY
+ j4y4EOl/Rm4al3OFAzHIWf+CmK4pBYK+QCl/46NwNNNIWVgckQM/nNVpaNp8pSdW8ZFD
+ inaC2rw4BGfyhi3o5ngKZEnAUlLKaLw6w1PS3/NXBzKMoO66kxv/DxLeGIXBoJ6qbOnv
+ OQxKm/d3HBF5nTODh31nHAk9ns8+X6JFgyEIZzWORnILr54ATQkilbjrSY73cDKEhyIn
+ 42Lw==
+X-Gm-Message-State: AOAM530+KRJZ0Bd2Zm137McU+ME6m/5Vlukd3SE7+uILeF91+boiGrbg
+ DSIXS1h7Uc8kdvMLwg8bIBfcJ+D4f2H5N4KS2qLO/lBSyP253lXNOOJBMA9QY8UAmhjnBJSbWpS
+ v85QqvJC7fLWEC3XLz+XLSg5Y
+X-Received: by 2002:a17:907:9808:: with SMTP id
+ ji8mr36339806ejc.751.1641217563898; 
+ Mon, 03 Jan 2022 05:46:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy8eeWuKUx9ItDdI27ssC7uVHwYjv+J0uZkjR9f5ux5q9swt42Ct+yubxq2zLvBYc7Ymbpb4Q==
+X-Received: by 2002:a17:907:9808:: with SMTP id
+ ji8mr36339789ejc.751.1641217563636; 
+ Mon, 03 Jan 2022 05:46:03 -0800 (PST)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+ by smtp.gmail.com with ESMTPSA id k12sm2610001ejk.188.2022.01.03.05.46.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 30 Dec 2021 13:11:15 -0800 (PST)
-Date: Thu, 30 Dec 2021 21:11:12 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Subject: Re: [RFC PATCH 00/10] KVM: selftests: Add support for
- test-selectable ucall implementations
-Message-ID: <Yc4gcJdhxthBKUUd@google.com>
-References: <20211210164620.11636-1-michael.roth@amd.com>
+ Mon, 03 Jan 2022 05:46:03 -0800 (PST)
+Date: Mon, 3 Jan 2022 14:46:01 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] hw/arm/virt: KVM: Enable PAuth when supported by the host
+Message-ID: <20220103134601.7cumwbza32wja3ei@gator>
+References: <20211228182347.1025501-1-maz@kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20211228182347.1025501-1-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-In-Reply-To: <20211210164620.11636-1-michael.roth@amd.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Marc Orr <marcorr@google.com>,
- linux-kselftest@vger.kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Nathan Tempelman <natet@google.com>,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, x86@kernel.org, Ingo Molnar <mingo@redhat.com>,
- Mingwei Zhang <mizhang@google.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>,
- Thomas Gleixner <tglx@linutronix.de>, Varad Gautam <varad.gautam@suse.com>,
- Jim Mattson <jmattson@google.com>, Steve Rutherford <srutherford@google.com>,
- linux-kernel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- David Woodhouse <dwmw@amazon.co.uk>
+Cc: kvm@vger.kernel.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,153 +101,255 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Dec 10, 2021, Michael Roth wrote:
-> To summarize, x86 relies on a ucall based on using PIO intructions to generate
-> an exit to userspace and provide the GVA of a dynamically-allocated ucall
-> struct that resides in guest memory and contains information about how to
-> handle/interpret the exit. This doesn't work for SEV guests for 3 main reasons:
+Hi Marc,
+
+On Tue, Dec 28, 2021 at 06:23:47PM +0000, Marc Zyngier wrote:
+> Add basic support for Pointer Authentication when running a KVM
+> guest and that the host supports it, loosely based on the SVE
+> support.
 > 
->   1) The guest memory is generally encrypted during run-time, so the guest
->      needs to ensure the ucall struct is allocated in shared memory.
->   2) The guest page table is also encrypted, so the address would need to be a
->      GPA instead of a GVA.
->   3) The guest vCPU register may also be encrypted in the case of
->      SEV-ES/SEV-SNP, so the approach of examining vCPU register state has
->      additional requirements such as requiring guest code to implement a #VC
->      handler that can provide the appropriate registers via a vmgexit.
+> Although the feature is enabled by default when the host advertises
+> it, it is possible to disable it by setting the 'pauth=off' CPU
+> property.
 > 
-> To address these issues, the SEV selftest RFC1 patchset introduced a set of new
-> SEV-specific interfaces that closely mirrored the functionality of
-> ucall()/get_ucall(), but relied on a pre-allocated/static ucall buffer in
-> shared guest memory so it that guest code could pass messages/state to the host
-> by simply writing to this pre-arranged shared memory region and then generating
-> an exit to userspace (via a halt instruction).
+> Tested on an Apple M1 running 5.16-rc6.
 > 
-> Paolo suggested instead implementing support for test/guest-specific ucall
-> implementations that could be used as an alternative to the default PIO-based
-> ucall implementations as-needed based on test/guest requirements, while still
-> allowing for tests to use a common set interfaces like ucall()/get_ucall().
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Andrew Jones <drjones@redhat.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  docs/system/arm/cpu-features.rst |  5 +++++
+>  target/arm/cpu.c                 |  1 +
+>  target/arm/cpu.h                 |  1 +
+>  target/arm/cpu64.c               | 36 ++++++++++++++++++++++++++++++++
+>  target/arm/kvm.c                 | 13 ++++++++++++
+>  target/arm/kvm64.c               | 10 +++++++++
+>  target/arm/kvm_arm.h             |  7 +++++++
+>  7 files changed, 73 insertions(+)
+> 
+> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
+> index 584eb17097..c9e39546a5 100644
+> --- a/docs/system/arm/cpu-features.rst
+> +++ b/docs/system/arm/cpu-features.rst
+> @@ -211,6 +211,11 @@ the list of KVM VCPU features and their descriptions.
+>                             influence the guest scheduler behavior and/or be
+>                             exposed to the guest userspace.
+>  
+> +  pauth                    Enable or disable ``FEAT_Pauth``, pointer
+> +                           authentication.  By default, the feature is enabled
+> +                           with ``-cpu host`` if supported by both the host
+> +                           kernel and the hardware.
+> +
 
-This all seems way more complicated than it needs to be.  HLT is _worse_ than
-PIO on x86 because it triggers a userspace exit if and only if the local APIC is
-not in-kernel.  That is bound to bite someone.  The only issue with SEV is the
-address, not the VM-Exit mechanism.  That doesn't change with SEV-ES, SEV-SNP,
-or TDX, as PIO and HLT will both get reflected as #VC/#VE, i.e. the guest side
-needs to be updated to use VMGEXIT/TDCALL no matter what, at which point having
-the hypercall request PIO emulation is just as easy as requesting HLT.
+Thanks for considering a documentation update. In this case, though, I
+think we should delete the "TCG VCPU Features" pauth paragraph, rather
+than add a new "KVM VCPU Features" pauth paragraph. We don't need to
+document each CPU feature. We just document complex ones, like sve*,
+KVM specific ones (kvm-*), and TCG specific ones (now only pauth-impdef).
 
-I also don't like having to differentiate between a "shared" and "regular" ucall.
-I kind of like having to explicitly pass the ucall object being used, but that
-puts undue burden on simple single-vCPU tests.
+>  TCG VCPU Features
+>  =================
+>  
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index a211804fd3..68b09cbc6a 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -2091,6 +2091,7 @@ static void arm_host_initfn(Object *obj)
+>      kvm_arm_set_cpu_features_from_host(cpu);
+>      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
+>          aarch64_add_sve_properties(obj);
+> +        aarch64_add_pauth_properties(obj);
+>      }
+>  #else
+>      hvf_arm_set_cpu_features_from_host(cpu);
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index e33f37b70a..c6a4d50e82 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1076,6 +1076,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
+>  void aarch64_sve_change_el(CPUARMState *env, int old_el,
+>                             int new_el, bool el0_a64);
+>  void aarch64_add_sve_properties(Object *obj);
+> +void aarch64_add_pauth_properties(Object *obj);
+>  
+>  /*
+>   * SVE registers are encoded in KVM's memory in an endianness-invariant format.
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 15245a60a8..305c0e19fe 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -625,6 +625,42 @@ void aarch64_add_sve_properties(Object *obj)
+>  #endif
+>  }
+>  
+> +static bool cpu_arm_get_pauth(Object *obj, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    return cpu_isar_feature(aa64_pauth, cpu);
+> +}
+> +
+> +static void cpu_arm_set_pauth(Object *obj, bool value, Error **errp)
+> +{
+> +    ARMCPU *cpu = ARM_CPU(obj);
+> +    uint64_t t;
+> +
+> +    if (value) {
+> +        if (!kvm_arm_pauth_supported()) {
+> +            error_setg(errp, "'pauth' feature not supported by KVM on this host");
+> +        }
+> +
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * If the host supports PAuth, we only end-up here if the user has
+> +     * disabled the support, and value is false.
+> +     */
+> +    t = cpu->isar.id_aa64isar1;
+> +    t = FIELD_DP64(t, ID_AA64ISAR1, APA, value);
+> +    t = FIELD_DP64(t, ID_AA64ISAR1, GPA, value);
+> +    t = FIELD_DP64(t, ID_AA64ISAR1, API, value);
+> +    t = FIELD_DP64(t, ID_AA64ISAR1, GPI, value);
+> +    cpu->isar.id_aa64isar1 = t;
+> +}
+> +
+> +void aarch64_add_pauth_properties(Object *obj)
+> +{
+> +    object_property_add_bool(obj, "pauth", cpu_arm_get_pauth, cpu_arm_set_pauth);
+> +}
 
-The inability to read guest private memory is really the only issue, and that can
-be easily solved without completely revamping the ucall framework, and without
-having to update a huge pile of tests to make them place nice with private memory.
+I think we should try to merge as much as possible between the TCG and KVM
+pauth property handling. I think we just need to move the
+qdev_property_add_static(DEVICE(obj), &arm_cpu_pauth_property) call into
+KVM/TCG common code and then modify arm_cpu_pauth_finalize() to
+handle checking KVM for support when KVM is enabled and also to not
+look at the impdef property.
 
-This would also be a good opportunity to clean up the stupidity of tests having to
-manually call ucall_init(), drop the unused/pointless @arg from ucall_init(), and
-maybe even fix arm64's lurking landmine of not being SMP safe (the address is shared
-by all vCPUs).
+> +
+>  void arm_cpu_pauth_finalize(ARMCPU *cpu, Error **errp)
+>  {
+>      int arch_val = 0, impdef_val = 0;
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index bbf1ce7ba3..71e2f46ce8 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -84,6 +84,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>      if (vmfd < 0) {
+>          goto err;
+>      }
+> +
+>      cpufd = ioctl(vmfd, KVM_CREATE_VCPU, 0);
+>      if (cpufd < 0) {
+>          goto err;
+> @@ -94,6 +95,18 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
+>          goto finish;
+>      }
+>  
+> +    /*
+> +     * Ask for Pointer Authentication if supported. We can't play the
+> +     * SVE trick of synthetising the ID reg as KVM won't tell us
+> +     * whether we have the architected or IMPDEF version of PAuth, so
+> +     * we have to use the actual ID regs.
+> +     */
+> +    if (ioctl(vmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_PTRAUTH_ADDRESS) > 0 &&
+> +        ioctl(vmfd, KVM_CHECK_EXTENSION, KVM_CAP_ARM_PTRAUTH_GENERIC) > 0) {
+> +        init->features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
+> +                              1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
+> +    }
+> +
 
-To reduce the burden on tests and avoid ordering issues with creating vCPUs,
-allocate a ucall struct for every possible vCPU when the VM is created and stuff
-the GPA of the struct in the struct itself so that the guest can communicate the
-GPA instead of the GVA.  Then confidential VMs just need to make all structs shared.
+I think kvm_init() is called prior to kvm_arm_get_host_cpu_features(),
+which means we can do this instead
 
-If all architectures have a way to access a vCPU ID, the ucall structs could be
-stored as a simple array.  If not, a list based allocator would probably suffice.
-
-E.g. something like this, except the list management is in common code instead of
-x86, and also delete all the per-test ucall_init() calls.
-
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-index a3489973e290..9aab6407bd42 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-@@ -8,19 +8,59 @@
-
- #define UCALL_PIO_PORT ((uint16_t)0x1000)
-
--void ucall_init(struct kvm_vm *vm, void *arg)
-+static struct list_head *ucall_list;
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index e790d6c9a573..d1512035ac5b 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -521,6 +521,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+      */
+     struct kvm_vcpu_init init = { .target = -1, };
+ 
++   /*
++    * Ask for Pointer Authentication if supported. We can't play the
++    * SVE trick of synthetising the ID reg as KVM won't tell us
++    * whether we have the architected or IMPDEF version of PAuth, so
++    * we have to use the actual ID regs.
++    */
++    if (kvm_arm_pauth_supported()) {
++        init->features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
++                              1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
++    }
 +
-+void ucall_init(struct kvm_vm *vm)
- {
-+       struct ucall *ucalls;
-+       int nr_cpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
-+       int i;
-+
-+       TEST_ASSERT(!ucall_list, "ucall() can only be used by one VM at a time");
-+
-+       INIT_LIST_HEAD(&vm->ucall_list);
-+
-+       ucalls = vm_vaddr_alloc(nr_cpus * sizeof(struct ucall));
-+       ucall_make_shared(ucall_list, <size>);
-+
-+       for (i = 0; i < nr_cpus; i++) {
-+               ucalls[i].gpa = addr_gva2gpa(vm, &ucalls[i]);
-+
-+               list_add(&vm->ucall_list, &ucalls[i].list)
-+       }
-+
-+       ucall_list = &vm->ucall_list;
-+       sync_global_to_guest(vm, ucall_list);
- }
+     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+         return false;
+     }
 
- void ucall_uninit(struct kvm_vm *vm)
- {
-+       ucall_list =  NULL;
-+       sync_global_to_guest(vm, ucall_list);
-+}
-+
-+static struct ucall *ucall_alloc(void)
-+{
-+       struct ucall *uc;
-+
-+       /* Is there a lock primitive for the guest? */
-+       lock_something(&ucall_lock);
-+       uc = list_first_entry(ucall_list, struct ucall, list);
-+
-+       list_del(&uc->list);
-+       unlock_something(&ucall_lock);
-+}
-+
-+static void ucall_free(struct ucall *uc)
-+{
-+       lock_something(&ucall_lock);
-+       list_add(&uc->list, ucall_list);
-+       unlock_something(&ucall_lock);
- }
+Assuming I'm right about the call order, then I think I'd like that more.
 
- void ucall(uint64_t cmd, int nargs, ...)
- {
--       struct ucall uc = {
--               .cmd = cmd,
--       };
-+       struct ucall *uc = ucall_alloc();
-        va_list va;
-        int i;
 
-@@ -32,7 +72,9 @@ void ucall(uint64_t cmd, int nargs, ...)
-        va_end(va);
+>      if (init->target == -1) {
+>          struct kvm_vcpu_init preferred;
+>  
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index e790d6c9a5..95b6902ca0 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -725,6 +725,12 @@ bool kvm_arm_sve_supported(void)
+>      return kvm_check_extension(kvm_state, KVM_CAP_ARM_SVE);
+>  }
+>  
+> +bool kvm_arm_pauth_supported(void)
+> +{
+> +    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
+> +            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
+> +}
+> +
+>  bool kvm_arm_steal_time_supported(void)
+>  {
+>      return kvm_check_extension(kvm_state, KVM_CAP_STEAL_TIME);
+> @@ -865,6 +871,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          assert(kvm_arm_sve_supported());
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
+>      }
+> +    if (cpu_isar_feature(aa64_pauth, cpu)) {
+> +	    cpu->kvm_init_features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
+> +					  1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
+> +    }
+>  
+>      /* Do KVM_ARM_VCPU_INIT ioctl */
+>      ret = kvm_arm_vcpu_init(cs);
+> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> index b7f78b5215..c26acf7866 100644
+> --- a/target/arm/kvm_arm.h
+> +++ b/target/arm/kvm_arm.h
+> @@ -306,6 +306,13 @@ bool kvm_arm_pmu_supported(void);
+>   */
+>  bool kvm_arm_sve_supported(void);
+>  
+> +/**
+> + * kvm_arm_pauth_supported:
+> + *
+> + * Returns true if KVM can enable Pointer Authentication and false otherwise.
+> + */
+> +bool kvm_arm_pauth_supported(void);
+> +
 
-        asm volatile("in %[port], %%al"
--               : : [port] "d" (UCALL_PIO_PORT), "D" (&uc) : "rax", "memory");
-+               : : [port] "d" (UCALL_PIO_PORT), "D" (uc->gpa) : "rax", "memory");
-+
-+       ucall_free(uc);
- }
+If we merge more of the pauth property handling with the TCG code, then
+we'll also need a stub in the !CONFIG_KVM section for compiling without
+kvm support.
 
- uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
-@@ -47,7 +89,7 @@ uint64_t get_ucall(struct kvm_vm *vm, uint32_t vcpu_id, struct ucall *uc)
-                struct kvm_regs regs;
+>  /**
+>   * kvm_arm_get_max_vm_ipa_size:
+>   * @ms: Machine state handle
+> -- 
+> 2.30.2
+>
 
-                vcpu_regs_get(vm, vcpu_id, &regs);
--               memcpy(&ucall, addr_gva2hva(vm, (vm_vaddr_t)regs.rdi),
-+               memcpy(&ucall, addr_gpa2hva(vm, (vm_paddr_t)regs.rdi),
-                       sizeof(ucall));
+Thanks,
+drew
 
-                vcpu_run_complete_io(vm, vcpu_id);
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
