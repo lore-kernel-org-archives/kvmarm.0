@@ -2,72 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EA09C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jan 2022 14:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B98C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jan 2022 14:40:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 169B349F0B;
-	Tue,  4 Jan 2022 09:05:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B19ED49EFE;
+	Tue,  4 Jan 2022 09:40:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@intel.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mu86rRBjHkOF; Tue,  4 Jan 2022 09:05:56 -0500 (EST)
+	with ESMTP id 9cFpABLD1LbE; Tue,  4 Jan 2022 09:40:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CBB049F44;
-	Tue,  4 Jan 2022 09:05:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A347549EBF;
+	Tue,  4 Jan 2022 09:40:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7275949F5B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 08:47:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC3D249EBF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 09:40:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5gD-g-m6bot3 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jan 2022 08:47:11 -0500 (EST)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E0C549F2C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 08:47:11 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
- t=1641304031; x=1672840031;
- h=date:from:to:cc:subject:message-id:references:
- mime-version:in-reply-to;
- bh=giCDfeerhSB/M4N2G4n+FT62UWoiMv/yX0S2mawmUU4=;
- b=E2BRNlszywgGZW0jk5D9nctEtiIqyzdgnhUpdrd9RIOoxwBlxo2n1cPu
- UbWERkvdjdNezGjj4LeMhn0phDJhCC0OnGdq0KI10NA3i2Vk7YXARrHjf
- gjT3pZh5pUBNj9y+bHWunWsCAJaVl4uMmk50O4m5IMdAp+r1e6787Oux+
- 59VaoFpTl/w1QxSfKZNnwLMi7YJeC7lLqX+ndMzQD1IvSDRRMwWAmVhRo
- x/XHySo4TSjlyP7XbOGhRRGMrqtS456Q+wLyUjZV4saqS5D10IwWqKrSx
- jbF+p7bR1CPppuyV9cOEaTR3RI8RVCDQpAysWQq7QI34hQr/mHJLJS976 w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10216"; a="305577088"
-X-IronPort-AV: E=Sophos;i="5.88,261,1635231600"; d="scan'208";a="305577088"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Jan 2022 05:47:07 -0800
-X-IronPort-AV: E=Sophos;i="5.88,261,1635231600"; d="scan'208";a="488198643"
-Received: from smile.fi.intel.com ([10.237.72.61])
- by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 04 Jan 2022 05:47:05 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.95)
- (envelope-from <andriy.shevchenko@linux.intel.com>)
- id 1n4k8J-006DjC-Hk; Tue, 04 Jan 2022 15:45:47 +0200
-Date: Tue, 4 Jan 2022 15:45:47 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v1 1/1] KVM: arm64: vgic: Replace kernel.h with the
- necessary inclusions
-Message-ID: <YdRPi65NyiigKPPG@smile.fi.intel.com>
-References: <20211222165552.69288-1-andriy.shevchenko@linux.intel.com>
- <8735mk1pgt.wl-maz@kernel.org>
- <YcNtpnxbyDA/CGgc@smile.fi.intel.com>
- <YcN5FKnbT9BHLn9f@smile.fi.intel.com>
- <87iluzvcn4.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87iluzvcn4.wl-maz@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-X-Mailman-Approved-At: Tue, 04 Jan 2022 09:05:56 -0500
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id TE6tc9t7COwP for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jan 2022 09:40:03 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6F4949EBB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 09:40:03 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id C00046144A;
+ Tue,  4 Jan 2022 14:40:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35811C36AED;
+ Tue,  4 Jan 2022 14:40:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1641307202;
+ bh=hNauZWxTvH4RpsnhBPPrHP5HNl6Fd4EBlLcYJIrT7x0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=DnlI2PXSWWbV1mGMih6JiUlmLIoa9IYefEEG+Dk1Yrp/x8J/oH8hoYj6TfF0+S/9B
+ gV93wdNiN3NdlBxynDntY9ZE3G0mCu+jq9aRvxo3wdLzgEFiWBe786T0QQvvK9oNJn
+ qg9ibaPLSHqn4oUeeHGcOp17n202wSMAr2ljvGQDrM6HsHulNStCTgoHGJHak7VrwL
+ TIxUlchJq7pVyonrWDbGobibWueUNnlxWqWO3IHWwUHffJa7TerYUvlapqksGMWU6V
+ KPEiuCPSuHReynaPxk+UtgH1BVOmsyP2eApLr980jA4XAzlNnwgtXaUiMiUE5GW8yX
+ gL+JFvvHV5VJA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n4kym-00Fvxk-7I; Tue, 04 Jan 2022 14:40:00 +0000
+Date: Tue, 04 Jan 2022 14:39:59 +0000
+Message-ID: <87h7ajva2o.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH kvmtool 9/9] arm64: Add support for
+ KVM_ARM_VCPU_PMU_V3_SET_PMU
+In-Reply-To: <20211115165705.195736-10-alexandru.elisei@arm.com>
+References: <20211115165705.195736-1-alexandru.elisei@arm.com>
+ <20211115165705.195736-10-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, will@kernel.org,
+ julien.thierry.kdev@gmail.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
+ mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -85,40 +88,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jan 04, 2022 at 01:44:31PM +0000, Marc Zyngier wrote:
-> On Wed, 22 Dec 2021 19:14:28 +0000,
-> Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
-> > On Wed, Dec 22, 2021 at 08:25:43PM +0200, Andy Shevchenko wrote:
-> > > On Wed, Dec 22, 2021 at 06:09:22PM +0000, Marc Zyngier wrote:
-> > > > On Wed, 22 Dec 2021 16:55:52 +0000,
-> > > > Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
-> > > > > 
-> > > > > When kernel.h is used in the headers it adds a lot into dependency hell,
-> > > > > especially when there are circular dependencies are involved.
-> > > > 
-> > > > Which circular dependencies? What problem are you solving?
-> > > 
-> > > In particular moving bitmap_*alloc() APIs to the headers.
-> > > 
-> > > But this may be a side effect of what I realized during the attempts
-> > > of solving that issue. In any case there is no need to take entire
-> > > mess of kernel.h in another header.
-> > 
-> > For the record  `make headerdep` doesn't make any difference with
-> > or without this patch. But I consider it's better not to use kernel.h
-> > in the headers due to a full mess behind it.
+On Mon, 15 Nov 2021 16:57:05 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Can you then please write a commit message that matches what this is
-> actually doing instead of mentioning a problem that doesn't seem to
-> exist?
+> The KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU ioctl is
+> used to assign a physical PMU to the events that KVM creates when emulating
+> the PMU for that VCPU. This is useful on heterogeneous systems, when there
+> is more than one hardware PMU present.
+> 
+> The assumption that is made in the implementation is that the user will
+> pin the kvmtool process on a set of CPUs that share the same PMU. This
+> allows kvmtool to set the same PMU for all VCPUs from the main thread,
+> instead of in the individual VCPU threads.
 
-Sure, thanks for review!
+May I suggest a slightly different use model? Ideally, you'd be able
+to run the vcpu threads on the CPUs matching the PMU affinity, and
+leave all the other threads to roam on other CPUs.
+
+With your implementation, the whole of kvmtool gets stuck to a given
+CPU type, which can be problematic.
+
+Thanks,
+
+	M.
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
