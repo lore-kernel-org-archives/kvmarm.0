@@ -2,51 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C425FC433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jan 2022 13:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 588C3C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jan 2022 13:44:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 376B44089E;
-	Tue,  4 Jan 2022 08:24:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD10C49EE1;
+	Tue,  4 Jan 2022 08:44:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uCXSA23DnFH1; Tue,  4 Jan 2022 08:24:11 -0500 (EST)
+	with ESMTP id b4ngwmjeUAJg; Tue,  4 Jan 2022 08:44:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF4A349E43;
-	Tue,  4 Jan 2022 08:24:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D32149E42;
+	Tue,  4 Jan 2022 08:44:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4979C40C1B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 08:24:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B810240BC2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 08:44:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GVHdipyA3x7i for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jan 2022 08:24:10 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F176349EC5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 08:24:09 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3304C1FB;
- Tue,  4 Jan 2022 05:24:09 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.9.1])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 91CD63F774;
- Tue,  4 Jan 2022 05:24:07 -0800 (PST)
-Date: Tue, 4 Jan 2022 13:24:02 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Frederic Weisbecker <frederic@kernel.org>
-Subject: Re: Possible nohz-full/RCU issue in arm64 KVM
-Message-ID: <YdRJA79bs1Im7h01@FVFF77S0Q05N>
-References: <d80e440375896f75d45e227d40af60ca7ba24ceb.camel@redhat.com>
- <YbyO40zDW/kvUHEE@FVFF77S0Q05N>
- <20211220161014.GC918551@lothringen>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211220161014.GC918551@lothringen>
-Cc: paulmck <paulmck@kernel.org>, maz <maz@kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
- rcu <rcu@vger.kernel.org>, Nicolas Saenz Julienne <nsaenzju@redhat.com>,
- Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id SzJ6UABMUvLN for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jan 2022 08:44:36 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9322C4078F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 08:44:36 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id E2321B815B3;
+ Tue,  4 Jan 2022 13:44:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6E1DC36AE9;
+ Tue,  4 Jan 2022 13:44:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1641303873;
+ bh=meSSg/YmNbksR9ORav1v/bOv0Oo6+Koppmo78YLMnIQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=mXJopMPoRAwqub3ro5VAA6/y7RCrAGRKjh3JRwztH91E50zE67fnYuiI95IwLjxYM
+ XzoR9b/DSZZtj85pabIlt28CO5xsdckUTKKPr2Rrhhm6UAPztxTqYz/bXhfrnvQJHX
+ MDOMIv1O9/RFWz+wd4sUz4SzVOJ5f0yRfehaaZuEbiYx/upt/x0SnC0SLk0/P0IqsC
+ vl3UhkBq3XM+fKk+8iCO8SK6Gb4O7COY3TZPpT0f2xoGIRG6jzWAnWTwZJipZb2kBk
+ cJLC9AEOVtISZrE53II4HTwmXQLzelEsfxx+qHKU/XOfKoBD+/rChWfaB9h1FJ85s1
+ Ni7Y+6z2JpwDA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n4k75-00FvHK-Ih; Tue, 04 Jan 2022 13:44:31 +0000
+Date: Tue, 04 Jan 2022 13:44:31 +0000
+Message-ID: <87iluzvcn4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH v1 1/1] KVM: arm64: vgic: Replace kernel.h with the
+ necessary inclusions
+In-Reply-To: <YcN5FKnbT9BHLn9f@smile.fi.intel.com>
+References: <20211222165552.69288-1-andriy.shevchenko@linux.intel.com>
+ <8735mk1pgt.wl-maz@kernel.org>
+ <YcNtpnxbyDA/CGgc@smile.fi.intel.com>
+ <YcN5FKnbT9BHLn9f@smile.fi.intel.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: andriy.shevchenko@linux.intel.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,71 +90,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Dec 20, 2021 at 05:10:14PM +0100, Frederic Weisbecker wrote:
-> On Fri, Dec 17, 2021 at 01:21:39PM +0000, Mark Rutland wrote:
-> > On Fri, Dec 17, 2021 at 12:51:57PM +0100, Nicolas Saenz Julienne wrote:
-> > > Hi All,
-> > 
-> > Hi,
-> > 
-> > > arm64's guest entry code does the following:
-> > > 
-> > > int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-> > > {
-> > > 	[...]
-> > > 
-> > > 	guest_enter_irqoff();
-> > > 
-> > > 	ret = kvm_call_hyp_ret(__kvm_vcpu_run, vcpu);
-> > > 
-> > > 	[...]
-> > > 
-> > > 	local_irq_enable();
-> > > 
-> > > 	/*
-> > > 	 * We do local_irq_enable() before calling guest_exit() so
-> > > 	 * that if a timer interrupt hits while running the guest we
-> > > 	 * account that tick as being spent in the guest.  We enable
-> > > 	 * preemption after calling guest_exit() so that if we get
-> > > 	 * preempted we make sure ticks after that is not counted as
-> > > 	 * guest time.
-> > > 	 */
-> > > 	guest_exit();
-> > > 	[...]
-> > > }
-> > > 
-> > > 
-> > > On a nohz-full CPU, guest_{enter,exit}() delimit an RCU extended quiescent
-> > > state (EQS). Any interrupt happening between local_irq_enable() and
-> > > guest_exit() should disable that EQS. Now, AFAICT all el0 interrupt handlers
-> > > do the right thing if trggered in this context, but el1's won't. Is it
-> > > possible to hit an el1 handler (for example __el1_irq()) there?
-> > 
-> > I think you're right that the EL1 handlers can trigger here and won't exit the
-> > EQS.
-> > 
-> > I'm not immediately sure what we *should* do here. What does x86 do for an IRQ
-> > taken from a guest mode? I couldn't spot any handling of that case, but I'm not
-> > familiar enough with the x86 exception model to know if I'm looking in the
-> > right place.
+On Wed, 22 Dec 2021 19:14:28 +0000,
+Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
 > 
-> This is one of the purposes of rcu_irq_enter(). el1 handlers don't call irq_enter()?
+> On Wed, Dec 22, 2021 at 08:25:43PM +0200, Andy Shevchenko wrote:
+> > On Wed, Dec 22, 2021 at 06:09:22PM +0000, Marc Zyngier wrote:
+> > > On Wed, 22 Dec 2021 16:55:52 +0000,
+> > > Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
+> > > > 
+> > > > When kernel.h is used in the headers it adds a lot into dependency hell,
+> > > > especially when there are circular dependencies are involved.
+> > > 
+> > > Which circular dependencies? What problem are you solving?
+> > 
+> > In particular moving bitmap_*alloc() APIs to the headers.
+> > 
+> > But this may be a side effect of what I realized during the attempts
+> > of solving that issue. In any case there is no need to take entire
+> > mess of kernel.h in another header.
+> 
+> For the record  `make headerdep` doesn't make any difference with
+> or without this patch. But I consider it's better not to use kernel.h
+> in the headers due to a full mess behind it.
 
-Due to lockep/tracing/etc ordering, we don't use irq_enter() directly and
-instead call rcu_irq_enter() and irq_enter_rcu() separately. Critically we only
-call rcu_irq_enter() for IRQs taken from the idle thread, as this was
-previously thought to be the only place where we could take an IRQ from an EL1
-EQS.
-
-See __el1_irq(), __enter_from_kernel_mode(), and __exit_to_kernel_mode() in
-arch/arm64/kernel/entry-common.c. The latter two are largely analogous to the
-common irqentry_enter9) and irqentry_exit() helpers in kernel/entry/common.c.
-
-We need to either rework the KVM code or that entry code. I'll dig into this a
-bit more...
+Can you then please write a commit message that matches what this is
+actually doing instead of mentioning a problem that doesn't seem to
+exist?
 
 Thanks,
-Mark.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
