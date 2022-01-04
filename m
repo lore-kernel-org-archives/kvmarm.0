@@ -2,103 +2,127 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E221AC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Jan 2022 09:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 310BFC433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Jan 2022 12:15:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 485F649E2A;
-	Wed,  5 Jan 2022 04:41:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ADCD4B164;
+	Wed,  5 Jan 2022 07:15:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, body has been altered) header.i=@amd.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yu-iGjT3YCAR; Wed,  5 Jan 2022 04:41:26 -0500 (EST)
+	with ESMTP id cW0p-j9aJlYe; Wed,  5 Jan 2022 07:15:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F2F249E29;
-	Wed,  5 Jan 2022 04:41:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D718C4B168;
+	Wed,  5 Jan 2022 07:15:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0844149E29
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 04:41:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BDB649E0E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 18:41:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 57bLD6oC96FB for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Jan 2022 04:41:23 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CC3A749B0A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 04:41:23 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1641375683;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XoueNQR4kEqT+Matt0jgIO5+7tZ5WzGFoeukEV1ezTI=;
- b=Y1ArslOA0OPBToB7anv0Bto1ZAJEp5qov5rWR2TkYUb/nayRdN+gsrDl09Gim6Y0NPoEEE
- xv9kIzU3KurWECSAMDpYutvIrTTtpzpbYnNYAAES2jt7eZ0DSh5b19tNXt+uM1Qgt8f+p/
- XWRGCLNFfMLi2pxqKcFY6gZeaT+d3KU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-140-sZFEya8dNfKUyA9_8EgL5g-1; Wed, 05 Jan 2022 04:41:22 -0500
-X-MC-Unique: sZFEya8dNfKUyA9_8EgL5g-1
-Received: by mail-wm1-f72.google.com with SMTP id
- r10-20020a1c440a000000b003456b2594e0so10290193wma.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Jan 2022 01:41:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:reply-to:subject:to:cc:references:from
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-transfer-encoding:content-language;
- bh=XoueNQR4kEqT+Matt0jgIO5+7tZ5WzGFoeukEV1ezTI=;
- b=VDSgUaZAqkn1o5Yg3q5sa3lz3q60EV8A/iiAacasMA2XeEoDWyicDc5DFdYaKcEiMO
- uRHbV7g7xvPESWnmJepMauhzQu0Da66N9T3mcH3N7pJ/utN9iy4OwyDFQg1YCplzq35u
- Uk421hIOn0ibOGT6RFOPkCv09L7GUaVUD1NXvED2ebJGxScAAgs4yEOKvYEH08cMs2pR
- U+ro5OCTXC8/apT4zL7NOKutEMhNQgt0uqmM2549+Zg8hgBHPkaXQPn2ldsPAe5PmIyg
- 6dimx/mgfnT8e/6M6mvxxWy2HQMllFlnrogSN/gWxG8+MnBeT6YDlGpWlDnmWX/xhkRW
- BbRQ==
-X-Gm-Message-State: AOAM530yr4M1s74J05y/rBXFx5D+AVLZiEkIYQkwlU/b2TM6EfJHqsDp
- FBUU/IMze2XP5+BGce6q2YpiVwja+v37cr1VcQuMAligKt3hNrrKhETp04V7z69eNqKYGVNFOre
- CcxwqU8IX7BgX1xw6ZILdF2nu
-X-Received: by 2002:adf:ea0d:: with SMTP id q13mr44299142wrm.597.1641375681233; 
- Wed, 05 Jan 2022 01:41:21 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJy8VwkzaUkiWk9Ver7jbdWPviFeEGKyfmS9ZKn/BPTA0eFyTMoTynKWTrju9cdQaTpcN6b/EA==
-X-Received: by 2002:adf:ea0d:: with SMTP id q13mr44299120wrm.597.1641375680951; 
- Wed, 05 Jan 2022 01:41:20 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id 1sm34185991wrb.13.2022.01.05.01.41.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 05 Jan 2022 01:41:20 -0800 (PST)
-Subject: Re: [PATCH v2 1/5] hw/arm/virt: Key enablement of highmem PCIe on
- highmem_ecam
-To: Marc Zyngier <maz@kernel.org>
-References: <20211003164605.3116450-1-maz@kernel.org>
- <20211003164605.3116450-2-maz@kernel.org>
- <dbe883ca-880e-7f2b-1de7-4b2d3361545d@redhat.com>
- <87pmpiyrfw.wl-maz@kernel.org>
- <b9031d40-897e-b8c5-4240-fc2936dcbcb9@redhat.com>
- <877dbfywpj.wl-maz@kernel.org>
-From: Eric Auger <eric.auger@redhat.com>
-Message-ID: <cb9f6c39-40f8-eea7-73bf-13df1e5dae9d@redhat.com>
-Date: Wed, 5 Jan 2022 10:41:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id Q-R-NCuv-8f2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jan 2022 18:41:51 -0500 (EST)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com
+ (mail-bn7nam10on2063.outbound.protection.outlook.com [40.107.92.63])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD8B140E3D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 18:41:51 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nwKowROj6HFCwafIg5KKIgNc6ZxPkNlLOBRNmLDR5WHxSLr8mbVZlilFFaeVZMSbkT8/ZP4awSIICGo81EAmcTMNnhlCB9c7OhvcaY5ExU89X7LCYRqmc9uuvgnJ9Ys1l3IelQeWqjpkma2CS/Zu3tjxjrysCYvSEe3z8E5T/w0mWE9+xio/8GVRSzU6OFlZm03fdQCfewsxR6DJ8vXw2e6jDl0/RNwb54Nxy9uTVYE4SK2AbBiI1rRkp1M/d084tbJHHPisbbiibkilxJ5Svayse3gS7xsch6HQx671hdjcY2pHvG4fKaO3TjwEQUxGw+sqlMzzm8Nl+JY3f8PrpA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XLlRqvdGVTwSwk5vsEEuVJZ+ZCogcD696/sFcvngZ8s=;
+ b=mMlI1kDAP548ZjSKvVTTg7t/m4lep7TDLgxyN6GGuoaaPEzVuRgOSZg2vsrIdRMvCWdJOqkeH589RJQ/Y74jdPaUh72K6ckWXO7LnY9kS/LH9LYp6pMRFgy2mNxpxvtBtQWM8hy42GZMPgyBxZhGNSTXhytJefrHJR6wEdnXswWUYb06ysnFfp2rCKpu3BuDJw+iVGrJeUy3sNVmGP+XrXcww2v3tm9YXmvvbX93SbrrhZ4CDjoSbOMA5RB3hWsMDvLN3DD8LP7k7QL/g3w8DdIXYMJRKZRu3uIJUJASYNIJgyZlCXcvkTzmytUYiT5RJngNgZngstH35pCmYrJWZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1; 
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XLlRqvdGVTwSwk5vsEEuVJZ+ZCogcD696/sFcvngZ8s=;
+ b=JzG/KaGVoz9EM/juIWWoMmxewVrQJwfYIZklTneozP5obiFxihSdnPLbolLHJav41nEbfXLAQGPUbcIbtGHXu2zEPSZCpUquf7EbL1Ud/k+A+qO1XEKNVCZzUih/OFoyWiS3OkZ+np8FzXdAtq+Oo5xapcNspCwJLKMwJxH9sbc=
+Received: from DM5PR15CA0027.namprd15.prod.outlook.com (2603:10b6:4:4b::13) by
+ CH2PR12MB4021.namprd12.prod.outlook.com (2603:10b6:610:2b::29) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4867.7; Tue, 4 Jan 2022 23:41:45 +0000
+Received: from DM6NAM11FT031.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:4:4b:cafe::58) by DM5PR15CA0027.outlook.office365.com
+ (2603:10b6:4:4b::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.16 via Frontend
+ Transport; Tue, 4 Jan 2022 23:41:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ DM6NAM11FT031.mail.protection.outlook.com (10.13.172.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4867.7 via Frontend Transport; Tue, 4 Jan 2022 23:41:45 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Tue, 4 Jan
+ 2022 17:41:45 -0600
+Date: Tue, 4 Jan 2022 17:35:17 -0600
+From: Michael Roth <michael.roth@amd.com>
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH 00/10] KVM: selftests: Add support for
+ test-selectable ucall implementations
+Message-ID: <20220104233517.kxjbdw4t7taymab5@amd.com>
+References: <20211210164620.11636-1-michael.roth@amd.com>
+ <Yc4gcJdhxthBKUUd@google.com>
 MIME-Version: 1.0
-In-Reply-To: <877dbfywpj.wl-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <Yc4gcJdhxthBKUUd@google.com>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
+ (10.181.40.144)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3be571a6-3cb7-4414-5f5e-08d9cfdbc4f9
+X-MS-TrafficTypeDiagnostic: CH2PR12MB4021:EE_
+X-Microsoft-Antispam-PRVS: <CH2PR12MB40218E908801E32AAFF7E3AF954A9@CH2PR12MB4021.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: l3U2gnaiY8QcHRokiHA2uFp/PloRhzY3Y0BR1wQsylhv7XdpI1WNVC+kgy5cwmNRU1N8imiaxlWnm0UPi8i9hAIjdGF0Y491YAP0piFW6ELAfpDaTznrFqZDcQ2h+LYNbtlvghq57y1nUXa03Jg2uWbwT6ErBljj+DS/DtiG0X/QqDgRP32EWec+VKxmFfu2xwyoM0q9Lk1tcoYMk9QkeHM28sEugM6kFMTAeUv2BkwQfmjWpkfqY9MPRYKZZ1ySJP6nuzCwa5hnnZjw5NctBPN8GDQ1s01tSRKV4dEXlPocRAaTCfypRPTAYmD37jZdwCWJHaVgR/8G72Z+dI3WFx3txA1A97ynX5nhHNQ/pk+JJknSBcidNIputO9YJM4bPCBMAp/PBAIXZYBo/CczFzCX+o0sv9gVvc25kuwo5UnP8jk6IkFQUEqwaMtDBRZYXV8JMovv5tlMIX4CV+Lsi2KQXJ7e3GN88xrM3mMHgWFYm/fxivoBkFc6xtf1TWx12WJn5GlzJIOG3X0o3ptz1X+CeOGnCv6KCpPR2eQ6OPIKsZUGyEV9N75iwoSmNcrcsCtgJj2ysTJkm1vZGFcMH6a/X4mbjVDGZB41fE+WJI4ot9lWy/5sWQAIRk7WEf1Vt8LK/CGmzPV+UeKeL+iz/YfY2oDHhgBBPqBEbwk7M/W7fRMB623vFSU4b8unvKpFfA2TV5IsXq+wocupi4q8cwC7XJFIc25DZuZ042VuKF78ixWqE/2oV9bU9eNtKC5zp7Mxd8sgjHizG6xETb4nfAnHwsVPJrHGBrqIWnq8lRo=
+X-Forefront-Antispam-Report: CIP:165.204.84.17; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:CAL; SFV:NSPM; H:SATLEXMB03.amd.com; PTR:InfoDomainNonexistent; CAT:NONE;
+ SFS:(4636009)(46966006)(36840700001)(40470700002)(8936002)(26005)(8676002)(83380400001)(47076005)(7416002)(2906002)(4326008)(316002)(1076003)(44832011)(54906003)(16526019)(86362001)(40460700001)(186003)(82310400004)(6666004)(356005)(508600001)(70206006)(81166007)(6916009)(70586007)(426003)(36860700001)(336012)(5660300002)(36756003)(2616005)(36900700001);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 23:41:45.8319 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3be571a6-3cb7-4414-5f5e-08d9cfdbc4f9
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d; Ip=[165.204.84.17];
+ Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT031.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4021
+X-Mailman-Approved-At: Wed, 05 Jan 2022 07:15:04 -0500
+Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
+ David Hildenbrand <david@redhat.com>, Marc Orr <marcorr@google.com>,
+ linux-kselftest@vger.kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Shuah Khan <shuah@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Nathan Tempelman <natet@google.com>, Janosch
+ Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, x86@kernel.org, Ingo Molnar <mingo@redhat.com>,
+ Mingwei Zhang <mizhang@google.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>,
+ Thomas Gleixner <tglx@linutronix.de>, Varad Gautam <varad.gautam@suse.com>,
+ Jim Mattson <jmattson@google.com>, Steve Rutherford <srutherford@google.com>,
+ linux-kernel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ David Woodhouse <dwmw@amazon.co.uk>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -112,133 +136,133 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, Dec 30, 2021 at 09:11:12PM +0000, Sean Christopherson wrote:
+> On Fri, Dec 10, 2021, Michael Roth wrote:
+> > To summarize, x86 relies on a ucall based on using PIO intructions to generate
+> > an exit to userspace and provide the GVA of a dynamically-allocated ucall
+> > struct that resides in guest memory and contains information about how to
+> > handle/interpret the exit. This doesn't work for SEV guests for 3 main reasons:
+> > 
+> >   1) The guest memory is generally encrypted during run-time, so the guest
+> >      needs to ensure the ucall struct is allocated in shared memory.
+> >   2) The guest page table is also encrypted, so the address would need to be a
+> >      GPA instead of a GVA.
+> >   3) The guest vCPU register may also be encrypted in the case of
+> >      SEV-ES/SEV-SNP, so the approach of examining vCPU register state has
+> >      additional requirements such as requiring guest code to implement a #VC
+> >      handler that can provide the appropriate registers via a vmgexit.
+> > 
+> > To address these issues, the SEV selftest RFC1 patchset introduced a set of new
+> > SEV-specific interfaces that closely mirrored the functionality of
+> > ucall()/get_ucall(), but relied on a pre-allocated/static ucall buffer in
+> > shared guest memory so it that guest code could pass messages/state to the host
+> > by simply writing to this pre-arranged shared memory region and then generating
+> > an exit to userspace (via a halt instruction).
+> > 
+> > Paolo suggested instead implementing support for test/guest-specific ucall
+> > implementations that could be used as an alternative to the default PIO-based
+> > ucall implementations as-needed based on test/guest requirements, while still
+> > allowing for tests to use a common set interfaces like ucall()/get_ucall().
+> 
+> This all seems way more complicated than it needs to be.  HLT is _worse_ than
+> PIO on x86 because it triggers a userspace exit if and only if the local APIC is
+> not in-kernel.  That is bound to bite someone.
 
-On 1/4/22 11:15 PM, Marc Zyngier wrote:
-> Hi Eric,
->
-> On Tue, 04 Jan 2022 15:31:33 +0000,
-> Eric Auger <eric.auger@redhat.com> wrote:
->> Hi Marc,
->>
->> On 12/27/21 4:53 PM, Marc Zyngier wrote:
->>> Hi Eric,
->>>
->>> Picking this up again after a stupidly long time...
->>>
->>> On Mon, 04 Oct 2021 13:00:21 +0100,
->>> Eric Auger <eric.auger@redhat.com> wrote:
->>>> Hi Marc,
->>>>
->>>> On 10/3/21 6:46 PM, Marc Zyngier wrote:
->>>>> Currently, the highmem PCIe region is oddly keyed on the highmem
->>>>> attribute instead of highmem_ecam. Move the enablement of this PCIe
->>>>> region over to highmem_ecam.
->>>>>
->>>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
->>>>> ---
->>>>>  hw/arm/virt-acpi-build.c | 10 ++++------
->>>>>  hw/arm/virt.c            |  4 ++--
->>>>>  2 files changed, 6 insertions(+), 8 deletions(-)
->>>>>
->>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>>> index 037cc1fd82..d7bef0e627 100644
->>>>> --- a/hw/arm/virt-acpi-build.c
->>>>> +++ b/hw/arm/virt-acpi-build.c
->>>>> @@ -157,10 +157,9 @@ static void acpi_dsdt_add_virtio(Aml *scope,
->>>>>  }
->>>>>  
->>>>>  static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>>>> -                              uint32_t irq, bool use_highmem, bool highmem_ecam,
->>>>> -                              VirtMachineState *vms)
->>>>> +                              uint32_t irq, VirtMachineState *vms)
->>>>>  {
->>>>> -    int ecam_id = VIRT_ECAM_ID(highmem_ecam);
->>>>> +    int ecam_id = VIRT_ECAM_ID(vms->highmem_ecam);
->>>>>      struct GPEXConfig cfg = {
->>>>>          .mmio32 = memmap[VIRT_PCIE_MMIO],
->>>>>          .pio    = memmap[VIRT_PCIE_PIO],
->>>>> @@ -169,7 +168,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
->>>>>          .bus    = vms->bus,
->>>>>      };
->>>>>  
->>>>> -    if (use_highmem) {
->>>>> +    if (vms->highmem_ecam) {
->>>> highmem_ecam is more restrictive than use_highmem:
->>>> vms->highmem_ecam &= vms->highmem && (!firmware_loaded || aarch64);
->>>>
->>>> If I remember correctly there was a problem using highmem ECAM with 32b
->>>> AAVMF FW.
->>>>
->>>> However 5125f9cd2532 ("hw/arm/virt: Add high MMIO PCI region, 512G in
->>>> size") introduced high MMIO PCI region without this constraint.
->>> Then I really don't understand the point of this highmem_ecam. We only
->>> register the highmem version if highmem_ecam is set (see the use of
->>> VIRT_ECAM_ID() to pick the right ECAM window).
->> but aren't we talking about different regions? On one hand the [high]
->> MMIO region (512GB wide) and the [high] ECAM region (256MB large).
->> To me you can enable either independently. High MMIO region is used by
->> some devices likes ivshmem/video cards while high ECAM was introduced to
->> extend the number of supported buses: 601d626d148a (hw/arm/virt: Add a
->> new 256MB ECAM region).
->>
->> with the above change the high MMIO region won't be set with 32b
->> FW+kernel and LPAE whereas it is currently.
->>
->> high ECAM was not supported by 32b FW, hence the highmem_ecam.
->>
->> but maybe I miss your point?
-> There are two issues.
->
-> First, I have been conflating the ECAM and MMIO ranges, and you only
-> made me realise that they were supposed to be independent.  I still
-> think the keying on highmem is wrong, but the main issue is that the
-> highmem* flags don't quite describe the shape of the platform.
->
-> All these booleans indicate is whether the feature they describe (the
-> high MMIO range, the high ECAM range, and in one of my patches the
-> high RD range) are *allowed* to live above 4GB, but do not express
-> whether then are actually usable (i.e. fit in the PA range).
->
-> Maybe we need to be more thorough in the way we describe the extended
-> region in the VirtMachineState structure:
->
-> - highmem: overall control for anything that *can* live above 4GB
-> - highmem_ecam: Has a PCIe ECAM region above 256GB
-> - highmem_mmio: Has a PCIe MMIO region above 256GB
-> - highmem_redist: Has 512 RDs above 256GB
->
-> Crucially, the last 3 items must fit in the PA range or be disabled.
->
-> We have highmem_ecam which is keyed on highmem, but not on the PA
-> range.  highmem_mmio doesn't exist at all (we use highmem instead),
-"highmem_ecam is keyed on highmem but not on the PA range". True but it
-is properly taken into account in highest_gpa computation so eventually
-we make sure it does not overflow the IPA limit. Same for the high mmio
-region which is keyed on highmem.
-> and I'm only introducing highmem_redist.
->
-> For these 3 ranges, we should have something like
->
-> vms->highmem_xxx &= (vms->highmem &&
-> 		     (vms->memmap[XXX].base + vms->vms->memmap[XXX].size) < vms->highest_gpa);
+Hmmm, fair point. It's easy for me to just not use in-kernel APIC in
+the current SEV tests to avoid the issue, but HLT is being made
+available as an available ucall implementation for other tests as well,
+and given in-kernel APIC is set up automatically maybe it's not robust
+enough.
 
-couldn't you simply introduce highmem_redist which is truly missing. You
-could set it in virt_set_memmap() in case you skip extended_map overlay
-and use it in virt_gicv3_redist_region_count() as you did?
-In addition to the device memory top address check against the 4GB limit
-if !highmem, we should be fine then?
+> not in-kernel.  That is bound to bite someone.  The only issue with SEV is the
+> address, not the VM-Exit mechanism.  That doesn't change with SEV-ES, SEV-SNP,
+> or TDX, as PIO and HLT will both get reflected as #VC/#VE, i.e. the guest side
+> needs to be updated to use VMGEXIT/TDCALL no matter what, at which point having
+> the hypercall request PIO emulation is just as easy as requesting HLT.
 
-Eric
->
-> and treat them as independent entities.  Unless someone shouts, I'm
-> going to go ahead and implement this logic.
->
-> Thanks,
->
-> 	M.
->
+I'm not aware of any #VC handling needed for HLT in the case of
+SEV-ES/SEV-SNP. That was one of the reasons for the SEV tests using
+this ucall implementation. Of course, at some point, we'd want full support
+for PIO/MMIO/etc. in the #VC handler, but it's not something I'd planned on
+adding until after the SEV-SNP tests, since it seems like we'd need to
+import a bunch of intruction decoding code from elsewhere in the kernel,
+which is a lot of churn that's not immediately necessary for getting at least
+some basic tests in place. Since the HLT implementation is only 20 lines of
+code it seemed like a reasonable stop-gap until we start getting more CoCo
+tests in place. But the in-kernel APIC issue probably needs more
+consideration...
 
+Perhaps for *just* PIO, the intruction decoding can be open-coded so it
+can be added to the initial #VC handler implementation, which would avoid the
+need for HLT implementation. I'll take a look at that.
+
+> 
+> I also don't like having to differentiate between a "shared" and "regular" ucall.
+> I kind of like having to explicitly pass the ucall object being used, but that
+> puts undue burden on simple single-vCPU tests.
+
+I tried to avoid it, but I got hung up on that fact that pre-allocating
+arrays/lists of ucall structs needs to be done for each VM, and so we'd
+end up needing some way for a guest to identify which pool it's ucall
+struct should be allocated from. But you've gotten around that by just
+sync_global_to_guest()'ing for each pool at the time ucall_init() is
+called, so the guest only ever sees it's particular pool. Then the switch
+from writing GVA to writing GPA solves the translation problem. Nice.
+
+> 
+> The inability to read guest private memory is really the only issue, and that can
+> be easily solved without completely revamping the ucall framework, and without
+> having to update a huge pile of tests to make them place nice with private memory.
+
+I think the first 5 patches in this series are still relevant cleanups
+vs. having a complete standalone ucall implementation for each arch, and Andrew
+has also already started looking at other header cleanups related to
+patch #1, so maybe Paolo would still like to queue those. Would also
+provide a better starting point for having a centralized allocator for
+the ucall structs, which you hinted at wanting below.
+
+But the subsequent patches that add the ucall_shared() interfaces should
+probably be set aside for now in favor of your proposal.
+
+> 
+> This would also be a good opportunity to clean up the stupidity of tests having to
+> manually call ucall_init(), drop the unused/pointless @arg from ucall_init(), and
+> maybe even fix arm64's lurking landmine of not being SMP safe (the address is shared
+> by all vCPUs).
+
+I thought you *didn't* want to update a huge pile of tests :) I suppose
+it's unavoidable, since with your proposal, having something like ucall_init()
+being called at some point is required, as opposed to the current
+implementation where it is optional. Are you intending to have it be
+called automatically by vm_create*()?
+
+> 
+> To reduce the burden on tests and avoid ordering issues with creating vCPUs,
+> allocate a ucall struct for every possible vCPU when the VM is created and stuff
+> the GPA of the struct in the struct itself so that the guest can communicate the
+> GPA instead of the GVA.  Then confidential VMs just need to make all structs shared.
+
+So a separate call like:
+
+  ucall_make_shared(vm->ucall_list)
+
+? Might need some good documentation/assertions to make sure it gets
+called at the right place for confidential VMs, and may need some extra
+hooks in SEV selftest implementation for switching from private to shared
+after the memory has already been allocated, but seems reasonable.
+
+> 
+> If all architectures have a way to access a vCPU ID, the ucall structs could be
+> stored as a simple array.  If not, a list based allocator would probably suffice.
+
+I think list allocator is nicer, generating #VCs for both the PIO and the
+cpuid checks for vCPU lookup seems like a lot of extra noise to sift
+through while debugging where an errant test is failing, and doesn't seem to
+have any disadvantage vs. an array.
+
+Thanks,
+
+Mike
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
