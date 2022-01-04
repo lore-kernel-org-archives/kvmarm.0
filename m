@@ -2,103 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57190C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  4 Jan 2022 17:10:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C8DC4332F
+	for <kvmarm@archiver.kernel.org>; Tue,  4 Jan 2022 17:18:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87E4149F39;
-	Tue,  4 Jan 2022 12:10:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72CE74A0FD;
+	Tue,  4 Jan 2022 12:18:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lDa0x6t3AtP2; Tue,  4 Jan 2022 12:10:09 -0500 (EST)
+	with ESMTP id qF4C3oynuIO0; Tue,  4 Jan 2022 12:18:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 66D3F49F4B;
-	Tue,  4 Jan 2022 12:10:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 619DE49F43;
+	Tue,  4 Jan 2022 12:18:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DAB749F39
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 12:10:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D91E649F43
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 12:18:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gRddqKFWtw5P for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jan 2022 12:10:06 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A102349EFE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 12:10:05 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1641316205;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PLTIaY5gg/CGkjyFI0nVD1Ynp1qrSv98dwVoxTGL/gk=;
- b=AJW0duqdvpbTpNkkJJBxxZay8mHvtWn+4v0iQjIkvZi9YAb6hK0/S6XFzVUI7df99hSsn8
- 8277Of9jev/146U9Q4n5RnY1SNlZYnbVV0T2B5GvD22qVhdBPw5kfaMEu8pJ2sZ0aZLoBJ
- d1+KF6U9RBMMiAU2HKyjQKbzaDmZwgA=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-671-polc7Ux0PTWPoVG_ovezpg-1; Tue, 04 Jan 2022 12:10:04 -0500
-X-MC-Unique: polc7Ux0PTWPoVG_ovezpg-1
-Received: by mail-ed1-f71.google.com with SMTP id
- t1-20020a056402524100b003f8500f6e35so25854209edd.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Jan 2022 09:10:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=PLTIaY5gg/CGkjyFI0nVD1Ynp1qrSv98dwVoxTGL/gk=;
- b=3Wn3Gm6CaXxmBdQb/dWst22pSxxH51gEX7L1f4JsK61ymyYe8dMoRfCNtj7JUG37tg
- OkUC1kCRPxXNJr/YQmlgt1+cNya0OMIxOqp4ULHTPiL3ER4oPEtc7Kil2FXpFM+j+u1b
- aNP5sq/rNAopcYHtyG1difwL0Zuf7ChgBCWq6FOj0IwKTg77KtW8LwRRVA3LFuYnUyxu
- pIiAE+qXZS6Wft+jAy9gukpOTzBaEoMf/+P8DmBTpuyZemDIgNN0JfRAa6NQ6w6wZy8F
- coUOcTj+7k6QtV/TOxu2wgI9JVW2Yb+bJJoPtLFKSu1u4a1d9+k2Md59yrh6NfxUyxvc
- 84ww==
-X-Gm-Message-State: AOAM530bYVZNOJIGQC0OwurdQ7ZxYVkke3ZjFoNzw6xYjbKN447ODb1a
- XdYWtX4t/8C8FH23bgzpSNHgksVcI9oUiQ7XkQZo5p8L6ERYPcoJdUE/+huWBFb6nrlui1sGefx
- TMNmZUPeMW9Gd93OtDJsQVBcT
-X-Received: by 2002:a17:906:9f01:: with SMTP id
- fy1mr6911389ejc.475.1641316202903; 
- Tue, 04 Jan 2022 09:10:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzg4c8oC/snOnarWsLYe2OuhHx3dyq7Vui9X2KCh4F+Gwu3wSidctLFczPe7rbJzItTjhvIEQ==
-X-Received: by 2002:a17:906:9f01:: with SMTP id
- fy1mr6911372ejc.475.1641316202670; 
- Tue, 04 Jan 2022 09:10:02 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e?
- ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
- by smtp.googlemail.com with ESMTPSA id w17sm14932963edu.48.2022.01.04.09.07.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 04 Jan 2022 09:10:02 -0800 (PST)
-Message-ID: <b8e273bf-ae2c-cc5c-0d20-33f3dd12053c@redhat.com>
-Date: Tue, 4 Jan 2022 18:07:32 +0100
+ with ESMTP id iIMiWHtNpUZt for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Jan 2022 12:18:35 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9CF849EFE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 12:18:35 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 84B83B8179E;
+ Tue,  4 Jan 2022 17:18:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F5CC36AED;
+ Tue,  4 Jan 2022 17:18:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1641316713;
+ bh=UkZFEDb4tbKzvcbyZHYlvNAxkPyB5nrD6sI05Eqzrxs=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=t8nCcaZoMJpJjkAnP/295K453uXOowW5+h53HDseFaAudgqbpdgEDDf/VZ/qRPM5u
+ xM/gEswIQSU5d7mW6S6XrKt7xMY8QTg7B7Lbyuy/JepqtGbW+3NUY30O7+ZBVHj3sU
+ X5GsgO/3sQqcmj+FSpW9yiUrY86Cdd98bO3XJAO8EQutZEx71sOYtFuQg3lOUm3I38
+ vVTlV9kBo/BYG8V1hvaAbGoMlspamoDRebRMygF4uug87QdXl+EpBnrdJ2A9Kxkx6B
+ +VT2RZ+e8x6L8+D/LT21Gk2DXMd41HKH1MczRkQNgz19+k0fqina6zFbBAmoh/+BZX
+ u8amhnVle7Jyw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n4nSB-00Fy9A-2X; Tue, 04 Jan 2022 17:18:31 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 1/1] KVM: arm64: vgic: Replace kernel.h with the
+ necessary inclusions
+Date: Tue,  4 Jan 2022 17:18:23 +0000
+Message-Id: <164131669019.3722270.11121664995774113019.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220104151940.55399-1-andriy.shevchenko@linux.intel.com>
+References: <20220104151940.55399-1-andriy.shevchenko@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: Possible nohz-full/RCU issue in arm64 KVM
-To: Mark Rutland <mark.rutland@arm.com>
-References: <d80e440375896f75d45e227d40af60ca7ba24ceb.camel@redhat.com>
- <YbyO40zDW/kvUHEE@FVFF77S0Q05N>
- <70f112072d9496d21901946ea82832d3ed3a8cb2.camel@redhat.com>
- <Ybyg1r/Q6EfeuXGV@FVFF77S0Q05N>
- <9ab8107f-ff41-6a9e-57e1-a261bea93aca@redhat.com>
- <YdR4N9QVYOzjowAb@FVFF77S0Q05N>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YdR4N9QVYOzjowAb@FVFF77S0Q05N>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: paulmck <paulmck@kernel.org>, maz <maz@kernel.org>,
- frederic <frederic@kernel.org>, Anup Patel <Anup.Patel@wdc.com>,
- linux-kernel <linux-kernel@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
- rcu <rcu@vger.kernel.org>, Nicolas Saenz Julienne <nsaenzju@redhat.com>,
- Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ andriy.shevchenko@linux.intel.com, linux-arm-kernel@lists.infradead.org,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, james.morse@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -110,38 +79,26 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 1/4/22 17:39, Mark Rutland wrote:
-> My main issue here was just that it's really difficult to see how the
-> entry/exit logic is balanced, and I reckon we can solve that by splitting
-> guest_{enter,exit}_irqoff() into helper functions to handle the vtime
-> accounting separately from the context tracking, so that arch code can do
-> something like:
-> 
->    guest_timing_enter_irqoff();
->    
->    guest_eqs_enter_irqoff();
->    < actually run vCPU here >
->    guest_eqs_exit_irqoff();
->    
->    < handle pending IRQs here >
->    
->    guest_timing_exit_irqoff();
-> 
-> ... which I hope should work for RISC-V too.
-> 
-> I've had a go, and I've pushed out a WIP to:
-> 
->    https://git.kernel.org/pub/scm/linux/kernel/git/mark/linux.git/log/?h=arm64/kvm/rcu
+On Tue, 4 Jan 2022 17:19:40 +0200, Andy Shevchenko wrote:
+> The arm_vgic.h does not require all the stuff the kernel.h provides.
+> Replace kernel.h inclusion with the list of what is really being used.
 
-Yes, you have a point and it makes sense for x86 too.  You can send me a 
-topic branch once you get all the acks.  Thanks!
+Applied to next, thanks!
 
-Paolo
+[1/1] KVM: arm64: vgic: Replace kernel.h with the necessary inclusions
+      commit: 6c9eeb5f4a9bb2b11a40fd0f15efde7bd33ee908
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
 
 _______________________________________________
 kvmarm mailing list
