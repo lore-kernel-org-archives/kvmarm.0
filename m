@@ -2,124 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 310BFC433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Jan 2022 12:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6134FC433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Jan 2022 12:15:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ADCD4B164;
-	Wed,  5 Jan 2022 07:15:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFD264B1B6;
+	Wed,  5 Jan 2022 07:15:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@amd.com
+	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cW0p-j9aJlYe; Wed,  5 Jan 2022 07:15:04 -0500 (EST)
+	with ESMTP id giuiEoFryI+h; Wed,  5 Jan 2022 07:15:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D718C4B168;
-	Wed,  5 Jan 2022 07:15:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 049AB4B17B;
+	Wed,  5 Jan 2022 07:15:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BDB649E0E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 18:41:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B10D649E5F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 02:14:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q-R-NCuv-8f2 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Jan 2022 18:41:51 -0500 (EST)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com
- (mail-bn7nam10on2063.outbound.protection.outlook.com [40.107.92.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD8B140E3D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Jan 2022 18:41:51 -0500 (EST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nwKowROj6HFCwafIg5KKIgNc6ZxPkNlLOBRNmLDR5WHxSLr8mbVZlilFFaeVZMSbkT8/ZP4awSIICGo81EAmcTMNnhlCB9c7OhvcaY5ExU89X7LCYRqmc9uuvgnJ9Ys1l3IelQeWqjpkma2CS/Zu3tjxjrysCYvSEe3z8E5T/w0mWE9+xio/8GVRSzU6OFlZm03fdQCfewsxR6DJ8vXw2e6jDl0/RNwb54Nxy9uTVYE4SK2AbBiI1rRkp1M/d084tbJHHPisbbiibkilxJ5Svayse3gS7xsch6HQx671hdjcY2pHvG4fKaO3TjwEQUxGw+sqlMzzm8Nl+JY3f8PrpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XLlRqvdGVTwSwk5vsEEuVJZ+ZCogcD696/sFcvngZ8s=;
- b=mMlI1kDAP548ZjSKvVTTg7t/m4lep7TDLgxyN6GGuoaaPEzVuRgOSZg2vsrIdRMvCWdJOqkeH589RJQ/Y74jdPaUh72K6ckWXO7LnY9kS/LH9LYp6pMRFgy2mNxpxvtBtQWM8hy42GZMPgyBxZhGNSTXhytJefrHJR6wEdnXswWUYb06ysnFfp2rCKpu3BuDJw+iVGrJeUy3sNVmGP+XrXcww2v3tm9YXmvvbX93SbrrhZ4CDjoSbOMA5RB3hWsMDvLN3DD8LP7k7QL/g3w8DdIXYMJRKZRu3uIJUJASYNIJgyZlCXcvkTzmytUYiT5RJngNgZngstH35pCmYrJWZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1; 
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XLlRqvdGVTwSwk5vsEEuVJZ+ZCogcD696/sFcvngZ8s=;
- b=JzG/KaGVoz9EM/juIWWoMmxewVrQJwfYIZklTneozP5obiFxihSdnPLbolLHJav41nEbfXLAQGPUbcIbtGHXu2zEPSZCpUquf7EbL1Ud/k+A+qO1XEKNVCZzUih/OFoyWiS3OkZ+np8FzXdAtq+Oo5xapcNspCwJLKMwJxH9sbc=
-Received: from DM5PR15CA0027.namprd15.prod.outlook.com (2603:10b6:4:4b::13) by
- CH2PR12MB4021.namprd12.prod.outlook.com (2603:10b6:610:2b::29) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4867.7; Tue, 4 Jan 2022 23:41:45 +0000
-Received: from DM6NAM11FT031.eop-nam11.prod.protection.outlook.com
- (2603:10b6:4:4b:cafe::58) by DM5PR15CA0027.outlook.office365.com
- (2603:10b6:4:4b::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.16 via Frontend
- Transport; Tue, 4 Jan 2022 23:41:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- DM6NAM11FT031.mail.protection.outlook.com (10.13.172.203) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4867.7 via Frontend Transport; Tue, 4 Jan 2022 23:41:45 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Tue, 4 Jan
- 2022 17:41:45 -0600
-Date: Tue, 4 Jan 2022 17:35:17 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC PATCH 00/10] KVM: selftests: Add support for
- test-selectable ucall implementations
-Message-ID: <20220104233517.kxjbdw4t7taymab5@amd.com>
-References: <20211210164620.11636-1-michael.roth@amd.com>
- <Yc4gcJdhxthBKUUd@google.com>
+ with ESMTP id meWYqegp0cNi for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Jan 2022 02:14:50 -0500 (EST)
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com
+ [209.85.219.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9816849E44
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 02:14:50 -0500 (EST)
+Received: by mail-yb1-f179.google.com with SMTP id w13so81462085ybs.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Jan 2022 23:14:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Ar70wR0uLqi2vs94HMsJBd4iJvsCR4GfURTETOA2peg=;
+ b=SD0W30ayy7Ht5hRyPFvOr5WbZyHVyQN18ZhFUk+IIBAnlLcM1tBlRnBEzDcFl6OSJL
+ uI7M6gwsXpNSFE3e04UHM/uN3Sp6TUP45ODbxnjduSZfhXWqiG6B5VZe4Bf5mg2/Lc+1
+ u7+6ipOmw9UMoFdyTVfAAZwN2luyZVwUzc9NQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Ar70wR0uLqi2vs94HMsJBd4iJvsCR4GfURTETOA2peg=;
+ b=YTtGB8MXd7gbx4LEUMVE4fjKfj/ifTMvmrapsGKYRtMDhdWXeZ36ZKBq5Ybti9l20p
+ YbP4g6RbKIf3Idh3SS4XQYEAlbF4zLvkbTUVAI/oTTWzoK3t7HEc/7WYTdK5+Sx/ld0/
+ 5V1dPzpll83LbK6V+3VLO9Ry5et2q9GrS5FMsz2D1liuLhYOt12O1WLcEswTB4D3moBh
+ PK4glpRiG+u3WKTPC0U3K5XaKmQUDCFtC6gDp1mRMArSWpA4iBYDwW4CXPTYsc8QLeYz
+ 47stw20XprSC6X7Se/hJuB7yRZrrXjJlbrzQZmU+IT9/0ESvGdw4/Rb7f3RzRts4q6tV
+ bDpQ==
+X-Gm-Message-State: AOAM533ELJW00a5yvuHfweS6TXsxataGJydF2vXvOSJzq1hbfoaI1hL/
+ WX51QlyMwuey/GIGxkpVQvioQuXzBRdPXx8xPnVTNw==
+X-Google-Smtp-Source: ABdhPJzMM9JD+YzU8GTpgvjQLU5j4pITzxMThzVJzImk/yziKs0vvTKMKEFlvsFvSU4M8Z5KLi8KkuIpUIk9t+9Hk2k=
+X-Received: by 2002:a5b:350:: with SMTP id q16mr545180ybp.639.1641366890092;
+ Tue, 04 Jan 2022 23:14:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yc4gcJdhxthBKUUd@google.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
- (10.181.40.144)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3be571a6-3cb7-4414-5f5e-08d9cfdbc4f9
-X-MS-TrafficTypeDiagnostic: CH2PR12MB4021:EE_
-X-Microsoft-Antispam-PRVS: <CH2PR12MB40218E908801E32AAFF7E3AF954A9@CH2PR12MB4021.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: l3U2gnaiY8QcHRokiHA2uFp/PloRhzY3Y0BR1wQsylhv7XdpI1WNVC+kgy5cwmNRU1N8imiaxlWnm0UPi8i9hAIjdGF0Y491YAP0piFW6ELAfpDaTznrFqZDcQ2h+LYNbtlvghq57y1nUXa03Jg2uWbwT6ErBljj+DS/DtiG0X/QqDgRP32EWec+VKxmFfu2xwyoM0q9Lk1tcoYMk9QkeHM28sEugM6kFMTAeUv2BkwQfmjWpkfqY9MPRYKZZ1ySJP6nuzCwa5hnnZjw5NctBPN8GDQ1s01tSRKV4dEXlPocRAaTCfypRPTAYmD37jZdwCWJHaVgR/8G72Z+dI3WFx3txA1A97ynX5nhHNQ/pk+JJknSBcidNIputO9YJM4bPCBMAp/PBAIXZYBo/CczFzCX+o0sv9gVvc25kuwo5UnP8jk6IkFQUEqwaMtDBRZYXV8JMovv5tlMIX4CV+Lsi2KQXJ7e3GN88xrM3mMHgWFYm/fxivoBkFc6xtf1TWx12WJn5GlzJIOG3X0o3ptz1X+CeOGnCv6KCpPR2eQ6OPIKsZUGyEV9N75iwoSmNcrcsCtgJj2ysTJkm1vZGFcMH6a/X4mbjVDGZB41fE+WJI4ot9lWy/5sWQAIRk7WEf1Vt8LK/CGmzPV+UeKeL+iz/YfY2oDHhgBBPqBEbwk7M/W7fRMB623vFSU4b8unvKpFfA2TV5IsXq+wocupi4q8cwC7XJFIc25DZuZ042VuKF78ixWqE/2oV9bU9eNtKC5zp7Mxd8sgjHizG6xETb4nfAnHwsVPJrHGBrqIWnq8lRo=
-X-Forefront-Antispam-Report: CIP:165.204.84.17; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:CAL; SFV:NSPM; H:SATLEXMB03.amd.com; PTR:InfoDomainNonexistent; CAT:NONE;
- SFS:(4636009)(46966006)(36840700001)(40470700002)(8936002)(26005)(8676002)(83380400001)(47076005)(7416002)(2906002)(4326008)(316002)(1076003)(44832011)(54906003)(16526019)(86362001)(40460700001)(186003)(82310400004)(6666004)(356005)(508600001)(70206006)(81166007)(6916009)(70586007)(426003)(36860700001)(336012)(5660300002)(36756003)(2616005)(36900700001);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2022 23:41:45.8319 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3be571a6-3cb7-4414-5f5e-08d9cfdbc4f9
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d; Ip=[165.204.84.17];
- Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT031.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4021
+References: <20211129034317.2964790-1-stevensd@google.com>
+ <20211129034317.2964790-5-stevensd@google.com>
+ <Yc4G23rrSxS59br5@google.com>
+In-Reply-To: <Yc4G23rrSxS59br5@google.com>
+From: David Stevens <stevensd@chromium.org>
+Date: Wed, 5 Jan 2022 16:14:39 +0900
+Message-ID: <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
+Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
+To: Sean Christopherson <seanjc@google.com>
 X-Mailman-Approved-At: Wed, 05 Jan 2022 07:15:04 -0500
-Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Marc Orr <marcorr@google.com>,
- linux-kselftest@vger.kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Nathan Tempelman <natet@google.com>, Janosch
- Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, x86@kernel.org, Ingo Molnar <mingo@redhat.com>,
- Mingwei Zhang <mizhang@google.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>,
- Thomas Gleixner <tglx@linutronix.de>, Varad Gautam <varad.gautam@suse.com>,
- Jim Mattson <jmattson@google.com>, Steve Rutherford <srutherford@google.com>,
- linux-kernel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- David Woodhouse <dwmw@amazon.co.uk>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -136,133 +84,110 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Dec 30, 2021 at 09:11:12PM +0000, Sean Christopherson wrote:
-> On Fri, Dec 10, 2021, Michael Roth wrote:
-> > To summarize, x86 relies on a ucall based on using PIO intructions to generate
-> > an exit to userspace and provide the GVA of a dynamically-allocated ucall
-> > struct that resides in guest memory and contains information about how to
-> > handle/interpret the exit. This doesn't work for SEV guests for 3 main reasons:
-> > 
-> >   1) The guest memory is generally encrypted during run-time, so the guest
-> >      needs to ensure the ucall struct is allocated in shared memory.
-> >   2) The guest page table is also encrypted, so the address would need to be a
-> >      GPA instead of a GVA.
-> >   3) The guest vCPU register may also be encrypted in the case of
-> >      SEV-ES/SEV-SNP, so the approach of examining vCPU register state has
-> >      additional requirements such as requiring guest code to implement a #VC
-> >      handler that can provide the appropriate registers via a vmgexit.
-> > 
-> > To address these issues, the SEV selftest RFC1 patchset introduced a set of new
-> > SEV-specific interfaces that closely mirrored the functionality of
-> > ucall()/get_ucall(), but relied on a pre-allocated/static ucall buffer in
-> > shared guest memory so it that guest code could pass messages/state to the host
-> > by simply writing to this pre-arranged shared memory region and then generating
-> > an exit to userspace (via a halt instruction).
-> > 
-> > Paolo suggested instead implementing support for test/guest-specific ucall
-> > implementations that could be used as an alternative to the default PIO-based
-> > ucall implementations as-needed based on test/guest requirements, while still
-> > allowing for tests to use a common set interfaces like ucall()/get_ucall().
-> 
-> This all seems way more complicated than it needs to be.  HLT is _worse_ than
-> PIO on x86 because it triggers a userspace exit if and only if the local APIC is
-> not in-kernel.  That is bound to bite someone.
+On Fri, Dec 31, 2021 at 4:22 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Nov 29, 2021, David Stevens wrote:
+> > From: David Stevens <stevensd@chromium.org>
+> >
+> > Remove two warnings that require ref counts for pages to be non-zero, as
+> > mapped pfns from follow_pfn may not have an initialized ref count.
+> >
+> > Signed-off-by: David Stevens <stevensd@chromium.org>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 7 -------
+> >  virt/kvm/kvm_main.c    | 2 +-
+> >  2 files changed, 1 insertion(+), 8 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 0626395ff1d9..7c4c7fededf0 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -621,13 +621,6 @@ static int mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+> >
+> >       pfn = spte_to_pfn(old_spte);
+> >
+> > -     /*
+> > -      * KVM does not hold the refcount of the page used by
+> > -      * kvm mmu, before reclaiming the page, we should
+> > -      * unmap it from mmu first.
+> > -      */
+> > -     WARN_ON(!kvm_is_reserved_pfn(pfn) && !page_count(pfn_to_page(pfn)));
+> > -
+> >       if (is_accessed_spte(old_spte))
+> >               kvm_set_pfn_accessed(pfn);
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 16a8a71f20bf..d81edcb3e107 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -170,7 +170,7 @@ bool kvm_is_zone_device_pfn(kvm_pfn_t pfn)
+> >        * the device has been pinned, e.g. by get_user_pages().  WARN if the
+> >        * page_count() is zero to help detect bad usage of this helper.
+>
+> Stale comment.
+>
+> >        */
+> > -     if (!pfn_valid(pfn) || WARN_ON_ONCE(!page_count(pfn_to_page(pfn))))
+> > +     if (!pfn_valid(pfn) || !page_count(pfn_to_page(pfn)))
+>
+> Hrm, I know the whole point of this series is to support pages without an elevated
+> refcount, but this WARN was extremely helpful in catching several use-after-free
+> bugs in the TDP MMU.  We talked about burying a slow check behind MMU_WARN_ON, but
+> that isn't very helpful because no one runs with MMU_WARN_ON, and this is also a
+> type of check that's most useful if it runs in production.
+>
+> IIUC, this series explicitly disallows using pfns that have a struct page without
+> refcounting, and the issue with the WARN here is that kvm_is_zone_device_pfn() is
+> called by kvm_is_reserved_pfn() before ensure_pfn_ref() rejects problematic pages,
+> i.e. triggers false positive.
+>
+> So, can't we preserve the use-after-free benefits of the check by moving it to
+> where KVM releases the PFN?  I.e.
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index fbca2e232e94..675b835525fa 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2904,15 +2904,19 @@ EXPORT_SYMBOL_GPL(kvm_release_pfn_dirty);
+>
+>  void kvm_set_pfn_dirty(kvm_pfn_t pfn)
+>  {
+> -       if (!kvm_is_reserved_pfn(pfn) && !kvm_is_zone_device_pfn(pfn))
+> +       if (!kvm_is_reserved_pfn(pfn) && !kvm_is_zone_device_pfn(pfn)) {
+> +               WARN_ON_ONCE(!page_count(pfn_to_page(pfn)));
+>                 SetPageDirty(pfn_to_page(pfn));
+> +       }
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_set_pfn_dirty);
 
-Hmmm, fair point. It's easy for me to just not use in-kernel APIC in
-the current SEV tests to avoid the issue, but HLT is being made
-available as an available ucall implementation for other tests as well,
-and given in-kernel APIC is set up automatically maybe it's not robust
-enough.
+I'm still seeing this warning show up via __handle_changed_spte
+calling kvm_set_pfn_dirty:
 
-> not in-kernel.  That is bound to bite someone.  The only issue with SEV is the
-> address, not the VM-Exit mechanism.  That doesn't change with SEV-ES, SEV-SNP,
-> or TDX, as PIO and HLT will both get reflected as #VC/#VE, i.e. the guest side
-> needs to be updated to use VMGEXIT/TDCALL no matter what, at which point having
-> the hypercall request PIO emulation is just as easy as requesting HLT.
+[  113.350473]  kvm_set_pfn_dirty+0x26/0x3e
+[  113.354861]  __handle_changed_spte+0x452/0x4f6
+[  113.359841]  __handle_changed_spte+0x452/0x4f6
+[  113.364819]  __handle_changed_spte+0x452/0x4f6
+[  113.369790]  zap_gfn_range+0x1de/0x27a
+[  113.373992]  kvm_tdp_mmu_zap_invalidated_roots+0x64/0xb8
+[  113.379945]  kvm_mmu_zap_all_fast+0x18c/0x1c1
+[  113.384827]  kvm_page_track_flush_slot+0x55/0x87
+[  113.390000]  kvm_set_memslot+0x137/0x455
+[  113.394394]  kvm_delete_memslot+0x5c/0x91
+[  113.398888]  __kvm_set_memory_region+0x3c0/0x5e6
+[  113.404061]  kvm_set_memory_region+0x45/0x74
+[  113.408844]  kvm_vm_ioctl+0x563/0x60c
 
-I'm not aware of any #VC handling needed for HLT in the case of
-SEV-ES/SEV-SNP. That was one of the reasons for the SEV tests using
-this ucall implementation. Of course, at some point, we'd want full support
-for PIO/MMIO/etc. in the #VC handler, but it's not something I'd planned on
-adding until after the SEV-SNP tests, since it seems like we'd need to
-import a bunch of intruction decoding code from elsewhere in the kernel,
-which is a lot of churn that's not immediately necessary for getting at least
-some basic tests in place. Since the HLT implementation is only 20 lines of
-code it seemed like a reasonable stop-gap until we start getting more CoCo
-tests in place. But the in-kernel APIC issue probably needs more
-consideration...
+I wasn't seeing it for my particular test case, but the gfn aging code
+might trigger the warning as well.
 
-Perhaps for *just* PIO, the intruction decoding can be open-coded so it
-can be added to the initial #VC handler implementation, which would avoid the
-need for HLT implementation. I'll take a look at that.
+I don't know if setting the dirty/accessed bits in non-refcounted
+struct pages is problematic. The only way I can see to avoid it would
+be to try to map from the spte to the vma and then check its flags. If
+setting the flags is benign, then we'd need to do that lookup to
+differentiate the safe case from the use-after-free case. Do you have
+any advice on how to handle this?
 
-> 
-> I also don't like having to differentiate between a "shared" and "regular" ucall.
-> I kind of like having to explicitly pass the ucall object being used, but that
-> puts undue burden on simple single-vCPU tests.
-
-I tried to avoid it, but I got hung up on that fact that pre-allocating
-arrays/lists of ucall structs needs to be done for each VM, and so we'd
-end up needing some way for a guest to identify which pool it's ucall
-struct should be allocated from. But you've gotten around that by just
-sync_global_to_guest()'ing for each pool at the time ucall_init() is
-called, so the guest only ever sees it's particular pool. Then the switch
-from writing GVA to writing GPA solves the translation problem. Nice.
-
-> 
-> The inability to read guest private memory is really the only issue, and that can
-> be easily solved without completely revamping the ucall framework, and without
-> having to update a huge pile of tests to make them place nice with private memory.
-
-I think the first 5 patches in this series are still relevant cleanups
-vs. having a complete standalone ucall implementation for each arch, and Andrew
-has also already started looking at other header cleanups related to
-patch #1, so maybe Paolo would still like to queue those. Would also
-provide a better starting point for having a centralized allocator for
-the ucall structs, which you hinted at wanting below.
-
-But the subsequent patches that add the ucall_shared() interfaces should
-probably be set aside for now in favor of your proposal.
-
-> 
-> This would also be a good opportunity to clean up the stupidity of tests having to
-> manually call ucall_init(), drop the unused/pointless @arg from ucall_init(), and
-> maybe even fix arm64's lurking landmine of not being SMP safe (the address is shared
-> by all vCPUs).
-
-I thought you *didn't* want to update a huge pile of tests :) I suppose
-it's unavoidable, since with your proposal, having something like ucall_init()
-being called at some point is required, as opposed to the current
-implementation where it is optional. Are you intending to have it be
-called automatically by vm_create*()?
-
-> 
-> To reduce the burden on tests and avoid ordering issues with creating vCPUs,
-> allocate a ucall struct for every possible vCPU when the VM is created and stuff
-> the GPA of the struct in the struct itself so that the guest can communicate the
-> GPA instead of the GVA.  Then confidential VMs just need to make all structs shared.
-
-So a separate call like:
-
-  ucall_make_shared(vm->ucall_list)
-
-? Might need some good documentation/assertions to make sure it gets
-called at the right place for confidential VMs, and may need some extra
-hooks in SEV selftest implementation for switching from private to shared
-after the memory has already been allocated, but seems reasonable.
-
-> 
-> If all architectures have a way to access a vCPU ID, the ucall structs could be
-> stored as a simple array.  If not, a list based allocator would probably suffice.
-
-I think list allocator is nicer, generating #VCs for both the PIO and the
-cpuid checks for vCPU lookup seems like a lot of extra noise to sift
-through while debugging where an errant test is failing, and doesn't seem to
-have any disadvantage vs. an array.
-
-Thanks,
-
-Mike
+-David
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
