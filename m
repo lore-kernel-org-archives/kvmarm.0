@@ -2,94 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78449C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  5 Jan 2022 17:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE805C433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  5 Jan 2022 19:02:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3A834B0AC;
-	Wed,  5 Jan 2022 12:43:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61C544A0FC;
+	Wed,  5 Jan 2022 14:02:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SVW9kSwWcI8u; Wed,  5 Jan 2022 12:43:28 -0500 (EST)
+	with ESMTP id nqrZgxHXXWm8; Wed,  5 Jan 2022 14:02:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A5C4A4B178;
-	Wed,  5 Jan 2022 12:43:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AC174B1B2;
+	Wed,  5 Jan 2022 14:02:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FD904B0AC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 12:43:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B04B4A0FC
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 14:02:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Jx1Mx+FpZepk for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Jan 2022 12:43:27 -0500 (EST)
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com
- [209.85.215.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E5D4749F27
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 12:43:26 -0500 (EST)
-Received: by mail-pg1-f176.google.com with SMTP id s1so34594631pga.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Jan 2022 09:43:26 -0800 (PST)
+ with ESMTP id R-8J+jWu9RZJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Jan 2022 14:02:46 -0500 (EST)
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com
+ [209.85.214.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3152649F57
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 14:02:46 -0500 (EST)
+Received: by mail-pl1-f176.google.com with SMTP id n16so333201plc.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Jan 2022 11:02:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=d0CM6f3epcJvfBW0AXtigNVn6uvFqm9aqgCZO4wHLDk=;
- b=tl5TRjsO5Xxya025PNLR1EZhjvW5OGtyRhabN1q5A5IArEgVtoWDWrSBJ21dwXsLjJ
- vdZxF+6np6puiGX/osCjuCDHponMy6k+twhvIPmg6JRQaLAHPwiowkDpOK9mWnzy8tCz
- zwVuLsSr/vgUBNcDIhKNzrDZiEuOLE2La4mQeVvt4IZEJRFPAqHUHbdud1JyxFU1GfnJ
- 1HabHYkloYIQhFfgVz5SPWmkBXbgKu4uUW8luD/Dsw1gHEFdhjgyp0Ccb0dA4C2TK9kR
- nKW8e9RqTLmvsjL+Bf6mwSW2nqseC+APgxNHzQrXXkfe9oyaKit6o7mlpqem+1X/1wmJ
- YiLw==
+ bh=C5TGxSihMQO3IXFdvvnm4Z/BjCSMQVybEIBkkH4uWd0=;
+ b=HBJacN4jBaXROANJNZOIsFCQr+cw2jAtH4pkRI5I0lWUCoa92DjpcPfElpngDicJzA
+ 0YyiOx5jgXBKIJ5sic5Wlmw5GLmGQaw/f6lvVmLi5zTn618CwkkKi6SqMJfbw9DZaCxa
+ nfyKvwXyGMHeXdC0ZGBuJhg6GdPua+6zJu52b+eSYfcZZz2KeeKkyOdb1ak69MwvXNS7
+ OQJd3WVIpvcprUaSnHlu4JHAKjMloofyJeKbNNo0zyTclI0eQ8VmpfzpTq6iytqyBm2D
+ nq++D6Xs4Gg3FrMu2idotXpK7jS54v9lhWU6lSrkp4qK81/QiMV+fhJaBeOdBhMl8lle
+ /4FQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=d0CM6f3epcJvfBW0AXtigNVn6uvFqm9aqgCZO4wHLDk=;
- b=pDrFp3hXMC0Ilp3YqMwgbAETEXESLwFwkx2sRVg13I93IQaPB+Gl3RhvEuyujGTOj8
- 3nx5RsHjYb3Xjs12jwgXn2sdHhJAYbv9OgcPT5b7n8mBVJ1M92wUVlSQhil+BUv4fvP8
- 4B6T6xYF7xpjtnO+SmFTaFbTXNfb4sXtJXmCDk8LMq1VJDFt0QEnwybw3DhUMEA6KSxo
- kNUsHfpY+8Ag5dgsw1ICpyBtLYujS8pZIVx94xGs7UppmKBBJuvFtoH8rUPLbZerVOLS
- q3htxm84OX7RZa3E1+4NDNRF2aFnOEjg/72H5azqVL59laxecspcDJ+m+V98U74aydZQ
- qvDg==
-X-Gm-Message-State: AOAM5323ltz9ojmD7gGSWLMErJzdtU9CIu7WqrCuHTXsZcr89ljeBOAQ
- GS4UD7azOYYlb9a8YejLBrov9A==
-X-Google-Smtp-Source: ABdhPJwUZuz0qf9rWN8CepkOkzOr4I60nu3nQPtBtpnE9XlUI3LUblc5PYLxfy2mn11zbjt4rTQZIw==
-X-Received: by 2002:a05:6a00:198a:b0:4bb:4621:f074 with SMTP id
- d10-20020a056a00198a00b004bb4621f074mr56308050pfl.69.1641404605737; 
- Wed, 05 Jan 2022 09:43:25 -0800 (PST)
+ bh=C5TGxSihMQO3IXFdvvnm4Z/BjCSMQVybEIBkkH4uWd0=;
+ b=vqxMjTD6SfmFGOc7lNOuytdFwPMXnLt3iZTNUPOMD+04Dmn5bJPmSZkn+wW7KJVV7p
+ AePz7m6huYBzrLWnqOMoWY6r+9ATRAvZiqEANxWoAJQL3xcTQQWKRJw4SLjjTvHqRegm
+ ZjVy9jojv6VWK7O5e4UvNfjXRMEV2Tuqev2EQo8XpBayF4HQequ57D/N/x7pqFIU1bT7
+ 9yoP8TIb2lW33D3SbMQbScmWmXXpK9BpcDynV0evGcEyF6Lhmm66ViKUowFSs3dWgNEE
+ fnOH4o/c4m6qxtcppq3/DXWbyW2aN+tnYutVDQqV8KfYipY+fVxAtSPENEtJ6WwCwfn5
+ c0UA==
+X-Gm-Message-State: AOAM532rW5bV3gqI1aKvXFvZARGk5teLgnwGjNgUOBVi+jjodEHjd3xd
+ 2kblFsFdE/VvgZWOa4xYmIOxEQ==
+X-Google-Smtp-Source: ABdhPJxUdnM3b6DqognTobDbG9Dmm0Ti/SDctNLZ/xAkOE4liZ0NPc+FLQpmerY5LVHMbecEx6BgSQ==
+X-Received: by 2002:a17:902:8e84:b0:149:a2cb:4dac with SMTP id
+ bg4-20020a1709028e8400b00149a2cb4dacmr30257117plb.22.1641409365057; 
+ Wed, 05 Jan 2022 11:02:45 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id r10sm45070777pff.120.2022.01.05.09.43.24
+ by smtp.gmail.com with ESMTPSA id y129sm10931675pfy.164.2022.01.05.11.02.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 05 Jan 2022 09:43:25 -0800 (PST)
-Date: Wed, 5 Jan 2022 17:43:21 +0000
+ Wed, 05 Jan 2022 11:02:44 -0800 (PST)
+Date: Wed, 5 Jan 2022 19:02:41 +0000
 From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Subject: Re: [RFC PATCH 00/10] KVM: selftests: Add support for
- test-selectable ucall implementations
-Message-ID: <YdXYuaoXJux6lHrF@google.com>
-References: <20211210164620.11636-1-michael.roth@amd.com>
- <Yc4gcJdhxthBKUUd@google.com>
- <20220104233517.kxjbdw4t7taymab5@amd.com>
- <YdTjnRZQID5IabK0@google.com>
- <20220105170244.jwr6i2erecbhx3fz@amd.com>
+To: David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
+Message-ID: <YdXrURHO/R82puD4@google.com>
+References: <20211129034317.2964790-1-stevensd@google.com>
+ <20211129034317.2964790-5-stevensd@google.com>
+ <Yc4G23rrSxS59br5@google.com>
+ <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220105170244.jwr6i2erecbhx3fz@amd.com>
-Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Marc Orr <marcorr@google.com>,
- linux-kselftest@vger.kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Nathan Tempelman <natet@google.com>,
- Janosch Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, x86@kernel.org, Ingo Molnar <mingo@redhat.com>,
- Mingwei Zhang <mizhang@google.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>,
- Thomas Gleixner <tglx@linutronix.de>, Varad Gautam <varad.gautam@suse.com>,
- Jim Mattson <jmattson@google.com>, Steve Rutherford <srutherford@google.com>,
- linux-kernel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- David Woodhouse <dwmw@amazon.co.uk>
+In-Reply-To: <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,110 +95,104 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 05, 2022, Michael Roth wrote:
-> On Wed, Jan 05, 2022 at 12:17:33AM +0000, Sean Christopherson wrote:
-> > PIO shouldn't require instruction decoding or a #VC handler.  What I was thinking
-> > is that the guest in the selftest would make a direct #VMGEXIT/TDCALL to request
-> > PIO instead of executing an OUT.  
+On Wed, Jan 05, 2022, David Stevens wrote:
+> On Fri, Dec 31, 2021 at 4:22 AM Sean Christopherson <seanjc@google.com> wrote:
+> > >        */
+> > > -     if (!pfn_valid(pfn) || WARN_ON_ONCE(!page_count(pfn_to_page(pfn))))
+> > > +     if (!pfn_valid(pfn) || !page_count(pfn_to_page(pfn)))
+> >
+> > Hrm, I know the whole point of this series is to support pages without an elevated
+> > refcount, but this WARN was extremely helpful in catching several use-after-free
+> > bugs in the TDP MMU.  We talked about burying a slow check behind MMU_WARN_ON, but
+> > that isn't very helpful because no one runs with MMU_WARN_ON, and this is also a
+> > type of check that's most useful if it runs in production.
+> >
+> > IIUC, this series explicitly disallows using pfns that have a struct page without
+> > refcounting, and the issue with the WARN here is that kvm_is_zone_device_pfn() is
+> > called by kvm_is_reserved_pfn() before ensure_pfn_ref() rejects problematic pages,
+> > i.e. triggers false positive.
+> >
+> > So, can't we preserve the use-after-free benefits of the check by moving it to
+> > where KVM releases the PFN?  I.e.
+> >
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index fbca2e232e94..675b835525fa 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -2904,15 +2904,19 @@ EXPORT_SYMBOL_GPL(kvm_release_pfn_dirty);
+> >
+> >  void kvm_set_pfn_dirty(kvm_pfn_t pfn)
+> >  {
+> > -       if (!kvm_is_reserved_pfn(pfn) && !kvm_is_zone_device_pfn(pfn))
+> > +       if (!kvm_is_reserved_pfn(pfn) && !kvm_is_zone_device_pfn(pfn)) {
+> > +               WARN_ON_ONCE(!page_count(pfn_to_page(pfn)));
+> >                 SetPageDirty(pfn_to_page(pfn));
+> > +       }
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_set_pfn_dirty);
 > 
-> That seems like a nicer approach. But it sort of lends itself to having
-> test-specific ucall implementations in some form. How are you thinking
-> vm_create() should decide what implementation to use? With this series
-> in place it could be something like:
+> I'm still seeing this warning show up via __handle_changed_spte
+> calling kvm_set_pfn_dirty:
 > 
->   vm_create(..., struct ucall_ops *ops)
->     ucall_init_ops(ops)
+> [  113.350473]  kvm_set_pfn_dirty+0x26/0x3e
+> [  113.354861]  __handle_changed_spte+0x452/0x4f6
+> [  113.359841]  __handle_changed_spte+0x452/0x4f6
+> [  113.364819]  __handle_changed_spte+0x452/0x4f6
+> [  113.369790]  zap_gfn_range+0x1de/0x27a
+> [  113.373992]  kvm_tdp_mmu_zap_invalidated_roots+0x64/0xb8
+> [  113.379945]  kvm_mmu_zap_all_fast+0x18c/0x1c1
+> [  113.384827]  kvm_page_track_flush_slot+0x55/0x87
+> [  113.390000]  kvm_set_memslot+0x137/0x455
+> [  113.394394]  kvm_delete_memslot+0x5c/0x91
+> [  113.398888]  __kvm_set_memory_region+0x3c0/0x5e6
+> [  113.404061]  kvm_set_memory_region+0x45/0x74
+> [  113.408844]  kvm_vm_ioctl+0x563/0x60c
 > 
-> and with the SEV selftests in their current form it would look something
-> like:
-> 
->   sev_vm_create(...)
->     vm_create_with_ucall(..., ops=ucall_ops_pio_vmgexit)
->       ucall_init_ops(ops)
-> 
-> is that sort of what you're thinking, or something else?
+> I wasn't seeing it for my particular test case, but the gfn aging code
+> might trigger the warning as well.
 
-I keep forgetting ucall() doesn't have access to the VM.  But, since we're
-restricing ucall() to a single VM, we can have a global that sets ucall_ops during
-ucall_init() based on the VM type, or skip an ops and just open code the behavior
-in x86's ucall() by snapshotting the VM type.  Either way, the goal is to avoid
-having to pass in ucall_ops at the test level.
+Ah, I got royally confused by ensure_pfn_ref()'s comment
 
-> > Yeah, I was thinking it could be done at the lowest level vm_create() helper.
-> > We'll need to expand vm_create() (or add yet another layer to avoid modifying a
-> > pile of tests) to allow opting out of initializing ucall, e.g. sev_migrate_tests.c
-> > needs to create multiple concurrent VMs, but happily doesn't need ucall support.
-> 
-> Why does sev_migrate_tests need to opt out? Couldn't it use
-> ucall_ops_pio_vmgexit like that SEV case above?
+  * Certain IO or PFNMAP mappings can be backed with valid
+  * struct pages, but be allocated without refcounting e.g.,
+  * tail pages of non-compound higher order allocations, which
+  * would then underflow the refcount when the caller does the
+  * required put_page. Don't allow those pages here.
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+that doesn't apply here because kvm_faultin_pfn() uses the low level
+__gfn_to_pfn_page_memslot().
 
-Because it uses multiple VMs, and my rough sketch only allows for a single VM to
-use ucall.  Though I suppose we could simply keep appending to the ucall list for
-every VM.  The requirement would then be that all VMs are of the same type, i.e.
-utilize the same ucall_ops.
+and my understanding is that @page will be non-NULL in ensure_pfn_ref() iff the
+page has an elevated refcount.
 
-> I ask because there is a ucall() in the exception handling code where
-> some unhandled exceptions result in the guest automatically issuing a
-> ucall(UCALL_UNHANDLED), so even when tests don't use ucall() they
-> might still rely on it if they enable exception handling. So that might
-> be an argument for always setting up at least the default ucall_ops_pio
-> implementation and creating a pool just in case. (or an argument for
-> dropping the UCALL_HANDLED handling).
+Can you update the changelogs for the x86+arm64 "use gfn_to_pfn_page" patches to
+explicitly call out the various ramifications of moving to gfn_to_pfn_page()?
 
-The sev_migrate_tests don't even run a guest, hence the quick-and-dirty "solution".
-Though thinking toward the future, that may be too dirty as it would prevent tests
-from having multiple "real" VMs.
+Side topic, s/covert/convert in both changelogs :-)
 
-> > > > To reduce the burden on tests and avoid ordering issues with creating vCPUs,
-> > > > allocate a ucall struct for every possible vCPU when the VM is created and stuff
-> > > > the GPA of the struct in the struct itself so that the guest can communicate the
-> > > > GPA instead of the GVA.  Then confidential VMs just need to make all structs shared.
-> > > 
-> > > So a separate call like:
-> > > 
-> > >   ucall_make_shared(vm->ucall_list)
-> > > 
-> > > ? Might need some good documentation/assertions to make sure it gets
-> > > called at the right place for confidential VMs, and may need some extra
-> > > hooks in SEV selftest implementation for switching from private to shared
-> > > after the memory has already been allocated, but seems reasonable.
-> > 
-> > Again, I was thinking that it would be done unconditionally by ucall_init(), i.e.
-> > would be automatically handled by the selftest framework and would Just Work for
-> > individual tests.
-> 
-> Ok, I'll have to think that through more. Currently with the SEV
-> selftests as they we have:
-> 
->   sev_vm_create(policy, npages)
->     vm = vm_create(...)
->     vm_set_memory_encryption(vm, encrypt_by_default, enc_bit)
->     //vm_vaddr_alloc_shared() can be used now
-> 
-> The ucall struct allocations would need to go through
-> vm_vaddr_alloc_shared() to make sure the selftest library tracks/maps
-> the pages as shared, but that vm_set_memory_encryption() happens too
-> late if the ucall_init() stuff is done in vm_create(). It should be
-> possible to pass the vm_set_memory_encryption() arguments directly to
-> vm_create() to allow for what you're proposing, but I guess we'd need
-> a new vm_create() wrapper that handles both the
-> vm_set_memory_encryption() args, along with the ucall_ops above,
-> something like:
-> 
->   sev_vm_create(policy, npages)
->     vm = vm_create_coco(..., encrypt_by_default, enc_bit/shared_bit, ucall_ops)
-> 
-> Or were you thinking something else? Just trying to get an idea of how
-> this will all need to tie in with the SEV selftests and what needs to
-> change on that end.
+> I don't know if setting the dirty/accessed bits in non-refcounted
+> struct pages is problematic.
 
-Hmm, I was thinking the selftest framework would only need to be told the VM type,
-e.g. DEFAULT, SEV, SEV-ES, SEV-SNP, or TDX, and would then handle setting everything
-up, e.g. enumerating the C-bit location and encrypting memory as needed.
+Without knowing exactly what lies behind such pages, KVM needs to set dirty bits,
+otherwise there's a potential for data lost.
 
-One thought would be to extend "enum vm_guest_mode" with flags above NUM_VM_MODES
-to specify the VM type.  That way tests that use VM_MODE_DEFAULT would continue to
-work without any updates.
+> The only way I can see to avoid it would be to try to map from the spte to
+> the vma and then check its flags. If setting the flags is benign, then we'd
+> need to do that lookup to differentiate the safe case from the use-after-free
+> case. Do you have any advice on how to handle this?
+
+Hrm.  I can't think of a clever generic solution.  But for x86-64, we can use a
+software available bit to mark SPTEs as being refcounted use that flag to assert
+the refcount is elevated when marking the backing pfn dirty/accessed.  It'd be
+64-bit only because we're out of software available bits for PAE paging, but (a)
+practically no one cares about 32-bit and (b) odds are slim that a use-after-free
+would be unique to 32-bit KVM.
+
+But that can all go in after your series is merged, e.g. I'd prefer to cleanup
+make_spte()'s prototype to use @fault adding yet another parameter, and that'll
+take a few patches to make happen since FNAME(sync_page) also uses make_spte().
+
+TL;DR: continue as you were, I'll stop whining about this :-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
