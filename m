@@ -2,86 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B17C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 17:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45907C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 18:16:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDDF649EB2;
-	Thu,  6 Jan 2022 12:38:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B00604B1DD;
+	Thu,  6 Jan 2022 13:16:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NwnxT-R8uDFK; Thu,  6 Jan 2022 12:38:49 -0500 (EST)
+	with ESMTP id abSZ5TpzKUw4; Thu,  6 Jan 2022 13:16:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C817049ED1;
-	Thu,  6 Jan 2022 12:38:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1543E4B1F0;
+	Thu,  6 Jan 2022 13:16:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A71949ED1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 12:38:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 067A34B1E0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 13:16:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zr34xoDnMuUT for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Jan 2022 12:38:46 -0500 (EST)
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
- [209.85.216.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEF6049EC0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 12:38:46 -0500 (EST)
-Received: by mail-pj1-f45.google.com with SMTP id iy13so3042594pjb.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Jan 2022 09:38:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=GYSLa7pA0gp7wUV13RWv0MqLP9/s7fLzmxP/zsHVRcY=;
- b=j41IMR6KZD4U5nPOCrxqCiJ3wofNvmQirr4AuGkd9syR7UwLMOkJGZE8Du7VF6G8CM
- oun7bZn44mafPumkXhw8PTvxpax0sh0VY1fW5SVDZPC0Bm4HeRPdVihDD7b+4Tjn5ZRs
- FAak69mzOIRufLQhcgc/XRF+u7Fmdo/1GoESmVcW7qq2ZL0grgEGzWcqLW6Qx5BDLsCv
- Uoal1Nh1zhGGNw8z9slwCJRoz+Cf+iuRjqBzcK3D+Z3Vlne8u6qwnyQmeUR2C69blu5R
- 00hcEFLtFOFtpTR3FxUuDkOfxvbx4VLlRmYFvzbcq4ph7/i2sYx2rqq6XnUdC4voOKmx
- pcjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=GYSLa7pA0gp7wUV13RWv0MqLP9/s7fLzmxP/zsHVRcY=;
- b=j6dkeTwh+JF9GKPUqrMr1oMk5Qfd/7FFz/GprgQHWlL//bB9aCXjODcNO2X6MMKfB0
- CLhA5qJrPtIoIL7sUcQbVODf8pCPJXxiu1Gfx/yD4HquTZtDYLgP1ywrxYMuCEPdksbS
- 7mPz3+LMi1bEGWQ65rTXRd1ss1YL+mMo6SZIW84lVctdKuVpc62I9UMRVBEaNQMvrUzF
- 6Tmprnrkc9KLQUVinEqsyXnuu1pWcDCTasKOjIj8qJgenpYXc47vydVXO5USq3wOXqh1
- YkLTLOAvOlLbKsRn4kqvG+AUcflEev1kcI7OsVLQYpdezkdYPufRTBWdIL+AmY+oPUKs
- X8eA==
-X-Gm-Message-State: AOAM532HSYecgQhWl7olkOlUBRg6Z3XhH5Tap+N4jNuF+mLUsz1baci9
- tDWjPXakykOd5aPLcbirG12Lzg==
-X-Google-Smtp-Source: ABdhPJzk/FdRU8abIcTFrHj96waF/NHjFtuzEZL1JeXq9Pfy+bowljtCmFDhyszaZc3ia0wyc8/eDQ==
-X-Received: by 2002:a17:902:8a94:b0:149:218c:b10a with SMTP id
- p20-20020a1709028a9400b00149218cb10amr58950325plo.114.1641490725484; 
- Thu, 06 Jan 2022 09:38:45 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id p22sm3271867pfo.57.2022.01.06.09.38.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 06 Jan 2022 09:38:44 -0800 (PST)
-Date: Thu, 6 Jan 2022 17:38:41 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
-Message-ID: <YdcpIQgMZJrqswKU@google.com>
-References: <20211129034317.2964790-1-stevensd@google.com>
- <20211129034317.2964790-5-stevensd@google.com>
- <Yc4G23rrSxS59br5@google.com>
- <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
- <YdXrURHO/R82puD4@google.com> <YdXvUaBUvaRPsv6m@google.com>
- <CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com>
-Cc: Chia-I Wu <olv@chromium.org>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+ with ESMTP id tOdbIn+-II0J for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jan 2022 13:16:09 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8254B4B1AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 13:16:09 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3C7E361D72;
+ Thu,  6 Jan 2022 18:16:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85170C36AEB;
+ Thu,  6 Jan 2022 18:16:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1641492967;
+ bh=/+/i0YJJZI1Lpgci2tsEtXMIaD3KjsXbvMHXbNbWgck=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=KROc0IcD9zDJ+4om2oVVwvIblLjsEOy6AnPo0cTlwm2vGTLwHCP/ZbE70qXqXopOh
+ Ikgzi5hN/cV3+Ua4gjzjozMoMBWRe1ies5rodDhYSAjzpVoiNhADkIzyfn4Gea2XNE
+ Uo9UDkR5wGJlUs4mE+SPkjnBNOh/MN2ErQtinKIG7EKH34CcbnT1a96C+7E+ymqGvV
+ 6cN+6FGIhiLw2wwBGWEjEODjTlfLPEV74TPhcEqK9J4gf8mABbU1NV6+Y4gtKVcoNW
+ RD2eAAsCd5tAHjYSuG9aa66Pc1sYBwRL86zXqTqb8IrFGkvUgkXpN3D63jOslgyoyS
+ mAxf+WlLeeJDw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n5XIz-00GPG7-AX; Thu, 06 Jan 2022 18:16:05 +0000
+Date: Thu, 06 Jan 2022 18:16:04 +0000
+Message-ID: <8735m0vifv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU
+ attribute
+In-Reply-To: <YdbYY/EZrTTPKOCp@monolith.localdoman>
+References: <20211213152309.158462-1-alexandru.elisei@arm.com>
+ <20211213152309.158462-4-alexandru.elisei@arm.com>
+ <8735mvjrq8.wl-maz@kernel.org>
+ <YdbYY/EZrTTPKOCp@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, will@kernel.org, mark.rutland@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ tglx@linutronix.de, mingo@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: mingo@redhat.com, tglx@linutronix.de, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,79 +90,260 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jan 06, 2022, David Stevens wrote:
-> On Thu, Jan 6, 2022 at 4:19 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Wed, Jan 05, 2022, Sean Christopherson wrote:
-> > > Ah, I got royally confused by ensure_pfn_ref()'s comment
-> > >
-> > >   * Certain IO or PFNMAP mappings can be backed with valid
-> > >   * struct pages, but be allocated without refcounting e.g.,
-> > >   * tail pages of non-compound higher order allocations, which
-> > >   * would then underflow the refcount when the caller does the
-> > >   * required put_page. Don't allow those pages here.
-> > >                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > > that doesn't apply here because kvm_faultin_pfn() uses the low level
-> > > __gfn_to_pfn_page_memslot().
-> >
-> > On fifth thought, I think this is wrong and doomed to fail.  By mapping these pages
-> > into the guest, KVM is effectively saying it supports these pages.  But if the guest
-> > uses the corresponding gfns for an action that requires KVM to access the page,
-> > e.g. via kvm_vcpu_map(), ensure_pfn_ref() will reject the access and all sorts of
-> > bad things will happen to the guest.
-> >
-> > So, why not fully reject these types of pages?  If someone is relying on KVM to
-> > support these types of pages, then we'll fail fast and get a bug report letting us
-> > know we need to properly support these types of pages.  And if not, then we reduce
-> > KVM's complexity and I get to keep my precious WARN :-)
+On Thu, 06 Jan 2022 11:54:11 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Our current use case here is virtio-gpu blob resources [1]. Blob
-> resources are useful because they avoid a guest shadow buffer and the
-> associated memcpys, and as I understand it they are also required for
-> virtualized vulkan.
+> Hi Marc,
 > 
-> One type of blob resources requires mapping dma-bufs allocated by the
-> host directly into the guest. This works on Intel platforms and the
-> ARM platforms I've tested. However, the amdgpu driver sometimes
-> allocates higher order, non-compound pages via ttm_pool_alloc_page.
+> On Tue, Dec 14, 2021 at 12:28:15PM +0000, Marc Zyngier wrote:
+> > On Mon, 13 Dec 2021 15:23:08 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > When KVM creates an event and there are more than one PMUs present on the
+> > > system, perf_init_event() will go through the list of available PMUs and
+> > > will choose the first one that can create the event. The order of the PMUs
+> > > in the PMU list depends on the probe order, which can change under various
+> > > circumstances, for example if the order of the PMU nodes change in the DTB
+> > > or if asynchronous driver probing is enabled on the kernel command line
+> > > (with the driver_async_probe=armv8-pmu option).
+> > > 
+> > > Another consequence of this approach is that, on heteregeneous systems,
+> > > all virtual machines that KVM creates will use the same PMU. This might
+> > > cause unexpected behaviour for userspace: when a VCPU is executing on
+> > > the physical CPU that uses this PMU, PMU events in the guest work
+> > > correctly; but when the same VCPU executes on another CPU, PMU events in
+> > > the guest will suddenly stop counting.
+> > > 
+> > > Fortunately, perf core allows user to specify on which PMU to create an
+> > > event by using the perf_event_attr->type field, which is used by
+> > > perf_init_event() as an index in the radix tree of available PMUs.
+> > > 
+> > > Add the KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU
+> > > attribute to allow userspace to specify the arm_pmu that KVM will use when
+> > > creating events for that VCPU. KVM will make no attempt to run the VCPU on
+> > > the physical CPUs that share this PMU, leaving it up to userspace to
+> > > manage the VCPU threads' affinity accordingly.
+> > > 
+> > > Setting the PMU for a VCPU is an all of nothing affair to avoid exposing an
+> > > asymmetric system to the guest: either all VCPUs have the same PMU, either
+> > > none of the VCPUs have a PMU set. Attempting to do something in between
+> > > will result in an error being returned when doing KVM_ARM_VCPU_PMU_V3_INIT.
+> > > 
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > ---
+> > > 
+> > > Checking that all VCPUs have the same PMU is done when the PMU is
+> > > initialized because setting the VCPU PMU is optional, and KVM cannot know
+> > > what the user intends until the KVM_ARM_VCPU_PMU_V3_INIT ioctl, which
+> > > prevents further changes to the VCPU PMU. vcpu->arch.pmu.created has been
+> > > changed to an atomic variable because changes to the VCPU PMU state now
+> > > need to be observable by all physical CPUs.
+> > > 
+> > >  Documentation/virt/kvm/devices/vcpu.rst | 30 ++++++++-
+> > >  arch/arm64/include/uapi/asm/kvm.h       |  1 +
+> > >  arch/arm64/kvm/pmu-emul.c               | 88 ++++++++++++++++++++-----
+> > >  include/kvm/arm_pmu.h                   |  4 +-
+> > >  tools/arch/arm64/include/uapi/asm/kvm.h |  1 +
+> > >  5 files changed, 104 insertions(+), 20 deletions(-)
+> > > 
+> > > [..]
+> > > -static u32 kvm_pmu_event_mask(struct kvm *kvm)
+> > > +static u32 kvm_pmu_event_mask(struct kvm_vcpu *vcpu)
+> > >  {
+> > > -	switch (kvm->arch.pmuver) {
+> > > +	unsigned int pmuver;
+> > > +
+> > > +	if (vcpu->arch.pmu.arm_pmu)
+> > > +		pmuver = vcpu->arch.pmu.arm_pmu->pmuver;
+> > > +	else
+> > > +		pmuver = vcpu->kvm->arch.pmuver;
+> > 
+> > This puzzles me throughout the whole patch. Why is the arm_pmu pointer
+> > a per-CPU thing? I would absolutely expect it to be stored in the kvm
+> > structure, making the whole thing much simpler.
+> 
+> Reply below.
+> 
+> > 
+> > > [..]
+> > > @@ -637,8 +645,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
+> > >  		return;
+> > >  
+> > >  	memset(&attr, 0, sizeof(struct perf_event_attr));
+> > > -	attr.type = PERF_TYPE_RAW;
+> > > -	attr.size = sizeof(attr);
+> > 
+> > Why is this line removed?
+> 
+> Typo on my part, thank you for spotting it.
+> 
+> > 
+> > > [..]
+> > > @@ -910,7 +922,16 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+> > >  	init_irq_work(&vcpu->arch.pmu.overflow_work,
+> > >  		      kvm_pmu_perf_overflow_notify_vcpu);
+> > >  
+> > > -	vcpu->arch.pmu.created = true;
+> > > +	atomic_set(&vcpu->arch.pmu.created, 1);
+> > > +
+> > > +	kvm_for_each_vcpu(i, v, kvm) {
+> > > +		if (!atomic_read(&v->arch.pmu.created))
+> > > +			continue;
+> > > +
+> > > +		if (v->arch.pmu.arm_pmu != arm_pmu)
+> > > +			return -ENXIO;
+> > > +	}
+> > 
+> > If you did store the arm_pmu at the VM level, you wouldn't need this.
+> > You could detect the discrepancy in the set_pmu ioctl.
+> 
+> I chose to set at the VCPU level to be consistent with how KVM treats the
+> PMU interrupt ID when the interrupt is a PPI, where the interrupt ID must
+> be the same for all VCPUs and it is stored at the VCPU. However, looking at
+> the code again, it occurs to me that it is stored at the VCPU when it's a
+> PPI because it's simpler to do it that way, as the code remains the same
+> when the interrupt ID is a SPI, which must be *different* between VCPUs. So
+> in the end, having the PMU stored at the VM level does match how KVM uses
+> it, which looks to be better than my approach.
+> 
+> This is the change you proposed in your branch [1]:
+> 
+> +static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+> +{
+> +       struct kvm *kvm = vcpu->kvm;
+> +       struct arm_pmu_entry *entry;
+> +       struct arm_pmu *arm_pmu;
+> +       int ret = -ENXIO;
+> +
+> +       mutex_lock(&kvm->lock);
+> +       mutex_lock(&arm_pmus_lock);
+> +
+> +       list_for_each_entry(entry, &arm_pmus, entry) {
+> +               arm_pmu = entry->arm_pmu;
+> +               if (arm_pmu->pmu.type == pmu_id) {
+> +                       /* Can't change PMU if filters are already in place */
+> +                       if (kvm->arch.arm_pmu != arm_pmu &&
+> +                           kvm->arch.pmu_filter) {
+> +                               ret = -EBUSY;
+> +                               break;
+> +                       }
+> +
+> +                       kvm->arch.arm_pmu = arm_pmu;
+> +                       ret = 0;
+> +                       break;
+> +               }
+> +       }
+> +
+> +       mutex_unlock(&arm_pmus_lock);
+> +       mutex_unlock(&kvm->lock);
+> +       return ret;
+> +}
+> 
+> As I understand the code, userspace only needs to call
+> KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) *once* (on one VCPU
+> fd) to set the PMU for all the VCPUs; subsequent calls (on the same VCPU or
+> on another VCPU) with a different PMU id will change the PMU for all VCPUs.
+> 
+> Two remarks:
+> 
+> 1. The documentation for the VCPU ioctls states this (from
+> Documentation/virt/kvm/devices/vcpu.rst):
+> 
+> "
+> ======================
+> Generic vcpu interface
+> ======================
+> 
+> The virtual cpu "device" also accepts the ioctls KVM_SET_DEVICE_ATTR,
+> KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
+> kvm_device_attr as other devices, but **targets VCPU-wide settings and
+> controls**" (emphasis added).
+> 
+> But I guess having VCPU ioctls affect *only* the VCPU hasn't really been
+> true ever since PMU event filtering has been added. I'll send a patch to
+> change that part of the documentation for arm64.
+> 
+> I was thinking maybe a VM capability would be better suited for changing a
+> VM-wide setting, what do you think? I don't have a strong preference either
+> way.
 
-Ah.  In the future, please provide this type of information in the cover letter,
-and in this case, a paragraph in patch 01 is also warranted.  The context of _why_
-is critical information, e.g. having something in the changelog explaining the use
-case is very helpful for future developers wondering why on earth KVM supports
-this type of odd behavior.
+I'm not sure it is worth the hassle of changing the API, as we'll have
+to keep the current one forever.
 
-> These are the type of pages which KVM is currently rejecting. Is this
-> something that KVM can support?
+> 
+> 2. What's to stop userspace to change the PMU after at least one VCPU has
+> run? That can be easily observed by the guest when reading PMCEIDx_EL0.
 
-I'm not opposed to it.  My complaint is that this series is incomplete in that it
-allows mapping the memory into the guest, but doesn't support accessing the memory
-from KVM itself.  That means for things to work properly, KVM is relying on the
-guest to use the memory in a limited capacity, e.g. isn't using the memory as
-general purpose RAM.  That's not problematic for your use case, because presumably
-the memory is used only by the vGPU, but as is KVM can't enforce that behavior in
-any way.
+That's a good point. We need something here. It is a bit odd as to do
+that, you need to fully enable a PMU on one CPU, but not on the other,
+then run the first while changing stuff on the other. Something along
+those lines (untested):
 
-The really gross part is that failures are not strictly punted to userspace;
-the resulting error varies significantly depending on how the guest "illegally"
-uses the memory.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 4bf28905d438..4f53520e84fd 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -139,6 +139,7 @@ struct kvm_arch {
+ 
+ 	/* Memory Tagging Extension enabled for the guest */
+ 	bool mte_enabled;
++	bool ran_once;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 83297fa97243..3045d7f609df 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -606,6 +606,10 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 
+ 	vcpu->arch.has_run_once = true;
+ 
++	mutex_lock(&kvm->lock);
++	kvm->arch.ran_once = true;
++	mutex_unlock(&kvm->lock);
++
+ 	kvm_arm_vcpu_init_debug(vcpu);
+ 
+ 	if (likely(irqchip_in_kernel(kvm))) {
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index dfc0430d6418..95100c541244 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -959,8 +959,9 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+ 		arm_pmu = entry->arm_pmu;
+ 		if (arm_pmu->pmu.type == pmu_id) {
+ 			/* Can't change PMU if filters are already in place */
+-			if (kvm->arch.arm_pmu != arm_pmu &&
+-			    kvm->arch.pmu_filter) {
++			if ((kvm->arch.arm_pmu != arm_pmu &&
++			     kvm->arch.pmu_filter) ||
++			    kvm->arch.ran_once) {
+ 				ret = -EBUSY;
+ 				break;
+ 			}
+@@ -1040,6 +1041,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 
+ 		mutex_lock(&vcpu->kvm->lock);
+ 
++		if (vcpu->kvm->arch.ran_once) {
++			mutex_unlock(&vcpu->kvm->lock);
++			return -EBUSY;
++		}
++
+ 		if (!vcpu->kvm->arch.pmu_filter) {
+ 			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
+ 			if (!vcpu->kvm->arch.pmu_filter) {
 
-My first choice would be to get the amdgpu driver "fixed", but that's likely an
-unreasonable request since it sounds like the non-KVM behavior is working as intended.
+which should prevent both PMU or filters to be changed once a single
+vcpu as run.
 
-One thought would be to require userspace to opt-in to mapping this type of memory
-by introducing a new memslot flag that explicitly states that the memslot cannot
-be accessed directly by KVM, i.e. can only be mapped into the guest.  That way,
-KVM has an explicit ABI with respect to how it handles this type of memory, even
-though the semantics of exactly what will happen if userspace/guest violates the
-ABI are not well-defined.  And internally, KVM would also have a clear touchpoint
-where it deliberately allows mapping such memslots, as opposed to the more implicit
-behavior of bypassing ensure_pfn_ref().
+Thoughts?
 
-If we're clever, we might even be able to share the flag with the "guest private
-memory"[*] concept being pursued for confidential VMs.
+	M.
 
-[*] https://lore.kernel.org/all/20211223123011.41044-1-chao.p.peng@linux.intel.com
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
