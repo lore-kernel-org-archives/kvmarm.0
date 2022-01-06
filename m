@@ -2,64 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45907C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 18:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E0EC433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 18:21:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B00604B1DD;
-	Thu,  6 Jan 2022 13:16:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21FF14B22A;
+	Thu,  6 Jan 2022 13:21:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id abSZ5TpzKUw4; Thu,  6 Jan 2022 13:16:12 -0500 (EST)
+	with ESMTP id NSYN66bpwZDn; Thu,  6 Jan 2022 13:21:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1543E4B1F0;
-	Thu,  6 Jan 2022 13:16:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0AFC4B1DD;
+	Thu,  6 Jan 2022 13:21:34 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 067A34B1E0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 13:16:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC8E04B1DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 13:21:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tOdbIn+-II0J for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Jan 2022 13:16:09 -0500 (EST)
+ with ESMTP id CCMmqHGoMbv5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jan 2022 13:21:31 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8254B4B1AC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 13:16:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B6B834B1DC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 13:21:31 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 3C7E361D72;
- Thu,  6 Jan 2022 18:16:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85170C36AEB;
- Thu,  6 Jan 2022 18:16:07 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 5670461D17;
+ Thu,  6 Jan 2022 18:21:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF3AEC36AEB;
+ Thu,  6 Jan 2022 18:21:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1641492967;
- bh=/+/i0YJJZI1Lpgci2tsEtXMIaD3KjsXbvMHXbNbWgck=;
+ s=k20201202; t=1641493289;
+ bh=zBpZGxgznYG2e8AhlNYg7DgwP3l3ot1s/+PwBHU4MOw=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=KROc0IcD9zDJ+4om2oVVwvIblLjsEOy6AnPo0cTlwm2vGTLwHCP/ZbE70qXqXopOh
- Ikgzi5hN/cV3+Ua4gjzjozMoMBWRe1ies5rodDhYSAjzpVoiNhADkIzyfn4Gea2XNE
- Uo9UDkR5wGJlUs4mE+SPkjnBNOh/MN2ErQtinKIG7EKH34CcbnT1a96C+7E+ymqGvV
- 6cN+6FGIhiLw2wwBGWEjEODjTlfLPEV74TPhcEqK9J4gf8mABbU1NV6+Y4gtKVcoNW
- RD2eAAsCd5tAHjYSuG9aa66Pc1sYBwRL86zXqTqb8IrFGkvUgkXpN3D63jOslgyoyS
- mAxf+WlLeeJDw==
+ b=X/FW69DHeO1CF320pQ0Xt7H/Gfk3AT7KZLQRnaSJ+1Jt33JNJxuDkUxAZZYG21Q9Y
+ 0KrbZ56oHt2ES0aOT+OVc+AnkVZ2NkLHQ4bskislGf5vTcqSMBxRl/6d01DdWuTpOJ
+ Rh1xrUrvS2CXJWP3pzJt4s8WQISJV0RV+UgScpqVWNsiBWHNZo2wOMIer7DXQApT7M
+ AAK1GYivIU+JIYM/UzuGofDxgSVeF/ve0RbKUeW8y0C+Vjo0fQG1+cMXgOXt942rXP
+ su8HRLq5gTOtsqWZYWl58TMlaqIjUfETXeygkf0SY3BDaXUSK8dmcv2F4ZIazVyx6Q
+ XNQhJ9OK6W90A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1n5XIz-00GPG7-AX; Thu, 06 Jan 2022 18:16:05 +0000
-Date: Thu, 06 Jan 2022 18:16:04 +0000
-Message-ID: <8735m0vifv.wl-maz@kernel.org>
+ id 1n5XOB-00GPJ3-Rl; Thu, 06 Jan 2022 18:21:27 +0000
+Date: Thu, 06 Jan 2022 18:21:27 +0000
+Message-ID: <871r1kvi6w.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v3 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU
- attribute
-In-Reply-To: <YdbYY/EZrTTPKOCp@monolith.localdoman>
+Subject: Re: [PATCH v3 0/4] KVM: arm64: Improve PMU support on heterogeneous
+ systems
+In-Reply-To: <Ydbbivoqo3vUxB4j@monolith.localdoman>
 References: <20211213152309.158462-1-alexandru.elisei@arm.com>
- <20211213152309.158462-4-alexandru.elisei@arm.com>
- <8735mvjrq8.wl-maz@kernel.org>
- <YdbYY/EZrTTPKOCp@monolith.localdoman>
+ <87bl0xzwu1.wl-maz@kernel.org>
+ <Ydbbivoqo3vUxB4j@monolith.localdoman>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -90,255 +89,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 06 Jan 2022 11:54:11 +0000,
+On Thu, 06 Jan 2022 12:07:38 +0000,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
 > Hi Marc,
 > 
-> On Tue, Dec 14, 2021 at 12:28:15PM +0000, Marc Zyngier wrote:
-> > On Mon, 13 Dec 2021 15:23:08 +0000,
+> On Thu, Dec 30, 2021 at 08:01:10PM +0000, Marc Zyngier wrote:
+> > Alex,
+> > 
+> > On Mon, 13 Dec 2021 15:23:05 +0000,
 > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > > > 
-> > > When KVM creates an event and there are more than one PMUs present on the
-> > > system, perf_init_event() will go through the list of available PMUs and
-> > > will choose the first one that can create the event. The order of the PMUs
-> > > in the PMU list depends on the probe order, which can change under various
-> > > circumstances, for example if the order of the PMU nodes change in the DTB
-> > > or if asynchronous driver probing is enabled on the kernel command line
-> > > (with the driver_async_probe=armv8-pmu option).
+> > > (CC'ing Peter Maydell in case this might be of interest to qemu)
 > > > 
-> > > Another consequence of this approach is that, on heteregeneous systems,
-> > > all virtual machines that KVM creates will use the same PMU. This might
-> > > cause unexpected behaviour for userspace: when a VCPU is executing on
-> > > the physical CPU that uses this PMU, PMU events in the guest work
-> > > correctly; but when the same VCPU executes on another CPU, PMU events in
-> > > the guest will suddenly stop counting.
+> > > The series can be found on a branch at [1], and the kvmtool support at [2].
+> > > The kvmtool patches are also on the mailing list [3] and haven't changed
+> > > since v1.
 > > > 
-> > > Fortunately, perf core allows user to specify on which PMU to create an
-> > > event by using the perf_event_attr->type field, which is used by
-> > > perf_init_event() as an index in the radix tree of available PMUs.
+> > > Detailed explanation of the issue and symptoms that the patches attempt to
+> > > correct can be found in the cover letter for v1 [4].
 > > > 
-> > > Add the KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU
-> > > attribute to allow userspace to specify the arm_pmu that KVM will use when
-> > > creating events for that VCPU. KVM will make no attempt to run the VCPU on
-> > > the physical CPUs that share this PMU, leaving it up to userspace to
-> > > manage the VCPU threads' affinity accordingly.
+> > > A summary of the problem is that on heterogeneous systems KVM will always
+> > > use the same PMU for creating the VCPU events for *all* VCPUs regardless of
+> > > the physical CPU on which the VCPU is running, leading to events suddenly
+> > > stopping and resuming in the guest as the VCPU thread gets migrated across
+> > > different CPUs.
 > > > 
-> > > Setting the PMU for a VCPU is an all of nothing affair to avoid exposing an
-> > > asymmetric system to the guest: either all VCPUs have the same PMU, either
-> > > none of the VCPUs have a PMU set. Attempting to do something in between
-> > > will result in an error being returned when doing KVM_ARM_VCPU_PMU_V3_INIT.
+> > > This series proposes to fix this behaviour by allowing the user to specify
+> > > which physical PMU is used when creating the VCPU events needed for guest
+> > > PMU emulation. When the PMU is set, KVM will refuse to the VCPU on a
+> > > physical which is not part of the supported CPUs for the specified PMU. The
+> > > restriction is that all VCPUs must use the same PMU to avoid emulating an
+> > > asymmetric platform.
 > > > 
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
+> > > The default behaviour stays the same - without userspace setting the PMU,
+> > > events will stop counting if the VCPU is scheduled on the wrong CPU.
 > > > 
-> > > Checking that all VCPUs have the same PMU is done when the PMU is
-> > > initialized because setting the VCPU PMU is optional, and KVM cannot know
-> > > what the user intends until the KVM_ARM_VCPU_PMU_V3_INIT ioctl, which
-> > > prevents further changes to the VCPU PMU. vcpu->arch.pmu.created has been
-> > > changed to an atomic variable because changes to the VCPU PMU state now
-> > > need to be observable by all physical CPUs.
+> > > Tested with a hacked version of kvmtool that does the PMU initialization
+> > > from the VCPU thread as opposed to from the main thread. Tested on
+> > > rockpro64 by testing what happens when all VCPUs having the same PMU, one
+> > > random VCPU having a different PMU than the other VCPUs and one random VCPU
+> > > not having the PMU set (each test was run 1,000 times on the little cores
+> > > and 1,000 times on the big cores).
 > > > 
-> > >  Documentation/virt/kvm/devices/vcpu.rst | 30 ++++++++-
-> > >  arch/arm64/include/uapi/asm/kvm.h       |  1 +
-> > >  arch/arm64/kvm/pmu-emul.c               | 88 ++++++++++++++++++++-----
-> > >  include/kvm/arm_pmu.h                   |  4 +-
-> > >  tools/arch/arm64/include/uapi/asm/kvm.h |  1 +
-> > >  5 files changed, 104 insertions(+), 20 deletions(-)
-> > > 
-> > > [..]
-> > > -static u32 kvm_pmu_event_mask(struct kvm *kvm)
-> > > +static u32 kvm_pmu_event_mask(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -	switch (kvm->arch.pmuver) {
-> > > +	unsigned int pmuver;
-> > > +
-> > > +	if (vcpu->arch.pmu.arm_pmu)
-> > > +		pmuver = vcpu->arch.pmu.arm_pmu->pmuver;
-> > > +	else
-> > > +		pmuver = vcpu->kvm->arch.pmuver;
+> > > Also tested on an Altra by testing all VCPUs having the same PMU, all VCPUs
+> > > not having a PMU set, and one random VCPU not having the PMU set; the VM
+> > > had 64 threads in each of the tests and each test was run 10,000 times.
 > > 
-> > This puzzles me throughout the whole patch. Why is the arm_pmu pointer
-> > a per-CPU thing? I would absolutely expect it to be stored in the kvm
-> > structure, making the whole thing much simpler.
+> > Came back to this series, and found more problems. On top of the
+> > remarks I had earlier (the per-CPU data structures that really should
+> > per VM, the disappearing attribute size), what happens when event
+> > filters are already registered and that you set a specific PMU?
 > 
-> Reply below.
-> 
-> > 
-> > > [..]
-> > > @@ -637,8 +645,7 @@ static void kvm_pmu_create_perf_event(struct kvm_vcpu *vcpu, u64 select_idx)
-> > >  		return;
-> > >  
-> > >  	memset(&attr, 0, sizeof(struct perf_event_attr));
-> > > -	attr.type = PERF_TYPE_RAW;
-> > > -	attr.size = sizeof(attr);
-> > 
-> > Why is this line removed?
-> 
-> Typo on my part, thank you for spotting it.
-> 
-> > 
-> > > [..]
-> > > @@ -910,7 +922,16 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
-> > >  	init_irq_work(&vcpu->arch.pmu.overflow_work,
-> > >  		      kvm_pmu_perf_overflow_notify_vcpu);
-> > >  
-> > > -	vcpu->arch.pmu.created = true;
-> > > +	atomic_set(&vcpu->arch.pmu.created, 1);
-> > > +
-> > > +	kvm_for_each_vcpu(i, v, kvm) {
-> > > +		if (!atomic_read(&v->arch.pmu.created))
-> > > +			continue;
-> > > +
-> > > +		if (v->arch.pmu.arm_pmu != arm_pmu)
-> > > +			return -ENXIO;
-> > > +	}
-> > 
-> > If you did store the arm_pmu at the VM level, you wouldn't need this.
-> > You could detect the discrepancy in the set_pmu ioctl.
-> 
-> I chose to set at the VCPU level to be consistent with how KVM treats the
-> PMU interrupt ID when the interrupt is a PPI, where the interrupt ID must
-> be the same for all VCPUs and it is stored at the VCPU. However, looking at
-> the code again, it occurs to me that it is stored at the VCPU when it's a
-> PPI because it's simpler to do it that way, as the code remains the same
-> when the interrupt ID is a SPI, which must be *different* between VCPUs. So
-> in the end, having the PMU stored at the VM level does match how KVM uses
-> it, which looks to be better than my approach.
-> 
-> This is the change you proposed in your branch [1]:
-> 
-> +static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
-> +{
-> +       struct kvm *kvm = vcpu->kvm;
-> +       struct arm_pmu_entry *entry;
-> +       struct arm_pmu *arm_pmu;
-> +       int ret = -ENXIO;
-> +
-> +       mutex_lock(&kvm->lock);
-> +       mutex_lock(&arm_pmus_lock);
-> +
-> +       list_for_each_entry(entry, &arm_pmus, entry) {
-> +               arm_pmu = entry->arm_pmu;
-> +               if (arm_pmu->pmu.type == pmu_id) {
-> +                       /* Can't change PMU if filters are already in place */
-> +                       if (kvm->arch.arm_pmu != arm_pmu &&
-> +                           kvm->arch.pmu_filter) {
-> +                               ret = -EBUSY;
-> +                               break;
-> +                       }
-> +
-> +                       kvm->arch.arm_pmu = arm_pmu;
-> +                       ret = 0;
-> +                       break;
-> +               }
-> +       }
-> +
-> +       mutex_unlock(&arm_pmus_lock);
-> +       mutex_unlock(&kvm->lock);
-> +       return ret;
-> +}
-> 
-> As I understand the code, userspace only needs to call
-> KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) *once* (on one VCPU
-> fd) to set the PMU for all the VCPUs; subsequent calls (on the same VCPU or
-> on another VCPU) with a different PMU id will change the PMU for all VCPUs.
-> 
-> Two remarks:
-> 
-> 1. The documentation for the VCPU ioctls states this (from
-> Documentation/virt/kvm/devices/vcpu.rst):
-> 
-> "
-> ======================
-> Generic vcpu interface
-> ======================
-> 
-> The virtual cpu "device" also accepts the ioctls KVM_SET_DEVICE_ATTR,
-> KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
-> kvm_device_attr as other devices, but **targets VCPU-wide settings and
-> controls**" (emphasis added).
-> 
-> But I guess having VCPU ioctls affect *only* the VCPU hasn't really been
-> true ever since PMU event filtering has been added. I'll send a patch to
-> change that part of the documentation for arm64.
-> 
-> I was thinking maybe a VM capability would be better suited for changing a
-> VM-wide setting, what do you think? I don't have a strong preference either
-> way.
+> This is a good point. When I looked at how the PMU event filter works, I
+> saw that KVM doesn't attempt to check that the events are actually
+> implemented on the PMU, but somehow skipped over the fact that the PMU
+> affects the total number of events available.
 
-I'm not sure it is worth the hassle of changing the API, as we'll have
-to keep the current one forever.
+That, but also the meaning of the events. Switching PMU after
+programmed event filters is really odd, as you don't know what you are
+filtering anymore (unless you stick to purely architected events).
 
-> 
-> 2. What's to stop userspace to change the PMU after at least one VCPU has
-> run? That can be easily observed by the guest when reading PMCEIDx_EL0.
-
-That's a good point. We need something here. It is a bit odd as to do
-that, you need to fully enable a PMU on one CPU, but not on the other,
-then run the first while changing stuff on the other. Something along
-those lines (untested):
-
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4bf28905d438..4f53520e84fd 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -139,6 +139,7 @@ struct kvm_arch {
- 
- 	/* Memory Tagging Extension enabled for the guest */
- 	bool mte_enabled;
-+	bool ran_once;
- };
- 
- struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 83297fa97243..3045d7f609df 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -606,6 +606,10 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.has_run_once = true;
- 
-+	mutex_lock(&kvm->lock);
-+	kvm->arch.ran_once = true;
-+	mutex_unlock(&kvm->lock);
-+
- 	kvm_arm_vcpu_init_debug(vcpu);
- 
- 	if (likely(irqchip_in_kernel(kvm))) {
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index dfc0430d6418..95100c541244 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -959,8 +959,9 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
- 		arm_pmu = entry->arm_pmu;
- 		if (arm_pmu->pmu.type == pmu_id) {
- 			/* Can't change PMU if filters are already in place */
--			if (kvm->arch.arm_pmu != arm_pmu &&
--			    kvm->arch.pmu_filter) {
-+			if ((kvm->arch.arm_pmu != arm_pmu &&
-+			     kvm->arch.pmu_filter) ||
-+			    kvm->arch.ran_once) {
- 				ret = -EBUSY;
- 				break;
- 			}
-@@ -1040,6 +1041,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 
- 		mutex_lock(&vcpu->kvm->lock);
- 
-+		if (vcpu->kvm->arch.ran_once) {
-+			mutex_unlock(&vcpu->kvm->lock);
-+			return -EBUSY;
-+		}
-+
- 		if (!vcpu->kvm->arch.pmu_filter) {
- 			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
- 			if (!vcpu->kvm->arch.pmu_filter) {
-
-which should prevent both PMU or filters to be changed once a single
-vcpu as run.
-
-Thoughts?
+Thanks,
 
 	M.
 
