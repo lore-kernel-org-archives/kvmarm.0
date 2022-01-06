@@ -2,68 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53F86C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 19:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40216C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 21:26:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDE7349ECD;
-	Thu,  6 Jan 2022 14:35:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEA3B4B1DD;
+	Thu,  6 Jan 2022 16:26:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LfILZj6j5254; Thu,  6 Jan 2022 14:35:01 -0500 (EST)
+	with ESMTP id B9a9uNmBWKMX; Thu,  6 Jan 2022 16:26:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCB9A49F01;
-	Thu,  6 Jan 2022 14:35:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AB9E4B1F0;
+	Thu,  6 Jan 2022 16:26:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A77C49ECD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 14:35:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 108EE4B231
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 16:26:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vBBCQ4t10tpD for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Jan 2022 14:34:59 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50AF649EAB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 14:34:59 -0500 (EST)
+ with ESMTP id s38cj5pMIPNr for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jan 2022 16:26:39 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C42784B183
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 16:26:39 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 5ABD961D26;
- Thu,  6 Jan 2022 19:34:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4893C36AEB;
- Thu,  6 Jan 2022 19:34:57 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 4DDC8B8240E;
+ Thu,  6 Jan 2022 21:26:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0923DC36AE3;
+ Thu,  6 Jan 2022 21:26:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1641497697;
- bh=2aGQymYqTmaWkfPiI1bX2V0qCtNAHECJTgwZi07GMh4=;
+ s=k20201202; t=1641504397;
+ bh=O4xI8X4Ahapcy6SScuecm/AabsQ3pVKDC7fpb6BqBfM=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=nNqWwlQz7WxKUjta1Ykq0eI8sEc++6Jqr+uYZoLWH/ihFTz5769u27qEayjrljlwg
- iCceiLkfcJaKgAquR2xCCxnuAVoLUwlAPT+zHBVg6ager2MCsNX9QrWfyboVk6Q1xF
- R3d5N8coVxtVq+K08l8caIbA2CthNSKgOgKnGpKwE6RbPg2afP1SGogRJEwxrgRZA9
- SqzeVwH+cTGHcYtdP/VqF+4ZdQiZNGRQQwhU/5M/vjMcLjdk4PXs4NjMfoVnzxAbhY
- 7bEtGUhk06KyHFtumXa70vTUixrIMnNVaDyFBq0upOX8QiMLthnyhnkUtdGBQcSYHu
- bn0dquxsEqIqA==
+ b=ftGNL2kfWkhDTXSIo3L/n3wsqKYvVeVGvVHNC29WfVkpdNBEjBGzewHy9UHSA4xcf
+ AF27elnCSEwratleb5efXi/TmBu5MhzCrFrpRJdidXfPbeKA5QV+kvHtW6Acp+LiO7
+ L4zSuGkuxnCwJ/Vl1oxA0aud2HZtBFKYTFPnNlTlcAV4dG7DWFFBSIdZHlWh/kZ4WO
+ jkgjZafVD1gG6ETkaEjVyoNBqxID+J5MkEA/T14xtzIC3pO13PKSXUfmyhelVP1qn6
+ uvPj8up1K+AZ7VkE2C7SWko84dTsz7lZ9fUMrR+M7IT5gOAt92S47EaYLCTCN/swp1
+ eXeWT0OT+RkkA==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1n5YXH-00GQ5m-TC; Thu, 06 Jan 2022 19:34:56 +0000
-Date: Thu, 06 Jan 2022 19:34:57 +0000
-Message-ID: <8735m0zmhq.wl-maz@kernel.org>
+ id 1n5aHL-00GRDk-5L; Thu, 06 Jan 2022 21:26:35 +0000
+Date: Thu, 06 Jan 2022 21:26:34 +0000
+Message-ID: <871r1kzhbp.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: eric.auger@redhat.com
-Subject: Re: [PATCH v2 1/5] hw/arm/virt: Key enablement of highmem PCIe on
- highmem_ecam
-In-Reply-To: <cb9f6c39-40f8-eea7-73bf-13df1e5dae9d@redhat.com>
-References: <20211003164605.3116450-1-maz@kernel.org>
- <20211003164605.3116450-2-maz@kernel.org>
- <dbe883ca-880e-7f2b-1de7-4b2d3361545d@redhat.com>
- <87pmpiyrfw.wl-maz@kernel.org>
- <b9031d40-897e-b8c5-4240-fc2936dcbcb9@redhat.com>
- <877dbfywpj.wl-maz@kernel.org>
- <cb9f6c39-40f8-eea7-73bf-13df1e5dae9d@redhat.com>
+Subject: Re: [PATCH v3 3/5] hw/arm/virt: Honor highmem setting when computing
+ the memory map
+In-Reply-To: <ef8b3500-04ab-5434-6a04-0e8b1dcc65d1@redhat.com>
+References: <20211227211642.994461-1-maz@kernel.org>
+ <20211227211642.994461-4-maz@kernel.org>
+ <ef8b3500-04ab-5434-6a04-0e8b1dcc65d1@redhat.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -93,29 +89,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
-
-On Wed, 05 Jan 2022 09:41:19 +0000,
+On Wed, 05 Jan 2022 09:22:39 +0000,
 Eric Auger <eric.auger@redhat.com> wrote:
 > 
-> couldn't you simply introduce highmem_redist which is truly missing. You
-> could set it in virt_set_memmap() in case you skip extended_map overlay
-> and use it in virt_gicv3_redist_region_count() as you did?
-> In addition to the device memory top address check against the 4GB limit
-> if !highmem, we should be fine then?
+> Hi Marc,
+> 
+> On 12/27/21 10:16 PM, Marc Zyngier wrote:
+> > Even when the VM is configured with highmem=off, the highest_gpa
+> > field includes devices that are above the 4GiB limit.
+> > Similarily, nothing seem to check that the memory is within
+> > the limit set by the highmem=off option.
+> >
+> > This leads to failures in virt_kvm_type() on systems that have
+> > a crippled IPA range, as the reported IPA space is larger than
+> > what it should be.
+> >
+> > Instead, honor the user-specified limit to only use the devices
+> > at the lowest end of the spectrum, and fail if we have memory
+> > crossing the 4GiB limit.
+> >
+> > Reviewed-by: Andrew Jones <drjones@redhat.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  hw/arm/virt.c | 9 ++++++++-
+> >  1 file changed, 8 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index 8b600d82c1..84dd3b36fb 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -1678,6 +1678,11 @@ static void virt_set_memmap(VirtMachineState *vms)
+> >          exit(EXIT_FAILURE);
+> >      }
+> >  
+> > +    if (!vms->highmem &&
+> > +        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
+> > +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+> > +        exit(EXIT_FAILURE);
+> 
+> The memory is composed of initial memory and device memory.
+> device memory is put after the initial memory but has a 1GB alignment
+> On top of that you have 1G page alignment per device memory slot
+> 
+> so potentially the highest mem address is larger than
+> vms->memmap[VIRT_MEM].base + ms->maxram_size.
+> I would rather do the check on device_memory_base + device_memory_size
 
-No, highmem really isn't nearly enough.
+Yup, that's a good point.
 
-Imagine you have (like I do) a system with 36 bits of IPA space.
-Create a VM with 8GB of RAM (which means the low-end of IPA space is
-already 9GB). Obviously, highmem=true here. With the current code, we
-will try to expose this PCI MMIO range, which falls way out of the IPA
-space (you need at least 40 bits of IPA to even cover it with the
-smallest configuration).
+There is also a corner case in one of the later patches where I check
+this limit against the PA using the rounded-up device_memory_size.
+This could result in returning an error if the last memory slot would
+still fit in the PA space, but the rounded-up quantity wouldn't. I
+don't think it matters much, but I'll fix it anyway.
 
-highmem really is a control that says 'things may live above 4GB'. It
-doesn't say *how far* above 4GB it can be placed. Which is what I am
-trying to address.
+> > +    }
+> >      /*
+> >       * We compute the base of the high IO region depending on the
+> >       * amount of initial and device memory. The device memory start/size
+> > @@ -1707,7 +1712,9 @@ static void virt_set_memmap(VirtMachineState *vms)
+> >          vms->memmap[i].size = size;
+> >          base += size;
+> >      }
+> > -    vms->highest_gpa = base - 1;
+> > +    vms->highest_gpa = (vms->highmem ?
+> > +                        base :
+> > +                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
+> As per the previous comment this looks wrong to me if !highmem.
+
+Agreed.
+
+> If !highmem, if RAM requirements are low we still could get benefit from
+> REDIST2 and HIGH ECAM which could fit within the 4GB limit. But maybe we
+> simply don't care?
+
+I don't see how. These devices live at a minimum of 256GB, which
+contradicts the very meaning of !highmem being a 4GB limit.
+
+> If we don't, why don't we simply skip the extended_memmap overlay as
+> suggested in v2? I did not get your reply sorry.
+
+Because although this makes sense if you only care about a 32bit
+limit, we eventually want to check against an arbitrary PA limit and
+enable the individual devices that do fit in that space.
+
+In order to do that, we need to compute the base addresses for these
+extra devices. Also, computing 3 base addresses isn't going to be
+massively expensive.
 
 Thanks,
 
