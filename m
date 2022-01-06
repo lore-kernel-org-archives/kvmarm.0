@@ -2,130 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB466C4332F
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 09:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13816C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 09:20:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EB554B19A;
-	Thu,  6 Jan 2022 04:19:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B02F24B1AF;
+	Thu,  6 Jan 2022 04:19:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@amd.com
+	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VedFAyhlaJdA; Thu,  6 Jan 2022 04:19:56 -0500 (EST)
+	with ESMTP id WYsz+nEi1rGE; Thu,  6 Jan 2022 04:19:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DED14B1C6;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 859734B1D2;
 	Thu,  6 Jan 2022 04:19:55 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A602840CE3
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 16:35:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C5C408D5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 21:42:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tUbKxyofkL0a for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Jan 2022 16:35:45 -0500 (EST)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com
- (mail-dm6nam12on2069.outbound.protection.outlook.com [40.107.243.69])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61F7D40C2B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 16:35:45 -0500 (EST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aWvWwztZKOYKbUn8RduOyy3owagwvZ/fH3ijzPHunPo4I8xyVQ+f/fFdRgkJSLN6wC2jnLoysLu34ussvBISzuO/Gs0AnkMksgD1ELNxjJhkGMo5ImPJcSXgSi4TJX+/MGVr3laUUOZ5uPixhUaUcUrfVmjyMbbg1Ea/D0U9qOI9ISCleQcTTSmxRG6Fd+jAxNh7XHzFcvkdV5JWuTS/lSZa71LjCVqNl2M9LJTeDNO8iz6jDLJ1mXdwT6zyaQgfDlh74bxVU9X+d6X8PL6dCz56AKrV27SHpewB1kPyCgOM4jAg1JjcWtsMzmy1wKiEBebmDkzOVdVXjptUcETo/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gv+NXoWxoVuQdXxbNp7fCof1XJIbw+vN3r9cSsMyZxw=;
- b=dJZLUHwyWbpTWnOPcl3YeknNgos609WJLHCDLvoJIwlXyAyrW/d7P4V1HFJgWuIg9BQzVq1VqH5Lu9humpjIRCLu+IMJG/65zIMWeUh7fU7w3bukPGRTvsDi/ccKYcXAo4GbkKz7Tn5T62b8x6uhrqXwPxWVhHhp1lRHrK6zvaC1zFmdoWu7g+bZaB0rjnHYbW3mn8mXw/2EGG5t7isLyszFlsLiDUCpy2BjDqITFBdVHziN2LzLcUsMHxRAFl7GDRzuIKh8ez49+YgyHFkQGXDestI53qk++r9a+hGPFGX/QCBfUT1g3FTP3DjH36OhpDXaXOoZZ5oRcbfUG9+Zfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1; 
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gv+NXoWxoVuQdXxbNp7fCof1XJIbw+vN3r9cSsMyZxw=;
- b=s3boD5bfyEbEjdvqCy+EWbJKRKQVoe2NzYS7jLCIu/3nHSv5j3lsNOD2P4ic0CbM594bq0p8PH17v21X9Y8te88U482acs8si7IQoJrm4DvdjSf863jyJZ039lJjqDeZeSZlVB4+Minuk5yQeQ34uZ9J1lkQTpeNuEFT3yo3Ilw=
-Received: from CO2PR05CA0055.namprd05.prod.outlook.com (2603:10b6:102:2::23)
- by BL1PR12MB5364.namprd12.prod.outlook.com (2603:10b6:208:314::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4844.15; Wed, 5 Jan
- 2022 21:35:43 +0000
-Received: from CO1NAM11FT060.eop-nam11.prod.protection.outlook.com
- (2603:10b6:102:2:cafe::10) by CO2PR05CA0055.outlook.office365.com
- (2603:10b6:102:2::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4888.4 via Frontend
- Transport; Wed, 5 Jan 2022 21:35:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CO1NAM11FT060.mail.protection.outlook.com (10.13.175.132) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4867.7 via Frontend Transport; Wed, 5 Jan 2022 21:35:42 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Wed, 5 Jan
- 2022 15:35:41 -0600
-Date: Wed, 5 Jan 2022 15:35:19 -0600
-From: Michael Roth <michael.roth@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [RFC PATCH 00/10] KVM: selftests: Add support for
- test-selectable ucall implementations
-Message-ID: <20220105213519.g746jzf756nax562@amd.com>
-References: <20211210164620.11636-1-michael.roth@amd.com>
- <Yc4gcJdhxthBKUUd@google.com>
- <20220104233517.kxjbdw4t7taymab5@amd.com>
- <YdTjnRZQID5IabK0@google.com>
- <20220105170244.jwr6i2erecbhx3fz@amd.com>
- <YdXYuaoXJux6lHrF@google.com>
- <20220105191107.qx67wf2coc3q6giu@amd.com>
- <YdX0SRoBXReggrVA@google.com>
+ with ESMTP id 5GF2Q9LfOWa5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Jan 2022 21:42:51 -0500 (EST)
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com
+ [209.85.219.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8E1F408C1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 21:42:51 -0500 (EST)
+Received: by mail-yb1-f180.google.com with SMTP id p15so3336622ybk.10
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Jan 2022 18:42:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=VUrh3Npgeap/8EiEtwRjncA+1oSJVR1QQxVGHBNvM04=;
+ b=f6EQYO79bUXprc7mhn+5kkGk7QaNhdm6TSnLti6itS7mqSCQT6sQjiGOBku7WoX188
+ vPdqu9VcHqayR/unWn8Q1ICELVnmKRotk6JQfhShEKTlwYXcQmP7i4wWQTx3chDRDI7A
+ 4kBgcl+GK+bigbshUapujhp4+UlbLV1/GOkiY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=VUrh3Npgeap/8EiEtwRjncA+1oSJVR1QQxVGHBNvM04=;
+ b=6+qFiE6BeaaierM2+e95sRCWEbgSzDP5yR4jSpHy6G2PIlKTPgrTw+NzZo/2k+1dhJ
+ ToNCWuH0WUiRfbuuOS5/qC6rnVmCK0VQAQHhuOnqkKBdr97eRyA2axblzwc6EFjvDNx0
+ Ir/GoZrZ6Rox9fQGjzBH37n0N+XUM4vn6Trv4vLQmjuT/e+cnlWPLsenmlPeeVLNfbNg
+ nrf3FYUkWqHd5lC81Yy1eEIVsHmJ0avF3RDhrro8S8vxEIhIkflXrg/0XKnahRy9BEl/
+ 3EzmQt2MYvm0YSEkQoNISxEk4W0KDOw3Iqyw+hEfnAmG0TnUiavsqnfB+wGr4Y+ESZax
+ GlVw==
+X-Gm-Message-State: AOAM530uMy0FeDjLCtw+AJSpVmS2COZgxnVoxP1q8Q6yPx0Pfu1qa/Io
+ fQM0Pto5nxYhOoZJP1GPVwBC+ScwIspquFu8GEgGvg==
+X-Google-Smtp-Source: ABdhPJySN8UQBiLK5ZELedz9aMDOihftjIfvLaugncGmaT2wHj67/GId/mm7KBCgharYeRmCbxfpR9IivB+Tgad8EI0=
+X-Received: by 2002:a25:5ca:: with SMTP id 193mr64959101ybf.406.1641436971074; 
+ Wed, 05 Jan 2022 18:42:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YdX0SRoBXReggrVA@google.com>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
- (10.181.40.144)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e0cb7c35-5e5f-4a7b-4adc-08d9d093531c
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5364:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5364F048D36D0A034F3E85F6954B9@BL1PR12MB5364.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: icilStvPUmzxfmhLP05ZpbxXQ9VxjZume+O5pTCK/bjm6q0DMtjdeXTy6midc/J1X9pQ/McQDEmV5DKIuSVJRYat9eOAvy06J44mNZ+h4ZQP1bzhH7v36EzvEpxNnWh6LwFXGyMb+l0mf6A7IFRsh3xke/BvDsE1j3FZNqqO++kBkvHcNBfcTiy5MKONOA6Vh+J0NuCTpCuMwCQjinH8wrdKW1ngepxm7hV/CTHCciv1TcX+s8GCTiHGlecZt9rWhk71OwggkTo4hxB55ksmp0DWAlIzyUv5O58tDx4rEGkmwN6c2J/mt1hZ917voeXqOXAsiKmck0cISIBXdKBgOmfWi3HUzFO+ZXjFFyUdFpIn+JH+M0gpzxRho4HzS1tMIyr7rFIlkhNt/sIdmmHPkvH4vOKPqVWPmbpe2Fm4L0GBc1q0RY7buQ3jYoKkx77KKlDgkxuLdEi9ZNDvVHcLLxvO3TtOi2yGYsPS/UkmH2j3uF98dspQaCpkraLPbNMcIjmkQcjCYxU/NoavOi5cqYIRkNEATIUqs3kqSN7ShMRmLYWvoXW7PgVH0I1iFvFd2OwJ86DkPTQfmhQFZiwpD3dHq2Jxns8PiQFQgntpODxmHYcqs/99m0L4lqp75bLvJB6HVYSIIVbZ/V4mCIEG8B4QDt+gkBYzSa45m1Wgje30f+s6N4+l51aVBDrleYgDAU2H6opq6mUyPCXlcMFuyMDyDiAzZLG8mJpSTgL3WcVTkFXNU5N/XDcRd+FXlP89seoRXmCBKqlyJOWY8gCod56pvi9sy0RwWSfSWDb29M8=
-X-Forefront-Antispam-Report: CIP:165.204.84.17; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:CAL; SFV:NSPM; H:SATLEXMB03.amd.com; PTR:InfoDomainNonexistent; CAT:NONE;
- SFS:(4636009)(36840700001)(46966006)(40470700002)(508600001)(6916009)(4326008)(2906002)(26005)(186003)(7416002)(44832011)(316002)(8936002)(336012)(16526019)(86362001)(426003)(8676002)(54906003)(40460700001)(47076005)(83380400001)(82310400004)(36756003)(36860700001)(81166007)(2616005)(5660300002)(1076003)(6666004)(356005)(70206006)(70586007)(36900700001);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2022 21:35:42.1206 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e0cb7c35-5e5f-4a7b-4adc-08d9d093531c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d; Ip=[165.204.84.17];
- Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT060.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5364
+References: <20211129034317.2964790-1-stevensd@google.com>
+ <20211129034317.2964790-5-stevensd@google.com>
+ <Yc4G23rrSxS59br5@google.com>
+ <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
+ <YdXrURHO/R82puD4@google.com> <YdXvUaBUvaRPsv6m@google.com>
+In-Reply-To: <YdXvUaBUvaRPsv6m@google.com>
+From: David Stevens <stevensd@chromium.org>
+Date: Thu, 6 Jan 2022 11:42:39 +0900
+Message-ID: <CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com>
+Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
+To: Sean Christopherson <seanjc@google.com>
 X-Mailman-Approved-At: Thu, 06 Jan 2022 04:19:54 -0500
-Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org,
- David Hildenbrand <david@redhat.com>, Marc Orr <marcorr@google.com>,
- linux-kselftest@vger.kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Nathan Tempelman <natet@google.com>, Janosch
- Frank <frankja@linux.ibm.com>, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, x86@kernel.org, Ingo Molnar <mingo@redhat.com>,
- Mingwei Zhang <mizhang@google.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Tom Lendacky <thomas.lendacky@amd.com>, Borislav Petkov <bp@alien8.de>,
- Thomas Gleixner <tglx@linutronix.de>, Varad Gautam <varad.gautam@suse.com>,
- Jim Mattson <jmattson@google.com>, Steve Rutherford <srutherford@google.com>,
- linux-kernel@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- David Woodhouse <dwmw@amazon.co.uk>
+Cc: Chia-I Wu <olv@chromium.org>, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -142,96 +87,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 05, 2022 at 07:40:57PM +0000, Sean Christopherson wrote:
-> On Wed, Jan 05, 2022, Michael Roth wrote:
-> > On Wed, Jan 05, 2022 at 05:43:21PM +0000, Sean Christopherson wrote:
-> > > Because it uses multiple VMs, and my rough sketch only allows for a single VM to
-> > > use ucall.  Though I suppose we could simply keep appending to the ucall list for
-> > > every VM.  The requirement would then be that all VMs are of the same type, i.e.
-> > > utilize the same ucall_ops.
-> > 
-> > Hmm, maybe I misread your patch. Not supporting multiple VMs was the
-> > reason I gave up on having the ucall structs allocated on-demand and
-> > went with requiring them to be passed as arguments to ucall().
-> > 
-> > I thought with your patch you had solved that by having each vm have it's
-> > own pool, via vm->ucall_list, and then mapping each pool into each guest
-> > separately via:
-> > 
-> >   ucall_init(vm):
-> >     ucall_list = vm->ucall_list
-> >     sync_global_to_guest(ucall_list).
-> > 
-> > then as long as that ucall_init() is done *after* the guest calls
-> > kvm_vm_elf_load(), it will end up with a 'ucall_list' global that points
-> > to it's own specific vm->ucall_list. Then on the test side it doesn't
-> > matter what the 'ucall_list' global is currently set to since you have
-> > the GPA and know what vm exited.
-> > 
-> > Or am I missing something there?
-> 
-> Ha, that was not at all intented.  But yes, it should work.  I'd rather be lucky
-> than good?
+On Thu, Jan 6, 2022 at 4:19 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Jan 05, 2022, Sean Christopherson wrote:
+> > Ah, I got royally confused by ensure_pfn_ref()'s comment
+> >
+> >   * Certain IO or PFNMAP mappings can be backed with valid
+> >   * struct pages, but be allocated without refcounting e.g.,
+> >   * tail pages of non-compound higher order allocations, which
+> >   * would then underflow the refcount when the caller does the
+> >   * required put_page. Don't allow those pages here.
+> >                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > that doesn't apply here because kvm_faultin_pfn() uses the low level
+> > __gfn_to_pfn_page_memslot().
+>
+> On fifth thought, I think this is wrong and doomed to fail.  By mapping these pages
+> into the guest, KVM is effectively saying it supports these pages.  But if the guest
+> uses the corresponding gfns for an action that requires KVM to access the page,
+> e.g. via kvm_vcpu_map(), ensure_pfn_ref() will reject the access and all sorts of
+> bad things will happen to the guest.
+>
+> So, why not fully reject these types of pages?  If someone is relying on KVM to
+> support these types of pages, then we'll fail fast and get a bug report letting us
+> know we need to properly support these types of pages.  And if not, then we reduce
+> KVM's complexity and I get to keep my precious WARN :-)
 
-:)
+Our current use case here is virtio-gpu blob resources [1]. Blob
+resources are useful because they avoid a guest shadow buffer and the
+associated memcpys, and as I understand it they are also required for
+virtualized vulkan.
 
-> 
-> > Although even if that is the case, now that we're proposing doing the
-> > ucall_init() inside vm_create(), then we run the risk of a test calling
-> > kvm_vm_elf_load() after, which might clobber the guest's copy of
-> > ucall_list global if ucall_init() had since been called for another VM.
-> > But that could maybe be worked around by having whatever vm_create()
-> > variant we use also do the kvm_vm_elf_load() unconditionally as part of
-> > creation.
-> 
-> Will sync_global_to_guest() even work as intended if kvm_vm_elf_load() hasn't
-> been called?  If not, then sync_global_{to,from}_guest() should really assert if
-> the test hasn't been loaded.
+One type of blob resources requires mapping dma-bufs allocated by the
+host directly into the guest. This works on Intel platforms and the
+ARM platforms I've tested. However, the amdgpu driver sometimes
+allocates higher order, non-compound pages via ttm_pool_alloc_page.
+These are the type of pages which KVM is currently rejecting. Is this
+something that KVM can support?
 
-Yah, seems like it would get clobbered by kvm_vm_elf_load() later. And
-can't think of any good reason to use sync_global_to_guest() without also
-needing kvm_vm_elf_load() at some point, so makes sense to enforce it.
++olv, who has done some of the blob resource work.
 
-> 
-> As for ucall_init(), I think the best approach would be to make kvm_vm_elf_load()
-> a static and replace all calls with:
-> 
-> 	kvm_vm_load_guest(vm);
-> 
-> where its implementation is:
-> 
->   void kvm_vm_load_guest(struct kvm_vm *vm)
->   {
->   	kvm_vm_elf_load(vm, program_invocation_name);
-> 
-> 	ucall_init(vm);
->   }
-> 
-> The logic being that if a test creates a VM but never loads any code into the guest,
-> e.g. kvm_create_max_vcpus, then it _can't_ make ucalls.
+[1] https://patchwork.kernel.org/project/dri-devel/cover/20200814024000.2485-1-gurchetansingh@chromium.org/
 
-Makes sense. And if different ops are needed for vmgexit()/tdcall() it
-could be something like (if based on patches 1-5 of this series, and
-extending vm_guest_mode as you suggested earlier):
-
-   void kvm_vm_load_guest(struct kvm_vm *vm)
-   {
-
-     kvm_vm_elf_load(vm, program_invocation_name);
-  
-     if (vm->mode == VM_MODE_SEV)
-  	    ucall_init_ops(vm, ucall_ops_pio_vmgexit);
-     else (vm->vm_type == VM_MODE_TDX)
-  	    ucall_init_ops(vm, ucall_ops_pio_tdcall);
-     else
-  	    ucall_init_ops(vm, ucall_ops_pio);
-
-Shame we have to update all the kvm_vm_elf_load() call-sites, but
-they'd end up potentially breaking things if left as-is anyway.
-
-Were you planning on sending patches for these changes, or should I incorporate
-your prototype and take a stab at the other changes as part of v2 of this
-series?
+-David
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
