@@ -2,74 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0702C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 04:29:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC8AC433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 09:16:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F68E4087B;
-	Wed,  5 Jan 2022 23:29:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A9BFB4B15A;
+	Thu,  6 Jan 2022 04:16:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id k0+Im8GRLlMT; Wed,  5 Jan 2022 23:29:17 -0500 (EST)
+	with ESMTP id M8UYkViRHRkb; Thu,  6 Jan 2022 04:16:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0C194089E;
-	Wed,  5 Jan 2022 23:29:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CB734B14D;
+	Thu,  6 Jan 2022 04:16:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29A954B0AC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 23:29:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B5154B14D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 04:16:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i2ijMKZMWtEt for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Jan 2022 23:29:13 -0500 (EST)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4023E49ED9
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Jan 2022 23:29:11 -0500 (EST)
-Received: by mail-pg1-f201.google.com with SMTP id
- j186-20020a636ec3000000b00340c5f3a0cbso872776pgc.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Jan 2022 20:29:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=zetP73B0MI1YCJQ9U6w8bmxUL7UaSGg41Pq/RoAIA7s=;
- b=Sc9gt+VUiFOjx1LUKrZJWr1or7fZ7n6YytsmGSEjmObbs2W00YJRE4KUdCMnIhT+eR
- 5xH1wDIZ6ZMFCWBVdIvXVqP0nIZ5CO3et8AKazel7agRt5Y1oLZKbnJvEBAgR6BOU8cW
- OA6CjRk7oQcP3xnCYeZ6/PfB36gVDPip5OlekAeQp9Hmk2HixP7Na/YkmT1gJ/iNaNfZ
- i1r4gVIcoA68rRrqApRp2UtezrqpI05bi/JNND1ZyeWCcgVPT1alZNSX7WL6eP3p93+x
- y99fnet96NF72Px3gtflawuOFvllgTkqAWsSiX7oPfJT+9xNTFpZmpWQY0WhbmZkRQNm
- B1WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=zetP73B0MI1YCJQ9U6w8bmxUL7UaSGg41Pq/RoAIA7s=;
- b=46jibERlm5QENTEQKOcAc97HLkfZzZ2H96UaQoMiZfSG8oQ3Zwu10xnfAMYv1hk3i9
- Sik5sYynwtSmANoYWh14nRd7ZbFU2ThjW4ZmeaRl2ufNnb6HgT3S+39ELz6YwpBYWfMK
- yatKhl0YdFK+IULOByoqwQKhczUAFxI0IoI3iWn98R55JJv6fcZ6b2HiKQHKbXjHXgYS
- ANh3wt9cAm+CdxZzTwX6L9nOfcGLQjDs/HxhCPGOy8r6+1+bwxBS8D5l68bkeAw6DlYr
- cE8h4OB29sDyHum5vhVhARpCCDlu1FpS+UaQ5NIL1nabLyJwQtdJekW1Q84S0jcPQeoS
- QRzw==
-X-Gm-Message-State: AOAM531+h5LCbNB6yQ5o01TSl+lv/lXWoAX9YLgu9yPKpUzTI1nQUaTm
- CvyTaK6lOzHbaaHX6+00wdM1IxffkwA=
-X-Google-Smtp-Source: ABdhPJy84phXFK2/WjtQypM7C67xthoCFia2tj+8X+RmoeVKJGEAzrUNrHh8Wae69VBpaz7T2q1jSzBFDec=
-X-Received: from reiji-vws-sp.c.googlers.com
- ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:90b:3ec5:: with SMTP id
- rm5mr8036414pjb.100.1641443350457; Wed, 05 Jan 2022 20:29:10 -0800 (PST)
-Date: Wed,  5 Jan 2022 20:27:08 -0800
-In-Reply-To: <20220106042708.2869332-1-reijiw@google.com>
-Message-Id: <20220106042708.2869332-27-reijiw@google.com>
-Mime-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com>
-X-Mailer: git-send-email 2.34.1.448.ga2b2bfdf31-goog
-Subject: [RFC PATCH v4 26/26] KVM: arm64: selftests: Introduce id_reg_test
-From: Reiji Watanabe <reijiw@google.com>
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id 7+H29XkEmkWt for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jan 2022 04:16:17 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 642024A7FD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 04:16:17 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id D187161AD8;
+ Thu,  6 Jan 2022 09:16:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 468B4C36AE5;
+ Thu,  6 Jan 2022 09:16:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1641460575;
+ bh=mdH8wLVZw9IC0axvrDBOf6u/F9++nH65H2Vt9jCeYSw=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=SQjF2ZDmhHDLNU8PSy++u2GW+aV5bYBZIvBxoyy64NK/p1qEKEZS/h+XSTUIQc+6f
+ o/NRsYCnzIAA5VFr6oPA4RVEI7Gfl1n2uoVb8ttjuFAyVRZFVm3kR9/v+Ryl4UPY77
+ nfRqyeUuULHcuDdR7uq2AcSfTIHhLoSQeKmaWw24CtOnMPBxd57odRQ6U78/P+oLFP
+ E3uDVxRESpx4SIBCr1z96gI8+upvhVGQeuQZw2+jWxdciYe2ilxWBfapj5quTT1qqS
+ cafpQWWJln0aRWs+G/qJgURciNlHE2w6owB7qYAG0LEy0IfOmGSZycO96G5Jym9Je0
+ K50GjjtSua87w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n5OsW-00GJrc-Rh; Thu, 06 Jan 2022 09:16:12 +0000
+Date: Thu, 06 Jan 2022 09:16:08 +0000
+Message-ID: <87czl5usvb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2] hw/arm/virt: KVM: Enable PAuth when supported by the
+ host
+In-Reply-To: <c5bedb8e-55e3-877f-31aa-92d59e5aba34@linaro.org>
+References: <20220103180507.2190429-1-maz@kernel.org>
+ <c5bedb8e-55e3-877f-31aa-92d59e5aba34@linaro.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com,
+ eric.auger@redhat.com, drjones@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,1304 +87,107 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce a test for aarch64 to validate basic behavior of
-KVM_GET_ONE_REG and KVM_SET_ONE_REG for ID registers.
+Hi Richard,
 
-This test runs only when KVM_CAP_ARM_ID_REG_CONFIGURABLE is supported.
+On Wed, 05 Jan 2022 21:36:55 +0000,
+Richard Henderson <richard.henderson@linaro.org> wrote:
+> 
+> On 1/3/22 10:05 AM, Marc Zyngier wrote:
+> > -        /*
+> > -         * KVM does not support modifications to this feature.
+> > -         * We have not registered the cpu properties when KVM
+> > -         * is in use, so the user will not be able to set them.
+> > -         */
+> > -        if (!kvm_enabled()) {
+> > -            arm_cpu_pauth_finalize(cpu, &local_err);
+> > -            if (local_err != NULL) {
+> > +	arm_cpu_pauth_finalize(cpu, &local_err);
+> > +	if (local_err != NULL) {
+> >                   error_propagate(errp, local_err);
+> >                   return;
+> > -            }
+> > -        }
+> > +	}
+> 
+> Looks like the indentation is off?
 
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- tools/arch/arm64/include/asm/sysreg.h         |    1 +
- tools/testing/selftests/kvm/.gitignore        |    1 +
- tools/testing/selftests/kvm/Makefile          |    1 +
- .../selftests/kvm/aarch64/id_reg_test.c       | 1239 +++++++++++++++++
- 4 files changed, 1242 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
+Most probably. I only just discovered how to use the QEMU style for
+Emacs, and was indenting things by hand before that (yes, pretty
+painful and likely to lead to issues (there is a TAB instead of a set
+of spaces there...).
 
-diff --git a/tools/arch/arm64/include/asm/sysreg.h b/tools/arch/arm64/include/asm/sysreg.h
-index 7640fa27be94..be3947c125f1 100644
---- a/tools/arch/arm64/include/asm/sysreg.h
-+++ b/tools/arch/arm64/include/asm/sysreg.h
-@@ -793,6 +793,7 @@
- #define ID_AA64PFR0_ELx_32BIT_64BIT	0x2
- 
- /* id_aa64pfr1 */
-+#define ID_AA64PFR1_CSV2FRAC_SHIFT	32
- #define ID_AA64PFR1_MPAMFRAC_SHIFT	16
- #define ID_AA64PFR1_RASFRAC_SHIFT	12
- #define ID_AA64PFR1_MTE_SHIFT		8
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 3cb5ac5da087..e0a5f304375d 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -2,6 +2,7 @@
- /aarch64/arch_timer
- /aarch64/debug-exceptions
- /aarch64/get-reg-list
-+/aarch64/id_reg_test
- /aarch64/psci_cpu_on_test
- /aarch64/vgic_init
- /s390x/memop
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 17342b575e85..0162a7d98889 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -94,6 +94,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
- TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
-+TEST_GEN_PROGS_aarch64 += aarch64/id_reg_test
- TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += demand_paging_test
-diff --git a/tools/testing/selftests/kvm/aarch64/id_reg_test.c b/tools/testing/selftests/kvm/aarch64/id_reg_test.c
-new file mode 100644
-index 000000000000..e2cac415ad57
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/id_reg_test.c
-@@ -0,0 +1,1239 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#define _GNU_SOURCE
-+
-+#include <stdlib.h>
-+#include <time.h>
-+#include <pthread.h>
-+#include <linux/kvm.h>
-+#include <linux/sizes.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "vgic.h"
-+
-+/*
-+ * id_reg_test.c - Tests reading/writing the aarch64's ID registers
-+ *
-+ * The test validates KVM_SET_ONE_REG/KVM_GET_ONE_REG ioctl for ID
-+ * registers as well as reading ID register from the guest works fine.
-+ */
-+
-+/* Reserved ID registers */
-+#define	SYS_ID_REG_3_3_EL1		sys_reg(3, 0, 0, 3, 3)
-+#define	SYS_ID_REG_3_7_EL1		sys_reg(3, 0, 0, 3, 7)
-+
-+#define	SYS_ID_REG_4_2_EL1		sys_reg(3, 0, 0, 4, 2)
-+#define	SYS_ID_REG_4_3_EL1		sys_reg(3, 0, 0, 4, 3)
-+#define	SYS_ID_REG_4_5_EL1		sys_reg(3, 0, 0, 4, 5)
-+#define	SYS_ID_REG_4_6_EL1		sys_reg(3, 0, 0, 4, 6)
-+#define	SYS_ID_REG_4_7_EL1		sys_reg(3, 0, 0, 4, 7)
-+
-+#define	SYS_ID_REG_5_2_EL1		sys_reg(3, 0, 0, 5, 2)
-+#define	SYS_ID_REG_5_3_EL1		sys_reg(3, 0, 0, 5, 3)
-+#define	SYS_ID_REG_5_6_EL1		sys_reg(3, 0, 0, 5, 6)
-+#define	SYS_ID_REG_5_7_EL1		sys_reg(3, 0, 0, 5, 7)
-+
-+#define	SYS_ID_REG_6_2_EL1		sys_reg(3, 0, 0, 6, 2)
-+#define	SYS_ID_REG_6_3_EL1		sys_reg(3, 0, 0, 6, 3)
-+#define	SYS_ID_REG_6_4_EL1		sys_reg(3, 0, 0, 6, 4)
-+#define	SYS_ID_REG_6_5_EL1		sys_reg(3, 0, 0, 6, 5)
-+#define	SYS_ID_REG_6_6_EL1		sys_reg(3, 0, 0, 6, 6)
-+#define	SYS_ID_REG_6_7_EL1		sys_reg(3, 0, 0, 6, 7)
-+
-+#define	SYS_ID_REG_7_3_EL1		sys_reg(3, 0, 0, 7, 3)
-+#define	SYS_ID_REG_7_4_EL1		sys_reg(3, 0, 0, 7, 4)
-+#define	SYS_ID_REG_7_5_EL1		sys_reg(3, 0, 0, 7, 5)
-+#define	SYS_ID_REG_7_6_EL1		sys_reg(3, 0, 0, 7, 6)
-+#define	SYS_ID_REG_7_7_EL1		sys_reg(3, 0, 0, 7, 7)
-+
-+#define	READ_ID_REG_FN(name)	read_## name ## _EL1
-+
-+#define	DEFINE_READ_SYS_REG(reg_name)			\
-+uint64_t read_##reg_name(void)				\
-+{							\
-+	return read_sysreg_s(SYS_##reg_name);		\
-+}
-+
-+#define DEFINE_READ_ID_REG(name)	\
-+	DEFINE_READ_SYS_REG(name ## _EL1)
-+
-+#define	__ID_REG(reg_name)		\
-+	.name = #reg_name,		\
-+	.id = SYS_## reg_name ##_EL1,	\
-+	.read_reg = READ_ID_REG_FN(reg_name),
-+
-+#define	ID_REG_ENT(reg_name)	\
-+	[ID_IDX(reg_name)] = { __ID_REG(reg_name) }
-+
-+/* Functions to read each ID register */
-+/* CRm=1 */
-+DEFINE_READ_ID_REG(ID_PFR0)
-+DEFINE_READ_ID_REG(ID_PFR1)
-+DEFINE_READ_ID_REG(ID_DFR0)
-+DEFINE_READ_ID_REG(ID_AFR0)
-+DEFINE_READ_ID_REG(ID_MMFR0)
-+DEFINE_READ_ID_REG(ID_MMFR1)
-+DEFINE_READ_ID_REG(ID_MMFR2)
-+DEFINE_READ_ID_REG(ID_MMFR3)
-+
-+/* CRm=2 */
-+DEFINE_READ_ID_REG(ID_ISAR0)
-+DEFINE_READ_ID_REG(ID_ISAR1)
-+DEFINE_READ_ID_REG(ID_ISAR2)
-+DEFINE_READ_ID_REG(ID_ISAR3)
-+DEFINE_READ_ID_REG(ID_ISAR4)
-+DEFINE_READ_ID_REG(ID_ISAR5)
-+DEFINE_READ_ID_REG(ID_MMFR4)
-+DEFINE_READ_ID_REG(ID_ISAR6)
-+
-+/* CRm=3 */
-+DEFINE_READ_ID_REG(MVFR0)
-+DEFINE_READ_ID_REG(MVFR1)
-+DEFINE_READ_ID_REG(MVFR2)
-+DEFINE_READ_ID_REG(ID_REG_3_3)
-+DEFINE_READ_ID_REG(ID_PFR2)
-+DEFINE_READ_ID_REG(ID_DFR1)
-+DEFINE_READ_ID_REG(ID_MMFR5)
-+DEFINE_READ_ID_REG(ID_REG_3_7)
-+
-+/* CRm=4 */
-+DEFINE_READ_ID_REG(ID_AA64PFR0)
-+DEFINE_READ_ID_REG(ID_AA64PFR1)
-+DEFINE_READ_ID_REG(ID_REG_4_2)
-+DEFINE_READ_ID_REG(ID_REG_4_3)
-+DEFINE_READ_ID_REG(ID_AA64ZFR0)
-+DEFINE_READ_ID_REG(ID_REG_4_5)
-+DEFINE_READ_ID_REG(ID_REG_4_6)
-+DEFINE_READ_ID_REG(ID_REG_4_7)
-+
-+/* CRm=5 */
-+DEFINE_READ_ID_REG(ID_AA64DFR0)
-+DEFINE_READ_ID_REG(ID_AA64DFR1)
-+DEFINE_READ_ID_REG(ID_REG_5_2)
-+DEFINE_READ_ID_REG(ID_REG_5_3)
-+DEFINE_READ_ID_REG(ID_AA64AFR0)
-+DEFINE_READ_ID_REG(ID_AA64AFR1)
-+DEFINE_READ_ID_REG(ID_REG_5_6)
-+DEFINE_READ_ID_REG(ID_REG_5_7)
-+
-+/* CRm=6 */
-+DEFINE_READ_ID_REG(ID_AA64ISAR0)
-+DEFINE_READ_ID_REG(ID_AA64ISAR1)
-+DEFINE_READ_ID_REG(ID_REG_6_2)
-+DEFINE_READ_ID_REG(ID_REG_6_3)
-+DEFINE_READ_ID_REG(ID_REG_6_4)
-+DEFINE_READ_ID_REG(ID_REG_6_5)
-+DEFINE_READ_ID_REG(ID_REG_6_6)
-+DEFINE_READ_ID_REG(ID_REG_6_7)
-+
-+/* CRm=7 */
-+DEFINE_READ_ID_REG(ID_AA64MMFR0)
-+DEFINE_READ_ID_REG(ID_AA64MMFR1)
-+DEFINE_READ_ID_REG(ID_AA64MMFR2)
-+DEFINE_READ_ID_REG(ID_REG_7_3)
-+DEFINE_READ_ID_REG(ID_REG_7_4)
-+DEFINE_READ_ID_REG(ID_REG_7_5)
-+DEFINE_READ_ID_REG(ID_REG_7_6)
-+DEFINE_READ_ID_REG(ID_REG_7_7)
-+
-+#define	ID_IDX(name)	REG_IDX_## name
-+
-+enum id_reg_idx {
-+	/* CRm=1 */
-+	ID_IDX(ID_PFR0) = 0,
-+	ID_IDX(ID_PFR1),
-+	ID_IDX(ID_DFR0),
-+	ID_IDX(ID_AFR0),
-+	ID_IDX(ID_MMFR0),
-+	ID_IDX(ID_MMFR1),
-+	ID_IDX(ID_MMFR2),
-+	ID_IDX(ID_MMFR3),
-+
-+	/* CRm=2 */
-+	ID_IDX(ID_ISAR0),
-+	ID_IDX(ID_ISAR1),
-+	ID_IDX(ID_ISAR2),
-+	ID_IDX(ID_ISAR3),
-+	ID_IDX(ID_ISAR4),
-+	ID_IDX(ID_ISAR5),
-+	ID_IDX(ID_MMFR4),
-+	ID_IDX(ID_ISAR6),
-+
-+	/* CRm=3 */
-+	ID_IDX(MVFR0),
-+	ID_IDX(MVFR1),
-+	ID_IDX(MVFR2),
-+	ID_IDX(ID_REG_3_3),
-+	ID_IDX(ID_PFR2),
-+	ID_IDX(ID_DFR1),
-+	ID_IDX(ID_MMFR5),
-+	ID_IDX(ID_REG_3_7),
-+
-+	/* CRm=4 */
-+	ID_IDX(ID_AA64PFR0),
-+	ID_IDX(ID_AA64PFR1),
-+	ID_IDX(ID_REG_4_2),
-+	ID_IDX(ID_REG_4_3),
-+	ID_IDX(ID_AA64ZFR0),
-+	ID_IDX(ID_REG_4_5),
-+	ID_IDX(ID_REG_4_6),
-+	ID_IDX(ID_REG_4_7),
-+
-+	/* CRm=5 */
-+	ID_IDX(ID_AA64DFR0),
-+	ID_IDX(ID_AA64DFR1),
-+	ID_IDX(ID_REG_5_2),
-+	ID_IDX(ID_REG_5_3),
-+	ID_IDX(ID_AA64AFR0),
-+	ID_IDX(ID_AA64AFR1),
-+	ID_IDX(ID_REG_5_6),
-+	ID_IDX(ID_REG_5_7),
-+
-+	/* CRm=6 */
-+	ID_IDX(ID_AA64ISAR0),
-+	ID_IDX(ID_AA64ISAR1),
-+	ID_IDX(ID_REG_6_2),
-+	ID_IDX(ID_REG_6_3),
-+	ID_IDX(ID_REG_6_4),
-+	ID_IDX(ID_REG_6_5),
-+	ID_IDX(ID_REG_6_6),
-+	ID_IDX(ID_REG_6_7),
-+
-+	/* CRm=7 */
-+	ID_IDX(ID_AA64MMFR0),
-+	ID_IDX(ID_AA64MMFR1),
-+	ID_IDX(ID_AA64MMFR2),
-+	ID_IDX(ID_REG_7_3),
-+	ID_IDX(ID_REG_7_4),
-+	ID_IDX(ID_REG_7_5),
-+	ID_IDX(ID_REG_7_6),
-+	ID_IDX(ID_REG_7_7),
-+};
-+
-+struct id_reg_test_info {
-+	char		*name;
-+	uint32_t	id;
-+	/* Indicates the register can be set to 0 */
-+	bool		can_clear;
-+	uint64_t	initial_value;
-+	uint64_t	current_value;
-+	uint64_t	(*read_reg)(void);
-+};
-+
-+#define	ID_REG_INFO(name)	(&id_reg_list[ID_IDX(name)])
-+static struct id_reg_test_info id_reg_list[] = {
-+	/* CRm=1 */
-+	ID_REG_ENT(ID_PFR0),
-+	ID_REG_ENT(ID_PFR1),
-+	ID_REG_ENT(ID_DFR0),
-+	ID_REG_ENT(ID_AFR0),
-+	ID_REG_ENT(ID_MMFR0),
-+	ID_REG_ENT(ID_MMFR1),
-+	ID_REG_ENT(ID_MMFR2),
-+	ID_REG_ENT(ID_MMFR3),
-+
-+	/* CRm=2 */
-+	ID_REG_ENT(ID_ISAR0),
-+	ID_REG_ENT(ID_ISAR1),
-+	ID_REG_ENT(ID_ISAR2),
-+	ID_REG_ENT(ID_ISAR3),
-+	ID_REG_ENT(ID_ISAR4),
-+	ID_REG_ENT(ID_ISAR5),
-+	ID_REG_ENT(ID_MMFR4),
-+	ID_REG_ENT(ID_ISAR6),
-+
-+	/* CRm=3 */
-+	ID_REG_ENT(MVFR0),
-+	ID_REG_ENT(MVFR1),
-+	ID_REG_ENT(MVFR2),
-+	ID_REG_ENT(ID_REG_3_3),
-+	ID_REG_ENT(ID_PFR2),
-+	ID_REG_ENT(ID_DFR1),
-+	ID_REG_ENT(ID_MMFR5),
-+	ID_REG_ENT(ID_REG_3_7),
-+
-+	/* CRm=4 */
-+	ID_REG_ENT(ID_AA64PFR0),
-+	ID_REG_ENT(ID_AA64PFR1),
-+	ID_REG_ENT(ID_REG_4_2),
-+	ID_REG_ENT(ID_REG_4_3),
-+	ID_REG_ENT(ID_AA64ZFR0),
-+	ID_REG_ENT(ID_REG_4_5),
-+	ID_REG_ENT(ID_REG_4_6),
-+	ID_REG_ENT(ID_REG_4_7),
-+
-+	/* CRm=5 */
-+	ID_REG_ENT(ID_AA64DFR0),
-+	ID_REG_ENT(ID_AA64DFR1),
-+	ID_REG_ENT(ID_REG_5_2),
-+	ID_REG_ENT(ID_REG_5_3),
-+	ID_REG_ENT(ID_AA64AFR0),
-+	ID_REG_ENT(ID_AA64AFR1),
-+	ID_REG_ENT(ID_REG_5_6),
-+	ID_REG_ENT(ID_REG_5_7),
-+
-+	/* CRm=6 */
-+	ID_REG_ENT(ID_AA64ISAR0),
-+	ID_REG_ENT(ID_AA64ISAR1),
-+	ID_REG_ENT(ID_REG_6_2),
-+	ID_REG_ENT(ID_REG_6_3),
-+	ID_REG_ENT(ID_REG_6_4),
-+	ID_REG_ENT(ID_REG_6_5),
-+	ID_REG_ENT(ID_REG_6_6),
-+	ID_REG_ENT(ID_REG_6_7),
-+
-+	/* CRm=7 */
-+	ID_REG_ENT(ID_AA64MMFR0),
-+	ID_REG_ENT(ID_AA64MMFR1),
-+	ID_REG_ENT(ID_AA64MMFR2),
-+	ID_REG_ENT(ID_REG_7_3),
-+	ID_REG_ENT(ID_REG_7_4),
-+	ID_REG_ENT(ID_REG_7_5),
-+	ID_REG_ENT(ID_REG_7_6),
-+	ID_REG_ENT(ID_REG_7_7),
-+};
-+
-+static bool aarch32_support = true;
-+
-+/* Utilities to get a feature field from ID register value */
-+static inline int
-+cpuid_signed_field_width(uint64_t id_val, int field, int width)
-+{
-+	return (s64)(id_val << (64 - width - field)) >> (64 - width);
-+}
-+
-+static unsigned int
-+cpuid_unsigned_field_width(uint64_t id_val, int field, int width)
-+{
-+	return (uint64_t)(id_val << (64 - width - field)) >> (64 - width);
-+}
-+
-+static inline int __attribute_const__
-+cpuid_extract_field_width(uint64_t id_val, int field, int width, bool sign)
-+{
-+	return (sign) ? cpuid_signed_field_width(id_val, field, width) :
-+			cpuid_unsigned_field_width(id_val, field, width);
-+}
-+
-+#define is_id_reg(id)	\
-+	(sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&	\
-+	 sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 0 &&	\
-+	 sys_reg_CRm(id) < 8)
-+
-+#define	GET_ID_FIELD(regval, shift, is_signed)	\
-+	cpuid_extract_field_width(regval, shift, 4, is_signed)
-+
-+#define	GET_ID_UFIELD(regval, shift)	\
-+	cpuid_unsigned_field_width(regval, shift, 4)
-+
-+#define	UPDATE_ID_UFIELD(regval, shift, fval)	\
-+	(((regval) & ~(0xfULL << (shift))) |	\
-+	 (((uint64_t)((fval) & 0xf)) << (shift)))
-+
-+void pmu_init(struct kvm_vm *vm, uint32_t vcpu)
-+{
-+	struct kvm_device_attr attr = {
-+		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-+		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
-+	};
-+	vcpu_ioctl(vm, vcpu, KVM_SET_DEVICE_ATTR, &attr);
-+}
-+
-+void sve_init(struct kvm_vm *vm, uint32_t vcpu)
-+{
-+	int feature = KVM_ARM_VCPU_SVE;
-+
-+	vcpu_ioctl(vm, vcpu, KVM_ARM_VCPU_FINALIZE, &feature);
-+}
-+
-+#define GICD_BASE_GPA			0x8000000ULL
-+#define GICR_BASE_GPA			0x80A0000ULL
-+
-+void test_vgic_init(struct kvm_vm *vm, uint32_t vcpu)
-+{
-+	/* We jsut need to configure gic v3 (we don't use it though) */
-+	vgic_v3_setup(vm, 1, GICD_BASE_GPA, GICR_BASE_GPA);
-+}
-+
-+static bool is_aarch32_id_reg(uint32_t id)
-+{
-+	uint32_t crm, op2;
-+
-+	if (!is_id_reg(id))
-+		return false;
-+
-+	crm = sys_reg_CRm(id);
-+	op2 = sys_reg_Op2(id);
-+	if (crm == 1 || crm == 2 || (crm == 3 && (op2 != 3 && op2 != 7)))
-+		/* AArch32 ID register */
-+		return true;
-+
-+	return false;
-+}
-+
-+#define	MAX_CAPS	2
-+struct feature_test_info {
-+	char	*name;	/* Feature Name (Debug information) */
-+
-+	/* ID register that identifies the presence of the feature */
-+	struct id_reg_test_info	*sreg;
-+
-+	/*
-+	 * Bit position of the ID register field that identifies
-+	 * the presence of the feature.
-+	 */
-+	int	shift;
-+
-+	/* Min value of the field that indicates the presence of the feature. */
-+	int	min;
-+	bool	is_sign;	/* Is the field signed or unsigned ? */
-+	int	ncaps;		/* Number of valid Capabilities in caps[] */
-+
-+	/* KVM_CAP_* Capabilities to indicates that KVM supports this feature */
-+	long	caps[MAX_CAPS];
-+
-+	/* struct kvm_enable_cap to use the capability if needed */
-+	struct kvm_enable_cap	*opt_in_cap;
-+
-+	/* Should the guest check the ID register for this feature ? */
-+	bool	run_test;
-+
-+	/*
-+	 * Extra initialization function to enable the feature if needed.
-+	 * (e.g. KVM_ARM_VCPU_FINALIZE for SVE)
-+	 */
-+	void	(*init_feature)(struct kvm_vm *vm, uint32_t vcpuid);
-+
-+	/* struct kvm_vcpu_init to opt-in the feature if needed */
-+	struct kvm_vcpu_init	*vcpu_init;
-+};
-+
-+/* Information for opt-in CPU features */
-+static struct feature_test_info feature_test_info_table[] = {
-+	{
-+		.name = "SVE",
-+		.sreg = ID_REG_INFO(ID_AA64PFR0),
-+		.shift = ID_AA64PFR0_SVE_SHIFT,
-+		.min = 1,
-+		.caps = {KVM_CAP_ARM_SVE},
-+		.ncaps = 1,
-+		.init_feature = sve_init,
-+		.vcpu_init = &(struct kvm_vcpu_init) {
-+			.features = {1ULL << KVM_ARM_VCPU_SVE},
-+		},
-+	},
-+	{
-+		.name = "GIC",
-+		.sreg = ID_REG_INFO(ID_AA64PFR0),
-+		.shift = ID_AA64PFR0_GIC_SHIFT,
-+		.min = 1,
-+		.caps = {KVM_CAP_IRQCHIP},
-+		.ncaps = 1,
-+		.init_feature = test_vgic_init,
-+	},
-+	{
-+		.name = "MTE",
-+		.sreg = ID_REG_INFO(ID_AA64PFR1),
-+		.shift = ID_AA64PFR1_MTE_SHIFT,
-+		.min = 2,
-+		.caps = {KVM_CAP_ARM_MTE},
-+		.ncaps = 1,
-+		.opt_in_cap = &(struct kvm_enable_cap) {
-+				.cap = KVM_CAP_ARM_MTE,
-+		},
-+	},
-+	{
-+		.name = "PMUV3",
-+		.sreg = ID_REG_INFO(ID_AA64DFR0),
-+		.shift = ID_AA64DFR0_PMUVER_SHIFT,
-+		.min = 1,
-+		.init_feature = pmu_init,
-+		.caps = {KVM_CAP_ARM_PMU_V3},
-+		.ncaps = 1,
-+		.vcpu_init = &(struct kvm_vcpu_init) {
-+			.features = {1ULL << KVM_ARM_VCPU_PMU_V3},
-+		},
-+	},
-+	{
-+		.name = "PERFMON",
-+		.sreg = ID_REG_INFO(ID_DFR0),
-+		.shift = ID_DFR0_PERFMON_SHIFT,
-+		.min = 3,
-+		.init_feature = pmu_init,
-+		.caps = {KVM_CAP_ARM_PMU_V3},
-+		.ncaps = 1,
-+		.vcpu_init = &(struct kvm_vcpu_init) {
-+			.features = {1ULL << KVM_ARM_VCPU_PMU_V3},
-+		},
-+	},
-+};
-+
-+static void walk_id_reg_list(void (*fn)(struct id_reg_test_info *r, void *arg),
-+			     void *arg)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(id_reg_list); i++)
-+		fn(&id_reg_list[i], arg);
-+}
-+
-+static void guest_code_id_reg_check_one(struct id_reg_test_info *idr, void *arg)
-+{
-+	uint64_t v = idr->read_reg();
-+
-+	GUEST_ASSERT_2(v == idr->current_value, idr->name, idr->current_value);
-+}
-+
-+static void guest_code_id_reg_check_all(uint32_t cpu)
-+{
-+	walk_id_reg_list(guest_code_id_reg_check_one, NULL);
-+	GUEST_DONE();
-+}
-+
-+static void guest_code_do_nothing(uint32_t cpu)
-+{
-+	GUEST_DONE();
-+}
-+
-+static void guest_code_feature_check(uint32_t cpu)
-+{
-+	int i;
-+	struct feature_test_info *finfo;
-+
-+	for (i = 0; i < ARRAY_SIZE(feature_test_info_table); i++) {
-+		finfo = &feature_test_info_table[i];
-+		if (finfo->run_test)
-+			guest_code_id_reg_check_one(finfo->sreg, NULL);
-+	}
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_code_ptrauth_check(uint32_t cpuid)
-+{
-+	struct id_reg_test_info *sreg = ID_REG_INFO(ID_AA64ISAR1);
-+	uint64_t val = sreg->read_reg();
-+
-+	GUEST_ASSERT_2(val == sreg->current_value, "PTRAUTH", val);
-+	GUEST_DONE();
-+}
-+
-+static void reset_id_reg_info_current_value(struct id_reg_test_info *info,
-+					    void *arg)
-+{
-+	info->current_value = info->initial_value;
-+}
-+
-+/* Reset current_value field of each id_reg_test_info */
-+static void reset_id_reg_info(void)
-+{
-+	walk_id_reg_list(reset_id_reg_info_current_value, NULL);
-+}
-+
-+static struct kvm_vm *test_vm_create(uint32_t nvcpus,
-+		void (*guest_code)(uint32_t), struct kvm_vcpu_init *init,
-+		struct kvm_enable_cap *cap)
-+{
-+	struct kvm_vm *vm;
-+	uint32_t cpuid;
-+	uint64_t mem_pages;
-+
-+	mem_pages = DEFAULT_GUEST_PHY_PAGES + DEFAULT_STACK_PGS * nvcpus;
-+	mem_pages += mem_pages / (PTES_PER_MIN_PAGE * 2);
-+	mem_pages = vm_adjust_num_guest_pages(VM_MODE_DEFAULT, mem_pages);
-+
-+	vm = vm_create(VM_MODE_DEFAULT, mem_pages, O_RDWR);
-+	if (cap)
-+		vm_enable_cap(vm, cap);
-+
-+	kvm_vm_elf_load(vm, program_invocation_name);
-+
-+	if (init && init->target == -1) {
-+		struct kvm_vcpu_init preferred;
-+
-+		vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &preferred);
-+		init->target = preferred.target;
-+	}
-+
-+	vm_init_descriptor_tables(vm);
-+	for (cpuid = 0; cpuid < nvcpus; cpuid++) {
-+		aarch64_vcpu_add_default(vm, cpuid, init, guest_code);
-+		vcpu_init_descriptor_tables(vm, cpuid);
-+	}
-+
-+	ucall_init(vm, NULL);
-+	return vm;
-+}
-+
-+static void test_vm_free(struct kvm_vm *vm)
-+{
-+	ucall_uninit(vm);
-+	kvm_vm_free(vm);
-+}
-+
-+#define	TEST_RUN(vm, cpu)	\
-+	(test_vcpu_run(__func__, __LINE__, vm, cpu, true))
-+
-+#define	TEST_RUN_NO_SYNC_DATA(vm, cpu)	\
-+	(test_vcpu_run(__func__, __LINE__, vm, cpu, false))
-+
-+static int test_vcpu_run(const char *test_name, int line,
-+			 struct kvm_vm *vm, uint32_t vcpuid, bool sync_data)
-+{
-+	struct ucall uc;
-+	int ret;
-+
-+	if (sync_data) {
-+		sync_global_to_guest(vm, id_reg_list);
-+		sync_global_to_guest(vm, feature_test_info_table);
-+	}
-+
-+	vcpu_args_set(vm, vcpuid, 1, vcpuid);
-+
-+	ret = _vcpu_run(vm, vcpuid);
-+	if (ret) {
-+		ret = errno;
-+		goto sync_exit;
-+	}
-+
-+	switch (get_ucall(vm, vcpuid, &uc)) {
-+	case UCALL_SYNC:
-+	case UCALL_DONE:
-+		ret = 0;
-+		break;
-+	case UCALL_ABORT:
-+		TEST_FAIL(
-+		    "%s (%s) at line %d (user %s at line %d), args[3]=0x%lx",
-+		    (char *)uc.args[0], (char *)uc.args[2], (int)uc.args[1],
-+		    test_name, line, uc.args[3]);
-+		break;
-+	default:
-+		TEST_FAIL("Unexpected guest exit\n");
-+	}
-+
-+sync_exit:
-+	if (sync_data) {
-+		sync_global_from_guest(vm, id_reg_list);
-+		sync_global_from_guest(vm, feature_test_info_table);
-+	}
-+	return ret;
-+}
-+
-+struct vm_vcpu_arg {
-+	struct kvm_vm	*vm;
-+	uint32_t	vcpuid;
-+	bool		after_run;
-+};
-+
-+/*
-+ * Test if KVM_SET_ONE_REG can work with the value KVM_GET_ONE_REG returns,
-+ * KVM_SET_ONE_REG with zero works before KVM_RUN (and fails after KVM_RUN),
-+ * and KVM_GET_ONE_REG returns the value KVM_SET_ONE_REG sets.
-+ */
-+static void test_get_set_id_reg(struct id_reg_test_info *sreg, void *arg)
-+{
-+	struct kvm_vm *vm = ((struct vm_vcpu_arg *)arg)->vm;
-+	uint32_t vcpuid = ((struct vm_vcpu_arg *)arg)->vcpuid;
-+	bool after_run = ((struct vm_vcpu_arg *)arg)->after_run;
-+	struct kvm_one_reg one_reg;
-+	uint64_t reg_val, tval;
-+	int ret;
-+
-+	one_reg.addr = (uint64_t)&reg_val;
-+	one_reg.id = KVM_ARM64_SYS_REG(sreg->id);
-+
-+	/* Check the current register value */
-+	vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, &one_reg);
-+	TEST_ASSERT(reg_val == sreg->current_value,
-+		    "GET(%s) didn't return 0x%lx but 0x%lx",
-+		    sreg->name, sreg->current_value, reg_val);
-+	tval = reg_val;
-+
-+	/* Try to clear the register that should be able to be cleared. */
-+	if ((reg_val != 0) && (sreg->can_clear)) {
-+		reg_val = 0;
-+		ret = _vcpu_ioctl(vm, vcpuid, KVM_SET_ONE_REG, &one_reg);
-+		if (after_run) {
-+			/* Expect an error after KVM_RUN */
-+			TEST_ASSERT(ret,
-+				    "Clearing %s unexpectedly worked\n",
-+				    sreg->name);
-+		} else {
-+			TEST_ASSERT(!ret,
-+				    "Clearing %s didn't work\n", sreg->name);
-+			/*
-+			 * Make sure that KVM_GET_ONE_REG provides the value
-+			 * we set.
-+			 */
-+			vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, &one_reg);
-+			TEST_ASSERT(reg_val == 0,
-+				    "GET(%s) didn't return 0x%lx but 0x%lx",
-+				    sreg->name, (uint64_t)0, reg_val);
-+		}
-+	}
-+
-+	/* Check if KVM_SET_ONE_REG works with the original value. */
-+	reg_val = tval;
-+	ret = _vcpu_ioctl(vm, vcpuid, KVM_SET_ONE_REG, &one_reg);
-+	TEST_ASSERT(ret == 0, "Setting the same ID reg value should work\n");
-+
-+	/* Make sure that KVM_GET_ONE_REG provides the value we set. */
-+	vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, &one_reg);
-+	TEST_ASSERT(reg_val == tval,
-+		    "GET(%s) didn't return 0x%lx but 0x%lx",
-+		    sreg->name, sreg->current_value, reg_val);
-+}
-+
-+/*
-+ * Test if KVM_SET_ONE_REG with the current value works before KVM_RUN,
-+ * values of ID registers the guest sees are consistent with the ones
-+ * userspace sees, and KVM_SET_ONE_REG after KVM_RUN works when the
-+ * specified value is the same as the current one (fails otherwise).
-+ */
-+static void test_id_regs_basic(void)
-+{
-+	struct kvm_vm *vm;
-+	struct vm_vcpu_arg arg = { .vcpuid = 0 };
-+	int ret;
-+
-+	reset_id_reg_info();
-+
-+	vm = test_vm_create(1, guest_code_id_reg_check_all, NULL, NULL);
-+
-+	arg.vm = vm;
-+	walk_id_reg_list(test_get_set_id_reg, &arg);
-+
-+	ret = TEST_RUN(vm, 0);
-+	assert(!ret);
-+
-+	arg.after_run = true;
-+	walk_id_reg_list(test_get_set_id_reg, &arg);
-+
-+	test_vm_free(vm);
-+}
-+
-+static bool caps_are_supported(long *caps, int ncaps)
-+{
-+	int i;
-+
-+	for (i = 0; i < ncaps; i++) {
-+		if (kvm_check_cap(caps[i]) <= 0)
-+			return false;
-+	}
-+	return true;
-+}
-+
-+#define	NCAPS_PTRAUTH	2
-+
-+/*
-+ * Test if the ID register value reflects the ptrauth feature configuration.
-+ * KVM_SET_ONE_REG should work as long as the requested value is consistent
-+ * with the ptrauth feature configuration.
-+ */
-+static void test_feature_ptrauth(void)
-+{
-+	struct kvm_one_reg one_reg;
-+	struct kvm_vcpu_init init;
-+	struct kvm_vm *vm = NULL;
-+	struct id_reg_test_info *sreg = ID_REG_INFO(ID_AA64ISAR1);
-+	uint32_t vcpu = 0;
-+	int64_t rval;
-+	int ret;
-+	int apa, api, gpa, gpi;
-+	char *name = "PTRAUTH";
-+	long caps[NCAPS_PTRAUTH] = {KVM_CAP_ARM_PTRAUTH_ADDRESS,
-+				    KVM_CAP_ARM_PTRAUTH_GENERIC};
-+
-+	reset_id_reg_info();
-+	one_reg.addr = (uint64_t)&rval;
-+	one_reg.id = KVM_ARM64_SYS_REG(sreg->id);
-+
-+	if (caps_are_supported(caps, NCAPS_PTRAUTH)) {
-+
-+		/* Test with feature enabled */
-+		memset(&init, 0, sizeof(init));
-+		init.target = -1;
-+		init.features[0] = (1ULL << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
-+				    1ULL << KVM_ARM_VCPU_PTRAUTH_GENERIC);
-+		vm = test_vm_create(1, guest_code_ptrauth_check, &init, NULL);
-+		vcpu_ioctl(vm, vcpu, KVM_GET_ONE_REG, &one_reg);
-+
-+		/* Make sure values of apa/api/gpa/gpi fields are expected */
-+		apa = GET_ID_UFIELD(rval, ID_AA64ISAR1_APA_SHIFT);
-+		api = GET_ID_UFIELD(rval, ID_AA64ISAR1_API_SHIFT);
-+		gpa = GET_ID_UFIELD(rval, ID_AA64ISAR1_GPA_SHIFT);
-+		gpi = GET_ID_UFIELD(rval, ID_AA64ISAR1_GPI_SHIFT);
-+
-+		TEST_ASSERT((apa > 0) || (api > 0),
-+			    "Either apa(0x%x) or api(0x%x) must be available",
-+			    apa, gpa);
-+		TEST_ASSERT((gpa > 0) || (gpi > 0),
-+			    "Either gpa(0x%x) or gpi(0x%x) must be available",
-+			    gpa, gpi);
-+
-+		TEST_ASSERT((apa > 0) ^ (api > 0),
-+			    "Both apa(0x%x) and api(0x%x) must not be available",
-+			    apa, api);
-+		TEST_ASSERT((gpa > 0) ^ (gpi > 0),
-+			    "Both gpa(0x%x) and gpi(0x%x) must not be available",
-+			    gpa, gpi);
-+
-+		sreg->current_value = rval;
-+
-+		pr_debug("%s: Test with %s enabled (%s: 0x%lx)\n",
-+			 __func__, name, sreg->name, sreg->current_value);
-+
-+		/* Make sure that the guest sees the same ID register value. */
-+		ret = TEST_RUN(vm, vcpu);
-+
-+		TEST_ASSERT(!ret, "%s:KVM_RUN failed with %s enabled",
-+			    __func__, name);
-+		test_vm_free(vm);
-+	}
-+
-+	reset_id_reg_info();
-+
-+	/* Test with feature disabled */
-+	vm = test_vm_create(1, guest_code_feature_check, NULL, NULL);
-+	vcpu_ioctl(vm, vcpu, KVM_GET_ONE_REG, &one_reg);
-+
-+	apa = GET_ID_UFIELD(rval, ID_AA64ISAR1_APA_SHIFT);
-+	api = GET_ID_UFIELD(rval, ID_AA64ISAR1_API_SHIFT);
-+	gpa = GET_ID_UFIELD(rval, ID_AA64ISAR1_GPA_SHIFT);
-+	gpi = GET_ID_UFIELD(rval, ID_AA64ISAR1_GPI_SHIFT);
-+	TEST_ASSERT(!apa && !api && !gpa && !gpi,
-+	    "apa(0x%x), api(0x%x), gpa(0x%x), gpi(0x%x) must be zero",
-+	    apa, api, gpa, gpi);
-+
-+	pr_debug("%s: Test with %s disabled (%s: 0x%lx)\n",
-+		 __func__, name, sreg->name, sreg->current_value);
-+
-+	/* Make sure that the guest sees the same ID register value. */
-+	ret = TEST_RUN(vm, vcpu);
-+	TEST_ASSERT(!ret, "%s TEST_RUN failed with %s enabled, ret=0x%x",
-+		    __func__, name, ret);
-+
-+	test_vm_free(vm);
-+}
-+
-+static bool feature_caps_are_available(struct feature_test_info *finfo)
-+{
-+	return ((finfo->ncaps > 0) &&
-+		caps_are_supported(finfo->caps, finfo->ncaps));
-+}
-+
-+/*
-+ * Test if the ID register value reflects the feature configuration.
-+ * KVM_SET_ONE_REG should work as long as the requested value is
-+ * consistent with the feature configuration.
-+ */
-+static void test_feature(struct feature_test_info *finfo)
-+{
-+	struct id_reg_test_info *sreg = finfo->sreg;
-+	struct kvm_one_reg one_reg;
-+	struct kvm_vcpu_init init, *initp = NULL;
-+	struct kvm_vm *vm = NULL;
-+	int64_t fval, reg_val;
-+	uint32_t vcpu = 0;
-+	bool is_sign = finfo->is_sign;
-+	int min = finfo->min;
-+	int shift = finfo->shift;
-+	int ret;
-+
-+	pr_debug("%s: %s (reg %s)\n", __func__, finfo->name, sreg->name);
-+
-+	reset_id_reg_info();
-+
-+	if (is_aarch32_id_reg(sreg->id) && !aarch32_support)
-+		/*
-+		 * AArch32 is not supported. Skip testing with the AArch32
-+		 * ID register.
-+		 */
-+		return;
-+
-+	/* Indicate that guest runs the test for the feature */
-+	finfo->run_test = 1;
-+	one_reg.addr = (uint64_t)&reg_val;
-+	one_reg.id = KVM_ARM64_SYS_REG(sreg->id);
-+
-+	/*
-+	 * Test with feature enabled if the feature is exposed in the default
-+	 * ID register value or the capabilities are supported at KVM level.
-+	 */
-+	if ((GET_ID_FIELD(sreg->initial_value, shift, is_sign) >= min) ||
-+	    feature_caps_are_available(finfo)) {
-+		if (finfo->vcpu_init) {
-+			/* Need to enable the feature via KVM_ARM_VCPU_INIT. */
-+			memset(&init, 0, sizeof(init));
-+			init = *finfo->vcpu_init;
-+			init.target = -1;
-+			initp = &init;
-+		}
-+
-+		vm = test_vm_create(1, guest_code_feature_check, initp,
-+				    finfo->opt_in_cap);
-+		if (finfo->init_feature)
-+			/* Run any required extra process to use the feature */
-+			finfo->init_feature(vm, vcpu);
-+
-+		/* Check if the ID register value indicates the feature */
-+		vcpu_ioctl(vm, vcpu, KVM_GET_ONE_REG, &one_reg);
-+		fval = GET_ID_FIELD(reg_val, shift, is_sign);
-+		TEST_ASSERT(fval >= min, "%s field of %s is too small (%ld)",
-+			    finfo->name, sreg->name, fval);
-+		sreg->current_value = reg_val;
-+
-+		pr_debug("%s: Test with %s enabled (%s: 0x%lx)\n", __func__,
-+			 finfo->name, sreg->name, sreg->current_value);
-+
-+		/* Make sure that the guest sees the same ID register value. */
-+		ret = TEST_RUN(vm, vcpu);
-+		TEST_ASSERT(!ret, "%s:TEST_RUN failed with %s enabled",
-+			    __func__, finfo->name);
-+
-+		test_vm_free(vm);
-+	}
-+
-+	reset_id_reg_info();
-+
-+	/* Test with feature disabled */
-+	vm = test_vm_create(1, guest_code_feature_check, NULL, NULL);
-+	vcpu_ioctl(vm, vcpu, KVM_GET_ONE_REG, &one_reg);
-+	fval = GET_ID_FIELD(reg_val, shift, is_sign);
-+	if (finfo->vcpu_init || finfo->opt_in_cap) {
-+		/*
-+		 * If the feature needs to be enabled with KVM_ARM_VCPU_INIT
-+		 * or opt-in capabilities, the default value of the ID register
-+		 * shouldn't indicate the feature.
-+		 */
-+		TEST_ASSERT(fval < min, "%s field of %s is too big (%ld)",
-+		    finfo->name, sreg->name, fval);
-+	} else {
-+		/* Update the relevant field to hide the feature. */
-+		fval = is_sign ? 0xf : 0x0;
-+		reg_val = UPDATE_ID_UFIELD(reg_val, shift, fval);
-+		ret = _vcpu_ioctl(vm, vcpu, KVM_SET_ONE_REG, &one_reg);
-+		TEST_ASSERT(ret == 0, "Disabling %s failed %d\n",
-+			    finfo->name, ret);
-+		sreg->current_value = reg_val;
-+	}
-+
-+	pr_debug("%s: Test with %s disabled (%s: 0x%lx)\n",
-+		 __func__, finfo->name, sreg->name, sreg->current_value);
-+
-+	/* Make sure that the guest sees the same ID register value. */
-+	ret = TEST_RUN(vm, vcpu);
-+	finfo->run_test = 0;
-+	test_vm_free(vm);
-+}
-+
-+/*
-+ * For each opt-in feature in feature_test_info_table[],
-+ * test if KVM_GET_ONE_REG/KVM_SET_ONE_REG works appropriately according
-+ * to the feature configuration.  See test_feature's comment for more detail.
-+ */
-+static void test_feature_all(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(feature_test_info_table); i++)
-+		test_feature(&feature_test_info_table[i]);
-+}
-+
-+int set_id_reg(struct kvm_vm *vm, uint32_t vcpu, struct id_reg_test_info *sreg,
-+	       uint64_t new_val)
-+{
-+	int ret;
-+	uint64_t reg_val;
-+	struct kvm_one_reg one_reg;
-+
-+	one_reg.id = KVM_ARM64_SYS_REG(sreg->id);
-+	one_reg.addr = (uint64_t)&reg_val;
-+
-+	reg_val = new_val;
-+	ret = _vcpu_ioctl(vm, vcpu, KVM_SET_ONE_REG, &one_reg);
-+	if (!ret)
-+		sreg->current_value = new_val;
-+
-+	return ret;
-+}
-+
-+
-+/*
-+ * Create a new VM with one vCPU, set the ID register to @new_val.
-+ */
-+int set_id_reg_vm(struct id_reg_test_info *sreg, uint64_t new_val)
-+{
-+	struct kvm_vm *vm;
-+	int ret;
-+	uint32_t vcpu = 0;
-+
-+	reset_id_reg_info();
-+
-+	vm = test_vm_create(1, guest_code_id_reg_check_all, NULL, NULL);
-+	ret = set_id_reg(vm, vcpu, sreg, new_val);
-+	test_vm_free(vm);
-+
-+	return ret;
-+}
-+
-+struct frac_info {
-+	char	*name;
-+	struct id_reg_test_info *sreg;
-+	struct id_reg_test_info *frac_sreg;
-+	int	shift;
-+	int	frac_shift;
-+};
-+
-+struct frac_info frac_info_table[] = {
-+	{
-+		.name = "RAS",
-+		.sreg = ID_REG_INFO(ID_AA64PFR0),
-+		.shift = ID_AA64PFR0_RAS_SHIFT,
-+		.frac_sreg = ID_REG_INFO(ID_AA64PFR1),
-+		.frac_shift = ID_AA64PFR1_RASFRAC_SHIFT,
-+	},
-+	{
-+		.name = "MPAM",
-+		.sreg = ID_REG_INFO(ID_AA64PFR0),
-+		.shift = ID_AA64PFR0_MPAM_SHIFT,
-+		.frac_sreg = ID_REG_INFO(ID_AA64PFR1),
-+		.frac_shift = ID_AA64PFR1_MPAMFRAC_SHIFT,
-+	},
-+	{
-+		.name = "CSV2",
-+		.sreg = ID_REG_INFO(ID_AA64PFR0),
-+		.shift = ID_AA64PFR0_CSV2_SHIFT,
-+		.frac_sreg = ID_REG_INFO(ID_AA64PFR1),
-+		.frac_shift = ID_AA64PFR1_CSV2FRAC_SHIFT,
-+	},
-+};
-+
-+
-+/*
-+ * Make sure that we can set the fractional reg field even before setting
-+ * the feature reg field.
-+ */
-+int test_feature_frac_vm(struct frac_info *frac, uint64_t new_val,
-+			 uint64_t frac_new_val)
-+{
-+	struct kvm_vm *vm;
-+	uint32_t vcpu = 0;
-+	struct id_reg_test_info *sreg, *frac_sreg;
-+	int ret;
-+
-+	sreg = frac->sreg;
-+	frac_sreg = frac->frac_sreg;
-+	reset_id_reg_info();
-+
-+	reset_id_reg_info();
-+
-+	vm = test_vm_create(1, guest_code_id_reg_check_all, NULL, NULL);
-+
-+	/* Set fractional reg field */
-+	ret = set_id_reg(vm, vcpu, frac_sreg, frac_new_val);
-+	TEST_ASSERT(!ret, "SET_REG(%s=0x%lx) failed, ret=0x%x",
-+		    frac_sreg->name, frac_new_val, ret);
-+
-+	/* Set feature reg field */
-+	ret = set_id_reg(vm, vcpu, sreg, new_val);
-+	TEST_ASSERT(!ret, "SET_REG(%s=0x%lx) failed, ret=0x%x",
-+		    sreg->name, new_val, ret);
-+
-+	ret = TEST_RUN(vm, vcpu);
-+	test_vm_free(vm);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Test for setting the feature fractional field of the ID register.
-+ * When the (main) feature field of the ID register is the same as the host's,
-+ * the fractional field value cannot be larger than the host's.
-+ * (KVM_SET_ONE_REG should work but KVM_RUN with the larger value will fail)
-+ * When the (main) feature field of the ID register is smaler than the host's,
-+ * the fractional field can be any values.
-+ * The function tests those behaviors.
-+ */
-+void test_feature_frac_one(struct frac_info *frac)
-+{
-+	uint64_t ftr_val, ftr_fval, frac_val, frac_fval;
-+	int ret, shift, frac_shift;
-+	struct id_reg_test_info *sreg, *frac_sreg;
-+
-+	reset_id_reg_info();
-+
-+	sreg = frac->sreg;
-+	shift = frac->shift;
-+	frac_sreg = frac->frac_sreg;
-+	frac_shift = frac->frac_shift;
-+
-+	pr_debug("%s(%s Frac) reg:%s(shift:%d) frac reg:%s(shift:%d)\n",
-+		 __func__, frac->name, sreg->name, shift, frac_sreg->name,
-+		 frac_shift);
-+
-+	/*
-+	 * Use the host's feature value for the guest.
-+	 * KVM_RUN with a larger frac value than the host's should fail.
-+	 * Otherwise, it should work.
-+	 */
-+
-+	frac_fval = GET_ID_UFIELD(frac_sreg->initial_value, frac_shift);
-+	if (frac_fval > 0) {
-+		/* Test with smaller frac value */
-+		frac_val = UPDATE_ID_UFIELD(frac_sreg->initial_value,
-+					    frac_shift, frac_fval - 1);
-+		ret = test_feature_frac_vm(frac, sreg->initial_value, frac_val);
-+		TEST_ASSERT(!ret, "Test smaller %s frac (val:%lx) failed(%d)",
-+			    frac->name, frac_val, ret);
-+	}
-+
-+	reset_id_reg_info();
-+
-+	if (frac_fval != 0xf) {
-+		/* Test with larger frac value */
-+		frac_val = UPDATE_ID_UFIELD(frac_sreg->initial_value,
-+						frac_shift, frac_fval + 1);
-+
-+		/* Setting larger frac shouldn't fail at ioctl */
-+		ret = set_id_reg_vm(frac_sreg, frac_val);
-+		TEST_ASSERT(!ret,
-+			"SET larger %s frac (%s org:%lx, val:%lx) failed(%d)",
-+			frac->name, frac_sreg->name, frac_sreg->initial_value,
-+			frac_val, ret);
-+
-+		/* KVM_RUN with larger frac should fail */
-+		ret = test_feature_frac_vm(frac, sreg->initial_value, frac_val);
-+		TEST_ASSERT(ret,
-+			"Test with larger %s frac (%s org:%lx, val:%lx) worked",
-+			frac->name, frac_sreg->name, frac_sreg->initial_value,
-+			frac_val);
-+	}
-+
-+	reset_id_reg_info();
-+
-+	/*
-+	 * Test with a smaller (main) feature value than the host's.
-+	 */
-+	ftr_fval = GET_ID_UFIELD(sreg->initial_value, shift);
-+	if (ftr_fval == 0)
-+		/* Cannot set it to the smaller value */
-+		return;
-+
-+	ftr_val = UPDATE_ID_UFIELD(sreg->initial_value, shift, ftr_fval - 1);
-+	ret = test_feature_frac_vm(frac, ftr_val, frac_sreg->initial_value);
-+	TEST_ASSERT(!ret, "Test with smaller %s (val:%lx) failed(%d)",
-+		    frac->name, ftr_val, ret);
-+
-+	if (frac_fval > 0) {
-+		/* Test with smaller frac value */
-+		frac_val = UPDATE_ID_UFIELD(frac_sreg->initial_value,
-+					    frac_shift, frac_fval - 1);
-+		ret = test_feature_frac_vm(frac, ftr_val, frac_val);
-+		TEST_ASSERT(!ret,
-+		    "Test with smaller %s and frac (val:%lx) failed(%d)",
-+		    frac->name, ftr_val, ret);
-+	}
-+
-+	if (frac_fval != 0xf) {
-+		/* Test with larger frac value */
-+		frac_val = UPDATE_ID_UFIELD(frac_sreg->initial_value,
-+					    frac_shift, frac_fval + 1);
-+		ret = test_feature_frac_vm(frac, ftr_val, frac_val);
-+		TEST_ASSERT(!ret,
-+		    "Test with smaller %s and larger frac (val:%lx) failed(%d)",
-+		    frac->name, ftr_val, ret);
-+	}
-+}
-+
-+/*
-+ * Test for setting feature fractional fields of ID registers.
-+ * See test_feature_frac_one's comments for more detail.
-+ */
-+void test_feature_frac_all(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(frac_info_table); i++)
-+		test_feature_frac_one(&frac_info_table[i]);
-+}
-+
-+void run_test(void)
-+{
-+	test_id_regs_basic();
-+	test_feature_all();
-+	test_feature_ptrauth();
-+	test_feature_frac_all();
-+}
-+
-+static void init_id_reg_info_one(struct id_reg_test_info *sreg, void *arg)
-+{
-+	struct kvm_one_reg one_reg;
-+	uint64_t reg_val;
-+	struct kvm_vm *vm = ((struct vm_vcpu_arg *)arg)->vm;
-+	uint32_t vcpuid = ((struct vm_vcpu_arg *)arg)->vcpuid;
-+	int ret;
-+
-+	one_reg.addr = (uint64_t)&reg_val;
-+	one_reg.id = KVM_ARM64_SYS_REG(sreg->id);
-+	vcpu_ioctl(vm, vcpuid, KVM_GET_ONE_REG, &one_reg);
-+	sreg->current_value = reg_val;
-+
-+	/* Keep the initial value to reset the register value later */
-+	sreg->initial_value = reg_val;
-+
-+	/* Check if the register can be set to 0 */
-+	reg_val = 0;
-+	ret = _vcpu_ioctl(vm, vcpuid, KVM_SET_ONE_REG, &one_reg);
-+	if (!ret)
-+		sreg->can_clear = true;
-+
-+	pr_debug("%s (0x%x): 0x%lx%s\n", sreg->name, sreg->id,
-+		 sreg->initial_value, sreg->can_clear ? ", can clear" : "");
-+}
-+
-+/*
-+ * Check if aarch32 is supported, and initialize id_reg_test_info for all
-+ * the ID registers.  Loop over the idreg list and populates each id_reg
-+ * info with the initial value, current value, and can_clear value.
-+ */
-+static void init_test_info(void)
-+{
-+	uint64_t reg_val;
-+	int fval;
-+	struct kvm_vm *vm;
-+	struct kvm_one_reg one_reg;
-+	struct vm_vcpu_arg arg = { .vcpuid = 0 };
-+
-+	vm = test_vm_create(1, guest_code_do_nothing, NULL, NULL);
-+
-+	/* Get ID_AA64PFR0_EL1 to check if AArch32 is supported */
-+	one_reg.addr = (uint64_t)&reg_val;
-+	one_reg.id = KVM_ARM64_SYS_REG(SYS_ID_AA64PFR0_EL1);
-+	vcpu_ioctl(vm, 0, KVM_GET_ONE_REG, &one_reg);
-+	fval = GET_ID_UFIELD(reg_val, ID_AA64PFR0_EL0_SHIFT);
-+	if (fval == 0x1)
-+		/* No AArch32 support */
-+		aarch32_support = false;
-+
-+	/* Initialize id_reg_test_info */
-+	arg.vm = vm;
-+	walk_id_reg_list(init_id_reg_info_one, &arg);
-+	test_vm_free(vm);
-+}
-+
-+int main(void)
-+{
-+
-+	setbuf(stdout, NULL);
-+
-+	if (kvm_check_cap(KVM_CAP_ARM_ID_REG_CONFIGURABLE) <= 0) {
-+		print_skip("KVM_CAP_ARM_ID_REG_CONFIGURABLE is not supported\n");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	init_test_info();
-+	run_test();
-+	return 0;
-+}
+> 
+> > +static bool kvm_arm_pauth_supported(void)
+> > +{
+> > +    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
+> > +            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
+> > +}
+> 
+> Do we really need to have them both set to play the game?  Given that
+> the only thing that happens is that we disable whatever host support
+> exists, can we have "pauth enabled" mean whatever subset the host has?
+
+The host will always expose either both features or none, and that's
+part of the ABI. From the bit of kernel documentation located in
+Documentation/virt/kvm/api.rst:
+
+<quote>
+4.82 KVM_ARM_VCPU_INIT
+----------------------
+[...]
+        - KVM_ARM_VCPU_PTRAUTH_ADDRESS: Enables Address Pointer authentication
+          for arm64 only.
+          Depends on KVM_CAP_ARM_PTRAUTH_ADDRESS.
+          If KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC are
+          both present, then both KVM_ARM_VCPU_PTRAUTH_ADDRESS and
+          KVM_ARM_VCPU_PTRAUTH_GENERIC must be requested or neither must be
+          requested.
+
+        - KVM_ARM_VCPU_PTRAUTH_GENERIC: Enables Generic Pointer authentication
+          for arm64 only.
+          Depends on KVM_CAP_ARM_PTRAUTH_GENERIC.
+          If KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC are
+          both present, then both KVM_ARM_VCPU_PTRAUTH_ADDRESS and
+          KVM_ARM_VCPU_PTRAUTH_GENERIC must be requested or neither must be
+          requested.
+</quote>
+
+KVM will reject the initialisation if only one of the features is
+requested, so checking and enabling both makes sense to me.
+
+> 
+> > @@ -521,6 +527,17 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+> >        */
+> >       struct kvm_vcpu_init init = { .target = -1, };
+> >   +    /*
+> > +     * Ask for Pointer Authentication if supported. We can't play the
+> > +     * SVE trick of synthetising the ID reg as KVM won't tell us
+> 
+> synthesizing
+
+Yup.
+
+> 
+> > +     * whether we have the architected or IMPDEF version of PAuth, so
+> > +     * we have to use the actual ID regs.
+> > +     */
+> > +    if (kvm_arm_pauth_supported()) {
+> > +        init.features[0] |= (1 << KVM_ARM_VCPU_PTRAUTH_ADDRESS |
+> > +			     1 << KVM_ARM_VCPU_PTRAUTH_GENERIC);
+> 
+> Align the two 1's.
+
+Gah, another of these... Will fix.
+
+> 
+> Otherwise, it looks good.
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1.448.ga2b2bfdf31-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
