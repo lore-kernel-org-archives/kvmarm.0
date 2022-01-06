@@ -2,48 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 649CCC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 12:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3BCC433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  6 Jan 2022 17:20:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E09814B190;
-	Thu,  6 Jan 2022 07:07:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD6154B229;
+	Thu,  6 Jan 2022 12:20:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 50IMVLuyHIbb; Thu,  6 Jan 2022 07:07:37 -0500 (EST)
+	with ESMTP id TiDuk4oTU4PZ; Thu,  6 Jan 2022 12:20:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2B084B16E;
-	Thu,  6 Jan 2022 07:07:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1E424B20F;
+	Thu,  6 Jan 2022 12:20:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6593E4B168
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 07:07:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A63434B21E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 12:20:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HIpF89wkoFwJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Jan 2022 07:07:34 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1670449F4D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 07:07:34 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81CB312FC;
- Thu,  6 Jan 2022 04:07:33 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6FAF43F774;
- Thu,  6 Jan 2022 04:07:31 -0800 (PST)
-Date: Thu, 6 Jan 2022 12:07:38 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+ with ESMTP id QbmsvVd4czcE for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Jan 2022 12:20:36 -0500 (EST)
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com
+ [209.85.216.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85E6E4B1F6
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 12:20:36 -0500 (EST)
+Received: by mail-pj1-f52.google.com with SMTP id pj2so1808121pjb.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Jan 2022 09:20:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=UboDS31gi+6ezClBOANA8GrTYVa4ZNE97bilfoocy74=;
+ b=n8ND/Yh2Aeh4upIOJUX6ItnoxdWH4/Fia63ZyKT+f9mMggMYBq+9LfDPbDYY6p6hKX
+ zHSrMN2J9ulhYOs6eohgALG0aYLSdzT0x4fN0iTgAuxPFmeiJSW05vwzDiLtmUyDsz9C
+ yCWEvtTzuR1o22D1y7a+jpQdXW5LsIpvs3bgtkWYLR6wwLr+p9FDdUDr99Wm984tpH7x
+ 0ATdeQQYJq/2e/0/o3sYf2qNZtTpVyGUn3jV8kFjk/c7SUjbPtaqt3XosRDBGK9Hp0Hr
+ 8q3I2+rE3Et28u7+6BdinfGw7WG70PnKcoJy/odrOJJ73K/AeulTRHnqjLQ3PUvXTeHm
+ Givw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UboDS31gi+6ezClBOANA8GrTYVa4ZNE97bilfoocy74=;
+ b=jHBX8Hfga8/RUtZfzYgCukTkKEgWJSsUlKNuzYzH83IBbJ4vWgDdUEk7X+M3P8r7ry
+ wT/AD7h0M1Xrty7RQSm96Oy3mGvlKBN88qrMR7SX1cuRf2zJxJ8mzOJUdD7NmEMzZLXF
+ zdnvWjAdrZ2NF4l6za6WD5B9MKp6WmpYZD/fEdomXlQqyFdbRh8mM96GeEnkz3th8vtA
+ bpMp2zO1G8ilWWT63ab2xUsXpRXADseqXmNbF7afYY8iVPuzNbuRKqy5RPM+ZZYCvFEU
+ AJjkD6UH6rxafdRpyJXRcRcK+lKxaQg62hJRJnyfYxvV2DbMiWVh1fPTSvehub7OJTSW
+ eLww==
+X-Gm-Message-State: AOAM533pCGBauhAIAe2UX1E7J82z4fMrH/q3vU342lKI5C/QZVLbJ60M
+ ETsBsSFFyB/2lTGwMcmBuj8Ocg==
+X-Google-Smtp-Source: ABdhPJzlaKrZaIdz6LGH8kAr0gek22yp7m1zrUEHpl6K7zWOYBVHmwMbe6AvXQgA3sBeLh2fKPBozQ==
+X-Received: by 2002:a17:90b:198d:: with SMTP id
+ mv13mr11366930pjb.182.1641489635507; 
+ Thu, 06 Jan 2022 09:20:35 -0800 (PST)
+Received: from [192.168.1.13] (174-21-75-75.tukw.qwest.net. [174.21.75.75])
+ by smtp.gmail.com with ESMTPSA id y3sm2890860pju.37.2022.01.06.09.20.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 06 Jan 2022 09:20:35 -0800 (PST)
+Subject: Re: [PATCH v2] hw/arm/virt: KVM: Enable PAuth when supported by the
+ host
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 0/4] KVM: arm64: Improve PMU support on heterogeneous
- systems
-Message-ID: <Ydbbivoqo3vUxB4j@monolith.localdoman>
-References: <20211213152309.158462-1-alexandru.elisei@arm.com>
- <87bl0xzwu1.wl-maz@kernel.org>
+References: <20220103180507.2190429-1-maz@kernel.org>
+ <c5bedb8e-55e3-877f-31aa-92d59e5aba34@linaro.org>
+ <87czl5usvb.wl-maz@kernel.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3db95713-2f05-3c70-82b1-7e12c579d3e2@linaro.org>
+Date: Thu, 6 Jan 2022 09:20:33 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87bl0xzwu1.wl-maz@kernel.org>
-Cc: mingo@redhat.com, tglx@linutronix.de, will@kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <87czl5usvb.wl-maz@kernel.org>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -55,80 +89,58 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On 1/6/22 1:16 AM, Marc Zyngier wrote:
+>>> +static bool kvm_arm_pauth_supported(void)
+>>> +{
+>>> +    return (kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_ADDRESS) &&
+>>> +            kvm_check_extension(kvm_state, KVM_CAP_ARM_PTRAUTH_GENERIC));
+>>> +}
+>>
+>> Do we really need to have them both set to play the game?  Given that
+>> the only thing that happens is that we disable whatever host support
+>> exists, can we have "pauth enabled" mean whatever subset the host has?
+> 
+> The host will always expose either both features or none, and that's
+> part of the ABI. From the bit of kernel documentation located in
+> Documentation/virt/kvm/api.rst:
+> 
+> <quote>
+> 4.82 KVM_ARM_VCPU_INIT
+> ----------------------
+> [...]
+>          - KVM_ARM_VCPU_PTRAUTH_ADDRESS: Enables Address Pointer authentication
+>            for arm64 only.
+>            Depends on KVM_CAP_ARM_PTRAUTH_ADDRESS.
+>            If KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC are
+>            both present, then both KVM_ARM_VCPU_PTRAUTH_ADDRESS and
+>            KVM_ARM_VCPU_PTRAUTH_GENERIC must be requested or neither must be
+>            requested.
+> 
+>          - KVM_ARM_VCPU_PTRAUTH_GENERIC: Enables Generic Pointer authentication
+>            for arm64 only.
+>            Depends on KVM_CAP_ARM_PTRAUTH_GENERIC.
+>            If KVM_CAP_ARM_PTRAUTH_ADDRESS and KVM_CAP_ARM_PTRAUTH_GENERIC are
+>            both present, then both KVM_ARM_VCPU_PTRAUTH_ADDRESS and
+>            KVM_ARM_VCPU_PTRAUTH_GENERIC must be requested or neither must be
+>            requested.
+> </quote>
+> 
+> KVM will reject the initialisation if only one of the features is
+> requested, so checking and enabling both makes sense to me.
 
-On Thu, Dec 30, 2021 at 08:01:10PM +0000, Marc Zyngier wrote:
-> Alex,
-> 
-> On Mon, 13 Dec 2021 15:23:05 +0000,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > (CC'ing Peter Maydell in case this might be of interest to qemu)
-> > 
-> > The series can be found on a branch at [1], and the kvmtool support at [2].
-> > The kvmtool patches are also on the mailing list [3] and haven't changed
-> > since v1.
-> > 
-> > Detailed explanation of the issue and symptoms that the patches attempt to
-> > correct can be found in the cover letter for v1 [4].
-> > 
-> > A summary of the problem is that on heterogeneous systems KVM will always
-> > use the same PMU for creating the VCPU events for *all* VCPUs regardless of
-> > the physical CPU on which the VCPU is running, leading to events suddenly
-> > stopping and resuming in the guest as the VCPU thread gets migrated across
-> > different CPUs.
-> > 
-> > This series proposes to fix this behaviour by allowing the user to specify
-> > which physical PMU is used when creating the VCPU events needed for guest
-> > PMU emulation. When the PMU is set, KVM will refuse to the VCPU on a
-> > physical which is not part of the supported CPUs for the specified PMU. The
-> > restriction is that all VCPUs must use the same PMU to avoid emulating an
-> > asymmetric platform.
-> > 
-> > The default behaviour stays the same - without userspace setting the PMU,
-> > events will stop counting if the VCPU is scheduled on the wrong CPU.
-> > 
-> > Tested with a hacked version of kvmtool that does the PMU initialization
-> > from the VCPU thread as opposed to from the main thread. Tested on
-> > rockpro64 by testing what happens when all VCPUs having the same PMU, one
-> > random VCPU having a different PMU than the other VCPUs and one random VCPU
-> > not having the PMU set (each test was run 1,000 times on the little cores
-> > and 1,000 times on the big cores).
-> > 
-> > Also tested on an Altra by testing all VCPUs having the same PMU, all VCPUs
-> > not having a PMU set, and one random VCPU not having the PMU set; the VM
-> > had 64 threads in each of the tests and each test was run 10,000 times.
-> 
-> Came back to this series, and found more problems. On top of the
-> remarks I had earlier (the per-CPU data structures that really should
-> per VM, the disappearing attribute size), what happens when event
-> filters are already registered and that you set a specific PMU?
+Well, no, that's not what that says.  It says that *if* both host flags are set, then both 
+guest flags must be set or both unset.
 
-This is a good point. When I looked at how the PMU event filter works, I
-saw that KVM doesn't attempt to check that the events are actually
-implemented on the PMU, but somehow skipped over the fact that the PMU
-affects the total number of events available.
+It's probably all academic anyway, because I can't actually imagine a vendor implementing 
+ADDR and not GENERIC, but in theory we ought to be able to support a host with only ADDR.
 
-Thanks,
-Alex
 
-> 
-> I took the matter in my own hands (the joy of being in quarantine) and
-> wrote whatever fixes I thought were necessary[1].
-> 
-> Please have a look.
-> 
-> 	M.
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/pmu-bl
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+r~
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
