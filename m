@@ -2,77 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 784A9C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 11:46:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1ED2C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 12:10:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1014D4B105;
-	Fri,  7 Jan 2022 06:46:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CCCA49F3D;
+	Fri,  7 Jan 2022 07:10:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 83LJv-LDp6yj; Fri,  7 Jan 2022 06:46:28 -0500 (EST)
+	with ESMTP id LEvchLGv+Iiy; Fri,  7 Jan 2022 07:10:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 034D94B139;
-	Fri,  7 Jan 2022 06:46:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39D884B160;
+	Fri,  7 Jan 2022 07:10:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 62DA849E21
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 21:21:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 427E149F3D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 07:10:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3krpw5Xki1Ld for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Jan 2022 21:21:27 -0500 (EST)
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com
- [209.85.219.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B4334B24E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Jan 2022 21:21:27 -0500 (EST)
-Received: by mail-yb1-f182.google.com with SMTP id p5so5495741ybd.13
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Jan 2022 18:21:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=w70wbEdrZB71eZ7G5vu7np2TisVg/QSyUt9QnspenOc=;
- b=PJzY3wgh+mwzx/EdpWDTNd9qDUJSucxLoxDlCP73jyOvxKm+qXxPYA1o+dMHW2MdVO
- XI0G0g0Ml2Gv3hYdGaLawxZiY4/2rPyx4OdBV5vHL5nSb8/AGkvP6ZnU4ZX1nHR70mbl
- z4QtjCr0pgIwTgGF1JP2jZ9quepjPmmKr2sWI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=w70wbEdrZB71eZ7G5vu7np2TisVg/QSyUt9QnspenOc=;
- b=dzQUMS/uGTvM51Iut+eNNbuj03lCHCIyoeJPbrWZxp1xW9gEplzxFLXVm04DtcPubm
- zbGEzHXVXGiiN7t9585fDFmA85xU06rEgHpPxAH9kUTCYOCoONxNGTBKgne/QKUSCQWM
- A3N3IV+7TW1aY8NtCucTD0UETRsGMMQZY2FF/2JjOtSZSax8DahwS+5v7d/Dv6jRYZ5N
- MyugYAy8UQVBP/v1z6fwhsFLs61NcBz4IxnCXO+0AeJlaY98orBXJUxA19L20DGv4cZl
- hQkE1GMgc8BnaV3IjcdlN2UpLBPhljZic8ndsbeQDD3lMA9EsTz9gX7kg1Pu6BPD7Zf2
- NAmg==
-X-Gm-Message-State: AOAM532F0d4jF5KoDK9wdRgXexnB/FJDcKRGTbLLU8ViwjnYXoCEgxVR
- OhaKBZSlq2ZIz3yNi8LXCnkUjiAadAor7ljcJ7WbeA==
-X-Google-Smtp-Source: ABdhPJyuGGdU1B4YPxYw/nS3nAD5s2wMNZ+axp3cZ+2j8IbHcyK/rE3IBGrNqTjmYE1Q7yj1rCOt5p2M1WYW4AGGLcg=
-X-Received: by 2002:a25:5ca:: with SMTP id 193mr70981373ybf.406.1641522086754; 
- Thu, 06 Jan 2022 18:21:26 -0800 (PST)
+ with ESMTP id rNhxZY6rJknL for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jan 2022 07:10:00 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D82749F05
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 07:10:00 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 461B613D5;
+ Fri,  7 Jan 2022 04:09:59 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B1D63F774;
+ Fri,  7 Jan 2022 04:09:57 -0800 (PST)
+Date: Fri, 7 Jan 2022 12:10:05 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH kvmtool 9/9] arm64: Add support for
+ KVM_ARM_VCPU_PMU_V3_SET_PMU
+Message-ID: <YdgtnQPAsy1hSOWj@monolith.localdoman>
+References: <20211115165705.195736-1-alexandru.elisei@arm.com>
+ <20211115165705.195736-10-alexandru.elisei@arm.com>
+ <87h7ajva2o.wl-maz@kernel.org>
 MIME-Version: 1.0
-References: <20211129034317.2964790-1-stevensd@google.com>
- <20211129034317.2964790-5-stevensd@google.com>
- <Yc4G23rrSxS59br5@google.com>
- <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
- <YdXrURHO/R82puD4@google.com> <YdXvUaBUvaRPsv6m@google.com>
- <CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com>
- <YdcpIQgMZJrqswKU@google.com>
-In-Reply-To: <YdcpIQgMZJrqswKU@google.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Fri, 7 Jan 2022 11:21:15 +0900
-Message-ID: <CAD=HUj5v37wZ9NuNC4QBDvCGO2SyNG2KAiTc9Jxfg=R7neCuTw@mail.gmail.com>
-Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
-To: Sean Christopherson <seanjc@google.com>
-X-Mailman-Approved-At: Fri, 07 Jan 2022 06:46:27 -0500
-Cc: Chia-I Wu <olv@chromium.org>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+Content-Disposition: inline
+In-Reply-To: <87h7ajva2o.wl-maz@kernel.org>
+Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,44 +61,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-> > These are the type of pages which KVM is currently rejecting. Is this
-> > something that KVM can support?
->
-> I'm not opposed to it.  My complaint is that this series is incomplete in that it
-> allows mapping the memory into the guest, but doesn't support accessing the memory
-> from KVM itself.  That means for things to work properly, KVM is relying on the
-> guest to use the memory in a limited capacity, e.g. isn't using the memory as
-> general purpose RAM.  That's not problematic for your use case, because presumably
-> the memory is used only by the vGPU, but as is KVM can't enforce that behavior in
-> any way.
->
-> The really gross part is that failures are not strictly punted to userspace;
-> the resulting error varies significantly depending on how the guest "illegally"
-> uses the memory.
->
-> My first choice would be to get the amdgpu driver "fixed", but that's likely an
-> unreasonable request since it sounds like the non-KVM behavior is working as intended.
->
-> One thought would be to require userspace to opt-in to mapping this type of memory
-> by introducing a new memslot flag that explicitly states that the memslot cannot
-> be accessed directly by KVM, i.e. can only be mapped into the guest.  That way,
-> KVM has an explicit ABI with respect to how it handles this type of memory, even
-> though the semantics of exactly what will happen if userspace/guest violates the
-> ABI are not well-defined.  And internally, KVM would also have a clear touchpoint
-> where it deliberately allows mapping such memslots, as opposed to the more implicit
-> behavior of bypassing ensure_pfn_ref().
+Hi Marc,
 
-Is it well defined when KVM needs to directly access a memslot? At
-least for x86, it looks like most of the use cases are related to
-nested virtualization, except for the call in
-emulator_cmpxchg_emulated. Without being able to specifically state
-what should be avoided, a flag like that would be difficult for
-userspace to use.
+On Tue, Jan 04, 2022 at 02:39:59PM +0000, Marc Zyngier wrote:
+> On Mon, 15 Nov 2021 16:57:05 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > The KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU ioctl is
+> > used to assign a physical PMU to the events that KVM creates when emulating
+> > the PMU for that VCPU. This is useful on heterogeneous systems, when there
+> > is more than one hardware PMU present.
+> > 
+> > The assumption that is made in the implementation is that the user will
+> > pin the kvmtool process on a set of CPUs that share the same PMU. This
+> > allows kvmtool to set the same PMU for all VCPUs from the main thread,
+> > instead of in the individual VCPU threads.
+> 
+> May I suggest a slightly different use model? Ideally, you'd be able
+> to run the vcpu threads on the CPUs matching the PMU affinity, and
+> leave all the other threads to roam on other CPUs.
 
-> If we're clever, we might even be able to share the flag with the "guest private
-> memory"[*] concept being pursued for confidential VMs.
->
-> [*] https://lore.kernel.org/all/20211223123011.41044-1-chao.p.peng@linux.intel.com
+Right now, the only way for userspace to make kvmtool run on a particular
+set of CPUs in a heterogeneous configuration is to use taskset, which means
+the entire kvmtool process ends up being pinned on a subset of CPUs which
+have the same PMU. I would like to keep this approach, as it's simple and
+straightforward to implement in kvmtool, and it's easy to change in the
+future if there's an incentive to do so.
+
+It's also not clear to me how your suggestion would work. Add a command
+line argument to pin all the VCPUs to the specified cpumask?
+
+> 
+> With your implementation, the whole of kvmtool gets stuck to a given
+> CPU type, which can be problematic.
+
+Do you have a specific use case in mind? Or is it more like a general
+concern regarding, for example, the virtio-blk-io or virtio-net-* threads
+competing with the VCPU threads if the VM is doing lots of I/O?
+
+Thanks,
+Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
