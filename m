@@ -2,74 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BFAC433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 06:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E414C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 07:12:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 307F349FE6;
-	Fri,  7 Jan 2022 01:07:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 174694B0DD;
+	Fri,  7 Jan 2022 02:12:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id e4JDePualA2Y; Fri,  7 Jan 2022 01:07:13 -0500 (EST)
+	with ESMTP id N-nS-YUHYdcA; Fri,  7 Jan 2022 02:12:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1130249F4B;
-	Fri,  7 Jan 2022 01:07:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1CAF4B0BE;
+	Fri,  7 Jan 2022 02:12:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AAC8249F4B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 01:07:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26CB24B0A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 02:12:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JL2-80vcmH-1 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jan 2022 01:07:10 -0500 (EST)
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com
- [209.85.216.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96D4D49EE4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 01:07:10 -0500 (EST)
-Received: by mail-pj1-f43.google.com with SMTP id
- y16-20020a17090a6c9000b001b13ffaa625so10980409pjj.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Jan 2022 22:07:10 -0800 (PST)
+ with ESMTP id sObdJ6CJRsYP for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jan 2022 02:12:46 -0500 (EST)
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com
+ [209.85.216.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE1984B08E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 02:12:46 -0500 (EST)
+Received: by mail-pj1-f47.google.com with SMTP id
+ d10-20020a17090a498a00b001b33bc40d01so2302197pjh.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Jan 2022 23:12:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2q58XOryfIlXBk+Ga94YK5KAiqVRv5tmtrlFtSkfC0E=;
- b=ochKJUmv9jcYYqjl8Ri0yXzDhwacQ2/M9JFDOvS2FBy8XLGNBzhfSvKLa9ii/FgSHR
- lKXPiHPPHOi42VPVoABzyceIiJ8F+Kbs3IS0k75hH2A5mdF2XigOH5lmdKWrpcwtxdbr
- ezxvlB8NX6lqdXgr7vLxp+V4EZIGdh1LCkEFmJztS6KTyCd2fXWSEdqhhi3oBwVmS13w
- /pYkJOH9knWKKZPd/LGxDD94eatNe6H5EBW+iGlQr71hEgAmZVB6ZiK24VPUj2ooMIaj
- 42ZKBZFHvnOHD474TolWmS+OmhGNji04Be9HsERGLppfG0rRjME6jGJDuXtYXGuWgZIu
- K72Q==
+ :cc; bh=kbcPDOVFWP/YoljnZK4KEPygQkk4mWtbYx8io3Et7Vw=;
+ b=hFNJ/2vCxmPB/RyLp/aeRUeCE51MnM2jcfBxGMSoPxuIDBqa32Sg6r9wK0/psKQLBq
+ MWlyyH4od+uM79+M9jXCj2vbmpcORUdzEpEPzKFjjOH88vORYKcAEFu2Qk5G/2z8SlV1
+ bzl/vunozjdqCeU/Y1v5iSAuZuYp+sVMfMSTEy8+x3p6TG44ufPq//gPx3Ul4HQ3zZd7
+ RJbH+rDaW5T9cJ+bJW9ARC0geiawneZGfAm+fY31v1SWGu8yGBtmTxQMUP0Shlj6wlFF
+ wDArec0wtOxMpBZVCbw87X1Xz7QVbymLWm3vZ/i1MBzoDQ5JbOTqL42+e2Ital80uazp
+ IIBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2q58XOryfIlXBk+Ga94YK5KAiqVRv5tmtrlFtSkfC0E=;
- b=oWXkADpva0rcZUDN92pONKUKYaXNfSO6iCf7MdzK74Kw0k9mhAxrZOOeaq4WUkxq9e
- G2ewnEAJxGNIXZHUXIob0QJj5KjFdHY7vqiLQX6JyHrdern62pIFb5NSuisheWwEXDUb
- L6K9Gtfivkirk2UmULL8usnvnMVX+ogriyr41eDgJZTBYanAzj3REXlccdlldsDhUt+B
- J6j4CbzZkQRsuF3Z033O3hjrYRca6rmFDsWAFNAoJnMYeSY5UPdkhSfyUDTS4r5F+ZPb
- 8zGS2QKtfRbf4lvnKH9BoKyUKUxGGPD8Tfd6mjDEKQuPhx793sFuMDh2KWB1asZHUdiA
- pfmA==
-X-Gm-Message-State: AOAM531SjuVYL7x6A0VvwrnR/eMySPgcCw5w4UbL48fN0wp89JYRpuJ9
- u2t4Z3Je0Y6KiFT9b73hNzoKhGfno+r5lReBhYkCOg==
-X-Google-Smtp-Source: ABdhPJzi8RhMHj39b+4Rn0KshD189vXaFIX2vj8EwamLndmdEQUpG8o9KUsh8L5L/q0EpOVykikO8FcKUk+BveZguG8=
-X-Received: by 2002:a17:902:c652:b0:148:f1a5:b7bf with SMTP id
- s18-20020a170902c65200b00148f1a5b7bfmr62134703pls.122.1641535629407; Thu, 06
- Jan 2022 22:07:09 -0800 (PST)
+ bh=kbcPDOVFWP/YoljnZK4KEPygQkk4mWtbYx8io3Et7Vw=;
+ b=EngEbnMtNXlYoJbEjkUCPumLuzzy+lmr4rvKZC4NG9cNsufCoSGB7R8to7Ng71rBzL
+ xp7++baBoYALAeGuL4R/A6tsAna5S/Y1qsSiGSyviSmFpk61/aqj+0iasH2oOW+o2wy0
+ dVY5nrU6cUye5JYVhsl9VgZdzN2oxUzA6/K89hGIQAokOoRzUs/ZnUdinORjAy0qKDUA
+ 3ogFvhyukgEO6tHSg0Xf5QjwkIVYqeQJRxgXRs9eH8Xhok7IwurgiGfrjezfDQeXg0e0
+ HL3Llh7YqLdZwbmT+StrlW9DIYJt+Pdvv0Ahv4a7QK85jKxrSyYyYLE3WRl8AHfnG6QJ
+ 16fw==
+X-Gm-Message-State: AOAM531B5qpo5/UOQcdLSsvybbueLd6pGk450BBwT+s7Rbg4ZqXf7IQs
+ MsZZNtzEiakYr5RFScQaJIauN/vvSP8+9rud4WIZVDgbVW5yeA==
+X-Google-Smtp-Source: ABdhPJwsb0Gv9vEPitDKlPfU9K/EV4+Ot0zzw1eukA8w2Pg2+Clqhc1BGKuyNR4H91D/xqtTAKv0lkEB9Mfong3YTkc=
+X-Received: by 2002:a17:90b:3b49:: with SMTP id
+ ot9mr14404416pjb.110.1641539565579; 
+ Thu, 06 Jan 2022 23:12:45 -0800 (PST)
 MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com>
- <20220104194918.373612-2-rananta@google.com>
-In-Reply-To: <20220104194918.373612-2-rananta@google.com>
+References: <20220106042708.2869332-1-reijiw@google.com>
+ <20220106042708.2869332-2-reijiw@google.com>
+In-Reply-To: <20220106042708.2869332-2-reijiw@google.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 6 Jan 2022 22:06:53 -0800
-Message-ID: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 6 Jan 2022 23:12:28 -0800
+Message-ID: <CAAeT=FxEr4N4j7tJQKpUANM1dSrpZrgDLaYEOVLRhmXWPn52NA@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 01/26] KVM: arm64: Introduce a validation function
+ for an ID register
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -87,89 +86,298 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Raghu,
-
-On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
+On Wed, Jan 5, 2022 at 8:28 PM Reiji Watanabe <reijiw@google.com> wrote:
 >
-> Capture the start of the KVM VM, which is basically the
-> start of any vCPU run. This state of the VM is helpful
-> in the upcoming patches to prevent user-space from
-> configuring certain VM features after the VM has started
-> running.
+> Introduce arm64_check_features(), which does a basic validity checking
+> of an ID register value against the register's limit value, which is
+> generally the host's sanitized value.
 >
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> This function will be used by the following patches to check if an ID
+> register value that userspace tries to set for a guest can be supported
+> on the host.
+>
+> The validation is done using arm64_ftr_bits_kvm, which is created from
+> arm64_ftr_regs, with some entries overwritten by entries from
+> arm64_ftr_bits_kvm_override.
+>
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > ---
->  include/linux/kvm_host.h | 3 +++
->  virt/kvm/kvm_main.c      | 9 +++++++++
->  2 files changed, 12 insertions(+)
+>  arch/arm64/include/asm/cpufeature.h |   1 +
+>  arch/arm64/kernel/cpufeature.c      | 228 ++++++++++++++++++++++++++++
+>  2 files changed, 229 insertions(+)
 >
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index c310648cc8f1..d0bd8f7a026c 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -623,6 +623,7 @@ struct kvm {
->         struct notifier_block pm_notifier;
->  #endif
->         char stats_id[KVM_STATS_NAME_SIZE];
-> +       bool vm_started;
-
-Since KVM_RUN on any vCPUs doesn't necessarily mean that the VM
-started yet, the name might be a bit misleading IMHO.  I would
-think 'has_run_once' or 'ran_once' might be more clear (?).
-
-
->  };
+> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> index ef6be92b1921..eda7ddbed8cf 100644
+> --- a/arch/arm64/include/asm/cpufeature.h
+> +++ b/arch/arm64/include/asm/cpufeature.h
+> @@ -631,6 +631,7 @@ void check_local_cpu_capabilities(void);
 >
->  #define kvm_err(fmt, ...) \
-> @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
+>  u64 read_sanitised_ftr_reg(u32 id);
+>  u64 __read_sysreg_by_encoding(u32 sys_id);
+> +int arm64_check_features(u32 sys_reg, u64 val, u64 limit);
+>
+>  static inline bool cpu_supports_mixed_endian_el0(void)
+>  {
+> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+> index 6f3e677d88f1..48dff8b101d9 100644
+> --- a/arch/arm64/kernel/cpufeature.c
+> +++ b/arch/arm64/kernel/cpufeature.c
+> @@ -3140,3 +3140,231 @@ ssize_t cpu_show_meltdown(struct device *dev, struct device_attribute *attr,
+>                 return sprintf(buf, "Vulnerable\n");
 >         }
 >  }
->
-> +#define kvm_vm_has_started(kvm) (kvm->vm_started)
 > +
->  extern bool kvm_rebooting;
->
->  extern unsigned int halt_poll_ns;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 72c4e6b39389..962b91ac2064 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
->         int r;
->         struct kvm_fpu *fpu = NULL;
->         struct kvm_sregs *kvm_sregs = NULL;
-> +       struct kvm *kvm = vcpu->kvm;
->
->         if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
->                 return -EIO;
-> @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
->                         if (oldpid)
->                                 synchronize_rcu();
->                         put_pid(oldpid);
+> +#ifdef CONFIG_KVM
+> +/*
+> + * arm64_ftr_bits_kvm[] is used for KVM to check if features that are
+> + * indicated in an ID register value for the guest are available on the host.
+> + * arm64_ftr_bits_kvm[] is created based on arm64_ftr_regs[].  But, for
+> + * registers for which arm64_ftr_bits_kvm_override[] has a corresponding
+> + * entry, replace arm64_ftr_bits entries in arm64_ftr_bits_kvm[] with the
+> + * ones in arm64_ftr_bits_kvm_override[].
+> + */
+> +static struct __ftr_reg_bits_entry *arm64_ftr_bits_kvm;
+> +static size_t arm64_ftr_bits_kvm_nentries;
+> +static DEFINE_MUTEX(arm64_ftr_bits_kvm_lock);
+> +
+> +/*
+> + * Number of arm64_ftr_bits entries for each register.
+> + * (Number of 4 bits fields in 64 bit register + 1 entry for ARM64_FTR_END)
+> + */
+> +#define        MAX_FTR_BITS_LEN        17
+> +
+> +/* Use FTR_LOWER_SAFE for AA64DFR0_EL1.PMUVER and AA64DFR0_EL1.DEBUGVER. */
+> +static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
+> +       S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
+> +       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
+> +       ARM64_FTR_END,
+> +};
+> +
+> +#define        ARM64_FTR_REG_BITS(id, table)   {       \
+> +       .sys_id = id,                           \
+> +       .ftr_bits = &((table)[0]),              \
+> +}
+> +
+> +struct __ftr_reg_bits_entry {
+> +       u32     sys_id;
+> +       struct arm64_ftr_bits   *ftr_bits;
+> +};
+> +
+> +/*
+> + * All entries in arm64_ftr_bits_kvm_override[] are used to override
+> + * the corresponding entries in arm64_ftr_bits_kvm[].
+> + */
+> +static struct __ftr_reg_bits_entry arm64_ftr_bits_kvm_override[] = {
+> +       ARM64_FTR_REG_BITS(SYS_ID_AA64DFR0_EL1, ftr_id_aa64dfr0_kvm),
+> +};
+> +
+> +/*
+> + * Override entries in @orig_ftrp with the ones in @new_ftrp when their shift
+> + * fields match.  The last entry of @orig_ftrp and @new_ftrp must be
+> + * ARM64_FTR_END (.width == 0).
+> + */
+> +static void arm64_ftr_reg_bits_overrite(struct arm64_ftr_bits *orig_ftrp,
+> +                                       struct arm64_ftr_bits *new_ftrp)
+> +{
+> +       struct arm64_ftr_bits *o_ftrp, *n_ftrp;
+> +
+> +       for (n_ftrp = new_ftrp; n_ftrp->width; n_ftrp++) {
+> +               for (o_ftrp = orig_ftrp; o_ftrp->width; o_ftrp++) {
+> +                       if (o_ftrp->shift == n_ftrp->shift) {
+> +                               *o_ftrp = *n_ftrp;
+> +                               break;
+> +                       }
+> +               }
+> +       }
+> +}
+> +
+> +/*
+> + * Copy arm64_ftr_bits entries from @src_ftrp to @dst_ftrp.  The last entries
+> + * of @dst_ftrp and @src_ftrp must be ARM64_FTR_END (.width == 0).
+> + */
+> +static void copy_arm64_ftr_bits(struct arm64_ftr_bits *dst_ftrp,
+> +                               const struct arm64_ftr_bits *src_ftrp)
+> +{
+> +       int i = 0;
+> +
+> +       for (; src_ftrp[i].width; i++) {
+> +               if (WARN_ON_ONCE(i >= (MAX_FTR_BITS_LEN - 1)))
+> +                       break;
+> +
+> +               dst_ftrp[i] = src_ftrp[i];
+> +       }
+> +
+> +       dst_ftrp[i].width = 0;
+> +}
+> +
+> +/*
+> + * Initialize arm64_ftr_bits_kvm.  Copy arm64_ftr_bits for each ID register
+> + * from arm64_ftr_regs to arm64_ftr_bits_kvm, and then override entries in
+> + * arm64_ftr_bits_kvm with ones in arm64_ftr_bits_kvm_override.
+> + */
+> +static int init_arm64_ftr_bits_kvm(void)
+> +{
+> +       struct arm64_ftr_bits ftr_temp[MAX_FTR_BITS_LEN];
+> +       static struct __ftr_reg_bits_entry *reg_bits_array, *bits, *o_bits;
+> +       int i, j, nent, ret;
+> +
+> +       mutex_lock(&arm64_ftr_bits_kvm_lock);
+> +       if (arm64_ftr_bits_kvm) {
+> +               /* Already initialized */
+> +               ret = 0;
+> +               goto unlock_exit;
+> +       }
+> +
+> +       nent = ARRAY_SIZE(arm64_ftr_regs);
+> +       reg_bits_array = kcalloc(nent, sizeof(struct __ftr_reg_bits_entry),
+> +                                GFP_KERNEL);
+> +       if (!reg_bits_array) {
+> +               ret = ENOMEM;
+> +               goto unlock_exit;
+> +       }
+> +
+> +       /* Copy entries from arm64_ftr_regs to reg_bits_array */
+> +       for (i = 0; i < nent; i++) {
+> +               bits = &reg_bits_array[i];
+> +               bits->sys_id = arm64_ftr_regs[i].sys_id;
+> +               bits->ftr_bits = (struct arm64_ftr_bits *)arm64_ftr_regs[i].reg->ftr_bits;
+> +       };
+> +
+> +       /*
+> +        * Override the entries in reg_bits_array with the ones in
+> +        * arm64_ftr_bits_kvm_override.
+> +        */
+> +       for (i = 0; i < ARRAY_SIZE(arm64_ftr_bits_kvm_override); i++) {
+> +               o_bits = &arm64_ftr_bits_kvm_override[i];
+> +               for (j = 0; j < nent; j++) {
+> +                       bits = &reg_bits_array[j];
+> +                       if (bits->sys_id != o_bits->sys_id)
+> +                               continue;
+> +
+> +                       memset(ftr_temp, 0, sizeof(ftr_temp));
 > +
 > +                       /*
-> +                        * Since we land here even on the first vCPU run,
-> +                        * we can mark that the VM has started running.
+> +                        * Temporary save all entries in o_bits->ftr_bits
+> +                        * to ftr_temp.
 > +                        */
+> +                       copy_arm64_ftr_bits(ftr_temp, o_bits->ftr_bits);
+> +
+> +                       /*
+> +                        * Copy entries from bits->ftr_bits to o_bits->ftr_bits.
+> +                        */
+> +                       copy_arm64_ftr_bits(o_bits->ftr_bits, bits->ftr_bits);
+> +
+> +                       /*
+> +                        * Override entries in o_bits->ftr_bits with the
+> +                        * saved ones, and update bits->ftr_bits with
+> +                        * o_bits->ftr_bits.
+> +                        */
+> +                       arm64_ftr_reg_bits_overrite(o_bits->ftr_bits, ftr_temp);
+> +                       bits->ftr_bits = o_bits->ftr_bits;
+> +                       break;
+> +               }
+> +       }
+> +
+> +       arm64_ftr_bits_kvm_nentries = nent;
+> +       arm64_ftr_bits_kvm = reg_bits_array;
 
-It might be nicer to add a comment why the code below gets kvm->lock.
+I've just noticed that the patch has a problem in terms of memory ordering.
+I'm thinking of fixing the code above as follows in the v5 patch.
+---
+        <...>
+        arm64_ftr_bits_kvm_nentries = nent;
 
-Anyway, the patch generally looks good to me, and thank you
-for making this change (it works for my purpose as well).
+        /*
+         * Make sure any data written earlier in this function are visible
+         * from other CPUs before setting arm64_ftr_bits_kvm.
+         */
+        smp_wmb();
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+        WRITE_ONCE(arm64_ftr_bits_kvm, reg_bits_array);
+        <...>
+---
+
+Also, I will fix the reader side code of those data in
+get_arm64_ftr_bits_kvm().
 
 Thanks,
 Reiji
 
 
-> +                       mutex_lock(&kvm->lock);
-> +                       kvm->vm_started = true;
-> +                       mutex_unlock(&kvm->lock);
->                 }
->                 r = kvm_arch_vcpu_ioctl_run(vcpu);
->                 trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+> +       ret = 0;
+> +
+> +unlock_exit:
+> +       mutex_unlock(&arm64_ftr_bits_kvm_lock);
+> +       return ret;
+> +}
+> +
+> +static int search_cmp_ftr_reg_bits(const void *id, const void *regp)
+> +{
+> +       return ((int)(unsigned long)id -
+> +               (int)((const struct __ftr_reg_bits_entry *)regp)->sys_id);
+> +}
+> +
+> +static const struct arm64_ftr_bits *get_arm64_ftr_bits_kvm(u32 sys_id)
+> +{
+> +       const struct __ftr_reg_bits_entry *ret;
+> +       int err;
+> +
+> +       if (!arm64_ftr_bits_kvm) {
+> +               /* arm64_ftr_bits_kvm is not initialized yet. */
+> +               err = init_arm64_ftr_bits_kvm();
+> +               if (err)
+> +                       return NULL;
+> +       }
+> +
+> +       ret = bsearch((const void *)(unsigned long)sys_id,
+> +                     arm64_ftr_bits_kvm,
+> +                     arm64_ftr_bits_kvm_nentries,
+> +                     sizeof(arm64_ftr_bits_kvm[0]),
+> +                     search_cmp_ftr_reg_bits);
+> +       if (ret)
+> +               return ret->ftr_bits;
+> +
+> +       return NULL;
+> +}
+> +
+> +/*
+> + * Check if features (or levels of features) that are indicated in the ID
+> + * register value @val are also indicated in @limit.
+> + * This function is for KVM to check if features that are indicated in @val,
+> + * which will be used as the ID register value for its guest, are supported
+> + * on the host.
+> + * For AA64MMFR0_EL1.TGranX_2 fields, which don't follow the standard ID
+> + * scheme, the function checks if values of the fields in @val are the same
+> + * as the ones in @limit.
+> + */
+> +int arm64_check_features(u32 sys_reg, u64 val, u64 limit)
+> +{
+> +       const struct arm64_ftr_bits *ftrp = get_arm64_ftr_bits_kvm(sys_reg);
+> +       u64 exposed_mask = 0;
+> +
+> +       if (!ftrp)
+> +               return -ENOENT;
+> +
+> +       for (; ftrp->width; ftrp++) {
+> +               s64 ftr_val = arm64_ftr_value(ftrp, val);
+> +               s64 ftr_lim = arm64_ftr_value(ftrp, limit);
+> +
+> +               exposed_mask |= arm64_ftr_mask(ftrp);
+> +
+> +               if (ftr_val == ftr_lim)
+> +                       continue;
+> +
+> +               if (ftr_val != arm64_ftr_safe_value(ftrp, ftr_val, ftr_lim))
+> +                       return -E2BIG;
+> +       }
+> +
+> +       /* Make sure that no unrecognized fields are set in @val. */
+> +       if (val & ~exposed_mask)
+> +               return -E2BIG;
+> +
+> +       return 0;
+> +}
+> +#endif /* CONFIG_KVM */
 > --
 > 2.34.1.448.ga2b2bfdf31-goog
 >
