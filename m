@@ -2,96 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4125C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 17:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98EBDC433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 17:15:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E8F04B293;
-	Fri,  7 Jan 2022 12:11:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2DE44B2A5;
+	Fri,  7 Jan 2022 12:15:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DdwFRdl+VE1e; Fri,  7 Jan 2022 12:10:59 -0500 (EST)
+	with ESMTP id dvTdNQkc3Bwo; Fri,  7 Jan 2022 12:15:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05E6D4B29B;
-	Fri,  7 Jan 2022 12:10:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 987D74B29B;
+	Fri,  7 Jan 2022 12:15:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FB334B293
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 12:10:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CA5C4B29B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 12:15:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id go9pCO2X1QJz for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jan 2022 12:10:56 -0500 (EST)
+ with ESMTP id bWHKvzxCz-NE for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jan 2022 12:15:27 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 394974B28A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 12:10:56 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F04984B291
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 12:15:26 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1641575455;
+ s=mimecast20190719; t=1641575726;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3pHZETgLBLv2UtRUl6D+BkLJ1jpxDMC+Tp9BPH2rI4Y=;
- b=CNNP5aJYi8BQHcqf02peUI0SqoPhZwOwGUJQFTl1mCSgMue7LMhE9p2zvqSkgDBHaNzKvs
- YIRSYkX0kqTrRdsW0dSePCzGAe1qndWsrtkZ4oTvRzIjPAg8wWqQ64AAdU8Q/Ensw6aKKA
- RyG06EudQ0Fzjh4axSEx3LF5TRCimVQ=
+ bh=4vsOOMP2jOzKaAjizeC5l39pTNWtPs1ir1jcXzS/usA=;
+ b=T4m3vGiYEN1EIJjmxg/ptifLBwSdoHUpPBMP72OpCNWMqXcRLk97YMyRyUZv9D8ECCINQe
+ H2MEvsTJzMJa52PyYXsIENFZGHX/M02q0E1LOZUTW0T0Ma3idV01Re39LgqU7EYnBdkmLw
+ Tp7jQllIdWpcFClr2xkNb10yXzt33g0=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-142-cKSNKlSQNR6p3QeJU_hj5A-1; Fri, 07 Jan 2022 12:10:54 -0500
-X-MC-Unique: cKSNKlSQNR6p3QeJU_hj5A-1
+ us-mta-439-vLgH0-NLPLe6I3iAG3HrWA-1; Fri, 07 Jan 2022 12:15:22 -0500
+X-MC-Unique: vLgH0-NLPLe6I3iAG3HrWA-1
 Received: by mail-wm1-f69.google.com with SMTP id
- i81-20020a1c3b54000000b003467c58cbddso4623057wma.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Jan 2022 09:10:54 -0800 (PST)
+ g4-20020a1c9d04000000b00346e0d6877fso1124678wme.8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Jan 2022 09:15:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:reply-to:subject:to:cc:references:from
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-transfer-encoding:content-language;
- bh=3pHZETgLBLv2UtRUl6D+BkLJ1jpxDMC+Tp9BPH2rI4Y=;
- b=FfQUS//TKDj0ZqZjRI1b4nHJbA2hgYvVKhRqe2m/dEQ0YIlz3UuG1YNnET/SABewJP
- 0EOi14/e2kGvMz5ggb1jt6PWartvEqkDXN504rhk/GUoXFHpzqcl602+TVrXWkH9HQ3o
- jmE2qwsfKa8kTgO9Gm5fy/IDc0RMysW+d893pNiWkL03uo2FprDuinDKoWyDLYzF7Ovk
- Ws/tu8Ne9FmJ1SH/KakyQWchpqhSBDs+Tm/BuwyOcGVnLCljqcQSp07PjAh4oe73GDAi
- jaYy0qwB+79Pw9MkjpjptfEzqgS9nwHTwxGFMhpO3K92rU61b5wyP4m3M1DezEs6Wps1
- P9zw==
-X-Gm-Message-State: AOAM530Os4ujJLsp1N0mS0XUNd/GHVtu3s3gwfTGtdM1xXi00ZPceW2N
- rNu1tHYAZFpT93/Ayy6gTf8Bej5tZnqfUSgmYDpJF+VzofddPX2DC4Xw3DhDgnpa8u4MlyA6EFE
- ckR1CM/JWiZANEhmmj7DN71Nn
-X-Received: by 2002:a05:6000:1e07:: with SMTP id
- bj7mr5846332wrb.126.1641575453603; 
- Fri, 07 Jan 2022 09:10:53 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx9B+o3El0zBY9MRT5nLG9njMtu1q5Pq4PQVdvKApvURcNkIL2mU6w3Vbnbe92sMBLQ4jEp8A==
-X-Received: by 2002:a05:6000:1e07:: with SMTP id
- bj7mr5846317wrb.126.1641575453396; 
- Fri, 07 Jan 2022 09:10:53 -0800 (PST)
+ bh=4vsOOMP2jOzKaAjizeC5l39pTNWtPs1ir1jcXzS/usA=;
+ b=ER1Km08TbBOog7pODY+H3GaRUncv+yd2l5Zz5dQNAxGZ8l0iMkTdwMwiG5PBaTZJDG
+ 032G35oHg/aewl9ah0NP0n8iJ14CuJSzqEGsyW22EbVgdk0q5cD1n/Cc3qbl+CkLoR7N
+ TpxuvHSiczx70xFRu3lt8v01n7WtN+hGi2fdf9UG+W7B6MCZ/ijSX8qy1E+rIXbiWKJl
+ p1BmfXskfCKG7llm6sQeKTqq4Ob4MJ8CgvkTYTGVOI6Po/zVqJ73PoKkIPWEC7Sh6atV
+ tdsWgHC/l6dRI45PML4hKBc5gpII8qymwsOqmGt9+o9iLS+jSVHsbXyXsTZkwpYR6SOr
+ RFCQ==
+X-Gm-Message-State: AOAM530JbgiImnW0nW6x0sq7R8kpiEXpu0U2aNs+NItA95DtJ3Gk7C9p
+ zgQO2PXhNKMKn+pPjeLwKc5I1gC77XJgZ8o7kekG+YjDAX30S8Gl6LE3wHp5ebinmTKL2o7RdkV
+ TZHOf5em0Wuqjy3NwqDt10jBO
+X-Received: by 2002:a5d:6483:: with SMTP id o3mr58268904wri.101.1641575721177; 
+ Fri, 07 Jan 2022 09:15:21 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx8r1YuVw97cm+4Ci+idvC+xsdVFCO7vo+Z/vxPfFrHtrqAw3arjPJQbNKCupw6ctQsN426gQ==
+X-Received: by 2002:a5d:6483:: with SMTP id o3mr58268875wri.101.1641575720919; 
+ Fri, 07 Jan 2022 09:15:20 -0800 (PST)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
  ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id p23sm5013096wms.3.2022.01.07.09.10.52
+ by smtp.gmail.com with ESMTPSA id y15sm1351601wmi.40.2022.01.07.09.15.19
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Jan 2022 09:10:52 -0800 (PST)
-Subject: Re: [PATCH v2 1/5] hw/arm/virt: Key enablement of highmem PCIe on
- highmem_ecam
+ Fri, 07 Jan 2022 09:15:20 -0800 (PST)
+Subject: Re: [PATCH v3 3/5] hw/arm/virt: Honor highmem setting when computing
+ the memory map
 To: Marc Zyngier <maz@kernel.org>
-References: <20211003164605.3116450-1-maz@kernel.org>
- <20211003164605.3116450-2-maz@kernel.org>
- <dbe883ca-880e-7f2b-1de7-4b2d3361545d@redhat.com>
- <87pmpiyrfw.wl-maz@kernel.org>
- <b9031d40-897e-b8c5-4240-fc2936dcbcb9@redhat.com>
- <877dbfywpj.wl-maz@kernel.org>
- <cb9f6c39-40f8-eea7-73bf-13df1e5dae9d@redhat.com>
- <8735m0zmhq.wl-maz@kernel.org>
+References: <20211227211642.994461-1-maz@kernel.org>
+ <20211227211642.994461-4-maz@kernel.org>
+ <ef8b3500-04ab-5434-6a04-0e8b1dcc65d1@redhat.com>
+ <871r1kzhbp.wl-maz@kernel.org>
 From: Eric Auger <eric.auger@redhat.com>
-Message-ID: <44fcbe49-4eb2-8891-2cb9-2e2df7dee98b@redhat.com>
-Date: Fri, 7 Jan 2022 18:10:51 +0100
+Message-ID: <d330de15-b452-1f9c-14fa-906b88a8b4c4@redhat.com>
+Date: Fri, 7 Jan 2022 18:15:19 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <8735m0zmhq.wl-maz@kernel.org>
+In-Reply-To: <871r1kzhbp.wl-maz@kernel.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -111,46 +105,109 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCk9uIDEvNi8yMiA4OjM0IFBNLCBNYXJjIFp5bmdpZXIgd3JvdGU6Cj4gSGkgRXJp
-YywKPgo+IE9uIFdlZCwgMDUgSmFuIDIwMjIgMDk6NDE6MTkgKzAwMDAsCj4gRXJpYyBBdWdlciA8
-ZXJpYy5hdWdlckByZWRoYXQuY29tPiB3cm90ZToKPj4gY291bGRuJ3QgeW91IHNpbXBseSBpbnRy
-b2R1Y2UgaGlnaG1lbV9yZWRpc3Qgd2hpY2ggaXMgdHJ1bHkgbWlzc2luZy4gWW91Cj4+IGNvdWxk
-IHNldCBpdCBpbiB2aXJ0X3NldF9tZW1tYXAoKSBpbiBjYXNlIHlvdSBza2lwIGV4dGVuZGVkX21h
-cCBvdmVybGF5Cj4+IGFuZCB1c2UgaXQgaW4gdmlydF9naWN2M19yZWRpc3RfcmVnaW9uX2NvdW50
-KCkgYXMgeW91IGRpZD8KPj4gSW4gYWRkaXRpb24gdG8gdGhlIGRldmljZSBtZW1vcnkgdG9wIGFk
-ZHJlc3MgY2hlY2sgYWdhaW5zdCB0aGUgNEdCIGxpbWl0Cj4+IGlmICFoaWdobWVtLCB3ZSBzaG91
-bGQgYmUgZmluZSB0aGVuPwo+IE5vLCBoaWdobWVtIHJlYWxseSBpc24ndCBuZWFybHkgZW5vdWdo
-Lgo+Cj4gSW1hZ2luZSB5b3UgaGF2ZSAobGlrZSBJIGRvKSBhIHN5c3RlbSB3aXRoIDM2IGJpdHMg
-b2YgSVBBIHNwYWNlLgo+IENyZWF0ZSBhIFZNIHdpdGggOEdCIG9mIFJBTSAod2hpY2ggbWVhbnMg
-dGhlIGxvdy1lbmQgb2YgSVBBIHNwYWNlIGlzCj4gYWxyZWFkeSA5R0IpLiBPYnZpb3VzbHksIGhp
-Z2htZW09dHJ1ZSBoZXJlLiBXaXRoIHRoZSBjdXJyZW50IGNvZGUsIHdlCj4gd2lsbCB0cnkgdG8g
-ZXhwb3NlIHRoaXMgUENJIE1NSU8gcmFuZ2UsIHdoaWNoIGZhbGxzIHdheSBvdXQgb2YgdGhlIElQ
-QQo+IHNwYWNlICh5b3UgbmVlZCBhdCBsZWFzdCA0MCBiaXRzIG9mIElQQSB0byBldmVuIGNvdmVy
-IGl0IHdpdGggdGhlCj4gc21hbGxlc3QgY29uZmlndXJhdGlvbikuCkluIHRoYXQgY2FzZSB0aGUg
-aGUgSGlnaCBNTUlPIHJlZ2lvbiBpcyBhY2NvdW50ZWQgaW4gdGhlIHZtcy0+aGlnaGVzdF9ncGE6
-CgrCoMKgwqAgZm9yIChpID0gVklSVF9MT1dNRU1NQVBfTEFTVDsgaSA8IEFSUkFZX1NJWkUoZXh0
-ZW5kZWRfbWVtbWFwKTsgaSsrKSB7CsKgwqDCoMKgwqDCoMKgIGh3YWRkciBzaXplID0gZXh0ZW5k
-ZWRfbWVtbWFwW2ldLnNpemU7CgrCoMKgwqDCoMKgwqDCoCBiYXNlID0gUk9VTkRfVVAoYmFzZSwg
-c2l6ZSk7CsKgwqDCoMKgwqDCoMKgIHZtcy0+bWVtbWFwW2ldLmJhc2UgPSBiYXNlOwrCoMKgwqDC
-oMKgwqDCoCB2bXMtPm1lbW1hcFtpXS5zaXplID0gc2l6ZTsKwqDCoMKgwqDCoMKgwqAgYmFzZSAr
-PSBzaXplOwrCoMKgwqAgfQrCoMKgwqAgdm1zLT5oaWdoZXN0X2dwYSA9IGJhc2UgLSAxOwoKYW5k
-IHZpcnRfa3ZtX3R5cGUoKSBzaG91bGQgZXhpdCBpbiB0aGF0IGNhc2UgYXQ6CmlmIChyZXF1ZXN0
-ZWRfcGFfc2l6ZSA+IG1heF92bV9wYV9zaXplKSB7CsKgwqDCoMKgwqDCoMKgIGVycm9yX3JlcG9y
-dCgiLW0gYW5kICxtYXhtZW0gb3B0aW9uIHZhbHVlcyAiCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgInJlcXVpcmUgYW4gSVBBIHJhbmdlICglZCBiaXRzKSBsYXJnZXIg
-dGhhbiAiCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgInRoZSBvbmUg
-c3VwcG9ydGVkIGJ5IHRoZSBob3N0ICglZCBiaXRzKSIsCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgcmVxdWVzdGVkX3BhX3NpemUsIG1heF92bV9wYV9zaXplKTsKwqDC
-oMKgwqDCoMKgwqAgZXhpdCgxKTsKwqDCoMKgIH0KCj8KPgo+IGhpZ2htZW0gcmVhbGx5IGlzIGEg
-Y29udHJvbCB0aGF0IHNheXMgJ3RoaW5ncyBtYXkgbGl2ZSBhYm92ZSA0R0InLiBJdAo+IGRvZXNu
-J3Qgc2F5ICpob3cgZmFyKiBhYm92ZSA0R0IgaXQgY2FuIGJlIHBsYWNlZC4gV2hpY2ggaXMgd2hh
-dCBJIGFtCj4gdHJ5aW5nIHRvIGFkZHJlc3MuCgpPSyBJIHdpbGwgbG9vayBhdCB5b3VyIHY0IDst
-KQoKVGhhbmtzCgpFcmljCj4KPiBUaGFua3MsCj4KPiAJTS4KPgoKX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
-YW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Marc,
+
+On 1/6/22 10:26 PM, Marc Zyngier wrote:
+> On Wed, 05 Jan 2022 09:22:39 +0000,
+> Eric Auger <eric.auger@redhat.com> wrote:
+>> Hi Marc,
+>>
+>> On 12/27/21 10:16 PM, Marc Zyngier wrote:
+>>> Even when the VM is configured with highmem=off, the highest_gpa
+>>> field includes devices that are above the 4GiB limit.
+>>> Similarily, nothing seem to check that the memory is within
+>>> the limit set by the highmem=off option.
+>>>
+>>> This leads to failures in virt_kvm_type() on systems that have
+>>> a crippled IPA range, as the reported IPA space is larger than
+>>> what it should be.
+>>>
+>>> Instead, honor the user-specified limit to only use the devices
+>>> at the lowest end of the spectrum, and fail if we have memory
+>>> crossing the 4GiB limit.
+>>>
+>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>> ---
+>>>  hw/arm/virt.c | 9 ++++++++-
+>>>  1 file changed, 8 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+>>> index 8b600d82c1..84dd3b36fb 100644
+>>> --- a/hw/arm/virt.c
+>>> +++ b/hw/arm/virt.c
+>>> @@ -1678,6 +1678,11 @@ static void virt_set_memmap(VirtMachineState *vms)
+>>>          exit(EXIT_FAILURE);
+>>>      }
+>>>  
+>>> +    if (!vms->highmem &&
+>>> +        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
+>>> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+>>> +        exit(EXIT_FAILURE);
+>> The memory is composed of initial memory and device memory.
+>> device memory is put after the initial memory but has a 1GB alignment
+>> On top of that you have 1G page alignment per device memory slot
+>>
+>> so potentially the highest mem address is larger than
+>> vms->memmap[VIRT_MEM].base + ms->maxram_size.
+>> I would rather do the check on device_memory_base + device_memory_size
+> Yup, that's a good point.
+>
+> There is also a corner case in one of the later patches where I check
+> this limit against the PA using the rounded-up device_memory_size.
+> This could result in returning an error if the last memory slot would
+> still fit in the PA space, but the rounded-up quantity wouldn't. I
+> don't think it matters much, but I'll fix it anyway.
+>
+>>> +    }
+>>>      /*
+>>>       * We compute the base of the high IO region depending on the
+>>>       * amount of initial and device memory. The device memory start/size
+>>> @@ -1707,7 +1712,9 @@ static void virt_set_memmap(VirtMachineState *vms)
+>>>          vms->memmap[i].size = size;
+>>>          base += size;
+>>>      }
+>>> -    vms->highest_gpa = base - 1;
+>>> +    vms->highest_gpa = (vms->highmem ?
+>>> +                        base :
+>>> +                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
+>> As per the previous comment this looks wrong to me if !highmem.
+> Agreed.
+>
+>> If !highmem, if RAM requirements are low we still could get benefit from
+>> REDIST2 and HIGH ECAM which could fit within the 4GB limit. But maybe we
+>> simply don't care?
+> I don't see how. These devices live at a minimum of 256GB, which
+> contradicts the very meaning of !highmem being a 4GB limit.
+Yes I corrected the above statement afterwards, sorry for the noise.
+>
+>> If we don't, why don't we simply skip the extended_memmap overlay as
+>> suggested in v2? I did not get your reply sorry.
+> Because although this makes sense if you only care about a 32bit
+> limit, we eventually want to check against an arbitrary PA limit and
+> enable the individual devices that do fit in that space.
+
+In my understanding that is what virt_kvm_type() was supposed to do by
+testing the result of kvm_arm_get_max_vm_ipa_size and requested_pa_size
+(which accounted the high regions) and exiting if they were
+incompatible. But I must miss something.
+>
+> In order to do that, we need to compute the base addresses for these
+> extra devices. Also, computing 3 base addresses isn't going to be
+> massively expensive.
+>
+> Thanks,
+>
+> 	M.
+>
+Eric
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
