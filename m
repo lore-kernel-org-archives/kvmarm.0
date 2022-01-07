@@ -2,59 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35EB8C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 16:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9672FC4332F
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 16:34:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE7AE4B2A8;
-	Fri,  7 Jan 2022 11:34:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 217994B248;
+	Fri,  7 Jan 2022 11:34:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qMGsamnWYSdM; Fri,  7 Jan 2022 11:34:05 -0500 (EST)
+	with ESMTP id 8zCuGDYdzIPM; Fri,  7 Jan 2022 11:34:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 645DF4B2B1;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A04564B2BD;
 	Fri,  7 Jan 2022 11:34:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 95CE74B227
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E171B4B248
  for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 11:34:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i89aTQO9qEWT for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id FmeHyWShjAS0 for <kvmarm@lists.cs.columbia.edu>;
  Fri,  7 Jan 2022 11:34:01 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F6DE4B245
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C6A464B296
  for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 11:34:01 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 93A9261EA2;
- Fri,  7 Jan 2022 16:34:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08DB7C36AE0;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 4E2DF61F13;
+ Fri,  7 Jan 2022 16:34:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B745CC36AF2;
  Fri,  7 Jan 2022 16:34:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1641573240;
- bh=3L/9tPruGiz7h73xzwH+NCKLF8ym5mrinTHffjc2kFg=;
- h=From:To:Cc:Subject:Date:From;
- b=oVXlzK1D01nQc1pBIq5O6nlDeAJEJg0wp1al2nRGBhEv3ORCuQn3wIimT1tGAu+/J
- /CFHr4knaIHMOyIQGRwyVbMMfXhPqyY6bc3BGL9T6wDTxKNprVHZYDg7WlmYzw7amK
- 8Yl6oTRXmtFslym/4o0aFFrEB0vaAJBUaa2mvQk9YCChFjD4YeCGcDNO3bEKplkiXE
- gEMGOApOp/V1Rdhg6Eist8WCmJ63JQKOycQb/CZQr9fcQulfp0BKdTsLCxspLXV+39
- X2tA0CWdiEu9qJoeFtdIzNRWPa+iCnsRZ3VuM55sxNjVBjsOqKX00vGXnwfHhgnjzE
- BuWI1sO0SDoAg==
+ bh=HWE9/B+wF4b607CUdPFIfJT6IFMZsln6c3BwaclkZ5I=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=ttSpDQEAHLh0A2FISQerOllZPsWP1i08wZFml1iEJqVm92n4Mqut5d5IlHeo6cpv8
+ TnXvltcvMcONgCqooq5KaLo3qRcWo9YVCWmW1RMfNn6eqmzGu95ubkpaWbuD82eiAh
+ EzD18tZctYpXdfc9/nfB68zHoYrDje3GmnKzMMI8b3k1waczi2EcQJVzHji3PqXyml
+ U/zzJnGF8AqzFwzOTbiplcAhmcgyKrlPQ5H1baRyCmHu5yL3loCuiVrHvMmAyDzDDX
+ 3rd3U9XBWC7kDTBqZOFjY3+9sHwyxjRb6U6+ayJlo0c4+pZnm0xqx0Q/9gQDZZEaxf
+ 2+vb1xIdNEYDA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1n5sBi-00GbiJ-0T; Fri, 07 Jan 2022 16:33:58 +0000
+ id 1n5sBi-00GbiJ-R5; Fri, 07 Jan 2022 16:33:58 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 0/6] target/arm: Reduced-IPA space and highmem fixes
-Date: Fri,  7 Jan 2022 16:33:18 +0000
-Message-Id: <20220107163324.2491209-1-maz@kernel.org>
+Subject: [PATCH v4 4/6] hw/arm/virt: Use the PA range to compute the memory map
+Date: Fri,  7 Jan 2022 16:33:22 +0000
+Message-Id: <20220107163324.2491209-5-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220107163324.2491209-1-maz@kernel.org>
+References: <20220107163324.2491209-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
@@ -80,70 +82,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Here's another stab at enabling QEMU on systems with pathologically
-reduced IPA ranges such as the Apple M1 (previous version at [1]).
-Eventually, we're able to run a KVM guest with more than just 3GB of
-RAM on a system with a 36bit IPA space, and at most 123 vCPUs.
+The highmem attribute is nothing but another way to express the
+PA range of a VM. To support HW that has a smaller PA range then
+what QEMU assumes, pass this PA range to the virt_set_memmap()
+function, allowing it to correctly exclude highmem devices
+if they are outside of the PA range.
 
-This also addresses some pathological QEMU behaviours, where the
-highmem property is used as a flag allowing exposure of devices that
-can't possibly fit in the PA space of the VM, resulting in a guest
-failure.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ hw/arm/virt.c | 53 ++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 46 insertions(+), 7 deletions(-)
 
-In the end, we generalise the notion of PA space when exposing
-individual devices in the expanded memory map, and treat highmem as
-another flavour or PA space restriction.
-
-This series does a few things:
-
-- introduce new attributes to control the enabling of the highmem
-  GICv3 redistributors and the highmem PCIe MMIO range
-
-- correctly cap the PA range with highmem is off
-
-- generalise the highmem behaviour to any PA range
-
-- disable each highmem device region that doesn't fit in the PA range
-
-- cleanup uses of highmem outside of virt_set_memmap()
-
-This has been tested on an M1-based Mac-mini running Linux v5.16-rc6
-with both KVM and TCG.
-
-* From v3 [1]:
-
-  - Introduced highmem_mmio as the MMIO pendant to highmem_ecam after
-    Eric made it plain that I was misguided in using highmem_ecam to
-    gate the MMIO region.
-
-  - Fixed the way the top of RAM is enforced (using the device memory
-    size, rounded up to the nearest GB). I long debated *not* using
-    the rounded up version, but finally decided that it would be the
-    least surprising, given that each slot is supposed to hold a full
-    GB.
-
-  - Now allowing some of the highmem devices to be individually
-    enabled if they fit in the PA range. For example, a system with a
-    39bit PA range and at most 255GB of RAM can use the highmem redist
-    and PCIe ECAM ranges, but not the high PCIe range.
-
-  - Dropped some of Andrew's RBs, as the code significantly changed.
-
-[1] https://lore.kernel.org/r/20211227211642.994461-1-maz@kernel.org
-
-Marc Zyngier (6):
-  hw/arm/virt: Add a control for the the highmem PCIe MMIO
-  hw/arm/virt: Add a control for the the highmem redistributors
-  hw/arm/virt: Honor highmem setting when computing the memory map
-  hw/arm/virt: Use the PA range to compute the memory map
-  hw/arm/virt: Disable highmem devices that don't fit in the PA range
-  hw/arm/virt: Drop superfluous checks against highmem
-
- hw/arm/virt-acpi-build.c | 10 ++---
- hw/arm/virt.c            | 87 +++++++++++++++++++++++++++++++++++-----
- include/hw/arm/virt.h    |  5 ++-
- 3 files changed, 85 insertions(+), 17 deletions(-)
-
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 57c55e8a37..db4b0636e1 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1660,7 +1660,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+     return arm_cpu_mp_affinity(idx, clustersz);
+ }
+ 
+-static void virt_set_memmap(VirtMachineState *vms)
++static void virt_set_memmap(VirtMachineState *vms, int pa_bits)
+ {
+     MachineState *ms = MACHINE(vms);
+     hwaddr base, device_memory_base, device_memory_size, memtop;
+@@ -1678,6 +1678,13 @@ static void virt_set_memmap(VirtMachineState *vms)
+         exit(EXIT_FAILURE);
+     }
+ 
++    /*
++     * !highmem is exactly the same as limiting the PA space to 32bit,
++     * irrespective of the underlying capabilities of the HW.
++     */
++    if (!vms->highmem)
++	    pa_bits = 32;
++
+     /*
+      * We compute the base of the high IO region depending on the
+      * amount of initial and device memory. The device memory start/size
+@@ -1691,8 +1698,9 @@ static void virt_set_memmap(VirtMachineState *vms)
+ 
+     /* Base address of the high IO region */
+     memtop = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+-    if (!vms->highmem && memtop > 4 * GiB) {
+-        error_report("highmem=off, but memory crosses the 4GiB limit\n");
++    if (memtop > BIT_ULL(pa_bits)) {
++	    error_report("Addressing limited to %d bits, but memory exceeds it by %llu bytes\n",
++			 pa_bits, memtop - BIT_ULL(pa_bits));
+         exit(EXIT_FAILURE);
+     }
+     if (base < device_memory_base) {
+@@ -1711,7 +1719,13 @@ static void virt_set_memmap(VirtMachineState *vms)
+         vms->memmap[i].size = size;
+         base += size;
+     }
+-    vms->highest_gpa = (vms->highmem ? base : memtop) - 1;
++
++    /*
++     * If base fits within pa_bits, all good. If it doesn't, limit it
++     * to the end of RAM, which is guaranteed to fit within pa_bits.
++     */
++    vms->highest_gpa = (base <= BIT_ULL(pa_bits) ? base : memtop) - 1;
++
+     if (device_memory_size > 0) {
+         ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+         ms->device_memory->base = device_memory_base;
+@@ -1902,12 +1916,38 @@ static void machvirt_init(MachineState *machine)
+     unsigned int smp_cpus = machine->smp.cpus;
+     unsigned int max_cpus = machine->smp.max_cpus;
+ 
++    possible_cpus = mc->possible_cpu_arch_ids(machine);
++
+     /*
+      * In accelerated mode, the memory map is computed earlier in kvm_type()
+      * to create a VM with the right number of IPA bits.
+      */
+     if (!vms->memmap) {
+-        virt_set_memmap(vms);
++        Object *cpuobj;
++        ARMCPU *armcpu;
++        int pa_bits;
++
++        /*
++         * Instanciate a temporary CPU object to find out about what
++         * we are about to deal with. Once this is done, get rid of
++         * the object.
++         */
++        cpuobj = object_new(possible_cpus->cpus[0].type);
++        armcpu = ARM_CPU(cpuobj);
++
++        if (object_property_get_bool(cpuobj, "aarch64", NULL)) {
++            pa_bits = arm_pamax(armcpu);
++        } else if (arm_feature(&armcpu->env, ARM_FEATURE_LPAE)) {
++            /* v7 with LPAE */
++            pa_bits = 40;
++        } else {
++            /* Anything else */
++            pa_bits = 32;
++        }
++
++        object_unref(cpuobj);
++
++        virt_set_memmap(vms, pa_bits);
+     }
+ 
+     /* We can probe only here because during property set
+@@ -1989,7 +2029,6 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_fdt(vms);
+ 
+-    possible_cpus = mc->possible_cpu_arch_ids(machine);
+     assert(possible_cpus->len == max_cpus);
+     for (n = 0; n < possible_cpus->len; n++) {
+         Object *cpuobj;
+@@ -2646,7 +2685,7 @@ static int virt_kvm_type(MachineState *ms, const char *type_str)
+     max_vm_pa_size = kvm_arm_get_max_vm_ipa_size(ms, &fixed_ipa);
+ 
+     /* we freeze the memory map to compute the highest gpa */
+-    virt_set_memmap(vms);
++    virt_set_memmap(vms, max_vm_pa_size);
+ 
+     requested_pa_size = 64 - clz64(vms->highest_gpa);
+ 
 -- 
 2.30.2
 
