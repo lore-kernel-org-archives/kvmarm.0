@@ -2,87 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD85AC433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 16:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECD19C4332F
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 16:34:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AEF14B2AA;
-	Fri,  7 Jan 2022 11:31:42 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8374B29B;
+	Fri,  7 Jan 2022 11:34:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XvVZm5BCrs4F; Fri,  7 Jan 2022 11:31:40 -0500 (EST)
+	with ESMTP id JuXOXXI9q2HO; Fri,  7 Jan 2022 11:34:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7E004B281;
-	Fri,  7 Jan 2022 11:31:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4397A4B2A8;
+	Fri,  7 Jan 2022 11:34:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBCDF4B281
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 11:31:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82F444B2A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 11:34:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W0EVkHGVAzTr for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jan 2022 11:31:38 -0500 (EST)
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com
- [209.85.215.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CAE364B274
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 11:31:38 -0500 (EST)
-Received: by mail-pg1-f169.google.com with SMTP id a22so1467150pgd.6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Jan 2022 08:31:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=8x5aau+9GId4X1fkS/Ix8Wi9zq+PLZoxIQ2oHrW+IM8=;
- b=L9AJlkClDBCQp2d0qcZIwYZbbM0UJrWK7mAnAs7XoHi5p3eXECQk/DT7ZPdJL6dOLF
- jIWwg4D0FCWGc+KY752pSLb0iqOUgyV4ueCX1tRs0iyIihUOfu+/nrN1UnQgQtHzU6Q9
- E2bh0Vzff3Bi2MgEvD6x1btKH7Hj+ZDktF1TswaiGXH2itZ6sMNFH0eff2bzCSZIUzPx
- Ljeu9mMpDh9SifesE99f/y4hFJusqSEbqQ+3QYY58RlPh7erzlf6CgVoHjBTmnzEr0gg
- cXvZjK196zShjNX+a2OopX31KfOYlHQPnp5tpCH8PJpwA4n+VcXTb4X9AGr99mUZ2sKJ
- dpBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=8x5aau+9GId4X1fkS/Ix8Wi9zq+PLZoxIQ2oHrW+IM8=;
- b=LxqHpU5aEoGNcXNIy8Kx7j9V/HlYFMIKGz0tU41TI8H0IcDpbNhuq39txGlkAgnGuy
- kbZA+ak7gDw6rgJEkhfWtHvlpZEpA3j2L1VhBbXx3wuhbUeFtVda40y0JiaWrgckx8Ao
- KKmtHW1BxsyrsX7hpGNNs0FC/CQ3dnndXniXgjlCLdfgK7TQOD0kbsGMIbW+ZkXf8NqN
- hAeBuSuichOah57gbPFh4bk+avRYVClRKNdayC8oCuTBC5VupW7peWjCNOHSZ5tquT6V
- kBJIK/5GGUAqoDCYmAzYV98YzaZ/nz0lkI8ynmSEiixQMlM1+U4wXzDXwBih8Clg2FfV
- Gfyw==
-X-Gm-Message-State: AOAM5326LJhlVulgYxBPIweLPDju+RMyeez7WqnuU5M7dQCY2S1iL7r7
- 2xU8Mhj8xrAgO4wtexQHMfaJjQ==
-X-Google-Smtp-Source: ABdhPJzgG47GKpuKWTf6oJSn9E2fBwBv84lP3oKIaE8NOaZd04A6CCABm5d7mq013onV7fWVKolFbQ==
-X-Received: by 2002:a63:3f88:: with SMTP id m130mr5233049pga.413.1641573097689; 
- Fri, 07 Jan 2022 08:31:37 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id v128sm4290920pfc.36.2022.01.07.08.31.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 07 Jan 2022 08:31:37 -0800 (PST)
-Date: Fri, 7 Jan 2022 16:31:33 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v5 4/4] KVM: mmu: remove over-aggressive warnings
-Message-ID: <Ydhq5aHW+JFo15UF@google.com>
-References: <20211129034317.2964790-1-stevensd@google.com>
- <20211129034317.2964790-5-stevensd@google.com>
- <Yc4G23rrSxS59br5@google.com>
- <CAD=HUj5Q6rW8UyxAXUa3o93T0LBqGQb7ScPj07kvuM3txHMMrQ@mail.gmail.com>
- <YdXrURHO/R82puD4@google.com> <YdXvUaBUvaRPsv6m@google.com>
- <CAD=HUj736L5oxkzeL2JoPV8g1S6Rugy_TquW=PRt73YmFzP6Jw@mail.gmail.com>
- <YdcpIQgMZJrqswKU@google.com>
- <CAD=HUj5v37wZ9NuNC4QBDvCGO2SyNG2KAiTc9Jxfg=R7neCuTw@mail.gmail.com>
+ with ESMTP id 49wdY4jM87ia for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jan 2022 11:34:01 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F56C4B227
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 11:34:01 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B3ABA61EF7;
+ Fri,  7 Jan 2022 16:34:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26B09C36AED;
+ Fri,  7 Jan 2022 16:34:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1641573240;
+ bh=6exvkxmNdMYiYOOqj0NjbeWY6bWnSyoqlQpjPPOncYo=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=rAOW7/m8wI3dh1xbQQUWizK+F+W0ueQfNPduBkl1f2UDIvUSQIzK2Fxj7dY7kLROE
+ hK9LwOPu/bflsn1bnTKn7Wirj9l3RNrpITeA7Dhn+9qvZOk1L/NVkUTo4ND9qJ007K
+ IAkU9ud5NdTUlFCcsO8eTw3sw8fOiwvSIODPzijZQLRrawxR1oicdGR05e5uiopkmz
+ b18QKbj/1BHdeL0UQYaggcUap4ibemXV6RQOn3kT4VoFWHJWDKVdDHaqnour+U2lSB
+ bJITScXQtxBJ+pgdJd1iub/xDL8aQcdZLeOk+EzIx0tgLUZrlV9bvs/pJxV8esFaEg
+ c17NSirC5dXEA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n5sBi-00GbiJ-9K; Fri, 07 Jan 2022 16:33:58 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 1/6] hw/arm/virt: Add a control for the the highmem PCIe
+ MMIO
+Date: Fri,  7 Jan 2022 16:33:19 +0000
+Message-Id: <20220107163324.2491209-2-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220107163324.2491209-1-maz@kernel.org>
+References: <20220107163324.2491209-1-maz@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAD=HUj5v37wZ9NuNC4QBDvCGO2SyNG2KAiTc9Jxfg=R7neCuTw@mail.gmail.com>
-Cc: Chia-I Wu <olv@chromium.org>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, kernel-team@android.com, drjones@redhat.com,
+ eric.auger@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,62 +83,110 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 07, 2022, David Stevens wrote:
-> > > These are the type of pages which KVM is currently rejecting. Is this
-> > > something that KVM can support?
-> >
-> > I'm not opposed to it.  My complaint is that this series is incomplete in that it
-> > allows mapping the memory into the guest, but doesn't support accessing the memory
-> > from KVM itself.  That means for things to work properly, KVM is relying on the
-> > guest to use the memory in a limited capacity, e.g. isn't using the memory as
-> > general purpose RAM.  That's not problematic for your use case, because presumably
-> > the memory is used only by the vGPU, but as is KVM can't enforce that behavior in
-> > any way.
-> >
-> > The really gross part is that failures are not strictly punted to userspace;
-> > the resulting error varies significantly depending on how the guest "illegally"
-> > uses the memory.
-> >
-> > My first choice would be to get the amdgpu driver "fixed", but that's likely an
-> > unreasonable request since it sounds like the non-KVM behavior is working as intended.
-> >
-> > One thought would be to require userspace to opt-in to mapping this type of memory
-> > by introducing a new memslot flag that explicitly states that the memslot cannot
-> > be accessed directly by KVM, i.e. can only be mapped into the guest.  That way,
-> > KVM has an explicit ABI with respect to how it handles this type of memory, even
-> > though the semantics of exactly what will happen if userspace/guest violates the
-> > ABI are not well-defined.  And internally, KVM would also have a clear touchpoint
-> > where it deliberately allows mapping such memslots, as opposed to the more implicit
-> > behavior of bypassing ensure_pfn_ref().
-> 
-> Is it well defined when KVM needs to directly access a memslot?
+Just like we can control the enablement of the highmem PCIe ECAM
+region using highmem_ecam, let's add a control for the highmem
+PCIe MMIO  region.
 
-Not really, there's certainly no established rule.
+Similarily to highmem_ecam, this region is disabled when highmem
+is off.
 
-> At least for x86, it looks like most of the use cases are related to nested
-> virtualization, except for the call in emulator_cmpxchg_emulated.
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ hw/arm/virt-acpi-build.c | 10 ++++------
+ hw/arm/virt.c            |  7 +++++--
+ include/hw/arm/virt.h    |  1 +
+ 3 files changed, 10 insertions(+), 8 deletions(-)
 
-The emulator_cmpxchg_emulated() will hopefully go away in the nearish future[*].
-Paravirt features that communicate between guest and host via memory is the other
-case that often maps a pfn into KVM.
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index d0f4867fdf..cdac009419 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -158,10 +158,9 @@ static void acpi_dsdt_add_virtio(Aml *scope,
+ }
+ 
+ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+-                              uint32_t irq, bool use_highmem, bool highmem_ecam,
+-                              VirtMachineState *vms)
++                              uint32_t irq, VirtMachineState *vms)
+ {
+-    int ecam_id = VIRT_ECAM_ID(highmem_ecam);
++    int ecam_id = VIRT_ECAM_ID(vms->highmem_ecam);
+     struct GPEXConfig cfg = {
+         .mmio32 = memmap[VIRT_PCIE_MMIO],
+         .pio    = memmap[VIRT_PCIE_PIO],
+@@ -170,7 +169,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+         .bus    = vms->bus,
+     };
+ 
+-    if (use_highmem) {
++    if (vms->highmem_mmio) {
+         cfg.mmio64 = memmap[VIRT_HIGH_PCIE_MMIO];
+     }
+ 
+@@ -868,8 +867,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     acpi_dsdt_add_fw_cfg(scope, &memmap[VIRT_FW_CFG]);
+     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+                     (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+-    acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
+-                      vms->highmem, vms->highmem_ecam, vms);
++    acpi_dsdt_add_pci(scope, memmap, irqmap[VIRT_PCIE] + ARM_SPI_BASE, vms);
+     if (vms->acpi_dev) {
+         build_ged_aml(scope, "\\_SB."GED_DEVICE,
+                       HOTPLUG_HANDLER(vms->acpi_dev),
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 4593fea1ce..b9ce81f4a1 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1412,7 +1412,7 @@ static void create_pcie(VirtMachineState *vms)
+                              mmio_reg, base_mmio, size_mmio);
+     memory_region_add_subregion(get_system_memory(), base_mmio, mmio_alias);
+ 
+-    if (vms->highmem) {
++    if (vms->highmem_mmio) {
+         /* Map high MMIO space */
+         MemoryRegion *high_mmio_alias = g_new0(MemoryRegion, 1);
+ 
+@@ -1466,7 +1466,7 @@ static void create_pcie(VirtMachineState *vms)
+     qemu_fdt_setprop_sized_cells(ms->fdt, nodename, "reg",
+                                  2, base_ecam, 2, size_ecam);
+ 
+-    if (vms->highmem) {
++    if (vms->highmem_mmio) {
+         qemu_fdt_setprop_sized_cells(ms->fdt, nodename, "ranges",
+                                      1, FDT_PCI_RANGE_IOPORT, 2, 0,
+                                      2, base_pio, 2, size_pio,
+@@ -2105,6 +2105,8 @@ static void machvirt_init(MachineState *machine)
+ 
+     virt_flash_fdt(vms, sysmem, secure_sysmem ?: sysmem);
+ 
++    vms->highmem_mmio &= vms->highmem;
++
+     create_gic(vms, sysmem);
+ 
+     virt_cpu_post_init(vms, sysmem);
+@@ -2802,6 +2804,7 @@ static void virt_instance_init(Object *obj)
+     vms->gic_version = VIRT_GIC_VERSION_NOSEL;
+ 
+     vms->highmem_ecam = !vmc->no_highmem_ecam;
++    vms->highmem_mmio = true;
+ 
+     if (vmc->no_its) {
+         vms->its = false;
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index dc6b66ffc8..9c54acd10d 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -143,6 +143,7 @@ struct VirtMachineState {
+     bool secure;
+     bool highmem;
+     bool highmem_ecam;
++    bool highmem_mmio;
+     bool its;
+     bool tcg_its;
+     bool virt;
+-- 
+2.30.2
 
-> Without being able to specifically state what should be avoided, a flag like
-> that would be difficult for userspace to use.
-
-Yeah :-(  I was thinking KVM could state the flag would be safe to use if and only
-if userspace could guarantee that the guest would use the memory for some "special"
-use case, but hadn't actually thought about how to word things.
-
-The best thing to do is probably to wait for for kvm_vcpu_map() to be eliminated,
-as described in the changelogs for commits:
-
-  357a18ad230f ("KVM: Kill kvm_map_gfn() / kvm_unmap_gfn() and gfn_to_pfn_cache")
-  7e2175ebd695 ("KVM: x86: Fix recording of guest steal time / preempted status")
-
-Once that is done, everything in KVM will either access guest memory through the
-userspace hva, or via a mechanism that is tied into the mmu_notifier, at which
-point accessing non-refcounted struct pages is safe and just needs to worry about
-not corrupting _refcount.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
