@@ -2,49 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1ED2C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 12:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1C4C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 14:35:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CCCA49F3D;
-	Fri,  7 Jan 2022 07:10:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B376A4B178;
+	Fri,  7 Jan 2022 09:35:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LEvchLGv+Iiy; Fri,  7 Jan 2022 07:10:03 -0500 (EST)
+	with ESMTP id jx6RVBSetWAZ; Fri,  7 Jan 2022 09:35:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39D884B160;
-	Fri,  7 Jan 2022 07:10:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 974AE4B1BF;
+	Fri,  7 Jan 2022 09:35:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 427E149F3D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 07:10:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F3B4B178
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 09:35:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rNhxZY6rJknL for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jan 2022 07:10:00 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D82749F05
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 07:10:00 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 461B613D5;
- Fri,  7 Jan 2022 04:09:59 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7B1D63F774;
- Fri,  7 Jan 2022 04:09:57 -0800 (PST)
-Date: Fri, 7 Jan 2022 12:10:05 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH kvmtool 9/9] arm64: Add support for
- KVM_ARM_VCPU_PMU_V3_SET_PMU
-Message-ID: <YdgtnQPAsy1hSOWj@monolith.localdoman>
-References: <20211115165705.195736-1-alexandru.elisei@arm.com>
- <20211115165705.195736-10-alexandru.elisei@arm.com>
- <87h7ajva2o.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87h7ajva2o.wl-maz@kernel.org>
-Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id VUxZ5zqm7cVf for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jan 2022 09:35:25 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BCF74B176
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 09:35:25 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3F06760C9B;
+ Fri,  7 Jan 2022 14:35:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A69BAC36AE0;
+ Fri,  7 Jan 2022 14:35:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1641566123;
+ bh=E5Ii6LbrkS/Ebzy5u+j9MvhVrkMFgncRBxfaTK9oY10=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=eSmSjrFu48UAnu1Bjv7D1M46BDg+NnPGqE8t+L2lnaZDtXIk6wz2Kgs6IvpxFmz+b
+ /UgQbIgRdXMWYJwZ3DI28g/UnDFcuXmFZwmw55DhSMlYqClq4W2p1YjgRVT+rnec++
+ fKt9GS3Jok62uoJJOkkDeISLRUGpjy0SXzdNDAAbI+Hna7ordcdimIbrHjD+sY6AD4
+ yk4O52sKKIW7+msFOSfXQmfXDgM3CGki5pR4r1bEjabDeCYiWI0Xb9P2nhwz7qfAZk
+ njzwKlXFfshdg8Hcd9ZBlm5P6ZsTG3x6w5zC/xXWPSym8oeaj90rlFRZkFPFl9yujn
+ IBkDELJuJlKWA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n5qKu-00GaZC-Pe; Fri, 07 Jan 2022 14:35:21 +0000
+Date: Fri, 07 Jan 2022 14:35:20 +0000
+Message-ID: <87zgo7txzr.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v3 3/4] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU
+ attribute
+In-Reply-To: <YdgfFa9y1CUkVC5k@monolith.localdoman>
+References: <20211213152309.158462-1-alexandru.elisei@arm.com>
+ <20211213152309.158462-4-alexandru.elisei@arm.com>
+ <8735mvjrq8.wl-maz@kernel.org>
+ <YdbYY/EZrTTPKOCp@monolith.localdoman>
+ <8735m0vifv.wl-maz@kernel.org>
+ <YdgfFa9y1CUkVC5k@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, will@kernel.org, mark.rutland@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ tglx@linutronix.de, mingo@redhat.com, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: mingo@redhat.com, tglx@linutronix.de, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -61,46 +92,94 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-On Tue, Jan 04, 2022 at 02:39:59PM +0000, Marc Zyngier wrote:
-> On Mon, 15 Nov 2021 16:57:05 +0000,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > The KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU ioctl is
-> > used to assign a physical PMU to the events that KVM creates when emulating
-> > the PMU for that VCPU. This is useful on heterogeneous systems, when there
-> > is more than one hardware PMU present.
-> > 
-> > The assumption that is made in the implementation is that the user will
-> > pin the kvmtool process on a set of CPUs that share the same PMU. This
-> > allows kvmtool to set the same PMU for all VCPUs from the main thread,
-> > instead of in the individual VCPU threads.
+On Fri, 07 Jan 2022 11:08:05 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> May I suggest a slightly different use model? Ideally, you'd be able
-> to run the vcpu threads on the CPUs matching the PMU affinity, and
-> leave all the other threads to roam on other CPUs.
-
-Right now, the only way for userspace to make kvmtool run on a particular
-set of CPUs in a heterogeneous configuration is to use taskset, which means
-the entire kvmtool process ends up being pinned on a subset of CPUs which
-have the same PMU. I would like to keep this approach, as it's simple and
-straightforward to implement in kvmtool, and it's easy to change in the
-future if there's an incentive to do so.
-
-It's also not clear to me how your suggestion would work. Add a command
-line argument to pin all the VCPUs to the specified cpumask?
-
+> Hi Marc,
 > 
-> With your implementation, the whole of kvmtool gets stuck to a given
-> CPU type, which can be problematic.
+> On Thu, Jan 06, 2022 at 06:16:04PM +0000, Marc Zyngier wrote:
+> > On Thu, 06 Jan 2022 11:54:11 +0000,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > 2. What's to stop userspace to change the PMU after at least one VCPU has
+> > > run? That can be easily observed by the guest when reading PMCEIDx_EL0.
+> > 
+> > That's a good point. We need something here. It is a bit odd as to do
+> > that, you need to fully enable a PMU on one CPU, but not on the other,
+> > then run the first while changing stuff on the other. Something along
+> > those lines (untested):
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 4bf28905d438..4f53520e84fd 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -139,6 +139,7 @@ struct kvm_arch {
+> >  
+> >  	/* Memory Tagging Extension enabled for the guest */
+> >  	bool mte_enabled;
+> > +	bool ran_once;
+> >  };
+> >  
+> >  struct kvm_vcpu_fault_info {
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 83297fa97243..3045d7f609df 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -606,6 +606,10 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> >  
+> >  	vcpu->arch.has_run_once = true;
+> >  
+> > +	mutex_lock(&kvm->lock);
+> > +	kvm->arch.ran_once = true;
+> > +	mutex_unlock(&kvm->lock);
+> > +
+> >  	kvm_arm_vcpu_init_debug(vcpu);
+> >  
+> >  	if (likely(irqchip_in_kernel(kvm))) {
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index dfc0430d6418..95100c541244 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -959,8 +959,9 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
+> >  		arm_pmu = entry->arm_pmu;
+> >  		if (arm_pmu->pmu.type == pmu_id) {
+> >  			/* Can't change PMU if filters are already in place */
+> > -			if (kvm->arch.arm_pmu != arm_pmu &&
+> > -			    kvm->arch.pmu_filter) {
+> > +			if ((kvm->arch.arm_pmu != arm_pmu &&
+> > +			     kvm->arch.pmu_filter) ||
+> > +			    kvm->arch.ran_once) {
+> >  				ret = -EBUSY;
+> >  				break;
+> >  			}
+> > @@ -1040,6 +1041,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> >  
+> >  		mutex_lock(&vcpu->kvm->lock);
+> >  
+> > +		if (vcpu->kvm->arch.ran_once) {
+> > +			mutex_unlock(&vcpu->kvm->lock);
+> > +			return -EBUSY;
+> > +		}
+> > +
+> >  		if (!vcpu->kvm->arch.pmu_filter) {
+> >  			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
+> >  			if (!vcpu->kvm->arch.pmu_filter) {
+> > 
+> > which should prevent both PMU or filters to be changed once a single
+> > vcpu as run.
+> > 
+> > Thoughts?
+> 
+> Haven't tested it either, but it looks good to me. If you agree, I can pick
+> the diff, turn it into a patch and send it for the next iteration of this
+> series as a fix for the PMU events filter, while keeping your authorship.
 
-Do you have a specific use case in mind? Or is it more like a general
-concern regarding, for example, the virtio-blk-io or virtio-net-* threads
-competing with the VCPU threads if the VM is doing lots of I/O?
+Of course, please help yourself! :-)
 
-Thanks,
-Alex
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
