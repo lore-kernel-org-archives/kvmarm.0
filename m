@@ -2,78 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 359CBC433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 20:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B87C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 23:43:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 795D64B283;
-	Fri,  7 Jan 2022 15:24:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ED024B161;
+	Fri,  7 Jan 2022 18:43:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KrLg7IQFf+Zv; Fri,  7 Jan 2022 15:23:59 -0500 (EST)
+	with ESMTP id 2yIsdjJj6dGC; Fri,  7 Jan 2022 18:43:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 40F604B2AC;
-	Fri,  7 Jan 2022 15:23:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEC3A4B1A2;
+	Fri,  7 Jan 2022 18:43:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E3FA4B2A7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 15:23:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FBD84B161
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 18:43:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bhRXVZPWsXGv for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jan 2022 15:23:57 -0500 (EST)
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
- [209.85.215.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 360E14B220
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 15:23:57 -0500 (EST)
-Received: by mail-pg1-f178.google.com with SMTP id z30so2865877pge.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Jan 2022 12:23:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=xDdfZmWyqdSVTAXVBADg0hD3oX2PNa9PSothirQTFSc=;
- b=GwFaMgbOJ7vA6rwcaZq6QXY9LSIBtiqYffH5RrxDF70uezPqIy7HuzeQ2SjW+QEbUz
- CKT8I/s+pt1nYnGQZ/O3D5QH7UcQu7QSnMS81azkgUo+9wjFyuwZlaQ5CPLw+ZzBDHOR
- Q9t2e0yQCppOMHHOEWhdFw9AO4HLdkdBAFpOZNtu9bjQ3ej25vV1ttXJXhy/EBqNHtgx
- pJuI4xCtsiAznyoXE0fPfCUSWmOcp40jwUOKW4vI4q98KxU7hhnQAcdPfRMy1F3v6sOp
- 568KU5kdPZthHU8gwNSyJJ7e7GHeazy13Jg2fKMA5yeEKAIAjqyb9NtPvAA5vX+MJR+e
- GMDA==
+ with ESMTP id 56aQeskF4dlo for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jan 2022 18:43:21 -0500 (EST)
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com
+ [209.85.219.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79BC94B150
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 18:43:21 -0500 (EST)
+Received: by mail-yb1-f169.google.com with SMTP id v186so11691269ybg.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Jan 2022 15:43:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=NVQO0hqDncW10QtXjDHk2S0GMpXvaQ8aqURw+uPH5wg=;
+ b=h9pJpcJm/YMBAmJgf1a/hNcRkR8eituMdmkl0QZEo6aDIhoj9bNGkybBY9tLwABtu5
+ T47vLXRIGeeLHeBuPozHHi8Pl/RQ9FhfwS4CsX5VbJEm+o+wzusNHWWSGZ6TJZLlaacs
+ hFudIJXMhNvmwU+GrNuWtSqOe6shbDP1H4ZddJx+9I6jJuIazgHC+dfsYqqPX1/1YHJJ
+ V6XbJI3aB9kMiqAK2jOUT7R604WZYwEtYUsLXxGIeATyYFqTvRlv+xz5DCzxYDdROZ8d
+ GJ29YJCzQ0FTF/sStFeSpJgFrnNnSlnbqv7RAH1xaBsdO/kGKvx5sEJyEQJfFtB47w1k
+ IEeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xDdfZmWyqdSVTAXVBADg0hD3oX2PNa9PSothirQTFSc=;
- b=2DWuFDTsajqw7+YYPqGt1BIPpkTWz4odRVh9wgQPxiSFQG1Z8AjaeUMtPKYLd6Ruzt
- VwBEKTWZUX8RGav11UNxGc8my50eDW08+j151rSG11DdtgQSQNwIl6tYKZ/+appwkrlM
- HOSXhl8TsA0sJZIIfN/azBtTN3sD4HmUwPPGnFSdyqdOiWcQAxA6xc5BKx3OozOJMg9h
- SzfEWibNVQiAKfGVMe19jGzNNfH1/PVizsXPJ4F8jZp7rBLupcqr0BeKNJr9ms9LbxJi
- J3xdf/iI5mxRYcvECctM1gZ7a5X0pntY+SEGYVcKrw9FlcrboLDgpRiMfwaqA1NUHWI8
- j70g==
-X-Gm-Message-State: AOAM530D36FlBPFLC91ORZVB7AOYCU2VOnfgAco4oP2j1AQ0SWP58230
- QPJmtQVVtV8icqN565nNhSIFzQ==
-X-Google-Smtp-Source: ABdhPJzftw4PEotEHASckTN5Gy0MMQebU7XjsnC+2xdRTZQFdnCEJ67BUd0zbNp7g3vfVMes2gAU8A==
-X-Received: by 2002:a63:9602:: with SMTP id c2mr42975234pge.538.1641587036373; 
- Fri, 07 Jan 2022 12:23:56 -0800 (PST)
-Received: from [192.168.1.13] (174-21-75-75.tukw.qwest.net. [174.21.75.75])
- by smtp.gmail.com with ESMTPSA id p24sm6121962pfn.33.2022.01.07.12.23.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 07 Jan 2022 12:23:55 -0800 (PST)
-Subject: Re: [PATCH v3] hw/arm/virt: KVM: Enable PAuth when supported by the
- host
-To: Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
-References: <20220107150154.2490308-1-maz@kernel.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a3d32f18-dbbb-e462-82ce-722f424707f9@linaro.org>
-Date: Fri, 7 Jan 2022 12:23:54 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=NVQO0hqDncW10QtXjDHk2S0GMpXvaQ8aqURw+uPH5wg=;
+ b=hZdOWGlkcQNkvK5GtbChdf/NSHy5epSTaDuA1xOTraKy0/lg3PFfJ7C5igcAHU8uRk
+ GspRwEbuV7xI7znEHoJzVelEzMJFByLllD0k6l2qU8sL05PTWh4Ee44V+PO+RYJ1BdbE
+ BrGqIuU/8xB96zl4VXpJ5/t4Kzih3v5oxicP4CwwyY01OY4b2htPVnkZ77chvEweq/t6
+ DJyQtJ1TMeys50fRVeOnqILd9EEvLmTI2Rw5fZfDM752uz4X7OxWlW/zZL5cs5lCsUZW
+ t/HrhPBx8/TBB+ehMTWR0A9TJx13cF/KAJ129d8kbxQGIdMSMa9Hq8yo/VTQc25VRGgI
+ V2hQ==
+X-Gm-Message-State: AOAM532Y3FGq1yhBOIVjCbfMATullI5IgF+my0YHibnCU6ITyHN4WBuP
+ WkRFsdElCKl5FwKF1zre2onSujAvrv1/P+z7nvwaLg==
+X-Google-Smtp-Source: ABdhPJyZoQctE8XarHYHTzHFEcdEszvQRqEN4nBFLuAThhkJYA2F4ThxIao4CKuearoh3PucipTEnVqNvqht/yFdp+Q=
+X-Received: by 2002:a25:c841:: with SMTP id y62mr35443827ybf.196.1641599000772; 
+ Fri, 07 Jan 2022 15:43:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20220107150154.2490308-1-maz@kernel.org>
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+References: <20220104194918.373612-1-rananta@google.com>
+ <20220104194918.373612-2-rananta@google.com>
+ <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+In-Reply-To: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Fri, 7 Jan 2022 15:43:08 -0800
+Message-ID: <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+To: Reiji Watanabe <reijiw@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,38 +81,114 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 1/7/22 7:01 AM, Marc Zyngier wrote:
-> @@ -1380,17 +1380,10 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
->               return;
->           }
->   
-> -        /*
-> -         * KVM does not support modifications to this feature.
-> -         * We have not registered the cpu properties when KVM
-> -         * is in use, so the user will not be able to set them.
-> -         */
-> -        if (!kvm_enabled()) {
-> -            arm_cpu_pauth_finalize(cpu, &local_err);
-> -            if (local_err != NULL) {
-> +        arm_cpu_pauth_finalize(cpu, &local_err);
-> +        if (local_err != NULL) {
->                   error_propagate(errp, local_err);
->                   return;
-> -            }
->           }
+Hi Reiji,
 
-Indentation is still off -- error + return should be out-dented one level.
+On Thu, Jan 6, 2022 at 10:07 PM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Hi Raghu,
+>
+> On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
+> <rananta@google.com> wrote:
+> >
+> > Capture the start of the KVM VM, which is basically the
+> > start of any vCPU run. This state of the VM is helpful
+> > in the upcoming patches to prevent user-space from
+> > configuring certain VM features after the VM has started
+> > running.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  include/linux/kvm_host.h | 3 +++
+> >  virt/kvm/kvm_main.c      | 9 +++++++++
+> >  2 files changed, 12 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index c310648cc8f1..d0bd8f7a026c 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -623,6 +623,7 @@ struct kvm {
+> >         struct notifier_block pm_notifier;
+> >  #endif
+> >         char stats_id[KVM_STATS_NAME_SIZE];
+> > +       bool vm_started;
+>
+> Since KVM_RUN on any vCPUs doesn't necessarily mean that the VM
+> started yet, the name might be a bit misleading IMHO.  I would
+> think 'has_run_once' or 'ran_once' might be more clear (?).
+>
+I always struggle with the names; but if you feel that 'ran_once'
+makes more sense for a reader, I can change it.
+>
+> >  };
+> >
+> >  #define kvm_err(fmt, ...) \
+> > @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
+> >         }
+> >  }
+> >
+> > +#define kvm_vm_has_started(kvm) (kvm->vm_started)
+> > +
+> >  extern bool kvm_rebooting;
+> >
+> >  extern unsigned int halt_poll_ns;
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index 72c4e6b39389..962b91ac2064 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >         int r;
+> >         struct kvm_fpu *fpu = NULL;
+> >         struct kvm_sregs *kvm_sregs = NULL;
+> > +       struct kvm *kvm = vcpu->kvm;
+> >
+> >         if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
+> >                 return -EIO;
+> > @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >                         if (oldpid)
+> >                                 synchronize_rcu();
+> >                         put_pid(oldpid);
+> > +
+> > +                       /*
+> > +                        * Since we land here even on the first vCPU run,
+> > +                        * we can mark that the VM has started running.
+> > +                        */
+>
+> It might be nicer to add a comment why the code below gets kvm->lock.
+>
+I've been going back and forth on this one. Initially I considered
+simply going with atomic_t, but the patch 4/11 (KVM: arm64: Setup a
+framework for hypercall bitmap firmware registers)
+kvm_arm_set_fw_reg_bmap()'s implementation felt like we need a lock to
+have the whole 'is the register busy?' operation atomic. But, that's
+just one of the applications.
+> Anyway, the patch generally looks good to me, and thank you
+> for making this change (it works for my purpose as well).
+>
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+>
+Glad that it's helping you as well and thanks for the review.
 
-Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Regards,
+Raghavendra
 
-
-r~
+> Thanks,
+> Reiji
+>
+>
+> > +                       mutex_lock(&kvm->lock);
+> > +                       kvm->vm_started = true;
+> > +                       mutex_unlock(&kvm->lock);
+> >                 }
+> >                 r = kvm_arch_vcpu_ioctl_run(vcpu);
+> >                 trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+> > --
+> > 2.34.1.448.ga2b2bfdf31-goog
+> >
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
