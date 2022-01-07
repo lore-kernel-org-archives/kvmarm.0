@@ -2,76 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59C5C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 18:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26910C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  7 Jan 2022 18:48:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 48E134B29B;
-	Fri,  7 Jan 2022 13:18:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86EFE4B279;
+	Fri,  7 Jan 2022 13:48:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D4dJST42hJsR; Fri,  7 Jan 2022 13:18:32 -0500 (EST)
+	with ESMTP id qwUjIYCMEZrn; Fri,  7 Jan 2022 13:48:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DECF64B295;
-	Fri,  7 Jan 2022 13:18:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 611D14B1E9;
+	Fri,  7 Jan 2022 13:48:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD91A4B291
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 13:18:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A7114B1E9
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 13:48:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mrt3xRJMx4Pk for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Jan 2022 13:18:30 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77D574B1BF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 13:18:30 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 1532BB82699;
- Fri,  7 Jan 2022 18:18:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8318C36AE9;
- Fri,  7 Jan 2022 18:18:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1641579507;
- bh=cAh/1ukCeNr4ljylsYNoFGLIbakq3LEf6JKqjDyyNVk=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=N6GNW9TipkwfsVP0anEBua8YoApQratKn//cWadkH6KX41NT88vBgMoiNSJZelYE3
- z7zxuaPWZJu8LTvbxPrTQKHw5JLYkJy4ujEHhxPFQGPw8H3V8H70tfp/mxnn+K+KKr
- TcRdGwbrridGXBVR4BlJ5l4FFHzwE0tvGxSLNsFhkojbNfVcTNgDoSWe0Nd4yiZS2+
- mzBaneUvhUR+H23i2BzuUmeN6TaLwcbs785Pb9BlPGFLw8oCTS+bkH0gFgOiwqaa14
- L7fe3vTjvUusnNQVj5o2KABlrPZ+IVbG5recQhB6aJxevugYnbRFw9yWaFdcus+6OT
- WWf8m4PMLA9xw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1n5ton-00GcuU-LF; Fri, 07 Jan 2022 18:18:25 +0000
-Date: Fri, 07 Jan 2022 18:18:25 +0000
-Message-ID: <87y23rtnny.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: eric.auger@redhat.com
-Subject: Re: [PATCH v3 3/5] hw/arm/virt: Honor highmem setting when computing
- the memory map
-In-Reply-To: <d330de15-b452-1f9c-14fa-906b88a8b4c4@redhat.com>
+ with ESMTP id OscosUkCXPrP for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Jan 2022 13:48:28 -0500 (EST)
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
+ [209.85.221.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 240834B1E1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Jan 2022 13:48:28 -0500 (EST)
+Received: by mail-wr1-f45.google.com with SMTP id l25so1906742wrb.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Jan 2022 10:48:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=raftlsgfS0DQzuOTvWNeZTfeD+RimU34KWwkH9tPzXs=;
+ b=NbTWi5M8MEUi0BMTcfYbnzqyj+f5aYFWoCxMXQurA9exrgDjgLVAbGS+vN0aZiDYI+
+ 1IRQc1VOo4NukUiZql4qunI9YKvTBUesEeqQkYh01nkestt8s8wPyNhE4B9UuBq652zj
+ 6mBQaM4bY+JlzD0ZwhnawuXxUVaJllVSTx2bNHQXbszLB2O1wiy0Qzi6tHOTxL/kUdbt
+ 1ZQNNfqV8ePvLwNVxEBZ0kzLTz1varW700B07QaJCeUTv64LmtUvragToRP5fvHeSan9
+ 0opvPRk+00khMAQRIRzwT7qQjZfPRz+Wc4QM5UUsXWMtSEvV+uf9Ws7IWSrkQhZjtFJB
+ 0W5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=raftlsgfS0DQzuOTvWNeZTfeD+RimU34KWwkH9tPzXs=;
+ b=kX+iYU51QBWe7Cy8ssHLGoqUZp2erebGPvgMsTQqZmVx3DYVYlUaFLqyq1ovppaBNu
+ J2gQSLTg0/v08a8HclI4Ga7GkMopjoGt4QH7eNQyJ6Fzv3910TPff/rema/HtI5tgsNP
+ ApiqY6D7orSp4THN5u5S7fB9hnNDJlyNBAVHP8mrpiYX7xKrGvLaycNmuPoHb6/EVeL5
+ 2i2u3zFtmyFQ7M5+UpmfPUfoQhDrMDyswoU8LxrLt8S1PvlAdPQQFsnqeTZ0PY1S4lub
+ QgzGpnc7d1cjfF6KyauyOeFO2rS+2TUrLKlLudXRSyEXnMYF0xsEGPBcyrKt+Y8k16dW
+ yKLg==
+X-Gm-Message-State: AOAM532XXTkGohEyCn1IXywC7tgp55uRqqknqNgootcgXO/DOoLkFbhU
+ xvawIws/FWDctPEz9XR3jF6+4WEVICwz09JwZahCDA==
+X-Google-Smtp-Source: ABdhPJxSrCyrEJr1EOWUT8XHqQX7+3cJ1ZfTXpm2LDTyfxkzeXIDtwiHj6P1/dInVJ97Wnu5CZ4/oDt3wl8O0HKcwDM=
+X-Received: by 2002:a5d:52c4:: with SMTP id r4mr34251380wrv.521.1641581307149; 
+ Fri, 07 Jan 2022 10:48:27 -0800 (PST)
+MIME-Version: 1.0
 References: <20211227211642.994461-1-maz@kernel.org>
  <20211227211642.994461-4-maz@kernel.org>
  <ef8b3500-04ab-5434-6a04-0e8b1dcc65d1@redhat.com>
  <871r1kzhbp.wl-maz@kernel.org>
  <d330de15-b452-1f9c-14fa-906b88a8b4c4@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: eric.auger@redhat.com, qemu-devel@nongnu.org,
- drjones@redhat.com, peter.maydell@linaro.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <87y23rtnny.wl-maz@kernel.org>
+In-Reply-To: <87y23rtnny.wl-maz@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 7 Jan 2022 18:48:16 +0000
+Message-ID: <CAFEAcA8KCZFfiYA_AAxA-ChfN5vZd7EF1jGcFxmcpq=fi4ToeQ@mail.gmail.com>
+Subject: Re: [PATCH v3 3/5] hw/arm/virt: Honor highmem setting when computing
+ the memory map
+To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, kernel-team@android.com,
  kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -90,120 +87,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Eric,
+On Fri, 7 Jan 2022 at 18:18, Marc Zyngier <maz@kernel.org> wrote:
+> This is a chicken and egg problem: you need the IPA size to compute
+> the memory map, and you need the memory map to compute the IPA
+> size. Fun, isn't it?
+>
+> At the moment, virt_set_memmap() doesn't know about the IPA space,
+> generates a highest_gpa that may not work, and we end-up failing
+> because the resulting VM type is out of bound.
+>
+> My solution to that is to feed the *maximum* IPA size to
+> virt_set_memmap(), compute the memory map there, and then use
+> highest_gpa to compute the actual IPA size that is used to create the
+> VM. By knowing the IPA limit in virt_set_memmap(), I'm able to keep it
+> in check and avoid generating an unusable memory map.
 
-On Fri, 07 Jan 2022 17:15:19 +0000,
-Eric Auger <eric.auger@redhat.com> wrote:
-> 
-> Hi Marc,
-> 
-> On 1/6/22 10:26 PM, Marc Zyngier wrote:
-> > On Wed, 05 Jan 2022 09:22:39 +0000,
-> > Eric Auger <eric.auger@redhat.com> wrote:
-> >> Hi Marc,
-> >>
-> >> On 12/27/21 10:16 PM, Marc Zyngier wrote:
-> >>> Even when the VM is configured with highmem=off, the highest_gpa
-> >>> field includes devices that are above the 4GiB limit.
-> >>> Similarily, nothing seem to check that the memory is within
-> >>> the limit set by the highmem=off option.
-> >>>
-> >>> This leads to failures in virt_kvm_type() on systems that have
-> >>> a crippled IPA range, as the reported IPA space is larger than
-> >>> what it should be.
-> >>>
-> >>> Instead, honor the user-specified limit to only use the devices
-> >>> at the lowest end of the spectrum, and fail if we have memory
-> >>> crossing the 4GiB limit.
-> >>>
-> >>> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> >>> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> >>> ---
-> >>>  hw/arm/virt.c | 9 ++++++++-
-> >>>  1 file changed, 8 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> >>> index 8b600d82c1..84dd3b36fb 100644
-> >>> --- a/hw/arm/virt.c
-> >>> +++ b/hw/arm/virt.c
-> >>> @@ -1678,6 +1678,11 @@ static void virt_set_memmap(VirtMachineState *vms)
-> >>>          exit(EXIT_FAILURE);
-> >>>      }
-> >>>  
-> >>> +    if (!vms->highmem &&
-> >>> +        vms->memmap[VIRT_MEM].base + ms->maxram_size > 4 * GiB) {
-> >>> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
-> >>> +        exit(EXIT_FAILURE);
-> >> The memory is composed of initial memory and device memory.
-> >> device memory is put after the initial memory but has a 1GB alignment
-> >> On top of that you have 1G page alignment per device memory slot
-> >>
-> >> so potentially the highest mem address is larger than
-> >> vms->memmap[VIRT_MEM].base + ms->maxram_size.
-> >> I would rather do the check on device_memory_base + device_memory_size
-> > Yup, that's a good point.
-> >
-> > There is also a corner case in one of the later patches where I check
-> > this limit against the PA using the rounded-up device_memory_size.
-> > This could result in returning an error if the last memory slot would
-> > still fit in the PA space, but the rounded-up quantity wouldn't. I
-> > don't think it matters much, but I'll fix it anyway.
-> >
-> >>> +    }
-> >>>      /*
-> >>>       * We compute the base of the high IO region depending on the
-> >>>       * amount of initial and device memory. The device memory start/size
-> >>> @@ -1707,7 +1712,9 @@ static void virt_set_memmap(VirtMachineState *vms)
-> >>>          vms->memmap[i].size = size;
-> >>>          base += size;
-> >>>      }
-> >>> -    vms->highest_gpa = base - 1;
-> >>> +    vms->highest_gpa = (vms->highmem ?
-> >>> +                        base :
-> >>> +                        vms->memmap[VIRT_MEM].base + ms->maxram_size) - 1;
-> >> As per the previous comment this looks wrong to me if !highmem.
-> > Agreed.
-> >
-> >> If !highmem, if RAM requirements are low we still could get benefit from
-> >> REDIST2 and HIGH ECAM which could fit within the 4GB limit. But maybe we
-> >> simply don't care?
-> > I don't see how. These devices live at a minimum of 256GB, which
-> > contradicts the very meaning of !highmem being a 4GB limit.
-> Yes I corrected the above statement afterwards, sorry for the noise.
-> >
-> >> If we don't, why don't we simply skip the extended_memmap overlay as
-> >> suggested in v2? I did not get your reply sorry.
-> > Because although this makes sense if you only care about a 32bit
-> > limit, we eventually want to check against an arbitrary PA limit and
-> > enable the individual devices that do fit in that space.
-> 
-> In my understanding that is what virt_kvm_type() was supposed to do by
-> testing the result of kvm_arm_get_max_vm_ipa_size and requested_pa_size
-> (which accounted the high regions) and exiting if they were
-> incompatible. But I must miss something.
+Is there any reason not to just always create the VM with the
+maximum supported IPA size, rather than trying to create it
+with the smallest IPA size that will work? (ie skip the last
+step of computing the IPA size to create the VM with)
 
-This is a chicken and egg problem: you need the IPA size to compute
-the memory map, and you need the memory map to compute the IPA
-size. Fun, isn't it?
-
-At the moment, virt_set_memmap() doesn't know about the IPA space,
-generates a highest_gpa that may not work, and we end-up failing
-because the resulting VM type is out of bound.
-
-My solution to that is to feed the *maximum* IPA size to
-virt_set_memmap(), compute the memory map there, and then use
-highest_gpa to compute the actual IPA size that is used to create the
-VM. By knowing the IPA limit in virt_set_memmap(), I'm able to keep it
-in check and avoid generating an unusable memory map.
-
-I've tried to make that clearer in my v4. Hopefully I succeeded.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+-- PMM
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
