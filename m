@@ -2,69 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A670C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jan 2022 21:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C36EFC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jan 2022 21:05:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0371B4B149;
-	Mon, 10 Jan 2022 16:05:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F68C4B0B4;
+	Mon, 10 Jan 2022 16:05:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DVYojNs4Ljq5; Mon, 10 Jan 2022 16:05:05 -0500 (EST)
+	with ESMTP id Z4xKJFEzADg8; Mon, 10 Jan 2022 16:05:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9587A4B120;
-	Mon, 10 Jan 2022 16:05:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B63294B11B;
+	Mon, 10 Jan 2022 16:05:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 695854A4BE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 16:05:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBEB54B134
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 16:05:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zx59GAAWWrf4 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Jan 2022 16:05:03 -0500 (EST)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B58C4AC78
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 16:05:03 -0500 (EST)
-Received: by mail-pl1-f201.google.com with SMTP id
- e10-20020a17090301ca00b001491f26bcd4so3097897plh.23
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 13:05:03 -0800 (PST)
+ with ESMTP id ZbCndVOEbfcp for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Jan 2022 16:05:05 -0500 (EST)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C97EF4B0FB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 16:05:04 -0500 (EST)
+Received: by mail-pl1-f202.google.com with SMTP id
+ p16-20020a170902a41000b0014992c5d56bso3108079plq.19
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 13:05:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=tvWQrk5m+auOAW75En/9PBKMdEwVtYbyEoey6RrsQGY=;
- b=e5wvyEvF+6FHTqteWzNNKatxYnJ4VRlsfWm24dqvR6gh/YchZ8gn84JRPhHUb4l2TC
- a/zNUCJkZ4csmy+GqoZjvNoUj4m4oA3lpGHhSsmc9hXQt/1ZLfi4sS8GkEcGugkuWjcL
- Jwddo2N9Pam5r0DUjpQfgFV8cqesubSvju8AQut6DA5nPGQEZNSdYPqhtxbIsYY6tYJa
- TEG26xC6/S+/MM2dQQfBXHJD2GiW3MDF4b7xHvPOlZhFc3v1Mw3m8rXCRcxtvLH0hFFp
- LCSBqQhBbFIKfU9BOWZWcQu/L/lzZUjOw6+P0uiv4rGAd1JpNJ5JOBpHXFaTllRe9sN4
- AyNA==
+ :cc; bh=SblhaXcWijIzk0Mapv3cGqzGg1Y0/XESvuNWuvJevdk=;
+ b=tJhw8ZATrv3Sjy9QhepZUWpfX9dTE8Ja4a0R/EZCvyfUQj/+OWsQL94ONBjWVMpaez
+ b2bNJQTqp6okRMwCqrN5Tt4UOCN2V+ptEfZEk3C3g/c8Y//NHMFgSJRgtIdayXr0LemP
+ UYcHoRiyjMfoQJC5LpxjbMcsa+oSbLKuBbaungcF3668+S7YF9EKmn4bGkYxiQEmQlke
+ wBmpEIHWalDlZEJLoE+Zgt3IZ9NyHxeGMLCwYNIdPApvX/MtGJGslz6BjO464WpeSKwZ
+ VEuOU2T24qaEojHNtI8BfU84V+5HoQzHehfcEfTff+Wvb5WL8jlpl/iyJK9Y6IbsYFvY
+ w+mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=tvWQrk5m+auOAW75En/9PBKMdEwVtYbyEoey6RrsQGY=;
- b=7J/3Et19pxYvmkIpWtYVsPFV3Ra3xvRin+1zOMqeIXNHo7/CoRSoZA009H/B5/8uLa
- C3zl9H+0tEvJatOKLIxRRpB5XcLpBxKm0+mFaJT1xfFIswg7d8KZ4ePl0MttMApm1jZw
- /tKRJtkdo0+xKpeGU4DQIL+PPkN6cMS93Ie45kzkowOpGfGLnyqtPSmZfSLEJKdn6pJ6
- 83V5i6cSoo0bwrypaMxt4s4U4dXO2SlMFEsNJ5SEQRqWypH6iKua12XQmBqX9wx6l9de
- lKghBTOix9Y2i6WSWRnXU3G3Os0pGXrMnBY7ta7dU49ukzmvLV3DmhTBrDyKaiiEMOWI
- cBMw==
-X-Gm-Message-State: AOAM531XabWggCKJaKZKj5hKsJNb2ZMtPHTY5uNB7KzJV1ljNWZ6jycF
- d0ejs6oqZ8d+nH/XOcd+grzed5wxCIlEdsszMg==
-X-Google-Smtp-Source: ABdhPJzKNuD1sJM5lGJUPo9JWpQ9TX/uS6nn/vrAZPHCas8+Luj+bHqUKHRmoSvs4znM+7FiR3Lwl9FKVzdJYJZqtw==
+ bh=SblhaXcWijIzk0Mapv3cGqzGg1Y0/XESvuNWuvJevdk=;
+ b=e9DL9Ixi1p8tqhPy2YEueZN+rMUMVtf9SRoGRUl79rPtaY5onDypXf7XL44xZupRSQ
+ H+wtL9KfwC1iAOaiKx/JyrKkYf32M/j6gpTahz2FJ69NliweOrdx3a9mFTNN9hxdwNx7
+ q3wa78rV9HWBL7+T8Ni4HbOSkFwZx+DuqkzqKpyoAde9lqCyoEnE0t2cXzGfukjiVaoF
+ ap94PNUSJzX1rMkHTib3cl/MDDcCdX251viWjA5JaVSWsHqSQuWCiimYAQ1X4EhGkqu/
+ VSgytoy1sEr7uNpoNJ6DSRMaBaupheWWn1MZkFxYvrmiC0puYefqCmwVnpDIgdq9WSY5
+ DWyQ==
+X-Gm-Message-State: AOAM530PjEjrXXhCSDnQiEd1reDyOyCxCXvhdp3njW61Nw5G2cSArROO
+ r6gNFhS5YmZJRwq44B51UtExjB1Z1zhqogAqQg==
+X-Google-Smtp-Source: ABdhPJyZXewBlKNnGyc7EiD71gjJFzijvf+twsuG6PIplDMkIgqq41GFwCDp+OOvS5LS/4e8YnTET8+Nw0N7jOmrdQ==
 X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by 2002:a63:a706:: with SMTP id
- d6mr1340856pgf.390.1641848702323; Mon, 10 Jan 2022 13:05:02 -0800 (PST)
-Date: Mon, 10 Jan 2022 21:04:39 +0000
+ (user=jingzhangos job=sendgmr) by
+ 2002:a17:902:c407:b0:149:2ef4:b6b2 with
+ SMTP id k7-20020a170902c40700b001492ef4b6b2mr1490383plk.112.1641848703948;
+ Mon, 10 Jan 2022 13:05:03 -0800 (PST)
+Date: Mon, 10 Jan 2022 21:04:40 +0000
 In-Reply-To: <20220110210441.2074798-1-jingzhangos@google.com>
-Message-Id: <20220110210441.2074798-2-jingzhangos@google.com>
+Message-Id: <20220110210441.2074798-3-jingzhangos@google.com>
 Mime-Version: 1.0
 References: <20220110210441.2074798-1-jingzhangos@google.com>
 X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
-Subject: [RFC PATCH 1/3] KVM: arm64: Use read/write spin lock for MMU
- protection
+Subject: [RFC PATCH 2/3] KVM: arm64: Add fast path to handle permission
+ relaxation during dirty logging
 From: Jing Zhang <jingzhangos@google.com>
 To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
  Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
@@ -87,169 +89,82 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-To reduce the contentions caused by MMU lock, some MMU operations can
-be performed under read lock.
-One improvement is to add a fast path for permission relaxation during
-dirty logging under the read lock.
+To reduce MMU lock contention during dirty logging, all permission
+relaxation operations would be performed under read lock.
 
 Signed-off-by: Jing Zhang <jingzhangos@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/mmu.c              | 36 +++++++++++++++----------------
- 2 files changed, 20 insertions(+), 18 deletions(-)
+ arch/arm64/kvm/mmu.c | 50 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 3b44ea17af88..6c99c0335bae 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -50,6 +50,8 @@
- #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
- 				     KVM_DIRTY_LOG_INITIALLY_SET)
- 
-+#define KVM_HAVE_MMU_RWLOCK
-+
- /*
-  * Mode of operation configurable with kvm-arm.mode early param.
-  * See Documentation/admin-guide/kernel-parameters.txt for more information.
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index bc2aba953299..cafd5813c949 100644
+index cafd5813c949..dd1f43fba4b0 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -58,7 +58,7 @@ static int stage2_apply_range(struct kvm *kvm, phys_addr_t addr,
- 			break;
- 
- 		if (resched && next != end)
--			cond_resched_lock(&kvm->mmu_lock);
-+			cond_resched_rwlock_write(&kvm->mmu_lock);
- 	} while (addr = next, addr != end);
- 
- 	return ret;
-@@ -179,7 +179,7 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	phys_addr_t end = start + size;
- 
--	assert_spin_locked(&kvm->mmu_lock);
-+	lockdep_assert_held_write(&kvm->mmu_lock);
- 	WARN_ON(size & ~PAGE_MASK);
- 	WARN_ON(stage2_apply_range(kvm, start, end, kvm_pgtable_stage2_unmap,
- 				   may_block));
-@@ -213,13 +213,13 @@ static void stage2_flush_vm(struct kvm *kvm)
- 	int idx, bkt;
- 
- 	idx = srcu_read_lock(&kvm->srcu);
--	spin_lock(&kvm->mmu_lock);
-+	write_lock(&kvm->mmu_lock);
- 
- 	slots = kvm_memslots(kvm);
- 	kvm_for_each_memslot(memslot, bkt, slots)
- 		stage2_flush_memslot(kvm, memslot);
- 
--	spin_unlock(&kvm->mmu_lock);
-+	write_unlock(&kvm->mmu_lock);
- 	srcu_read_unlock(&kvm->srcu, idx);
+@@ -1063,6 +1063,54 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+ 	return 0;
  }
  
-@@ -720,13 +720,13 @@ void stage2_unmap_vm(struct kvm *kvm)
++static bool fast_mark_writable(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
++		struct kvm_memory_slot *memslot, unsigned long fault_status)
++{
++	int ret;
++	bool writable;
++	bool write_fault = kvm_is_write_fault(vcpu);
++	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
++	kvm_pfn_t pfn;
++	struct kvm *kvm = vcpu->kvm;
++	bool logging_active = memslot_is_logging(memslot);
++	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
++	unsigned long fault_granule;
++
++	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
++
++	/* Make sure the fault can be handled in the fast path.
++	 * Only handle write permission fault on non-hugepage during dirty
++	 * logging period.
++	 */
++	if (fault_status != FSC_PERM || fault_granule != PAGE_SIZE
++			|| !logging_active || !write_fault)
++		return false;
++
++
++	/* Pin the pfn to make sure it couldn't be freed and be resued for
++	 * another gfn.
++	 */
++	pfn = __gfn_to_pfn_memslot(memslot, gfn, true, NULL,
++				   write_fault, &writable, NULL);
++	if (is_error_pfn(pfn) || !writable)
++		return false;
++
++	read_lock(&kvm->mmu_lock);
++	ret = kvm_pgtable_stage2_relax_perms(
++			vcpu->arch.hw_mmu->pgt, fault_ipa, PAGE_HYP);
++
++	if (!ret) {
++		kvm_set_pfn_dirty(pfn);
++		mark_page_dirty_in_slot(kvm, memslot, gfn);
++	}
++	read_unlock(&kvm->mmu_lock);
++
++	kvm_set_pfn_accessed(pfn);
++	kvm_release_pfn_clean(pfn);
++
++	return true;
++}
++
+ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 			  struct kvm_memory_slot *memslot, unsigned long hva,
+ 			  unsigned long fault_status)
+@@ -1085,6 +1133,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+ 	struct kvm_pgtable *pgt;
  
- 	idx = srcu_read_lock(&kvm->srcu);
- 	mmap_read_lock(current->mm);
--	spin_lock(&kvm->mmu_lock);
-+	write_lock(&kvm->mmu_lock);
- 
- 	slots = kvm_memslots(kvm);
- 	kvm_for_each_memslot(memslot, bkt, slots)
- 		stage2_unmap_memslot(kvm, memslot);
- 
--	spin_unlock(&kvm->mmu_lock);
-+	write_unlock(&kvm->mmu_lock);
- 	mmap_read_unlock(current->mm);
- 	srcu_read_unlock(&kvm->srcu, idx);
- }
-@@ -736,14 +736,14 @@ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	struct kvm_pgtable *pgt = NULL;
- 
--	spin_lock(&kvm->mmu_lock);
-+	write_lock(&kvm->mmu_lock);
- 	pgt = mmu->pgt;
- 	if (pgt) {
- 		mmu->pgd_phys = 0;
- 		mmu->pgt = NULL;
- 		free_percpu(mmu->last_vcpu_ran);
- 	}
--	spin_unlock(&kvm->mmu_lock);
-+	write_unlock(&kvm->mmu_lock);
- 
- 	if (pgt) {
- 		kvm_pgtable_stage2_destroy(pgt);
-@@ -783,10 +783,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 		if (ret)
- 			break;
- 
--		spin_lock(&kvm->mmu_lock);
-+		write_lock(&kvm->mmu_lock);
- 		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
- 					     &cache);
--		spin_unlock(&kvm->mmu_lock);
-+		write_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
- 
-@@ -834,9 +834,9 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
- 	start = memslot->base_gfn << PAGE_SHIFT;
- 	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
- 
--	spin_lock(&kvm->mmu_lock);
-+	write_lock(&kvm->mmu_lock);
- 	stage2_wp_range(&kvm->arch.mmu, start, end);
--	spin_unlock(&kvm->mmu_lock);
-+	write_unlock(&kvm->mmu_lock);
- 	kvm_flush_remote_tlbs(kvm);
- }
- 
-@@ -1212,7 +1212,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
- 
--	spin_lock(&kvm->mmu_lock);
-+	write_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_notifier_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1271,7 +1271,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- out_unlock:
--	spin_unlock(&kvm->mmu_lock);
-+	write_unlock(&kvm->mmu_lock);
- 	kvm_set_pfn_accessed(pfn);
- 	kvm_release_pfn_clean(pfn);
- 	return ret != -EAGAIN ? ret : 0;
-@@ -1286,10 +1286,10 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 
- 	trace_kvm_access_fault(fault_ipa);
- 
--	spin_lock(&vcpu->kvm->mmu_lock);
-+	write_lock(&vcpu->kvm->mmu_lock);
- 	mmu = vcpu->arch.hw_mmu;
- 	kpte = kvm_pgtable_stage2_mkyoung(mmu->pgt, fault_ipa);
--	spin_unlock(&vcpu->kvm->mmu_lock);
-+	write_unlock(&vcpu->kvm->mmu_lock);
- 
- 	pte = __pte(kpte);
- 	if (pte_valid(pte))
-@@ -1692,9 +1692,9 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 	gpa_t gpa = slot->base_gfn << PAGE_SHIFT;
- 	phys_addr_t size = slot->npages << PAGE_SHIFT;
- 
--	spin_lock(&kvm->mmu_lock);
-+	write_lock(&kvm->mmu_lock);
- 	unmap_stage2_range(&kvm->arch.mmu, gpa, size);
--	spin_unlock(&kvm->mmu_lock);
-+	write_unlock(&kvm->mmu_lock);
- }
- 
- /*
++	if (fast_mark_writable(vcpu, fault_ipa, memslot, fault_status))
++		return 0;
+ 	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+ 	write_fault = kvm_is_write_fault(vcpu);
+ 	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
 -- 
 2.34.1.575.g55b058a8bb-goog
 
