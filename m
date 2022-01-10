@@ -2,50 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9317EC433F5
-	for <kvmarm@archiver.kernel.org>; Sat,  8 Jan 2022 16:03:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C16C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jan 2022 05:41:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01ECA49EBF;
-	Sat,  8 Jan 2022 11:03:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A82EE4B1F7;
+	Mon, 10 Jan 2022 00:41:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kkmiwZvKeKWw; Sat,  8 Jan 2022 11:03:33 -0500 (EST)
+	with ESMTP id 4+IcEtbvg+Cj; Mon, 10 Jan 2022 00:41:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 89C0749EE7;
-	Sat,  8 Jan 2022 11:03:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99D0B4B1FC;
+	Mon, 10 Jan 2022 00:41:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6096A49EE0
- for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Jan 2022 11:03:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E9FA4B1F5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 00:41:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YYYS7kYFSg4a for <kvmarm@lists.cs.columbia.edu>;
- Sat,  8 Jan 2022 11:03:30 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 250D149EBF
- for <kvmarm@lists.cs.columbia.edu>; Sat,  8 Jan 2022 11:03:30 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5B1BA106F;
- Sat,  8 Jan 2022 08:03:29 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 67BBD3F5A1;
- Sat,  8 Jan 2022 08:03:27 -0800 (PST)
-Date: Sat, 8 Jan 2022 16:03:36 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH kvmtool 9/9] arm64: Add support for
- KVM_ARM_VCPU_PMU_V3_SET_PMU
-Message-ID: <Ydm12K8O/9SNO3ht@monolith.localdoman>
-References: <20211115165705.195736-1-alexandru.elisei@arm.com>
- <20211115165705.195736-10-alexandru.elisei@arm.com>
- <87h7ajva2o.wl-maz@kernel.org>
- <YdgtnQPAsy1hSOWj@monolith.localdoman>
- <87o84mtl1m.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87o84mtl1m.wl-maz@kernel.org>
-Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id 09zFQFZuIcZU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Jan 2022 00:41:12 -0500 (EST)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 955BD4B1AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 00:41:12 -0500 (EST)
+Received: by mail-pj1-f73.google.com with SMTP id
+ d92-20020a17090a6f6500b001b35ac5f393so8138274pjk.7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 09 Jan 2022 21:41:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=P1aAJUJH4MNJA7hqf+LRqj2aY6nDmgn4ybYnyTkArAE=;
+ b=DKYr9uQS09X33zIc7+1zVb3NQ0xRf8HBTMLLm3p4pinup+CxLE+HbHLqhHvzqvqAb3
+ olhmXPyqbPsUCCdHiJUGtosE19JLvR49S1qjZI4NX924Y68uziCJNmqT7LElQs3CUgru
+ ExwQbM7Qg6Bp7LwtNaXcprLPD7B9xYFoOVH2UWJDlxBXG+XmnTWYmM1BLt8KxaIs0Ln/
+ W4dqLxfV+V9VxkGMAIITblVgrtK4ZoaKN54r589zJ60edJKeaDB8mrTHaHEhBl8zRdZ5
+ R3D+YC4m8EYrXYfBL75jWzbnqUsG/7N57JvFqLytLroLG8h0FO7JdV6M7gHFF0CP0/Lb
+ 9J2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=P1aAJUJH4MNJA7hqf+LRqj2aY6nDmgn4ybYnyTkArAE=;
+ b=d3oEPax0rVEGMAXlPdRAr39pf3hB90SEv7c4Z5MBity1GI63CRXcyvhVJKrYRys9Yt
+ F9PJP8qO2uG2b4ItFutjD+3bjyXv4s2fKBTAkcm/IyKI2vAuOGGCH4rIZhG9H28TzMvi
+ 16JnnFK9jWs1l/7FICjGW2RairQGWb5M+N57oXSZqX8hwUoJGl86M5Rs80oDbzYpBZlg
+ TK6d6HisW7EFS2sjqpnQylwaCQB3I6hL6eggO+iAEEbZYwvFjH8Q9UoYdCJtrimWesVH
+ FtfwSqdSJ9AxAq/SSDVLtmiCSUgpsAE8ojBg5X6V0Nx4hvT/4rBwqbd0eIRmVNdWw5BQ
+ 5lfQ==
+X-Gm-Message-State: AOAM531iUewthFwAdz/TFbYplSaPsBr3Tu1c5Mus26P5jQf0NUnKt29P
+ VRK9EYrBYNhYgjEXuQ5ANK/a1xO9dUI=
+X-Google-Smtp-Source: ABdhPJy2ff3+Ra0eAAdVIR8qPPRFVBp537t4vFeJtOPbXf4dGRZKqRvR8mgwpxO5W3cOouanq7W4upyND6M=
+X-Received: from reiji-vws-sp.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
+ (user=reijiw job=sendgmr) by 2002:a05:6a00:d64:b0:4ba:cb6f:87e0 with SMTP id
+ n36-20020a056a000d6400b004bacb6f87e0mr74125375pfv.72.1641793271719; Sun, 09
+ Jan 2022 21:41:11 -0800 (PST)
+Date: Sun,  9 Jan 2022 21:40:41 -0800
+Message-Id: <20220110054042.1079932-1-reijiw@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.575.g55b058a8bb-goog
+Subject: [PATCH 1/2] KVM: arm64: mixed-width check should be skipped for
+ uninitialized vCPUs
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -63,64 +85,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+vcpu_allowed_register_width() checks if all the VCPUs are either
+all 32bit or all 64bit.  Since the checking is done even for vCPUs
+that are not initialized (KVM_ARM_VCPU_INIT has not been done) yet,
+the non-initialized vCPUs are erroneously treated as 64bit vCPU,
+which causes the function to incorrectly detect a mixed-width VM.
 
-On Sat, Jan 08, 2022 at 01:27:17PM +0000, Marc Zyngier wrote:
-> On Fri, 07 Jan 2022 12:10:05 +0000,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Tue, Jan 04, 2022 at 02:39:59PM +0000, Marc Zyngier wrote:
-> > > On Mon, 15 Nov 2021 16:57:05 +0000,
-> > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > > 
-> > > > The KVM_ARM_VCPU_PMU_V3_CTRL(KVM_ARM_VCPU_PMU_V3_SET_PMU) VCPU ioctl is
-> > > > used to assign a physical PMU to the events that KVM creates when emulating
-> > > > the PMU for that VCPU. This is useful on heterogeneous systems, when there
-> > > > is more than one hardware PMU present.
-> > > > 
-> > > > The assumption that is made in the implementation is that the user will
-> > > > pin the kvmtool process on a set of CPUs that share the same PMU. This
-> > > > allows kvmtool to set the same PMU for all VCPUs from the main thread,
-> > > > instead of in the individual VCPU threads.
-> > > 
-> > > May I suggest a slightly different use model? Ideally, you'd be able
-> > > to run the vcpu threads on the CPUs matching the PMU affinity, and
-> > > leave all the other threads to roam on other CPUs.
-> > 
-> > Right now, the only way for userspace to make kvmtool run on a particular
-> > set of CPUs in a heterogeneous configuration is to use taskset, which means
-> > the entire kvmtool process ends up being pinned on a subset of CPUs which
-> > have the same PMU. I would like to keep this approach, as it's simple and
-> > straightforward to implement in kvmtool, and it's easy to change in the
-> > future if there's an incentive to do so.
-> > 
-> > It's also not clear to me how your suggestion would work. Add a command
-> > line argument to pin all the VCPUs to the specified cpumask?
-> > 
-> > > 
-> > > With your implementation, the whole of kvmtool gets stuck to a given
-> > > CPU type, which can be problematic.
-> > 
-> > Do you have a specific use case in mind? Or is it more like a general
-> > concern regarding, for example, the virtio-blk-io or virtio-net-* threads
-> > competing with the VCPU threads if the VM is doing lots of I/O?
-> 
-> Exactly that. The real requirement is that the vcpu thread affinities
-> are that of the PMU, but not that of any other thread. Maybe that's
-> just another parameter, independent of the PMU setup. Something like:
-> 
-> 	lkvm run ... --vcpu-affinity $(< /sys/devices/armv8_pmuv3_0/cpus)
-> 
-> for example.
+Fix vcpu_allowed_register_width() to skip the check for vCPUs that
+are not initialized yet.
 
-That should be easy (famous last words?) to implement as a separate patch
-on top of this series, I'll give that a go in the next iteration.
+Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
+---
+ arch/arm64/kvm/reset.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Thanks for the suggestion.
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 426bd7fbc3fd..ef78bbc7566a 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -180,8 +180,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+ 	if (kvm_has_mte(vcpu->kvm) && is32bit)
+ 		return false;
+ 
++	/*
++	 * Make sure vcpu->arch.target setting is visible from others so
++	 * that the width consistency checking between two vCPUs is done
++	 * by at least one of them at KVM_ARM_VCPU_INIT.
++	 */
++	smp_mb();
++
+ 	/* Check that the vcpus are either all 32bit or all 64bit */
+ 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
++		/* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
++		if (tmp->arch.target == -1)
++			continue;
++
+ 		if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
+ 			return false;
+ 	}
 
-Alex
+base-commit: df0cc57e057f18e44dac8e6c18aba47ab53202f9
+-- 
+2.34.1.575.g55b058a8bb-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
