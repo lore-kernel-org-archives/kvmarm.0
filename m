@@ -2,74 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2097C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jan 2022 23:24:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF14C4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jan 2022 23:40:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F2A14B14C;
-	Mon, 10 Jan 2022 18:24:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D0AB4B0A0;
+	Mon, 10 Jan 2022 18:40:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jIzgWHE1jpHr; Mon, 10 Jan 2022 18:24:01 -0500 (EST)
+	with ESMTP id hJoPm+-x+3zE; Mon, 10 Jan 2022 18:40:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1277E4B133;
-	Mon, 10 Jan 2022 18:24:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F5834B0B9;
+	Mon, 10 Jan 2022 18:40:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8FB14B0B9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 18:23:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 54FB64A11C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 18:40:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sIDqv6I5LSbO for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Jan 2022 18:23:58 -0500 (EST)
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com
- [209.85.219.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 801904B133
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 18:23:58 -0500 (EST)
-Received: by mail-yb1-f182.google.com with SMTP id 127so26210403ybb.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 15:23:58 -0800 (PST)
+ with ESMTP id uj7tu45NE9pX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Jan 2022 18:40:47 -0500 (EST)
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com
+ [209.85.219.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35DF449FE6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 18:40:47 -0500 (EST)
+Received: by mail-yb1-f172.google.com with SMTP id g81so15285017ybg.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 15:40:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2g1hbad4Ezo/DEI6dD8aLA+EdL+7wxXqyuFafbp6z7Q=;
- b=oM55QpMEWMcvOqaoBxInuJtySCBl6PW7f7mAJVErZF/Edaw25Fs3NnxBEJGutKpThM
- NaMCG+wYGHuROiIcWOSChJyZdCvgXhoIPl01LYbl3tcfPCyVLadaFRSVb3VoxGMW80D/
- ZITS7pnXfImw/rEfW1PwvZMzxk43Vw9o6paseMqNBSYkkV0CrHC9eOmg8mdCrZ1ulUQm
- hDge8Dig10AO1msI2UMUwgnnmnRU1I83ydBHfrFYy7asvInQuDd+xUhLhqYQg4u0W4Vm
- rScD8sdocOnCM923CAOopu0+gVHJ2fr9/sFxjd/vmInLMWavXstJvLkA7DsctY0vjSxz
- hKIQ==
+ :cc; bh=qDGx4rPveudwE1vRW4I5CFIMkMb5URvZDsFlXmH9o6w=;
+ b=o+EU0nOsD+ZtFVMEDfBaLk5/YT0q9pC/SpmMwy14s0gakua6hifIB6k2Xj6m3iX+1S
+ BMYt1+ojCSX3t0ua86Q+GxiiyhEcmq1oYBYIqDV5gKshJy2P5jgPLAvBTNk+oSgrl9ZK
+ pvTsQttJJkS9nzBVld6M9FGwH27Bcjkuo4H4/+qcaOVCtGk/3z3NcxgN0Jc7TT4rUNb4
+ NXo4sVOg4isK1LNnG+dwaxcNqdTCs1TA3DJrcHSfiRbf1s9GYgTJVArz/NKkC+llvCnN
+ BNrCIJc4wYzG0UoC1Jp/oLXFyODb16L+QlTcyOhaYzSZRsnapZNMD/18hoziMEdmzhSY
+ iOUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2g1hbad4Ezo/DEI6dD8aLA+EdL+7wxXqyuFafbp6z7Q=;
- b=4QdvWpT89t5u7LSVcR0WFht6y0rR4LSRgF4tpPtHeuR2Z3wke/JbAefqKj3cCOXaXD
- Q/ljX2Pri5UEJLZttnGXU/K5CkzxdArAMHkTMzkrkCmYnDrkgn9I81tmFZGFsKHWGdG/
- 4H1Hhs0i+56lWEOg1zectWFyL72nzkWKlJ6Rf8YeTYzAyukDDQITV4LDhv4iHYHuXASt
- rOgGt7bURmjuYr0I2CBzW4gsakjAbbJ4RGMBeBHf9YZnd6aV0zwPhWvNRF869+NN8cCL
- +7PeYYyGyxoNB/NNvrckMz3H9tyhH2+w5DdcXSB2tVXC29kzhQDd1rcqCbC88ntoO4p+
- Bcew==
-X-Gm-Message-State: AOAM533O7xaKzt89SfcozGpRRJ11aOyDlG+/bWkIkAcc9waPG7/j8BGh
- V4Ar55DdxUS4DEioaIM5HNP0lLLehN66r9Rhuo1SFQ==
-X-Google-Smtp-Source: ABdhPJz5so6Chi1+nIiR5l3idPgrT/QBMsfnjZlAPbMETIEUAr95xu0h9jTnoe2QCZEdnEG9W/LLTv4gt3Ndz+8iVXU=
-X-Received: by 2002:a25:7e83:: with SMTP id z125mr2770391ybc.446.1641857037793; 
- Mon, 10 Jan 2022 15:23:57 -0800 (PST)
+ bh=qDGx4rPveudwE1vRW4I5CFIMkMb5URvZDsFlXmH9o6w=;
+ b=t7M1nEDzylvnogLdn7Vq8CWPqVLxvj4SrTae0KKglJatrFWLC1p6RC0jZKDFf3XlT+
+ 45zp64oVVw4pPd3Sv76nB/P2lPP8xDT9ng66jKBbZl5cG7YOHjzyeR8aV5eY02cm8RiH
+ Z0SnzGcUzghz2CvKBs1qBSR2HzSQk2TSXbvb9qNc9z5q0VdnUVfOSSgWXl4UAWXemG0J
+ vpJwJUA0UG7rdXHgr4lFTXQIFs1jp0q6LVl1ntz1jJiy61G4+pYP9GsmrhD22FFZiPH4
+ xETZJyod8UT1lXhDp7FcrUR72xyJfDikJQluQERfSjvePS/hz9aAcfbXu+Vd6WLQdZLm
+ fSNA==
+X-Gm-Message-State: AOAM533LpEwci+6PQfY12QMshOXFf4C808HKcotpe0t4RZyHUQlE2RFa
+ nCmCte7H3mNVqODxX1kcHvVFkumcwcyD/O2UKoISDw==
+X-Google-Smtp-Source: ABdhPJzIrPJFmkpkT1MmYvnvF/19vaa1rmG/3n9wA4uvNrhhiocvS0sMsPUM5NnLiqbCvThjitV3yXClYJU59u9WFNk=
+X-Received: by 2002:a25:244e:: with SMTP id k75mr2749219ybk.172.1641858046407; 
+ Mon, 10 Jan 2022 15:40:46 -0800 (PST)
 MIME-Version: 1.0
 References: <20220104194918.373612-1-rananta@google.com>
- <20220104194918.373612-2-rananta@google.com>
- <Ydjje8qBOP3zDOZi@google.com>
-In-Reply-To: <Ydjje8qBOP3zDOZi@google.com>
+ <20220104194918.373612-4-rananta@google.com>
+ <CAAeT=FxCCD+H1z8+gfyBZNeibfAUqUenZZe56Vj_3fCghJjy=Q@mail.gmail.com>
+In-Reply-To: <CAAeT=FxCCD+H1z8+gfyBZNeibfAUqUenZZe56Vj_3fCghJjy=Q@mail.gmail.com>
 From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 10 Jan 2022 15:23:46 -0800
-Message-ID: <CAJHc60ziKv6P4ZmpLXrv+s4DrrDtOwuQRAc4bKcrbR3aNAK5mQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+Date: Mon, 10 Jan 2022 15:40:35 -0800
+Message-ID: <CAJHc60yY9qH5_r09Tz2fhWr+tT+i7RnKhchBuEePCKnos52kwA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 03/11] KVM: Introduce KVM_CAP_ARM_HVC_FW_REG_BMAP
+To: Reiji Watanabe <reijiw@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,123 +86,111 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Jan 7, 2022 at 5:06 PM Sean Christopherson <seanjc@google.com> wrote:
+On Fri, Jan 7, 2022 at 9:40 PM Reiji Watanabe <reijiw@google.com> wrote:
 >
-> On Tue, Jan 04, 2022, Raghavendra Rao Ananta wrote:
-> > Capture the start of the KVM VM, which is basically the
+> Hi Raghu,
 >
-> Please wrap at ~75 chars.
->
-> > start of any vCPU run. This state of the VM is helpful
-> > in the upcoming patches to prevent user-space from
-> > configuring certain VM features after the VM has started
-> > running.
->
-> Please provide context of how the flag will be used.  I glanced at the future
-> patches, and knowing very little about arm, I was unable to glean useful info
-> about exactly who is being prevented from doing what.
->
+> On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
+> <rananta@google.com> wrote:
+> >
+> > Introduce the KVM ARM64 capability, KVM_CAP_ARM_HVC_FW_REG_BMAP,
+> > to indicate the support for psuedo-firmware bitmap extension.
+> > Each of these registers holds a feature-set exposed to the guest
+> > in the form of a bitmap. If supported, a simple 'read' of the
+> > capability should return the number of psuedo-firmware registers
+> > supported. User-space can utilize this to discover the registers.
+> > It can further explore or modify the features using the classical
+> > GET/SET_ONE_REG interface.
 > >
 > > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > > ---
-> >  include/linux/kvm_host.h | 3 +++
-> >  virt/kvm/kvm_main.c      | 9 +++++++++
-> >  2 files changed, 12 insertions(+)
+> >  Documentation/virt/kvm/api.rst | 21 +++++++++++++++++++++
+> >  include/uapi/linux/kvm.h       |  1 +
+> >  2 files changed, 22 insertions(+)
 > >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index c310648cc8f1..d0bd8f7a026c 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -623,6 +623,7 @@ struct kvm {
-> >       struct notifier_block pm_notifier;
-> >  #endif
-> >       char stats_id[KVM_STATS_NAME_SIZE];
-> > +     bool vm_started;
-> >  };
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index aeeb071c7688..646176537f2c 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -6925,6 +6925,27 @@ indicated by the fd to the VM this is called on.
+> >  This is intended to support intra-host migration of VMs between userspace VMMs,
+> >  upgrading the VMM process without interrupting the guest.
 > >
-> >  #define kvm_err(fmt, ...) \
-> > @@ -1666,6 +1667,8 @@ static inline bool kvm_check_request(int req, struct kvm_vcpu *vcpu)
-> >       }
-> >  }
-> >
-> > +#define kvm_vm_has_started(kvm) (kvm->vm_started)
+> > +7.30 KVM_CAP_ARM_HVC_FW_REG_BMAP
 >
-> Needs parantheses around (kvm), but why bother with a macro?  This is the same
-> header that defines struct kvm.
+> IMHO, instead of including its format of the register in the name,
+> including its purpose/function in the name might be better.
+> e.g. KVM_CAP_ARM_HVC_FEATURE_REG ?
+> (Feature fields don't necessarily have to be in a bitmap format
+>  if they don't fit well although I'm not sure if we have such fields.)
 >
-No specific reason for creating a macro as such. I can remove it if it
-feels noisy.
-> > +
-> >  extern bool kvm_rebooting;
-> >
-> >  extern unsigned int halt_poll_ns;
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 72c4e6b39389..962b91ac2064 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -3686,6 +3686,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >       int r;
-> >       struct kvm_fpu *fpu = NULL;
-> >       struct kvm_sregs *kvm_sregs = NULL;
-> > +     struct kvm *kvm = vcpu->kvm;
->
-> If you're going to bother grabbing kvm, replace the instances below that also do
-> vcpu->kvm.
->
-> >
-> >       if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
-> >               return -EIO;
-> > @@ -3723,6 +3724,14 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >                       if (oldpid)
-> >                               synchronize_rcu();
-> >                       put_pid(oldpid);
-> > +
-> > +                     /*
-> > +                      * Since we land here even on the first vCPU run,
-> > +                      * we can mark that the VM has started running.
->
-> Please avoid "we", "us", etc..
->
-> "vm_started" is also ambiguous.  If we end up with a flag, then I would prefer a
-> much more literal name, a la created_vcpus, e.g. ran_vcpus or something.
->
-> > +                      */
-> > +                     mutex_lock(&kvm->lock);
->
-> This adds unnecessary lock contention when running vCPUs.  The naive solution
-> would be:
->                         if (!kvm->vm_started) {
->                                 ...
->                         }
->
-Not sure if I understood the solution..
+Well we do have registers, KVM_REG_ARM_PSCI_VERSION for instance,
+that's not covered by this CAP. But sure, I can explicitly add
+'FEATURES' to the name. I also wanted to explicitly convey that we are
+covering the *bitmapped* firmware registers here. But not sure if
+appending 'BMAP' might give an impression that the CAP itself is
+bitmapped.
+Do you think KVM_CAP_ARM_HVC_BMAP_FEAT_REG is better?
 
-> > +                     kvm->vm_started = true;
-> > +                     mutex_unlock(&kvm->lock);
+> > +
+> > +:Architectures: arm64
+> > +:Parameters: None
+> > +:Returns: Number of psuedo-firmware registers supported
 >
-> Lastly, why is this in generic KVM?
+> Looking at patch-4, the return value of this would be the number of
+> pseudo-firmware *bitmap* registers supported.
+> BTW, "4.68 KVM_SET_ONE_REG" in the doc uses the word "arm64 firmware
+> pseudo-registers".  It would be nicer to use the same term.
 >
-The v1 of the series originally had it in the arm specific code.
-However, I was suggested to move it to the generic code since the book
-keeping is not arch specific and could be helpful to others too [1].
-
-Thanks for the review. I'll add your other comments as well.
+Nice catch. I'll fix it here in apr.rst.
+> > +
+> > +This capability indicates that KVM for arm64 supports the psuedo-firmware
+> > +register bitmap extension. Each of these registers represent the features
+> > +supported by a particular type in the form of a bitmap. By default, these
+> > +registers are set with the upper limit of the features that are supported.
+> > +
+> > +The registers can be accessed via the standard SET_ONE_REG and KVM_GET_ONE_REG
+> > +interfaces. The user-space is expected to read the number of these registers
+> > +available by reading KVM_CAP_ARM_HVC_FW_REG_BMAP, read the current bitmap
+> > +configuration via GET_ONE_REG for each register, and then write back the
+> > +desired bitmap of features that it wishes the guest to see via SET_ONE_REG.
+> > +
+> > +Note that KVM doesn't allow the user-space to modify these registers after
+> > +the VM (any of the vCPUs) has started running.
+>
+> Since even if KVM_RUN fails, and the VM hasn't started yet,
+> it will get immutable. So, "after any of the vCPUs run KVM_RUN."
+> might be more clear ?
+>
+Sure, that's probably more clear. I'll fix it.
 
 Regards,
 Raghavendra
 
-[1]: https://lore.kernel.org/kvmarm/YYMKphExkqttn2w0@google.com/
-
-> >               }
-> >               r = kvm_arch_vcpu_ioctl_run(vcpu);
-> >               trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
+> Thanks,
+> Reiji
+>
+>
+>
+> > +
+> >  8. Other capabilities.
+> >  ======================
+> >
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 1daa45268de2..209b43dbbc3c 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
+> >  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+> >  #define KVM_CAP_ARM_MTE 205
+> >  #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
+> > +#define KVM_CAP_ARM_HVC_FW_REG_BMAP 207
+> >
+> >  #ifdef KVM_CAP_IRQ_ROUTING
+> >
 > > --
 > > 2.34.1.448.ga2b2bfdf31-goog
 > >
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
