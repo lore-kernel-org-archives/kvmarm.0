@@ -2,51 +2,100 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF8EC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 10 Jan 2022 11:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D8BC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 10 Jan 2022 15:31:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1B204B0CC;
-	Mon, 10 Jan 2022 06:40:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C756C4B10C;
+	Mon, 10 Jan 2022 10:31:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cFsn2uwIflPu; Mon, 10 Jan 2022 06:40:22 -0500 (EST)
+	with ESMTP id KrKQuVnkoEMg; Mon, 10 Jan 2022 10:31:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 52219411C7;
-	Mon, 10 Jan 2022 06:40:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74F624B152;
+	Mon, 10 Jan 2022 10:31:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3044411C7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 06:40:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37D374B10C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 10:31:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4jDRuWtdB9YB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Jan 2022 06:40:19 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 177BB41173
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 06:40:19 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 801502B;
- Mon, 10 Jan 2022 03:40:18 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 387713F5A1;
- Mon, 10 Jan 2022 03:40:17 -0800 (PST)
-Date: Mon, 10 Jan 2022 11:40:26 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- will@kernel.org, mark.rutland@arm.com
-Subject: Re: [RFC PATCH v5 19/38] KVM: arm64: Do not run a VCPU on a CPU
- without SPE
-Message-ID: <YdwbKtLCXfZnKXb9@monolith.localdoman>
-References: <20211117153842.302159-1-alexandru.elisei@arm.com>
- <20211117153842.302159-20-alexandru.elisei@arm.com>
+ with ESMTP id 5lUeGGU0S8qQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Jan 2022 10:31:06 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B60F4B108
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 10:31:06 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1641828664;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hAsOCNUk4gJy3xfkTWxDnJ/ocn/Hng6/ay6Zh+ITS5o=;
+ b=Rv63s3NnEwom4uzSU8nGGX7r7FajtSwPMLLU8OviAgLC7fl+/XrPRH4/CMlwkVqTwamwWH
+ t2OJDeNkobi6dEzQF4b6TJHchvKEE8wBN7KzTysIcxKwAgSvLhe+pgdBnjLYW7iDiBWqIz
+ 3OA8nYvC6RccezD0eMJeYx/dKyWqhsE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-63-0hVKw9iHNNCysFP5bLPszw-1; Mon, 10 Jan 2022 10:31:01 -0500
+X-MC-Unique: 0hVKw9iHNNCysFP5bLPszw-1
+Received: by mail-wm1-f70.google.com with SMTP id
+ m19-20020a05600c4f5300b00345cb6e8dd4so2249943wmq.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Jan 2022 07:31:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:reply-to:subject:to:cc:references:from
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-transfer-encoding:content-language;
+ bh=hAsOCNUk4gJy3xfkTWxDnJ/ocn/Hng6/ay6Zh+ITS5o=;
+ b=sP3uhlV2O3F+z9PqRngryBHPWLtHShI/fmbvlkRrxSZ9JSubjFfYiotXtue90l2D3h
+ SVrclFH2L/K05zl8HfIFWAfV2xgbxRaSnYdHp68wI/Yu+4WaBldlQrxuwgfF8fah0Gl6
+ rEV5XoOOmbal9TCMXX7p14AGc8+51D2dHU8RafsIj6IAlqX1QEccU029zf6/AoVca1W5
+ HiionX+o+OanpCUpNyPLOAsMdVqckWQXtvPeL4+ck1UO11g2d/P1TSkvwzGpmcLSgSg9
+ BxD7lcmK2Rurt5N/qYPdOSFyVrfgt59az7DpOizbyQZFXWzgn7SO+H5nxXyUp84WNKGf
+ tD+g==
+X-Gm-Message-State: AOAM530NavgTn5O/JsgLY7/W4CQTs5k3Eo9pRmhjvkp+9BgMLiYdv8De
+ 6EvIKrcflnft34Zgshov2jBWx72JEO5+jJG1EMtN1E8CT2MU9f7sMhtzaa8b55oAcFTmMIYqTls
+ jbhjHcz/bXxWgi49KHceTVw9F
+X-Received: by 2002:a05:600c:34c4:: with SMTP id
+ d4mr22837827wmq.53.1641828660522; 
+ Mon, 10 Jan 2022 07:31:00 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwZ5PbKWG2o82UtfdwF8YlHmCQ3IAN9akDTuLFh8hqRxJQpStKQ1peYtx8PsS1Wl2ACmE2rXQ==
+X-Received: by 2002:a05:600c:34c4:: with SMTP id
+ d4mr22837815wmq.53.1641828660301; 
+ Mon, 10 Jan 2022 07:31:00 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id g5sm7517121wrd.100.2022.01.10.07.30.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 10 Jan 2022 07:30:59 -0800 (PST)
+Subject: Re: [PATCH v4 3/6] hw/arm/virt: Honor highmem setting when computing
+ the memory map
+To: Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
+References: <20220107163324.2491209-1-maz@kernel.org>
+ <20220107163324.2491209-4-maz@kernel.org>
+From: Eric Auger <eric.auger@redhat.com>
+Message-ID: <a72846d6-d559-9f12-154f-20c04821747e@redhat.com>
+Date: Mon, 10 Jan 2022 16:30:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211117153842.302159-20-alexandru.elisei@arm.com>
+In-Reply-To: <20220107163324.2491209-4-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: kernel-team@android.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -60,117 +109,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hello,
+Hi Marc,
 
-This patch will be dropped in the next iteration, and instead I'll
-implement the same approach that PMU emulation emulation uses, which is
-currently being worked on [1].
+On 1/7/22 5:33 PM, Marc Zyngier wrote:
+> Even when the VM is configured with highmem=off, the highest_gpa
+> field includes devices that are above the 4GiB limit.
+> Similarily, nothing seem to check that the memory is within
+> the limit set by the highmem=off option.
+>
+> This leads to failures in virt_kvm_type() on systems that have
+> a crippled IPA range, as the reported IPA space is larger than
+> what it should be.
+>
+> Instead, honor the user-specified limit to only use the devices
+> at the lowest end of the spectrum, and fail if we have memory
+> crossing the 4GiB limit.
+>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Prospective reviewers can safely ignore this patch.
-
-[1] https://lore.kernel.org/linux-arm-kernel/20211213152309.158462-1-alexandru.elisei@arm.com
-
-Thanks,
-Alex
-
-On Wed, Nov 17, 2021 at 03:38:23PM +0000, Alexandru Elisei wrote:
-> The kernel allows heterogeneous systems where FEAT_SPE is not present on
-> all CPUs. This presents a challenge for KVM, as it will have to touch the
-> SPE registers when emulating SPE for a guest, and those accesses will cause
-> an undefined exception if SPE is not present on the CPU.
-> 
-> Avoid this situation by keeping a cpumask of CPUs that the VCPU is
-> allowed run on, which for SPE is the reunion of all CPUs that support
-> SPE, and refuse to run the VCPU on a CPU which is not part of the
-> cpumask.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Eric
 > ---
->  arch/arm64/include/asm/kvm_host.h |  3 +++
->  arch/arm64/kvm/arm.c              | 15 +++++++++++++++
->  arch/arm64/kvm/spe.c              |  2 ++
->  3 files changed, 20 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 8b3faed48914..96ce98f6135d 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -405,6 +405,9 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	cpumask_var_t supported_cpus;
-> +	bool cpu_not_supported;
->  };
+>  hw/arm/virt.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+>
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 4d1d629432..57c55e8a37 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1663,7 +1663,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>  static void virt_set_memmap(VirtMachineState *vms)
+>  {
+>      MachineState *ms = MACHINE(vms);
+> -    hwaddr base, device_memory_base, device_memory_size;
+> +    hwaddr base, device_memory_base, device_memory_size, memtop;
+>      int i;
 >  
->  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index b2997b919be2..8a7c01d1df58 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -351,6 +351,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>      vms->memmap = extended_memmap;
+> @@ -1690,7 +1690,11 @@ static void virt_set_memmap(VirtMachineState *vms)
+>      device_memory_size = ms->maxram_size - ms->ram_size + ms->ram_slots * GiB;
 >  
->  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
->  
-> +	if (!zalloc_cpumask_var(&vcpu->arch.supported_cpus, GFP_KERNEL))
-> +		return -ENOMEM;
-> +
->  	/* Set up the timer */
->  	kvm_timer_vcpu_init(vcpu);
->  
-> @@ -378,6 +381,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	if (vcpu->arch.has_run_once && unlikely(!irqchip_in_kernel(vcpu->kvm)))
->  		static_branch_dec(&userspace_irqchip_in_use);
->  
-> +	free_cpumask_var(vcpu->arch.supported_cpus);
->  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
->  	kvm_timer_vcpu_terminate(vcpu);
->  	kvm_pmu_vcpu_destroy(vcpu);
-> @@ -456,6 +460,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	if (vcpu_has_ptrauth(vcpu))
->  		vcpu_ptrauth_disable(vcpu);
->  	kvm_arch_vcpu_load_debug_state_flags(vcpu);
-> +
-> +	if (!cpumask_empty(vcpu->arch.supported_cpus) &&
-> +	    !cpumask_test_cpu(smp_processor_id(), vcpu->arch.supported_cpus))
-> +		vcpu->arch.cpu_not_supported = true;
->  }
->  
->  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> @@ -893,6 +901,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		 */
->  		preempt_disable();
->  
-> +		if (unlikely(vcpu->arch.cpu_not_supported)) {
-> +			vcpu->arch.cpu_not_supported = false;
-> +			ret = -ENOEXEC;
-> +			preempt_enable();
-> +			continue;
-> +		}
-> +
->  		kvm_pmu_flush_hwstate(vcpu);
->  
->  		local_irq_disable();
-> diff --git a/arch/arm64/kvm/spe.c b/arch/arm64/kvm/spe.c
-> index 7c6f94358cc1..f3863728bab6 100644
-> --- a/arch/arm64/kvm/spe.c
-> +++ b/arch/arm64/kvm/spe.c
-> @@ -40,5 +40,7 @@ int kvm_spe_vcpu_enable_spe(struct kvm_vcpu *vcpu)
->  	if (vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT))
->  		return -EINVAL;
->  
-> +	cpumask_copy(vcpu->arch.supported_cpus, &supported_cpus);
-> +
->  	return 0;
->  }
-> -- 
-> 2.33.1
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>      /* Base address of the high IO region */
+> -    base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> +    memtop = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> +    if (!vms->highmem && memtop > 4 * GiB) {
+> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+> +        exit(EXIT_FAILURE);
+> +    }
+>      if (base < device_memory_base) {
+>          error_report("maxmem/slots too huge");
+>          exit(EXIT_FAILURE);
+> @@ -1707,7 +1711,7 @@ static void virt_set_memmap(VirtMachineState *vms)
+>          vms->memmap[i].size = size;
+>          base += size;
+>      }
+> -    vms->highest_gpa = base - 1;
+> +    vms->highest_gpa = (vms->highmem ? base : memtop) - 1;
+>      if (device_memory_size > 0) {
+>          ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+>          ms->device_memory->base = device_memory_base;
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
