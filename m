@@ -2,51 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D66B2C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 16:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B31B6C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 17:36:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C41C4B205;
-	Tue, 11 Jan 2022 11:11:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB14F4B0D7;
+	Tue, 11 Jan 2022 12:36:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7WRyka87JqU6; Tue, 11 Jan 2022 11:11:21 -0500 (EST)
+	with ESMTP id i4n0Qa80qaLc; Tue, 11 Jan 2022 12:36:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEAFA4B1D5;
-	Tue, 11 Jan 2022 11:11:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEE9D4B130;
+	Tue, 11 Jan 2022 12:36:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CD504B1A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 11:11:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A911D4B0D7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 12:36:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yn-3C6XuY9t2 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Jan 2022 11:11:18 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C9CF94B131
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 11:11:18 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 342FB6D;
- Tue, 11 Jan 2022 08:11:18 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8B16B3F774;
- Tue, 11 Jan 2022 08:11:15 -0800 (PST)
-Date: Tue, 11 Jan 2022 16:11:25 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/2] KVM: arm64: mixed-width check should be skipped for
- uninitialized vCPUs
-Message-ID: <Yd2sLbiw/XPCZe7q@monolith.localdoman>
-References: <20220110054042.1079932-1-reijiw@google.com>
- <YdwPCcZWD8Uc1eej@monolith.localdoman>
- <CAAeT=Fz1KPbpmcSbukBuGWMJH=V_oXAJoaDHAen_Gy9Qswo_1Q@mail.gmail.com>
- <875yqqtn5q.wl-maz@kernel.org>
+ with ESMTP id zurDkxTRLnnd for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Jan 2022 12:36:31 -0500 (EST)
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com
+ [209.85.214.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 948264B0CC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 12:36:31 -0500 (EST)
+Received: by mail-pl1-f174.google.com with SMTP id z3so18312891plg.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 09:36:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=kmqD567CtlmXllpc1rQayweyZNMIGqk+RZtPJBuYT90=;
+ b=sivzBEkWVy1S0pf5Z71owP5T4t13Zyykw7vqCCakVV0L1ZomD5pSrWWdeOgJuBAzWL
+ zFUHh31Ym7mqCNUa7K4JxPVQhFbPy4N3qrzqt5roRk7BcHeqGnIc2hOgv6DFtWK5tTy2
+ WdWZCAOQdakcQ38IpcuCVuoEK9rwgLOE50yRhvkZiFuadJGbVSlIPWXMc7yIFrHCMtIG
+ bTt98MWR4oDq6HIq7Y/sVn7MmFX9CS1xFwzTO6bvb1DR9JWIcoX/Hrrl/rCckOdh5LoP
+ mdC2nr6t5awVklH9vDGx4GBF7LvyiGNU3Chu6orbgSoWmiYl0jqTamZ/7yzMNKGRgmwF
+ 24Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=kmqD567CtlmXllpc1rQayweyZNMIGqk+RZtPJBuYT90=;
+ b=fbOb2tg3WzxAfEB9zyqV/zh0+vpyRP7DaNYmAgHljp+/cxHS9xHMopkkWUHVfZ7uER
+ U0rguZwyLZsAHw6sNt6fjOmlJMYrP0vK9KiKdlYoOkqCo+0F+VVtsF1WlsgMn6ST2EBx
+ EnL04ObQB5NZkKlfMmNMPIWq1j0k6hEvkoCSQqZdXxUGe+eeWr4LDrLO+2IgGKe1AmtD
+ BF6ONZXxUSr6IIIHbCurlYp/QJLF4gHChuCVQHPsvpJLyk2RMCmdpMMGoVv506cBEZeU
+ ZtaIyOP22c3ylt4JxQT/c7cr6ICQjLVN02l2V10zLz0HeCbsuPWmR+aP1Y+XJoeHRM+M
+ MWHg==
+X-Gm-Message-State: AOAM532hdAqyA+L3GTVyFGY5iSIRAVG1yyb2kPCSgL20h1Gtv9dIHINA
+ bFaNoY9z7JOb1UOgm3gejtLsMQ==
+X-Google-Smtp-Source: ABdhPJyi/ql3rEX/0G3ckRnHJKB6twfx7NB9W6on7gUjJywSRrz2rhGBuYgadAJVOgr9Cf/e9+m1Mg==
+X-Received: by 2002:a62:79c2:0:b0:4bd:e9da:c173 with SMTP id
+ u185-20020a6279c2000000b004bde9dac173mr5462897pfc.65.1641922590326; 
+ Tue, 11 Jan 2022 09:36:30 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id qe10sm3488021pjb.5.2022.01.11.09.36.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 11 Jan 2022 09:36:29 -0800 (PST)
+Date: Tue, 11 Jan 2022 17:36:25 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+Message-ID: <Yd3AGRtkBgWSmGf2@google.com>
+References: <20220104194918.373612-1-rananta@google.com>
+ <20220104194918.373612-2-rananta@google.com>
+ <Ydjje8qBOP3zDOZi@google.com>
+ <CAJHc60ziKv6P4ZmpLXrv+s4DrrDtOwuQRAc4bKcrbR3aNAK5mQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <875yqqtn5q.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <CAJHc60ziKv6P4ZmpLXrv+s4DrrDtOwuQRAc4bKcrbR3aNAK5mQ@mail.gmail.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,239 +95,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Mon, Jan 10, 2022, Raghavendra Rao Ananta wrote:
+> On Fri, Jan 7, 2022 at 5:06 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Jan 04, 2022, Raghavendra Rao Ananta wrote:
+> > > +#define kvm_vm_has_started(kvm) (kvm->vm_started)
+> >
+> > Needs parantheses around (kvm), but why bother with a macro?  This is the same
+> > header that defines struct kvm.
+> >
+> No specific reason for creating a macro as such. I can remove it if it
+> feels noisy.
 
-On Tue, Jan 11, 2022 at 01:30:41PM +0000, Marc Zyngier wrote:
-> On Tue, 11 Jan 2022 07:37:57 +0000,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> > 
-> > Hi Alex,
-> > 
-> > On Mon, Jan 10, 2022 at 2:48 AM Alexandru Elisei
-> > <alexandru.elisei@arm.com> wrote:
-> > >
-> > > Hi Reiji,
-> > >
-> > > On Sun, Jan 09, 2022 at 09:40:41PM -0800, Reiji Watanabe wrote:
-> > > > vcpu_allowed_register_width() checks if all the VCPUs are either
-> > > > all 32bit or all 64bit.  Since the checking is done even for vCPUs
-> > > > that are not initialized (KVM_ARM_VCPU_INIT has not been done) yet,
-> > > > the non-initialized vCPUs are erroneously treated as 64bit vCPU,
-> > > > which causes the function to incorrectly detect a mixed-width VM.
-> > > >
-> > > > Fix vcpu_allowed_register_width() to skip the check for vCPUs that
-> > > > are not initialized yet.
-> > > >
-> > > > Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
-> > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/reset.c | 11 +++++++++++
-> > > >  1 file changed, 11 insertions(+)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> > > > index 426bd7fbc3fd..ef78bbc7566a 100644
-> > > > --- a/arch/arm64/kvm/reset.c
-> > > > +++ b/arch/arm64/kvm/reset.c
-> > > > @@ -180,8 +180,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-> > > >       if (kvm_has_mte(vcpu->kvm) && is32bit)
-> > > >               return false;
-> > > >
-> > > > +     /*
-> > > > +      * Make sure vcpu->arch.target setting is visible from others so
-> > > > +      * that the width consistency checking between two vCPUs is done
-> > > > +      * by at least one of them at KVM_ARM_VCPU_INIT.
-> > > > +      */
-> > > > +     smp_mb();
-> > >
-> > > From ARM DDI 0487G.a, page B2-146 ("Data Memory Barrier (DMB)"):
-> > >
-> > > "The DMB instruction is a memory barrier instruction that ensures the relative
-> > > order of memory accesses before the barrier with memory accesses after the
-> > > barrier."
-> > >
-> > > I'm going to assume from the comment that you are referring to completion of
-> > > memory accesses ("Make sure [..] is visible from others"). Please correct me if
-> > > I am wrong. In this case, DMB ensures ordering of memory accesses with regards
-> > > to writes and reads, not *completion*.  Have a look at
-> > > tools/memory-model/litmus-tests/MP+fencewmbonceonce+fencermbonceonce.litmus for
-> > > the classic message passing example as an example of memory ordering.
-> > > Message passing and other patterns are also explained in ARM DDI 0487G.a, page
-> > > K11-8363.
-> > >
-> > > I'm not saying that your approach is incorrect, but the commit message should
-> > > explain what memory accesses are being ordered relative to each other and why.
-> > 
-> > Thank you so much for the review.
-> > What I meant with the comment was:
-> > ---
-> >   DMB is used to make sure that writing @vcpu->arch.target, which is done
-> >   by kvm_vcpu_set_target() before getting here, is visible to other PEs
-> >   before the following kvm_for_each_vcpu iteration reads the other vCPUs'
-> >   target field.
-> > ---
-> > Did the comment become more clear ?? (Or do I use DMB incorrectly ?)
-> > 
-> > > > +
-> > > >       /* Check that the vcpus are either all 32bit or all 64bit */
-> > > >       kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-> > > > +             /* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
-> > > > +             if (tmp->arch.target == -1)
-> > > > +                     continue;
-> > 
-> > I just noticed DMB(ishld) is needed here to assure ordering between
-> > reading tmp->arch.target and reading vcpu->arch.features for this fix.
-> > Similarly, kvm_vcpu_set_target() needs DMB(ishst) to assure ordering
-> > between writing vcpu->arch.features and writing vcpu->arch.target...
-> > I am going to fix them in the v2 series.
-> 
-> Yes, you'd need at least this, and preferably in their smp_rmb/wmb
-> variants.
-> 
-> However, this looks like a pretty fragile construct, as there are
-> multiple paths where we can change target (including some error
-> paths from the run loop).
-> 
-> I'd rather all changes to target and the feature bits happen under the
-> kvm->lock, and take that lock when checking for consistency in
-> vcpu_allowed_register_width(), as this isn't a fast path. I wrote the
-> following, which is obviously incomplete and as usual untested.
+Please do.  In the future, don't use a macro unless there's a good reason to do
+so.  Don't get me wrong, I love abusing macros, but for things like this they are
+completely inferior to
 
-I think this is the better approach, because we also want to make sure that
-a PE observes changes to target and features as soon as they have been
-made, to avoid situations where one PE sets the target and the 32bit
-feature, and another PE reads the old values and skips the check, in which
-case memory ordering is not enough.
+  static inline bool kvm_vm_has_started(struct kvm *kvm)
+  {
+  	return kvm->vm_started;
+  }
 
-Thanks,
-Alex
+because a helper function gives us type safety, doesn't suffer from concatenation
+of tokens potentially doing weird things, is easier to extend to a multi-line
+implementation, etc...
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index e4727dc771bf..42f2ab80646c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1061,7 +1061,8 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->  			       const struct kvm_vcpu_init *init)
->  {
-> -	unsigned int i, ret;
-> +	unsigned int i;
-> +	int ret = 0;
->  	u32 phys_target = kvm_target_cpu();
->  
->  	if (init->target != phys_target)
-> @@ -1074,32 +1075,46 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->  	if (vcpu->arch.target != -1 && vcpu->arch.target != init->target)
->  		return -EINVAL;
->  
-> +	/* Hazard against a concurent check of the target in kvm_reset_vcpu() */
-> +	mutex_lock(&vcpu->kvm->lock);
-> +
->  	/* -ENOENT for unknown features, -EINVAL for invalid combinations. */
->  	for (i = 0; i < sizeof(init->features) * 8; i++) {
->  		bool set = (init->features[i / 32] & (1 << (i % 32)));
->  
-> -		if (set && i >= KVM_VCPU_MAX_FEATURES)
-> -			return -ENOENT;
-> +		if (set && i >= KVM_VCPU_MAX_FEATURES) {
-> +			ret = -ENOENT;
-> +			break;
-> +		}
->  
->  		/*
->  		 * Secondary and subsequent calls to KVM_ARM_VCPU_INIT must
->  		 * use the same feature set.
->  		 */
->  		if (vcpu->arch.target != -1 && i < KVM_VCPU_MAX_FEATURES &&
-> -		    test_bit(i, vcpu->arch.features) != set)
-> -			return -EINVAL;
-> +		    test_bit(i, vcpu->arch.features) != set) {
-> +			ret = -EINVAL;
-> +			break;
-> +		}
->  
->  		if (set)
->  			set_bit(i, vcpu->arch.features);
->  	}
->  
-> -	vcpu->arch.target = phys_target;
-> +	if (!ret)
-> +		vcpu->arch.target = phys_target;
-> +
-> +	mutex_unlock(&vcpu->kvm->lock);
-> +	if (ret)
-> +		return ret;
->  
->  	/* Now we know what it is, we can reset it. */
->  	ret = kvm_reset_vcpu(vcpu);
->  	if (ret) {
-> +		mutex_lock(&vcpu->kvm->lock);
->  		vcpu->arch.target = -1;
->  		bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> +		mutex_unlock(&vcpu->kvm->lock);
->  	}
->  
->  	return ret;
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index ef78bbc7566a..fae88a703140 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -180,13 +180,6 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
->  	if (kvm_has_mte(vcpu->kvm) && is32bit)
->  		return false;
->  
-> -	/*
-> -	 * Make sure vcpu->arch.target setting is visible from others so
-> -	 * that the width consistency checking between two vCPUs is done
-> -	 * by at least one of them at KVM_ARM_VCPU_INIT.
-> -	 */
-> -	smp_mb();
-> -
->  	/* Check that the vcpus are either all 32bit or all 64bit */
->  	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
->  		/* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
-> @@ -222,14 +215,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
->  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_reset_state reset_state;
-> -	int ret;
-> +	int ret = -EINVAL;
->  	bool loaded;
->  	u32 pstate;
->  
->  	mutex_lock(&vcpu->kvm->lock);
-> -	reset_state = vcpu->arch.reset_state;
-> -	WRITE_ONCE(vcpu->arch.reset_state.reset, false);
-> +	if (vcpu_allowed_register_width(vcpu)) {
-> +		reset_state = vcpu->arch.reset_state;
-> +		WRITE_ONCE(vcpu->arch.reset_state.reset, false);
-> +		ret = 0;
-> +	}
->  	mutex_unlock(&vcpu->kvm->lock);
-> +	if (ret)
-> +		goto out;
->  
->  	/* Reset PMU outside of the non-preemptible section */
->  	kvm_pmu_vcpu_reset(vcpu);
-> @@ -257,11 +255,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
->  		}
->  	}
->  
-> -	if (!vcpu_allowed_register_width(vcpu)) {
-> -		ret = -EINVAL;
-> -		goto out;
-> -	}
-> -
->  	switch (vcpu->arch.target) {
->  	default:
->  		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+An example of when it's ok to use a macro is x86's
+
+  #define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+
+which uses a macro instead of a proper function to avoid a circular dependency
+due to arch/x86/include/asm/kvm_host.h being included by include/linux/kvm_host.h
+and thus x86's implementation of kvm_arch_vcpu_memslots_id() coming before the
+definition of struct kvm_vcpu.  But that's very much an exception and done only
+because the alternatives suck more.
+
+> > > +                      */
+> > > +                     mutex_lock(&kvm->lock);
+> >
+> > This adds unnecessary lock contention when running vCPUs.  The naive solution
+> > would be:
+> >                         if (!kvm->vm_started) {
+> >                                 ...
+> >                         }
+> >
+> Not sure if I understood the solution..
+
+In your proposed patch, KVM_RUN will take kvm->lock _every_ time.  That introduces
+unnecessary contention as it will serialize this bit of code if multiple vCPUs
+are attempting KVM_RUN.  By checking !vm_started, only the "first" KVM_RUN for a
+VM will acquire kvm->lock and thus avoid contention once the VM is up and running.
+There's still a possibility that multiple vCPUs will contend for kvm->lock on their
+first KVM_RUN, hence the quotes.  I called it "naive" because it's possible there's
+a more elegant solution depending on the use case, e.g. a lockless approach might
+work (or it might not).
+
+> > > +                     kvm->vm_started = true;
+> > > +                     mutex_unlock(&kvm->lock);
+> >
+> > Lastly, why is this in generic KVM?
+> >
+> The v1 of the series originally had it in the arm specific code.
+> However, I was suggested to move it to the generic code since the book
+> keeping is not arch specific and could be helpful to others too [1].
+
+I'm definitely in favor of moving/adding thing to generic KVM when it makes sense,
+but I'm skeptical in this particular case.  The code _is_ arch specific in that
+arm64 apparently needs to acquire kvm->lock when checking if a vCPU has run, e.g.
+versus a hypothetical x86 use case that might be completely ok with a lockless
+implementation.  And it's not obvious that there's a plausible, safe use case
+outside of arm64, e.g. on x86, there is very, very little that is truly shared
+across the entire VM/system, most things are per-thread/core/package in some way,
+shape, or form.  In other words, I'm a wary of providing something like this for
+x86 because odds are good that any use will be functionally incorrect.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
