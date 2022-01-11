@@ -2,84 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85CA9C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 19:04:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E20BEC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 19:43:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10FEF4B25F;
-	Tue, 11 Jan 2022 14:04:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CD304B277;
+	Tue, 11 Jan 2022 14:43:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id c3I64UMMNaoy; Tue, 11 Jan 2022 14:04:52 -0500 (EST)
+	with ESMTP id cECHzPMGFs54; Tue, 11 Jan 2022 14:43:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCED24B244;
-	Tue, 11 Jan 2022 14:04:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 205864B278;
+	Tue, 11 Jan 2022 14:43:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E2DD4B244
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 14:04:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 263C44B276
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 14:43:01 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gDjozxfICKBa for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Jan 2022 14:04:48 -0500 (EST)
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
- [209.85.214.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D5C034B1E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 14:04:48 -0500 (EST)
-Received: by mail-pl1-f175.google.com with SMTP id w7so160315plp.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 11:04:48 -0800 (PST)
+ with ESMTP id BfsTJy-XwRIk for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Jan 2022 14:43:00 -0500 (EST)
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
+ [209.85.216.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F24324B272
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 14:42:59 -0500 (EST)
+Received: by mail-pj1-f45.google.com with SMTP id pf13so829573pjb.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 11:42:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=K0voZAURqPJsMSPgWRWSbzQgUhtAjQkdnnmPm2jJT2w=;
- b=OBsot1EYclSvooVusPEFiHcqQS0tLiqutA1hLvc4Q8dJ1Ly3d4NacG3jUTcwT8b5B0
- yAzAAMtSPazCmF1twB9t7p7OjthaBlEEVkPWyFLjoGrBIC4wlTb5/+rRXf0vM/6rqMCU
- Ragb7afH7stdPZ3KqbuRhWmkPsSooAAmEnsXlw63cnann8b5t+woTMjdUi9ErVLDZadL
- SBMqnGpNjCY4JuVHxg3BCfGS2f1fwERk57a6Mqygc7EBur2rRRWKrn5R3WR0uUengxin
- T+1Z9+vSV6mbJNk442DU5o4tAuCOGgn5t6ttzvE2XufqHuwrPcbXryB0l8VXzxOzfmXG
- EbOw==
+ bh=/FgK5IAnk6FTMgJ52e8i7lV+7gxkfwjZm7Vn+Nisr9w=;
+ b=cyRc7pebHjcqfec09Gg909vXcbxF1ItyjKOkz4RPd7uTitdC93xRVMXxRaWVXPW1F/
+ 6+OynK/dadT9Zax5twqvJQGuHy6WfhiYET1qpIPZFHwkBaAoDRPWPyuwxgCU9C0yNGTC
+ uX+wSWZHEuAIO5uT1RYqxdJaFnWbjJBYk7yJ5oH9WMnpW2vkBrXhZtk5RkS3N2FenERI
+ +MrPTpfmORE3846hdHowtS/7RNHWsZWbod3Dd+60iCXf4XlW3FL5DRxnaFPanygmO0U/
+ d97tE0NvDBnWT+ZGoDV4nd0Le9apc6wyAXt1WGWNJqHk00pHWioCOvfKnxxsax/EqhZ0
+ eLOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=K0voZAURqPJsMSPgWRWSbzQgUhtAjQkdnnmPm2jJT2w=;
- b=AccpcCvhLl+4adw7V/CMsoQUkQ3VGbKJtwKcbbUeaEgAlNpiRPDfwb7EtVXCApeIVi
- Pfaqh+3MAWRXFDbvVCLO8Dk+IxF3IQBeha7U+UT+AHCuZWDjMZV80BvUeV0gVj9kf+9n
- BvpBLAoly89xtiH0b2y+ubUrsqiy/GLUWKyFiy0njhkRHV3Vu/t2KetZakbRNgnBnryS
- 1MM2CmKMS8LxFgaD+EEq/7Me89RlZQxTy5rjHxCoyCsiBYQtk1s/z7vsTrzUZ5S+SZFp
- 721tCpinvBOM+tvVsOxaBgH61xfmIsGZ8J+VNmEitzK1V4A2jbTRUV4uFXy23vxAJEYE
- AySA==
-X-Gm-Message-State: AOAM5301nPDhFDVrBWA0bT/vmwmvMiJluiZTNf9mDPiRlX7TY81zqEA+
- ajey5RO6R2YEl8fVnpO3ZIWC0Q==
-X-Google-Smtp-Source: ABdhPJxSyV27y218zwiIgly8FGJNiKN5fGPK6Fudoin6YBhcWN0ZlQZF3CdSOjibQ9Gqz01uCEpKuA==
-X-Received: by 2002:a63:7c5e:: with SMTP id l30mr5246852pgn.297.1641927887737; 
- Tue, 11 Jan 2022 11:04:47 -0800 (PST)
+ bh=/FgK5IAnk6FTMgJ52e8i7lV+7gxkfwjZm7Vn+Nisr9w=;
+ b=h0Sap+CE+dWBysG0oQ/lq+BV88e+S1QUqkMzMmCP5GA6ijVF/x5gYsHl2J6hJjKUoz
+ 8CisWG/xcS3SSLMJG2rkYAORZnYchQod7ULAOBOVWO6fvUmCGbF/YADuQjsGq7KoEobn
+ A1OeYhmDM/sQhoplAjzFnq+5LtJARBL3QEXpJm6mDqrLFrbs0//9SSS4K9v0/EV8UAW/
+ DdGKKXx/QS9F7I6iNsqHPmWOUosxvnbm7YFUv5QQGLlUxUv+w84mszTPIUULD2jlfzAG
+ GBfZnYo8y72UIwpd0pG12ROzHCUKM1g34pKwUsvMF/zUkDg4sAZ6j/RrQkaK9k3LZV/Q
+ gOwA==
+X-Gm-Message-State: AOAM532oN0r5UUlY81CBhiGj6bXvY5yC1Oi2pTFS4sVvBvXek1m6x706
+ 2nQKQ36/DDFyDcaDtSD5VMw0Dg==
+X-Google-Smtp-Source: ABdhPJzaDuTd4GVMQuDQLn3fOUD2ETpVmwUGMlFIET+66unTNa39QrLyGOYIClARpmqJlRGFyDu8zA==
+X-Received: by 2002:a17:902:a70b:b0:149:75ae:4d63 with SMTP id
+ w11-20020a170902a70b00b0014975ae4d63mr6305902plq.50.1641930178932; 
+ Tue, 11 Jan 2022 11:42:58 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157])
- by smtp.gmail.com with ESMTPSA id l22sm11246197pfc.167.2022.01.11.11.04.46
+ by smtp.gmail.com with ESMTPSA id o11sm145586pgk.36.2022.01.11.11.42.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 11 Jan 2022 11:04:47 -0800 (PST)
-Date: Tue, 11 Jan 2022 19:04:42 +0000
+ Tue, 11 Jan 2022 11:42:58 -0800 (PST)
+Date: Tue, 11 Jan 2022 19:42:54 +0000
 From: Sean Christopherson <seanjc@google.com>
-To: Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-Message-ID: <Yd3UymPg++JW98/2@google.com>
-References: <20220104194918.373612-1-rananta@google.com>
- <20220104194918.373612-2-rananta@google.com>
- <Ydjje8qBOP3zDOZi@google.com>
- <CAJHc60ziKv6P4ZmpLXrv+s4DrrDtOwuQRAc4bKcrbR3aNAK5mQ@mail.gmail.com>
- <Yd3AGRtkBgWSmGf2@google.com>
- <CAJHc60w7vfHkg+9XkPw+38nZBWLLhETJj310ekM1HpQQTL_O0Q@mail.gmail.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: debug: mark test_[bp, wp, ss] as
+ noinline
+Message-ID: <Yd3dvorNkP7eercw@google.com>
+References: <20220111041103.2199594-1-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CAJHc60w7vfHkg+9XkPw+38nZBWLLhETJj310ekM1HpQQTL_O0Q@mail.gmail.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20220111041103.2199594-1-ricarkol@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,63 +90,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jan 11, 2022, Raghavendra Rao Ananta wrote:
-> On Tue, Jan 11, 2022 at 9:36 AM Sean Christopherson <seanjc@google.com> wrote:
-> > In your proposed patch, KVM_RUN will take kvm->lock _every_ time.  That introduces
-> > unnecessary contention as it will serialize this bit of code if multiple vCPUs
-> > are attempting KVM_RUN.  By checking !vm_started, only the "first" KVM_RUN for a
-> > VM will acquire kvm->lock and thus avoid contention once the VM is up and running.
-> > There's still a possibility that multiple vCPUs will contend for kvm->lock on their
-> > first KVM_RUN, hence the quotes.  I called it "naive" because it's possible there's
-> > a more elegant solution depending on the use case, e.g. a lockless approach might
-> > work (or it might not).
-> >
-> But is it safe to read kvm->vm_started without grabbing the lock in
-> the first place?
+On Mon, Jan 10, 2022, Ricardo Koller wrote:
+> Clang inlines some functions (like test_ss) which define global labels
+> in inline assembly (e.g., ss_start). This results in:
+> 
+>     arm/debug.c:382:15: error: invalid symbol redefinition
+>             asm volatile("ss_start:\n"
+>                          ^
+>     <inline asm>:1:2: note: instantiated into assembly here
+>             ss_start:
+>             ^
+>     1 error generated.
+> 
+> Fix these functions by marking them as "noinline".
+> 
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+> This applies on top of: "[kvm-unit-tests PATCH 0/3] arm64: debug: add migration tests for debug state"
+> which is in https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue.
+> 
+>  arm/debug.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arm/debug.c b/arm/debug.c
+> index 54f059d..6c5b683 100644
+> --- a/arm/debug.c
+> +++ b/arm/debug.c
+> @@ -264,7 +264,7 @@ static void do_migrate(void)
+>  	report_info("Migration complete");
+>  }
+>  
+> -static void test_hw_bp(bool migrate)
+> +static __attribute__((noinline)) void test_hw_bp(bool migrate)
 
-Don't know, but that's my point.  Without a consumer in generic KVM and due to
-my lack of arm64 knowledge, without a high-level description of how the flag will
-be used by arm64, it's really difficult to determine what's safe and what's not.
-For other architectures, it's an impossible question to answer because we don't
-know how the flag might be used.
-
-> use atomic_t maybe for this?
-
-No.  An atomic_t is generally useful only if there are multiple writers that can
-possibly write different values.  It's highly unlikely that simply switching to an
-atomic address the needs of arm64.
-
-> > > > > +                     kvm->vm_started = true;
-> > > > > +                     mutex_unlock(&kvm->lock);
-> > > >
-> > > > Lastly, why is this in generic KVM?
-> > > >
-> > > The v1 of the series originally had it in the arm specific code.
-> > > However, I was suggested to move it to the generic code since the book
-> > > keeping is not arch specific and could be helpful to others too [1].
-> >
-> > I'm definitely in favor of moving/adding thing to generic KVM when it makes sense,
-> > but I'm skeptical in this particular case.  The code _is_ arch specific in that
-> > arm64 apparently needs to acquire kvm->lock when checking if a vCPU has run, e.g.
-> > versus a hypothetical x86 use case that might be completely ok with a lockless
-> > implementation.  And it's not obvious that there's a plausible, safe use case
-> > outside of arm64, e.g. on x86, there is very, very little that is truly shared
-> > across the entire VM/system, most things are per-thread/core/package in some way,
-> > shape, or form.  In other words, I'm a wary of providing something like this for
-> > x86 because odds are good that any use will be functionally incorrect.
-> I've been going back and forth on this. I've seen a couple of
-> variables declared in the generic struct and used only in the arch
-> code. vcpu->valid_wakeup for instance, which is used only by s390
-> arch. Maybe I'm looking at it the wrong way as to what can and can't
-> go in the generic kvm code.
-
-Ya, valid_wakeup is an oddball, I don't know why it's in kvm_vcpu instead of
-arch code that's wrapped with e.g. kvm_arch_vcpu_valid_wakeup().
-
-That said, valid_wakeup is consumed by generic KVM, i.e. has well defined semantics
-for how it is used, so it's purely a "this code is rather odd" issue.  vm_started
-on the other hand is only produced by generic KVM, and so its required semantics are
-unclear.
+Use "noinline", which was added by commit 16431a7 ("lib: define the "noinline" macro").
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
