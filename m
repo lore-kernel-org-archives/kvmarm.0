@@ -2,62 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4197DC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 10:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C818C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 10:50:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D9A84B274;
-	Tue, 11 Jan 2022 05:30:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BD93C4B220;
+	Tue, 11 Jan 2022 05:50:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JF5uNKnJXLEY; Tue, 11 Jan 2022 05:30:31 -0500 (EST)
+	with ESMTP id yiY2fSfPdgYs; Tue, 11 Jan 2022 05:50:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61B394B1F5;
-	Tue, 11 Jan 2022 05:30:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 775694B1F5;
+	Tue, 11 Jan 2022 05:50:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3025D4B1F5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 05:30:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FD114B1F5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 05:50:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AOVFl4Ui2WxA for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Jan 2022 05:30:25 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 444054B1E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 05:30:25 -0500 (EST)
+ with ESMTP id sDr-PUyJba-2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Jan 2022 05:50:35 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6F584B1F2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 05:50:34 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 00BC361575;
- Tue, 11 Jan 2022 10:30:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65D2CC36AE3;
- Tue, 11 Jan 2022 10:30:23 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 19D3EB81867;
+ Tue, 11 Jan 2022 10:50:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4C04C36AE9;
+ Tue, 11 Jan 2022 10:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1641897023;
- bh=gNqCMZ11UpYCH8D1vh+lSGQHiNJW0YuBO0Zbglzt9Jg=;
+ s=k20201202; t=1641898231;
+ bh=uYkOEBszxZOpcG0NrLDVLMxfsa96ybEJc3uI8jmdgPM=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=KlqD/LwnppBFjQL0vN1u+quxTAwVeJK57X0z2ilY36TjIpKvdqMpssewdLn1iXhbX
- SfpFg3/2D7Y+qmkX6UGgvsv4K+NMWKy/PO+qgyPFO4rX1y+n3DUWdw7AeFRPwrBN0p
- dDEJQ8kBII2lBY8Vw9s3u+Ura5m0z+xWYtcVnAouse5SProFAHYMdRgAo94CZmIRlP
- Jt0MeAG2DKSDAfdO0kxyNJRzxVxmnsVn1+DbhU5kKVA5MEuqjkCytkqpr2VBneq9BX
- qZYkk6oo1hi4TUDNuAEXBYFgNWgD/9pvt7i6IyS9Z02Ls07sh0Lntm9vHF7Mb+jSvG
- aB8fvaN2a7FnA==
+ b=pJHJNbGMkXwLoUuxxPZfOLYC1+nrst0b1RTx/HLSC12Bm1IwTyLpl8yhyeKJWKMsp
+ IZLwiBsLEVHbmJX6ZkwWQAHPQg6wHbyAOXRkyVY/ukJAsU89LTNmIzYzh84kZsDjIw
+ u84jbucBzqS3tdalEXb0EANDLuQTg8iiKoILE+xYqb7GmgCcQc0sBDz7IuBwmqTCDZ
+ xW0eQR1baC/C/y10pV5mYJf338kPy3hOguWhc2FmJuBgYeyZ+sebcV0XGmdUobcNLe
+ YTfpaTYaXfdMNTKQlEytlTZ4AjMfzB+SzuKZwRpnB64PnO9rq186idFxrbvoobQGNI
+ bN7RUoXBs5Tig==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1n7EQ1-00HM7n-HI; Tue, 11 Jan 2022 10:30:21 +0000
-Date: Tue, 11 Jan 2022 10:30:21 +0000
-Message-ID: <87a6g2tvia.wl-maz@kernel.org>
+ id 1n7EjV-00HML5-W4; Tue, 11 Jan 2022 10:50:30 +0000
+Date: Tue, 11 Jan 2022 10:50:29 +0000
+Message-ID: <878rvmtukq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Jing Zhang <jingzhangos@google.com>
-Subject: Re: [RFC PATCH 3/3] KVM: selftests: Add vgic initialization for dirty
- log perf test for ARM
-In-Reply-To: <20220110210441.2074798-4-jingzhangos@google.com>
+Subject: Re: [RFC PATCH 2/3] KVM: arm64: Add fast path to handle permission
+ relaxation during dirty logging
+In-Reply-To: <20220110210441.2074798-3-jingzhangos@google.com>
 References: <20220110210441.2074798-1-jingzhangos@google.com>
- <20220110210441.2074798-4-jingzhangos@google.com>
+ <20220110210441.2074798-3-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -88,37 +88,97 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 10 Jan 2022 21:04:41 +0000,
+Coming back to this, as it does bother me.
+
+On Mon, 10 Jan 2022 21:04:40 +0000,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> For ARM64, if no vgic is setup before the dirty log perf test, the
-> userspace irqchip would be used, which would affect the dirty log perf
-> test result.
-
-Doesn't it affect *all* performance tests? How much does this change
-contributes to the performance numbers you give in the cover letter?
-
+> To reduce MMU lock contention during dirty logging, all permission
+> relaxation operations would be performed under read lock.
 > 
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  tools/testing/selftests/kvm/dirty_log_perf_test.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  arch/arm64/kvm/mmu.c | 50 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index 1954b964d1cf..b501338d9430 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -18,6 +18,12 @@
->  #include "test_util.h"
->  #include "perf_test_util.h"
->  #include "guest_modes.h"
-> +#ifdef __aarch64__
-> +#include "aarch64/vgic.h"
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index cafd5813c949..dd1f43fba4b0 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1063,6 +1063,54 @@ static int sanitise_mte_tags(struct kvm *kvm, kvm_pfn_t pfn,
+>  	return 0;
+>  }
+>  
+> +static bool fast_mark_writable(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> +		struct kvm_memory_slot *memslot, unsigned long fault_status)
+> +{
+> +	int ret;
+> +	bool writable;
+> +	bool write_fault = kvm_is_write_fault(vcpu);
+> +	gfn_t gfn = fault_ipa >> PAGE_SHIFT;
+> +	kvm_pfn_t pfn;
+> +	struct kvm *kvm = vcpu->kvm;
+> +	bool logging_active = memslot_is_logging(memslot);
+> +	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
+> +	unsigned long fault_granule;
 > +
-> +#define GICD_BASE_GPA			0x8000000ULL
-> +#define GICR_BASE_GPA			0x80A0000ULL
+> +	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+> +
+> +	/* Make sure the fault can be handled in the fast path.
+> +	 * Only handle write permission fault on non-hugepage during dirty
+> +	 * logging period.
+> +	 */
+> +	if (fault_status != FSC_PERM || fault_granule != PAGE_SIZE
+> +			|| !logging_active || !write_fault)
+> +		return false;
+> +
+> +
+> +	/* Pin the pfn to make sure it couldn't be freed and be resued for
+> +	 * another gfn.
+> +	 */
+> +	pfn = __gfn_to_pfn_memslot(memslot, gfn, true, NULL,
+> +				   write_fault, &writable, NULL);
 
-How did you pick these values?
+Why the requirement to be atomic? Once this returns, the page will
+have an elevated refcount, atomic or not. Given that we're not in an
+environment that requires atomicity (we're fully preemptible at this
+stage), I wonder what this is achieving.
+
+> +	if (is_error_pfn(pfn) || !writable)
+> +		return false;
+> +
+> +	read_lock(&kvm->mmu_lock);
+
+You also dropped the hazarding against a concurrent MMU notifier. Why
+is it safe to do so?
+
+> +	ret = kvm_pgtable_stage2_relax_perms(
+> +			vcpu->arch.hw_mmu->pgt, fault_ipa, PAGE_HYP);
+> +
+> +	if (!ret) {
+> +		kvm_set_pfn_dirty(pfn);
+> +		mark_page_dirty_in_slot(kvm, memslot, gfn);
+> +	}
+> +	read_unlock(&kvm->mmu_lock);
+> +
+> +	kvm_set_pfn_accessed(pfn);
+> +	kvm_release_pfn_clean(pfn);
+> +
+> +	return true;
+> +}
+> +
+>  static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  			  struct kvm_memory_slot *memslot, unsigned long hva,
+>  			  unsigned long fault_status)
+> @@ -1085,6 +1133,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+>  	struct kvm_pgtable *pgt;
+>  
+> +	if (fast_mark_writable(vcpu, fault_ipa, memslot, fault_status))
+> +		return 0;
+>  	fault_granule = 1UL << ARM64_HW_PGTABLE_LEVEL_SHIFT(fault_level);
+>  	write_fault = kvm_is_write_fault(vcpu);
+>  	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
 
 Thanks,
 
