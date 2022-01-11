@@ -2,79 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A31C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 21:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4FFC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 22:12:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C49504B11C;
-	Tue, 11 Jan 2022 16:02:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE30F4B0D9;
+	Tue, 11 Jan 2022 17:12:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2Vcxn1+aoLj3; Tue, 11 Jan 2022 16:02:36 -0500 (EST)
+	with ESMTP id Fd8CRMGyGPFB; Tue, 11 Jan 2022 17:12:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B566C4B12E;
-	Tue, 11 Jan 2022 16:02:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 984B349F40;
+	Tue, 11 Jan 2022 17:12:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D42F04B11C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 16:02:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77D5B49F3E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 17:12:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6uXdH-Mnj5Nu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Jan 2022 16:02:34 -0500 (EST)
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com
- [209.85.214.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B215049FE6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 16:02:34 -0500 (EST)
-Received: by mail-pl1-f176.google.com with SMTP id g5so629704plo.12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 13:02:34 -0800 (PST)
+ with ESMTP id UGLZ8TFG6Wrt for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Jan 2022 17:12:46 -0500 (EST)
+Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com
+ [209.85.222.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4451F49F36
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 17:12:46 -0500 (EST)
+Received: by mail-ua1-f52.google.com with SMTP id p1so1261753uap.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 14:12:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=KP22ekfBfvtfdZJuVQAmoq8mG19AH/gb+o7LwKndtYs=;
- b=b/P8JT3dnswhxIdvQnrQuqhUXUeaJ1GZbigQbjs9sIgAsLD4ixy/s9Rim/uumbTLr/
- hmGE2gF+yj3wXwhJDjoJSf4WpKTRuKft/UrhmsJkf5Azn1VA4pEjq43xO1U3N+tkODSg
- eeTWU3giubfEZBDAtAknNHCKhI3uHiiSqFL8sWsVZHbLKYLv0X3rYSQzgk2vmJWN1bsG
- SLdXXggYx8s7P5c8ITinq5w6zb4DiX/DF10A+2g5TS7DFlo3S0ejJcTqPTjkZym09X2q
- J0fl5UOW9MgoArXIXRf7WEokjCoStGC5HvkEW/r6ZdroAIzUo8HrwmoXbHwhAOITQNh8
- 6Mdw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=r07AHSrwP7IiWaEc7XuaOpzxQqznHXlAJOTUVnC9Vs4=;
+ b=SoKy7zFxyiZIdEqDDvOy55G3RyQeDHBYuXYA0ds5AFE1ghNy88MWPRSTJJu1I27m//
+ Tn0zXSHitKGrBp82XAL0fqoQEQftUzzmRiRs3cYeqCqKNWnVrqdNdiGuAKiExQbrJ/pn
+ PeeU8VO/ymOqvy1DR08Ddip5epHa/U+1AvWGOU5mFS00J6+PQf+GxHG7fgugyVD9q/E0
+ ddcKS/8jlMs6CeE1VnGo/jSicIwx7r2YbZemenSGs2pQqqMbSFcIfSeWISIqG2Q2ZyGC
+ ViHS32HwVD+VIzeEMdbcAwmlRNq7I+FmHmKrUdjmOgMg54ZCHnb/lmlKpIq4kpt3lFY1
+ K3kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=KP22ekfBfvtfdZJuVQAmoq8mG19AH/gb+o7LwKndtYs=;
- b=p+B0njFyqDFzkP/sdDu9/JGXu2oPzk3aJzvU4VxLyKuEE3dPbzBwFeSsheM9Z3Gr9F
- UFe6IF/aN15/160aw7A6Pdwoy2dC7UP6NkpTWSkwareHKiIUoxE+TkERtEL+o3mIr2aG
- 6vMgXRP8K6sLpylx0fLnDKcPF4p3xGSvIwYV3ORCSH7lcf4/DICjcVLJo1H+hSBA37EZ
- LuRD0dkJ6rlPB95SjYe615khnmv/ELYKa3lp7GShpoMKF2DieatCtdEZz1EnnecAlUL6
- C7S6AZHDpeLIxHvKlNaet7P3MUIsIWdYqdKzlj+z6qMBos0+aq4oFptSq7X/omGfL3xH
- S7mw==
-X-Gm-Message-State: AOAM533ie3bqKjosk0L6SJpP4bzdjb2wX+5A6Q0MWLPS2zWcc5NPkSXK
- SSDmnAkygmiMAKZw1vtwC5GJPw==
-X-Google-Smtp-Source: ABdhPJwYyA1X7Bfg45oD8YBhBwdA5jD7QS6C7HOdCnRZ2tfTgfGILyCszz8uNmzWyZLAkeSMiyLXGg==
-X-Received: by 2002:a17:90a:9284:: with SMTP id
- n4mr5133516pjo.109.1641934953660; 
- Tue, 11 Jan 2022 13:02:33 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id h19sm11844710pfh.112.2022.01.11.13.02.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 11 Jan 2022 13:02:33 -0800 (PST)
-Date: Tue, 11 Jan 2022 13:02:29 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [kvm-unit-tests PATCH] arm64: debug: mark test_[bp, wp, ss] as
- noinline
-Message-ID: <Yd3wZaEVMTjdqpk2@google.com>
-References: <20220111041103.2199594-1-ricarkol@google.com>
- <Yd3dvorNkP7eercw@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=r07AHSrwP7IiWaEc7XuaOpzxQqznHXlAJOTUVnC9Vs4=;
+ b=NKbP+tPxY7VaCTdlZkAMLO6pt3eRzlHIijFLGefgsiLUrqo386V9siYJJQJYZ2GCzO
+ V/vhzwAZs+n0YV7EjqPOO2wc1uiVzx/I+WdDKQaRXQ715//TNgunERQSGbV0f8Wg16FT
+ d3T+uXRt0sEbKKh/H51ZAfVEaoIZZxaMlLO4S/uyExRLBdI4ltLKqRFUWxrFUYA+/i8S
+ Vq9HWtlJXeu/cfqW75gqyA9gWcoZ3ZwWK7IzNxNmR0uyMva34wq41APGeER9y3XuHS/3
+ JYAWjYkLO1QXrMRSGW6LKVEpxMV9Su1TmgUN3k8GGIgIXlC47+w/Bg+JOU5QBh0umR8U
+ bQ2w==
+X-Gm-Message-State: AOAM532VeR6zTwxKMG/DkP3B/9U7JX9sdTXaK1/Ixn2sdkSzRD1Tp580
+ lWhGtI3a0yZbhWN1duZdtxOA0DhYNZCXMlPIIY2JLQ==
+X-Google-Smtp-Source: ABdhPJykyDLPhTd+VxJJF2l6DucJ4yNqzfCKkidJatnlOChHRQstJQQgi8avKM3niDpObkvUxYiEkxdrWnFBgVBxboQ=
+X-Received: by 2002:a05:6102:c46:: with SMTP id
+ y6mr3403896vss.82.1641939165542; 
+ Tue, 11 Jan 2022 14:12:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yd3dvorNkP7eercw@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, maz@kernel.org
+References: <20220110210441.2074798-1-jingzhangos@google.com>
+ <877db6trlc.wl-maz@kernel.org>
+In-Reply-To: <877db6trlc.wl-maz@kernel.org>
+From: Jing Zhang <jingzhangos@google.com>
+Date: Tue, 11 Jan 2022 14:12:33 -0800
+Message-ID: <CAAdAUtiZ4GXkDfjeknCmN5TZAiw5roH2h8pdeUGLMva50CL6rg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] ARM64: Guest performance improvement during dirty
+To: Marc Zyngier <maz@kernel.org>
+Cc: KVM <kvm@vger.kernel.org>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,44 +84,121 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jan 11, 2022 at 07:42:54PM +0000, Sean Christopherson wrote:
-> On Mon, Jan 10, 2022, Ricardo Koller wrote:
-> > Clang inlines some functions (like test_ss) which define global labels
-> > in inline assembly (e.g., ss_start). This results in:
-> > 
-> >     arm/debug.c:382:15: error: invalid symbol redefinition
-> >             asm volatile("ss_start:\n"
-> >                          ^
-> >     <inline asm>:1:2: note: instantiated into assembly here
-> >             ss_start:
-> >             ^
-> >     1 error generated.
-> > 
-> > Fix these functions by marking them as "noinline".
-> > 
-> > Cc: Andrew Jones <drjones@redhat.com>
-> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > ---
-> > This applies on top of: "[kvm-unit-tests PATCH 0/3] arm64: debug: add migration tests for debug state"
-> > which is in https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue.
-> > 
-> >  arm/debug.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arm/debug.c b/arm/debug.c
-> > index 54f059d..6c5b683 100644
-> > --- a/arm/debug.c
-> > +++ b/arm/debug.c
-> > @@ -264,7 +264,7 @@ static void do_migrate(void)
-> >  	report_info("Migration complete");
-> >  }
-> >  
-> > -static void test_hw_bp(bool migrate)
-> > +static __attribute__((noinline)) void test_hw_bp(bool migrate)
-> 
-> Use "noinline", which was added by commit 16431a7 ("lib: define the "noinline" macro").
+On Tue, Jan 11, 2022 at 3:55 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Mon, 10 Jan 2022 21:04:38 +0000,
+> Jing Zhang <jingzhangos@google.com> wrote:
+> >
+> > This patch is to reduce the performance degradation of guest workload during
+> > dirty logging on ARM64. A fast path is added to handle permission relaxation
+> > during dirty logging. The MMU lock is replaced with rwlock, by which all
+> > permision relaxations on leaf pte can be performed under the read lock. This
+> > greatly reduces the MMU lock contention during dirty logging. With this
+> > solution, the source guest workload performance degradation can be improved
+> > by more than 60%.
+> >
+> > Problem:
+> >   * A Google internal live migration test shows that the source guest workload
+> >   performance has >99% degradation for about 105 seconds, >50% degradation
+> >   for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
+> >   This shows that most of the time, the guest workload degradtion is above
+> >   99%, which obviously needs some improvement compared to the test result
+> >   on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
+> >   * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB
+> >   * VM spec: #vCPU: 48, #Mem/vCPU: 4GB
+>
+> What are the host and guest page sizes?
+Both are 4K and guest mem is 2M hugepage backed. Will add the info for
+future posts.
+>
+> >
+> > Analysis:
+> >   * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
+> >     the number of contentions of MMU lock and the "dirty memory time" on
+> >     various VM spec.
+> >     By using test command
+> >     ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
+>
+> How is this test representative of the internal live migration test
+> you mention above? '-m 2' indicates a mode that varies depending on
+> the HW and revision of the test (I just added a bunch of supported
+> modes). Which one is it?
+The "dirty memory time" is the time vCPU threads spent in KVM after
+fault. Higher "dirty memory time" means higher degradation to guest
+workload.
+'-m 2' indicates mode "PA-bits:48,  VA-bits:48,  4K pages". Will add
+this for future posts.
+>
+> >     Below are the results:
+> >     +-------+------------------------+-----------------------+
+> >     | #vCPU | dirty memory time (ms) | number of contentions |
+> >     +-------+------------------------+-----------------------+
+> >     | 1     | 926                    | 0                     |
+> >     +-------+------------------------+-----------------------+
+> >     | 2     | 1189                   | 4732558               |
+> >     +-------+------------------------+-----------------------+
+> >     | 4     | 2503                   | 11527185              |
+> >     +-------+------------------------+-----------------------+
+> >     | 8     | 5069                   | 24881677              |
+> >     +-------+------------------------+-----------------------+
+> >     | 16    | 10340                  | 50347956              |
+> >     +-------+------------------------+-----------------------+
+> >     | 32    | 20351                  | 100605720             |
+> >     +-------+------------------------+-----------------------+
+> >     | 64    | 40994                  | 201442478             |
+> >     +-------+------------------------+-----------------------+
+> >
+> >   * From the test results above, the "dirty memory time" and the number of
+> >     MMU lock contention scale with the number of vCPUs. That means all the
+> >     dirty memory operations from all vCPU threads have been serialized by
+> >     the MMU lock. Further analysis also shows that the permission relaxation
+> >     during dirty logging is where vCPU threads get serialized.
+> >
+> > Solution:
+> >   * On ARM64, there is no mechanism as PML (Page Modification Logging) and
+> >     the dirty-bit solution for dirty logging is much complicated compared to
+> >     the write-protection solution. The straight way to reduce the guest
+> >     performance degradation is to enhance the concurrency for the permission
+> >     fault path during dirty logging.
+> >   * In this patch, we only put leaf PTE permission relaxation for dirty
+> >     logging under read lock, all others would go under write lock.
+> >     Below are the results based on the solution:
+> >     +-------+------------------------+
+> >     | #vCPU | dirty memory time (ms) |
+> >     +-------+------------------------+
+> >     | 1     | 803                    |
+> >     +-------+------------------------+
+> >     | 2     | 843                    |
+> >     +-------+------------------------+
+> >     | 4     | 942                    |
+> >     +-------+------------------------+
+> >     | 8     | 1458                   |
+> >     +-------+------------------------+
+> >     | 16    | 2853                   |
+> >     +-------+------------------------+
+> >     | 32    | 5886                   |
+> >     +-------+------------------------+
+> >     | 64    | 12190                  |
+> >     +-------+------------------------+
+> >     All "dirty memory time" have been reduced by more than 60% when the
+> >     number of vCPU grows.
+>
+> How does that translate to the original problem statement with your
+> live migration test?
+Based on the solution, the test results from the Google internal live
+migration test also shows more than 60% improvement with >99% for 30s,
+>50% for 58s and >10% for 76s.
+Will add this info in to future posts.
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 
-Will do, thanks for the pointer.
+Thanks,
+Jing
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
