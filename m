@@ -2,69 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE1EEC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 06:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D75C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 06:43:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29F7049F2F;
-	Wed, 12 Jan 2022 01:35:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81EEE49F12;
+	Wed, 12 Jan 2022 01:43:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id foeHwmUouxwp; Wed, 12 Jan 2022 01:35:03 -0500 (EST)
+	with ESMTP id Ub9MkCNQ+dhs; Wed, 12 Jan 2022 01:43:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C37064B13D;
-	Wed, 12 Jan 2022 01:35:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D1E124B093;
+	Wed, 12 Jan 2022 01:43:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C5B449F2F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 01:35:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FD4549F29
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 01:43:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GWquGYVJZapF for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Jan 2022 01:35:02 -0500 (EST)
+ with ESMTP id bzcNG200kzZ7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Jan 2022 01:43:48 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2708D49F29
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 01:35:02 -0500 (EST)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C891649F12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 01:43:48 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1641969301;
+ s=mimecast20190719; t=1641969828;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B1z83hJO+HnY0jnMCoreYTDUsNFy5zyg+TrY2m14oOE=;
- b=GPTCHPYQmkkGEzNfeG7YaWlmM1q1VdmTJi1QoEYme+rDsYbNhS9OQwds4ZixpYMukR3n2e
- zQfHDaDIbyj0tHfJ3E0D7v9PaSESkRBpyLldENUUD7fuJJ2zPjV/4QSHVN+B6u5ruXwysK
- /1xf1iUq7eUmNIQUBchc5ASTF9q9XVc=
+ bh=H2/scgVj9r7wMSNo1nFE4yD66dJitUm+1roYfYsXnC8=;
+ b=H4C06vDar+x7koY62Esn581f76gslcVhw6n6JJtZ+5VzLl/6Ge/KwNJPUBql1a4cwpPkwJ
+ 93DGAy7wBl55zzw4Iu40Z32QPOuDv4ab/CprMG88ECdCpZ6DBR8UgJa8nord3dN82jeXhq
+ 4bwPk22Bp/H7J7i/8Q7/3zoJJm460XA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-322-08llcZ5POhO_IXuM-CXU9g-1; Wed, 12 Jan 2022 01:34:55 -0500
-X-MC-Unique: 08llcZ5POhO_IXuM-CXU9g-1
+ us-mta-241-gWt-zo3MMv6vg9VTi7Q3eQ-1; Wed, 12 Jan 2022 01:43:45 -0500
+X-MC-Unique: gWt-zo3MMv6vg9VTi7Q3eQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 146B181CCB6;
- Wed, 12 Jan 2022 06:34:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7F8084B9A7;
+ Wed, 12 Jan 2022 06:43:43 +0000 (UTC)
 Received: from [10.72.12.204] (ovpn-12-204.pek2.redhat.com [10.72.12.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F9935E49B;
- Wed, 12 Jan 2022 06:34:49 +0000 (UTC)
-Subject: Re: [PATCH v4 13/21] KVM: arm64: Impment SDEI event delivery
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C148173140;
+ Wed, 12 Jan 2022 06:43:39 +0000 (UTC)
+Subject: Re: [PATCH v4 14/21] KVM: arm64: Support SDEI_EVENT_{COMPLETE,
+ COMPLETE_AND_RESUME} hypercall
 To: Eric Auger <eauger@redhat.com>, kvmarm@lists.cs.columbia.edu
 References: <20210815001352.81927-1-gshan@redhat.com>
- <20210815001352.81927-14-gshan@redhat.com>
- <74c5f170-fb08-56a7-ff87-9a51ecfda989@redhat.com>
+ <20210815001352.81927-15-gshan@redhat.com>
+ <62c67e31-fa33-24e9-6508-59976673c0db@redhat.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <61768711-a68d-db9a-f049-61fa25808183@redhat.com>
-Date: Wed, 12 Jan 2022 14:34:46 +0800
+Message-ID: <fdb013e7-10a1-58de-92aa-3ab9d25346fa@redhat.com>
+Date: Wed, 12 Jan 2022 14:43:36 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <74c5f170-fb08-56a7-ff87-9a51ecfda989@redhat.com>
+In-Reply-To: <62c67e31-fa33-24e9-6508-59976673c0db@redhat.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Cc: maz@kernel.org, pbonzini@redhat.com, will@kernel.org,
@@ -89,200 +90,243 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 Hi Eric,
 
 On 11/10/21 6:58 PM, Eric Auger wrote:
-> s/Impment/Implement in the commit title
-> 
 > On 8/15/21 2:13 AM, Gavin Shan wrote:
->> This implement kvm_sdei_deliver() to support SDEI event delivery.
->> The function is called when the request (KVM_REQ_SDEI) is raised.
->> The following rules are taken according to the SDEI specification:
+>> This supports SDEI_EVENT_{COMPLETE, COMPLETE_AND_RESUME} hypercall.
+>> They are used by the guest to notify the completion of the SDEI
+>> event in the handler. The registers are changed according to the
+>> SDEI specification as below:
 >>
->>     * x0 - x17 are saved. All of them are cleared except the following
->>       registered:
-> s/registered/registers
->>       x0: number SDEI event to be delivered
-> s/number SDEI event/SDEI event number
->>       x1: parameter associated with the SDEI event
-> user arg?
-
-The commit log will be improved in next respin.
-
->>       x2: PC of the interrupted context
->>       x3: PState of the interrupted context
+>>     * x0 - x17, PC and PState are restored to what values we had in
+>>       the interrupted context.
 >>
->>     * PC is set to the handler of the SDEI event, which was provided
->>       during its registration. PState is modified accordingly.
->>
->>     * SDEI event with critical priority can preempt those with normal
->>       priority.
+>>     * If it's SDEI_EVENT_COMPLETE_AND_RESUME hypercall, IRQ exception
+>>       is injected.
 >>
 >> Signed-off-by: Gavin Shan <gshan@redhat.com>
 >> ---
->>   arch/arm64/include/asm/kvm_host.h |  1 +
->>   arch/arm64/include/asm/kvm_sdei.h |  1 +
->>   arch/arm64/kvm/arm.c              |  3 ++
->>   arch/arm64/kvm/sdei.c             | 84 +++++++++++++++++++++++++++++++
->>   4 files changed, 89 insertions(+)
+>>   arch/arm64/include/asm/kvm_emulate.h |  1 +
+>>   arch/arm64/include/asm/kvm_host.h    |  1 +
+>>   arch/arm64/kvm/hyp/exception.c       |  7 +++
+>>   arch/arm64/kvm/inject_fault.c        | 27 ++++++++++
+>>   arch/arm64/kvm/sdei.c                | 75 ++++++++++++++++++++++++++++
+>>   5 files changed, 111 insertions(+)
 >>
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>> index fd418955e31e..923b4d08ea9a 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -37,6 +37,7 @@ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+>>   void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+>>   
+>>   void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+>> +void kvm_inject_irq(struct kvm_vcpu *vcpu);
+>>   void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+>>   void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+>>   void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
 >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index aedf901e1ec7..46f363aa6524 100644
+>> index 46f363aa6524..1824f7e1f9ab 100644
 >> --- a/arch/arm64/include/asm/kvm_host.h
 >> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -47,6 +47,7 @@
->>   #define KVM_REQ_RECORD_STEAL	KVM_ARCH_REQ(3)
->>   #define KVM_REQ_RELOAD_GICv4	KVM_ARCH_REQ(4)
->>   #define KVM_REQ_RELOAD_PMU	KVM_ARCH_REQ(5)
->> +#define KVM_REQ_SDEI		KVM_ARCH_REQ(6)
->>   
->>   #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
->>   				     KVM_DIRTY_LOG_INITIALLY_SET)
->> diff --git a/arch/arm64/include/asm/kvm_sdei.h b/arch/arm64/include/asm/kvm_sdei.h
->> index b0abc13a0256..7f5f5ad689e6 100644
->> --- a/arch/arm64/include/asm/kvm_sdei.h
->> +++ b/arch/arm64/include/asm/kvm_sdei.h
->> @@ -112,6 +112,7 @@ KVM_SDEI_FLAG_FUNC(enabled)
->>   void kvm_sdei_init_vm(struct kvm *kvm);
->>   void kvm_sdei_create_vcpu(struct kvm_vcpu *vcpu);
->>   int kvm_sdei_hypercall(struct kvm_vcpu *vcpu);
->> +void kvm_sdei_deliver(struct kvm_vcpu *vcpu);
->>   void kvm_sdei_destroy_vcpu(struct kvm_vcpu *vcpu);
->>   void kvm_sdei_destroy_vm(struct kvm *kvm);
->>   
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 2f021aa41632..0c3db1ef1ba9 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -689,6 +689,9 @@ static void check_vcpu_requests(struct kvm_vcpu *vcpu)
->>   		if (kvm_check_request(KVM_REQ_VCPU_RESET, vcpu))
->>   			kvm_reset_vcpu(vcpu);
->>   
->> +		if (kvm_check_request(KVM_REQ_SDEI, vcpu))
->> +			kvm_sdei_deliver(vcpu);
->> +
->>   		/*
->>   		 * Clear IRQ_PENDING requests that were made to guarantee
->>   		 * that a VCPU sees new virtual interrupts.
->> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
->> index 62efee2b67b8..b5d6d1ed3858 100644
->> --- a/arch/arm64/kvm/sdei.c
->> +++ b/arch/arm64/kvm/sdei.c
->> @@ -671,6 +671,90 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
->>   	return 1;
+>> @@ -437,6 +437,7 @@ struct kvm_vcpu_arch {
+>>   #define KVM_ARM64_EXCEPT_AA32_UND	(0 << 9)
+>>   #define KVM_ARM64_EXCEPT_AA32_IABT	(1 << 9)
+>>   #define KVM_ARM64_EXCEPT_AA32_DABT	(2 << 9)
+>> +#define KVM_ARM64_EXCEPT_AA32_IRQ	(3 << 9)
+>>   /* For AArch64: */
+>>   #define KVM_ARM64_EXCEPT_AA64_ELx_SYNC	(0 << 9)
+>>   #define KVM_ARM64_EXCEPT_AA64_ELx_IRQ	(1 << 9)
+>> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+>> index 0418399e0a20..ef458207d152 100644
+>> --- a/arch/arm64/kvm/hyp/exception.c
+>> +++ b/arch/arm64/kvm/hyp/exception.c
+>> @@ -310,6 +310,9 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+>>   		case KVM_ARM64_EXCEPT_AA32_DABT:
+>>   			enter_exception32(vcpu, PSR_AA32_MODE_ABT, 16);
+>>   			break;
+>> +		case KVM_ARM64_EXCEPT_AA32_IRQ:
+>> +			enter_exception32(vcpu, PSR_AA32_MODE_IRQ, 4);
+>> +			break;
+>>   		default:
+>>   			/* Err... */
+>>   			break;
+>> @@ -320,6 +323,10 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+>>   		      KVM_ARM64_EXCEPT_AA64_EL1):
+>>   			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+>>   			break;
+>> +		case (KVM_ARM64_EXCEPT_AA64_ELx_IRQ |
+>> +		      KVM_ARM64_EXCEPT_AA64_EL1):
+>> +			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_irq);
+>> +			break;
+>>   		default:
+>>   			/*
+>>   			 * Only EL1_SYNC makes sense so far, EL2_{SYNC,IRQ}
+>> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+>> index b47df73e98d7..3a8c55867d2f 100644
+>> --- a/arch/arm64/kvm/inject_fault.c
+>> +++ b/arch/arm64/kvm/inject_fault.c
+>> @@ -66,6 +66,13 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+>>   	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
 >>   }
 >>   
->> +void kvm_sdei_deliver(struct kvm_vcpu *vcpu)
+>> +static void inject_irq64(struct kvm_vcpu *vcpu)
+>> +{
+>> +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1     |
+>> +			     KVM_ARM64_EXCEPT_AA64_ELx_IRQ |
+>> +			     KVM_ARM64_PENDING_EXCEPTION);
+>> +}
+>> +
+>>   #define DFSR_FSC_EXTABT_LPAE	0x10
+>>   #define DFSR_FSC_EXTABT_nLPAE	0x08
+>>   #define DFSR_LPAE		BIT(9)
+>> @@ -77,6 +84,12 @@ static void inject_undef32(struct kvm_vcpu *vcpu)
+>>   			     KVM_ARM64_PENDING_EXCEPTION);
+>>   }
+>>   
+>> +static void inject_irq32(struct kvm_vcpu *vcpu)
+>> +{
+>> +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA32_IRQ |
+>> +			     KVM_ARM64_PENDING_EXCEPTION);
+>> +}
+>> +
+>>   /*
+>>    * Modelled after TakeDataAbortException() and TakePrefetchAbortException
+>>    * pseudocode.
+>> @@ -160,6 +173,20 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+>>   		inject_undef64(vcpu);
+>>   }
+>>   
+>> +/**
+>> + * kvm_inject_irq - inject an IRQ into the guest
+>> + *
+>> + * It is assumed that this code is called from the VCPU thread and that the
+>> + * VCPU therefore is not currently executing guest code.
+>> + */
+>> +void kvm_inject_irq(struct kvm_vcpu *vcpu)
+>> +{
+>> +	if (vcpu_el1_is_32bit(vcpu))
+>> +		inject_irq32(vcpu);
+>> +	else
+>> +		inject_irq64(vcpu);
+>> +}
+>> +
+>>   void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 esr)
+>>   {
+>>   	vcpu_set_vsesr(vcpu, esr & ESR_ELx_ISS_MASK);
+>> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
+>> index b5d6d1ed3858..1e8e213c9d70 100644
+>> --- a/arch/arm64/kvm/sdei.c
+>> +++ b/arch/arm64/kvm/sdei.c
+>> @@ -308,6 +308,75 @@ static unsigned long kvm_sdei_hypercall_context(struct kvm_vcpu *vcpu)
+>>   	return ret;
+>>   }
+>>   
+>> +static unsigned long kvm_sdei_hypercall_complete(struct kvm_vcpu *vcpu,
+>> +						 bool resume)
 >> +{
 >> +	struct kvm *kvm = vcpu->kvm;
 >> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
 >> +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
->> +	struct kvm_sdei_event *kse = NULL;
 >> +	struct kvm_sdei_kvm_event *kske = NULL;
 >> +	struct kvm_sdei_vcpu_event *ksve = NULL;
->> +	struct kvm_sdei_vcpu_regs *regs = NULL;
->> +	unsigned long pstate;
->> +	int index = 0;
+>> +	struct kvm_sdei_vcpu_regs *regs;
+>> +	unsigned long ret = SDEI_SUCCESS;
+> for the RESUME you never seem to read resume_addr arg? How does it work?
+> I don't get the irq injection path. Please could you explain?
+
+The guest kernel uses COMPLETE and COMPLETE_AND_RESUME hypercalls to notify the
+SDEI event has been acknoledged by it. The difference between them is COMPLETE_AND_RESUME
+fires the pending interrupts, but COMPLETE doesn't.
+
+>> +	int index;
 >> +
 >> +	/* Sanity check */
->> +	if (!(ksdei && vsdei))
->> +		return;
+>> +	if (!(ksdei && vsdei)) {
+>> +		ret = SDEI_NOT_SUPPORTED;
+>> +		goto out;
+>> +	}
 >> +
->> +	/* The critical event can't be preempted */
-> move the comment after the spin_lock
-
-Ok.
-
 >> +	spin_lock(&vsdei->lock);
->> +	if (vsdei->critical_event)
->> +		goto unlock;
->> +
->> +	/*
->> +	 * The normal event can be preempted by the critical event.
->> +	 * However, the normal event can't be preempted by another
->> +	 * normal event.
->> +	 */
->> +	ksve = list_first_entry_or_null(&vsdei->critical_events,
->> +			struct kvm_sdei_vcpu_event, link);
->> +	if (!ksve && !vsdei->normal_event) {
->> +		ksve = list_first_entry_or_null(&vsdei->normal_events,
->> +				struct kvm_sdei_vcpu_event, link);
->> +	}
-> At this stage of the review the struct kvm_sdei_vcpu_event lifecycle is
-> not known.
-> 
-
-The object (kvm_sdei_vcpu_event) is queued to the target vCPU for dispatch.
-The multiple and same SDEI events can be queued to one target vCPU. In this
-case, the objecct is reused.
-
->>From the dispatcher pseudocode I understand you check
-> 
-> ((IsCriticalEvent(E) and !CriticalEventRunning(P, C)) ||
-> (!IsCriticalEvent(E) and !EventRunning(P, C)))
-> 
-> but I can't check you take care of
-> IsEnabled(E) and
-> IsEventTarget(E, P)
-> IsUnmasked(P)
-> 
-> Either you should shash with 18/21 or at least you should add comments.
-
-The additional conditions are checked when the event is injected in PATCH[v4 18/21].
-I think it's good idead to squash them.
-
->> +
->> +	if (!ksve)
->> +		goto unlock;
->> +
->> +	kske = ksve->kske;
->> +	kse = kske->kse;
->> +	if (kse->state.priority == SDEI_EVENT_PRIORITY_CRITICAL) {
->> +		vsdei->critical_event = ksve;
->> +		vsdei->state.critical_num = ksve->state.num;
+>> +	if (vsdei->critical_event) {
+>> +		ksve = vsdei->critical_event;
 >> +		regs = &vsdei->state.critical_regs;
->> +	} else {
->> +		vsdei->normal_event = ksve;
->> +		vsdei->state.normal_num = ksve->state.num;
+>> +		vsdei->critical_event = NULL;
+>> +		vsdei->state.critical_num = KVM_SDEI_INVALID_NUM;
+>> +	} else if (vsdei->normal_event) {
+>> +		ksve = vsdei->normal_event;
 >> +		regs = &vsdei->state.normal_regs;
+>> +		vsdei->normal_event = NULL;
+>> +		vsdei->state.normal_num = KVM_SDEI_INVALID_NUM;
+>> +	} else {
+>> +		ret = SDEI_DENIED;
+>> +		goto unlock;
 >> +	}
 >> +
->> +	/* Save registers: x0 -> x17, PC, PState */
+>> +	/* Restore registers: x0 -> x17, PC, PState */
 >> +	for (index = 0; index < ARRAY_SIZE(regs->regs); index++)
->> +		regs->regs[index] = vcpu_get_reg(vcpu, index);
+>> +		vcpu_set_reg(vcpu, index, regs->regs[index]);
 >> +
->> +	regs->pc = *vcpu_pc(vcpu);
->> +	regs->pstate = *vcpu_cpsr(vcpu);
+>> +	*vcpu_cpsr(vcpu) = regs->pstate;
+>> +	*vcpu_pc(vcpu) = regs->pc;
+>> +
+>> +	/* Inject interrupt if needed */
+>> +	if (resume)
+>> +		kvm_inject_irq(vcpu);
 >> +
 >> +	/*
->> +	 * Inject SDEI event: x0 -> x3, PC, PState. We needn't take lock
->> +	 * for the KVM event as it can't be destroyed because of its
->> +	 * reference count.
+>> +	 * Update state. We needn't take lock in order to update the KVM
+>> +	 * event state as it's not destroyed because of the reference
+>> +	 * count.
 >> +	 */
->> +	for (index = 0; index < ARRAY_SIZE(regs->regs); index++)
->> +		vcpu_set_reg(vcpu, index, 0);
+>> +	kske = ksve->kske;
+>> +	ksve->state.refcount--;
+>> +	kske->state.refcount--;
+> why double --?
+
+On each SDEI event is queued for delivery, both reference count are increased. I guess
+it's a bit confusing. I will change in next revision:
+
+ksve->state.refcount: Increased on each SDEI event is queued for delivered
+kske->state.refcount: Increased on each @ksve is created
+
+
+>> +	if (!ksve->state.refcount) {
+> why not using a struct kref directly?
+
+The reason is kref isn't friendly to userspace. This field (@refcount) needs to be
+migrated :)
+
+>> +		list_del(&ksve->link);
+>> +		kfree(ksve);
+>> +	}
 >> +
->> +	index = (kse->state.type == SDEI_EVENT_TYPE_PRIVATE) ?
->> +		vcpu->vcpu_idx : 0;
->> +	vcpu_set_reg(vcpu, 0, kske->state.num);
->> +	vcpu_set_reg(vcpu, 1, kske->state.params[index]);
->> +	vcpu_set_reg(vcpu, 2, regs->pc);
->> +	vcpu_set_reg(vcpu, 3, regs->pstate);
->> +
->> +	pstate = regs->pstate;
->> +	pstate |= (PSR_D_BIT | PSR_A_BIT | PSR_I_BIT | PSR_F_BIT);
->> +	pstate &= ~PSR_MODE_MASK;
->> +	pstate |= PSR_MODE_EL1h;
->> +	pstate &= ~PSR_MODE32_BIT;
->> +
->> +	vcpu_write_sys_reg(vcpu, regs->pstate, SPSR_EL1);
->> +	*vcpu_cpsr(vcpu) = pstate;
->> +	*vcpu_pc(vcpu) = kske->state.entries[index];
+>> +	/* Make another request if there is pending event */
+>> +	if (!(list_empty(&vsdei->critical_events) &&
+>> +	      list_empty(&vsdei->normal_events)))
+>> +		kvm_make_request(KVM_REQ_SDEI, vcpu);
 >> +
 >> +unlock:
 >> +	spin_unlock(&vsdei->lock);
+>> +out:
+>> +	return ret;
 >> +}
 >> +
->>   void kvm_sdei_init_vm(struct kvm *kvm)
+>>   static unsigned long kvm_sdei_hypercall_unregister(struct kvm_vcpu *vcpu)
 >>   {
->>   	struct kvm_sdei_kvm *ksdei;
+>>   	struct kvm *kvm = vcpu->kvm;
+>> @@ -628,7 +697,13 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
+>>   		ret = kvm_sdei_hypercall_context(vcpu);
+>>   		break;
+>>   	case SDEI_1_0_FN_SDEI_EVENT_COMPLETE:
+>> +		has_result = false;
+>> +		ret = kvm_sdei_hypercall_complete(vcpu, false);
+>> +		break;
+>>   	case SDEI_1_0_FN_SDEI_EVENT_COMPLETE_AND_RESUME:
+>> +		has_result = false;
+>> +		ret = kvm_sdei_hypercall_complete(vcpu, true);
+>> +		break;
+>>   	case SDEI_1_0_FN_SDEI_EVENT_UNREGISTER:
+>>   		ret = kvm_sdei_hypercall_unregister(vcpu);
+>>   		break;
 >>
 
 Thanks,
