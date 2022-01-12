@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43051C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 06:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F04C4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 07:03:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9E724B154;
-	Wed, 12 Jan 2022 01:48:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F1754B16E;
+	Wed, 12 Jan 2022 02:03:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8yV2cfu-NNcB; Wed, 12 Jan 2022 01:48:50 -0500 (EST)
+	with ESMTP id 8LmkBJNGEyq6; Wed, 12 Jan 2022 02:03:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 774774B0AC;
-	Wed, 12 Jan 2022 01:48:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 850D04B1B0;
+	Wed, 12 Jan 2022 02:03:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A1A974B093
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 01:48:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84B084B16E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 02:03:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E3UKz1aPWxxa for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Jan 2022 01:48:48 -0500 (EST)
+ with ESMTP id tNDL92LerBhE for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Jan 2022 02:03:37 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AA5B49F29
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 01:48:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B8F34B154
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 02:03:36 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1641970128;
+ s=mimecast20190719; t=1641971016;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j3vZpy1v43MCXzCf8RgSiN5mYO8Oebbulqjm86kYz9w=;
- b=NPGy9vfNuxZhyOQIJ/1PO2VnjSZxZbXo7ag30HIXHWngnUqiIpBuaR6dZ+n/qEpOkGIZry
- mIjwUW1d8BqvJW+YHC6tacTCOOv0RV9qrK7RJSDvFbGnXimewpFrt6gsF0iNQR0FGfYto/
- rxLlwBuyjcUk/nBqdslU6Bw88y+6bwc=
+ bh=J3LSL1gU8SJwYaXJ+vLXFoAHO4dJGzEvNDddl0YaMTk=;
+ b=F4RNgT9dlOfHwWi6ra+ao5IsLi7Fg2NImmwwptd6dVu7YjOkQRIoHgCBMMg/VEAnV8LLpl
+ htdcB+qHO7UsGpYWkuMPykyEKj/8AWUc1KvVSVLnuIF7WJSaEVXTAlwnORCLArKO7PDba/
+ BRSN2b+bvZGKOXy1r9Z5eQKWBEgv+eA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-133-IoTo8QhUNrSgpRdwlrL_dw-1; Wed, 12 Jan 2022 01:48:46 -0500
-X-MC-Unique: IoTo8QhUNrSgpRdwlrL_dw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-329-3No6FUU9PgOMW4ziBpJcMQ-1; Wed, 12 Jan 2022 02:03:33 -0500
+X-MC-Unique: 3No6FUU9PgOMW4ziBpJcMQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71EFB2F25;
- Wed, 12 Jan 2022 06:48:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0997344B0;
+ Wed, 12 Jan 2022 07:03:31 +0000 (UTC)
 Received: from [10.72.12.204] (ovpn-12-204.pek2.redhat.com [10.72.12.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8190A795A1;
- Wed, 12 Jan 2022 06:48:40 +0000 (UTC)
-Subject: Re: [PATCH v4 15/21] KVM: arm64: Support SDEI event notifier
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CDC835E4B0;
+ Wed, 12 Jan 2022 07:03:27 +0000 (UTC)
+Subject: Re: [PATCH v4 16/21] KVM: arm64: Support SDEI ioctl commands on VM
 To: Eric Auger <eauger@redhat.com>, kvmarm@lists.cs.columbia.edu
 References: <20210815001352.81927-1-gshan@redhat.com>
- <20210815001352.81927-16-gshan@redhat.com>
- <a5a9f99b-d919-e381-f4f0-45a1db417843@redhat.com>
+ <20210815001352.81927-17-gshan@redhat.com>
+ <6a4f1736-3af0-ccaa-e8a0-242759610430@redhat.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <a00b94cd-6d31-a180-a929-4c2929b939e8@redhat.com>
-Date: Wed, 12 Jan 2022 14:48:37 +0800
+Message-ID: <96776800-d6fd-757b-348b-e566f068ed2a@redhat.com>
+Date: Wed, 12 Jan 2022 15:03:22 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <a5a9f99b-d919-e381-f4f0-45a1db417843@redhat.com>
+In-Reply-To: <6a4f1736-3af0-ccaa-e8a0-242759610430@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Cc: maz@kernel.org, pbonzini@redhat.com, will@kernel.org,
  linux-kernel@vger.kernel.org, Jonathan.Cameron@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -88,187 +88,328 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Eric,
 
-On 11/10/21 7:35 PM, Eric Auger wrote:
+On 11/10/21 9:48 PM, Eric Auger wrote:
 > On 8/15/21 2:13 AM, Gavin Shan wrote:
->> The owner of the SDEI event, like asynchronous page fault, need
-> owner is not a terminology used in the SDEI spec
->> know the state of injected SDEI event. This supports SDEI event
-> s/need know the state of injected/to know the state of the injected
->> state updating by introducing notifier mechanism. It's notable
-> a notifier mechanism
->> the notifier (handler) should be capable of migration.
-> I don't understand the last sentence
+>> This supports ioctl commands on VM to manage the various objects.
+>> It's primarily used by VMM to accomplish live migration. The ioctl
+>> commands introduced by this are highlighted as blow:
+> below
+>>
+>>     * KVM_SDEI_CMD_GET_VERSION
+>>       Retrieve the version of current implementation
+> which implementation, SDEI?
+>>     * KVM_SDEI_CMD_SET_EVENT
+>>       Add event to be exported from KVM so that guest can register
+>>       against it afterwards
+>>     * KVM_SDEI_CMD_GET_KEVENT_COUNT
+>>       Retrieve number of registered SDEI events
+>>     * KVM_SDEI_CMD_GET_KEVENT
+>>       Retrieve the state of the registered SDEI event
+>>     * KVM_SDEI_CMD_SET_KEVENT
+>>       Populate the registered SDEI event
+> I think we really miss the full picture of what you want to achieve with
+> those IOCTLs or at least I fail to get it. Please document the UAPI
+> separately including the structs and IOCTLs.
 
-Thanks, Eric. The commit log will be improved accordingly in next
-revision.
+The commit log will be improved accordingly in next revision. Yep, I will
+add document for UAPI and IOCTLs :)
 
 >>
 >> Signed-off-by: Gavin Shan <gshan@redhat.com>
 >> ---
->>   arch/arm64/include/asm/kvm_sdei.h      | 12 +++++++
->>   arch/arm64/include/uapi/asm/kvm_sdei.h |  1 +
->>   arch/arm64/kvm/sdei.c                  | 45 +++++++++++++++++++++++++-
->>   3 files changed, 57 insertions(+), 1 deletion(-)
+>>   arch/arm64/include/asm/kvm_sdei.h      |   1 +
+>>   arch/arm64/include/uapi/asm/kvm_sdei.h |  17 +++
+>>   arch/arm64/kvm/arm.c                   |   3 +
+>>   arch/arm64/kvm/sdei.c                  | 171 +++++++++++++++++++++++++
+>>   include/uapi/linux/kvm.h               |   3 +
+>>   5 files changed, 195 insertions(+)
 >>
 >> diff --git a/arch/arm64/include/asm/kvm_sdei.h b/arch/arm64/include/asm/kvm_sdei.h
->> index 7f5f5ad689e6..19f2d9b91f85 100644
+>> index 19f2d9b91f85..8f5ea947ed0e 100644
 >> --- a/arch/arm64/include/asm/kvm_sdei.h
 >> +++ b/arch/arm64/include/asm/kvm_sdei.h
->> @@ -16,6 +16,16 @@
->>   #include <linux/list.h>
->>   #include <linux/spinlock.h>
->>   
->> +struct kvm_vcpu;
->> +
->> +typedef void (*kvm_sdei_notifier)(struct kvm_vcpu *vcpu,
->> +				  unsigned long num,
->> +				  unsigned int state);
->> +enum {
->> +	KVM_SDEI_NOTIFY_DELIVERED,
->> +	KVM_SDEI_NOTIFY_COMPLETED,
->> +};
->> +
->>   struct kvm_sdei_event {
->>   	struct kvm_sdei_event_state		state;
->>   	struct kvm				*kvm;
->> @@ -112,6 +122,8 @@ KVM_SDEI_FLAG_FUNC(enabled)
->>   void kvm_sdei_init_vm(struct kvm *kvm);
->>   void kvm_sdei_create_vcpu(struct kvm_vcpu *vcpu);
->>   int kvm_sdei_hypercall(struct kvm_vcpu *vcpu);
->> +int kvm_sdei_register_notifier(struct kvm *kvm, unsigned long num,
->> +			       kvm_sdei_notifier notifier);
+>> @@ -125,6 +125,7 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu);
+>>   int kvm_sdei_register_notifier(struct kvm *kvm, unsigned long num,
+>>   			       kvm_sdei_notifier notifier);
 >>   void kvm_sdei_deliver(struct kvm_vcpu *vcpu);
+>> +long kvm_sdei_vm_ioctl(struct kvm *kvm, unsigned long arg);
 >>   void kvm_sdei_destroy_vcpu(struct kvm_vcpu *vcpu);
 >>   void kvm_sdei_destroy_vm(struct kvm *kvm);
+>>   
 >> diff --git a/arch/arm64/include/uapi/asm/kvm_sdei.h b/arch/arm64/include/uapi/asm/kvm_sdei.h
->> index 8928027023f6..4ef661d106fe 100644
+>> index 4ef661d106fe..35ff05be3c28 100644
 >> --- a/arch/arm64/include/uapi/asm/kvm_sdei.h
 >> +++ b/arch/arm64/include/uapi/asm/kvm_sdei.h
->> @@ -23,6 +23,7 @@ struct kvm_sdei_event_state {
->>   	__u8	type;
->>   	__u8	signaled;
->>   	__u8	priority;
->> +	__u64	notifier;
-> why is the notifier attached to the exposed event and not to the
-> registered or even vcpu event? This needs to be motivated.
-> 
-> Also as commented earlier I really think we first need to agree on the
-> uapi and get a consensus on it as it must be right on the 1st shot. In
-> that prospect maybe introduce a patch dedicated to the uapi and document
-> it properly, including the way the end user is supposed to use it.
-> 
-> Another way to proceed would be to not support migration at the moment,
-> mature the API and then introduce migration support later. Would it make
-> sense? For instance, in the past in-kernel ITS emulation was first
-> introduced without migration support.
-> 
-
-You're correct that @notifier needs to be migrated. I perfer to drop the
-migration support at first, and then add the support when the APIs become
-mature. However, the only user of SDEI would be Async PF, which is used in
-migration scenario. So I will think about how to reorgnize the code and have
-separate patch for the UAPI stuff, including the document.
-
-
+>> @@ -57,5 +57,22 @@ struct kvm_sdei_vcpu_state {
+>>   	struct kvm_sdei_vcpu_regs	normal_regs;
 >>   };
 >>   
->>   struct kvm_sdei_kvm_event_state {
+>> +#define KVM_SDEI_CMD_GET_VERSION		0
+>> +#define KVM_SDEI_CMD_SET_EVENT			1
+>> +#define KVM_SDEI_CMD_GET_KEVENT_COUNT		2
+>> +#define KVM_SDEI_CMD_GET_KEVENT			3
+>> +#define KVM_SDEI_CMD_SET_KEVENT			4
+>> +
+>> +struct kvm_sdei_cmd {
+>> +	__u32						cmd;
+>> +	union {
+>> +		__u32					version;
+>> +		__u32					count;
+>> +		__u64					num;
+>> +		struct kvm_sdei_event_state		kse_state;
+>> +		struct kvm_sdei_kvm_event_state		kske_state;
+>> +	};
+>> +};
+>> +
+>>   #endif /* !__ASSEMBLY__ */
+>>   #endif /* _UAPI__ASM_KVM_SDEI_H */
+>> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+>> index 0c3db1ef1ba9..8d61585124b2 100644
+>> --- a/arch/arm64/kvm/arm.c
+>> +++ b/arch/arm64/kvm/arm.c
+>> @@ -1389,6 +1389,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>>   			return -EFAULT;
+>>   		return kvm_vm_ioctl_mte_copy_tags(kvm, &copy_tags);
+>>   	}
+>> +	case KVM_ARM_SDEI_COMMAND: {
+>> +		return kvm_sdei_vm_ioctl(kvm, arg);
+>> +	}
+>>   	default:
+>>   		return -EINVAL;
+>>   	}
 >> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
->> index 1e8e213c9d70..5f7a37dcaa77 100644
+>> index 5f7a37dcaa77..bdd76c3e5153 100644
 >> --- a/arch/arm64/kvm/sdei.c
 >> +++ b/arch/arm64/kvm/sdei.c
->> @@ -314,9 +314,11 @@ static unsigned long kvm_sdei_hypercall_complete(struct kvm_vcpu *vcpu,
->>   	struct kvm *kvm = vcpu->kvm;
->>   	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
->>   	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
->> +	struct kvm_sdei_event *kse = NULL;
->>   	struct kvm_sdei_kvm_event *kske = NULL;
->>   	struct kvm_sdei_vcpu_event *ksve = NULL;
->>   	struct kvm_sdei_vcpu_regs *regs;
->> +	kvm_sdei_notifier notifier;
->>   	unsigned long ret = SDEI_SUCCESS;
->>   	int index;
->>   
->> @@ -349,6 +351,13 @@ static unsigned long kvm_sdei_hypercall_complete(struct kvm_vcpu *vcpu,
->>   	*vcpu_cpsr(vcpu) = regs->pstate;
->>   	*vcpu_pc(vcpu) = regs->pc;
->>   
->> +	/* Notifier */
->> +	kske = ksve->kske;
->> +	kse = kske->kse;
->> +	notifier = (kvm_sdei_notifier)(kse->state.notifier);
->> +	if (notifier)
->> +		notifier(vcpu, kse->state.num, KVM_SDEI_NOTIFY_COMPLETED);
->> +
->>   	/* Inject interrupt if needed */
->>   	if (resume)
->>   		kvm_inject_irq(vcpu);
->> @@ -358,7 +367,6 @@ static unsigned long kvm_sdei_hypercall_complete(struct kvm_vcpu *vcpu,
->>   	 * event state as it's not destroyed because of the reference
->>   	 * count.
->>   	 */
->> -	kske = ksve->kske;
->>   	ksve->state.refcount--;
->>   	kske->state.refcount--;
->>   	if (!ksve->state.refcount) {
->> @@ -746,6 +754,35 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
->>   	return 1;
+>> @@ -931,6 +931,177 @@ void kvm_sdei_create_vcpu(struct kvm_vcpu *vcpu)
+>>   	vcpu->arch.sdei = vsdei;
 >>   }
 >>   
->> +int kvm_sdei_register_notifier(struct kvm *kvm,
->> +			       unsigned long num,
->> +			       kvm_sdei_notifier notifier)
+>> +static long kvm_sdei_set_event(struct kvm *kvm,
+>> +			       struct kvm_sdei_event_state *kse_state)
 >> +{
 >> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
 >> +	struct kvm_sdei_event *kse = NULL;
->> +	int ret = 0;
 >> +
+>> +	if (!kvm_sdei_is_valid_event_num(kse_state->num))
+>> +		return -EINVAL;
+>> +
+>> +	if (!(kse_state->type == SDEI_EVENT_TYPE_SHARED ||
+>> +	      kse_state->type == SDEI_EVENT_TYPE_PRIVATE))
+>> +		return -EINVAL;
+>> +
+>> +	if (!(kse_state->priority == SDEI_EVENT_PRIORITY_NORMAL ||
+>> +	      kse_state->priority == SDEI_EVENT_PRIORITY_CRITICAL))
+>> +		return -EINVAL;
+>> +
+>> +	kse = kvm_sdei_find_event(kvm, kse_state->num);
+>> +	if (kse)
+>> +		return -EEXIST;
+>> +
+>> +	kse = kzalloc(sizeof(*kse), GFP_KERNEL);
+>> +	if (!kse)
+>> +		return -ENOMEM;
+> userspace can exhaust the mem since there is no limit. There must be a max.
+> 
+
+Ok. I think it's minor or corner case. For now, the number of defined SDEI
+events are only one. I leave it for something to be improved in future.
+
+>> +
+>> +	kse->state = *kse_state;
+>> +	kse->kvm = kvm;
+>> +	list_add_tail(&kse->link, &ksdei->events);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static long kvm_sdei_get_kevent_count(struct kvm *kvm, int *count)
+>> +{
+>> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
+>> +	struct kvm_sdei_kvm_event *kske = NULL;
+>> +	int total = 0;
+>> +
+>> +	list_for_each_entry(kske, &ksdei->kvm_events, link) {
+>> +		total++;
+>> +	}
+>> +
+>> +	*count = total;
+>> +	return 0;
+>> +}
+>> +
+>> +static long kvm_sdei_get_kevent(struct kvm *kvm,
+>> +				struct kvm_sdei_kvm_event_state *kske_state)
+>> +{
+>> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
+>> +	struct kvm_sdei_kvm_event *kske = NULL;
+>> +
+>> +	/*
+>> +	 * The first entry is fetched if the event number is invalid.
+>> +	 * Otherwise, the next entry is fetched.
+> why don't we return an error? What is the point returning the next entry?
+
+The SDEI events attached to the KVM are migrated one by one. Thoese attached
+SDEI events are linked through a linked list:
+
+     (1) on !kvm_sdei_is_valid_event_num(kske_state->num), the first SDEI event
+         in the linked list is retrieved from source VM and will be restored on
+         the destination VM.
+
+     (2) Otherwise, the next SDEI event in the linked list will be retrieved
+         from source VM and restored on the destination VM.
+
+Another option is to introduce additional struct like below. In this way, all
+the attached SDEI events are retrieved and restored once. In this way, the
+memory block used for storing @kvm_sdei_kvm_event_state should be allocated
+and released by QEMU. Please let me know your preference:
+
+     struct xxx {
+            __u64                              count;
+            struct kvm_sdei_kvm_event_state    events;
+     }
+
+>> +	 */
+>> +	if (!kvm_sdei_is_valid_event_num(kske_state->num)) {
+>> +		kske = list_first_entry_or_null(&ksdei->kvm_events,
+>> +				struct kvm_sdei_kvm_event, link);
+>> +	} else {
+>> +		kske = kvm_sdei_find_kvm_event(kvm, kske_state->num);
+>> +		if (kske && !list_is_last(&kske->link, &ksdei->kvm_events))
+>> +			kske = list_next_entry(kske, link);
+> Sorry I don't get why we return the next one?
+
+Please refer to the explanation above.
+
+>> +		else
+>> +			kske = NULL;
+>> +	}
+>> +
+>> +	if (!kske)
+>> +		return -ENOENT;
+>> +
+>> +	*kske_state = kske->state;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static long kvm_sdei_set_kevent(struct kvm *kvm,
+>> +				struct kvm_sdei_kvm_event_state *kske_state)
+>> +{
+>> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
+>> +	struct kvm_sdei_event *kse = NULL;
+>> +	struct kvm_sdei_kvm_event *kske = NULL;
+>> +
+>> +	/* Sanity check */
+>> +	if (!kvm_sdei_is_valid_event_num(kske_state->num))
+>> +		return -EINVAL;
+>> +
+>> +	if (!(kske_state->route_mode == SDEI_EVENT_REGISTER_RM_ANY ||
+>> +	      kske_state->route_mode == SDEI_EVENT_REGISTER_RM_PE))
+>> +		return -EINVAL;
+>> +
+>> +	/* Check if the event number is valid */
+>> +	kse = kvm_sdei_find_event(kvm, kske_state->num);
+>> +	if (!kse)
+>> +		return -ENOENT;
+>> +
+>> +	/* Check if the event has been populated */
+>> +	kske = kvm_sdei_find_kvm_event(kvm, kske_state->num);
+>> +	if (kske)
+>> +		return -EEXIST;
+>> +
+>> +	kske = kzalloc(sizeof(*kske), GFP_KERNEL);
+> userspace can exhaust the mem since there is no limit
+
+Ok.
+
+>> +	if (!kske)
+>> +		return -ENOMEM;
+>> +
+>> +	kske->state = *kske_state;
+>> +	kske->kse   = kse;
+>> +	kske->kvm   = kvm;
+>> +	list_add_tail(&kske->link, &ksdei->kvm_events);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +long kvm_sdei_vm_ioctl(struct kvm *kvm, unsigned long arg)
+>> +{
+>> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
+>> +	struct kvm_sdei_cmd *cmd = NULL;
+>> +	void __user *argp = (void __user *)arg;
+>> +	bool copy = false;
+>> +	long ret = 0;
+>> +
+>> +	/* Sanity check */
 >> +	if (!ksdei) {
 >> +		ret = -EPERM;
 >> +		goto out;
 >> +	}
 >> +
->> +	spin_lock(&ksdei->lock);
->> +
->> +	kse = kvm_sdei_find_event(kvm, num);
->> +	if (!kse) {
->> +		ret = -EINVAL;
->> +		goto unlock;
+>> +	cmd = kzalloc(sizeof(*cmd), GFP_KERNEL);
+>> +	if (!cmd) {
+>> +		ret = -ENOMEM;
+>> +		goto out;
 >> +	}
 >> +
->> +	kse->state.notifier = (unsigned long)notifier;
+>> +	if (copy_from_user(cmd, argp, sizeof(*cmd))) {
+>> +		ret = -EFAULT;
+>> +		goto out;
+>> +	}
 >> +
->> +unlock:
+>> +	spin_lock(&ksdei->lock);
+>> +
+>> +	switch (cmd->cmd) {
+>> +	case KVM_SDEI_CMD_GET_VERSION:
+>> +		copy = true;
+>> +		cmd->version = (1 << 16);       /* v1.0.0 */
+>> +		break;
+>> +	case KVM_SDEI_CMD_SET_EVENT:
+>> +		ret = kvm_sdei_set_event(kvm, &cmd->kse_state);
+>> +		break;
+>> +	case KVM_SDEI_CMD_GET_KEVENT_COUNT:
+>> +		copy = true;
+>> +		ret = kvm_sdei_get_kevent_count(kvm, &cmd->count);
+>> +		break;
+>> +	case KVM_SDEI_CMD_GET_KEVENT:
+>> +		copy = true;
+>> +		ret = kvm_sdei_get_kevent(kvm, &cmd->kske_state);
+>> +		break;
+>> +	case KVM_SDEI_CMD_SET_KEVENT:
+>> +		ret = kvm_sdei_set_kevent(kvm, &cmd->kske_state);
+>> +		break;
+>> +	default:
+>> +		ret = -EINVAL;
+>> +	}
+>> +
 >> +	spin_unlock(&ksdei->lock);
 >> +out:
+>> +	if (!ret && copy && copy_to_user(argp, cmd, sizeof(*cmd)))
+>> +		ret = -EFAULT;
+>> +
+>> +	kfree(cmd);
 >> +	return ret;
 >> +}
 >> +
->>   void kvm_sdei_deliver(struct kvm_vcpu *vcpu)
+>>   void kvm_sdei_destroy_vcpu(struct kvm_vcpu *vcpu)
 >>   {
->>   	struct kvm *kvm = vcpu->kvm;
->> @@ -755,6 +792,7 @@ void kvm_sdei_deliver(struct kvm_vcpu *vcpu)
->>   	struct kvm_sdei_kvm_event *kske = NULL;
->>   	struct kvm_sdei_vcpu_event *ksve = NULL;
->>   	struct kvm_sdei_vcpu_regs *regs = NULL;
->> +	kvm_sdei_notifier notifier;
->>   	unsigned long pstate;
->>   	int index = 0;
+>>   	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index d9e4aabcb31a..8cf41fd4bf86 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -1679,6 +1679,9 @@ struct kvm_xen_vcpu_attr {
+>>   #define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_DATA	0x4
+>>   #define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST	0x5
 >>   
->> @@ -826,6 +864,11 @@ void kvm_sdei_deliver(struct kvm_vcpu *vcpu)
->>   	*vcpu_cpsr(vcpu) = pstate;
->>   	*vcpu_pc(vcpu) = kske->state.entries[index];
->>   
->> +	/* Notifier */
->> +	notifier = (kvm_sdei_notifier)(kse->state.notifier);
->> +	if (notifier)
->> +		notifier(vcpu, kse->state.num, KVM_SDEI_NOTIFY_DELIVERED);
+>> +/* Available with KVM_CAP_ARM_SDEI */
+>> +#define KVM_ARM_SDEI_COMMAND	_IOWR(KVMIO, 0xce, struct kvm_sdei_cmd)
 >> +
->>   unlock:
->>   	spin_unlock(&vsdei->lock);
->>   }
+>>   /* Secure Encrypted Virtualization command */
+>>   enum sev_cmd_id {
+>>   	/* Guest initialization commands */
 >>
-> 
 
 Thanks,
 Gavin
