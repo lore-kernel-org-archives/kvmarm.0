@@ -2,77 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21218C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 11 Jan 2022 22:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD91C433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 02:19:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A98CE4B139;
-	Tue, 11 Jan 2022 17:16:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F2194B10D;
+	Tue, 11 Jan 2022 21:19:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Rb17Y9Ptip4T; Tue, 11 Jan 2022 17:16:17 -0500 (EST)
+	with ESMTP id jxGreOGmTyaG; Tue, 11 Jan 2022 21:19:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A05749F54;
-	Tue, 11 Jan 2022 17:16:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C621249F59;
+	Tue, 11 Jan 2022 21:19:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2724E49F54
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 17:16:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA11F49F47
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 21:19:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G3cGtnkB2AIF for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Jan 2022 17:16:15 -0500 (EST)
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com
- [209.85.222.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 36A2449F4D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 17:16:15 -0500 (EST)
-Received: by mail-ua1-f52.google.com with SMTP id l15so1250031uai.11
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 14:16:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AF3AnK5QyRYkI5duIqUXZZyuc4HWRw2U/KYG/ayPad0=;
- b=kqs/HwY3kdGXMoeolWYAyWUmTsR5sUhlpiLE8CAWHX6TaOVUKEGXDoxHbcTKLmVCG0
- IhtAfUwVRh7KP08av16i05Pd8FSrwjNjdtpPbMsBBI6PnKm01aCOykc8ytoDzIF+jZDB
- ucnSWegydwRYmRG2G1HxICSrD5e0tifOqyBR84K9SvrJc3dFdKb2+NJk33fJ7KcgEmCj
- 8My/Dr+oFtLZiKHrhV+u2262tUuikggcl6klljuaZ7xfc240+z/kd9ZN5q+lHPduYO6Z
- h7M0lXflluwxEqTugcPItRA1FJLHtUckpYA1aVFTZM2fVFlq5m8B05K0fMNvQZ60va7a
- 9NAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AF3AnK5QyRYkI5duIqUXZZyuc4HWRw2U/KYG/ayPad0=;
- b=pmHnNAAuTCPRNNZWDLkjFQIIWFF5fAMQ4sTM3b1DAIaus+YZF3xu8jZ2CJA1ZkFCot
- m96AYxyv7VWREtMEfDY6x5JuPVk2/4So0/8SZa2mwdB1GgSfXBEt98kQdqmd130pKrSD
- /LVotwIoxiPy/1QVbPv1yJopCBCmMGrGQGKqTnzeSdxYPfDe38tMxcHMLlAOffUPP1WG
- y/G1TCEyDzO0sLIxh/D7Xx3UnsFechHXhqjG8OuZTlc+BG5Qazkyw/l+TVVPtHaMBBr2
- iJ8pwWBtQ3HmX+OerjdMJjxYoLdMizLmqCMWW+oP0GM+AJ0/kSCRHmYaurfQEjAPxrZ/
- LJlg==
-X-Gm-Message-State: AOAM531b/yqgFWRSTJND6oEqNeZH28Ndi4NX1T4kczrPBlzA9/qFeDME
- s4sy+n4mlk8YOcLCvxfTR62/+gLXLcDiQh0qsu5YvA==
-X-Google-Smtp-Source: ABdhPJwH0XMvSBmXysbrAE0IMAmKDuqLdVGaZMH4BqCu7B80Ul8RetTLJ2iipZWKkFFmI8wAVmH1SRHloobnvEvWEdg=
-X-Received: by 2002:a05:6102:c46:: with SMTP id
- y6mr3408907vss.82.1641939373465; 
- Tue, 11 Jan 2022 14:16:13 -0800 (PST)
+ with ESMTP id ucadrSqljaCw for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Jan 2022 21:19:30 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3791B49F45
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 21:19:30 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1641953968;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AQIy1tnY0f6qoWZEP3tFJkR6OJmbwGoKaen0O/T2Psg=;
+ b=TLi7avjrY4im6CR3Q+QGtgmZr0uyIcp8Z7XcOEATKjmPGECrvCuY81xZWbJ1Iq89WhTV07
+ CPlDQGNH9wqyY3mZl6To0Xl6jiknmte725jyGTf9DgsDvXEEQZmsMu/apjFJkMFrEqADsU
+ MKOHWNJWufQuO/YPq/ATbsWhH+GthiQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-160-3yQ1v3uGO5iW3j-ckWxUMQ-1; Tue, 11 Jan 2022 21:19:23 -0500
+X-MC-Unique: 3yQ1v3uGO5iW3j-ckWxUMQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAA52101AFA8;
+ Wed, 12 Jan 2022 02:19:19 +0000 (UTC)
+Received: from [10.72.12.29] (ovpn-12-29.pek2.redhat.com [10.72.12.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 770484E2C5;
+ Wed, 12 Jan 2022 02:19:11 +0000 (UTC)
+Subject: Re: [PATCH v4 04/21] KVM: arm64: Support SDEI_EVENT_REGISTER hypercall
+To: Eric Auger <eauger@redhat.com>, kvmarm@lists.cs.columbia.edu
+References: <20210815001352.81927-1-gshan@redhat.com>
+ <20210815001352.81927-5-gshan@redhat.com>
+ <434349d3-4dcb-9157-35a5-9f05aaed4982@redhat.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <9eca731c-e53e-127d-c61e-b346ffcc09c2@redhat.com>
+Date: Wed, 12 Jan 2022 10:19:06 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20220110210441.2074798-1-jingzhangos@google.com>
- <20220110210441.2074798-4-jingzhangos@google.com>
- <87a6g2tvia.wl-maz@kernel.org>
-In-Reply-To: <87a6g2tvia.wl-maz@kernel.org>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Tue, 11 Jan 2022 14:16:01 -0800
-Message-ID: <CAAdAUthmAMy3UE3_C_CitW9MWWMGcOPHu0x9aV72YEUL2kpO=g@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/3] KVM: selftests: Add vgic initialization for dirty
- log perf test for ARM
-To: Marc Zyngier <maz@kernel.org>
-Cc: KVM <kvm@vger.kernel.org>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- KVMARM <kvmarm@lists.cs.columbia.edu>
+In-Reply-To: <434349d3-4dcb-9157-35a5-9f05aaed4982@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Cc: maz@kernel.org, pbonzini@redhat.com, will@kernel.org,
+ linux-kernel@vger.kernel.org, Jonathan.Cameron@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -81,80 +81,219 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jan 11, 2022 at 2:30 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Mon, 10 Jan 2022 21:04:41 +0000,
-> Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > For ARM64, if no vgic is setup before the dirty log perf test, the
-> > userspace irqchip would be used, which would affect the dirty log perf
-> > test result.
->
-> Doesn't it affect *all* performance tests? How much does this change
-> contributes to the performance numbers you give in the cover letter?
->
-This bottleneck showed up after adding the fast path patch. I didn't
-try other performance tests with this, but I think it is a good idea
-to add a vgic setup for all performance tests. I can post another
-patch later to make it available for all performance tests after
-finishing this one and verifying all other performance tests.
-Below is the test result without adding the vgic setup. It shows
-20~30% improvement for the different number of vCPUs.
-+-------+------------------------+
-    | #vCPU | dirty memory time (ms) |
-    +-------+------------------------+
-    | 1     | 965                    |
-    +-------+------------------------+
-    | 2     | 1006                    |
-    +-------+------------------------+
-    | 4     | 1128                    |
-    +-------+------------------------+
-    | 8     | 2005                   |
-    +-------+------------------------+
-    | 16    | 3903                   |
-    +-------+------------------------+
-    | 32    | 7595                   |
-    +-------+------------------------+
-    | 64    | 15783                  |
-    +-------+------------------------+
-> >
-> > Signed-off-by: Jing Zhang <jingzhangos@google.com>
-> > ---
-> >  tools/testing/selftests/kvm/dirty_log_perf_test.c | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> > index 1954b964d1cf..b501338d9430 100644
-> > --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> > +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> > @@ -18,6 +18,12 @@
-> >  #include "test_util.h"
-> >  #include "perf_test_util.h"
-> >  #include "guest_modes.h"
-> > +#ifdef __aarch64__
-> > +#include "aarch64/vgic.h"
-> > +
-> > +#define GICD_BASE_GPA                        0x8000000ULL
-> > +#define GICR_BASE_GPA                        0x80A0000ULL
->
-> How did you pick these values?
-I used the same values from other tests.
-Talked with Raghavendra about the values. It could be arbitrary and he
-chose these values from QEMU's configuration.
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Hi Eric,
+
+On 11/9/21 11:50 PM, Eric Auger wrote:
+> On 8/15/21 2:13 AM, Gavin Shan wrote:
+>> This supports SDEI_EVENT_REGISTER hypercall, which is used by guest
+>> to register SDEI events. The SDEI event won't be raised to the guest
+>> or specific vCPU until it's registered and enabled explicitly.
+>>
+>> Only those events that have been exported by KVM can be registered.
+>> After the event is registered successfully, the KVM SDEI event (object)
+>> is created or updated because the same KVM SDEI event is shared by
+> revisit the terminology (KVM SDEI event). The same SDEI registered event
+> object is shared by multiple vCPUs if it is a private event.
+
+Yep, I will correct the commit log in next respin.
+
+>> multiple vCPUs if it's a private event.>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>>   arch/arm64/kvm/sdei.c | 122 ++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 122 insertions(+)
+>>
+>> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
+>> index aa9485f076a9..d3ea3eee154b 100644
+>> --- a/arch/arm64/kvm/sdei.c
+>> +++ b/arch/arm64/kvm/sdei.c
+>> @@ -21,6 +21,20 @@ static struct kvm_sdei_event_state defined_kse[] = {
+>>   	},
+>>   };
+>>   
+>> +static struct kvm_sdei_event *kvm_sdei_find_event(struct kvm *kvm,
+>> +						  unsigned long num)
+>> +{
+>> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
+>> +	struct kvm_sdei_event *kse;
+> the 'k' prefix everywhere for your local variable is unneeded.
+
+ok.
+
+>> +
+>> +	list_for_each_entry(kse, &ksdei->events, link) {
+>> +		if (kse->state.num == num)
+>> +			return kse;
+>> +	}
+>> +
+>> +	return NULL;
+>> +}
+>> +
+>>   static void kvm_sdei_remove_events(struct kvm *kvm)
+>>   {
+>>   	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
+>> @@ -32,6 +46,20 @@ static void kvm_sdei_remove_events(struct kvm *kvm)
+>>   	}
+>>   }
+>>   
+>> +static struct kvm_sdei_kvm_event *kvm_sdei_find_kvm_event(struct kvm *kvm,
+>> +							  unsigned long num)
+>> +{
+>> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
+>> +	struct kvm_sdei_kvm_event *kske;
+>> +
+>> +	list_for_each_entry(kske, &ksdei->kvm_events, link) {> +		if (kske->state.num == num)
+> I still don't get the diff between the num of an SDEI event vs the num
+> of a so-called SDEI kvm event. Event numbers are either static or
+> dynamically created using bind ops which you do not support. But to me
+> this is a property of the root exposed SDEI event and not a property of
+> the registered event. Please could you clarify?
+
+Your understanding is correct. The SDEI events are defined staticly apart
+from the binding one, which we don't support for now. As the information
+(properties) of one specific SDEI event is scattered and associated with
+different objects, like KVM/vCPU/context. The SDEI event (@num) is the key
+to associate these scattered information (properties).
+
+>> +			return kske;
+>> +	}
+>> +
+>> +	return NULL;
+>> +}
+>> +
+>>   static void kvm_sdei_remove_kvm_events(struct kvm *kvm,
+>>   				       unsigned int mask,
+>>   				       bool force)
+>> @@ -86,6 +114,98 @@ static unsigned long kvm_sdei_hypercall_version(struct kvm_vcpu *vcpu)
+>>   	return ret;
+>>   }
+>>   
+>> +static unsigned long kvm_sdei_hypercall_register(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct kvm *kvm = vcpu->kvm;
+>> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
+>> +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
+>> +	struct kvm_sdei_event *kse = NULL;
+>> +	struct kvm_sdei_kvm_event *kske = NULL;
+>> +	unsigned long event_num = smccc_get_arg1(vcpu);
+>> +	unsigned long event_entry = smccc_get_arg2(vcpu);
+>> +	unsigned long event_param = smccc_get_arg3(vcpu);
+>> +	unsigned long route_mode = smccc_get_arg4(vcpu);
+>> +	unsigned long route_affinity = smccc_get_arg5(vcpu);
+>> +	int index = vcpu->vcpu_idx;
+>> +	unsigned long ret = SDEI_SUCCESS;
+>> +
+>> +	/* Sanity check */
+>> +	if (!(ksdei && vsdei)) {
+>> +		ret = SDEI_NOT_SUPPORTED;
+>> +		goto out;
+>> +	}
+>> +
+>> +	if (!kvm_sdei_is_valid_event_num(event_num)) {
+>> +		ret = SDEI_INVALID_PARAMETERS;
+>> +		goto out;
+>> +	}
+>> +
+>> +	if (!(route_mode == SDEI_EVENT_REGISTER_RM_ANY ||
+>> +	      route_mode == SDEI_EVENT_REGISTER_RM_PE)) {
+>> +		ret = SDEI_INVALID_PARAMETERS;
+>> +		goto out;
+>> +	}
+>> +
+>> +	/*
+>> +	 * The KVM event could have been created if it's a private event.
+>> +	 * We needn't create a KVM event in this case.
+> s/create a KVM event/to create another KVM event instance
+
+Ok.
+
+>> +	 */
+>> +	spin_lock(&ksdei->lock);
+>> +	kske = kvm_sdei_find_kvm_event(kvm, event_num);
+>> +	if (kske) {
+>> +		kse = kske->kse;
+>> +		index = (kse->state.type == SDEI_EVENT_TYPE_PRIVATE) ?
+>> +			vcpu->vcpu_idx : 0;
+>> +
+>> +		if (kvm_sdei_is_registered(kske, index)) {
+>> +			ret = SDEI_DENIED;
+>> +			goto unlock;
+>> +		}
+>> +
+>> +		kske->state.route_mode     = route_mode;
+>> +		kske->state.route_affinity = route_affinity;
+>> +		kske->state.entries[index] = event_entry;
+>> +		kske->state.params[index]  = event_param;
+>> +		kvm_sdei_set_registered(kske, index);
+>> +		goto unlock;
+>> +	}
+>> +
+>> +	/* Check if the event number has been registered */
+>> +	kse = kvm_sdei_find_event(kvm, event_num);
+> I don't get the comment. find_event looks up for exposed events and not
+> registered events, right? So maybe this is the first thing to check, ie.
+> the num matches one exposed event.
+
+This should be corrected to:
+
+	/* Check if the event has been defined or exposed */
+
+>> +	if (!kse) {
+>> +		ret = SDEI_INVALID_PARAMETERS;
+>> +		goto unlock;
+>> +	}
+>> +
+>> +	/* Create KVM event */
+>> +	kske = kzalloc(sizeof(*kske), GFP_KERNEL);
+>> +	if (!kske) {
+>> +		ret = SDEI_OUT_OF_RESOURCE;
+>> +		goto unlock;
+>> +	}
+>> +
+>> +	/* Initialize KVM event state */
+>> +	index = (kse->state.type == SDEI_EVENT_TYPE_PRIVATE) ?
+>> +		vcpu->vcpu_idx : 0;
+>> +	kske->state.num            = event_num;
+>> +	kske->state.refcount       = 0;
+>> +	kske->state.route_mode     = route_affinity;
+>> +	kske->state.route_affinity = route_affinity;
+>> +	kske->state.entries[index] = event_entry;
+>> +	kske->state.params[index] = event_param;
+>> +	kvm_sdei_set_registered(kske, index);
+>> +
+>> +	/* Initialize KVM event */
+>> +	kske->kse = kse;
+>> +	kske->kvm = kvm;
+>> +	list_add_tail(&kske->link, &ksdei->kvm_events);
+>> +
+>> +unlock:
+>> +	spin_unlock(&ksdei->lock);
+>> +out:
+>> +	return ret;
+>> +}
+>> +
+>>   int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
+>>   {
+>>   	u32 func = smccc_get_function(vcpu);
+>> @@ -97,6 +217,8 @@ int kvm_sdei_hypercall(struct kvm_vcpu *vcpu)
+>>   		ret = kvm_sdei_hypercall_version(vcpu);
+>>   		break;
+>>   	case SDEI_1_0_FN_SDEI_EVENT_REGISTER:
+>> +		ret = kvm_sdei_hypercall_register(vcpu);
+>> +		break;
+>>   	case SDEI_1_0_FN_SDEI_EVENT_ENABLE:
+>>   	case SDEI_1_0_FN_SDEI_EVENT_DISABLE:
+>>   	case SDEI_1_0_FN_SDEI_EVENT_CONTEXT:
+>>
+
 Thanks,
-Jing
+Gavin
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
