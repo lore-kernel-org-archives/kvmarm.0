@@ -2,69 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B90CC433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 15:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31772C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 15:49:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4C334B18F;
-	Wed, 12 Jan 2022 10:39:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95F964B1F0;
+	Wed, 12 Jan 2022 10:49:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hMpnVIrLL8Qj; Wed, 12 Jan 2022 10:39:12 -0500 (EST)
+	with ESMTP id HMTaQLIxIpI3; Wed, 12 Jan 2022 10:49:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AE77D4B1FD;
-	Wed, 12 Jan 2022 10:39:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5166C4B1F3;
+	Wed, 12 Jan 2022 10:49:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 555624B1E6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 10:39:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9549C4B1E9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 10:49:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1om7TyYMw5qQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Jan 2022 10:39:10 -0500 (EST)
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
- [209.85.167.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45CEA4B18F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 10:39:10 -0500 (EST)
-Received: by mail-lf1-f48.google.com with SMTP id x22so9444926lfd.10
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 07:39:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4NHrrtVx/ROy3kyTlu3CE7Qr8R3mDdPRYahp1mG4kmY=;
- b=B3rgZ7TabV4LX9H6WnaYZZEmZ5pe9BI/soLu1GNchfDygG0BfByZZvt+R8JxgpSNny
- taj0E2QyqpUkIF3Nvnc+JJ+Oo/fhg0ptG4xvr4dQuzCDNhR2CTSV8fZcZB7iDbzSQ5FM
- WUlFpW8SgMvEtUmmJDtwJw5ERPVoY/mWvAeCemQTWpDRCZBrA4hdLwzlpHjjs8jzdEPu
- cLYG3C/4hEdnX2FvVl3StblDUOcZsMegX2fGX7kUcXdV7yHdfEjvq2XdwUHx6wtvgjZm
- V9Fl1mUK7AydBSYK0Tm9hKornS7+YwUU2eSVI1pRjkVy04JacmwPWXs6VGW4keCmYe9N
- ZfMw==
+ with ESMTP id pFilIDB0BNzD for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Jan 2022 10:49:18 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 44DE54B1DA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 10:49:18 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1642002558;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=7itWgmWnZ91DtB2i3ZIJIZlEIAIGcoEdB/2ozTQ8AS0=;
+ b=e/QOMS40WM+ijqmw3GsmQyk0X0WTvehGcXM3JS9pzS9XcHS/2hLz+0lowVUgu3zfkz3rTE
+ zHUyJ05MQzZGe1Nc8YN14NDf+o5LnQnNm6GFMhnq++RX9beAW0drM9CC0oPPSoMPIz/e2b
+ PZOwZgrjVXcNiWwE7XrYwcElzg89hVQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-240-GymYTfXLOWaifmiv-PYsfQ-1; Wed, 12 Jan 2022 10:49:11 -0500
+X-MC-Unique: GymYTfXLOWaifmiv-PYsfQ-1
+Received: by mail-ed1-f70.google.com with SMTP id
+ c8-20020a05640227c800b003fdc1684cdeso2630825ede.12
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 07:49:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4NHrrtVx/ROy3kyTlu3CE7Qr8R3mDdPRYahp1mG4kmY=;
- b=D/e7345aN7WHL2wmutYEFQVBLXzioPxh/saYubD1T6SjMc0ngsKOYlFgAFvw8SqvkT
- qiwNq6/t96QQ4gMtG6IGrGMiaW4nGGLt097ItVUQ/f6u4lwx/mvbtSBn02mnCRx4YJ4L
- nvIGdFi8yXIupz7mDyNB4l3BUGyFmrJXLA6Cpqo+R0wuQ308LGEqogPMJpQbKvYx195l
- ru9Izxxt9ttdILmC+y/GMG9H9NfWiHgaNF5Gg/JtjKbGTMCslGRHKxEzQVQAUhYsDiSz
- MMsSPE6N+ZT5AHMIbQowCv250JNlsu4fy7JmXsZug525IvWv9Xwx+jdxLpYVRXK1mh8s
- NS/w==
-X-Gm-Message-State: AOAM530610QvVOms08JhJrY88zsjoE4R7w99UhkMqSpNxoegzXH2DbG2
- mAlClcS/dZVX+xxgf28PgNJkkdJHNncmV/ar3//7HA==
-X-Google-Smtp-Source: ABdhPJyZcAf6iXBV+8nq0HU9ppkAPT2/aEbylm9rx5FMjJZsnQSALWFPMZ6r3jb0Q7/zqxxt8c25XqedkVk6grCm3Uo=
-X-Received: by 2002:a05:651c:334:: with SMTP id
- b20mr58189ljp.275.1642001948722; 
- Wed, 12 Jan 2022 07:39:08 -0800 (PST)
-MIME-Version: 1.0
-References: <20220112152155.2600645-1-ricarkol@google.com>
-In-Reply-To: <20220112152155.2600645-1-ricarkol@google.com>
-From: Oliver Upton <oupton@google.com>
-Date: Wed, 12 Jan 2022 09:38:57 -0600
-Message-ID: <CAOQ_QshBSJTR2aH4nDNnXD9ZsmU0uE+7Bh_SUHOBZEpNWGnfUA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2] arm64: debug: mark test_[bp, wp,
- ss] as noinline
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=7itWgmWnZ91DtB2i3ZIJIZlEIAIGcoEdB/2ozTQ8AS0=;
+ b=StPz0mIGoPOlcXzhYTr4xUWh7JKaHgAhV7b5O8/gUb9Qq5Hj5ki8//e2tb+4nEVUyZ
+ tSFqS6TNmMjdCSs42s3W0pGDKALTpYvyWOsjYc56RAuZ4++dZxBtmEL9v0278pnF866K
+ XU2w1KXdX9ZrS5uTyEEOdrfD2TysenQQDnbsTrjJOuNw1Y+QBYWPAfPPb/hz/mP7Xn2N
+ 4cKRv70o3TpkTQattw4e313OiAGKvmBmGZO0Uh/IBveHSR2w7X1wK4oR318tveOypV4I
+ ahxDKLRwpnGobMXyL5MZJOgKxQCx7jLMz/pul7mJUOPPDc7gnpJ7RmqupboCZYwcupW8
+ AASQ==
+X-Gm-Message-State: AOAM530yZBH7cXrjNHX7Kf1yukGWOQ0MGjbDZ7NNHA0WjGrL1O9ZB9Dr
+ h4FYVfqApgysaMh4NezPDHdRfBFUvObZJEcRYOcyx0zBoYjyTpupN5gOAOe5RIq0+nZ94Ooo+9l
+ 1T3Q3d3OYxALoJAvCMUz8wqNf
+X-Received: by 2002:a17:907:1b24:: with SMTP id
+ mp36mr248065ejc.487.1642002550446; 
+ Wed, 12 Jan 2022 07:49:10 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw40+QE09WlkrEISryOAcx48Ytgv3S0ky6bH1FTMs6+heuN9ei+cd5PFh5muS1eK7XPLuqb+w==
+X-Received: by 2002:a17:907:1b24:: with SMTP id
+ mp36mr248052ejc.487.1642002550234; 
+ Wed, 12 Jan 2022 07:49:10 -0800 (PST)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+ by smtp.gmail.com with ESMTPSA id f13sm31284ejf.53.2022.01.12.07.49.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 12 Jan 2022 07:49:09 -0800 (PST)
+Date: Wed, 12 Jan 2022 16:49:07 +0100
+From: Andrew Jones <drjones@redhat.com>
 To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [kvm-unit-tests PATCH v2] arm64: debug: mark test_[bp,wp,ss] as
+ noinline
+Message-ID: <20220112154907.gjuhetv4db6kbqwh@gator>
+References: <20220112152155.2600645-1-ricarkol@google.com>
+MIME-Version: 1.0
+In-Reply-To: <20220112152155.2600645-1-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
 Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, maz@kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -83,11 +102,10 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 12, 2022 at 9:22 AM Ricardo Koller <ricarkol@google.com> wrote:
->
+On Wed, Jan 12, 2022 at 07:21:55AM -0800, Ricardo Koller wrote:
 > Clang inlines some functions (like test_ss) which define global labels
 > in inline assembly (e.g., ss_start). This results in:
->
+> 
 >     arm/debug.c:382:15: error: invalid symbol redefinition
 >             asm volatile("ss_start:\n"
 >                          ^
@@ -95,13 +113,58 @@ On Wed, Jan 12, 2022 at 9:22 AM Ricardo Koller <ricarkol@google.com> wrote:
 >             ss_start:
 >             ^
 >     1 error generated.
->
+> 
 > Fix these functions by marking them as "noinline".
->
+> 
 > Cc: Andrew Jones <drjones@redhat.com>
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+> This applies on top of: "[kvm-unit-tests PATCH 0/3] arm64: debug: add migration tests for debug state"
+> which is in https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue.
+> 
+>  arm/debug.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arm/debug.c b/arm/debug.c
+> index 54f059d..e9f8056 100644
+> --- a/arm/debug.c
+> +++ b/arm/debug.c
+> @@ -264,7 +264,7 @@ static void do_migrate(void)
+>  	report_info("Migration complete");
+>  }
+>  
+> -static void test_hw_bp(bool migrate)
+> +static noinline void test_hw_bp(bool migrate)
+>  {
+>  	extern unsigned char hw_bp0;
+>  	uint32_t bcr;
+> @@ -310,7 +310,7 @@ static void test_hw_bp(bool migrate)
+>  
+>  static volatile char write_data[16];
+>  
+> -static void test_wp(bool migrate)
+> +static noinline void test_wp(bool migrate)
+>  {
+>  	uint32_t wcr;
+>  	uint32_t mdscr;
+> @@ -353,7 +353,7 @@ static void test_wp(bool migrate)
+>  	}
+>  }
+>  
+> -static void test_ss(bool migrate)
+> +static noinline void test_ss(bool migrate)
+>  {
+>  	extern unsigned char ss_start;
+>  	uint32_t mdscr;
+> -- 
+> 2.34.1.575.g55b058a8bb-goog
+>
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+Applied to arm/queue.
+
+Thanks,
+drew 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
