@@ -2,82 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFD3C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 11:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E8CC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 11:37:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E40594B25D;
-	Wed, 12 Jan 2022 06:18:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 701674B1C9;
+	Wed, 12 Jan 2022 06:37:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tgI4czHi6w+u; Wed, 12 Jan 2022 06:18:13 -0500 (EST)
+	with ESMTP id 4HuNvRZpo1Xm; Wed, 12 Jan 2022 06:37:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA6E94B1F3;
-	Wed, 12 Jan 2022 06:18:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E5A44B172;
+	Wed, 12 Jan 2022 06:37:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F2654B1E7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 14:17:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6FD49E22
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 06:37:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nWbqwwU9L7YK for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Jan 2022 14:16:59 -0500 (EST)
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com
- [209.85.210.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B1974B161
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 14:16:59 -0500 (EST)
-Received: by mail-ot1-f41.google.com with SMTP id
- r7-20020a05683001c700b005906f5b0969so19758768ota.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Jan 2022 11:16:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=RmmeEOXgL4aczt2lYfVEJ81JJyR5GHuXnUEqtqtBYAw=;
- b=cOATJM7qKaMwa1rfMreaSBRrwDDzMO7PjOtbZd5NEoxEnpoVYSyEoZ9YYXqeYIXSvr
- YE9v8N/iag490QDHMRj+L/DdGLjpFJHDqQCT7vnsL3SeJdwkX63Af178WulVTiUohxbi
- 2Z/g/UTUnmDWrvpF1A4BuycMUQiQMZtfEfDMEJMhly8ysY21Lwy1FYkVyAAHc2Y+CloD
- QUqxx8+pjJdctbF3pQ+CoqO2LSEEj2OAsTt02lMfMbyq/L2h4o6KshlrJhMnTMxz7HRI
- kj1j8PJ6vmHhfhTs5wV82Z3hYb9FrcuJ2q8JzsdRPEiJYoahPTsWOV6v37b2pmdg3f9Q
- Qtpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=RmmeEOXgL4aczt2lYfVEJ81JJyR5GHuXnUEqtqtBYAw=;
- b=NdMxHU69EeiykVfKTUbh+BPOxvn1KQk6GWHLBNyxXTveRaFrVA9teJx99OHK5bZQ9m
- VUGXqHYUVRDcNYfhxMvy1LMxagNcX54cMQdnAs1hqWI70kCq7E7Kn67gIKnjkFOvm4qa
- Nnzmw6+lpoatmO/48UmCvnO1ZcUUY0JqdLcN9tId2HJCR+stMDsfM7f7Tp79/eN4G/wW
- RSD+uTs3Wbr95r6vFZpVlZy+r+pUigOePwquauybqAYuu7A4wQxMNAot/P0Yvm1a+Hmq
- +IFgcqf7yZ2IS15I8NJHCUV8RoaKuSjw+NbsLZo6gAxiVCjEjWTtfSOU5N1qwOjdWEPs
- l0Tg==
-X-Gm-Message-State: AOAM531DF3f8JE5jHdHTojSH5Hdsj5G0ldddBifuM9pNIZLriC6LaGtn
- GuGdVAOW+3xYYrdynKo1df+3NeNUrTQUTsMF4qbknw==
-X-Google-Smtp-Source: ABdhPJyFhnhDMW2ISK4zn+lMszvCQjj7MkaLiyC7O4OUsyaW0HdldRqbQFmZ06I5CZ/gdojGHnnTpqjIXgdkiahuGYk=
-X-Received: by 2002:a05:6830:441f:: with SMTP id
- q31mr4578699otv.14.1641928618059; 
- Tue, 11 Jan 2022 11:16:58 -0800 (PST)
-MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com>
- <20220104194918.373612-2-rananta@google.com>
- <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
- <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
- <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
- <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
- <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
- <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
-In-Reply-To: <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Tue, 11 Jan 2022 11:16:46 -0800
-Message-ID: <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To: Raghavendra Rao Ananta <rananta@google.com>
-X-Mailman-Approved-At: Wed, 12 Jan 2022 06:18:12 -0500
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id XNZP3F7iP2cr for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Jan 2022 06:37:17 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8F3549E21
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 06:37:17 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id BEEF561870;
+ Wed, 12 Jan 2022 11:37:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16CA5C36AE9;
+ Wed, 12 Jan 2022 11:37:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1641987436;
+ bh=ELGmfdGB+Qa9ZMuMc84rnCgltPOBDTiQTDC3b8/gV/Q=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ZGy6tcuT7keW17J9J4OG3QInYsviQ9vWvwEVwMJoAwrpD1ruwo9vlm1c3TcwyzqS8
+ vvIwPqrXl7MyjDEXqqOdYhnRx7800sGkAFKh5j4X4fKnSTBG44Jmerzh8L+I0V3YYs
+ EqaMm6/ojOoY8JlQKSgQN4rZWVpngesHBlHVePlN+q9Z8Ggq2adpknYJI64RtN716m
+ Q4XgvygAqpNuqlKG7XfEq+jdO36wf1XIH0F747LFAcx+TAwBFb7YW9v4whC6lcqy+T
+ HtvIhXwo1ohSidfzouYZnmmU/GX27/sJhFroOfHkgVNoNOcn97SyI5ef2BT4+MRzUR
+ KeWhLw48RMBQA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n7bwH-00021I-Dp; Wed, 12 Jan 2022 11:37:13 +0000
+Date: Wed, 12 Jan 2022 11:37:12 +0000
+Message-ID: <87sfttrxqv.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jing Zhang <jingzhangos@google.com>
+Subject: Re: [RFC PATCH 3/3] KVM: selftests: Add vgic initialization for dirty
+ log perf test for ARM
+In-Reply-To: <CAAdAUthmAMy3UE3_C_CitW9MWWMGcOPHu0x9aV72YEUL2kpO=g@mail.gmail.com>
+References: <20220110210441.2074798-1-jingzhangos@google.com>
+ <20220110210441.2074798-4-jingzhangos@google.com>
+ <87a6g2tvia.wl-maz@kernel.org>
+ <CAAdAUthmAMy3UE3_C_CitW9MWWMGcOPHu0x9aV72YEUL2kpO=g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, will@kernel.org, pbonzini@redhat.com,
+ dmatlack@google.com, oupton@google.com, reijiw@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: KVM <kvm@vger.kernel.org>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,69 +90,56 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jan 11, 2022 at 10:52 AM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
->
-> On Mon, Jan 10, 2022 at 3:57 PM Jim Mattson <jmattson@google.com> wrote:
+On Tue, 11 Jan 2022 22:16:01 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> On Tue, Jan 11, 2022 at 2:30 AM Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > On Mon, Jan 10, 2022 at 3:07 PM Raghavendra Rao Ananta
-> > <rananta@google.com> wrote:
+> > On Mon, 10 Jan 2022 21:04:41 +0000,
+> > Jing Zhang <jingzhangos@google.com> wrote:
 > > >
-> > > On Fri, Jan 7, 2022 at 4:05 PM Jim Mattson <jmattson@google.com> wrote:
-> > > >
-> > > > On Fri, Jan 7, 2022 at 3:43 PM Raghavendra Rao Ananta
-> > > > <rananta@google.com> wrote:
-> > > > >
-> > > > > Hi Reiji,
-> > > > >
-> > > > > On Thu, Jan 6, 2022 at 10:07 PM Reiji Watanabe <reijiw@google.com> wrote:
-> > > > > >
-> > > > > > Hi Raghu,
-> > > > > >
-> > > > > > On Tue, Jan 4, 2022 at 11:49 AM Raghavendra Rao Ananta
-> > > > > > <rananta@google.com> wrote:
-> > > > > > >
-> > > > > > > Capture the start of the KVM VM, which is basically the
-> > > > > > > start of any vCPU run. This state of the VM is helpful
-> > > > > > > in the upcoming patches to prevent user-space from
-> > > > > > > configuring certain VM features after the VM has started
-> > > > > > > running.
-> > > >
-> > > > What about live migration, where the VM has already technically been
-> > > > started before the first call to KVM_RUN?
-> > >
-> > > My understanding is that a new 'struct kvm' is created on the target
-> > > machine and this flag should be reset, which would allow the VMM to
-> > > restore the firmware registers. However, we would be running KVM_RUN
-> > > for the first time on the target machine, thus setting the flag.
-> > > So, you are right; It's more of a resume operation from the guest's
-> > > point of view. I guess the name of the variable is what's confusing
-> > > here.
+> > > For ARM64, if no vgic is setup before the dirty log perf test, the
+> > > userspace irqchip would be used, which would affect the dirty log perf
+> > > test result.
 > >
-> > I was actually thinking that live migration gives userspace an easy
-> > way to circumvent your restriction. You said, "This state of the VM is
-> > helpful in the upcoming patches to prevent user-space from configuring
-> > certain VM features after the VM has started running." However, if you
-> > don't ensure that these VM features are configured the same way on the
-> > target machine as they were on the source machine, you have not
-> > actually accomplished your stated goal.
+> > Doesn't it affect *all* performance tests? How much does this change
+> > contributes to the performance numbers you give in the cover letter?
 > >
-> Isn't that up to the VMM to save/restore and validate the registers
-> across migrations?
+> This bottleneck showed up after adding the fast path patch. I didn't
+> try other performance tests with this, but I think it is a good idea
+> to add a vgic setup for all performance tests. I can post another
+> patch later to make it available for all performance tests after
+> finishing this one and verifying all other performance tests.
+> Below is the test result without adding the vgic setup. It shows
+> 20~30% improvement for the different number of vCPUs.
+> +-------+------------------------+
+>     | #vCPU | dirty memory time (ms) |
+>     +-------+------------------------+
+>     | 1     | 965                    |
+>     +-------+------------------------+
+>     | 2     | 1006                    |
+>     +-------+------------------------+
+>     | 4     | 1128                    |
+>     +-------+------------------------+
+>     | 8     | 2005                   |
+>     +-------+------------------------+
+>     | 16    | 3903                   |
+>     +-------+------------------------+
+>     | 32    | 7595                   |
+>     +-------+------------------------+
+>     | 64    | 15783                  |
+>     +-------+------------------------+
 
-Yes, just as it is up to userspace not to make bad configuration
-changes after the first VMRUN.
+So please use these numbers in your cover letter when you repost your
+series, as the improvement you'd observe on actual workloads is likely
+to be less than what you claim due to this change in the test itself
+(in other words, if you are going to benchamark something, don't
+change the benchmark halfway).
 
-> Perhaps I have to re-word my intentions for the patch- userspace
-> should be able to configure the registers before issuing the first
-> KVM_RUN.
+	M.
 
-Perhaps it would help if you explained *why* you are doing this. It
-sounds like you are either trying to protect against a malicious
-userspace, or you are trying to keep userspace from doing something
-stupid. In general, kvm only enforces constraints that are necessary
-to protect the host. If that's what you're doing, I don't understand
-why live migration doesn't provide an end-run around your protections.
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
