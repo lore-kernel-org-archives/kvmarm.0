@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94565C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 07:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCD4C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 12 Jan 2022 07:19:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EF4A04B1C3;
-	Wed, 12 Jan 2022 02:13:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D62694B1BF;
+	Wed, 12 Jan 2022 02:19:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id A8lHi3oFEkiL; Wed, 12 Jan 2022 02:12:59 -0500 (EST)
+	with ESMTP id zOge9k0f4lSK; Wed, 12 Jan 2022 02:19:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC0134B150;
-	Wed, 12 Jan 2022 02:12:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E3084B160;
+	Wed, 12 Jan 2022 02:19:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC09F4B13D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 02:12:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 146D849F4F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 02:19:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 49sYq27knZxL for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Jan 2022 02:12:57 -0500 (EST)
+ with ESMTP id qX86anDktNYM for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Jan 2022 02:19:31 -0500 (EST)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97CBB4A19F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 02:12:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ADD649F4D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 02:19:31 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1641971577;
+ s=mimecast20190719; t=1641971970;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=i4DwJd3VBrIuZBhZeLiKOVZ3AibbAwHxY0tLpu2xHGE=;
- b=Mz+cfXgzHTBPjgCyTgO3Kj5po3pqTZXlTFAPzWoscOVXK8swfIyQlFugyH8PRazae+t6Is
- 1s1sMzZsndqE4XxhbEZBOWe2Mpc3X+49Je6X9mH3fGUH+zxOmdx4OAhZowyYwHb+SSIN3q
- PPgem1jS67Pb23/3QQlzgueliU4+uwM=
+ bh=w5CS/fk3B1Jvusc64HiZRYZbo+ognmOdXNBVykQBTZQ=;
+ b=LPXFIqWp0FKBQHrYXcViPHl8PAgV6p5WYCHjp/pEYb+2+Mksbq1jMrOWNeRNlDUsj8Eti3
+ 4YFrHFhV8HaJbd07A1YxKa1UyAJiNEyVIplAbuVpPC0aloNrywyYB05KWJr0gIfWhmfF61
+ P7ZzHeIOBK5NSroCFHk+CV6OD4PIyF8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-339-qqlBMFP2PW6Rd7wtpOESOA-1; Wed, 12 Jan 2022 02:12:53 -0500
-X-MC-Unique: qqlBMFP2PW6Rd7wtpOESOA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-495-jU2kZIyKNhygsq7pPn5lug-1; Wed, 12 Jan 2022 02:19:28 -0500
+X-MC-Unique: jU2kZIyKNhygsq7pPn5lug-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9446381CCB4;
- Wed, 12 Jan 2022 07:12:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 049731023F4D;
+ Wed, 12 Jan 2022 07:19:25 +0000 (UTC)
 Received: from [10.72.12.204] (ovpn-12-204.pek2.redhat.com [10.72.12.204])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EAC9C163C7;
- Wed, 12 Jan 2022 07:12:42 +0000 (UTC)
-Subject: Re: [PATCH v4 18/21] KVM: arm64: Support SDEI event injection
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 533B56E201;
+ Wed, 12 Jan 2022 07:19:13 +0000 (UTC)
+Subject: Re: [PATCH v4 19/21] KVM: arm64: Support SDEI event cancellation
 To: Eric Auger <eauger@redhat.com>, kvmarm@lists.cs.columbia.edu
 References: <20210815001352.81927-1-gshan@redhat.com>
- <20210815001352.81927-19-gshan@redhat.com>
- <6c11ed83-796e-765e-bb6a-116947d33eab@redhat.com>
+ <20210815001352.81927-20-gshan@redhat.com>
+ <6557af7a-ca00-d9dd-c970-3e85c81d1582@redhat.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <b0603dc2-a7d1-04d2-3efc-8890e6e3aadf@redhat.com>
-Date: Wed, 12 Jan 2022 15:12:39 +0800
+Message-ID: <13955510-6e0f-dc94-83cc-26f0f53a8fcd@redhat.com>
+Date: Wed, 12 Jan 2022 15:19:09 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <6c11ed83-796e-765e-bb6a-116947d33eab@redhat.com>
+In-Reply-To: <6557af7a-ca00-d9dd-c970-3e85c81d1582@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Cc: maz@kernel.org, pbonzini@redhat.com, will@kernel.org,
  linux-kernel@vger.kernel.org, Jonathan.Cameron@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -88,182 +88,102 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Eric,
 
-On 11/10/21 10:05 PM, Eric Auger wrote:
+On 11/10/21 10:09 PM, Eric Auger wrote:
 > On 8/15/21 2:13 AM, Gavin Shan wrote:
->> This supports SDEI event injection by implementing kvm_sdei_inject().
->> It's called by kernel directly or VMM through ioctl command to inject
->> SDEI event to the specific vCPU.
+>> The injected SDEI event is to send notification to guest. The SDEI
+>> event might not be needed after it's injected. This introduces API
+>> to support cancellation on the injected SDEI event if it's not fired
+>> to the guest yet.
+>>
+>> This mechanism will be needed when we're going to support asynchronous
+>> page fault.
+> 
+> if we are able to manage the migration of an executing SDEI why can't we
+> manage the migration of pending SDEIs?
+> 
+
+I think the commit log needs to explain the use case in a clearer way. It's
+about Async PF's performance, not migration. In Async PF, the page fault is
+delivered in asynchronous way using worker. The page fault can be completed
+before the injected SDEI event for page-not-present notification is delivered.
+In this case, we needn't the overhead caused by the injected SDEI event.
+
+I will think about it and may drop this patch from the series, to detach
+SDEI and async PF as much as possible :)
+
+
 >>
 >> Signed-off-by: Gavin Shan <gshan@redhat.com>
 >> ---
->>   arch/arm64/include/asm/kvm_sdei.h      |   2 +
->>   arch/arm64/include/uapi/asm/kvm_sdei.h |   1 +
->>   arch/arm64/kvm/sdei.c                  | 108 +++++++++++++++++++++++++
->>   3 files changed, 111 insertions(+)
+>>   arch/arm64/include/asm/kvm_sdei.h |  1 +
+>>   arch/arm64/kvm/sdei.c             | 49 +++++++++++++++++++++++++++++++
+>>   2 files changed, 50 insertions(+)
 >>
 >> diff --git a/arch/arm64/include/asm/kvm_sdei.h b/arch/arm64/include/asm/kvm_sdei.h
->> index a997989bab77..51087fe971ba 100644
+>> index 51087fe971ba..353744c7bad9 100644
 >> --- a/arch/arm64/include/asm/kvm_sdei.h
 >> +++ b/arch/arm64/include/asm/kvm_sdei.h
->> @@ -124,6 +124,8 @@ void kvm_sdei_create_vcpu(struct kvm_vcpu *vcpu);
->>   int kvm_sdei_hypercall(struct kvm_vcpu *vcpu);
->>   int kvm_sdei_register_notifier(struct kvm *kvm, unsigned long num,
+>> @@ -126,6 +126,7 @@ int kvm_sdei_register_notifier(struct kvm *kvm, unsigned long num,
 >>   			       kvm_sdei_notifier notifier);
->> +int kvm_sdei_inject(struct kvm_vcpu *vcpu,
->> +		    unsigned long num, bool immediate);
+>>   int kvm_sdei_inject(struct kvm_vcpu *vcpu,
+>>   		    unsigned long num, bool immediate);
+>> +int kvm_sdei_cancel(struct kvm_vcpu *vcpu, unsigned long num);
 >>   void kvm_sdei_deliver(struct kvm_vcpu *vcpu);
 >>   long kvm_sdei_vm_ioctl(struct kvm *kvm, unsigned long arg);
 >>   long kvm_sdei_vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned long arg);
->> diff --git a/arch/arm64/include/uapi/asm/kvm_sdei.h b/arch/arm64/include/uapi/asm/kvm_sdei.h
->> index b916c3435646..f7a6b2b22b50 100644
->> --- a/arch/arm64/include/uapi/asm/kvm_sdei.h
->> +++ b/arch/arm64/include/uapi/asm/kvm_sdei.h
->> @@ -67,6 +67,7 @@ struct kvm_sdei_vcpu_state {
->>   #define KVM_SDEI_CMD_SET_VEVENT			7
->>   #define KVM_SDEI_CMD_GET_VCPU_STATE		8
->>   #define KVM_SDEI_CMD_SET_VCPU_STATE		9
->> +#define KVM_SDEI_CMD_INJECT_EVENT		10
->>   
->>   struct kvm_sdei_cmd {
->>   	__u32						cmd;
 >> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
->> index 79315b77f24b..7c2789cd1421 100644
+>> index 7c2789cd1421..4f5a582daa97 100644
 >> --- a/arch/arm64/kvm/sdei.c
 >> +++ b/arch/arm64/kvm/sdei.c
->> @@ -802,6 +802,111 @@ int kvm_sdei_register_notifier(struct kvm *kvm,
+>> @@ -907,6 +907,55 @@ int kvm_sdei_inject(struct kvm_vcpu *vcpu,
 >>   	return ret;
 >>   }
 >>   
->> +int kvm_sdei_inject(struct kvm_vcpu *vcpu,
->> +		    unsigned long num,
->> +		    bool immediate)
-> don't get the immediate param.
-
-I definitely need comments to explain @immediate here. It means the
-injected SDEI event should be handled and delivered immediately.
-For example, if one of the following conditions is met, the injected
-event can't be delivered immediately. This mechanism is needed by
-Async PF to inject event for page-not-present notification and it's
-expected to be delivered immediately.
-
-    (a) Current event is critical, another critical event is being delivered.
-    (b) Current event is normal, another critical or normal event is being delivered.
-
+>> +int kvm_sdei_cancel(struct kvm_vcpu *vcpu, unsigned long num)
 >> +{
 >> +	struct kvm *kvm = vcpu->kvm;
 >> +	struct kvm_sdei_kvm *ksdei = kvm->arch.sdei;
 >> +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
->> +	struct kvm_sdei_event *kse = NULL;
 >> +	struct kvm_sdei_kvm_event *kske = NULL;
 >> +	struct kvm_sdei_vcpu_event *ksve = NULL;
->> +	int index, ret = 0;
+>> +	int ret = 0;
 >> +
->> +	/* Sanity check */
 >> +	if (!(ksdei && vsdei)) {
 >> +		ret = -EPERM;
 >> +		goto out;
 >> +	}
 >> +
->> +	if (!kvm_sdei_is_valid_event_num(num)) {
->> +		ret = -EINVAL;
->> +		goto out;
->> +	}
->> +
->> +	/* Check the kvm event */
->> +	spin_lock(&ksdei->lock);
->> +	kske = kvm_sdei_find_kvm_event(kvm, num);
->> +	if (!kske) {
->> +		ret = -ENOENT;
->> +		goto unlock_kvm;
->> +	}
->> +
->> +	kse = kske->kse;
->> +	index = (kse->state.type == SDEI_EVENT_TYPE_PRIVATE) ?
->> +		vcpu->vcpu_idx : 0;
->> +	if (!(kvm_sdei_is_registered(kske, index) &&
->> +	      kvm_sdei_is_enabled(kske, index))) {
->> +		ret = -EPERM;
->> +		goto unlock_kvm;
->> +	}
->> +
->> +	/* Check the vcpu state */
+>> +	/* Find the vCPU event */
 >> +	spin_lock(&vsdei->lock);
->> +	if (vsdei->state.masked) {
->> +		ret = -EPERM;
->> +		goto unlock_vcpu;
->> +	}
->> +
->> +	/* Check if the event can be delivered immediately */
->> +	if (immediate) {
-> According to the dispatcher pseudo code this should be always checked?
-
-Nope, The spec doesn't require that the event is delivered immediately.
-It means the event can be delayed.
-
->> +		if (kse->state.priority == SDEI_EVENT_PRIORITY_CRITICAL &&
->> +		    !list_empty(&vsdei->critical_events)) {
->> +			ret = -ENOSPC;
->> +			goto unlock_vcpu;
->> +		}
->> +
->> +		if (kse->state.priority == SDEI_EVENT_PRIORITY_NORMAL &&
->> +		    (!list_empty(&vsdei->critical_events) ||
->> +		     !list_empty(&vsdei->normal_events))) {
->> +			ret = -ENOSPC;
->> +			goto unlock_vcpu;
->> +		}
->> +	}
-> What about shared event dispatching. I don't see the afficinity checked
-> anywhere?
-
-You're correct. I ignore affinity stuff for now for two reasons: (1) I didn't
-figure out the mechanism to verify the affinity, as I mentioned before.
-(2) Currently, the affinity isn't used by SDEI client driver in the guest kernel.
-
->> +
->> +	/* Check if the vcpu event exists */
 >> +	ksve = kvm_sdei_find_vcpu_event(vcpu, num);
->> +	if (ksve) {
->> +		kske->state.refcount++;
->> +		ksve->state.refcount++;
-> why this double refcount increment??
-
-Yep, As I explained before, "ksve->state.refcount" should be increased only
-when the corresponding vCPU event is created.
-
->> +		kvm_make_request(KVM_REQ_SDEI, vcpu);
->> +		goto unlock_vcpu;
->> +	}
->> +
->> +	/* Allocate vcpu event */
->> +	ksve = kzalloc(sizeof(*ksve), GFP_KERNEL);
 >> +	if (!ksve) {
->> +		ret = -ENOMEM;
->> +		goto unlock_vcpu;
+>> +		ret = -EINVAL;
+>> +		goto unlock;
 >> +	}
 >> +
->> +	/*
->> +	 * We should take lock to update KVM event state because its
->> +	 * reference count might be zero. In that case, the KVM event
->> +	 * could be destroyed.
->> +	 */
->> +	kske->state.refcount++;
->> +	ksve->state.num      = num;
->> +	ksve->state.refcount = 1;
->> +	ksve->kske           = kske;
->> +	ksve->vcpu           = vcpu;
+>> +	/* Event can't be cancelled if it has been delivered */
+>> +	if (ksve->state.refcount <= 1 &&
+>> +	    (vsdei->critical_event == ksve ||
+>> +	     vsdei->normal_event == ksve)) {
+>> +		ret = -EINPROGRESS;
+>> +		goto unlock;
+>> +	}
 >> +
->> +	if (kse->state.priority == SDEI_EVENT_PRIORITY_CRITICAL)
->> +		list_add_tail(&ksve->link, &vsdei->critical_events);
->> +	else
->> +		list_add_tail(&ksve->link, &vsdei->normal_events);
+>> +	/* Free the vCPU event if necessary */
+>> +	kske = ksve->kske;
+>> +	ksve->state.refcount--;
+>> +	if (!ksve->state.refcount) {
+>> +		list_del(&ksve->link);
+>> +		kfree(ksve);
+>> +	}
 >> +
->> +	kvm_make_request(KVM_REQ_SDEI, vcpu);
->> +
->> +unlock_vcpu:
+>> +unlock:
 >> +	spin_unlock(&vsdei->lock);
->> +unlock_kvm:
->> +	spin_unlock(&ksdei->lock);
+>> +	if (kske) {
+>> +		spin_lock(&ksdei->lock);
+>> +		kske->state.refcount--;
+>> +		spin_unlock(&ksdei->lock);
+>> +	}
 >> +out:
 >> +	return ret;
 >> +}
@@ -271,16 +191,6 @@ when the corresponding vCPU event is created.
 >>   void kvm_sdei_deliver(struct kvm_vcpu *vcpu)
 >>   {
 >>   	struct kvm *kvm = vcpu->kvm;
->> @@ -1317,6 +1422,9 @@ long kvm_sdei_vcpu_ioctl(struct kvm_vcpu *vcpu, unsigned long arg)
->>   	case KVM_SDEI_CMD_SET_VCPU_STATE:
->>   		ret = kvm_sdei_set_vcpu_state(vcpu, &cmd->ksv_state);
->>   		break;
->> +	case KVM_SDEI_CMD_INJECT_EVENT:
->> +		ret = kvm_sdei_inject(vcpu, cmd->num, false);
->> +		break;
->>   	default:
->>   		ret = -EINVAL;
->>   	}
 >>
 
 Thanks,
