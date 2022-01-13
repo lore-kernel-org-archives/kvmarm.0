@@ -2,76 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF734C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Jan 2022 05:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1FCC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Jan 2022 06:12:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BC3A4B159;
-	Thu, 13 Jan 2022 00:33:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1DBC4A369;
+	Thu, 13 Jan 2022 01:12:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yqyLjZOI7ZGO; Thu, 13 Jan 2022 00:33:41 -0500 (EST)
+	with ESMTP id oL3AhuS-TFIU; Thu, 13 Jan 2022 01:12:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDF6C4B130;
-	Thu, 13 Jan 2022 00:33:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59EA24B099;
+	Thu, 13 Jan 2022 01:12:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65C594B126
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 00:33:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AB9E4A369
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 01:12:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Npf-9ad9Fy7r for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Jan 2022 00:33:39 -0500 (EST)
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com
- [209.85.216.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E62D04B10E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 00:33:38 -0500 (EST)
-Received: by mail-pj1-f48.google.com with SMTP id oa15so9173144pjb.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 21:33:38 -0800 (PST)
+ with ESMTP id 6D2+N-ubqLPy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Jan 2022 01:12:26 -0500 (EST)
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com
+ [209.85.214.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3432D4A1D9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 01:12:26 -0500 (EST)
+Received: by mail-pl1-f179.google.com with SMTP id t18so8086061plg.9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 22:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=p+r0LPZOfGniF2N+vDyRSD/lUF/vLa2MZKw07kH77DU=;
- b=SZXola/5bZftUkpaDVEqwhjFOzmbQ4qvJgirlkjTGO+p7XRCkKS0mIL+QCB+oBRQ0d
- tbpDHOZVuU+eOTTIPdwJc2/lc5azw/P37zrp8XxHq9/WglqfsBkzfUMSWfAlKtJkHK5H
- pF73lnEKuqYmguEZrk0ot0kx2MRFI6VND9TzMsF88+QD6IJ6a4bV/N/xf/OmhJmBzuDu
- yP1A4kLVy0QHAfUA/X0Z5vZBXLcYShP5s7QPcXnbqvKieYhDJTJuvnTeBYmLwnV+XtFx
- 98Ve/5Hun9tjeK9nSBP7fhHmbelxDkYC/6CGldF0iB4JCYiiKc8S3dPWLuQt3VOBtT9u
- C8pQ==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=ts8RgrIvYlUyMkKlBFR0Ft0sqT+vD7UXNC3L+87myZY=;
+ b=P0K9rW4/Aw3etpwJ5+F/WEEAIoXaJIDCfzGGfnJ1emVyNRH1I6qqhVk0D285sTW6bJ
+ 8U5BFJAT9ycdC/wEKdQQMCC7QXIyrTpjp3XQOWm3Xvg9z/1SXef0QNuY6XQofKfatOCG
+ TZRFaGIdF+tUjuLT7Q0I/lUoZPKomQYojo7+kHObvp9r5tma4p4kB8wNYqJXrrYYvEMb
+ 2K6lTTYk7PJumcLrEzdWBVTj0vWYKvIQtYkcOdb+AI3yjwvpJKmy8dgbU98YoLjvFmTl
+ h4rD1aO9eaCxKyKnZmz+866E66RpKyzvtTPghNt5rm1K+T4oRp3+p3ux0g8hdD8RdXut
+ TUyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=p+r0LPZOfGniF2N+vDyRSD/lUF/vLa2MZKw07kH77DU=;
- b=5b7+doakincC0a5a/C0Ko1KA5eSCL2Q9zm0ohNLCnizmdWYrpIoKpr8ZUm4NCxSob3
- fXucSOqCNSTD9ZJcPYSVHOzs8jN+Zg2ZrCvIjjgf8MqbqymYlQP2h5NMCVJlb/MoeRHl
- zCPzBNOju2GoWx+zI7iRQKJV3+J2tRDCsdbQV+RdijNu3/NftejAJeGqX1si0Kauw+8k
- 2wzQKIaan0pY7CH4YQTqIgD1GLy66AsI5vgLpvYCI19XDLl+neJcRWzoChaYFOfBKpHE
- XBqLp5BpaG+A7tEAPD6COLXY+DZBS7qwWtacASaN+vJj5WtVrLK5baFD8z47fF9hdtWN
- +frw==
-X-Gm-Message-State: AOAM530NXnlwGu1J9WWgI5sLS6PhDOVJUU6zQZnatIpNl5/m2q6Mb4Ov
- v68YR47F2WpE5TlauTIOmqjCKfOSN/pRFDilMmpi9g==
-X-Google-Smtp-Source: ABdhPJxRejhJ4rImaa5T0dvK3sqkItOKQW3Nq/2+rpgfD4lSO6ngdk1tncp/0Wak0SXUznMf9+X8ef+BRb0JTXBOn+Q=
-X-Received: by 2002:a05:6a00:ccf:b0:4ba:ea96:dff with SMTP id
- b15-20020a056a000ccf00b004baea960dffmr2767397pfv.82.1642052017693; Wed, 12
- Jan 2022 21:33:37 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ts8RgrIvYlUyMkKlBFR0Ft0sqT+vD7UXNC3L+87myZY=;
+ b=IQxW2pt7ZYfmrqyFQJ22zHGi6T59IJiMQGoduuSzvrh6M7/j0vSqTMJTcUaBrvzs5h
+ RCTsvlarSiZAkwaz5tMbO09/8sSm/RGN3zwGiFUsaJ9MvkHHAUzIMldoVMEChXnb2HDB
+ PJWN4dl/pDqVpQ/qxvyvVlevF9S7svMDOIxxBgiwq54m+YpuDxsPFRuqwloaCKZHegyj
+ QAhKNvrQX6nGuBkhkWHTrgXec/WrFzrqujUFzeUQPO7KB9MXcQ4r4txEHToaBTCvvVFu
+ GaHaTkInzh0hI8Yal23y65Sucga/nIw/hu/PnfII+VM/p02szXddOq7orB+nmaB94WRn
+ 1RRA==
+X-Gm-Message-State: AOAM532o8AKLEC9Gw7DnrT1mh9cSv1OmHXw2iAE/t+uxhwFtpQxLKLV3
+ n4k0F+wGzzBbuClgOUNY8Rbx5w==
+X-Google-Smtp-Source: ABdhPJwBmxVJaaKyVTUhtBy2c9tOZg+9WMPmADe4DCEKJmhoY/VUIGr5zDc+0NurF6gPP8ev8vWtgQ==
+X-Received: by 2002:a17:90b:33cd:: with SMTP id
+ lk13mr12790344pjb.35.1642054344988; 
+ Wed, 12 Jan 2022 22:12:24 -0800 (PST)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150])
+ by smtp.gmail.com with ESMTPSA id c19sm1448592pfo.91.2022.01.12.22.12.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 12 Jan 2022 22:12:24 -0800 (PST)
+Date: Wed, 12 Jan 2022 22:12:20 -0800
+From: Ricardo Koller <ricarkol@google.com>
+To: Jing Zhang <jingzhangos@google.com>
+Subject: Re: [RFC PATCH 0/3] ARM64: Guest performance improvement during dirty
+Message-ID: <Yd/CxKuA04I9k5W1@google.com>
+References: <20220110210441.2074798-1-jingzhangos@google.com>
+ <Yd+TV4Bkhzpnpx8N@google.com>
+ <CAAdAUtgk7y6WA4YO96ZTX6ZUPPzfLtJWnToBVPHtLG89vJ-y2g@mail.gmail.com>
 MIME-Version: 1.0
-References: <20220110054042.1079932-1-reijiw@google.com>
- <YdwPCcZWD8Uc1eej@monolith.localdoman>
- <CAAeT=Fz1KPbpmcSbukBuGWMJH=V_oXAJoaDHAen_Gy9Qswo_1Q@mail.gmail.com>
- <875yqqtn5q.wl-maz@kernel.org> <Yd2sLbiw/XPCZe7q@monolith.localdoman>
-In-Reply-To: <Yd2sLbiw/XPCZe7q@monolith.localdoman>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 12 Jan 2022 21:33:21 -0800
-Message-ID: <CAAeT=Fx62SZJvQYfFWj2sA-pcvrghuh8dSGuAaAtYWnJ5T5HCA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: mixed-width check should be skipped for
- uninitialized vCPUs
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <CAAdAUtgk7y6WA4YO96ZTX6ZUPPzfLtJWnToBVPHtLG89vJ-y2g@mail.gmail.com>
+Cc: KVM <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,254 +92,132 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc and Alex,
-
-On Tue, Jan 11, 2022 at 8:11 AM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Hi Marc,
->
-> On Tue, Jan 11, 2022 at 01:30:41PM +0000, Marc Zyngier wrote:
-> > On Tue, 11 Jan 2022 07:37:57 +0000,
-> > Reiji Watanabe <reijiw@google.com> wrote:
-> > >
-> > > Hi Alex,
-> > >
-> > > On Mon, Jan 10, 2022 at 2:48 AM Alexandru Elisei
-> > > <alexandru.elisei@arm.com> wrote:
-> > > >
-> > > > Hi Reiji,
-> > > >
-> > > > On Sun, Jan 09, 2022 at 09:40:41PM -0800, Reiji Watanabe wrote:
-> > > > > vcpu_allowed_register_width() checks if all the VCPUs are either
-> > > > > all 32bit or all 64bit.  Since the checking is done even for vCPUs
-> > > > > that are not initialized (KVM_ARM_VCPU_INIT has not been done) yet,
-> > > > > the non-initialized vCPUs are erroneously treated as 64bit vCPU,
-> > > > > which causes the function to incorrectly detect a mixed-width VM.
-> > > > >
-> > > > > Fix vcpu_allowed_register_width() to skip the check for vCPUs that
-> > > > > are not initialized yet.
-> > > > >
-> > > > > Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
-> > > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > > > ---
-> > > > >  arch/arm64/kvm/reset.c | 11 +++++++++++
-> > > > >  1 file changed, 11 insertions(+)
-> > > > >
-> > > > > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> > > > > index 426bd7fbc3fd..ef78bbc7566a 100644
-> > > > > --- a/arch/arm64/kvm/reset.c
-> > > > > +++ b/arch/arm64/kvm/reset.c
-> > > > > @@ -180,8 +180,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-> > > > >       if (kvm_has_mte(vcpu->kvm) && is32bit)
-> > > > >               return false;
-> > > > >
-> > > > > +     /*
-> > > > > +      * Make sure vcpu->arch.target setting is visible from others so
-> > > > > +      * that the width consistency checking between two vCPUs is done
-> > > > > +      * by at least one of them at KVM_ARM_VCPU_INIT.
-> > > > > +      */
-> > > > > +     smp_mb();
-> > > >
-> > > > From ARM DDI 0487G.a, page B2-146 ("Data Memory Barrier (DMB)"):
-> > > >
-> > > > "The DMB instruction is a memory barrier instruction that ensures the relative
-> > > > order of memory accesses before the barrier with memory accesses after the
-> > > > barrier."
-> > > >
-> > > > I'm going to assume from the comment that you are referring to completion of
-> > > > memory accesses ("Make sure [..] is visible from others"). Please correct me if
-> > > > I am wrong. In this case, DMB ensures ordering of memory accesses with regards
-> > > > to writes and reads, not *completion*.  Have a look at
-> > > > tools/memory-model/litmus-tests/MP+fencewmbonceonce+fencermbonceonce.litmus for
-> > > > the classic message passing example as an example of memory ordering.
-> > > > Message passing and other patterns are also explained in ARM DDI 0487G.a, page
-> > > > K11-8363.
-> > > >
-> > > > I'm not saying that your approach is incorrect, but the commit message should
-> > > > explain what memory accesses are being ordered relative to each other and why.
-> > >
-> > > Thank you so much for the review.
-> > > What I meant with the comment was:
-> > > ---
-> > >   DMB is used to make sure that writing @vcpu->arch.target, which is done
-> > >   by kvm_vcpu_set_target() before getting here, is visible to other PEs
-> > >   before the following kvm_for_each_vcpu iteration reads the other vCPUs'
-> > >   target field.
-> > > ---
-> > > Did the comment become more clear ?? (Or do I use DMB incorrectly ?)
-> > >
-> > > > > +
-> > > > >       /* Check that the vcpus are either all 32bit or all 64bit */
-> > > > >       kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-> > > > > +             /* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
-> > > > > +             if (tmp->arch.target == -1)
-> > > > > +                     continue;
-> > >
-> > > I just noticed DMB(ishld) is needed here to assure ordering between
-> > > reading tmp->arch.target and reading vcpu->arch.features for this fix.
-> > > Similarly, kvm_vcpu_set_target() needs DMB(ishst) to assure ordering
-> > > between writing vcpu->arch.features and writing vcpu->arch.target...
-> > > I am going to fix them in the v2 series.
+On Wed, Jan 12, 2022 at 07:50:48PM -0800, Jing Zhang wrote:
+> On Wed, Jan 12, 2022 at 6:50 PM Ricardo Koller <ricarkol@google.com> wrote:
 > >
-> > Yes, you'd need at least this, and preferably in their smp_rmb/wmb
-> > variants.
+> > Hi Jing,
 > >
-> > However, this looks like a pretty fragile construct, as there are
-> > multiple paths where we can change target (including some error
-> > paths from the run loop).
+> > On Mon, Jan 10, 2022 at 09:04:38PM +0000, Jing Zhang wrote:
+> > > This patch is to reduce the performance degradation of guest workload during
+> > > dirty logging on ARM64. A fast path is added to handle permission relaxation
+> > > during dirty logging. The MMU lock is replaced with rwlock, by which all
+> > > permision relaxations on leaf pte can be performed under the read lock. This
+> > > greatly reduces the MMU lock contention during dirty logging. With this
+> > > solution, the source guest workload performance degradation can be improved
+> > > by more than 60%.
+> > >
+> > > Problem:
+> > >   * A Google internal live migration test shows that the source guest workload
+> > >   performance has >99% degradation for about 105 seconds, >50% degradation
+> > >   for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
+> > >   This shows that most of the time, the guest workload degradtion is above
+> > >   99%, which obviously needs some improvement compared to the test result
+> > >   on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
+> > >   * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB
+> > >   * VM spec: #vCPU: 48, #Mem/vCPU: 4GB
+> > >
+> > > Analysis:
+> > >   * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
+> > >     the number of contentions of MMU lock and the "dirty memory time" on
+> > >     various VM spec.
+> > >     By using test command
+> > >     ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
+> > >     Below are the results:
+> > >     +-------+------------------------+-----------------------+
+> > >     | #vCPU | dirty memory time (ms) | number of contentions |
+> > >     +-------+------------------------+-----------------------+
+> > >     | 1     | 926                    | 0                     |
+> > >     +-------+------------------------+-----------------------+
+> > >     | 2     | 1189                   | 4732558               |
+> > >     +-------+------------------------+-----------------------+
+> > >     | 4     | 2503                   | 11527185              |
+> > >     +-------+------------------------+-----------------------+
+> > >     | 8     | 5069                   | 24881677              |
+> > >     +-------+------------------------+-----------------------+
+> > >     | 16    | 10340                  | 50347956              |
+> > >     +-------+------------------------+-----------------------+
+> > >     | 32    | 20351                  | 100605720             |
+> > >     +-------+------------------------+-----------------------+
+> > >     | 64    | 40994                  | 201442478             |
+> > >     +-------+------------------------+-----------------------+
+> > >
+> > >   * From the test results above, the "dirty memory time" and the number of
+> > >     MMU lock contention scale with the number of vCPUs. That means all the
+> > >     dirty memory operations from all vCPU threads have been serialized by
+> > >     the MMU lock. Further analysis also shows that the permission relaxation
+> > >     during dirty logging is where vCPU threads get serialized.
+> > >
+> > > Solution:
+> > >   * On ARM64, there is no mechanism as PML (Page Modification Logging) and
+> > >     the dirty-bit solution for dirty logging is much complicated compared to
+> > >     the write-protection solution. The straight way to reduce the guest
+> > >     performance degradation is to enhance the concurrency for the permission
+> > >     fault path during dirty logging.
+> > >   * In this patch, we only put leaf PTE permission relaxation for dirty
+> > >     logging under read lock, all others would go under write lock.
+> > >     Below are the results based on the solution:
+> > >     +-------+------------------------+
+> > >     | #vCPU | dirty memory time (ms) |
+> > >     +-------+------------------------+
+> > >     | 1     | 803                    |
+> > >     +-------+------------------------+
+> > >     | 2     | 843                    |
+> > >     +-------+------------------------+
+> > >     | 4     | 942                    |
+> > >     +-------+------------------------+
+> > >     | 8     | 1458                   |
+> > >     +-------+------------------------+
+> > >     | 16    | 2853                   |
+> > >     +-------+------------------------+
+> > >     | 32    | 5886                   |
+> > >     +-------+------------------------+
+> > >     | 64    | 12190                  |
+> > >     +-------+------------------------+
 > >
-> > I'd rather all changes to target and the feature bits happen under the
-> > kvm->lock, and take that lock when checking for consistency in
-> > vcpu_allowed_register_width(), as this isn't a fast path. I wrote the
-> > following, which is obviously incomplete and as usual untested.
->
-> I think this is the better approach, because we also want to make sure that
-> a PE observes changes to target and features as soon as they have been
-> made, to avoid situations where one PE sets the target and the 32bit
-> feature, and another PE reads the old values and skips the check, in which
-> case memory ordering is not enough.
+> > Just curious, do yo know why is time still doubling (roughly) with the
+> > number of cpus? maybe you performed another experiment or have some
+> > guess(es).
+> Yes. it is from the serialization caused by TLB flush whenever the
+> permission is relaxed. I tried test by removing the TLB flushes (of
+> course it shouldn't be removed), the time would be close to a constant
+> no matter the number of vCPUs.
 
-Thank you for the comments and the suggestion.
-I will look into fixing this based on the suggestion.
+Got it, thanks for the info.
 
-Thanks,
-Reiji
+Ricardo
 
-
-
-
->
-> Thanks,
-> Alex
->
 > >
 > > Thanks,
+> > Ricardo
 > >
-> >       M.
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index e4727dc771bf..42f2ab80646c 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1061,7 +1061,8 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
-> >  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-> >                              const struct kvm_vcpu_init *init)
-> >  {
-> > -     unsigned int i, ret;
-> > +     unsigned int i;
-> > +     int ret = 0;
-> >       u32 phys_target = kvm_target_cpu();
-> >
-> >       if (init->target != phys_target)
-> > @@ -1074,32 +1075,46 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
-> >       if (vcpu->arch.target != -1 && vcpu->arch.target != init->target)
-> >               return -EINVAL;
-> >
-> > +     /* Hazard against a concurent check of the target in kvm_reset_vcpu() */
-> > +     mutex_lock(&vcpu->kvm->lock);
-> > +
-> >       /* -ENOENT for unknown features, -EINVAL for invalid combinations. */
-> >       for (i = 0; i < sizeof(init->features) * 8; i++) {
-> >               bool set = (init->features[i / 32] & (1 << (i % 32)));
-> >
-> > -             if (set && i >= KVM_VCPU_MAX_FEATURES)
-> > -                     return -ENOENT;
-> > +             if (set && i >= KVM_VCPU_MAX_FEATURES) {
-> > +                     ret = -ENOENT;
-> > +                     break;
-> > +             }
-> >
-> >               /*
-> >                * Secondary and subsequent calls to KVM_ARM_VCPU_INIT must
-> >                * use the same feature set.
-> >                */
-> >               if (vcpu->arch.target != -1 && i < KVM_VCPU_MAX_FEATURES &&
-> > -                 test_bit(i, vcpu->arch.features) != set)
-> > -                     return -EINVAL;
-> > +                 test_bit(i, vcpu->arch.features) != set) {
-> > +                     ret = -EINVAL;
-> > +                     break;
-> > +             }
-> >
-> >               if (set)
-> >                       set_bit(i, vcpu->arch.features);
-> >       }
-> >
-> > -     vcpu->arch.target = phys_target;
-> > +     if (!ret)
-> > +             vcpu->arch.target = phys_target;
-> > +
-> > +     mutex_unlock(&vcpu->kvm->lock);
-> > +     if (ret)
-> > +             return ret;
-> >
-> >       /* Now we know what it is, we can reset it. */
-> >       ret = kvm_reset_vcpu(vcpu);
-> >       if (ret) {
-> > +             mutex_lock(&vcpu->kvm->lock);
-> >               vcpu->arch.target = -1;
-> >               bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> > +             mutex_unlock(&vcpu->kvm->lock);
-> >       }
-> >
-> >       return ret;
-> > diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> > index ef78bbc7566a..fae88a703140 100644
-> > --- a/arch/arm64/kvm/reset.c
-> > +++ b/arch/arm64/kvm/reset.c
-> > @@ -180,13 +180,6 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-> >       if (kvm_has_mte(vcpu->kvm) && is32bit)
-> >               return false;
-> >
-> > -     /*
-> > -      * Make sure vcpu->arch.target setting is visible from others so
-> > -      * that the width consistency checking between two vCPUs is done
-> > -      * by at least one of them at KVM_ARM_VCPU_INIT.
-> > -      */
-> > -     smp_mb();
-> > -
-> >       /* Check that the vcpus are either all 32bit or all 64bit */
-> >       kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
-> >               /* Skip if KVM_ARM_VCPU_INIT is not done for the vcpu yet */
-> > @@ -222,14 +215,19 @@ static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-> >  int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> >  {
-> >       struct vcpu_reset_state reset_state;
-> > -     int ret;
-> > +     int ret = -EINVAL;
-> >       bool loaded;
-> >       u32 pstate;
-> >
-> >       mutex_lock(&vcpu->kvm->lock);
-> > -     reset_state = vcpu->arch.reset_state;
-> > -     WRITE_ONCE(vcpu->arch.reset_state.reset, false);
-> > +     if (vcpu_allowed_register_width(vcpu)) {
-> > +             reset_state = vcpu->arch.reset_state;
-> > +             WRITE_ONCE(vcpu->arch.reset_state.reset, false);
-> > +             ret = 0;
-> > +     }
-> >       mutex_unlock(&vcpu->kvm->lock);
-> > +     if (ret)
-> > +             goto out;
-> >
-> >       /* Reset PMU outside of the non-preemptible section */
-> >       kvm_pmu_vcpu_reset(vcpu);
-> > @@ -257,11 +255,6 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> >               }
-> >       }
-> >
-> > -     if (!vcpu_allowed_register_width(vcpu)) {
-> > -             ret = -EINVAL;
-> > -             goto out;
-> > -     }
-> > -
-> >       switch (vcpu->arch.target) {
-> >       default:
-> >               if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
-> >
-> > --
-> > Without deviation from the norm, progress is not possible.
+> > >     All "dirty memory time" have been reduced by more than 60% when the
+> > >     number of vCPU grows.
+> > >
+> > > ---
+> > >
+> > > Jing Zhang (3):
+> > >   KVM: arm64: Use read/write spin lock for MMU protection
+> > >   KVM: arm64: Add fast path to handle permission relaxation during dirty
+> > >     logging
+> > >   KVM: selftests: Add vgic initialization for dirty log perf test for
+> > >     ARM
+> > >
+> > >  arch/arm64/include/asm/kvm_host.h             |  2 +
+> > >  arch/arm64/kvm/mmu.c                          | 86 +++++++++++++++----
+> > >  .../selftests/kvm/dirty_log_perf_test.c       | 10 +++
+> > >  3 files changed, 80 insertions(+), 18 deletions(-)
+> > >
+> > >
+> > > base-commit: fea31d1690945e6dd6c3e89ec5591490857bc3d4
+> > > --
+> > > 2.34.1.575.g55b058a8bb-goog
+> > >
+> > > _______________________________________________
+> > > kvmarm mailing list
+> > > kvmarm@lists.cs.columbia.edu
+> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Thanks,
+> Jing
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
