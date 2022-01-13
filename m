@@ -2,83 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1FCC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Jan 2022 06:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 036D7C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Jan 2022 07:02:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1DBC4A369;
-	Thu, 13 Jan 2022 01:12:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 583804B0DE;
+	Thu, 13 Jan 2022 02:02:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oL3AhuS-TFIU; Thu, 13 Jan 2022 01:12:29 -0500 (EST)
+	with ESMTP id HecvAPNK4243; Thu, 13 Jan 2022 02:02:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59EA24B099;
-	Thu, 13 Jan 2022 01:12:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 371374A417;
+	Thu, 13 Jan 2022 02:02:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AB9E4A369
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 01:12:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C77EC4A19A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 02:02:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6D2+N-ubqLPy for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Jan 2022 01:12:26 -0500 (EST)
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com
- [209.85.214.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3432D4A1D9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 01:12:26 -0500 (EST)
-Received: by mail-pl1-f179.google.com with SMTP id t18so8086061plg.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Jan 2022 22:12:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=ts8RgrIvYlUyMkKlBFR0Ft0sqT+vD7UXNC3L+87myZY=;
- b=P0K9rW4/Aw3etpwJ5+F/WEEAIoXaJIDCfzGGfnJ1emVyNRH1I6qqhVk0D285sTW6bJ
- 8U5BFJAT9ycdC/wEKdQQMCC7QXIyrTpjp3XQOWm3Xvg9z/1SXef0QNuY6XQofKfatOCG
- TZRFaGIdF+tUjuLT7Q0I/lUoZPKomQYojo7+kHObvp9r5tma4p4kB8wNYqJXrrYYvEMb
- 2K6lTTYk7PJumcLrEzdWBVTj0vWYKvIQtYkcOdb+AI3yjwvpJKmy8dgbU98YoLjvFmTl
- h4rD1aO9eaCxKyKnZmz+866E66RpKyzvtTPghNt5rm1K+T4oRp3+p3ux0g8hdD8RdXut
- TUyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=ts8RgrIvYlUyMkKlBFR0Ft0sqT+vD7UXNC3L+87myZY=;
- b=IQxW2pt7ZYfmrqyFQJ22zHGi6T59IJiMQGoduuSzvrh6M7/j0vSqTMJTcUaBrvzs5h
- RCTsvlarSiZAkwaz5tMbO09/8sSm/RGN3zwGiFUsaJ9MvkHHAUzIMldoVMEChXnb2HDB
- PJWN4dl/pDqVpQ/qxvyvVlevF9S7svMDOIxxBgiwq54m+YpuDxsPFRuqwloaCKZHegyj
- QAhKNvrQX6nGuBkhkWHTrgXec/WrFzrqujUFzeUQPO7KB9MXcQ4r4txEHToaBTCvvVFu
- GaHaTkInzh0hI8Yal23y65Sucga/nIw/hu/PnfII+VM/p02szXddOq7orB+nmaB94WRn
- 1RRA==
-X-Gm-Message-State: AOAM532o8AKLEC9Gw7DnrT1mh9cSv1OmHXw2iAE/t+uxhwFtpQxLKLV3
- n4k0F+wGzzBbuClgOUNY8Rbx5w==
-X-Google-Smtp-Source: ABdhPJwBmxVJaaKyVTUhtBy2c9tOZg+9WMPmADe4DCEKJmhoY/VUIGr5zDc+0NurF6gPP8ev8vWtgQ==
-X-Received: by 2002:a17:90b:33cd:: with SMTP id
- lk13mr12790344pjb.35.1642054344988; 
- Wed, 12 Jan 2022 22:12:24 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id c19sm1448592pfo.91.2022.01.12.22.12.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 12 Jan 2022 22:12:24 -0800 (PST)
-Date: Wed, 12 Jan 2022 22:12:20 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Jing Zhang <jingzhangos@google.com>
-Subject: Re: [RFC PATCH 0/3] ARM64: Guest performance improvement during dirty
-Message-ID: <Yd/CxKuA04I9k5W1@google.com>
-References: <20220110210441.2074798-1-jingzhangos@google.com>
- <Yd+TV4Bkhzpnpx8N@google.com>
- <CAAdAUtgk7y6WA4YO96ZTX6ZUPPzfLtJWnToBVPHtLG89vJ-y2g@mail.gmail.com>
+ with ESMTP id hAOMg2G2tpWV for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Jan 2022 02:02:41 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CEEFE49EBB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 02:02:41 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1642057361;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wa1b8MmKgX3tm872f9qab+x44K+GoLAvtcl9qdRW4BA=;
+ b=DcIX1a4g46TBzFYiGgzHM7IEZqh8OzEViTQdVdZgtQQVYKgUcBnvDZhQzDFcis2jNXyvc/
+ wARAxIp6Fk8sndl5gDYlPLnq4QUvgZYQ5LM360e1pciE7FtwrB8kMZO1wxYnxGnuD0raLS
+ VNWv0naQG9TC47CfdoS5Xjt06/RdK4Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-192-ODlie5dgMVCGAC5FglCJow-1; Thu, 13 Jan 2022 02:02:38 -0500
+X-MC-Unique: ODlie5dgMVCGAC5FglCJow-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06D7C8042DB;
+ Thu, 13 Jan 2022 07:02:37 +0000 (UTC)
+Received: from [10.72.13.202] (ovpn-13-202.pek2.redhat.com [10.72.13.202])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F3656784A;
+ Thu, 13 Jan 2022 07:02:21 +0000 (UTC)
+Subject: Re: [PATCH v4 06/21] KVM: arm64: Support SDEI_EVENT_CONTEXT hypercall
+To: Shannon Zhao <shannon.zhaosl@gmail.com>, kvmarm@lists.cs.columbia.edu
+References: <20210815001352.81927-1-gshan@redhat.com>
+ <20210815001352.81927-7-gshan@redhat.com>
+ <40d818a2-0c91-e06e-6ce8-ac8123b8d1d4@gmail.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <798ecbb0-f369-f3e7-ad50-78acfd902d1d@redhat.com>
+Date: Thu, 13 Jan 2022 15:02:15 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAAdAUtgk7y6WA4YO96ZTX6ZUPPzfLtJWnToBVPHtLG89vJ-y2g@mail.gmail.com>
-Cc: KVM <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>
+In-Reply-To: <40d818a2-0c91-e06e-6ce8-ac8123b8d1d4@gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Cc: maz@kernel.org, pbonzini@redhat.com, will@kernel.org,
+ linux-kernel@vger.kernel.org, Jonathan.Cameron@huawei.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -87,138 +81,40 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 12, 2022 at 07:50:48PM -0800, Jing Zhang wrote:
-> On Wed, Jan 12, 2022 at 6:50 PM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > Hi Jing,
-> >
-> > On Mon, Jan 10, 2022 at 09:04:38PM +0000, Jing Zhang wrote:
-> > > This patch is to reduce the performance degradation of guest workload during
-> > > dirty logging on ARM64. A fast path is added to handle permission relaxation
-> > > during dirty logging. The MMU lock is replaced with rwlock, by which all
-> > > permision relaxations on leaf pte can be performed under the read lock. This
-> > > greatly reduces the MMU lock contention during dirty logging. With this
-> > > solution, the source guest workload performance degradation can be improved
-> > > by more than 60%.
-> > >
-> > > Problem:
-> > >   * A Google internal live migration test shows that the source guest workload
-> > >   performance has >99% degradation for about 105 seconds, >50% degradation
-> > >   for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
-> > >   This shows that most of the time, the guest workload degradtion is above
-> > >   99%, which obviously needs some improvement compared to the test result
-> > >   on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
-> > >   * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB
-> > >   * VM spec: #vCPU: 48, #Mem/vCPU: 4GB
-> > >
-> > > Analysis:
-> > >   * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
-> > >     the number of contentions of MMU lock and the "dirty memory time" on
-> > >     various VM spec.
-> > >     By using test command
-> > >     ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
-> > >     Below are the results:
-> > >     +-------+------------------------+-----------------------+
-> > >     | #vCPU | dirty memory time (ms) | number of contentions |
-> > >     +-------+------------------------+-----------------------+
-> > >     | 1     | 926                    | 0                     |
-> > >     +-------+------------------------+-----------------------+
-> > >     | 2     | 1189                   | 4732558               |
-> > >     +-------+------------------------+-----------------------+
-> > >     | 4     | 2503                   | 11527185              |
-> > >     +-------+------------------------+-----------------------+
-> > >     | 8     | 5069                   | 24881677              |
-> > >     +-------+------------------------+-----------------------+
-> > >     | 16    | 10340                  | 50347956              |
-> > >     +-------+------------------------+-----------------------+
-> > >     | 32    | 20351                  | 100605720             |
-> > >     +-------+------------------------+-----------------------+
-> > >     | 64    | 40994                  | 201442478             |
-> > >     +-------+------------------------+-----------------------+
-> > >
-> > >   * From the test results above, the "dirty memory time" and the number of
-> > >     MMU lock contention scale with the number of vCPUs. That means all the
-> > >     dirty memory operations from all vCPU threads have been serialized by
-> > >     the MMU lock. Further analysis also shows that the permission relaxation
-> > >     during dirty logging is where vCPU threads get serialized.
-> > >
-> > > Solution:
-> > >   * On ARM64, there is no mechanism as PML (Page Modification Logging) and
-> > >     the dirty-bit solution for dirty logging is much complicated compared to
-> > >     the write-protection solution. The straight way to reduce the guest
-> > >     performance degradation is to enhance the concurrency for the permission
-> > >     fault path during dirty logging.
-> > >   * In this patch, we only put leaf PTE permission relaxation for dirty
-> > >     logging under read lock, all others would go under write lock.
-> > >     Below are the results based on the solution:
-> > >     +-------+------------------------+
-> > >     | #vCPU | dirty memory time (ms) |
-> > >     +-------+------------------------+
-> > >     | 1     | 803                    |
-> > >     +-------+------------------------+
-> > >     | 2     | 843                    |
-> > >     +-------+------------------------+
-> > >     | 4     | 942                    |
-> > >     +-------+------------------------+
-> > >     | 8     | 1458                   |
-> > >     +-------+------------------------+
-> > >     | 16    | 2853                   |
-> > >     +-------+------------------------+
-> > >     | 32    | 5886                   |
-> > >     +-------+------------------------+
-> > >     | 64    | 12190                  |
-> > >     +-------+------------------------+
-> >
-> > Just curious, do yo know why is time still doubling (roughly) with the
-> > number of cpus? maybe you performed another experiment or have some
-> > guess(es).
-> Yes. it is from the serialization caused by TLB flush whenever the
-> permission is relaxed. I tried test by removing the TLB flushes (of
-> course it shouldn't be removed), the time would be close to a constant
-> no matter the number of vCPUs.
-
-Got it, thanks for the info.
-
-Ricardo
-
-> >
-> > Thanks,
-> > Ricardo
-> >
-> > >     All "dirty memory time" have been reduced by more than 60% when the
-> > >     number of vCPU grows.
-> > >
-> > > ---
-> > >
-> > > Jing Zhang (3):
-> > >   KVM: arm64: Use read/write spin lock for MMU protection
-> > >   KVM: arm64: Add fast path to handle permission relaxation during dirty
-> > >     logging
-> > >   KVM: selftests: Add vgic initialization for dirty log perf test for
-> > >     ARM
-> > >
-> > >  arch/arm64/include/asm/kvm_host.h             |  2 +
-> > >  arch/arm64/kvm/mmu.c                          | 86 +++++++++++++++----
-> > >  .../selftests/kvm/dirty_log_perf_test.c       | 10 +++
-> > >  3 files changed, 80 insertions(+), 18 deletions(-)
-> > >
-> > >
-> > > base-commit: fea31d1690945e6dd6c3e89ec5591490857bc3d4
-> > > --
-> > > 2.34.1.575.g55b058a8bb-goog
-> > >
-> > > _______________________________________________
-> > > kvmarm mailing list
-> > > kvmarm@lists.cs.columbia.edu
-> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> Thanks,
-> Jing
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgU2hhbm5vbiwKCk9uIDEvMTEvMjIgNTo0MyBQTSwgU2hhbm5vbiBaaGFvIHdyb3RlOgo+IE9u
+IDIwMjEvOC8xNSA4OjEzLCBHYXZpbiBTaGFuIHdyb3RlOgo+PiArc3RhdGljIHVuc2lnbmVkIGxv
+bmcga3ZtX3NkZWlfaHlwZXJjYWxsX2NvbnRleHQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiAr
+ewo+PiArwqDCoMKgIHN0cnVjdCBrdm0gKmt2bSA9IHZjcHUtPmt2bTsKPj4gK8KgwqDCoCBzdHJ1
+Y3Qga3ZtX3NkZWlfa3ZtICprc2RlaSA9IGt2bS0+YXJjaC5zZGVpOwo+PiArwqDCoMKgIHN0cnVj
+dCBrdm1fc2RlaV92Y3B1ICp2c2RlaSA9IHZjcHUtPmFyY2guc2RlaTsKPj4gK8KgwqDCoCBzdHJ1
+Y3Qga3ZtX3NkZWlfdmNwdV9yZWdzICpyZWdzOwo+PiArwqDCoMKgIHVuc2lnbmVkIGxvbmcgaW5k
+ZXggPSBzbWNjY19nZXRfYXJnMSh2Y3B1KTsKPj4gK8KgwqDCoCB1bnNpZ25lZCBsb25nIHJldCA9
+IFNERUlfU1VDQ0VTUzsKPj4gKwo+PiArwqDCoMKgIC8qIFNhbml0eSBjaGVjayAqLwo+PiArwqDC
+oMKgIGlmICghKGtzZGVpICYmIHZzZGVpKSkgewo+PiArwqDCoMKgwqDCoMKgwqAgcmV0ID0gU0RF
+SV9OT1RfU1VQUE9SVEVEOwo+PiArwqDCoMKgwqDCoMKgwqAgZ290byBvdXQ7Cj4+ICvCoMKgwqAg
+fQo+IE1heWJlIHdlIGNvdWxkIG1vdmUgdGhlc2UgY29tbW9uIHNhbml0eSBjaGVjayBjb2RlcyB0
+byBrdm1fc2RlaV9oeXBlcmNhbGwgdG8gc2F2ZSBzb21lIGxpbmVzLgo+IAoKTm90IGFsbCBoeXBl
+cmNhbGxzIG5lZWQgdGhpcyBjaGVjay4gRm9yIGV4YW1wbGUsIENPTVBMRVRFL0NPTVBMRVRFX1JF
+U1VNRS9DT05URVhUIGRvbid0CmhhdmUgU0RFSSBldmVudCBudW1iZXIgYXMgdGhlIGFyZ3VtZW50
+LiBJZiB3ZSByZWFsbHkgd2FudCBtb3ZlIHRoaXMgY2hlY2sgaW50byBmdW5jdGlvbgprdm1fc2Rl
+aV9oeXBlcmNhbGwoKSwgd2Ugd291bGQgaGF2ZSBjb2RlIGxpa2UgYmVsb3cuIFRvbyBtdWNoIGR1
+cGxpY2F0ZWQgc25pcHBldHMgd2lsbApiZSBzZWVuLiBJIGRvbid0IHRoaW5rIGl0J3MgYmV0dGVy
+IHRoYW4gd2hhdCB3ZSBoYXZlIGlmIEkgZnVsbHkgdW5kZXJzdGFuZCB5b3VyIGNvbW1lbnRzLgoK
+ICAgICAgIHN3aXRjaCAoLi4uKSB7CiAgICAgICBjYXNlIFJFR0lTVEVSOgogICAgICAgICAgICBp
+ZiAoIShrc2RlaSAmJiB2c2RlaSkpIHsKICAgICAgICAgICAgICAgIHJldCA9IFNERUlfTk9UX1NV
+UFBPUlRFRDsKICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICB9CgogICAgICAgICAg
+ICByZXQgPSBrdm1fc2RlaV9oeXBlcmNhbGxfcmVnaXN0ZXIodmNwdSk7CiAgICAgICAgICAgIGJy
+ZWFrOwogICAgICAgY2FzZSBVTlJFR0lTVEVSOgogICAgICAgICAgICBpZiAoIShrc2RlaSAmJiB2
+c2RlaSkpIHsKICAgICAgICAgICAgICAgIHJldCA9IFNERUlfTk9UX1NVUFBPUlRFRDsKICAgICAg
+ICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICB9CgogICAgICAgICAgICByZXQgPSBrdm1fc2Rl
+aV9oeXBlcmNhbGxfdW5yZWdpc3Rlcih2Y3B1KTsKICAgICAgICAgICAgYnJlYWs7CiAgICAgIGNh
+c2UgQ09OVEVYVDoKICAgICAgICAgICAgcmV0ID0ga3ZtX3NkZWlfaHlwZXJjYWxsX2NvbnRleHQo
+dmNwdSk7CiAgICAgICAgICAgIGJyZWFrOwogICAgICAgIDoKICAgICB9CgpUaGFua3MsCkdhdmlu
+CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0g
+bWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5j
+cy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
