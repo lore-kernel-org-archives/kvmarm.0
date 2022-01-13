@@ -2,45 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EF4C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 13 Jan 2022 12:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F79CC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 13 Jan 2022 13:15:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A3794A49C;
-	Thu, 13 Jan 2022 07:12:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFF5D49F44;
+	Thu, 13 Jan 2022 08:15:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mOZWERpydxpe; Thu, 13 Jan 2022 07:12:03 -0500 (EST)
+	with ESMTP id 56pAXDfiKLwj; Thu, 13 Jan 2022 08:15:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0725649F58;
-	Thu, 13 Jan 2022 07:12:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C53049F55;
+	Thu, 13 Jan 2022 08:15:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAAB249F55
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 07:12:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3969D49F44
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 08:15:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WLh26Bg+vubN for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Jan 2022 07:12:00 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77A4549F54
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 07:12:00 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C6CDED1;
- Thu, 13 Jan 2022 04:11:59 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9BB763F774;
- Thu, 13 Jan 2022 04:11:57 -0800 (PST)
-Date: Thu, 13 Jan 2022 12:12:04 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
+ with ESMTP id JUO8j4el6lbu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Jan 2022 08:14:58 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EECFB49F3F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 08:14:57 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 9C6B961C14;
+ Thu, 13 Jan 2022 13:14:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09AA1C36AE3;
+ Thu, 13 Jan 2022 13:14:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1642079696;
+ bh=PC2kWfELEgBeO40pucTAQA7SnGY+5p/CRP7FmI/zchA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=CDkcyCd2DCy9WK430UiY2NsrROYZclTJEwlRH0lzQSoIhYXzQNRxE7rTEzBRfn21H
+ 5Rs+ryiwcRaxHP+oZ/Sw+WiMNGOnsAFxTwnd7o6gqBQTNGpBmH4D5kmrHNDgl34zry
+ QHVXdMp9W8bcIyQDPw5p/ODl/og+z7kYr3DonsjgeyISwm4VCrqUyRh09W+jsx0gqH
+ zFPS/5bfTnIC+FV0SYzitsk0F7cP+FNTeIcRufh7HXMZKEx553t5Z9woZKkB8LC0Yu
+ GO3WEgVq7TiUQvTH4wQ8nhNssS+y9VLvWU/gMFoqX8JBZoqdfGB7MdnV2w5A4+YKNi
+ Et+n7++hs5TUg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n7zwM-000Ho5-3I; Thu, 13 Jan 2022 13:14:54 +0000
+Date: Thu, 13 Jan 2022 13:14:53 +0000
+Message-ID: <87o84f93qq.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [PATCH v5 05/69] KVM: arm64: Allow preservation of the S2 SW bits
-Message-ID: <YeAXFOR1wf3LekrQ@monolith.localdoman>
+In-Reply-To: <YeAXFOR1wf3LekrQ@monolith.localdoman>
 References: <20211129200150.351436-1-maz@kernel.org>
  <20211129200150.351436-6-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211129200150.351436-6-maz@kernel.org>
+ <YeAXFOR1wf3LekrQ@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
+ jintack@cs.columbia.edu, haibo.xu@linaro.org,
+ gankulkarni@os.amperecomputing.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
@@ -61,65 +92,86 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Alex,
 
-On Mon, Nov 29, 2021 at 08:00:46PM +0000, Marc Zyngier wrote:
-> The S2 page table code has a limited use the SW bits, but we are about
-> to need them to encode some guest Stage-2 information (its mapping size
-> in the form of the TTL encoding).
+On Thu, 13 Jan 2022 12:12:04 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Propagate the SW bits specified by the caller, and store them into
-> the corresponding entry.
+> Hi Marc,
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/pgtable.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> On Mon, Nov 29, 2021 at 08:00:46PM +0000, Marc Zyngier wrote:
+> > The S2 page table code has a limited use the SW bits, but we are about
+> > to need them to encode some guest Stage-2 information (its mapping size
+> > in the form of the TTL encoding).
+> > 
+> > Propagate the SW bits specified by the caller, and store them into
+> > the corresponding entry.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/hyp/pgtable.c | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> > index 8cdbc43fa651..d69e400b2de6 100644
+> > --- a/arch/arm64/kvm/hyp/pgtable.c
+> > +++ b/arch/arm64/kvm/hyp/pgtable.c
+> > @@ -1064,9 +1064,6 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+> >  	u32 level;
+> >  	kvm_pte_t set = 0, clr = 0;
+> >  
+> > -	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
+> > -		return -EINVAL;
+> > -
+> >  	if (prot & KVM_PGTABLE_PROT_R)
+> >  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
+> >  
+> > @@ -1076,6 +1073,10 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
+> >  	if (prot & KVM_PGTABLE_PROT_X)
+> >  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
+> >  
+> > +	/* Always propagate the SW bits */
+> > +	clr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_SW, 0xf);
 > 
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 8cdbc43fa651..d69e400b2de6 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1064,9 +1064,6 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->  	u32 level;
->  	kvm_pte_t set = 0, clr = 0;
->  
-> -	if (prot & KVM_PTE_LEAF_ATTR_HI_SW)
-> -		return -EINVAL;
-> -
->  	if (prot & KVM_PGTABLE_PROT_R)
->  		set |= KVM_PTE_LEAF_ATTR_LO_S2_S2AP_R;
->  
-> @@ -1076,6 +1073,10 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
->  	if (prot & KVM_PGTABLE_PROT_X)
->  		clr |= KVM_PTE_LEAF_ATTR_HI_S2_XN;
->  
-> +	/* Always propagate the SW bits */
-> +	clr |= FIELD_PREP(KVM_PTE_LEAF_ATTR_HI_SW, 0xf);
+> Nitpick: isn't that the same as:
+> 
+> 	clr |= KVM_PTE_LEAF_ATTR_HI_SW;
+> 
+> which looks more readable to me.
+> 
+> > +	set |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
+> 
+> Checked stage2_attr_walker() callbak, first it clears the bits in clr, then
+> sets the bits in set, so this looks correct to me:
+> 
+> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-Nitpick: isn't that the same as:
+Thanks. However, I have now dropped this patch since as it turns out,
+the PTE update does preserve pre-existing SW bits. I am now carrying
+this:
 
-	clr |= KVM_PTE_LEAF_ATTR_HI_SW;
+@@ -1212,6 +1218,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+         * kvm_pgtable_stage2_map() should be called to change block size.
+         */
+        if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
++               /*
++                * Drop the SW bits in favour of those stored in the
++                * PTE, which will be preserved.
++                */
++               prot &= ~KVM_NV_GUEST_MAP_SZ;
+                ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
+        } else {
+                ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
 
-which looks more readable to me.
-
-> +	set |= prot & KVM_PTE_LEAF_ATTR_HI_SW;
-
-Checked stage2_attr_walker() callbak, first it clears the bits in clr, then
-sets the bits in set, so this looks correct to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+as part of the patch that tags the shadow S2 with the guest's S2
+mapping size (or level, which amounts to the same thing).
 
 Thanks,
-Alex
 
-> +
->  	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level);
->  	if (!ret)
->  		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-> -- 
-> 2.30.2
-> 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
