@@ -2,63 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C57EEC4332F
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Jan 2022 00:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D99C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Jan 2022 01:10:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E6A34B0DE;
-	Thu, 13 Jan 2022 19:42:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38C0D49F17;
+	Thu, 13 Jan 2022 20:10:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vb7XfCSnQpr0; Thu, 13 Jan 2022 19:42:37 -0500 (EST)
+	with ESMTP id e0Lbh9DkEvNB; Thu, 13 Jan 2022 20:10:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22A1549F28;
-	Thu, 13 Jan 2022 19:42:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AA8A49EF6;
+	Thu, 13 Jan 2022 20:10:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3093849F1C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 19:42:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B598249EED
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 20:10:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mvfH8uAYSBgl for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Jan 2022 19:42:35 -0500 (EST)
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com
- [209.85.219.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1651049F17
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 19:42:35 -0500 (EST)
-Received: by mail-yb1-f179.google.com with SMTP id c6so19935137ybk.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 16:42:35 -0800 (PST)
+ with ESMTP id 25VqRYw1ZNMD for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Jan 2022 20:10:08 -0500 (EST)
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
+ [209.85.216.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D1F349EE9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 20:10:08 -0500 (EST)
+Received: by mail-pj1-f54.google.com with SMTP id
+ l10-20020a17090a384a00b001b22190e075so20502381pjf.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 17:10:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=icBlwwG2S2E04P2qTRk86rIfnSaHc8RFayb+HCWMsy8=;
- b=tKuXvh3Jl6y3jS3nNpMOtk5TYed9in2+9l0MQDWeBPTgmc9SfhBhxTcP+2aSyAp96d
- 6Iuq865Zw7Rv6MeKqikBZeELMIR3n1NXcsa49mOnzXgLfaBe2NVGgJGlfwI+8ti9Gmna
- PTbc/eW26Nz3E3gyxZf+B2y6zSNCWJ9SQz6us+FTQFdkT5aLcAXPU3xX6/bhFErjBd8W
- XcCBIxd+0ZDk0DQpEt4x+iNtipwd6dDLD40i1xllnZ1fsSbTiuARx8VsDYRj+5WdiBen
- nZBCp+ypPa5GJ11ow81b7st46ISyajSOqdIv4ZoUhDBN3yzG7OfkEKaFm5mGxaViCAWZ
- I7TQ==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=dfHTMu5yyfREc50x2Kq3TV4XK0N3u2/ilz/wJ1H6bEc=;
+ b=Qp0L93h2Bp9PLGVaYi0WSJZdkp402RO5l/aQCpgeknH84r7jXsj7pSuEYA955i7rn1
+ W/p3e5Om59luBvf1WCuy9aMCOrdXM0d9zK5q9FPAIBUu+YPOluPJPYYDgGJHTgZdtQpc
+ nUerIZBF1IuHj8vPAaqSwkIRpzapyybW2OQchtN+j/XvAyejjbCFcFTsNN3peB96A/cW
+ U3rxmnuP7tXIc4sW/2zfK+HG8geZbnDbbhy93s2AOQI02kxI7/1FPXmzht3IuvE5V4jZ
+ 2AaVVp/32HkacH3MCRJUeaGvlUbX2c5ey2lnicXWxn/xg22G9auoTekB9x32FSWgUC01
+ MK/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=icBlwwG2S2E04P2qTRk86rIfnSaHc8RFayb+HCWMsy8=;
- b=He69WRnMGwqw41Mp/IgHVyCeat1Qf2bgzZZfNK9uwS0PHIn+FZIFMYOxmyFoH85B74
- q/xix5wLOtw/sJNTrecKkX6apuBegBOuKb/6dsBvD3qk3OkI9NvhvMa6XMoez+APH9tu
- GknCFgZEWUMl+DYxMrw1ndC4f9lyjbZy6Cs46MxTFf5nU/hI+WV0IKZ2MjClNpshFR4z
- 0vqGTBgUkHFXmAotYo8ULet3vNlCDRn+RnmYUntvsQw+cyvJC3Ghm8LZ/plyfV6Bz2ko
- 3Y96ckRn05UJHggd6Klv1A/1IWcDOkJohRsOMQgG3v+/QcCz6LZTGGE+CcfSOnxxrO1E
- QWkw==
-X-Gm-Message-State: AOAM533iunzzQa2VGnJWiEtPT5KByGGoQMFK9D4iNCK77ag1HJdlD+9C
- ZXBotCKi13GyBQJ0oj/wAgweFQRLQoEjIjdwxpnRfw==
-X-Google-Smtp-Source: ABdhPJzA5ysrjGHDfSMMHKV/CX9xt6B+hEhmXIe4BPrNn8IqXhCDlvsfXi2BIWVHktBVEEvOLNqxRSnYpiZnTbZ78qg=
-X-Received: by 2002:a25:d801:: with SMTP id p1mr6233026ybg.543.1642120954230; 
- Thu, 13 Jan 2022 16:42:34 -0800 (PST)
-MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com>
- <20220104194918.373612-2-rananta@google.com>
- <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=dfHTMu5yyfREc50x2Kq3TV4XK0N3u2/ilz/wJ1H6bEc=;
+ b=DQvck7npnNGJADfZy48PaSFXsYRm0YGt124betsVZ+Sbb+/Dwa1HQsYMRGyiFNTcU+
+ YoILgixMEI1mE8LfnpbO8UGFBljI7+nvHeU21dM+ZMW6ndsRyIniJOT19m3o+hamDYWq
+ yXbJG1NyvSus+GeN//mmtMzFKc0UMNDrpnz02vd++ok2Cqcu/cuoKT+h3ZL/3kG4c9/q
+ XXQKHpuoMATDFb31Ugc3LR4E1UU6PRW5Xy96vmOmEFqhZDdmUGVjhfAlal8hrHIe4bmw
+ pt98ka1sNL4msjvOTNMxLquLiq5KYXUeM2MasZuir9m+AuoUmfGH1S3XEzf7uaqKykL+
+ wTYw==
+X-Gm-Message-State: AOAM530LeWDMx6tDpRs7KNA7ZY9vzDopz0Sl0Mn9TpRJ0flIxFf8X5Rj
+ VDoZ90co3tqKp/t7Mo32pbaCsg==
+X-Google-Smtp-Source: ABdhPJwJPF9HsoPu5KG5130tnrH/ZAmOSjZe/Jj2K4WwUe35vcCRE5fNeuBHwGHXHuwdjfoMvZZibA==
+X-Received: by 2002:a17:902:76c2:b0:149:7fa3:2ace with SMTP id
+ j2-20020a17090276c200b001497fa32acemr7109949plt.64.1642122607394; 
+ Thu, 13 Jan 2022 17:10:07 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id y64sm3134915pgy.12.2022.01.13.17.10.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 13 Jan 2022 17:10:06 -0800 (PST)
+Date: Fri, 14 Jan 2022 01:10:03 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+Message-ID: <YeDNa+/rF0YEVJAi@google.com>
+References: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
  <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
  <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
  <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
@@ -67,12 +77,10 @@ References: <20220104194918.373612-1-rananta@google.com>
  <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
  <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
  <YeBfj89mIf8SezfD@google.com>
-In-Reply-To: <YeBfj89mIf8SezfD@google.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Thu, 13 Jan 2022 16:42:23 -0800
-Message-ID: <CAJHc60wRrgnvwqPWdXdvoqT0V9isXW5xH=btgdjPWQkqVW31Pw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To: Sean Christopherson <seanjc@google.com>
+ <CAJHc60wRrgnvwqPWdXdvoqT0V9isXW5xH=btgdjPWQkqVW31Pw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <CAJHc60wRrgnvwqPWdXdvoqT0V9isXW5xH=btgdjPWQkqVW31Pw@mail.gmail.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
  Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -95,49 +103,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Jan 13, 2022 at 9:21 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Wed, Jan 12, 2022, Raghavendra Rao Ananta wrote:
-> > On Tue, Jan 11, 2022 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
-> > > Perhaps it would help if you explained *why* you are doing this. It
-> > > sounds like you are either trying to protect against a malicious
-> > > userspace, or you are trying to keep userspace from doing something
-> > > stupid. In general, kvm only enforces constraints that are necessary
-> > > to protect the host. If that's what you're doing, I don't understand
-> > > why live migration doesn't provide an end-run around your protections.
-> > It's mainly to safeguard the guests. With respect to migration, KVM
-> > and the userspace are collectively playing a role here. It's up to the
-> > userspace to ensure that the registers are configured the same across
-> > migrations and KVM ensures that the userspace doesn't modify the
-> > registers after KVM_RUN so that they don't see features turned OFF/ON
-> > during execution. I'm not sure if it falls into the definition of
-> > protecting the host. Do you see a value in adding this extra
-> > protection from KVM?
->
-> Short answer: probably not?
->
-> There is precedent for disallowing userspace from doing stupid things, but that's
-> either for KVM's protection (as Jim pointed out), or because KVM can't honor the
-> change, e.g. x86 is currently in the process of disallowing most CPUID changes
-> after KVM_RUN because KVM itself consumes the CPUID information and KVM doesn't
-> support updating some of it's own internal state (because removing features like
-> GB hugepage support is nonsensical and would require a large pile of complicated,
-> messy code).
->
-> Restricing CPUID changes does offer some "protection" to the guest, but that's
-> not the goal.  E.g. KVM won't detect CPUID misconfiguration in the migration
-> case, and trying to do so is a fool's errand.
->
-> If restricting updates in the arm64 is necessary to ensure KVM provides sane
-> behavior, then it could be justified.  But if it's purely a sanity check on
-> behalf of the guest, then it's not justified.
-Agreed that KVM doesn't really safeguard the guests, but just curious,
-is there really a downside in adding this thin layer of safety check?
-On the bright side, the guests would be safe, and it could save the
-developers some time in hunting down the bugs in this path, no?
+On Thu, Jan 13, 2022, Raghavendra Rao Ananta wrote:
+> On Thu, Jan 13, 2022 at 9:21 AM Sean Christopherson <seanjc@google.com> wrote:
+> > If restricting updates in the arm64 is necessary to ensure KVM provides sane
+> > behavior, then it could be justified.  But if it's purely a sanity check on
+> > behalf of the guest, then it's not justified.
+> Agreed that KVM doesn't really safeguard the guests, but just curious,
+> is there really a downside in adding this thin layer of safety check?
 
-Regards,
-Raghavendra
+It's more stuff that KVM has to maintain, creates an ABI that KVM must adhere to,
+potentially creates inconsistencies in KVM, and prevents using KVM to intentionally
+do stupid things to test scenarios that are "impossible".  And we also try to avoid
+defining arbitrary CPU behavior in KVM (that may not be the case here).
+
+> On the bright side, the guests would be safe, and it could save the
+> developers some time in hunting down the bugs in this path, no?
+
+Yes, but that can be said for lots and lots of things.  This is both a slippery
+slope argument and the inconsistency argument above, e.g. if KVM actively prevents
+userspace from doing X, why doesn't KVM prevent userspace from doing Y?  Having a
+decently defined rule for these types of things, e.g. protect KVM/kernel and adhere
+to the architecture but otherwise let userspace do whatever, avoids spending too
+much time arguing over what KVM should/shouldn't allow, or wondering why on earth
+KVM does XYZ, at least in theory :-)
+
+There are certainly times where KVM could have saved userspace some pain, but
+overall I do think KVM is better off staying out of the way when possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
