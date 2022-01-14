@@ -2,79 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BACC433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 14 Jan 2022 06:24:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB943C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 14 Jan 2022 12:51:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD03F49F1F;
-	Fri, 14 Jan 2022 01:24:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EB5349EBF;
+	Fri, 14 Jan 2022 07:51:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iPuGGr91TROB; Fri, 14 Jan 2022 01:24:09 -0500 (EST)
+	with ESMTP id fP3Szar0U-eG; Fri, 14 Jan 2022 07:51:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C51249EF6;
-	Fri, 14 Jan 2022 01:24:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAE8E49EC1;
+	Fri, 14 Jan 2022 07:51:17 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5557349ECA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Jan 2022 01:24:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0F0649EBD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Jan 2022 07:51:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id milDCG1VdPvD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 14 Jan 2022 01:24:06 -0500 (EST)
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com
- [209.85.214.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54A9749E32
- for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Jan 2022 01:24:06 -0500 (EST)
-Received: by mail-pl1-f170.google.com with SMTP id u15so12528999ple.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Jan 2022 22:24:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=efD7MXnSTwwB5xVjXzKnpMf87tT71yAx/cljfnEhNas=;
- b=VGerjJAK8GzUatgIVU0a+8oCQmLsZwZaA+xK/n8dg9nnhsCwi/cLvyukvffHwbq4lD
- KUfhzEQDfHJ3FYQFDjf3LmONir9tuCFjuR8y8YaMKZaXGG7AkFWUIkVcXQmn/4eRmCng
- jm6TqwihJHpnT5w4Rtz9yeYnmgsj/596lDOnlOI5WxnBOLAY+Dn/CUdUt//Oqn89O9xX
- 5K5aNFzbE9ndV89wLtwYSCJIyuPEKzB5JZcATTObSRZ0LF2ryCXr9GwRsphLbHwK1Dz5
- mFl0gV7bAhaYxQp4RtohXeS+M/y0JGauajd/X3ewewRMHVIMEvFdPOX5lWBO5GSl2h6k
- 3+PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=efD7MXnSTwwB5xVjXzKnpMf87tT71yAx/cljfnEhNas=;
- b=vxKsPemsOy42zr2JrKraBqZNA3QJlaUN2x9IfWuKNMV3si+GyeKQYhNtdKW8u1wWQB
- 17Rn0i+PI9QLAFZNH+p6hIyV5OopDgp8IG7/w2++ybdQY4xKUIgoq3u3sUbMGnQEEC4z
- c2APrY3tsNhC5X/sQ5pJfqvpCRaI0XQP354HU/RA0XX2wIjiUSKfDXQ2kLpgnrj+Nidc
- zbAgEuBSzJt2Gx9ZNi5L1e5mnRM9lUixwt1axJhRx+ZeJsjb1IS1a2lwhMbtf47tslHY
- C6o7NnUqmLH34f8qjz1tZn5yi72WxmMHqkZjxgQ9Z5RY9oXUZgQCLLAUEKfzOaxcsKxs
- 8wWQ==
-X-Gm-Message-State: AOAM531sE0KtcOAs9oh2ldGAvM1OM34C1sg4Ow20Km8hHRHh0EvE6lVC
- vMQAGTMCYKaVzDjYOqT5tv0ugfpOkXi+4rnbgnCUtaTmiIqw3A==
-X-Google-Smtp-Source: ABdhPJyOGEzTN5ie9agHxl4cS61ylB6xO8eTkZnYeEg8FGn5HzoowBJbQV+Ws9vld5pFq3VE38zPZoChvTtPXqEREvE=
-X-Received: by 2002:a17:90b:4a09:: with SMTP id
- kk9mr18400389pjb.230.1642141445152; 
- Thu, 13 Jan 2022 22:24:05 -0800 (PST)
+ with ESMTP id f7TNo974daoG for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 14 Jan 2022 07:51:15 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8822340C23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 14 Jan 2022 07:51:15 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B765B61F53;
+ Fri, 14 Jan 2022 12:51:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25C01C36AE5;
+ Fri, 14 Jan 2022 12:51:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1642164674;
+ bh=dPXq9cLFgWXLcBFy2+9YcSrY9JD0ytJBG2TzdVinXGA=;
+ h=From:To:Cc:Subject:Date:From;
+ b=mtMg7A7Tnmm79zBf0Dd/R5J5h17JnfA5hZ/0jQlsnNbU6unYIqe32Zt5r62L1+r68
+ ziVSep55J/TTnYAfQY9TrojkURSL2/9O2KfMmcRwH2j+4zGwVuGtBj8GxmT10s0s2O
+ FR4nhFSikADvGEBduN3+4/W5U5UNc1M6OGOJK2oMndMZ1HAIywZBR/o9vJ+d9Py+2E
+ A92CLHBZNXe4QWpFE0Taw3lzPv/dQcmM6KNwmdL7MjGu1mNJ8rozxcooBqKDtGLa9x
+ MjtshmQ1u/xDk8XK5FSavmyNVDorEw7+iOUGOD7DFamr7yRPZbT+MO8swG3gtBbi/C
+ 3SjfkEVuCi9Qw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1n8M2x-000UM5-Cv; Fri, 14 Jan 2022 12:51:11 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] KVM: arm64: pkvm: Use the mm_ops indirection for cache
+ maintenance
+Date: Fri, 14 Jan 2022 12:50:38 +0000
+Message-Id: <20220114125038.1336965-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20220104194918.373612-1-rananta@google.com>
- <20220104194918.373612-5-rananta@google.com>
- <CAAeT=FztkibSajKjnpRfObx+D1r8H1s_8-5MmqjemJTfmb2mpg@mail.gmail.com>
- <CAJHc60ywYgAPfG11Ljkj3qzLoUn9mZPKnPH0P-HYS-pfs+A__g@mail.gmail.com>
- <CAAeT=FwA9X9eXrF+Q31Wzah=UkM-B8bMJObjJ=oCV0rjLfX6=g@mail.gmail.com>
- <CAJHc60y6b-scY8zcPuLnjGtr6HzSBnmhi2mCnmkNm4nTxgMTUQ@mail.gmail.com>
-In-Reply-To: <CAJHc60y6b-scY8zcPuLnjGtr6HzSBnmhi2mCnmkNm4nTxgMTUQ@mail.gmail.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 13 Jan 2022 22:23:49 -0800
-Message-ID: <CAAeT=FyER7GWZqSHyRA4-YRwef_KmGEw+tUoxBc7GXC4-6hFhw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 04/11] KVM: arm64: Setup a framework for hypercall
- bitmap firmware registers
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, will@kernel.org,
+ tabba@google.com, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,26 +83,61 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-> > > > > +static void
-> > > > > +kvm_arm_get_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 fw_reg_bmap, u64 *val)
-> > > > > +{
-> > > > > +       struct kvm *kvm = vcpu->kvm;
-> > > > > +
-> > > > > +       mutex_lock(&kvm->lock);
-> > > > > +       *val = fw_reg_bmap;
-> > > > > +       mutex_unlock(&kvm->lock);
-> > > >
+CMOs issued from EL2 cannot directly use the kernel helpers,
+as EL2 doesn't have a mapping of the guest pages. Oops.
 
-I have another comment for kvm_arm_get_fw_reg_bmap.
+Instead, use the mm_ops indirection to use helpers that will
+perform a mapping at EL2 and allow the CMO to be effective.
 
-I just noticed that @fw_reg_bmap is a value of the bitmap register
-(not a pointer).  I believe what you meant was a pointer to
-hvc_desc->hvc_*_bmap.  Also, you can remove @val and return the register
-value instead (change the type of the return value from void to u64).
-I'm not sure if you will keep this function in the next version though.
+Fixes: 25aa28691bb9 ("KVM: arm64: Move guest CMOs to the fault handlers")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-Thanks,
-Reiji
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 844a6f003fd5..2cb3867eb7c2 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -983,13 +983,9 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	 */
+ 	stage2_put_pte(ptep, mmu, addr, level, mm_ops);
+ 
+-	if (need_flush) {
+-		kvm_pte_t *pte_follow = kvm_pte_follow(pte, mm_ops);
+-
+-		dcache_clean_inval_poc((unsigned long)pte_follow,
+-				    (unsigned long)pte_follow +
+-					    kvm_granule_size(level));
+-	}
++	if (need_flush && mm_ops->dcache_clean_inval_poc)
++		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pte, mm_ops),
++					       kvm_granule_size(level));
+ 
+ 	if (childp)
+ 		mm_ops->put_page(childp);
+@@ -1151,15 +1147,13 @@ static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
+ 	struct kvm_pgtable *pgt = arg;
+ 	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
+ 	kvm_pte_t pte = *ptep;
+-	kvm_pte_t *pte_follow;
+ 
+ 	if (!kvm_pte_valid(pte) || !stage2_pte_cacheable(pgt, pte))
+ 		return 0;
+ 
+-	pte_follow = kvm_pte_follow(pte, mm_ops);
+-	dcache_clean_inval_poc((unsigned long)pte_follow,
+-			    (unsigned long)pte_follow +
+-				    kvm_granule_size(level));
++	if (mm_ops->dcache_clean_inval_poc)
++		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(pte, mm_ops),
++					       kvm_granule_size(level));
+ 	return 0;
+ }
+ 
+-- 
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
