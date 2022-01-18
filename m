@@ -2,71 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D15C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Jan 2022 04:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6EEDC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jan 2022 08:52:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA7ED40F93;
-	Mon, 17 Jan 2022 23:25:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26FF349EEA;
+	Tue, 18 Jan 2022 03:52:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q21VPxCl5nGF; Mon, 17 Jan 2022 23:25:16 -0500 (EST)
+	with ESMTP id 23afjePGeJ5N; Tue, 18 Jan 2022 03:52:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8463D4101F;
-	Mon, 17 Jan 2022 23:25:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BA7149EBC;
+	Tue, 18 Jan 2022 03:52:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 749DB40E25
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jan 2022 23:25:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 54AD04141D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 01:49:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vK2jZI9BAIzx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Jan 2022 23:25:13 -0500 (EST)
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com
- [209.85.215.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2417840CE3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jan 2022 23:25:13 -0500 (EST)
-Received: by mail-pg1-f182.google.com with SMTP id h23so12784257pgk.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Jan 2022 20:25:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/KiEjTbr7mV22Iwjp/ByerxeqSvZMhmbYnRZo6WKer4=;
- b=byAYP8qLYQSW2RuQxL/XrqNPwNQ0kfamBRbJMQ7KeoAd0zMgxCTvWa9wUKYsiJyBw6
- oIXWTmgq9jBfalqDN5uJNybQ2HRm1mC1aKZVc6COpgSGIOlWZ07+shc4Gi7QO7H5LLUF
- rZIFyEmXD3TuRZeW4tZFkL3TjT6f58Lyqlm6Fm21xgNjWbfo6ZhBLQs+EXui9L7uXEcZ
- T4SPdv7pJeCpLjbTALgy9mNcjdI6nQPPoZ9yp/kP5fGa00WGUxJigw4+Sv8auwgJPPBP
- t4hmXGeiKBln+5HCGAXO+6S0X7rzmTQ/lOofNwpExhq5bakbB8k3ljEUcmmpo6rasYNi
- ONog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/KiEjTbr7mV22Iwjp/ByerxeqSvZMhmbYnRZo6WKer4=;
- b=tMlpEwYO6+3FSFRr+sfDJg07LPw74YaQY9AYgY/2D5Xu9ayU+jRwZqLnGRS1T5JRP5
- WooYDsy1+yNvTveDi2InK72Xk+VDF608Ktki6YvWecC23cWtAAlhxQDwNwhdEq73F5Hv
- gbj+XRujEDePVra6B2DFCXkdrRfTDm1TlqNhLGe1yXGv/C0F2GNEvpsqR4jF9Ud3kMU/
- LCrsjboEoPs/jJWoZdZ1nApWYGzkm6F2KbxuJaOu8ByC8xSJP/69z10nazAUdVIAAif9
- EWPd7Xn7Up1fDijGZrRfdBMffItCOIc5e+XHdVg1kHcJSz5W/OP3DZEPAS6IFo0YrPE4
- 1iiA==
-X-Gm-Message-State: AOAM533GyPaL9NFMcDeOayYr9yEyidxOZ9cF2avfkF383p+C4v4rl3XX
- T1iNlt3riZF7rg+uOPkU/uqIpX03B+EFZfMwuql6/Q==
-X-Google-Smtp-Source: ABdhPJy9dN3br55hPmjDQhsXnIIAj3PRNvZbNpxAZXjDO6/ElP/PzF+/qxAMj+PkOPsEXMJmMNXkawM6ISRTCSjA4SA=
-X-Received: by 2002:a63:7d4e:: with SMTP id m14mr21827572pgn.514.1642479911844; 
- Mon, 17 Jan 2022 20:25:11 -0800 (PST)
+ with ESMTP id XIbSRSZsol77 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jan 2022 01:49:41 -0500 (EST)
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58FB740BCF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 01:49:41 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+ t=1642488581; x=1674024581;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=Qle7iYX0bWtMWgGrX9XT60FWnCJkJa+OHVP1jvUZDP4=;
+ b=NfJdI1sG9aByRorDiFE5YJdj5aXQ6U9pUrJ7dCfL82d18Bhi2wp3cMTm
+ inGBYdpZywu4m5CqatbpiLt4ZHPfY9iZhZS2DyebskjwKmb7Yx/34V8Y3
+ sxfJcd3Lo4BqUwIQBuMo/Jd7t1m/e0QMNcC6O3Nx7iezADCZVpCXG6NeE
+ pNO46UDTb3zR5IOeT1A8ffIi7lb3OBXL0JTx27cCHYb5Rq3Xzil008sPo
+ 0a+c0DgRHqHIVR2PoXzDyqkHrLTzu5w+hwfPcNZMVFgvPd+FtY1J8V+wv
+ hpq23xOtjvEEnCu7KJkqNSeoZ/0LEnRhR3tSXAWFloAmFlUhIIjoHhHTp w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10230"; a="244710349"
+X-IronPort-AV: E=Sophos;i="5.88,296,1635231600"; d="scan'208";a="244710349"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Jan 2022 22:49:29 -0800
+X-IronPort-AV: E=Sophos;i="5.88,296,1635231600"; d="scan'208";a="531648541"
+Received: from hyperv-sh4.sh.intel.com ([10.239.48.22])
+ by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Jan 2022 22:49:17 -0800
+From: Chao Gao <chao.gao@intel.com>
+To: kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
+ kevin.tian@intel.com, tglx@linutronix.de
+Subject: [PATCH v2 0/4] Improve KVM's interaction with CPU hotplug
+Date: Tue, 18 Jan 2022 14:44:23 +0800
+Message-Id: <20220118064430.3882337-1-chao.gao@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com>
-In-Reply-To: <20220106042708.2869332-1-reijiw@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 17 Jan 2022 20:24:55 -0800
-Message-ID: <CAAeT=FyjqC47pHe_G_Z0sVua8A1SEbzQg6UZkQBwkTezA7tLsA@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 00/26] KVM: arm64: Make CPU ID registers writable
- by userspace
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+X-Mailman-Approved-At: Tue, 18 Jan 2022 03:52:33 -0500
+Cc: Thomas Richter <tmricht@linux.ibm.com>, Wanpeng Li <wanpengli@tencent.com>,
+ David Hildenbrand <david@redhat.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ linux-mips@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, "H. Peter Anvin" <hpa@zytor.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Janosch Frank <frankja@linux.ibm.com>, Joerg Roedel <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>, linux-riscv@lists.infradead.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Ingo Molnar <mingo@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Chao Gao <chao.gao@intel.com>, Ravi Bangoria <ravi.bangoria@linux.ibm.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Vasily Gorbik <gor@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, John Garry <john.garry@huawei.com>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ Shaokun Zhang <zhangshaokun@hisilicon.com>, Borislav Petkov <bp@alien8.de>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Atish Patra <atishp@atishpatra.org>,
+ Sumanth Korikkar <sumanthk@linux.ibm.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Fabiano Rosas <farosas@linux.ibm.com>, Hector Martin <marcan@marcan.st>,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
+ Bharata B Rao <bharata@linux.ibm.com>, kvm-riscv@lists.infradead.org,
+ Marc Zyngier <maz@kernel.org>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,185 +104,69 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 5, 2022 at 8:27 PM Reiji Watanabe <reijiw@google.com> wrote:
->
-> In KVM/arm64, values of ID registers for a guest are mostly same as
-> its host's values except for bits for feature that KVM doesn't support
-> and for opt-in features that userspace didn't configure.  Userspace
-> can use KVM_SET_ONE_REG to a set ID register value, but it fails
-> if userspace attempts to modify the register value.
->
-> This patch series adds support to allow userspace to modify a value of
-> ID registers (as long as KVM can support features that are indicated
-> in the registers) so userspace can have more control of configuring
-> and unconfiguring features for guests.  We need this because we would
-> like to expose a uniform set/level of features for a group of guests on
-> systems with different ARM CPUs.  Since some features are not binary
-> in nature (e.g. AA64DFR0_EL1.BRPs fields indicate number of
-> breakpoints minus 1), using KVM_ARM_VCPU_INIT to control such features
-> is inconvenient.
->
-> The patch series is for both VHE and non-VHE, except for protected VMs,
-> which have a different way of configuring ID registers based on its
-> different requirements [1].
-> There was a patch series that tried to achieve the same thing [2].
-> A few snippets of codes in this series were inspired by or came from [2].
->
-> The initial value of ID registers for a vCPU will be the host's value
-> with bits cleared for unsupported features and for opt-in features that
-> were not configured. So, the initial value userspace can see (via
-> KVM_GET_ONE_REG) is the upper limit that can be set for the register.
-> Any requests to change the value that conflicts with opt-in features'
-> configuration will fail (e.g. if KVM_ARM_VCPU_PMU_V3 is configured by
-> KVM_ARM_VCPU_INIT, ID_AA64DFR0_EL1.PMUVER cannot be set to zero.
-> Otherwise, the initial value of ID_AA64DFR0_EL1.PMUVER will be zero,
-> and cannot be changed from zero).
->
-> When a guest tries to use a CPU feature that is not exposed to the guest,
-> trapping it (to emulate a real CPU's behavior) would generally be a
-> desirable behavior (when it is possible with no or little side effects).
-> The later patches in the series add codes for this.  Only features that
-> can be trapped independently will be trapped by this series though.
->
-> This series adds kunit tests for new functions in sys_regs.c (except for
-> trivial ones), and these tests are enabled with a new configuration
-> option 'CONFIG_KVM_KUNIT_TEST'.
+Changes from v1->v2: (all comments/suggestions on v1 are from Sean, thanks)
+ - Merged v1's patch 2 into patch 1, and v1's patch 5 into patch 6.
+ - Use static_call for check_processor_compatibility().
+ - Generate patch 2 with "git revert" and do manual changes based on that.
+ - Loosen the WARN_ON() in kvm_arch_check_processor_compat() instead of
+   removing it.
+ - KVM always prevent incompatible CPUs from being brought up regardless of
+   running VMs.
+ - Use pr_warn instead of pr_info to emit logs when KVM finds offending
+   CPUs.
 
-A gentle ping on this series.
+KVM registers its CPU hotplug callback to CPU starting section. And in the
+callback, KVM enables hardware virtualization on hotplugged CPUs if any VM
+is running on existing CPUs.
 
-Since KVM/ARM doesn't have any kunit tests yet, the series (patch-16)
-introduces .kunitconfig for KVM/ARM in addition to the new configuration
-option (The .kunitconfig in the patch includes only the minimum
-configuration options needed for the current tests in the patch).
+There are two problems in the process:
+1. KVM doesn't do compatibility checks before enabling hardware
+virtualization on hotplugged CPUs. This may cause #GP if VMX isn't
+supported or vmentry failure if some in-use VMX features are missing on
+hotplugged CPUs. Both break running VMs.
+2. Callbacks in CPU STARTING section cannot fail. So, even if KVM finds
+some incompatible CPUs, its callback cannot block CPU hotplug.
 
-Any feedback on the patch-16 would be appreciated as with other patches.
+This series improves KVM's interaction with CPU hotplug to avoid
+incompatible CPUs breaking running VMs. Following changes are made:
 
-Thanks,
-Reiji
+1. move KVM's CPU hotplug callback to ONLINE section (suggested by Thomas)
+2. do compatibility checks on hotplugged CPUs.
+3. abort onlining incompatible CPUs
 
+This series is a follow-up to the discussion about KVM and CPU hotplug
+https://lore.kernel.org/lkml/3d3296f0-9245-40f9-1b5a-efffdb082de9@redhat.com/T/
 
+Note: this series is tested only on Intel systems.
 
+Chao Gao (4):
+  KVM: x86: Move check_processor_compatibility from init ops to runtime
+    ops
+  Partially revert "KVM: Pass kvm_init()'s opaque param to additional
+    arch funcs"
+  KVM: Rename and move CPUHP_AP_KVM_STARTING to ONLINE section
+  KVM: Do compatibility checks on hotplugged CPUs
 
+ arch/arm64/kvm/arm.c               |  2 +-
+ arch/mips/kvm/mips.c               |  2 +-
+ arch/powerpc/kvm/powerpc.c         |  2 +-
+ arch/riscv/kvm/main.c              |  2 +-
+ arch/s390/kvm/kvm-s390.c           |  2 +-
+ arch/x86/include/asm/kvm-x86-ops.h |  1 +
+ arch/x86/include/asm/kvm_host.h    |  2 +-
+ arch/x86/kvm/svm/svm.c             |  4 +-
+ arch/x86/kvm/vmx/evmcs.c           |  2 +-
+ arch/x86/kvm/vmx/evmcs.h           |  2 +-
+ arch/x86/kvm/vmx/vmx.c             | 12 +++---
+ arch/x86/kvm/x86.c                 | 16 +++++---
+ include/linux/cpuhotplug.h         |  2 +-
+ include/linux/kvm_host.h           |  2 +-
+ virt/kvm/kvm_main.c                | 62 ++++++++++++++++++++----------
+ 15 files changed, 71 insertions(+), 44 deletions(-)
 
+-- 
+2.25.1
 
-
-
->
-> The series is based on v5.16-rc8 with the patch [3] applied.
->
-> v4:
->   - Make ID registers storage per VM instead of per vCPU. [Marc]
->   - Implement arm64_check_features() in arch/arm64/kernel/cpufeature.c
->     by using existing codes in the file. [Marc]
->   - Use a configuration function to enable traps for disabled
->     features. [Marc]
->   - Document ID registers become immutable after the first KVM_RUN [Eric]
->   - Update ID_AA64PFR0.GIC at the point where a GICv3 is created. [Marc]
->   - Get TGranX's bit position by substracting 12 from TGranX_2's bit
->     position. [Eric]
->   - Don't validate AArch32 ID registers when the system doesn't support
->     32bit EL0. [Eric]
->   - Add/fixes comments for patches. [Eric]
->   - Made bug fixes/improvements of the selftest. [Eric]
->   - Added .kunitconfig for arm64 KUnit tests
->
-> v3: https://lore.kernel.org/all/20211117064359.2362060-1-reijiw@google.com/
->   - Remove ID register consistency checking across vCPUs. [Oliver]
->   - Change KVM_CAP_ARM_ID_REG_WRITABLE to
->     KVM_CAP_ARM_ID_REG_CONFIGURABLE. [Oliver]
->   - Add KUnit testing for ID register validation and trap initialization.
->   - Change read_id_reg() to take care of ID_AA64PFR0_EL1.GIC.
->   - Add a helper of read_id_reg() (__read_id_reg()) and use the helper
->     instead of directly using __vcpu_sys_reg().
->   - Change not to run kvm_id_regs_consistency_check() and
->     kvm_vcpu_init_traps() for protected VMs.
->   - Update selftest to remove test cases for ID register consistency.
->     checking across vCPUs and to add test cases for ID_AA64PFR0_EL1.GIC.
->
-> v2: https://lore.kernel.org/all/20211103062520.1445832-1-reijiw@google.com/
->   - Remove unnecessary line breaks. [Andrew]
->   - Use @params for comments. [Andrew]
->   - Move arm64_check_features to arch/arm64/kvm/sys_regs.c and
->     change that KVM specific feature check function.  [Andrew]
->   - Remove unnecessary raz handling from __set_id_reg. [Andrew]
->   - Remove sys_val field from the initial id_reg_info and add it
->     in the later patch. [Andrew]
->   - Call id_reg->init() from id_reg_info_init(). [Andrew]
->   - Fix cpuid_feature_cap_perfmon_field() to convert 0xf to 0x0
->     (and use it in the following patches).
->   - Change kvm_vcpu_first_run_init to set has_run_once to false
->     when kvm_id_regs_consistency_check() fails.
->   - Add a patch to introduce id_reg_info for ID_AA64MMFR0_EL1,
->     which requires special validity checking for TGran*_2 fields.
->   - Add patches to introduce id_reg_info for ID_DFR1_EL1 and
->     ID_MMFR0_EL1, which are required due to arm64_check_features
->     implementation change.
->   - Add a new argument, which is a pointer to id_reg_info, for
->     id_reg_info's validate().
->
-> v1: https://lore.kernel.org/all/20211012043535.500493-1-reijiw@google.com/
->
-> [1] https://lore.kernel.org/kvmarm/20211010145636.1950948-1-tabba@google.com/
-> [2] https://lore.kernel.org/kvm/20201102033422.657391-1-liangpeng10@huawei.com/
-> [3] https://lore.kernel.org/all/20220104194918.373612-2-rananta@google.com/
->
-> Reiji Watanabe (26):
->   KVM: arm64: Introduce a validation function for an ID register
->   KVM: arm64: Save ID registers' sanitized value per guest
->   KVM: arm64: Introduce struct id_reg_info
->   KVM: arm64: Make ID_AA64PFR0_EL1 writable
->   KVM: arm64: Make ID_AA64PFR1_EL1 writable
->   KVM: arm64: Make ID_AA64ISAR0_EL1 writable
->   KVM: arm64: Make ID_AA64ISAR1_EL1 writable
->   KVM: arm64: Make ID_AA64MMFR0_EL1 writable
->   KVM: arm64: Hide IMPLEMENTATION DEFINED PMU support for the guest
->   KVM: arm64: Make ID_AA64DFR0_EL1 writable
->   KVM: arm64: Make ID_DFR0_EL1 writable
->   KVM: arm64: Make MVFR1_EL1 writable
->   KVM: arm64: Make ID registers without id_reg_info writable
->   KVM: arm64: Add consistency checking for frac fields of ID registers
->   KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE capability
->   KVM: arm64: Add kunit test for ID register validation
->   KVM: arm64: Use vcpu->arch cptr_el2 to track value of cptr_el2 for VHE
->   KVM: arm64: Use vcpu->arch.mdcr_el2 to track value of mdcr_el2
->   KVM: arm64: Introduce framework to trap disabled features
->   KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
->   KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
->   KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
->   KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
->   KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
->   KVM: arm64: Add kunit test for trap initialization
->   KVM: arm64: selftests: Introduce id_reg_test
->
->  Documentation/virt/kvm/api.rst                |   12 +
->  arch/arm64/include/asm/cpufeature.h           |    3 +-
->  arch/arm64/include/asm/kvm_arm.h              |   32 +
->  arch/arm64/include/asm/kvm_host.h             |   19 +
->  arch/arm64/include/asm/sysreg.h               |    3 +
->  arch/arm64/kernel/cpufeature.c                |  228 +++
->  arch/arm64/kvm/.kunitconfig                   |    4 +
->  arch/arm64/kvm/Kconfig                        |   11 +
->  arch/arm64/kvm/arm.c                          |   24 +-
->  arch/arm64/kvm/debug.c                        |   13 +-
->  arch/arm64/kvm/hyp/vhe/switch.c               |   14 +-
->  arch/arm64/kvm/sys_regs.c                     | 1329 +++++++++++++++--
->  arch/arm64/kvm/sys_regs_test.c                | 1247 ++++++++++++++++
->  arch/arm64/kvm/vgic/vgic-init.c               |    5 +
->  include/uapi/linux/kvm.h                      |    1 +
->  tools/arch/arm64/include/asm/sysreg.h         |    1 +
->  tools/testing/selftests/kvm/.gitignore        |    1 +
->  tools/testing/selftests/kvm/Makefile          |    1 +
->  .../selftests/kvm/aarch64/id_reg_test.c       | 1239 +++++++++++++++
->  19 files changed, 4041 insertions(+), 146 deletions(-)
->  create mode 100644 arch/arm64/kvm/.kunitconfig
->  create mode 100644 arch/arm64/kvm/sys_regs_test.c
->  create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
->
->
-> base-commit: d399b107ee49bf5ea0391bd7614d512809e927b0
-> --
-> 2.34.1.448.ga2b2bfdf31-goog
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
