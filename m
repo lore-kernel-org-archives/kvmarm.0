@@ -2,39 +2,39 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E11C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Jan 2022 16:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B89C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jan 2022 16:16:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDF5840C2B;
-	Tue, 18 Jan 2022 11:16:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51A03410BB;
+	Tue, 18 Jan 2022 11:16:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q6JfaUn4NczK; Tue, 18 Jan 2022 11:16:45 -0500 (EST)
+	with ESMTP id pG1rrQp0uct5; Tue, 18 Jan 2022 11:16:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A46B749ECF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A93549EBA;
 	Tue, 18 Jan 2022 11:16:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8452149E44
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 06:50:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68AD540AFA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 06:36:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id auIbCujRcny7 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jan 2022 06:50:29 -0500 (EST)
+ with ESMTP id 8D6ZhBdiqY1z for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jan 2022 06:35:59 -0500 (EST)
 Received: from NAM10-MW2-obe.outbound.protection.outlook.com
- (mail-mw2nam10on2127.outbound.protection.outlook.com [40.107.94.127])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2484B49E43
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 06:50:28 -0500 (EST)
+ (mail-mw2nam10on2125.outbound.protection.outlook.com [40.107.94.125])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 03AEC40797
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 06:35:58 -0500 (EST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ILTmNMZpqLscZQaC5xzqFK9h878Bek/1d6yZElc9zQCcJw4ALfkwTd9gdLhFtYTslaydIxGlIhtL9JAgD/z4/wuzU25OgnEHf+0vEEOeT0b+liDfdwsr0sj9iMxkmVyuIHeNfO2FJD0/BtWwf6DocwK1QGpvEbGoRdmnsgcnHxiMgnvHkHE3vT4sVBociylE6mbpj/5Jpp+xBW1QjZIHfDSsf+OiljIAqEcZs3v1NfAiJpxosToSX288qd2/k6VbY7uoxy1t4tr/IZeAostLAKS/bwQuWbBMuNenNV03W83wFweiQUQoG7AydMwvxHZIPS+hw9ScSFquszEBTd7VCA==
+ b=Je1cU8sVSewWEy4pXOPJ17gLAOtKz0D830xqgT715jB7sVbxfd79qrWnxnqf2TB4f3jg+/ENQI6VqJ+WTF1tZN0Ccdh+MIY47QRsbnfolswBXakKDaOD7Va8mRLAfFTUI3Ay6H6klfP1v552Z6RbIHT9cx0LM350nvUXcmOansihqEK+JqjtNFzE4++j7Cd7vAt4HB0dk/jJ+LZPBgTlQHjf8mDERKaaGAXzSLjD5o4TOZQ61RHPeffeEfrMVJyBXw9VeOnx8EFhbLgjPa/oG4BwwoftWWXihhdxBccF+PQ95Grk606MYSn0ZAEaJiNUBir4KkIPuW2l0ZUyqJk/0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=54u7WpTJYLtaHYafc1udTkdh9PqbFVAFMfy2ALLZ2QM=;
- b=hkYXQfQ8fH9AEmmL+HkQkhXg5TmLBceHjN/6C0jWYf2w8bAM1V7vy853y7rk2BtAVb4tVgx0r8xjMIjcCGCubMfEAVp2ZSq0zCu4zdHDcZ154KFrn5WqZZyLTOFnn5HPd6S88E558kOd2CaTuyuufAMeuSyOtjzuHTlZGAJv8nRTNl8gnEunkn0AKMi/tnqA0NdVHFolP0XR6mXtjtJzL1/gv7J2EIKQUnU3S9whFUi2sqPP8zsdYRHP5pVdw7iY6Qz0j4RYvKvYqMdPs7d4Z2VGo6bApdkoPQ1vqkUzRvQX6twqUBmjbmLIsURzrOKNMNYUllTlHDcdDYCsdgXHdA==
+ bh=HP7rNY98gphorBxtXs4l/8QMsZeVyY85UjnGMr4/uEI=;
+ b=UAXeXwQSqsAt/D9NiQOoxrkWB5liDUXdX0TaNLmKbZTItk3f171d9CcFxCJvlmGsQq2ib8E5psVWz8ibVSrhZnQeEowQHdugnsOvHlCU2cOOVt8y5CULd+eIM1AG+sdWYdR/isRO4MvnbaJdU45LFxDr9WN0BEwUXOaBI85MocXPJa1M3bhWEaHVf21E/Gcb1K88QCg+E+LOtd4At8y0ih7/4oq0cxjg8JynDP7PWtF8k/c+rt4BjQfrLUoPp3ut7kW61N7LSpHUwrLX87UOgqT01Jo/XGAW2tF9KIO1VRaHHS4MYF2Fyjse/8r9iluQJ/TpkPJCg5SH1rHPuCnxuw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -42,97 +42,98 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=54u7WpTJYLtaHYafc1udTkdh9PqbFVAFMfy2ALLZ2QM=;
- b=VELLQ6u/tU8qpX0q/DYXF33vAAwDpaUm8mzYAxWbHObIpOY3EFhU8K3xbpnQUpZXGteDMBhir1g1UHpc4xAQMyeb3QIRBXrUXloHd2peLrQnaGFpcU0MKiOmzcLwEPc/pOH/1Ebjm/uj2h0LZ1sOjq5TV8frRQwW0bgTGmkVw5k=
+ bh=HP7rNY98gphorBxtXs4l/8QMsZeVyY85UjnGMr4/uEI=;
+ b=jOjGrWQKNu0IyXJhqSvq5ntyxDsBb/95ceubxCXqg9ZDODFOw1qinm5siSyJ1PHZygwx5TClmoboP8MO0lpKJucF5CLi8+IrDvqViGnY7gzE0IMCn1JNfQTb83FNxd8Ef+UWB23acj2MYfJztpISM0DMlAi2ZZo2rn4HT+uAPnQ=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- CO1PR01MB6518.prod.exchangelabs.com (2603:10b6:303:d9::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4888.9; Tue, 18 Jan 2022 11:50:26 +0000
+ DM6PR01MB5739.prod.exchangelabs.com (2603:10b6:5:202::27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4888.12; Tue, 18 Jan 2022 11:35:55 +0000
 Received: from DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::3825:c594:1116:2a01]) by DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::3825:c594:1116:2a01%8]) with mapi id 15.20.4888.014; Tue, 18 Jan 2022
- 11:50:26 +0000
-Message-ID: <7fe1ce9e-1b86-ed57-a0e5-117d1b9011b4@os.amperecomputing.com>
-Date: Tue, 18 Jan 2022 17:20:18 +0530
+ 11:35:55 +0000
+Message-ID: <3e161689-1f04-8baf-201c-e14d453be2c9@os.amperecomputing.com>
+Date: Tue, 18 Jan 2022 17:05:48 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH v5 67/69] KVM: arm64: nv: Enable ARMv8.4-NV support
+Subject: Re: [PATCH v5 58/69] KVM: arm64: nv: Add handling of ARMv8.4-TTL TLB
+ invalidation
 Content-Language: en-US
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-68-maz@kernel.org>
+ <20211129200150.351436-59-maz@kernel.org>
 From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <20211129200150.351436-68-maz@kernel.org>
-X-ClientProxiedBy: CY4PR14CA0036.namprd14.prod.outlook.com
- (2603:10b6:903:101::22) To DM8PR01MB6824.prod.exchangelabs.com
+In-Reply-To: <20211129200150.351436-59-maz@kernel.org>
+X-ClientProxiedBy: CH2PR14CA0049.namprd14.prod.outlook.com
+ (2603:10b6:610:56::29) To DM8PR01MB6824.prod.exchangelabs.com
  (2603:10b6:8:23::24)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2f072f97-aeec-4624-2293-08d9da78b760
-X-MS-TrafficTypeDiagnostic: CO1PR01MB6518:EE_
-X-Microsoft-Antispam-PRVS: <CO1PR01MB6518129121C2BE61677383659C589@CO1PR01MB6518.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Office365-Filtering-Correlation-Id: 02612022-6f41-4c3e-41d7-08d9da76b0a2
+X-MS-TrafficTypeDiagnostic: DM6PR01MB5739:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR01MB5739ECA4585446C4F9995F309C589@DM6PR01MB5739.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /SQmxiMlcyaXAzuI3ccsb83kzsF5j7OgVftpUdVQxyZNX/wlbVgmxMXdSv38tvwhplLqZ5cLd99KKWg0cmiPuENY91rvzVHr3WupfO5RhpYaS8v+NJqMQ2GlbZzyQdbUa2H7taN9NA69nq1sovFVVu2bNN0hJUCRe62D94EWYBSiv5xCpsRaYTRh+SdmN3XmtjVtb7LgOzfGy9BQvJi2FEk3La5KTH2QDMQKdRxFXu3bxFnZvzLRKf1SuTK/o0cwpCnAWZTAQ14Ts6a/YsSAdLwCY8TFCQsiGG+u+h+ANgGJDuO46k7yNWdluPRSN2jjDRyGnhWZ2YxIo3pa3pK40QhVuoJkj63JlEUKggWG7sSL2WTj2BsmZB367STjF5K8VSuvF9NwbW1JqsL3bok/iGwiYld7adri4QtnnLkgGCMaCl+n+h7LO0Uqma9N7dVM45+H6oB6zFD9F/Fl6gFTm1w6b9wAZzdL9DminMlFViOOUEdGVWirhbkZ9So3BpReQVn1jj5nzhZW/SNAYb5IEHDB0t3WHXbvfv/shhsCaJ+pWVE4l51ZMQEHcBQ4k8MhZnNjL0crybBZZnrLspv6G0nwe35GwlsfKxIKaRm2VsHQdkv5933cyweZLve9RW92fpFXR4dQGXrLxCDFXFM7OXV2DJrF2OqNNZsMNWlaX92VfQSFsxpsjpmBuvITFsXJ/rnidupvgfePlk74Y62NPVXB8M6nOcKqDfPUQLRQRe4=
+X-Microsoft-Antispam-Message-Info: 1sHGhzkrsYcV4BYfe+3B8KxFZxlmgdfLC6C8dr5eV7Rd9vXmmH/lHH2Ythc71GkOuwPQJZWjTF8o58S/To8xSfVrQwNpwl+IzteC1FaHb1F2g09STZW5pEvEeyVP5huoEKJw3Bg3Ow18b2h+c1UvlEEq5fEPsTyiXfcmPn6LooolcwkXRu6JtAqX7IAToZ73Tr4c1rgyigL5FW+YIWR3pXwcCTyFCtsfLNcHVgywZTkBSrvoeoP8vdZa8D2kRaZA0MTD1CNnvStbj40rVGSKP3w5ZueCYtRXMwSLEN2N8gd3pOiV/8kxYxO3F1SrZOm4zgoQ/46rbTOf2Z1//WUKD6IWKqu/MXgqZPymv09fOHVobRYwYIDDWC9E2PYz+um+KCNDGDJQy6mu2PVohd9OVe4f5NELOgZGTocyvEHpkurycsHrb9YaZCXY+QEylsbSeFIkDKPmpAIGi8e1r2yfaNl1TSRdmRVR86jNbJEZL0E1hk1Qq9qXUspwNnQpUDW5hCrzSRfLWCIP2DNWa+dQ5Ct3vCwxEANsvS3Z1Dt98xbSrYjug+Z6OaRmB31D7q19gCO2HtFF5IVyQGzmnAPjP7QsZUAs62MmX0YZSrZEojoOWW5VfUCquDHM8Qd96q9eUWzTBvPM6S/gaQTsFKbo0W/Kqe0vtv05KTWDTMHQlgovwwzQ1Y43MTlzdS4CrcdduUwvkimlCmiFlBlQBs8atB6MfuRweOQcWBXNXIbghdQ=
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(186003)(7416002)(53546011)(5660300002)(26005)(6512007)(4326008)(66556008)(6666004)(52116002)(66476007)(6506007)(66946007)(83380400001)(2906002)(38100700002)(38350700002)(86362001)(508600001)(8676002)(6486002)(2616005)(316002)(31686004)(31696002)(8936002)(54906003)(43740500002);
+ SFS:(4636009)(366004)(508600001)(6512007)(66946007)(38100700002)(6666004)(2616005)(66476007)(38350700002)(7416002)(83380400001)(6486002)(66556008)(8676002)(2906002)(52116002)(31686004)(8936002)(54906003)(186003)(316002)(26005)(6506007)(53546011)(31696002)(86362001)(4326008)(5660300002)(43740500002);
  DIR:OUT; SFP:1102; 
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Tmk0ZE1iTVd3RW83eWdXWERwa2J2SThIeHBBa2Q2N2F0cWFTekxlZjZWejhT?=
- =?utf-8?B?WTdwbS9xOVNhaTZqU0dhZmh3cWZrNmR5dVNKK2RlWTBNYnVNemErTHYxU2tF?=
- =?utf-8?B?VnU4eGh3M2RRTE9UMDNlVjJJOC84a3BtRlV0RGdvTUg4MTNDTE9kRmVIVjZG?=
- =?utf-8?B?bURlVTUrcHZ5N2hFVjI1ampndzFDRSs3Z1FmcmQ4NmxJVW4rRjJ0MFR6TnBx?=
- =?utf-8?B?Sk5CdkJVZzJKTk50VUMwK0RQWWVNYzgvemt0S2VlbURYdStQWStlZHNtbi92?=
- =?utf-8?B?Q0hJUi9QK29NRXpkK1crLzF1amNIdDVGbWxLbXZxNUtkdTc1TzIyZjdOTDgw?=
- =?utf-8?B?VkpBU3R0eTQ3TEo5S3NMWVRBMG9Fdi9nMWl0eVYrZHVEbmd2UGJYWTdXQ0Ev?=
- =?utf-8?B?VW91STJ3MXlPWmhxZ0hSRFpBeXhEMUdhaVhmcjB2L3FVNWljejdwR3dMNkNG?=
- =?utf-8?B?NGNQdy9WOWRQS2s5ZVNJd2pSeGVjQzZBOVNtaU9RQUVlYjA5c1BaZCtMRFha?=
- =?utf-8?B?dVNCYk4weng1VWlReTNqUWx0eko2NW5TZUFIVDJjK1gzdm83dWtGbnpwQUNu?=
- =?utf-8?B?cG4zR3Eya3YvQml5NEtZZnBLbzJHUVoydDNmSVdDRGE4VHFTU3huVTBaNUlZ?=
- =?utf-8?B?ZkFvY3gvd0g2b2JsVVcyQWwySnJQOC9jeXV1dWNuaEs5Sm94djVsTFp2MGxI?=
- =?utf-8?B?cTZmMmEzS0sxWU1FZHBtMDNBdFlZOEtLQ2Q2MEw1WkVOOEdPSW94Z0s3OUJN?=
- =?utf-8?B?VjZMRmhLMmREUExqRHA5OUc2dUpLck5NSEdTTnoydzR2VkpkY01FVWNwc25V?=
- =?utf-8?B?V011aTM3akNnUlhsc09QeGY3UGdCYmVOTklRZ3Qrc09IUnA2aHR6VTZ2SCt0?=
- =?utf-8?B?RlBzbFZyaXRCTzExSG8zN2hnRUYrb2JKQnE3RndPYU9rOEZ0YVpsRHpsWjRH?=
- =?utf-8?B?dmh1VXovRUZDSlFLdDFEa1BuWnF4MjBjVktEWGh2am1rWWFZKzhlL0NsOGtm?=
- =?utf-8?B?VmZUTnBiUGdqSHZtc2VPNHF1QTcrL2E1Q1hlR3pZSWVMVGxsamR5bjJCdTZ5?=
- =?utf-8?B?azJoLzJOZFBlV1lQRVFxWnI2Zmx2Nk9GMzBkTHFtVnZXWlFCcjE1ZVk1THBu?=
- =?utf-8?B?ZDJieW04OFpyUGY0RDhQZllwSnRzL3g2UFRhQmwyNHhSOHRNVDFnVllrRGlS?=
- =?utf-8?B?ckNtZWwyVW9aZnh0OTFKTGxuVmF6ME5MYjlLTFdsSG1JNU00aStGVkhSSGFS?=
- =?utf-8?B?RHo2V2YvVUlUcDZLVFYyOTA4eGx4bkdGN3JzOWpyVXdjQlR2RjNIczRPVkdH?=
- =?utf-8?B?c1luNGRldFZOKytEOHlKTHFNdExnZXNBb2dRL3JKK3I3MFBqYlpRUE1yZHFY?=
- =?utf-8?B?SkF2RittNHdzcGtHVWUxU01KU0tvWXpGQ0p0YUw2ZUlzc2lLNWdrUmtKQmxI?=
- =?utf-8?B?NFlyTUFwVFFYa2tBTXNZWTNyS3kzanl0NFBNeEdYS0RiRkJHNFU4QnIxY2Jv?=
- =?utf-8?B?TnNMaEdDckdZUVcraXZVbWtsNGZvV0VtS1dCc1hmRnZlRUlkbzhtaXkwRW5j?=
- =?utf-8?B?dUFuSE84YjJJZnF5SXVNKytpdDFuc0hxZFc3RHZHUWU5K0NBeEtIR0lCeGMr?=
- =?utf-8?B?dWFMcU1jRUN0QUQ5VmZJRU1zM3JibDUyT09ZVk1XRUNRZGpUeUQxMllxL29U?=
- =?utf-8?B?blNYTFF5VVMzK1U4dkF0MUdvQXEweTN4WFhkQ2RFUEVHVVNWc2ZuL1VIYUNY?=
- =?utf-8?B?MCszUnpPZWlJYkJOVmN4ZXNkeEVJZ2gwRG91Uno5VDcyWWJHM3ludkRFOThO?=
- =?utf-8?B?MStoVG82OWZUK1BZeXdzSldudXVRaFRaRmZ6eDI2YzdIU0lmVkc0djVzSUQ2?=
- =?utf-8?B?RW5uRnJBMFhwT2JVZ2I1RHRVZ21BditwR0xMUmhlamhVeGdvVmRwOTd2VGMx?=
- =?utf-8?B?TnJYVE9ybmpJbHNyaDNwVjFadVdTNzVqVGZIc3dEM0tESzhPa2d1MHJsUkQ1?=
- =?utf-8?B?NXNLeVUwR1NJcGlkenYwZkV3TmNTMjdKeURtKzBTNk1jY3ZEN1ZKWnVjOWIx?=
- =?utf-8?B?ZFlTOTRtWmg0cE03ZTlLUU9NK3R3MVozUEZWRmw1bkhyeTgwR3lka1VFcEdr?=
- =?utf-8?B?ZGhSV1gxS1c5RStpWWRYYlI2RUxWRU41dVpOaFlwblhKc0FPaEtpNm16T0ph?=
- =?utf-8?B?MkNHZ0l3Vmp0bEFUOFFsOUxpWTVFZXR4b3l4N01VbTJSc29MbCtIcEdRU1cy?=
- =?utf-8?B?RmwwaWt4T3YvUlZvdjB6UjVGRXQ5Ym96QXhjTHQ4RzR6NUxIOUpUMERFN2dR?=
- =?utf-8?B?NWw1L0l0MUhML2x5TXE3ZmZFRXdGSmtpRnZpKzFIeDdTdldSNHkvZz09?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cUk3emN5N2Rqbnh4Z3IwREZVdVZWbkFEWTJFQ1ZqQVVZWElCaEdoTkcrS1BT?=
+ =?utf-8?B?U0NsZjFDNDJ0QlZ1S1IvQW5CTDkyd201YkZoeUdWblNEd0FYSGdFMnRBNSs4?=
+ =?utf-8?B?SGYzMG14MXR4WDNmWjZwQVc3MFVnaXEvRXJONDBWRWR2WVVWYWpZd24vNkNX?=
+ =?utf-8?B?RGJkTGI1OXFQem0zMjQ3SndqSDZxSlg1Q0dwdUo5eGVnWVRkL3plcEsreHNa?=
+ =?utf-8?B?MDhzN0lWUXZFUHZ2Y01ISEppK2txNEpTUFhHRkxObnN1czFRdTJOYlEvYUVL?=
+ =?utf-8?B?THZEU05LTUJaMWFnUFE5c0o2RDlDZzVHNzNsUTZzWkpvdEdDRUtmYll0SFor?=
+ =?utf-8?B?d21DM2hFNm9GdEwvZjQ4clZ6b1B6cGx4MGJtZ21BeWxFRjNUL3RPQ1ZTTTBv?=
+ =?utf-8?B?aGNSTS9OeFVKUDNCa01PNVhKaG82cmtGUlhKUUVWcGRXcy80UjBKbnc2Qkhs?=
+ =?utf-8?B?bWtJZkVMOFF5alJZZFZMVC9VcjByU2FDc1lXUDAxa2V1S1lzVDE1ZHFJSnU0?=
+ =?utf-8?B?RldvY2p2NGd6L25lR1hZUWtKeEZ1V1NoeDlpRlFVV1VxbFIxVFNmTVpjZng3?=
+ =?utf-8?B?WHgvck1VdDVocmtxcHNyRXUyREhud01iVXdQcmlIZTNCbWVkZGlyNXVnV1RN?=
+ =?utf-8?B?M1ExWWVpOVQwK2VsejdLa3ZvQXB3UUVScDBZcUU2ZXhVR29idEhoZGxwajJO?=
+ =?utf-8?B?TTBGelJtOFU2OXp1d0dZVUV2dE8vb2hFY3dYYm5vbkxJbDE5UkZkOXQ1ZDNP?=
+ =?utf-8?B?U04rb0Jrakxma2cxU3lEL0lYWHQ0MHQ4M09Gc3VROEdDbEw3ZXhKM2pvZng5?=
+ =?utf-8?B?MzAzSXl4MzJDRy9idEZSekhFcTdoTHFiVnlySlNHZWlyYVl0Rlc2VHYweGFo?=
+ =?utf-8?B?TFkvbFI3bDdlSTBhQ0Vac0RoRGJOMnVCZXFFc2dPWXliVVpRcmR4YXJicGtU?=
+ =?utf-8?B?Tnd1R2M1V3VNRC9ubG5sY0ZYV3ZDNlI3K3lEdGJUa2c4NG03a3ZqVUZBQmtZ?=
+ =?utf-8?B?UGtiSUpKRytMcGJmdzhldzRNaWQ5QlRxWDdmekZKSWd5VUZ1d1hqL2JURVhj?=
+ =?utf-8?B?aTBMYmtXRDdFOGk3bmJVNU9ZVkpXa2tIa21sSWVWSWxCVnMwWjBRYXB1V1RD?=
+ =?utf-8?B?QVB2NTQwMXNBV2FkWEhXV1o2QmU3T0V6SmdnYmFMWGV3NjJKUXZIRllYNGJn?=
+ =?utf-8?B?Ty8wVk15UlUxQUlLOUJqcGNXOEVMRU9YOWJlZG5QSXU5QmVqNEJkRm5LY253?=
+ =?utf-8?B?TzlXTWdUSGhTNGtQV0NwMzdwRWszazEwZ2F1b1UzckluOVF6NWNlM3pUeTFx?=
+ =?utf-8?B?eWhIZ21kRDFla21YNExtVkRLWFJZbmZ0UUhJaFFTM0F2UHkvc0ovVlhtOWdC?=
+ =?utf-8?B?MjBzeUxkTGRqaVVCYmNCZ3BnZ0ZtV2RhTUdOSnJQS3QrWlcrM2RSZnZBUytn?=
+ =?utf-8?B?eUtETVppVm1YNDRSQnJBbkMreXRxazk5RHJpYzJIZG55V1h2UjR4NDg0VnJM?=
+ =?utf-8?B?czNCcm95cVZ6bFYxeUtDM1E3VzAxYkozanlCa1lLRGpyV0tudngrK0kyU1Rm?=
+ =?utf-8?B?MXc1OW9LMDhFY1ZsbGtaV3FsOGhSTVd4cHNNZW5xQXZ6aWhmTWRjS0J3REdz?=
+ =?utf-8?B?ZW1ENWRlUWdCSXduYldmM3BMQk8wRk5Wd0huNUxhRVl4emVmTnVxWTFCaGFM?=
+ =?utf-8?B?U1ZYUHpIL20vekRxbi9yd01wWkh2UE4zL00vVzV5c2ZreGJ4WEw2U25NS0tB?=
+ =?utf-8?B?Y1ZtQlVRTERIemZpdkh6RUR5aE96WnZEbGt1cjN3MDdOU0R4bFFIVXExSFRB?=
+ =?utf-8?B?T290cTlBbG1zYjBnUm4yNGl0Rkd2WUFEUjkrRitDN1hjOXFXUkY2blFhZDN5?=
+ =?utf-8?B?aWlBbm55MXl1Q2JmTTJYdFhaY0xRYjFFLzN6Y3hMbXNpdUVVM0xCTVZpSk52?=
+ =?utf-8?B?WGpFWGJiVURYSm1oYUhLQnF0Y1drQ01VZTV5NEptZThUQVBmakpidlU5THAz?=
+ =?utf-8?B?eTRXRmUyc21BL3c1dDBTZnR0STVhZTg3L1ZiaFFuWG8zaDN2RmVOMUdkM1pK?=
+ =?utf-8?B?UVY5VGpMK3NQTXVhNis5REQ1N0MzNmlmOVFNTDViNGtjVG9QdXArcnlrZWtD?=
+ =?utf-8?B?bW82UEpwRXl0YUx1SjdVc0o1V2NTUnhpQ2RJR0dvUEJ3VzNUZlFmZ1hVS0dL?=
+ =?utf-8?B?akc1VlRjb3hMQS8yd2FDRFJsUG5UbW9xZmNGZWJzVWprZWxhcEZJUVBNZndL?=
+ =?utf-8?B?T2Irb3RJVFNudjRJcE84VHowVTduanBUZnJuTTBwZFBmU3Bocm5OTWkyQXdH?=
+ =?utf-8?B?NE5nVGFUNGI5M2p4NmE0ZTFUYnBSMWhudWFPNmlYd1h6YlFJRkZGZz09?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f072f97-aeec-4624-2293-08d9da78b760
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02612022-6f41-4c3e-41d7-08d9da76b0a2
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2022 11:50:25.7881 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2022 11:35:55.4992 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MRss1NsO7O6RORlrsxj1FK1Tv2eMZpv4yoZLGd+OAPdM61Fy1QC52esEWU0y2UodFOt6R1kptpV2S0EXZ8nNOJYuDWAhBNAIZ+sU9Eb/vZ9TA0xjvFiCrklOEAcCUbGW
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR01MB6518
+X-MS-Exchange-CrossTenant-UserPrincipalName: gWFEXqLOgVO42cbFa1H0Kvc2j5XWar3zXVTcF6bOcSjX/JPY0oeuqFqukpOl3DOL7BT3r8FiUVXoYA8DSIUM8D0B0uhoMYawQqbmnUz3hV9zwcTRsIicy6J2W4RxNdGM
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5739
 X-Mailman-Approved-At: Tue, 18 Jan 2022 11:16:40 -0500
 Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>
@@ -155,118 +156,218 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
 On 30-11-2021 01:31 am, Marc Zyngier wrote:
-> As all the VNCR-capable system registers are nicely separated
-> from the rest of the crowd, let's set HCR_EL2.NV2 on and let
-> the ball rolling.
+> Support guest-provided information information to find out about
+
+Typo: information written twice.
+
+> the range of required invalidation.
 > 
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   arch/arm64/include/asm/kvm_arm.h     |  1 +
->   arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
->   arch/arm64/include/asm/sysreg.h      |  1 +
->   arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
->   4 files changed, 28 insertions(+), 11 deletions(-)
+>   arch/arm64/include/asm/kvm_nested.h |  1 +
+>   arch/arm64/kvm/nested.c             | 57 +++++++++++++++++++++
+>   arch/arm64/kvm/sys_regs.c           | 78 ++++++++++++++++++-----------
+>   3 files changed, 108 insertions(+), 28 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index b603466803d2..18c35446249f 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -20,6 +20,7 @@
->   #define HCR_AMVOFFEN	(UL(1) << 51)
->   #define HCR_FIEN	(UL(1) << 47)
->   #define HCR_FWB		(UL(1) << 46)
-> +#define HCR_NV2		(UL(1) << 45)
->   #define HCR_AT		(UL(1) << 44)
->   #define HCR_NV1		(UL(1) << 43)
->   #define HCR_NV		(UL(1) << 42)
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 1664430be698..f282997e4a4c 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -245,21 +245,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 5fa3c634c8e1..7c47ad655e2e 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -123,6 +123,7 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+>   			    u64 control_bit);
+>   extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+>   extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+> +unsigned int ttl_to_size(u8 ttl);
 >   
->   static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
->   {
-> -	if (!__vcpu_el2_e2h_is_set(ctxt)) {
-> -		/*
-> -		 * Clear the .M field when writing SPSR to the CPU, so that we
-> -		 * can detect when the CPU clobbered our SPSR copy during a
-> -		 * local exception.
-> -		 */
-> -		val &= ~0xc;
-> -	}
-> +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
-> +
-> +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
-> +		return val;
->   
-> -	return val;
-> +	/*
-> +	 * Clear the .M field when writing SPSR to the CPU, so that we
-> +	 * can detect when the CPU clobbered our SPSR copy during a
-> +	 * local exception.
-> +	 */
-> +	return val &= ~0xc;
+>   struct sys_reg_params;
+>   struct sys_reg_desc;
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> index 198169648c3c..6f738b5f57dd 100644
+> --- a/arch/arm64/kvm/nested.c
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -363,6 +363,63 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+>   	return ret;
 >   }
 >   
->   static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
->   {
-> -	if (__vcpu_el2_e2h_is_set(ctxt))
-> +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
 > +
-> +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
->   		return val;
+> +unsigned int ttl_to_size(u8 ttl)
+> +{
+> +	int level = ttl & 3;
+> +	int gran = (ttl >> 2) & 3;
+> +	unsigned int max_size = 0;
+> +
+> +	switch (gran) {
+> +	case TLBI_TTL_TG_4K:
+> +		switch (level) {
+> +		case 0:
+			/* No 52bit IPA support */
+> +			break;
+> +		case 1:
+> +			max_size = SZ_1G;
+> +			break;
+> +		case 2:
+> +			max_size = SZ_2M;
+> +			break;
+> +		case 3:
+> +			max_size = SZ_4K;
+> +			break;
+> +		}
+> +		break;
+> +	case TLBI_TTL_TG_16K:
+> +		switch (level) {
+> +		case 0:
+> +		case 1:
+			/* No 52bit IPA support */
+> +			break;
+> +		case 2:
+> +			max_size = SZ_32M;
+> +			break;
+> +		case 3:
+> +			max_size = SZ_16K;
+> +			break;
+> +		}
+> +		break;
+> +	case TLBI_TTL_TG_64K:
+> +		switch (level) {
+> +		case 0:
+> +		case 1:
+> +			/* No 52bit IPA support */
+> +			break;
+> +		case 2:
+> +			max_size = SZ_512M;
+> +			break;
+> +		case 3:
+> +			max_size = SZ_64K;
+> +			break;
+> +		}
+> +		break;
+> +	default:			/* No size information */
+> +		break;
+> +	}
+> +
+> +	return max_size;
+> +}
+> +
+>   /* Must be called with kvm->lock held */
+>   struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+>   {
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 55f3e94c24f1..e0f088de2cad 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2699,59 +2699,81 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>   	return true;
+>   }
+>   
+> +static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
+> +					     struct kvm_s2_mmu *mmu,
+> +					     u64 val)
+> +{
+> +	unsigned long max_size;
+> +	u8 ttl = 0;
+> +
+> +	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
+> +		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
+> +	}
+> +
+> +	max_size = ttl_to_size(ttl);
+> +
+> +	if (!max_size) {
+> +		u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+> +
+> +		/* Compute the maximum extent of the invalidation */
+> +		switch ((vtcr & VTCR_EL2_TG0_MASK)) {
+> +		case VTCR_EL2_TG0_4K:
+> +			max_size = SZ_1G;
+> +			break;
+> +		case VTCR_EL2_TG0_16K:
+> +			max_size = SZ_32M;
+> +			break;
+> +		case VTCR_EL2_TG0_64K:
+> +			/*
+> +			 * No, we do not support 52bit IPA in nested yet. Once
+> +			 * we do, this should be 4TB.
+> +			 */
+> +			/* FIXME: remove the 52bit PA support from the IDregs */
+> +			max_size = SZ_512M;
+> +			break;
+> +		default:
+> +			BUG();
+> +		}
+> +	}
+> +
+> +	WARN_ON(!max_size);
+> +	return max_size;
+> +}
+> +
+>   static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>   			     const struct sys_reg_desc *r)
+>   {
+>   	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+> -	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+>   	struct kvm_s2_mmu *mmu;
+>   	u64 base_addr;
+> -	int max_size;
+> +	unsigned long max_size;
 >   
 >   	/*
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 71e6a0410e7c..5de90138d0a4 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -550,6 +550,7 @@
->   #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
->   #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
->   #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-> +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+>   	 * We drop a number of things from the supplied value:
+>   	 *
+>   	 * - NS bit: we're non-secure only.
+>   	 *
+> -	 * - TTL field: We already have the granule size from the
+> -	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
+> -	 *   guest's S2PT.
+> -	 *
+>   	 * - IPA[51:48]: We don't support 52bit IPA just yet...
+>   	 *
+>   	 * And of course, adjust the IPA to be on an actual address.
+>   	 */
+>   	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
 >   
->   #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
->   #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index ef4488db6dc1..5cadda79089a 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -45,7 +45,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->   			 * the EL1 virtual memory control register accesses
->   			 * as well as the AT S1 operations.
->   			 */
-> -			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
-> +			if (enhanced_nested_virt_in_use(vcpu)) {
-> +				hcr &= ~HCR_TVM;
-
-I think, we should clear TRVM also?
-				hcr &= ~(HCR_TVM | HCR_TRVM);
-
-> +			} else {
-> +				hcr |= HCR_TVM | HCR_TRVM | HCR_TTLB;
-> +			}
-> +
-> +			hcr |= HCR_AT | HCR_NV1;
->   		} else {
->   			/*
->   			 * For a guest hypervisor on v8.1 (VHE), allow to
-> @@ -79,6 +85,12 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->   			if (!vcpu_el2_tge_is_set(vcpu))
->   				hcr |= HCR_AT | HCR_TTLB;
->   		}
-> +
-> +		if (enhanced_nested_virt_in_use(vcpu)) {
-> +			hcr |= HCR_AT | HCR_TTLB | HCR_NV2;
-> +			write_sysreg_s(vcpu->arch.ctxt.vncr_array,
-> +				       SYS_VNCR_EL2);
-> +		}
->   	} else if (nested_virt_in_use(vcpu)) {
->   		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+> -	/* Compute the maximum extent of the invalidation */
+> -	switch ((vtcr & VTCR_EL2_TG0_MASK)) {
+> -	case VTCR_EL2_TG0_4K:
+> -		max_size = SZ_1G;
+> -		break;
+> -	case VTCR_EL2_TG0_16K:
+> -		max_size = SZ_32M;
+> -		break;
+> -	case VTCR_EL2_TG0_64K:
+> -		/*
+> -		 * No, we do not support 52bit IPA in nested yet. Once
+> -		 * we do, this should be 4TB.
+> -		 */
+> -		/* FIXME: remove the 52bit PA support from the IDregs */
+> -		max_size = SZ_512M;
+> -		break;
+> -	default:
+> -		BUG();
+> -	}
+> -
+>   	spin_lock(&vcpu->kvm->mmu_lock);
+>   
+>   	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
+> -	if (mmu)
+> +	if (mmu) {
+> +		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
+> +		base_addr &= ~(max_size - 1);
+>   		kvm_unmap_stage2_range(mmu, base_addr, max_size);
+> +	}
+>   
+>   	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
+> -	if (mmu)
+> +	if (mmu) {
+> +		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
+> +		base_addr &= ~(max_size - 1);
+>   		kvm_unmap_stage2_range(mmu, base_addr, max_size);
+> +	}
+>   
+>   	spin_unlock(&vcpu->kvm->mmu_lock);
 >   
 
+It looks good to me, please feel free to add.
+Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 
 Thanks,
 Ganapat
