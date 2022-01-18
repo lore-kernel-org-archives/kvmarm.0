@@ -2,70 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD94C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Jan 2022 17:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65181C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jan 2022 22:54:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4763049F03;
-	Tue, 18 Jan 2022 12:18:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BACFB40CAB;
+	Tue, 18 Jan 2022 17:54:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kAsCdwvSsO+G; Tue, 18 Jan 2022 12:18:11 -0500 (EST)
+	with ESMTP id z1URtfMWgA9R; Tue, 18 Jan 2022 17:54:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B21749F09;
-	Tue, 18 Jan 2022 12:18:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4894E49F11;
+	Tue, 18 Jan 2022 17:54:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9617F49F03
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 12:18:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AF6949F10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 17:54:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X045HLFMGhNS for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jan 2022 12:18:09 -0500 (EST)
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com
- [209.85.128.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C6D44141D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 12:18:09 -0500 (EST)
-Received: by mail-wm1-f44.google.com with SMTP id c66so29252468wma.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 09:18:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ with ESMTP id 42lqiAfb2mAt for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jan 2022 17:54:25 -0500 (EST)
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com
+ [209.85.219.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4284749F0E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 17:54:25 -0500 (EST)
+Received: by mail-yb1-f169.google.com with SMTP id p5so1438156ybd.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 14:54:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Q22wl6OCD19GypMuT9QWRHowipst+oy+Pq7cX65GDBI=;
- b=XUFayqN3S6FO4rPKr8roe5K/9ilHZSe4lyDj0PGBjfxYK5UPUK9yVoOP1cuzZi4978
- EL7ELnSrMVQtL1DugrfPVtAtJSIY9W+fs7/RXfkHB2QzccKaNTJw8Quj6AapJKw7kBCy
- zZ+HMyYgZvn9L1V9WWHUmuzT0IOQLDQJqJbGehtZvALfgf8Ff/QezpFCPRx7KvGTEUH6
- G8cfFfn2dpLENFi+QttOleeMdDgK8352iOb30OOWBVbWR4NbhjndWOglswuUnm5+5zw1
- J8KquigKXGiv3hUXXABfzkZgl4Gx9eJG63UzqSQX9HEQrxdrwRGhEI0yrIoK/Eh4r+E7
- p9Dw==
+ :cc; bh=2A0o9RStrnIxmL11KBIrT0fGYmNaZT0XLIaxHQF5rjs=;
+ b=dag6jxRDJUEiQYlvYUtjYS/OfkScCbS15kuV1kOlQvrem03MJYgdAwaEHsk7xkMGTO
+ kFHIj3pxg2l26Gamk9bynAV2Zfontn1hV5i3Z18gq3jN3xjnwhxB20CVOjA4+vlA0R02
+ ceyCS6rF1ci0H0IzntFxCa97kN3hwPwH9Z5sBLk8kMfM4ZECEp0lNsPAGgF1rYgVCvUR
+ PGkIyNBVj8eZ5YoiH4PXKb+AZcWt0b511F2zYUm4g2+HsrQfl/5+64z1s3gsYWingZHi
+ WN++EpOE6AguKoOdixg8BZ9R5wasNuqelZQvKvhUyQa3VDRdqhnIkSRieTj99s3sWzle
+ ku3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Q22wl6OCD19GypMuT9QWRHowipst+oy+Pq7cX65GDBI=;
- b=BPJbB72ir6VPKQ1BWwM1S/4cbt596u328hS9fOtLC9R5wQzDNipfrC2f76kFR/Gj/1
- U5YbxZHmbwPZPiByOSeK7i6zgVbwUDvLJeWgqIEhBBI+AUZVYj1KCOXv+AiCZ5XMEeG3
- TIlOcgFGeg4uDLYbXu/V6qqMXp+iDr5pr6hCd3RZ8DA8zcTiuCoiBGRDVZ1kQjF9QNuv
- CwIIA19z0dwfC1Qmv0/2aTuoyP9xSoyg45WcibNHpiEht2HI4k6hrxOcovdEHPQtx588
- ii/sXi2CnG97/xM4StTwuE+Ynit0x8+9A7dpIVYAif2MIn6WRIBt30sl0fvYVKCikfuQ
- nDYA==
-X-Gm-Message-State: AOAM532YR5w/iamvOP0g3FSBK6nlkL3wRFUkqycNTQOvrLdm9njzOW1o
- cwZ80ID1/gKpc2q4Bp6IwdV6x4pyAoImPfTjmOVsRg==
-X-Google-Smtp-Source: ABdhPJz8MsvFIKOMo3v6OXCZ/Gti1AwvjDfQH2v2OENrYDIXl+aE+R5HUBYG9wft9NNF4CAYxEC9y6k8jNSNNSoXMnQ=
-X-Received: by 2002:a05:600c:4f51:: with SMTP id
- m17mr11463648wmq.32.1642526288443; 
- Tue, 18 Jan 2022 09:18:08 -0800 (PST)
+ bh=2A0o9RStrnIxmL11KBIrT0fGYmNaZT0XLIaxHQF5rjs=;
+ b=l1zkE3c68BInszYDymKNoZfkfmlGjhroxP+uGWCjE2sI0/ZhDyF64fZaLg95meSwzC
+ fVLESWNsdjWDhubjwOKQGdNqpAscmmpXRtblAlREFgdVM2a7Suxx9QC0fric98XhLd5j
+ ksOmUtsPQD2ZaL7MZOnWnpUqi1xAjyIhE+Vu+1BDz2VD2tl/5Gjs5GnRUkyabr7TAisx
+ KLK24M7JhBu6fAvy3LmU2xy5rNJ0blVSP0R37F2ZNMo8VvEkySgw+9jzOdg9hxfV+Ard
+ ovFFGL4quMbobQo7XO+YaQow5ROMB5qdlRf4kjNRigOJu/D2VH/wkPaQYJCpxj8K9yuF
+ TzEg==
+X-Gm-Message-State: AOAM530NuD8lV4AHqHEqjaPj8anUoV3EGFoDovDslxDwPBY8mICR0ZOY
+ 9BcmwT6DFNBMVzMDFsVNNqyq6Khkaqc7sCkrituxlg==
+X-Google-Smtp-Source: ABdhPJwKhpxDqzsHYaDrecYU3+cgHLkJME7T1oocecMclqJnaqy7jDJK7leekDDAezlwQk6RPUBfNaub4qT6EIgRDRI=
+X-Received: by 2002:a25:d055:: with SMTP id h82mr6237602ybg.543.1642546464435; 
+ Tue, 18 Jan 2022 14:54:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20220114140741.1358263-1-maz@kernel.org>
-In-Reply-To: <20220114140741.1358263-1-maz@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 18 Jan 2022 17:17:57 +0000
-Message-ID: <CAFEAcA9dFVUY5a9WANrS1UEPrbsUueYaUzneMYhjdn=XTKDGvA@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] target/arm: Reduced-IPA space and highmem fixes
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu
+References: <20220104194918.373612-1-rananta@google.com>
+ <20220104194918.373612-2-rananta@google.com>
+ <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
+ <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
+ <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
+ <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
+ <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
+ <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
+ <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
+ <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
+ <YeBfj89mIf8SezfD@google.com>
+ <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
+In-Reply-To: <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Tue, 18 Jan 2022 14:54:13 -0800
+Message-ID: <CAJHc60zcwNskA7JCg9nQc4YhmLdziHVauf1gQQ48GHYtby_aYg@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
+To: Reiji Watanabe <reijiw@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,28 +96,76 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 14 Jan 2022 at 14:08, Marc Zyngier <maz@kernel.org> wrote:
+On Fri, Jan 14, 2022 at 1:51 PM Reiji Watanabe <reijiw@google.com> wrote:
 >
-> Here's yet another stab at enabling QEMU on systems with
-> pathologically reduced IPA ranges such as the Apple M1 (previous
-> version at [1]). Eventually, we're able to run a KVM guest with more
-> than just 3GB of RAM on a system with a 36bit IPA space, and at most
-> 123 vCPUs.
+> On Thu, Jan 13, 2022 at 9:21 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Wed, Jan 12, 2022, Raghavendra Rao Ananta wrote:
+> > > On Tue, Jan 11, 2022 at 11:16 AM Jim Mattson <jmattson@google.com> wrote:
+> > > > Perhaps it would help if you explained *why* you are doing this. It
+> > > > sounds like you are either trying to protect against a malicious
+> > > > userspace, or you are trying to keep userspace from doing something
+> > > > stupid. In general, kvm only enforces constraints that are necessary
+> > > > to protect the host. If that's what you're doing, I don't understand
+> > > > why live migration doesn't provide an end-run around your protections.
+> > > It's mainly to safeguard the guests. With respect to migration, KVM
+> > > and the userspace are collectively playing a role here. It's up to the
+> > > userspace to ensure that the registers are configured the same across
+> > > migrations and KVM ensures that the userspace doesn't modify the
+> > > registers after KVM_RUN so that they don't see features turned OFF/ON
+> > > during execution. I'm not sure if it falls into the definition of
+> > > protecting the host. Do you see a value in adding this extra
+> > > protection from KVM?
+> >
+> > Short answer: probably not?
+> >
+> > There is precedent for disallowing userspace from doing stupid things, but that's
+> > either for KVM's protection (as Jim pointed out), or because KVM can't honor the
+> > change, e.g. x86 is currently in the process of disallowing most CPUID changes
+> > after KVM_RUN because KVM itself consumes the CPUID information and KVM doesn't
+> > support updating some of it's own internal state (because removing features like
+> > GB hugepage support is nonsensical and would require a large pile of complicated,
+> > messy code).
+> >
+> > Restricing CPUID changes does offer some "protection" to the guest, but that's
+> > not the goal.  E.g. KVM won't detect CPUID misconfiguration in the migration
+> > case, and trying to do so is a fool's errand.
+> >
+> > If restricting updates in the arm64 is necessary to ensure KVM provides sane
+> > behavior, then it could be justified.  But if it's purely a sanity check on
+> > behalf of the guest, then it's not justified.
 >
-> This also addresses some pathological QEMU behaviours, where the
-> highmem property is used as a flag allowing exposure of devices that
-> can't possibly fit in the PA space of the VM, resulting in a guest
-> failure.
+> The pseudo firmware hvc registers, which this series are adding, are
+> used by KVM to identify available hvc features for the guest, and not
+> directly exposed to the guest as registers.
+> The ways the KVM code in the series consumes the registers' values are
+> very limited, and no KVM data/state is created based on their values.
+> But, as the code that consumes the registers grows in the future,
+> I wouldn't be surprised if KVM consumes them differently than it does
+> now (e.g. create another data structure based on the register values).
+> I'm not sure though :)
 >
-> In the end, we generalise the notion of PA space when exposing
-> individual devices in the expanded memory map, and treat highmem as
-> another flavour of PA space restriction.
+> The restriction, with which KVM doesn't need to worry about the changes
+> in the registers after KVM_RUN, could potentially protect or be useful
+> to protect KVM and simplify future changes/maintenance of the KVM codes
+> that consumes the values.
+> I thought this was one of the reasons for having the restriction.
+>
+Well, that wasn't the original intention of the patch, but just to
+protect the guests from the userspace's dynamic updates. Having said
+that, and based on what Sean mentioned in his last reply, it could be
+inconsistent from what KVM has been doing so far and would be
+difficult to cover all the scenarios that userspace can mess things up
+for guests.
+I'll plan to drop this patch in the next version, and bring it back
+back to arm64 if we really need it.
 
+Thanks Sean, Jim, and Reiji for the comments and discussion.
 
-
-Applied to target-arm.next, thanks.
-
--- PMM
+Regards,
+Raghavendra
+> Thanks,
+> Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
