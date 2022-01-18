@@ -2,39 +2,39 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD33C433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 18 Jan 2022 16:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E11C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 18 Jan 2022 16:16:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B1D24101F;
-	Tue, 18 Jan 2022 11:16:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDF5840C2B;
+	Tue, 18 Jan 2022 11:16:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@os.amperecomputing.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id crCwwhmA5H3W; Tue, 18 Jan 2022 11:16:43 -0500 (EST)
+	with ESMTP id Q6JfaUn4NczK; Tue, 18 Jan 2022 11:16:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CA2449E49;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A46B749ECF;
 	Tue, 18 Jan 2022 11:16:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40C1940BDF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 06:29:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8452149E44
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 06:50:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8Hkh+8Waws4P for <kvmarm@lists.cs.columbia.edu>;
- Tue, 18 Jan 2022 06:29:09 -0500 (EST)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com
- (mail-dm6nam11on2096.outbound.protection.outlook.com [40.107.223.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1CD140AFA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 06:29:09 -0500 (EST)
+ with ESMTP id auIbCujRcny7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Jan 2022 06:50:29 -0500 (EST)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com
+ (mail-mw2nam10on2127.outbound.protection.outlook.com [40.107.94.127])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2484B49E43
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 06:50:28 -0500 (EST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gAqcKGi03qhL+eI/Ott8AwIxYp/cbSs7I8xqsZqa6i3arlHs7prG1Uv3JAXaqdC0cGPqHgUZgcoHOQDmqATF+F53nwMkr+xOvde875VPO2OL9FJJ7IzP0HoBogSrTPNuALv8RCdRV+TYbAqgxq7T1hcDJkgtOaLuX2dWEo4DK7Ub/oVXXE7YclXOfPtNSz9ccY6Bco2SoGcCCilxL8O41u6ZFgzBoreZ6Hp0hqX5OPYsETpbV91LuO+u7g0OwZ40NbKcEOXUFpYrf0Ahgrq+7MpKX23HXBgY3/5+YxUHJy8xB7/TE1IbUFDN5L0fbqLkMUy0qLzqX3SxYiHgIHtzLw==
+ b=ILTmNMZpqLscZQaC5xzqFK9h878Bek/1d6yZElc9zQCcJw4ALfkwTd9gdLhFtYTslaydIxGlIhtL9JAgD/z4/wuzU25OgnEHf+0vEEOeT0b+liDfdwsr0sj9iMxkmVyuIHeNfO2FJD0/BtWwf6DocwK1QGpvEbGoRdmnsgcnHxiMgnvHkHE3vT4sVBociylE6mbpj/5Jpp+xBW1QjZIHfDSsf+OiljIAqEcZs3v1NfAiJpxosToSX288qd2/k6VbY7uoxy1t4tr/IZeAostLAKS/bwQuWbBMuNenNV03W83wFweiQUQoG7AydMwvxHZIPS+hw9ScSFquszEBTd7VCA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Sepb/7fGHtYjOzWWfZ8RjEw0/PBaVghM84Sz/ZvZZuc=;
- b=CvUKjvBYzmuUUgE9ZNcASE23olHgheLhu9yTy+I+lKnWfcG4wDbIw0UZ+/7KURB1LkHvqowyBsrs4cr6oB1ChvpxL6LnkkjcXWGkOc1d6/Q8tZNn1n1C585SqiZmrKZaNdf6jcMDPq4VFbAR+8Tis28zzJyLIJ4vxK38xYAzqJiBZsmn2+Oqgun5iMmxxClMdWOyBzmvUd43yFDFvzaBtiZQllT5MpGZJDRvT+QjcYaQizUEx3Bu0ZJRwMfMZ1csJpGx18Ycenzccz6pwPYI7+9lWWRcnmsuhjiNv62br7pVVbNRR7h7/Tv8I0dGNb58DVVANa5ZA65u4ccPGKlh2w==
+ bh=54u7WpTJYLtaHYafc1udTkdh9PqbFVAFMfy2ALLZ2QM=;
+ b=hkYXQfQ8fH9AEmmL+HkQkhXg5TmLBceHjN/6C0jWYf2w8bAM1V7vy853y7rk2BtAVb4tVgx0r8xjMIjcCGCubMfEAVp2ZSq0zCu4zdHDcZ154KFrn5WqZZyLTOFnn5HPd6S88E558kOd2CaTuyuufAMeuSyOtjzuHTlZGAJv8nRTNl8gnEunkn0AKMi/tnqA0NdVHFolP0XR6mXtjtJzL1/gv7J2EIKQUnU3S9whFUi2sqPP8zsdYRHP5pVdw7iY6Qz0j4RYvKvYqMdPs7d4Z2VGo6bApdkoPQ1vqkUzRvQX6twqUBmjbmLIsURzrOKNMNYUllTlHDcdDYCsdgXHdA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -42,98 +42,97 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Sepb/7fGHtYjOzWWfZ8RjEw0/PBaVghM84Sz/ZvZZuc=;
- b=QtbZGnUOA3Hl2cJYd4+v+Qr22hBwWBq8XmvB6V8CUdNUM1EuF+we1Rwos4uDC97ljbdlvsvevxdV3SqjRGYKsow6s0gRvrlO2sduG0lEyAxWqNpH/tKxkeiDf4Oli+hf1qCKOHsMP+dlGAqCcMXVelkvFTrJ40eJkax7riBnk5w=
+ bh=54u7WpTJYLtaHYafc1udTkdh9PqbFVAFMfy2ALLZ2QM=;
+ b=VELLQ6u/tU8qpX0q/DYXF33vAAwDpaUm8mzYAxWbHObIpOY3EFhU8K3xbpnQUpZXGteDMBhir1g1UHpc4xAQMyeb3QIRBXrUXloHd2peLrQnaGFpcU0MKiOmzcLwEPc/pOH/1Ebjm/uj2h0LZ1sOjq5TV8frRQwW0bgTGmkVw5k=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- BN0PR01MB6957.prod.exchangelabs.com (2603:10b6:408:16c::12) with Microsoft
+ CO1PR01MB6518.prod.exchangelabs.com (2603:10b6:303:d9::13) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4888.13; Tue, 18 Jan 2022 11:29:07 +0000
+ 15.20.4888.9; Tue, 18 Jan 2022 11:50:26 +0000
 Received: from DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::3825:c594:1116:2a01]) by DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::3825:c594:1116:2a01%8]) with mapi id 15.20.4888.014; Tue, 18 Jan 2022
- 11:29:07 +0000
-Message-ID: <a70a4d4a-c036-615c-4076-fe0753bcd810@os.amperecomputing.com>
-Date: Tue, 18 Jan 2022 16:59:00 +0530
+ 11:50:26 +0000
+Message-ID: <7fe1ce9e-1b86-ed57-a0e5-117d1b9011b4@os.amperecomputing.com>
+Date: Tue, 18 Jan 2022 17:20:18 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
-Subject: Re: [PATCH v5 44/69] KVM: arm64: nv: Set a handler for the system
- instruction traps
+Subject: Re: [PATCH v5 67/69] KVM: arm64: nv: Enable ARMv8.4-NV support
 Content-Language: en-US
 To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-45-maz@kernel.org>
+ <20211129200150.351436-68-maz@kernel.org>
 From: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <20211129200150.351436-45-maz@kernel.org>
-X-ClientProxiedBy: CH0PR03CA0059.namprd03.prod.outlook.com
- (2603:10b6:610:b3::34) To DM8PR01MB6824.prod.exchangelabs.com
+In-Reply-To: <20211129200150.351436-68-maz@kernel.org>
+X-ClientProxiedBy: CY4PR14CA0036.namprd14.prod.outlook.com
+ (2603:10b6:903:101::22) To DM8PR01MB6824.prod.exchangelabs.com
  (2603:10b6:8:23::24)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8afa3f40-1c57-43cd-19ca-08d9da75bd9e
-X-MS-TrafficTypeDiagnostic: BN0PR01MB6957:EE_
-X-Microsoft-Antispam-PRVS: <BN0PR01MB6957ADEB023A87174ADDD2AB9C589@BN0PR01MB6957.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Office365-Filtering-Correlation-Id: 2f072f97-aeec-4624-2293-08d9da78b760
+X-MS-TrafficTypeDiagnostic: CO1PR01MB6518:EE_
+X-Microsoft-Antispam-PRVS: <CO1PR01MB6518129121C2BE61677383659C589@CO1PR01MB6518.prod.exchangelabs.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bX8QzyhDMazzFRfaJ1iYdtaE60dQPZ+j5UAxzmOTDvhbbdwYDthyraQEtcAVcU2Rd012x6B+qETZt4oDTW3lBRTavpEJId+9tqpqOfNsDDyJfsfzRZFT0+il8gwUVXFdlWDD7FUoDPcaoHnspWMO01/mX4ufobux6R6KEq2Juo8ZX7AuYmLz7DaDQ6La43C8qH183rjFBN7JbbxtFjYBTxfEVKLjnbasmaJSSAHo08BgKhtqcAjJ4L1jrL9U2gsSjEM3Ff3wwpYlXECIFIz92i83DIxH0Gx8TBntD75rP5j7V/9koJfCcyLsGslpFVQKe4uhfOqQxGhFPJrUsTIhCfpJaVrEAfW8mgACytOUGCzuMT/uJn0m4/lz9uLCyPQCEKmWPV2o/60czJHHjySEqCJS/fy4OFSRL5CtZoLzU9fk6Xn1cU3LcUNzg5S8UqZfK0fdVFzH46ee29A7SNuLJ4/lV9Ug/CaAL6ctmGx02PSgiw67jxNxO7x/OyggfS2e+4OMl7N7h2RJlTWOgPIwyg34cvX4esfbnaaRI3Hl6ohMiDir7ZuPvgrF3CRhczG4o0jXr6Hn5DBxOCjH4+43LB14/ATJGIF/GKVcC2a+wTCg8MkCEE+rBownumKxylWB0Fo5EXyix2BBE6W4/Av4TsJqv80aPFaB8xncsctAW15XlR7oGcb+1GFdDCIqE+2P9oWvT+gCv6zzJfgQDUj+3dlo4fdLHihXfgk/+0jnBW4=
+X-Microsoft-Antispam-Message-Info: /SQmxiMlcyaXAzuI3ccsb83kzsF5j7OgVftpUdVQxyZNX/wlbVgmxMXdSv38tvwhplLqZ5cLd99KKWg0cmiPuENY91rvzVHr3WupfO5RhpYaS8v+NJqMQ2GlbZzyQdbUa2H7taN9NA69nq1sovFVVu2bNN0hJUCRe62D94EWYBSiv5xCpsRaYTRh+SdmN3XmtjVtb7LgOzfGy9BQvJi2FEk3La5KTH2QDMQKdRxFXu3bxFnZvzLRKf1SuTK/o0cwpCnAWZTAQ14Ts6a/YsSAdLwCY8TFCQsiGG+u+h+ANgGJDuO46k7yNWdluPRSN2jjDRyGnhWZ2YxIo3pa3pK40QhVuoJkj63JlEUKggWG7sSL2WTj2BsmZB367STjF5K8VSuvF9NwbW1JqsL3bok/iGwiYld7adri4QtnnLkgGCMaCl+n+h7LO0Uqma9N7dVM45+H6oB6zFD9F/Fl6gFTm1w6b9wAZzdL9DminMlFViOOUEdGVWirhbkZ9So3BpReQVn1jj5nzhZW/SNAYb5IEHDB0t3WHXbvfv/shhsCaJ+pWVE4l51ZMQEHcBQ4k8MhZnNjL0crybBZZnrLspv6G0nwe35GwlsfKxIKaRm2VsHQdkv5933cyweZLve9RW92fpFXR4dQGXrLxCDFXFM7OXV2DJrF2OqNNZsMNWlaX92VfQSFsxpsjpmBuvITFsXJ/rnidupvgfePlk74Y62NPVXB8M6nOcKqDfPUQLRQRe4=
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:DM8PR01MB6824.prod.exchangelabs.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(6512007)(2616005)(54906003)(6486002)(5660300002)(8676002)(8936002)(52116002)(53546011)(6506007)(86362001)(31686004)(31696002)(26005)(66476007)(316002)(66946007)(6666004)(508600001)(66556008)(38100700002)(38350700002)(2906002)(4326008)(186003)(83380400001)(7416002)(43740500002);
+ SFS:(4636009)(366004)(186003)(7416002)(53546011)(5660300002)(26005)(6512007)(4326008)(66556008)(6666004)(52116002)(66476007)(6506007)(66946007)(83380400001)(2906002)(38100700002)(38350700002)(86362001)(508600001)(8676002)(6486002)(2616005)(316002)(31686004)(31696002)(8936002)(54906003)(43740500002);
  DIR:OUT; SFP:1102; 
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZGZlWFlXd2t2RDJPYW9WSS8xRi9aR3BrREZidk0wMnhlWElOTlpFYnB6aGFj?=
- =?utf-8?B?UHFiVUNWWGh2cEY5aUd4Rzg4cWpucVMwUy9lRkNSUlJSbkpPVUFuR2xMNXJ6?=
- =?utf-8?B?L3FZaWJTcHdzeHdqM2xPd1VXT1I5Wmp3ZjQ5di9NM2dVZ3RmaW83WTBPdHNz?=
- =?utf-8?B?bmkvS09welJRdUtKUGVQaFVMdjBkdm85MHV3b1pPYWhpbmlwWWR6VHNobEtE?=
- =?utf-8?B?S2lZdzlLUktpaVJKYXFENEQrYUxsVkFlOUJENFkyQmNqS1dlR2k5QXBjSkRk?=
- =?utf-8?B?UkkyY3NCcjFzdVEzbFNOTzhGOVcvK01zZVVtckJRV2REZDRXejNOeHIyMGVh?=
- =?utf-8?B?OSt6WXpTV3lWckIyY1QxbVlpWTUrcDdEYkNOK2FHUG9SbjJXVjByWEdhUm1D?=
- =?utf-8?B?bmRQVkltb1dqdEw1SzZuc1g4Z2w4WUtDdHg3K2c1YVh0MWJ6VG54VnVSZDY4?=
- =?utf-8?B?a3dxTjZvOVNrYllvMDlnZElaRXNjUDFQMy9XT2xZekdkU01QaHhLMm1UQ3JL?=
- =?utf-8?B?aXZiSU5NanFJNnFpVmM1NHNSVmUzaGM3WkxQOGdKMkxhd1N3SUZqZkt1S0lv?=
- =?utf-8?B?RlNHbU41N09uUjVoR2k0Z2Z1cko1ZUdSNkxKdHdwNlNKa1U2enVoM2l4UWtu?=
- =?utf-8?B?NFJiRGJHbnZsL3lUREJJb2VmM2NqREdrT3k5QVdVQ29TeEpUM1lIcEtHUHhj?=
- =?utf-8?B?dlpwWWdpekJtbS9iZ3p4WFBIUFVjZlU4OGNWK0Q1TUFxVXBCckxXeFltOGYx?=
- =?utf-8?B?UDdJRUNsRjY4ZFplTUkvRVJwNHpzQjMxS2RSaWZ6dU5HWGNhamNtaE5kcVc1?=
- =?utf-8?B?eWgzdUtmeXpiOEtyMHR4Ti9FeU9NdTFpdjRNam54RDVjTDJXZnFQK2tDb0xh?=
- =?utf-8?B?MC9yQVhnR0hpblowZFRPSkhEd1UrNWxrT1dDRWxaT01jTFNlQWNHeVpZSUUz?=
- =?utf-8?B?M2dtbWVIWWIvWHV1b1U1eU9LV1FtbDA3NUNwblNFUDdGd3NoUjZjR2xqME5y?=
- =?utf-8?B?V1o1YVhSU0JUTUwzd3hhSW0wenV3QWZnUGxITTN2T1BQWHU0MUNjUlNvMG1R?=
- =?utf-8?B?VTB3UElsTCtzS3VtVU10YXh5YXBxY2owMUU1eTZyb1pQSVIwTThTM0RGTTBj?=
- =?utf-8?B?RFFIbFBYVXdJd0pQMjBmU2tHQWJxQW5XSjhRYkpCQXhMNWxIRm1ITkNWOUhD?=
- =?utf-8?B?aGY1STdpeDZMQ2xmK09ZUVZsZjJtZXYreW93K1R5b0ZVVENVZnJzeTd4QmQy?=
- =?utf-8?B?M2R2QkR0ZXlGRWFLbGdmb25aWC8ya1FRZjVzTVYvWHkxVHlFd2ltQVlCbkg2?=
- =?utf-8?B?VWdvaGdFdFMyMEs3cDErUXNGZmcvcTBFMTV3L2xrcnVZM1NKanF3VXhFQzJL?=
- =?utf-8?B?NkRvSVc2eFRObEJJWDJNTkg0VnpSOFlweDdZcXpHREdwczc2aXN6N3N2b0cy?=
- =?utf-8?B?YTZPTVhrOEo1RFkwNU5FYk1DSHUrS0NiL2c4QWxzTFMvOXIyN1hxSXlKY1Na?=
- =?utf-8?B?QWhKT28rWTBOaDZ2aHVBUEJQTGppRTJQWlAxRUR3N1llWlpTWDdMVkhKeFdj?=
- =?utf-8?B?bGJIdFpOU2szaFRBTkVEMVNOMnZoczQ0cGZGTitPTVZrZUVjWmFuNzNiVEhD?=
- =?utf-8?B?eFFHNVUxWkhsUlhlZXVOM3RmRHZlaWl6ZC9NcEtINUpDMFhVUlRGR1MvMUx3?=
- =?utf-8?B?Tlhocks0d1ZYWWVraXZaeXlIaTE4Zk44Q0tvV0k0MUd3WUl5dm9sRVo2anVl?=
- =?utf-8?B?NG5IbW5TN3E3bHZnK2FsOCtFZkkrRzYxSHoveWd2U3M4WlJxcUs2NjZkVS9Z?=
- =?utf-8?B?V3o1UFVVcXY1RngwNzZaRGhIdVdOZlgyQU0ybit6K1BIdDF2dWcvcWtxdEVH?=
- =?utf-8?B?ODU4SWdlY21DanZTK1ZaRVVpaFpySS8rZXVvUGpoUGpOamxkUDkvQXovaU5Z?=
- =?utf-8?B?bmE5c2xGTmkzejNUUFlzZHZldVVDOTk0bkZrZXJ4c2wyZ2pIMDFOcWVhQmNH?=
- =?utf-8?B?MVJXYUN1Y3VnYTM2Q3FwVXA1Mk1ZdFJ4ODdodVAxdHhTdE0weGZzWkF3Mktq?=
- =?utf-8?B?N1ZYc3hHT0I5Y2JMdVhHQVRNbE9mdmY5L3ZXUUw0eVJORldhN2lJRDN6RVVN?=
- =?utf-8?B?N0Faa21KZGp6NFhvdndRTnZjTW0vTFFXUUtxR3pGWU5GSFFxeVRtczJWdlpQ?=
- =?utf-8?B?MVFPL1ppN0k3d2t0bkdzL3pBWnFudUExTkhSMzlna0VYVEloa0dBUzVxTysv?=
- =?utf-8?B?OEVsckhlZC9aZktQQTZGVlptcVJ6eGxZNlppRWErWkQyZUV3cTltZUdLMlZv?=
- =?utf-8?B?cGRnc3J6NmVhbDBUL1pXSlllbXJuK3lIVFYxeHV0MlcvUFd4b3ZYQT09?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Tmk0ZE1iTVd3RW83eWdXWERwa2J2SThIeHBBa2Q2N2F0cWFTekxlZjZWejhT?=
+ =?utf-8?B?WTdwbS9xOVNhaTZqU0dhZmh3cWZrNmR5dVNKK2RlWTBNYnVNemErTHYxU2tF?=
+ =?utf-8?B?VnU4eGh3M2RRTE9UMDNlVjJJOC84a3BtRlV0RGdvTUg4MTNDTE9kRmVIVjZG?=
+ =?utf-8?B?bURlVTUrcHZ5N2hFVjI1ampndzFDRSs3Z1FmcmQ4NmxJVW4rRjJ0MFR6TnBx?=
+ =?utf-8?B?Sk5CdkJVZzJKTk50VUMwK0RQWWVNYzgvemt0S2VlbURYdStQWStlZHNtbi92?=
+ =?utf-8?B?Q0hJUi9QK29NRXpkK1crLzF1amNIdDVGbWxLbXZxNUtkdTc1TzIyZjdOTDgw?=
+ =?utf-8?B?VkpBU3R0eTQ3TEo5S3NMWVRBMG9Fdi9nMWl0eVYrZHVEbmd2UGJYWTdXQ0Ev?=
+ =?utf-8?B?VW91STJ3MXlPWmhxZ0hSRFpBeXhEMUdhaVhmcjB2L3FVNWljejdwR3dMNkNG?=
+ =?utf-8?B?NGNQdy9WOWRQS2s5ZVNJd2pSeGVjQzZBOVNtaU9RQUVlYjA5c1BaZCtMRFha?=
+ =?utf-8?B?dVNCYk4weng1VWlReTNqUWx0eko2NW5TZUFIVDJjK1gzdm83dWtGbnpwQUNu?=
+ =?utf-8?B?cG4zR3Eya3YvQml5NEtZZnBLbzJHUVoydDNmSVdDRGE4VHFTU3huVTBaNUlZ?=
+ =?utf-8?B?ZkFvY3gvd0g2b2JsVVcyQWwySnJQOC9jeXV1dWNuaEs5Sm94djVsTFp2MGxI?=
+ =?utf-8?B?cTZmMmEzS0sxWU1FZHBtMDNBdFlZOEtLQ2Q2MEw1WkVOOEdPSW94Z0s3OUJN?=
+ =?utf-8?B?VjZMRmhLMmREUExqRHA5OUc2dUpLck5NSEdTTnoydzR2VkpkY01FVWNwc25V?=
+ =?utf-8?B?V011aTM3akNnUlhsc09QeGY3UGdCYmVOTklRZ3Qrc09IUnA2aHR6VTZ2SCt0?=
+ =?utf-8?B?RlBzbFZyaXRCTzExSG8zN2hnRUYrb2JKQnE3RndPYU9rOEZ0YVpsRHpsWjRH?=
+ =?utf-8?B?dmh1VXovRUZDSlFLdDFEa1BuWnF4MjBjVktEWGh2am1rWWFZKzhlL0NsOGtm?=
+ =?utf-8?B?VmZUTnBiUGdqSHZtc2VPNHF1QTcrL2E1Q1hlR3pZSWVMVGxsamR5bjJCdTZ5?=
+ =?utf-8?B?azJoLzJOZFBlV1lQRVFxWnI2Zmx2Nk9GMzBkTHFtVnZXWlFCcjE1ZVk1THBu?=
+ =?utf-8?B?ZDJieW04OFpyUGY0RDhQZllwSnRzL3g2UFRhQmwyNHhSOHRNVDFnVllrRGlS?=
+ =?utf-8?B?ckNtZWwyVW9aZnh0OTFKTGxuVmF6ME5MYjlLTFdsSG1JNU00aStGVkhSSGFS?=
+ =?utf-8?B?RHo2V2YvVUlUcDZLVFYyOTA4eGx4bkdGN3JzOWpyVXdjQlR2RjNIczRPVkdH?=
+ =?utf-8?B?c1luNGRldFZOKytEOHlKTHFNdExnZXNBb2dRL3JKK3I3MFBqYlpRUE1yZHFY?=
+ =?utf-8?B?SkF2RittNHdzcGtHVWUxU01KU0tvWXpGQ0p0YUw2ZUlzc2lLNWdrUmtKQmxI?=
+ =?utf-8?B?NFlyTUFwVFFYa2tBTXNZWTNyS3kzanl0NFBNeEdYS0RiRkJHNFU4QnIxY2Jv?=
+ =?utf-8?B?TnNMaEdDckdZUVcraXZVbWtsNGZvV0VtS1dCc1hmRnZlRUlkbzhtaXkwRW5j?=
+ =?utf-8?B?dUFuSE84YjJJZnF5SXVNKytpdDFuc0hxZFc3RHZHUWU5K0NBeEtIR0lCeGMr?=
+ =?utf-8?B?dWFMcU1jRUN0QUQ5VmZJRU1zM3JibDUyT09ZVk1XRUNRZGpUeUQxMllxL29U?=
+ =?utf-8?B?blNYTFF5VVMzK1U4dkF0MUdvQXEweTN4WFhkQ2RFUEVHVVNWc2ZuL1VIYUNY?=
+ =?utf-8?B?MCszUnpPZWlJYkJOVmN4ZXNkeEVJZ2gwRG91Uno5VDcyWWJHM3ludkRFOThO?=
+ =?utf-8?B?MStoVG82OWZUK1BZeXdzSldudXVRaFRaRmZ6eDI2YzdIU0lmVkc0djVzSUQ2?=
+ =?utf-8?B?RW5uRnJBMFhwT2JVZ2I1RHRVZ21BditwR0xMUmhlamhVeGdvVmRwOTd2VGMx?=
+ =?utf-8?B?TnJYVE9ybmpJbHNyaDNwVjFadVdTNzVqVGZIc3dEM0tESzhPa2d1MHJsUkQ1?=
+ =?utf-8?B?NXNLeVUwR1NJcGlkenYwZkV3TmNTMjdKeURtKzBTNk1jY3ZEN1ZKWnVjOWIx?=
+ =?utf-8?B?ZFlTOTRtWmg0cE03ZTlLUU9NK3R3MVozUEZWRmw1bkhyeTgwR3lka1VFcEdr?=
+ =?utf-8?B?ZGhSV1gxS1c5RStpWWRYYlI2RUxWRU41dVpOaFlwblhKc0FPaEtpNm16T0ph?=
+ =?utf-8?B?MkNHZ0l3Vmp0bEFUOFFsOUxpWTVFZXR4b3l4N01VbTJSc29MbCtIcEdRU1cy?=
+ =?utf-8?B?RmwwaWt4T3YvUlZvdjB6UjVGRXQ5Ym96QXhjTHQ4RzR6NUxIOUpUMERFN2dR?=
+ =?utf-8?B?NWw1L0l0MUhML2x5TXE3ZmZFRXdGSmtpRnZpKzFIeDdTdldSNHkvZz09?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8afa3f40-1c57-43cd-19ca-08d9da75bd9e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f072f97-aeec-4624-2293-08d9da78b760
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2022 11:29:07.8013 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2022 11:50:25.7881 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oAjuEBUCM9kMqz44hkrAboOKWaGf6aE57VXlvKUIygP7IMW3Ow8eNSPt1DwNqtrcGPo+FoAWXfDRaN2Y138mtQCFKVgWOXCvmpU/aS9josP+rkBiTkdA94ORZbGaTZ04
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR01MB6957
+X-MS-Exchange-CrossTenant-UserPrincipalName: MRss1NsO7O6RORlrsxj1FK1Tv2eMZpv4yoZLGd+OAPdM61Fy1QC52esEWU0y2UodFOt6R1kptpV2S0EXZ8nNOJYuDWAhBNAIZ+sU9Eb/vZ9TA0xjvFiCrklOEAcCUbGW
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR01MB6518
 X-Mailman-Approved-At: Tue, 18 Jan 2022 11:16:40 -0500
 Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>
@@ -156,168 +155,118 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
 On 30-11-2021 01:31 am, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
+> As all the VNCR-capable system registers are nicely separated
+> from the rest of the crowd, let's set HCR_EL2.NV2 on and let
+> the ball rolling.
 > 
-> When HCR.NV bit is set, execution of the EL2 translation regime address
-> aranslation instructions and TLB maintenance instructions are trapped to
-Typo: translation
-
-> EL2. In addition, execution of the EL1 translation regime address
-> aranslation instructions and TLB maintenance instructions that are only
-Typo: translation
-
-> accessible from EL2 and above are trapped to EL2. In these cases,
-> ESR_EL2.EC will be set to 0x18.
-> 
-> Rework the system instruction emulation framework to handle potentially
-> all system instruction traps other than MSR/MRS instructions. Those
-> system instructions would be AT and TLBI instructions controlled by
-> HCR_EL2.NV, AT, and TTLB bits.
-> 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> [maz: squashed two patches together, redispatched various bits around]
 > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > ---
->   arch/arm64/include/asm/kvm_host.h |  4 +--
->   arch/arm64/kvm/handle_exit.c      |  2 +-
->   arch/arm64/kvm/sys_regs.c         | 48 +++++++++++++++++++++++++------
->   3 files changed, 42 insertions(+), 12 deletions(-)
+>   arch/arm64/include/asm/kvm_arm.h     |  1 +
+>   arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
+>   arch/arm64/include/asm/sysreg.h      |  1 +
+>   arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
+>   4 files changed, 28 insertions(+), 11 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 00c3366129b8..35f3d7939484 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -411,7 +411,7 @@ struct kvm_vcpu_arch {
->   	/*
->   	 * Guest registers we preserve during guest debugging.
->   	 *
-> -	 * These shadow registers are updated by the kvm_handle_sys_reg
-> +	 * These shadow registers are updated by the kvm_handle_sys
->   	 * trap handler if the guest accesses or updates them while we
->   	 * are using guest debug.
->   	 */
-> @@ -729,7 +729,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
->   int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
->   int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
->   int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
-> -int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
-> +int kvm_handle_sys(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index b603466803d2..18c35446249f 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -20,6 +20,7 @@
+>   #define HCR_AMVOFFEN	(UL(1) << 51)
+>   #define HCR_FIEN	(UL(1) << 47)
+>   #define HCR_FWB		(UL(1) << 46)
+> +#define HCR_NV2		(UL(1) << 45)
+>   #define HCR_AT		(UL(1) << 44)
+>   #define HCR_NV1		(UL(1) << 43)
+>   #define HCR_NV		(UL(1) << 42)
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 1664430be698..f282997e4a4c 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -245,21 +245,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
 >   
->   void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
->   
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 6ff709c124d0..8b3b758e674e 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -234,7 +234,7 @@ static exit_handle_fn arm_exit_handlers[] = {
->   	[ESR_ELx_EC_SMC32]	= handle_smc,
->   	[ESR_ELx_EC_HVC64]	= handle_hvc,
->   	[ESR_ELx_EC_SMC64]	= handle_smc,
-> -	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
-> +	[ESR_ELx_EC_SYS64]	= kvm_handle_sys,
->   	[ESR_ELx_EC_SVE]	= handle_sve,
->   	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
->   	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 77f07f960d84..222f8c6f1d7e 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1770,10 +1770,6 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
->    * more demanding guest...
->    */
->   static const struct sys_reg_desc sys_reg_descs[] = {
-> -	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-> -	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-> -	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
-> -
->   	DBG_BCR_BVR_WCR_WVR_EL1(0),
->   	DBG_BCR_BVR_WCR_WVR_EL1(1),
->   	{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
-> @@ -2240,6 +2236,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->   	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
->   };
->   
-> +#define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)	\
-> +	{ SYS_DESC((insn)), (access_fn), NULL, 0, 0, NULL, NULL, (forward_fn) }
-> +static struct sys_reg_desc sys_insn_descs[] = {
-> +	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
-> +	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
-> +	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
-> +};
-> +
->   static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
->   			struct sys_reg_params *p,
->   			const struct sys_reg_desc *r)
-> @@ -2794,6 +2798,24 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
->   	return 1;
->   }
->   
-> +static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
-> +{
-> +	const struct sys_reg_desc *r;
-> +
-> +	/* Search from the system instruction table. */
-> +	r = find_reg(p, sys_insn_descs, ARRAY_SIZE(sys_insn_descs));
-> +
-> +	if (likely(r)) {
-> +		perform_access(vcpu, p, r);
-> +	} else {
-> +		kvm_err("Unsupported guest sys instruction at: %lx\n",
-> +			*vcpu_pc(vcpu));
-> +		print_sys_reg_instr(p);
-> +		kvm_inject_undefined(vcpu);
-> +	}
-> +	return 1;
-> +}
-> +
->   /**
->    * kvm_reset_sys_regs - sets system registers to reset value
->    * @vcpu: The VCPU pointer
-> @@ -2811,10 +2833,11 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
->   }
->   
->   /**
-> - * kvm_handle_sys_reg -- handles a mrs/msr trap on a guest sys_reg access
-> + * kvm_handle_sys-- handles a system instruction or mrs/msr instruction trap
-> +		    on a guest execution
->    * @vcpu: The VCPU pointer
->    */
-> -int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
-> +int kvm_handle_sys(struct kvm_vcpu *vcpu)
+>   static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
 >   {
->   	struct sys_reg_params params;
->   	unsigned long esr = kvm_vcpu_get_esr(vcpu);
-> @@ -2826,10 +2849,16 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
->   	params = esr_sys64_to_params(esr);
->   	params.regval = vcpu_get_reg(vcpu, Rt);
+> -	if (!__vcpu_el2_e2h_is_set(ctxt)) {
+> -		/*
+> -		 * Clear the .M field when writing SPSR to the CPU, so that we
+> -		 * can detect when the CPU clobbered our SPSR copy during a
+> -		 * local exception.
+> -		 */
+> -		val &= ~0xc;
+> -	}
+> +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> +
+> +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
+> +		return val;
 >   
-> -	ret = emulate_sys_reg(vcpu, &params);
-> +	if (params.Op0 == 1) {
-> +		/* System instructions */
-> +		ret = emulate_sys_instr(vcpu, &params);
-> +	} else {
-> +		/* MRS/MSR instructions */
-> +		ret = emulate_sys_reg(vcpu, &params);
-> +		if (!params.is_write)
-> +			vcpu_set_reg(vcpu, Rt, params.regval);
-> +	}
->   
-> -	if (!params.is_write)
-> -		vcpu_set_reg(vcpu, Rt, params.regval);
->   	return ret;
+> -	return val;
+> +	/*
+> +	 * Clear the .M field when writing SPSR to the CPU, so that we
+> +	 * can detect when the CPU clobbered our SPSR copy during a
+> +	 * local exception.
+> +	 */
+> +	return val &= ~0xc;
 >   }
 >   
-> @@ -3245,6 +3274,7 @@ void kvm_sys_reg_table_init(void)
->   	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true));
->   	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true));
->   	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false));
-> +	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false));
+>   static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
+>   {
+> -	if (__vcpu_el2_e2h_is_set(ctxt))
+> +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
+> +
+> +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
+>   		return val;
 >   
->   	/* We abuse the reset function to overwrite the table itself. */
->   	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
+>   	/*
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 71e6a0410e7c..5de90138d0a4 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -550,6 +550,7 @@
+>   #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+>   #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+>   #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+> +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+>   
+>   #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+>   #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> index ef4488db6dc1..5cadda79089a 100644
+> --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> @@ -45,7 +45,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>   			 * the EL1 virtual memory control register accesses
+>   			 * as well as the AT S1 operations.
+>   			 */
+> -			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
+> +			if (enhanced_nested_virt_in_use(vcpu)) {
+> +				hcr &= ~HCR_TVM;
 
-It looks good to me, please feel free to add.
-Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+I think, we should clear TRVM also?
+				hcr &= ~(HCR_TVM | HCR_TRVM);
+
+> +			} else {
+> +				hcr |= HCR_TVM | HCR_TRVM | HCR_TTLB;
+> +			}
+> +
+> +			hcr |= HCR_AT | HCR_NV1;
+>   		} else {
+>   			/*
+>   			 * For a guest hypervisor on v8.1 (VHE), allow to
+> @@ -79,6 +85,12 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+>   			if (!vcpu_el2_tge_is_set(vcpu))
+>   				hcr |= HCR_AT | HCR_TTLB;
+>   		}
+> +
+> +		if (enhanced_nested_virt_in_use(vcpu)) {
+> +			hcr |= HCR_AT | HCR_TTLB | HCR_NV2;
+> +			write_sysreg_s(vcpu->arch.ctxt.vncr_array,
+> +				       SYS_VNCR_EL2);
+> +		}
+>   	} else if (nested_virt_in_use(vcpu)) {
+>   		u64 vhcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+>   
+
 
 Thanks,
 Ganapat
