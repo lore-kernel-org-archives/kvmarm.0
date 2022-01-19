@@ -2,83 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3B0C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 19 Jan 2022 07:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C27C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 19 Jan 2022 09:23:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCBF84A7FD;
-	Wed, 19 Jan 2022 02:47:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28F6149E35;
+	Wed, 19 Jan 2022 04:23:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UfNbZ4S2DoFH; Wed, 19 Jan 2022 02:47:33 -0500 (EST)
+	with ESMTP id e+wUOLpNwpc4; Wed, 19 Jan 2022 04:23:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 834BF4A49C;
-	Wed, 19 Jan 2022 02:47:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 571D44B08B;
+	Wed, 19 Jan 2022 04:23:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CA3F4A119
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jan 2022 02:47:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E0DE4AC78
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jan 2022 04:23:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iJkfA5kfyosH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Jan 2022 02:47:31 -0500 (EST)
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com
- [209.85.210.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 373A149F40
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jan 2022 02:47:31 -0500 (EST)
-Received: by mail-pf1-f169.google.com with SMTP id i65so1784013pfc.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Jan 2022 23:47:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qbiJb2UVtirrAHsd/tlBtET4SjB9SQTlHXui+2izr3s=;
- b=bP8mpKrUKYYcA4KRpX/Iab6PVeCaEBou0Rle0wK4u0oCxHKHJNxK3XOy8B6lcxgvXY
- FOco+CP1Zd+i3br6c9kACIwlpelrznWTBYQUgGtAv7CIL5/Vnzro9VaR+3UOWqaq8BVB
- xO6cf+i5UOhU4GoneriU5p5ARzP2ioFnBe4GfgF/C+JvyNABeyjbtY0rfzzo/ABYY++3
- iJR1Xxp98BG1ihJUwNmD+zPbT8XFXRlCn6TXC5AqGaP9hKk35oUB0BaIZ9HYjhj8NlBp
- FAWsGfVPMfQ2g6v6WkTOQ8wNCoRN/d9yFYycIOipiN0vhIS7vAg3sF7aPCVLXrVqbIL7
- RxNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qbiJb2UVtirrAHsd/tlBtET4SjB9SQTlHXui+2izr3s=;
- b=01yFYDbPoSBikMm+lonbuUHeWHRo4yWCKSDAHc54DKEMgsAzL0qHZVJslH9/H19ma6
- STCYNwV0ffbuhQUXwYPmgB7hXEb4te2kSMHC322j4MpuSyEfEseYDvbHHdrI+sLNUqOp
- 2iT/eFbeu/Iy2ERXO6w+LMr+/Xc2H2WlMyMQCO+hlBkRNzQdbVgFlwyNidCFCw+KSaOX
- /jIAlnFHokoK0k/4hQELBJusxFeJgP+OXiZHZFrPK3jr2LVjNTsXsNE4rJ3GOtH8D97O
- GNdMNN0wwYT2sDuBcgXNMDo6KcZCVFJqKv0fqFK9pWy0HhNbNxhF9ClH6ns7ThRRslhG
- 8jPA==
-X-Gm-Message-State: AOAM532tFQtPfBgujRL2wI4DghchY+5A3C9RDp7rePNwi5T44sbg7nsh
- 4dht5KsBMees7NG5HwLvO+P4cBsL0FuLz7UwtIs6Bg==
-X-Google-Smtp-Source: ABdhPJynjuL5EJyIFAzAyBjd8DX1zCihK90pwXV5JoP1UY92TV4OnkyTmudcqtrcfRqYDdlvxWABUiftzGEKe/ZrgUE=
-X-Received: by 2002:a63:7d42:: with SMTP id m2mr26257918pgn.491.1642578450084; 
- Tue, 18 Jan 2022 23:47:30 -0800 (PST)
+ with ESMTP id UXN7gwsc5Lnv for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Jan 2022 04:23:35 -0500 (EST)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
+ [185.176.79.56])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2ABDC49E35
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Jan 2022 04:23:35 -0500 (EST)
+Received: from fraeml714-chm.china.huawei.com (unknown [172.18.147.206])
+ by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Jf0VK0HwYz67n9B;
+ Wed, 19 Jan 2022 17:20:25 +0800 (CST)
+Received: from lhreml721-chm.china.huawei.com (10.201.108.72) by
+ fraeml714-chm.china.huawei.com (10.206.15.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 19 Jan 2022 10:23:32 +0100
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml721-chm.china.huawei.com (10.201.108.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Wed, 19 Jan 2022 09:23:32 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.021; Wed, 19 Jan 2022 09:23:31 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Subject: RE: [PATCH v4 0/4] kvm/arm: New VMID allocator based on asid
+Thread-Topic: [PATCH v4 0/4] kvm/arm: New VMID allocator based on asid
+Thread-Index: AQHX35sqG4N0fL5BTkOeJNZZBpVcWaxpD9KAgAFUH+A=
+Date: Wed, 19 Jan 2022 09:23:31 +0000
+Message-ID: <207f800d1a67427a9771ffb06086365b@huawei.com>
+References: <20211122121844.867-1-shameerali.kolothum.thodi@huawei.com>
+ <Yeazd1lLuYm4k3lH@arm.com>
+In-Reply-To: <Yeazd1lLuYm4k3lH@arm.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.47.82.100]
 MIME-Version: 1.0
-References: <CAAeT=Fxyct=WLUvfbpROKwB9huyt+QdJnKTaj8c5NKk+UY51WQ@mail.gmail.com>
- <CAJHc60za+E-zEO5v2QeKuifoXznPnt5n--g1dAN5jgsuq+SxrA@mail.gmail.com>
- <CALMp9eQDzqoJMck=_agEZNU9FJY9LB=iW-8hkrRc20NtqN=gDA@mail.gmail.com>
- <CAJHc60xZ9emY9Rs9ZbV+AH-Mjmkyg4JZU7V16TF48C-HJn+n4A@mail.gmail.com>
- <CALMp9eTPJZDtMiHZ5XRiYw2NR9EBKSfcP5CYddzyd2cgWsJ9hw@mail.gmail.com>
- <CAJHc60xD2U36pM4+Dq3yZw6Cokk-16X83JHMPXj4aFnxOJ3BUQ@mail.gmail.com>
- <CALMp9eR+evJ+w9VTSvR2KHciQDgTsnS=bh=1OUL4yy8gG6O51A@mail.gmail.com>
- <CAJHc60zw1o=JdUJ+sNNtv3mc_JTRMKG3kPp=-cchWkHm74hUYA@mail.gmail.com>
- <YeBfj89mIf8SezfD@google.com>
- <CAAeT=Fz2q4PfJMXes3A9f+c01NnyORbvUrzJZO=ew-LsjPq2jQ@mail.gmail.com>
- <YedWUJNnQK3HFrWC@google.com>
-In-Reply-To: <YedWUJNnQK3HFrWC@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 18 Jan 2022 23:47:13 -0800
-Message-ID: <CAAeT=FyJAG1dEFLvrQ4UXrwUqBUhY0AKkjzFpyi74zCJZUEYVg@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 01/11] KVM: Capture VM start
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>,
- Jim Mattson <jmattson@google.com>
+X-CFilter-Loop: Reflected
+Cc: "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+ "maz@kernel.org" <maz@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Linuxarm <linuxarm@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>,
+ "will@kernel.org" <will@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,47 +75,139 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Jan 18, 2022 at 4:07 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Jan 14, 2022, Reiji Watanabe wrote:
-> > The restriction, with which KVM doesn't need to worry about the changes
-> > in the registers after KVM_RUN, could potentially protect or be useful
-> > to protect KVM and simplify future changes/maintenance of the KVM codes
-> > that consumes the values.
->
-> That sort of protection is definitely welcome, the previously mentioned CPUID mess
-> on x86 would have benefit greatly by KVM being restrictive in the past.  That said,
-> hooking KVM_RUN is likely the wrong way to go about implementing any restrictions.
-> Running a vCPU is where much of the vCPU's state is explicitly consumed, but it's
-> all too easy for KVM to implicity/indirectly consume state via a different ioctl(),
-> e.g. if there are side effects that are visible in other registers, than an update
-> can also be visible to userspace via KVM_{G,S}ET_{S,}REGS, at which point disallowing
-> modifying state after KVM_RUN but not after reading/writing regs is arbitrary and
-> inconsitent.
+Hi Catalin,
 
-Thank you for your comments !
-I think I understand your concern, and that's a great point.
-That's not the case for those pseudo registers though at least for now :)
-BTW, is this concern specific to hooking KVM_RUN ? (Wouldn't it be the
-same for the option with "if kvm->created_vcpus > 0" ?)
+> -----Original Message-----
+> From: Catalin Marinas [mailto:catalin.marinas@arm.com]
+> Sent: 18 January 2022 12:33
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> linux-kernel@vger.kernel.org; maz@kernel.org; will@kernel.org;
+> james.morse@arm.com; julien.thierry.kdev@gmail.com;
+> suzuki.poulose@arm.com; jean-philippe@linaro.org;
+> Alexandru.Elisei@arm.com; qperret@google.com; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>
+> Subject: Re: [PATCH v4 0/4] kvm/arm: New VMID allocator based on asid
+> =
+
+> Hi Shameer,
+> =
+
+> On Mon, Nov 22, 2021 at 12:18:40PM +0000, Shameer Kolothum wrote:
+> > =A0-TLA+ model. Modified the asidalloc model to incorporate the new
+> >   VMID algo. The main differences are,
+> > =A0 -flush_tlb_all() instead of local_tlb_flush_all() on rollover.
+> > =A0 -Introduced INVALID_VMID and vCPU Sched Out logic.
+> > =A0 -No CnP (Removed UniqueASIDAllCPUs & UniqueASIDActiveTask
+> invariants).
+> > =A0 -Removed =A0UniqueVMIDPerCPU invariant for now as it looks like
+> >    because of the speculative fetching with flush_tlb_all() there
+> >    is a small window where this gets triggered. If I change the
+> >    logic back to local_flush_tlb_all(), UniqueVMIDPerCPU seems to
+> >    be fine. With my limited knowledge on TLA+ model, it is not
+> >    clear to me whether this is a problem with the above logic
+> >    or the VMID model implementation. Really appreciate any help
+> >    with the model.
+> >    The initial VMID TLA+ model is here,
+> >    https://github.com/shamiali2008/kernel-tla/tree/private-vmidalloc-v1
+> =
+
+> I only had a brief look at the TLA+ model and I don't understand why you
+> have a separate 'shed_out' process. It would run in parallel with the
+> 'sched' but AFAICT you can't really schedule a guest out while you are
+> in the middle of scheduling it in. I'd rather use the same 'sched'
+> process and either schedule in an inactive task or schedule out an
+> active one for a given CPU.
+> =
+
+> Also active_vmids[] for example is defined on the CPUS domain but you
+> call vcpu_sched_out() from a process that's not in the CPUS domain but
+> the SCHED_OUT one.
+
+Many thanks for taking a look. My bad!. The 'sched_out' would indeed run in=
+ parallel
+and defeat the purpose. I must say I was really confused by the TLA+ syntax=
+ and
+is still not very confident about it.
+
+Based on the above suggestion, I have modified it as below,
+
+\* vCPU is scheduled out by KVM
+macro vcpu_sched_out() {
+        active_kvm[self].task :=3D 0;
+        active_vmids[self] :=3D INVALID_VMID;
+}
+....
+
+\* About to run a Guest VM
+process (sched \in CPUS)
+{
+sched_loop:
+        while (TRUE) {
+                with (t \in TASKS) {
+                        if (t # ActiveTask(self))
+                                call kvm_arm_vmid_update(t);
+                        else
+                                vcpu_sched_out();
+                }
+        }
+}
+
+Please let me know if this is ok.
+
+> Regarding UniqueVMIDPerCPU, I think we need to figure out why it
+> happens. The fact that flush_tlb_all() was made to simulate the
+> speculative TLB loads is not relevant. In a different spec I have,
+> arm64kpti.tla, I just used another process that invokes an update_tlbs()
+> macro so that it can happen at any time. I didn't bother to update the
+> ASID spec in a similar way but it may be useful.
+
+Ok. I will take a look at that and try that.
+
+ The corresponding
+> UniqueASIDPerCPU meant that for any two TLB entries on a single CPU, if
+> they correspond to different tasks (pgd), they should have different
+> ASIDs. That's a strong requirement, otherwise we end up with the wrong
+> translation.
+
+Yes, I understand that it is a strong requirement. Also, I thought this is =
+something
+that will trigger easily with the test setup I had with the real hardware. =
+But testing
+stayed on for days, so I was not sure it is a problem with the TLA+ impleme=
+ntation
+or not.  =
 
 
-> If possible, preventing modification if kvm->created_vcpus > 0 is ideal as it's
-> a relatively common pattern in KVM, and provides a clear boundary to userpace
-> regarding what is/isn't allowed.
+> =
 
-Yes, I agree that would be better in general.  For (pseudo) registers,
-I would think preventing modification if kvm->created_vcpus > 0 might
-not be a very good option for KVM/ARM though considering usage of
-KVM_GET_REG_LIST and KVM_{G,S}ET_ONE_REG.
+> Why did you remove the CnP? Do we have this disabled for KVM guests?
+
+I removed CnP related Invariants to simplify things for the first version. =
+Also not sure
+what specific changes we need to do for CnP here. Do we still need that swi=
+tching to =
+
+global pg_dir to prevent any speculative reading? I didn't see that being d=
+one in KVM =
+
+anywhere at the moment. Maybe I am missing something.
+
+On a side note, In my setup, the CnP=3DTRUE case for asidalloc.tla now fail=
+s with,
+"Error: Invariant TLBEmptyInvalPTE is violated.". Please check.
 
 Thanks,
-Reiji
+Shameer =
+
+
+> --
+> Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
