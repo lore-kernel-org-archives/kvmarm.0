@@ -2,46 +2,45 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E02C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Jan 2022 15:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E1DC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Jan 2022 16:28:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E160E43479;
-	Thu, 20 Jan 2022 10:12:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D318449DFF;
+	Thu, 20 Jan 2022 11:28:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z2M1pFRYZft9; Thu, 20 Jan 2022 10:12:51 -0500 (EST)
+	with ESMTP id 9uHAov8mm2uE; Thu, 20 Jan 2022 11:28:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6864B48F9C;
-	Thu, 20 Jan 2022 10:12:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82A7B4126B;
+	Thu, 20 Jan 2022 11:28:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38907412AF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 10:12:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D23FA43479
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 11:28:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hPfO-FYXNZHk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Jan 2022 10:12:48 -0500 (EST)
+ with ESMTP id WL5Au3D+dmB9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Jan 2022 11:28:45 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 94D8840FAC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 10:12:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85C4048F9C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 11:28:45 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 08029101E;
- Thu, 20 Jan 2022 07:12:48 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D6D3FED1;
+ Thu, 20 Jan 2022 08:28:44 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D04C83F73D;
- Thu, 20 Jan 2022 07:12:45 -0800 (PST)
-Date: Thu, 20 Jan 2022 15:12:54 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDB443F73D;
+ Thu, 20 Jan 2022 08:28:42 -0800 (PST)
+Date: Thu, 20 Jan 2022 16:28:47 +0000
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in
- vcpu_read/write_sys_reg()
-Message-ID: <Yel79mQSV/8iINrS@monolith.localdoman>
+Subject: Re: [PATCH v5 19/69] KVM: arm64: nv: Handle SPSR_EL2 specially
+Message-ID: <YemNv+Bmr4hXmi3P@monolith.localdoman>
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-19-maz@kernel.org>
+ <20211129200150.351436-20-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20211129200150.351436-19-maz@kernel.org>
+In-Reply-To: <20211129200150.351436-20-maz@kernel.org>
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
@@ -64,226 +63,141 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Marc,
 
-On Mon, Nov 29, 2021 at 08:00:59PM +0000, Marc Zyngier wrote:
-> KVM internally uses accessor functions when reading or writing the
-> guest's system registers. This takes care of accessing either the stored
-> copy or using the "live" EL1 system registers when the host uses VHE.
+On Mon, Nov 29, 2021 at 08:01:00PM +0000, Marc Zyngier wrote:
+> SPSR_EL2 needs special attention when running nested on ARMv8.3:
 > 
-> With the introduction of virtual EL2 we add a bunch of EL2 system
-> registers, which now must also be taken care of:
-> - If the guest is running in vEL2, and we access an EL1 sysreg, we must
->   revert to the stored version of that, and not use the CPU's copy.
-> - If the guest is running in vEL1, and we access an EL2 sysreg, we must
->   also use the stored version, since the CPU carries the EL1 copy.
-> - Some EL2 system registers are supposed to affect the current execution
->   of the system, so we need to put them into their respective EL1
->   counterparts. For this we need to define a mapping between the two.
->   This is done using the newly introduced struct el2_sysreg_map.
-> - Some EL2 system registers have a different format than their EL1
->   counterpart, so we need to translate them before writing them to the
->   CPU. This is done using an (optional) translate function in the map.
-> - There are the three special registers SP_EL2, SPSR_EL2 and ELR_EL2,
->   which need some separate handling (SPSR_EL2 is being handled in a
->   separate patch).
+> If taking an exception while running at vEL2 (actually EL1), the
+> HW will update the SPSR_EL1 register with the EL1 mode. We need
+> to track this in order to make sure that accesses to the virtual
+> view of SPSR_EL2 is correct.
 > 
-> All of these cases are now wrapped into the existing accessor functions,
-> so KVM users wouldn't need to care whether they access EL2 or EL1
-> registers and also which state the guest is in.
-> 
-> This handles what was formerly known as the "shadow state" dynamically,
-> without requiring a separate copy for each vCPU EL.
-> 
-> Co-developed-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 143 ++++++++++++++++++++++++++++++++++++--
->  1 file changed, 139 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 730a24468915..61596355e42d 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -24,6 +24,7 @@
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/kvm_nested.h>
->  #include <asm/perf_event.h>
->  #include <asm/sysreg.h>
->  
-> @@ -64,23 +65,157 @@ static bool write_to_read_only(struct kvm_vcpu *vcpu,
->  	return false;
->  }
->  
-> +#define PURE_EL2_SYSREG(el2)						\
-> +	case el2: {							\
-> +		*el1r = el2;						\
-> +		return true;						\
-> +	}
-> +
-> +#define MAPPED_EL2_SYSREG(el2, el1, fn)					\
-> +	case el2: {							\
-> +		*xlate = fn;						\
-> +		*el1r = el1;						\
-> +		return true;						\
-> +	}
-> +
-> +static bool get_el2_mapping(unsigned int reg,
-> +			    unsigned int *el1r, u64 (**xlate)(u64))
+> To do so, we place an illegal value in SPSR_EL1.M, and patch it
+> accordingly if required when accessing it.
 
-Nitpick: this could be renamed to get_el2_to_el1_mapping() to remove any
-ambiguities regarding what is being mapped to what (and to match the
-translate_* functions). With our without this change, the patch looks
-correct to me:
+When KVM runs a L1 guest hypervisor with hardware HCR_EL2.NV1 clear (virtual
+HCR_EL2.E2H set), when an exception is taken from vEL2 to vEL2, SPSR_EL1.M is
+automatically set to CurrentEL_EL2. But this doesn't happen when hardware NV1 is
+set (virtual HCR_EL2.E2H unset) and as far as I can tell this patch does the
+right thing to emulate it in software:
 
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
 Thanks,
 Alex
 
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 37 ++++++++++++++++++++++++++++
+>  arch/arm64/kvm/sys_regs.c            | 23 +++++++++++++++--
+>  2 files changed, 58 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 46c849ba281e..2db11ff3fdad 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -241,6 +241,43 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+>  	return __is_hyp_ctxt(&vcpu->arch.ctxt);
+>  }
+>  
+> +static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
 > +{
-> +	switch (reg) {
-> +		PURE_EL2_SYSREG(  VPIDR_EL2	);
-> +		PURE_EL2_SYSREG(  VMPIDR_EL2	);
-> +		PURE_EL2_SYSREG(  ACTLR_EL2	);
-> +		PURE_EL2_SYSREG(  HCR_EL2	);
-> +		PURE_EL2_SYSREG(  MDCR_EL2	);
-> +		PURE_EL2_SYSREG(  HSTR_EL2	);
-> +		PURE_EL2_SYSREG(  HACR_EL2	);
-> +		PURE_EL2_SYSREG(  VTTBR_EL2	);
-> +		PURE_EL2_SYSREG(  VTCR_EL2	);
-> +		PURE_EL2_SYSREG(  RVBAR_EL2	);
-> +		PURE_EL2_SYSREG(  TPIDR_EL2	);
-> +		PURE_EL2_SYSREG(  HPFAR_EL2	);
-> +		PURE_EL2_SYSREG(  ELR_EL2	);
-> +		PURE_EL2_SYSREG(  SPSR_EL2	);
-> +		MAPPED_EL2_SYSREG(SCTLR_EL2,   SCTLR_EL1,
-> +				  translate_sctlr_el2_to_sctlr_el1	     );
-> +		MAPPED_EL2_SYSREG(CPTR_EL2,    CPACR_EL1,
-> +				  translate_cptr_el2_to_cpacr_el1	     );
-> +		MAPPED_EL2_SYSREG(TTBR0_EL2,   TTBR0_EL1,
-> +				  translate_ttbr0_el2_to_ttbr0_el1	     );
-> +		MAPPED_EL2_SYSREG(TTBR1_EL2,   TTBR1_EL1,   NULL	     );
-> +		MAPPED_EL2_SYSREG(TCR_EL2,     TCR_EL1,
-> +				  translate_tcr_el2_to_tcr_el1		     );
-> +		MAPPED_EL2_SYSREG(VBAR_EL2,    VBAR_EL1,    NULL	     );
-> +		MAPPED_EL2_SYSREG(AFSR0_EL2,   AFSR0_EL1,   NULL	     );
-> +		MAPPED_EL2_SYSREG(AFSR1_EL2,   AFSR1_EL1,   NULL	     );
-> +		MAPPED_EL2_SYSREG(ESR_EL2,     ESR_EL1,     NULL	     );
-> +		MAPPED_EL2_SYSREG(FAR_EL2,     FAR_EL1,     NULL	     );
-> +		MAPPED_EL2_SYSREG(MAIR_EL2,    MAIR_EL1,    NULL	     );
-> +		MAPPED_EL2_SYSREG(AMAIR_EL2,   AMAIR_EL1,   NULL	     );
-> +		MAPPED_EL2_SYSREG(CNTHCTL_EL2, CNTKCTL_EL1,
-> +				  translate_cnthctl_el2_to_cntkctl_el1	     );
-> +	default:
-> +		return false;
+> +	if (!__vcpu_el2_e2h_is_set(ctxt)) {
+> +		/*
+> +		 * Clear the .M field when writing SPSR to the CPU, so that we
+> +		 * can detect when the CPU clobbered our SPSR copy during a
+> +		 * local exception.
+> +		 */
+> +		val &= ~0xc;
 > +	}
+> +
+> +	return val;
 > +}
 > +
->  u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->  {
->  	u64 val = 0x8badf00d8badf00d;
-> +	u64 (*xlate)(u64) = NULL;
-> +	unsigned int el1r;
-> +
-> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
-> +		goto memory_read;
-> +
-> +	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-> +		if (!is_hyp_ctxt(vcpu))
-> +			goto memory_read;
-> +
-> +		/*
-> +		 * ELR_EL2 is special cased for now.
-> +		 */
-> +		switch (reg) {
-> +		case ELR_EL2:
-> +			return read_sysreg_el1(SYS_ELR);
-> +		}
-> +
-> +		/*
-> +		 * If this register does not have an EL1 counterpart,
-> +		 * then read the stored EL2 version.
-> +		 */
-> +		if (reg == el1r)
-> +			goto memory_read;
-> +
-> +		/*
-> +		 * If we have a non-VHE guest and that the sysreg
-> +		 * requires translation to be used at EL1, use the
-> +		 * in-memory copy instead.
-> +		 */
-> +		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
-> +			goto memory_read;
-> +
-> +		/* Get the current version of the EL1 counterpart. */
-> +		WARN_ON(!__vcpu_read_sys_reg_from_cpu(el1r, &val));
+> +static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
+> +{
+> +	if (__vcpu_el2_e2h_is_set(ctxt))
 > +		return val;
-> +	}
 > +
-> +	/* EL1 register can't be on the CPU if the guest is in vEL2. */
-> +	if (unlikely(is_hyp_ctxt(vcpu)))
-> +		goto memory_read;
+> +	/*
+> +	 * SPSR.M == 0 means the CPU has not touched the SPSR, so the
+> +	 * register has still the value we saved on the last write.
+> +	 */
+> +	if ((val & 0xc) == 0)
+> +		return ctxt_sys_reg(ctxt, SPSR_EL2);
+> +
+> +	/*
+> +	 * Otherwise there was a "local" exception on the CPU,
+> +	 * which from the guest's point of view was being taken from
+> +	 * EL2 to EL2, although it actually happened to be from
+> +	 * EL1 to EL1.
+> +	 * So we need to fix the .M field in SPSR, to make it look
+> +	 * like EL2, which is what the guest would expect.
+> +	 */
+> +	return (val & ~0x0c) | CurrentEL_EL2;
+> +}
+> +
+>  /*
+>   * The layout of SPSR for an AArch32 state is different when observed from an
+>   * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 61596355e42d..875040bcfbe1 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -133,11 +133,14 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+>  			goto memory_read;
 >  
-> -	if (vcpu->arch.sysregs_loaded_on_cpu &&
-> -	    __vcpu_read_sys_reg_from_cpu(reg, &val))
-> +	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
->  		return val;
+>  		/*
+> -		 * ELR_EL2 is special cased for now.
+> +		 * ELR_EL2 and SPSR_EL2 are special cased for now.
+>  		 */
+>  		switch (reg) {
+>  		case ELR_EL2:
+>  			return read_sysreg_el1(SYS_ELR);
+> +		case SPSR_EL2:
+> +			val = read_sysreg_el1(SYS_SPSR);
+> +			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
+>  		}
 >  
-> +memory_read:
->  	return __vcpu_sys_reg(vcpu, reg);
+>  		/*
+> @@ -194,6 +197,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+>  		case ELR_EL2:
+>  			write_sysreg_el1(val, SYS_ELR);
+>  			return;
+> +		case SPSR_EL2:
+> +			val = __fixup_spsr_el2_write(&vcpu->arch.ctxt, val);
+> +			write_sysreg_el1(val, SYS_SPSR);
+> +			return;
+>  		}
+>  
+>  		/* No EL1 counterpart? We're done here.? */
+> @@ -1620,6 +1627,18 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>  	return true;
 >  }
 >  
->  void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
->  {
-> -	if (vcpu->arch.sysregs_loaded_on_cpu &&
-> -	    __vcpu_write_sys_reg_to_cpu(val, reg))
-> +	u64 (*xlate)(u64) = NULL;
-> +	unsigned int el1r;
+> +static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+> +			    struct sys_reg_params *p,
+> +			    const struct sys_reg_desc *r)
+> +{
+> +	if (p->is_write)
+> +		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
+> +	else
+> +		p->regval = vcpu_read_sys_reg(vcpu, SPSR_EL2);
 > +
-> +	if (!vcpu->arch.sysregs_loaded_on_cpu)
-> +		goto memory_write;
+> +	return true;
+> +}
 > +
-> +	if (unlikely(get_el2_mapping(reg, &el1r, &xlate))) {
-> +		if (!is_hyp_ctxt(vcpu))
-> +			goto memory_write;
-> +
-> +		/*
-> +		 * Always store a copy of the write to memory to avoid having
-> +		 * to reverse-translate virtual EL2 system registers for a
-> +		 * non-VHE guest hypervisor.
-> +		 */
-> +		__vcpu_sys_reg(vcpu, reg) = val;
-> +
-> +		switch (reg) {
-> +		case ELR_EL2:
-> +			write_sysreg_el1(val, SYS_ELR);
-> +			return;
-> +		}
-> +
-> +		/* No EL1 counterpart? We're done here.? */
-> +		if (reg == el1r)
-> +			return;
-> +
-> +		if (!vcpu_el2_e2h_is_set(vcpu) && xlate)
-> +			val = xlate(val);
-> +
-> +		/* Redirect this to the EL1 version of the register. */
-> +		WARN_ON(!__vcpu_write_sys_reg_to_cpu(val, el1r));
-> +		return;
-> +	}
-> +
-> +	/* EL1 register can't be on the CPU if the guest is in vEL2. */
-> +	if (unlikely(is_hyp_ctxt(vcpu)))
-> +		goto memory_write;
-> +
-> +	if (__vcpu_write_sys_reg_to_cpu(val, reg))
->  		return;
+>  /*
+>   * Architected system registers.
+>   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+> @@ -2052,7 +2071,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
 >  
-> +memory_write:
->  	 __vcpu_sys_reg(vcpu, reg) = val;
->  }
+>  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+> -	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
+> +	{ SYS_DESC(SYS_SPSR_EL2), access_spsr_el2, reset_val, SPSR_EL2, 0 },
+>  	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
+>  	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
 >  
 > -- 
 > 2.30.2
