@@ -2,49 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E1DC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 20 Jan 2022 16:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBACC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 20 Jan 2022 17:39:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D318449DFF;
-	Thu, 20 Jan 2022 11:28:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0C3F49E38;
+	Thu, 20 Jan 2022 12:39:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9uHAov8mm2uE; Thu, 20 Jan 2022 11:28:48 -0500 (EST)
+	with ESMTP id vDwPF9JH5SIx; Thu, 20 Jan 2022 12:39:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82A7B4126B;
-	Thu, 20 Jan 2022 11:28:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD56E49E3F;
+	Thu, 20 Jan 2022 12:39:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D23FA43479
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 11:28:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA74849E38
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 12:39:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WL5Au3D+dmB9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 20 Jan 2022 11:28:45 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85C4048F9C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 11:28:45 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D6D3FED1;
- Thu, 20 Jan 2022 08:28:44 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CDB443F73D;
- Thu, 20 Jan 2022 08:28:42 -0800 (PST)
-Date: Thu, 20 Jan 2022 16:28:47 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v5 19/69] KVM: arm64: nv: Handle SPSR_EL2 specially
-Message-ID: <YemNv+Bmr4hXmi3P@monolith.localdoman>
-References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-20-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20211129200150.351436-20-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- kernel-team@android.com, linux-arm-kernel@lists.infradead.org
+ with ESMTP id 50CJQ5y3CWGZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 20 Jan 2022 12:39:09 -0500 (EST)
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
+ [209.85.210.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8997149E35
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 12:39:09 -0500 (EST)
+Received: by mail-pf1-f202.google.com with SMTP id
+ z20-20020aa791d4000000b004bd024eaf19so4238109pfa.16
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 20 Jan 2022 09:39:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=YE99vojQD2AxPQSWB/44jVS0Qb0ZYbLu9xs6WG/RgmY=;
+ b=D6LYnL518npfbdVeQXIesu0zquom0i1+sfkMdjABkguXDWxwAoLo4dmjtrX4/t1fyC
+ SfUBX9J6Dv+QtXM06M8qeaEifOHS7MWiLcAPaa4Y/3VQXOBRz7OXK2kdJAFSQEcXIA7c
+ cOCHmddd1EMevUnWCjZhIZDO1ES2jg2QsLwyqLmK2HHa/Hlvv8p52tahLZFbyCFNYWHi
+ lbQxzJE/dNOf17RGJqptAa9304lgCY1U7RMGpjIlRzATlJHnrN/ZNdphWq1qEPSz1Ai0
+ qFSql/7qsjaaLC3Zq/UTrUU/+L3QH09L1VYK4hotZTzDtTwr3fcVyco+9q7Mvy8fB4P8
+ GT4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=YE99vojQD2AxPQSWB/44jVS0Qb0ZYbLu9xs6WG/RgmY=;
+ b=Pyfvqr2nBJWuK6yqwjLe28+s+anucu28213cc5ImQkqc/AXLSfqfyZJ0pwsRt+j2PM
+ fZZSza7cT9uU24Kheh4cYT9jU0bwD8wwMfvhc77Sag4Wp1Ixqfzvopv+dMBFNJ2WWSL7
+ QC7tX9AfRuuyKSBza1udMLj79RiJY2yWi2tmtG4xGiRLkdJToMZD7yEwV/36s3/SzCZA
+ HYYq/5AEWBER8xxHZ9xNg58xi6mk9t2JVVifA0zPRvKPrMvWMsUifBYYJhQCyHsGMTty
+ LiRhLuNQMqZVoe45363J2aT4svA+U5swCWSA9Rgfndzutbr2/m19R0RiP5Te9TImuFiF
+ K6Pg==
+X-Gm-Message-State: AOAM533deOKmP2qrGCuOHgY3JopPVde/bmg7dsU8ZdDYOq/8pfNuvFye
+ cm36W7WNDhFI2F5p0jddhDoukyZHD01KaQ==
+X-Google-Smtp-Source: ABdhPJy97Lg4jLb/CtetkWy0ICvzz47NCQ+mT9Hlb27wuiusZjTfw0b4KdBOMMenlF8DLQ82HlI7DiWyqcF07g==
+X-Received: from ricarkol2.c.googlers.com
+ ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:aa7:81cf:0:b0:4c0:6242:c14e with SMTP id
+ c15-20020aa781cf000000b004c06242c14emr3040pfn.83.1642700348410; Thu, 20 Jan
+ 2022 09:39:08 -0800 (PST)
+Date: Thu, 20 Jan 2022 09:39:03 -0800
+Message-Id: <20220120173905.1047015-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
+Subject: [PATCH 0/2] kvm: selftests: aarch64: some fixes for vgic_irq
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+Cc: maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -61,147 +82,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Reiji discovered some issues with the vgic_irq series [0]:
+- there's an assert that needs fixing.
+- there are lots of comments that use the wrong formatting for comments.
 
-On Mon, Nov 29, 2021 at 08:01:00PM +0000, Marc Zyngier wrote:
-> SPSR_EL2 needs special attention when running nested on ARMv8.3:
-> 
-> If taking an exception while running at vEL2 (actually EL1), the
-> HW will update the SPSR_EL1 register with the EL1 mode. We need
-> to track this in order to make sure that accesses to the virtual
-> view of SPSR_EL2 is correct.
-> 
-> To do so, we place an illegal value in SPSR_EL1.M, and patch it
-> accordingly if required when accessing it.
+I haven't hit the failed assert, but just by chance: my compiler is
+initializing the respective local variable to 0. The second commit is not
+critical, but it would be nice to have.
 
-When KVM runs a L1 guest hypervisor with hardware HCR_EL2.NV1 clear (virtual
-HCR_EL2.E2H set), when an exception is taken from vEL2 to vEL2, SPSR_EL1.M is
-automatically set to CurrentEL_EL2. But this doesn't happen when hardware NV1 is
-set (virtual HCR_EL2.E2H unset) and as far as I can tell this patch does the
-right thing to emulate it in software:
+This series applies on top of:
+[PATCH] kvm: selftests: conditionally build vm_xsave_req_perm()
+The aarch64 selftests fail to build otherwise.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+[0] https://lore.kernel.org/kvmarm/164072141023.1027791.3183483860602648119.b4-ty@kernel.org/
 
-Thanks,
-Alex
+Ricardo Koller (2):
+  kvm: selftests: aarch64: fix assert in gicv3_access_reg
+  kvm: selftests: aarch64: fix some vgic related comments
 
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 37 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/sys_regs.c            | 23 +++++++++++++++--
->  2 files changed, 58 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 46c849ba281e..2db11ff3fdad 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -241,6 +241,43 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
->  	return __is_hyp_ctxt(&vcpu->arch.ctxt);
->  }
->  
-> +static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
-> +{
-> +	if (!__vcpu_el2_e2h_is_set(ctxt)) {
-> +		/*
-> +		 * Clear the .M field when writing SPSR to the CPU, so that we
-> +		 * can detect when the CPU clobbered our SPSR copy during a
-> +		 * local exception.
-> +		 */
-> +		val &= ~0xc;
-> +	}
-> +
-> +	return val;
-> +}
-> +
-> +static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
-> +{
-> +	if (__vcpu_el2_e2h_is_set(ctxt))
-> +		return val;
-> +
-> +	/*
-> +	 * SPSR.M == 0 means the CPU has not touched the SPSR, so the
-> +	 * register has still the value we saved on the last write.
-> +	 */
-> +	if ((val & 0xc) == 0)
-> +		return ctxt_sys_reg(ctxt, SPSR_EL2);
-> +
-> +	/*
-> +	 * Otherwise there was a "local" exception on the CPU,
-> +	 * which from the guest's point of view was being taken from
-> +	 * EL2 to EL2, although it actually happened to be from
-> +	 * EL1 to EL1.
-> +	 * So we need to fix the .M field in SPSR, to make it look
-> +	 * like EL2, which is what the guest would expect.
-> +	 */
-> +	return (val & ~0x0c) | CurrentEL_EL2;
-> +}
-> +
->  /*
->   * The layout of SPSR for an AArch32 state is different when observed from an
->   * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 61596355e42d..875040bcfbe1 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -133,11 +133,14 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
->  			goto memory_read;
->  
->  		/*
-> -		 * ELR_EL2 is special cased for now.
-> +		 * ELR_EL2 and SPSR_EL2 are special cased for now.
->  		 */
->  		switch (reg) {
->  		case ELR_EL2:
->  			return read_sysreg_el1(SYS_ELR);
-> +		case SPSR_EL2:
-> +			val = read_sysreg_el1(SYS_SPSR);
-> +			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
->  		}
->  
->  		/*
-> @@ -194,6 +197,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
->  		case ELR_EL2:
->  			write_sysreg_el1(val, SYS_ELR);
->  			return;
-> +		case SPSR_EL2:
-> +			val = __fixup_spsr_el2_write(&vcpu->arch.ctxt, val);
-> +			write_sysreg_el1(val, SYS_SPSR);
-> +			return;
->  		}
->  
->  		/* No EL1 counterpart? We're done here.? */
-> @@ -1620,6 +1627,18 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +static bool access_spsr_el2(struct kvm_vcpu *vcpu,
-> +			    struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *r)
-> +{
-> +	if (p->is_write)
-> +		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
-> +	else
-> +		p->regval = vcpu_read_sys_reg(vcpu, SPSR_EL2);
-> +
-> +	return true;
-> +}
-> +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -2052,7 +2071,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
->  
->  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-> -	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
-> +	{ SYS_DESC(SYS_SPSR_EL2), access_spsr_el2, reset_val, SPSR_EL2, 0 },
->  	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
->  	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
->  
-> -- 
-> 2.30.2
-> 
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 12 ++++++++----
+ tools/testing/selftests/kvm/lib/aarch64/gic_v3.c | 13 ++++++++-----
+ tools/testing/selftests/kvm/lib/aarch64/vgic.c   |  3 ++-
+ 3 files changed, 18 insertions(+), 10 deletions(-)
+
+-- 
+2.35.0.rc0.227.g00780c9af4-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
