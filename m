@@ -2,70 +2,67 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D8F8C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 24 Jan 2022 08:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 669AAC433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 24 Jan 2022 15:58:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F44F49E08;
-	Mon, 24 Jan 2022 03:57:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C292F40DCB;
+	Mon, 24 Jan 2022 10:58:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id M6aGw6qvtGrJ; Mon, 24 Jan 2022 03:57:22 -0500 (EST)
+	with ESMTP id GJA9KhDhv-UU; Mon, 24 Jan 2022 10:58:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 875AB49E20;
-	Mon, 24 Jan 2022 03:57:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B67B640FB2;
+	Mon, 24 Jan 2022 10:58:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7584949E08
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 03:57:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CBAF40DCB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 10:58:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pi2YiwexDcWR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Jan 2022 03:57:20 -0500 (EST)
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com
- [209.85.167.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F1FA411BD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 03:57:20 -0500 (EST)
-Received: by mail-oi1-f180.google.com with SMTP id m9so10002966oia.12
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 00:57:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=7LOYL+rXbKkBxwKnxxUJRI+JYuYrzmRIZD8R7ss33Fo=;
- b=mOOM32JvhyWHxDNT1yl3o3ilV91m8p0sbxYBFE2MaJPRhEDNPFjsP2l/9YgR1e4n/j
- /+Ki5Wm3HUJjPfHmtoyeLbLIo740NpCjaxlELrLzkpxjvTtLVLgFWh8GpXYSEC2vg8xw
- iALRbAuJMSsqq2pRpY9vxpEREZ4RJi0zTV/KM0ihwHpDnu4BVD/4YzgHzVTpsoFaN6M/
- fUNijqYnsFrEFtdDqrP8v+9Q5RTA3dsVOlW+tn4g5RcNPn2AzUI2B4k2Th2N4rlXs+NR
- YVgFC+bMIftycOG+A/gPsTHZFp/9Ps/r6PvQpOeBiH4RaPhbQKDlyKSAj7xOc1Q1HQYY
- XRNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=7LOYL+rXbKkBxwKnxxUJRI+JYuYrzmRIZD8R7ss33Fo=;
- b=oujumkFkD03uxPqhGnDlVdplG4KvQaOu7vUWUxMDVSMf8W/QUIo0pYmU041/MnINmp
- 98Di4JLxqJD10AyDseHUrULCLFEYK3MrW5KIlA7K1rLgh6Lbquc3rA2grXknHjxd9eT7
- FkR4zES/biPsEKxq/fjvSfIUJu6+znwgBepkj0ZfweWzLh7fX0Mb7a+QiCMPKwU240OO
- X5XPUjQfmBlKoajXF0/uEt48jYvlQPIcP0Kpn92TAGgINL6L1tNDWuJ82HjTJ1K44iHF
- cSBm3Gg7gh3tAtlrYs+lBPwjuEOiUH3yNF+MmwqUXisl1kU/quwD8ernrvI0+hNc9w2A
- Ev3g==
-X-Gm-Message-State: AOAM531bsafThV1MalfW3aOoaSSZh6o/PhdUnL7dUqJC4+YM1kI1KvwF
- IMzieaUIFonwyHkN1kO4KK4AQqCF9mZ5ufQAJf8QQg==
-X-Google-Smtp-Source: ABdhPJxyYrXLQdtFig50Jm9MpWiRAsg7rBHxdCaoci5ZAoy/TpI9NboFii/+p4yqn/MGRoXXtldKiGH6LOsbJbsLU20=
-X-Received: by 2002:aca:1e14:: with SMTP id m20mr640396oic.14.1643014639400;
- Mon, 24 Jan 2022 00:57:19 -0800 (PST)
-MIME-Version: 1.0
-References: <20220121184207.423426-1-maz@kernel.org>
-In-Reply-To: <20220121184207.423426-1-maz@kernel.org>
-From: Fuad Tabba <tabba@google.com>
-Date: Mon, 24 Jan 2022 08:56:43 +0000
-Message-ID: <CA+EHjTzks6CpViFPc=xCq4SGpdiEPy_88L3MTjikmNA-9bC0Tg@mail.gmail.com>
-Subject: Re: [PATCH] KVM: arm64: Use shadow SPSR_EL1 when injecting exceptions
- on !VHE
+ with ESMTP id OCa7qOoyzbbv for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Jan 2022 10:58:49 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B06640307
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 10:58:49 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 3B5AAB810FE;
+ Mon, 24 Jan 2022 15:58:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E032C340E5;
+ Mon, 24 Jan 2022 15:58:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1643039926;
+ bh=QXQ8JfRtlbgKLaluYNOA5cd75hhBrpIfHU5/kIw2HVs=;
+ h=From:To:Cc:Subject:Date:From;
+ b=NN7BN2VilW9yIYf95xdZEddsTXRXWFCd4swo3b7O3f8F58fBOzUugbVooBxYr0DBA
+ yrmADXbXsjwOCbOxtJkoZZNpQktPd+MMfJdSU5ClkjbE3JJ5ETPa1NdL3wPQOkIFrK
+ kdSmjiaygZBQysiJS3J2qF4Kf9RYZhPoZHL+67/K25DU2N+vDQo7btG/MuzdC4ae44
+ p2V1p3uwDedmtxIo58RSpnRkKA7X1VypEC/gK3+1HFnYjifzHfwJcmGh371cl1xCl6
+ WFiYyVASiU4SqjFgzOk37myGPl0NzNLEQ3sP3a/uARM7aZn077Cwazta22yD84eaXi
+ DCplohxBlA8qg==
+From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+Subject: [PATCH v1 0/2] KVM: arm64: Additional documentation of the FP code
+Date: Mon, 24 Jan 2022 15:57:18 +0000
+Message-Id: <20220124155720.3943374-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=567; h=from:subject;
+ bh=QXQ8JfRtlbgKLaluYNOA5cd75hhBrpIfHU5/kIw2HVs=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBh7sxdwjS34zj0UaRImcDwXochgOPt+/jCTaoyui3R
+ YZ2u02OJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYe7MXQAKCRAk1otyXVSH0D4PB/
+ 4wFM4PixS8ThaBp80H78OS4YKJtOB7dEcjBHEoRNV7lvgFCifbZdcQLPrrx9VH9hinfkYgpQCqvLyf
+ BinHuYfcMyW5Xm/bw46soFC3/ThzYs9YD6wO7wljfALoWSRqn3N8RXzgWwcEGQtRV1wTgA6uHRN7M1
+ rpcVV/TwEJD5PhuzmL83LH4eCK7Cem3m8+ZMl+IrUMlYqYHdkLB5nIC9EmaRXYvKoAE5CWPrsvnKe7
+ A/g91T0F8e7ubFBNpKf2RcQjshQcA7qo0gz4Yoh+ctpqL22WQfo2fEOHJeh5RC9NAipCm+ho8dwzWY
+ fNqQpH4v8kUcHL/QbmwURHGDOE/XSj
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Cc: Mark Brown <broonie@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -83,61 +80,23 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+These couple of patches add a few more comments to the floating point
+code which will hopefully help the next person who comes along and tries
+to figure out what is going on.
 
-On Fri, Jan 21, 2022 at 6:42 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> Injecting an exception into a guest with non-VHE is risky business.
-> Instead of writing in the shadow register for the switch code to
-> restore it, we override the CPU register instead. Which gets
-> overriden a few instructions later by said restore code.
+Mark Brown (2):
+  KVM: arm64: Add comments for context flush and sync callbacks
+  KVM: arm64: Add some more comments in kvm_hyp_handle_fpsimd()
 
-I see that in __sysreg_restore_el1_state(), which as you said is
-called after __vcpu_write_spsr().
-
-> The result is that although the guest correctly gets the exception,
-> it will return to the original context in some random state,
-> depending on what was there the first place... Boo.
->
-> Fix the issue by writing to the shadow register. The original code
-> is absolutely fine on VHE, as the state is already loaded, and writing
-> to the shadow register in that case would actually be a bug.
-
-Which happens via kvm_vcpu_load_sysregs_vhe() calling
-__sysreg_restore_el1_state() before __vcpu_write_spsr() in this case.
-
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Cheers,
-/fuad
+ arch/arm64/kvm/fpsimd.c                 | 14 ++++++++++----
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++++
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
 
-> Fixes: bb666c472ca2 ("KVM: arm64: Inject AArch64 exceptions from HYP")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/exception.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
-> index 0418399e0a20..c5d009715402 100644
-> --- a/arch/arm64/kvm/hyp/exception.c
-> +++ b/arch/arm64/kvm/hyp/exception.c
-> @@ -38,7 +38,10 @@ static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
->
->  static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
->  {
-> -       write_sysreg_el1(val, SYS_SPSR);
-> +       if (has_vhe())
-> +               write_sysreg_el1(val, SYS_SPSR);
-> +       else
-> +               __vcpu_sys_reg(vcpu, SPSR_EL1) = val;
->  }
->
->  static void __vcpu_write_spsr_abt(struct kvm_vcpu *vcpu, u64 val)
-> --
-> 2.34.1
->
+base-commit: e783362eb54cd99b2cac8b3a9aeac942e6f6ac07
+-- 
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
