@@ -2,74 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38000C2BA4C
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 09:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 555D1C2BA4C
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 09:16:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ECD440D26;
-	Wed, 26 Jan 2022 04:07:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4AAB49AF7;
+	Wed, 26 Jan 2022 04:16:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@linuxfoundation.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MQhM-jVeorN5; Wed, 26 Jan 2022 04:07:58 -0500 (EST)
+	with ESMTP id 2cxdMss9Ht2m; Wed, 26 Jan 2022 04:16:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6557B40D34;
-	Wed, 26 Jan 2022 04:07:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C09C40FD6;
+	Wed, 26 Jan 2022 04:16:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9420340B59
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 04:07:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92C8040B80
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 14:48:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IcXPZIIV4ZWv for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 04:07:52 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 973E04086C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 04:07:52 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 7E12261586;
- Wed, 26 Jan 2022 09:07:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5651C340E3;
- Wed, 26 Jan 2022 09:07:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643188070;
- bh=CoppXPKwlPuYpjxSjbP8rvLDgdyiQVokjZ7ovrpaV2U=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=dIgoghzP6U7sNeUaM0iVXDrjS0EB1bW1suZ1BkSaQS3GXSKDeiXbhMIMAUGabODmf
- NuY3efJ5lQaFZ+qFfXOv1Lpwhj0Pv3a2mUlvlGT7dGhmSqpYb0vrjR9FVJ6VRHrxi1
- dFxG8bAaYf7J6mGyJKkgXpltNJM0mdGbIrACwi/WeYlXmn7aGceGuJhlZxM2mY4fW3
- WUYgkkvvTiwLQwIWaQW/7jqqgEMN8QT2VvnQhRPyQpP/Vn4fqPKLmEjcjGvMnX5I7h
- 7YhY2cbP8bG6k10PF4TVDTtzuzW5qjRr4+D03aut+PUj8dDa62ylFvmhG5Ag1j7wH9
- GYpltoPPqvACg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nCeHM-0039gh-TP; Wed, 26 Jan 2022 09:07:49 +0000
-Date: Wed, 26 Jan 2022 09:07:48 +0000
-Message-ID: <87h79q7tln.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+ with ESMTP id FeFDvRc8P5aG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jan 2022 14:48:03 -0500 (EST)
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com
+ [209.85.166.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73D1C408F4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 14:48:03 -0500 (EST)
+Received: by mail-io1-f47.google.com with SMTP id s18so8510441ioa.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 11:48:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=linuxfoundation.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=UhLIm0K4haH8bYFhDCpqtBWqTKC3e3dD5n20TDHCsEU=;
+ b=LQmFhxo97JuO3uJKyBgLhODQfyiRm33Fa7nwDLgCR6dbQVF8VzDu7zZhzHJ29NKlYt
+ C76zQtUnK+Xr9cHfdRMIJJDI6G+vSQPym8ss7dguvlhs0rQpyenT1aGH+73QKh1St/6h
+ g41sB7aSWHA/vmmWVnJqcR9hT9FwXGtTrFmjY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UhLIm0K4haH8bYFhDCpqtBWqTKC3e3dD5n20TDHCsEU=;
+ b=tH5wdsWZAdIPLzGbcKk35lC8Dnn5qvO9BRwsXMRi+iWbrYrpelBvQtdjC9fvG6GCsL
+ Q4FBaGUwYlkWEUrowIGfG9zK+fcqd5dAp6pcdYOHf7MWgjoEidLm1BZFHrI+1j1zAXJm
+ DrSAI/456LHXoan6hFvNnVdcdI6Y6SmjfTzr373/MQ6BWl3ACr5AflN/kvgkgquJuES5
+ wVgiQODd+JN3xfYhvM/LcJOzY8ryNacVrNXD7V/roVFbC+QUdwOQB0nuQsjsdgP/HCl9
+ vyrOgTIhyijTf027FGPjBSG7IgxpdXLxcq54EW/2sJdcuhqw+iZxd7olVaHI65NsxNMq
+ 2ywQ==
+X-Gm-Message-State: AOAM532TYNbQ16jCCSRRo/fQn1Q+7eYhquGQ6D7vEn0FdGt2TDe3logF
+ omYkEZLS/8hsINNW2G7pVEyRKQ==
+X-Google-Smtp-Source: ABdhPJzKaByjZS2TCv+LDaZM1ersKACGdc0hYfosLk3drvVpzlg/TCFdUx7usK/mXeitxXxhamL43g==
+X-Received: by 2002:a5e:9b07:: with SMTP id j7mr11438878iok.136.1643140082829; 
+ Tue, 25 Jan 2022 11:48:02 -0800 (PST)
+Received: from ?IPv6:2601:282:8200:4c:4ef8:d404:554b:9671?
+ ([2601:282:8200:4c:4ef8:d404:554b:9671])
+ by smtp.gmail.com with ESMTPSA id l7sm9486227ilv.75.2022.01.25.11.48.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 25 Jan 2022 11:48:02 -0800 (PST)
 Subject: Re: [PATCH] kselftest: kvm/arm64: Skip tests if we can't create a
  vgic-v3
-In-Reply-To: <20220125192851.3907611-1-broonie@kernel.org>
+To: Mark Brown <broonie@kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Shuah Khan <shuah@kernel.org>
 References: <20220125192851.3907611-1-broonie@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, shuah@kernel.org, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+From: Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <a7215f00-2ffd-d3ec-eb02-e7fc8e527715@linuxfoundation.org>
+Date: Tue, 25 Jan 2022 12:48:00 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
+MIME-Version: 1.0
+In-Reply-To: <20220125192851.3907611-1-broonie@kernel.org>
+Content-Language: en-US
+X-Mailman-Approved-At: Wed, 26 Jan 2022 04:16:24 -0500
+Cc: linux-kselftest@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -82,14 +87,12 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 25 Jan 2022 19:28:51 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
+On 1/25/22 12:28 PM, Mark Brown wrote:
 > The arch_timer and vgic_irq kselftests assume that they can create a
 > vgic-v3, using the library function vgic_v3_setup() which aborts with a
 > test failure if it is not possible to do so. Since vgic-v3 can only be
@@ -104,32 +107,79 @@ Mark Brown <broonie@kernel.org> wrote:
 > 
 > Signed-off-by: Mark Brown <broonie@kernel.org>
 > ---
->  tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
->  tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 5 +++++
->  tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
->  3 files changed, 14 insertions(+), 2 deletions(-)
->
-
-[...]
-
+>   tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
+>   tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 5 +++++
+>   tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
+>   3 files changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> index 9ad38bd360a4..791d38404652 100644
+> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+> @@ -366,6 +366,7 @@ static struct kvm_vm *test_vm_create(void)
+>   {
+>   	struct kvm_vm *vm;
+>   	unsigned int i;
+> +	int ret;
+>   	int nr_vcpus = test_args.nr_vcpus;
+>   
+>   	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
+> @@ -382,7 +383,11 @@ static struct kvm_vm *test_vm_create(void)
+>   
+>   	ucall_init(vm, NULL);
+>   	test_init_timer_irq(vm);
+> -	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+> +	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+> +	if (ret < 0) {
+> +		pr_info("Failed to create vgic-v3, skipping\n");
+> +		exit(KSFT_SKIP);
+> +	}
+>   
+>   	/* Make all the test's cmdline args visible to the guest */
+>   	sync_global_to_guest(vm, test_args);
+> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+> index e6c7d7f8fbd1..8c6b61b8e6aa 100644
+> --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+> +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+> @@ -761,6 +761,11 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
+>   
+>   	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
+>   			GICD_BASE_GPA, GICR_BASE_GPA);
+> +	if (gic_fd < 0) {
+> +		pr_info("Failed to create vgic-v3, skipping\n");
+> +		exit(KSFT_SKIP);
+> +	}
+> +
+>   
+>   	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
+>   		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
 > diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
 > index b3a0fca0d780..647c18733e1b 100644
 > --- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
 > +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
 > @@ -52,7 +52,9 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
->  			nr_vcpus, nr_vcpus_created);
->  
->  	/* Distributor setup */
+>   			nr_vcpus, nr_vcpus_created);
+>   
+>   	/* Distributor setup */
 > -	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
 > +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
 
-So you now only test whether it is possible to create a virtual GICv3,
-but don't actually create it. How does this work?
+Assume the flag change is intentional. The reason isn't obvious in the
+change log
+  
+> +	if (gic_fd == -1)
+> +		return -1;
+>   
+>   	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+>   			0, &nr_irqs, true);
+> 
 
-	M.
+Looks good to me otherwise - thanks for adding the skips
 
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
+
+thanks,
+-- Shuah
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
