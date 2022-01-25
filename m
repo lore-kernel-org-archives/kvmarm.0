@@ -2,71 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6DACC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 15:45:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4A7C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 16:51:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6158749B08;
-	Tue, 25 Jan 2022 10:45:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7223240D34;
+	Tue, 25 Jan 2022 11:51:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TE3yi2p8azcT; Tue, 25 Jan 2022 10:45:10 -0500 (EST)
+	with ESMTP id k5QLvJagQZF7; Tue, 25 Jan 2022 11:51:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD5CE49E1A;
-	Tue, 25 Jan 2022 10:45:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC25449AFD;
+	Tue, 25 Jan 2022 11:51:52 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D965949DFF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 10:45:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE36B40D34
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 11:51:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8jnrg8iC1o8Q for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Jan 2022 10:45:08 -0500 (EST)
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com
- [209.85.222.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 923DF49B08
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 10:45:08 -0500 (EST)
-Received: by mail-ua1-f41.google.com with SMTP id u6so38205295uaq.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 07:45:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PPIEe+st9cF5MAH0hHhZ+qq16py4m+I4ddilHRSbQ3w=;
- b=PEv4ClL5nM9Feh8S60aS+OCooCdVoq6QUZLmQ7RwtiBXCAl/aj47zwgY2qMKu7W/P8
- 9BHPTd1QlFfM0ArL9Rxku463v1nrn85avkyQxgxIYtqdfKBUdI/r4cE5KoLJ0rUahi1a
- zqHRvVWmfWrDizSPNXGMJ2cJXxUbrEWjPHwghugfZf62+rB4rQchSND9Tzi7FVrEq4/h
- rzJWqUn1IjM0gAVImb8TdjlBWZq+2dgywux0UeKkWuc9uSJpuLOcud+Hkg0eAjZys3CE
- EoJ5g5zv1UHAB4uQl5VuHAcUyYpPp5BpfnOwjuAIfr2mnFrP+tq5VCcwhJv6qqIz/8Ir
- 4SFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PPIEe+st9cF5MAH0hHhZ+qq16py4m+I4ddilHRSbQ3w=;
- b=SnYRVhjbhh8yKEGUBJH0zwkFk+wP+PsTq5/tkIFSKUwC368/pABBI2gIHIR5o1vNlT
- ZryA9Rt9J2ok/bHOvbd/c4l4bxXCvdj4UV4HyZ3+HGZ+nRZdr8q+GFViu4d77sWRnTCR
- S6gLUL8cRx19ebRfcTts67MWhviTSLmnSQUpZMTcx0mXPHZ2+gKWl73WfJur31Z8tv1C
- bEjuckqQiHI8s2MBye56f7NgKjNxpV22clxVrTk0vG4r1riPEoxFGmLadQp2MuakpK9U
- rxR1uyIK6+wR0VPmCdY3/VE68q5Vd2AyvfGGAGmGechc0Hm6MYlooeSf56Xfvr56uba6
- bOyg==
-X-Gm-Message-State: AOAM532XJ52xkwLXH3AczOnXIO321uQey9ogzSpeRlWQFYH4s9nnAIVC
- ExeXuZba+Tadni+nIYTLSPGNLzDtoHKz1knyVcidpg==
-X-Google-Smtp-Source: ABdhPJzswcvU0OHQ8LHteSUlTIJOXJDpk5/DIjq9oA64wiSgTSvRd+mAzuNnzBqcNxjjNg0uTXlmFn1A2Yo+43HUgYs=
-X-Received: by 2002:ab0:7390:: with SMTP id l16mr7490109uap.73.1643125507698; 
- Tue, 25 Jan 2022 07:45:07 -0800 (PST)
-MIME-Version: 1.0
-References: <20220118015703.3630552-1-jingzhangos@google.com>
- <CA+EHjTwZsODk4pY9sYsUeyETUXQTLNDViPKjD_KbuaPF4sBu=A@mail.gmail.com>
-In-Reply-To: <CA+EHjTwZsODk4pY9sYsUeyETUXQTLNDViPKjD_KbuaPF4sBu=A@mail.gmail.com>
-From: Jing Zhang <jingzhangos@google.com>
-Date: Tue, 25 Jan 2022 07:44:55 -0800
-Message-ID: <CAAdAUthkri_fdMzrBwZP5ZfebpieD=rYqWY+reDuRhJsQ_ZrJA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] ARM64: Guest performance improvement during dirty
-To: Fuad Tabba <tabba@google.com>
-Cc: KVM <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>
+ with ESMTP id Nx99i0w1nfT6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jan 2022 11:51:50 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BA0840D01
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 11:51:50 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id CEB4560B3A;
+ Tue, 25 Jan 2022 16:51:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 244CAC340E6;
+ Tue, 25 Jan 2022 16:51:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1643129508;
+ bh=ba6hZXXKEBXmXsK6VF/eKcgxP0IeTJCJUtv09CRILFw=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=bDUUDgnyS81xYtrpJlQTunvEtxpv8qpQV9E2CVBZnCI2a1lpdFKyS9ItUb5s+ay23
+ 7DVRXADQSqr2raQEArU1lYLOuUH9ruTyH+srlPFKymIvSHi5qWIThf4oIQC/U+GqYy
+ 6JgNsEyajzQK9fcTm7yfULVMas3FSaaddz/FYkPQWIRxjt4peUaFjdcHBgl6uXvK65
+ rISL+xRt21uK72F4vz8rx/qMiSJYVx2AhXeQnTspeRu2NQcC1hpcUjAG6rjEKzMerE
+ PEkrQ1EAs0EO0iOKGmoPb0hHXsYkVx2wdf30S1M8nbLrKMhRG1x14d64Yvn/D8llcD
+ r88HjGhLKC1hw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nCP2o-002yKd-5T; Tue, 25 Jan 2022 16:51:46 +0000
+Date: Tue, 25 Jan 2022 16:51:45 +0000
+Message-ID: <87mtjj7o7y.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: James Morse <james.morse@arm.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: Workaround Cortex-A510's single-step and
+ PAC trap errata
+In-Reply-To: <20220125153803.549084-5-james.morse@arm.com>
+References: <20220125153803.549084-1-james.morse@arm.com>
+ <20220125153803.549084-5-james.morse@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: james.morse@arm.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com, will@kernel.org,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, anshuman.khandual@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+ Anshuman Khandual <anshuman.khandual@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,169 +88,261 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Fuad,
+Hi James,
 
-On Tue, Jan 25, 2022 at 5:22 AM Fuad Tabba <tabba@google.com> wrote:
->
-> Hi Jing,
->
-> On Tue, Jan 18, 2022 at 1:57 AM Jing Zhang <jingzhangos@google.com> wrote:
-> >
-> > This patch is to reduce the performance degradation of guest workload during
-> > dirty logging on ARM64. A fast path is added to handle permission relaxation
-> > during dirty logging. The MMU lock is replaced with rwlock, by which all
-> > permision relaxations on leaf pte can be performed under the read lock. This
-> > greatly reduces the MMU lock contention during dirty logging. With this
-> > solution, the source guest workload performance degradation can be improved
-> > by more than 60%.
-> >
-> > Problem:
-> >   * A Google internal live migration test shows that the source guest workload
-> >   performance has >99% degradation for about 105 seconds, >50% degradation
-> >   for about 112 seconds, >10% degradation for about 112 seconds on ARM64.
-> >   This shows that most of the time, the guest workload degradtion is above
-> >   99%, which obviously needs some improvement compared to the test result
-> >   on x86 (>99% for 6s, >50% for 9s, >10% for 27s).
-> >   * Tested H/W: Ampere Altra 3GHz, #CPU: 64, #Mem: 256GB, PageSize: 4K
-> >   * VM spec: #vCPU: 48, #Mem/vCPU: 4GB, PageSize: 4K, 2M hugepage backed
-> >
-> > Analysis:
-> >   * We enabled CONFIG_LOCK_STAT in kernel and used dirty_log_perf_test to get
-> >     the number of contentions of MMU lock and the "dirty memory time" on
-> >     various VM spec. The "dirty memory time" is the time vCPU threads spent
-> >     in KVM after fault. Higher "dirty memory time" means higher degradation
-> >     to guest workload.
-> >     '-m 2' specifies the mode "PA-bits:48,  VA-bits:48,  4K pages".
-> >     By using test command
-> >     ./dirty_log_perf_test -b 2G -m 2 -i 2 -s anonymous_hugetlb_2mb -v [#vCPU]
-> >     Below are the results:
-> >     +-------+------------------------+-----------------------+
-> >     | #vCPU | dirty memory time (ms) | number of contentions |
-> >     +-------+------------------------+-----------------------+
-> >     | 1     | 926                    | 0                     |
-> >     +-------+------------------------+-----------------------+
-> >     | 2     | 1189                   | 4732558               |
-> >     +-------+------------------------+-----------------------+
-> >     | 4     | 2503                   | 11527185              |
-> >     +-------+------------------------+-----------------------+
-> >     | 8     | 5069                   | 24881677              |
-> >     +-------+------------------------+-----------------------+
-> >     | 16    | 10340                  | 50347956              |
-> >     +-------+------------------------+-----------------------+
-> >     | 32    | 20351                  | 100605720             |
-> >     +-------+------------------------+-----------------------+
-> >     | 64    | 40994                  | 201442478             |
-> >     +-------+------------------------+-----------------------+
-> >
-> >   * From the test results above, the "dirty memory time" and the number of
-> >     MMU lock contention scale with the number of vCPUs. That means all the
-> >     dirty memory operations from all vCPU threads have been serialized by
-> >     the MMU lock. Further analysis also shows that the permission relaxation
-> >     during dirty logging is where vCPU threads get serialized.
->
-> I am curious about any changes to performance for this case (the base
-> case) with the changes in patch 3.
->
-> Thanks,
-> /fuad
->
->
->
-> >
-> > Solution:
-> >   * On ARM64, there is no mechanism as PML (Page Modification Logging) and
-> >     the dirty-bit solution for dirty logging is much complicated compared to
-> >     the write-protection solution. The straight way to reduce the guest
-> >     performance degradation is to enhance the concurrency for the permission
-> >     fault path during dirty logging.
-> >   * In this patch, we only put leaf PTE permission relaxation for dirty
-> >     logging under read lock, all others would go under write lock.
-> >     Below are the results based on the fast path solution:
-> >     +-------+------------------------+
-> >     | #vCPU | dirty memory time (ms) |
-> >     +-------+------------------------+
-> >     | 1     | 965                    |
-> >     +-------+------------------------+
-> >     | 2     | 1006                   |
-> >     +-------+------------------------+
-> >     | 4     | 1128                   |
-> >     +-------+------------------------+
-> >     | 8     | 2005                   |
-> >     +-------+------------------------+
-> >     | 16    | 3903                   |
-> >     +-------+------------------------+
-> >     | 32    | 7595                   |
-> >     +-------+------------------------+
-> >     | 64    | 15783                  |
-> >     +-------+------------------------+
-> >
-> >   * Furtuer analysis shows that there is another bottleneck caused by the
-> >     setup of the test code itself. The 3rd commit is meant to fix that by
-> >     setting up vgic in the test code. With the test code fix, below are
-> >     the results which show better improvement.
-> >     +-------+------------------------+
-> >     | #vCPU | dirty memory time (ms) |
-> >     +-------+------------------------+
-> >     | 1     | 803                    |
-> >     +-------+------------------------+
-> >     | 2     | 843                    |
-> >     +-------+------------------------+
-> >     | 4     | 942                    |
-> >     +-------+------------------------+
-> >     | 8     | 1458                   |
-> >     +-------+------------------------+
-> >     | 16    | 2853                   |
-> >     +-------+------------------------+
-> >     | 32    | 5886                   |
-> >     +-------+------------------------+
-> >     | 64    | 12190                  |
-> >     +-------+------------------------+
-> >     All "dirty memory time" has been reduced by more than 60% when the
-> >     number of vCPU grows.
-> >   * Based on the solution, the test results from the Google internal live
-> >     migration test also shows more than 60% improvement with >99% for 30s,
-> >     >50% for 58s and >10% for 76s.
-> >
-> > ---
-> >
-> > * v1 -> v2
-> >   - Renamed flag name from use_mmu_readlock to logging_perm_fault.
-> >   - Removed unnecessary check for fault_granule to use readlock.
-> > * RFC -> v1
-> >   - Rebase to kvm/queue, commit fea31d169094
-> >     (KVM: x86/pmu: Fix available_event_types check for REF_CPU_CYCLES event)
-> >   - Moved the fast path in user_mem_abort, as suggested by Marc.
-> >   - Addressed other comments from Marc.
-> >
-> > [v1] https://lore.kernel.org/all/20220113221829.2785604-1-jingzhangos@google.com
-> > [RFC] https://lore.kernel.org/all/20220110210441.2074798-1-jingzhangos@google.com
-> >
-> > ---
-> >
-> > Jing Zhang (3):
-> >   KVM: arm64: Use read/write spin lock for MMU protection
-> >   KVM: arm64: Add fast path to handle permission relaxation during dirty
-> >     logging
-> >   KVM: selftests: Add vgic initialization for dirty log perf test for
-> >     ARM
-> >
-> >  arch/arm64/include/asm/kvm_host.h             |  2 +
-> >  arch/arm64/kvm/mmu.c                          | 49 ++++++++++++-------
-> >  .../selftests/kvm/dirty_log_perf_test.c       | 10 ++++
-> >  3 files changed, 43 insertions(+), 18 deletions(-)
-> >
-> >
-> > base-commit: fea31d1690945e6dd6c3e89ec5591490857bc3d4
-> > --
-> > 2.34.1.703.g22d0c6ccf7-goog
-> >
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-Thanks for all your reviews and testing.
+Thanks for this. I guess.
 
-Jing
+On Tue, 25 Jan 2022 15:38:03 +0000,
+James Morse <james.morse@arm.com> wrote:
+> 
+> Cortex-A510's erratum #2077057 causes SPSR_EL2 to be corrupted when
+> single-stepping authenticated ERET instructions. A single step is
+> expected, but a pointer authentication trap is taken instead. The
+> erratum causes SPSR_EL1 to be copied to SPSR_EL2, which could allow
+> EL1 to cause a return to EL2 with a guest controlled ELR_EL2.
+> 
+> Because the conditions require an ERET into active-not-pending state,
+> this is only a problem for the EL2 when EL2 is stepping EL1. In this case
+> the previous SPSR_EL2 value is preserved in struct kvm_vcpu, and can be
+> restored.
+
+Urgh. That's pretty nasty :-(.
+
+> 
+> Cc: stable@vger.kernel.org # ${GITHASHHERE}: arm64: Add Cortex-A510 CPU part definition
+> Cc: stable@vger.kernel.org
+> Signed-off-by: James Morse <james.morse@arm.com>
+> ---
+>  Documentation/arm64/silicon-errata.rst  |  2 ++
+>  arch/arm64/Kconfig                      | 16 ++++++++++++++++
+>  arch/arm64/kernel/cpu_errata.c          |  8 ++++++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 24 +++++++++++++++++++++---
+>  arch/arm64/tools/cpucaps                |  1 +
+>  5 files changed, 48 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/arm64/silicon-errata.rst b/Documentation/arm64/silicon-errata.rst
+> index 5342e895fb60..ac1ae34564c9 100644
+> --- a/Documentation/arm64/silicon-errata.rst
+> +++ b/Documentation/arm64/silicon-errata.rst
+> @@ -92,6 +92,8 @@ stable kernels.
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A77      | #1508412        | ARM64_ERRATUM_1508412       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+> +| ARM            | Cortex-A510     | #2077057        | ARM64_ERRATUM_2077057       |
+> ++----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A710     | #2119858        | ARM64_ERRATUM_2119858       |
+>  +----------------+-----------------+-----------------+-----------------------------+
+>  | ARM            | Cortex-A710     | #2054223        | ARM64_ERRATUM_2054223       |
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 6978140edfa4..02b542ec18c8 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -670,6 +670,22 @@ config ARM64_ERRATUM_1508412
+>  config ARM64_WORKAROUND_TRBE_OVERWRITE_FILL_MODE
+>  	bool
+>  
+> +config ARM64_ERRATUM_2077057
+> +	bool "Cortex-A510: 2077057: workaround software-step corrupting SPSR_EL2"
+> +	help
+> +	  This option adds the workaround for ARM Cortex-A510 erratum 2077057.
+> +	  Affected Cortex-A510 may corrupt SPSR_EL2 when the a step exception is
+> +	  expected, but a Pointer Authentication trap is taken instead. The
+> +	  erratum causes SPSR_EL1 to be copied to SPSR_EL2, which could allow
+> +	  EL1 to cause a return to EL2 with a guest controlled ELR_EL2.
+> +
+> +	  This can only happen when EL2 is stepping EL1.
+> +
+> +	  When these conditions occur, the SPSR_EL2 value is unchanged from the
+> +	  previous guest entry, and can be restored from the in-memory copy.
+> +
+> +	  If unsure, say Y.
+> +
+>  config ARM64_ERRATUM_2119858
+>  	bool "Cortex-A710: 2119858: workaround TRBE overwriting trace data in FILL mode"
+>  	default y
+> diff --git a/arch/arm64/kernel/cpu_errata.c b/arch/arm64/kernel/cpu_errata.c
+> index 9e1c1aef9ebd..04a014c63251 100644
+> --- a/arch/arm64/kernel/cpu_errata.c
+> +++ b/arch/arm64/kernel/cpu_errata.c
+> @@ -597,6 +597,14 @@ const struct arm64_cpu_capabilities arm64_errata[] = {
+>  		.type = ARM64_CPUCAP_WEAK_LOCAL_CPU_FEATURE,
+>  		CAP_MIDR_RANGE_LIST(trbe_write_out_of_range_cpus),
+>  	},
+> +#endif
+> +#ifdef CONFIG_ARM64_ERRATUM_2077057
+> +	{
+> +		.desc = "ARM erratum 2077057",
+> +		.capability = ARM64_WORKAROUND_2077057,
+> +		.type = ARM64_CPUCAP_LOCAL_CPU_ERRATUM,
+> +		ERRATA_MIDR_REV_RANGE(MIDR_CORTEX_A510, 0, 0, 2),
+> +	},
+>  #endif
+>  	{
+>  	}
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 331dd10821df..93bf140cc972 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -409,6 +409,8 @@ static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>   */
+>  static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+> +	u8 esr_ec;
+> +
+>  	/*
+>  	 * Save PSTATE early so that we can evaluate the vcpu mode
+>  	 * early on.
+> @@ -421,13 +423,13 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	 */
+>  	early_exit_filter(vcpu, exit_code);
+>  
+> -	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+> +	if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ) {
+>  		vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
+> +		esr_ec = kvm_vcpu_trap_get_class(vcpu);
+> +	}
+>  
+>  	if (ARM_SERROR_PENDING(*exit_code) &&
+>  	    ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ) {
+> -		u8 esr_ec = kvm_vcpu_trap_get_class(vcpu);
+> -
+>  		/*
+>  		 * HVC already have an adjusted PC, which we need to
+>  		 * correct in order to return to after having injected
+> @@ -440,6 +442,22 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  			write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
+>  	}
+>  
+> +	/*
+> +	 * Check for the conditions of Cortex-A510's #2077057. When these occur
+> +	 * SPSR_EL2 can't be trusted, but isn't needed either as it is
+> +	 * unchanged from the value in vcpu_gp_regs(vcpu)->pstate.
+> +	 * Did we just take a PAC exception when a step exception was expected?
+> +	 */
+> +	if (IS_ENABLED(CONFIG_ARM64_ERRATUM_2077057) &&
+
+nit: we can drop this IS_ENABLED()...
+
+> +	    cpus_have_const_cap(ARM64_WORKAROUND_2077057) &&
+
+and make this a final cap. Being a ARM64_CPUCAP_LOCAL_CPU_ERRATUM, we
+won't accept late CPUs on a system that wasn't affected until then.
+
+> +	    ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ &&
+> +	    esr_ec == ESR_ELx_EC_PAC &&
+> +	    vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> +		/* Active-not-pending? */
+> +		if (*vcpu_cpsr(vcpu) & DBG_SPSR_SS)
+> +			write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+
+Err... Isn't this way too late? The function starts with:
+
+	vcpu->arch.ctxt.regs.pstate = read_sysreg_el2(SYS_SPSR);
+
+which is just another way to write:
+
+	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
+
+By that time, the vcpu's PSTATE is terminally corrupted.
+
+I think you need to hoist this workaround way up, before we call into
+early_exit_filter() as it will assume that the guest pstate is correct
+(this is used by both pKVM and the NV code).
+
+Something like this (untested):
+
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 93bf140cc972..a8a1502db237 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -402,6 +402,26 @@ static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return false;
+ }
+ 
++static inline void synchronize_vcpu_pstate(struct kvm_vcpu *vcpu,
++					   u64 *exit_code)
++{
++	/*
++	 * Check for the conditions of Cortex-A510's #2077057. When these occur
++	 * SPSR_EL2 can't be trusted, but isn't needed either as it is
++	 * unchanged from the value in vcpu_gp_regs(vcpu)->pstate.
++	 * Did we just take a PAC exception when a step exception (being in the
++	 * Active-not-pending state) was expected?
++	 */
++	if (cpus_have_final_cap(ARM64_WORKAROUND_2077057)	&&
++	    ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ	&&
++	    kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_PAC	&&
++	    vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP		&&
++	    *vcpu_cpsr(vcpu) & DBG_SPSR_SS)
++		write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
++
++	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
++}
++
+ /*
+  * Return true when we were able to fixup the guest exit and should return to
+  * the guest, false when we should restore the host state and return to the
+@@ -415,7 +435,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	 * Save PSTATE early so that we can evaluate the vcpu mode
+ 	 * early on.
+ 	 */
+-	vcpu->arch.ctxt.regs.pstate = read_sysreg_el2(SYS_SPSR);
++	synchronize_vcpu_pstate(vcpu, exit_code);
+ 
+ 	/*
+ 	 * Check whether we want to repaint the state one way or
+@@ -442,22 +462,6 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 			write_sysreg_el2(read_sysreg_el2(SYS_ELR) - 4, SYS_ELR);
+ 	}
+ 
+-	/*
+-	 * Check for the conditions of Cortex-A510's #2077057. When these occur
+-	 * SPSR_EL2 can't be trusted, but isn't needed either as it is
+-	 * unchanged from the value in vcpu_gp_regs(vcpu)->pstate.
+-	 * Did we just take a PAC exception when a step exception was expected?
+-	 */
+-	if (IS_ENABLED(CONFIG_ARM64_ERRATUM_2077057) &&
+-	    cpus_have_const_cap(ARM64_WORKAROUND_2077057) &&
+-	    ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ &&
+-	    esr_ec == ESR_ELx_EC_PAC &&
+-	    vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+-		/* Active-not-pending? */
+-		if (*vcpu_cpsr(vcpu) & DBG_SPSR_SS)
+-			write_sysreg_el2(*vcpu_cpsr(vcpu), SYS_SPSR);
+-	}
+-
+ 	/*
+ 	 * We're using the raw exception code in order to only process
+ 	 * the trap if no SError is pending. We will come back to the
+
+> +	}
+> +
+>  	/*
+>  	 * We're using the raw exception code in order to only process
+>  	 * the trap if no SError is pending. We will come back to the
+> diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+> index 870c39537dd0..2e7cd3fecca6 100644
+> --- a/arch/arm64/tools/cpucaps
+> +++ b/arch/arm64/tools/cpucaps
+> @@ -55,6 +55,7 @@ WORKAROUND_1418040
+>  WORKAROUND_1463225
+>  WORKAROUND_1508412
+>  WORKAROUND_1542419
+> +WORKAROUND_2077057
+>  WORKAROUND_TRBE_OVERWRITE_FILL_MODE
+>  WORKAROUND_TSB_FLUSH_FAILURE
+>  WORKAROUND_TRBE_WRITE_OUT_OF_RANGE
+
+Other than that, I'm happy to take the series as a whole ASAP, if only
+for the two pretty embarrassing bug fixes. If you can respin it
+shortly and address the comments above, I'd like it into -rc2.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
