@@ -2,75 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E0BC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 00:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E12EAC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 03:47:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ABBA149F17;
-	Mon, 24 Jan 2022 19:17:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5169949E2C;
+	Mon, 24 Jan 2022 22:47:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HN+s9PLRNHGK; Mon, 24 Jan 2022 19:17:54 -0500 (EST)
+	with ESMTP id YABTMChqcJLw; Mon, 24 Jan 2022 22:47:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C5F349F1E;
-	Mon, 24 Jan 2022 19:17:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3B0049E17;
+	Mon, 24 Jan 2022 22:47:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D0F6349F1E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 19:17:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 11AD949E17
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 22:47:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k5JzBWifSYp3 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Jan 2022 19:17:51 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2CAAC49E0E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 19:17:51 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id A86F26154A;
- Tue, 25 Jan 2022 00:17:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6775C340E7;
- Tue, 25 Jan 2022 00:17:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643069870;
- bh=/IsDiGLrik2jwYTUfwMASyDcTKTPn/KCUYF6KIYhml8=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=RhIA7EaV78Me0NwHqw/hOmgtbNE89SoWDFATaUNJpS0VR3sjBMlIwUs0qpDncUZLS
- K2M66zXBe2iIesZskO67wmNAFvE/+bqnD+ZhTAyJyRyvCwvvz/EHBmBZPk7RKgK+gY
- DyCdXsbSEgoS3c74IyIidS/2TLYzCQw70aWbin0co/TyLIHhORjDhHZuGUHOiFYbBb
- k+a2eNO2wxkuq2KWUwf//keql+An5j0KKzmK/ZztBXLip1kzi6uT36mK7XhhZPI20B
- 25rzStqgBKWv0bD7RIPPWkw4X0clPKOMbytPzpWUwCnrRUevGvcwy5PTYN/le5qodJ
- +CnH0nuhBrSUA==
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
- Shuah Khan <shuah@kernel.org>
-Subject: [PATCH v8 38/38] kselftest/arm64: Add SME support to syscall ABI test
-Date: Tue, 25 Jan 2022 00:11:14 +0000
-Message-Id: <20220125001114.193425-39-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220125001114.193425-1-broonie@kernel.org>
-References: <20220125001114.193425-1-broonie@kernel.org>
+ with ESMTP id XHpkcAlwrZKt for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 24 Jan 2022 22:47:17 -0500 (EST)
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com
+ [209.85.219.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 869D649AF7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 22:47:17 -0500 (EST)
+Received: by mail-yb1-f182.google.com with SMTP id p5so57677869ybd.13
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 19:47:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=3JStU3NdQOz3moQMwSNGHWkyavUfFkQRe4Ox6rYyRZo=;
+ b=s2sH5NPOvw0cLy+zlBKOOBMD1XkTLO8+WwiEIZfbrK7vE+IoRYT6mQ8RE2ZxYT5HD+
+ M0IPP0igg1Vu34gs6oEVbbrxBf51x4M9Qxb2yhUc4Jcn3dqtHE/rf2qRE3CSZBwfW5tF
+ nv2hstN2C8bpSsG8fHKUOM3VY0a7ODBMpav5zNUpwoKRc/2OnFH5b79YDkOIfEyr/335
+ X4eTBTLCr0RRtgTv639Wk63/Fc1iCQDbezm3e3Qe203qZszFhl8WesWQdaQKU5mz9mqM
+ KR5TthJp8xPt2rrd+jUgBVVNU1d2E+aHYyz1672JWWgMf1i4YerXJU4XmBupjjBavoOy
+ o7pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=3JStU3NdQOz3moQMwSNGHWkyavUfFkQRe4Ox6rYyRZo=;
+ b=AIVuha19LPaA5dpNhxLkjVrm4hzk12HpcFalbjyyfpWuqJi4BqMvKmvcE9WtYHJ5oh
+ K612wIv8qr6SzX30//d/B0YDpG6iqAf9/7bLe3FxWM0fWhI3vB1H5muUYAITy8UIbJWs
+ MbUkyjz4qLdM2VUKFyDdwgDjsvOxy1kJlX4qEkV/9nB7Pf6dk2B1/cg7SC5Lvp3Zi3pe
+ s5GIErU48aEXIrc3E6lT0DBBN8cWjsAPjfPjwlgZvbXOitzeCAg2awAr3rVgv3CbnDCp
+ BafMOu34VK1Ez421CpF8j7VvrQfiJH9JN0NusoCIzxVQkP3OwO1pHJClEZaB75kPuoXm
+ x1Lg==
+X-Gm-Message-State: AOAM533gmJp0KsOVDwMy79aSF/OUTn6VSQ5B2D8RW55opi+9aMjofcsG
+ nphcocIq+nN4WybIEQuZtPhGfF34IVs3huSWk7Xigg==
+X-Google-Smtp-Source: ABdhPJywssp8SsyP3pLaqLGoUHU33BtaZIVWcYSInCrUc6yOhzdrIxiAgEeeO1te/rBPfJsTjsOMnAR2SKxdTVoGodA=
+X-Received: by 2002:a25:343:: with SMTP id 64mr28185944ybd.497.1643082436766; 
+ Mon, 24 Jan 2022 19:47:16 -0800 (PST)
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=14984; h=from:subject;
- bh=/IsDiGLrik2jwYTUfwMASyDcTKTPn/KCUYF6KIYhml8=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBh70AfeJVDEKktOGfFvufTKaqV0EDA+nJC+unOKEej
- MYJ6Fv2JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYe9AHwAKCRAk1otyXVSH0ErAB/
- 9kDMZvCAhaYfoAZ1Li9Wtbr84ysFhVCBIwa7KR1X40VId14q/0xMwTsVi15ko6HW7LlXUn6ebqorIw
- tfiKcM+3oT4HDbvoweBIhlHSgEW90sFHY6ILOP3YI2vyehqFPfdQe7Uf83TMDcDM24nve+gPmiL2D8
- FfeGinE2iRERuWbwA4xvpfoA6FW3KS82kRy3Rn/cLmITUKpS+VgpoCNpTV90gB6qtFI8sAjjV1Yqjz
- teC/JVH51JbcSG9TmlajtQy7+AsEjoI1zNe0pguOsInPgiloTZYwRENvNupjZdSqaqv6XRqDg/zRDH
- RtLcyGFHc5HhlhfwnofQCqmWGgGbKS
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Luis Machado <luis.machado@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
- kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>
+References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
+ <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+ <87fsuxq049.wl-maz@kernel.org> <20210825150713.5rpwzm4grfn7akcw@gator.home>
+ <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
+ <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
+ <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
+ <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
+ <87ilyitt6e.wl-maz@kernel.org>
+ <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+ <87lf3drmvp.wl-maz@kernel.org>
+ <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
+In-Reply-To: <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Mon, 24 Jan 2022 19:47:04 -0800
+Message-ID: <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,520 +91,150 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-For every possible combination of SVE and SME vector length verify that for
-each possible value of SVCR after a syscall we leave streaming mode and ZA
-is preserved. We don't need to take account of any streaming/non streaming
-SVE vector length changes in the assembler code since the store instructions
-will handle the vector length for us. We log if the system supports FA64 and
-only try to set FFR in streaming mode if it does.
+Hello all,
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- .../selftests/arm64/abi/syscall-abi-asm.S     |  69 +++++-
- .../testing/selftests/arm64/abi/syscall-abi.c | 204 ++++++++++++++++--
- .../testing/selftests/arm64/abi/syscall-abi.h |  15 ++
- 3 files changed, 265 insertions(+), 23 deletions(-)
- create mode 100644 tools/testing/selftests/arm64/abi/syscall-abi.h
+Based on the recent discussion on the patch '[RFC PATCH v3 01/11] KVM:
+Capture VM start' [1], Reiji, I (and others in the team) were
+wondering, since the hypercall feature-map is technically per-VM and
+not per-vCPU, would it make more sense to present it as a kvm_device,
+rather than vCPU psuedo-registers to the userspace?
 
-diff --git a/tools/testing/selftests/arm64/abi/syscall-abi-asm.S b/tools/testing/selftests/arm64/abi/syscall-abi-asm.S
-index 983467cfcee0..bc70e04224bf 100644
---- a/tools/testing/selftests/arm64/abi/syscall-abi-asm.S
-+++ b/tools/testing/selftests/arm64/abi/syscall-abi-asm.S
-@@ -9,15 +9,42 @@
- // invoked is configured in x8 of the input GPR data.
- //
- // x0:	SVE VL, 0 for FP only
-+// x1:	SME VL
- //
- //	GPRs:	gpr_in, gpr_out
- //	FPRs:	fpr_in, fpr_out
- //	Zn:	z_in, z_out
- //	Pn:	p_in, p_out
- //	FFR:	ffr_in, ffr_out
-+//	ZA:	za_in, za_out
-+//	SVCR:	svcr_in, svcr_out
-+
-+#include "syscall-abi.h"
- 
- .arch_extension sve
- 
-+/*
-+ * LDR (vector to ZA array):
-+ *	LDR ZA[\nw, #\offset], [X\nxbase, #\offset, MUL VL]
-+ */
-+.macro _ldr_za nw, nxbase, offset=0
-+	.inst	0xe1000000			\
-+		| (((\nw) & 3) << 13)		\
-+		| ((\nxbase) << 5)		\
-+		| ((\offset) & 7)
-+.endm
-+
-+/*
-+ * STR (vector from ZA array):
-+ *	STR ZA[\nw, #\offset], [X\nxbase, #\offset, MUL VL]
-+ */
-+.macro _str_za nw, nxbase, offset=0
-+	.inst	0xe1200000			\
-+		| (((\nw) & 3) << 13)		\
-+		| ((\nxbase) << 5)		\
-+		| ((\offset) & 7)
-+.endm
-+
- .globl do_syscall
- do_syscall:
- 	// Store callee saved registers x19-x29 (80 bytes) plus x0 and x1
-@@ -30,6 +57,24 @@ do_syscall:
- 	stp	x25, x26, [sp, #80]
- 	stp	x27, x28, [sp, #96]
- 
-+	// Set SVCR if we're doing SME
-+	cbz	x1, 1f
-+	adrp	x2, svcr_in
-+	ldr	x2, [x2, :lo12:svcr_in]
-+	msr	S3_3_C4_C2_2, x2
-+1:
-+
-+	// Load ZA if it's enabled - uses x12 as scratch due to SME LDR
-+	tbz	x2, #SVCR_ZA_SHIFT, 1f
-+	mov	w12, #0
-+	ldr	x2, =za_in
-+2:	_ldr_za 12, 2
-+	add	x2, x2, x1
-+	add	x12, x12, #1
-+	cmp	x1, x12
-+	bne	2b
-+1:
-+
- 	// Load GPRs x8-x28, and save our SP/FP for later comparison
- 	ldr	x2, =gpr_in
- 	add	x2, x2, #64
-@@ -68,7 +113,7 @@ do_syscall:
- 	ldp	q30, q31, [x2, #16 * 30]
- 1:
- 
--	// Load the SVE registers if we're doing SVE
-+	// Load the SVE registers if we're doing SVE/SME
- 	cbz	x0, 1f
- 
- 	ldr	x2, =z_in
-@@ -105,9 +150,13 @@ do_syscall:
- 	ldr	z30, [x2, #30, MUL VL]
- 	ldr	z31, [x2, #31, MUL VL]
- 
-+	// Only set a non-zero FFR, test patterns must be zero since the
-+	// syscall should clear it - this lets us handle FA64.
- 	ldr	x2, =ffr_in
-+	cbz	x2, 2f
- 	ldr	p0, [x2, #0]
- 	wrffr	p0.b
-+2:
- 
- 	ldr	x2, =p_in
- 	ldr	p0, [x2, #0, MUL VL]
-@@ -169,6 +218,24 @@ do_syscall:
- 	stp	q28, q29, [x2, #16 * 28]
- 	stp	q30, q31, [x2, #16 * 30]
- 
-+	// Save SVCR if we're doing SME
-+	cbz	x1, 1f
-+	mrs	x2, S3_3_C4_C2_2
-+	adrp	x3, svcr_out
-+	str	x2, [x3, :lo12:svcr_out]
-+1:
-+
-+	// Save ZA if it's enabled - uses x12 as scratch due to SME STR
-+	tbz	x2, #SVCR_ZA_SHIFT, 1f
-+	mov	w12, #0
-+	ldr	x2, =za_out
-+2:	_str_za 12, 2
-+	add	x2, x2, x1
-+	add	x12, x12, #1
-+	cmp	x1, x12
-+	bne	2b
-+1:
-+
- 	// Save the SVE state if we have some
- 	cbz	x0, 1f
- 
-diff --git a/tools/testing/selftests/arm64/abi/syscall-abi.c b/tools/testing/selftests/arm64/abi/syscall-abi.c
-index 1e13b7523918..b632bfe9e022 100644
---- a/tools/testing/selftests/arm64/abi/syscall-abi.c
-+++ b/tools/testing/selftests/arm64/abi/syscall-abi.c
-@@ -18,9 +18,13 @@
- 
- #include "../../kselftest.h"
- 
-+#include "syscall-abi.h"
-+
- #define NUM_VL ((SVE_VQ_MAX - SVE_VQ_MIN) + 1)
- 
--extern void do_syscall(int sve_vl);
-+static int default_sme_vl;
-+
-+extern void do_syscall(int sve_vl, int sme_vl);
- 
- static void fill_random(void *buf, size_t size)
- {
-@@ -48,14 +52,15 @@ static struct syscall_cfg {
- uint64_t gpr_in[NUM_GPR];
- uint64_t gpr_out[NUM_GPR];
- 
--static void setup_gpr(struct syscall_cfg *cfg, int sve_vl)
-+static void setup_gpr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		      uint64_t svcr)
- {
- 	fill_random(gpr_in, sizeof(gpr_in));
- 	gpr_in[8] = cfg->syscall_nr;
- 	memset(gpr_out, 0, sizeof(gpr_out));
- }
- 
--static int check_gpr(struct syscall_cfg *cfg, int sve_vl)
-+static int check_gpr(struct syscall_cfg *cfg, int sve_vl, int sme_vl, uint64_t svcr)
- {
- 	int errors = 0;
- 	int i;
-@@ -79,13 +84,15 @@ static int check_gpr(struct syscall_cfg *cfg, int sve_vl)
- uint64_t fpr_in[NUM_FPR * 2];
- uint64_t fpr_out[NUM_FPR * 2];
- 
--static void setup_fpr(struct syscall_cfg *cfg, int sve_vl)
-+static void setup_fpr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		      uint64_t svcr)
- {
- 	fill_random(fpr_in, sizeof(fpr_in));
- 	memset(fpr_out, 0, sizeof(fpr_out));
- }
- 
--static int check_fpr(struct syscall_cfg *cfg, int sve_vl)
-+static int check_fpr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		     uint64_t svcr)
- {
- 	int errors = 0;
- 	int i;
-@@ -109,13 +116,15 @@ static uint8_t z_zero[__SVE_ZREG_SIZE(SVE_VQ_MAX)];
- uint8_t z_in[SVE_NUM_PREGS * __SVE_ZREG_SIZE(SVE_VQ_MAX)];
- uint8_t z_out[SVE_NUM_PREGS * __SVE_ZREG_SIZE(SVE_VQ_MAX)];
- 
--static void setup_z(struct syscall_cfg *cfg, int sve_vl)
-+static void setup_z(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		    uint64_t svcr)
- {
- 	fill_random(z_in, sizeof(z_in));
- 	fill_random(z_out, sizeof(z_out));
- }
- 
--static int check_z(struct syscall_cfg *cfg, int sve_vl)
-+static int check_z(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		   uint64_t svcr)
- {
- 	size_t reg_size = sve_vl;
- 	int errors = 0;
-@@ -126,13 +135,17 @@ static int check_z(struct syscall_cfg *cfg, int sve_vl)
- 
- 	/*
- 	 * After a syscall the low 128 bits of the Z registers should
--	 * be preserved and the rest be zeroed or preserved.
-+	 * be preserved and the rest be zeroed or preserved, except if
-+	 * we were in streaming mode in which case the low 128 bits may
-+	 * also be cleared by the transition out of streaming mode.
- 	 */
- 	for (i = 0; i < SVE_NUM_ZREGS; i++) {
- 		void *in = &z_in[reg_size * i];
- 		void *out = &z_out[reg_size * i];
- 
--		if (memcmp(in, out, SVE_VQ_BYTES) != 0) {
-+		if ((memcmp(in, out, SVE_VQ_BYTES) != 0) &&
-+		    !((svcr & SVCR_SM_MASK) &&
-+		      memcmp(z_zero, out, SVE_VQ_BYTES) == 0)) {
- 			ksft_print_msg("%s SVE VL %d Z%d low 128 bits changed\n",
- 				       cfg->name, sve_vl, i);
- 			errors++;
-@@ -145,13 +158,15 @@ static int check_z(struct syscall_cfg *cfg, int sve_vl)
- uint8_t p_in[SVE_NUM_PREGS * __SVE_PREG_SIZE(SVE_VQ_MAX)];
- uint8_t p_out[SVE_NUM_PREGS * __SVE_PREG_SIZE(SVE_VQ_MAX)];
- 
--static void setup_p(struct syscall_cfg *cfg, int sve_vl)
-+static void setup_p(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		    uint64_t svcr)
- {
- 	fill_random(p_in, sizeof(p_in));
- 	fill_random(p_out, sizeof(p_out));
- }
- 
--static int check_p(struct syscall_cfg *cfg, int sve_vl)
-+static int check_p(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		   uint64_t svcr)
- {
- 	size_t reg_size = sve_vq_from_vl(sve_vl) * 2; /* 1 bit per VL byte */
- 
-@@ -175,8 +190,19 @@ static int check_p(struct syscall_cfg *cfg, int sve_vl)
- uint8_t ffr_in[__SVE_PREG_SIZE(SVE_VQ_MAX)];
- uint8_t ffr_out[__SVE_PREG_SIZE(SVE_VQ_MAX)];
- 
--static void setup_ffr(struct syscall_cfg *cfg, int sve_vl)
-+static void setup_ffr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		      uint64_t svcr)
- {
-+	/*
-+	 * If we are in streaming mode and do not have FA64 then FFR
-+	 * is unavailable.
-+	 */
-+	if ((svcr & SVCR_SM_MASK) &&
-+	    !(getauxval(AT_HWCAP2) & HWCAP2_SME_FA64)) {
-+		memset(&ffr_in, 0, sizeof(ffr_in));
-+		return;
-+	}
-+
- 	/*
- 	 * It is only valid to set a contiguous set of bits starting
- 	 * at 0.  For now since we're expecting this to be cleared by
-@@ -186,7 +212,8 @@ static void setup_ffr(struct syscall_cfg *cfg, int sve_vl)
- 	fill_random(ffr_out, sizeof(ffr_out));
- }
- 
--static int check_ffr(struct syscall_cfg *cfg, int sve_vl)
-+static int check_ffr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		     uint64_t svcr)
- {
- 	size_t reg_size = sve_vq_from_vl(sve_vl) * 2;  /* 1 bit per VL byte */
- 	int errors = 0;
-@@ -195,6 +222,10 @@ static int check_ffr(struct syscall_cfg *cfg, int sve_vl)
- 	if (!sve_vl)
- 		return 0;
- 
-+	if ((svcr & SVCR_SM_MASK) &&
-+	    !(getauxval(AT_HWCAP2) & HWCAP2_SME_FA64))
-+		return 0;
-+
- 	/* After a syscall the P registers should be preserved or zeroed */
- 	for (i = 0; i < reg_size; i++)
- 		if (ffr_out[i] && (ffr_in[i] != ffr_out[i]))
-@@ -206,8 +237,65 @@ static int check_ffr(struct syscall_cfg *cfg, int sve_vl)
- 	return errors;
- }
- 
--typedef void (*setup_fn)(struct syscall_cfg *cfg, int sve_vl);
--typedef int (*check_fn)(struct syscall_cfg *cfg, int sve_vl);
-+uint64_t svcr_in, svcr_out;
-+
-+static void setup_svcr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		    uint64_t svcr)
-+{
-+	svcr_in = svcr;
-+}
-+
-+static int check_svcr(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		      uint64_t svcr)
-+{
-+	int errors = 0;
-+
-+	if (svcr_out & SVCR_SM_MASK) {
-+		ksft_print_msg("%s Still in SM, SVCR %llx\n",
-+			       cfg->name, svcr_out);
-+		errors++;
-+	}
-+
-+	if ((svcr_in & SVCR_ZA_MASK) != (svcr_out & SVCR_ZA_MASK)) {
-+		ksft_print_msg("%s PSTATE.ZA changed, SVCR %llx != %llx\n",
-+			       cfg->name, svcr_in, svcr_out);
-+		errors++;
-+	}
-+
-+	return errors;
-+}
-+
-+uint8_t za_in[SVE_NUM_PREGS * __SVE_ZREG_SIZE(SVE_VQ_MAX)];
-+uint8_t za_out[SVE_NUM_PREGS * __SVE_ZREG_SIZE(SVE_VQ_MAX)];
-+
-+static void setup_za(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		     uint64_t svcr)
-+{
-+	fill_random(za_in, sizeof(za_in));
-+	memset(za_out, 0, sizeof(za_out));
-+}
-+
-+static int check_za(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		    uint64_t svcr)
-+{
-+	size_t reg_size = sme_vl * sme_vl;
-+	int errors = 0;
-+
-+	if (!(svcr & SVCR_ZA_MASK))
-+		return 0;
-+
-+	if (memcmp(za_in, za_out, reg_size) != 0) {
-+		ksft_print_msg("SME VL %d ZA does not match\n", sme_vl);
-+		errors++;
-+	}
-+
-+	return errors;
-+}
-+
-+typedef void (*setup_fn)(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+			 uint64_t svcr);
-+typedef int (*check_fn)(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+			uint64_t svcr);
- 
- /*
-  * Each set of registers has a setup function which is called before
-@@ -225,20 +313,23 @@ static struct {
- 	{ setup_z, check_z },
- 	{ setup_p, check_p },
- 	{ setup_ffr, check_ffr },
-+	{ setup_svcr, check_svcr },
-+	{ setup_za, check_za },
- };
- 
--static bool do_test(struct syscall_cfg *cfg, int sve_vl)
-+static bool do_test(struct syscall_cfg *cfg, int sve_vl, int sme_vl,
-+		    uint64_t svcr)
- {
- 	int errors = 0;
- 	int i;
- 
- 	for (i = 0; i < ARRAY_SIZE(regset); i++)
--		regset[i].setup(cfg, sve_vl);
-+		regset[i].setup(cfg, sve_vl, sme_vl, svcr);
- 
--	do_syscall(sve_vl);
-+	do_syscall(sve_vl, sme_vl);
- 
- 	for (i = 0; i < ARRAY_SIZE(regset); i++)
--		errors += regset[i].check(cfg, sve_vl);
-+		errors += regset[i].check(cfg, sve_vl, sme_vl, svcr);
- 
- 	return errors == 0;
- }
-@@ -246,9 +337,10 @@ static bool do_test(struct syscall_cfg *cfg, int sve_vl)
- static void test_one_syscall(struct syscall_cfg *cfg)
- {
- 	int sve_vq, sve_vl;
-+	int sme_vq, sme_vl;
- 
- 	/* FPSIMD only case */
--	ksft_test_result(do_test(cfg, 0),
-+	ksft_test_result(do_test(cfg, 0, default_sme_vl, 0),
- 			 "%s FPSIMD\n", cfg->name);
- 
- 	if (!(getauxval(AT_HWCAP) & HWCAP_SVE))
-@@ -265,8 +357,36 @@ static void test_one_syscall(struct syscall_cfg *cfg)
- 		if (sve_vq != sve_vq_from_vl(sve_vl))
- 			sve_vq = sve_vq_from_vl(sve_vl);
- 
--		ksft_test_result(do_test(cfg, sve_vl),
-+		ksft_test_result(do_test(cfg, sve_vl, default_sme_vl, 0),
- 				 "%s SVE VL %d\n", cfg->name, sve_vl);
-+
-+		if (!(getauxval(AT_HWCAP2) & HWCAP2_SME))
-+			continue;
-+
-+		for (sme_vq = SVE_VQ_MAX; sme_vq > 0; --sme_vq) {
-+			sme_vl = prctl(PR_SME_SET_VL, sme_vq * 16);
-+			if (sme_vl == -1)
-+				ksft_exit_fail_msg("PR_SME_SET_VL failed: %s (%d)\n",
-+						   strerror(errno), errno);
-+
-+			sme_vl &= PR_SME_VL_LEN_MASK;
-+
-+			if (sme_vq != sve_vq_from_vl(sme_vl))
-+				sme_vq = sve_vq_from_vl(sme_vl);
-+
-+			ksft_test_result(do_test(cfg, sve_vl, sme_vl,
-+						 SVCR_ZA_MASK | SVCR_SM_MASK),
-+					 "%s SVE VL %d/SME VL %d SM+ZA\n",
-+					 cfg->name, sve_vl, sme_vl);
-+			ksft_test_result(do_test(cfg, sve_vl, sme_vl,
-+						 SVCR_SM_MASK),
-+					 "%s SVE VL %d/SME VL %d SM\n",
-+					 cfg->name, sve_vl, sme_vl);
-+			ksft_test_result(do_test(cfg, sve_vl, sme_vl,
-+						 SVCR_ZA_MASK),
-+					 "%s SVE VL %d/SME VL %d ZA\n",
-+					 cfg->name, sve_vl, sme_vl);
-+		}
- 	}
- }
- 
-@@ -299,14 +419,54 @@ int sve_count_vls(void)
- 	return vl_count;
- }
- 
-+int sme_count_vls(void)
-+{
-+	unsigned int vq;
-+	int vl_count = 0;
-+	int vl;
-+
-+	if (!(getauxval(AT_HWCAP2) & HWCAP2_SME))
-+		return 0;
-+
-+	/* Ensure we configure a SME VL, used to flag if SVCR is set */
-+	default_sme_vl = 16;
-+
-+	/*
-+	 * Enumerate up to SVE_VQ_MAX vector lengths
-+	 */
-+	for (vq = SVE_VQ_MAX; vq > 0; --vq) {
-+		vl = prctl(PR_SME_SET_VL, vq * 16);
-+		if (vl == -1)
-+			ksft_exit_fail_msg("PR_SME_SET_VL failed: %s (%d)\n",
-+					   strerror(errno), errno);
-+
-+		vl &= PR_SME_VL_LEN_MASK;
-+
-+		if (vq != sve_vq_from_vl(vl))
-+			vq = sve_vq_from_vl(vl);
-+
-+		vl_count++;
-+	}
-+
-+	return vl_count;
-+}
-+
- int main(void)
- {
- 	int i;
-+	int tests = 1;  /* FPSIMD */
- 
- 	srandom(getpid());
- 
- 	ksft_print_header();
--	ksft_set_plan(ARRAY_SIZE(syscalls) * (sve_count_vls() + 1));
-+	tests += sve_count_vls();
-+	tests += (sve_count_vls() * sme_count_vls()) * 3;
-+	ksft_set_plan(ARRAY_SIZE(syscalls) * tests);
-+
-+	if (getauxval(AT_HWCAP2) & HWCAP2_SME_FA64)
-+		ksft_print_msg("SME with FA64\n");
-+	else if (getauxval(AT_HWCAP2) & HWCAP2_SME)
-+		ksft_print_msg("SME without FA64\n");
- 
- 	for (i = 0; i < ARRAY_SIZE(syscalls); i++)
- 		test_one_syscall(&syscalls[i]);
-diff --git a/tools/testing/selftests/arm64/abi/syscall-abi.h b/tools/testing/selftests/arm64/abi/syscall-abi.h
-new file mode 100644
-index 000000000000..bda5a87ad381
---- /dev/null
-+++ b/tools/testing/selftests/arm64/abi/syscall-abi.h
-@@ -0,0 +1,15 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2021 ARM Limited.
-+ */
-+
-+#ifndef SYSCALL_ABI_H
-+#define SYSCALL_ABI_H
-+
-+#define SVCR_ZA_MASK		2
-+#define SVCR_SM_MASK		1
-+
-+#define SVCR_ZA_SHIFT		1
-+#define SVCR_SM_SHIFT		0
-+
-+#endif
--- 
-2.30.2
+If I understand correctly, the original motivation for going with
+pseudo-registers was to comply with QEMU, which uses KVM_GET_REG_LIST
+and KVM_[GET|SET]_ONE_REG interface, but I'm guessing the VMMs doing
+save/restore across migration might write the same values for every
+vCPU.
 
+Granted that we would be diverging from the existing implementation
+(psci versioning and spectre WA registers), but this can be a cleaner
+way forward for extending hypercall support. The kvm_device interface
+can be made backward compatible with the way hypercalls are exposed
+today, it can have the same registers/features discovery mechanisms
+that we discussed above, and majorly the userspace has to configure it
+only once per-VM. We can probably make the feature selection immutable
+just before any vCPU is created.
+
+Please let me know your thoughts or any disadvantages that I'm overlooking.
+
+Thanks,
+Raghavendra
+
+[1]: https://lore.kernel.org/kvmarm/CAJHc60zhRyOad7AqtEFn-Ptro5BGVkfpB2wXWGw5EZMxOHUc=w@mail.gmail.com/
+
+
+
+On Fri, Oct 1, 2021 at 8:38 AM Oliver Upton <oupton@google.com> wrote:
+>
+> On Fri, Oct 1, 2021 at 4:43 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 30 Sep 2021 18:24:23 +0100,
+> > Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > Hey Marc,
+> > >
+> > > On Thu, Sep 30, 2021 at 12:32 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > >
+> > > > Hi Oliver,
+> > > >
+> > > > On Wed, 29 Sep 2021 19:22:05 +0100,
+> > > > Oliver Upton <oupton@google.com> wrote:
+> > > > >
+> > > > > I have some lingering thoughts on this subject since we last spoke and
+> > > > > wanted to discuss.
+> > > > >
+> > > > > I'm having a hard time figuring out how a VMM should handle a new
+> > > > > hypercall identity register introduced on a newer kernel. In order to
+> > > > > maintain guest ABI, the VMM would need to know about that register and
+> > > > > zero it when restoring an older guest.
+> > > >
+> > > > Just as it would need to be able to discover any new system register
+> > > > exposed by default, as it happens at all times. Which is why we have a
+> > > > way to discover all the registers, architected or not.
+> > > >
+> > > > > Perhaps instead we could reserve a range of firmware registers as the
+> > > > > 'hypercall identity' registers. Implement all of them as RAZ/WI by
+> > > > > default, encouraging userspace to zero these registers away for older
+> > > > > VMs but still allowing an old userspace to pick up new KVM features.
+> > > > > Doing so would align the hypercall identity registers with the feature
+> > > > > ID registers from the architecture.
+> > > >
+> > > > The range already exists in the form of the "coprocessor" 0x14. I
+> > > > don't see the need to expose it as RAZ/WI, however. If userspace
+> > > > doesn't know about how this pseudo-register works, it won't be able to
+> > > > program it anyway.
+> > > >
+> > > > I don't buy the parallel with the ID-regs either. They are RAZ/WI by
+> > > > default so that they don't UNDEF at runtime. The meaning of a RAZ
+> > > > id-register is also well defined (feature not implemented), and the
+> > > > CPU cannot write to them. In a way, the ID-regs *are* the enumeration
+> > > > mechanism.
+> > > >
+> > > > Our firmware registers don't follow the same rules. Userspace can
+> > > > write to them, and there is no such "not implemented" rule (case in
+> > > > point, PSCI). We also have a separate enumeration mechanism
+> > > > (GET_ONE_REG), which is (more or less) designed for userspace to find
+> > > > what is implemented.
+> > > >
+> > > > For these reasons, I don't immediately see the point of advertising a
+> > > > set of registers ahead of time, before userspace grows an
+> > > > understanding of what these registers mean.
+> > >
+> > > Supposing we don't preallocate some hypercall ID registers, how can we
+> > > safely migrate a guest from an older kernel to newer kernel? Ideally,
+> > > we would preserve the hypercall feature set across the migration which
+> > > could work for a while with the first set of registers that get
+> > > defined, but whenever a new hypercall firmware register comes along
+> > > then the VMM will be clueless to the new ABI.
+> >
+> > My expectations were that whenever userspace writes a set of firmware
+> > register, all the defaults are invalidated. For example say that
+> > host-A know about a single hypercall register, while host-B knows
+> > about two. Upon writing to the first register, the host would clear
+> > the set of available services in the second one. If userspace
+> > eventually writes there, the value would stick if valid.
+> >
+> > Also, remember that pseudo-registers don't have to be 64bit. We could
+> > define a new class of hypercall-specific registers that would be much
+> > wider, and thus have a larger write granularity (KVM supports anything
+> > from 8 to 2048 bits). This would make it pretty easy to implement the
+> > above.
+> >
+> > > Fundamentally, I don't think userspace should need a patch to preserve
+> > > ABI on a newer kernel. Despite that, it would seem that userspace will
+> > > need to learn of any firmware registers that control hypercall
+> > > features which come after the initial set that gets proposed. If
+> > > KVM_GET_REG_LIST were to disambiguate between ID registers (hypercall,
+> > > architectural feature ID registers) from other parts of the vCPU
+> > > state, it would be clear to what registers to zero on a newer kernel.
+> > > Apologies if it is distracting to mention the feature ID registers
+> > > here, but both are on my mind currently and want to make sure there is
+> > > some consistency in how features get handled on newer kernels,
+> > > architected or not.
+> >
+> > The problem I see is that we will always need to grow the HC register
+> > space one way or another, no matter how many we reserve. Your approach
+> > only works if we don't exceed that particular range. Maybe it will
+> > never be a problem, but it remains that this is not scalable.
+> >
+> > If we wanted to be safe, we'd reserve the whole of the possible space
+> > as defined by the SMCCC spec. Given that we currently have two HC
+> > spaces (the ARM-controlled one, and the KVM-specific one), the
+> > function space being 16bits in each case, that's 16kB worth of zeroes
+> > that userspace has to save/restore at all times... I'm not overly
+> > enthusiastic.
+>
+> Yeah, that's definitely overkill.
+>
+> I agree with your position; we can solve the issue altogether by
+> enforcing ordering on the hypercall registers. Userspace should read
+> all hypercall registers to discover features, then write them. Given
+> your suggestion, I don't know if there is much need for the guesswork
+> to conclude on an appropriate register size for the hypercall bitmaps.
+> 64 bits seems fine to me..
+>
+> --
+> Thanks,
+> Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
