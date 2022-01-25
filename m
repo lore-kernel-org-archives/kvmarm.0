@@ -2,79 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E12EAC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 03:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10671C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 06:31:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5169949E2C;
-	Mon, 24 Jan 2022 22:47:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F8D640B9F;
+	Tue, 25 Jan 2022 01:31:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YABTMChqcJLw; Mon, 24 Jan 2022 22:47:21 -0500 (EST)
+	with ESMTP id w7pKLr+AQzkC; Tue, 25 Jan 2022 01:31:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3B0049E17;
-	Mon, 24 Jan 2022 22:47:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3B7740D34;
+	Tue, 25 Jan 2022 01:31:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11AD949E17
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 22:47:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7864540BC2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 01:31:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XHpkcAlwrZKt for <kvmarm@lists.cs.columbia.edu>;
- Mon, 24 Jan 2022 22:47:17 -0500 (EST)
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com
- [209.85.219.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 869D649AF7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 22:47:17 -0500 (EST)
-Received: by mail-yb1-f182.google.com with SMTP id p5so57677869ybd.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 19:47:17 -0800 (PST)
+ with ESMTP id 6drfN2kJreGh for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jan 2022 01:31:20 -0500 (EST)
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com
+ [209.85.210.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C536F40B9F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 01:31:20 -0500 (EST)
+Received: by mail-pf1-f169.google.com with SMTP id a8so13332637pfa.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 24 Jan 2022 22:31:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3JStU3NdQOz3moQMwSNGHWkyavUfFkQRe4Ox6rYyRZo=;
- b=s2sH5NPOvw0cLy+zlBKOOBMD1XkTLO8+WwiEIZfbrK7vE+IoRYT6mQ8RE2ZxYT5HD+
- M0IPP0igg1Vu34gs6oEVbbrxBf51x4M9Qxb2yhUc4Jcn3dqtHE/rf2qRE3CSZBwfW5tF
- nv2hstN2C8bpSsG8fHKUOM3VY0a7ODBMpav5zNUpwoKRc/2OnFH5b79YDkOIfEyr/335
- X4eTBTLCr0RRtgTv639Wk63/Fc1iCQDbezm3e3Qe203qZszFhl8WesWQdaQKU5mz9mqM
- KR5TthJp8xPt2rrd+jUgBVVNU1d2E+aHYyz1672JWWgMf1i4YerXJU4XmBupjjBavoOy
- o7pA==
+ :cc; bh=YG1wib0jWKpTEv/nofuJq/GxyHAOLnxfqxgZPfSyV44=;
+ b=qk4o3TTXTv+cpSH/i+RQveYIp99fA4DsTRghVk2Ob/WiY5w8IxPAtvr/Vb5mn5vULW
+ h1q4t6ma/beOHTtY8MiRELHR2U+7K2eIP+2TApkr+W8cR4vdjNlrxtuxmBfO403eswJu
+ DWqZCkc8lInsa/dptVMjA0mDfU/wkiaKGoHzo3vXIUDyJRq7Yk3dr0VnwlBNQfUEpqvA
+ YR/LdZUqIvWlUsJ1FTO1PoH8K9zAn64eYg16OYnAAmhvMUr1JF/KpkJNT02kmv0A5150
+ Wq0ehR49xD9hwnCZ+nwuxeYWGpit1+x7FxJlMOIL0d6fKF7TiJue2+I5yzywawUEG0Um
+ AJ4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=3JStU3NdQOz3moQMwSNGHWkyavUfFkQRe4Ox6rYyRZo=;
- b=AIVuha19LPaA5dpNhxLkjVrm4hzk12HpcFalbjyyfpWuqJi4BqMvKmvcE9WtYHJ5oh
- K612wIv8qr6SzX30//d/B0YDpG6iqAf9/7bLe3FxWM0fWhI3vB1H5muUYAITy8UIbJWs
- MbUkyjz4qLdM2VUKFyDdwgDjsvOxy1kJlX4qEkV/9nB7Pf6dk2B1/cg7SC5Lvp3Zi3pe
- s5GIErU48aEXIrc3E6lT0DBBN8cWjsAPjfPjwlgZvbXOitzeCAg2awAr3rVgv3CbnDCp
- BafMOu34VK1Ez421CpF8j7VvrQfiJH9JN0NusoCIzxVQkP3OwO1pHJClEZaB75kPuoXm
- x1Lg==
-X-Gm-Message-State: AOAM533gmJp0KsOVDwMy79aSF/OUTn6VSQ5B2D8RW55opi+9aMjofcsG
- nphcocIq+nN4WybIEQuZtPhGfF34IVs3huSWk7Xigg==
-X-Google-Smtp-Source: ABdhPJywssp8SsyP3pLaqLGoUHU33BtaZIVWcYSInCrUc6yOhzdrIxiAgEeeO1te/rBPfJsTjsOMnAR2SKxdTVoGodA=
-X-Received: by 2002:a25:343:: with SMTP id 64mr28185944ybd.497.1643082436766; 
- Mon, 24 Jan 2022 19:47:16 -0800 (PST)
+ bh=YG1wib0jWKpTEv/nofuJq/GxyHAOLnxfqxgZPfSyV44=;
+ b=2bWLAtqvUm463is1/Euis6hs21KW3HoNIgYq6o1mpKUo8FXdSnO2TuZZV0ilx6nO7Q
+ GOzftgvLARIeptM8kg/jID4vrc0D0mwCrRC2I9ohLmWeElXbvH5FU75sgHQ7YKOtWyGH
+ PTw3B4jFkJbEC1KLEI8SPVgrplaJimLtaF4IzpSBkrBEQd0ZQ7XWDNwtVHQqZFPya6Zi
+ 7jzP9mfTEE2zPguLr6ZhYHpXaKbGKmcQHtFVDA1iWM/9j1KBkNVZzgndnHyKzFcn+ZX+
+ JAw0agleh8HsIYyqxxOBMH6xzKZwD1sHZXckF7Qajnk2dzNoQXjfrdetXLyakOx0QXkZ
+ +HSQ==
+X-Gm-Message-State: AOAM532YQ7y08rwXEDIo6tajlsLReDjES+ajACDFBBDHCZlzZk7tJ1+u
+ EAz/BtrjYYIaW507sxA7M3r8UosbjISmFqu8fuZQZw==
+X-Google-Smtp-Source: ABdhPJzKPY5+AosojAOsMf5//CbEsDG7qRW3/e0s545y2t9TU7KMtsojg5imxCq5qHPLc+yrFU5vqzypZk2T/AWwJ94=
+X-Received: by 2002:a63:7c03:: with SMTP id x3mr14146005pgc.433.1643092279490; 
+ Mon, 24 Jan 2022 22:31:19 -0800 (PST)
 MIME-Version: 1.0
-References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
- <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
- <87fsuxq049.wl-maz@kernel.org> <20210825150713.5rpwzm4grfn7akcw@gator.home>
- <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
- <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
- <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
- <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
- <87ilyitt6e.wl-maz@kernel.org>
- <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
- <87lf3drmvp.wl-maz@kernel.org>
- <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
-In-Reply-To: <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Mon, 24 Jan 2022 19:47:04 -0800
-Message-ID: <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20220106042708.2869332-1-reijiw@google.com>
+ <CA+EHjTz1=Nwd97GzagkAqZ08m-yGUHeujmtX45mLDD1beF8Ykg@mail.gmail.com>
+In-Reply-To: <CA+EHjTz1=Nwd97GzagkAqZ08m-yGUHeujmtX45mLDD1beF8Ykg@mail.gmail.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Mon, 24 Jan 2022 22:31:03 -0800
+Message-ID: <CAAeT=FzC4U380ZhhxFgZ0xa5xae2ZUf5uFOOfjT2RA6K2btX_w@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 00/26] KVM: arm64: Make CPU ID registers writable
+ by userspace
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,150 +85,165 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hello all,
+Hi Fuad,
 
-Based on the recent discussion on the patch '[RFC PATCH v3 01/11] KVM:
-Capture VM start' [1], Reiji, I (and others in the team) were
-wondering, since the hypercall feature-map is technically per-VM and
-not per-vCPU, would it make more sense to present it as a kvm_device,
-rather than vCPU psuedo-registers to the userspace?
+On Mon, Jan 24, 2022 at 8:19 AM Fuad Tabba <tabba@google.com> wrote:
+>
+> Hi Reiji,
+>
+> On Thu, Jan 6, 2022 at 4:27 AM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> > The patch series is for both VHE and non-VHE, except for protected VMs,
+> > which have a different way of configuring ID registers based on its
+> > different requirements [1].
+>
+> I am reviewing this patch series and I really like your approach. I
+> think that once it's through we might be able to generalize it for
+> protected VMs as well (I did some of the work for the ID registers for
+> those).
 
-If I understand correctly, the original motivation for going with
-pseudo-registers was to comply with QEMU, which uses KVM_GET_REG_LIST
-and KVM_[GET|SET]_ONE_REG interface, but I'm guessing the VMMs doing
-save/restore across migration might write the same values for every
-vCPU.
+Thank you for the review and comments for the series.
+I will be looking at your comments.
 
-Granted that we would be diverging from the existing implementation
-(psci versioning and spectre WA registers), but this can be a cleaner
-way forward for extending hypercall support. The kvm_device interface
-can be made backward compatible with the way hypercalls are exposed
-today, it can have the same registers/features discovery mechanisms
-that we discussed above, and majorly the userspace has to configure it
-only once per-VM. We can probably make the feature selection immutable
-just before any vCPU is created.
+> > The series is based on v5.16-rc8 with the patch [3] applied.
+>
+> I tried to apply this series on v5.16-rc8 after applying
+> 20220104194918.373612-2-rananta@google.com, and it didn't apply
+> cleanly. If you could point me to a working branch that I could
+> checkout I would like to test it and experiment with it a bit more.
 
-Please let me know your thoughts or any disadvantages that I'm overlooking.
+I'm sorry for the inconvenience.  I'm not sure why though...
+I tried that again (applied the series on v5.16-rc8 after applying
+20220104194918.373612-2-rananta@google.com), and it worked fine.
+
+Anyway, you can find the branch at:
+ https://github.com/reijiw-kvm/kvmarm-idreg/tree/id-regs-v4-5.16-rc8
 
 Thanks,
-Raghavendra
-
-[1]: https://lore.kernel.org/kvmarm/CAJHc60zhRyOad7AqtEFn-Ptro5BGVkfpB2wXWGw5EZMxOHUc=w@mail.gmail.com/
+Reiji
 
 
-
-On Fri, Oct 1, 2021 at 8:38 AM Oliver Upton <oupton@google.com> wrote:
 >
-> On Fri, Oct 1, 2021 at 4:43 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Thu, 30 Sep 2021 18:24:23 +0100,
-> > Oliver Upton <oupton@google.com> wrote:
-> > >
-> > > Hey Marc,
-> > >
-> > > On Thu, Sep 30, 2021 at 12:32 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > >
-> > > > Hi Oliver,
-> > > >
-> > > > On Wed, 29 Sep 2021 19:22:05 +0100,
-> > > > Oliver Upton <oupton@google.com> wrote:
-> > > > >
-> > > > > I have some lingering thoughts on this subject since we last spoke and
-> > > > > wanted to discuss.
-> > > > >
-> > > > > I'm having a hard time figuring out how a VMM should handle a new
-> > > > > hypercall identity register introduced on a newer kernel. In order to
-> > > > > maintain guest ABI, the VMM would need to know about that register and
-> > > > > zero it when restoring an older guest.
-> > > >
-> > > > Just as it would need to be able to discover any new system register
-> > > > exposed by default, as it happens at all times. Which is why we have a
-> > > > way to discover all the registers, architected or not.
-> > > >
-> > > > > Perhaps instead we could reserve a range of firmware registers as the
-> > > > > 'hypercall identity' registers. Implement all of them as RAZ/WI by
-> > > > > default, encouraging userspace to zero these registers away for older
-> > > > > VMs but still allowing an old userspace to pick up new KVM features.
-> > > > > Doing so would align the hypercall identity registers with the feature
-> > > > > ID registers from the architecture.
-> > > >
-> > > > The range already exists in the form of the "coprocessor" 0x14. I
-> > > > don't see the need to expose it as RAZ/WI, however. If userspace
-> > > > doesn't know about how this pseudo-register works, it won't be able to
-> > > > program it anyway.
-> > > >
-> > > > I don't buy the parallel with the ID-regs either. They are RAZ/WI by
-> > > > default so that they don't UNDEF at runtime. The meaning of a RAZ
-> > > > id-register is also well defined (feature not implemented), and the
-> > > > CPU cannot write to them. In a way, the ID-regs *are* the enumeration
-> > > > mechanism.
-> > > >
-> > > > Our firmware registers don't follow the same rules. Userspace can
-> > > > write to them, and there is no such "not implemented" rule (case in
-> > > > point, PSCI). We also have a separate enumeration mechanism
-> > > > (GET_ONE_REG), which is (more or less) designed for userspace to find
-> > > > what is implemented.
-> > > >
-> > > > For these reasons, I don't immediately see the point of advertising a
-> > > > set of registers ahead of time, before userspace grows an
-> > > > understanding of what these registers mean.
-> > >
-> > > Supposing we don't preallocate some hypercall ID registers, how can we
-> > > safely migrate a guest from an older kernel to newer kernel? Ideally,
-> > > we would preserve the hypercall feature set across the migration which
-> > > could work for a while with the first set of registers that get
-> > > defined, but whenever a new hypercall firmware register comes along
-> > > then the VMM will be clueless to the new ABI.
-> >
-> > My expectations were that whenever userspace writes a set of firmware
-> > register, all the defaults are invalidated. For example say that
-> > host-A know about a single hypercall register, while host-B knows
-> > about two. Upon writing to the first register, the host would clear
-> > the set of available services in the second one. If userspace
-> > eventually writes there, the value would stick if valid.
-> >
-> > Also, remember that pseudo-registers don't have to be 64bit. We could
-> > define a new class of hypercall-specific registers that would be much
-> > wider, and thus have a larger write granularity (KVM supports anything
-> > from 8 to 2048 bits). This would make it pretty easy to implement the
-> > above.
-> >
-> > > Fundamentally, I don't think userspace should need a patch to preserve
-> > > ABI on a newer kernel. Despite that, it would seem that userspace will
-> > > need to learn of any firmware registers that control hypercall
-> > > features which come after the initial set that gets proposed. If
-> > > KVM_GET_REG_LIST were to disambiguate between ID registers (hypercall,
-> > > architectural feature ID registers) from other parts of the vCPU
-> > > state, it would be clear to what registers to zero on a newer kernel.
-> > > Apologies if it is distracting to mention the feature ID registers
-> > > here, but both are on my mind currently and want to make sure there is
-> > > some consistency in how features get handled on newer kernels,
-> > > architected or not.
-> >
-> > The problem I see is that we will always need to grow the HC register
-> > space one way or another, no matter how many we reserve. Your approach
-> > only works if we don't exceed that particular range. Maybe it will
-> > never be a problem, but it remains that this is not scalable.
-> >
-> > If we wanted to be safe, we'd reserve the whole of the possible space
-> > as defined by the SMCCC spec. Given that we currently have two HC
-> > spaces (the ARM-controlled one, and the KVM-specific one), the
-> > function space being 16bits in each case, that's 16kB worth of zeroes
-> > that userspace has to save/restore at all times... I'm not overly
-> > enthusiastic.
 >
-> Yeah, that's definitely overkill.
 >
-> I agree with your position; we can solve the issue altogether by
-> enforcing ordering on the hypercall registers. Userspace should read
-> all hypercall registers to discover features, then write them. Given
-> your suggestion, I don't know if there is much need for the guesswork
-> to conclude on an appropriate register size for the hypercall bitmaps.
-> 64 bits seems fine to me..
 >
-> --
-> Thanks,
-> Oliver
+> > v4:
+> >   - Make ID registers storage per VM instead of per vCPU. [Marc]
+> >   - Implement arm64_check_features() in arch/arm64/kernel/cpufeature.c
+> >     by using existing codes in the file. [Marc]
+> >   - Use a configuration function to enable traps for disabled
+> >     features. [Marc]
+> >   - Document ID registers become immutable after the first KVM_RUN [Eric]
+> >   - Update ID_AA64PFR0.GIC at the point where a GICv3 is created. [Marc]
+> >   - Get TGranX's bit position by substracting 12 from TGranX_2's bit
+> >     position. [Eric]
+> >   - Don't validate AArch32 ID registers when the system doesn't support
+> >     32bit EL0. [Eric]
+> >   - Add/fixes comments for patches. [Eric]
+> >   - Made bug fixes/improvements of the selftest. [Eric]
+> >   - Added .kunitconfig for arm64 KUnit tests
+> >
+> > v3: https://lore.kernel.org/all/20211117064359.2362060-1-reijiw@google.com/
+> >   - Remove ID register consistency checking across vCPUs. [Oliver]
+> >   - Change KVM_CAP_ARM_ID_REG_WRITABLE to
+> >     KVM_CAP_ARM_ID_REG_CONFIGURABLE. [Oliver]
+> >   - Add KUnit testing for ID register validation and trap initialization.
+> >   - Change read_id_reg() to take care of ID_AA64PFR0_EL1.GIC.
+> >   - Add a helper of read_id_reg() (__read_id_reg()) and use the helper
+> >     instead of directly using __vcpu_sys_reg().
+> >   - Change not to run kvm_id_regs_consistency_check() and
+> >     kvm_vcpu_init_traps() for protected VMs.
+> >   - Update selftest to remove test cases for ID register consistency.
+> >     checking across vCPUs and to add test cases for ID_AA64PFR0_EL1.GIC.
+> >
+> > v2: https://lore.kernel.org/all/20211103062520.1445832-1-reijiw@google.com/
+> >   - Remove unnecessary line breaks. [Andrew]
+> >   - Use @params for comments. [Andrew]
+> >   - Move arm64_check_features to arch/arm64/kvm/sys_regs.c and
+> >     change that KVM specific feature check function.  [Andrew]
+> >   - Remove unnecessary raz handling from __set_id_reg. [Andrew]
+> >   - Remove sys_val field from the initial id_reg_info and add it
+> >     in the later patch. [Andrew]
+> >   - Call id_reg->init() from id_reg_info_init(). [Andrew]
+> >   - Fix cpuid_feature_cap_perfmon_field() to convert 0xf to 0x0
+> >     (and use it in the following patches).
+> >   - Change kvm_vcpu_first_run_init to set has_run_once to false
+> >     when kvm_id_regs_consistency_check() fails.
+> >   - Add a patch to introduce id_reg_info for ID_AA64MMFR0_EL1,
+> >     which requires special validity checking for TGran*_2 fields.
+> >   - Add patches to introduce id_reg_info for ID_DFR1_EL1 and
+> >     ID_MMFR0_EL1, which are required due to arm64_check_features
+> >     implementation change.
+> >   - Add a new argument, which is a pointer to id_reg_info, for
+> >     id_reg_info's validate().
+> >
+> > v1: https://lore.kernel.org/all/20211012043535.500493-1-reijiw@google.com/
+> >
+> > [1] https://lore.kernel.org/kvmarm/20211010145636.1950948-1-tabba@google.com/
+> > [2] https://lore.kernel.org/kvm/20201102033422.657391-1-liangpeng10@huawei.com/
+> > [3] https://lore.kernel.org/all/20220104194918.373612-2-rananta@google.com/
+> >
+> > Reiji Watanabe (26):
+> >   KVM: arm64: Introduce a validation function for an ID register
+> >   KVM: arm64: Save ID registers' sanitized value per guest
+> >   KVM: arm64: Introduce struct id_reg_info
+> >   KVM: arm64: Make ID_AA64PFR0_EL1 writable
+> >   KVM: arm64: Make ID_AA64PFR1_EL1 writable
+> >   KVM: arm64: Make ID_AA64ISAR0_EL1 writable
+> >   KVM: arm64: Make ID_AA64ISAR1_EL1 writable
+> >   KVM: arm64: Make ID_AA64MMFR0_EL1 writable
+> >   KVM: arm64: Hide IMPLEMENTATION DEFINED PMU support for the guest
+> >   KVM: arm64: Make ID_AA64DFR0_EL1 writable
+> >   KVM: arm64: Make ID_DFR0_EL1 writable
+> >   KVM: arm64: Make MVFR1_EL1 writable
+> >   KVM: arm64: Make ID registers without id_reg_info writable
+> >   KVM: arm64: Add consistency checking for frac fields of ID registers
+> >   KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE capability
+> >   KVM: arm64: Add kunit test for ID register validation
+> >   KVM: arm64: Use vcpu->arch cptr_el2 to track value of cptr_el2 for VHE
+> >   KVM: arm64: Use vcpu->arch.mdcr_el2 to track value of mdcr_el2
+> >   KVM: arm64: Introduce framework to trap disabled features
+> >   KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
+> >   KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
+> >   KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
+> >   KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
+> >   KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
+> >   KVM: arm64: Add kunit test for trap initialization
+> >   KVM: arm64: selftests: Introduce id_reg_test
+> >
+> >  Documentation/virt/kvm/api.rst                |   12 +
+> >  arch/arm64/include/asm/cpufeature.h           |    3 +-
+> >  arch/arm64/include/asm/kvm_arm.h              |   32 +
+> >  arch/arm64/include/asm/kvm_host.h             |   19 +
+> >  arch/arm64/include/asm/sysreg.h               |    3 +
+> >  arch/arm64/kernel/cpufeature.c                |  228 +++
+> >  arch/arm64/kvm/.kunitconfig                   |    4 +
+> >  arch/arm64/kvm/Kconfig                        |   11 +
+> >  arch/arm64/kvm/arm.c                          |   24 +-
+> >  arch/arm64/kvm/debug.c                        |   13 +-
+> >  arch/arm64/kvm/hyp/vhe/switch.c               |   14 +-
+> >  arch/arm64/kvm/sys_regs.c                     | 1329 +++++++++++++++--
+> >  arch/arm64/kvm/sys_regs_test.c                | 1247 ++++++++++++++++
+> >  arch/arm64/kvm/vgic/vgic-init.c               |    5 +
+> >  include/uapi/linux/kvm.h                      |    1 +
+> >  tools/arch/arm64/include/asm/sysreg.h         |    1 +
+> >  tools/testing/selftests/kvm/.gitignore        |    1 +
+> >  tools/testing/selftests/kvm/Makefile          |    1 +
+> >  .../selftests/kvm/aarch64/id_reg_test.c       | 1239 +++++++++++++++
+> >  19 files changed, 4041 insertions(+), 146 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/.kunitconfig
+> >  create mode 100644 arch/arm64/kvm/sys_regs_test.c
+> >  create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
+> >
+> >
+> > base-commit: d399b107ee49bf5ea0391bd7614d512809e927b0
+> > --
+> > 2.34.1.448.ga2b2bfdf31-goog
+> >
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
