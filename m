@@ -2,59 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DA8C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 12:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C19D0C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 12:26:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F114C49E49;
-	Tue, 25 Jan 2022 07:15:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3103A49E3F;
+	Tue, 25 Jan 2022 07:26:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7KZBi+jKcHUf; Tue, 25 Jan 2022 07:15:40 -0500 (EST)
+	with ESMTP id zBIYvcQsQ6Qt; Tue, 25 Jan 2022 07:25:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB2C49B0A;
-	Tue, 25 Jan 2022 07:15:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13F7249E08;
+	Tue, 25 Jan 2022 07:25:59 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A4F849AF7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 07:15:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 154E149E08
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 07:25:58 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tsqg8wPEaKNc for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Jan 2022 07:15:39 -0500 (EST)
+ with ESMTP id YUKtba+FKBCP for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jan 2022 07:25:56 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C475411BD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 07:15:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C255049B0A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 07:25:56 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 633F9B817ED;
- Tue, 25 Jan 2022 12:15:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAC0EC340E0;
- Tue, 25 Jan 2022 12:15:32 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 3D705B817E6;
+ Tue, 25 Jan 2022 12:25:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1DDFC340E8;
+ Tue, 25 Jan 2022 12:25:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643112936;
- bh=+BPgF8RegY0meHVcPfjKYDlnsQFJtpvb4tI1Bi3dYXE=;
+ s=k20201202; t=1643113554;
+ bh=5B9ipYG7P2XAgJiApkrkAj/aL+rVlE6P2bCU9qSvapk=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=MtM0nmjKZgFQbwMBnBGO/d5R3rHePax1BqLreg9msC+fpgKIGKk0ZGrk7Lk0bWo08
- jEaruAfvfaT3zWVSlNFBOE3WVaQ9xfJPC87FnkuwedSYGET09lWy1LCQeiBinB2rdb
- lwgoV5gjF8Go/Nj7Wl5q8tq8sn16X+fOInxNXBfHDuXccGOu652i/xwLYjX9+YmsA4
- AtnS6Pr1WTGHgZog1BdwBhDrBatOqqHwnXEs3cQqdMN0o1lf6v32CgLbJkRKEyhUkx
- 9HxKqsipXfZG/GWBrdy12AHY+uHLxC6nxRDSSpqUg29V1zJ9u9g6xJqsviMtfNb3OI
- u+vA4aFtVw4Fw==
-Date: Tue, 25 Jan 2022 12:15:29 +0000
+ b=PS9tLmv0jJluiKXrT6PmvhZ/8nrKq52kM+3Ipn1TbFwOWu0GUUTP4RD4RgTKcRMAI
+ mqJwDpEi6BJMVRl4JVSZkm6N181F7XGH6io2CR67oRP74Uf3//Xqy9GbY7wGB9JZJh
+ A25OKzB99K2UJ31J4UX9loeAeziFbI3ACh0Fr/0HF75LvTg+v2bqf0WUd/UH5hJG01
+ HoxHQ/GyR5Y5/zXYI1VVF6u9+JS2lnr1mlSBpSrX1TSMaMtC9uUhOqxLVTV7i8lFwJ
+ 0mkCF5Y5UGDoFXzcRg3NQ9gfgNt/ai5w9aXbSDWtieYH1TXf3/+iGb4d3/QFUAdMrV
+ p/Qjm657opWLw==
+Date: Tue, 25 Jan 2022 12:25:47 +0000
 From: Mark Brown <broonie@kernel.org>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v8 05/38] arm64/sme: System register and exception
- syndrome definitions
-Message-ID: <Ye/p4YpWWnZSPFaZ@sirena.org.uk>
+Subject: Re: [PATCH v8 25/38] KVM: arm64: Trap SME usage in guest
+Message-ID: <Ye/sS0jEXnBuumeG@sirena.org.uk>
 References: <20220125001114.193425-1-broonie@kernel.org>
- <20220125001114.193425-6-broonie@kernel.org>
- <87zgnk6or8.wl-maz@kernel.org>
+ <20220125001114.193425-26-broonie@kernel.org>
+ <87y2346on8.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87zgnk6or8.wl-maz@kernel.org>
+In-Reply-To: <87y2346on8.wl-maz@kernel.org>
 X-Cookie: The second best policy is dishonesty.
 Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
  Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
@@ -75,52 +74,76 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============9051762072174147319=="
+Content-Type: multipart/mixed; boundary="===============2972823055958245614=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 
---===============9051762072174147319==
+--===============2972823055958245614==
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="DA6PqB3G+/AhTsSL"
+	protocol="application/pgp-signature"; boundary="HlKet4hlDtIiiSTT"
 Content-Disposition: inline
 
 
---DA6PqB3G+/AhTsSL
+--HlKet4hlDtIiiSTT
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Tue, Jan 25, 2022 at 11:25:31AM +0000, Marc Zyngier wrote:
-> On Tue, 25 Jan 2022 00:10:41 +0000,
+On Tue, Jan 25, 2022 at 11:27:55AM +0000, Marc Zyngier wrote:
 > Mark Brown <broonie@kernel.org> wrote:
 
-> > +/* HFG[WR]TR_EL2 bit definitions */
-> > +#define HFGxTR_EL2_nTPIDR_EL0_SHIFT	55
-> > +#define HFGxTR_EL2_nTPIDR_EL0_MASK	(1 << HFGxTR_EL2_nTPIDR_EL0_SHIFT)
+> > +	if (IS_ENABLED(CONFIG_ARM64_SME) && cpus_have_final_cap(ARM64_SME))
 
-> This annoyingly clashes with bit 35 of the same registers, which maps
-> to TPIDR_EL0. I have the feeling that this really should be TPIDR2_EL0.
+> Please drop the IS_ENABLED(). We purposely avoid conditional
+> compilation in KVM in order to avoid bitrot, and the amount of code
+> you save isn't significant. Having a static key is more than enough to
+> avoid runtime costs.
 
-Yes, it should be.
+Sure, I wanted to be extra careful here as this is all in hot paths and
+going to get moved elsewhere when we have real guest support.
 
---DA6PqB3G+/AhTsSL
+> > +	if (IS_ENABLED(CONFIG_ARM64_SME) && cpus_have_final_cap(ARM64_SME) &&
+> > +	    cpus_have_final_cap(ARM64_HAS_FGT)) {
+> > +		val = read_sysreg_s(SYS_HFGRTR_EL2);
+> > +		val &= ~(HFGxTR_EL2_nTPIDR_EL0_MASK |
+> > +			 HFGxTR_EL2_nSMPRI_EL1_MASK);
+> > +		write_sysreg_s(val, SYS_HFGRTR_EL2);
+> > +
+> > +		val = read_sysreg_s(SYS_HFGWTR_EL2);
+> > +		val &= ~(HFGxTR_EL2_nTPIDR_EL0_MASK |
+> > +			 HFGxTR_EL2_nSMPRI_EL1_MASK);
+> > +		write_sysreg_s(val, SYS_HFGWTR_EL2);
+> > +	}
+
+> If the CPUs do not have FGT, what provides the equivalent trapping?
+
+Nothing for nVHE mode.
+
+> If FGT is mandatory when SME exists, then you should simplify the
+> condition.
+
+OK, I'll remove the defensiveness here.  FGT is mandatory from v8.6 and
+SME is a v9 feature so people shouldn't build a SME implementation that
+lacks FGT.
+
+--HlKet4hlDtIiiSTT
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmHv6eEACgkQJNaLcl1U
-h9Bqogf/cPq0bM4yoDggdP1uvRbGK1VpH1TSSNyNLxG6PNgq8w3D5EY8BuCDrP40
-Ss+eJ0UElwdsoXScwvFKoIeXt6pGtughyC2uEnxz+rif0YlGOQyoWg9SWbzq56+g
-lSrYeMGyIPzHiJaXtjsFQEQBfiRoxEGilmte8Owq01WhyTea9cEZbYyu9Wk8pjJZ
-GWPOOMBXqCRPL5zbFVJsGEV4meEMFew/pqNCZJw5jgkUEHGj8ln92kipxoE8YULJ
-ibed2fmR2WpadC7SftEzh9S/Gd+I2XBxtw5bg7f8OSqn0NAit0umxnwXVmT1jGxu
-+kQ/lXqNg/SndWNAKKGAWteJRQqTUA==
-=nbA7
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmHv7EoACgkQJNaLcl1U
+h9CPdwf/bepHM47acsAUJ/1SIELl2t6fb0e3PrHQy3ufg4GKQoisB2ANDhSGiKsa
+3OuSW0C6z4VSsOMnjzoiIBHO0mpQ1Q0lGtZoZk5kiQMASY5kvzIvebAwxxQZ3+NT
+kEqUu1zQHln1+t0vIrQX4W5aOV+B2PP1WIVEmWYRETuHYmBPJTWLymDzVORJsCDu
+uXBhoLNH10E/7D8ouGsYrYKFhJdiWoBsSstWUszgsq/VYHOJmAjhc7phBP9roUwY
+7m/O5xgUW8uIKRBLmjOYJGPdCxZxbN8sWmXdZVxDW3DeThj0EspdSsZ5Ruaib9Ws
+cJZA2h5jK5cJwpyCWb7vltdzl03rhw==
+=m+CQ
 -----END PGP SIGNATURE-----
 
---DA6PqB3G+/AhTsSL--
+--HlKet4hlDtIiiSTT--
 
---===============9051762072174147319==
+--===============2972823055958245614==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -131,4 +154,4 @@ kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
---===============9051762072174147319==--
+--===============2972823055958245614==--
