@@ -2,96 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE53C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 18:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F450C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 25 Jan 2022 19:30:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B939E49EF4;
-	Tue, 25 Jan 2022 13:43:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A444A49ECF;
+	Tue, 25 Jan 2022 14:30:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9v9Kft-lO9Nz; Tue, 25 Jan 2022 13:43:05 -0500 (EST)
+	with ESMTP id aI61R6sBdCEo; Tue, 25 Jan 2022 14:30:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AB7D49E35;
-	Tue, 25 Jan 2022 13:43:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 45E3849E27;
+	Tue, 25 Jan 2022 14:30:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D586D41003
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 13:43:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AF9F049AF9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 14:30:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lcEGW8eDzLnW for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Jan 2022 13:43:02 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8708240E00
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 13:43:02 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1643136182;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=k/E8W/vFo172c5tLpHmdy+vUoVoEPG0qfVKMS8tIOlk=;
- b=bOzVR+JulCFXAfDzR8tu83XPUPrmMdYHhGZbNdC8arC7PSaey8i18eNN+/2hrGB3NtBv8/
- xiEKwLFNcZMfIFL+GbtYKvZaJJLOudWUD6bL/FZLRT0si2e3v9iTvuyvuMQs7zu4D40lSs
- dZLFLfYgI+BMEc97tQuPOj1ZZ8dcrrk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-131-KusHN2JIPWW2w74AL9fwhA-1; Tue, 25 Jan 2022 13:43:00 -0500
-X-MC-Unique: KusHN2JIPWW2w74AL9fwhA-1
-Received: by mail-wr1-f69.google.com with SMTP id
- j26-20020adfb31a000000b001d8e22f75fbso3467946wrd.20
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 10:43:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=k/E8W/vFo172c5tLpHmdy+vUoVoEPG0qfVKMS8tIOlk=;
- b=wwnj7yH1bhScxwCLKjjSWoACRDVx77aoMA+zMGh0AP9ojTC58Jaqbu/8XKZ7/egFSH
- YoANEJ6MSKIXgoS10EpSCBnir/Zzgp/+HPeWQzXt6d+lgZ+8bxHQLZRXGuCL7imDmKGk
- XaOzbjfonrE32hXDVCrcafNkDzRpxRRsQFfKHtYy3U4xIxGhrEZiQdzU73Kjnim07PTg
- TXOyMz/guuIpUSTdPRVoQnltnLxlqL+CxqOdipXALPxnKz8ImynHn9ZLEY8tO42DT4gy
- k/VllSnR0BpmvC2d8e5buFwXS+f9S5P9YD6+v/EG8hlZ0lk9WGI64kP+Qf5fEVK0H9tb
- efeg==
-X-Gm-Message-State: AOAM5328sZXZ+LiV4nmEXKs3lMmU8BmiK/O1EpKugTzL2/px8HmIQBLj
- Hq3neEqZomk0GwmpZHKs+8EIBIoBeOkwXvhBGsGIJCvVXtt2lBEE6BEll2ltM35W3cUaLWAnoB7
- MBXAUY//kdnpawSi9a5DvjJSy
-X-Received: by 2002:a5d:6d04:: with SMTP id e4mr9512120wrq.398.1643136179216; 
- Tue, 25 Jan 2022 10:42:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyy/7ISkdIjSYoDZ1gzcYOgd0KtipUYjYIsylN82M3L6gXjY9mDWnzDzpKnA0PmGmlx+o5rrA==
-X-Received: by 2002:a5d:6d04:: with SMTP id e4mr9512106wrq.398.1643136178982; 
- Tue, 25 Jan 2022 10:42:58 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
- ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
- by smtp.gmail.com with ESMTPSA id 11sm1096881wmx.5.2022.01.25.10.42.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 25 Jan 2022 10:42:58 -0800 (PST)
-Subject: Re: [PATCH v4 07/21] KVM: arm64: Support SDEI_EVENT_UNREGISTER
- hypercall
-To: Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu
-References: <20210815001352.81927-1-gshan@redhat.com>
- <20210815001352.81927-8-gshan@redhat.com>
- <100a4aa0-6c2d-2fec-6f11-c7e64946ef0b@redhat.com>
- <11022feb-16d7-8732-0d3a-12a65a4e39de@redhat.com>
-From: Eric Auger <eauger@redhat.com>
-Message-ID: <60e5b475-2ebb-f697-9024-3afba7a7ab3e@redhat.com>
-Date: Tue, 25 Jan 2022 19:42:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+ with ESMTP id c0mH8+bfh3Ql for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Jan 2022 14:30:20 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4ED9840E25
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Jan 2022 14:30:20 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id EC3CD61155;
+ Tue, 25 Jan 2022 19:30:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D38C340E0;
+ Tue, 25 Jan 2022 19:30:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1643139018;
+ bh=btODPc+dZZQjxxnN5VCaILHerPfd9JLeVrfEn0bK9tk=;
+ h=From:To:Cc:Subject:Date:From;
+ b=dSaFsdFwwAbRTjAdd1rKt01j6MoQhSzqoCXB2ttuKNPsms8UHQdMsW+rxJYBkNFXd
+ 4MJVsENl3zHU69VdsZWGyNsDBYObbrZbAF3pjvSb7H+Y7C3SJ1xwa6JJGsOJvEDMJ3
+ mk7nEIOCoQQk7Mp2qAXTegcOnvX/btKBmaGrEUByTvkl9Tx6t6XESuXU2zwc6comKt
+ sAcvRzhvhfCs+wNUclZKB6J8en4RUY5Vcrkv577RFB0T0V+OCeM01kEYSyborXZaad
+ MarSneoWjlXL6UAmAosDhFFj7pVAnQPuZ0zfc5oaZAWw1g9RE9mB2GF/wWKzdJefxd
+ w9HQo8L8eHpfw==
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Subject: [PATCH] kselftest: kvm/arm64: Skip tests if we can't create a vgic-v3
+Date: Tue, 25 Jan 2022 19:28:51 +0000
+Message-Id: <20220125192851.3907611-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <11022feb-16d7-8732-0d3a-12a65a4e39de@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eauger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: maz@kernel.org, pbonzini@redhat.com, will@kernel.org,
- linux-kernel@vger.kernel.org, Jonathan.Cameron@huawei.com
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3268; h=from:subject;
+ bh=btODPc+dZZQjxxnN5VCaILHerPfd9JLeVrfEn0bK9tk=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBh8E8ZLLSOntKYlRv4TqS2Cfufo39D0QY0X34iBQg9
+ heFyjdKJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYfBPGQAKCRAk1otyXVSH0E6QCA
+ CAATGByCssAImuJDJhg0mPnn6WtDIRT6Qdp5QicLgIS0yy84siOHyM/APpEBo8VsO4SzEe+Yt2lxvW
+ +lPjCTHcszqOXLFL0M2kfeilUUqZ36Qy6KcrmalDt+v29KXzcx0xxCUiHTcWCpxN+EdXif4gaThT9z
+ vomXR0usgx5LHcbHkv5rPkbDiR6nFcKVvs0eOaVt2u4OOKvS4eDJVLGW1eXms+DF1AuC94oOGFpQi8
+ +CgFU2pBd2NRcu1U5NkzEPP8PKj2JCXuk+nR/6V/tfNNcsvh7TrwijEUoKd/Z0eW/4yjk664mCC9Qu
+ wfNB2mnHKn3WCThyad6cQ6YmXjueJv
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Cc: Mark Brown <broonie@kernel.org>, linux-kselftest@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,96 +76,90 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgR2F2aW4sCk9uIDEvMTIvMjIgMzozOCBBTSwgR2F2aW4gU2hhbiB3cm90ZToKPiBIaSBFcmlj
-LAo+IAo+IE9uIDExLzEwLzIxIDE6MDUgQU0sIEVyaWMgQXVnZXIgd3JvdGU6Cj4+IE9uIDgvMTUv
-MjEgMjoxMyBBTSwgR2F2aW4gU2hhbiB3cm90ZToKPj4+IFRoaXMgc3VwcG9ydHMgU0RFSV9FVkVO
-VF9VTlJFR0lTVEVSIGh5cGVyY2FsbC4gSXQncyB1c2VkIGJ5IHRoZQo+Pj4gZ3Vlc3QgdG8gdW5y
-ZWdpc3RlciBTREVJIGV2ZW50LiBUaGUgU0RFSSBldmVudCB3b24ndCBiZSByYWlzZWQgdG8KPj4+
-IHRoZSBndWVzdCBvciBzcGVjaWZpYyB2Q1BVIGFmdGVyIGl0J3MgdW5yZWdpc3RlcmVkIHN1Y2Nl
-c3NmdWxseS4KPj4+IEl0J3Mgbm90YWJsZSB0aGUgU0RFSSBldmVudCBpcyBkaXNhYmxlZCBhdXRv
-bWF0aWNhbGx5IG9uIHRoZSBndWVzdAo+Pj4gb3Igc3BlY2lmaWMgdkNQVSBvbmNlIGl0J3MgdW5y
-ZWdpc3RlcmVkIHN1Y2Nlc3NmdWxseS4KPj4+Cj4+PiBTaWduZWQtb2ZmLWJ5OiBHYXZpbiBTaGFu
-IDxnc2hhbkByZWRoYXQuY29tPgo+Pj4gLS0tCj4+PiDCoCBhcmNoL2FybTY0L2t2bS9zZGVpLmMg
-fCA2MSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrCj4+PiDCoCAx
-IGZpbGUgY2hhbmdlZCwgNjEgaW5zZXJ0aW9ucygrKQo+Pj4KPj4+IGRpZmYgLS1naXQgYS9hcmNo
-L2FybTY0L2t2bS9zZGVpLmMgYi9hcmNoL2FybTY0L2t2bS9zZGVpLmMKPj4+IGluZGV4IGI0MTYy
-ZWZkYTQ3MC4uYTNiYTY5ZGM5MWNiIDEwMDY0NAo+Pj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc2Rl
-aS5jCj4+PiArKysgYi9hcmNoL2FybTY0L2t2bS9zZGVpLmMKPj4+IEBAIC0zMDgsNiArMzA4LDY1
-IEBAIHN0YXRpYyB1bnNpZ25lZCBsb25nCj4+PiBrdm1fc2RlaV9oeXBlcmNhbGxfY29udGV4dChz
-dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+PiDCoMKgwqDCoMKgIHJldHVybiByZXQ7Cj4+PiDCoCB9
-Cj4+PiDCoCArc3RhdGljIHVuc2lnbmVkIGxvbmcga3ZtX3NkZWlfaHlwZXJjYWxsX3VucmVnaXN0
-ZXIoc3RydWN0IGt2bV92Y3B1Cj4+PiAqdmNwdSkKPj4+ICt7Cj4+PiArwqDCoMKgIHN0cnVjdCBr
-dm0gKmt2bSA9IHZjcHUtPmt2bTsKPj4+ICvCoMKgwqAgc3RydWN0IGt2bV9zZGVpX2t2bSAqa3Nk
-ZWkgPSBrdm0tPmFyY2guc2RlaTsKPj4+ICvCoMKgwqAgc3RydWN0IGt2bV9zZGVpX3ZjcHUgKnZz
-ZGVpID0gdmNwdS0+YXJjaC5zZGVpOwo+Pj4gK8KgwqDCoCBzdHJ1Y3Qga3ZtX3NkZWlfZXZlbnQg
-KmtzZSA9IE5VTEw7Cj4+PiArwqDCoMKgIHN0cnVjdCBrdm1fc2RlaV9rdm1fZXZlbnQgKmtza2Ug
-PSBOVUxMOwo+Pj4gK8KgwqDCoCB1bnNpZ25lZCBsb25nIGV2ZW50X251bSA9IHNtY2NjX2dldF9h
-cmcxKHZjcHUpOwo+Pj4gK8KgwqDCoCBpbnQgaW5kZXggPSAwOwo+Pj4gK8KgwqDCoCB1bnNpZ25l
-ZCBsb25nIHJldCA9IFNERUlfU1VDQ0VTUzsKPj4+ICsKPj4+ICvCoMKgwqAgLyogU2FuaXR5IGNo
-ZWNrICovCj4+PiArwqDCoMKgIGlmICghKGtzZGVpICYmIHZzZGVpKSkgewo+Pj4gK8KgwqDCoMKg
-wqDCoMKgIHJldCA9IFNERUlfTk9UX1NVUFBPUlRFRDsKPj4+ICvCoMKgwqDCoMKgwqDCoCBnb3Rv
-IG91dDsKPj4+ICvCoMKgwqAgfQo+Pj4gKwo+Pj4gK8KgwqDCoCBpZiAoIWt2bV9zZGVpX2lzX3Zh
-bGlkX2V2ZW50X251bShldmVudF9udW0pKSB7Cj4+PiArwqDCoMKgwqDCoMKgwqAgcmV0ID0gU0RF
-SV9JTlZBTElEX1BBUkFNRVRFUlM7Cj4+PiArwqDCoMKgwqDCoMKgwqAgZ290byBvdXQ7Cj4+PiAr
-wqDCoMKgIH0KPj4+ICsKPj4+ICvCoMKgwqAgLyogQ2hlY2sgaWYgdGhlIEtWTSBldmVudCBleGlz
-dHMgKi8KPj4+ICvCoMKgwqAgc3Bpbl9sb2NrKCZrc2RlaS0+bG9jayk7Cj4+PiArwqDCoMKgIGtz
-a2UgPSBrdm1fc2RlaV9maW5kX2t2bV9ldmVudChrdm0sIGV2ZW50X251bSk7Cj4+PiArwqDCoMKg
-IGlmICgha3NrZSkgewo+Pj4gK8KgwqDCoMKgwqDCoMKgIHJldCA9IFNERUlfSU5WQUxJRF9QQVJB
-TUVURVJTOwo+Pj4gK8KgwqDCoMKgwqDCoMKgIGdvdG8gdW5sb2NrOwo+Pj4gK8KgwqDCoCB9Cj4+
-PiArCj4+PiArwqDCoMKgIC8qIENoZWNrIGlmIHRoZXJlIGlzIHBlbmRpbmcgZXZlbnRzICovCj4+
-PiArwqDCoMKgIGlmIChrc2tlLT5zdGF0ZS5yZWZjb3VudCkgewo+Pj4gK8KgwqDCoMKgwqDCoMKg
-IHJldCA9IFNERUlfUEVORElORzsKPj4gZG9uJ3QgeW91IHdhbnQgdG8gcmVjb3JkIHRoZSBmYWN0
-IHRoZSB1bnJlZ2lzdHJhdGlvbiBpcyBvdXRzdGFuZGluZyB0bwo+PiBwZXJmb3JtIHN1YnNlcXVl
-bnQgYWN0aW9ucz8gT3RoZXJ3aXNlIG5vdGhpbmcgd2lsbCBoYXBlbiB3aGVuIHRoZQo+PiBjdXJy
-ZW50IGV4ZWN1dGluZyBoYW5kbGVycyBjb21wbGV0ZT8+Cj4gSXQncyBub3QgbmVjZXNzYXJ5LiBU
-aGUgZ3Vlc3Qgc2hvdWxkIHJldHJ5IGluIHRoaXMgY2FzZS4KCkkgZG8gbm90IHVuZGVyc3RhbmQg
-dGhhdCBmcm9tIHRoZSBzcGVjOgo2LjcgVW5yZWdpc3RlcmluZyBhbiBldmVudCBzYXlzCgpXaXRo
-IHRoZSBQRU5ESU5HIHN0YXR1cywgdGhlIHVucmVnaXN0ZXIgcmVxdWVzdCB3aWxsIGJlIHF1ZXVl
-ZCB1bnRpbCB0aGUKZXZlbnQgaXMgY29tcGxldGVkIHVzaW5nIFNERUlfRVZFTlRfQ09NUExFVEUg
-LgoKQWxzbyB0aGVyZSBpcyBzdGF0ZSBjYWxsZWQgIkhhbmRsZXItdW5yZWdpc3Rlci1wZW5kaW5n
-IgoKQnV0IHdlbGwgSSB3b3VsZCBuZWVkIHRvIGRpZyBmdXJ0aGVyIGludG8gdGhlIHNwZWMgYWdh
-aW4gOikKCgo+IAo+Pj4gK8KgwqDCoMKgwqDCoMKgIGdvdG8gdW5sb2NrOwo+Pj4gK8KgwqDCoCB9
-Cj4+PiArCj4+PiArwqDCoMKgIC8qIENoZWNrIGlmIGl0IGhhcyBiZWVuIHJlZ2lzdGVyZWQgKi8K
-Pj4+ICvCoMKgwqAga3NlID0ga3NrZS0+a3NlOwo+Pj4gK8KgwqDCoCBpbmRleCA9IChrc2UtPnN0
-YXRlLnR5cGUgPT0gU0RFSV9FVkVOVF9UWVBFX1BSSVZBVEUpID8KPj4+ICvCoMKgwqDCoMKgwqDC
-oCB2Y3B1LT52Y3B1X2lkeCA6IDA7Cj4+IHlvdSBjb3VsZCBoYXZlIGFuIGlubGluZSBmb3IgdGhl
-IGFib3ZlIGFzIHRoaXMgaXMgZXhlY3V0ZWQgaW4gbWFueQo+PiBmdW5jdGlvbnMuIGV2ZW4gaW5j
-bHVkaW5nIHRoZSBjb2RlIGJlbG93Lgo+IAo+IE9rLCBpdCdzIGEgZ29vZCBpZGVhLgo+IAo+Pj4g
-K8KgwqDCoCBpZiAoIWt2bV9zZGVpX2lzX3JlZ2lzdGVyZWQoa3NrZSwgaW5kZXgpKSB7Cj4+PiAr
-wqDCoMKgwqDCoMKgwqAgcmV0ID0gU0RFSV9ERU5JRUQ7Cj4+PiArwqDCoMKgwqDCoMKgwqAgZ290
-byB1bmxvY2s7Cj4+PiArwqDCoMKgIH0KPj4+ICsKPj4+ICvCoMKgwqAgLyogVGhlIGV2ZW50IGlz
-IGRpc2FibGVkIHdoZW4gaXQncyB1bnJlZ2lzdGVyZWQgKi8KPj4+ICvCoMKgwqAga3ZtX3NkZWlf
-Y2xlYXJfZW5hYmxlZChrc2tlLCBpbmRleCk7Cj4+PiArwqDCoMKgIGt2bV9zZGVpX2NsZWFyX3Jl
-Z2lzdGVyZWQoa3NrZSwgaW5kZXgpOwo+Pj4gK8KgwqDCoCBpZiAoa3ZtX3NkZWlfZW1wdHlfcmVn
-aXN0ZXJlZChrc2tlKSkgewo+PiBhIHJlZmNvdW50IG1lY2hhbmlzbSB3b3VsZCBiZSBjbGVhbmVy
-IEkgdGhpbmsuCj4gCj4gQSByZWZjb3VudCBpc24ndCB3b3JraW5nIHdlbGwuIFdlIG5lZWQgYSBt
-YXBwaW5nIGhlcmUgYmVjYXVzZSB0aGUgcHJpdmF0ZQo+IFNERUkgZXZlbnQgY2FuIGJlIGVuYWJs
-ZWQvcmVnaXN0ZXJlZCBvbiBtdWx0aXBsZSB2Q1BVcy4gV2UgbmVlZCB0byBrbm93Cj4gdGhlIGV4
-YWN0IHZDUFVzIHdoZXJlIHRoZSBwcml2YXRlIFNERUkgZXZlbnQgaXMgZW5hYmxlZC9yZWdpc3Rl
-cmVkLgoKSSBkb24ndCBnZXQgd2h5IHlvdSBjYW4ndCBpbmNyZW1lbnQvZGVjcmVtZW50IHRoZSBy
-ZWYgY291bnQgZWFjaCB0aW1lCnRoZSBldmVudCBpcyByZWdpc3RlcmVkL3VucmVnaXN0ZXJlZCBi
-eSBhIGdpdmVuIHZjcHUgdG8gbWFuYWdlIGl0cyBsaWZlCmN5Y2xlPyBEb2VzIG5vdCBtZWFuIHlv
-dSBkb24ndCBuZWVkIHRoZSBiaXRtYXAgdG8ga25vdyB0aGUgYWN0dWFsIG1hcHBpbmcuCgpUaGFu
-a3MKCkVyaWMKPiAKPj4+ICvCoMKgwqDCoMKgwqDCoCBsaXN0X2RlbCgma3NrZS0+bGluayk7Cj4+
-PiArwqDCoMKgwqDCoMKgwqAga2ZyZWUoa3NrZSk7Cj4+PiArwqDCoMKgIH0KPj4+ICsKPj4+ICt1
-bmxvY2s6Cj4+PiArwqDCoMKgIHNwaW5fdW5sb2NrKCZrc2RlaS0+bG9jayk7Cj4+PiArb3V0Ogo+
-Pj4gK8KgwqDCoCByZXR1cm4gcmV0Owo+Pj4gK30KPj4+ICsKPj4+IMKgIGludCBrdm1fc2RlaV9o
-eXBlcmNhbGwoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+Pj4gwqAgewo+Pj4gwqDCoMKgwqDCoCB1
-MzIgZnVuYyA9IHNtY2NjX2dldF9mdW5jdGlvbih2Y3B1KTsKPj4+IEBAIC0zMzMsNiArMzkyLDgg
-QEAgaW50IGt2bV9zZGVpX2h5cGVyY2FsbChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+PiDCoMKg
-wqDCoMKgIGNhc2UgU0RFSV8xXzBfRk5fU0RFSV9FVkVOVF9DT01QTEVURToKPj4+IMKgwqDCoMKg
-wqAgY2FzZSBTREVJXzFfMF9GTl9TREVJX0VWRU5UX0NPTVBMRVRFX0FORF9SRVNVTUU6Cj4+PiDC
-oMKgwqDCoMKgIGNhc2UgU0RFSV8xXzBfRk5fU0RFSV9FVkVOVF9VTlJFR0lTVEVSOgo+Pj4gK8Kg
-wqDCoMKgwqDCoMKgIHJldCA9IGt2bV9zZGVpX2h5cGVyY2FsbF91bnJlZ2lzdGVyKHZjcHUpOwo+
-Pj4gK8KgwqDCoMKgwqDCoMKgIGJyZWFrOwo+Pj4gwqDCoMKgwqDCoCBjYXNlIFNERUlfMV8wX0ZO
-X1NERUlfRVZFTlRfU1RBVFVTOgo+Pj4gwqDCoMKgwqDCoCBjYXNlIFNERUlfMV8wX0ZOX1NERUlf
-RVZFTlRfR0VUX0lORk86Cj4+PiDCoMKgwqDCoMKgIGNhc2UgU0RFSV8xXzBfRk5fU0RFSV9FVkVO
-VF9ST1VUSU5HX1NFVDoKPj4+Cj4gCj4gVGhhbmtzLAo+IEdhdmluCj4gCgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
-bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
-bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+The arch_timer and vgic_irq kselftests assume that they can create a
+vgic-v3, using the library function vgic_v3_setup() which aborts with a
+test failure if it is not possible to do so. Since vgic-v3 can only be
+instantiated on systems where the host has GICv3 this leads to false
+positives on older systems where that is not the case.
+
+Fix this by changing vgic_v3_setup() to return an error if the vgic can't
+be instantiated and have the callers skip if this happens. We could also
+exit flagging a skip in vgic_v3_setup() but this would prevent future test
+cases conditionally deciding which GIC to use or generally doing more
+complex output.
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 5 +++++
+ tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index 9ad38bd360a4..791d38404652 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -366,6 +366,7 @@ static struct kvm_vm *test_vm_create(void)
+ {
+ 	struct kvm_vm *vm;
+ 	unsigned int i;
++	int ret;
+ 	int nr_vcpus = test_args.nr_vcpus;
+ 
+ 	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
+@@ -382,7 +383,11 @@ static struct kvm_vm *test_vm_create(void)
+ 
+ 	ucall_init(vm, NULL);
+ 	test_init_timer_irq(vm);
+-	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
++	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
++	if (ret < 0) {
++		pr_info("Failed to create vgic-v3, skipping\n");
++		exit(KSFT_SKIP);
++	}
+ 
+ 	/* Make all the test's cmdline args visible to the guest */
+ 	sync_global_to_guest(vm, test_args);
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+index e6c7d7f8fbd1..8c6b61b8e6aa 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+@@ -761,6 +761,11 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
+ 
+ 	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
+ 			GICD_BASE_GPA, GICR_BASE_GPA);
++	if (gic_fd < 0) {
++		pr_info("Failed to create vgic-v3, skipping\n");
++		exit(KSFT_SKIP);
++	}
++
+ 
+ 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
+ 		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+index b3a0fca0d780..647c18733e1b 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+@@ -52,7 +52,9 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
+ 			nr_vcpus, nr_vcpus_created);
+ 
+ 	/* Distributor setup */
+-	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
++	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
++	if (gic_fd == -1)
++		return -1;
+ 
+ 	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
+ 			0, &nr_irqs, true);
+-- 
+2.30.2
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
