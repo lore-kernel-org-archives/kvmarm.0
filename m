@@ -2,62 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AACE2C2BA4C
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 19:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4492EC63684
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 20:11:33 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09CFB4B086;
-	Wed, 26 Jan 2022 14:53:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A20074B0C5;
+	Wed, 26 Jan 2022 15:11:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Rhm84-v1scFO; Wed, 26 Jan 2022 14:53:02 -0500 (EST)
+	with ESMTP id 0wblvKa66nDY; Wed, 26 Jan 2022 15:11:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C5354B0C5;
-	Wed, 26 Jan 2022 14:53:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FBA14B0E1;
+	Wed, 26 Jan 2022 15:11:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3415A4B08E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 14:53:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C3314B0C5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 15:11:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gZSTx60UicCZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 14:53:00 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E10B24B086
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 14:52:59 -0500 (EST)
+ with ESMTP id sRf6LFTcmQ2r for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 15:11:28 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23B124B0B9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 15:11:28 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 331A5B81AC2;
- Wed, 26 Jan 2022 19:52:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAF9DC340E3;
- Wed, 26 Jan 2022 19:52:54 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 2CD19617A3;
+ Wed, 26 Jan 2022 20:11:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 504D8C340E3;
+ Wed, 26 Jan 2022 20:11:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643226776;
- bh=lYnTOPW2Pkwco72TKCwFmkv1sef05aWRjM7kJ34pSNk=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Lf/8QN+efHRUBfI9x5RtjPSYqDl/9+Vt/n2mflRhwUO2g89GtR9sqOYZUNtdYNxCK
- Mxk5v9efCffbhIjWYHHpgWYumiMyHVdaop1XSqTwg0Mw3nubmEf6oCr8mn51BryUhy
- rg9YqUPniua+/iqn5yaYxlnm0BbFA6WAZ5aMNUUA16sFRsFmTelG4tOfr3B6ZIEDuN
- R9s0/LtCeR4Uh0TFGhEx7IgPuXiZwxBpkECopl+QpWaomzGihDbbIGf6y4jdoCDWWd
- /58BRDmHaJDOgxiC34WfnJaiOQyQ8uP6fI5JuMG4e9OTEOs2FidzXFWhC1TQLDCcJh
- FCiyXMswOy3NQ==
-Date: Wed, 26 Jan 2022 19:52:51 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: [PATCH v3] kselftest: kvm/arm64: Skip tests if we can't create a
- vgic-v3
-Message-ID: <YfGmk1I8l+ROoE/k@sirena.org.uk>
-References: <20220126145242.3473836-1-broonie@kernel.org>
- <4424dd30-f74b-006f-b540-dbaf02e45e28@linuxfoundation.org>
-MIME-Version: 1.0
-In-Reply-To: <4424dd30-f74b-006f-b540-dbaf02e45e28@linuxfoundation.org>
-X-Cookie: Use only in a well-ventilated area.
-Cc: Marc Zyngier <maz@kernel.org>, linux-kselftest@vger.kernel.org,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ s=k20201202; t=1643227886;
+ bh=UQmyc4A2PVzfOHmZNdtF8MLSSLUqSRys4+RLnb3F/xg=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=YywwW2zy/BXbWcIuqwZhmHZmc4dM0T/gIetVO/HHoaKR6VF+5ADHf7ck/2knK/oU6
+ WXZPTvMI5eC5Mu5JpeqgtkZEu5Mjxleu5+b2B6ze8ZdRhkDHdN2+5seRPwMpZYoqdS
+ 7cpWwsP8RuGdD0PI+7mpskpqsnPAY4UG2fb3HjxV7ETnaFHC4mrlLrFIuYKVWOjZgO
+ G8z7u/IKwj7GAXO7qIYMZUBOX4PdAOLwpwv/rWp8vIbOGuWeIZS1XQQwV7A3ZKAeAt
+ uQceWD+xXZpggbr9XWwTKnPbljHXg0iiTuL3/jifkKe2LrmqplOt3q44ac0gZVBn5l
+ o07kb8nL3H1nA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nCodX-003KGO-PT; Wed, 26 Jan 2022 20:11:23 +0000
+Date: Wed, 26 Jan 2022 20:11:23 +0000
+Message-ID: <877dam6yvo.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v5 14/69] KVM: arm64: nv: Support virtual EL2 exceptions
+In-Reply-To: <YebKfXhj08h9PoXb@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-15-maz@kernel.org>
+ <YebKfXhj08h9PoXb@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
+ jintack@cs.columbia.edu, haibo.xu@linaro.org,
+ gankulkarni@os.amperecomputing.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,59 +87,561 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============1291116105345185331=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Tue, 18 Jan 2022 14:11:09 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Mon, Nov 29, 2021 at 08:00:55PM +0000, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack.lim@linaro.org>
+> > 
+> > Support injecting exceptions and performing exception returns to and
+> > from virtual EL2.  This must be done entirely in software except when
+> > taking an exception from vEL0 to vEL2 when the virtual HCR_EL2.{E2H,TGE}
+> > == {1,1}  (a VHE guest hypervisor).
+> 
+> Might be useful to explain why emulation shouldn't (or can't) be done in
+> software in that particular case.
+> 
+> It looks to me like kvm_inject_nested() and kvm_emulate_nested_eret()
+> handles the above case, so why does does it say that emulation must not be
+> done entirely in software?
 
---===============1291116105345185331==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="URcG2D/2QfQA1Gjm"
-Content-Disposition: inline
+Not quite. What can be done in HW is the transition between EL0 and
+vEL2 when the guest is VHE (where EL2 looks just like EL1). Everything
+else has to be mediated one way or the other.
 
+> 
+> > 
+> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > [maz: switch to common exception injection framework]
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  .mailmap                             |   1 +
+> >  arch/arm64/include/asm/kvm_arm.h     |  17 +++
+> >  arch/arm64/include/asm/kvm_emulate.h |  10 ++
+> >  arch/arm64/include/asm/kvm_host.h    |   1 +
+> >  arch/arm64/kvm/Makefile              |   2 +-
+> >  arch/arm64/kvm/emulate-nested.c      | 176 +++++++++++++++++++++++++++
+> >  arch/arm64/kvm/hyp/exception.c       |  49 ++++++--
+> >  arch/arm64/kvm/inject_fault.c        |  68 +++++++++--
+> >  arch/arm64/kvm/trace_arm.h           |  59 +++++++++
+> >  9 files changed, 362 insertions(+), 21 deletions(-)
+> >  create mode 100644 arch/arm64/kvm/emulate-nested.c
+> > 
+> > diff --git a/.mailmap b/.mailmap
+> > index 14314e3c5d5e..491238a888cb 100644
+> > --- a/.mailmap
+> > +++ b/.mailmap
+> > @@ -167,6 +167,7 @@ Jeff Layton <jlayton@kernel.org> <jlayton@redhat.com>
+> >  Jens Axboe <axboe@suse.de>
+> >  Jens Osterkamp <Jens.Osterkamp@de.ibm.com>
+> >  Jernej Skrabec <jernej.skrabec@gmail.com> <jernej.skrabec@siol.net>
+> > +<jintack@cs.columbia.edu> <jintack.lim@linaro.org>
+> >  Jiri Slaby <jirislaby@kernel.org> <jirislaby@gmail.com>
+> >  Jiri Slaby <jirislaby@kernel.org> <jslaby@novell.com>
+> >  Jiri Slaby <jirislaby@kernel.org> <jslaby@suse.com>
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index a39fcf318c77..589a6b92d741 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -359,4 +359,21 @@
+> >  #define CPACR_EL1_TTA		(1 << 28)
+> >  #define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
+> >  
+> > +#define kvm_mode_names				\
+> > +	{ PSR_MODE_EL0t,	"EL0t" },	\
+> > +	{ PSR_MODE_EL1t,	"EL1t" },	\
+> > +	{ PSR_MODE_EL1h,	"EL1h" },	\
+> > +	{ PSR_MODE_EL2t,	"EL2t" },	\
+> > +	{ PSR_MODE_EL2h,	"EL2h" },	\
+> > +	{ PSR_MODE_EL3t,	"EL3t" },	\
+> > +	{ PSR_MODE_EL3h,	"EL3h" },	\
+> > +	{ PSR_AA32_MODE_USR,	"32-bit USR" },	\
+> > +	{ PSR_AA32_MODE_FIQ,	"32-bit FIQ" },	\
+> > +	{ PSR_AA32_MODE_IRQ,	"32-bit IRQ" },	\
+> > +	{ PSR_AA32_MODE_SVC,	"32-bit SVC" },	\
+> > +	{ PSR_AA32_MODE_ABT,	"32-bit ABT" },	\
+> > +	{ PSR_AA32_MODE_HYP,	"32-bit HYP" },	\
+> > +	{ PSR_AA32_MODE_UND,	"32-bit UND" },	\
+> > +	{ PSR_AA32_MODE_SYS,	"32-bit SYS" }
+> > +
+> >  #endif /* __ARM64_KVM_ARM_H__ */
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index f4b079945d0f..46c849ba281e 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -33,6 +33,12 @@ enum exception_type {
+> >  	except_type_serror	= 0x180,
+> >  };
+> >  
+> > +#define kvm_exception_type_names		\
+> > +	{ except_type_sync,	"SYNC"   },	\
+> > +	{ except_type_irq,	"IRQ"    },	\
+> > +	{ except_type_fiq,	"FIQ"    },	\
+> > +	{ except_type_serror,	"SERROR" }
+> > +
+> >  bool kvm_condition_valid32(const struct kvm_vcpu *vcpu);
+> >  void kvm_skip_instr32(struct kvm_vcpu *vcpu);
+> >  
+> > @@ -41,6 +47,10 @@ void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+> >  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> >  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> >  
+> > +void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu);
+> > +int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2);
+> > +int kvm_inject_nested_irq(struct kvm_vcpu *vcpu);
+> > +
+> >  static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+> >  {
+> >  	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 4f642a2e9c34..7b6fe18ee450 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -477,6 +477,7 @@ struct kvm_vcpu_arch {
+> >  #define KVM_ARM64_EXCEPT_AA64_ELx_SERR	(3 << 9)
+> >  #define KVM_ARM64_EXCEPT_AA64_EL1	(0 << 11)
+> >  #define KVM_ARM64_EXCEPT_AA64_EL2	(1 << 11)
+> > +#define KVM_ARM64_EXCEPT_AA64_EL_MASK	(1 << 11)
+> >  
+> >  /*
+> >   * Overlaps with KVM_ARM64_EXCEPT_MASK on purpose so that it can't be
+> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> > index 989bb5dad2c8..1f602526e9a2 100644
+> > --- a/arch/arm64/kvm/Makefile
+> > +++ b/arch/arm64/kvm/Makefile
+> > @@ -16,7 +16,7 @@ kvm-y := $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o \
+> >  	 inject_fault.o va_layout.o handle_exit.o \
+> >  	 guest.o debug.o reset.o sys_regs.o \
+> >  	 vgic-sys-reg-v3.o fpsimd.o pmu.o \
+> > -	 arch_timer.o trng.o\
+> > +	 arch_timer.o trng.o emulate-nested.o \
+> >  	 vgic/vgic.o vgic/vgic-init.o \
+> >  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+> >  	 vgic/vgic-v3.o vgic/vgic-v4.o \
+> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > new file mode 100644
+> > index 000000000000..339e8272b01e
+> > --- /dev/null
+> > +++ b/arch/arm64/kvm/emulate-nested.c
+> > @@ -0,0 +1,176 @@
+> > +/*
+> > + * Copyright (C) 2016 - Linaro and Columbia University
+> > + * Author: Jintack Lim <jintack.lim@linaro.org>
+> > + *
+> > + * This program is free software; you can redistribute it and/or modify
+> > + * it under the terms of the GNU General Public License version 2 as
+> > + * published by the Free Software Foundation.
+> > + *
+> > + * This program is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > + * GNU General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License
+> > + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> 
+> Wouldn't an SPDX license identifier be better here?
 
---URcG2D/2QfQA1Gjm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Yup, done.
 
-On Wed, Jan 26, 2022 at 12:22:41PM -0700, Shuah Khan wrote:
-> On 1/26/22 7:52 AM, Mark Brown wrote:
+> 
+> > + */
+> > +
+> > +#include <linux/kvm.h>
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_nested.h>
+> > +
+> > +#include "hyp/include/hyp/adjust_pc.h"
+> > +
+> > +#include "trace.h"
+> > +
+> > +void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u64 spsr, elr, mode;
+> > +	bool direct_eret;
+> > +
+> > +	/*
+> > +	 * Going through the whole put/load motions is a waste of time
+> > +	 * if this is a VHE guest hypervisor returning to its own
+> > +	 * userspace, or the hypervisor performing a local exception
+> > +	 * return. No need to save/restore registers, no need to
+> > +	 * switch S2 MMU. Just do the canonical ERET.
+> > +	 */
+> > +	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> > +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > +
+> > +	direct_eret  = (mode == PSR_MODE_EL0t &&
+> > +			vcpu_el2_e2h_is_set(vcpu) &&
+> > +			vcpu_el2_tge_is_set(vcpu));
+> > +	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+> > +
+> > +	if (direct_eret) {
+> > +		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
+> > +		*vcpu_cpsr(vcpu) = spsr;
+> > +		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
+> > +		return;
+> > +	}
+> > +
+> > +	preempt_disable();
+> > +	kvm_arch_vcpu_put(vcpu);
+> > +
+> > +	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+> > +
+> > +	trace_kvm_nested_eret(vcpu, elr, spsr);
+> > +
+> > +	/*
+> > +	 * Note that the current exception level is always the virtual EL2,
+> > +	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
+> > +	 */
+> > +	*vcpu_pc(vcpu) = elr;
+> > +	*vcpu_cpsr(vcpu) = spsr;
+> > +
+> > +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
+> > +	preempt_enable();
+> > +}
+> > +
+> > +static void kvm_inject_el2_exception(struct kvm_vcpu *vcpu, u64 esr_el2,
+> > +				     enum exception_type type)
+> > +{
+> > +	trace_kvm_inject_nested_exception(vcpu, esr_el2, type);
+> > +
+> > +	switch (type) {
+> > +	case except_type_sync:
+> > +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_ELx_SYNC;
+> > +		break;
+> > +	case except_type_irq:
+> > +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_ELx_IRQ;
+> > +		break;
+> > +	default:
+> > +		WARN_ONCE(1, "Unsupported EL2 exception injection %d\n", type);
+> > +	}
+> > +
+> > +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL2		|
+> > +			     KVM_ARM64_PENDING_EXCEPTION);
+> > +
+> > +	vcpu_write_sys_reg(vcpu, esr_el2, ESR_EL2);
+> > +}
+> > +
+> > +/*
+> > + * Emulate taking an exception to EL2.
+> > + * See ARM ARM J8.1.2 AArch64.TakeException()
+> > + */
+> > +static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+> > +			     enum exception_type type)
+> > +{
+> > +	u64 pstate, mode;
+> > +	bool direct_inject;
+> > +
+> > +	if (!nested_virt_in_use(vcpu)) {
+> > +		kvm_err("Unexpected call to %s for the non-nesting configuration\n",
+> > +				__func__);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	/*
+> > +	 * As for ERET, we can avoid doing too much on the injection path by
+> > +	 * checking that we either took the exception from a VHE host
+> > +	 * userspace or from vEL2. In these cases, there is no change in
+> > +	 * translation regime (or anything else), so let's do as little as
+> > +	 * possible.
+> > +	 */
+> > +	pstate = *vcpu_cpsr(vcpu);
+> > +	mode = pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > +
+> > +	direct_inject  = (mode == PSR_MODE_EL0t &&
+> > +			  vcpu_el2_e2h_is_set(vcpu) &&
+> > +			  vcpu_el2_tge_is_set(vcpu));
+> > +	direct_inject |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+> > +
+> > +	if (direct_inject) {
+> > +		kvm_inject_el2_exception(vcpu, esr_el2, type);
+> > +		return 1;
+> > +	}
+> > +
+> > +	preempt_disable();
+> > +	kvm_arch_vcpu_put(vcpu);
+> > +
+> > +	kvm_inject_el2_exception(vcpu, esr_el2, type);
+> > +
+> > +	/*
+> > +	 * A hard requirement is that a switch between EL1 and EL2
+> > +	 * contexts has to happen between a put/load, so that we can
+> > +	 * pick the correct timer and interrupt configuration, among
+> > +	 * other things.
+> > +	 *
+> > +	 * Make sure the exception actually took place before we load
+> > +	 * the new context.
+> > +	 */
+> > +	__kvm_adjust_pc(vcpu);
+> > +
+> > +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
+> > +	preempt_enable();
+> > +
+> > +	return 1;
+> > +}
+> > +
+> > +int kvm_inject_nested_sync(struct kvm_vcpu *vcpu, u64 esr_el2)
+> > +{
+> > +	return kvm_inject_nested(vcpu, esr_el2, except_type_sync);
+> > +}
+> > +
+> > +int kvm_inject_nested_irq(struct kvm_vcpu *vcpu)
+> 
+> I assume this is actually injecting an IRQ to the guest's virtual EL2, not
+> a nested interrupt, right?
 
-> > +	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-> > +	if (ret < 0) {
-> > +		print_skip("Failed to create vgic-v3");
+Neither, really. This is injecting an IRQ *exception* into the guest.
+The actual interrupt delivery is done via the vgic. If nested
+interrupts (in the interrupt preemption sense) have to happen, the
+vgic will take care of it.
 
-> Printing the negative error code returned by vgic_v3_setup will be useful.
+> 
+> > +{
+> > +	/*
+> > +	 * Do not inject an irq if the:
+> > +	 *  - Current exception level is EL2, and
+> > +	 *  - virtual HCR_EL2.TGE == 0
+> > +	 *  - virtual HCR_EL2.IMO == 0
+> > +	 *
+> > +	 * See Table D1-17 "Physical interrupt target and masking when EL3 is
+> > +	 * not implemented and EL2 is implemented" in ARM DDI 0487C.a.
+> 
+> That's now Table D1-13 in ARM DDI 0487G.a, the latest Arm ARM as of now, in
+> case you want to update the comment. The table name isn't unchanged, so
+> that can be used to find it in newer versions, so I don't think the update
+> is strictly necessary.
+> 
+> I assume the comment refers to the first line of the table, as that's the
+> only case when an interrupt is unconditionally not taken when asserted.
+> But according to the table, the interrupt is not taken when the *target* EL
+> is EL1 and the CPU is executing at EL2. Which makes me very confused. Isn't
+> this function supposed to inject an interrupt to virtual EL2? If this
+> function also injects interrupts to virtual EL1, why doesn't it also check
+> that the target EL is EL1 before returning?
 
-If the function fails for any reason other than the system not
-supporting vgic-v3 it will abort rather than return.
+This is already checked by the caller: see kvm_vgic_flush_hwstate()
+which has the following sequence:
 
---URcG2D/2QfQA1Gjm
-Content-Type: application/pgp-signature; name="signature.asc"
+	if (vgic_state_is_nested(vcpu)) {
+		if (kvm_vgic_vcpu_pending_irq(vcpu))
+			kvm_make_request(KVM_REQ_GUEST_HYP_IRQ_PENDING, vcpu);
 
------BEGIN PGP SIGNATURE-----
+which ends up triggering the exception injection.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmHxppIACgkQJNaLcl1U
-h9Drpwf/VP/AtJtHPAgAVlI1NnA4IzzzhMgNH0jsweAqajJFm2bSjc/BLmWJ1PH6
-MdO7y23ckqvapSbg9Gmlw/AhR495m4AmRf1h0mMNdGo6D8fljhbRT0ICiw24GpI9
-H0Tz3wMrTPIIVpr3Iq/LvXYSeLZ0qHsVpZAKC6NoBN/Iok5fWOJBcCvwNMkBsgyl
-GmseUwlAfaHmJxuVX18ZesoAw6poYVHbRjcVEMlsVgl49DOq6yXemS7us3bhr6qJ
-265lzlaP2T1j5nM6lfTORUGlFlWMYLd3Uj3V40iU9zCWiJT5H5VY1Dd0w6vdewOd
-7vKTsJkiQGSaPF5f3+qcgNNIP/1qeg==
-=IcN4
------END PGP SIGNATURE-----
+> 
+> > +	 */
+> > +
+> > +	if (vcpu_mode_el2(vcpu) && !vcpu_el2_tge_is_set(vcpu) &&
+> > +	    !(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_IMO))
+> > +		return 1;
+> > +
+> > +	/* esr_el2 value doesn't matter for exits due to irqs. */
+> > +	return kvm_inject_nested(vcpu, 0, except_type_irq);
+> > +}
+> > diff --git a/arch/arm64/kvm/hyp/exception.c b/arch/arm64/kvm/hyp/exception.c
+> > index 0418399e0a20..4ef5e86efd8b 100644
+> > --- a/arch/arm64/kvm/hyp/exception.c
+> > +++ b/arch/arm64/kvm/hyp/exception.c
+> > @@ -13,6 +13,7 @@
+> >  #include <hyp/adjust_pc.h>
+> >  #include <linux/kvm_host.h>
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_nested.h>
+> >  
+> >  #if !defined (__KVM_NVHE_HYPERVISOR__) && !defined (__KVM_VHE_HYPERVISOR__)
+> >  #error Hypervisor code only!
+> > @@ -22,7 +23,9 @@ static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+> >  {
+> >  	u64 val;
+> >  
+> > -	if (__vcpu_read_sys_reg_from_cpu(reg, &val))
+> > +	if (unlikely(nested_virt_in_use(vcpu)))
+> > +		return vcpu_read_sys_reg(vcpu, reg);
+> > +	else if (__vcpu_read_sys_reg_from_cpu(reg, &val))
+> >  		return val;
+> 
+> I find the above unintuitive. The original code duplicated the
+> functionality from sys_regs.c::vcpu_read_sys_reg() in order to be able to
+> run the code at EL2 in the protected KVM case. So why are we now adding
+> back the dependency to the EL1 code? Yes, the call to vcpu_read_sys_reg()
+> is never compiled because of how nested_virt_in_use() is defined, but still
+> looks unconsistent with the purpose of the function (and this file).
+> 
+> After careful digging, I realized why this change is needed:
+> kvm_inject_nested() calls __kvm_adjust_pc() after a vcpu_put(), so the
+> function needs to check vcpu->arch.sysregs_loaded_on_cpu, which now can be
+> false. Why not copy the body of vcpu_read_sys_reg(), which is what
+> __vcpu_read_sys_reg is supposed to do? With a comment explaining why
+> sysregs_loaded_on_cpu can be false, I think the code would be a lot more
+> understandable.
+> 
+> Or is it that you want all VCPU register accesses to be done with
+> vcpu_read_sys_reg() when the VCPU has the EL2 feature?
 
---URcG2D/2QfQA1Gjm--
+Both. The whole NV support is based on this "put/load" sequences when
+we alternate between EL{0,1} and EL2, and tracking whether you're
+loaded or not is really difficult. I agree that this is pretty ugly,
+but I also don't want to spread the crap everywhere (and I have
+trouble keeping both the NV and pKVM models in my head at the same
+time!).
 
---===============1291116105345185331==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> 
+> >  
+> >  	return __vcpu_sys_reg(vcpu, reg);
+> > @@ -30,14 +33,24 @@ static inline u64 __vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+> >  
+> >  static inline void __vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+> >  {
+> > -	if (__vcpu_write_sys_reg_to_cpu(val, reg))
+> > -		return;
+> > -
+> > -	 __vcpu_sys_reg(vcpu, reg) = val;
+> > +	if (unlikely(nested_virt_in_use(vcpu)))
+> > +		vcpu_write_sys_reg(vcpu, val, reg);
+> > +	else if (!__vcpu_write_sys_reg_to_cpu(val, reg))
+> > +		__vcpu_sys_reg(vcpu, reg) = val;
+> >  }
+> >  
+> > -static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, u64 val)
+> > +static void __vcpu_write_spsr(struct kvm_vcpu *vcpu, unsigned long target_mode,
+> > +			      u64 val)
+> >  {
+> > +	if (unlikely(nested_virt_in_use(vcpu))) {
+> > +		if (target_mode == PSR_MODE_EL1h)
+> > +			vcpu_write_sys_reg(vcpu, val, SPSR_EL1);
+> > +		else
+> > +			vcpu_write_sys_reg(vcpu, val, SPSR_EL2);
+> > +
+> > +		return;
+> > +	}
+> > +
+> >  	write_sysreg_el1(val, SYS_SPSR);
+> >  }
+> >  
+> > @@ -97,6 +110,11 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+> >  		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> >  		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL1);
+> >  		break;
+> > +	case PSR_MODE_EL2h:
+> > +		vbar = __vcpu_read_sys_reg(vcpu, VBAR_EL2);
+> > +		sctlr = __vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> > +		__vcpu_write_sys_reg(vcpu, *vcpu_pc(vcpu), ELR_EL2);
+> > +		break;
+> >  	default:
+> >  		/* Don't do that */
+> >  		BUG();
+> > @@ -149,7 +167,7 @@ static void enter_exception64(struct kvm_vcpu *vcpu, unsigned long target_mode,
+> >  	new |= target_mode;
+> >  
+> >  	*vcpu_cpsr(vcpu) = new;
+> > -	__vcpu_write_spsr(vcpu, old);
+> > +	__vcpu_write_spsr(vcpu, target_mode, old);
+> >  }
+> >  
+> >  /*
+> > @@ -320,11 +338,22 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
+> >  		      KVM_ARM64_EXCEPT_AA64_EL1):
+> >  			enter_exception64(vcpu, PSR_MODE_EL1h, except_type_sync);
+> >  			break;
+> > +
+> > +		case (KVM_ARM64_EXCEPT_AA64_ELx_SYNC |
+> > +		      KVM_ARM64_EXCEPT_AA64_EL2):
+> > +			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_sync);
+> > +			break;
+> > +
+> > +		case (KVM_ARM64_EXCEPT_AA64_ELx_IRQ |
+> > +		      KVM_ARM64_EXCEPT_AA64_EL2):
+> > +			enter_exception64(vcpu, PSR_MODE_EL2h, except_type_irq);
+> > +			break;
+> > +
+> >  		default:
+> >  			/*
+> > -			 * Only EL1_SYNC makes sense so far, EL2_{SYNC,IRQ}
+> > -			 * will be implemented at some point. Everything
+> > -			 * else gets silently ignored.
+> > +			 * Only EL1_SYNC and EL2_{SYNC,IRQ} makes
+> > +			 * sense so far. Everything else gets silently
+> > +			 * ignored.
+> >  			 */
+> >  			break;
+> >  		}
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > index b47df73e98d7..5dcf3f8b08b8 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -12,19 +12,58 @@
+> >  
+> >  #include <linux/kvm_host.h>
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_nested.h>
+> >  #include <asm/esr.h>
+> >  
+> > +static void pend_sync_exception(struct kvm_vcpu *vcpu)
+> > +{
+> > +	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
+> > +			     KVM_ARM64_PENDING_EXCEPTION);
+> > +
+> > +	/* If not nesting, EL1 is the only possible exception target */
+> > +	if (likely(!nested_virt_in_use(vcpu))) {
+> > +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL1;
+> > +		return;
+> > +	}
+> > +
+> > +	/*
+> > +	 * With NV, we need to pick between EL1 and EL2. Note that we
+> > +	 * never deal with a nesting exception here, hence never
+> 
+> I don't understand what "a nesting exception" refers to. In
+> emulate_nested.c, the comment for kvm_inject_nested() says that it
+> emulates taking an exception to EL2, so I assume a *nested*
+> exception is an exception injected to guest virtual EL2. But what is
+> a *nesting* exception? Am I misunderstanding something?
 
+Same thing. It is just that the code and the comments have been
+written by 3 different people, none of whom being native English
+speakers, and this is bound to be inconsistent.
+
+Just get over it. ;-)
+
+> 
+> > +	 * changing context, and the exception itself can be delayed
+> > +	 * until the next entry.
+> > +	 */
+> > +	switch(*vcpu_cpsr(vcpu) & PSR_MODE_MASK) {
+> > +	case PSR_MODE_EL2h:
+> > +	case PSR_MODE_EL2t:
+> > +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL2;
+> > +		break;
+> > +	case PSR_MODE_EL1h:
+> > +	case PSR_MODE_EL1t:
+> > +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL1;
+> > +		break;
+> > +	case PSR_MODE_EL0t:
+> > +		if (vcpu_el2_tge_is_set(vcpu) & HCR_TGE)
+> 
+> Doesn't vcpu_el2_tge_is_set() already return true if HCR_TGE is set?
+
+Weee!!! Nice catch! Good thing we almost never inject any of those (we
+mostly run wel;l behaved SW), as we'd target the wrong exception
+level...
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============1291116105345185331==--
