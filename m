@@ -2,76 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D150CC2BA4C
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 13:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B5AC28CF5
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 13:53:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BE4740CBC;
-	Wed, 26 Jan 2022 08:32:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8550040B78;
+	Wed, 26 Jan 2022 08:53:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uCrUfTfJ5fDz; Wed, 26 Jan 2022 08:32:39 -0500 (EST)
+	with ESMTP id Z4Zj9pj4Jhdi; Wed, 26 Jan 2022 08:53:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C6340E00;
-	Wed, 26 Jan 2022 08:32:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49E5440C0A;
+	Wed, 26 Jan 2022 08:53:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1337840C0A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 08:32:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B747940C0A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 08:53:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V7+NRNw7osS9 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 08:32:37 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF15140BEE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 08:32:36 -0500 (EST)
+ with ESMTP id 5JXp-daWzH20 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 08:53:28 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BBE140BEE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 08:53:28 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 6A815CE13DD;
- Wed, 26 Jan 2022 13:32:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC591C340E3;
- Wed, 26 Jan 2022 13:32:30 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A8C8CB81E15;
+ Wed, 26 Jan 2022 13:53:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B4CC340E3;
+ Wed, 26 Jan 2022 13:53:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643203950;
- bh=BF//QCDOYS765nSWE02GmvKsCguT/tbnogB393KJsJM=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=OtdyjI/W2x8VM9/qRRMiy18NtCc12qQjh8ucaKuH2HYe1uyh224S3gzJnq9kyw/vZ
- 901K73rwgkCD+dq3v48DCyEEY+N4imMVLXo73IX/TOCGqhqUNncpb60TZJKIh59UpK
- xs5HrwgocEVUbtqnXoLk9BNnegqcAE8S6ng0bXA6ZvaO/r6Y8gvnaryudFphLpzEpk
- c74kngZzaOF7ZyvfJC5PSiMLwkgyOA7jkfv3NBcA5kOIwMt9B0PxoGLq24mAlnOfTU
- VPuwp2SnB8kMi9h6E+mZ5+HHxoMxH9YbFwn/LKrKkbKbtn1I4xLdwCXOWu/Y1lJ2U8
- YKz6OeBnQR9lA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nCiPU-003Duu-R8; Wed, 26 Jan 2022 13:32:28 +0000
-Date: Wed, 26 Jan 2022 13:32:28 +0000
-Message-ID: <87bkzy7hcj.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH] kselftest: kvm/arm64: Skip tests if we can't create a
+ s=k20201202; t=1643205205;
+ bh=SB1wPkecSWgUxIk4Kgzf28opZ+Vn2jcLSfzzazV/QB8=;
+ h=From:To:Cc:Subject:Date:From;
+ b=p8cpGDeAymdCdWT6X54KxabPxqJi8EQEzIY+wCfhKMsnJ+jBEFxPYPeyL/+pu7qZo
+ 3oD58Gy6ce45UP/h9KMq1X7rI7kHgyCLl3HUJgiRVPIiZLtDDSm/iagabO7rWXnBez
+ d2tfYonckL5KqKYH5T6sBZAoQGH6vO832N0oS+ery4ZzzDQhZ1Rhi8TAKYwmLLajKD
+ uT2A2WMDy69nYggSeK2CxONIa0n/efVPH7TZ+bvFMKwiWbn5qaEFhKePlK2k7pDQOK
+ ZDWzeLbPFfTUr6aYvxnUA0EG+Yqh9EDzC12sjSSpRgUcVRjDP52t94JcbtgSdOImOq
+ pZ4cwdJG8eNpg==
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Subject: [PATCH v2] kselftest: kvm/arm64: Skip tests if we can't create a
  vgic-v3
-In-Reply-To: <YfFKzWxNd5l26Ebk@sirena.org.uk>
-References: <20220125192851.3907611-1-broonie@kernel.org>
- <87h79q7tln.wl-maz@kernel.org> <YfFEBlsUH+dMxmku@sirena.org.uk>
- <87czke7ima.wl-maz@kernel.org> <YfFKzWxNd5l26Ebk@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, shuah@kernel.org, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
+Date: Wed, 26 Jan 2022 13:53:19 +0000
+Message-Id: <20220126135319.1918802-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Cc: Mark Brown <broonie@kernel.org>, linux-kselftest@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -89,36 +71,89 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-aOn Wed, 26 Jan 2022 13:21:17 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Wed, Jan 26, 2022 at 01:05:01PM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > > > So you now only test whether it is possible to create a virtual GICv3,
-> > > > but don't actually create it. How does this work?
-> 
-> > > Oh, that's rather obscure in the API - so the file descriptor returned
-> > > if the test flag is specified can't actually be used?
-> 
-> > No file descriptor is returned at all from the kernel, so you should
-> > always get -1 as populated by kvm_create_device().
-> 
-> > See virt/kvm/kvm_main.c::kvm_ioctl_create_device().
-> 
-> Ugh, right - the descriptor is returned separately to the return code
-> but is then mapped onto the return code by the library since the library
-> just aborts on error in the non-test case and in the test case the kernel
-> returns an inverted boolean which gets passed straight through.  Like I
-> say the API seems a bit confusing here.
+The arch_timer and vgic_irq kselftests assume that they can create a
+vgic-v3, using the library function vgic_v3_setup() which aborts with a
+test failure if it is not possible to do so. Since vgic-v3 can only be
+instantiated on systems where the host has GICv3 this leads to false
+positives on older systems where that is not the case.
 
-That's a very... "kind" way of putting it.
+Fix this by changing vgic_v3_setup() to return an error if the vgic can't
+be instantiated and have the callers skip if this happens. We could also
+exit flagging a skip in vgic_v3_setup() but this would prevent future test
+cases conditionally deciding which GIC to use or generally doing more
+complex output.
 
-	M.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
 
+v2:
+ - The test for being able to create the GIC doesn't actually
+   instantiate it, add a call doing so in that case.
+
+ tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
+ tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 4 ++++
+ tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 5 ++++-
+ 3 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index 9ad38bd360a4..791d38404652 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -366,6 +366,7 @@ static struct kvm_vm *test_vm_create(void)
+ {
+ 	struct kvm_vm *vm;
+ 	unsigned int i;
++	int ret;
+ 	int nr_vcpus = test_args.nr_vcpus;
+ 
+ 	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
+@@ -382,7 +383,11 @@ static struct kvm_vm *test_vm_create(void)
+ 
+ 	ucall_init(vm, NULL);
+ 	test_init_timer_irq(vm);
+-	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
++	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
++	if (ret < 0) {
++		pr_info("Failed to create vgic-v3, skipping\n");
++		exit(KSFT_SKIP);
++	}
+ 
+ 	/* Make all the test's cmdline args visible to the guest */
+ 	sync_global_to_guest(vm, test_args);
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+index e6c7d7f8fbd1..b127a261fd29 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
+@@ -761,6 +761,10 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
+ 
+ 	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
+ 			GICD_BASE_GPA, GICR_BASE_GPA);
++	if (gic_fd < 0) {
++		pr_info("Failed to create vgic-v3, skipping\n");
++		exit(KSFT_SKIP);
++	}
+ 
+ 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
+ 		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
+diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+index b3a0fca0d780..4ea65e119bdd 100644
+--- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
++++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
+@@ -51,7 +51,10 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
+ 			"Number of vCPUs requested (%u) doesn't match with the ones created for the VM (%u)\n",
+ 			nr_vcpus, nr_vcpus_created);
+ 
+-	/* Distributor setup */
++	/* Distributor setup - test if it's possible then actually do it */
++	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
++	if (gic_fd != 0)
++		return -1;
+ 	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+ 
+ 	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
 -- 
-Without deviation from the norm, progress is not possible.
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
