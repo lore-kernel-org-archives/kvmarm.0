@@ -2,69 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A887C2BA4C
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 15:32:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FE1C28CF5
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 15:32:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 201E340DCB;
-	Wed, 26 Jan 2022 10:32:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 603A34B08E;
+	Wed, 26 Jan 2022 10:32:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ESuT9k9riJoN; Wed, 26 Jan 2022 10:32:27 -0500 (EST)
+	with ESMTP id 6mTLj3ji06Rn; Wed, 26 Jan 2022 10:32:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFA6A4B099;
-	Wed, 26 Jan 2022 10:32:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 127C649F22;
+	Wed, 26 Jan 2022 10:32:31 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B9F449ED8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:32:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5519A4A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:32:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u0nHTbGeyvN8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 10:32:25 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 164E24B0B8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:32:25 -0500 (EST)
+ with ESMTP id uEZ+wX7BLof9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 10:32:29 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D42D49F22
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:32:28 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 365CCB81E9E;
- Wed, 26 Jan 2022 15:32:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6BE0C340E9;
- Wed, 26 Jan 2022 15:32:19 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 654F76171D;
+ Wed, 26 Jan 2022 15:32:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78994C340EC;
+ Wed, 26 Jan 2022 15:32:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643211143;
- bh=3il89y80lqKSeBlP8c8K13FChN+0Rfp1qjkKOqCKgPI=;
+ s=k20201202; t=1643211146;
+ bh=bxmJiz4iJDucMw8+bb1RejhHVADIm4+kHNfyEyijSjk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=U0VDcd2LXh9I7ONbFZiinsosF+IHw+ygjG5bM29ymGzfqURhZkN9S8gVTLaVRfe9P
- IOdIj6DH6q4tlTo4mYFM3oz+k6BbyYqRl0c6LZAqiV8/+ZA/qcvznrXxzLGfbi/l42
- MX0uW1jGWbButC7+sXn0ALgO6nlTX7sgNzwGhJDgF4gAoGiliKuXhl4PJqHGvjnITz
- jhPhzilxzHDAIu+4h4YbC4UDqPZpsogzrT75a4D7RSujZ4NLXDLzvZ21NTbyaDcgpx
- /Btdl3WMOjguy8e2C4+AhFIj1u2g+/n0tbTEQ4Y2CLMyTsam3rteDaA3T2ABHZQ3vY
- lo8tnJkrBS5KA==
+ b=vEH3Y7vaM1mCtcY0NPCvECJ26xCdQRXWggB89RAeStpRABjUJVyUgv3d5AEdOH8Ph
+ DeThe/ekqgm/1/xDoe5E3/XiW3hQwzDaTLbfA+D1htJNR3653ErcN4Bk43T1IL3eHF
+ xXS8c8pCl+Mfr7P3D8wRmejUm6NsG6ZEtss0GWh4zwjL8N0fIkGFaupI3C7VxoMihe
+ 6RLEeKbTxAn/UA9MKNDldrHTYh7k7YxBOseOUuFPUCHlAwOwcuDmQSDSVviXXQamWx
+ dfxpXhvPMB0KE/jkkxy7EDbxzL1msXgyyxpo8wWWx7ZPgF+PzgLbKB/CXm3eTheEcE
+ nySJw1vLsVriQ==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
  Shuah Khan <shuah@kernel.org>
-Subject: [PATCH v10 31/39] kselftest/arm64: Extend vector configuration API
- tests to cover SME
-Date: Wed, 26 Jan 2022 15:27:41 +0000
-Message-Id: <20220126152749.233712-32-broonie@kernel.org>
+Subject: [PATCH v10 32/39] kselftest/arm64: sme: Provide streaming mode SVE
+ stress test
+Date: Wed, 26 Jan 2022 15:27:42 +0000
+Message-Id: <20220126152749.233712-33-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220126152749.233712-1-broonie@kernel.org>
 References: <20220126152749.233712-1-broonie@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3696; h=from:subject;
- bh=3il89y80lqKSeBlP8c8K13FChN+0Rfp1qjkKOqCKgPI=;
- b=owGbwMvMwMWocq27KDak/QLjabUkhsSPGbnm7YHvWwy+bD4wdVubLDN38qUJ8U90fGrV414pJQXt
- 1DzYyWjMwsDIxSArpsiy9lnGqvRwia3zH81/BTOIlQlkCgMXpwBMpGQD+/+s9F+WIedWstw+IGe/v7
- ZF492FKIlXuidYdaSV/Iq6vdhn8QZsPyGk9kV5Ver7Pz5XnNakSm5w0VYvitxneMFlb7rts8P2y/a7
- TGhhsJkuWHUjJftJTZKB9bc3jjKWIYs9ayfbuBsq2u6LP8TSKZ3Z/bOZ80b00qPTZF7VXMxXr9sQ/m
- exuvaett/7vPs0I/lqXhwJ4jv0aHeMmKruvKdvBc8xmPwKsPz14oWuV5ZUCKP7Y+s9y0TaOps9xMRZ
- lVZ/asgPPt6eXLK5epHbcoO3RutMLv+eyuwQledsrttlfFl5ynYR6/Np3LMsLnkoPLgZ5Hj+4MWj7b
- k3T568K+r6Z5HU1hLlOK9kkUhmAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5076; h=from:subject;
+ bh=bxmJiz4iJDucMw8+bb1RejhHVADIm4+kHNfyEyijSjk=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBh8WhusLor7YdTJhC+qpcUC09jl9a2LtWwVEU/ZOxU
+ RA60NfaJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYfFobgAKCRAk1otyXVSH0Pb/B/
+ 9IHYYz2QxKZ4SEvOYbxUlfbaa9Qam80MSgXbeH5SLgqOj/k+iuy0QD0l5QLY56b2FyKsuygKS60PtT
+ tBlZKY+FgyDmu+MMcMLfyJvmfhPjxnj+gTh+JZIJkFYGiaXJfeyXXbGjOie/A/gfCwuK9kcYXw3+8C
+ 4orpF8PJ6PRjY9OIBgi295/QL/fi78K+zhqo6NAnrKlYw6U9IP3A3qLsIJEeSnBWwKsEamYpyJlPW3
+ 7xBMPdBQdi/Km5qty8dCfIlZ0+DDZVGyJfqgYBVD/c1HnEm5p9Ooi+C8Il2p4Msiiw/JjU3qZJTtmR
+ fRndVIXlPd9goaSTH4510VzoG9Y+dS
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
@@ -88,121 +88,214 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Provide RDVL helpers for SME and extend the main vector configuration tests
-to cover SME.
+One of the features of SME is the addition of streaming mode, in which we
+have access to a set of streaming mode SVE registers at the SME vector
+length. Since these are accessed using the SVE instructions let's reuse
+the existing SVE stress test for testing with a compile time option for
+controlling the few small differences needed:
+
+ - Enter streaming mode immediately on starting the program.
+ - In streaming mode FFR is removed so skip reading and writing FFR.
+
+In order to avoid requiring a cutting edge toolchain with SME support
+use the op/CR form for specifying SVCR.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- tools/testing/selftests/arm64/fp/.gitignore   |  1 +
- tools/testing/selftests/arm64/fp/Makefile     |  3 ++-
- tools/testing/selftests/arm64/fp/rdvl-sme.c   | 14 ++++++++++++++
- tools/testing/selftests/arm64/fp/rdvl.S       |  8 ++++++++
- tools/testing/selftests/arm64/fp/rdvl.h       |  1 +
- tools/testing/selftests/arm64/fp/vec-syscfg.c | 10 ++++++++++
- 6 files changed, 36 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/arm64/fp/rdvl-sme.c
+ tools/testing/selftests/arm64/fp/.gitignore  |  1 +
+ tools/testing/selftests/arm64/fp/Makefile    |  3 +
+ tools/testing/selftests/arm64/fp/ssve-stress | 59 ++++++++++++++++++++
+ tools/testing/selftests/arm64/fp/sve-test.S  | 30 ++++++++++
+ 4 files changed, 93 insertions(+)
+ create mode 100644 tools/testing/selftests/arm64/fp/ssve-stress
 
 diff --git a/tools/testing/selftests/arm64/fp/.gitignore b/tools/testing/selftests/arm64/fp/.gitignore
-index c50d86331ed2..6e9a610c5e5d 100644
+index 6e9a610c5e5d..5729a5b1adfc 100644
 --- a/tools/testing/selftests/arm64/fp/.gitignore
 +++ b/tools/testing/selftests/arm64/fp/.gitignore
-@@ -1,5 +1,6 @@
- fp-pidbench
- fpsimd-test
-+rdvl-sme
- rdvl-sve
+@@ -5,5 +5,6 @@ rdvl-sve
  sve-probe-vls
  sve-ptrace
+ sve-test
++ssve-test
+ vec-syscfg
+ vlset
 diff --git a/tools/testing/selftests/arm64/fp/Makefile b/tools/testing/selftests/arm64/fp/Makefile
-index 95f0b877a060..a224fff8082b 100644
+index a224fff8082b..e6643c9b0474 100644
 --- a/tools/testing/selftests/arm64/fp/Makefile
 +++ b/tools/testing/selftests/arm64/fp/Makefile
-@@ -3,7 +3,7 @@
- CFLAGS += -I../../../../../usr/include/
- TEST_GEN_PROGS := sve-ptrace sve-probe-vls vec-syscfg
+@@ -5,6 +5,7 @@ TEST_GEN_PROGS := sve-ptrace sve-probe-vls vec-syscfg
  TEST_PROGS_EXTENDED := fp-pidbench fpsimd-test fpsimd-stress \
--	rdvl-sve \
-+	rdvl-sme rdvl-sve \
+ 	rdvl-sme rdvl-sve \
  	sve-test sve-stress \
++	ssve-test ssve-stress \
  	vlset
  
-@@ -13,6 +13,7 @@ fp-pidbench: fp-pidbench.S asm-utils.o
- 	$(CC) -nostdlib $^ -o $@
- fpsimd-test: fpsimd-test.o asm-utils.o
- 	$(CC) -nostdlib $^ -o $@
-+rdvl-sme: rdvl-sme.o rdvl.o
- rdvl-sve: rdvl-sve.o rdvl.o
- sve-ptrace: sve-ptrace.o
+ all: $(TEST_GEN_PROGS) $(TEST_PROGS_EXTENDED)
+@@ -19,6 +20,8 @@ sve-ptrace: sve-ptrace.o
  sve-probe-vls: sve-probe-vls.o rdvl.o
-diff --git a/tools/testing/selftests/arm64/fp/rdvl-sme.c b/tools/testing/selftests/arm64/fp/rdvl-sme.c
+ sve-test: sve-test.o asm-utils.o
+ 	$(CC) -nostdlib $^ -o $@
++ssve-test: sve-test.S asm-utils.o
++	$(CC) -DSSVE -nostdlib $^ -o $@
+ vec-syscfg: vec-syscfg.o rdvl.o
+ vlset: vlset.o
+ 
+diff --git a/tools/testing/selftests/arm64/fp/ssve-stress b/tools/testing/selftests/arm64/fp/ssve-stress
 new file mode 100644
-index 000000000000..49b0b2e08bac
+index 000000000000..e2bd2cc184ad
 --- /dev/null
-+++ b/tools/testing/selftests/arm64/fp/rdvl-sme.c
-@@ -0,0 +1,14 @@
-+// SPDX-License-Identifier: GPL-2.0-only
++++ b/tools/testing/selftests/arm64/fp/ssve-stress
+@@ -0,0 +1,59 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0-only
++# Copyright (C) 2015-2019 ARM Limited.
++# Original author: Dave Martin <Dave.Martin@arm.com>
 +
-+#include <stdio.h>
++set -ue
 +
-+#include "rdvl.h"
++NR_CPUS=`nproc`
 +
-+int main(void)
-+{
-+	int vl = rdvl_sme();
++pids=
++logs=
 +
-+	printf("%d\n", vl);
++cleanup () {
++	trap - INT TERM CHLD
++	set +e
 +
-+	return 0;
++	if [ -n "$pids" ]; then
++		kill $pids
++		wait $pids
++		pids=
++	fi
++
++	if [ -n "$logs" ]; then
++		cat $logs
++		rm $logs
++		logs=
++	fi
 +}
-diff --git a/tools/testing/selftests/arm64/fp/rdvl.S b/tools/testing/selftests/arm64/fp/rdvl.S
-index c916c1c9defd..1a2ebf07a20c 100644
---- a/tools/testing/selftests/arm64/fp/rdvl.S
-+++ b/tools/testing/selftests/arm64/fp/rdvl.S
-@@ -8,3 +8,11 @@ rdvl_sve:
- 	hint	34			// BTI C
- 	rdvl	x0, #1
- 	ret
 +
-+.globl rdvl_sme
-+rdvl_sme:
-+	hint	34			// BTI C
++interrupt () {
++	cleanup
++	exit 0
++}
 +
-+	.inst	0x4bf5820		// RDSVL x0, #1
++child_died () {
++	cleanup
++	exit 1
++}
++
++trap interrupt INT TERM EXIT
++
++for x in `seq 0 $((NR_CPUS * 4))`; do
++	log=`mktemp`
++	logs=$logs\ $log
++	./ssve-test >$log &
++	pids=$pids\ $!
++done
++
++# Wait for all child processes to be created:
++sleep 10
++
++while :; do
++	kill -USR1 $pids
++done &
++pids=$pids\ $!
++
++wait
++
++exit 1
+diff --git a/tools/testing/selftests/arm64/fp/sve-test.S b/tools/testing/selftests/arm64/fp/sve-test.S
+index f5b1b48ffff2..31764e8370db 100644
+--- a/tools/testing/selftests/arm64/fp/sve-test.S
++++ b/tools/testing/selftests/arm64/fp/sve-test.S
+@@ -156,6 +156,7 @@ endfunction
+ // We fill the upper lanes of FFR with zeros.
+ // Beware: corrupts P0.
+ function setup_ffr
++#ifndef SSVE
+ 	mov	x4, x30
+ 
+ 	and	w0, w0, #0x3
+@@ -178,6 +179,9 @@ function setup_ffr
+ 	wrffr	p0.b
+ 
+ 	ret	x4
++#else
++	ret
++#endif
+ endfunction
+ 
+ // Trivial memory compare: compare x2 bytes starting at address x0 with
+@@ -260,6 +264,7 @@ endfunction
+ // Beware -- corrupts P0.
+ // Clobbers x0-x5.
+ function check_ffr
++#ifndef SSVE
+ 	mov	x3, x30
+ 
+ 	ldr	x4, =scratch
+@@ -280,6 +285,9 @@ function check_ffr
+ 	mov	x2, x5
+ 	mov	x30, x3
+ 	b	memcmp
++#else
++	ret
++#endif
+ endfunction
+ 
+ // Any SVE register modified here can cause corruption in the main
+@@ -295,13 +303,26 @@ function irritator_handler
+ 	movi	v0.8b, #1
+ 	movi	v9.16b, #2
+ 	movi	v31.8b, #3
++#ifndef SSVE
+ 	// And P0
+ 	rdffr	p0.b
+ 	// And FFR
+ 	wrffr	p15.b
++#endif
 +
 +	ret
-diff --git a/tools/testing/selftests/arm64/fp/rdvl.h b/tools/testing/selftests/arm64/fp/rdvl.h
-index 7c9d953fc9e7..5d323679fbc9 100644
---- a/tools/testing/selftests/arm64/fp/rdvl.h
-+++ b/tools/testing/selftests/arm64/fp/rdvl.h
-@@ -3,6 +3,7 @@
- #ifndef RDVL_H
- #define RDVL_H
++endfunction
++
++#ifdef SSVE
++function enable_sm
++	// Set SVCR.SM to 1, equivalent to SMSTART SM but doesn't need a
++	// SME capable toolchain.
++	mov	x0, #1
++	msr	S3_3_C4_C2_2, x0
  
-+int rdvl_sme(void);
- int rdvl_sve(void);
+ 	ret
+ endfunction
++#endif
  
- #endif
-diff --git a/tools/testing/selftests/arm64/fp/vec-syscfg.c b/tools/testing/selftests/arm64/fp/vec-syscfg.c
-index c90658811a83..9bcfcdc34ee9 100644
---- a/tools/testing/selftests/arm64/fp/vec-syscfg.c
-+++ b/tools/testing/selftests/arm64/fp/vec-syscfg.c
-@@ -51,6 +51,16 @@ static struct vec_data vec_data[] = {
- 		.prctl_set = PR_SVE_SET_VL,
- 		.default_vl_file = "/proc/sys/abi/sve_default_vector_length",
- 	},
-+	{
-+		.name = "SME",
-+		.hwcap_type = AT_HWCAP2,
-+		.hwcap = HWCAP2_SME,
-+		.rdvl = rdvl_sme,
-+		.rdvl_binary = "./rdvl-sme",
-+		.prctl_get = PR_SME_GET_VL,
-+		.prctl_set = PR_SME_SET_VL,
-+		.default_vl_file = "/proc/sys/abi/sme_default_vector_length",
-+	},
- };
+ function terminate_handler
+ 	mov	w21, w0
+@@ -359,6 +380,11 @@ endfunction
+ .globl _start
+ function _start
+ _start:
++#ifdef SSVE
++	puts	"Streaming mode "
++	bl	enable_sm
++#endif
++
+ 	// Sanity-check and report the vector length
  
- static int stdio_read_integer(FILE *f, const char *what, int *val)
+ 	rdvl	x19, #8
+@@ -407,6 +433,10 @@ _start:
+ 	orr	w2, w2, #SA_NODEFER
+ 	bl	setsignal
+ 
++#ifdef SSVE
++	bl	enable_sm	// syscalls will have exited streaming mode
++#endif
++
+ 	mov	x22, #0		// generation number, increments per iteration
+ .Ltest_loop:
+ 	rdvl	x0, #8
 -- 
 2.30.2
 
