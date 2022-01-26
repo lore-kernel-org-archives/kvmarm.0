@@ -2,75 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC63DC2BA4C
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 15:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C97BC2BA4C
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 15:17:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A187E49DF6;
-	Wed, 26 Jan 2022 10:14:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38D1440DCB;
+	Wed, 26 Jan 2022 10:17:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id A7Ec5n37mumm; Wed, 26 Jan 2022 10:14:30 -0500 (EST)
+	with ESMTP id S0Tn25atFAbZ; Wed, 26 Jan 2022 10:17:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ACE3412FC;
-	Wed, 26 Jan 2022 10:14:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AF0D49AF7;
+	Wed, 26 Jan 2022 10:17:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0963540DCB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:14:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CBB8B40E0A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:17:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qHJU5f71DRsu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 10:14:28 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 56BF549E33
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:14:27 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id E2CFB61883;
- Wed, 26 Jan 2022 15:14:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4818BC340E8;
- Wed, 26 Jan 2022 15:14:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643210066;
- bh=copy4cRQ6puPNwPV3UaCKRsGUK05uLwxOUu+r7/XC10=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Z78BLYv32FxtO975+1ZRXnyIDr1HVDi5tg9h1si/BHxCjOFnFExApxIrbNBgY1/8G
- 2LaXk4DreF+ZgjE3rmluBZXR/kQC7ROFrKNaPukUIOo4HS+dUUsg/1ESIh8+v/Pj01
- XP0C7ML4IhpHSnU+mC9RyR/W9wdOWfMbntB/BoEGZHoBErvhoJJJJaBaLvK9Js54cu
- uFiK17q2ZyvkxwMnzgE0MqCRC9TAVBly4bPoneGEl8ag5oDI6qr1Ymqc5aYraXHIgp
- LY+k0xKH6buJicrdmx5qOvmYAi9VFZCFUJVLt3EwEj0zjkEGJPPke1K/1aPVBvi4a8
- W3ZY4reYpUZ4Q==
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
- Shuah Khan <shuah@kernel.org>
-Subject: [PATCH v9 40/40] squqsh traps
-Date: Wed, 26 Jan 2022 15:11:20 +0000
-Message-Id: <20220126151120.3811248-41-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220126151120.3811248-1-broonie@kernel.org>
-References: <20220126151120.3811248-1-broonie@kernel.org>
+ with ESMTP id gUE49kAqgFPg for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 10:17:30 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B5F9940DCB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:17:30 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1643210250;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=enco3IhisiiJCqxipp6ORBzLiXPjBMV853tTPBlB3V0=;
+ b=HG8vi/CIbQM+tDwzZYrvl/9DEEiPgjfAKeF+fssKJmsNq2nJXcTuk5Wb/6G5A5bvroH2f5
+ jXQg7q3h38kpyRmx0etax3WtmwDCCWcNQ40AYWQs2bWa5XBX+r3kR1LLhohBvxQA3bIpYk
+ tHwdErrgSnAhrq6ZuRVaP7qGCLTfH1M=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-622-hX0N3CZEMp-Ujv1CdfM_Mw-1; Wed, 26 Jan 2022 10:17:26 -0500
+X-MC-Unique: hX0N3CZEMp-Ujv1CdfM_Mw-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ el8-20020a056402360800b00403bbdcef64so16819196edb.14
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 07:17:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=enco3IhisiiJCqxipp6ORBzLiXPjBMV853tTPBlB3V0=;
+ b=7pdsoFG6aOdPmoG97CriHXneFZUDoJVoYVT3Azo6k3d2oq23bchkCQK3RQNlx7jNA5
+ jvX2fY+lOUe+R/FyIBZ/kSvL+ahL5Y0yrgJCgxW6uusrXmYciHsDmrJZ+1acZw+yX4n+
+ i0MayWthc3gCt94/ZqxMOv+FI4fbfTyuQyOT27HHsoA3ZOBKKJKsHddHHV7cC0FH8qca
+ U1RGsYj14vke64Aow3mQ/wxGWHtv280nJsnNMlxcYq+WGNkOufzrODTG9/mjVhDYHSoM
+ NRmHdxO+XkqN4l59pc77Olp7lzOSDePyJZe5HdOKn5dms2oLFiANzGG+lnkVYhNkXsym
+ aa2A==
+X-Gm-Message-State: AOAM531+0hLztEwMsuMA7xASVZgLIWSOJoWawyvIILjOEJiHaZtDd7Iz
+ d9zxRricybdBbqVYFdQlgOn5Aqor08Zj8v1XRQCnrqv2P3T/uzNLPLv5kRH6XJLXfMXEFOOlav2
+ 3sUNVe3fvK6Q3y6HS+DdynN+V
+X-Received: by 2002:a05:6402:42d0:: with SMTP id
+ i16mr25601054edc.143.1643210245866; 
+ Wed, 26 Jan 2022 07:17:25 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwXMv3eA9lQHhc4IcU2U+Yip2mSW1MIOrMol37/92RnG0VGlb0ODLVMG1k0h0PbwSGsD36zSQ==
+X-Received: by 2002:a05:6402:42d0:: with SMTP id
+ i16mr25601041edc.143.1643210245721; 
+ Wed, 26 Jan 2022 07:17:25 -0800 (PST)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+ by smtp.gmail.com with ESMTPSA id h15sm7636317ejg.144.2022.01.26.07.17.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Jan 2022 07:17:25 -0800 (PST)
+Date: Wed, 26 Jan 2022 16:17:23 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH 1/2] kvm: selftests: aarch64: fix assert in
+ gicv3_access_reg
+Message-ID: <20220126151723.xcpa5rdgxmcdv22c@gator>
+References: <20220120173905.1047015-1-ricarkol@google.com>
+ <20220120173905.1047015-2-ricarkol@google.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4479; h=from:subject;
- bh=copy4cRQ6puPNwPV3UaCKRsGUK05uLwxOUu+r7/XC10=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBh8WSWpilDW9eFLR9WsG+pu8O0oF7wMm6YV2gEwgCG
- DNHOJqqJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYfFklgAKCRAk1otyXVSH0CjgB/
- 9L+PEoqD+XcoxnxNpfVepzo0f0TuyQ/QjuCAai209ngWlT2tkE+A7RbRVGotpHUNWdRqTru1xQJ2iR
- kPGJXAWAUkpDOZb8Xe661bgaYNXIEBgabR3RhuOdTH/6pwrHhO3vpg+m4LAQNRTShE/ieYIuAb2r4w
- 4UdbuVJElFW0YcMiMsQgXTvwJgtG8RcS7zAs1I7YYTS85+x0jPrII3e4leiZJkS9vDt31Dgd7VXps1
- wl4suOMcTKs+sdlJNH0fzGVEzf0WAQryFYfIXBUpCtOu1VXDKGyrb8tIqH5Xy1arbux0iOyDdI8oAN
- S3q7A55s/MzSSBaWoQFUyEenBIgMQL
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Luis Machado <luis.machado@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
- kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>
+In-Reply-To: <20220120173905.1047015-2-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,129 +103,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
----
- arch/arm64/kvm/fpsimd.c          | 22 ++++++++++------------
- arch/arm64/kvm/hyp/nvhe/switch.c | 20 ++++++++++----------
- arch/arm64/kvm/hyp/vhe/switch.c  |  4 ++--
- 3 files changed, 22 insertions(+), 24 deletions(-)
+On Thu, Jan 20, 2022 at 09:39:04AM -0800, Ricardo Koller wrote:
+> The val argument in gicv3_access_reg can have any value when used for a
+> read, not necessarily 0.  Fix the assert by checking val only for
+> writes.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> Reported-by: Reiji Watanabe <reijiw@google.com>
+> Cc: Andrew Jones <drjones@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/lib/aarch64/gic_v3.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> index 00f613c0583c..e4945fe66620 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> @@ -159,7 +159,7 @@ static void gicv3_access_reg(uint32_t intid, uint64_t offset,
+>  	uint32_t cpu_or_dist;
+>  
+>  	GUEST_ASSERT(bits_per_field <= reg_bits);
+> -	GUEST_ASSERT(*val < (1U << bits_per_field));
+> +	GUEST_ASSERT(!write || *val < (1U << bits_per_field));
+>  	/* Some registers like IROUTER are 64 bit long. Those are currently not
+>  	 * supported by readl nor writel, so just asserting here until then.
+>  	 */
+> -- 
+> 2.35.0.rc0.227.g00780c9af4-goog
+>
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index cecaddb644ce..1c585553d74f 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -153,18 +153,16 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
- 	 * If we have VHE then the Hyp code will reset CPACR_EL1 to
- 	 * CPACR_EL1_DEFAULT and we need to reenable SME.
- 	 */
--	if (has_vhe()) {
--		if (system_supports_sme()) {
--			/* Also restore EL0 state seen on entry */
--			if (vcpu->arch.flags & KVM_ARM64_HOST_SME_ENABLED)
--				sysreg_clear_set(CPACR_EL1, 0,
--						 CPACR_EL1_SMEN_EL0EN |
--						 CPACR_EL1_SMEN_EL1EN);
--			else
--				sysreg_clear_set(CPACR_EL1,
--						 CPACR_EL1_SMEN_EL0EN,
--						 CPACR_EL1_SMEN_EL1EN);
--		}
-+	if (has_vhe() && system_supports_sme()) {
-+		/* Also restore EL0 state seen on entry */
-+		if (vcpu->arch.flags & KVM_ARM64_HOST_SME_ENABLED)
-+			sysreg_clear_set(CPACR_EL1, 0,
-+					 CPACR_EL1_SMEN_EL0EN |
-+					 CPACR_EL1_SMEN_EL1EN);
-+		else
-+			sysreg_clear_set(CPACR_EL1,
-+					 CPACR_EL1_SMEN_EL0EN,
-+					 CPACR_EL1_SMEN_EL1EN);
- 	}
  
- 	if (vcpu->arch.flags & KVM_ARM64_FP_ENABLED) {
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 184bf6bd79b9..caace61ea459 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -47,21 +47,20 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 		val |= CPTR_EL2_TFP | CPTR_EL2_TZ;
- 		__activate_traps_fpsimd32(vcpu);
- 	}
--	if (IS_ENABLED(CONFIG_ARM64_SME) && cpus_have_final_cap(ARM64_SME))
-+	if (cpus_have_final_cap(ARM64_SME))
- 		val |= CPTR_EL2_TSM;
- 
- 	write_sysreg(val, cptr_el2);
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el2);
- 
--	if (IS_ENABLED(CONFIG_ARM64_SME) && cpus_have_final_cap(ARM64_SME) &&
--	    cpus_have_final_cap(ARM64_HAS_FGT)) {
-+	if (cpus_have_final_cap(ARM64_SME)) {
- 		val = read_sysreg_s(SYS_HFGRTR_EL2);
--		val &= ~(HFGxTR_EL2_nTPIDR_EL0_MASK |
-+		val &= ~(HFGxTR_EL2_nTPIDR2_EL0_MASK |
- 			 HFGxTR_EL2_nSMPRI_EL1_MASK);
- 		write_sysreg_s(val, SYS_HFGRTR_EL2);
- 
- 		val = read_sysreg_s(SYS_HFGWTR_EL2);
--		val &= ~(HFGxTR_EL2_nTPIDR_EL0_MASK |
-+		val &= ~(HFGxTR_EL2_nTPIDR2_EL0_MASK |
- 			 HFGxTR_EL2_nSMPRI_EL1_MASK);
- 		write_sysreg_s(val, SYS_HFGWTR_EL2);
- 	}
-@@ -109,23 +108,24 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 
- 	write_sysreg(this_cpu_ptr(&kvm_init_params)->hcr_el2, hcr_el2);
- 
--	if (IS_ENABLED(CONFIG_ARM64_SME) && cpus_have_final_cap(ARM64_SME) &&
--	    cpus_have_final_cap(ARM64_HAS_FGT)) {
-+	if (cpus_have_final_cap(ARM64_SME)) {
- 		u64 val;
- 
- 		val = read_sysreg_s(SYS_HFGRTR_EL2);
--		val |= HFGxTR_EL2_nTPIDR_EL0_MASK | HFGxTR_EL2_nSMPRI_EL1_MASK;
-+		val |= HFGxTR_EL2_nTPIDR2_EL0_MASK |
-+			HFGxTR_EL2_nSMPRI_EL1_MASK;
- 		write_sysreg_s(val, SYS_HFGRTR_EL2);
- 
- 		val = read_sysreg_s(SYS_HFGWTR_EL2);
--		val |= HFGxTR_EL2_nTPIDR_EL0_MASK | HFGxTR_EL2_nSMPRI_EL1_MASK;
-+		val |= HFGxTR_EL2_nTPIDR2_EL0_MASK |
-+			HFGxTR_EL2_nSMPRI_EL1_MASK;
- 		write_sysreg_s(val, SYS_HFGWTR_EL2);
- 	}
- 
- 	cptr = CPTR_EL2_DEFAULT;
- 	if (vcpu_has_sve(vcpu) && (vcpu->arch.flags & KVM_ARM64_FP_ENABLED))
- 		cptr |= CPTR_EL2_TZ;
--	if (IS_ENABLED(CONFIG_ARM64_SME) && cpus_have_final_cap(ARM64_SME))
-+	if (cpus_have_final_cap(ARM64_SME))
- 		cptr &= ~CPTR_EL2_TSM;
- 
- 	write_sysreg(cptr, cptr_el2);
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 21217485514d..a4d2fb5c9710 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -60,7 +60,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 		__activate_traps_fpsimd32(vcpu);
- 	}
- 
--	if (IS_ENABLED(CONFIG_ARM64_SME) && cpus_have_final_cap(ARM64_SME))
-+	if (cpus_have_final_cap(ARM64_SME))
- 		write_sysreg(read_sysreg(sctlr_el2) & ~SCTLR_ELx_ENTP2,
- 			     sctlr_el2);
- 
-@@ -85,7 +85,7 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
- 	 */
- 	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
- 
--	if (IS_ENABLED(CONFIG_ARM64_SME) && cpus_have_final_cap(ARM64_SME))
-+	if (cpus_have_final_cap(ARM64_SME))
- 		write_sysreg(read_sysreg(sctlr_el2) | SCTLR_ELx_ENTP2,
- 			     sctlr_el2);
- 
--- 
-2.30.2
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
 _______________________________________________
 kvmarm mailing list
