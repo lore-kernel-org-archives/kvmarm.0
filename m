@@ -2,69 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8FCC28CF5
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 17:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57785C63684
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 17:30:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E610F4A0FE;
-	Wed, 26 Jan 2022 12:30:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D4BD4B090;
+	Wed, 26 Jan 2022 12:30:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UjmYf2tCxDKP; Wed, 26 Jan 2022 12:30:35 -0500 (EST)
+	with ESMTP id SByMr8Bjyi1x; Wed, 26 Jan 2022 12:30:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB58B4A5A0;
-	Wed, 26 Jan 2022 12:30:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C723A4A014;
+	Wed, 26 Jan 2022 12:30:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41C354A4BE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 12:30:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7EC14A10E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 12:30:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CTcVgIaQXMSZ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 12:30:32 -0500 (EST)
+ with ESMTP id RscHBz4hO2Lw for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 12:30:35 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3F06D4A49C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 12:30:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF18B4B0B3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 12:30:34 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id C094161B29;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 7DAF261B2A;
+ Wed, 26 Jan 2022 17:30:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5052C340E7;
  Wed, 26 Jan 2022 17:30:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBE1EC340ED;
- Wed, 26 Jan 2022 17:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643218231;
- bh=NkDHn/GFNzvHawPVS9Op4WAl8MYqnxITPT90mOH4U9k=;
+ s=k20201202; t=1643218233;
+ bh=pO2QvUUsV5L71fd/N5ug5v8ZnpkBMeHmPsJTXFD+MSg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=qP1am5qxgM0KkzyrIl6Q0mpR9YjjeqfvI5J0rwwQx0TyqI9pm+FolKFUmQQC4Lb2j
- 6D3/AgEm7K9ZYjsNC54LVuPMc3AlZld8YT0Jk2T5r21VW9jONWm+xbnKvSBOm77nlg
- wH4RqgWTqzYiIETCdUHnMdnH6L9TLZLNaGaFicbQQQiIt/uCINcYITkMApXsIBkuLB
- aYp3FNu2h5QX3XJlx+AcdcLAWgetZ7voTk8+2k6VFSNMLT7vMML9ysXdCUDRFMPYJx
- IHkxukLBMOuUNYfpJvCo24OdcibMD1Dik30im1JLNlIb+GaYOYZVOtZn3Lh9yfc1PA
- 0Vcq6K5mZpxBA==
+ b=h4mWX3z03gi8sHlG0EWbH3tBlmtzj7tvg3DWAos6nt50rpnSz+y4Eo/8029jByzvN
+ 1QS6bxsqkew7z6/g9AMZR9VyY1rGyCZIpSGhsDL6MXG2ly75+IVJGMwbP5qQNQmnc5
+ niDLO7NXIvS8SW/sS+Iu9RE0rgtq1yAVtlynnyHMK3kjdKVHWSzzxx/9fq5DpWQKYu
+ uFouCpefIDGbxSjJ6uLwAvPlD+k/rnpTUE5yE4RTjHp/v/t7Y/50IOKA0+6mcFKqkS
+ bDbWFaatfMikrY8xjz63C104GtDmitiWGq6t64sFVO6JZD8B1suaQ4ed7Ix0FOkLFJ
+ ZqUY+QNom/i5Q==
 From: Ard Biesheuvel <ardb@kernel.org>
 To: linux-arm-kernel@lists.infradead.org
-Subject: [RFC PATCH 04/12] arm64: mm: remap PGD pages r/o in the linear region
- after allocation
-Date: Wed, 26 Jan 2022 18:30:03 +0100
-Message-Id: <20220126173011.3476262-5-ardb@kernel.org>
+Subject: [RFC PATCH 05/12] arm64: mm: remap PUD pages r/o in linear region
+Date: Wed, 26 Jan 2022 18:30:04 +0100
+Message-Id: <20220126173011.3476262-6-ardb@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220126173011.3476262-1-ardb@kernel.org>
 References: <20220126173011.3476262-1-ardb@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2460; h=from:subject;
- bh=NkDHn/GFNzvHawPVS9Op4WAl8MYqnxITPT90mOH4U9k=;
- b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBh8YUTOXbAUibor0RdzEKRaxJDrNYFfRidvP8AjwRP
- cwb0lxuJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCYfGFEwAKCRDDTyI5ktmPJF8DC/
- 9RAU2RHO/xy49vf4HfxCaKH83qITUHRcA6r89bUF/uVIsCSLeyZu+YTSVYzVbR0oXkOvhePQUSGjBY
- fvk161grsqB5b5VoZDT/OvYggUxZ59BPeuBNzXYJ5C/XcD12JX9iNQvtND/f9oZTsPX3c4ztmwMppH
- ak+KB8FI3rug+zIflF7vXnshCCkPPC+pVlaszPqQYupXLi/gt1JmKoSP7+BUfUTJKnPk/HBh1T0jRW
- MdqFeYWyU/bQz8befC9PuUO02UDcFECd7eAk2FFib0WKtMO6XbOY8HWbM32M66nAOtsOkYwBtSTWGx
- SSgTnGgokH7pQMkzM2loNpUvAwzHw5JsRLnXQxigbV8f1+aSHLZpBs21XN2mNSwwB8ZZ/zcFEhvJyA
- 9HraR1/POsV2WVoUC6CREUfB7YYT5GZZZn2tpWVcHinY6iopviXhB3G1gpK1eWeWEEUta13iIQY52U
- U3xV+Wn3b6sZOOBTd4c0mMonkJYtbsMQV1MSFq7CnsEP0=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2436; h=from:subject;
+ bh=pO2QvUUsV5L71fd/N5ug5v8ZnpkBMeHmPsJTXFD+MSg=;
+ b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBh8YUVOOEJY4XVWRP3L+tY2Fd1rYmhhe86Q8f7AUSQ
+ xXjIo1iJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCYfGFFQAKCRDDTyI5ktmPJM0SC/
+ 9TJASSXr7BX76TnGrR6DVfOMgm4ePZMcUwkFtSUNvrQSheHkJ5Dhpn+wTwQ4G4uEaCrIvhsyhtOJXn
+ gIAqHwx4C2T9W1b3QHf9d5i2c6OXAwWavoJbXb8Hc6W5hBuUylZ+Sb0Aksn1COSPDrNZKn8uB8hGIC
+ /Qea52bWHMwHQdXM1FX2hlKl0SgwrSoyI5HhgMYMQSZJAm8smM6XDsjvXKXwerEg6thIIg3owWG3lp
+ NDAgAmCQu7Se96JZUEYEQoTpGuVBpz4Z2RpNgEMGOCLwfvDDRV9g6cdh9xx+09jia6i0HYga3glYgY
+ AkYpFuapogYWP+/BG6trhpDrEoW8nGh94AxbjdrhxuodEwdGEVg/uE4n4b7ytd6I6UmU5Uq2mUl6PC
+ fhsWIcI82knyV4QIBwfu020onGbyrADdPL9XzuLKgXlr2lVwZmxWs342yn7MxpTq/Y6K5LZqFL6php
+ ii5PZEXG/T7oY+AlBemmzo9R20Bdx0Xcgthq3RHGGaox4=
 X-Developer-Key: i=ardb@kernel.org; a=openpgp;
  fpr=F43D03328115A198C90016883D200E9CA6329909
 Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
@@ -86,91 +85,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As the first step in restricting write access to all page tables via the
-linear mapping, remap the page at the root PGD level of a user space
-page table hierarchy read-only after allocation, so that it can only be
-manipulated using the dedicated fixmap based API.
+Implement the arch specific PUD alloc/free helpers by wrapping the
+generic code, and remapping the page read-only on allocation and
+read-write on free.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/mm/mmu.c |  7 ++++--
- arch/arm64/mm/pgd.c | 25 ++++++++++++++------
- 2 files changed, 23 insertions(+), 9 deletions(-)
+ arch/arm64/include/asm/pgalloc.h |  5 +++++
+ arch/arm64/include/asm/tlb.h     |  2 ++
+ arch/arm64/mm/mmu.c              | 20 ++++++++++++++++++++
+ 3 files changed, 27 insertions(+)
 
+diff --git a/arch/arm64/include/asm/pgalloc.h b/arch/arm64/include/asm/pgalloc.h
+index d54ac9f8d6c7..737e9f32b199 100644
+--- a/arch/arm64/include/asm/pgalloc.h
++++ b/arch/arm64/include/asm/pgalloc.h
+@@ -14,6 +14,8 @@
+ #include <asm/tlbflush.h>
+ 
+ #define __HAVE_ARCH_PGD_FREE
++#define __HAVE_ARCH_PUD_ALLOC_ONE
++#define __HAVE_ARCH_PUD_FREE
+ #include <asm-generic/pgalloc.h>
+ 
+ #define PGD_SIZE	(PTRS_PER_PGD * sizeof(pgd_t))
+@@ -45,6 +47,9 @@ static inline void __pud_populate(pud_t *pudp, phys_addr_t pmdp, pudval_t prot)
+ 
+ #if CONFIG_PGTABLE_LEVELS > 3
+ 
++pud_t *pud_alloc_one(struct mm_struct *mm, unsigned long addr);
++void pud_free(struct mm_struct *mm, pud_t *pud);
++
+ static inline void __p4d_populate(p4d_t *p4dp, phys_addr_t pudp, p4dval_t prot)
+ {
+ 	set_p4d(p4dp, __p4d(__phys_to_p4d_val(pudp) | prot));
+diff --git a/arch/arm64/include/asm/tlb.h b/arch/arm64/include/asm/tlb.h
+index c995d1f4594f..6557626752fc 100644
+--- a/arch/arm64/include/asm/tlb.h
++++ b/arch/arm64/include/asm/tlb.h
+@@ -94,6 +94,8 @@ static inline void __pmd_free_tlb(struct mmu_gather *tlb, pmd_t *pmdp,
+ static inline void __pud_free_tlb(struct mmu_gather *tlb, pud_t *pudp,
+ 				  unsigned long addr)
+ {
++	if (page_tables_are_ro())
++		set_pgtable_rw(pudp);
+ 	tlb_remove_table(tlb, virt_to_page(pudp));
+ }
+ #endif
 diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
-index acfae9b41cc8..a52c3162beae 100644
+index a52c3162beae..03d77c4c3570 100644
 --- a/arch/arm64/mm/mmu.c
 +++ b/arch/arm64/mm/mmu.c
-@@ -394,8 +394,11 @@ static phys_addr_t __pgd_pgtable_alloc(int shift)
- 	void *ptr = (void *)__get_free_page(GFP_PGTABLE_KERNEL);
- 	BUG_ON(!ptr);
- 
--	/* Ensure the zeroed page is visible to the page table walker */
--	dsb(ishst);
-+	if (page_tables_are_ro())
-+		set_pgtable_ro(ptr);
-+	else
-+		/* Ensure the zeroed page is visible to the page table walker */
-+		dsb(ishst);
- 	return __pa(ptr);
+@@ -1645,3 +1645,23 @@ static int __init prevent_bootmem_remove_init(void)
  }
- 
-diff --git a/arch/arm64/mm/pgd.c b/arch/arm64/mm/pgd.c
-index 4a64089e5771..637d6eceeada 100644
---- a/arch/arm64/mm/pgd.c
-+++ b/arch/arm64/mm/pgd.c
-@@ -9,8 +9,10 @@
- #include <linux/mm.h>
- #include <linux/gfp.h>
- #include <linux/highmem.h>
-+#include <linux/set_memory.h>
- #include <linux/slab.h>
- 
-+#include <asm/mmu_context.h>
- #include <asm/pgalloc.h>
- #include <asm/page.h>
- #include <asm/tlbflush.h>
-@@ -20,24 +22,33 @@ static struct kmem_cache *pgd_cache __ro_after_init;
- pgd_t *pgd_alloc(struct mm_struct *mm)
- {
- 	gfp_t gfp = GFP_PGTABLE_USER;
-+	pgd_t *pgd;
- 
--	if (PGD_SIZE == PAGE_SIZE)
--		return (pgd_t *)__get_free_page(gfp);
--	else
-+	if (PGD_SIZE < PAGE_SIZE && !page_tables_are_ro())
- 		return kmem_cache_alloc(pgd_cache, gfp);
+ early_initcall(prevent_bootmem_remove_init);
+ #endif
 +
-+	pgd = (pgd_t *)__get_free_page(gfp);
-+	if (!pgd)
++#ifndef __PAGETABLE_PUD_FOLDED
++pud_t *pud_alloc_one(struct mm_struct *mm, unsigned long addr)
++{
++	pud_t *pud = __pud_alloc_one(mm, addr);
++
++	if (!pud)
 +		return NULL;
 +	if (page_tables_are_ro())
-+		set_pgtable_ro(pgd);
-+	return pgd;
- }
- 
- void pgd_free(struct mm_struct *mm, pgd_t *pgd)
- {
--	if (PGD_SIZE == PAGE_SIZE)
--		free_page((unsigned long)pgd);
--	else
-+	if (PGD_SIZE < PAGE_SIZE && !page_tables_are_ro()) {
- 		kmem_cache_free(pgd_cache, pgd);
-+	} else {
-+		if (page_tables_are_ro())
-+			set_pgtable_rw(pgd);
-+		free_page((unsigned long)pgd);
-+	}
- }
- 
- void __init pgtable_cache_init(void)
- {
--	if (PGD_SIZE == PAGE_SIZE)
-+	if (PGD_SIZE == PAGE_SIZE || page_tables_are_ro())
- 		return;
- 
- #ifdef CONFIG_ARM64_PA_BITS_52
++		set_pgtable_ro(pud);
++	return pud;
++}
++
++void pud_free(struct mm_struct *mm, pud_t *pud)
++{
++	if (page_tables_are_ro())
++		set_pgtable_rw(pud);
++	free_page((u64)pud);
++}
++#endif
 -- 
 2.30.2
 
