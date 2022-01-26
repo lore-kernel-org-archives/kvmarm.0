@@ -2,74 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 894BEC28CF5
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 13:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 387A6C28CF5
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 13:21:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C466140712;
-	Wed, 26 Jan 2022 08:05:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1A26411C7;
+	Wed, 26 Jan 2022 08:21:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O2D82+kRk5TN; Wed, 26 Jan 2022 08:05:08 -0500 (EST)
+	with ESMTP id IJZDLBP4wto8; Wed, 26 Jan 2022 08:21:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD2DD408D5;
-	Wed, 26 Jan 2022 08:05:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90ECC40BEE;
+	Wed, 26 Jan 2022 08:21:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8877A40712
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 08:05:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2278A40E00
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 08:21:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dkst3iHL6oWu for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 08:05:06 -0500 (EST)
+ with ESMTP id 9+6QkUH26o4K for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 08:21:23 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D44440472
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 08:05:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC64240AFA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 08:21:23 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id E51DA61A6C;
- Wed, 26 Jan 2022 13:05:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56E5CC340E3;
- Wed, 26 Jan 2022 13:05:04 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 129DA60F1D;
+ Wed, 26 Jan 2022 13:21:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6455C340E3;
+ Wed, 26 Jan 2022 13:21:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643202304;
- bh=aRSD0q8QbNlli6eHa3NnFpfLKDi1bW68kqnD1RqIhjc=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Sv520NMzkWC3oJ5r3ashYHWDr0wfjkTiKCWfmcOVuri48k8f1ER/s7HLWwmsjUVJw
- AfTExaG+VhAnGAMO2p4UTRltLcTuB/bDbXYitLw4a7bP83oY5gUDVlwg2QYItBgC9O
- XJNcww3cNFzNLUTQGLJ0CrcZS7lkm7+Vjg/3jFCx6Uk/PMp2hgTAUPnapvwgy5nPnm
- jgAKClyRGQadVZnamG+uxCrggvf1+ILfZ9kK97iiGjsFUNKG5iSgdu2qoxHQus8ESn
- r5f6e1Zbdo2Q0RE3Fsv4I9ReSZ3LtfP9AxVXTHEY2348rtKheZmT1KG1QYx1gBZ9W3
- sAQnc8H/QjLLg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nChyw-003DX9-9C; Wed, 26 Jan 2022 13:05:02 +0000
-Date: Wed, 26 Jan 2022 13:05:01 +0000
-Message-ID: <87czke7ima.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
+ s=k20201202; t=1643203282;
+ bh=fPMNkVvTGtEkb1FdmSeOFQ9ZC+OjP+x1qXbgEQWmxbk=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=anfqCzhI3pGu70Eck98ANgaIj2RBKp42hlYgrjRdLVP+WrLFnRRgF9FGEnCvknvM3
+ SfaHfvpvI0YM9lM10pp4yG2k+YCqjZXsJk0n2i83qFsSyPi8RppldYBUOsf/vvSvtR
+ hlLkG2RqpZtr4SAgcC1AFNREzBXBspY8+9XEzGCV/aaib0Vq01uphIY9P+AFOnZDrE
+ Y9r3KY7c6UuD20ZaeQHEGe4nRxKIAqHbiC6IYBW4HmxAW7t2eE/Ddje0CpHC5Z+IfJ
+ 8Uo//QrKk3k4u5iIpBOOJCb8+EhNk1OGo1avDhNd2F5ceyebRVuxrDS9s22W0E+O52
+ l3RGErcCRpICw==
+Date: Wed, 26 Jan 2022 13:21:17 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH] kselftest: kvm/arm64: Skip tests if we can't create a
  vgic-v3
-In-Reply-To: <YfFEBlsUH+dMxmku@sirena.org.uk>
+Message-ID: <YfFKzWxNd5l26Ebk@sirena.org.uk>
 References: <20220125192851.3907611-1-broonie@kernel.org>
  <87h79q7tln.wl-maz@kernel.org> <YfFEBlsUH+dMxmku@sirena.org.uk>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, shuah@kernel.org, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kselftest@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <87czke7ima.wl-maz@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <87czke7ima.wl-maz@kernel.org>
+X-Cookie: Use only in a well-ventilated area.
 Cc: linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -83,37 +69,67 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============0705198005055769555=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 26 Jan 2022 12:52:22 +0000,
-Mark Brown <broonie@kernel.org> wrote:
-> 
-> On Wed, Jan 26, 2022 at 09:07:48AM +0000, Marc Zyngier wrote:
-> > Mark Brown <broonie@kernel.org> wrote:
-> 
-> > >  	/* Distributor setup */
-> > > -	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-> > > +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
-> 
-> > So you now only test whether it is possible to create a virtual GICv3,
-> > but don't actually create it. How does this work?
-> 
-> Oh, that's rather obscure in the API - so the file descriptor returned
-> if the test flag is specified can't actually be used?
 
-No file descriptor is returned at all from the kernel, so you should
-always get -1 as populated by kvm_create_device().
+--===============0705198005055769555==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="gspqA5Mq/TOiapel"
+Content-Disposition: inline
 
-See virt/kvm/kvm_main.c::kvm_ioctl_create_device().
 
-	M.
+--gspqA5Mq/TOiapel
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
--- 
-Without deviation from the norm, progress is not possible.
+On Wed, Jan 26, 2022 at 01:05:01PM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+
+> > > So you now only test whether it is possible to create a virtual GICv3,
+> > > but don't actually create it. How does this work?
+
+> > Oh, that's rather obscure in the API - so the file descriptor returned
+> > if the test flag is specified can't actually be used?
+
+> No file descriptor is returned at all from the kernel, so you should
+> always get -1 as populated by kvm_create_device().
+
+> See virt/kvm/kvm_main.c::kvm_ioctl_create_device().
+
+Ugh, right - the descriptor is returned separately to the return code
+but is then mapped onto the return code by the library since the library
+just aborts on error in the non-test case and in the test case the kernel
+returns an inverted boolean which gets passed straight through.  Like I
+say the API seems a bit confusing here.
+
+--gspqA5Mq/TOiapel
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmHxSswACgkQJNaLcl1U
+h9Dsmgf/e8msOXlT7YykzDeLiWdBtZ7S3j8L7Q3+RRpswDfva7HRFzgu3hABYNIA
+NFcX4iDBz4ATuI5fa3jQ+aBTf1XwBh1nCQQP7CBH6vTydkR1RFPJ4eRL9Km94yXJ
+0b4GQF+vVLRAyiK93GpvKJhQBIB8VlOM6Xtt4fkWcBaLcRrBr1idEQYZKe8ttP/Q
+hhhtMVcR8ojaxUpH5CNdeDCVMt42Sf0ayleoH4HKfBEJ9iyMSdDG1Rkr9f3fH2wU
+5b5hrdQGaAhVoMW4MgWrxCh5bFnTU6Rioxx4gtkcPDYNPBoyZjAPs01kYJFCdSok
+jMixYIz0sHLQL8cdNJv+x3IBxGWLMA==
+=58KH
+-----END PGP SIGNATURE-----
+
+--gspqA5Mq/TOiapel--
+
+--===============0705198005055769555==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============0705198005055769555==--
