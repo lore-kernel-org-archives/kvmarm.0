@@ -2,91 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C12FCC28CF5
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 15:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1360C28CF5
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 15:12:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D08449B08;
-	Wed, 26 Jan 2022 10:12:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7853A40BDC;
+	Wed, 26 Jan 2022 10:12:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9Rk0e6dNpbJC; Wed, 26 Jan 2022 10:12:37 -0500 (EST)
+	with ESMTP id GXJijg9QRa3Z; Wed, 26 Jan 2022 10:12:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E14749E27;
-	Wed, 26 Jan 2022 10:12:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F61B49E2B;
+	Wed, 26 Jan 2022 10:12:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A928F40BAF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:12:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D10B40B75
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:12:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uF5TV+6bL3g8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 10:12:34 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 931E140658
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:12:34 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1643209954;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UUIXRDsB43LqGC6wuVo5tX7u3LkbrScUsL4k4ngSu2Y=;
- b=W4zik2eG40YkFtA8d2/yLSWgTOg0vcF6M2XB2Vh4J449Wg98ARJHJAxSkHKh9C7NRSi4l5
- CEWJjR1AQEOR4jNnpukMOS7kFob7zJdN0vqIW888KCc58dlP3oYwJtnQmr3N5Ew8FPKBPJ
- P8CPZRr2Ltma9lyFeobhOS5ykXB/MzM=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-479-T-NmGVwXPImDofn_mDD0ZQ-1; Wed, 26 Jan 2022 10:12:31 -0500
-X-MC-Unique: T-NmGVwXPImDofn_mDD0ZQ-1
-Received: by mail-ej1-f70.google.com with SMTP id
- 13-20020a170906328d00b006982d0888a4so4982176ejw.9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 07:12:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=UUIXRDsB43LqGC6wuVo5tX7u3LkbrScUsL4k4ngSu2Y=;
- b=KPlAK9dClL+HqMUw2wnf8oR8vaUmYWO9UcYZVaFLm0BTMl5jix88x7re0Nv2InD1Pp
- xFFr2RkqZDIBKfdniCMwCq6tWvRbmEZ790dqvCbAALIrU0FNEXlcU7Gpk59NJCKHoU3K
- uOXfyeD/g0w2aYFGGuJ/7NEzxU2HYRqEbyg4S6YW+VrDPOYmKmDG/g9nsVZGtWzVbN4Z
- XXcHrKJCg68VU8hKri5jCTQfI/NnRiFeDRlDMJhi/Z1PrlG5gsUil6W9oyRdCjrai1RR
- aGtkpEmj5vtf9bEVfiMIp7WwuaLkKqkWKnK4ilFyCnm1npRG1lGkrPg7x2Ig54cWEfkF
- hZ5A==
-X-Gm-Message-State: AOAM533rJQlHHmFIg36jq9crhIJ07hzcdImUbSFQHqSiviVzFT/kZo8e
- 2r1jQEBhXo7Yv9UNnIHbsK5+ftpyGwIAlkavfLZ9U/2o9gzONA/BdgLHWgGAw5ix4U5OSpvF8fL
- Nd13KpRMHqcUiURbQGbZOolXp
-X-Received: by 2002:a05:6402:1e93:: with SMTP id
- f19mr24928682edf.343.1643209949954; 
- Wed, 26 Jan 2022 07:12:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw6Qy96gPxqMhyDBBrrHHmi32FfITBGmSSHPgu5dt26Cvx+nGMpg11N+n6bAEnecDU6AecWoQ==
-X-Received: by 2002:a05:6402:1e93:: with SMTP id
- f19mr24928663edf.343.1643209949742; 
- Wed, 26 Jan 2022 07:12:29 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
- by smtp.gmail.com with ESMTPSA id u17sm7479631ejb.31.2022.01.26.07.12.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Jan 2022 07:12:29 -0800 (PST)
-Date: Wed, 26 Jan 2022 16:12:27 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3] kselftest: kvm/arm64: Skip tests if we can't create a
- vgic-v3
-Message-ID: <20220126151227.jlhb5o32jwal24m6@gator>
-References: <20220126145242.3473836-1-broonie@kernel.org>
+ with ESMTP id HS3KbMb8+u3m for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 10:12:36 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA35140BAF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:12:35 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id E93D8B81C0F;
+ Wed, 26 Jan 2022 15:12:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39A66C36AE3;
+ Wed, 26 Jan 2022 15:12:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1643209954;
+ bh=FbM5omNpKVlWYHj4CpEGaUUeTfnFSez5FdQgrP8X7BI=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=kKLygm2uoVTl5QjMGR4bmBhYj5mTaH0P7D3OKQ6L897ArykA2nnlBIKr5kAu7Gy/u
+ jHu02MSDFlgr4UFmbViBGnaZQHxO853FMofrNG+MyZzePr2Um18XWybm4idIOLfLM6
+ F6xq5ZHjcc7XkDdNqbHEnJwx17STGYoVad2XpHK7a6tlh6zp0cMDK4aylor6AjKOC8
+ Tv9OPloSnQBc4iL/6Vlg0RmSQDt4t3OspWwd1s5jyYFAat5nUu9/J6fLbAM1NEsk9q
+ LcUQAl8YdXj3Dmm/sB3dY7nl2CiWsq+igR7EUNAhe7kxhIgsqnMkNK84qWHnNMZmtS
+ hMDlMiphoB5Cg==
+From: Mark Brown <broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+ Shuah Khan <shuah@kernel.org>
+Subject: [PATCH v9 15/40] arm64/sme: Implement streaming SVE context switching
+Date: Wed, 26 Jan 2022 15:10:55 +0000
+Message-Id: <20220126151120.3811248-16-broonie@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220126151120.3811248-1-broonie@kernel.org>
+References: <20220126151120.3811248-1-broonie@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20220126145242.3473836-1-broonie@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-kselftest@vger.kernel.org
+X-Developer-Signature: v=1; a=openpgp-sha256; l=12873; h=from:subject;
+ bh=FbM5omNpKVlWYHj4CpEGaUUeTfnFSez5FdQgrP8X7BI=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBh8WSCM4HwaIbkwMOJ8Gp+ywzMOTGQSE4vsjmP7EyU
+ 9JyhDDuJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYfFkggAKCRAk1otyXVSH0EUzB/
+ 9rOIrvRmu3IFylTx/sZ6oahOLGZdcTd2diWaJjjFSnoUadZwdQaVTCBdthHN6WXSSBMwJo4ErZFfhg
+ xdWGAsWARfa0X5qnoyfA0z0qtQGXhXOFLF+VD6CDiZDcyi6w2eMKwZVvit2bxv1kvZquijr2TQiHLF
+ m2EVLQ0wfPJ6nAfdtlySbfn3YzDOldn9JV9UJRJkwYS8u4pfpNjg6v5t6k3HIcZSOC5ssDr1CRvOts
+ dmqBe9+NRHq3WN0QYmzeEnHmJZ/ppnKvv6XnqdCDxtPJHfN/iRe08rJ5BFzbCQ4qGMhniDl0+uTK0Q
+ csjzAS7OrP2FfWzfn2cpjwiEHBiyYb
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Luis Machado <luis.machado@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>,
+ Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
+ kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,37 +87,379 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 26, 2022 at 02:52:42PM +0000, Mark Brown wrote:
-> The arch_timer and vgic_irq kselftests assume that they can create a
-> vgic-v3, using the library function vgic_v3_setup() which aborts with a
-> test failure if it is not possible to do so. Since vgic-v3 can only be
-> instantiated on systems where the host has GICv3 this leads to false
-> positives on older systems where that is not the case.
-> 
-> Fix this by changing vgic_v3_setup() to return an error if the vgic can't
-> be instantiated and have the callers skip if this happens. We could also
-> exit flagging a skip in vgic_v3_setup() but this would prevent future test
-> cases conditionally deciding which GIC to use or generally doing more
-> complex output.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
-> 
-> v3:
->  - Use custom print_skip() helper.
->  - Use internal version of _kvm_create_device.
-> v2:
->  - The test for being able to create the GIC doesn't actually
->    instantiate it, add a call doing so in that case.
-> 
->  tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
->  tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 4 ++++
->  tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
->  3 files changed, 13 insertions(+), 2 deletions(-)
->
+When in streaming mode we need to save and restore the streaming mode
+SVE register state rather than the regular SVE register state. This uses
+the streaming mode vector length and omits FFR but is otherwise identical,
+if TIF_SVE is enabled when we are in streaming mode then streaming mode
+takes precedence.
 
+This does not handle use of streaming SVE state with KVM, ptrace or
+signals. This will be updated in further patches.
+
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+ arch/arm64/include/asm/fpsimd.h       |  22 +++++-
+ arch/arm64/include/asm/fpsimdmacros.h |  11 +++
+ arch/arm64/include/asm/processor.h    |  10 +++
+ arch/arm64/kernel/entry-fpsimd.S      |   5 ++
+ arch/arm64/kernel/fpsimd.c            | 109 +++++++++++++++++++++-----
+ arch/arm64/kvm/fpsimd.c               |   3 +-
+ 6 files changed, 137 insertions(+), 23 deletions(-)
+
+diff --git a/arch/arm64/include/asm/fpsimd.h b/arch/arm64/include/asm/fpsimd.h
+index d1bae65d3dba..650ec642159c 100644
+--- a/arch/arm64/include/asm/fpsimd.h
++++ b/arch/arm64/include/asm/fpsimd.h
+@@ -47,11 +47,21 @@ extern void fpsimd_update_current_state(struct user_fpsimd_state const *state);
  
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+ extern void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *state,
+ 				     void *sve_state, unsigned int sve_vl,
+-				     u64 *svcr);
++				     unsigned int sme_vl, u64 *svcr);
+ 
+ extern void fpsimd_flush_task_state(struct task_struct *target);
+ extern void fpsimd_save_and_flush_cpu_state(void);
+ 
++static inline bool thread_sm_enabled(struct thread_struct *thread)
++{
++	return system_supports_sme() && (thread->svcr & SYS_SVCR_EL0_SM_MASK);
++}
++
++static inline bool thread_za_enabled(struct thread_struct *thread)
++{
++	return system_supports_sme() && (thread->svcr & SYS_SVCR_EL0_ZA_MASK);
++}
++
+ /* Maximum VL that SVE/SME VL-agnostic software can transparently support */
+ #define VL_ARCH_MAX 0x100
+ 
+@@ -63,7 +73,14 @@ static inline size_t sve_ffr_offset(int vl)
+ 
+ static inline void *sve_pffr(struct thread_struct *thread)
+ {
+-	return (char *)thread->sve_state + sve_ffr_offset(thread_get_sve_vl(thread));
++	unsigned int vl;
++
++	if (system_supports_sme() && thread_sm_enabled(thread))
++		vl = thread_get_sme_vl(thread);
++	else
++		vl = thread_get_sve_vl(thread);
++
++	return (char *)thread->sve_state + sve_ffr_offset(vl);
+ }
+ 
+ extern void sve_save_state(void *state, u32 *pfpsr, int save_ffr);
+@@ -72,6 +89,7 @@ extern void sve_load_state(void const *state, u32 const *pfpsr,
+ extern void sve_flush_live(bool flush_ffr, unsigned long vq_minus_1);
+ extern unsigned int sve_get_vl(void);
+ extern void sve_set_vq(unsigned long vq_minus_1);
++extern void sme_set_vq(unsigned long vq_minus_1);
+ 
+ struct arm64_cpu_capabilities;
+ extern void sve_kernel_enable(const struct arm64_cpu_capabilities *__unused);
+diff --git a/arch/arm64/include/asm/fpsimdmacros.h b/arch/arm64/include/asm/fpsimdmacros.h
+index 11c426ddd62c..a50fa1eab730 100644
+--- a/arch/arm64/include/asm/fpsimdmacros.h
++++ b/arch/arm64/include/asm/fpsimdmacros.h
+@@ -261,6 +261,17 @@
+ 921:
+ .endm
+ 
++/* Update SMCR_EL1.LEN with the new VQ */
++.macro sme_load_vq xvqminus1, xtmp, xtmp2
++		mrs_s		\xtmp, SYS_SMCR_EL1
++		bic		\xtmp2, \xtmp, SMCR_ELx_LEN_MASK
++		orr		\xtmp2, \xtmp2, \xvqminus1
++		cmp		\xtmp2, \xtmp
++		b.eq		921f
++		msr_s		SYS_SMCR_EL1, \xtmp2	//self-synchronising
++921:
++.endm
++
+ /* Preserve the first 128-bits of Znz and zero the rest. */
+ .macro _sve_flush_z nz
+ 	_sve_check_zreg \nz
+diff --git a/arch/arm64/include/asm/processor.h b/arch/arm64/include/asm/processor.h
+index 7e08a4d48c24..6e2af9de153c 100644
+--- a/arch/arm64/include/asm/processor.h
++++ b/arch/arm64/include/asm/processor.h
+@@ -183,6 +183,11 @@ static inline unsigned int thread_get_sve_vl(struct thread_struct *thread)
+ 	return thread_get_vl(thread, ARM64_VEC_SVE);
+ }
+ 
++static inline unsigned int thread_get_sme_vl(struct thread_struct *thread)
++{
++	return thread_get_vl(thread, ARM64_VEC_SME);
++}
++
+ unsigned int task_get_vl(const struct task_struct *task, enum vec_type type);
+ void task_set_vl(struct task_struct *task, enum vec_type type,
+ 		 unsigned long vl);
+@@ -196,6 +201,11 @@ static inline unsigned int task_get_sve_vl(const struct task_struct *task)
+ 	return task_get_vl(task, ARM64_VEC_SVE);
+ }
+ 
++static inline unsigned int task_get_sme_vl(const struct task_struct *task)
++{
++	return task_get_vl(task, ARM64_VEC_SME);
++}
++
+ static inline void task_set_sve_vl(struct task_struct *task, unsigned long vl)
+ {
+ 	task_set_vl(task, ARM64_VEC_SVE, vl);
+diff --git a/arch/arm64/kernel/entry-fpsimd.S b/arch/arm64/kernel/entry-fpsimd.S
+index deee5f01462e..6f88c0f86d50 100644
+--- a/arch/arm64/kernel/entry-fpsimd.S
++++ b/arch/arm64/kernel/entry-fpsimd.S
+@@ -94,4 +94,9 @@ SYM_FUNC_START(sme_get_vl)
+ 	ret
+ SYM_FUNC_END(sme_get_vl)
+ 
++SYM_FUNC_START(sme_set_vq)
++	sme_load_vq x0, x1, x2
++	ret
++SYM_FUNC_END(sme_set_vq)
++
+ #endif /* CONFIG_ARM64_SME */
+diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
+index a1918b71d335..12fef62cf07a 100644
+--- a/arch/arm64/kernel/fpsimd.c
++++ b/arch/arm64/kernel/fpsimd.c
+@@ -123,6 +123,7 @@ struct fpsimd_last_state_struct {
+ 	void *sve_state;
+ 	u64 *svcr;
+ 	unsigned int sve_vl;
++	unsigned int sme_vl;
+ };
+ 
+ static DEFINE_PER_CPU(struct fpsimd_last_state_struct, fpsimd_last_state);
+@@ -301,17 +302,28 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
+ 	task->thread.vl_onexec[type] = vl;
+ }
+ 
++/*
++ * TIF_SME controls whether a task can use SME without trapping while
++ * in userspace, when TIF_SME is set then we must have storage
++ * alocated in sve_state and za_state to store the contents of both ZA
++ * and the SVE registers for both streaming and non-streaming modes.
++ *
++ * If both SVCR.ZA and SVCR.SM are disabled then at any point we
++ * may disable TIF_SME and reenable traps.
++ */
++
++
+ /*
+  * TIF_SVE controls whether a task can use SVE without trapping while
+- * in userspace, and also the way a task's FPSIMD/SVE state is stored
+- * in thread_struct.
++ * in userspace, and also (together with TIF_SME) the way a task's
++ * FPSIMD/SVE state is stored in thread_struct.
+  *
+  * The kernel uses this flag to track whether a user task is actively
+  * using SVE, and therefore whether full SVE register state needs to
+  * be tracked.  If not, the cheaper FPSIMD context handling code can
+  * be used instead of the more costly SVE equivalents.
+  *
+- *  * TIF_SVE set:
++ *  * TIF_SVE or SVCR.SM set:
+  *
+  *    The task can execute SVE instructions while in userspace without
+  *    trapping to the kernel.
+@@ -319,7 +331,8 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
+  *    When stored, Z0-Z31 (incorporating Vn in bits[127:0] or the
+  *    corresponding Zn), P0-P15 and FFR are encoded in in
+  *    task->thread.sve_state, formatted appropriately for vector
+- *    length task->thread.sve_vl.
++ *    length task->thread.sve_vl or, if SVCR.SM is set,
++ *    task->thread.sme_vl.
+  *
+  *    task->thread.sve_state must point to a valid buffer at least
+  *    sve_state_size(task) bytes in size.
+@@ -357,19 +370,40 @@ void task_set_vl_onexec(struct task_struct *task, enum vec_type type,
+  */
+ static void task_fpsimd_load(void)
+ {
++	bool restore_sve_regs = false;
++	bool restore_ffr;
++
+ 	WARN_ON(!system_supports_fpsimd());
+ 	WARN_ON(!have_cpu_fpsimd_context());
+ 
+-	if (IS_ENABLED(CONFIG_ARM64_SME) && test_thread_flag(TIF_SME))
+-		write_sysreg_s(current->thread.svcr, SYS_SVCR_EL0);
+-
++	/* Check if we should restore SVE first */
+ 	if (IS_ENABLED(CONFIG_ARM64_SVE) && test_thread_flag(TIF_SVE)) {
+ 		sve_set_vq(sve_vq_from_vl(task_get_sve_vl(current)) - 1);
++		restore_sve_regs = true;
++		restore_ffr = true;
++	}
++
++	/* Restore SME, override SVE register configuration if needed */
++	if (system_supports_sme()) {
++		unsigned long sme_vl = task_get_sme_vl(current);
++
++		if (test_thread_flag(TIF_SME))
++			sme_set_vq(sve_vq_from_vl(sme_vl) - 1);
++
++		write_sysreg_s(current->thread.svcr, SYS_SVCR_EL0);
++
++		if (thread_sm_enabled(&current->thread)) {
++			restore_sve_regs = true;
++			restore_ffr = system_supports_fa64();
++		}
++	}
++
++	if (restore_sve_regs)
+ 		sve_load_state(sve_pffr(&current->thread),
+-			       &current->thread.uw.fpsimd_state.fpsr, true);
+-	} else {
++			       &current->thread.uw.fpsimd_state.fpsr,
++			       restore_ffr);
++	else
+ 		fpsimd_load_state(&current->thread.uw.fpsimd_state);
+-	}
+ }
+ 
+ /*
+@@ -381,6 +415,9 @@ static void fpsimd_save(void)
+ 	struct fpsimd_last_state_struct const *last =
+ 		this_cpu_ptr(&fpsimd_last_state);
+ 	/* set by fpsimd_bind_task_to_cpu() or fpsimd_bind_state_to_cpu() */
++	bool save_sve_regs = false;
++	bool save_ffr;
++	unsigned int vl;
+ 
+ 	WARN_ON(!system_supports_fpsimd());
+ 	WARN_ON(!have_cpu_fpsimd_context());
+@@ -388,15 +425,33 @@ static void fpsimd_save(void)
+ 	if (test_thread_flag(TIF_FOREIGN_FPSTATE))
+ 		return;
+ 
+-	if (IS_ENABLED(CONFIG_ARM64_SME) &&
+-	    test_thread_flag(TIF_SME)) {
++	if (test_thread_flag(TIF_SVE)) {
++		save_sve_regs = true;
++		save_ffr = true;
++		vl = last->sve_vl;
++	}
++
++	if (system_supports_sme()) {
+ 		u64 *svcr = last->svcr;
+ 		*svcr = read_sysreg_s(SYS_SVCR_EL0);
++
++		if (thread_za_enabled(&current->thread)) {
++			/* ZA state managment is not implemented yet */
++			force_signal_inject(SIGKILL, SI_KERNEL, 0, 0);
++			return;
++		}
++
++		/* If we are in streaming mode override regular SVE. */
++		if (*svcr & SYS_SVCR_EL0_SM_MASK) {
++			save_sve_regs = true;
++			save_ffr = system_supports_fa64();
++			vl = last->sme_vl;
++		}
+ 	}
+ 
+-	if (IS_ENABLED(CONFIG_ARM64_SVE) &&
+-	    test_thread_flag(TIF_SVE)) {
+-		if (WARN_ON(sve_get_vl() != last->sve_vl)) {
++	if (IS_ENABLED(CONFIG_ARM64_SVE) && save_sve_regs) {
++		/* Get the configured VL from RDVL, will account for SM */
++		if (WARN_ON(sve_get_vl() != vl)) {
+ 			/*
+ 			 * Can't save the user regs, so current would
+ 			 * re-enter user with corrupt state.
+@@ -407,8 +462,8 @@ static void fpsimd_save(void)
+ 		}
+ 
+ 		sve_save_state((char *)last->sve_state +
+-					sve_ffr_offset(last->sve_vl),
+-			       &last->st->fpsr, true);
++					sve_ffr_offset(vl),
++			       &last->st->fpsr, save_ffr);
+ 	} else {
+ 		fpsimd_save_state(last->st);
+ 	}
+@@ -613,7 +668,14 @@ static void sve_to_fpsimd(struct task_struct *task)
+  */
+ static size_t sve_state_size(struct task_struct const *task)
+ {
+-	return SVE_SIG_REGS_SIZE(sve_vq_from_vl(task_get_sve_vl(task)));
++	unsigned int vl = 0;
++
++	if (system_supports_sve())
++		vl = task_get_sve_vl(task);
++	if (system_supports_sme())
++		vl = max(vl, task_get_sme_vl(task));
++
++	return SVE_SIG_REGS_SIZE(sve_vq_from_vl(vl));
+ }
+ 
+ /*
+@@ -742,7 +804,8 @@ int vec_set_vector_length(struct task_struct *task, enum vec_type type,
+ 	}
+ 
+ 	fpsimd_flush_task_state(task);
+-	if (test_and_clear_tsk_thread_flag(task, TIF_SVE))
++	if (test_and_clear_tsk_thread_flag(task, TIF_SVE) ||
++	    thread_sm_enabled(&task->thread))
+ 		sve_to_fpsimd(task);
+ 
+ 	if (system_supports_sme() && type == ARM64_VEC_SME)
+@@ -1369,6 +1432,9 @@ void fpsimd_flush_thread(void)
+ 		fpsimd_flush_thread_vl(ARM64_VEC_SVE);
+ 	}
+ 
++	if (system_supports_sme())
++		fpsimd_flush_thread_vl(ARM64_VEC_SME);
++
+ 	put_cpu_fpsimd_context();
+ }
+ 
+@@ -1412,6 +1478,7 @@ static void fpsimd_bind_task_to_cpu(void)
+ 	last->st = &current->thread.uw.fpsimd_state;
+ 	last->sve_state = current->thread.sve_state;
+ 	last->sve_vl = task_get_sve_vl(current);
++	last->sme_vl = task_get_sme_vl(current);
+ 	last->svcr = &current->thread.svcr;
+ 	current->thread.fpsimd_cpu = smp_processor_id();
+ 
+@@ -1427,7 +1494,8 @@ static void fpsimd_bind_task_to_cpu(void)
+ }
+ 
+ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
+-			      unsigned int sve_vl, u64 *svcr)
++			      unsigned int sve_vl, unsigned int sme_vl,
++			      u64 *svcr)
+ {
+ 	struct fpsimd_last_state_struct *last =
+ 		this_cpu_ptr(&fpsimd_last_state);
+@@ -1439,6 +1507,7 @@ void fpsimd_bind_state_to_cpu(struct user_fpsimd_state *st, void *sve_state,
+ 	last->svcr = svcr;
+ 	last->sve_state = sve_state;
+ 	last->sve_vl = sve_vl;
++	last->sme_vl = sme_vl;
+ }
+ 
+ /*
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index 04698c4bcd30..902c598b7ed2 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -109,7 +109,8 @@ void kvm_arch_vcpu_ctxsync_fp(struct kvm_vcpu *vcpu)
+ 		 */
+ 		fpsimd_bind_state_to_cpu(&vcpu->arch.ctxt.fp_regs,
+ 					 vcpu->arch.sve_state,
+-					 vcpu->arch.sve_max_vl);
++					 vcpu->arch.sve_max_vl,
++					 0);
+ 
+ 		clear_thread_flag(TIF_FOREIGN_FPSTATE);
+ 		update_thread_flag(TIF_SVE, vcpu_has_sve(vcpu));
+-- 
+2.30.2
 
 _______________________________________________
 kvmarm mailing list
