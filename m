@@ -2,52 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73360C2BA4C
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 16:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF2BC28CF5
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 17:30:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF8584045D;
-	Wed, 26 Jan 2022 11:49:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ACBD4A014;
+	Wed, 26 Jan 2022 12:30:26 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6W8G+NsU6Gva; Wed, 26 Jan 2022 11:49:47 -0500 (EST)
+	with ESMTP id 8DlSj7byfcdd; Wed, 26 Jan 2022 12:30:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A57049F17;
-	Wed, 26 Jan 2022 11:49:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02F6049EF0;
+	Wed, 26 Jan 2022 12:30:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 364C149F0E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 11:49:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5960440B80
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 12:30:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3dZjAt0wHsG6 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 11:49:45 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B860240CDE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 11:49:45 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 21894D6E;
- Wed, 26 Jan 2022 08:49:45 -0800 (PST)
-Received: from [10.1.196.218] (eglon.cambridge.arm.com [10.1.196.218])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0431F3F7D8;
- Wed, 26 Jan 2022 08:49:43 -0800 (PST)
-Subject: Re: [PATCH 4/4] KVM: arm64: Workaround Cortex-A510's single-step and
- PAC trap errata
-To: Marc Zyngier <maz@kernel.org>
-References: <20220125153803.549084-1-james.morse@arm.com>
- <20220125153803.549084-5-james.morse@arm.com> <87mtjj7o7y.wl-maz@kernel.org>
- <711e16a1-c853-10e8-43d5-31890f0d4c7c@arm.com> <87k0en7jcw.wl-maz@kernel.org>
-From: James Morse <james.morse@arm.com>
-Message-ID: <a28f54a5-47d2-651a-0a2f-4274ab9d5855@arm.com>
-Date: Wed, 26 Jan 2022 16:49:29 +0000
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+ with ESMTP id K28t6eq6wp4r for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 12:30:23 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0951840B78
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 12:30:22 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 9584DB81F83;
+ Wed, 26 Jan 2022 17:30:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A640C340E3;
+ Wed, 26 Jan 2022 17:30:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1643218220;
+ bh=pWY8dXRqISyPMpXIUIg/1ZSCdi0mhgFpF9BPw5qS6og=;
+ h=From:To:Cc:Subject:Date:From;
+ b=U1XnwyrLyXDPT//AZt9PCThDvtK2xGE9oqOh1MiLmFcGnYPllVj5Xc4Z2/ujXaTT7
+ 4fvNlp5YxPKIzJf+FMaZVsA5jyERhYVHV0JMx4n+ecAY+dirGzPXDb5zoPOdU52sen
+ kzRqa49W7pPW86Rm+IB/QEg5xZqU11Q+S/w4aBe+PRAvC9ZgqeisClk2xyvzrmv7N1
+ Jg+vo+UIpo0/p5RySXDMr3PwT7iJnnECKgtYrbnqEErAgTSpqAa8G3+viq6bOU3seC
+ 74/c75jF5U/mMQoBMz/+Hms6jXUl5HbyXmkhgGGExuNXv7DvftLuodf+vf0uLTNf+S
+ a1tut6N0407dA==
+From: Ard Biesheuvel <ardb@kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Subject: [RFC PATCH 00/12] arm64: implement read-only page tables
+Date: Wed, 26 Jan 2022 18:29:59 +0100
+Message-Id: <20220126173011.3476262-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <87k0en7jcw.wl-maz@kernel.org>
-Content-Language: en-GB
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
- Anshuman Khandual <anshuman.khandual@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3236; h=from:subject;
+ bh=pWY8dXRqISyPMpXIUIg/1ZSCdi0mhgFpF9BPw5qS6og=;
+ b=owEB7QES/pANAwAKAcNPIjmS2Y8kAcsmYgBh8YULht9E74L+zZTJTFFoCawdjRMmCdtZ4IAnm71U
+ fV10y1eJAbMEAAEKAB0WIQT72WJ8QGnJQhU3VynDTyI5ktmPJAUCYfGFCwAKCRDDTyI5ktmPJNFTC/
+ 0V/JLHp/pLWgfXzMdscielk702MIPXv5P67aangziUlBHvgp/05Wxx65qFDbqXB2/vPOqNzVgFfWab
+ cWNhO6fAjUINbg9T/5fPfaobv41zpQJD59prgP700vizYNi7XaqnVmXbwO1rIEsuREl841ib/7XeHK
+ 5MLh7Hqp/40l6m7tWYP8C7rZDOUTD34KKwZGHiy3VNPLXTdluOIBhUJUVr9YXN+BhslSPbH1//lfWH
+ EMsqGI+9u3JyJfEFt2d5lPksfcxMT8GoPnc5wSPK7ZZKC+fNvmob3Kr9pVpJC8eK2s5nYlC+B4oHbr
+ PcVbo9dEFc1jY3RX4mtrOGQkafyGm6j1Fnvv3fwg5p6US+L0wv3fKUQ9/w62z7UzavpXf/K+t4X0tt
+ i1tT4IwDC2w9j+u+INppZJv7qJjEgBfwPwcJ/MsKJLGcKrK5j17WnQk1XJXJGhg0Ip225B7crFlziW
+ NqsamI68x3zHZPXaZuG7LeOVLCW2CIVg9jgyfYlCjJT/w=
+X-Developer-Key: i=ardb@kernel.org; a=openpgp;
+ fpr=F43D03328115A198C90016883D200E9CA6329909
+Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-hardening@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -59,82 +78,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCk9uIDI1LzAxLzIwMjIgMTg6MzYsIE1hcmMgWnluZ2llciB3cm90ZToKPiBPbiBU
-dWUsIDI1IEphbiAyMDIyIDE4OjE5OjQ1ICswMDAwLAo+IEphbWVzIE1vcnNlIDxqYW1lcy5tb3Jz
-ZUBhcm0uY29tPiB3cm90ZToKPj4gT24gMjUvMDEvMjAyMiAxNjo1MSwgTWFyYyBaeW5naWVyIHdy
-b3RlOgo+Pj4gT24gVHVlLCAyNSBKYW4gMjAyMiAxNTozODowMyArMDAwMCwKPj4+IEphbWVzIE1v
-cnNlIDxqYW1lcy5tb3JzZUBhcm0uY29tPiB3cm90ZToKPj4+Pgo+Pj4+IENvcnRleC1BNTEwJ3Mg
-ZXJyYXR1bSAjMjA3NzA1NyBjYXVzZXMgU1BTUl9FTDIgdG8gYmUgY29ycnVwdGVkIHdoZW4KPj4+
-PiBzaW5nbGUtc3RlcHBpbmcgYXV0aGVudGljYXRlZCBFUkVUIGluc3RydWN0aW9ucy4gQSBzaW5n
-bGUgc3RlcCBpcwo+Pj4+IGV4cGVjdGVkLCBidXQgYSBwb2ludGVyIGF1dGhlbnRpY2F0aW9uIHRy
-YXAgaXMgdGFrZW4gaW5zdGVhZC4gVGhlCj4+Pj4gZXJyYXR1bSBjYXVzZXMgU1BTUl9FTDEgdG8g
-YmUgY29waWVkIHRvIFNQU1JfRUwyLCB3aGljaCBjb3VsZCBhbGxvdwo+Pj4+IEVMMSB0byBjYXVz
-ZSBhIHJldHVybiB0byBFTDIgd2l0aCBhIGd1ZXN0IGNvbnRyb2xsZWQgRUxSX0VMMi4KPj4+Pgo+
-Pj4+IEJlY2F1c2UgdGhlIGNvbmRpdGlvbnMgcmVxdWlyZSBhbiBFUkVUIGludG8gYWN0aXZlLW5v
-dC1wZW5kaW5nIHN0YXRlLAo+Pj4+IHRoaXMgaXMgb25seSBhIHByb2JsZW0gZm9yIHRoZSBFTDIg
-d2hlbiBFTDIgaXMgc3RlcHBpbmcgRUwxLiBJbiB0aGlzIGNhc2UKPj4+PiB0aGUgcHJldmlvdXMg
-U1BTUl9FTDIgdmFsdWUgaXMgcHJlc2VydmVkIGluIHN0cnVjdCBrdm1fdmNwdSwgYW5kIGNhbiBi
-ZQo+Pj4+IHJlc3RvcmVkLgoKPj4+PiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL2lu
-Y2x1ZGUvaHlwL3N3aXRjaC5oIGIvYXJjaC9hcm02NC9rdm0vaHlwL2luY2x1ZGUvaHlwL3N3aXRj
-aC5oCj4+Pj4gaW5kZXggMzMxZGQxMDgyMWRmLi45M2JmMTQwY2M5NzIgMTAwNjQ0Cj4+Pj4gLS0t
-IGEvYXJjaC9hcm02NC9rdm0vaHlwL2luY2x1ZGUvaHlwL3N3aXRjaC5oCj4+Pj4gKysrIGIvYXJj
-aC9hcm02NC9rdm0vaHlwL2luY2x1ZGUvaHlwL3N3aXRjaC5oCj4+Pj4gQEAgLTQ0MCw2ICs0NDIs
-MjIgQEAgc3RhdGljIGlubGluZSBib29sIGZpeHVwX2d1ZXN0X2V4aXQoc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1LCB1NjQgKmV4aXRfY29kZSkKPj4+PiAgCQkJd3JpdGVfc3lzcmVnX2VsMihyZWFkX3N5
-c3JlZ19lbDIoU1lTX0VMUikgLSA0LCBTWVNfRUxSKTsKPj4+PiAgCX0KPj4+PiAgCj4+Pj4gKwkv
-Kgo+Pj4+ICsJICogQ2hlY2sgZm9yIHRoZSBjb25kaXRpb25zIG9mIENvcnRleC1BNTEwJ3MgIzIw
-NzcwNTcuIFdoZW4gdGhlc2Ugb2NjdXIKPj4+PiArCSAqIFNQU1JfRUwyIGNhbid0IGJlIHRydXN0
-ZWQsIGJ1dCBpc24ndCBuZWVkZWQgZWl0aGVyIGFzIGl0IGlzCj4+Pj4gKwkgKiB1bmNoYW5nZWQg
-ZnJvbSB0aGUgdmFsdWUgaW4gdmNwdV9ncF9yZWdzKHZjcHUpLT5wc3RhdGUuCj4+Pj4gKwkgKiBE
-aWQgd2UganVzdCB0YWtlIGEgUEFDIGV4Y2VwdGlvbiB3aGVuIGEgc3RlcCBleGNlcHRpb24gd2Fz
-IGV4cGVjdGVkPwo+Pj4+ICsJICovCj4+Pj4gKwlpZiAoSVNfRU5BQkxFRChDT05GSUdfQVJNNjRf
-RVJSQVRVTV8yMDc3MDU3KSAmJgo+Pj4KPj4+IG5pdDogd2UgY2FuIGRyb3AgdGhpcyBJU19FTkFC
-TEVEKCkuLi4KPj4KPj4gSG1tbSwgSSB0aG91Z2h0IGRlYWQgY29kZSBlbGltaW5hdGlvbiB3YXMg
-YSBnb29kIHRoaW5nIQo+PiBXaXRob3V0IHRoZSBjcHVfZXJyYXRhLmMgbWF0Y2gsICh3aGljaCBp
-cyBhbHNvIGd1YXJkZWQgYnkgI2lmZGVmKSwKPj4gdGhlIGNhcCB3aWxsIG5ldmVyIGJlIHRydWUs
-IGV2ZW4gaWYgYW4gYWZmZWN0ZWQgQ1BVIHNob3dlZCB1cC4gVGhpcwo+PiB3YXkgdGhlIGNvbXBp
-bGVyIGtub3dzIGl0IGNhbiByZW1vdmUgYWxsIHRoaXMuCgo+IEkgZG9uJ3QgZGlzcHV0ZSB0aGF0
-LiBIb3dldmVyLCBleHBlcmllbmNlIHNob3dzIHRoYXQgdGhlIG1vcmUgb2YgdGhlc2UKPiB3ZSBz
-cHJpbmtsZSBhcm91bmQsIHRoZSBxdWlja2VyIHRoaXMgY29kZSBiaXRyb3RzIGFzIHdlIGRvbid0
-IGJ1aWxkCj4gZm9yIGFsbCB0aGUgcG9zc2libGUgY29uZmlndXJhdGlvbnMuIEluIGdlbmVyYWws
-IHdlIGhhcmRseSBoYXZlIGFueQo+IGRlcGVuZGVuY3kgb24gY29uZmlndXJhdGlvbiBzeW1ib2xz
-LCBhbmQgcmVseSBvbiBzdGF0aWMga2V5cyBnb3QKPiB0aGluZ3Mgbm90IGJlIHRlcnJpYmx5IHN1
-Y2t5LgoKSSdsbCByZW1vdmUgaXQgLSBidXQgSSdtIG5vdCBjb252aW5jZWQ6CgpJZiB0aGlzIHdl
-cmUgaW4gYW4gI2lmZGVmIGJsb2NrLCBJIGFncmVlIHRoYXQgd291bGQgcHJldmVudCB0aGUgY29t
-cGlsZXIgZnJvbSBldmVuIHNlZWluZwp0aGlzIGNvZGUsIGFuZCBpdCB3b3VsZCBjZXJ0YWlubHkg
-Yml0cm90IGlmIHRoYXQgS2NvbmZpZyBpc24ndCBzZWxlY3RlZCwgYW5kIHdvdWxkIG5vdCBiZQpi
-dWlsZC10ZXN0ZWQgcHJvcGVybHkgaW4gYWxsIHRoZSBiaXphcnJlIGNhc2VzIHRoYXQgb25seSBD
-SSBzeXN0ZW1zIHRyeS4KCkJ1dCB0aGUgSVNfRU5BQkxFRCgpIHN0dWZmIGxldHMgdGhlIGNvbXBp
-bGVyIGNhbiBzZWUgaW5zaWRlIHRoYXQgYmxvY2ssIGFuZCBtZWFucyB0aGUKY29tcGlsZXIgY2Fu
-IGNoZWNrIHRoZSB0eXBlcyBldGMsIGJlZm9yZSBldmVudHVhbGx5IHJlbW92aW5nIGl0IGFzIHRo
-ZSBjb25kaXRpb24gYmVjb21lcwoiaWYoZmFsc2UpIi4KCkZvciBleGFtcGxlOgp8CWlmIChJU19F
-TkFCTEVEKENPTkZJR19BUk02NF9FUlJBVFVNXzIwNzcwNTcpKQp8CQlzeW5jaHJvbml6ZV92Y3B1
-X3BzdGF0ZSg0Mik7CgpUaGlzIGZhaWxzIHRvIGNvbXBpbGUgcmVnYXJkbGVzcyBvZiB0aGUgdmFs
-dWUgb2YgdGhlIEtjb25maWcgc3ltYm9sOgp8IEluIGZpbGUgaW5jbHVkZWQgZnJvbSBhcmNoL2Fy
-bTY0L2t2bS9oeXAvdmhlL3N3aXRjaC5jOjc6CnwgLi9hcmNoL2FybTY0L2t2bS9oeXAvaW5jbHVk
-ZS9oeXAvc3dpdGNoLmg6IEluIGZ1bmN0aW9uIOKAmHN5bmNocm9uaXplX3ZjcHVfcHN0YXRl4oCZ
-Ogp8IC4vYXJjaC9hcm02NC9rdm0vaHlwL2luY2x1ZGUvaHlwL3N3aXRjaC5oOjQxNToyNzogd2Fy
-bmluZzogcGFzc2luZyBhcmd1bWVudCAxIG9mCnwg4oCYc3luY2hyb25pemVfdmNwdV9wc3RhdGXi
-gJkgbWFrZXMgcG9pbnRlciBmcm9tIGludGVnZXIgd2l0aG91dCBhIGNhc3QgWy1XaW50LWNvbnZl
-cnNpb25dCnwgICA0MTUgfCAgIHN5bmNocm9uaXplX3ZjcHVfcHN0YXRlKDQyKTsKfAp8IC4vYXJj
-aC9hcm02NC9rdm0vaHlwL2luY2x1ZGUvaHlwL3N3aXRjaC5oOjQwNTo2MTogbm90ZTogZXhwZWN0
-ZWQg4oCYc3RydWN0IGt2bV92Y3B1ICrigJkgYnV0CnwgYXJndW1lbnQgaXMgb2YgdHlwZSDigJhp
-bnTigJkKfCAgNDA1IHwgc3RhdGljIGlubGluZSB2b2lkIHN5bmNocm9uaXplX3ZjcHVfcHN0YXRl
-KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTY0ICpleGl0X2NvZGUpCgpldGMuCgp8IGNhdCAuY29u
-ZmlnIHwgZ3JlcCAyMDc3MDU3CnwgIyBDT05GSUdfQVJNNjRfRVJSQVRVTV8yMDc3MDU3IGlzIG5v
-dCBzZXQKCgpJIGd1ZXNzIHlvdSdyZSB3b3JyaWVkIGFib3V0IGxpbmsgZXJyb3JzLgoKWy4uXQoK
-Pj4+IE90aGVyIHRoYW4gdGhhdCwgSSdtIGhhcHB5IHRvIHRha2UgdGhlIHNlcmllcyBhcyBhIHdo
-b2xlIEFTQVAsIGlmIG9ubHkKPj4+IGZvciB0aGUgdHdvIHByZXR0eSBlbWJhcnJhc3NpbmcgYnVn
-IGZpeGVzLiBJZiB5b3UgY2FuIHJlc3BpbiBpdAo+Pj4gc2hvcnRseSBhbmQgYWRkcmVzcyB0aGUg
-Y29tbWVudHMgYWJvdmUsIEknZCBsaWtlIGl0IGludG8gLXJjMi4KPj4KPj4gV2lsbCBkby4gU2hv
-dXQgaWYgeW91IHN0cm9uZ2x5IGNhcmUgYWJvdXQgdGhlIElTX0VOQUJMRUQoKS4KPiAKPiBJJ2Qg
-cmVhbGx5IGxpa2UgaXQgZ29uZS4gT3RoZXJ3aXNlLCBJJ2xsIG5ldmVyIGNvbXBpbGUgdGhhdCBj
-b2RlLgoKClRoYW5rcywKCkphbWVzCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
-LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
-bQo=
+This RFC series implements support for mapping all user and kernel page
+tables read-only in the linear map, and using a special fixmap slot to
+make any modifications.
+
+The purpose is to prevent page tables from being manipulated
+inadvertently, which is becoming more and more important on arm64, as
+many new hardening features such as BTI and MTE are controlled via
+attributes in the page tables.
+
+This series is only half of the work that is underway to implement this
+in terms of hypervisor services rather than fixmap pokes, as this will
+allow the hypervisor to remove all write permissions from pages used as
+page tables. This work is being done in the context of the pKVM project,
+which defines a clear boundary between the hypervisor executing at EL2,
+and the [untrusted] host running at EL1. In this context, managing the
+host's page tables at HYP level should increase the robustness of the
+entire system substantially.
+
+This series is posted separately for discussion, as it introduces the
+changes that are necessary to route all page table updates via a small
+set of helpers, allowing us to choose between unprotected, fixmap or HYP
+protection straight-forwardly.
+
+The pKVM specific changes will be posted as a followup series.
+
+Cc: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Fuad Tabba <tabba@google.com>
+Cc: Quentin Perret <qperret@google.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+
+Ard Biesheuvel (12):
+  asm-generic/pgalloc: allow arch to override PMD alloc/free routines
+  arm64: mm: add helpers to remap page tables read-only/read-write
+  arm64: mm: use a fixmap slot for user page table modifications
+  arm64: mm: remap PGD pages r/o in the linear region after allocation
+  arm64: mm: remap PUD pages r/o in linear region
+  arm64: mm: remap PMD pages r/o in linear region
+  arm64: mm: remap PTE level user page tables r/o in the linear region
+  arm64: mm: remap kernel PTE level page tables r/o in the linear region
+  arm64: mm: remap kernel page tables read-only at end of init
+  mm: add default definition of p4d_index()
+  arm64: efi: use set_pte_at() not set_pte() in order to pass mm pointer
+  arm64: hugetlb: use set_pte_at() not set_pte() to provide mm pointer
+
+ arch/arm64/Kconfig               |  11 ++
+ arch/arm64/include/asm/fixmap.h  |   1 +
+ arch/arm64/include/asm/pgalloc.h |  49 ++++++++-
+ arch/arm64/include/asm/pgtable.h |  82 +++++++++++---
+ arch/arm64/include/asm/tlb.h     |   6 +
+ arch/arm64/kernel/efi.c          |   2 +-
+ arch/arm64/mm/Makefile           |   2 +
+ arch/arm64/mm/fault.c            |   8 +-
+ arch/arm64/mm/hugetlbpage.c      |   4 +-
+ arch/arm64/mm/mmu.c              | 115 +++++++++++++++++++-
+ arch/arm64/mm/pageattr.c         |  14 +++
+ arch/arm64/mm/pgd.c              |  25 +++--
+ arch/arm64/mm/ro_page_tables.c   | 100 +++++++++++++++++
+ include/asm-generic/pgalloc.h    |  13 ++-
+ include/linux/pgtable.h          |   8 ++
+ 15 files changed, 405 insertions(+), 35 deletions(-)
+ create mode 100644 arch/arm64/mm/ro_page_tables.c
+
+
+base-commit: e783362eb54cd99b2cac8b3a9aeac942e6f6ac07
+-- 
+2.30.2
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
