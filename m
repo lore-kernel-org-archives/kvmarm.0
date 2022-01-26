@@ -2,81 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 491E5C2BA4C
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 16:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9106C28CF5
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 16:08:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC7BB49F2F;
-	Wed, 26 Jan 2022 11:02:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 717C349F28;
+	Wed, 26 Jan 2022 11:08:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Wc2AUOeLKOmj; Wed, 26 Jan 2022 11:02:01 -0500 (EST)
+	with ESMTP id k3sfGK18tzqW; Wed, 26 Jan 2022 11:08:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8204E40C80;
-	Wed, 26 Jan 2022 11:02:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B9124A369;
+	Wed, 26 Jan 2022 11:08:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A536540C80
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 11:01:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 41BBD49F26
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 11:08:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LS6MZvUxMbwy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 11:01:57 -0500 (EST)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D55D44052C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 11:01:56 -0500 (EST)
+ with ESMTP id ztRMQEvXi-mQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 11:08:07 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA0F349F2A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 11:08:07 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 39771CE19A3;
- Wed, 26 Jan 2022 16:01:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8719BC340E3;
- Wed, 26 Jan 2022 16:01:50 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id F21B5B81EDF;
+ Wed, 26 Jan 2022 16:08:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8128AC340E3;
+ Wed, 26 Jan 2022 16:08:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643212910;
- bh=Zm56TX38N4k6+PcIP+qv/GJxQSw/9vyV20Gjbh9l/xI=;
+ s=k20201202; t=1643213284;
+ bh=tcYVnR+6bu9js6MrGvF92RyHbLvpOlSpAkUBxlI3y1g=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=ks+ECd1EC2NMbczzCdGXwwmsG+sn/t+c5A44Rje+RzmMjsJuWuU9VwTZHy6cvaTXQ
- 7iPQyhzQp9DRL8RRwjtTEZEAUIsBci2IPxExDsANpOlTybasS7rQSL6GbPkaW/OMCs
- Z63D+JoHwtFM/Itt6eBVHWYNhEcxVkzOc67+YYGY5oxXSOHoSdwayLv7OEGO2VZ2yc
- eJ0GI5MRln99zgf6tTrhSBJv4AyTb1tJqUJnVHvqdU97sbJhA+oF3ORpayCx+z5YPm
- dukBzj0+rqDGxOf21lhVt8wz5kkOcnRynD5amqs9danfgNBZQicl9LdGyOT02OwAmL
- yuOfEE8fszv/w==
+ b=qqrhHrPWJ/2eSmXtw53akc6EZTXaVp+gCQfWlX4HWF/CmizGRRq6nmPKxLukHBUST
+ QfZ1JZJbZqogaYDc+/iCdLv6qrAX8waGvn+fIKf0s6j/rq8iu4UhvkIWzei1YXEOb8
+ GMx9q6vebm6xsupxINJoKbvkLLFcgdC/OpiRdTOMEoQziPwIP3qoJqUE4mQRyta/4C
+ VBTEyg/vxdIKa/uzP4V6mFFivh+h8NYEZpclxmIjpPb/RGUGM+huTgpGX+1iBsQfsf
+ PAi5lvXX7BugQwJQ/j0K5ruKGM9CJ/BhUtj+XBvgVR6Dwh2REgrn09go/ywqBFy/YV
+ OlZOWyY0W3Ucg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nCkk0-003Gwb-9C; Wed, 26 Jan 2022 16:01:48 +0000
-Date: Wed, 26 Jan 2022 16:01:47 +0000
-Message-ID: <87a6fi7afo.wl-maz@kernel.org>
+ id 1nCkq2-003H3H-Ix; Wed, 26 Jan 2022 16:08:02 +0000
+Date: Wed, 26 Jan 2022 16:08:02 +0000
+Message-ID: <878rv27a59.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
 Subject: Re: [PATCH v5 12/69] KVM: arm64: nv: Handle HCR_EL2.NV system
  register traps
-In-Reply-To: <YebiAjUTzVECLOun@shell.armlinux.org.uk>
+In-Reply-To: <YeVTnZcW82G36cda@monolith.localdoman>
 References: <20211129200150.351436-1-maz@kernel.org>
  <20211129200150.351436-13-maz@kernel.org>
- <YebiAjUTzVECLOun@shell.armlinux.org.uk>
+ <YeVTnZcW82G36cda@monolith.localdoman>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
- christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
+ jintack@cs.columbia.edu, haibo.xu@linaro.org,
  gankulkarni@os.amperecomputing.com, james.morse@arm.com,
- suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+ suzuki.poulose@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Andre Przywara <andre.przywara@arm.com>,
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- linux-arm-kernel@lists.infradead.org
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,8 +93,15 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 18 Jan 2022 15:51:30 +0000,
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On Mon, 17 Jan 2022 11:31:41 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> Nitpick, but HCR_EL2.NV also traps accesses to *_EL02 and *_EL12 registers,
+> according to ARM DDI 0487G.a, page D5-2770. The subject could be changed to
+> "Handle HCR_EL2.NV *_EL2 system register traps" to better match the
+> content, but doesn't make much a difference overall.
 > 
 > On Mon, Nov 29, 2021 at 08:00:53PM +0000, Marc Zyngier wrote:
 > > From: Jintack Lim <jintack.lim@linaro.org>
@@ -117,69 +124,180 @@ On Tue, 18 Jan 2022 15:51:30 +0000,
 > > [maz: added SCTLR_EL2 RES0/RES1 handling]
 > > Signed-off-by: Marc Zyngier <maz@kernel.org>
 > > ---
-> ...
-> > @@ -1825,9 +1882,51 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
-> >  	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+> >  arch/arm64/include/asm/sysreg.h |  41 +++++++++++-
+> >  arch/arm64/kvm/sys_regs.c       | 109 ++++++++++++++++++++++++++++++--
+> >  2 files changed, 144 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 615dd6278f8b..c77fe5401826 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -531,10 +531,26 @@
 > >  
-> > +	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
+> >  #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+> >  
+> > +#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
+> > +#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
 > > +
-> > +	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
-> > +	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_HCR_EL2), access_rw, reset_val, HCR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_MDCR_EL2), access_rw, reset_val, MDCR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_CPTR_EL2), access_rw, reset_val, CPTR_EL2, CPTR_EL2_DEFAULT },
-> > +	{ SYS_DESC(SYS_HSTR_EL2), access_rw, reset_val, HSTR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_HACR_EL2), access_rw, reset_val, HACR_EL2, 0 },
+> >  #define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
+> > +#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
+> > +#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
+> > +#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
+> > +#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
+> > +#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
+> >  #define SYS_HFGRTR_EL2			sys_reg(3, 4, 1, 1, 4)
+> >  #define SYS_HFGWTR_EL2			sys_reg(3, 4, 1, 1, 5)
+> >  #define SYS_HFGITR_EL2			sys_reg(3, 4, 1, 1, 6)
+> > +#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
 > > +
-> > +	{ SYS_DESC(SYS_TTBR0_EL2), access_rw, reset_val, TTBR0_EL2, 0 },
-> > +	{ SYS_DESC(SYS_TTBR1_EL2), access_rw, reset_val, TTBR1_EL2, 0 },
-> > +	{ SYS_DESC(SYS_TCR_EL2), access_rw, reset_val, TCR_EL2, TCR_EL2_RES1 },
-> > +	{ SYS_DESC(SYS_VTTBR_EL2), access_rw, reset_val, VTTBR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
+> > +#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
+> > +#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
+> > +#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+> > +#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+> > +#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
 > > +
-> >  	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-> > +	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
+> >  #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+> >  #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+> >  #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+> > @@ -543,14 +559,26 @@
+> >  #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+> >  #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+> >  #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
+> > +#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+> >  #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
+> > +#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
+> > +#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
+> >  #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
+> >  #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
+> >  #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+> >  #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
+> >  #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+> >  
+> > -#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
+> > +#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+> > +#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
 > > +
-> >  	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
-> > +	{ SYS_DESC(SYS_AFSR0_EL2), access_rw, reset_val, AFSR0_EL2, 0 },
-> > +	{ SYS_DESC(SYS_AFSR1_EL2), access_rw, reset_val, AFSR1_EL2, 0 },
-> > +	{ SYS_DESC(SYS_ESR_EL2), access_rw, reset_val, ESR_EL2, 0 },
-> >  	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
+> > +#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
+> > +#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
 > > +
-> > +	{ SYS_DESC(SYS_FAR_EL2), access_rw, reset_val, FAR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_HPFAR_EL2), access_rw, reset_val, HPFAR_EL2, 0 },
+> > +#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
+> > +#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
+> > +#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
+> > +#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
+> >  #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+> >  #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+> >  #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
+> > @@ -592,15 +620,24 @@
+> >  #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+> >  #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+> >  
+> > +#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
+> > +#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
 > > +
-> > +	{ SYS_DESC(SYS_MAIR_EL2), access_rw, reset_val, MAIR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_AMAIR_EL2), access_rw, reset_val, AMAIR_EL2, 0 },
+> > +#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
+> > +#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
 > > +
-> > +	{ SYS_DESC(SYS_VBAR_EL2), access_rw, reset_val, VBAR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_RVBAR_EL2), access_rw, reset_val, RVBAR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
+> >  /* VHE encodings for architectural EL0/1 system registers */
+> >  #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
+> >  #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
+> >  #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
 > > +
-> > +	{ SYS_DESC(SYS_CONTEXTIDR_EL2), access_rw, reset_val, CONTEXTIDR_EL2, 0 },
-> > +	{ SYS_DESC(SYS_TPIDR_EL2), access_rw, reset_val, TPIDR_EL2, 0 },
+> >  #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+> >  #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+> >  #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
 > > +
-> > +	{ SYS_DESC(SYS_CNTVOFF_EL2), access_rw, reset_val, CNTVOFF_EL2, 0 },
-> > +	{ SYS_DESC(SYS_CNTHCTL_EL2), access_rw, reset_val, CNTHCTL_EL2, 0 },
+> >  #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+> >  #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
 > > +
-> > +	{ SYS_DESC(SYS_SP_EL2), NULL, reset_unknown, SP_EL2 },
+> >  #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+> >  #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+> >  #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+> > @@ -618,6 +655,8 @@
+> >  #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
+> >  #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
+> >  
+> > +#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
 > 
-> Doesn't this have an effect on the ability to migrate guests between
-> identical hardware but running kernels with vs without this patch?
-> From what I remember, QEMU fails a migration if the migration target
-> has less system registers than the migration source.
+> Checked the encoding for the newly added registers, they match.
 > 
-> If so, this should at the very least be spelt out in the commit
-> message - it's a user experience breaking change. Maybe also preventing
-> the exposure of these when NV is disabled would be a good idea?
+> > +
+> >  /* Common SCTLR_ELx flags. */
+> >  #define SCTLR_ELx_DSSBS	(BIT(44))
+> >  #define SCTLR_ELx_ATA	(BIT(43))
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index e3ec1a44f94d..a23701f29858 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -105,6 +105,46 @@ static u32 get_ccsidr(u32 csselr)
+> >  	return ccsidr;
+> >  }
+> >  
+> > +static bool access_rw(struct kvm_vcpu *vcpu,
+> > +		      struct sys_reg_params *p,
+> > +		      const struct sys_reg_desc *r)
+> > +{
+> > +	if (p->is_write)
+> > +		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
+> > +	else
+> > +		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+> > +
+> > +	return true;
+> > +}
+> > +
+> > +static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
+> > +			     struct sys_reg_params *p,
+> > +			     const struct sys_reg_desc *r)
+> > +{
+> > +	if (p->is_write) {
+> > +		u64 val = p->regval;
+> > +
+> > +		if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)) {
+> > +			val &= ~(GENMASK_ULL(63,45) | GENMASK_ULL(34, 32) |
+> > +				 BIT_ULL(17) | BIT_ULL(9));
+> > +			val |=  SCTLR_EL1_RES1;
+> > +		} else {
+> > +			val &= ~(GENMASK_ULL(63,45) | BIT_ULL(42) |
+> > +				 GENMASK_ULL(39, 38) | GENMASK_ULL(35, 32) |
+> > +				 BIT_ULL(26) | BIT_ULL(24) | BIT_ULL(20) |
+> > +				 BIT_ULL(17) | GENMASK_ULL(15, 14) |
+> > +				 GENMASK(10, 7));
+> > +			val |=  SCTLR_EL2_RES1;
+> > +		}
+> 
+> Some bits in SCTLR_EL2 are functional bits when {E2H, TGE} = {1, 1}, otherwise
+> they are RES0. This is how ARM DDI 0487G.a describes the behaviour of bits which
+> are RES0 only in some contexts (page Glossary-8529, emphasis added by me):
+> 
+> "For a bit in a read/write register, when the bit is described as RES0:
+> 
+> - An indirect write to the register sets the bit to 0.
+> 
+> - ** A read of the bit must return the value last successfully written to the bit,
+>   by either a direct or an indirect write, regardless of the use of the register
+>   when the bit was written **
+> 
+> If the bit has not been successfully written since reset, then the read of the bit returns the reset
+> value if there is one, or otherwise returns an UNKNOWN value.
+> 
+> - A direct write to the bit must update a storage location associated with the bit.
+> 
+> - While the use of the register is such that the bit is described as RES0, the
+>   value of the bit must have no effect on the operation of the PE, other than
+>   determining the value read back from that bit, unless this Manual
+>   explicitly defines additional properties for the bit."
+> 
+> Let's take bit 24, E0E, as an example. When E2H,TGE != {1,1} (which means the
+> bit is now RES0), KVM clears the bit on a write, when according to the above
+> definition, it should save the value.
 
-Yes, that's a known issue. I have taken steps to avoid exposing these
-registers (the get-reg-list test now passes on a !NV system, while it
-didn't before).
+That's an interesting observation. It means we should munge these bits
+at save/restore time (specially in the nVHE case where we have to
+translate SCTLR_EL2 to the SCTLR_EL1 format), rather than at access
+time.
+
+This would also solve the discrepancy we have between the ARMv8.3
+trapping and the ARMv8.4 memory write (we can sanitise the former, but
+not the latter).
 
 Thanks,
 
