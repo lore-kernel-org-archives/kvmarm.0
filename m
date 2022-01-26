@@ -2,63 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 800BDC28CF5
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 20:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 029D7C5DF62
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 20:32:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F23154B0B9;
-	Wed, 26 Jan 2022 15:13:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62E4E4B0FB;
+	Wed, 26 Jan 2022 15:32:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HYd3itKy2MGl; Wed, 26 Jan 2022 15:13:28 -0500 (EST)
+	with ESMTP id v4GO1NBpUIV8; Wed, 26 Jan 2022 15:32:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9C914B0DB;
-	Wed, 26 Jan 2022 15:13:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 244724B116;
+	Wed, 26 Jan 2022 15:32:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F84F4B0B9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 15:13:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2AB24B103
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 15:32:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jUJnbWw51vNy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 15:13:27 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5627D4A10E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 15:13:27 -0500 (EST)
+ with ESMTP id J04H7fO4RNDm for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 15:32:48 -0500 (EST)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 47F304B0FB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 15:32:48 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 9CE22B81EA6;
- Wed, 26 Jan 2022 20:13:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D4CCC340E3;
- Wed, 26 Jan 2022 20:13:22 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 05BBACE1AEE;
+ Wed, 26 Jan 2022 20:32:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51CD9C340E3;
+ Wed, 26 Jan 2022 20:32:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643228004;
- bh=hmQwvBpYksIzl7tcb2EWb3VBLUCZuCxu0fG9RHpcc/A=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=c5brgLcOgZMJcUiF847vR77ELwVGIwtvyWnad09uOpkGBhYsb0BJ+W3OLZxHifz9O
- jSczxpKBaMUyGvHAxdLo9EqY5sFIeK68bjApwhDDDQ6vOKzRD+CjKZ90O99Mx2CSp/
- Xyz3kZ2FBleEAFziaBLYEcmzoawON03dFy24I9QyEbR75X9sBr4Z4EzrExYbgzYkOf
- A8xjnQGDmQ1ZnDmSlo7GWJAnr/aJbjl7Re9ngOoKYGJe9U2AVWRLJvfiVt6SgS+Ptf
- zrTHv1oLmuyamYZ9TnUMFII0PXoIVAOgW2yNu6ML/1XktIAXuLuXyUQu6VXn4Gjimy
- /t58lS0pg2mBw==
-Date: Wed, 26 Jan 2022 20:13:18 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: [PATCH v3] kselftest: kvm/arm64: Skip tests if we can't create a
- vgic-v3
-Message-ID: <YfGrXr1/NGREULnB@sirena.org.uk>
-References: <20220126145242.3473836-1-broonie@kernel.org>
- <4424dd30-f74b-006f-b540-dbaf02e45e28@linuxfoundation.org>
- <YfGmk1I8l+ROoE/k@sirena.org.uk>
- <48c44d74-6668-7823-ada6-0285a8b32a35@linuxfoundation.org>
-MIME-Version: 1.0
-In-Reply-To: <48c44d74-6668-7823-ada6-0285a8b32a35@linuxfoundation.org>
-X-Cookie: Use only in a well-ventilated area.
-Cc: Marc Zyngier <maz@kernel.org>, linux-kselftest@vger.kernel.org,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ s=k20201202; t=1643229162;
+ bh=XYaD/d6SG1smVMloGRMNQs4F/FTP6XnZyqHQfV/Y6qc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=CWweYOovpuFowzu36L+FAi8D2Rn6Lp6LJe8LkfoiefCD5cUtFglqbCRiiTQSvSRPt
+ fR8Gs01Tbm/hHv4l3KakRvxWhp8TJKtW+KHu2y1WAOCA8/wFFXMUOPkx3008Ez3The
+ oTmrOI4AM3jIxNF+EyUnKgLVxcXkRuvsORGhXU9E10qQuye9cG7OOYXtUrQq7+4rC8
+ uR5U9UUZAeyFn8EWJqtD5R6i5DKliStzGT+WBJYll4i7UG1cp14DmJmbwMtaQJoHjr
+ tZz59C0ZZdC3suBD7w6bgVEO/0ttF6VDWbEtLM+b9OOCqXA069+MU6K5EWB8kFK/GV
+ v6ul+deRh5kCw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nCoy7-003KRq-T5; Wed, 26 Jan 2022 20:32:40 +0000
+Date: Wed, 26 Jan 2022 20:32:39 +0000
+Message-ID: <875yq66xw8.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Subject: Re: [PATCH v5 14/69] KVM: arm64: nv: Support virtual EL2 exceptions
+In-Reply-To: <YebklBdMSwOplyrJ@shell.armlinux.org.uk>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-15-maz@kernel.org>
+ <YebklBdMSwOplyrJ@shell.armlinux.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
+ christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
+ gankulkarni@os.amperecomputing.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -71,66 +87,126 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4402730077649576464=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Tue, 18 Jan 2022 16:02:28 +0000,
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> 
+> On Mon, Nov 29, 2021 at 08:00:55PM +0000, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack.lim@linaro.org>
+> > 
+> > Support injecting exceptions and performing exception returns to and
+> > from virtual EL2.  This must be done entirely in software except when
+> > taking an exception from vEL0 to vEL2 when the virtual HCR_EL2.{E2H,TGE}
+> > == {1,1}  (a VHE guest hypervisor).
+> > 
+> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > [maz: switch to common exception injection framework]
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> ...
+> > +void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u64 spsr, elr, mode;
+> > +	bool direct_eret;
+> > +
+> > +	/*
+> > +	 * Going through the whole put/load motions is a waste of time
+> > +	 * if this is a VHE guest hypervisor returning to its own
+> > +	 * userspace, or the hypervisor performing a local exception
+> > +	 * return. No need to save/restore registers, no need to
+> > +	 * switch S2 MMU. Just do the canonical ERET.
+> > +	 */
+> > +	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> > +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > +
+> > +	direct_eret  = (mode == PSR_MODE_EL0t &&
+> > +			vcpu_el2_e2h_is_set(vcpu) &&
+> > +			vcpu_el2_tge_is_set(vcpu));
+> > +	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+> 
+> There are excessive parens on the RHS of the above two.
 
---===============4402730077649576464==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="HNasRwzf7887euQs"
-Content-Disposition: inline
+I guess this is my personal taste, and this is the kind of cosmetic
+things that help me reason about the code. Some people use syntax
+highlighting, I use bracketing. I don't think this really matters in
+the grand scheme of things.
 
+[...]
 
---HNasRwzf7887euQs
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> > +/*
+> > + * Emulate taking an exception to EL2.
+> > + * See ARM ARM J8.1.2 AArch64.TakeException()
+> > + */
+> > +static int kvm_inject_nested(struct kvm_vcpu *vcpu, u64 esr_el2,
+> > +			     enum exception_type type)
+> > +{
+> > +	u64 pstate, mode;
+> > +	bool direct_inject;
+> > +
+> > +	if (!nested_virt_in_use(vcpu)) {
+> > +		kvm_err("Unexpected call to %s for the non-nesting configuration\n",
+> > +				__func__);
+> 
+> Too much indentation. I'm guessing this "unexpected" condition isn't
+> something that can be caused by a rogue guest? If it can, doesn't this
+> need to be rate limited?
 
-On Wed, Jan 26, 2022 at 01:03:44PM -0700, Shuah Khan wrote:
-> On 1/26/22 12:52 PM, Mark Brown wrote:
+If we end-up here, this is very much a hypervisor logic bug.
 
-> > If the function fails for any reason other than the system not
-> > supporting vgic-v3 it will abort rather than return.
+[...]
 
-> Hmm. vgic_v3_setup() return gic_fd looks like and the interface says
-> Return: GIC file-descriptor or negative error code upon failure
+> > +
+> > +	/* If not nesting, EL1 is the only possible exception target */
+> > +	if (likely(!nested_virt_in_use(vcpu))) {
+> > +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL1;
+> > +		return;
+> > +	}
+> > +
+> > +	/*
+> > +	 * With NV, we need to pick between EL1 and EL2. Note that we
+> > +	 * never deal with a nesting exception here, hence never
+> > +	 * changing context, and the exception itself can be delayed
+> > +	 * until the next entry.
+> > +	 */
+> > +	switch(*vcpu_cpsr(vcpu) & PSR_MODE_MASK) {
+> > +	case PSR_MODE_EL2h:
+> > +	case PSR_MODE_EL2t:
+> > +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL2;
+> > +		break;
+> > +	case PSR_MODE_EL1h:
+> > +	case PSR_MODE_EL1t:
+> > +		vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL1;
+> > +		break;
+> > +	case PSR_MODE_EL0t:
+> > +		if (vcpu_el2_tge_is_set(vcpu) & HCR_TGE)
+> > +			vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL2;
+> > +		else
+> > +			vcpu->arch.flags |= KVM_ARM64_EXCEPT_AA64_EL1;
+> > +		break;
+> > +	default:
+> > +		BUG();
+> 
+> Is taking out the host really appropriate here? Is this something a
+> rogue guest could trigger?
 
-Yes, but in reality the only return other than a valid file descriptor
-is just -1 rather than a useful error code.
+This switch is supposed to cover all the NS exception levels, in
+either stack configuration. If we suddenly find ourselves with a
+non-architectural state, we have horribly messed up. And no, a guest
+shouldn't be able to affect this. If it can, that's even more of a
+reason to take everything down ASAP.
 
-> I don't follow the abort part.
+Thanks,
 
-All the TEST_ASSERTS() in the code (including those in the functions
-called) are calls to test_assert() in assert.c which if the test
-asserted isn't true will print some diagnostics and call exit(), the
-general idiom is to give up immediately on error.
+	M.
 
---HNasRwzf7887euQs
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmHxq14ACgkQJNaLcl1U
-h9CC/Qf+PVOAm5Wc6qrMXiY0e8FQ6SOhccpSgyoFbwUUJet/ReDC1snRgYGn+vTx
-O+LMTd3nvNcl2guAo+rUn/0bvyUFgINvvECors31R6gMO/y8m5rsQwP+2Hsf5FMY
-bLpy1Jd3olD/cXw8gstIq8X8HMvfGO5q2Kt4Pk4L1Bi73K6E37vG/CydsE21n1jc
-KI3JYbj2Zk41ylo8a/rfqcO7xQuhj3e+B2jT0Wll7+JyDCMZd69Cni/13mYBLy9e
-mudYeJfwt1HZWxNqltl9KWZ221u+Mkek/aCHfklyFLVIDcI0D/p8dT/Xmw0amWaI
-mnmMSKKsnsVFZ6VbdLE+kgHKKKPi9w==
-=q/Nf
------END PGP SIGNATURE-----
-
---HNasRwzf7887euQs--
-
---===============4402730077649576464==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4402730077649576464==--
