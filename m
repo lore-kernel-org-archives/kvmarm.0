@@ -2,88 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43380C28CF5
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 14:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3C9FC2BA4C
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 14:29:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB76B41014;
-	Wed, 26 Jan 2022 09:17:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60F0240B87;
+	Wed, 26 Jan 2022 09:29:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 84PGea+Fncok; Wed, 26 Jan 2022 09:17:56 -0500 (EST)
+	with ESMTP id nNbJLRYKUlWK; Wed, 26 Jan 2022 09:29:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7015D40AEA;
-	Wed, 26 Jan 2022 09:17:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2558740DF3;
+	Wed, 26 Jan 2022 09:29:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6B5D40AEA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 09:17:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CE2240D01
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 09:29:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W06ZfOgSgeDh for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 09:17:53 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6404087B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 09:17:53 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1643206673;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=pBsc1hWd3oxs011RR96KjS1IY2+oHS5R8Wd9986U2nM=;
- b=FK2J3/bpKwHEv4aKobtPsTMifcmV6Pedj2LXdpZgK5DgvfZguQiwrxE3YBQVASa6OJuxOm
- w4Xc8CdUjo0BzNZIQIzgxr22dM0gLx8JbogGJvtza75Ppe+siZcP4DnU6ZoZQOTqDoc+3W
- E6j4v8idOmJiR1rdS0vN7ykuDxx/ahU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-117-KKi0zqYuN92WTTc0MWUABA-1; Wed, 26 Jan 2022 09:17:44 -0500
-X-MC-Unique: KKi0zqYuN92WTTc0MWUABA-1
-Received: by mail-ej1-f72.google.com with SMTP id
- r18-20020a17090609d200b006a6e943d09eso4937949eje.20
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 06:17:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=pBsc1hWd3oxs011RR96KjS1IY2+oHS5R8Wd9986U2nM=;
- b=Gb/nGNz2nHxS3AniJMsz/ClbDRRy5Pj6DUSp/oRQLd+C89KoYPkR89bjTI9vIQw98q
- rAlmon+ycVAVq1owpMa+S157dA3vUsiGkp8sQ/R6kH1xWrjtLUelFbB3F0gjdRcQTbCe
- EsY7ATg/xaKADC/PRQEM8+VNuAIDotNZi9M/w77VHvnd0VDy01lf4qpAtr6asGGY1S/d
- +F8sbNhBXxbplrEnsN0cIzDOdHGmFM0MyKuefmeuCVSH6nWiyOP2LOgT0A3s95IY2oUT
- 9fIfAWiF9OG4QH1v3Ahf7l79WgYf5ZxqgyaGplY/9thAvTemDUcFZ19PcSK8odHNuwSC
- WLEA==
-X-Gm-Message-State: AOAM533OMYdkLz23Mtp/07U3riJQIa9ZPzfkd94mQlHhZA82wO20oSnj
- SqPljR+2+xm1ZbDp8xMoWMqXEwBAhgfZmQYT7hfxz2ZeuKjYyDF5V3MdoIufSsREaTdEmVebN4L
- QaA5KorugcVW5EuUJHtNNNOjD
-X-Received: by 2002:a17:906:4347:: with SMTP id
- z7mr21046214ejm.671.1643206663607; 
- Wed, 26 Jan 2022 06:17:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyzjw+1AXpd7hzxxgJS9LZv/KCQ4BAHMGkrSijf7nugItNU7ldGtWLdTM8SkChNzJwfiV99uQ==
-X-Received: by 2002:a17:906:4347:: with SMTP id
- z7mr21046190ejm.671.1643206663327; 
- Wed, 26 Jan 2022 06:17:43 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
- by smtp.gmail.com with ESMTPSA id k23sm7491029ejr.65.2022.01.26.06.17.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Jan 2022 06:17:42 -0800 (PST)
-Date: Wed, 26 Jan 2022 15:17:41 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Mark Brown <broonie@kernel.org>
+ with ESMTP id whOs7CNqVvhk for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 09:29:21 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5925C40B87
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 09:29:21 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 1C7426178E;
+ Wed, 26 Jan 2022 14:29:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC5BC340E3;
+ Wed, 26 Jan 2022 14:29:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1643207359;
+ bh=mkzlzshfwmXGC5C35YNhdausZ28P0cfPjSTLQMvdsdg=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=l+xIuCxCCzh0nxhuQkj9j0uPv1RhNkS6M51isL5dn/mbPFythrmY3OyQgdjy862mg
+ u31suntXEKmF9obu+OQluiFHQox3RjItHPkEoWh2kfRohHBUBIWfrHPT2QJSaCsKzM
+ F4IkoZ65Fut1gvcNaoA/EZtJwgpvzwYetC/GSWPxsinghCXVYiENlyNDIX1GG+GyI4
+ GzuyNRgfWLty1UnWfMNuYtkPU8cTxvcfQBOBO5/iyRTf7CIC0xM91NEfdaTwefSlPy
+ dMqY4OTJJds4VrHDVcXPhfsRUUrQGwD8LGdQI9ARMpAC0oVONQyBC76izA/kbueYtP
+ 86g9ua6EIBlcA==
+Date: Wed, 26 Jan 2022 14:29:14 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Andrew Jones <drjones@redhat.com>
 Subject: Re: [PATCH v2] kselftest: kvm/arm64: Skip tests if we can't create a
  vgic-v3
-Message-ID: <20220126141741.zxxltis5zdtjzz33@gator>
+Message-ID: <YfFauhK4FuM1/I8S@sirena.org.uk>
 References: <20220126135319.1918802-1-broonie@kernel.org>
+ <20220126141741.zxxltis5zdtjzz33@gator>
 MIME-Version: 1.0
-In-Reply-To: <20220126135319.1918802-1-broonie@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
+In-Reply-To: <20220126141741.zxxltis5zdtjzz33@gator>
+X-Cookie: Use only in a well-ventilated area.
 Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
  Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-kselftest@vger.kernel.org
@@ -98,124 +69,81 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============1007224331892273410=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 26, 2022 at 01:53:19PM +0000, Mark Brown wrote:
-> The arch_timer and vgic_irq kselftests assume that they can create a
-> vgic-v3, using the library function vgic_v3_setup() which aborts with a
-> test failure if it is not possible to do so. Since vgic-v3 can only be
-> instantiated on systems where the host has GICv3 this leads to false
-> positives on older systems where that is not the case.
-> 
-> Fix this by changing vgic_v3_setup() to return an error if the vgic can't
-> be instantiated and have the callers skip if this happens. We could also
-> exit flagging a skip in vgic_v3_setup() but this would prevent future test
-> cases conditionally deciding which GIC to use or generally doing more
-> complex output.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
-> 
-> v2:
->  - The test for being able to create the GIC doesn't actually
->    instantiate it, add a call doing so in that case.
-> 
->  tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
->  tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 4 ++++
->  tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 5 ++++-
->  3 files changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> index 9ad38bd360a4..791d38404652 100644
-> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> @@ -366,6 +366,7 @@ static struct kvm_vm *test_vm_create(void)
->  {
->  	struct kvm_vm *vm;
->  	unsigned int i;
-> +	int ret;
->  	int nr_vcpus = test_args.nr_vcpus;
->  
->  	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
-> @@ -382,7 +383,11 @@ static struct kvm_vm *test_vm_create(void)
->  
->  	ucall_init(vm, NULL);
->  	test_init_timer_irq(vm);
-> -	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-> +	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-> +	if (ret < 0) {
-> +		pr_info("Failed to create vgic-v3, skipping\n");
 
-Please use 'print_skip', which appends ", skipping test" to keep the skip
-messages consistent. Also, print_skip can't be disabled with -DQUIET like
-pr_info.
-
-> +		exit(KSFT_SKIP);
-> +	}
->  
->  	/* Make all the test's cmdline args visible to the guest */
->  	sync_global_to_guest(vm, test_args);
-> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> index e6c7d7f8fbd1..b127a261fd29 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> @@ -761,6 +761,10 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
->  
->  	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
->  			GICD_BASE_GPA, GICR_BASE_GPA);
-> +	if (gic_fd < 0) {
-> +		pr_info("Failed to create vgic-v3, skipping\n");
-
-print_skip
-
-> +		exit(KSFT_SKIP);
-> +	}
->  
->  	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
->  		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> index b3a0fca0d780..4ea65e119bdd 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> @@ -51,7 +51,10 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
->  			"Number of vCPUs requested (%u) doesn't match with the ones created for the VM (%u)\n",
->  			nr_vcpus, nr_vcpus_created);
->  
-> -	/* Distributor setup */
-> +	/* Distributor setup - test if it's possible then actually do it */
-> +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
-> +	if (gic_fd != 0)
-> +		return -1;
->  	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-
-kvm selftests generally asserts on failure with the nonunderscore
-prefixed KVM ioctl wrapper functions, which is why you appear to
-be forced to do this nasty dance. However, kvm selftests usually
-always also offers an underscore prefixed version of the KVM ioctl
-wrapper function too for cases like these. So we can just do
-
-  if (_kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false, &gic_fd) != 0)
-          return -1;
+--===============1007224331892273410==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Q0r4KlKPWGD9cZBd"
+Content-Disposition: inline
 
 
-Thanks,
-drew
+--Q0r4KlKPWGD9cZBd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
->  
->  	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
-> -- 
-> 2.30.2
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+On Wed, Jan 26, 2022 at 03:17:41PM +0100, Andrew Jones wrote:
+> On Wed, Jan 26, 2022 at 01:53:19PM +0000, Mark Brown wrote:
+
+> > -	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+> > +	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+> > +	if (ret < 0) {
+> > +		pr_info("Failed to create vgic-v3, skipping\n");
+
+> Please use 'print_skip', which appends ", skipping test" to keep the skip
+> messages consistent. Also, print_skip can't be disabled with -DQUIET like
+> pr_info.
+
+I see.  It might be nice to convert these tests to use the ksft_
+stuff...
+
+> > -	/* Distributor setup */
+> > +	/* Distributor setup - test if it's possible then actually do it */
+> > +	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, true);
+> > +	if (gic_fd != 0)
+> > +		return -1;
+> >  	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
+
+> kvm selftests generally asserts on failure with the nonunderscore
+> prefixed KVM ioctl wrapper functions, which is why you appear to
+> be forced to do this nasty dance. However, kvm selftests usually
+> always also offers an underscore prefixed version of the KVM ioctl
+> wrapper function too for cases like these. So we can just do
+
+>   if (_kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false, &gic_fd) != 0)
+>           return -1;
+
+And the _ version is OK to use in the vgic code?  The _ makes it look
+like it's internal only.
+
+--Q0r4KlKPWGD9cZBd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmHxWroACgkQJNaLcl1U
+h9DGogf/eAFnfs352DIqX0ZCza8kHAZYU9UXqh6gAgNBgbeRICZ+kKetNtsj5efi
+ANrpL5tKqb6cHfI3yz2p1dK+H37fpMP4STYGX0KOdqeE/W8a25US5pXd1OLBMPih
+CON/GwSIe9tkPXlhiETSWHGXulnSg2h+JutOhEM6Tx0aqBySW7eOg0iBy3yOkUgk
+68JIYTqD169Q3jFIP+8V/3wFI+V+A172GR5Gh8BmB29hITIUeEGYHsoMkzOW9GGd
+rBEXBekq0U8GxMnWudFkH2Gfkkl/A306iu7cTgyYZhoBeR4ikQ7fEoYZt5wQo0e2
+UZ4q8NqZbIhIxxGB9APUTjpKJm503g==
+=e1L/
+-----END PGP SIGNATURE-----
+
+--Q0r4KlKPWGD9cZBd--
+
+--===============1007224331892273410==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1007224331892273410==--
