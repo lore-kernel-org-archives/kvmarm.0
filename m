@@ -2,70 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F22C28CF5
-	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 14:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A24C3526D
+	for <kvmarm@archiver.kernel.org>; Wed, 26 Jan 2022 15:11:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD11C40BE6;
-	Wed, 26 Jan 2022 09:52:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A21D543C96;
+	Wed, 26 Jan 2022 10:11:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id P7RBihrEAbxb; Wed, 26 Jan 2022 09:52:54 -0500 (EST)
+	with ESMTP id uoiu1S5XKWoN; Wed, 26 Jan 2022 10:11:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8573440E25;
-	Wed, 26 Jan 2022 09:52:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E12DF40DF3;
+	Wed, 26 Jan 2022 10:11:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0249D408F4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 09:52:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00A4040D26
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:11:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fCDLy6kaT2UP for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 09:52:51 -0500 (EST)
+ with ESMTP id AYSPoQ3q42dV for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Jan 2022 10:11:39 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0F9540B41
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 09:52:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ABEF640E25
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 10:11:39 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id F26F9617CC;
- Wed, 26 Jan 2022 14:52:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58EBBC340E3;
- Wed, 26 Jan 2022 14:52:48 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 0702E61446;
+ Wed, 26 Jan 2022 15:11:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06494C340ED;
+ Wed, 26 Jan 2022 15:11:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643208770;
- bh=jm4UyXrKg8K/tVEMOvInmlJVENOimmSLeYrRFZ3iAhE=;
- h=From:To:Cc:Subject:Date:From;
- b=Ct7qB/ZAGMxyNqXRG5A9kCT09NEZ3jSt5gRRvrD5WPAeCAP7Ht1/9Kb4YXZ0ioABC
- 1mUvtkpMZ5F+ErEYve2etOfyiQCtPRTgKobkRgRm0CsXyfwO6mTKReroCii81W28WE
- DCPfcwYlFdillSzeKUpo/AnjSBxQVGHKok6SGuwImxnDl+baMWEtdZJ2UJPNSjiBuw
- F7n/gZySkP9wPLElD9Bx1JWgsUOAsYVDvSC2BfvtTXlZyqtoi2dDXHMIo2neBtQ7Gl
- 9yuIT2DLTB+/pjuzde2hJwpwQTJq1jZubLm5pMcFKguOjarfsPY7g6q9QcOqBsMR9J
- zp2y2+L/0dWDQ==
+ s=k20201202; t=1643209898;
+ bh=+7q3tm71SwRhuirdKp9GKi5rtB4x6+OdJkLWZ94Mc9g=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=OywQjmwQgTzKX8O6GeH1KqcaMIOCny0KQU/4YUO8gwDpb3//7lmJLvV/8NLJxV/q5
+ ag9+7/0aK1PPQwQw+Xq5D3OIi0jayb5fFonsoW9TtKo/tHy0PHC84gjC8a5UF/iORH
+ peXlJIRyplOrMvBxXtxhEwAbWmeBidhr8RQ78zp98mqiXIUrNFELnlMNOjVNAsv6LK
+ E41M8/VVfejSHCcSa1MH3OVBUr9CCbMoMMtRooBLAu/P7THDu+abw7NUcGqK+M6SFF
+ 6mRyOWhpu9uU4MDvWd5OtgwH2vvqUcEL1LpnbYyo0OdVvjNM3iSbKd7rmAqg0OnHUu
+ c+LxKL/lmEy3A==
 From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH v3] kselftest: kvm/arm64: Skip tests if we can't create a
- vgic-v3
-Date: Wed, 26 Jan 2022 14:52:42 +0000
-Message-Id: <20220126145242.3473836-1-broonie@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+ Shuah Khan <shuah@kernel.org>
+Subject: [PATCH v9 01/40] arm64: Define CPACR_EL1_FPEN similarly to other
+ floating point controls
+Date: Wed, 26 Jan 2022 15:10:41 +0000
+Message-Id: <20220126151120.3811248-2-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220126151120.3811248-1-broonie@kernel.org>
+References: <20220126151120.3811248-1-broonie@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3473; h=from:subject;
- bh=jm4UyXrKg8K/tVEMOvInmlJVENOimmSLeYrRFZ3iAhE=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBh8V/S6QVgi5cZ6m4uINQ0R+IA6o/Pp0GxJxgH2V3E
- xbqPOk+JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYfFf0gAKCRAk1otyXVSH0Ae2B/
- 0cD5U10nc39f3kDDOT/XI0PcJ6n6+O+Wc+lW1Mvs8Pj+qd4x7AbZPV4WZ1YL+x2l6I9FsJpEcMLnz1
- rrkOnaCc1SJMDQ15wqRrLXVEXAgIW2w88TjGfTBnpgHxVX4CVmuxkpZUrXK/kD2xJORtfO8gae5ilD
- eX4+iMqFnu+VIirw5oCuwQPpkQR6CNYkJE7rQ8rosa2RZvZjWcQ3s59GxVayil+06kOM7urphERRuI
- bjIJ0f7QRkGebZ7gsvWKCIbU+zXqtQNu3ifb9ZEVU7Rje9XUr9hoeFzv7aYgKJlQ1gp1HzSIlLPo/9
- N8Tu08HBMIvpai5MVPE6zE92vTnuDN
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1837; h=from:subject;
+ bh=+7q3tm71SwRhuirdKp9GKi5rtB4x6+OdJkLWZ94Mc9g=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBh8WR3xPwduzBtzQGWnI6lrwWCEEEUoE/eJxky1JgR
+ ndA8iA+JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYfFkdwAKCRAk1otyXVSH0LCAB/
+ 9hezGWJNPKVa612fhSfevbONlcnfaUMTl86av0wM0s6308x6oajAf81Y0krzoEEzYQ6LtwIqlvaT5G
+ TVORg0iXIwCt6P03caZZHkg/yvIkng+f3Q6qh47RfwAwupJ9RHJ/X2q/EzCupSUuGXsys7xMPR626y
+ BVvloXlj2N4k+zV34hFoplm30F2R41jfmi98W/4P+7UhpnUwOTGQhz/annLIEjw0T10PfEYCdCC3Jx
+ TiA3Y87NdWakX1vv8TLwSnA+A/O9pr9Yb5uAaoZ88oIaBiXpDEbKeLaGc82T7pg+Bo9pUhhlVdvxdA
+ Cb+iwT+PxVC2ctv+BMdVomSyoSHIk9
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
-Cc: Mark Brown <broonie@kernel.org>, linux-kselftest@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Luis Machado <luis.machado@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>,
+ Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
+ kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,88 +88,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The arch_timer and vgic_irq kselftests assume that they can create a
-vgic-v3, using the library function vgic_v3_setup() which aborts with a
-test failure if it is not possible to do so. Since vgic-v3 can only be
-instantiated on systems where the host has GICv3 this leads to false
-positives on older systems where that is not the case.
-
-Fix this by changing vgic_v3_setup() to return an error if the vgic can't
-be instantiated and have the callers skip if this happens. We could also
-exit flagging a skip in vgic_v3_setup() but this would prevent future test
-cases conditionally deciding which GIC to use or generally doing more
-complex output.
+The base floating point, SVE and SME all have enable controls for EL0 and
+EL1 in CPACR_EL1 which have a similar layout and function. Currently the
+basic floating point enable FPEN is defined differently to the SVE control,
+specified as a single define in kvm_arm.h rather than in sysreg.h. Move the
+define to sysreg.h and provide separate EL0 and EL1 control bits so code
+managing the different floating point enables can look consistent.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
+ arch/arm64/include/asm/kvm_arm.h | 1 -
+ arch/arm64/include/asm/sysreg.h  | 4 ++++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-v3:
- - Use custom print_skip() helper.
- - Use internal version of _kvm_create_device.
-v2:
- - The test for being able to create the GIC doesn't actually
-   instantiate it, add a call doing so in that case.
-
- tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
- tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 4 ++++
- tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
- 3 files changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-index 9ad38bd360a4..b08d30bf71c5 100644
---- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-+++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-@@ -366,6 +366,7 @@ static struct kvm_vm *test_vm_create(void)
- {
- 	struct kvm_vm *vm;
- 	unsigned int i;
-+	int ret;
- 	int nr_vcpus = test_args.nr_vcpus;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 01d47c5886dc..eec790842fe2 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -355,7 +355,6 @@
+ 	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
+ 	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
  
- 	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
-@@ -382,7 +383,11 @@ static struct kvm_vm *test_vm_create(void)
+-#define CPACR_EL1_FPEN		(3 << 20)
+ #define CPACR_EL1_TTA		(1 << 28)
+ #define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN | CPACR_EL1_ZEN_EL1EN)
  
- 	ucall_init(vm, NULL);
- 	test_init_timer_irq(vm);
--	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-+	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-+	if (ret < 0) {
-+		print_skip("Failed to create vgic-v3");
-+		exit(KSFT_SKIP);
-+	}
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 898bee0004ae..1da4c43d597d 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -1097,6 +1097,10 @@
+ #define ZCR_ELx_LEN_SIZE	9
+ #define ZCR_ELx_LEN_MASK	0x1ff
  
- 	/* Make all the test's cmdline args visible to the guest */
- 	sync_global_to_guest(vm, test_args);
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-index e6c7d7f8fbd1..7eca97799917 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-@@ -761,6 +761,10 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
- 
- 	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
- 			GICD_BASE_GPA, GICR_BASE_GPA);
-+	if (gic_fd < 0) {
-+		print_skip("Failed to create vgic-v3, skipping");
-+		exit(KSFT_SKIP);
-+	}
- 
- 	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
- 		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-index b3a0fca0d780..f5cd0c536d85 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-@@ -52,7 +52,9 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
- 			nr_vcpus, nr_vcpus_created);
- 
- 	/* Distributor setup */
--	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-+	if (_kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3,
-+			       false, &gic_fd) != 0)
-+		return -1;
- 
- 	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
- 			0, &nr_irqs, true);
++#define CPACR_EL1_FPEN_EL1EN	(BIT(20)) /* enable EL1 access */
++#define CPACR_EL1_FPEN_EL0EN	(BIT(21)) /* enable EL0 access, if EL1EN set */
++#define CPACR_EL1_FPEN		(CPACR_EL1_FPEN_EL1EN | CPACR_EL1_FPEN_EL0EN)
++
+ #define CPACR_EL1_ZEN_EL1EN	(BIT(16)) /* enable EL1 access */
+ #define CPACR_EL1_ZEN_EL0EN	(BIT(17)) /* enable EL0 access, if EL1EN set */
+ #define CPACR_EL1_ZEN		(CPACR_EL1_ZEN_EL1EN | CPACR_EL1_ZEN_EL0EN)
 -- 
 2.30.2
 
