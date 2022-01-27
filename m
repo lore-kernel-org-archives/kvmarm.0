@@ -2,48 +2,46 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A214C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 16:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA018C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 16:20:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D25004A534;
-	Thu, 27 Jan 2022 11:18:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 255214A11C;
+	Thu, 27 Jan 2022 11:20:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pNS4xmUT5Uhk; Thu, 27 Jan 2022 11:18:16 -0500 (EST)
+	with ESMTP id 4somG5aZNPVD; Thu, 27 Jan 2022 11:20:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22C4E4B104;
-	Thu, 27 Jan 2022 11:18:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F0B84A49C;
+	Thu, 27 Jan 2022 11:20:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F1D24B0ED
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 11:18:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2758149F2F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 11:20:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZZn0FPvA5VL5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Jan 2022 11:18:13 -0500 (EST)
+ with ESMTP id F950eujxhJq8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Jan 2022 11:20:26 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD40249ED3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 11:18:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5797549F1F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 11:20:26 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D249F113E;
- Thu, 27 Jan 2022 08:18:12 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2554D1063;
+ Thu, 27 Jan 2022 08:20:25 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 85C893F766;
- Thu, 27 Jan 2022 08:18:10 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9DA653F766;
+ Thu, 27 Jan 2022 08:20:22 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- will@kernel.org, mark.rutland@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v4 6/6] KVM: arm64: Refuse to run VCPU if the PMU doesn't
- match the physical CPU
-Date: Thu, 27 Jan 2022 16:17:59 +0000
-Message-Id: <20220127161759.53553-7-alexandru.elisei@arm.com>
+To: will@kernel.org, julien.thierry.kdev@gmail.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
+ mark.rutland@arm.com, andre.przywara@arm.com
+Subject: [PATCH v2 kvmtool 00/10] arm64: Improve PMU support on heterogeneous
+ systems
+Date: Thu, 27 Jan 2022 16:20:23 +0000
+Message-Id: <20220127162033.54290-1-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220127161759.53553-1-alexandru.elisei@arm.com>
-References: <20220127161759.53553-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-Cc: tglx@linutronix.de, mingo@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -60,160 +58,125 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Userspace can assign a PMU to a VCPU with the KVM_ARM_VCPU_PMU_V3_SET_PMU
-device ioctl. If the VCPU is scheduled on a physical CPU which has a
-different PMU, the perf events needed to emulate a guest PMU won't be
-scheduled in and the guest performance counters will stop counting. Treat
-it as an userspace error and refuse to run the VCPU in this situation.
+The series can be found at [1], and the Linux patches that this series is
+based on at [2].
 
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- Documentation/virt/kvm/devices/vcpu.rst |  6 +++++-
- arch/arm64/include/asm/kvm_host.h       | 12 ++++++++++++
- arch/arm64/include/uapi/asm/kvm.h       |  3 +++
- arch/arm64/kvm/arm.c                    | 17 +++++++++++++++++
- arch/arm64/kvm/pmu-emul.c               |  1 +
- 5 files changed, 38 insertions(+), 1 deletion(-)
+The series adds support for the KVM_ARM_VCPU_PMU_V3_SET_PMU PMU attribute,
+which allows userspace to set a PMU for a VCPU. This PMU is used by KVM
+when creating perf events to emulate the guest PMU.
 
-diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-index e8c5770590a2..260db203a1e2 100644
---- a/Documentation/virt/kvm/devices/vcpu.rst
-+++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -131,7 +131,11 @@ if a PMU event filter is already present.
- 
- Note that KVM will not make any attempts to run the VCPU on the physical CPUs
- associated with the PMU specified by this attribute. This is entirely left to
--userspace.
-+userspace. However, attempting to run the VCPU on a physical CPU not supported
-+by the PMU will fail and KVM_RUN will return with
-+exit_reason = KVM_EXIT_FAIL_ENTRY and populate the fail_entry struct by setting
-+hardare_entry_failure_reason field to KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED and
-+the cpu field to the processor id.
- 
- 2. GROUP: KVM_ARM_VCPU_TIMER_CTRL
- =================================
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 57141a3a3740..0bed0e33e1ae 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -131,6 +131,8 @@ struct kvm_arch {
- 	unsigned long *pmu_filter;
- 	struct arm_pmu *arm_pmu;
- 
-+	cpumask_var_t supported_cpus;
-+
- 	u8 pfr0_csv2;
- 	u8 pfr0_csv3;
- 
-@@ -436,6 +438,7 @@ struct kvm_vcpu_arch {
- #define KVM_ARM64_DEBUG_STATE_SAVE_SPE	(1 << 12) /* Save SPE context if active  */
- #define KVM_ARM64_DEBUG_STATE_SAVE_TRBE	(1 << 13) /* Save TRBE context if active  */
- #define KVM_ARM64_FP_FOREIGN_FPSTATE	(1 << 14)
-+#define KVM_ARM64_ON_UNSUPPORTED_CPU	(1 << 15) /* Physical CPU not in supported_cpus */
- 
- #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
- 				 KVM_GUESTDBG_USE_SW_BP | \
-@@ -454,6 +457,15 @@ struct kvm_vcpu_arch {
- #define vcpu_has_ptrauth(vcpu)		false
- #endif
- 
-+#define vcpu_on_unsupported_cpu(vcpu)					\
-+	((vcpu)->arch.flags & KVM_ARM64_ON_UNSUPPORTED_CPU)
-+
-+#define vcpu_set_on_unsupported_cpu(vcpu)				\
-+	((vcpu)->arch.flags |= KVM_ARM64_ON_UNSUPPORTED_CPU)
-+
-+#define vcpu_clear_on_unsupported_cpu(vcpu)				\
-+	((vcpu)->arch.flags &= ~KVM_ARM64_ON_UNSUPPORTED_CPU)
-+
- #define vcpu_gp_regs(v)		(&(v)->arch.ctxt.regs)
- 
- /*
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 1d0a0a2a9711..d49f714f48e6 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -414,6 +414,9 @@ struct kvm_arm_copy_mte_tags {
- #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
- #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
- 
-+/* run->fail_entry.hardware_entry_failure_reason codes. */
-+#define KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED	(1ULL << 0)
-+
- #endif
- 
- #endif /* __ARM_KVM_H__ */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index f4e7e38a19e9..7b7658a9186f 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -150,6 +150,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	if (ret)
- 		goto out_free_stage2_pgd;
- 
-+	if (!zalloc_cpumask_var(&kvm->arch.supported_cpus, GFP_KERNEL))
-+		goto out_free_stage2_pgd;
-+	cpumask_copy(kvm->arch.supported_cpus, cpu_possible_mask);
-+
- 	kvm_vgic_early_init(kvm);
- 
- 	/* The maximum number of VCPUs is limited by the host's GIC model */
-@@ -176,6 +180,7 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
- void kvm_arch_destroy_vm(struct kvm *kvm)
- {
- 	bitmap_free(kvm->arch.pmu_filter);
-+	free_cpumask_var(kvm->arch.supported_cpus);
- 
- 	kvm_vgic_destroy(kvm);
- 
-@@ -411,6 +416,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (vcpu_has_ptrauth(vcpu))
- 		vcpu_ptrauth_disable(vcpu);
- 	kvm_arch_vcpu_load_debug_state_flags(vcpu);
-+
-+	if (!cpumask_test_cpu(smp_processor_id(), vcpu->kvm->arch.supported_cpus))
-+		vcpu_set_on_unsupported_cpu(vcpu);
- }
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-@@ -423,6 +431,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	kvm_vgic_put(vcpu);
- 	kvm_vcpu_pmu_restore_host(vcpu);
- 
-+	vcpu_clear_on_unsupported_cpu(vcpu);
- 	vcpu->cpu = -1;
- }
- 
-@@ -796,6 +805,14 @@ static bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu, int *ret)
- 		}
- 	}
- 
-+	if (unlikely(vcpu_on_unsupported_cpu(vcpu))) {
-+		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
-+		run->fail_entry.hardware_entry_failure_reason = KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED;
-+		run->fail_entry.cpu = smp_processor_id();
-+		*ret = 0;
-+		return true;
-+	}
-+
- 	return kvm_request_pending(vcpu) ||
- 			need_new_vmid_gen(&vcpu->arch.hw_mmu->vmid) ||
- 			xfer_to_guest_mode_work_pending();
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 18361f367495..4526a5824dac 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -968,6 +968,7 @@ static int kvm_arm_pmu_v3_set_pmu(struct kvm_vcpu *vcpu, int pmu_id)
- 			}
- 
- 			kvm->arch.arm_pmu = arm_pmu;
-+			cpumask_copy(kvm->arch.supported_cpus, &arm_pmu->supported_cpus);
- 			ret = 0;
- 			break;
- 		}
+Without settings this attribute, the PMU used when creating events is the
+first one that successfully probed when booting, but this is unreliable as
+the probe order can change (if the order of the PMUs is changed in the DTB
+or if asynchronous driver probing is enabled on the host's command line),
+and furthermore it requires the user to have intimate knowledge of how the
+PMU was chosen in order to pin the VM on the correct physical CPUs.
+
+With KVM_ARM_VCPU_PMU_V3_SET_PMU, the user is still expected to pin the
+VCPUs on a particular set of CPUs, but now it can be any CPUs as long as
+they share the same PMU. The set does not depend anymore on the driver
+probe order and all that is necessary for the user to know is which CPUs
+are the little core and which are the big cores, in a big.little
+configuration, which I believe is more reasonable.
+
+Patches #1-#2 are fixes and can be taken independently of this series.
+
+Patches #3-#6 move the PMU code to aarch64, where it belongs, because the
+PMU has never been supported on KVM for arm. This also paves the way for
+pulling in the KVM_ARM_VCPU_PMU_V3_SET_PMU attribute, which was not defined
+for KVM for arm (when KVM supported arm). This also can be merged right
+now, independently of the other patches.
+
+Patch #7 adds the cpumask_* functions which are necessary for subsequent
+patches.
+
+Patch #9 adds basic support for KVM_ARM_VCPU_PMU_V3_SET_PMU; the user is
+still expected to use taskset to pin the entire VM to the correct CPUs.
+
+Patch #10 adds --vcpu-affinity command line argument to pin VCPUs to the
+correct CPUs without pinning the rest of the kvmtool threads.
+
+Changes since v1:
+
+* Patch #2 ("bitops.h: Include wordsize.h to provide the __WORDSIZE
+  define") is new.
+
+* Added for_each_cpu(), cpumask_and() and cpumask_subset() functions and
+  all the cpumask_* functions are added in one patch.
+
+* Bumped NR_CPUS fro arm64 to 4096 to match the Linux Kconfig option.
+
+* Reworked the way kvmtool specific header files were included to use
+  quotes to clearly differentiate them from the system level headers and to
+  keep the style consistent with the current code (for example, #include
+  <linux/bitops.h> is now "linux/bitops.h").
+
+* Patch #10 ("arm64: Add --vcpu-affinity command line argument") is new.
+
+[1] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/pmu-big-little-fix-v2
+[2] https://gitlab.arm.com/linux-arm/linux-ae/-/tree/pmu-big-little-fix-v4
+
+Alexandru Elisei (10):
+  linux/err.h: Add missing stdbool.h include
+  bitops.h: Include wordsize.h to provide the __WORDSIZE define
+  arm: Move arch specific VCPU features to the arch specific function
+  arm: Get rid of the ARM_VCPU_FEATURE_FLAGS() macro
+  arm: Make the PMUv3 emulation code arm64 specific
+  arm64: Rework set_pmu_attr()
+  Add cpumask functions
+  update_headers.sh: Sync headers with Linux v5.17-rc1 + SET_PMU
+    attribute
+  arm64: Add support for KVM_ARM_VCPU_PMU_V3_SET_PMU
+  arm64: Add --vcpu-affinity command line argument
+
+ Makefile                                      |   6 +-
+ arm/aarch32/include/asm/kernel.h              |   8 +
+ arm/aarch32/include/kvm/kvm-cpu-arch.h        |   4 -
+ arm/aarch64/arm-cpu.c                         |   3 +-
+ arm/aarch64/include/asm/kernel.h              |   8 +
+ arm/aarch64/include/asm/kvm.h                 |   4 +
+ .../arm-common => aarch64/include/asm}/pmu.h  |   0
+ arm/aarch64/include/kvm/kvm-config-arch.h     |   5 +
+ arm/aarch64/include/kvm/kvm-cpu-arch.h        |   6 -
+ arm/aarch64/kvm-cpu.c                         |  21 ++
+ arm/aarch64/kvm.c                             |  32 +++
+ arm/aarch64/pmu.c                             | 231 ++++++++++++++++
+ arm/include/arm-common/kvm-arch.h             |   7 +
+ arm/include/arm-common/kvm-config-arch.h      |   1 +
+ arm/kvm-cpu.c                                 |  14 +-
+ arm/pmu.c                                     |  76 ------
+ include/linux/bitmap.h                        |  71 +++++
+ include/linux/bitops.h                        |   4 +
+ include/linux/bits.h                          |   8 +
+ include/linux/cpumask.h                       |  67 +++++
+ include/linux/err.h                           |   2 +
+ include/linux/find.h                          |  30 ++
+ include/linux/kernel.h                        |   6 +
+ include/linux/kvm.h                           |  16 ++
+ mips/include/asm/kernel.h                     |   8 +
+ powerpc/include/asm/kernel.h                  |   8 +
+ util/bitmap.c                                 | 256 ++++++++++++++++++
+ util/find.c                                   |  40 +++
+ x86/include/asm/kernel.h                      |   8 +
+ x86/include/asm/kvm.h                         |  16 +-
+ 30 files changed, 867 insertions(+), 99 deletions(-)
+ create mode 100644 arm/aarch32/include/asm/kernel.h
+ create mode 100644 arm/aarch64/include/asm/kernel.h
+ rename arm/{include/arm-common => aarch64/include/asm}/pmu.h (100%)
+ create mode 100644 arm/aarch64/pmu.c
+ delete mode 100644 arm/pmu.c
+ create mode 100644 include/linux/bitmap.h
+ create mode 100644 include/linux/bits.h
+ create mode 100644 include/linux/cpumask.h
+ create mode 100644 include/linux/find.h
+ create mode 100644 mips/include/asm/kernel.h
+ create mode 100644 powerpc/include/asm/kernel.h
+ create mode 100644 util/bitmap.c
+ create mode 100644 util/find.c
+ create mode 100644 x86/include/asm/kernel.h
+
 -- 
-2.34.1
+2.31.1
 
 _______________________________________________
 kvmarm mailing list
