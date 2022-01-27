@@ -2,80 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AA9C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 11:08:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 578C7C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 11:48:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D26E49F5B;
-	Thu, 27 Jan 2022 06:08:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B487149DFF;
+	Thu, 27 Jan 2022 06:48:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1SS4+EU8LLZa; Thu, 27 Jan 2022 06:08:25 -0500 (EST)
+	with ESMTP id tmOAvhJXHk0b; Thu, 27 Jan 2022 06:48:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6CF149F07;
-	Thu, 27 Jan 2022 06:08:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C0EB41174;
+	Thu, 27 Jan 2022 06:48:16 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 735D049F02
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 06:08:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA9AA49DFF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 06:48:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E5NWsu8GvzL8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Jan 2022 06:08:23 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A6BA49F00
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 06:08:23 -0500 (EST)
+ with ESMTP id qIzzDYMvQQ-e for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Jan 2022 06:48:14 -0500 (EST)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5181240D2E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 06:48:14 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id DE242B821EE;
- Thu, 27 Jan 2022 11:08:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABCC0C340E4;
- Thu, 27 Jan 2022 11:08:20 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 867B5CE21A4;
+ Thu, 27 Jan 2022 11:48:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D87C340EB;
+ Thu, 27 Jan 2022 11:48:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643281700;
- bh=AP8HPBckMHpuur+KWsdHskLCCjMEybkEiGTwDnOGq70=;
+ s=k20201202; t=1643284087;
+ bh=xCqfeUzSsfMIQ36LI/gRTI/XYXEjr23cIsrNayduwco=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=vF0FTfmcqCWaK5clS9XaDpUUU+rj++j+oBVuTaLWOuYWH+VOOEWaheY9veepj6gvZ
- EvHtGn9qtRYgmBD/mwFaacRQ7h1QKsz/CoozlszgEZNAxyEez4whcbPJP43nsQgJvP
- 9s68hHFO5FdyDDQ2vx/bpd4B3gWcxiVaDhT9/WcLUaEsIWvwKCOUDEo2w36mv1gEoG
- IMGk2ffOaC17fVuw3oV2xDgJ24+bkCe3FfaHvkzQayDNM4B82WQCfjgWx9Gv24saI3
- bcf6Srpvy5m0mPp8w8RFuwIcVPPmg6PGfr7qiWnJ1T2fgY/BtuXXyf4CSIvIVe3ken
- KRiU0TrL1Pebw==
+ b=RWpiHXrAzPQ/+jzK0XDusG6l8RdoqqvHeOxNtT9PmIsNLNZErjJ8XsRyLvpT+WEMi
+ 31NiMgBzHeJ+WPlueHen21rhVye0UVontHjS97uYvRe1KsHYdt0wD4wT6LP4PbIx8d
+ uDAYlFy0QFOUL2dM9Pssf20klHRfwP1yvf8KQssi2VYGUlqEUiTfpv9dO3xyaS9x45
+ gggos/HEBi8neB9+HJ0y4EgI1pt+ap0nbHtQFPrT8zXcSYnk2nnsFnD0IH95KZSgDG
+ iROI65D7s1ZPT33lL4KpOboD8aRvluYRuJ6DvUM/QKM3bl0JGnH+QGAdkUCWLjyTdO
+ gudATOFkMYGfw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nD2dW-003Tiy-4l; Thu, 27 Jan 2022 11:08:18 +0000
-Date: Thu, 27 Jan 2022 11:08:17 +0000
-Message-ID: <874k5p77xa.wl-maz@kernel.org>
+ id 1nD3G1-003UZm-TI; Thu, 27 Jan 2022 11:48:06 +0000
+Date: Thu, 27 Jan 2022 11:48:05 +0000
+Message-ID: <8735l9762y.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v5 14/69] KVM: arm64: nv: Support virtual EL2 exceptions
-In-Reply-To: <YelqampUOCIt3YZE@monolith.localdoman>
+To: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v5 67/69] KVM: arm64: nv: Enable ARMv8.4-NV support
+In-Reply-To: <7fe1ce9e-1b86-ed57-a0e5-117d1b9011b4@os.amperecomputing.com>
 References: <20211129200150.351436-1-maz@kernel.org>
- <20211129200150.351436-15-maz@kernel.org>
- <YelqampUOCIt3YZE@monolith.localdoman>
+ <20211129200150.351436-68-maz@kernel.org>
+ <7fe1ce9e-1b86-ed57-a0e5-117d1b9011b4@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
- jintack@cs.columbia.edu, haibo.xu@linaro.org,
- gankulkarni@os.amperecomputing.com, james.morse@arm.com,
- suzuki.poulose@arm.com, kernel-team@android.com
+ jintack@cs.columbia.edu, haibo.xu@linaro.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- kernel-team@android.com, linux-arm-kernel@lists.infradead.org
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,69 +91,108 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 20 Jan 2022 13:58:02 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Tue, 18 Jan 2022 11:50:18 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> Hi Marc,
 > 
-> On Mon, Nov 29, 2021 at 08:00:55PM +0000, Marc Zyngier wrote:
-> > +void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
-> > +{
-> > +	u64 spsr, elr, mode;
-> > +	bool direct_eret;
+> 
+> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+> > As all the VNCR-capable system registers are nicely separated
+> > from the rest of the crowd, let's set HCR_EL2.NV2 on and let
+> > the ball rolling.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >   arch/arm64/include/asm/kvm_arm.h     |  1 +
+> >   arch/arm64/include/asm/kvm_emulate.h | 23 +++++++++++++----------
+> >   arch/arm64/include/asm/sysreg.h      |  1 +
+> >   arch/arm64/kvm/hyp/vhe/switch.c      | 14 +++++++++++++-
+> >   4 files changed, 28 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index b603466803d2..18c35446249f 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -20,6 +20,7 @@
+> >   #define HCR_AMVOFFEN	(UL(1) << 51)
+> >   #define HCR_FIEN	(UL(1) << 47)
+> >   #define HCR_FWB		(UL(1) << 46)
+> > +#define HCR_NV2		(UL(1) << 45)
+> >   #define HCR_AT		(UL(1) << 44)
+> >   #define HCR_NV1		(UL(1) << 43)
+> >   #define HCR_NV		(UL(1) << 42)
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 1664430be698..f282997e4a4c 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -245,21 +245,24 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+> >     static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context
+> > *ctxt, u64 val)
+> >   {
+> > -	if (!__vcpu_el2_e2h_is_set(ctxt)) {
+> > -		/*
+> > -		 * Clear the .M field when writing SPSR to the CPU, so that we
+> > -		 * can detect when the CPU clobbered our SPSR copy during a
+> > -		 * local exception.
+> > -		 */
+> > -		val &= ~0xc;
+> > -	}
+> > +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
 > > +
+> > +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
+> > +		return val;
+> >   -	return val;
 > > +	/*
-> > +	 * Going through the whole put/load motions is a waste of time
-> > +	 * if this is a VHE guest hypervisor returning to its own
-> > +	 * userspace, or the hypervisor performing a local exception
-> > +	 * return. No need to save/restore registers, no need to
-> > +	 * switch S2 MMU. Just do the canonical ERET.
+> > +	 * Clear the .M field when writing SPSR to the CPU, so that we
+> > +	 * can detect when the CPU clobbered our SPSR copy during a
+> > +	 * local exception.
 > > +	 */
-> > +	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
-> > +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > +	return val &= ~0xc;
+> >   }
+> >     static inline u64 __fixup_spsr_el2_read(const struct
+> > kvm_cpu_context *ctxt, u64 val)
+> >   {
+> > -	if (__vcpu_el2_e2h_is_set(ctxt))
+> > +	struct kvm_vcpu *vcpu = container_of(ctxt, struct kvm_vcpu, arch.ctxt);
 > > +
-> > +	direct_eret  = (mode == PSR_MODE_EL0t &&
-> > +			vcpu_el2_e2h_is_set(vcpu) &&
-> > +			vcpu_el2_tge_is_set(vcpu));
-> > +	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
-> > +
-> > +	if (direct_eret) {
-> > +		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
-> > +		*vcpu_cpsr(vcpu) = spsr;
-> > +		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
-> > +		return;
-> > +	}
-> > +
-> > +	preempt_disable();
-> > +	kvm_arch_vcpu_put(vcpu);
-> > +
-> > +	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
-> > +
-> > +	trace_kvm_nested_eret(vcpu, elr, spsr);
-> > +
-> > +	/*
-> > +	 * Note that the current exception level is always the virtual EL2,
-> > +	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
-> > +	 */
-> > +	*vcpu_pc(vcpu) = elr;
-> > +	*vcpu_cpsr(vcpu) = spsr;
-> > +
-> > +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
-> > +	preempt_enable();
+> > +	if (enhanced_nested_virt_in_use(vcpu) || __vcpu_el2_e2h_is_set(ctxt))
+> >   		return val;
+> >     	/*
+> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> > index 71e6a0410e7c..5de90138d0a4 100644
+> > --- a/arch/arm64/include/asm/sysreg.h
+> > +++ b/arch/arm64/include/asm/sysreg.h
+> > @@ -550,6 +550,7 @@
+> >   #define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
+> >   #define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
+> >   #define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
+> > +#define SYS_VNCR_EL2			sys_reg(3, 4, 2, 2, 0)
+> >     #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+> >   #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index ef4488db6dc1..5cadda79089a 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -45,7 +45,13 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+> >   			 * the EL1 virtual memory control register accesses
+> >   			 * as well as the AT S1 operations.
+> >   			 */
+> > -			hcr |= HCR_TVM | HCR_TRVM | HCR_AT | HCR_TTLB | HCR_NV1;
+> > +			if (enhanced_nested_virt_in_use(vcpu)) {
+> > +				hcr &= ~HCR_TVM;
 > 
-> According to ARM DDI 0487G.a, page D13-3289, ERET'ing to EL1 when
-> HCR_EL2.TGE is set is an illegal exception return. I don't see this
-> case treated here.
+> I think, we should clear TRVM also?
+> 				hcr &= ~(HCR_TVM | HCR_TRVM);
 
-Yes, good call.
+Hmmm. But TRVM is never set the first place, is it? It is only here
+that we augment the host HCR_EL2 with various trap configurations
+depending on whether the host is NV2 capable or not, whether the
+guest is VHE or not, and whether the guest as set of additional flags
+of its own.
 
-I've now added handling for both the return to EL1 with TGE set as
-well as return to a 32bit mode. The return to EL3 case will directly
-be handled by the HW, and the return from AArch32 to AArch64 cannot
-happen by construction.
+Given that, I don't think there is a need to clear this bit.
 
-Thanks for spotting it.
-
+Thanks,
 	M.
 
 -- 
