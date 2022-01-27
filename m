@@ -2,80 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 761C6C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 04:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A568BC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 05:03:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E96FC49F00;
-	Wed, 26 Jan 2022 23:17:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F0FE049F5A;
+	Thu, 27 Jan 2022 00:03:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OQ9uMPeZNw53; Wed, 26 Jan 2022 23:17:06 -0500 (EST)
+	with ESMTP id baH82zbZN93y; Thu, 27 Jan 2022 00:03:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B570149F03;
-	Wed, 26 Jan 2022 23:17:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC6B749EEF;
+	Thu, 27 Jan 2022 00:03:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6B1149EED
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 23:17:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28D6C49EE2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 00:03:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x3aHcwEjQJPr for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Jan 2022 23:17:04 -0500 (EST)
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com
- [209.85.216.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69C4A49EBB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 23:17:04 -0500 (EST)
-Received: by mail-pj1-f50.google.com with SMTP id
- d12-20020a17090a628c00b001b4f47e2f51so6305528pjj.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 20:17:04 -0800 (PST)
+ with ESMTP id ZllCrjEA6Jzx for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Jan 2022 00:03:51 -0500 (EST)
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com
+ [209.85.215.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB62D40453
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 00:03:51 -0500 (EST)
+Received: by mail-pg1-f180.google.com with SMTP id q75so1269365pgq.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 21:03:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=MlI851lUoHdmSjJoGiyp5I4kiqlKaCdV4NPdXhxRA+8=;
- b=C8VvuZFe4rCP2uCFSONmb99RN1LdQn529TOYmrpKoK7PYZcziPiAhrOW11oPx+kR43
- opz70CnPxzxoZTYSSVhdERYlJMV8TdO2QuyuvwmFnkgUYxlX3/+xpOKrqI+Z+SedE8V0
- b2zhdCzpSnUjJajZlBYXB+FSVxcFj2HkqHfh92IhUWwU9i3Q4biweQtzgZksk14c+YiH
- 52bQWQ89Jcu87pb3B4VxHhWSQojQZDN4MzrgykfnIRP/6lSrZxJ1K92QfFOGFIVPjDYw
- 3UM41Q/sdGDYKwy0SqhzCI9wShehVrMqDwPAZ1e+aIL1TRmW3bpwLdmcoEgNXDTVMahN
- 1OPg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=agPawYo4RaAHn59m9QDt6suEoJLBOjPFjwtduhksCZA=;
+ b=SHnaCJpS0XGF2gKPdqkxKsiQEN5Pvi0d4uuTXh2KymzYNDiqFtc13ey3Pu+dNkEgbZ
+ pk/V6yrlgQge1/tujoYulDwjpCQmWLLJcvfWi7mBzKxIVSCCE8ta7V+Lr91cJvfLziNq
+ 1uhuc6gxDu5tYnDXQ9IZeL2cvPMXV7AkK6FfjUOn72PfHO55XXe+YnCas50gOtS14/ep
+ s5P8DmOcWl0mqJzudyVMXOSVsO4TlTfZ3mcMuJ7eIRGMqv4k6h9ONr8mBjNhNlDM2U+g
+ 0k2IIfdEN+/P1B2f+UGy92Qj2L4lhmvWNcuhQbbK/iFk/hu8IIA0p10SGvmIfbW2vIZJ
+ WkOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=MlI851lUoHdmSjJoGiyp5I4kiqlKaCdV4NPdXhxRA+8=;
- b=3/ig1Wpp2fPx3dWVbnYe1uG2tDjB7wf8R0oxczr75tEwIuoezLdZbLMi16r8nvDA5Z
- G7TpyH8Ivc7u74NtT6DydaC3fpiI+GpAZ7j2FTmZ4uwYg7vHQ0MqX2/Fl/D5X+L2XZPg
- PJulHdJfNpC/QqQhUnCUtijhuIARz/XvBwsrSc7f5U0MTCesWawbDiQk68hopjLkPKqF
- VpgWhv8tCz/ynsevD6Lg22dCihLBaZoLJ08fGoIFMQMtj0pk7iroTkiOKlbN+nnFppS6
- RTQQfk6Bu59Rzcwz1egWGh0f1oUlQxUJqfIO4TfyyDBYIKSM8sNsYvM+/ezjwVstIR5O
- zAqA==
-X-Gm-Message-State: AOAM532gvS4G0AaCcn9P7bs7TLKMlRDX4ZckLwEKmy5gmPkynqm3FEYY
- YGTnSAIelSxtJaiccxjN11hbFw==
-X-Google-Smtp-Source: ABdhPJzz3u8vPsKiH9OPkvGE3abpQ/af8KLmu4FJ0c7+83/vDdWzlReCnpAVhOP8ndMIaORK9xGeGg==
-X-Received: by 2002:a17:902:f083:: with SMTP id
- p3mr2247927pla.72.1643257023220; 
- Wed, 26 Jan 2022 20:17:03 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id z7sm3556746pfe.49.2022.01.26.20.17.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Jan 2022 20:17:02 -0800 (PST)
-Date: Wed, 26 Jan 2022 20:16:59 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3] kselftest: kvm/arm64: Skip tests if we can't create a
- vgic-v3
-Message-ID: <YfIcu2DMi83eua8C@google.com>
-References: <20220126145242.3473836-1-broonie@kernel.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=agPawYo4RaAHn59m9QDt6suEoJLBOjPFjwtduhksCZA=;
+ b=TcvOAHzwQKIrXspVl6iVLHeUpecS5RAP9penux+yF4092/MUAcwCNfa6s+tpjahz1B
+ y6zkJHmH0omsWEUaVQVNg9B5sO7S2XJ89WBKGdw7LPKLo4UKk1bNjfcDtx9/fxaXlt18
+ fJbYndEd12Xs/I33zJ4kPJFtEMb8U+AUl8G2d4XNxt1bqJMdxovyNc7IMpYIopTH5pek
+ nM4i8d8LW6qr24JUTg5g49PDvCgy1xgMhYQbrtr+g0vaqc8YZIzRNErrEk6sJ6yG6Rqt
+ TD1VHCZR8eGLVBQHQj4ODhd4e2VE0vggs3slXVNhi0H/bCEtjHfnfY+ZXveIGIvg87Ag
+ xsfQ==
+X-Gm-Message-State: AOAM530kRag/HD8Rsp8c5lBWX3gdzAvWNPj98yrToM8bh4OfWvxG4xFl
+ 5dgVQxd+SNOe52us7CgVCQyAeGCET22es9K16m3cDA==
+X-Google-Smtp-Source: ABdhPJyohy4/6u5c4O8NFD2tW970/10L+Klc/wjONOYTfQvmiQ0UEXicdr8tiFzT/PhrjqK7I+uv9Ai47/74v+I+TOk=
+X-Received: by 2002:a63:6909:: with SMTP id e9mr1595725pgc.514.1643259830730; 
+ Wed, 26 Jan 2022 21:03:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220126145242.3473836-1-broonie@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-kselftest@vger.kernel.org
+References: <20220106042708.2869332-1-reijiw@google.com>
+ <20220106042708.2869332-15-reijiw@google.com>
+ <CA+EHjTzQK2kswrW3LDf0ybz4estOCdafCvtRZHWwvTv2nH-UVw@mail.gmail.com>
+In-Reply-To: <CA+EHjTzQK2kswrW3LDf0ybz4estOCdafCvtRZHWwvTv2nH-UVw@mail.gmail.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Wed, 26 Jan 2022 21:03:34 -0800
+Message-ID: <CAAeT=FzR+=evcsOA9PMtsE=TDJmBq1LJxR5wo1DMgEZ0B=dU9Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 14/26] KVM: arm64: Add consistency checking for
+ frac fields of ID registers
+To: Fuad Tabba <tabba@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,100 +86,171 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 26, 2022 at 02:52:42PM +0000, Mark Brown wrote:
-> The arch_timer and vgic_irq kselftests assume that they can create a
-> vgic-v3, using the library function vgic_v3_setup() which aborts with a
-> test failure if it is not possible to do so. Since vgic-v3 can only be
-> instantiated on systems where the host has GICv3 this leads to false
-> positives on older systems where that is not the case.
-> 
-> Fix this by changing vgic_v3_setup() to return an error if the vgic can't
-> be instantiated and have the callers skip if this happens. We could also
-> exit flagging a skip in vgic_v3_setup() but this would prevent future test
-> cases conditionally deciding which GIC to use or generally doing more
-> complex output.
-> 
-> Signed-off-by: Mark Brown <broonie@kernel.org>
-> ---
-> 
-> v3:
->  - Use custom print_skip() helper.
->  - Use internal version of _kvm_create_device.
-> v2:
->  - The test for being able to create the GIC doesn't actually
->    instantiate it, add a call doing so in that case.
-> 
->  tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
->  tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 4 ++++
->  tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
->  3 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> index 9ad38bd360a4..b08d30bf71c5 100644
-> --- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> +++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
-> @@ -366,6 +366,7 @@ static struct kvm_vm *test_vm_create(void)
->  {
->  	struct kvm_vm *vm;
->  	unsigned int i;
-> +	int ret;
->  	int nr_vcpus = test_args.nr_vcpus;
->  
->  	vm = vm_create_default_with_vcpus(nr_vcpus, 0, 0, guest_code, NULL);
-> @@ -382,7 +383,11 @@ static struct kvm_vm *test_vm_create(void)
->  
->  	ucall_init(vm, NULL);
->  	test_init_timer_irq(vm);
-> -	vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-> +	ret = vgic_v3_setup(vm, nr_vcpus, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-> +	if (ret < 0) {
-> +		print_skip("Failed to create vgic-v3");
-> +		exit(KSFT_SKIP);
-> +	}
->  
->  	/* Make all the test's cmdline args visible to the guest */
->  	sync_global_to_guest(vm, test_args);
-> diff --git a/tools/testing/selftests/kvm/aarch64/vgic_irq.c b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> index e6c7d7f8fbd1..7eca97799917 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vgic_irq.c
-> @@ -761,6 +761,10 @@ static void test_vgic(uint32_t nr_irqs, bool level_sensitive, bool eoi_split)
->  
->  	gic_fd = vgic_v3_setup(vm, 1, nr_irqs,
->  			GICD_BASE_GPA, GICR_BASE_GPA);
-> +	if (gic_fd < 0) {
-> +		print_skip("Failed to create vgic-v3, skipping");
-> +		exit(KSFT_SKIP);
-> +	}
->  
->  	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
->  		guest_irq_handlers[args.eoi_split][args.level_sensitive]);
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> index b3a0fca0d780..f5cd0c536d85 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> @@ -52,7 +52,9 @@ int vgic_v3_setup(struct kvm_vm *vm, unsigned int nr_vcpus, uint32_t nr_irqs,
->  			nr_vcpus, nr_vcpus_created);
->  
->  	/* Distributor setup */
-> -	gic_fd = kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3, false);
-> +	if (_kvm_create_device(vm, KVM_DEV_TYPE_ARM_VGIC_V3,
-> +			       false, &gic_fd) != 0)
-> +		return -1;
->  
->  	kvm_device_access(gic_fd, KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
->  			0, &nr_irqs, true);
-> -- 
-> 2.30.2
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Hi Fuad,
 
-Tried both gicv2 and v3 and the change works as expected.
+On Mon, Jan 24, 2022 at 9:01 AM Fuad Tabba <tabba@google.com> wrote:
+>
+> Hi Reiji,
+>
+> On Thu, Jan 6, 2022 at 4:29 AM Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Feature fractional field of an ID register cannot be simply validated
+> > at KVM_SET_ONE_REG because its validity depends on its (main) feature
+> > field value, which could be in a different ID register (and might be
+> > set later).
+> > Validate fractional fields at the first KVM_RUN instead.
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |   1 +
+> >  arch/arm64/kvm/arm.c              |   3 +
+> >  arch/arm64/kvm/sys_regs.c         | 116 +++++++++++++++++++++++++++++-
+> >  3 files changed, 117 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 4509f9e7472d..7b3f86bd6a6b 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -750,6 +750,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> >
+> >  void set_default_id_regs(struct kvm *kvm);
+> >  int kvm_set_id_reg_feature(struct kvm *kvm, u32 id, u8 field_shift, u8 fval);
+> > +int kvm_id_regs_consistency_check(const struct kvm_vcpu *vcpu);
+> >
+> >  /* Guest/host FPSIMD coordination helpers */
+> >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 5f497a0af254..16fc2ce32069 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -596,6 +596,9 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+> >         if (!kvm_arm_vcpu_is_finalized(vcpu))
+> >                 return -EPERM;
+> >
+> > +       if (!kvm_vm_is_protected(kvm) && kvm_id_regs_consistency_check(vcpu))
+> > +               return -EPERM;
+> > +
+> >         vcpu->arch.has_run_once = true;
+> >
+> >         kvm_arm_vcpu_init_debug(vcpu);
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index ddbeefc3881c..6adb7b04620c 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -756,9 +756,6 @@ static struct id_reg_info id_aa64pfr0_el1_info = {
+> >
+> >  static struct id_reg_info id_aa64pfr1_el1_info = {
+> >         .sys_reg = SYS_ID_AA64PFR1_EL1,
+> > -       .ignore_mask = ARM64_FEATURE_MASK(ID_AA64PFR1_RASFRAC) |
+> > -                      ARM64_FEATURE_MASK(ID_AA64PFR1_MPAMFRAC) |
+> > -                      ARM64_FEATURE_MASK(ID_AA64PFR1_CSV2FRAC),
+> >         .init = init_id_aa64pfr1_el1_info,
+> >         .validate = validate_id_aa64pfr1_el1,
+> >         .vcpu_mask = vcpu_mask_id_aa64pfr1_el1,
+> > @@ -3434,10 +3431,109 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+> >         return write_demux_regids(uindices);
+> >  }
+> >
+> > +/* ID register's fractional field information with its feature field. */
+> > +struct feature_frac {
+> > +       u32     id;
+> > +       u32     shift;
+> > +       u32     frac_id;
+> > +       u32     frac_shift;
+> > +       u8      frac_ftr_check;
+> > +};
+>
+> frac_ftr_check doesn't seem to be used. Also, it would be easier to
+> read if the ordering of the fields match the ordering you initialize
+> them below.
 
-Tested-by: Ricardo Koller <ricarkol@google.com>
+Thank you for catching this.
+I will remove frac_ftr_check and change the ordering.
+
+>
+> > +
+> > +static struct feature_frac feature_frac_table[] = {
+> > +       {
+> > +               .frac_id = SYS_ID_AA64PFR1_EL1,
+> > +               .frac_shift = ID_AA64PFR1_RASFRAC_SHIFT,
+> > +               .id = SYS_ID_AA64PFR0_EL1,
+> > +               .shift = ID_AA64PFR0_RAS_SHIFT,
+> > +       },
+> > +       {
+> > +               .frac_id = SYS_ID_AA64PFR1_EL1,
+> > +               .frac_shift = ID_AA64PFR1_MPAMFRAC_SHIFT,
+> > +               .id = SYS_ID_AA64PFR0_EL1,
+> > +               .shift = ID_AA64PFR0_MPAM_SHIFT,
+> > +       },
+> > +       {
+> > +               .frac_id = SYS_ID_AA64PFR1_EL1,
+> > +               .frac_shift = ID_AA64PFR1_CSV2FRAC_SHIFT,
+> > +               .id = SYS_ID_AA64PFR0_EL1,
+> > +               .shift = ID_AA64PFR0_CSV2_SHIFT,
+> > +       },
+> > +};
+> > +
+> > +/*
+> > + * Return non-zero if the feature/fractional fields pair are not
+> > + * supported. Return zero otherwise.
+> > + * This function validates only the fractional feature field,
+> > + * and relies on the fact the feature field is validated before
+> > + * through arm64_check_features.
+> > + */
+> > +static int vcpu_id_reg_feature_frac_check(const struct kvm_vcpu *vcpu,
+> > +                                         const struct feature_frac *ftr_frac)
+> > +{
+> > +       const struct id_reg_info *id_reg;
+> > +       u32 id;
+> > +       u64 val, lim, mask;
+> > +
+> > +       /* Check if the feature field value is same as the limit */
+> > +       id = ftr_frac->id;
+> > +       id_reg = GET_ID_REG_INFO(id);
+> > +
+> > +       mask = (u64)ARM64_FEATURE_FIELD_MASK << ftr_frac->shift;
+> > +       val = __read_id_reg(vcpu, id) & mask;
+> > +       lim = id_reg ? id_reg->vcpu_limit_val : read_sanitised_ftr_reg(id);
+> > +       lim &= mask;
+> > +
+> > +       if (val != lim)
+> > +               /*
+> > +                * The feature level is lower than the limit.
+> > +                * Any fractional version should be fine.
+> > +                */
+> > +               return 0;
+> > +
+> > +       /* Check the fractional feature field */
+> > +       id = ftr_frac->frac_id;
+> > +       id_reg = GET_ID_REG_INFO(id);
+> > +
+> > +       mask = (u64)ARM64_FEATURE_FIELD_MASK << ftr_frac->frac_shift;
+> > +       val = __read_id_reg(vcpu, id) & mask;
+> > +       lim = id_reg ? id_reg->vcpu_limit_val : read_sanitised_ftr_reg(id);
+> > +       lim &= mask;
+> > +
+> > +       if (val == lim)
+> > +               /*
+> > +                * Both the feature and fractional fields are the same
+> > +                * as limit.
+> > +                */
+> > +               return 0;
+> > +
+> > +       return arm64_check_features(id, val, lim);
+> > +}
+> > +
+> > +int kvm_id_regs_consistency_check(const struct kvm_vcpu *vcpu)
+>
+> Nit: considering that this is only checking the fractional fields,
+> should the function name reflect that?
+
+Thank you for the suggestion.
+I will change the function name to reflect that.
+(There were more checks in older version and I forgot to
+change the name...)
+
+Thanks,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
