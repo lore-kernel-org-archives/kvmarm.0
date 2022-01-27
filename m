@@ -2,44 +2,44 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99969C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 16:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC7A2C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 16:20:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5236F4B0BE;
-	Thu, 27 Jan 2022 11:20:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F87349F56;
+	Thu, 27 Jan 2022 11:20:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id a6fp7bgF4mNR; Thu, 27 Jan 2022 11:20:37 -0500 (EST)
+	with ESMTP id rw+2hU8zFcdP; Thu, 27 Jan 2022 11:20:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D3274B10A;
-	Thu, 27 Jan 2022 11:20:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E9ED4B129;
+	Thu, 27 Jan 2022 11:20:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5CB149F2F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 11:20:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A852C49F56
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 11:20:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nVY49ieczkRV for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Jan 2022 11:20:34 -0500 (EST)
+ with ESMTP id wbBciE8Feqin for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Jan 2022 11:20:36 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E6424A49C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 11:20:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E8D44B0ED
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 11:20:36 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3519E1063;
- Thu, 27 Jan 2022 08:20:34 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0DA5E113E;
+ Thu, 27 Jan 2022 08:20:36 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 22BAB3F766;
- Thu, 27 Jan 2022 08:20:31 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76AB53F766;
+ Thu, 27 Jan 2022 08:20:34 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: will@kernel.org, julien.thierry.kdev@gmail.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
  mark.rutland@arm.com, andre.przywara@arm.com
-Subject: [PATCH v2 kvmtool 04/10] arm: Get rid of the ARM_VCPU_FEATURE_FLAGS()
- macro
-Date: Thu, 27 Jan 2022 16:20:27 +0000
-Message-Id: <20220127162033.54290-5-alexandru.elisei@arm.com>
+Subject: [PATCH v2 kvmtool 05/10] arm: Make the PMUv3 emulation code arm64
+ specific
+Date: Thu, 27 Jan 2022 16:20:28 +0000
+Message-Id: <20220127162033.54290-6-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220127162033.54290-1-alexandru.elisei@arm.com>
 References: <20220127162033.54290-1-alexandru.elisei@arm.com>
@@ -60,75 +60,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The ARM_VCPU_FEATURE_FLAGS() macro sets a feature bit in a rather
-convoluted way: if cpu_id is 0, then bit KVM_ARM_VCPU_POWER_OFF is 0,
-otherwise is set to 1. There's really no need for this indirection,
-especially considering that the macro has been changed to return the same
-value for both the arm and arm64 architectures. Replace it with a simple
-conditional statement in kvm_cpu__arch_init(), which makes it clearer to
-understand.
+KVM for aarch32 does not exist anymore, PMUv3 is a hardware feature
+present only on aarch64 CPUs, the command line option to enable the
+feature for a VCPU is aarch64 specific, the PMU code is called only from
+an aarch64 function and it compiles to an empty stub when ARCH=arm.
+There is no reason to have the PMUv3 emulation code in the common code
+area for arm and arm64, so move it to the arm64 directory, where it can
+be expanded in the future without fear of breaking aarch32 support.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/aarch32/include/kvm/kvm-cpu-arch.h | 4 ----
- arm/aarch64/include/kvm/kvm-cpu-arch.h | 4 ----
- arm/kvm-cpu.c                          | 6 +++++-
- 3 files changed, 5 insertions(+), 9 deletions(-)
+ Makefile                                              | 4 ++--
+ arm/aarch64/arm-cpu.c                                 | 3 ++-
+ arm/{include/arm-common => aarch64/include/asm}/pmu.h | 0
+ arm/{ => aarch64}/pmu.c                               | 7 ++-----
+ 4 files changed, 6 insertions(+), 8 deletions(-)
+ rename arm/{include/arm-common => aarch64/include/asm}/pmu.h (100%)
+ rename arm/{ => aarch64}/pmu.c (93%)
 
-diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-index 780e0e2f0934..fc9aef9f6320 100644
---- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-@@ -5,10 +5,6 @@
+diff --git a/Makefile b/Makefile
+index f25114755701..2fe5fb0fba62 100644
+--- a/Makefile
++++ b/Makefile
+@@ -159,8 +159,7 @@ endif
  
- #include "arm-common/kvm-cpu-arch.h"
+ # ARM
+ OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/gicv2m.o arm/ioport.o \
+-			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
+-			   arm/pmu.o
++			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o
+ HDRS_ARM_COMMON		:= arm/include
+ ifeq ($(ARCH), arm)
+ 	DEFINES		+= -DCONFIG_ARM
+@@ -182,6 +181,7 @@ ifeq ($(ARCH), arm64)
+ 	OBJS		+= arm/aarch64/arm-cpu.o
+ 	OBJS		+= arm/aarch64/kvm-cpu.o
+ 	OBJS		+= arm/aarch64/kvm.o
++	OBJS		+= arm/aarch64/pmu.o
+ 	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+ 	ARCH_INCLUDE	+= -Iarm/aarch64/include
  
--#define ARM_VCPU_FEATURE_FLAGS(kvm, cpuid)	{			\
--	[0] = (!!(cpuid) << KVM_ARM_VCPU_POWER_OFF),			\
--}
--
- #define ARM_MPIDR_HWID_BITMASK	0xFFFFFF
- #define ARM_CPU_ID		0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
-diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-index 016cf5b2b9ea..17b80493e2c0 100644
---- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-@@ -5,10 +5,6 @@
+diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
+index d7572b7790b1..1ec37fa60c50 100644
+--- a/arm/aarch64/arm-cpu.c
++++ b/arm/aarch64/arm-cpu.c
+@@ -5,7 +5,8 @@
  
- #include "arm-common/kvm-cpu-arch.h"
- 
--#define ARM_VCPU_FEATURE_FLAGS(kvm, cpuid)	{				\
--	[0] = (!!(cpuid) << KVM_ARM_VCPU_POWER_OFF),				\
--}
--
- #define ARM_MPIDR_HWID_BITMASK	0xFF00FFFFFFUL
- #define ARM_CPU_ID		3, 0, 0, 0
- #define ARM_CPU_ID_MPIDR	5
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 554414f81b7a..62177ea73f82 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -43,7 +43,7 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	unsigned int i;
- 	struct kvm_vcpu_init preferred_init;
- 	struct kvm_vcpu_init vcpu_init = {
--		.features = ARM_VCPU_FEATURE_FLAGS(kvm, cpu_id)
-+		.features = {},
- 	};
- 
- 	vcpu = calloc(1, sizeof(struct kvm_cpu));
-@@ -63,6 +63,10 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	if (vcpu->kvm_run == MAP_FAILED)
- 		die("unable to mmap vcpu fd");
- 
-+	/* VCPU 0 is the boot CPU, the others start in a poweroff state. */
-+	if (cpu_id > 0)
-+		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_POWER_OFF);
+ #include "arm-common/gic.h"
+ #include "arm-common/timer.h"
+-#include "arm-common/pmu.h"
 +
- 	/* Set KVM_ARM_VCPU_PSCI_0_2 if available */
- 	if (kvm__supports_extension(kvm, KVM_CAP_ARM_PSCI_0_2)) {
- 		vcpu_init.features[0] |= (1UL << KVM_ARM_VCPU_PSCI_0_2);
++#include "asm/pmu.h"
+ 
+ #include <linux/byteorder.h>
+ #include <linux/types.h>
+diff --git a/arm/include/arm-common/pmu.h b/arm/aarch64/include/asm/pmu.h
+similarity index 100%
+rename from arm/include/arm-common/pmu.h
+rename to arm/aarch64/include/asm/pmu.h
+diff --git a/arm/pmu.c b/arm/aarch64/pmu.c
+similarity index 93%
+rename from arm/pmu.c
+rename to arm/aarch64/pmu.c
+index 5b058eabb49d..6b190c5e2ae5 100644
+--- a/arm/pmu.c
++++ b/arm/aarch64/pmu.c
+@@ -4,9 +4,9 @@
+ #include "kvm/util.h"
+ 
+ #include "arm-common/gic.h"
+-#include "arm-common/pmu.h"
+ 
+-#ifdef CONFIG_ARM64
++#include "asm/pmu.h"
++
+ static int set_pmu_attr(struct kvm *kvm, int vcpu_idx,
+ 			struct kvm_device_attr *attr)
+ {
+@@ -71,6 +71,3 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ 	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
+ 	_FDT(fdt_end_node(fdt));
+ }
+-#else
+-void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm) { }
+-#endif
 -- 
 2.31.1
 
