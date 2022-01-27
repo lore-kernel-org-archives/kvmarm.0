@@ -2,91 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E0EC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 07:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2AA9C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 11:08:27 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DC9249F20;
-	Thu, 27 Jan 2022 02:51:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D26E49F5B;
+	Thu, 27 Jan 2022 06:08:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id X+X1PMwzv6sJ; Thu, 27 Jan 2022 02:51:27 -0500 (EST)
+	with ESMTP id 1SS4+EU8LLZa; Thu, 27 Jan 2022 06:08:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E285A4A014;
-	Thu, 27 Jan 2022 02:51:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6CF149F07;
+	Thu, 27 Jan 2022 06:08:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A2CEC49F27
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 02:51:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 735D049F02
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 06:08:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dhT14G4z9TzF for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Jan 2022 02:51:25 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4B4F49F20
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 02:51:25 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1643269885;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GZX/pfOEsztdvqNPhksRj9ximKWEK/m51aO4OO9gIOw=;
- b=b7Jp4AcX3kuHQxt/Fk5erIL/0UiD5952SRoSIA7LKavxlHgr/qmBXNKI30Ag9x0NH7nSN+
- JaIlOmwGGHO0hjrxyUZJyCQW672B5XDVaiUJE3v2MQ9B+oFDwSiJrUObG+x1wDQuhmBPFK
- 2ZCTfVMKyTfiagqs/sBR4qZm+6JHrME=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-204-uM8NzwD6P--IdxSVcC_xuQ-1; Thu, 27 Jan 2022 02:51:24 -0500
-X-MC-Unique: uM8NzwD6P--IdxSVcC_xuQ-1
-Received: by mail-ej1-f71.google.com with SMTP id
- kw5-20020a170907770500b006ba314a753eso919791ejc.21
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 23:51:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=GZX/pfOEsztdvqNPhksRj9ximKWEK/m51aO4OO9gIOw=;
- b=XOrg9lcPX2aY0tlnbXaB8LYnsCgJx/M0/tZLgkYPr4yNHlNRnZj+rykCHL3CTj36ns
- ltXE15VRtPe1ltjM8zW0ZyDpppFi/UgX5Y+7WPyNct3FeiMtqFvwHbgGkYDtPlkiqBNJ
- SArCvqQBFC/9Znk7aGmixs0BZP97MsCiD/sJ6ovDitzJ6JNNXmuShTDLI1mTjn0Tr8VY
- QLHjaIU05rHB+Kd7tmltSR1vF3MbOD7xrmmzx+uDMxetqer3+JDHS/hHu1NGtBl8jVXw
- IBm6giHgu8hX1Ob2P8fpa5UPA/5CXzDfM2NxCsGOOso7/rP9oF9coFXg+O/AA/fUbwiv
- wuAA==
-X-Gm-Message-State: AOAM532cHKb0LjD9V3a2qSYPdf8wAjsxqNTH19qSMwWby8mjuI3Pydzb
- AlHaRJTlfMtebj6jlDB7vl/iOecENyC1aud5graFBPCK1CO68q7e0jTQU4Pm5Isc4+SbsgNXyve
- J3prhtcq0x/pjDgFT9+vvawJ0
-X-Received: by 2002:a17:907:7ba9:: with SMTP id
- ne41mr2137815ejc.554.1643269883098; 
- Wed, 26 Jan 2022 23:51:23 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwG/4UQhcMKE386PoihoaUB7txnfoFbjmOGSKcgi5XKPa25Kh8n1GHpKiCaWiNcG0+jyHaPGA==
-X-Received: by 2002:a17:907:7ba9:: with SMTP id
- ne41mr2137807ejc.554.1643269882938; 
- Wed, 26 Jan 2022 23:51:22 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
- by smtp.gmail.com with ESMTPSA id g15sm10892632edy.77.2022.01.26.23.51.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 26 Jan 2022 23:51:22 -0800 (PST)
-Date: Thu, 27 Jan 2022 08:51:20 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v2 5/5] kvm: selftests: aarch64: use a tighter assert in
- vgic_poke_irq()
-Message-ID: <20220127075120.5ntwadlgf2ncd2ua@gator>
-References: <20220127030858.3269036-1-ricarkol@google.com>
- <20220127030858.3269036-6-ricarkol@google.com>
-MIME-Version: 1.0
-In-Reply-To: <20220127030858.3269036-6-ricarkol@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvm@vger.kernel.org, maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu
+ with ESMTP id E5NWsu8GvzL8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Jan 2022 06:08:23 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A6BA49F00
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 06:08:23 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id DE242B821EE;
+ Thu, 27 Jan 2022 11:08:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABCC0C340E4;
+ Thu, 27 Jan 2022 11:08:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1643281700;
+ bh=AP8HPBckMHpuur+KWsdHskLCCjMEybkEiGTwDnOGq70=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=vF0FTfmcqCWaK5clS9XaDpUUU+rj++j+oBVuTaLWOuYWH+VOOEWaheY9veepj6gvZ
+ EvHtGn9qtRYgmBD/mwFaacRQ7h1QKsz/CoozlszgEZNAxyEez4whcbPJP43nsQgJvP
+ 9s68hHFO5FdyDDQ2vx/bpd4B3gWcxiVaDhT9/WcLUaEsIWvwKCOUDEo2w36mv1gEoG
+ IMGk2ffOaC17fVuw3oV2xDgJ24+bkCe3FfaHvkzQayDNM4B82WQCfjgWx9Gv24saI3
+ bcf6Srpvy5m0mPp8w8RFuwIcVPPmg6PGfr7qiWnJ1T2fgY/BtuXXyf4CSIvIVe3ken
+ KRiU0TrL1Pebw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nD2dW-003Tiy-4l; Thu, 27 Jan 2022 11:08:18 +0000
+Date: Thu, 27 Jan 2022 11:08:17 +0000
+Message-ID: <874k5p77xa.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v5 14/69] KVM: arm64: nv: Support virtual EL2 exceptions
+In-Reply-To: <YelqampUOCIt3YZE@monolith.localdoman>
+References: <20211129200150.351436-1-maz@kernel.org>
+ <20211129200150.351436-15-maz@kernel.org>
+ <YelqampUOCIt3YZE@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
+ jintack@cs.columbia.edu, haibo.xu@linaro.org,
+ gankulkarni@os.amperecomputing.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,49 +92,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Jan 26, 2022 at 07:08:58PM -0800, Ricardo Koller wrote:
-> vgic_poke_irq() checks that the attr argument passed to the vgic device
-> ioctl is sane. Make this check tighter by moving it to after the last
-> attr update.
+On Thu, 20 Jan 2022 13:58:02 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> Reported-by: Reiji Watanabe <reijiw@google.com>
-> Cc: Andrew Jones <drjones@redhat.com>
-> ---
->  tools/testing/selftests/kvm/lib/aarch64/vgic.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> Hi Marc,
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> index 79864b941617..f365c32a7296 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-> @@ -138,9 +138,6 @@ static void vgic_poke_irq(int gic_fd, uint32_t intid,
->  	uint64_t val;
->  	bool intid_is_private = INTID_IS_SGI(intid) || INTID_IS_PPI(intid);
->  
-> -	/* Check that the addr part of the attr is within 32 bits. */
-> -	assert(attr <= KVM_DEV_ARM_VGIC_OFFSET_MASK);
-> -
->  	uint32_t group = intid_is_private ? KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
->  					  : KVM_DEV_ARM_VGIC_GRP_DIST_REGS;
->  
-> @@ -150,6 +147,9 @@ static void vgic_poke_irq(int gic_fd, uint32_t intid,
->  		attr += SZ_64K;
->  	}
->  
-> +	/* Check that the addr part of the attr is within 32 bits. */
-> +	assert((attr & ~KVM_DEV_ARM_VGIC_OFFSET_MASK) == 0);
-> +
->  	/*
->  	 * All calls will succeed, even with invalid intid's, as long as the
->  	 * addr part of the attr is within 32 bits (checked above). An invalid
-> -- 
-> 2.35.0.rc0.227.g00780c9af4-goog
->
+> On Mon, Nov 29, 2021 at 08:00:55PM +0000, Marc Zyngier wrote:
+> > +void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+> > +{
+> > +	u64 spsr, elr, mode;
+> > +	bool direct_eret;
+> > +
+> > +	/*
+> > +	 * Going through the whole put/load motions is a waste of time
+> > +	 * if this is a VHE guest hypervisor returning to its own
+> > +	 * userspace, or the hypervisor performing a local exception
+> > +	 * return. No need to save/restore registers, no need to
+> > +	 * switch S2 MMU. Just do the canonical ERET.
+> > +	 */
+> > +	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+> > +	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+> > +
+> > +	direct_eret  = (mode == PSR_MODE_EL0t &&
+> > +			vcpu_el2_e2h_is_set(vcpu) &&
+> > +			vcpu_el2_tge_is_set(vcpu));
+> > +	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+> > +
+> > +	if (direct_eret) {
+> > +		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
+> > +		*vcpu_cpsr(vcpu) = spsr;
+> > +		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
+> > +		return;
+> > +	}
+> > +
+> > +	preempt_disable();
+> > +	kvm_arch_vcpu_put(vcpu);
+> > +
+> > +	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+> > +
+> > +	trace_kvm_nested_eret(vcpu, elr, spsr);
+> > +
+> > +	/*
+> > +	 * Note that the current exception level is always the virtual EL2,
+> > +	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
+> > +	 */
+> > +	*vcpu_pc(vcpu) = elr;
+> > +	*vcpu_cpsr(vcpu) = spsr;
+> > +
+> > +	kvm_arch_vcpu_load(vcpu, smp_processor_id());
+> > +	preempt_enable();
+> 
+> According to ARM DDI 0487G.a, page D13-3289, ERET'ing to EL1 when
+> HCR_EL2.TGE is set is an illegal exception return. I don't see this
+> case treated here.
 
- 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Yes, good call.
 
+I've now added handling for both the return to EL1 with TGE set as
+well as return to a 32bit mode. The return to EL3 case will directly
+be handled by the HW, and the return from AArch32 to AArch64 cannot
+happen by construction.
+
+Thanks for spotting it.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
