@@ -2,75 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD3BC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 07:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 828D1C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 27 Jan 2022 07:34:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB68B4A100;
-	Thu, 27 Jan 2022 02:19:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC1044A0FE;
+	Thu, 27 Jan 2022 02:34:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YRMuPBgv+tNY; Thu, 27 Jan 2022 02:19:35 -0500 (EST)
+	with ESMTP id qkETiPCLM7PF; Thu, 27 Jan 2022 02:34:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F8F949F2F;
-	Thu, 27 Jan 2022 02:19:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9792B4A014;
+	Thu, 27 Jan 2022 02:34:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26B1949F27
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 02:19:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB4B14A014
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 02:34:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 835I4pka0L4k for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Jan 2022 02:19:34 -0500 (EST)
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com
- [209.85.214.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1606F49ED5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 02:19:34 -0500 (EST)
-Received: by mail-pl1-f172.google.com with SMTP id b15so1760104plg.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 23:19:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=i2RBhTxWRPU1sfMn3Q98WcKVoFM08enITE4vRBeZ0ts=;
- b=LveWagL8Y8wBrtFmstEFsxtVqR1cOWjSmVVo65yBqhyJF2T9o8vkHeytGjWxDMvW37
- KkJOHyfSKBRPCACtT5nb96Qsz1vHII0V9f0DWvWt2JzYKfRvbEUnHh2I7QDwUwm9jHiZ
- KXJQVXMh0+LfChNfwdq3PBx/Rom3FSQdlR506AUB3hnBBsJMF5+NX0UlH5YXfzAM2ucy
- pL0MHTrMME6dXUD4DM3djF7MFuhZ8iji6n9/OCThl5QPK3nbgzvB6Yl1nszY25PERhoP
- IVWe4CjOca/AqrKAXU40l/FHxoJGkjovc6+OHakCV5075aM+G4ADSX9M/42lCQVyLomO
- VBcA==
+ with ESMTP id 4vqRfR7BgTLd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Jan 2022 02:34:42 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD0EF49F5B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Jan 2022 02:34:42 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1643268882;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=rZtyNWVIJ5YOp9jbjrOdT7tvYwsl2Y7lnfgiw1GSFeM=;
+ b=U88hv5hdhFtseJ9+eVHQeNEJclU4Mkc4Xn8/zzprqS4j8dUUw+3ZWl7fGSfkO9gZ7qOcMJ
+ gInr7T2HBb3xbmXYoBxEWBYyCUEz6M3Gb5QhAJhOV22npBkRTZoIBeu5JxW+PVSSXkl22Y
+ EKt/4mHwxMr3N72fO3+knuikJ+5cEcM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-187-kO3WZSfhNxGoMozkHWPyLw-1; Thu, 27 Jan 2022 02:34:38 -0500
+X-MC-Unique: kO3WZSfhNxGoMozkHWPyLw-1
+Received: by mail-ed1-f71.google.com with SMTP id
+ a18-20020aa7d752000000b00403d18712beso946290eds.17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Jan 2022 23:34:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=i2RBhTxWRPU1sfMn3Q98WcKVoFM08enITE4vRBeZ0ts=;
- b=f1nuJHkxldTu/+673u41xNLU13l76suNCf2cqUvFnOUOAEEIXwG0gN4g0KolUVF9oF
- 1guSD/BXAZ+dEglZLP75IAw2lpEVEQrYtvzElePwZ3utepvG3AKcN0RmeLE4qKsesnAi
- xJBmaO5H7o3PLtzjVQp2bgKc7iTfClxhrTOAb38f6LZ4AlUtjnDqCTodaR1kkdVrjvmo
- 07OYbY3MmwPMeDME25L4LuG2cS5G0AiSfnE5xAYrNzVDTuFTxuJkG7EOQPDgXAYQiDQb
- v4LPebQuuSgpnMs2yv0i92zRbz9cluAnk3I/hefLBZuhyqhlOVEt4mPschGpWilU/2sH
- DGWw==
-X-Gm-Message-State: AOAM533mGA1VVykN1GZq752ISYKRJcoT9adHr2/pfViWpTYa8v7AAwhW
- 7hjPoacKPTP1Va0aXWSyBOGhws2G1oFg/kuVok26Aw==
-X-Google-Smtp-Source: ABdhPJx0IH1AvG7ogKWuMzMV7o4j8Ergb4xi8pLDsEOdIkOfB6Z5ux4Yre4+FVoHvdLBt2Vo8S4SBzDXKvetgqgjFhA=
-X-Received: by 2002:a17:902:bc83:: with SMTP id
- bb3mr2671934plb.172.1643267973009; 
- Wed, 26 Jan 2022 23:19:33 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=rZtyNWVIJ5YOp9jbjrOdT7tvYwsl2Y7lnfgiw1GSFeM=;
+ b=t8kyqZ7C0bSAotNPpMlFGS5GOkmYzCdQD0nWKb1/Sr1zqPfMW56Z9BQVSmdW/ALnS3
+ GT70Lkzh7/ozISY+dxu/oy/VivUrIlcLIsCdhO8lQHLcsN05zPJ7R5F7biHCSGzD4FsN
+ kEjVshBif9N8TMJFbi2sexsdoZfhS+5HXPcGTaBF6xfkMogv4HwjyEh6JXV1akSx4gv3
+ wElrtUS7dhAwvZt3iNWtUb/B6eDBySICLY8M3XZ7AitpRFKOmJuC9Q2iIzKTJG5Mesd1
+ 6D1xCGfLupgQoK+t9s9rZw8IyRShQqsZ55MCjWmvPSB+qNVzjbKrSbFB5L5Q0vWAcALF
+ fvuQ==
+X-Gm-Message-State: AOAM531Xmqr+REfseh2LMAGEmX39r9UvYb0n+bqSkgKqtKejfurFQGjJ
+ psPTLU9fo8cqpp6dzvykCzPCN7cb++LyjiHl3S6YQqLMU27oEsrgVotEfmTh8BwC+CwmLDb8Eo3
+ 0x52w007Pa+S15RPE/6RqyF/8
+X-Received: by 2002:a17:906:3656:: with SMTP id
+ r22mr1928253ejb.329.1643268877734; 
+ Wed, 26 Jan 2022 23:34:37 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzJLhumx8C9wQK88l4ogwUYtf8FjiIGnNJTylnn3U7wYd9tsoL3ojKCLIabRhgnbZMTq8uEQQ==
+X-Received: by 2002:a17:906:3656:: with SMTP id
+ r22mr1928237ejb.329.1643268877580; 
+ Wed, 26 Jan 2022 23:34:37 -0800 (PST)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+ by smtp.gmail.com with ESMTPSA id j26sm3046934edt.65.2022.01.26.23.34.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 26 Jan 2022 23:34:37 -0800 (PST)
+Date: Thu, 27 Jan 2022 08:34:35 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v2 1/5] kvm: selftests: aarch64: fix assert in
+ gicv3_access_reg
+Message-ID: <20220127073435.dmqskodccsiqj7oi@gator>
+References: <20220127030858.3269036-1-ricarkol@google.com>
+ <20220127030858.3269036-2-ricarkol@google.com>
 MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com>
- <20220106042708.2869332-21-reijiw@google.com>
- <CA+EHjTy4L37G89orJ+cPTTZdFUehxNSMy0Pd36PW41JKVB0ohA@mail.gmail.com>
-In-Reply-To: <CA+EHjTy4L37G89orJ+cPTTZdFUehxNSMy0Pd36PW41JKVB0ohA@mail.gmail.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 26 Jan 2022 23:19:17 -0800
-Message-ID: <CAAeT=Fx1pM66cQaefkBTAJ7-Y0nzjmABJrp5DiNm4_47hdEyrg@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 20/26] KVM: arm64: Trap disabled features of
- ID_AA64PFR0_EL1
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20220127030858.3269036-2-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: kvm@vger.kernel.org, maz@kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,103 +103,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Fuad,
+On Wed, Jan 26, 2022 at 07:08:54PM -0800, Ricardo Koller wrote:
+> The val argument in gicv3_access_reg can have any value when used for a
+> read, not necessarily 0.  Fix the assert by checking val only for
+> writes.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> Reported-by: Reiji Watanabe <reijiw@google.com>
+> Cc: Andrew Jones <drjones@redhat.com>
 
-On Mon, Jan 24, 2022 at 9:17 AM Fuad Tabba <tabba@google.com> wrote:
->
-> Hi Reiji,
->
-> On Thu, Jan 6, 2022 at 4:29 AM Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > Add feature_config_ctrl for RAS and AMU, which are indicated in
-> > ID_AA64PFR0_EL1, to program configuration registers to trap
-> > guest's using those features when they are not exposed to the guest.
-> >
-> > Introduce trap_ras_regs() to change a behavior of guest's access to
-> > the registers, which is currently raz/wi, depending on the feature's
-> > availability for the guest (and inject undefined instruction
-> > exception when guest's RAS register access are trapped and RAS is
-> > not exposed to the guest).  In order to keep the current visibility
-> > of the RAS registers from userspace (always visible), a visibility
-> > function for RAS registers is not added.
-> >
-> > No code is added for AMU's access/visibility handler because the
-> > current code already injects the exception for Guest's AMU register
-> > access unconditionally because AMU is never exposed to the guest.
->
-> I think it might be code to trap it anyway, in case AMU guest support
-> is added in the future.
+Commit message said my r-b would be here, but it doesn't appear to be.
+Here it is again
 
-Yes, I will fix it.
-(I forgot to update the comment above...)
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
+> ---
+>  tools/testing/selftests/kvm/lib/aarch64/gic_v3.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> index 00f613c0583c..e4945fe66620 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> @@ -159,7 +159,7 @@ static void gicv3_access_reg(uint32_t intid, uint64_t offset,
+>  	uint32_t cpu_or_dist;
+>  
+>  	GUEST_ASSERT(bits_per_field <= reg_bits);
+> -	GUEST_ASSERT(*val < (1U << bits_per_field));
+> +	GUEST_ASSERT(!write || *val < (1U << bits_per_field));
+>  	/* Some registers like IROUTER are 64 bit long. Those are currently not
+>  	 * supported by readl nor writel, so just asserting here until then.
+>  	 */
+> -- 
+> 2.35.0.rc0.227.g00780c9af4-goog
+> 
 
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 90 +++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 82 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 33893a501475..015d67092d5e 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -304,6 +304,63 @@ struct feature_config_ctrl {
-> >         void    (*trap_activate)(struct kvm_vcpu *vcpu);
-> >  };
-> >
-> > +enum vcpu_config_reg {
-> > +       VCPU_HCR_EL2 = 1,
-> > +       VCPU_MDCR_EL2,
-> > +       VCPU_CPTR_EL2,
-> > +};
-> > +
-> > +static void feature_trap_activate(struct kvm_vcpu *vcpu,
-> > +                                 enum vcpu_config_reg cfg_reg,
-> > +                                 u64 cfg_set, u64 cfg_clear)
-> > +{
-> > +       u64 *reg_ptr, reg_val;
-> > +
-> > +       switch (cfg_reg) {
-> > +       case VCPU_HCR_EL2:
-> > +               reg_ptr = &vcpu->arch.hcr_el2;
-> > +               break;
-> > +       case VCPU_MDCR_EL2:
-> > +               reg_ptr = &vcpu->arch.mdcr_el2;
-> > +               break;
-> > +       case VCPU_CPTR_EL2:
-> > +               reg_ptr = &vcpu->arch.cptr_el2;
-> > +               break;
-> > +       }
-> > +
-> > +       /* Clear/Set fields that are indicated by cfg_clear/cfg_set. */
-> > +       reg_val = (*reg_ptr & ~cfg_clear);
-> > +       reg_val |= cfg_set;
-> > +       *reg_ptr = reg_val;
-> > +}
-> > +
-> > +static void feature_ras_trap_activate(struct kvm_vcpu *vcpu)
-> > +{
-> > +       feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TERR | HCR_TEA, HCR_FIEN);
->
-> Covers all the flags for ras.
->
-> > +}
-> > +
-> > +static void feature_amu_trap_activate(struct kvm_vcpu *vcpu)
-> > +{
-> > +       feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPTR_EL2_TAM, 0);
->
-> Covers the CPTR flags for AMU, but as you mentioned, does not
-> explicitly clear HCR_AMVOFFEN.
-
-In my understanding, clearing HCR_EL2.AMVOFFEN is not necessary as
-CPTR_EL2.TAM == 1 traps the guest's accessing AMEVCNTR0<n>_EL0 and
-AMEVCNTR1<n>_EL0 anyway (HCR_EL2.AMVOFFEN doesn't matter).
-(Or is my understanding wrong ??)
-
-Thanks,
-Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
