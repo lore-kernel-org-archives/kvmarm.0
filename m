@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4298FC4332F
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E700C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:20:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E779149EEF;
-	Fri, 28 Jan 2022 07:20:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18EE94B0D0;
+	Fri, 28 Jan 2022 07:20:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UH70dc0OeA13; Fri, 28 Jan 2022 07:20:08 -0500 (EST)
+	with ESMTP id 6-hvwFddQN1d; Fri, 28 Jan 2022 07:20:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0BE74B091;
-	Fri, 28 Jan 2022 07:20:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0D224B118;
+	Fri, 28 Jan 2022 07:20:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F9D449EC0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:20:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 67C8649EC0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:20:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hrh8nDghJeTu for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:20:06 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5120F49ED8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:20:06 -0500 (EST)
+ with ESMTP id ciqsxHvIVtLL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:20:07 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 104F149F00
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:20:07 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 62362B8256E;
- Fri, 28 Jan 2022 12:20:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FE26C340E0;
- Fri, 28 Jan 2022 12:20:04 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 7642C61AE0;
+ Fri, 28 Jan 2022 12:20:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BB78C340E0;
+ Fri, 28 Jan 2022 12:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643372404;
- bh=F0WDPTujzh01Sq2s/H4RolAuXeFIrVC3Zcaf5EdNwW0=;
+ s=k20201202; t=1643372406;
+ bh=Sxjb2vw/86FO48Hzsm2TRTwfi1YJpsquRJf2MWg/u44=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=aYKUh28AyglCuRrCGavmXM+QKo+pT+WTNFagUtlGrCNLh2Pidy8bYlXyjPc21H8tY
- vIdQO84Py1i+BYViLCGDvPHhWLIJUeeJycFa/CQfsS69Dl5mdajvR+7RJBhvS2OIFB
- o8oib1bsQQfVOsIbdzeNwNFqNcvK/y2HTVWnkH833lvLQU2T9LcaMzQYOVp9W1rgeU
- XVpz6Fa18LwEWogvnIDZMlNP5PrB/rmElloQ7qeJnnXqYnKU8FiN4CfrVTxR/iHFCt
- iHP0RHiK6Sd1EzU0egisOiSgnrQnmLs8E/K/vAV/fFAC9bcmHAd9SDD9ZXUUUi+fkk
- sOHdATHs1AHfg==
+ b=RFPOfBOhwddcdbwxae4tEQUmW+kpbYFMgMb7q7WsfCtFdXMkCIVBvH6njvDYtMFvE
+ L7pFX92+oNm0ceCcdI2y8QoP+dyDC154Np0kLN2MOLr7c0+wuXa/JgwyoMo7Dsa1Az
+ thqY5pUqjJpwTczndMDMpb7LpvGZZyoD0FOMK0/ucOrvOplCugw+SqVWaUYWRFZ6Ck
+ fEi4ACcO0uZ/0BfStwhWiLBl+bNlBYX2XXv7imXMjDkXFTyXHgMcAPvXiYdNL5lVyC
+ L0CnfyIMPkXH8fBZxoGZPvi13nJ7mBq0c3tPHUw3FjGgoBzFIVOMQ9uDPU6wcY7Ojc
+ Rr4eipbFbEb+w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQDx-003njR-Iu; Fri, 28 Jan 2022 12:19:29 +0000
+ id 1nDQE2-003njR-Ap; Fri, 28 Jan 2022 12:19:34 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 15/64] KVM: arm64: nv: Handle HCR_EL2.E2H specially
-Date: Fri, 28 Jan 2022 12:18:23 +0000
-Message-Id: <20220128121912.509006-16-maz@kernel.org>
+Subject: [PATCH v6 23/64] KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,
+ FPEN} settings
+Date: Fri, 28 Jan 2022 12:18:31 +0000
+Message-Id: <20220128121912.509006-24-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -91,60 +92,128 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-HCR_EL2.E2H is nasty, as a flip of this bit completely changes the way
-we deal with a lot of the state. So when the guest flips this bit
-(sysregs are live), do the put/load dance so that we have a consistent
-state.
+From: Jintack Lim <jintack.lim@linaro.org>
 
-Yes, this is slow. Don't do it.
+Forward traps due to FP/ASIMD register accesses to the virtual EL2
+if virtual CPTR_EL2.TFP is set (with HCR_EL2.E2H == 0) or
+CPTR_EL2.FPEN is configure to do so (with HCR_EL2.E2h == 1).
 
-Suggested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+[maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
+ all the hard work actually being done by Chase Conklin]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ arch/arm64/include/asm/kvm_emulate.h    | 26 +++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c            | 16 +++++++++++----
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  8 ++++++--
+ 3 files changed, 44 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ace4a54caef9..102bc4906723 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -183,9 +183,24 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		goto memory_write;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 54e8eee413eb..ff8980a39ee8 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -11,12 +11,14 @@
+ #ifndef __ARM64_KVM_EMULATE_H__
+ #define __ARM64_KVM_EMULATE_H__
  
- 	if (unlikely(get_el2_to_el1_mapping(reg, &el1r, &xlate))) {
-+		bool need_put_load;
-+
- 		if (!is_hyp_ctxt(vcpu))
- 			goto memory_write;
++#include <linux/bitfield.h>
+ #include <linux/kvm_host.h>
  
-+		/*
-+		 * HCR_EL2.E2H is nasty: it changes the way we interpret a
-+		 * lot of the EL2 state, so treat is as a full state
-+		 * transition.
-+		 */
-+		need_put_load = ((reg == HCR_EL2) &&
-+				 vcpu_el2_e2h_is_set(vcpu) != !!(val & HCR_E2H));
-+
-+		if (need_put_load) {
-+			preempt_disable();
-+			kvm_arch_vcpu_put(vcpu);
-+		}
-+
- 		/*
- 		 * Always store a copy of the write to memory to avoid having
- 		 * to reverse-translate virtual EL2 system registers for a
-@@ -193,6 +208,11 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		 */
- 		__vcpu_sys_reg(vcpu, reg) = val;
+ #include <asm/debug-monitors.h>
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_nested.h>
+ #include <asm/ptrace.h>
+ #include <asm/cputype.h>
+ #include <asm/virt.h>
+@@ -324,6 +326,30 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+ 	return mode != PSR_MODE_EL0t;
+ }
  
-+		if (need_put_load) {
-+			kvm_arch_vcpu_load(vcpu, smp_processor_id());
-+			preempt_enable();
-+		}
++static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
++{
++	u64 val;
 +
- 		switch (reg) {
- 		case ELR_EL2:
- 			write_sysreg_el1(val, SYS_ELR);
++	if (!vcpu_has_nv(vcpu))
++		return false;
++
++	val = vcpu_read_sys_reg(vcpu, CPTR_EL2);
++
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		return (val & CPTR_EL2_TFP);
++
++	switch (FIELD_GET(CPACR_EL1_FPEN, val)) {
++	case 0b00:
++	case 0b10:
++		return true;
++	case 0b01:
++		return vcpu_el2_tge_is_set(vcpu) && !vcpu_is_el2(vcpu);
++	case 0b11:
++	default:		/* GCC is dumb */
++		return false;
++	}
++}
++
+ static __always_inline u32 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.fault.esr_el2;
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index a1b1bbf3d598..a5c698f188d6 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -96,11 +96,19 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ }
+ 
+ /*
+- * Guest access to FP/ASIMD registers are routed to this handler only
+- * when the system doesn't support FP/ASIMD.
++ * This handles the cases where the system does not support FP/ASIMD or when
++ * we are running nested virtualization and the guest hypervisor is trapping
++ * FP/ASIMD accesses by its guest guest.
++ *
++ * All other handling of guest vs. host FP/ASIMD register state is handled in
++ * fixup_guest_exit().
+  */
+-static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
++static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu)
+ {
++	if (guest_hyp_fpsimd_traps_enabled(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
++	/* This is the case when the system doesn't support FP/ASIMD. */
+ 	kvm_inject_undefined(vcpu);
+ 	return 1;
+ }
+@@ -231,7 +239,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
+-	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
++	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
+ 	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+ };
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 49c3b9eb09d7..42c47731f64e 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -166,8 +166,12 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	sve_guest = vcpu_has_sve(vcpu);
+ 	esr_ec = kvm_vcpu_trap_get_class(vcpu);
+ 
+-	/* Don't handle SVE traps for non-SVE vcpus here: */
+-	if (!sve_guest && esr_ec != ESR_ELx_EC_FP_ASIMD)
++	/*
++	 * Don't handle SVE traps for non-SVE vcpus here. This
++	 * includes NV guests for the time being.
++	 */
++	if (!sve_guest && (esr_ec != ESR_ELx_EC_FP_ASIMD ||
++			   guest_hyp_fpsimd_traps_enabled(vcpu)))
+ 		return false;
+ 
+ 	/* Valid trap.  Switch the context: */
 -- 
 2.30.2
 
