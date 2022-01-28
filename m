@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF14FC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 047C4C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:20:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB704B116;
-	Fri, 28 Jan 2022 07:20:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AADC94B0F5;
+	Fri, 28 Jan 2022 07:20:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id j+pcQYCP+1PG; Fri, 28 Jan 2022 07:20:03 -0500 (EST)
+	with ESMTP id q2m58G2wreZc; Fri, 28 Jan 2022 07:20:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6705749F5A;
-	Fri, 28 Jan 2022 07:20:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E3544B0A0;
+	Fri, 28 Jan 2022 07:20:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E548E49E43
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:20:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4BB849ED8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:20:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b1O9qgANIKar for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:20:00 -0500 (EST)
+ with ESMTP id BOQtAd61vHuw for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:20:04 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C1EE4B0F4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:20:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E41CA4B120
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:20:03 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 9A37BB82568;
- Fri, 28 Jan 2022 12:19:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73888C340E0;
- Fri, 28 Jan 2022 12:19:58 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 0CE4CB8256B;
+ Fri, 28 Jan 2022 12:20:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7471FC36AE7;
+ Fri, 28 Jan 2022 12:20:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643372398;
- bh=BcakOqNxvM/st9PuJGoF+YHFup2GgF6cgj+witITG78=;
+ s=k20201202; t=1643372401;
+ bh=fD/OIdxzU/mYVdjUNkTw5RVKK8ewez/Ug1vaU47woTE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=i1qvAo8j2st/0eT3g1jiANE33emYHvpsOc9au1tIA7VsfqW/O/Nf2LZ2kkOxU2ukv
- ykL1OGPhBI/jk5SUM9/AusqRnQfl2amLxe/Fjx/aHNBA3JiO/nKPT7B46MF11PWRv+
- ScMy2azjclw3ghxZvAmuVrlVjfwI2N9Mc2EPOtumDYIMn2CkB5HneGfpT4evJwmDEa
- uuuQR5gfuJ8wlcDBZnzvzyqAtPginkWVwYgEWmD+yTkWJViN6YI27kTW2ayH5/SGbB
- l7w02MovE3fH/S81GYeYk6l3bU4IY9qECpQHtnan9Dk35j6fHU7tQc70mZ4MzQKQea
- dLTHT4Sry5gpA==
+ b=iJBzmyBk46VhEBqx6jqCroJbJ5xpZaNnOJhXSrUweIftKnc+4rM4k9+P/TQVVOfu7
+ M84pTmMSg9Lz9xMsUpxyvSyMU87TxNOdgVFkaxV1jieZGqfMG8ONQ+15YQQq0pq0e4
+ yqxnmHz0ts7E+jkdAR2dGbwE2RUmF5OdWQHjC1v4Y5YsxGdBMgr/I+Qmo0jANJ4R1o
+ mr2zqL69ICi6Ry5Fibb25tdh6z9PDgk/T3p08xtwzjSKKVWdStO59A/Lo1WDJUTG1D
+ eG6dA8qcTtsO4RRLA2pA+rT3ewm8U3NLeJRbRwlto6cUmYVrtBoPDIUTO9btdtX1aw
+ muUESefv8KS4A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQDw-003njR-2h; Fri, 28 Jan 2022 12:19:28 +0000
+ id 1nDQE1-003njR-Gg; Fri, 28 Jan 2022 12:19:33 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 11/64] KVM: arm64: nv: Handle trapped ERET from virtual EL2
-Date: Fri, 28 Jan 2022 12:18:19 +0000
-Message-Id: <20220128121912.509006-12-maz@kernel.org>
+Subject: [PATCH v6 21/64] KVM: arm64: nv: Handle PSCI call via smc from the
+ guest
+Date: Fri, 28 Jan 2022 12:18:29 +0000
+Message-Id: <20220128121912.509006-22-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -91,78 +92,70 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Jintack Lim <jintack.lim@linaro.org>
 
-When a guest hypervisor running virtual EL2 in EL1 executes an ERET
-instruction, we will have set HCR_EL2.NV which traps ERET to EL2, so
-that we can emulate the exception return in software.
+VMs used to execute hvc #0 for the psci call if EL3 is not implemented.
+However, when we come to provide the virtual EL2 mode to the VM, the
+host OS inside the VM calls kvm_call_hyp() which is also hvc #0. So,
+it's hard to differentiate between them from the host hypervisor's point
+of view.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+So, let the VM execute smc instruction for the psci call. On ARMv8.3,
+even if EL3 is not implemented, a smc instruction executed at non-secure
+EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than being treated as
+UNDEFINED. So, the host hypervisor can handle this psci call without any
+confusion.
+
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/esr.h     |  4 ++++
- arch/arm64/include/asm/kvm_arm.h |  2 +-
- arch/arm64/kvm/handle_exit.c     | 10 ++++++++++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/handle_exit.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index d52a0b269ee8..3574c224889f 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -257,6 +257,10 @@
- 		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
- 		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
- 
-+/* ISS field definitions for ERET/ERETAA/ERETAB trapping */
-+#define ESR_ELx_ERET_ISS_ERET		0x2
-+#define ESR_ELx_ERET_ISS_ERETA		0x1
-+
- /*
-  * ISS field definitions for floating-point exception traps
-  * (FP_EXC_32/FP_EXC_64).
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index e6e3aae87a09..5acb153a82c8 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -353,7 +353,7 @@
- 	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
- 	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
- 	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
--	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
-+	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64), ECN(ERET)
- 
- #define CPACR_EL1_FPEN		(3 << 20)
- #define CPACR_EL1_TTA		(1 << 28)
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 6bfb5c31cad1..2bbeed8c9786 100644
+index 2bbeed8c9786..0cedef6e0d80 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -171,6 +171,15 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	return 1;
+@@ -62,6 +62,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+ 
+ static int handle_smc(struct kvm_vcpu *vcpu)
+ {
++	int ret;
++
+ 	/*
+ 	 * "If an SMC instruction executed at Non-secure EL1 is
+ 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
+@@ -69,10 +71,28 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ 	 *
+ 	 * We need to advance the PC after the trap, as it would
+ 	 * otherwise return to the same address...
++	 *
++	 * If imm is non-zero, it's not defined, so just skip it.
++	 */
++	if (kvm_vcpu_hvc_get_imm(vcpu)) {
++		vcpu_set_reg(vcpu, 0, ~0UL);
++		kvm_incr_pc(vcpu);
++		return 1;
++	}
++
++	/*
++	 * If imm is zero, it's a psci call.
++	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
++	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
++	 * being treated as UNDEFINED.
+ 	 */
+-	vcpu_set_reg(vcpu, 0, ~0UL);
++	ret = kvm_hvc_call_handler(vcpu);
++	if (ret < 0)
++		vcpu_set_reg(vcpu, 0, ~0UL);
++
+ 	kvm_incr_pc(vcpu);
+-	return 1;
++
++	return ret;
  }
  
-+static int kvm_handle_eret(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
-+		return kvm_handle_ptrauth(vcpu);
-+
-+	kvm_emulate_nested_eret(vcpu);
-+	return 1;
-+}
-+
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -185,6 +194,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
- 	[ESR_ELx_EC_SVE]	= handle_sve,
-+	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
- 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
+ /*
 -- 
 2.30.2
 
