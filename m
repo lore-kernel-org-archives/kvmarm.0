@@ -2,80 +2,51 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95406C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3F4C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 16:09:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 450CC4B199;
-	Fri, 28 Jan 2022 07:51:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 052504B1C7;
+	Fri, 28 Jan 2022 11:09:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VVPSyy47pAEY; Fri, 28 Jan 2022 07:51:24 -0500 (EST)
+	with ESMTP id oeliumTF0eEW; Fri, 28 Jan 2022 11:08:58 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E90EF4B21C;
-	Fri, 28 Jan 2022 07:51:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01CA84B1DB;
+	Fri, 28 Jan 2022 11:08:58 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A51F4B177
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:51:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09F714B1CB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 11:08:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0gDb8eoqToIz for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:51:20 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 246C24B1C6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:51:18 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 26809B8259F;
- Fri, 28 Jan 2022 12:51:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91D4BC340E6;
- Fri, 28 Jan 2022 12:51:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643374275;
- bh=4sntOba+HOt64VYcBVF+JN837XYpqX9dp0/y0iN2kb4=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Hh0x7WbWrKyr8ABwI+RCPuEMxV6EcYt2mbPAwasjRtHaHi/qCOb3Jk8JqeYDxSfTO
- d9EcYnYnVEPjNaQMrsknjx5bNekvQX+V/33GobjIxZvuvayoZqBJc1GKAcHle0zUQG
- jzek6xEqhDKsiTdY9rqbuCIAE3AZAna7fF76BOAIUaa1ksZ77+lq6R0W2khsGCDMX5
- +oDR0FASiEdXOI87WoGkonWlO/2kcgORT6KjZqyh3AVPDCX6y0u6JqE26oQn2xV7E/
- ffYjCLKVb5v6MTtQ70fcYNrhylvPhOsBhlrmNlUXOYbZKJJbFsP0NNnJoYjvthjJTt
- KukaiXsxHMvOw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nDQEP-003njR-2q; Fri, 28 Jan 2022 12:19:57 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
-Subject: [PATCH v6 43/64] KVM: arm64: nv: arch_timer: Support hyp timer
- emulation
-Date: Fri, 28 Jan 2022 12:18:51 +0000
-Message-Id: <20220128121912.509006-44-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
-References: <20220128121912.509006-1-maz@kernel.org>
+ with ESMTP id d1VPh-6CRSUH for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 11:08:54 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7B674B1C7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 11:08:54 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEF7D113E;
+ Fri, 28 Jan 2022 08:08:53 -0800 (PST)
+Received: from [10.57.13.224] (unknown [10.57.13.224])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE1693F793;
+ Fri, 28 Jan 2022 08:08:51 -0800 (PST)
+Message-ID: <65e1ae7d-44ae-a19f-e193-583590cfa0c3@arm.com>
+Date: Fri, 28 Jan 2022 16:08:50 +0000
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
- christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
- gankulkarni@os.amperecomputing.com, chase.conklin@arm.com,
- linux@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, karl.heubaum@oracle.com, mihai.carabas@oracle.com,
- miguel.luis@oracle.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- "Russell King \(Oracle\)" <linux@armlinux.org.uk>, mihai.carabas@oracle.com,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [RFC PATCH 03/12] arm64: mm: use a fixmap slot for user page
+ table modifications
+Content-Language: en-GB
+To: Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org
+References: <20220126173011.3476262-1-ardb@kernel.org>
+ <20220126173011.3476262-4-ardb@kernel.org>
+From: Steven Price <steven.price@arm.com>
+In-Reply-To: <20220126173011.3476262-4-ardb@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, linux-hardening@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,614 +63,478 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+Hi Ard,
 
-Emulating EL2 also means emulating the EL2 timers. To do so, we expand
-our timer framework to deal with at most 4 timers. At any given time,
-two timers are using the HW timers, and the two others are purely
-emulated.
+Interesting series - I attempted[1] something similar a few years ago,
+but only dealing with the page tables in the linear map.
 
-The role of deciding which is which at any given time is left to a
-mapping function which is called every time we need to make such a
-decision.
+At first glace the series looks like it should work, but this patch
+caught my eye because there's only a single fixmap slot for page table
+modifications. The upshot of which is you need the patch_pte_lock
+serialising multiple CPUs' access to the page tables. Which looks like
+it would hurt badly as the number of CPUs grows.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-[maz: added CNTVOFF support, general reworking for v4.8]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/kvm_host.h |   4 +
- arch/arm64/kvm/arch_timer.c       | 165 ++++++++++++++++++++++++++++--
- arch/arm64/kvm/sys_regs.c         |   7 +-
- arch/arm64/kvm/trace_arm.h        |   6 +-
- arch/arm64/kvm/vgic/vgic.c        |  15 +++
- include/kvm/arm_arch_timer.h      |   8 +-
- include/kvm/arm_vgic.h            |   1 +
- 7 files changed, 194 insertions(+), 12 deletions(-)
+Do you have any benchmarks of the performance? I've lost any I did at
+the time I previously looked at this idea but obviously thought it was
+important at the time.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 0b887364f994..03833eca3307 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -285,6 +285,10 @@ enum vcpu_sysreg {
- 	TPIDR_EL2,	/* EL2 Software Thread ID Register */
- 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
- 	SP_EL2,		/* EL2 Stack Pointer */
-+	CNTHP_CTL_EL2,
-+	CNTHP_CVAL_EL2,
-+	CNTHV_CTL_EL2,
-+	CNTHV_CVAL_EL2,
- 
- 	NR_SYS_REGS	/* Nothing after this line! */
- };
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 6e542e2eae32..5e4f93605d36 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -16,6 +16,7 @@
- #include <asm/arch_timer.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_nested.h>
- 
- #include <kvm/arm_vgic.h>
- #include <kvm/arm_arch_timer.h>
-@@ -40,6 +41,16 @@ static const struct kvm_irq_level default_vtimer_irq = {
- 	.level	= 1,
- };
- 
-+static const struct kvm_irq_level default_hptimer_irq = {
-+	.irq	= 26,
-+	.level	= 1,
-+};
-+
-+static const struct kvm_irq_level default_hvtimer_irq = {
-+	.irq	= 28,
-+	.level	= 1,
-+};
-+
- static bool kvm_timer_irq_can_fire(struct arch_timer_context *timer_ctx);
- static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
- 				 struct arch_timer_context *timer_ctx);
-@@ -51,6 +62,11 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
- static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
- 			      struct arch_timer_context *timer,
- 			      enum kvm_arch_timer_regs treg);
-+static bool kvm_arch_timer_get_input_level(int vintid);
-+
-+static struct irq_ops arch_timer_irq_ops = {
-+	.get_input_level = kvm_arch_timer_get_input_level,
-+};
- 
- u32 timer_get_ctl(struct arch_timer_context *ctxt)
- {
-@@ -61,6 +77,10 @@ u32 timer_get_ctl(struct arch_timer_context *ctxt)
- 		return __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
- 	case TIMER_PTIMER:
- 		return __vcpu_sys_reg(vcpu, CNTP_CTL_EL0);
-+	case TIMER_HVTIMER:
-+		return __vcpu_sys_reg(vcpu, CNTHV_CTL_EL2);
-+	case TIMER_HPTIMER:
-+		return __vcpu_sys_reg(vcpu, CNTHP_CTL_EL2);
- 	default:
- 		WARN_ON(1);
- 		return 0;
-@@ -76,6 +96,10 @@ u64 timer_get_cval(struct arch_timer_context *ctxt)
- 		return __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
- 	case TIMER_PTIMER:
- 		return __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
-+	case TIMER_HVTIMER:
-+		return __vcpu_sys_reg(vcpu, CNTHV_CVAL_EL2);
-+	case TIMER_HPTIMER:
-+		return __vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2);
- 	default:
- 		WARN_ON(1);
- 		return 0;
-@@ -105,6 +129,12 @@ static void timer_set_ctl(struct arch_timer_context *ctxt, u32 ctl)
- 	case TIMER_PTIMER:
- 		__vcpu_sys_reg(vcpu, CNTP_CTL_EL0) = ctl;
- 		break;
-+	case TIMER_HVTIMER:
-+		__vcpu_sys_reg(vcpu, CNTHV_CTL_EL2) = ctl;
-+		break;
-+	case TIMER_HPTIMER:
-+		__vcpu_sys_reg(vcpu, CNTHP_CTL_EL2) = ctl;
-+		break;
- 	default:
- 		WARN_ON(1);
- 	}
-@@ -121,6 +151,12 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
- 	case TIMER_PTIMER:
- 		__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0) = cval;
- 		break;
-+	case TIMER_HVTIMER:
-+		__vcpu_sys_reg(vcpu, CNTHV_CVAL_EL2) = cval;
-+		break;
-+	case TIMER_HPTIMER:
-+		__vcpu_sys_reg(vcpu, CNTHP_CVAL_EL2) = cval;
-+		break;
- 	default:
- 		WARN_ON(1);
- 	}
-@@ -146,13 +182,27 @@ u64 kvm_phys_timer_read(void)
- 
- static void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map)
- {
--	if (has_vhe()) {
-+	if (vcpu_has_nv(vcpu)) {
-+		if (is_hyp_ctxt(vcpu)) {
-+			map->direct_vtimer = vcpu_hvtimer(vcpu);
-+			map->direct_ptimer = vcpu_hptimer(vcpu);
-+			map->emul_vtimer = vcpu_vtimer(vcpu);
-+			map->emul_ptimer = vcpu_ptimer(vcpu);
-+		} else {
-+			map->direct_vtimer = vcpu_vtimer(vcpu);
-+			map->direct_ptimer = vcpu_ptimer(vcpu);
-+			map->emul_vtimer = vcpu_hvtimer(vcpu);
-+			map->emul_ptimer = vcpu_hptimer(vcpu);
-+		}
-+	} else if (has_vhe()) {
- 		map->direct_vtimer = vcpu_vtimer(vcpu);
- 		map->direct_ptimer = vcpu_ptimer(vcpu);
-+		map->emul_vtimer = NULL;
- 		map->emul_ptimer = NULL;
- 	} else {
- 		map->direct_vtimer = vcpu_vtimer(vcpu);
- 		map->direct_ptimer = NULL;
-+		map->emul_vtimer = NULL;
- 		map->emul_ptimer = vcpu_ptimer(vcpu);
- 	}
- 
-@@ -325,9 +375,11 @@ static bool kvm_timer_should_fire(struct arch_timer_context *timer_ctx)
- 
- 		switch (index) {
- 		case TIMER_VTIMER:
-+		case TIMER_HVTIMER:
- 			cnt_ctl = read_sysreg_el0(SYS_CNTV_CTL);
- 			break;
- 		case TIMER_PTIMER:
-+		case TIMER_HPTIMER:
- 			cnt_ctl = read_sysreg_el0(SYS_CNTP_CTL);
- 			break;
- 		case NR_KVM_TIMERS:
-@@ -358,6 +410,7 @@ bool kvm_timer_is_pending(struct kvm_vcpu *vcpu)
- 
- 	return kvm_timer_should_fire(map.direct_vtimer) ||
- 	       kvm_timer_should_fire(map.direct_ptimer) ||
-+	       kvm_timer_should_fire(map.emul_vtimer) ||
- 	       kvm_timer_should_fire(map.emul_ptimer);
- }
- 
-@@ -438,6 +491,7 @@ static void timer_save_state(struct arch_timer_context *ctx)
- 
- 	switch (index) {
- 	case TIMER_VTIMER:
-+	case TIMER_HVTIMER:
- 		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTV_CTL));
- 		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTV_CVAL));
- 
-@@ -447,6 +501,7 @@ static void timer_save_state(struct arch_timer_context *ctx)
- 
- 		break;
- 	case TIMER_PTIMER:
-+	case TIMER_HPTIMER:
- 		timer_set_ctl(ctx, read_sysreg_el0(SYS_CNTP_CTL));
- 		timer_set_cval(ctx, read_sysreg_el0(SYS_CNTP_CVAL));
- 
-@@ -484,6 +539,7 @@ static void kvm_timer_blocking(struct kvm_vcpu *vcpu)
- 	 */
- 	if (!kvm_timer_irq_can_fire(map.direct_vtimer) &&
- 	    !kvm_timer_irq_can_fire(map.direct_ptimer) &&
-+	    !kvm_timer_irq_can_fire(map.emul_vtimer) &&
- 	    !kvm_timer_irq_can_fire(map.emul_ptimer))
- 		return;
- 
-@@ -517,11 +573,13 @@ static void timer_restore_state(struct arch_timer_context *ctx)
- 
- 	switch (index) {
- 	case TIMER_VTIMER:
-+	case TIMER_HVTIMER:
- 		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTV_CVAL);
- 		isb();
- 		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTV_CTL);
- 		break;
- 	case TIMER_PTIMER:
-+	case TIMER_HPTIMER:
- 		write_sysreg_el0(timer_get_cval(ctx), SYS_CNTP_CVAL);
- 		isb();
- 		write_sysreg_el0(timer_get_ctl(ctx), SYS_CNTP_CTL);
-@@ -598,6 +656,42 @@ static void kvm_timer_vcpu_load_nogic(struct kvm_vcpu *vcpu)
- 		enable_percpu_irq(host_vtimer_irq, host_vtimer_irq_flags);
- }
- 
-+static void kvm_timer_vcpu_load_nested_switch(struct kvm_vcpu *vcpu,
-+					      struct timer_map *map)
-+{
-+	int hw, ret;
-+
-+	if (!irqchip_in_kernel(vcpu->kvm))
-+		return;
-+
-+	/*
-+	 * We only ever unmap the vtimer irq on a VHE system that runs nested
-+	 * virtualization, in which case we have both a valid emul_vtimer,
-+	 * emul_ptimer, direct_vtimer, and direct_ptimer.
-+	 *
-+	 * Since this is called from kvm_timer_vcpu_load(), a change between
-+	 * vEL2 and vEL1/0 will have just happened, and the timer_map will
-+	 * represent this, and therefore we switch the emul/direct mappings
-+	 * below.
-+	 */
-+	hw = kvm_vgic_get_map(vcpu, map->direct_vtimer->irq.irq);
-+	if (hw < 0) {
-+		kvm_vgic_unmap_phys_irq(vcpu, map->emul_vtimer->irq.irq);
-+		kvm_vgic_unmap_phys_irq(vcpu, map->emul_ptimer->irq.irq);
-+
-+		ret = kvm_vgic_map_phys_irq(vcpu,
-+					    map->direct_vtimer->host_timer_irq,
-+					    map->direct_vtimer->irq.irq,
-+					    &arch_timer_irq_ops);
-+		WARN_ON_ONCE(ret);
-+		ret = kvm_vgic_map_phys_irq(vcpu,
-+					    map->direct_ptimer->host_timer_irq,
-+					    map->direct_ptimer->irq.irq,
-+					    &arch_timer_irq_ops);
-+		WARN_ON_ONCE(ret);
-+	}
-+}
-+
- void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
-@@ -609,6 +703,9 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 	get_timer_map(vcpu, &map);
- 
- 	if (static_branch_likely(&has_gic_active_state)) {
-+		if (vcpu_has_nv(vcpu))
-+			kvm_timer_vcpu_load_nested_switch(vcpu, &map);
-+
- 		kvm_timer_vcpu_load_gic(map.direct_vtimer);
- 		if (map.direct_ptimer)
- 			kvm_timer_vcpu_load_gic(map.direct_ptimer);
-@@ -624,6 +721,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
- 	if (map.direct_ptimer)
- 		timer_restore_state(map.direct_ptimer);
- 
-+	if (map.emul_vtimer)
-+		timer_emulate(map.emul_vtimer);
- 	if (map.emul_ptimer)
- 		timer_emulate(map.emul_ptimer);
- }
-@@ -668,6 +767,8 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	 * In any case, we re-schedule the hrtimer for the physical timer when
- 	 * coming back to the VCPU thread in kvm_timer_vcpu_load().
- 	 */
-+	if (map.emul_vtimer)
-+		soft_timer_cancel(&map.emul_vtimer->hrtimer);
- 	if (map.emul_ptimer)
- 		soft_timer_cancel(&map.emul_ptimer->hrtimer);
- 
-@@ -728,10 +829,14 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 	 */
- 	timer_set_ctl(vcpu_vtimer(vcpu), 0);
- 	timer_set_ctl(vcpu_ptimer(vcpu), 0);
-+	timer_set_ctl(vcpu_hvtimer(vcpu), 0);
-+	timer_set_ctl(vcpu_hptimer(vcpu), 0);
- 
- 	if (timer->enabled) {
- 		kvm_timer_update_irq(vcpu, false, vcpu_vtimer(vcpu));
- 		kvm_timer_update_irq(vcpu, false, vcpu_ptimer(vcpu));
-+		kvm_timer_update_irq(vcpu, false, vcpu_hvtimer(vcpu));
-+		kvm_timer_update_irq(vcpu, false, vcpu_hptimer(vcpu));
- 
- 		if (irqchip_in_kernel(vcpu->kvm)) {
- 			kvm_vgic_reset_mapped_irq(vcpu, map.direct_vtimer->irq.irq);
-@@ -740,6 +845,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
-+	if (map.emul_vtimer)
-+		soft_timer_cancel(&map.emul_vtimer->hrtimer);
- 	if (map.emul_ptimer)
- 		soft_timer_cancel(&map.emul_ptimer->hrtimer);
- 
-@@ -770,30 +877,47 @@ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
- 	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
- 	struct arch_timer_context *vtimer = vcpu_vtimer(vcpu);
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
-+	struct arch_timer_context *hvtimer = vcpu_hvtimer(vcpu);
-+	struct arch_timer_context *hptimer = vcpu_hptimer(vcpu);
- 
- 	vtimer->vcpu = vcpu;
- 	ptimer->vcpu = vcpu;
-+	hvtimer->vcpu = vcpu;
-+	hptimer->vcpu = vcpu;
- 
- 	/* Synchronize cntvoff across all vtimers of a VM. */
- 	update_vtimer_cntvoff(vcpu, kvm_phys_timer_read());
- 	timer_set_offset(ptimer, 0);
-+	timer_set_offset(hvtimer, 0);
-+	timer_set_offset(hptimer, 0);
- 
- 	hrtimer_init(&timer->bg_timer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	timer->bg_timer.function = kvm_bg_timer_expire;
- 
- 	hrtimer_init(&vtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
- 	hrtimer_init(&ptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-+	hrtimer_init(&hvtimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-+	hrtimer_init(&hptimer->hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_ABS_HARD);
-+
- 	vtimer->hrtimer.function = kvm_hrtimer_expire;
- 	ptimer->hrtimer.function = kvm_hrtimer_expire;
-+	hvtimer->hrtimer.function = kvm_hrtimer_expire;
-+	hptimer->hrtimer.function = kvm_hrtimer_expire;
- 
- 	vtimer->irq.irq = default_vtimer_irq.irq;
- 	ptimer->irq.irq = default_ptimer_irq.irq;
-+	hvtimer->irq.irq = default_hvtimer_irq.irq;
-+	hptimer->irq.irq = default_hptimer_irq.irq;
- 
- 	vtimer->host_timer_irq = host_vtimer_irq;
- 	ptimer->host_timer_irq = host_ptimer_irq;
-+	hvtimer->host_timer_irq = host_vtimer_irq;
-+	hptimer->host_timer_irq = host_ptimer_irq;
- 
- 	vtimer->host_timer_irq_flags = host_vtimer_irq_flags;
- 	ptimer->host_timer_irq_flags = host_ptimer_irq_flags;
-+	hvtimer->host_timer_irq_flags = host_vtimer_irq_flags;
-+	hptimer->host_timer_irq_flags = host_ptimer_irq_flags;
- }
- 
- static void kvm_timer_init_interrupt(void *info)
-@@ -900,6 +1024,10 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
- 		val = kvm_phys_timer_read() - timer_get_offset(timer);
- 		break;
- 
-+	case TIMER_REG_VOFF:
-+		val = timer_get_offset(timer);
-+		break;
-+
- 	default:
- 		BUG();
- 	}
-@@ -942,6 +1070,10 @@ static void kvm_arm_timer_write(struct kvm_vcpu *vcpu,
- 		timer_set_cval(timer, val);
- 		break;
- 
-+	case TIMER_REG_VOFF:
-+		timer_set_offset(timer, val);
-+		break;
-+
- 	default:
- 		BUG();
- 	}
-@@ -1040,10 +1172,6 @@ static const struct irq_domain_ops timer_domain_ops = {
- 	.free	= timer_irq_domain_free,
- };
- 
--static struct irq_ops arch_timer_irq_ops = {
--	.get_input_level = kvm_arch_timer_get_input_level,
--};
--
- static void kvm_irq_fixup_flags(unsigned int virq, u32 *flags)
- {
- 	*flags = irq_get_trigger_type(virq);
-@@ -1188,7 +1316,7 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
- 
- static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
- {
--	int vtimer_irq, ptimer_irq, ret;
-+	int vtimer_irq, ptimer_irq, hvtimer_irq, hptimer_irq, ret;
- 	unsigned long i;
- 
- 	vtimer_irq = vcpu_vtimer(vcpu)->irq.irq;
-@@ -1201,16 +1329,28 @@ static bool timer_irqs_are_valid(struct kvm_vcpu *vcpu)
- 	if (ret)
- 		return false;
- 
-+	hvtimer_irq = vcpu_hvtimer(vcpu)->irq.irq;
-+	ret = kvm_vgic_set_owner(vcpu, hvtimer_irq, vcpu_hvtimer(vcpu));
-+	if (ret)
-+		return false;
-+
-+	hptimer_irq = vcpu_hptimer(vcpu)->irq.irq;
-+	ret = kvm_vgic_set_owner(vcpu, hptimer_irq, vcpu_hptimer(vcpu));
-+	if (ret)
-+		return false;
-+
- 	kvm_for_each_vcpu(i, vcpu, vcpu->kvm) {
- 		if (vcpu_vtimer(vcpu)->irq.irq != vtimer_irq ||
--		    vcpu_ptimer(vcpu)->irq.irq != ptimer_irq)
-+		    vcpu_ptimer(vcpu)->irq.irq != ptimer_irq ||
-+		    vcpu_hvtimer(vcpu)->irq.irq != hvtimer_irq ||
-+		    vcpu_hptimer(vcpu)->irq.irq != hptimer_irq)
- 			return false;
- 	}
- 
- 	return true;
- }
- 
--bool kvm_arch_timer_get_input_level(int vintid)
-+static bool kvm_arch_timer_get_input_level(int vintid)
- {
- 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
- 	struct arch_timer_context *timer;
-@@ -1219,6 +1359,10 @@ bool kvm_arch_timer_get_input_level(int vintid)
- 		timer = vcpu_vtimer(vcpu);
- 	else if (vintid == vcpu_ptimer(vcpu)->irq.irq)
- 		timer = vcpu_ptimer(vcpu);
-+	else if (vintid == vcpu_hvtimer(vcpu)->irq.irq)
-+		timer = vcpu_hvtimer(vcpu);
-+	else if (vintid == vcpu_hptimer(vcpu)->irq.irq)
-+		timer = vcpu_hptimer(vcpu);
- 	else
- 		BUG();
- 
-@@ -1301,6 +1445,7 @@ static void set_timer_irqs(struct kvm *kvm, int vtimer_irq, int ptimer_irq)
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		vcpu_vtimer(vcpu)->irq.irq = vtimer_irq;
- 		vcpu_ptimer(vcpu)->irq.irq = ptimer_irq;
-+		/* TODO: Add support for hv/hp timers */
- 	}
- }
- 
-@@ -1311,6 +1456,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	struct arch_timer_context *ptimer = vcpu_ptimer(vcpu);
- 	int irq;
- 
-+	/* TODO: Add support for hv/hp timers */
-+
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return -EINVAL;
- 
-@@ -1343,6 +1490,8 @@ int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 	struct arch_timer_context *timer;
- 	int irq;
- 
-+	/* TODO: Add support for hv/hp timers */
-+
- 	switch (attr->attr) {
- 	case KVM_ARM_VCPU_TIMER_IRQ_VTIMER:
- 		timer = vcpu_vtimer(vcpu);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d7441b8ba406..bbc58930a5eb 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1288,6 +1288,11 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
- 		tmr = TIMER_PTIMER;
- 		treg = TIMER_REG_CVAL;
- 		break;
-+	case SYS_CNTVOFF_EL2:
-+		tmr = TIMER_VTIMER;
-+		treg = TIMER_REG_VOFF;
-+		break;
-+
- 	default:
- 		BUG();
- 	}
-@@ -2212,7 +2217,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(CONTEXTIDR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(TPIDR_EL2, access_rw, reset_val, 0),
- 
--	EL2_REG(CNTVOFF_EL2, access_rw, reset_val, 0),
-+	{ SYS_DESC(SYS_CNTVOFF_EL2), access_arch_timer },
- 	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
- 
- 	EL12_REG(SCTLR, access_vm_reg, reset_val, 0x00C50078),
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index f3e46a976125..6ce5c025218d 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -206,6 +206,7 @@ TRACE_EVENT(kvm_get_timer_map,
- 		__field(	unsigned long,		vcpu_id	)
- 		__field(	int,			direct_vtimer	)
- 		__field(	int,			direct_ptimer	)
-+		__field(	int,			emul_vtimer	)
- 		__field(	int,			emul_ptimer	)
- 	),
- 
-@@ -214,14 +215,17 @@ TRACE_EVENT(kvm_get_timer_map,
- 		__entry->direct_vtimer		= arch_timer_ctx_index(map->direct_vtimer);
- 		__entry->direct_ptimer =
- 			(map->direct_ptimer) ? arch_timer_ctx_index(map->direct_ptimer) : -1;
-+		__entry->emul_vtimer =
-+			(map->emul_vtimer) ? arch_timer_ctx_index(map->emul_vtimer) : -1;
- 		__entry->emul_ptimer =
- 			(map->emul_ptimer) ? arch_timer_ctx_index(map->emul_ptimer) : -1;
- 	),
- 
--	TP_printk("VCPU: %ld, dv: %d, dp: %d, ep: %d",
-+	TP_printk("VCPU: %ld, dv: %d, dp: %d, ev: %d, ep: %d",
- 		  __entry->vcpu_id,
- 		  __entry->direct_vtimer,
- 		  __entry->direct_ptimer,
-+		  __entry->emul_vtimer,
- 		  __entry->emul_ptimer)
- );
- 
-diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
-index 9b98876a8a93..e7fe0447af08 100644
---- a/arch/arm64/kvm/vgic/vgic.c
-+++ b/arch/arm64/kvm/vgic/vgic.c
-@@ -573,6 +573,21 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid)
- 	return 0;
- }
- 
-+int kvm_vgic_get_map(struct kvm_vcpu *vcpu, unsigned int vintid)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, vintid);
-+	unsigned long flags;
-+	int ret = -1;
-+
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+	if (irq->hw)
-+		ret = irq->hwintid;
-+	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+
-+	vgic_put_irq(vcpu->kvm, irq);
-+	return ret;
-+}
-+
- /**
-  * kvm_vgic_set_owner - Set the owner of an interrupt for a VM
-  *
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 51c19381108c..0a76dac8cb6a 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -13,6 +13,8 @@
- enum kvm_arch_timers {
- 	TIMER_PTIMER,
- 	TIMER_VTIMER,
-+	TIMER_HVTIMER,
-+	TIMER_HPTIMER,
- 	NR_KVM_TIMERS
- };
- 
-@@ -21,6 +23,7 @@ enum kvm_arch_timer_regs {
- 	TIMER_REG_CVAL,
- 	TIMER_REG_TVAL,
- 	TIMER_REG_CTL,
-+	TIMER_REG_VOFF,
- };
- 
- struct arch_timer_context {
-@@ -47,6 +50,7 @@ struct arch_timer_context {
- struct timer_map {
- 	struct arch_timer_context *direct_vtimer;
- 	struct arch_timer_context *direct_ptimer;
-+	struct arch_timer_context *emul_vtimer;
- 	struct arch_timer_context *emul_ptimer;
- };
- 
-@@ -85,12 +89,12 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
- 
- void kvm_timer_init_vhe(void);
- 
--bool kvm_arch_timer_get_input_level(int vintid);
--
- #define vcpu_timer(v)	(&(v)->arch.timer_cpu)
- #define vcpu_get_timer(v,t)	(&vcpu_timer(v)->timers[(t)])
- #define vcpu_vtimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_VTIMER])
- #define vcpu_ptimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_PTIMER])
-+#define vcpu_hvtimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_HVTIMER])
-+#define vcpu_hptimer(v)	(&(v)->arch.timer_cpu.timers[TIMER_HPTIMER])
- 
- #define arch_timer_ctx_index(ctx)	((ctx) - vcpu_timer((ctx)->vcpu)->timers)
- 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index bb30a6803d9f..17b651890d22 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -375,6 +375,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, unsigned int host_irq,
- 			  u32 vintid, struct irq_ops *ops);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int vintid);
-+int kvm_vgic_get_map(struct kvm_vcpu *vcpu, unsigned int vintid);
- bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int vintid);
- 
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
--- 
-2.30.2
+Thanks,
+
+Steve
+
+[1]
+https://lore.kernel.org/lkml/20200417152619.41680-1-steven.price@arm.com/
+
+On 26/01/2022 17:30, Ard Biesheuvel wrote:
+> To prepare for user and kernel page tables being remapped read-only in
+> the linear region, define a new fixmap slot and use it to apply all page
+> table descriptor updates that target page tables other than swapper.
+> 
+> Fortunately for us, the fixmap descriptors themselves are always
+> manipulated via their kernel mapping in .bss, so there is no special
+> exception required to avoid circular logic here.
+> 
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  arch/arm64/Kconfig               |  11 +++
+>  arch/arm64/include/asm/fixmap.h  |   1 +
+>  arch/arm64/include/asm/pgalloc.h |  28 +++++-
+>  arch/arm64/include/asm/pgtable.h |  79 +++++++++++++---
+>  arch/arm64/mm/Makefile           |   2 +
+>  arch/arm64/mm/fault.c            |   8 +-
+>  arch/arm64/mm/ro_page_tables.c   | 100 ++++++++++++++++++++
+>  7 files changed, 209 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index 6978140edfa4..a3e98286b074 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -1311,6 +1311,17 @@ config RODATA_FULL_DEFAULT_ENABLED
+>  	  This requires the linear region to be mapped down to pages,
+>  	  which may adversely affect performance in some cases.
+>  
+> +config ARM64_RO_PAGE_TABLES
+> +	bool "Remap page tables read-only in the kernel VA space"
+> +	select RODATA_FULL_DEFAULT_ENABLED
+> +	help
+> +	  Remap linear mappings of page table pages read-only as long as they
+> +	  are being used as such, and use a fixmap API to manipulate all page
+> +	  table descriptors, instead of manipulating them directly via their
+> +	  writable mappings in the direct map. This is intended as a debug
+> +	  and/or hardening feature, as it removes the ability for stray writes
+> +	  to be exploited to bypass permission restrictions.
+> +
+>  config ARM64_SW_TTBR0_PAN
+>  	bool "Emulate Privileged Access Never using TTBR0_EL1 switching"
+>  	help
+> diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
+> index 4335800201c9..71dfbe0452bb 100644
+> --- a/arch/arm64/include/asm/fixmap.h
+> +++ b/arch/arm64/include/asm/fixmap.h
+> @@ -50,6 +50,7 @@ enum fixed_addresses {
+>  
+>  	FIX_EARLYCON_MEM_BASE,
+>  	FIX_TEXT_POKE0,
+> +	FIX_TEXT_POKE_PTE,
+>  
+>  #ifdef CONFIG_ACPI_APEI_GHES
+>  	/* Used for GHES mapping from assorted contexts */
+> diff --git a/arch/arm64/include/asm/pgalloc.h b/arch/arm64/include/asm/pgalloc.h
+> index 237224484d0f..d54ac9f8d6c7 100644
+> --- a/arch/arm64/include/asm/pgalloc.h
+> +++ b/arch/arm64/include/asm/pgalloc.h
+> @@ -30,7 +30,11 @@ static inline void pud_populate(struct mm_struct *mm, pud_t *pudp, pmd_t *pmdp)
+>  	pudval_t pudval = PUD_TYPE_TABLE;
+>  
+>  	pudval |= (mm == &init_mm) ? PUD_TABLE_UXN : PUD_TABLE_PXN;
+> -	__pud_populate(pudp, __pa(pmdp), pudval);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(mm, (pte_t *)pudp,
+> +			    __pte(__phys_to_pud_val(__pa(pmdp) | pudval)));
+> +	else
+> +		__pud_populate(pudp, __pa(pmdp), pudval);
+>  }
+>  #else
+>  static inline void __pud_populate(pud_t *pudp, phys_addr_t pmdp, pudval_t prot)
+> @@ -51,7 +55,11 @@ static inline void p4d_populate(struct mm_struct *mm, p4d_t *p4dp, pud_t *pudp)
+>  	p4dval_t p4dval = P4D_TYPE_TABLE;
+>  
+>  	p4dval |= (mm == &init_mm) ? P4D_TABLE_UXN : P4D_TABLE_PXN;
+> -	__p4d_populate(p4dp, __pa(pudp), p4dval);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(mm, (pte_t *)p4dp,
+> +			    __pte(__phys_to_p4d_val(__pa(pudp) | p4dval)));
+> +	else
+> +		__p4d_populate(p4dp, __pa(pudp), p4dval);
+>  }
+>  #else
+>  static inline void __p4d_populate(p4d_t *p4dp, phys_addr_t pudp, p4dval_t prot)
+> @@ -76,15 +84,27 @@ static inline void __pmd_populate(pmd_t *pmdp, phys_addr_t ptep,
+>  static inline void
+>  pmd_populate_kernel(struct mm_struct *mm, pmd_t *pmdp, pte_t *ptep)
+>  {
+> +	pmdval_t pmdval = PMD_TYPE_TABLE | PMD_TABLE_UXN;
+> +
+>  	VM_BUG_ON(mm && mm != &init_mm);
+> -	__pmd_populate(pmdp, __pa(ptep), PMD_TYPE_TABLE | PMD_TABLE_UXN);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(mm, (pte_t *)pmdp,
+> +			    __pte(__phys_to_pmd_val(__pa(ptep) | pmdval)));
+> +	else
+> +		__pmd_populate(pmdp, __pa(ptep), pmdval);
+>  }
+>  
+>  static inline void
+>  pmd_populate(struct mm_struct *mm, pmd_t *pmdp, pgtable_t ptep)
+>  {
+> +	pmdval_t pmdval = PMD_TYPE_TABLE | PMD_TABLE_PXN;
+> +
+>  	VM_BUG_ON(mm == &init_mm);
+> -	__pmd_populate(pmdp, page_to_phys(ptep), PMD_TYPE_TABLE | PMD_TABLE_PXN);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(mm, (pte_t *)pmdp,
+> +			    __pte(__phys_to_pmd_val(page_to_phys(ptep) | pmdval)));
+> +	else
+> +		__pmd_populate(pmdp, page_to_phys(ptep), pmdval);
+>  }
+>  
+>  #endif
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index 8d3806c68687..a8daea6b4ac9 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -30,6 +30,7 @@
+>  
+>  #include <asm/cmpxchg.h>
+>  #include <asm/fixmap.h>
+> +#include <linux/jump_label.h>
+>  #include <linux/mmdebug.h>
+>  #include <linux/mm_types.h>
+>  #include <linux/sched.h>
+> @@ -37,6 +38,17 @@
+>  int set_pgtable_ro(void *addr);
+>  int set_pgtable_rw(void *addr);
+>  
+> +DECLARE_STATIC_KEY_FALSE(ro_page_tables);
+> +
+> +static inline bool page_tables_are_ro(void)
+> +{
+> +	return IS_ENABLED(CONFIG_ARM64_RO_PAGE_TABLES) &&
+> +	       static_branch_unlikely(&ro_page_tables);
+> +}
+> +
+> +pte_t xchg_ro_pte(struct mm_struct *mm, pte_t *ptep, pte_t pte);
+> +pte_t cmpxchg_ro_pte(struct mm_struct *mm, pte_t *ptep, pte_t old, pte_t new);
+> +
+>  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+>  #define __HAVE_ARCH_FLUSH_PMD_TLB_RANGE
+>  
+> @@ -89,7 +101,7 @@ static inline pteval_t __phys_to_pte_val(phys_addr_t phys)
+>  	__pte(__phys_to_pte_val((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot))
+>  
+>  #define pte_none(pte)		(!pte_val(pte))
+> -#define pte_clear(mm,addr,ptep)	set_pte(ptep, __pte(0))
+> +#define pte_clear(mm,addr,ptep)	set_pte_at(mm, addr, ptep, __pte(0))
+>  #define pte_page(pte)		(pfn_to_page(pte_pfn(pte)))
+>  
+>  /*
+> @@ -257,7 +269,10 @@ static inline pte_t pte_mkdevmap(pte_t pte)
+>  
+>  static inline void set_pte(pte_t *ptep, pte_t pte)
+>  {
+> -	WRITE_ONCE(*ptep, pte);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(&init_mm, ptep, pte);
+> +	else
+> +		WRITE_ONCE(*ptep, pte);
+>  
+>  	/*
+>  	 * Only if the new pte is valid and kernel, otherwise TLB maintenance
+> @@ -343,7 +358,10 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
+>  
+>  	__check_racy_pte_update(mm, ptep, pte);
+>  
+> -	set_pte(ptep, pte);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(mm, ptep, pte);
+> +	else
+> +		set_pte(ptep, pte);
+>  }
+>  
+>  /*
+> @@ -579,7 +597,10 @@ static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
+>  	}
+>  #endif /* __PAGETABLE_PMD_FOLDED */
+>  
+> -	WRITE_ONCE(*pmdp, pmd);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(&init_mm, (pte_t *)pmdp, pmd_pte(pmd));
+> +	else
+> +		WRITE_ONCE(*pmdp, pmd);
+>  
+>  	if (pmd_valid(pmd)) {
+>  		dsb(ishst);
+> @@ -589,7 +610,10 @@ static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
+>  
+>  static inline void pmd_clear(pmd_t *pmdp)
+>  {
+> -	set_pmd(pmdp, __pmd(0));
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(NULL, (pte_t *)pmdp, __pte(0));
+> +	else
+> +		set_pmd(pmdp, __pmd(0));
+>  }
+>  
+>  static inline phys_addr_t pmd_page_paddr(pmd_t pmd)
+> @@ -640,7 +664,10 @@ static inline void set_pud(pud_t *pudp, pud_t pud)
+>  	}
+>  #endif /* __PAGETABLE_PUD_FOLDED */
+>  
+> -	WRITE_ONCE(*pudp, pud);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(&init_mm, (pte_t *)pudp, pud_pte(pud));
+> +	else
+> +		WRITE_ONCE(*pudp, pud);
+>  
+>  	if (pud_valid(pud)) {
+>  		dsb(ishst);
+> @@ -650,7 +677,10 @@ static inline void set_pud(pud_t *pudp, pud_t pud)
+>  
+>  static inline void pud_clear(pud_t *pudp)
+>  {
+> -	set_pud(pudp, __pud(0));
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(NULL, (pte_t *)pudp, __pte(0));
+> +	else
+> +		set_pud(pudp, __pud(0));
+>  }
+>  
+>  static inline phys_addr_t pud_page_paddr(pud_t pud)
+> @@ -704,14 +734,20 @@ static inline void set_p4d(p4d_t *p4dp, p4d_t p4d)
+>  		return;
+>  	}
+>  
+> -	WRITE_ONCE(*p4dp, p4d);
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(&init_mm, (pte_t *)p4dp, p4d_pte(p4d));
+> +	else
+> +		WRITE_ONCE(*p4dp, p4d);
+>  	dsb(ishst);
+>  	isb();
+>  }
+>  
+>  static inline void p4d_clear(p4d_t *p4dp)
+>  {
+> -	set_p4d(p4dp, __p4d(0));
+> +	if (page_tables_are_ro())
+> +		xchg_ro_pte(NULL, (pte_t *)p4dp, __pte(0));
+> +	else
+> +		set_p4d(p4dp, __p4d(0));
+>  }
+>  
+>  static inline phys_addr_t p4d_page_paddr(p4d_t p4d)
+> @@ -806,7 +842,7 @@ static inline int pgd_devmap(pgd_t pgd)
+>   * Atomic pte/pmd modifications.
+>   */
+>  #define __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG
+> -static inline int __ptep_test_and_clear_young(pte_t *ptep)
+> +static inline int __ptep_test_and_clear_young(struct mm_struct *mm, pte_t *ptep)
+>  {
+>  	pte_t old_pte, pte;
+>  
+> @@ -814,8 +850,13 @@ static inline int __ptep_test_and_clear_young(pte_t *ptep)
+>  	do {
+>  		old_pte = pte;
+>  		pte = pte_mkold(pte);
+> -		pte_val(pte) = cmpxchg_relaxed(&pte_val(*ptep),
+> -					       pte_val(old_pte), pte_val(pte));
+> +
+> +		if (page_tables_are_ro())
+> +			pte = cmpxchg_ro_pte(mm, ptep, old_pte, pte);
+> +		else
+> +			pte_val(pte) = cmpxchg_relaxed(&pte_val(*ptep),
+> +						       pte_val(old_pte),
+> +						       pte_val(pte));
+>  	} while (pte_val(pte) != pte_val(old_pte));
+>  
+>  	return pte_young(pte);
+> @@ -825,7 +866,7 @@ static inline int ptep_test_and_clear_young(struct vm_area_struct *vma,
+>  					    unsigned long address,
+>  					    pte_t *ptep)
+>  {
+> -	return __ptep_test_and_clear_young(ptep);
+> +	return __ptep_test_and_clear_young(vma->vm_mm, ptep);
+>  }
+>  
+>  #define __HAVE_ARCH_PTEP_CLEAR_YOUNG_FLUSH
+> @@ -863,6 +904,8 @@ static inline int pmdp_test_and_clear_young(struct vm_area_struct *vma,
+>  static inline pte_t ptep_get_and_clear(struct mm_struct *mm,
+>  				       unsigned long address, pte_t *ptep)
+>  {
+> +	if (page_tables_are_ro())
+> +		return xchg_ro_pte(mm, ptep, __pte(0));
+>  	return __pte(xchg_relaxed(&pte_val(*ptep), 0));
+>  }
+>  
+> @@ -888,8 +931,12 @@ static inline void ptep_set_wrprotect(struct mm_struct *mm, unsigned long addres
+>  	do {
+>  		old_pte = pte;
+>  		pte = pte_wrprotect(pte);
+> -		pte_val(pte) = cmpxchg_relaxed(&pte_val(*ptep),
+> -					       pte_val(old_pte), pte_val(pte));
+> +		if (page_tables_are_ro())
+> +			pte = cmpxchg_ro_pte(mm, ptep, old_pte, pte);
+> +		else
+> +			pte_val(pte) = cmpxchg_relaxed(&pte_val(*ptep),
+> +						       pte_val(old_pte),
+> +						       pte_val(pte));
+>  	} while (pte_val(pte) != pte_val(old_pte));
+>  }
+>  
+> @@ -905,6 +952,8 @@ static inline void pmdp_set_wrprotect(struct mm_struct *mm,
+>  static inline pmd_t pmdp_establish(struct vm_area_struct *vma,
+>  		unsigned long address, pmd_t *pmdp, pmd_t pmd)
+>  {
+> +	if (page_tables_are_ro())
+> +		return pte_pmd(xchg_ro_pte(vma->vm_mm, (pte_t *)pmdp, pmd_pte(pmd)));
+>  	return __pmd(xchg_relaxed(&pmd_val(*pmdp), pmd_val(pmd)));
+>  }
+>  #endif
+> diff --git a/arch/arm64/mm/Makefile b/arch/arm64/mm/Makefile
+> index ff1e800ba7a1..7750cafd969a 100644
+> --- a/arch/arm64/mm/Makefile
+> +++ b/arch/arm64/mm/Makefile
+> @@ -14,3 +14,5 @@ KASAN_SANITIZE_physaddr.o	+= n
+>  
+>  obj-$(CONFIG_KASAN)		+= kasan_init.o
+>  KASAN_SANITIZE_kasan_init.o	:= n
+> +
+> +obj-$(CONFIG_ARM64_RO_PAGE_TABLES) += ro_page_tables.o
+> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
+> index 77341b160aca..5a5055c3e1c2 100644
+> --- a/arch/arm64/mm/fault.c
+> +++ b/arch/arm64/mm/fault.c
+> @@ -220,7 +220,13 @@ int ptep_set_access_flags(struct vm_area_struct *vma,
+>  		pteval ^= PTE_RDONLY;
+>  		pteval |= pte_val(entry);
+>  		pteval ^= PTE_RDONLY;
+> -		pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval, pteval);
+> +		if (page_tables_are_ro())
+> +			pteval = pte_val(cmpxchg_ro_pte(vma->vm_mm, ptep,
+> +							__pte(old_pteval),
+> +							__pte(pteval)));
+> +		else
+> +			pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval,
+> +						 pteval);
+>  	} while (pteval != old_pteval);
+>  
+>  	/* Invalidate a stale read-only entry */
+> diff --git a/arch/arm64/mm/ro_page_tables.c b/arch/arm64/mm/ro_page_tables.c
+> new file mode 100644
+> index 000000000000..f497adfd774d
+> --- /dev/null
+> +++ b/arch/arm64/mm/ro_page_tables.c
+> @@ -0,0 +1,100 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2021 - Google Inc
+> + * Author: Ard Biesheuvel <ardb@google.com>
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/init.h>
+> +#include <linux/memory.h>
+> +#include <linux/mm.h>
+> +#include <linux/sizes.h>
+> +
+> +#include <asm/fixmap.h>
+> +#include <asm/kernel-pgtable.h>
+> +#include <asm/mmu_context.h>
+> +#include <asm/pgalloc.h>
+> +#include <asm/tlbflush.h>
+> +#include <asm/sections.h>
+> +
+> +static DEFINE_RAW_SPINLOCK(patch_pte_lock);
+> +
+> +DEFINE_STATIC_KEY_FALSE(ro_page_tables);
+> +
+> +static bool __initdata ro_page_tables_enabled = true;
+> +
+> +static int __init parse_ro_page_tables(char *arg)
+> +{
+> +	return strtobool(arg, &ro_page_tables_enabled);
+> +}
+> +early_param("ro_page_tables", parse_ro_page_tables);
+> +
+> +static bool in_kernel_text_or_rodata(phys_addr_t pa)
+> +{
+> +	/*
+> +	 * This is a minimal check to ensure that the r/o page table patching
+> +	 * API is not being abused to make changes to the kernel text. This
+> +	 * should ideally cover module and BPF text/rodata as well, but that
+> +	 * is less straight-forward and hence more costly.
+> +	 */
+> +	return pa >= __pa_symbol(_stext) && pa < __pa_symbol(__init_begin);
+> +}
+> +
+> +pte_t xchg_ro_pte(struct mm_struct *mm, pte_t *ptep, pte_t pte)
+> +{
+> +	unsigned long flags;
+> +	u64 pte_pa;
+> +	pte_t ret;
+> +	pte_t *p;
+> +
+> +	/* can we use __pa() on ptep? */
+> +	if (!virt_addr_valid(ptep)) {
+> +		/* only linear aliases are remapped r/o anyway */
+> +		pte_val(ret) = xchg_relaxed(&pte_val(*ptep), pte_val(pte));
+> +		return ret;
+> +	}
+> +
+> +	pte_pa = __pa(ptep);
+> +	BUG_ON(in_kernel_text_or_rodata(pte_pa));
+> +
+> +	raw_spin_lock_irqsave(&patch_pte_lock, flags);
+> +	p = (pte_t *)set_fixmap_offset(FIX_TEXT_POKE_PTE, pte_pa);
+> +	pte_val(ret) = xchg_relaxed(&pte_val(*p), pte_val(pte));
+> +	clear_fixmap(FIX_TEXT_POKE_PTE);
+> +	raw_spin_unlock_irqrestore(&patch_pte_lock, flags);
+> +	return ret;
+> +}
+> +
+> +pte_t cmpxchg_ro_pte(struct mm_struct *mm, pte_t *ptep, pte_t old, pte_t new)
+> +{
+> +	unsigned long flags;
+> +	u64 pte_pa;
+> +	pte_t ret;
+> +	pte_t *p;
+> +
+> +	BUG_ON(!virt_addr_valid(ptep));
+> +
+> +	pte_pa = __pa(ptep);
+> +	BUG_ON(in_kernel_text_or_rodata(pte_pa));
+> +
+> +	raw_spin_lock_irqsave(&patch_pte_lock, flags);
+> +	p = (pte_t *)set_fixmap_offset(FIX_TEXT_POKE_PTE, pte_pa);
+> +	pte_val(ret) = cmpxchg_relaxed(&pte_val(*p), pte_val(old), pte_val(new));
+> +	clear_fixmap(FIX_TEXT_POKE_PTE);
+> +	raw_spin_unlock_irqrestore(&patch_pte_lock, flags);
+> +	return ret;
+> +}
+> +
+> +static int __init ro_page_tables_init(void)
+> +{
+> +	if (ro_page_tables_enabled) {
+> +		if (!rodata_full) {
+> +			pr_err("Failed to enable R/O page table protection, rodata=full is not enabled\n");
+> +		} else {
+> +			pr_err("Enabling R/O page table protection\n");
+> +			static_branch_enable(&ro_page_tables);
+> +		}
+> +	}
+> +	return 0;
+> +}
+> +early_initcall(ro_page_tables_init);
 
 _______________________________________________
 kvmarm mailing list
