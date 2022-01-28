@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 832CDC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 310D1C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:51:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 201504B20B;
-	Fri, 28 Jan 2022 07:51:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFB2A4B1BD;
+	Fri, 28 Jan 2022 07:51:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8nk0mJ3DHayL; Fri, 28 Jan 2022 07:51:09 -0500 (EST)
+	with ESMTP id h-+XxNiIw8LZ; Fri, 28 Jan 2022 07:51:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5636F4B205;
-	Fri, 28 Jan 2022 07:51:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FE044B1CA;
+	Fri, 28 Jan 2022 07:51:13 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DCFC4B121
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:51:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 704C54B1CA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:51:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NVJGcP-GcsZ8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:51:05 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0CDC64B216
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:51:04 -0500 (EST)
+ with ESMTP id 6tBLAIKhqX25 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:51:11 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45B964B204
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:51:10 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 7EC0C61C55;
- Fri, 28 Jan 2022 12:51:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53C0FC340E0;
- Fri, 28 Jan 2022 12:51:03 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 6E995B8251F;
+ Fri, 28 Jan 2022 12:51:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A17EC340E6;
+ Fri, 28 Jan 2022 12:51:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643374263;
- bh=4FoB1LgjNdTlnD1PdZ2hrSF0tPZxxGXiZk/4OSXnxqw=;
+ s=k20201202; t=1643374268;
+ bh=qEJsaG5LUtQe2H2z8Fa2s360nDYyv5kiWkv10yXELbM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=t6ue88eLWshxU045sxIDLsr5/0jIbyAEj6jn9PlxjWi+w/N8nDA4kr7eZuG4loMeT
- cbCiiuoBzZTuLmcsJes0F1JwOphpUXWL+9qP4+pR9Ah+OkGBVkjyXOznlTAmoo8LCa
- 0UjUZZYF8mDxLNI6VAOyeQ4tF7NdTLL70BavW5PCwCwxd1SZzp+koghcs7aK2lXwiJ
- d1bWGsK7dKIghGcYbKntg9iUJXRJUBKSrXF24gcY+I1yI8GQo3zkCb40ayo5RTnTCZ
- YEhSUpXiy0fbuHfNV33T6g+FbaWagHGCPT22T/n7q/UHl1uioXt42lBa1GgOcHCDYc
- R7eB4hiLzy3FA==
+ b=sglH5D0M43LKA58lbgWqLPYjWqoikf+XcDfP7958KlO/LtbzKkqUeoAffMV6lf8QN
+ YC/ishGXDAAkHlFekkaK+zrEvwh/jWw8VdhYjXuuG6GKdCyT5UFh+F3n3S0L2SgcNi
+ OvSoRXc/ya3k85nO30s/oUZdtNYFoCfcm1KnBvX2GoMOttdqnhOzIrl6T8jLx0U236
+ JPi4trQaY8vimrpU8EaSusm1BUdanUsOEY1gkYjHlp6cCpf8OuTZnnpv8UfeluzRJv
+ JQf5eDf2ItKd0TzuCzfH4lOtF7mplgek0sKSyUKiikimku2T3WQthcEF9OFIp5/1RD
+ NKGO8K3SE/8PA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQEU-003njR-8E; Fri, 28 Jan 2022 12:20:02 +0000
+ id 1nDQEa-003njR-6U; Fri, 28 Jan 2022 12:20:08 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 49/64] KVM: arm64: nv: vgic: Allow userland to set VGIC
- maintenance IRQ
-Date: Fri, 28 Jan 2022 12:18:57 +0000
-Message-Id: <20220128121912.509006-50-maz@kernel.org>
+Subject: [PATCH v6 59/64] KVM: arm64: Add ARMv8.4 Enhanced Nested Virt
+ cpufeature
+Date: Fri, 28 Jan 2022 12:19:07 +0000
+Message-Id: <20220128121912.509006-60-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -92,135 +92,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+Add the detection code for the ARMv8.4-NV feature.
 
-The VGIC maintenance IRQ signals various conditions about the LRs, when
-the GIC's virtualization extension is used.
-So far we didn't need it, but nested virtualization needs to know about
-this interrupt, so add a userland interface to setup the IRQ number.
-The architecture mandates that it must be a PPI, on top of that this code
-only exports a per-device option, so the PPI is the same on all VCPUs.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-[added some bits of documentation]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- .../virt/kvm/devices/arm-vgic-v3.rst          | 12 +++++++++-
- arch/arm64/include/uapi/asm/kvm.h             |  1 +
- arch/arm64/kvm/vgic/vgic-kvm-device.c         | 22 +++++++++++++++++++
- include/kvm/arm_vgic.h                        |  3 +++
- tools/arch/arm/include/uapi/asm/kvm.h         |  1 +
- 5 files changed, 38 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_nested.h |  6 ++++++
+ arch/arm64/kernel/cpufeature.c      | 10 ++++++++++
+ arch/arm64/tools/cpucaps            |  1 +
+ 3 files changed, 17 insertions(+)
 
-diff --git a/Documentation/virt/kvm/devices/arm-vgic-v3.rst b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-index 51e5e5762571..1901e651cc00 100644
---- a/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-+++ b/Documentation/virt/kvm/devices/arm-vgic-v3.rst
-@@ -284,8 +284,18 @@ Groups:
-       |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 3b5838a2f29e..57b14474a062 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -14,6 +14,12 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+ 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
+ }
  
-   Errors:
--
-     =======  =============================================
-     -EINVAL  vINTID is not multiple of 32 or info field is
- 	     not VGIC_LEVEL_INFO_LINE_LEVEL
-     =======  =============================================
++static inline bool vcpu_has_nv2(const struct kvm_vcpu *vcpu)
++{
++	return cpus_have_final_cap(ARM64_HAS_ENHANCED_NESTED_VIRT) &&
++		vcpu_has_nv(vcpu);
++}
 +
-+  KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ
-+   Attributes:
-+
-+    The attr field of kvm_device_attr encodes the following values:
-+
-+      bits:     | 31   ....    5 | 4  ....  0 |
-+      values:   |      RES0      |   vINTID   |
-+
-+    The vINTID specifies which interrupt is generated when the vGIC
-+    must generate a maintenance interrupt. This must be a PPI.
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 395a4c039bcc..b2811b90fa13 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -346,6 +346,7 @@ struct kvm_arm_copy_mte_tags {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS 8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ  9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index c6d52a1fd9c8..c653259f5a4f 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -251,6 +251,12 @@ static int vgic_get_common_attr(struct kvm_device *dev,
- 			     VGIC_NR_PRIVATE_IRQS, uaddr);
- 		break;
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+
-+		r = put_user(dev->kvm->arch.vgic.maint_irq, uaddr);
-+		break;
-+	}
- 	}
- 
- 	return r;
-@@ -637,6 +643,21 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
- 		reg = tmp32;
- 		return vgic_v3_attr_regs_access(dev, attr, &reg, true);
- 	}
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ: {
-+		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+		u32 val;
-+
-+		if (get_user(val, uaddr))
-+			return -EFAULT;
-+
-+		/* Must be a PPI. */
-+		if ((val >= VGIC_NR_PRIVATE_IRQS) || (val < VGIC_NR_SGIS))
-+			return -EINVAL;
-+
-+		dev->kvm->arch.vgic.maint_irq = val;
-+
-+		return 0;
-+	}
- 	case KVM_DEV_ARM_VGIC_GRP_CTRL: {
- 		int ret;
- 
-@@ -722,6 +743,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
- 		return vgic_v3_has_attr_regs(dev, attr);
- 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
-+	case KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ:
- 		return 0;
- 	case KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO: {
- 		if (((attr->attr & KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK) >>
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index beeb99dc3cc1..b44db6b013f5 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -240,6 +240,9 @@ struct vgic_dist {
- 
- 	int			nr_spis;
- 
-+	/* The GIC maintenance IRQ for nested hypervisors. */
-+	u32			maint_irq;
-+
- 	/* base addresses in guest physical address space: */
- 	gpa_t			vgic_dist_base;		/* distributor */
- 	union {
-diff --git a/tools/arch/arm/include/uapi/asm/kvm.h b/tools/arch/arm/include/uapi/asm/kvm.h
-index 03cd7c19a683..d5dd96902817 100644
---- a/tools/arch/arm/include/uapi/asm/kvm.h
-+++ b/tools/arch/arm/include/uapi/asm/kvm.h
-@@ -246,6 +246,7 @@ struct kvm_vcpu_events {
- #define KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS 6
- #define KVM_DEV_ARM_VGIC_GRP_LEVEL_INFO  7
- #define KVM_DEV_ARM_VGIC_GRP_ITS_REGS	8
-+#define KVM_DEV_ARM_VGIC_GRP_MAINT_IRQ	9
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT	10
- #define KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_MASK \
- 			(0x3fffffULL << KVM_DEV_ARM_VGIC_LINE_LEVEL_INFO_SHIFT)
+ /* Translation helpers from non-VHE EL2 to EL1 */
+ static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
+ {
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 2fa39ce108d0..6e0577d3bf63 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -2029,6 +2029,16 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.field_pos = ID_AA64MMFR2_NV_SHIFT,
+ 		.min_field_value = 1,
+ 	},
++	{
++		.desc = "Enhanced Nested Virtualization Support",
++		.capability = ARM64_HAS_ENHANCED_NESTED_VIRT,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_nested_virt_support,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_NV_SHIFT,
++		.min_field_value = 2,
++	},
+ 	{
+ 		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index a49864b56a07..3f6f567d2811 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -19,6 +19,7 @@ HAS_DCPODP
+ HAS_DCPOP
+ HAS_E0PD
+ HAS_ECV
++HAS_ENHANCED_NESTED_VIRT
+ HAS_EPAN
+ HAS_GENERIC_AUTH
+ HAS_GENERIC_AUTH_ARCH
 -- 
 2.30.2
 
