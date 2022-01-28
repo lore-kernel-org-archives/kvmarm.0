@@ -2,94 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C715C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:48:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FCB4C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:49:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 213A74B0D9;
-	Fri, 28 Jan 2022 07:48:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3ACB4B11C;
+	Fri, 28 Jan 2022 07:49:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cv6Iy-o5EbQz; Fri, 28 Jan 2022 07:48:26 -0500 (EST)
+	with ESMTP id OsN-s0cdPztl; Fri, 28 Jan 2022 07:49:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D52C24B0E1;
-	Fri, 28 Jan 2022 07:48:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28C7B4B0FC;
+	Fri, 28 Jan 2022 07:49:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 580AC4B0D9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:48:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 386554B0E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:49:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z0-znBipcxvS for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:48:24 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2151049F1C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:48:24 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1643374103;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Bo8ZOiKS2adjR5eMsgOruuTsYEGNkSRUgFp15Xq4s0k=;
- b=d0jDuJhy77oKEDTTcVGOdLpqMa/JRl7RFEsmmMX8SAggTjntqp7qi6puwEafCakj1suL/z
- H8anDsaZ2MVqmxkaz0+3e0jvIO4yD6IBQFh1ikfnTWxIMKbws91T1lWQ7mA4Ye72e0VvAp
- 2Y4yrgGeTn6rch90CxekjcGn61wUMN0=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-602-LQRSnvr3OGOy0c9rqSB5Qw-1; Fri, 28 Jan 2022 07:48:19 -0500
-X-MC-Unique: LQRSnvr3OGOy0c9rqSB5Qw-1
-Received: by mail-ej1-f72.google.com with SMTP id
- r18-20020a17090609d200b006a6e943d09eso2812432eje.20
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 04:48:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=Bo8ZOiKS2adjR5eMsgOruuTsYEGNkSRUgFp15Xq4s0k=;
- b=vOJDwvBQhpmSt1usrmt6FAiYWFMugmrS3UlgGCigCpC16lc/M9K4wWAqs/AGMmHJc0
- XX3vqiQmZysnE5z1zYp8HVjh8Sr3B609iG3vxqB2O80OKSgRL4sOm5xgTfjp8dW9OvQT
- VqtYf3eE47ymLh7OTMsnCgSVdbD34o+gPr4iHjO7yJb3xHQPFfjJ8KazgQbuLRxE7i1r
- GU+XQx2ZQuJZX0FPDsF4TR2t2mc+pnu7n7tPbbfRbcjTG/tLRLY/FLXdEEWrbKh9ftuu
- z1FTmEIS16wURVt0S9P9cRwjJRFEt5cKRkelFVQOEhx7oLU6OuYFfMo/dIQ5Z7Unym4O
- 9znA==
-X-Gm-Message-State: AOAM532keV6TGiSteKAgbkTxcy1KHmkumKdk8B7Yqom/4FjFzI45SjD1
- s00H1ep8I8U3E+iApOju6ycZMTFcoCScAuwAVifZUFBCBNUSz6EIn0dWrdlv3/FvzGQHdG0Zjn7
- /m3rmRP3K+F5jmZhyzGU9xOga
-X-Received: by 2002:a05:6402:650:: with SMTP id
- u16mr8010751edx.167.1643374098331; 
- Fri, 28 Jan 2022 04:48:18 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwB2OzlwLHsX6cQfqU4/ONk7VwKQxBpbkHfUGKrzVKUNTmNb3W4B/+uFDcrKSXpWkuMhcbW/Q==
-X-Received: by 2002:a05:6402:650:: with SMTP id
- u16mr8010728edx.167.1643374098108; 
- Fri, 28 Jan 2022 04:48:18 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.googlemail.com with ESMTPSA id d3sm2657530edq.13.2022.01.28.04.48.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Jan 2022 04:48:17 -0800 (PST)
-Message-ID: <8a78eca4-79b2-e183-f01a-6f56124bfdeb@redhat.com>
-Date: Fri, 28 Jan 2022 13:48:10 +0100
+ with ESMTP id EGEBe+zI3zrK for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:49:48 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B14F4B0E1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:49:48 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id ED6D8B8258E;
+ Fri, 28 Jan 2022 12:49:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A97B7C340E0;
+ Fri, 28 Jan 2022 12:49:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1643374185;
+ bh=jRIKDhkVUrbFh/irI2xtBwSiJqsV6zH2COYmtk3NzAY=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=hHOXBLnrEDoKriprPsVEQJEAwFhNqOOyNraCNeeleirRGC9HC25HBHbMDLavvtb+q
+ 7V/RNfJWcN4m7l5E9jjED58FI0IHg6hP1BsZj+sWDMWiTdHIbqHSmgXbTqn8LsHRah
+ crkgiC8ekd7m6KsasLS3OmAx7EkgjcEuwUrEd6Lghv+VO/azzugNZxXp7/q30DUntg
+ xUAoG5H2eqqXsrtxOuGjMIE+WIKao/tH3we1258p+yBg/FFTdNiyGh2TaWDJ8ZB3MW
+ ALvoaV35uHZ55Q9J9xl3EPthQ2sZIEfY2jKfeR9CiAjg82Y0PvzGzwRB+0cSwSo5W5
+ 03GaUYEwg3GbQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nDQEL-003njR-TS; Fri, 28 Jan 2022 12:19:54 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH v6 38/64] KVM: arm64: nv: Unmap/flush shadow stage 2 page
+ tables
+Date: Fri, 28 Jan 2022 12:18:46 +0000
+Message-Id: <20220128121912.509006-39-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
+References: <20220128121912.509006-1-maz@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.17, take #1
-To: Marc Zyngier <maz@kernel.org>
-References: <20220128101245.506715-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220128101245.506715-1-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
+ christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
+ gankulkarni@os.amperecomputing.com, chase.conklin@arm.com,
+ linux@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+ miguel.luis@oracle.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>,
+ "Russell King \(Oracle\)" <linux@armlinux.org.uk>, mihai.carabas@oracle.com,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,27 +87,241 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 1/28/22 11:12, Marc Zyngier wrote:
-> The following changes since commit 1c53a1ae36120997a82f936d044c71075852e521:
-> 
->    Merge branch kvm-arm64/misc-5.17 into kvmarm-master/next (2022-01-04 17:16:15 +0000)
-> 
-> are available in the Git repository at:
-> 
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.17-1
-> 
-> for you to fetch changes up to 278583055a237270fac70518275ba877bf9e4013:
-> 
->    KVM: arm64: Use shadow SPSR_EL1 when injecting exceptions on !VHE (2022-01-24 09:39:03 +0000)
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Pulled, thanks.
+Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
+stage 2 page table for the guest hypervisor.
 
-Paolo
+Note: A bunch of the code in mmu.c relating to MMU notifiers is
+currently dealt with in an extremely abrupt way, for example by clearing
+out an entire shadow stage-2 table. This will be handled in a more
+efficient way using the reverse mapping feature in a later version of
+the patch series.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/include/asm/kvm_mmu.h    |  3 +++
+ arch/arm64/include/asm/kvm_nested.h |  3 +++
+ arch/arm64/kvm/mmu.c                | 31 +++++++++++++++++++----
+ arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++++
+ 4 files changed, 71 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 0750d022bbf8..afad4a27a6f2 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -160,6 +160,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+ 			   void __iomem **haddr);
+ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+ 			     void **haddr);
++void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
++			    phys_addr_t addr, phys_addr_t end);
+ void free_hyp_pgds(void);
+ 
+ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+@@ -168,6 +170,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
++void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end);
+ 
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index f4b846d09d86..8915bead0633 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -118,6 +118,9 @@ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+ 				    struct kvm_s2_trans *trans);
+ extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
++extern void kvm_nested_s2_wp(struct kvm *kvm);
++extern void kvm_nested_s2_clear(struct kvm *kvm);
++extern void kvm_nested_s2_flush(struct kvm *kvm);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 7c56e1522d3c..b9b11be65009 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -190,13 +190,20 @@ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+ 	__unmap_stage2_range(mmu, start, size, true);
+ }
+ 
++void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
++			    phys_addr_t addr, phys_addr_t end)
++{
++	stage2_apply_range_resched(kvm_s2_mmu_to_kvm(mmu), addr, end, kvm_pgtable_stage2_flush);
++}
++
+ static void stage2_flush_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
+ 	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
+ 	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
++	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+ 
+-	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_flush);
++	kvm_stage2_flush_range(mmu, addr, end);
+ }
+ 
+ /**
+@@ -219,6 +226,8 @@ static void stage2_flush_vm(struct kvm *kvm)
+ 	kvm_for_each_memslot(memslot, bkt, slots)
+ 		stage2_flush_memslot(kvm, memslot);
+ 
++	kvm_nested_s2_flush(kvm);
++
+ 	spin_unlock(&kvm->mmu_lock);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+ }
+@@ -742,6 +751,8 @@ void stage2_unmap_vm(struct kvm *kvm)
+ 	kvm_for_each_memslot(memslot, bkt, slots)
+ 		stage2_unmap_memslot(kvm, memslot);
+ 
++	kvm_nested_s2_clear(kvm);
++
+ 	spin_unlock(&kvm->mmu_lock);
+ 	mmap_read_unlock(current->mm);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+@@ -814,12 +825,12 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ }
+ 
+ /**
+- * stage2_wp_range() - write protect stage2 memory region range
++ * kvm_stage2_wp_range() - write protect stage2 memory region range
+  * @mmu:        The KVM stage-2 MMU pointer
+  * @addr:	Start address of range
+  * @end:	End address of range
+  */
+-static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
++void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+ {
+ 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+ 	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_wrprotect);
+@@ -851,7 +862,8 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
+ 	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
+ 
+ 	spin_lock(&kvm->mmu_lock);
+-	stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_nested_s2_wp(kvm);
+ 	spin_unlock(&kvm->mmu_lock);
+ 	kvm_flush_remote_tlbs(kvm);
+ }
+@@ -875,7 +887,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
+ 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+ 
+-	stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
+ }
+ 
+ /*
+@@ -890,6 +902,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 		gfn_t gfn_offset, unsigned long mask)
+ {
+ 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
++	kvm_nested_s2_wp(kvm);
+ }
+ 
+ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+@@ -1529,6 +1542,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			     (range->end - range->start) << PAGE_SHIFT,
+ 			     range->may_block);
+ 
++	kvm_nested_s2_clear(kvm);
+ 	return false;
+ }
+ 
+@@ -1560,6 +1574,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			       PAGE_SIZE, __pfn_to_phys(pfn),
+ 			       KVM_PGTABLE_PROT_R, NULL);
+ 
++	kvm_nested_s2_clear(kvm);
+ 	return false;
+ }
+ 
+@@ -1578,6 +1593,11 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 					range->start << PAGE_SHIFT);
+ 	pte = __pte(kpte);
+ 	return pte_valid(pte) && pte_young(pte);
++
++	/*
++	 * TODO: Handle nested_mmu structures here using the reverse mapping in
++	 * a later version of patch series.
++	 */
+ }
+ 
+ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+@@ -1789,6 +1809,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 
+ 	spin_lock(&kvm->mmu_lock);
+ 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
++	kvm_nested_s2_clear(kvm);
+ 	spin_unlock(&kvm->mmu_lock);
+ }
+ 
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index a74ffb1d2064..b39af4d87787 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -505,6 +505,45 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
+ 	return kvm_inject_nested_sync(vcpu, esr_el2);
+ }
+ 
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_wp(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(kvm));
++	}
++}
++
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_clear(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
++	}
++}
++
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_flush(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(kvm));
++	}
++}
++
+ /*
+  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+-- 
+2.30.2
 
 _______________________________________________
 kvmarm mailing list
