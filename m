@@ -2,51 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3F4C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 16:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF53DC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 19:27:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 052504B1C7;
-	Fri, 28 Jan 2022 11:09:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2D4F4B128;
+	Fri, 28 Jan 2022 14:27:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oeliumTF0eEW; Fri, 28 Jan 2022 11:08:58 -0500 (EST)
+	with ESMTP id A8XAGd84XvyQ; Fri, 28 Jan 2022 14:27:38 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01CA84B1DB;
-	Fri, 28 Jan 2022 11:08:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C2F94B133;
+	Fri, 28 Jan 2022 14:27:38 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09F714B1CB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 11:08:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C67BF4B128
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 14:27:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id d1VPh-6CRSUH for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 11:08:54 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7B674B1C7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 11:08:54 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AEF7D113E;
- Fri, 28 Jan 2022 08:08:53 -0800 (PST)
-Received: from [10.57.13.224] (unknown [10.57.13.224])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EE1693F793;
- Fri, 28 Jan 2022 08:08:51 -0800 (PST)
-Message-ID: <65e1ae7d-44ae-a19f-e193-583590cfa0c3@arm.com>
-Date: Fri, 28 Jan 2022 16:08:50 +0000
+ with ESMTP id MSL49IxpvhgH for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 14:27:35 -0500 (EST)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com
+ [209.85.208.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 419CB4B125
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 14:27:35 -0500 (EST)
+Received: by mail-ed1-f43.google.com with SMTP id m11so11769679edi.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 11:27:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=rGi3kvUTWLMlTMsLo7Uiwt0VLKLoGeVNXRBhLXdxbYg=;
+ b=BAoRGYHWM81Tqy6/WtRLJ3S5YhFVToMahxbexRpQVvAPy5/dCikD2CLI8dv5yTq++X
+ Xh8B8zeMXAVtSz3qSb3/pGtVoHlr3A4Cu1iE+pkSif7kzmRQgG6xaMuAOowwhqcPT0aS
+ 1ltQQOfNhQ0TUZA6D+5JylaeODzyKbHjoacKbq/uycdasxcsvf1xyvPYFHAf9YZvWkaU
+ iFPmhOLuoVTMXejz4bvjiFOaz78K7mr212QySlMcTzNHNj9c16P1iPFRLtHY1UyVzb5c
+ GvQ3mYQ8nZHtd2XYUpZXEAANSNvuVroWdMzNan90UAOSy/2NDEiYUZXbReiWZH4Jo0qW
+ Cokg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=rGi3kvUTWLMlTMsLo7Uiwt0VLKLoGeVNXRBhLXdxbYg=;
+ b=6pbCN8Mq3f45Tfmy/g8bBPwFMU0u1MxeuUVM0OZ6Nt922654OwqPTjYwV2KMBiziVT
+ ORSJuy92yL/ANR5joK8csgigRujJmpQpPBqxw/0YecaysLCp+NWQREj9VWh2uuGKBYCe
+ zGpRT40BlL5W+7Jaa/eOmzo+dULJCG1K1+6DiZ9uIbITxDXj/mlgXPYeh43pV9GLwedL
+ Ux5oWxUGecGLpzbswSDjz/auk6M65UDw/duHoviPmQOzHVEQjwkBBP7e2is6qXLkS6uo
+ F9jZIuTs/USDjN/ZTNsDNPZudVV41U9EObkPrrsl8xzxG/Q7DBefslVEdXZC7etUyVoh
+ AAjA==
+X-Gm-Message-State: AOAM533SX7j6syZ88EehDLxR1VBreTKZcxiyLm51cazCo1WMYOS0HFXh
+ lnpUfvDDoaJPRNC8CB8o0xyEsAY3Pf/2UJ0kRlwMow==
+X-Google-Smtp-Source: ABdhPJwfca8B8rOhxbI8lwoElPyVVie0Abri7eCEDHDUIBYUY2U55XJiRS0ZLuT8wvnSUDk5afJL5gn1VvdwooEJ2uk=
+X-Received: by 2002:aa7:cd08:: with SMTP id b8mr9312715edw.265.1643398053850; 
+ Fri, 28 Jan 2022 11:27:33 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [RFC PATCH 03/12] arm64: mm: use a fixmap slot for user page
- table modifications
-Content-Language: en-GB
-To: Ard Biesheuvel <ardb@kernel.org>, linux-arm-kernel@lists.infradead.org
-References: <20220126173011.3476262-1-ardb@kernel.org>
- <20220126173011.3476262-4-ardb@kernel.org>
-From: Steven Price <steven.price@arm.com>
-In-Reply-To: <20220126173011.3476262-4-ardb@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, linux-hardening@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu
+References: <20220106042708.2869332-1-reijiw@google.com>
+ <20220106042708.2869332-3-reijiw@google.com>
+ <YfDaiUbSkpi9/5YY@google.com>
+ <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
+In-Reply-To: <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
+From: Ricardo Koller <ricarkol@google.com>
+Date: Fri, 28 Jan 2022 11:27:21 -0800
+Message-ID: <CAOHnOrwBoQncTPngxqWgD_mEDWT6AwcmB_QC=j-eUPY2fwHa2Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
+ value per guest
+To: Reiji Watanabe <reijiw@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,479 +87,240 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Ard,
+On Thu, Jan 27, 2022 at 10:24 PM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Hi Ricardo,
+>
+> On Tue, Jan 25, 2022 at 9:22 PM Ricardo Koller <ricarkol@google.com> wrote:
+> >
+> > On Wed, Jan 05, 2022 at 08:26:44PM -0800, Reiji Watanabe wrote:
+> > > Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> > > and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> > > Use the saved ones when ID registers are read by the guest or
+> > > userspace (via KVM_GET_ONE_REG).
+> > >
+> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h | 16 ++++++++
+> > >  arch/arm64/kvm/arm.c              |  1 +
+> > >  arch/arm64/kvm/sys_regs.c         | 62 ++++++++++++++++++++++---------
+> > >  3 files changed, 62 insertions(+), 17 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index 2a5f7f38006f..c789a0137f58 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -102,6 +102,17 @@ struct kvm_s2_mmu {
+> > >  struct kvm_arch_memory_slot {
+> > >  };
+> > >
+> > > +/*
+> > > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> > > + * where 0<=crm<8, 0<=op2<8.
+> >
+> > Is this observation based on this table?
+> >
+> > Table D12-2 System instruction encodings for non-Debug System register accesses
+> > in that case, it seems that the ID registers list might grow after
+> > crm=7, and as CRm has 4 bits, why not 16*8=128?
+>
+> This is basically for registers that are already reserved as RAZ in the
+> table (sys_reg_descs[] has entries for the reserved ones as well).
+> Registers with crm > 7 are not reserved yet, and that will be expanded
+> later as needed later.
+>
+>
+> >
+> > > + */
+> > > +#define KVM_ARM_ID_REG_MAX_NUM       64
+> > > +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> > > +#define is_id_reg(id)        \
+> > > +     (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&        \
+> > > +      sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 0 &&        \
+> > > +      sys_reg_CRm(id) < 8)
+> > > +
+> > >  struct kvm_arch {
+> > >       struct kvm_s2_mmu mmu;
+> > >
+> > > @@ -137,6 +148,9 @@ struct kvm_arch {
+> > >
+> > >       /* Memory Tagging Extension enabled for the guest */
+> > >       bool mte_enabled;
+> > > +
+> > > +     /* ID registers for the guest. */
+> > > +     u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
+> > >  };
+> > >
+> > >  struct kvm_vcpu_fault_info {
+> > > @@ -734,6 +748,8 @@ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+> > >  long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+> > >                               struct kvm_arm_copy_mte_tags *copy_tags);
+> > >
+> > > +void set_default_id_regs(struct kvm *kvm);
+> > > +
+> > >  /* Guest/host FPSIMD coordination helpers */
+> > >  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+> > >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu);
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index e4727dc771bf..5f497a0af254 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> > >       kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+> > >
+> > >       set_default_spectre(kvm);
+> > > +     set_default_id_regs(kvm);
+> > >
+> > >       return ret;
+> > >  out_free_stage2_pgd:
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index e3ec1a44f94d..80dc62f98ef0 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -33,6 +33,8 @@
+> > >
+> > >  #include "trace.h"
+> > >
+> > > +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+> > > +
+> > >  /*
+> > >   * All of this file is extremely similar to the ARM coproc.c, but the
+> > >   * types are different. My gut feeling is that it should be pretty
+> > > @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+> > >                         struct sys_reg_params *p,
+> > >                         const struct sys_reg_desc *r)
+> > >  {
+> > > -     u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > > +     u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
+> > >       u32 sr = reg_to_encoding(r);
+> > >
+> > >       if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
+> > > @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+> > >       return true;
+> > >  }
+> > >
+> > > -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> > > -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > > -             struct sys_reg_desc const *r, bool raz)
+> > > +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+> > >  {
+> > > -     u32 id = reg_to_encoding(r);
+> > > -     u64 val;
+> > > -
+> > > -     if (raz)
+> > > -             return 0;
+> > > -
+> > > -     val = read_sanitised_ftr_reg(id);
+> > > +     u64 val = vcpu->kvm->arch.id_regs[IDREG_IDX(id)];
+> > >
+> > >       switch (id) {
+> > >       case SYS_ID_AA64PFR0_EL1:
+> > > @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > >       return val;
+> > >  }
+> > >
+> > > +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> > > +                    struct sys_reg_desc const *r, bool raz)
+> > > +{
+> > > +     u32 id = reg_to_encoding(r);
+> > > +
+> > > +     return raz ? 0 : __read_id_reg(vcpu, id);
+> > > +}
+> > > +
+> > >  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+> > >                                 const struct sys_reg_desc *r)
+> > >  {
+> > > @@ -1223,9 +1225,8 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> > >  /*
+> > >   * cpufeature ID register user accessors
+> > >   *
+> > > - * For now, these registers are immutable for userspace, so no values
+> > > - * are stored, and for set_id_reg() we don't allow the effective value
+> > > - * to be changed.
+> > > + * For now, these registers are immutable for userspace, so for set_id_reg()
+> > > + * we don't allow the effective value to be changed.
+> > >   */
+> > >  static int __get_id_reg(const struct kvm_vcpu *vcpu,
+> > >                       const struct sys_reg_desc *rd, void __user *uaddr,
+> > > @@ -1237,7 +1238,7 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
+> > >       return reg_to_user(uaddr, &val, id);
+> > >  }
+> > >
+> > > -static int __set_id_reg(const struct kvm_vcpu *vcpu,
+> > > +static int __set_id_reg(struct kvm_vcpu *vcpu,
+> > >                       const struct sys_reg_desc *rd, void __user *uaddr,
+> > >                       bool raz)
+> > >  {
+> > > @@ -1837,8 +1838,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+> > >       if (p->is_write) {
+> > >               return ignore_write(vcpu, p);
+> > >       } else {
+> > > -             u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+> > > -             u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> > > +             u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
+> > > +             u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
+> > >               u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
+> > >
+> > >               p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
+> > > @@ -2850,3 +2851,30 @@ void kvm_sys_reg_table_init(void)
+> > >       /* Clear all higher bits. */
+> > >       cache_levels &= (1 << (i*3))-1;
+> > >  }
+> > > +
+> > > +/*
+> > > + * Set the guest's ID registers that are defined in sys_reg_descs[]
+> > > + * with ID_SANITISED() to the host's sanitized value.
+> > > + */
+> > > +void set_default_id_regs(struct kvm *kvm)
+> > > +{
+> > > +     int i;
+> > > +     u32 id;
+> > > +     const struct sys_reg_desc *rd;
+> > > +     u64 val;
+> > > +
+> > > +     for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
+> > > +             rd = &sys_reg_descs[i];
+> > > +             if (rd->access != access_id_reg)
+> > > +                     /* Not ID register, or hidden/reserved ID register */
+> > > +                     continue;
+> > > +
+> > > +             id = reg_to_encoding(rd);
+> > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
+> > > +                     /* Shouldn't happen */
+> > > +                     continue;
+> > > +
+> > > +             val = read_sanitised_ftr_reg(id);
+> >
+> > I'm a bit confused. Shouldn't the default+sanitized values already use
+> > arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
+>
+> I'm not sure if I understand your question.
+> arm64_ftr_bits_kvm is used for feature support checkings when
+> userspace tries to modify a value of ID registers.
+> With this patch, KVM just saves the sanitized values in the kvm's
+> buffer, but userspace is still not allowed to modify values of ID
+> registers yet.
+> I hope it answers your question.
 
-Interesting series - I attempted[1] something similar a few years ago,
-but only dealing with the page tables in the linear map.
+Based on the previous commit I was assuming that some registers, like
+id_aa64dfr0,
+would default to the overwritten values as the sanitized values. More
+specifically: if
+userspace doesn't modify any ID reg, shouldn't the defaults have the
+KVM overwritten
+values (arm64_ftr_bits_kvm)?
 
-At first glace the series looks like it should work, but this patch
-caught my eye because there's only a single fixmap slot for page table
-modifications. The upshot of which is you need the patch_pte_lock
-serialising multiple CPUs' access to the page tables. Which looks like
-it would hurt badly as the number of CPUs grows.
-
-Do you have any benchmarks of the performance? I've lost any I did at
-the time I previously looked at this idea but obviously thought it was
-important at the time.
-
-Thanks,
-
-Steve
-
-[1]
-https://lore.kernel.org/lkml/20200417152619.41680-1-steven.price@arm.com/
-
-On 26/01/2022 17:30, Ard Biesheuvel wrote:
-> To prepare for user and kernel page tables being remapped read-only in
-> the linear region, define a new fixmap slot and use it to apply all page
-> table descriptor updates that target page tables other than swapper.
-> 
-> Fortunately for us, the fixmap descriptors themselves are always
-> manipulated via their kernel mapping in .bss, so there is no special
-> exception required to avoid circular logic here.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  arch/arm64/Kconfig               |  11 +++
->  arch/arm64/include/asm/fixmap.h  |   1 +
->  arch/arm64/include/asm/pgalloc.h |  28 +++++-
->  arch/arm64/include/asm/pgtable.h |  79 +++++++++++++---
->  arch/arm64/mm/Makefile           |   2 +
->  arch/arm64/mm/fault.c            |   8 +-
->  arch/arm64/mm/ro_page_tables.c   | 100 ++++++++++++++++++++
->  7 files changed, 209 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 6978140edfa4..a3e98286b074 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -1311,6 +1311,17 @@ config RODATA_FULL_DEFAULT_ENABLED
->  	  This requires the linear region to be mapped down to pages,
->  	  which may adversely affect performance in some cases.
->  
-> +config ARM64_RO_PAGE_TABLES
-> +	bool "Remap page tables read-only in the kernel VA space"
-> +	select RODATA_FULL_DEFAULT_ENABLED
-> +	help
-> +	  Remap linear mappings of page table pages read-only as long as they
-> +	  are being used as such, and use a fixmap API to manipulate all page
-> +	  table descriptors, instead of manipulating them directly via their
-> +	  writable mappings in the direct map. This is intended as a debug
-> +	  and/or hardening feature, as it removes the ability for stray writes
-> +	  to be exploited to bypass permission restrictions.
-> +
->  config ARM64_SW_TTBR0_PAN
->  	bool "Emulate Privileged Access Never using TTBR0_EL1 switching"
->  	help
-> diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-> index 4335800201c9..71dfbe0452bb 100644
-> --- a/arch/arm64/include/asm/fixmap.h
-> +++ b/arch/arm64/include/asm/fixmap.h
-> @@ -50,6 +50,7 @@ enum fixed_addresses {
->  
->  	FIX_EARLYCON_MEM_BASE,
->  	FIX_TEXT_POKE0,
-> +	FIX_TEXT_POKE_PTE,
->  
->  #ifdef CONFIG_ACPI_APEI_GHES
->  	/* Used for GHES mapping from assorted contexts */
-> diff --git a/arch/arm64/include/asm/pgalloc.h b/arch/arm64/include/asm/pgalloc.h
-> index 237224484d0f..d54ac9f8d6c7 100644
-> --- a/arch/arm64/include/asm/pgalloc.h
-> +++ b/arch/arm64/include/asm/pgalloc.h
-> @@ -30,7 +30,11 @@ static inline void pud_populate(struct mm_struct *mm, pud_t *pudp, pmd_t *pmdp)
->  	pudval_t pudval = PUD_TYPE_TABLE;
->  
->  	pudval |= (mm == &init_mm) ? PUD_TABLE_UXN : PUD_TABLE_PXN;
-> -	__pud_populate(pudp, __pa(pmdp), pudval);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(mm, (pte_t *)pudp,
-> +			    __pte(__phys_to_pud_val(__pa(pmdp) | pudval)));
-> +	else
-> +		__pud_populate(pudp, __pa(pmdp), pudval);
->  }
->  #else
->  static inline void __pud_populate(pud_t *pudp, phys_addr_t pmdp, pudval_t prot)
-> @@ -51,7 +55,11 @@ static inline void p4d_populate(struct mm_struct *mm, p4d_t *p4dp, pud_t *pudp)
->  	p4dval_t p4dval = P4D_TYPE_TABLE;
->  
->  	p4dval |= (mm == &init_mm) ? P4D_TABLE_UXN : P4D_TABLE_PXN;
-> -	__p4d_populate(p4dp, __pa(pudp), p4dval);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(mm, (pte_t *)p4dp,
-> +			    __pte(__phys_to_p4d_val(__pa(pudp) | p4dval)));
-> +	else
-> +		__p4d_populate(p4dp, __pa(pudp), p4dval);
->  }
->  #else
->  static inline void __p4d_populate(p4d_t *p4dp, phys_addr_t pudp, p4dval_t prot)
-> @@ -76,15 +84,27 @@ static inline void __pmd_populate(pmd_t *pmdp, phys_addr_t ptep,
->  static inline void
->  pmd_populate_kernel(struct mm_struct *mm, pmd_t *pmdp, pte_t *ptep)
->  {
-> +	pmdval_t pmdval = PMD_TYPE_TABLE | PMD_TABLE_UXN;
-> +
->  	VM_BUG_ON(mm && mm != &init_mm);
-> -	__pmd_populate(pmdp, __pa(ptep), PMD_TYPE_TABLE | PMD_TABLE_UXN);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(mm, (pte_t *)pmdp,
-> +			    __pte(__phys_to_pmd_val(__pa(ptep) | pmdval)));
-> +	else
-> +		__pmd_populate(pmdp, __pa(ptep), pmdval);
->  }
->  
->  static inline void
->  pmd_populate(struct mm_struct *mm, pmd_t *pmdp, pgtable_t ptep)
->  {
-> +	pmdval_t pmdval = PMD_TYPE_TABLE | PMD_TABLE_PXN;
-> +
->  	VM_BUG_ON(mm == &init_mm);
-> -	__pmd_populate(pmdp, page_to_phys(ptep), PMD_TYPE_TABLE | PMD_TABLE_PXN);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(mm, (pte_t *)pmdp,
-> +			    __pte(__phys_to_pmd_val(page_to_phys(ptep) | pmdval)));
-> +	else
-> +		__pmd_populate(pmdp, page_to_phys(ptep), pmdval);
->  }
->  
->  #endif
-> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> index 8d3806c68687..a8daea6b4ac9 100644
-> --- a/arch/arm64/include/asm/pgtable.h
-> +++ b/arch/arm64/include/asm/pgtable.h
-> @@ -30,6 +30,7 @@
->  
->  #include <asm/cmpxchg.h>
->  #include <asm/fixmap.h>
-> +#include <linux/jump_label.h>
->  #include <linux/mmdebug.h>
->  #include <linux/mm_types.h>
->  #include <linux/sched.h>
-> @@ -37,6 +38,17 @@
->  int set_pgtable_ro(void *addr);
->  int set_pgtable_rw(void *addr);
->  
-> +DECLARE_STATIC_KEY_FALSE(ro_page_tables);
-> +
-> +static inline bool page_tables_are_ro(void)
-> +{
-> +	return IS_ENABLED(CONFIG_ARM64_RO_PAGE_TABLES) &&
-> +	       static_branch_unlikely(&ro_page_tables);
-> +}
-> +
-> +pte_t xchg_ro_pte(struct mm_struct *mm, pte_t *ptep, pte_t pte);
-> +pte_t cmpxchg_ro_pte(struct mm_struct *mm, pte_t *ptep, pte_t old, pte_t new);
-> +
->  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
->  #define __HAVE_ARCH_FLUSH_PMD_TLB_RANGE
->  
-> @@ -89,7 +101,7 @@ static inline pteval_t __phys_to_pte_val(phys_addr_t phys)
->  	__pte(__phys_to_pte_val((phys_addr_t)(pfn) << PAGE_SHIFT) | pgprot_val(prot))
->  
->  #define pte_none(pte)		(!pte_val(pte))
-> -#define pte_clear(mm,addr,ptep)	set_pte(ptep, __pte(0))
-> +#define pte_clear(mm,addr,ptep)	set_pte_at(mm, addr, ptep, __pte(0))
->  #define pte_page(pte)		(pfn_to_page(pte_pfn(pte)))
->  
->  /*
-> @@ -257,7 +269,10 @@ static inline pte_t pte_mkdevmap(pte_t pte)
->  
->  static inline void set_pte(pte_t *ptep, pte_t pte)
->  {
-> -	WRITE_ONCE(*ptep, pte);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(&init_mm, ptep, pte);
-> +	else
-> +		WRITE_ONCE(*ptep, pte);
->  
->  	/*
->  	 * Only if the new pte is valid and kernel, otherwise TLB maintenance
-> @@ -343,7 +358,10 @@ static inline void set_pte_at(struct mm_struct *mm, unsigned long addr,
->  
->  	__check_racy_pte_update(mm, ptep, pte);
->  
-> -	set_pte(ptep, pte);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(mm, ptep, pte);
-> +	else
-> +		set_pte(ptep, pte);
->  }
->  
->  /*
-> @@ -579,7 +597,10 @@ static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
->  	}
->  #endif /* __PAGETABLE_PMD_FOLDED */
->  
-> -	WRITE_ONCE(*pmdp, pmd);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(&init_mm, (pte_t *)pmdp, pmd_pte(pmd));
-> +	else
-> +		WRITE_ONCE(*pmdp, pmd);
->  
->  	if (pmd_valid(pmd)) {
->  		dsb(ishst);
-> @@ -589,7 +610,10 @@ static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
->  
->  static inline void pmd_clear(pmd_t *pmdp)
->  {
-> -	set_pmd(pmdp, __pmd(0));
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(NULL, (pte_t *)pmdp, __pte(0));
-> +	else
-> +		set_pmd(pmdp, __pmd(0));
->  }
->  
->  static inline phys_addr_t pmd_page_paddr(pmd_t pmd)
-> @@ -640,7 +664,10 @@ static inline void set_pud(pud_t *pudp, pud_t pud)
->  	}
->  #endif /* __PAGETABLE_PUD_FOLDED */
->  
-> -	WRITE_ONCE(*pudp, pud);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(&init_mm, (pte_t *)pudp, pud_pte(pud));
-> +	else
-> +		WRITE_ONCE(*pudp, pud);
->  
->  	if (pud_valid(pud)) {
->  		dsb(ishst);
-> @@ -650,7 +677,10 @@ static inline void set_pud(pud_t *pudp, pud_t pud)
->  
->  static inline void pud_clear(pud_t *pudp)
->  {
-> -	set_pud(pudp, __pud(0));
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(NULL, (pte_t *)pudp, __pte(0));
-> +	else
-> +		set_pud(pudp, __pud(0));
->  }
->  
->  static inline phys_addr_t pud_page_paddr(pud_t pud)
-> @@ -704,14 +734,20 @@ static inline void set_p4d(p4d_t *p4dp, p4d_t p4d)
->  		return;
->  	}
->  
-> -	WRITE_ONCE(*p4dp, p4d);
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(&init_mm, (pte_t *)p4dp, p4d_pte(p4d));
-> +	else
-> +		WRITE_ONCE(*p4dp, p4d);
->  	dsb(ishst);
->  	isb();
->  }
->  
->  static inline void p4d_clear(p4d_t *p4dp)
->  {
-> -	set_p4d(p4dp, __p4d(0));
-> +	if (page_tables_are_ro())
-> +		xchg_ro_pte(NULL, (pte_t *)p4dp, __pte(0));
-> +	else
-> +		set_p4d(p4dp, __p4d(0));
->  }
->  
->  static inline phys_addr_t p4d_page_paddr(p4d_t p4d)
-> @@ -806,7 +842,7 @@ static inline int pgd_devmap(pgd_t pgd)
->   * Atomic pte/pmd modifications.
->   */
->  #define __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG
-> -static inline int __ptep_test_and_clear_young(pte_t *ptep)
-> +static inline int __ptep_test_and_clear_young(struct mm_struct *mm, pte_t *ptep)
->  {
->  	pte_t old_pte, pte;
->  
-> @@ -814,8 +850,13 @@ static inline int __ptep_test_and_clear_young(pte_t *ptep)
->  	do {
->  		old_pte = pte;
->  		pte = pte_mkold(pte);
-> -		pte_val(pte) = cmpxchg_relaxed(&pte_val(*ptep),
-> -					       pte_val(old_pte), pte_val(pte));
-> +
-> +		if (page_tables_are_ro())
-> +			pte = cmpxchg_ro_pte(mm, ptep, old_pte, pte);
-> +		else
-> +			pte_val(pte) = cmpxchg_relaxed(&pte_val(*ptep),
-> +						       pte_val(old_pte),
-> +						       pte_val(pte));
->  	} while (pte_val(pte) != pte_val(old_pte));
->  
->  	return pte_young(pte);
-> @@ -825,7 +866,7 @@ static inline int ptep_test_and_clear_young(struct vm_area_struct *vma,
->  					    unsigned long address,
->  					    pte_t *ptep)
->  {
-> -	return __ptep_test_and_clear_young(ptep);
-> +	return __ptep_test_and_clear_young(vma->vm_mm, ptep);
->  }
->  
->  #define __HAVE_ARCH_PTEP_CLEAR_YOUNG_FLUSH
-> @@ -863,6 +904,8 @@ static inline int pmdp_test_and_clear_young(struct vm_area_struct *vma,
->  static inline pte_t ptep_get_and_clear(struct mm_struct *mm,
->  				       unsigned long address, pte_t *ptep)
->  {
-> +	if (page_tables_are_ro())
-> +		return xchg_ro_pte(mm, ptep, __pte(0));
->  	return __pte(xchg_relaxed(&pte_val(*ptep), 0));
->  }
->  
-> @@ -888,8 +931,12 @@ static inline void ptep_set_wrprotect(struct mm_struct *mm, unsigned long addres
->  	do {
->  		old_pte = pte;
->  		pte = pte_wrprotect(pte);
-> -		pte_val(pte) = cmpxchg_relaxed(&pte_val(*ptep),
-> -					       pte_val(old_pte), pte_val(pte));
-> +		if (page_tables_are_ro())
-> +			pte = cmpxchg_ro_pte(mm, ptep, old_pte, pte);
-> +		else
-> +			pte_val(pte) = cmpxchg_relaxed(&pte_val(*ptep),
-> +						       pte_val(old_pte),
-> +						       pte_val(pte));
->  	} while (pte_val(pte) != pte_val(old_pte));
->  }
->  
-> @@ -905,6 +952,8 @@ static inline void pmdp_set_wrprotect(struct mm_struct *mm,
->  static inline pmd_t pmdp_establish(struct vm_area_struct *vma,
->  		unsigned long address, pmd_t *pmdp, pmd_t pmd)
->  {
-> +	if (page_tables_are_ro())
-> +		return pte_pmd(xchg_ro_pte(vma->vm_mm, (pte_t *)pmdp, pmd_pte(pmd)));
->  	return __pmd(xchg_relaxed(&pmd_val(*pmdp), pmd_val(pmd)));
->  }
->  #endif
-> diff --git a/arch/arm64/mm/Makefile b/arch/arm64/mm/Makefile
-> index ff1e800ba7a1..7750cafd969a 100644
-> --- a/arch/arm64/mm/Makefile
-> +++ b/arch/arm64/mm/Makefile
-> @@ -14,3 +14,5 @@ KASAN_SANITIZE_physaddr.o	+= n
->  
->  obj-$(CONFIG_KASAN)		+= kasan_init.o
->  KASAN_SANITIZE_kasan_init.o	:= n
-> +
-> +obj-$(CONFIG_ARM64_RO_PAGE_TABLES) += ro_page_tables.o
-> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-> index 77341b160aca..5a5055c3e1c2 100644
-> --- a/arch/arm64/mm/fault.c
-> +++ b/arch/arm64/mm/fault.c
-> @@ -220,7 +220,13 @@ int ptep_set_access_flags(struct vm_area_struct *vma,
->  		pteval ^= PTE_RDONLY;
->  		pteval |= pte_val(entry);
->  		pteval ^= PTE_RDONLY;
-> -		pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval, pteval);
-> +		if (page_tables_are_ro())
-> +			pteval = pte_val(cmpxchg_ro_pte(vma->vm_mm, ptep,
-> +							__pte(old_pteval),
-> +							__pte(pteval)));
-> +		else
-> +			pteval = cmpxchg_relaxed(&pte_val(*ptep), old_pteval,
-> +						 pteval);
->  	} while (pteval != old_pteval);
->  
->  	/* Invalidate a stale read-only entry */
-> diff --git a/arch/arm64/mm/ro_page_tables.c b/arch/arm64/mm/ro_page_tables.c
-> new file mode 100644
-> index 000000000000..f497adfd774d
-> --- /dev/null
-> +++ b/arch/arm64/mm/ro_page_tables.c
-> @@ -0,0 +1,100 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2021 - Google Inc
-> + * Author: Ard Biesheuvel <ardb@google.com>
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <linux/init.h>
-> +#include <linux/memory.h>
-> +#include <linux/mm.h>
-> +#include <linux/sizes.h>
-> +
-> +#include <asm/fixmap.h>
-> +#include <asm/kernel-pgtable.h>
-> +#include <asm/mmu_context.h>
-> +#include <asm/pgalloc.h>
-> +#include <asm/tlbflush.h>
-> +#include <asm/sections.h>
-> +
-> +static DEFINE_RAW_SPINLOCK(patch_pte_lock);
-> +
-> +DEFINE_STATIC_KEY_FALSE(ro_page_tables);
-> +
-> +static bool __initdata ro_page_tables_enabled = true;
-> +
-> +static int __init parse_ro_page_tables(char *arg)
-> +{
-> +	return strtobool(arg, &ro_page_tables_enabled);
-> +}
-> +early_param("ro_page_tables", parse_ro_page_tables);
-> +
-> +static bool in_kernel_text_or_rodata(phys_addr_t pa)
-> +{
-> +	/*
-> +	 * This is a minimal check to ensure that the r/o page table patching
-> +	 * API is not being abused to make changes to the kernel text. This
-> +	 * should ideally cover module and BPF text/rodata as well, but that
-> +	 * is less straight-forward and hence more costly.
-> +	 */
-> +	return pa >= __pa_symbol(_stext) && pa < __pa_symbol(__init_begin);
-> +}
-> +
-> +pte_t xchg_ro_pte(struct mm_struct *mm, pte_t *ptep, pte_t pte)
-> +{
-> +	unsigned long flags;
-> +	u64 pte_pa;
-> +	pte_t ret;
-> +	pte_t *p;
-> +
-> +	/* can we use __pa() on ptep? */
-> +	if (!virt_addr_valid(ptep)) {
-> +		/* only linear aliases are remapped r/o anyway */
-> +		pte_val(ret) = xchg_relaxed(&pte_val(*ptep), pte_val(pte));
-> +		return ret;
-> +	}
-> +
-> +	pte_pa = __pa(ptep);
-> +	BUG_ON(in_kernel_text_or_rodata(pte_pa));
-> +
-> +	raw_spin_lock_irqsave(&patch_pte_lock, flags);
-> +	p = (pte_t *)set_fixmap_offset(FIX_TEXT_POKE_PTE, pte_pa);
-> +	pte_val(ret) = xchg_relaxed(&pte_val(*p), pte_val(pte));
-> +	clear_fixmap(FIX_TEXT_POKE_PTE);
-> +	raw_spin_unlock_irqrestore(&patch_pte_lock, flags);
-> +	return ret;
-> +}
-> +
-> +pte_t cmpxchg_ro_pte(struct mm_struct *mm, pte_t *ptep, pte_t old, pte_t new)
-> +{
-> +	unsigned long flags;
-> +	u64 pte_pa;
-> +	pte_t ret;
-> +	pte_t *p;
-> +
-> +	BUG_ON(!virt_addr_valid(ptep));
-> +
-> +	pte_pa = __pa(ptep);
-> +	BUG_ON(in_kernel_text_or_rodata(pte_pa));
-> +
-> +	raw_spin_lock_irqsave(&patch_pte_lock, flags);
-> +	p = (pte_t *)set_fixmap_offset(FIX_TEXT_POKE_PTE, pte_pa);
-> +	pte_val(ret) = cmpxchg_relaxed(&pte_val(*p), pte_val(old), pte_val(new));
-> +	clear_fixmap(FIX_TEXT_POKE_PTE);
-> +	raw_spin_unlock_irqrestore(&patch_pte_lock, flags);
-> +	return ret;
-> +}
-> +
-> +static int __init ro_page_tables_init(void)
-> +{
-> +	if (ro_page_tables_enabled) {
-> +		if (!rodata_full) {
-> +			pr_err("Failed to enable R/O page table protection, rodata=full is not enabled\n");
-> +		} else {
-> +			pr_err("Enabling R/O page table protection\n");
-> +			static_branch_enable(&ro_page_tables);
-> +		}
-> +	}
-> +	return 0;
-> +}
-> +early_initcall(ro_page_tables_init);
-
+>
+> Thanks,
+> Reiji
+>
+> >
+> > > +             kvm->arch.id_regs[IDREG_IDX(id)] = val;
+> > > +     }
+> > > +}
+> > > --
+> > > 2.34.1.448.ga2b2bfdf31-goog
+> > >
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
