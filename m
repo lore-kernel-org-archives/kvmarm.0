@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E179CC433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB94C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D83A4B1F1;
-	Fri, 28 Jan 2022 07:50:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A1074B1EC;
+	Fri, 28 Jan 2022 07:50:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Be2sZ5TCbgGh; Fri, 28 Jan 2022 07:50:46 -0500 (EST)
+	with ESMTP id WPnwuu2qyPQz; Fri, 28 Jan 2022 07:50:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2234E4B1D8;
-	Fri, 28 Jan 2022 07:50:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49EB24B1D3;
+	Fri, 28 Jan 2022 07:50:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 484434B08E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 32AED4B1E1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rgmAygRofFQq for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:50:42 -0500 (EST)
+ with ESMTP id 6hZ4n3a7G9Fg for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:50:45 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C831049F20
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEE8E4B11E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:44 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 481C061C40;
- Fri, 28 Jan 2022 12:50:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F8B4C340E0;
- Fri, 28 Jan 2022 12:50:41 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 6452761C55;
+ Fri, 28 Jan 2022 12:50:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEEE6C340E0;
+ Fri, 28 Jan 2022 12:50:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643374241;
- bh=m8ddQU1Y6AidryS52FbUiU+XjXer1JKBiTma5xKnjsQ=;
+ s=k20201202; t=1643374243;
+ bh=DODeF9o8Sl2vkui25obN2Ct4mXtkcYS1+9H7aC1HxUc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ptybCxyY+9jkOIVAMrBsY+6gs+xn1GPQcy7wFmus87QI7t7bjxPjaEeKCdXAvzvNh
- UXQ2eKkMNxu67ivcUbAL3NEnsSa3WrdZP5dc73d2hlyvAy5hMBg2cgprSSI/PwVTki
- Sco4d2brd3qCNs0k1eAZBYO3r6ONZFy8fyjqK1p9V9UMAuXbM0b0x/nag6KhFrNo+E
- 2SZogw2u/IKfmahNE8VGnRhjJF/K9uthm1/v8H2Xh55jqJYtile5UB3CE8Bu4CLKhj
- c/lAux+upIK2jefgGof7i2nK7D+N3VTzGotQicirnZmeAr38sGROrrlo3E8eRulXJb
- 1QKi+NL4NI3Mg==
+ b=fCTWqJCfwI202ExJ0XgYw6eqmW9biV0iPa4FPbQId4aKlzLcLWEvoOBbpuH1Brn+r
+ t+7hyp4BUSNS7dQkITGMXmjArsRl5Mw7espg7ORu8hPdqqwPObzv0mGJcv6jMBA+j/
+ t2s0dvo5qAWWyhO+j3NmMYeQeaboZGMqyzL4CJu1Avsx1j2otxglzu4R3DhXjMKg3B
+ 4JQxXQyaB784u/3rGJiIMC8/EAFhdKjBC9fxCfdEyNEdNR/l8Q3rDam+sY95Er5uBN
+ 3nM6lWU7U42FvYwgGDq/xIUnV2f+jjOrtTzfzHW6PNwvFipInmlv8ik5XP2aFhc165
+ MvQ3CThhCnDgw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQEE-003njR-R3; Fri, 28 Jan 2022 12:19:46 +0000
+ id 1nDQEY-003njR-Uf; Fri, 28 Jan 2022 12:20:07 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 32/64] KVM: arm64: nv: Filter out unsupported features from
- ID regs
-Date: Fri, 28 Jan 2022 12:18:40 +0000
-Message-Id: <20220128121912.509006-33-maz@kernel.org>
+Subject: [PATCH v6 56/64] KVM: arm64: nv: Add include containing the VNCR_EL2
+ offsets
+Date: Fri, 28 Jan 2022 12:19:04 +0000
+Message-Id: <20220128121912.509006-57-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -92,236 +92,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-As there is a number of features that we either can't support,
-or don't want to support right away with NV, let's add some
-basic filtering so that we don't advertize silly things to the
-EL2 guest.
+VNCR_EL2 points to a page containing a number of system registers
+accessed by a guest hypervisor when ARMv8.4-NV is enabled.
 
-Whilst we are at it, advertize ARMv8.4-TTL as well as ARMv8.5-GTG.
+Let's document the offsets in that page, as we are going to use
+this layout.
 
-Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |   6 ++
- arch/arm64/kvm/nested.c             | 157 ++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c           |   4 +-
- arch/arm64/kvm/sys_regs.h           |   2 +
- 4 files changed, 168 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/vncr_mapping.h | 74 +++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+ create mode 100644 arch/arm64/include/asm/vncr_mapping.h
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 047ca700163b..7d398510fd9d 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -72,4 +72,10 @@ extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
- extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
- extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
- 
-+struct sys_reg_params;
-+struct sys_reg_desc;
-+
-+void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r);
-+
- #endif /* __ARM64_KVM_NESTED_H */
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 5e1104f8e765..254152cd791e 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -8,6 +8,10 @@
- #include <linux/kvm_host.h>
- 
- #include <asm/kvm_emulate.h>
-+#include <asm/kvm_nested.h>
-+#include <asm/sysreg.h>
-+
-+#include "sys_regs.h"
- 
- /*
-  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-@@ -26,3 +30,156 @@ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
- 
- 	return -EINVAL;
- }
-+
+diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
+new file mode 100644
+index 000000000000..c0a2acd5045c
+--- /dev/null
++++ b/arch/arm64/include/asm/vncr_mapping.h
+@@ -0,0 +1,74 @@
++/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * Our emulated CPU doesn't support all the possible features. For the
-+ * sake of simplicity (and probably mental sanity), wipe out a number
-+ * of feature bits we don't intend to support for the time being.
-+ * This list should get updated as new features get added to the NV
-+ * support, and new extension to the architecture.
++ * System register offsets in the VNCR page
++ * All offsets are *byte* displacements!
 + */
-+void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
-+{
-+	u32 id = sys_reg((u32)r->Op0, (u32)r->Op1,
-+			 (u32)r->CRn, (u32)r->CRm, (u32)r->Op2);
-+	u64 val, tmp;
 +
-+	if (!vcpu_has_nv(v))
-+		return;
++#ifndef __ARM64_VNCR_MAPPING_H__
++#define __ARM64_VNCR_MAPPING_H__
 +
-+	val = p->regval;
++#define VNCR_VTTBR_EL2          0x020
++#define VNCR_VTCR_EL2           0x040
++#define VNCR_VMPIDR_EL2         0x050
++#define VNCR_CNTVOFF_EL2        0x060
++#define VNCR_HCR_EL2            0x078
++#define VNCR_HSTR_EL2           0x080
++#define VNCR_VPIDR_EL2          0x088
++#define VNCR_TPIDR_EL2          0x090
++#define VNCR_VNCR_EL2           0x0B0
++#define VNCR_CPACR_EL1          0x100
++#define VNCR_CONTEXTIDR_EL1     0x108
++#define VNCR_SCTLR_EL1          0x110
++#define VNCR_ACTLR_EL1          0x118
++#define VNCR_TCR_EL1            0x120
++#define VNCR_AFSR0_EL1          0x128
++#define VNCR_AFSR1_EL1          0x130
++#define VNCR_ESR_EL1            0x138
++#define VNCR_MAIR_EL1           0x140
++#define VNCR_AMAIR_EL1          0x148
++#define VNCR_MDSCR_EL1          0x158
++#define VNCR_SPSR_EL1           0x160
++#define VNCR_CNTV_CVAL_EL0      0x168
++#define VNCR_CNTV_CTL_EL0       0x170
++#define VNCR_CNTP_CVAL_EL0      0x178
++#define VNCR_CNTP_CTL_EL0       0x180
++#define VNCR_SCXTNUM_EL1        0x188
++#define VNCR_TFSR_EL1		0x190
++#define VNCR_ZCR_EL1            0x1E0
++#define VNCR_TTBR0_EL1          0x200
++#define VNCR_TTBR1_EL1          0x210
++#define VNCR_FAR_EL1            0x220
++#define VNCR_ELR_EL1            0x230
++#define VNCR_SP_EL1             0x240
++#define VNCR_VBAR_EL1           0x250
++#define VNCR_ICH_LR0_EL2        0x400
++//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
++#define VNCR_ICH_AP0R0_EL2      0x480
++//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
++#define VNCR_ICH_AP1R0_EL2      0x4A0
++//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
++#define VNCR_ICH_HCR_EL2        0x4C0
++#define VNCR_ICH_VMCR_EL2       0x4C8
++#define VNCR_VDISR_EL2          0x500
++#define VNCR_PMBLIMITR_EL1      0x800
++#define VNCR_PMBPTR_EL1         0x810
++#define VNCR_PMBSR_EL1          0x820
++#define VNCR_PMSCR_EL1          0x828
++#define VNCR_PMSEVFR_EL1        0x830
++#define VNCR_PMSICR_EL1         0x838
++#define VNCR_PMSIRR_EL1         0x840
++#define VNCR_PMSLATFR_EL1       0x848
++#define VNCR_TRFCR_EL1          0x880
++#define VNCR_MPAM1_EL1          0x900
++#define VNCR_MPAMHCR_EL2        0x930
++#define VNCR_MPAMVPMV_EL2       0x938
++#define VNCR_MPAMVPM0_EL2       0x940
++#define VNCR_MPAMVPM1_EL2       0x948
++#define VNCR_MPAMVPM2_EL2       0x950
++#define VNCR_MPAMVPM3_EL2       0x958
++#define VNCR_MPAMVPM4_EL2       0x960
++#define VNCR_MPAMVPM5_EL2       0x968
++#define VNCR_MPAMVPM6_EL2       0x970
++#define VNCR_MPAMVPM7_EL2       0x978
 +
-+	switch (id) {
-+	case SYS_ID_AA64ISAR0_EL1:
-+		/* Support everything but O.S. and Range TLBIs */
-+		val &= ~(FEATURE(ID_AA64ISAR0_TLB)	|
-+			 GENMASK_ULL(27, 24)		|
-+			 GENMASK_ULL(3, 0));
-+		break;
-+
-+	case SYS_ID_AA64ISAR1_EL1:
-+		/* Support everything but PtrAuth and Spec Invalidation */
-+		val &= ~(GENMASK_ULL(63, 56)		|
-+			 FEATURE(ID_AA64ISAR1_SPECRES)	|
-+			 FEATURE(ID_AA64ISAR1_GPI)	|
-+			 FEATURE(ID_AA64ISAR1_GPA)	|
-+			 FEATURE(ID_AA64ISAR1_API)	|
-+			 FEATURE(ID_AA64ISAR1_APA));
-+		break;
-+
-+	case SYS_ID_AA64PFR0_EL1:
-+		/* No AMU, MPAM, S-EL2, RAS or SVE */
-+		val &= ~(GENMASK_ULL(55, 52)		|
-+			 FEATURE(ID_AA64PFR0_AMU)	|
-+			 FEATURE(ID_AA64PFR0_MPAM)	|
-+			 FEATURE(ID_AA64PFR0_SEL2)	|
-+			 FEATURE(ID_AA64PFR0_RAS)	|
-+			 FEATURE(ID_AA64PFR0_SVE)	|
-+			 FEATURE(ID_AA64PFR0_EL3)	|
-+			 FEATURE(ID_AA64PFR0_EL2));
-+		/* 64bit EL2/EL3 only */
-+		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL2), 0b0001);
-+		val |= FIELD_PREP(FEATURE(ID_AA64PFR0_EL3), 0b0001);
-+		break;
-+
-+	case SYS_ID_AA64PFR1_EL1:
-+		/* Only support SSBS */
-+		val &= FEATURE(ID_AA64PFR1_SSBS);
-+		break;
-+
-+	case SYS_ID_AA64MMFR0_EL1:
-+		/* Hide ECV, FGT, ExS, Secure Memory */
-+		val &= ~(GENMASK_ULL(63, 43)			|
-+			 FEATURE(ID_AA64MMFR0_TGRAN4_2)		|
-+			 FEATURE(ID_AA64MMFR0_TGRAN16_2)	|
-+			 FEATURE(ID_AA64MMFR0_TGRAN64_2)	|
-+			 FEATURE(ID_AA64MMFR0_SNSMEM));
-+
-+		/* Disallow unsupported S2 page sizes */
-+		switch (PAGE_SIZE) {
-+		case SZ_64K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0001);
-+			fallthrough;
-+		case SZ_16K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0001);
-+			fallthrough;
-+		case SZ_4K:
-+			/* Support everything */
-+			break;
-+		}
-+		/*
-+		 * Since we can't support a guest S2 page size smaller than
-+		 * the host's own page size (due to KVM only populating its
-+		 * own S2 using the kernel's page size), advertise the
-+		 * limitation using FEAT_GTG.
-+		 */
-+		switch (PAGE_SIZE) {
-+		case SZ_4K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN4_2), 0b0010);
-+			fallthrough;
-+		case SZ_16K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN16_2), 0b0010);
-+			fallthrough;
-+		case SZ_64K:
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_TGRAN64_2), 0b0010);
-+			break;
-+		}
-+		/* Cap PARange to 40bits */
-+		tmp = FIELD_GET(FEATURE(ID_AA64MMFR0_PARANGE), val);
-+		if (tmp > 0b0010) {
-+			val &= ~FEATURE(ID_AA64MMFR0_PARANGE);
-+			val |= FIELD_PREP(FEATURE(ID_AA64MMFR0_PARANGE), 0b0010);
-+		}
-+		break;
-+
-+	case SYS_ID_AA64MMFR1_EL1:
-+		val &= (FEATURE(ID_AA64MMFR1_PAN)	|
-+			FEATURE(ID_AA64MMFR1_LOR)	|
-+			FEATURE(ID_AA64MMFR1_HPD)	|
-+			FEATURE(ID_AA64MMFR1_VHE)	|
-+			FEATURE(ID_AA64MMFR1_VMIDBITS));
-+		break;
-+
-+	case SYS_ID_AA64MMFR2_EL1:
-+		val &= ~(FEATURE(ID_AA64MMFR2_EVT)	|
-+			 FEATURE(ID_AA64MMFR2_BBM)	|
-+			 FEATURE(ID_AA64MMFR2_TTL)	|
-+			 GENMASK_ULL(47, 44)		|
-+			 FEATURE(ID_AA64MMFR2_ST)	|
-+			 FEATURE(ID_AA64MMFR2_CCIDX)	|
-+			 FEATURE(ID_AA64MMFR2_LVA));
-+
-+		/* Force TTL support */
-+		val |= FIELD_PREP(FEATURE(ID_AA64MMFR2_TTL), 0b0001);
-+		break;
-+
-+	case SYS_ID_AA64DFR0_EL1:
-+		/* Only limited support for PMU, Debug, BPs and WPs */
-+		val &= (FEATURE(ID_AA64DFR0_PMSVER)	|
-+			FEATURE(ID_AA64DFR0_WRPS)	|
-+			FEATURE(ID_AA64DFR0_BRPS)	|
-+			FEATURE(ID_AA64DFR0_DEBUGVER));
-+
-+		/* Cap PMU to ARMv8.1 */
-+		tmp = FIELD_GET(FEATURE(ID_AA64DFR0_PMUVER), val);
-+		if (tmp > 0b0100) {
-+			val &= ~FEATURE(ID_AA64DFR0_PMUVER);
-+			val |= FIELD_PREP(FEATURE(ID_AA64DFR0_PMUVER), 0b0100);
-+		}
-+		/* Cap Debug to ARMv8.1 */
-+		tmp = FIELD_GET(FEATURE(ID_AA64DFR0_DEBUGVER), val);
-+		if (tmp > 0b0111) {
-+			val &= ~FEATURE(ID_AA64DFR0_DEBUGVER);
-+			val |= FIELD_PREP(FEATURE(ID_AA64DFR0_DEBUGVER), 0b0111);
-+		}
-+		break;
-+
-+	default:
-+		/* Unknown register, just wipe it clean */
-+		val = 0;
-+		break;
-+	}
-+
-+	p->regval = val;
-+}
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 3e1f37c507a8..ebcdf2714b73 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1394,8 +1394,10 @@ static bool access_id_reg(struct kvm_vcpu *vcpu,
- 			  const struct sys_reg_desc *r)
- {
- 	bool raz = sysreg_visible_as_raz(vcpu, r);
-+	bool ret = __access_id_reg(vcpu, p, r, raz);
- 
--	return __access_id_reg(vcpu, p, r, raz);
-+	access_nested_id_reg(vcpu, p, r);
-+	return ret;
- }
- 
- static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index 850629f083a3..b82683224250 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -211,4 +211,6 @@ const struct sys_reg_desc *find_reg_by_id(u64 id,
- 	CRn(sys_reg_CRn(reg)), CRm(sys_reg_CRm(reg)),	\
- 	Op2(sys_reg_Op2(reg))
- 
-+#define FEATURE(x)	(GENMASK_ULL(x##_SHIFT + 3, x##_SHIFT))
-+
- #endif /* __ARM64_KVM_SYS_REGS_LOCAL_H__ */
++#endif /* __ARM64_VNCR_MAPPING_H__ */
 -- 
 2.30.2
 
