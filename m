@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6D6C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AC7C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B9F34B1B6;
-	Fri, 28 Jan 2022 07:50:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82FE64045D;
+	Fri, 28 Jan 2022 07:50:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id igfh+Akj2uRR; Fri, 28 Jan 2022 07:50:18 -0500 (EST)
+	with ESMTP id gwC9rC8+PCnR; Fri, 28 Jan 2022 07:50:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0F814B11E;
-	Fri, 28 Jan 2022 07:50:18 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC8B54B17B;
+	Fri, 28 Jan 2022 07:50:19 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37FBD4B104
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C214B156
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:18 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vh6zDqhhK75Z for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:50:15 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81BA94B11E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:15 -0500 (EST)
+ with ESMTP id tbp+XycO13ry for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:50:17 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 584D74B0FC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:17 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 7A90BB8259E;
- Fri, 28 Jan 2022 12:50:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2530CC340E6;
- Fri, 28 Jan 2022 12:50:13 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id CCC7461B47;
+ Fri, 28 Jan 2022 12:50:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43DF4C340E0;
+ Fri, 28 Jan 2022 12:50:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643374213;
- bh=teS7KN3kkjrB7NqmXo/HCiCLdeFHtuZcX4fT4zxZGOQ=;
+ s=k20201202; t=1643374216;
+ bh=sas9AHjJj7kBXyWG3/TfULlZF4Cx7y0CsuXuVX3Jpek=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=OtNHkH7WdcEy8F+9tJFwUC1vIcG/tjwK6hVrVzDQzxfnEVy1lT2kSf54JZTULZ198
- 95JSCIism++qA/dbj7BfXolOQODvS4H+y9DqrsLqezB6C1us7Tb8PPAy4Dy9QX3tQq
- rDxA/Dhdg5FdvtwetXzpAOsQDbJj9qe3di9YYkZKBtaXeq51iVp/jNXgFHVAbXKhsr
- amCKCVhBWoluK5ZdcaXkwZGyy+GGrNYMjUiezxX05ENMihu32XQi0ON+9qel8JkVM/
- H8UNVRiB8qr7pJ7b3zV6XfONwQlYCciANQdGyYbhRBOv6syIw+XF4RK3Tw1t7FAdSF
- CvEr7EqfQtIwQ==
+ b=ht/kgywrLd0ji9sB8HIHl3Pv+P0bljPRpR5fmfDwvWlOsDQrtMu/+h2GBx7MBb1lt
+ 1OSP4s/30lA3ZDiCUgYkCs/TGUvDKxUu9JDKllDNXCIs70i8Vsft63t2xwoXfh1xQj
+ h97BYyvXcCcD8ig/JLRXmKWq4ALe+PUWI1OnHoRHgQnABjDibeFEnkzVZN1Fm7MXW1
+ f7IKxpeZLiveEo3vDGPPqjnFb2rFLgfzLGtPWVyDX8G92G/4gAYy1J4M3qXoPKhQM/
+ 4VQVAeuiDWbEGAu+/wltikCaomkcll01IDZ2MKj0VY0myx3lxeeEs0geUZE/JW5pEg
+ vu3N0OowsegLQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQEd-003njR-00; Fri, 28 Jan 2022 12:20:11 +0000
+ id 1nDQEU-003njR-Q0; Fri, 28 Jan 2022 12:20:03 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 64/64] KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
-Date: Fri, 28 Jan 2022 12:19:12 +0000
-Message-Id: <20220128121912.509006-65-maz@kernel.org>
+Subject: [PATCH v6 50/64] KVM: arm64: nv: Implement maintenance interrupt
+ forwarding
+Date: Fri, 28 Jan 2022 12:18:58 +0000
+Message-Id: <20220128121912.509006-51-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -91,155 +92,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Due to the way ARMv8.4-NV suppresses traps when accessing EL2
-system registers, we can't track when the guest changes its
-HCR_EL2.TGE setting. This means we always trap EL1 TLBIs,
-even if they don't affect any guest.
-
-This obviously has a huge impact on performance, as we handle
-TLBI traps as a normal exit, and a normal VHE host issues
-thousands of TLBIs when booting (and quite a few when running
-userspace).
-
-A cheap way to reduce the overhead is to handle the limited
-case of {E2H,TGE}=={1,1} as a guest fixup, as we already have
-the right mmu configuration in place. Just execute the decoded
-instruction right away and return to the guest.
+When we take a maintenance interrupt, we need to decide whether
+it is generated on an action from the guest, or if it is something
+that needs to be forwarded to the guest hypervisor.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 43 ++++++++++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/vhe/tlb.c    |  6 +++--
- arch/arm64/kvm/sys_regs.c       | 25 ++++++-------------
- 3 files changed, 54 insertions(+), 20 deletions(-)
+ arch/arm64/kvm/vgic/vgic-init.c      | 30 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 25 +++++++++++++++++++----
+ 2 files changed, 51 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index f469bf51b4be..686b37579d3b 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -161,6 +161,47 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- 	__deactivate_traps_common(vcpu);
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index fc00304fe7d8..6485b7935155 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -6,10 +6,12 @@
+ #include <linux/uaccess.h>
+ #include <linux/interrupt.h>
+ #include <linux/cpu.h>
++#include <linux/irq.h>
+ #include <linux/kvm_host.h>
+ #include <kvm/arm_vgic.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/kvm_nested.h>
+ #include "vgic.h"
+ 
+ /*
+@@ -222,6 +224,16 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
+ 	if (!irqchip_in_kernel(vcpu->kvm))
+ 		return 0;
+ 
++	if (vcpu_has_nv(vcpu)) {
++		/* FIXME: remove this hack */
++		if (vcpu->kvm->arch.vgic.maint_irq == 0)
++			vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
++		ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq,
++					 vcpu);
++		if (ret)
++			return ret;
++	}
++
+ 	/*
+ 	 * If we are creating a VCPU with a GICv3 we must also register the
+ 	 * KVM io device for the redistributor that belongs to this VCPU.
+@@ -475,12 +487,23 @@ static int vgic_init_cpu_dying(unsigned int cpu)
+ 
+ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+ {
++	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
++
+ 	/*
+ 	 * We cannot rely on the vgic maintenance interrupt to be
+ 	 * delivered synchronously. This means we can only use it to
+ 	 * exit the VM, and we perform the handling of EOIed
+ 	 * interrupts on the exit path (see vgic_fold_lr_state).
+ 	 */
++
++	/* If not nested, deactivate */
++	if (!vcpu || !vgic_state_is_nested(vcpu)) {
++		irq_set_irqchip_state(irq, IRQCHIP_STATE_ACTIVE, false);
++		return IRQ_HANDLED;
++	}
++
++	/* Assume nested from now */
++	vgic_v3_handle_nested_maint_irq(vcpu);
+ 	return IRQ_HANDLED;
  }
  
-+static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	u32 instr;
-+	u64 val;
-+
-+	/*
-+	 * Ideally, we would never trap on EL1 TLB invalidations when the
-+	 * guest's HCR_EL2.{E2H,TGE} == {1,1}. But "thanks" to ARMv8.4, we
-+	 * don't trap writes to HCR_EL2, meaning that we can't track
-+	 * changes to the virtual TGE bit. So we leave HCR_EL2.TTLB set on
-+	 * the host. Oopsie...
-+	 *
-+	 * In order to speed-up EL1 TLBIs from the vEL2 guest when TGE is
-+	 * set, try and handle these invalidation as quickly as possible,
-+	 * without fully exiting (unless this needs forwarding).
-+	 */
-+	if (!vcpu_has_nv2(vcpu) ||
-+	    !vcpu_is_el2(vcpu) ||
-+	    (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE))
-+		return false;
-+
-+	instr = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
-+	if (sys_reg_Op0(instr) != TLBI_Op0 ||
-+	    sys_reg_Op1(instr) != TLBI_Op1_EL1)
-+		return false;
-+
-+	val = vcpu_get_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu));
-+	__kvm_tlb_el1_instr(NULL, val, instr);
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
-+
-+static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
-+		return true;
-+
-+	return kvm_hyp_handle_sysreg(vcpu, exit_code);
-+}
-+
- static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-@@ -209,7 +250,7 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
--	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
-+	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
- 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index c4389db4cc22..beb162468c0b 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -201,7 +201,8 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ishst);
+@@ -579,6 +602,13 @@ int kvm_vgic_hyp_init(void)
+ 		return ret;
+ 	}
  
- 	/* Switch to requested VMID */
--	__tlb_switch_to_guest(mmu, &cxt);
-+	if (mmu)
-+		__tlb_switch_to_guest(mmu, &cxt);
++	ret = irq_set_vcpu_affinity(kvm_vgic_global_state.maint_irq,
++				    kvm_get_running_vcpus());
++	if (ret) {
++		kvm_err("Error setting vcpu affinity\n");
++		goto out_free_irq;
++	}
++
+ 	ret = cpuhp_setup_state(CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
+ 				"kvm/arm/vgic:starting",
+ 				vgic_init_cpu_starting, vgic_init_cpu_dying);
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index e88c75e79010..4a35c2be7984 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -175,10 +175,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq;
++	unsigned long flags;
+ 
+ 	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
+ 	vgic_v3_create_shadow_lr(vcpu);
+ 	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
++
++	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
++	raw_spin_lock_irqsave(&irq->irq_lock, flags);
++	if (irq->line_level || irq->active)
++		irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
++				      IRQCHIP_STATE_ACTIVE, true);
++	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
++	vgic_put_irq(vcpu->kvm, irq);
+ }
+ 
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+@@ -193,11 +203,14 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
+ 	 */
+ 	vgic_v3_fixup_shadow_lr_state(vcpu);
+ 	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
++	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
++			      IRQCHIP_STATE_ACTIVE, false);
+ }
+ 
+ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	bool state;
  
  	/*
- 	 * Execute the same instruction as the guest hypervisor did,
-@@ -240,5 +241,6 @@ void __kvm_tlb_el1_instr(struct kvm_s2_mmu *mmu, u64 val, u64 sys_encoding)
- 	dsb(ish);
- 	isb();
- 
--	__tlb_switch_to_host(&cxt);
-+	if (mmu)
-+		__tlb_switch_to_host(&cxt);
+ 	 * If we exit a nested VM with a pending maintenance interrupt from the
+@@ -205,8 +218,12 @@ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
+ 	 * can re-sync the appropriate LRs and sample level triggered interrupts
+ 	 * again.
+ 	 */
+-	if (vgic_state_is_nested(vcpu) &&
+-	    (cpu_if->vgic_hcr & ICH_HCR_EN) &&
+-	    vgic_v3_get_misr(vcpu))
+-		kvm_inject_nested_irq(vcpu);
++	if (!vgic_state_is_nested(vcpu))
++		return;
++
++	state  = cpu_if->vgic_hcr & ICH_HCR_EN;
++	state &= vgic_v3_get_misr(vcpu);
++
++	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++			    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
  }
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 351bcb429f25..5023ae566f7f 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2839,6 +2839,8 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
- 	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	struct kvm_s2_mmu *mmu;
- 
- 	if (vcpu_has_nv(vcpu) && forward_traps(vcpu, HCR_TTLB))
- 		return false;
-@@ -2860,24 +2862,13 @@ static bool handle_tlbi_el1(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 
- 	mutex_lock(&vcpu->kvm->lock);
- 
--	if ((__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
--		u64 virtual_vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
--		struct kvm_s2_mmu *mmu;
--
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
--		if (mmu)
--			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, HCR_VM);
-+	if (mmu)
-+		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
- 
--		mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
--		if (mmu)
--			__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
--	} else {
--		/*
--		 * ARMv8.4-NV allows the guest to change TGE behind
--		 * our back, so we always trap EL1 TLBIs from vEL2...
--		 */
--		__kvm_tlb_el1_instr(&vcpu->kvm->arch.mmu, p->regval, sys_encoding);
--	}
-+	mmu = lookup_s2_mmu(vcpu->kvm, virtual_vttbr, 0);
-+	if (mmu)
-+		__kvm_tlb_el1_instr(mmu, p->regval, sys_encoding);
- 
- 	mutex_unlock(&vcpu->kvm->lock);
- 
 -- 
 2.30.2
 
