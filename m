@@ -2,63 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10579C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:19:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69DC5C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:19:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5DF84B12C;
-	Fri, 28 Jan 2022 07:19:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1586E4B091;
+	Fri, 28 Jan 2022 07:19:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AZiMbOpTXHOb; Fri, 28 Jan 2022 07:19:39 -0500 (EST)
+	with ESMTP id 7YQ3a9ev-0Ma; Fri, 28 Jan 2022 07:19:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D0E24B0EF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5555149E49;
 	Fri, 28 Jan 2022 07:19:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59C2C49EC4
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CEB6E49F54
  for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:19:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SsRIq0jrX+tk for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id lz5NU-zKq0Ml for <kvmarm@lists.cs.columbia.edu>;
  Fri, 28 Jan 2022 07:19:29 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2ECD49F1C
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9E6549F0E
  for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:19:28 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id B921861B14;
- Fri, 28 Jan 2022 12:19:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FF2FC340E0;
- Fri, 28 Jan 2022 12:19:28 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 427ADB82568;
+ Fri, 28 Jan 2022 12:19:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6349C340E6;
+ Fri, 28 Jan 2022 12:19:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643372368;
- bh=NFVmjlUxLmGGeWlyBOoMaSxfLvXZVmT03LLwLgGhYSM=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Q9bLeHhQ9FG9elowBCM91R/wtdmtRJy4T8djKBdiid+o3YhkdagdaacsCq7pei/Kj
- r05Q8er67rC1JqdZoboUo+6o6XrG/rSVi4i/IXKdx7qd0fmHkEshAx8SgrbiYqBhGW
- px/ChBIp450KdVUnNBpeP1w6p9c8KXsCiipVUGFn7Y83JekI2KHicmZXRme8T4OqD7
- TmJk/LyF+CzqK6VhsOHIL1JhXGMmBJEG8FgMWIHEOklOLIzPGCRb2LcQdNI7K/myqr
- k1qYjP+qSo42J7SI8f88O1Bv/GCye/ePaqs1YkdRJxnOrpmDx1c7LSog4BSrHweEOI
- KRtluNEtwrSIw==
+ s=k20201202; t=1643372366;
+ bh=hsG3ROQDWq32IhFhvaa0G4T355RjVp+ePhiZfPfoVUk=;
+ h=From:To:Cc:Subject:Date:From;
+ b=oJusbHPx++gfx9M9z0bDuy92tZsjSEfsnefJvRDGFR3dk7jHsPiWYvv51Q6/MErj8
+ 8C2pIUgKUEvg4xQDzcsJfZjzskNH8Jm/fA+iGtAui9SNJTI3Pn0TI75HgbwwiYkcKL
+ ZGld2oIYcsDq9alvbq9200ArvqD/Iyx4rPqn3lPQ3WLSjEN9ytRNTswOz/DS/2HX8s
+ AaCmx38qxuRPH4RSRj0MfHynlfJSlz9FTqmfLFDEKu9ZyQiboVlWNO14v9OJ1GpqG+
+ dODf/O9Sd+VzLXjsKA7RavjJBzPFYeXfgyZQfudww8Z0a9+ACUow/MqHvJcXZYDwBf
+ zT+GpNWhjVpcQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQDu-003njR-HA; Fri, 28 Jan 2022 12:19:26 +0000
+ id 1nDQDr-003njR-M5; Fri, 28 Jan 2022 12:19:23 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 07/64] KVM: arm64: nv: Handle HCR_EL2.NV system register
- traps
-Date: Fri, 28 Jan 2022 12:18:15 +0000
-Message-Id: <20220128121912.509006-8-maz@kernel.org>
+Subject: [PATCH v6 00/64] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
+Date: Fri, 28 Jan 2022 12:18:08 +0000
+Message-Id: <20220128121912.509006-1-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
-References: <20220128121912.509006-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
@@ -92,279 +89,187 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Jintack Lim <jintack.lim@linaro.org>
+Here the first drop of the KVM/arm64 NV support code for 2022. Nothing
+to worry about, it certainly isn't going to be the last!
 
-ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
-this bit is set, accessing EL2 registers in EL1 traps to EL2. In
-addition, executing the following instructions in EL1 will trap to EL2:
-tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
-instructions that trap to EL2 with the NV bit were undef at EL1 prior to
-ARM v8.3. The only instruction that was not undef is eret.
+A number of changes since [1]:
 
-This patch sets up a handler for EL2 registers and SP_EL1 register
-accesses at EL1. The host hypervisor keeps those register values in
-memory, and will emulate their behavior.
+- The exposure of the EL2 sysregs to userspace is now gated by NV
+  being enabled, as you'd expect. Which means we shouldn't break live
+  migration anymore (yay!).
 
-This patch doesn't set the NV bit yet. It will be set in a later patch
-once nested virtualization support is completed.
+- We now correctly detect and handle an Illegal Exception Return from
+  vEL2. Don't try this at home, kids!
 
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-[maz: EL2_REG() macros]
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/sysreg.h | 41 +++++++++++++-
- arch/arm64/kvm/sys_regs.c       | 99 +++++++++++++++++++++++++++++++--
- 2 files changed, 134 insertions(+), 6 deletions(-)
+- Non-nested exception injection when executing at EL0 has been fixed.
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 898bee0004ae..61c990e5591a 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -532,10 +532,26 @@
- 
- #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
- 
-+#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
-+#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
-+
- #define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
-+#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
-+#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
-+#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
-+#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
-+#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
- #define SYS_HFGRTR_EL2			sys_reg(3, 4, 1, 1, 4)
- #define SYS_HFGWTR_EL2			sys_reg(3, 4, 1, 1, 5)
- #define SYS_HFGITR_EL2			sys_reg(3, 4, 1, 1, 6)
-+#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
-+
-+#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
-+#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
-+#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
-+#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
-+#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
-+
- #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
- #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
- #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
-@@ -544,14 +560,26 @@
- #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
- #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
- #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
-+#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
- #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
-+#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
-+#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
- #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
- #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
- #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
- #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
- #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
- 
--#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
-+#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
-+#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
-+
-+#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
-+#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
-+
-+#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
-+#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
-+#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
-+#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
- #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
- #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
- #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
-@@ -593,15 +621,24 @@
- #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
- #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
- 
-+#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
-+#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
-+
-+#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
-+#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
-+
- /* VHE encodings for architectural EL0/1 system registers */
- #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
- #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
- #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
-+
- #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
- #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
- #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
-+
- #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
- #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
-+
- #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
- #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
- #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
-@@ -619,6 +656,8 @@
- #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
- #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
- 
-+#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
-+
- /* Common SCTLR_ELx flags. */
- #define SCTLR_ELx_DSSBS	(BIT(44))
- #define SCTLR_ELx_ATA	(BIT(43))
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4dc2fba316ff..06ca98458815 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -24,6 +24,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_hyp.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include <asm/perf_event.h>
- #include <asm/sysreg.h>
- 
-@@ -105,6 +106,18 @@ static u32 get_ccsidr(u32 csselr)
- 	return ccsidr;
- }
- 
-+static bool access_rw(struct kvm_vcpu *vcpu,
-+		      struct sys_reg_params *p,
-+		      const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-+	else
-+		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-+
-+	return true;
-+}
-+
- /*
-  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-  */
-@@ -263,6 +276,14 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
- }
- 
-+static bool trap_undef(struct kvm_vcpu *vcpu,
-+		       struct sys_reg_params *p,
-+		       const struct sys_reg_desc *r)
-+{
-+	kvm_inject_undefined(vcpu);
-+	return false;
-+}
-+
- /*
-  * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
-  * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-@@ -342,12 +363,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
- 			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *r)
- {
--	if (p->is_write) {
--		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
-+	access_rw(vcpu, p, r);
-+	if (p->is_write)
- 		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
--	} else {
--		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
--	}
- 
- 	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
- 
-@@ -1378,6 +1396,24 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- 	.visibility = mte_visibility,		\
- }
- 
-+static unsigned int el2_visibility(const struct kvm_vcpu *vcpu,
-+				   const struct sys_reg_desc *rd)
-+{
-+	if (vcpu_has_nv(vcpu))
-+		return 0;
-+
-+	return REG_HIDDEN;
-+}
-+
-+#define EL2_REG(name, acc, rst, v) {		\
-+	SYS_DESC(SYS_##name),			\
-+	.access = acc,				\
-+	.reset = rst,				\
-+	.reg = name,				\
-+	.visibility = el2_visibility,		\
-+	.val = v,				\
-+}
-+
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define ID_SANITISED(name) {			\
- 	SYS_DESC(SYS_##name),			\
-@@ -1411,6 +1447,18 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- 	.set_user = set_raz_id_reg,		\
- }
- 
-+static bool access_sp_el1(struct kvm_vcpu *vcpu,
-+			  struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		__vcpu_sys_reg(vcpu, SP_EL1) = p->regval;
-+	else
-+		p->regval = __vcpu_sys_reg(vcpu, SP_EL1);
-+
-+	return true;
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -1825,9 +1873,50 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
- 	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
- 
-+	EL2_REG(VPIDR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(VMPIDR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
-+	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HCR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_EL2_DEFAULT ),
-+	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
-+
-+	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
-+	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
-+	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
-+	EL2_REG(VTTBR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
-+
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
-+	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
-+	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
-+
- 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
-+	EL2_REG(AFSR0_EL2, access_rw, reset_val, 0),
-+	EL2_REG(AFSR1_EL2, access_rw, reset_val, 0),
-+	EL2_REG(ESR_EL2, access_rw, reset_val, 0),
- 	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
-+
-+	EL2_REG(FAR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
-+
-+	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
-+
-+	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(RVBAR_EL2, access_rw, reset_val, 0),
-+	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
-+
-+	EL2_REG(CONTEXTIDR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(TPIDR_EL2, access_rw, reset_val, 0),
-+
-+	EL2_REG(CNTVOFF_EL2, access_rw, reset_val, 0),
-+	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
-+
-+	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
- 
- static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+- We forbid NV+SVE for now. This is a change in ABI, and I hope to
+  remove this requirement at some point. I've pushed out a kvmtool
+  change that enforces this [2], and QEMU will need similar surgery
+  for now.
+
+- nested_virt_in_use() is now renamed to vcpu_has_nv() (resp
+  vcpu_has_nv2() for the v8.4 support).
+
+- A bunch of small nits being tidied up, thanks to our eagle eyed
+  reviewers.
+
+Many thanks to Alexandru, Chase, Ganapatrao and Russell for spending a
+lot of time reviewing this and actively spotting issues. There is a
+pending issue that Ganapatrao mentioned when running L0 with 4kB and
+L1 with 64kB, resulting in no forward progress. I haven't investigated
+this yet, but I strongly suspect that something is amiss in the S2 PTW
+at the point where we combine the L2 IPA with the L1 IPA.
+
+As usual, blame me for any bug, and nobody else. It has been tested on
+my usual zoo, and nothing caught fire. Which means nothing, of course.
+Obviously, it isn't feature complete, and it is quite easy to write a
+guest that will not behave as intended. The current goal is to make
+sure that non-NV KVM is unaffected by the NV stuff.
+
+It is massively painful to run on the FVP, but if you have a Neoverse
+V1 or N2 system (or anything else with ARMv8.4-NV) that is collecting
+dust, I have the right stuff to keep it busy.
+
+	M.
+
+[1] https://lore.kernel.org/r/20211129200150.351436-1-maz@kernel.org
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-5.16
+
+Andre Przywara (1):
+  KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
+
+Christoffer Dall (15):
+  KVM: arm64: nv: Introduce nested virtualization VCPU feature
+  KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
+  KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
+  KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
+  KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
+  KVM: arm64: nv: Handle trapped ERET from virtual EL2
+  KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
+  KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
+  KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2
+    changes
+  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+  KVM: arm64: nv: arch_timer: Support hyp timer emulation
+  KVM: arm64: nv: vgic: Emulate the HW bit in software
+  KVM: arm64: nv: Add nested GICv3 tracepoints
+  KVM: arm64: nv: Sync nested timer state with ARMv8.4
+
+Jintack Lim (18):
+  arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+  KVM: arm64: nv: Handle HCR_EL2.NV system register traps
+  KVM: arm64: nv: Support virtual EL2 exceptions
+  KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
+  KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and VBAR_EL1 from virtual EL2
+  KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
+  KVM: arm64: nv: Handle PSCI call via smc from the guest
+  KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+  KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
+  KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
+  KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
+  KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
+  KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
+  KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
+  KVM: arm64: nv: Set a handler for the system instruction traps
+  KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
+  KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
+  KVM: arm64: nv: Nested GICv3 Support
+
+Marc Zyngier (30):
+  KVM: arm64: nv: Add EL2 system registers to vcpu context
+  KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+  KVM: arm64: nv: Handle virtual EL2 registers in
+    vcpu_read/write_sys_reg()
+  KVM: arm64: nv: Handle SPSR_EL2 specially
+  KVM: arm64: nv: Handle HCR_EL2.E2H specially
+  KVM: arm64: nv: Save/Restore vEL2 sysregs
+  KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
+  KVM: arm64: nv: Forward debug traps to the nested guest
+  KVM: arm64: nv: Filter out unsupported features from ID regs
+  KVM: arm64: nv: Hide RAS from nested guests
+  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+  KVM: arm64: nv: Handle shadow stage 2 page faults
+  KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
+  KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
+  KVM: arm64: nv: Add handling of EL2-specific timer registers
+  KVM: arm64: nv: Load timer before the GIC
+  KVM: arm64: nv: Don't load the GICv4 context on entering a nested
+    guest
+  KVM: arm64: nv: Implement maintenance interrupt forwarding
+  KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+  KVM: arm64: nv: Add handling of ARMv8.4-TTL TLB invalidation
+  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+    information
+  KVM: arm64: nv: Tag shadow S2 entries with nested level
+  KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
+  KVM: arm64: nv: Map VNCR-capable registers to a separate page
+  KVM: arm64: nv: Move nested vgic state into the sysreg file
+  KVM: arm64: Add ARMv8.4 Enhanced Nested Virt cpufeature
+  KVM: arm64: nv: Allocate VNCR page when required
+  KVM: arm64: nv: Enable ARMv8.4-NV support
+  KVM: arm64: nv: Fast-track 'InHost' exception returns
+  KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
+
+ .../admin-guide/kernel-parameters.txt         |    7 +-
+ .../virt/kvm/devices/arm-vgic-v3.rst          |   12 +-
+ arch/arm64/include/asm/esr.h                  |    5 +
+ arch/arm64/include/asm/kvm_arm.h              |   27 +-
+ arch/arm64/include/asm/kvm_asm.h              |    4 +
+ arch/arm64/include/asm/kvm_emulate.h          |  143 +-
+ arch/arm64/include/asm/kvm_host.h             |  185 ++-
+ arch/arm64/include/asm/kvm_hyp.h              |    2 +
+ arch/arm64/include/asm/kvm_mmu.h              |   18 +-
+ arch/arm64/include/asm/kvm_nested.h           |  156 ++
+ arch/arm64/include/asm/sysreg.h               |  101 +-
+ arch/arm64/include/asm/vncr_mapping.h         |   74 +
+ arch/arm64/include/uapi/asm/kvm.h             |    2 +
+ arch/arm64/kernel/cpufeature.c                |   34 +
+ arch/arm64/kvm/Makefile                       |    4 +-
+ arch/arm64/kvm/arch_timer.c                   |  202 ++-
+ arch/arm64/kvm/arm.c                          |   42 +-
+ arch/arm64/kvm/at.c                           |  219 +++
+ arch/arm64/kvm/emulate-nested.c               |  211 +++
+ arch/arm64/kvm/guest.c                        |    6 +
+ arch/arm64/kvm/handle_exit.c                  |   81 +-
+ arch/arm64/kvm/hyp/exception.c                |   49 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h       |   12 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   24 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c              |    2 +-
+ arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |    2 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c               |    2 +-
+ arch/arm64/kvm/hyp/vhe/switch.c               |  181 ++-
+ arch/arm64/kvm/hyp/vhe/sysreg-sr.c            |  125 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c                  |   83 ++
+ arch/arm64/kvm/inject_fault.c                 |   68 +-
+ arch/arm64/kvm/mmu.c                          |  206 ++-
+ arch/arm64/kvm/nested.c                       |  915 ++++++++++++
+ arch/arm64/kvm/reset.c                        |   30 +-
+ arch/arm64/kvm/sys_regs.c                     | 1252 ++++++++++++++++-
+ arch/arm64/kvm/sys_regs.h                     |   14 +-
+ arch/arm64/kvm/trace_arm.h                    |   65 +-
+ arch/arm64/kvm/vgic/vgic-init.c               |   30 +
+ arch/arm64/kvm/vgic/vgic-kvm-device.c         |   22 +
+ arch/arm64/kvm/vgic/vgic-nested-trace.h       |  137 ++
+ arch/arm64/kvm/vgic/vgic-v3-nested.c          |  242 ++++
+ arch/arm64/kvm/vgic/vgic-v3.c                 |   39 +-
+ arch/arm64/kvm/vgic/vgic.c                    |   44 +
+ arch/arm64/kvm/vgic/vgic.h                    |   10 +
+ arch/arm64/tools/cpucaps                      |    2 +
+ include/kvm/arm_arch_timer.h                  |    9 +-
+ include/kvm/arm_vgic.h                        |   16 +
+ include/uapi/linux/kvm.h                      |    1 +
+ tools/arch/arm/include/uapi/asm/kvm.h         |    1 +
+ 49 files changed, 4947 insertions(+), 171 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_nested.h
+ create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+ create mode 100644 arch/arm64/kvm/at.c
+ create mode 100644 arch/arm64/kvm/emulate-nested.c
+ create mode 100644 arch/arm64/kvm/nested.c
+ create mode 100644 arch/arm64/kvm/vgic/vgic-nested-trace.h
+ create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
+
 -- 
 2.30.2
 
