@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C68C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6B4C433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3C464B12E;
-	Fri, 28 Jan 2022 07:50:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0ACE14B1AB;
+	Fri, 28 Jan 2022 07:50:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 29SzzpcKdDbO; Fri, 28 Jan 2022 07:50:11 -0500 (EST)
+	with ESMTP id P54TxfkBRWDC; Fri, 28 Jan 2022 07:50:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 628734B190;
-	Fri, 28 Jan 2022 07:50:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 914064B0F4;
+	Fri, 28 Jan 2022 07:50:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BC2034A1D9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C52904B0F4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2u85QFKUTiVw for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:50:09 -0500 (EST)
+ with ESMTP id ENisZq8hOudL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:50:13 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA8824045D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F9224B13D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:11 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 511A661C4E;
- Fri, 28 Jan 2022 12:50:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B40B5C340E0;
- Fri, 28 Jan 2022 12:50:07 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 049BF61B47;
+ Fri, 28 Jan 2022 12:50:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C740C340E8;
+ Fri, 28 Jan 2022 12:50:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643374207;
- bh=jvIOSYAOKtITrfyXIWsZlZUISa8XZG5VUJ+kf8xroDU=;
+ s=k20201202; t=1643374210;
+ bh=vO817KRkOHpxEweeX6aW6Hl3DEqAP5UvbYZYN4bIdi8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=pptZatiADdRRGOM79+RlAvGRaEmyAjt5DbHGefVrQzin9usaG0mE+VawU/45/773s
- 90d4FJVHq87GAHVWcwcOW+Ai6KuofaW5wnNCMWwHl/jR9TXUmTsTrqoFXbhUrLzCdi
- UwhFCPGUIjluFmwJdCxXdn2Zfp8KlI+4tXSoyKQsSnCU84oDY6mRkJr04hny+7YUI4
- x839FqIqIrdE6pxT5jGjK6j9zCS+c5uIXl6dtupVhCAwRuIKsoUwe24oOWSujHLpbT
- BTtOBFAcUj237+f8YzTwae9k7UAF+My6gE3dEnL3UjfeE4i1BqNQ+N2601KiCVLdiN
- zS25knAwQDKZA==
+ b=HPfIBcu1EiPJCxeXwgj0B4GxzzgAsaq1+w0NpQXs13yusT1bf3NXJ2BVtF7Jyt4gu
+ zXbNf5X7u22Lar7qXnAfWrfB3wYgob3l42zFzhz414K6jxoNHfMPTHWpaEJutWE7MG
+ CcNXrT7IScVoYtD+aZ0tL37Q0zyJ2iwnGmzpGJZ3jVur0cciaMNcYUh7615zmNHBsT
+ 3JVgIpzUqiE7B2+QNUpkOLHaUrYXpHO850mrlmFK8V159dVYP/QL7aQ8QXa3XgOyWh
+ r7oKT8gqFwxT6iOD9XX89A/hvT3mbjiiuPrRvX2HqprikibLifz7seI4FNuzb1/Dex
+ QqexlsTBWnodQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQEb-003njR-Ec; Fri, 28 Jan 2022 12:20:09 +0000
+ id 1nDQEW-003njR-TD; Fri, 28 Jan 2022 12:20:05 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 60/64] KVM: arm64: nv: Sync nested timer state with ARMv8.4
-Date: Fri, 28 Jan 2022 12:19:08 +0000
-Message-Id: <20220128121912.509006-61-maz@kernel.org>
+Subject: [PATCH v6 53/64] KVM: arm64: nv: Add handling of ARMv8.4-TTL TLB
+ invalidation
+Date: Fri, 28 Jan 2022 12:19:01 +0000
+Message-Id: <20220128121912.509006-54-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -91,95 +92,211 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+Support guest-provided information information to find out about
+the range of required invalidation.
 
-Emulating the ARMv8.4-NV timers is a bit odd, as the timers can
-be reconfigured behind our back without the hypervisor even
-noticing. In the VHE case, that's an actual regression in the
-architecture...
-
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/arch_timer.c  | 37 ++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/arm.c         |  3 +++
- include/kvm/arm_arch_timer.h |  1 +
- 3 files changed, 41 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h |  1 +
+ arch/arm64/kvm/nested.c             | 57 +++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 78 ++++++++++++++++++-----------
+ 3 files changed, 108 insertions(+), 28 deletions(-)
 
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index 5e4f93605d36..2371796b1ab5 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -785,6 +785,43 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
- 	set_cntvoff(0);
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 3eef5f60c76d..8bfbeca2f4cd 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -128,6 +128,7 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+ extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+ extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
++unsigned int ttl_to_size(u8 ttl);
+ 
+ struct sys_reg_params;
+ struct sys_reg_desc;
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 39c9b1033f02..7e4ff98c4e95 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -351,6 +351,63 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	return ret;
  }
  
-+void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
++
++unsigned int ttl_to_size(u8 ttl)
 +{
-+	if (!is_hyp_ctxt(vcpu))
-+		return;
++	int level = ttl & 3;
++	int gran = (ttl >> 2) & 3;
++	unsigned int max_size = 0;
 +
-+	/*
-+	 * Guest hypervisors using ARMv8.4 enhanced nested virt support have
-+	 * their EL1 timer register accesses redirected to the VNCR page.
-+	 */
-+	if (!vcpu_el2_e2h_is_set(vcpu)) {
-+		/*
-+		 * For a non-VHE guest hypervisor, we update the hardware
-+		 * timer registers with the latest value written by the guest
-+		 * to the VNCR page and let the hardware take care of the
-+		 * rest.
-+		 */
-+		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
-+		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
-+		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
-+		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
-+	} else {
-+		/*
-+		 * For a VHE guest hypervisor, the emulated state (which
-+		 * is stored in the VNCR page) could have been updated behind
-+		 * our back, and we must reset the emulation of the timers.
-+		 */
-+
-+		struct timer_map map;
-+		get_timer_map(vcpu, &map);
-+
-+		soft_timer_cancel(&map.emul_vtimer->hrtimer);
-+		soft_timer_cancel(&map.emul_ptimer->hrtimer);
-+		timer_emulate(map.emul_vtimer);
-+		timer_emulate(map.emul_ptimer);
++	switch (gran) {
++	case TLBI_TTL_TG_4K:
++		switch (level) {
++		case 0:
++			break;
++		case 1:
++			max_size = SZ_1G;
++			break;
++		case 2:
++			max_size = SZ_2M;
++			break;
++		case 3:
++			max_size = SZ_4K;
++			break;
++		}
++		break;
++	case TLBI_TTL_TG_16K:
++		switch (level) {
++		case 0:
++		case 1:
++			break;
++		case 2:
++			max_size = SZ_32M;
++			break;
++		case 3:
++			max_size = SZ_16K;
++			break;
++		}
++		break;
++	case TLBI_TTL_TG_64K:
++		switch (level) {
++		case 0:
++		case 1:
++			/* No 52bit IPA support */
++			break;
++		case 2:
++			max_size = SZ_512M;
++			break;
++		case 3:
++			max_size = SZ_64K;
++			break;
++		}
++		break;
++	default:			/* No size information */
++		break;
 +	}
++
++	return max_size;
 +}
 +
- /*
-  * With a userspace irqchip we have to check if the guest de-asserted the
-  * timer and if so, unmask the timer irq signal on the host interrupt
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ac7d89c1e987..4c47a66eac8c 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -936,6 +936,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		if (static_branch_unlikely(&userspace_irqchip_in_use))
- 			kvm_timer_sync_user(vcpu);
+ /* Must be called with kvm->lock held */
+ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+ {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index a18d845bcff7..ebe6fad76b4b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2731,14 +2731,54 @@ static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
  
-+		if (vcpu_has_nv2(vcpu))
-+			kvm_timer_sync_nested(vcpu);
++static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
++					     struct kvm_s2_mmu *mmu,
++					     u64 val)
++{
++	unsigned long max_size;
++	u8 ttl = 0;
 +
- 		kvm_arch_vcpu_ctxsync_fp(vcpu);
++	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
++		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++	}
++
++	max_size = ttl_to_size(ttl);
++
++	if (!max_size) {
++		u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
++
++		/* Compute the maximum extent of the invalidation */
++		switch ((vtcr & VTCR_EL2_TG0_MASK)) {
++		case VTCR_EL2_TG0_4K:
++			max_size = SZ_1G;
++			break;
++		case VTCR_EL2_TG0_16K:
++			max_size = SZ_32M;
++			break;
++		case VTCR_EL2_TG0_64K:
++			/*
++			 * No, we do not support 52bit IPA in nested yet. Once
++			 * we do, this should be 4TB.
++			 */
++			/* FIXME: remove the 52bit PA support from the IDregs */
++			max_size = SZ_512M;
++			break;
++		default:
++			BUG();
++		}
++	}
++
++	WARN_ON(!max_size);
++	return max_size;
++}
++
+ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			     const struct sys_reg_desc *r)
+ {
+ 	u64 vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
+-	u64 vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
+ 	struct kvm_s2_mmu *mmu;
+ 	u64 base_addr;
+-	int max_size;
++	unsigned long max_size;
  
- 		/*
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 0a76dac8cb6a..89b08e5b456e 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -68,6 +68,7 @@ int kvm_timer_hyp_init(bool);
- int kvm_timer_enable(struct kvm_vcpu *vcpu);
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
- void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
-+void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
- void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
- bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
- void kvm_timer_update_run(struct kvm_vcpu *vcpu);
+ 	if (vcpu_has_nv(vcpu) && forward_nv_traps(vcpu))
+ 		return false;
+@@ -2748,45 +2788,27 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	 *
+ 	 * - NS bit: we're non-secure only.
+ 	 *
+-	 * - TTL field: We already have the granule size from the
+-	 *   VTCR_EL2.TG0 field, and the level is only relevant to the
+-	 *   guest's S2PT.
+-	 *
+ 	 * - IPA[51:48]: We don't support 52bit IPA just yet...
+ 	 *
+ 	 * And of course, adjust the IPA to be on an actual address.
+ 	 */
+ 	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
+ 
+-	/* Compute the maximum extent of the invalidation */
+-	switch ((vtcr & VTCR_EL2_TG0_MASK)) {
+-	case VTCR_EL2_TG0_4K:
+-		max_size = SZ_1G;
+-		break;
+-	case VTCR_EL2_TG0_16K:
+-		max_size = SZ_32M;
+-		break;
+-	case VTCR_EL2_TG0_64K:
+-		/*
+-		 * No, we do not support 52bit IPA in nested yet. Once
+-		 * we do, this should be 4TB.
+-		 */
+-		/* FIXME: remove the 52bit PA support from the IDregs */
+-		max_size = SZ_512M;
+-		break;
+-	default:
+-		BUG();
+-	}
+-
+ 	spin_lock(&vcpu->kvm->mmu_lock);
+ 
+ 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
+-	if (mmu)
++	if (mmu) {
++		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
++		base_addr &= ~(max_size - 1);
+ 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
++	}
+ 
+ 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, 0);
+-	if (mmu)
++	if (mmu) {
++		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
++		base_addr &= ~(max_size - 1);
+ 		kvm_unmap_stage2_range(mmu, base_addr, max_size);
++	}
+ 
+ 	spin_unlock(&vcpu->kvm->mmu_lock);
+ 
 -- 
 2.30.2
 
