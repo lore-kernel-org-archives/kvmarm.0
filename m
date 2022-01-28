@@ -2,60 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CB94C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3421EC433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A1074B1EC;
-	Fri, 28 Jan 2022 07:50:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCF744B1C4;
+	Fri, 28 Jan 2022 07:50:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WPnwuu2qyPQz; Fri, 28 Jan 2022 07:50:47 -0500 (EST)
+	with ESMTP id S414prE56Id6; Fri, 28 Jan 2022 07:50:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 49EB24B1D3;
-	Fri, 28 Jan 2022 07:50:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C53A4B1E0;
+	Fri, 28 Jan 2022 07:50:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 32AED4B1E1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 048F34B1E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6hZ4n3a7G9Fg for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:50:45 -0500 (EST)
+ with ESMTP id EO8+MHqsu8EY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:50:47 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEE8E4B11E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77A994B1E1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:46 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 6452761C55;
- Fri, 28 Jan 2022 12:50:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEEE6C340E0;
- Fri, 28 Jan 2022 12:50:43 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id E1EB961C4F;
+ Fri, 28 Jan 2022 12:50:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6B19C340E0;
+ Fri, 28 Jan 2022 12:50:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643374243;
- bh=DODeF9o8Sl2vkui25obN2Ct4mXtkcYS1+9H7aC1HxUc=;
+ s=k20201202; t=1643374245;
+ bh=F0Em6ITTrFeHlXFpHaH97jmBz05ld/C99fqLrfsvtwI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=fCTWqJCfwI202ExJ0XgYw6eqmW9biV0iPa4FPbQId4aKlzLcLWEvoOBbpuH1Brn+r
- t+7hyp4BUSNS7dQkITGMXmjArsRl5Mw7espg7ORu8hPdqqwPObzv0mGJcv6jMBA+j/
- t2s0dvo5qAWWyhO+j3NmMYeQeaboZGMqyzL4CJu1Avsx1j2otxglzu4R3DhXjMKg3B
- 4JQxXQyaB784u/3rGJiIMC8/EAFhdKjBC9fxCfdEyNEdNR/l8Q3rDam+sY95Er5uBN
- 3nM6lWU7U42FvYwgGDq/xIUnV2f+jjOrtTzfzHW6PNwvFipInmlv8ik5XP2aFhc165
- MvQ3CThhCnDgw==
+ b=nNMZUgTSDc95vhn5CJxF71MSZilSq9yLXgzoGOaK299ZZiyXlQgLuyvfta8t0CQGi
+ kt8Ytq+IeMqvRC6en9xS1M8BAeJpm3A2F0kFNEvfHh8CE0RBOBQbVpJMBZaiXqQe0m
+ SPe9ZFjiQzy+58Rr8DXcOLB7Vr3FSnicyUbujy/37aN7ohoa+YpitHrL8wyTv1kwXy
+ sb1yeHfaed6awyZEXC54SJyrBDDo8lj2A8a0bsCo4qevVXe40N1lA6asMIMR++INIR
+ gu0e6qmvuvxmxSEcEEMKjtP0YTKIwam2keFoq1ycyQZdNwXYQ8vk71C6Wx7GsH1Wj/
+ 0pGIoErti6KwQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQEY-003njR-Uf; Fri, 28 Jan 2022 12:20:07 +0000
+ id 1nDQEc-003njR-Io; Fri, 28 Jan 2022 12:20:10 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 56/64] KVM: arm64: nv: Add include containing the VNCR_EL2
- offsets
-Date: Fri, 28 Jan 2022 12:19:04 +0000
-Message-Id: <20220128121912.509006-57-maz@kernel.org>
+Subject: [PATCH v6 63/64] KVM: arm64: nv: Fast-track 'InHost' exception returns
+Date: Fri, 28 Jan 2022 12:19:11 +0000
+Message-Id: <20220128121912.509006-64-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -92,98 +91,144 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-VNCR_EL2 points to a page containing a number of system registers
-accessed by a guest hypervisor when ARMv8.4-NV is enabled.
+A significant part of the ARMv8.3-NV extension is to trap ERET
+instructions so that the hypervisor gets a chance to switch
+from a vEL2 L1 guest to an EL1 L2 guest.
 
-Let's document the offsets in that page, as we are going to use
-this layout.
+But this also has the unfortunate consequence of trapping ERET
+in unsuspecting circumstances, such as staying at vEL2 (interrupt
+handling while being in the guest hypervisor), or returning to host
+userspace in the case of a VHE guest.
+
+Although we already make some effort to handle these ERET quicker
+by not doing the put/load dance, it is still way too far down the
+line for it to be efficient enough.
+
+For these cases, it would ideal to ERET directly, no question asked.
+Of course, we can't do that. But the next best thing is to do it as
+early as possible, in fixup_guest_exit(), much as we would handle
+FPSIMD exceptions.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/vncr_mapping.h | 74 +++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
- create mode 100644 arch/arm64/include/asm/vncr_mapping.h
+ arch/arm64/kvm/emulate-nested.c | 29 +++------------------
+ arch/arm64/kvm/hyp/vhe/switch.c | 46 +++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
-new file mode 100644
-index 000000000000..c0a2acd5045c
---- /dev/null
-+++ b/arch/arm64/include/asm/vncr_mapping.h
-@@ -0,0 +1,74 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * System register offsets in the VNCR page
-+ * All offsets are *byte* displacements!
-+ */
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 1f6cf8fe9fe3..3f3b1296b4ac 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -76,8 +76,7 @@ static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+ 
+ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ {
+-	u64 spsr, elr, mode;
+-	bool direct_eret;
++	u64 spsr, elr;
+ 
+ 	/*
+ 	 * Forward this trap to the virtual EL2 if the virtual
+@@ -86,33 +85,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	if (forward_nv_traps(vcpu))
+ 		return;
+ 
+-	/*
+-	 * Going through the whole put/load motions is a waste of time
+-	 * if this is a VHE guest hypervisor returning to its own
+-	 * userspace, or the hypervisor performing a local exception
+-	 * return. No need to save/restore registers, no need to
+-	 * switch S2 MMU. Just do the canonical ERET.
+-	 */
+-	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
+-	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+-
+-	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
+-
+-	direct_eret  = (mode == PSR_MODE_EL0t &&
+-			vcpu_el2_e2h_is_set(vcpu) &&
+-			vcpu_el2_tge_is_set(vcpu));
+-	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
+-
+-	if (direct_eret) {
+-		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
+-		*vcpu_cpsr(vcpu) = spsr;
+-		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
+-		return;
+-	}
+-
+ 	preempt_disable();
+ 	kvm_arch_vcpu_put(vcpu);
+ 
++	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
++	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+ 	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+ 
+ 	trace_kvm_nested_eret(vcpu, elr, spsr);
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 65120c9027d6..f469bf51b4be 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -161,6 +161,51 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps_common(vcpu);
+ }
+ 
++static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
++	u64 spsr, mode;
 +
-+#ifndef __ARM64_VNCR_MAPPING_H__
-+#define __ARM64_VNCR_MAPPING_H__
++	/*
++	 * Going through the whole put/load motions is a waste of time
++	 * if this is a VHE guest hypervisor returning to its own
++	 * userspace, or the hypervisor performing a local exception
++	 * return. No need to save/restore registers, no need to
++	 * switch S2 MMU. Just do the canonical ERET.
++	 *
++	 * Unless the trap has to be forwarded further down the line,
++	 * of course...
++	 */
++	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
++		return false;
 +
-+#define VNCR_VTTBR_EL2          0x020
-+#define VNCR_VTCR_EL2           0x040
-+#define VNCR_VMPIDR_EL2         0x050
-+#define VNCR_CNTVOFF_EL2        0x060
-+#define VNCR_HCR_EL2            0x078
-+#define VNCR_HSTR_EL2           0x080
-+#define VNCR_VPIDR_EL2          0x088
-+#define VNCR_TPIDR_EL2          0x090
-+#define VNCR_VNCR_EL2           0x0B0
-+#define VNCR_CPACR_EL1          0x100
-+#define VNCR_CONTEXTIDR_EL1     0x108
-+#define VNCR_SCTLR_EL1          0x110
-+#define VNCR_ACTLR_EL1          0x118
-+#define VNCR_TCR_EL1            0x120
-+#define VNCR_AFSR0_EL1          0x128
-+#define VNCR_AFSR1_EL1          0x130
-+#define VNCR_ESR_EL1            0x138
-+#define VNCR_MAIR_EL1           0x140
-+#define VNCR_AMAIR_EL1          0x148
-+#define VNCR_MDSCR_EL1          0x158
-+#define VNCR_SPSR_EL1           0x160
-+#define VNCR_CNTV_CVAL_EL0      0x168
-+#define VNCR_CNTV_CTL_EL0       0x170
-+#define VNCR_CNTP_CVAL_EL0      0x178
-+#define VNCR_CNTP_CTL_EL0       0x180
-+#define VNCR_SCXTNUM_EL1        0x188
-+#define VNCR_TFSR_EL1		0x190
-+#define VNCR_ZCR_EL1            0x1E0
-+#define VNCR_TTBR0_EL1          0x200
-+#define VNCR_TTBR1_EL1          0x210
-+#define VNCR_FAR_EL1            0x220
-+#define VNCR_ELR_EL1            0x230
-+#define VNCR_SP_EL1             0x240
-+#define VNCR_VBAR_EL1           0x250
-+#define VNCR_ICH_LR0_EL2        0x400
-+//      VNCR_ICH_LRN_EL2(n)     VNCR_ICH_LR0_EL2+8*((n) & 7)
-+#define VNCR_ICH_AP0R0_EL2      0x480
-+//      VNCR_ICH_AP0RN_EL2(n)   VNCR_ICH_AP0R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_AP1R0_EL2      0x4A0
-+//      VNCR_ICH_AP1RN_EL2(n)   VNCR_ICH_AP1R0_EL2+8*((n) & 3)
-+#define VNCR_ICH_HCR_EL2        0x4C0
-+#define VNCR_ICH_VMCR_EL2       0x4C8
-+#define VNCR_VDISR_EL2          0x500
-+#define VNCR_PMBLIMITR_EL1      0x800
-+#define VNCR_PMBPTR_EL1         0x810
-+#define VNCR_PMBSR_EL1          0x820
-+#define VNCR_PMSCR_EL1          0x828
-+#define VNCR_PMSEVFR_EL1        0x830
-+#define VNCR_PMSICR_EL1         0x838
-+#define VNCR_PMSIRR_EL1         0x840
-+#define VNCR_PMSLATFR_EL1       0x848
-+#define VNCR_TRFCR_EL1          0x880
-+#define VNCR_MPAM1_EL1          0x900
-+#define VNCR_MPAMHCR_EL2        0x930
-+#define VNCR_MPAMVPMV_EL2       0x938
-+#define VNCR_MPAMVPM0_EL2       0x940
-+#define VNCR_MPAMVPM1_EL2       0x948
-+#define VNCR_MPAMVPM2_EL2       0x950
-+#define VNCR_MPAMVPM3_EL2       0x958
-+#define VNCR_MPAMVPM4_EL2       0x960
-+#define VNCR_MPAMVPM5_EL2       0x968
-+#define VNCR_MPAMVPM6_EL2       0x970
-+#define VNCR_MPAMVPM7_EL2       0x978
++	spsr = read_sysreg_el1(SYS_SPSR);
++	spsr = __fixup_spsr_el2_read(ctxt, spsr);
++	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
 +
-+#endif /* __ARM64_VNCR_MAPPING_H__ */
++	switch (mode) {
++	case PSR_MODE_EL0t:
++		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
++			return false;
++		break;
++	case PSR_MODE_EL2t:
++		mode = PSR_MODE_EL1t;
++		break;
++	case PSR_MODE_EL2h:
++		mode = PSR_MODE_EL1h;
++		break;
++	default:
++		return false;
++	}
++
++	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
++
++	write_sysreg_el2(spsr, SYS_SPSR);
++	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
++
++	return true;
++}
++
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+@@ -170,6 +215,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
+ 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
++	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
+ };
+ 
+ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
 -- 
 2.30.2
 
