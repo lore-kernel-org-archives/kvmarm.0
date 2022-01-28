@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B94C5C4332F
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10579C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:19:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DA5649F21;
-	Fri, 28 Jan 2022 07:19:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5DF84B12C;
+	Fri, 28 Jan 2022 07:19:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dSxDraEL9dyf; Fri, 28 Jan 2022 07:19:37 -0500 (EST)
+	with ESMTP id AZiMbOpTXHOb; Fri, 28 Jan 2022 07:19:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 19EBB4B10B;
-	Fri, 28 Jan 2022 07:19:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D0E24B0EF;
+	Fri, 28 Jan 2022 07:19:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC08649EC4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:19:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59C2C49EC4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:19:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RJd3xvduz7sN for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id SsRIq0jrX+tk for <kvmarm@lists.cs.columbia.edu>;
  Fri, 28 Jan 2022 07:19:29 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8063549F2A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:19:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2ECD49F1C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:19:28 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 061C061B04;
- Fri, 28 Jan 2022 12:19:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D03F6C340E6;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B921861B14;
+ Fri, 28 Jan 2022 12:19:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FF2FC340E0;
  Fri, 28 Jan 2022 12:19:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1643372368;
- bh=yrs624Iq+S7Afe7Zx4Kn1sOrlB6vzZwSzF77XulISrE=;
+ bh=NFVmjlUxLmGGeWlyBOoMaSxfLvXZVmT03LLwLgGhYSM=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=KEPjr+XPQ4e6gEPtloHv5Ywtq1kenYz2p5kCGSEb41048KCeULXnQ6L1VVlH43SZg
- NEKkcY6pjdXNwI2peQMRQdJwIZncKU6CU5Dp7Wip0Q5Sta4MnSrUEVR/7ml4OTRN3E
- mz6mK/pNwOhH70KVsHhnFrDAB5zMqoG6ZaDo759/e4tuNIk2WonYuMe9dLAH5yJg2D
- gV/asgvENCiPgRG8D2mVV09tKQ2ve4/f6c7SibK1KAAqhkKyPL4IzruyiruYHu6E0X
- j2/X483tAIAdlemcymkVV6twF8y2B9boKWNYM3saf3XDqgw6dM8zof/EZpp4xanau9
- rM53b3u4KZUeg==
+ b=Q9bLeHhQ9FG9elowBCM91R/wtdmtRJy4T8djKBdiid+o3YhkdagdaacsCq7pei/Kj
+ r05Q8er67rC1JqdZoboUo+6o6XrG/rSVi4i/IXKdx7qd0fmHkEshAx8SgrbiYqBhGW
+ px/ChBIp450KdVUnNBpeP1w6p9c8KXsCiipVUGFn7Y83JekI2KHicmZXRme8T4OqD7
+ TmJk/LyF+CzqK6VhsOHIL1JhXGMmBJEG8FgMWIHEOklOLIzPGCRb2LcQdNI7K/myqr
+ k1qYjP+qSo42J7SI8f88O1Bv/GCye/ePaqs1YkdRJxnOrpmDx1c7LSog4BSrHweEOI
+ KRtluNEtwrSIw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQDu-003njR-UJ; Fri, 28 Jan 2022 12:19:27 +0000
+ id 1nDQDu-003njR-HA; Fri, 28 Jan 2022 12:19:26 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 08/64] KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to
- sane values
-Date: Fri, 28 Jan 2022 12:18:16 +0000
-Message-Id: <20220128121912.509006-9-maz@kernel.org>
+Subject: [PATCH v6 07/64] KVM: arm64: nv: Handle HCR_EL2.NV system register
+ traps
+Date: Fri, 28 Jan 2022 12:18:15 +0000
+Message-Id: <20220128121912.509006-8-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -92,69 +92,279 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+From: Jintack Lim <jintack.lim@linaro.org>
 
-The VMPIDR_EL2 and VPIDR_EL2 are architecturally UNKNOWN at reset, but
-let's be nice to a guest hypervisor behaving foolishly and reset these
-to something reasonable anyway.
+ARM v8.3 introduces a new bit in the HCR_EL2, which is the NV bit. When
+this bit is set, accessing EL2 registers in EL1 traps to EL2. In
+addition, executing the following instructions in EL1 will trap to EL2:
+tlbi, at, eret, and msr/mrs instructions to access SP_EL1. Most of the
+instructions that trap to EL2 with the NV bit were undef at EL1 prior to
+ARM v8.3. The only instruction that was not undef is eret.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+This patch sets up a handler for EL2 registers and SP_EL1 register
+accesses at EL1. The host hypervisor keeps those register values in
+memory, and will emulate their behavior.
+
+This patch doesn't set the NV bit yet. It will be set in a later patch
+once nested virtualization support is completed.
+
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+[maz: EL2_REG() macros]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/sysreg.h | 41 +++++++++++++-
+ arch/arm64/kvm/sys_regs.c       | 99 +++++++++++++++++++++++++++++++--
+ 2 files changed, 134 insertions(+), 6 deletions(-)
 
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 898bee0004ae..61c990e5591a 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -532,10 +532,26 @@
+ 
+ #define SYS_PMCCFILTR_EL0		sys_reg(3, 3, 14, 15, 7)
+ 
++#define SYS_VPIDR_EL2			sys_reg(3, 4, 0, 0, 0)
++#define SYS_VMPIDR_EL2			sys_reg(3, 4, 0, 0, 5)
++
+ #define SYS_SCTLR_EL2			sys_reg(3, 4, 1, 0, 0)
++#define SYS_ACTLR_EL2			sys_reg(3, 4, 1, 0, 1)
++#define SYS_HCR_EL2			sys_reg(3, 4, 1, 1, 0)
++#define SYS_MDCR_EL2			sys_reg(3, 4, 1, 1, 1)
++#define SYS_CPTR_EL2			sys_reg(3, 4, 1, 1, 2)
++#define SYS_HSTR_EL2			sys_reg(3, 4, 1, 1, 3)
+ #define SYS_HFGRTR_EL2			sys_reg(3, 4, 1, 1, 4)
+ #define SYS_HFGWTR_EL2			sys_reg(3, 4, 1, 1, 5)
+ #define SYS_HFGITR_EL2			sys_reg(3, 4, 1, 1, 6)
++#define SYS_HACR_EL2			sys_reg(3, 4, 1, 1, 7)
++
++#define SYS_TTBR0_EL2			sys_reg(3, 4, 2, 0, 0)
++#define SYS_TTBR1_EL2			sys_reg(3, 4, 2, 0, 1)
++#define SYS_TCR_EL2			sys_reg(3, 4, 2, 0, 2)
++#define SYS_VTTBR_EL2			sys_reg(3, 4, 2, 1, 0)
++#define SYS_VTCR_EL2			sys_reg(3, 4, 2, 1, 2)
++
+ #define SYS_ZCR_EL2			sys_reg(3, 4, 1, 2, 0)
+ #define SYS_TRFCR_EL2			sys_reg(3, 4, 1, 2, 1)
+ #define SYS_DACR32_EL2			sys_reg(3, 4, 3, 0, 0)
+@@ -544,14 +560,26 @@
+ #define SYS_HAFGRTR_EL2			sys_reg(3, 4, 3, 1, 6)
+ #define SYS_SPSR_EL2			sys_reg(3, 4, 4, 0, 0)
+ #define SYS_ELR_EL2			sys_reg(3, 4, 4, 0, 1)
++#define SYS_SP_EL1			sys_reg(3, 4, 4, 1, 0)
+ #define SYS_IFSR32_EL2			sys_reg(3, 4, 5, 0, 1)
++#define SYS_AFSR0_EL2			sys_reg(3, 4, 5, 1, 0)
++#define SYS_AFSR1_EL2			sys_reg(3, 4, 5, 1, 1)
+ #define SYS_ESR_EL2			sys_reg(3, 4, 5, 2, 0)
+ #define SYS_VSESR_EL2			sys_reg(3, 4, 5, 2, 3)
+ #define SYS_FPEXC32_EL2			sys_reg(3, 4, 5, 3, 0)
+ #define SYS_TFSR_EL2			sys_reg(3, 4, 5, 6, 0)
+ #define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
+ 
+-#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1,  1)
++#define SYS_FAR_EL2			sys_reg(3, 4, 6, 0, 0)
++#define SYS_HPFAR_EL2			sys_reg(3, 4, 6, 0, 4)
++
++#define SYS_MAIR_EL2			sys_reg(3, 4, 10, 2, 0)
++#define SYS_AMAIR_EL2			sys_reg(3, 4, 10, 3, 0)
++
++#define SYS_VBAR_EL2			sys_reg(3, 4, 12, 0, 0)
++#define SYS_RVBAR_EL2			sys_reg(3, 4, 12, 0, 1)
++#define SYS_RMR_EL2			sys_reg(3, 4, 12, 0, 2)
++#define SYS_VDISR_EL2			sys_reg(3, 4, 12, 1, 1)
+ #define __SYS__AP0Rx_EL2(x)		sys_reg(3, 4, 12, 8, x)
+ #define SYS_ICH_AP0R0_EL2		__SYS__AP0Rx_EL2(0)
+ #define SYS_ICH_AP0R1_EL2		__SYS__AP0Rx_EL2(1)
+@@ -593,15 +621,24 @@
+ #define SYS_ICH_LR14_EL2		__SYS__LR8_EL2(6)
+ #define SYS_ICH_LR15_EL2		__SYS__LR8_EL2(7)
+ 
++#define SYS_CONTEXTIDR_EL2		sys_reg(3, 4, 13, 0, 1)
++#define SYS_TPIDR_EL2			sys_reg(3, 4, 13, 0, 2)
++
++#define SYS_CNTVOFF_EL2			sys_reg(3, 4, 14, 0, 3)
++#define SYS_CNTHCTL_EL2			sys_reg(3, 4, 14, 1, 0)
++
+ /* VHE encodings for architectural EL0/1 system registers */
+ #define SYS_SCTLR_EL12			sys_reg(3, 5, 1, 0, 0)
+ #define SYS_CPACR_EL12			sys_reg(3, 5, 1, 0, 2)
+ #define SYS_ZCR_EL12			sys_reg(3, 5, 1, 2, 0)
++
+ #define SYS_TTBR0_EL12			sys_reg(3, 5, 2, 0, 0)
+ #define SYS_TTBR1_EL12			sys_reg(3, 5, 2, 0, 1)
+ #define SYS_TCR_EL12			sys_reg(3, 5, 2, 0, 2)
++
+ #define SYS_SPSR_EL12			sys_reg(3, 5, 4, 0, 0)
+ #define SYS_ELR_EL12			sys_reg(3, 5, 4, 0, 1)
++
+ #define SYS_AFSR0_EL12			sys_reg(3, 5, 5, 1, 0)
+ #define SYS_AFSR1_EL12			sys_reg(3, 5, 5, 1, 1)
+ #define SYS_ESR_EL12			sys_reg(3, 5, 5, 2, 0)
+@@ -619,6 +656,8 @@
+ #define SYS_CNTV_CTL_EL02		sys_reg(3, 5, 14, 3, 1)
+ #define SYS_CNTV_CVAL_EL02		sys_reg(3, 5, 14, 3, 2)
+ 
++#define SYS_SP_EL2			sys_reg(3, 6,  4, 1, 0)
++
+ /* Common SCTLR_ELx flags. */
+ #define SCTLR_ELx_DSSBS	(BIT(44))
+ #define SCTLR_ELx_ATA	(BIT(43))
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 06ca98458815..25386cb622c5 100644
+index 4dc2fba316ff..06ca98458815 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -591,7 +591,7 @@ static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	vcpu_write_sys_reg(vcpu, actlr, ACTLR_EL1);
+@@ -24,6 +24,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/kvm_nested.h>
+ #include <asm/perf_event.h>
+ #include <asm/sysreg.h>
+ 
+@@ -105,6 +106,18 @@ static u32 get_ccsidr(u32 csselr)
+ 	return ccsidr;
  }
  
--static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+static u64 compute_reset_mpidr(struct kvm_vcpu *vcpu)
++static bool access_rw(struct kvm_vcpu *vcpu,
++		      struct sys_reg_params *p,
++		      const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
++	else
++		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
++
++	return true;
++}
++
+ /*
+  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+  */
+@@ -263,6 +276,14 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+ 		return read_zero(vcpu, p);
+ }
+ 
++static bool trap_undef(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *p,
++		       const struct sys_reg_desc *r)
++{
++	kvm_inject_undefined(vcpu);
++	return false;
++}
++
+ /*
+  * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
+  * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
+@@ -342,12 +363,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+ 			    struct sys_reg_params *p,
+ 			    const struct sys_reg_desc *r)
  {
- 	u64 mpidr;
+-	if (p->is_write) {
+-		vcpu_write_sys_reg(vcpu, p->regval, r->reg);
++	access_rw(vcpu, p, r);
++	if (p->is_write)
+ 		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
+-	} else {
+-		p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+-	}
  
-@@ -605,7 +605,24 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
- 	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
- 	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
--	vcpu_write_sys_reg(vcpu, (1ULL << 31) | mpidr, MPIDR_EL1);
-+	mpidr |= (1ULL << 31);
-+
-+	return mpidr;
-+}
-+
-+static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), MPIDR_EL1);
-+}
-+
-+static void reset_vmpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), VMPIDR_EL2);
-+}
-+
-+static void reset_vpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	vcpu_write_sys_reg(vcpu, read_cpuid_id(), VPIDR_EL2);
+ 	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
+ 
+@@ -1378,6 +1396,24 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+ 	.visibility = mte_visibility,		\
  }
  
- static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
-@@ -1873,8 +1890,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
++static unsigned int el2_visibility(const struct kvm_vcpu *vcpu,
++				   const struct sys_reg_desc *rd)
++{
++	if (vcpu_has_nv(vcpu))
++		return 0;
++
++	return REG_HIDDEN;
++}
++
++#define EL2_REG(name, acc, rst, v) {		\
++	SYS_DESC(SYS_##name),			\
++	.access = acc,				\
++	.reset = rst,				\
++	.reg = name,				\
++	.visibility = el2_visibility,		\
++	.val = v,				\
++}
++
+ /* sys_reg_desc initialiser for known cpufeature ID registers */
+ #define ID_SANITISED(name) {			\
+ 	SYS_DESC(SYS_##name),			\
+@@ -1411,6 +1447,18 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+ 	.set_user = set_raz_id_reg,		\
+ }
+ 
++static bool access_sp_el1(struct kvm_vcpu *vcpu,
++			  struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		__vcpu_sys_reg(vcpu, SP_EL1) = p->regval;
++	else
++		p->regval = __vcpu_sys_reg(vcpu, SP_EL1);
++
++	return true;
++}
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -1825,9 +1873,50 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
  	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
  
--	EL2_REG(VPIDR_EL2, access_rw, reset_val, 0),
--	EL2_REG(VMPIDR_EL2, access_rw, reset_val, 0),
-+	EL2_REG(VPIDR_EL2, access_rw, reset_vpidr, 0),
-+	EL2_REG(VMPIDR_EL2, access_rw, reset_vmpidr, 0),
- 	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
- 	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
- 	EL2_REG(HCR_EL2, access_rw, reset_val, 0),
++	EL2_REG(VPIDR_EL2, access_rw, reset_val, 0),
++	EL2_REG(VMPIDR_EL2, access_rw, reset_val, 0),
++	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
++	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HCR_EL2, access_rw, reset_val, 0),
++	EL2_REG(MDCR_EL2, access_rw, reset_val, 0),
++	EL2_REG(CPTR_EL2, access_rw, reset_val, CPTR_EL2_DEFAULT ),
++	EL2_REG(HSTR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HACR_EL2, access_rw, reset_val, 0),
++
++	EL2_REG(TTBR0_EL2, access_rw, reset_val, 0),
++	EL2_REG(TTBR1_EL2, access_rw, reset_val, 0),
++	EL2_REG(TCR_EL2, access_rw, reset_val, TCR_EL2_RES1),
++	EL2_REG(VTTBR_EL2, access_rw, reset_val, 0),
++	EL2_REG(VTCR_EL2, access_rw, reset_val, 0),
++
+ 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
++	EL2_REG(SPSR_EL2, access_rw, reset_val, 0),
++	EL2_REG(ELR_EL2, access_rw, reset_val, 0),
++	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
++
+ 	{ SYS_DESC(SYS_IFSR32_EL2), NULL, reset_unknown, IFSR32_EL2 },
++	EL2_REG(AFSR0_EL2, access_rw, reset_val, 0),
++	EL2_REG(AFSR1_EL2, access_rw, reset_val, 0),
++	EL2_REG(ESR_EL2, access_rw, reset_val, 0),
+ 	{ SYS_DESC(SYS_FPEXC32_EL2), NULL, reset_val, FPEXC32_EL2, 0x700 },
++
++	EL2_REG(FAR_EL2, access_rw, reset_val, 0),
++	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
++
++	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
++	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
++
++	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
++	EL2_REG(RVBAR_EL2, access_rw, reset_val, 0),
++	{ SYS_DESC(SYS_RMR_EL2), trap_undef },
++
++	EL2_REG(CONTEXTIDR_EL2, access_rw, reset_val, 0),
++	EL2_REG(TPIDR_EL2, access_rw, reset_val, 0),
++
++	EL2_REG(CNTVOFF_EL2, access_rw, reset_val, 0),
++	EL2_REG(CNTHCTL_EL2, access_rw, reset_val, 0),
++
++	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+ };
+ 
+ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
 -- 
 2.30.2
 
