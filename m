@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AC7C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A11E8C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:50:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82FE64045D;
-	Fri, 28 Jan 2022 07:50:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 574BE4B0E1;
+	Fri, 28 Jan 2022 07:50:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gwC9rC8+PCnR; Fri, 28 Jan 2022 07:50:20 -0500 (EST)
+	with ESMTP id 1MgIoa-iadCe; Fri, 28 Jan 2022 07:50:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC8B54B17B;
-	Fri, 28 Jan 2022 07:50:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E670A4B0F4;
+	Fri, 28 Jan 2022 07:50:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4C214B156
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 843104B192
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tbp+XycO13ry for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:50:17 -0500 (EST)
+ with ESMTP id Rz2XQqu-uzBh for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:50:21 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 584D74B0FC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 630A94B0F4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:50:20 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id CCC7461B47;
- Fri, 28 Jan 2022 12:50:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43DF4C340E0;
- Fri, 28 Jan 2022 12:50:16 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id D4EF861C4E;
+ Fri, 28 Jan 2022 12:50:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 443C3C340E6;
+ Fri, 28 Jan 2022 12:50:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643374216;
- bh=sas9AHjJj7kBXyWG3/TfULlZF4Cx7y0CsuXuVX3Jpek=;
+ s=k20201202; t=1643374219;
+ bh=XnXYamFtn0pKGTplz+YFZgvmBJgBZToc3ZKsAOGe3MY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ht/kgywrLd0ji9sB8HIHl3Pv+P0bljPRpR5fmfDwvWlOsDQrtMu/+h2GBx7MBb1lt
- 1OSP4s/30lA3ZDiCUgYkCs/TGUvDKxUu9JDKllDNXCIs70i8Vsft63t2xwoXfh1xQj
- h97BYyvXcCcD8ig/JLRXmKWq4ALe+PUWI1OnHoRHgQnABjDibeFEnkzVZN1Fm7MXW1
- f7IKxpeZLiveEo3vDGPPqjnFb2rFLgfzLGtPWVyDX8G92G/4gAYy1J4M3qXoPKhQM/
- 4VQVAeuiDWbEGAu+/wltikCaomkcll01IDZ2MKj0VY0myx3lxeeEs0geUZE/JW5pEg
- vu3N0OowsegLQ==
+ b=ZTZjRUqgZ77vCMqvmXB6Bawu1jyYqOk5jazrzJiiTbEcFy+feGkywNVI7MjhVQMRv
+ Sz8A8MXlEpDhxciZZNVQFCcNU/CR0Foz2OqGgRPKTObJnSiZyTAkuJZFI/jJ2VsSOZ
+ 9YsfDSfGGeKkziqNdclJAuB8u95OyC42QthgmScAy5zGiev1d35REf3j08JO6tx2I8
+ BRkW7d8hZxnL41dxQJoMAFYH5anF3ogdv5HsszQo6sf+WZTXHGTotDDX19CT5JY+VB
+ V97OzUagqaS82SKyntRRiMQW4suWxH8rnx+UiW2Hyn32FZ+7ySj9c0GdYUa8YtcN95
+ JrSRpjEbow/gQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQEU-003njR-Q0; Fri, 28 Jan 2022 12:20:03 +0000
+ id 1nDQEY-003njR-76; Fri, 28 Jan 2022 12:20:06 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 50/64] KVM: arm64: nv: Implement maintenance interrupt
- forwarding
-Date: Fri, 28 Jan 2022 12:18:58 +0000
-Message-Id: <20220128121912.509006-51-maz@kernel.org>
+Subject: [PATCH v6 54/64] KVM: arm64: nv: Invalidate TLBs based on shadow S2
+ TTL-like information
+Date: Fri, 28 Jan 2022 12:19:02 +0000
+Message-Id: <20220128121912.509006-55-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -92,145 +92,201 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When we take a maintenance interrupt, we need to decide whether
-it is generated on an action from the guest, or if it is something
-that needs to be forwarded to the guest hypervisor.
+In order to be able to make S2 TLB invalidations more performant on NV,
+let's use a scheme derived from the ARMv8.4 TTL extension.
+
+If bits [56:55] in the descriptor are non-zero, they indicate a level
+which can be used as an invalidation range.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-init.c      | 30 ++++++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-v3-nested.c | 25 +++++++++++++++++++----
- 2 files changed, 51 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_nested.h |  4 ++
+ arch/arm64/kvm/nested.c             | 98 +++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c           | 13 ++--
+ 3 files changed, 110 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index fc00304fe7d8..6485b7935155 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -6,10 +6,12 @@
- #include <linux/uaccess.h>
- #include <linux/interrupt.h>
- #include <linux/cpu.h>
-+#include <linux/irq.h>
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 8bfbeca2f4cd..847b652bd376 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -128,6 +128,8 @@ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+ extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+ extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
++u8 get_guest_mapping_ttl(struct kvm_vcpu *vcpu, struct kvm_s2_mmu *mmu,
++			 u64 addr);
+ unsigned int ttl_to_size(u8 ttl);
+ 
+ struct sys_reg_params;
+@@ -136,4 +138,6 @@ struct sys_reg_desc;
+ void access_nested_id_reg(struct kvm_vcpu *v, struct sys_reg_params *p,
+ 			  const struct sys_reg_desc *r);
+ 
++#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
++
+ #endif /* __ARM64_KVM_NESTED_H */
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 7e4ff98c4e95..8e99690cdde1 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -4,6 +4,7 @@
+  * Author: Jintack Lim <jintack.lim@linaro.org>
+  */
+ 
++#include <linux/bitfield.h>
+ #include <linux/kvm.h>
  #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/kvm_nested.h>
- #include "vgic.h"
  
- /*
-@@ -222,6 +224,16 @@ int kvm_vgic_vcpu_init(struct kvm_vcpu *vcpu)
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return 0;
- 
-+	if (vcpu_has_nv(vcpu)) {
-+		/* FIXME: remove this hack */
-+		if (vcpu->kvm->arch.vgic.maint_irq == 0)
-+			vcpu->kvm->arch.vgic.maint_irq = kvm_vgic_global_state.maint_irq;
-+		ret = kvm_vgic_set_owner(vcpu, vcpu->kvm->arch.vgic.maint_irq,
-+					 vcpu);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	/*
- 	 * If we are creating a VCPU with a GICv3 we must also register the
- 	 * KVM io device for the redistributor that belongs to this VCPU.
-@@ -475,12 +487,23 @@ static int vgic_init_cpu_dying(unsigned int cpu)
- 
- static irqreturn_t vgic_maintenance_handler(int irq, void *data)
- {
-+	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)data;
-+
- 	/*
- 	 * We cannot rely on the vgic maintenance interrupt to be
- 	 * delivered synchronously. This means we can only use it to
- 	 * exit the VM, and we perform the handling of EOIed
- 	 * interrupts on the exit path (see vgic_fold_lr_state).
- 	 */
-+
-+	/* If not nested, deactivate */
-+	if (!vcpu || !vgic_state_is_nested(vcpu)) {
-+		irq_set_irqchip_state(irq, IRQCHIP_STATE_ACTIVE, false);
-+		return IRQ_HANDLED;
-+	}
-+
-+	/* Assume nested from now */
-+	vgic_v3_handle_nested_maint_irq(vcpu);
- 	return IRQ_HANDLED;
+@@ -351,6 +352,29 @@ int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ 	return ret;
  }
  
-@@ -579,6 +602,13 @@ int kvm_vgic_hyp_init(void)
- 		return ret;
++static int read_host_s2_desc(phys_addr_t pa, u64 *desc, void *data)
++{
++	u64 *va = phys_to_virt(pa);
++
++	*desc = *va;
++
++	return 0;
++}
++
++static int kvm_walk_shadow_s2(struct kvm_s2_mmu *mmu, phys_addr_t gipa,
++			      struct kvm_s2_trans *result)
++{
++	struct s2_walk_info wi = { };
++
++	wi.read_desc = read_host_s2_desc;
++	wi.baddr = mmu->pgd_phys;
++
++	vtcr_to_walk_info(mmu->arch->vtcr, &wi);
++
++	wi.be = IS_ENABLED(CONFIG_CPU_BIG_ENDIAN);
++
++	return walk_nested_s2_pgd(gipa, &wi, result);
++}
+ 
+ unsigned int ttl_to_size(u8 ttl)
+ {
+@@ -408,6 +432,80 @@ unsigned int ttl_to_size(u8 ttl)
+ 	return max_size;
+ }
+ 
++/*
++ * Compute the equivalent of the TTL field by parsing the shadow PT.
++ * The granule size is extracted from VTCR_EL2.TG0 while the level is
++ * retrieved from first entry carrying the level as a tag.
++ */
++u8 get_guest_mapping_ttl(struct kvm_vcpu *vcpu, struct kvm_s2_mmu *mmu,
++			 u64 addr)
++{
++	u64 tmp, sz = 0, vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
++	struct kvm_s2_trans out;
++	u8 ttl, level;
++
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		ttl = (1 << 2);
++		break;
++	case VTCR_EL2_TG0_16K:
++		ttl = (2 << 2);
++		break;
++	case VTCR_EL2_TG0_64K:
++		ttl = (3 << 2);
++		break;
++	default:
++		BUG();
++	}
++
++	tmp = addr;
++
++again:
++	/* Iteratively compute the block sizes for a particular granule size */
++	switch (vtcr & VTCR_EL2_TG0_MASK) {
++	case VTCR_EL2_TG0_4K:
++		if	(sz < SZ_4K)	sz = SZ_4K;
++		else if (sz < SZ_2M)	sz = SZ_2M;
++		else if (sz < SZ_1G)	sz = SZ_1G;
++		else			sz = 0;
++		break;
++	case VTCR_EL2_TG0_16K:
++		if	(sz < SZ_16K)	sz = SZ_16K;
++		else if (sz < SZ_32M)	sz = SZ_32M;
++		else			sz = 0;
++		break;
++	case VTCR_EL2_TG0_64K:
++		if	(sz < SZ_64K)	sz = SZ_64K;
++		else if (sz < SZ_512M)	sz = SZ_512M;
++		else			sz = 0;
++		break;
++	default:
++		BUG();
++	}
++
++	if (sz == 0)
++		return 0;
++
++	tmp &= ~(sz - 1);
++	out = (struct kvm_s2_trans) { };
++	kvm_walk_shadow_s2(mmu, tmp, &out);
++	level = FIELD_GET(KVM_NV_GUEST_MAP_SZ, out.upper_attr);
++	if (!level)
++		goto again;
++
++	ttl |= level;
++
++	/*
++	 * We now have found some level information in the shadow S2. Check
++	 * that the resulting range is actually including the original IPA.
++	 */
++	sz = ttl_to_size(ttl);
++	if (addr < (tmp + sz))
++		return ttl;
++
++	return 0;
++}
++
+ /* Must be called with kvm->lock held */
+ struct kvm_s2_mmu *lookup_s2_mmu(struct kvm *kvm, u64 vttbr, u64 hcr)
+ {
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index ebe6fad76b4b..32b8f4c1074a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2736,10 +2736,13 @@ static unsigned long compute_tlb_inval_range(struct kvm_vcpu *vcpu,
+ 					     u64 val)
+ {
+ 	unsigned long max_size;
+-	u8 ttl = 0;
++	u8 ttl;
+ 
+-	if (cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL)) {
+-		ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++	ttl = FIELD_GET(GENMASK_ULL(47, 44), val);
++
++	if (!(cpus_have_const_cap(ARM64_HAS_ARMv8_4_TTL) && ttl)) {
++		u64 addr = (val & GENMASK_ULL(35, 0)) << 12;
++		ttl = get_guest_mapping_ttl(vcpu, mmu, addr);
  	}
  
-+	ret = irq_set_vcpu_affinity(kvm_vgic_global_state.maint_irq,
-+				    kvm_get_running_vcpus());
-+	if (ret) {
-+		kvm_err("Error setting vcpu affinity\n");
-+		goto out_free_irq;
-+	}
+ 	max_size = ttl_to_size(ttl);
+@@ -2783,6 +2786,8 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	if (vcpu_has_nv(vcpu) && forward_nv_traps(vcpu))
+ 		return false;
+ 
++	spin_lock(&vcpu->kvm->mmu_lock);
 +
- 	ret = cpuhp_setup_state(CPUHP_AP_KVM_ARM_VGIC_INIT_STARTING,
- 				"kvm/arm/vgic:starting",
- 				vgic_init_cpu_starting, vgic_init_cpu_dying);
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index e88c75e79010..4a35c2be7984 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -175,10 +175,20 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_irq *irq;
-+	unsigned long flags;
- 
- 	vgic_cpu->shadow_vgic_v3 = vgic_cpu->nested_vgic_v3;
- 	vgic_v3_create_shadow_lr(vcpu);
- 	__vgic_v3_restore_state(vcpu_shadow_if(vcpu));
-+
-+	irq = vgic_get_irq(vcpu->kvm, vcpu, vcpu->kvm->arch.vgic.maint_irq);
-+	raw_spin_lock_irqsave(&irq->irq_lock, flags);
-+	if (irq->line_level || irq->active)
-+		irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
-+				      IRQCHIP_STATE_ACTIVE, true);
-+	raw_spin_unlock_irqrestore(&irq->irq_lock, flags);
-+	vgic_put_irq(vcpu->kvm, irq);
- }
- 
- void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
-@@ -193,11 +203,14 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 	 */
- 	vgic_v3_fixup_shadow_lr_state(vcpu);
- 	vgic_cpu->nested_vgic_v3 = vgic_cpu->shadow_vgic_v3;
-+	irq_set_irqchip_state(kvm_vgic_global_state.maint_irq,
-+			      IRQCHIP_STATE_ACTIVE, false);
- }
- 
- void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
-+	bool state;
- 
  	/*
- 	 * If we exit a nested VM with a pending maintenance interrupt from the
-@@ -205,8 +218,12 @@ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu)
- 	 * can re-sync the appropriate LRs and sample level triggered interrupts
- 	 * again.
+ 	 * We drop a number of things from the supplied value:
+ 	 *
+@@ -2794,8 +2799,6 @@ static bool handle_ipas2e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
  	 */
--	if (vgic_state_is_nested(vcpu) &&
--	    (cpu_if->vgic_hcr & ICH_HCR_EN) &&
--	    vgic_v3_get_misr(vcpu))
--		kvm_inject_nested_irq(vcpu);
-+	if (!vgic_state_is_nested(vcpu))
-+		return;
-+
-+	state  = cpu_if->vgic_hcr & ICH_HCR_EN;
-+	state &= vgic_v3_get_misr(vcpu);
-+
-+	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-+			    vcpu->kvm->arch.vgic.maint_irq, state, vcpu);
- }
+ 	base_addr = (p->regval & GENMASK_ULL(35, 0)) << 12;
+ 
+-	spin_lock(&vcpu->kvm->mmu_lock);
+-
+ 	mmu = lookup_s2_mmu(vcpu->kvm, vttbr, HCR_VM);
+ 	if (mmu) {
+ 		max_size = compute_tlb_inval_range(vcpu, mmu, p->regval);
 -- 
 2.30.2
 
