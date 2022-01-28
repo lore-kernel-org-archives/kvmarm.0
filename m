@@ -2,60 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FCB4C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20235C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 28 Jan 2022 12:49:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3ACB4B11C;
-	Fri, 28 Jan 2022 07:49:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4CA04B105;
+	Fri, 28 Jan 2022 07:49:54 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OsN-s0cdPztl; Fri, 28 Jan 2022 07:49:51 -0500 (EST)
+	with ESMTP id pNaYlpjM-0FL; Fri, 28 Jan 2022 07:49:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28C7B4B0FC;
-	Fri, 28 Jan 2022 07:49:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ED894B11F;
+	Fri, 28 Jan 2022 07:49:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 386554B0E6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:49:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DEC14B0E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:49:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EGEBe+zI3zrK for <kvmarm@lists.cs.columbia.edu>;
- Fri, 28 Jan 2022 07:49:48 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B14F4B0E1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:49:48 -0500 (EST)
+ with ESMTP id S9zJt7Ly-Sbp for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 28 Jan 2022 07:49:49 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A9C754045D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 28 Jan 2022 07:49:49 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id ED6D8B8258E;
- Fri, 28 Jan 2022 12:49:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A97B7C340E0;
- Fri, 28 Jan 2022 12:49:45 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 835E061B47;
+ Fri, 28 Jan 2022 12:49:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9728C340E0;
+ Fri, 28 Jan 2022 12:49:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643374185;
- bh=jRIKDhkVUrbFh/irI2xtBwSiJqsV6zH2COYmtk3NzAY=;
+ s=k20201202; t=1643374187;
+ bh=hhTJdWtO25zjba35X6o9zqmc3uDEJNt1xKYK/S6Y2o0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=hHOXBLnrEDoKriprPsVEQJEAwFhNqOOyNraCNeeleirRGC9HC25HBHbMDLavvtb+q
- 7V/RNfJWcN4m7l5E9jjED58FI0IHg6hP1BsZj+sWDMWiTdHIbqHSmgXbTqn8LsHRah
- crkgiC8ekd7m6KsasLS3OmAx7EkgjcEuwUrEd6Lghv+VO/azzugNZxXp7/q30DUntg
- xUAoG5H2eqqXsrtxOuGjMIE+WIKao/tH3we1258p+yBg/FFTdNiyGh2TaWDJ8ZB3MW
- ALvoaV35uHZ55Q9J9xl3EPthQ2sZIEfY2jKfeR9CiAjg82Y0PvzGzwRB+0cSwSo5W5
- 03GaUYEwg3GbQ==
+ b=dHCTtSEmVBjWxJWusOmcvoi/3BYmGITiMcWUT5SbUpL/xDwSOAg7au6q7rYEbbqxh
+ Fe/DodBsopDhnZepcP5BATiXJ7mS+Z3QgMPkByhwba3c8UQaEDYZzwOjbN7qUHS3x4
+ b9Q6XFFWpubnTGPaNnXXO+6cPIKRQcP8JAhZrdt3No5kVHufh4Ov9cpzi7edYfzzbX
+ cPVp67dwfFFO7ZORT5r1kPLFc6KCv4DViwX/fvsMRO2Lln1muLrP3znZu5LODL3E5h
+ rpTYsvChbUovcdlHUwqzfLb3cw+8k+r7KvX0sSbJecR1dlY+QqosnGtzIBtf6arxLl
+ 80MyxDbayXYjA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nDQEL-003njR-TS; Fri, 28 Jan 2022 12:19:54 +0000
+ id 1nDQEZ-003njR-Ay; Fri, 28 Jan 2022 12:20:07 +0000
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH v6 38/64] KVM: arm64: nv: Unmap/flush shadow stage 2 page
- tables
-Date: Fri, 28 Jan 2022 12:18:46 +0000
-Message-Id: <20220128121912.509006-39-maz@kernel.org>
+Subject: [PATCH v6 57/64] KVM: arm64: nv: Map VNCR-capable registers to a
+ separate page
+Date: Fri, 28 Jan 2022 12:19:05 +0000
+Message-Id: <20220128121912.509006-58-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220128121912.509006-1-maz@kernel.org>
 References: <20220128121912.509006-1-maz@kernel.org>
@@ -92,234 +92,203 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+With ARMv8.4-NV, registers that can be directly accessed in memory
+by the guest have to live at architected offsets in a special page.
 
-Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
-stage 2 page table for the guest hypervisor.
+Let's annotate the sysreg enum to reflect the offset at which they
+are in this page, whith a little twist:
 
-Note: A bunch of the code in mmu.c relating to MMU notifiers is
-currently dealt with in an extremely abrupt way, for example by clearing
-out an entire shadow stage-2 table. This will be handled in a more
-efficient way using the reverse mapping feature in a later version of
-the patch series.
+If running on HW that doesn't have the ARMv8.4-NV feature, or even
+a VM that doesn't use NV, we store all the system registers in the
+usual sys_regs array. The only difference with the pre-8.4
+situation is that VNCR-capable registers are at a "similar" offset
+as in the VNCR page (we can compute the actual offset at compile
+time), and that the sys_regs array is both bigger and sparse.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_mmu.h    |  3 +++
- arch/arm64/include/asm/kvm_nested.h |  3 +++
- arch/arm64/kvm/mmu.c                | 31 +++++++++++++++++++----
- arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++++
- 4 files changed, 71 insertions(+), 5 deletions(-)
+ arch/arm64/include/asm/kvm_host.h | 99 ++++++++++++++++++++-----------
+ 1 file changed, 64 insertions(+), 35 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 0750d022bbf8..afad4a27a6f2 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -160,6 +160,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
- 			   void __iomem **haddr);
- int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
- 			     void **haddr);
-+void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
-+			    phys_addr_t addr, phys_addr_t end);
- void free_hyp_pgds(void);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 0ea8cf0eeca7..3f6ddccae310 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -26,6 +26,7 @@
+ #include <asm/fpsimd.h>
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
++#include <asm/vncr_mapping.h>
  
- void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
-@@ -168,6 +170,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
- void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 			  phys_addr_t pa, unsigned long size, bool writable);
-+void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end);
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
  
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+@@ -180,31 +181,32 @@ struct kvm_vcpu_fault_info {
+ 	u64 disr_el1;		/* Deferred [SError] Status Register */
+ };
  
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index f4b846d09d86..8915bead0633 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -118,6 +118,9 @@ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
- 				    struct kvm_s2_trans *trans);
- extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
-+extern void kvm_nested_s2_wp(struct kvm *kvm);
-+extern void kvm_nested_s2_clear(struct kvm *kvm);
-+extern void kvm_nested_s2_flush(struct kvm *kvm);
- int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
- extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
- 			    u64 control_bit);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 7c56e1522d3c..b9b11be65009 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -190,13 +190,20 @@ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
- 	__unmap_stage2_range(mmu, start, size, true);
- }
- 
-+void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
-+			    phys_addr_t addr, phys_addr_t end)
-+{
-+	stage2_apply_range_resched(kvm_s2_mmu_to_kvm(mmu), addr, end, kvm_pgtable_stage2_flush);
-+}
++/*
++ * VNCR() just places the VNCR_capable registers in the enum after
++ * __VNCR_START__, and the value (after correction) to be an 8-byte offset
++ * from the VNCR base. As we don't require the enum to be otherwise ordered,
++ * we need the terrible hack below to ensure that we correctly size the
++ * sys_regs array, no matter what.
++ *
++ * The __MAX__ macro has been lifted from Sean Eron Anderson's wonderful
++ * treasure trove of bit hacks:
++ * https://graphics.stanford.edu/~seander/bithacks.html#IntegerMinOrMax
++ */
++#define __MAX__(x,y)	((x) ^ (((x) ^ (y)) & -((x) < (y))))
++#define VNCR(r)						\
++	__before_##r,					\
++	r = __VNCR_START__ + ((VNCR_ ## r) / 8),	\
++	__after_##r = __MAX__(__before_##r - 1, r)
 +
- static void stage2_flush_memslot(struct kvm *kvm,
- 				 struct kvm_memory_slot *memslot)
- {
- 	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
- 	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
-+	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
+ enum vcpu_sysreg {
+ 	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+ 	MPIDR_EL1,	/* MultiProcessor Affinity Register */
+ 	CSSELR_EL1,	/* Cache Size Selection Register */
+-	SCTLR_EL1,	/* System Control Register */
+-	ACTLR_EL1,	/* Auxiliary Control Register */
+-	CPACR_EL1,	/* Coprocessor Access Control */
+-	ZCR_EL1,	/* SVE Control */
+-	TTBR0_EL1,	/* Translation Table Base Register 0 */
+-	TTBR1_EL1,	/* Translation Table Base Register 1 */
+-	TCR_EL1,	/* Translation Control Register */
+-	ESR_EL1,	/* Exception Syndrome Register */
+-	AFSR0_EL1,	/* Auxiliary Fault Status Register 0 */
+-	AFSR1_EL1,	/* Auxiliary Fault Status Register 1 */
+-	FAR_EL1,	/* Fault Address Register */
+-	MAIR_EL1,	/* Memory Attribute Indirection Register */
+-	VBAR_EL1,	/* Vector Base Address Register */
+-	CONTEXTIDR_EL1,	/* Context ID Register */
+ 	TPIDR_EL0,	/* Thread ID, User R/W */
+ 	TPIDRRO_EL0,	/* Thread ID, User R/O */
+ 	TPIDR_EL1,	/* Thread ID, Privileged */
+-	AMAIR_EL1,	/* Aux Memory Attribute Indirection Register */
+ 	CNTKCTL_EL1,	/* Timer Control Register (EL1) */
+ 	PAR_EL1,	/* Physical Address Register */
+-	MDSCR_EL1,	/* Monitor Debug System Control Register */
+ 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+ 	DISR_EL1,	/* Deferred Interrupt Status Register */
  
--	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_flush);
-+	kvm_stage2_flush_range(mmu, addr, end);
- }
+@@ -234,20 +236,9 @@ enum vcpu_sysreg {
+ 	APGAKEYLO_EL1,
+ 	APGAKEYHI_EL1,
  
- /**
-@@ -219,6 +226,8 @@ static void stage2_flush_vm(struct kvm *kvm)
- 	kvm_for_each_memslot(memslot, bkt, slots)
- 		stage2_flush_memslot(kvm, memslot);
+-	ELR_EL1,
+-	SP_EL1,
+-	SPSR_EL1,
+-
+-	CNTVOFF_EL2,
+-	CNTV_CVAL_EL0,
+-	CNTV_CTL_EL0,
+-	CNTP_CVAL_EL0,
+-	CNTP_CTL_EL0,
+-
+ 	/* Memory Tagging Extension registers */
+ 	RGSR_EL1,	/* Random Allocation Tag Seed Register */
+ 	GCR_EL1,	/* Tag Control Register */
+-	TFSR_EL1,	/* Tag Fault Status Register (EL1) */
+ 	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
  
-+	kvm_nested_s2_flush(kvm);
+ 	/* 32bit specific registers. */
+@@ -257,20 +248,14 @@ enum vcpu_sysreg {
+ 	DBGVCR32_EL2,	/* Debug Vector Catch Register */
+ 
+ 	/* EL2 registers */
+-	VPIDR_EL2,	/* Virtualization Processor ID Register */
+-	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
+ 	SCTLR_EL2,	/* System Control Register (EL2) */
+ 	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
+-	HCR_EL2,	/* Hypervisor Configuration Register */
+ 	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
+ 	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
+-	HSTR_EL2,	/* Hypervisor System Trap Register */
+ 	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
+ 	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
+ 	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
+ 	TCR_EL2,	/* Translation Control Register (EL2) */
+-	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
+-	VTCR_EL2,	/* Virtualization Translation Control Register */
+ 	SPSR_EL2,	/* EL2 saved program status register */
+ 	ELR_EL2,	/* EL2 exception link register */
+ 	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
+@@ -283,7 +268,6 @@ enum vcpu_sysreg {
+ 	VBAR_EL2,	/* Vector Base Address Register (EL2) */
+ 	RVBAR_EL2,	/* Reset Vector Base Address Register */
+ 	CONTEXTIDR_EL2,	/* Context ID Register (EL2) */
+-	TPIDR_EL2,	/* EL2 Software Thread ID Register */
+ 	CNTHCTL_EL2,	/* Counter-timer Hypervisor Control register */
+ 	SP_EL2,		/* EL2 Stack Pointer */
+ 	CNTHP_CTL_EL2,
+@@ -291,6 +275,42 @@ enum vcpu_sysreg {
+ 	CNTHV_CTL_EL2,
+ 	CNTHV_CVAL_EL2,
+ 
++	__VNCR_START__,	/* Any VNCR-capable reg goes after this point */
 +
- 	spin_unlock(&kvm->mmu_lock);
- 	srcu_read_unlock(&kvm->srcu, idx);
- }
-@@ -742,6 +751,8 @@ void stage2_unmap_vm(struct kvm *kvm)
- 	kvm_for_each_memslot(memslot, bkt, slots)
- 		stage2_unmap_memslot(kvm, memslot);
- 
-+	kvm_nested_s2_clear(kvm);
++	VNCR(SCTLR_EL1),/* System Control Register */
++	VNCR(ACTLR_EL1),/* Auxiliary Control Register */
++	VNCR(CPACR_EL1),/* Coprocessor Access Control */
++	VNCR(ZCR_EL1),	/* SVE Control */
++	VNCR(TTBR0_EL1),/* Translation Table Base Register 0 */
++	VNCR(TTBR1_EL1),/* Translation Table Base Register 1 */
++	VNCR(TCR_EL1),	/* Translation Control Register */
++	VNCR(ESR_EL1),	/* Exception Syndrome Register */
++	VNCR(AFSR0_EL1),/* Auxiliary Fault Status Register 0 */
++	VNCR(AFSR1_EL1),/* Auxiliary Fault Status Register 1 */
++	VNCR(FAR_EL1),	/* Fault Address Register */
++	VNCR(MAIR_EL1),	/* Memory Attribute Indirection Register */
++	VNCR(VBAR_EL1),	/* Vector Base Address Register */
++	VNCR(CONTEXTIDR_EL1),	/* Context ID Register */
++	VNCR(AMAIR_EL1),/* Aux Memory Attribute Indirection Register */
++	VNCR(MDSCR_EL1),/* Monitor Debug System Control Register */
++	VNCR(ELR_EL1),
++	VNCR(SP_EL1),
++	VNCR(SPSR_EL1),
++	VNCR(TFSR_EL1),	/* Tag Fault Status Register (EL1) */
++	VNCR(VPIDR_EL2),/* Virtualization Processor ID Register */
++	VNCR(VMPIDR_EL2),/* Virtualization Multiprocessor ID Register */
++	VNCR(HCR_EL2),	/* Hypervisor Configuration Register */
++	VNCR(HSTR_EL2),	/* Hypervisor System Trap Register */
++	VNCR(VTTBR_EL2),/* Virtualization Translation Table Base Register */
++	VNCR(VTCR_EL2),	/* Virtualization Translation Control Register */
++	VNCR(TPIDR_EL2),/* EL2 Software Thread ID Register */
 +
- 	spin_unlock(&kvm->mmu_lock);
- 	mmap_read_unlock(current->mm);
- 	srcu_read_unlock(&kvm->srcu, idx);
-@@ -814,12 +825,12 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- }
++	VNCR(CNTVOFF_EL2),
++	VNCR(CNTV_CVAL_EL0),
++	VNCR(CNTV_CTL_EL0),
++	VNCR(CNTP_CVAL_EL0),
++	VNCR(CNTP_CTL_EL0),
++
+ 	NR_SYS_REGS	/* Nothing after this line! */
+ };
  
- /**
-- * stage2_wp_range() - write protect stage2 memory region range
-+ * kvm_stage2_wp_range() - write protect stage2 memory region range
-  * @mmu:        The KVM stage-2 MMU pointer
-  * @addr:	Start address of range
-  * @end:	End address of range
+@@ -307,6 +327,9 @@ struct kvm_cpu_context {
+ 	u64 sys_regs[NR_SYS_REGS];
+ 
+ 	struct kvm_vcpu *__hyp_running_vcpu;
++
++	/* This pointer has to be 4kB aligned. */
++	u64 *vncr_array;
+ };
+ 
+ struct kvm_pmu_events {
+@@ -534,7 +557,13 @@ struct kvm_vcpu_arch {
+  * for system registers that are never context switched, but only
+  * emulated.
   */
--static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
-+void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
- 	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_wrprotect);
-@@ -851,7 +862,8 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
- 	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
- 
- 	spin_lock(&kvm->mmu_lock);
--	stage2_wp_range(&kvm->arch.mmu, start, end);
-+	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
-+	kvm_nested_s2_wp(kvm);
- 	spin_unlock(&kvm->mmu_lock);
- 	kvm_flush_remote_tlbs(kvm);
- }
-@@ -875,7 +887,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
- 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
- 
--	stage2_wp_range(&kvm->arch.mmu, start, end);
-+	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
- }
- 
- /*
-@@ -890,6 +902,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 		gfn_t gfn_offset, unsigned long mask)
- {
- 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
-+	kvm_nested_s2_wp(kvm);
- }
- 
- static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
-@@ -1529,6 +1542,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
- 			     (range->end - range->start) << PAGE_SHIFT,
- 			     range->may_block);
- 
-+	kvm_nested_s2_clear(kvm);
- 	return false;
- }
- 
-@@ -1560,6 +1574,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 			       PAGE_SIZE, __pfn_to_phys(pfn),
- 			       KVM_PGTABLE_PROT_R, NULL);
- 
-+	kvm_nested_s2_clear(kvm);
- 	return false;
- }
- 
-@@ -1578,6 +1593,11 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
- 					range->start << PAGE_SHIFT);
- 	pte = __pte(kpte);
- 	return pte_valid(pte) && pte_young(pte);
-+
-+	/*
-+	 * TODO: Handle nested_mmu structures here using the reverse mapping in
-+	 * a later version of patch series.
-+	 */
- }
- 
- bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
-@@ -1789,6 +1809,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
- 
- 	spin_lock(&kvm->mmu_lock);
- 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-+	kvm_nested_s2_clear(kvm);
- 	spin_unlock(&kvm->mmu_lock);
- }
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index a74ffb1d2064..b39af4d87787 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -505,6 +505,45 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
- 	return kvm_inject_nested_sync(vcpu, esr_el2);
- }
- 
-+/* expects kvm->mmu_lock to be held */
-+void kvm_nested_s2_wp(struct kvm *kvm)
+-#define __ctxt_sys_reg(c,r)	(&(c)->sys_regs[(r)])
++static inline u64 *__ctxt_sys_reg(const struct kvm_cpu_context *ctxt, int r)
 +{
-+	int i;
++	if (unlikely(r >= __VNCR_START__ && ctxt->vncr_array))
++		return &ctxt->vncr_array[r - __VNCR_START__];
 +
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (kvm_s2_mmu_valid(mmu))
-+			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(kvm));
-+	}
++	return (u64 *)&ctxt->sys_regs[r];
 +}
-+
-+/* expects kvm->mmu_lock to be held */
-+void kvm_nested_s2_clear(struct kvm *kvm)
-+{
-+	int i;
-+
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (kvm_s2_mmu_valid(mmu))
-+			kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
-+	}
-+}
-+
-+/* expects kvm->mmu_lock to be held */
-+void kvm_nested_s2_flush(struct kvm *kvm)
-+{
-+	int i;
-+
-+	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
-+		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
-+
-+		if (kvm_s2_mmu_valid(mmu))
-+			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(kvm));
-+	}
-+}
-+
- /*
-  * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
-  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+ 
+ #define ctxt_sys_reg(c,r)	(*__ctxt_sys_reg(c,r))
+ 
 -- 
 2.30.2
 
