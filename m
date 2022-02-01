@@ -2,84 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B83C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Feb 2022 13:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D64C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Feb 2022 14:13:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C826B49EFE;
-	Tue,  1 Feb 2022 08:10:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAA5049EC2;
+	Tue,  1 Feb 2022 09:13:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LvRuf9GtM7d7; Tue,  1 Feb 2022 08:10:51 -0500 (EST)
+	with ESMTP id AcsRYsEDP0rv; Tue,  1 Feb 2022 09:13:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB9449F01;
-	Tue,  1 Feb 2022 08:10:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 399E749EFB;
+	Tue,  1 Feb 2022 09:13:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E44249EFE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 08:10:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BFFA049EC3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 09:13:37 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p747nwd+CD8P for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Feb 2022 08:10:48 -0500 (EST)
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com
- [209.85.218.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D083749EF8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 08:10:48 -0500 (EST)
-Received: by mail-ej1-f47.google.com with SMTP id k25so53698390ejp.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Feb 2022 05:10:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:date:in-reply-to
- :message-id:mime-version:content-transfer-encoding;
- bh=eC9jzuaPZejKnjk0GWhMgTqAMqfuhRTIOSuZXWu8eXw=;
- b=RVU7etuW7MdtYnJbRNNzCMVAbSLc0oeE2iBAn+ct+xMR+grBtuJ1qUUeBZLcCvGI1K
- oUvlcs7F46KsoYJ0m5IiGJqkTdBg4goYrwlXMl1TvwS5BxJiedmK6fk9xO4i1Ww1soE9
- ERYNf8mO3lqKe0csETjVPelTqe7JWgv+yMPw9RmVY0M8nsW+E6oXmVp1aV+0SRMMIdoO
- JnbOtcuAcg/CMKIh/13RQytM7CmRQrZTXGEaq8YEtXpkSsma9f2dqOqEopZOaD3LFfL6
- ccCy2nZIwqdpS1g55iRaQNL10jYJKewglt6AVfEoRzHztlTJXpB3uDKD1IZ1OtPMy/D0
- nb7g==
+ with ESMTP id saOYjOTwMna7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Feb 2022 09:13:36 -0500 (EST)
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com
+ [209.85.167.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D46249EC2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 09:13:36 -0500 (EST)
+Received: by mail-oi1-f175.google.com with SMTP id x193so33623808oix.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Feb 2022 06:13:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GwqkeG+g4LwdC0sxgm8GhOw8w2Ac27ntPZtzSV9QXXQ=;
+ b=TbszfdTD6hbW8GY3BhTg8qfFInWP7/coaawLYztDfTCwYZIxI4OTyYo9T+sCEEM2OS
+ VWZ25OOWC3fULib+VnAyUczI4gCoRMnq6Oiv3mPKhqPj35fnd+5Ka4X3eUSnSXI2FbV0
+ EbXlhj2x5ywVf14BqVac/vkmF2Vc/JDUiKZebU+jvIWY1HXWFr3yAYGQj38GCsqHX90E
+ a+aPfpxMHXILp4LaM22vTsphA9ZsFKX94ejuBUnKr5xhAWaHmaJCr/NEKr1vZdMjNNYy
+ bE/fPpGRTEh+eJRU0Ejt3r3/0NJjP7EmmMaUwk+9CNmFHtmKr/g6n558er8oMO79SfmF
+ MH8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
- :in-reply-to:message-id:mime-version:content-transfer-encoding;
- bh=eC9jzuaPZejKnjk0GWhMgTqAMqfuhRTIOSuZXWu8eXw=;
- b=IjDfruB1iHgfdyS2gHpzwYouVh4O8orzksgm/09SubZc1q+MkUeQhnE1mWtx7mbQSy
- 7rXSoxI5wO5/w2nv5AM2UUSTiY4lQEMAVkOWAh+kdPwAQpmTB/rZAWkeVNqhMfVcmLXF
- r4OfWsO7VYlNy2tD0n8G1LJG4u10pucs5TJ1SwyUfF1TnyKqXm4HFIeuw0EP1LSJFFeR
- BD8D6bPaTYyr2RDYENk/K6iiJg3JleWrecH50WCBaqdahIRkXJhYxsIGKqNHem4LKCto
- R6phjKAtQg7wkvV+9Si4YrCowQqk60yRHvlNAtDK/NKe2DlCxwon3Fwg0jBd9BlMGvl6
- geTA==
-X-Gm-Message-State: AOAM532MrtI+hlgc4qQgqXxdtfKA9LBxR2LZYmYgCPBlG6pTywd7/mx+
- PQVjnbBdBIPOdwPBJvRofwXTTQ==
-X-Google-Smtp-Source: ABdhPJw4SkHe643vb01cK/lUVBDhWsTREIoWAOkvnRgbkkMXJUhRgtRI4kvtYUdz1RXFlTq+jqGZAw==
-X-Received: by 2002:a17:907:1c1c:: with SMTP id
- nc28mr20850529ejc.651.1643721047776; 
- Tue, 01 Feb 2022 05:10:47 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id jl17sm14870439ejc.13.2022.02.01.05.10.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Feb 2022 05:10:46 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E8B0C1FFB7;
- Tue,  1 Feb 2022 13:10:45 +0000 (GMT)
-References: <20211112114734.3058678-1-alex.bennee@linaro.org>
- <20211112132312.qrgmby55mlenj72p@gator.home> <87wnldfoul.fsf@linaro.org>
- <20211112145442.5ktlpwyolwdsxlnx@gator.home> <877dd4umy6.fsf@linaro.org>
- <20211119183059.jwrhb77jfjbv5rbz@gator.home> <87a6hlzq8t.fsf@linaro.org>
- <20211130143425.bh27yy47vpihllvs@gator.home>
-User-agent: mu4e 1.7.6; emacs 28.0.91
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v3 0/3] GIC ITS tests
-Date: Tue, 01 Feb 2022 13:10:13 +0000
-In-reply-to: <20211130143425.bh27yy47vpihllvs@gator.home>
-Message-ID: <87sft2yboq.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GwqkeG+g4LwdC0sxgm8GhOw8w2Ac27ntPZtzSV9QXXQ=;
+ b=rL0IXK8jGWLLV5Xb5Xin1L95J2rwCMcOalRI2DVWiazI1MZ6rpQwEhI7d75cT7R8Ey
+ LTPeGvBon+OmcjvHcZRr5xP0pAECo/KT3JmMkOwDf71LdBYsiP39UCrvbhxhjUgj3Oo0
+ SOOcuTjH4iLU/HXCPVF+0hCZbFb9nfJaU4b5eDmwDJpLtV/EJkcCmMKxjFCj4lVeqZVV
+ rgVdWkka5UHwQUwRIMmPcW5Aamz/CFFj4ITGAmScAdqAKm+axMbkr2LrQG++v0NvNH80
+ Ifec8okQqnC+4RWakG1Nr5eGHTU25DTgiyxQ+Hgm8nRlYG1/0eiAfSgRAsKrGpKAgLUn
+ oEhQ==
+X-Gm-Message-State: AOAM530cqdzH6oM0QIcph6e5kJ486qnIpu2Yjqpu+QERn68RKS8MWL3F
+ 0VVU/fjnTIMIEtS5m23YLLPMZbschQl0eQ1pgemTTA==
+X-Google-Smtp-Source: ABdhPJxGjxzAErQUzyH4GFR5+L8XQBKsLvQtokC7pjfdp+yRUn37zezAq9QISJKFhKEQDdQxloO09st7izsG0AENlYw=
+X-Received: by 2002:a05:6808:ec2:: with SMTP id
+ q2mr1315303oiv.124.1643724815339; 
+ Tue, 01 Feb 2022 06:13:35 -0800 (PST)
 MIME-Version: 1.0
-Cc: kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
- qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20220106042708.2869332-1-reijiw@google.com>
+ <CA+EHjTz1=Nwd97GzagkAqZ08m-yGUHeujmtX45mLDD1beF8Ykg@mail.gmail.com>
+ <CAAeT=FzC4U380ZhhxFgZ0xa5xae2ZUf5uFOOfjT2RA6K2btX_w@mail.gmail.com>
+In-Reply-To: <CAAeT=FzC4U380ZhhxFgZ0xa5xae2ZUf5uFOOfjT2RA6K2btX_w@mail.gmail.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 1 Feb 2022 14:12:59 +0000
+Message-ID: <CA+EHjTxwwswnpG25pY8KXSiSgW0Tw7LcYYBFgZnyRjP6=dxAEw@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 00/26] KVM: arm64: Make CPU ID registers writable
+ by userspace
+To: Reiji Watanabe <reijiw@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,59 +82,183 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IE9uIFR1ZSwgTm92
-IDMwLCAyMDIxIGF0IDAyOjExOjM0UE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gCj4+
-IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cj4+IAo+PiA+IE9uIEZy
-aSwgTm92IDE5LCAyMDIxIGF0IDA0OjMwOjQ3UE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToK
-Pj4gPj4gCj4+ID4+IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cj4+
-ID4+IAo+PiA+PiA+IE9uIEZyaSwgTm92IDEyLCAyMDIxIGF0IDAyOjA4OjAxUE0gKzAwMDAsIEFs
-ZXggQmVubsOpZSB3cm90ZToKPj4gPj4gPj4gCj4+ID4+ID4+IEFuZHJldyBKb25lcyA8ZHJqb25l
-c0ByZWRoYXQuY29tPiB3cml0ZXM6Cj4+ID4+ID4+IAo+PiA+PiA+PiA+IE9uIEZyaSwgTm92IDEy
-LCAyMDIxIGF0IDExOjQ3OjMxQU0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gPj4gPj4g
-Pj4gSGksCj4+ID4+ID4+ID4+IAo+PiA+PiA+PiA+PiBTb3JyeSB0aGlzIGhhcyBiZWVuIHNpdHRp
-bmcgaW4gbXkgdHJlZSBzbyBsb25nLiBUaGUgY2hhbmdlcyBhcmUgZmFpcmx5Cj4+ID4+ID4+ID4+
-IG1pbm9yIGZyb20gdjIuIEkgbm8gbG9uZ2VyIHNwbGl0IHRoZSB0ZXN0cyB1cCBpbnRvIFRDRyBh
-bmQgS1ZNCj4+ID4+ID4+ID4+IHZlcnNpb25zIGFuZCBpbnN0ZWFkIGp1c3QgZW5zdXJlIHRoYXQg
-RVJSQVRBX0ZPUkNFIGlzIGFsd2F5cyBzZXQgd2hlbgo+PiA+PiA+PiA+PiBydW4gdW5kZXIgVENH
-Lgo+PiA+PiA+PiA+PiAKPj4gPj4gPj4gPj4gQWxleCBCZW5uw6llICgzKToKPj4gPj4gPj4gPj4g
-ICBhcm02NDogcmVtb3ZlIGludmFsaWQgY2hlY2sgZnJvbSBpdHMtdHJpZ2dlciB0ZXN0Cj4+ID4+
-ID4+ID4+ICAgYXJtNjQ6IGVuYWJsZSBpdHMtbWlncmF0aW9uIHRlc3RzIGZvciBUQ0cKPj4gPj4g
-Pj4gPj4gICBhcmNoLXJ1bjogZG8gbm90IHByb2Nlc3MgRVJSQVRBIHdoZW4gcnVubmluZyB1bmRl
-ciBUQ0cKPj4gPj4gPj4gPj4gCj4+ID4+ID4+ID4+ICBzY3JpcHRzL2FyY2gtcnVuLmJhc2ggfCAg
-NCArKystCj4+ID4+ID4+ID4+ICBhcm0vZ2ljLmMgICAgICAgICAgICAgfCAxNiArKysrKystLS0t
-LS0tLS0tCj4+ID4+ID4+ID4+ICBhcm0vdW5pdHRlc3RzLmNmZyAgICAgfCAgMyAtLS0KPj4gPj4g
-Pj4gPj4gIDMgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkK
-Pj4gPj4gPj4gPj4gCj4+ID4+ID4+ID4+IC0tIAo+PiA+PiA+PiA+PiAyLjMwLjIKPj4gPj4gPj4g
-Pj4gCj4+ID4+ID4+ID4+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fCj4+ID4+ID4+ID4+IGt2bWFybSBtYWlsaW5nIGxpc3QKPj4gPj4gPj4gPj4ga3ZtYXJt
-QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQo+PiA+PiA+PiA+PiBodHRwczovL2xpc3RzLmNzLmNvbHVt
-YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo+PiA+PiA+PiA+Cj4+ID4+ID4+ID4gSGkg
-QWxleCwKPj4gPj4gPj4gPgo+PiA+PiA+PiA+IFRoYW5rcyBmb3IgdGhpcy4gSSd2ZSBhcHBsaWVk
-IHRvIGFybS9xdWV1ZSwgYnV0IEkgc2VlIHRoYXQKPj4gPj4gPj4gPgo+PiA+PiA+PiA+IEZBSUw6
-IGdpY3YzOiBpdHMtdHJpZ2dlcjogaW52L2ludmFsbDogZGV2Mi9ldmVudGlkPTIwIHBlbmRpbmcg
-TFBJIGlzIHJlY2VpdmVkCj4+ID4+ID4+ID4KPj4gPj4gPj4gPiBjb25zaXN0ZW50bHkgZmFpbHMg
-Zm9yIG1lLiBJcyB0aGF0IGV4cGVjdGVkPyBEb2VzIGl0IHdvcmsgZm9yIHlvdT8KPj4gPj4gPj4g
-Cj4+ID4+ID4+IGRvaCAtIGxvb2tzIGxpa2UgSSBjb2NrZWQgdXAgdGhlIG1lcmdlIGNvbmZsaWN0
-Li4uCj4+ID4+ID4+IAo+PiA+PiA+PiBEaWQgaXQgZmFpbCBmb3IgVENHIG9yIGZvciBLVk0gKG9y
-IGJvdGgpPwo+PiA+PiA+Cj4+ID4+ID4gSnVzdCBUQ0csIHdoaWNoIHdhcyB3aHkgSSB3YXMgd29u
-ZGVyaW5nIGlmIGl0IHdhcyBleHBlY3RlZC4gSSd2ZSBuZXZlciBydW4KPj4gPj4gPiB0aGVzZSB0
-ZXN0cyB3aXRoIFRDRyBiZWZvcmUuCj4+ID4+IAo+PiA+PiBIbW0gSSB0aGluayBleHBlY3Rpbmcg
-dGhlIElSUSBhdCBhbGwgaXMgYnJva2VuIHNvIEkgdGhpbmsgSSBzaG91bGQKPj4gPj4gZGVsZXRl
-IHRoZSB3aG9sZSBwZW5kaW5nIHRlc3QuCj4+ID4KPj4gPiBGZWVsIGZyZWUgdG8gcmVwb3N0LiBJ
-J2xsIHVwZGF0ZSB0aGUgcGF0Y2hlcyBpbiBhcm0vcXVldWUgYmVmb3JlIG15IG5leHQKPj4gPiBN
-Ui4KPj4gCj4+IEFjdHVhbGx5IEkgdGhpbmsgdGhlIHByb2JsZW0gd2FzIHdpdGggYSByZWdyZXNz
-aW9uIGluIHRoZSBUQ0cgSVRTCj4+IHN1cHBvcnQgKG5vdyBmaXhlZCBpbiBtYXN0ZXIpLiBTbyBJ
-IGJlbGlldmUgYXMgb2YgdjMgZXZlcnl0aGluZyBpcwo+PiBjb3JyZWN0IChhbmQgdjQgc2hvdWxk
-IGJlIGlnbm9yZWQpLgo+PiAKPj4gQXJlIHlvdSBoYXBweSB0byBhcHBseSB0aGlzIHNlcmllcyBv
-ciBkbyB5b3Ugd2FudCBtZSB0byByZXBvc3QgaXQgYXMgdjU/Cj4KPiBObyBuZWVkIHRvIHJlcG9z
-dC4gSSdsbCByZXRlc3QgdjMgd2l0aCBsYXRlc3QgUUVNVS4KCkdlbnRsZSBwaW5nLCBJJ20gdHJ5
-aW5nIHRvIGNsZWFyIHRoaXMgb2ZmIG15IGludGVybmFsIEpJUkEgc28gbGV0IG1lCmtub3cgaWYg
-eW91IHdhbnQgbWUgdG8gZG8gYW55dGhpbmcgdG8gaGVscC4KCj4KPiBUaGFua3MsCj4gZHJldwoK
-Ci0tIApBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
-Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Reiji,
+
+On Tue, Jan 25, 2022 at 6:31 AM Reiji Watanabe <reijiw@google.com> wrote:
+>
+> Hi Fuad,
+>
+> On Mon, Jan 24, 2022 at 8:19 AM Fuad Tabba <tabba@google.com> wrote:
+> >
+> > Hi Reiji,
+> >
+> > On Thu, Jan 6, 2022 at 4:27 AM Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > > The patch series is for both VHE and non-VHE, except for protected VMs,
+> > > which have a different way of configuring ID registers based on its
+> > > different requirements [1].
+> >
+> > I am reviewing this patch series and I really like your approach. I
+> > think that once it's through we might be able to generalize it for
+> > protected VMs as well (I did some of the work for the ID registers for
+> > those).
+>
+> Thank you for the review and comments for the series.
+> I will be looking at your comments.
+>
+> > > The series is based on v5.16-rc8 with the patch [3] applied.
+> >
+> > I tried to apply this series on v5.16-rc8 after applying
+> > 20220104194918.373612-2-rananta@google.com, and it didn't apply
+> > cleanly. If you could point me to a working branch that I could
+> > checkout I would like to test it and experiment with it a bit more.
+>
+> I'm sorry for the inconvenience.  I'm not sure why though...
+> I tried that again (applied the series on v5.16-rc8 after applying
+> 20220104194918.373612-2-rananta@google.com), and it worked fine.
+>
+> Anyway, you can find the branch at:
+>  https://github.com/reijiw-kvm/kvmarm-idreg/tree/id-regs-v4-5.16-rc8
+
+This works, thanks. I guess the problem I had earlier was that I got
+the whole series in 20220104194918.373612-2-rananta@google.com and not
+just the first patch.
+
+Cheers,
+/fuad
+
+
+> Thanks,
+> Reiji
+>
+>
+> >
+> >
+> >
+> >
+> > > v4:
+> > >   - Make ID registers storage per VM instead of per vCPU. [Marc]
+> > >   - Implement arm64_check_features() in arch/arm64/kernel/cpufeature.c
+> > >     by using existing codes in the file. [Marc]
+> > >   - Use a configuration function to enable traps for disabled
+> > >     features. [Marc]
+> > >   - Document ID registers become immutable after the first KVM_RUN [Eric]
+> > >   - Update ID_AA64PFR0.GIC at the point where a GICv3 is created. [Marc]
+> > >   - Get TGranX's bit position by substracting 12 from TGranX_2's bit
+> > >     position. [Eric]
+> > >   - Don't validate AArch32 ID registers when the system doesn't support
+> > >     32bit EL0. [Eric]
+> > >   - Add/fixes comments for patches. [Eric]
+> > >   - Made bug fixes/improvements of the selftest. [Eric]
+> > >   - Added .kunitconfig for arm64 KUnit tests
+> > >
+> > > v3: https://lore.kernel.org/all/20211117064359.2362060-1-reijiw@google.com/
+> > >   - Remove ID register consistency checking across vCPUs. [Oliver]
+> > >   - Change KVM_CAP_ARM_ID_REG_WRITABLE to
+> > >     KVM_CAP_ARM_ID_REG_CONFIGURABLE. [Oliver]
+> > >   - Add KUnit testing for ID register validation and trap initialization.
+> > >   - Change read_id_reg() to take care of ID_AA64PFR0_EL1.GIC.
+> > >   - Add a helper of read_id_reg() (__read_id_reg()) and use the helper
+> > >     instead of directly using __vcpu_sys_reg().
+> > >   - Change not to run kvm_id_regs_consistency_check() and
+> > >     kvm_vcpu_init_traps() for protected VMs.
+> > >   - Update selftest to remove test cases for ID register consistency.
+> > >     checking across vCPUs and to add test cases for ID_AA64PFR0_EL1.GIC.
+> > >
+> > > v2: https://lore.kernel.org/all/20211103062520.1445832-1-reijiw@google.com/
+> > >   - Remove unnecessary line breaks. [Andrew]
+> > >   - Use @params for comments. [Andrew]
+> > >   - Move arm64_check_features to arch/arm64/kvm/sys_regs.c and
+> > >     change that KVM specific feature check function.  [Andrew]
+> > >   - Remove unnecessary raz handling from __set_id_reg. [Andrew]
+> > >   - Remove sys_val field from the initial id_reg_info and add it
+> > >     in the later patch. [Andrew]
+> > >   - Call id_reg->init() from id_reg_info_init(). [Andrew]
+> > >   - Fix cpuid_feature_cap_perfmon_field() to convert 0xf to 0x0
+> > >     (and use it in the following patches).
+> > >   - Change kvm_vcpu_first_run_init to set has_run_once to false
+> > >     when kvm_id_regs_consistency_check() fails.
+> > >   - Add a patch to introduce id_reg_info for ID_AA64MMFR0_EL1,
+> > >     which requires special validity checking for TGran*_2 fields.
+> > >   - Add patches to introduce id_reg_info for ID_DFR1_EL1 and
+> > >     ID_MMFR0_EL1, which are required due to arm64_check_features
+> > >     implementation change.
+> > >   - Add a new argument, which is a pointer to id_reg_info, for
+> > >     id_reg_info's validate().
+> > >
+> > > v1: https://lore.kernel.org/all/20211012043535.500493-1-reijiw@google.com/
+> > >
+> > > [1] https://lore.kernel.org/kvmarm/20211010145636.1950948-1-tabba@google.com/
+> > > [2] https://lore.kernel.org/kvm/20201102033422.657391-1-liangpeng10@huawei.com/
+> > > [3] https://lore.kernel.org/all/20220104194918.373612-2-rananta@google.com/
+> > >
+> > > Reiji Watanabe (26):
+> > >   KVM: arm64: Introduce a validation function for an ID register
+> > >   KVM: arm64: Save ID registers' sanitized value per guest
+> > >   KVM: arm64: Introduce struct id_reg_info
+> > >   KVM: arm64: Make ID_AA64PFR0_EL1 writable
+> > >   KVM: arm64: Make ID_AA64PFR1_EL1 writable
+> > >   KVM: arm64: Make ID_AA64ISAR0_EL1 writable
+> > >   KVM: arm64: Make ID_AA64ISAR1_EL1 writable
+> > >   KVM: arm64: Make ID_AA64MMFR0_EL1 writable
+> > >   KVM: arm64: Hide IMPLEMENTATION DEFINED PMU support for the guest
+> > >   KVM: arm64: Make ID_AA64DFR0_EL1 writable
+> > >   KVM: arm64: Make ID_DFR0_EL1 writable
+> > >   KVM: arm64: Make MVFR1_EL1 writable
+> > >   KVM: arm64: Make ID registers without id_reg_info writable
+> > >   KVM: arm64: Add consistency checking for frac fields of ID registers
+> > >   KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE capability
+> > >   KVM: arm64: Add kunit test for ID register validation
+> > >   KVM: arm64: Use vcpu->arch cptr_el2 to track value of cptr_el2 for VHE
+> > >   KVM: arm64: Use vcpu->arch.mdcr_el2 to track value of mdcr_el2
+> > >   KVM: arm64: Introduce framework to trap disabled features
+> > >   KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
+> > >   KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
+> > >   KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
+> > >   KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
+> > >   KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
+> > >   KVM: arm64: Add kunit test for trap initialization
+> > >   KVM: arm64: selftests: Introduce id_reg_test
+> > >
+> > >  Documentation/virt/kvm/api.rst                |   12 +
+> > >  arch/arm64/include/asm/cpufeature.h           |    3 +-
+> > >  arch/arm64/include/asm/kvm_arm.h              |   32 +
+> > >  arch/arm64/include/asm/kvm_host.h             |   19 +
+> > >  arch/arm64/include/asm/sysreg.h               |    3 +
+> > >  arch/arm64/kernel/cpufeature.c                |  228 +++
+> > >  arch/arm64/kvm/.kunitconfig                   |    4 +
+> > >  arch/arm64/kvm/Kconfig                        |   11 +
+> > >  arch/arm64/kvm/arm.c                          |   24 +-
+> > >  arch/arm64/kvm/debug.c                        |   13 +-
+> > >  arch/arm64/kvm/hyp/vhe/switch.c               |   14 +-
+> > >  arch/arm64/kvm/sys_regs.c                     | 1329 +++++++++++++++--
+> > >  arch/arm64/kvm/sys_regs_test.c                | 1247 ++++++++++++++++
+> > >  arch/arm64/kvm/vgic/vgic-init.c               |    5 +
+> > >  include/uapi/linux/kvm.h                      |    1 +
+> > >  tools/arch/arm64/include/asm/sysreg.h         |    1 +
+> > >  tools/testing/selftests/kvm/.gitignore        |    1 +
+> > >  tools/testing/selftests/kvm/Makefile          |    1 +
+> > >  .../selftests/kvm/aarch64/id_reg_test.c       | 1239 +++++++++++++++
+> > >  19 files changed, 4041 insertions(+), 146 deletions(-)
+> > >  create mode 100644 arch/arm64/kvm/.kunitconfig
+> > >  create mode 100644 arch/arm64/kvm/sys_regs_test.c
+> > >  create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
+> > >
+> > >
+> > > base-commit: d399b107ee49bf5ea0391bd7614d512809e927b0
+> > > --
+> > > 2.34.1.448.ga2b2bfdf31-goog
+> > >
+> > > _______________________________________________
+> > > kvmarm mailing list
+> > > kvmarm@lists.cs.columbia.edu
+> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
