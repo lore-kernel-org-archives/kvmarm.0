@@ -2,54 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB5AC433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Feb 2022 08:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B83C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  1 Feb 2022 13:10:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 712B749EF5;
-	Tue,  1 Feb 2022 03:42:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C826B49EFE;
+	Tue,  1 Feb 2022 08:10:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R7diZ1OGfYWV; Tue,  1 Feb 2022 03:42:37 -0500 (EST)
+	with ESMTP id LvRuf9GtM7d7; Tue,  1 Feb 2022 08:10:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E221B49EED;
-	Tue,  1 Feb 2022 03:42:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB9449F01;
+	Tue,  1 Feb 2022 08:10:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B2B649EE6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 03:41:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E44249EFE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 08:10:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W+Ykj2Or7SmZ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Feb 2022 03:41:08 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1313449EE4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 03:41:07 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 86F9F6D;
- Tue,  1 Feb 2022 00:41:07 -0800 (PST)
-Received: from [192.168.1.11] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A9A3D3F40C;
- Tue,  1 Feb 2022 00:41:05 -0800 (PST)
-Subject: Re: [PATCH][kvmtool] virtio/pci: Signal INTx interrupts as level
- instead of edge
-To: Ard Biesheuvel <ardb@kernel.org>, Marc Zyngier <maz@kernel.org>
-References: <20220131160242.2665191-1-maz@kernel.org>
- <CAMj1kXHyxfe8E028OnN3Ac2PCC4HdyDdonHo785YTDjyXv=1qQ@mail.gmail.com>
-From: Pierre Gondois <pierre.gondois@arm.com>
-Message-ID: <a95adee4-bad2-08f7-af11-ef2f63935b12@arm.com>
-Date: Tue, 1 Feb 2022 09:41:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ with ESMTP id p747nwd+CD8P for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Feb 2022 08:10:48 -0500 (EST)
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com
+ [209.85.218.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D083749EF8
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 08:10:48 -0500 (EST)
+Received: by mail-ej1-f47.google.com with SMTP id k25so53698390ejp.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Feb 2022 05:10:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:date:in-reply-to
+ :message-id:mime-version:content-transfer-encoding;
+ bh=eC9jzuaPZejKnjk0GWhMgTqAMqfuhRTIOSuZXWu8eXw=;
+ b=RVU7etuW7MdtYnJbRNNzCMVAbSLc0oeE2iBAn+ct+xMR+grBtuJ1qUUeBZLcCvGI1K
+ oUvlcs7F46KsoYJ0m5IiGJqkTdBg4goYrwlXMl1TvwS5BxJiedmK6fk9xO4i1Ww1soE9
+ ERYNf8mO3lqKe0csETjVPelTqe7JWgv+yMPw9RmVY0M8nsW+E6oXmVp1aV+0SRMMIdoO
+ JnbOtcuAcg/CMKIh/13RQytM7CmRQrZTXGEaq8YEtXpkSsma9f2dqOqEopZOaD3LFfL6
+ ccCy2nZIwqdpS1g55iRaQNL10jYJKewglt6AVfEoRzHztlTJXpB3uDKD1IZ1OtPMy/D0
+ nb7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+ :in-reply-to:message-id:mime-version:content-transfer-encoding;
+ bh=eC9jzuaPZejKnjk0GWhMgTqAMqfuhRTIOSuZXWu8eXw=;
+ b=IjDfruB1iHgfdyS2gHpzwYouVh4O8orzksgm/09SubZc1q+MkUeQhnE1mWtx7mbQSy
+ 7rXSoxI5wO5/w2nv5AM2UUSTiY4lQEMAVkOWAh+kdPwAQpmTB/rZAWkeVNqhMfVcmLXF
+ r4OfWsO7VYlNy2tD0n8G1LJG4u10pucs5TJ1SwyUfF1TnyKqXm4HFIeuw0EP1LSJFFeR
+ BD8D6bPaTYyr2RDYENk/K6iiJg3JleWrecH50WCBaqdahIRkXJhYxsIGKqNHem4LKCto
+ R6phjKAtQg7wkvV+9Si4YrCowQqk60yRHvlNAtDK/NKe2DlCxwon3Fwg0jBd9BlMGvl6
+ geTA==
+X-Gm-Message-State: AOAM532MrtI+hlgc4qQgqXxdtfKA9LBxR2LZYmYgCPBlG6pTywd7/mx+
+ PQVjnbBdBIPOdwPBJvRofwXTTQ==
+X-Google-Smtp-Source: ABdhPJw4SkHe643vb01cK/lUVBDhWsTREIoWAOkvnRgbkkMXJUhRgtRI4kvtYUdz1RXFlTq+jqGZAw==
+X-Received: by 2002:a17:907:1c1c:: with SMTP id
+ nc28mr20850529ejc.651.1643721047776; 
+ Tue, 01 Feb 2022 05:10:47 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id jl17sm14870439ejc.13.2022.02.01.05.10.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Feb 2022 05:10:46 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E8B0C1FFB7;
+ Tue,  1 Feb 2022 13:10:45 +0000 (GMT)
+References: <20211112114734.3058678-1-alex.bennee@linaro.org>
+ <20211112132312.qrgmby55mlenj72p@gator.home> <87wnldfoul.fsf@linaro.org>
+ <20211112145442.5ktlpwyolwdsxlnx@gator.home> <877dd4umy6.fsf@linaro.org>
+ <20211119183059.jwrhb77jfjbv5rbz@gator.home> <87a6hlzq8t.fsf@linaro.org>
+ <20211130143425.bh27yy47vpihllvs@gator.home>
+User-agent: mu4e 1.7.6; emacs 28.0.91
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 0/3] GIC ITS tests
+Date: Tue, 01 Feb 2022 13:10:13 +0000
+In-reply-to: <20211130143425.bh27yy47vpihllvs@gator.home>
+Message-ID: <87sft2yboq.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMj1kXHyxfe8E028OnN3Ac2PCC4HdyDdonHo785YTDjyXv=1qQ@mail.gmail.com>
-Content-Language: en-US
-X-Mailman-Approved-At: Tue, 01 Feb 2022 03:42:34 -0500
-Cc: Will Deacon <will@kernel.org>, Andre Przywara <andre.przywara@arm.com>,
- Sami Mujawar <sami.mujawar@arm.com>,
- Android Kernel Team <kernel-team@android.com>,
- kvmarm <kvmarm@lists.cs.columbia.edu>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
+ qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -61,73 +91,59 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-
-
-On 1/31/22 5:04 PM, Ard Biesheuvel wrote:
-> On Mon, 31 Jan 2022 at 17:03, Marc Zyngier <maz@kernel.org> wrote:
->>
->> It appears that the way INTx is emulated is "slightly" out of spec
->> in kvmtool. We happily inject an edge interrupt, even if the spec
->> mandates a level.
->>
->> This doesn't change much for either the guest or userspace (only
->> KVM will have a bit more work tracking the EOI), but at least
->> this is correct.
->>
->> Reported-by: Pierre Gondois <pierre.gondois@arm.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> Cc: Ard Biesheuvel <ardb@kernel.org>
->> Cc: Sami Mujawar <sami.mujawar@arm.com>
->> Cc: Will Deacon <will@kernel.org>
-> 
-> Acked-by: Ard Biesheuvel <ardb@kernel.org>
-
-Hi,
-Just to confirm, I tried the patch and everything is working for me,
-Regards,
-Pierre
-
-> 
->> ---
->>   pci.c        | 2 +-
->>   virtio/pci.c | 2 +-
->>   2 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/pci.c b/pci.c
->> index e5930331..a769ae27 100644
->> --- a/pci.c
->> +++ b/pci.c
->> @@ -61,7 +61,7 @@ int pci__assign_irq(struct pci_device_header *pci_hdr)
->>          pci_hdr->irq_line       = irq__alloc_line();
->>
->>          if (!pci_hdr->irq_type)
->> -               pci_hdr->irq_type = IRQ_TYPE_EDGE_RISING;
->> +               pci_hdr->irq_type = IRQ_TYPE_LEVEL_HIGH;
->>
->>          return pci_hdr->irq_line;
->>   }
->> diff --git a/virtio/pci.c b/virtio/pci.c
->> index 41085291..2777d1c8 100644
->> --- a/virtio/pci.c
->> +++ b/virtio/pci.c
->> @@ -413,7 +413,7 @@ int virtio_pci__signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq)
->>                          kvm__irq_trigger(kvm, vpci->gsis[vq]);
->>          } else {
->>                  vpci->isr = VIRTIO_IRQ_HIGH;
->> -               kvm__irq_trigger(kvm, vpci->legacy_irq_line);
->> +               kvm__irq_line(kvm, vpci->legacy_irq_line, VIRTIO_IRQ_HIGH);
->>          }
->>          return 0;
->>   }
->> --
->> 2.34.1
->>
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IE9uIFR1ZSwgTm92
+IDMwLCAyMDIxIGF0IDAyOjExOjM0UE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gCj4+
+IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cj4+IAo+PiA+IE9uIEZy
+aSwgTm92IDE5LCAyMDIxIGF0IDA0OjMwOjQ3UE0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToK
+Pj4gPj4gCj4+ID4+IEFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cj4+
+ID4+IAo+PiA+PiA+IE9uIEZyaSwgTm92IDEyLCAyMDIxIGF0IDAyOjA4OjAxUE0gKzAwMDAsIEFs
+ZXggQmVubsOpZSB3cm90ZToKPj4gPj4gPj4gCj4+ID4+ID4+IEFuZHJldyBKb25lcyA8ZHJqb25l
+c0ByZWRoYXQuY29tPiB3cml0ZXM6Cj4+ID4+ID4+IAo+PiA+PiA+PiA+IE9uIEZyaSwgTm92IDEy
+LCAyMDIxIGF0IDExOjQ3OjMxQU0gKzAwMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gPj4gPj4g
+Pj4gSGksCj4+ID4+ID4+ID4+IAo+PiA+PiA+PiA+PiBTb3JyeSB0aGlzIGhhcyBiZWVuIHNpdHRp
+bmcgaW4gbXkgdHJlZSBzbyBsb25nLiBUaGUgY2hhbmdlcyBhcmUgZmFpcmx5Cj4+ID4+ID4+ID4+
+IG1pbm9yIGZyb20gdjIuIEkgbm8gbG9uZ2VyIHNwbGl0IHRoZSB0ZXN0cyB1cCBpbnRvIFRDRyBh
+bmQgS1ZNCj4+ID4+ID4+ID4+IHZlcnNpb25zIGFuZCBpbnN0ZWFkIGp1c3QgZW5zdXJlIHRoYXQg
+RVJSQVRBX0ZPUkNFIGlzIGFsd2F5cyBzZXQgd2hlbgo+PiA+PiA+PiA+PiBydW4gdW5kZXIgVENH
+Lgo+PiA+PiA+PiA+PiAKPj4gPj4gPj4gPj4gQWxleCBCZW5uw6llICgzKToKPj4gPj4gPj4gPj4g
+ICBhcm02NDogcmVtb3ZlIGludmFsaWQgY2hlY2sgZnJvbSBpdHMtdHJpZ2dlciB0ZXN0Cj4+ID4+
+ID4+ID4+ICAgYXJtNjQ6IGVuYWJsZSBpdHMtbWlncmF0aW9uIHRlc3RzIGZvciBUQ0cKPj4gPj4g
+Pj4gPj4gICBhcmNoLXJ1bjogZG8gbm90IHByb2Nlc3MgRVJSQVRBIHdoZW4gcnVubmluZyB1bmRl
+ciBUQ0cKPj4gPj4gPj4gPj4gCj4+ID4+ID4+ID4+ICBzY3JpcHRzL2FyY2gtcnVuLmJhc2ggfCAg
+NCArKystCj4+ID4+ID4+ID4+ICBhcm0vZ2ljLmMgICAgICAgICAgICAgfCAxNiArKysrKystLS0t
+LS0tLS0tCj4+ID4+ID4+ID4+ICBhcm0vdW5pdHRlc3RzLmNmZyAgICAgfCAgMyAtLS0KPj4gPj4g
+Pj4gPj4gIDMgZmlsZXMgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAxNCBkZWxldGlvbnMoLSkK
+Pj4gPj4gPj4gPj4gCj4+ID4+ID4+ID4+IC0tIAo+PiA+PiA+PiA+PiAyLjMwLjIKPj4gPj4gPj4g
+Pj4gCj4+ID4+ID4+ID4+IF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fCj4+ID4+ID4+ID4+IGt2bWFybSBtYWlsaW5nIGxpc3QKPj4gPj4gPj4gPj4ga3ZtYXJt
+QGxpc3RzLmNzLmNvbHVtYmlhLmVkdQo+PiA+PiA+PiA+PiBodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo+PiA+PiA+PiA+Cj4+ID4+ID4+ID4gSGkg
+QWxleCwKPj4gPj4gPj4gPgo+PiA+PiA+PiA+IFRoYW5rcyBmb3IgdGhpcy4gSSd2ZSBhcHBsaWVk
+IHRvIGFybS9xdWV1ZSwgYnV0IEkgc2VlIHRoYXQKPj4gPj4gPj4gPgo+PiA+PiA+PiA+IEZBSUw6
+IGdpY3YzOiBpdHMtdHJpZ2dlcjogaW52L2ludmFsbDogZGV2Mi9ldmVudGlkPTIwIHBlbmRpbmcg
+TFBJIGlzIHJlY2VpdmVkCj4+ID4+ID4+ID4KPj4gPj4gPj4gPiBjb25zaXN0ZW50bHkgZmFpbHMg
+Zm9yIG1lLiBJcyB0aGF0IGV4cGVjdGVkPyBEb2VzIGl0IHdvcmsgZm9yIHlvdT8KPj4gPj4gPj4g
+Cj4+ID4+ID4+IGRvaCAtIGxvb2tzIGxpa2UgSSBjb2NrZWQgdXAgdGhlIG1lcmdlIGNvbmZsaWN0
+Li4uCj4+ID4+ID4+IAo+PiA+PiA+PiBEaWQgaXQgZmFpbCBmb3IgVENHIG9yIGZvciBLVk0gKG9y
+IGJvdGgpPwo+PiA+PiA+Cj4+ID4+ID4gSnVzdCBUQ0csIHdoaWNoIHdhcyB3aHkgSSB3YXMgd29u
+ZGVyaW5nIGlmIGl0IHdhcyBleHBlY3RlZC4gSSd2ZSBuZXZlciBydW4KPj4gPj4gPiB0aGVzZSB0
+ZXN0cyB3aXRoIFRDRyBiZWZvcmUuCj4+ID4+IAo+PiA+PiBIbW0gSSB0aGluayBleHBlY3Rpbmcg
+dGhlIElSUSBhdCBhbGwgaXMgYnJva2VuIHNvIEkgdGhpbmsgSSBzaG91bGQKPj4gPj4gZGVsZXRl
+IHRoZSB3aG9sZSBwZW5kaW5nIHRlc3QuCj4+ID4KPj4gPiBGZWVsIGZyZWUgdG8gcmVwb3N0LiBJ
+J2xsIHVwZGF0ZSB0aGUgcGF0Y2hlcyBpbiBhcm0vcXVldWUgYmVmb3JlIG15IG5leHQKPj4gPiBN
+Ui4KPj4gCj4+IEFjdHVhbGx5IEkgdGhpbmsgdGhlIHByb2JsZW0gd2FzIHdpdGggYSByZWdyZXNz
+aW9uIGluIHRoZSBUQ0cgSVRTCj4+IHN1cHBvcnQgKG5vdyBmaXhlZCBpbiBtYXN0ZXIpLiBTbyBJ
+IGJlbGlldmUgYXMgb2YgdjMgZXZlcnl0aGluZyBpcwo+PiBjb3JyZWN0IChhbmQgdjQgc2hvdWxk
+IGJlIGlnbm9yZWQpLgo+PiAKPj4gQXJlIHlvdSBoYXBweSB0byBhcHBseSB0aGlzIHNlcmllcyBv
+ciBkbyB5b3Ugd2FudCBtZSB0byByZXBvc3QgaXQgYXMgdjU/Cj4KPiBObyBuZWVkIHRvIHJlcG9z
+dC4gSSdsbCByZXRlc3QgdjMgd2l0aCBsYXRlc3QgUUVNVS4KCkdlbnRsZSBwaW5nLCBJJ20gdHJ5
+aW5nIHRvIGNsZWFyIHRoaXMgb2ZmIG15IGludGVybmFsIEpJUkEgc28gbGV0IG1lCmtub3cgaWYg
+eW91IHdhbnQgbWUgdG8gZG8gYW55dGhpbmcgdG8gaGVscC4KCj4KPiBUaGFua3MsCj4gZHJldwoK
+Ci0tIApBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
+Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
