@@ -2,86 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F9E0C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Feb 2022 18:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC89C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Feb 2022 06:46:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1BA649E57;
-	Tue,  1 Feb 2022 13:39:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B500B49F21;
+	Wed,  2 Feb 2022 01:46:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4fr86QYu5C97; Tue,  1 Feb 2022 13:39:04 -0500 (EST)
+	with ESMTP id Ut37V9eoofSS; Wed,  2 Feb 2022 01:46:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B89C49E10;
-	Tue,  1 Feb 2022 13:39:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61FD349F28;
+	Wed,  2 Feb 2022 01:46:35 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ADBF49B0A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 13:39:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 996A349F21
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Feb 2022 01:46:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1OJVbq40nBsg for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Feb 2022 13:39:01 -0500 (EST)
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com
- [209.85.214.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1403340C95
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Feb 2022 13:39:00 -0500 (EST)
-Received: by mail-pl1-f170.google.com with SMTP id l13so7427541plg.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Feb 2022 10:39:00 -0800 (PST)
+ with ESMTP id gFycruo0irvg for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Feb 2022 01:46:32 -0500 (EST)
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com
+ [209.85.216.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3BF1B49F05
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Feb 2022 01:46:32 -0500 (EST)
+Received: by mail-pj1-f49.google.com with SMTP id
+ z14-20020a17090ab10e00b001b6175d4040so5927406pjq.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Feb 2022 22:46:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=cjMVwAHRzuneEUKCTGxfeEiXs54VyjggPNF5H89xF7w=;
- b=JTwSqzw1ISkkD95jXW49KDQXWIJU7LMPf79YGR5OHzdcWgTDFD2vZnmClEK8S9sIm7
- JG1sjCJ4GHPHwknL7z/u6qBHDhfxVFHX/NZR9aig2Fs23tpjwAAQ0Gjiys78JXDkn1HY
- dFBT9lQgnvLP5aD9U4HLgAiiOZ3h0N7wdeSCgbqTYWaw7czW4M15Q1uzshu0XbP1xikS
- 7RNnaQcvhA/21FQgG4dgj1WwLpDt9hu5ENsX4NCqQ/oncRs+0wQnR9kzkWdb1iJNk5zA
- st0u3wgIde9hqiufaNdkLeO7+tGoj3tsm/SNjAzE/J4+XhFc2Z7l2rQqxNCTkSSuKloa
- nToQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=n4I2R/hpf5Fa4L81XJ6bvxceN9VV7gkH/UQIc45psZ4=;
+ b=tIMuSrNzRH+KWp61Vo/OMMvaDkFTGOZvrsS0v4SKqfShDl+PQ3OrxwXGO10cig7KH0
+ brcJBL/bKE0lhbtp/HBpjl8yUDAZIr+3+OAp3aHtGlVyz8pl2ZDkN2dD93zpt/5KHz02
+ 0E/PovCbpnSEtik2Y/iWeVjuCFFXvfJs8Vwshd3VGIeFzjV1j3CLTqG67f4uqtl0i2ka
+ ifuPeeci4ApuXeShICr+eGBiR+8gyLw5sre/ZFpDIg5UlGuKCxhjyTzyD36/s2RrvTX3
+ LuNCPHae9QrMzdR+0IJY5XUrXrrXz70jc5K8PUm3ajXy5lZj7CEpMJ+5hqPJptRHP17l
+ 4N7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=cjMVwAHRzuneEUKCTGxfeEiXs54VyjggPNF5H89xF7w=;
- b=akkBuF2HHAqZH/mTRyqNDNq/XLJ0WdLn2GfSFEdkn9ccdyD12AD3i1KUQ6Bn2wKOLo
- cMeU8LHaErFAkEMOTAcNlyS6ZogMvjBUwmO7Z5ivMRl23S2ecrWht2rUo3meba/f++6m
- Y2mC8cTb3ET0fzDAkI7qJDxtjHJy7kbe2Z7ebhoSfBeUVl+qClrQAWE4clp+ZWh58sy7
- 0jd6JgnNH1Qyx1R6b/WR2ovQEAoVHAUa7uQYxM8phjz4Bjcmqu1QmxheQqtzvhKEtWAV
- wuheBa0P5uL4pknguzB0Eck4Chd0dUAvYGoRG4KAhBW2HUKquBQud++v4GMWJ9XFaTJZ
- rs3Q==
-X-Gm-Message-State: AOAM530VwZJY1n5GO4VBc9JRGafYoOU9vb4B4Ht0EX0berdMYWDxNytX
- u2Iief2V46k739Kcvc94Tp+6Mw==
-X-Google-Smtp-Source: ABdhPJwABX4STQVMJpby2CBINrprsj+frRBmFwkzRq9nIq5ueQaSjnpQnxERileNsQ4/lJqG9fqj5w==
-X-Received: by 2002:a17:903:41c1:: with SMTP id
- u1mr21030773ple.91.1643740739772; 
- Tue, 01 Feb 2022 10:38:59 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id f8sm20287551pfv.24.2022.02.01.10.38.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Feb 2022 10:38:59 -0800 (PST)
-Date: Tue, 1 Feb 2022 10:38:55 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-Message-ID: <Yfl+Pz4MWOyEHfhf@google.com>
-References: <20220106042708.2869332-1-reijiw@google.com>
- <20220106042708.2869332-3-reijiw@google.com>
- <YfDaiUbSkpi9/5YY@google.com>
- <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
- <CAOHnOrwBoQncTPngxqWgD_mEDWT6AwcmB_QC=j-eUPY2fwHa2Q@mail.gmail.com>
- <CAAeT=FyqPX_XQ+LDuRBZhApeiWD4s81bTMe=qiKDOZkBWm5ARg@mail.gmail.com>
- <YfdaKpBqFkULxgX/@google.com>
- <CAAeT=Fw7Fr2=sWyMZ85Ky-rhQJ3WQTa8fE8tNDHinwFYm3ksBQ@mail.gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=n4I2R/hpf5Fa4L81XJ6bvxceN9VV7gkH/UQIc45psZ4=;
+ b=NWYXYbouWxeida1sYKfsYRQG8c5IGCQo3fOdYAljLPRrHmdKDHLziUH9TnSYdgobqy
+ OVjRgy43Z19MTNjM+GFsBjepEIKzk/Ix69KSKfEzPmzy7vpHudlJE60uE/3qWZYedFo1
+ QQaUfJ5ym9gi9lwkKjtC2ma4cNbreW9m1PpLmNvQNfJFq1rSp59agWwhVOU18qOMiUEz
+ 2FuigGm70Ai9LTsL0qihFxlqtxQ18dzgzLHI0Nn/jGMFLHtJoMggnUM3NqciPBU7ub+d
+ YH/+Sy02vrmLQZHXlITpqmCH/TpP5pTNgcvrQVe8VimiHXNmp2M7ZlPapOWWcnu4RNRB
+ 1how==
+X-Gm-Message-State: AOAM530GhJvTbRzbvNPX6LvGWD1bCWFaE8FN9M/EQWNfcZHFZpnLKsBV
+ QtS0JTIqxyL1ca9ukzo4dpPhvNWLXqDwR2tKmMbBRA==
+X-Google-Smtp-Source: ABdhPJxoAC726UM4u8e1ITpNdSeFTzBmsKFwQ8RsnfrQGMs41DYzrOEDXws/ljWMGL4oA33Cq0yVqGM2HhAprUNIMQw=
+X-Received: by 2002:a17:902:b684:: with SMTP id
+ c4mr1249326pls.122.1643784391037; 
+ Tue, 01 Feb 2022 22:46:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAAeT=Fw7Fr2=sWyMZ85Ky-rhQJ3WQTa8fE8tNDHinwFYm3ksBQ@mail.gmail.com>
+References: <20220106042708.2869332-1-reijiw@google.com>
+ <20220106042708.2869332-2-reijiw@google.com>
+ <CA+EHjTx+b0ZVw30riW4OUVP4BCPeJZe+gr5_ycHkPbwU=y7sqA@mail.gmail.com>
+ <CAAeT=Fy8AXaM1SGs1wRssTZ9QW9bH-d1d_sCdSrC7EitZLPKBw@mail.gmail.com>
+ <CA+EHjTwRiNpGq=i8LyuH4M3kCdTHFQKALXWNJcTZ+J5SQD87Wg@mail.gmail.com>
+In-Reply-To: <CA+EHjTwRiNpGq=i8LyuH4M3kCdTHFQKALXWNJcTZ+J5SQD87Wg@mail.gmail.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Tue, 1 Feb 2022 22:46:14 -0800
+Message-ID: <CAAeT=FzDVbLsCdshTP+jszn_E_CqK3fN0V5bXeozf98abCdTZg@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 01/26] KVM: arm64: Introduce a validation function
+ for an ID register
+To: Fuad Tabba <tabba@google.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
  Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -99,125 +90,160 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Reiji,
+Hi Fuad,
 
-On Mon, Jan 31, 2022 at 10:00:40PM -0800, Reiji Watanabe wrote:
-> Hi Ricardo,
-> 
-> On Sun, Jan 30, 2022 at 7:40 PM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > On Fri, Jan 28, 2022 at 09:52:21PM -0800, Reiji Watanabe wrote:
-> > > Hi Ricardo,
-> > >
-> > > > > > > +
-> > > > > > > +/*
-> > > > > > > + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> > > > > > > + * with ID_SANITISED() to the host's sanitized value.
-> > > > > > > + */
-> > > > > > > +void set_default_id_regs(struct kvm *kvm)
-> > > > > > > +{
-> > > > > > > +     int i;
-> > > > > > > +     u32 id;
-> > > > > > > +     const struct sys_reg_desc *rd;
-> > > > > > > +     u64 val;
-> > > > > > > +
-> > > > > > > +     for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> > > > > > > +             rd = &sys_reg_descs[i];
-> > > > > > > +             if (rd->access != access_id_reg)
-> > > > > > > +                     /* Not ID register, or hidden/reserved ID register */
-> > > > > > > +                     continue;
-> > > > > > > +
-> > > > > > > +             id = reg_to_encoding(rd);
-> > > > > > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
-> > > > > > > +                     /* Shouldn't happen */
-> > > > > > > +                     continue;
-> > > > > > > +
-> > > > > > > +             val = read_sanitised_ftr_reg(id);
-> > > > > >
-> > > > > > I'm a bit confused. Shouldn't the default+sanitized values already use
-> > > > > > arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
-> > > > >
-> > > > > I'm not sure if I understand your question.
-> > > > > arm64_ftr_bits_kvm is used for feature support checkings when
-> > > > > userspace tries to modify a value of ID registers.
-> > > > > With this patch, KVM just saves the sanitized values in the kvm's
-> > > > > buffer, but userspace is still not allowed to modify values of ID
-> > > > > registers yet.
-> > > > > I hope it answers your question.
-> > > >
-> > > > Based on the previous commit I was assuming that some registers, like
-> > > > id_aa64dfr0,
-> > > > would default to the overwritten values as the sanitized values. More
-> > > > specifically: if
-> > > > userspace doesn't modify any ID reg, shouldn't the defaults have the
-> > > > KVM overwritten
-> > > > values (arm64_ftr_bits_kvm)?
-> > >
-> > > arm64_ftr_bits_kvm doesn't have arm64_ftr_reg but arm64_ftr_bits,
-> > > and arm64_ftr_bits_kvm doesn't have the sanitized values.
-> > >
-> > > Thanks,
-> >
-> > Hey Reiji,
-> >
-> > Sorry, I wasn't very clear. This is what I meant.
-> >
-> > If I set DEBUGVER to 0x5 (w/ FTR_EXACT) using this patch on top of the
-> > series:
-> >
-> >  static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
-> >         S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
-> > -       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
-> > +       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x5),
-> >
-> > it means that userspace would not be able to set DEBUGVER to anything
-> > but 0x5. But I'm not sure what it should mean for the default KVM value
-> > of DEBUGVER, specifically the value calculated in set_default_id_regs().
-> > As it is, KVM is still setting the guest-visible value to 0x6, and my
-> > "desire" to only allow booting VMs with DEBUGVER=0x5 is being ignored: I
-> > booted a VM and the DEBUGVER value from inside is still 0x6. I was
-> > expecting it to not boot, or to show a warning.
+On Tue, Feb 1, 2022 at 6:14 AM Fuad Tabba <tabba@google.com> wrote:
 >
-> Thank you for the explanation!
-> 
-> FTR_EXACT (in the existing code) means that the safe_val should be
-> used if values of the field are not identical between CPUs (see how
-> update_cpu_ftr_reg() uses arm64_ftr_safe_value()). For KVM usage,
-> it means that if the field value for a vCPU is different from the one
-> for the host's sanitized value, only the safe_val can be used safely
-> for the guest (purely in terms of CPU feature).
+> Hi Reiji,
+>
+> ...
+>
+> > > Could you please explain using ftr_temp[] and changing the value in
+> > > arm64_ftr_bits_kvm_override, rather than just
+> > > arm64_ftr_reg_bits_overrite(bits->ftr_bits, o_bits->ftr_bits)?
+> >
+> > I would like to maintain the order of the entries in the original
+> > ftr_bits so that (future) functions that work for the original ones
+> > also work for the KVM's.
+> > The copy and override is an easy way to do that.  The same thing can
+> > be done without ftr_temp[], but it would look a bit tricky.
+> >
+> > If we assume the order shouldn't matter or entries in ftr_bits
+> > are always in descending order, just changing the value in
+> > arm64_ftr_bits_kvm_override would be a much simpler way though.
+>
+> Could you please add a comment in that case? I did find it to be
+> confusing until I read your explanation here.
 
-Let me double check my understanding using the DEBUGVER example, please.
-The safe_value would be DEBUGVER=5, and it contradicts the initial VM
-value calculated on the KVM side. Q1: Can a contradiction like this
-occur in practice? Q2: If the user saves and restores this id-reg on the
-same kernel, the AA64DFR0 userspace write would fail (ftr_val !=
-arm64_ftr_safe_value), right?
+Yes, I will add a comment for it.
 
-> 
-> If KVM wants to restrict some features due to some reasons (e.g.
-> a feature for guests is not supported by the KVM yet), it should
-> be done by KVM (not by cpufeature.c), and  'validate' function in
-> "struct id_reg_info", which is introduced in patch-3, will be used
-> for such cases (the following patches actually use).
-> 
+>
+> >
+> > >
+> > >
+> > > > +static const struct arm64_ftr_bits *get_arm64_ftr_bits_kvm(u32 sys_id)
+> > > > +{
+> > > > +       const struct __ftr_reg_bits_entry *ret;
+> > > > +       int err;
+> > > > +
+> > > > +       if (!arm64_ftr_bits_kvm) {
+> > > > +               /* arm64_ftr_bits_kvm is not initialized yet. */
+> > > > +               err = init_arm64_ftr_bits_kvm();
+> > >
+> > > Rather than doing this check, can we just initialize it earlier, maybe
+> > > (indirectly) via kvm_arch_init_vm() or around the same time?
+> >
+> > Thank you for the comment.
+> > I will consider when it should be initialized.
+> > ( perhaps even earlier than kvm_arch_init_vm())
+> >
+> > >
+> > >
+> > > > +               if (err)
+> > > > +                       return NULL;
+> > > > +       }
+> > > > +
+> > > > +       ret = bsearch((const void *)(unsigned long)sys_id,
+> > > > +                     arm64_ftr_bits_kvm,
+> > > > +                     arm64_ftr_bits_kvm_nentries,
+> > > > +                     sizeof(arm64_ftr_bits_kvm[0]),
+> > > > +                     search_cmp_ftr_reg_bits);
+> > > > +       if (ret)
+> > > > +               return ret->ftr_bits;
+> > > > +
+> > > > +       return NULL;
+> > > > +}
+> > > > +
+> > > > +/*
+> > > > + * Check if features (or levels of features) that are indicated in the ID
+> > > > + * register value @val are also indicated in @limit.
+> > > > + * This function is for KVM to check if features that are indicated in @val,
+> > > > + * which will be used as the ID register value for its guest, are supported
+> > > > + * on the host.
+> > > > + * For AA64MMFR0_EL1.TGranX_2 fields, which don't follow the standard ID
+> > > > + * scheme, the function checks if values of the fields in @val are the same
+> > > > + * as the ones in @limit.
+> > > > + */
+> > > > +int arm64_check_features(u32 sys_reg, u64 val, u64 limit)
+> > > > +{
+> > > > +       const struct arm64_ftr_bits *ftrp = get_arm64_ftr_bits_kvm(sys_reg);
+> > > > +       u64 exposed_mask = 0;
+> > > > +
+> > > > +       if (!ftrp)
+> > > > +               return -ENOENT;
+> > > > +
+> > > > +       for (; ftrp->width; ftrp++) {
+> > > > +               s64 ftr_val = arm64_ftr_value(ftrp, val);
+> > > > +               s64 ftr_lim = arm64_ftr_value(ftrp, limit);
+> > > > +
+> > > > +               exposed_mask |= arm64_ftr_mask(ftrp);
+> > > > +
+> > > > +               if (ftr_val == ftr_lim)
+> > > > +                       continue;
+> > >
+> > > At first I thought that this check isn't necessary, it should be
+> > > covered by the check below (arm64_ftr_safe_value. However, I think
+> > > that it's needed for the FTR_HIGHER_OR_ZERO_SAFE case. If my
+> > > understanding is correct, it might be worth adding a comment, or even
+> > > encapsulating this logic in a arm64_is_safe_value() function for
+> > > clarity.
+> >
+> > In my understanding, arm64_ftr_safe_value() provides a safe value
+> > when two values are different, and I think there is nothing special
+> > about the usage of this function (This is actually how the function
+> > is used by update_cpu_ftr_reg()).
+> > Without the check, it won't work for FTR_EXACT, but there might be
+> > more in the future.
+> >
+> > Perhaps it might be more straightforward to add the equality check
+> > into arm64_ftr_safe_value() ?
+>
+> I don't think this would work for all callers of
+> arm64_ftr_safe_value(). The thing is arm64_ftr_safe_value() doesn't
+> check whether the value is safe, but it returns the safe value that
+> supports the highest feature. Whereas arm64_check_features() on the
+> other hand is trying to determine whether a value is safe.
+>
+> If you move the equality check there it would work for
+> arm64_check_features(), but I am not convinced it wouldn't change the
+> behavior for init_cpu_ftr_reg() in the case of FTR_EXACT, unless this
+> never applies to override->val. What do you think?
 
-Got it, thanks.
+The equality check (simply returns the new value if new == cur) could
+change a return value of arm64_ftr_safe_value only if ftr_ovr == ftr_new
+for FTR_EXACT case.  For init_cpu_ftr_reg, since ftr_ovr value doesn't
+matter if ftr_ovr == ftr_new, I would think the override behavior itself
+stays the same although the message that will be printed by
+init_cpu_ftr_reg() will change ("ignoring override" => "already set").
 
-> Thanks,
-> Reiji
-> 
+Having said that, since the change (having arm64_ftr_safe_value does
+the equality check) isn't necessary, either way is fine, and
+I can keep the current implementation of arm64_ftr_safe_value().
 
 Thanks,
-Ricardo
+Reiji
 
-> >
-> > I think this has some implications for migrations. It would not be
-> > possible to migrate the example VM on the patched kernel from above: you
-> > can boot a VM with DEBUGVER=0x5 but you can't migrate it.
+
+>
+> Thanks,
+> /fuad
+>
+>
+> > >
+> > > > +
+> > > > +               if (ftr_val != arm64_ftr_safe_value(ftrp, ftr_val, ftr_lim))
+> > > > +                       return -E2BIG;
+> > > > +       }
+> > > > +
+> > > > +       /* Make sure that no unrecognized fields are set in @val. */
+> > > > +       if (val & ~exposed_mask)
+> > > > +               return -E2BIG;
+> > > > +
+> > > > +       return 0;
+> > > > +}
 > >
 > > Thanks,
-> > Ricardo
+> > Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
