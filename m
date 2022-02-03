@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145FEC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Feb 2022 17:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AF59C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Feb 2022 17:42:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2AEA4B13E;
-	Thu,  3 Feb 2022 12:42:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 13D484B0F4;
+	Thu,  3 Feb 2022 12:42:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 54CYo7dAYxaW; Thu,  3 Feb 2022 12:42:10 -0500 (EST)
+	with ESMTP id oDUivoNCei01; Thu,  3 Feb 2022 12:42:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 559124B132;
-	Thu,  3 Feb 2022 12:42:10 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 70FDF4B156;
+	Thu,  3 Feb 2022 12:42:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBB5C4B108
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Feb 2022 12:42:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BFB24B137
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Feb 2022 12:42:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E7SHrLYbIdGm for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Feb 2022 12:42:07 -0500 (EST)
-Received: from mail-oo1-f74.google.com (mail-oo1-f74.google.com
- [209.85.161.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E87DA4B133
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Feb 2022 12:42:06 -0500 (EST)
-Received: by mail-oo1-f74.google.com with SMTP id
- c124-20020a4a4f82000000b002fb4087a29fso1995055oob.20
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Feb 2022 09:42:06 -0800 (PST)
+ with ESMTP id X917fOgB8geF for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Feb 2022 12:42:09 -0500 (EST)
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com
+ [209.85.166.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D6984B103
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Feb 2022 12:42:07 -0500 (EST)
+Received: by mail-il1-f202.google.com with SMTP id
+ t18-20020a92ca92000000b002b952c60bfbso2144108ilo.15
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Feb 2022 09:42:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=4r0SOCWPt5wKx9CF8jZGU5LRHrjPyjKnyg/twxUQ99U=;
- b=WGfV40wvKZIU47t0pOoO5Ect/ooh/k+M7Cw6D4v4PpUlSOKP2FwOHEGVYONx6nGhFu
- mDHr/OM6Rdc09lcwS2cWOiwbvKPWoiF9BSba/1uh3PQsRUM5nqWX3LDzBHUaCCjDuWQ1
- YNAAigy48uvL8v1HAa9CT/S0GHAyWUMgmlOORwpinqt4djULKhls70VGihjrC8KkFRkQ
- UFAlTt0N368uTzsFGbVHTfwtLm0EZ8H4nyC1zZa9eKBQlQQnBFxdaih58yPTHd60dMj2
- RfIhwE0I/CnkSytY9p6WYOmRVlI27AbhdjTyNO/zP9PXDu7iigNQo7IsNzAZQudlGRur
- OMvw==
+ :cc; bh=Nr8Z5OJ29ROTcrYqtf+ESfxb+ZGc4axhNqbKIHGyx48=;
+ b=Zsmt6apLHIOrBX2WT/vEH+Cx5ozwlrkyIKXHn1hHeEEE8fib7VyrQFw+64K33mlo4Z
+ fKUvhi393LhKtsn0GRp2uUfGOVxAsGxCBjRJM7yN8Y9+WLbgvoN5wCmKqh6kCq/UJOAL
+ vjoe9AVESUQJhGxjbxHPCrwUwwM92RQKsK3vbxKrMyJV/p7MghbYHLe4x/VmHq9z4pZa
+ KMKANvjA3mPuRaxs0Wq2zJMymU36GpQ7HlmIHT+eza9nhM8pRxerwWnuaNtP+EuoWuQ0
+ 0mrlcZhcXPaDJjPprgQTJQk7vwIoTBQLndrmGxCML+1AG77OAz3qSPsXarnS5G8nQyz1
+ qpuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=4r0SOCWPt5wKx9CF8jZGU5LRHrjPyjKnyg/twxUQ99U=;
- b=3te7p3HPXvgnWTR35PzfhEtIoG+6dNJdksHKTYURnolt84RFtvUZ1rKwGkEHYWIHrM
- 6TVz1MiMiWV5SbFldtgzHHMGzoqC9JbxFCR4Y0PNFaDrSYQvheWsYcQs5DrfPEtlLBae
- UuJSQEbFJIZMh61AIlkkqxiLJR/lD91PBvp2avz6SicL80vml28K9pHZe+zs7axJ18jP
- ZYki4f/riNiCLjNspF23249LJefgxpIQRLt6UJnWXw9CNJo0XcZRTFn3wPqBhfplBv7m
- Hma1id6Wcueh38iNhDiQSsHgT0i5nESVZqnGPE9MgFcqHSk8mS24rPDVGydNLAE4DQoJ
- fxpw==
-X-Gm-Message-State: AOAM5332w0r8D52h1aQxRN31Q5P8OmInyR6qZcTtGRAJvZDWCIsRgKfP
- Sga/KFmGjDh/eQlTXEemUP2aScm3+QnrK5ITUyh6YjxFv8nagJr2YQQrT19RPLh/HPbJLtAKiT6
- 2uHwA/sExrHNuBqSsLpSWPeVTWJ/ZvoB2q3Y4Ua8x9z46zJ01DbwVH+pRXdYG8XNHjpfj2g==
-X-Google-Smtp-Source: ABdhPJxrLATr32R3AP4ZJY+RhNzt4B+T3nXZBmmd/mTtPyPFp/J8N73If4L4WfmS23RqXFjtJKk7h1BtLA0=
+ bh=Nr8Z5OJ29ROTcrYqtf+ESfxb+ZGc4axhNqbKIHGyx48=;
+ b=SFT4zkHpLBoOW3NaylP6eOD98ljyUa2wg+3plrySjMiJEa8QMsEzslgCUC98hlQhgL
+ IKjzMd8/ICWHHtM6p0etfkrPShQHEWX2pAHbdnzmmY9KzZAXusDDJbAiH+780UXZFPFB
+ jYcGreWBgjUUQeCzXqXS9lbAT4h2ABjuxnBUzN1u/LKD+M+vrD7f37E1/6U46hFcNbe6
+ Ej7oJffCslXVyww/fu1mu8SqM3SAhzL3g4L7KrsMSQcEv/HsoDFU0Fm0piU6r+PWc8Nx
+ 7oyD10EmAP9QAmrnIco7xH/aq2/SmWEtxBxSVmhGmCEvkOAB+fJ85YFR2dpXS2Ew1Eu+
+ bgQg==
+X-Gm-Message-State: AOAM533GDC6HsxsAzej/8iCspXYjqeHKppbbn7rXw3O2BNNMVqfhcaGN
+ 1ugH65D3KC4Hatq0I3BL9Po8a08IJ1jjIdFz+myUdRCW9ZbTW1t3LUIfRCfh4XkXXSTqF5IHwRB
+ RCbT7xmJYKrUPW2+XPmx/KrQLVkaGnpE+tPXb9ib94aqEczL/+FFlK63r/Xw16wmrtt2Vxg==
+X-Google-Smtp-Source: ABdhPJyPjx/GoLIMEP3S5DYF0m7WONfmTl73rjwA7Ukvp8YcT5Olh4b/zTsPduICjWXRqbtnZGNz7XZiRHs=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a9d:57c6:: with SMTP id
- q6mr19955651oti.328.1643910126087; 
- Thu, 03 Feb 2022 09:42:06 -0800 (PST)
-Date: Thu,  3 Feb 2022 17:41:56 +0000
+ (user=oupton job=sendgmr) by 2002:a02:ba14:: with SMTP id
+ z20mr11969165jan.102.1643910127009; 
+ Thu, 03 Feb 2022 09:42:07 -0800 (PST)
+Date: Thu,  3 Feb 2022 17:41:57 +0000
 In-Reply-To: <20220203174159.2887882-1-oupton@google.com>
-Message-Id: <20220203174159.2887882-4-oupton@google.com>
+Message-Id: <20220203174159.2887882-5-oupton@google.com>
 Mime-Version: 1.0
 References: <20220203174159.2887882-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
-Subject: [PATCH v5 3/6] KVM: arm64: Allow guest to set the OSLK bit
+Subject: [PATCH v5 4/6] KVM: arm64: Emulate the OS Lock
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -86,121 +86,114 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Allow writes to OSLAR and forward the OSLK bit to OSLSR. Do nothing with
-the value for now.
+The OS lock blocks all debug exceptions at every EL. To date, KVM has
+not implemented the OS lock for its guests, despite the fact that it is
+mandatory per the architecture. Simple context switching between the
+guest and host is not appropriate, as its effects are not constrained to
+the guest context.
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Emulate the OS Lock by clearing MDE and SS in MDSCR_EL1, thereby
+blocking all but software breakpoint instructions.
+
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/include/asm/sysreg.h |  3 +++
- arch/arm64/kvm/sys_regs.c       | 37 ++++++++++++++++++++++++++-------
- 2 files changed, 33 insertions(+), 7 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  4 ++++
+ arch/arm64/kvm/debug.c            | 26 ++++++++++++++++++++++----
+ arch/arm64/kvm/sys_regs.c         |  6 +++---
+ 3 files changed, 29 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index abc85eaa453d..906a3550fc50 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -128,12 +128,15 @@
- #define SYS_DBGWVRn_EL1(n)		sys_reg(2, 0, 0, n, 6)
- #define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
- #define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index cc1cc40d89f0..3c73e4de4229 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -726,6 +726,10 @@ void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
 +
- #define SYS_OSLAR_EL1			sys_reg(2, 0, 1, 0, 4)
-+#define SYS_OSLAR_OSLK			BIT(0)
++#define kvm_vcpu_os_lock_enabled(vcpu)		\
++	(!!(__vcpu_sys_reg(vcpu, OSLSR_EL1) & SYS_OSLSR_OSLK))
++
+ int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+ 			       struct kvm_device_attr *attr);
+ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index db9361338b2a..4fd5c216c4bb 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -105,9 +105,11 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+ 	 *  - Userspace is using the hardware to debug the guest
+ 	 *  (KVM_GUESTDBG_USE_HW is set).
+ 	 *  - The guest is not using debug (KVM_ARM64_DEBUG_DIRTY is clear).
++	 *  - The guest has enabled the OS Lock (debug exceptions are blocked).
+ 	 */
+ 	if ((vcpu->guest_debug & KVM_GUESTDBG_USE_HW) ||
+-	    !(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY))
++	    !(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY) ||
++	    kvm_vcpu_os_lock_enabled(vcpu))
+ 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
  
- #define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
- #define SYS_OSLSR_OSLM_MASK		(BIT(3) | BIT(0))
- #define SYS_OSLSR_OSLM_NI		0
- #define SYS_OSLSR_OSLM_IMPLEMENTED	BIT(3)
-+#define SYS_OSLSR_OSLK			BIT(1)
+ 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+@@ -160,8 +162,8 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
  
- #define SYS_OSDLR_EL1			sys_reg(2, 0, 1, 3, 4)
- #define SYS_DBGPRCR_EL1			sys_reg(2, 0, 1, 4, 4)
+ 	kvm_arm_setup_mdcr_el2(vcpu);
+ 
+-	/* Is Guest debugging in effect? */
+-	if (vcpu->guest_debug) {
++	/* Check if we need to use the debug registers. */
++	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
+ 		/* Save guest debug state */
+ 		save_guest_debug_regs(vcpu);
+ 
+@@ -223,6 +225,19 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+ 			trace_kvm_arm_set_regset("WAPTS", get_num_wrps(),
+ 						&vcpu->arch.debug_ptr->dbg_wcr[0],
+ 						&vcpu->arch.debug_ptr->dbg_wvr[0]);
++
++		/*
++		 * The OS Lock blocks debug exceptions in all ELs when it is
++		 * enabled. If the guest has enabled the OS Lock, constrain its
++		 * effects to the guest. Emulate the behavior by clearing
++		 * MDSCR_EL1.MDE. In so doing, we ensure that host debug
++		 * exceptions are unaffected by guest configuration of the OS
++		 * Lock.
++		 */
++		} else if (kvm_vcpu_os_lock_enabled(vcpu)) {
++			mdscr = vcpu_read_sys_reg(vcpu, MDSCR_EL1);
++			mdscr &= ~DBG_MDSCR_MDE;
++			vcpu_write_sys_reg(vcpu, mdscr, MDSCR_EL1);
+ 		}
+ 	}
+ 
+@@ -244,7 +259,10 @@ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+ {
+ 	trace_kvm_arm_clear_debug(vcpu->guest_debug);
+ 
+-	if (vcpu->guest_debug) {
++	/*
++	 * Restore the guest's debug registers if we were using them.
++	 */
++	if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu)) {
+ 		restore_guest_debug_regs(vcpu);
+ 
+ 		/*
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b8286c31e01c..b0d7240ef49f 100644
+index b0d7240ef49f..dd34b5ab51d4 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -44,6 +44,10 @@
-  * 64bit interface.
+@@ -1457,9 +1457,9 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+  * Debug handling: We do trap most, if not all debug related system
+  * registers. The implementation is good enough to ensure that a guest
+  * can use these with minimal performance degradation. The drawback is
+- * that we don't implement any of the external debug, none of the
+- * OSlock protocol. This should be revisited if we ever encounter a
+- * more demanding guest...
++ * that we don't implement any of the external debug architecture.
++ * This should be revisited if we ever encounter a more demanding
++ * guest...
   */
- 
-+static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
-+static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
-+static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
-+
- static bool read_from_write_only(struct kvm_vcpu *vcpu,
- 				 struct sys_reg_params *params,
- 				 const struct sys_reg_desc *r)
-@@ -287,6 +291,24 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
- 	return trap_raz_wi(vcpu, p, r);
- }
- 
-+static bool trap_oslar_el1(struct kvm_vcpu *vcpu,
-+			   struct sys_reg_params *p,
-+			   const struct sys_reg_desc *r)
-+{
-+	u64 oslsr;
-+
-+	if (!p->is_write)
-+		return read_from_write_only(vcpu, p, r);
-+
-+	/* Forward the OSLK bit to OSLSR */
-+	oslsr = __vcpu_sys_reg(vcpu, OSLSR_EL1) & ~SYS_OSLSR_OSLK;
-+	if (p->regval & SYS_OSLAR_OSLK)
-+		oslsr |= SYS_OSLSR_OSLK;
-+
-+	__vcpu_sys_reg(vcpu, OSLSR_EL1) = oslsr;
-+	return true;
-+}
-+
- static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
- 			   struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
-@@ -309,9 +331,14 @@ static int set_oslsr_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
- 	if (err)
- 		return err;
- 
--	if (val != rd->val)
-+	/*
-+	 * The only modifiable bit is the OSLK bit. Refuse the write if
-+	 * userspace attempts to change any other bit in the register.
-+	 */
-+	if ((val ^ rd->val) & ~SYS_OSLSR_OSLK)
- 		return -EINVAL;
- 
-+	__vcpu_sys_reg(vcpu, rd->reg) = val;
- 	return 0;
- }
- 
-@@ -1180,10 +1207,6 @@ static bool access_raz_id_reg(struct kvm_vcpu *vcpu,
- 	return __access_id_reg(vcpu, p, r, true);
- }
- 
--static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
--static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
--static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
--
- /* Visibility overrides for SVE-specific control registers */
- static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *rd)
-@@ -1463,7 +1486,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	DBG_BCR_BVR_WCR_WVR_EL1(15),
- 
- 	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
--	{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
-+	{ SYS_DESC(SYS_OSLAR_EL1), trap_oslar_el1 },
- 	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1,
- 		SYS_OSLSR_OSLM_IMPLEMENTED, .set_user = set_oslsr_el1, },
- 	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
-@@ -1937,7 +1960,7 @@ static const struct sys_reg_desc cp14_regs[] = {
- 
- 	DBGBXVR(0),
- 	/* DBGOSLAR */
--	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_raz_wi },
-+	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_oslar_el1 },
- 	DBGBXVR(1),
- 	/* DBGOSLSR */
- 	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1, NULL, OSLSR_EL1 },
+ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
 -- 
 2.35.0.263.gb82422642f-goog
 
