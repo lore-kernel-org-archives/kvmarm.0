@@ -2,80 +2,46 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FBABC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Feb 2022 18:29:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0166EC433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Feb 2022 10:58:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DF7A49F55;
-	Thu,  3 Feb 2022 13:29:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B78340C02;
+	Fri,  4 Feb 2022 05:58:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yHxGkWavcUR3; Thu,  3 Feb 2022 13:29:20 -0500 (EST)
+	with ESMTP id fBxqCUNrgo3g; Fri,  4 Feb 2022 05:58:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4817449F1E;
-	Thu,  3 Feb 2022 13:29:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A3BB40E3D;
+	Fri,  4 Feb 2022 05:58:37 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D47249F1E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Feb 2022 13:29:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CEA040C02
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 05:58:36 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0MNJy5jEtuY3 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Feb 2022 13:29:17 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B83B949F04
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Feb 2022 13:29:17 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 6ECA5618E3;
- Thu,  3 Feb 2022 18:29:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3049C340E8;
- Thu,  3 Feb 2022 18:29:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643912955;
- bh=ncqPtg+DYpNlGvx4X6HMr8JFXcAL5tl358yKDL55o44=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=VtsBhmSjo+Kdf44472ysg4KDANbBqsE1QTfyaJqKrXxE1QsO2iUl7l0rknGcsOC7W
- tfloh+wvu1VbcIgC1B6Z3j6iVaf5BustlGwoUgWbmKKgl5dr4M2bqMA+fg1Icum2/j
- AaQK61Cpi+sHtIePYM69uGVnleZ51R9imPJkUMLXuEkaQpj6kRbzHfEK31k0LHartO
- Tmf4TZ0xhnZ8SD8fOY4zTRGyvuS7jLkkVyyXzsWJ7PspVMqgax38B/r00C07JF7j1r
- PA1YGFHQHhR/SATEwQeOrzlTMid/cPpDYphdwnp8MoPl9jL7jR+fFz8JBefxO18DeJ
- hR5LSUW1Ozn5g==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=billy-the-mountain.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nFgr3-005EBq-NS; Thu, 03 Feb 2022 18:29:13 +0000
-Date: Thu, 03 Feb 2022 18:29:13 +0000
-Message-ID: <87fsoz3iti.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH v6 12/64] KVM: arm64: nv: Add non-VHE-EL2->EL1 translation
- helpers
-In-Reply-To: <Yfq6ig0TIv2Bs4Dq@monolith.localdoman>
+ with ESMTP id xcL1jGW8BmBS for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Feb 2022 05:58:33 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B59ED40AFA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 05:58:33 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 338E22B;
+ Fri,  4 Feb 2022 02:58:33 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6062B3F774;
+ Fri,  4 Feb 2022 02:58:30 -0800 (PST)
+Date: Fri, 4 Feb 2022 10:58:40 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v6 19/64] KVM: arm64: nv: Trap SPSR_EL1, ELR_EL1 and
+ VBAR_EL1 from virtual EL2
+Message-ID: <Yf0G4Ka/ho0Rdt2N@monolith.localdoman>
 References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-13-maz@kernel.org>
- <Yfq6ig0TIv2Bs4Dq@monolith.localdoman>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com,
- jintack@cs.columbia.edu, haibo.xu@linaro.org,
- gankulkarni@os.amperecomputing.com, chase.conklin@arm.com,
- linux@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com,
- karl.heubaum@oracle.com, mihai.carabas@oracle.com, miguel.luis@oracle.com,
- kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <20220128121912.509006-20-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-20-maz@kernel.org>
 Cc: kernel-team@android.com, kvm@vger.kernel.org,
  Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>,
@@ -100,174 +66,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 02 Feb 2022 17:08:26 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Fri, Jan 28, 2022 at 12:18:20PM +0000, Marc Zyngier wrote:
-> > Some EL2 system registers immediately affect the current execution
-> > of the system, so we need to use their respective EL1 counterparts.
-> > For this we need to define a mapping between the two. In general,
-> > this only affects non-VHE guest hypervisors, as VHE system registers
-> > are compatible with the EL1 counterparts.
-> > 
-> > These helpers will get used in subsequent patches.
-> > 
-> > Co-developed-by: Andre Przywara <andre.przywara@arm.com>
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_nested.h | 54 +++++++++++++++++++++++++++++
-> >  1 file changed, 54 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > index fd601ea68d13..5a85be6d8eb3 100644
-> > --- a/arch/arm64/include/asm/kvm_nested.h
-> > +++ b/arch/arm64/include/asm/kvm_nested.h
-> > @@ -2,6 +2,7 @@
-> >  #ifndef __ARM64_KVM_NESTED_H
-> >  #define __ARM64_KVM_NESTED_H
-> >  
-> > +#include <linux/bitfield.h>
-> >  #include <linux/kvm_host.h>
-> >  
-> >  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-> > @@ -11,4 +12,57 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-> >  		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
-> >  }
-> >  
-> > +/* Translation helpers from non-VHE EL2 to EL1 */
-> > +static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
-> > +{
-> > +	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
-> > +}
-> > +
-> > +static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
-> > +{
-> > +	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
-> > +	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
-> > +	       tcr_el2_ps_to_tcr_el1_ips(tcr) |
-> > +	       (tcr & TCR_EL2_TG0_MASK) |
-> > +	       (tcr & TCR_EL2_ORGN0_MASK) |
-> > +	       (tcr & TCR_EL2_IRGN0_MASK) |
-> > +	       (tcr & TCR_EL2_T0SZ_MASK);
-> > +}
-> > +
-> > +static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
-> > +{
-> > +	u64 cpacr_el1 = 0;
-> > +
-> > +	if (cptr_el2 & CPTR_EL2_TTA)
-> > +		cpacr_el1 |= CPACR_EL1_TTA;
-> > +	if (!(cptr_el2 & CPTR_EL2_TFP))
-> > +		cpacr_el1 |= CPACR_EL1_FPEN;
-> > +	if (!(cptr_el2 & CPTR_EL2_TZ))
-> > +		cpacr_el1 |= CPACR_EL1_ZEN;
-> > +
-> > +	return cpacr_el1;
-> > +}
-> > +
-> > +static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
-> > +{
-> > +	/* Only preserve the minimal set of bits we support */
-> > +	val &= (SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | SCTLR_ELx_SA |
-> > +		SCTLR_ELx_I | SCTLR_ELx_IESB | SCTLR_ELx_WXN | SCTLR_ELx_EE);
-> 
-> Checked that the bit positions are the same between SCTLR_EL2 and SCTLR_EL1. I
-> think the IESB bit (bit 21) should be after the WXN bit (bit 19) to be
-> consistent; doesn't really matter either way.
-> 
-> > +	val |= SCTLR_EL1_RES1;
-> > +
-> > +	return val;
-> > +}
-> > +
-> > +static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
-> > +{
-> > +	/* Clear the ASID field */
-> > +	return ttbr0 & ~GENMASK_ULL(63, 48);
-> > +}
-> > +
-> > +static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
-> > +{
-> > +	return ((FIELD_GET(CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN, cnthctl) << 10) |
-> > +		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
-> 
-> I asked about the field positions in the previous series and this is what you
-> replied:
-> 
-> > It's a classic one. Remember that we are running VHE, and remapping a
-> > nVHE view of CNTHCTL_EL2 into the VHE view *for the guest*, and that
-> > these things are completely shifted around (it has the CNTKCTL_EL1
-> > format).
-> >
-> > For example, on nVHE, CNTHCTL_EL2.EL1PCTEN is bit 0. On nVHE, this is
-> > bit 10. That's why we have this shift, and that you now need some
-> > paracetamol.
-> >
-> > You can also look at the way we deal with the same stuff in
-> > kvm_timer_init_vhe()".
-> 
-> Here's how this function is used in vhe/sysreg-sr.c:
-> 
-> static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
-> {
-> 	[..]
-> 	if (__vcpu_el2_e2h_is_set(ctxt)) {
-> 		[..]
-> 	} else {
-> 		[..]
-> 		val = translate_cnthctl_el2_to_cntkctl_el1(ctxt_sys_reg(ctxt, CNTHCTL_EL2));
-> 		write_sysreg_el1(val, SYS_CNTKCTL);
-> 	}
-> 	[..]
-> }
-> 
-> CNTHCTL_EL2 is a pure EL2 register. The translate function is called
-> when guest HCR_EL2.E2H is not set, therefore virtual CNTHCTL_EL2 has
-> the non-VHE format.  And the result of the function is used to write
-> to the hardware CNTKCTL_EL1 register (using the CNTKCTL_EL12
-> encoding), which is different from the CNTHCTL_EL2
-> register. CNTKCTL_EL1 also always has the same format regardless of
-> the value of the HCR_EL2.E2H bit.
-> 
-> I don't understand what the host running with VHE has to do with the
-> translate function.
+Hi Marc,
 
-It's just that I completely misunderstood your question, and that I
-also failed to realise that this code is just plain buggy. Apologies
-for wasting your time on this.
+On Fri, Jan 28, 2022 at 12:18:27PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> For the same reason we trap virtual memory register accesses at virtual
+> EL2, we need to trap SPSR_EL1, ELR_EL1 and VBAR_EL1 accesses. ARM v8.3
+> introduces the HCR_EL2.NV1 bit to be able to trap on those register
+> accesses in EL1. Do not set this bit until the whole nesting support is
+> completed.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 29 ++++++++++++++++++++++++++++-
+>  1 file changed, 28 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 9d3520f1d17a..4f2bcc1e0c25 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1650,6 +1650,30 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static bool access_elr(struct kvm_vcpu *vcpu,
+> +		       struct sys_reg_params *p,
+> +		       const struct sys_reg_desc *r)
+> +{
+> +	if (p->is_write)
+> +		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
+> +	else
+> +		p->regval = vcpu_read_sys_reg(vcpu, ELR_EL1);
 
-As it turns out, CNTHCTL_EL2 has *zero* influence on the hypervisor
-itself, so messing with it and trying to restore it into CNTKCTL_EL12
-is remarkably pointless. It is solely designed to influence the
-execution of EL1. Duh.
+Going over the patch again, I was a bit confused why access_elr() uses
+vcpu_{read,write}_sys_reg(), but access_spsr() uses __vcpu_sys_reg(). In
+the end, vcpu_{read,write}_sys_reg() will write to the shadow copy of the
+registers, as the guest is executing at virtual non-VHE EL2, so the two are
+equivalent.
 
-What it should do is to restore parts of this register *on the host*
-so that L1's EL1 is actually influenced by what L1's EL2 has set up
-(mostly to handle traps from EL1 to EL2).
-
-To summarise:
-
-- the name of the function is misleading: it should be something like
-  'translate_nvhe_cnthctl_el2_to_vhe()'. The function is otherwise
-  correct, and why I was rambling about the bit offsets.
-
-- the location of the save/restore is wrong: it should happen when
-  dealing with EL1 instead of EL2
-
-- the register it targets is wrong: it should target CNTHTL_EL2 (or
-  CNTKCTL_EL1 as seen from VHE EL2)
-
-I'll stick a brown paper bag on my head and wear it for the evening.
+It's obviously me nitpicking, but the inconsistency is unexpected. How
+about using vcpu_{read,write}_sys_reg() for access_spsr() below?
 
 Thanks,
+Alex
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+> +
+> +	return true;
+> +}
+> +
+> +static bool access_spsr(struct kvm_vcpu *vcpu,
+> +			struct sys_reg_params *p,
+> +			const struct sys_reg_desc *r)
+> +{
+> +	if (p->is_write)
+> +		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
+> +	else
+> +		p->regval = __vcpu_sys_reg(vcpu, SPSR_EL1);
+> +
+> +	return true;
+> +}
+> +
+>  static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+>  			    struct sys_reg_params *p,
+>  			    const struct sys_reg_desc *r)
+> @@ -1812,6 +1836,9 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	PTRAUTH_KEY(APDB),
+>  	PTRAUTH_KEY(APGA),
+>  
+> +	{ SYS_DESC(SYS_SPSR_EL1), access_spsr},
+> +	{ SYS_DESC(SYS_ELR_EL1), access_elr},
+> +
+>  	{ SYS_DESC(SYS_AFSR0_EL1), access_vm_reg, reset_unknown, AFSR0_EL1 },
+>  	{ SYS_DESC(SYS_AFSR1_EL1), access_vm_reg, reset_unknown, AFSR1_EL1 },
+>  	{ SYS_DESC(SYS_ESR_EL1), access_vm_reg, reset_unknown, ESR_EL1 },
+> @@ -1859,7 +1886,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+>  	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+>  
+> -	{ SYS_DESC(SYS_VBAR_EL1), NULL, reset_val, VBAR_EL1, 0 },
+> +	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
+>  	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+>  
+>  	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
+> -- 
+> 2.30.2
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
