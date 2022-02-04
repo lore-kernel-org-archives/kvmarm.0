@@ -2,46 +2,47 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA515C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Feb 2022 11:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB955C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Feb 2022 11:47:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 378B240066;
-	Fri,  4 Feb 2022 06:10:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AAA849E22;
+	Fri,  4 Feb 2022 06:47:23 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eylX5SpMatcd; Fri,  4 Feb 2022 06:10:24 -0500 (EST)
+	with ESMTP id w4dPpHmUk9Qw; Fri,  4 Feb 2022 06:47:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E0BF40C95;
-	Fri,  4 Feb 2022 06:10:24 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D415949E29;
+	Fri,  4 Feb 2022 06:47:21 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B6D1D40C95
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 06:10:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E73449E22
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 06:47:20 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G7sESRVyCw1v for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Feb 2022 06:10:21 -0500 (EST)
+ with ESMTP id 80ALQ4OBoHGM for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Feb 2022 06:47:19 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EDA140066
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 06:10:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06C9849B26
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 06:47:18 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5AF441435;
- Fri,  4 Feb 2022 03:10:20 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5687F1480;
+ Fri,  4 Feb 2022 03:47:18 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BEE53F774;
- Fri,  4 Feb 2022 03:10:17 -0800 (PST)
-Date: Fri, 4 Feb 2022 11:10:35 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 838873F40C;
+ Fri,  4 Feb 2022 03:47:15 -0800 (PST)
+Date: Fri, 4 Feb 2022 11:47:25 +0000
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v6 20/64] KVM: arm64: nv: Trap CPACR_EL1 access in
- virtual EL2
-Message-ID: <Yf0Jm4vUNrnTcylS@monolith.localdoman>
+Subject: Re: [PATCH v6 09/64] KVM: arm64: nv: Support virtual EL2 exceptions
+Message-ID: <Yf0STQXSEtPPApTL@monolith.localdoman>
 References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-21-maz@kernel.org>
+ <20220128121912.509006-10-maz@kernel.org>
+ <Yfqh6BocbZA1jexU@monolith.localdoman>
+ <87h79f3kxj.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220128121912.509006-21-maz@kernel.org>
+In-Reply-To: <87h79f3kxj.wl-maz@kernel.org>
 Cc: kernel-team@android.com, kvm@vger.kernel.org,
  Andre Przywara <andre.przywara@arm.com>,
  Christoffer Dall <christoffer.dall@arm.com>,
@@ -68,69 +69,107 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Marc,
 
-This also what Arm ARM recommends for a guest with HCR_EL2.E2H = 0 in section
-D5.7.1 "Armv8.3 nested virtualization functionality".
+On Thu, Feb 03, 2022 at 05:43:36PM +0000, Marc Zyngier wrote:
+> On Wed, 02 Feb 2022 15:23:20 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi,
+> > 
+> > On Fri, Jan 28, 2022 at 12:18:17PM +0000, Marc Zyngier wrote:
+> > > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> > > new file mode 100644
+> > > index 000000000000..f52cd4458947
+> > > --- /dev/null
+> > > +++ b/arch/arm64/kvm/emulate-nested.c
+> > > @@ -0,0 +1,197 @@
+> > 
+> > Looks like this line:
+> > 
+> > // SPDX-License-Identifier: GPL-2.0-only
+> > 
+> > is missing.
+> 
+> Indeed. I should check all the new files, as they are a bit... off.
+> 
+> > 
+> > > +/*
+> > > + * Copyright (C) 2016 - Linaro and Columbia University
+> > > + * Author: Jintack Lim <jintack.lim@linaro.org>
+> > > + */
+> > > +
+> > > +#include <linux/kvm.h>
+> > > +#include <linux/kvm_host.h>
+> > > +
+> > > +#include <asm/kvm_emulate.h>
+> > > +#include <asm/kvm_nested.h>
+> > > +
+> > > +#include "hyp/include/hyp/adjust_pc.h"
+> > > +
+> > > +#include "trace.h"
+> > > +
+> > > +static u64 kvm_check_illegal_exception_return(struct kvm_vcpu *vcpu, u64 spsr)
+> > > +{
+> > > +	u64 mode = spsr & PSR_MODE_MASK;
+> > > +
+> > > +	/*
+> > > +	 * Possible causes for an Illegal Exception Return from EL2:
+> > > +	 * - trying to return to EL3
+> > > +	 * - trying to return to a 32bit EL
+> > > +	 * - trying to return to EL1 with HCR_EL2.TGE set
+> > > +	 */
+> > > +	if (mode == PSR_MODE_EL3t || mode == PSR_MODE_EL3h ||
+> > > +	    spsr & PSR_MODE32_BIT ||
+> > 
+> > I take it KVM will not allow a L1 hypervisor to run EL1 or EL0 in 32
+> > bit mode?
+> 
+> No, that'd really be a distraction at this stage. I don't expect any
+> HW supporting NV NV to support AArch32 at EL1, and if someone really
+> needs EL0 support (the HW support actually exists), they'll have to
+> revisit this.
+> 
+> >
+> > > +	    (vcpu_el2_tge_is_set(vcpu) && (mode == PSR_MODE_EL1t ||
+> > > +					   mode == PSR_MODE_EL1h))) {
+> > 
+> > I think these checks should also be added:
+> > 
+> > "A return where the value of the saved process state M[4] bit is 0,
+> > indicating a return to AArch64 state, and one of the following is
+> > true:
+> > 
+> > - The M[1] bit is 1.
+> > - The M[3:0] bits are 0b0001.
+> 
+> Definitely should add these two, probably in the form of a switch
+> enumerating all the possible exception levels rather than checking for
+> discrete bits that are hard to reason about.
+> 
+> > - The Exception level being returned to is using AArch32 state, as
+> >   programmed by the SCR_EL3.RW or HCR_EL2.RW bits, or as configured
+> >   from reset."
+> 
+> That's already caught with the SPSR check above.
 
-The L1 guest hypervisor running at virtual EL2 is restoring the guest context at
-EL1, but the host is actually running in hardware EL1 and the register access
-needs to be trapped because it affects the guest hypervisor. And because the L0
-host is running with HCR_EL2.E2H = 1, writes to CPACR_EL1 are redirected to
-CPTR_EL2.
+Hmm... I don't think so. The illegal condition, according to the snippet, should
+be:
 
-Also the reset value is correct, as CPACR_EL1 either has RES0 or UNKNOWN fields
-are reset.
+!(mode & PSR_MODE32_BIT) && !(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_RW)
 
-Looks good to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Or, perhaps better, KVM could add an HCR_EL2 accessor that treated the
+HCR_EL2.RW bit as RA0/WI as per the architecture when the EL1 is not capable of
+AArch32.  That would make the above situation impossible.
 
 Thanks,
 Alex
 
-On Fri, Jan 28, 2022 at 12:18:28PM +0000, Marc Zyngier wrote:
-> From: Jintack Lim <jintack.lim@linaro.org>
 > 
-> For the same reason we trap virtual memory register accesses in virtual
-> EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
-> access EL1 system register state instead of the virtual EL2 one.
+> Thanks,
 > 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/vhe/switch.c | 3 +++
->  arch/arm64/kvm/sys_regs.c       | 2 +-
->  2 files changed, 4 insertions(+), 1 deletion(-)
+> 	M.
 > 
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index 6ed9e4893a02..1e6a00e7bfb3 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -64,6 +64,9 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
->  		__activate_traps_fpsimd32(vcpu);
->  	}
->  
-> +	if (vcpu_is_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
-> +		val |= CPTR_EL2_TCPAC;
-> +	
->  	write_sysreg(val, cpacr_el1);
->  
->  	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 4f2bcc1e0c25..7f074a7f6eb3 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1819,7 +1819,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  
->  	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
->  	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
-> -	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
-> +	{ SYS_DESC(SYS_CPACR_EL1), access_rw, reset_val, CPACR_EL1, 0 },
->  
->  	MTE_REG(RGSR_EL1),
->  	MTE_REG(GCR_EL1),
 > -- 
-> 2.30.2
-> 
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
