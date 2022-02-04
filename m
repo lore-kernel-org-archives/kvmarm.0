@@ -2,89 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D789C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Feb 2022 14:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C666BC433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Feb 2022 15:40:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E01940D0B;
-	Fri,  4 Feb 2022 09:41:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3144440F93;
+	Fri,  4 Feb 2022 10:40:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5ugyHGNt5TUd; Fri,  4 Feb 2022 09:41:44 -0500 (EST)
+	with ESMTP id M654ImEGFOEw; Fri,  4 Feb 2022 10:40:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9605641019;
-	Fri,  4 Feb 2022 09:41:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9453640BD0;
+	Fri,  4 Feb 2022 10:40:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CE3F40B6C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 09:41:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6533640BD0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 10:40:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P2eA4Vswqs2P for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Feb 2022 09:41:41 -0500 (EST)
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com
- [209.85.214.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D9CC40AFA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 09:41:41 -0500 (EST)
-Received: by mail-pl1-f178.google.com with SMTP id d1so5291400plh.10
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Feb 2022 06:41:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=dg20lHH+5hD5YQZ8GrVegKK1/VjQk9NXTtH1Zx4dOJI=;
- b=Q0O6T9mUzP6wJy9zhpgHJbkyvT10vvCO1wiEmaykAZR23D+4jFHhT8dkvhBY2lp6Yd
- kMAlLCr04o35/20X5iGzoiO9n672vtaUb9rr5gs7ZElqOxPpEopgPtaAV4GdDU0wlFkM
- ihj2/UrAuFCGA/jNATtlzzl4awHx2drn0ReV1ZGuXnq0zmG/iom8TvKZoVxVi9Yaczwz
- PqGPi/eTeQwWjqeu4gfbVMsnctKbwZebEDngDIYqtJIqDemnHoPipyI7iEyB1sZb7fEW
- C4FS6Pb653PwLX4O6Y6lQlO52zbpC8TddXFgxgGLdBQALrSUAWRawK6su8G/93ztDNzW
- BNxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=dg20lHH+5hD5YQZ8GrVegKK1/VjQk9NXTtH1Zx4dOJI=;
- b=3ko/WBsSkjt+Sz8cm2Qccx8TiriHkS+COSLjsd+/fYkNXQGxYQb+nfa5YOgI43+b0J
- bV7+YHLNGchtXf/y1uHzsbo6oJPU3JaRZgbYuHlyCPxdKVJb0jpz23TIFboy4gSCf0iB
- 0QkwOy4S5hEde0IufmO8zC+k0g9ujJoV7tRfCU/8zEtjx7uEKHUwoCvkjoCo1E4VeN5v
- vkRzY+hsXoNoTXEzXk0WBp5Vyo2oq/ZhMV9H2RH45pmDAnTHSL6JUXIjFcfyWUieqbWx
- rAHChLoTst7ScW8gAD0o8fSzIFsoC+xJFOjLjmbYpYc09CLXN5XOukfCZFd6B2Fvnm2b
- e5Uw==
-X-Gm-Message-State: AOAM533mgldrR6Kw3mFx4CYSzti8ZT86GH76FpRBYNT9bCFQe4t2TRH+
- 7Srtp86QBgzWsN2bpjbEJRONvQ==
-X-Google-Smtp-Source: ABdhPJxuZ3MRzFW5Hq5CFl1LOZ2xYN55KrXKqNYxi4zn6Kz1Gif+qEnOXKdqDWkXy6BdB1YNpaeU3Q==
-X-Received: by 2002:a17:902:d702:: with SMTP id
- w2mr3264277ply.17.1643985697349; 
- Fri, 04 Feb 2022 06:41:37 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com.
- [34.83.12.150])
- by smtp.gmail.com with ESMTPSA id h25sm2634724pfn.208.2022.02.04.06.41.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Feb 2022 06:41:36 -0800 (PST)
-Date: Fri, 4 Feb 2022 06:41:32 -0800
-From: Ricardo Koller <ricarkol@google.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [RFC PATCH v4 02/26] KVM: arm64: Save ID registers' sanitized
- value per guest
-Message-ID: <Yf07HATXyDDeE68t@google.com>
-References: <20220106042708.2869332-1-reijiw@google.com>
- <20220106042708.2869332-3-reijiw@google.com>
- <YfDaiUbSkpi9/5YY@google.com>
- <CAAeT=FzNSvzz-Ok0Ka95=kkdDGsAMmzf9xiRfD5gYCdvmEfifg@mail.gmail.com>
- <CAOHnOrwBoQncTPngxqWgD_mEDWT6AwcmB_QC=j-eUPY2fwHa2Q@mail.gmail.com>
- <CAAeT=FyqPX_XQ+LDuRBZhApeiWD4s81bTMe=qiKDOZkBWm5ARg@mail.gmail.com>
- <YfdaKpBqFkULxgX/@google.com>
- <CAAeT=Fw7Fr2=sWyMZ85Ky-rhQJ3WQTa8fE8tNDHinwFYm3ksBQ@mail.gmail.com>
- <Yfl+Pz4MWOyEHfhf@google.com>
- <CAAeT=Fx3oBoyUmJjyMWmeyzMJJxcAZAYWDQuv4DUqZztm8ooKQ@mail.gmail.com>
+ with ESMTP id EqLMKESk9s0U for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Feb 2022 10:40:09 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B25504088C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 10:40:09 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 207641396;
+ Fri,  4 Feb 2022 07:40:09 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E2DA13F774;
+ Fri,  4 Feb 2022 07:40:05 -0800 (PST)
+Date: Fri, 4 Feb 2022 15:40:15 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v6 22/64] KVM: arm64: nv: Respect virtual HCR_EL2.TWX
+ setting
+Message-ID: <Yf1I3w/xPjwM9IiO@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-23-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CAAeT=Fx3oBoyUmJjyMWmeyzMJJxcAZAYWDQuv4DUqZztm8ooKQ@mail.gmail.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20220128121912.509006-23-maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>, kvmarm@lists.cs.columbia.edu,
+ mihai.carabas@oracle.com,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -101,125 +66,159 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Feb 02, 2022 at 10:31:26PM -0800, Reiji Watanabe wrote:
-> Hi Ricardo,
-> 
-> On Tue, Feb 1, 2022 at 10:39 AM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> > Hey Reiji,
-> >
-> > On Mon, Jan 31, 2022 at 10:00:40PM -0800, Reiji Watanabe wrote:
-> > > Hi Ricardo,
-> > >
-> > > On Sun, Jan 30, 2022 at 7:40 PM Ricardo Koller <ricarkol@google.com> wrote:
-> > > >
-> > > > On Fri, Jan 28, 2022 at 09:52:21PM -0800, Reiji Watanabe wrote:
-> > > > > Hi Ricardo,
-> > > > >
-> > > > > > > > > +
-> > > > > > > > > +/*
-> > > > > > > > > + * Set the guest's ID registers that are defined in sys_reg_descs[]
-> > > > > > > > > + * with ID_SANITISED() to the host's sanitized value.
-> > > > > > > > > + */
-> > > > > > > > > +void set_default_id_regs(struct kvm *kvm)
-> > > > > > > > > +{
-> > > > > > > > > +     int i;
-> > > > > > > > > +     u32 id;
-> > > > > > > > > +     const struct sys_reg_desc *rd;
-> > > > > > > > > +     u64 val;
-> > > > > > > > > +
-> > > > > > > > > +     for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
-> > > > > > > > > +             rd = &sys_reg_descs[i];
-> > > > > > > > > +             if (rd->access != access_id_reg)
-> > > > > > > > > +                     /* Not ID register, or hidden/reserved ID register */
-> > > > > > > > > +                     continue;
-> > > > > > > > > +
-> > > > > > > > > +             id = reg_to_encoding(rd);
-> > > > > > > > > +             if (WARN_ON_ONCE(!is_id_reg(id)))
-> > > > > > > > > +                     /* Shouldn't happen */
-> > > > > > > > > +                     continue;
-> > > > > > > > > +
-> > > > > > > > > +             val = read_sanitised_ftr_reg(id);
-> > > > > > > >
-> > > > > > > > I'm a bit confused. Shouldn't the default+sanitized values already use
-> > > > > > > > arm64_ftr_bits_kvm (instead of arm64_ftr_regs)?
-> > > > > > >
-> > > > > > > I'm not sure if I understand your question.
-> > > > > > > arm64_ftr_bits_kvm is used for feature support checkings when
-> > > > > > > userspace tries to modify a value of ID registers.
-> > > > > > > With this patch, KVM just saves the sanitized values in the kvm's
-> > > > > > > buffer, but userspace is still not allowed to modify values of ID
-> > > > > > > registers yet.
-> > > > > > > I hope it answers your question.
-> > > > > >
-> > > > > > Based on the previous commit I was assuming that some registers, like
-> > > > > > id_aa64dfr0,
-> > > > > > would default to the overwritten values as the sanitized values. More
-> > > > > > specifically: if
-> > > > > > userspace doesn't modify any ID reg, shouldn't the defaults have the
-> > > > > > KVM overwritten
-> > > > > > values (arm64_ftr_bits_kvm)?
-> > > > >
-> > > > > arm64_ftr_bits_kvm doesn't have arm64_ftr_reg but arm64_ftr_bits,
-> > > > > and arm64_ftr_bits_kvm doesn't have the sanitized values.
-> > > > >
-> > > > > Thanks,
-> > > >
-> > > > Hey Reiji,
-> > > >
-> > > > Sorry, I wasn't very clear. This is what I meant.
-> > > >
-> > > > If I set DEBUGVER to 0x5 (w/ FTR_EXACT) using this patch on top of the
-> > > > series:
-> > > >
-> > > >  static struct arm64_ftr_bits ftr_id_aa64dfr0_kvm[MAX_FTR_BITS_LEN] = {
-> > > >         S_ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64DFR0_PMUVER_SHIFT, 4, 0),
-> > > > -       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x6),
-> > > > +       ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_EXACT, ID_AA64DFR0_DEBUGVER_SHIFT, 4, 0x5),
-> > > >
-> > > > it means that userspace would not be able to set DEBUGVER to anything
-> > > > but 0x5. But I'm not sure what it should mean for the default KVM value
-> > > > of DEBUGVER, specifically the value calculated in set_default_id_regs().
-> > > > As it is, KVM is still setting the guest-visible value to 0x6, and my
-> > > > "desire" to only allow booting VMs with DEBUGVER=0x5 is being ignored: I
-> > > > booted a VM and the DEBUGVER value from inside is still 0x6. I was
-> > > > expecting it to not boot, or to show a warning.
-> > >
-> > > Thank you for the explanation!
-> > >
-> > > FTR_EXACT (in the existing code) means that the safe_val should be
-> > > used if values of the field are not identical between CPUs (see how
-> > > update_cpu_ftr_reg() uses arm64_ftr_safe_value()). For KVM usage,
-> > > it means that if the field value for a vCPU is different from the one
-> > > for the host's sanitized value, only the safe_val can be used safely
-> > > for the guest (purely in terms of CPU feature).
-> >
-> > Let me double check my understanding using the DEBUGVER example, please.
-> > The safe_value would be DEBUGVER=5, and it contradicts the initial VM
-> > value calculated on the KVM side. Q1: Can a contradiction like this
-> > occur in practice? Q2: If the user saves and restores this id-reg on the
-> > same kernel, the AA64DFR0 userspace write would fail (ftr_val !=
-> > arm64_ftr_safe_value), right?
-> 
-> Thank you for the comment!
-> 
-> For Q1, yes, we might possibly create a bug that makes a contradiction
-> between KVM and cpufeature.c.
-> For Q2, even with such a contradiction, userspace will still be able to
-> save and restore the id reg on the same kernel on the same system in most
-> cases because @limit that KVM will specify for arm64_check_features()
-> will mostly be the same as the initial value for the guest (except for
-> fields corresponding to opt-in CPU features, which are configured with
-> KVM_ARM_VCPU_INIT or etc) and arm64_check_features does an equality check
-> per field.  Having said that, as you suggested, it might be better to run
-> arm64_check_features for the initial value against the host value so we
-> can catch such a bug. I'll look into doing that in v5.
-> 
+Hi Marc,
 
-Thanks Reiji. Looking forward to v5.
+On Fri, Jan 28, 2022 at 12:18:30PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+> they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h |  2 ++
+>  arch/arm64/kvm/Makefile             |  2 +-
+>  arch/arm64/kvm/handle_exit.c        | 11 ++++++++++-
+>  arch/arm64/kvm/nested.c             | 28 ++++++++++++++++++++++++++++
+>  4 files changed, 41 insertions(+), 2 deletions(-)
+>  create mode 100644 arch/arm64/kvm/nested.c
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 5a85be6d8eb3..79d382fa02ea 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -65,4 +65,6 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
+>  		(cnthctl & (CNTHCTL_EVNTI | CNTHCTL_EVNTDIR | CNTHCTL_EVNTEN)));
+>  }
+>  
+> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+> +
+>  #endif /* __ARM64_KVM_NESTED_H */
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index b67c4ebd72b1..dbaf42ff65f1 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -14,7 +14,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
+>  	 inject_fault.o va_layout.o handle_exit.o \
+>  	 guest.o debug.o reset.o sys_regs.o \
+>  	 vgic-sys-reg-v3.o fpsimd.o pmu.o pkvm.o \
+> -	 arch_timer.o trng.o emulate-nested.o \
+> +	 arch_timer.o trng.o emulate-nested.o nested.o \
+>  	 vgic/vgic.o vgic/vgic-init.o \
+>  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
+>  	 vgic/vgic-v3.o vgic/vgic-v4.o \
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 0cedef6e0d80..a1b1bbf3d598 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -119,7 +119,16 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
+>   */
+>  static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+>  {
+> -	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
+> +	bool is_wfe = !!(kvm_vcpu_get_esr(vcpu) & ESR_ELx_WFx_ISS_WFE);
+> +
+> +	if (vcpu_has_nv(vcpu)) {
+> +		int ret = handle_wfx_nested(vcpu, is_wfe);
+> +
+> +		if (ret != -EINVAL)
+> +			return ret;
 
-> Thanks,
-> Reiji
+I find this rather clunky. The common pattern is that a function returns
+early when it encounters an error, but here this pattern is reversed:
+-EINVAL means that handle_wfx_nested() failed in handling the WFx, so
+proceed as usual; conversly, anything but -EINVAL means handle_wfx_nested()
+was successful in handling WFx, so exit early from kvm_handle_wfx().
+
+That would be ok by itself, but if we dig deeper, handle_wfx_nested() ends up
+calling kvm_inject_nested(), where -EINVAL is actually an error code. Granted,
+that should never happen, because kvm_handle_wfx() first checks vcpu_has_nv(),
+but still feels like something that could be improved.
+
+Maybe changing handle_wfx_nested() like this would be better:
+
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -14,15 +14,18 @@
+  * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+  * handle this.
+  */
+-int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
++bool handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe, int *error)
+ {
+        u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+ 
++       *error = 0;
+        if (vcpu_is_el2(vcpu))
+-               return -EINVAL;
++               return false;
+ 
+-       if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
+-               return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++       if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI))) {
++               *error = kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++               return true;
++       }
+ 
+-       return -EINVAL;
++       return false;
+ }
+
+Now the return value means one thing only (did handle_wfx_nested() handle
+the trap?) and we still capture the error code.
+
+Or perhaps folding handle_wfx_nested() into kvm_handle_wfx() would be
+preferable.
+
+What do you think?
+
+Thanks,
+Alex
+
+> +	}
+> +
+> +	if (is_wfe) {
+>  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
+>  		vcpu->stat.wfe_exit_stat++;
+>  		kvm_vcpu_on_spin(vcpu, vcpu_mode_priv(vcpu));
+> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> new file mode 100644
+> index 000000000000..5e1104f8e765
+> --- /dev/null
+> +++ b/arch/arm64/kvm/nested.c
+> @@ -0,0 +1,28 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2017 - Columbia University and Linaro Ltd.
+> + * Author: Jintack Lim <jintack.lim@linaro.org>
+> + */
+> +
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_emulate.h>
+> +
+> +/*
+> + * Inject wfx to the virtual EL2 if this is not from the virtual EL2 and
+> + * the virtual HCR_EL2.TWX is set. Otherwise, let the host hypervisor
+> + * handle this.
+> + */
+> +int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe)
+> +{
+> +	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
+> +
+> +	if (vcpu_is_el2(vcpu))
+> +		return -EINVAL;
+> +
+> +	if ((is_wfe && (hcr_el2 & HCR_TWE)) || (!is_wfe && (hcr_el2 & HCR_TWI)))
+> +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+> +
+> +	return -EINVAL;
+> +}
+> -- 
+> 2.30.2
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
