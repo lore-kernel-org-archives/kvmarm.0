@@ -2,70 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35545C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Feb 2022 13:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8755DC433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Feb 2022 14:02:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CFB443C96;
-	Fri,  4 Feb 2022 08:51:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E7F0141016;
+	Fri,  4 Feb 2022 09:02:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Q8Bel-T85p3A; Fri,  4 Feb 2022 08:51:30 -0500 (EST)
+	with ESMTP id Un2qlhVD7SR0; Fri,  4 Feb 2022 09:02:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C874540D23;
-	Fri,  4 Feb 2022 08:51:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7804241003;
+	Fri,  4 Feb 2022 09:02:09 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47BF740CDE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 08:51:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58F6D41003
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 09:02:08 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ROZnTOEvhkXM for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Feb 2022 08:51:29 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1512F40C67
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 08:51:29 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 669E261BF8;
- Fri,  4 Feb 2022 13:51:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AF26C004E1;
- Fri,  4 Feb 2022 13:51:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1643982688;
- bh=HBeQGeA56RJQC0kVdE6j6svl7AT/tnn/cVac/ZjQWy0=;
- h=From:To:Cc:Subject:Date:From;
- b=KhokMH1VHQQvia2HwWjHR5vlsBLwruWzSopNXvdG4M0qwRrQZ6iTqwy6dzo928gmT
- OCtas90A5XlB+0nZ+3JhtIyVYvF1U535QsO7qWWiSv1PMXQ9/KCoLPn/izeFAlrxMg
- uz4vxEALb4yCcbP0OmEizQoMYgSAexu6mfxpw9zdMokgkZt5clhwlFgeJIDGGB8g8n
- 72N4cEdYxPOiCNmiRILjNyASOMOzlcsvx7hggfpkMRhk1mminwKTlhVPPTKgXjaURG
- DOylWpEjZWxCyXFxpXyp6It/RDQ7KjunHuI+IAUXMWOT5BVn/EDfdeih9x2afm6axW
- sbBDPbGOFk+PQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nFyzl-005PIR-N8; Fri, 04 Feb 2022 13:51:25 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 5.17, take #2
-Date: Fri,  4 Feb 2022 13:51:20 +0000
-Message-Id: <20220204135120.1000894-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+ with ESMTP id QBMr3bJoci8D for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Feb 2022 09:02:06 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 908BC40066
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Feb 2022 09:02:06 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C563311D4;
+ Fri,  4 Feb 2022 06:02:05 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0767A3F40C;
+ Fri,  4 Feb 2022 06:02:02 -0800 (PST)
+Date: Fri, 4 Feb 2022 14:02:12 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v6 21/64] KVM: arm64: nv: Handle PSCI call via smc from
+ the guest
+Message-ID: <Yf0x5Nx18wjvnUUw@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-22-maz@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, james.morse@arm.com,
- steven.price@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Steven Price <steven.price@arm.com>, kvmarm@lists.cs.columbia.edu,
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-22-maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>, kvmarm@lists.cs.columbia.edu,
+ mihai.carabas@oracle.com,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -83,47 +66,85 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Paolo,
+Hi Marc,
 
-Here's a handful of fixes for -rc3, all courtesy of James Morse.
+The patch looks good to me. Checked kvm_hvc_call_handler(), it returns -1
+only when kvm_psci_call() doesn't handle the function and
+PSCI_RET_NOT_SUPPORTED must be set by the caller (which is handle_smc).
 
-Please pull,
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 
-	M.
+Thanks,
+Alex
 
-The following changes since commit 26291c54e111ff6ba87a164d85d4a4e134b7315c:
-
-  Linux 5.17-rc2 (2022-01-30 15:37:07 +0200)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.17-2
-
-for you to fetch changes up to 1dd498e5e26ad71e3e9130daf72cfb6a693fee03:
-
-  KVM: arm64: Workaround Cortex-A510's single-step and PAC trap errata (2022-02-03 09:22:30 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.17, take #2
-
-- A couple of fixes when handling an exception while a SError has been
-  delivered
-
-- Workaround for Cortex-A510's single-step[ erratum
-
-----------------------------------------------------------------
-James Morse (3):
-      KVM: arm64: Avoid consuming a stale esr value when SError occur
-      KVM: arm64: Stop handle_exit() from handling HVC twice when an SError occurs
-      KVM: arm64: Workaround Cortex-A510's single-step and PAC trap errata
-
- Documentation/arm64/silicon-errata.rst  |  2 ++
- arch/arm64/Kconfig                      | 16 ++++++++++++++++
- arch/arm64/kernel/cpu_errata.c          |  8 ++++++++
- arch/arm64/kvm/handle_exit.c            |  8 ++++++++
- arch/arm64/kvm/hyp/include/hyp/switch.h | 23 +++++++++++++++++++++--
- arch/arm64/tools/cpucaps                |  5 +++--
- 6 files changed, 58 insertions(+), 4 deletions(-)
+On Fri, Jan 28, 2022 at 12:18:29PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> VMs used to execute hvc #0 for the psci call if EL3 is not implemented.
+> However, when we come to provide the virtual EL2 mode to the VM, the
+> host OS inside the VM calls kvm_call_hyp() which is also hvc #0. So,
+> it's hard to differentiate between them from the host hypervisor's point
+> of view.
+> 
+> So, let the VM execute smc instruction for the psci call. On ARMv8.3,
+> even if EL3 is not implemented, a smc instruction executed at non-secure
+> EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than being treated as
+> UNDEFINED. So, the host hypervisor can handle this psci call without any
+> confusion.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/handle_exit.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 2bbeed8c9786..0cedef6e0d80 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -62,6 +62,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
+>  
+>  static int handle_smc(struct kvm_vcpu *vcpu)
+>  {
+> +	int ret;
+> +
+>  	/*
+>  	 * "If an SMC instruction executed at Non-secure EL1 is
+>  	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
+> @@ -69,10 +71,28 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+>  	 *
+>  	 * We need to advance the PC after the trap, as it would
+>  	 * otherwise return to the same address...
+> +	 *
+> +	 * If imm is non-zero, it's not defined, so just skip it.
+> +	 */
+> +	if (kvm_vcpu_hvc_get_imm(vcpu)) {
+> +		vcpu_set_reg(vcpu, 0, ~0UL);
+> +		kvm_incr_pc(vcpu);
+> +		return 1;
+> +	}
+> +
+> +	/*
+> +	 * If imm is zero, it's a psci call.
+> +	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
+> +	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
+> +	 * being treated as UNDEFINED.
+>  	 */
+> -	vcpu_set_reg(vcpu, 0, ~0UL);
+> +	ret = kvm_hvc_call_handler(vcpu);
+> +	if (ret < 0)
+> +		vcpu_set_reg(vcpu, 0, ~0UL);
+> +
+>  	kvm_incr_pc(vcpu);
+> -	return 1;
+> +
+> +	return ret;
+>  }
+>  
+>  /*
+> -- 
+> 2.30.2
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
