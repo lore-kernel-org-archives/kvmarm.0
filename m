@@ -2,53 +2,67 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 630BDC433EF
-	for <kvmarm@archiver.kernel.org>; Sun,  6 Feb 2022 13:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33860C433EF
+	for <kvmarm@archiver.kernel.org>; Sun,  6 Feb 2022 18:45:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 953D340B80;
-	Sun,  6 Feb 2022 08:08:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DA8C405C6;
+	Sun,  6 Feb 2022 13:45:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@infradead.org
+	(fail, message has been altered) header.i=@chromium.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MUqjSMsTZmAU; Sun,  6 Feb 2022 08:08:43 -0500 (EST)
+	with ESMTP id EJkXgSuvZ8p6; Sun,  6 Feb 2022 13:45:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88A2F408B3;
-	Sun,  6 Feb 2022 08:08:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36F554086C;
+	Sun,  6 Feb 2022 13:45:20 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C6F9C408B3
- for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Feb 2022 08:08:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 23C81405C6
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Feb 2022 13:45:19 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id It02NpMczBiF for <kvmarm@lists.cs.columbia.edu>;
- Sun,  6 Feb 2022 08:08:39 -0500 (EST)
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4430A404CD
- for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Feb 2022 08:08:39 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
- References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description;
- bh=r+gFF/vh5cSrP7KvoK/nIgqjizm6gE7sf4GkpA389wU=; b=BxgIxsrU2QJcX39YxBcIRdWY9m
- 1InCvuuhaZSBAHPDyxkW4kpQEW0PNI5OxHuRe2VyAKR+rsthjZyBtDoLV9v7P5gRABQlP+rDck/2T
- 0Eum8llSq5MxbwmLQpdYtcwBE5lCjmmPWl/g3fZasID1Jm2FK8DaxmlkyVaAq7eksYG4vwOFtylsF
- ByER5B38SETjK5k2BRG8SlZO3f49/oYQqWjBa94ODbHh0LFJZkMFeF/tx37n3wBcNQiV2YbfXfJZ7
- empLcdFZ4dEfuW7xG5uJjCMhH1bF6ec2hmMvDRlW5hjO4ndYT9fBGOZQcYkdr18YfQKWXiF6erKkV
- wpLVj/lA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100]
- helo=worktop.programming.kicks-ass.net)
- by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
- id 1nGhHM-007QNp-1l; Sun, 06 Feb 2022 13:08:32 +0000
-Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
- id 9E68198622D; Sun,  6 Feb 2022 14:08:30 +0100 (CET)
-Date: Sun, 6 Feb 2022 14:08:30 +0100
-From: Peter Zijlstra <peterz@infradead.org>
+ with ESMTP id c9kWY4CHXB8F for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  6 Feb 2022 13:45:17 -0500 (EST)
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com
+ [209.85.210.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B73664052C
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Feb 2022 13:45:17 -0500 (EST)
+Received: by mail-pf1-f175.google.com with SMTP id e6so9789325pfc.7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 06 Feb 2022 10:45:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=g99EK4RBFIcLjOA2xsAgfPy/FWBWvPsPH9rm8hJWuN4=;
+ b=biHHkqKY9Ho6lpFnUvZwHS3Q5oqNdHnItOI0AX5F4NU6WRtoewrftBfJOMU6myFuVw
+ +M3wYhBHPiacfrFCkY7wbQ5phlQLfD6QNZM/QDckqZyMqFBKPudW+ryJ+gMTIWn8VS/A
+ cRGemeQFuDF4522ZQFDF57DgekBIK9wYHAWPI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=g99EK4RBFIcLjOA2xsAgfPy/FWBWvPsPH9rm8hJWuN4=;
+ b=XavHJOoM6hvjm4LFZSF9zX0k1Jb3C8L1XCqkrAiEY+HE5yp/o5MEyAbNcKY/aqPKc9
+ oqI2ZlkNH6VJz4VnIkZF//GfBiRWOq78qEl2aB2EMr+vD+PDBwB7DKzWx3dA+zfCqNRy
+ EaXpMZ1+1MDh5DbTfRCWc65NpxoYGhU2ZbSdQ6FI/G1WOPGBm508PuFJDV1J+t0Q56ht
+ zjAJEmG1nIenOez1USg+nH/F9L3x2oeYJ11vkloCTrTn5RmHbKibg2XERISkXnl9julo
+ 69U6ZxiTa7U5a1QMkIbQe5j4EOv0yfgzCeR9TJ7pGLFxP2YDDJ9jof1FIro/rqf+BFz1
+ fiTg==
+X-Gm-Message-State: AOAM533ArOn53L37QSq91pkMiFfDKigK5y8DHwA8Q9n4ffrkc5w6lnMk
+ vYTE3jzuvxVg/i7JzJsywOPQeg==
+X-Google-Smtp-Source: ABdhPJwsGxmyQ5I5YdyWqLxqzGVpFwSbHqBQWHaTvyZjbtd3CV9mMg9vZBIckMMYD9dBGO8G2KeEOA==
+X-Received: by 2002:a62:ce83:: with SMTP id y125mr12588532pfg.6.1644173116776; 
+ Sun, 06 Feb 2022 10:45:16 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+ by smtp.gmail.com with ESMTPSA id bv22sm8729991pjb.31.2022.02.06.10.45.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 06 Feb 2022 10:45:16 -0800 (PST)
+Date: Sun, 6 Feb 2022 10:45:15 -0800
+From: Kees Cook <keescook@chromium.org>
 To: Sami Tolvanen <samitolvanen@google.com>
 Subject: Re: [PATCH v4 09/17] perf/core: Use static_call to optimize
  perf_guest_info_callbacks
-Message-ID: <20220206130830.GC23216@worktop.programming.kicks-ass.net>
+Message-ID: <202202061011.A255DE55B@keescook>
 References: <20211111020738.2512932-1-seanjc@google.com>
  <20211111020738.2512932-10-seanjc@google.com>
  <YfrQzoIWyv9lNljh@google.com>
@@ -56,8 +70,8 @@ References: <20211111020738.2512932-1-seanjc@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
 In-Reply-To: <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
-Cc: Will McVicker <willmcvicker@google.com>, Kees Cook <keescook@chromium.org>,
- kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+Cc: Will McVicker <willmcvicker@google.com>, kvm@vger.kernel.org,
+ Peter Zijlstra <peterz@infradead.org>, LKML <linux-kernel@vger.kernel.org>,
  kvmarm <kvmarm@lists.cs.columbia.edu>,
  linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -103,9 +117,56 @@ On Fri, Feb 04, 2022 at 09:35:49AM -0800, Sami Tolvanen wrote:
 > make the indirect call if it does. If neither of these options are
 > feasible, you can disable CFI checking in the functions that have
 > these static calls using the __nocfi attribute.
+> 
+> Kees, any thoughts?
 
-There's also the tp_stub_func() thing that does basically the same
-thing.
+I'm digging through the macros to sort this out, but IIUC, an example of
+the problem is:
+
+perf_guest_cbs->handle_intel_pt_intr is:
+
+	unsigned int (*handle_intel_pt_intr)(void);
+
+The declaration for this starts with:
+
+DECLARE_STATIC_CALL(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
+
+which produces:
+
+extern struct static_call_key STATIC_CALL_KEY(__perf_guest_handle_intel_pt_intr);
+extern typeof(*perf_guest_cbs->handle_intel_pt_intr) STATIC_CALL_TRAMP(__perf_guest_handle_intel_pt_intr);
+
+and the last line becomes:
+
+extern unsigned int (*__SCT____perf_guest_handle_intel_pt_intr)(void);
+
+with !HAVE_STATIC_CALL, when perf_guest_handle_intel_pt_intr() does:
+
+	return static_call(__perf_guest_handle_intel_pt_intr)();
+
+it is resolving static_call() into:
+
+	((typeof(STATIC_CALL_TRAMP(name))*)(STATIC_CALL_KEY(name).func))
+
+so the caller is expecting "unsigned int (*)(void)" but the prototype
+of __static_call_return0 is "long (*)(void)":
+
+long __static_call_return0(void);
+
+Could we simply declare a type-matched ret0 trampoline too?
+
+#define STATIC_CALL_TRAMP_RET0_PREFIX	__SCT__ret0__
+#define STATIC_CALL_TRAMP_RET0(name)	__PASTE(STATIC_CALL_TRAMP_RET0_PREFIX, name)
+
+#define DEFINE_STATIC_CALL_RET0(name, _func)				\
+	static typeof(_func) STATIC_CALL_TRAMP_RET0(name) { return 0; }	\
+        __DEFINE_STATIC_CALL(name, _func, STATIC_CALL_TRAMP_RET0(name));
+
+static_call_update(__perf_guest_handle_intel_pt_intr,
+		   (void *)&STATIC_CALL_TRAMP_RET0(__perf_guest_handle_intel_pt_intr))
+
+-- 
+Kees Cook
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
