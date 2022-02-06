@@ -2,76 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33860C433EF
-	for <kvmarm@archiver.kernel.org>; Sun,  6 Feb 2022 18:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B7CC4332F
+	for <kvmarm@archiver.kernel.org>; Sun,  6 Feb 2022 20:29:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DA8C405C6;
-	Sun,  6 Feb 2022 13:45:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 266614083E;
+	Sun,  6 Feb 2022 15:29:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@chromium.org
+	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id EJkXgSuvZ8p6; Sun,  6 Feb 2022 13:45:20 -0500 (EST)
+	with ESMTP id g4aX8IO97qi0; Sun,  6 Feb 2022 15:29:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36F554086C;
-	Sun,  6 Feb 2022 13:45:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A00214089E;
+	Sun,  6 Feb 2022 15:29:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23C81405C6
- for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Feb 2022 13:45:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1C5C4086D
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Feb 2022 15:29:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c9kWY4CHXB8F for <kvmarm@lists.cs.columbia.edu>;
- Sun,  6 Feb 2022 13:45:17 -0500 (EST)
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com
- [209.85.210.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B73664052C
- for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Feb 2022 13:45:17 -0500 (EST)
-Received: by mail-pf1-f175.google.com with SMTP id e6so9789325pfc.7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 06 Feb 2022 10:45:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=g99EK4RBFIcLjOA2xsAgfPy/FWBWvPsPH9rm8hJWuN4=;
- b=biHHkqKY9Ho6lpFnUvZwHS3Q5oqNdHnItOI0AX5F4NU6WRtoewrftBfJOMU6myFuVw
- +M3wYhBHPiacfrFCkY7wbQ5phlQLfD6QNZM/QDckqZyMqFBKPudW+ryJ+gMTIWn8VS/A
- cRGemeQFuDF4522ZQFDF57DgekBIK9wYHAWPI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=g99EK4RBFIcLjOA2xsAgfPy/FWBWvPsPH9rm8hJWuN4=;
- b=XavHJOoM6hvjm4LFZSF9zX0k1Jb3C8L1XCqkrAiEY+HE5yp/o5MEyAbNcKY/aqPKc9
- oqI2ZlkNH6VJz4VnIkZF//GfBiRWOq78qEl2aB2EMr+vD+PDBwB7DKzWx3dA+zfCqNRy
- EaXpMZ1+1MDh5DbTfRCWc65NpxoYGhU2ZbSdQ6FI/G1WOPGBm508PuFJDV1J+t0Q56ht
- zjAJEmG1nIenOez1USg+nH/F9L3x2oeYJ11vkloCTrTn5RmHbKibg2XERISkXnl9julo
- 69U6ZxiTa7U5a1QMkIbQe5j4EOv0yfgzCeR9TJ7pGLFxP2YDDJ9jof1FIro/rqf+BFz1
- fiTg==
-X-Gm-Message-State: AOAM533ArOn53L37QSq91pkMiFfDKigK5y8DHwA8Q9n4ffrkc5w6lnMk
- vYTE3jzuvxVg/i7JzJsywOPQeg==
-X-Google-Smtp-Source: ABdhPJwsGxmyQ5I5YdyWqLxqzGVpFwSbHqBQWHaTvyZjbtd3CV9mMg9vZBIckMMYD9dBGO8G2KeEOA==
-X-Received: by 2002:a62:ce83:: with SMTP id y125mr12588532pfg.6.1644173116776; 
- Sun, 06 Feb 2022 10:45:16 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
- by smtp.gmail.com with ESMTPSA id bv22sm8729991pjb.31.2022.02.06.10.45.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 06 Feb 2022 10:45:16 -0800 (PST)
-Date: Sun, 6 Feb 2022 10:45:15 -0800
-From: Kees Cook <keescook@chromium.org>
-To: Sami Tolvanen <samitolvanen@google.com>
+ with ESMTP id qRb3zYP+Fhx0 for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  6 Feb 2022 15:28:58 -0500 (EST)
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D27D74083E
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  6 Feb 2022 15:28:58 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+ References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description;
+ bh=7i3Z46f5V98hV+7wSTAkWTsI05L/w170G6IYhhzBpJA=; b=LTZUCqL9Z3AVQpPhC89N2wQE/C
+ YdGgOE1ts3Gu9PU8GOjbz4eCamBzlB/KgHkxoDvcBviMgkTQhkBe9WHUehrTo/WvD10IIuNK+Ff7k
+ 3IQH1lm5ymPtJtvqFFK3yULXa8hD5OViN/myVM7rlPRRzc4UccEswil6Fm69OyxKdV8xWEjCYhl+S
+ WQ/MFu0/O8jyETbb6MqCdHb/i84MyngV/2XAr6K28PxPENXi/kM9GqjIUfsiapg7SkXIP+XGXdCtU
+ xyrbvaM3yTboYVCL0+OvEir4eQ2qIraGZYDAnt5coom3Iuh5Y2VVy78vZCKfeZpM3IU89MSE98rt/
+ NetFg+qg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100]
+ helo=noisy.programming.kicks-ass.net)
+ by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+ id 1nGo9W-007XVO-KM; Sun, 06 Feb 2022 20:28:54 +0000
+Received: from hirez.programming.kicks-ass.net
+ (hirez.programming.kicks-ass.net [192.168.1.225])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+ (Client did not present a certificate)
+ by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4A9503001C7;
+ Sun,  6 Feb 2022 21:28:52 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+ id 321F621378EDF; Sun,  6 Feb 2022 21:28:52 +0100 (CET)
+Date: Sun, 6 Feb 2022 21:28:52 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Kees Cook <keescook@chromium.org>
 Subject: Re: [PATCH v4 09/17] perf/core: Use static_call to optimize
  perf_guest_info_callbacks
-Message-ID: <202202061011.A255DE55B@keescook>
+Message-ID: <YgAvhG4wvnslbTqP@hirez.programming.kicks-ass.net>
 References: <20211111020738.2512932-1-seanjc@google.com>
  <20211111020738.2512932-10-seanjc@google.com>
  <YfrQzoIWyv9lNljh@google.com>
  <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
+ <202202061011.A255DE55B@keescook>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CABCJKufg=ONNOvF8+BRXfLoTUfeiZZsdd8TnpV-GaNK_o-HuaA@mail.gmail.com>
+In-Reply-To: <202202061011.A255DE55B@keescook>
 Cc: Will McVicker <willmcvicker@google.com>, kvm@vger.kernel.org,
- Peter Zijlstra <peterz@infradead.org>, LKML <linux-kernel@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, Sami Tolvanen <samitolvanen@google.com>,
  kvmarm <kvmarm@lists.cs.columbia.edu>,
  linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -90,83 +84,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Feb 04, 2022 at 09:35:49AM -0800, Sami Tolvanen wrote:
-> On Wed, Feb 2, 2022 at 10:43 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_state, *perf_guest_cbs->state);
-> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_get_ip, *perf_guest_cbs->get_ip);
-> > > +DEFINE_STATIC_CALL_RET0(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
-> >
-> > Using __static_call_return0() makes clang's CFI sad on arm64 due to the resulting
-> > function prototype mistmatch, which IIUC, is verified by clang's __cfi_check()
-> > for indirect calls, i.e. architectures without CONFIG_HAVE_STATIC_CALL.
-> >
-> > We could fudge around the issue by using stubs, massaging prototypes, etc..., but
-> > that means doing that for every arch-agnostic user of __static_call_return0().
-> >
-> > Any clever ideas?  Can we do something like generate a unique function for every
-> > DEFINE_STATIC_CALL_RET0 for CONFIG_HAVE_STATIC_CALL=n, e.g. using typeof() to
-> > get the prototype?
+On Sun, Feb 06, 2022 at 10:45:15AM -0800, Kees Cook wrote:
+
+> I'm digging through the macros to sort this out, but IIUC, an example of
+> the problem is:
 > 
-> I'm not sure there's a clever fix for this. On architectures without
-> HAVE_STATIC_CALL, this is an indirect call to a function with a
-> mismatching type, which CFI is intended to catch.
+
+> so the caller is expecting "unsigned int (*)(void)" but the prototype
+> of __static_call_return0 is "long (*)(void)":
 > 
-> The obvious way to solve the problem would be to use a stub function
-> with the correct type, which I agree, isn't going to scale. You can
-> alternatively check if .func points to __static_call_return0 and not
-> make the indirect call if it does. If neither of these options are
-> feasible, you can disable CFI checking in the functions that have
-> these static calls using the __nocfi attribute.
+> long __static_call_return0(void);
 > 
-> Kees, any thoughts?
+> Could we simply declare a type-matched ret0 trampoline too?
 
-I'm digging through the macros to sort this out, but IIUC, an example of
-the problem is:
+That'll work for this case, but the next case the function will have
+arguments we'll need even more nonsense...
 
-perf_guest_cbs->handle_intel_pt_intr is:
+And as stated in that other email, there's tb_stub_func() having the
+exact same problem as well.
 
-	unsigned int (*handle_intel_pt_intr)(void);
-
-The declaration for this starts with:
-
-DECLARE_STATIC_CALL(__perf_guest_handle_intel_pt_intr, *perf_guest_cbs->handle_intel_pt_intr);
-
-which produces:
-
-extern struct static_call_key STATIC_CALL_KEY(__perf_guest_handle_intel_pt_intr);
-extern typeof(*perf_guest_cbs->handle_intel_pt_intr) STATIC_CALL_TRAMP(__perf_guest_handle_intel_pt_intr);
-
-and the last line becomes:
-
-extern unsigned int (*__SCT____perf_guest_handle_intel_pt_intr)(void);
-
-with !HAVE_STATIC_CALL, when perf_guest_handle_intel_pt_intr() does:
-
-	return static_call(__perf_guest_handle_intel_pt_intr)();
-
-it is resolving static_call() into:
-
-	((typeof(STATIC_CALL_TRAMP(name))*)(STATIC_CALL_KEY(name).func))
-
-so the caller is expecting "unsigned int (*)(void)" but the prototype
-of __static_call_return0 is "long (*)(void)":
-
-long __static_call_return0(void);
-
-Could we simply declare a type-matched ret0 trampoline too?
-
-#define STATIC_CALL_TRAMP_RET0_PREFIX	__SCT__ret0__
-#define STATIC_CALL_TRAMP_RET0(name)	__PASTE(STATIC_CALL_TRAMP_RET0_PREFIX, name)
-
-#define DEFINE_STATIC_CALL_RET0(name, _func)				\
-	static typeof(_func) STATIC_CALL_TRAMP_RET0(name) { return 0; }	\
-        __DEFINE_STATIC_CALL(name, _func, STATIC_CALL_TRAMP_RET0(name));
-
-static_call_update(__perf_guest_handle_intel_pt_intr,
-		   (void *)&STATIC_CALL_TRAMP_RET0(__perf_guest_handle_intel_pt_intr))
-
--- 
-Kees Cook
+The x86_64 CFI patches had a work-around for this, that could trivially
+be lifted I suppose.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
