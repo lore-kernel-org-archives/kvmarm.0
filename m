@@ -2,76 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7645DC433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 17:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E59D0C433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 17:49:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C9EF4A0FC;
-	Tue,  8 Feb 2022 12:37:38 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58C8B4B0F1;
+	Tue,  8 Feb 2022 12:49:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DdTfgLkwaAC2; Tue,  8 Feb 2022 12:37:36 -0500 (EST)
+	with ESMTP id DdzMAnuCFUYG; Tue,  8 Feb 2022 12:49:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 347C64B183;
-	Tue,  8 Feb 2022 12:37:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 389E64B0FC;
+	Tue,  8 Feb 2022 12:49:04 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3792B4B128
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 12:37:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CE744B0F7
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 12:49:03 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ekr+fSIPgAF2 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Feb 2022 12:37:32 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A859D4B0F4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 12:37:32 -0500 (EST)
+ with ESMTP id sJiPxzkGCqUR for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Feb 2022 12:49:02 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3CC194B0F1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 12:49:02 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id BF456B81CBA;
- Tue,  8 Feb 2022 17:37:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 585C6C004E1;
- Tue,  8 Feb 2022 17:37:30 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id C5A3B617E3;
+ Tue,  8 Feb 2022 17:49:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37060C004E1;
+ Tue,  8 Feb 2022 17:49:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1644341850;
- bh=t26HgygNCh8gCfuTN/ojA3LnBOvxFUkG2+R14a7qPUY=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ZDXHH6KXySyqGenuzjikTOkmMlmgn61tcGHp65CJstK7pekDYRNyzdPbsWcUdRHMa
- be9t0aqXdDBJZb2jh3M2ctzvjGKPhT2+U8miu88OGgesRiFS9qXr3dc9MBm6tagmwz
- vOEQKiTzfNU/5ARKxOpFxgcWjZ7pTKxkjlDZxqjKohjn1KxVvI9YexxZfQo0TFibwA
- 2W1FOUJIJrluOsvh9LjXLg79eDMJ/gQF0HttM5iJCclCaGPPEvvIuxcp0nd2NYkoIP
- JaWnyT/RDPoiM/SXeYzlWDGxq1lDtrtgq5PPZG7Hy+jHEZijyvDHudQ9opSnqKHdZW
- NO2nOr+ZV8syw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ s=k20201202; t=1644342540;
+ bh=fiDA/ww0hH9Ihny0p1Mw46FtIdZcId1+1g9QAhPQmMQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ThxP1jgwknTX415K1izO5hWFXB3QTxYCPffGDOViUTzgffNYlps4PC96hjrk8rNYX
+ kPXzHQ7w/VGVhwJ8wny31enHFT4WCwLtBDdGPA6MvFOQvrN+t6uC5LWnq1aZ7bcXCb
+ RZqX5hBcrqaJgPezu2NYCzG59/kw0liK9v2vslhT2m3jsIZNoPcmqwpCRi0oTytQSG
+ 0mH53xrRqSNfyp2QbovIBFfev4rUCgKxexdyAB5joNbtkYe+cPLJyhzhsFPQCPMp7b
+ z5UPlJow8XUsDNQmGt6RfkZj3r3+Xk5c+p7JZbDih2zS232alW7rH/3tqdjLcZziSH
+ 7JlpPSXbwpWIw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nHUQi-006Ksl-E4; Tue, 08 Feb 2022 17:37:28 +0000
+ id 1nHUbq-006L8W-8g; Tue, 08 Feb 2022 17:48:58 +0000
+Date: Tue, 08 Feb 2022 17:48:57 +0000
+Message-ID: <878rul5jw6.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH v4 0/4] kvm/arm: New VMID allocator based on asid
-Date: Tue,  8 Feb 2022 17:37:27 +0000
-Message-Id: <164434147328.3931943.1270605694385749340.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20211122121844.867-1-shameerali.kolothum.thodi@huawei.com>
-References: <20211122121844.867-1-shameerali.kolothum.thodi@huawei.com>
-MIME-Version: 1.0
+To: Sean Christopherson <seanjc@google.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <YgKhMjGtBH+1nJCk@google.com>
+References: <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
+ <87ilyitt6e.wl-maz@kernel.org>
+ <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+ <87lf3drmvp.wl-maz@kernel.org>
+ <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
+ <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
+ <875yq88app.wl-maz@kernel.org>
+ <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
+ <878ruld72v.wl-maz@kernel.org>
+ <CAOQ_QshwtTknXrpLkHbKj119=wVHvch0tHJURfrvia6Syy3tjg@mail.gmail.com>
+ <YgKhMjGtBH+1nJCk@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- shameerali.kolothum.thodi@huawei.com, will@kernel.org,
- jonathan.cameron@huawei.com, Alexandru.Elisei@arm.com, catalin.marinas@arm.com,
- linuxarm@huawei.com, jean-philippe@linaro.org, qperret@google.com,
- julien.thierry.kdev@gmail.com, suzuki.poulose@arm.com, james.morse@arm.com
+X-SA-Exim-Rcpt-To: seanjc@google.com, oupton@google.com, rananta@google.com,
+ drjones@redhat.com, kvmarm@lists.cs.columbia.edu, pshier@google.com,
+ ricarkol@google.com, reijiw@google.com, jingzhangos@google.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: jean-philippe@linaro.org, will@kernel.org, jonathan.cameron@huawei.com,
- linuxarm@huawei.com, catalin.marinas@arm.com
+Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,32 +92,62 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gTW9uLCAyMiBOb3YgMjAyMSAxMjoxODo0MCArMDAwMCwgU2hhbWVlciBLb2xvdGh1bSB3cm90
-ZToKPiBDaGFuZ2VzIGZyb20gdjM6Cj4gLSBNYWluIGNoYW5nZSBpcyBpbiBwYXRjaCAjNCwgd2hl
-cmUgdGhlIFZNSUQgaXMgbm93IHNldCB0byBhbgo+ICAgaW52YWxpZCBvbmUgb24gdkNQVSBzY2hl
-ZHVsZSBvdXQuIEludHJvZHVjZWQgYW4KPiAgIElOVkFMSURfQUNUSVZFX1ZNSUQgd2hpY2ggaXMg
-YmFzaWNhbGx5IGEgVk1JRCAwIHdpdGggZ2VuZXJhdGlvbiAxLgo+IMKgIFNpbmNlIHRoZSBiYXNp
-YyBhbGxvY2F0b3IgYWxnb3JpdGhtIHJlc2VydmVzIHZtaWQgIzAsIGl0IGlzIG5ldmVyCj4gICB1
-c2VkIGFzIGFuIGFjdGl2ZSBWTUlELiBUaGlzIChob3BlZnVsbHkpIHdpbGwgZml4IHRoZSBpc3N1
-ZSBvZgo+ICAgdW5uZWNlc3NhcmlseSByZXNlcnZpbmcgVk1JRCBzcGFjZSB3aXRoIGFjdGl2ZV92
-bWlkcyB3aGVuIHRob3NlCj4gICBWTXMgYXJlIG5vIGxvbmdlciBhY3RpdmVbMF0gYW5kIGF0IHRo
-ZSBzYW1lIHRpbWUgYWRkcmVzcyB0aGUKPiAgIHByb2JsZW0gbm90ZWQgaW4gdjMgd2hlcmVpbiBl
-dmVyeXRoaW5nIGVuZHMgdXAgaW4gc2xvdy1wYXRoWzFdLgo+IAo+IFsuLi5dCgpBcHBsaWVkIHRv
-IG5leHQsIHRoYW5rcyEKClsxLzRdIEtWTTogYXJtNjQ6IEludHJvZHVjZSBhIG5ldyBWTUlEIGFs
-bG9jYXRvciBmb3IgS1ZNCiAgICAgIGNvbW1pdDogNDE3ODM4MzkyZjJlNjU3ZWUyNWNjMzBlMzcz
-ZmY0YzM1YTBmYWE5MApbMi80XSBLVk06IGFybTY0OiBNYWtlIFZNSUQgYml0cyBhY2Nlc3NpYmxl
-IG91dHNpZGUgb2YgYWxsb2NhdG9yCiAgICAgIGNvbW1pdDogZjgwNTFlOTYwOTIyYTlkZThlNDIx
-NTkxMDNkNWQ5YzY5N2VmMTdlYwpbMy80XSBLVk06IGFybTY0OiBBbGlnbiB0aGUgVk1JRCBhbGxv
-Y2F0aW9uIHdpdGggdGhlIGFybTY0IEFTSUQKICAgICAgY29tbWl0OiAzMjQ4MTM2YjM2MzdlMTY3
-MWU0ZmE0NmUzMmUyMTIyZjllYzRiYzNkCls0LzRdIEtWTTogYXJtNjQ6IE1ha2UgYWN0aXZlX3Zt
-aWRzIGludmFsaWQgb24gdkNQVSBzY2hlZHVsZSBvdXQKICAgICAgY29tbWl0OiAxMDBiNGYwOTJm
-ODc4ZGMzNzlmMWZjZWY5Y2U1NjdjMjVkZWUzNDczCgpDaGVlcnMsCgoJTS4KLS0gCldpdGhvdXQg
-ZGV2aWF0aW9uIGZyb20gdGhlIG5vcm0sIHByb2dyZXNzIGlzIG5vdCBwb3NzaWJsZS4KCgpfX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGlu
-ZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1
-bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Tue, 08 Feb 2022 16:58:26 +0000,
+Sean Christopherson <seanjc@google.com> wrote:
+> 
+> On Tue, Feb 08, 2022, Oliver Upton wrote:
+> > Hi Marc,
+> > 
+> > On Tue, Feb 8, 2022 at 1:46 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > > > KVM currently restricts the vcpu features to be unified across vcpus,
+> > > > > but that's only an implementation choice.
+> > > >
+> > > > But that implementation choice has become ABI, no? How could support
+> > > > for asymmetry be added without requiring userspace opt-in or breaking
+> > > > existing VMMs that depend on feature unification?
+> > >
+> > > Of course, you'd need some sort of advertising of this new behaviour.
+> > >
+> > > One thing I would like to add to the current state of thing is an
+> > > indication of whether the effects of a sysreg being written from
+> > > userspace are global or local to a vcpu. You'd need a new capability,
+> > > and an extra flag added to the encoding of each register.
+> > 
+> > Ah. I think that is a much more reasonable fit then. VMMs unaware of
+> > this can continue to migrate new bits (albeit at the cost of
+> > potentially higher lock contention for the per-VM stuff), and those
+> > that do can reap the benefits of writing such attributes exactly once.
+> 
+> But the "proper" usage is no different than adding support for
+> VM-scoped variants of KVM_{G,S}ET_ONE_REG and friends, and a
+> VM-scoped variant is conceptually a lot cleaner IMO.  And making
+> them truly VM-scoped means KVM can do things like support sysregs
+> that are immutable after vCPUs are created.
+
+It is different, because your approach requires you to update all the
+existing VMMs to find out which register is of which kind. Not to
+mention that global sysregs are an absolute oddity in the face of the
+architecture (there is none in the base architecture).
+
+> So long as KVM defaults to '0' for all such registers, lack of
+> migration support in userspace that isn't aware of the new API,
+> i.e. doesn't do KVM_GET_REG_LIST at a VM-scope, is a nop because
+> said userspace also won't modify the registers in the first place.
+
+We want any VMM that correctly uses the API today to seamlessly be
+able to save/restore any new feature. QEMU does that, and it should
+continue to work no matter what new feature we add to the list.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
