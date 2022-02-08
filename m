@@ -2,64 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22993C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 09:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE23C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 09:57:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 431474B0E1;
-	Tue,  8 Feb 2022 04:46:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27D4D4086D;
+	Tue,  8 Feb 2022 04:57:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h2krwhQfdx+N; Tue,  8 Feb 2022 04:46:29 -0500 (EST)
+	with ESMTP id Z3wmQvFUeHRj; Tue,  8 Feb 2022 04:57:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED7364B0D6;
-	Tue,  8 Feb 2022 04:46:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 750E94B11E;
+	Tue,  8 Feb 2022 04:57:02 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2E204B0C2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 04:46:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AC7A4B11A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 04:57:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7dYwL--BtUgO for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Feb 2022 04:46:27 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21C454B0BE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 04:46:27 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id D9718B817D0;
- Tue,  8 Feb 2022 09:46:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA0B9C004E1;
- Tue,  8 Feb 2022 09:46:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1644313584;
- bh=N2iwFt+9nu2+miw7Yd5yWcMLN1r1UbYEZrqOpFnZfVY=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Tg7xQX2aFayXpgxebMRXN32qDsQLMRc5MalU2t91q1q7VDMd0YBdTLKrltFONY6qS
- vHvy7FENHlTVkIwCJKTeBpfkBIMuOBD/J+l0bsgxjigeFXZMJuF+6HZt8l3TeyQvp0
- wpxLQJmW7BPc9NRxx5cgd1Gk3jlHEjMrfuBdXg9WZXUz1JPIzaKnW26BTrd9vU2TTw
- CGT2xxVM9XFgxO7Uf4hXcXKx7I9rN08k3pftUMqhM1FGr3icweYCN9hvvBvluB/s0P
- JJQyhxXmkbHSBLbAbz0IhxMZyYnr5e+ejYopvsBH0DtySSmMQZtu4FQJn/YLGR7WWE
- Yfs6vDtHrfysQ==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=billy-the-mountain.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nHN4o-006DrU-IX; Tue, 08 Feb 2022 09:46:22 +0000
-Date: Tue, 08 Feb 2022 09:46:16 +0000
-Message-ID: <878ruld72v.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-In-Reply-To: <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
+ with ESMTP id S4c+cgUCVF91 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Feb 2022 04:57:00 -0500 (EST)
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
+ [209.85.167.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63E4A4086D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 04:57:00 -0500 (EST)
+Received: by mail-lf1-f48.google.com with SMTP id i17so6158919lfg.11
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Feb 2022 01:57:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xnDB24LQeAUZkcfN3wL+FHV/aKMR05Pb76EsfKgOtQs=;
+ b=gvGqrcbMb8DtdN8ZXcz6prSV4SyBxVL8iaSXK7eBe0hV86JPh8TEGaBs9LeBjH394n
+ JV5aBERcpIRWYYa6clmXFDkBsubhJVVJXzuUPZt7JtaDR+AcLQ74PLG74djh/U6ThE9F
+ jYLME7ZdZfWKpgrV+VImN+2PQV0ucGeZ80w1uSkw089d/t3KRCTq41dyBqhBLwUg08Y+
+ oFdo8CrrtiCXONlgKD+p0PBpktOXX9dbD5ax6mo9/6Hk50Eh3BsT6JiVSEF2I2T7Agvt
+ DGIRHYiSRdYJMcE9MSwtJaWRukyds/9cMoCgWlB0nnL/HMht3xIjt98uC6O9o9xEKRbe
+ 1vKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xnDB24LQeAUZkcfN3wL+FHV/aKMR05Pb76EsfKgOtQs=;
+ b=f5oDz6VIy4wTneLr49rZXGc5MaD8CyOdWc/O0xlc6kjvgzeNPtc9csOn2HN+BZ6ZSX
+ adsj+7ao0A9VSdSEuzGU9OwSTfGiAOJpLX4rzveGXc8DBSxYWc71wY8BfHVQeOS1EdTs
+ 1OgylsShHgV+A3o0DwSYzZtOZcCl/aBmYfxEcxhxFFSG5rhTJ3HXtFFExw/UXjIdHZ2K
+ nd5fb5TE8IlHEdMceguFeSxjx8WrZ0Yjjh7Ww1niJ/Evj3jvQ5MyBGU8fBgFswYc9erH
+ NNY1Kvtb+DynSyZApCjmIWcLZgf4Fbi7kJZnOonhHJ6fvHYxRa5sW4lPO3hUrAZ1rNdo
+ 2qKw==
+X-Gm-Message-State: AOAM5329vq91OwQ844+VQasdk6gagIMk9nqUHhyN6iZad4GaUV18irhW
+ JjtlTll39JcaRG0jpaJKkZsniQ9iZT0Ubh21ng/Q0Q==
+X-Google-Smtp-Source: ABdhPJxaGa+pLWFNUpDY6o6qT/j3Mq2c5YYfreeyurnEZrGUe6/lYOJubaJ+/Um6tzeBm0PoCUWy/A+7MB2iwbKR5iU=
+X-Received: by 2002:a05:6512:3181:: with SMTP id
+ i1mr2552749lfe.286.1644314218724; 
+ Tue, 08 Feb 2022 01:56:58 -0800 (PST)
+MIME-Version: 1.0
 References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
  <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
- <87fsuxq049.wl-maz@kernel.org>
- <20210825150713.5rpwzm4grfn7akcw@gator.home>
+ <87fsuxq049.wl-maz@kernel.org> <20210825150713.5rpwzm4grfn7akcw@gator.home>
  <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
  <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
  <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
@@ -71,20 +71,13 @@ References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
  <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
  <875yq88app.wl-maz@kernel.org>
  <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@google.com, rananta@google.com, drjones@redhat.com,
- kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com,
- reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org,
- seanjc@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <878ruld72v.wl-maz@kernel.org>
+In-Reply-To: <878ruld72v.wl-maz@kernel.org>
+From: Oliver Upton <oupton@google.com>
+Date: Tue, 8 Feb 2022 01:56:47 -0800
+Message-ID: <CAOQ_QshwtTknXrpLkHbKj119=wVHvch0tHJURfrvia6Syy3tjg@mail.gmail.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+To: Marc Zyngier <maz@kernel.org>
 Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -103,95 +96,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Huh, somewhat missed that email, apologies for the delay.
+Hi Marc,
 
-On Tue, 25 Jan 2022 17:29:13 +0000,
-Oliver Upton <oupton@google.com> wrote:
-> 
-> Hi Marc,
-> 
-> On Tue, Jan 25, 2022 at 12:46 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > If I understand correctly, the original motivation for going with
-> > > pseudo-registers was to comply with QEMU, which uses KVM_GET_REG_LIST
-> > > and KVM_[GET|SET]_ONE_REG interface, but I'm guessing the VMMs doing
-> > > save/restore across migration might write the same values for every
-> > > vCPU.
+On Tue, Feb 8, 2022 at 1:46 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > KVM currently restricts the vcpu features to be unified across vcpus,
+> > > but that's only an implementation choice.
 > >
-> > KVM currently restricts the vcpu features to be unified across vcpus,
-> > but that's only an implementation choice.
-> 
-> But that implementation choice has become ABI, no? How could support
-> for asymmetry be added without requiring userspace opt-in or breaking
-> existing VMMs that depend on feature unification?
-
-Of course, you'd need some sort of advertising of this new behaviour.
-
-One thing I would like to add to the current state of thing is an
-indication of whether the effects of a sysreg being written from
-userspace are global or local to a vcpu. You'd need a new capability,
-and an extra flag added to the encoding of each register.
-
-> 
-> > The ARM architecture doesn't
-> > mandate that these registers are all the same, and it isn't impossible
-> > that we'd allow for the feature set to become per-vcpu at some point
-> > in time. So this argument doesn't really hold.
-> 
-> Accessing per-VM state N times is bound to increase VM blackout time
-> during migrations ~linearly as the number of vCPUs in a VM increases,
-> since a VM scoped lock is necessary to serialize guest accesses. It
-> could be tolerable at present scale, but seems like in the future it
-> could become a real problem.
-
-I don't disagree. But I doubt switching to a different API altogether
-is the solution to this.
-
-> 
-> > Furthermore, compatibility with QEMU's save/restore model is
-> > essential, and AFAICT, there is no open source alternative.
-> 
-> Agree fundamentally, but I believe it is entirely reasonable to
-> require a userspace change to adopt a new KVM feature. Otherwise, we
-> may be trying to shoehorn new features into existing UAPI that may not
-> be a precise fit..
-
-But the very purpose of this API is to support discoverability. If we
-can't support it, then we might as well declare the whole API
-deprecated and restart from scratch.
-
-No, I'm not seriously suggesting this :-/.
-
-> In order to cure the serialization mentioned above, two options are
-> top of mind: accessing the VM state with the VM FD or informing
-> userspace that a set of registers need only be written once for an
-> entire VM. If we add support for asymmetry later down the road, that
-> would become an opt-in such that userspace will do the access
-> per-vCPU.
-
-It is the latter that I'm suggesting.
-
+> > But that implementation choice has become ABI, no? How could support
+> > for asymmetry be added without requiring userspace opt-in or breaking
+> > existing VMMs that depend on feature unification?
 >
-> > A device means yet another configuration and migration API. Don't you
-> > think we have enough of those? The complexity of KVM/arm64 userspace
-> > API is already insane, and extremely fragile. Adding to it will be a
-> > validation nightmare (it already is, and I don't see anyone actively
-> > helping with it).
-> 
-> It seems equally fragile to introduce VM-wide serialization to vCPU
-> UAPI that we know is in the live migration critical path for _any_
-> VMM. Without requiring userspace changes for all the new widgets under
-> discussion we're effectively forcing VMMs to do something suboptimal.
+> Of course, you'd need some sort of advertising of this new behaviour.
+>
+> One thing I would like to add to the current state of thing is an
+> indication of whether the effects of a sysreg being written from
+> userspace are global or local to a vcpu. You'd need a new capability,
+> and an extra flag added to the encoding of each register.
 
-I'm perfectly happy with suboptimal to start with, and find ways to
-make it better once we have a clear path forward. I just don't want to
-conflate the two.
+Ah. I think that is a much more reasonable fit then. VMMs unaware of
+this can continue to migrate new bits (albeit at the cost of
+potentially higher lock contention for the per-VM stuff), and those
+that do can reap the benefits of writing such attributes exactly once.
 
-Thanks,
+[...]
 
-	M.
+> > > A device means yet another configuration and migration API. Don't you
+> > > think we have enough of those? The complexity of KVM/arm64 userspace
+> > > API is already insane, and extremely fragile. Adding to it will be a
+> > > validation nightmare (it already is, and I don't see anyone actively
+> > > helping with it).
+> >
+> > It seems equally fragile to introduce VM-wide serialization to vCPU
+> > UAPI that we know is in the live migration critical path for _any_
+> > VMM. Without requiring userspace changes for all the new widgets under
+> > discussion we're effectively forcing VMMs to do something suboptimal.
+>
+> I'm perfectly happy with suboptimal to start with, and find ways to
+> make it better once we have a clear path forward. I just don't want to
+> conflate the two.
 
--- 
-Without deviation from the norm, progress is not possible.
+Fair. My initial concern was that it didn't seem as though there was
+much room for growth/improvement with the one reg UAPI, but your
+suggestion definitely provides a ramp out to handle VM state once per
+VM.
+
+Thanks for following up :)
+
+--
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
