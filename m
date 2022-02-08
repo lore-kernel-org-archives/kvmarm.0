@@ -2,85 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E59D0C433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 17:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 945D8C433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 17:55:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58C8B4B0F1;
-	Tue,  8 Feb 2022 12:49:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B32004B105;
+	Tue,  8 Feb 2022 12:55:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DdzMAnuCFUYG; Tue,  8 Feb 2022 12:49:04 -0500 (EST)
+	with ESMTP id MWsmH3np9aRb; Tue,  8 Feb 2022 12:55:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 389E64B0FC;
-	Tue,  8 Feb 2022 12:49:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FCC04B0F7;
+	Tue,  8 Feb 2022 12:55:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CE744B0F7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 12:49:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDE074B0EF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 12:55:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sJiPxzkGCqUR for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Feb 2022 12:49:02 -0500 (EST)
+ with ESMTP id ByYqqtHq4w-a for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Feb 2022 12:55:43 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3CC194B0F1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 12:49:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8792940307
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 12:55:43 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id C5A3B617E3;
- Tue,  8 Feb 2022 17:49:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37060C004E1;
- Tue,  8 Feb 2022 17:49:00 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 6EE0A617E6;
+ Tue,  8 Feb 2022 17:55:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7CF8C004E1;
+ Tue,  8 Feb 2022 17:55:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1644342540;
- bh=fiDA/ww0hH9Ihny0p1Mw46FtIdZcId1+1g9QAhPQmMQ=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=ThxP1jgwknTX415K1izO5hWFXB3QTxYCPffGDOViUTzgffNYlps4PC96hjrk8rNYX
- kPXzHQ7w/VGVhwJ8wny31enHFT4WCwLtBDdGPA6MvFOQvrN+t6uC5LWnq1aZ7bcXCb
- RZqX5hBcrqaJgPezu2NYCzG59/kw0liK9v2vslhT2m3jsIZNoPcmqwpCRi0oTytQSG
- 0mH53xrRqSNfyp2QbovIBFfev4rUCgKxexdyAB5joNbtkYe+cPLJyhzhsFPQCPMp7b
- z5UPlJow8XUsDNQmGt6RfkZj3r3+Xk5c+p7JZbDih2zS232alW7rH/3tqdjLcZziSH
- 7JlpPSXbwpWIw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ s=k20201202; t=1644342941;
+ bh=vuOki87uw/cVjiDBNRuvVbweJ7mfBUbdWsYNIU6Q4CQ=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=iL+NboFDWPKiFk7BCoHiTAkSC8jqhERdstt77f7mcBalWlHF+WJ/qAPgpPHVzXpmm
+ mSQlatzJT/sJqW4xeRc76+0fQgM4BpyHzDKYc6PInlI0Wl8XP3o+lAtimpKJHdXaZG
+ qzO62yVy8P6ofwZxzbtA4BTsnT9H3MihYWUHzd/KVN5pGGIWyRRlO8gCJAdLgQbMcj
+ 5C2Y5rjpXoj3ZWMuhksDojrXpyCM3soqJJOUwPFUEfUEiNXBqhaJJU15551unAZUlc
+ ULrx6qVqKzVhlHU6RLxXiXRWUw3sxDu/0MurK29n3yG2jQui0lH3GC2/jYWtbjs3ak
+ OtUsFuJKrIO8A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nHUbq-006L8W-8g; Tue, 08 Feb 2022 17:48:58 +0000
-Date: Tue, 08 Feb 2022 17:48:57 +0000
-Message-ID: <878rul5jw6.wl-maz@kernel.org>
+ id 1nHUiJ-006LJ3-Tp; Tue, 08 Feb 2022 17:55:40 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-In-Reply-To: <YgKhMjGtBH+1nJCk@google.com>
-References: <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
- <87ilyitt6e.wl-maz@kernel.org>
- <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
- <87lf3drmvp.wl-maz@kernel.org>
- <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
- <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
- <875yq88app.wl-maz@kernel.org>
- <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
- <878ruld72v.wl-maz@kernel.org>
- <CAOQ_QshwtTknXrpLkHbKj119=wVHvch0tHJURfrvia6Syy3tjg@mail.gmail.com>
- <YgKhMjGtBH+1nJCk@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+To: suzuki.poulose@arm.com, mark.rutland@arm.com, james.morse@arm.com,
+ Alexandru Elisei <alexandru.elisei@arm.com>, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 0/6] KVM: arm64: Improve PMU support on heterogeneous
+ systems
+Date: Tue,  8 Feb 2022 17:55:37 +0000
+Message-Id: <164434293099.3932761.490212877046976183.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220127161759.53553-1-alexandru.elisei@arm.com>
+References: <20220127161759.53553-1-alexandru.elisei@arm.com>
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, oupton@google.com, rananta@google.com,
- drjones@redhat.com, kvmarm@lists.cs.columbia.edu, pshier@google.com,
- ricarkol@google.com, reijiw@google.com, jingzhangos@google.com,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, mark.rutland@arm.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org, tglx@linutronix.de,
+ mingo@redhat.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: tglx@linutronix.de, mingo@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,56 +86,38 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 08 Feb 2022 16:58:26 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+On Thu, 27 Jan 2022 16:17:53 +0000, Alexandru Elisei wrote:
+> (CC'ing Peter Maydell in case this might be of interest to qemu)
 > 
-> On Tue, Feb 08, 2022, Oliver Upton wrote:
-> > Hi Marc,
-> > 
-> > On Tue, Feb 8, 2022 at 1:46 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > > > KVM currently restricts the vcpu features to be unified across vcpus,
-> > > > > but that's only an implementation choice.
-> > > >
-> > > > But that implementation choice has become ABI, no? How could support
-> > > > for asymmetry be added without requiring userspace opt-in or breaking
-> > > > existing VMMs that depend on feature unification?
-> > >
-> > > Of course, you'd need some sort of advertising of this new behaviour.
-> > >
-> > > One thing I would like to add to the current state of thing is an
-> > > indication of whether the effects of a sysreg being written from
-> > > userspace are global or local to a vcpu. You'd need a new capability,
-> > > and an extra flag added to the encoding of each register.
-> > 
-> > Ah. I think that is a much more reasonable fit then. VMMs unaware of
-> > this can continue to migrate new bits (albeit at the cost of
-> > potentially higher lock contention for the per-VM stuff), and those
-> > that do can reap the benefits of writing such attributes exactly once.
+> The series can be found on a branch at [1], and the kvmtool support at [2].
 > 
-> But the "proper" usage is no different than adding support for
-> VM-scoped variants of KVM_{G,S}ET_ONE_REG and friends, and a
-> VM-scoped variant is conceptually a lot cleaner IMO.  And making
-> them truly VM-scoped means KVM can do things like support sysregs
-> that are immutable after vCPUs are created.
+> Detailed explanation of the issue and symptoms that the patches attempt to
+> correct can be found in the cover letter for v1 [3].
+> 
+> [...]
 
-It is different, because your approach requires you to update all the
-existing VMMs to find out which register is of which kind. Not to
-mention that global sysregs are an absolute oddity in the face of the
-architecture (there is none in the base architecture).
+Applied to next, thanks!
 
-> So long as KVM defaults to '0' for all such registers, lack of
-> migration support in userspace that isn't aware of the new API,
-> i.e. doesn't do KVM_GET_REG_LIST at a VM-scope, is a nop because
-> said userspace also won't modify the registers in the first place.
+[1/6] KVM: arm64: Do not change the PMU event filter after a VCPU has run
+      commit: 5177fe91e4cf78a659aada2c9cf712db4d788481
+[2/6] perf: Fix wrong name in comment for struct perf_cpu_context
+      commit: 2093057ab879da1070c851b9e07126eaa86d0dfc
+[3/6] KVM: arm64: Keep a per-VM pointer to the default PMU
+      commit: 46b18782147248b62f00e98a7f87abaf934951e8
+[4/6] KVM: arm64: Keep a list of probed PMUs
+      commit: db858060b1a788fba03711793dcaff19ea43286c
+[5/6] KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU attribute
+      commit: 6ee7fca2a4a023b14aa1f1f3c4f6c833116116ef
+[6/6] KVM: arm64: Refuse to run VCPU if the PMU doesn't match the physical CPU
+      commit: 583cda1b0e7d5d49db5fc15db623166310e36bf6
 
-We want any VMM that correctly uses the API today to seamlessly be
-able to save/restore any new feature. QEMU does that, and it should
-continue to work no matter what new feature we add to the list.
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
