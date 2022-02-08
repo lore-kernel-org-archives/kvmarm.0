@@ -2,84 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEE23C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 09:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF069C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 12:37:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27D4D4086D;
-	Tue,  8 Feb 2022 04:57:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4ABA74B106;
+	Tue,  8 Feb 2022 07:37:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z3wmQvFUeHRj; Tue,  8 Feb 2022 04:57:02 -0500 (EST)
+	with ESMTP id HgYhwlBQpI8Z; Tue,  8 Feb 2022 07:37:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 750E94B11E;
-	Tue,  8 Feb 2022 04:57:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AB9604B0B3;
+	Tue,  8 Feb 2022 07:37:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AC7A4B11A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 04:57:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A534A531
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 07:37:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S4c+cgUCVF91 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Feb 2022 04:57:00 -0500 (EST)
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com
- [209.85.167.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63E4A4086D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 04:57:00 -0500 (EST)
-Received: by mail-lf1-f48.google.com with SMTP id i17so6158919lfg.11
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Feb 2022 01:57:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xnDB24LQeAUZkcfN3wL+FHV/aKMR05Pb76EsfKgOtQs=;
- b=gvGqrcbMb8DtdN8ZXcz6prSV4SyBxVL8iaSXK7eBe0hV86JPh8TEGaBs9LeBjH394n
- JV5aBERcpIRWYYa6clmXFDkBsubhJVVJXzuUPZt7JtaDR+AcLQ74PLG74djh/U6ThE9F
- jYLME7ZdZfWKpgrV+VImN+2PQV0ucGeZ80w1uSkw089d/t3KRCTq41dyBqhBLwUg08Y+
- oFdo8CrrtiCXONlgKD+p0PBpktOXX9dbD5ax6mo9/6Hk50Eh3BsT6JiVSEF2I2T7Agvt
- DGIRHYiSRdYJMcE9MSwtJaWRukyds/9cMoCgWlB0nnL/HMht3xIjt98uC6O9o9xEKRbe
- 1vKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xnDB24LQeAUZkcfN3wL+FHV/aKMR05Pb76EsfKgOtQs=;
- b=f5oDz6VIy4wTneLr49rZXGc5MaD8CyOdWc/O0xlc6kjvgzeNPtc9csOn2HN+BZ6ZSX
- adsj+7ao0A9VSdSEuzGU9OwSTfGiAOJpLX4rzveGXc8DBSxYWc71wY8BfHVQeOS1EdTs
- 1OgylsShHgV+A3o0DwSYzZtOZcCl/aBmYfxEcxhxFFSG5rhTJ3HXtFFExw/UXjIdHZ2K
- nd5fb5TE8IlHEdMceguFeSxjx8WrZ0Yjjh7Ww1niJ/Evj3jvQ5MyBGU8fBgFswYc9erH
- NNY1Kvtb+DynSyZApCjmIWcLZgf4Fbi7kJZnOonhHJ6fvHYxRa5sW4lPO3hUrAZ1rNdo
- 2qKw==
-X-Gm-Message-State: AOAM5329vq91OwQ844+VQasdk6gagIMk9nqUHhyN6iZad4GaUV18irhW
- JjtlTll39JcaRG0jpaJKkZsniQ9iZT0Ubh21ng/Q0Q==
-X-Google-Smtp-Source: ABdhPJxaGa+pLWFNUpDY6o6qT/j3Mq2c5YYfreeyurnEZrGUe6/lYOJubaJ+/Um6tzeBm0PoCUWy/A+7MB2iwbKR5iU=
-X-Received: by 2002:a05:6512:3181:: with SMTP id
- i1mr2552749lfe.286.1644314218724; 
- Tue, 08 Feb 2022 01:56:58 -0800 (PST)
+ with ESMTP id tFHipZ-N4VMr for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Feb 2022 07:37:51 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2762449EE2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 07:37:51 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 82A39B81AEE;
+ Tue,  8 Feb 2022 12:37:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52EC3C004E1;
+ Tue,  8 Feb 2022 12:37:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1644323868;
+ bh=Vdzv6/VbCUfmB9ltCSpCmrJCAknBa748GpfXsqv7SuY=;
+ h=From:To:Cc:Subject:Date:From;
+ b=qmuMJ8idnULy1JeLdMTOgVlGQSy4iea+9UUHi3D6DoiEFoAwTCsKJarkGnh9C8wo7
+ gcj0hZDWqxCqcCNqL7X0jPIs2CSHx70b28Pl7WjXfQPXKpx3QYWWHDFRGZjv/WnhXn
+ yb05l0jB8K01IncTERH7mbpugILidG2rkvR+MtOBfw5dloXjf/j7DT1qIRmGvdE6w3
+ t7xVPTQRwgb/w+1CbKnl6OW9W3MowN94jibzF+H6rt8y1vcpLZ9RFA0gsLc4KGOPt0
+ pgKp9oKyidHeDeU5Jt98QpteNPQu+R9TsYFC2x83S2aablvzLPxIk09kYWByQWrzLU
+ t9b1sUe5dcFYw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nHPkg-006FuE-2W; Tue, 08 Feb 2022 12:37:46 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Subject: [PATCH] KVM: arm64: vgic: Read HW interrupt pending state from the HW
+Date: Tue,  8 Feb 2022 12:37:26 +0000
+Message-Id: <20220208123726.3604198-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
- <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
- <87fsuxq049.wl-maz@kernel.org> <20210825150713.5rpwzm4grfn7akcw@gator.home>
- <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
- <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
- <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
- <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
- <87ilyitt6e.wl-maz@kernel.org>
- <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
- <87lf3drmvp.wl-maz@kernel.org>
- <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
- <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
- <875yq88app.wl-maz@kernel.org>
- <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
- <878ruld72v.wl-maz@kernel.org>
-In-Reply-To: <878ruld72v.wl-maz@kernel.org>
-From: Oliver Upton <oupton@google.com>
-Date: Tue, 8 Feb 2022 01:56:47 -0800
-Message-ID: <CAOQ_QshwtTknXrpLkHbKj119=wVHvch0tHJURfrvia6Syy3tjg@mail.gmail.com>
-Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com,
+ ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,54 +82,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+It appears that a read access to GIC[DR]_I[CS]PENDRn doesn't always
+result in the pending interrupts being accurately reported if they are
+mapped to a HW interrupt. This is particularily visible when acking
+the timer interrupt and reading the GICR_ISPENDR1 register immediately
+after, for example (the interrupt appears as not-pending while it really
+is...).
 
-On Tue, Feb 8, 2022 at 1:46 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > KVM currently restricts the vcpu features to be unified across vcpus,
-> > > but that's only an implementation choice.
-> >
-> > But that implementation choice has become ABI, no? How could support
-> > for asymmetry be added without requiring userspace opt-in or breaking
-> > existing VMMs that depend on feature unification?
->
-> Of course, you'd need some sort of advertising of this new behaviour.
->
-> One thing I would like to add to the current state of thing is an
-> indication of whether the effects of a sysreg being written from
-> userspace are global or local to a vcpu. You'd need a new capability,
-> and an extra flag added to the encoding of each register.
+This is because a HW interrupt has its 'active and pending state' kept
+in the *physical* distributor, and not in the virtual one, as mandated
+by the spec (this is what allows the direct deactivation). The virtual
+distributor only caries the pending and active *states* (note the
+plural, as these are two independent and non-overlapping states).
 
-Ah. I think that is a much more reasonable fit then. VMMs unaware of
-this can continue to migrate new bits (albeit at the cost of
-potentially higher lock contention for the per-VM stuff), and those
-that do can reap the benefits of writing such attributes exactly once.
+Fix it by reading the HW state back, either from the timer itself or
+from the distributor if necessary.
 
-[...]
+Reported-by: Ricardo Koller <ricarkol@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-mmio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> > > A device means yet another configuration and migration API. Don't you
-> > > think we have enough of those? The complexity of KVM/arm64 userspace
-> > > API is already insane, and extremely fragile. Adding to it will be a
-> > > validation nightmare (it already is, and I don't see anyone actively
-> > > helping with it).
-> >
-> > It seems equally fragile to introduce VM-wide serialization to vCPU
-> > UAPI that we know is in the live migration critical path for _any_
-> > VMM. Without requiring userspace changes for all the new widgets under
-> > discussion we're effectively forcing VMMs to do something suboptimal.
->
-> I'm perfectly happy with suboptimal to start with, and find ways to
-> make it better once we have a clear path forward. I just don't want to
-> conflate the two.
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index 7068da080799..49837d3a3ef5 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -248,6 +248,8 @@ unsigned long vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+ 						    IRQCHIP_STATE_PENDING,
+ 						    &val);
+ 			WARN_RATELIMIT(err, "IRQ %d", irq->host_irq);
++		} else if (vgic_irq_is_mapped_level(irq)) {
++			val = vgic_get_phys_line_level(irq);
+ 		} else {
+ 			val = irq_is_pending(irq);
+ 		}
+-- 
+2.34.1
 
-Fair. My initial concern was that it didn't seem as though there was
-much room for growth/improvement with the one reg UAPI, but your
-suggestion definitely provides a ramp out to handle VM state once per
-VM.
-
-Thanks for following up :)
-
---
-Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
