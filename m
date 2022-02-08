@@ -2,69 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D858C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 01:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22993C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Feb 2022 09:46:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E18E64A119;
-	Mon,  7 Feb 2022 20:27:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 431474B0E1;
+	Tue,  8 Feb 2022 04:46:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eB-aZxDozqsQ; Mon,  7 Feb 2022 20:27:20 -0500 (EST)
+	with ESMTP id h2krwhQfdx+N; Tue,  8 Feb 2022 04:46:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 723C14A7FD;
-	Mon,  7 Feb 2022 20:27:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED7364B0D6;
+	Tue,  8 Feb 2022 04:46:29 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F40484A119
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Feb 2022 20:27:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2E204B0C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 04:46:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tEOf-15JNPkZ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Feb 2022 20:27:17 -0500 (EST)
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com
- [209.85.166.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C6CC549F3E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Feb 2022 20:27:17 -0500 (EST)
-Received: by mail-io1-f74.google.com with SMTP id
- b4-20020a05660214c400b00632eb8bff25so10369963iow.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Feb 2022 17:27:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=gGfwXYlGCeVdn9VPRh3V4tDKjPW4ZQjqWRu/l1nGaXA=;
- b=Rn6x40CqNhj7S3R3b9SiwvoWmH3ai4cKbllf15bsoxy4gRJWCfi7N6Oc9xQaITcyeS
- U9tGKNBkNTBZxAleegnM25vsRDWOE6hvT2Gq5GzWuUTf9n7VJHAubVx3dQijV/DtiJ9w
- tqXba1ti7uChPUXnpq8L4OW4qh89Gw+GlVRfyjPNMPULYh44MCunrH6kYlQB43SCyZPN
- BdY14rb8oYBNOlvPWqsBOeETx8XwvOIvpCiDTvZL/27CZJBgaGOqFPDWI18JKvdVn+kk
- O5X5HYo0/P7rIiWyfbiDTyPIW6zgHs1UQYfSsYyFN1L6U/ds8hG1BbP+TEM6WWjeCk1d
- z51Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=gGfwXYlGCeVdn9VPRh3V4tDKjPW4ZQjqWRu/l1nGaXA=;
- b=kQjhMPQzCp6w15/jhsYpR2B6BwpcYDDUpsjecNx7Ti+bjmNuB6W+TippKtGAmjdoVO
- KveYHiCZ6b4EFmVhSpf5DuX89cqdT78tigwIu7OQKPgw5EsZGMIfl61PC4s8JTMnd0mg
- iU58mynLsNMXBI4r7aJEjJjNo7DpjHEaXF/qCBssGe5TkHuUU7c3L3zPDKCigM69rbRi
- ym5O4iP5iipaIFmQsrM36zHx/RojRyTWrsCs1cRyfGjY9Q1bUHp9CrNzVip0sKyv1msl
- px4xyzZDmy7Vpqv1t08I87iLckCTHWN/DgdzuZVjjBlYCXuj31YtMjjkB2xE5oU2Fkpb
- UeJg==
-X-Gm-Message-State: AOAM531NSqvgRnWlYzT6FVwmMoUnjw5SXGqExSsjKTenAx6jurWWnLlq
- PMlFEvCk0EcPPHxpRgbNmWHxnTuWCmBuJ4Mx0R749vNCE9jAr9i1kxLt40vQdr4/CykSCxeSOJA
- /7WjKXEBr9rXTULAsR/dFsmZLJaXWP2ndRLF/zW2wSHEg2ffRbduG86Rm9Q1U4mj3MvIVVg==
-X-Google-Smtp-Source: ABdhPJz67NVxJW2vaoMGx286+lfyUve0UxOOQS00muAMBgCrDOPr5VxvwaPFBQxM9shyB9jvw/hfAhJ3jr4=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6638:2506:: with SMTP id
- v6mr1140464jat.94.1644283637128; Mon, 07 Feb 2022 17:27:17 -0800 (PST)
-Date: Tue,  8 Feb 2022 01:27:05 +0000
-Message-Id: <20220208012705.640444-1-oupton@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
-Subject: [PATCH] KVM: arm64: Drop unused param from kvm_psci_version()
-From: Oliver Upton <oupton@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>
+ with ESMTP id 7dYwL--BtUgO for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Feb 2022 04:46:27 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21C454B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Feb 2022 04:46:27 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id D9718B817D0;
+ Tue,  8 Feb 2022 09:46:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA0B9C004E1;
+ Tue,  8 Feb 2022 09:46:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1644313584;
+ bh=N2iwFt+9nu2+miw7Yd5yWcMLN1r1UbYEZrqOpFnZfVY=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Tg7xQX2aFayXpgxebMRXN32qDsQLMRc5MalU2t91q1q7VDMd0YBdTLKrltFONY6qS
+ vHvy7FENHlTVkIwCJKTeBpfkBIMuOBD/J+l0bsgxjigeFXZMJuF+6HZt8l3TeyQvp0
+ wpxLQJmW7BPc9NRxx5cgd1Gk3jlHEjMrfuBdXg9WZXUz1JPIzaKnW26BTrd9vU2TTw
+ CGT2xxVM9XFgxO7Uf4hXcXKx7I9rN08k3pftUMqhM1FGr3icweYCN9hvvBvluB/s0P
+ JJQyhxXmkbHSBLbAbz0IhxMZyYnr5e+ejYopvsBH0DtySSmMQZtu4FQJn/YLGR7WWE
+ Yfs6vDtHrfysQ==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=billy-the-mountain.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nHN4o-006DrU-IX; Tue, 08 Feb 2022 09:46:22 +0000
+Date: Tue, 08 Feb 2022 09:46:16 +0000
+Message-ID: <878ruld72v.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: KVM/arm64: Guest ABI changes do not appear rollback-safe
+In-Reply-To: <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
+References: <YSVhV+UIMY12u2PW@google.com> <87mtp5q3gx.wl-maz@kernel.org>
+ <CAOQ_QshSaEm_cMYQfRTaXJwnVqeoN29rMLBej-snWd6_0HsgGw@mail.gmail.com>
+ <87fsuxq049.wl-maz@kernel.org>
+ <20210825150713.5rpwzm4grfn7akcw@gator.home>
+ <CAOQ_QsgWiw9-BuGTUFpHqBw3simUaM4Tweb9y5_oz1UHdr4ELg@mail.gmail.com>
+ <877dg8ppnt.wl-maz@kernel.org> <YSfiN3Xq1vUzHeap@google.com>
+ <20210827074011.ci2kzo4cnlp3qz7h@gator.home>
+ <CAOQ_Qsg2dKLLanSx6nMbC1Er9DSO3peLVEAJNvU1ZcRVmwaXgQ@mail.gmail.com>
+ <87ilyitt6e.wl-maz@kernel.org>
+ <CAOQ_QshfXEGL691_MOJn0YbL94fchrngP8vuFReCW-=5UQtNKQ@mail.gmail.com>
+ <87lf3drmvp.wl-maz@kernel.org>
+ <CAOQ_QsjVk9n7X9E76ycWBNguydPE0sVvywvKW0jJ_O58A0NJHg@mail.gmail.com>
+ <CAJHc60wp4uCVQhigNrNxF3pPd_8RPHXQvK+gf7rSxCRfH6KwFg@mail.gmail.com>
+ <875yq88app.wl-maz@kernel.org>
+ <CAOQ_QshL2MCc8-vkYRTDhtZXug20OnMg=qedhSGDrp_VUnX+5g@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, rananta@google.com, drjones@redhat.com,
+ kvmarm@lists.cs.columbia.edu, pshier@google.com, ricarkol@google.com,
+ reijiw@google.com, jingzhangos@google.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ Alexandru.Elisei@arm.com, suzuki.poulose@arm.com, peter.maydell@linaro.org,
+ seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, pshier@google.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,71 +103,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_psci_version() consumes a pointer to struct kvm in addition to a
-vcpu pointer. Drop the kvm pointer as it is unused. While the comment
-suggests the explicit kvm pointer was useful for calling from hyp, there
-exist no such callsite in hyp.
+Huh, somewhat missed that email, apologies for the delay.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
+On Tue, 25 Jan 2022 17:29:13 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Tue, Jan 25, 2022 at 12:46 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > If I understand correctly, the original motivation for going with
+> > > pseudo-registers was to comply with QEMU, which uses KVM_GET_REG_LIST
+> > > and KVM_[GET|SET]_ONE_REG interface, but I'm guessing the VMMs doing
+> > > save/restore across migration might write the same values for every
+> > > vCPU.
+> >
+> > KVM currently restricts the vcpu features to be unified across vcpus,
+> > but that's only an implementation choice.
+> 
+> But that implementation choice has become ABI, no? How could support
+> for asymmetry be added without requiring userspace opt-in or breaking
+> existing VMMs that depend on feature unification?
 
-Applies to 5.17-rc3.
+Of course, you'd need some sort of advertising of this new behaviour.
 
- arch/arm64/kvm/psci.c  | 6 +++---
- include/kvm/arm_psci.h | 6 +-----
- 2 files changed, 4 insertions(+), 8 deletions(-)
+One thing I would like to add to the current state of thing is an
+indication of whether the effects of a sysreg being written from
+userspace are global or local to a vcpu. You'd need a new capability,
+and an extra flag added to the encoding of each register.
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 3eae32876897..a0c10c11f40e 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -85,7 +85,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	if (!vcpu)
- 		return PSCI_RET_INVALID_PARAMS;
- 	if (!vcpu->arch.power_off) {
--		if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
-+		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
- 			return PSCI_RET_ALREADY_ON;
- 		else
- 			return PSCI_RET_INVALID_PARAMS;
-@@ -392,7 +392,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
-  */
- int kvm_psci_call(struct kvm_vcpu *vcpu)
- {
--	switch (kvm_psci_version(vcpu, vcpu->kvm)) {
-+	switch (kvm_psci_version(vcpu)) {
- 	case KVM_ARM_PSCI_1_0:
- 		return kvm_psci_1_0_call(vcpu);
- 	case KVM_ARM_PSCI_0_2:
-@@ -471,7 +471,7 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 
- 	switch (reg->id) {
- 	case KVM_REG_ARM_PSCI_VERSION:
--		val = kvm_psci_version(vcpu, vcpu->kvm);
-+		val = kvm_psci_version(vcpu);
- 		break;
- 	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
- 	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 5b58bd2fe088..297645edcaff 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -16,11 +16,7 @@
- 
- #define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_0
- 
--/*
-- * We need the KVM pointer independently from the vcpu as we can call
-- * this from HYP, and need to apply kern_hyp_va on it...
-- */
--static inline int kvm_psci_version(struct kvm_vcpu *vcpu, struct kvm *kvm)
-+static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * Our PSCI implementation stays the same across versions from
+> 
+> > The ARM architecture doesn't
+> > mandate that these registers are all the same, and it isn't impossible
+> > that we'd allow for the feature set to become per-vcpu at some point
+> > in time. So this argument doesn't really hold.
+> 
+> Accessing per-VM state N times is bound to increase VM blackout time
+> during migrations ~linearly as the number of vCPUs in a VM increases,
+> since a VM scoped lock is necessary to serialize guest accesses. It
+> could be tolerable at present scale, but seems like in the future it
+> could become a real problem.
+
+I don't disagree. But I doubt switching to a different API altogether
+is the solution to this.
+
+> 
+> > Furthermore, compatibility with QEMU's save/restore model is
+> > essential, and AFAICT, there is no open source alternative.
+> 
+> Agree fundamentally, but I believe it is entirely reasonable to
+> require a userspace change to adopt a new KVM feature. Otherwise, we
+> may be trying to shoehorn new features into existing UAPI that may not
+> be a precise fit..
+
+But the very purpose of this API is to support discoverability. If we
+can't support it, then we might as well declare the whole API
+deprecated and restart from scratch.
+
+No, I'm not seriously suggesting this :-/.
+
+> In order to cure the serialization mentioned above, two options are
+> top of mind: accessing the VM state with the VM FD or informing
+> userspace that a set of registers need only be written once for an
+> entire VM. If we add support for asymmetry later down the road, that
+> would become an opt-in such that userspace will do the access
+> per-vCPU.
+
+It is the latter that I'm suggesting.
+
+>
+> > A device means yet another configuration and migration API. Don't you
+> > think we have enough of those? The complexity of KVM/arm64 userspace
+> > API is already insane, and extremely fragile. Adding to it will be a
+> > validation nightmare (it already is, and I don't see anyone actively
+> > helping with it).
+> 
+> It seems equally fragile to introduce VM-wide serialization to vCPU
+> UAPI that we know is in the live migration critical path for _any_
+> VMM. Without requiring userspace changes for all the new widgets under
+> discussion we're effectively forcing VMMs to do something suboptimal.
+
+I'm perfectly happy with suboptimal to start with, and find ways to
+make it better once we have a clear path forward. I just don't want to
+conflate the two.
+
+Thanks,
+
+	M.
+
 -- 
-2.35.0.263.gb82422642f-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
