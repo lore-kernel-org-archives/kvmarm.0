@@ -2,90 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F76C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Feb 2022 10:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1947FC433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Feb 2022 11:04:27 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 12FD540417;
-	Wed,  9 Feb 2022 05:00:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65BAE49F2E;
+	Wed,  9 Feb 2022 06:04:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id r7ZOx8ZO1+qA; Wed,  9 Feb 2022 05:00:19 -0500 (EST)
+	with ESMTP id iMOZPV2nIQgR; Wed,  9 Feb 2022 06:04:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99AD049F4A;
-	Wed,  9 Feb 2022 05:00:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAE3949F0A;
+	Wed,  9 Feb 2022 06:04:25 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D215048F9C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Feb 2022 02:42:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE76749F05
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Feb 2022 06:04:24 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5cw1sio8Eylg for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Feb 2022 02:42:15 -0500 (EST)
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 38608407EB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Feb 2022 02:42:15 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
- t=1644392535; x=1675928535;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=7VeRspiyxXCh3lSSnfqh2HL4gkG0CHa04PfTnd3ABnE=;
- b=Ag7JEcQNDX1WC5JpD1c19DSGruW+ZjlwiATwCtmoq1ql8CU8d7P2dQgI
- 2X2rfjOhqIjGOJFvIGPlD7AgTf7bRR9gMwQgUjT5FxyeQUcAV/kCkawKQ
- 54jE5LoHLWwje8N7mCIKKrQf3PNzKuTVp3t5Rn8QS2pQsiR63Q11NmESd
- nziuS9jXkwuefcx8avDzU9+n8b9Hs8q9YV+hSRhfHsQ5VxmmBO+jAH8Fk
- RlEbLgjix3RoXcjmnQC0fycRtns3IPIse4t+lqOfMuqKacNw7v1wgJHL2
- Sbn6OnEFpkkDHeIen0PC13KMmjVYOs/RmHkNOPworlz5mIP2enYGbQBxa Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10252"; a="273681482"
-X-IronPort-AV: E=Sophos;i="5.88,355,1635231600"; d="scan'208";a="273681482"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 08 Feb 2022 23:41:51 -0800
-X-IronPort-AV: E=Sophos;i="5.88,355,1635231600"; d="scan'208";a="540984661"
-Received: from hyperv-sh4.sh.intel.com ([10.239.48.22])
- by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 08 Feb 2022 23:41:40 -0800
-From: Chao Gao <chao.gao@intel.com>
-To: kvm@vger.kernel.org, seanjc@google.com, pbonzini@redhat.com,
- kevin.tian@intel.com, tglx@linutronix.de
-Subject: [PATCH v3 2/5] Partially revert "KVM: Pass kvm_init()'s opaque param
- to additional arch funcs"
-Date: Wed,  9 Feb 2022 15:41:03 +0800
-Message-Id: <20220209074109.453116-3-chao.gao@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220209074109.453116-1-chao.gao@intel.com>
-References: <20220209074109.453116-1-chao.gao@intel.com>
+ with ESMTP id LLdytswPv9uJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Feb 2022 06:04:23 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4684F49F02
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Feb 2022 06:04:23 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F4D9ED1;
+ Wed,  9 Feb 2022 03:04:22 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1BBB3F73B;
+ Wed,  9 Feb 2022 03:04:18 -0800 (PST)
+Date: Wed, 9 Feb 2022 11:04:39 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v6 29/64] KVM: arm64: nv: Forward debug traps to the
+ nested guest
+Message-ID: <YgOfxxqVOjLYZLGL@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-30-maz@kernel.org>
 MIME-Version: 1.0
-X-Mailman-Approved-At: Wed, 09 Feb 2022 05:00:14 -0500
-Cc: x86@kernel.org, Wanpeng Li <wanpengli@tencent.com>,
- David Hildenbrand <david@redhat.com>,
- Benjamin Herrenschmidt <benh@kernel.crashing.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, linux-mips@vger.kernel.org,
- Paul Mackerras <paulus@samba.org>, Michael Ellerman <mpe@ellerman.id.au>,
- "H. Peter Anvin" <hpa@zytor.com>, Alexander Gordeev <agordeev@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
- linux-s390@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>, linux-riscv@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, Dave Hansen <dave.hansen@linux.intel.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Ingo Molnar <mingo@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Chao Gao <chao.gao@intel.com>, Ravi Bangoria <ravi.bangoria@linux.ibm.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Vasily Gorbik <gor@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Borislav Petkov <bp@alien8.de>,
- Atish Patra <atishp@atishpatra.org>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, Juergen Gross <jgross@suse.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Fabiano Rosas <farosas@linux.ibm.com>,
- Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
- Bharata B Rao <bharata@linux.ibm.com>, kvm-riscv@lists.infradead.org,
- Vitaly Kuznetsov <vkuznets@redhat.com>, linuxppc-dev@lists.ozlabs.org
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-30-maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>, kvmarm@lists.cs.columbia.edu,
+ mihai.carabas@oracle.com,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,162 +66,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This partially reverts commit b99040853738 ("KVM: Pass kvm_init()'s opaque
-param to additional arch funcs") remove opaque from
-kvm_arch_check_processor_compat because no one uses this opaque now.
-Address conflicts for ARM (due to file movement) and manually handle RISC-V
-which comes after the commit.
+Hi Marc,
 
-And changes about kvm_arch_hardware_setup() in original commit are still
-needed so they are not reverted.
+On Fri, Jan 28, 2022 at 12:18:37PM +0000, Marc Zyngier wrote:
+> On handling a debug trap, check whether we need to forward it to the
+> guest before handling it.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_nested.h | 2 ++
+>  arch/arm64/kvm/emulate-nested.c     | 9 +++++++--
+>  arch/arm64/kvm/sys_regs.c           | 3 +++
+>  3 files changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 82fc8b6c990b..047ca700163b 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -66,6 +66,8 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
+>  }
+>  
+>  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+> +extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+> +			    u64 control_bit);
+>  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
+>  extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
+>  extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+> index 0109dfd664dd..1f6cf8fe9fe3 100644
+> --- a/arch/arm64/kvm/emulate-nested.c
+> +++ b/arch/arm64/kvm/emulate-nested.c
+> @@ -13,14 +13,14 @@
+>  
+>  #include "trace.h"
+>  
+> -bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
+> +bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg, u64 control_bit)
+>  {
+>  	bool control_bit_set;
+>  
+>  	if (!vcpu_has_nv(vcpu))
+>  		return false;
+>  
+> -	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
+> +	control_bit_set = __vcpu_sys_reg(vcpu, reg) & control_bit;
+>  	if (!vcpu_is_el2(vcpu) && control_bit_set) {
+>  		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
+>  		return true;
+> @@ -28,6 +28,11 @@ bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
+>  	return false;
+>  }
+>  
+> +bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
+> +{
+> +	return __forward_traps(vcpu, HCR_EL2, control_bit);
+> +}
+> +
+>  bool forward_nv_traps(struct kvm_vcpu *vcpu)
+>  {
+>  	return forward_traps(vcpu, HCR_NV);
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 697bf0bca550..3e1f37c507a8 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -566,6 +566,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+>  			    struct sys_reg_params *p,
+>  			    const struct sys_reg_desc *r)
+>  {
+> +	if (__forward_traps(vcpu, MDCR_EL2, MDCR_EL2_TDA | MDCR_EL2_TDE))
+> +		return false;
 
-Signed-off-by: Chao Gao <chao.gao@intel.com>
----
- arch/arm64/kvm/arm.c       |  2 +-
- arch/mips/kvm/mips.c       |  2 +-
- arch/powerpc/kvm/powerpc.c |  2 +-
- arch/riscv/kvm/main.c      |  2 +-
- arch/s390/kvm/kvm-s390.c   |  2 +-
- arch/x86/kvm/x86.c         |  2 +-
- include/linux/kvm_host.h   |  2 +-
- virt/kvm/kvm_main.c        | 16 +++-------------
- 8 files changed, 10 insertions(+), 20 deletions(-)
+The description of the MDCR_EL2.TDA field says:
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a069d5925f77..60494c576242 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -73,7 +73,7 @@ int kvm_arch_hardware_setup(void *opaque)
- 	return 0;
- }
- 
--int kvm_arch_check_processor_compat(void *opaque)
-+int kvm_arch_check_processor_compat(void)
- {
- 	return 0;
- }
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index a25e0b73ee70..092d09fb6a7e 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -140,7 +140,7 @@ int kvm_arch_hardware_setup(void *opaque)
- 	return 0;
- }
- 
--int kvm_arch_check_processor_compat(void *opaque)
-+int kvm_arch_check_processor_compat(void)
- {
- 	return 0;
- }
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 2ad0ccd202d5..30c817f3fa0c 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -423,7 +423,7 @@ int kvm_arch_hardware_setup(void *opaque)
- 	return 0;
- }
- 
--int kvm_arch_check_processor_compat(void *opaque)
-+int kvm_arch_check_processor_compat(void)
- {
- 	return kvmppc_core_check_processor_compat();
- }
-diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-index 2e5ca43c8c49..992877e78393 100644
---- a/arch/riscv/kvm/main.c
-+++ b/arch/riscv/kvm/main.c
-@@ -20,7 +20,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
- 	return -EINVAL;
- }
- 
--int kvm_arch_check_processor_compat(void *opaque)
-+int kvm_arch_check_processor_compat(void)
- {
- 	return 0;
- }
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 9c6d45d0d345..99c70d881cb6 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -252,7 +252,7 @@ int kvm_arch_hardware_enable(void)
- 	return 0;
- }
- 
--int kvm_arch_check_processor_compat(void *opaque)
-+int kvm_arch_check_processor_compat(void)
- {
- 	return 0;
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b71549a52ae0..e9777ffc50c2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11548,7 +11548,7 @@ void kvm_arch_hardware_unsetup(void)
- 	static_call(kvm_x86_hardware_unsetup)();
- }
- 
--int kvm_arch_check_processor_compat(void *opaque)
-+int kvm_arch_check_processor_compat(void)
- {
- 	struct cpuinfo_x86 *c = &cpu_data(smp_processor_id());
- 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index b3810976a27f..3c7b654e43fb 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1413,7 +1413,7 @@ int kvm_arch_hardware_enable(void);
- void kvm_arch_hardware_disable(void);
- int kvm_arch_hardware_setup(void *opaque);
- void kvm_arch_hardware_unsetup(void);
--int kvm_arch_check_processor_compat(void *opaque);
-+int kvm_arch_check_processor_compat(void);
- int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu);
- bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu);
- int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 034c567a680c..be614a6325e4 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -5599,22 +5599,14 @@ struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void)
-         return &kvm_running_vcpu;
- }
- 
--struct kvm_cpu_compat_check {
--	void *opaque;
--	int *ret;
--};
--
--static void check_processor_compat(void *data)
-+static void check_processor_compat(void *rtn)
- {
--	struct kvm_cpu_compat_check *c = data;
--
--	*c->ret = kvm_arch_check_processor_compat(c->opaque);
-+	*(int *)rtn = kvm_arch_check_processor_compat();
- }
- 
- int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
- 		  struct module *module)
- {
--	struct kvm_cpu_compat_check c;
- 	int r;
- 	int cpu;
- 
-@@ -5642,10 +5634,8 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
- 	if (r < 0)
- 		goto out_free_1;
- 
--	c.ret = &r;
--	c.opaque = opaque;
- 	for_each_online_cpu(cpu) {
--		smp_call_function_single(cpu, check_processor_compat, &c, 1);
-+		smp_call_function_single(cpu, check_processor_compat, &r, 1);
- 		if (r < 0)
- 			goto out_free_2;
- 	}
--- 
-2.25.1
+"This field is treated as being 1 for all purposes other than a direct read
+when one or more of the following are true:
 
+- MDCR_EL2.TDE == 1
+- HCR_EL2.TGE == 1"
+
+Shouldn't we also check for HCR_EL2.TGE == 1 when deciding to forward the trap?
+
+Thanks,
+Alex
+
+> +
+>  	access_rw(vcpu, p, r);
+>  	if (p->is_write)
+>  		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
+> -- 
+> 2.30.2
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
