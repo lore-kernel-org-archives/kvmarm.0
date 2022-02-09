@@ -2,54 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1947FC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Feb 2022 11:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B69EC433FE
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Feb 2022 12:04:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65BAE49F2E;
-	Wed,  9 Feb 2022 06:04:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8881B4291D;
+	Wed,  9 Feb 2022 07:04:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iMOZPV2nIQgR; Wed,  9 Feb 2022 06:04:25 -0500 (EST)
+	with ESMTP id jLXgpMSy8wCd; Wed,  9 Feb 2022 07:04:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAE3949F0A;
-	Wed,  9 Feb 2022 06:04:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57DD449F4B;
+	Wed,  9 Feb 2022 07:04:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE76749F05
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Feb 2022 06:04:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E302F49F2F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Feb 2022 07:04:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LLdytswPv9uJ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Feb 2022 06:04:23 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4684F49F02
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Feb 2022 06:04:23 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0F4D9ED1;
- Wed,  9 Feb 2022 03:04:22 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E1BBB3F73B;
- Wed,  9 Feb 2022 03:04:18 -0800 (PST)
-Date: Wed, 9 Feb 2022 11:04:39 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v6 29/64] KVM: arm64: nv: Forward debug traps to the
- nested guest
-Message-ID: <YgOfxxqVOjLYZLGL@monolith.localdoman>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-30-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220128121912.509006-30-maz@kernel.org>
-Cc: kernel-team@android.com, kvm@vger.kernel.org,
- Andre Przywara <andre.przywara@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Chase Conklin <chase.conklin@arm.com>, kvmarm@lists.cs.columbia.edu,
- mihai.carabas@oracle.com,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id 3HREmdnNH1Hs for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Feb 2022 07:04:41 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F05D4291D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Feb 2022 07:04:41 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 5E3A3616E7;
+ Wed,  9 Feb 2022 12:04:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301CEC340EF;
+ Wed,  9 Feb 2022 12:04:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1644408280;
+ bh=X3JslEcts3201WhkIsOB99xq0WjL+sdJPjqwAwvB/GM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=auMFBMIykaOHfvoauJj/NIr2wF7cNLi5UIVz2VN/IJU18jra87XpEWCDWuoiZX973
+ EK61tfJW86VSmprbpkN1ID0T99CV7/txtPJmvS1e+FGRC7BaQCeSpbNmghg9h16UIo
+ KfS3Jdml8NOApQDxYBDfhszZLRj4Pfu4EBwKGZoMgyfDU6YqsED9oi679t5pHT2ojK
+ ObUrk9sJdiw2WFP/OQsJIOFu5U4EXuJ9NFi7Tk9u9q/mppphaM06s1/N9LlbGdthgu
+ TTvnp3BthD7vamWqes9g06zNHljN8MteT755QGNJEBXIG8FO3dvCmEDl/H9lecjMr3
+ 5q8DHRn9hNa4w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nHli9-006bcc-Rn; Wed, 09 Feb 2022 12:04:38 +0000
+Date: Wed, 09 Feb 2022 12:04:37 +0000
+Message-ID: <875ypo5jqi.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: mixed-width check should be skipped
+ for uninitialized vCPUs
+In-Reply-To: <CAAeT=FwjcgTM0hKSERfVMYDvYWqdC+Deqd=x2xT=-Zymb6SLtA@mail.gmail.com>
+References: <20220118041923.3384602-1-reijiw@google.com>
+ <87a6f15skj.wl-maz@kernel.org>
+ <CAAeT=FwjcgTM0hKSERfVMYDvYWqdC+Deqd=x2xT=-Zymb6SLtA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com,
+ jingzhangos@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -66,96 +91,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Hi Reiji,
 
-On Fri, Jan 28, 2022 at 12:18:37PM +0000, Marc Zyngier wrote:
-> On handling a debug trap, check whether we need to forward it to the
-> guest before handling it.
+On Wed, 09 Feb 2022 05:32:36 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_nested.h | 2 ++
->  arch/arm64/kvm/emulate-nested.c     | 9 +++++++--
->  arch/arm64/kvm/sys_regs.c           | 3 +++
->  3 files changed, 12 insertions(+), 2 deletions(-)
+> Hi Marc,
 > 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 82fc8b6c990b..047ca700163b 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -66,6 +66,8 @@ static inline u64 translate_cnthctl_el2_to_cntkctl_el1(u64 cnthctl)
->  }
->  
->  int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
-> +extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
-> +			    u64 control_bit);
->  extern bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit);
->  extern bool forward_nv_traps(struct kvm_vcpu *vcpu);
->  extern bool forward_nv1_traps(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> index 0109dfd664dd..1f6cf8fe9fe3 100644
-> --- a/arch/arm64/kvm/emulate-nested.c
-> +++ b/arch/arm64/kvm/emulate-nested.c
-> @@ -13,14 +13,14 @@
->  
->  #include "trace.h"
->  
-> -bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-> +bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg, u64 control_bit)
->  {
->  	bool control_bit_set;
->  
->  	if (!vcpu_has_nv(vcpu))
->  		return false;
->  
-> -	control_bit_set = __vcpu_sys_reg(vcpu, HCR_EL2) & control_bit;
-> +	control_bit_set = __vcpu_sys_reg(vcpu, reg) & control_bit;
->  	if (!vcpu_is_el2(vcpu) && control_bit_set) {
->  		kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
->  		return true;
-> @@ -28,6 +28,11 @@ bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
->  	return false;
->  }
->  
-> +bool forward_traps(struct kvm_vcpu *vcpu, u64 control_bit)
-> +{
-> +	return __forward_traps(vcpu, HCR_EL2, control_bit);
-> +}
-> +
->  bool forward_nv_traps(struct kvm_vcpu *vcpu)
->  {
->  	return forward_traps(vcpu, HCR_NV);
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 697bf0bca550..3e1f37c507a8 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -566,6 +566,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
->  			    struct sys_reg_params *p,
->  			    const struct sys_reg_desc *r)
->  {
-> +	if (__forward_traps(vcpu, MDCR_EL2, MDCR_EL2_TDA | MDCR_EL2_TDE))
-> +		return false;
+> On Tue, Feb 8, 2022 at 6:41 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > In [1], I suggested another approach that didn't require extra state,
+> > and moved the existing checks under the kvm lock. What was wrong with
+> > that approach?
+> 
+> With that approach, even for a vcpu that has a broken set of features,
+> which leads kvm_reset_vcpu() to fail for the vcpu, the vcpu->arch.features
+> are checked by other vCPUs' vcpu_allowed_register_width() until the
+> vcpu->arch.target is set to -1.
+> Due to this, I would think some or possibly all vCPUs' kvm_reset_vcpu()
+> may or may not fail (e.g. if userspace tries to configure vCPU#0 with
+> 32bit EL1, and vCPU#1 and #2 with 64 bit EL1, KVM_ARM_VCPU_INIT
+> for either vCPU#0, or both vCPU#1 and #2 should fail.  But, with that
+> approach, it doesn't always work that way.  Instead, KVM_ARM_VCPU_INIT
+> for all vCPUs could fail or KVM_ARM_VCPU_INIT for vCPU#0 and #1 could
+> fail while the one for CPU#2 works).
+> Also, even after the first KVM_RUN for vCPUs are already done,
+> (the first) KVM_ARM_VCPU_INIT for another vCPU could cause the
+> kvm_reset_vcpu() for those vCPUs to fail.
+> 
+> I would think those behaviors are odd, and I wanted to avoid them.
 
-The description of the MDCR_EL2.TDA field says:
+OK, fair enough. But then you need to remove most of the uses of
+KVM_ARM_VCPU_EL1_32BIT so that it is only used as a userspace
+interface and maybe not carried as part of the vcpu feature flag
+anymore.
 
-"This field is treated as being 1 for all purposes other than a direct read
-when one or more of the following are true:
-
-- MDCR_EL2.TDE == 1
-- HCR_EL2.TGE == 1"
-
-Shouldn't we also check for HCR_EL2.TGE == 1 when deciding to forward the trap?
+Also, we really should turn all these various bits in the kvm struct
+into a set of flags. I have a patch posted there[1] for this, feel
+free to pick it up.
 
 Thanks,
-Alex
 
-> +
->  	access_rw(vcpu, p, r);
->  	if (p->is_write)
->  		vcpu->arch.flags |= KVM_ARM64_DEBUG_DIRTY;
-> -- 
-> 2.30.2
-> 
+	M.
+
+[1] https://lore.kernel.org/r/20211004174849.2831548-2-maz@kernel.org
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
