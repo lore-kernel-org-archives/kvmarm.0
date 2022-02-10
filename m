@@ -2,78 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61764C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 09:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95613C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 09:28:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 069524A1B0;
-	Fri, 11 Feb 2022 04:28:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27BAE49F5A;
+	Fri, 11 Feb 2022 04:28:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id O0eGXTyFUWBm; Fri, 11 Feb 2022 04:28:14 -0500 (EST)
+	with ESMTP id XeoPAP+AQ3-1; Fri, 11 Feb 2022 04:28:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C2B844A7FD;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D73984B089;
 	Fri, 11 Feb 2022 04:28:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D52A349F53
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:44:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1016C4017A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:45:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DPkJzmAI9yXD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Feb 2022 17:44:45 -0500 (EST)
+ with ESMTP id SIEWh1uPudTT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Feb 2022 17:45:25 -0500 (EST)
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
  [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B85D649EEA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:44:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 784BB400D5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:45:25 -0500 (EST)
 Received: by mail-yb1-f201.google.com with SMTP id
- 3-20020a250103000000b0061d99b7d0b8so15082064ybb.13
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:44:45 -0800 (PST)
+ t8-20020a259ac8000000b00619a3b5977fso15164596ybo.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:45:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:cc;
- bh=2dZOYBOmJua4dYugoiMtuQUhFU9vmd43xxG8qEJDkFQ=;
- b=ep6/TNGFOJe8CMFzZYZTp3879NvaY6+muWoz075exQAtJ+Dtv/XxFOgo1TvFvY76YC
- XOB/EOtVDQ935brIbXoSTuX/PaYdWJC8dHLpt6DXVeYIdx05KvPgXyX9s2r4wBITC+yr
- AiLe4qiBik1TW8/yYKyz/i9tgLFNDvabJBTvtv17doe7xkkBUVgcvImDEydYuurvMduH
- wbTib7UbkW1wLjMaJazhGbz3ZRn3P6dDOBYxBoKnsfjlvq1oDKICPU7DpepOHn7PWInc
- 6NuG3/TMjtT91dnM2QUaLSFBNYRxG6DVDul48ADGrixxtXdibO2kEXGlX1gPRU0hafh+
- ZcpQ==
+ bh=OagLRmMmzyQmGqXHU8QCfKrH7+tgm0iC+teioaMlxY8=;
+ b=KZUDFgua6kTwrdY0rgWjsvVP3R/Era680jCgYQwjuK0iUjxXTEGhr1k5AU4ecCZI8w
+ lGlhfM50n/PyOfFuEnRyrza/dCfR09l2qnRTramuth4IQ5kSJWx8IHEXrR6WGw+YWDLS
+ Fcw37pMtSTu7lmTbNbpjWo/86asLiZ0qeY3n5xM9TuAmWeZiYQybxooNBeFcYXyFXw0+
+ nw3MMrt2SnLYQkB9BXZaWEk/9+7BpUqlQ9/jkoMabBFdTAqgmPJRbDiXXuHwXpiKMGkR
+ ABy9ETz+4Cv/q3YuBrAzVEL6xo4Z9nyp3TJ9LkgLV7VtKKpMguCHsIaLgm9iv9xO8mkw
+ WU8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:cc;
- bh=2dZOYBOmJua4dYugoiMtuQUhFU9vmd43xxG8qEJDkFQ=;
- b=rz18qS1MxxItMhcn8MhanhhkyyrRujzM9NCapErc6GIO+ZI2ZaHsssFCo7+gVP+cn5
- eLeo4Olepd8KUwCxwKwGxHlk+7NtaQTQtpIjYm5Yo2b2vJrUyDio4SskcLVVg5lVvRbP
- PS68pe1CQdFG4DjF+/auqTJhITcT83/g/Wg4/JX4y3/LEjKhzv9MJ21XyCQQvLQ3Ujq7
- Ta1z+ckU0cSYhtsQpE/8QDjD8fcT5pN3/s+GQrve4kBHvbLiBnG7ZlZT/CkQWTeatAKA
- 23jZ7itIiCHOOyeTMJZ8hFJYE7exuo2XCCWVIKwp21njrWlI2qxc5V9P94VSufa2XwNB
- VCjw==
-X-Gm-Message-State: AOAM532CW78ePArncd6ZMDvwBdx7DjC6LL6fCQWIoLaqS9PYrOG//XfW
- Wt3YSVluQ6jhRik3cQVbOEgfkuInyV2DIDVrGg==
-X-Google-Smtp-Source: ABdhPJzhHuVVpX5/8wSgs7kQYW10C9SFtD8VH8eIEn4uDIMdbuJGadpvTqkiYBtfns2EGA0KUtz+LKt9roCBW8sc/A==
+ bh=OagLRmMmzyQmGqXHU8QCfKrH7+tgm0iC+teioaMlxY8=;
+ b=QvT6VPRII17D90E9/9upJQinIvUOpaScrKxnwXxNWsaJboRBkheFJ3rnYDKV0ISnAe
+ q81vSyzKjlvG88EW/NS/ahWqSEVL8BO8A8QQnFiwOkE2hIsinl7Dl+GYqlkTjc+sVROX
+ WObq11kLGE9A9Nwnx2K9n+TiCNA3bzi1yRiRzaJFaULwta+mBowYAijbQOQmqEwOqzLB
+ UvIZX/rbRdMaDNuf+pvwbd1DXf8ZPA/DnW4IzpEr4iZ5hvGtCGWar7I6TFIPA/HL1ij0
+ AdxqqQmaLsWPh3xv3yuwfrUKbUkPm4G/jPtNvR34HoqKbeuk3JLiOzz2FjsMW+WlFxpx
+ 9BZQ==
+X-Gm-Message-State: AOAM530+3ovP2rMht7XXraW/c9vhGihvK+8Hg2GMM+32lVslRr0sLwPx
+ 66TQ2W041X0uhNse6UzQ+YoQdRMfci8I1yCk+w==
+X-Google-Smtp-Source: ABdhPJxzsMWs7cPxHcJVEK0MMmzcLZ3BX26xgEqJ+cjkAM67DycOE9xaVXyG4ooDAIXoCBwYiczs1AVvH+kAit3i8g==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:8f02:232:ad86:2ab2])
- (user=kaleshsingh job=sendgmr) by 2002:a5b:548:: with SMTP id
- r8mr9416027ybp.717.1644533085249; Thu, 10 Feb 2022 14:44:45 -0800 (PST)
-Date: Thu, 10 Feb 2022 14:41:44 -0800
+ (user=kaleshsingh job=sendgmr) by 2002:a5b:804:: with SMTP id
+ x4mr9503248ybp.673.1644533125008; Thu, 10 Feb 2022 14:45:25 -0800 (PST)
+Date: Thu, 10 Feb 2022 14:41:45 -0800
 In-Reply-To: <20220210224220.4076151-1-kaleshsingh@google.com>
-Message-Id: <20220210224220.4076151-4-kaleshsingh@google.com>
+Message-Id: <20220210224220.4076151-5-kaleshsingh@google.com>
 Mime-Version: 1.0
 References: <20220210224220.4076151-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
-Subject: [PATCH 3/7] arm64: asm: Introduce test_sp_overflow macro
+Subject: [PATCH 4/7] KVM: arm64: Allocate guard pages near hyp stacks
 From: Kalesh Singh <kaleshsingh@google.com>
 X-Mailman-Approved-At: Fri, 11 Feb 2022 04:28:10 -0500
 Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
  Pasha Tatashin <pasha.tatashin@soleen.com>, will@kernel.org,
  Peter Collingbourne <pcc@google.com>, maz@kernel.org,
  linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- kvmarm@lists.cs.columbia.edu, Andrew Walbran <qwandor@google.com>,
- Kalesh Singh <kaleshsingh@google.com>, surenb@google.com,
- linux-arm-kernel@lists.infradead.org
+ kvmarm@lists.cs.columbia.edu, Kalesh Singh <kaleshsingh@google.com>,
+ surenb@google.com, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,64 +91,103 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Quentin Perret <qperret@google.com>
 
-The asm entry code in the kernel uses a trick to check if VMAP'd stacks
-have overflowed by aligning them at THREAD_SHIFT * 2 granularity and
-checking the SP's THREAD_SHIFT bit.
+Allocate unbacked VA space underneath each stack page to ensure stack
+overflows get trapped and don't corrupt memory silently.
 
-Protected KVM will soon make use of a similar trick to detect stack
-overflows, so factor out the asm code in a re-usable macro.
+The stack is aligned to twice its size (PAGE_SIZE), meaning that any
+valid stack address has PAGE_SHIFT bit as 0. This allows us to easily
+check for overflow in the exception entry without corrupting any GPRs.
 
 Signed-off-by: Quentin Perret <qperret@google.com>
-[Kalesh - Resolve minor conflicts]
+[ Kalesh - Update commit text and comments,
+           refactor, add overflow handling ]
 Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 ---
- arch/arm64/include/asm/assembler.h | 11 +++++++++++
- arch/arm64/kernel/entry.S          |  9 ++-------
- 2 files changed, 13 insertions(+), 7 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/host.S   | 16 ++++++++++++++++
+ arch/arm64/kvm/hyp/nvhe/setup.c  | 19 ++++++++++++++++++-
+ arch/arm64/kvm/hyp/nvhe/switch.c |  5 +++++
+ 3 files changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
-index e8bd0af0141c..ad40eb0eee83 100644
---- a/arch/arm64/include/asm/assembler.h
-+++ b/arch/arm64/include/asm/assembler.h
-@@ -850,4 +850,15 @@ alternative_endif
+diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+index 3d613e721a75..78e4b612ac06 100644
+--- a/arch/arm64/kvm/hyp/nvhe/host.S
++++ b/arch/arm64/kvm/hyp/nvhe/host.S
+@@ -153,6 +153,10 @@ SYM_FUNC_END(__host_hvc)
  
- #endif /* GNU_PROPERTY_AARCH64_FEATURE_1_DEFAULT */
- 
-+/*
-+ * Test whether the SP has overflowed, without corrupting a GPR.
-+ */
-+.macro test_sp_overflow shift, label
-+	add	sp, sp, x0			// sp' = sp + x0
-+	sub	x0, sp, x0			// x0' = sp' - x0 = (sp + x0) - x0 = sp
-+	tbnz	x0, #\shift, \label
-+	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
-+	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
-+.endm
+ .macro invalid_host_el2_vect
+ 	.align 7
 +
- #endif	/* __ASM_ASSEMBLER_H */
-diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
-index 772ec2ecf488..2632bc47b348 100644
---- a/arch/arm64/kernel/entry.S
-+++ b/arch/arm64/kernel/entry.S
-@@ -53,16 +53,11 @@ alternative_else_nop_endif
- 	sub	sp, sp, #PT_REGS_SIZE
- #ifdef CONFIG_VMAP_STACK
- 	/*
--	 * Test whether the SP has overflowed, without corrupting a GPR.
- 	 * Task and IRQ stacks are aligned so that SP & (1 << THREAD_SHIFT)
- 	 * should always be zero.
++	/* Test stack overflow without corrupting GPRs */
++	test_sp_overflow PAGE_SHIFT, .L__hyp_sp_overflow\@
++
+ 	/* If a guest is loaded, panic out of it. */
+ 	stp	x0, x1, [sp, #-16]!
+ 	get_loaded_vcpu x0, x1
+@@ -165,6 +169,18 @@ SYM_FUNC_END(__host_hvc)
+ 	 * been partially clobbered by __host_enter.
  	 */
--	add	sp, sp, x0			// sp' = sp + x0
--	sub	x0, sp, x0			// x0' = sp' - x0 = (sp + x0) - x0 = sp
--	tbnz	x0, #THREAD_SHIFT, 0f
--	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
--	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
--	b	el\el\ht\()_\regsize\()_\label
-+	test_sp_overflow THREAD_SHIFT, 0f
-+	b       el\el\ht\()_\regsize\()_\label
+ 	b	hyp_panic
++
++.L__hyp_sp_overflow\@:
++	/*
++	 * Reset SP to the top of the stack, to allow handling the hyp_panic.
++	 * This corrupts the stack but is ok, since we won't be attempting
++	 * any unwinding here.
++	 */
++	ldr_this_cpu	x0, kvm_init_params + NVHE_INIT_STACK_HYP_VA, x1
++	mov	sp, x0
++
++	bl	hyp_panic_bad_stack
++	ASM_BUG()
+ .endm
  
- 0:
- 	/*
+ .macro invalid_host_el1_vect
+diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+index 99e178cf4249..114053dff228 100644
+--- a/arch/arm64/kvm/hyp/nvhe/setup.c
++++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+@@ -105,7 +105,24 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+ 		if (ret)
+ 			return ret;
+ 
+-		/* Map stack pages in the 'private' VA range */
++		/*
++		 * Allocate 'private' VA range for stack guard pages.
++		 *
++		 * The 'private' VA range grows upward and stacks downwards, so
++		 * allocate the guard page first. But make sure to align the
++		 * stack itself with PAGE_SIZE * 2 granularity to ease overflow
++		 * detection in the entry assembly code.
++		 */
++		do {
++			start = (void *)hyp_alloc_private_va_range(PAGE_SIZE);
++			if (IS_ERR(start))
++				return PTR_ERR(start);
++		} while (IS_ALIGNED((u64) start, PAGE_SIZE * 2));
++
++		/*
++		 * Map stack pages in the 'private' VA range above the allocated
++		 * guard pages.
++		 */
+ 		end = (void *)__hyp_pa(per_cpu_ptr(&kvm_init_params, i)->stack_hyp_va);
+ 		start = end - PAGE_SIZE;
+ 		start = (void *)__pkvm_create_private_mapping((phys_addr_t)start,
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 6410d21d8695..5a2e1ab79913 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -369,6 +369,11 @@ void __noreturn hyp_panic(void)
+ 	unreachable();
+ }
+ 
++void __noreturn hyp_panic_bad_stack(void)
++{
++	hyp_panic();
++}
++
+ asmlinkage void kvm_unexpected_el2_exception(void)
+ {
+ 	return __kvm_unexpected_el2_exception();
 -- 
 2.35.1.265.g69c8d7142f-goog
 
