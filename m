@@ -2,69 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA9CC433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 157F8C433EF
 	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 09:28:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A4149F48;
-	Fri, 11 Feb 2022 04:28:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 74D7349F58;
+	Fri, 11 Feb 2022 04:28:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lcrKQSyooy-L; Fri, 11 Feb 2022 04:28:13 -0500 (EST)
+	with ESMTP id eB-d3Hppgqht; Fri, 11 Feb 2022 04:28:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC3934A3A5;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 736294A11C;
 	Fri, 11 Feb 2022 04:28:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1156849F53
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:44:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07E4749F53
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:42:46 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dr64LF9yfJVF for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Feb 2022 17:44:02 -0500 (EST)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1399849F4B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:44:02 -0500 (EST)
-Received: by mail-yb1-f201.google.com with SMTP id
- z15-20020a25bb0f000000b00613388c7d99so15120262ybg.8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:44:02 -0800 (PST)
+ with ESMTP id rHeBf8pl8xRq for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Feb 2022 17:42:44 -0500 (EST)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEC1D49F4B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:42:44 -0500 (EST)
+Received: by mail-yb1-f202.google.com with SMTP id
+ 3-20020a250103000000b0061d99b7d0b8so15074035ybb.13
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:42:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:cc;
- bh=FWvONc6PPT7SOgcpYOOzYgnlsLgy4lIL2CKlJJtukzs=;
- b=mBuynU6nVtUUhgSN/Mzp+TKEbV4pFhe3dtKgEyVMOiwApKF6+HLlSY4gE57X5hOP70
- rAAiYgmNoRwzjL9PRCjeUoKyBvbWi9KRQIFADz3Q6trpDjsIh8e/dl0J/VD9kGCwAI+J
- BESFy4HJ4E6dX5+yow+EWQQLwzm01n1PyiQJhfT9IrZs+BepkmJI7SxxevOSmOe5Zkde
- eBCAolmAIMIZry/9HLPgsUjMn0zqebgFcw0PnbcfnYgLHiakd0mei8onuiCvnJNdqIbB
- Mix+BHSyf/9IvbRtthvYA/aAELP0sccVnHZzFmlpWyLkFP2bSNkbmY8rnK0kh6Acc1Vw
- G2Fw==
+ h=date:message-id:mime-version:subject:from:cc;
+ bh=KKogoV3I1Ztwi08cWi/kskl7f13dMqHnW1NYHFKZhQY=;
+ b=MSpmQCaLUVfuj+jaf2QClix5p6yRH8yzpyXKVnUK70zmSq5C6/qdwILNdwUhcYMF8c
+ u2hO+qWimnqb+XJXum2CyHU9kaCpP4gkRh47JMce1cQUyDNmevlnXSk/v4J+ibagMpdi
+ 6SyBC+677sSNAQTgfwfnsoK9hG38S7tJZegaoLmq/yU+PY5VBbjSvEWD5BQFkjDn541W
+ 0JSNQrorMDSfKK5rlmgt+EWI1MHti2dN4PrYJBbrILg+UvVfff878dBp5MtI/4qmAOqW
+ Nc7XlL61zC/1JLJf8Tf3E1Keb7HV2kSiSgcuaOFlOR7BDfv+pCD6q+wH9wLq+bDThuMT
+ cAVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:cc;
- bh=FWvONc6PPT7SOgcpYOOzYgnlsLgy4lIL2CKlJJtukzs=;
- b=yCriKl4t4a3DxTjEn/pUCOayEMHuP1N73uUAyhgYjy0q55gxYhNg3Nq8/cymemh5OJ
- m7uUM5E7stumINTgqFC65tpEyiay2QhRcn+d8iy4TGDhSENwPVCOVotAxmFHcMJ+dCZL
- n5XQr7ls7IFs3AOcN3mdoySKgLdcQ0lIuqZfUmt9qC7XnM19fPHIUwi7doS5Zib1rWYp
- N1wsI9vhLCDv8OlwcpQ53Zaf9eBi3D+vx9342f+ssiU/TGT9FL1RIkjGC+EobVt8Hnh1
- W+43WaUK5nGnCHVWV5QeAtH6lMGmTkmept1/DbAtYs1d5I1Dm1FHrR1PxrVKCMKAWbTZ
- wcfQ==
-X-Gm-Message-State: AOAM533xDsXb0pje9QGnXNT0QIzZuvqmPCnYMlmFH2jFtmgT+JvheCvg
- iSXLRX5pmL6EbVPjtZhKhoDn7AcOALTnYk8lJw==
-X-Google-Smtp-Source: ABdhPJxZHBnjRsaIEqwkHqdAbXT7GDJWvj+cAd1UkPLHhqa+mVsLffzcbYP42soJ9363QIkLwEeaj1E/kFGFAp78sg==
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:cc;
+ bh=KKogoV3I1Ztwi08cWi/kskl7f13dMqHnW1NYHFKZhQY=;
+ b=JLqkp0SW1UdhtBNxpUmh/+qdLE25SSMkIP+q+9iLGJTufq4Ev0CltCAjyRCNYafrxR
+ X6w9fV+Q5WIYg99/ewp8+5cDlTMMPic4c2DvVYTqcEyeiYdAChFCAtB9+ZhXVAzGgG1D
+ EpQqXo3jCKprbRZrR0JFaPLg5nHv0MoRlmK/hu+GAxMe6MRXzXaas34vD7Aa5L36zFZG
+ N1r+LeTf7k5XUhfeDZ6pmxZzmcpL0PtBiWpzqUDirRq58TlD8xi8TWd2dwu+X3B6eToI
+ xYcpvqSlBV3tsa7LgSHh5LP94ASbGlf2aKEe/AcMdsDkGJz8eZgEfde6JyNP3jUw7inr
+ bDbQ==
+X-Gm-Message-State: AOAM531dLU7Gv+D25ZMWEOoGvKwCfp4VgNvhF9zC7wU504NLa5lJvjRx
+ w5/SnLNd7bJXiIvHVa6Cfrn+M4BP2iR9OkjS9Q==
+X-Google-Smtp-Source: ABdhPJyp/KdgRlhbqVTv9Y4bfoAHsHmpgIk8uWR57nT9DX2u71VlcwaE1ajfiRh3Ozy8DknZf9zAjVroiBACXQvDfw==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:8f02:232:ad86:2ab2])
- (user=kaleshsingh job=sendgmr) by 2002:a25:6f08:: with SMTP id
- k8mr8699054ybc.469.1644533041615; Thu, 10 Feb 2022 14:44:01 -0800 (PST)
-Date: Thu, 10 Feb 2022 14:41:43 -0800
-In-Reply-To: <20220210224220.4076151-1-kaleshsingh@google.com>
-Message-Id: <20220210224220.4076151-3-kaleshsingh@google.com>
+ (user=kaleshsingh job=sendgmr) by 2002:a25:5802:: with SMTP id
+ m2mr9400424ybb.681.1644532964348; Thu, 10 Feb 2022 14:42:44 -0800 (PST)
+Date: Thu, 10 Feb 2022 14:41:41 -0800
+Message-Id: <20220210224220.4076151-1-kaleshsingh@google.com>
 Mime-Version: 1.0
-References: <20220210224220.4076151-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
-Subject: [PATCH 2/7] KVM: arm64: Factor out private range VA allocation
+Subject: [PATCH 0/7] KVM: arm64: Hypervisor stack enhancements
 From: Kalesh Singh <kaleshsingh@google.com>
 X-Mailman-Approved-At: Fri, 11 Feb 2022 04:28:10 -0500
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Joey Gouly <joey.gouly@arm.com>,
@@ -90,83 +87,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Quentin Perret <qperret@google.com>
+This series is based on v5.17-rc3 and adds the following stack features to
+the KVM nVHE hypervisor:
 
-__pkvm_create_private_mapping() is currently responsible for allocating
-VA space in the hypervisor's "private" range and creating stage-1
-mappings. In order to allow reusing the VA space allocation logic from
-other places, let's factor it out in a standalone function. This is will
-be used to allocate private VA ranges for hypervisor stack guard pages
-in a subsequent patch in this series.
+== Hyp Stack Guard Pages ==
 
-Signed-off-by: Quentin Perret <qperret@google.com>
-[Kalesh - Resolve conflicts and make hyp_alloc_private_va_range
-          available outside nvhe/mm.c, update commit message]
-Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
----
- arch/arm64/kvm/hyp/include/nvhe/mm.h |  1 +
- arch/arm64/kvm/hyp/nvhe/mm.c         | 28 +++++++++++++++++++---------
- 2 files changed, 20 insertions(+), 9 deletions(-)
+Based on the technique used by arm64 VMAP_STACK to detect overflow.
+i.e. the stack is aligned to twice its size which ensure that the 
+'stack shift' bit of any valid SP is 0. The 'stack shift' bit can be
+tested in the exception entry to detect overflow without corrupting GPRs.
 
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-index 2d08510c6cc1..f53fb0e406db 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
-@@ -21,6 +21,7 @@ int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
- int pkvm_create_mappings_locked(void *from, void *to, enum kvm_pgtable_prot prot);
- unsigned long __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 					    enum kvm_pgtable_prot prot);
-+unsigned long hyp_alloc_private_va_range(size_t size);
- 
- static inline void hyp_vmemmap_range(phys_addr_t phys, unsigned long size,
- 				     unsigned long *start, unsigned long *end)
-diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
-index 526a7d6fa86f..e196441e072f 100644
---- a/arch/arm64/kvm/hyp/nvhe/mm.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mm.c
-@@ -37,6 +37,22 @@ static int __pkvm_create_mappings(unsigned long start, unsigned long size,
- 	return err;
- }
- 
-+unsigned long hyp_alloc_private_va_range(size_t size)
-+{
-+	unsigned long addr = __io_map_base;
-+
-+	hyp_assert_lock_held(&pkvm_pgd_lock);
-+	__io_map_base += PAGE_ALIGN(size);
-+
-+	/* Are we overflowing on the vmemmap ? */
-+	if (__io_map_base > __hyp_vmemmap) {
-+		__io_map_base = addr;
-+		addr = (unsigned long)ERR_PTR(-ENOMEM);
-+	}
-+
-+	return addr;
-+}
-+
- unsigned long __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 					    enum kvm_pgtable_prot prot)
- {
-@@ -45,16 +61,10 @@ unsigned long __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
- 
- 	hyp_spin_lock(&pkvm_pgd_lock);
- 
--	size = PAGE_ALIGN(size + offset_in_page(phys));
--	addr = __io_map_base;
--	__io_map_base += size;
--
--	/* Are we overflowing on the vmemmap ? */
--	if (__io_map_base > __hyp_vmemmap) {
--		__io_map_base -= size;
--		addr = (unsigned long)ERR_PTR(-ENOMEM);
-+	size = size + offset_in_page(phys);
-+	addr = hyp_alloc_private_va_range(size);
-+	if (IS_ERR((void *)addr))
- 		goto out;
--	}
- 
- 	err = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, size, phys, prot);
- 	if (err) {
+== Hyp Stack Unwinder ==
+
+Based on the arm64 kernel stack unwinder
+(See: arch/arm64/kernel/stacktrace.c)
+
+The unwinding and dumping of the hyp stack is not enabled by default and
+depends on CONFIG_NVHE_EL2_DEBUG to avoid potential information leaks.
+
+When CONFIG_NVHE_EL2_DEBUG is enabled the host stage 2 protection is
+disabled, allowing the host to read the hypervisor stack pages and unwind
+the stack from EL1. This allows us to print the hypervisor stacktrace
+before panicking the host; as shown below:
+
+kvm [408]: nVHE hyp panic at: \
+           [<ffffffc01161460c>] __kvm_nvhe_overflow_stack+0x10/0x34!
+kvm [408]: nVHE HYP call trace:
+kvm [408]: [<ffffffc011614974>] __kvm_nvhe_hyp_panic_bad_stack+0xc/0x10
+kvm [408]: [<ffffffc01160fa48>] __kvm_nvhe___kvm_hyp_host_vector+0x248/0x794
+kvm [408]: [<ffffffc01161461c>] __kvm_nvhe_overflow_stack+0x20/0x34
+. . .
+kvm [408]: [<ffffffc01161461c>] __kvm_nvhe_overflow_stack+0x20/0x34
+kvm [408]: [<ffffffc01161421c>] __kvm_nvhe___kvm_vcpu_run+0x2c/0x40c
+kvm [408]: [<ffffffc011615e14>] __kvm_nvhe_handle___kvm_vcpu_run+0x1c8/0x36c
+kvm [408]: [<ffffffc0116157c4>] __kvm_nvhe_handle_trap+0xa4/0x124
+kvm [408]: [<ffffffc01160f060>] __kvm_nvhe___host_exit+0x60/0x64
+kvm [408]: ---- end of nVHE HYP call trace ----
+
+
+Kalesh Singh (3):
+  KVM: arm64: Add Hyp overflow stack
+  KVM: arm64: Unwind and dump nVHE HYP stacktrace
+  KVM: arm64: Symbolize the nVHE HYP backtrace
+
+Quentin Perret (4):
+  KVM: arm64: Map the stack pages in the 'private' range
+  KVM: arm64: Factor out private range VA allocation
+  arm64: asm: Introduce test_sp_overflow macro
+  KVM: arm64: Allocate guard pages near hyp stacks
+
+ arch/arm64/include/asm/assembler.h   |  11 +
+ arch/arm64/include/asm/kvm_asm.h     |  17 ++
+ arch/arm64/kernel/entry.S            |   9 +-
+ arch/arm64/kvm/Makefile              |   1 +
+ arch/arm64/kvm/arm.c                 |   2 +-
+ arch/arm64/kvm/handle_exit.c         |  14 +-
+ arch/arm64/kvm/hyp/include/nvhe/mm.h |   1 +
+ arch/arm64/kvm/hyp/nvhe/host.S       |  21 ++
+ arch/arm64/kvm/hyp/nvhe/mm.c         |  28 ++-
+ arch/arm64/kvm/hyp/nvhe/setup.c      |  63 +++++-
+ arch/arm64/kvm/hyp/nvhe/switch.c     |  22 ++
+ arch/arm64/kvm/stacktrace.c          | 290 +++++++++++++++++++++++++++
+ arch/arm64/kvm/stacktrace.h          |  17 ++
+ scripts/kallsyms.c                   |   2 +-
+ 14 files changed, 468 insertions(+), 30 deletions(-)
+ create mode 100644 arch/arm64/kvm/stacktrace.c
+ create mode 100644 arch/arm64/kvm/stacktrace.h
+
+
+base-commit: dfd42facf1e4ada021b939b4e19c935dcdd55566
 -- 
 2.35.1.265.g69c8d7142f-goog
 
