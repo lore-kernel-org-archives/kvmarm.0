@@ -2,99 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A099BC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 08:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA9CC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 09:28:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1413B49F09;
-	Fri, 11 Feb 2022 03:13:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A4149F48;
+	Fri, 11 Feb 2022 04:28:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3uRmczPeIrVF; Fri, 11 Feb 2022 03:13:54 -0500 (EST)
+	with ESMTP id lcrKQSyooy-L; Fri, 11 Feb 2022 04:28:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 395E149F32;
-	Fri, 11 Feb 2022 03:13:54 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC3934A3A5;
+	Fri, 11 Feb 2022 04:28:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDEB149F32
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 03:13:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1156849F53
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:44:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZeRpUxs+rZJN for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Feb 2022 03:13:51 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE71349F09
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 03:13:51 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1644567231;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OUVR/zoupdoX6+ubOzd6knBoEGVnkn4cOQdoBMCfCbw=;
- b=UKSxmPRqGMN2HQsjtYFNB8/C7uWKe7rx/wkh11bGUWQIVI7lXVvdWdUScnncF6oy180yRd
- ubB9H1mjMgVRGCh8fCerEKUrjPl8YNinVRWGEKpumslgGavW8iXPq3laMla3QWaIscZAQ2
- jnPvDb77Sapd3fyD89kED/NU+E+YXVY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-441-P8E9wMuqPIeJ4V8XJFRSBw-1; Fri, 11 Feb 2022 03:13:50 -0500
-X-MC-Unique: P8E9wMuqPIeJ4V8XJFRSBw-1
-Received: by mail-wm1-f71.google.com with SMTP id
- c7-20020a1c3507000000b0034a0dfc86aaso5546044wma.6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 00:13:49 -0800 (PST)
+ with ESMTP id Dr64LF9yfJVF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Feb 2022 17:44:02 -0500 (EST)
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
+ [209.85.219.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1399849F4B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 17:44:02 -0500 (EST)
+Received: by mail-yb1-f201.google.com with SMTP id
+ z15-20020a25bb0f000000b00613388c7d99so15120262ybg.8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:44:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:cc;
+ bh=FWvONc6PPT7SOgcpYOOzYgnlsLgy4lIL2CKlJJtukzs=;
+ b=mBuynU6nVtUUhgSN/Mzp+TKEbV4pFhe3dtKgEyVMOiwApKF6+HLlSY4gE57X5hOP70
+ rAAiYgmNoRwzjL9PRCjeUoKyBvbWi9KRQIFADz3Q6trpDjsIh8e/dl0J/VD9kGCwAI+J
+ BESFy4HJ4E6dX5+yow+EWQQLwzm01n1PyiQJhfT9IrZs+BepkmJI7SxxevOSmOe5Zkde
+ eBCAolmAIMIZry/9HLPgsUjMn0zqebgFcw0PnbcfnYgLHiakd0mei8onuiCvnJNdqIbB
+ Mix+BHSyf/9IvbRtthvYA/aAELP0sccVnHZzFmlpWyLkFP2bSNkbmY8rnK0kh6Acc1Vw
+ G2Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=OUVR/zoupdoX6+ubOzd6knBoEGVnkn4cOQdoBMCfCbw=;
- b=qUSTug9fZpg0arf9C6x73OcDCd6OJONi1cOsTXCFZRuOFNGCIROuwTEL89Jc1gXIZf
- inIRVCj0MMGdF5qMVkSmfSvVX2MTVHnYt0XmDJ6iMGotBWoZoOYdxkXp8b2wKDmwUyGX
- kM7rCE7TX13kU75a1kwQqlsgBjksmlT+mXAJFNZKbMyFdWyhQNr3s8ZsNKUkLZ+3apto
- EYpRQ+tKIXn678oBIgBj2vtu7URZ5DTPll1/liYo7+0glnTzsEDZB+vIkIZBP3iCqDmm
- O/w4YFfwGy4VSMHWbFRQ3kc8YwJxSqwwIiVJNthucof/SfuXbt/G0OR2L1VynJgp1osa
- o46A==
-X-Gm-Message-State: AOAM53169WJxqlWQ6jAPuvt0tdvDwQweii/qIAs75o9R5rO/JsDPKq7v
- 0iGTJHHKnvhATfmDh6maHHLXjzUiqAYgYCAP5MWj9KDG/E7gXuhoyW0naz8bdImvN6TKN8uFOx6
- krqdq4jGLNipEx9/RxazH2/pc
-X-Received: by 2002:a05:600c:4295:: with SMTP id
- v21mr1158172wmc.19.1644567229080; 
- Fri, 11 Feb 2022 00:13:49 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzFDwMOqNhdLMmzCS9As9GMXonsgOfpQhipriYO985eA+t9E1y7/H8f0Oa+d3sbWGyRVAQfEA==
-X-Received: by 2002:a05:600c:4295:: with SMTP id
- v21mr1158150wmc.19.1644567228874; 
- Fri, 11 Feb 2022 00:13:48 -0800 (PST)
-Received: from [192.168.8.104] (tmo-098-218.customers.d1-online.com.
- [80.187.98.218])
- by smtp.gmail.com with ESMTPSA id l28sm19947430wrz.90.2022.02.11.00.13.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 11 Feb 2022 00:13:48 -0800 (PST)
-Message-ID: <f326daff-8384-4666-fc5e-6b7b509f6fe8@redhat.com>
-Date: Fri, 11 Feb 2022 09:13:45 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [kvm-unit-tests PATCH 0/4] configure changes and rename
- --target-efi
-To: Zixuan Wang <zxwang42@gmail.com>, Sean Christopherson <seanjc@google.com>
-References: <20220210150943.1280146-1-alexandru.elisei@arm.com>
- <YgVKmjBnAjITQcm+@google.com> <YgVPPCTJG7UFRkhQ@monolith.localdoman>
- <CAEDJ5ZSR=rw_ALjBcLgeVz9H6TS67eWvZW2SvGTJV468WjgyKw@mail.gmail.com>
- <YgVpJDIfUVzVvFdx@google.com>
- <CAEDJ5ZRkuCbmPzZXz0x2XUXqjKoi+O+Uq_SNkNW_We2mSv4aRg@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-In-Reply-To: <CAEDJ5ZRkuCbmPzZXz0x2XUXqjKoi+O+Uq_SNkNW_We2mSv4aRg@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm list <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
- Paolo Bonzini <pbonzini@redhat.com>, Varad Gautam <varad.gautam@suse.com>
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:cc;
+ bh=FWvONc6PPT7SOgcpYOOzYgnlsLgy4lIL2CKlJJtukzs=;
+ b=yCriKl4t4a3DxTjEn/pUCOayEMHuP1N73uUAyhgYjy0q55gxYhNg3Nq8/cymemh5OJ
+ m7uUM5E7stumINTgqFC65tpEyiay2QhRcn+d8iy4TGDhSENwPVCOVotAxmFHcMJ+dCZL
+ n5XQr7ls7IFs3AOcN3mdoySKgLdcQ0lIuqZfUmt9qC7XnM19fPHIUwi7doS5Zib1rWYp
+ N1wsI9vhLCDv8OlwcpQ53Zaf9eBi3D+vx9342f+ssiU/TGT9FL1RIkjGC+EobVt8Hnh1
+ W+43WaUK5nGnCHVWV5QeAtH6lMGmTkmept1/DbAtYs1d5I1Dm1FHrR1PxrVKCMKAWbTZ
+ wcfQ==
+X-Gm-Message-State: AOAM533xDsXb0pje9QGnXNT0QIzZuvqmPCnYMlmFH2jFtmgT+JvheCvg
+ iSXLRX5pmL6EbVPjtZhKhoDn7AcOALTnYk8lJw==
+X-Google-Smtp-Source: ABdhPJxZHBnjRsaIEqwkHqdAbXT7GDJWvj+cAd1UkPLHhqa+mVsLffzcbYP42soJ9363QIkLwEeaj1E/kFGFAp78sg==
+X-Received: from kaleshsingh.mtv.corp.google.com
+ ([2620:15c:211:200:8f02:232:ad86:2ab2])
+ (user=kaleshsingh job=sendgmr) by 2002:a25:6f08:: with SMTP id
+ k8mr8699054ybc.469.1644533041615; Thu, 10 Feb 2022 14:44:01 -0800 (PST)
+Date: Thu, 10 Feb 2022 14:41:43 -0800
+In-Reply-To: <20220210224220.4076151-1-kaleshsingh@google.com>
+Message-Id: <20220210224220.4076151-3-kaleshsingh@google.com>
+Mime-Version: 1.0
+References: <20220210224220.4076151-1-kaleshsingh@google.com>
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+Subject: [PATCH 2/7] KVM: arm64: Factor out private range VA allocation
+From: Kalesh Singh <kaleshsingh@google.com>
+X-Mailman-Approved-At: Fri, 11 Feb 2022 04:28:10 -0500
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Joey Gouly <joey.gouly@arm.com>,
+ Kalesh Singh <kaleshsingh@google.com>, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, Andrew Walbran <qwandor@google.com>,
+ maz@kernel.org, linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, surenb@google.com,
+ Peter Collingbourne <pcc@google.com>, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -106,63 +85,90 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 10/02/2022 20.48, Zixuan Wang wrote:
-> On Thu, Feb 10, 2022 at 11:36 AM Sean Christopherson <seanjc@google.com> wrote:
->>
->> On Thu, Feb 10, 2022, Zixuan Wang wrote:
->>> On Thu, Feb 10, 2022 at 11:05 AM Alexandru Elisei
->>> <alexandru.elisei@arm.com> wrote:
->>>>
->>>> Hi,
->>>>
->>>> On Thu, Feb 10, 2022 at 05:25:46PM +0000, Sean Christopherson wrote:
->>>>> On Thu, Feb 10, 2022, Alexandru Elisei wrote:
->>>>>> I renamed --target-efi to --efi-payload in the last patch because I felt it
->>>>>> looked rather confusing to do ./configure --target=qemu --target-efi when
->>>>>> configuring the tests. If the rename is not acceptable, I can think of a
->>>>>> few other options:
->>>>>
->>>>> I find --target-efi to be odd irrespective of this new conflict.  A simple --efi
->>>>> seems like it would be sufficient.
->>>>>
->>>>>> 1. Rename --target to --vmm. That was actually the original name for the
->>>>>> option, but I changed it because I thought --target was more generic and
->>>>>> that --target=efi would be the way going forward to compile kvm-unit-tests
->>>>>> to run as an EFI payload. I realize now that separating the VMM from
->>>>>> compiling kvm-unit-tests to run as an EFI payload is better, as there can
->>>>>> be multiple VMMs that can run UEFI in a VM. Not many people use kvmtool as
->>>>>> a test runner, so I think the impact on users should be minimal.
->>>>>
->>>>> Again irrespective of --target-efi, I think --target for the VMM is a potentially
->>>>> confusing name.  Target Triplet[*] and --target have specific meaning for the
->>>>> compiler, usurping that for something similar but slightly different is odd.
->>>>
->>>> Wouldn't that mean that --target-efi is equally confusing? Do you have
->>>> suggestions for other names?
->>>
->>> How about --config-efi for configure, and CONFIG_EFI for source code?
->>> I thought about this name when I was developing the initial patch, and
->>> Varad also proposed similar names in his initial patch series [1]:
->>> --efi and CONFIG_EFI.
->>
->> I don't mind CONFIG_EFI for the source, that provides a nice hint that it's a
->> configure option and is familiar for kernel developers.  But for the actually
->> option, why require more typing?  I really don't see any benefit of --config-efi
->> over --efi.
-> 
-> I agree, --efi looks better than --target-efi or --config-efi.
+From: Quentin Perret <qperret@google.com>
 
-<bikeshedding>
-Or maybe --enable-efi ... since configure scripts normally take 
-"--enable-..." or "--disable-..." parameters for stuff like this?
-</bikeshedding>
+__pkvm_create_private_mapping() is currently responsible for allocating
+VA space in the hypervisor's "private" range and creating stage-1
+mappings. In order to allow reusing the VA space allocation logic from
+other places, let's factor it out in a standalone function. This is will
+be used to allocate private VA ranges for hypervisor stack guard pages
+in a subsequent patch in this series.
 
-  Thomas
+Signed-off-by: Quentin Perret <qperret@google.com>
+[Kalesh - Resolve conflicts and make hyp_alloc_private_va_range
+          available outside nvhe/mm.c, update commit message]
+Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+---
+ arch/arm64/kvm/hyp/include/nvhe/mm.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/mm.c         | 28 +++++++++++++++++++---------
+ 2 files changed, 20 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/mm.h b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+index 2d08510c6cc1..f53fb0e406db 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/mm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/mm.h
+@@ -21,6 +21,7 @@ int pkvm_create_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
+ int pkvm_create_mappings_locked(void *from, void *to, enum kvm_pgtable_prot prot);
+ unsigned long __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
+ 					    enum kvm_pgtable_prot prot);
++unsigned long hyp_alloc_private_va_range(size_t size);
+ 
+ static inline void hyp_vmemmap_range(phys_addr_t phys, unsigned long size,
+ 				     unsigned long *start, unsigned long *end)
+diff --git a/arch/arm64/kvm/hyp/nvhe/mm.c b/arch/arm64/kvm/hyp/nvhe/mm.c
+index 526a7d6fa86f..e196441e072f 100644
+--- a/arch/arm64/kvm/hyp/nvhe/mm.c
++++ b/arch/arm64/kvm/hyp/nvhe/mm.c
+@@ -37,6 +37,22 @@ static int __pkvm_create_mappings(unsigned long start, unsigned long size,
+ 	return err;
+ }
+ 
++unsigned long hyp_alloc_private_va_range(size_t size)
++{
++	unsigned long addr = __io_map_base;
++
++	hyp_assert_lock_held(&pkvm_pgd_lock);
++	__io_map_base += PAGE_ALIGN(size);
++
++	/* Are we overflowing on the vmemmap ? */
++	if (__io_map_base > __hyp_vmemmap) {
++		__io_map_base = addr;
++		addr = (unsigned long)ERR_PTR(-ENOMEM);
++	}
++
++	return addr;
++}
++
+ unsigned long __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
+ 					    enum kvm_pgtable_prot prot)
+ {
+@@ -45,16 +61,10 @@ unsigned long __pkvm_create_private_mapping(phys_addr_t phys, size_t size,
+ 
+ 	hyp_spin_lock(&pkvm_pgd_lock);
+ 
+-	size = PAGE_ALIGN(size + offset_in_page(phys));
+-	addr = __io_map_base;
+-	__io_map_base += size;
+-
+-	/* Are we overflowing on the vmemmap ? */
+-	if (__io_map_base > __hyp_vmemmap) {
+-		__io_map_base -= size;
+-		addr = (unsigned long)ERR_PTR(-ENOMEM);
++	size = size + offset_in_page(phys);
++	addr = hyp_alloc_private_va_range(size);
++	if (IS_ERR((void *)addr))
+ 		goto out;
+-	}
+ 
+ 	err = kvm_pgtable_hyp_map(&pkvm_pgtable, addr, size, phys, prot);
+ 	if (err) {
+-- 
+2.35.1.265.g69c8d7142f-goog
 
 _______________________________________________
 kvmarm mailing list
