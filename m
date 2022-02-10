@@ -2,76 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3D5C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Feb 2022 05:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9042C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Feb 2022 10:31:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A72CF49F0C;
-	Thu, 10 Feb 2022 00:33:58 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 39B0E49F5F;
+	Thu, 10 Feb 2022 05:31:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RUfvBYadsuTD; Thu, 10 Feb 2022 00:33:57 -0500 (EST)
+	with ESMTP id lfrVx58pFgzM; Thu, 10 Feb 2022 05:31:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 825E849F13;
-	Thu, 10 Feb 2022 00:33:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76DAF49F48;
+	Thu, 10 Feb 2022 05:31:57 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CE09349F0C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 00:33:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E574B49F32
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 05:31:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dk1GgY4VG9p3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Feb 2022 00:33:55 -0500 (EST)
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
- [209.85.216.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 60AD649F09
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 00:33:55 -0500 (EST)
-Received: by mail-pj1-f53.google.com with SMTP id y9so4205677pjf.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Feb 2022 21:33:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4S1PGlBITDbPfDHxEWfVav4BYHFT1sybX2IDUqfuWTQ=;
- b=isDaEpKYGvxkxAbKsHb9vCzaGtOkhUtqMKoKEgF+nkKbnZtS8+ac5cIFoVRR23suou
- GVcLttonHw8byyKbCHgqQ0YS8UDZ+WQkPQBf+7svOSZ7NojZkt3+H45Kl7kRIpSoawW2
- hRgvESlJS+kiKrWMJBAracoDlptVNsidTAYCHcsrI8pvYmmg2WLY5MFCmbAnCkBo7uzI
- S1U25BcrPqOG04jupyggHGdQBLvFa05TvdYN8SZ87q3tEgqOhdx4okHKJRZ3g24uFoaJ
- BsmhtRgY0YthsOyByDn65K7Uz879V77+rlGFxz9XCkn116Pnb+3C3ElFjDZrZP0WTz2S
- +FSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4S1PGlBITDbPfDHxEWfVav4BYHFT1sybX2IDUqfuWTQ=;
- b=yp75OLNE4wlf2/kdKvmTQaAbr7ahO6DdwKi4lgdIIRPiL/RV5/ZGZNhIFTv6hTsmRa
- 0/dWZGPRHe3jZpbEWv3HzljmEKU/fracyW2pnOIWEG6rqGDF4tDWdNasQqflfVJs/UUR
- kV0OrKAZvvYzvjBVVzK2kMcR2epUiATwM2QEl2snhTGuysR80AN4y+ip6cZP5FUMsq6o
- HapQEK6i7ByuxqeyudGuLgHxY0gXd+P7XP77CQCrSXJ+CHwLyVVY/b8X42DyE5lSGiev
- N0vOODdv3sRVSHMxF+Fz1Ba+SLnzMffKxwhfuy1PBHf8/KjDOr8yHfPJb38p7YfojquN
- pTCg==
-X-Gm-Message-State: AOAM530PS2PNYAal5wd+7ZXJGm0upj8qVuxphfuPdcmZ9l5J5v2vV1vg
- Dgv9AB2FF7EB0F06vwl3NWQL1zdeEjXg9F/IQ8jwTkvTPpA=
-X-Google-Smtp-Source: ABdhPJyOYpAB/1KVlL9BpGn1hBcrVObh/j/ZODwkPJefZgNp7E9L6Xi+YRMLTn6dQNZAMk+w8rpZ0mbxDKUleu0QqeE=
-X-Received: by 2002:a17:90b:390a:: with SMTP id
- ob10mr1074103pjb.110.1644471234298; 
- Wed, 09 Feb 2022 21:33:54 -0800 (PST)
-MIME-Version: 1.0
-References: <20220106042708.2869332-1-reijiw@google.com>
- <20220106042708.2869332-5-reijiw@google.com>
- <CA+EHjTxCWe2pFNhq+9gRUJ0RnjX4OcuV2WazDbProUaJE2ZTBg@mail.gmail.com>
- <CAAeT=FzBC+1P3jNuLvF_tLwy-aQehPyJXJ3dmAsijB8=ky-ZKA@mail.gmail.com>
- <CA+EHjTzK_We_vwu6QbR3N4J5wJqF00fKm6rf6X8RA_4Mjg=VXw@mail.gmail.com>
-In-Reply-To: <CA+EHjTzK_We_vwu6QbR3N4J5wJqF00fKm6rf6X8RA_4Mjg=VXw@mail.gmail.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 9 Feb 2022 21:33:38 -0800
-Message-ID: <CAAeT=FyHGY3ypVQt_P-a8Mj8G_FMUtuwgdhos=DWV1SPeemC7A@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 04/26] KVM: arm64: Make ID_AA64PFR0_EL1 writable
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ with ESMTP id i6fEm7tewrU1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Feb 2022 05:31:54 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E14849F31
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 05:31:54 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id EE41BB824A5;
+ Thu, 10 Feb 2022 10:31:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B70D4C004E1;
+ Thu, 10 Feb 2022 10:31:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1644489111;
+ bh=N2HI8qSihMQX0nVOdnkUOKIzjezs+8DTSwDNJwrZaiA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=N2GOdPf8N1TAoDJOlHO6xu9cmv8KwBzvfYtPJace0dxvu8vZacBWTO0rNpBOP33GM
+ Fs2Cyct7TjzBaw7lHDw5XiHrxiyPAynMWNLWgiI6hd3ZayZc/9DZIonBwQE/ILfiJc
+ ojW1tN0zF6kwZoRA1XKyYIe/kjOJKDvlN7ubal5IjhwT/vTgl4YgKW59zMgrgMrJjN
+ S3OIFz+2a7yKuzkkahxIbdoSms/bCeRVxbFLdqwbcxHr7IifDpWQ9e7Jdaf2VzTneZ
+ 4QMaD+ni0K1TRzkQ9pKgHGSnuvxRJI/Gs1ETqe3Ko7LdCgYRjnWq+sZeBHJhZmiOwu
+ v5dVEBhIKTfKQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nI6jt-006sGC-EX; Thu, 10 Feb 2022 10:31:49 +0000
+Date: Thu, 10 Feb 2022 10:31:48 +0000
+Message-ID: <87wni33td7.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: mixed-width check should be skipped
+ for uninitialized vCPUs
+In-Reply-To: <CAAeT=FwF=agQH-2u0fzGL4eUzz5-=6M=zwXiaxyucPf+n_ihxQ@mail.gmail.com>
+References: <20220118041923.3384602-1-reijiw@google.com>
+ <87a6f15skj.wl-maz@kernel.org>
+ <CAAeT=FwjcgTM0hKSERfVMYDvYWqdC+Deqd=x2xT=-Zymb6SLtA@mail.gmail.com>
+ <875ypo5jqi.wl-maz@kernel.org>
+ <CAAeT=FwF=agQH-2u0fzGL4eUzz5-=6M=zwXiaxyucPf+n_ihxQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ will@kernel.org, pshier@google.com, ricarkol@google.com, oupton@google.com,
+ jingzhangos@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,46 +93,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Fuad,
-
-On Tue, Feb 1, 2022 at 6:14 AM Fuad Tabba <tabba@google.com> wrote:
->
-> Hi Reiji,
->
-> ...
->
-> > > > diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > index 0a06d0648970..28d9bf0e178c 100644
-> > > > --- a/arch/arm64/kvm/vgic/vgic-init.c
-> > > > +++ b/arch/arm64/kvm/vgic/vgic-init.c
-> > > > @@ -116,6 +116,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
-> > > >         else
-> > > >                 INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
-> > > >
-> > > > +       if (type == KVM_DEV_TYPE_ARM_VGIC_V3)
-> > > > +               /* Set ID_AA64PFR0_EL1.GIC to 1 */
-> > > > +               (void)kvm_set_id_reg_feature(kvm, SYS_ID_AA64PFR0_EL1,
-> > > > +                                    ID_AA64PFR0_GIC3, ID_AA64PFR0_GIC_SHIFT);
-> > > > +
-> > >
-> > > If this fails wouldn't it be better to return the error?
+On Thu, 10 Feb 2022 05:31:49 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Wed, Feb 9, 2022 at 4:04 AM Marc Zyngier <maz@kernel.org> wrote:
 > >
-> > This should never fail because kvm_vgic_create() prevents
-> > userspace from running the first KVM_RUN for any vCPUs
-> > while it calls kvm_set_id_reg_feature().
-> > So, I am thinking of adding WARN_ON_ONCE() for the return value
-> > rather than adding an unnecessary error handling.
->
-> Consider this to be a nit from my part, as I don't have any strong
-> feelings about this, but kvm_vgic_create() already returns an error if
-> there's a problem. So I don't think that that would be imposing any
-> additional error handling.
+> > Hi Reiji,
+> >
+> > On Wed, 09 Feb 2022 05:32:36 +0000,
+> > Reiji Watanabe <reijiw@google.com> wrote:
+> > >
+> > > Hi Marc,
+> > >
+> > > On Tue, Feb 8, 2022 at 6:41 AM Marc Zyngier <maz@kernel.org> wrote:
+> > > >
+> > > > In [1], I suggested another approach that didn't require extra state,
+> > > > and moved the existing checks under the kvm lock. What was wrong with
+> > > > that approach?
+> > >
+> > > With that approach, even for a vcpu that has a broken set of features,
+> > > which leads kvm_reset_vcpu() to fail for the vcpu, the vcpu->arch.features
+> > > are checked by other vCPUs' vcpu_allowed_register_width() until the
+> > > vcpu->arch.target is set to -1.
+> > > Due to this, I would think some or possibly all vCPUs' kvm_reset_vcpu()
+> > > may or may not fail (e.g. if userspace tries to configure vCPU#0 with
+> > > 32bit EL1, and vCPU#1 and #2 with 64 bit EL1, KVM_ARM_VCPU_INIT
+> > > for either vCPU#0, or both vCPU#1 and #2 should fail.  But, with that
+> > > approach, it doesn't always work that way.  Instead, KVM_ARM_VCPU_INIT
+> > > for all vCPUs could fail or KVM_ARM_VCPU_INIT for vCPU#0 and #1 could
+> > > fail while the one for CPU#2 works).
+> > > Also, even after the first KVM_RUN for vCPUs are already done,
+> > > (the first) KVM_ARM_VCPU_INIT for another vCPU could cause the
+> > > kvm_reset_vcpu() for those vCPUs to fail.
+> > >
+> > > I would think those behaviors are odd, and I wanted to avoid them.
+> >
+> > OK, fair enough. But then you need to remove most of the uses of
+> > KVM_ARM_VCPU_EL1_32BIT so that it is only used as a userspace
+> > interface and
+> 
+> Yes, I will.
+> 
+> > maybe not carried as part of the vcpu feature flag anymore.
+> 
+> At the first call of kvm_reset_vcpu() for the guest, the new kvm
+> flag is not set yet. So, KVM_ARM_VCPU_EL1_32BIT will be needed
+> by the function (unless we pass the flag as an argument for the
+> function or by any other way).
 
-That's true.  But, since this failure case cannot be caused by userspace
-(but KVM's bug), I would still prefer using WARN_ON_ONCE.
+Which is why I said 'maybe'. It's not a big deal if the flags stays,
+but I don't want it evaluated further down the line. It is also pretty
+similar to HCR_EL2.RW, which we already test with vcpu_el1_is_32bit().
+
+Overall, we need to reduce that state to be as simple as possible.
+
+> 
+> > Also, we really should turn all these various bits in the kvm struct
+> > into a set of flags. I have a patch posted there[1] for this, feel
+> > free to pick it up.
+> 
+> Thank you for the suggestion. But, kvm->arch.el1_reg_width is not
+> a binary because it needs to indicate an uninitialized state.  So, it
+> won't fit perfectly with kvm->arch.flags, which is introduced by [1]
+> as it is. Of course it's feasible by using 2 bits of the flags though...
+
+2 bits is what I had in mind (one bit to indicate that it has already
+been initialised, another to carry the actual width).
 
 Thanks,
-Reiji
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
