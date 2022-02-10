@@ -2,66 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B6DC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Feb 2022 19:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 034E5C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Feb 2022 21:55:42 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E5F149F31;
-	Thu, 10 Feb 2022 14:46:02 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 61D2A40431;
+	Thu, 10 Feb 2022 16:55:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aAEuwdOpTM4b; Thu, 10 Feb 2022 14:46:01 -0500 (EST)
+	with ESMTP id 0HeJjCNdduPG; Thu, 10 Feb 2022 16:55:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CE0F49EE2;
-	Thu, 10 Feb 2022 14:46:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36C4640AFA;
+	Thu, 10 Feb 2022 16:55:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44B2149EE2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:45:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D735749F2F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:31:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zjS6MvZCCLUa for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Feb 2022 14:45:58 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA63A49EAC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:45:57 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id ECF8E615A1;
- Thu, 10 Feb 2022 19:45:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B65C004E1;
- Thu, 10 Feb 2022 19:45:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1644522356;
- bh=2/d36OBbSBxlblWgpunNGQoCjUN3lbA5kTgumqeqpPU=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=hFbJvvg04LiXsdxqp6J+MMjRBfSHyXxF5SVtvHBUdfAm7Tj4ATmmEzAHLmTBxRgPG
- hZ6h65hQbrjz/1OZL+FLZ88/UQFYsgpDS9ZpSQJJQlYuLj4Mvad8D2YkkQVOtZrd+7
- M5RIbw4bhYAaFRYrbLF7buIt+7Sbv48m+xefrr6EEVj5dlWQ3gluyjQAzol45/adwO
- nJhEDnOU3gxFUV3QG2E00X0r7mDzhnFVVz6cyJd+uJpbg/nn7y3tXbEHOvA4glITdS
- YTCo4xt963J3T4ojxuVhxKp6lsstxLHYdvg8895QDpEqO4TnHDHjU3/vPHheFjxNUp
- D8md5Wf4M+yWA==
-Date: Thu, 10 Feb 2022 19:45:49 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v11 06/40] arm64/sme: Provide ABI documentation for SME
-Message-ID: <YgVrbc4fFrA0Vjh2@sirena.org.uk>
-References: <20220207152109.197566-1-broonie@kernel.org>
- <20220207152109.197566-7-broonie@kernel.org>
- <YgVaTounTtunlGU6@arm.com>
+ with ESMTP id 7vOAkj0FFbYq for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Feb 2022 14:31:33 -0500 (EST)
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com
+ [209.85.167.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEFE749EF3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:31:32 -0500 (EST)
+Received: by mail-lf1-f46.google.com with SMTP id f41so5175978lfv.12
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 11:31:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YV7m43lW01+30L4cJfH2Iw5JSUBAH1SM73s9lnsoK9w=;
+ b=gbWeYOhQiRnb8jPf5HKGRvZVFiNwiCG5pDavy5zRNbcS57wGnNDd0yC/ZCOnk3dBo8
+ ekHOdjb6l33u41dM3bM/NlssICsWUEXWG8LoBqtJscR5zsQqxdbc33JyRj8/cy4nO8Bc
+ xBM8OFMuTrirsHKn1QhHi5jOoi51nBnQsk++Q1qqSnBEOISJEPgw1/Of9eM9pUEJiapc
+ jDp5kXnLRTysjPsIM5BJotH4tbsQSBcK4XVHWfEnXkFMNExPvzz/xR6Su2MSSv/L0Dkb
+ a9PnCFTEBccE8QxIa3ymNWv9Eutv0lyJlqlUhUmnH08aauiERZHsOMg6eelMRHlQghWi
+ zqwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YV7m43lW01+30L4cJfH2Iw5JSUBAH1SM73s9lnsoK9w=;
+ b=WTBZ+eh2JVIUes4lXEgylS2JcuKxXuL3OjzFHbWgYZ4FCXKsf+BGzHbW1wPNuWbyPW
+ EzhbNPg3PTiuwArLzKk9BNVkPkrvUyYqN3DQuAyTnjAMhgjRqhZkDoS0TQemDimQ5mWR
+ ujwYK9ZuU4BeQIt1KG1I/8nbHZhRLt8sOc1TyVA4Wbk2MUlc4rj5Zqp7BZXsnRkofLug
+ Li0tY2fXyuU8W9ApSpigHdkpFfEJy+FhTGPFMPq7qHEv46XwwNo0zCNlIEvfd/BykBsF
+ 3/4Vqe4FnCE1bc8iIyHwItJxOtnqh0LAur0GOu6f+H2pj8RGMtVrNMAto6MFiL8XaYgL
+ vthQ==
+X-Gm-Message-State: AOAM532E9P6fptVFqU87h1sLSQZf0Zl18W+h7BEM4g328HVs7Mhw8fmP
+ 3ojzkWblqmLWEcDctYoec6ELSZfn+2oThWnpiLMIP2pR
+X-Google-Smtp-Source: ABdhPJyx6CUZeqEnp1CPbqshcBbV3uSIOGIIpzCGWxHlngrSN7TAikAv4oHo3jE88DLmxSgPvJjep6TxvDJT2UJ8E48=
+X-Received: by 2002:ac2:44ad:: with SMTP id c13mr6247450lfm.339.1644521491545; 
+ Thu, 10 Feb 2022 11:31:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <YgVaTounTtunlGU6@arm.com>
-X-Cookie: Only God can make random selections.
-Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>, Marc Zyngier <maz@kernel.org>,
- Shuah Khan <skhan@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Salil Akerkar <Salil.Akerkar@arm.com>
+References: <20220210150943.1280146-1-alexandru.elisei@arm.com>
+ <YgVKmjBnAjITQcm+@google.com> <YgVPPCTJG7UFRkhQ@monolith.localdoman>
+In-Reply-To: <YgVPPCTJG7UFRkhQ@monolith.localdoman>
+From: Zixuan Wang <zxwang42@gmail.com>
+Date: Thu, 10 Feb 2022 11:30:55 -0800
+Message-ID: <CAEDJ5ZSR=rw_ALjBcLgeVz9H6TS67eWvZW2SvGTJV468WjgyKw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH 0/4] configure changes and rename
+ --target-efi
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+X-Mailman-Approved-At: Thu, 10 Feb 2022 16:55:40 -0500
+Cc: thuth@redhat.com, kvm list <kvm@vger.kernel.org>,
+ Zixuan Wang <zixuanwang@google.com>, kvmarm@lists.cs.columbia.edu,
+ Paolo Bonzini <pbonzini@redhat.com>, Varad Gautam <varad.gautam@suse.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,135 +80,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4775894684611347889=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Thu, Feb 10, 2022 at 11:05 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi,
+>
+> On Thu, Feb 10, 2022 at 05:25:46PM +0000, Sean Christopherson wrote:
+> > On Thu, Feb 10, 2022, Alexandru Elisei wrote:
+> > > I renamed --target-efi to --efi-payload in the last patch because I felt it
+> > > looked rather confusing to do ./configure --target=qemu --target-efi when
+> > > configuring the tests. If the rename is not acceptable, I can think of a
+> > > few other options:
+> >
+> > I find --target-efi to be odd irrespective of this new conflict.  A simple --efi
+> > seems like it would be sufficient.
+> >
+> > > 1. Rename --target to --vmm. That was actually the original name for the
+> > > option, but I changed it because I thought --target was more generic and
+> > > that --target=efi would be the way going forward to compile kvm-unit-tests
+> > > to run as an EFI payload. I realize now that separating the VMM from
+> > > compiling kvm-unit-tests to run as an EFI payload is better, as there can
+> > > be multiple VMMs that can run UEFI in a VM. Not many people use kvmtool as
+> > > a test runner, so I think the impact on users should be minimal.
+> >
+> > Again irrespective of --target-efi, I think --target for the VMM is a potentially
+> > confusing name.  Target Triplet[*] and --target have specific meaning for the
+> > compiler, usurping that for something similar but slightly different is odd.
+>
+> Wouldn't that mean that --target-efi is equally confusing? Do you have
+> suggestions for other names?
 
---===============4775894684611347889==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ucqnplsdaKjxWywi"
-Content-Disposition: inline
+How about --config-efi for configure, and CONFIG_EFI for source code?
+I thought about this name when I was developing the initial patch, and
+Varad also proposed similar names in his initial patch series [1]:
+--efi and CONFIG_EFI.
 
-
---ucqnplsdaKjxWywi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Thu, Feb 10, 2022 at 06:32:46PM +0000, Catalin Marinas wrote:
-> On Mon, Feb 07, 2022 at 03:20:35PM +0000, Mark Brown wrote:
-
-> > +It is implementation defined which if any parts of the SVE state are shared
-> > +between streaming and non-streaming modes.  When switching between modes
-> > +via software interfaces such as ptrace if no register content is provided as
-> > +part of switching no state will be assumed to be shared and everything will
-> > +be zeroed.
-
-> Is there anything other than ptrace() here? I read the sigreturn() case
-> below but did not say anything about changing PSTATE.SM via the
-> sigcontext. I guess it's similar to ptrace().
-
-The signal handling code requires that register data be provided to
-restore with either form of SVE data, this falls out of the existing
-requirement that register data be provided for SVE.
-
-> > +4.  System call behaviour
-> > +-------------------------
-
-> > +* On syscall PSTATE.ZA is preserved, if PSTATE.ZA==1 then the contents of the
-> > +  ZA matrix are preserved.
-
-> Sorry if this was discussed. What is the rationale for preserving the ZA
-> registers on syscall? We don't do this for the top part of the Z
-> registers.
-
-In both cases it's mirroring the expected PCS which is that for normal
-functions they must be called with streaming mode disabled, the high
-bits of Z may be changed and there is a lazy saving scheme for ZA.  The
-handling of the Z registers falls out of a combination of the fact that
-the low bits are shared with the V registers and a desire to
-interoperate with binaries that are only aware of FPSIMD.
-
-See:
-
-  https://github.com/rsandifo-arm/abi-aa/blob/sme-aapcs64/aapcs64/aapcs64.rst
-
-for the PCS (it's an open pull request on the AAPCS), if we disable ZA
-we should really cooperate with the lazy save scheme for ZA in section
-6.5 which would involve writing to userspace buffers.  Given that we
-need to support preserving ZA for cases where userspace is preempted
-it's not really much effort to do that, if userspace doesn't want the
-cost it can disable ZA before doing a syscall and it means that syscalls
-don't push userspace code that would otherwise not do anything with ZA
-to have problems interoperating with the lazy saving scheme.
-
-If we don't preserve ZA then userspace will be forced to save it when
-enabled which increases overall costs, if we do preserve ZA then it's no
-more expensive for the kernel to save it than userspace, we avoid the
-cost of restoring in the case where return directly to userspace without
-context switching and if we do future work to save more lazily then we
-may be able to avoid some of the saves.
-
-> > +  as normal.
-
-> What does that mean? Is this as per the sve.rst doc (unspecified but
-> zeroed in practice)?
-
-Yes, we will exit streaming mode and proceed as per sve.rst and the rest
-of the ABI.
-
-> > +* Neither the SVE registers nor ZA are used to pass arguments to or receive
-> > +  results from any syscall.
-> > +
-> > +* On creation fork() or clone() the newly created process will have PSTATE.SM
-> > +  and PSTATE.ZA cleared.
-
-> This looks slightly inconsistent with the first bullet point on ZA being
-> preserved on syscalls. Why do these differ?
-
-Largely just because it's more complicated to implement copying the ZA
-backing store for this and it seemed more likely that someone would be
-surprised by a new process getting stuck carrying a potentially large
-copy of ZA around that it was unaware of than that someone would
-actually want that to happen.  It's not a particularly strongly held
-opinon.
-
-> > +[4] ARM IHI0055C
-> > +    http://infocenter.arm.com/help/topic/com.arm.doc.ihi0055c/IHI0055C_beta_aapcs64.pdf
-> > +    http://infocenter.arm.com/help/topic/com.arm.doc.subset.swdev.abi/index.html
-> > +    Procedure Call Standard for the ARM 64-bit Architecture (AArch64)
-
-> The second link no longer works. I also couldn't find any reference to
-> [4] but there's a lot of text to scan, so I may have missed it.
-
-We don't referenced it, it's just carried over from SVE.
-
---ucqnplsdaKjxWywi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmIFa2wACgkQJNaLcl1U
-h9AJwgf/Ypezgo+N1Oozlkua7rL21V3dADz3wxpSkFNz+XMGuu4D9jB5MQMFQ2wt
-T9nTi48TNkn+0KIronwPWFZU8HJgScMUdTMCbc5vH1zbcmwvl6yo81kFZvLV3WTv
-Wnic6YqHhO8DDI3yEv+4qb9VzrcMHJ3CfJmBdZHMChHl0kZtebtOr8OOv/VdTQ7g
-bVKliNO14tPkP1n46GnuCX9E9PTyf00wXxBsPJSJN6xJka79shXNS1QiamJtskb+
-fsYYtmlLcOMvX0pV3ECRlUsN2RrjRfAR67/AD47A2Bu5izFbrn6t2+1NwNi8RLgJ
-isjUK1vyHHxXlcogPQqvcLCHK0+QTw==
-=4wmD
------END PGP SIGNATURE-----
-
---ucqnplsdaKjxWywi--
-
---===============4775894684611347889==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+[1] https://lore.kernel.org/kvm/20210819113400.26516-1-varad.gautam@suse.com/
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4775894684611347889==--
