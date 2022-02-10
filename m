@@ -2,71 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC271C4332F
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Feb 2022 16:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D994C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 10 Feb 2022 17:25:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B13949F46;
-	Thu, 10 Feb 2022 11:19:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0554F49F4B;
+	Thu, 10 Feb 2022 12:25:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 2wkafvr5TwtQ; Thu, 10 Feb 2022 11:19:06 -0500 (EST)
+	with ESMTP id HJEwwvp36Bgz; Thu, 10 Feb 2022 12:25:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C814649F2A;
-	Thu, 10 Feb 2022 11:19:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4795449F2C;
+	Thu, 10 Feb 2022 12:25:54 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA0A949EEF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 11:19:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C6F249F0B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 12:25:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mL-G+iHFzbCh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Feb 2022 11:19:00 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 76C8540F9C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 11:19:00 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id B2955B806A0;
- Thu, 10 Feb 2022 16:18:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E9EFC004E1;
- Thu, 10 Feb 2022 16:18:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1644509937;
- bh=mE84CfkELN0c9QW331zz8GqcAyg9pAb8AMkwuNJ/wAo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=kBzfe+whiU8VkD4nnORvwXkJN8aVak97dv2TTsubkTsnNIVCNC/uzO1fIGIaoeQvp
- 7dG6zzaZ5tBMf7/WFGwormiSNi5N8C6pa+WdE2ZNNUek3CibRw7WDKQWyRgw6UOrnA
- LIEjwM0WF2rVJOpf7kz8DwkQTKLpj591RU9ZKhnsd1aUJPPEIQUo8uGy5+qf/9fSIu
- DWsoOLKMks7BYOFTJ/xF4asIUwLuiWkmxjoNVsfMc6kn8omtqzWuckOs51E5Tvvsdl
- tvNbYEbcx4IprVlXrVSzphSQHcQdCOePTm8B6O1WgQ4d5HVYyyTlAq5lHtWzhqwXDl
- 9DWLNIrz1Ad9A==
-Date: Thu, 10 Feb 2022 16:18:50 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Shuah Khan <skhan@linuxfoundation.org>
-Subject: Re: [PATCH v11 06/40] arm64/sme: Provide ABI documentation for SME
-Message-ID: <YgU66pT3efqwwn7U@sirena.org.uk>
-References: <20220207152109.197566-1-broonie@kernel.org>
- <20220207152109.197566-7-broonie@kernel.org>
- <49da0f58-7a20-e557-54c3-34bd7074f711@linuxfoundation.org>
- <YgKQTLwW+ha5XNx8@sirena.org.uk> <YgK4kKrSs6e9seG8@sirena.org.uk>
- <e6d76104-b7f6-1588-d734-1a09c2990299@linuxfoundation.org>
- <YgK9v7u+FcBTB1ur@sirena.org.uk>
- <d41ec776-5bd0-438f-0ab3-6eb1891e7fdc@linuxfoundation.org>
+ with ESMTP id JlGJPDmxEB9o for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Feb 2022 12:25:51 -0500 (EST)
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com
+ [209.85.214.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 95EB449EF3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 12:25:51 -0500 (EST)
+Received: by mail-pl1-f182.google.com with SMTP id y7so2418649plp.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 09:25:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=RpI/Pc77MpSRjpUPrJOrramDZi3SB+e1ryNxx/yPgHo=;
+ b=YXn1/quEkEPJgPghKbNEXhPloXCwF+kn0GrB0c72VWDmu5+C+iufjiqJX/Zr7tVpW0
+ 8tLNF97X6qmvnQBaBY8UiMvsEdFogDhcq51cd3xJnjlHtp10MEyoS6K8wvvsjfuoZ6GL
+ t+mcZcxRnOedetqu/7SyA2Pwqhgh0s1LcWI7ECfu79Vim90OsZtmrhyYuap4IxhilZ2E
+ sX/t8sg5u3YmXdN5ZDW9yazi1ftIZNy+CwmnPouwTvr3AdttbsByYH12cY8v0T+AtNuS
+ kjC4ReI5peTud5+z+aE8jKm8jkKB3ooVnAM9lZixP/HtGqMLYuY2ge7zwlAeV07PF5Gq
+ oMXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=RpI/Pc77MpSRjpUPrJOrramDZi3SB+e1ryNxx/yPgHo=;
+ b=bmxRJPPFF3GSWTIRMogqAiTipkNqTZh2XR4LArXL6SemOTLDCn/q2827x6alA5gWkT
+ VahMLtShVn3OaWjrJQ1LP8UXDhIzYMrK59yLgzofw/lS7/xmHLc/LFvwi3H8xEcDvkyz
+ nPueaxD+T4j0uUrwrvpmdBgqp4zRPOfixdr+KqDUzRlYpZ1byyI5BTcGNrOtcZhASvDC
+ 0QQazMz9IgzZsMCPGoVA88ynm7YF1iciwyLEHs2Oyvr/Rle0Bs+ClMCz3C6Q+O6ssqx2
+ y5+l1wMvTfkDpC3UKOmFeQB7Om07e7M5UJtU0P0VBN7nEwy34CNQbOOugXOWfT4p0Doq
+ 8Tsg==
+X-Gm-Message-State: AOAM5336nJpLOP0YFsw38c6HgeBOqEvMbIeH98qfkgZNz+LifLX24Q8V
+ gigN9UYjVZZZLK6kA5Yu7qvo8w==
+X-Google-Smtp-Source: ABdhPJwGUlWFmBPzh0GMITsa52rZCyLCgNTJR2YZipN8WICLLLDonkxqL5M8Iq/HWVX+SCN8uZE1xA==
+X-Received: by 2002:a17:903:2410:: with SMTP id
+ e16mr8503196plo.19.1644513950416; 
+ Thu, 10 Feb 2022 09:25:50 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157])
+ by smtp.gmail.com with ESMTPSA id k16sm24344783pfu.140.2022.02.10.09.25.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 10 Feb 2022 09:25:49 -0800 (PST)
+Date: Thu, 10 Feb 2022 17:25:46 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 0/4] configure changes and rename
+ --target-efi
+Message-ID: <YgVKmjBnAjITQcm+@google.com>
+References: <20220210150943.1280146-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <d41ec776-5bd0-438f-0ab3-6eb1891e7fdc@linuxfoundation.org>
-X-Cookie: Only God can make random selections.
-Cc: Marc Zyngier <maz@kernel.org>,
- Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org,
- Alan Hayward <alan.hayward@arm.com>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>
+Content-Disposition: inline
+In-Reply-To: <20220210150943.1280146-1-alexandru.elisei@arm.com>
+Cc: thuth@redhat.com, kvm@vger.kernel.org, zixuanwang@google.com,
+ kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, varad.gautam@suse.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,71 +85,40 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============6648562463102305009=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Thu, Feb 10, 2022, Alexandru Elisei wrote:
+> I renamed --target-efi to --efi-payload in the last patch because I felt it
+> looked rather confusing to do ./configure --target=qemu --target-efi when
+> configuring the tests. If the rename is not acceptable, I can think of a
+> few other options:
 
---===============6648562463102305009==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="E6HfXQqv4dHcMRh/"
-Content-Disposition: inline
+I find --target-efi to be odd irrespective of this new conflict.  A simple --efi
+seems like it would be sufficient.
 
+> 1. Rename --target to --vmm. That was actually the original name for the
+> option, but I changed it because I thought --target was more generic and
+> that --target=efi would be the way going forward to compile kvm-unit-tests
+> to run as an EFI payload. I realize now that separating the VMM from
+> compiling kvm-unit-tests to run as an EFI payload is better, as there can
+> be multiple VMMs that can run UEFI in a VM. Not many people use kvmtool as
+> a test runner, so I think the impact on users should be minimal.
 
---E6HfXQqv4dHcMRh/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Again irrespective of --target-efi, I think --target for the VMM is a potentially
+confusing name.  Target Triplet[*] and --target have specific meaning for the
+compiler, usurping that for something similar but slightly different is odd.
 
-On Thu, Feb 10, 2022 at 08:12:44AM -0700, Shuah Khan wrote:
-> On 2/8/22 12:00 PM, Mark Brown wrote:
+But why is the VMM specified at ./configure time?  Why can't it be an option to
+run_tests.sh?  E.g. --target-efi in configure makes sense because it currently
+requires different compilation options, but even that I hope we can someday change
+so that x86-64 always builds EFI-friendly tests.  I really don't want to get to a
+point where tests themselves have to be recompiled to run under different VMMs.
 
-> > Sure, there are lots of structured files in there like .rst ones which
-> > have SPDX headers but this is just a free format text file so it's not
-> > clear what if any format to use.
-
-> I think SPDX is applicable to all files free format or not. Are you seeing
-> any build warns during doc build on this?
-
-No, but I'm not exactly going out of my way to do anything with them.
-As far as I know these files don't get touched during builds, they just
-exist in the kernel tree.  If there is some way of generating warnings
-=66rom them there are quite a lot of other such files already there and
-doing so.  Like I say I can't find any evidence that anyone has looked
-at adding SPDX to these files, as far as I know the long term plan such
-as it is is to convert to other formats and I can't immediately think
-how one would do it otherwise in a way that works well.
-
-I'm sure the license compliance people would find adding annotations
-useful but working out how to do that sensibly for these files seems
-beyond the scope of this series.
-
---E6HfXQqv4dHcMRh/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmIFOuoACgkQJNaLcl1U
-h9A10Af9HttlrltFQQbCvNVwAOt31oIw1I7NKyD4F2QPCnbjirxGPF9FhoQCKxlh
-/4VLdkvuPNogggtjy9M2yHjmRN4rix4RlhVTd2L4gyPaixsNDSyn8Qu77x4jq6iP
-d2qsu+w8J8Fzg4bq7oRPMHPa/kEJXwq02NiVZMzcxHU0kuBue5qJEpU8HRGnRwDV
-3ZaWQOYl0zRojYCYWz4a/FGdPVGyhvA0Giet2iYRFJ4c4UHOReS65y7w49dzDsqZ
-sgK2ZbwLIpZGqiiCjC+hdYqbRHebJpMsJSQekJLKEYeI5Az1VktNXPnAzTOGiqYY
-34BmoPSY/6gjss5tsCgqNbkF8N/D9Q==
-=kc0B
------END PGP SIGNATURE-----
-
---E6HfXQqv4dHcMRh/--
-
---===============6648562463102305009==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+[*] https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.69/html_node/Specifying-Target-Triplets.html
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============6648562463102305009==--
