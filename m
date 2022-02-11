@@ -2,172 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92DBCC433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 16:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA22C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 17:02:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 068E040CF5;
-	Fri, 11 Feb 2022 11:35:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A913740C02;
+	Fri, 11 Feb 2022 12:02:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@oracle.com
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@oracle.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W89nDtiWwTtl; Fri, 11 Feb 2022 11:35:51 -0500 (EST)
+	with ESMTP id h07vbILEIHIo; Fri, 11 Feb 2022 12:02:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF35540B9F;
-	Fri, 11 Feb 2022 11:35:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DB4449F5D;
+	Fri, 11 Feb 2022 12:02:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF52F4087B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 11:35:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5850049F49
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 12:02:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bFyrb58swDfO for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Feb 2022 11:35:48 -0500 (EST)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com
- [205.220.165.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA7E94086D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 11:35:48 -0500 (EST)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
- by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21BG16Rs015547; 
- Fri, 11 Feb 2022 16:35:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=G59eiw/pguJV/zloenhhZdWLlS8NFANpUCp7nRRaGuI=;
- b=ne/ekrwk1qzO2i3HAFrHwP7Oi9f2pgKCn3J2HmGOzK/pZb4oD3cG3797xfC6VEhR6JWU
- BMxZ4XmyvMzCue8tVjPjGFoLmX4SGxNW1CAEu1IaxK+zUkum8Rkn4aAhRtWEKs/hF5kk
- yqXOSuyc4fVf1/V6qxo/3/dQRX7EyKLB3ZwxEZlGFEKzBWmIL9k8c9RD7yo5Xmk0KaQK
- uQKnAIHiKpMegBNMqUmelsjg/Dj5tumBGfRBZvz86hmxyWcmTI9sYJEor0wVNBHjMabr
- q37ScB5CbKedZa7Ch6NH4YwXtoJg7aNF4ZaY5sjTeLJu85mfosgonrZvMRZavTiyc7Ts bA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by mx0b-00069f02.pphosted.com with ESMTP id 3e5g989h2r-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 11 Feb 2022 16:35:18 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 21BGGO3L112895;
- Fri, 11 Feb 2022 16:35:17 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com
- (mail-bn8nam12lp2169.outbound.protection.outlook.com [104.47.55.169])
- by userp3020.oracle.com with ESMTP id 3e1jpy2p8h-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 11 Feb 2022 16:35:17 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KgQtZTQS03hmoiUWOQDPjeFYbxynlXiZZWQkeNmFXWzHHRPcYq+HLy1+JOXpA9+j9xYLiOTbLypVWxIWLmP8rtZFvD6a58RSVW9YjaBY08KtUlERHjvLQbOoikT03fySoqOW9i7BFBxxnD3WJb0Eu9Dwn9xvtN9g4YdY/dxzWiRfZYmKDiv4Pe3agjp3VUTjDF4ubqb7BYt0fUQZMXptnz97+asZ5XFabV2+jP4ZRi8Pi37v+lk+CDw87GJeQuf5y5ZnfIGkxTcjYANKU91O4iwW6cZaFtKQeCYL4AEjWNX8LG4IQXUdXAobNnO4qOfD8J+bPYk5xUmdE+1niFB9AQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G59eiw/pguJV/zloenhhZdWLlS8NFANpUCp7nRRaGuI=;
- b=VmXx5rS0yM27Kf2bdsRMVaqfygB8ErJCEyA5tgq2yEuIlaAN4DYfPHNOnPWgUL0f14cJnGHwZc/szHsIAShdkRRy0YLRtWQn6skkQvAfHCz5JzAT3FQ9KFuyi25vQaCx0iA8vTJ0WmdQsAK/xxslOdGR4S82xMGnBnpY8O3XU+2inZrCRxjWfGidia0x+MVkBmQBfwFAZcuVemaX07JZ75kcZQ5yEJy7/C+E6aTdaMXPJGmaAr7lfSvPLWV86iDExjc+seR0ahgglwruQWPQjqTHwQKbNGJoNqKxqCkOAA9/jkqZB4YPlveNUtgtmCopJqn7tslRNOzOLocMJEDhSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G59eiw/pguJV/zloenhhZdWLlS8NFANpUCp7nRRaGuI=;
- b=fdGF6s2r9F+l+iNDjr0BXIPG4DKs+qwsVHSNnfZNz7/yQCF1k3N/4+7udjEO8/RQh87FBi1mo1zAtzAEA8LQMAweuEGXE/w51CNJGj2yOFGxdb2vczCoDqyMcJB1diblgbPgKEOiyl/jB4pI5jjUpsSDDgqchv6Ani4N/ezCyok=
-Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
- by DM6PR10MB3995.namprd10.prod.outlook.com (2603:10b6:5:1fa::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4951.12; Fri, 11 Feb
- 2022 16:35:13 +0000
-Received: from PH0PR10MB5433.namprd10.prod.outlook.com
- ([fe80::3010:9c9e:e9d4:a6ab]) by PH0PR10MB5433.namprd10.prod.outlook.com
- ([fe80::3010:9c9e:e9d4:a6ab%4]) with mapi id 15.20.4975.011; Fri, 11 Feb 2022
- 16:35:13 +0000
-From: Miguel Luis <miguel.luis@oracle.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v6 05/64] KVM: arm64: nv: Add EL2 system registers to vcpu
- context
-Thread-Topic: [PATCH v6 05/64] KVM: arm64: nv: Add EL2 system registers to
- vcpu context
-Thread-Index: AQHYFEFOwGH/a/x0ek6lUNd0w6xrFKyOoikA
-Date: Fri, 11 Feb 2022 16:35:12 +0000
-Message-ID: <9FB6A1EB-6A7B-4DDF-A676-7C24FB64A0CC@oracle.com>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-6-maz@kernel.org>
-In-Reply-To: <20220128121912.509006-6-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: acebb263-70c5-4369-6760-08d9ed7c7a23
-x-ms-traffictypediagnostic: DM6PR10MB3995:EE_
-x-microsoft-antispam-prvs: <DM6PR10MB3995D76D75410E9FD482C23E91309@DM6PR10MB3995.namprd10.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: TLSmOjx16HkzfbEYw4Ty4JGinM+EAUS3Ps0/S46oEshtTrAJaoe1amRyGKd6k9I7AW21Tdx0AS25ovO/opgneeOamviHAL9VnrtLPv3TFTygLXAEcrUXJ4Q5WC6ICTdQndZ0QSaPLXWKMeVveJSOInNiajspRP/k852/xgpFmVdM8lG/Wz2WbVk07CLhLpviGyl0kC1+cuYpn1Q+b+LWDhpVtkeyAuuK4qO0HR4cli8OqJWbdn74HiwXVbKRrKe0GbTYljXI6Liw4/ixUtccalziYknMrukMgq0qbpHwZRz2bxTLFvGTHcsEUbZ3mGC/09bGoiJ3JeUuPgRBLS8a+mcuAqKbuyn5N88LYJ2VpFgXarx9TOEbBSjDOtzrN1JrtgjxEARiu8BJXUcMbE7S2K21AVBASjtr7B6BXATUD5dlBmxYyTXCm/UWEU4KIDOsIRyOSyht5xoy9W6JuV43kEFYY9BMOIA8maC+BmSKwgKlj9JOLdrxqSajqmsTaTIh4uWVcKKNwf/6g4ZqCZc3mGVGfNsvWiWoYyP/sBn+1iXzQhCghNJb7A5b+MC+Kj3FYzuVxU72j4Nar0ZhQ+jDza0UAF4xb5MKnv27E0zqFyFcXXHMD5iMnrLSpMuHzs8w8sFVchHTV/V8me6q2hQFPtWiCeMwDJBOm+A4+cG1EebDyF0faoprlbpabCs7JGyApYfkQxbqvL+N93V9z19DU6ABDo24i62dXyU+4EjyR2Y=
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:PH0PR10MB5433.namprd10.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(13230001)(366004)(33656002)(44832011)(2616005)(6506007)(64756008)(5660300002)(2906002)(7416002)(6512007)(66446008)(91956017)(8676002)(8936002)(4326008)(66556008)(66476007)(66946007)(53546011)(71200400001)(38070700005)(76116006)(186003)(316002)(83380400001)(6486002)(38100700002)(508600001)(122000001)(6916009)(36756003)(86362001)(54906003)(45980500001);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?u2OalZQjewTdJhrYJOgvdrh7p4urwmAZJWYQTXPwz3ESCKwWQs4DFtlDZ52g?=
- =?us-ascii?Q?iqC08cMZVlbqY25kRuj4qFiRPnBiRj0p7589Zp+x8sIwPMjSgUCCs1kV/ni2?=
- =?us-ascii?Q?sy3sUT4//zZPU90aHAvNbS2A8Z3p9GTSQDIEr/IEzCks3q9+1d5gjrSc26eq?=
- =?us-ascii?Q?W8zlzqE1tMp5GqikJkim+U1T5U1eCLsoIAMbYknQJjJbf+XAWk3VkNzwQXQ6?=
- =?us-ascii?Q?yGCvgqKnczaekOpnPuIMHcm0wNhZVBYDhXQRyNyIl48eykntcqf6qBEu1DhG?=
- =?us-ascii?Q?E3B6E5nqQWtSS/IdpgNYmC12o7DhBiIu0/b78fibIYIvlLsIaJoTyyelABCc?=
- =?us-ascii?Q?I4k+9uX8fe9CviYSVcKfvvO8Hg84xznuHdBcsdB8WBR/6CNilK+bHmpG07H7?=
- =?us-ascii?Q?wkjL2ocGStdwXo8sfr+FLTRVdMPzGyp1LDanFdUclgMNbmOHMmgtateKVloE?=
- =?us-ascii?Q?VCzW9gdIzGaJSZHcVzTQP8kMXfuztIR1I82mNyVrOSJLcwkR4b+e1XaumA9M?=
- =?us-ascii?Q?i9O1Qnv0efdi7cc5C3bjyHYjTht7M8C6dxw5nMBQejJPzUyqds35UrtOCeyy?=
- =?us-ascii?Q?Mpwx3jsU2DUT4IFoxmzPQNZrvsYF1Bdoiuh92AWJIpqSBORNhtoEn668ys5p?=
- =?us-ascii?Q?DcfDTZWCnx0yPQ9MVuu8ZM0buvezwMB6Wcg1T/3ZtboMysyKOIi0NWsCosR5?=
- =?us-ascii?Q?HvfTZhakQ1DaIq9rGByqiBNIzwjOHeqd0rRKScHxKUT+2X537ohGzMhkVwQg?=
- =?us-ascii?Q?b5sNxRMmsXc8Q9TYLb1jr2HCtHWUCeQpMMRVjSEc5KGdjRB2xyGsJAH5YO+U?=
- =?us-ascii?Q?p9jhlvRmBXM8Jwy5TvXXhj4noT27dh2JQbCnzZ/+4OqvDUqtbE+746VePi+N?=
- =?us-ascii?Q?n0v4SaolFluPXmbs7pUjT4FPdQClR/0mqf8M8xvH0LR5puADPdhOB5DgflDz?=
- =?us-ascii?Q?apB+9P1tKwzLeqMA+E6lvDKdUo+mcg7QZybOea+gJOCYuxfpU9miKpFetq8d?=
- =?us-ascii?Q?kqHh5Q6ccOfvxNxAJED9Z2N9Eux5K26fs+93Kezg4SdZISv3HNmE7iY++3ph?=
- =?us-ascii?Q?W33oxL9ryfrEgFGGgqLoxFpghg/UKEdVUWoFt6XfV8ridiFZnF0NTdmOBkHM?=
- =?us-ascii?Q?L0nikwaJ0ZHuJhfcthASHtl8T/xETYyoKofDkdZzEi4HQVPA4zmEeC3g98FD?=
- =?us-ascii?Q?hasAQAKznIzxi2xWWaZmiBehnSg99p5lYRIfMKcReEnKuDQ/gv11yz6N4hnT?=
- =?us-ascii?Q?c7Rjoi5k0m5kozk35CNpgvW3C2jrJ16EwW8f9GepIpeEIzpQhdRgqz0OYBZJ?=
- =?us-ascii?Q?fpoEd93xAAJzBdIY2lMTF0VjPGokEmNvu3kHyBTb6dOYPRXOxWS0xT/PxQZN?=
- =?us-ascii?Q?6lv1vtV1xo76dwBYROUfwPPG0yiGqlzGprjPt06RpSVabYaABx6T7olMJ/dL?=
- =?us-ascii?Q?/X2Eki7pFRRwXigHTcNDe4sAH2NvhjwpDR2jMyQRloNMI3+CkTqMa1s7T4//?=
- =?us-ascii?Q?DNdpwcs+8G6A/vshnlwj4Q/AGHOavHExf17ngC3FOFN1BTWXqedykel3bSEw?=
- =?us-ascii?Q?k9dslXEQpjaNfcVsBLwH7mp4XFlbGyAfpGdlrHWAJA6llB8oIFdwflLpys3m?=
- =?us-ascii?Q?arGVawEOo51yDPe0Qci5+lmRJTn7iQ96TNJxVJcIe+Cjk/dcuWiyiF0uUlYg?=
- =?us-ascii?Q?xI2HFr8xM38pI+/GSnoZjfByNiI=3D?=
-Content-ID: <D3A68567EE81FF4F830D51A373166F8B@namprd10.prod.outlook.com>
+ with ESMTP id PwZw6DagMni4 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Feb 2022 12:02:26 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D980249F0E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 12:02:25 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 4180CB82A9E;
+ Fri, 11 Feb 2022 17:02:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3804C340E9;
+ Fri, 11 Feb 2022 17:02:19 +0000 (UTC)
+Date: Fri, 11 Feb 2022 17:02:16 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v11 06/40] arm64/sme: Provide ABI documentation for SME
+Message-ID: <YgaWmP+P7v9b2lLz@arm.com>
+References: <20220207152109.197566-1-broonie@kernel.org>
+ <20220207152109.197566-7-broonie@kernel.org>
+ <YgVaTounTtunlGU6@arm.com> <YgVrbc4fFrA0Vjh2@sirena.org.uk>
 MIME-Version: 1.0
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: acebb263-70c5-4369-6760-08d9ed7c7a23
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2022 16:35:12.9410 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3XY4TedibE1rMjbW6qxUfJJ0NuHlsDBOhveFcH9iI5n3V/uyH9YYj9bJlz12hhJ8pNynSGEGt5bdvj97k13HpA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB3995
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10254
- signatures=673431
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- mlxscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 phishscore=0 adultscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2201110000
- definitions=main-2202110089
-X-Proofpoint-GUID: DVdIpSo_FEA2ZJyeZ0iXKdSvp4m3IXcW
-X-Proofpoint-ORIG-GUID: DVdIpSo_FEA2ZJyeZ0iXKdSvp4m3IXcW
-Cc: "kernel-team@android.com" <kernel-team@android.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Andre Przywara <andre.przywara@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- Mihai Carabas <mihai.carabas@oracle.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Disposition: inline
+In-Reply-To: <YgVrbc4fFrA0Vjh2@sirena.org.uk>
+Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
+ Szabolcs Nagy <szabolcs.nagy@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Shuah Khan <skhan@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Salil Akerkar <Salil.Akerkar@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -184,62 +66,115 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Thu, Feb 10, 2022 at 07:45:49PM +0000, Mark Brown wrote:
+> On Thu, Feb 10, 2022 at 06:32:46PM +0000, Catalin Marinas wrote:
+> > On Mon, Feb 07, 2022 at 03:20:35PM +0000, Mark Brown wrote:
+> > > +4.  System call behaviour
+> > > +-------------------------
+> 
+> > > +* On syscall PSTATE.ZA is preserved, if PSTATE.ZA==1 then the contents of the
+> > > +  ZA matrix are preserved.
+> 
+> > Sorry if this was discussed. What is the rationale for preserving the ZA
+> > registers on syscall? We don't do this for the top part of the Z
+> > registers.
+> 
+> In both cases it's mirroring the expected PCS which is that for normal
+> functions they must be called with streaming mode disabled, the high
+> bits of Z may be changed and there is a lazy saving scheme for ZA.  The
+> handling of the Z registers falls out of a combination of the fact that
+> the low bits are shared with the V registers and a desire to
+> interoperate with binaries that are only aware of FPSIMD.
+> 
+> See:
+> 
+>   https://github.com/rsandifo-arm/abi-aa/blob/sme-aapcs64/aapcs64/aapcs64.rst
+> 
+> for the PCS (it's an open pull request on the AAPCS), if we disable ZA
+> we should really cooperate with the lazy save scheme for ZA in section
+> 6.5 which would involve writing to userspace buffers.  Given that we
+> need to support preserving ZA for cases where userspace is preempted
+> it's not really much effort to do that, if userspace doesn't want the
+> cost it can disable ZA before doing a syscall and it means that syscalls
+> don't push userspace code that would otherwise not do anything with ZA
+> to have problems interoperating with the lazy saving scheme.
+> 
+> If we don't preserve ZA then userspace will be forced to save it when
+> enabled which increases overall costs, if we do preserve ZA then it's no
+> more expensive for the kernel to save it than userspace, we avoid the
+> cost of restoring in the case where return directly to userspace without
+> context switching and if we do future work to save more lazily then we
+> may be able to avoid some of the saves.
 
-> On 28 Jan 2022, at 11:18, Marc Zyngier <maz@kernel.org> wrote:
-> 
-> Add the minimal set of EL2 system registers to the vcpu context.
-> Nothing uses them just yet.
-> 
-> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
-> arch/arm64/include/asm/kvm_host.h | 33 ++++++++++++++++++++++++++++++-
-> 1 file changed, 32 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 115e0e2caf9a..15f690c27baf 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -220,12 +220,43 @@ enum vcpu_sysreg {
-> 	TFSR_EL1,	/* Tag Fault Status Register (EL1) */
-> 	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
-> 
-> -	/* 32bit specific registers. Keep them at the end of the range */
-> +	/* 32bit specific registers. */
-> 	DACR32_EL2,	/* Domain Access Control Register */
-> 	IFSR32_EL2,	/* Instruction Fault Status Register */
-> 	FPEXC32_EL2,	/* Floating-Point Exception Control Register */
-> 	DBGVCR32_EL2,	/* Debug Vector Catch Register */
-> 
-> +	/* EL2 registers */
-> +	VPIDR_EL2,	/* Virtualization Processor ID Register */
-> +	VMPIDR_EL2,	/* Virtualization Multiprocessor ID Register */
-> +	SCTLR_EL2,	/* System Control Register (EL2) */
-> +	ACTLR_EL2,	/* Auxiliary Control Register (EL2) */
-> +	HCR_EL2,	/* Hypervisor Configuration Register */
-> +	MDCR_EL2,	/* Monitor Debug Configuration Register (EL2) */
-> +	CPTR_EL2,	/* Architectural Feature Trap Register (EL2) */
-> +	HSTR_EL2,	/* Hypervisor System Trap Register */
-> +	HACR_EL2,	/* Hypervisor Auxiliary Control Register */
-> +	TTBR0_EL2,	/* Translation Table Base Register 0 (EL2) */
-> +	TTBR1_EL2,	/* Translation Table Base Register 1 (EL2) */
-> +	TCR_EL2,	/* Translation Control Register (EL2) */
-> +	VTTBR_EL2,	/* Virtualization Translation Table Base Register */
-> +	VTCR_EL2,	/* Virtualization Translation Control Register */
-> +	SPSR_EL2,	/* EL2 saved program status register */
-> +	ELR_EL2,	/* EL2 exception link register */
-> +	AFSR0_EL2,	/* Auxiliary Fault Status Register 0 (EL2) */
-> +	AFSR1_EL2,	/* Auxiliary Fault Status Register 1 (EL2) */
-> +	ESR_EL2,	/* Exception Syndrome Register (EL2) */
-> +	FAR_EL2,	/* Hypervisor IPA Fault Address Register */
+Thanks for the explanation and the PCS pointer. I guess doing the lazy
+saving scheme in the syscall handler is a lot more painful (faults etc.)
+and it's a user-only ABI/PCS, so we shouldn't tie the kernel into it.
 
-The comment for the FAR_EL2 register seems incorrect. As per D13.2.41
-FAR_EL2, Fault Address Register (EL2).
+Given that Linux doesn't plan to use the ZA registers itself, in most
+cases it won't need to restore anything. But we still need to save the
+ZA registers on context switch in case the thread wakes up on a
+different CPU. How often do you reckon would the user do a syscall with
+active ZA?
 
-Miguel
+Anyway, I'll go through the other patches and get back to the ABI doc
+later, once I understand the kernel implementation better.
 
+> > > +  as normal.
+> 
+> > What does that mean? Is this as per the sve.rst doc (unspecified but
+> > zeroed in practice)?
+> 
+> Yes, we will exit streaming mode and proceed as per sve.rst and the rest
+> of the ABI.
+
+So in this case we consider the syscall interface as non-streaming (as
+per the PCS terminology). Should we require that the PSTATE.SM is
+cleared by the user as well? Alternatively, we could make it
+streaming-compatible and just preserve it. Are there any drawbacks?
+kernel_neon_begin() could clear SM if needed.
+
+> > > +* Neither the SVE registers nor ZA are used to pass arguments to or receive
+> > > +  results from any syscall.
+> > > +
+> > > +* On creation fork() or clone() the newly created process will have PSTATE.SM
+> > > +  and PSTATE.ZA cleared.
+> 
+> > This looks slightly inconsistent with the first bullet point on ZA being
+> > preserved on syscalls. Why do these differ?
+> 
+> Largely just because it's more complicated to implement copying the ZA
+> backing store for this and it seemed more likely that someone would be
+> surprised by a new process getting stuck carrying a potentially large
+> copy of ZA around that it was unaware of than that someone would
+> actually want that to happen.  It's not a particularly strongly held
+> opinon.
+
+If PSTATE.ZA is valid and the user does a fork() (well, implemented as
+clone()), normally it expects a nearly identical state in the child.
+With clone() if a new thread is created, we likely don't need the
+additional ZA state. We got away with having to think about this for
+SVE as the state is lost on syscall. Here we risk having a vaguely
+defined ABI - fork() is disabled on arm64 for example but we do have
+clone() and clone3().
+
+Still thinking about this but maybe we could do something like always
+copy the ZA state unless CLONE_VM is passed for example. It is
+marginally more precise.
+
+> > > +[4] ARM IHI0055C
+> > > +    http://infocenter.arm.com/help/topic/com.arm.doc.ihi0055c/IHI0055C_beta_aapcs64.pdf
+> > > +    http://infocenter.arm.com/help/topic/com.arm.doc.subset.swdev.abi/index.html
+> > > +    Procedure Call Standard for the ARM 64-bit Architecture (AArch64)
+> 
+> > The second link no longer works. I also couldn't find any reference to
+> > [4] but there's a lot of text to scan, so I may have missed it.
+> 
+> We don't referenced it, it's just carried over from SVE.
+
+So I guess we can drop them from this doc.
+
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
