@@ -2,54 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA22C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 17:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 367E2C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 17:11:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A913740C02;
-	Fri, 11 Feb 2022 12:02:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91BCA49F38;
+	Fri, 11 Feb 2022 12:11:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h07vbILEIHIo; Fri, 11 Feb 2022 12:02:28 -0500 (EST)
+	with ESMTP id 3zQr4jgtiPOd; Fri, 11 Feb 2022 12:11:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DB4449F5D;
-	Fri, 11 Feb 2022 12:02:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E080149EE4;
+	Fri, 11 Feb 2022 12:11:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5850049F49
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 12:02:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C04FF40B41
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 12:11:21 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PwZw6DagMni4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Feb 2022 12:02:26 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D980249F0E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 12:02:25 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 4180CB82A9E;
- Fri, 11 Feb 2022 17:02:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3804C340E9;
- Fri, 11 Feb 2022 17:02:19 +0000 (UTC)
-Date: Fri, 11 Feb 2022 17:02:16 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v11 06/40] arm64/sme: Provide ABI documentation for SME
-Message-ID: <YgaWmP+P7v9b2lLz@arm.com>
-References: <20220207152109.197566-1-broonie@kernel.org>
- <20220207152109.197566-7-broonie@kernel.org>
- <YgVaTounTtunlGU6@arm.com> <YgVrbc4fFrA0Vjh2@sirena.org.uk>
+ with ESMTP id H1JAYgZ2Mdzx for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Feb 2022 12:11:20 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F610408BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 12:11:20 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1644599479;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+fH+egNgtrcTN/yo9SnJEosgMHxBzskBNmKpy4+ujzU=;
+ b=g9d44WAjUQIf0RQ446oky42MOIMkrnJ5+PkDWXZOm7Migq8zxYlBuoCN4fVISsUlv+4brf
+ zXaegeRWm6TDAFE6OrYJje+f0fsgfTfbBEyQiCO+kDAt4O9Qd+96V9KQHqLBhlZcKy03WJ
+ udMGj8Kg8AjHYNA02MrF/vo3mUpL6w0=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-652-307ITZqVOn6qkZ03D8pX6g-1; Fri, 11 Feb 2022 12:11:18 -0500
+X-MC-Unique: 307ITZqVOn6qkZ03D8pX6g-1
+Received: by mail-ej1-f70.google.com with SMTP id
+ q3-20020a17090676c300b006a9453c33b0so4338598ejn.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 09:11:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=+fH+egNgtrcTN/yo9SnJEosgMHxBzskBNmKpy4+ujzU=;
+ b=JasN9XoUME+i0MlqjxSYTvahgIcaAs1JAeU5KPIhdnc6zCnrh+TPNS+VsZfMJbh/ko
+ z4xRgFdF85pWY2zlbCLUll/Xr2rfSDJIzrApnTLsF/H8gnqTbtyoI22j7vyyc/R96k6R
+ p8gIZH7hC4594eQFCumlUnWT0D5EZadn2AyHqeamVWe8dc24O1iKheSrIOH5qLjR3oul
+ 0Rq6xr4UHMZpPtm/CGx+f+JuoBfyWNre9J5uR5gWTDotuRcmeieGjxU9Gf06leofzRze
+ 7FqBfTwNmrtFTJzJAem6J66yBCOaXeRXbOQa5/zHbuKtYLNb0TYDJ5RJKqHErfEkZkQN
+ 5WYg==
+X-Gm-Message-State: AOAM53272Es1eB/H1y75Sa8WHtIbexFVl4OjlKMTqNfexoy+Dk8CKv+S
+ WUwq+0slbiumRmD5Q4S7ApQugSwSj1DaHHW6u96IzBja+IkmoZXeZJwE6hdfeRBzpk/koZcuS3R
+ 55i0yIdtwvNp0Qg8rdNFyj816
+X-Received: by 2002:aa7:c418:: with SMTP id j24mr2924132edq.451.1644599477487; 
+ Fri, 11 Feb 2022 09:11:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwpwFcUYYNnkvRcA/m4GHfj0uOwr5SJjb7uoU4Dl3Wm/sXyNsM619P3/nsOD/l0UxZdqTWSEg==
+X-Received: by 2002:aa7:c418:: with SMTP id j24mr2924106edq.451.1644599477274; 
+ Fri, 11 Feb 2022 09:11:17 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045?
+ ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+ by smtp.googlemail.com with ESMTPSA id s16sm9313882edy.70.2022.02.11.09.11.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 11 Feb 2022 09:11:16 -0800 (PST)
+Message-ID: <e84b11cc-5961-f8a2-78cb-a3861debe82d@redhat.com>
+Date: Fri, 11 Feb 2022 18:11:03 +0100
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YgVrbc4fFrA0Vjh2@sirena.org.uk>
-Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>, Marc Zyngier <maz@kernel.org>,
- Shuah Khan <skhan@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Salil Akerkar <Salil.Akerkar@arm.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.17, take #3
+To: Marc Zyngier <maz@kernel.org>
+References: <20220211111129.1180161-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220211111129.1180161-1-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -61,120 +99,18 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Feb 10, 2022 at 07:45:49PM +0000, Mark Brown wrote:
-> On Thu, Feb 10, 2022 at 06:32:46PM +0000, Catalin Marinas wrote:
-> > On Mon, Feb 07, 2022 at 03:20:35PM +0000, Mark Brown wrote:
-> > > +4.  System call behaviour
-> > > +-------------------------
-> 
-> > > +* On syscall PSTATE.ZA is preserved, if PSTATE.ZA==1 then the contents of the
-> > > +  ZA matrix are preserved.
-> 
-> > Sorry if this was discussed. What is the rationale for preserving the ZA
-> > registers on syscall? We don't do this for the top part of the Z
-> > registers.
-> 
-> In both cases it's mirroring the expected PCS which is that for normal
-> functions they must be called with streaming mode disabled, the high
-> bits of Z may be changed and there is a lazy saving scheme for ZA.  The
-> handling of the Z registers falls out of a combination of the fact that
-> the low bits are shared with the V registers and a desire to
-> interoperate with binaries that are only aware of FPSIMD.
-> 
-> See:
-> 
->   https://github.com/rsandifo-arm/abi-aa/blob/sme-aapcs64/aapcs64/aapcs64.rst
-> 
-> for the PCS (it's an open pull request on the AAPCS), if we disable ZA
-> we should really cooperate with the lazy save scheme for ZA in section
-> 6.5 which would involve writing to userspace buffers.  Given that we
-> need to support preserving ZA for cases where userspace is preempted
-> it's not really much effort to do that, if userspace doesn't want the
-> cost it can disable ZA before doing a syscall and it means that syscalls
-> don't push userspace code that would otherwise not do anything with ZA
-> to have problems interoperating with the lazy saving scheme.
-> 
-> If we don't preserve ZA then userspace will be forced to save it when
-> enabled which increases overall costs, if we do preserve ZA then it's no
-> more expensive for the kernel to save it than userspace, we avoid the
-> cost of restoring in the case where return directly to userspace without
-> context switching and if we do future work to save more lazily then we
-> may be able to avoid some of the saves.
+On 2/11/22 12:11, Marc Zyngier wrote:
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.17-3
 
-Thanks for the explanation and the PCS pointer. I guess doing the lazy
-saving scheme in the syscall handler is a lot more painful (faults etc.)
-and it's a user-only ABI/PCS, so we shouldn't tie the kernel into it.
+Pulled, thanks.
 
-Given that Linux doesn't plan to use the ZA registers itself, in most
-cases it won't need to restore anything. But we still need to save the
-ZA registers on context switch in case the thread wakes up on a
-different CPU. How often do you reckon would the user do a syscall with
-active ZA?
+Paolo
 
-Anyway, I'll go through the other patches and get back to the ABI doc
-later, once I understand the kernel implementation better.
-
-> > > +  as normal.
-> 
-> > What does that mean? Is this as per the sve.rst doc (unspecified but
-> > zeroed in practice)?
-> 
-> Yes, we will exit streaming mode and proceed as per sve.rst and the rest
-> of the ABI.
-
-So in this case we consider the syscall interface as non-streaming (as
-per the PCS terminology). Should we require that the PSTATE.SM is
-cleared by the user as well? Alternatively, we could make it
-streaming-compatible and just preserve it. Are there any drawbacks?
-kernel_neon_begin() could clear SM if needed.
-
-> > > +* Neither the SVE registers nor ZA are used to pass arguments to or receive
-> > > +  results from any syscall.
-> > > +
-> > > +* On creation fork() or clone() the newly created process will have PSTATE.SM
-> > > +  and PSTATE.ZA cleared.
-> 
-> > This looks slightly inconsistent with the first bullet point on ZA being
-> > preserved on syscalls. Why do these differ?
-> 
-> Largely just because it's more complicated to implement copying the ZA
-> backing store for this and it seemed more likely that someone would be
-> surprised by a new process getting stuck carrying a potentially large
-> copy of ZA around that it was unaware of than that someone would
-> actually want that to happen.  It's not a particularly strongly held
-> opinon.
-
-If PSTATE.ZA is valid and the user does a fork() (well, implemented as
-clone()), normally it expects a nearly identical state in the child.
-With clone() if a new thread is created, we likely don't need the
-additional ZA state. We got away with having to think about this for
-SVE as the state is lost on syscall. Here we risk having a vaguely
-defined ABI - fork() is disabled on arm64 for example but we do have
-clone() and clone3().
-
-Still thinking about this but maybe we could do something like always
-copy the ZA state unless CLONE_VM is passed for example. It is
-marginally more precise.
-
-> > > +[4] ARM IHI0055C
-> > > +    http://infocenter.arm.com/help/topic/com.arm.doc.ihi0055c/IHI0055C_beta_aapcs64.pdf
-> > > +    http://infocenter.arm.com/help/topic/com.arm.doc.subset.swdev.abi/index.html
-> > > +    Procedure Call Standard for the ARM 64-bit Architecture (AArch64)
-> 
-> > The second link no longer works. I also couldn't find any reference to
-> > [4] but there's a lot of text to scan, so I may have missed it.
-> 
-> We don't referenced it, it's just carried over from SVE.
-
-So I guess we can drop them from this doc.
-
--- 
-Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
