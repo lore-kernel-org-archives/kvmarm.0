@@ -2,75 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFACC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 10 Feb 2022 21:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D455CC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Feb 2022 05:04:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E6CD4087B;
-	Thu, 10 Feb 2022 16:55:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5186149F3E;
+	Fri, 11 Feb 2022 00:04:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Gg8B6hEo+nya; Thu, 10 Feb 2022 16:55:42 -0500 (EST)
+	with ESMTP id 1+FKEy3+1Hu9; Fri, 11 Feb 2022 00:04:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5899340B9F;
-	Thu, 10 Feb 2022 16:55:41 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CBEF49F2C;
+	Fri, 11 Feb 2022 00:04:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85DAC4291D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:48:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93AEC49F0B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 00:04:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jsbz476pYIM5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Feb 2022 14:48:40 -0500 (EST)
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com
- [209.85.208.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE1314141A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 14:48:40 -0500 (EST)
-Received: by mail-lj1-f181.google.com with SMTP id k18so9482464lji.12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 11:48:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ with ESMTP id l64id8LxP7jS for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Feb 2022 00:04:31 -0500 (EST)
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com
+ [209.85.216.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66E1249EF3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Feb 2022 00:04:31 -0500 (EST)
+Received: by mail-pj1-f53.google.com with SMTP id
+ v5-20020a17090a4ec500b001b8b702df57so10827094pjl.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Feb 2022 21:04:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mp6/zsAuzd6lQaBPLCwcBd2CC2OBncN9PY8Mg62kvT0=;
- b=pwBCi1NjwIEa1M4QRfRcZP6qJhbNCa37epiBEiqNO1eOZSSMj2Ni2Zf2DViQ7slU6R
- Gh91ZuoUvSsRnKLyIRGT8hCU1qr4nO0UlogiZYl9ouFSFCgu/tutAbra1kz1q69Tz7AC
- gHH8S1Rv+jo5cI7Yx3ENQnb1GvsYIGXVoaxmCAsOKlTQBMYioxlnU2xRBVlneAI8/7mM
- 3nWg6zJFNErIr70PvEsAOxk+UGpv6iCR+YfI+/49Pqlud3R0SdhBlwA98qcW9w+CK4Uh
- O46at5ccWRzyTB92gztTKDyxPz8//dnIKX2YpN43w6cz4ujr2BXXsbze89UVh5HHJ51e
- Fpfg==
+ :cc; bh=hafp+SZmlpr9AIwlLC0AjbdundomKkMQTM3i7h5hOko=;
+ b=HEmqti9TBXPB3AgN69donMmH29Y5xqziF2WLDQcCD96zK0fU5P6wypu/8lgYF25myR
+ di+zV3FTrLjipVxiPY3X97CT5YE0pRdBQxNXOuSNGi/8pzZeZYIlHFcCB5Hlm0Q9FWSm
+ qnuH2jYgA9ahhyiMcZ7St/2u2UiHo17yD9ZKPYWJFtj72/Vu26fHu6/3PGqB32j481UI
+ Z3isYpTw7Hcq35PSpqRSkqualueaMF/Kfv9Mx5P4VYlO5OgpNLs+GQqoE8okm9BHvjPx
+ YlSuNiDxiaWm5eDr7gcCdbpie6pq/crRlk5RMcnwa/TJwY+A2h0HoD/jPoeOzspyyeNb
+ LUFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=mp6/zsAuzd6lQaBPLCwcBd2CC2OBncN9PY8Mg62kvT0=;
- b=yLAwcJycRpnRZ5zdUVR8YxKzni/Kk8VzerZsUF1SDRHWQLFzcxsRWcTU4oG8fnfPHf
- RXe6gFdlm5zXnt2sJgSrfPoTtC1lZOM67cQk4MQBuYbqySbiQIUucLjcHefeTR2KgK6K
- x0427RuFyQvXbhfTkoZqptODxQXPwrYHQVX8OMPrSVrd5cpssboqSAXkchWtviaBWpWm
- JKW1TqRtwAkgqYBbCZRW+Q8bR7B8Ox1DNdkZE8BhXQSleDrDmGOia7AIqERYWk6TPoyz
- NWYxMP5+VSxoyJWInaGbMY0tVa8OkZ0VdlH8iEVzpTSkgkNlw8aNKX4rSyVkLBZpjDLq
- vRog==
-X-Gm-Message-State: AOAM532W4jw01EaaLDKRVEwC7ruSZ5mfki2xag35iySo69RtA5E+Ldiv
- YEGg53vtnps/CeRGmeVyH0hRVdlCL8Y94PxH6fw=
-X-Google-Smtp-Source: ABdhPJwVhhT91vjuEGyGF679QPPxcZTU0sy8pBOv1n6AzbZRSeIMO0+dfxulP248CdtHbx03SnvyZthnuzdyWqOJMuU=
-X-Received: by 2002:a2e:9149:: with SMTP id q9mr3751383ljg.36.1644522519388;
- Thu, 10 Feb 2022 11:48:39 -0800 (PST)
+ bh=hafp+SZmlpr9AIwlLC0AjbdundomKkMQTM3i7h5hOko=;
+ b=UgYG12euISjwtU+IGCgiMlTWuIsyxSoRl5uGlpPAPmH81wZ0xEM9v1/yxdYxAbwTRz
+ ueEcaz9lpk0qYX87NfIz31iReqWX4lGaecPKbnPuh25cFmyaZJsVbqV1JrjO2gErnvlA
+ tik2z8y+Tf1IqZaZC84nxoJdVuOW2UX0bAxqulLb+m4XObf4+Od7KKo0uBUiPlMgExqu
+ i6BeCf23J+aNs2taHWw+4eW5DSG0C+raWhXu7lScHMml8xSlPJkno5BEnY5LMOqh32ez
+ Z09bbHeISPCjNShFkxdVLIdUB7kQlZJNwi5SGTT+Sso4E0QHeJ3snXiLzvCtTpeVdMUF
+ VU8g==
+X-Gm-Message-State: AOAM533qfmYWXx2qiiauvIBFtWNYGABxCvKRznsNtr9Xh5rLo8+ryUJl
+ uAhC07KhP4wGSGV5bHhkgJxYwuFoQlGbRWznAmmurg==
+X-Google-Smtp-Source: ABdhPJxVpz+4mZJs01nTXHzISx4FfZlba+M0gcEsKqH63dBrGFwxdQMBlt246gsdjFdx9ihmmFqnpFYoybH0AaYSP78=
+X-Received: by 2002:a17:90b:3c6:: with SMTP id
+ go6mr912970pjb.230.1644555870192; 
+ Thu, 10 Feb 2022 21:04:30 -0800 (PST)
 MIME-Version: 1.0
-References: <20220210150943.1280146-1-alexandru.elisei@arm.com>
- <YgVKmjBnAjITQcm+@google.com> <YgVPPCTJG7UFRkhQ@monolith.localdoman>
- <CAEDJ5ZSR=rw_ALjBcLgeVz9H6TS67eWvZW2SvGTJV468WjgyKw@mail.gmail.com>
- <YgVpJDIfUVzVvFdx@google.com>
-In-Reply-To: <YgVpJDIfUVzVvFdx@google.com>
-From: Zixuan Wang <zxwang42@gmail.com>
-Date: Thu, 10 Feb 2022 11:48:03 -0800
-Message-ID: <CAEDJ5ZRkuCbmPzZXz0x2XUXqjKoi+O+Uq_SNkNW_We2mSv4aRg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 0/4] configure changes and rename
- --target-efi
-To: Sean Christopherson <seanjc@google.com>
-X-Mailman-Approved-At: Thu, 10 Feb 2022 16:55:40 -0500
-Cc: thuth@redhat.com, kvm list <kvm@vger.kernel.org>,
- kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>,
- Varad Gautam <varad.gautam@suse.com>
+References: <20220118041923.3384602-1-reijiw@google.com>
+ <87a6f15skj.wl-maz@kernel.org>
+ <CAAeT=FwjcgTM0hKSERfVMYDvYWqdC+Deqd=x2xT=-Zymb6SLtA@mail.gmail.com>
+ <875ypo5jqi.wl-maz@kernel.org>
+ <CAAeT=FwF=agQH-2u0fzGL4eUzz5-=6M=zwXiaxyucPf+n_ihxQ@mail.gmail.com>
+ <87wni33td7.wl-maz@kernel.org>
+In-Reply-To: <87wni33td7.wl-maz@kernel.org>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Thu, 10 Feb 2022 21:04:14 -0800
+Message-ID: <CAAeT=FzGP6jcsDbhZsNZVCUib8UQ4zc+y6s0TrsaKjAKx9WSWg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] KVM: arm64: mixed-width check should be skipped
+ for uninitialized vCPUs
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,50 +90,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Feb 10, 2022 at 11:36 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Feb 10, 2022, Zixuan Wang wrote:
-> > On Thu, Feb 10, 2022 at 11:05 AM Alexandru Elisei
-> > <alexandru.elisei@arm.com> wrote:
-> > >
-> > > Hi,
-> > >
-> > > On Thu, Feb 10, 2022 at 05:25:46PM +0000, Sean Christopherson wrote:
-> > > > On Thu, Feb 10, 2022, Alexandru Elisei wrote:
-> > > > > I renamed --target-efi to --efi-payload in the last patch because I felt it
-> > > > > looked rather confusing to do ./configure --target=qemu --target-efi when
-> > > > > configuring the tests. If the rename is not acceptable, I can think of a
-> > > > > few other options:
-> > > >
-> > > > I find --target-efi to be odd irrespective of this new conflict.  A simple --efi
-> > > > seems like it would be sufficient.
-> > > >
-> > > > > 1. Rename --target to --vmm. That was actually the original name for the
-> > > > > option, but I changed it because I thought --target was more generic and
-> > > > > that --target=efi would be the way going forward to compile kvm-unit-tests
-> > > > > to run as an EFI payload. I realize now that separating the VMM from
-> > > > > compiling kvm-unit-tests to run as an EFI payload is better, as there can
-> > > > > be multiple VMMs that can run UEFI in a VM. Not many people use kvmtool as
-> > > > > a test runner, so I think the impact on users should be minimal.
-> > > >
-> > > > Again irrespective of --target-efi, I think --target for the VMM is a potentially
-> > > > confusing name.  Target Triplet[*] and --target have specific meaning for the
-> > > > compiler, usurping that for something similar but slightly different is odd.
-> > >
-> > > Wouldn't that mean that --target-efi is equally confusing? Do you have
-> > > suggestions for other names?
-> >
-> > How about --config-efi for configure, and CONFIG_EFI for source code?
-> > I thought about this name when I was developing the initial patch, and
-> > Varad also proposed similar names in his initial patch series [1]:
-> > --efi and CONFIG_EFI.
->
-> I don't mind CONFIG_EFI for the source, that provides a nice hint that it's a
-> configure option and is familiar for kernel developers.  But for the actually
-> option, why require more typing?  I really don't see any benefit of --config-efi
-> over --efi.
+Hi Marc,
 
-I agree, --efi looks better than --target-efi or --config-efi.
+> > > Also, we really should turn all these various bits in the kvm struct
+> > > into a set of flags. I have a patch posted there[1] for this, feel
+> > > free to pick it up.
+> >
+> > Thank you for the suggestion. But, kvm->arch.el1_reg_width is not
+> > a binary because it needs to indicate an uninitialized state.  So, it
+> > won't fit perfectly with kvm->arch.flags, which is introduced by [1]
+> > as it is. Of course it's feasible by using 2 bits of the flags though...
+>
+> 2 bits is what I had in mind (one bit to indicate that it has already
+> been initialised, another to carry the actual width).
+
+Understood. Then, I will take the patch and will work on v3.
+Thank you for all the comments!
+
+Regards,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
