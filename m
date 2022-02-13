@@ -2,76 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B873C433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 13 Feb 2022 12:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C84C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 13 Feb 2022 18:36:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B21D74291D;
-	Sun, 13 Feb 2022 07:57:26 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCA034B091;
+	Sun, 13 Feb 2022 13:36:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PM-WMgPhmTzj; Sun, 13 Feb 2022 07:57:25 -0500 (EST)
+	with ESMTP id 4GM0TVorRT2N; Sun, 13 Feb 2022 13:36:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E967411C7;
-	Sun, 13 Feb 2022 07:57:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A78C49ECA;
+	Sun, 13 Feb 2022 13:36:03 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7415D411C7
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Feb 2022 07:57:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2189D408F4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Feb 2022 00:05:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0TRtPt1NXiYx for <kvmarm@lists.cs.columbia.edu>;
- Sun, 13 Feb 2022 07:57:22 -0500 (EST)
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com
- [209.85.221.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 55131411BD
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Feb 2022 07:57:22 -0500 (EST)
-Received: by mail-wr1-f49.google.com with SMTP id q7so22625069wrc.13
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Feb 2022 04:57:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2c0SI7m7ZB+m4RaXReFLA6+iDUdiDg4G2NOqfn4wgmQ=;
- b=aIWlNEwWaI2UJKNAmkRKc6aBrQm3cGtJHiz2aA0Z7odhnA3B1av2838F3V38ouojFQ
- rQJIUHmH7pK3pIlfJvyojEXJ/jrxYmrHkcXH9+jHkcspcl8lzYfAjGhisTB91qaFWZ1W
- 2BwwhmEX4y9/G17HyrYXTsfnFrYzQ1J6IZAyF2541fRZOA9GOZ0fP0FRfSDDIae9Bklr
- yXZadDm4hD8lk3qwt2ny3UlFloyTzA5v1upVlSIMM2Hl9jvykTVNK31f6Nh473mTdALw
- bVLtsY5lBiBenxv4FUbogTTfxRPiTSKH1Kmx0i8KUAHWT51UFIXTHJ6GjoLWC/WgDprv
- /C9A==
+ with ESMTP id a-wpgTjhVEur for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 13 Feb 2022 00:05:39 -0500 (EST)
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com
+ [209.85.210.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 432AB404FA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Feb 2022 00:05:39 -0500 (EST)
+Received: by mail-pf1-f174.google.com with SMTP id z16so1620882pfh.3
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Feb 2022 21:05:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=message-id:date:mime-version:user-agent:subject:content-language:to
+ :references:from:cc:in-reply-to:content-transfer-encoding;
+ bh=SvASqGw57nnd+VLnYfU88dyRPvfuj1Dziis/gpDvPDQ=;
+ b=XBfoxrRuIu3fmcbhjJ9kr7VMkCaBcJPqOurHmRK/FiCs/ms8WaQX1+mimEBoUIpFTy
+ xJbVxkqyJGJ+3UaCl4oKwzFlzG9jWw5b1pRVl2DvbkLXt03ATv+tkT6D1Dpp0xtWy8xv
+ G/w5f5rX2k0b2B82um9zrqxd9V3zkCE+/AiXXRm+uP0S7fTIPQVH6S1pVpdsAYSvtmCf
+ lo3U4Guzx78b+GBEBIboxzMUhDuEKvceAKQ6rXaYq6Xw5WUPmZyzrQhI3aq0IwY4C3x+
+ kXP3BMcSfvyqPG/yUZpOrSqvpzoywuA8txl+CJiOghHDWc9QTtX3iOZOoh62DGcofK60
+ uJIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2c0SI7m7ZB+m4RaXReFLA6+iDUdiDg4G2NOqfn4wgmQ=;
- b=K6dmw3Z0WNfeJtvIMTjkq4YOj+6if6SVj6Xm7g6H21FZroF0rSF1KUh2o6BBeq1/4k
- YQZJcKV0RbGZ/9LItqoBX1wjixIkrXrpZhCDdniVaazXw+48MchDgYzixeJcgRpbmyUC
- 05dQkRw+fHnpQxh4V0cvIZlhJQqq0hgYvdZ4wbmmjEBDsrQIoA8qRUSlXWhWYWeFhA+R
- axs+7EQh9U2/956gwcBED09FeZmKkkZXt04JxxvRdquAGd8pmG0Ma6vcvoHuYa+J4ZZn
- 4W1lk/3qhC7ADKu8fVUctJS/OI0XWHBUZ5oOITi4ZxFNHb6hrtKHy3lMagM0ByCVxF8u
- oUXQ==
-X-Gm-Message-State: AOAM533BPNHaZvTsjfvOQ36KyQY18qpzlmwQqNsjSAsTnMeXVG4g+M5Y
- 2B8Y4de+xa9LXRKK9dc4iugZdXwZ331m5Dmhoy/O2g==
-X-Google-Smtp-Source: ABdhPJyhWkmqOt5Qv5V8sVaUI/z6NPBi3j81Oxw8fxbdgicbVi/hBwNisw0rORYtSXJDU+bZsM9nUw4+Wq9rLZHPZF4=
-X-Received: by 2002:a5d:62c4:: with SMTP id o4mr7776005wrv.319.1644757041279; 
- Sun, 13 Feb 2022 04:57:21 -0800 (PST)
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+ :content-language:to:references:from:cc:in-reply-to
+ :content-transfer-encoding;
+ bh=SvASqGw57nnd+VLnYfU88dyRPvfuj1Dziis/gpDvPDQ=;
+ b=S2Mqhe/yeBasQv9bWOU1oe0OFZ83I6zzArdRg1iao3EFx35vCzvul5yLgulqhrYwWa
+ vVZVZgifiNxbHR6hjvfRH5+CEBRaLsFWJ9jUz30T8avWfo3uLsWTbH5JNBtoux8+t53w
+ 82Xh487Q3gyLkfKKb7MSJxvpba2D/XSXyU0EJ195qKZ/hCFmF5+2y5LMRbO0VfvVcjf3
+ Xk/teAPV4h3s9xmVwNe8pXlKokLRYym0eH0LYlCyMl0QBPH8r2Ks3W8rx15jSzI3xKXs
+ XlIOnHji/k5oqT23F8p0vnEzB2TVkAm+/8QPk/FvwfjTdJdp0OelVYIr9zIpynwx8FuA
+ M+gA==
+X-Gm-Message-State: AOAM53116GZPPD216RSonNg6uzwWC0AAU3ohHn7BxossVHt6/fsPMAlx
+ 3l+t/qlVNzUCyfJXID40vn2eXBPpKPA=
+X-Google-Smtp-Source: ABdhPJyB1aKZywkCHJZjJmET0O2A221R61VkLCC7y5fqq25Y8mxu103Gzp1+U5B1a7FbncablDHLaQ==
+X-Received: by 2002:a05:6a00:98e:: with SMTP id
+ u14mr8601475pfg.12.1644728738382; 
+ Sat, 12 Feb 2022 21:05:38 -0800 (PST)
+Received: from [192.168.66.3] (p912131-ipoe.ipoe.ocn.ne.jp. [153.243.13.130])
+ by smtp.gmail.com with ESMTPSA id
+ l8sm34061282pfc.187.2022.02.12.21.05.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 12 Feb 2022 21:05:37 -0800 (PST)
+Message-ID: <3f4f5e98-fcb8-bf4d-e464-6ad365af92f8@gmail.com>
+Date: Sun, 13 Feb 2022 14:05:33 +0900
 MIME-Version: 1.0
-References: <20220120123630.267975-1-peter.maydell@linaro.org>
- <20220120123630.267975-19-peter.maydell@linaro.org>
- <3f4f5e98-fcb8-bf4d-e464-6ad365af92f8@gmail.com>
- <87iltjxdz6.wl-maz@kernel.org>
- <CAFEAcA9yR4=PNCGJk6iMEq0EHejwwt-gQJfvByEk-EN6ER5o_g@mail.gmail.com>
- <CAMVc7JWUm7v6gt48TP+ugzEeHwo6FA66TeE3h3fqyHmHsShoig@mail.gmail.com>
-In-Reply-To: <CAMVc7JWUm7v6gt48TP+ugzEeHwo6FA66TeE3h3fqyHmHsShoig@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 13 Feb 2022 12:57:10 +0000
-Message-ID: <CAFEAcA817oN+UNJC=o-GTAXo0UypgsTkm7MvcLKDSR-9amkPXA@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
 Subject: Re: [PULL 18/38] hw/arm/virt: Honor highmem setting when computing
  the memory map
-To: Akihiko Odaki <akihiko.odaki@gmail.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- qemu Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@csgraf.de>,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu
+Content-Language: en-US
+To: Marc Zyngier <maz@kernel.org>
+References: <20220120123630.267975-1-peter.maydell@linaro.org>
+ <20220120123630.267975-19-peter.maydell@linaro.org>
+From: Akihiko Odaki <akihiko.odaki@gmail.com>
+In-Reply-To: <20220120123630.267975-19-peter.maydell@linaro.org>
+X-Mailman-Approved-At: Sun, 13 Feb 2022 13:36:01 -0500
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,40 +90,82 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, 13 Feb 2022 at 11:38, Akihiko Odaki <akihiko.odaki@gmail.com> wrote:
-> I found that it actually gets the available PA bit of the emulated CPU
-> when highmem=on. I used "cortex-a72", which can have more than 36
-> bits. I just simply switched to "host"; hvf didn't support "host" when
-> I set up my VM but now it does.
+On 2022/01/20 21:36, Peter Maydell wrote:
+> From: Marc Zyngier <maz@kernel.org>
+> 
+> Even when the VM is configured with highmem=off, the highest_gpa
+> field includes devices that are above the 4GiB limit.
+> Similarily, nothing seem to check that the memory is within
+> the limit set by the highmem=off option.
+> 
+> This leads to failures in virt_kvm_type() on systems that have
+> a crippled IPA range, as the reported IPA space is larger than
+> what it should be.
+> 
+> Instead, honor the user-specified limit to only use the devices
+> at the lowest end of the spectrum, and fail if we have memory
+> crossing the 4GiB limit.
+> 
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Message-id: 20220114140741.1358263-4-maz@kernel.org
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   hw/arm/virt.c | 10 +++++++---
+>   1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 62bdce1eb4b..3b839ba78ba 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1670,7 +1670,7 @@ static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>   static void virt_set_memmap(VirtMachineState *vms)
+>   {
+>       MachineState *ms = MACHINE(vms);
+> -    hwaddr base, device_memory_base, device_memory_size;
+> +    hwaddr base, device_memory_base, device_memory_size, memtop;
+>       int i;
+>   
+>       vms->memmap = extended_memmap;
+> @@ -1697,7 +1697,11 @@ static void virt_set_memmap(VirtMachineState *vms)
+>       device_memory_size = ms->maxram_size - ms->ram_size + ms->ram_slots * GiB;
+>   
+>       /* Base address of the high IO region */
+> -    base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> +    memtop = base = device_memory_base + ROUND_UP(device_memory_size, GiB);
+> +    if (!vms->highmem && memtop > 4 * GiB) {
+> +        error_report("highmem=off, but memory crosses the 4GiB limit\n");
+> +        exit(EXIT_FAILURE);
+> +    }
+>       if (base < device_memory_base) {
+>           error_report("maxmem/slots too huge");
+>           exit(EXIT_FAILURE);
+> @@ -1714,7 +1718,7 @@ static void virt_set_memmap(VirtMachineState *vms)
+>           vms->memmap[i].size = size;
+>           base += size;
+>       }
+> -    vms->highest_gpa = base - 1;
+> +    vms->highest_gpa = (vms->highmem ? base : memtop) - 1;
+>       if (device_memory_size > 0) {
+>           ms->device_memory = g_malloc0(sizeof(*ms->device_memory));
+>           ms->device_memory->base = device_memory_base;
 
-It's a bug that we accept 'cortex-a72' there. What should happen
-is something like:
- * we want to use the ID register values of a cortex-a72
- * QEMU's hvf layer should say "no, that doesn't match the actual
-   CPU we're running on", and give an error
+Hi,
+This breaks in a case where highmem is disabled but can have more than 4 
+GiB of RAM. M1 (Apple Silicon) actually can have 36-bit PA with HVF, 
+which is not enough for highmem MMIO but is enough to contain 32 GiB of RAM.
 
-This works correctly with KVM because there the kernel refuses
-attempts to set ID registers to values that don't match the host;
-for hvf the hvf APIs do permit lying to the guest about ID register
-values so we need to do the check ourselves.
+Where the magic number of 4 GiB / 32-bit came from? I also don't quite 
+understand what failures virt_kvm_type() had.
 
-(The other approach would be to check the ID register values
-and allow them to the extent that the host CPU actually has
-the support for the features they imply, so you could "downgrade"
-to a less capable CPU but not tell the guest it has feature X
-if it isn't really there. But this is (a) a lot more complicated
-and (b) gets into the swamp of trying to figure out how to tell
-the guest about CPU errata -- the guest needs to apply errata
-workarounds for the real host CPU, not for whatever the emulated
-CPU is. So "just reject anything that's not an exact match" is
-the easy approach.)
-
--- PMM
+Regards,
+Akihiko Odaki
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
