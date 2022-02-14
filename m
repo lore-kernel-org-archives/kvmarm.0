@@ -2,172 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95640C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 12:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C414C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 14:06:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F201549E5F;
-	Mon, 14 Feb 2022 07:39:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0096349F55;
+	Mon, 14 Feb 2022 09:06:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@oracle.com
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@oracle.onmicrosoft.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mfDdaugH1zhJ; Mon, 14 Feb 2022 07:39:44 -0500 (EST)
+	with ESMTP id cgugCc4G-aEk; Mon, 14 Feb 2022 09:06:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6C1C49E3C;
-	Mon, 14 Feb 2022 07:39:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 514B149E20;
+	Mon, 14 Feb 2022 09:06:50 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 80F8243482
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 07:39:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D9CB4120D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 09:06:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id on27yr9c2xuc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Feb 2022 07:39:42 -0500 (EST)
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com
- [205.220.177.32])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9047D40DE6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 07:39:42 -0500 (EST)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
- by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 21EB5gvl003692; 
- Mon, 14 Feb 2022 12:39:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=m8DZKp7RrG5AVXm8wy2phZIl5LvyoqoTzioQ3yDtl1s=;
- b=w91i93mlAbYrK3D4YwEAhoLFh9mJrAAborZrPzbSQ+I1V70i7VrIUMvS+FwIgL/4kx6E
- gbFfrbnrHRBP+W+ENyWbW/JfgcEhFbKB8zNpDT3uQa1J33s5M1Yk6eoKl1vbPxNR0nF6
- YQYX/1jZ43rdZ7RB718HKVDG7Rl12062mR6GasAS7RtD4G2TgTN7E/8tPI9UxynA+6aj
- PpStIwhPFy/G8lovRnGt2K7+0SW081VfFATrqiBMQBmZKNLnzwgv9iZZRdqWKYzuUBdH
- IS48nWXWBXVhHo6wP69cCxMTZ61AUqqB6O3E5MBw0rNoWhJDU+BqZ/GFqAZ2UHcMB8Ms Vg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by mx0b-00069f02.pphosted.com with ESMTP id 3e63ad4b7c-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 14 Feb 2022 12:39:11 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 21ECUfe5135005;
- Mon, 14 Feb 2022 12:39:10 GMT
-Received: from nam10-dm6-obe.outbound.protection.outlook.com
- (mail-dm6nam10lp2103.outbound.protection.outlook.com [104.47.58.103])
- by userp3030.oracle.com with ESMTP id 3e620vw8yv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 14 Feb 2022 12:39:10 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nayednLvwaal5kEojgNlV2dEWnrAUkndvU81z3WuMvpakQ/eD+CP8UyzG3dy0qHKhZR17ZXXT52llhZdDYFW1C474YXUaF42/SSTzFXyvnwPuhtOyH1hXpdnO753RQuBdbHikOmbr744JmLfz8qGYXC50j/bjtKyxXq3pylO1ADuDHaMglvUCCYYoNDu8oDVZQLVoQf802PPaZs4043KddO4/F7or6TdFaWZZC26SF6ACootCusU5taxpO61/PRjb1XqeVjCccnV8XFu3iMTN1hZckx/Wd+xdXesgzvtVrq/qh50CwYyTR3fddxYH1nt8pORZvrwda4HT7y7m6SLOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m8DZKp7RrG5AVXm8wy2phZIl5LvyoqoTzioQ3yDtl1s=;
- b=TtouQ3o3IWBEH7aaVIYtni0m9QJVD7oYdNizhbFbFfAwVoQ2sPQ8msKRPsjjC1eYSkWzo6hQYWHETHUpcwv4VzuQjLxRb026mAWnZucjFaBwies7TOGbozyos6UOqk5nN2w2oMm6oQBDE0t8zuPCq7MAKUnY359ODmTBJkogJAPrlD0JykZOUfdOB+JrJovTXoDSchaozZF3NCqFrz/gANvt9Qz9jeTR73RmINgzI3EkX5Gnejp71abChBwxWdjKU2mZoOCuiYD6Mz6PsVjwiA4w+1bw0AJVLzZFbbJpW1QRv3SqfVEkx1ezafbn9nOzlKs8b76B+LTTp0i430jGNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m8DZKp7RrG5AVXm8wy2phZIl5LvyoqoTzioQ3yDtl1s=;
- b=ye1BWmQMvw+9t7r+nOJJfQyIr7Z+keRhP7F8+g8AqjVBRdg/R1sWirmc0iEzkO1+QgX7aZqXEEQME987w8zb7+uFF4Bfx/Ho7W+zwKz6DiYWaDj+zEnZUPUjqj3U1BW0DoWwD5ZeVko1OeIwNgpqv1K8d6JmkpLBotI+RuxpzJk=
-Received: from PH0PR10MB5433.namprd10.prod.outlook.com (2603:10b6:510:e0::9)
- by BN8PR10MB3603.namprd10.prod.outlook.com (2603:10b6:408:b9::28) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4975.12; Mon, 14 Feb
- 2022 12:39:08 +0000
-Received: from PH0PR10MB5433.namprd10.prod.outlook.com
- ([fe80::3010:9c9e:e9d4:a6ab]) by PH0PR10MB5433.namprd10.prod.outlook.com
- ([fe80::3010:9c9e:e9d4:a6ab%4]) with mapi id 15.20.4975.019; Mon, 14 Feb 2022
- 12:39:06 +0000
-From: Miguel Luis <miguel.luis@oracle.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v6 06/64] KVM: arm64: nv: Add nested virt VCPU primitives
- for vEL2 VCPU state
-Thread-Topic: [PATCH v6 06/64] KVM: arm64: nv: Add nested virt VCPU primitives
- for vEL2 VCPU state
-Thread-Index: AQHYFEFOCTNNdqyqr02nPKJycKECW6yTFzGA
-Date: Mon, 14 Feb 2022 12:39:06 +0000
-Message-ID: <9724047B-0890-4C23-95CF-3AD553C4C63D@oracle.com>
-References: <20220128121912.509006-1-maz@kernel.org>
- <20220128121912.509006-7-maz@kernel.org>
-In-Reply-To: <20220128121912.509006-7-maz@kernel.org>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ac7060ab-8790-4cf1-63f8-08d9efb6fd63
-x-ms-traffictypediagnostic: BN8PR10MB3603:EE_
-x-microsoft-antispam-prvs: <BN8PR10MB3603B3188AEA6587493FF8AA91339@BN8PR10MB3603.namprd10.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cGG3ggj0GO/yxe7kF2+r3hBqczFKUv/LmY06DJInI/VAuHB6EtskbxsINik0/KSJcqX51L5hPVQq82B3nBBjnMul91BCk3Zq16jMth8Jqkh+AfDw9rPdWWzQ9dpvBNBiFxGXCgyTERcpWhHPoWHABjPCn/uoy3DNbUdSN13sOBllbosEIXXPXNZDHEvn5MCGA/Edhxx/ztu7nSf/KGspVXYya5XgqAipTzjIqt7t3QH9J07dlHh6kn33jftmq4WCHSX2d0qoEc0QCXAmI2arp2RdX5bE/XgmUS3iXBHQ7fbWO7QivWvVN7o3qSR2Pf4ROB8kHhZxcUrocFt00aCAFMCMRQS0DMZALQGyGRPf92gpD5zhLWvbOJBVaF+ixS3HlrTfdGto6tlqjudU5fcMfLHL3T+cXPY3czBySfeZVGLke0BZo33phTwfNjaOdeqVPleaeZkh4mAkjg1i5+HIX5tVBunXS4H+WxS9HCZxBJAojADrznc+jPivBXdd/sUyN3S2dYxatBZaWUlSlliTRJRgudmFfOgLwTRW19zrpoCbGYCv86rANv84kPTL2tNfna3GEV6ZiV4SEs8/vDzkDIXMyaleGM2R9ZQsAzmibxgKrbpQ87hA69NkfKDCRHw2/YvCeJtznI56EFpuuJroBMll4J6/u+Z/C8I/N5E2YOKxcLKgiGhknWKWhk9n2YD2XHi0k39SS619Eyn9i8rmjO+H5vwlWfNV5U0008vJww4=
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:PH0PR10MB5433.namprd10.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(13230001)(366004)(33656002)(2906002)(508600001)(71200400001)(6486002)(44832011)(7416002)(5660300002)(36756003)(38100700002)(38070700005)(316002)(66946007)(66476007)(76116006)(86362001)(4326008)(66556008)(8676002)(8936002)(66446008)(91956017)(64756008)(54906003)(6512007)(122000001)(2616005)(186003)(6916009)(6506007)(53546011)(45980500001);
- DIR:OUT; SFP:1101; 
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?iPeWqZQnhGeum4lNzAwH3wFVny7rAq/cNlQeLAJSDpsFV/AsBdu1CHdDVH2z?=
- =?us-ascii?Q?bbiDHmgxP9AlmJ3VizlJrxhdRzs/FZynFJtX7kcuarU6qjImqtXjdTCYqmmq?=
- =?us-ascii?Q?27hpctM/GYOgvtafRe5E1PkfkhVT/5V52yYCUfuupUbTSjN0yEpdkUS+IQQr?=
- =?us-ascii?Q?PI4ybWNDGU1nF4+ebl6pSllUY/Tj8o1rNCMwIcHKkGPAwmMY46s4Mr1RY8XF?=
- =?us-ascii?Q?WeKMQK70lBvezg208rLBkNoxzNLiyqjBc/rFTKpO3owbWIZX9nroH01HLAtF?=
- =?us-ascii?Q?8tscZPk/WpmeLAJU4HwiSN5BJ1jSmNg+YvwevMt1A8JnuNvg2U8Cca1ERPam?=
- =?us-ascii?Q?2elyX8YT+C9MTP6nuqkiBzavtEzp8udhrDHSHZkKfMaLOL8jFnBKoXdlh1A8?=
- =?us-ascii?Q?k0UIu/dDx49pKM1VnyDzUXu3pAh3ZsQOmyzIwPJVcplvZdYNIVWXkxxJfnsK?=
- =?us-ascii?Q?WkS/RZ1sPwPwEw7ea7MODrQF0vzo+7U3/3ybhlxMx4ZgBDLxPX+NHYpmcO+p?=
- =?us-ascii?Q?KoTaJ9PCtQ35x9t2mDqbfvHKwkb4vit+XC/G/M9cYjP5XwfcWDWb0wbxcaeh?=
- =?us-ascii?Q?5fp0gmVKeEcS66OhoRkSdf9RoaOg1moDrCGBHKaZVSfU4YbKjiWVWmtoC5oq?=
- =?us-ascii?Q?/ig5g+jk7l+Fx5OTAyUUb6c5Vwu7z0PIkh1zIBbB6T8Y1OnChJiy4fEgRjR0?=
- =?us-ascii?Q?f6aQV5398JxGEl7Gv0wMcPBmOr25KgTGe5dcTUN9DWYb5ku4R64/gJRrbIgs?=
- =?us-ascii?Q?o0/sslMdnetGfro82cZtbISl9gHQIFKwIiZGl26ut+nd2MMiq9bNCZeE1b7A?=
- =?us-ascii?Q?NUR03/sxuKiLs9WqLgf6mGq+rs2neONxZaZCDaLQvkNsNVYzQAHVRDSibTY8?=
- =?us-ascii?Q?uZZ1YYbv+1ytdW3HLRMGfpG3dDY16MxpjuN3VuH3mt7etmzh+3p/ft1US8P/?=
- =?us-ascii?Q?izVW6rxNoYPb1FLTLZ6yp+VwyeBkVt7TJPIBM39pU2U8xM47/lPZymfHZ643?=
- =?us-ascii?Q?uaGW7Mck+4d1rBGqbkttTchpKa3yoR1OCWwuz+1c1OSJEHN7EzdbUS+MkHKo?=
- =?us-ascii?Q?HIPwjgmSl4eInLQXKet8jTX7iCAoL9Aas0IkIUxuDJGTkFD6vZ+PofaFhpEU?=
- =?us-ascii?Q?hhdHU/zPVFqpeoZVp652hQ+RpaIwpBh9/hqAPYtU8lQS5bh8bs02D8cfMRgK?=
- =?us-ascii?Q?h+gvGqjqFIsSImoYBtlSn2KQ7+qwipndY1VkO2BCfXpF5YUdGaSwi1Gw7AXw?=
- =?us-ascii?Q?jd1EWKSuw3KC0o7+lQ8pG7wLeGPRsyNhe3IPEwOzgP8L/tltBabNUU2w5rLQ?=
- =?us-ascii?Q?OQ5/J6t6iHHqvDpclZXpqiCfvg33CmClH/h3MeH6a2Fv8DjLH+f/DrpRm1A0?=
- =?us-ascii?Q?ivGPOHRDBfcE/g6yNFrDCW6QlXd2Ip347qGLT4DjVVQeXX3i09cvaFK8efxI?=
- =?us-ascii?Q?PJkgHobShqEgiUo8XiZcierxEbQz5wcKc1mQCT/vnJfMNEu1KRGF3oO/RRDO?=
- =?us-ascii?Q?YGL99lCwh6yKybFEAoN2yncIOCRvs96rke3uvAedIH2ii8Nj06FfgHcS+1v1?=
- =?us-ascii?Q?i6Il0eknx1RwjoxM5iP2AZfwC3wU58st1OjKdcAKqrgFnEL3Quh0jNYg37ze?=
- =?us-ascii?Q?kj4un64chReYhCE1aHHp0Ce4WD/YjeTuU90otZTq2C3/esNe2cY3NWjwLqdz?=
- =?us-ascii?Q?ksdcOkMx2aIAUJC5tyoRsYk1rn8=3D?=
-Content-ID: <D4BE1007056E63408855C892345E9704@namprd10.prod.outlook.com>
-MIME-Version: 1.0
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB5433.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac7060ab-8790-4cf1-63f8-08d9efb6fd63
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Feb 2022 12:39:06.2777 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: r2XWdM1+BZ6eacpp6v6EOgm9pdT+/IzuRn2bda6QJO4wfudEr8DMusv2XMM9jyP92QHJK9HE2lQu6uA4zNfDTw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR10MB3603
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10257
- signatures=673431
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- mlxlogscore=999 bulkscore=0 spamscore=0 adultscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2201110000 definitions=main-2202140076
-X-Proofpoint-GUID: 2evxkv6KHpw6bZzyqOzcyteTmAfr2GAS
-X-Proofpoint-ORIG-GUID: 2evxkv6KHpw6bZzyqOzcyteTmAfr2GAS
-Cc: "kernel-team@android.com" <kernel-team@android.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- Andre Przywara <andre.przywara@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Chase Conklin <chase.conklin@arm.com>,
- "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
- Mihai Carabas <mihai.carabas@oracle.com>,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
- "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id 7+g5EzafHOB0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Feb 2022 09:06:48 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEDC840DFE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 09:06:47 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 2585DB80EA9;
+ Mon, 14 Feb 2022 14:06:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3150C340EE;
+ Mon, 14 Feb 2022 14:06:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1644847604;
+ bh=uUt6bE07NssIaYfZ1Wzc5VcSVVOyx1PQSGWXB+SwyNg=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=TTjhN2oQXHO/DPe8aypKoXxulEjAeg9gpvnVZ98AN1NH4isPapKOXXyyV6mDb7GhX
+ SbNHHxzhjn512Ou4zrxUTjx5KIbns+zuIDsKXiDTYayIv7JPf1DVZNHVyjBOnpwlxt
+ 5us9f6eMs18RID38v6oueyITdTp4U/j1/FtOFkWkT7K5k/03ZqjDFwFyncMlnmhQ48
+ 3rZDqhttac1LzYsBgP2rfA6efbI6zzBKVCNe794A4bmustR8jmoBpZglhSHOJcF9R1
+ ZLoRcBrINUI6hx91vkfpEKw7bKZvf5oQIv0ig6WeaKAmHtYPxoTyS4yKnsASNU6xO/
+ T9Km6girYxw3w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nJc02-007nP8-LH; Mon, 14 Feb 2022 14:06:42 +0000
+Date: Mon, 14 Feb 2022 14:06:41 +0000
+Message-ID: <87leyd4k5q.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH 4/7] KVM: arm64: Allocate guard pages near hyp stacks
+In-Reply-To: <20220210224220.4076151-5-kaleshsingh@google.com>
+References: <20220210224220.4076151-1-kaleshsingh@google.com>
+ <20220210224220.4076151-5-kaleshsingh@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, will@kernel.org, qperret@google.com,
+ tabba@google.com, surenb@google.com, kernel-team@android.com,
+ catalin.marinas@arm.com, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, ardb@kernel.org, mark.rutland@arm.com,
+ pasha.tatashin@soleen.com, joey.gouly@arm.com, pcc@google.com,
+ ascull@google.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, will@kernel.org,
+ Peter Collingbourne <pcc@google.com>, kernel-team@android.com,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>,
+ surenb@google.com, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -184,106 +93,102 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
-
-> On 28 Jan 2022, at 11:18, Marc Zyngier <maz@kernel.org> wrote:
+On Thu, 10 Feb 2022 22:41:45 +0000,
+Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> From: Christoffer Dall <christoffer.dall@arm.com>
+> From: Quentin Perret <qperret@google.com>
 > 
-> When running a nested hypervisor we commonly have to figure out if
-> the VCPU mode is running in the context of a guest hypervisor or guest
-> guest, or just a normal guest.
+> Allocate unbacked VA space underneath each stack page to ensure stack
+> overflows get trapped and don't corrupt memory silently.
 > 
-> Add convenient primitives for this.
+> The stack is aligned to twice its size (PAGE_SIZE), meaning that any
+> valid stack address has PAGE_SHIFT bit as 0. This allows us to easily
+> check for overflow in the exception entry without corrupting any GPRs.
 > 
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> [ Kalesh - Update commit text and comments,
+>            refactor, add overflow handling ]
+> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 > ---
-> arch/arm64/include/asm/kvm_emulate.h | 53 ++++++++++++++++++++++++++++
-> 1 file changed, 53 insertions(+)
+>  arch/arm64/kvm/hyp/nvhe/host.S   | 16 ++++++++++++++++
+>  arch/arm64/kvm/hyp/nvhe/setup.c  | 19 ++++++++++++++++++-
+>  arch/arm64/kvm/hyp/nvhe/switch.c |  5 +++++
+>  3 files changed, 39 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index d62405ce3e6d..ea9a130c4b6a 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -178,6 +178,59 @@ static __always_inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
-> 		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
-> }
-> 
-> +static inline bool vcpu_is_el2_ctxt(const struct kvm_cpu_context *ctxt)
-> +{
-> +	switch (ctxt->regs.pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
-> +	case PSR_MODE_EL2h:
-> +	case PSR_MODE_EL2t:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-
-PSR_MODE_EL2{h,t} values the least significant nibble, so why the PSR_MODE32_BIT in the condition?
-
-For the scope of this function as is, may I suggest:
-
-	switch (ctxt->regs.pstate & PSR_MODE_MASK) {
-
-which should be sufficient to check if vcpu_is_el2_ctx.
-
-Thank you.
-
-	Miguel
-
+> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
+> index 3d613e721a75..78e4b612ac06 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/host.S
+> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
+> @@ -153,6 +153,10 @@ SYM_FUNC_END(__host_hvc)
+>  
+>  .macro invalid_host_el2_vect
+>  	.align 7
 > +
-> +static inline bool vcpu_is_el2(const struct kvm_vcpu *vcpu)
-> +{
-> +	return vcpu_is_el2_ctxt(&vcpu->arch.ctxt);
-> +}
+> +	/* Test stack overflow without corrupting GPRs */
+> +	test_sp_overflow PAGE_SHIFT, .L__hyp_sp_overflow\@
 > +
-> +static inline bool __vcpu_el2_e2h_is_set(const struct kvm_cpu_context *ctxt)
-> +{
-> +	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_E2H;
-> +}
+
+I am definitely concerned with this in a system not using pKVM (which
+is on average 100% of the upstream users so far! ;-). This is more or
+less guaranteed to do the wrong thing 50% of the times, depending on
+the alignment of the stack.
+
+>  	/* If a guest is loaded, panic out of it. */
+>  	stp	x0, x1, [sp, #-16]!
+>  	get_loaded_vcpu x0, x1
+> @@ -165,6 +169,18 @@ SYM_FUNC_END(__host_hvc)
+>  	 * been partially clobbered by __host_enter.
+>  	 */
+>  	b	hyp_panic
 > +
-> +static inline bool vcpu_el2_e2h_is_set(const struct kvm_vcpu *vcpu)
-> +{
-> +	return __vcpu_el2_e2h_is_set(&vcpu->arch.ctxt);
-> +}
-> +
-> +static inline bool __vcpu_el2_tge_is_set(const struct kvm_cpu_context *ctxt)
-> +{
-> +	return ctxt_sys_reg(ctxt, HCR_EL2) & HCR_TGE;
-> +}
-> +
-> +static inline bool vcpu_el2_tge_is_set(const struct kvm_vcpu *vcpu)
-> +{
-> +	return __vcpu_el2_tge_is_set(&vcpu->arch.ctxt);
-> +}
-> +
-> +static inline bool __is_hyp_ctxt(const struct kvm_cpu_context *ctxt)
-> +{
+> +.L__hyp_sp_overflow\@:
 > +	/*
-> +	 * We are in a hypervisor context if the vcpu mode is EL2 or
-> +	 * E2H and TGE bits are set. The latter means we are in the user space
-> +	 * of the VHE kernel. ARMv8.1 ARM describes this as 'InHost'
+> +	 * Reset SP to the top of the stack, to allow handling the hyp_panic.
+> +	 * This corrupts the stack but is ok, since we won't be attempting
+> +	 * any unwinding here.
 > +	 */
-> +	return vcpu_is_el2_ctxt(ctxt) ||
-> +		(__vcpu_el2_e2h_is_set(ctxt) && __vcpu_el2_tge_is_set(ctxt)) ||
-> +		WARN_ON(__vcpu_el2_tge_is_set(ctxt));
-> +}
+> +	ldr_this_cpu	x0, kvm_init_params + NVHE_INIT_STACK_HYP_VA, x1
+> +	mov	sp, x0
 > +
-> +static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
-> +{
-> +	return __is_hyp_ctxt(&vcpu->arch.ctxt);
-> +}
-> +
-> /*
->  * The layout of SPSR for an AArch32 state is different when observed from an
->  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
-> -- 
-> 2.30.2
-> 
+> +	bl	hyp_panic_bad_stack
+> +	ASM_BUG()
+>  .endm
+>  
+>  .macro invalid_host_el1_vect
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index 99e178cf4249..114053dff228 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -105,7 +105,24 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
+>  		if (ret)
+>  			return ret;
+>  
+> -		/* Map stack pages in the 'private' VA range */
+> +		/*
+> +		 * Allocate 'private' VA range for stack guard pages.
+> +		 *
+> +		 * The 'private' VA range grows upward and stacks downwards, so
+> +		 * allocate the guard page first. But make sure to align the
+> +		 * stack itself with PAGE_SIZE * 2 granularity to ease overflow
+> +		 * detection in the entry assembly code.
+> +		 */
+> +		do {
+> +			start = (void *)hyp_alloc_private_va_range(PAGE_SIZE);
+> +			if (IS_ERR(start))
+> +				return PTR_ERR(start);
+> +		} while (IS_ALIGNED((u64) start, PAGE_SIZE * 2));
 
+This seems cumbersome. Can't we tweak hyp_alloc_private_va_range() to
+perform the required alignment? It could easily be convinced to return
+an address that is aligned on the size of the region, which would
+avoid this sort of loop.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
