@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A03AEC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 07:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39486C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 07:00:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A366404FA;
-	Mon, 14 Feb 2022 02:00:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF46C408A7;
+	Mon, 14 Feb 2022 02:00:44 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cFibe3fni0yZ; Mon, 14 Feb 2022 02:00:33 -0500 (EST)
+	with ESMTP id RXsfQTzO0HaK; Mon, 14 Feb 2022 02:00:43 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 306B740AEA;
-	Mon, 14 Feb 2022 02:00:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 609F240B91;
+	Mon, 14 Feb 2022 02:00:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 591D9404B2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 02:00:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3273640AEA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 02:00:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bxKv2Grb3oyr for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Feb 2022 02:00:31 -0500 (EST)
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
- [209.85.214.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E0C45402DB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 02:00:30 -0500 (EST)
-Received: by mail-pl1-f202.google.com with SMTP id
- v14-20020a170902e8ce00b0014b48e8e498so5782866plg.2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Feb 2022 23:00:30 -0800 (PST)
+ with ESMTP id w1iSZ0LtJ8kt for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Feb 2022 02:00:41 -0500 (EST)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21FAE408A7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 02:00:41 -0500 (EST)
+Received: by mail-pj1-f73.google.com with SMTP id
+ a15-20020a17090ad80f00b001b8a1e1da50so11512856pjv.6
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Feb 2022 23:00:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=bOvKI1kPCaNNGWhIjOWMoR69tGeqR4WLISP2Q7llMqI=;
- b=csOB7hi1VBA/oFDOyjQMZYQFqlg8l/OnmxylmJhek12832NT8JhFn5Phv7C6mUHwbp
- AKruxmYtN8nVv4ced2ng2XspMYt/cavaRDSE9kd8AsUuTGyjGmcIqUzihAgLo9HcDuB6
- BKZZ4iza/sROO2ChnPsyCtEyqhIstwciWY1Bs1iz9w93e+WCzWDG9+wgT9g3NrJi2m5o
- 2mXJwZC6t+JxapfS4ExaBSlUMRQEj9sBcrQlQl75AxtlYa/XH9WUCCSZVc9vt/uzSogG
- YSlwNIZ0jXx8QSNce60sNbxG5PzHlTEWVEqjb7+D4psXrlSiEDExSYtKX1EolSUDlfmc
- EYWA==
+ :cc; bh=zPnMHKVlqcgDQB6kXKJ7+KuQAdNLH0y013yuxCMh/uc=;
+ b=jAMpDPE2rwLv0xUEZh0rf99E5rltD6fSrYSdLKH9MDqodxvRCPt1zuOb6B9b1nSoMA
+ LOc7lWlmOcHkEb3/SBDlw6Q7xWUkfRgOZ1/NqJWEvzc5aDDmO8WA4sfAwP6macnQqeyH
+ r6q9dAjHDQScFr8QtjWa/2fYmOShpUA+EwsRzEeG57GB3ibYFUFWOAF6mvoXUDAVkyA5
+ qdH+/5VtcQPN2f26W69X4y+bwUZEa/LdHQgNuUtcEPiB3ZcsOsInUXYrSf0CqniMr8OB
+ g3UniLutFzrP920Ugjw95OH7nvWvChiNn1a4eZS9a7keu0rnuQTJxjcx3A2k/2SX70Ay
+ xBiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=bOvKI1kPCaNNGWhIjOWMoR69tGeqR4WLISP2Q7llMqI=;
- b=dMfsYa6Uxm3XbgY1gkTuw2mqYuUEREslwypNWULZlF4M5QcO4M9Ev74uWP5JnVZczo
- UuNZoTugAVz/p4kGzgzfjnzIJun8s+M4FX0XZF76bwN6uzCvh8EwE+4GqvmSaMxYntyb
- 12FhmmNmsqb7PCGArLHXOA9md4i0Wj2xrFl2Ymek92R8pjSuri0s+V5WcrR4ARS9d/Tz
- eW5Cw9fal3cIJaQLR97/pvKlWorycnueRFr8tUfoMXbVIeD4c2/rYZWlEgSbYyTcebpm
- OD6W1x75je34YsJBfDUjN6VQYs3NN/DN2JUEFw/m8ZkRok06mxb1Dvs+Rcu5yjz2N24a
- SdDg==
-X-Gm-Message-State: AOAM5321Qy2gphgn65HNUJTBGh1n/k9MWiY/A57Xum1hfvjg9zS1G7iG
- Dq7Qd72V9p2I8GNQ8CE/0/h37CffTSk=
-X-Google-Smtp-Source: ABdhPJx0j283c3uteG5vU/Wm7GzzzV9S4GvLk6zEMwainkGx3b9r3oXjbaFonEE5MPqvOlYgJbXjZ0p1T3E=
+ bh=zPnMHKVlqcgDQB6kXKJ7+KuQAdNLH0y013yuxCMh/uc=;
+ b=GTYMVTqBg3rz/IbkeUlo+DIt+yspj0wjsBw2RvSgRQiJBqAFlNUsP/nhv8iHqWgjec
+ O1+obolMDM2j/B8E7Oha+U4NanUjVQ5PxaipekUXr7/GHjm0BqlsEInAclVv+feou/AQ
+ 5Ny7VuoeMo+gF3/f99LmRibfPeLd8RJ22k4yXyzdkGwee4Vmfmf5eIrE2x+KZ9tVAPFG
+ eDomuXRROI46+T181KWYw4pVBuZmt7x1qqyU/ocepj6J2AZt8Q6WAGvGgSFBEHDgYcOZ
+ JcMm59ITJeU28ntQCgBfyG6tJpTv8N+7WegXv+Bch2mWyeJwVq0m8TxIN1QX2gbxOyHS
+ 7khA==
+X-Gm-Message-State: AOAM5319w15usvHNWO2N6TwlCF0nwePHBVulMBR1275aiLNwAKmXdyQD
+ FjTd+dlBR2tPDOKTJ9KwzXiXznDcTl8=
+X-Google-Smtp-Source: ABdhPJyJ0YhcLpxpXD9Q6qbj2a2Z8CEceYHauRoXxBka/sS6SnTbMSEqpjKMgS7gdS6Ry14yGjGjZ3cqwj8=
 X-Received: from reiji-vws-sp.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:aa7:9ad0:: with SMTP id
- x16mr12998774pfp.55.1644822030158; 
- Sun, 13 Feb 2022 23:00:30 -0800 (PST)
-Date: Sun, 13 Feb 2022 22:57:32 -0800
+ (user=reijiw job=sendgmr) by 2002:a17:903:11d0:: with SMTP id
+ q16mr12831689plh.134.1644822040248; Sun, 13 Feb 2022 23:00:40 -0800 (PST)
+Date: Sun, 13 Feb 2022 22:57:33 -0800
 In-Reply-To: <20220214065746.1230608-1-reijiw@google.com>
-Message-Id: <20220214065746.1230608-14-reijiw@google.com>
+Message-Id: <20220214065746.1230608-15-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220214065746.1230608-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
-Subject: [PATCH v5 13/27] KVM: arm64: Make MVFR1_EL1 writable
+Subject: [PATCH v5 14/27] KVM: arm64: Make ID registers without id_reg_info
+ writable
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -87,80 +87,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This patch adds id_reg_info for MVFR1_EL1 to make it writable
-by userspace.
-
-There are only a few valid combinations of values that can be set
-for FPHP and SIMDHP fields according to Arm ARM.  Return an error
-when userspace tries to set those fields to values that don't match
-any of the valid combinations.
+Make ID registers that don't have id_reg_info writable.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 90e6a85d4e31..fea7b49018b2 100644
+index fea7b49018b2..9d7041a10b41 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -654,6 +654,36 @@ static int validate_id_dfr0_el1(struct kvm_vcpu *vcpu,
- 	return 0;
- }
+@@ -1909,11 +1909,8 @@ static int __set_id_reg(struct kvm_vcpu *vcpu,
+ 		/* The value is same as the current value. Nothing to do. */
+ 		return 0;
  
-+static int validate_mvfr1_el1(struct kvm_vcpu *vcpu,
-+			      const struct id_reg_info *id_reg, u64 val)
-+{
-+	unsigned int fphp, simdhp;
-+	struct fphp_simdhp {
-+		unsigned int fphp;
-+		unsigned int simdhp;
-+	};
-+	/* Permitted fphp/simdhp value combinations according to Arm ARM */
-+	struct fphp_simdhp valid_fphp_simdhp[3] = {{0, 0}, {2, 1}, {3, 2}};
-+	int i;
-+	bool is_valid_fphp_simdhp = false;
-+
-+	fphp = cpuid_feature_extract_unsigned_field(val, MVFR1_FPHP_SHIFT);
-+	simdhp = cpuid_feature_extract_unsigned_field(val, MVFR1_SIMDHP_SHIFT);
-+
-+	for (i = 0; i < ARRAY_SIZE(valid_fphp_simdhp); i++) {
-+		if (valid_fphp_simdhp[i].fphp == fphp &&
-+		    valid_fphp_simdhp[i].simdhp == simdhp) {
-+			is_valid_fphp_simdhp = true;
-+			break;
-+		}
-+	}
-+
-+	if (!is_valid_fphp_simdhp)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
- {
- 	u64 limit = id_reg->vcpu_limit_val;
-@@ -816,6 +846,11 @@ static struct id_reg_info id_dfr0_el1_info = {
- 	.vcpu_mask = vcpu_mask_id_dfr0_el1,
- };
+-	/*
+-	 * Don't allow to modify the register's value if the register is raz,
+-	 * or the reg doesn't have the id_reg_info.
+-	 */
+-	if (raz || !GET_ID_REG_INFO(encoding))
++	/* Don't allow to modify the register's value if the register is raz. */
++	if (raz)
+ 		return -EINVAL;
  
-+static struct id_reg_info mvfr1_el1_info = {
-+	.sys_reg = SYS_MVFR1_EL1,
-+	.validate = validate_mvfr1_el1,
-+};
-+
- /*
-  * An ID register that needs special handling to control the value for the
-  * guest must have its own id_reg_info in id_reg_info_table.
-@@ -826,6 +861,7 @@ static struct id_reg_info id_dfr0_el1_info = {
- #define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
- static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
- 	[IDREG_IDX(SYS_ID_DFR0_EL1)] = &id_dfr0_el1_info,
-+	[IDREG_IDX(SYS_MVFR1_EL1)] = &mvfr1_el1_info,
- 	[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
- 	[IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
- 	[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
+ 	/*
 -- 
 2.35.1.265.g69c8d7142f-goog
 
