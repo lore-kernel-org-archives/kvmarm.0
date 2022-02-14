@@ -2,43 +2,43 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0654C433FE
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 16:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE891C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 16:58:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 68A7449E3F;
-	Mon, 14 Feb 2022 11:58:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ECAC49F51;
+	Mon, 14 Feb 2022 11:58:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y7YYUYPgEAUf; Mon, 14 Feb 2022 11:58:30 -0500 (EST)
+	with ESMTP id b9udMdFuue91; Mon, 14 Feb 2022 11:58:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EFCB49F23;
-	Mon, 14 Feb 2022 11:58:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E23249F26;
+	Mon, 14 Feb 2022 11:58:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A062F49E27
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 11:58:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A48649E3F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 11:58:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nx97ZQjSaRZe for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Feb 2022 11:58:26 -0500 (EST)
+ with ESMTP id xhmy8IlKzULa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Feb 2022 11:58:29 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66B0549ECB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 11:58:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BE6B49F0B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 11:58:28 -0500 (EST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E6CCF13D5;
- Mon, 14 Feb 2022 08:58:25 -0800 (PST)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA5AE13D5;
+ Mon, 14 Feb 2022 08:58:27 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6809D3F70D;
- Mon, 14 Feb 2022 08:58:24 -0800 (PST)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 37F813F70D;
+ Mon, 14 Feb 2022 08:58:26 -0800 (PST)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu, andre.przywara@arm.com,
  pierre.gondois@arm.com
-Subject: [PATCH kvmtool 2/3] arm: Use pr_debug() to print memory layout when
- loading a firmware image
-Date: Mon, 14 Feb 2022 16:58:29 +0000
-Message-Id: <20220214165830.69207-3-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 3/3] arm: pci: Generate "msi-parent" property only
+ with a MSI controller
+Date: Mon, 14 Feb 2022 16:58:30 +0000
+Message-Id: <20220214165830.69207-4-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220214165830.69207-1-alexandru.elisei@arm.com>
 References: <20220214165830.69207-1-alexandru.elisei@arm.com>
@@ -59,46 +59,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When loading a kernel image, kvmtool is nice enough to print a message
-informing the user where the file was loaded in guest memory, which is very
-useful for debugging. Do the same for the firmware image.
+The "msi-parent" PCI root complex property describes the MSI parent of the
+root complex. When the VM is created with a GICv2 or GICv3 irqchip
+(--irqchip=gicv3 or --irqchip=gicv2), there is no MSI controller present on
+the system and the corresponding phandle is not generated, leaving the
+"msi-parent" property to point to a non-existing phandle. Skip creating the
+"msi-parent" property when no MSI controller exists.
 
-Commit e1c7c62afc7b ("arm: turn pr_info() into pr_debug() messages")
-changed various pr_info() into pr_debug() messages to stop kvmtool from
-cluttering stdout. Do the same when printing where the FDT has been copied
-when loading a firmware image.
-
+Reported-by: Pierre Gondois <pierre.gondois@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/kvm.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ arm/fdt.c                    | 2 +-
+ arm/include/arm-common/pci.h | 3 ++-
+ arm/pci.c                    | 8 ++++++--
+ 3 files changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 5aea18fedc3e..80d233f13d0b 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -218,6 +218,8 @@ bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
+diff --git a/arm/fdt.c b/arm/fdt.c
+index 635de7f27fa5..286ccadf1311 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -190,7 +190,7 @@ static int setup_fdt(struct kvm *kvm)
+ 	}
  
- 	/* Kernel isn't loaded by kvm, point start address to firmware */
- 	kvm->arch.kern_guest_start = fw_addr;
-+	pr_debug("Loaded firmware to 0x%llx (%zd bytes)",
-+		 kvm->arch.kern_guest_start, fw_sz);
+ 	/* PCI host controller */
+-	pci__generate_fdt_nodes(fdt);
++	pci__generate_fdt_nodes(fdt, kvm);
  
- 	/* Load dtb just after the firmware image*/
- 	host_pos += fw_sz;
-@@ -226,9 +228,9 @@ bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
+ 	/* PSCI firmware */
+ 	_FDT(fdt_begin_node(fdt, "psci"));
+diff --git a/arm/include/arm-common/pci.h b/arm/include/arm-common/pci.h
+index 9008a0ed072e..afa7f7f42bcb 100644
+--- a/arm/include/arm-common/pci.h
++++ b/arm/include/arm-common/pci.h
+@@ -1,6 +1,7 @@
+ #ifndef ARM_COMMON__PCI_H
+ #define ARM_COMMON__PCI_H
  
- 	kvm->arch.dtb_guest_start = ALIGN(host_to_guest_flat(kvm, host_pos),
- 					  FDT_ALIGN);
--	pr_info("Placing fdt at 0x%llx - 0x%llx",
--		kvm->arch.dtb_guest_start,
--		kvm->arch.dtb_guest_start + FDT_MAX_SIZE);
-+	pr_debug("Placing fdt at 0x%llx - 0x%llx",
-+		 kvm->arch.dtb_guest_start,
-+		 kvm->arch.dtb_guest_start + FDT_MAX_SIZE);
+-void pci__generate_fdt_nodes(void *fdt);
++struct kvm;
++void pci__generate_fdt_nodes(void *fdt, struct kvm *kvm);
  
- 	return true;
- }
+ #endif /* ARM_COMMON__PCI_H */
+diff --git a/arm/pci.c b/arm/pci.c
+index e44e45343c6a..5bd82d438807 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -6,6 +6,7 @@
+ #include "kvm/util.h"
+ 
+ #include "arm-common/pci.h"
++#include "arm-common/gic.h"
+ 
+ /*
+  * An entry in the interrupt-map table looks like:
+@@ -24,8 +25,9 @@ struct of_interrupt_map_entry {
+ 	struct of_gic_irq		gic_irq;
+ } __attribute__((packed));
+ 
+-void pci__generate_fdt_nodes(void *fdt)
++void pci__generate_fdt_nodes(void *fdt, struct kvm *kvm)
+ {
++	enum irqchip_type irqchip = kvm->cfg.arch.irqchip;
+ 	struct device_header *dev_hdr;
+ 	struct of_interrupt_map_entry irq_map[OF_PCI_IRQ_MAP_MAX];
+ 	unsigned nentries = 0;
+@@ -68,7 +70,9 @@ void pci__generate_fdt_nodes(void *fdt)
+ 	_FDT(fdt_property(fdt, "bus-range", bus_range, sizeof(bus_range)));
+ 	_FDT(fdt_property(fdt, "reg", &cfg_reg_prop, sizeof(cfg_reg_prop)));
+ 	_FDT(fdt_property(fdt, "ranges", ranges, sizeof(ranges)));
+-	_FDT(fdt_property_cell(fdt, "msi-parent", PHANDLE_MSI));
++
++	if (irqchip == IRQCHIP_GICV2M || irqchip == IRQCHIP_GICV3_ITS)
++		_FDT(fdt_property_cell(fdt, "msi-parent", PHANDLE_MSI));
+ 
+ 	/* Generate the interrupt map ... */
+ 	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
 -- 
 2.31.1
 
