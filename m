@@ -2,81 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C414C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 14:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7727C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 14:21:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0096349F55;
-	Mon, 14 Feb 2022 09:06:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58F5141016;
+	Mon, 14 Feb 2022 09:21:06 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cgugCc4G-aEk; Mon, 14 Feb 2022 09:06:50 -0500 (EST)
+	with ESMTP id 6ULTwb4jnX3S; Mon, 14 Feb 2022 09:21:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 514B149E20;
-	Mon, 14 Feb 2022 09:06:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BBA449E2A;
+	Mon, 14 Feb 2022 09:21:05 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D9CB4120D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 09:06:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE3CC41016
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 09:21:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7+g5EzafHOB0 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Feb 2022 09:06:48 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEDC840DFE
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 09:06:47 -0500 (EST)
+ with ESMTP id JRwVgRrg+9wE for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Feb 2022 09:21:03 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6090D40DE6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 09:21:03 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 2585DB80EA9;
- Mon, 14 Feb 2022 14:06:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3150C340EE;
- Mon, 14 Feb 2022 14:06:44 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 2D45E6102D;
+ Mon, 14 Feb 2022 14:21:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F260C340E9;
+ Mon, 14 Feb 2022 14:21:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1644847604;
- bh=uUt6bE07NssIaYfZ1Wzc5VcSVVOyx1PQSGWXB+SwyNg=;
+ s=k20201202; t=1644848461;
+ bh=F1gp4tJ4gmy9EY9Y249vOXEmsd/gkZm4hZliZmvfUuY=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=TTjhN2oQXHO/DPe8aypKoXxulEjAeg9gpvnVZ98AN1NH4isPapKOXXyyV6mDb7GhX
- SbNHHxzhjn512Ou4zrxUTjx5KIbns+zuIDsKXiDTYayIv7JPf1DVZNHVyjBOnpwlxt
- 5us9f6eMs18RID38v6oueyITdTp4U/j1/FtOFkWkT7K5k/03ZqjDFwFyncMlnmhQ48
- 3rZDqhttac1LzYsBgP2rfA6efbI6zzBKVCNe794A4bmustR8jmoBpZglhSHOJcF9R1
- ZLoRcBrINUI6hx91vkfpEKw7bKZvf5oQIv0ig6WeaKAmHtYPxoTyS4yKnsASNU6xO/
- T9Km6girYxw3w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ b=WoS6O3Kr5uEhqS1goJlqSgk8kpWAb0IpUeN9HmajoDdPsNxJ5WolE3T9bXJieoFnW
+ LxZzAFbB0j7q+gWdep+HRqnUi+NfOtLL9/FrM/kzDYNdFBMUFhprfWshB//TVjH9iD
+ 3T1XWyxtYEElW3IOuSFhZlhVgZlAF3f7ZTBM6iGPXUhk2nvlYUd8cHRuG3oNZdBmy2
+ nPVXbYwvGmsYG3nIZlzIgjTcUs+tfCvfYuwM80C8n8EMkWjT4ac9Q88rNTqVf9p7JJ
+ ssHc57YsDex2iFhLCB929cmYoP8qBa8wlWFRkK9gazw74cEKftLf8wzExpht0lxjGf
+ Ja07NbtIwqeYg==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nJc02-007nP8-LH; Mon, 14 Feb 2022 14:06:42 +0000
-Date: Mon, 14 Feb 2022 14:06:41 +0000
-Message-ID: <87leyd4k5q.wl-maz@kernel.org>
+ id 1nJcDr-007nf0-J2; Mon, 14 Feb 2022 14:20:59 +0000
+MIME-Version: 1.0
+Date: Mon, 14 Feb 2022 14:20:59 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH 4/7] KVM: arm64: Allocate guard pages near hyp stacks
-In-Reply-To: <20220210224220.4076151-5-kaleshsingh@google.com>
-References: <20220210224220.4076151-1-kaleshsingh@google.com>
- <20220210224220.4076151-5-kaleshsingh@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kaleshsingh@google.com, will@kernel.org, qperret@google.com,
- tabba@google.com, surenb@google.com, kernel-team@android.com,
- catalin.marinas@arm.com, james.morse@arm.com, alexandru.elisei@arm.com,
- suzuki.poulose@arm.com, ardb@kernel.org, mark.rutland@arm.com,
- pasha.tatashin@soleen.com, joey.gouly@arm.com, pcc@google.com,
- ascull@google.com, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Miguel Luis <miguel.luis@oracle.com>
+Subject: Re: [PATCH v6 06/64] KVM: arm64: nv: Add nested virt VCPU primitives
+ for vEL2 VCPU state
+In-Reply-To: <9724047B-0890-4C23-95CF-3AD553C4C63D@oracle.com>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-7-maz@kernel.org>
+ <9724047B-0890-4C23-95CF-3AD553C4C63D@oracle.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <78e2094fb22d935c9bd635abb9a646ca@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: miguel.luis@oracle.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com,
+ christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org,
+ gankulkarni@os.amperecomputing.com, chase.conklin@arm.com,
+ linux@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com,
+ alexandru.elisei@arm.com, karl.heubaum@oracle.com, mihai.carabas@oracle.com,
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Pasha Tatashin <pasha.tatashin@soleen.com>, will@kernel.org,
- Peter Collingbourne <pcc@google.com>, kernel-team@android.com,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>,
- surenb@google.com, linux-arm-kernel@lists.infradead.org
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Mihai Carabas <mihai.carabas@oracle.com>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,107 +92,81 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 10 Feb 2022 22:41:45 +0000,
-Kalesh Singh <kaleshsingh@google.com> wrote:
+On 2022-02-14 12:39, Miguel Luis wrote:
+> Hi Marc,
 > 
-> From: Quentin Perret <qperret@google.com>
+>> On 28 Jan 2022, at 11:18, Marc Zyngier <maz@kernel.org> wrote:
+>> 
+>> From: Christoffer Dall <christoffer.dall@arm.com>
+>> 
+>> When running a nested hypervisor we commonly have to figure out if
+>> the VCPU mode is running in the context of a guest hypervisor or guest
+>> guest, or just a normal guest.
+>> 
+>> Add convenient primitives for this.
+>> 
+>> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+>> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>> arch/arm64/include/asm/kvm_emulate.h | 53 ++++++++++++++++++++++++++++
+>> 1 file changed, 53 insertions(+)
+>> 
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h 
+>> b/arch/arm64/include/asm/kvm_emulate.h
+>> index d62405ce3e6d..ea9a130c4b6a 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -178,6 +178,59 @@ static __always_inline void vcpu_set_reg(struct 
+>> kvm_vcpu *vcpu, u8 reg_num,
+>> 		vcpu_gp_regs(vcpu)->regs[reg_num] = val;
+>> }
+>> 
+>> +static inline bool vcpu_is_el2_ctxt(const struct kvm_cpu_context 
+>> *ctxt)
+>> +{
+>> +	switch (ctxt->regs.pstate & (PSR_MODE32_BIT | PSR_MODE_MASK)) {
+>> +	case PSR_MODE_EL2h:
+>> +	case PSR_MODE_EL2t:
+>> +		return true;
+>> +	default:
+>> +		return false;
+>> +	}
+>> +}
 > 
-> Allocate unbacked VA space underneath each stack page to ensure stack
-> overflows get trapped and don't corrupt memory silently.
-> 
-> The stack is aligned to twice its size (PAGE_SIZE), meaning that any
-> valid stack address has PAGE_SHIFT bit as 0. This allows us to easily
-> check for overflow in the exception entry without corrupting any GPRs.
-> 
-> Signed-off-by: Quentin Perret <qperret@google.com>
-> [ Kalesh - Update commit text and comments,
->            refactor, add overflow handling ]
-> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/host.S   | 16 ++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/setup.c  | 19 ++++++++++++++++++-
->  arch/arm64/kvm/hyp/nvhe/switch.c |  5 +++++
->  3 files changed, 39 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index 3d613e721a75..78e4b612ac06 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -153,6 +153,10 @@ SYM_FUNC_END(__host_hvc)
->  
->  .macro invalid_host_el2_vect
->  	.align 7
-> +
-> +	/* Test stack overflow without corrupting GPRs */
-> +	test_sp_overflow PAGE_SHIFT, .L__hyp_sp_overflow\@
-> +
+> PSR_MODE_EL2{h,t} values the least significant nibble, so why the
+> PSR_MODE32_BIT in the condition?
 
-I am definitely concerned with this in a system not using pKVM (which
-is on average 100% of the upstream users so far! ;-). This is more or
-less guaranteed to do the wrong thing 50% of the times, depending on
-the alignment of the stack.
+Because that's part of the M bits in SPSR, and this has to be
+valid on any code path, no matter what execution state the
+guest is in. You can't evaluate the M[3:0] on their own *unless*
+you have already checked that M[4] is 0 (an AArch32 guest would
+have M[4]==1).
 
->  	/* If a guest is loaded, panic out of it. */
->  	stp	x0, x1, [sp, #-16]!
->  	get_loaded_vcpu x0, x1
-> @@ -165,6 +169,18 @@ SYM_FUNC_END(__host_hvc)
->  	 * been partially clobbered by __host_enter.
->  	 */
->  	b	hyp_panic
-> +
-> +.L__hyp_sp_overflow\@:
-> +	/*
-> +	 * Reset SP to the top of the stack, to allow handling the hyp_panic.
-> +	 * This corrupts the stack but is ok, since we won't be attempting
-> +	 * any unwinding here.
-> +	 */
-> +	ldr_this_cpu	x0, kvm_init_params + NVHE_INIT_STACK_HYP_VA, x1
-> +	mov	sp, x0
-> +
-> +	bl	hyp_panic_bad_stack
-> +	ASM_BUG()
->  .endm
->  
->  .macro invalid_host_el1_vect
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index 99e178cf4249..114053dff228 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -105,7 +105,24 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
->  		if (ret)
->  			return ret;
->  
-> -		/* Map stack pages in the 'private' VA range */
-> +		/*
-> +		 * Allocate 'private' VA range for stack guard pages.
-> +		 *
-> +		 * The 'private' VA range grows upward and stacks downwards, so
-> +		 * allocate the guard page first. But make sure to align the
-> +		 * stack itself with PAGE_SIZE * 2 granularity to ease overflow
-> +		 * detection in the entry assembly code.
-> +		 */
-> +		do {
-> +			start = (void *)hyp_alloc_private_va_range(PAGE_SIZE);
-> +			if (IS_ERR(start))
-> +				return PTR_ERR(start);
-> +		} while (IS_ALIGNED((u64) start, PAGE_SIZE * 2));
+Yes, we are so far lucky that AArch32 and AArch64 don't overlap
+in their values of SPSR_EL2.M[3:0]. We may run out of luck at
+some point.
 
-This seems cumbersome. Can't we tweak hyp_alloc_private_va_range() to
-perform the required alignment? It could easily be convinced to return
-an address that is aligned on the size of the region, which would
-avoid this sort of loop.
+> 
+> For the scope of this function as is, may I suggest:
+> 
+> 	switch (ctxt->regs.pstate & PSR_MODE_MASK) {
+> 
+> which should be sufficient to check if vcpu_is_el2_ctx.
+
+I don't think this is wise. It makes the code more fragile,
+and harder to reason about.
 
 Thanks,
 
-	M.
-
+         M.
 -- 
-Without deviation from the norm, progress is not possible.
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
