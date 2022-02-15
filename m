@@ -2,68 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 028BFC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Feb 2022 19:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6635CC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Feb 2022 05:34:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D61E49E17;
-	Mon, 14 Feb 2022 14:41:06 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D10B940C94;
+	Tue, 15 Feb 2022 00:34:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mii7HKKWlQFZ; Mon, 14 Feb 2022 14:41:04 -0500 (EST)
+	with ESMTP id uM4+W3W5x5ex; Tue, 15 Feb 2022 00:34:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FABF49E1E;
-	Mon, 14 Feb 2022 14:41:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FD2C40D26;
+	Tue, 15 Feb 2022 00:34:51 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 863C549E16
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 14:41:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3199B40D0B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 00:34:50 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WyiBprxuUU5Y for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Feb 2022 14:41:01 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1FF349E10
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 14:41:01 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 6D46FB81676;
- Mon, 14 Feb 2022 19:41:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D63C340EE;
- Mon, 14 Feb 2022 19:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1644867659;
- bh=1o5yberQtulpwwBd/plhZbg28raYj8ZfYwhHG4ZSxto=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=bfTmgXXadlMCUzdd7Ex9U0v4ZkThqvVNxUWIhRWKBci+ySORwLpe9TAkTqhaFf3Qk
- 1WMTZqraPlhucWRNPM4MZ60GCr+zWFIpPBXaB6+hKiWZYzRwVqGFHl8JcKoy98W8TG
- mo0UOx3zq+Bgtd+b3qMXKwzcltJ09obZjRpHghs0T5eoUli5g/yqYY4f5+ouawkRF+
- M8VAOzYNjCMEzwYnWV4Ng3303UUz+zeNYDUlOHoTQeIG37x2hHunV/jtDPdwB38CJK
- NBxo3dsItnggCiRS6UNL95q0cO0pxM8NnFMVRj+jva5AZ00ouY3FkVthW1udGl7MIF
- yU90mBm8XWB8Q==
-Date: Mon, 14 Feb 2022 19:40:52 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v11 06/40] arm64/sme: Provide ABI documentation for SME
-Message-ID: <YgqwRIIi7UZzOOR2@sirena.org.uk>
-References: <20220207152109.197566-1-broonie@kernel.org>
- <20220207152109.197566-7-broonie@kernel.org>
- <YgVaTounTtunlGU6@arm.com> <YgVrbc4fFrA0Vjh2@sirena.org.uk>
- <YgaWmP+P7v9b2lLz@arm.com> <YganZni933HbRTmO@sirena.org.uk>
- <YgqdTv3Hq+H76Ml7@arm.com>
+ with ESMTP id jKyKz0CTspkt for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Feb 2022 00:34:48 -0500 (EST)
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com
+ [209.85.214.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 41DA740C02
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 00:34:48 -0500 (EST)
+Received: by mail-pl1-f176.google.com with SMTP id c3so12277757pls.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Feb 2022 21:34:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pEGYpK2WTUlNo49K4aOabZchrFLXXj+UJFJyyQaWWLY=;
+ b=c1IRU79OBWKmKVvHoZ657hn+BIOvnKaFDOysbBwvV1swwtxP2CzvWpMYFodZL7pyXe
+ DZdKduKDBeOlfW9Lb5I3y5oMliiCCQHJtBBYyAzvBsovMwky8eFOtXXrRSb2f/UiLJFH
+ OlNH9sv0czL3LubU8biAy8Q9UWVE5CdP+DXfR4VteUQ24CXsfid1iYzKljLWfZRN+KrE
+ E24ugnb+6K145mMZy34gogpxb7w5CV8p4xy+jAnSkHmLEIB5c3YBzxumctv4t6J43Sox
+ dssSloNguYubuE7EjQLBJPECjxUQMB6ao7LjLbELAuC2BvMwX3VPQl1jOUxp9imd8rEc
+ q25Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pEGYpK2WTUlNo49K4aOabZchrFLXXj+UJFJyyQaWWLY=;
+ b=UXzocpiKudc6gS7F+d6q6gFccIAuW5vf1lXxWpawRmNbKOm668eSb3v2GMC1LoGYzN
+ 8//AQOQGQEo3VcryWdaztq1A+9uM9spr9aN5n0+Dq55GuhbF1gNEP/wxhKAkv6v6Bw/G
+ qxCFBETdT4EUUHfJndJUH1vnHOLX8/E2HbsNExGQm1KI9LZUemE2gA+KYFpDHavzzUR/
+ GyUlW6+NoPywAKr/UtxrSBwBt9gw0gyoREC9Xoa5Z4EuDliQGrDqyzeGUvSxxAh/Eb58
+ MBzNMXk/0U9yL/NqqdCYQY4Ee4I8FuHIwLbRK9FhMOIUz1+m5plTXyZn/RQDGHe8xuhx
+ GHyw==
+X-Gm-Message-State: AOAM531fR8kWAUTpsq4XA8v33pkP0s1xQh43W7qmDzeCWibxd5QTq9nz
+ byQCluL4JXIAQiPBdIdzSzhkAB0NHfM1vdVwCfns8Q==
+X-Google-Smtp-Source: ABdhPJwTIc9T/alHiSxZa2YiPqqJGthvxTNntB2RDakGFxaxfT81PxoYoEvPkoTvCJhvou+qhX+H9SUOI+CN9YfRjww=
+X-Received: by 2002:a17:90b:4f43:: with SMTP id
+ pj3mr2553859pjb.9.1644903286999; 
+ Mon, 14 Feb 2022 21:34:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <YgqdTv3Hq+H76Ml7@arm.com>
-X-Cookie: Am I in GRADUATE SCHOOL yet?
-Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>, Marc Zyngier <maz@kernel.org>,
- Shuah Khan <skhan@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Salil Akerkar <Salil.Akerkar@arm.com>
+References: <20211117153842.302159-1-alexandru.elisei@arm.com>
+ <20211117153842.302159-2-alexandru.elisei@arm.com>
+In-Reply-To: <20211117153842.302159-2-alexandru.elisei@arm.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Mon, 14 Feb 2022 21:34:30 -0800
+Message-ID: <CAAeT=Fyy-DNg_uYPJFQopgc+h2VgOzeoZZLt5MByj7hgq1BGww@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 01/38] KVM: arm64: Make lock_all_vcpus() available
+ to the rest of KVM
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,172 +79,299 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4895609108928880463=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Hi Alex,
 
---===============4895609108928880463==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="m90JMmwjd1FkMFl4"
-Content-Disposition: inline
+On Wed, Nov 17, 2021 at 7:37 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> The VGIC code uses the lock_all_vcpus() function to make sure no VCPUs are
+> run while it fiddles with the global VGIC state. Move the declaration of
+> lock_all_vcpus() and the corresponding unlock function into asm/kvm_host.h
+> where it can be reused by other parts of KVM/arm64 and rename the functions
+> to kvm_{lock,unlock}_all_vcpus() to make them more generic.
+>
+> Because the scope of the code potentially using the functions has
+> increased, add a lockdep check that the kvm->lock is held by the caller.
+> Holding the lock is necessary because otherwise userspace would be able to
+> create new VCPUs and run them while the existing VCPUs are locked.
+>
+> No functional change intended.
+>
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h     |  3 ++
+>  arch/arm64/kvm/arm.c                  | 41 ++++++++++++++++++++++
+>  arch/arm64/kvm/vgic/vgic-init.c       |  4 +--
+>  arch/arm64/kvm/vgic/vgic-its.c        |  8 ++---
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 50 ++++-----------------------
+>  arch/arm64/kvm/vgic/vgic.h            |  3 --
+>  6 files changed, 56 insertions(+), 53 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2a5f7f38006f..733621e41900 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -606,6 +606,9 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  void kvm_arm_halt_guest(struct kvm *kvm);
+>  void kvm_arm_resume_guest(struct kvm *kvm);
+>
+> +bool kvm_lock_all_vcpus(struct kvm *kvm);
+> +void kvm_unlock_all_vcpus(struct kvm *kvm);
+> +
+>  #ifndef __KVM_NVHE_HYPERVISOR__
+>  #define kvm_call_hyp_nvhe(f, ...)                                              \
+>         ({                                                              \
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 2f03cbfefe67..e9b4ad7b5c82 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -651,6 +651,47 @@ void kvm_arm_resume_guest(struct kvm *kvm)
+>         }
+>  }
+>
+> +/* unlocks vcpus from @vcpu_lock_idx and smaller */
+> +static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
+> +{
+> +       struct kvm_vcpu *tmp_vcpu;
+> +
+> +       for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+> +               tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
+> +               mutex_unlock(&tmp_vcpu->mutex);
+> +       }
+> +}
+> +
+> +void kvm_unlock_all_vcpus(struct kvm *kvm)
+> +{
+> +       lockdep_assert_held(&kvm->lock);
+> +       unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
+> +}
+> +
+> +/* Returns true if all vcpus were locked, false otherwise */
+> +bool kvm_lock_all_vcpus(struct kvm *kvm)
+> +{
+> +       struct kvm_vcpu *tmp_vcpu;
+> +       int c;
+> +
+> +       lockdep_assert_held(&kvm->lock);
+> +
+> +       /*
+> +        * Any time a vcpu is run, vcpu_load is called which tries to grab the
+> +        * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure that
+
+Nit: vcpu_load() doesn't try to grab the vcpu->mutex, but kvm_vcpu_ioctl()
+does (The original comment in lock_all_vcpus() was outdated).
+
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+
+Thanks,
+Reiji
 
 
---m90JMmwjd1FkMFl4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Mon, Feb 14, 2022 at 06:19:58PM +0000, Catalin Marinas wrote:
-> On Fri, Feb 11, 2022 at 06:13:58PM +0000, Mark Brown wrote:
-
-> > We could preserve PSTATE.SM, though since all the other register state
-> > for streaming mode is shared with SVE I would expect that we should be
-> > applying the SVE discard rules to it and there is therefore no other
-> > state that should be retained.
-
-> So when clearing PSTATE.SM, the streaming SVE regs become unknown (well,
-> the wording is a bit more verbose). I think this fits well with the
-> proposal to drop the streaming SVE state entirely on syscalls.
-
-They're preserved or zeroed, yes.
-
-> The ZA state I think is not affected by the PSTATE.SM change (early
-> internal SME specs were listing this as unknown after SM clearing but I
-> can't find it in the latest spec). However, after the syscall, the user
-> won't be able to execute SME instruction until turning on PSTATE.SM
-> again.
-
-Yes, ZA is preserved unless PSTATE.ZA is disabled.  There are some
-instructions that can be used to interact with it outside of streaming
-mode, a subset of the instructions for loading and storing values in ZA.
-
-> Would the libc wrappers preserve PSTATE.SM? What I find a bit confusing
-> is that we only partially preserve some state while in streaming mode -
-> the ZA registers but not the SVE ones.
-
-I would expect that libc wrappers would expect to be called with
-streaming mode already disabled - that's what default functions in the
-PCS expect, and since without FA64 enabled a huge proportion of FPSIMD
-instructions and some SVE instructions become undefined standard code
-could easily generate traps if it uses those instructions for anything.
-I wouldn't expect that libc would explicitly disable SME itself in
-standard configurations.
-
->                                        Is the user more likely to turn
-> PSTATE.SM on for ZA processing or for SVE? If the former, we don't want
-> to unnecessarily save/restore some SVE state that the user doesn't care
-
-It's expected that any active work with ZA will require enabling
-streaming mode, you can't do any actual computation with it without
-doing so and most of the work with ZA will involve using the streaming
-mode SVE registers as part of the computation (eg, collecting results in
-a Z register, or doing an operation to a ZA tile using the contents of a
-Z register as an operand).
-
-It is also expected that some applications may prefer to execute what is
-mainly a SVE workload in streaming mode, as well as any performance
-relevant differences in the implementation choices the hardware makes it
-is likely that some systems will have vector lengths available in
-streaming mode that are otherwise unavailable (eg, you might have PEs
-with 128 bit FPSIMD/SVE units and a 512 bit SMCU).
-
-I don't have a good handle on which sort of usage is going to be more
-common, and I expect that the answer is going to be very system
-dependent varying based on both the mix of applications running on the
-system at any given moment and the capabilities of the standard and
-streaming mode floating point implementations that the system has.
-
-However the existing syscall ABI for the Z and P registers (which is all
-the SVE register state, FFR is a magic P register) means that unless we
-treat streaming mode differently to non-streaming mode we'll be
-discarding whatever state is there anyway so userspace by definition
-shouldn't have anything in there it expects to be preserved when it does
-a syscall.  I'd rather not introduce an ABI that guarantees that we
-preserve the streaming mode SVE register state in cases where we discard
-(or can discard) the non-streaming SVE register state, that's both going
-to be more complicated to implement and more likely to cause unexpected
-differences that trip userspace up.
-
-> about (can we even trap SVE instructions independently of SME while in
-> streaming mode?).
-
-I'd need to check through but I don't believe so.
-
-> I'd find it clearer if we preserved PSTATE.SM and, w.r.t. the streaming
-> SVE state, we somewhat follow the PCS and not restore the regs (input
-> from the libc people welcomed).
-
-Like I say we can do that easily enough, it's not something I expect to
-ever come up in practical usage though.
-
-> > Having said that as with ZA userspace can just exit streaming mode to
-> > avoid any overhead having it enabled introduces and the common case is
-> > expected to be that it will have done so due to the PCS, it should be an
-> > extremely rare case - unlike keeping ZA active there doesn't seem to be
-> > any case where it would be sensible to want to do this and the PCS means
-> > you'd have to actively try to do so.
-
-> IIUC, the PCS introduced the notion of streaming-compatible functions
-> that preserve the SM bit. If they are non-streaming, SM should be 0 on
-
-Yes, it isn't the default though.
-
-> entry. It would be nice if we put the syscalls in one of these
-> categories, so either mandate SM == 0 on entry or preserve (the latter
-> being easier, I think, I haven't looked at what it takes to save/restore
-> the streaming SVE state; I may change my mind after reviewing at the
-> other patches).
-
-The streaming SVE state is identical to the SVE state with the exception
-of the FFR predicate register which is not present unless FA64 is
-available in the system and enabled and the separatly configured vector
-length.
-
-It's sounding like we may as well just preserve SM, it shouldn't come up
-that often anyway and if it causes performance problems we can probably
-optimise it, and/or userspace can simply just not do that.  Like I say I
-don't have particularly strong feelings, the current behaviour was just
-the easiest thing to implement and it doesn't seem like there is a use
-case.  This is fine by me, I can do that for the next version.
-
-[fork()/clone() behaviour]
-> (few hours later) I think instead of singling out fork() (clone3()
-> actually), we can just say that new tasks (process/thread) always start
-> with PSTATE.ZA == 0, PSTATE.SM == 0 (tbd for this) and TPIDR2_EL0 == 0
-> irrespective of any clone3() flags (even CLONE_SETTLS). The C library
-> will have to implement the lazy ZA saving in the parent before the
-> syscall and the child will automatically recover the state if it follows
-> the PCS.
-
-Works for me, I think forcing the userspace to consider this is going to
-work out more robust.
-
---m90JMmwjd1FkMFl4
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmIKsEMACgkQJNaLcl1U
-h9CY5wf8CSOiz63Wqwe1/Yuqmw2EskUr3T5VUQjZG17xtbYsMIbDQTwuK0PL9sr+
-5pXdIYsvcDH0+3Su8LL6+WKQYfGbLBli9b5nK6yWoQME6tP7E6fD51eJg6TiXvaZ
-0ujB61I5aGOHxLDYnpZJmeKKiJplFdTYzunW6PyCGgQqU8Sya84bCNNPP1PQj3vm
-s4MDXEl9Ypif4go0ptR3Dkb6hJhayvCfTv9CxJ8KoeQxqrqwvlAmYfmKpCBRGXs9
-i2EN621MQidF9GdhiwKfEhAvJZRM3zdf4vacdtRpbSLys3wRYPFMSQ1/N3t2BxMw
-6+PSEUDzijTYJ+PxbdqIREE9kEH/pA==
-=8xaj
------END PGP SIGNATURE-----
-
---m90JMmwjd1FkMFl4--
-
---===============4895609108928880463==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+> +        * no other VCPUs are run and it is safe to fiddle with KVM global
+> +        * state.
+> +        */
+> +       kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
+> +               if (!mutex_trylock(&tmp_vcpu->mutex)) {
+> +                       unlock_vcpus(kvm, c - 1);
+> +                       return false;
+> +               }
+> +       }
+> +
+> +       return true;
+> +}
+> +
+>  static void vcpu_req_sleep(struct kvm_vcpu *vcpu)
+>  {
+>         struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
+> diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+> index 0a06d0648970..cd045c7abde8 100644
+> --- a/arch/arm64/kvm/vgic/vgic-init.c
+> +++ b/arch/arm64/kvm/vgic/vgic-init.c
+> @@ -87,7 +87,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>                 return -ENODEV;
+>
+>         ret = -EBUSY;
+> -       if (!lock_all_vcpus(kvm))
+> +       if (!kvm_lock_all_vcpus(kvm))
+>                 return ret;
+>
+>         kvm_for_each_vcpu(i, vcpu, kvm) {
+> @@ -117,7 +117,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>                 INIT_LIST_HEAD(&kvm->arch.vgic.rd_regions);
+>
+>  out_unlock:
+> -       unlock_all_vcpus(kvm);
+> +       kvm_unlock_all_vcpus(kvm);
+>         return ret;
+>  }
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 089fc2ffcb43..bc4197e87d95 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2005,7 +2005,7 @@ static int vgic_its_attr_regs_access(struct kvm_device *dev,
+>                 goto out;
+>         }
+>
+> -       if (!lock_all_vcpus(dev->kvm)) {
+> +       if (!kvm_lock_all_vcpus(dev->kvm)) {
+>                 ret = -EBUSY;
+>                 goto out;
+>         }
+> @@ -2023,7 +2023,7 @@ static int vgic_its_attr_regs_access(struct kvm_device *dev,
+>         } else {
+>                 *reg = region->its_read(dev->kvm, its, addr, len);
+>         }
+> -       unlock_all_vcpus(dev->kvm);
+> +       kvm_unlock_all_vcpus(dev->kvm);
+>  out:
+>         mutex_unlock(&dev->kvm->lock);
+>         return ret;
+> @@ -2668,7 +2668,7 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
+>         mutex_lock(&kvm->lock);
+>         mutex_lock(&its->its_lock);
+>
+> -       if (!lock_all_vcpus(kvm)) {
+> +       if (!kvm_lock_all_vcpus(kvm)) {
+>                 mutex_unlock(&its->its_lock);
+>                 mutex_unlock(&kvm->lock);
+>                 return -EBUSY;
+> @@ -2686,7 +2686,7 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
+>                 break;
+>         }
+>
+> -       unlock_all_vcpus(kvm);
+> +       kvm_unlock_all_vcpus(kvm);
+>         mutex_unlock(&its->its_lock);
+>         mutex_unlock(&kvm->lock);
+>         return ret;
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> index 0d000d2fe8d2..c5de904643cc 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> @@ -305,44 +305,6 @@ int vgic_v2_parse_attr(struct kvm_device *dev, struct kvm_device_attr *attr,
+>         return 0;
+>  }
+>
+> -/* unlocks vcpus from @vcpu_lock_idx and smaller */
+> -static void unlock_vcpus(struct kvm *kvm, int vcpu_lock_idx)
+> -{
+> -       struct kvm_vcpu *tmp_vcpu;
+> -
+> -       for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+> -               tmp_vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
+> -               mutex_unlock(&tmp_vcpu->mutex);
+> -       }
+> -}
+> -
+> -void unlock_all_vcpus(struct kvm *kvm)
+> -{
+> -       unlock_vcpus(kvm, atomic_read(&kvm->online_vcpus) - 1);
+> -}
+> -
+> -/* Returns true if all vcpus were locked, false otherwise */
+> -bool lock_all_vcpus(struct kvm *kvm)
+> -{
+> -       struct kvm_vcpu *tmp_vcpu;
+> -       int c;
+> -
+> -       /*
+> -        * Any time a vcpu is run, vcpu_load is called which tries to grab the
+> -        * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
+> -        * that no other VCPUs are run and fiddle with the vgic state while we
+> -        * access it.
+> -        */
+> -       kvm_for_each_vcpu(c, tmp_vcpu, kvm) {
+> -               if (!mutex_trylock(&tmp_vcpu->mutex)) {
+> -                       unlock_vcpus(kvm, c - 1);
+> -                       return false;
+> -               }
+> -       }
+> -
+> -       return true;
+> -}
+> -
+>  /**
+>   * vgic_v2_attr_regs_access - allows user space to access VGIC v2 state
+>   *
+> @@ -373,7 +335,7 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
+>         if (ret)
+>                 goto out;
+>
+> -       if (!lock_all_vcpus(dev->kvm)) {
+> +       if (!kvm_lock_all_vcpus(dev->kvm)) {
+>                 ret = -EBUSY;
+>                 goto out;
+>         }
+> @@ -390,7 +352,7 @@ static int vgic_v2_attr_regs_access(struct kvm_device *dev,
+>                 break;
+>         }
+>
+> -       unlock_all_vcpus(dev->kvm);
+> +       kvm_unlock_all_vcpus(dev->kvm);
+>  out:
+>         mutex_unlock(&dev->kvm->lock);
+>         return ret;
+> @@ -539,7 +501,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+>                 goto out;
+>         }
+>
+> -       if (!lock_all_vcpus(dev->kvm)) {
+> +       if (!kvm_lock_all_vcpus(dev->kvm)) {
+>                 ret = -EBUSY;
+>                 goto out;
+>         }
+> @@ -589,7 +551,7 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
+>                 break;
+>         }
+>
+> -       unlock_all_vcpus(dev->kvm);
+> +       kvm_unlock_all_vcpus(dev->kvm);
+>  out:
+>         mutex_unlock(&dev->kvm->lock);
+>         return ret;
+> @@ -644,12 +606,12 @@ static int vgic_v3_set_attr(struct kvm_device *dev,
+>                 case KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES:
+>                         mutex_lock(&dev->kvm->lock);
+>
+> -                       if (!lock_all_vcpus(dev->kvm)) {
+> +                       if (!kvm_lock_all_vcpus(dev->kvm)) {
+>                                 mutex_unlock(&dev->kvm->lock);
+>                                 return -EBUSY;
+>                         }
+>                         ret = vgic_v3_save_pending_tables(dev->kvm);
+> -                       unlock_all_vcpus(dev->kvm);
+> +                       kvm_unlock_all_vcpus(dev->kvm);
+>                         mutex_unlock(&dev->kvm->lock);
+>                         return ret;
+>                 }
+> diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+> index 3fd6c86a7ef3..e69c839a6941 100644
+> --- a/arch/arm64/kvm/vgic/vgic.h
+> +++ b/arch/arm64/kvm/vgic/vgic.h
+> @@ -255,9 +255,6 @@ int vgic_init(struct kvm *kvm);
+>  void vgic_debug_init(struct kvm *kvm);
+>  void vgic_debug_destroy(struct kvm *kvm);
+>
+> -bool lock_all_vcpus(struct kvm *kvm);
+> -void unlock_all_vcpus(struct kvm *kvm);
+> -
+>  static inline int vgic_v3_max_apr_idx(struct kvm_vcpu *vcpu)
+>  {
+>         struct vgic_cpu *cpu_if = &vcpu->arch.vgic_cpu;
+> --
+> 2.33.1
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4895609108928880463==--
