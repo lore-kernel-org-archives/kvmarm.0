@@ -2,75 +2,48 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1F0C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Feb 2022 12:02:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6530DC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Feb 2022 12:13:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5140040E06;
-	Tue, 15 Feb 2022 07:02:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAB3540DE6;
+	Tue, 15 Feb 2022 07:13:15 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Z1TUyrwkXosU; Tue, 15 Feb 2022 07:02:31 -0500 (EST)
+	with ESMTP id C2MPVcmejP6U; Tue, 15 Feb 2022 07:13:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC2EC40E3D;
-	Tue, 15 Feb 2022 07:02:31 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3673D40E00;
+	Tue, 15 Feb 2022 07:13:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5444A40E00
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 07:02:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3EDB40BF0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 07:13:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rJfIb59lOcvf for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Feb 2022 07:02:30 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E538740B78
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 07:02:29 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 3CF6961615;
- Tue, 15 Feb 2022 12:02:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1305C340EB;
- Tue, 15 Feb 2022 12:02:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1644926548;
- bh=s21r4dvSoHmp4TFK+Gvvi3g9+TCZtq/B77jgoG4D1Oo=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=hhjH34OTmoQ80EVAmuOnjxPcB1CWtcPJJhkjshBsIWwwZVFkDMzcHwoWmfzOUGMmj
- jnasDFhjf4r8sdAm7aa7U8psXD1+KOTrAJTF6Qty1vfWXk9T80klEy4EzfTClFhGEe
- tIUDZ86xWXnWJQtUOPBdAUC5gbPCdqvVfitavRqBlzcMS1pS6ioMW3lVEGCzQwQi1b
- 9NZbknLNN/uPp8yp/esMSRrKNd99Z15MuCWnyE+nAV9S8OZorQqsNzbButofsRY9bL
- Ljz7ikYKm1i84KmIspMEIVKr5IPcX5byy2CMVFE2MvdTr8VKnSC7MOEf4Fet9OPTrL
- /SjV8smIzklhg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nJwXK-0082Zt-L7; Tue, 15 Feb 2022 12:02:26 +0000
-Date: Tue, 15 Feb 2022 12:02:26 +0000
-Message-ID: <87ee4449t9.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
+ with ESMTP id 4vQEb7VaIPyA for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Feb 2022 07:13:11 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BC8F401A2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 07:13:11 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F39CC1480;
+ Tue, 15 Feb 2022 04:13:10 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4E48A3F718;
+ Tue, 15 Feb 2022 04:13:09 -0800 (PST)
+Date: Tue, 15 Feb 2022 12:13:23 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [RFC PATCH v5 02/38] KVM: arm64: Add lock/unlock memslot user API
-In-Reply-To: <YguInzLt1D9PZkwh@monolith.localdoman>
+Message-ID: <YguY450MMykpbKsm@monolith.localdoman>
 References: <20211117153842.302159-1-alexandru.elisei@arm.com>
  <20211117153842.302159-3-alexandru.elisei@arm.com>
  <CAAeT=Fzx4Hf+Rimi7yNMxCO2OOm6C1_s1CnhcONHwg04nV_d7Q@mail.gmail.com>
  <YguInzLt1D9PZkwh@monolith.localdoman>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, reijiw@google.com,
- james.morse@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- will@kernel.org, mark.rutland@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <87ee4449t9.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <87ee4449t9.wl-maz@kernel.org>
 Cc: Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
  Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -89,45 +62,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 15 Feb 2022 11:03:59 +0000,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> > If a memslot with read/write permission is locked with read only,
-> > and then unlocked, can userspace expect stage 2 mapping for the
-> > memslot to be updated with read/write ?
-> 
-> Locking a memslot with the read flag would map the memory described by the
-> memslot with read permissions at stage 2. When the memslot is unlocked, KVM
-> won't touch the stage 2 entries.
-> 
-> When the memslot is unlocked, the pages (as in, struct page) backing the VM
-> memory as described by the memslot are unpinned. Then the host's MM subsystem
-> can treat the memory like any other pages (make them old, new, unmap them, do
-> nothing, etc), and the MMU notifier will take care of updating the stage 2
-> entries as necessary.
-> 
-> I guess I should have been more precise in the description. I'll
-> change "causes the memory pinned when locking the memslot specified
-> in args[0] to be unpinned" to something that clearly states that the
-> memory in the host that backs the memslot is unpinned.
-> 
-> > Can userspace delete the memslot that is locked (without unlocking) ?
-> 
-> No, it cannot.
-> 
-> > If so, userspace can expect the corresponding range to be implicitly
-> > unlocked, correct ?
-> 
-> Userspace must explicitely unlock the memslot before deleting it. I want
-> userspace to be explicit in its intent.
+Hi,
 
-Does it get in the way of making this robust wrt userspace being
-killed (or terminating without unlock first)?
+On Tue, Feb 15, 2022 at 12:02:26PM +0000, Marc Zyngier wrote:
+> On Tue, 15 Feb 2022 11:03:59 +0000,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > > If a memslot with read/write permission is locked with read only,
+> > > and then unlocked, can userspace expect stage 2 mapping for the
+> > > memslot to be updated with read/write ?
+> > 
+> > Locking a memslot with the read flag would map the memory described by the
+> > memslot with read permissions at stage 2. When the memslot is unlocked, KVM
+> > won't touch the stage 2 entries.
+> > 
+> > When the memslot is unlocked, the pages (as in, struct page) backing the VM
+> > memory as described by the memslot are unpinned. Then the host's MM subsystem
+> > can treat the memory like any other pages (make them old, new, unmap them, do
+> > nothing, etc), and the MMU notifier will take care of updating the stage 2
+> > entries as necessary.
+> > 
+> > I guess I should have been more precise in the description. I'll
+> > change "causes the memory pinned when locking the memslot specified
+> > in args[0] to be unpinned" to something that clearly states that the
+> > memory in the host that backs the memslot is unpinned.
+> > 
+> > > Can userspace delete the memslot that is locked (without unlocking) ?
+> > 
+> > No, it cannot.
+> > 
+> > > If so, userspace can expect the corresponding range to be implicitly
+> > > unlocked, correct ?
+> > 
+> > Userspace must explicitely unlock the memslot before deleting it. I want
+> > userspace to be explicit in its intent.
+> 
+> Does it get in the way of making this robust wrt userspace being
+> killed (or terminating without unlock first)?
 
-	M.
+Patch #8 ("KVM: arm64: Unlock memslots after stage 2 tables are freed")
+teaches kvm_arch_flush_shadow_all() to unlock all locked memslots.
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Alex
+
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
