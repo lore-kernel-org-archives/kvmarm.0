@@ -2,75 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE676C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Feb 2022 02:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03433C433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Feb 2022 16:11:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2529E41173;
-	Tue, 15 Feb 2022 21:52:49 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B140408BA;
+	Wed, 16 Feb 2022 11:11:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id a2TKFLUkKqWb; Tue, 15 Feb 2022 21:52:47 -0500 (EST)
+	with ESMTP id taNDzIg1vuqH; Wed, 16 Feb 2022 11:11:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A75AA40DFE;
-	Tue, 15 Feb 2022 21:52:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFFA549E3F;
+	Wed, 16 Feb 2022 11:11:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CF8F40C2B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 21:52:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2AD649B0E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 11:11:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CXdUWCdviwWN for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Feb 2022 21:52:45 -0500 (EST)
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com
- [209.85.215.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 36D0040A84
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 21:52:45 -0500 (EST)
-Received: by mail-pg1-f178.google.com with SMTP id 139so923805pge.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Feb 2022 18:52:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=T+3VYyLTECeMOgMEiaC+u6xcJ2KtTI5ankI+rDGci68=;
- b=RkVxrBBbGlwz2LwLmUz7vynCN/Hz6yebDI6Ug4N2e6KSbowJjnGGfo5/oRl3W3bahj
- BXiCJ6uViTXhNvdB+Q1ElZW8lUxk09g/v0mpKVFDy4YreCxrvmtSoAgcFeAyPzl0J03Y
- NalWLIGV6CHe//5ceFpoG+T9OmXOa9zJcOOI11Qu0mISxXAD1ox/Hh1sIiW7Kt6qwA6F
- 7dbKufKasGrPiQB+Pb6KeLT5s7PHj7otdLDc+GTw10M4r80oDXeQzY7BVvQncPIs7TQL
- wPZljBtKv12fMLemhmd3fg/JzWyUM7+ueJehkzw0uJ8/RXsz/uUjqCH9L//u3dyT5cwZ
- d4Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=T+3VYyLTECeMOgMEiaC+u6xcJ2KtTI5ankI+rDGci68=;
- b=2L3z7mXgba/oy/ObcUzgMS1ViTSFZ86ZaUfdNavWiG9pBU38ZBxMOU8C+5YgiNAHYl
- sU8kmm/amPDOQOLoUYa/Qqt4BJP+3wklOSjh4wm4bfBgxHpDxFjW9V4Q1cQEWlaaibLH
- RbVvPvA5Mcyz6NOJHoFxed26lBGpjSal2U/ByiLl622cF/G1ogHrYMgQzsOosiPRkEPv
- Gp3MloDChonYz7pYXzLw9q4QPMk8ufupNXoLjMlx7uxkA7PuG55KQbjz5WoRkBeqXwJg
- +84i/Spq4IVjv0ko2jiiXs2EtMId+QuqO1cIYKsDmalx0xvqa51xLh7OMhS7eMpRkyBi
- NbYQ==
-X-Gm-Message-State: AOAM532eCHrzsMOclePP4ClJPughdi7fP3TBrvYBWvMtl4c+eltG+SvJ
- Z30H1s7IsvATeK71JPfjKvvpyABm4e9Y0ZTeh5adQQ==
-X-Google-Smtp-Source: ABdhPJwiN0rD8LslLaIwFI6zgh4dyuMS3WAvh9+7lnEbHj9G2opQoU8bmKoO6GTQVnjXTzExS+VwI7tNaAlZNrS7rkA=
-X-Received: by 2002:a63:5525:0:b0:372:c376:74f1 with SMTP id
- j37-20020a635525000000b00372c37674f1mr504815pgb.433.1644979964245; Tue, 15
- Feb 2022 18:52:44 -0800 (PST)
+ with ESMTP id rHAKegxgCd7Y for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Feb 2022 11:11:31 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2461E408BA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 11:11:31 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 72C9CB81F67;
+ Wed, 16 Feb 2022 16:11:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5870EC004E1;
+ Wed, 16 Feb 2022 16:11:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1645027888;
+ bh=T55G/11Y1oiYmF+1j/uPL7cCs5GJVxmzOFnwXcSCwxY=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=FnR12cvKX97Jqj0O2e87vd18jVujAjsE8oswjwBnnbJsx9nEPusSxE3lLp1ySYp5s
+ FPovzwJqGyPsOLxPx3broUxLD48exc3AoBCMjG08p1BateqRIYNAapOGGyv1jwc0a1
+ X2T41saN8Sw2kIAaq4y66uNCE3gaLwJndDRWRYlOzLly2Qxon+bjAmFJimJiBWZwJ6
+ Kr7Ue+tW/K6dq0UOKVoilw4MOp9KGtGO0KlHn9HM5oFhIbjmU64ujFoy9xVoz9aICR
+ AEgM505brdL84b1rdh/i95Kdb1M+iD4ZCyCor6msN560UdBE/ofaxfrMef6bduRQNv
+ pgN/og9TTgsrw==
+From: Will Deacon <will@kernel.org>
+To: andre.przywara@arm.com, Alexandru Elisei <alexandru.elisei@arm.com>,
+ pierre.gondois@arm.com, kvmarm@lists.cs.columbia.edu,
+ julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Subject: Re: [PATCH kvmtool 0/3] Misc fixes
+Date: Wed, 16 Feb 2022 16:11:19 +0000
+Message-Id: <164502718020.1969392.9699126746620631658.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20220214165830.69207-1-alexandru.elisei@arm.com>
+References: <20220214165830.69207-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
-References: <20220214065746.1230608-1-reijiw@google.com>
- <20220214065746.1230608-11-reijiw@google.com>
- <Ygv3q/+arejIWnzs@google.com>
-In-Reply-To: <Ygv3q/+arejIWnzs@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Tue, 15 Feb 2022 18:52:27 -0800
-Message-ID: <CAAeT=Fxvsniq4NW92LESqJ1ie6e+N1J793JrX0UBf2mq9B35dg@mail.gmail.com>
-Subject: Re: [PATCH v5 10/27] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
- support for the guest
-To: Oliver Upton <oupton@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: catalin.marinas@arm.com, kernel-team@android.com,
+ Will Deacon <will@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,39 +73,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
+On Mon, 14 Feb 2022 16:58:27 +0000, Alexandru Elisei wrote:
+> These are a handful of small fixes for random stuff which I found while
+> using kvmtool.
+> 
+> Patch #1 is actually needed to use kvmtool as a test runner for
+> kvm-unit-tests (more detailed explanation in the commit message).
+> 
+> Patch #2 is more like a quality of life improvement for users.
+> 
+> [...]
 
-Thank you for the review!
+Applied to kvmtool (master), thanks!
 
-On Tue, Feb 15, 2022 at 10:57 AM Oliver Upton <oupton@google.com> wrote:
->
-> Hi Reiji,
->
-> On Sun, Feb 13, 2022 at 10:57:29PM -0800, Reiji Watanabe wrote:
-> > When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
-> > means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
-> > expose the value for the guest as it is.  Since KVM doesn't support
-> > IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
-> > expose 0x0 (PMU is not implemented) instead.
-> >
-> > Change cpuid_feature_cap_perfmon_field() to update the field value
-> > to 0x0 when it is 0xf.
->
-> Definitely agree with the change in this patch. Do we need to tolerate
-> writes of 0xf for ABI compatibility (even if it is nonsensical)?
-> Otherwise a guest with IMP_DEF PMU cannot be migrated to a newer kernel.
+[1/3] Remove initrd magic check
+      https://git.kernel.org/will/kvmtool/c/9b681b0827d7
+[2/3] arm: Use pr_debug() to print memory layout when loading a firmware image
+      https://git.kernel.org/will/kvmtool/c/c334a68e202e
+[3/3] arm: pci: Generate "msi-parent" property only with a MSI controller
+      https://git.kernel.org/will/kvmtool/c/95f47968a1d3
 
-Hmm, yes, I think KVM should tolerate writes of 0xf so that we can
-avoid the migration failure.  I will make this change in v6.
+Cheers,
+-- 
+Will
 
-Since ID registers are immutable with the current KVM, I think a live
-migration failure to a newer kernel happens when the newer kernel/KVM
-supports more CPU features (or when an ID register field is newly
-masked or capped by KVM, etc).  So, I would assume such migration
-breakage on KVM/ARM has been introduced from time to time though.
-
-Thanks,
-Reiji
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
