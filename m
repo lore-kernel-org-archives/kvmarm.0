@@ -2,47 +2,56 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F0DC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 16:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 726B4C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 18:40:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C4664A534;
-	Thu, 17 Feb 2022 11:50:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A162D49EE0;
+	Thu, 17 Feb 2022 13:40:14 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id A5iEuit67VFK; Thu, 17 Feb 2022 11:50:23 -0500 (EST)
+	with ESMTP id aZQJljEsbRPA; Thu, 17 Feb 2022 13:40:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8F904A100;
-	Thu, 17 Feb 2022 11:50:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EAC0E49ED4;
+	Thu, 17 Feb 2022 13:40:12 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3A8549F1D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 11:50:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F3DCC49EC1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 13:40:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UFKpZJ5ZNZSI for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Feb 2022 11:50:21 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DB1E49B0C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 11:50:21 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C63E3113E;
- Thu, 17 Feb 2022 08:50:20 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 681DD3F70D;
- Thu, 17 Feb 2022 08:50:19 -0800 (PST)
-Date: Thu, 17 Feb 2022 16:50:42 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH kvmtool v2] aarch64: Add stolen time support
-Message-ID: <Yg584hgsmmrigkck@monolith.localdoman>
-References: <Yg5lBZKsSoPNmVkT@google.com>
- <Yg5tE3TqgwWRFypB@monolith.localdoman>
+ with ESMTP id 0ikODuSxeJ4X for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Feb 2022 13:40:10 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9EAE549EBE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 13:40:10 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 974E761B8F;
+ Thu, 17 Feb 2022 18:40:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DFE5C340EC;
+ Thu, 17 Feb 2022 18:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1645123209;
+ bh=Dbjh2u64Nwrj1+UqHZeo6jHQzL9HuPf3gHIjesle38A=;
+ h=From:To:Cc:Subject:Date:From;
+ b=om424GyXiuXkTHcWTvWwS/vwSqes2iPpJ+Mc8fksnKsu3PIHl74qzxdfmtZE+fNuZ
+ C0mmX4YNZRjugDMoJOLDF2Aei8iXg5TdSi7CTJxpO9HjpHTIrirtX7AEFJTJTvF30z
+ UBq7pM/RZfoX5/1qT0Z4jQTIZsKPl40PO7ngsOOcWMjpwoGERGs8c5ABNG6vrsFrQo
+ ugSRdd3OPZ/B0feEYK24KCavVn2vCAADI8TKbKEkS74VCJNwsUjOWmN04EqGkD0mxG
+ Zk6oIx6KTq57w5/z/zCj20z9ikmZ6UCkgZdlQQhogXZbG+i17RWOo4b1X4ig2FkxhR
+ +fAuwzJO9PH+Q==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH 0/3] Plumb PSCI SYSTEM_RESET2 call for guests
+Date: Thu, 17 Feb 2022 18:39:58 +0000
+Message-Id: <20220217184001.11753-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yg5tE3TqgwWRFypB@monolith.localdoman>
-Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -59,61 +68,36 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Hi folks,
 
-On Thu, Feb 17, 2022 at 03:43:15PM +0000, Alexandru Elisei wrote:
-> Hi,
-> 
-> Some general comments while I familiarize myself with the stolen time spec.
-> 
-> On Thu, Feb 17, 2022 at 03:08:53PM +0000, Sebastian Ene wrote:
-[..]
-> >  
-> > +	/* Populate the vcpu structure. */
-> > +	vcpu->kvm		= kvm;
-> > +	vcpu->cpu_id		= cpu_id;
-> > +	vcpu->cpu_type		= vcpu_init.target;
-> > +	vcpu->cpu_compatible	= target->compatible;
-> > +	vcpu->is_running	= true;
-> > +
-> >  	if (err || target->init(vcpu))
-> >  		die("Unable to initialise vcpu");
-> >  
-> > @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
-> >  		vcpu->ring = (void *)vcpu->kvm_run +
-> >  			     (coalesced_offset * PAGE_SIZE);
-> >  
-> > -	/* Populate the vcpu structure. */
-> > -	vcpu->kvm		= kvm;
-> > -	vcpu->cpu_id		= cpu_id;
-> > -	vcpu->cpu_type		= vcpu_init.target;
-> > -	vcpu->cpu_compatible	= target->compatible;
-> > -	vcpu->is_running	= true;
-> > -
-> 
-> Why this change?
+This small series exposes the PSCI SYSTEM_RESET2 call to guests, which
+allows the propagation of a "reset_type" and a "cookie" back to the VMM.
+Although Linux guests only ever pass 0 for the type ("SYSTEM_WARM_RESET"),
+the vendor-defined range can be used by a bootloader to provide additional
+information about the reset, such as an error code.
 
-Got it know, it's needed for target->init, which is actually arm_cpu__vcpu_init.
-Weird that it wasn't that way in the first place, but that's because of the
-awkwardness of generating the fdt nodes for the gic/timer/pmu.
+Cheers,
 
-Thanks,
-Alex
+Will
 
-> 
-> Thanks,
-> Alex
-> 
-> >  	if (kvm_cpu__configure_features(vcpu))
-> >  		die("Unable to configure requested vcpu features");
-> >  
-> > -- 
-> > 2.35.1.265.g69c8d7142f-goog
-> > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+--->8
+
+Will Deacon (3):
+  KVM: arm64: Bump guest PSCI version to 1.1
+  KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the guest
+  KVM: arm64: Indicate SYSTEM_RESET2 in kvm_run::system_event flags
+    field
+
+ Documentation/virt/kvm/api.rst    |  5 +++
+ arch/arm64/include/uapi/asm/kvm.h |  7 ++++
+ arch/arm64/kvm/psci.c             | 58 +++++++++++++++++++++++++------
+ include/kvm/arm_psci.h            |  3 +-
+ include/uapi/linux/psci.h         |  4 +++
+ 5 files changed, 66 insertions(+), 11 deletions(-)
+
+-- 
+2.35.1.265.g69c8d7142f-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
