@@ -2,55 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B83F1C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 12:14:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DEE9C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 13:41:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 08C8749E2A;
-	Thu, 17 Feb 2022 07:14:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63D5E49EF2;
+	Thu, 17 Feb 2022 08:41:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sCYzwDdyQvXK; Thu, 17 Feb 2022 07:14:33 -0500 (EST)
+	with ESMTP id 7-J5Gp6FAvaz; Thu, 17 Feb 2022 08:41:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8B6A49E27;
-	Thu, 17 Feb 2022 07:14:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE442408BA;
+	Thu, 17 Feb 2022 08:41:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2A9549E1B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 07:14:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28333407ED
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 08:40:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NkCIgixugjWN for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Feb 2022 07:14:31 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44A81410F7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 07:14:31 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ACD50113E;
- Thu, 17 Feb 2022 04:14:30 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD1BD3F66F;
- Thu, 17 Feb 2022 04:14:28 -0800 (PST)
-Date: Thu, 17 Feb 2022 12:14:47 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [kvm-unit-tests PATCH 0/4] configure changes and rename
- --target-efi
-Message-ID: <Yg48KawN1+u+sL53@monolith.localdoman>
-References: <20220210150943.1280146-1-alexandru.elisei@arm.com>
- <YgVKmjBnAjITQcm+@google.com>
- <YgVPPCTJG7UFRkhQ@monolith.localdoman>
- <CAEDJ5ZSR=rw_ALjBcLgeVz9H6TS67eWvZW2SvGTJV468WjgyKw@mail.gmail.com>
- <YgVpJDIfUVzVvFdx@google.com>
- <CAEDJ5ZRkuCbmPzZXz0x2XUXqjKoi+O+Uq_SNkNW_We2mSv4aRg@mail.gmail.com>
- <f326daff-8384-4666-fc5e-6b7b509f6fe8@redhat.com>
- <YgaMqwbWts3vQ6fD@google.com>
+ with ESMTP id X5e36PiasrSt for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Feb 2022 08:40:57 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E99A40597
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 08:40:57 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 2FB65B8212B;
+ Thu, 17 Feb 2022 13:40:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4782C340E9;
+ Thu, 17 Feb 2022 13:40:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1645105255;
+ bh=Ss67S13WIbOTQNO32Um4TEuBFG3UFPz44UqCkkF0YeY=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=tNXUrNV6GCVRn8Exm/tkHGSQNU2vydVaAUyZUS4vmCWuVjZSKfQgFNoktfJ0yncsC
+ wNjmdHax6vkMTfzCSQiVAXfhQN4hFOJ+ddKZwLCBKqtnqug/N1GNd/7UDPTkrqjDOP
+ 1NJ+wpj+kiIan6fWo+4irQpE2/THtRLB3VQ3d40wNA+EETfw+1pCg9/q2tSMF/v2fX
+ omlbfcmxXlVFxvI5cfyhiPFGlOJIfjufhhlVsZ+vwbV+4+jcrr7ch2xSmBthbPx6Cr
+ 0Qe7O57eRV9tqgTfcxmZoLId0d+ZYasoidhx6mwm6+DcPcg6kgu+tcwqVKSN+iNIaL
+ uZ+CYoBONIcUA==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nKh1h-008a8W-Hp; Thu, 17 Feb 2022 13:40:53 +0000
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YgaMqwbWts3vQ6fD@google.com>
-Cc: Thomas Huth <thuth@redhat.com>, Zixuan Wang <zxwang42@gmail.com>,
- kvm list <kvm@vger.kernel.org>, kvmarm@lists.cs.columbia.edu,
- Paolo Bonzini <pbonzini@redhat.com>, Varad Gautam <varad.gautam@suse.com>
+Date: Thu, 17 Feb 2022 13:40:53 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't miss pending interrupts for suspended
+ vCPU
+In-Reply-To: <20220217101242.3013716-1-oupton@google.com>
+References: <20220217101242.3013716-1-oupton@google.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <aa6851d90aeb0dfade28527687253219@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ pshier@google.com, ricarkol@google.com, reijiw@google.com, pbonzini@redhat.com,
+ seanjc@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -62,75 +83,55 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-On Fri, Feb 11, 2022 at 04:19:55PM +0000, Sean Christopherson wrote:
-> On Fri, Feb 11, 2022, Thomas Huth wrote:
-> > On 10/02/2022 20.48, Zixuan Wang wrote:
-> > > On Thu, Feb 10, 2022 at 11:36 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > 
-> > > > On Thu, Feb 10, 2022, Zixuan Wang wrote:
-> > > > > On Thu, Feb 10, 2022 at 11:05 AM Alexandru Elisei
-> > > > > <alexandru.elisei@arm.com> wrote:
-> > > > > > 
-> > > > > > Hi,
-> > > > > > 
-> > > > > > On Thu, Feb 10, 2022 at 05:25:46PM +0000, Sean Christopherson wrote:
-> > > > > > > On Thu, Feb 10, 2022, Alexandru Elisei wrote:
-> > > > > > > > I renamed --target-efi to --efi-payload in the last patch because I felt it
-> > > > > > > > looked rather confusing to do ./configure --target=qemu --target-efi when
-> > > > > > > > configuring the tests. If the rename is not acceptable, I can think of a
-> > > > > > > > few other options:
-> > > > > > > 
-> > > > > > > I find --target-efi to be odd irrespective of this new conflict.  A simple --efi
-> > > > > > > seems like it would be sufficient.
-> > > > > > > 
-> > > > > > > > 1. Rename --target to --vmm. That was actually the original name for the
-> > > > > > > > option, but I changed it because I thought --target was more generic and
-> > > > > > > > that --target=efi would be the way going forward to compile kvm-unit-tests
-> > > > > > > > to run as an EFI payload. I realize now that separating the VMM from
-> > > > > > > > compiling kvm-unit-tests to run as an EFI payload is better, as there can
-> > > > > > > > be multiple VMMs that can run UEFI in a VM. Not many people use kvmtool as
-> > > > > > > > a test runner, so I think the impact on users should be minimal.
-> > > > > > > 
-> > > > > > > Again irrespective of --target-efi, I think --target for the VMM is a potentially
-> > > > > > > confusing name.  Target Triplet[*] and --target have specific meaning for the
-> > > > > > > compiler, usurping that for something similar but slightly different is odd.
-> > > > > > 
-> > > > > > Wouldn't that mean that --target-efi is equally confusing? Do you have
-> > > > > > suggestions for other names?
-> > > > > 
-> > > > > How about --config-efi for configure, and CONFIG_EFI for source code?
-> > > > > I thought about this name when I was developing the initial patch, and
-> > > > > Varad also proposed similar names in his initial patch series [1]:
-> > > > > --efi and CONFIG_EFI.
-> > > > 
-> > > > I don't mind CONFIG_EFI for the source, that provides a nice hint that it's a
-> > > > configure option and is familiar for kernel developers.  But for the actually
-> > > > option, why require more typing?  I really don't see any benefit of --config-efi
-> > > > over --efi.
-> > > 
-> > > I agree, --efi looks better than --target-efi or --config-efi.
-> > 
-> > <bikeshedding>
-> > Or maybe --enable-efi ... since configure scripts normally take
-> > "--enable-..." or "--disable-..." parameters for stuff like this?
-> > </bikeshedding>
+On 2022-02-17 10:12, Oliver Upton wrote:
+> In order to properly emulate the WFI instruction, KVM reads back
+> ICH_VMCR_EL2 and enables doorbells for GICv4. These preparations are
+> necessary in order to recognize pending interrupts in
+> kvm_arch_vcpu_runnable() and return to the guest. Until recently, this
+> work was done by kvm_arch_vcpu_{blocking,unblocking}(). Since commit
+> 6109c5a6ab7f ("KVM: arm64: Move vGIC v4 handling for WFI out arch
+> callback hook"), these callbacks were gutted and superseded by
+> kvm_vcpu_wfi().
 > 
-> I don't hate it :-)  It'll also future-proof things if we ever make UEFI the
-> default for x86.
+> It is important to note that KVM implements PSCI CPU_SUSPEND calls as
+> a WFI within the guest. However, the implementation calls directly into
+> kvm_vcpu_halt(), which skips the needed work done in kvm_vcpu_wfi()
+> to detect pending interrupts. Fix the issue by calling the WFI helper.
+> 
+> Fixes: 6109c5a6ab7f ("KVM: arm64: Move vGIC v4 handling for WFI out
+> arch callback hook")
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/kvm/psci.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index 3eae32876897..2ce60fecd861 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -46,8 +46,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct
+> kvm_vcpu *vcpu)
+>  	 * specification (ARM DEN 0022A). This means all suspend states
+>  	 * for KVM will preserve the register state.
+>  	 */
+> -	kvm_vcpu_halt(vcpu);
+> -	kvm_clear_request(KVM_REQ_UNHALT, vcpu);
+> +	kvm_vcpu_wfi(vcpu);
+> 
+>  	return PSCI_RET_SUCCESS;
+>  }
 
-Thank you all for the feedback.
+Thanks for picking this up, I kept forgetting about fixing it.
+I'll merge it once I'm back home.
 
-I'll respin the series and rename --target-efi to --enable-efi.
-
-Thanks,
-Alex
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
