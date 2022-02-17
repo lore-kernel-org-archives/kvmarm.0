@@ -2,80 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DADBFC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 05:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C56C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 07:35:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7131C40BD3;
-	Thu, 17 Feb 2022 00:14:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 610B149E1E;
+	Thu, 17 Feb 2022 02:35:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6KnUi5g4NHNc; Thu, 17 Feb 2022 00:14:50 -0500 (EST)
+	with ESMTP id Vz6X9NeAyWAg; Thu, 17 Feb 2022 02:35:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BD3B410FF;
-	Thu, 17 Feb 2022 00:14:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 10F2A49B26;
+	Thu, 17 Feb 2022 02:35:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C7E2F40CF5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 00:14:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0907A40BDF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 02:35:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mcawhe4i03rZ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Feb 2022 00:14:48 -0500 (EST)
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com
- [209.85.166.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3755340BD3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 00:14:48 -0500 (EST)
-Received: by mail-il1-f178.google.com with SMTP id p11so1489596ils.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 21:14:48 -0800 (PST)
+ with ESMTP id 1RV+azPkDqxC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Feb 2022 02:35:24 -0500 (EST)
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com
+ [209.85.214.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 619CD408F4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 02:35:24 -0500 (EST)
+Received: by mail-pl1-f171.google.com with SMTP id x4so3964281plb.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 23:35:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=oZFftC7fjW59EFI2OJ05JcjnYAHcobyzdot6u9knipQ=;
- b=BNDVfa01xGmS4GmqZnKf735+pTjc4BIfyPDkoEIXx9TDMgjjmLJorWkLT5hhFvVhac
- w7OTnzjVVQ/AAk0whse6lRC/sU/PIo0UZ9lTS8bHltgAzAK56QahfMKa37p6YXHHh56V
- LZuXVsvCynOR0OVBLPKWnZSjOMrDzMwqG7p+3jnK3w54MxLJEvdDjkX3+Aylrkw/+xBq
- ZbAU4LFujAlKBtXPGN4vH/EWFx9bdxA6NwL0iZyYuA1YgcMojPGu3h6PlsEDJquKGnKe
- i8WEMTL6iJyRJwzFKBJ0Bmtpuyu75baz2/KKtTW5FCdut5Rlx6k5nQ2Wj011ZZqZ3fQN
- tUDw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=SVxDTqzOLiwSArjA4uEneB+4g3NyZ7INsmKj7WeD7iY=;
+ b=Tu/J68Kc6HuzQGKfuRH0gTdjFLco+pOlKE+DtLy90KwnTEb8WzZ1ZOeb/6oQ5tnUvT
+ U3XnXTHZ9exNCpI2p8uIjjH4JelScgCL1RDU6zvXMtHmdvKWqrnfUdzgGE/MY9cjgkqZ
+ euahgn58G53K1uxKwB8slBfY7ejFLXpkwSYkzSJq4K7nOJ6KugryuktiNtdHIeIJxBAv
+ Kl/srDfFJQkGs5s9ibyu/I9i6SXO7iPL3m+nTmcqX2r6asL1hb9e21QXlCurGipfCZnX
+ CX824DwLm/3Pk0ZrT+51MGYeEm5wC9O0CAKG1HeAmBwLlcyQ/Dk1XZG1AFAiqBMqhNeW
+ 1MKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=oZFftC7fjW59EFI2OJ05JcjnYAHcobyzdot6u9knipQ=;
- b=pjHsJt6055PPa58BrPmxpILI+XdRnWfjTSRcyMGHemccR2dk9m9+aSqUhvkLrw4Ral
- nxVnvF+36LsaHmykezVl8xUwbKS8yvTS+VR+atVEaGlvnp5tJdCJsfFzD6IsCXovE0Ub
- b9QO7XxSlSOi1bKpjy5Bjz2pOBeq+WP2IQJmwBj4O2a1o3HBvA3WUErp5l/GPLItrSCy
- XbGhE5RQk2jBByHKVuW/7G3xX2ICXo8UELrQumLvFy/1C5Zvi+W8lnR/2huzETgM2D6U
- wqmNJm+A+VVbmMvRtzL3SsUygi2J0aECL3UFYoUpAJEHc+TfdPL0XhMhDDVqh2c0fO11
- a5QQ==
-X-Gm-Message-State: AOAM531QnifjmTcRhiQumHCoQR+FG4YLszdGXzYOF6uAUhLaMd5gpyhJ
- GQb0QTD/Yjj6SbHGZaQubrTW0g==
-X-Google-Smtp-Source: ABdhPJwr6SWqMRMsK8z5hvqUbyL9j3RC/hMinu+q2RslmhxLbsdlKV8g68vEYWAUbtrPi1LLcVlNbA==
-X-Received: by 2002:a05:6e02:1c22:b0:2b9:dcbb:e810 with SMTP id
- m2-20020a056e021c2200b002b9dcbbe810mr892199ilh.262.1645074887254; 
- Wed, 16 Feb 2022 21:14:47 -0800 (PST)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194])
- by smtp.gmail.com with ESMTPSA id l1sm1420860iln.29.2022.02.16.21.14.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Feb 2022 21:14:45 -0800 (PST)
-Date: Thu, 17 Feb 2022 05:14:42 +0000
-From: Oliver Upton <oupton@google.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v5 03/27] KVM: arm64: Introduce struct id_reg_info
-Message-ID: <Yg3ZwuW+ykGJt2A5@google.com>
-References: <20220214065746.1230608-1-reijiw@google.com>
- <20220214065746.1230608-4-reijiw@google.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SVxDTqzOLiwSArjA4uEneB+4g3NyZ7INsmKj7WeD7iY=;
+ b=JfMyNMTeGcPzT1vXcyzQI+aBAcf68/zakF/hHad8lP68PMolCj7e+Qlm3LqUnhl91V
+ PmFTQjSmdNq/h3HXa6o5DpzrH8TG07fmOG5Irod1c066a9Yst0hNyj4YGEocciUBZAaV
+ tqhIpAi0+EsgizsmS4X/WZYAGHlTPEvvG4yzF006q5VVGZhRRywOTV9i2WKiEsuUltQ5
+ i2tXJTR4okCqVdRfFxfMTU0ZHf7A4vOZKlfF70fvnx5/wc0OBHGeidx0F1do1fkcQ5Ev
+ ajDzxp96N+0cVylM9tCEZCwFMupddclWHfB09WQ+jRdMJX5BAETAtdRdCmC1n6/yKW/F
+ pc1Q==
+X-Gm-Message-State: AOAM5317Ocf5vzgIUdcHMERGiEgseRWGrDFrd8i5pd2pYOhZiWnELLv+
+ JC8tGBjUv3zHeCpYNxrA+VzEt2tGmfeHDVW/UYdAnQ==
+X-Google-Smtp-Source: ABdhPJzQq2jU9wjJ+M2BKLWnp9AtLOaP9UcnTGoME0lu8pMei3KG7pZTS9m+9W3sIVem6QRSJvH8A9JcnoEeKwsk/zQ=
+X-Received: by 2002:a17:902:7296:b0:14f:2a67:b400 with SMTP id
+ d22-20020a170902729600b0014f2a67b400mr1678902pll.172.1645083323170; Wed, 16
+ Feb 2022 23:35:23 -0800 (PST)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220214065746.1230608-4-reijiw@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20211117153842.302159-1-alexandru.elisei@arm.com>
+ <20211117153842.302159-3-alexandru.elisei@arm.com>
+ <CAAeT=Fzx4Hf+Rimi7yNMxCO2OOm6C1_s1CnhcONHwg04nV_d7Q@mail.gmail.com>
+ <YguInzLt1D9PZkwh@monolith.localdoman>
+In-Reply-To: <YguInzLt1D9PZkwh@monolith.localdoman>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Wed, 16 Feb 2022 23:35:06 -0800
+Message-ID: <CAAeT=FwOh2125oscptguaLEK+PVFqTmtz0eG078xrUoEcGzr6A@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 02/38] KVM: arm64: Add lock/unlock memslot user API
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,443 +85,410 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Feb 13, 2022 at 10:57:22PM -0800, Reiji Watanabe wrote:
-> This patch lays the groundwork to make ID registers writable.
-> 
-> Introduce struct id_reg_info for an ID register to manage the
-> register specific control of its value for the guest, and provide set
-> of functions commonly used for ID registers to make them writable.
-> 
-> The id_reg_info is used to do register specific initialization,
-> validation of the ID register and etc.  Not all ID registers must
-> have the id_reg_info. ID registers that don't have the id_reg_info
-> are handled in a common way that is applied to all ID registers.
-> 
-> At present, changing an ID register from userspace is allowed only
-> if the ID register has the id_reg_info, but that will be changed
-> by the following patches.
-> 
-> No ID register has the structure yet and the following patches
-> will add the id_reg_info for some ID registers.
-> 
-> kvm_set_id_reg_feature(), which is introduced in this patch,
-> is going to be used by the following patch outsdie from sys_regs.c
+Hi Alex,
 
-typo: outside
+On Tue, Feb 15, 2022 at 3:03 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+>
+> Hi Reiji,
+>
+> On Mon, Feb 14, 2022 at 09:59:09PM -0800, Reiji Watanabe wrote:
+> > Hi Alex,
+> >
+> > On Wed, Nov 17, 2021 at 7:37 AM Alexandru Elisei
+> > <alexandru.elisei@arm.com> wrote:
+> > >
+> > > Stage 2 faults triggered by the profiling buffer attempting to write to
+> > > memory are reported by the SPE hardware by asserting a buffer management
+> > > event interrupt. Interrupts are by their nature asynchronous, which means
+> > > that the guest might have changed its stage 1 translation tables since the
+> > > attempted write. SPE reports the guest virtual address that caused the data
+> > > abort, not the IPA, which means that KVM would have to walk the guest's
+> > > stage 1 tables to find the IPA. Using the AT instruction to walk the
+> > > guest's tables in hardware is not an option because it doesn't report the
+> > > IPA in the case of a stage 2 fault on a stage 1 table walk.
+> > >
+> > > Avoid both issues by pre-mapping the guest memory at stage 2. This is being
+> > > done by adding a capability that allows the user to pin the memory backing
+> > > a memslot. The same capability can be used to unlock a memslot, which
+> > > unpins the pages associated with the memslot, but doesn't unmap the IPA
+> > > range from stage 2; in this case, the addresses will be unmapped from stage
+> > > 2 via the MMU notifiers when the process' address space changes.
+> > >
+> > > For now, the capability doesn't actually do anything other than checking
+> > > that the usage is correct; the memory operations will be added in future
+> > > patches.
+> > >
+> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > ---
+> > >  Documentation/virt/kvm/api.rst   | 57 ++++++++++++++++++++++++++
+> > >  arch/arm64/include/asm/kvm_mmu.h |  3 ++
+> > >  arch/arm64/kvm/arm.c             | 42 ++++++++++++++++++--
+> > >  arch/arm64/kvm/mmu.c             | 68 ++++++++++++++++++++++++++++++++
+> > >  include/uapi/linux/kvm.h         |  8 ++++
+> > >  5 files changed, 174 insertions(+), 4 deletions(-)
+> > >
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > index aeeb071c7688..16aa59eae3d9 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -6925,6 +6925,63 @@ indicated by the fd to the VM this is called on.
+> > >  This is intended to support intra-host migration of VMs between userspace VMMs,
+> > >  upgrading the VMM process without interrupting the guest.
+> > >
+> > > +7.30 KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
+> > > +----------------------------------------
+> > > +
+> > > +:Architectures: arm64
+> > > +:Target: VM
+> > > +:Parameters: flags is one of KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK or
+> > > +                     KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
+> > > +             args[0] is the slot number
+> > > +             args[1] specifies the permisions when the memslot is locked or if
+> > > +                     all memslots should be unlocked
+> > > +
+> > > +The presence of this capability indicates that KVM supports locking the memory
+> > > +associated with the memslot, and unlocking a previously locked memslot.
+> > > +
+> > > +The 'flags' parameter is defined as follows:
+> > > +
+> > > +7.30.1 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK
+> > > +-------------------------------------------------
+> > > +
+> > > +:Capability: 'flags' parameter to KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
+> > > +:Architectures: arm64
+> > > +:Target: VM
+> > > +:Parameters: args[0] contains the memory slot number
+> > > +             args[1] contains the permissions for the locked memory:
+> > > +                     KVM_ARM_LOCK_MEMORY_READ (mandatory) to map it with
+> > > +                     read permissions and KVM_ARM_LOCK_MEMORY_WRITE
+> > > +                     (optional) with write permissions
+> >
+> > Nit: Those flag names don't match the ones in the code.
+> > (Their names in the code are KVM_ARM_LOCK_MEM_READ/KVM_ARM_LOCK_MEM_WRITE)
+>
+> That's true, I'll change the flags to match.
+>
+> >
+> > What is the reason why KVM_ARM_LOCK_MEMORY_{READ,WRITE} flags need
+> > to be specified even though memslot already has similar flags ??
+>
+> I added both flags to make the ABI more flexible, and I don't think it's a
+> burden on userspace to specify the flags when locking a memslot.
+>
+> For this reason, I would rather keep it like this for now, unless you think
+> there's a good reason to remove them.
 
-> when an ID register field needs to be updated.
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |   1 +
->  arch/arm64/include/asm/sysreg.h   |   1 +
->  arch/arm64/kvm/sys_regs.c         | 280 ++++++++++++++++++++++++++++--
->  3 files changed, 268 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index c041e5afe3d2..9ffe6604a58a 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -747,6 +747,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
->  				struct kvm_arm_copy_mte_tags *copy_tags);
->  
->  void set_default_id_regs(struct kvm *kvm);
-> +int kvm_set_id_reg_feature(struct kvm *kvm, u32 id, u8 field_shift, u8 fval);
->  
->  /* Guest/host FPSIMD coordination helpers */
->  int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index 898bee0004ae..3f12e7036985 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -1214,6 +1214,7 @@
->  #define ICH_VTR_TDS_MASK	(1 << ICH_VTR_TDS_SHIFT)
->  
->  #define ARM64_FEATURE_FIELD_BITS	4
-> +#define ARM64_FEATURE_FIELD_MASK	((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
+Understood.
+Just to confirm, KVM_ARM_LOCK_MEMORY_READ is practically unnecessary,
+isn't it ? (Perhaps it might be more straightforward to have a similar
+read only lock flag to the memslot considering this is an operation for
+a memslot?)
 
-nit: use GENMASK_ULL()
+>
+> >
+> > > +:Returns: 0 on success; negative error code on failure
+> > > +
+> > > +Enabling this capability causes the memory described by the memslot to be
+> > > +pinned in the process address space and the corresponding stage 2 IPA range
+> > > +mapped at stage 2. The permissions specified in args[1] apply to both
+> > > +mappings. The memory pinned with this capability counts towards the max
 
->  /* Create a mask for the feature bits of the specified feature. */
->  #define ARM64_FEATURE_MASK(x)	(GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
+I assume 'both mappings' mean the permission is applied to the
+mapping for process address space as well as stage 2.
+Why do you want to apply the permission to the process address space
+mapping as well (not just for the stage 2 mapping) ?
 
-nit: make use of the newly-minted ARM64_FEATURE_FIELD_MASK in this
-macro.
 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 080908c60fa6..da76516f2aad 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -265,6 +265,113 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
->  		return read_zero(vcpu, p);
->  }
->  
-> +struct id_reg_info {
-> +	/* Register ID */
-> +	u32	sys_reg;
-> +
-> +	/*
-> +	 * Limit value of the register for a vcpu. The value is the sanitized
-> +	 * system value with bits set/cleared for unsupported features for the
-> +	 * guest.
-> +	 */
-> +	u64	vcpu_limit_val;
-> +
-> +	/* Fields that are not validated by arm64_check_features_kvm. */
-> +	u64	ignore_mask;
-> +
-> +	/* An optional initialization function of the id_reg_info */
-> +	void (*init)(struct id_reg_info *id_reg);
-> +
-> +	/*
-> +	 * This is an optional ID register specific validation function. When
-> +	 * userspace tries to set the ID register, arm64_check_features_kvm()
-> +	 * will check if the requested value indicates any features that cannot
-> +	 * be supported by KVM on the host.  But, some ID register fields need
-> +	 * a special checking, and this function can be used for such fields.
-> +	 * e.g. When SVE is configured for a vCPU by KVM_ARM_VCPU_INIT,
-> +	 * ID_AA64PFR0_EL1.SVE shouldn't be set to 0 for the vCPU.
-> +	 * The validation function for ID_AA64PFR0_EL1 could be used to check
-> +	 * the field is consistent with SVE configuration.
-> +	 */
-> +	int (*validate)(struct kvm_vcpu *vcpu, const struct id_reg_info *id_reg,
-> +			u64 val);
-> +
-> +	/*
-> +	 * Return a bitmask of the vCPU's ID register fields that are not
-> +	 * synced with saved (per VM) ID register value, which usually
-> +	 * indicates opt-in CPU features that are not configured for the vCPU.
-> +	 * ID registers are saved per VM, but some opt-in CPU features can
-> +	 * be configured per vCPU.  The saved (per VM) values for such
-> +	 * features are for vCPUs with the features (and zero for
-> +	 * vCPUs without the features).
-> +	 * Return value of this function is used to handle such fields
-> +	 * for per vCPU ID register read/write request with saved per VM
-> +	 * ID register.  See the __write_id_reg's comment for more detail.
-> +	 */
-> +	u64 (*vcpu_mask)(const struct kvm_vcpu *vcpu,
-> +			 const struct id_reg_info *id_reg);
-> +};
-> +
-> +static void id_reg_info_init(struct id_reg_info *id_reg)
-> +{
-> +	u64 val = read_sanitised_ftr_reg(id_reg->sys_reg);
-> +
-> +	id_reg->vcpu_limit_val = val;
-> +	if (id_reg->init)
-> +		id_reg->init(id_reg);
-> +
-> +	/*
-> +	 * id_reg->init() might update id_reg->vcpu_limit_val.
-> +	 * Make sure that id_reg->vcpu_limit_val, which will be the default
-> +	 * register value for guests, is a safe value to use for guests
-> +	 * on the host.
-> +	 */
-> +	WARN_ON_ONCE(arm64_check_features_kvm(id_reg->sys_reg,
-> +					      id_reg->vcpu_limit_val, val));
-> +}
-> +
-> +/*
-> + * An ID register that needs special handling to control the value for the
-> + * guest must have its own id_reg_info in id_reg_info_table.
-> + * (i.e. the reset value is different from the host's sanitized value,
-> + * the value is affected by opt-in features, some fields need specific
-> + * validation, etc.)
-> + */
-> +#define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
-> +static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {};
+> > > +locked memory limit for the current process.
+> > > +
+> > > +The capability should be enabled when no VCPUs are in the kernel executing an
+> > > +ioctl (and in particular, KVM_RUN); otherwise the ioctl will block until all
+> > > +VCPUs have returned. The virtual memory range described by the memslot must be
+> > > +mapped in the userspace process without any gaps. It is considered an error if
+> > > +write permissions are specified for a memslot which logs dirty pages.
+> > > +
+> > > +7.30.2 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
+> > > +---------------------------------------------------
+> > > +
+> > > +:Capability: 'flags' parameter to KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
+> > > +:Architectures: arm64
+> > > +:Target: VM
+> > > +:Parameters: args[0] contains the memory slot number
+> > > +             args[1] optionally contains the flag KVM_ARM_UNLOCK_MEM_ALL,
+> > > +                     which unlocks all previously locked memslots.
+> > > +:Returns: 0 on success; negative error code on failure
+> > > +
+> > > +Enabling this capability causes the memory pinned when locking the memslot
+> > > +specified in args[0] to be unpinned, or, optionally, all memslots to be
+> > > +unlocked. The IPA range is not unmapped from stage 2.
+> > > +>>>>>>> 56641eee289e (KVM: arm64: Add lock/unlock memslot user API)
+> >
+> > Nit: An unnecessary line.
+> >
+> > If a memslot with read/write permission is locked with read only,
+> > and then unlocked, can userspace expect stage 2 mapping for the
+> > memslot to be updated with read/write ?
+>
+> Locking a memslot with the read flag would map the memory described by the
+> memslot with read permissions at stage 2. When the memslot is unlocked, KVM
+> won't touch the stage 2 entries.
+>
+> When the memslot is unlocked, the pages (as in, struct page) backing the VM
+> memory as described by the memslot are unpinned. Then the host's MM subsystem
+> can treat the memory like any other pages (make them old, new, unmap them, do
+> nothing, etc), and the MMU notifier will take care of updating the stage 2
+> entries as necessary.
+>
+> I guess I should have been more precise in the description. I'll change "causes
+> the memory pinned when locking the memslot specified in args[0] to be unpinned"
+> to something that clearly states that the memory in the host that backs the
+> memslot is unpinned.
 
-It seems a bit peculiar that we effectively have two arrays that
-describe feature ID registers now. IMO, it might be a bit cleaner to
-sweep all relevant data into this array and just remove them from the
-general system register array altogether.
+Thank you for the explanation.
+It seems I misunderstood the read/write lock flag.
+These lock flags only affect the permission of locked mappings, not
+the guest's permission to access the memory, which depends only on
+the memslot permission (not on the lock flags) as before. Correct ?
 
-We are already adding a lot of special-case handling for feature ID
-registers, and that is only bound to increase as the architecture is
-extended upon further.
 
-> +static int validate_id_reg(struct kvm_vcpu *vcpu, u32 id, u64 val)
-> +{
-> +	const struct id_reg_info *id_reg = GET_ID_REG_INFO(id);
-> +	u64 limit, tmp_val;
-> +	int err;
-> +
-> +	if (id_reg) {
-> +		limit = id_reg->vcpu_limit_val;
-> +		/*
-> +		 * Replace the fields that are indicated in ignore_mask with
-> +		 * the value in the limit to not have arm64_check_features_kvm()
-> +		 * check the field in @val.
-> +		 */
-> +		tmp_val = val & ~id_reg->ignore_mask;
-> +		tmp_val |= (limit & id_reg->ignore_mask);
-> +	} else {
-> +		limit = read_sanitised_ftr_reg(id);
-> +		tmp_val = val;
-> +	}
-> +
-> +	/* Check if the value indicates any feature that is not in the limit. */
-> +	err = arm64_check_features_kvm(id, tmp_val, limit);
-> +	if (err)
-> +		return err;
-> +
-> +	if (id_reg && id_reg->validate)
-> +		/* Run the ID register specific validity check. */
-> +		err = id_reg->validate(vcpu, id_reg, val);
-> +
-> +	return err;
-> +}
-> +
->  /*
->   * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
->   * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-> @@ -1068,9 +1175,91 @@ static bool is_id_reg(u32 id)
->  		sys_reg_CRm(id) < 8);
->  }
->  
-> +static u64 read_kvm_id_reg(struct kvm *kvm, u32 id)
-> +{
-> +	return kvm->arch.id_regs[IDREG_IDX(id)];
-> +}
-> +
-> +static int __modify_kvm_id_reg(struct kvm *kvm, u32 id, u64 val,
-> +			     u64 preserve_mask)
-> +{
-> +	u64 old, new;
-> +
-> +	lockdep_assert_held(&kvm->lock);
-> +
-> +	old = kvm->arch.id_regs[IDREG_IDX(id)];
-> +
-> +	/* Preserve the value at the bit position set in preserve_mask */
-> +	new = old & preserve_mask;
-> +	new |= (val & ~preserve_mask);
-> +
-> +	/* Don't allow to modify ID register value after KVM_RUN on any vCPUs */
-> +	if (kvm->arch.ran_once && new != old)
-> +		return -EBUSY;
-> +
-> +	WRITE_ONCE(kvm->arch.id_regs[IDREG_IDX(id)], new);
-> +
-> +	return 0;
-> +}
-> +
-> +static int modify_kvm_id_reg(struct kvm *kvm, u32 id, u64 val,
-> +			     u64 preserve_mask)
-> +{
-> +	int ret;
-> +
-> +	mutex_lock(&kvm->lock);
-> +	ret = __modify_kvm_id_reg(kvm, id, val, preserve_mask);
-> +	mutex_unlock(&kvm->lock);
-> +
-> +	return ret;
-> +}
-> +
-> +static int write_kvm_id_reg(struct kvm *kvm, u32 id, u64 val)
-> +{
-> +	return modify_kvm_id_reg(kvm, id, val, 0);
-> +}
-> +
-> +/*
-> + * KVM basically forces all vCPUs of the guest to have a uniform value for
-> + * each ID register (it means KVM_SET_ONE_REG for a vCPU affects all
-> + * the vCPUs of the guest), and the id_regs[] of kvm_arch holds values
-> + * of ID registers for the guest.  However, there is an exception for
-> + * ID register fields corresponding to CPU features that can be
-> + * configured per vCPU by KVM_ARM_VCPU_INIT, or etc (e.g. PMUv3, SVE, etc).
-> + * For such fields, all vCPUs that have the feature will have a non-zero
-> + * uniform value, which can be updated by userspace, but the vCPUs that
-> + * don't have the feature will have zero for the fields.
-> + * Values that @id_regs holds are for vCPUs that have such features.  So,
-> + * to get the ID register value for a vCPU that doesn't have those features,
-> + * the corresponding fields in id_regs[] needs to be cleared.
-> + * A bitmask of the fields are provided by id_reg_info's vcpu_mask(), and
-> + * __write_id_reg() and __read_id_reg() take care of those fields using
-> + * the bitmask.
-> + */
-> +static int __write_id_reg(struct kvm_vcpu *vcpu, u32 id, u64 val)
-> +{
-> +	const struct id_reg_info *id_reg = GET_ID_REG_INFO(id);
-> +	u64 mask = 0;
-> +
-> +	if (id_reg && id_reg->vcpu_mask)
-> +		mask = id_reg->vcpu_mask(vcpu, id_reg);
-> +
-> +	/*
-> +	 * Update the ID register for the guest with @val, except for fields
-> +	 * that are set in the mask, which indicates fields for opt-in
-> +	 * features that are not configured for the vCPU.
-> +	 */
-> +	return modify_kvm_id_reg(vcpu->kvm, id, val, mask);
-> +}
-> +
->  static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
-> -	u64 val = vcpu->kvm->arch.id_regs[IDREG_IDX(id)];
-> +	const struct id_reg_info *id_reg = GET_ID_REG_INFO(id);
-> +	u64 val = read_kvm_id_reg(vcpu->kvm, id);
-> +
-> +	if (id_reg && id_reg->vcpu_mask)
-> +		/* Clear fields for opt-in features that are not configured. */
-> +		val &= ~(id_reg->vcpu_mask(vcpu, id_reg));
->  
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
-> @@ -1229,12 +1418,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> -/*
-> - * cpufeature ID register user accessors
-> - *
-> - * For now, these registers are immutable for userspace, so for set_id_reg()
-> - * we don't allow the effective value to be changed.
-> - */
-> +/* cpufeature ID register user accessors */
->  static int __get_id_reg(const struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
->  			bool raz)
-> @@ -1245,11 +1429,31 @@ static int __get_id_reg(const struct kvm_vcpu *vcpu,
->  	return reg_to_user(uaddr, &val, id);
->  }
->  
-> -static int __set_id_reg(const struct kvm_vcpu *vcpu,
-> +/*
-> + * Check if the given id indicates AArch32 ID register encoding.
-> + */
-> +static bool is_aarch32_id_reg(u32 id)
-> +{
-> +	u32 crm, op2;
-> +
-> +	if (!is_id_reg(id))
-> +		return false;
-> +
-> +	crm = sys_reg_CRm(id);
-> +	op2 = sys_reg_Op2(id);
-> +	if (crm == 1 || crm == 2 || (crm == 3 && (op2 != 3 && op2 != 7)))
-> +		/* AArch32 ID register */
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
-> +static int __set_id_reg(struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
->  			bool raz)
->  {
->  	const u64 id = sys_reg_to_index(rd);
-> +	u32 encoding = reg_to_encoding(rd);
->  	int err;
->  	u64 val;
->  
-> @@ -1257,11 +1461,28 @@ static int __set_id_reg(const struct kvm_vcpu *vcpu,
->  	if (err)
->  		return err;
->  
-> -	/* This is what we mean by invariant: you can't change it. */
-> -	if (val != read_id_reg(vcpu, rd, raz))
-> +	if (val == read_id_reg(vcpu, rd, raz))
-> +		/* The value is same as the current value. Nothing to do. */
-> +		return 0;
-> +
-> +	/*
-> +	 * Don't allow to modify the register's value if the register is raz,
-> +	 * or the reg doesn't have the id_reg_info.
-> +	 */
-> +	if (raz || !GET_ID_REG_INFO(encoding))
->  		return -EINVAL;
->  
-> -	return 0;
-> +	/*
-> +	 * Skip the validation of AArch32 ID registers if the system doesn't
-> +	 * 32bit EL0 (their value are UNKNOWN).
-> +	 */
-> +	if (system_supports_32bit_el0() || !is_aarch32_id_reg(encoding)) {
-> +		err = validate_id_reg(vcpu, encoding, val);
-> +		if (err)
-> +			return err;
-> +	}
-> +
-> +	return __write_id_reg(vcpu, encoding, val);
->  }
->  
->  static int get_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> @@ -2823,6 +3044,20 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
->  	return write_demux_regids(uindices);
->  }
->  
-> +static void id_reg_info_init_all(void)
-> +{
-> +	int i;
-> +	struct id_reg_info *id_reg;
-> +
-> +	for (i = 0; i < ARRAY_SIZE(id_reg_info_table); i++) {
-> +		id_reg = (struct id_reg_info *)id_reg_info_table[i];
-> +		if (!id_reg)
-> +			continue;
-> +
-> +		id_reg_info_init(id_reg);
-> +	}
-> +}
-> +
->  void kvm_sys_reg_table_init(void)
->  {
->  	unsigned int i;
-> @@ -2857,6 +3092,8 @@ void kvm_sys_reg_table_init(void)
->  			break;
->  	/* Clear all higher bits. */
->  	cache_levels &= (1 << (i*3))-1;
-> +
-> +	id_reg_info_init_all();
->  }
->  
->  /*
-> @@ -2869,11 +3106,12 @@ void set_default_id_regs(struct kvm *kvm)
->  	u32 id;
->  	const struct sys_reg_desc *rd;
->  	u64 val;
-> +	struct id_reg_info *idr;
->  
->  	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
->  		rd = &sys_reg_descs[i];
->  		if (rd->access != access_id_reg)
-> -			/* Not ID register, or hidden/reserved ID register */
-> +			/* Not ID register or hidden/reserved ID register */
->  			continue;
->  
->  		id = reg_to_encoding(rd);
-> @@ -2881,7 +3119,21 @@ void set_default_id_regs(struct kvm *kvm)
->  			/* Shouldn't happen */
->  			continue;
->  
-> -		val = read_sanitised_ftr_reg(id);
-> -		kvm->arch.id_regs[IDREG_IDX(id)] = val;
-> +		idr = GET_ID_REG_INFO(id);
-> +		val = idr ? idr->vcpu_limit_val : read_sanitised_ftr_reg(id);
-> +		WARN_ON_ONCE(write_kvm_id_reg(kvm, id, val));
->  	}
->  }
-> +
-> +/*
-> + * Update the ID register's field with @fval for the guest.
-> + * The caller is expected to hold the kvm->lock.
-> + * This will not fail unless any vCPUs in the guest have started.
-> + */
-> +int kvm_set_id_reg_feature(struct kvm *kvm, u32 id, u8 field_shift, u8 fval)
-> +{
-> +	u64 val = ((u64)fval & ARM64_FEATURE_FIELD_MASK) << field_shift;
-> +	u64 preserve_mask = ~(ARM64_FEATURE_FIELD_MASK << field_shift);
-> +
-> +	return __modify_kvm_id_reg(kvm, id, val, preserve_mask);
-> +}
-> -- 
-> 2.35.1.265.g69c8d7142f-goog
-> 
+>
+> > Can userspace delete the memslot that is locked (without unlocking) ?
+>
+> No, it cannot.
+>
+> > If so, userspace can expect the corresponding range to be implicitly
+> > unlocked, correct ?
+>
+> Userspace must explicitely unlock the memslot before deleting it. I want
+> userspace to be explicit in its intent.
 
---
-Thanks,
-Oliver
+I see. Thank you for the clarification (I checked patch-9 as well).
+
+Thanks!
+Reiji
+
+
+
+>
+> Thanks,
+> Alex
+>
+> >
+> > Thanks,
+> > Reiji
+> >
+> > > +
+> > >  8. Other capabilities.
+> > >  ======================
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > > index 02d378887743..2c50734f048d 100644
+> > > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > > @@ -216,6 +216,9 @@ static inline void __invalidate_icache_guest_page(void *va, size_t size)
+> > >  void kvm_set_way_flush(struct kvm_vcpu *vcpu);
+> > >  void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
+> > >
+> > > +int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags);
+> > > +int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags);
+> > > +
+> > >  static inline unsigned int kvm_get_vmid_bits(void)
+> > >  {
+> > >         int reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index e9b4ad7b5c82..d49905d18cee 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -78,16 +78,43 @@ int kvm_arch_check_processor_compat(void *opaque)
+> > >         return 0;
+> > >  }
+> > >
+> > > +static int kvm_arm_lock_memslot_supported(void)
+> > > +{
+> > > +       return 0;
+> > > +}
+> > > +
+> > > +static int kvm_lock_user_memory_region_ioctl(struct kvm *kvm,
+> > > +                                            struct kvm_enable_cap *cap)
+> > > +{
+> > > +       u64 slot, action_flags;
+> > > +       u32 action;
+> > > +
+> > > +       if (cap->args[2] || cap->args[3])
+> > > +               return -EINVAL;
+> > > +
+> > > +       slot = cap->args[0];
+> > > +       action = cap->flags;
+> > > +       action_flags = cap->args[1];
+> > > +
+> > > +       switch (action) {
+> > > +       case KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK:
+> > > +               return kvm_mmu_lock_memslot(kvm, slot, action_flags);
+> > > +       case KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK:
+> > > +               return kvm_mmu_unlock_memslot(kvm, slot, action_flags);
+> > > +       default:
+> > > +               return -EINVAL;
+> > > +       }
+> > > +}
+> > > +
+> > >  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> > >                             struct kvm_enable_cap *cap)
+> > >  {
+> > >         int r;
+> > >
+> > > -       if (cap->flags)
+> > > -               return -EINVAL;
+> > > -
+> > >         switch (cap->cap) {
+> > >         case KVM_CAP_ARM_NISV_TO_USER:
+> > > +               if (cap->flags)
+> > > +                       return -EINVAL;
+> > >                 r = 0;
+> > >                 kvm->arch.return_nisv_io_abort_to_user = true;
+> > >                 break;
+> > > @@ -101,6 +128,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+> > >                 }
+> > >                 mutex_unlock(&kvm->lock);
+> > >                 break;
+> > > +       case KVM_CAP_ARM_LOCK_USER_MEMORY_REGION:
+> > > +               if (!kvm_arm_lock_memslot_supported())
+> > > +                       return -EINVAL;
+> > > +               r = kvm_lock_user_memory_region_ioctl(kvm, cap);
+> > > +               break;
+> > >         default:
+> > >                 r = -EINVAL;
+> > >                 break;
+> > > @@ -168,7 +200,6 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+> > >         return VM_FAULT_SIGBUS;
+> > >  }
+> > >
+> > > -
+> > >  /**
+> > >   * kvm_arch_destroy_vm - destroy the VM data structure
+> > >   * @kvm:       pointer to the KVM struct
+> > > @@ -276,6 +307,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> > >         case KVM_CAP_ARM_PTRAUTH_GENERIC:
+> > >                 r = system_has_full_ptr_auth();
+> > >                 break;
+> > > +       case KVM_CAP_ARM_LOCK_USER_MEMORY_REGION:
+> > > +               r = kvm_arm_lock_memslot_supported();
+> > > +               break;
+> > >         default:
+> > >                 r = 0;
+> > >         }
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 326cdfec74a1..f65bcbc9ae69 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -1296,6 +1296,74 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> > >         return ret;
+> > >  }
+> > >
+> > > +int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags)
+> > > +{
+> > > +       struct kvm_memory_slot *memslot;
+> > > +       int ret;
+> > > +
+> > > +       if (slot >= KVM_MEM_SLOTS_NUM)
+> > > +               return -EINVAL;
+> > > +
+> > > +       if (!(flags & KVM_ARM_LOCK_MEM_READ))
+> > > +               return -EINVAL;
+> > > +
+> > > +       mutex_lock(&kvm->lock);
+> > > +       if (!kvm_lock_all_vcpus(kvm)) {
+> > > +               ret = -EBUSY;
+> > > +               goto out_unlock_kvm;
+> > > +       }
+> > > +       mutex_lock(&kvm->slots_lock);
+> > > +
+> > > +       memslot = id_to_memslot(kvm_memslots(kvm), slot);
+> > > +       if (!memslot) {
+> > > +               ret = -EINVAL;
+> > > +               goto out_unlock_slots;
+> > > +       }
+> > > +       if ((flags & KVM_ARM_LOCK_MEM_WRITE) &&
+> > > +           ((memslot->flags & KVM_MEM_READONLY) || memslot->dirty_bitmap)) {
+> > > +               ret = -EPERM;
+> > > +               goto out_unlock_slots;
+> > > +       }
+> > > +
+> > > +       ret = -EINVAL;
+> > > +
+> > > +out_unlock_slots:
+> > > +       mutex_unlock(&kvm->slots_lock);
+> > > +       kvm_unlock_all_vcpus(kvm);
+> > > +out_unlock_kvm:
+> > > +       mutex_unlock(&kvm->lock);
+> > > +       return ret;
+> > > +}
+> > > +
+> > > +int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags)
+> > > +{
+> > > +       bool unlock_all = flags & KVM_ARM_UNLOCK_MEM_ALL;
+> > > +       struct kvm_memory_slot *memslot;
+> > > +       int ret;
+> > > +
+> > > +       if (!unlock_all && slot >= KVM_MEM_SLOTS_NUM)
+> > > +               return -EINVAL;
+> > > +
+> > > +       mutex_lock(&kvm->slots_lock);
+> > > +
+> > > +       if (unlock_all) {
+> > > +               ret = -EINVAL;
+> > > +               goto out_unlock_slots;
+> > > +       }
+> > > +
+> > > +       memslot = id_to_memslot(kvm_memslots(kvm), slot);
+> > > +       if (!memslot) {
+> > > +               ret = -EINVAL;
+> > > +               goto out_unlock_slots;
+> > > +       }
+> > > +
+> > > +       ret = -EINVAL;
+> > > +
+> > > +out_unlock_slots:
+> > > +       mutex_unlock(&kvm->slots_lock);
+> > > +       return ret;
+> > > +}
+> > > +
+> > >  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+> > >  {
+> > >         if (!kvm->arch.mmu.pgt)
+> > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > > index 1daa45268de2..70c969967557 100644
+> > > --- a/include/uapi/linux/kvm.h
+> > > +++ b/include/uapi/linux/kvm.h
+> > > @@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
+> > >  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+> > >  #define KVM_CAP_ARM_MTE 205
+> > >  #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
+> > > +#define KVM_CAP_ARM_LOCK_USER_MEMORY_REGION 207
+> > >
+> > >  #ifdef KVM_CAP_IRQ_ROUTING
+> > >
+> > > @@ -1483,6 +1484,13 @@ struct kvm_s390_ucas_mapping {
+> > >  #define KVM_PPC_SVM_OFF                  _IO(KVMIO,  0xb3)
+> > >  #define KVM_ARM_MTE_COPY_TAGS    _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
+> > >
+> > > +/* Used by KVM_CAP_ARM_LOCK_USER_MEMORY_REGION */
+> > > +#define KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK     (1 << 0)
+> > > +#define   KVM_ARM_LOCK_MEM_READ                                (1 << 0)
+> > > +#define   KVM_ARM_LOCK_MEM_WRITE                       (1 << 1)
+> > > +#define KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK   (1 << 1)
+> > > +#define   KVM_ARM_UNLOCK_MEM_ALL                       (1 << 0)
+> > > +
+> > >  /* ioctl for vm fd */
+> > >  #define KVM_CREATE_DEVICE        _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+> > >
+> > > --
+> > > 2.33.1
+> > >
+> > > _______________________________________________
+> > > kvmarm mailing list
+> > > kvmarm@lists.cs.columbia.edu
+> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
