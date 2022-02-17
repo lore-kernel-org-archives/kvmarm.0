@@ -2,46 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DECF0C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 15:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 640A3C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 16:10:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BE3349F1E;
-	Thu, 17 Feb 2022 10:43:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDC76401AF;
+	Thu, 17 Feb 2022 11:10:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Uu2hn9flMy9A; Thu, 17 Feb 2022 10:43:01 -0500 (EST)
+	with ESMTP id uBhPx5PB-FIo; Thu, 17 Feb 2022 11:10:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C70F349F15;
-	Thu, 17 Feb 2022 10:43:01 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38F9040256;
+	Thu, 17 Feb 2022 11:10:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A09A949F13
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 10:43:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF31549E42
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 11:10:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n8o7rIVXjd0o for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Feb 2022 10:42:58 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5BD141071
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 10:42:58 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3AC8212FC;
- Thu, 17 Feb 2022 07:42:58 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E6823F70D;
- Thu, 17 Feb 2022 07:42:56 -0800 (PST)
-Date: Thu, 17 Feb 2022 15:43:15 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH kvmtool v2] aarch64: Add stolen time support
-Message-ID: <Yg5tE3TqgwWRFypB@monolith.localdoman>
-References: <Yg5lBZKsSoPNmVkT@google.com>
+ with ESMTP id hC2M5VlYqafd for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Feb 2022 11:10:30 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D1F849E39
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 11:10:30 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1645114230;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=KCilBuq9NLr3A/KqmUevjyQMMZifNiNCO4lvtgHn2dk=;
+ b=RzGSodow88diGNoJ3qeR5fXj25JlprNPyxW1yim3QZMesxrDNfUf/fL6Zo3fzj+ixyz04u
+ WCLHQgB+T2QuMgCUDtxmsEfnB5rdjxfB2OTUes/5DgrUMpIoaT/vA1FwTV4f96HANzHUKl
+ OLhdFqCXK+e7K3H0f7ccL7HdXIW6S1E=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-637-wpTZZAyVNnCjxNu2Wg_Y5Q-1; Thu, 17 Feb 2022 11:10:27 -0500
+X-MC-Unique: wpTZZAyVNnCjxNu2Wg_Y5Q-1
+Received: by mail-wm1-f70.google.com with SMTP id
+ p24-20020a05600c1d9800b0037be98d03a1so4482671wms.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 08:10:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=KCilBuq9NLr3A/KqmUevjyQMMZifNiNCO4lvtgHn2dk=;
+ b=UDTI8FQ9rj1EBxz/aTY1BI580UwajV1T8NDOn6Y0VqW2EYJwc+uFWEmfSGuxTuJ8+e
+ Exs4TdlHLrzrtjPbTvMLFccq4LApx8g7ZuOCl0wuxAvgVCmhx7zJQaz2kf2mFMKFeP/j
+ rF85nlxlhieyG/f3pVBCmmEUtI3jNPIfvT5iDKL9mP+lsBWSw4mC4uGQUAWrqj8QuRlJ
+ HqkQpjkz4rQG8F0NdZ8RQ96xnVs80BNtkI10AoyZeC2FmewbSWOJeHQC/8HRGvRLxUxI
+ ANtSomhvVb7FLE5HKTW/7bvYw3soXsSCOemdN593iG0qkYn7XyA622OEe5J2bJhLMkbO
+ igEw==
+X-Gm-Message-State: AOAM532hwASMEPoQJoAAiEw5FA3CX08eQG3Rh6Hfb6BOkiTdc/ERFTwH
+ 4sJ2IeIaWZe49eWSc7yjcvte2yiOPuFm66QvUFfsYiKqUQlLTyIn7xB2TwuU+BNcT3wcCzFeOtI
+ ayDxCisjOdI4U84wvo0cdHYam
+X-Received: by 2002:adf:912e:0:b0:1e3:d88:bb46 with SMTP id
+ j43-20020adf912e000000b001e30d88bb46mr2830362wrj.27.1645114225752; 
+ Thu, 17 Feb 2022 08:10:25 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwbQN5AdES0GxnQJugmFvBObJzZ+H0Qui96yhuMVknj224TdFRUkCkuk52o2dsoZehckyo38g==
+X-Received: by 2002:adf:912e:0:b0:1e3:d88:bb46 with SMTP id
+ j43-20020adf912e000000b001e30d88bb46mr2830344wrj.27.1645114225478; 
+ Thu, 17 Feb 2022 08:10:25 -0800 (PST)
+Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+ by smtp.gmail.com with ESMTPSA id l11sm29837357wry.77.2022.02.17.08.10.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 17 Feb 2022 08:10:24 -0800 (PST)
+Date: Thu, 17 Feb 2022 17:10:22 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Nikos Nikoleris <nikos.nikoleris@arm.com>
+Subject: Re: [kvm-unit-tests PATCH] configure: arm: Fixes to build and run
+ tests on Apple Silicon
+Message-ID: <20220217161022.krzj2g37natxrj6x@gator>
+References: <20220217102806.28749-1-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
+In-Reply-To: <20220217102806.28749-1-nikos.nikoleris@arm.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-In-Reply-To: <Yg5lBZKsSoPNmVkT@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, will@kernel.org,
- kvmarm@lists.cs.columbia.edu
+Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, jade.alglave@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -58,224 +102,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
-
-Some general comments while I familiarize myself with the stolen time spec.
-
-On Thu, Feb 17, 2022 at 03:08:53PM +0000, Sebastian Ene wrote:
-> This patch adds support for stolen time by sharing a memory region
-> with the guest which will be used by the hypervisor to store the stolen
-> time information. The exact format of the structure stored by the
-> hypervisor is described in the ARM DEN0057A document.
+On Thu, Feb 17, 2022 at 10:28:06AM +0000, Nikos Nikoleris wrote:
+> On MacOS:
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
+> $> uname -m
+> 
+> returns:
+> 
+> arm64
+> 
+> To unify how we handle the achitecture detection across different
+> systems, sed it to aarch64 which is what's typically reported on
+
+Was "sed" a typo or a new verb for "sedding" stuff :-)
+
+> Linux.
+> 
+> In addition, when HVF is the acceleration method on aarch64, make sure
+> we select the right processor when invoking qemu.
+> 
+> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 > ---
-
-It is customary to describe the changes you have made from the previous version,
-to make it easier for the people who want to review your code.
-
->  Makefile                               |  1 +
->  arm/aarch64/arm-cpu.c                  |  1 +
->  arm/aarch64/include/kvm/kvm-cpu-arch.h |  1 +
->  arm/aarch64/pvtime.c                   | 84 ++++++++++++++++++++++++++
->  arm/include/arm-common/kvm-arch.h      |  4 ++
->  arm/kvm-cpu.c                          | 14 ++---
->  6 files changed, 98 insertions(+), 7 deletions(-)
->  create mode 100644 arm/aarch64/pvtime.c
+>  arm/run   | 3 +++
+>  configure | 2 +-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index f251147..e9121dc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
->  	OBJS		+= arm/aarch64/arm-cpu.o
->  	OBJS		+= arm/aarch64/kvm-cpu.o
->  	OBJS		+= arm/aarch64/kvm.o
-> +	OBJS		+= arm/aarch64/pvtime.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch64/include
->  
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index d7572b7..326fb20 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -22,6 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
->  {
->  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> +	kvm_cpu__setup_pvtime(vcpu);
->  	return 0;
->  }
->  
-> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> index 8dfb82e..b57d6e6 100644
-> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> @@ -19,5 +19,6 @@
->  
->  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
->  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
->  
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> new file mode 100644
-> index 0000000..c09fd89
-> --- /dev/null
-> +++ b/arm/aarch64/pvtime.c
-> @@ -0,0 +1,84 @@
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
+> diff --git a/arm/run b/arm/run
+> index 2153bd3..0629b69 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -27,6 +27,9 @@ if [ "$ACCEL" = "kvm" ]; then
+>  	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
+>  		M+=',gic-version=host'
+>  	fi
+> +fi
 > +
-> +#include <linux/byteorder.h>
-> +#include <linux/types.h>
-> +
-> +struct pvtime_data_priv {
-> +	bool	is_supported;
-> +	char	*usr_mem;
-> +};
-> +
-> +static struct pvtime_data_priv pvtime_data = {
-> +	.is_supported	= true,
-> +	.usr_mem	= NULL
-> +};
-> +
-> +static int pvtime__alloc_region(struct kvm *kvm)
-> +{
-> +	char *mem;
-> +	int ret = 0;
-> +
-> +	mem = mmap(NULL, AARCH64_PVTIME_IPA_MAX_SIZE, PROT_RW,
-> +		   MAP_ANON_NORESERVE, -1, 0);
-> +	if (mem == MAP_FAILED)
-> +		return -ENOMEM;
-> +
-> +	ret = kvm__register_dev_mem(kvm, AARCH64_PVTIME_IPA_START,
-> +				    AARCH64_PVTIME_IPA_MAX_SIZE, mem);
-> +	if (ret) {
-> +		munmap(mem, AARCH64_PVTIME_IPA_MAX_SIZE);
-> +		return ret;
-> +	}
-> +
-> +	pvtime_data.usr_mem = mem;
-> +	return ret;
-> +}
-> +
-> +static int pvtime__teardown_region(struct kvm *kvm)
-> +{
-> +	if (pvtime_data.usr_mem == NULL)
-> +		return 0;
-> +
-> +	kvm__destroy_mem(kvm, AARCH64_PVTIME_IPA_START,
-> +			 AARCH64_PVTIME_IPA_MAX_SIZE, pvtime_data.usr_mem);
-> +	munmap(pvtime_data.usr_mem, AARCH64_PVTIME_IPA_MAX_SIZE);
-> +	pvtime_data.usr_mem = NULL;
-> +	return 0;
-> +}
-> +
-> +void kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> +{
-> +	int ret;
-> +	u64 pvtime_guest_addr = AARCH64_PVTIME_IPA_START + vcpu->cpu_id *
-> +		AARCH64_PVTIME_SIZE;
-> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> +	};
-> +
-> +	if (!pvtime_data.is_supported)
-> +		return;
-> +
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> +	if (ret)
-> +		goto out_err;
-> +
-> +	if (!pvtime_data.usr_mem) {
-> +		ret = pvtime__alloc_region(vcpu->kvm);
-> +		if (ret)
-> +			goto out_err;
-> +	}
-> +
-> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> +	if (!ret)
-> +		return;
-> +
-> +	pvtime__teardown_region(vcpu->kvm);
-> +out_err:
-> +	pvtime_data.is_supported = false;
-> +}
-> +
-> +dev_exit(pvtime__teardown_region);
-> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> index c645ac0..865bd68 100644
-> --- a/arm/include/arm-common/kvm-arch.h
-> +++ b/arm/include/arm-common/kvm-arch.h
-> @@ -54,6 +54,10 @@
->  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
->  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
->  
-> +#define AARCH64_PVTIME_IPA_MAX_SIZE	SZ_64K
-> +#define AARCH64_PVTIME_IPA_START	(ARM_MEMORY_AREA - \
-> +					 AARCH64_PVTIME_IPA_MAX_SIZE)
+> +if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
+>  	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
+>  		processor="host"
+>  		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
+> diff --git a/configure b/configure
+> index 2d9c3e0..ff840c1 100755
+> --- a/configure
+> +++ b/configure
+> @@ -14,7 +14,7 @@ objcopy=objcopy
+>  objdump=objdump
+>  ar=ar
+>  addr2line=addr2line
+> -arch=$(uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/')
+> +arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
+>  host=$arch
+>  cross_prefix=
+>  endian=""
+> -- 
+> 2.32.0 (Apple Git-132)
+>
 
-This overlaps with the ARM_PCI_MMIO_AREA. If you want to change the memory
-layout for a guest, there's a handy ASCII map at the top of this file.  That
-should also be updated to reflect the modified layout.
+So, with this, we've got kvm-unit-tests running on HVF now?
 
-Why do you want to put it below RAM? Is there a requirement to have it there or
-was the location chosen for other reasons?
+Applied to arm/queue
 
-> +#define AARCH64_PVTIME_SIZE		(64)
-
-This looks like something that should go in pvtime.c, as it's not relevant to
-the memory layout.
-
->  
->  #define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
->  #define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
-> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> index 6a2408c..84ac1e9 100644
-> --- a/arm/kvm-cpu.c
-> +++ b/arm/kvm-cpu.c
-> @@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
->  			die("Unable to find matching target");
->  	}
->  
-> +	/* Populate the vcpu structure. */
-> +	vcpu->kvm		= kvm;
-> +	vcpu->cpu_id		= cpu_id;
-> +	vcpu->cpu_type		= vcpu_init.target;
-> +	vcpu->cpu_compatible	= target->compatible;
-> +	vcpu->is_running	= true;
-> +
->  	if (err || target->init(vcpu))
->  		die("Unable to initialise vcpu");
->  
-> @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
->  		vcpu->ring = (void *)vcpu->kvm_run +
->  			     (coalesced_offset * PAGE_SIZE);
->  
-> -	/* Populate the vcpu structure. */
-> -	vcpu->kvm		= kvm;
-> -	vcpu->cpu_id		= cpu_id;
-> -	vcpu->cpu_type		= vcpu_init.target;
-> -	vcpu->cpu_compatible	= target->compatible;
-> -	vcpu->is_running	= true;
-> -
-
-Why this change?
+https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
 
 Thanks,
-Alex
+drew
 
->  	if (kvm_cpu__configure_features(vcpu))
->  		die("Unable to configure requested vcpu features");
->  
-> -- 
-> 2.35.1.265.g69c8d7142f-goog
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
