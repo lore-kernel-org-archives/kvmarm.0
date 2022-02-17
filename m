@@ -2,71 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C97E6C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Feb 2022 16:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E40F2C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Feb 2022 03:50:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3803749EEF;
-	Wed, 16 Feb 2022 11:59:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3107F48F9C;
+	Wed, 16 Feb 2022 22:50:16 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Fez9c3d0Tw5u; Wed, 16 Feb 2022 11:59:19 -0500 (EST)
+	with ESMTP id lTvjyjTylqjy; Wed, 16 Feb 2022 22:50:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FE5849EE4;
-	Wed, 16 Feb 2022 11:59:19 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEC4D40E00;
+	Wed, 16 Feb 2022 22:50:14 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72D5049ED4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 11:59:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2D1D40E00
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 22:50:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Zp6rAE5QhAGd for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Feb 2022 11:59:17 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32BA649E1A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 11:59:17 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 2B6BB61B98;
- Wed, 16 Feb 2022 16:59:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B56C004E1;
- Wed, 16 Feb 2022 16:59:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1645030753;
- bh=uVu4zdN8SO7+j0AXlkFCys1Fwhkdn9BpTEsbNFi295k=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=I5T6vatqtLYP2yJ05i/PEFFlqaSjw/6XP7ME7w1Sucj52yc0tzs7UaFi7wN7lZ46F
- wVHV1zCC4qk926wuHt2xeV3C+whVog5o2v37LmiKKbfHDGFGEz+CYNrYclTTGCropA
- z8bUt3ma6Cxat6PIofARKlYHlAtvasJfor70Uf/ZJnOAaE5S1Z11pPF8naBbVj+j5b
- TtcNetitW+uMdLSHTNLTcWOpXCSWE7furz8ZvwlPWuDW/4wBMLi+QwPq9IVnt22qZW
- T/7jWxkp46VeZa55CR1GquOjva3ot91QDLtTTB83kvd1IzMUHJt7AEzTLr0Jy5t1TN
- Blad18NSYTvxw==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nKNe3-008Nk7-7K; Wed, 16 Feb 2022 16:59:11 +0000
-MIME-Version: 1.0
-Date: Wed, 16 Feb 2022 16:59:10 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH kvmtool] aarch64: Add stolen time support
-In-Reply-To: <Yg0jcO32I+zFz/0s@google.com>
-References: <Yg0jcO32I+zFz/0s@google.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <6dcb9ce8090a34105be012965f3eadc4@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: sebastianene@google.com, kvm@vger.kernel.org,
- qperret@google.com, kvmarm@lists.cs.columbia.edu, will@kernel.org,
- julien.thierry.kdev@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+ with ESMTP id mWNFS1FfrAA5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Feb 2022 22:50:12 -0500 (EST)
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
+ [209.85.214.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5EC39408A7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 22:50:12 -0500 (EST)
+Received: by mail-pl1-f201.google.com with SMTP id
+ q14-20020a170902eb8e00b0014f5d754fa5so459683plg.17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Feb 2022 19:50:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=vRtM/cROOx5FsqNMttv0pPiPYqWySn+ox7xCpR/R9pQ=;
+ b=VXI/EO5uA+etW0dY+bDcMbof9vcOt9SX4c8MIwKYL2KjJK778sgRC4ONa+S96Tq0kC
+ 2DNAkeg32L87pidTLjIxaGqseJc+3T5vMuB+w+93GZkI2D2TVXTTsK9tLKdq55IVduJd
+ HY6Yt6e7ITaZd1JWGm6SAif/ms7rSjFues9sLIJCzp12Jt5VwgzXhnRJusVMPVi7fx7K
+ EGLTgjyoji9r7qxZ7uhq821QmUs0eEGMKzsvl5mW4BzjI4gNlfYLd+rvssbuo7pt2BsP
+ pXyzTyGwbqarreY8cymIKeiUQtmMLmNlCpb2jOchN184vkaWtt52ENyHw4o+hy9Vex4V
+ c4Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=vRtM/cROOx5FsqNMttv0pPiPYqWySn+ox7xCpR/R9pQ=;
+ b=v+NLmYWbD19ONc5G+g1zgUAiSshHqrcNSeII3eb6sJynOQ1yKi1qrs+bhaMwLZ6iSr
+ XjuIHqe4MLZ72g7Ug6MP5I79LSw/OUqJQsYOVsMuED9XJsKi/FYV3+zc+c5qVwfJMRV8
+ 5PSVgyy3qapXFN8xLT+EScRAIOsQXM9+jgByOy2Z4CUhaVzRS2RaZBOwo/jnD8oislw4
+ X23FjMPShdBlWdk3leH/dNzB9hKCvic1wQM3eHI5F9tDkj7SWO+VYvnaovipWurTbmoM
+ A4GqvwzwxTlRP/pVY9GXXrehEAMEhyHxcFCdp5zNG8M4gaKJc2QqyIzHpACSsGaB/pPZ
+ UbVQ==
+X-Gm-Message-State: AOAM531MVHcKnaqOqwIQfBwA9wR+AJiY9W/z91oB59Lzf+EsjZ+MDsJC
+ KFAqEIyc1evSntC3hGEF+BZ9HEv7tH4=
+X-Google-Smtp-Source: ABdhPJz43oeS5F0siXWsZh061o21n+qfPtthgPIgTIT8DyUX6v2rSoMU2ZNvcsVNXhRZGwvcQO+2wDnOY7E=
+X-Received: from reiji-vws-sp.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
+ (user=reijiw job=sendgmr) by 2002:a17:90a:1f4d:b0:1bb:a657:ace5 with SMTP id
+ y13-20020a17090a1f4d00b001bba657ace5mr2283133pjy.39.1645069811410; Wed, 16
+ Feb 2022 19:50:11 -0800 (PST)
+Date: Wed, 16 Feb 2022 19:49:46 -0800
+Message-Id: <20220217034947.180935-1-reijiw@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
+Subject: [PATCH 1/2] KVM: selftests: kvm_vm_elf_load() and elfhdr_get() should
+ close fd
+From: Reiji Watanabe <reijiw@google.com>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,257 +80,44 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Sebastian,
+kvm_vm_elf_load() and elfhdr_get() open one file each, but they
+never close the opened file descriptor.  If a test repeatedly
+creates and destroys a VM with vm_create_with_vcpus(), which
+(directly or indirectly) calls those two functions, the test
+might end up getting a open failure with EMFILE.
+Fix those two functions to close the file descriptor.
 
-Thanks for looking into this. A few comments below.
+Signed-off-by: Reiji Watanabe <reijiw@google.com>
+---
+ tools/testing/selftests/kvm/lib/elf.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On 2022-02-16 16:16, Sebastian Ene wrote:
-> This patch add support for stolen time by sharing a memory region
-> with the guest which will be used by the hypervisor to store the stolen
-> time information. The exact format of the structure stored by the
-> hypervisor is described in the ARM DEN0057A document.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  Makefile                          |  3 +-
->  arm/aarch64/arm-cpu.c             |  2 +
->  arm/aarch64/include/kvm/pvtime.h  |  6 +++
->  arm/aarch64/pvtime.c              | 83 +++++++++++++++++++++++++++++++
->  arm/include/arm-common/kvm-arch.h |  6 +++
->  arm/kvm-cpu.c                     | 14 +++---
->  6 files changed, 106 insertions(+), 8 deletions(-)
->  create mode 100644 arm/aarch64/include/kvm/pvtime.h
->  create mode 100644 arm/aarch64/pvtime.c
-> 
-> diff --git a/Makefile b/Makefile
-> index f251147..282ae99 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
->  	OBJS		+= arm/aarch64/arm-cpu.o
->  	OBJS		+= arm/aarch64/kvm-cpu.o
->  	OBJS		+= arm/aarch64/kvm.o
-> +	OBJS		+= arm/aarch64/pvtime.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch64/include
-> 
-> @@ -582,4 +583,4 @@ ifneq ($(MAKECMDGOALS),clean)
-> 
->  KVMTOOLS-VERSION-FILE:
->  	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
-> -endif
-> \ No newline at end of file
-> +endif
-
-Spurious change?
-
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index d7572b7..80bf83a 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -2,6 +2,7 @@
->  #include "kvm/kvm.h"
->  #include "kvm/kvm-cpu.h"
->  #include "kvm/util.h"
-> +#include "kvm/pvtime.h"
-> 
->  #include "arm-common/gic.h"
->  #include "arm-common/timer.h"
-> @@ -22,6 +23,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm 
-> *kvm)
->  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
->  {
->  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> +	pvtime__setup_vcpu(vcpu);
->  	return 0;
->  }
-> 
-> diff --git a/arm/aarch64/include/kvm/pvtime.h 
-> b/arm/aarch64/include/kvm/pvtime.h
-> new file mode 100644
-> index 0000000..c31f019
-> --- /dev/null
-> +++ b/arm/aarch64/include/kvm/pvtime.h
-> @@ -0,0 +1,6 @@
-> +#ifndef KVM__PVTIME_H
-> +#define KVM__PVTIME_H
-> +
-> +void pvtime__setup_vcpu(struct kvm_cpu *vcpu);
-> +
-> +#endif /* KVM__PVTIME_H */
-
-How about sticking this in kvm-cpu-arch.h instead? A whole new include 
-file
-for just a prototype isn't totally warranted.
-
-> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> new file mode 100644
-> index 0000000..eb92388
-> --- /dev/null
-> +++ b/arm/aarch64/pvtime.c
-> @@ -0,0 +1,83 @@
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
-> +#include "kvm/pvtime.h"
-> +
-> +#include <linux/byteorder.h>
-> +#include <linux/types.h>
-> +
-> +struct pvtime_data_priv {
-> +	bool	is_supported;
-> +	char	*usr_mem;
-> +};
-> +
-> +static struct pvtime_data_priv pvtime_data = {
-> +	.is_supported	= true,
-> +	.usr_mem	= NULL
-> +};
-> +
-> +static int pvtime__aloc_region(struct kvm *kvm)
-
-s/aloc/alloc/ ?
-
-> +{
-> +	char *mem;
-> +	int ret = 0;
-> +
-> +	mem = mmap(NULL, AARCH64_PVTIME_IPA_MAX_SIZE, PROT_RW,
-> +		   MAP_ANON_NORESERVE, -1, 0);
-> +	if (mem == MAP_FAILED)
-> +		return -ENOMEM;
-> +
-> +	ret = kvm__register_dev_mem(kvm, AARCH64_PVTIME_IPA_START,
-> +				    AARCH64_PVTIME_IPA_MAX_SIZE, mem);
-> +	if (ret) {
-> +		munmap(mem, AARCH64_PVTIME_IPA_MAX_SIZE);
-> +		return ret;
-> +	}
-> +
-> +	pvtime_data.usr_mem = mem;
-> +	return ret;
-> +}
-> +
-> +static int pvtime__teardown_region(struct kvm *kvm)
-> +{
-> +	kvm__destroy_mem(kvm, AARCH64_PVTIME_IPA_START,
-> +			 AARCH64_PVTIME_IPA_MAX_SIZE, pvtime_data.usr_mem);
-> +	munmap(pvtime_data.usr_mem, AARCH64_PVTIME_IPA_MAX_SIZE);
-> +	pvtime_data.usr_mem = NULL;
-> +	return 0;
-> +}
-> +
-> +void pvtime__setup_vcpu(struct kvm_cpu *vcpu)
-> +{
-> +	int ret;
-> +	u64 pvtime_guest_addr = AARCH64_PVTIME_IPA_START + vcpu->cpu_id *
-> +		AARCH64_PVTIME_SIZE;
-> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> +	};
-> +
-> +	if (!pvtime_data.is_supported)
-> +		return;
-> +
-> +	if (!pvtime_data.usr_mem) {
-> +		ret = pvtime__aloc_region(vcpu->kvm);
-> +		if (ret)
-> +			goto out_err_alloc;
-> +	}
-> +
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> +	if (ret)
-> +		goto out_err_attr;
-
-You should check for the stolen time capability before allocating and 
-mapping
-the memory.
-
-> +
-> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> +	if (!ret)
-> +		return;
-> +
-> +out_err_attr:
-> +	pvtime__teardown_region(vcpu->kvm);
-> +out_err_alloc:
-> +	pvtime_data.is_supported = false;
-> +}
-> +
-> +dev_exit(pvtime__teardown_region);
-> diff --git a/arm/include/arm-common/kvm-arch.h
-> b/arm/include/arm-common/kvm-arch.h
-> index c645ac0..7b683d6 100644
-> --- a/arm/include/arm-common/kvm-arch.h
-> +++ b/arm/include/arm-common/kvm-arch.h
-> @@ -54,6 +54,12 @@
->  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
->  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
-> 
-> +#define AARCH64_PVTIME_IPA_MAX_SIZE		(0x10000)
-
-SZ_64K?
-
-> +#define AARCH64_PROTECTED_VM_FW_MAX_SIZE	(0x200000)
-
-This definitely looks like something that shouldn't be there. Yet.
-
-> +#define AARCH64_PVTIME_IPA_START	(ARM_MEMORY_AREA - \
-> +					 AARCH64_PROTECTED_VM_FW_MAX_SIZE - \
-> +					 AARCH64_PVTIME_IPA_MAX_SIZE)
-> +#define AARCH64_PVTIME_SIZE		(64)
-> 
->  #define ARM_LOMAP_MAX_MEMORY	((1ULL << 32) - ARM_MEMORY_AREA)
->  #define ARM_HIMAP_MAX_MEMORY	((1ULL << 40) - ARM_MEMORY_AREA)
-> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> index 6a2408c..84ac1e9 100644
-> --- a/arm/kvm-cpu.c
-> +++ b/arm/kvm-cpu.c
-> @@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm
-> *kvm, unsigned long cpu_id)
->  			die("Unable to find matching target");
->  	}
-> 
-> +	/* Populate the vcpu structure. */
-> +	vcpu->kvm		= kvm;
-> +	vcpu->cpu_id		= cpu_id;
-> +	vcpu->cpu_type		= vcpu_init.target;
-> +	vcpu->cpu_compatible	= target->compatible;
-> +	vcpu->is_running	= true;
-> +
->  	if (err || target->init(vcpu))
->  		die("Unable to initialise vcpu");
-> 
-> @@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm
-> *kvm, unsigned long cpu_id)
->  		vcpu->ring = (void *)vcpu->kvm_run +
->  			     (coalesced_offset * PAGE_SIZE);
-> 
-> -	/* Populate the vcpu structure. */
-> -	vcpu->kvm		= kvm;
-> -	vcpu->cpu_id		= cpu_id;
-> -	vcpu->cpu_type		= vcpu_init.target;
-> -	vcpu->cpu_compatible	= target->compatible;
-> -	vcpu->is_running	= true;
-> -
-
-What is the reason for moving these assignments around?
-
->  	if (kvm_cpu__configure_features(vcpu))
->  		die("Unable to configure requested vcpu features");
-
-Thanks,
-
-         M.
+diff --git a/tools/testing/selftests/kvm/lib/elf.c b/tools/testing/selftests/kvm/lib/elf.c
+index 13e8e3dcf984..9b23537a3caa 100644
+--- a/tools/testing/selftests/kvm/lib/elf.c
++++ b/tools/testing/selftests/kvm/lib/elf.c
+@@ -91,6 +91,7 @@ static void elfhdr_get(const char *filename, Elf64_Ehdr *hdrp)
+ 		"  hdrp->e_shentsize: %x\n"
+ 		"  expected: %zx",
+ 		hdrp->e_shentsize, sizeof(Elf64_Shdr));
++	close(fd);
+ }
+ 
+ /* VM ELF Load
+@@ -190,4 +191,5 @@ void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename)
+ 				phdr.p_filesz);
+ 		}
+ 	}
++	close(fd);
+ }
 -- 
-Jazz is not dead. It just smells funny...
+2.35.1.473.g83b2b277ed-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
