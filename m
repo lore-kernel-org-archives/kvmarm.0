@@ -2,51 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F033CC433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 20 Feb 2022 19:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE9EC433EF
+	for <kvmarm@archiver.kernel.org>; Sun, 20 Feb 2022 19:04:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DE8E4B1C9;
-	Sun, 20 Feb 2022 14:04:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AAA94B132;
+	Sun, 20 Feb 2022 14:04:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@gmail.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OBOVogQw2w8l; Sun, 20 Feb 2022 14:04:07 -0500 (EST)
+	with ESMTP id 1K1uYkMBCfaH; Sun, 20 Feb 2022 14:04:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AC4234B131;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C0F4B183;
 	Sun, 20 Feb 2022 14:04:07 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9092411BD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 12:11:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 70BA1408D5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Feb 2022 06:28:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zHO0OWEVmkn8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Feb 2022 12:11:07 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84F4C407EB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 12:11:07 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8EB88113E;
- Thu, 17 Feb 2022 09:11:06 -0800 (PST)
-Received: from [10.57.39.132] (unknown [10.57.39.132])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B02833F70D;
- Thu, 17 Feb 2022 09:11:05 -0800 (PST)
-Message-ID: <9e3389dd-2d29-4eb8-60d6-f67724be1f4a@arm.com>
-Date: Thu, 17 Feb 2022 17:11:03 +0000
+ with ESMTP id mSPM7HZaSb3T for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Feb 2022 06:28:10 -0500 (EST)
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com
+ [209.85.216.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D126408AA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Feb 2022 06:28:10 -0500 (EST)
+Received: by mail-pj1-f42.google.com with SMTP id b8so8294374pjb.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Feb 2022 03:28:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=PK/ubS/6VsrQfiT6fGu4snd5NM7nEqZO9rUfJO/NsiI=;
+ b=n/cvs6OXRCT6uPZ/Yw7GOroXVfh58ytcqRxwlJXMudjxgtROBVythTC/elOjbwNC3u
+ UH9nSTNV9ahF0MqrDCfr+DfIi8+vD4xNJ4qdK5ApItATZ0grW1xWnHAenvlSJ7NIIoj3
+ 0FK3cM95L6B3YdgR8Dp2MOJHgdED9iU6z2vgxjXLJxciDepCwVki4Kb96IOBfojKypXA
+ AENFOrP9JnnwZ5pKQThwrwWgTut7f8LDlWtNTk4+Jk8ffzjg8/EXw7SI7nzgXFNsAFaT
+ 2FGQy82gtk3SROxpDsW0cDqTFGSozWPPDbNulKfLODuimfsD6DkJA3THtl2LYxKeKM1b
+ T43Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=PK/ubS/6VsrQfiT6fGu4snd5NM7nEqZO9rUfJO/NsiI=;
+ b=aQPliQ1AeGeSj7mJj6GeyQSxKdr4UoN4COwuuyEaUWCCI6vyr8Dh+B+s2MYuCqrzuV
+ oaqNH1mWribSd6GbZd8qEw7ir5a5DuV9jrhDypE5yIEGUs4l2qXp2eZK5xMf0AX3QZ6a
+ q0FTGNAbl1YPIFauT+6aVWAjM7FHekQklFyfooGVkebMSZsPBdvT3zLViDuVlpucqfAH
+ LIpw5cEOB0Y2QmmPLzZdt3DfyFI0htjC4ZRs7O1jqkTxZHJdKha2daPfJRbp8Xj9qQ9M
+ 9bG4MwAJfFMgLDna0J0ZZyd0On4i/BtEclAAXIP79pX0cFqdE5zS60JDY/MDBXjEkUt4
+ zyzQ==
+X-Gm-Message-State: AOAM532wDA1JpCRwYnX+7fu70SaKffA2vYsual/lnK8Be/g9bQNmRmX4
+ OEFRko9GB2viA2Ugw0pr0bM=
+X-Google-Smtp-Source: ABdhPJy3Gih8h6AYa+elDZwsK5cx+J5xZ+6EWCZm6XLpJpwnVTm7xeYAKheh5zAXCfPVi6sQ7lPfKw==
+X-Received: by 2002:a17:903:143:b0:14d:44e7:5886 with SMTP id
+ r3-20020a170903014300b0014d44e75886mr7051510plc.148.1645183689452; 
+ Fri, 18 Feb 2022 03:28:09 -0800 (PST)
+Received: from baohua-VirtualBox.localdomain (47-72-151-34.dsl.dyn.ihug.co.nz.
+ [47.72.151.34])
+ by smtp.gmail.com with ESMTPSA id ob12sm5222899pjb.5.2022.02.18.03.28.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 18 Feb 2022 03:28:09 -0800 (PST)
+From: Barry Song <21cnbao@gmail.com>
+X-Google-Original-From: Barry Song <song.bao.hua@hisilicon.com>
+To: shankerd@codeaurora.org,
+	will@kernel.org
+Subject: Re: [PATCH] irqchip/gic-v3: Use wmb() instead of smb_wmb() in
+ gic_raise_softirq()
+Date: Fri, 18 Feb 2022 19:27:52 +0800
+Message-Id: <20220218112752.9811-1-song.bao.hua@hisilicon.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <1517443422-30693-1-git-send-email-shankerd@codeaurora.org>
+References: <1517443422-30693-1-git-send-email-shankerd@codeaurora.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.6.1
-Subject: Re: [kvm-unit-tests PATCH] configure: arm: Fixes to build and run
- tests on Apple Silicon
-Content-Language: en-GB
-To: Andrew Jones <drjones@redhat.com>
-References: <20220217102806.28749-1-nikos.nikoleris@arm.com>
- <20220217161022.krzj2g37natxrj6x@gator>
-From: Nikos Nikoleris <nikos.nikoleris@arm.com>
-In-Reply-To: <20220217161022.krzj2g37natxrj6x@gator>
 X-Mailman-Approved-At: Sun, 20 Feb 2022 14:04:07 -0500
-Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, jade.alglave@arm.com
+Cc: tspeier@codeaurora.org, vikrams@codeaurora.org, scampbel@codeaurora.org,
+ marc.zyngier@arm.com, linux-kernel@vger.kernel.org, tglx@linutronix.de,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -58,127 +89,31 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 17/02/2022 16:10, Andrew Jones wrote:
-> On Thu, Feb 17, 2022 at 10:28:06AM +0000, Nikos Nikoleris wrote:
->> On MacOS:
->>
->> $> uname -m
->>
->> returns:
->>
->> arm64
->>
->> To unify how we handle the achitecture detection across different
->> systems, sed it to aarch64 which is what's typically reported on
-> 
-> Was "sed" a typo or a new verb for "sedding" stuff :-)
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -688,7 +688,7 @@ static void gic_raise_softirq(const struct cpumask *mask, unsigned int irq)
+>  	 * Ensure that stores to Normal memory are visible to the
+>  	 * other CPUs before issuing the IPI.
+>  	 */
+> -	smp_wmb();
+> +	wmb();
 
-A much needed amendment to English  :)
+Sorry for waking up the old thread. isn't dsb(ishst) enough here as we only
+need to guarantee the visibility of data to other CPUs in smp inner domain
+before we send the ipi?
 
 > 
->> Linux.
->>
->> In addition, when HVF is the acceleration method on aarch64, make sure
->> we select the right processor when invoking qemu.
->>
->> Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
->> ---
->>   arm/run   | 3 +++
->>   configure | 2 +-
->>   2 files changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/arm/run b/arm/run
->> index 2153bd3..0629b69 100755
->> --- a/arm/run
->> +++ b/arm/run
->> @@ -27,6 +27,9 @@ if [ "$ACCEL" = "kvm" ]; then
->>   	if $qemu $M,\? 2>&1 | grep gic-version > /dev/null; then
->>   		M+=',gic-version=host'
->>   	fi
->> +fi
->> +
->> +if [ "$ACCEL" = "kvm" ] || [ "$ACCEL" = "hvf" ]; then
->>   	if [ "$HOST" = "aarch64" ] || [ "$HOST" = "arm" ]; then
->>   		processor="host"
->>   		if [ "$ARCH" = "arm" ] && [ "$HOST" = "aarch64" ]; then
->> diff --git a/configure b/configure
->> index 2d9c3e0..ff840c1 100755
->> --- a/configure
->> +++ b/configure
->> @@ -14,7 +14,7 @@ objcopy=objcopy
->>   objdump=objdump
->>   ar=ar
->>   addr2line=addr2line
->> -arch=$(uname -m | sed -e 's/i.86/i386/;s/arm.*/arm/;s/ppc64.*/ppc64/')
->> +arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
->>   host=$arch
->>   cross_prefix=
->>   endian=""
->> -- 
->> 2.32.0 (Apple Git-132)
->>
-> 
-> So, with this, we've got kvm-unit-tests running on HVF now?
->  
+>  	for_each_cpu(cpu, mask) {
+>  		u64 cluster_id = MPIDR_TO_SGI_CLUSTER_ID(cpu_logical_map(cpu));
 
-Just a step to get everything up and running. Not all tests pass, but I 
-haven't had the time to understand what's supported with HVF and what's not:
+Thanks
+Barry
 
-PASS selftest-setup (2 tests)
-FAIL selftest-vectors-kernel (timeout; duration=90s)
-PASS selftest-vectors-user (2 tests)
-PASS selftest-smp (1 tests)
-SKIP pci-test (KVM is needed, but not available on this host)
-SKIP pmu-cycle-counter (0 tests)
-SKIP pmu-event-introspection (0 tests)
-SKIP pmu-event-counter-config (0 tests)
-SKIP pmu-basic-event-count (0 tests)
-SKIP pmu-mem-access (0 tests)
-SKIP pmu-sw-incr (0 tests)
-SKIP pmu-chained-counters (0 tests)
-SKIP pmu-chained-sw-incr (0 tests)
-SKIP pmu-chain-promotion (0 tests)
-SKIP pmu-overflow-interrupt (0 tests)
-PASS gicv2-ipi (3 tests)
-PASS gicv2-mmio (17 tests, 1 skipped)
-FAIL gicv2-mmio-up (17 tests, 2 unexpected failures)
-FAIL gicv2-mmio-3p (17 tests, 3 unexpected failures)
-FAIL gicv3-ipi
-PASS gicv2-active (1 tests)
-FAIL gicv3-active
-PASS its-introspection (5 tests)
-FAIL its-trigger
-SKIP its-migration
-SKIP its-pending-migration
-SKIP its-migrate-unmapped-collection
-PASS psci (4 tests)
-FAIL timer (10 tests, 1 unexpected failures)
-SKIP micro-bench (test marked as manual run only)
-PASS cache (1 tests)
-PASS debug-bp (6 tests)
-SKIP debug-bp-migration
-PASS debug-wp (8 tests)
-SKIP debug-wp-migration
-PASS debug-sstep (1 tests)
-SKIP debug-sstep-migration
-
-> Applied to arm/queue
-> 
-> https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
-> 
-
-Thanks for the review!
-
-Nikos
-
-> Thanks,
-> drew
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
