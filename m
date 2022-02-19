@@ -2,76 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F03C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Feb 2022 04:41:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30835C433FE
+	for <kvmarm@archiver.kernel.org>; Sat, 19 Feb 2022 03:54:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FFD049ED0;
-	Thu, 17 Feb 2022 23:41:56 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A51549E32;
+	Fri, 18 Feb 2022 22:54:17 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id x2hnEamLtB0C; Thu, 17 Feb 2022 23:41:53 -0500 (EST)
+	with ESMTP id gwK+PJY2dveB; Fri, 18 Feb 2022 22:54:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ADC2949E3F;
-	Thu, 17 Feb 2022 23:41:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AFF449B26;
+	Fri, 18 Feb 2022 22:54:15 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D240F43C96
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 23:41:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDD1549B26
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Feb 2022 22:54:13 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id w81XklLV+P03 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Feb 2022 23:41:50 -0500 (EST)
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com
- [209.85.216.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C988408A7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 23:41:50 -0500 (EST)
-Received: by mail-pj1-f46.google.com with SMTP id
- t14-20020a17090a3e4e00b001b8f6032d96so7449205pjm.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Feb 2022 20:41:49 -0800 (PST)
+ with ESMTP id Fk75paCZB8VU for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Feb 2022 22:54:12 -0500 (EST)
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com
+ [209.85.216.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E936F41071
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Feb 2022 22:54:11 -0500 (EST)
+Received: by mail-pj1-f44.google.com with SMTP id y16so2026426pjt.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Feb 2022 19:54:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8mB2gqSD/1thxfzyI/cpGIPMbdmhDsan4VttXL4Bg6I=;
- b=og2nWtUt8EycuGyrUpNYUG6PP6l+vllk0AUrsieVj4M//vM9q1tvNvHES3cOhrjQjL
- lqKRMPLAzolXBMdCh5iWq/8JQlEDpw4whxUX9D1OV1l9v+hjDoWb/Veg9dpJxMmcG+Nn
- 1pWaK3LC6WzGIuHmYuILY8pcBfk1PDo0nIiFKFp4itYkDmOsF5VQ1LgrWfqyMXWH95fF
- CsTxUINokiCrBGM32azoTbVIWtbIW8lEfPVuSXUPEKqQQG55Oi+Qaf6otWj4Qq6kSVKw
- 5O/azujLdXuRqLDIGLryYQjpQG/HGdNti+wSZBrwUKrXBbNfA2R3xDHN4LVyI3yOYgtp
- ivig==
+ :cc; bh=/1hp/Nrrc9bXJDpvRd5gLdI1xht+MBR0HZwZMEg4+eg=;
+ b=ibv5XIIsn4khTUZiIydBkdX8DL8HU4FBF4pc4AN70R+/DD3wmUXegaDRBzBgjI1B70
+ x+srgxKiPP2poCP91mOczkoQzBK9pUtR/RDg0pDWYHTFUeu93aFve1akAtOQTygn9Ky7
+ GDYDToFLv6oo9CI2oNbH4LNRgPDcJw9JAeKvMOWNwhqNbGwzGKXRoqLxg+d4ceuIHBDo
+ eaYZc5Qv43EvzP98aW3Bt5vBVYT/HdRgYGxD7UTGg5bw7mzAs0h8UmbDr4fHGtk1HlYM
+ OQNw7kvsOOWKr42DMRAuzIe2Z6uD6bNkrwJx3IypjohF/MCzQ4+8hXcXsHKYgqyip5J3
+ WQGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=8mB2gqSD/1thxfzyI/cpGIPMbdmhDsan4VttXL4Bg6I=;
- b=fVrClsPxREMLBV1EfqEkSV+dqkiUJnE0xVJHx+nGsYXtDTtZAv/ciItAHHlfOg1oIY
- icUKSiM495XeoOL1aJ3tVRJIBPDVuHyPz/ePj/3vOLru4t8Av0MPehPzvNgf6nkMh9oL
- wAoPT0qyY8BmADTCcj8t7SNdHA+UlBtgAvWRrFG/HAmQK0qFD719P9/AjCtER/HS8Hob
- G/xX/4sik671Z6szG5VlMM0O94i4+vf/giyXwnHpCpDg38WG3aDo/+cK9uHGwdlhqrtv
- dKMIoqZPpEwynenTz3ipcmyF7AFc6vq52YcJaNbgjLA/AyNW5ALnPHNF1mpwmKBGJEou
- FcdA==
-X-Gm-Message-State: AOAM532Zp4MsIQUPOntX5JbfOPjTxFSJPnwT8+Sdb3rt4BPuk3GBiWZq
- XyCSpbbwpiPKeynxQEztF4lg9WK9mkNTHgoKNf1Mcw==
-X-Google-Smtp-Source: ABdhPJzKhswnQm9ZYFcqdns0/Zz+3JvbWbMFelBubqWhTsazsR9nCqWcqBxoVaQdMQjBFFn5NXgz5LePRF0K2H/QJc4=
-X-Received: by 2002:a17:902:7296:b0:14f:2a67:b400 with SMTP id
- d22-20020a170902729600b0014f2a67b400mr5971476pll.172.1645159308661; Thu, 17
- Feb 2022 20:41:48 -0800 (PST)
+ bh=/1hp/Nrrc9bXJDpvRd5gLdI1xht+MBR0HZwZMEg4+eg=;
+ b=2//ABGdgKkcAvAh6fQ7NrVmXmu2juiwzEifYXaoGUrdQQ3Mg0nxSf2nXBbpKuHaCdq
+ erOfYDEKd5sPoVj+lIuuJvYLynqyM+M0LxvEM2K9+vwvSxqhKm9pXAqyiNJhLfAaTSSD
+ ID8jF6cqYbVyxlU2AFQC/K8gFdNM3aT5ohV+Q5Ax2q+UukSJ3vO9+2Ldvq/R0CrEC60C
+ e7MX1q38W2PAfVy5C3Yi/Il256k3nSYbVRKR8xpGx4+F6Wi2bgnPT211+Eafm1o0JAxH
+ EblXm9QH5TirVFciwwRTTSX8GugG1gUuZLK+Lgdt13brgUIggkkeEiTbwi5J9wYPyQdd
+ 9xCw==
+X-Gm-Message-State: AOAM532TnkkqeBfl1tY90Pk54+71BAK6so0lzRBY/wODqSj3madd/epm
+ 4LUul+jqlOLFylh65b1lSBmcu2QGJCgatmhWNisWGA==
+X-Google-Smtp-Source: ABdhPJzXdmRKfhQdOZxyDxlljfrV3yzxnu6W1Hx39yzT9ZypjjTgVo+5FstbA7/CtZjy1J32df9OT8dYMVaMejeHbQQ=
+X-Received: by 2002:a17:90b:38c7:b0:1b8:d642:d447 with SMTP id
+ nn7-20020a17090b38c700b001b8d642d447mr15445104pjb.230.1645242850608; Fri, 18
+ Feb 2022 19:54:10 -0800 (PST)
 MIME-Version: 1.0
-References: <20211117153842.302159-1-alexandru.elisei@arm.com>
- <20211117153842.302159-3-alexandru.elisei@arm.com>
- <CAAeT=Fzx4Hf+Rimi7yNMxCO2OOm6C1_s1CnhcONHwg04nV_d7Q@mail.gmail.com>
- <YguInzLt1D9PZkwh@monolith.localdoman>
- <CAAeT=FwOh2125oscptguaLEK+PVFqTmtz0eG078xrUoEcGzr6A@mail.gmail.com>
- <Yg4j8MpTZ3BA7wZy@monolith.localdoman>
-In-Reply-To: <Yg4j8MpTZ3BA7wZy@monolith.localdoman>
+References: <20220217034947.180935-1-reijiw@google.com>
+ <20220217034947.180935-2-reijiw@google.com>
+ <Yg3Uer/K6n/h6oBz@google.com>
+In-Reply-To: <Yg3Uer/K6n/h6oBz@google.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Thu, 17 Feb 2022 20:41:32 -0800
-Message-ID: <CAAeT=Fy+OkEeuSAUAUELYuW3XpD-F7r0iRZHyq17Y_8YCA+d=g@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 02/38] KVM: arm64: Add lock/unlock memslot user API
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
+Date: Fri, 18 Feb 2022 19:53:54 -0800
+Message-ID: <CAAeT=FyW+nQCzrUt7S63KBTRnHEh2yvjWHwd2C2b7fMcweaaWg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: selftests: Introduce get_set_regs_perf
+ test
+To: Oliver Upton <oupton@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,465 +87,635 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
+Hi Oliver,
 
-On Thu, Feb 17, 2022 at 2:31 AM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
+On Wed, Feb 16, 2022 at 8:52 PM Oliver Upton <oupton@google.com> wrote:
 >
 > Hi Reiji,
 >
-> On Wed, Feb 16, 2022 at 11:35:06PM -0800, Reiji Watanabe wrote:
-> > Hi Alex,
-> >
-> > On Tue, Feb 15, 2022 at 3:03 AM Alexandru Elisei
-> > <alexandru.elisei@arm.com> wrote:
-> > >
-> > > Hi Reiji,
-> > >
-> > > On Mon, Feb 14, 2022 at 09:59:09PM -0800, Reiji Watanabe wrote:
-> > > > Hi Alex,
-> > > >
-> > > > On Wed, Nov 17, 2021 at 7:37 AM Alexandru Elisei
-> > > > <alexandru.elisei@arm.com> wrote:
-> > > > >
-> > > > > Stage 2 faults triggered by the profiling buffer attempting to write to
-> > > > > memory are reported by the SPE hardware by asserting a buffer management
-> > > > > event interrupt. Interrupts are by their nature asynchronous, which means
-> > > > > that the guest might have changed its stage 1 translation tables since the
-> > > > > attempted write. SPE reports the guest virtual address that caused the data
-> > > > > abort, not the IPA, which means that KVM would have to walk the guest's
-> > > > > stage 1 tables to find the IPA. Using the AT instruction to walk the
-> > > > > guest's tables in hardware is not an option because it doesn't report the
-> > > > > IPA in the case of a stage 2 fault on a stage 1 table walk.
-> > > > >
-> > > > > Avoid both issues by pre-mapping the guest memory at stage 2. This is being
-> > > > > done by adding a capability that allows the user to pin the memory backing
-> > > > > a memslot. The same capability can be used to unlock a memslot, which
-> > > > > unpins the pages associated with the memslot, but doesn't unmap the IPA
-> > > > > range from stage 2; in this case, the addresses will be unmapped from stage
-> > > > > 2 via the MMU notifiers when the process' address space changes.
-> > > > >
-> > > > > For now, the capability doesn't actually do anything other than checking
-> > > > > that the usage is correct; the memory operations will be added in future
-> > > > > patches.
-> > > > >
-> > > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > > > ---
-> > > > >  Documentation/virt/kvm/api.rst   | 57 ++++++++++++++++++++++++++
-> > > > >  arch/arm64/include/asm/kvm_mmu.h |  3 ++
-> > > > >  arch/arm64/kvm/arm.c             | 42 ++++++++++++++++++--
-> > > > >  arch/arm64/kvm/mmu.c             | 68 ++++++++++++++++++++++++++++++++
-> > > > >  include/uapi/linux/kvm.h         |  8 ++++
-> > > > >  5 files changed, 174 insertions(+), 4 deletions(-)
-> > > > >
-> > > > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > > > > index aeeb071c7688..16aa59eae3d9 100644
-> > > > > --- a/Documentation/virt/kvm/api.rst
-> > > > > +++ b/Documentation/virt/kvm/api.rst
-> > > > > @@ -6925,6 +6925,63 @@ indicated by the fd to the VM this is called on.
-> > > > >  This is intended to support intra-host migration of VMs between userspace VMMs,
-> > > > >  upgrading the VMM process without interrupting the guest.
-> > > > >
-> > > > > +7.30 KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-> > > > > +----------------------------------------
-> > > > > +
-> > > > > +:Architectures: arm64
-> > > > > +:Target: VM
-> > > > > +:Parameters: flags is one of KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK or
-> > > > > +                     KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
-> > > > > +             args[0] is the slot number
-> > > > > +             args[1] specifies the permisions when the memslot is locked or if
-> > > > > +                     all memslots should be unlocked
-> > > > > +
-> > > > > +The presence of this capability indicates that KVM supports locking the memory
-> > > > > +associated with the memslot, and unlocking a previously locked memslot.
-> > > > > +
-> > > > > +The 'flags' parameter is defined as follows:
-> > > > > +
-> > > > > +7.30.1 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK
-> > > > > +-------------------------------------------------
-> > > > > +
-> > > > > +:Capability: 'flags' parameter to KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-> > > > > +:Architectures: arm64
-> > > > > +:Target: VM
-> > > > > +:Parameters: args[0] contains the memory slot number
-> > > > > +             args[1] contains the permissions for the locked memory:
-> > > > > +                     KVM_ARM_LOCK_MEMORY_READ (mandatory) to map it with
-> > > > > +                     read permissions and KVM_ARM_LOCK_MEMORY_WRITE
-> > > > > +                     (optional) with write permissions
-> > > >
-> > > > Nit: Those flag names don't match the ones in the code.
-> > > > (Their names in the code are KVM_ARM_LOCK_MEM_READ/KVM_ARM_LOCK_MEM_WRITE)
-> > >
-> > > That's true, I'll change the flags to match.
-> > >
-> > > >
-> > > > What is the reason why KVM_ARM_LOCK_MEMORY_{READ,WRITE} flags need
-> > > > to be specified even though memslot already has similar flags ??
-> > >
-> > > I added both flags to make the ABI more flexible, and I don't think it's a
-> > > burden on userspace to specify the flags when locking a memslot.
-> > >
-> > > For this reason, I would rather keep it like this for now, unless you think
-> > > there's a good reason to remove them.
-> >
-> > Understood.
-> > Just to confirm, KVM_ARM_LOCK_MEMORY_READ is practically unnecessary,
-> > isn't it ? (Perhaps it might be more straightforward to have a similar
+> First off, thanks for looking into this! Seems like a very useful thing
+> to test :-)
 >
-> Even if the flag looks unnecessary now, that might change in the future, if new
-> flags are added.
->
-> > read only lock flag to the memslot considering this is an operation for
-> > a memslot?)
->
-> I don't see a reason to add a read-only flag to this ioctl, the memslot's
-> read-only flag should be enough.
-
-What I meant was, if we don't need KVM_ARM_LOCK_MEMORY_READ
-and if we can remove that (which isn't the case), instead of the write lock
-flag (KVM_ARM_LOCK_MEMORY_WRITE), naming that as read only lock flag
-(e.g. KVM_ARM_LOCK_MEMORY_READ_ONLY) might be better.
-Anyway, please disregard this comment.
-I understand you want to keep KVM_ARM_LOCK_MEMORY_READ and why.
-
-
+> On Wed, Feb 16, 2022 at 07:49:47PM -0800, Reiji Watanabe wrote:
+> > Introduce a simple performance test of KVM_GET_ONE_REG/KVM_SET_ONE_REG
+> > for registers that are returned by KVM_GET_REG_LIST. This is a pseudo
+> > process of saving/restoring registers during live migration, and this
+> > test quantifies the performance of the process.
 > >
-> > >
-> > > >
-> > > > > +:Returns: 0 on success; negative error code on failure
-> > > > > +
-> > > > > +Enabling this capability causes the memory described by the memslot to be
-> > > > > +pinned in the process address space and the corresponding stage 2 IPA range
-> > > > > +mapped at stage 2. The permissions specified in args[1] apply to both
-> > > > > +mappings. The memory pinned with this capability counts towards the max
-> >
-> > I assume 'both mappings' mean the permission is applied to the
-> > mapping for process address space as well as stage 2.
-> > Why do you want to apply the permission to the process address space
-> > mapping as well (not just for the stage 2 mapping) ?
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/.gitignore        |   1 +
+> >  tools/testing/selftests/kvm/Makefile          |   1 +
+> >  .../selftests/kvm/aarch64/get_set_regs_perf.c | 456 ++++++++++++++++++
 >
-> pin_user_pages() does not apply the permissions. It checks that they are already
-> there (look at pin_user_pages -> __gup_longterm_locked -> __get_user_pages_locked).
+> Without having looked at the diff yet, I wonder if this can be done for
+> multiple architectures, as the whole get/set reg UAPI is used by several
+> other architectures.
 >
-> I put the "both mappings" bit there to let userspace know that the userspace
-> mapping backing the memslot must have at least the same permissions as those
-> specified when locking the memslot. I'll remove this part, because it's
-> confusing and redundant.
-
-The above explanation ("backing the memslot must have at least...")
-looks clear to me and might be good to replace the original statement with
-that instead of removing.
-(I don't think that is explained in the doc in this patch)
-
-
+> >  3 files changed, 458 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/aarch64/get_set_regs_perf.c
 > >
-> >
-> > > > > +locked memory limit for the current process.
-> > > > > +
-> > > > > +The capability should be enabled when no VCPUs are in the kernel executing an
-> > > > > +ioctl (and in particular, KVM_RUN); otherwise the ioctl will block until all
-> > > > > +VCPUs have returned. The virtual memory range described by the memslot must be
-> > > > > +mapped in the userspace process without any gaps. It is considered an error if
-> > > > > +write permissions are specified for a memslot which logs dirty pages.
-> > > > > +
-> > > > > +7.30.2 KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK
-> > > > > +---------------------------------------------------
-> > > > > +
-> > > > > +:Capability: 'flags' parameter to KVM_CAP_ARM_LOCK_USER_MEMORY_REGION
-> > > > > +:Architectures: arm64
-> > > > > +:Target: VM
-> > > > > +:Parameters: args[0] contains the memory slot number
-> > > > > +             args[1] optionally contains the flag KVM_ARM_UNLOCK_MEM_ALL,
-> > > > > +                     which unlocks all previously locked memslots.
-> > > > > +:Returns: 0 on success; negative error code on failure
-> > > > > +
-> > > > > +Enabling this capability causes the memory pinned when locking the memslot
-> > > > > +specified in args[0] to be unpinned, or, optionally, all memslots to be
-> > > > > +unlocked. The IPA range is not unmapped from stage 2.
-> > > > > +>>>>>>> 56641eee289e (KVM: arm64: Add lock/unlock memslot user API)
-> > > >
-> > > > Nit: An unnecessary line.
-> > > >
-> > > > If a memslot with read/write permission is locked with read only,
-> > > > and then unlocked, can userspace expect stage 2 mapping for the
-> > > > memslot to be updated with read/write ?
-> > >
-> > > Locking a memslot with the read flag would map the memory described by the
-> > > memslot with read permissions at stage 2. When the memslot is unlocked, KVM
-> > > won't touch the stage 2 entries.
-> > >
-> > > When the memslot is unlocked, the pages (as in, struct page) backing the VM
-> > > memory as described by the memslot are unpinned. Then the host's MM subsystem
-> > > can treat the memory like any other pages (make them old, new, unmap them, do
-> > > nothing, etc), and the MMU notifier will take care of updating the stage 2
-> > > entries as necessary.
-> > >
-> > > I guess I should have been more precise in the description. I'll change "causes
-> > > the memory pinned when locking the memslot specified in args[0] to be unpinned"
-> > > to something that clearly states that the memory in the host that backs the
-> > > memslot is unpinned.
-> >
-> > Thank you for the explanation.
-> > It seems I misunderstood the read/write lock flag.
-> > These lock flags only affect the permission of locked mappings, not
-> > the guest's permission to access the memory, which depends only on
-> > the memslot permission (not on the lock flags) as before. Correct ?
+> > diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> > index dce7de7755e6..b6b18aaf9322 100644
+> > --- a/tools/testing/selftests/kvm/.gitignore
+> > +++ b/tools/testing/selftests/kvm/.gitignore
+> > @@ -2,6 +2,7 @@
+> >  /aarch64/arch_timer
+> >  /aarch64/debug-exceptions
+> >  /aarch64/get-reg-list
+> > +/aarch64/get_set_regs_perf
+> >  /aarch64/psci_cpu_on_test
+> >  /aarch64/vgic_init
+> >  /aarch64/vgic_irq
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index 0e4926bc9a58..46a28ce89002 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -103,6 +103,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
+> >  TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+> >  TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+> >  TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+> > +TEST_GEN_PROGS_aarch64 += aarch64/get_set_regs_perf
+> >  TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
+> >  TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+> >  TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
+> > diff --git a/tools/testing/selftests/kvm/aarch64/get_set_regs_perf.c b/tools/testing/selftests/kvm/aarch64/get_set_regs_perf.c
+> > new file mode 100644
+> > index 000000000000..27944ccce4a1
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/aarch64/get_set_regs_perf.c
+> > @@ -0,0 +1,456 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * get_set_regs_perf - KVM_GET_ONE_REG/KVM_SET_ONE_REG performance test
+> > + *
+> > + * The test runs performance test of saving registers that are returned
+> > + * by KVM_GET_REG_LIST for vCPUs in a VM and restoring them for vCPUs
+> > + * in another VM (a part of behavior during blackout on live migration).
+> > + *
+> > + * Copyright (c) 2022, Google LLC.
+> > + */
+> > +
+> > +#define _GNU_SOURCE
+> > +
+> > +#include <stdio.h>
+> > +#include <stdlib.h>
+> > +#include <stdint.h>
+> > +#include <unistd.h>
+> > +#include <time.h>
+> > +#include <pthread.h>
+> > +
+> > +#include "kvm_util.h"
+> > +#include "processor.h"
+> > +
+> > +#define      N2USEC(nsec)    ((nsec)/1000)
 >
-> Yes, the locked flags only affect the initial permissions with which the IPAs
-> are mapped at stage 2.
+> How about defining:
+>
+>   #define       NSEC_PER_USEC   1000L
+>
+> and explicitly doing division inline? This is consistent with the kernel
+> as well.
 
-Thank you for all the clarification!!
-Now I think I understand the API (and your intention) better, and
-I will continue to take a look at the implementation more closely.
+Sure, that sounds good.
+
+
+> > +#define      REG_STR_LEN     64
+> > +
+> > +struct reg_val {
+> > +      /* Big enough buffer even for the longest vector register */
+> > +     uint64_t        val[32];
+> > +};
+> > +
+> > +struct thread_data {
+> > +     uint32_t        vcpuid;
+> > +     bool            is_set_reg;
+> > +     volatile bool   *start;
+> > +     struct kvm_vm   *vm;
+> > +     struct timespec time;
+> > +     struct kvm_reg_list     *reg_list;
+> > +
+> > +     /*
+> > +      * Pointer to an array of reg_val, which will hold a value of each
+> > +      * register. The number of elements in it is indicated in reg_list.n.
+> > +      */
+> > +     struct reg_val  *reg_vals;
+> > +
+> > +     /*
+> > +      * Pointer to an array of timespec, which will hold per register
+> > +      * latency of KVM_GET_ONE_REG or KVM_SET_ONE_REG. The number of
+> > +      * elements in it is indicated in reg_list.n.
+> > +      */
+> > +     struct timespec *reg_time;
+> > +};
+> > +
+> > +pthread_t threads[KVM_MAX_VCPUS];
+> > +struct thread_data thread_args[KVM_MAX_VCPUS];
+> > +
+> > +struct sys_reg_params {
+> > +     u8      Op0;
+> > +     u8      Op1;
+> > +     u8      CRn;
+> > +     u8      CRm;
+> > +     u8      Op2;
+> > +};
+> > +
+> > +static int regid_to_params(u64 id, struct sys_reg_params *params)
+> > +{
+> > +     switch (id & KVM_REG_SIZE_MASK) {
+> > +     case KVM_REG_SIZE_U64:
+> > +             /* Any unused index bits means it's not valid. */
+> > +             if (id & ~(KVM_REG_ARCH_MASK | KVM_REG_SIZE_MASK
+> > +                           | KVM_REG_ARM_COPROC_MASK
+> > +                           | KVM_REG_ARM64_SYSREG_OP0_MASK
+> > +                           | KVM_REG_ARM64_SYSREG_OP1_MASK
+> > +                           | KVM_REG_ARM64_SYSREG_CRN_MASK
+> > +                           | KVM_REG_ARM64_SYSREG_CRM_MASK
+> > +                           | KVM_REG_ARM64_SYSREG_OP2_MASK))
+> > +                     return -1;
+> > +             params->Op0 = ((id & KVM_REG_ARM64_SYSREG_OP0_MASK)
+> > +                            >> KVM_REG_ARM64_SYSREG_OP0_SHIFT);
+> > +             params->Op1 = ((id & KVM_REG_ARM64_SYSREG_OP1_MASK)
+> > +                            >> KVM_REG_ARM64_SYSREG_OP1_SHIFT);
+> > +             params->CRn = ((id & KVM_REG_ARM64_SYSREG_CRN_MASK)
+> > +                            >> KVM_REG_ARM64_SYSREG_CRN_SHIFT);
+> > +             params->CRm = ((id & KVM_REG_ARM64_SYSREG_CRM_MASK)
+> > +                            >> KVM_REG_ARM64_SYSREG_CRM_SHIFT);
+> > +             params->Op2 = ((id & KVM_REG_ARM64_SYSREG_OP2_MASK)
+> > +                            >> KVM_REG_ARM64_SYSREG_OP2_SHIFT);
+> > +             return 0;
+> > +     default:
+> > +             return -1;
+> > +     }
+> > +}
+> > +
+> > +static void reg_id_to_str(uint64_t id, char *str, int len)
+> > +{
+> > +     struct sys_reg_params p;
+> > +
+> > +     TEST_ASSERT((id & KVM_REG_ARCH_MASK) == KVM_REG_ARM64,
+> > +                 "Not KVM_REG_ARM64 register (0x%lx)", id);
+> > +
+> > +     switch (id & KVM_REG_ARM_COPROC_MASK) {
+> > +     case KVM_REG_ARM_CORE:
+> > +             snprintf(str, len, "CORE(id:0x%lx)", id);
+> > +             break;
+> > +     case KVM_REG_ARM64_SVE:
+> > +             snprintf(str, len, "SVE(id:0x%lx)", id);
+> > +             break;
+> > +     case KVM_REG_ARM_DEMUX:
+> > +             snprintf(str, len, "DEMUX(id:0x%lx)", id);
+> > +             break;
+> > +     case KVM_REG_ARM_FW:
+> > +             snprintf(str, len, "FW_REG_%ld", id & 0xffff);
+> > +             break;
+> > +     case KVM_REG_ARM64_SYSREG:
+> > +             if (regid_to_params(id, &p) == 0)
+> > +                     snprintf(str, len, "SYSREG(%d,%d,%d,%d,%d)",
+> > +                              p.Op0, p.Op1, p.CRn, p.CRm, p.Op2);
+> > +             else
+> > +                     snprintf(str, len, "SYSREG(id:0x%lx)", id);
+> > +             break;
+> > +     default:
+> > +             snprintf(str, len, "KVM_REG_ARM64(id:0x%lx)", id);
+> > +     }
+> > +}
+>
+> I see that print_reg() in aarch64/get-reg-list.c implements most of
+> this. Would it be possible to hoist that into a shared helper function?
+
+Register name formats that are printed by get-reg-list.c are unnecessarily
+long for some registers like below for this testing, which I don't
+think is convenient
+for this testing.
+
+KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE |
+KVM_REG_ARM_CORE_REG(regs.regs[0]),
+KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE |
+KVM_REG_ARM_CORE_REG(regs.sp),
+
+Although I don't want to use this long format for this testing, I will
+look into creating a library function on this so that it can be used
+by both (or any other testings).
+
+
+>
+> > +/*
+> > + * Save or restore registers that were saved by get_regs_vcpu_thread with
+> > + * KVM_GET_ONE_REG or KVM_SET_ONE_REG. Measure time taken by this process.
+> > + */
+> > +static void *vcpu_thread(void *data)
+> > +{
+> > +     int i, ret;
+> > +     struct thread_data *arg = data;
+> > +     struct kvm_reg_list *reg_list = arg->reg_list;
+> > +     bool is_set_reg = arg->is_set_reg;
+> > +     unsigned int cmd = is_set_reg ? KVM_SET_ONE_REG : KVM_GET_ONE_REG;
+> > +     char *cmd_str = is_set_reg ? "SET_ONE_REG" : "GET_ONE_REG";
+>
+> Why not use vcpu_{get,set}_reg() instead? They already have informative
+> assertions that print the name of the ioctl and the name of the errno.
+
+Thank you for the comment !
+This comment reminded me of another problem that I wanted to fix:)
+(Since TEST_ASSERT unconditionally evaluates its arguments, strerror(),
+ which is internally serialized, is called from vcpu_{get,set}_reg())
+
+
+> > +     struct timespec ts_reg_diff, ts_reg_start;
+> > +     struct kvm_one_reg reg;
+> > +
+> > +     memset(&arg->time, 0, sizeof(arg->time));
+> > +
+> > +     /* Wait until start is set */
+> > +     while (!(*arg->start))
+> > +             ;
+>
+> Have you considered using a pthread_barrier for this?
+
+Thank you for the proposal. I will use that.
+
+
+>
+> > +     /* Warm up the cache. */
+> > +     reg.id = reg_list->reg[0];
+> > +     reg.addr = (uint64_t)&arg->reg_vals[0];
+> > +     ret = _vcpu_ioctl(arg->vm, arg->vcpuid, cmd, &reg);
+> > +     TEST_ASSERT(!ret, "%s(id:0x%llx) failed\n", cmd_str, reg.id);
+>
+> I wouldn't expect VMMs to do this before starting migration. Do you
+> think it would be better to replicate the behavior of typical userspace?
+
+The reason why I added that was because it makes a bit of noise for
+per register result (and the impact on the whole is not significant).
+
+ytbcp26:/tmp# ./get_set_regs_perf -v8 -r| tail -n +4| sort -nk2 |tail -n 3
+ SYSREG(3,0,0,1,0)                         1084        617        467
+ SYSREG(3,3,14,3,2)                        2678        397       2281
+ CORE(id:0x6030000000100000)               2855       1459       1396
+
+ytbcp26:/tmp# ./get_set_regs_perf -v8 -r| tail -n +4| sort -nk2 |tail -n 3
+ SYSREG(3,0,0,4,0)                          994        461        533
+ SYSREG(3,0,0,1,0)                         1052        582        470
+ SYSREG(3,3,14,3,2)                        2675        396       2279
+
+So, I would prefer to keep that.
+
+>
+> > +     pr_debug("%s[%d] start\n", __func__, arg->vcpuid);
+> > +
+> > +     /* Run KVM_SET_ONE_REG or KVM_GET_ONE_REG for registers in reg_list */
+> > +     for (i = 0; i < reg_list->n; i++) {
+> > +             clock_gettime(CLOCK_MONOTONIC, &ts_reg_start);
+> > +
+> > +             reg.id = reg_list->reg[i];
+> > +             reg.addr = (uint64_t)&arg->reg_vals[i];
+> > +             ret = _vcpu_ioctl(arg->vm, arg->vcpuid, cmd, &reg);
+> > +
+> > +             ts_reg_diff = timespec_elapsed(ts_reg_start);
+> > +             arg->time = timespec_add(arg->time, ts_reg_diff);
+> > +             if (arg->reg_time)
+> > +                     /* Need per register latency separately */
+> > +                     arg->reg_time[i] = ts_reg_diff;
+> > +
+> > +             TEST_ASSERT(!ret, "%s(id:0x%llx) failed\n", cmd_str, reg.id);
+> > +             pr_debug("%s: id:0x%lx, val:0x%lx\n", cmd_str, (uint64_t)reg.id,
+> > +                      arg->reg_vals[i].val[0]);
+> > +     }
+> > +
+> > +     return NULL;
+> > +}
+> > +
+> > +void aggregate_time(uint64_t cnt, struct timespec *total, struct timespec *data)
+> > +{
+> > +     uint64_t i;
+> > +
+> > +     for (i = 0; i < cnt; i++)
+> > +             total[i] = timespec_add(total[i], data[i]);
+> > +}
+> > +
+> > +struct result_timespec {
+> > +     struct timespec src;
+> > +     struct timespec dst;
+> > +     struct timespec *src_per_reg;
+> > +     struct timespec *dst_per_reg;
+> > +};
+> > +
+> > +/*
+> > + * Run KVM_GET_ONE_REG/KVM_SET_ONE_REG performance test.
+> > + * Create a VM with the given number of vCPUs, create a thread for each
+> > + * vCPU in the VM, and wait until all the threads complete KVM_GET_ONE_REG
+> > + * for all the registers KVM_GET_REG_LIST returns. Then repeat the same thing
+> > + * with KVM_SET_ONE_REG. Aggregate the time spent by each thread on
+> > + * KVM_GET_ONE_REG and KVM_SET_ONE_REG, and return the vCPU average value to
+> > + * the caller via @res.
+> > + */
+> > +void run_test_one(int nvcpus, struct kvm_reg_list *reg_list,
+> > +               struct result_timespec *res)
+> > +{
+> > +     bool per_reg_data = res->src_per_reg ? true : false;
+> > +     uint64_t nregs = reg_list->n;
+> > +     volatile bool start = false;
+> > +     int i, ret;
+> > +     struct kvm_vm *src_vm, *dst_vm;
+> > +     struct thread_data *targ;
+> > +     struct timespec src_sum = (struct timespec){0};
+> > +     struct timespec dst_sum = (struct timespec){0};
+>
+> Is the cast required?
+
+No, it isn't... I will fix that.
+
+>
+> > +     if (per_reg_data) {
+> > +             /* Reset the buffers to save the per register result */
+> > +             memset(res->src_per_reg, 0, nregs * sizeof(struct timespec));
+> > +             memset(res->dst_per_reg, 0, nregs * sizeof(struct timespec));
+> > +     }
+> > +
+> > +     /* Create VMs to save/restore registers */
+> > +     src_vm = vm_create_default_with_vcpus(nvcpus, 0, 0, NULL, NULL);
+> > +     dst_vm = vm_create_default_with_vcpus(nvcpus, 0, 0, NULL, NULL);
+> > +
+> > +     /* Start saving registers process for src_vm */
+> > +
+> > +     /* Create source VM's vCPU threads */
+> > +     for (i = 0; i < nvcpus; i++) {
+> > +             targ = &thread_args[i];
+> > +             targ->vm = src_vm;
+> > +             targ->vcpuid = i;
+> > +             targ->is_set_reg = false;
+> > +             targ->start = &start;
+> > +             targ->reg_list = reg_list;
+> > +             targ->reg_vals = calloc(nregs, sizeof(struct reg_val));
+> > +             TEST_ASSERT(targ->reg_vals, "Failed to allocate reg_vals");
+> > +             if (per_reg_data) {
+> > +                     /* Per register result buffer for the vCPU */
+> > +                     targ->reg_time = calloc(nregs, sizeof(struct timespec));
+> > +                     TEST_ASSERT(targ->reg_time, "Failed to allocate reg_time");
+> > +             }
+> > +             ret = pthread_create(&threads[i], NULL, vcpu_thread, targ);
+> > +             TEST_ASSERT(!ret, "pthread_create failed: %d\n", ret);
+> > +     }
+> > +
+> > +     /*
+> > +      * Let threads start saving registers for vCPUs, and wait for all
+> > +      * threads to complete restoring registers.
+> > +      */
+> > +     start = true;
+> > +     for (i = 0; i < nvcpus; i++) {
+> > +             targ = &thread_args[i];
+> > +             ret = pthread_join(threads[i], NULL);
+> > +             TEST_ASSERT(!ret, "pthread_join failed: %d\n", ret);
+> > +             src_sum = timespec_add(src_sum, targ->time);
+>
+> I think it would make more sense to measure wall time instead of CPU
+> time here. It may not be immediately obvious when running this test why
+> the reported time scales as the number of vCPUs increases.
+
+The result that is going to be shown is vCPU average (I don't want
+to include the costs incurred by the test code as much as possible).
+I will consider adding an optional behavior to show the worst result
+among vCPUs.
+
+>
+> > +             if (per_reg_data)
+> > +                     aggregate_time(nregs, res->src_per_reg, targ->reg_time);
+> > +     }
+> > +
+> > +     start = false;
+> > +     pr_debug("%s Saving registers completed.\n", __func__);
+> > +
+> > +     /* Start restoring registers process for dst_vm */
+> > +
+> > +     /* Create destination VM's vCPU threads */
+> > +     for (i = 0; i < nvcpus; i++) {
+> > +             targ = &thread_args[i];
+> > +             /* Update fields that are different from the src case */
+> > +             targ->vm = dst_vm;
+> > +             targ->is_set_reg = true;
+> > +             ret = pthread_create(&threads[i], NULL, vcpu_thread, targ);
+> > +             TEST_ASSERT(!ret, "pthread_create failed: %d\n", ret);
+> > +     }
+> > +
+> > +     /*
+> > +      * Let threads start saving registers for vCPUs, and wait for all
+> > +      * threads to complete restoring registers.
+> > +      */
+> > +     start = true;
+> > +     for (i = 0; i < nvcpus; i++) {
+> > +             targ = &thread_args[i];
+> > +             ret = pthread_join(threads[i], NULL);
+> > +             TEST_ASSERT(!ret, "pthread_join failed: %d\n", ret);
+> > +
+> > +             free(targ->reg_vals);
+> > +             dst_sum = timespec_add(dst_sum, targ->time);
+> > +             if (per_reg_data) {
+> > +                     aggregate_time(nregs, res->dst_per_reg, targ->reg_time);
+> > +                     free(targ->reg_time);
+> > +             }
+> > +     }
+> > +
+> > +     kvm_vm_free(src_vm);
+> > +     kvm_vm_free(dst_vm);
+> > +
+> > +     pr_debug("%s Restoring registers completed.\n", __func__);
+> > +
+> > +     /* Calculate the vCPU average */
+> > +     res->src = timespec_div(src_sum, nvcpus);
+> > +     res->dst = timespec_div(dst_sum, nvcpus);
+> > +     if (!per_reg_data)
+> > +             return;
+> > +
+> > +     /* Calculate the vCPU average for each register */
+> > +     for (i = 0; i < nregs; i++) {
+> > +             res->src_per_reg[i] = timespec_div(res->src_per_reg[i], nvcpus);
+> > +             res->dst_per_reg[i] = timespec_div(res->dst_per_reg[i], nvcpus);
+> > +     }
+> > +}
+> > +
+> > +/*
+> > + * Run saving/restoring vCPU registers (KVM_GET_ONE_REG/KVM_SET_ONE_REG)
+> > + * performance test with the given number of vCPUs (@nvcpus) for the given
+> > + * number (@iterations) of times.
+> > + * Each iteration of the test returns the latency of saving/restoring all
+> > + * the registers that KVM_GET_REG_LIST returns (See comments for
+> > + * run_test_one() for more details of each iteration of the test).
+> > + * Print the average latency of each iteration, and if @per_reg_result is set,
+> > + * print the average latency for each register as well.
+> > + */
+> > +void run_test(int nvcpus, int iterations, bool per_reg_result)
+> > +{
+> > +     int i, j;
+> > +     uint64_t nregs;
+> > +     struct result_timespec res = {0};
+> > +     struct timespec src_sum = {0};
+> > +     struct timespec dst_sum = {0};
+> > +     struct timespec avg, src_avg, dst_avg;
+> > +     struct timespec *src_per_reg_sum, *dst_per_reg_sum;
+> > +     struct kvm_vm *vm;
+> > +     struct kvm_reg_list *reg_list;
+> > +     char reg_str[REG_STR_LEN];
+> > +
+> > +     /* Get kvm_reg_list */
+> > +     vm = vm_create_default(0, 0, NULL);
+> > +     reg_list = vcpu_get_reg_list(vm, 0);
+>
+> Would it make sense to test some opt-in capabilities that expose
+> additional registers (PMU, SVE, etc.)?
+
+Yes, I will implement that.
+
+>
+> > +     kvm_vm_free(vm);
+> > +     nregs = reg_list->n;
+> > +
+> > +     if (per_reg_result) {
+> > +             /*
+> > +              * Allocate buffers to save latency of KVM_GET_ONE_REG
+> > +              * and KVM_SET_ONE_REG respectively.
+> > +              */
+> > +
+> > +             /* Buffers for each iteration */
+> > +             res.src_per_reg = calloc(nregs, sizeof(struct timespec));
+> > +             res.dst_per_reg = calloc(nregs, sizeof(struct timespec));
+> > +
+> > +             /* Buffers for the sum */
+> > +             src_per_reg_sum = calloc(nregs, sizeof(struct timespec));
+> > +             dst_per_reg_sum = calloc(nregs, sizeof(struct timespec));
+> > +
+> > +             TEST_ASSERT(res.src_per_reg && res.dst_per_reg &&
+> > +                         src_per_reg_sum && dst_per_reg_sum,
+> > +                         "Failed to allocate per register time buffer");
+> > +     }
+> > +
+> > +     pr_info("Iterations %d (vCPUs %d, regs %lld): ",
+> > +             iterations, nvcpus, reg_list->n);
+> > +
+> > +     for (i = 0; i < iterations; i++) {
+> > +             /* Run the test */
+> > +             run_test_one(nvcpus, reg_list, &res);
+> > +
+> > +             src_sum = timespec_add(src_sum, res.src);
+> > +             dst_sum = timespec_add(dst_sum, res.dst);
+> > +
+> > +             if (!per_reg_result)
+> > +                     continue;
+> > +
+> > +             /* Aggregate per register result */
+> > +             for (j = 0; j < nregs; j++) {
+> > +                     src_per_reg_sum[j] = timespec_add(src_per_reg_sum[j],
+> > +                                                       res.src_per_reg[j]);
+> > +                     dst_per_reg_sum[j] = timespec_add(dst_per_reg_sum[j],
+> > +                                                       res.dst_per_reg[j]);
+> > +             }
+> > +     }
+> > +
+> > +     /* Calculate the iteration average */
+> > +     src_avg = timespec_div(src_sum, iterations);
+> > +     dst_avg = timespec_div(dst_sum, iterations);
+> > +     avg = timespec_add(src_avg, dst_avg);
+> > +
+> > +     /* Print the average */
+> > +     if (avg.tv_sec > 0) {
+> > +             pr_info("get+set %ld.%.9lds (get %ld.%.9lds, set %ld.%.9lds)\n",
+> > +                     avg.tv_sec, avg.tv_nsec,
+> > +                     src_avg.tv_sec, src_avg.tv_nsec,
+> > +                     dst_avg.tv_sec, dst_avg.tv_nsec);
+> > +     } else {
+> > +             pr_info("get+set %ldus (get %ldus, set %ldus)\n",
+> > +                     N2USEC(avg.tv_nsec), N2USEC(src_avg.tv_nsec),
+> > +                     N2USEC(dst_avg.tv_nsec));
+> > +     }
+> > +
+> > +     /* Print per register result when requested */
+> > +     if (per_reg_result) {
+> > +             pr_info("Per Register Result:\n");
+> > +             pr_info(" %-32s %13s  %9s  %9s\n", "Register", "get+set(ns)", "get(ns)", "set(ns)");
+> > +             for (i = 0; i < nregs; i++) {
+> > +                     /* Calculate the average for the register */
+> > +                     src_avg = timespec_div(src_per_reg_sum[i], iterations);
+> > +                     dst_avg = timespec_div(dst_per_reg_sum[i], iterations);
+> > +                     avg = timespec_add(src_avg, dst_avg);
+> > +
+> > +                     assert(avg.tv_sec == 0);
+> > +                     reg_id_to_str(reg_list->reg[i], reg_str, REG_STR_LEN);
+> > +                     pr_info(" %-32s %13ld  %9ld  %9ld\n", reg_str,
+> > +                             avg.tv_nsec, src_avg.tv_nsec, dst_avg.tv_nsec);
+> > +             }
+>
+> Do you think it would be useful to optionally dump this granular data
+> into a machine-parseable format (like CSV)? It could be helpful for
+> analysis. We have several hundred exposed registers (and always
+> growing!) and grokking stdout might be a bit difficult.
+
+I am thinking of changing spaces in the output into tabs so that the
+output can be parsed easily (the stdout should be redirected to the
+file as needed).
+Then, since I am checking the result with sort+tail/head, one output
+format should be enough for both rather than adding extra options.
+BTW, some register names includes ',' because they are printed
+like "SYSREG(op0, op1, ...).
+
+Thank you so much for the review!
 
 Regards,
 Reiji
 
 
 >
-> Thanks,
-> Alex
+> > +             free(res.src_per_reg);
+> > +             free(res.dst_per_reg);
+> > +             free(src_per_reg_sum);
+> > +             free(dst_per_reg_sum);
+> > +     }
+> > +
+> > +     free(reg_list);
+> > +}
+> > +
+> > +int main(int argc, char *argv[])
+> > +{
+> > +     int opt;
+> > +     int nvcpus = 1;
+> > +     int max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
+> > +     int iterations = 1000;
+> > +     bool per_reg_result = false;
+> > +
+> > +     while ((opt = getopt(argc, argv, "hri:v:")) != -1) {
+> > +             switch (opt) {
+> > +             case 'i':
+> > +                     iterations = atoi(optarg);
+> > +                     break;
+> > +             case 'v':
+> > +                     nvcpus = atoi(optarg);
+> > +                     TEST_ASSERT(nvcpus > 0 && nvcpus <= max_vcpus,
+> > +                                 "Number of vcpus, must be between 1 and %d",
+> > +                                 max_vcpus);
+> > +                     break;
+> > +             case 'r':
+> > +                     per_reg_result = true;
+> > +                     break;
+> > +             case 'h':
+> > +             default:
+> > +                     printf("usage: %s [-h] [-v vcpus] [-i iterations]\n",
+> > +                            argv[0]);
+> > +                     exit(0);
+> > +             }
+> > +     }
+> > +
+> > +     setbuf(stdout, NULL);
+> > +
+> > +     run_test(nvcpus, iterations, per_reg_result);
+> > +
+> > +     return 0;
+> > +}
+> > --
+> > 2.35.1.473.g83b2b277ed-goog
+> >
 >
-> >
-> >
-> > >
-> > > > Can userspace delete the memslot that is locked (without unlocking) ?
-> > >
-> > > No, it cannot.
-> > >
-> > > > If so, userspace can expect the corresponding range to be implicitly
-> > > > unlocked, correct ?
-> > >
-> > > Userspace must explicitely unlock the memslot before deleting it. I want
-> > > userspace to be explicit in its intent.
-> >
-> > I see. Thank you for the clarification (I checked patch-9 as well).
-> >
-> > Thanks!
-> > Reiji
-> >
-> >
-> >
-> > >
-> > > Thanks,
-> > > Alex
-> > >
-> > > >
-> > > > Thanks,
-> > > > Reiji
-> > > >
-> > > > > +
-> > > > >  8. Other capabilities.
-> > > > >  ======================
-> > > > >
-> > > > > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> > > > > index 02d378887743..2c50734f048d 100644
-> > > > > --- a/arch/arm64/include/asm/kvm_mmu.h
-> > > > > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> > > > > @@ -216,6 +216,9 @@ static inline void __invalidate_icache_guest_page(void *va, size_t size)
-> > > > >  void kvm_set_way_flush(struct kvm_vcpu *vcpu);
-> > > > >  void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
-> > > > >
-> > > > > +int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags);
-> > > > > +int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags);
-> > > > > +
-> > > > >  static inline unsigned int kvm_get_vmid_bits(void)
-> > > > >  {
-> > > > >         int reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > > > index e9b4ad7b5c82..d49905d18cee 100644
-> > > > > --- a/arch/arm64/kvm/arm.c
-> > > > > +++ b/arch/arm64/kvm/arm.c
-> > > > > @@ -78,16 +78,43 @@ int kvm_arch_check_processor_compat(void *opaque)
-> > > > >         return 0;
-> > > > >  }
-> > > > >
-> > > > > +static int kvm_arm_lock_memslot_supported(void)
-> > > > > +{
-> > > > > +       return 0;
-> > > > > +}
-> > > > > +
-> > > > > +static int kvm_lock_user_memory_region_ioctl(struct kvm *kvm,
-> > > > > +                                            struct kvm_enable_cap *cap)
-> > > > > +{
-> > > > > +       u64 slot, action_flags;
-> > > > > +       u32 action;
-> > > > > +
-> > > > > +       if (cap->args[2] || cap->args[3])
-> > > > > +               return -EINVAL;
-> > > > > +
-> > > > > +       slot = cap->args[0];
-> > > > > +       action = cap->flags;
-> > > > > +       action_flags = cap->args[1];
-> > > > > +
-> > > > > +       switch (action) {
-> > > > > +       case KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK:
-> > > > > +               return kvm_mmu_lock_memslot(kvm, slot, action_flags);
-> > > > > +       case KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK:
-> > > > > +               return kvm_mmu_unlock_memslot(kvm, slot, action_flags);
-> > > > > +       default:
-> > > > > +               return -EINVAL;
-> > > > > +       }
-> > > > > +}
-> > > > > +
-> > > > >  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> > > > >                             struct kvm_enable_cap *cap)
-> > > > >  {
-> > > > >         int r;
-> > > > >
-> > > > > -       if (cap->flags)
-> > > > > -               return -EINVAL;
-> > > > > -
-> > > > >         switch (cap->cap) {
-> > > > >         case KVM_CAP_ARM_NISV_TO_USER:
-> > > > > +               if (cap->flags)
-> > > > > +                       return -EINVAL;
-> > > > >                 r = 0;
-> > > > >                 kvm->arch.return_nisv_io_abort_to_user = true;
-> > > > >                 break;
-> > > > > @@ -101,6 +128,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> > > > >                 }
-> > > > >                 mutex_unlock(&kvm->lock);
-> > > > >                 break;
-> > > > > +       case KVM_CAP_ARM_LOCK_USER_MEMORY_REGION:
-> > > > > +               if (!kvm_arm_lock_memslot_supported())
-> > > > > +                       return -EINVAL;
-> > > > > +               r = kvm_lock_user_memory_region_ioctl(kvm, cap);
-> > > > > +               break;
-> > > > >         default:
-> > > > >                 r = -EINVAL;
-> > > > >                 break;
-> > > > > @@ -168,7 +200,6 @@ vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
-> > > > >         return VM_FAULT_SIGBUS;
-> > > > >  }
-> > > > >
-> > > > > -
-> > > > >  /**
-> > > > >   * kvm_arch_destroy_vm - destroy the VM data structure
-> > > > >   * @kvm:       pointer to the KVM struct
-> > > > > @@ -276,6 +307,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> > > > >         case KVM_CAP_ARM_PTRAUTH_GENERIC:
-> > > > >                 r = system_has_full_ptr_auth();
-> > > > >                 break;
-> > > > > +       case KVM_CAP_ARM_LOCK_USER_MEMORY_REGION:
-> > > > > +               r = kvm_arm_lock_memslot_supported();
-> > > > > +               break;
-> > > > >         default:
-> > > > >                 r = 0;
-> > > > >         }
-> > > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > > index 326cdfec74a1..f65bcbc9ae69 100644
-> > > > > --- a/arch/arm64/kvm/mmu.c
-> > > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > > @@ -1296,6 +1296,74 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> > > > >         return ret;
-> > > > >  }
-> > > > >
-> > > > > +int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags)
-> > > > > +{
-> > > > > +       struct kvm_memory_slot *memslot;
-> > > > > +       int ret;
-> > > > > +
-> > > > > +       if (slot >= KVM_MEM_SLOTS_NUM)
-> > > > > +               return -EINVAL;
-> > > > > +
-> > > > > +       if (!(flags & KVM_ARM_LOCK_MEM_READ))
-> > > > > +               return -EINVAL;
-> > > > > +
-> > > > > +       mutex_lock(&kvm->lock);
-> > > > > +       if (!kvm_lock_all_vcpus(kvm)) {
-> > > > > +               ret = -EBUSY;
-> > > > > +               goto out_unlock_kvm;
-> > > > > +       }
-> > > > > +       mutex_lock(&kvm->slots_lock);
-> > > > > +
-> > > > > +       memslot = id_to_memslot(kvm_memslots(kvm), slot);
-> > > > > +       if (!memslot) {
-> > > > > +               ret = -EINVAL;
-> > > > > +               goto out_unlock_slots;
-> > > > > +       }
-> > > > > +       if ((flags & KVM_ARM_LOCK_MEM_WRITE) &&
-> > > > > +           ((memslot->flags & KVM_MEM_READONLY) || memslot->dirty_bitmap)) {
-> > > > > +               ret = -EPERM;
-> > > > > +               goto out_unlock_slots;
-> > > > > +       }
-> > > > > +
-> > > > > +       ret = -EINVAL;
-> > > > > +
-> > > > > +out_unlock_slots:
-> > > > > +       mutex_unlock(&kvm->slots_lock);
-> > > > > +       kvm_unlock_all_vcpus(kvm);
-> > > > > +out_unlock_kvm:
-> > > > > +       mutex_unlock(&kvm->lock);
-> > > > > +       return ret;
-> > > > > +}
-> > > > > +
-> > > > > +int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags)
-> > > > > +{
-> > > > > +       bool unlock_all = flags & KVM_ARM_UNLOCK_MEM_ALL;
-> > > > > +       struct kvm_memory_slot *memslot;
-> > > > > +       int ret;
-> > > > > +
-> > > > > +       if (!unlock_all && slot >= KVM_MEM_SLOTS_NUM)
-> > > > > +               return -EINVAL;
-> > > > > +
-> > > > > +       mutex_lock(&kvm->slots_lock);
-> > > > > +
-> > > > > +       if (unlock_all) {
-> > > > > +               ret = -EINVAL;
-> > > > > +               goto out_unlock_slots;
-> > > > > +       }
-> > > > > +
-> > > > > +       memslot = id_to_memslot(kvm_memslots(kvm), slot);
-> > > > > +       if (!memslot) {
-> > > > > +               ret = -EINVAL;
-> > > > > +               goto out_unlock_slots;
-> > > > > +       }
-> > > > > +
-> > > > > +       ret = -EINVAL;
-> > > > > +
-> > > > > +out_unlock_slots:
-> > > > > +       mutex_unlock(&kvm->slots_lock);
-> > > > > +       return ret;
-> > > > > +}
-> > > > > +
-> > > > >  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
-> > > > >  {
-> > > > >         if (!kvm->arch.mmu.pgt)
-> > > > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > > > > index 1daa45268de2..70c969967557 100644
-> > > > > --- a/include/uapi/linux/kvm.h
-> > > > > +++ b/include/uapi/linux/kvm.h
-> > > > > @@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
-> > > > >  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
-> > > > >  #define KVM_CAP_ARM_MTE 205
-> > > > >  #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
-> > > > > +#define KVM_CAP_ARM_LOCK_USER_MEMORY_REGION 207
-> > > > >
-> > > > >  #ifdef KVM_CAP_IRQ_ROUTING
-> > > > >
-> > > > > @@ -1483,6 +1484,13 @@ struct kvm_s390_ucas_mapping {
-> > > > >  #define KVM_PPC_SVM_OFF                  _IO(KVMIO,  0xb3)
-> > > > >  #define KVM_ARM_MTE_COPY_TAGS    _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
-> > > > >
-> > > > > +/* Used by KVM_CAP_ARM_LOCK_USER_MEMORY_REGION */
-> > > > > +#define KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK     (1 << 0)
-> > > > > +#define   KVM_ARM_LOCK_MEM_READ                                (1 << 0)
-> > > > > +#define   KVM_ARM_LOCK_MEM_WRITE                       (1 << 1)
-> > > > > +#define KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK   (1 << 1)
-> > > > > +#define   KVM_ARM_UNLOCK_MEM_ALL                       (1 << 0)
-> > > > > +
-> > > > >  /* ioctl for vm fd */
-> > > > >  #define KVM_CREATE_DEVICE        _IOWR(KVMIO,  0xe0, struct kvm_create_device)
-> > > > >
-> > > > > --
-> > > > > 2.33.1
-> > > > >
-> > > > > _______________________________________________
-> > > > > kvmarm mailing list
-> > > > > kvmarm@lists.cs.columbia.edu
-> > > > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> --
+> Best,
+> Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
