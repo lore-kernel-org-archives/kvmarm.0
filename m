@@ -2,67 +2,51 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF66BC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Feb 2022 18:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E2D8C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Feb 2022 18:32:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53CC049EF5;
-	Tue, 22 Feb 2022 13:17:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F2B0E41016;
+	Tue, 22 Feb 2022 13:32:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hJKzftt4P8We; Tue, 22 Feb 2022 13:17:12 -0500 (EST)
+	with ESMTP id 3-kQLjTJBiLp; Tue, 22 Feb 2022 13:32:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A323E49F33;
-	Tue, 22 Feb 2022 13:17:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCA0B49B07;
+	Tue, 22 Feb 2022 13:32:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CCCE49ED1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 13:17:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8395243C96
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 13:32:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3mQY1a9IFRxb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Feb 2022 13:17:03 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67802404B2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 13:17:03 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 49F35612D5;
- Tue, 22 Feb 2022 18:17:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76747C340E8;
- Tue, 22 Feb 2022 18:16:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1645553821;
- bh=MAUQrzPoVyGg35iV25GX0SuNLSauz5QYCshu0X7ErLA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=K4kP1d/3LrMcCtQIdy6XWKMykzzzOuz/P0APllZGT9z+ZJzhwtiiupPwtqy3SjuDW
- OqBmQRWKFa5ghDAKphXUsDxiT/+PwSduUbmQe301RAiZv76X7kSrtdxdnLbKbcb94X
- 9I7S//e7/GO5vLmQl6fxnNtLfBw3l+3yXmqSvVBqv6IjbPUJQfKNiEsp2aS7ur8E/r
- v3KFlb5PHuO9c7f2J6s9Q1fhmTAeAoavc4J1rlmIdkItvAz2p9AyEbNZy3aF0bSS+y
- OCCRxnC9+ts15C4bQ/7RxMZKP6yfvpf/BU5dUp3fQH0cWd/VWrTY4SWtunBd0xFM5E
- 5DuBpayL2zRPQ==
-Date: Tue, 22 Feb 2022 18:16:55 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v11 18/40] arm64/sme: Implement traps and syscall
- handling for SME
-Message-ID: <YhUol4EV0OTyXmDw@sirena.org.uk>
-References: <20220207152109.197566-1-broonie@kernel.org>
- <20220207152109.197566-19-broonie@kernel.org>
- <YhUjZZGaTW4FAkvM@arm.com>
+ with ESMTP id rz9HAN6r+Q1N for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Feb 2022 13:32:38 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9060041014
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 13:32:38 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C95D1139F;
+ Tue, 22 Feb 2022 10:32:37 -0800 (PST)
+Received: from lakrids (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 61EB33F66F;
+ Tue, 22 Feb 2022 10:32:35 -0800 (PST)
+Date: Tue, 22 Feb 2022 18:32:33 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v2 5/9] arm64: asm: Introduce test_sp_overflow macro
+Message-ID: <YhUsQZUqgb94EjmD@lakrids>
+References: <20220222165212.2005066-1-kaleshsingh@google.com>
+ <20220222165212.2005066-6-kaleshsingh@google.com>
 MIME-Version: 1.0
-In-Reply-To: <YhUjZZGaTW4FAkvM@arm.com>
-X-Cookie: I smell a wumpus.
-Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>, Marc Zyngier <maz@kernel.org>,
- Shuah Khan <skhan@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Salil Akerkar <Salil.Akerkar@arm.com>
+Content-Disposition: inline
+In-Reply-To: <20220222165212.2005066-6-kaleshsingh@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ Pasha Tatashin <pasha.tatashin@soleen.com>, will@kernel.org,
+ Peter Collingbourne <pcc@google.com>, maz@kernel.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ kvmarm@lists.cs.columbia.edu, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, surenb@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -74,95 +58,98 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============8917342854883531412=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Tue, Feb 22, 2022 at 08:51:06AM -0800, Kalesh Singh wrote:
+> From: Quentin Perret <qperret@google.com>
+> 
+> The asm entry code in the kernel uses a trick to check if VMAP'd stacks
+> have overflowed by aligning them at THREAD_SHIFT * 2 granularity and
+> checking the SP's THREAD_SHIFT bit.
+> 
+> Protected KVM will soon make use of a similar trick to detect stack
+> overflows, so factor out the asm code in a re-usable macro.
+> 
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> [Kalesh - Resolve minor conflicts]
+> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> ---
+>  arch/arm64/include/asm/assembler.h | 11 +++++++++++
+>  arch/arm64/kernel/entry.S          |  7 +------
+>  2 files changed, 12 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/assembler.h b/arch/arm64/include/asm/assembler.h
+> index e8bd0af0141c..ad40eb0eee83 100644
+> --- a/arch/arm64/include/asm/assembler.h
+> +++ b/arch/arm64/include/asm/assembler.h
+> @@ -850,4 +850,15 @@ alternative_endif
+>  
+>  #endif /* GNU_PROPERTY_AARCH64_FEATURE_1_DEFAULT */
+>  
+> +/*
+> + * Test whether the SP has overflowed, without corrupting a GPR.
+> + */
+> +.macro test_sp_overflow shift, label
+> +	add	sp, sp, x0			// sp' = sp + x0
+> +	sub	x0, sp, x0			// x0' = sp' - x0 = (sp + x0) - x0 = sp
+> +	tbnz	x0, #\shift, \label
+> +	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
+> +	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
+> +.endm
 
---===============8917342854883531412==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="bBZysAYOWnT5sYmR"
-Content-Disposition: inline
+I'm a little unhappy about factoring this out, since it's not really
+self-contained and leaves sp and x0 partially-swapped when it branches
+to the label. You can't really make that clear with comments on the
+macro, and you need comments at each use-sire, so I'd ratehr we just
+open-coded a copy of this.
 
+> +
+>  #endif	/* __ASM_ASSEMBLER_H */
+> diff --git a/arch/arm64/kernel/entry.S b/arch/arm64/kernel/entry.S
+> index 772ec2ecf488..ce99ee30c77e 100644
+> --- a/arch/arm64/kernel/entry.S
+> +++ b/arch/arm64/kernel/entry.S
+> @@ -53,15 +53,10 @@ alternative_else_nop_endif
+>  	sub	sp, sp, #PT_REGS_SIZE
+>  #ifdef CONFIG_VMAP_STACK
+>  	/*
+> -	 * Test whether the SP has overflowed, without corrupting a GPR.
+>  	 * Task and IRQ stacks are aligned so that SP & (1 << THREAD_SHIFT)
+>  	 * should always be zero.
+>  	 */
+> -	add	sp, sp, x0			// sp' = sp + x0
+> -	sub	x0, sp, x0			// x0' = sp' - x0 = (sp + x0) - x0 = sp
+> -	tbnz	x0, #THREAD_SHIFT, 0f
+> -	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
+> -	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
+> +	test_sp_overflow THREAD_SHIFT, 0f
+>  	b	el\el\ht\()_\regsize\()_\label
+>  
+>  0:
 
---bBZysAYOWnT5sYmR
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Further to my comment above, immediately after this we have:
 
-On Tue, Feb 22, 2022 at 05:54:45PM +0000, Catalin Marinas wrote:
-> On Mon, Feb 07, 2022 at 03:20:47PM +0000, Mark Brown wrote:
+	/* Stash the original SP (minus PT_REGS_SIZE) in tpidr_el0. */
+	msr     tpidr_el0, x0
 
-> > On syscall we exit streaming mode if we were previously in it and ensure
-> > that all but the lower 128 bits of the registers are zeroed while
-> > preserving the state of ZA. This follows the aarch64 PCS for SME, ZA
-> > state is preserved over a function call and streaming mode is exited.
+	/* Recover the original x0 value and stash it in tpidrro_el0 */
+	sub     x0, sp, x0
+	msr     tpidrro_el0, x0
 
-> I'm not sure this is entirely correct about the PCS. The caller must
-> disable SM if the function it calls is not compatible. But it's fine for
-> the kernel to impose this at the ABI level.
+... which is really surprising with the `test_sp_overflow` macro because
+it's not clear that modifies x0 and sp in this way.
 
-Yeah, I was thinking of it as being constructive error handling for
-being a normal function - if this were within userspace then the risk
-for the caller would be a SIGILL when the called function tries to do
-something that's invalid in streaming mode.  I'll tweak the text.
+Thanks,
+Mark.
+... 
 
-> > +	if (system_supports_sme() && test_thread_flag(TIF_SME) &&
-> > +	    !restore_sve_regs) {
-> > +		int sve_vq_minus_one;
-> > +
-> > +		sve_vq_minus_one = sve_vq_from_vl(task_get_sve_vl(current)) - 1;
-> > +		sve_set_vq(sve_vq_minus_one);
-> > +		sve_flush_live(true, sve_vq_minus_one);
-> > +	}
-
-> Shouldn't the SVE state be flushed by the hardware when switching to
-> streaming mode?
-
-Ah, yes - this is now the case.  In earlier revisions of the
-specification it was implementation defined if the state was zeroed or
-preserved so we had to clear but with the current version the state will
-always be zeroed so the flush is redundant and can be deleted.
-
-> > +	/*
-> > +	 * If SME is active then exit streaming mode.  If ZA is active
-> > +	 * then flush the SVE registers but leave userspace access to
-> > +	 * both SVE and SME enabled, otherwise disable SME for the
-> > +	 * task and fall through to disabling SVE too.  This means
-> > +	 * that after a syscall we never have any SME register state
-> > +	 * to track, if this changes the KVM code will need updating.
-> > +	 */
-
-> By "we never have any SME register state to track" I understand that we
-> drop the ZA state as well which AFAICT is not the case.
-
-s/SME/streaming SVE/
-
---bBZysAYOWnT5sYmR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmIVKJYACgkQJNaLcl1U
-h9BEpQf/cXSopp2p1A/Lku6H/oZh6fssrxuAE1d6Kc7xr0F8rm7Fn9qhanZDObJI
-2MIqPGdjBSEzYGjyOR32r/VxF9P7vPgBgjqEGYxCzdcgHru4zlbAacjSCDwbSH1Q
-DX0KrOr69cZw/INCqiut5BC282Q3aY14mQXHuEgIfiCe/gBFV2IA/eHNOm36OrXZ
-AFEB8z6AcIMp4n8AaaNQ33jlF2Ut5RexB4UPzVAW+V9zTj/QsivB2kT9//QvEjlj
-4QE2dkuDGLN+tQYTS9AesKgqdEY/wkyqn0GU7AxP5NNxrHgWpLU9MSROuL/A6UKp
-RyQaqzly7DOdxjud5bZXnVNRAjR77w==
-=QLrH
------END PGP SIGNATURE-----
-
---bBZysAYOWnT5sYmR--
-
---===============8917342854883531412==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+> -- 
+> 2.35.1.473.g83b2b277ed-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============8917342854883531412==--
