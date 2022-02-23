@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4596BC4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Feb 2022 04:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2A1C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Feb 2022 04:19:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DC07C4C36B;
-	Tue, 22 Feb 2022 23:19:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2AF54C3DD;
+	Tue, 22 Feb 2022 23:19:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZVwI4GFlS1hg; Tue, 22 Feb 2022 23:19:08 -0500 (EST)
+	with ESMTP id rdoPVp4QNHkG; Tue, 22 Feb 2022 23:19:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7408F4C3CE;
-	Tue, 22 Feb 2022 23:19:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9ADB54C3D6;
+	Tue, 22 Feb 2022 23:19:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 791204C36A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 23:19:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FFC54C36A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 23:19:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G0Ixz6kh2ePK for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Feb 2022 23:19:06 -0500 (EST)
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com
- [209.85.166.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C4324C3D6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 23:19:04 -0500 (EST)
-Received: by mail-io1-f73.google.com with SMTP id
- k10-20020a5d91ca000000b006414a00b160so4007644ior.18
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 20:19:04 -0800 (PST)
+ with ESMTP id oWQLBEfhS-WK for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Feb 2022 23:19:08 -0500 (EST)
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
+ [209.85.128.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19D124C36B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 23:19:08 -0500 (EST)
+Received: by mail-yw1-f202.google.com with SMTP id
+ 00721157ae682-2d7b96d74f8so25334517b3.16
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 20:19:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=hgAQAdRcLSzomebV7T5zWpSf8Sqv0crdtVr6zMUFKdo=;
- b=kLwPfeDgRiC06/LMgqmn21pwYTrxD8wWyQPGPXcy9D5sejy59RpWLZLIQfhAB+7zbc
- UY8NGRAIA/uzhchPlRZh02gB57nAAh+rHFQ/fKY8iCPv11qjGweXN7axa5k0LChl838B
- 75ogCb4VXicj9FhFFZ1Yj+9NhwvxVqHXXotu2QrkDDsmktMKg5iAkGgKBksVa2CwESXI
- zIYzPofAe8tu+R+Ku5SZaCoqWoGZtlDJUgJpwH1cUKKMKUTh2JBs0D3DMLG0s6Y2v9gu
- BNgkm7kVQI3AicbTSQlDah8CFngEj49pKQFj0cYsXbMu6gUt2u9IY6KgORJo+1rdQi7m
- OkFA==
+ :cc; bh=EnWXwLktezdYxVf4VXehGQaziGIoOwllvHGoxXaFkSk=;
+ b=NEjgsqtOFotB8rwtwgxw3nTKJIjcy3ygfSUnOerwYC8jtMBPV+WVzZP7gk6Sw+8rAQ
+ slf46M+kM70WVhS9OC1Dftw3Fd9xageH2ezIhLlTlAULl2ZNqEtjXEmfHcoJ1z3leWRL
+ Y2Q1TcuhaUfhM2y4Zu233zlNlZGcXS3xiPunbw9VaVelj8gALfVkGtKFjWS3HblWVNcC
+ NT9R6s5QfOf9QdyEMQqnPnfyVE5Wy62eKrQt/uytmG3x55QlnmP9RAbpQYjYLerhDRcE
+ OfRn3H4RXHIkN70lq1/ZumftMAc3OSme/5IwSAT1z1FCoR/lHXYabE0J7Det7jXyh8pM
+ WGOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=hgAQAdRcLSzomebV7T5zWpSf8Sqv0crdtVr6zMUFKdo=;
- b=h3RRN1DzKt7xCFjnRpS+fqtCFCqHYqxLd7OS96q0JPqiz2uEhoA8WpJore85LySpeF
- noWcRxXZwNBMo8bKfymY4urbuwmJUpZN/bBkDHzKSul8LjjqqBCQwN4SxflIfMllcnxx
- O4Jm5zUB2zREgA/fWXOxEpTaqoY1q9EkoP5y1NyLFptWcEdugHa464znob5uVHpxqV3A
- DgJMqArDSSSccm/XVceHAwb3Q2VVtlzPxObKvKU9u4+mL9cMF4NhCBpQcbf4s+aimad8
- 2+U5tczunfTX9UvX+ie3ATOsU5vDkp2zYvg6g+RvP9mhYWGF4BxCiWBUuhoClg2uXz3u
- Y0pQ==
-X-Gm-Message-State: AOAM531tAgBbNbC+FGmmerEObSy3MpikOWEpWHyn60oqdlBFSMSEJvIA
- j1FC3ew8eTrsYGMolnvNnA3OqbkqyAdts/8rvi7KaCY8co7ja8Xe8YqzRbosMe0LBRQaxx3HfZ1
- 2XMjmqQfbo6r5+mCFABiFrr3hRn1Sq7wtDUIe8pIWPSHoTtwJqRoGFNSFGxhfXesnBtfziA==
-X-Google-Smtp-Source: ABdhPJzesx/F3VdiTU8q8DAYdFAI9MvGQ2hrEzXrG+QY121eCCuyEw1mDHNKhI3wKWR0nN2+nmdX/YoCJRw=
+ bh=EnWXwLktezdYxVf4VXehGQaziGIoOwllvHGoxXaFkSk=;
+ b=cuhwgJ5S6jjf28mz1vOnnM9XbOqI1tr0OpKtzi+v2ZbUGgh7ICNq45V5UAc0sCd+Ha
+ Hm/MBVYt9+SwfI3C8nROdGlxfLxJQghTID4YZF0tjXSPoDzNd4ZeGQ7Q4nYbq8to+0X3
+ /hbd0NZ3Lpejr9fsmOmtgOGLpRFKMBj5ADf1ZdkdVhA3EwZEUhu6Plc89FN/VC/1lWag
+ z8as52OjkJqYcM9l4SG8cIoi4WePya5Y+osyftwHczNuOly+rm/JZ4dl0PCn4KPYuT5M
+ xco+cldNGrLcO2l3DmXzCzt58d6dHWlvO4uXHlja8wVsiNDp5z7xa/7RFIMfEZS1vAqr
+ IBOQ==
+X-Gm-Message-State: AOAM5304+RXij1RVdbZrrH5qO0v2Gofz8DmtY0U5PFImPJMAToD6fDBH
+ M0bEUhI9CPLfUKUs6/wuoqAh7czz+RC+gEzWno5MHQ7pnhytuZFuvRgvdjXGRA8gtUemE1mmwwd
+ e1pZIC3zQB4sRzKTylHOVLhhAepOd1/7zb+5ZTCs/vkYWc2VW5YdQuPodosbXhjdQ0TO4oA==
+X-Google-Smtp-Source: ABdhPJyjm1Ng5s7CW1KhrIyzYIpmZbuuYhZ/Y0UPWEqvGtpWPaulnfintVKcauly/pEhuTNpasU+6iJod1Q=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6638:378c:b0:313:f08c:e4df
- with SMTP id
- w12-20020a056638378c00b00313f08ce4dfmr21162221jal.192.1645589943753; Tue, 22
- Feb 2022 20:19:03 -0800 (PST)
-Date: Wed, 23 Feb 2022 04:18:26 +0000
+ (user=oupton job=sendgmr) by 2002:a25:8b0a:0:b0:61a:4aab:3e78 with
+ SMTP id
+ i10-20020a258b0a000000b0061a4aab3e78mr26177594ybl.619.1645589946470; Tue, 22
+ Feb 2022 20:19:06 -0800 (PST)
+Date: Wed, 23 Feb 2022 04:18:27 +0000
 In-Reply-To: <20220223041844.3984439-1-oupton@google.com>
-Message-Id: <20220223041844.3984439-2-oupton@google.com>
+Message-Id: <20220223041844.3984439-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20220223041844.3984439-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [PATCH v3 01/19] KVM: arm64: Drop unused param from kvm_psci_version()
+Subject: [PATCH v3 02/19] KVM: arm64: Create a helper to check if IPA is valid
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
@@ -90,67 +90,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-kvm_psci_version() consumes a pointer to struct kvm in addition to a
-vcpu pointer. Drop the kvm pointer as it is unused. While the comment
-suggests the explicit kvm pointer was useful for calling from hyp, there
-exist no such callsite in hyp.
+Create a helper that tests if a given IPA fits within the guest's
+address space.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20220208012705.640444-1-oupton@google.com
 ---
- arch/arm64/kvm/psci.c  | 6 +++---
- include/kvm/arm_psci.h | 6 +-----
- 2 files changed, 4 insertions(+), 8 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h      | 9 +++++++++
+ arch/arm64/kvm/vgic/vgic-kvm-device.c | 2 +-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 3eae32876897..a0c10c11f40e 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -85,7 +85,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	if (!vcpu)
- 		return PSCI_RET_INVALID_PARAMS;
- 	if (!vcpu->arch.power_off) {
--		if (kvm_psci_version(source_vcpu, kvm) != KVM_ARM_PSCI_0_1)
-+		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
- 			return PSCI_RET_ALREADY_ON;
- 		else
- 			return PSCI_RET_INVALID_PARAMS;
-@@ -392,7 +392,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
-  */
- int kvm_psci_call(struct kvm_vcpu *vcpu)
- {
--	switch (kvm_psci_version(vcpu, vcpu->kvm)) {
-+	switch (kvm_psci_version(vcpu)) {
- 	case KVM_ARM_PSCI_1_0:
- 		return kvm_psci_1_0_call(vcpu);
- 	case KVM_ARM_PSCI_0_2:
-@@ -471,7 +471,7 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 81839e9a8a24..78e8be7ea627 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -111,6 +111,7 @@ alternative_cb_end
+ #else
  
- 	switch (reg->id) {
- 	case KVM_REG_ARM_PSCI_VERSION:
--		val = kvm_psci_version(vcpu, vcpu->kvm);
-+		val = kvm_psci_version(vcpu);
- 		break;
- 	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
- 	case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
-diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
-index 5b58bd2fe088..297645edcaff 100644
---- a/include/kvm/arm_psci.h
-+++ b/include/kvm/arm_psci.h
-@@ -16,11 +16,7 @@
+ #include <linux/pgtable.h>
++#include <linux/kvm_host.h>
+ #include <asm/pgalloc.h>
+ #include <asm/cache.h>
+ #include <asm/cacheflush.h>
+@@ -147,6 +148,14 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+ #define kvm_phys_size(kvm)		(_AC(1, ULL) << kvm_phys_shift(kvm))
+ #define kvm_phys_mask(kvm)		(kvm_phys_size(kvm) - _AC(1, ULL))
  
- #define KVM_ARM_PSCI_LATEST	KVM_ARM_PSCI_1_0
++/*
++ * Returns true if the provided IPA exists within the VM's IPA space.
++ */
++static inline bool kvm_ipa_valid(struct kvm *kvm, phys_addr_t guest_ipa)
++{
++	return !(guest_ipa & ~kvm_phys_mask(kvm));
++}
++
+ #include <asm/kvm_pgtable.h>
+ #include <asm/stage2_pgtable.h>
  
--/*
-- * We need the KVM pointer independently from the vcpu as we can call
-- * this from HYP, and need to apply kern_hyp_va on it...
-- */
--static inline int kvm_psci_version(struct kvm_vcpu *vcpu, struct kvm *kvm)
-+static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
- {
- 	/*
- 	 * Our PSCI implementation stays the same across versions from
+diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+index c6d52a1fd9c8..e3853a75cb00 100644
+--- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
++++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+@@ -27,7 +27,7 @@ int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
+ 	if (addr + size < addr)
+ 		return -EINVAL;
+ 
+-	if (addr & ~kvm_phys_mask(kvm) || addr + size > kvm_phys_size(kvm))
++	if (!kvm_ipa_valid(kvm, addr) || addr + size > kvm_phys_size(kvm))
+ 		return -E2BIG;
+ 
+ 	return 0;
 -- 
 2.35.1.473.g83b2b277ed-goog
 
