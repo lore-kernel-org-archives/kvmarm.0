@@ -2,77 +2,62 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B6EEC4332F
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Feb 2022 11:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF948C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Feb 2022 11:02:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA1E14C49A;
-	Wed, 23 Feb 2022 06:02:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 957954C479;
+	Wed, 23 Feb 2022 06:02:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@infradead.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SLDCqgIFmyX9; Wed, 23 Feb 2022 06:02:44 -0500 (EST)
+	with ESMTP id q9eaZJytWG7t; Wed, 23 Feb 2022 06:02:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CF4E4C4B3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EB984C4BA;
 	Wed, 23 Feb 2022 06:02:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 051D44C40A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Feb 2022 04:28:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20EB94C458
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Feb 2022 05:02:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iYhiJIUOundn for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Feb 2022 04:27:59 -0500 (EST)
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com
- [209.85.219.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88C8F4C3BF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Feb 2022 04:27:59 -0500 (EST)
-Received: by mail-qv1-f48.google.com with SMTP id h13so7123750qvk.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Feb 2022 01:27:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=FhQOAPGriaJ90awBuK8zqjdKv78PGZubmhSGXhOpsOU=;
- b=WYvmz1X6IIdRaJ23Vh2yQ2n13gh/YEBa6QbFeHL6Hg+tvYpNdPGs2Yu2PPKeeQv3+e
- qG22nPSJTrT257gOYx3Q38lCw72iwtPISJGPnbgOEWf4UrqUHUHHbaVmX5J91ZsHMny+
- Sf3SSmoVt9kuW+aJgpPzk/jWHEDn9VVfEboLyY6dLhgY7/1+OzK7mtRhmy7uSCFijIyr
- DPNPZ27GmcW3LA2PNV5QhivEIZNmfxLb4ijyB22M7eliIcOyJr7/0jBgSVrvUeZALUDY
- E/A86W3bkAxbwJcOisoR85JnOvJ8yv2gCX0OOuRYnIFIjW3gguw2auSFMBFgjZsy27Zc
- LYZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=FhQOAPGriaJ90awBuK8zqjdKv78PGZubmhSGXhOpsOU=;
- b=ou24YkoXefZ5wVp8CK5EQ1w4EitoaNc5jN+WCPCQADnwqaHV+NeEW0GAInF+up+oaY
- 6Hp+MFHiqOP/cme64pWqRjDUITslgdivx3aecUWbSnNhWwMie7QzQmQVZxz5RJqNYrVl
- rH5UOOfNp1EjKhcHxUe+DCkdl5ibdAnhOfYXWlfVtydENp7r0Jp3p7lW3c4Wv29D4b4v
- 38tdPe1OWKP7HGrxRlOc8y7BWJvwOltM3MuUU8G9dTGp3tjXsYqYh9UmRBmhCMyvP7oR
- jQlSyEEOimeHKrBqchKa2+/ywy+Rzy5wJGlbq0oZsBGaKyG5H6oR/mNTDc+mN55vXU2c
- 5b9A==
-X-Gm-Message-State: AOAM531UOlRyf0fkVfD/VSX9UWqPhChCijUwegozfCsa3dNQm5SpQ7xR
- eFv06UK3j9odfkRdIixsM1k=
-X-Google-Smtp-Source: ABdhPJysnuY1B6OBDOm07qZYHEzp4gc3FPKgkCLtJYvJiUsHxlwskqu3IAXmibYmkfhtVSIXogVIHg==
-X-Received: by 2002:a05:622a:1452:b0:2de:6ed5:6230 with SMTP id
- v18-20020a05622a145200b002de6ed56230mr4682893qtx.619.1645608479002; 
- Wed, 23 Feb 2022 01:27:59 -0800 (PST)
-Received: from localhost.localdomain ([193.203.214.57])
- by smtp.gmail.com with ESMTPSA id 18sm1691485qtx.88.2022.02.23.01.27.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 23 Feb 2022 01:27:58 -0800 (PST)
-From: cgel.zte@gmail.com
-X-Google-Original-From: deng.changcheng@zte.com.cn
-To: maz@kernel.org
-Subject: [PATCH] KVM: arm64: Remove unneeded semicolon
-Date: Wed, 23 Feb 2022 09:27:50 +0000
-Message-Id: <20220223092750.1934130-1-deng.changcheng@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+ with ESMTP id P1FvSamwQFkO for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Feb 2022 05:02:54 -0500 (EST)
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 085F64C457
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Feb 2022 05:02:53 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+ In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+ Content-Transfer-Encoding:Content-ID:Content-Description;
+ bh=xniVx7Xx+NhrCVAQM7GGmPMpzrOCc61gpKt3BTFhkb0=; b=kljlGBFEFOWPtmxANQaW9RPHID
+ /QB2FGRTaClSA65aWNphuAbOxRhdlDCJiEkLSrySbVw0li5Rr0wfZJCexe7npnWsAiVahS+zvuhNK
+ frHCFNuMOZ+DsY+44rQiecdVy2PAPVRMrsWqV5azVUE3TFzsuIw7Fql1BuE2o3x2neilFTc9hmDLJ
+ qqFQpP0KfNKWkbM+GUAMhm+iRtE3Syk3udE0HkmYYM8bPN9F2gDctZwLyco9bG0ObP+dsfUk5qLDg
+ yG7tzxpKQ/tHsmKfy7XGb1pI194y4BnzQP39HSSVVdH9bJPctkPDIVbuBHfTeuGBzlp/aXbmxGU92
+ Oy8fK1Kg==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+ by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+ id 1nMoTu-003e66-7M; Wed, 23 Feb 2022 10:02:46 +0000
+Message-ID: <8622beb5a721ae888f21c2e7c74fae23b2e2ccb6.camel@infradead.org>
+Subject: Re: [PATCH v8 7/7] KVM: x86: Expose TSC offset controls to userspace
+From: David Woodhouse <dwmw2@infradead.org>
+To: Oliver Upton <oupton@google.com>, kvm@vger.kernel.org, 
+ kvmarm@lists.cs.columbia.edu
+Date: Wed, 23 Feb 2022 10:02:44 +0000
+In-Reply-To: <20210916181538.968978-8-oupton@google.com>
+References: <20210916181538.968978-1-oupton@google.com>
+ <20210916181538.968978-8-oupton@google.com>
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by
+ casper.infradead.org. See http://www.infradead.org/rpr.html
 X-Mailman-Approved-At: Wed, 23 Feb 2022 06:02:29 -0500
-Cc: will@kernel.org, catalin.marinas@arm.com, Zeal Robot <zealci@zte.com.cn>,
- linux-kernel@vger.kernel.org, Changcheng Deng <deng.changcheng@zte.com.cn>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,39 +69,210 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============1781136156672486138=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Changcheng Deng <deng.changcheng@zte.com.cn>
 
-Fix the following coccicheck review:
-./arch/arm64/kvm/psci.c: 379: 3-4: Unneeded semicolon
+--===============1781136156672486138==
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-Uo+/RJ9pVBZdWpqGNUDQ"
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
----
- arch/arm64/kvm/psci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-index 0a00ef250725..3b16dae4ab3d 100644
---- a/arch/arm64/kvm/psci.c
-+++ b/arch/arm64/kvm/psci.c
-@@ -376,7 +376,7 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
- 				ret = 0;
- 			}
- 			break;
--		};
-+		}
- 		fallthrough;
- 	default:
- 		return kvm_psci_0_2_call(vcpu);
--- 
-2.25.1
+--=-Uo+/RJ9pVBZdWpqGNUDQ
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 2021-09-16 at 18:15 +0000, Oliver Upton wrote:
+> To date, VMM-directed TSC synchronization and migration has been a bit
+> messy. KVM has some baked-in heuristics around TSC writes to infer if
+> the VMM is attempting to synchronize. This is problematic, as it depends
+> on host userspace writing to the guest's TSC within 1 second of the last
+> write.
+>=20
+> A much cleaner approach to configuring the guest's views of the TSC is to
+> simply migrate the TSC offset for every vCPU. Offsets are idempotent,
+> and thus not subject to change depending on when the VMM actually
+> reads/writes values from/to KVM. The VMM can then read the TSC once with
+> KVM_GET_CLOCK to capture a (realtime, host_tsc) pair at the instant when
+> the guest is paused.
+>=20
+> Cc: David Matlack <dmatlack@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  Documentation/virt/kvm/devices/vcpu.rst |  57 ++++++++++++
+>  arch/x86/include/asm/kvm_host.h         |   1 +
+>  arch/x86/include/uapi/asm/kvm.h         |   4 +
+>  arch/x86/kvm/x86.c                      | 110 ++++++++++++++++++++++++
+>  4 files changed, 172 insertions(+)
+>=20
+> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt=
+/kvm/devices/vcpu.rst
+> index 2acec3b9ef65..3b399d727c11 100644
+> --- a/Documentation/virt/kvm/devices/vcpu.rst
+> +++ b/Documentation/virt/kvm/devices/vcpu.rst
+> @@ -161,3 +161,60 @@ Specifies the base address of the stolen time struct=
+ure for this VCPU. The
+>  base address must be 64 byte aligned and exist within a valid guest memo=
+ry
+>  region. See Documentation/virt/kvm/arm/pvtime.rst for more information
+>  including the layout of the stolen time structure.
+> +
+> +4. GROUP: KVM_VCPU_TSC_CTRL
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+> +
+> +:Architectures: x86
+> +
+> +4.1 ATTRIBUTE: KVM_VCPU_TSC_OFFSET
+> +
+> +:Parameters: 64-bit unsigned TSC offset
+> +
+> +Returns:
+> +
+> +	 =3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +	 -EFAULT Error reading/writing the provided
+> +		 parameter address.
+> +	 -ENXIO  Attribute not supported
+> +	 =3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +Specifies the guest's TSC offset relative to the host's TSC. The guest's
+> +TSC is then derived by the following equation:
+> +
+> +  guest_tsc =3D host_tsc + KVM_VCPU_TSC_OFFSET
+
+This isn't true. The guest TSC also depends on the *scaling* factor.
+
+
+
+--=-Uo+/RJ9pVBZdWpqGNUDQ
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIwMjIzMTAwMjQ0WjAvBgkqhkiG9w0BCQQxIgQgtdHEtNoX
+xAcx14GpymHOLyQNJ5iaFngg9tv5oU3KdDwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgB/5/63wDckSXiqlxRG2HHCJ+g/KdzE+VrX
+K5b2ZjKg2yjtyz3DP5cvthmen6E4BNWao/Fvst4XHMvpw/xvhJBQ14oCwR+i2+M8Dr0P5M8zhfre
+J+icClI99KGuCofxO3Xm745lSuMZmduBzPvYMrbew3vS7u6R/JFzcCixwOC3F0EEdgcqBiUR89Li
+gP2hj1sMbtmX+U3/SYhae0Dn2gDOdA1rcHxSC4qir7T/Xv3Q2tkkzcoNNYtoEegVMsGpnRNBjR1k
+eDkN5p0ipr0vstTFfDjAl6tYkVDRFxu4q0OERPlGCNBIBUtKdWmnzQanM0UdrEWXrjt5ii4x7LNl
+j9zTVqTFvvgOmK//b8CzyjQtkLnIFPyC8k3EjhFNNdCI8lmv4tgKjGz64MVDG1hRNsBff87svEHy
+vszk26xA6JyfKChtdxKzDIarancXEKq4Nf6gZ6FelOo+t2p20JIx/DOo94WHZbuLoFMrBxAdEydZ
+p9plSTMlZxPTgt6aFhwX1GtggaPgydbYFcCC03L4Ogt8mcNc7rfJ83PqJBjWYUVs7gm5Pqr3e7cJ
+7NMREfsf5sN5KNjUqn4BPwOVph56llKl+EgbFcVN/ir2PvLETGXdw8+ZFT2R3voNNBkQviHhbj1D
+KJTbBnGLjnn4ASUGZmBpL4IAQZW+4pY6niVKrKwEOgAAAAAAAA==
+
+
+--=-Uo+/RJ9pVBZdWpqGNUDQ--
+
+
+--===============1781136156672486138==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1781136156672486138==--
+
