@@ -2,71 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26EBCC433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Feb 2022 04:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2583C4332F
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Feb 2022 04:20:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D14504C408;
-	Tue, 22 Feb 2022 23:20:00 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EF3F4C318;
+	Tue, 22 Feb 2022 23:20:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uaSBOkcQntl5; Tue, 22 Feb 2022 23:19:59 -0500 (EST)
+	with ESMTP id RkaV3cy1smAX; Tue, 22 Feb 2022 23:20:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72E324C40C;
-	Tue, 22 Feb 2022 23:19:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F4144C3F8;
+	Tue, 22 Feb 2022 23:20:00 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F6404C3F0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 23:19:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A813E4C369
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 23:19:59 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id E-82Jk9M9nQw for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Feb 2022 23:19:56 -0500 (EST)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA8684C2FE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 23:19:56 -0500 (EST)
-Received: by mail-yb1-f201.google.com with SMTP id
- i205-20020a2522d6000000b00622c778ac7cso26632479ybi.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 20:19:56 -0800 (PST)
+ with ESMTP id udSgjd2g5CBg for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Feb 2022 23:19:58 -0500 (EST)
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com
+ [209.85.166.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D7444C3EE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 23:19:58 -0500 (EST)
+Received: by mail-il1-f201.google.com with SMTP id
+ x6-20020a923006000000b002bea39c3974so11803390ile.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 20:19:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=wX3uLQzTSI1VGuKWaldZ9OxCxf9p8PEqoE0rKvDDfEY=;
- b=Kf5M0rxY7HQQeZge6xI5zVRK2n2hqX67dNO4ZfduWzrnYcNHFWeUg6et/fV66kMTv9
- f3yK6Yl1K3Rf5O3bbEuBdW12/ZYF9SuD5mkVNppx/+UfgCTU0qr6XUJkDPFOc/Oe37sU
- EUWuxkItN92Y6rYy1DwSj8++FXcg1m+6/7j1CFy0Na2YsV+ZP/ayfTUOl0p7Mh1TzUGE
- x/59SqmzMR2JBIXSbQaVin+KiZw9cDuhjNnx/nH5/fQs7TJQ+IZZBeLXQn209Lx0af92
- 4jmDJJiHNB9g0ulDKUFPq7U1w6vuxSjflkmLk7luJbee+y9MyDgIBi+MVcqR6av2cYo1
- tvOA==
+ :cc; bh=mNL+HTBUZ2MsABidwZFWaxMTNZTxqHsDRZZiQtVvY9U=;
+ b=AnT6yz+jzBN+vZRmnnU3kjwLqiu3bJDpwtLDuddpuszcgrqzqhSXZ5D1upnUqYuCgs
+ cXEK3U2pvCizUZ0UOIi8jHCh1VfC1GrM2HmD4ZnPWkMB9rZYWd1Enk2vqA2A5xy9wsxO
+ E+mzny0LNc3xOzqkH6jLQ6R6qWfKPKw5X6meGW7xSAAj4zTNi3xO+sqccqedCgV8qCga
+ fRhznPV4YXuu1WR1IUaOU8J9Rn4uHJd5964/doZzZDIhtH9+RsKPPYkg27TRddFJFG4Z
+ n0CAbnRU8DaEdayNrTP6vjkeXhqvahh7ZEHhS4VszZ1JckMmkqsx3O8STOTwXgaHOQ6A
+ 4s2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=wX3uLQzTSI1VGuKWaldZ9OxCxf9p8PEqoE0rKvDDfEY=;
- b=F2azODbUvFDGZdKbF2rXGR4gorYHboCVbpb/4ikQvluCIG+cpFvaW/PYDNuXPNcXX1
- DUUnftkXAWAta6qTey5/tMZdxDcYlvU2YBkKu10YOodbETFKysxeCUonLPFgzvWA2Qm3
- bt49BFoedQy5fCVG7S/UlKyPx/A7EjZ/zLLVIL8Y/PcObjbRcR6TwGviGbTGfa1fDBYT
- Ke2PG6G+D/878Z+o6XncP9u9lFhC/t+gqwfz++6vpeeYUCe30qVZcYqb0pzEE2v80A91
- N3ehiaSU8p/AroXyATQBigtEbO9hL7zjOTqhGzuApnpu8t+2G2hR0BzsnAIvJaad52C7
- /OXQ==
-X-Gm-Message-State: AOAM531bl3QcC2NfWCc1gcIm7LumsFLzHOHwV9L2gcoefu2+K8QoBRGV
- 81IkGRHKIGVsp6Rv0Juuqqvf6RMVQdI125Wt9nQQg2IARRptuPyU2PBqFdUSKR6LWJEvIXWbc+z
- 8Bh/TPYnztCep1IXnBGcA64knH9w/3wuiseh09WnKlnB2xzHJq8KLHkL23jGZkh8DWJGXWA==
-X-Google-Smtp-Source: ABdhPJx2YT+GU5lWSgnrMCYBlsHI2XDxNPpCJLOOdiCNG5irLKCRPgODRJMyBSnjRIKFdre9AH202Lw+e4M=
+ bh=mNL+HTBUZ2MsABidwZFWaxMTNZTxqHsDRZZiQtVvY9U=;
+ b=NljvbfXkaWHCrVy+x6xJFHQy7AMpGRhzIgRU/kE3fil80wnYntMr4xKoVQ/MdBhjBf
+ MojgT2Eq+3JtYEYeNyzPAs3TDPaP3K4MgxbuoeF8iGORHUaasZMMzbJ7A2VXj7tHRGDg
+ g2VtI0cu3MYzekZw81qI6FNM3HJErSGpVtnivrrVYHWxlEiAHwwadFkje+Ao9SFiYq4r
+ RM6WrL2J7G0e38rxomiPH82NhOMFKTLogo5Ta1jORJNGjujaaL7FnQw6fZG8scB66og4
+ V5JCb211+K7n+WG5IQMyIJtSnGZrubYER1ERmxgmggh+TZgP+YXGZlDu/ia1v8oTs5RG
+ C0qA==
+X-Gm-Message-State: AOAM533PGd29Xt0kDNEG7Z3VR1HRvh2sRVWw0uxhZ8gAY7DIM8HB049n
+ aK3blwNFwsvjBhbzYPxeGppj9nuAbAcevIUl92u3PpDqrzmECLDw0zX11dqLQSRu7cGGweS5rHG
+ q2FwWtlN1BMqDnVaHWx3f9n9S3T9ujeNfKduZKAJHGBGkJODtgsofjRP3qW6Kp7podWP0cQ==
+X-Google-Smtp-Source: ABdhPJw0kP0Dlf52lvVcBVnZ85OYD33u0JUbWlmw8FKgmBU6fU3nlvm/brYHvzUYLCy9kdMtFX8SXw/pFCk=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a25:ac53:0:b0:624:6fce:7c6e with
+ (user=oupton job=sendgmr) by 2002:a02:b048:0:b0:311:85be:a797 with
  SMTP id
- r19-20020a25ac53000000b006246fce7c6emr16211592ybd.164.1645589996212; Tue, 22
- Feb 2022 20:19:56 -0800 (PST)
-Date: Wed, 23 Feb 2022 04:18:41 +0000
+ q8-20020a02b048000000b0031185bea797mr21012184jah.284.1645589997820; Tue, 22
+ Feb 2022 20:19:57 -0800 (PST)
+Date: Wed, 23 Feb 2022 04:18:42 +0000
 In-Reply-To: <20220223041844.3984439-1-oupton@google.com>
-Message-Id: <20220223041844.3984439-17-oupton@google.com>
+Message-Id: <20220223041844.3984439-18-oupton@google.com>
 Mime-Version: 1.0
 References: <20220223041844.3984439-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [PATCH v3 16/19] selftests: KVM: Create helper for making SMCCC calls
+Subject: [PATCH v3 17/19] selftests: KVM: Use KVM_SET_MP_STATE to power off
+ vCPU in psci_test
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
@@ -90,153 +91,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The PSCI and PV stolen time tests both need to make SMCCC calls within
-the guest. Create a helper for making SMCCC calls and rework the
-existing tests to use the library function.
+Setting a vCPU's MP state to KVM_MP_STATE_STOPPED has the effect of
+powering off the vCPU. Rather than using the vCPU init feature flag, use
+the KVM_SET_MP_STATE ioctl to power off the target vCPU.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- .../testing/selftests/kvm/aarch64/psci_test.c | 25 ++++++-------------
- .../selftests/kvm/include/aarch64/processor.h | 22 ++++++++++++++++
- .../selftests/kvm/lib/aarch64/processor.c     | 25 +++++++++++++++++++
- tools/testing/selftests/kvm/steal_time.c      | 13 +++-------
- 4 files changed, 58 insertions(+), 27 deletions(-)
+ tools/testing/selftests/kvm/aarch64/psci_test.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-index 4c5f6814030f..8c998f0b802c 100644
+index 8c998f0b802c..fe1d5d343a2f 100644
 --- a/tools/testing/selftests/kvm/aarch64/psci_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-@@ -26,32 +26,23 @@
- static uint64_t psci_cpu_on(uint64_t target_cpu, uint64_t entry_addr,
- 			    uint64_t context_id)
- {
--	register uint64_t x0 asm("x0") = PSCI_0_2_FN64_CPU_ON;
--	register uint64_t x1 asm("x1") = target_cpu;
--	register uint64_t x2 asm("x2") = entry_addr;
--	register uint64_t x3 asm("x3") = context_id;
-+	struct arm_smccc_res res;
- 
--	asm("hvc #0"
--	    : "=r"(x0)
--	    : "r"(x0), "r"(x1), "r"(x2), "r"(x3)
--	    : "memory");
-+	smccc_hvc(PSCI_0_2_FN64_CPU_ON, target_cpu, entry_addr, context_id,
-+		  0, 0, 0, 0, &res);
- 
--	return x0;
-+	return res.a0;
+@@ -60,6 +60,15 @@ static void guest_main(uint64_t target_cpu)
+ 	GUEST_DONE();
  }
  
- static uint64_t psci_affinity_info(uint64_t target_affinity,
- 				   uint64_t lowest_affinity_level)
- {
--	register uint64_t x0 asm("x0") = PSCI_0_2_FN64_AFFINITY_INFO;
--	register uint64_t x1 asm("x1") = target_affinity;
--	register uint64_t x2 asm("x2") = lowest_affinity_level;
-+	struct arm_smccc_res res;
- 
--	asm("hvc #0"
--	    : "=r"(x0)
--	    : "r"(x0), "r"(x1), "r"(x2)
--	    : "memory");
-+	smccc_hvc(PSCI_0_2_FN64_AFFINITY_INFO, target_affinity, lowest_affinity_level,
-+		  0, 0, 0, 0, 0, &res);
- 
--	return x0;
-+	return res.a0;
- }
- 
- static void guest_main(uint64_t target_cpu)
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 8f9f46979a00..59ece9d4e0d1 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -185,4 +185,26 @@ static inline void local_irq_disable(void)
- 	asm volatile("msr daifset, #3" : : : "memory");
- }
- 
-+/**
-+ * struct arm_smccc_res - Result from SMC/HVC call
-+ * @a0-a3 result values from registers 0 to 3
-+ */
-+struct arm_smccc_res {
-+	unsigned long a0;
-+	unsigned long a1;
-+	unsigned long a2;
-+	unsigned long a3;
-+};
-+
-+/**
-+ * smccc_hvc - Invoke a SMCCC function using the hvc conduit
-+ * @function_id: the SMCCC function to be called
-+ * @arg0-arg6: SMCCC function arguments, corresponding to registers x1-x7
-+ * @res: pointer to write the return values from registers x0-x3
-+ *
-+ */
-+void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
-+	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
-+	       uint64_t arg6, struct arm_smccc_res *res);
-+
- #endif /* SELFTEST_KVM_PROCESSOR_H */
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 9343d82519b4..6a041289fa80 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -500,3 +500,28 @@ void __attribute__((constructor)) init_guest_modes(void)
- {
-        guest_modes_append_default();
- }
-+
-+void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
-+	       uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5,
-+	       uint64_t arg6, struct arm_smccc_res *res)
++static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
 +{
-+	asm volatile("mov   w0, %w[function_id]\n"
-+		     "mov   x1, %[arg0]\n"
-+		     "mov   x2, %[arg1]\n"
-+		     "mov   x3, %[arg2]\n"
-+		     "mov   x4, %[arg3]\n"
-+		     "mov   x5, %[arg4]\n"
-+		     "mov   x6, %[arg5]\n"
-+		     "mov   x7, %[arg6]\n"
-+		     "hvc   #0\n"
-+		     "mov   %[res0], x0\n"
-+		     "mov   %[res1], x1\n"
-+		     "mov   %[res2], x2\n"
-+		     "mov   %[res3], x3\n"
-+		     : [res0] "=r"(res->a0), [res1] "=r"(res->a1),
-+		       [res2] "=r"(res->a2), [res3] "=r"(res->a3)
-+		     : [function_id] "r"(function_id), [arg0] "r"(arg0),
-+		       [arg1] "r"(arg1), [arg2] "r"(arg2), [arg3] "r"(arg3),
-+		       [arg4] "r"(arg4), [arg5] "r"(arg5), [arg6] "r"(arg6)
-+		     : "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7");
++	struct kvm_mp_state mp_state = {
++		.mp_state = KVM_MP_STATE_STOPPED,
++	};
++
++	vcpu_set_mp_state(vm, vcpuid, &mp_state);
 +}
-diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
-index 62f2eb9ee3d5..8c4e811bd586 100644
---- a/tools/testing/selftests/kvm/steal_time.c
-+++ b/tools/testing/selftests/kvm/steal_time.c
-@@ -118,17 +118,10 @@ struct st_time {
- 
- static int64_t smccc(uint32_t func, uint64_t arg)
++
+ int main(void)
  {
--	unsigned long ret;
-+	struct arm_smccc_res res;
+ 	uint64_t target_mpidr, obs_pc, obs_x0;
+@@ -75,12 +84,12 @@ int main(void)
+ 	init.features[0] |= (1 << KVM_ARM_VCPU_PSCI_0_2);
  
--	asm volatile(
--		"mov	w0, %w1\n"
--		"mov	x1, %2\n"
--		"hvc	#0\n"
--		"mov	%0, x0\n"
--	: "=r" (ret) : "r" (func), "r" (arg) :
--	  "x0", "x1", "x2", "x3");
--
--	return ret;
-+	smccc_hvc(func, arg, 0, 0, 0, 0, 0, 0, &res);
-+	return res.a0;
- }
+ 	aarch64_vcpu_add_default(vm, VCPU_ID_SOURCE, &init, guest_main);
++	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
  
- static void check_status(struct st_time *st)
+ 	/*
+ 	 * make sure the target is already off when executing the test.
+ 	 */
+-	init.features[0] |= (1 << KVM_ARM_VCPU_POWER_OFF);
+-	aarch64_vcpu_add_default(vm, VCPU_ID_TARGET, &init, guest_main);
++	vcpu_power_off(vm, VCPU_ID_TARGET);
+ 
+ 	get_reg(vm, VCPU_ID_TARGET, KVM_ARM64_SYS_REG(SYS_MPIDR_EL1), &target_mpidr);
+ 	vcpu_args_set(vm, VCPU_ID_SOURCE, 1, target_mpidr & MPIDR_HWID_BITMASK);
 -- 
 2.35.1.473.g83b2b277ed-goog
 
