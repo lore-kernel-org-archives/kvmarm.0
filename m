@@ -2,58 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61819C433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Feb 2022 02:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F53EC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Feb 2022 02:29:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A76194BDED;
-	Tue, 22 Feb 2022 21:28:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC4444BAF4;
+	Tue, 22 Feb 2022 21:29:53 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id flVTWh0aq2NN; Tue, 22 Feb 2022 21:28:50 -0500 (EST)
+	with ESMTP id d+aaS3yZ8uHO; Tue, 22 Feb 2022 21:29:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 419034BDE3;
-	Tue, 22 Feb 2022 21:28:50 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 974014BDE0;
+	Tue, 22 Feb 2022 21:29:53 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59A964BDDA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 21:28:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D215C4BDE0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 21:29:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LQx0lvjoGASd for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Feb 2022 21:28:46 -0500 (EST)
+ with ESMTP id kblV-Fy4NqP8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Feb 2022 21:29:51 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA7EA4BDDE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 21:28:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A34314BAF4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Feb 2022 21:29:51 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 54B71B81E0B;
- Wed, 23 Feb 2022 02:28:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D395CC36AE5;
- Wed, 23 Feb 2022 02:28:42 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 39EF8B81E16;
+ Wed, 23 Feb 2022 02:29:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC7B1C340E8;
+ Wed, 23 Feb 2022 02:29:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1645583324;
+ s=k20201202; t=1645583388;
  bh=pJlFBvjxuJ7foblMFzRm/Bg/OJGdmZY6qGEQYa19W1U=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=IofOm66rkQxCSeQ8Zud04dSEVnvdTJtGsRowFl8AOXdL/oZFj8I7W2kRZdpUTvo9X
- k2/MM9w/UyrB8NPvOhTTsfuGhZ0ilwy52LjyJOK5eVg4wk5mmpTqob338FUUimW2Bu
- KEyB0mnC4xn+BEQjP5+P/z1JbKgSwDTRlHf5VHmpXTdWpZkDKRVSyUcI7UP/6zySxF
- s1kYzuGPbp2BksR5DTqKtIDG4vb6YHLP9P3RQHEX4r51DOIglHeu6Iab0o0bwO+KlT
- zyezhQrZ1MbVfDM9t5+7v9tq8HKSD7fUaDjrgPpTK3XJLNRySZ5vt0tOrcip8b3x95
- Bkyp1THeQnD1g==
+ b=HFjbgaQDqsmWMcFR/0svz9kahFBQc0IRkPyrKj3/kTHfhoQqotHnR+wXO43z/+Aju
+ O9XUpMryeD+WaOfsK4xpe9MM27b4sc6AxPaIO5y2Pgz1LeIjzTGp4eDJY6xvGFxY1t
+ QnnZTP8EIf9fsUMq6nryexbhdJHSqhOYo4Zr4lc0xsC3tL4787lAHnw5vueN+910i3
+ BeTG/nTnOO7SXrQzvR85ezCrkiXtizCmD9YRbGrfNr/gPBZAK9BCY7niDHyMxs3fnC
+ ruoDU66FUoUsrZTFdwG0MTuzgtshmBI3h3eQks2hzV4Znxdm1fTvrUXE0FbrX0nLyV
+ ABrKDhXq8F+cQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 11/30] KVM: arm64: vgic: Read HW interrupt
+Subject: [PATCH AUTOSEL 5.15 09/28] KVM: arm64: vgic: Read HW interrupt
  pending state from the HW
-Date: Tue, 22 Feb 2022 21:28:00 -0500
-Message-Id: <20220223022820.240649-11-sashal@kernel.org>
+Date: Tue, 22 Feb 2022 21:29:10 -0500
+Message-Id: <20220223022929.241127-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220223022820.240649-1-sashal@kernel.org>
-References: <20220223022820.240649-1-sashal@kernel.org>
+In-Reply-To: <20220223022929.241127-1-sashal@kernel.org>
+References: <20220223022929.241127-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
