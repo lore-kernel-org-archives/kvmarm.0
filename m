@@ -2,96 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2365C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 14:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 240F3C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 14:59:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F224B907;
-	Fri, 25 Feb 2022 09:49:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87E2D4BAAE;
+	Fri, 25 Feb 2022 09:59:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id c5pJy2GnYV6G; Fri, 25 Feb 2022 09:49:57 -0500 (EST)
+	with ESMTP id avIqPQzv0uix; Fri, 25 Feb 2022 09:59:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9CCA4B92C;
-	Fri, 25 Feb 2022 09:49:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05F874BA24;
+	Fri, 25 Feb 2022 09:59:47 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ED984B92B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 09:49:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0BEB4BD83
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 12:20:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cKQQpUBIjak4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Feb 2022 09:49:55 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D4694B900
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 09:49:55 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1645800594;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oG46p9ApnGlILl1ZLvkfxhnD10O2+FDP9Z7Tm2fwr+c=;
- b=Q4FannQMidh+cKStF5mM7UjA0ru81slTT9xfeYeW91GYut47wLCpMAoLj1KSUWLCoYuGui
- imRHQWoFvv7g+bmt7ILnLHzqu4jYU0bKIepF7D45Kto85la9TYHHjLcwhdb+pfOuK3UEqb
- L5wERKOD7za39oi4iIMz1OTdRcD95vY=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-427-ApsMbUurNy-X0m96RwkmIA-1; Fri, 25 Feb 2022 09:49:53 -0500
-X-MC-Unique: ApsMbUurNy-X0m96RwkmIA-1
-Received: by mail-wm1-f70.google.com with SMTP id
- h19-20020a05600c351300b0038141cf26deso43462wmq.8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 06:49:53 -0800 (PST)
+ with ESMTP id J4IioiwD-YjB for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Feb 2022 12:20:45 -0500 (EST)
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com
+ [209.85.128.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEBDB4BD62
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 12:20:45 -0500 (EST)
+Received: by mail-wm1-f46.google.com with SMTP id
+ v2-20020a7bcb42000000b0037b9d960079so254817wmj.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 09:20:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=utvkfVXnWSLnKdSa+6GF8/PEjrYoBqu8Fn7jPDqt4C8=;
+ b=szYIf+QYV3bkFqska1K1C7UKOpPo41TzN2e6+y2rvl1hoZ9nWrJLNybL6rXfgMa+Oy
+ jYdPkUB7BHGYklKB6fxLUc3o/7OEeG3fUNVf//99pRNztv57dfPpkYQvSop97SBXHOuC
+ rMEo+RCm4Mfxj0YHxHJpkETG7GqP0nbNwSgC6MRjdIYo1CIFADFwVE1jkaPROu8f5lkG
+ gQd/pTij053kUAh299u3QTXvthJzAlOeRlG8eoKBnRVQDs6Jh81P0hCaP/PD9iZVCM5Y
+ vi+tuuypxe+UCJk1KkQQdGul6BVp9pwgH2S+qo+9+iOM/aX1gCUkK8eWIRjMdoKIWaEl
+ HxnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=oG46p9ApnGlILl1ZLvkfxhnD10O2+FDP9Z7Tm2fwr+c=;
- b=Re0YTl5EzS2/s+QXJBxqnPsV5Zm0lh3DLg4BzfJNcj/nsQUFDLhr7dgCvKjL+iMB4C
- u/OeTNrHwi2z9BPLAbZv3MNTMykBT0z0440Um6u4fqZqKSJy7EMmNZMrFEC64F1KpZBZ
- sQxbJfuuyYZr5LE5VUHscb4o/m1d1oKarvvkSFPgrxuojlkh4xkP+B5z+jO2o5oFr9nQ
- 2Lpm/sfnENMBrDa1sAjPi7kYTP2W3N4hus2mBamCLBhnMTbUWwR8YYWig91jlfM1jBMJ
- XZPoRMIzOKiOYGwUkbIYMJkAqUtHD3IMZMLTnrLQ8vvoJUXAsj0gbEtqBqP6ShL13Rsi
- J0zw==
-X-Gm-Message-State: AOAM53046SU8aD9rNpkXcCOAi0hHBRGvnUcfgpTgh8KzZUj6s2h4jTvT
- 9xDxRne8s0lP6yJGla+xWzozsPQv950xdqgU3m1C8Ov2tuTkHzpagD56bodhw32gmRSt1taA3ZV
- BxrD9BcFlh+uougTl6yrkAbXY
-X-Received: by 2002:a05:6000:3c6:b0:1e4:a380:bb53 with SMTP id
- b6-20020a05600003c600b001e4a380bb53mr6213171wrg.559.1645800591923; 
- Fri, 25 Feb 2022 06:49:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyPvZpYeV1cMChykbmMIlrqZ62jXUzNXFVvdiNhkV7FTQ/vQZtP351aVYLRANF8AJomAWs86Q==
-X-Received: by 2002:a05:6000:3c6:b0:1e4:a380:bb53 with SMTP id
- b6-20020a05600003c600b001e4a380bb53mr6213154wrg.559.1645800591650; 
- Fri, 25 Feb 2022 06:49:51 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.googlemail.com with ESMTPSA id
- l26-20020a05600c1d1a00b00380def7d3desm2672667wms.17.2022.02.25.06.49.50
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 25 Feb 2022 06:49:51 -0800 (PST)
-Message-ID: <b03f6e27-bd55-e06b-af8d-a4e6bdf5d778@redhat.com>
-Date: Fri, 25 Feb 2022 15:49:49 +0100
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=utvkfVXnWSLnKdSa+6GF8/PEjrYoBqu8Fn7jPDqt4C8=;
+ b=NBIEGeVKeAig8Pr47/oUKH0RalRfSkV0Evn8u86Bp5tGaaKPklp5mwrOByAMvUs68B
+ bb8Epj8FSd9eOYpkIjUUkFBWwU+qMFmp86+Gqi9f+sIFcHyWk/gFSwcikW3kxsqzfbs7
+ cs2MknpabzpspokiK5hlan+9UZ4zOr+ENHpAZNWY645MC50Wp0CGyfsnCkDpZmZCMids
+ ZIFIPR4Wx4/MiTORdnMQqlKE+42pkK4UO//BfzoS9QZMdP8Q9geraRlnN24G18fnTQfI
+ W6AOICK59yhCnsXU5p9kdm2ypZjKVjM1uHTsGJ2Kfxcv4KZgOIqZF56OXW44xX2oKE36
+ ISdA==
+X-Gm-Message-State: AOAM531tFr/H6svs5Bn59SatNrdz5b9msBfHn0kixkiPat931KzZE6cQ
+ 9A61W+m8KYSRmm87fYPwnj8C65KIxCpVsQjMNlOiAw==
+X-Google-Smtp-Source: ABdhPJyYTMT7ZHiCXg3C7vYinlc/deu0CArrWe4sGJ5a7HqhVEUUgHUB6YfQBKFlcXs+aoYupAJ+EG7p0iyKX3/K2QI=
+X-Received: by 2002:a05:600c:4fc4:b0:37c:9116:ef3d with SMTP id
+ o4-20020a05600c4fc400b0037c9116ef3dmr3102577wmq.167.1645723244554; Thu, 24
+ Feb 2022 09:20:44 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.17, take #4
-To: Marc Zyngier <maz@kernel.org>
-References: <20220225131302.107215-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220225131302.107215-1-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kvm@vger.kernel.org, kernel-team@android.com,
- Mark Brown <broonie@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20220224051439.640768-1-kaleshsingh@google.com>
+ <20220224051439.640768-2-kaleshsingh@google.com>
+ <CA+EHjTzkmPuqtpRQRRfRnC2n-ah_jnPiqfa2kg55YESGSjN6OA@mail.gmail.com>
+In-Reply-To: <CA+EHjTzkmPuqtpRQRRfRnC2n-ah_jnPiqfa2kg55YESGSjN6OA@mail.gmail.com>
+From: Kalesh Singh <kaleshsingh@google.com>
+Date: Thu, 24 Feb 2022 09:20:33 -0800
+Message-ID: <CAC_TJvdTqiK87iT86JngJbtB-JfRDbuJREcLXvuEg3pqTEzcCQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/8] KVM: arm64: Introduce hyp_alloc_private_va_range()
+To: Fuad Tabba <tabba@google.com>
+X-Mailman-Approved-At: Fri, 25 Feb 2022 09:59:45 -0500
+Cc: "Cc: Android Kernel" <kernel-team@android.com>,
+ Will Deacon <will@kernel.org>, Peter Collingbourne <pcc@google.com>,
+ Marc Zyngier <maz@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ kvmarm@lists.cs.columbia.edu,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Suren Baghdasaryan <surenb@google.com>,
+ "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,59 +89,197 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2/25/22 14:13, Marc Zyngier wrote:
-> Hi Paolo,
-> 
-> Only a couple of fixes this time around: one for the long standing
-> PSCI CPU_SUSPEND issue, and a selftest fix for systems that don't have
-> a GICv3.
-> 
-> Please pull,
-> 
-> 	M.
-> 
-> The following changes since commit 5bfa685e62e9ba93c303a9a8db646c7228b9b570:
-> 
->    KVM: arm64: vgic: Read HW interrupt pending state from the HW (2022-02-11 11:01:12 +0000)
-> 
-> are available in the Git repository at:
-> 
->    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.17-4
-> 
-> for you to fetch changes up to 456f89e0928ab938122a40e9f094a6524cc158b4:
-> 
->    KVM: selftests: aarch64: Skip tests if we can't create a vgic-v3 (2022-02-25 13:02:28 +0000)
-> 
-> ----------------------------------------------------------------
-> KVM/arm64 fixes for 5.17, take #4
-> 
-> - Correctly synchronise PMR and co on PSCI CPU_SUSPEND
-> 
-> - Skip tests that depend on GICv3 when the HW isn't available
-> 
-> ----------------------------------------------------------------
-> Mark Brown (1):
->        KVM: selftests: aarch64: Skip tests if we can't create a vgic-v3
-> 
-> Oliver Upton (1):
->        KVM: arm64: Don't miss pending interrupts for suspended vCPU
-> 
->   arch/arm64/kvm/psci.c                            | 3 +--
->   tools/testing/selftests/kvm/aarch64/arch_timer.c | 7 ++++++-
->   tools/testing/selftests/kvm/aarch64/vgic_irq.c   | 4 ++++
->   tools/testing/selftests/kvm/lib/aarch64/vgic.c   | 4 +++-
->   4 files changed, 14 insertions(+), 4 deletions(-)
-> 
+On Thu, Feb 24, 2022 at 4:25 AM Fuad Tabba <tabba@google.com> wrote:
+>
+> Hi Kalesh,
+>
+> On Thu, Feb 24, 2022 at 5:16 AM Kalesh Singh <kaleshsingh@google.com> wrote:
+> >
+> > hyp_alloc_private_va_range() can be used to reserve private VA ranges
+> > in the nVHE hypervisor. Also update  __create_hyp_private_mapping()
+> > to allow specifying an alignment for the private VA mapping.
+> >
+> > These will be used to implement stack guard pages for KVM nVHE hypervisor
+> > (nVHE Hyp mode / not pKVM), in a subsequent patch in the series.
+> >
+> > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> > ---
+> >
+> > Changes in v3:
+> >   - Handle null ptr in IS_ERR_OR_NULL checks, per Mark
+> >
+> >  arch/arm64/include/asm/kvm_mmu.h |  4 +++
+> >  arch/arm64/kvm/mmu.c             | 62 ++++++++++++++++++++------------
+> >  2 files changed, 43 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > index 81839e9a8a24..0b0c71302b92 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -153,6 +153,10 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+> >  int kvm_share_hyp(void *from, void *to);
+> >  void kvm_unshare_hyp(void *from, void *to);
+> >  int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
+> > +unsigned long hyp_alloc_private_va_range(size_t size, size_t align);
+> > +int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+> > +                               size_t align, unsigned long *haddr,
+> > +                               enum kvm_pgtable_prot prot);
+> >  int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+> >                            void __iomem **kaddr,
+> >                            void __iomem **haddr);
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index bc2aba953299..fc09536c8197 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -457,22 +457,16 @@ int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
+> >         return 0;
+> >  }
+> >
+> > -static int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+> > -                                       unsigned long *haddr,
+> > -                                       enum kvm_pgtable_prot prot)
+> > +
+> > +/*
+> > + * Allocates a private VA range below io_map_base.
+> > + *
+> > + * @size:      The size of the VA range to reserve.
+> > + * @align:     The required alignment for the allocation.
+> > + */
+>
+> Many of the functions in this file use the kernel-doc format, and your
+> added comments are close, but not quite conforment. If you want to use
+> the kernel-doc for these you can refer to:
+> https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html
 
-Pulled, thanks.
+Hi Fuad,
 
-Paolo
+Thanks for the pointer. I will update the function comments to match
+when I send the next version.
 
+>
+> > +unsigned long hyp_alloc_private_va_range(size_t size, size_t align)
+> >  {
+> >         unsigned long base;
+> > -       int ret = 0;
+> > -
+> > -       if (!kvm_host_owns_hyp_mappings()) {
+> > -               base = kvm_call_hyp_nvhe(__pkvm_create_private_mapping,
+> > -                                        phys_addr, size, prot);
+> > -               if (IS_ERR_OR_NULL((void *)base))
+> > -                       return PTR_ERR((void *)base);
+> > -               *haddr = base;
+> > -
+> > -               return 0;
+> > -       }
+> >
+> >         mutex_lock(&kvm_hyp_pgd_mutex);
+> >
+> > @@ -484,8 +478,8 @@ static int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+> >          *
+> >          * The allocated size is always a multiple of PAGE_SIZE.
+> >          */
+> > -       size = PAGE_ALIGN(size + offset_in_page(phys_addr));
+> > -       base = io_map_base - size;
+> > +       base = io_map_base - PAGE_ALIGN(size);
+> > +       base = ALIGN_DOWN(base, align);
+> >
+> >         /*
+> >          * Verify that BIT(VA_BITS - 1) hasn't been flipped by
+> > @@ -493,20 +487,42 @@ static int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+> >          * overflowed the idmap/IO address range.
+> >          */
+> >         if ((base ^ io_map_base) & BIT(VA_BITS - 1))
+> > -               ret = -ENOMEM;
+> > +               base = (unsigned long)ERR_PTR(-ENOMEM);
+> >         else
+> >                 io_map_base = base;
+> >
+> >         mutex_unlock(&kvm_hyp_pgd_mutex);
+> >
+> > -       if (ret)
+> > -               goto out;
+> > +       return base;
+> > +}
+> > +
+> > +int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+> > +                               size_t align, unsigned long *haddr,
+> > +                               enum kvm_pgtable_prot prot)
+> > +{
+> > +       unsigned long addr;
+> > +       int ret = 0;
+> > +
+> > +       if (!kvm_host_owns_hyp_mappings()) {
+> > +               addr = kvm_call_hyp_nvhe(__pkvm_create_private_mapping,
+> > +                                        phys_addr, size, prot);
+> > +               if (IS_ERR_OR_NULL((void *)addr))
+> > +                       return addr ? PTR_ERR((void *)addr) : -ENOMEM;
+> > +               *haddr = addr;
+> > +
+> > +               return 0;
+> > +       }
+> > +
+> > +       size += offset_in_page(phys_addr);
+>
+> You're not page-aligning the size, which was the behavior before this
+> patch. However, looking at where it's being used it seems to be fine
+> because the users of size would align it if necessary.
+
+This is now done by hyp_alloc_private_va_range() when calculating the new base:
+ ...
+ * The allocated size is always a multiple of PAGE_SIZE.
+ */
+base = io_map_base - PAGE_ALIGN(size);
+...
+
+Thanks,
+Kalesh
+
+>
+> Thanks,
+> /fuad
+>
+>
+>
+> > +       addr = hyp_alloc_private_va_range(size, align);
+> > +       if (IS_ERR_OR_NULL((void *)addr))
+> > +               return addr ? PTR_ERR((void *)addr) : -ENOMEM;
+> >
+> > -       ret = __create_hyp_mappings(base, size, phys_addr, prot);
+> > +       ret = __create_hyp_mappings(addr, size, phys_addr, prot);
+> >         if (ret)
+> >                 goto out;
+> >
+> > -       *haddr = base + offset_in_page(phys_addr);
+> > +       *haddr = addr + offset_in_page(phys_addr);
+> >  out:
+> >         return ret;
+> >  }
+> > @@ -537,7 +553,7 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+> >                 return 0;
+> >         }
+> >
+> > -       ret = __create_hyp_private_mapping(phys_addr, size,
+> > +       ret = __create_hyp_private_mapping(phys_addr, size, PAGE_SIZE,
+> >                                            &addr, PAGE_HYP_DEVICE);
+> >         if (ret) {
+> >                 iounmap(*kaddr);
+> > @@ -564,7 +580,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+> >
+> >         BUG_ON(is_kernel_in_hyp_mode());
+> >
+> > -       ret = __create_hyp_private_mapping(phys_addr, size,
+> > +       ret = __create_hyp_private_mapping(phys_addr, size, PAGE_SIZE,
+> >                                            &addr, PAGE_HYP_EXEC);
+> >         if (ret) {
+> >                 *haddr = NULL;
+> > --
+> > 2.35.1.473.g83b2b277ed-goog
+> >
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
