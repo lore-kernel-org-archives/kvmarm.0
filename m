@@ -2,69 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07440C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Feb 2022 06:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46FEFC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Feb 2022 06:32:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A2584BE52;
-	Thu, 24 Feb 2022 01:14:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BE6094BC4C;
+	Thu, 24 Feb 2022 01:32:33 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ro71KGYihmM5; Thu, 24 Feb 2022 01:14:29 -0500 (EST)
+	with ESMTP id d7ky6S0mvbKy; Thu, 24 Feb 2022 01:32:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 288FF4BE3D;
-	Thu, 24 Feb 2022 01:14:29 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A29E94BCF0;
+	Thu, 24 Feb 2022 01:32:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B64C4BE39
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 01:14:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D60AA4BC4C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 01:32:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cdBDxBUoYJf1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Feb 2022 01:14:27 -0500 (EST)
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com
- [209.85.210.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6EE44BE32
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 01:14:27 -0500 (EST)
-Received: by mail-pf1-f180.google.com with SMTP id i21so951443pfd.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Feb 2022 22:14:27 -0800 (PST)
+ with ESMTP id cQZoYZp0MHjQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Feb 2022 01:32:29 -0500 (EST)
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com
+ [209.85.210.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF35F4BC3D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 01:32:29 -0500 (EST)
+Received: by mail-pf1-f169.google.com with SMTP id x18so1016760pfh.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Feb 2022 22:32:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AcesQizc+ubZc3BIrOT5zz6JTdW6rEleTjgpKAn42RQ=;
- b=C4xlXdce515O+e+mu5KsDJlkUT0q8i+OwflyqkLbu9OgXXhJPm+IFmxLmq+eF6lX0+
- E60Cgs1wwbm/76XCpMbAGbZEwO/xZd2ib9Wk9MUjC2kH6zKI/NQ1xy4JXt4l7VoIwvwZ
- QyO47cWdfQSgdHu5aM1QTYfl+8k/LbcWbWvOYF9lFVKSzwLxjGkJoMfEvooKS5fZAvSo
- dLYzreUYLEmC1vQwZaFhP6d/6K8HAFC+/L5DoMtXed863g/wxlUqDeFkrCAFaakN+aKI
- tG1T9y8Sg0Bq47XaSx7UPJAGRAFuqoei4ARB7j0jzLjMSzGtOA3Rx74BWQnYkh1pF55q
- GpZg==
+ :cc; bh=sYr99btjNTWEFNut0mb3PVrtN8rcpoOwvOaTLkgqYy0=;
+ b=a+LOwzF5lzDECLaXU5NlyXjxhd9hdgKj2SifQ0n7qYgDOD7cFelQDqpDYtFdD5zfbW
+ IYE947PfF0pfkSvU76f+Lj+ma0++tfZikaMvkdCGFqwbzl3zkIChzoLw8rjOh42aA4tQ
+ T0gnZm9RzWVb/GYbfQzvRaLVS1PtEeLX0mBeO3TNG48Uw04BvCeFi9LgPI5DXe1wLwll
+ VkrUWWyruEmVPyw+nYXE2QwX4NMSjsMlyGVbntjMaxDwcUW+xOohnLnhykdvAL60+Ajp
+ xVZiLmSk2QKvbbivZsZ8Ily264mJUkNZgP+NbEBz1KheVCvAD8ghONd8Fj3YDQEwyVR5
+ OtQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=AcesQizc+ubZc3BIrOT5zz6JTdW6rEleTjgpKAn42RQ=;
- b=XTFoIHeZqCuO1AHeBg3S3loZo1FTdLmyTDBJJTy2wvZu2XDwuAU+0+r2a5gUHHH7lW
- gQvNk950QO1YLwQdMoghhQ9jToKIQLMDDl1/t/OtnC0E0kLdXsYQW6w1YBKp+JExXa8s
- Qc/r77iO+gbx0amhVwQ5iJNOQlUgZvOUmsKuknJmILdJgQe3K/g7wiz/cdTIwNh5Gj0z
- 7sAeUeiWwDUHLjsbB5NoALH0adhhKFLnQl+qQVwvlymMWffs4hbC0KlbFjujUVNTRkok
- F4w/X3tArSJVqqAls3nJlbHHSMjEvYG3VUgl1UCUXNGDZUSD4xe7W+P4IqCHraOW38Xl
- eH4Q==
-X-Gm-Message-State: AOAM5339rReemzCQ6xhsXN15ZabxH2znZ7SRbSKEhxPEGsFLTqb7mXfj
- jD1Au8aY12Zf3S36VVjuq0ec39g//cGIh+as7Q7OYA==
-X-Google-Smtp-Source: ABdhPJxI2uT3Q1vcNIt/vBqPLHZP7CvTxkIVzKbUC8ZJOcqQjVxntyiAbpTdnGLxdUaIQfKtQMtmwRDM/xvJ2RoY4Xk=
-X-Received: by 2002:a05:6a00:194b:b0:4e1:799:7a3 with SMTP id
- s11-20020a056a00194b00b004e1079907a3mr1167891pfk.82.1645683266572; Wed, 23
- Feb 2022 22:14:26 -0800 (PST)
+ bh=sYr99btjNTWEFNut0mb3PVrtN8rcpoOwvOaTLkgqYy0=;
+ b=TkiEI8+NCEp2Spq4/wVCmFMJydb80B8qN2y6dTBnDaDpeVdlrZn5DV/peYNXlUPNjw
+ Opkh8hnJDoqUmJ7Kpmao76BFu7PnCxuiw6ClF/bUeH+wyTRDIR+Xa7IwK7xA3fb+/8C9
+ GlzJhgSvFwI+eujPqmSHFeIcoQcq7MKZKRvJApwQE4e6ft8KpHASkP0gdtohPUnzcKO0
+ zUe6oAlnaQyuTf5R2tA1Gxve0dDDqYCc8xmjvtNTKULfWM0GcKZcP8HzI8mBY2JhuoNS
+ H3HPXH8Y4MHK8Ro+vfjt7QwSGLbgZuOB/q8xULWxPCA7wxrUDqjuKA8fxAndTNikZFE8
+ I3gQ==
+X-Gm-Message-State: AOAM530JadU2x3L1moVA4Pj1bCOlsJZceYd6w82Y9LQoBLX5ojxaVBQl
+ gqmDKOBE2r1nmo7pRBaOwFWLa3zdJen8mwKuD7XZvQ==
+X-Google-Smtp-Source: ABdhPJxy+hQPYHL1gH+M5yt+rbHWMaKEV2iXUpDUODPI6GqUNWYbbv55cDAcFy2+qDfAFoy2YtBDJhMVr8Qy3viTVEk=
+X-Received: by 2002:a63:5525:0:b0:372:c376:74f1 with SMTP id
+ j37-20020a635525000000b00372c37674f1mr1158862pgb.433.1645684348485; Wed, 23
+ Feb 2022 22:32:28 -0800 (PST)
 MIME-Version: 1.0
 References: <20220223041844.3984439-1-oupton@google.com>
- <20220223041844.3984439-2-oupton@google.com>
-In-Reply-To: <20220223041844.3984439-2-oupton@google.com>
+ <20220223041844.3984439-3-oupton@google.com>
+In-Reply-To: <20220223041844.3984439-3-oupton@google.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 23 Feb 2022 22:14:10 -0800
-Message-ID: <CAAeT=FwgekGA-OjqN5hQeWNY8TS=Vf03GKfgW03sFhFahpgTKw@mail.gmail.com>
-Subject: Re: [PATCH v3 01/19] KVM: arm64: Drop unused param from
- kvm_psci_version()
+Date: Wed, 23 Feb 2022 22:32:12 -0800
+Message-ID: <CAAeT=FyfOzk6CS2BuXcJdxhRHWj9MVZgXULrHsC344WV-kUepA@mail.gmail.com>
+Subject: Re: [PATCH v3 02/19] KVM: arm64: Create a helper to check if IPA is
+ valid
 To: Oliver Upton <oupton@google.com>
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
@@ -90,15 +90,69 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Tue, Feb 22, 2022 at 8:19 PM Oliver Upton <oupton@google.com> wrote:
 >
-> kvm_psci_version() consumes a pointer to struct kvm in addition to a
-> vcpu pointer. Drop the kvm pointer as it is unused. While the comment
-> suggests the explicit kvm pointer was useful for calling from hyp, there
-> exist no such callsite in hyp.
+> Create a helper that tests if a given IPA fits within the guest's
+> address space.
 >
 > Signed-off-by: Oliver Upton <oupton@google.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h      | 9 +++++++++
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c | 2 +-
+>  2 files changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 81839e9a8a24..78e8be7ea627 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -111,6 +111,7 @@ alternative_cb_end
+>  #else
+>
+>  #include <linux/pgtable.h>
+> +#include <linux/kvm_host.h>
+>  #include <asm/pgalloc.h>
+>  #include <asm/cache.h>
+>  #include <asm/cacheflush.h>
+> @@ -147,6 +148,14 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+>  #define kvm_phys_size(kvm)             (_AC(1, ULL) << kvm_phys_shift(kvm))
+>  #define kvm_phys_mask(kvm)             (kvm_phys_size(kvm) - _AC(1, ULL))
+>
+> +/*
+> + * Returns true if the provided IPA exists within the VM's IPA space.
+> + */
+> +static inline bool kvm_ipa_valid(struct kvm *kvm, phys_addr_t guest_ipa)
+> +{
+> +       return !(guest_ipa & ~kvm_phys_mask(kvm));
+> +}
+> +
+>  #include <asm/kvm_pgtable.h>
+>  #include <asm/stage2_pgtable.h>
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> index c6d52a1fd9c8..e3853a75cb00 100644
+> --- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> +++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
+> @@ -27,7 +27,7 @@ int vgic_check_iorange(struct kvm *kvm, phys_addr_t ioaddr,
+>         if (addr + size < addr)
+>                 return -EINVAL;
+>
+> -       if (addr & ~kvm_phys_mask(kvm) || addr + size > kvm_phys_size(kvm))
+> +       if (!kvm_ipa_valid(kvm, addr) || addr + size > kvm_phys_size(kvm))
+>                 return -E2BIG;
+>
+>         return 0;
 
 Reviewed-by: Reiji Watanabe <reijiw@google.com>
+
+It looks like we can use the helper for kvm_handle_guest_abort()
+in arch/arm64/kvm/mmu.c as well though.
+----------
+<...>
+        /* Userspace should not be able to register out-of-bounds IPAs */
+        VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
+<...>
+----------
+
+Thanks,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
