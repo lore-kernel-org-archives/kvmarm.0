@@ -2,90 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E87C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Feb 2022 10:39:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1625C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Feb 2022 11:59:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EFCC4BF55;
-	Thu, 24 Feb 2022 05:39:25 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 336354BF94;
+	Thu, 24 Feb 2022 06:59:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QTd4XBU53q1y; Thu, 24 Feb 2022 05:39:23 -0500 (EST)
+	with ESMTP id kgmO7kce79TM; Thu, 24 Feb 2022 06:59:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2A794BF5E;
-	Thu, 24 Feb 2022 05:39:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A9CB4BFCF;
+	Thu, 24 Feb 2022 06:59:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C03104BF55
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 05:39:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 745A44BF94
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 06:59:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ao9sdbT387uc for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Feb 2022 05:39:21 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69C024BC84
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 05:39:21 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id AEDF36167F;
- Thu, 24 Feb 2022 10:39:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75D07C340E9;
- Thu, 24 Feb 2022 10:39:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1645699160;
- bh=JE74vM6F239/HyTrEDsqOE00ec9BmQ42Y4OdvszfnpU=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=qAs+hGS6Ri7GNCE9Har0J+LPVD+ewhbDdPU45i37O7fJZZKp9bcyVQb4eE4Jvb94e
- 4P7PTXOxSwb3MNglKP4zsZgu0734lr6EMTGVUWMidtpZi/GhVgwZ526WxmlhJoS4TG
- YRULgtIp5lITDHTUl9XTZCrjWmaMCwnAGOoYJNecxrXJ6mmAhqGJGnTvqePx+ruLxE
- ykAsn+5JTIlB+HnsujxgbU1U9Oqd14UR0JDzrh6Cer3YxKsG6gNuVywh/pMQBr6qml
- W5n6O49t1pX+X4FoiLqeMlFzNIxpXPXlFriizE+cwWKxUdjN7brcP0yLpz3y41GVEr
- BKjT6Li1tOwig==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nNBWo-00A9YD-5V; Thu, 24 Feb 2022 10:39:18 +0000
+ with ESMTP id uiB-yGCFmOZr for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Feb 2022 06:58:58 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7F084BF90
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 06:58:58 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F0387106F;
+ Thu, 24 Feb 2022 03:58:57 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B67193F66F;
+ Thu, 24 Feb 2022 03:58:53 -0800 (PST)
+Date: Thu, 24 Feb 2022 11:59:18 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH v6 39/64] KVM: arm64: nv: Set a handler for the system
+ instruction traps
+Message-ID: <YhdzFk75J/dFW0Tl@monolith.localdoman>
+References: <20220128121912.509006-1-maz@kernel.org>
+ <20220128121912.509006-40-maz@kernel.org>
 MIME-Version: 1.0
-Date: Thu, 24 Feb 2022 10:39:17 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [kbuild-all] Re: [PATCH v2 6/9] KVM: arm64: Detect and handle
- hypervisor stack overflows
-In-Reply-To: <CAMj1kXHsNsQXbeeS1zcy+xYA7kSE5apbLpChohfvkABS7Z6jKg@mail.gmail.com>
-References: <20220222165212.2005066-7-kaleshsingh@google.com>
- <202202231727.L621fVgD-lkp@intel.com> <875yp63ptg.wl-maz@kernel.org>
- <YhYpvfZaSjrAtkZp@rli9-dbox> <cb750267af0636c49d2f8aa354f086a5@kernel.org>
- <CAMj1kXHsNsQXbeeS1zcy+xYA7kSE5apbLpChohfvkABS7Z6jKg@mail.gmail.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <89c48bd2a9b32b4607d1515714fa3c1b@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: ardb@kernel.org, philip.li@intel.com, kaleshsingh@google.com,
- lkp@intel.com, llvm@lists.linux.dev, kbuild-all@lists.01.org, will@kernel.org,
- qperret@google.com, tabba@google.com, surenb@google.com,
- kernel-team@android.com, catalin.marinas@arm.com, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com,
- pasha.tatashin@soleen.com, joey.gouly@arm.com, pcc@google.com,
- ascull@google.com, pbonzini@redhat.com, yuzenghui@huawei.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: Catalin Marinas <catalin.marinas@arm.com>, llvm@lists.linux.dev,
- Joey Gouly <joey.gouly@arm.com>, Kalesh Singh <kaleshsingh@google.com>,
- Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
- kernel test robot <lkp@intel.com>, surenb@google.com,
- Android Kernel Team <kernel-team@android.com>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Peter Collingbourne <pcc@google.com>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>, kbuild-all@lists.01.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Philip Li <philip.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Disposition: inline
+In-Reply-To: <20220128121912.509006-40-maz@kernel.org>
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Andre Przywara <andre.przywara@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Chase Conklin <chase.conklin@arm.com>, kvmarm@lists.cs.columbia.edu,
+ mihai.carabas@oracle.com,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ "Russell King \(Oracle\)" <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -97,92 +61,192 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 2022-02-23 12:56, Ard Biesheuvel wrote:
-> On Wed, 23 Feb 2022 at 13:54, Marc Zyngier <maz@kernel.org> wrote:
->> 
->> On 2022-02-23 12:34, Philip Li wrote:
->> > On Wed, Feb 23, 2022 at 09:16:59AM +0000, Marc Zyngier wrote:
->> >> On Wed, 23 Feb 2022 09:05:18 +0000,
->> >> kernel test robot <lkp@intel.com> wrote:
->> >> >
->> >> > Hi Kalesh,
->> >> >
->> >> > Thank you for the patch! Perhaps something to improve:
->> >> >
->> >> > [auto build test WARNING on cfb92440ee71adcc2105b0890bb01ac3cddb8507]
->> >> >
->> >> > url:    https://github.com/0day-ci/linux/commits/Kalesh-Singh/KVM-arm64-Hypervisor-stack-enhancements/20220223-010522
->> >> > base:   cfb92440ee71adcc2105b0890bb01ac3cddb8507
->> >> > config: arm64-randconfig-r011-20220221 (https://download.01.org/0day-ci/archive/20220223/202202231727.L621fVgD-lkp@intel.com/config)
->> >> > compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d271fc04d5b97b12e6b797c6067d3c96a8d7470e)
->> >> > reproduce (this is a W=1 build):
->> >> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->> >> >         chmod +x ~/bin/make.cross
->> >> >         # install arm64 cross compiling tool for clang build
->> >> >         # apt-get install binutils-aarch64-linux-gnu
->> >> >         # https://github.com/0day-ci/linux/commit/7fe99fd40f7c4b2973218045ca5b9c9160524db1
->> >> >         git remote add linux-review https://github.com/0day-ci/linux
->> >> >         git fetch --no-tags linux-review Kalesh-Singh/KVM-arm64-Hypervisor-stack-enhancements/20220223-010522
->> >> >         git checkout 7fe99fd40f7c4b2973218045ca5b9c9160524db1
->> >> >         # save the config file to linux build tree
->> >> >         mkdir build_dir
->> >> >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
->> >> >
->> >> > If you fix the issue, kindly add following tag as appropriate
->> >> > Reported-by: kernel test robot <lkp@intel.com>
->> >> >
->> >> > All warnings (new ones prefixed by >>):
->> >> >
->> >> >    include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
->> >> >    #define NULL ((void *)0)
->> >> >                 ^~~~~~~~~~~
->> >> >    arch/arm64/kvm/hyp/nvhe/switch.c:200:27: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
->> >> >            [ESR_ELx_EC_FP_ASIMD]           = kvm_hyp_handle_fpsimd,
->> >> >                                              ^~~~~~~~~~~~~~~~~~~~~
->> >> >    arch/arm64/kvm/hyp/nvhe/switch.c:196:28: note: previous initialization is here
->> >> >            [0 ... ESR_ELx_EC_MAX]          = NULL,
->> >> >                                              ^~~~
->> >> >    include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
->> >> >    #define NULL ((void *)0)
->> >> >                 ^~~~~~~~~~~
->> >>
->> >> Kalesh, please ignore this nonsense. There may be things to improve,
->> >> but this is *NOT* one of them.
->> >>
->> >> These reports are pretty useless, and just lead people to ignore real
->> >> bug reports.
->> >
->> > Hi Kalesh, sorry there're some irrelevant issues mixed in the report,
->> > kindly ignore them. And the valuable ones are the new ones that
->> > prefixed by >>, as the below one in original report.
->> >
->> >>> arch/arm64/kvm/hyp/nvhe/switch.c:372:17: warning: no previous
->> >>> prototype for function 'hyp_panic_bad_stack' [-Wmissing-prototypes]
->> >    void __noreturn hyp_panic_bad_stack(void)
->> >                    ^
->> 
->> This is only called from assembly code, so a prototype wouldn't bring
->> much.
->> 
+Hi,
+
+On Fri, Jan 28, 2022 at 12:18:47PM +0000, Marc Zyngier wrote:
+> From: Jintack Lim <jintack.lim@linaro.org>
 > 
-> Should probably be marked as 'asmlinkage' then. I've suggested many
-> times already that this bogus diagnostic should either be disabled, or
-> disregard 'asmlinkage' symbols.
+> When HCR.NV bit is set, execution of the EL2 translation regime address
+> aranslation instructions and TLB maintenance instructions are trapped to
+> EL2. In addition, execution of the EL1 translation regime address
+> aranslation instructions and TLB maintenance instructions that are only
+> accessible from EL2 and above are trapped to EL2. In these cases,
+> ESR_EL2.EC will be set to 0x18.
+> 
+> Rework the system instruction emulation framework to handle potentially
+> all system instruction traps other than MSR/MRS instructions. Those
+> system instructions would be AT and TLBI instructions controlled by
+> HCR_EL2.NV, AT, and TTLB bits.
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> [maz: squashed two patches together, redispatched various bits around]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  4 +--
+>  arch/arm64/kvm/handle_exit.c      |  2 +-
+>  arch/arm64/kvm/sys_regs.c         | 48 +++++++++++++++++++++++++------
+>  3 files changed, 42 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a15183d0e1bf..0b887364f994 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -407,7 +407,7 @@ struct kvm_vcpu_arch {
+>  	/*
+>  	 * Guest registers we preserve during guest debugging.
+>  	 *
+> -	 * These shadow registers are updated by the kvm_handle_sys_reg
+> +	 * These shadow registers are updated by the kvm_handle_sys
+>  	 * trap handler if the guest accesses or updates them while we
+>  	 * are using guest debug.
+>  	 */
+> @@ -724,7 +724,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu);
+>  int kvm_handle_cp14_64(struct kvm_vcpu *vcpu);
+>  int kvm_handle_cp15_32(struct kvm_vcpu *vcpu);
+>  int kvm_handle_cp15_64(struct kvm_vcpu *vcpu);
+> -int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
+> +int kvm_handle_sys(struct kvm_vcpu *vcpu);
+>  
+>  void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 867de65eb766..d135fc7e6883 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -236,7 +236,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+>  	[ESR_ELx_EC_SMC32]	= handle_smc,
+>  	[ESR_ELx_EC_HVC64]	= handle_hvc,
+>  	[ESR_ELx_EC_SMC64]	= handle_smc,
+> -	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
+> +	[ESR_ELx_EC_SYS64]	= kvm_handle_sys,
+>  	[ESR_ELx_EC_SVE]	= handle_sve,
+>  	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
+>  	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 5e8876177ce6..f669618f966b 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -1771,10 +1771,6 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+>   * more demanding guest...
+>   */
+>  static const struct sys_reg_desc sys_reg_descs[] = {
+> -	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
+> -	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
+> -	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+> -
+>  	DBG_BCR_BVR_WCR_WVR_EL1(0),
+>  	DBG_BCR_BVR_WCR_WVR_EL1(1),
+>  	{ SYS_DESC(SYS_MDCCINT_EL1), trap_debug_regs, reset_val, MDCCINT_EL1, 0 },
+> @@ -2240,6 +2236,14 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+>  };
+>  
+> +#define SYS_INSN_TO_DESC(insn, access_fn, forward_fn)	\
+> +	{ SYS_DESC((insn)), (access_fn), NULL, 0, 0, NULL, NULL, (forward_fn) }
 
-Yes, asmlinkage is definitely missing.
+This macro looks out of place: it's not used anywhere in this patch, and the
+next patch deletes it.
 
-But it is pretty obvious that the robot people aren't interested in
-fixing this particular issue, given how long we have been suggesting
-this...
+> +static struct sys_reg_desc sys_insn_descs[] = {
+> +	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
+> +	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
+> +	{ SYS_DESC(SYS_DC_CISW), access_dcsw },
+> +};
+> +
+>  static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+>  			struct sys_reg_params *p,
+>  			const struct sys_reg_desc *r)
+> @@ -2786,6 +2790,24 @@ static int emulate_sys_reg(struct kvm_vcpu *vcpu,
+>  	return 1;
+>  }
+>  
+> +static int emulate_sys_instr(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
+> +{
+> +	const struct sys_reg_desc *r;
+> +
+> +	/* Search from the system instruction table. */
+> +	r = find_reg(p, sys_insn_descs, ARRAY_SIZE(sys_insn_descs));
+> +
+> +	if (likely(r)) {
+> +		perform_access(vcpu, p, r);
+> +	} else {
+> +		kvm_err("Unsupported guest sys instruction at: %lx\n",
+> +			*vcpu_pc(vcpu));
+> +		print_sys_reg_instr(p);
+> +		kvm_inject_undefined(vcpu);
+> +	}
+> +	return 1;
+> +}
+> +
+>  /**
+>   * kvm_reset_sys_regs - sets system registers to reset value
+>   * @vcpu: The VCPU pointer
+> @@ -2803,10 +2825,11 @@ void kvm_reset_sys_regs(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  /**
+> - * kvm_handle_sys_reg -- handles a mrs/msr trap on a guest sys_reg access
+> + * kvm_handle_sys-- handles a system instruction or mrs/msr instruction trap
+> +		    on a guest execution
+>   * @vcpu: The VCPU pointer
+>   */
+> -int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+> +int kvm_handle_sys(struct kvm_vcpu *vcpu)
+>  {
+>  	struct sys_reg_params params;
+>  	unsigned long esr = kvm_vcpu_get_esr(vcpu);
+> @@ -2818,10 +2841,16 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu)
+>  	params = esr_sys64_to_params(esr);
+>  	params.regval = vcpu_get_reg(vcpu, Rt);
+>  
+> -	ret = emulate_sys_reg(vcpu, &params);
+> +	if (params.Op0 == 1) {
+> +		/* System instructions */
+> +		ret = emulate_sys_instr(vcpu, &params);
+> +	} else {
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+This doesn't look right: according to ARM DDI 0487G.a, page C5-393, Op0 =
+{0,2} represents instruction classes different from system register
+accesses, yet KVM puts them in the same bucket as system register traps.
+
+May I suggest this change:
+
+	if (params.Op0 == 3) {
+		/* do emulate_sys_reg() */
+	} else {
+		/* do emulate_sys_instr() */
+	}
+
+Thanks,
+Alex
+
+> +		/* MRS/MSR instructions */
+> +		ret = emulate_sys_reg(vcpu, &params);
+> +		if (!params.is_write)
+> +			vcpu_set_reg(vcpu, Rt, params.regval);
+> +	}
+>  
+> -	if (!params.is_write)
+> -		vcpu_set_reg(vcpu, Rt, params.regval);
+>  	return ret;
+>  }
+>  
+> @@ -3237,6 +3266,7 @@ void kvm_sys_reg_table_init(void)
+>  	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true));
+>  	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true));
+>  	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false));
+> +	BUG_ON(check_sysreg_table(sys_insn_descs, ARRAY_SIZE(sys_insn_descs), false));
+>  
+>  	/* We abuse the reset function to overwrite the table itself. */
+>  	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
+> -- 
+> 2.30.2
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
