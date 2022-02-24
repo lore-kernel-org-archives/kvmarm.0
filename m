@@ -2,80 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF73C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Feb 2022 10:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E87C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Feb 2022 10:39:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C31654BFCE;
-	Thu, 24 Feb 2022 05:36:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EFCC4BF55;
+	Thu, 24 Feb 2022 05:39:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PeWr+rPPWEFh; Thu, 24 Feb 2022 05:36:31 -0500 (EST)
+	with ESMTP id QTd4XBU53q1y; Thu, 24 Feb 2022 05:39:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F3C4C066;
-	Thu, 24 Feb 2022 05:36:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2A794BF5E;
+	Thu, 24 Feb 2022 05:39:23 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2701C4BC7E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 00:23:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C03104BF55
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 05:39:22 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HsVRVqd4MBgp for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Feb 2022 00:23:40 -0500 (EST)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A2014BC67
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 00:23:40 -0500 (EST)
-Received: by mail-yb1-f201.google.com with SMTP id
- i6-20020a255406000000b006241e97e420so944519ybb.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Feb 2022 21:23:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:cc;
- bh=fcCfTEScaMgjegsqAtCFQCUUlnf7S421rxV5/DLFNa4=;
- b=K2UkLk6KH0WGprg1Tt3b/YISPTEbGJ5NwL75GWwwQRifJr+Ia78r3xJ74AmzAn6des
- +RpW5F9uvgZ9sJ1fT5i6np+KQN4qKRmZSJJLm2W9x5SYPYx8og6F3yLGsatCWV6FzEDf
- 673NAhqpRqg9eTDgS3UnApqhvX/5GRHjopLIWxweU9YOKdQpVxRnTDNuOFv5bZKbiXBW
- 6zpPdP2dAFKxHQAsD8SNy1C39D6al0+AgBC+DSjUXheYoiIBU/1Kmxx/wpNbXRnyHlFP
- d6Mi3V5tWu+SiyXcU2q1ve1zdVP5SR3nN7kl8jsFPLZhM2l3A8Uk9bYysuSZ57PN/rxz
- s+uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:cc;
- bh=fcCfTEScaMgjegsqAtCFQCUUlnf7S421rxV5/DLFNa4=;
- b=BZz12eVHMB8AtB3GB4im+x0vX/qXK00hQJu08UkTdZ2gz/Gw0diS4rEc9x0i5QxvoT
- n51SG43ywmRUWxGuyv+0dmMWBgr/pB/FKCf1vPyjRmRRXLOA/SRk1n/oca7JwP1rwmyY
- 06zgq64IZ9BrjvYnZVdCE3W0uE6D431xGPw95VgI40P9Z+B6w9e4xAPwVE4dkhcPO/Rc
- Hg4OSaD93kqoDSZcAs6k4rgfVIaMTYMf7gP8cAt2gjZlUyr8Kyyyw2sd5QiZlxitZTYP
- ZATikCm5tyA3y2caXeELkfJr5Q2rM96lrepGdNmIm+a9YzED7Hii+umCp316xhs5s1dP
- onsw==
-X-Gm-Message-State: AOAM531gd/6gEfvQ11A/qnflUaxJA0I21riHPAiqx+Hg8zn8X3Dvbs50
- B/l0QVE00w45q6pRsjGOUFM1KiECcOQEfWuW7g==
-X-Google-Smtp-Source: ABdhPJwr5WYU+mcvUrEVYhYcHNbWEi05aKeybW8uxmEUPY7QeTHeRrUuULjEo5RNfVU+of1dj3HUHZ68vUNHlphVAQ==
-X-Received: from kaleshsingh.mtv.corp.google.com
- ([2620:15c:211:200:415c:9be0:c461:440a])
- (user=kaleshsingh job=sendgmr) by 2002:a25:30d6:0:b0:624:cd97:b907 with SMTP
- id w205-20020a2530d6000000b00624cd97b907mr981062ybw.542.1645680219922; Wed,
- 23 Feb 2022 21:23:39 -0800 (PST)
-Date: Wed, 23 Feb 2022 21:13:43 -0800
-In-Reply-To: <20220224051439.640768-1-kaleshsingh@google.com>
-Message-Id: <20220224051439.640768-9-kaleshsingh@google.com>
-Mime-Version: 1.0
-References: <20220224051439.640768-1-kaleshsingh@google.com>
-X-Mailer: git-send-email 2.35.1.473.g83b2b277ed-goog
-Subject: [PATCH v3 8/8] KVM: arm64: Symbolize the nVHE HYP backtrace
-From: Kalesh Singh <kaleshsingh@google.com>
-X-Mailman-Approved-At: Thu, 24 Feb 2022 05:36:21 -0500
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- Andrew Walbran <qwandor@google.com>, will@kernel.org,
- Peter Collingbourne <pcc@google.com>, maz@kernel.org,
- linux-kernel@vger.kernel.org,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Kalesh Singh <kaleshsingh@google.com>, linux-arm-kernel@lists.infradead.org,
- surenb@google.com, kvmarm@lists.cs.columbia.edu
+ with ESMTP id Ao9sdbT387uc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Feb 2022 05:39:21 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 69C024BC84
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 05:39:21 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id AEDF36167F;
+ Thu, 24 Feb 2022 10:39:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75D07C340E9;
+ Thu, 24 Feb 2022 10:39:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1645699160;
+ bh=JE74vM6F239/HyTrEDsqOE00ec9BmQ42Y4OdvszfnpU=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=qAs+hGS6Ri7GNCE9Har0J+LPVD+ewhbDdPU45i37O7fJZZKp9bcyVQb4eE4Jvb94e
+ 4P7PTXOxSwb3MNglKP4zsZgu0734lr6EMTGVUWMidtpZi/GhVgwZ526WxmlhJoS4TG
+ YRULgtIp5lITDHTUl9XTZCrjWmaMCwnAGOoYJNecxrXJ6mmAhqGJGnTvqePx+ruLxE
+ ykAsn+5JTIlB+HnsujxgbU1U9Oqd14UR0JDzrh6Cer3YxKsG6gNuVywh/pMQBr6qml
+ W5n6O49t1pX+X4FoiLqeMlFzNIxpXPXlFriizE+cwWKxUdjN7brcP0yLpz3y41GVEr
+ BKjT6Li1tOwig==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nNBWo-00A9YD-5V; Thu, 24 Feb 2022 10:39:18 +0000
+MIME-Version: 1.0
+Date: Thu, 24 Feb 2022 10:39:17 +0000
+From: Marc Zyngier <maz@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [kbuild-all] Re: [PATCH v2 6/9] KVM: arm64: Detect and handle
+ hypervisor stack overflows
+In-Reply-To: <CAMj1kXHsNsQXbeeS1zcy+xYA7kSE5apbLpChohfvkABS7Z6jKg@mail.gmail.com>
+References: <20220222165212.2005066-7-kaleshsingh@google.com>
+ <202202231727.L621fVgD-lkp@intel.com> <875yp63ptg.wl-maz@kernel.org>
+ <YhYpvfZaSjrAtkZp@rli9-dbox> <cb750267af0636c49d2f8aa354f086a5@kernel.org>
+ <CAMj1kXHsNsQXbeeS1zcy+xYA7kSE5apbLpChohfvkABS7Z6jKg@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <89c48bd2a9b32b4607d1515714fa3c1b@kernel.org>
+X-Sender: maz@kernel.org
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: ardb@kernel.org, philip.li@intel.com, kaleshsingh@google.com,
+ lkp@intel.com, llvm@lists.linux.dev, kbuild-all@lists.01.org, will@kernel.org,
+ qperret@google.com, tabba@google.com, surenb@google.com,
+ kernel-team@android.com, catalin.marinas@arm.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, mark.rutland@arm.com,
+ pasha.tatashin@soleen.com, joey.gouly@arm.com, pcc@google.com,
+ ascull@google.com, pbonzini@redhat.com, yuzenghui@huawei.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Catalin Marinas <catalin.marinas@arm.com>, llvm@lists.linux.dev,
+ Joey Gouly <joey.gouly@arm.com>, Kalesh Singh <kaleshsingh@google.com>,
+ Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ kernel test robot <lkp@intel.com>, surenb@google.com,
+ Android Kernel Team <kernel-team@android.com>,
+ Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Peter Collingbourne <pcc@google.com>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>, kbuild-all@lists.01.org,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Philip Li <philip.li@intel.com>, Paolo Bonzini <pbonzini@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,95 +97,92 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Reintroduce the __kvm_nvhe_ symbols in kallsyms, ignoring the local
-symbols in this namespace. The local symbols are not informative and
-can cause aliasing issues when symbolizing the addresses.
+On 2022-02-23 12:56, Ard Biesheuvel wrote:
+> On Wed, 23 Feb 2022 at 13:54, Marc Zyngier <maz@kernel.org> wrote:
+>> 
+>> On 2022-02-23 12:34, Philip Li wrote:
+>> > On Wed, Feb 23, 2022 at 09:16:59AM +0000, Marc Zyngier wrote:
+>> >> On Wed, 23 Feb 2022 09:05:18 +0000,
+>> >> kernel test robot <lkp@intel.com> wrote:
+>> >> >
+>> >> > Hi Kalesh,
+>> >> >
+>> >> > Thank you for the patch! Perhaps something to improve:
+>> >> >
+>> >> > [auto build test WARNING on cfb92440ee71adcc2105b0890bb01ac3cddb8507]
+>> >> >
+>> >> > url:    https://github.com/0day-ci/linux/commits/Kalesh-Singh/KVM-arm64-Hypervisor-stack-enhancements/20220223-010522
+>> >> > base:   cfb92440ee71adcc2105b0890bb01ac3cddb8507
+>> >> > config: arm64-randconfig-r011-20220221 (https://download.01.org/0day-ci/archive/20220223/202202231727.L621fVgD-lkp@intel.com/config)
+>> >> > compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d271fc04d5b97b12e6b797c6067d3c96a8d7470e)
+>> >> > reproduce (this is a W=1 build):
+>> >> >         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>> >> >         chmod +x ~/bin/make.cross
+>> >> >         # install arm64 cross compiling tool for clang build
+>> >> >         # apt-get install binutils-aarch64-linux-gnu
+>> >> >         # https://github.com/0day-ci/linux/commit/7fe99fd40f7c4b2973218045ca5b9c9160524db1
+>> >> >         git remote add linux-review https://github.com/0day-ci/linux
+>> >> >         git fetch --no-tags linux-review Kalesh-Singh/KVM-arm64-Hypervisor-stack-enhancements/20220223-010522
+>> >> >         git checkout 7fe99fd40f7c4b2973218045ca5b9c9160524db1
+>> >> >         # save the config file to linux build tree
+>> >> >         mkdir build_dir
+>> >> >         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash arch/arm64/
+>> >> >
+>> >> > If you fix the issue, kindly add following tag as appropriate
+>> >> > Reported-by: kernel test robot <lkp@intel.com>
+>> >> >
+>> >> > All warnings (new ones prefixed by >>):
+>> >> >
+>> >> >    include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
+>> >> >    #define NULL ((void *)0)
+>> >> >                 ^~~~~~~~~~~
+>> >> >    arch/arm64/kvm/hyp/nvhe/switch.c:200:27: warning: initializer overrides prior initialization of this subobject [-Winitializer-overrides]
+>> >> >            [ESR_ELx_EC_FP_ASIMD]           = kvm_hyp_handle_fpsimd,
+>> >> >                                              ^~~~~~~~~~~~~~~~~~~~~
+>> >> >    arch/arm64/kvm/hyp/nvhe/switch.c:196:28: note: previous initialization is here
+>> >> >            [0 ... ESR_ELx_EC_MAX]          = NULL,
+>> >> >                                              ^~~~
+>> >> >    include/linux/stddef.h:8:14: note: expanded from macro 'NULL'
+>> >> >    #define NULL ((void *)0)
+>> >> >                 ^~~~~~~~~~~
+>> >>
+>> >> Kalesh, please ignore this nonsense. There may be things to improve,
+>> >> but this is *NOT* one of them.
+>> >>
+>> >> These reports are pretty useless, and just lead people to ignore real
+>> >> bug reports.
+>> >
+>> > Hi Kalesh, sorry there're some irrelevant issues mixed in the report,
+>> > kindly ignore them. And the valuable ones are the new ones that
+>> > prefixed by >>, as the below one in original report.
+>> >
+>> >>> arch/arm64/kvm/hyp/nvhe/switch.c:372:17: warning: no previous
+>> >>> prototype for function 'hyp_panic_bad_stack' [-Wmissing-prototypes]
+>> >    void __noreturn hyp_panic_bad_stack(void)
+>> >                    ^
+>> 
+>> This is only called from assembly code, so a prototype wouldn't bring
+>> much.
+>> 
+> 
+> Should probably be marked as 'asmlinkage' then. I've suggested many
+> times already that this bogus diagnostic should either be disabled, or
+> disregard 'asmlinkage' symbols.
 
-With the necessary symbols now in kallsyms we can symbolize nVHE
-stacktrace addresses using the %pB print format specifier.
+Yes, asmlinkage is definitely missing.
 
-Example call trace:
+But it is pretty obvious that the robot people aren't interested in
+fixing this particular issue, given how long we have been suggesting
+this...
 
-[   98.916444][  T426] kvm [426]: nVHE hyp panic at: [<ffffffc0096156fc>] __kvm_nvhe_overflow_stack+0x8/0x34!
-[   98.918360][  T426] nVHE HYP call trace:
-[   98.918692][  T426] kvm [426]: [<ffffffc009615aac>] __kvm_nvhe_cpu_prepare_nvhe_panic_info+0x4c/0x68
-[   98.919545][  T426] kvm [426]: [<ffffffc0096159a4>] __kvm_nvhe_hyp_panic+0x2c/0xe8
-[   98.920107][  T426] kvm [426]: [<ffffffc009615ad8>] __kvm_nvhe_hyp_panic_bad_stack+0x10/0x10
-[   98.920665][  T426] kvm [426]: [<ffffffc009610a4c>] __kvm_nvhe___kvm_hyp_host_vector+0x24c/0x794
-[   98.921292][  T426] kvm [426]: [<ffffffc009615718>] __kvm_nvhe_overflow_stack+0x24/0x34
-. . .
-
-[   98.973382][  T426] kvm [426]: [<ffffffc009615718>] __kvm_nvhe_overflow_stack+0x24/0x34
-[   98.973816][  T426] kvm [426]: [<ffffffc0096152f4>] __kvm_nvhe___kvm_vcpu_run+0x38/0x438
-[   98.974255][  T426] kvm [426]: [<ffffffc009616f80>] __kvm_nvhe_handle___kvm_vcpu_run+0x1c4/0x364
-[   98.974719][  T426] kvm [426]: [<ffffffc009616928>] __kvm_nvhe_handle_trap+0xa8/0x130
-[   98.975152][  T426] kvm [426]: [<ffffffc009610064>] __kvm_nvhe___host_exit+0x64/0x64
-[   98.975588][  T426] ---- end of nVHE HYP call trace ----
-
-Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
----
-
-Changes in v2:
-  - Fix printk warnings - %p expects (void *)
-
- arch/arm64/kvm/handle_exit.c | 13 +++++--------
- scripts/kallsyms.c           |  2 +-
- 2 files changed, 6 insertions(+), 9 deletions(-)
-
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index ff69dff33700..3a5c32017c6b 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -296,13 +296,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 	u64 elr_in_kimg = __phys_to_kimg(elr_phys);
- 	u64 hyp_offset = elr_in_kimg - kaslr_offset() - elr_virt;
- 	u64 mode = spsr & PSR_MODE_MASK;
-+	u64 panic_addr = elr_virt + hyp_offset;
- 
--	/*
--	 * The nVHE hyp symbols are not included by kallsyms to avoid issues
--	 * with aliasing. That means that the symbols cannot be printed with the
--	 * "%pS" format specifier, so fall back to the vmlinux address if
--	 * there's no better option.
--	 */
- 	if (mode != PSR_MODE_EL2t && mode != PSR_MODE_EL2h) {
- 		kvm_err("Invalid host exception to nVHE hyp!\n");
- 	} else if (ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
-@@ -322,9 +317,11 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 		if (file)
- 			kvm_err("nVHE hyp BUG at: %s:%u!\n", file, line);
- 		else
--			kvm_err("nVHE hyp BUG at: %016llx!\n", elr_virt + hyp_offset);
-+			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
-+					(void *)panic_addr);
- 	} else {
--		kvm_err("nVHE hyp panic at: %016llx!\n", elr_virt + hyp_offset);
-+		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
-+				(void *)panic_addr);
- 	}
- 
- 	kvm_nvhe_dump_backtrace(hyp_offset);
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 54ad86d13784..19aba43d9da4 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -111,7 +111,7 @@ static bool is_ignored_symbol(const char *name, char type)
- 		".LASANPC",		/* s390 kasan local symbols */
- 		"__crc_",		/* modversions */
- 		"__efistub_",		/* arm64 EFI stub namespace */
--		"__kvm_nvhe_",		/* arm64 non-VHE KVM namespace */
-+		"__kvm_nvhe_$",		/* arm64 local symbols in non-VHE KVM namespace */
- 		"__AArch64ADRPThunk_",	/* arm64 lld */
- 		"__ARMV5PILongThunk_",	/* arm lld */
- 		"__ARMV7PILongThunk_",
+         M.
 -- 
-2.35.1.473.g83b2b277ed-goog
-
+Jazz is not dead. It just smells funny...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
