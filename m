@@ -2,78 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F31B2C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Feb 2022 19:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 707C0C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Feb 2022 19:35:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 542AE4BB47;
-	Thu, 24 Feb 2022 14:21:59 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5DD54BA40;
+	Thu, 24 Feb 2022 14:35:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VZoecrKb8MjD; Thu, 24 Feb 2022 14:21:57 -0500 (EST)
+	with ESMTP id iWrIzx4p4LDd; Thu, 24 Feb 2022 14:35:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D9504BB64;
-	Thu, 24 Feb 2022 14:21:57 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FAB14B95E;
+	Thu, 24 Feb 2022 14:35:41 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AAB44BB48
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 14:21:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B600640096
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 14:35:39 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e9A-l6iIKFQ7 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Feb 2022 14:21:55 -0500 (EST)
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com
- [209.85.166.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05F974BB47
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 14:21:54 -0500 (EST)
-Received: by mail-il1-f180.google.com with SMTP id f2so2561012ilq.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 11:21:54 -0800 (PST)
+ with ESMTP id z2yvNC3KiNMo for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Feb 2022 14:35:38 -0500 (EST)
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com
+ [209.85.166.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 425F84BBE6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 14:35:38 -0500 (EST)
+Received: by mail-il1-f172.google.com with SMTP id z7so2570988ilb.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 11:35:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=dlxbBhjVxgATP0KM5oNG0LzdCfA40MUHrDIe/INdi68=;
- b=NYOdpm1bR56HSGohn/sRm5A66fRUWCpyofnOGctj1Y7ae7i9UeuP70P/+ILbsYGshn
- g4CwQLakXJ7vlyBMwxLrvT6z/s1hnpRc/M+qijG4uaLuozRkQ7rglS5G25Lb7vEEW3fx
- 79iYlHvvkRS2gTK0O3vXFMqYmF1B8mjqRa9jETuLcu4PalAreDBoVpmPKOZ59Jb7VSWr
- xyxFkKFJ3nUb/YTG8zk8spMQvhsp4Iiz3Sp6WdQoYEpuypYRa23kod5z0BrhLeH5pBG7
- bYHrKwcQ6CwTqdOo19gGMZNyZeTd7zVuSXiIdG5lSR5k/TCUKojup/YE6KCIhw4tVyVR
- 4x3g==
+ bh=nhX3bsgpSDyttb54655oQihTzzAj4GP6gmlwB+g2+XU=;
+ b=npt5FKr2XpSxwA7sZmT2ddB61OwNxFOyr3+/FXeYQNRnR1oW8Y1dFHHWbz1/Ppa5C6
+ GyylKF/3cCFL2kNt8zNbFRz7zfMn/9+bkcKjXEXjyf3ZdUTE6t0Wh2FZ6aipgmbwwl6G
+ BJUooKVDLML2H/Y1q3mzCarwNOqIFe0Ju7FaYiNQFQ2w5/xx1PKBFkQWcGHlBncWODIn
+ 8uHuupKUAm522TKMXZwSuX4d9zvJH0cRrvvBsMaaUJ089uRfxVwoucU7KF+7ApTQoTpC
+ BOqBjO9N9vIQgjlGr+GCG5l5rNyzYMZIFEWWkUJDPdlh4yKu0ylQWGq10JdVnVd4PObE
+ Otjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=dlxbBhjVxgATP0KM5oNG0LzdCfA40MUHrDIe/INdi68=;
- b=5GhcDebgfYK+jpngp1/785lvcEqvPqKyz6ZpsRcQe9FSzjVgbzMejNP1rXxC7FmreT
- RDYxoQFdUy/fE14VYYbArqLGLU/qkH8NKDj8Q4AwLHHoEG8c3wU8SYt7WdcVdce3Kx1g
- Pz7z+FLkVnyc5esOyMjdQg4qyrnfepDAEuLv1qLEqUqiWH6x8ziN8rtD5UP9J+h58Nt7
- wHSku6SKc9Fim6d70KwtuRxeQR3Jsb0ZgqueaTdHf9bfpALO6afBmu6hKQkPOaLgGm+M
- jDKvKBlV8GoiAVf9r+KduDFnLzGiwn7gjf4QKWDUhnIu50/cbv/EDAde/yA6LGxYoV0I
- MjAQ==
-X-Gm-Message-State: AOAM53120j/WHdHkvbHnZ/FB6A4LYFcWB2IA5RsL+AtF89zqKgN9Z3OZ
- 2mtcqVnnRW4DEE0ADccUpIaOzQ==
-X-Google-Smtp-Source: ABdhPJwn7IgJZMEfgRQOCW+UbgVEsAFzikAr2Dh30XA4U2P9oW3FIDdVTPHHiCobPFdhZhWNF/zmHg==
-X-Received: by 2002:a05:6e02:1bc5:b0:2c2:7bc9:8e8f with SMTP id
- x5-20020a056e021bc500b002c27bc98e8fmr3548686ilv.5.1645730514046; 
- Thu, 24 Feb 2022 11:21:54 -0800 (PST)
+ bh=nhX3bsgpSDyttb54655oQihTzzAj4GP6gmlwB+g2+XU=;
+ b=LYc+NlAvmyn4z+GeSXC2VFj34nIJzVgyIMXGd35cvFp/YI7+cM3b37ZJzmzQkWrP6Z
+ BIojKpFLiYGL9nCW3ol0bABU1Kjzi7VjRfSLXBcbhUvqlESBCTTbhYhW3IauI9Iq1Rao
+ B+T9oVD6l5jfDO/gi5Ipx3Sd9G53KHG5+33l52aglL8no2SrMOO4FY/kslR73FJOAmoa
+ SnXC9hET/iOojc/axR9mDpObzPV1JzCETFqV7O8t8dqCth5LA8dD3PuKlqlixWykd71l
+ 40iQ0lTqkAK9OZCdv5g4kYzAzbAQYhSQECzbVbVjsA9paSvxM+tniT8LoFa+Zvv9mion
+ +0zw==
+X-Gm-Message-State: AOAM5317xsDJzdH7CsrGxY3Cw2RYSOpRE8g6G9kBF36IeeEDiG22p8Ip
+ 2epAgXx4AD2qjwuRKPg1dIzucQ==
+X-Google-Smtp-Source: ABdhPJycwpD6mXs4gDPbvHxlvan4Cix0pIzqdjhyt1BYJVKfcy2+h/UY61uiRrBXWobwtcCTXb8Z9w==
+X-Received: by 2002:a05:6e02:1c28:b0:2bf:4c8a:6207 with SMTP id
+ m8-20020a056e021c2800b002bf4c8a6207mr3328664ilh.249.1645731337242; 
+ Thu, 24 Feb 2022 11:35:37 -0800 (PST)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- k10-20020a6b7e4a000000b00640a8142cbdsm289173ioq.49.2022.02.24.11.21.53
+ v3-20020a5d9483000000b00640d3d4acabsm281032ioj.44.2022.02.24.11.35.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Feb 2022 11:21:53 -0800 (PST)
-Date: Thu, 24 Feb 2022 19:21:50 +0000
+ Thu, 24 Feb 2022 11:35:36 -0800 (PST)
+Date: Thu, 24 Feb 2022 19:35:33 +0000
 From: Oliver Upton <oupton@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v3 03/19] KVM: arm64: Reject invalid addresses for CPU_ON
- PSCI call
-Message-ID: <YhfaztgV0GHzyh24@google.com>
+Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
+Message-ID: <YhfeBfgbDA8IGc9f@google.com>
 References: <20220223041844.3984439-1-oupton@google.com>
- <20220223041844.3984439-4-oupton@google.com>
- <87zgmg30qu.wl-maz@kernel.org>
+ <20220223041844.3984439-10-oupton@google.com>
+ <87wnhk2whx.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87zgmg30qu.wl-maz@kernel.org>
+In-Reply-To: <87wnhk2whx.wl-maz@kernel.org>
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  Joerg Roedel <joro@8bytes.org>, Peter Shier <pshier@google.com>,
  kvm-riscv@lists.infradead.org, Atish Patra <atishp@atishpatra.org>,
@@ -97,92 +96,125 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Marc,
 
-On Thu, Feb 24, 2022 at 12:30:49PM +0000, Marc Zyngier wrote:
-> On Wed, 23 Feb 2022 04:18:28 +0000,
+Thanks for reviewing the series. ACK to the nits and smaller comments
+you've made, I'll incorporate that feedback in the next series.
+
+On Thu, Feb 24, 2022 at 02:02:34PM +0000, Marc Zyngier wrote:
+> On Wed, 23 Feb 2022 04:18:34 +0000,
 > Oliver Upton <oupton@google.com> wrote:
 > > 
-> > DEN0022D.b 5.6.2 "Caller responsibilities" states that a PSCI
-> > implementation may return INVALID_ADDRESS for the CPU_ON call if the
-> > provided entry address is known to be invalid. There is an additional
-> > caveat to this rule. Prior to PSCI v1.0, the INVALID_PARAMETERS error
-> > is returned instead. Check the guest's PSCI version and return the
-> > appropriate error if the IPA is invalid.
+> > ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
+> > software to request that a system be placed in the deepest possible
+> > low-power state. Effectively, software can use this to suspend itself to
+> > RAM. Note that the semantics of this PSCI call are very similar to
+> > CPU_SUSPEND, which is already implemented in KVM.
 > > 
-> > Reported-by: Reiji Watanabe <reijiw@google.com>
+> > Implement the SYSTEM_SUSPEND in KVM. Similar to CPU_SUSPEND, the
+> > low-power state is implemented as a guest WFI. Synchronously reset the
+> > calling CPU before entering the WFI, such that the vCPU may immediately
+> > resume execution when a wakeup event is recognized.
+> > 
 > > Signed-off-by: Oliver Upton <oupton@google.com>
 > > ---
-> >  arch/arm64/kvm/psci.c | 24 ++++++++++++++++++++++--
-> >  1 file changed, 22 insertions(+), 2 deletions(-)
+> >  arch/arm64/kvm/psci.c  | 51 ++++++++++++++++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/reset.c |  3 ++-
+> >  2 files changed, 53 insertions(+), 1 deletion(-)
 > > 
 > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > index a0c10c11f40e..de1cf554929d 100644
+> > index 77a00913cdfd..41adaaf2234a 100644
 > > --- a/arch/arm64/kvm/psci.c
 > > +++ b/arch/arm64/kvm/psci.c
-> > @@ -12,6 +12,7 @@
+> > @@ -208,6 +208,50 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
+> >  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
+> >  }
 > >  
-> >  #include <asm/cputype.h>
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_mmu.h>
-> >  
-> >  #include <kvm/arm_psci.h>
-> >  #include <kvm/arm_hypercalls.h>
-> > @@ -70,12 +71,31 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> >  	struct vcpu_reset_state *reset_state;
-> >  	struct kvm *kvm = source_vcpu->kvm;
-> >  	struct kvm_vcpu *vcpu = NULL;
-> > -	unsigned long cpu_id;
-> > +	unsigned long cpu_id, entry_addr;
-> >  
-> >  	cpu_id = smccc_get_arg1(source_vcpu);
-> >  	if (!kvm_psci_valid_affinity(source_vcpu, cpu_id))
-> >  		return PSCI_RET_INVALID_PARAMS;
-> >  
-> > +	/*
-> > +	 * Basic sanity check: ensure the requested entry address actually
-> > +	 * exists within the guest's address space.
-> > +	 */
-> > +	entry_addr = smccc_get_arg2(source_vcpu);
-> > +	if (!kvm_ipa_valid(kvm, entry_addr)) {
+> > +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> > +{
+> > +	struct vcpu_reset_state reset_state;
+> > +	struct kvm *kvm = vcpu->kvm;
+> > +	struct kvm_vcpu *tmp;
+> > +	bool denied = false;
+> > +	unsigned long i;
 > > +
-> > +		/*
-> > +		 * Before PSCI v1.0, the INVALID_PARAMETERS error is returned
-> > +		 * instead of INVALID_ADDRESS.
-> > +		 *
-> > +		 * For more details, see ARM DEN0022D.b 5.6 "CPU_ON".
-> > +		 */
-> > +		if (kvm_psci_version(source_vcpu) < KVM_ARM_PSCI_1_0)
-> > +			return PSCI_RET_INVALID_PARAMS;
-> > +		else
-> > +			return PSCI_RET_INVALID_ADDRESS;
+> > +	reset_state.pc = smccc_get_arg1(vcpu);
+> > +	if (!kvm_ipa_valid(kvm, reset_state.pc)) {
+> > +		smccc_set_retval(vcpu, PSCI_RET_INVALID_ADDRESS, 0, 0, 0);
+> > +		return 1;
 > > +	}
 > > +
+> > +	reset_state.r0 = smccc_get_arg2(vcpu);
+> > +	reset_state.be = kvm_vcpu_is_be(vcpu);
+> > +	reset_state.reset = true;
+> > +
+> > +	/*
+> > +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
+> > +	 * calling vCPU) be in an OFF state, as determined by the
+> > +	 * implementation.
+> > +	 *
+> > +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
+> > +	 */
+> > +	mutex_lock(&kvm->lock);
+> > +	kvm_for_each_vcpu(i, tmp, kvm) {
+> > +		if (tmp != vcpu && !kvm_arm_vcpu_powered_off(tmp)) {
+> > +			denied = true;
+> > +			break;
+> > +		}
+> > +	}
+> > +	mutex_unlock(&kvm->lock);
 > 
-> If you're concerned with this, should you also check for the PC
-> alignment, or the presence of a memslot covering the address you are
-> branching to?  Le latter is particularly hard to implement reliably.
+> This looks dodgy. Nothing seems to prevent userspace from setting the
+> mp_state to RUNNING in parallel with this, as only the vcpu mutex is
+> held when this ioctl is issued.
+> 
+> It looks to me that what you want is what lock_all_vcpus() does
+> (Alexandru has a patch moving it out of the vgic code as part of his
+> SPE series).
+> 
+> It is also pretty unclear what the interaction with userspace is once
+> you have released the lock. If the VMM starts a vcpu other than the
+> suspending one, what is its state? The spec doesn't see to help
+> here. I can see two options:
+> 
+> - either all the vcpus have the same reset state applied to them as
+>   they come up, unless they are started with CPU_ON by a vcpu that has
+>   already booted (but there is a single 'context_id' provided, and I
+>   fear this is going to confuse the OS)...
+> 
+> - or only the suspending vcpu can resume the system, and we must fail
+>   a change of mp_state for the other vcpus.
+> 
+> What do you think?
 
-Andrew, Reiji and I had a conversation regarding exactly this on the
-last run of this series, and concluded that checking against the IPA is
-probably the best KVM can do [1]. That said, alignment is also an easy
-thing to check.
+Definitely the latter. The documentation of SYSTEM_SUSPEND is quite
+shaky on this, but it would appear that the intention is for the caller
+to be the first CPU to wake up.
 
-> So far, my position has been that the guest is free to shoot itself in
-> the foot if that's what it wants to do, and that babysitting it was a
-> waste of useful bits! ;-)
->
+> > +
+> > +	if (denied) {
+> > +		smccc_set_retval(vcpu, PSCI_RET_DENIED, 0, 0, 0);
+> > +		return 1;
+> > +	}
+> > +
+> > +	__kvm_reset_vcpu(vcpu, &reset_state);
+> > +	kvm_vcpu_wfi(vcpu);
+> 
+> I have mixed feelings about this. The vcpu has reset before being in
+> WFI, while it really should be the other way around and userspace
+> could rely on observing the transition.
+> 
+> What breaks if you change this?
 
-Agreed -- there are plenty of spectacular/hilarious ways in which the
-guest can mess up :-)
+I don't think that userspace would be able to observe the transition
+even if we WFI before the reset. I imagine that would take the form
+of setting KVM_REQ_VCPU_RESET, which we explicitly handle before
+letting userspace access the vCPU's state as of commit
+6826c6849b46 ("KVM: arm64: Handle PSCI resets before userspace
+touches vCPU state").
 
-> Or have you identified something that makes it a requirement to handle
-> this case (and possibly others)  in the hypervisor?
-
-It is a lot easier to tell a guest that their software is broken if they
-get an error back from the hypercall, whereas a vCPU off in the weeds
-might need to be looked at before concluding there's a guest issue.
-
-
-[1]: http://lore.kernel.org/r/20211005190153.dc2befzcisvznxq5@gator.home
+Given this, I felt it was probably best to avoid all the indirection and
+just do the vCPU reset in the handling of SYSTEM_SUSPEND. It does,
+however, imply that we have slightly different behavior when userspace
+exits are enabled, as that will happen pre-reset and pre-WFI.
 
 --
 Oliver
