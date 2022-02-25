@@ -2,81 +2,66 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D3BC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 15:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC1DC433FE
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 15:50:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6A294B9DA;
-	Fri, 25 Feb 2022 10:38:28 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 373B14B9D2;
+	Fri, 25 Feb 2022 10:50:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RfQtrTxeW0Kt; Fri, 25 Feb 2022 10:38:27 -0500 (EST)
+	with ESMTP id F-QRnp2wKdQl; Fri, 25 Feb 2022 10:50:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 185874B9E8;
-	Fri, 25 Feb 2022 10:38:27 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E519E4B9C4;
+	Fri, 25 Feb 2022 10:50:28 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FBFB4B9DA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 10:38:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 194634B9C3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 10:50:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9tJrb1Ig+UH4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Feb 2022 10:38:24 -0500 (EST)
+ with ESMTP id rnLXFd+85qEM for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Feb 2022 10:50:25 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EC0314B9D1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 10:38:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1C724B950
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 10:50:25 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 07243618A9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 15:38:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BFB8C340E7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 15:38:22 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 9C21B619AC;
+ Fri, 25 Feb 2022 15:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7D90C340E7;
+ Fri, 25 Feb 2022 15:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1645803502;
- bh=Qp6aGn+gfpXQjgM8XZgj/bDqpiOmsivhTJEvuTz+fDA=;
- h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
- b=vKYh1x0GLneHhE/0yXjH1+P2NcfgvGJ3rCBu/pBYythxhJYskOaY0cmc7hWO4hiPz
- 68HtLHzakEQIt9ab4Oh9cw7bOTzhwh+6FB/vhIbFOQU+sQerX5/FIxGW+iEGN9b2NJ
- QbnFnvcW6iL0ElUVoOpWEik/X3w82RwNCbmdYvQWoxvBQTqI1yS7C5hgMgwx1/6750
- MR2ctkpc7CDcrWOGB07E7GwZY4AOzEqk1VQyG+269hgNHnaTA2X2g97sWnSVV8HZV/
- vY5Aw9WvYq/cnbeUBCD33rTerbIScpj1+E3HCzJftDyqekClorrI5KpA0qMfwcuJfb
- Z+RUrCbwGQZqg==
-Received: by mail-yb1-f182.google.com with SMTP id d21so6589454yba.11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 07:38:22 -0800 (PST)
-X-Gm-Message-State: AOAM531kxDThCEVnLSgonWwanIgsbdQEY1N3hJ5SCbPrRM4188+twQF7
- 5IkktoSVN2TMfupjglHIom3jsp+/Epj4IQI1M70=
-X-Google-Smtp-Source: ABdhPJx3rvESMXLxmCbN7BFFRnF9VG0LfFW9lEx0SZZrJ9ggiEnkwCvqiu8bEDq0wko4R3DdaAXk1mMrwpgvYOmaWJ4=
-X-Received: by 2002:a25:6c43:0:b0:61d:e94b:3c55 with SMTP id
- h64-20020a256c43000000b0061de94b3c55mr7907145ybc.224.1645803501561; Fri, 25
- Feb 2022 07:38:21 -0800 (PST)
+ s=k20201202; t=1645804224;
+ bh=6zeaKhd1cDa2VHznk9BHK/J+rUpp98k9PC6C1x/CCcA=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=OmQogqEMrHFY/J4fGPzzzQHFACVS3JY4bSut9uF3yhpbwzWJrxULaAJsdBbdLt9G8
+ cl5vYyO+5zhZ+F2+6PpBTzuWjzAB65KOxo/+Yi+ANh5kiOmHT4mtyFAwYkYH/WmcOR
+ Ash2BtQr0e5U6V6cfHsQ2LPParHbx/cRaI6JNCEcnqgZHai+7cFTvchQcIaV1c3Dl1
+ D3CBaSzPYzSV4w5rzOWIzvAK/kO0GYqNq2IKK5smD6uhD9onns158aLqmOiExCIofm
+ t9mPL3g0VnSWQF2omRJ4dQA+PfCszH+udd2TajYiX/WHMtnRnxgBz8ki6JslOavKLP
+ 9jSwUFz0f+aaQ==
+From: Will Deacon <will@kernel.org>
+To: Catalin Marinas <catalin.marinas@arm.com>, Mark Brown <broonie@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+ Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH v11 00/40] arm64/sme: Initial support for the Scalable
+ Matrix Extension
+Date: Fri, 25 Feb 2022 15:50:12 +0000
+Message-Id: <164579991080.3691228.14311210559888008730.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20220207152109.197566-1-broonie@kernel.org>
+References: <20220207152109.197566-1-broonie@kernel.org>
 MIME-Version: 1.0
-References: <20220222165212.2005066-7-kaleshsingh@google.com>
- <202202231727.L621fVgD-lkp@intel.com> <875yp63ptg.wl-maz@kernel.org>
- <YhYpvfZaSjrAtkZp@rli9-dbox> <cb750267af0636c49d2f8aa354f086a5@kernel.org>
- <CAMj1kXHsNsQXbeeS1zcy+xYA7kSE5apbLpChohfvkABS7Z6jKg@mail.gmail.com>
- <89c48bd2a9b32b4607d1515714fa3c1b@kernel.org>
- <16f47fa9-90b4-0b5c-33cb-cb004fc39266@intel.com>
-In-Reply-To: <16f47fa9-90b4-0b5c-33cb-cb004fc39266@intel.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 25 Feb 2022 16:38:10 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXEfsxj44t13rpgNddvTeM3qgfv5zU_xpnxn7HV3xUN2YA@mail.gmail.com>
-Message-ID: <CAMj1kXEfsxj44t13rpgNddvTeM3qgfv5zU_xpnxn7HV3xUN2YA@mail.gmail.com>
-Subject: Re: [kbuild-all] Re: [PATCH v2 6/9] KVM: arm64: Detect and handle
- hypervisor stack overflows
-To: "Chen, Rong A" <rong.a.chen@intel.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, llvm@lists.linux.dev,
- Joey Gouly <joey.gouly@arm.com>, Kalesh Singh <kaleshsingh@google.com>,
- Will Deacon <will@kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
- kernel test robot <lkp@intel.com>, Marc Zyngier <maz@kernel.org>,
- Android Kernel Team <kernel-team@android.com>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Suren Baghdasaryan <surenb@google.com>, Peter Collingbourne <pcc@google.com>,
- Linux ARM <linux-arm-kernel@lists.infradead.org>, kbuild-all@lists.01.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Luis Machado <luis.machado@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>,
+ kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
+ Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Salil Akerkar <Salil.Akerkar@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,33 +78,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 25 Feb 2022 at 03:12, Chen, Rong A <rong.a.chen@intel.com> wrote:
->
->
->
+On Mon, 7 Feb 2022 15:20:29 +0000, Mark Brown wrote:
+> This series provides initial support for the ARMv9 Scalable Matrix
+> Extension (SME).  SME takes the approach used for vectors in SVE and
+> extends this to provide architectural support for matrix operations.  A
+> more detailed overview can be found in [1].
+> 
+> For the kernel SME can be thought of as a series of features which are
+> intended to be used together by applications but operate mostly
+> orthogonally:
+> 
+> [...]
 
-> Hi Marc, Ard,
->
-> We have ignored the warning related to asmlinkage according to the below
-> advice:
->
-> https://lore.kernel.org/lkml/CAMj1kXHrRYagSVniSetHdG15rkQS+fm4zVOtN=Zda3W0QaEoJA@mail.gmail.com/
->
+Applied patch 5 to arm64 (for-next/kselftest), thanks!
 
-Excellent! Thanks for implementing this - I wasn't aware that you
-adopted this suggestion.
+[05/40] kselftest/arm64: signal: Allow tests to be incompatible with features
+        https://git.kernel.org/arm64/c/32de73e89099
 
-> do you want the bot ignore such warning if asmlinkage not specified?
->
-
-Even though I think this warning has little value, I think asmlinkage
-is sufficient for us to avoid it for symbols that are exported for use
-by assembler code.
-
-So I don't think this additional change is needed.
-
+Cheers,
 -- 
-Ard.
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
