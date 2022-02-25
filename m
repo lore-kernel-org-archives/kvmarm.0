@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB9EC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 15:00:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 119F2C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 15:00:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 353D14B9E0;
-	Fri, 25 Feb 2022 10:00:04 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA0F24BA44;
+	Fri, 25 Feb 2022 10:00:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id B0HnT09sRhTS; Fri, 25 Feb 2022 10:00:02 -0500 (EST)
+	with ESMTP id 9SFYL7Q2ihkG; Fri, 25 Feb 2022 10:00:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85B034BA2C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A4CD94BABF;
 	Fri, 25 Feb 2022 09:59:48 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EE1C4BBDB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 22:45:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D01274BA2B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 22:46:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4oZeCEFG+fG9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Feb 2022 22:45:01 -0500 (EST)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A7024BBD0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 22:45:01 -0500 (EST)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-2d07ae11460so19802997b3.7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 19:45:01 -0800 (PST)
+ with ESMTP id GaHsg69WJJFI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Feb 2022 22:46:00 -0500 (EST)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D4C4A4BA21
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 22:46:00 -0500 (EST)
+Received: by mail-yb1-f202.google.com with SMTP id
+ s22-20020a252d56000000b00624652ac3e1so1990741ybe.16
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Feb 2022 19:46:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:cc;
- bh=53jTUHXN8pXhAmdBLdFZ3XwM5fVPq5Z9CpfRPZqZFCI=;
- b=Vuz84OwZMocSA83nvo8NZ4zxH6ccvGrHdYvieAWCrHxxrge7jQQG/OH1a8uFFGG4t0
- GAfASHstE4xtShS2AA7B5kso/iNl7ro+9oirqf1U0bSq+Uzf5hhssvO0GkISWMyybAeX
- 7BvdyvbW02JKYDtiLwjM1HUgVDPHahEXe8LP8aQT3bDAE30D49aHNFHS+Gf9kmKHlfkT
- cdfOYW9WnT4/rtSTYaWkBZCFYQwYShrnDme/ddg8d8qh2GtFqPx74zGTMQnR1xpBFtEF
- Ladj1Ae/voJEATBIZ4vuWd/MgNnf6zMvOfwtSkER77HyC18caRCbFRIBen0IE3m2Ez3z
- pDTg==
+ bh=/eP6KkGiGHYHgGXXJMimz0Hq7QtJksJXpIi1SEKLKNk=;
+ b=pid3etewg8QyLJOpMPH04kaj2w8Mrq2b0dugec1Zq+yJIsLQBSppw34T7ZOSYFBU23
+ +Fo4EM4L4yr5CNIhqIhV5rDJoIWpceoPh19HJCktbP4Mbs9pJF+EflmOX51uDQAhWrZ0
+ Uz9dUFD6IEKpajb1g3/BJyuMTV82IDpJCVOz3imzbc7AwPpyMyw/vO1IoPA+8u8QgaMI
+ AvIkh3koYVMWZqPfyZ3zJa5Cy2g3n59M95hCfIsmz5QrYaP6we5UBX+nx5qUzd5dDovb
+ Iet2LBlmx9aDamxqNHx8b/g0fddm3jaP65kvxd9CjmSV93ckP7K0wM1FPGKk5iRS2Zpo
+ SSlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:cc;
- bh=53jTUHXN8pXhAmdBLdFZ3XwM5fVPq5Z9CpfRPZqZFCI=;
- b=4FXFUk5eCDJUfcPY8qASkVRJ/KgxBm5gku50XCj6/xpOjn4usepKPGDW2mI7GUGIRZ
- cgmv9d+rS1E4mHBWeM2SrwubNsEkfdBxQBT8PIKFqHR7cgXvV8HXwQi4CjfAI/gFIT2L
- nlo74b8yOOAn3FYP8be3YyvC5CT5A3IndfANEGHFa4dF9RuQ31zG6VvW8zzyL33682do
- x+CGuoCxKi+fc5mtLqphXIGW93tzh5rgpm6scw7HiCFz3gv7X2N59zjFPNdYd8oSIoLO
- ahkwttNQzfWd3SFfeYpZlXdi8bZwp+7d/hMVzWTcgOfVDX/f/XGO8UBYgk109KoCsZLV
- 3eLQ==
-X-Gm-Message-State: AOAM531FCNDBXMW/fBRhrG2kvf+bkK5s5+HR1DMwp+BSzJaeDiNCRkTb
- 9yKkxcrHdegFM3OLGQucA/eZf5IAEX1zgdj1Kw==
-X-Google-Smtp-Source: ABdhPJx4OPw80y5Vq18KcxUsCYgPq2jDdE5mSLmC2vx51PsGs+75ealL5rRfaLmZWL1VA67CEKvpatgngkV2u3nJHg==
+ bh=/eP6KkGiGHYHgGXXJMimz0Hq7QtJksJXpIi1SEKLKNk=;
+ b=BRHLc/SbwbOIojOLKnvpLk1ug3C8USFsd91QpHolNR14tNSPmXY559fgpP16aomX0r
+ jghoPlHJ1h6L5GwNz11O28nZiE/u7TVv2kz0ftOZleFkVlC36ugJriwhZ7E+LFEhVew4
+ vaUr+7xWjt86OVc6VAfVZEbR4Nre0DGqcSZro0oQgj75HCr3dJfCBiHq6ou5Om+bHtJ3
+ SMHHF3w9zE+n7Y8sC5EUI575V8/mjAHPSFaHSobCsfLHezhakkDAr7wjh4tI6zInWXOI
+ /gnuc+/sop1/d5pFyGAxpn1VhE+ONhU8sGqTMvjI8tZQLrfkAdVme9SceLH1qdj2OfQc
+ 0NRA==
+X-Gm-Message-State: AOAM532LHJsu0n8YQUjtatqeauBZuWuTlAD+gjd985Jh5VepNKXe7GQ0
+ sWb+icmwyJkslfPgnej+iZpdjbgPSEtC3VHpIQ==
+X-Google-Smtp-Source: ABdhPJwiNmu25jX3B/9IxvgenhQ+qHAZePaLs+S4RErausxnPewXhDPUALVZC+uDBH0uV+l+Uk1OWArABD5JK7aliQ==
 X-Received: from kaleshsingh.mtv.corp.google.com
  ([2620:15c:211:200:3a50:90b2:e6a2:9060])
- (user=kaleshsingh job=sendgmr) by 2002:a0d:ee45:0:b0:2d6:ec15:4f89 with SMTP
- id x66-20020a0dee45000000b002d6ec154f89mr5460513ywe.372.1645760700677; Thu,
- 24 Feb 2022 19:45:00 -0800 (PST)
-Date: Thu, 24 Feb 2022 19:34:51 -0800
+ (user=kaleshsingh job=sendgmr) by 2002:a25:1181:0:b0:624:6c32:e341 with SMTP
+ id 123-20020a251181000000b006246c32e341mr5471713ybr.437.1645760760374; Thu,
+ 24 Feb 2022 19:46:00 -0800 (PST)
+Date: Thu, 24 Feb 2022 19:34:52 -0800
 In-Reply-To: <20220225033548.1912117-1-kaleshsingh@google.com>
-Message-Id: <20220225033548.1912117-7-kaleshsingh@google.com>
+Message-Id: <20220225033548.1912117-8-kaleshsingh@google.com>
 Mime-Version: 1.0
 References: <20220225033548.1912117-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
-Subject: [PATCH v4 6/8] KVM: arm64: Add hypervisor overflow stack
+Subject: [PATCH v4 7/8] KVM: arm64: Unwind and dump nVHE HYP stacktrace
 From: Kalesh Singh <kaleshsingh@google.com>
 X-Mailman-Approved-At: Fri, 25 Feb 2022 09:59:45 -0500
 Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
@@ -74,8 +74,8 @@ Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
  linux-kernel@vger.kernel.org,
  "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
  Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Kalesh Singh <kaleshsingh@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- surenb@google.com, kvmarm@lists.cs.columbia.edu
+ Kalesh Singh <kaleshsingh@google.com>, surenb@google.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,65 +92,480 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Allocate and switch to 16-byte aligned secondary stack on overflow. This
-provides us stack space to better handle overflows; and is used in
-a subsequent patch to dump the hypervisor stacktrace. The overflow stack
-is only allocated if CONFIG_NVHE_EL2_DEBUG is enabled, as hypervisor
-stacktraces is a debug feature dependent on CONFIG_NVHE_EL2_DEBUG.
+Unwind the stack in EL1, when CONFIG_NVHE_EL2_DEBUG is enabled.
+This is possible because CONFIG_NVHE_EL2_DEBUG disables the host
+stage-2 protection on hyp_panic(), allowing the host to access
+the hypervisor stack pages in EL1.
+
+A simple stack overflow test produces the following output:
+
+[  580.376051][  T412] kvm: nVHE hyp panic at: ffffffc0116145c4!
+[  580.378034][  T412] kvm [412]: nVHE HYP call trace:
+[  580.378591][  T412] kvm [412]:  [<ffffffc011614934>]
+[  580.378993][  T412] kvm [412]:  [<ffffffc01160fa48>]
+[  580.379386][  T412] kvm [412]:  [<ffffffc0116145dc>]  // Non-terminating recursive call
+[  580.379772][  T412] kvm [412]:  [<ffffffc0116145dc>]
+[  580.380158][  T412] kvm [412]:  [<ffffffc0116145dc>]
+[  580.380544][  T412] kvm [412]:  [<ffffffc0116145dc>]
+[  580.380928][  T412] kvm [412]:  [<ffffffc0116145dc>]
+. . .
+
+Since nVHE hyp symbols are not included by kallsyms to avoid issues
+with aliasing, we fallback to the vmlinux addresses. Symbolizing the
+addresses is handled in the next patch in this series.
 
 Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 ---
 
 Changes in v4:
-  - Update comment to clarify resetting the SP to the top of the stack
-    only happens if CONFIG_NVHE_EL2_DEBUG is disabled, per Fuad
+  - Update commit text and struct kvm_nvhe_panic_info kernel-doc comment
+    to clarify that CONFIG_NVHE_EL2_DEBUG only disables the host stage-2
+    protection on hyp_panic(), per Fuad
+  - Update NVHE_EL2_DEBUG Kconfig description to clarify that the
+    hypervisor stack trace is printed when hyp_panic() is called, per Fuad
 
- arch/arm64/kvm/hyp/nvhe/host.S   | 11 ++++++++---
- arch/arm64/kvm/hyp/nvhe/switch.c |  5 +++++
- 2 files changed, 13 insertions(+), 3 deletions(-)
+Changes in v3:
+  - The nvhe hyp stack unwinder now makes use of the core logic from the
+    regular kernel unwinder to avoid duplication, per Mark
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-index 749961bfa5ba..2c04f3e6b3f0 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -179,13 +179,18 @@ SYM_FUNC_END(__host_hvc)
- 	b	hyp_panic
+Changes in v2:
+  - Add cpu_prepare_nvhe_panic_info()
+  - Move updating the panic info to hyp_panic(), so that unwinding also
+    works for conventional nVHE Hyp-mode.
+
+ arch/arm64/include/asm/kvm_asm.h    |  20 +++
+ arch/arm64/include/asm/stacktrace.h |  12 ++
+ arch/arm64/kernel/stacktrace.c      | 210 +++++++++++++++++++++++++---
+ arch/arm64/kvm/Kconfig              |   5 +-
+ arch/arm64/kvm/arm.c                |   2 +-
+ arch/arm64/kvm/handle_exit.c        |   3 +
+ arch/arm64/kvm/hyp/nvhe/switch.c    |  18 +++
+ 7 files changed, 244 insertions(+), 26 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 2e277f2ed671..4abcf93c6662 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -176,6 +176,26 @@ struct kvm_nvhe_init_params {
+ 	unsigned long vtcr;
+ };
  
- .L__hyp_sp_overflow\@:
 +#ifdef CONFIG_NVHE_EL2_DEBUG
-+	/* Switch to the overflow stack */
-+	adr_this_cpu sp, hyp_overflow_stack + PAGE_SIZE, x0
-+#else
- 	/*
--	 * Reset SP to the top of the stack, to allow handling the hyp_panic.
--	 * This corrupts the stack but is ok, since we won't be attempting
--	 * any unwinding here.
-+	 * If !CONFIG_NVHE_EL2_DEBUG, reset SP to the top of the stack, to
-+	 * allow handling the hyp_panic. This corrupts the stack but is ok,
-+	 * since we won't be attempting any unwinding here.
- 	 */
- 	ldr_this_cpu	x0, kvm_init_params + NVHE_INIT_STACK_HYP_VA, x1
- 	mov	sp, x0
-+#endif
++/**
++ * struct kvm_nvhe_panic_info - nVHE hypervisor panic info.
++ * @hyp_stack_base:             hyp VA of the hyp_stack base.
++ * @hyp_overflow_stack_base:    hyp VA of the hyp_overflow_stack base.
++ * @fp:                         hyp FP where the backtrace begins.
++ * @pc:                         hyp PC where the backtrace begins.
++ *
++ * Used by the host in EL1 to dump the nVHE hypervisor backtrace on
++ * hyp_panic. This is possible because CONFIG_NVHE_EL2_DEBUG disables
++ * the host stage 2 protection on hyp_panic(). See: __hyp_do_panic()
++ */
++struct kvm_nvhe_panic_info {
++	unsigned long hyp_stack_base;
++	unsigned long hyp_overflow_stack_base;
++	unsigned long fp;
++	unsigned long pc;
++};
++#endif /* CONFIG_NVHE_EL2_DEBUG */
++
+ /* Translate a kernel address @ptr into its equivalent linear mapping */
+ #define kvm_ksym_ref(ptr)						\
+ 	({								\
+diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
+index e77cdef9ca29..18611a51cf14 100644
+--- a/arch/arm64/include/asm/stacktrace.h
++++ b/arch/arm64/include/asm/stacktrace.h
+@@ -22,6 +22,10 @@ enum stack_type {
+ 	STACK_TYPE_OVERFLOW,
+ 	STACK_TYPE_SDEI_NORMAL,
+ 	STACK_TYPE_SDEI_CRITICAL,
++#ifdef CONFIG_NVHE_EL2_DEBUG
++	STACK_TYPE_KVM_NVHE_HYP,
++	STACK_TYPE_KVM_NVHE_OVERFLOW,
++#endif /* CONFIG_NVHE_EL2_DEBUG */
+ 	__NR_STACK_TYPES
+ };
  
- 	bl	hyp_panic_bad_stack
- 	ASM_BUG()
+@@ -147,4 +151,12 @@ static inline bool on_accessible_stack(const struct task_struct *tsk,
+ 	return false;
+ }
+ 
++#ifdef CONFIG_NVHE_EL2_DEBUG
++void kvm_nvhe_dump_backtrace(unsigned long hyp_offset);
++#else
++static inline void kvm_nvhe_dump_backtrace(unsigned long hyp_offset)
++{
++}
++#endif /* CONFIG_NVHE_EL2_DEBUG */
++
+ #endif	/* __ASM_STACKTRACE_H */
+diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
+index e4103e085681..6ec85cb69b1f 100644
+--- a/arch/arm64/kernel/stacktrace.c
++++ b/arch/arm64/kernel/stacktrace.c
+@@ -15,6 +15,8 @@
+ 
+ #include <asm/irq.h>
+ #include <asm/pointer_auth.h>
++#include <asm/kvm_asm.h>
++#include <asm/kvm_hyp.h>
+ #include <asm/stack_pointer.h>
+ #include <asm/stacktrace.h>
+ 
+@@ -64,26 +66,15 @@ NOKPROBE_SYMBOL(start_backtrace);
+  * records (e.g. a cycle), determined based on the location and fp value of A
+  * and the location (but not the fp value) of B.
+  */
+-static int notrace unwind_frame(struct task_struct *tsk,
+-				struct stackframe *frame)
++static int notrace __unwind_frame(struct stackframe *frame, struct stack_info *info,
++		unsigned long (*translate_fp)(unsigned long, enum stack_type))
+ {
+ 	unsigned long fp = frame->fp;
+-	struct stack_info info;
+-
+-	if (!tsk)
+-		tsk = current;
+-
+-	/* Final frame; nothing to unwind */
+-	if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
+-		return -ENOENT;
+ 
+ 	if (fp & 0x7)
+ 		return -EINVAL;
+ 
+-	if (!on_accessible_stack(tsk, fp, 16, &info))
+-		return -EINVAL;
+-
+-	if (test_bit(info.type, frame->stacks_done))
++	if (test_bit(info->type, frame->stacks_done))
+ 		return -EINVAL;
+ 
+ 	/*
+@@ -94,28 +85,62 @@ static int notrace unwind_frame(struct task_struct *tsk,
+ 	 *
+ 	 * TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
+ 	 * TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
++	 * KVM_NVHE_HYP -> KVM_NVHE_OVERFLOW
+ 	 *
+ 	 * ... but the nesting itself is strict. Once we transition from one
+ 	 * stack to another, it's never valid to unwind back to that first
+ 	 * stack.
+ 	 */
+-	if (info.type == frame->prev_type) {
++	if (info->type == frame->prev_type) {
+ 		if (fp <= frame->prev_fp)
+ 			return -EINVAL;
+ 	} else {
+ 		set_bit(frame->prev_type, frame->stacks_done);
+ 	}
+ 
++	/* Record fp as prev_fp before attempting to get the next fp */
++	frame->prev_fp = fp;
++
++	/*
++	 * If fp is not from the current address space perform the
++	 * necessary translation before dereferencing it to get next fp.
++	 */
++	if (translate_fp)
++		fp = translate_fp(fp, info->type);
++	if (!fp)
++		return -EINVAL;
++
+ 	/*
+ 	 * Record this frame record's values and location. The prev_fp and
+-	 * prev_type are only meaningful to the next unwind_frame() invocation.
++	 * prev_type are only meaningful to the next __unwind_frame() invocation.
+ 	 */
+ 	frame->fp = READ_ONCE_NOCHECK(*(unsigned long *)(fp));
+ 	frame->pc = READ_ONCE_NOCHECK(*(unsigned long *)(fp + 8));
+-	frame->prev_fp = fp;
+-	frame->prev_type = info.type;
+-
+ 	frame->pc = ptrauth_strip_insn_pac(frame->pc);
++	frame->prev_type = info->type;
++
++	return 0;
++}
++
++static int notrace unwind_frame(struct task_struct *tsk, struct stackframe *frame)
++{
++	unsigned long fp = frame->fp;
++	struct stack_info info;
++	int err;
++
++	if (!tsk)
++		tsk = current;
++
++	/* Final frame; nothing to unwind */
++	if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
++		return -ENOENT;
++
++	if (!on_accessible_stack(tsk, fp, 16, &info))
++		return -EINVAL;
++
++	err = __unwind_frame(frame, &info, NULL);
++	if (err)
++		return err;
+ 
+ #ifdef CONFIG_FUNCTION_GRAPH_TRACER
+ 	if (tsk->ret_stack &&
+@@ -143,20 +168,27 @@ static int notrace unwind_frame(struct task_struct *tsk,
+ }
+ NOKPROBE_SYMBOL(unwind_frame);
+ 
+-static void notrace walk_stackframe(struct task_struct *tsk,
+-				    struct stackframe *frame,
+-				    bool (*fn)(void *, unsigned long), void *data)
++static void notrace __walk_stackframe(struct task_struct *tsk, struct stackframe *frame,
++		bool (*fn)(void *, unsigned long), void *data,
++		int (*unwind_frame_fn)(struct task_struct *tsk, struct stackframe *frame))
+ {
+ 	while (1) {
+ 		int ret;
+ 
+ 		if (!fn(data, frame->pc))
+ 			break;
+-		ret = unwind_frame(tsk, frame);
++		ret = unwind_frame_fn(tsk, frame);
+ 		if (ret < 0)
+ 			break;
+ 	}
+ }
++
++static void notrace walk_stackframe(struct task_struct *tsk,
++				    struct stackframe *frame,
++				    bool (*fn)(void *, unsigned long), void *data)
++{
++	__walk_stackframe(tsk, frame, fn, data, unwind_frame);
++}
+ NOKPROBE_SYMBOL(walk_stackframe);
+ 
+ static bool dump_backtrace_entry(void *arg, unsigned long where)
+@@ -210,3 +242,135 @@ noinline notrace void arch_stack_walk(stack_trace_consume_fn consume_entry,
+ 
+ 	walk_stackframe(task, &frame, consume_entry, cookie);
+ }
++
++#ifdef CONFIG_NVHE_EL2_DEBUG
++DECLARE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
++DECLARE_KVM_NVHE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], hyp_overflow_stack);
++DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_panic_info, kvm_panic_info);
++
++static inline bool kvm_nvhe_on_overflow_stack(unsigned long sp, unsigned long size,
++				 struct stack_info *info)
++{
++	struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
++	unsigned long low = (unsigned long)panic_info->hyp_overflow_stack_base;
++	unsigned long high = low + PAGE_SIZE;
++
++	return on_stack(sp, size, low, high, STACK_TYPE_KVM_NVHE_OVERFLOW, info);
++}
++
++static inline bool kvm_nvhe_on_hyp_stack(unsigned long sp, unsigned long size,
++				 struct stack_info *info)
++{
++	struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
++	unsigned long low = (unsigned long)panic_info->hyp_stack_base;
++	unsigned long high = low + PAGE_SIZE;
++
++	return on_stack(sp, size, low, high, STACK_TYPE_KVM_NVHE_HYP, info);
++}
++
++static inline bool kvm_nvhe_on_accessible_stack(unsigned long sp, unsigned long size,
++				       struct stack_info *info)
++{
++	if (info)
++		info->type = STACK_TYPE_UNKNOWN;
++
++	if (kvm_nvhe_on_hyp_stack(sp, size, info))
++		return true;
++	if (kvm_nvhe_on_overflow_stack(sp, size, info))
++		return true;
++
++	return false;
++}
++
++static unsigned long kvm_nvhe_hyp_stack_kern_va(unsigned long addr)
++{
++	struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
++	unsigned long hyp_base, kern_base, hyp_offset;
++
++	hyp_base = (unsigned long)panic_info->hyp_stack_base;
++	hyp_offset = addr - hyp_base;
++
++	kern_base = (unsigned long)*this_cpu_ptr(&kvm_arm_hyp_stack_page);
++
++	return kern_base + hyp_offset;
++}
++
++static unsigned long kvm_nvhe_overflow_stack_kern_va(unsigned long addr)
++{
++	struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
++	unsigned long hyp_base, kern_base, hyp_offset;
++
++	hyp_base = (unsigned long)panic_info->hyp_overflow_stack_base;
++	hyp_offset = addr - hyp_base;
++
++	kern_base = (unsigned long)this_cpu_ptr_nvhe_sym(hyp_overflow_stack);
++
++	return kern_base + hyp_offset;
++}
++
++/*
++ * Convert KVM nVHE hypervisor stack VA to a kernel VA.
++ *
++ * The nVHE hypervisor stack is mapped in the flexible 'private' VA range, to allow
++ * for guard pages below the stack. Consequently, the fixed offset address
++ * translation macros won't work here.
++ *
++ * The kernel VA is calculated as an offset from the kernel VA of the hypervisor
++ * stack base. See: kvm_nvhe_hyp_stack_kern_va(),  kvm_nvhe_overflow_stack_kern_va()
++ */
++static unsigned long kvm_nvhe_stack_kern_va(unsigned long addr,
++					enum stack_type type)
++{
++	switch (type) {
++	case STACK_TYPE_KVM_NVHE_HYP:
++		return kvm_nvhe_hyp_stack_kern_va(addr);
++	case STACK_TYPE_KVM_NVHE_OVERFLOW:
++		return kvm_nvhe_overflow_stack_kern_va(addr);
++	default:
++		return 0UL;
++	}
++}
++
++static int notrace kvm_nvhe_unwind_frame(struct task_struct *tsk,
++					struct stackframe *frame)
++{
++	struct stack_info info;
++
++	if (!kvm_nvhe_on_accessible_stack(frame->fp, 16, &info))
++		return -EINVAL;
++
++	return  __unwind_frame(frame, &info, kvm_nvhe_stack_kern_va);
++}
++
++static bool kvm_nvhe_dump_backtrace_entry(void *arg, unsigned long where)
++{
++	unsigned long va_mask = GENMASK_ULL(vabits_actual - 1, 0);
++	unsigned long hyp_offset = (unsigned long)arg;
++
++	where &= va_mask;	/* Mask tags */
++	where += hyp_offset;	/* Convert to kern addr */
++
++	kvm_err("[<%016lx>] %pB\n", where, (void *)where);
++
++	return true;
++}
++
++static void notrace kvm_nvhe_walk_stackframe(struct task_struct *tsk,
++				    struct stackframe *frame,
++				    bool (*fn)(void *, unsigned long), void *data)
++{
++	__walk_stackframe(tsk, frame, fn, data, kvm_nvhe_unwind_frame);
++}
++
++void kvm_nvhe_dump_backtrace(unsigned long hyp_offset)
++{
++	struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
++	struct stackframe frame;
++
++	start_backtrace(&frame, panic_info->fp, panic_info->pc);
++	pr_err("nVHE HYP call trace:\n");
++	kvm_nvhe_walk_stackframe(NULL, &frame, kvm_nvhe_dump_backtrace_entry,
++					(void *)hyp_offset);
++	pr_err("---- end of nVHE HYP call trace ----\n");
++}
++#endif /* CONFIG_NVHE_EL2_DEBUG */
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 8a5fbbf084df..a7be4ef35fbf 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -51,8 +51,9 @@ config NVHE_EL2_DEBUG
+ 	depends on KVM
+ 	help
+ 	  Say Y here to enable the debug mode for the non-VHE KVM EL2 object.
+-	  Failure reports will BUG() in the hypervisor. This is intended for
+-	  local EL2 hypervisor development.
++	  Failure reports will BUG() in the hypervisor; and calls to hyp_panic()
++	  will result in printing the hypervisor call stack.
++	  This is intended for local EL2 hypervisor development.
+ 
+ 	  If unsure, say N.
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 0a83c0e7f838..1f6f0b43a388 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -49,7 +49,7 @@ DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
+ 
+ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
+-static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
++DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+ unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
+ DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+ 
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index e3140abd2e2e..ff69dff33700 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -17,6 +17,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
+ #include <asm/debug-monitors.h>
++#include <asm/stacktrace.h>
+ #include <asm/traps.h>
+ 
+ #include <kvm/arm_hypercalls.h>
+@@ -326,6 +327,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+ 		kvm_err("nVHE hyp panic at: %016llx!\n", elr_virt + hyp_offset);
+ 	}
+ 
++	kvm_nvhe_dump_backtrace(hyp_offset);
++
+ 	/*
+ 	 * Hyp has panicked and we're going to handle that by panicking the
+ 	 * kernel. The kernel offset will be revealed in the panic so we're
 diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 703a5d3f611b..efc20273a352 100644
+index efc20273a352..b8ecffc47424 100644
 --- a/arch/arm64/kvm/hyp/nvhe/switch.c
 +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -34,6 +34,11 @@ DEFINE_PER_CPU(struct kvm_host_data, kvm_host_data);
- DEFINE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
- DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
- 
-+#ifdef CONFIG_NVHE_EL2_DEBUG
-+DEFINE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], hyp_overflow_stack)
-+	__aligned(16);
-+#endif
+@@ -37,6 +37,22 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
+ #ifdef CONFIG_NVHE_EL2_DEBUG
+ DEFINE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], hyp_overflow_stack)
+ 	__aligned(16);
++DEFINE_PER_CPU(struct kvm_nvhe_panic_info, kvm_panic_info);
 +
++static inline void cpu_prepare_nvhe_panic_info(void)
++{
++	struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr(&kvm_panic_info);
++	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
++
++	panic_info->hyp_stack_base = (unsigned long)(params->stack_hyp_va - PAGE_SIZE);
++	panic_info->hyp_overflow_stack_base = (unsigned long)this_cpu_ptr(hyp_overflow_stack);
++	panic_info->fp = (unsigned long)__builtin_frame_address(0);
++	panic_info->pc = _THIS_IP_;
++}
++ #else
++static inline void cpu_prepare_nvhe_panic_info(void)
++{
++}
+ #endif
+ 
  static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
+@@ -360,6 +376,8 @@ asmlinkage void __noreturn hyp_panic(void)
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_vcpu *vcpu;
+ 
++	cpu_prepare_nvhe_panic_info();
++
+ 	host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
+ 	vcpu = host_ctxt->__hyp_running_vcpu;
+ 
 -- 
 2.35.1.574.g5d30c73bfb-goog
 
