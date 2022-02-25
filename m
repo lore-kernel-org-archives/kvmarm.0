@@ -2,63 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C10C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 15:35:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54111C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 15:37:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BB504B9D0;
-	Fri, 25 Feb 2022 10:35:21 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E46F74B9B9;
+	Fri, 25 Feb 2022 10:37:12 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VlznqQvNYDjw; Fri, 25 Feb 2022 10:35:20 -0500 (EST)
+	with ESMTP id OVkzNaWGjf8X; Fri, 25 Feb 2022 10:37:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63BFA4B9BC;
-	Fri, 25 Feb 2022 10:35:20 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B01184B9BC;
+	Fri, 25 Feb 2022 10:37:11 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E03A4B9B9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 10:35:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD7214B9B9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 10:37:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ke2JEmCI9H49 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Feb 2022 10:35:17 -0500 (EST)
+ with ESMTP id PEqXOv7WZnoJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Feb 2022 10:37:09 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F3004B9A7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 10:35:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 760CC4B993
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 10:37:09 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 347E6B8324E;
- Fri, 25 Feb 2022 15:35:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDE38C340E7;
- Fri, 25 Feb 2022 15:35:14 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 050BAB83250;
+ Fri, 25 Feb 2022 15:37:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACED8C340E7;
+ Fri, 25 Feb 2022 15:37:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1645803314;
- bh=XWLirn2GNbTjE51zo7iPv6tgFO5o53opK4mG6ZCkM5Y=;
+ s=k20201202; t=1645803426;
+ bh=SiyBeYhls8/kz1YvQqn0t9gFcAOpmUd7OBXO0BWM8ck=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=JSvAOfyVc3on3y3Y+/Uleua1zaLcfP/tAFHpc7b82oUv0rfYpXGxMVI0eK8FjSHPA
- euIJu1y3rnCmPFrT1VrZMxKO/zIWmXI5Zak9bBYWSq5vtLMEINdeNgZFcpugG5SQdM
- Rp1Gukf8xWHy632Gm/dsqYUxLQ1Ri0i0e+X9Gv8qWvAu8zFakNK4hJb12pVQW8uMUL
- XPLRx6PjzLnN89TmzrVLiVJxncne5xpTsv7nZ3SaQTsUXHk9QGjnmUlrFyk/XO/P8E
- xYNkr0X38TJQ50+FUIOzWNY0S2ec5S5IzyUiN4i19MJE9KeDmkO/ueMgmI5j7kt7U6
- iLNHyTmIBZxcg==
+ b=iW215UkmDi1NpBBJ6pJstgL/K6ct++CQLRyzZeGOKAQBTK41VGm2L/z+tik6wrGzB
+ HdGq5l7wbeDjeO5uiqfubRKbjmH25YDruQMNkFzgwCHUruZz2B5mGPlzJyEdzl1rEi
+ rPpxaZDpsSsRcbQPEjfHdjc7pAZKENlBBzRhD+dvblbwhY/yGuk3pt7yai5/l8ViV+
+ lJZA4poUGjdLOX1z4w3k+URBaRKv2X8R7HbHkyfSXK2TsRCYzNGB08N+J51RIbMWcb
+ o9QXwBdGHYNDMeTCQ/iR64NYdZ68KvUTk7dCIwB+AnZYXe1QO03cfkQFnXwbZETsC4
+ kfWq5MvmEqAyQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nNcci-00AYyb-LA; Fri, 25 Feb 2022 15:35:12 +0000
-Date: Fri, 25 Feb 2022 15:35:12 +0000
-Message-ID: <87ilt32c3z.wl-maz@kernel.org>
+ id 1nNceW-00AZ0Q-C0; Fri, 25 Feb 2022 15:37:04 +0000
+Date: Fri, 25 Feb 2022 15:37:03 +0000
+Message-ID: <87h78n2c0w.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v3 03/19] KVM: arm64: Reject invalid addresses for CPU_ON
- PSCI call
-In-Reply-To: <YhfaztgV0GHzyh24@google.com>
+Subject: Re: [PATCH v3 06/19] KVM: arm64: Track vCPU power state using MP
+ state values
+In-Reply-To: <YhgBz1/cgpoS3HuD@google.com>
 References: <20220223041844.3984439-1-oupton@google.com>
- <20220223041844.3984439-4-oupton@google.com>
- <87zgmg30qu.wl-maz@kernel.org> <YhfaztgV0GHzyh24@google.com>
+ <20220223041844.3984439-7-oupton@google.com>
+ <87y2202y8f.wl-maz@kernel.org> <YhgBz1/cgpoS3HuD@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -95,100 +95,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 24 Feb 2022 19:21:50 +0000,
+On Thu, 24 Feb 2022 22:08:15 +0000,
 Oliver Upton <oupton@google.com> wrote:
 > 
 > Hi Marc,
 > 
-> On Thu, Feb 24, 2022 at 12:30:49PM +0000, Marc Zyngier wrote:
-> > On Wed, 23 Feb 2022 04:18:28 +0000,
-> > Oliver Upton <oupton@google.com> wrote:
-> > > 
-> > > DEN0022D.b 5.6.2 "Caller responsibilities" states that a PSCI
-> > > implementation may return INVALID_ADDRESS for the CPU_ON call if the
-> > > provided entry address is known to be invalid. There is an additional
-> > > caveat to this rule. Prior to PSCI v1.0, the INVALID_PARAMETERS error
-> > > is returned instead. Check the guest's PSCI version and return the
-> > > appropriate error if the IPA is invalid.
-> > > 
-> > > Reported-by: Reiji Watanabe <reijiw@google.com>
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > ---
-> > >  arch/arm64/kvm/psci.c | 24 ++++++++++++++++++++++--
-> > >  1 file changed, 22 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > > index a0c10c11f40e..de1cf554929d 100644
-> > > --- a/arch/arm64/kvm/psci.c
-> > > +++ b/arch/arm64/kvm/psci.c
-> > > @@ -12,6 +12,7 @@
+> On Thu, Feb 24, 2022 at 01:25:04PM +0000, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > > @@ -190,7 +190,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+> > >  	 * re-initialized.
+> > >  	 */
+> > >  	kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> > > -		tmp->arch.power_off = true;
+> > > +		tmp->arch.mp_state = KVM_MP_STATE_STOPPED;
+> > >  	kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
 > > >  
-> > >  #include <asm/cputype.h>
-> > >  #include <asm/kvm_emulate.h>
-> > > +#include <asm/kvm_mmu.h>
-> > >  
-> > >  #include <kvm/arm_psci.h>
-> > >  #include <kvm/arm_hypercalls.h>
-> > > @@ -70,12 +71,31 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
-> > >  	struct vcpu_reset_state *reset_state;
-> > >  	struct kvm *kvm = source_vcpu->kvm;
-> > >  	struct kvm_vcpu *vcpu = NULL;
-> > > -	unsigned long cpu_id;
-> > > +	unsigned long cpu_id, entry_addr;
-> > >  
-> > >  	cpu_id = smccc_get_arg1(source_vcpu);
-> > >  	if (!kvm_psci_valid_affinity(source_vcpu, cpu_id))
-> > >  		return PSCI_RET_INVALID_PARAMS;
-> > >  
-> > > +	/*
-> > > +	 * Basic sanity check: ensure the requested entry address actually
-> > > +	 * exists within the guest's address space.
-> > > +	 */
-> > > +	entry_addr = smccc_get_arg2(source_vcpu);
-> > > +	if (!kvm_ipa_valid(kvm, entry_addr)) {
-> > > +
-> > > +		/*
-> > > +		 * Before PSCI v1.0, the INVALID_PARAMETERS error is returned
-> > > +		 * instead of INVALID_ADDRESS.
-> > > +		 *
-> > > +		 * For more details, see ARM DEN0022D.b 5.6 "CPU_ON".
-> > > +		 */
-> > > +		if (kvm_psci_version(source_vcpu) < KVM_ARM_PSCI_1_0)
-> > > +			return PSCI_RET_INVALID_PARAMS;
-> > > +		else
-> > > +			return PSCI_RET_INVALID_ADDRESS;
-> > > +	}
-> > > +
+> > >  	memset(&vcpu->run->system_event, 0, sizeof(vcpu->run->system_event));
 > > 
-> > If you're concerned with this, should you also check for the PC
-> > alignment, or the presence of a memslot covering the address you are
-> > branching to?  Le latter is particularly hard to implement reliably.
+> > You also may want to initialise the mp_state to RUNNABLE by default in
+> > kvm_arch_vcpu_create(). We are currently relying on power_off to be
+> > false thanks to the vcpu struct being zeroed, but we may as well make
+> > it clearer (RUNNABLE is also 0, so there is no actual bug here).
 > 
-> Andrew, Reiji and I had a conversation regarding exactly this on the
-> last run of this series, and concluded that checking against the IPA is
-> probably the best KVM can do [1]. That said, alignment is also an easy
-> thing to check.
+> We unconditionally initialize power_off in
+> kvm_arch_vcpu_ioctl_vcpu_init(), and do the same in this patch for mp_state,
+> depending on if KVM_ARM_VCPU_POWER_OFF is set.
 
-Until you look at Thumb-2 ;-)
+Ah, I missed that. Thanks for the heads up.
 
-> 
-> > So far, my position has been that the guest is free to shoot itself in
-> > the foot if that's what it wants to do, and that babysitting it was a
-> > waste of useful bits! ;-)
-> >
-> 
-> Agreed -- there are plenty of spectacular/hilarious ways in which the
-> guest can mess up :-)
-> 
-> > Or have you identified something that makes it a requirement to handle
-> > this case (and possibly others)  in the hypervisor?
-> 
-> It is a lot easier to tell a guest that their software is broken if they
-> get an error back from the hypercall, whereas a vCPU off in the weeds
-> might need to be looked at before concluding there's a guest issue.
+> Any objections to leaving that as-is? I can move the RUNNABLE case into
+> kvm_arch_vcpu_create() as you've suggested, too.
 
-Fair enough. I'm not fundamentally against this patch. It is just a
-bit out of context in this series.
+No, that's just a brain fart on my part. Leave it as is.
+
+Thanks,
 
 	M.
 
