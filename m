@@ -2,65 +2,67 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61892C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Feb 2022 18:58:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC11C433FE
+	for <kvmarm@archiver.kernel.org>; Sat, 26 Feb 2022 11:29:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8FDD4B7D2;
-	Fri, 25 Feb 2022 13:58:23 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D8D4B803;
+	Sat, 26 Feb 2022 06:29:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TGvjyXdU6e02; Fri, 25 Feb 2022 13:58:22 -0500 (EST)
+	with ESMTP id 5edBXSCafASq; Sat, 26 Feb 2022 06:29:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75FEB4B7B6;
-	Fri, 25 Feb 2022 13:58:22 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E454B809;
+	Sat, 26 Feb 2022 06:29:30 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0F8D4B76C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 13:58:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57EF54966F
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Feb 2022 06:29:30 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id olc3OpvBZGah for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Feb 2022 13:58:19 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A90C4B75D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Feb 2022 13:58:19 -0500 (EST)
+ with ESMTP id 7zRDoyh7SrIG for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 26 Feb 2022 06:29:28 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A454C40CDE
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Feb 2022 06:29:28 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 8DECA60B0E;
- Fri, 25 Feb 2022 18:58:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0DC1C340E7;
- Fri, 25 Feb 2022 18:58:15 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 4E74DB81C11;
+ Sat, 26 Feb 2022 11:29:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9CF9C340F0;
+ Sat, 26 Feb 2022 11:29:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1645815496;
- bh=Q0F0Vr2oAKsTHDX197nsDi4YWEXysGYrQy8OtS9Ofo4=;
+ s=k20201202; t=1645874966;
+ bh=JuXM1IcwZ6ufdbQ1el8Jp2dut1va9ksUnfPsEgEfHDo=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=dUPxGeW5yIMDL3458nshLukjBg6ZV+UEyQsdf3TeGvvLOZ2N8OkSRYdZmseDWMrrb
- /Pg9EYJt5mbGKydHd0Tt0zvwCtl6mJYQtVTQPKA/nJmwEH8H5DwLLNKfuqqN4Sux0+
- B72QPdWPMU8xyX3oqdc8G8KdcIhD/9sP8qmBV8opTH2ZKb9FRwMAPYoaRjI6S99yQd
- 0nWoVnS7nxTfaNryQPHPSmdYcbl0p5w+O/IaUnTcm+uvjqOJEip/LiVM0R71HnLH+F
- 2eljEKGimj1YWn0r3a3w/JwKrjxQe+as9I7QTYMHYcgGYVsUO28f9E9vAntFc8FwJB
- Awk59wMNokw8g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ b=HNeSTaJQTFB/513j1PexQUXeqMVZH6fVirVuZHzamyaheAvnHMWZa7b8ObQ0GpnHo
+ kSwJO72NhZfmX0hn65kIbDyEWAqQLX2J+S8G1NPCw3xceqieyDW6OBDLQSLOzfcj6V
+ QBsGnESxUuIMZuCmWgCl5lgktCiC9bsYL9EC8ZLzeCjvkBSyCwhq3UsaIVsAjAD2LH
+ AjeNfqnW1csvufpARR/4pJ4YsMarzZhFKJPDj3/hnpuqCJkWCqdTmoYMMtCOjqXb8L
+ 6+gKgbjvnSGJaSMrhWsNAsnDV4KmaE9LWoI3JjoV7GwSONRNda417qdHI5l5+bOfTP
+ YmUnrpY0j30qw==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=billy-the-mountain.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nNfnB-00AcUf-KF; Fri, 25 Feb 2022 18:58:13 +0000
-Date: Fri, 25 Feb 2022 18:58:13 +0000
-Message-ID: <87fso63ha2.wl-maz@kernel.org>
+ id 1nNvGN-00AjCy-KR; Sat, 26 Feb 2022 11:29:23 +0000
+Date: Sat, 26 Feb 2022 11:29:22 +0000
+Message-ID: <8735k57tnx.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v3 09/19] KVM: arm64: Implement PSCI SYSTEM_SUSPEND
-In-Reply-To: <YhfeBfgbDA8IGc9f@google.com>
+Subject: Re: [PATCH v3 13/19] KVM: arm64: Add support KVM_SYSTEM_EVENT_SUSPEND
+ to PSCI SYSTEM_SUSPEND
+In-Reply-To: <YhflJ74nF2N+u1i4@google.com>
 References: <20220223041844.3984439-1-oupton@google.com>
- <20220223041844.3984439-10-oupton@google.com>
- <87wnhk2whx.wl-maz@kernel.org> <YhfeBfgbDA8IGc9f@google.com>
+ <20220223041844.3984439-14-oupton@google.com>
+ <87sfs82rz4.wl-maz@kernel.org> <YhflJ74nF2N+u1i4@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
@@ -94,151 +96,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 24 Feb 2022 19:35:33 +0000,
+On Thu, 24 Feb 2022 20:05:59 +0000,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> Hi Marc,
-> 
-> Thanks for reviewing the series. ACK to the nits and smaller comments
-> you've made, I'll incorporate that feedback in the next series.
-> 
-> On Thu, Feb 24, 2022 at 02:02:34PM +0000, Marc Zyngier wrote:
-> > On Wed, 23 Feb 2022 04:18:34 +0000,
-> > Oliver Upton <oupton@google.com> wrote:
-> > > 
-> > > ARM DEN0022D.b 5.19 "SYSTEM_SUSPEND" describes a PSCI call that allows
-> > > software to request that a system be placed in the deepest possible
-> > > low-power state. Effectively, software can use this to suspend itself to
-> > > RAM. Note that the semantics of this PSCI call are very similar to
-> > > CPU_SUSPEND, which is already implemented in KVM.
-> > > 
-> > > Implement the SYSTEM_SUSPEND in KVM. Similar to CPU_SUSPEND, the
-> > > low-power state is implemented as a guest WFI. Synchronously reset the
-> > > calling CPU before entering the WFI, such that the vCPU may immediately
-> > > resume execution when a wakeup event is recognized.
-> > > 
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > ---
-> > >  arch/arm64/kvm/psci.c  | 51 ++++++++++++++++++++++++++++++++++++++++++
-> > >  arch/arm64/kvm/reset.c |  3 ++-
-> > >  2 files changed, 53 insertions(+), 1 deletion(-)
-> > > 
+> On Thu, Feb 24, 2022 at 03:40:15PM +0000, Marc Zyngier wrote:
 > > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > > index 77a00913cdfd..41adaaf2234a 100644
+> > > index 2bb8d047cde4..a7de84cec2e4 100644
 > > > --- a/arch/arm64/kvm/psci.c
 > > > +++ b/arch/arm64/kvm/psci.c
-> > > @@ -208,6 +208,50 @@ static void kvm_psci_system_reset(struct kvm_vcpu *vcpu)
-> > >  	kvm_prepare_system_event(vcpu, KVM_SYSTEM_EVENT_RESET);
-> > >  }
+> > > @@ -245,6 +245,11 @@ static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> > >  		return 1;
+> > >  	}
 > > >  
-> > > +static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	struct vcpu_reset_state reset_state;
-> > > +	struct kvm *kvm = vcpu->kvm;
-> > > +	struct kvm_vcpu *tmp;
-> > > +	bool denied = false;
-> > > +	unsigned long i;
-> > > +
-> > > +	reset_state.pc = smccc_get_arg1(vcpu);
-> > > +	if (!kvm_ipa_valid(kvm, reset_state.pc)) {
-> > > +		smccc_set_retval(vcpu, PSCI_RET_INVALID_ADDRESS, 0, 0, 0);
-> > > +		return 1;
+> > > +	if (kvm->arch.system_suspend_exits) {
+> > > +		kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_SUSPEND);
+> > > +		return 0;
 > > > +	}
 > > > +
-> > > +	reset_state.r0 = smccc_get_arg2(vcpu);
-> > > +	reset_state.be = kvm_vcpu_is_be(vcpu);
-> > > +	reset_state.reset = true;
-> > > +
-> > > +	/*
-> > > +	 * The SYSTEM_SUSPEND PSCI call requires that all vCPUs (except the
-> > > +	 * calling vCPU) be in an OFF state, as determined by the
-> > > +	 * implementation.
-> > > +	 *
-> > > +	 * See ARM DEN0022D, 5.19 "SYSTEM_SUSPEND" for more details.
-> > > +	 */
-> > > +	mutex_lock(&kvm->lock);
-> > > +	kvm_for_each_vcpu(i, tmp, kvm) {
-> > > +		if (tmp != vcpu && !kvm_arm_vcpu_powered_off(tmp)) {
-> > > +			denied = true;
-> > > +			break;
-> > > +		}
-> > > +	}
-> > > +	mutex_unlock(&kvm->lock);
 > > 
-> > This looks dodgy. Nothing seems to prevent userspace from setting the
-> > mp_state to RUNNING in parallel with this, as only the vcpu mutex is
-> > held when this ioctl is issued.
+> > So there really is a difference in behaviour here. Userspace sees the
+> > WFI behaviour before reset (it implements it), while when not using
+> > the SUSPEND event, reset occurs before anything else.
 > > 
-> > It looks to me that what you want is what lock_all_vcpus() does
-> > (Alexandru has a patch moving it out of the vgic code as part of his
-> > SPE series).
-> > 
-> > It is also pretty unclear what the interaction with userspace is once
-> > you have released the lock. If the VMM starts a vcpu other than the
-> > suspending one, what is its state? The spec doesn't see to help
-> > here. I can see two options:
-> > 
-> > - either all the vcpus have the same reset state applied to them as
-> >   they come up, unless they are started with CPU_ON by a vcpu that has
-> >   already booted (but there is a single 'context_id' provided, and I
-> >   fear this is going to confuse the OS)...
-> > 
-> > - or only the suspending vcpu can resume the system, and we must fail
-> >   a change of mp_state for the other vcpus.
-> > 
-> > What do you think?
+> > They really should behave in a similar way (WFI first, reset next).
 > 
-> Definitely the latter. The documentation of SYSTEM_SUSPEND is quite
-> shaky on this, but it would appear that the intention is for the caller
-> to be the first CPU to wake up.
-
-Yup. We now have clarification on the intent of the spec (only the
-caller CPU can resume the system), and this needs to be tightened.
-
+> I mentioned this on the other patch, but I think the conversation should
+> continue here as UAPI context is in this one.
 > 
-> > > +
-> > > +	if (denied) {
-> > > +		smccc_set_retval(vcpu, PSCI_RET_DENIED, 0, 0, 0);
-> > > +		return 1;
-> > > +	}
-> > > +
-> > > +	__kvm_reset_vcpu(vcpu, &reset_state);
-> > > +	kvm_vcpu_wfi(vcpu);
-> > 
-> > I have mixed feelings about this. The vcpu has reset before being in
-> > WFI, while it really should be the other way around and userspace
-> > could rely on observing the transition.
-> > 
-> > What breaks if you change this?
+> If SUSPEND exits are disabled and SYSTEM_SUSPEND is implemented in the
+> kernel, userspace cannot observe any intermediate state. I think it is
+> necessary for migration, otherwise if userspace were to save the vCPU
+> post-WFI, pre-reset the pending reset would get lost along the way.
 > 
-> I don't think that userspace would be able to observe the transition
-> even if we WFI before the reset.
-
-I disagree. At any point can userspace issue a signal which would
-trigger a return from WFI and an exit to userspace, and I don't think
-this should result in a reset being observed.
-
-This also means that SYSTEM_SUSPEND must be robust wrt signal
-delivery, which it doesn't seem to be.
-
-> I imagine that would take the form
-> of setting KVM_REQ_VCPU_RESET, which we explicitly handle before
-> letting userspace access the vCPU's state as of commit
-> 6826c6849b46 ("KVM: arm64: Handle PSCI resets before userspace
-> touches vCPU state").
-
-In that case, the vcpu is ready to run, and is not blocked by
-anything, so this is quite different.
-
+> As far as userspace is concerned, I think the WFI+reset operation is
+> atomic. SUSPEND exits just allow userspace to intervene before said
+> atomic operation.
 >
-> Given this, I felt it was probably best to avoid all the indirection and
-> just do the vCPU reset in the handling of SYSTEM_SUSPEND. It does,
-> however, imply that we have slightly different behavior when userspace
-> exits are enabled, as that will happen pre-reset and pre-WFI.
+> Perhaps I'm missing something: assuming SUSPEND exits are disabled, what
+> value is provided to userspace if it can see WFI behavior before the
+> reset?
 
-And that's exactly the sort of behaviour I'd like to avoid if at all
-possible. But maybe we don't need to support the standalone version
-that doesn't involve userspace?
+Signals get in the way, and break the notion of atomicity. Userspace
+*will* observe this.
+
+I agree that save/restore is an important point, and that snapshoting
+the guest at this stage should capture the reset value. But it is the
+asymmetry of the behaviours that I find jarring:
+
+- if you ask for userspace exit, no reset value is applied and you
+  need to implement the reset in userspace
+
+- if you *don't* ask for a userspace exit, the reset values are
+  applied, and a signal while in WFI will result in this reset being
+  observed
+
+Why can't the userspace exit path also apply the reset values *before*
+exiting? After all, you can model this exit to userspace as
+reset+WFI+'spurious exit from WFI'. This would at least unify the two
+behaviours.
+
+I still dislike the reset state being applied early, but consistency
+(and save/restore) trumps taste here. I know I'm being pedantic here,
+but we've been burned with loosely defined semantics in the past, and
+I want to get this right. Or less wrong.
+
+Thanks,
 
 	M.
 
