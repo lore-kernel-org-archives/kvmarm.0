@@ -2,79 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC11C433FE
-	for <kvmarm@archiver.kernel.org>; Sat, 26 Feb 2022 11:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C7AC433FE
+	for <kvmarm@archiver.kernel.org>; Sat, 26 Feb 2022 18:28:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D8D4B803;
-	Sat, 26 Feb 2022 06:29:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6886F4B621;
+	Sat, 26 Feb 2022 13:28:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5edBXSCafASq; Sat, 26 Feb 2022 06:29:30 -0500 (EST)
+	with ESMTP id jhU8hAvC89A8; Sat, 26 Feb 2022 13:28:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E454B809;
-	Sat, 26 Feb 2022 06:29:30 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEA854B611;
+	Sat, 26 Feb 2022 13:28:36 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57EF54966F
- for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Feb 2022 06:29:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B98774B5AA
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Feb 2022 13:28:35 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7zRDoyh7SrIG for <kvmarm@lists.cs.columbia.edu>;
- Sat, 26 Feb 2022 06:29:28 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A454C40CDE
- for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Feb 2022 06:29:28 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 4E74DB81C11;
- Sat, 26 Feb 2022 11:29:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9CF9C340F0;
- Sat, 26 Feb 2022 11:29:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1645874966;
- bh=JuXM1IcwZ6ufdbQ1el8Jp2dut1va9ksUnfPsEgEfHDo=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=HNeSTaJQTFB/513j1PexQUXeqMVZH6fVirVuZHzamyaheAvnHMWZa7b8ObQ0GpnHo
- kSwJO72NhZfmX0hn65kIbDyEWAqQLX2J+S8G1NPCw3xceqieyDW6OBDLQSLOzfcj6V
- QBsGnESxUuIMZuCmWgCl5lgktCiC9bsYL9EC8ZLzeCjvkBSyCwhq3UsaIVsAjAD2LH
- AjeNfqnW1csvufpARR/4pJ4YsMarzZhFKJPDj3/hnpuqCJkWCqdTmoYMMtCOjqXb8L
- 6+gKgbjvnSGJaSMrhWsNAsnDV4KmaE9LWoI3JjoV7GwSONRNda417qdHI5l5+bOfTP
- YmUnrpY0j30qw==
-Received: from sofa.misterjones.org ([185.219.108.64]
- helo=billy-the-mountain.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nNvGN-00AjCy-KR; Sat, 26 Feb 2022 11:29:23 +0000
-Date: Sat, 26 Feb 2022 11:29:22 +0000
-Message-ID: <8735k57tnx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v3 13/19] KVM: arm64: Add support KVM_SYSTEM_EVENT_SUSPEND
- to PSCI SYSTEM_SUSPEND
-In-Reply-To: <YhflJ74nF2N+u1i4@google.com>
+ with ESMTP id nGV2nNMzPg6s for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 26 Feb 2022 13:28:34 -0500 (EST)
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com
+ [209.85.208.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 217D64B477
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Feb 2022 13:28:34 -0500 (EST)
+Received: by mail-lj1-f175.google.com with SMTP id u11so11796919lju.4
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 26 Feb 2022 10:28:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YhAgqiWLbIhprpB4PTDWt6I/fMa4rCNESBFaVBRMGDk=;
+ b=eF7sTfy8PRdrb5HHtbrH1LzmyvW0DK91TGdIQim+9sPGZkTcokk57lq6AU2sC6XCtN
+ KZQHn4B6exdIG2xwONt7g+IsZk613AAMSVFbZpCl1fn9dhihWlm5FkWBSWT3xyxGbrkl
+ GyrDbBJIT0oSJE/NnurO9H4rgeRRdlj84EfMdP/FVKZ0hYY+YMYJ9+RA93KZUIje4RAe
+ jnhJOfj0CvGUuV0OaqwQe//20t/Kn5uEC5YtjdfhCuxXqM8YoihpoFCYD1wUpRl5unmf
+ d4tbH0RXyyr93hd0k50r41p8V/7Qpe7r85LPvkCUpCBLKAx6TgeqQzYs/RMw4Vns5+bc
+ Tzng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YhAgqiWLbIhprpB4PTDWt6I/fMa4rCNESBFaVBRMGDk=;
+ b=DesWOMY+dzJpCtXYIxDZV3vIebCZAV3vPI0TqFfZy6n09x3Y5fVbLz2iyqM5xrVW+N
+ neXS9BLTgnP9g/AbB4CP7rQApR92oEhOUVWearIVijItQDTK2/xZ6+TIAfV0r5bxUapk
+ jAkvwYRcOVmsYu1QmVkzzKZjlLMClSVLNvcwIF4kVn9kASszUzF2NvHR7azGlbd3B43A
+ av0D+u/rsz/AlU/YSUIz4KgwsdKMlaIdm9WqxmzJGlhNW/rFJv3gL+vo2QYwEQQDm3/W
+ 7DFHOHBVAeGj2Aj8JMrpraajOp9ZKwlgpwb1NqLRvz4sIPXKF3AtvwsGc6Hw6SLyx4t4
+ /Xxg==
+X-Gm-Message-State: AOAM530bxh0yk4Sf9mboCDwLNyN2iA4bh7IQWUG1rFB86p8xm9DhS+DR
+ y4oF6cqsT/pzOQJyiNCESm2G8Iic/wz1ZkB+fXQJFw==
+X-Google-Smtp-Source: ABdhPJxKzfIa2r2T8l8vr9vzs4enUHCu5WQWCNzEzy+VRL15+oBvPXtlpfEul4sVs5zWWtJh4YRYFC3zKqUfZsh2EIs=
+X-Received: by 2002:a05:651c:160c:b0:244:c704:8315 with SMTP id
+ f12-20020a05651c160c00b00244c7048315mr9079489ljq.170.1645900112391; Sat, 26
+ Feb 2022 10:28:32 -0800 (PST)
+MIME-Version: 1.0
 References: <20220223041844.3984439-1-oupton@google.com>
  <20220223041844.3984439-14-oupton@google.com>
  <87sfs82rz4.wl-maz@kernel.org> <YhflJ74nF2N+u1i4@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
- pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com,
- suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org,
- seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
- jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com,
- ricarkol@google.com, rananta@google.com, jingzhangos@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <8735k57tnx.wl-maz@kernel.org>
+In-Reply-To: <8735k57tnx.wl-maz@kernel.org>
+From: Oliver Upton <oupton@google.com>
+Date: Sat, 26 Feb 2022 10:28:21 -0800
+Message-ID: <CAOQ_Qsi1n2PTGe3F5BAhy3yHS4ar_0n0tru7smAfwAFWGY3Jug@mail.gmail.com>
+Subject: Re: [PATCH v3 13/19] KVM: arm64: Add support KVM_SYSTEM_EVENT_SUSPEND
+ to PSCI SYSTEM_SUSPEND
+To: Marc Zyngier <maz@kernel.org>
 Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
  Joerg Roedel <joro@8bytes.org>, Peter Shier <pshier@google.com>,
  kvm-riscv@lists.infradead.org, Atish Patra <atishp@atishpatra.org>,
@@ -96,76 +89,104 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 24 Feb 2022 20:05:59 +0000,
-Oliver Upton <oupton@google.com> wrote:
-> 
-> On Thu, Feb 24, 2022 at 03:40:15PM +0000, Marc Zyngier wrote:
-> > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
-> > > index 2bb8d047cde4..a7de84cec2e4 100644
-> > > --- a/arch/arm64/kvm/psci.c
-> > > +++ b/arch/arm64/kvm/psci.c
-> > > @@ -245,6 +245,11 @@ static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
-> > >  		return 1;
-> > >  	}
-> > >  
-> > > +	if (kvm->arch.system_suspend_exits) {
-> > > +		kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_SUSPEND);
-> > > +		return 0;
-> > > +	}
-> > > +
-> > 
-> > So there really is a difference in behaviour here. Userspace sees the
-> > WFI behaviour before reset (it implements it), while when not using
-> > the SUSPEND event, reset occurs before anything else.
-> > 
-> > They really should behave in a similar way (WFI first, reset next).
-> 
-> I mentioned this on the other patch, but I think the conversation should
-> continue here as UAPI context is in this one.
-> 
-> If SUSPEND exits are disabled and SYSTEM_SUSPEND is implemented in the
-> kernel, userspace cannot observe any intermediate state. I think it is
-> necessary for migration, otherwise if userspace were to save the vCPU
-> post-WFI, pre-reset the pending reset would get lost along the way.
-> 
-> As far as userspace is concerned, I think the WFI+reset operation is
-> atomic. SUSPEND exits just allow userspace to intervene before said
-> atomic operation.
+On Sat, Feb 26, 2022 at 3:29 AM Marc Zyngier <maz@kernel.org> wrote:
 >
-> Perhaps I'm missing something: assuming SUSPEND exits are disabled, what
-> value is provided to userspace if it can see WFI behavior before the
-> reset?
+> On Thu, 24 Feb 2022 20:05:59 +0000,
+> Oliver Upton <oupton@google.com> wrote:
+> >
+> > On Thu, Feb 24, 2022 at 03:40:15PM +0000, Marc Zyngier wrote:
+> > > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > > > index 2bb8d047cde4..a7de84cec2e4 100644
+> > > > --- a/arch/arm64/kvm/psci.c
+> > > > +++ b/arch/arm64/kvm/psci.c
+> > > > @@ -245,6 +245,11 @@ static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> > > >           return 1;
+> > > >   }
+> > > >
+> > > > + if (kvm->arch.system_suspend_exits) {
+> > > > +         kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_SUSPEND);
+> > > > +         return 0;
+> > > > + }
+> > > > +
+> > >
+> > > So there really is a difference in behaviour here. Userspace sees the
+> > > WFI behaviour before reset (it implements it), while when not using
+> > > the SUSPEND event, reset occurs before anything else.
+> > >
+> > > They really should behave in a similar way (WFI first, reset next).
+> >
+> > I mentioned this on the other patch, but I think the conversation should
+> > continue here as UAPI context is in this one.
+> >
+> > If SUSPEND exits are disabled and SYSTEM_SUSPEND is implemented in the
+> > kernel, userspace cannot observe any intermediate state. I think it is
+> > necessary for migration, otherwise if userspace were to save the vCPU
+> > post-WFI, pre-reset the pending reset would get lost along the way.
+> >
+> > As far as userspace is concerned, I think the WFI+reset operation is
+> > atomic. SUSPEND exits just allow userspace to intervene before said
+> > atomic operation.
+> >
+> > Perhaps I'm missing something: assuming SUSPEND exits are disabled, what
+> > value is provided to userspace if it can see WFI behavior before the
+> > reset?
+>
+> Signals get in the way, and break the notion of atomicity. Userspace
+> *will* observe this.
+>
+> I agree that save/restore is an important point, and that snapshoting
+> the guest at this stage should capture the reset value. But it is the
+> asymmetry of the behaviours that I find jarring:
+>
+> - if you ask for userspace exit, no reset value is applied and you
+>   need to implement the reset in userspace
+>
+> - if you *don't* ask for a userspace exit, the reset values are
+>   applied, and a signal while in WFI will result in this reset being
+>   observed
+>
+> Why can't the userspace exit path also apply the reset values *before*
+> exiting? After all, you can model this exit to userspace as
+> reset+WFI+'spurious exit from WFI'. This would at least unify the two
+> behaviours.
 
-Signals get in the way, and break the notion of atomicity. Userspace
-*will* observe this.
+I hesitated applying the reset context to the CPU before the userspace
+exit because that would be wildly different from the other system
+events. Userspace wouldn't have much choice but to comply with the
+guest request at that point.
 
-I agree that save/restore is an important point, and that snapshoting
-the guest at this stage should capture the reset value. But it is the
-asymmetry of the behaviours that I find jarring:
+What about adopting the following:
 
-- if you ask for userspace exit, no reset value is applied and you
-  need to implement the reset in userspace
+ - Drop the in-kernel SYSTEM_SUSPEND emulation. I think you were
+getting at this point in [1], and I'd certainly be open to it. Without
+a userspace exit, I don't think there is anything meaningfully
+different between this call and a WFI instruction.
 
-- if you *don't* ask for a userspace exit, the reset values are
-  applied, and a signal while in WFI will result in this reset being
-  observed
+ - Add data to the kvm_run structure to convey the reset state for a
+SYSTEM_SUSPEND exit. There's plenty of room left in the structure for
+more, and can be done generically (just an array of data) for future
+expansion. We already are going to need a code change in userspace to
+do this right, so may as well update its view of kvm_run along the
+way.
 
-Why can't the userspace exit path also apply the reset values *before*
-exiting? After all, you can model this exit to userspace as
-reset+WFI+'spurious exit from WFI'. This would at least unify the two
-behaviours.
+ - Exit to userspace with PSCI_RET_INTERNAL_FAILURE queued up for the
+guest. Doing so keeps the exits consistent with the other system
+exits, and affords userspace the ability to deny the call when it
+wants to.
 
-I still dislike the reset state being applied early, but consistency
-(and save/restore) trumps taste here. I know I'm being pedantic here,
-but we've been burned with loosely defined semantics in the past, and
-I want to get this right. Or less wrong.
+[1]: http://lore.kernel.org/r/87fso63ha2.wl-maz@kernel.org
 
-Thanks,
+> I still dislike the reset state being applied early, but consistency
+> (and save/restore) trumps taste here. I know I'm being pedantic here,
+> but we've been burned with loosely defined semantics in the past, and
+> I want to get this right. Or less wrong.
 
-	M.
+I completely agree with you. The semantics are a bit funky, and I
+really do wonder if the easiest way around that is to just make the
+implementation a userspace problem.
 
--- 
-Without deviation from the norm, progress is not possible.
+--
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
