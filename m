@@ -2,86 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467DDC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 07:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C62C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 09:52:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B82FA49ECE;
-	Wed,  2 Mar 2022 02:58:17 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C486749EC5;
+	Wed,  2 Mar 2022 04:52:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6BqVhvluqPh7; Wed,  2 Mar 2022 02:58:16 -0500 (EST)
+	with ESMTP id rvpzF2whf3xJ; Wed,  2 Mar 2022 04:52:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A63F949E34;
-	Wed,  2 Mar 2022 02:58:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5544F49ECB;
+	Wed,  2 Mar 2022 04:52:33 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFD6049E27
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 02:58:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D35D549EC5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 04:52:31 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8wkDOOXGNarZ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2022 02:58:14 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 709BD49B0A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 02:58:14 -0500 (EST)
+ with ESMTP id BPcY2z2m457v for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Mar 2022 04:52:30 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 55BD149EC4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 04:52:30 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 27C60B81F20;
- Wed,  2 Mar 2022 07:58:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8CA6C004E1;
- Wed,  2 Mar 2022 07:58:11 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 4AC8D61363;
+ Wed,  2 Mar 2022 09:52:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD217C004E1;
+ Wed,  2 Mar 2022 09:52:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1646207891;
- bh=fHrv4m4CZ1D4uxW2jCaTRj1I7ej4PPHZOGKkWlysm4g=;
+ s=k20201202; t=1646214748;
+ bh=7zDERuQn+Ys+IDNujrCXcLVJZmZUXaPD3z+uIHWPPLg=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=dUnB2XUTnE5vK5JzLbAgEW50QvwE2+UBfxSaTeoskrlX9XDeXehPnrq/P5UhtMEEM
- OoCqfowmWiTr5JGkwnZVzxEaRU9L+sGHxYpQMgJ0Qo5zapzgyFjulVDuGyh5GO/4Eq
- ANmbKiA/vjEudisECe7n+T9xOkvg8i7U6oAHkxWipuvQdAL/BOOMRV7cXTvDhnAG/9
- O+Grnr6iOYd0+SWrN0ZIRjoz+ITdwY73Yy6L4SnKASL2kpaQuGJ+lRHlfBRFea7MRA
- Dvzg8izETb1AKQ34OQjdA6QuTEGc0GY8yhJHOU7BrZ7KtU436+0jYXgGFXWt/+vDc3
- 3RVNzJL6IfQsQ==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
- helo=billy-the-mountain.misterjones.org)
+ b=pyoVx3eUWGzhs9AfFhTWmetEzf2ni18HFbz46lQ9wjtKr/cAxksuixbgcQcQdpmT0
+ ZWnMog4XYCPR/T0p7g398ei1e11rCxyaTYT5yxQj/1xfOm4f8wC57CZIZbWs1A6nb7
+ mLCGsx5VWaqZTxO7S3w2oRZUR7aZ7+Aqv9fyPwCtnmBN/zP3nsfz8vvw0J7/cBLoH6
+ yR7mbdCPTOS129t3RmtZ4SajLhnrOUzHzmdZfBLS6GNkkySJSx/T8wI0/9ax4weoWB
+ TsP+X5o3j9nHsVds3HWo5n4Ndd3V97ul+0LHcuejnQs0Lw2cSV5Fq0UtaV5O4NYttw
+ mwTM9HknEnlIg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nPJs9-00BbrE-2m; Wed, 02 Mar 2022 07:58:09 +0000
-Date: Wed, 02 Mar 2022 07:58:05 +0000
-Message-ID: <87sfs06b1u.wl-maz@kernel.org>
+ id 1nPLek-00BdaK-6O; Wed, 02 Mar 2022 09:52:26 +0000
+Date: Wed, 02 Mar 2022 09:52:25 +0000
+Message-ID: <87a6e83cme.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v4 4/8] KVM: arm64: Add guard pages for pKVM (protected
- nVHE) hypervisor stack
-In-Reply-To: <20220225033548.1912117-5-kaleshsingh@google.com>
-References: <20220225033548.1912117-1-kaleshsingh@google.com>
- <20220225033548.1912117-5-kaleshsingh@google.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v3 13/19] KVM: arm64: Add support KVM_SYSTEM_EVENT_SUSPEND
+ to PSCI SYSTEM_SUSPEND
+In-Reply-To: <CAOQ_Qsi1n2PTGe3F5BAhy3yHS4ar_0n0tru7smAfwAFWGY3Jug@mail.gmail.com>
+References: <20220223041844.3984439-1-oupton@google.com>
+ <20220223041844.3984439-14-oupton@google.com>
+ <87sfs82rz4.wl-maz@kernel.org> <YhflJ74nF2N+u1i4@google.com>
+ <8735k57tnx.wl-maz@kernel.org>
+ <CAOQ_Qsi1n2PTGe3F5BAhy3yHS4ar_0n0tru7smAfwAFWGY3Jug@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: kaleshsingh@google.com, will@kernel.org, qperret@google.com,
- tabba@google.com, surenb@google.com, kernel-team@android.com,
- james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org,
- mhiramat@kernel.org, pcc@google.com, madvenka@linux.microsoft.com,
- qwandor@google.com, ascull@google.com, ardb@kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- linux-kernel@vger.kernel.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
+ pbonzini@redhat.com, james.morse@arm.com, Alexandru.Elisei@arm.com,
+ suzuki.poulose@arm.com, anup@brainfault.org, atishp@atishpatra.org,
+ seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+ jmattson@google.com, joro@8bytes.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, pshier@google.com, reijiw@google.com,
+ ricarkol@google.com, rananta@google.com, jingzhangos@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Andrew Walbran <qwandor@google.com>, will@kernel.org,
- Peter Collingbourne <pcc@google.com>, kernel-team@android.com,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org, surenb@google.com
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Joerg Roedel <joro@8bytes.org>, Peter Shier <pshier@google.com>,
+ kvm-riscv@lists.infradead.org, Atish Patra <atishp@atishpatra.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,70 +97,125 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 25 Feb 2022 03:34:49 +0000,
-Kalesh Singh <kaleshsingh@google.com> wrote:
+On Sat, 26 Feb 2022 18:28:21 +0000,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> Maps the stack pages in the flexible private VA range and allocates
-> guard pages below the stack as unbacked VA space. The stack is aligned
-> to twice its size to aid overflow detection (implemented in a subsequent
-> patch in the series).
+> On Sat, Feb 26, 2022 at 3:29 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Thu, 24 Feb 2022 20:05:59 +0000,
+> > Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > On Thu, Feb 24, 2022 at 03:40:15PM +0000, Marc Zyngier wrote:
+> > > > > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > > > > index 2bb8d047cde4..a7de84cec2e4 100644
+> > > > > --- a/arch/arm64/kvm/psci.c
+> > > > > +++ b/arch/arm64/kvm/psci.c
+> > > > > @@ -245,6 +245,11 @@ static int kvm_psci_system_suspend(struct kvm_vcpu *vcpu)
+> > > > >           return 1;
+> > > > >   }
+> > > > >
+> > > > > + if (kvm->arch.system_suspend_exits) {
+> > > > > +         kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_SUSPEND);
+> > > > > +         return 0;
+> > > > > + }
+> > > > > +
+> > > >
+> > > > So there really is a difference in behaviour here. Userspace sees the
+> > > > WFI behaviour before reset (it implements it), while when not using
+> > > > the SUSPEND event, reset occurs before anything else.
+> > > >
+> > > > They really should behave in a similar way (WFI first, reset next).
+> > >
+> > > I mentioned this on the other patch, but I think the conversation should
+> > > continue here as UAPI context is in this one.
+> > >
+> > > If SUSPEND exits are disabled and SYSTEM_SUSPEND is implemented in the
+> > > kernel, userspace cannot observe any intermediate state. I think it is
+> > > necessary for migration, otherwise if userspace were to save the vCPU
+> > > post-WFI, pre-reset the pending reset would get lost along the way.
+> > >
+> > > As far as userspace is concerned, I think the WFI+reset operation is
+> > > atomic. SUSPEND exits just allow userspace to intervene before said
+> > > atomic operation.
+> > >
+> > > Perhaps I'm missing something: assuming SUSPEND exits are disabled, what
+> > > value is provided to userspace if it can see WFI behavior before the
+> > > reset?
+> >
+> > Signals get in the way, and break the notion of atomicity. Userspace
+> > *will* observe this.
+> >
+> > I agree that save/restore is an important point, and that snapshoting
+> > the guest at this stage should capture the reset value. But it is the
+> > asymmetry of the behaviours that I find jarring:
+> >
+> > - if you ask for userspace exit, no reset value is applied and you
+> >   need to implement the reset in userspace
+> >
+> > - if you *don't* ask for a userspace exit, the reset values are
+> >   applied, and a signal while in WFI will result in this reset being
+> >   observed
+> >
+> > Why can't the userspace exit path also apply the reset values *before*
+> > exiting? After all, you can model this exit to userspace as
+> > reset+WFI+'spurious exit from WFI'. This would at least unify the two
+> > behaviours.
 > 
-> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-> ---
+> I hesitated applying the reset context to the CPU before the userspace
+> exit because that would be wildly different from the other system
+> events. Userspace wouldn't have much choice but to comply with the
+> guest request at that point.
 > 
-> Changes in v4:
->   - Replace IS_ERR_OR_NULL check with IS_ERR check now that
->     pkvm_alloc_private_va_range() returns an error for null
->     pointer, per Fuad
+> What about adopting the following:
 > 
-> Changes in v3:
->   - Handle null ptr in IS_ERR_OR_NULL checks, per Mark
-> 
->  arch/arm64/kvm/hyp/nvhe/setup.c | 25 +++++++++++++++++++++----
->  1 file changed, 21 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index 27af337f9fea..1b69a25c1861 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -105,11 +105,28 @@ static int recreate_hyp_mappings(phys_addr_t phys, unsigned long size,
->  		if (ret)
->  			return ret;
->  
-> -		end = (void *)per_cpu_ptr(&kvm_init_params, i)->stack_hyp_va;
-> +		/*
-> +		 * Private mappings are allocated upwards from __io_map_base
-> +		 * so allocate the guard page first then the stack.
-> +		 */
-> +		start = (void *)pkvm_alloc_private_va_range(PAGE_SIZE, PAGE_SIZE);
-> +		if (IS_ERR(start))
-> +			return PTR_ERR(start);
-> +
-> +		/*
-> +		 * The stack is aligned to twice its size to facilitate overflow
-> +		 * detection.
-> +		 */
-> +		end = (void *)per_cpu_ptr(&kvm_init_params, i)->stack_pa;
->  		start = end - PAGE_SIZE;
-> -		ret = pkvm_create_mappings(start, end, PAGE_HYP);
-> -		if (ret)
-> -			return ret;
-> +		start = (void *)__pkvm_create_private_mapping((phys_addr_t)start,
-> +					PAGE_SIZE, PAGE_SIZE * 2, PAGE_HYP);
+>  - Drop the in-kernel SYSTEM_SUSPEND emulation. I think you were
+> getting at this point in [1], and I'd certainly be open to it. Without
+> a userspace exit, I don't think there is anything meaningfully
+> different between this call and a WFI instruction.
 
-Similar comments as the previous patch. I'd rather you treat each
-stack as a two-page VA, populated by a single page. It would be a lot
-clearer, and less fragile.
+The only difference is the reset part. And I agree, it only makes the
+kernel part more complicated than we strictly need it to be. It also
+slightly clashes with the rest of the system events, in the sense that
+it is the only one that would have an in-kernel implementation (both
+reboot and power-off are entirely implemented in userspace).
 
-> +		if (IS_ERR(start))
-> +			return PTR_ERR(start);
-> +		end = start + PAGE_SIZE;
-> +
-> +		/* Update stack_hyp_va to end of the stack's private VA range */
-> +		per_cpu_ptr(&kvm_init_params, i)->stack_hyp_va = (unsigned long) end;
->  	}
->  
->  	/*
+So I definitely agree about dropping this.
+
+> 
+>  - Add data to the kvm_run structure to convey the reset state for a
+> SYSTEM_SUSPEND exit. There's plenty of room left in the structure for
+> more, and can be done generically (just an array of data) for future
+> expansion. We already are going to need a code change in userspace to
+> do this right, so may as well update its view of kvm_run along the
+> way.
+
+The reset state is already available in the guest registers, which are
+available to userspace. What else do we need to expose?
+
+>  - Exit to userspace with PSCI_RET_INTERNAL_FAILURE queued up for the
+> guest. Doing so keeps the exits consistent with the other system
+> exits, and affords userspace the ability to deny the call when it
+> wants to.
+
+Yup, that's what I like about pushing this completely to userspace.
+
+> 
+> [1]: http://lore.kernel.org/r/87fso63ha2.wl-maz@kernel.org
+> 
+> > I still dislike the reset state being applied early, but consistency
+> > (and save/restore) trumps taste here. I know I'm being pedantic here,
+> > but we've been burned with loosely defined semantics in the past, and
+> > I want to get this right. Or less wrong.
+> 
+> I completely agree with you. The semantics are a bit funky, and I
+> really do wonder if the easiest way around that is to just make the
+> implementation a userspace problem.
+
+We're in violent agreement. It means that we only need the MP_STATE
+part to implement WFI from userspace.
+
+Could you try and respin this? Also, it'd be good to see a prototype
+of userspace code using this, as this is a new API.
 
 Thanks,
 
