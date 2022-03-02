@@ -2,73 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD6D6C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 07:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9B4C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 07:46:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CEAB49EC2;
-	Wed,  2 Mar 2022 02:29:11 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E11649DED;
+	Wed,  2 Mar 2022 02:46:51 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vTNJ2EJog9Sh; Wed,  2 Mar 2022 02:29:08 -0500 (EST)
+	with ESMTP id MCVi3F4hc0Vk; Wed,  2 Mar 2022 02:46:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C836049EC0;
-	Wed,  2 Mar 2022 02:29:08 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F292F49E22;
+	Wed,  2 Mar 2022 02:46:49 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EFAA49EBD
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 02:29:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E9AD649DED
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 02:46:48 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GsR1hPMMhzhi for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2022 02:29:02 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A880F49EBC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 02:29:02 -0500 (EST)
+ with ESMTP id CCNr-PRDLqdy for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Mar 2022 02:46:47 -0500 (EST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94FB04966F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 02:46:47 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 3564661929;
- Wed,  2 Mar 2022 07:29:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 991A3C004E1;
- Wed,  2 Mar 2022 07:29:00 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 09585B81F1D;
+ Wed,  2 Mar 2022 07:46:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3297C340EF;
+ Wed,  2 Mar 2022 07:46:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1646206140;
- bh=jWx+LGSjHYVPOLqQ2ixdypgnUdVNer561Qll5V5i7BQ=;
+ s=k20201202; t=1646207204;
+ bh=saY4uFacqmTSqZECGMkmCoPAAs90t/+LOjZSwwOwbOs=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=tXNaR/6M0E2MuSbHYp4aD8AEs9SCS2Q4Ai/cwXyNqOPD3+WvNsmummpIWaJG3bJLt
- JRRkfeNlFC7WYhW2Ss5R2uoJgct8RWFGj5zLe6JxXi/LeP4YldlctBSYRZQ5byXSy7
- q2uGmxt4xqb1fylGEXvvq833f5fT1CGSt0hY4zYh/YmZzmm19jfXBPmszcy+dpZOpf
- yTh8WaQIs99wPRUKGNVRXHnAgFeo3jez5MCQA6G/KiSdFhT1tdA9zaSV1CCRe6qKPm
- yH4PmYChMFxIzB+qQroQHf6ggbs5JDc1+Pgr25sYlkvT8uIu0GsoxOS/15o01NOiEV
- oDY0Fyg4SpGpA==
+ b=ADExU80jY0rCuB1MLxUsZbsn2dmH1n/N7E8zpyl2JnH93MaN8Q5ol/fmRPgUsmc2T
+ avv7Uo44zr8igfL2hCz8WrnE396s23ZKOjSWgEo3xPmkfsLp31XbAdezPOWqH1alTw
+ hVyNKN02A/lBCyhc9mto47EraNfvWJpPpuOCGIg6cIh66GJ8aUgvJq6aAyU9pm0ayl
+ VkR9dwE042ukx+SD8foK1q9DsH0dmkpWX8MCNmjWn0Tfbwr6FrVmKO5vBocVrRnrjC
+ +dJ0k6mgIqsM+LYxDOhcNDRQs8tZuUqukTNLqrLBAdmWIuQRWjKfMbZmduLx0nuify
+ Ph/Lt18XMf1wg==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
  helo=billy-the-mountain.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nPJPu-00BbX8-2J; Wed, 02 Mar 2022 07:28:58 +0000
-Date: Wed, 02 Mar 2022 07:28:56 +0000
-Message-ID: <87wnhc6cef.wl-maz@kernel.org>
+ id 1nPJh3-00BbhG-UP; Wed, 02 Mar 2022 07:46:42 +0000
+Date: Wed, 02 Mar 2022 07:46:35 +0000
+Message-ID: <87v8ww6bl0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Eugene Huang <eugeneh@nvidia.com>
-Subject: Re: Timer delays in VM
-In-Reply-To: <BYAPR12MB3192EFEBABB1B31D9751C931D9029@BYAPR12MB3192.namprd12.prod.outlook.com>
-References: <BYAPR12MB31927AEB9D0A4068ED12826DD9019@BYAPR12MB3192.namprd12.prod.outlook.com>
- <667c9f084b2d38725369de60daef6d58@misterjones.org>
- <BYAPR12MB3192EFEBABB1B31D9751C931D9029@BYAPR12MB3192.namprd12.prod.outlook.com>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v4 2/8] KVM: arm64: Introduce pkvm_alloc_private_va_range()
+In-Reply-To: <20220225033548.1912117-3-kaleshsingh@google.com>
+References: <20220225033548.1912117-1-kaleshsingh@google.com>
+ <20220225033548.1912117-3-kaleshsingh@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: eugeneh@nvidia.com, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, will@kernel.org, qperret@google.com,
+ tabba@google.com, surenb@google.com, kernel-team@android.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org,
+ mhiramat@kernel.org, pcc@google.com, madvenka@linux.microsoft.com,
+ ascull@google.com, pbonzini@redhat.com, ardb@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: linux-arm-kernel@lists.infradead.org, will@kernel.org,
+ Peter Collingbourne <pcc@google.com>, kernel-team@android.com,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ surenb@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,83 +97,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 01 Mar 2022 19:03:33 +0000,
-Eugene Huang <eugeneh@nvidia.com> wrote:
+On Fri, 25 Feb 2022 03:34:47 +0000,
+Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> > >       * Does this timer rely on kvm timer irq injection?
-> > 
-> > Yes. A timer interrupt is always injected in SW. But the timer interrupt can
-> > either come from the HW timer itself (the VM was running while the timer
-> > expired), or from a SW timer that KVM as setup if the guest was blocked on
-> > WFI.
+> pkvm_hyp_alloc_private_va_range() can be used to reserve private VA ranges
+> in the pKVM nVHE hypervisor (). Also update __pkvm_create_private_mapping()
+> to allow specifying an alignment for the private VA mapping.
 > 
-> <EH> Here for arm64, EL1Virtual Timer is used. EL1 Virtual Timer is
-> a HW timer, correct?  There is an armvtimer implementation in QEMU
-> 6.1+. Does this armvtimer make a difference?
-
-KVM only deals with the EL1 timers (both physical and virtual). I
-guess that by 'armvtimer', you mean libvirt's front-end for the stolen
-time feature to expose to the guest how wall clock and CPU time
-diverge (i.e. it isn't a timer at all, but a dynamic correction for
-it).
-
-> > >       * What can be any possible causes for the timer delay? Are there
-> > > some locking mechanisms which can cause the delay?
-> > 
-> > This completely depend on how loaded your host is, the respective priorities
-> > of the various processes, and a million of other things.
-> > This is no different from the same userspace running on the host.
-> > It also depends on the *guest* kernel, by the way.
+> These will be used to implement stack guard pages for pKVM nVHE hypervisor
+> (in a subsequent patch in the series).
 > 
-> <EH> Our guest kernel is 5.4. How is the *guest* kernel involved?
-> Can you give an example? Do you have suggestions on the guest kernel
-> version as well.
-
-It is the guest kernel that programs the timer, and KVM isn't involved
-at all, specially on your HW (direct access to both timers on
-VHE-capable systems).
-
-> > >       * What parameters can tune this timer?
-> > 
-> > None. You may want to check whether the delay is observed when the VM
-> > has hit WFI or not.
+> Credits to Quentin Perret <qperret@google.com> for the idea of moving
+> private VA allocation out of __pkvm_create_private_mapping()
 > 
-> <EH> Yes, delay is observed after vm_exit because of WFx (not sure
-> WFI or WFE) but only when on a different vCPU in the same VM some
-> workload is started.
-
-Let me see if I understand what you mean:
-
-- vcpu-0 is running your timer test, everything is fine
-- vcpu-1 starts some other workload, and this affects the timer test
-  on the other vcpu
-
-Is that correct? It so, this would tend to indicate that both vcpu
-share some physical resources such as a physical CPU. How do you run
-your VM?
-
-Also, please work out whether you exit because of a blocking WFI or
-WFE, as they are indicative of different guest behaviour.
-
-> Since we pin that workload to its own vCPU, in
-> theory, it should not affect the timing of another vCPU.
-
-Why not? a vcpu is just a host thread, and if they share a physical
-CPU at some point, there is a knock-on effect.
-
-> > You also don't mention what host kernel version you are running.
-> > In general, please try and reproduce the issue using the latest kernel version
-> > (5.16 at the moment). Please also indicate what HW you are using.
+> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> ---
 > 
-> <EH> Tried 5.15 and 5.4 kernels. Both have the issue. Do you think
-> 5.16 can make a difference? The HW is an Ampere Altra system.
+> Changes in v4:
+>   - Handle null ptr in pkvm_alloc_private_va_range() and replace
+>     IS_ERR_OR_NULL checks in callers with IS_ERR checks, per Fuad
+>   - Fix kernel-doc comments format, per Fuad
+>   - Format __pkvm_create_private_mapping() prototype args (< 80 col), per Fuad
+> 
+> Changes in v3:
+>   - Handle null ptr in IS_ERR_OR_NULL checks, per Mark
+> 
+> Changes in v2:
+>   - Allow specifying an alignment for the private VA allocations, per Marc
 
-Unlikely. The Altra is a mostly sane system, as long as you make sure
-that VMs don't migrate across sockets (at which point it becomes
-laughably bad). Nothing to do with KVM though.
+I probably badly expressed my earlier concern.
 
-Are these kernels compiled from scratch? Or are they whatever the
-distro ships? Same question for the guest.
+Yes, an alignment is necessary. But how often do we want an alignment
+that isn't naturally aligned to the size of the allocation (i.e. the
+power of 2 >= the size of the allocation)? This is what the rest of
+the kernel does (get_order() and co), and I thing we should follow
+this.
+
+This applies to both this patch and the previous one.
 
 Thanks,
 
