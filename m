@@ -2,90 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C12D4C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  1 Mar 2022 09:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD6D6C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 07:29:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A0F349E43;
-	Tue,  1 Mar 2022 04:07:05 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CEAB49EC2;
+	Wed,  2 Mar 2022 02:29:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oBlcJqSto5QR; Tue,  1 Mar 2022 04:07:03 -0500 (EST)
+	with ESMTP id vTNJ2EJog9Sh; Wed,  2 Mar 2022 02:29:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C743749E2C;
-	Tue,  1 Mar 2022 04:07:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C836049EC0;
+	Wed,  2 Mar 2022 02:29:08 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3A8249DE3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2022 04:07:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EFAA49EBD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 02:29:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DKATOzc+5j06 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Mar 2022 04:07:01 -0500 (EST)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 78DFD49E33
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2022 04:07:01 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1646125621;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=yvepydnYzGU3SWQG48ulR9nFOyOjuERIrVXsBMjjm5E=;
- b=DwVynh+z6EHGZrpaVoDD638Z9Zd2uVV0VgA11znY1iIxbje2x+RP5k05jHrEfG0pnWjqEb
- Gg9DVpynZ+7SoMSIpYhOvAS4QB8f+2oxJAwo+T0xZBnKK1zntiZe8zXVRAJcFkQuzdwSyT
- s/75hGuftMFfuC46WGjl/cUczU9XO2s=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-214-EIjUUYMPMcK2cHudc2Eb0w-1; Tue, 01 Mar 2022 04:06:57 -0500
-X-MC-Unique: EIjUUYMPMcK2cHudc2Eb0w-1
-Received: by mail-wr1-f71.google.com with SMTP id
- z16-20020adff1d0000000b001ef7dc78b23so2039478wro.12
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Mar 2022 01:06:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=yvepydnYzGU3SWQG48ulR9nFOyOjuERIrVXsBMjjm5E=;
- b=ZQxo2537skUccT49GCli/ChFFPDvRWKF+A3a33jiwTGSdHm0q5Axo4BSe3UIVGdAKp
- WXJOjZozo0aNgKaYfOwGbHzQ82U2jSdFoGHIzoaxMKLYKoD6dPL1R3s7iFi2u2oWG5HW
- QtVVAkYnJCTrP5pt00VspYYQpNRSsKzvu4DZZnAzNPiWIIyQbcWwgOVRYS00hKInF3M9
- 26Ywr5uXHzQQ8Wh0Vbw5ZzmhE3Dz/8Hd9ULDSMdVUdLzm/myjUrOGjDsBPcnUhLVlsdJ
- xEqxxS0T/CjFGauaciSy7SGwstjIWG4zuEgX+OsfvVO1jXrQilD4ApYHqLx80zNIEV9D
- Rcxg==
-X-Gm-Message-State: AOAM533l3UQz9e+FEtkKDeDTsfG3GrpmLF2I7qiiC8IvAkojSYxHIWmR
- Vs36dQiNzLyB3g/3VLJP1rqBxf35dX8dyEW9ctdUy0lCYyGTx4fR3l+98C6dtYtcVm4Kbh7kPbJ
- dq5D26PojcGn++uinYxuTpXJo
-X-Received: by 2002:a5d:49c9:0:b0:1f0:16b2:584f with SMTP id
- t9-20020a5d49c9000000b001f016b2584fmr1282971wrs.710.1646125616333; 
- Tue, 01 Mar 2022 01:06:56 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJysPuQNRZM4I3CerlyPgO2J4N/MPFQV33vrrQB+RZ+Mucd9f7im/hH9m1ZdNgj7gMA+tTZeqA==
-X-Received: by 2002:a5d:49c9:0:b0:1f0:16b2:584f with SMTP id
- t9-20020a5d49c9000000b001f016b2584fmr1282958wrs.710.1646125616134; 
- Tue, 01 Mar 2022 01:06:56 -0800 (PST)
-Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
- by smtp.gmail.com with ESMTPSA id
- m10-20020adfe94a000000b001ef57f562ccsm13171245wrn.51.2022.03.01.01.06.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Mar 2022 01:06:55 -0800 (PST)
-Date: Tue, 1 Mar 2022 10:06:53 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Marc Zyngier <maz@kernel.org>
+ with ESMTP id GsR1hPMMhzhi for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Mar 2022 02:29:02 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A880F49EBC
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 02:29:02 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3564661929;
+ Wed,  2 Mar 2022 07:29:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 991A3C004E1;
+ Wed,  2 Mar 2022 07:29:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1646206140;
+ bh=jWx+LGSjHYVPOLqQ2ixdypgnUdVNer561Qll5V5i7BQ=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=tXNaR/6M0E2MuSbHYp4aD8AEs9SCS2Q4Ai/cwXyNqOPD3+WvNsmummpIWaJG3bJLt
+ JRRkfeNlFC7WYhW2Ss5R2uoJgct8RWFGj5zLe6JxXi/LeP4YldlctBSYRZQ5byXSy7
+ q2uGmxt4xqb1fylGEXvvq833f5fT1CGSt0hY4zYh/YmZzmm19jfXBPmszcy+dpZOpf
+ yTh8WaQIs99wPRUKGNVRXHnAgFeo3jez5MCQA6G/KiSdFhT1tdA9zaSV1CCRe6qKPm
+ yH4PmYChMFxIzB+qQroQHf6ggbs5JDc1+Pgr25sYlkvT8uIu0GsoxOS/15o01NOiEV
+ oDY0Fyg4SpGpA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
+ helo=billy-the-mountain.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nPJPu-00BbX8-2J; Wed, 02 Mar 2022 07:28:58 +0000
+Date: Wed, 02 Mar 2022 07:28:56 +0000
+Message-ID: <87wnhc6cef.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Eugene Huang <eugeneh@nvidia.com>
 Subject: Re: Timer delays in VM
-Message-ID: <20220301090653.yzsd5eichip4li7r@gator>
+In-Reply-To: <BYAPR12MB3192EFEBABB1B31D9751C931D9029@BYAPR12MB3192.namprd12.prod.outlook.com>
 References: <BYAPR12MB31927AEB9D0A4068ED12826DD9019@BYAPR12MB3192.namprd12.prod.outlook.com>
  <667c9f084b2d38725369de60daef6d58@misterjones.org>
-MIME-Version: 1.0
-In-Reply-To: <667c9f084b2d38725369de60daef6d58@misterjones.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvmarm@lists.cs.columbia.edu, Eugene Huang <eugeneh@nvidia.com>
+ <BYAPR12MB3192EFEBABB1B31D9751C931D9029@BYAPR12MB3192.namprd12.prod.outlook.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: eugeneh@nvidia.com, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,25 +85,90 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Feb 28, 2022 at 09:02:47PM +0000, Marc Zyngier wrote:
+On Tue, 01 Mar 2022 19:03:33 +0000,
+Eugene Huang <eugeneh@nvidia.com> wrote:
 > 
-> You also don't mention what host kernel version you are running.
-> In general, please try and reproduce the issue using the latest
-> kernel version (5.16 at the moment). Please also indicate what
-> HW you are using.
->
+> > >       * Does this timer rely on kvm timer irq injection?
+> > 
+> > Yes. A timer interrupt is always injected in SW. But the timer interrupt can
+> > either come from the HW timer itself (the VM was running while the timer
+> > expired), or from a SW timer that KVM as setup if the guest was blocked on
+> > WFI.
+> 
+> <EH> Here for arm64, EL1Virtual Timer is used. EL1 Virtual Timer is
+> a HW timer, correct?  There is an armvtimer implementation in QEMU
+> 6.1+. Does this armvtimer make a difference?
 
-Yes, please reply with the kernel version these delays are seen on
-and also try to reproduce with a latest upstream kernel version. If
-the delays are not present with the upstream kernel version, then
-we can open a CentOS bug.
+KVM only deals with the EL1 timers (both physical and virtual). I
+guess that by 'armvtimer', you mean libvirt's front-end for the stolen
+time feature to expose to the guest how wall clock and CPU time
+diverge (i.e. it isn't a timer at all, but a dynamic correction for
+it).
 
-(You may want to experiment with host and guest kernel configs as
-well.)
+> > >       * What can be any possible causes for the timer delay? Are there
+> > > some locking mechanisms which can cause the delay?
+> > 
+> > This completely depend on how loaded your host is, the respective priorities
+> > of the various processes, and a million of other things.
+> > This is no different from the same userspace running on the host.
+> > It also depends on the *guest* kernel, by the way.
+> 
+> <EH> Our guest kernel is 5.4. How is the *guest* kernel involved?
+> Can you give an example? Do you have suggestions on the guest kernel
+> version as well.
+
+It is the guest kernel that programs the timer, and KVM isn't involved
+at all, specially on your HW (direct access to both timers on
+VHE-capable systems).
+
+> > >       * What parameters can tune this timer?
+> > 
+> > None. You may want to check whether the delay is observed when the VM
+> > has hit WFI or not.
+> 
+> <EH> Yes, delay is observed after vm_exit because of WFx (not sure
+> WFI or WFE) but only when on a different vCPU in the same VM some
+> workload is started.
+
+Let me see if I understand what you mean:
+
+- vcpu-0 is running your timer test, everything is fine
+- vcpu-1 starts some other workload, and this affects the timer test
+  on the other vcpu
+
+Is that correct? It so, this would tend to indicate that both vcpu
+share some physical resources such as a physical CPU. How do you run
+your VM?
+
+Also, please work out whether you exit because of a blocking WFI or
+WFE, as they are indicative of different guest behaviour.
+
+> Since we pin that workload to its own vCPU, in
+> theory, it should not affect the timing of another vCPU.
+
+Why not? a vcpu is just a host thread, and if they share a physical
+CPU at some point, there is a knock-on effect.
+
+> > You also don't mention what host kernel version you are running.
+> > In general, please try and reproduce the issue using the latest kernel version
+> > (5.16 at the moment). Please also indicate what HW you are using.
+> 
+> <EH> Tried 5.15 and 5.4 kernels. Both have the issue. Do you think
+> 5.16 can make a difference? The HW is an Ampere Altra system.
+
+Unlikely. The Altra is a mostly sane system, as long as you make sure
+that VMs don't migrate across sockets (at which point it becomes
+laughably bad). Nothing to do with KVM though.
+
+Are these kernels compiled from scratch? Or are they whatever the
+distro ships? Same question for the guest.
 
 Thanks,
-drew
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
