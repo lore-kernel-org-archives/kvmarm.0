@@ -2,74 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49289C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 15:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFA9C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 15:05:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF2B049F17;
-	Wed,  2 Mar 2022 10:01:40 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DD3649EF2;
+	Wed,  2 Mar 2022 10:05:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id K06o8Py86PF4; Wed,  2 Mar 2022 10:01:39 -0500 (EST)
+	with ESMTP id uHSToM5X1AfF; Wed,  2 Mar 2022 10:05:44 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6584749EFE;
-	Wed,  2 Mar 2022 10:01:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22B9140AEB;
+	Wed,  2 Mar 2022 10:05:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E07E49E29
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 10:01:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9725949EDF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 10:05:42 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PNKswxuwrWoM for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2022 10:01:37 -0500 (EST)
+ with ESMTP id DvlCjRhbRcB5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Mar 2022 10:05:41 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EF0D49EDF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 10:01:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8ACB249ECF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 10:05:41 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id B4197B8201F;
- Wed,  2 Mar 2022 15:01:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57829C004E1;
- Wed,  2 Mar 2022 15:01:34 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 21829B82025;
+ Wed,  2 Mar 2022 15:05:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFB0FC004E1;
+ Wed,  2 Mar 2022 15:05:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1646233294;
- bh=8rlRtNMynmDDYNccJCGEJDz3PorlhjmSjRbR1couMPI=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=F74e7+dNSPY+BQ9gHlUkrRz9jtiBXD89HzGZTUpI016+V8uK3q0wsJAcAPuE2Jsp2
- I1d2NS4IYN1fhtXyhFPi5VZHxiptY/nhQiO31GP2xzmAJVpFCAQvrBkQSS/dH9rbFy
- vv8ECzUceI1tfwisEHyb2oX88UeYtZ/QkMNl1Ay/ehN21+7A7D7AFbDC97/8+r4f1o
- /VqiV5gjbSphH1qheD4bb1A7AzR4BUoI+dOvvT2JouFcQ7JEtQfHvLYvhwhr5TWkho
- 3myl8ZzvkGL8jRwhlL4vQRJJCQPnlln5tqqL/OOfwJFaMBg4wEPSKpPWECF41qHyP2
- oC4d/Qwq2yUsw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ s=k20201202; t=1646233538;
+ bh=eQqM5ysabFFKHeuhGo8OOZSK8/fVAPxIy4eE2d8L/Qc=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=Y0unoGP5KBZHjT18Xi4Joegb2P4+OYaIInZRRjtkiJId0CqMBeJ86fykX45+klNiI
+ v7M6RbTrcu0Z3VztSEEWo5NuVbXi7zU3IyKhEyUd1Dtdz7dmgignO6DdRk3AkfqKjI
+ epTAgmWd55N8ffkJB3QhJEo/5taaeUT+U5xQj6BE56Jy48tj7HLDxZ05A2L6qSlvVt
+ rju/dFCIiATLhuVXTODeDqqVQpBFDnxge1DGsyRm0Os1rPY1Sx3XnGNBHcH8AUhGII
+ 8to4ZmKe6hzTK4WuM9ITE1wtJvmhWXQUISx2dvTSmdrkprSX77NtKX9V/+TIZj52Nm
+ StkdWAdsDB8qA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nPQTr-00BiIb-Ua; Wed, 02 Mar 2022 15:01:32 +0000
-Date: Wed, 02 Mar 2022 15:01:31 +0000
-Message-ID: <87zgm81jqs.wl-maz@kernel.org>
+ id 1nPQXo-00BiLN-F6; Wed, 02 Mar 2022 15:05:36 +0000
 From: Marc Zyngier <maz@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
+To: Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>
 Subject: Re: [PATCH] KVM: arm64: Enable Cortex-A510 erratum 2077057 by default
-In-Reply-To: <Yh96ggLwtKAhu7xe@arm.com>
+Date: Wed,  2 Mar 2022 15:05:32 +0000
+Message-Id: <164623350047.1159363.1531648833145192400.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220225184658.172527-1-broonie@kernel.org>
 References: <20220225184658.172527-1-broonie@kernel.org>
- <Yh96ggLwtKAhu7xe@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, broonie@kernel.org, will@kernel.org,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Rcpt-To: will@kernel.org, broonie@kernel.org, catalin.marinas@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,31 +82,24 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 02 Mar 2022 14:09:06 +0000,
-Catalin Marinas <catalin.marinas@arm.com> wrote:
-> 
-> On Fri, Feb 25, 2022 at 06:46:58PM +0000, Mark Brown wrote:
-> > The recently added configuration option for Cortex A510 erratum 2077057 does
-> > not have a "default y" unlike other errata fixes. This appears to simply be
-> > an oversight since the help text suggests enabling the option if unsure and
-> > there's nothing in the commit log to suggest it is intentional.
-> > 
-> > Fixes: 1dd498e5e26ad ("KVM: arm64: Workaround Cortex-A510's single-step and PAC trap errata")
-> > Signed-off-by: Mark Brown <broonie@kernel.org>
-> 
-> The fixed commit went in through Marc's KVM tree, so this patch can go
-> in via the same route. I don't think it's critical for 5.17 (unless
-> there are pending fixes from Marc already; I don't have any for arm64).
+On Fri, 25 Feb 2022 18:46:58 +0000, Mark Brown wrote:
+> The recently added configuration option for Cortex A510 erratum 2077057 does
+> not have a "default y" unlike other errata fixes. This appears to simply be
+> an oversight since the help text suggests enabling the option if unsure and
+> there's nothing in the commit log to suggest it is intentional.
 
-I don't have anything at the moment, so unless something really urgent
-crops up next week, I'll punt that to 5.18.
+Applied to next, thanks!
 
-Thanks,
+[1/1] KVM: arm64: Enable Cortex-A510 erratum 2077057 by default
+      commit: 4c11113c1a3d10f5b617e5d2b9acd8d1d715450f
+
+Cheers,
 
 	M.
-
 -- 
 Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
