@@ -2,73 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C9B0C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 14:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49289C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 15:01:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAE8C49F09;
-	Wed,  2 Mar 2022 09:41:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF2B049F17;
+	Wed,  2 Mar 2022 10:01:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9Ny8mIDdKCvZ; Wed,  2 Mar 2022 09:41:15 -0500 (EST)
+	with ESMTP id K06o8Py86PF4; Wed,  2 Mar 2022 10:01:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73EF149F01;
-	Wed,  2 Mar 2022 09:41:15 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6584749EFE;
+	Wed,  2 Mar 2022 10:01:39 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F82A49EFF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 09:41:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E07E49E29
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 10:01:38 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1ezThlpCbK8z for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2022 09:41:13 -0500 (EST)
+ with ESMTP id PNKswxuwrWoM for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Mar 2022 10:01:37 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF6D340B64
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 09:41:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EF0D49EDF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 10:01:37 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 43B12B81FA0;
- Wed,  2 Mar 2022 14:41:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBE97C004E1;
- Wed,  2 Mar 2022 14:41:09 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id B4197B8201F;
+ Wed,  2 Mar 2022 15:01:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57829C004E1;
+ Wed,  2 Mar 2022 15:01:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1646232070;
- bh=DxnODdk51AgHTpe4eGxu5RQUtbpXH6AstFf+hpM+yuk=;
+ s=k20201202; t=1646233294;
+ bh=8rlRtNMynmDDYNccJCGEJDz3PorlhjmSjRbR1couMPI=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=tB3DM/Z+BpDTVqOobBSFi18y36FdeU3O9hZIyjCVokzkCT3MStFRPd3Icm8yJ4Mit
- vH3CTyIi/7pjIz+36A+LIzGECkSHQn8/kS8TudVcDAxrlN36yzjj7G8MZOlJC09FjW
- hZ8rd5QVIaRsXJ6zCpMitibBTjmbr4gV4DWTFZq5ZTCvqfZ0AgbV59pY8oDrfZcXxL
- 92tYEkslt50/9+0Yiha6ZT6IYxPyiPpAlJKZ7S2Fc9+vmokEceJo10MYsSpgXoKRx7
- oOPP6GNDm9S4HV2MZMFV898IrBdoiwuqpgW2edanPjHsvnfGAeEEEqHKJ9reIQY/JR
- Ypd62TfLwOYKw==
+ b=F74e7+dNSPY+BQ9gHlUkrRz9jtiBXD89HzGZTUpI016+V8uK3q0wsJAcAPuE2Jsp2
+ I1d2NS4IYN1fhtXyhFPi5VZHxiptY/nhQiO31GP2xzmAJVpFCAQvrBkQSS/dH9rbFy
+ vv8ECzUceI1tfwisEHyb2oX88UeYtZ/QkMNl1Ay/ehN21+7A7D7AFbDC97/8+r4f1o
+ /VqiV5gjbSphH1qheD4bb1A7AzR4BUoI+dOvvT2JouFcQ7JEtQfHvLYvhwhr5TWkho
+ 3myl8ZzvkGL8jRwhlL4vQRJJCQPnlln5tqqL/OOfwJFaMBg4wEPSKpPWECF41qHyP2
+ oC4d/Qwq2yUsw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nPQA7-00Bi1f-FF; Wed, 02 Mar 2022 14:41:07 +0000
-Date: Wed, 02 Mar 2022 14:41:07 +0000
-Message-ID: <8735k02z98.wl-maz@kernel.org>
+ id 1nPQTr-00BiIb-Ua; Wed, 02 Mar 2022 15:01:32 +0000
+Date: Wed, 02 Mar 2022 15:01:31 +0000
+Message-ID: <87zgm81jqs.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH kvmtool v7 2/3] aarch64: Add stolen time support
-In-Reply-To: <20220302140734.1015958-3-sebastianene@google.com>
-References: <20220302140734.1015958-1-sebastianene@google.com>
- <20220302140734.1015958-3-sebastianene@google.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH] KVM: arm64: Enable Cortex-A510 erratum 2077057 by default
+In-Reply-To: <Yh96ggLwtKAhu7xe@arm.com>
+References: <20220225184658.172527-1-broonie@kernel.org>
+ <Yh96ggLwtKAhu7xe@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: sebastianene@google.com, kvm@vger.kernel.org,
- qperret@google.com, kvmarm@lists.cs.columbia.edu, will@kernel.org,
- julien.thierry.kdev@gmail.com
+X-SA-Exim-Rcpt-To: catalin.marinas@arm.com, broonie@kernel.org, will@kernel.org,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: will@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Mark Brown <broonie@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,232 +86,24 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Sebastian,
-
-On Wed, 02 Mar 2022 14:07:35 +0000,
-Sebastian Ene <sebastianene@google.com> wrote:
+On Wed, 02 Mar 2022 14:09:06 +0000,
+Catalin Marinas <catalin.marinas@arm.com> wrote:
 > 
-> This patch adds support for stolen time by sharing a memory region
-> with the guest which will be used by the hypervisor to store the stolen
-> time information. Reserve a 64kb MMIO memory region after the RTC peripheral
-> to be used by pvtime. The exact format of the structure stored by the
-> hypervisor is described in the ARM DEN0057A document.
+> On Fri, Feb 25, 2022 at 06:46:58PM +0000, Mark Brown wrote:
+> > The recently added configuration option for Cortex A510 erratum 2077057 does
+> > not have a "default y" unlike other errata fixes. This appears to simply be
+> > an oversight since the help text suggests enabling the option if unsure and
+> > there's nothing in the commit log to suggest it is intentional.
+> > 
+> > Fixes: 1dd498e5e26ad ("KVM: arm64: Workaround Cortex-A510's single-step and PAC trap errata")
+> > Signed-off-by: Mark Brown <broonie@kernel.org>
 > 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  Makefile                               |   1 +
->  arm/aarch64/arm-cpu.c                  |   2 +-
->  arm/aarch64/include/kvm/kvm-cpu-arch.h |   1 +
->  arm/aarch64/pvtime.c                   | 103 +++++++++++++++++++++++++
->  arm/include/arm-common/kvm-arch.h      |   6 +-
->  include/kvm/kvm-config.h               |   1 +
->  6 files changed, 112 insertions(+), 2 deletions(-)
->  create mode 100644 arm/aarch64/pvtime.c
-> 
-> diff --git a/Makefile b/Makefile
-> index f251147..e9121dc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
->  	OBJS		+= arm/aarch64/arm-cpu.o
->  	OBJS		+= arm/aarch64/kvm-cpu.o
->  	OBJS		+= arm/aarch64/kvm.o
-> +	OBJS		+= arm/aarch64/pvtime.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch64/include
->  
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index d7572b7..7e4a3c1 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
->  {
->  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> -	return 0;
-> +	return kvm_cpu__setup_pvtime(vcpu);
->  }
->  
->  static struct kvm_arm_target target_generic_v8 = {
-> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> index 8dfb82e..2b2c1ff 100644
-> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> @@ -19,5 +19,6 @@
->  
->  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
->  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
->  
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> new file mode 100644
-> index 0000000..fdde683
-> --- /dev/null
-> +++ b/arm/aarch64/pvtime.c
-> @@ -0,0 +1,103 @@
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
-> +
-> +#include <linux/byteorder.h>
-> +#include <linux/types.h>
-> +
-> +#define ARM_PVTIME_STRUCT_SIZE		(64)
-> +
-> +struct pvtime_data_priv {
-> +	bool	is_supported;
-> +	char	*usr_mem;
+> The fixed commit went in through Marc's KVM tree, so this patch can go
+> in via the same route. I don't think it's critical for 5.17 (unless
+> there are pending fixes from Marc already; I don't have any for arm64).
 
-Consider using void * for pointers that do not have any particular
-semantics associated to them.
-
-> +};
-> +
-> +static struct pvtime_data_priv pvtime_data = {
-> +	.is_supported	= true,
-> +	.usr_mem	= NULL
-> +};
-> +
-> +static int pvtime__alloc_region(struct kvm *kvm)
-> +{
-> +	char *mem;
-> +	int ret = 0;
-> +
-> +	mem = mmap(NULL, ARM_PVTIME_MMIO_SIZE, PROT_RW,
-
-I sort of object to the 'MMIO' part of the name. The spec is quite
-clear that this should be normal memory. That's purely cosmetic, but
-still a bit confusing.
-
-> +		   MAP_ANON_NORESERVE, -1, 0);
-> +	if (mem == MAP_FAILED)
-> +		return -errno;
-> +
-> +	ret = kvm__register_dev_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> +				    ARM_PVTIME_MMIO_SIZE, mem);
-
-This, on the other side, is wrong. Since the pvtime pages are memory,
-mapping them with device attributes will do the wrong thing (the
-hypervisor will write to a cacheable mapping, and the guest will
-bypass the cache due to the S2 override that you provide here).
-
-kvm__register_ram() is more likely to lead to the behaviour you'd
-expect.
-
-> +	if (ret) {
-> +		munmap(mem, ARM_PVTIME_MMIO_SIZE);
-> +		return ret;
-> +	}
-> +
-> +	pvtime_data.usr_mem = mem;
-> +	return ret;
-> +}
-> +
-> +static int pvtime__teardown_region(struct kvm *kvm)
-> +{
-> +	if (pvtime_data.usr_mem == NULL)
-> +		return 0;
-> +
-> +	kvm__destroy_mem(kvm, ARM_PVTIME_MMIO_BASE,
-> +			 ARM_PVTIME_MMIO_SIZE, pvtime_data.usr_mem);
-> +	munmap(pvtime_data.usr_mem, ARM_PVTIME_MMIO_SIZE);
-> +	pvtime_data.usr_mem = NULL;
-> +	return 0;
-> +}
-> +
-> +dev_exit(pvtime__teardown_region);
-> +
-> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> +{
-> +	int ret;
-> +	bool has_stolen_time;
-> +	u64 pvtime_guest_addr = ARM_PVTIME_MMIO_BASE + vcpu->cpu_id *
-> +		ARM_PVTIME_STRUCT_SIZE;
-> +	struct kvm_config *kvm_cfg = NULL;
-> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> +		.addr	= KVM_ARM_VCPU_PVTIME_IPA
-> +	};
-> +
-> +	kvm_cfg = &vcpu->kvm->cfg;
-> +	if (kvm_cfg->no_pvtime)
-> +		return 0;
-> +
-> +	if (!pvtime_data.is_supported)
-> +		return -ENOTSUP;
-
-It is a bit odd to have this hard failure if running on a system that
-doesn't have pvtime. It forces the user to alter their command-line,
-which is a bit annoying. I'd rather have a soft-fail here.
-
-> +
-> +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
-> +						  KVM_CAP_STEAL_TIME);
-> +	if (!has_stolen_time)
-> +		return 0;
-> +
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> +	if (ret) {
-> +		perror("KVM_HAS_DEVICE_ATTR failed\n");
-> +		goto out_err;
-> +	}
-> +
-> +	if (!pvtime_data.usr_mem) {
-> +		ret = pvtime__alloc_region(vcpu->kvm);
-> +		if (ret) {
-> +			perror("Failed allocating pvtime region\n");
-> +			goto out_err;
-> +		}
-> +	}
-> +
-> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> +	if (!ret)
-> +		return 0;
-> +
-> +	perror("KVM_SET_DEVICE_ATTR failed\n");
-> +	pvtime__teardown_region(vcpu->kvm);
-> +out_err:
-> +	pvtime_data.is_supported = false;
-> +	return ret;
-> +}
-> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> index c645ac0..3f82663 100644
-> --- a/arm/include/arm-common/kvm-arch.h
-> +++ b/arm/include/arm-common/kvm-arch.h
-> @@ -15,7 +15,8 @@
->   * |  PCI  |////| plat  |       |        |     |         |
->   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
->   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
-> - * |       |////| RTC   |       |        |     |         |
-> + * |       |////| RTC,  |       |        |     |         |
-> + * |       |////| PVTIME|       |        |     |         |
->   * +-------+----+-------+-------+--------+-----+---------+---......
->   */
->  
-> @@ -34,6 +35,9 @@
->  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
->  #define ARM_RTC_MMIO_SIZE	0x10000
->  
-> +#define ARM_PVTIME_MMIO_BASE	(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
-> +#define ARM_PVTIME_MMIO_SIZE	SZ_64K
-> +
->  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
->  #define KVM_FLASH_MAX_SIZE	0x1000000
->  
-> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> index 6a5720c..48adf27 100644
-> --- a/include/kvm/kvm-config.h
-> +++ b/include/kvm/kvm-config.h
-> @@ -62,6 +62,7 @@ struct kvm_config {
->  	bool no_dhcp;
->  	bool ioport_debug;
->  	bool mmio_debug;
-> +	bool no_pvtime;
->  };
->  
->  #endif
+I don't have anything at the moment, so unless something really urgent
+crops up next week, I'll punt that to 5.18.
 
 Thanks,
 
