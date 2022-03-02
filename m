@@ -2,68 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 978FEC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 13:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BE30C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 14:04:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 100E149E36;
-	Wed,  2 Mar 2022 08:03:16 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF66949EEF;
+	Wed,  2 Mar 2022 09:04:07 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YFOWCWJ31KXL; Wed,  2 Mar 2022 08:03:12 -0500 (EST)
+	with ESMTP id 8i4ySc2oH2PZ; Wed,  2 Mar 2022 09:04:06 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C092949EDE;
-	Wed,  2 Mar 2022 08:03:12 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A52C649ED6;
+	Wed,  2 Mar 2022 09:04:06 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B684949E36
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 08:03:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AA3F49ED3
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 09:04:05 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TvWdhen0yoy0 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2022 08:03:06 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBA554141A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 08:03:06 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 27A07B81FE8;
- Wed,  2 Mar 2022 13:03:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 453D8C004E1;
- Wed,  2 Mar 2022 13:03:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1646226183;
- bh=ibmXcOSmeHL09sRVILi0Er6msdkw98p2iNvq4Z+J6RE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=rUZPBKvf3WuH9rU5+3WcDt2MLzqRo7s8K9YuGgWUUh0gwAdA1HOjR+B7T5Ha6Sb+h
- lYGoTuu0kwBU9TJcgM1vZ9B/Ee4qpLqk1cPlLvHQjOvrBIqgjy8LkQDqNwVqURl1wT
- mCIcBSGA4s/RMbbGQJCF5gwdVxTJND2tr0iI8JRVZgtGLNtC2L5zYEGU62+92Uaz13
- UsdnFPvHKrpuyO0+z6jxSyFHEQMN7/FXTIoe9UErNSz/BneTtzr5oW0RMmhW5+NDep
- FMwAcLsTIJ420VL53bBVokT5GIzQ0vUcnCe5bzT4wHILRJmEVgVivv7RrztPx5ENL/
- SqD3tf0bpPdyg==
-Date: Wed, 2 Mar 2022 13:02:57 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v11 03/40] arm64: cpufeature: Always specify and use a
- field width for capabilities
-Message-ID: <Yh9rAZjmmqjCAGZ3@sirena.org.uk>
-References: <20220207152109.197566-1-broonie@kernel.org>
- <20220207152109.197566-4-broonie@kernel.org>
- <Yh6kqaR9FQXg8Q4w@qian> <878rts3bpi.wl-maz@kernel.org>
- <Yh9akZaM+qeWPgEz@arm.com>
-MIME-Version: 1.0
-In-Reply-To: <Yh9akZaM+qeWPgEz@arm.com>
-X-Cookie: The sheep died in the wool.
-Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>, Marc Zyngier <maz@kernel.org>,
- Alan Hayward <alan.hayward@arm.com>, Qian Cai <quic_qiancai@quicinc.com>,
- Salil Akerkar <Salil.Akerkar@arm.com>, linux-kselftest@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ with ESMTP id tLE-mhx3ZrkE for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Mar 2022 09:04:04 -0500 (EST)
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com
+ [209.85.221.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4ABC4408F4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 09:04:04 -0500 (EST)
+Received: by mail-wr1-f74.google.com with SMTP id
+ f9-20020a5d58e9000000b001f0247e5e96so674928wrd.15
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Mar 2022 06:04:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=hPKuRtrZ7FciAHN0houkzwDHAjhc6VOJutEOMHbNfWA=;
+ b=jbv65BHk8GqJHm2EmtbEtTPoARICcpi/WQbKKS7FdWkuEKfUHNCM48Q0jsI78A8yES
+ 4vRerRTJR0n75FIpBbWVkuk/iCG6UzT7EbwwcSveeIB9NRMBrZx/aDW4FQ+GptlpOzp5
+ IWo9O9SLj9jKlhLeW7vEVl+Eggj9RlwN+5BElRSd84yMsO2D3T1TUCxrs9QShQOj37fZ
+ Fxy7Jn5p3ZHFTXwIRDF5O25joN6L1FttWSE2bitSxTsUbxhjfRhc/BHdM6WVK++qXrq7
+ GElNl7Uvw/Dapkyo9GSKF8shRbFBBeYiy9q3uY2udVW8kvAuHnOl4xFwhSOP70f+dx/N
+ SoZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=hPKuRtrZ7FciAHN0houkzwDHAjhc6VOJutEOMHbNfWA=;
+ b=y5W+J2d8EZ4JPcEPfgTNVavsJufzuc9zOSVKK3TvPB/Gu4ZcIDMgc+rhSCBy29fDuD
+ avVk4fq/ojwgNG0KjPjztU73UVqDGJ5qknxhWlENFCZ9/lhcAxVMFb762UyfmaNvP8Na
+ KbiZL+nCslzqOtxaLfvTd8vwG5Wj/zrsKDfsMTe+M9I0qjKFcFTmWUaQLxbaolOKmps+
+ q+0EJ991yo2rdtRKmFPRbJgRkWm1KqkVCuhwzC89rZwyQaMbjSMe+UV+dR8lxoA+Hwbq
+ 3JBz7H9F+9kmj4kj9IJX6w2si7VWVLKoT9pOAk2GA6MPI5pINKB55eubS+VSa1qmm0jk
+ BLoQ==
+X-Gm-Message-State: AOAM533vfEBDNgIMgw10TNAsIHFdFxj8r+lypgxtR4JZ/bNf0jG4Y0EL
+ aIZmjbf3RHU1fjUzm0bCfzV100CuKD7QGssGGkY=
+X-Google-Smtp-Source: ABdhPJwCwe0Ivn4oxuYW85DCZt8LEkoCUulaqDf9S/0R2XreVsB1ACODvonVA/kCsqzYygLXLLlKNtB9xtvojYGmmqM=
+X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
+ (user=sebastianene job=sendgmr) by
+ 2002:a05:600c:3203:b0:381:b544:7970 with
+ SMTP id r3-20020a05600c320300b00381b5447970mr5936255wmp.144.1646229843153;
+ Wed, 02 Mar 2022 06:04:03 -0800 (PST)
+Date: Wed,  2 Mar 2022 14:03:22 +0000
+Message-Id: <20220302140324.1010891-1-sebastianene@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.574.g5d30c73bfb-goog
+Subject: [PATCH kvmtool v6 0/3] aarch64: Add stolen time support
+From: Sebastian Ene <sebastianene@google.com>
+To: kvm@vger.kernel.org
+Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,62 +77,51 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============0697648048012469519=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+These patches add support for stolen time functionality.
 
---===============0697648048012469519==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7loqhh/QB0lB0Fcr"
-Content-Disposition: inline
+Patch #1 moves the vCPU structure initialisation before the target->init()
+call to allow early access to the kvm structure from the vCPU
+during target->init().
 
+Patch #2 modifies the memory layout in arm-common/kvm-arch.h and adds a
+new MMIO device PVTIME after the RTC region. A new flag is added in
+kvm-config.h that will be used to control [enable/disable] the pvtime
+functionality. Stolen time is enabled by default when the host
+supports KVM_CAP_STEAL_TIME.
 
---7loqhh/QB0lB0Fcr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Patch #3 adds a new command line argument to disable the stolen time
+functionality(by default is enabled).
 
-On Wed, Mar 02, 2022 at 11:52:49AM +0000, Catalin Marinas wrote:
-> On Wed, Mar 02, 2022 at 10:12:09AM +0000, Marc Zyngier wrote:
+Changelog since v5:
+ - propagate the error code from the kvm_cpu__setup_pvtime() when the
+   host supports KVM_CAP_STEAL_TIME but if fails to configure it for
+   stolen time functionality.
 
-> > I don't think that's on purpose, and we should definitely address
-> > this. Maybe we should have a warning if we spot an occurrence of
-> > .width being 0.
+Sebastian Ene (3):
+  aarch64: Populate the vCPU struct before target->init()
+  aarch64: Add stolen time support
+  Add --no-pvtime command line argument
 
-> We should indeed have a check. Alternatively, assume the default to be 4
-> and convert all 0s to 4 during boot (less patch churn).
+ Makefile                               |   1 +
+ arm/aarch64/arm-cpu.c                  |   2 +-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h |   1 +
+ arm/aarch64/pvtime.c                   | 103 +++++++++++++++++++++++++
+ arm/include/arm-common/kvm-arch.h      |   6 +-
+ arm/kvm-cpu.c                          |  14 ++--
+ builtin-run.c                          |   2 +
+ include/kvm/kvm-config.h               |   1 +
+ 8 files changed, 121 insertions(+), 9 deletions(-)
+ create mode 100644 arm/aarch64/pvtime.c
 
-That's got the issue that it becomes very easy to end up defaulting to
-a width of 4 in the case where the field is narrower which isn't going
-to be easily visible in testing until it encounters a system where it
-misfires in a way that breaks things.
-
---7loqhh/QB0lB0Fcr
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmIfawAACgkQJNaLcl1U
-h9CL0Af+LMYSxGux9+H2KZiS3uH6kguND2mecwSS/f7SK6AC7kMkLZcfz/72uoT3
-NtscTwK9k8C/lBWsab8WWTEcAhNBUTc+KSeYbnUQmw29oNO30VT3NjkRe6l4xdjW
-gmUHWfwDN/hl/DViKzHbswYgVNaUZck5vwUonMuQyAM0PtJYoerOVpcavgd/9u7F
-6jI4E7ZeIOS4AX0XUkJpRDZxykF/NsPJvadKvEP60UOrYiJ54vVHSewrqshd6cgA
-g2lSQW+XeibnhLFTEsNiIGtpxCdnQBOkA7562cREw9f6BttWsHsJoklRs+c19WiV
-7sCyOIXcLXhJIm39SdLzJjHuXKK7fQ==
-=vfZs
------END PGP SIGNATURE-----
-
---7loqhh/QB0lB0Fcr--
-
---===============0697648048012469519==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+-- 
+2.35.1.574.g5d30c73bfb-goog
 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============0697648048012469519==--
