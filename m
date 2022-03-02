@@ -2,70 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFFA9C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 15:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD50C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  2 Mar 2022 16:29:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DD3649EF2;
-	Wed,  2 Mar 2022 10:05:45 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 85E0749F28;
+	Wed,  2 Mar 2022 11:29:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uHSToM5X1AfF; Wed,  2 Mar 2022 10:05:44 -0500 (EST)
+	with ESMTP id NX5wownd9p23; Wed,  2 Mar 2022 11:29:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 22B9140AEB;
-	Wed,  2 Mar 2022 10:05:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36DC249F11;
+	Wed,  2 Mar 2022 11:29:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9725949EDF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 10:05:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 916F449ED9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 11:29:40 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DvlCjRhbRcB5 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2022 10:05:41 -0500 (EST)
+ with ESMTP id A+dfXMii-o9G for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Mar 2022 11:29:39 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8ACB249ECF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 10:05:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30C6B49ECA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 11:29:39 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 21829B82025;
- Wed,  2 Mar 2022 15:05:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFB0FC004E1;
- Wed,  2 Mar 2022 15:05:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1646233538;
- bh=eQqM5ysabFFKHeuhGo8OOZSK8/fVAPxIy4eE2d8L/Qc=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Y0unoGP5KBZHjT18Xi4Joegb2P4+OYaIInZRRjtkiJId0CqMBeJ86fykX45+klNiI
- v7M6RbTrcu0Z3VztSEEWo5NuVbXi7zU3IyKhEyUd1Dtdz7dmgignO6DdRk3AkfqKjI
- epTAgmWd55N8ffkJB3QhJEo/5taaeUT+U5xQj6BE56Jy48tj7HLDxZ05A2L6qSlvVt
- rju/dFCIiATLhuVXTODeDqqVQpBFDnxge1DGsyRm0Os1rPY1Sx3XnGNBHcH8AUhGII
- 8to4ZmKe6hzTK4WuM9ITE1wtJvmhWXQUISx2dvTSmdrkprSX77NtKX9V/+TIZj52Nm
- StkdWAdsDB8qA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nPQXo-00BiLN-F6; Wed, 02 Mar 2022 15:05:36 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH] KVM: arm64: Enable Cortex-A510 erratum 2077057 by default
-Date: Wed,  2 Mar 2022 15:05:32 +0000
-Message-Id: <164623350047.1159363.1531648833145192400.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220225184658.172527-1-broonie@kernel.org>
-References: <20220225184658.172527-1-broonie@kernel.org>
+ by ams.source.kernel.org (Postfix) with ESMTPS id 8714FB81F52;
+ Wed,  2 Mar 2022 16:29:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BA5AC340ED;
+ Wed,  2 Mar 2022 16:29:32 +0000 (UTC)
+Date: Wed, 2 Mar 2022 16:29:29 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v12 10/40] arm64/sme: Basic enumeration support
+Message-ID: <Yh+bafhTeVpJct3M@arm.com>
+References: <20220225165923.1474372-1-broonie@kernel.org>
+ <20220225165923.1474372-11-broonie@kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: will@kernel.org, broonie@kernel.org, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20220225165923.1474372-11-broonie@kernel.org>
+Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
+ Szabolcs Nagy <szabolcs.nagy@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Shuah Khan <skhan@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Salil Akerkar <Salil.Akerkar@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -82,24 +65,44 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 25 Feb 2022 18:46:58 +0000, Mark Brown wrote:
-> The recently added configuration option for Cortex A510 erratum 2077057 does
-> not have a "default y" unlike other errata fixes. This appears to simply be
-> an oversight since the help text suggests enabling the option if unsure and
-> there's nothing in the commit log to suggest it is intentional.
+On Fri, Feb 25, 2022 at 04:58:53PM +0000, Mark Brown wrote:
+> +HWCAP2_SME
+> +
+> +    Functionality implied by ID_AA64PFR1_EL1.SME == 0b0001, as described
+> +    by Documentation/arm64/sme.rst.
+> +
+> +HWCAP2_SME_I16I64
+> +
+> +    Functionality implied by ID_AA64SMFR0_EL1.I16I64 == 0b1111.
+> +
+> +HWCAP2_SME_F64F64
+> +
+> +    Functionality implied by ID_AA64SMFR0_EL1.F64F64 == 0b1.
+> +
+> +HWCAP2_SME_I8I32
+> +
+> +    Functionality implied by ID_AA64SMFR0_EL1.I8I32 == 0b1111.
+> +
+> +HWCAP2_SME_F16F32
+> +
+> +    Functionality implied by ID_AA64SMFR0_EL1.F16F32 == 0b1.
+> +
+> +HWCAP2_SME_B16F32
+> +
+> +    Functionality implied by ID_AA64SMFR0_EL1.B16F32 == 0b1.
+> +
+> +HWCAP2_SME_F32F32
+> +
+> +    Functionality implied by ID_AA64SMFR0_EL1.F32F32 == 0b1.
+> +
+> +HWCAP2_SME_FA64
+> +
+> +    Functionality implied by ID_AA64SMFR0_EL1.FA64 == 0b1.
 
-Applied to next, thanks!
+Without any strong opinion only exposing MRS emulation for these, I
+guess we go ahead with adding all these new HWCAPs.
 
-[1/1] KVM: arm64: Enable Cortex-A510 erratum 2077057 by default
-      commit: 4c11113c1a3d10f5b617e5d2b9acd8d1d715450f
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
