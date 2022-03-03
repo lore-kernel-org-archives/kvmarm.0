@@ -2,63 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4487EC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Mar 2022 07:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B05C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Mar 2022 07:28:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A151C49E36;
-	Thu,  3 Mar 2022 02:22:14 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38BD449E37;
+	Thu,  3 Mar 2022 02:28:11 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id BOxah0-Y7r2t; Thu,  3 Mar 2022 02:22:13 -0500 (EST)
+	with ESMTP id qcTrUYrDkXG9; Thu,  3 Mar 2022 02:28:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EEEE49EE8;
-	Thu,  3 Mar 2022 02:22:13 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 24D8349E43;
+	Thu,  3 Mar 2022 02:28:10 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A4E049E36
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 02:22:12 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 628FA49E36
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 02:28:09 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rwE84Ki2m8Ti for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Mar 2022 02:22:11 -0500 (EST)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E7EC49E2B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 02:22:10 -0500 (EST)
+ with ESMTP id UKc5jHifwGBn for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Mar 2022 02:28:08 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C00240BDF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 02:28:07 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 7D1A6B82372;
- Thu,  3 Mar 2022 07:22:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47ECCC004E1;
- Thu,  3 Mar 2022 07:22:08 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 62959619AB;
+ Thu,  3 Mar 2022 07:28:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 343E6C004E1;
+ Thu,  3 Mar 2022 07:28:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1646292128;
- bh=MHIbLwgBAWMHdfUXELcmaCZb2HwLpKYYxXXvAGZ9g8U=;
+ s=k20201202; t=1646292487;
+ bh=nXEY3U73KpldvOmaPQr9dtPzYTloqhGn+AZ0mTlq1+Q=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=tx85Tb8/8wjmNCZr/5woKYOrvIWfUwyr9FQdqVVEET1pCz3llX1ROF1z5B1AG0i9m
- WlSZbQCTSRmt1WFBlQ6sS1rStpnlSBmOV0T6oK52ZbbgwVwsdFSqXvH2qGSnZF/8Rk
- BI7Jv1yJVB7dCAU1utD0hSrR2aFHpjT3W7qNaMgEHF75j7vndZsJOaMPG06loggP48
- ed5N/f0DTvDOORvPssajmE23+IqC9T+u+8l5UWvMGHihAg+/imavx4Cq2jzCtjOyZv
- x9xBxUJjXFyljPbe2nr7Fi88c4hxUcvSGtdmdUbet4euTEBz107Fawv8PRE/8vGVMW
- yvbmZtV16uq9A==
+ b=EaHVHXTbT4R6Y9/IgPW6jxbxC059H6AyUFoyBChM7GmBMInAEwUKMSlLtvwlDYWAj
+ GoP929n1la2Usg9gjrqNuj11eoTq7N285bTCZ4iYx+4MAQUvkEgymjrR0EQLJmgyLy
+ jyW7rfhBx7x364Z//FY4q3Txsspf2KAMvafMt/slL0iKD2JThHClWHDLqg2cL9i8sp
+ BlKa/NVlaMOF10TcoPI1F2XbJUtMS2gwVjsoXAj1VKWchI1LXFj2IZJPQ3SN69HGJT
+ IrIpJaeBcRXrJd8g4klhOYUJ4ejG3SD/bU5fD4wX0tBJ4rPBcaY8jzROT2h/xILvj1
+ tM+vuNHd5SewQ==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
  helo=billy-the-mountain.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nPfmn-00BtGo-F8; Thu, 03 Mar 2022 07:22:05 +0000
-Date: Thu, 03 Mar 2022 07:21:44 +0000
-Message-ID: <87r17j5wmv.wl-maz@kernel.org>
+ id 1nPfsa-00BtMa-H8; Thu, 03 Mar 2022 07:28:04 +0000
+Date: Thu, 03 Mar 2022 07:28:02 +0000
+Message-ID: <87pmn35wcd.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 1/2] Documentation: KVM: Update documentation to indicate
- KVM is arm64-only
-In-Reply-To: <20220302194221.1774513-2-oupton@google.com>
+Subject: Re: [PATCH 2/2] Documentation: KVM: Move KVM/arm64 docs into aptly
+ named directory
+In-Reply-To: <20220302194221.1774513-3-oupton@google.com>
 References: <20220302194221.1774513-1-oupton@google.com>
- <20220302194221.1774513-2-oupton@google.com>
+ <20220302194221.1774513-3-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -90,80 +90,18 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
-
-Thanks for taking the hint! :D A few remarks below.
-
-On Wed, 02 Mar 2022 19:42:20 +0000,
+On Wed, 02 Mar 2022 19:42:21 +0000,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> KVM support for 32-bit ARM hosts (KVM/arm) has been removed from the
-> kernel since commit 541ad0150ca4 ("arm: Remove 32bit KVM host
-> support"). There still exists some remnants of the old architecture in
-> the KVM documentation.
+> ARM64 is the only supported ARM archiecture for KVM now. Move all the
+> documentation into a new directory, arm64, making the file structure
+> consistent with this change.
 > 
-> Remove all traces of 32-bit host support from the documentation. Note
-> that AArch32 guests are still supported.
-> 
-> Fixes: 541ad0150ca4 ("arm: Remove 32bit KVM host support")
+> While we're at it, rename hyp-abi.rst to el2-abi.rst for the sake of
+> consistency with the architecture as well.
 
-TBH, I'd drop the Fixes. Otherwise, it is going to be dragged into
--stable versions, and generate a number of pointless conflicts.
-
-> Suggested-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  Documentation/virt/kvm/api.rst          | 83 ++++++++++++-------------
->  Documentation/virt/kvm/arm/hyp-abi.rst  | 54 ++++++++--------
->  Documentation/virt/kvm/arm/ptp_kvm.rst  |  4 +-
->  Documentation/virt/kvm/devices/vcpu.rst |  2 +-
->  4 files changed, 70 insertions(+), 73 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 9f3172376ec3..25423ee890e2 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-
-This part looks good.
-
-> diff --git a/Documentation/virt/kvm/arm/hyp-abi.rst b/Documentation/virt/kvm/arm/hyp-abi.rst
-> index 4d43fbc25195..516ea630d160 100644
-> --- a/Documentation/virt/kvm/arm/hyp-abi.rst
-> +++ b/Documentation/virt/kvm/arm/hyp-abi.rst
-
-The content of this file is, however, still valid. Despite KVM having
-been removed, the 32bit kernel still supports being entered at HYP
-(bootloaders such as u-boot will definitely do that), and still uses
-this internal API to switch back to HYP on kexec. Other hypervisors
-(such as jailhouse) also rely on this API to install themselves at
-runtime.
-
-> diff --git a/Documentation/virt/kvm/arm/ptp_kvm.rst b/Documentation/virt/kvm/arm/ptp_kvm.rst
-> index aecdc80ddcd8..5d47f7ecbf5a 100644
-> --- a/Documentation/virt/kvm/arm/ptp_kvm.rst
-> +++ b/Documentation/virt/kvm/arm/ptp_kvm.rst
-> @@ -1,7 +1,7 @@
->  .. SPDX-License-Identifier: GPL-2.0
->  
-> -PTP_KVM support for arm/arm64
-> -=============================
-> +PTP_KVM support for arm64
-
-This is a service that the arm64 hypervisor offers to guests,
-including 32bit guests. It was actually merged after 32bit port was
-removed. So this file should probably stay untouched, or be amended to
-clarify the nuance in terms of support.
-
-> +=========================
->  
->  PTP_KVM is used for high precision time sync between host and guests.
->  It relies on transferring the wall clock and counter value from the
-> diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-> index 60a29972d3f1..92942440a9e7 100644
-> --- a/Documentation/virt/kvm/devices/vcpu.rst
-> +++ b/Documentation/virt/kvm/devices/vcpu.rst
-
-This one is OK.
+See my earlier comment as to why this isn't valid. As for the rest of
+the renaming, I'm not opposed to it, but it doesn't bring a lot either.
 
 Thanks,
 
