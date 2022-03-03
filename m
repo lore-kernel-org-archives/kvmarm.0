@@ -2,83 +2,128 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9A5C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Mar 2022 11:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4073BC433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Mar 2022 11:20:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E8D449EDF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E57CC49EE8;
 	Thu,  3 Mar 2022 06:20:29 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, body has been altered) header.i=@nvidia.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IivN2xKerNev; Thu,  3 Mar 2022 06:20:28 -0500 (EST)
+	with ESMTP id Tpj6IPUib9AR; Thu,  3 Mar 2022 06:20:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3977249EF2;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D40F49EF8;
 	Thu,  3 Mar 2022 06:20:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C24C49B07
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 12:31:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CD0749673
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 00:49:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VljmSrB50GKH for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2022 12:31:16 -0500 (EST)
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com
- [209.85.128.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 093DC43C8C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2022 12:31:15 -0500 (EST)
-Received: by mail-wm1-f44.google.com with SMTP id
- a5-20020a05600c224500b003832be89f25so1718768wmm.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Mar 2022 09:31:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=r8D9Glo/IqaUHdT1IqNZ/4L9jANqiQOBO7H8ZnJ11bo=;
- b=kprMM0PaxhQaUOtqFTUXwwSlh4FWOta0HNFj3k7wlkS3kkvEmZ+wqPXkOH8B7y9/oC
- bm2gpBOVubXzle2zPcw8J4V7zljJPHIGhK4LrcPmyX92uvl7bC9wBUgtv6SjxBBFh2dY
- hcYB13Xv3owOAW+CWyYokl0ROfZlLpNgD4VTywg6B1V5WHMB04iufGZ/UiYQmN4WA4Nr
- gaiSEvvwL/JrKDnH1wb7+LFr4UY8vX1Fl/UqusDD2AYSrYEW5Zk/uEXCJYGrCSk/ufW4
- Hn7qtBMFNHJAEYKi1pg6r+9QpgVjIiYbQPjAYT+hhjhFeyakxl5yLxHCKGsJOlUmknxn
- +W3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=r8D9Glo/IqaUHdT1IqNZ/4L9jANqiQOBO7H8ZnJ11bo=;
- b=e01ZswlEUJzkejyH1K+U4etLZ9/8wwKt9eXWyd9x4JyIpXErGbktp6PoQnpZnhewHE
- WFaXs8VlYL0VMwfU9D0Z2bthTYfRrbWZA+MMmP8OvSHhyvlXbSxw7roC3TAMdKLS7GCZ
- 9w4PaIWH6HCFl1nN980Vp5e7rwjqcvcLEBFaMuoQBANFhuSQazBKfhUyuF2lxgfNnSoQ
- hsrs/armFIlfiIIrW05n4Y2E/S9BwzCOe07TMiESSsxdttlkpGM7YoBTGOZtcpPXe/5A
- MicuxPWUeMkml3JuylIeOnKyQov/aZgv5ViIbduv86TI50DpRmoDz5ACSsGy5hv+bn4m
- Cvjg==
-X-Gm-Message-State: AOAM532aKsVxiJi2eE4wy0DbUzvkTj82Zc033uyQNQ77UBe4y6JVakBM
- QhanEoyaakh2jygutvE70R88jO2bWkj5L9wmSaB6FA==
-X-Google-Smtp-Source: ABdhPJyq4u8HQIq9pMffamDskyFj4okMEA25x2hK2hxWrrZpj8MvyhBFFR4we+1tTnFgbJ0bfNScYb4wg6LgfMWVPhU=
-X-Received: by 2002:a05:600c:2284:b0:386:90d8:73ca with SMTP id
- 4-20020a05600c228400b0038690d873camr714048wmf.66.1646242274759; Wed, 02 Mar
- 2022 09:31:14 -0800 (PST)
-MIME-Version: 1.0
-References: <20220225033548.1912117-1-kaleshsingh@google.com>
- <20220225033548.1912117-4-kaleshsingh@google.com>
- <87tucg6b97.wl-maz@kernel.org>
-In-Reply-To: <87tucg6b97.wl-maz@kernel.org>
-From: Kalesh Singh <kaleshsingh@google.com>
-Date: Wed, 2 Mar 2022 09:31:03 -0800
-Message-ID: <CAC_TJvcjq5R_+UzhhqjZnusa5g+RT0HbLHBob-pTqofKgMSp9g@mail.gmail.com>
-Subject: Re: [PATCH v4 3/8] KVM: arm64: Add guard pages for KVM nVHE
- hypervisor stack
+ with ESMTP id Ks92fCPNkO8d for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Mar 2022 00:49:03 -0500 (EST)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com
+ (mail-bn8nam12on2074.outbound.protection.outlook.com [40.107.237.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0666440D2E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 00:49:02 -0500 (EST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GnmS+2WpRszS17rlo67gZ7cHwVEEiOxNbptPZgZ2mxTtGywUeyuQoZmsTNEzsBVx2nfw2jw140UmZis+zuNPEFP4TlKqYDju5q/l97939+sf5PO05/xgkVXPKt5lF8GNgd5AYPwq3UzTuhMEFhLbokYEHmWRckW1YIb57xkGaXVUV3eoYu+gzROqW/21DBsi8bL68XGF3HkFWwzZASjAjvM1RF9bMb5B5Co7E7DZpbHb/8FS8sG17EjfU+d7i1Re40qxGtLJV7YAur3ti2OyVE3Jd3GHF/VQ0IqlOLUpJkEuy7qEIBaa3yT+s24pdol/1uTLBLzjgQi6NdDLOF77kQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CK0hQGO5ibYBU4WkVfvEtDQVISuezYFEo1QPh+SHJLU=;
+ b=F974kehazyRIIS5YN+yPPvIizpty3eJEN+sAmPYLCWkZBb+1eBxHFyoyMdeZNmyrfZb3ZBuS0AhW4Gw078WnL1mB90tFNKvqKiFshEQ1HGLiFCYna12CYuG6MZ/jsllmeibER7AAJ7YKmoaHAhlOEFvHkQ0UANq/3CQQdNZrz4jsFsFK3MXnaTgtYOwffUUYbV2ZZVIltMVhwgFksnUNOkAeMBGj1GbVxrjgGBQPm0Q1MuXy1KfoBuNwiUxwfDGeMCTazZNHSTZv3GOKQUd9LC4+2rHJ2ZG2vCGuTcRW6WysPHPWCwZIzG3b7oM/TDxDgcOur3Xilxqtg19KnGy9NQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CK0hQGO5ibYBU4WkVfvEtDQVISuezYFEo1QPh+SHJLU=;
+ b=L9wGdATDfO/DOs5G0jcDxPES3Tn2YD6ZfoTVsFGCdjsXPjdamyP2Q4QNF5xgvThERQOiXlvaEnjnJ7Lo0r/Y20NgEQ9UfK4PLnRLp2dy9nyrpVTOnN9AZNQ0feduYCIeISLGeY8VirUCXfZlfm034VbAT/8wUMv7cV6fl+b/pm/GcU/OyAYDDSz6/lWLdGs1utrKzesSLrWwBanrevlv8V2Pt0QJC01X/xqdJwAUwpXOgGs3uPStGShcmHWUoGuZnEeUdkq9vYJzzggrU7MgIA1HkboQUtyZ94hMoXAKARm56LuU7tuji1TRUWAeNGnPd1pGFlSl/bs+ClmQjyeT8A==
+Received: from BYAPR12MB3192.namprd12.prod.outlook.com (2603:10b6:a03:139::14)
+ by DM6PR12MB3290.namprd12.prod.outlook.com (2603:10b6:5:189::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5017.24; Thu, 3 Mar
+ 2022 05:49:01 +0000
+Received: from BYAPR12MB3192.namprd12.prod.outlook.com
+ ([fe80::fdf5:3159:a592:7d32]) by BYAPR12MB3192.namprd12.prod.outlook.com
+ ([fe80::fdf5:3159:a592:7d32%4]) with mapi id 15.20.5038.014; Thu, 3 Mar 2022
+ 05:49:01 +0000
+From: Eugene Huang <eugeneh@nvidia.com>
 To: Marc Zyngier <maz@kernel.org>
+Subject: RE: Timer delays in VM
+Thread-Topic: Timer delays in VM
+Thread-Index: AdgszUnmuyWPbbQDTHiT7yyfAge0rQAGT+yAAC1xtPAAGrceAAAuDgAw
+Date: Thu, 3 Mar 2022 05:49:00 +0000
+Message-ID: <BYAPR12MB3192AD55DF0B67DB2F7C78FFD9049@BYAPR12MB3192.namprd12.prod.outlook.com>
+References: <BYAPR12MB31927AEB9D0A4068ED12826DD9019@BYAPR12MB3192.namprd12.prod.outlook.com>
+ <667c9f084b2d38725369de60daef6d58@misterjones.org>
+ <BYAPR12MB3192EFEBABB1B31D9751C931D9029@BYAPR12MB3192.namprd12.prod.outlook.com>
+ <87wnhc6cef.wl-maz@kernel.org>
+In-Reply-To: <87wnhc6cef.wl-maz@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 22faae95-1748-448f-ab75-08d9fcd98483
+x-ms-traffictypediagnostic: DM6PR12MB3290:EE_
+x-microsoft-antispam-prvs: <DM6PR12MB32907E2D6A8EFFBA7749912BD9049@DM6PR12MB3290.namprd12.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yG8+oBUm4VPvcjAJ7koB+am7Hrws+gcWqE10jJe2maEiJ4fvyVsIw7D1jwfGhXToMBcmkY7Ycm/wpK+zLK8x9dHafxze0QDjTHnCzCKsgVduZ6kaZRaMbNgSnRKE2jd1xzyiFsLtEZ4+3z6azmbZymRST34RkNWzYXX/lVCBVcVgOef6relOB/n1nV3ZVQxsoMGnBSPfZ3AJKVW9nkne2zllALZPQbeSKTo2H/ibThXSXALz0pKEFf8Fz01ODiBQLLr9BL0cvCDGXsWwHUAjGtcsex253DwO/XmozD5ETy5ThYSd8nPwragb4cCRgpZIEGCekYgVQlMyETLPb6TW5BrrQumt1Zzn20MsMde3I9dJ0JcAGwOJcywnShtUfVfM7Bg+Bdfo0zxTBKMbF7/5SWS5yeoi6cB5eozkyukJg1mz3RM87KmXfdBszQgWo//utFsqJ7YR/7jEmPwYa20spPH3CCHUWWJVpvZ+B+pQ0npmAw02HmT6IJXl6KwXljnQbO14YjGvZdSrVBPmSehxDOCtdcET5gPw9Kdkde5fCZU/DvAdTXYux4G9FxLO7rjkccbLBEgymJSt0CVJ4Syg+9zKcxx0HyASpP8q/KuuJ579ZoglvqeWbP2UOUo50qEC6FHSdv16KhZrShJzzXOAEOZ1MwhVMM5KPAlmHQgGSAI4lyPBDvfl2a3QmhNVlHuQV2DYgJw8zlFwdRiwq9ZPvw==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BYAPR12MB3192.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(13230001)(4636009)(366004)(9686003)(3480700007)(53546011)(6916009)(38100700002)(33656002)(55016003)(83380400001)(2906002)(5660300002)(66946007)(52536014)(8676002)(4326008)(66556008)(66476007)(64756008)(66446008)(76116006)(86362001)(122000001)(316002)(71200400001)(38070700005)(508600001)(186003)(7696005)(26005)(6506007)(8936002);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?rDVSRC5AkfkS4zgYLcWeQrBamamXunAC/GT27D5Vx8oqB3lCMBwBQQT3Yc80?=
+ =?us-ascii?Q?tesQlUkk7iuBdYu+rP4+CThSVz4saTTWLtiYt2rioU7VZMz2Ci217KJ9jwpH?=
+ =?us-ascii?Q?YLqo/rSqlkPDbk/yGBfvV3iDQ8qUxLsI+JlFfh8Hru99jUHESVUV0Kc6MOmV?=
+ =?us-ascii?Q?lXcxxIrWt1I8l+PScx0jDJ+cHVupOjXJ5WmyMHekdd9E7Qeku77o9jOoJl5a?=
+ =?us-ascii?Q?oe90UogryEn4b/my8waXfe587KSVa9MfTjMMEXXoMeLbGIyhG3AonfPcETLa?=
+ =?us-ascii?Q?UdHA0lASTdIFNeneTsKTE+Pr/a67Gp2PY5pWXXbJYFZWs2Vqwwe01Pak0uaF?=
+ =?us-ascii?Q?a49CEQ47uonoCZHSWoc47uv4xyhFI+9unFUgNnEhcZC/rJLN9ZExYecHMBG1?=
+ =?us-ascii?Q?3Hvx+f7PZ7wLX4woPHlAlmGjL4YoAA4Y0TTsVCNsXyj0ZmN3bwoRnSuDWLjG?=
+ =?us-ascii?Q?HWbFnVxmXoiyszB+iw20/6rLQ0azqUKcvNW5+XrhlJxJs+WUOPm5G5nAw31s?=
+ =?us-ascii?Q?ID7bQlxVFhl1DFf8+dvnIBT8wiqRpZpYx3tbip1vok1DkPhiMg32ssOVrWFW?=
+ =?us-ascii?Q?tIK2SeN1dogMQZeuNSSdeeNn5HgHdG/hZu1YvitTPcI8H1ktbZGWaIXY7uC9?=
+ =?us-ascii?Q?y+ZSsGY1JBeFViUdfpVIu5nVxoEUlAD/ehf8BdrlAa7cZ5mOdDiLoaQgkEGc?=
+ =?us-ascii?Q?pAdZ4XdY0FUjPog7j0CKZeu7m0RyRl3qZi8DsLCZAfg8Kta/q0XPpTBvYYUm?=
+ =?us-ascii?Q?YG6Hxe5PKNdS2SXbMuPiyMel91fpx/rhsfKKWSQ3qgpCDvHkPo3dYvwnMmsM?=
+ =?us-ascii?Q?Bi5rY05a4G3LXqNFQ9Q3vj5gmt0rRANqXtwWHO/3Xic+BC4Eiqo3SlDBm+MZ?=
+ =?us-ascii?Q?B88SQL00dVLzccdlza0HI5yKpAg62+dy6sAYfbQMG5ha+1gODLIAYs/1139T?=
+ =?us-ascii?Q?F+J0VI2Swx+5WjpkdDJF+ecb6uXrEzMCW8cEhkHWkE00pzBLqs5ZkIkoTNvF?=
+ =?us-ascii?Q?+glBaQjjiz95W3rZhRSLHHD3hMPshUufsDEyJPblQrQJIsH3z7HKKKSLnL5s?=
+ =?us-ascii?Q?nP8NJjT11yk2B8eu05ph6KQPg+xwEXGzM7jQpJ9d0luKSmteOOIejEOIs1yF?=
+ =?us-ascii?Q?+Halp/9sIKVrFT5s8b4uoXZQ3kKbpwfq0X8yDQVlJsmAUhlLYE3LArQkfaI1?=
+ =?us-ascii?Q?CXnLmcRH06c44TgsIfMwYCIVHUrxhU5ash7sCqajnUFwO/J1REOC3x4CRg3g?=
+ =?us-ascii?Q?MmwXcTeRqfoAIoHmwW5XtoRMtYbx99feEKbSgW7lOxQdhUx3eQFyNXd2WWhZ?=
+ =?us-ascii?Q?TXiGjxJbZeKc8rNvqqpcs3LLyy2kDY2ZG+IDKzAfnDT1rGChcJSMTodEkQvM?=
+ =?us-ascii?Q?APDJiJaC+AwbeK0WurIlH5KMlkQbF82Q1VzSfWRlZYfhCFStH42Y8gv4kxJx?=
+ =?us-ascii?Q?CuxJYmHNonT6U4s5U9Yluo6Jzw8eGfwG+nOHCBCYqdN75GGVH4BQ7HFsU5dO?=
+ =?us-ascii?Q?AZpqMEsjdQ9CbUjtk9PrvE1UYUD+fd5Vfz0uSqvWQFQWjguFv0Yp2LUVVAYo?=
+ =?us-ascii?Q?uc/PVSNICf7vCee46Kogagb8CLuqv07nLVNRZHuaVO12gxxteuXt48M07jVf?=
+ =?us-ascii?Q?P4Rq2SQCxRmTf+wY3CLhGWI=3D?=
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB3192.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22faae95-1748-448f-ab75-08d9fcd98483
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Mar 2022 05:49:00.9866 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: g54KazG0rs8T7l7x1hcvVLFWscUo0gOVp+HZNTM/izYRc/qwLGy60LnWE7rDvXhDRksCLmHfEKNAmCjUaXiPYQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3290
 X-Mailman-Approved-At: Thu, 03 Mar 2022 06:20:26 -0500
-Cc: Andrew Walbran <qwandor@google.com>, Will Deacon <will@kernel.org>,
- Peter Collingbourne <pcc@google.com>,
- "Cc: Android Kernel" <kernel-team@android.com>,
- LKML <linux-kernel@vger.kernel.org>,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, Suren Baghdasaryan <surenb@google.com>,
- kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,122 +140,125 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 1, 2022 at 11:53 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 25 Feb 2022 03:34:48 +0000,
-> Kalesh Singh <kaleshsingh@google.com> wrote:
+> -----Original Message-----
+> From: Marc Zyngier <maz@kernel.org>
+> Sent: Tuesday, March 1, 2022 11:29 PM
+> To: Eugene Huang <eugeneh@nvidia.com>
+> Cc: kvmarm@lists.cs.columbia.edu
+> Subject: Re: Timer delays in VM
+> 
+> 
+> On Tue, 01 Mar 2022 19:03:33 +0000,
+> Eugene Huang <eugeneh@nvidia.com> wrote:
 > >
-> > Maps the stack pages in the flexible private VA range and allocates
-> > guard pages below the stack as unbacked VA space. The stack is aligned
-> > to twice its size to aid overflow detection (implemented in a subsequent
-> > patch in the series).
+> > > >       * Does this timer rely on kvm timer irq injection?
+> > >
+> > > Yes. A timer interrupt is always injected in SW. But the timer
+> > > interrupt can either come from the HW timer itself (the VM was
+> > > running while the timer expired), or from a SW timer that KVM as
+> > > setup if the guest was blocked on WFI.
 > >
-> > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-> > ---
-> >
-> > Changes in v4:
-> >   - Replace IS_ERR_OR_NULL check with IS_ERR check now that
-> >     hyp_alloc_private_va_range() returns an error for null
-> >     pointer, per Fuad
-> >   - Format comments to < 80 cols, per Fuad
-> >
-> > Changes in v3:
-> >   - Handle null ptr in IS_ERR_OR_NULL checks, per Mark
-> >
-> >  arch/arm64/include/asm/kvm_asm.h |  1 +
-> >  arch/arm64/kvm/arm.c             | 32 +++++++++++++++++++++++++++++---
-> >  2 files changed, 30 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> > index d5b0386ef765..2e277f2ed671 100644
-> > --- a/arch/arm64/include/asm/kvm_asm.h
-> > +++ b/arch/arm64/include/asm/kvm_asm.h
-> > @@ -169,6 +169,7 @@ struct kvm_nvhe_init_params {
-> >       unsigned long tcr_el2;
-> >       unsigned long tpidr_el2;
-> >       unsigned long stack_hyp_va;
-> > +     unsigned long stack_pa;
-> >       phys_addr_t pgd_pa;
-> >       unsigned long hcr_el2;
-> >       unsigned long vttbr;
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index ecc5958e27fe..0a83c0e7f838 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -1541,7 +1541,6 @@ static void cpu_prepare_hyp_mode(int cpu)
-> >       tcr |= (idmap_t0sz & GENMASK(TCR_TxSZ_WIDTH - 1, 0)) << TCR_T0SZ_OFFSET;
-> >       params->tcr_el2 = tcr;
-> >
-> > -     params->stack_hyp_va = kern_hyp_va(per_cpu(kvm_arm_hyp_stack_page, cpu) + PAGE_SIZE);
-> >       params->pgd_pa = kvm_mmu_get_httbr();
-> >       if (is_protected_kvm_enabled())
-> >               params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
-> > @@ -1990,14 +1989,41 @@ static int init_hyp_mode(void)
-> >        * Map the Hyp stack pages
-> >        */
-> >       for_each_possible_cpu(cpu) {
-> > +             struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
-> >               char *stack_page = (char *)per_cpu(kvm_arm_hyp_stack_page, cpu);
-> > -             err = create_hyp_mappings(stack_page, stack_page + PAGE_SIZE,
-> > -                                       PAGE_HYP);
-> > +             unsigned long stack_hyp_va, guard_hyp_va;
-> >
-> > +             /*
-> > +              * Private mappings are allocated downwards from io_map_base
-> > +              * so allocate the stack first then the guard page.
-> > +              *
-> > +              * The stack is aligned to twice its size to facilitate overflow
-> > +              * detection.
-> > +              */
-> > +             err = __create_hyp_private_mapping(__pa(stack_page), PAGE_SIZE,
-> > +                                             PAGE_SIZE * 2, &stack_hyp_va, PAGE_HYP);
->
-> Right, I guess that's where my earlier ask breaks, as you want an
-> alignment that is *larger* than the allocation.
->
-> >               if (err) {
-> >                       kvm_err("Cannot map hyp stack\n");
-> >                       goto out_err;
-> >               }
-> > +
-> > +             /* Allocate unbacked private VA range for stack guard page */
-> > +             guard_hyp_va = hyp_alloc_private_va_range(PAGE_SIZE, PAGE_SIZE);
->
-> Huh. You are implicitly relying on the VA allocator handing you an
-> address contiguous with the previous mapping. That's... brave. I'd
-> rather you allocate the VA space upfront with the correct alignment
-> and then map the single page where it should be in the VA region.
->
-> That'd be a lot less fragile.
+> > <EH> Here for arm64, EL1Virtual Timer is used. EL1 Virtual Timer is a
+> > HW timer, correct?  There is an armvtimer implementation in QEMU 6.1+.
+> > Does this armvtimer make a difference?
+> 
+> KVM only deals with the EL1 timers (both physical and virtual). I guess that by
+> 'armvtimer', you mean libvirt's front-end for the stolen time feature to
+> expose to the guest how wall clock and CPU time diverge (i.e. it isn't a timer
+> at all, but a dynamic correction for it).
 
-Agreed. I'll fix it in the next version.
+<EH> Yes, I mean the libvirt front-end setting.  Okay, got it. Thanks.
+
+> 
+> > > >       * What can be any possible causes for the timer delay? Are
+> > > > there some locking mechanisms which can cause the delay?
+> > >
+> > > This completely depend on how loaded your host is, the respective
+> > > priorities of the various processes, and a million of other things.
+> > > This is no different from the same userspace running on the host.
+> > > It also depends on the *guest* kernel, by the way.
+> >
+> > <EH> Our guest kernel is 5.4. How is the *guest* kernel involved?
+> > Can you give an example? Do you have suggestions on the guest kernel
+> > version as well.
+> 
+> It is the guest kernel that programs the timer, and KVM isn't involved at all,
+> specially on your HW (direct access to both timers on VHE-capable systems).
+> 
+> > > >       * What parameters can tune this timer?
+> > >
+> > > None. You may want to check whether the delay is observed when the
+> > > VM has hit WFI or not.
+> >
+> > <EH> Yes, delay is observed after vm_exit because of WFx (not sure WFI
+> > or WFE) but only when on a different vCPU in the same VM some workload
+> > is started.
+> 
+> Let me see if I understand what you mean:
+> 
+> - vcpu-0 is running your timer test, everything is fine
+> - vcpu-1 starts some other workload, and this affects the timer test
+>   on the other vcpu
+> 
+> Is that correct? It so, this would tend to indicate that both vcpu share some
+> physical resources such as a physical CPU. How do you run your VM?
+
+<EH> We have the following further 1-to-1 mappings:
+pcpu-20 - vcpu-0 is running your timer test, everything is fine
+pcpu-21 - vcpu-1 starts some other workload, and this affects the timer test
+on the other vcpu
+
+- Each vCPU thread is pinned to its individual pCPU on the host (vcpupin in libvirt).
+- Each pCPU on which a vCPU thread runs is isolated on the host (isolcpus).
+- Each vCPU that runs the workload is isolated in the guest VM (isolcpus).
+
+So we are pretty sure the workloads are separated.
+
+> 
+> Also, please work out whether you exit because of a blocking WFI or WFE, as
+> they are indicative of different guest behaviour.
+
+<EH> Will do. Somehow our current trace does not show this information.
+
+> 
+> > Since we pin that workload to its own vCPU, in theory, it should not
+> > affect the timing of another vCPU.
+> 
+> Why not? a vcpu is just a host thread, and if they share a physical CPU at
+> some point, there is a knock-on effect.
+
+<EH> Again, because of vcpupin in libvirt, there is no sharing of a pCPU among vCPUs. At least that is our configuration intention.
+
+> 
+> > > You also don't mention what host kernel version you are running.
+> > > In general, please try and reproduce the issue using the latest
+> > > kernel version
+> > > (5.16 at the moment). Please also indicate what HW you are using.
+> >
+> > <EH> Tried 5.15 and 5.4 kernels. Both have the issue. Do you think
+> > 5.16 can make a difference? The HW is an Ampere Altra system.
+> 
+> Unlikely. The Altra is a mostly sane system, as long as you make sure that
+> VMs don't migrate across sockets (at which point it becomes laughably bad).
+> Nothing to do with KVM though.
+
+<EH> Right, there is no migration of VMs.
+I see kvm arm timer related code is very different between 5.4 and 5.15/5.16.  Can we still use 5.4 for both the host and the guest?
+
+> 
+> Are these kernels compiled from scratch? Or are they whatever the distro
+> ships? Same question for the guest.
+
+<EH> Yes. Both host and guest kernels are compiled from scratch. 
 
 Thanks,
-Kalesh
->
-> > +             if (IS_ERR((void *)guard_hyp_va)) {
-> > +                     err = PTR_ERR((void *)guard_hyp_va);
-> > +                     kvm_err("Cannot allocate hyp stack guard page\n");
-> > +                     goto out_err;
-> > +             }
-> > +
-> > +             /*
-> > +              * Save the stack PA in nvhe_init_params. This will be needed
-> > +              * to recreate the stack mapping in protected nVHE mode.
-> > +              * __hyp_pa() won't do the right thing there, since the stack
-> > +              * has been mapped in the flexible private VA space.
-> > +              */
-> > +             params->stack_pa = __pa(stack_page) + PAGE_SIZE;
-> > +
-> > +             params->stack_hyp_va = stack_hyp_va + PAGE_SIZE;
-> >       }
-> >
-> >       for_each_possible_cpu(cpu) {
->
+Eugene
+
+> 
 > Thanks,
->
+> 
 >         M.
->
+> 
 > --
 > Without deviation from the norm, progress is not possible.
 _______________________________________________
