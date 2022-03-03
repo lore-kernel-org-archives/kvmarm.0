@@ -2,79 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B74AC433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  3 Mar 2022 16:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08DD2C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  3 Mar 2022 17:29:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 76699404A0;
-	Thu,  3 Mar 2022 11:11:09 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 439A843399;
+	Thu,  3 Mar 2022 12:29:43 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 5pJtOw+ioVDx; Thu,  3 Mar 2022 11:11:08 -0500 (EST)
+	with ESMTP id yGY2PPShGPzO; Thu,  3 Mar 2022 12:29:42 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1544408D5;
-	Thu,  3 Mar 2022 11:11:07 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3578443482;
+	Thu,  3 Mar 2022 12:29:42 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77252404FA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 11:11:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47B5543399
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 12:29:41 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pfugwMAug1MS for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Mar 2022 11:11:06 -0500 (EST)
+ with ESMTP id 0I8hhNZUEXiW for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Mar 2022 12:29:40 -0500 (EST)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA2F1404A0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 11:11:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E0E8A4291D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2022 12:29:39 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 3CD5EB82646;
- Thu,  3 Mar 2022 16:11:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8C0FC004E1;
- Thu,  3 Mar 2022 16:11:02 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 3F8FDB82650;
+ Thu,  3 Mar 2022 17:29:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE2B9C004E1;
+ Thu,  3 Mar 2022 17:29:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1646323863;
- bh=L/Yjc+tzEd+sixKrfJePhiG6pFPJhdHQBVzV0tA4TCA=;
+ s=k20201202; t=1646328576;
+ bh=FOw+85uwmyeCg5YFO8PbTlTtboPnRTZQlSAakLzXseA=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=Y+8vUNj3yM/i75GOnT59nc1b1X8gNUzMGJsjSumjAwZVdPwTvT4YgrIBiZW6sVWkR
- EtjqOGNUHjgleds6ZjYccEkd9jLyEk6qkw2E9rFAxim2KqYOgrK1FNQZXpGcpplNO1
- 8xBPGrNXo1UpYmtK5qy28sb5el9HQUC1eFGPuTJIQ3nCGDmWPNPmpAljYEXg0y2EAq
- 3IMF1Hr9vK+p2pHNRoscNS0667A9umRc9vM2YeqFDcGIlVvt07KWB+sUctRvC0W555
- 0RsJ/yy2JQfchnAWw5aB9gnSdbF4pssdh9fBzNFL5sTxmAWlOd4E9Z0wtn5C1Qeunm
- yvu5AsWz1k5Rg==
+ b=RBGiaT51hagwMp8oY91hK6Cz8Vxfbmh7xb6MBZf9kRQZkun+DuA9cTcePc7EY6LvM
+ /pH1fOlPU+biHohqNGjvovDaI2QmwtG/ZSRzCT8FG8EteWh4F358xVG3kP5vdyj7U2
+ TkxIBm8WQhzjwx+UcD/BFDW/aMNOoV23VRvw6tMG5NRUIr/uSVDqgSIdGYgJ/EsISU
+ TBa+cT/GaLLOclth+gbqvkcu+YMNiKYp5xlPGtN4oxJ1i0gec6jdOt9Y10Tcw+Z8rq
+ APbNdFTkV4Zp4aPA8FL2cPqZ6+Hz2aeKx0uUwsoPjsfQInLDmEo1fqzd+x0pb6u5l3
+ 01C/F0rtLgZ4w==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nPo2e-00C06p-9w; Thu, 03 Mar 2022 16:11:00 +0000
-Date: Thu, 03 Mar 2022 16:10:59 +0000
-Message-ID: <87tucf10fg.wl-maz@kernel.org>
+ id 1nPpGf-00C14D-UP; Thu, 03 Mar 2022 17:29:34 +0000
+Date: Thu, 03 Mar 2022 17:29:33 +0000
+Message-ID: <87r17j0wsi.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v3 2/3] KVM: arm64: mixed-width check should be skipped
- for uninitialized vCPUs
-In-Reply-To: <20220303035408.3708241-2-reijiw@google.com>
-References: <20220303035408.3708241-1-reijiw@google.com>
- <20220303035408.3708241-2-reijiw@google.com>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v4 2/8] KVM: arm64: Introduce pkvm_alloc_private_va_range()
+In-Reply-To: <CAC_TJvfTZP9+EKFFXQUeGOWJb=WK2Wkd53bPOX2gaz0Gh5o8OA@mail.gmail.com>
+References: <20220225033548.1912117-1-kaleshsingh@google.com>
+ <20220225033548.1912117-3-kaleshsingh@google.com>
+ <87v8ww6bl0.wl-maz@kernel.org>
+ <CAC_TJvfTZP9+EKFFXQUeGOWJb=WK2Wkd53bPOX2gaz0Gh5o8OA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
- will@kernel.org, drjones@redhat.com, liangpeng10@huawei.com, pshier@google.com,
- ricarkol@google.com, oupton@google.com, jingzhangos@google.com,
- rananta@google.com
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, will@kernel.org, qperret@google.com,
+ tabba@google.com, surenb@google.com, kernel-team@android.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, mark.rutland@arm.com, broonie@kernel.org,
+ mhiramat@kernel.org, pcc@google.com, madvenka@linux.microsoft.com,
+ ascull@google.com, pbonzini@redhat.com, ardb@kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, Will Deacon <will@kernel.org>,
+ Peter Collingbourne <pcc@google.com>,
+ "Cc: Android Kernel" <kernel-team@android.com>,
+ LKML <linux-kernel@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Suren Baghdasaryan <surenb@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,238 +100,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Reiji,
+Hi Kalesh,
 
-Please add a cover letter to your patches. It actually is important to
-track the changes as well as being an anchor in my email client.
-
-On Thu, 03 Mar 2022 03:54:07 +0000,
-Reiji Watanabe <reijiw@google.com> wrote:
+On Wed, 02 Mar 2022 17:24:53 +0000,
+Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> KVM allows userspace to configure either all EL1 32bit or 64bit vCPUs
-> for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
-> if the vcpu's register width is consistent with all other vCPUs'.
-> Since the checking is done even against vCPUs that are not initialized
-> (KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
-> are erroneously treated as 64bit vCPU, which causes the function to
-> incorrectly detect a mixed-width VM.
+> On Tue, Mar 1, 2022 at 11:46 PM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > On Fri, 25 Feb 2022 03:34:47 +0000,
+> > Kalesh Singh <kaleshsingh@google.com> wrote:
+> > >
+> > > pkvm_hyp_alloc_private_va_range() can be used to reserve private VA ranges
+> > > in the pKVM nVHE hypervisor (). Also update __pkvm_create_private_mapping()
+> > > to allow specifying an alignment for the private VA mapping.
+> > >
+> > > These will be used to implement stack guard pages for pKVM nVHE hypervisor
+> > > (in a subsequent patch in the series).
+> > >
+> > > Credits to Quentin Perret <qperret@google.com> for the idea of moving
+> > > private VA allocation out of __pkvm_create_private_mapping()
+> > >
+> > > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> > > ---
+> > >
+> > > Changes in v4:
+> > >   - Handle null ptr in pkvm_alloc_private_va_range() and replace
+> > >     IS_ERR_OR_NULL checks in callers with IS_ERR checks, per Fuad
+> > >   - Fix kernel-doc comments format, per Fuad
+> > >   - Format __pkvm_create_private_mapping() prototype args (< 80 col), per Fuad
+> > >
+> > > Changes in v3:
+> > >   - Handle null ptr in IS_ERR_OR_NULL checks, per Mark
+> > >
+> > > Changes in v2:
+> > >   - Allow specifying an alignment for the private VA allocations, per Marc
+> >
+> > I probably badly expressed my earlier concern.
+> >
+> > Yes, an alignment is necessary. But how often do we want an alignment
+> > that isn't naturally aligned to the size of the allocation (i.e. the
+> > power of 2 >= the size of the allocation)? This is what the rest of
+> > the kernel does (get_order() and co), and I thing we should follow
+> > this.
 > 
-> Introduce KVM_ARCH_FLAG_EL1_32BIT and KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED
-> bits for kvm->arch.flags.  A value of the EL1_32BIT bit indicates that
-> the guest needs to be configured with all 32bit or 64bit vCPUs, and
-> a value of the REG_WIDTH_CONFIGURED bit indicates if a value of the
-> EL1_32BIT bit is valid (already set up). Values in those bits are set at
-> the first KVM_ARM_VCPU_INIT for the guest based on KVM_ARM_VCPU_EL1_32BIT
-> configuration for the vCPU.
+> Hi Marc,
 > 
-> Check vcpu's register width against those new bits at the vcpu's
-> KVM_ARM_VCPU_INIT (instead of against other vCPUs' register width).
-> 
-> Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 25 +++++++++++------
->  arch/arm64/include/asm/kvm_host.h    |  8 ++++++
->  arch/arm64/kvm/arm.c                 | 41 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/reset.c               |  8 ------
->  4 files changed, 65 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index d62405ce3e6d..f4f960819888 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -20,6 +20,7 @@
->  #include <asm/ptrace.h>
->  #include <asm/cputype.h>
->  #include <asm/virt.h>
-> +#include <asm/kvm_mmu.h>
+> Thanks for clarifying. I think making the alignment implicitly based
+> on the size here will create unnecessary holes where PAGE_SIZE
+> alignment would be ok and potentially overflow the private VA space
+> earlier. Is it not a concern?
 
-Huh... I wish we didn't drag that one here, it is eventually going to
-hurt...
+I don't think we should worry too much about this. Even when building
+the kernel with a very small VA space (commonly 39 bits), we still
+have a quarter of that reserved for private EL2 mappings. That's
+pretty big.
 
->  
->  #define CURRENT_EL_SP_EL0_VECTOR	0x0
->  #define CURRENT_EL_SP_ELx_VECTOR	0x200
-> @@ -45,7 +46,14 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
->  
->  static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
->  {
-> -	return !(vcpu->arch.hcr_el2 & HCR_RW);
-> +	struct kvm *kvm;
-> +
-> +	kvm = is_kernel_in_hyp_mode() ? kern_hyp_va(vcpu->kvm) : vcpu->kvm;
+We will use a bit more of the memory that is set aside for EL2 page
+tables, but this shouldn't be a problem either.
 
-Errr... On first approximation, this is the wrong way around. A VHE
-kernel doesn't need any repainting of the address, while a nVHE kernel
-does. Even more, a bit of context:
-
-static inline bool is_kernel_in_hyp_mode(void)
-{
-	return read_sysreg(CurrentEL) == CurrentEL_EL2;
-}
-
-So not only the expression is the wrong way around, but it *cannot*
-distinguish VHE and nVHE when running at EL2. You're just lucky that
-the two bugs (on a single line) cancel each others.
-
-The only sane way to write this is to *not* look at the mode you're
-running in. kern_hyp_va() is designed to be nop'ed out on VHE.
-
-> +
-> +	WARN_ON_ONCE(!test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED,
-> +			       &kvm->arch.flags));
-> +
-> +	return test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
->  }
-
-Given that this is used on the vcpu switch fast path at least twice
-per run, we need something better. You probably want to offer
-different primitives depending on the context:
-
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index d62405ce3e6d..daea0885c28d 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -43,10 +43,22 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
- 
- void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
- 
-+#if defined (__KVM_VHE_HYPERVISOR__) || defined (__KVM_NVHE_HYPERVISOR__)
- static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- {
- 	return !(vcpu->arch.hcr_el2 & HCR_RW);
- }
-+#else
-+static inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+
-+	WARN_ON_ONCE(!test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED,
-+			       &kvm->arch_flags));
-+
-+	return test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
-+}
-+#endif
- 
-as you are guaranteed to have configured the width of the vcpu by the
-time you hit start messing with it in the context of the hypervisor.
-
->  
->  static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-> @@ -72,15 +80,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hcr_el2 |= HCR_TVM;
->  	}
->  
-> -	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
-> +	if (vcpu_el1_is_32bit(vcpu))
->  		vcpu->arch.hcr_el2 &= ~HCR_RW;
-> -
-> -	/*
-> -	 * TID3: trap feature register accesses that we virtualise.
-> -	 * For now this is conditional, since no AArch32 feature regs
-> -	 * are currently virtualised.
-> -	 */
-> -	if (!vcpu_el1_is_32bit(vcpu))
-> +	else
-> +		/*
-> +		 * TID3: trap feature register accesses that we virtualise.
-> +		 * For now this is conditional, since no AArch32 feature regs
-> +		 * are currently virtualised.
-> +		 */
->  		vcpu->arch.hcr_el2 |= HCR_TID3;
->  
->  	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 11a7ae747ded..5cde7f7b5042 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -125,6 +125,14 @@ struct kvm_arch {
->  #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
->  	/* Memory Tagging Extension enabled for the guest */
->  #define KVM_ARCH_FLAG_MTE_ENABLED			1
-> +	/*
-> +	 * The guest's EL1 register width.  A value of KVM_ARCH_FLAG_EL1_32BIT
-> +	 * bit is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED is set.
-> +	 * Otherwise, the guest's EL1 register width has not yet been
-> +	 * determined yet.
-> +	 */
-> +#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		2
-> +#define KVM_ARCH_FLAG_EL1_32BIT				3
->  	unsigned long flags;
->  
->  	/*
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 9a2d240ef6a3..9ac75aa46e2f 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -1101,6 +1101,43 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
->  	return -EINVAL;
->  }
->  
-> +/*
-> + * A guest can have either all EL1 32bit or 64bit vcpus only. It is
-> + * indicated by a value of KVM_ARCH_FLAG_EL1_32BIT bit in kvm->arch.flags,
-> + * which is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED in
-> + * kvm->arch.flags is set.
-> + * This function checks if the vCPU's register width configuration is
-> + * consistent with a value of the EL1_32BIT bit in kvm->arch.flags
-> + * when the REG_WIDTH_CONFIGURED bit is set.
-> + * Otherwise, the function sets a value of EL1_32BIT bit based on the vcpu's
-> + * KVM_ARM_VCPU_EL1_32BIT configuration (and sets the REG_WIDTH_CONFIGURED
-> + * bit of kvm->arch.flags).
-> + */
-> +static int kvm_register_width_check_or_init(struct kvm_vcpu *vcpu)
-
-The naming is positively Java-esque! How about kvm_set_vm_width()
-instead? Also, please document the error code.
-
-> +{
-> +	bool is32bit;
-> +	bool allowed = true;
-> +	struct kvm *kvm = vcpu->kvm;
-> +
-> +	is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
-> +
-> +	mutex_lock(&kvm->lock);
-> +
-> +	if (test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags)) {
-> +		allowed = (is32bit ==
-> +			   test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags));
-> +	} else {
-> +		if (is32bit)
-> +			set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
-
-nit: probably best written as:
-
-		__assign_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags, is32bit);
-
-> +
-> +		set_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags);
-
-Since this is only ever set whilst holding the lock, you can user the
-__set_bit() version.
-
-> +	}
-> +
-> +	mutex_unlock(&kvm->lock);
-> +
-> +	return allowed ? 0 : -EINVAL;
-> +}
-> +
->  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->  			       const struct kvm_vcpu_init *init)
->  {
-> @@ -1140,6 +1177,10 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
->  
->  	/* Now we know what it is, we can reset it. */
->  	ret = kvm_reset_vcpu(vcpu);
-> +
-> +	if (!ret)
-> +		ret = kvm_register_width_check_or_init(vcpu);
-
-Why is that called *after* resetting the vcpu, which itself relies on
-KVM_ARM_VCPU_EL1_32BIT, which we agreed to get rid of as much as
-possible?
+Thanks,
 
 	M.
 
