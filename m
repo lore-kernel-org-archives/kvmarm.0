@@ -2,47 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 401E1C433F5
-	for <kvmarm@archiver.kernel.org>; Fri,  4 Mar 2022 14:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D66C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  4 Mar 2022 14:57:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DD6349F0C;
-	Fri,  4 Mar 2022 09:27:36 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 07B8C4A0FC;
+	Fri,  4 Mar 2022 09:57:34 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nbHlgpv5A-mu; Fri,  4 Mar 2022 09:27:35 -0500 (EST)
+	with ESMTP id OlLVKW1Pn+Ol; Fri,  4 Mar 2022 09:57:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2380249F2F;
-	Fri,  4 Mar 2022 09:27:35 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D78094A100;
+	Fri,  4 Mar 2022 09:57:32 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 98A2849F26
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Mar 2022 09:27:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81D5B4A0FC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Mar 2022 09:57:32 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s7SMEBkprdCW for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Mar 2022 09:27:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 414EE49F0C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Mar 2022 09:27:33 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 562451424;
- Fri,  4 Mar 2022 06:27:32 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.22.160])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 109173F70D;
- Fri,  4 Mar 2022 06:27:30 -0800 (PST)
-Date: Fri, 4 Mar 2022 14:27:22 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Only open the interrupt window on exit due
- to an interrupt
-Message-ID: <YiIekBoAJqz4rI+Q@FVFF77S0Q05N>
-References: <20220304135914.1464721-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220304135914.1464721-1-maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id AkLsjYvh+z2i for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Mar 2022 09:57:31 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53B0349EBB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Mar 2022 09:57:31 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 27E2D619AC;
+ Fri,  4 Mar 2022 14:57:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 880F8C340F1;
+ Fri,  4 Mar 2022 14:57:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1646405849;
+ bh=7Ldz7YSA4Ps9qM53w7/XL0hJH0liwzBbGhFCg76DoUM=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=djD7WUAwKjFQ6Rd3Naa94CttQM5U8Ei0ivjUrivNahMlokBDPm4ZS5cTtWsSfqMEL
+ vhHaC4HD3x+imsKjYMiA/vjdsc3cDmLQN6RHb89IJlDpgwOaXcu/VnE2SkGr2VHX4G
+ y/I3XHCxMhtXMhJ6/jhZGfLaD4pziH4scVpRjoxdo7PvLOKvoAEd/WyyB8YOOMb7zr
+ JFp2eytiKlhJvzWp24xQjZ9dTAGvmP9NRA1dHgV5qbhiVtEaY5JtRD40rpJ3hhWuGK
+ ktEmJIzGN53ox3qPi1Uu3yMKMj/9aHlN+AdgDHTemYksdYn6FNkpzAEGDMao5G3d4G
+ gQDPlr/gWmG8g==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nQ9N1-00CFQC-6Z; Fri, 04 Mar 2022 14:57:27 +0000
+Date: Fri, 04 Mar 2022 14:57:26 +0000
+Message-ID: <87mti522ax.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v3 2/3] KVM: arm64: mixed-width check should be skipped
+ for uninitialized vCPUs
+In-Reply-To: <75e90ab4-141f-21a8-1559-f792b84d60fa@google.com>
+References: <20220303035408.3708241-1-reijiw@google.com>
+ <20220303035408.3708241-2-reijiw@google.com>
+ <87tucf10fg.wl-maz@kernel.org>
+ <75e90ab4-141f-21a8-1559-f792b84d60fa@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ will@kernel.org, drjones@redhat.com, liangpeng10@huawei.com, pshier@google.com,
+ ricarkol@google.com, oupton@google.com, jingzhangos@google.com,
+ rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -59,46 +93,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Mar 04, 2022 at 01:59:14PM +0000, Marc Zyngier wrote:
-> Now that we properly account for interrupts taken whilst the guest
-> was running, it becomes obvious that there is no need to open
-> this accounting window if we didn't exit because of an interrupt.
+On Fri, 04 Mar 2022 08:00:20 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
 > 
-> This saves a number of system register accesses and other barriers
-> if we exited for any other reason (such as a trap, for example).
+> > > +{
+> > > +     bool is32bit;
+> > > +     bool allowed = true;
+> > > +     struct kvm *kvm = vcpu->kvm;
+> > > +
+> > > +     is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
+> > > +
+> > > +     mutex_lock(&kvm->lock);
+> > > +
+> > > +     if (test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags)) {
+> > > +             allowed = (is32bit ==
+> > > +                        test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags));
+> > > +     } else {
+> > > +             if (is32bit)
+> > > +                     set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
+> > 
+> > nit: probably best written as:
+> > 
+> >                 __assign_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags, is32bit);
+> > 
+> > > +
+> > > +             set_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags);
+> > 
+> > Since this is only ever set whilst holding the lock, you can user the
+> > __set_bit() version.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Thank you for the proposal. But since other CPUs could attempt
+> to set other bits without holding the lock, I don't think we
+> can use the non-atomic version here.
 
-Acked-by: Mark Rutland <mark.rutland@arm.com>
+Ah, good point. Keep the atomic accesses then.
 
-Mark.
+> 
+> > 
+> > > +     }
+> > > +
+> > > +     mutex_unlock(&kvm->lock);
+> > > +
+> > > +     return allowed ? 0 : -EINVAL;
+> > > +}
+> > > +
+> > >  static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+> > >                              const struct kvm_vcpu_init *init)
+> > >  {
+> > > @@ -1140,6 +1177,10 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
+> > >
+> > >       /* Now we know what it is, we can reset it. */
+> > >       ret = kvm_reset_vcpu(vcpu);
+> > > +
+> > > +     if (!ret)
+> > > +             ret = kvm_register_width_check_or_init(vcpu);
+> > 
+> > Why is that called *after* resetting the vcpu, which itself relies on
+> > KVM_ARM_VCPU_EL1_32BIT, which we agreed to get rid of as much as
+> > possible?
+> 
+> That's because I didn't want to set EL1_32BIT/REG_WIDTH_CONFIGURED
+> for the guest based on the vCPU for which KVM_ARM_VCPU_INIT would fail.
+> The flags can be set in the kvm_reset_vcpu() and cleared in
+> case of failure.  But then that temporary value could lead
+> KVM_ARM_VCPU_INIT for other vCPUs to fail, which I don't think
+> is nice to do.
 
-> ---
->  arch/arm64/kvm/arm.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index fefd5774ab55..f49ebdd9c990 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -887,9 +887,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		 * context synchronization event) is necessary to ensure that
->  		 * pending interrupts are taken.
->  		 */
-> -		local_irq_enable();
-> -		isb();
-> -		local_irq_disable();
-> +		if (ARM_EXCEPTION_CODE(ret) == ARM_EXCEPTION_IRQ) {
-> +			local_irq_enable();
-> +			isb();
-> +			local_irq_disable();
-> +		}
->  
->  		guest_timing_exit_irqoff();
->  
-> -- 
-> 2.34.1
-> 
+But it also means that userspace is trying to create incompatible
+vcpus concurrently. Why should we care? We shouldn't even consider
+resetting the flags on failure, as userspace has already indicated its
+intention to create a 32 or 64bit VM.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
