@@ -2,73 +2,45 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C84C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  8 Mar 2022 15:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A52EC433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  8 Mar 2022 16:29:58 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 352B549EBA;
-	Tue,  8 Mar 2022 10:33:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F70549EC2;
+	Tue,  8 Mar 2022 11:29:57 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id glg7u1aMlmLw; Tue,  8 Mar 2022 10:33:32 -0500 (EST)
+	with ESMTP id x8N3zkeSWgt7; Tue,  8 Mar 2022 11:29:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26FF349EBF;
-	Tue,  8 Mar 2022 10:33:32 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E05149EAE;
+	Tue,  8 Mar 2022 11:29:56 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B419A49EBA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Mar 2022 10:33:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5790B49E48
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Mar 2022 11:29:55 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id THsgbSU9lbYi for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Mar 2022 10:33:29 -0500 (EST)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8BA1949EC3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Mar 2022 10:33:29 -0500 (EST)
-Received: by mail-wm1-f73.google.com with SMTP id
- l2-20020a1ced02000000b0038482a47e7eso1306185wmh.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Mar 2022 07:33:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=txkn166+EfY7PppLWw4qc4C+/p2UR63wD9i9h0OJBgQ=;
- b=pddi0OSiiw8dazmXtcwiTq02d0DXNRhXP19P0GEVAifH0Ov4Ygmouk8WLBNsu9/q+v
- Dj9KRSeqnZVQ7vnXFR5DjUv4Fk1xnfLYZ1cTi0r8sesB5VhXx6UA+PAhnDj/YuljOv+k
- tdGjM5YV/zTBAxZegz2pex89Qls2gA7Q6Md36Yu2vtwXZEHH0ylU0J9GZ4MXfqEuKMZr
- qxp+lvB07oZK+8N1oa7Rk6CiX5jp+cHL0j2i2xyZ8scfVf3tzCiGROaKUfaYC3bi/iWk
- H1tjc54tOH3qeYPD4OsY2+qmUO+jQ+5URHgCDXEhGIt9Kiue8pjF+MrBsm0zWe7F2Yxl
- QF1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=txkn166+EfY7PppLWw4qc4C+/p2UR63wD9i9h0OJBgQ=;
- b=J+j5DMK2UXNADM4Yvk7PhHEj9ndXFR5ADr/hGZSd9lfGAwrxrnk/xLCu9j4iye0OW7
- J1iGwbZwvWR7eg+RLDsBNVpfgoxy3no4Ft9w0ULTQj2W+fLMjXGO3wiCjP0zzJAHP/Lk
- JqacilShqbKe/qiUPicgWsw1jy33v6CaRrq5/eXuB3bm85Hkm/TenFjddq59+Ec6tQhP
- 1yqZStbInfI4kYUHCDnJ4inXbubiChe/EwrHIWBcojcZCC0XYqUNX7tkC/d8A4ueZhqD
- ov78oYFgY2Vm2yTnrCGAxCIWMtEGXO/cdGh0U0PUiCVtTcB+Zp4JE655NAVkBvNdj4NA
- 5hFA==
-X-Gm-Message-State: AOAM533YIGLJgJhgypX6XjegNZKy5rXSQieXwZbDwF0JiuDsOsl1fdAR
- YWZe0h+KPojbvrp1AMbS3Jzx5Nn+Y7lQBDT/DsU=
-X-Google-Smtp-Source: ABdhPJz9IthMw6tJSFg3E2QKBXXnsfAhoYP/pCCNOHYFKDxtU/RBheveh/HjrORqAbwIF/t6jLK8FonxU9aCB67mCdI=
-X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
- (user=sebastianene job=sendgmr) by
- 2002:a05:600c:27cb:b0:381:400d:3bba with
- SMTP id l11-20020a05600c27cb00b00381400d3bbamr4165855wmb.60.1646753608731;
- Tue, 08 Mar 2022 07:33:28 -0800 (PST)
-Date: Tue,  8 Mar 2022 15:32:30 +0000
-In-Reply-To: <20220308153227.2238533-1-sebastianene@google.com>
-Message-Id: <20220308153227.2238533-4-sebastianene@google.com>
-Mime-Version: 1.0
-References: <20220308153227.2238533-1-sebastianene@google.com>
-X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
-Subject: [PATCH kvmtool v9 3/3] Add --no-pvtime command line argument
-From: Sebastian Ene <sebastianene@google.com>
-To: kvm@vger.kernel.org
-Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
+ with ESMTP id DhhsH6pUnfMe for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Mar 2022 11:29:54 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB42049E34
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Mar 2022 11:29:53 -0500 (EST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6ADFB1516;
+ Tue,  8 Mar 2022 08:29:53 -0800 (PST)
+Received: from eglon.cambridge.arm.com (eglon.cambridge.arm.com [10.1.196.218])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CE273FA45;
+ Tue,  8 Mar 2022 08:29:52 -0800 (PST)
+From: James Morse <james.morse@arm.com>
+To: stable@vger.kernel.org,
+	kvmarm@lists.cs.columbia.edu
+Subject: [stable:PATCH] KVM: arm64: Reset PMC_EL0 to avoid a panic() on
+ systems with no PMU
+Date: Tue,  8 Mar 2022 16:29:39 +0000
+Message-Id: <20220308162939.603335-1-james.morse@arm.com>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Cc: Marc Zyngier <maz@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,30 +57,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The command line argument disables the stolen time functionality when is
-specified.
+The logic in commit 2a5f1b67ec57 "KVM: arm64: Don't access PMCR_EL0 when no
+PMU is available" relies on an empty reset handler being benign.  This was
+not the case in earlier kernel versions, so the stable backport of this
+patch is causing problems.
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
+KVMs behaviour in this area changed over time. In particular, prior to commit
+03fdfb269009 ("KVM: arm64: Don't write junk to sysregs on reset"), an empty
+reset handler will trigger a warning, as the guest registers have been
+poisoned.
+Prior to commit 20589c8cc47d ("arm/arm64: KVM: Don't panic on failure to
+properly reset system registers"), this warning was a panic().
+
+Instead of reverting the backport, make it write 0 to the sys_reg[] array.
+This keeps the reset logic happy, and the dodgy value can't be seen by
+the guest as it can't request the emulation.
+
+The original bug was accessing the PMCR_EL0 register on CPUs that don't
+implement that feature. There is no known silicon that does this, but
+v4.9's ACPI support is unable to find the PMU, so triggers this code:
+
+| Kernel panic - not syncing: Didn't reset vcpu_sys_reg(24)
+| CPU: 1 PID: 3055 Comm: lkvm Not tainted 4.9.302-00032-g64e078a56789 #13476
+| Hardware name: ARM LTD ARM Juno Development Platform/ARM Juno Development Platform, BIOS EDK II Jul 30 2018
+| Call trace:
+| [<ffff00000808b4b0>] dump_backtrace+0x0/0x1a0
+| [<ffff00000808b664>] show_stack+0x14/0x20
+| [<ffff0000088f0e18>] dump_stack+0x98/0xb8
+| [<ffff0000088eef08>] panic+0x118/0x274
+| [<ffff0000080b50e0>] access_actlr+0x0/0x20
+| [<ffff0000080b2620>] kvm_reset_vcpu+0x5c/0xac
+| [<ffff0000080ac688>] kvm_arch_vcpu_ioctl+0x3e4/0x490
+| [<ffff0000080a382c>] kvm_vcpu_ioctl+0x5b8/0x720
+| [<ffff000008201e44>] do_vfs_ioctl+0x2f4/0x884
+| [<ffff00000820244c>] SyS_ioctl+0x78/0x9c
+| [<ffff000008083a9c>] __sys_trace_return+0x0/0x4
+
+Cc: <stable@vger.kernel.org> # < v5.3 with 2a5f1b67ec57 backported
+Signed-off-by: James Morse <james.morse@arm.com>
 ---
- builtin-run.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/builtin-run.c b/builtin-run.c
-index 9a1a0c1..7c8be9d 100644
---- a/builtin-run.c
-+++ b/builtin-run.c
-@@ -128,6 +128,8 @@ void kvm_run_set_wrapper_sandbox(void)
- 			" rootfs"),					\
- 	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
- 			"Hugetlbfs path"),				\
-+	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
-+			" stolen time"),				\
- 									\
- 	OPT_GROUP("Kernel options:"),					\
- 	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 10d80456f38f..8d548fdbb6b2 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -451,8 +451,10 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	u64 pmcr, val;
+ 
+ 	/* No PMU available, PMCR_EL0 may UNDEF... */
+-	if (!kvm_arm_support_pmu_v3())
++	if (!kvm_arm_support_pmu_v3()) {
++		vcpu_sys_reg(vcpu, PMCR_EL0) = 0;
+ 		return;
++	}
+ 
+ 	pmcr = read_sysreg(pmcr_el0);
+ 	/*
 -- 
-2.35.1.616.g0bdcbb4464-goog
+2.30.2
 
 _______________________________________________
 kvmarm mailing list
