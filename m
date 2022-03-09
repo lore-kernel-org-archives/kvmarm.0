@@ -2,49 +2,58 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E872AC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Mar 2022 17:11:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 106B0C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Mar 2022 18:13:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DAE840C10;
-	Wed,  9 Mar 2022 12:11:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D7149EDE;
+	Wed,  9 Mar 2022 13:13:28 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YjhASg5+rApc; Wed,  9 Mar 2022 12:11:48 -0500 (EST)
+	with ESMTP id hvaN8ocbbr5C; Wed,  9 Mar 2022 13:13:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACF2349EB3;
-	Wed,  9 Mar 2022 12:11:48 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C39149E22;
+	Wed,  9 Mar 2022 13:13:27 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7701940C67
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2022 12:11:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A11B412AF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2022 13:13:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fxbI-DumqaAv for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2022 12:11:45 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3D6A40C10
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2022 12:11:45 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 42CA81691;
- Wed,  9 Mar 2022 09:11:45 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 226CA3F7F5;
- Wed,  9 Mar 2022 09:11:44 -0800 (PST)
-Date: Wed, 9 Mar 2022 17:12:05 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 2/2] arm/run: Fix using
- qemu-system-aarch64 to run aarch32 tests on aarch64
-Message-ID: <Yijf5TlbOKhV+Mw6@monolith.localdoman>
-References: <20220309162117.56681-1-alexandru.elisei@arm.com>
- <20220309162117.56681-3-alexandru.elisei@arm.com>
- <20220309165812.46xmnjek72yrv3g6@gator>
+ with ESMTP id H5obvHByrzfV for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2022 13:13:24 -0500 (EST)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C37141071
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2022 13:13:24 -0500 (EST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 754B861631;
+ Wed,  9 Mar 2022 18:13:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45ECCC340E8;
+ Wed,  9 Mar 2022 18:13:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1646849602;
+ bh=lyggJlXndKJKDnziS0BOwCX9JVHL04zmV0yEEEp8eGw=;
+ h=From:To:Cc:Subject:Date:From;
+ b=cIxCCctPMem2NI35nWHGiSJ5+I2A4y5VacGJ+61FL2HnZgfVbAAWqY9OHmcJ01RIs
+ EgKmez5rNwoevHVNayWlb3ey7cH5DVdVbUNTrSRNg+/A4ovH/ZN3gXrV7QHCg3DMtV
+ JskZ5L21U0tHd5g9clh0dmZUPxQKmnCDkC412PvIXwA1FkiMhUxYxB4tX2125NbyrJ
+ 5wlloMmq2RrGoSwWWxQUcAIvM7qZCJ6pwuiS7AZnXVzY4acOWPDJ+TrDPCbd4zH85U
+ 0w8fREeDpKTW9v/VlLtH70aa5KOHzAYtgKZ0+wRl2E2ZgNrufyhmqjGdevL0IrpL4P
+ Tcv5ZFToZvGsg==
+From: Will Deacon <will@kernel.org>
+To: kvmarm@lists.cs.columbia.edu
+Subject: [PATCH] KVM: arm64: Really propagate PSCI SYSTEM_RESET2 arguments to
+ userspace
+Date: Wed,  9 Mar 2022 18:13:08 +0000
+Message-Id: <20220309181308.982-1-will@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220309165812.46xmnjek72yrv3g6@gator>
-Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+Cc: maz@kernel.org, Will Deacon <will@kernel.org>,
+ Andrew Walbran <qwandor@google.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -61,78 +70,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Commit d43583b890e7 ("KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the
+guest") hooked up the SYSTEM_RESET2 PSCI call for guests but failed to
+preserve its arguments for userspace, instead overwriting them with
+zeroes via smccc_set_retval(). As Linux only passes zeroes for these
+arguments, this appeared to be working for Linux guests. Oh well.
 
-On Wed, Mar 09, 2022 at 05:58:12PM +0100, Andrew Jones wrote:
-> On Wed, Mar 09, 2022 at 04:21:17PM +0000, Alexandru Elisei wrote:
-> > From: Andrew Jones <drjones@redhat.com>
-> > 
-> > KVM on arm64 can create 32 bit and 64 bit VMs. kvm-unit-tests tries to
-> > take advantage of this by setting the aarch64=off -cpu option. However,
-> > get_qemu_accelerator() isn't aware that KVM on arm64 can run both types
-> > of VMs and it selects qemu-system-arm instead of qemu-system-aarch64.
-> > This leads to an error in premature_failure() and the test is marked as
-> > skipped:
-> > 
-> > $ ./run_tests.sh selftest-setup
-> > SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
-> > 
-> > Fix this by setting QEMU to the correct qemu binary before calling
-> > get_qemu_accelerator().
-> > 
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > [ Alex E: Added commit message, changed the logic to make it clearer ]
-> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > ---
-> >  arm/run | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/arm/run b/arm/run
-> > index 2153bd320751..5fe0a45c4820 100755
-> > --- a/arm/run
-> > +++ b/arm/run
-> > @@ -13,6 +13,11 @@ processor="$PROCESSOR"
-> >  ACCEL=$(get_qemu_accelerator) ||
-> >  	exit $?
-> >  
-> > +# KVM for arm64 can create a VM in either aarch32 or aarch64 modes.
-> > +if [ "$ACCEL" = kvm ] && [ -z "$QEMU" ] && [ "$HOST" = "aarch64" ]; then
-> > +	QEMU=qemu-system-aarch64
-> > +fi
-> > +
-> >  qemu=$(search_qemu_binary) ||
-> >  	exit $?
-> >  
-> > -- 
-> > 2.35.1
-> >
-> 
-> So there's a bug with this patch which was also present in the patch I
-> proposed. By setting $QEMU before we call search_qemu_binary() we may
-> force a "A QEMU binary was not found." failure even though a perfectly
-> good 'qemu-kvm' binary is present.
+Don't call smccc_set_retval() for a SYSTEM_RESET2 heading to userspace
+and instead set X0 (and only X0) explicitly to PSCI_RET_INTERNAL_FAILURE
+just in case the vCPU re-enters the guest.
 
-I noticed that search_qemu_binary() tries to search for both
-qemu-system-ARCH_NAME and qemu-kvm, and I first thought that qemu-kvm is a
-legacy name for qemu-system-ARCH_NAME.
+Fixes: d43583b890e7 ("KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the guest")
+Reported-by: Andrew Walbran <qwandor@google.com>
+Signed-off-by: Will Deacon <will@kernel.org>
+---
+ arch/arm64/kvm/psci.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-I just did some googling, and I think it's actually how certain distros (like
-SLES) package qemu-system-ARCH_NAME, is that correct?
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index ecb4b74cb12a..b0c920717632 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -367,14 +367,14 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+ 		if (minor >= 1) {
+ 			arg = smccc_get_arg1(vcpu);
+ 
+-			if (arg > PSCI_1_1_RESET_TYPE_SYSTEM_WARM_RESET &&
+-			    arg < PSCI_1_1_RESET_TYPE_VENDOR_START) {
+-				val = PSCI_RET_INVALID_PARAMS;
+-			} else {
++			if (arg <= PSCI_1_1_RESET_TYPE_SYSTEM_WARM_RESET ||
++			    arg >= PSCI_1_1_RESET_TYPE_VENDOR_START) {
+ 				kvm_psci_system_reset2(vcpu);
+-				val = PSCI_RET_INTERNAL_FAILURE;
+-				ret = 0;
++				vcpu_set_reg(vcpu, 0, PSCI_RET_INTERNAL_FAILURE);
++				return 0;
+ 			}
++
++			val = PSCI_RET_INVALID_PARAMS;
+ 			break;
+ 		};
+ 		fallthrough;
+-- 
+2.35.1.616.g0bdcbb4464-goog
 
-If that is so, one idea I toyed with (for something else) is to move the error
-messages from search_qemu_binary() to the call sites, that way arm/run can first
-try to find qemu-system-aarch64, then fallback to qemu-kvm, and only after both
-aren't found exit with an error. Just a suggestion, in case you find it useful.
-
-Thanks,
-Alex
-
-> 
-> I'll try to come up with something better.
-> 
-> Thanks,
-> drew
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
