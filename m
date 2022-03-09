@@ -2,88 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C50BC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  9 Mar 2022 16:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F69EC433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  9 Mar 2022 16:58:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DCA1749F16;
-	Wed,  9 Mar 2022 11:50:53 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CB09149E17;
+	Wed,  9 Mar 2022 11:58:27 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id s2T1qbiyqspu; Wed,  9 Mar 2022 11:50:52 -0500 (EST)
+	with ESMTP id bX-QGPaz9ZwC; Wed,  9 Mar 2022 11:58:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3B0649E36;
-	Wed,  9 Mar 2022 11:50:52 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A0D9249E3C;
+	Wed,  9 Mar 2022 11:58:26 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5180D49E1A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2022 11:50:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB2A249E35
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2022 11:58:25 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pmNmJoG+ew7c for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2022 11:50:50 -0500 (EST)
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com
- [209.85.128.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1A77349E17
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2022 11:50:50 -0500 (EST)
-Received: by mail-wm1-f44.google.com with SMTP id
- p184-20020a1c29c1000000b0037f76d8b484so1830532wmp.5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Mar 2022 08:50:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=ZgHou8MqoXhRtzbJoo/yhan8iXTUzQE6PBiS2FKYRVk=;
- b=ApCIZr+MN6aee2cgqpPw+PV2CFMmrVy6Tba9Ix98g0JMbS/aPhT2nRYGytV5+Ew1dK
- z0tHBjwNiHk8ULLoDS6I4IZtOD1vgXLJ6jKahOF+IevRmjrWjq4mt6e2HLiiL22auFD7
- MnRfKwypFDEgPWQJnHfOysoynPTsTdtaTl0uYlV7qZCkg7zwXRBiAvgulaFHIPHCW0x5
- Hnuu1IVwWai8BPnp6D9ccORnN9fLNaPf57yibDLFRvp1pBm3n06ltkKX9Je5tohqyKmH
- OCBB1atg/D7hEWIqw31e2vKDb8speQ438g9RZRyONaVt0go3FMRBOFD7EDZjPJEfAe+j
- YQcw==
+ with ESMTP id lmM-bPUXTUkx for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2022 11:58:24 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB38649E17
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2022 11:58:24 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1646845104;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=SAUeJG8UY6RhUcIGm8viMKGF/F+Mz8ELefSwyfTVQTI=;
+ b=f3dBURq/T4TKn6Hb4JHkwT9aZkapwPiHLE3Y+Lo3S0cDW1nL8aAPIeAxLYqa7HqCyzhWTd
+ ZJOXW1psRpvvf8bkTCxiQGM3C0wmLbaQjp7AnFa81wCCNmkCpflBRGd5UTynbB974i9b5z
+ yY8hPTJcT6KwN2H7GXwhfKK+42mouRA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-651-h3b5vQIiNV6OTKRq99tJvQ-1; Wed, 09 Mar 2022 11:58:23 -0500
+X-MC-Unique: h3b5vQIiNV6OTKRq99tJvQ-1
+Received: by mail-ej1-f71.google.com with SMTP id
+ og24-20020a1709071dd800b006dab87bec4fso1651791ejc.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Mar 2022 08:58:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=ZgHou8MqoXhRtzbJoo/yhan8iXTUzQE6PBiS2FKYRVk=;
- b=8LhB7OPY0At//uNemqLuUugOf8GE+3Vyyvb4fbTyUvNkgrYjMSaR72B4M7NUgJvb/7
- nepuc6VEq3qIkruTx2oyC5wP7D5bN+DwxO3Wr7WtDERzxW+AwjkCJwTh/7pfRmamDBJC
- QhC663p/Qm8ts0szDbGVYLMGa456jEvvewkE82bKAPOleZ3Kd87TcdmnUb3FUtVn+LC/
- mnejtlgRecBDfFb7JUOuCKnNsh7flbgh2xtZ0GhVyzD+J9MQpSBaVNeq28TEIvtQ1Eep
- IkIoM8HL+E1WGddVg5HM4MRk5J0x4osXSXkuQZBv8/C9GUh5MeyViUQ5yOf4z1MpeEYx
- HUNw==
-X-Gm-Message-State: AOAM533i5v18lYjLkOWhs5zOTU7InCdeBPjAP19iyyRUrvR3f5e/gaN+
- jQz5viHU3m+JnHipyeqf1tjB4A==
-X-Google-Smtp-Source: ABdhPJxsfLI0wVXG0HYqp8aGshE147e4FbNfGYA0n96plE+EG/lqB6ihUwJsiKwXUPa03ZDRH3qAhA==
-X-Received: by 2002:a05:600c:3b1c:b0:389:8677:6c73 with SMTP id
- m28-20020a05600c3b1c00b0038986776c73mr210606wms.192.1646844648795; 
- Wed, 09 Mar 2022 08:50:48 -0800 (PST)
-Received: from google.com ([2a00:79e0:d:210:24bb:c5c7:5788:287d])
+ bh=SAUeJG8UY6RhUcIGm8viMKGF/F+Mz8ELefSwyfTVQTI=;
+ b=bU243dJJfSqqqiuX3ULeyiNUSdtWBmiTHHB6J2HMt2Gsy2EMjaL6b9KIF5FmCDdVKE
+ fA90Ho/PMqiGio61YN+OINMmHGRT6lYW/no0wx1op3EtUSB++wSsQsx6G3Nr4JaAsDSW
+ daEjZGUSTdFY4BSmNV17CcVcCTU7j2tL+fJSsEOjZORa0enneraZxIDpGV2sOG/Xw2tl
+ 9P63cpRmj/K/MbtMxOn/npUumK87uspu5POP/7748+qM9wtZPEjcCHVHF28k54ibnXGW
+ i0VTMcCjNmBobjXphx4oiQXycY7JzIm57wSLzjjXJcwnkdyuFCvNLk6OAm5ck/nFhz5D
+ 2h7g==
+X-Gm-Message-State: AOAM530QEm1Wq1DYNSxsfHRroHyRCXXuGPqTRXg68YzkMQ5DtZcl6kh0
+ Ci94p8Utjd4Ez3UiMJjmc9drSnKiltzoiVJfSqAkRtsVXVjm57Ufw0SsJRXVoRo4rC+lcLqyjBw
+ Vg/sM4xzz8ID2nCrIDl7AUqP2
+X-Received: by 2002:a17:907:c1c:b0:6db:62b7:8357 with SMTP id
+ ga28-20020a1709070c1c00b006db62b78357mr637251ejc.536.1646845096314; 
+ Wed, 09 Mar 2022 08:58:16 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzLGi3RtaPnymESOcjh/lKXdPE2+WXXCEbhupK9tOpWsDHLVS5te2YjIiSdqV+8bbb7Q0NcVg==
+X-Received: by 2002:a17:907:c1c:b0:6db:62b7:8357 with SMTP id
+ ga28-20020a1709070c1c00b006db62b78357mr637236ejc.536.1646845096102; 
+ Wed, 09 Mar 2022 08:58:16 -0800 (PST)
+Received: from gator (cst-prg-78-140.cust.vodafone.cz. [46.135.78.140])
  by smtp.gmail.com with ESMTPSA id
- v20-20020a7bcb54000000b0037fa63db8aasm5972989wmj.5.2022.03.09.08.50.47
+ v2-20020a509d02000000b00412d53177a6sm1071505ede.20.2022.03.09.08.58.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Mar 2022 08:50:48 -0800 (PST)
-Date: Wed, 9 Mar 2022 16:50:45 +0000
-From: Quentin Perret <qperret@google.com>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v5 1/8] KVM: arm64: Introduce hyp_alloc_private_va_range()
-Message-ID: <Yija5cY6j/B25Psw@google.com>
-References: <20220307184935.1704614-1-kaleshsingh@google.com>
- <20220307184935.1704614-2-kaleshsingh@google.com>
- <CAE-0n52LmVRkrSNN=eJf+TYYnmesVjFv99nnetYvRWshm82rOg@mail.gmail.com>
- <CAC_TJvc6LYp95BXQc0DSBBBAZpYpixa+NyHKMLFWsBADD5Ubhg@mail.gmail.com>
+ Wed, 09 Mar 2022 08:58:15 -0800 (PST)
+Date: Wed, 9 Mar 2022 17:58:12 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [kvm-unit-tests PATCH 2/2] arm/run: Fix using
+ qemu-system-aarch64 to run aarch32 tests on aarch64
+Message-ID: <20220309165812.46xmnjek72yrv3g6@gator>
+References: <20220309162117.56681-1-alexandru.elisei@arm.com>
+ <20220309162117.56681-3-alexandru.elisei@arm.com>
 MIME-Version: 1.0
+In-Reply-To: <20220309162117.56681-3-alexandru.elisei@arm.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-In-Reply-To: <CAC_TJvc6LYp95BXQc0DSBBBAZpYpixa+NyHKMLFWsBADD5Ubhg@mail.gmail.com>
-Cc: "Cc: Android Kernel" <kernel-team@android.com>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, Will Deacon <will@kernel.org>,
- Peter Collingbourne <pcc@google.com>, Marc Zyngier <maz@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Stephen Boyd <swboyd@chromium.org>,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -100,32 +104,59 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tuesday 08 Mar 2022 at 15:09:18 (-0800), Kalesh Singh wrote:
-> On Tue, Mar 8, 2022 at 12:21 PM Stephen Boyd <swboyd@chromium.org> wrote:
-> > It looks odd to use an error pointer casted to unsigned long to return
-> > from an address allocation function. Why not pass a pointer for base
-> > like the function was written before and return an int from this
-> > function with 0 for success and negative error value?Otherwise some
-> > sort of define should made like DMA_MAPPING_ERROR and that can be used
-> > to indicate to the caller that the allocation failed, or a simple zero
-> > may work?
+On Wed, Mar 09, 2022 at 04:21:17PM +0000, Alexandru Elisei wrote:
+> From: Andrew Jones <drjones@redhat.com>
 > 
-> I wanted to keep consistent between the pkvm and traditional nvhe
-> code. I will refactor both *alloc_private_va_range() functions to take
-> a pointer and return an int error if that's preferred. There would
-> still be a case of this kind of cast in
-> __pkvm_create_private_mapping() which does return an unsigned long
-> address or ERR_PTR(...). It looks like it was made to return the
-> address to facilitate use as a hypercall (@Quentin CMIW).
+> KVM on arm64 can create 32 bit and 64 bit VMs. kvm-unit-tests tries to
+> take advantage of this by setting the aarch64=off -cpu option. However,
+> get_qemu_accelerator() isn't aware that KVM on arm64 can run both types
+> of VMs and it selects qemu-system-arm instead of qemu-system-aarch64.
+> This leads to an error in premature_failure() and the test is marked as
+> skipped:
+> 
+> $ ./run_tests.sh selftest-setup
+> SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
+> 
+> Fix this by setting QEMU to the correct qemu binary before calling
+> get_qemu_accelerator().
+> 
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> [ Alex E: Added commit message, changed the logic to make it clearer ]
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arm/run | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arm/run b/arm/run
+> index 2153bd320751..5fe0a45c4820 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -13,6 +13,11 @@ processor="$PROCESSOR"
+>  ACCEL=$(get_qemu_accelerator) ||
+>  	exit $?
+>  
+> +# KVM for arm64 can create a VM in either aarch32 or aarch64 modes.
+> +if [ "$ACCEL" = kvm ] && [ -z "$QEMU" ] && [ "$HOST" = "aarch64" ]; then
+> +	QEMU=qemu-system-aarch64
+> +fi
+> +
+>  qemu=$(search_qemu_binary) ||
+>  	exit $?
+>  
+> -- 
+> 2.35.1
+>
 
-Yep, passing everything by value was much easier to cross the EL1/EL2
-boundary as that avoids having the hypervisor map kernel memory and all
-that fun. But Stephen's point is fair, so no objection from to keep this
-little dance confined to the hypercall wrapper and make the function
-signature nicer and easier to use for the rest of the code.
+So there's a bug with this patch which was also present in the patch I
+proposed. By setting $QEMU before we call search_qemu_binary() we may
+force a "A QEMU binary was not found." failure even though a perfectly
+good 'qemu-kvm' binary is present.
 
-Cheers,
-Quentin
+I'll try to come up with something better.
+
+Thanks,
+drew
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
