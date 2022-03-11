@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F2CEC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Mar 2022 08:49:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8EFC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Mar 2022 08:49:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E5EF49ECA;
-	Fri, 11 Mar 2022 03:49:03 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67A2B49F3E;
+	Fri, 11 Mar 2022 03:49:04 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xWSkmiCcdFL8; Fri, 11 Mar 2022 03:49:01 -0500 (EST)
+	with ESMTP id 4OfJ6Hmpybze; Fri, 11 Mar 2022 03:49:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3C3149F01;
-	Fri, 11 Mar 2022 03:48:44 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 095B64B086;
+	Fri, 11 Mar 2022 03:48:45 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A988408A7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:26:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 753BB40C52
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:26:10 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QMjqnleFV+3x for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Mar 2022 19:26:07 -0500 (EST)
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
- [209.85.216.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E4FE40FF0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:26:07 -0500 (EST)
-Received: by mail-pj1-f73.google.com with SMTP id
- q9-20020a17090a7a8900b001bf0a7d9dfdso4239890pjf.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 16:26:07 -0800 (PST)
+ with ESMTP id 40isP4IIp5tu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Mar 2022 19:26:09 -0500 (EST)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C63F408C1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:26:09 -0500 (EST)
+Received: by mail-pl1-f202.google.com with SMTP id
+ z14-20020a170902ccce00b0014d7a559635so3534856ple.16
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 16:26:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=GR+ED1Eu59W4o3nJAyG55WZVxFJ9/aqXQ0I8zOq5KWw=;
- b=OaktuYZQ/pvIKWnmmZaGYUKQVLGED+tckPX6EQ/Hge7NnOHi+0dW6e3BHGTVrJ5LSe
- zYj8P0q2JukbFWsyULC/88FupX6jIBpbFfharxjl39QDAs9lanUyXICTSDK8cj3pDZOV
- WEWEMonrACc5oHh0JE70KDRZRDGPSgYrCPwzJsWJm+sQ1qVmyolq8NXGcq0IrnRYyig7
- nNTneUiLNKNAjzW7VEGLrEYY1dnIvKM+6ysBXeasZcBA2ng++NQvJ9sjXPuw854de0H0
- XQPTUr5op2/4j+/a0wymfSm9VmfA19cou++hpRyPqqizmjhN5tVB2h0HSqgqbNMKiYrm
- VL0g==
+ :cc; bh=Xxlsl5gMjKmF9SCaiAavzpq6LPoScWsJHzRFSDHyFso=;
+ b=cMEUZuguiW6pmIHu9LU3eoo1FDRnKfP07X6qrVJz+feSqP00edJurvJ6fZVCoGCvaJ
+ 5svA21y657lW0vnnvcB8DrJj0Wif0psmeyY8i7OHoLX//aZidsK2Kwctp17DBZkm6zks
+ bNqQTe153ijee74TbEx9ka/WwLu8NnHNmhJ3rzu0hVNv/X65IxxIaEZsKTVXiz3k0pq/
+ PXKVNpYhcW10Mo0GvokzU2pQFbCQGCYnnW5ERLDk3Bglg0cMtbS8FePSpbkv3zkxP4/+
+ HypkhlHZXg2YdqZQ+p9wkqmsfUp8Sg4/Y0BzNMC+ciXTAMJksdrkfNpcGpiny8WuXLFB
+ rq7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=GR+ED1Eu59W4o3nJAyG55WZVxFJ9/aqXQ0I8zOq5KWw=;
- b=ormnoN/KH25m+E8mERaDjH36T51EQI2zjfTrIysblI4BecayexLyrg1H15knhZiUWr
- to7+JF5isP33Vflq4xDTKbZ+n9A88hnWBDy32VgCKgTAq2QEN4H7TLHTZD979TGn4/uB
- xWTA3CTKy0YByl5GxRi6w2i1FLKD3PD1GTXvuLGPM7YXNa3kQ6xh9wLlh4Ie+T1CqDlH
- JTPyH3RoTo8AdoNwqDxRyguSbCAkJTF2Oxy85yovDF4FB55czKwizsysRGJGjAjOjAPB
- uxYxGg6MC7+FRiRAdCkkjY+jhZK6Y32UcoBwqWlphV481ZiI1yXCJbgt8dfO1cvWVEmM
- I+WQ==
-X-Gm-Message-State: AOAM532rTHNVuZUd7L2DZ/KEDdAUyCOYlEqFqS7GjKT1iJRTBKEC9udG
- XrVq2yAtWg7oxeTb96ksn9aGbC5phrDFzw==
-X-Google-Smtp-Source: ABdhPJzHaoRrrUKazsHH7xWX2bJBJdhTwzNXL7WwckHPvdlf9FodGi4JOJFbVyjzmnYSAL0OQxSui6or0+UizQ==
+ bh=Xxlsl5gMjKmF9SCaiAavzpq6LPoScWsJHzRFSDHyFso=;
+ b=wn6a1c6clMVBBtuSa1FddK3bld+43NPa8lU6hdgi+OsSksB5rETsy1XiyS4Yqq/OVU
+ Xo8Y1Wcf5YytPaX8AQXMtWo/RqjaeBpuaJPLWf7maLz2IxM2alTw9+BBs9i/WmNvY+iU
+ gae7d92LTyAFrWLg6lxj47ZGwOzWHA5HuqScpz5uNePhz8BAw74t+C2IZ2maJnGm2R06
+ 3CZBjuEsB66gn512W+AA5K9gs3KGkMp3BPq3qDoHkzxXvVJEJusPln+k1E9yhADJ5SQC
+ lYOMA2WrlWHlmOAibGIhuR4nF47SkasLqkxqr94XYxPWogRepEt1gMed7kkFvW5uuOoH
+ laDQ==
+X-Gm-Message-State: AOAM531iRdWtpAbZZra03Dp2/XmRtZGS7CzOFYb58CuY+L99C6MyPBU2
+ Gvv/YuYvuGERSXw01rVPoAHI6fllvVRFjw==
+X-Google-Smtp-Source: ABdhPJywweZjzvrfhg7epKsXyYUluoBQw2WEtYQ9qKQxDvH8uHrVK9h/VGrnh31BcpoNycSVrImYh5be0PAtHQ==
 X-Received: from dmatlack-heavy.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:7e4d:b0:14f:e295:5a41 with SMTP
- id a13-20020a1709027e4d00b0014fe2955a41mr7628012pln.27.1646958366783; Thu, 10
- Mar 2022 16:26:06 -0800 (PST)
-Date: Fri, 11 Mar 2022 00:25:23 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:17ca:b0:1bf:6188:cc00 with SMTP
+ id me10-20020a17090b17ca00b001bf6188cc00mr19161970pjb.2.1646958368553; Thu,
+ 10 Mar 2022 16:26:08 -0800 (PST)
+Date: Fri, 11 Mar 2022 00:25:24 +0000
 In-Reply-To: <20220311002528.2230172-1-dmatlack@google.com>
-Message-Id: <20220311002528.2230172-22-dmatlack@google.com>
+Message-Id: <20220311002528.2230172-23-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220311002528.2230172-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v2 21/26] KVM: Allow for different capacities in
- kvm_mmu_memory_cache structs
+Subject: [PATCH v2 22/26] KVM: Allow GFP flags to be passed when topping up
+ MMU caches
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Fri, 11 Mar 2022 03:48:42 -0500
@@ -99,268 +99,64 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
-declaration time rather than being fixed for all declarations. This will
-be used in a follow-up commit to declare an cache in x86 with a capacity
-of 512+ objects without having to increase the capacity of all caches in
-KVM.
-
-This change requires each cache now specify its capacity at runtime,
-since the cache struct itself no longer has a fixed capacity known at
-compile time. To protect against someone accidentally defining a
-kvm_mmu_memory_cache struct directly (without the extra storage), this
-commit includes a WARN_ON() in kvm_mmu_topup_memory_cache().
-
-This change, unfortunately, adds some grottiness to
-kvm_phys_addr_ioremap() in arm64, which uses a function-local (i.e.
-stack-allocated) kvm_mmu_memory_cache struct. Since C does not allow
-anonymous structs in functions, the new wrapper struct that contains
-kvm_mmu_memory_cache and the objects pointer array, must be named, which
-means dealing with an outer and inner struct. The outer struct can't be
-dropped since then there would be no guarantee the kvm_mmu_memory_cache
-struct and objects array would be laid out consecutively on the stack.
+This will be used in a subsequent commit to top-up MMU caches under the
+MMU lock with GFP_NOWAIT as part of eager page splitting.
 
 No functional change intended.
 
+Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/arm.c              |  1 +
- arch/arm64/kvm/mmu.c              | 13 +++++++++----
- arch/mips/include/asm/kvm_host.h  |  2 +-
- arch/mips/kvm/mips.c              |  2 ++
- arch/riscv/include/asm/kvm_host.h |  2 +-
- arch/riscv/kvm/vcpu.c             |  1 +
- arch/x86/include/asm/kvm_host.h   |  8 ++++----
- arch/x86/kvm/mmu/mmu.c            |  9 +++++++++
- include/linux/kvm_types.h         | 19 +++++++++++++++++--
- virt/kvm/kvm_main.c               | 10 +++++++++-
- 11 files changed, 55 insertions(+), 14 deletions(-)
+ include/linux/kvm_host.h | 1 +
+ virt/kvm/kvm_main.c      | 9 +++++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 5bc01e62c08a..1369415290dd 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -357,7 +357,7 @@ struct kvm_vcpu_arch {
- 	bool pause;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 252ee4a61b58..7d3a1f28beb2 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1335,6 +1335,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm);
  
- 	/* Cache some mmu pages needed inside spinlock regions */
--	struct kvm_mmu_memory_cache mmu_page_cache;
-+	DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
- 
- 	/* Target CPU and feature flags */
- 	int target;
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index ecc5958e27fe..5e38385be0ef 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -319,6 +319,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	vcpu->arch.target = -1;
- 	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
- 
-+	vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
- 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
- 
- 	/* Set up the timer */
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index bc2aba953299..940089ba65ad 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -765,7 +765,12 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- {
- 	phys_addr_t addr;
- 	int ret = 0;
--	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
-+	DEFINE_KVM_MMU_MEMORY_CACHE(cache) page_cache = {
-+		.cache = {
-+			.gfp_zero = __GFP_ZERO,
-+			.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
-+		},
-+	};
- 	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
- 				     KVM_PGTABLE_PROT_R |
-@@ -778,14 +783,14 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 	guest_ipa &= PAGE_MASK;
- 
- 	for (addr = guest_ipa; addr < guest_ipa + size; addr += PAGE_SIZE) {
--		ret = kvm_mmu_topup_memory_cache(&cache,
-+		ret = kvm_mmu_topup_memory_cache(&page_cache.cache,
- 						 kvm_mmu_cache_min_pages(kvm));
- 		if (ret)
- 			break;
- 
- 		spin_lock(&kvm->mmu_lock);
- 		ret = kvm_pgtable_stage2_map(pgt, addr, PAGE_SIZE, pa, prot,
--					     &cache);
-+					     &page_cache.cache);
- 		spin_unlock(&kvm->mmu_lock);
- 		if (ret)
- 			break;
-@@ -793,7 +798,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 		pa += PAGE_SIZE;
- 	}
- 
--	kvm_mmu_free_memory_cache(&cache);
-+	kvm_mmu_free_memory_cache(&page_cache.cache);
- 	return ret;
- }
- 
-diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
-index 717716cc51c5..935511d7fc3a 100644
---- a/arch/mips/include/asm/kvm_host.h
-+++ b/arch/mips/include/asm/kvm_host.h
-@@ -347,7 +347,7 @@ struct kvm_vcpu_arch {
- 	unsigned long pending_exceptions_clr;
- 
- 	/* Cache some mmu pages needed inside spinlock regions */
--	struct kvm_mmu_memory_cache mmu_page_cache;
-+	DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
- 
- 	/* vcpu's vzguestid is different on each host cpu in an smp system */
- 	u32 vzguestid[NR_CPUS];
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index a25e0b73ee70..45c7179144dc 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -387,6 +387,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 	if (err)
- 		goto out_free_gebase;
- 
-+	vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-+
- 	return 0;
- 
- out_free_gebase:
-diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-index 99ef6a120617..5bd4902ebda3 100644
---- a/arch/riscv/include/asm/kvm_host.h
-+++ b/arch/riscv/include/asm/kvm_host.h
-@@ -186,7 +186,7 @@ struct kvm_vcpu_arch {
- 	struct kvm_sbi_context sbi_context;
- 
- 	/* Cache pages needed to program page tables with spinlock held */
--	struct kvm_mmu_memory_cache mmu_page_cache;
-+	DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_cache);
- 
- 	/* VCPU power-off state */
- 	bool power_off;
-diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-index 624166004e36..6a5f5aa45bac 100644
---- a/arch/riscv/kvm/vcpu.c
-+++ b/arch/riscv/kvm/vcpu.c
-@@ -94,6 +94,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	/* Mark this VCPU never ran */
- 	vcpu->arch.ran_atleast_once = false;
-+	vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
- 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
- 
- 	/* Setup ISA features available to VCPU */
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 0f5a36772bdc..544dde11963b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -692,10 +692,10 @@ struct kvm_vcpu_arch {
- 	 */
- 	struct kvm_mmu *walk_mmu;
- 
--	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
--	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
--	struct kvm_mmu_memory_cache mmu_shadowed_translation_cache;
--	struct kvm_mmu_memory_cache mmu_page_header_cache;
-+	DEFINE_KVM_MMU_MEMORY_CACHE(mmu_pte_list_desc_cache);
-+	DEFINE_KVM_MMU_MEMORY_CACHE(mmu_shadow_page_cache);
-+	DEFINE_KVM_MMU_MEMORY_CACHE(mmu_shadowed_translation_cache);
-+	DEFINE_KVM_MMU_MEMORY_CACHE(mmu_page_header_cache);
- 
- 	/*
- 	 * QEMU userspace and the guest each have their own FPU state.
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index dd56b5b9624f..24e7e053e05b 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5817,12 +5817,21 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
- {
- 	int ret;
- 
-+	vcpu->arch.mmu_pte_list_desc_cache.capacity =
-+		KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
- 	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
- 	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
- 
-+	vcpu->arch.mmu_page_header_cache.capacity =
-+		KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
- 	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
- 	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
- 
-+	vcpu->arch.mmu_shadowed_translation_cache.capacity =
-+		KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-+
-+	vcpu->arch.mmu_shadow_page_cache.capacity =
-+		KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
- 	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
- 
- 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index ac1ebb37a0ff..579cf39986ec 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -83,14 +83,29 @@ struct gfn_to_pfn_cache {
-  * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
-  * holding MMU locks.  Note, these caches act more like prefetch buffers than
-  * classical caches, i.e. objects are not returned to the cache on being freed.
-+ *
-+ * The storage for the cache object pointers is laid out after the struct, to
-+ * allow different declarations to choose different capacities. The capacity
-+ * field defines the number of object pointers available after the struct.
-  */
- struct kvm_mmu_memory_cache {
- 	int nobjs;
-+	int capacity;
- 	gfp_t gfp_zero;
- 	struct kmem_cache *kmem_cache;
--	void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
-+	void *objects[];
- };
--#endif
-+
-+#define __DEFINE_KVM_MMU_MEMORY_CACHE(_name, _capacity)		\
-+	struct {						\
-+		struct kvm_mmu_memory_cache _name;		\
-+		void *_name##_objects[_capacity];		\
-+	}
-+
-+#define DEFINE_KVM_MMU_MEMORY_CACHE(_name) \
-+	__DEFINE_KVM_MMU_MEMORY_CACHE(_name, KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE)
-+
-+#endif /* KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE */
- 
- #define HALT_POLL_HIST_COUNT			32
- 
+ #ifdef KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
+ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
++int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min, gfp_t gfp);
+ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc);
+ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9581a24c3d17..1d849ba9529f 100644
+index 1d849ba9529f..7861874af1c8 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -371,9 +371,17 @@ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+@@ -367,7 +367,7 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+ 		return (void *)__get_free_page(gfp_flags);
+ }
+ 
+-int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
++int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min, gfp_t gfp)
  {
  	void *obj;
  
-+	/*
-+	 * The capacity fieldmust be initialized since the storage for the
-+	 * objects pointer array is laid out after the kvm_mmu_memory_cache
-+	 * struct and not known at compile time.
-+	 */
-+	if (WARN_ON(mc->capacity == 0))
-+		return -EINVAL;
-+
+@@ -382,7 +382,7 @@ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
  	if (mc->nobjs >= min)
  		return 0;
--	while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
-+	while (mc->nobjs < mc->capacity) {
- 		obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
+ 	while (mc->nobjs < mc->capacity) {
+-		obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
++		obj = mmu_memory_cache_alloc_obj(mc, gfp);
  		if (!obj)
  			return mc->nobjs >= min ? 0 : -ENOMEM;
+ 		mc->objects[mc->nobjs++] = obj;
+@@ -390,6 +390,11 @@ int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+ 	return 0;
+ }
+ 
++int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
++{
++	return __kvm_mmu_topup_memory_cache(mc, min, GFP_KERNEL_ACCOUNT);
++}
++
+ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc)
+ {
+ 	return mc->nobjs;
 -- 
 2.35.1.723.g4982287a31-goog
 
