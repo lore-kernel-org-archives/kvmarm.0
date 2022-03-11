@@ -2,47 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C652C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Mar 2022 11:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E9FCC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Mar 2022 17:09:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 09A1C49EBE;
-	Fri, 11 Mar 2022 06:18:39 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7200408AA;
+	Fri, 11 Mar 2022 12:09:02 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IdvRDNqC5IFG; Fri, 11 Mar 2022 06:18:37 -0500 (EST)
+	with ESMTP id f69Otabe3Iv5; Fri, 11 Mar 2022 12:09:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6191949EC5;
-	Fri, 11 Mar 2022 06:18:37 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9357E4076A;
+	Fri, 11 Mar 2022 12:09:01 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAC8349EC3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Mar 2022 06:18:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92AF640815
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Mar 2022 12:09:00 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g4uRLOpUsrLT for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Mar 2022 06:18:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C2E449EBE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Mar 2022 06:18:33 -0500 (EST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C3CC1175D;
- Fri, 11 Mar 2022 03:18:32 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C69F73FA45;
- Fri, 11 Mar 2022 03:18:31 -0800 (PST)
-Date: Fri, 11 Mar 2022 11:18:55 +0000
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Sebastian Ene <sebastianene@google.com>
-Subject: Re: [PATCH kvmtool v10 2/3] aarch64: Add stolen time support
-Message-ID: <YiswH2PGOB86gLNQ@monolith.localdoman>
-References: <20220309133422.2432649-1-sebastianene@google.com>
- <20220309133422.2432649-3-sebastianene@google.com>
+ with ESMTP id x25H7Yz3O5QC for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Mar 2022 12:08:59 -0500 (EST)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8801F40712
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Mar 2022 12:08:59 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1647018539;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=CGRRW1HyrjpX/mPdb1gMd4vnitCkHwitZW09OE4n8UI=;
+ b=EaLBSUAgC9GUeFFs5cIw/htfE2IZhHGdJnVQmHrDehHKRZKrRluU/gzJawLwrAWmM/4mT9
+ VyFH27NymFAIVhRkbwm01zoYrR1NS/G+JaRWSyOaHutN1HMLBGTNBocMPWeAh14F8bWnXv
+ +cjZhpiTW85+GbQB/+TFJiBKED9b3c0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-332-M_2iTGDXOeu-AwPOdsOApg-1; Fri, 11 Mar 2022 12:08:55 -0500
+X-MC-Unique: M_2iTGDXOeu-AwPOdsOApg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1144FC80;
+ Fri, 11 Mar 2022 17:08:54 +0000 (UTC)
+Received: from thuth.com (unknown [10.39.194.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7596E1059163;
+ Fri, 11 Mar 2022 17:08:53 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Andrew Jones <drjones@redhat.com>,
+	kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] arm: Fix typos
+Date: Fri, 11 Mar 2022 18:08:50 +0100
+Message-Id: <20220311170850.2911898-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220309133422.2432649-3-sebastianene@google.com>
-Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Cc: kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -59,260 +76,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+Correct typos which were discovered with the "codespell" utility.
 
-On Wed, Mar 09, 2022 at 01:34:23PM +0000, Sebastian Ene wrote:
-> This patch adds support for stolen time by sharing a memory region
-> with the guest which will be used by the hypervisor to store the stolen
-> time information. Reserve a 64kb MMIO memory region after the RTC peripheral
-> to be used by pvtime. The exact format of the structure stored by the
-> hypervisor is described in the ARM DEN0057A document.
-> 
-> Signed-off-by: Sebastian Ene <sebastianene@google.com>
-> ---
->  Makefile                               |  1 +
->  arm/aarch32/include/kvm/kvm-cpu-arch.h |  5 ++
->  arm/aarch64/arm-cpu.c                  |  2 +-
->  arm/aarch64/include/kvm/kvm-cpu-arch.h |  2 +
->  arm/aarch64/pvtime.c                   | 96 ++++++++++++++++++++++++++
->  arm/include/arm-common/kvm-arch.h      |  6 +-
->  arm/kvm-cpu.c                          |  1 +
->  include/kvm/kvm-config.h               |  1 +
->  8 files changed, 112 insertions(+), 2 deletions(-)
->  create mode 100644 arm/aarch64/pvtime.c
-> 
-> diff --git a/Makefile b/Makefile
-> index f251147..e9121dc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -182,6 +182,7 @@ ifeq ($(ARCH), arm64)
->  	OBJS		+= arm/aarch64/arm-cpu.o
->  	OBJS		+= arm/aarch64/kvm-cpu.o
->  	OBJS		+= arm/aarch64/kvm.o
-> +	OBJS		+= arm/aarch64/pvtime.o
->  	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
->  	ARCH_INCLUDE	+= -Iarm/aarch64/include
->  
-> diff --git a/arm/aarch32/include/kvm/kvm-cpu-arch.h b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> index 780e0e2..6fe0206 100644
-> --- a/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch32/include/kvm/kvm-cpu-arch.h
-> @@ -20,4 +20,9 @@ static inline int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
->  	return 0;
->  }
->  
-> +static inline int kvm_cpu__teardown_pvtime(struct kvm *kvm)
-> +{
-> +	return 0;
-> +}
-> +
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index d7572b7..7e4a3c1 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -22,7 +22,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
->  static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
->  {
->  	vcpu->generate_fdt_nodes = generate_fdt_nodes;
-> -	return 0;
-> +	return kvm_cpu__setup_pvtime(vcpu);
->  }
->  
->  static struct kvm_arm_target target_generic_v8 = {
-> diff --git a/arm/aarch64/include/kvm/kvm-cpu-arch.h b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> index 8dfb82e..35996dc 100644
-> --- a/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> +++ b/arm/aarch64/include/kvm/kvm-cpu-arch.h
-> @@ -19,5 +19,7 @@
->  
->  void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init);
->  int kvm_cpu__configure_features(struct kvm_cpu *vcpu);
-> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu);
-> +int kvm_cpu__teardown_pvtime(struct kvm *kvm);
->  
->  #endif /* KVM__KVM_CPU_ARCH_H */
-> diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-> new file mode 100644
-> index 0000000..720e9de
-> --- /dev/null
-> +++ b/arm/aarch64/pvtime.c
-> @@ -0,0 +1,96 @@
-> +#include "kvm/kvm.h"
-> +#include "kvm/kvm-cpu.h"
-> +#include "kvm/util.h"
-> +
-> +#include <linux/byteorder.h>
-> +#include <linux/types.h>
-> +
-> +#define ARM_PVTIME_STRUCT_SIZE		(64)
-> +
-> +static void *usr_mem;
-> +
-> +static int pvtime__alloc_region(struct kvm *kvm)
-> +{
-> +	char *mem;
-> +	int ret = 0;
-> +
-> +	mem = mmap(NULL, ARM_PVTIME_BASE, PROT_RW,
-> +		   MAP_ANON_NORESERVE, -1, 0);
-> +	if (mem == MAP_FAILED)
-> +		return -errno;
-> +
-> +	ret = kvm__register_ram(kvm, ARM_PVTIME_BASE,
-> +				ARM_PVTIME_BASE, mem);
-> +	if (ret) {
-> +		munmap(mem, ARM_PVTIME_BASE);
-> +		return ret;
-> +	}
-> +
-> +	usr_mem = mem;
-> +	return ret;
-> +}
-> +
-> +static int pvtime__teardown_region(struct kvm *kvm)
-> +{
-> +	if (usr_mem == NULL)
-> +		return 0;
-> +
-> +	kvm__destroy_mem(kvm, ARM_PVTIME_BASE,
-> +			 ARM_PVTIME_BASE, usr_mem);
-> +	munmap(usr_mem, ARM_PVTIME_BASE);
-> +	usr_mem = NULL;
-> +	return 0;
-> +}
-> +
-> +int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
-> +{
-> +	int ret;
-> +	bool has_stolen_time;
-> +	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
-> +		ARM_PVTIME_STRUCT_SIZE;
-> +	struct kvm_config *kvm_cfg = NULL;
-> +	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
-> +		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
-> +		.attr	= KVM_ARM_VCPU_PVTIME_IPA
-> +	};
-> +
-> +	kvm_cfg = &vcpu->kvm->cfg;
-> +	if (kvm_cfg->no_pvtime)
-> +		return 0;
-> +
-> +	has_stolen_time = kvm__supports_extension(vcpu->kvm,
-> +						  KVM_CAP_STEAL_TIME);
-> +	if (!has_stolen_time) {
-> +		kvm_cfg->no_pvtime = true;
-> +		return 0;
-> +	}
-> +
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &pvtime_attr);
-> +	if (ret) {
-> +		perror("KVM_HAS_DEVICE_ATTR failed\n");
-> +		goto out_err;
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ arm/cstart.S              | 2 +-
+ arm/gic.c                 | 2 +-
+ arm/micro-bench.c         | 2 +-
+ lib/arm64/asm/assembler.h | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-Nitpick: here we return -1 (ioctl() return value when it fails) instead of
-returning -errno. You can set ret = -errno before the perror() call (in
-case it also fails for some reason, thus changing the value of errno).
+diff --git a/arm/cstart.S b/arm/cstart.S
+index 2401d92..7036e67 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -44,7 +44,7 @@ start:
+ 
+ 	/*
+ 	 * set stack, making room at top of stack for cpu0's
+-	 * exception stacks. Must start wtih stackptr, not
++	 * exception stacks. Must start with stackptr, not
+ 	 * stacktop, so the thread size masking (shifts) work.
+ 	 */
+ 	ldr	sp, =stackptr
+diff --git a/arm/gic.c b/arm/gic.c
+index 1e3ea80..60457e2 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -909,7 +909,7 @@ static void test_its_pending_migration(void)
+ 	gicv3_lpi_rdist_disable(pe0);
+ 	gicv3_lpi_rdist_disable(pe1);
+ 
+-	/* lpis are interleaved inbetween the 2 PEs */
++	/* lpis are interleaved between the 2 PEs */
+ 	for (i = 0; i < 256; i++) {
+ 		struct its_collection *col = i % 2 ? collection[0] :
+ 						     collection[1];
+diff --git a/arm/micro-bench.c b/arm/micro-bench.c
+index c731b1d..8436612 100644
+--- a/arm/micro-bench.c
++++ b/arm/micro-bench.c
+@@ -265,7 +265,7 @@ static void timer_post(uint64_t ntimes, uint64_t *total_ticks)
+ {
+ 	/*
+ 	 * We use a 10msec timer to test the latency of PPI,
+-	 * so we substract the ticks of 10msec to get the
++	 * so we subtract the ticks of 10msec to get the
+ 	 * actual latency
+ 	 */
+ 	*total_ticks -= ntimes * (cntfrq / 100);
+diff --git a/lib/arm64/asm/assembler.h b/lib/arm64/asm/assembler.h
+index a271e4c..aa8c65a 100644
+--- a/lib/arm64/asm/assembler.h
++++ b/lib/arm64/asm/assembler.h
+@@ -32,7 +32,7 @@
+  * kvm-unit-tests has no concept of scheduling.
+  *
+  * 	op:		operation passed to dc instruction
+- * 	domain:		domain used in dsb instruciton
++ * 	domain:		domain used in dsb instruction
+  * 	addr:		starting virtual address of the region
+  * 	size:		size of the region
+  * 	Corrupts:	addr, size, tmp1, tmp2
+-- 
+2.27.0
 
-Not a big deal, but it changes the semantics of the return value for the
-function: below, for pvtime__alloc_region() we return -errno, but here we
-return -1. Someone who is debugging an error might print this return value
-and think that the ioctl() failed with error code EPERM (EPERM is 1), which
-is not a valid error code for ioctl() according to man 2 ioctl. It will
-also look rather strange for the perror to print the error message
-associated with a different error code than the error code that is returned
-from this function.
-
-> +	}
-> +
-> +	if (!usr_mem) {
-> +		ret = pvtime__alloc_region(vcpu->kvm);
-> +		if (ret) {
-> +			perror("Failed allocating pvtime region\n");
-> +			goto out_err;
-> +		}
-> +	}
-> +
-> +	pvtime_attr.addr = (u64)&pvtime_guest_addr;
-> +	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &pvtime_attr);
-> +	if (!ret)
-> +		return 0;
-
-Nitpick: same here, ret must be set to -errno before returning.
-
-> +
-> +	perror("KVM_SET_DEVICE_ATTR failed\n");
-> +	pvtime__teardown_region(vcpu->kvm);
-> +out_err:
-> +	return ret;
-> +}
-> +
-> +int kvm_cpu__teardown_pvtime(struct kvm *kvm)
-> +{
-> +	return pvtime__teardown_region(kvm);
-> +}
-> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-> index c645ac0..43b1f77 100644
-> --- a/arm/include/arm-common/kvm-arch.h
-> +++ b/arm/include/arm-common/kvm-arch.h
-> @@ -15,7 +15,8 @@
->   * |  PCI  |////| plat  |       |        |     |         |
->   * |  I/O  |////| MMIO: | Flash | virtio | GIC |   PCI   |  DRAM
->   * | space |////| UART, |       |  MMIO  |     |  (AXI)  |
-> - * |       |////| RTC   |       |        |     |         |
-> + * |       |////| RTC,  |       |        |     |         |
-> + * |       |////| PVTIME|       |        |     |         |
->   * +-------+----+-------+-------+--------+-----+---------+---......
->   */
->  
-> @@ -34,6 +35,9 @@
->  #define ARM_RTC_MMIO_BASE	(ARM_UART_MMIO_BASE + ARM_UART_MMIO_SIZE)
->  #define ARM_RTC_MMIO_SIZE	0x10000
->  
-> +#define ARM_PVTIME_BASE		(ARM_RTC_MMIO_BASE + ARM_RTC_MMIO_SIZE)
-> +#define ARM_PVTIME_SIZE		SZ_64K
-> +
->  #define KVM_FLASH_MMIO_BASE	(ARM_MMIO_AREA + 0x1000000)
->  #define KVM_FLASH_MAX_SIZE	0x1000000
->  
-> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> index 84ac1e9..00660d6 100644
-> --- a/arm/kvm-cpu.c
-> +++ b/arm/kvm-cpu.c
-> @@ -144,6 +144,7 @@ void kvm_cpu__arch_nmi(struct kvm_cpu *cpu)
->  
->  void kvm_cpu__delete(struct kvm_cpu *vcpu)
->  {
-> +	kvm_cpu__teardown_pvtime(vcpu->kvm);
->  	free(vcpu);
->  }
->  
-> diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-> index 6a5720c..48adf27 100644
-> --- a/include/kvm/kvm-config.h
-> +++ b/include/kvm/kvm-config.h
-> @@ -62,6 +62,7 @@ struct kvm_config {
->  	bool no_dhcp;
->  	bool ioport_debug;
->  	bool mmio_debug;
-> +	bool no_pvtime;
->  };
->  
->  #endif
-> -- 
-
-Tested the series, a guest is able to detect pvtime:
-
-[    0.008661] arm-pv: using stolen time PV
-
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-With the two nitpicks above fixed, the patch looks correct to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
