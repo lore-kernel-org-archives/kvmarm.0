@@ -2,70 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A7FC433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92505C433F5
 	for <kvmarm@archiver.kernel.org>; Fri, 11 Mar 2022 08:48:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DD4249F2C;
-	Fri, 11 Mar 2022 03:48:51 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EDDA49F21;
+	Fri, 11 Mar 2022 03:48:52 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UlBMWFRgmbVA; Fri, 11 Mar 2022 03:48:50 -0500 (EST)
+	with ESMTP id 7vOtqBbUvDol; Fri, 11 Mar 2022 03:48:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 683BB49F3E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EB3349F46;
 	Fri, 11 Mar 2022 03:48:43 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08A43410F7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:25:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40A2140C67
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:25:49 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yJA534f6uClM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Mar 2022 19:25:46 -0500 (EST)
+ with ESMTP id s+mlalEqhTpC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Mar 2022 19:25:48 -0500 (EST)
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
  [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1DA141021
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:25:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0028740CF5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:25:47 -0500 (EST)
 Received: by mail-pg1-f201.google.com with SMTP id
- i4-20020a63b304000000b0038108d6e7cdso318337pgf.14
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 16:25:45 -0800 (PST)
+ 9-20020a630509000000b0037c8607d296so3773014pgf.22
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 16:25:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=hUhTNfsRlcAhlCAEwuaf6qTSRETsPLu85xICgb6Pw2I=;
- b=Ux2f+mr/mK9ysuQSi/sBCmxVVqyTzZtZcuO+SYe9GBnc8TQpBaRNkuO26UcTq9+K7m
- 9XCEug+JYAx7QgnxtFzMKpDzCZ2Kl3NLGHYaMWkmd4Ic4q6ryxK1fh3eirtILH29GWRl
- y4ndBbNMnsnmerSi8z/TQIBMaNCb13Zxm6I81Hm3D5/Iw1XB83q9r0puc/5thPme9yUe
- 5CQHUvdH3HOyCN2dpgX6tbRevneUEVUCc5bYxwqg6D0Njsn05gMV/tq0tNKd8PUtrCZL
- TKX0vUgoYTO6j6iEsFtBVDflNzJ0qcKCJCSdpf3D5PzBxpdR1jblF6G0g4UsVDlY5RTe
- t19g==
+ :cc; bh=V/b+716hREpGluS5au7SFvhvrZUH1mP5ZRBJUo2aKek=;
+ b=NrOteM9lQZRLTvGjh7Vk2YOgkSJONBJ9EpO+Rh0e4cd73vulmGH+hFimtPt0gE+8Ho
+ k8JVHCrbIF0zjGII7zgfaIT8k7/FKxKSqC1qy+gJKY1Fn2gJfg1PT4ql7x80T5MMdSaX
+ bC9lIGSQ2dpF23XdAOIxEeUHf4ph7pFTmtW6mlo8a7I2IbuHRD/FW6U8cEQZUD+p+OvW
+ NX7TXaXYU4um5GdK+Pbvp3NhR93SLOD1Grc7+fg58Gq5DdoJsaPOmjlVu9RAJc+vFAXt
+ UqlKZqaxGUd8fVlMc0DOlFb8fnPCoA2kMW1cjgW7bS5hxnqYubmgtW/N6whS2ZNh3U3y
+ 2nmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=hUhTNfsRlcAhlCAEwuaf6qTSRETsPLu85xICgb6Pw2I=;
- b=QsXTafz/Ow+rVZWBzasn5L48wYmOgLC0TsJCT4FGm4tNP0dlGJN5e4ARtRgPMJzgsj
- EeWQymngnSejvFO3ancdUEsDrR3ijO1/nBTOgPOfiDtTgj5VaG4tpgMq9ZAP+q+E+mFq
- ea+jq8EK7qcn2f2iq1KDm+xhRn7RjSfWPCWojuIm/lgt/qwcRxOvOUqP7wghrSF3hDX8
- 4LPbxrPfkTq4vOKZ9yYseAfCQdEMqFMys9YTa9KxJMhBqP01Cc5laFTjuNp/pkx+XTBH
- Cb07bsQ4LskcCeeHddF509Km6Gh6LAUvSqKfZUJOBfLHVbJ/Bdu8KaXoOJd0WBMPem1R
- FaYw==
-X-Gm-Message-State: AOAM531SVpexKMZq7l1seThbDctPFb5KEDXhlkc7sFG5xt8+TlBbd5V4
- NFbqZs6SJagZRuxqWVN+FSGa82045BJ2uQ==
-X-Google-Smtp-Source: ABdhPJyVkv6e6MFwOzwVPNnjhMEMTwjec6c9yLeYXj0Dnt6k4PAJzbfaJIjMW+/lDxdSlSq9DXN35GK1V5t4+g==
+ bh=V/b+716hREpGluS5au7SFvhvrZUH1mP5ZRBJUo2aKek=;
+ b=Q7L6uHBiA7TUj5zJn6RUpdUHx7sZQNoiXL4lr3x0bM/QQwOLcW87ur3pjEMlzGlkqm
+ 0eGh5BakuLQ/UQARTlk0X9M/2zlzduXYuKqMiywY7HYr4za8N6XncQpWSeA1TzbeKBla
+ SAADwmwKB0eF5vhs3R4KoUADfTqKJLchmdrOJJg2FOeM1nzs9MWNeswuoh81cSueP/KU
+ hI2LixIyLQDYTm9eIobd3ob9lfGXPjbWWySvlmwwCeDYGwStFMLNbGY36d7jrN/KqrD/
+ skfLPmgnOZP5xhTpD+HFnYtCc7qJJZ85Uj6d2NrQnB6Q4TF1/4L9qCX7RLY+yfoRLd4M
+ F94A==
+X-Gm-Message-State: AOAM533mD74IRmTLsFwTnLWjQpAd19Hq1hilbzPovQbJfGbVIJjzLljD
+ k7N5EnvRJjT9zJCydb+ZFvbVK1Fgg8H4IA==
+X-Google-Smtp-Source: ABdhPJwJMvWtF2+lcHehUS9eYrjqEwNfEYfhcTLqNJ3E9xEg/1eZ72BHS9KkgILyrBX8MA8OHqfLuhNcfwn1aQ==
 X-Received: from dmatlack-heavy.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a63:9d8c:0:b0:378:4b73:5b3b with SMTP id
- i134-20020a639d8c000000b003784b735b3bmr6119017pgd.564.1646958344889; Thu, 10
- Mar 2022 16:25:44 -0800 (PST)
-Date: Fri, 11 Mar 2022 00:25:10 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:4d81:b0:1bf:8ce4:4f51 with SMTP
+ id oj1-20020a17090b4d8100b001bf8ce44f51mr322556pjb.0.1646958346675; Thu, 10
+ Mar 2022 16:25:46 -0800 (PST)
+Date: Fri, 11 Mar 2022 00:25:11 +0000
 In-Reply-To: <20220311002528.2230172-1-dmatlack@google.com>
-Message-Id: <20220311002528.2230172-9-dmatlack@google.com>
+Message-Id: <20220311002528.2230172-10-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220311002528.2230172-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v2 08/26] KVM: x86/mmu: Link spt to sp during allocation
+Subject: [PATCH v2 09/26] KVM: x86/mmu: Move huge page split sp allocation
+ code to mmu.c
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Fri, 11 Mar 2022 03:48:42 -0500
@@ -98,55 +99,138 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Link the shadow page table to the sp (via set_page_private()) during
-allocation rather than initialization. This is a more logical place to
-do it because allocation time is also where we do the reverse link
-(setting sp->spt).
+Move the code that allocates a new shadow page for splitting huge pages
+into mmu.c. Currently this code is only used by the TDP MMU but it will
+be reused in subsequent commits to also split huge pages mapped by the
+shadow MMU.
 
-This creates one extra call to set_page_private(), but having multiple
-calls to set_page_private() is unavoidable anyway. We either do
-set_page_private() during allocation, which requires 1 per allocation
-function, or we do it during initialization, which requires 1 per
-initialization function.
+While here, also shove the GFP complexity down into the allocation
+function so that it does not have to be duplicated when the shadow MMU
+needs to start allocating SPs for splitting.
 
 No functional change intended.
 
-Suggested-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 34 +++++++++++++++++++++++++++++++++
+ arch/x86/kvm/mmu/mmu_internal.h |  2 ++
+ arch/x86/kvm/mmu/tdp_mmu.c      | 34 ++-------------------------------
+ 3 files changed, 38 insertions(+), 32 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index af60922906ef..eecb0215e636 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -274,6 +274,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
- 
- 	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
- 	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-+	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
- 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e866e05c4ba5..c12d5016f6dc 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1722,6 +1722,40 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
  	return sp;
  }
-@@ -281,8 +282,6 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
- static void tdp_mmu_init_sp(struct kvm_mmu_page *sp, tdp_ptep_t sptep,
- 			    gfn_t gfn, union kvm_mmu_page_role role)
- {
--	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
--
- 	sp->role = role;
- 	sp->gfn = gfn;
- 	sp->ptep = sptep;
-@@ -1410,6 +1409,8 @@ static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
- 		return NULL;
- 	}
  
++/*
++ * Allocate a new shadow page, potentially while holding the MMU lock.
++ *
++ * Huge page splitting always uses direct shadow pages since the huge page is
++ * being mapped directly with a lower level page table. Thus there's no need to
++ * allocate the gfns array.
++ */
++struct kvm_mmu_page *kvm_mmu_alloc_direct_sp_for_split(bool locked)
++{
++	struct kvm_mmu_page *sp;
++	gfp_t gfp;
++
++	/*
++	 * If under the MMU lock, use GFP_NOWAIT to avoid direct reclaim (which
++	 * is slow) and to avoid making any filesystem callbacks (which can end
++	 * up invoking KVM MMU notifiers, resulting in a deadlock).
++	 */
++	gfp = (locked ? GFP_NOWAIT : GFP_KERNEL) | __GFP_ACCOUNT | __GFP_ZERO;
++
++	sp = kmem_cache_alloc(mmu_page_header_cache, gfp);
++	if (!sp)
++		return NULL;
++
++	sp->spt = (void *)__get_free_page(gfp);
++	if (!sp->spt) {
++		kmem_cache_free(mmu_page_header_cache, sp);
++		return NULL;
++	}
++
 +	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
 +
- 	return sp;
++	return sp;
++}
++
+ static void mark_unsync(u64 *spte);
+ static void kvm_mmu_mark_parents_unsync(struct kvm_mmu_page *sp)
+ {
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 1bff453f7cbe..a0648e7ddd33 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -171,4 +171,6 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+ void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+ void unaccount_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+ 
++struct kvm_mmu_page *kvm_mmu_alloc_direct_sp_for_split(bool locked);
++
+ #endif /* __KVM_X86_MMU_INTERNAL_H */
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index eecb0215e636..1a43f908d508 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1393,43 +1393,13 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
+ 	return spte_set;
  }
  
+-static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
+-{
+-	struct kvm_mmu_page *sp;
+-
+-	gfp |= __GFP_ZERO;
+-
+-	sp = kmem_cache_alloc(mmu_page_header_cache, gfp);
+-	if (!sp)
+-		return NULL;
+-
+-	sp->spt = (void *)__get_free_page(gfp);
+-	if (!sp->spt) {
+-		kmem_cache_free(mmu_page_header_cache, sp);
+-		return NULL;
+-	}
+-
+-	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+-
+-	return sp;
+-}
+-
+ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+ 						       struct tdp_iter *iter,
+ 						       bool shared)
+ {
+ 	struct kvm_mmu_page *sp;
+ 
+-	/*
+-	 * Since we are allocating while under the MMU lock we have to be
+-	 * careful about GFP flags. Use GFP_NOWAIT to avoid blocking on direct
+-	 * reclaim and to avoid making any filesystem callbacks (which can end
+-	 * up invoking KVM MMU notifiers, resulting in a deadlock).
+-	 *
+-	 * If this allocation fails we drop the lock and retry with reclaim
+-	 * allowed.
+-	 */
+-	sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT);
++	sp = kvm_mmu_alloc_direct_sp_for_split(true);
+ 	if (sp)
+ 		return sp;
+ 
+@@ -1441,7 +1411,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+ 		write_unlock(&kvm->mmu_lock);
+ 
+ 	iter->yielded = true;
+-	sp = __tdp_mmu_alloc_sp_for_split(GFP_KERNEL_ACCOUNT);
++	sp = kvm_mmu_alloc_direct_sp_for_split(false);
+ 
+ 	if (shared)
+ 		read_lock(&kvm->mmu_lock);
 -- 
 2.35.1.723.g4982287a31-goog
 
