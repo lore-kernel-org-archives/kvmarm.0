@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3008CC433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 11 Mar 2022 08:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 104ADC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 11 Mar 2022 08:48:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1BAA49EE2;
-	Fri, 11 Mar 2022 03:48:55 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEDC049EEA;
+	Fri, 11 Mar 2022 03:48:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VH1sFg1-Nwwp; Fri, 11 Mar 2022 03:48:54 -0500 (EST)
+	with ESMTP id KeEjDX4PVSu7; Fri, 11 Mar 2022 03:48:55 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7B4949F56;
-	Fri, 11 Mar 2022 03:48:43 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0414449F5A;
+	Fri, 11 Mar 2022 03:48:44 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 422C740FAC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:25:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6D5540CF5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:25:56 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ey4kHCTd2NYv for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Mar 2022 19:25:54 -0500 (EST)
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
- [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0FC1040BBF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:25:54 -0500 (EST)
-Received: by mail-pj1-f74.google.com with SMTP id
- lt6-20020a17090b354600b001bf5a121802so4179162pjb.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 16:25:53 -0800 (PST)
+ with ESMTP id KHewJo42ruaM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 10 Mar 2022 19:25:55 -0500 (EST)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9317D40C31
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 19:25:55 -0500 (EST)
+Received: by mail-pg1-f202.google.com with SMTP id
+ b18-20020a63d812000000b0037e1aa59c0bso3774989pgh.12
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Mar 2022 16:25:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=v7qCsbgsr/gR22mozQcF+sQ2jUkkViok2U86H9+3SCg=;
- b=sxbiv6bxYZKji+KMkwgFhZgmKilK+x7JKaeklm0aaY/0tPHo6PqSDrSP8HWopQYwNb
- nYjE55/Ylu41BjN1Wr8tR6Vj6dzqCF34FD3W/C18qtOwHO8+ZBiBG1Y+12IK5ZU+3UoP
- CC+BQNMbs5hN4UK+uFlYFs4kOqkifWM+N5qlJK7DTJ7axe2fdbrrMPmRjJrIVbzuWq0r
- 3k81g/OAwBL5gKGcgy6IkuE3EHezxxR9kafqxsj1rgsGhwauVhdI2uyKyMeYKz8leCWX
- I4Bqze8qQcKReoPNBhoTBprcMm2NQA/bx4Z1RgJ2wXF5sWAbMswIfJlKoVg2OV4VMNvY
- kgtw==
+ :cc; bh=trCyse6kc5VaWQEWZpkBTeyDB9juUOFht/HeyrHGEd0=;
+ b=ITUQYvDkX2h3RQafxt+nm82/5781iHDiISy4DhTqmrro4/iNkPMsCBDlg8t8eB6+vW
+ WoKsbJ7zeDrbOuwfTkcWOWIHcZkJGUw2d4r+98Smj6dBLngOlw908mgtDChj3UyeFl76
+ FyOJizpm4NSOQnGdgQxrZIN82+kY5NHA6X6TJmku0dL5yKt8RAtw/MBwBf3lvsO9ufHQ
+ Dqd5AKP8PlHMHCKEXNTDH4MaONsDnd2Q9BRw9Kd7sIUZhnRm7oa9dS0kBigX9ayD9ejf
+ EqqRiqfDXYoPw8fi+Fl3DZk+QJK6k5SwEwYznvLftMTTXWKnvbsNNkitPFK/djwTdGSR
+ vCjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=v7qCsbgsr/gR22mozQcF+sQ2jUkkViok2U86H9+3SCg=;
- b=bqd4Vt0z5cA7KAX89uDkYZDz7xaE9HqeXHzqcs5yv2T+TNEA/AM/X1jMzcZLjzVqpB
- Fnt5Jk6Ra8c+MO8GPbgf9P0Xlh5LfJUc+Pn3P3zqlaq1nJ6GXdNtpX1J5CUtjyhlYUgH
- Kn1raxuzjArLOV/rWhox+qkvHiXQjR/ifcwKyvHXgKXK+LTIRKOYG6sZZnI6UDL74d2M
- Rx9SQMnO6aChyyuedv2tLegfrDYvT3uJQ7CmK/kj4X0Badu/gB2tYXLTaf+WFWc8Ln7q
- g5BK18yTj/hotQWazlIVKGZ9Vtsg7eetx9M36cAp1KxIVd8FQNaxeUVcuZpx8+a+2/HN
- aYwg==
-X-Gm-Message-State: AOAM532oedKCovwgZQbkPLqD4z1fRbZM583w1Zyk/A2zpJmsejzNrsOw
- C0gW09QbrzHDyIl8wTjYSsVjXBQ7QYGfRg==
-X-Google-Smtp-Source: ABdhPJzvjuqM/MeknIQuH530q9QhRKE8ELO29h5EvZaK896mLaUdORuS4wDYPcFM+SuVielHfBcrazhJK1uDSA==
+ bh=trCyse6kc5VaWQEWZpkBTeyDB9juUOFht/HeyrHGEd0=;
+ b=Gr2LA6/PBZdbkUy7xFTtwtto2UicXXLMwzFv0FJ1DE/Gw8IY+cqPL25QfkrGrmncOg
+ SB+fZL1lM9Aq4Q6bowKG1LZwq6xHy25GKnxujMyaHsS+KEL+DP7PmtpTf/Zfo2BthSnG
+ eprxlFlDpVXkWJqj0GybcNsWEq93FINUfyiqYbKwZW8v5w4PjRfHEm68GBBu/DNQo82k
+ dvT/jizAuN7fq7dUfPrCoHdEqpbSyNwf74wg2GinL1KGwuKRQrBXl8gQGlsWwQeY04gP
+ fWNdsRLuqzjoMUu2aMzn9ZXr/rZja5khAySxkc3OWRv8rm8Uc1Hr2Jwcpsj/Qnis9feI
+ lH2g==
+X-Gm-Message-State: AOAM530RKebYQP6RgirtgqaV3P+qbnnRPrNAcU8KNFT7qYzA+6aARBm2
+ sIf9wR6b3ldrwYe0SwLORzv632WDGFR1pA==
+X-Google-Smtp-Source: ABdhPJzvAwzKoOAunNI85/tiPMvRTJXBrV2pzYGx34nWHsviDIj876IlOqB4GDjd2lcrh2rYpRjUo90RjQTUhw==
 X-Received: from dmatlack-heavy.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:be18:b0:153:2444:9c1a with SMTP
- id r24-20020a170902be1800b0015324449c1amr4691462pls.152.1646958353220; Thu,
- 10 Mar 2022 16:25:53 -0800 (PST)
-Date: Fri, 11 Mar 2022 00:25:15 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:1941:b0:1bf:5440:d716 with SMTP
+ id nk1-20020a17090b194100b001bf5440d716mr7787622pjb.147.1646958354821; Thu,
+ 10 Mar 2022 16:25:54 -0800 (PST)
+Date: Fri, 11 Mar 2022 00:25:16 +0000
 In-Reply-To: <20220311002528.2230172-1-dmatlack@google.com>
-Message-Id: <20220311002528.2230172-14-dmatlack@google.com>
+Message-Id: <20220311002528.2230172-15-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220311002528.2230172-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v2 13/26] KVM: x86/mmu: Pass const memslot to
- init_shadow_page() and descendants
+Subject: [PATCH v2 14/26] KVM: x86/mmu: Decouple rmap_add() and
+ link_shadow_page() from kvm_vcpu
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Fri, 11 Mar 2022 03:48:42 -0500
@@ -99,127 +99,145 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Use a const pointer so that init_shadow_page() can be called from
-contexts where we have a const pointer.
+Allow adding new entries to the rmap and linking shadow pages without a
+struct kvm_vcpu pointer by moving the implementation of rmap_add() and
+link_shadow_page() into inner helper functions.
 
 No functional change intended.
 
 Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/include/asm/kvm_page_track.h | 2 +-
- arch/x86/kvm/mmu/mmu.c                | 6 +++---
- arch/x86/kvm/mmu/mmu_internal.h       | 2 +-
- arch/x86/kvm/mmu/page_track.c         | 4 ++--
- arch/x86/kvm/mmu/tdp_mmu.c            | 2 +-
- arch/x86/kvm/mmu/tdp_mmu.h            | 2 +-
- 6 files changed, 9 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 43 +++++++++++++++++++++++++++---------------
+ 1 file changed, 28 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-index eb186bc57f6a..3a2dc183ae9a 100644
---- a/arch/x86/include/asm/kvm_page_track.h
-+++ b/arch/x86/include/asm/kvm_page_track.h
-@@ -58,7 +58,7 @@ int kvm_page_track_create_memslot(struct kvm *kvm,
- 				  unsigned long npages);
- 
- void kvm_slot_page_track_add_page(struct kvm *kvm,
--				  struct kvm_memory_slot *slot, gfn_t gfn,
-+				  const struct kvm_memory_slot *slot, gfn_t gfn,
- 				  enum kvm_page_track_mode mode);
- void kvm_slot_page_track_remove_page(struct kvm *kvm,
- 				     struct kvm_memory_slot *slot, gfn_t gfn,
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 23c0a36ac93f..d7ad71be6c52 100644
+index d7ad71be6c52..c57070ed157d 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -794,7 +794,7 @@ void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn)
+@@ -725,9 +725,9 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+ 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
  }
  
- static void account_shadowed(struct kvm *kvm,
--			     struct kvm_memory_slot *slot,
-+			     const struct kvm_memory_slot *slot,
- 			     struct kvm_mmu_page *sp)
+-static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_vcpu *vcpu)
++static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_mmu_memory_cache *cache)
  {
- 	gfn_t gfn;
-@@ -1373,7 +1373,7 @@ int kvm_cpu_dirty_log_size(void)
+-	return kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_pte_list_desc_cache);
++	return kvm_mmu_memory_cache_alloc(cache);
  }
  
- bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
--				    struct kvm_memory_slot *slot, u64 gfn,
-+				    const struct kvm_memory_slot *slot, u64 gfn,
- 				    int min_level)
+ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
+@@ -874,7 +874,7 @@ gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu, gfn_t gfn,
+ /*
+  * Returns the number of pointers in the rmap chain, not counting the new one.
+  */
+-static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
++static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
+ 			struct kvm_rmap_head *rmap_head)
  {
+ 	struct pte_list_desc *desc;
+@@ -885,7 +885,7 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
+ 		rmap_head->val = (unsigned long)spte;
+ 	} else if (!(rmap_head->val & 1)) {
+ 		rmap_printk("%p %llx 1->many\n", spte, *spte);
+-		desc = mmu_alloc_pte_list_desc(vcpu);
++		desc = mmu_alloc_pte_list_desc(cache);
+ 		desc->sptes[0] = (u64 *)rmap_head->val;
+ 		desc->sptes[1] = spte;
+ 		desc->spte_count = 2;
+@@ -897,7 +897,7 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
+ 		while (desc->spte_count == PTE_LIST_EXT) {
+ 			count += PTE_LIST_EXT;
+ 			if (!desc->more) {
+-				desc->more = mmu_alloc_pte_list_desc(vcpu);
++				desc->more = mmu_alloc_pte_list_desc(cache);
+ 				desc = desc->more;
+ 				desc->spte_count = 0;
+ 				break;
+@@ -1596,8 +1596,10 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 
+ #define RMAP_RECYCLE_THRESHOLD 1000
+ 
+-static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+-		     u64 *spte, gfn_t gfn)
++static void __rmap_add(struct kvm *kvm,
++		       struct kvm_mmu_memory_cache *cache,
++		       const struct kvm_memory_slot *slot,
++		       u64 *spte, gfn_t gfn)
+ {
+ 	struct kvm_mmu_page *sp;
  	struct kvm_rmap_head *rmap_head;
-@@ -2151,7 +2151,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
+@@ -1606,15 +1608,21 @@ static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+ 	sp = sptep_to_sp(spte);
+ 	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
+ 	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
+-	rmap_count = pte_list_add(vcpu, spte, rmap_head);
++	rmap_count = pte_list_add(cache, spte, rmap_head);
+ 
+ 	if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
+-		kvm_unmap_rmapp(vcpu->kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
++		kvm_unmap_rmapp(kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
+ 		kvm_flush_remote_tlbs_with_address(
+-				vcpu->kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
++				kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
+ 	}
  }
  
- static void init_shadow_page(struct kvm *kvm, struct kvm_mmu_page *sp,
--			     struct kvm_memory_slot *slot, gfn_t gfn,
-+			     const struct kvm_memory_slot *slot, gfn_t gfn,
- 			     union kvm_mmu_page_role role)
++static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
++		     u64 *spte, gfn_t gfn)
++{
++	__rmap_add(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, slot, spte, gfn);
++}
++
+ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
  {
- 	struct hlist_head *sp_list;
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index d4e2de5f2a6d..b6e22ba9c654 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -134,7 +134,7 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
- void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
- void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
- bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
--				    struct kvm_memory_slot *slot, u64 gfn,
-+				    const struct kvm_memory_slot *slot, u64 gfn,
- 				    int min_level);
- void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
- 					u64 start_gfn, u64 pages);
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index 2e09d1b6249f..3e7901294573 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -84,7 +84,7 @@ int kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot)
- 	return 0;
+ 	bool young = false;
+@@ -1682,13 +1690,13 @@ static unsigned kvm_page_table_hashfn(gfn_t gfn)
+ 	return hash_64(gfn, KVM_MMU_HASH_SHIFT);
  }
  
--static void update_gfn_track(struct kvm_memory_slot *slot, gfn_t gfn,
-+static void update_gfn_track(const struct kvm_memory_slot *slot, gfn_t gfn,
- 			     enum kvm_page_track_mode mode, short count)
+-static void mmu_page_add_parent_pte(struct kvm_vcpu *vcpu,
++static void mmu_page_add_parent_pte(struct kvm_mmu_memory_cache *cache,
+ 				    struct kvm_mmu_page *sp, u64 *parent_pte)
  {
- 	int index, val;
-@@ -112,7 +112,7 @@ static void update_gfn_track(struct kvm_memory_slot *slot, gfn_t gfn,
-  * @mode: tracking mode, currently only write track is supported.
-  */
- void kvm_slot_page_track_add_page(struct kvm *kvm,
--				  struct kvm_memory_slot *slot, gfn_t gfn,
-+				  const struct kvm_memory_slot *slot, gfn_t gfn,
- 				  enum kvm_page_track_mode mode)
+ 	if (!parent_pte)
+ 		return;
+ 
+-	pte_list_add(vcpu, parent_pte, &sp->parent_ptes);
++	pte_list_add(cache, parent_pte, &sp->parent_ptes);
+ }
+ 
+ static void mmu_page_remove_parent_pte(struct kvm_mmu_page *sp,
+@@ -2307,8 +2315,8 @@ static void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator)
+ 	__shadow_walk_next(iterator, *iterator->sptep);
+ }
+ 
+-static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+-			     struct kvm_mmu_page *sp)
++static void __link_shadow_page(struct kvm_mmu_memory_cache *cache, u64 *sptep,
++			       struct kvm_mmu_page *sp)
  {
+ 	u64 spte;
  
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index f285fd76717b..85b7bc333302 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1768,7 +1768,7 @@ static bool write_protect_gfn(struct kvm *kvm, struct kvm_mmu_page *root,
-  * Returns true if an SPTE was set and a TLB flush is needed.
-  */
- bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
--				   struct kvm_memory_slot *slot, gfn_t gfn,
-+				   const struct kvm_memory_slot *slot, gfn_t gfn,
- 				   int min_level)
+@@ -2318,12 +2326,17 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+ 
+ 	mmu_spte_set(sptep, spte);
+ 
+-	mmu_page_add_parent_pte(vcpu, sp, sptep);
++	mmu_page_add_parent_pte(cache, sp, sptep);
+ 
+ 	if (sp->unsync_children || sp->unsync)
+ 		mark_unsync(sptep);
+ }
+ 
++static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep, struct kvm_mmu_page *sp)
++{
++	__link_shadow_page(&vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
++}
++
+ static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 				   unsigned direct_access)
  {
- 	struct kvm_mmu_page *root;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 54bc8118c40a..8308bfa4126b 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -42,7 +42,7 @@ void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 				       const struct kvm_memory_slot *slot);
- 
- bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
--				   struct kvm_memory_slot *slot, gfn_t gfn,
-+				   const struct kvm_memory_slot *slot, gfn_t gfn,
- 				   int min_level);
- 
- void kvm_tdp_mmu_try_split_huge_pages(struct kvm *kvm,
 -- 
 2.35.1.723.g4982287a31-goog
 
