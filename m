@@ -2,53 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3B0C433F5
-	for <kvmarm@archiver.kernel.org>; Sat, 12 Mar 2022 11:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF561C433F5
+	for <kvmarm@archiver.kernel.org>; Sat, 12 Mar 2022 11:16:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54AD440159;
-	Sat, 12 Mar 2022 06:16:34 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8452E49EF5;
+	Sat, 12 Mar 2022 06:16:47 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@linuxfoundation.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9LoKhXYToAZJ; Sat, 12 Mar 2022 06:16:33 -0500 (EST)
+	with ESMTP id MvotevEzKDYj; Sat, 12 Mar 2022 06:16:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B7D040FB2;
-	Sat, 12 Mar 2022 06:16:33 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4723A43482;
+	Sat, 12 Mar 2022 06:16:46 -0500 (EST)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46B2B40C1B
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2022 06:16:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 434C040FB2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2022 06:16:45 -0500 (EST)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jCeKWo8DtQ7N for <kvmarm@lists.cs.columbia.edu>;
- Sat, 12 Mar 2022 06:16:30 -0500 (EST)
+ with ESMTP id wQ4kD+wEwMbE for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 12 Mar 2022 06:16:43 -0500 (EST)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BCF7240159
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2022 06:16:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C547940FAB
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2022 06:16:43 -0500 (EST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 27FF160C41;
- Sat, 12 Mar 2022 11:16:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3749DC340EB;
- Sat, 12 Mar 2022 11:16:29 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3F09860B2A;
+ Sat, 12 Mar 2022 11:16:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04702C340ED;
+ Sat, 12 Mar 2022 11:16:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
- s=korg; t=1647083789;
- bh=gVap+F6+VcmlWnzAiZ43OcYWrwnOX9Bh45EjJhTTtC8=;
+ s=korg; t=1647083802;
+ bh=YzawpeHEj83O3MHK1mt6N6MJbgfsmB6tLIfOzzkNzXo=;
  h=Subject:To:Cc:From:Date:In-Reply-To:From;
- b=irNaXGL4mP086q/cH8UAzf19EIx7VVL0xYYpq/KBP9GlMEe9tihwFZTFpBRnrhq26
- tYI2uO+lFradl9fjnogyHZ/CHFYFkc5S1KZAxONnjYRSTK+hhg/zj89b3EfXiCFVuC
- ML0dJ6vIaMZtzkK3QfkVX+Q5jkqJVRC/CMpDfx5g=
+ b=Ipa7BExXZI4AoDyBs6KsgQOa7w4sNA0RSKGSSHAePYer+kRz82tws8OjGFLiT0BLE
+ JRX9w4o1u78JAVAT/0qY4+mTgPc0cuorJX/JY5zUpQv0dzW5lmES0VOxHLLnJrnPr/
+ 1bDc5pJC1daZmr3yEcPGVM2nDFGJRovKomQ+XtcU=
 Subject: Patch "KVM: arm64: Reset PMC_EL0 to avoid a panic() on systems with
- no PMU" has been added to the 4.14-stable tree
+ no PMU" has been added to the 4.19-stable tree
 To: alexandru.elisei@arm.com, gregkh@linuxfoundation.org, james.morse@arm.com,
  kvmarm@lists.cs.columbia.edu, maz@kernel.org
 From: <gregkh@linuxfoundation.org>
-Date: Sat, 12 Mar 2022 12:16:26 +0100
+Date: Sat, 12 Mar 2022 12:16:38 +0100
 In-Reply-To: <20220308162939.603335-1-james.morse@arm.com>
-Message-ID: <164708378659148@kroah.com>
+Message-ID: <164708379811058@kroah.com>
 MIME-Version: 1.0
 X-stable: commit
 X-Patchwork-Hint: ignore 
@@ -74,12 +74,12 @@ This is a note to let you know that I've just added the patch titled
 
     KVM: arm64: Reset PMC_EL0 to avoid a panic() on systems with no PMU
 
-to the 4.14-stable tree which can be found at:
+to the 4.19-stable tree which can be found at:
     http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
 
 The filename of the patch is:
      kvm-arm64-reset-pmc_el0-to-avoid-a-panic-on-systems-with-no-pmu.patch
-and it can be found in the queue-4.14 subdirectory.
+and it can be found in the queue-4.19 subdirectory.
 
 If you, or anyone else, feels it should not be added to the stable tree,
 please let <stable@vger.kernel.org> know about it.
@@ -140,7 +140,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -471,8 +471,10 @@ static void reset_pmcr(struct kvm_vcpu *
+@@ -620,8 +620,10 @@ static void reset_pmcr(struct kvm_vcpu *
  	u64 pmcr, val;
  
  	/* No PMU available, PMCR_EL0 may UNDEF... */
@@ -156,7 +156,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 Patches currently in stable-queue which might be from james.morse@arm.com are
 
-queue-4.14/kvm-arm64-reset-pmc_el0-to-avoid-a-panic-on-systems-with-no-pmu.patch
+queue-4.19/kvm-arm64-reset-pmc_el0-to-avoid-a-panic-on-systems-with-no-pmu.patch
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
