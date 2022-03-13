@@ -2,57 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF561C433F5
-	for <kvmarm@archiver.kernel.org>; Sat, 12 Mar 2022 11:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E65C0C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 13 Mar 2022 16:20:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8452E49EF5;
-	Sat, 12 Mar 2022 06:16:47 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38D8B40BD3;
+	Sun, 13 Mar 2022 12:20:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linuxfoundation.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MvotevEzKDYj; Sat, 12 Mar 2022 06:16:46 -0500 (EST)
+	with ESMTP id LWtUJpD2vkB9; Sun, 13 Mar 2022 12:20:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4723A43482;
-	Sat, 12 Mar 2022 06:16:46 -0500 (EST)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F43049E37;
+	Sun, 13 Mar 2022 12:20:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 434C040FB2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2022 06:16:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0599F40BC2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 12:20:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wQ4kD+wEwMbE for <kvmarm@lists.cs.columbia.edu>;
- Sat, 12 Mar 2022 06:16:43 -0500 (EST)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C547940FAB
- for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2022 06:16:43 -0500 (EST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 3F09860B2A;
- Sat, 12 Mar 2022 11:16:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04702C340ED;
- Sat, 12 Mar 2022 11:16:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
- s=korg; t=1647083802;
- bh=YzawpeHEj83O3MHK1mt6N6MJbgfsmB6tLIfOzzkNzXo=;
- h=Subject:To:Cc:From:Date:In-Reply-To:From;
- b=Ipa7BExXZI4AoDyBs6KsgQOa7w4sNA0RSKGSSHAePYer+kRz82tws8OjGFLiT0BLE
- JRX9w4o1u78JAVAT/0qY4+mTgPc0cuorJX/JY5zUpQv0dzW5lmES0VOxHLLnJrnPr/
- 1bDc5pJC1daZmr3yEcPGVM2nDFGJRovKomQ+XtcU=
-Subject: Patch "KVM: arm64: Reset PMC_EL0 to avoid a panic() on systems with
- no PMU" has been added to the 4.19-stable tree
-To: alexandru.elisei@arm.com, gregkh@linuxfoundation.org, james.morse@arm.com,
- kvmarm@lists.cs.columbia.edu, maz@kernel.org
-From: <gregkh@linuxfoundation.org>
-Date: Sat, 12 Mar 2022 12:16:38 +0100
-In-Reply-To: <20220308162939.603335-1-james.morse@arm.com>
-Message-ID: <164708379811058@kroah.com>
-MIME-Version: 1.0
-X-stable: commit
-X-Patchwork-Hint: ignore 
-Cc: stable-commits@vger.kernel.org
+ with ESMTP id EUeYetJES6KI for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 13 Mar 2022 12:20:49 -0400 (EDT)
+Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
+ [209.85.128.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 929584086C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 12:20:49 -0400 (EDT)
+Received: by mail-wm1-f74.google.com with SMTP id
+ z9-20020a7bc7c9000000b00389bd375677so5777385wmk.4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 09:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=7Wuv74yKEdjvXwkDK4Px5jJ6apmvoxE3JexOVM2IrlA=;
+ b=iY3hG+5rhqP1jTbLxBqEjg7UKqAVd3z1+Xn1s989OYEoEP58Mt06JFjWzVY9NaHdvx
+ UYKBUJeJBjZMNIv4z1pwHDUuGgRrEn78BScFyF3hRQjsSUQu9wqB/C+y61zUYUGP4A1P
+ hh1/8TMy633VEWtNzhec4Y5CtClTWkv1ADQjYxCDIBOQyb96WN4GXMJflCNxJw1R+/s+
+ oBDvqgblv75f2euQZLZtk1YJUoS+jL3mj8xX/0iB6VYPi0q3KeJT6TWqwPuPrklBih55
+ o7S5ZlQig3NOqekLUo2GEDjpPAONDx/QJrhS+q0pTixqVuFGTKIDHc6ixnMAwaGDFAGy
+ p4WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=7Wuv74yKEdjvXwkDK4Px5jJ6apmvoxE3JexOVM2IrlA=;
+ b=ExKPUUymXIK+nq/YWuaWWD/yAcRfMe57nngkDIbKSpEtbpNgA+Ry/Zjx84j7jGx7B7
+ ZrxegCC7m/NCbVULIm6KPrFOd0T4nyZ13XWcUjU2j0WqV4n12I8mo55RTlHEFmKJlXWc
+ BarJKsvWCuy1vbn0dbSTFb0XWM+jz2nPNKGcE9KrUylFrd+OqRRBqGwS8haMsAFL2QgI
+ qqAo+Pl/MJlLeCslCrSZL20TcLDVCwmZZiteeIP0UOlt4x851zmHE6+dQiZSm4AcV4b1
+ NYAz0utGCjs3zt9Xm3Gkqh+MW+Daik1OBVIOMeKAGxB4VtVg+Lb5REI1T1l5be0LBv5h
+ 0/KQ==
+X-Gm-Message-State: AOAM531K1TNh8NMNJ2MXtIXTso25gOQ6LFxThpB4AEn96vVzb/B2vbHc
+ CbZ1oBH4ip3kRouo4w5rOopJQWEVlwXBgOFW/WA=
+X-Google-Smtp-Source: ABdhPJzhl0gG4Adi0f1C2JUggqNP47tmOd8Uoc7ehQMllk4ZVnR5xcuRb7esdtvPuDku6DzyyiErK0ckKl/qUiNOx2w=
+X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
+ (user=sebastianene job=sendgmr) by
+ 2002:a05:600c:3589:b0:389:cf43:da61 with
+ SMTP id p9-20020a05600c358900b00389cf43da61mr17863422wmq.203.1647188448234;
+ Sun, 13 Mar 2022 09:20:48 -0700 (PDT)
+Date: Sun, 13 Mar 2022 16:19:47 +0000
+Message-Id: <20220313161949.3565171-1-sebastianene@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
+Subject: [PATCH kvmtool v11 0/3] aarch64: Add stolen time support
+From: Sebastian Ene <sebastianene@google.com>
+To: kvm@vger.kernel.org
+Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -69,94 +82,58 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+This series adds support for stolen time functionality.
 
-This is a note to let you know that I've just added the patch titled
+Patch #1 moves the vCPU structure initialisation before the target->init()
+call to allow early access to the kvm structure from the vCPU
+during target->init().
 
-    KVM: arm64: Reset PMC_EL0 to avoid a panic() on systems with no PMU
+Patch #2 modifies the memory layout in arm-common/kvm-arch.h and adds a
+new MMIO device PVTIME after the RTC region. A new flag is added in
+kvm-config.h that will be used to control [enable/disable] the pvtime
+functionality. Stolen time is enabled by default when the host
+supports KVM_CAP_STEAL_TIME.
 
-to the 4.19-stable tree which can be found at:
-    http://www.kernel.org/git/?p=linux/kernel/git/stable/stable-queue.git;a=summary
+Patch #3 adds a new command line argument to disable the stolen time
+functionality(by default is enabled).
 
-The filename of the patch is:
-     kvm-arm64-reset-pmc_el0-to-avoid-a-panic-on-systems-with-no-pmu.patch
-and it can be found in the queue-4.19 subdirectory.
+Changelog since v10:
+ - set the return value to -errno on failed exit path from
+   'kvm_cpu__setup_pvtime' 
 
-If you, or anyone else, feels it should not be added to the stable tree,
-please let <stable@vger.kernel.org> know about it.
+Changelog since v9:
+ - use the `attr` field for the 'struct kvm_device_attr' initialisation
+   with KVM_ARM_VCPU_PVTIME_IPA instead of the `addr` field
 
+Changelog since v8:
+ - fix an error caused by kvm_cpu__teardown_pvtime() not beeing defined
+   for aarch32
+ - cleanup the pvtime setup by removing the flag 'is_failed_cfg' and
+   drop the 'pvtime_data_priv' definition
+ - add missing Review-by tag 
 
-From james.morse@arm.com  Sat Mar 12 12:08:36 2022
-From: James Morse <james.morse@arm.com>
-Date: Tue,  8 Mar 2022 16:29:39 +0000
-Subject: KVM: arm64: Reset PMC_EL0 to avoid a panic() on systems with no PMU
-To: stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Marc Zyngier <maz@kernel.org>, Alexandru Elisei <alexandru.elisei@arm.com>, james.morse@arm.com
-Message-ID: <20220308162939.603335-1-james.morse@arm.com>
+The patch has been tested on qemu-system-aarch64.
 
-From: James Morse <james.morse@arm.com>
+Sebastian Ene (3):
+  aarch64: Populate the vCPU struct before target->init()
+  aarch64: Add stolen time support
+  Add --no-pvtime command line argument
 
-The logic in commit 2a5f1b67ec57 "KVM: arm64: Don't access PMCR_EL0 when no
-PMU is available" relies on an empty reset handler being benign.  This was
-not the case in earlier kernel versions, so the stable backport of this
-patch is causing problems.
+ Makefile                               |  1 +
+ arm/aarch32/include/kvm/kvm-cpu-arch.h |  5 ++
+ arm/aarch64/arm-cpu.c                  |  2 +-
+ arm/aarch64/include/kvm/kvm-cpu-arch.h |  2 +
+ arm/aarch64/pvtime.c                   | 98 ++++++++++++++++++++++++++
+ arm/include/arm-common/kvm-arch.h      |  6 +-
+ arm/kvm-cpu.c                          | 15 ++--
+ builtin-run.c                          |  2 +
+ include/kvm/kvm-config.h               |  1 +
+ 9 files changed, 123 insertions(+), 9 deletions(-)
+ create mode 100644 arm/aarch64/pvtime.c
 
-KVMs behaviour in this area changed over time. In particular, prior to commit
-03fdfb269009 ("KVM: arm64: Don't write junk to sysregs on reset"), an empty
-reset handler will trigger a warning, as the guest registers have been
-poisoned.
-Prior to commit 20589c8cc47d ("arm/arm64: KVM: Don't panic on failure to
-properly reset system registers"), this warning was a panic().
+-- 
+2.35.1.723.g4982287a31-goog
 
-Instead of reverting the backport, make it write 0 to the sys_reg[] array.
-This keeps the reset logic happy, and the dodgy value can't be seen by
-the guest as it can't request the emulation.
-
-The original bug was accessing the PMCR_EL0 register on CPUs that don't
-implement that feature. There is no known silicon that does this, but
-v4.9's ACPI support is unable to find the PMU, so triggers this code:
-
-| Kernel panic - not syncing: Didn't reset vcpu_sys_reg(24)
-| CPU: 1 PID: 3055 Comm: lkvm Not tainted 4.9.302-00032-g64e078a56789 #13476
-| Hardware name: ARM LTD ARM Juno Development Platform/ARM Juno Development Platform, BIOS EDK II Jul 30 2018
-| Call trace:
-| [<ffff00000808b4b0>] dump_backtrace+0x0/0x1a0
-| [<ffff00000808b664>] show_stack+0x14/0x20
-| [<ffff0000088f0e18>] dump_stack+0x98/0xb8
-| [<ffff0000088eef08>] panic+0x118/0x274
-| [<ffff0000080b50e0>] access_actlr+0x0/0x20
-| [<ffff0000080b2620>] kvm_reset_vcpu+0x5c/0xac
-| [<ffff0000080ac688>] kvm_arch_vcpu_ioctl+0x3e4/0x490
-| [<ffff0000080a382c>] kvm_vcpu_ioctl+0x5b8/0x720
-| [<ffff000008201e44>] do_vfs_ioctl+0x2f4/0x884
-| [<ffff00000820244c>] SyS_ioctl+0x78/0x9c
-| [<ffff000008083a9c>] __sys_trace_return+0x0/0x4
-
-Cc: <stable@vger.kernel.org> # < v5.3 with 2a5f1b67ec57 backported
-Signed-off-by: James Morse <james.morse@arm.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- arch/arm64/kvm/sys_regs.c |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -620,8 +620,10 @@ static void reset_pmcr(struct kvm_vcpu *
- 	u64 pmcr, val;
- 
- 	/* No PMU available, PMCR_EL0 may UNDEF... */
--	if (!kvm_arm_support_pmu_v3())
-+	if (!kvm_arm_support_pmu_v3()) {
-+		vcpu_sys_reg(vcpu, PMCR_EL0) = 0;
- 		return;
-+	}
- 
- 	pmcr = read_sysreg(pmcr_el0);
- 	/*
-
-
-Patches currently in stable-queue which might be from james.morse@arm.com are
-
-queue-4.19/kvm-arm64-reset-pmc_el0-to-avoid-a-panic-on-systems-with-no-pmu.patch
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
