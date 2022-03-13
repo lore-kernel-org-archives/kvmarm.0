@@ -2,67 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E65C0C433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 13 Mar 2022 16:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AAFC4332F
+	for <kvmarm@archiver.kernel.org>; Sun, 13 Mar 2022 16:20:55 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38D8B40BD3;
-	Sun, 13 Mar 2022 12:20:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FB4549E3A;
+	Sun, 13 Mar 2022 12:20:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LWtUJpD2vkB9; Sun, 13 Mar 2022 12:20:52 -0400 (EDT)
+	with ESMTP id 1S0ozZ7Lu6An; Sun, 13 Mar 2022 12:20:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F43049E37;
-	Sun, 13 Mar 2022 12:20:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3043940C02;
+	Sun, 13 Mar 2022 12:20:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0599F40BC2
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 12:20:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A58C040BC2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 12:20:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EUeYetJES6KI for <kvmarm@lists.cs.columbia.edu>;
- Sun, 13 Mar 2022 12:20:49 -0400 (EDT)
+ with ESMTP id RBfJ2zpJjEMk for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 13 Mar 2022 12:20:51 -0400 (EDT)
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
  [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 929584086C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 12:20:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78AA04086C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 12:20:51 -0400 (EDT)
 Received: by mail-wm1-f74.google.com with SMTP id
- z9-20020a7bc7c9000000b00389bd375677so5777385wmk.4
- for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 09:20:49 -0700 (PDT)
+ o21-20020a05600c511500b003818c4b98b5so4620831wms.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2022 09:20:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=7Wuv74yKEdjvXwkDK4Px5jJ6apmvoxE3JexOVM2IrlA=;
- b=iY3hG+5rhqP1jTbLxBqEjg7UKqAVd3z1+Xn1s989OYEoEP58Mt06JFjWzVY9NaHdvx
- UYKBUJeJBjZMNIv4z1pwHDUuGgRrEn78BScFyF3hRQjsSUQu9wqB/C+y61zUYUGP4A1P
- hh1/8TMy633VEWtNzhec4Y5CtClTWkv1ADQjYxCDIBOQyb96WN4GXMJflCNxJw1R+/s+
- oBDvqgblv75f2euQZLZtk1YJUoS+jL3mj8xX/0iB6VYPi0q3KeJT6TWqwPuPrklBih55
- o7S5ZlQig3NOqekLUo2GEDjpPAONDx/QJrhS+q0pTixqVuFGTKIDHc6ixnMAwaGDFAGy
- p4WQ==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=SeD4Qzgh/sHfvC8bjBiziK/e63h3+qRRDuOCSxAtRyU=;
+ b=PnyhGUpo0WrgazIr8uDW4N3gs0xJHwKFIZiYrlq9Hc3T9feIf7NQrM/a9nuc+gKFw8
+ vGUCw9bNsPCrfwJ2Y/+raF+mJG09gugnXcsuaQhyZXTCFkafMYfayL3qAzE+mOHgwyHj
+ xc8PaChyGJw/RcwtolTaPvj4B4zCSr6RMKJQk/h2Rde/lHmlqa4RwaqYhn5j58orluzG
+ KKPnHCQ9fIUiePG7+gOM7IwXZ7/BrHygGdtC0fFabVvdWO+hlRRhFeuSgwF2aMzxtJqs
+ TgSOG14klT1oE8Q4NDLZUK/j4qEsOkWS8BzKBJzMoL1b0jEhOoB/uLqCP7LrKk+K3pzK
+ dyJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=7Wuv74yKEdjvXwkDK4Px5jJ6apmvoxE3JexOVM2IrlA=;
- b=ExKPUUymXIK+nq/YWuaWWD/yAcRfMe57nngkDIbKSpEtbpNgA+Ry/Zjx84j7jGx7B7
- ZrxegCC7m/NCbVULIm6KPrFOd0T4nyZ13XWcUjU2j0WqV4n12I8mo55RTlHEFmKJlXWc
- BarJKsvWCuy1vbn0dbSTFb0XWM+jz2nPNKGcE9KrUylFrd+OqRRBqGwS8haMsAFL2QgI
- qqAo+Pl/MJlLeCslCrSZL20TcLDVCwmZZiteeIP0UOlt4x851zmHE6+dQiZSm4AcV4b1
- NYAz0utGCjs3zt9Xm3Gkqh+MW+Daik1OBVIOMeKAGxB4VtVg+Lb5REI1T1l5be0LBv5h
- 0/KQ==
-X-Gm-Message-State: AOAM531K1TNh8NMNJ2MXtIXTso25gOQ6LFxThpB4AEn96vVzb/B2vbHc
- CbZ1oBH4ip3kRouo4w5rOopJQWEVlwXBgOFW/WA=
-X-Google-Smtp-Source: ABdhPJzhl0gG4Adi0f1C2JUggqNP47tmOd8Uoc7ehQMllk4ZVnR5xcuRb7esdtvPuDku6DzyyiErK0ckKl/qUiNOx2w=
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=SeD4Qzgh/sHfvC8bjBiziK/e63h3+qRRDuOCSxAtRyU=;
+ b=BLNqvcGbefPYOyzDgQzHWYcBUGVwGGBHHeXZX6YzPhXB61rQx7+IAjrhDlvEOf5Y7w
+ UKYPrhi9ug5RLJVojq7arg4ckfwbQgqlyfXuOXkAWRmcWKlstaLbcvhUv3jB3Iuuy/z6
+ iO6OwVtPhNEglvqLg/SitRYKtRk9qVMaTMGb3R4v66vYfZCyI32MGSSmElVYjt6NcBEn
+ o6qCeowdtwJmeVqmOdNMx/QAFuvH+3qV+CHP8CM4w+YiLjfVUhJEp5+aND2BMRR7Hfnp
+ NXb1N6Lw7kJzNGPdvOteOcYpMOb7PxAwu6C6bS3/1Pyft5kAcs2rUwrT8/wouLHg4YlR
+ SAzg==
+X-Gm-Message-State: AOAM533086IclJguvZQbJ30UxiJODtZ2NlFF1YlR1r68Bcksk0337XRE
+ t3OoCL7HkcGaAaeXnA5TFVtGot7S1N0u3UuxZVs=
+X-Google-Smtp-Source: ABdhPJzqcbVtACj62ep3LZlqhTo9GesJQnwZ8D/9dKWe+MvvBQWPqLqZQ6BD33SYazsTGRfTx+fE62r7Mddnm08si14=
 X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
  (user=sebastianene job=sendgmr) by
- 2002:a05:600c:3589:b0:389:cf43:da61 with
- SMTP id p9-20020a05600c358900b00389cf43da61mr17863422wmq.203.1647188448234;
- Sun, 13 Mar 2022 09:20:48 -0700 (PDT)
-Date: Sun, 13 Mar 2022 16:19:47 +0000
-Message-Id: <20220313161949.3565171-1-sebastianene@google.com>
+ 2002:a05:600c:ac5:b0:389:a170:c34 with
+ SMTP id c5-20020a05600c0ac500b00389a1700c34mr22917340wmr.100.1647188450683;
+ Sun, 13 Mar 2022 09:20:50 -0700 (PDT)
+Date: Sun, 13 Mar 2022 16:19:48 +0000
+In-Reply-To: <20220313161949.3565171-1-sebastianene@google.com>
+Message-Id: <20220313161949.3565171-2-sebastianene@google.com>
 Mime-Version: 1.0
+References: <20220313161949.3565171-1-sebastianene@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH kvmtool v11 0/3] aarch64: Add stolen time support
+Subject: [PATCH kvmtool v11 1/3] aarch64: Populate the vCPU struct before
+ target->init()
 From: Sebastian Ene <sebastianene@google.com>
 To: kvm@vger.kernel.org
 Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
@@ -82,55 +86,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This series adds support for stolen time functionality.
+Move the vCPU structure initialisation before the target->init() call to
+ keep a reference to the kvm structure during init().
+This is required by the pvtime peripheral to reserve a memory region
+while the vCPU is beeing initialised.
 
-Patch #1 moves the vCPU structure initialisation before the target->init()
-call to allow early access to the kvm structure from the vCPU
-during target->init().
+Reviewed-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
+---
+ arm/kvm-cpu.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Patch #2 modifies the memory layout in arm-common/kvm-arch.h and adds a
-new MMIO device PVTIME after the RTC region. A new flag is added in
-kvm-config.h that will be used to control [enable/disable] the pvtime
-functionality. Stolen time is enabled by default when the host
-supports KVM_CAP_STEAL_TIME.
-
-Patch #3 adds a new command line argument to disable the stolen time
-functionality(by default is enabled).
-
-Changelog since v10:
- - set the return value to -errno on failed exit path from
-   'kvm_cpu__setup_pvtime' 
-
-Changelog since v9:
- - use the `attr` field for the 'struct kvm_device_attr' initialisation
-   with KVM_ARM_VCPU_PVTIME_IPA instead of the `addr` field
-
-Changelog since v8:
- - fix an error caused by kvm_cpu__teardown_pvtime() not beeing defined
-   for aarch32
- - cleanup the pvtime setup by removing the flag 'is_failed_cfg' and
-   drop the 'pvtime_data_priv' definition
- - add missing Review-by tag 
-
-The patch has been tested on qemu-system-aarch64.
-
-Sebastian Ene (3):
-  aarch64: Populate the vCPU struct before target->init()
-  aarch64: Add stolen time support
-  Add --no-pvtime command line argument
-
- Makefile                               |  1 +
- arm/aarch32/include/kvm/kvm-cpu-arch.h |  5 ++
- arm/aarch64/arm-cpu.c                  |  2 +-
- arm/aarch64/include/kvm/kvm-cpu-arch.h |  2 +
- arm/aarch64/pvtime.c                   | 98 ++++++++++++++++++++++++++
- arm/include/arm-common/kvm-arch.h      |  6 +-
- arm/kvm-cpu.c                          | 15 ++--
- builtin-run.c                          |  2 +
- include/kvm/kvm-config.h               |  1 +
- 9 files changed, 123 insertions(+), 9 deletions(-)
- create mode 100644 arm/aarch64/pvtime.c
-
+diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+index 6a2408c..84ac1e9 100644
+--- a/arm/kvm-cpu.c
++++ b/arm/kvm-cpu.c
+@@ -116,6 +116,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 			die("Unable to find matching target");
+ 	}
+ 
++	/* Populate the vcpu structure. */
++	vcpu->kvm		= kvm;
++	vcpu->cpu_id		= cpu_id;
++	vcpu->cpu_type		= vcpu_init.target;
++	vcpu->cpu_compatible	= target->compatible;
++	vcpu->is_running	= true;
++
+ 	if (err || target->init(vcpu))
+ 		die("Unable to initialise vcpu");
+ 
+@@ -125,13 +132,6 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+ 		vcpu->ring = (void *)vcpu->kvm_run +
+ 			     (coalesced_offset * PAGE_SIZE);
+ 
+-	/* Populate the vcpu structure. */
+-	vcpu->kvm		= kvm;
+-	vcpu->cpu_id		= cpu_id;
+-	vcpu->cpu_type		= vcpu_init.target;
+-	vcpu->cpu_compatible	= target->compatible;
+-	vcpu->is_running	= true;
+-
+ 	if (kvm_cpu__configure_features(vcpu))
+ 		die("Unable to configure requested vcpu features");
+ 
 -- 
 2.35.1.723.g4982287a31-goog
 
