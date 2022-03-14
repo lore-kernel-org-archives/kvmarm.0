@@ -2,75 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9617DC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Mar 2022 20:02:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B5CC43217
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Mar 2022 20:02:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31057404CD;
-	Mon, 14 Mar 2022 16:02:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DDCC4086D;
+	Mon, 14 Mar 2022 16:02:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9+vRL6kDrTsm; Mon, 14 Mar 2022 16:02:04 -0400 (EDT)
+	with ESMTP id Xsmi6NgKxGiD; Mon, 14 Mar 2022 16:02:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF3F949EBD;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F138A49EF6;
 	Mon, 14 Mar 2022 16:02:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B4F949EB2
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BCC449EBD
  for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 16:02:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 90Jhh8RF9P5o for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Mar 2022 16:02:02 -0400 (EDT)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C17D14045D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 16:02:02 -0400 (EDT)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-2d7eaa730d9so141792927b3.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 13:02:02 -0700 (PDT)
+ with ESMTP id QchIad3AQH-O for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Mar 2022 16:02:03 -0400 (EDT)
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com
+ [209.85.166.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 36E5A404CD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 16:02:03 -0400 (EDT)
+Received: by mail-io1-f49.google.com with SMTP id z7so19753183iom.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 13:02:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:cc;
- bh=xEuR5NAbPKTc90nTUG2UpVDsPT4/g7gJ4EIuKy2M61Y=;
- b=ry7DrS+DzmCoBuS+N3t8KJPneqxZpyjWKhm0hi4UrJVtWocUiLGratH7dA7vGH64X7
- Qg/sE6ZP+ZQuX6cKWQqNcZW6E9FfL8kpyZVAoWnG+B5DO6fQiwivmN8fNnXVY0N6Ixvf
- bMOIdm00KmvyWI9+z3twtaJ6QG9adpXzf7D7r2LWmUXxnDLf73lL12Lok43SuXanyQop
- KBwSkd7sD4mFizm5xQ53F43xhYn9dXjcZk0+drkMZbmDDYN3Y4hmCBytmO7wv8ywRXdB
- b8p8OtiKMvR67lAOiIZx034Nf/fJoa1ZehmUA2wp5KusaqdbU77O+LKpVeykEIpNS6GY
- fuZw==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=uWhSAiXtN2kud9zOcgRUJbOu6RBWnBBMw3VH5eaYAVk=;
+ b=Z5wn1jQkI/tL2La22TjtqzWpSST81fZ9JcfOvXLTViP7hWAWBun1uo/L60hUZ9iA+W
+ ni8c1XupVrx+ACPqZTP9bZzCN55x9A10H4PAwRVU8kMoHC84aaHcwfimlpYyD7ZfeBoY
+ yZv/RuGavd53xyvNtorLgojnnZaQyWj2bc72UBvtfwe/6i9ljb5FBMkXn1vJzOVZ3974
+ Zcrao9MJ597SPt/7ht67phLP+6X+0u150bJLMC7SEEHFZIWfYGMKY4fEeDtl9z2wiuot
+ bf9zjyK+9hn3/IwDvngTcmKxVaONIFKuREe/M3XMiaZXrL258a836JAUj9Mmc9wsrOTL
+ qCsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:cc;
- bh=xEuR5NAbPKTc90nTUG2UpVDsPT4/g7gJ4EIuKy2M61Y=;
- b=kGCdVS5HlpAFG7jKeVGvvEmwR8JKeubDNlDfMkg4r0QQuMK+iW9Whw6w5e1Xu6QJiw
- NzPTumvMPL7fYwiuCSyVLs0rTKuKw7Y57iN6N1alt6FFDgnciMThkrazmn3jh+S60jCP
- iCkugojtiW1kU97uLJnkc/n1cNicuwUivy+7W/S2boYcqEi2u9noLH3ttOasQ+W9wvUp
- ocxEsgnHrVHVcp1f7/Ab7rMjnr86t4RDuQO9fR1olFk0Q2YW2sfAd7jd+W8NvPP+MT+X
- 9wYnFjSaTGbuScfTRmRc60Y/fH5GsHIdFOvu/A1XrlzcC8Fz0dEnc4pNgvClxQebP7fG
- /2NQ==
-X-Gm-Message-State: AOAM531UCYhM5IQGjEox3L6yj7ECV7IIuu2lyhd733kb3sBnqY88G+VO
- c3HnTlAJyf+vOKvVh57go5dPEvirL0uisYcYPQ==
-X-Google-Smtp-Source: ABdhPJxifXiV2IwBShgAldnOtAN44f4qB6zmnPyH/IJw/7BkXZPOJKxYCtAxbJk4yN0V7cgS+dlxUhTFe/JmaJ6gOg==
-X-Received: from kaleshsingh.mtv.corp.google.com
- ([2620:15c:211:200:500a:9ac2:e73e:69e3])
- (user=kaleshsingh job=sendgmr) by 2002:a25:7b85:0:b0:628:beb3:d877 with SMTP
- id w127-20020a257b85000000b00628beb3d877mr19510073ybc.8.1647288122059; Mon,
- 14 Mar 2022 13:02:02 -0700 (PDT)
-Date: Mon, 14 Mar 2022 13:01:09 -0700
-Message-Id: <20220314200148.2695206-1-kaleshsingh@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v6 0/8] KVM: arm64: Hypervisor stack enhancements
-From: Kalesh Singh <kaleshsingh@google.com>
-Cc: kernel-team@android.com, Catalin Marinas <catalin.marinas@arm.com>,
- linux-arm-kernel@lists.infradead.org, will@kernel.org,
- Peter Collingbourne <pcc@google.com>, maz@kernel.org,
- linux-kernel@vger.kernel.org,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- surenb@google.com, kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=uWhSAiXtN2kud9zOcgRUJbOu6RBWnBBMw3VH5eaYAVk=;
+ b=ax8+25s3By2C7Z/Pm/GX/Og6838pkv25EqmzYfna/mXCsJojw5Z2edfbKzGFpWBHk0
+ 09452cS0ZL6mXdoaGbVd/UWD8j6pJLIoABqdDINI5Pd8rRkiVWhSWD3olsdGF/vo3m/r
+ YqdcaYF4fLLmzp3wOcYvrCeblFNHi5wVUJS+GCbLo7aGe9I1qGL9ur3hs2TOz9Kyte/G
+ Nje7DLOiPe2R+/MldmprDqzZIKfcAwEk9gWR9jOl4JIPy6jVb/1cMEwr+aY6vZIiMBLb
+ LmDKn/sKFQ3HIjSQWOKk6BZSvdb1t28gkXPhC5P3zQn57qyEWd5xkRrcG2BPOEm7kIWN
+ QLjQ==
+X-Gm-Message-State: AOAM531hs9pisqRIwznaxZ1CacbwFn9vgnLh52eA9e5/wt7bq/qd2LCp
+ uRxtx/O8HPvuMMtbH+ibZaOV9A==
+X-Google-Smtp-Source: ABdhPJx5zEqKVyMxJ+r6McoYCQD64sld7d8x7eq7OhmRF56lD4EEnSDeeaZi8lEf/y3UDHbyHhJz9w==
+X-Received: by 2002:a5d:8d1a:0:b0:633:283d:8959 with SMTP id
+ p26-20020a5d8d1a000000b00633283d8959mr19911675ioj.80.1647288122399; 
+ Mon, 14 Mar 2022 13:02:02 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ f1-20020a056e020b4100b002c68e176293sm8273190ilu.87.2022.03.14.13.02.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 14 Mar 2022 13:02:01 -0700 (PDT)
+Date: Mon, 14 Mar 2022 20:01:58 +0000
+From: Oliver Upton <oupton@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v4 09/13] Docs: KVM: Rename psci.rst to hypercalls.rst
+Message-ID: <Yi+fNr9w28Nz2j3G@google.com>
+References: <20220224172559.4170192-1-rananta@google.com>
+ <20220224172559.4170192-10-rananta@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20220224172559.4170192-10-rananta@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,99 +93,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi all,
+On Thu, Feb 24, 2022 at 05:25:55PM +0000, Raghavendra Rao Ananta wrote:
+> Since the doc now covers more of general hypercalls'
+> details, rather than just PSCI, rename the file to a
+> more appropriate name- hypercalls.rst.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 
-This is v6 of the nVHE hypervisor stack enhancements. Addresses some
-refactoring/cleanup and documentation improvments from Stephen,
-and rebased on 5.17-rc8.
+You should move the file before adding to it IMO (switch this patch with
+the previous one).
 
-Previous versions can be found at:
-v5: https://lore.kernel.org/r/20220307184935.1704614-1-kaleshsingh@google.com/
-v4: https://lore.kernel.org/r/20220225033548.1912117-1-kaleshsingh@google.com/
-v3: https://lore.kernel.org/r/20220224051439.640768-1-kaleshsingh@google.com/
-v2: https://lore.kernel.org/r/20220222165212.2005066-1-kaleshsingh@google.com/
-v1: https://lore.kernel.org/r/20220210224220.4076151-1-kaleshsingh@google.com/
+Reviewed-by: Oliver Upton <oupton@google.com>
 
-The previous cover letter has been copied below for convenience.
-
-Thanks,
-Kalesh
-
------
-
-This series is based on 5.17-rc8 and adds the following stack features to
-the KVM nVHE hypervisor:
-
-== Hyp Stack Guard Pages ==
-
-Based on the technique used by arm64 VMAP_STACK to detect overflow.
-i.e. the stack is aligned such that the 'stack shift' bit of any valid
-SP is 1. The 'stack shift' bit can be tested in the exception entry to
-detect overflow without corrupting GPRs.
-
-== Hyp Stack Unwinder ==
-
-The unwinding and dumping of the hyp stack is not enabled by default and
-depends on CONFIG_NVHE_EL2_DEBUG to avoid potential information leaks.
-
-When CONFIG_NVHE_EL2_DEBUG is enabled the host stage 2 protection is
-disabled, allowing the host to read the hypervisor stack pages and unwind
-the stack from EL1. This allows us to print the hypervisor stacktrace
-before panicking the host; as shown below.
-
-Example call trace:
-
-[   98.916444][  T426] kvm [426]: nVHE hyp panic at: [<ffffffc0096156fc>] __kvm_nvhe_overflow_stack+0x8/0x34!
-[   98.918360][  T426] nVHE HYP call trace:
-[   98.918692][  T426] kvm [426]: [<ffffffc009615aac>] __kvm_nvhe_cpu_prepare_nvhe_panic_info+0x4c/0x68
-[   98.919545][  T426] kvm [426]: [<ffffffc0096159a4>] __kvm_nvhe_hyp_panic+0x2c/0xe8
-[   98.920107][  T426] kvm [426]: [<ffffffc009615ad8>] __kvm_nvhe_hyp_panic_bad_stack+0x10/0x10
-[   98.920665][  T426] kvm [426]: [<ffffffc009610a4c>] __kvm_nvhe___kvm_hyp_host_vector+0x24c/0x794
-[   98.921292][  T426] kvm [426]: [<ffffffc009615718>] __kvm_nvhe_overflow_stack+0x24/0x34
-. . .
-
-[   98.973382][  T426] kvm [426]: [<ffffffc009615718>] __kvm_nvhe_overflow_stack+0x24/0x34
-[   98.973816][  T426] kvm [426]: [<ffffffc0096152f4>] __kvm_nvhe___kvm_vcpu_run+0x38/0x438
-[   98.974255][  T426] kvm [426]: [<ffffffc009616f80>] __kvm_nvhe_handle___kvm_vcpu_run+0x1c4/0x364
-[   98.974719][  T426] kvm [426]: [<ffffffc009616928>] __kvm_nvhe_handle_trap+0xa8/0x130
-[   98.975152][  T426] kvm [426]: [<ffffffc009610064>] __kvm_nvhe___host_exit+0x64/0x64
-[   98.975588][  T426] ---- end of nVHE HYP call trace ----
-
-
-
-
-Kalesh Singh (8):
-  KVM: arm64: Introduce hyp_alloc_private_va_range()
-  KVM: arm64: Introduce pkvm_alloc_private_va_range()
-  KVM: arm64: Add guard pages for KVM nVHE hypervisor stack
-  KVM: arm64: Add guard pages for pKVM (protected nVHE) hypervisor stack
-  KVM: arm64: Detect and handle hypervisor stack overflows
-  KVM: arm64: Add hypervisor overflow stack
-  KVM: arm64: Unwind and dump nVHE HYP stacktrace
-  KVM: arm64: Symbolize the nVHE HYP backtrace
-
- arch/arm64/include/asm/kvm_asm.h     |  21 +++
- arch/arm64/include/asm/kvm_mmu.h     |   4 +
- arch/arm64/include/asm/stacktrace.h  |  12 ++
- arch/arm64/kernel/stacktrace.c       | 210 ++++++++++++++++++++++++---
- arch/arm64/kvm/Kconfig               |   5 +-
- arch/arm64/kvm/arm.c                 |  41 +++++-
- arch/arm64/kvm/handle_exit.c         |  16 +-
- arch/arm64/kvm/hyp/include/nvhe/mm.h |   6 +-
- arch/arm64/kvm/hyp/nvhe/host.S       |  29 ++++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  18 ++-
- arch/arm64/kvm/hyp/nvhe/mm.c         |  78 ++++++----
- arch/arm64/kvm/hyp/nvhe/setup.c      |  31 +++-
- arch/arm64/kvm/hyp/nvhe/switch.c     |  30 +++-
- arch/arm64/kvm/mmu.c                 |  70 ++++++---
- scripts/kallsyms.c                   |   2 +-
- 15 files changed, 477 insertions(+), 96 deletions(-)
-
-
-base-commit: 09688c0166e76ce2fb85e86b9d99be8b0084cdf9
--- 
-2.35.1.723.g4982287a31-goog
-
+> ---
+>  Documentation/virt/kvm/arm/{psci.rst => hypercalls.rst} | 0
+>  1 file changed, 0 insertions(+), 0 deletions(-)
+>  rename Documentation/virt/kvm/arm/{psci.rst => hypercalls.rst} (100%)
+> 
+> diff --git a/Documentation/virt/kvm/arm/psci.rst b/Documentation/virt/kvm/arm/hypercalls.rst
+> similarity index 100%
+> rename from Documentation/virt/kvm/arm/psci.rst
+> rename to Documentation/virt/kvm/arm/hypercalls.rst
+> -- 
+> 2.35.1.473.g83b2b277ed-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
