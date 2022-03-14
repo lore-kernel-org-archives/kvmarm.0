@@ -2,77 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 979CCC4332F
-	for <kvmarm@archiver.kernel.org>; Mon, 14 Mar 2022 20:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F15C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 14 Mar 2022 20:22:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 31FBF49EFB;
-	Mon, 14 Mar 2022 16:08:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 402E949E43;
+	Mon, 14 Mar 2022 16:22:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pGX91gJajN7H; Mon, 14 Mar 2022 16:08:00 -0400 (EDT)
+	with ESMTP id k1KNBiZX-6y9; Mon, 14 Mar 2022 16:22:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FA5C49EC0;
-	Mon, 14 Mar 2022 16:08:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B393949E5F;
+	Mon, 14 Mar 2022 16:22:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BC574141A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 16:07:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2CE249E5F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 16:22:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id isxuOryhtJiG for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Mar 2022 16:07:58 -0400 (EDT)
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com
- [209.85.166.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 04B1240A84
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 16:07:57 -0400 (EDT)
-Received: by mail-io1-f52.google.com with SMTP id l18so12446603ioj.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 13:07:57 -0700 (PDT)
+ with ESMTP id h9LWjQdoMj0i for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Mar 2022 16:22:12 -0400 (EDT)
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com
+ [209.85.166.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68B3849E43
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 16:22:12 -0400 (EDT)
+Received: by mail-il1-f181.google.com with SMTP id h7so11906156ile.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2022 13:22:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=5/64AAEf4Vzs1A/LiRdwPiWTgC6wn0RFoaoEGIYS0K0=;
- b=qm68+ONcoiq70dlktTbSNWbKZczAYgBGwZhIZ/TCBXLlcnEgoXErDNKwxkmfapE/54
- PTEL1lKRg2IAH7cVdEVFVAvCBmewE0HrgTTPrnMWrHk+MPOzMIw5rUXPmi8Y5/H1gRez
- 859U1z7DBPH6FPvSI0hvnipljJ4ADXURCyDlTeYJmNZ9ebJs4R7l4K5MVDF42BY6TNIT
- xnH6CcG7sUGUYNdTJ5r9lM/oLxYYKhu1euBNh51o+Ui5s9E2bmfqEsICS0yQZ5cEw5sf
- g0b2C3UITVh6uavnGAIFFQ+ncGVq4H6EWgNjHawb22qaRmnDZpwWrAOtZSZOl/X1NLJG
- K0bQ==
+ bh=2Bt6+Ca2x4nxRfIi5WYw88o7wk+blAKPH7fbDEP/s6U=;
+ b=gNIjYO84h+WERe6rT3JV1WoytsmwcN2lH6DMwhce7wnNKPY4bzcCzqNCR1k7QiUnDt
+ 3wZjOwUbLwCJa5hwke3SdeYA0AB2f2Q+11WzlKgxEOIBmKvVWd/UEyXQzpCvCRxjNRVJ
+ P0ZcRGH2QOHwCTfzJ4JDRhxSLJJLPzlg8GW4so/Ep/+MsmKBHClHAeZRuR4Wpfkl1teA
+ wVZTjDXXbcMUMWFb1/Ya5bkDGXBuq6JDRHmDlHbk+t285Q4IYvK54Cat9yHSdUOY6+Jg
+ wNCwJ3S81y3OGFCYAMobQieLpF01k3SIjCdc92rrXwZiL6tnC6d39gB4ykJh9H5nGUDF
+ scSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=5/64AAEf4Vzs1A/LiRdwPiWTgC6wn0RFoaoEGIYS0K0=;
- b=mprVsyVMJdjOQekxrwVmaZydv6A2agGWk40FHeuPM8zryaAjwaDZpzH1iGbyQTI1+O
- RSWcb0TGODIEb/yPJFJ7nEjyuHO3KT4TQatuqvmuQXiOTKXoQPO/BmVGCh5eOAR1dUbR
- bE+h5X9DDP6sEn+CdQeSbQRHkEgX7oESMXN9lKb9BmaDUas8bNVibP3BhiMnjuNhRPKl
- kePx5ewQma3/qcBj+BN+ywbNn+rl1XRSClEvFChTeyexrunDTaRPA3WD4GNyHLFr8CJF
- MpmcRHVzH5pFJnIHXAkbDC/ZAkPV6vZvVKVvCNAKnVebbQHXJIIOattBiMVPUnyO5jxF
- k8zQ==
-X-Gm-Message-State: AOAM530qSF+K5gR9YQqVVsRgY/eO4025hGWKdLmzAjZYBL/aOqZMSMYa
- Dmjo7EviHf3QHyb5jOsKU2vYMw==
-X-Google-Smtp-Source: ABdhPJx+cCT9RbztBLcxVFaSRxxa8KxO45I5CoBY2KZENSIpHruKS+BfdUba5UJey30qxO8YNS+AMQ==
-X-Received: by 2002:a05:6638:1616:b0:31a:131c:9079 with SMTP id
- x22-20020a056638161600b0031a131c9079mr2603879jas.89.1647288477157; 
- Mon, 14 Mar 2022 13:07:57 -0700 (PDT)
+ bh=2Bt6+Ca2x4nxRfIi5WYw88o7wk+blAKPH7fbDEP/s6U=;
+ b=c8qBX+OXBaVlAjVZiOI2dHX/HzyUmYEraJuKMoY62lpbxAMYz+bxM77KflN98djyqx
+ mw+0oZ1+j22obXAErq/z0ac4HEz6FkrideNtggeA8NZmkHgmywVF4w27p0q1LleKHyWU
+ y+QCo9LM4nL/bi/Qr+qwHDuuKOufmj1jPsa6wiy/sGLrr/vkfrhoo5QCfAH+USIkY9r1
+ y4EaOR1sMt8eSgM0XBjh/ruPJeuwzs+WUEXUqyN6ClMQyEjfEy04lWhYwRa1afQGlGt3
+ njKRxgvlQXOp0ehYEZzl73oLGhbBLmhKHc9lO6u1gvZsclwOO7QsB+xn3ofYqm3x/hQy
+ KgEQ==
+X-Gm-Message-State: AOAM533OB7nTFuyBnUCUUIp/LLOGOIDO7r8pRLVWVH9So8YW7mswR07d
+ 4UJw210nwU4xxziNbGdGbXKiyg==
+X-Google-Smtp-Source: ABdhPJwhm/TaO7FFg/+K/rjpb9mtXjkN554TejXnnYG/4s4LMcqQATZvLzU4jt2heXeJlc3hSmvw5Q==
+X-Received: by 2002:a92:c088:0:b0:2c7:9421:3c7b with SMTP id
+ h8-20020a92c088000000b002c794213c7bmr9181438ile.280.1647289331417; 
+ Mon, 14 Mar 2022 13:22:11 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- b25-20020a5d8059000000b00644ddaad77asm9076916ior.29.2022.03.14.13.07.56
+ p22-20020a6bce16000000b00640922b3699sm8771766iob.15.2022.03.14.13.22.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 14 Mar 2022 13:07:56 -0700 (PDT)
-Date: Mon, 14 Mar 2022 20:07:53 +0000
+ Mon, 14 Mar 2022 13:22:10 -0700 (PDT)
+Date: Mon, 14 Mar 2022 20:22:07 +0000
 From: Oliver Upton <oupton@google.com>
 To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v4 1/3] KVM: arm64: Generalise VM features into a set of
- flags
-Message-ID: <Yi+gmV6xuiCkAtbh@google.com>
+Subject: Re: [PATCH v4 2/3] KVM: arm64: mixed-width check should be skipped
+ for uninitialized vCPUs
+Message-ID: <Yi+j7zGxA80ZR4t7@google.com>
 References: <20220314061959.3349716-1-reijiw@google.com>
- <20220314061959.3349716-2-reijiw@google.com>
+ <20220314061959.3349716-3-reijiw@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220314061959.3349716-2-reijiw@google.com>
+In-Reply-To: <20220314061959.3349716-3-reijiw@google.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
@@ -93,27 +93,232 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Mar 13, 2022 at 11:19:57PM -0700, Reiji Watanabe wrote:
-> From: Marc Zyngier <maz@kernel.org>
+On Sun, Mar 13, 2022 at 11:19:58PM -0700, Reiji Watanabe wrote:
+> KVM allows userspace to configure either all EL1 32bit or 64bit vCPUs
+> for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
+> if the vcpu's register width is consistent with all other vCPUs'.
+> Since the checking is done even against vCPUs that are not initialized
+> (KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
+> are erroneously treated as 64bit vCPU, which causes the function to
+> incorrectly detect a mixed-width VM.
 > 
-> We currently deal with a set of booleans for VM features,
-> while they could be better represented as set of flags
-> contained in an unsigned long, similarily to what we are
-> doing on the CPU side.
+> Introduce KVM_ARCH_FLAG_EL1_32BIT and KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED
+> bits for kvm->arch.flags.  A value of the EL1_32BIT bit indicates that
+> the guest needs to be configured with all 32bit or 64bit vCPUs, and
+> a value of the REG_WIDTH_CONFIGURED bit indicates if a value of the
+> EL1_32BIT bit is valid (already set up). Values in those bits are set at
+> the first KVM_ARM_VCPU_INIT for the guest based on KVM_ARM_VCPU_EL1_32BIT
+> configuration for the vCPU.
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> Check vcpu's register width against those new bits at the vcpu's
+> KVM_ARM_VCPU_INIT (instead of against other vCPUs' register width).
+> 
+> Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
 > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 
-Gee, that's one popular patch! Just as a heads up, I rebased it on top
-of kvmarm/next in:
+Hrmph... I hate to be asking this question so late in the game, but...
 
-  http://lore.kernel.org/r/20220311174001.605719-2-oupton@google.com
+Are there any bits that we really allow variation per-vCPU besides
+KVM_ARM_VCPU_POWER_OFF? We unintentionally allow for variance with the
+KVM_ARM_VCPU_PSCI_0_2 bit even though that's complete nonsense.
 
-since kvm_arch picked up another bool.
+Stated plainly, should we just deny any attempts at asymmetry besides
+POWER_OFF?
 
---
-Oliver
+Besides the nits, I see nothing objectionable with the patch. I'd really
+like to see more generalized constraints on vCPU configuration, but if
+this is the route we take:
+
+Reviewed-by: Oliver Upton <oupton@google.com>
+
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 27 ++++++++----
+>  arch/arm64/include/asm/kvm_host.h    |  9 ++++
+>  arch/arm64/kvm/reset.c               | 64 ++++++++++++++++++----------
+>  3 files changed, 70 insertions(+), 30 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index d62405ce3e6d..7496deab025a 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -43,10 +43,22 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+>  
+>  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+>  
+> +#if defined(__KVM_VHE_HYPERVISOR__) || defined(__KVM_NVHE_HYPERVISOR__)
+>  static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+>  {
+>  	return !(vcpu->arch.hcr_el2 & HCR_RW);
+>  }
+> +#else
+> +static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = vcpu->kvm;
+> +
+> +	WARN_ON_ONCE(!test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED,
+> +			       &kvm->arch.flags));
+> +
+> +	return test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
+> +}
+> +#endif
+>  
+>  static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+>  {
+> @@ -72,15 +84,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+>  		vcpu->arch.hcr_el2 |= HCR_TVM;
+>  	}
+>  
+> -	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
+> +	if (vcpu_el1_is_32bit(vcpu))
+>  		vcpu->arch.hcr_el2 &= ~HCR_RW;
+> -
+> -	/*
+> -	 * TID3: trap feature register accesses that we virtualise.
+> -	 * For now this is conditional, since no AArch32 feature regs
+> -	 * are currently virtualised.
+> -	 */
+> -	if (!vcpu_el1_is_32bit(vcpu))
+> +	else
+> +		/*
+> +		 * TID3: trap feature register accesses that we virtualise.
+> +		 * For now this is conditional, since no AArch32 feature regs
+> +		 * are currently virtualised.
+> +		 */
+>  		vcpu->arch.hcr_el2 |= HCR_TID3;
+>  
+>  	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 11a7ae747ded..22ad977069f5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -125,6 +125,15 @@ struct kvm_arch {
+>  #define KVM_ARCH_FLAG_RETURN_NISV_IO_ABORT_TO_USER	0
+>  	/* Memory Tagging Extension enabled for the guest */
+>  #define KVM_ARCH_FLAG_MTE_ENABLED			1
+> +	/*
+> +	 * The following two bits are used to indicate the guest's EL1
+> +	 * register width configuration. A value of KVM_ARCH_FLAG_EL1_32BIT
+> +	 * bit is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED is set.
+> +	 * Otherwise, the guest's EL1 register width has not yet been
+> +	 * determined yet.
+> +	 */
+> +#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		2
+> +#define KVM_ARCH_FLAG_EL1_32BIT				3
+>  	unsigned long flags;
+>  
+>  	/*
+> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> index ecc40c8cd6f6..cbeb6216ee25 100644
+> --- a/arch/arm64/kvm/reset.c
+> +++ b/arch/arm64/kvm/reset.c
+> @@ -181,27 +181,45 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
+>  	return 0;
+>  }
+>  
+> -static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
+> +/*
+> + * A guest can have either all EL1 32bit or 64bit vcpus only. It is
+> + * indicated by a value of KVM_ARCH_FLAG_EL1_32BIT bit in kvm->arch.flags,
+> + * which is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED in
+> + * kvm->arch.flags is set.
+> + * This function sets the EL1_32BIT bit based on the given @is32bit (and
+> + * sets REG_WIDTH_CONFIGURED bit). When those flags are already set,
+> + * @is32bit must be consistent with the flags.
+> + * Returns 0 on success, or non-zero otherwise.
+> + */
+
+nit: use kerneldoc style:
+
+  https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html
+
+> +static int kvm_set_vm_width(struct kvm *kvm, bool is32bit)
+>  {
+> -	struct kvm_vcpu *tmp;
+> -	bool is32bit;
+> -	unsigned long i;
+> +	bool allowed;
+> +
+> +	lockdep_assert_held(&kvm->lock);
+> +
+> +	if (test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags)) {
+> +		/*
+> +		 * The guest's register width is already configured.
+> +		 * Make sure that @is32bit is consistent with it.
+> +		 */
+> +		allowed = (is32bit ==
+> +			   test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags));
+> +		return allowed ? 0 : -EINVAL;
+
+nit: I'd avoid the ternary and just use a boring if/else (though I could
+be in the minority here).
+
+> +	}
+>  
+> -	is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
+>  	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
+> -		return false;
+> +		return -EINVAL;
+>  
+>  	/* MTE is incompatible with AArch32 */
+> -	if (kvm_has_mte(vcpu->kvm) && is32bit)
+> -		return false;
+> +	if (kvm_has_mte(kvm) && is32bit)
+> +		return -EINVAL;
+>  
+> -	/* Check that the vcpus are either all 32bit or all 64bit */
+> -	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> -		if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
+> -			return false;
+> -	}
+> +	if (is32bit)
+> +		set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
+>  
+> -	return true;
+> +	set_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags);
+> +
+> +	return 0;
+>  }
+>  
+>  /**
+> @@ -230,10 +248,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  	u32 pstate;
+>  
+>  	mutex_lock(&vcpu->kvm->lock);
+> -	reset_state = vcpu->arch.reset_state;
+> -	WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> +	ret = kvm_set_vm_width(vcpu->kvm,
+> +			       vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT));
+> +	if (!ret) {
+> +		reset_state = vcpu->arch.reset_state;
+> +		WRITE_ONCE(vcpu->arch.reset_state.reset, false);
+> +	}
+>  	mutex_unlock(&vcpu->kvm->lock);
+>  
+> +	if (ret)
+> +		return ret;
+> +
+>  	/* Reset PMU outside of the non-preemptible section */
+>  	kvm_pmu_vcpu_reset(vcpu);
+>  
+> @@ -260,14 +285,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>  		}
+>  	}
+>  
+> -	if (!vcpu_allowed_register_width(vcpu)) {
+> -		ret = -EINVAL;
+> -		goto out;
+> -	}
+> -
+>  	switch (vcpu->arch.target) {
+>  	default:
+> -		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+> +		if (vcpu_el1_is_32bit(vcpu)) {
+>  			pstate = VCPU_RESET_PSTATE_SVC;
+>  		} else {
+>  			pstate = VCPU_RESET_PSTATE_EL1;
+> -- 
+> 2.35.1.723.g4982287a31-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
