@@ -2,46 +2,48 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1413C433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Mar 2022 15:48:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9A47C433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Mar 2022 16:31:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2819149EFC;
-	Tue, 15 Mar 2022 11:48:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29AC549F15;
+	Tue, 15 Mar 2022 12:31:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DrNATLS9ioZj; Tue, 15 Mar 2022 11:48:09 -0400 (EDT)
+	with ESMTP id DPm99gkwlA5J; Tue, 15 Mar 2022 12:31:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E14A549EFE;
-	Tue, 15 Mar 2022 11:48:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D441A49EC3;
+	Tue, 15 Mar 2022 12:31:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 70DB149E0E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 11:48:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3303049EC3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 12:31:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id APfpBopwUtDb for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Mar 2022 11:48:06 -0400 (EDT)
+ with ESMTP id g6nE4UdOLsNv for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Mar 2022 12:31:02 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D359E4076A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 11:48:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E25249E35
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 12:31:02 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4DF621474;
- Tue, 15 Mar 2022 08:48:06 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 06BCC1474;
+ Tue, 15 Mar 2022 09:31:02 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0C6B43F766;
- Tue, 15 Mar 2022 08:48:04 -0700 (PDT)
-Date: Tue, 15 Mar 2022 15:48:30 +0000
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 04F7C3F766;
+ Tue, 15 Mar 2022 09:31:00 -0700 (PDT)
+Date: Tue, 15 Mar 2022 16:31:34 +0000
 From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests] Adding the QCBOR library to kvm-unit-tests
-Message-ID: <YjC1TsFlZeTAeyYD@monolith.localdoman>
-References: <YjCVxT1yo0hi6Vdc@monolith.localdoman>
- <b1d5e4b7-c07c-0e34-ef6d-58aab19a41b2@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests] arch-run: Introduce QEMU_ARCH
+Message-ID: <YjC62NycFfevZ4wx@monolith.localdoman>
+References: <20220315080152.224606-1-drjones@redhat.com>
+ <YjCHcV3iyTtSrw3k@monolith.localdoman>
+ <20220315151630.obxraie6ikqrwtrw@gator>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <b1d5e4b7-c07c-0e34-ef6d-58aab19a41b2@redhat.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20220315151630.obxraie6ikqrwtrw@gator>
+Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -60,53 +62,98 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi,
 
-On Tue, Mar 15, 2022 at 03:21:39PM +0100, Thomas Huth wrote:
-> On 15/03/2022 14.33, Alexandru Elisei wrote:
+On Tue, Mar 15, 2022 at 04:16:30PM +0100, Andrew Jones wrote:
+> On Tue, Mar 15, 2022 at 12:33:17PM +0000, Alexandru Elisei wrote:
 > > Hi,
 > > 
-> > Arm is planning to upstream tests that are being developed as part of the
-> > Confidential Compute Architecture [1]. Some of the tests target the
-> > attestation part of creating and managing a confidential compute VM, which
-> > requires the manipulation of messages in the Concise Binary Object
-> > Representation (CBOR) format [2].
+> > On Tue, Mar 15, 2022 at 09:01:52AM +0100, Andrew Jones wrote:
+> > > Add QEMU_ARCH, which allows run scripts to specify which architecture
+> > > of QEMU should be used. This is useful on AArch64 when running with
+> > > KVM and running AArch32 tests. For those tests, we *don't* want to
+> > > select the 'arm' QEMU, as would have been selected, but rather the
+> > > $HOST ('aarch64') QEMU.
+> > > 
+> > > To use this new variable, simply ensure it's set prior to calling
+> > > search_qemu_binary().
 > > 
-> > I would like to ask if it would be acceptable from a license perspective to
-> > include the QCBOR library [3] into kvm-unit-tests, which will be used for
-> > encoding and decoding of CBOR messages.
+> > Looks good, tested on an arm64 machine, with ACCEL set to tcg -
+> > run_tests.sh selects qemu-system-arm; ACCEL unset - run_tests.sh selects
+> > ACCEL=kvm and qemu-system-aarch64; also tested on an x86 machine -
+> > run_tests.sh selects ACCEL=tcg and qemu-system-arm:
 > > 
-> > The library is licensed under the 3-Clause BSD license, which is compatible
-> > with GPLv2 [4]. Some of the files that were created inside Qualcomm before
-> > the library was open-sourced have a slightly modified 3-Clause BSD license,
-> > where a NON-INFRINGMENT clause is added to the disclaimer:
+> > Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > > 
-> > "THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
-> > WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-> > MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE **AND NON-INFRINGEMENT**
-> > ARE DISCLAIMED" (emphasis by me on the added clause).
+> > One thing I noticed is that if the user sets QEMU=qemu-system-arm on an arm64
+> > machine, run_tests.sh still selects ACCEL=kvm which leads to the following
+> > failure:
 > > 
-> > The files in question include the core files that implement the
-> > encode/decode functionality, and thus would have to be included in
-> > kvm-unit-tests. I believe that the above modification does not affect the
-> > compatibility with GPLv2.
+> > SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
+> > 
+> > I'm not sure if this deserves a fix, if the user set the QEMU variable I
+> > believe it is probable that the user is also aware of the ACCEL variable
+> > and the error message does a good job explaining what is wrong.
 > 
-> IANAL, but I think it should be ok to add those files to the kvm-unit-tests.
-> With regards to the "non-infringement" extension, it seems to be the one
-> mentioned here: https://enterprise.dejacode.com/licenses/public/bsd-x11/ ...
-> and on the "license condition" tab they mention that it is compatible with
-> the GPL. On gnu.org, they list e.g. the
-> https://www.gnu.org/licenses/license-list.html#X11License which also
-> contains a "non-infringement" statement, so that should really be
-> compatible.
+> Yes, we assume the user selected the wrong qemu, rather than assuming the
+> user didn't expect KVM to be enabled. If we're wrong, then the error
+> message should hopefully imply to the user that they need to do
+> 
+>  QEMU=qemu-system-arm ACCEL=tcg ...
 
-Thanks you for the links, I wasn't aware of them. They further confirm that
-QCBOR is indeed compatible with GPLv2.
+Yep, it was very easy to figure out what needs to be done to get the tests
+running again.
+
+> 
+> > Just in
+> > case, this is what I did to make kvm-unit-tests pick the right accelerator
+> > (copied-and-pasted the find_word function from scripts/runtime.bash):
+> > 
+> > diff --git a/arm/run b/arm/run
+> > index 94adcddb7399..b0c9613b8d28 100755
+> > --- a/arm/run
+> > +++ b/arm/run
+> > @@ -10,6 +15,10 @@ if [ -z "$KUT_STANDALONE" ]; then
+> >  fi
+> >  processor="$PROCESSOR"
+> > 
+> > +if [ -z $ACCEL ] && [ "$HOST" = "aarch64" ] && ! find_word "qemu-system-arm" "$QEMU"; then
+> 
+> Instead of find_word,
+> 
+>  [ "$QEMU" ] && [ "$(basename $QEMU)" = "qemu-system-arm" ]
+> 
+> > +       ACCEL=tcg
+> > +fi
+> > +
+> 
+> When ACCEL is unset, we currently set it to kvm when we have /dev/kvm and
+> $HOST == $ARCH_NAME or ($HOST == aarch64 && $ARCH == arm) and tcg
+> otherwise. Adding logic like the above would allow overriding the
+> "set to kvm" logic when $QEMU == qemu-system-arm. That makes sense to
+> me, but we trade one assumption for another. We would now assume that
+> $QEMU is correct and the user wants to run with TCG, rather than that
+> $QEMU is wrong and the user wanted to run with KVM.
+> 
+> I think I'd prefer not adding the special case override. I think it's
+> more likely the user expects to run with KVM when running on an AArch64
+> host and that they mistakenly selected the wrong qemu, than that they
+> wanted TCG with qemu-system-arm. We also avoid a few more lines of code
+> and a change in behavior by maintaining the old assumption.
+
+Well, kvm-unit-tests selects KVM or TCG under the hood without the user
+being involved at all. In my opinion, it's slightly better from an
+usability perspective for kvm-unit-tests to do its best to run the tests
+based on what the user specifically set (QEMU=qemu-system-arm) than fail to
+run the tests because of an internal heuristic of which the user might be
+entirely ignorant (if arm64 and /dev/kvm is available, pick ACCEL=kvm).
+
+Regardless, I don't have a strong opinion either way, and it's trivial for
+a user to figure out that ACCEL=tcg will make the tests run. So from my
+side this is mostly academic and the test runner can stay as it is if you
+don't see a reason to change it.
 
 Thanks,
 Alex
-
-> 
->  Thomas
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
