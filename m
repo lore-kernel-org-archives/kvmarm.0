@@ -2,91 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBFEC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Mar 2022 15:16:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A67C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Mar 2022 15:25:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28A4949F02;
-	Tue, 15 Mar 2022 11:16:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3819F49F16;
+	Tue, 15 Mar 2022 11:25:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SSqwR2wWkBss; Tue, 15 Mar 2022 11:16:38 -0400 (EDT)
+	with ESMTP id 2HOelTy6EswE; Tue, 15 Mar 2022 11:25:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BD9C49EBC;
-	Tue, 15 Mar 2022 11:16:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C76DA49F07;
+	Tue, 15 Mar 2022 11:25:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFBB9408B3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 11:16:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6CF849F07
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 11:25:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lfhIxOoKnp+q for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Mar 2022 11:16:36 -0400 (EDT)
+ with ESMTP id dW0B20HZBPDZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Mar 2022 11:25:36 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99976408AB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 11:16:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 81DD649F02
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 11:25:36 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1647357396;
+ s=mimecast20190719; t=1647357936;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=m/7BYXukn7buzDSsXOMYbRlp86FSMB6fqjAlxafd0GI=;
- b=iKV4FEQftp42cB4DU04pz1bU9JoWw3qUT7GfIoh10vJqVw4OZ1Uc0gctpI3vvQtB0MQ+zc
- qxOPZEckkTjsM2M0H1hrbLVojQM5/Q+/0FxG/AO7Sekq6RAoJHallgM1TVIYYR2gL1dgk9
- 7m04DBhcKAfbR02op8NFdP9N0Qub7A8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=+vHON9sLMUnWuhzssX9l36MlFGplt76F/UZcJvgCxP4=;
+ b=JZVdYH7Wwhz+Zg5e76jdkvJjunM+9B28ypo+lrsakjZI/EdM8E3s6HufIfZ2KglDZcJgcS
+ CK9rBf6A7hB++yu1YxgupuKYEox/KPVxxzvmQNubI/PCuJYi7Ie+CSQggRVmGwjrJm33Nj
+ lRFXlGThgDSnOufgJlOxN453BXWd4NI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-407-2EiP-unBMS-HMBnNrYzJCw-1; Tue, 15 Mar 2022 11:16:34 -0400
-X-MC-Unique: 2EiP-unBMS-HMBnNrYzJCw-1
-Received: by mail-wm1-f72.google.com with SMTP id
- f189-20020a1c38c6000000b0037d1bee4847so1355763wma.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 08:16:34 -0700 (PDT)
+ us-mta-191-joT0b04OM7OjfXhlQ5EMQA-1; Tue, 15 Mar 2022 11:25:32 -0400
+X-MC-Unique: joT0b04OM7OjfXhlQ5EMQA-1
+Received: by mail-wr1-f69.google.com with SMTP id
+ e6-20020a5d4e86000000b001f045d4a962so5408444wru.21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 08:25:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=m/7BYXukn7buzDSsXOMYbRlp86FSMB6fqjAlxafd0GI=;
- b=ikgRqDEuIbT/aBxorHhH0Lxv23bnW8MXi1KhtlKhIiqbscDUTPlwf6kBzt6AW/GFJB
- gwXZUsbro4SNwhRJLdwSSsFQdJpb0ld6XRbwfy1q6aT/OLnQKzbnSNLyT1Axmeq5MGtX
- rErAxu8mbLIhMkwRUzm/C7/raSg01tdEOHwBklc+EsoKIfPaFDjwEG4E5Ql7AlNqZyT+
- Q6qgUOmxCN96Jkc5NE891+Xe9sl542xYA1LFCYIDEnpkzeMO1CJEmd0QG/Z5qCdupM7g
- 3hHSxrj34YI3JRz89nnzPFEIoHZOjSEwqR5vJZs+2ND8xkur7zx6buDKJsWpdGWvVg7l
- EitQ==
-X-Gm-Message-State: AOAM532vEmLeJTpeK+hBAA2U2E/upKBPfGdPovIw8g9FMRJW/JDIuHZ3
- 3wdMcQAu57i89FC3PI7IGgZjKaOSFvuNdg/6JkIv4iQY1999KQFHW6777nOEwEfyS4p2wU3Kta3
- c4eV76bAfeVf0TJsjwjN0xjdh
-X-Received: by 2002:adf:dbd2:0:b0:1ea:9382:6bff with SMTP id
- e18-20020adfdbd2000000b001ea93826bffmr20441374wrj.705.1647357393618; 
- Tue, 15 Mar 2022 08:16:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz8Aa12w4oOTyt/U2Fn3zGv+XBxaSJ3EAWOWRw+ZWLtaqS3q+xxi95Suhv+sCUMw2Y229UZCA==
-X-Received: by 2002:adf:dbd2:0:b0:1ea:9382:6bff with SMTP id
- e18-20020adfdbd2000000b001ea93826bffmr20441312wrj.705.1647357392616; 
- Tue, 15 Mar 2022 08:16:32 -0700 (PDT)
+ bh=+vHON9sLMUnWuhzssX9l36MlFGplt76F/UZcJvgCxP4=;
+ b=5EUxK4uUNvfuZR7c8daNzR98esrJEzEVr1Uw6Sb2NQqShFiC1woXKWvJfPp5x5Ybcr
+ 7fk5QeNmoGsOqsj4rBr1tj/5vRG6ScJLQheVEtCDj0yM2zHvjY5APv2BJNJUIklge43H
+ O6bA9uVdg2dITbMa2zFfQ3O+aKMieo6V3Cm6FL4PLxGAqhNLzjSOxX1kUsOutD5cc7cf
+ 11KDvV9RA1BmHSl8BuiXsl9JRsG4PabkCiqCwbBlCzXIrQwbp2hWupwo5Asseur90/xU
+ EJcdVYEsDEvespKunstSpv/sKX098dDjZdtO8vPjooGirAZl5TH9wieTskZo3iw5Y5fe
+ Wkiw==
+X-Gm-Message-State: AOAM531A9lscdulRL/QiovIEmLELRQ5rRCdqd61LC2ejubt7HQuuBsai
+ WGSB2TJVT3RgfUTDmdtjtTm2pnXI0swGGuSxhzCSE2HBH1PgU+I7cT9MBMpFEVY7cdkD6eQZUZC
+ fJ/xrXY3M4J+m9dsi9FOL/dZH
+X-Received: by 2002:adf:d1eb:0:b0:203:9349:12b5 with SMTP id
+ g11-20020adfd1eb000000b00203934912b5mr17160913wrd.285.1647357931075; 
+ Tue, 15 Mar 2022 08:25:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz2ee9e3ZcJNtbvd1Kl1w+g+2sYRYd7utinJ9zHtcCamj5vcsF8wTRZt4xGOXgYc/WbZJf1CQ==
+X-Received: by 2002:adf:d1eb:0:b0:203:9349:12b5 with SMTP id
+ g11-20020adfd1eb000000b00203934912b5mr17160901wrd.285.1647357930888; 
+ Tue, 15 Mar 2022 08:25:30 -0700 (PDT)
 Received: from gator (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
  by smtp.gmail.com with ESMTPSA id
- l25-20020a1c7919000000b0038999b380e9sm2467699wme.38.2022.03.15.08.16.31
+ e6-20020a5d5006000000b0020374784350sm15897016wrt.64.2022.03.15.08.25.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Mar 2022 08:16:32 -0700 (PDT)
-Date: Tue, 15 Mar 2022 16:16:30 +0100
+ Tue, 15 Mar 2022 08:25:30 -0700 (PDT)
+Date: Tue, 15 Mar 2022 16:25:28 +0100
 From: Andrew Jones <drjones@redhat.com>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH kvm-unit-tests] arch-run: Introduce QEMU_ARCH
-Message-ID: <20220315151630.obxraie6ikqrwtrw@gator>
-References: <20220315080152.224606-1-drjones@redhat.com>
- <YjCHcV3iyTtSrw3k@monolith.localdoman>
+Subject: Re: [kvm-unit-tests] Adding the QCBOR library to kvm-unit-tests
+Message-ID: <20220315152528.u7zdkjlq6okahidm@gator>
+References: <YjCVxT1yo0hi6Vdc@monolith.localdoman>
 MIME-Version: 1.0
-In-Reply-To: <YjCHcV3iyTtSrw3k@monolith.localdoman>
+In-Reply-To: <YjCVxT1yo0hi6Vdc@monolith.localdoman>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org
+Cc: thuth@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,83 +102,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 15, 2022 at 12:33:17PM +0000, Alexandru Elisei wrote:
+On Tue, Mar 15, 2022 at 01:33:57PM +0000, Alexandru Elisei wrote:
 > Hi,
 > 
-> On Tue, Mar 15, 2022 at 09:01:52AM +0100, Andrew Jones wrote:
-> > Add QEMU_ARCH, which allows run scripts to specify which architecture
-> > of QEMU should be used. This is useful on AArch64 when running with
-> > KVM and running AArch32 tests. For those tests, we *don't* want to
-> > select the 'arm' QEMU, as would have been selected, but rather the
-> > $HOST ('aarch64') QEMU.
-> > 
-> > To use this new variable, simply ensure it's set prior to calling
-> > search_qemu_binary().
+> Arm is planning to upstream tests that are being developed as part of the
+> Confidential Compute Architecture [1]. Some of the tests target the
+> attestation part of creating and managing a confidential compute VM, which
+> requires the manipulation of messages in the Concise Binary Object
+> Representation (CBOR) format [2].
 > 
-> Looks good, tested on an arm64 machine, with ACCEL set to tcg -
-> run_tests.sh selects qemu-system-arm; ACCEL unset - run_tests.sh selects
-> ACCEL=kvm and qemu-system-aarch64; also tested on an x86 machine -
-> run_tests.sh selects ACCEL=tcg and qemu-system-arm:
+> I would like to ask if it would be acceptable from a license perspective to
+> include the QCBOR library [3] into kvm-unit-tests, which will be used for
+> encoding and decoding of CBOR messages.
 > 
-> Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> The library is licensed under the 3-Clause BSD license, which is compatible
+> with GPLv2 [4]. Some of the files that were created inside Qualcomm before
+> the library was open-sourced have a slightly modified 3-Clause BSD license,
+> where a NON-INFRINGMENT clause is added to the disclaimer:
 > 
-> One thing I noticed is that if the user sets QEMU=qemu-system-arm on an arm64
-> machine, run_tests.sh still selects ACCEL=kvm which leads to the following
-> failure:
+> "THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+> WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+> MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE **AND NON-INFRINGEMENT**
+> ARE DISCLAIMED" (emphasis by me on the added clause).
 > 
-> SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
+> The files in question include the core files that implement the
+> encode/decode functionality, and thus would have to be included in
+> kvm-unit-tests. I believe that the above modification does not affect the
+> compatibility with GPLv2.
 > 
-> I'm not sure if this deserves a fix, if the user set the QEMU variable I
-> believe it is probable that the user is also aware of the ACCEL variable
-> and the error message does a good job explaining what is wrong.
-
-Yes, we assume the user selected the wrong qemu, rather than assuming the
-user didn't expect KVM to be enabled. If we're wrong, then the error
-message should hopefully imply to the user that they need to do
-
- QEMU=qemu-system-arm ACCEL=tcg ...
-
-> Just in
-> case, this is what I did to make kvm-unit-tests pick the right accelerator
-> (copied-and-pasted the find_word function from scripts/runtime.bash):
+> I would also like to mention that the QCBOR library is also used in Trusted
+> Firmware-M [5], which is licensed under BSD 3-Clause.
 > 
-> diff --git a/arm/run b/arm/run
-> index 94adcddb7399..b0c9613b8d28 100755
-> --- a/arm/run
-> +++ b/arm/run
-> @@ -10,6 +15,10 @@ if [ -z "$KUT_STANDALONE" ]; then
->  fi
->  processor="$PROCESSOR"
+> [1] https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+> [2] https://datatracker.ietf.org/doc/html/rfc8949
+> [3] https://github.com/laurencelundblade/QCBOR
+> [4] https://www.gnu.org/licenses/license-list.html#GPLCompatibleLicenses
+> [5] https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git/tree/lib/ext/qcbor
 > 
-> +if [ -z $ACCEL ] && [ "$HOST" = "aarch64" ] && ! find_word "qemu-system-arm" "$QEMU"; then
+> Thanks,
+> Alex
+>
 
-Instead of find_word,
-
- [ "$QEMU" ] && [ "$(basename $QEMU)" = "qemu-system-arm" ]
-
-> +       ACCEL=tcg
-> +fi
-> +
-
-When ACCEL is unset, we currently set it to kvm when we have /dev/kvm and
-$HOST == $ARCH_NAME or ($HOST == aarch64 && $ARCH == arm) and tcg
-otherwise. Adding logic like the above would allow overriding the
-"set to kvm" logic when $QEMU == qemu-system-arm. That makes sense to
-me, but we trade one assumption for another. We would now assume that
-$QEMU is correct and the user wants to run with TCG, rather than that
-$QEMU is wrong and the user wanted to run with KVM.
-
-I think I'd prefer not adding the special case override. I think it's
-more likely the user expects to run with KVM when running on an AArch64
-host and that they mistakenly selected the wrong qemu, than that they
-wanted TCG with qemu-system-arm. We also avoid a few more lines of code
-and a change in behavior by maintaining the old assumption.
-
-I've pushed this to arm/queue -- and MR coming up.
+Assuming the license is OK (I'm not educated in that stuff enough to give
+an opinion), then the next question is how do we want to integrate it?
+Bring it all in, like we did libfdt? Or use a git submodule?
 
 Thanks,
-drew
+drew 
 
 _______________________________________________
 kvmarm mailing list
