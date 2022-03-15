@@ -2,84 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF1DC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Mar 2022 10:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8689BC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Mar 2022 10:23:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A160C4291D;
-	Tue, 15 Mar 2022 06:18:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED56649F1F;
+	Tue, 15 Mar 2022 06:23:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pdx8yIe1YhrR; Tue, 15 Mar 2022 06:18:13 -0400 (EDT)
+	with ESMTP id zqzfwtP+cqhe; Tue, 15 Mar 2022 06:23:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51A0D49EFC;
-	Tue, 15 Mar 2022 06:18:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D159E49EC0;
+	Tue, 15 Mar 2022 06:23:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C1A24291D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 06:18:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 17F7E49E3F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 06:23:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5DlyiuMEoNKu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Mar 2022 06:18:11 -0400 (EDT)
+ with ESMTP id DByVF7Ku5z0U for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Mar 2022 06:23:00 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1057340C2B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 06:18:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1799B4291D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 06:23:00 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1647339489;
+ s=mimecast20190719; t=1647339779;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=8aKmgpWQOn5fy2pFZJV3AASa7qkUAzElx68DLyF1Rv8=;
- b=Lq8k79MTF2uZ86Ebz0XuG1CLRjf3gDwxvAv9nQWA9h6+0DMJljbStHqf/39kxvUwIYaiZt
- 53uyk2VQlNV2T9U0QsTjuKqe1RxhOJ8g+Kn4VUMLlT49JFeiKTadDPsmAE/FWcbDzVJZa3
- c2a6Z6RyE/hvOzIS+H+cmMV8vh1z7VA=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=LjO2FjgMYcDXjzsWvO69h8LISgo2Po4eNzRhF4LMslU=;
+ b=UxVHS6LkBAFQUm7TTvr36FB8+dlE5lMRUIh2YBraeilRam0ez/cgi9PiMYEASu0++ExOXS
+ ubeakem/JLWwPL4BItcAufxWbPdi7fWAhHDm02CAX2uWRJ6F4bobrgvVtCERqx4zysQt2N
+ ULf0YmL4oz+mxs2nW7+m9jOXkPXYpA4=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-460-cQ_a0xELOE217CJchaUu4Q-1; Tue, 15 Mar 2022 06:18:06 -0400
-X-MC-Unique: cQ_a0xELOE217CJchaUu4Q-1
-Received: by mail-pf1-f197.google.com with SMTP id
- 67-20020a621446000000b004f739ef52f1so11582168pfu.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 03:18:06 -0700 (PDT)
+ us-mta-316-vk41WundPgmqyVww-SUEFw-1; Tue, 15 Mar 2022 06:22:56 -0400
+X-MC-Unique: vk41WundPgmqyVww-SUEFw-1
+Received: by mail-pl1-f197.google.com with SMTP id
+ w24-20020a170902a71800b001538d7b076dso1708439plq.16
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 03:22:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=8aKmgpWQOn5fy2pFZJV3AASa7qkUAzElx68DLyF1Rv8=;
- b=kfcPDfUanNIY0SMOA3eAOQvTj571pKQRPeN/8YP4xNc5BD0NO1erHrXX/D5hSTCYdr
- +K5vZUvbqLcdi4p9nvPGx6I6PvAhVj3XC4JK4hw/uOsBk8ncL1sGAsTspTGpzwU2u1wO
- gsf3SD6XmBxZ6AdJpHJMbQQMU7tH3eiBKoDmZGbCJG/FTbEVR2eq9nBt4egQGMLbnzHM
- zmjAkKubCTix32k6mkcVVJTo+uBWHIWJyRT+cRkXw/KK4dxa2qbQCbAwD0JrBSaaQM+C
- bO44J57KwNAmeVY2YqEIeywM0QE6XdIgEZNZF3D2mX4F7+x4+PwX/+nNzXCfgCBpbWXd
- DGjQ==
-X-Gm-Message-State: AOAM532vz9YzUjrgSB4sEzkySuiPkqYXomPAHIv/yZ75XckSOe4Y3VC8
- ljELv2mWLMqA+yfmfwX5/nXakfpP7ZZD9Gebs5UT2UdXalXUE+Ii5UKxYj2+7f8OZ/YswDEFTu+
- jb/cpczuv8LgtV0Z0AABqKqB3
-X-Received: by 2002:a62:7b55:0:b0:4f6:adc7:c306 with SMTP id
- w82-20020a627b55000000b004f6adc7c306mr27924613pfc.29.1647339485568; 
- Tue, 15 Mar 2022 03:18:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy+jS23UzOASPRoyKYjAv3PS8/jYIxosAR15TYCR7wHvt7VgBXKlwPyxZv5RL8fbxTjQ3li9A==
-X-Received: by 2002:a62:7b55:0:b0:4f6:adc7:c306 with SMTP id
- w82-20020a627b55000000b004f6adc7c306mr27924572pfc.29.1647339485245; 
- Tue, 15 Mar 2022 03:18:05 -0700 (PDT)
+ bh=LjO2FjgMYcDXjzsWvO69h8LISgo2Po4eNzRhF4LMslU=;
+ b=2nxa27k7lfEbkkZ+6n3TK+pxgH+jUs1zfTt+z89rJHxF/knCf49a1sFwFfOgY2cqXA
+ /A0U1innHUl4YsbnHQAJZOl42pi2cfMIjh8p+UJeuofpW9LI1czTSaT29cSU85tLaX7s
+ OZYxHmqGcghpploivk1sG/DYV6O+ASHs6D0sDUtwk/E7NDUcg9mtSjOlykdrDDXGOtWk
+ 4CvT1oPge3zbNNiQdzCJD+HfZepGA2lNG20v2sP49dhFyUNg0JpO+PE+FYbrOkumlwz2
+ U/JAkmDp31NZy2ExseCImhChqHF4jF1xtJEGBBFmxx+Rp6du7L5sUl9676FNKidaxtXn
+ JURA==
+X-Gm-Message-State: AOAM5311wjB8HHEeQe5VPrd0hroAPiaI/eQLgeuYnoZUzc08uxbGre+f
+ OFDGFPCTFkYDVhsKkaab5q7jJQ2Imsis43wBiLeXyUrekcl8j+5K/IQxg+XbkgLOkZoj2BfsKC+
+ zfO0vyWSqBLIBL7VGJubKh1mr
+X-Received: by 2002:a05:6a00:14c2:b0:4f7:aa97:b5e with SMTP id
+ w2-20020a056a0014c200b004f7aa970b5emr15093610pfu.36.1647339775632; 
+ Tue, 15 Mar 2022 03:22:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxlgZBAANuQaigRsSRxv4DdK0Lzq7N0trNYqbFO7O9+WaQCS1rR26LE1oMF3KmJgCc+f7s88A==
+X-Received: by 2002:a05:6a00:14c2:b0:4f7:aa97:b5e with SMTP id
+ w2-20020a056a0014c200b004f7aa970b5emr15093565pfu.36.1647339775342; 
+ Tue, 15 Mar 2022 03:22:55 -0700 (PDT)
 Received: from xz-m1.local ([191.101.132.43]) by smtp.gmail.com with ESMTPSA id
- u5-20020a056a00158500b004f745148736sm25052836pfk.179.2022.03.15.03.17.58
+ o5-20020a056a00214500b004bd7036b50asm24014757pfk.172.2022.03.15.03.22.48
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Mar 2022 03:18:04 -0700 (PDT)
-Date: Tue, 15 Mar 2022 18:17:55 +0800
+ Tue, 15 Mar 2022 03:22:55 -0700 (PDT)
+Date: Tue, 15 Mar 2022 18:22:46 +0800
 From: Peter Xu <peterx@redhat.com>
 To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v2 09/26] KVM: x86/mmu: Move huge page split sp
- allocation code to mmu.c
-Message-ID: <YjBn0w54kLk1eDT/@xz-m1.local>
+Subject: Re: [PATCH v2 10/26] KVM: x86/mmu: Use common code to free
+ kvm_mmu_page structs
+Message-ID: <YjBo9iuSBm1hbqXz@xz-m1.local>
 References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-10-dmatlack@google.com>
+ <20220311002528.2230172-11-dmatlack@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20220311002528.2230172-10-dmatlack@google.com>
+In-Reply-To: <20220311002528.2230172-11-dmatlack@google.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -114,19 +114,15 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Mar 11, 2022 at 12:25:11AM +0000, David Matlack wrote:
-> Move the code that allocates a new shadow page for splitting huge pages
-> into mmu.c. Currently this code is only used by the TDP MMU but it will
-> be reused in subsequent commits to also split huge pages mapped by the
-> shadow MMU.
-> 
-> While here, also shove the GFP complexity down into the allocation
-> function so that it does not have to be duplicated when the shadow MMU
-> needs to start allocating SPs for splitting.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
+On Fri, Mar 11, 2022 at 12:25:12AM +0000, David Matlack wrote:
+>  static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
+>  {
+> -	free_page((unsigned long)sp->spt);
+> -	kmem_cache_free(mmu_page_header_cache, sp);
+> +	kvm_mmu_free_shadow_page(sp);
+>  }
+
+Perhaps tdp_mmu_free_sp() can be dropped altogether with this?
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
 
