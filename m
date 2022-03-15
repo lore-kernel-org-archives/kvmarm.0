@@ -2,101 +2,46 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B25D1C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 15 Mar 2022 10:39:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1ADCC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 15 Mar 2022 12:32:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DAB649EBF;
-	Tue, 15 Mar 2022 06:39:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 158B449EC1;
+	Tue, 15 Mar 2022 08:32:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RIosuJf9bkA7; Tue, 15 Mar 2022 06:39:26 -0400 (EDT)
+	with ESMTP id iMYSv1-G58jP; Tue, 15 Mar 2022 08:32:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FD7249DF6;
-	Tue, 15 Mar 2022 06:39:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A188A49EFD;
+	Tue, 15 Mar 2022 08:32:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E257411C7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 06:39:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 637F749E49
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 08:32:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 77+dU9uDvJ9f for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Mar 2022 06:39:23 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE95140C0A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 06:39:23 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1647340763;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=kJDd/9JiDZbTHZohyZFbEtBTCygNnRdmmrmfy8MFg0M=;
- b=SNrc0B7LfQET7HJElrLhlhklWn3/m126GaZV1xU2K1WinqUGy2QgUbrj2rYoqtg86TzXjW
- YFjOGiSXRwwpw1YAJS2cdJh79LrXai3wFKUZ3HFlB6KAVbx1lM1MJNPBQTKwnl+GYKVrqK
- rEPPDitgjWmsZbmERBL0Bo1YH+iqWYA=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-54-z233ocm2MoS_28CLB-azJQ-1; Tue, 15 Mar 2022 06:39:22 -0400
-X-MC-Unique: z233ocm2MoS_28CLB-azJQ-1
-Received: by mail-pj1-f69.google.com with SMTP id
- p15-20020a17090a748f00b001bf3ba2ae95so12248031pjk.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 03:39:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=kJDd/9JiDZbTHZohyZFbEtBTCygNnRdmmrmfy8MFg0M=;
- b=TNlpS/n4cEsBdF3ebzNCWeN3F4ScbV6+ICysEpxL5xpFglhBaD0N+spbwqEb2XshHT
- OOqKpQP2BC9zenF+QuKRVP2TIH+Euo2RzN3RyffPZghDU8N3u/ei+ccJiiZBGhHgEwG9
- q6kojnH6dsvpic8sZIRYsCgcMY6Q3Uweh1ew3metT1neWTTlikhKPiexcJkIb+gUmcpD
- 6mVNj6Kj6wGXXNcwqaru1ffs9RjA9Qrx5b18RBfY5WllnMwe4s4n5fGR3YMOWqDbiGTW
- ujy2CSVCsUeRZ+hSvPEJbKgT/FvlZMs94NVU85YiesmqqRcspO+zgRHPLst/orxg6Fdj
- dgLg==
-X-Gm-Message-State: AOAM532xSl34iXZ/NhqIW8DenS79o9yi26VAiNeTT2KHr8SGMU4Ve7jG
- gJyUV0Hn9qW3xHaasLD+/y8LgFSVg1l0/geeiuNNBP65kLoUMPXbGmOtCi1FHFGXn0d5Xz+QyHt
- MnZqp5BrHoev8yJRfCgFGPQEe
-X-Received: by 2002:a05:6a00:140f:b0:4e0:6995:9c48 with SMTP id
- l15-20020a056a00140f00b004e069959c48mr27468850pfu.59.1647340761004; 
- Tue, 15 Mar 2022 03:39:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwSfNOcUi9xy2ekJmnOxedBPrTrKX0N/yrTIaL/Gy94SQN4Gb5kFP9OF6Ce9WSip5I+m8Q7zA==
-X-Received: by 2002:a05:6a00:140f:b0:4e0:6995:9c48 with SMTP id
- l15-20020a056a00140f00b004e069959c48mr27468818pfu.59.1647340760732; 
- Tue, 15 Mar 2022 03:39:20 -0700 (PDT)
-Received: from xz-m1.local ([191.101.132.43]) by smtp.gmail.com with ESMTPSA id
- q2-20020a056a00150200b004f8d80ced3csm4351131pfu.40.2022.03.15.03.39.14
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 15 Mar 2022 03:39:20 -0700 (PDT)
-Date: Tue, 15 Mar 2022 18:39:11 +0800
-From: Peter Xu <peterx@redhat.com>
-To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v2 15/26] KVM: x86/mmu: Update page stats in __rmap_add()
-Message-ID: <YjBsz/V7FLsNkNh3@xz-m1.local>
-References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-16-dmatlack@google.com>
+ with ESMTP id N0Z7lIrhc4VN for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Mar 2022 08:32:50 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F006411D2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2022 08:32:49 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6F3791474;
+ Tue, 15 Mar 2022 05:32:49 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 751383F66F;
+ Tue, 15 Mar 2022 05:32:48 -0700 (PDT)
+Date: Tue, 15 Mar 2022 12:33:17 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH kvm-unit-tests] arch-run: Introduce QEMU_ARCH
+Message-ID: <YjCHcV3iyTtSrw3k@monolith.localdoman>
+References: <20220315080152.224606-1-drjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20220311002528.2230172-16-dmatlack@google.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Disposition: inline
-Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- maciej.szmigiero@oracle.com,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+In-Reply-To: <20220315080152.224606-1-drjones@redhat.com>
+Cc: pbonzini@redhat.com, thuth@redhat.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -113,21 +58,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Mar 11, 2022 at 12:25:17AM +0000, David Matlack wrote:
-> Update the page stats in __rmap_add() rather than at the call site. This
-> will avoid having to manually update page stats when splitting huge
-> pages in a subsequent commit.
+Hi,
+
+On Tue, Mar 15, 2022 at 09:01:52AM +0100, Andrew Jones wrote:
+> Add QEMU_ARCH, which allows run scripts to specify which architecture
+> of QEMU should be used. This is useful on AArch64 when running with
+> KVM and running AArch32 tests. For those tests, we *don't* want to
+> select the 'arm' QEMU, as would have been selected, but rather the
+> $HOST ('aarch64') QEMU.
 > 
-> No functional change intended.
+> To use this new variable, simply ensure it's set prior to calling
+> search_qemu_binary().
+
+Looks good, tested on an arm64 machine, with ACCEL set to tcg -
+run_tests.sh selects qemu-system-arm; ACCEL unset - run_tests.sh selects
+ACCEL=kvm and qemu-system-aarch64; also tested on an x86 machine -
+run_tests.sh selects ACCEL=tcg and qemu-system-arm:
+
+Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+One thing I noticed is that if the user sets QEMU=qemu-system-arm on an arm64
+machine, run_tests.sh still selects ACCEL=kvm which leads to the following
+failure:
+
+SKIP selftest-setup (qemu-system-arm: -accel kvm: invalid accelerator kvm)
+
+I'm not sure if this deserves a fix, if the user set the QEMU variable I
+believe it is probable that the user is also aware of the ACCEL variable
+and the error message does a good job explaining what is wrong. Just in
+case, this is what I did to make kvm-unit-tests pick the right accelerator
+(copied-and-pasted the find_word function from scripts/runtime.bash):
+
+diff --git a/arm/run b/arm/run
+index 94adcddb7399..b0c9613b8d28 100755
+--- a/arm/run
++++ b/arm/run
+@@ -10,6 +15,10 @@ if [ -z "$KUT_STANDALONE" ]; then
+ fi
+ processor="$PROCESSOR"
+
++if [ -z $ACCEL ] && [ "$HOST" = "aarch64" ] && ! find_word "qemu-system-arm" "$QEMU"; then
++       ACCEL=tcg
++fi
++
+
+Thanks,
+Alex
+
 > 
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
--- 
-Peter Xu
-
+> Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arm/run               | 4 ++++
+>  scripts/arch-run.bash | 4 +++-
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arm/run b/arm/run
+> index 0629b69a117c..28a0b4ad2729 100755
+> --- a/arm/run
+> +++ b/arm/run
+> @@ -13,6 +13,10 @@ processor="$PROCESSOR"
+>  ACCEL=$(get_qemu_accelerator) ||
+>  	exit $?
+>  
+> +if [ "$ACCEL" = "kvm" ]; then
+> +	QEMU_ARCH=$HOST
+> +fi
+> +
+>  qemu=$(search_qemu_binary) ||
+>  	exit $?
+>  
+> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+> index aae552321f9b..0dfaf017db0a 100644
+> --- a/scripts/arch-run.bash
+> +++ b/scripts/arch-run.bash
+> @@ -176,8 +176,10 @@ search_qemu_binary ()
+>  	local save_path=$PATH
+>  	local qemucmd qemu
+>  
+> +	: "${QEMU_ARCH:=$ARCH_NAME}"
+> +
+>  	export PATH=$PATH:/usr/libexec
+> -	for qemucmd in ${QEMU:-qemu-system-$ARCH_NAME qemu-kvm}; do
+> +	for qemucmd in ${QEMU:-qemu-system-$QEMU_ARCH qemu-kvm}; do
+>  		if $qemucmd --help 2>/dev/null | grep -q 'QEMU'; then
+>  			qemu="$qemucmd"
+>  			break
+> -- 
+> 2.34.1
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
