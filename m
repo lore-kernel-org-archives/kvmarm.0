@@ -2,71 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EB21C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 16 Mar 2022 14:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D04C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 16 Mar 2022 15:01:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60DAD49EC4;
-	Wed, 16 Mar 2022 10:34:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C942D49ED4;
+	Wed, 16 Mar 2022 11:01:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6fmnJHi32hoS; Wed, 16 Mar 2022 10:34:18 -0400 (EDT)
+	with ESMTP id WvRBKfvrMJQy; Wed, 16 Mar 2022 11:01:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BE6049EF6;
-	Wed, 16 Mar 2022 10:34:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91DE849EF6;
+	Wed, 16 Mar 2022 11:01:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9932E49ED4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 10:34:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5040449ED7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 11:01:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EiSyGhi4LRjJ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Mar 2022 10:34:16 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49CA349EC4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 10:34:16 -0400 (EDT)
+ with ESMTP id mEOjRW2N7nxz for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Mar 2022 11:01:06 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29A7F49ED4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 11:01:06 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id C96F861514;
- Wed, 16 Mar 2022 14:34:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39D97C340E9;
- Wed, 16 Mar 2022 14:34:14 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 69A6FB81BF9;
+ Wed, 16 Mar 2022 15:01:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31308C340E9;
+ Wed, 16 Mar 2022 15:01:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1647441254;
- bh=VWZO6logcPmIAjwbV3zbm6a1BVrJSihsBsQj1LSuGUo=;
+ s=k20201202; t=1647442863;
+ bh=Dy0POSLfJZum5AoWzG4sgm9ElC3fanRy+FgV015B1YA=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=PE5+rzg6WQCX9SVQ7ejlV4RwrvCReltkXOszkPyZRjWmxPC4QBT30WcJD47KMgpG/
- bT3NgLuwcHs18Vj9bsIvz7GMOA9rkRHwrDECfCVeNfA0Hn/PIhiWBNJQXYZM9/bfD0
- T6kaNo95O36oyK9XLazwU5LBPrsDRlq9PDYl+UOKZ+PpM9FB0paOLFFnTKSDRFH9l6
- Z3Uo0oZZ+Ce0bcO9ofPOcGa9I0yVGJTZwE6ZtQf507MWtEm06QO04EXXPGqsxNpGTj
- 2epAdLiPAGwiidocw35rUu9BxHE7/qXnLoX9PkrT5yIBerDS271oVWA4NSsSzDAv2A
- 1BCZNAB44hdCw==
+ b=nU2bjpfIzatogL6tjUB9CATcwxHgDBPE+S2SVfJwirxSIG+U0zRzfnFs/ox9yGkl6
+ KZ/LkUfgaHcOxmk6W77+qEk0Na+Ln0zpxL9aC6F8P7eGtqrcRuEatZY3FDAa7QGGvt
+ cHC1ALT/QJcCz9CGjKmyBUItLHKC0mS4TEvypk9UO+xFcy4U/hGWVu2UIKb9OoxUsm
+ DJc+0g7Ptv7PZ4aXsr+k9wROafXCuAxOHmGyXJyYEuxRfgCsLtBmzLKyAVgRO/zUqI
+ GlCS/Q87zb8CpZtLyHEdctzBpQ3USo/68d51eBziszvmup/62pzfeE+DMpin4MvyNO
+ IT8yEFZCky4wQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nUUj5-00EwUQ-Rl; Wed, 16 Mar 2022 14:34:11 +0000
-Date: Wed, 16 Mar 2022 14:34:11 +0000
-Message-ID: <877d8uynj0.wl-maz@kernel.org>
+ id 1nUV92-00Ewsa-L4; Wed, 16 Mar 2022 15:01:00 +0000
+Date: Wed, 16 Mar 2022 15:01:00 +0000
+Message-ID: <875yoeymab.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH] KVM: selftests: get-reg-list: Add KVM_REG_ARM_FW_REG(3)
-In-Reply-To: <20220316125129.392128-1-drjones@redhat.com>
-References: <20220316125129.392128-1-drjones@redhat.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH 4/4] KVM: arm64: vgic-v3: Advertise GICR_CTLR.{IR,
+ CES} as a new GICD_IIDR revision
+In-Reply-To: <YjEdhVFKTkS4GiIS@google.com>
+References: <20220314164044.772709-1-maz@kernel.org>
+ <20220314164044.772709-5-maz@kernel.org>
+ <YjEdhVFKTkS4GiIS@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: drjones@redhat.com, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com, pbonzini@redhat.com
+X-SA-Exim-Rcpt-To: oupton@google.com, linux-arm-kernel@lists.infradead.org,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
+ andre.przywara@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Cc: Andre Przywara <andre.przywara@arm.com>, kernel-team@android.com,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,77 +89,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-+Paolo
+Hi Oliver,
 
-On Wed, 16 Mar 2022 12:51:29 +0000,
-Andrew Jones <drjones@redhat.com> wrote:
+On Tue, 15 Mar 2022 23:13:09 +0000,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> When testing a kernel with commit a5905d6af492 ("KVM: arm64:
-> Allow SMCCC_ARCH_WORKAROUND_3 to be discovered and migrated")
-> get-reg-list output
+> Hi Marc,
 > 
-> vregs: Number blessed registers:   234
-> vregs: Number registers:           238
+> On Mon, Mar 14, 2022 at 04:40:44PM +0000, Marc Zyngier wrote:
+> > @@ -87,8 +91,16 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
+> >  		 * migration from old kernels to new kernels with legacy
+> >  		 * userspace.
+> >  		 */
+> > -		vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
+> > -		return 0;
+> > +		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
+> > +		switch (reg) {
+> > +		case KVM_VGIC_IMP_REV_2:
+> > +		case KVM_VGIC_IMP_REV_3:
+> > +			dist->v2_groups_user_writable = true;
 > 
-> vregs: There are 1 new registers.
-> Consider adding them to the blessed reg list with the following lines:
-> 
-> 	KVM_REG_ARM_FW_REG(3),
-> 
-> vregs: PASS
-> ...
-> 
-> That output inspired two changes: 1) add the new register to the
-> blessed list and 2) explain why "Number registers" is actually four
-> larger than "Number blessed registers" (on the system used for
-> testing), even though only one register is being stated as new.
-> The reason is that some registers are host dependent and they get
-> filtered out when comparing with the blessed list. The system
-> used for the test apparently had three filtered registers.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index f769fc6cd927..7efe918ded9e 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -503,8 +503,13 @@ static void run_test(struct vcpu_config *c)
->  		++missing_regs;
->  
->  	if (new_regs || missing_regs) {
-> +		n = 0;
-> +		for_each_reg_filtered(i)
-> +			++n;
-> +
->  		printf("%s: Number blessed registers: %5lld\n", config_name(c), blessed_n);
-> -		printf("%s: Number registers:         %5lld\n", config_name(c), reg_list->n);
-> +		printf("%s: Number registers:         %5lld (includes %lld filtered registers)\n",
-> +		       config_name(c), reg_list->n, reg_list->n - n);
->  	}
->  
->  	if (new_regs) {
-> @@ -683,9 +688,10 @@ static __u64 base_regs[] = {
->  	KVM_REG_ARM64 | KVM_REG_SIZE_U64 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(spsr[4]),
->  	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.fpsr),
->  	KVM_REG_ARM64 | KVM_REG_SIZE_U32 | KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(fp_regs.fpcr),
-> -	KVM_REG_ARM_FW_REG(0),
-> -	KVM_REG_ARM_FW_REG(1),
-> -	KVM_REG_ARM_FW_REG(2),
-> +	KVM_REG_ARM_FW_REG(0),		/* KVM_REG_ARM_PSCI_VERSION */
-> +	KVM_REG_ARM_FW_REG(1),		/* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1 */
-> +	KVM_REG_ARM_FW_REG(2),		/* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2 */
-> +	KVM_REG_ARM_FW_REG(3),		/* KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3 */
->  	ARM64_SYS_REG(3, 3, 14, 3, 1),	/* CNTV_CTL_EL0 */
->  	ARM64_SYS_REG(3, 3, 14, 3, 2),	/* CNTV_CVAL_EL0 */
->  	ARM64_SYS_REG(3, 3, 14, 0, 2),
+> Could you eliminate this bool and just pivot off of the implementation
+> version?
 
-Acked-by: Marc Zyngier <maz@kernel.org>
+[coming back to this]
 
-Paolo, I don't have anything pending for 5.17, so feel free to take it
-directly into Linus' tree.
+Now I remember why this doesn't work. The established behaviour is
+that it takes a write to IIDR to switch to the 'writable groups'
+mode. If we base the switch on the implementation version, we don't
+need a write anymore (we always allow groups to be writable), and old
+guests cannot be reliably restored.
+
+32f8777ed92d has the gory details, and that's really not old enough
+that we can turn a blind eye to it, unfortunately.
 
 Thanks,
 
