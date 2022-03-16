@@ -2,78 +2,87 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD54C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDEBC43217
 	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 09:28:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 278E449F5F;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55FA049F5A;
 	Thu, 17 Mar 2022 05:28:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ZHdZsNFdCWUw; Thu, 17 Mar 2022 05:28:55 -0400 (EDT)
+	with ESMTP id Xm6-ROqFTRvB; Thu, 17 Mar 2022 05:28:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 221604AC78;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3899149F5B;
 	Thu, 17 Mar 2022 05:28:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8BF149E17
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 14:49:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D21649EC4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 17:44:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BuTT75m03vl3 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Mar 2022 14:49:38 -0400 (EDT)
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
- [209.85.214.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9339B49DF6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 14:49:38 -0400 (EDT)
-Received: by mail-pl1-f175.google.com with SMTP id d18so2538350plr.6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 11:49:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=y7ERAKcifRzxT6vcVSjDSozSgypW/KEW+vG0ASHCMHY=;
- b=EzwZe3ti/2sTFi0gzWAE+otHNwPAgMXQlTrdW5phcUmxKkHY/mhUFb2IyXF9KVVy/D
- ZZScNEQ30YzZhGoDBcDZwia4z6A8qPXdZYDXWIe1+P7k6dicin06qMrNjt3UBPEGg0xg
- hXRUdafsQ4hecOzsNY8upgcQF/oTX1S+MFQdBAm5vGiFsmlgOef5nXj5Lih8CZJjNAC1
- 8z2v38eH+liqupz+geO+Jhdb8o970vpMhLS4UkfDjB26oOyfng2nrCBZgaQQoVM80Uak
- B+d+V2FIZiDq0KBGNEgpnXziZu8VfjqhxX/NJyQgCCDiqwRrqIkL9BtI8MgIhQfcEk6b
- CmPg==
+ with ESMTP id h1Bz6JH5M14J for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Mar 2022 17:44:34 -0400 (EDT)
+Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com
+ [209.85.161.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8524449EC2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 17:44:34 -0400 (EDT)
+Received: by mail-oo1-f54.google.com with SMTP id
+ h16-20020a4a6f10000000b00320507b9ccfso4309407ooc.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 14:44:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:date:in-reply-to
+ :message-id:mime-version:content-transfer-encoding;
+ bh=jaTnWfP5Ctwr90+tTsSeB1mPeSYn8clE+CkG+kehTNk=;
+ b=I4xUDzI1RQ9uhmUTrNp9Zl9awT7HtuyhW42gT4zUQGO2cTzapPafEa21pW2fJjSJh6
+ M/drMRkTXwYbNkaj5qy/FlNRZ5Wal9fzyfAv5mmZE2ufle/Nnf51tWlLZ6vApCGvmJ/b
+ HQYvCayrrItYl4WZl+KlwNQdbE9TFlLbt9XdKw/zBmvw6XzOVWA/FL3QJSU5ptQbbz/J
+ FBGKWI5meAce6LYi9WaOSqvYJNWhTOvnbZP0iIxV9LXiAd+oDHU6/FZIUtawnMbfPqNe
+ 4X9OqWGaDHdwpDxUymsjkc58xeoVpXwq0ru5BfsR/re+n0rvku5p7aDCw6V8AIDDshWr
+ GkAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=y7ERAKcifRzxT6vcVSjDSozSgypW/KEW+vG0ASHCMHY=;
- b=OoUiZHHkqaUTIHhJniLf5jWX1VOlALmLWfWnRIE435kf6tUScmy8nXdtYhcj4jc7ya
- W5Aos9CeJBTZ76FEyt2V+6hbfyqKgySDg+s0S+slHhmfmquOO4fW0Ns2u5wwodP2kR6U
- xoNEwEtK4D56bOI64RFmRRzlW7wVaGDZMarDWWlYVKY1KnFDwBmXSTgmwplYQa33z0VD
- Gzw5Gmu4eIaWJLCvOI0HFLy2zXWWQi2rV0UzZFPUCHuC+yIhc1XiaF5goHbdyUS5X+ai
- hYfoYDytbZBIA2nHkAE2F/Ma9aOB5a7ZBFHtIYzFqEXTiKj5hZ+uV/vp0mAUCW0nHiDk
- IQgQ==
-X-Gm-Message-State: AOAM531yp3DbjjwrfpNfDKhc/bsNCuBVhBZY2cEbpJv+242/64/SeGxY
- 6ilpNEOjWMSTvkCkkcV6JOOwSYZDAye/Nb27u9kN
-X-Google-Smtp-Source: ABdhPJxwp/pkpCQtHo7tVh5Dg1xcTc9fNxHdNL+EZXfY9wfYvIVklmRmDUPiJum14n0p7tN0MasdTRHMWSpkdNRp57Q=
-X-Received: by 2002:a17:903:32c8:b0:150:1189:c862 with SMTP id
- i8-20020a17090332c800b001501189c862mr878311plr.134.1647456577401; Wed, 16 Mar
- 2022 11:49:37 -0700 (PDT)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+ :in-reply-to:message-id:mime-version:content-transfer-encoding;
+ bh=jaTnWfP5Ctwr90+tTsSeB1mPeSYn8clE+CkG+kehTNk=;
+ b=4jJu6OGYuOkw1g85fe0bWJjs07CDhNPFdUAsKcZqE9SECBbzJmctQs0lmNG4L2zQwg
+ zlH1pkQS1sDZ6ERq++OkODMv6R1dOQe44+AHoz1qQQBKN9rLaTx2xtyLN37u4Cd5X2WR
+ kaVSpW6W4dxoXPhGfF10KRaVqlDr0KBq2hCECWibUxFX83z1HoEd7jk3SJgRbERWRr7j
+ p2j2y++dCaF3j+oQHNNzVJ5kUDPcFYr2IyD12d0WIJdh68h3HD/iWSnmVqkUlYmiGG8k
+ yoXbPwt9I5otRNFmIiRHvMr0KIyOASVNRVy7YDkdDo7gdtutL2yuBzEANXlmEkoTHM7B
+ J1kg==
+X-Gm-Message-State: AOAM530gjOue8u7hWlVw3uhtTBb2qd0+BKUfhckHbfqOh5IJ+KjucH7o
+ +PTaYTSlYsmv7/ioRX2XTIuevA==
+X-Google-Smtp-Source: ABdhPJyn2zMtJrrUWIhbSfg3xPJmr73k3HTxz5k9k2IpYSZgp00Taw6kZsoWEYPNqF8D9fjRROZaKQ==
+X-Received: by 2002:a05:6870:9617:b0:d7:5d73:8545 with SMTP id
+ d23-20020a056870961700b000d75d738545mr677058oaq.15.1647467073556; 
+ Wed, 16 Mar 2022 14:44:33 -0700 (PDT)
+Received: from localhost ([2804:14d:7e39:8470:b171:978c:2a42:8690])
+ by smtp.gmail.com with ESMTPSA id
+ a19-20020a056808099300b002da1428db03sm1441975oic.7.2022.03.16.14.44.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 16 Mar 2022 14:44:33 -0700 (PDT)
+References: <20220225165923.1474372-1-broonie@kernel.org>
+ <20220225165923.1474372-12-broonie@kernel.org>
+User-agent: mu4e 1.6.10; emacs 27.2
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v12 11/40] arm64/sme: Identify supported SME vector
+ lengths at boot
+Date: Wed, 16 Mar 2022 18:32:47 -0300
+In-reply-to: <20220225165923.1474372-12-broonie@kernel.org>
+Message-ID: <8435jhd13g.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20220316060214.2200695-1-morbo@google.com>
- <20220316074356.n7e5lzrmnal2dcgu@gator>
- <334cc93e-9843-daa9-5846-394c199e294f@redhat.com>
-In-Reply-To: <334cc93e-9843-daa9-5846-394c199e294f@redhat.com>
-From: Bill Wendling <morbo@google.com>
-Date: Wed, 16 Mar 2022 11:49:26 -0700
-Message-ID: <CAGG=3QWOZVtXfyR4Lu8qBS-ASBFeMaLGo1ANXTxi7gPoLbA2Ag@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] libfdt: use logical "or" instead of
- bitwise "or" with boolean operands
-To: Thomas Huth <thuth@redhat.com>
 X-Mailman-Approved-At: Thu, 17 Mar 2022 05:28:50 -0400
-Cc: Laurent Vivier <lvivier@redhat.com>,
- linux-s390 <linux-s390@vger.kernel.org>, frankja@linux.ibm.com,
- kvm list <kvm@vger.kernel.org>, David Hildenbrand <david@redhat.com>,
- kvm-ppc@vger.kernel.org, Nikos Nikoleris <nikos.nikoleris@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, imbrenda@linux.ibm.com,
- kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <maz@kernel.org>,
+ Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
+ Szabolcs Nagy <szabolcs.nagy@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alan Hayward <alan.hayward@arm.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org,
+ Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,74 +94,23 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 16, 2022 at 12:53 AM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 16/03/2022 08.43, Andrew Jones wrote:
-> > On Tue, Mar 15, 2022 at 11:02:14PM -0700, Bill Wendling wrote:
-> >> Clang warns about using a bitwise '|' with boolean operands. This seems
-> >> to be due to a small typo.
-> >>
-> >>    lib/libfdt/fdt_rw.c:438:6: warning: use of bitwise '|' with boolean operands [-Werror,-Wbitwise-instead-of-logical]
-> >>            if (can_assume(LIBFDT_ORDER) |
-> >>
-> >> Using '||' removes this warnings.
-> >>
-> >> Signed-off-by: Bill Wendling <morbo@google.com>
-> >> ---
-> >>   lib/libfdt/fdt_rw.c | 2 +-
-> >>   1 file changed, 1 insertion(+), 1 deletion(-)
-> >>
-> >> diff --git a/lib/libfdt/fdt_rw.c b/lib/libfdt/fdt_rw.c
-> >> index 13854253ff86..3320e5559cac 100644
-> >> --- a/lib/libfdt/fdt_rw.c
-> >> +++ b/lib/libfdt/fdt_rw.c
-> >> @@ -435,7 +435,7 @@ int fdt_open_into(const void *fdt, void *buf, int bufsize)
-> >>                      return struct_size;
-> >>      }
-> >>
-> >> -    if (can_assume(LIBFDT_ORDER) |
-> >> +    if (can_assume(LIBFDT_ORDER) ||
-> >>          !fdt_blocks_misordered_(fdt, mem_rsv_size, struct_size)) {
-> >>              /* no further work necessary */
-> >>              err = fdt_move(fdt, buf, bufsize);
-> >> --
-> >> 2.35.1.723.g4982287a31-goog
-> >>
-> >
-> > This is fixed in libfdt upstream with commit 7be250b4 ("libfdt:
-> > Correct condition for reordering blocks"), which is in v1.6.1.
-> > We can either take this patch as a backport of 7be250b4 or we
-> > can rebase all of our libfdt to v1.6.1. Based on the number of
-> > fixes in v1.6.1, which appear to be mostly for compiling with
-> > later compilers, I'm in favor of rebasing.
->
-> +1 for updating to v1.6.1 completely.
->
-Also +1. :-) Thank you!
-
--bw
-
-> > Actually, we can also use this opportunity to [re]visit the
-> > idea of changing libfdt to a git submodule. I'd like to hear
-> > opinions on that.
->
-> I'm always a little bit torn when it comes to this question. Sure, git
-> submodules maybe make the update easier ... but they are a real pita when
-> you're working with remote machines that might not have direct connection to
-> the internet. For example, I'm used to rsync my sources to the non-x86
-> machines, and if you forget to update the submodule to the right state
-> before the sync, you've just lost. So from my side, it's a preference for
-> continuing without submodules (but I won't insist if everybody else wants to
-> have them instead).
->
->   Thomas
->
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+CkhlbGxvLAoKSnVzdCBhIHNtYWxsIHN1Z2dlc3Rpb246CgpNYXJrIEJyb3duIDxicm9vbmllQGtl
+cm5lbC5vcmc+IHdyaXRlczoKCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20v
+Y3B1LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdS5oCj4gaW5kZXggZDA4MDYyYmNiOWMx
+Li41NTBlMWZjNGFlNmMgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHUu
+aAo+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1LmgKPiBAQCAtNjQsNiArNjQsOSBA
+QCBzdHJ1Y3QgY3B1aW5mb19hcm02NCB7Cj4gIAo+ICAJLyogcHNldWRvLVpDUiBmb3IgcmVjb3Jk
+aW5nIG1heGltdW0gWkNSX0VMMSBMRU4gdmFsdWU6ICovCj4gIAl1NjQJCXJlZ196Y3I7Cj4gKwo+
+ICsJLyogcHNldWRvLVNNQ1IgZm9yIHJlY29yZGluZyBtYXhpbXVtIFpDUl9FTDEgTEVOIHZhbHVl
+OiAqLwo+ICsJdTY0CQlyZWdfc21jcjsKPiAgfTsKClBlcmhhcHMgYXBwZW5kIOKAnHdoZW4gaW4g
+c3RyZWFtaW5nIG1vZGXigJ0gdG8gdGhlIGNvbW1lbnQgYWJvdmUgKG9yIG1lbnRpb24Kc3RyZWFt
+aW5nIG1vZGUgaW4gc29tZSBvdGhlciB3YXkpLCB0byBjb252ZXkgdGhlIGRpZmZlcmVuY2UgYmV0
+d2VlbgpyZWdfc21jciBhbmQgcmVnX3pjcj8KCi0tIApUaGlhZ28KX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
