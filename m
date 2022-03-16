@@ -2,87 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFDEBC43217
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 09:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CDDC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 09:28:58 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 55FA049F5A;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 924404A3A5;
 	Thu, 17 Mar 2022 05:28:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xm6-ROqFTRvB; Thu, 17 Mar 2022 05:28:57 -0400 (EDT)
+	with ESMTP id uQ06skDXUWkw; Thu, 17 Mar 2022 05:28:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3899149F5B;
-	Thu, 17 Mar 2022 05:28:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C80404A1D9;
+	Thu, 17 Mar 2022 05:28:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D21649EC4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 17:44:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 13A85404B2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 14:07:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h1Bz6JH5M14J for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Mar 2022 17:44:34 -0400 (EDT)
-Received: from mail-oo1-f54.google.com (mail-oo1-f54.google.com
- [209.85.161.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8524449EC2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 17:44:34 -0400 (EDT)
-Received: by mail-oo1-f54.google.com with SMTP id
- h16-20020a4a6f10000000b00320507b9ccfso4309407ooc.7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 14:44:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:date:in-reply-to
- :message-id:mime-version:content-transfer-encoding;
- bh=jaTnWfP5Ctwr90+tTsSeB1mPeSYn8clE+CkG+kehTNk=;
- b=I4xUDzI1RQ9uhmUTrNp9Zl9awT7HtuyhW42gT4zUQGO2cTzapPafEa21pW2fJjSJh6
- M/drMRkTXwYbNkaj5qy/FlNRZ5Wal9fzyfAv5mmZE2ufle/Nnf51tWlLZ6vApCGvmJ/b
- HQYvCayrrItYl4WZl+KlwNQdbE9TFlLbt9XdKw/zBmvw6XzOVWA/FL3QJSU5ptQbbz/J
- FBGKWI5meAce6LYi9WaOSqvYJNWhTOvnbZP0iIxV9LXiAd+oDHU6/FZIUtawnMbfPqNe
- 4X9OqWGaDHdwpDxUymsjkc58xeoVpXwq0ru5BfsR/re+n0rvku5p7aDCw6V8AIDDshWr
- GkAg==
+ with ESMTP id oJ-RUtNYtUdU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Mar 2022 14:07:33 -0400 (EDT)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com
+ [209.85.219.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 111DE402A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 14:07:33 -0400 (EDT)
+Received: by mail-yb1-f178.google.com with SMTP id f38so5920508ybi.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 11:07:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=PnmkVyhkE9O12y1T9viSC5Yt4nwOSPLkRDwt3vG/CDc=;
+ b=LjuosIEEYYEzAVjUbeyd05n+XRZzzyXQNWGnpxPY2Xw5NcS8D/uvf0EdccSmRJXhKb
+ VpxTrEcAMFfOx+DDZGxmQq5X9JqfajNjpZ5oh9YWlyb5XlHxa/e/rgKthm6WmIYj32eH
+ mFwav9CCGijv6u7q9+Vsfemo5DDQ58bYM1D38UTdt+0Jv/K0UzeDfncjWD3T+NurGmRP
+ KKmJ/jOKi+kl9wQaNhs75a998Db2r2mVDjCdyQkNxWPakeWljy3n5t0Cc9bE6cio7KZy
+ BT7qh5hXsLc/8tcJopJD7VEVUlEbMUKZO7CGstjRGP7gfreFy2KLA5m30PoD+ocDI6FR
+ FGDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
- :in-reply-to:message-id:mime-version:content-transfer-encoding;
- bh=jaTnWfP5Ctwr90+tTsSeB1mPeSYn8clE+CkG+kehTNk=;
- b=4jJu6OGYuOkw1g85fe0bWJjs07CDhNPFdUAsKcZqE9SECBbzJmctQs0lmNG4L2zQwg
- zlH1pkQS1sDZ6ERq++OkODMv6R1dOQe44+AHoz1qQQBKN9rLaTx2xtyLN37u4Cd5X2WR
- kaVSpW6W4dxoXPhGfF10KRaVqlDr0KBq2hCECWibUxFX83z1HoEd7jk3SJgRbERWRr7j
- p2j2y++dCaF3j+oQHNNzVJ5kUDPcFYr2IyD12d0WIJdh68h3HD/iWSnmVqkUlYmiGG8k
- yoXbPwt9I5otRNFmIiRHvMr0KIyOASVNRVy7YDkdDo7gdtutL2yuBzEANXlmEkoTHM7B
- J1kg==
-X-Gm-Message-State: AOAM530gjOue8u7hWlVw3uhtTBb2qd0+BKUfhckHbfqOh5IJ+KjucH7o
- +PTaYTSlYsmv7/ioRX2XTIuevA==
-X-Google-Smtp-Source: ABdhPJyn2zMtJrrUWIhbSfg3xPJmr73k3HTxz5k9k2IpYSZgp00Taw6kZsoWEYPNqF8D9fjRROZaKQ==
-X-Received: by 2002:a05:6870:9617:b0:d7:5d73:8545 with SMTP id
- d23-20020a056870961700b000d75d738545mr677058oaq.15.1647467073556; 
- Wed, 16 Mar 2022 14:44:33 -0700 (PDT)
-Received: from localhost ([2804:14d:7e39:8470:b171:978c:2a42:8690])
- by smtp.gmail.com with ESMTPSA id
- a19-20020a056808099300b002da1428db03sm1441975oic.7.2022.03.16.14.44.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Mar 2022 14:44:33 -0700 (PDT)
-References: <20220225165923.1474372-1-broonie@kernel.org>
- <20220225165923.1474372-12-broonie@kernel.org>
-User-agent: mu4e 1.6.10; emacs 27.2
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v12 11/40] arm64/sme: Identify supported SME vector
- lengths at boot
-Date: Wed, 16 Mar 2022 18:32:47 -0300
-In-reply-to: <20220225165923.1474372-12-broonie@kernel.org>
-Message-ID: <8435jhd13g.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=PnmkVyhkE9O12y1T9viSC5Yt4nwOSPLkRDwt3vG/CDc=;
+ b=SdP98ua9+qLr3gAArYjqRFbL3okNPNATc32l68Js8lUzz0ShMoQOm9bB9uhV3bBO5B
+ iJ1fmRHFVJ6OD61fRbwWNaaUFF61eUE5utoYiYAHqf2VNab7U4q9ojXW8NfJILWTW7y5
+ 8vIjck3NEG3fl8KUM6NpTwU1jfDIKcRJ+ZFDVIKmI26Db3TGAhwDeYShClJHfLk8Rspq
+ I+/ifwpJdO5Lo07UkYjMKwcF38kvKYcdRuUmtCU+KOI2HGcvs6V64Y4zNc2B1SZFzV04
+ vhTvTeTe9o1L3ah8Mf9uEoWvB1vM8YRis+4FqD9JYh0ITInCA8ZMb6iq2+BjO/WADZJQ
+ MBMg==
+X-Gm-Message-State: AOAM5327LLcRUrHYiZME4lX/AjFgpx4KYNme2ajkuDxpYXEdMcQPiMb7
+ u3fUoph7AUPCVqRBtt9TCgsMvKqNQfOg+97B/bC/Ag==
+X-Google-Smtp-Source: ABdhPJyyXFoQn1uerPs5goPnQmblKmVx5IKBTpH/PqBXtW4BaLiDyXA8LgJB5YBszNuVqJzUMU8TQOGvQDlBfaX/Z0A=
+X-Received: by 2002:a25:d191:0:b0:628:79ad:1e61 with SMTP id
+ i139-20020a25d191000000b0062879ad1e61mr1147185ybg.255.1647454052316; Wed, 16
+ Mar 2022 11:07:32 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220311060207.2438667-1-ricarkol@google.com>
+ <20220311060207.2438667-5-ricarkol@google.com>
+In-Reply-To: <20220311060207.2438667-5-ricarkol@google.com>
+From: Ben Gardon <bgardon@google.com>
+Date: Wed, 16 Mar 2022 12:07:21 -0600
+Message-ID: <CANgfPd8u_K3cOpaUPY8+rU+4RFehj8J61gdzuDyOZv4dSDZ+xQ@mail.gmail.com>
+Subject: Re: [PATCH 04/11] KVM: selftests: Add vm_alloc_page_table_in_memslot
+ library function
+To: Ricardo Koller <ricarkol@google.com>
 X-Mailman-Approved-At: Thu, 17 Mar 2022 05:28:50 -0400
-Cc: Marc Zyngier <maz@kernel.org>,
- Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alan Hayward <alan.hayward@arm.com>,
- linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>
+Cc: kvm <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,23 +81,71 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-CkhlbGxvLAoKSnVzdCBhIHNtYWxsIHN1Z2dlc3Rpb246CgpNYXJrIEJyb3duIDxicm9vbmllQGtl
-cm5lbC5vcmc+IHdyaXRlczoKCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20v
-Y3B1LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdS5oCj4gaW5kZXggZDA4MDYyYmNiOWMx
-Li41NTBlMWZjNGFlNmMgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHUu
-aAo+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1LmgKPiBAQCAtNjQsNiArNjQsOSBA
-QCBzdHJ1Y3QgY3B1aW5mb19hcm02NCB7Cj4gIAo+ICAJLyogcHNldWRvLVpDUiBmb3IgcmVjb3Jk
-aW5nIG1heGltdW0gWkNSX0VMMSBMRU4gdmFsdWU6ICovCj4gIAl1NjQJCXJlZ196Y3I7Cj4gKwo+
-ICsJLyogcHNldWRvLVNNQ1IgZm9yIHJlY29yZGluZyBtYXhpbXVtIFpDUl9FTDEgTEVOIHZhbHVl
-OiAqLwo+ICsJdTY0CQlyZWdfc21jcjsKPiAgfTsKClBlcmhhcHMgYXBwZW5kIOKAnHdoZW4gaW4g
-c3RyZWFtaW5nIG1vZGXigJ0gdG8gdGhlIGNvbW1lbnQgYWJvdmUgKG9yIG1lbnRpb24Kc3RyZWFt
-aW5nIG1vZGUgaW4gc29tZSBvdGhlciB3YXkpLCB0byBjb252ZXkgdGhlIGRpZmZlcmVuY2UgYmV0
-d2VlbgpyZWdfc21jciBhbmQgcmVnX3pjcj8KCi0tIApUaGlhZ28KX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
-YW4vbGlzdGluZm8va3ZtYXJtCg==
+On Fri, Mar 11, 2022 at 12:02 AM Ricardo Koller <ricarkol@google.com> wrote:
+>
+> Add a library function to allocate a page-table physical page in a
+> particular memslot.  The default behavior is to create new page-table
+> pages in memslot 0.
+>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+
+This is very similar to one of the patches in the NX hugepages control
+series I sent out last week, I guess we both had similar needs at the
+same time.
+Your solution introduces way less churn though, so it's probably
+better. I might use this commit or wait for it to be merged before I
+send out v2 of my NX control series.
+
+In any case,
+Reviewed-by: Ben Gardon <bgardon@google.com>
+
+> ---
+>  tools/testing/selftests/kvm/include/kvm_util_base.h | 1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c          | 8 +++++++-
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index d6acec0858c0..c8dce12a9a52 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -307,6 +307,7 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+>  vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+>                               vm_paddr_t paddr_min, uint32_t memslot);
+>  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+> +vm_paddr_t vm_alloc_page_table_in_memslot(struct kvm_vm *vm, uint32_t pt_memslot);
+>
+>  /*
+>   * Create a VM with reasonable defaults
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index 64ef245b73de..ae21564241c8 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -2409,9 +2409,15 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+>  /* Arbitrary minimum physical address used for virtual translation tables. */
+>  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
+>
+> +vm_paddr_t vm_alloc_page_table_in_memslot(struct kvm_vm *vm, uint32_t pt_memslot)
+> +{
+> +       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> +                       pt_memslot);
+> +}
+> +
+>  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+>  {
+> -       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
+> +       return vm_alloc_page_table_in_memslot(vm, 0);
+>  }
+>
+>  /*
+> --
+> 2.35.1.723.g4982287a31-goog
+>
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
