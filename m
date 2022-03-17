@@ -2,71 +2,68 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F55AC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 04:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E9CC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 04:51:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFDAB49F1F;
-	Thu, 17 Mar 2022 00:51:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EC9A49F30;
+	Thu, 17 Mar 2022 00:51:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MsASsSH0qUZR; Thu, 17 Mar 2022 00:51:35 -0400 (EDT)
+	with ESMTP id HdvAtmOe7Xik; Thu, 17 Mar 2022 00:51:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF80C49F21;
-	Thu, 17 Mar 2022 00:51:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02F754A100;
+	Thu, 17 Mar 2022 00:51:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CECB49EF6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 00:51:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3115649F26
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 00:51:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8alRhsQIe-LO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Mar 2022 00:51:33 -0400 (EDT)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C89A49ECB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 00:51:33 -0400 (EDT)
-Received: by mail-pf1-f202.google.com with SMTP id
- z194-20020a627ecb000000b004f6db380a59so2870577pfc.19
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 21:51:33 -0700 (PDT)
+ with ESMTP id s95E7JY2qUoz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Mar 2022 00:51:32 -0400 (EDT)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DBC6149EAE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 00:51:31 -0400 (EDT)
+Received: by mail-pj1-f73.google.com with SMTP id
+ s20-20020a17090ad49400b001bf481fae01so3625297pju.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 21:51:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=orPz1N9sb4VObY0DVEB/1SEaT7xLNh+eUph/PNeO4nQ=;
- b=GHFh4+29HUaAFUYRfJ/jHI3C57so7rNewE6Lv/OXEhhyIgXMWs4LbD5tSqnSmzryUO
- BCU9Ke3HGeM/aIr7AemTs7+60ktbBDcDgmuhFV5Ss+8TuPogYofszjB+VsbF30hI35ii
- ApkgwVKn92b7jtL1cOY68PJUQSaEn+0hy3CifabQ4zAi7OQyzhubSfOkWgR+94WnoMlO
- QNxLLqAuXNY3mFjkJXnxZxfY3dO6aPZnl/wC5iShn224fcJc7GKXNU7Jepa05issM7PT
- zpq86zdo8RU15t9QLETux0eo7zaa/4+o7LYxG67/nOs0b1jEDAM+8Oqp5ZqAOyvvWlj/
- OsAA==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=gsRfKzq4vGn1YNn7YUeVAb6qtw1e/e04FOs1fz7BrH8=;
+ b=JQG63yoRkgZtQa+AY5jQ61gQ21UrAkBQTDwjcqE2wayF+Aw4AE7+soI3KijdVqUYth
+ PA+hEiVlLfeDxUnpYSSfvZYqpWIzC/cD7KxxMRRaidxbHfUUpjfNO++vp23aI8SxFNXQ
+ VNz91cyBoLSLN/u8cEo327J4nZPFO4XQN6SUi8pt//hAX8OFAQtYftmQtWHYqMfE+Oh/
+ 3To00VP/WmW2h9NWj9TJ3SI4+LNL3gUxfXG60r9DWvtkrVBmfYJqVcS27uYuDIbO/qES
+ XixXnDXWQ751hX8ejbeNt6RayBdIbk+kZshHHKYU/RrxBMcLdnI2MmN96lBOjX7ldQpI
+ +YSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=orPz1N9sb4VObY0DVEB/1SEaT7xLNh+eUph/PNeO4nQ=;
- b=vGpptY5XIZQ+JDTNOhQt3zDAZRse2NuFyjgNZm/1NZ02ODCumYvfEC5HWUBJL0gP/u
- nCpfW6vOzM8BFfJOvufqYRp874HZ4CKBU9XsOGePYWBx7MaSulZ0HhT8oHy95V2tV6br
- JFbPhNSvPTFF0bDYKhrmWkmZUQ150NoMq3oGgAeNqNHsHZbndLEVuH64Sow5nsvCk1+p
- u+IHucHoRh0me7pKIFwRtR1quhAb20OVGhhV8u61HCKv8H09NOiR2kbuFebiF3+eZSh2
- 2Jc8mmR94La7DQo5GUJ6uUbWVLGEf2hRJLfbedAZaM92jPA04pidzpKyGTVOXAIELnCD
- h3/g==
-X-Gm-Message-State: AOAM5314irtRMLFiqa1lmK4gDFOhWLhHPBd9SrECk0I1SrQ3pUU3pr//
- WF5bmsOmMSPgb6vl9GewuoWfsHJjHZ9OeQ==
-X-Google-Smtp-Source: ABdhPJzMNVszd9N8c+vlCGkv5DBuw+V048hOo2NeEOnk9aZLyf/NK51yu1+AdrmZzfTiIaeLEeS0t9jWO0FI8A==
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=gsRfKzq4vGn1YNn7YUeVAb6qtw1e/e04FOs1fz7BrH8=;
+ b=pSi2B7ZBETzohc6qzzM8E++U2p59vaLD+QTf8ki/t2JBeHDfVpXsAoOObt9+OKuj+M
+ WtDape7DQpPojFEeWANT5uX3zSw1fnz15Qjr7QLjNA/fGSpJYPwrb7ZnfsDEBXlPgjur
+ Byw/bESAxYISrsbAHUb/vUOcP10Tn/IjWugPImmgcc7anWcHQeOtiyav1gFTjpeEO6y9
+ aJvjgQU2jWrF5pyiIWyiZ2NwUE2ByvsR8QGWsT9lOK0ZSTqKaA51/RxmUEhbhJntxx80
+ PeepxLSmgL8D+jB0L8iG1NeZABpZ0gq5iWnBxa4PeUKZ8cbzEqiKl1NvEqwKMYkqQuot
+ TKvQ==
+X-Gm-Message-State: AOAM533U2Iqh/fNcIii3HPSGTZJJ9+Po6rbk3nhHKjMXJUdtg7owNqHx
+ aq1RQLXKLJB5/OE0yRawO3VX1HD5KORKjA==
+X-Google-Smtp-Source: ABdhPJzy+EnjPuXkGb+ndtKs1lIVtKRwKk8qD6YEJzvqK1mx3sZTRli0/Bkp7MZ6poB8q45nifTmZHT0ufFTpQ==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6a00:10cb:b0:4f7:942:6a22 with SMTP
- id d11-20020a056a0010cb00b004f709426a22mr3258065pfu.84.1647492692552; Wed, 16
- Mar 2022 21:51:32 -0700 (PDT)
-Date: Wed, 16 Mar 2022 21:51:25 -0700
-In-Reply-To: <20220317045127.124602-1-ricarkol@google.com>
-Message-Id: <20220317045127.124602-2-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a17:90a:e541:b0:1c6:55e5:ae4b with SMTP
+ id ei1-20020a17090ae54100b001c655e5ae4bmr9070079pjb.62.1647492690738; Wed, 16
+ Mar 2022 21:51:30 -0700 (PDT)
+Date: Wed, 16 Mar 2022 21:51:24 -0700
+Message-Id: <20220317045127.124602-1-ricarkol@google.com>
 Mime-Version: 1.0
-References: <20220317045127.124602-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v2 1/3] KVM: arm64: selftests: add timer_get_tval() lib
- function
+Subject: [PATCH v2 0/3] KVM: arm64: selftests: Add edge cases tests for the
+ arch timer
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com
 Cc: maz@kernel.org, pbonzini@redhat.com
@@ -86,53 +83,52 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add timer_get_tval() into the arch timer library functions in
-selftests/kvm. Bonus: change the set_tval function to get an int32_t
-(tval is signed).
+Add a new selftests that validates some edge cases related to the virtual
+arch-timer, for example:
+- timers across counter roll-overs.
+- moving counters ahead and behind pending timers.
+- having the same timer condition firing multiple times.
 
-Reviewed-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- .../selftests/kvm/include/aarch64/arch_timer.h | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+The tests run while checking the state of the IRQs (e.g., pending when they
+are supposed to be) and stressing things a bit by waiting for interrupts
+while: re-scheduling the vcpu (with sched_yield()), by migrating the vcpu
+between cores, or by sleeping in userspace (with usleep()).
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-index cb7c03de3a21..93f35a4fc1aa 100644
---- a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
-@@ -79,7 +79,7 @@ static inline uint64_t timer_get_cval(enum arch_timer timer)
- 	return 0;
- }
- 
--static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
-+static inline void timer_set_tval(enum arch_timer timer, int32_t tval)
- {
- 	switch (timer) {
- 	case VIRTUAL:
-@@ -95,6 +95,22 @@ static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
- 	isb();
- }
- 
-+static inline int32_t timer_get_tval(enum arch_timer timer)
-+{
-+	isb();
-+	switch (timer) {
-+	case VIRTUAL:
-+		return (int32_t)read_sysreg(cntv_tval_el0);
-+	case PHYSICAL:
-+		return (int32_t)read_sysreg(cntp_tval_el0);
-+	default:
-+		GUEST_ASSERT_1(0, timer);
-+	}
-+
-+	/* We should not reach here */
-+	return 0;
-+}
-+
- static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
- {
- 	switch (timer) {
+The first commit adds a timer utility function.  The second commit adds
+some sanity checks and basic tests for the timer. The third commit adds
+the actual edge case tests (like forcing rollovers).
+
+v1 -> v2:
+- Remove the checks for timers firing within some margin; only leave the
+  checks for timers not firing ahead of time. Also remove the tests that
+  depend on timers firing within some margin. [Oliver, Marc]
+- Collect R-b tag from Oliver (first commit). [Oliver]
+- Multiple nits: replace wfi_ functions with wait_, reduce use of macros,
+  drop typedefs, use IAR_SPURIOUS from header, move some comments functions
+  to top. [Oliver]
+- Don't fail if the test has a single cpu available. [Oliver]
+- Don't fail if there's no GICv3 available. [Oliver]
+
+v1: https://lore.kernel.org/kvmarm/20220302172144.2734258-1-ricarkol@google.com/
+
+There is a slight complication with where this series applies.  The test added
+here fails without commit cc94d47ce16d ("kvm: selftests: aarch64: fix assert in
+gicv3_access_reg") which lives in kvmarm/next.  However, it can't be built on
+top of kvmarm/next as it depends on commit 456f89e0928a ("KVM: selftests:
+aarch64: Skip tests if we can't create a vgic-v3") which is not in kvmarm/next.
+
+Ricardo Koller (3):
+  KVM: arm64: selftests: add timer_get_tval() lib function
+  KVM: arm64: selftests: add arch_timer_edge_cases
+  KVM: arm64: selftests: add edge cases tests into arch_timer_edge_cases
+
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/aarch64/arch_timer_edge_cases.c       | 891 ++++++++++++++++++
+ .../kvm/include/aarch64/arch_timer.h          |  18 +-
+ 4 files changed, 910 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+
 -- 
 2.35.1.723.g4982287a31-goog
 
