@@ -2,74 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D10DC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 10:17:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2360AC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 11:34:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 90ADA49F07;
-	Thu, 17 Mar 2022 06:17:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6530249F3D;
+	Thu, 17 Mar 2022 07:34:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id E3qtQpyGSzaX; Thu, 17 Mar 2022 06:17:22 -0400 (EDT)
+	with ESMTP id Xk0KwKoqeIlE; Thu, 17 Mar 2022 07:34:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43A1649F1C;
-	Thu, 17 Mar 2022 06:17:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04CCB49F28;
+	Thu, 17 Mar 2022 07:34:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5AB849F07
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 06:17:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AF7E49F1D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 07:34:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bv7uGVc8SqkZ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Mar 2022 06:17:20 -0400 (EDT)
+ with ESMTP id OpDbmkMeF4fz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Mar 2022 07:34:42 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 244A949EE4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 06:17:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1139349F07
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 07:34:42 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 6CAE9617BB;
- Thu, 17 Mar 2022 10:17:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D19A3C340E9;
- Thu, 17 Mar 2022 10:17:18 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 680AB618EE;
+ Thu, 17 Mar 2022 11:34:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9BAEC340EC;
+ Thu, 17 Mar 2022 11:34:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1647512238;
- bh=Ac3+Zu4JJhOiqtXO0r903zb8S377HU8RCpuDNXxEp2w=;
+ s=k20201202; t=1647516879;
+ bh=ORov9gVmJ2HPUwjeBEPodpmnd8fTvKTLG5i+PtnN5NI=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=LIxewhOO7mTDGWxC+uGpYafMzpVkySVAs6tXhhapSeaXVim+9LNI7555bLoYnApeN
- n/b2xuUZpQXwKY6McT6P4ScoLs/JLLx3pwXXq7M134j0HTVMzwXA2/Du06nIK4tVic
- f1KAqb2NfmPLZLGIGXuTEkdeUspaVpScyjosUHPdXBvG47ifksIqpkLepnizo6vvTp
- aPV/DWF4VtB7JBQlew+Nw8j21TwmRnn7jq+5cAIMPabcKFrW86OpzB2Vu9/l1H8hu4
- gWla4KDA67C4/j+yzLIlGunHoH6Q8zwat3WwZ0BQSDuWm/u4tu7I2OGui8WaD049xG
- +fHeBdE3Df2/g==
+ b=YmcmrL5w+ZcF35uC0sBaHJZgEhB+AN3iQsaS9qUvyKo6gwUeeBoZtFMDq8S52jTGn
+ s8HRIfP0+4XMYkWAawosJ8+HDOQLl3lPjqS761u8EL8BqZr4l6xG0AgAL3RideCxuu
+ m4J+moGrVbHnMOs5nRBk3oQZm6SCtIsQmA/491vxuaDIBr1QXKw0LgemFOGdUI4llO
+ tDTyq7a3N3JeAGaEYwEdJ/zHzoG3qL/2SbwZ8KxW0z9SfvQ3BDNcS98D8zmGxOIsFs
+ rxzQWdp/F90dJyRQiSkOGsOH4GHCN7ocsyNARj32GZ8UEOaCRcd+341ZRj80rIJ6NR
+ PpyLP476ObXNQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nUnC0-00F92j-GX; Thu, 17 Mar 2022 10:17:16 +0000
-Date: Thu, 17 Mar 2022 10:17:16 +0000
-Message-ID: <87v8wcyjbn.wl-maz@kernel.org>
+ id 1nUoOr-00F9vq-He; Thu, 17 Mar 2022 11:34:37 +0000
+Date: Thu, 17 Mar 2022 11:34:37 +0000
+Message-ID: <87tubwyfqq.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Jingyi Wang <wangjingyi11@huawei.com>
-Subject: Re: Report an error on GICv4.1 vcpu de-schedule
-In-Reply-To: <4aae10ba-b39a-5f84-754b-69c2eb0a2c03@huawei.com>
-References: <4aae10ba-b39a-5f84-754b-69c2eb0a2c03@huawei.com>
+To: Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v1 1/2] KVM: arm64: Add arch specific exit reasons
+In-Reply-To: <20220317005630.3666572-2-jingzhangos@google.com>
+References: <20220317005630.3666572-1-jingzhangos@google.com>
+ <20220317005630.3666572-2-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: wangjingyi11@huawei.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- kvm@vger.kernel.org, wanghaibin.wang@huawei.com, yuzenghui@huawei.com,
- Martin.Weidmann@arm.com, tangnianyao@huawei.com, chengjian8@huawei.com
+X-SA-Exim-Rcpt-To: jingzhangos@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, will@kernel.org, pbonzini@redhat.com,
+ dmatlack@google.com, seanjc@google.com, oupton@google.com, reijiw@google.com,
+ ricarkol@google.com, rananta@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, chengjian8@huawei.com, Martin.Weidmann@arm.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: KVM <kvm@vger.kernel.org>, David Matlack <dmatlack@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ KVMARM <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -81,96 +83,151 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgSmluZ3lpLAoKT24gVGh1LCAxNyBNYXIgMjAyMiAwNzoyNzo0NSArMDAwMCwKSmluZ3lpIFdh
-bmcgPHdhbmdqaW5neWkxMUBodWF3ZWkuY29tPiB3cm90ZToKPiAKPiBIaSBNYXJj77yMCj4gCj4g
-VGhlIHBhdGNoICJLVk06IGFybTY0OiBEZWxheSB0aGUgcG9sbGluZyBvZiB0aGUgR0lDUl9WUEVO
-REJBU0VSLkRpcnR5Cj4gYml0Iig1N2UzY2ViZDAyMmZiYzAzNWRjZjE5MGFjNzg5ZmQyZmZjNzQ3
-ZjViKSByZW1vdmUgdGhlIHBvbGxpbmcgb2YKPiBHSUNSX1ZQRU5EQkFTRVIuRGlydHkgYml0IGlu
-IHZjcHVfbG9hZCgpICwgd2hpbGUgY2hlY2sgdGhlIFZQVCBwYXJzaW5nCj4gcmVhZHkgaW4ga3Zt
-X3ZnaWNfZmx1c2hfaHdzdGF0ZSgpIGZvciBiZXR0ZXIgcGVyZm9ybWFuY2UuCj4gCj4gTW9zdCB0
-aW1lIGl0IHdvcmtzLCBidXQgd2UgaGF2ZSBtZXQgYW4gZXJyb3Igb24gb3VyIGhhcmR3YXJlIHJl
-Y2VudGx5Lgo+IEluIHByZWVtcHRhYmxlIGtlcm5lbCwgdGhlIHZjcHUgY2FuIGJlIHByZWVtcHRl
-ZCBiZXR3ZWVuIHZjcHVfbG9hZCBhbmQKPiBrdm1fdmdpY19mbHVzaF9od3N0YXRlLiBBcyBhIHJl
-c3VsdCwgaXQgZ2V0IGRlLXNjaGVkdWxlZCBhbmQKPiBpdHNfY2xlYXJfdnBlbmRfdmFsaWQoKSBp
-cyBjYWxsZWQKPiAKPiAJdmFsID0gZ2ljcl9yZWFkX3ZwZW5kYmFzZXIodmxwaV9iYXNlICsgR0lD
-Ul9WUEVOREJBU0VSKTsKPiAJdmFsICY9IH5HSUNSX1ZQRU5EQkFTRVJfVmFsaWQ7Cj4gCXZhbCAm
-PSB+Y2xyOwo+IAl2YWwgfD0gc2V0Owo+IAlnaWNyX3dyaXRlX3ZwZW5kYmFzZXIodmFsLCB2bHBp
-X2Jhc2UgKyBHSUNSX1ZQRU5EQkFTRVIpOwo+IAo+IAo+IFRoZSBmdW5jdGlvbiBjbGVhcnMgVmFs
-aWQgYml0IG1lYW53aGlsZSBHSUNSX1ZQRU5EQkFTRVJfRGlydHkKPiBtYXliZSBzdGlsbCAxLCB3
-aGljaCBjYXVzZSB0aGUgc3Vic2VxdWVudCBHSUNSX1ZQRU5EQkFTRVJfRGlydHkgcG9sbGluZwo+
-IGZhaWwgYW5kIHJlcG9ydCAiIklUUyB2aXJ0dWFsIHBlbmRpbmcgdGFibGUgbm90IGNsZWFuaW5n
-Ii4KPiAKPiBXZSBoYXZlIGNvbW11bmljYXRlZCB3aXRoIE1hcnRpbiBmcm9tIEFSTSBhbmQgZ2V0
-IHRoZSBjb25jbHVzaW9uCj4gdGhhdCB3ZSBzaG91bGQgbm90IGNoYW5nZSB2YWxpZCBiaXQgd2hp
-bGUgdGhlIGRpcnR5IGJpdCBub3QgY2xlYXLigJTigJQKPiAiVGhlIGRpcnR5IGJpdCByZXBvcnRz
-IHdoZXRoZXIgdGhlIGxhc3Qgc2NoZWR1bGUgL2RlLXNjaGVkdWxlCj4gb3BlcmF0aW9uIGhhcyBj
-b21wbGV0ZWQuVGhlIHJlc3RyaWN0aW9uIG9uIG5vdCBjaGFuZ2luZyBWYWxpZCB3aGVuIERpcnR5
-Cj4gaXMgMSwgaXMgc28gdGhhdCBoYXJkd2FyZSBjYW4gYWx3YXlzIGNvbXBsZXRlIHRoZSBsYXN0
-IG9wZXJhdGlvbiBmb3IKPiBzdGFydGluZyB0aGUgbmV4dCIuCgpJbmRlZWQsIHRoZSBzcGVjIGlz
-IGNyeXN0YWwgY2xlYXIgYWJvdXQgdGhhdCwgYW5kIGNsZWFyaW5nIFZhbGlkIHdoaWxlCkRpcnR5
-IGlzIHNldCBpcyBwbGFpbiB3cm9uZy4KCj4gCj4gSSB0aGluayBtYXliZSB3ZSBjYW4gY2hlY2sg
-ZGlydHkgYml0IGNsZWFyIGJlZm9yZSBjbGVhcmluZyB0aGUgdmFsaWQgYml0Cj4gaW4gaXRzX2Ns
-ZWFyX3ZwZW5kX3ZhbGlkKCkgY29kZS4gSG9wZSB0byBrbm93IHlvdXIgb3BpbmlvbiBhYm91dCB0
-aGlzCj4gaXNzdWUuCgpZZXMsIHRoYXQncyB3aGF0IHNob3VsZCBoYXBwZW4uIEkgY2FtZSB1cCB3
-aXRoIHRoZSBwYXRjaCBiZWxvdy4gUGxlYXNlCmdpdmUgaXQgYSBzaG90IGFuZCBsZXQgbWUga25v
-dyBpZiB0aGF0IGhlbHBzLiBJZiBpdCBkb2VzLCBJJ2xsIHF1ZXVlCml0IGFzIGEgZml4LgoKVGhh
-bmtzLAoKCU0uCgpGcm9tIGMyM2NjYzljZmE2MDNlMzBhYzE4OWQ0M2FmNzVmMDNiNjBkNzgwYmMg
-TW9uIFNlcCAxNyAwMDowMDowMCAyMDAxCkZyb206IE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5v
-cmc+CkRhdGU6IFRodSwgMTcgTWFyIDIwMjIgMDk6NDk6MDIgKzAwMDAKU3ViamVjdDogW1BBVENI
-XSBpcnFjaGlwL2dpYy12NDogV2FpdCBmb3IgR0lDUl9WUEVOREJBU0VSLkRpcnR5IHRvIGNsZWFy
-CiBiZWZvcmUgZGVzY2hlZHVsaW5nCgpUaGUgd2F5IEtWTSBkcml2ZXMgR0lDdjQuezAsMX0gaXMg
-YXMgZm9sbG93czoKLSB2Y3B1X2xvYWQoKSBtYWtlcyB0aGUgVlBFIHJlc2lkZW50LCBpbnN0cnVj
-dGluZyB0aGUgUkQgdG8gc3RhcnQKICBzY2FubmluZyBmb3IgaW50ZXJydXB0cwotIGp1c3QgYmVm
-b3JlIGVudGVyaW5nIHRoZSBndWVzdCwgd2UgY2hlY2sgdGhhdCB0aGUgUkQgaGFzIGZpbmlzaGVk
-CiAgc2Nhbm5pbmcgYW5kIHRoYXQgd2UgY2FuIHN0YXJ0IHJ1bm5pbmcgdGhlIHZjcHUKLSBvbiBw
-cmVlbXB0aW9uLCB3ZSBkZXNjaGVkdWxlIHRoZSBWUEUgYnkgbWFraW5nIGl0IGludmFsaWQgb24K
-ICB0aGUgUkQKCkhvd2V2ZXIsIHdlIGFyZSBwcmVlbXB0aWJsZSBiZXR3ZWVuIHRoZSBmaXJzdCB0
-d28gc3RlcHMuIElmIGl0IHNvCmhhcHBlbnMgKmFuZCogdGhhdCB0aGUgUkQgd2FzIHN0aWxsIHNj
-YW5uaW5nLCB3ZSBub25ldGhlbGVzcyB3cml0ZQp0byB0aGUgR0lDUl9WUEVOREJBU0VSIHJlZ2lz
-dGVyIHdoaWxlIERpcnR5IGlzIHNldCwgYW5kIGJhZCB0aGluZ3MKaGFwcGVuICh3ZSdyZSBpbiBV
-TlBSRUQgbGFuZCkuCgpUaGlzIGFmZmVjdHMgYm90aCB0aGUgNC4wIGFuZCA0LjEgaW1wbGVtZW50
-YXRpb25zLgoKTWFrZSBzdXJlIERpcnR5IGlzIGNsZWFyZWQgYmVmb3JlIHBlcmZvcm1pbmcgdGhl
-IGRlc2NoZWR1bGUsCm1lYW5pbmcgdGhhdCBpdHNfY2xlYXJfdnBlbmRfdmFsaWQoKSBiZWNvbWVz
-IGEgc29ydCBvZiBmdWxsIFZQRQpyZXNpZGVuY3kgYmFycmllci4KClJlcG9ydGVkLWJ5OiBKaW5n
-eWkgV2FuZyA8d2FuZ2ppbmd5aTExQGh1YXdlaS5jb20+ClNpZ25lZC1vZmYtYnk6IE1hcmMgWnlu
-Z2llciA8bWF6QGtlcm5lbC5vcmc+CkZpeGVzOiA1N2UzY2ViZDAyMmYgKCJLVk06IGFybTY0OiBE
-ZWxheSB0aGUgcG9sbGluZyBvZiB0aGUgR0lDUl9WUEVOREJBU0VSLkRpcnR5CmJpdCIpCkxpbms6
-IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL3IvNGFhZTEwYmEtYjM5YS01Zjg0LTc1NGItNjljMmVi
-MGEyYzAzQGh1YXdlaS5jb20KLS0tCiBkcml2ZXJzL2lycWNoaXAvaXJxLWdpYy12My1pdHMuYyB8
-IDI4ICsrKysrKysrKysrKysrKysrKystLS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCAxOSBpbnNl
-cnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvaXJxY2hpcC9p
-cnEtZ2ljLXYzLWl0cy5jIGIvZHJpdmVycy9pcnFjaGlwL2lycS1naWMtdjMtaXRzLmMKaW5kZXgg
-OWU5M2ZmMmI2Mzc1Li5jOWIxZGY5ODA4OTkgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvaXJxY2hpcC9p
-cnEtZ2ljLXYzLWl0cy5jCisrKyBiL2RyaXZlcnMvaXJxY2hpcC9pcnEtZ2ljLXYzLWl0cy5jCkBA
-IC0zMDExLDE4ICszMDExLDEyIEBAIHN0YXRpYyBpbnQgX19pbml0IGFsbG9jYXRlX2xwaV90YWJs
-ZXModm9pZCkKIAlyZXR1cm4gMDsKIH0KIAotc3RhdGljIHU2NCBpdHNfY2xlYXJfdnBlbmRfdmFs
-aWQodm9pZCBfX2lvbWVtICp2bHBpX2Jhc2UsIHU2NCBjbHIsIHU2NCBzZXQpCitzdGF0aWMgdTY0
-IHJlYWRfdnBlbmRfZGlydHlfY2xlYXIodm9pZCBfX2lvbWVtICp2bHBpX2Jhc2UpCiB7CiAJdTMy
-IGNvdW50ID0gMTAwMDAwMDsJLyogMXMhICovCiAJYm9vbCBjbGVhbjsKIAl1NjQgdmFsOwogCi0J
-dmFsID0gZ2ljcl9yZWFkX3ZwZW5kYmFzZXIodmxwaV9iYXNlICsgR0lDUl9WUEVOREJBU0VSKTsK
-LQl2YWwgJj0gfkdJQ1JfVlBFTkRCQVNFUl9WYWxpZDsKLQl2YWwgJj0gfmNscjsKLQl2YWwgfD0g
-c2V0OwotCWdpY3Jfd3JpdGVfdnBlbmRiYXNlcih2YWwsIHZscGlfYmFzZSArIEdJQ1JfVlBFTkRC
-QVNFUik7Ci0KIAlkbyB7CiAJCXZhbCA9IGdpY3JfcmVhZF92cGVuZGJhc2VyKHZscGlfYmFzZSAr
-IEdJQ1JfVlBFTkRCQVNFUik7CiAJCWNsZWFuID0gISh2YWwgJiBHSUNSX1ZQRU5EQkFTRVJfRGly
-dHkpOwpAQCAtMzAzMywxMCArMzAyNywyNiBAQCBzdGF0aWMgdTY0IGl0c19jbGVhcl92cGVuZF92
-YWxpZCh2b2lkIF9faW9tZW0gKnZscGlfYmFzZSwgdTY0IGNsciwgdTY0IHNldCkKIAkJfQogCX0g
-d2hpbGUgKCFjbGVhbiAmJiBjb3VudCk7CiAKLQlpZiAodW5saWtlbHkodmFsICYgR0lDUl9WUEVO
-REJBU0VSX0RpcnR5KSkgeworCWlmICh1bmxpa2VseSghY2xlYW4pKQogCQlwcl9lcnJfcmF0ZWxp
-bWl0ZWQoIklUUyB2aXJ0dWFsIHBlbmRpbmcgdGFibGUgbm90IGNsZWFuaW5nXG4iKTsKKworCXJl
-dHVybiB2YWw7Cit9CisKK3N0YXRpYyB1NjQgaXRzX2NsZWFyX3ZwZW5kX3ZhbGlkKHZvaWQgX19p
-b21lbSAqdmxwaV9iYXNlLCB1NjQgY2xyLCB1NjQgc2V0KQoreworCXU2NCB2YWw7CisKKwkvKiBN
-YWtlIHN1cmUgd2Ugd2FpdCB1bnRpbCB0aGUgUkQgaXMgZG9uZSB3aXRoIHRoZSBpbml0aWFsIHNj
-YW4gKi8KKwl2YWwgPSByZWFkX3ZwZW5kX2RpcnR5X2NsZWFyKHZscGlfYmFzZSk7CisJdmFsICY9
-IH5HSUNSX1ZQRU5EQkFTRVJfVmFsaWQ7CisJdmFsICY9IH5jbHI7CisJdmFsIHw9IHNldDsKKwln
-aWNyX3dyaXRlX3ZwZW5kYmFzZXIodmFsLCB2bHBpX2Jhc2UgKyBHSUNSX1ZQRU5EQkFTRVIpOwor
-CisJdmFsID0gcmVhZF92cGVuZF9kaXJ0eV9jbGVhcih2bHBpX2Jhc2UpOworCWlmICh1bmxpa2Vs
-eSh2YWwgJiBHSUNSX1ZQRU5EQkFTRVJfRGlydHkpKQogCQl2YWwgfD0gR0lDUl9WUEVOREJBU0VS
-X1BlbmRpbmdMYXN0OwotCX0KIAogCXJldHVybiB2YWw7CiB9Ci0tIAoyLjM0LjEKCgotLSAKV2l0
-aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
-bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
-b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+Hi Jing,
+
+On Thu, 17 Mar 2022 00:56:29 +0000,
+Jing Zhang <jingzhangos@google.com> wrote:
+> 
+> Arch specific exit reasons have been available for other architectures.
+> Add arch specific exit reason support for ARM64, which would be used in
+> KVM stats for monitoring VCPU status.
+> 
+> Signed-off-by: Jing Zhang <jingzhangos@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h |  5 +++
+>  arch/arm64/include/asm/kvm_host.h    | 33 +++++++++++++++
+>  arch/arm64/kvm/handle_exit.c         | 62 +++++++++++++++++++++++++---
+>  arch/arm64/kvm/mmu.c                 |  4 ++
+>  arch/arm64/kvm/sys_regs.c            |  6 +++
+>  5 files changed, 105 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index d62405ce3e6d..f73c8d900642 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -321,6 +321,11 @@ static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
+>  	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
+>  }
+>  
+> +static inline bool kvm_vcpu_trap_is_dabt(const struct kvm_vcpu *vcpu)
+> +{
+> +	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW;
+> +}
+> +
+>  static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
+>  {
+>  	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 76f795b628f1..daa68b053bdc 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -282,6 +282,36 @@ struct vcpu_reset_state {
+>  	bool		reset;
+>  };
+>  
+> +enum arm_exit_reason {
+> +	ARM_EXIT_UNKNOWN,
+> +	ARM_EXIT_IRQ,
+> +	ARM_EXIT_EL1_SERROR,
+> +	ARM_EXIT_HYP_GONE,
+> +	ARM_EXIT_IL,
+> +	ARM_EXIT_WFI,
+> +	ARM_EXIT_WFE,
+> +	ARM_EXIT_CP15_32,
+> +	ARM_EXIT_CP15_64,
+> +	ARM_EXIT_CP14_32,
+> +	ARM_EXIT_CP14_LS,
+> +	ARM_EXIT_CP14_64,
+> +	ARM_EXIT_HVC32,
+> +	ARM_EXIT_SMC32,
+> +	ARM_EXIT_HVC64,
+> +	ARM_EXIT_SMC64,
+> +	ARM_EXIT_SYS64,
+> +	ARM_EXIT_SVE,
+> +	ARM_EXIT_IABT_LOW,
+> +	ARM_EXIT_DABT_LOW,
+> +	ARM_EXIT_SOFTSTP_LOW,
+> +	ARM_EXIT_WATCHPT_LOW,
+> +	ARM_EXIT_BREAKPT_LOW,
+> +	ARM_EXIT_BKPT32,
+> +	ARM_EXIT_BRK64,
+> +	ARM_EXIT_FP_ASIMD,
+> +	ARM_EXIT_PAC,
+> +};
+> +
+>  struct kvm_vcpu_arch {
+>  	struct kvm_cpu_context ctxt;
+>  	void *sve_state;
+> @@ -382,6 +412,9 @@ struct kvm_vcpu_arch {
+>  		u64 last_steal;
+>  		gpa_t base;
+>  	} steal;
+> +
+> +	/* Arch specific exit reason */
+> +	enum arm_exit_reason exit_reason;
+
+We already have a copy of ESR_EL2. Together with the exit code, this
+gives you everything you need. Why add another piece of state?
+
+[...]
+
+> @@ -135,6 +179,7 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
+>  	kvm_pr_unimpl("Unknown exception class: esr: %#08x -- %s\n",
+>  		      esr, esr_get_class_string(esr));
+>  
+> +	vcpu->arch.exit_reason = ARM_EXIT_UNKNOWN;
+
+If anything, this should say "either CPU out of spec, or KVM bug". And
+I don't see the point of tracking these. This should be reported in a
+completely different manner, because this has nothing to do with the
+normal exits a vcpu does.
+
+> @@ -250,6 +299,7 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+>  		 * EL2 has been reset to the hyp-stub. This happens when a guest
+>  		 * is pre-empted by kvm_reboot()'s shutdown call.
+>  		 */
+> +		vcpu->arch.exit_reason = ARM_EXIT_HYP_GONE;
+
+Same thing here: the machine is *rebooting*. Who cares?
+
+>  		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
+>  		return 0;
+>  	case ARM_EXCEPTION_IL:
+> @@ -257,11 +307,13 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+>  		 * We attempted an illegal exception return.  Guest state must
+>  		 * have been corrupted somehow.  Give up.
+>  		 */
+> +		vcpu->arch.exit_reason = ARM_EXIT_IL;
+
+This is another reason why I dislike this patch. It mixes
+architectural state (ESR) and KVM gunk (exit code). Why not spit these
+two bits of information in the trace, and let whoever deals with it to
+infer what they want from it?
+
+>  		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
+>  		return -EINVAL;
+>  	default:
+>  		kvm_pr_unimpl("Unsupported exception type: %d",
+>  			      exception_index);
+> +		vcpu->arch.exit_reason = ARM_EXIT_UNKNOWN;
+
+See? Now you have UNKNOWN covering two really different concepts.
+That's broken. Overall, this patch is reinventing the wheel (and
+slightly square one), and I don't see a good reason for the state
+duplication.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
