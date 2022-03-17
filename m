@@ -2,78 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4BC4C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 00:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F55AC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 04:51:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FE6649E08;
-	Wed, 16 Mar 2022 20:56:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFDAB49F1F;
+	Thu, 17 Mar 2022 00:51:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yr3jZxyq8gTu; Wed, 16 Mar 2022 20:56:45 -0400 (EDT)
+	with ESMTP id MsASsSH0qUZR; Thu, 17 Mar 2022 00:51:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41C1049F0F;
-	Wed, 16 Mar 2022 20:56:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF80C49F21;
+	Thu, 17 Mar 2022 00:51:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E1EE49F0F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 20:56:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CECB49EF6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 00:51:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FpYDb9l+d5-v for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Mar 2022 20:56:43 -0400 (EDT)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB22B49F1C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 20:56:42 -0400 (EDT)
-Received: by mail-pl1-f201.google.com with SMTP id
- n17-20020a170902f61100b001538c882549so1938349plg.18
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 17:56:42 -0700 (PDT)
+ with ESMTP id 8alRhsQIe-LO for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Mar 2022 00:51:33 -0400 (EDT)
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
+ [209.85.210.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C89A49ECB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 00:51:33 -0400 (EDT)
+Received: by mail-pf1-f202.google.com with SMTP id
+ z194-20020a627ecb000000b004f6db380a59so2870577pfc.19
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 21:51:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=Jg9GQhk+MrZN5dXhW+X4cf0jKpd+avRpNX7anKj5Jrc=;
- b=m89l2hQAmUEdjNqV8OSCTfysZ/zOOwEFynaTXmVlR6Yzoo1Tx/dZoxyW6lOexx8+fq
- QUzXN6cI+cdNXN/EtWPD+f16r6B89XHPNUsNz4fxE70ESglpMWEl6bUWyJCBhYEsbYQb
- zxe9PXL1GLkt1QJJ4VG3Ie8JbNi3IGFnlkc9yRNI//242WCP8SA6wjBDbrK8gWrpduTZ
- OgvfmcZOxe567V08fuXZiraQk4SlFSiORjD6r1LqMp6mzhggpxoeD7hT2Yyyvo9M0k6l
- sMc8dnS9btYLpIWRh7ECmbtm7cyooPtA7nCYio+MoLGW2LDuWd26q4maprX8HLyqA1fe
- Ne/w==
+ :cc; bh=orPz1N9sb4VObY0DVEB/1SEaT7xLNh+eUph/PNeO4nQ=;
+ b=GHFh4+29HUaAFUYRfJ/jHI3C57so7rNewE6Lv/OXEhhyIgXMWs4LbD5tSqnSmzryUO
+ BCU9Ke3HGeM/aIr7AemTs7+60ktbBDcDgmuhFV5Ss+8TuPogYofszjB+VsbF30hI35ii
+ ApkgwVKn92b7jtL1cOY68PJUQSaEn+0hy3CifabQ4zAi7OQyzhubSfOkWgR+94WnoMlO
+ QNxLLqAuXNY3mFjkJXnxZxfY3dO6aPZnl/wC5iShn224fcJc7GKXNU7Jepa05issM7PT
+ zpq86zdo8RU15t9QLETux0eo7zaa/4+o7LYxG67/nOs0b1jEDAM+8Oqp5ZqAOyvvWlj/
+ OsAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=Jg9GQhk+MrZN5dXhW+X4cf0jKpd+avRpNX7anKj5Jrc=;
- b=oDC+NLGQ8B6oAxL9kQfHc1JLIHofWcxoT8mmaZ9A9IJR0FcQjWgdsXIWETgOvTFIdJ
- MP9wFP49dvcPb0/oMUVnYXugfp2XohOccZLeyYDaOyB6z8bB7TcgwZe/RpDGSIjFF+Vv
- U/JAC6SAMHPw6m5vgN7ru06dtP8v2xXWTUQc6cv3pj8CDsyqAHIyvf/WSdtHuabu6IDL
- NFZI9AIV0OhUz6WPC8rBawt76EArJB5Bp3+s/eQwSBuPSNQRYwPySa+II6m/ezEU7gWe
- 52DmN1WEe39d1n5LuZWYQ6dzvntl9wLtdMUEXBQqVtp+MFh4jZL68eaB15ho25ny6SJK
- P8Ug==
-X-Gm-Message-State: AOAM532VU49/A6TajX/k1XG4yugvCZokbYeImsytu9Z/1OD/18BcagJF
- u5VL50pQzvO5Oh+CfG1v5aojfRGDhp+LABrePQ==
-X-Google-Smtp-Source: ABdhPJwHRN519VOfnvRnJr+eDRdY4WPxlBAdx8ibhHEmrVvzFG7w2BsmEup87mQKjxpdevwHPl3T4yZQyEjnfWSjTw==
-X-Received: from jgzg.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1acf])
- (user=jingzhangos job=sendgmr) by
- 2002:a17:903:124a:b0:153:47d7:de49 with
- SMTP id u10-20020a170903124a00b0015347d7de49mr2556590plh.81.1647478602084;
- Wed, 16 Mar 2022 17:56:42 -0700 (PDT)
-Date: Thu, 17 Mar 2022 00:56:30 +0000
-In-Reply-To: <20220317005630.3666572-1-jingzhangos@google.com>
-Message-Id: <20220317005630.3666572-3-jingzhangos@google.com>
+ bh=orPz1N9sb4VObY0DVEB/1SEaT7xLNh+eUph/PNeO4nQ=;
+ b=vGpptY5XIZQ+JDTNOhQt3zDAZRse2NuFyjgNZm/1NZ02ODCumYvfEC5HWUBJL0gP/u
+ nCpfW6vOzM8BFfJOvufqYRp874HZ4CKBU9XsOGePYWBx7MaSulZ0HhT8oHy95V2tV6br
+ JFbPhNSvPTFF0bDYKhrmWkmZUQ150NoMq3oGgAeNqNHsHZbndLEVuH64Sow5nsvCk1+p
+ u+IHucHoRh0me7pKIFwRtR1quhAb20OVGhhV8u61HCKv8H09NOiR2kbuFebiF3+eZSh2
+ 2Jc8mmR94La7DQo5GUJ6uUbWVLGEf2hRJLfbedAZaM92jPA04pidzpKyGTVOXAIELnCD
+ h3/g==
+X-Gm-Message-State: AOAM5314irtRMLFiqa1lmK4gDFOhWLhHPBd9SrECk0I1SrQ3pUU3pr//
+ WF5bmsOmMSPgb6vl9GewuoWfsHJjHZ9OeQ==
+X-Google-Smtp-Source: ABdhPJzMNVszd9N8c+vlCGkv5DBuw+V048hOo2NeEOnk9aZLyf/NK51yu1+AdrmZzfTiIaeLEeS0t9jWO0FI8A==
+X-Received: from ricarkol2.c.googlers.com
+ ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a05:6a00:10cb:b0:4f7:942:6a22 with SMTP
+ id d11-20020a056a0010cb00b004f709426a22mr3258065pfu.84.1647492692552; Wed, 16
+ Mar 2022 21:51:32 -0700 (PDT)
+Date: Wed, 16 Mar 2022 21:51:25 -0700
+In-Reply-To: <20220317045127.124602-1-ricarkol@google.com>
+Message-Id: <20220317045127.124602-2-ricarkol@google.com>
 Mime-Version: 1.0
-References: <20220317005630.3666572-1-jingzhangos@google.com>
+References: <20220317045127.124602-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.35.1.723.g4982287a31-goog
-Subject: [PATCH v1 2/2] KVM: arm64: Add debug tracepoint for vcpu exits
-From: Jing Zhang <jingzhangos@google.com>
-To: KVM <kvm@vger.kernel.org>, KVMARM <kvmarm@lists.cs.columbia.edu>, 
- Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, 
- David Matlack <dmatlack@google.com>, Sean Christopherson <seanjc@google.com>, 
- Oliver Upton <oupton@google.com>, Reiji Watanabe <reijiw@google.com>, 
- Ricardo Koller <ricarkol@google.com>,
- Raghavendra Rao Ananta <rananta@google.com>
+Subject: [PATCH v2 1/3] KVM: arm64: selftests: add timer_get_tval() lib
+ function
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com
+Cc: maz@kernel.org, pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,71 +86,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This tracepoint only provides a hook for poking vcpu exits information,
-not exported to tracefs.
-A timestamp is added for the last vcpu exit, which would be useful for
-analysis for vcpu exits.
+Add timer_get_tval() into the arch timer library functions in
+selftests/kvm. Bonus: change the set_tval function to get an int32_t
+(tval is signed).
 
-Signed-off-by: Jing Zhang <jingzhangos@google.com>
+Reviewed-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h | 3 +++
- arch/arm64/kvm/arm.c              | 2 ++
- arch/arm64/kvm/trace_arm.h        | 8 ++++++++
- 3 files changed, 13 insertions(+)
+ .../selftests/kvm/include/aarch64/arch_timer.h | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index daa68b053bdc..576f2c18d008 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -415,6 +415,9 @@ struct kvm_vcpu_arch {
+diff --git a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+index cb7c03de3a21..93f35a4fc1aa 100644
+--- a/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
++++ b/tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+@@ -79,7 +79,7 @@ static inline uint64_t timer_get_cval(enum arch_timer timer)
+ 	return 0;
+ }
  
- 	/* Arch specific exit reason */
- 	enum arm_exit_reason exit_reason;
+-static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
++static inline void timer_set_tval(enum arch_timer timer, int32_t tval)
+ {
+ 	switch (timer) {
+ 	case VIRTUAL:
+@@ -95,6 +95,22 @@ static inline void timer_set_tval(enum arch_timer timer, uint32_t tval)
+ 	isb();
+ }
+ 
++static inline int32_t timer_get_tval(enum arch_timer timer)
++{
++	isb();
++	switch (timer) {
++	case VIRTUAL:
++		return (int32_t)read_sysreg(cntv_tval_el0);
++	case PHYSICAL:
++		return (int32_t)read_sysreg(cntp_tval_el0);
++	default:
++		GUEST_ASSERT_1(0, timer);
++	}
 +
-+	/* Timestamp for the last vcpu exit */
-+	u64 last_exit_time;
- };
- 
- /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index f49ebdd9c990..98631f79c182 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -783,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 	ret = 1;
- 	run->exit_reason = KVM_EXIT_UNKNOWN;
- 	while (ret > 0) {
-+		trace_kvm_vcpu_exits(vcpu);
- 		/*
- 		 * Check conditions before entering the guest
- 		 */
-@@ -898,6 +899,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		local_irq_enable();
- 
- 		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-+		vcpu->arch.last_exit_time = ktime_to_ns(ktime_get());
- 
- 		/* Exit types that need handling before we can be preempted */
- 		handle_exit_early(vcpu, ret);
-diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
-index 33e4e7dd2719..3e7dfd640e23 100644
---- a/arch/arm64/kvm/trace_arm.h
-+++ b/arch/arm64/kvm/trace_arm.h
-@@ -301,6 +301,14 @@ TRACE_EVENT(kvm_timer_emulate,
- 		  __entry->timer_idx, __entry->should_fire)
- );
- 
-+/*
-+ * Following tracepoints are not exported in tracefs and provide hooking
-+ * mechanisms only for testing and debugging purposes.
-+ */
-+DECLARE_TRACE(kvm_vcpu_exits,
-+	TP_PROTO(struct kvm_vcpu *vcpu),
-+	TP_ARGS(vcpu));
++	/* We should not reach here */
++	return 0;
++}
 +
- #endif /* _TRACE_ARM_ARM64_KVM_H */
- 
- #undef TRACE_INCLUDE_PATH
+ static inline void timer_set_ctl(enum arch_timer timer, uint32_t ctl)
+ {
+ 	switch (timer) {
 -- 
 2.35.1.723.g4982287a31-goog
 
