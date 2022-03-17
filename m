@@ -2,61 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2360AC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 11:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E0DC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 11:43:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6530249F3D;
-	Thu, 17 Mar 2022 07:34:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 456A649F33;
+	Thu, 17 Mar 2022 07:43:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Xk0KwKoqeIlE; Thu, 17 Mar 2022 07:34:44 -0400 (EDT)
+	with ESMTP id 1zotcwNTlT2G; Thu, 17 Mar 2022 07:43:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 04CCB49F28;
-	Thu, 17 Mar 2022 07:34:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A1DA49F28;
+	Thu, 17 Mar 2022 07:43:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AF7E49F1D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 07:34:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8D2140D01
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 07:43:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OpDbmkMeF4fz for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Mar 2022 07:34:42 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1139349F07
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 07:34:42 -0400 (EDT)
+ with ESMTP id AdwM9zfKUW7U for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Mar 2022 07:43:38 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6755140B8D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 07:43:38 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 680AB618EE;
- Thu, 17 Mar 2022 11:34:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9BAEC340EC;
- Thu, 17 Mar 2022 11:34:39 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 35B04B81E15;
+ Thu, 17 Mar 2022 11:43:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7427C340E9;
+ Thu, 17 Mar 2022 11:43:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1647516879;
- bh=ORov9gVmJ2HPUwjeBEPodpmnd8fTvKTLG5i+PtnN5NI=;
+ s=k20201202; t=1647517414;
+ bh=FGRIOk0v4eRxILLN0EmqViJbiPzs8tFo65NZYK2c6M8=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=YmcmrL5w+ZcF35uC0sBaHJZgEhB+AN3iQsaS9qUvyKo6gwUeeBoZtFMDq8S52jTGn
- s8HRIfP0+4XMYkWAawosJ8+HDOQLl3lPjqS761u8EL8BqZr4l6xG0AgAL3RideCxuu
- m4J+moGrVbHnMOs5nRBk3oQZm6SCtIsQmA/491vxuaDIBr1QXKw0LgemFOGdUI4llO
- tDTyq7a3N3JeAGaEYwEdJ/zHzoG3qL/2SbwZ8KxW0z9SfvQ3BDNcS98D8zmGxOIsFs
- rxzQWdp/F90dJyRQiSkOGsOH4GHCN7ocsyNARj32GZ8UEOaCRcd+341ZRj80rIJ6NR
- PpyLP476ObXNQ==
+ b=k7jHa6fyKnp18ueUptgaaNar4W0EJHj7RZrOYzOoHcWIQMpX/OiLxyXGcA0lTs/rg
+ oMYgpJGfLo96U03BBDNHMrMgOMGYHWZEN6wjmooA5Rda3NT4FzA+y8FenrhXjc+cGG
+ wU7W96PBKe8ldlwffOtNJGAkq3IC2RgcK5BeGJLaFftNoJCYxc41XGwPVG6sOvjWiz
+ TH2T/co8qejYx2ELVM7+mgqRMQaI7hygQJmAHA4BO9Pl70Ejf3FCDdnrUXV1RQwF1S
+ AQywzrzaDZV68bJ25grI8ZyTQks+y3pX5Z+hm8VfM/TVCf583pvEx5g5fgB/snBoKJ
+ 2pUg/sHAq4Vvg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nUoOr-00F9vq-He; Thu, 17 Mar 2022 11:34:37 +0000
-Date: Thu, 17 Mar 2022 11:34:37 +0000
-Message-ID: <87tubwyfqq.wl-maz@kernel.org>
+ id 1nUoXT-00FA6r-FP; Thu, 17 Mar 2022 11:43:31 +0000
+Date: Thu, 17 Mar 2022 11:43:31 +0000
+Message-ID: <87sfrgyfbw.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v1 1/2] KVM: arm64: Add arch specific exit reasons
-In-Reply-To: <20220317005630.3666572-2-jingzhangos@google.com>
+Subject: Re: [PATCH v1 2/2] KVM: arm64: Add debug tracepoint for vcpu exits
+In-Reply-To: <20220317005630.3666572-3-jingzhangos@google.com>
 References: <20220317005630.3666572-1-jingzhangos@google.com>
- <20220317005630.3666572-2-jingzhangos@google.com>
+ <20220317005630.3666572-3-jingzhangos@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -90,136 +90,89 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Jing,
 
-On Thu, 17 Mar 2022 00:56:29 +0000,
+On Thu, 17 Mar 2022 00:56:30 +0000,
 Jing Zhang <jingzhangos@google.com> wrote:
 > 
-> Arch specific exit reasons have been available for other architectures.
-> Add arch specific exit reason support for ARM64, which would be used in
-> KVM stats for monitoring VCPU status.
+> This tracepoint only provides a hook for poking vcpu exits information,
+> not exported to tracefs.
+> A timestamp is added for the last vcpu exit, which would be useful for
+> analysis for vcpu exits.
+
+The trace itself gives you a timestamp. Why do you need an extra one?
+
 > 
 > Signed-off-by: Jing Zhang <jingzhangos@google.com>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h |  5 +++
->  arch/arm64/include/asm/kvm_host.h    | 33 +++++++++++++++
->  arch/arm64/kvm/handle_exit.c         | 62 +++++++++++++++++++++++++---
->  arch/arm64/kvm/mmu.c                 |  4 ++
->  arch/arm64/kvm/sys_regs.c            |  6 +++
->  5 files changed, 105 insertions(+), 5 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h | 3 +++
+>  arch/arm64/kvm/arm.c              | 2 ++
+>  arch/arm64/kvm/trace_arm.h        | 8 ++++++++
+>  3 files changed, 13 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index d62405ce3e6d..f73c8d900642 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -321,6 +321,11 @@ static inline bool kvm_vcpu_trap_is_iabt(const struct kvm_vcpu *vcpu)
->  	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_IABT_LOW;
->  }
->  
-> +static inline bool kvm_vcpu_trap_is_dabt(const struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_vcpu_trap_get_class(vcpu) == ESR_ELx_EC_DABT_LOW;
-> +}
-> +
->  static inline bool kvm_vcpu_trap_is_exec_fault(const struct kvm_vcpu *vcpu)
->  {
->  	return kvm_vcpu_trap_is_iabt(vcpu) && !kvm_vcpu_abt_iss1tw(vcpu);
 > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 76f795b628f1..daa68b053bdc 100644
+> index daa68b053bdc..576f2c18d008 100644
 > --- a/arch/arm64/include/asm/kvm_host.h
 > +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -282,6 +282,36 @@ struct vcpu_reset_state {
->  	bool		reset;
+> @@ -415,6 +415,9 @@ struct kvm_vcpu_arch {
+>  
+>  	/* Arch specific exit reason */
+>  	enum arm_exit_reason exit_reason;
+> +
+> +	/* Timestamp for the last vcpu exit */
+> +	u64 last_exit_time;
 >  };
 >  
-> +enum arm_exit_reason {
-> +	ARM_EXIT_UNKNOWN,
-> +	ARM_EXIT_IRQ,
-> +	ARM_EXIT_EL1_SERROR,
-> +	ARM_EXIT_HYP_GONE,
-> +	ARM_EXIT_IL,
-> +	ARM_EXIT_WFI,
-> +	ARM_EXIT_WFE,
-> +	ARM_EXIT_CP15_32,
-> +	ARM_EXIT_CP15_64,
-> +	ARM_EXIT_CP14_32,
-> +	ARM_EXIT_CP14_LS,
-> +	ARM_EXIT_CP14_64,
-> +	ARM_EXIT_HVC32,
-> +	ARM_EXIT_SMC32,
-> +	ARM_EXIT_HVC64,
-> +	ARM_EXIT_SMC64,
-> +	ARM_EXIT_SYS64,
-> +	ARM_EXIT_SVE,
-> +	ARM_EXIT_IABT_LOW,
-> +	ARM_EXIT_DABT_LOW,
-> +	ARM_EXIT_SOFTSTP_LOW,
-> +	ARM_EXIT_WATCHPT_LOW,
-> +	ARM_EXIT_BREAKPT_LOW,
-> +	ARM_EXIT_BKPT32,
-> +	ARM_EXIT_BRK64,
-> +	ARM_EXIT_FP_ASIMD,
-> +	ARM_EXIT_PAC,
-> +};
-> +
->  struct kvm_vcpu_arch {
->  	struct kvm_cpu_context ctxt;
->  	void *sve_state;
-> @@ -382,6 +412,9 @@ struct kvm_vcpu_arch {
->  		u64 last_steal;
->  		gpa_t base;
->  	} steal;
-> +
-> +	/* Arch specific exit reason */
-> +	enum arm_exit_reason exit_reason;
+>  /* Pointer to the vcpu's SVE FFR for sve_{save,load}_state() */
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index f49ebdd9c990..98631f79c182 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -783,6 +783,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  	ret = 1;
+>  	run->exit_reason = KVM_EXIT_UNKNOWN;
+>  	while (ret > 0) {
+> +		trace_kvm_vcpu_exits(vcpu);
 
-We already have a copy of ESR_EL2. Together with the exit code, this
-gives you everything you need. Why add another piece of state?
+Exit? We haven't entered the guest yet!
 
-[...]
-
-> @@ -135,6 +179,7 @@ static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
->  	kvm_pr_unimpl("Unknown exception class: esr: %#08x -- %s\n",
->  		      esr, esr_get_class_string(esr));
+>  		/*
+>  		 * Check conditions before entering the guest
+>  		 */
+> @@ -898,6 +899,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  		local_irq_enable();
 >  
-> +	vcpu->arch.exit_reason = ARM_EXIT_UNKNOWN;
+>  		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+> +		vcpu->arch.last_exit_time = ktime_to_ns(ktime_get());
 
-If anything, this should say "either CPU out of spec, or KVM bug". And
-I don't see the point of tracking these. This should be reported in a
-completely different manner, because this has nothing to do with the
-normal exits a vcpu does.
+Why isn't the above tracepoint sufficient? It gives you the EC, and
+comes with a timestamp for free. And why should *everyone* pay the
+price of this timestamp update if not tracing?
 
-> @@ -250,6 +299,7 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
->  		 * EL2 has been reset to the hyp-stub. This happens when a guest
->  		 * is pre-empted by kvm_reboot()'s shutdown call.
->  		 */
-> +		vcpu->arch.exit_reason = ARM_EXIT_HYP_GONE;
+>  
+>  		/* Exit types that need handling before we can be preempted */
+>  		handle_exit_early(vcpu, ret);
+> diff --git a/arch/arm64/kvm/trace_arm.h b/arch/arm64/kvm/trace_arm.h
+> index 33e4e7dd2719..3e7dfd640e23 100644
+> --- a/arch/arm64/kvm/trace_arm.h
+> +++ b/arch/arm64/kvm/trace_arm.h
+> @@ -301,6 +301,14 @@ TRACE_EVENT(kvm_timer_emulate,
+>  		  __entry->timer_idx, __entry->should_fire)
+>  );
+>  
+> +/*
+> + * Following tracepoints are not exported in tracefs and provide hooking
+> + * mechanisms only for testing and debugging purposes.
+> + */
+> +DECLARE_TRACE(kvm_vcpu_exits,
+> +	TP_PROTO(struct kvm_vcpu *vcpu),
+> +	TP_ARGS(vcpu));
+> +
+>  #endif /* _TRACE_ARM_ARM64_KVM_H */
+>  
+>  #undef TRACE_INCLUDE_PATH
 
-Same thing here: the machine is *rebooting*. Who cares?
-
->  		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
->  		return 0;
->  	case ARM_EXCEPTION_IL:
-> @@ -257,11 +307,13 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
->  		 * We attempted an illegal exception return.  Guest state must
->  		 * have been corrupted somehow.  Give up.
->  		 */
-> +		vcpu->arch.exit_reason = ARM_EXIT_IL;
-
-This is another reason why I dislike this patch. It mixes
-architectural state (ESR) and KVM gunk (exit code). Why not spit these
-two bits of information in the trace, and let whoever deals with it to
-infer what they want from it?
-
->  		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
->  		return -EINVAL;
->  	default:
->  		kvm_pr_unimpl("Unsupported exception type: %d",
->  			      exception_index);
-> +		vcpu->arch.exit_reason = ARM_EXIT_UNKNOWN;
-
-See? Now you have UNKNOWN covering two really different concepts.
-That's broken. Overall, this patch is reinventing the wheel (and
-slightly square one), and I don't see a good reason for the state
-duplication.
+I guess this is the only bit I actually like about this series: a
+generic, out of the way mechanism to let people hook whatever they
+want and dump the state they need.
 
 Thanks,
 
