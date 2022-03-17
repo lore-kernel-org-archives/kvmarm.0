@@ -2,87 +2,97 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8CFC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 09:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C25EFC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 17 Mar 2022 09:29:01 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A3B149F5B;
-	Thu, 17 Mar 2022 05:28:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 703FC4A531;
+	Thu, 17 Mar 2022 05:29:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
+	(fail, message has been altered) header.i=@intel.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pVSwMtbZ5MHg; Thu, 17 Mar 2022 05:28:57 -0400 (EDT)
+	with ESMTP id WfgzSi0E3GaM; Thu, 17 Mar 2022 05:28:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EBC64B08D;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 647F44B091;
 	Thu, 17 Mar 2022 05:28:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1A5049EFC
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 18:39:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E612C49F21
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 05:16:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IiP1Qq4f4J0d for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Mar 2022 18:39:32 -0400 (EDT)
-Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com
- [209.85.161.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD97D49EFB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 18:39:32 -0400 (EDT)
-Received: by mail-oo1-f51.google.com with SMTP id
- g5-20020a4ae885000000b003240bc9b2afso4430655ooe.10
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2022 15:39:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:date:in-reply-to
- :message-id:mime-version;
- bh=1+QbwgDl1LJslolUIJ7aexnhE/1LwjAWswIgk1iXd24=;
- b=xzzNr7XnXnHN9KieNsWW12uHCOnL1fvC5NJz2h9xZHzRho5cO/9nl2sPy+zpi89PBw
- t90jzK1RBl4EyUSMsVIuuw+T2Nw1vvRfuwtMNgivb6kL9jlZTKmHbeJK0MuJX6P+sQOm
- p9AVmuXrFwKy3HW/IwJkQRC8uSeBuS9JpgzPvcswFNxTZYoj+XYlT/vRBMS9rxbKSzi6
- fOnJyNYN0yTqvLdAD5OCLWSpyAdYtt3HvAZvoasf8hWMND+Qy+jeJ6NllsSE8mP8iXUL
- X6rudyfiV07RrbdjldFxbQi8+RJuE2aavPChDRaUKQwLFP/OfsoW/UUiRBLMRfjRDVhQ
- luRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
- :in-reply-to:message-id:mime-version;
- bh=1+QbwgDl1LJslolUIJ7aexnhE/1LwjAWswIgk1iXd24=;
- b=X1j8m1jXCYisvb9BxQluWbM77qLA/sk4Ft54EGITHEBkUqXOvuKu45xpvRXCmJ3f6j
- c9Iv9Osk1Me3pOZS4GIqvjHFl5pVSfu/52LR/NM1AxEIvdiA91jVJogyJheQ/7n/MJFW
- tSoxDVCVpQ/rdu41ejAjOfCeb+IHU54y5EUP6Og8exlykeMOE9ip2nahJFwjdT30dCbn
- aNPeBSME0e2qqcA59rKlvyqT0Cfs6QOoWm4jlHPxat265N5JzSAgUrRBaoINSjAmWhOG
- nTV/igQsrBMWbsWU/5NBGEdKOCp3hreQBVcjWHWJEHrM8azG22f0Ge7BZRBSZESkfKIz
- edug==
-X-Gm-Message-State: AOAM532D9F5FxRajvZE7rm9/ErARLBE4ObORnDbxXF5B5JcUf1GHi/hw
- WAXMP91W1Og3YRJktKNLCUUGKw==
-X-Google-Smtp-Source: ABdhPJxCOYtAyq6RuYOy4M7ev+ABARQur36mgrpikApcM4DwinFa1ybZoRDFPU3zAD2BCczsS2YIug==
-X-Received: by 2002:a05:6870:d10e:b0:dd:a653:a25 with SMTP id
- e14-20020a056870d10e00b000dda6530a25mr1837976oac.299.1647470372180; 
- Wed, 16 Mar 2022 15:39:32 -0700 (PDT)
-Received: from localhost ([2804:14d:7e39:8470:b171:978c:2a42:8690])
- by smtp.gmail.com with ESMTPSA id
- p8-20020a0568301cc800b005b2259500e2sm1550391otg.25.2022.03.16.15.39.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 16 Mar 2022 15:39:31 -0700 (PDT)
-References: <20220225165923.1474372-1-broonie@kernel.org>
- <20220225165923.1474372-21-broonie@kernel.org>
-User-agent: mu4e 1.6.10; emacs 27.2
-From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v12 20/40] arm64/sme: Implement streaming SVE signal
- handling
-Date: Wed, 16 Mar 2022 19:38:30 -0300
-In-reply-to: <20220225165923.1474372-21-broonie@kernel.org>
-Message-ID: <84v8wdbjz4.fsf@linaro.org>
+ with ESMTP id kqo1In9h9onp for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Mar 2022 05:15:59 -0400 (EDT)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 440A949F18
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 05:15:59 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+ t=1647508559; x=1679044559;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=AgYkRzO8ksOYyWWAS/gpvfK0lt7Rzm9dkVzVmq0l0/w=;
+ b=bFr1S//xyXqz1idPy74O7MaCjZB/B8E2Yh04iXEmv+TGAHIE3nf+X3bk
+ uSxyHpozVvN92vivWvYdxypWhnDjeO9/N+hjNIThzbyYJAqvXeAjjkkNr
+ K5OGZDH58NzbwlWPnLpRHiArguT9CD7YwEPrhtxp5z8oN26vrvueGpEev
+ 9imhDjAEaadc9tm4uSv/Lx9qC1gWRYI7Hab4qBN4g6gzpi/rN9yjEeZo5
+ FXALOjwqJ8VuKU4++cZvq3VHV/gJC8o1Ms8QxY5Xx4VCwewSzB7mu7m4X
+ g7Vfqm3Rvmd3I6nfmrumHuk1qVY/zS/z2CJnAaU3SgIeozLX61YJ4h1yG A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10288"; a="244276238"
+X-IronPort-AV: E=Sophos;i="5.90,188,1643702400"; d="scan'208";a="244276238"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Mar 2022 02:15:57 -0700
+X-IronPort-AV: E=Sophos;i="5.90,188,1643702400"; d="scan'208";a="557852602"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.23])
+ by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 17 Mar 2022 02:15:44 -0700
+Date: Thu, 17 Mar 2022 17:15:41 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: seanjc@google.com, maz@kernel.org, kvm@vger.kernel.org,
+ pbonzini@redhat.com, kevin.tian@intel.com, tglx@linutronix.de
+Subject: Re: [PATCH v4 0/6] Improve KVM's interaction with CPU hotplug
+Message-ID: <20220317091539.GA7257@gao-cwp>
+References: <20220216031528.92558-1-chao.gao@intel.com>
 MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20220216031528.92558-1-chao.gao@intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-Mailman-Approved-At: Thu, 17 Mar 2022 05:28:50 -0400
-Cc: Marc Zyngier <maz@kernel.org>,
- Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alan Hayward <alan.hayward@arm.com>,
- linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>
+Cc: Thomas Richter <tmricht@linux.ibm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ David Hildenbrand <david@redhat.com>,
+ Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ linux-mips@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, Wanpeng Li <wanpengli@tencent.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-s390@vger.kernel.org,
+ Jia He <justin.he@arm.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
+ linux-riscv@lists.infradead.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Ingo Molnar <mingo@redhat.com>, "Darrick J. Wong" <djwong@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Qi Liu <liuqi115@huawei.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ John Garry <john.garry@huawei.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Tom Zanussi <tom.zanussi@linux.intel.com>, Borislav Petkov <bp@alien8.de>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Atish Patra <atishp@atishpatra.org>,
+ Sumanth Korikkar <sumanthk@linux.ibm.com>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ Juergen Gross <jgross@suse.com>, Shaokun Zhang <zhangshaokun@hisilicon.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Hector Martin <marcan@marcan.st>, Nick Desaulniers <ndesaulniers@google.com>,
+ linux-kernel@vger.kernel.org, Bharata B Rao <bharata@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, kvm-riscv@lists.infradead.org,
+ Michael Ellerman <mpe@ellerman.id.au>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ linuxppc-dev@lists.ozlabs.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,27 +109,9 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Ping. Anyone can help to review this series (particularly patch 3-5)?
 
-Hello,
-
-Mark Brown <broonie@kernel.org> writes:
-
-> @@ -186,9 +189,16 @@ struct sve_context {
->   * sve_context.vl must equal the thread's current vector length when
->   * doing a sigreturn.
->   *
-> + * On systems with support for SME the SVE register state may reflect either
-> + * streaming or non-streaming mode.  In streaming mode the streaming mode
-> + * vector length will be used and the flag SVE_SIG_FLAG_SM will be set in
-> + * the flags field. It is permitted to enter or leave streaming mode in
-> + * a signal return, applications should take care to ensure that any difference
-> + * in vector length between the two modes is handled, including any resixing
-> + * and movement of context blocks.
-
-s/resixing/resizing/
-
--- 
-Thiago
+FYI, Sean gave his Reviewed-by to patch 1,2,5 and 6.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
