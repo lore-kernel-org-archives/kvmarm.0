@@ -2,84 +2,65 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46352C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Mar 2022 05:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD331C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Mar 2022 05:27:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 858C649EF0;
-	Fri, 18 Mar 2022 01:20:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2125C49ECB;
+	Fri, 18 Mar 2022 01:27:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, body has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Eg10hMbvPurH; Fri, 18 Mar 2022 01:20:01 -0400 (EDT)
+	with ESMTP id aOeOIRjf1gQZ; Fri, 18 Mar 2022 01:27:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BD4049F35;
-	Fri, 18 Mar 2022 01:20:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EBE849EC2;
+	Fri, 18 Mar 2022 01:27:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6349D49ECB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 01:20:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3ADDD49EC2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 01:27:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R8gokeHhN7wY for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Mar 2022 01:19:59 -0400 (EDT)
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com
- [209.85.210.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A23C49EC2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 01:19:59 -0400 (EDT)
-Received: by mail-pf1-f169.google.com with SMTP id s42so8676465pfg.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 22:19:59 -0700 (PDT)
+ with ESMTP id B7CUN58eMza5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Mar 2022 01:27:09 -0400 (EDT)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com
+ [209.85.208.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 067E449E5F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 01:27:08 -0400 (EDT)
+Received: by mail-ed1-f41.google.com with SMTP id g20so9006300edw.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Mar 2022 22:27:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=message-id:date:mime-version:user-agent:subject:content-language:to
- :references:from:in-reply-to:content-transfer-encoding;
- bh=vjwmQ3LT6/MkM+MWL06sDoV0rE+62vRkuXuZNHEGmFU=;
- b=mHQKT60iyniva73gouIOenNIHLub2xIvh+8EdLLsaXtCdjXEgCfQrIYyHtHSycjfRg
- wptHBKzGOPMl7woR/FcYF79fj3jxK7w/n2R+udkl/QV+d+PX4WbQIWBiyc84XrWja5GJ
- Dwu02jG+5sHm/SdCKKI7/F0Ymhvz8g1W+BAC9P8x5TI8RSDDN+R1E27eYwrDkdxH5w/H
- h9nNby/UTuXbz4rjFthmMGzMWR40/kNow6uFBHmrNZSi+1PyRqgG+acO2rjBWTUKfNUr
- fkd54cgyjL0DKhRUuy2JGSA75IEoYIs5BxiZrTY0rcVzKLeBwulGGvhdo7Dp1KVgBzMj
- doNA==
+ h=mime-version:from:date:message-id:subject:to;
+ bh=I2Klq0jUAW6SmsUfRBibu2q3PVe4spyAFc4g3m9nGbc=;
+ b=dUIqTvQoAnVHEdYAl8NZGuoa571ubQxC+AIW2DaJWDqg9dQZDzbJCXqJYgxkV1dk/w
+ wQJfzIDvi5CaRDVvzpfgliCxmQ2DlbqxgAffTnakG5oh9lWdjeBbapNELXXEL7TxsNNC
+ J/UNpLWCC+CYb/5Ob+0nL6j00wrtvq3tQdgwlsBYlSKCrEx77rbGlt4o541Jm/Z4NzSe
+ lxxCVX1QJrwHtjvhKOFUhkDPCEKxXkFR0ZEtkxH2ZoLqRHlhNMp+Dwi0TMxjuTMP4S00
+ MMdkLWysifgpsDRFesDVxZQecXssKDrxsIao/0ZzDBRveyPkYY4ekYd8SnsOXGvpsQoI
+ 7CGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:references:from:in-reply-to
- :content-transfer-encoding;
- bh=vjwmQ3LT6/MkM+MWL06sDoV0rE+62vRkuXuZNHEGmFU=;
- b=nQh7EQzEln4RkORREhbi4dky0wqNLrZiAEV9f2762c1iIJAidRJM0HG4Gb9wH9MO3k
- ++NdO1Qiqklgmzzso4xvNKBdtS/CVNNFuHhePxPfZhUJgJlRh9z8RTSoxE+AKhz9+ix/
- TrqVDDiPom3T+xRSFennDlO3QDsjStjN3PIRpLtAnhTsLY5/BfK/5S3oYAGaDQERKM/L
- Htrq0R4hI968hChhffHz2sBqzAm8xPNNC1Q/f+oGQAKv1Xyvo4ITosGjUDZnoh0YJrEn
- pC4yjybjxxw1V54f6eaBRpFmjYjtj2JqDT61tXjkEwpWWIQk1kot0Nodm/P8jzhne4OO
- sfLw==
-X-Gm-Message-State: AOAM533k6Eah6PFhQNhIWQBujVt/3KAUBnpcRzedd6KetcglCk9gpPbH
- WAC620J9NktHCtR5CnInrjqasw4txBkcT+CQ
-X-Google-Smtp-Source: ABdhPJxamSUJqhC8eJyQ1Eb0PcmI1KtDN5hr3RNTdm9ta4m/H65UtCPnuVxhMmomnEdD0w1ybZ1bTg==
-X-Received: by 2002:a63:dd54:0:b0:382:2fb1:13cf with SMTP id
- g20-20020a63dd54000000b003822fb113cfmr714217pgj.72.1647580798076; 
- Thu, 17 Mar 2022 22:19:58 -0700 (PDT)
-Received: from [192.168.86.237]
- (107-203-254-183.lightspeed.sntcca.sbcglobal.net. [107.203.254.183])
- by smtp.gmail.com with ESMTPSA id
- ng12-20020a17090b1a8c00b001bfc847b555sm11386072pjb.46.2022.03.17.22.19.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 17 Mar 2022 22:19:57 -0700 (PDT)
-Message-ID: <0ce1011b-6e77-f00c-6d19-5b5394e0d0c2@google.com>
-Date: Thu, 17 Mar 2022 22:19:56 -0700
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=I2Klq0jUAW6SmsUfRBibu2q3PVe4spyAFc4g3m9nGbc=;
+ b=6O5R9SnZOmqhuJnV+jZY/vvyFMg+fUH731l6H29el1jR/mFvsPZShUdzZxP8L4Fij1
+ SmUmodnsmoqqv9MPZN1WX2Ndc212h9LpTmlkgPMbWK3yYcRpFey5ikhJ3SdFuIBQmyDi
+ P6q6l8zfjF5x1cAGZ4PyR1U8ZSGg8krXjIl0LGyQfGnUyS1QJ5vCEq55cT8sGI0okJkr
+ 6N30TyVi28HsiyQDbJUj9vGNPmDrWWudqPT+NZoC9DfK9mPCVt4PiohBatyG8yVpuTkB
+ aW2TWuYCUXX1LK/YaITA3ztppX8+T9eNhkQr4Bn2avYr4dJUQ2ZzJOeJXSA8VkKIj3L8
+ 1MWQ==
+X-Gm-Message-State: AOAM533MhopStQfbs/69515pxYICe6qKIsC3XPY2hYA7X8tOpJSlmIU4
+ ScVeDxJs7Qy3jD9SkVmuDBfoVCiAlKGLFDc/9AYlBlcnBTPolg==
+X-Google-Smtp-Source: ABdhPJzt+1k4Z9zdLYjtRihnw8aFIn+9bARMvO3NrpvEMJNKCbOrCXod5W+WgfL0dbFSPruuEn4qpbql+o2N9mqjJqA=
+X-Received: by 2002:aa7:cac8:0:b0:410:cc6c:6512 with SMTP id
+ l8-20020aa7cac8000000b00410cc6c6512mr7774931edt.408.1647581227535; Thu, 17
+ Mar 2022 22:27:07 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [RFC PATCH v5 08/38] KVM: arm64: Unlock memslots after stage 2
- tables are freed
-Content-Language: en-US
-To: Alexandru Elisei <alexandru.elisei@arm.com>, maz@kernel.org,
- james.morse@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- will@kernel.org, mark.rutland@arm.com
-References: <20211117153842.302159-1-alexandru.elisei@arm.com>
- <20211117153842.302159-9-alexandru.elisei@arm.com>
-From: Reiji Watanabe <reijiw@google.com>
-In-Reply-To: <20211117153842.302159-9-alexandru.elisei@arm.com>
+From: Ricardo Koller <ricarkol@google.com>
+Date: Thu, 17 Mar 2022 22:26:56 -0700
+Message-ID: <CAOHnOryT4A2QjX9Mg57vczoakyTT+7Dq1os_DUXHAQ+McDFpSA@mail.gmail.com>
+Subject: Spectre - BHB
+To: KVMARM <kvmarm@lists.cs.columbia.edu>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,83 +72,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Alex,
+Hello,
 
-On 11/17/21 7:38 AM, Alexandru Elisei wrote:
-> Unpin the backing pages mapped at stage 2 after the stage 2 translation
-> tables are destroyed.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->   arch/arm64/kvm/mmu.c | 23 ++++++++++++++++++-----
->   1 file changed, 18 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index cd6f1bc7842d..072e2aba371f 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1627,11 +1627,19 @@ int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags)
->   	return ret;
->   }
->   
-> -static void unlock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot)
-> +static void __unlock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot)
->   {
->   	bool writable = memslot->arch.flags & KVM_MEMSLOT_LOCK_WRITE;
->   	unsigned long npages = memslot->npages;
->   
-> +	unpin_memslot_pages(memslot, writable);
-> +	account_locked_vm(current->mm, npages, false);
-> +
-> +	memslot->arch.flags &= ~KVM_MEMSLOT_LOCK_MASK;
-> +}
-> +
-> +static void unlock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot)
-> +{
->   	/*
->   	 * MMU maintenace operations aren't performed on an unlocked memslot.
->   	 * Unmap it from stage 2 so the abort handler performs the necessary
-> @@ -1640,10 +1648,7 @@ static void unlock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot)
->   	if (kvm_mmu_has_pending_ops(kvm))
->   		kvm_arch_flush_shadow_memslot(kvm, memslot);
->   
-> -	unpin_memslot_pages(memslot, writable);
-> -	account_locked_vm(current->mm, npages, false);
-> -
-> -	memslot->arch.flags &= ~KVM_MEMSLOT_LOCK_MASK;
-> +	__unlock_memslot(kvm, memslot);
->   }
->   
->   int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags)
-> @@ -1951,7 +1956,15 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
->   
->   void kvm_arch_flush_shadow_all(struct kvm *kvm)
->   {
-> +	struct kvm_memory_slot *memslot;
-> +
->   	kvm_free_stage2_pgd(&kvm->arch.mmu);
-> +
-> +	kvm_for_each_memslot(memslot, kvm_memslots(kvm)) {
-> +		if (!memslot_is_locked(memslot))
-> +			continue;
-> +		__unlock_memslot(kvm, memslot);
-> +	}
->   }
+We've been talking internally about Spectre-BHB (disclosed a couple of
+weeks ago [0])
+and thought it could be interesting to start some discussion on the mailing
+list, especially around the software mitigation.
 
-Perhaps it might be useful to manage the number of locked memslots ?
-(can be used in the fix for kvm_mmu_unlock_memslot in the patch-7 as well)
-                                                  
-Thanks,
-Reiji
+As a start, here is the overhead of the mitigation [1] for some guest operations
+on a Neoverse N1 core [0]. The table shows the avg. latency of each operation,
+measured using kvm-unit-tests/arm/micro-bench.
 
+Micro-bench          not-mitigated   mitigated
+                     nsecs           nsecs           overhead
+=============================================================
+hvc                  292             317             8.56%
+mmio_read_user       1609            1704            5.90%
+mmio_read_vgic       419             444             5.97%
+eoi                  29              29              0.00%
+ipi                  1509            1548            2.58%
+lpi                  1643            1758            7.00%
+timer_10ms           798             844             5.76%
 
->   
->   void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+Some details:
+- Using 56e337f2cf13 with and without MITIGATE_SPECTRE_BRANCH_HISTORY.
+- Each test (row) runs for 1 minute in a tight loop.
+
+We are still evaluating the effect of this on real workloads.
+
+Thanks!
+Ricardo
+
+[0] Spectre-BHB white paper:
+https://developer.arm.com/support/arm-security-updates/speculative-processor-vulnerability/spectre-bhb
+[1] 558c303c9734af5a813739cd284879227f7297d2 arm64: Mitigate spectre
+style branch history side channels
+[2] the specific vector is spectre_bhb_k24 (Arm Neoverse-N1), from the
+Spectre-BHB white paper in [0].
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
