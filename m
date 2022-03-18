@@ -2,77 +2,59 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52E27C433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Mar 2022 14:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FFD7C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Mar 2022 17:00:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1B6049E2B;
-	Fri, 18 Mar 2022 10:36:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 824B649EC0;
+	Fri, 18 Mar 2022 13:00:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@inria.fr
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UZM-ODOXFSE2; Fri, 18 Mar 2022 10:36:55 -0400 (EDT)
+	with ESMTP id FmiUdUoZb3PX; Fri, 18 Mar 2022 13:00:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5725149F1E;
-	Fri, 18 Mar 2022 10:36:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F100A49ED1;
+	Fri, 18 Mar 2022 13:00:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5970A49E2B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 10:36:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C85F440BD6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 06:37:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pW94rSTAkjEB for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Mar 2022 10:36:52 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B841D43C8C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 10:36:52 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 00089B823DF;
- Fri, 18 Mar 2022 14:36:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EEE7C340E8;
- Fri, 18 Mar 2022 14:36:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1647614209;
- bh=0h3evQx6Yv2gaoIRUruq18FX6Pu8A8sZlELDeSriisk=;
- h=From:To:Cc:Subject:Date:From;
- b=L7GxGpTLGkpBvkhgfWt+i9nk929o/zoP8Q30xjb2m0d6cyc/TTAr9WEhMBY4RQUSP
- wNJqxz2yFj4Pn9vL04mOmV3DL3NOLpJaEt+jRRMkuIfDzW4xDVJknIjB1wduDa0yHL
- cyG5cQGbP4Ueza4JJoEh6NTo9GoghwJUcPzlvSxOT1/+i/dqZMnSNmT9uo8zpSI/Ps
- DuuNDTGvQhnZdP4Lh36CsxEiqWlgXtOx0Yl0I26YE9q6SSgst7oLKy+shlLzWQ0JYf
- 3XmqJt4P9u6YUiR32oQqu+kC1WXaQQUAeFBx8O0pGVrqwzNZahdb2M9zZfk+eLMrOB
- TmevIV1pJYFCg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nVDih-00FSvn-31; Fri, 18 Mar 2022 14:36:47 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [GIT PULL] KVM/arm64 updates for 5.18
-Date: Fri, 18 Mar 2022 14:36:29 +0000
-Message-Id: <20220318143629.863625-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+ with ESMTP id J73SrzC22R3d for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Mar 2022 06:37:40 -0400 (EDT)
+Received: from mail3-relais-sop.national.inria.fr
+ (mail3-relais-sop.national.inria.fr [192.134.164.104])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2F4E8404FA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 06:37:39 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=inria.fr; s=dc;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=pS7arhwdyxiLBpw5HAeNYXhsv7AvmLsCK+O6q1yQ9rU=;
+ b=arTLc8bgqEq4N5GNK1xjAtfkwmA1fcqrxpmJFzdDw2xXcg02AhV3y4W2
+ Wpdg8IclaiXlkcTdt0esWqiJ117uCJ6DCg0BuIjbuHu9HlaWSSPgL1GgT
+ hkySdtY5Rmw8X8eLR/TZPNnhedTyd1mxzYLHgitAs37B2dPdof9v+8mrD M=;
+Authentication-Results: mail3-relais-sop.national.inria.fr;
+ dkim=none (message not signed) header.i=none;
+ spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr;
+ dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="5.90,192,1643670000"; 
+   d="scan'208";a="8935660"
+Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
+ by mail3-relais-sop.national.inria.fr with
+ ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2022 11:37:39 +0100
+From: Julia Lawall <Julia.Lawall@inria.fr>
+To: Marc Zyngier <maz@kernel.org>
+Subject: [PATCH] KVM: arm64: fix typos in comments
+Date: Fri, 18 Mar 2022 11:37:19 +0100
+Message-Id: <20220318103729.157574-24-Julia.Lawall@inria.fr>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
- drjones@redhat.com, qwandor@google.com, catalin.marinas@arm.com,
- deng.changcheng@zte.com.cn, tabba@google.com, james.morse@arm.com,
- jingzhangos@google.com, Julia.Lawall@inria.fr, keirf@google.com,
- broonie@kernel.org, mark.rutland@arm.com, oupton@google.com, reijiw@google.com,
- ricarkol@google.com, shameerali.kolothum.thodi@huawei.com,
- suzuki.poulose@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Andrew Walbran <qwandor@google.com>, kernel-team@android.com,
- Changcheng Deng <deng.changcheng@zte.com.cn>, Mark Brown <broonie@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Julia Lawall <Julia.Lawall@inria.fr>
+X-Mailman-Approved-At: Fri, 18 Mar 2022 13:00:41 -0400
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kernel-janitors@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,172 +71,108 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo,
+Various spelling mistakes in comments.
+Detected with the help of Coccinelle.
 
-Here's the bulk of KVM/arm64 updates for 5.18. For this time, a bunch
-of work has gone into the MMU side of things with a new VMID allocator
-and better scalability of the MM locking when tracking dirty pages,
-better debug emulation, new PSCI version, more selftests, and the
-usual bunch of cleanups all over the map.
+Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 
-Please pull,
+---
+ arch/arm64/kvm/arm.c                 |    2 +-
+ arch/arm64/kvm/guest.c               |    2 +-
+ arch/arm64/kvm/handle_exit.c         |    2 +-
+ arch/arm64/kvm/hyp/nvhe/page_alloc.c |    4 ++--
+ arch/arm64/kvm/mmu.c                 |    2 +-
+ arch/arm64/kvm/vgic/vgic.c           |    2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
 
-	M.
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 01fa1838698c..edb00517a242 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1686,7 +1686,7 @@ static void init_cpu_logical_map(void)
+ 
+ 	/*
+ 	 * Copy the MPIDR <-> logical CPU ID mapping to hyp.
+-	 * Only copy the set of online CPUs whose features have been chacked
++	 * Only copy the set of online CPUs whose features have been checked
+ 	 * against the finalized system capabilities. The hypervisor will not
+ 	 * allow any other CPUs from the `possible` set to boot.
+ 	 */
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index e116c7767730..7e15b03fbdf8 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -282,7 +282,7 @@ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ 			break;
+ 
+ 		/*
+-		 * Otherwide, this is a priviledged mode, and *all* the
++		 * Otherwise, this is a privileged mode, and *all* the
+ 		 * registers must be narrowed to 32bit.
+ 		 */
+ 		default:
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index e3140abd2e2e..97fe14aab1a3 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -248,7 +248,7 @@ int handle_exit(struct kvm_vcpu *vcpu, int exception_index)
+ 	case ARM_EXCEPTION_HYP_GONE:
+ 		/*
+ 		 * EL2 has been reset to the hyp-stub. This happens when a guest
+-		 * is pre-empted by kvm_reboot()'s shutdown call.
++		 * is pre-emptied by kvm_reboot()'s shutdown call.
+ 		 */
+ 		run->exit_reason = KVM_EXIT_FAIL_ENTRY;
+ 		return 0;
+diff --git a/arch/arm64/kvm/hyp/nvhe/page_alloc.c b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+index 543cad6c376a..d40f0b30b534 100644
+--- a/arch/arm64/kvm/hyp/nvhe/page_alloc.c
++++ b/arch/arm64/kvm/hyp/nvhe/page_alloc.c
+@@ -102,7 +102,7 @@ static void __hyp_attach_page(struct hyp_pool *pool,
+ 	 * Only the first struct hyp_page of a high-order page (otherwise known
+ 	 * as the 'head') should have p->order set. The non-head pages should
+ 	 * have p->order = HYP_NO_ORDER. Here @p may no longer be the head
+-	 * after coallescing, so make sure to mark it HYP_NO_ORDER proactively.
++	 * after coalescing, so make sure to mark it HYP_NO_ORDER proactively.
+ 	 */
+ 	p->order = HYP_NO_ORDER;
+ 	for (; (order + 1) < pool->max_order; order++) {
+@@ -110,7 +110,7 @@ static void __hyp_attach_page(struct hyp_pool *pool,
+ 		if (!buddy)
+ 			break;
+ 
+-		/* Take the buddy out of its list, and coallesce with @p */
++		/* Take the buddy out of its list, and coalesce with @p */
+ 		page_remove_from_list(buddy);
+ 		buddy->order = HYP_NO_ORDER;
+ 		p = min(p, buddy);
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 1623abc56af2..0d19259454d8 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -615,7 +615,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+ };
+ 
+ /**
+- * kvm_init_stage2_mmu - Initialise a S2 MMU strucrure
++ * kvm_init_stage2_mmu - Initialise a S2 MMU structure
+  * @kvm:	The pointer to the KVM structure
+  * @mmu:	The pointer to the s2 MMU structure
+  *
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 9b98876a8a93..d97e6080b421 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -37,7 +37,7 @@ struct vgic_global kvm_vgic_global_state __ro_after_init = {
+  * If you need to take multiple locks, always take the upper lock first,
+  * then the lower ones, e.g. first take the its_lock, then the irq_lock.
+  * If you are already holding a lock and need to take a higher one, you
+- * have to drop the lower ranking lock first and re-aquire it after having
++ * have to drop the lower ranking lock first and re-acquire it after having
+  * taken the upper one.
+  *
+  * When taking more than one ap_list_lock at the same time, always take the
 
-The following changes since commit dfd42facf1e4ada021b939b4e19c935dcdd55566:
-
-  Linux 5.17-rc3 (2022-02-06 12:20:50 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.18
-
-for you to fetch changes up to 21ea457842759a236eefed2cfaa8cc7e5dc967a0:
-
-  KVM: arm64: fix typos in comments (2022-03-18 14:04:15 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 updates for 5.18
-
-- Proper emulation of the OSLock feature of the debug architecture
-
-- Scalibility improvements for the MMU lock when dirty logging is on
-
-- New VMID allocator, which will eventually help with SVA in VMs
-
-- Better support for PMUs in heterogenous systems
-
-- PSCI 1.1 support, enabling support for SYSTEM_RESET2
-
-- Implement CONFIG_DEBUG_LIST at EL2
-
-- Make CONFIG_ARM64_ERRATUM_2077057 default y
-
-- Reduce the overhead of VM exit when no interrupt is pending
-
-- Remove traces of 32bit ARM host support from the documentation
-
-- Updated vgic selftests
-
-- Various cleanups, doc updates and spelling fixes
-
-----------------------------------------------------------------
-Alexandru Elisei (4):
-      perf: Fix wrong name in comment for struct perf_cpu_context
-      KVM: arm64: Keep a list of probed PMUs
-      KVM: arm64: Add KVM_ARM_VCPU_PMU_V3_SET_PMU attribute
-      KVM: arm64: Refuse to run VCPU if the PMU doesn't match the physical CPU
-
-Changcheng Deng (1):
-      KVM: arm64: Remove unneeded semicolons
-
-Jing Zhang (3):
-      KVM: arm64: Use read/write spin lock for MMU protection
-      KVM: arm64: Add fast path to handle permission relaxation during dirty logging
-      KVM: selftests: Add vgic initialization for dirty log perf test for ARM
-
-Julia Lawall (1):
-      KVM: arm64: fix typos in comments
-
-Julien Grall (1):
-      KVM: arm64: Align the VMID allocation with the arm64 ASID
-
-Keir Fraser (1):
-      KVM: arm64: pkvm: Implement CONFIG_DEBUG_LIST at EL2
-
-Marc Zyngier (14):
-      Merge branch kvm-arm64/oslock into kvmarm-master/next
-      Merge branch kvm-arm64/mmu-rwlock into kvmarm-master/next
-      Merge branch kvm-arm64/fpsimd-doc into kvmarm-master/next
-      Merge branch kvm-arm64/vmid-allocator into kvmarm-master/next
-      Merge branch kvm-arm64/selftest/vgic-5.18 into kvmarm-master/next
-      Merge branch kvm-arm64/misc-5.18 into kvmarm-master/next
-      KVM: arm64: Do not change the PMU event filter after a VCPU has run
-      KVM: arm64: Keep a per-VM pointer to the default PMU
-      Merge branch kvm-arm64/pmu-bl into kvmarm-master/next
-      Merge branch kvm-arm64/psci-1.1 into kvmarm-master/next
-      KVM: arm64: Only open the interrupt window on exit due to an interrupt
-      Merge branch kvm-arm64/misc-5.18 into kvmarm-master/next
-      Merge branch kvm-arm64/psci-1.1 into kvmarm-master/next
-      KVM: arm64: Generalise VM features into a set of flags
-
-Mark Brown (4):
-      KVM: arm64: Add comments for context flush and sync callbacks
-      KVM: arm64: Add some more comments in kvm_hyp_handle_fpsimd()
-      arm64/fpsimd: Clarify the purpose of using last in fpsimd_save()
-      KVM: arm64: Enable Cortex-A510 erratum 2077057 by default
-
-Oliver Upton (8):
-      KVM: arm64: Correctly treat writes to OSLSR_EL1 as undefined
-      KVM: arm64: Stash OSLSR_EL1 in the cpu context
-      KVM: arm64: Allow guest to set the OSLK bit
-      KVM: arm64: Emulate the OS Lock
-      selftests: KVM: Add OSLSR_EL1 to the list of blessed regs
-      selftests: KVM: Test OS lock behavior
-      KVM: arm64: Drop unused param from kvm_psci_version()
-      Documentation: KVM: Update documentation to indicate KVM is arm64-only
-
-Ricardo Koller (5):
-      kvm: selftests: aarch64: fix assert in gicv3_access_reg
-      kvm: selftests: aarch64: pass vgic_irq guest args as a pointer
-      kvm: selftests: aarch64: fix the failure check in kvm_set_gsi_routing_irqchip_check
-      kvm: selftests: aarch64: fix some vgic related comments
-      kvm: selftests: aarch64: use a tighter assert in vgic_poke_irq()
-
-Shameer Kolothum (3):
-      KVM: arm64: Introduce a new VMID allocator for KVM
-      KVM: arm64: Make VMID bits accessible outside of allocator
-      KVM: arm64: Make active_vmids invalid on vCPU schedule out
-
-Will Deacon (4):
-      KVM: arm64: Bump guest PSCI version to 1.1
-      KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the guest
-      KVM: arm64: Indicate SYSTEM_RESET2 in kvm_run::system_event flags field
-      KVM: arm64: Really propagate PSCI SYSTEM_RESET2 arguments to userspace
-
- Documentation/virt/kvm/api.rst                     |  92 +++++-----
- Documentation/virt/kvm/devices/vcpu.rst            |  36 +++-
- arch/arm64/Kconfig                                 |   1 +
- arch/arm64/include/asm/kvm_host.h                  |  45 ++++-
- arch/arm64/include/asm/kvm_mmu.h                   |   4 +-
- arch/arm64/include/asm/sysreg.h                    |   8 +
- arch/arm64/include/uapi/asm/kvm.h                  |  11 ++
- arch/arm64/kernel/fpsimd.c                         |   8 +-
- arch/arm64/kernel/image-vars.h                     |   3 +
- arch/arm64/kvm/Makefile                            |   2 +-
- arch/arm64/kvm/arm.c                               | 142 +++++----------
- arch/arm64/kvm/debug.c                             |  26 ++-
- arch/arm64/kvm/fpsimd.c                            |  14 +-
- arch/arm64/kvm/guest.c                             |   2 +-
- arch/arm64/kvm/handle_exit.c                       |   2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h            |   4 +
- arch/arm64/kvm/hyp/nvhe/Makefile                   |   3 +-
- arch/arm64/kvm/hyp/nvhe/list_debug.c               |  54 ++++++
- arch/arm64/kvm/hyp/nvhe/mem_protect.c              |   3 +-
- arch/arm64/kvm/hyp/nvhe/page_alloc.c               |   4 +-
- arch/arm64/kvm/hyp/nvhe/stub.c                     |  22 ---
- arch/arm64/kvm/mmio.c                              |   3 +-
- arch/arm64/kvm/mmu.c                               |  52 +++---
- arch/arm64/kvm/pmu-emul.c                          | 141 +++++++++++----
- arch/arm64/kvm/psci.c                              |  66 +++++--
- arch/arm64/kvm/sys_regs.c                          |  74 ++++++--
- arch/arm64/kvm/vgic/vgic.c                         |   2 +-
- arch/arm64/kvm/vmid.c                              | 196 +++++++++++++++++++++
- include/kvm/arm_pmu.h                              |   5 +
- include/kvm/arm_psci.h                             |   9 +-
- include/linux/perf_event.h                         |   2 +-
- include/uapi/linux/psci.h                          |   4 +
- tools/arch/arm64/include/uapi/asm/kvm.h            |   1 +
- .../selftests/kvm/aarch64/debug-exceptions.c       |  58 +++++-
- tools/testing/selftests/kvm/aarch64/get-reg-list.c |   1 +
- tools/testing/selftests/kvm/aarch64/vgic_irq.c     |  45 +++--
- tools/testing/selftests/kvm/dirty_log_perf_test.c  |  10 ++
- tools/testing/selftests/kvm/lib/aarch64/gic_v3.c   |  12 +-
- tools/testing/selftests/kvm/lib/aarch64/vgic.c     |   9 +-
- 39 files changed, 865 insertions(+), 311 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/nvhe/list_debug.c
- delete mode 100644 arch/arm64/kvm/hyp/nvhe/stub.c
- create mode 100644 arch/arm64/kvm/vmid.c
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
