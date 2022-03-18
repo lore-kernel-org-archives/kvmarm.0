@@ -2,79 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48916C433FE
-	for <kvmarm@archiver.kernel.org>; Fri, 18 Mar 2022 20:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B98FC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 18 Mar 2022 20:33:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B35B349E08;
-	Fri, 18 Mar 2022 16:30:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A1BD49EE7;
+	Fri, 18 Mar 2022 16:33:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id eGA5lh2Wwww8; Fri, 18 Mar 2022 16:30:14 -0400 (EDT)
+	with ESMTP id d47UxeQSTqJD; Fri, 18 Mar 2022 16:33:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F06949E22;
-	Fri, 18 Mar 2022 16:30:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED58049E22;
+	Fri, 18 Mar 2022 16:33:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E725D41021
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 16:30:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43B5641021
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 16:33:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 68dspCL6zvPE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 18 Mar 2022 16:30:12 -0400 (EDT)
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
- [209.85.216.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D54CA40FD8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 16:30:12 -0400 (EDT)
-Received: by mail-pj1-f54.google.com with SMTP id
- mr5-20020a17090b238500b001c67366ae93so6789025pjb.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 13:30:12 -0700 (PDT)
+ with ESMTP id orbhEcJ5v2R8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Mar 2022 16:33:16 -0400 (EDT)
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com
+ [209.85.214.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1502040FD8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 16:33:16 -0400 (EDT)
+Received: by mail-pl1-f175.google.com with SMTP id w4so7880331ply.13
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2022 13:33:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=FVCHk1zWp8eim4nBsqqeQ8iwNhZBw4mfvm+aRrnbvoA=;
- b=iqJUrhPvONHqeiD0TBwXhkitap6OTovnZpAfQnfp6kB5hRpeTIelZGlr4XPv2BSaDe
- F91q+xGy7zfxGupIh8ZlD9PgT0UoPa9vStN4hS3tqGZ2PtMxXxrtD6l14WfES41GQaPs
- in7Rk0MKkvD47TDUKXc2cERmULhBGrC0kc4hXCucq6dU/qShK3dq9RPvq986fjtGFK49
- 6IkwDMe6sY/xERF0y5ZTBB49FAhaXTuVzWZaDE5rqtJjQwLPsod+X6fPCiz32u1/8k2W
- DPmxigueJtLWe08qUNe9VFVuTFDpxPLTBN7r7tr4FsUwApgh+pC2vrBwFrd0/OYtNQoT
- fTlg==
+ bh=zNTmz5JVOVEGqxQfmkKH5ofnXJ8F9rxSfSnMnrjnpm4=;
+ b=sDKjHCF2YiI5RwzthUN4Q7iTrVDi6S27oXMB5v1GCnRgY4pF3/LESD7rdMsfp+HoMJ
+ GcgJtKyNHn10/X0NoKBpytT+QFyjWhf+BayR5vL6RUrXog/5/yo3l4VkZcFzbyU32Guc
+ i6BepxBRjypw0vzPAAGj/rzm7VBEYYKCRAyqPUNw9UsLK6pFvIp/AschAojYD7ZCeIon
+ Tby9YcnCwg+B/BKGcTK2yT2aNqWkGJWSmDGzksKoTeDyk8CKEQFFvoIxpkQp6F5x+v7E
+ 2vWyg+PgbTQtHl2PLOl3rjXgJAxttPyoL6Ka5r17rOwTE7vqatCKXzidY9tM7PFNRHJU
+ 93/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=FVCHk1zWp8eim4nBsqqeQ8iwNhZBw4mfvm+aRrnbvoA=;
- b=U19WK9bLsMIfRpaAV1pTtDAFSLjyN8xCjrXeHsm31eughed7C1z4oMyekx+ghPsTLN
- FSp0PzDbjKy+QQgVM8KucLnD2dQHNuDXoPM0wHTG4wI6LPLsXaK8J3RWWIoOrZxGZwQi
- sEWfcfUmk22e+uVEhFUEWn3L2cz1al9OTVEVMUC5V6Jd5sSkA5LXqqkSG/BLRMr6TYXM
- 3/tWHYZG+E26V8VFzJP5zWs0O2xUvtkBl7aczfw24Sr5KpbKBBalRMCPPBNsteNG2oRg
- 2SPuRp3ST+2CngOGVjIVC7B/+zXYq51veTc2aTkzNxDWdFqzIo3VvDM9X+j9HM6YXhV7
- rkCQ==
-X-Gm-Message-State: AOAM530xvN8TRGavl0F0mCyXkxvSXGpYv8cf3uP40/02dDGGQYEwvY7r
- AGZBIFMrtcckCNSo+laLJ2DQUw==
-X-Google-Smtp-Source: ABdhPJzcO6Xwud7tPt4mS4MdVcpJlHQFaYSkJVhqhN/l8RGRASuCh9nddyYC3yiPE7Ss3+zKbGuK9Q==
-X-Received: by 2002:a17:90b:3b50:b0:1c6:66d3:94d9 with SMTP id
- ot16-20020a17090b3b5000b001c666d394d9mr13183319pjb.140.1647635411717; 
- Fri, 18 Mar 2022 13:30:11 -0700 (PDT)
+ bh=zNTmz5JVOVEGqxQfmkKH5ofnXJ8F9rxSfSnMnrjnpm4=;
+ b=CEl3GhB5QBQPi3yROlAsaQ5wKJ4ReZw/1QNolmIQOJKz961XUQNtcWjH9c+NGaWyyj
+ SEt/+sg15FcVLJQh//PQGL49zhb3SOWYgl3E6u3QQPMWId8sL/+jMrvEGaj0aKlbTqav
+ 79jxs+SnRZhetunrfCDffxAGA6RofD7dzrwTwTVXRCq1HUZajtWBN3kBmhInpDdwNmrU
+ hQsC+hP4/cf99DhGztMocuNb1u/WXY7hyjCeXzaOL8QxyGiGUEBMp7MYs1gDohGk/pbr
+ yVyoySNwebp79tbpLCPI2aU/XRTpXMdNE+kGw/TzkL3cN1YG2D5SmTr/MFoQbC2C7Xqv
+ ToYA==
+X-Gm-Message-State: AOAM530lYTR89XqgadHsy1f0ZR4d6vvt8tesncFr3py9ePWCmI0/jqFX
+ Ly+gxUBtJ1z4CDxshIkztbYaxR+3mc6ZJg==
+X-Google-Smtp-Source: ABdhPJxtJX0OLWnA5Jkz12Gg7fL+PabeAp7W7uiK4hS5tDluCNTLaEa1So9I9jDCC1UmOFv4zjOA5w==
+X-Received: by 2002:a17:90a:19d5:b0:1bc:a5db:b655 with SMTP id
+ 21-20020a17090a19d500b001bca5dbb655mr23906080pjj.46.1647635594843; 
+ Fri, 18 Mar 2022 13:33:14 -0700 (PDT)
 Received: from google.com (150.12.83.34.bc.googleusercontent.com.
  [34.83.12.150]) by smtp.gmail.com with ESMTPSA id
- m7-20020a056a00080700b004f6ff260c9dsm11016119pfk.154.2022.03.18.13.30.10
+ d5-20020a17090acd0500b001b9c05b075dsm12829958pju.44.2022.03.18.13.33.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 18 Mar 2022 13:30:11 -0700 (PDT)
-Date: Fri, 18 Mar 2022 13:30:07 -0700
+ Fri, 18 Mar 2022 13:33:14 -0700 (PDT)
+Date: Fri, 18 Mar 2022 13:33:10 -0700
 From: Ricardo Koller <ricarkol@google.com>
 To: Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 02/11] KVM: selftests: Add vm_mem_region_get_src_fd
+Subject: Re: [PATCH 04/11] KVM: selftests: Add vm_alloc_page_table_in_memslot
  library function
-Message-ID: <YjTrz40SD3HmebBh@google.com>
+Message-ID: <YjTshgT6ByCPEubc@google.com>
 References: <20220311060207.2438667-1-ricarkol@google.com>
- <20220311060207.2438667-3-ricarkol@google.com>
- <CANgfPd_iRBDX=mtBy80G0R9U-BfukLV0H3SyrBr+jvK1e8BRvA@mail.gmail.com>
+ <20220311060207.2438667-5-ricarkol@google.com>
+ <CANgfPd8u_K3cOpaUPY8+rU+4RFehj8J61gdzuDyOZv4dSDZ+xQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CANgfPd_iRBDX=mtBy80G0R9U-BfukLV0H3SyrBr+jvK1e8BRvA@mail.gmail.com>
+In-Reply-To: <CANgfPd8u_K3cOpaUPY8+rU+4RFehj8J61gdzuDyOZv4dSDZ+xQ@mail.gmail.com>
 Cc: kvm <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Axel Rasmussen <axelrasmussen@google.com>,
  kvmarm@lists.cs.columbia.edu
@@ -94,73 +93,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 16, 2022 at 12:08:23PM -0600, Ben Gardon wrote:
+On Wed, Mar 16, 2022 at 12:07:21PM -0600, Ben Gardon wrote:
 > On Fri, Mar 11, 2022 at 12:02 AM Ricardo Koller <ricarkol@google.com> wrote:
 > >
-> > Add a library function to get the backing source FD of a memslot.
+> > Add a library function to allocate a page-table physical page in a
+> > particular memslot.  The default behavior is to create new page-table
+> > pages in memslot 0.
 > >
 > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > 
-> This appears to be dead code as of this commit, would recommend
-> merging it into the commit in which it's actually used.
+> This is very similar to one of the patches in the NX hugepages control
+> series I sent out last week, I guess we both had similar needs at the
+> same time.
+> Your solution introduces way less churn though, so it's probably
+> better. I might use this commit or wait for it to be merged before I
+> send out v2 of my NX control series.
 
-I was trying to separate lib changes (which are mostly arch independent)
-with the actual test. Would move the commit to be right before the one
-that uses be better? and maybe add a commit comment mentioning how it's
-going to be used.
+Both options sound good to me. I'm glad it helps.
 
 > 
+> In any case,
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> 
 > > ---
-> >  .../selftests/kvm/include/kvm_util_base.h     |  1 +
-> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 23 +++++++++++++++++++
-> >  2 files changed, 24 insertions(+)
+> >  tools/testing/selftests/kvm/include/kvm_util_base.h | 1 +
+> >  tools/testing/selftests/kvm/lib/kvm_util.c          | 8 +++++++-
+> >  2 files changed, 8 insertions(+), 1 deletion(-)
 > >
 > > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > index 4ed6aa049a91..d6acec0858c0 100644
+> > index d6acec0858c0..c8dce12a9a52 100644
 > > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 > > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > @@ -163,6 +163,7 @@ int _kvm_ioctl(struct kvm_vm *vm, unsigned long ioctl, void *arg);
-> >  void vm_mem_region_set_flags(struct kvm_vm *vm, uint32_t slot, uint32_t flags);
-> >  void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa);
-> >  void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot);
-> > +int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot);
-> >  void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid);
-> >  vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t vaddr_min);
-> >  vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
+> > @@ -307,6 +307,7 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+> >  vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> >                               vm_paddr_t paddr_min, uint32_t memslot);
+> >  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+> > +vm_paddr_t vm_alloc_page_table_in_memslot(struct kvm_vm *vm, uint32_t pt_memslot);
+> >
+> >  /*
+> >   * Create a VM with reasonable defaults
 > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > index d8cf851ab119..64ef245b73de 100644
+> > index 64ef245b73de..ae21564241c8 100644
 > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -580,6 +580,29 @@ kvm_userspace_memory_region_find(struct kvm_vm *vm, uint64_t start,
-> >         return &region->region;
-> >  }
+> > @@ -2409,9 +2409,15 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+> >  /* Arbitrary minimum physical address used for virtual translation tables. */
+> >  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
 > >
-> > +/*
-> > + * KVM Userspace Memory Get Backing Source FD
-> > + *
-> > + * Input Args:
-> > + *   vm - Virtual Machine
-> > + *   memslot - KVM memory slot ID
-> > + *
-> > + * Output Args: None
-> > + *
-> > + * Return:
-> > + *   Backing source file descriptor, -1 if the memslot is an anonymous region.
-> > + *
-> > + * Returns the backing source fd of a memslot, so tests can use it to punch
-> > + * holes, or to setup permissions.
-> > + */
-> > +int vm_mem_region_get_src_fd(struct kvm_vm *vm, uint32_t memslot)
+> > +vm_paddr_t vm_alloc_page_table_in_memslot(struct kvm_vm *vm, uint32_t pt_memslot)
 > > +{
-> > +       struct userspace_mem_region *region;
-> > +
-> > +       region = memslot2region(vm, memslot);
-> > +       return region->fd;
+> > +       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
+> > +                       pt_memslot);
 > > +}
 > > +
+> >  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+> >  {
+> > -       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
+> > +       return vm_alloc_page_table_in_memslot(vm, 0);
+> >  }
+> >
 > >  /*
-> >   * VCPU Find
-> >   *
 > > --
 > > 2.35.1.723.g4982287a31-goog
 > >
