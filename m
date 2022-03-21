@@ -2,61 +2,49 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA699C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 21 Mar 2022 14:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D00B6C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 21 Mar 2022 17:10:01 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CD8D49E2A;
-	Mon, 21 Mar 2022 10:29:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F4F649EC0;
+	Mon, 21 Mar 2022 13:10:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id W8SdqE025Soe; Mon, 21 Mar 2022 10:29:32 -0400 (EDT)
+	with ESMTP id DsU5H+oT5qM3; Mon, 21 Mar 2022 13:09:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A3DB49E57;
-	Mon, 21 Mar 2022 10:29:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B93F49E2C;
+	Mon, 21 Mar 2022 13:09:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F81F49E44
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 10:29:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 50EEE49E27
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 13:09:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VIQcgD-E2zqH for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Mar 2022 10:29:26 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 408EC40C52
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 10:29:26 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 52DBE609EE;
- Mon, 21 Mar 2022 14:29:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA7DFC340F3;
- Mon, 21 Mar 2022 14:29:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1647872965;
- bh=9mxvzfFWtwfQLECDMiS80V8FJcePBS2XkbDd8KDSM+k=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=lnlZmG035UNg/wUBwsfHuA+FG11MDnCCSyE4QbLtZyMbQKsBy0ozovwbulJRIKrzL
- DJxTRRuh6GKrSdWI9BrPe4UuuXwgNy8cfcq96/dDnVMTHx5Z4m5V58xuhI0si67zqJ
- d9lXvq7xOV5jz5BokdAEVb08JhJuX8LsquN7J4PrtJAxf6B7JNGENpfO9vYQwW/aJ6
- 478bbvXq4jx835dFass3aCEQVzDS3k0UNJrBFECBmWJiUashwKEDXR6vzeJhLlvA9O
- 38TgjuKi1tlgaDbV0L39sKqalluyd91XeG1kpthLF6sX09kLKYF7Hv4UOhxYUsfPr1
- LkqtsH6nvp9pA==
-Date: Mon, 21 Mar 2022 14:29:19 +0000
-From: Will Deacon <will@kernel.org>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH 0/2] KVM: arm64: Fixes for SMC64 SYSTEM_RESET2 calls
-Message-ID: <20220321142918.GA11145@willie-the-truck>
-References: <20220318193831.482349-1-oupton@google.com>
+ with ESMTP id HER5vaiWMPbK for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Mar 2022 13:09:56 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C32D40B75
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 13:09:56 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5FC011042;
+ Mon, 21 Mar 2022 10:09:55 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 288073F66F;
+ Mon, 21 Mar 2022 10:09:53 -0700 (PDT)
+Date: Mon, 21 Mar 2022 17:10:20 +0000
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [RFC PATCH v5 04/38] KVM: arm64: Defer CMOs for locked memslots
+ until a VCPU is run
+Message-ID: <YjixWp3Xeuq67aNL@monolith.localdoman>
+References: <20211117153842.302159-1-alexandru.elisei@arm.com>
+ <20211117153842.302159-5-alexandru.elisei@arm.com>
+ <CAAeT=FwKp9rUPNmJyOR7B0FBc_mgeEfgBnUcwhQb5Xe6=7UQgg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220318193831.482349-1-oupton@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <CAAeT=FwKp9rUPNmJyOR7B0FBc_mgeEfgBnUcwhQb5Xe6=7UQgg@mail.gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -73,46 +61,240 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Mar 18, 2022 at 07:38:29PM +0000, Oliver Upton wrote:
-> This series addresses a couple of issues with how KVM exposes SMC64
-> calls to its guest. It is currently possible for an AArch32 guest to
-> discover the SMC64 SYSTEM_RESET2 function (via
-> PSCI_1_0_FN_PSCI_FEATURES) and even make a call to it. SMCCC does not
-> allow for 64 bit calls to be made from a 32 bit state.
-> 
-> Patch 1 cleans up the way we filter SMC64 calls in PSCI. Using a switch
-> with case statements for each possibly-filtered function is asking for
-> trouble. Instead, pivot off of the bit that indicates the desired
-> calling convention. This plugs the PSCI_FEATURES hole for SYSTEM_RESET2.
-> 
-> Patch 2 adds a check to the PSCI v1.x call handler in KVM, bailing out
-> early if the guest is not allowed to use a particular function. This
-> closes the door on calls to 64-bit SYSTEM_RESET2 from AArch32.
-> 
-> My first crack at this [1] was missing the fix for direct calls to
-> SYSTEM_RESET2. Taking the patch out of that series and sending
-> separately.
-> 
-> Applies on top of today's kvmarm pull, commit:
-> 
->   21ea45784275 ("KVM: arm64: fix typos in comments")
-> 
-> [1]: https://patchwork.kernel.org/project/kvm/patch/20220311174001.605719-3-oupton@google.com/
-> 
-> Oliver Upton (2):
->   KVM: arm64: Generally disallow SMC64 for AArch32 guests
->   KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from AArch32
-> 
->  arch/arm64/kvm/psci.c | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
+Hi,
 
-For both patches:
+On Wed, Feb 23, 2022 at 09:56:01PM -0800, Reiji Watanabe wrote:
+> Hi Alex,
+> 
+> On Wed, Nov 17, 2021 at 7:37 AM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > KVM relies on doing dcache maintenance on stage 2 faults to present to a
+> > guest running with the MMU off the same view of memory as userspace. For
+> > locked memslots, KVM so far has done the dcache maintenance when a memslot
+> > is locked, but that leaves KVM in a rather awkward position: what userspace
+> > writes to guest memory after the memslot is locked, but before a VCPU is
+> > run, might not be visible to the guest.
+> >
+> > Fix this by deferring the dcache maintenance until the first VCPU is run.
+> >
+> > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  7 ++++
+> >  arch/arm64/include/asm/kvm_mmu.h  |  5 +++
+> >  arch/arm64/kvm/arm.c              |  3 ++
+> >  arch/arm64/kvm/mmu.c              | 55 ++++++++++++++++++++++++++++---
+> >  4 files changed, 66 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index 7fd70ad90c16..3b4839b447c4 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -113,6 +113,10 @@ struct kvm_arch_memory_slot {
+> >         u32 flags;
+> >  };
+> >
+> > +/* kvm->arch.mmu_pending_ops flags */
+> > +#define KVM_LOCKED_MEMSLOT_FLUSH_DCACHE        0
+> > +#define KVM_MAX_MMU_PENDING_OPS                1
+> > +
+> >  struct kvm_arch {
+> >         struct kvm_s2_mmu mmu;
+> >
+> > @@ -136,6 +140,9 @@ struct kvm_arch {
+> >          */
+> >         bool return_nisv_io_abort_to_user;
+> >
+> > +       /* Defer MMU operations until a VCPU is run. */
+> > +       unsigned long mmu_pending_ops;
+> > +
+> >         /*
+> >          * VM-wide PMU filter, implemented as a bitmap and big enough for
+> >          * up to 2^10 events (ARMv8.0) or 2^16 events (ARMv8.1+).
+> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > index 2c50734f048d..cbf57c474fea 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -219,6 +219,11 @@ void kvm_toggle_cache(struct kvm_vcpu *vcpu, bool was_enabled);
+> >  int kvm_mmu_lock_memslot(struct kvm *kvm, u64 slot, u64 flags);
+> >  int kvm_mmu_unlock_memslot(struct kvm *kvm, u64 slot, u64 flags);
+> >
+> > +#define kvm_mmu_has_pending_ops(kvm)   \
+> > +       (!bitmap_empty(&(kvm)->arch.mmu_pending_ops, KVM_MAX_MMU_PENDING_OPS))
+> > +
+> > +void kvm_mmu_perform_pending_ops(struct kvm *kvm);
+> > +
+> >  static inline unsigned int kvm_get_vmid_bits(void)
+> >  {
+> >         int reg = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index b9b8b43835e3..96ed48455cdd 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -870,6 +870,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+> >         if (unlikely(!kvm_vcpu_initialized(vcpu)))
+> >                 return -ENOEXEC;
+> >
+> > +       if (unlikely(kvm_mmu_has_pending_ops(vcpu->kvm)))
+> > +               kvm_mmu_perform_pending_ops(vcpu->kvm);
+> > +
+> >         ret = kvm_vcpu_first_run_init(vcpu);
+> >         if (ret)
+> >                 return ret;
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index b0a8e61315e4..8e4787019840 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1305,6 +1305,40 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> >         return ret;
+> >  }
+> >
+> > +/*
+> > + * It's safe to do the CMOs when the first VCPU is run because:
+> > + * - VCPUs cannot run until mmu_cmo_needed is cleared.
+> 
+> What does 'mmu_cmo_needed' mean ? Do you mean 'mmu_pending_ops' instead ?
 
-Acked-by: Will Deacon <will@kernel.org>
+Yes, I meant mmu_pending_ops here. I used mmu_cmo_needed for the field name
+as I was working on it and I forgot to change it. Will fix it.
 
-Thanks for fixing this!
+> 
+> 
+> > + * - Memslots cannot be modified because we hold the kvm->slots_lock.
+> > + *
+> > + * It's safe to periodically release the mmu_lock because:
+> > + * - VCPUs cannot run.
+> > + * - Any changes to the stage 2 tables triggered by the MMU notifiers also take
+> > + *   the mmu_lock, which means accesses will be serialized.
+> > + * - Stage 2 tables cannot be freed from under us as long as at least one VCPU
+> > + *   is live, which means that the VM will be live.
+> > + */
+> > +void kvm_mmu_perform_pending_ops(struct kvm *kvm)
+> > +{
+> > +       struct kvm_memory_slot *memslot;
+> > +
+> > +       mutex_lock(&kvm->slots_lock);
+> > +       if (!kvm_mmu_has_pending_ops(kvm))
+> > +               goto out_unlock;
+> > +
+> > +       if (test_bit(KVM_LOCKED_MEMSLOT_FLUSH_DCACHE, &kvm->arch.mmu_pending_ops)) {
+> > +               kvm_for_each_memslot(memslot, kvm_memslots(kvm)) {
+> > +                       if (!memslot_is_locked(memslot))
+> > +                               continue;
+> 
+> Shouldn't the code hold the mmu_lock to call stage2_flush_memslot() ?
 
-Will
+There will be no contention between different VCPUs because the stage 2
+translation tables are protected against concurrent accesses with the
+kvm->slots_lock mutex above. But stage2_flush_memslot() expects the
+mmu_lock to be held and it will be periodically released by
+cond_resched_lock() in stage2_apply_range(); if the lock is not held, then
+lockdep will complain about it.
+
+Your observation actually explains why I was seeing intermitent warnings
+when lockdep was enabled: __cond_resched_lock was complaining the KVM was
+trying to release a lock it wasn't holding. Thank you for pointing the
+missing lock acquire operation.
+
+I'll change the code to avoid the lockdep warning.
+
+> 
+> > +                       stage2_flush_memslot(kvm, memslot);
+> 
+> Since stage2_flush_memslot() won't do anything when stage2_has_fwb()
+> returns true, I wonder if it can be checked even before iterating
+> memslots (so those iterations can be skipped when not needed).
+
+I think this can be further improved by setting the
+KVM_LOCKED_MEMSLOT_FLUSH_DCACHE bit only if FWB is not present.
+
+Thanks,
+Alex
+
+> 
+> Thanks,
+> Reiji
+> 
+> > +               }
+> > +               clear_bit(KVM_LOCKED_MEMSLOT_FLUSH_DCACHE, &kvm->arch.mmu_pending_ops);
+> > +       }
+> > +
+> > +out_unlock:
+> > +       mutex_unlock(&kvm->slots_lock);
+> > +       return;
+> > +}
+> > +
+> >  static int try_rlimit_memlock(unsigned long npages)
+> >  {
+> >         unsigned long lock_limit;
+> > @@ -1345,7 +1379,8 @@ static int lock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot,
+> >         struct kvm_memory_slot_page *page_entry;
+> >         bool writable = flags & KVM_ARM_LOCK_MEM_WRITE;
+> >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+> > -       struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> > +       struct kvm_pgtable pgt;
+> > +       struct kvm_pgtable_mm_ops mm_ops;
+> >         struct vm_area_struct *vma;
+> >         unsigned long npages = memslot->npages;
+> >         unsigned int pin_flags = FOLL_LONGTERM;
+> > @@ -1363,6 +1398,16 @@ static int lock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot,
+> >                 pin_flags |= FOLL_WRITE;
+> >         }
+> >
+> > +       /*
+> > +        * Make a copy of the stage 2 translation table struct to remove the
+> > +        * dcache callback so we can postpone the cache maintenance operations
+> > +        * until the first VCPU is run.
+> > +        */
+> > +       mm_ops = *kvm->arch.mmu.pgt->mm_ops;
+> > +       mm_ops.dcache_clean_inval_poc = NULL;
+> > +       pgt = *kvm->arch.mmu.pgt;
+> > +       pgt.mm_ops = &mm_ops;
+> > +
+> >         hva = memslot->userspace_addr;
+> >         ipa = memslot->base_gfn << PAGE_SHIFT;
+> >
+> > @@ -1414,13 +1459,13 @@ static int lock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot,
+> >                         goto out_err;
+> >                 }
+> >
+> > -               ret = kvm_pgtable_stage2_map(pgt, ipa, PAGE_SIZE,
+> > +               ret = kvm_pgtable_stage2_map(&pgt, ipa, PAGE_SIZE,
+> >                                              page_to_phys(page_entry->page),
+> >                                              prot, &cache);
+> >                 spin_unlock(&kvm->mmu_lock);
+> >
+> >                 if (ret) {
+> > -                       kvm_pgtable_stage2_unmap(pgt, memslot->base_gfn << PAGE_SHIFT,
+> > +                       kvm_pgtable_stage2_unmap(&pgt, memslot->base_gfn << PAGE_SHIFT,
+> >                                                  i << PAGE_SHIFT);
+> >                         unpin_memslot_pages(memslot, writable);
+> >                         goto out_err;
+> > @@ -1439,7 +1484,7 @@ static int lock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot,
+> >          */
+> >         ret = account_locked_vm(current->mm, npages, true);
+> >         if (ret) {
+> > -               kvm_pgtable_stage2_unmap(pgt, memslot->base_gfn << PAGE_SHIFT,
+> > +               kvm_pgtable_stage2_unmap(&pgt, memslot->base_gfn << PAGE_SHIFT,
+> >                                          npages << PAGE_SHIFT);
+> >                 unpin_memslot_pages(memslot, writable);
+> >                 goto out_err;
+> > @@ -1449,6 +1494,8 @@ static int lock_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot,
+> >         if (writable)
+> >                 memslot->arch.flags |= KVM_MEMSLOT_LOCK_WRITE;
+> >
+> > +       set_bit(KVM_LOCKED_MEMSLOT_FLUSH_DCACHE, &kvm->arch.mmu_pending_ops);
+> > +
+> >         kvm_mmu_free_memory_cache(&cache);
+> >
+> >         return 0;
+> > --
+> > 2.33.1
+> >
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
