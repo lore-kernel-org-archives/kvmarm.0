@@ -2,70 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3980BC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 09:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E01DC433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 09:57:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A96149F4E;
-	Wed, 23 Mar 2022 05:57:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBB3D4B106;
+	Wed, 23 Mar 2022 05:57:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id GbqmiXTXf9nl; Wed, 23 Mar 2022 05:57:15 -0400 (EDT)
+	with ESMTP id KB2DvmNfFa+v; Wed, 23 Mar 2022 05:57:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A3B49F58;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FE814A0FE;
 	Wed, 23 Mar 2022 05:57:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F18DE49E37
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:17:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55ADA49EED
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:21:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rqye5F7PHXlZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2022 14:17:27 -0400 (EDT)
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com
- [209.85.167.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC29A411C7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:17:27 -0400 (EDT)
-Received: by mail-lf1-f44.google.com with SMTP id 5so13021507lfp.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 11:17:27 -0700 (PDT)
+ with ESMTP id oS9NNj4IHi4u for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2022 14:21:58 -0400 (EDT)
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com
+ [209.85.167.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3094A49EE6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:21:58 -0400 (EDT)
+Received: by mail-lf1-f50.google.com with SMTP id k21so14701285lfe.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 11:21:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=rjXWwDt+piFjEizKBPLIwkQ3oNcecYs/t2+aRfZKR2Q=;
- b=e0SsUFEnYUMCyRAkGyLVow0+R4bFdfmash3hSguwzYMReIozuymckocyM5BR/BZLJg
- F/po3/TlVjopsmXJ41juFAnRzPe45KNaRNkzN0MtvjZ9mBPCEsZrjkO6ujDAemvwda96
- rl80jZRhNG2l/NMfwbStZ6I+jDlhs/HdozQzWkjJ80csfkdMlVM4vYTOYFFyjfHkCzzd
- 9/mg9mIusJIiJ41q4kWg6sKjFXIQgUQguTqgxHiq8PkCHtwIR6pYWShWbrYo5MzF8yp5
- bQ749BhKFyRlGHbieptNt6y4VPTEPjdhkDnJ0TPl0KSwq8Nl847v1G4lQzpS2egtD3Nu
- R/sA==
+ :cc; bh=WAKfsHYufu3U00AAQ3K6rkkqvblKGp7U0moxttx1nDc=;
+ b=g2Mo8JicfcFH/ca4r/k8qwzNmJcqohXhHSc8ZN1vggO+ws0hE9XyigO2hPYcPZWWtk
+ wNEza19s0fPDjH5GX8/kKgwDj/AAV9pY4XeHmvC71+6Y6ICWamfbXU6C9YM9stEziAjS
+ Pyzvv0cV9b5kaL2Vw0X3sHjwvfQugdxpBZP6WpNszpT8tGNVYT59NDnhX2XhWEiAEB2q
+ R6auCiZeG6hXuo36MJY34i1dlEJGkAos2ZUzCMTTS5Ma09OmY4Ad9S5p/J99OkWTba+X
+ viy50q5OpxBRGYxh9kdfQAiI1GToU553m9eY93dV6MAHbc4QHm6K6V/UCEWO+8O6FNPA
+ Fxtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=rjXWwDt+piFjEizKBPLIwkQ3oNcecYs/t2+aRfZKR2Q=;
- b=7609Ix/CaejJxG/hZlFK6z+717Rwe/860XxIm0SKk+GnpEGd+ll2xOCAP2OR6boxIA
- XoIIwVrmgpkDx0E1+bD1C7ZInvJZGtAN8petqTJloiphAmHGTwtBytMHX80x6ktZhvDD
- NjNcuEDGqdHxgVbxZbv9/cBcSs0HJmhMJSqX6iuuzcuzgUtxP0VgZ5x6QhV4OfF3o79M
- W3F5KJPwcVAfVcZbRKTKrOppt0d7sfHfIgG32YF76fhQrSURIdjBaUsf7rCZoT8BCdxr
- ik2J9208eIAYeIpWI0isTO5L0GoysFltVxUNA5ooR3g9824jwLjbDw0DefW/2KtqJe2L
- bvCw==
-X-Gm-Message-State: AOAM531SNL7YYF4+QkDV5ezv2dy/14ocAdMLOjt/pdv3LcFvezpaVW0g
- 7EBlwaUvSx1H++rEfxjEOuSQgcyvqGGIuL/kNd18Dw==
-X-Google-Smtp-Source: ABdhPJxTpXDCogH6wFEbXP5cV7bKAnz+C/vzgCxatvwG3tgn9N4H9nX6rT0RugIgjr0sQJpMf/ysU29QMVGOZ9XlHbA=
-X-Received: by 2002:ac2:57db:0:b0:44a:23ce:b7f5 with SMTP id
- k27-20020ac257db000000b0044a23ceb7f5mr9953556lfo.235.1647973045570; Tue, 22
- Mar 2022 11:17:25 -0700 (PDT)
+ bh=WAKfsHYufu3U00AAQ3K6rkkqvblKGp7U0moxttx1nDc=;
+ b=4ZSB1seoYKS51VRlDzoqQ7Wa0CZYQlsCiwxuIA9SGVBZzKfPFSD5gWHZsUEv9nJONF
+ lJXvj08YLqkE5Z2lHHH9qjePKFBeTp7UYxd9zgZBsVW5QknMJSkv4EFquFKhbGPH4mzD
+ rxTYeURbNcFCLK9RKtGEFwfR1vYrGLmCQ/91h82t3ywzERXIzjCga+PJqv+4XQPO3X8b
+ cgfiv3RwF32XgK3SEA8hLhuiAq3kTlWUbzM5IS5mCxg9xZjWfaibEkV0Y1ppll1FI3l+
+ gomc2uwtA7ajg4n78ao5xyCwOMFmkK5/Lp8rSo0m2G1IT2qlGagxPjtGGEXdZWmHGI1X
+ aU5A==
+X-Gm-Message-State: AOAM533cD8mJSz18LeWQKBaLiVqj/NZdwWDMZFFiUt2r+Wu6KPUCndVY
+ 5UuNeKKTCB2VjTaMvjXsoIBaqLFASsgzH8A3roBLYg==
+X-Google-Smtp-Source: ABdhPJyrSF1plRNyRh9A7BhcuZu0NWWd/cVBt3Nl5hNQUOvH0RUPVILChyti/fD/O7GaiC+DirE+BwoMtfWc3XC9kZI=
+X-Received: by 2002:a05:6512:1114:b0:448:388c:b79f with SMTP id
+ l20-20020a056512111400b00448388cb79fmr19109715lfg.250.1647973316603; Tue, 22
+ Mar 2022 11:21:56 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-2-dmatlack@google.com>
- <YjBC1ZLio2iPkZ0V@xz-m1.local>
-In-Reply-To: <YjBC1ZLio2iPkZ0V@xz-m1.local>
+ <20220311002528.2230172-3-dmatlack@google.com>
+ <YjBEWm3YsuSKj+ES@xz-m1.local>
+In-Reply-To: <YjBEWm3YsuSKj+ES@xz-m1.local>
 From: David Matlack <dmatlack@google.com>
-Date: Tue, 22 Mar 2022 11:16:59 -0700
-Message-ID: <CALzav=dx2rm7xm07x0iEMiS1jzNoU2cOT-mtA9=P6C1riOe2AQ@mail.gmail.com>
-Subject: Re: [PATCH v2 01/26] KVM: x86/mmu: Optimize MMU page cache lookup for
- all direct SPs
+Date: Tue, 22 Mar 2022 11:21:30 -0700
+Message-ID: <CALzav=cMFL=ZZyV5uckbhb3RqC0LhOnnooiJGKKN26F69TF63A@mail.gmail.com>
+Subject: Re: [PATCH v2 02/26] KVM: x86/mmu: Use a bool for direct
 To: Peter Xu <peterx@redhat.com>
 X-Mailman-Approved-At: Wed, 23 Mar 2022 05:57:13 -0400
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
@@ -97,33 +96,32 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 15, 2022 at 12:40 AM Peter Xu <peterx@redhat.com> wrote:
+On Tue, Mar 15, 2022 at 12:46 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Fri, Mar 11, 2022 at 12:25:03AM +0000, David Matlack wrote:
-> > Commit fb58a9c345f6 ("KVM: x86/mmu: Optimize MMU page cache lookup for
-> > fully direct MMUs") skipped the unsync checks and write flood clearing
-> > for full direct MMUs. We can extend this further and skip the checks for
-> > all direct shadow pages. Direct shadow pages are never marked unsynced
-> > or have a non-zero write-flooding count.
->
-> Nit: IMHO it's better to spell out the exact functional change, IIUC those
-> are the direct mapped SPs where guest uses huge pages but host uses only
-> small pages for the shadowing?
-
-Yes that's correct. I'll include that in the commit message in the next version.
-
->
-> >
-> > Checking sp->role.direct alos generates better code than checking
-> > direct_map because, due to register pressure, direct_map has to get
-> > shoved onto the stack and then pulled back off.
+> On Fri, Mar 11, 2022 at 12:25:04AM +0000, David Matlack wrote:
+> > The parameter "direct" can either be true or false, and all of the
+> > callers pass in a bool variable or true/false literal, so just use the
+> > type bool.
 > >
 > > No functional change intended.
 > >
-> > Reviewed-by: Sean Christopherson <seanjc@google.com>
 > > Signed-off-by: David Matlack <dmatlack@google.com>
 >
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+> If we care about this.. how about convert another one altogether?
+>
+> TRACE_EVENT(kvm_hv_stimer_expiration,
+>         TP_PROTO(int vcpu_id, int timer_index, int direct, int msg_send_result),
+>         TP_ARGS(vcpu_id, timer_index, direct, msg_send_result),
+
+My preference would be to keep this commit specific to uses of
+"direct" that are related to shadow pages.
+
+The parameter `direct` in trace_kvm_hv_stimer_expiration() looks like
+it could be converted as well, but is a different concept altogether
+despite having the same variable name.
+
+>
+> Thanks,
 >
 > --
 > Peter Xu
