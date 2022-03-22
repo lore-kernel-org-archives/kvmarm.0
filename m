@@ -2,68 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 760D6C4332F
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Mar 2022 18:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1577BC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Mar 2022 18:35:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C46BE49F40;
-	Tue, 22 Mar 2022 14:35:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC8B349F2A;
+	Tue, 22 Mar 2022 14:35:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ghd4JpPlCT-B; Tue, 22 Mar 2022 14:35:46 -0400 (EDT)
+	with ESMTP id k94jTGQSMCxJ; Tue, 22 Mar 2022 14:35:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 697CD49F19;
-	Tue, 22 Mar 2022 14:35:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D8FA49F1C;
+	Tue, 22 Mar 2022 14:35:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B22A049E1E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:35:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E06EF49E1E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:35:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 957MUlte0b00 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2022 14:35:44 -0400 (EDT)
-Received: from mail-oi1-f201.google.com (mail-oi1-f201.google.com
- [209.85.167.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99366405AA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:35:44 -0400 (EDT)
-Received: by mail-oi1-f201.google.com with SMTP id
- w185-20020aca30c2000000b002ecce746c73so11394431oiw.19
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 11:35:44 -0700 (PDT)
+ with ESMTP id ikfOamZ7iqHx for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2022 14:35:45 -0400 (EDT)
+Received: from mail-oo1-f73.google.com (mail-oo1-f73.google.com
+ [209.85.161.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A746C49F14
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:35:45 -0400 (EDT)
+Received: by mail-oo1-f73.google.com with SMTP id
+ g16-20020a4a2510000000b00324173d3201so12166479ooa.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 11:35:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=5SgsMWfo3s1L8LtQzUYqsFC2nGQvlmxjA5TrVXlNF5o=;
- b=NX/BKlXFUX08TaXDOkYcmlRKl5vaPl5VlRDyAV1k+AuDKOzI1MZXJ5+22dygCqBHx0
- cndVmYMiBZ8nmrVLXS7wr6r6xMVjqUptm/oFwkxO8iNVzx+jkh9rRiaya/P07+3MpJ04
- PJViSnNZvSINYM+HXpkl74vp6GVfLa5lg8R/MzRO2JEF9yr9GzaPdDsd1M4R7DOnsPnL
- GY4FOgGYGPB1d8cgw93lNLO7qXMe/gl/08vQDPIOX1VpM1MxuhjQ7CPtWAeOg9CIuqab
- h8WEqyqK+VHesnwGBityrclGfO6IJCwPfj6gqm7TZCeFBV2aliXaT2f3+d6CEFOzHXMT
- ycVg==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=3PzR5vzjBym0Xrr1WAh6EkOFmL2w1PsYl+ih5Ad/dqk=;
+ b=SGblp6gYJTNQJbOVKJuZHzVH1+KspPybgjStuKKj0ooDhsYubYE8RgbOz71CqIVIjr
+ SP/4dvB0b76AjPGSoyzVZ1LBu501I1vwxlx8D1FWgRrsHFXbOuQci+fEdW5XRxq4bGOX
+ 5rlIbDFc2u7S1S7WTteu0BD6kmSRpMILcW1q6F4oKF0zemBXr5gKSSOuPwbCiLDpRkkP
+ 2c5b8tXImTSrhnxbW/JVf+0W7g3mBcSg64r10QY+/AJQ+fiXoTxUjbtz1cjBNvw8Aw0F
+ Ls0OzeMV1Ac8oK7Yww2DOCYx+7o3/XAGcuiFnV2+o8Wh/vssPQd/XsBMgzi6x8gYr0UT
+ yMcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=5SgsMWfo3s1L8LtQzUYqsFC2nGQvlmxjA5TrVXlNF5o=;
- b=Suc9eXRegSWPt1QK85d5bAVttGRscGVlCsPUrKoOyAC+mkV6k3Cjhc4qQxv5aFTXo8
- LQ0iYTwmmaxFYylw1z0fMu9COsKUQ+hnFnwkEFyJ5Aldz8LKfefopKNLFIGHGNhF2aBC
- yAmLM4pBBv4sppZAFU3rHyaN8UWCrtqmaM/KgvnE7K+UqLK5oWO9+kieGZWaBKtrubPy
- Q6vJ4J5STcpcuHMDoeDkTQ8I9uOEP78YJs/1ESX7i9sBT4vZ5JDSpfC7Glrhtiq2HZwf
- QfzGIXNwnAZq0oGgNrKASDebaIj6nOwpBGGqoGFWQAzEeKCTuUHsMurTCwXvRSPSjPP3
- n2fA==
-X-Gm-Message-State: AOAM530jKbaXmCxX6kRvwNHAbZXYoiFRNwUhjLNYa+2xTYCEQS64y4e1
- RJqXhF+ujbQqzBbvw18H939g52kqH2ChgASS/OZugMiwn4O7XAcAhZGx+L0cHHyZh/SoZfK6Raw
- cftL239ZPxwB+Kymm5xwqn7LqFqiLIYDyk8enlMjbXZCCzpkWNdfWTINtx1Mi9R0aGgrZ0w==
-X-Google-Smtp-Source: ABdhPJzHEAq3Ahy4FlfkKxUuOF9jkElOWpjOAJdQhPLkwUNZPQY2dc71XrglzJC9u5kFBcUHDcv+k9hh18A=
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=3PzR5vzjBym0Xrr1WAh6EkOFmL2w1PsYl+ih5Ad/dqk=;
+ b=s3mdFLzezBeI1eaZhgiGovqt2mkWxk4fQG9FPLiKVbiANtHjN89RjG88cQ1KNpFyz/
+ DyG6BrAG7vPTkduPp3FBYvf2mGcBKqOADnS8ONHsobtlqxvh6tJTMRzZft0bAsnD47g6
+ EDnkiCQPrBwymI+IP9TB3O5FCiEOoZ0xhrrQKdHAhgUPSqHiTHaNDi4ERlbsdi5qsJBg
+ FDgppktZLDFRc60xhKkquN/7KBUfhQZJe1PuG1UwsJNgQ4wM7n8oXwTvMBMdVfLspNDK
+ nMi918ANrTsCoQorVcZ2cCCqaSo25w4FhQ5c/ucY5wK5Vdy999bRpiO+EPC0rKScqiWD
+ WWCA==
+X-Gm-Message-State: AOAM531ey8MAnhyy8lth3AKfYTe91C/OTfqLvAJvhL4ApZ9YsQoMpfE2
+ EYONqvLEvaIG328N7RUJa27ZFjQyrumDQnZKnqJxQT8KilZQhQIyLZo0VcRgCJBxyNJb4LF2G25
+ r0t9x0UEcB6AVXjwg1EFCQjQ1pIIuN4U16SIDrzSuCTCubDdxVPd8EikhW0v51cxLkh/ktw==
+X-Google-Smtp-Source: ABdhPJzn9OAifeYpnFU+SY/qxn1hQQpBef9smelEDXHHVlma7uJiqUTGI5RF9LlKNBUY6ZOaiPTb3GAZ4wE=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6808:1a97:b0:2ec:a246:ad01
+ (user=oupton job=sendgmr) by 2002:a05:6808:1283:b0:2ec:f440:e076
  with SMTP id
- bm23-20020a0568081a9700b002eca246ad01mr2796378oib.54.1647974143817; Tue, 22
- Mar 2022 11:35:43 -0700 (PDT)
-Date: Tue, 22 Mar 2022 18:35:35 +0000
-Message-Id: <20220322183538.2757758-1-oupton@google.com>
+ a3-20020a056808128300b002ecf440e076mr2801595oiw.157.1647974144916; Tue, 22
+ Mar 2022 11:35:44 -0700 (PDT)
+Date: Tue, 22 Mar 2022 18:35:36 +0000
+In-Reply-To: <20220322183538.2757758-1-oupton@google.com>
+Message-Id: <20220322183538.2757758-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20220322183538.2757758-1-oupton@google.com>
 X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH v2 0/3] KVM: arm64: Fixes for SMC64 SYSTEM_RESET2 calls
+Subject: [PATCH v2 1/3] KVM: arm64: Generally disallow SMC64 for AArch32 guests
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -85,42 +88,48 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This series addresses a couple of issues with how KVM exposes SMC64
-calls to its guest. It is currently possible for an AArch32 guest to
-discover the SMC64 SYSTEM_RESET2 function (via
-PSCI_1_0_FN_PSCI_FEATURES) and even make a call to it. SMCCC does not
-allow for 64 bit calls to be made from a 32 bit state.
+The only valid calling SMC calling convention from an AArch32 state is
+SMC32. Disallow any PSCI function that sets the SMC64 function ID bit
+when called from AArch32 rather than comparing against known SMC64 PSCI
+functions.
 
-Patch 1 cleans up the way we filter SMC64 calls in PSCI. Using a switch
-with case statements for each possibly-filtered function is asking for
-trouble. Instead, pivot off of the bit that indicates the desired
-calling convention. This plugs the PSCI_FEATURES hole for SYSTEM_RESET2.
+Note that without this change KVM advertises the SMC64 flavor of
+SYSTEM_RESET2 to AArch32 guests.
 
-Patch 2 adds a check to the PSCI v1.x call handler in KVM, bailing out
-early if the guest is not allowed to use a particular function. This
-closes the door on calls to 64-bit SYSTEM_RESET2 from AArch32.
+Fixes: d43583b890e7 ("KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the guest")
+Acked-by: Will Deacon <will@kernel.org>
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ arch/arm64/kvm/psci.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-Lastly, patch 3 is a nit to remove a superfluous check in the hopes of
-avoiding trouble the next time we raise KVM's PSCI version.
-
-Applies on top of kvmarm/next at commit:
-
-  21ea45784275 ("KVM: arm64: fix typos in comments")
-
-v1: http://lore.kernel.org/r/20220318193831.482349-1-oupton@google.com
-
-v1 -> v2:
- - Collect Acks and Reviews (Reiji, Will)
- - Hoist SMC64 filtering all the way up to kvm_psci_call() (Reiji)
-
-Oliver Upton (3):
-  KVM: arm64: Generally disallow SMC64 for AArch32 guests
-  KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from AArch32
-  KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler
-
- arch/arm64/kvm/psci.c | 31 ++++++++++++++-----------------
- 1 file changed, 14 insertions(+), 17 deletions(-)
-
+diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+index a433c3eac9b7..cd3ee947485f 100644
+--- a/arch/arm64/kvm/psci.c
++++ b/arch/arm64/kvm/psci.c
+@@ -216,15 +216,11 @@ static void kvm_psci_narrow_to_32bit(struct kvm_vcpu *vcpu)
+ 
+ static unsigned long kvm_psci_check_allowed_function(struct kvm_vcpu *vcpu, u32 fn)
+ {
+-	switch(fn) {
+-	case PSCI_0_2_FN64_CPU_SUSPEND:
+-	case PSCI_0_2_FN64_CPU_ON:
+-	case PSCI_0_2_FN64_AFFINITY_INFO:
+-		/* Disallow these functions for 32bit guests */
+-		if (vcpu_mode_is_32bit(vcpu))
+-			return PSCI_RET_NOT_SUPPORTED;
+-		break;
+-	}
++	/*
++	 * Prevent 32 bit guests from calling 64 bit PSCI functions.
++	 */
++	if ((fn & PSCI_0_2_64BIT) && vcpu_mode_is_32bit(vcpu))
++		return PSCI_RET_NOT_SUPPORTED;
+ 
+ 	return 0;
+ }
 -- 
 2.35.1.894.gb6a874cedc-goog
 
