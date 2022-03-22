@@ -2,77 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C70B6C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Mar 2022 19:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B74BC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Mar 2022 22:43:26 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 276E749F16;
-	Tue, 22 Mar 2022 15:43:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 072A549EEE;
+	Tue, 22 Mar 2022 18:43:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 407Q+NQRO6VN; Tue, 22 Mar 2022 15:43:02 -0400 (EDT)
+	with ESMTP id t1dkHVKHEFHA; Tue, 22 Mar 2022 18:43:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 000AD49F18;
-	Tue, 22 Mar 2022 15:43:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 153AE49F29;
+	Tue, 22 Mar 2022 18:43:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A964A49EDF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 15:43:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1CC349ECB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 18:43:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eRqUn1DxXB3H for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2022 15:42:59 -0400 (EDT)
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com
- [209.85.166.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3A1F49AF7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 15:42:59 -0400 (EDT)
-Received: by mail-io1-f46.google.com with SMTP id k25so21387113iok.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 12:42:59 -0700 (PDT)
+ with ESMTP id vMbddbtit4VH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2022 18:43:19 -0400 (EDT)
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com
+ [209.85.166.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C36749E44
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 18:43:19 -0400 (EDT)
+Received: by mail-il1-f174.google.com with SMTP id j15so3296572ila.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 15:43:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=kQfCViyvUcBGR9en7E9fM3gdNj6iSkExb9yK7Ef7nEA=;
- b=ftdIEVwRJDcINszz+pr2yi6zQaeeWx0v8sERiwy/J65J8gwYYBKlP0vwlFd4V5ivIc
- F5jbq0UkSMW398aYNBgLFHwNilRbIz06KMjmGGEPppjE1liHeZ8YIz4abvK4/IDPqSqx
- TuO8izyi0Uhf17++AoAFq/Uh2DkSuANy5cwZKf8MpMa8fvBCheNivveIFMwg4uu4AhTh
- d/Pn3MIRX6V0KKejM0KnbPVp95/pKJj/XVE1gvqMp1/r9fbwit46uZDi+g0DPNxaKWW4
- 1NK6nhBEuWFlyN3/xcp/BfInF/UvkyZNzsupHUuK0LjCRMdbPg0PdOa1rJdrgWeNRVpp
- NERg==
+ bh=drm0r/PTZ7ubOkgkGBi9eLSIu5ArVOIUaQXVPgE87AY=;
+ b=XknlLv7TdmebHzy9yFDqqH0piVqt3T3ZXQ+HPYmQbGlDH4YwRxIoDgeDp0ZoZW3F72
+ YFfzaMZ9DUIB32yaljw94bnXkHvQ89n8Em/xm/HJHhmPcB6QHF752z5i7+a/86fLpa9j
+ xu4bKVJIwrkmosNPbwdjYsDLJBNTt9gCwhGZ4Uw2iBYPzWiYIWznX5ghaMzTWk9EvFXp
+ 607ye0H4LYZufAOnNPq6FQCYWNaSX4y2Cn0xIFC2Fv0gO8rnXYrKRtFP9x3vxSpZkc2P
+ eKSfFlv1qXK4ryO5H+UTdsCtZm+eHJboUH8Y5YD/DCvGy5ktb52nGZN68P/8plGv2VFW
+ RgSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=kQfCViyvUcBGR9en7E9fM3gdNj6iSkExb9yK7Ef7nEA=;
- b=jCJqLr7coM21tLmJMj1YR7FCHkPGIKh0W7pLf903uI7gE3Iixlbm5zC4KVSzquXWaE
- fWqpP7TnwSeaKqU4WxrAXRDAnaG0tkhQv5Bc6Uoi+Uk7OEBRMHwF1IqVL5Q+uu26UEpb
- //AZreiCwoZgeJXDfD1LmHuEIj6Wp/8otqUh3bFr0kmA59WxmcXeaExpVphMomzwSS61
- 8BvYi+oND6i+t/vNawKqAUlpD5i2D2r8WIC91R+hp3bfNPDmj9XVL396wX1r+qi9Ol8k
- lQHF/3zTBeQNYgR+GSTKWb1a3YF+VbW1fIWyQsi/o+Hx/8gI0kuWt9Sp9IE2TRRU2kn8
- /D7w==
-X-Gm-Message-State: AOAM53360Lzh8t6lHBGZXpswup//kZHK1M4xD9Q71DZqAxB6tzuMeHw5
- b4jcCRC1EE1qKKhcDlAEVKcdTA==
-X-Google-Smtp-Source: ABdhPJzbEmmA31pMa7o1H5I0WOaV1TzDfua9AcuuxEy8N/e12lQalCiP31/gC0kyxSNbn9HRDMpncQ==
-X-Received: by 2002:a05:6638:1694:b0:31a:594:f4c7 with SMTP id
- f20-20020a056638169400b0031a0594f4c7mr13259160jat.139.1647978178814; 
- Tue, 22 Mar 2022 12:42:58 -0700 (PDT)
+ bh=drm0r/PTZ7ubOkgkGBi9eLSIu5ArVOIUaQXVPgE87AY=;
+ b=GVo8Z3dxYDDWwOf8rHUiOGV5u9AOhNsp+iGsWB8m4djm8yoGuZLE21KOF3p0DFHIlP
+ jgDuq1oQr1JlvtwicuGv4G5wgbRHB8Znv6N3rk4O+ccqc1e8JFHomNSWwcEJ8t3PgFOV
+ yD69YkwwYU+Y9lfFYDT6d3atxj167XPaDbEnH3EGVtWElXu6fj2P9LtCssG3yLTglZUD
+ 7l99WSVToAT3tgNBOveWFBET18r67rvzK4uclkj+TeyYDYwP0sVUDyD6NKMktzkmVHWM
+ yYuwrfE9bRxKg6VigYCGpz15YHVucZo69Jtlf+y+boTN3RLjQk6xL6vNs5nhFPtbf1KX
+ bSRg==
+X-Gm-Message-State: AOAM5300jITRslCaq7getvhsbMy7dWXcQZ3yI/dU5uNJHSIu0MfkuF/8
+ lFCcYVM7a8Jcgl7f3coPAPUH0g==
+X-Google-Smtp-Source: ABdhPJysB8brbkgeKvnoTeVG/g7dtRmXqNObqCO/2NcRFKLsIAwo4kytaJ78kIO09+y2li+AsEYP6g==
+X-Received: by 2002:a05:6e02:164b:b0:2c7:f5b9:214e with SMTP id
+ v11-20020a056e02164b00b002c7f5b9214emr11160945ilu.188.1647988998589; 
+ Tue, 22 Mar 2022 15:43:18 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- i12-20020a926d0c000000b002c3fa6cf756sm11169508ilc.25.2022.03.22.12.42.57
+ w5-20020a056e021c8500b002c7f39eba1bsm9085186ill.82.2022.03.22.15.43.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 22 Mar 2022 12:42:58 -0700 (PDT)
-Date: Tue, 22 Mar 2022 19:42:54 +0000
+ Tue, 22 Mar 2022 15:43:17 -0700 (PDT)
+Date: Tue, 22 Mar 2022 22:43:14 +0000
 From: Oliver Upton <oupton@google.com>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v5 01/22] KVM: arm64: Introduce template for inline
- functions
-Message-ID: <YjomvjFNjGADmu6l@google.com>
+Subject: Re: [PATCH v5 02/22] KVM: arm64: Add SDEI virtualization
+ infrastructure
+Message-ID: <YjpRArSezR3gVv2K@google.com>
 References: <20220322080710.51727-1-gshan@redhat.com>
- <20220322080710.51727-2-gshan@redhat.com>
+ <20220322080710.51727-3-gshan@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220322080710.51727-2-gshan@redhat.com>
+In-Reply-To: <20220322080710.51727-3-gshan@redhat.com>
 Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
  shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
  vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
@@ -94,60 +94,151 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Gavin,
 
-On Tue, Mar 22, 2022 at 04:06:49PM +0800, Gavin Shan wrote:
-> The inline functions used to get the SMCCC parameters have same
-> layout. It means these functions can be presented by an unified
-> template, to make the code simplified. Besides, this adds more
-> similar inline functions like smccc_get_arg{4,5,6,7,8}() to get
-> more SMCCC arguments, which are needed by SDEI virtualization
-> support.
+On Tue, Mar 22, 2022 at 04:06:50PM +0800, Gavin Shan wrote:
+> Software Delegated Exception Interface (SDEI) provides a mechanism for
+> registering and servicing system events. Those system events are high
+> priority events, which must be serviced immediately. It's going to be
+> used by Asynchronous Page Fault (APF) to deliver notification from KVM
+> to guest. It's noted that SDEI is defined by ARM DEN0054C specification.
+
+I'm guessing that you're using linked lists for stitching all of this
+together because the specification provides for 24 bits of event
+encoding. However, it seems that there will be a finite number of events
+in KVM. So the APF stuff and a software signaled event.
+
+Given that the number of events in KVM is rather small, would it make
+more sense to do away with the overhead of linked lists and having the
+state just represented in a static or allocated array? I think you can
+cram all of the VM scoped event state into a single structure and hang
+the implementation off of that.
+
+> This introduces SDEI virtualization infrastructure where the SDEI events
+> are registered and manipulated by the guest through hypercall. The SDEI
+> event is delivered to one specific vCPU by KVM once it's raised. This
+> introduces data structures to represent the needed objects to support
+> the feature, which is highlighted as below. As those objects could be
+> migrated between VMs, these data structures are partially exposed to
+> user space.
+> 
+>    * kvm_sdei_exposed_event
+>      The exposed events are determined and added by VMM through ioctl
+>      interface. Only the exposed events can be registered from the
+>      guest.
+> 
+>    * kvm_sdei_registered_event
+>      The events that have been registered from the guest through the
+>      SDEI_1_0_FN_SDEI_EVENT_REGISTER hypercall.
+> 
+>    * kvm_sdei_vcpu_event
+>      The events that have been delivered to the target vCPU.
+> 
+>    * kvm_sdei_vcpu
+>      Used to save the preempted context when the SDEI event is serviced
+>      and delivered. After the SDEI event handling is completed, the
+>      execution is resumed from the preempted context.
+> 
+>    * kvm_sdei_kvm
+>      Place holder for the exposed and registered events.
+
+It might be a good idea to expand these a bit and move them into
+comments on each of the structures.
+
+> The error of SDEI_NOT_SUPPORTED is returned for all SDEI hypercalls for
+> now. They will be supported in the subsequent patches.
 > 
 > Signed-off-by: Gavin Shan <gshan@redhat.com>
 > ---
->  include/kvm/arm_hypercalls.h | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h            |   3 +
+>  arch/arm64/include/asm/kvm_sdei.h            | 171 +++++++++++++
+>  arch/arm64/include/uapi/asm/kvm.h            |   1 +
+>  arch/arm64/include/uapi/asm/kvm_sdei_state.h |  72 ++++++
+>  arch/arm64/kvm/Makefile                      |   2 +-
+>  arch/arm64/kvm/arm.c                         |   8 +
+>  arch/arm64/kvm/hypercalls.c                  |  21 ++
+>  arch/arm64/kvm/sdei.c                        | 244 +++++++++++++++++++
+>  include/uapi/linux/arm_sdei.h                |   2 +
+>  9 files changed, 523 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/include/asm/kvm_sdei.h
+>  create mode 100644 arch/arm64/include/uapi/asm/kvm_sdei_state.h
+>  create mode 100644 arch/arm64/kvm/sdei.c
 > 
-> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-> index 0e2509d27910..d5144c852fe4 100644
-> --- a/include/kvm/arm_hypercalls.h
-> +++ b/include/kvm/arm_hypercalls.h
-> @@ -13,20 +13,20 @@ static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
->  	return vcpu_get_reg(vcpu, 0);
->  }
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 031e3a2537fc..5d37e046a458 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -113,6 +113,8 @@ struct kvm_arch {
+>  	/* Interrupt controller */
+>  	struct vgic_dist	vgic;
 >  
-> -static inline unsigned long smccc_get_arg1(struct kvm_vcpu *vcpu)
-> -{
-> -	return vcpu_get_reg(vcpu, 1);
-> -}
-> -
-> -static inline unsigned long smccc_get_arg2(struct kvm_vcpu *vcpu)
-> -{
-> -	return vcpu_get_reg(vcpu, 2);
-> +#define SMCCC_DECLARE_GET_ARG(reg)					\
-> +static inline unsigned long smccc_get_arg##reg(struct kvm_vcpu *vcpu)	\
-> +{									\
-> +	return vcpu_get_reg(vcpu, reg);					\
->  }
+> +	struct kvm_sdei_kvm *sdei;
+> +
+
+nit: avoid repeating 'kvm'. struct kvm_sdei should be descriptive enough
+:)
+
+>  	/* Mandated version of PSCI */
+>  	u32 psci_version;
 >  
-> -static inline unsigned long smccc_get_arg3(struct kvm_vcpu *vcpu)
-> -{
-> -	return vcpu_get_reg(vcpu, 3);
-> -}
-> +SMCCC_DECLARE_GET_ARG(1)
-> +SMCCC_DECLARE_GET_ARG(2)
-> +SMCCC_DECLARE_GET_ARG(3)
-> +SMCCC_DECLARE_GET_ARG(4)
-> +SMCCC_DECLARE_GET_ARG(5)
-> +SMCCC_DECLARE_GET_ARG(6)
-> +SMCCC_DECLARE_GET_ARG(7)
-> +SMCCC_DECLARE_GET_ARG(8)
+> @@ -338,6 +340,7 @@ struct kvm_vcpu_arch {
+>  	 * Anything that is not used directly from assembly code goes
+>  	 * here.
+>  	 */
+> +	struct kvm_sdei_vcpu *sdei;
+>
 
-Hmm. What if we specify a single inline function where the caller passes
-the arg # as a parameter? We really just want to abstract away the
-off-by-one difference between GP registers and SMCCC arguments.
+nit: put your scoping tokens at the beginning of a symbol name, so
+'struct kvm_vcpu_sdei'.
 
-Macros generally make me uneasy for template functions, but I may be in
-the vocal minority on this topic :)
+[...]
+
+> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> index 202b8c455724..3c20fee72bb4 100644
+> --- a/arch/arm64/kvm/hypercalls.c
+> +++ b/arch/arm64/kvm/hypercalls.c
+> @@ -5,6 +5,7 @@
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/kvm_emulate.h>
+> +#include <asm/kvm_sdei.h>
+>  
+>  #include <kvm/arm_hypercalls.h>
+>  #include <kvm/arm_psci.h>
+> @@ -151,6 +152,26 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+>  	case ARM_SMCCC_TRNG_RND32:
+>  	case ARM_SMCCC_TRNG_RND64:
+>  		return kvm_trng_call(vcpu);
+> +	case SDEI_1_0_FN_SDEI_VERSION:
+> +	case SDEI_1_0_FN_SDEI_EVENT_REGISTER:
+> +	case SDEI_1_0_FN_SDEI_EVENT_ENABLE:
+> +	case SDEI_1_0_FN_SDEI_EVENT_DISABLE:
+> +	case SDEI_1_0_FN_SDEI_EVENT_CONTEXT:
+> +	case SDEI_1_0_FN_SDEI_EVENT_COMPLETE:
+> +	case SDEI_1_0_FN_SDEI_EVENT_COMPLETE_AND_RESUME:
+> +	case SDEI_1_0_FN_SDEI_EVENT_UNREGISTER:
+> +	case SDEI_1_0_FN_SDEI_EVENT_STATUS:
+> +	case SDEI_1_0_FN_SDEI_EVENT_GET_INFO:
+> +	case SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET:
+> +	case SDEI_1_0_FN_SDEI_PE_MASK:
+> +	case SDEI_1_0_FN_SDEI_PE_UNMASK:
+> +	case SDEI_1_0_FN_SDEI_INTERRUPT_BIND:
+> +	case SDEI_1_0_FN_SDEI_INTERRUPT_RELEASE:
+> +	case SDEI_1_1_FN_SDEI_EVENT_SIGNAL:
+> +	case SDEI_1_0_FN_SDEI_PRIVATE_RESET:
+> +	case SDEI_1_0_FN_SDEI_SHARED_RESET:
+> +	case SDEI_1_1_FN_SDEI_FEATURES:
+
+Consider only adding switch statements for hypercalls when they're
+actually implemented.
+
+Additionally, while this isn't directly related to your patch, I do have
+a gripe about kvm_hvc_call_handler(). It is really ugly that we
+enumerate the specific hypercalls we support, and otherwise fall through
+to PSCI.
+
+IMO, a cleaner approach would be to have kvm_hvc_call_handler() simply
+route a particular service range/service owner to the appropriate
+handler. We can then terminate individual hypercalls in those handlers,
+avoiding a catch-all switch such as this one is currently.
 
 --
 Thanks,
