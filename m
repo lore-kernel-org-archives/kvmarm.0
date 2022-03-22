@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4861C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 09:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C9AC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 09:57:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 940EB49F35;
-	Wed, 23 Mar 2022 05:57:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2197249F44;
+	Wed, 23 Mar 2022 05:57:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zL71222j1PLx; Wed, 23 Mar 2022 05:57:23 -0400 (EDT)
+	with ESMTP id Fv09b2HkCfti; Wed, 23 Mar 2022 05:57:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7214D4B0B3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BA6549F5F;
 	Wed, 23 Mar 2022 05:57:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3139F40C52
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 18:52:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 246914086C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 19:08:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B90kcNxbvR5o for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2022 18:52:22 -0400 (EDT)
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com
- [209.85.167.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF53240B80
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 18:52:22 -0400 (EDT)
-Received: by mail-lf1-f51.google.com with SMTP id 5so14064223lfp.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 15:52:22 -0700 (PDT)
+ with ESMTP id poomfIGXNTVT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2022 19:08:37 -0400 (EDT)
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com
+ [209.85.167.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 094FB40797
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 19:08:36 -0400 (EDT)
+Received: by mail-lf1-f47.google.com with SMTP id bu29so32372824lfb.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 16:08:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WvvHbaLzRYu7wKbKBkm0f3RCm6Tn7L9LKo6nWKndQoM=;
- b=IeY+8LZbgT5WN7RXZk7eh5d4wwEgng3XBSCniMnT9QQ7QynNJwZl7uqW7IKmQbo57i
- 9WsPaoXnjD8RCC9dMJB2euDfnWOanl9VNI5e72UmnBkRwmDoIKf2X+UGaOYLgaXrQHUy
- RILbd+Y2hFukTlo6qBE9n95ArzhdO1ynnb7dT9o+uTxioSnIM2113VbgYH4kxLeiy2Yk
- wLRr3byfZRvARMnc1IHMc7Kb1nmIm278w00qMLp9kgcTtYRuy2IqBS9AxlsuczMBGoHZ
- S1bsn1pIYGuQI/BJQXmQvaI4b6yZK2RE/eASsco4xU31oK99EL3IlMefS9t6EbdC4+4L
- TQTQ==
+ :cc; bh=mTTFE/78fuZDPiUjjJj3Ss+v6yYociVg/54x3WiDppI=;
+ b=AtUMJgZ9t0Fiz5REAj00cuT2GhuBOVgcleoPH33KuSiD6KinBWwOwkTJUkr9PsgxDN
+ TyDPGlBdULNNbsjEeWOukk/bVG7/QNX0CG1Sr3YVimBK2RTwFt9JEwHuXd89blOchI4O
+ vwbvArTGQ9IPaoj9TTK+fhuX+VGfQF2u2DCC4WrtNhILbnJociZ7w1dQlFqaV2j0vf7n
+ svQP5H4o/8R/VNvsQakatJxIytdbL7IJ3QIgcAEtDTHuN21fPSlb4cnYK4zu1p6CpS65
+ YZFFJjFNFeCVNR5eCWbIo5vple/iraGnKrEDxh5nxpkupBxwR6jz94TEofxga2vrX8Dr
+ RtoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=WvvHbaLzRYu7wKbKBkm0f3RCm6Tn7L9LKo6nWKndQoM=;
- b=m/d61z0IDPYa+mp01hjE16+rPlkdO0hZeFb+gmOdDTo7Pz9mwfiIIQRLZzNH1cXbiL
- AVDLgTESMhs9s8tQf3Xk1CT/X0WvLFu+id80hNYGKS+D0rNLwaCbuG4dWiZe5Ret6GZ6
- 4+HmKItVJ071Erd6ksM7DAU00zxTgW4TwE1hFm2ImmmdJVP9InaEEWy1qTvaa1j/wGOK
- 5wzrJGDbAl0eAidfk+hSKLiNIq9ZOx+xE+hLWvXtyYuMTMib+u9f7lHdTqWV7DXLX0Oc
- YbTNL8cD3fgwqgfOPyZrauKS6mCWROx1TP1lGaUMJ5WpmuV/u38fpvRCJ+F4GKJMlL6j
- 1Qog==
-X-Gm-Message-State: AOAM530U0Lk0ZmM7xqhZtps7Dl5HybM/JLeNq27TM3eJNkYT6qC4z+BN
- +/Db2drPiAIV6fQZB6eKGSGYlkEpLs0rhygBJMf2aw==
-X-Google-Smtp-Source: ABdhPJwI/z0/a17reQN2zQe+86LABc5jxg23lp5/QgxLJAcsYtyoxn6igiqHu+q8XWGSRty2B7/wG5HPsWsQkXUiGVs=
-X-Received: by 2002:a05:6512:128e:b0:44a:4067:9ffe with SMTP id
- u14-20020a056512128e00b0044a40679ffemr3043386lfs.64.1647989540978; Tue, 22
- Mar 2022 15:52:20 -0700 (PDT)
+ bh=mTTFE/78fuZDPiUjjJj3Ss+v6yYociVg/54x3WiDppI=;
+ b=Tse1lyDFFmWObJUmOFhvwsReP2/SAkjitd+LGWAFOWQWADqPlBsaHv1F3OKvkOqLAp
+ vYCUexxrskl9X+Bof8N/JfcXeYPA1yqMBnSrzm1GKo/Txo+b+kLEC10m/+5EqlDINz6w
+ pfGNvh9J7XPSsGAlumQttqg/aqobQ2fS0jQ/7Sn4PVLREEsNvsfS6ihne/72ZeJGYsQ5
+ M32vG7csQaCBRSQEkyy+BDhgvPKyKU4wuPhe1TsLBNurgDa0WPTuGO1tGCC3bmAD5qQf
+ lR5pyKBsKe0APK3iEaD24/Js2GTQ2n2yIZ5MKQoRZ1LTs/OsoVb6L3lffmE6gOrCWSzK
+ 9FcQ==
+X-Gm-Message-State: AOAM533BOgWPW8PN2YnAq1g8kLnxh2CIFIMux3UgLvt7jVXHhjkoWFM/
+ S6cUg1EyOtyPF1Nw/2uRfa/qSp3T3j0fTTrJaBVWmg==
+X-Google-Smtp-Source: ABdhPJwvtLvpn2H6Z4lJn9F/iyZNFskD3MwkoE6H+EfWq/OlKZPPiQcbGScUEqtawLL0W5MBlHCvFgFE+wVkBkGa91U=
+X-Received: by 2002:a19:674c:0:b0:448:3f49:e6d5 with SMTP id
+ e12-20020a19674c000000b004483f49e6d5mr20032193lfj.518.1647990514538; Tue, 22
+ Mar 2022 16:08:34 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-17-dmatlack@google.com>
- <YjGgjTnP/9sG8L+2@xz-m1.local>
-In-Reply-To: <YjGgjTnP/9sG8L+2@xz-m1.local>
+ <20220311002528.2230172-18-dmatlack@google.com>
+ <YjGjWcmn+7sZPjNX@xz-m1.local>
+In-Reply-To: <YjGjWcmn+7sZPjNX@xz-m1.local>
 From: David Matlack <dmatlack@google.com>
-Date: Tue, 22 Mar 2022 15:51:54 -0700
-Message-ID: <CALzav=fZQYC7YyTbZqbkYTYVUXCq4skc6pkQ2S59BoSxbkKUhw@mail.gmail.com>
-Subject: Re: [PATCH v2 16/26] KVM: x86/mmu: Cache the access bits of shadowed
- translations
+Date: Tue, 22 Mar 2022 16:08:08 -0700
+Message-ID: <CALzav=d1j-SUFEauqrQaJ5gE89ybSdW3OWnmdsaA6iADVnQfjA@mail.gmail.com>
+Subject: Re: [PATCH v2 17/26] KVM: x86/mmu: Pass access information to
+ make_huge_page_split_spte()
 To: Peter Xu <peterx@redhat.com>
 X-Mailman-Approved-At: Wed, 23 Mar 2022 05:57:13 -0400
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
@@ -97,131 +97,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 16, 2022 at 1:32 AM Peter Xu <peterx@redhat.com> wrote:
+On Wed, Mar 16, 2022 at 1:44 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Fri, Mar 11, 2022 at 12:25:18AM +0000, David Matlack wrote:
-> > In order to split a huge page we need to know what access bits to assign
-> > to the role of the new child page table. This can't be easily derived
-> > from the huge page SPTE itself since KVM applies its own access policies
-> > on top, such as for HugePage NX.
-> >
-> > We could walk the guest page tables to determine the correct access
-> > bits, but that is difficult to plumb outside of a vCPU fault context.
-> > Instead, we can store the original access bits for each leaf SPTE
-> > alongside the GFN in the gfns array. The access bits only take up 3
-> > bits, which leaves 61 bits left over for gfns, which is more than
-> > enough. So this change does not require any additional memory.
+> On Fri, Mar 11, 2022 at 12:25:19AM +0000, David Matlack wrote:
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 85b7bc333302..541b145b2df2 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -1430,7 +1430,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
+> >        * not been linked in yet and thus is not reachable from any other CPU.
+> >        */
+> >       for (i = 0; i < PT64_ENT_PER_PAGE; i++)
+> > -             sp->spt[i] = make_huge_page_split_spte(huge_spte, level, i);
+> > +             sp->spt[i] = make_huge_page_split_spte(huge_spte, level, i, ACC_ALL);
 >
-> I have a pure question on why eager page split needs to worry on hugepage
-> nx..
->
-> IIUC that was about forbidden huge page being mapped as executable.  So
-> afaiu the only missing bit that could happen if we copy over the huge page
-> ptes is the executable bit.
->
-> But then?  I think we could get a page fault on fault->exec==true on the
-> split small page (because when we copy over it's cleared, even though the
-> page can actually be executable), but it should be well resolved right
-> after that small page fault.
->
-> The thing is IIUC this is a very rare case, IOW, it should mostly not
-> happen in 99% of the use case?  And there's a slight penalty when it
-> happens, but only perf-wise.
->
-> As I'm not really fluent with the code base, perhaps I missed something?
+> Pure question: is it possible that huge_spte is RO while we passed in
+> ACC_ALL here (which has the write bit set)?
 
-You're right that we could get away with not knowing the shadowed
-access permissions to assign to the child SPTEs when splitting a huge
-SPTE. We could just copy the huge SPTE access permissions and then let
-the execute bit be repaired on fault (although those faults would be a
-performance cost).
+Yes that is possible, but only if KVM the page is RO due to host-side
+policies (e.g. RO memslot or RO VMA). "access" here is the
+guest-allowed access permissions, similar to the pte_access parameter
+to mmu_set_spte(). e.g. notice how the TDP MMU passes ACC_ALL to
+make_spte().
 
-But the access permissions are also needed to lookup an existing
-shadow page (or create a new shadow page) to use to split the huge
-page. For example, let's say we are going to split a huge page that
-does not have execute permissions enabled. That could be because NX
-HugePages are enabled or because we are shadowing a guest translation
-that does not allow execution (or both). We wouldn't want to propagate
-the no-execute permission into the child SP role.access if the
-shadowed translation really does allow execution (and vice versa).
+> Would it be better if we make it a "bool exec" to be clearer?
 
->
-> >
-> > In order to keep the access bit cache in sync with the guest, we have to
-> > extend FNAME(sync_page) to also update the access bits.
->
-> Besides sync_page(), I also see that in mmu_set_spte() there's a path that
-> we will skip the rmap_add() if existed:
->
->         if (!was_rmapped) {
->                 WARN_ON_ONCE(ret == RET_PF_SPURIOUS);
->                 kvm_update_page_stats(vcpu->kvm, level, 1);
->                 rmap_add(vcpu, slot, sptep, gfn);
->         }
->
-> I didn't check, but it's not obvious whether the sync_page() change here
-> will cover all of the cases, hence raise this up too.
+But all that being said, the ACC_ALL stuff is confusing for exactly
+the reason you pointed out so it doesn't make sense to duplicate it
+further. I agree it would make more sense to pass in bool exec.
 
-Good catch. I will need to dig into this more to confirm but I think
-you might be right.
-
->
-> >
-> > Now that the gfns array caches more information than just GFNs, rename
-> > it to shadowed_translation.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h |  2 +-
-> >  arch/x86/kvm/mmu/mmu.c          | 32 +++++++++++++++++++-------------
-> >  arch/x86/kvm/mmu/mmu_internal.h | 15 +++++++++++++--
-> >  arch/x86/kvm/mmu/paging_tmpl.h  |  7 +++++--
-> >  4 files changed, 38 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index f72e80178ffc..0f5a36772bdc 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -694,7 +694,7 @@ struct kvm_vcpu_arch {
-> >
-> >       struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
-> >       struct kvm_mmu_memory_cache mmu_shadow_page_cache;
-> > -     struct kvm_mmu_memory_cache mmu_gfn_array_cache;
-> > +     struct kvm_mmu_memory_cache mmu_shadowed_translation_cache;
->
-> I'd called it with a shorter name.. :) maybe mmu_shadowed_info_cache?  No
-> strong opinion.
->
-> >       struct kvm_mmu_memory_cache mmu_page_header_cache;
-> >
-> >       /*
->
-> [...]
->
-> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-> > index b6e22ba9c654..c5b8ee625df7 100644
-> > --- a/arch/x86/kvm/mmu/mmu_internal.h
-> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> > @@ -32,6 +32,11 @@ extern bool dbg;
-> >
-> >  typedef u64 __rcu *tdp_ptep_t;
-> >
-> > +struct shadowed_translation_entry {
-> > +     u64 access:3;
-> > +     u64 gfn:56;
->
-> Why 56?
-
-I was going for the theoretical maximum number of bits for a GFN. But
-that would be 64 - 12 = 52... so I'm not sure what I was thinking
-here.
-
-I'll switch it to 52 and add a comment.
-
->
-> > +};
->
-> Thanks,
 >
 > --
 > Peter Xu
