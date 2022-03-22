@@ -2,68 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F1E9C433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Mar 2022 08:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 920D1C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Mar 2022 08:30:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06EC74141A;
-	Tue, 22 Mar 2022 04:12:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 02C7849EF7;
+	Tue, 22 Mar 2022 04:30:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IG6+lkbYknvZ; Tue, 22 Mar 2022 04:11:59 -0400 (EDT)
+	with ESMTP id SW-YJUt3-CQv; Tue, 22 Mar 2022 04:30:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F718411C7;
-	Tue, 22 Mar 2022 04:11:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57C8E49ECB;
+	Tue, 22 Mar 2022 04:30:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B81640CDE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 04:11:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D99F40C2B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 20:08:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JqDwy-nm1VvJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2022 04:11:56 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD88D40431
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 04:11:56 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1647936716;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SuoNHRzUPWWhkYa3DBe2wOhzLsIQa6xM5wffndPFSig=;
- b=SVLivOm1kZ/ca3JWgbmfdq1BI2Cb6pqJP55ehsW93fai4E+ELwwwCD+5YFOhWD0hGKQ/AG
- S2nfCeDTQBeOix+1jtpy4D5dhKsP0r0vn9/PWOEH0H6x3gtfvZ1Lnn+BO3P9Q7BBNZJXj6
- zztK07sSH9SIF7Om5mkfcRMmGZHDiIQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-45-OgXkFtI9OKmju0xspCIjXQ-1; Tue, 22 Mar 2022 04:11:53 -0400
-X-MC-Unique: OgXkFtI9OKmju0xspCIjXQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
- [10.11.54.3])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0DB32802809;
- Tue, 22 Mar 2022 08:11:53 +0000 (UTC)
-Received: from gshan.redhat.com (ovpn-12-33.pek2.redhat.com [10.72.12.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 83A221121324;
- Tue, 22 Mar 2022 08:11:23 +0000 (UTC)
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v5 22/22] KVM: selftests: Add SDEI test case
-Date: Tue, 22 Mar 2022 16:07:10 +0800
-Message-Id: <20220322080710.51727-23-gshan@redhat.com>
-In-Reply-To: <20220322080710.51727-1-gshan@redhat.com>
-References: <20220322080710.51727-1-gshan@redhat.com>
+ with ESMTP id o6FuT450jKEq for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 21 Mar 2022 20:08:13 -0400 (EDT)
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com
+ [209.85.167.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3596640AEB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 20:08:13 -0400 (EDT)
+Received: by mail-lf1-f42.google.com with SMTP id w7so27181541lfd.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 17:08:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=HajGksMSq1RuOfUtCvBANBROHaJPWfbgSuMQb23l8Ro=;
+ b=KzdT/r2b+R4xT9E4ZyW0pA3n2KF3e8r8r9jgILDidIfEfyel8zLeYcb4r+2u77UaAh
+ pc/Yg7QbJagANBD+oN8ancQDLMRPWyDJebAxBSNT9aCf0VYWKS06DjU5/zEIIvIk/Q1I
+ nkFXsdVMcPK3kwVbf1u62S2hNnKfQJJGatVAcFntq5+bMjZCKrPRgwPh4QP/D7wL2/4t
+ /vuDNvin8RXFKN5DQ+DqwE7aVzCojlTAeCvJabLCq0ozAw1AsOEfMz9D2xPgs0gsviGo
+ lwX3Ai+CSBpgrtHkmrqXgloO6s8kyNJX1xf/sV1gZ7EapjUJdQ7cTcxqO5zK3qZxUVnP
+ TVRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=HajGksMSq1RuOfUtCvBANBROHaJPWfbgSuMQb23l8Ro=;
+ b=XbUAs6W1XkO3ad62zqNp3ZCW3bjbic63+OxBx4OjM4TuQvf/g1dhMk2MUfqy/3Gman
+ ThOc4LWzeaoiOemcJ3WvGG35m3JUg9CQl6oDXD+KM0dCVD7+S4c11pRUa66qv7EjVqH8
+ q7+PYbLl7Bo0sFIK9PgkbJRhmcTHmLfRrTg2/wIFBVyK8Rk7I3+TjEb1UtbkLe0A4Ys2
+ M0ONGvMu8RmYtUQycmgqn+i5HeA74gNO7yPsQqGBAXrnBkovNGR8r6iuTUvM0HS2FNf9
+ dRYI4jyRgRgYsyEbrX4ilPqn551Tx3u3/ldkHggk5+9R5m8Pd4P89C63CIVqZpzNmd5v
+ uwSQ==
+X-Gm-Message-State: AOAM532ISfxKD3jR3bE6J9K/YsIkRvFp+mZTEEe0XePJ8ZKatKt6cTwh
+ ktntf/i0KKOB0dMllSG5v7yU746MSaR/B588D3Q8Tg==
+X-Google-Smtp-Source: ABdhPJyr2CHJfKFlgXHv7B6Wio+Fhr9ZiDa/iuyftFTLzzh0ztintaAMADr5wc/dGTnXMgI7Ud+S7N2nKq2tEXPmjGg=
+X-Received: by 2002:a19:674c:0:b0:448:3f49:e6d5 with SMTP id
+ e12-20020a19674c000000b004483f49e6d5mr16515926lfj.518.1647907691443; Mon, 21
+ Mar 2022 17:08:11 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org
+References: <20220311002528.2230172-1-dmatlack@google.com>
+ <20220311002528.2230172-21-dmatlack@google.com>
+ <YjG7Zh4zwTDsO3L1@xz-m1.local>
+In-Reply-To: <YjG7Zh4zwTDsO3L1@xz-m1.local>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 21 Mar 2022 17:07:44 -0700
+Message-ID: <CALzav=fPvi2eHt2Dbuti=9A1yw_bFFwgY_AFN2wSvbCLVyUjFQ@mail.gmail.com>
+Subject: Re: [PATCH v2 20/26] KVM: x86/mmu: Extend Eager Page Splitting to the
+ shadow MMU
+To: Peter Xu <peterx@redhat.com>
+X-Mailman-Approved-At: Tue, 22 Mar 2022 04:30:06 -0400
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -80,585 +97,346 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This adds SDEI self-test case where the various hypercalls are issued
-to default event (0x0). The default event is private, signaled and in
-normal priority.
+On Wed, Mar 16, 2022 at 3:27 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Fri, Mar 11, 2022 at 12:25:22AM +0000, David Matlack wrote:
+> > Extend KVM's eager page splitting to also split huge pages that are
+> > mapped by the shadow MMU. Specifically, walk through the rmap splitting
+> > all 1GiB pages to 2MiB pages, and splitting all 2MiB pages to 4KiB
+> > pages.
+> >
+> > Splitting huge pages mapped by the shadow MMU requries dealing with some
+> > extra complexity beyond that of the TDP MMU:
+> >
+> > (1) The shadow MMU has a limit on the number of shadow pages that are
+> >     allowed to be allocated. So, as a policy, Eager Page Splitting
+> >     refuses to split if there are KVM_MIN_FREE_MMU_PAGES or fewer
+> >     pages available.
+> >
+> > (2) Huge pages may be mapped by indirect shadow pages which have the
+> >     possibility of being unsync. As a policy we opt not to split such
+> >     pages as their translation may no longer be valid.
+> >
+> > (3) Splitting a huge page may end up re-using an existing lower level
+> >     shadow page tables. This is unlike the TDP MMU which always allocates
+> >     new shadow page tables when splitting.  This commit does *not*
+> >     handle such aliasing and opts not to split such huge pages.
+> >
+> > (4) When installing the lower level SPTEs, they must be added to the
+> >     rmap which may require allocating additional pte_list_desc structs.
+> >     This commit does *not* handle such cases and instead opts to leave
+> >     such lower-level SPTEs non-present. In this situation TLBs must be
+> >     flushed before dropping the MMU lock as a portion of the huge page
+> >     region is being unmapped.
+> >
+> > Suggested-by: Peter Feiner <pfeiner@google.com>
+> > [ This commit is based off of the original implementation of Eager Page
+> >   Splitting from Peter in Google's kernel from 2016. ]
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  .../admin-guide/kernel-parameters.txt         |   3 -
+> >  arch/x86/kvm/mmu/mmu.c                        | 307 ++++++++++++++++++
+> >  2 files changed, 307 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> > index 05161afd7642..495f6ac53801 100644
+> > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > @@ -2360,9 +2360,6 @@
+> >                       the KVM_CLEAR_DIRTY ioctl, and only for the pages being
+> >                       cleared.
+> >
+> > -                     Eager page splitting currently only supports splitting
+> > -                     huge pages mapped by the TDP MMU.
+> > -
+> >                       Default is Y (on).
+> >
+> >       kvm.enable_vmware_backdoor=[KVM] Support VMware backdoor PV interface.
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 926ddfaa9e1a..dd56b5b9624f 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -727,6 +727,11 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+> >
+> >  static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_mmu_memory_cache *cache)
+> >  {
+> > +     static const gfp_t gfp_nocache = GFP_ATOMIC | __GFP_ACCOUNT | __GFP_ZERO;
+> > +
+> > +     if (WARN_ON_ONCE(!cache))
+> > +             return kmem_cache_alloc(pte_list_desc_cache, gfp_nocache);
+> > +
+>
+> I also think this is not proper to be added into this patch.  Maybe it'll
+> be more suitable for the rmap_add() rework patch previously, or maybe it
+> can be dropped directly if it should never trigger at all. Then we die hard
+> at below when referencing it.
+>
+> >       return kvm_mmu_memory_cache_alloc(cache);
+> >  }
+> >
+> > @@ -743,6 +748,28 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+> >       return sp->gfn + (index << ((sp->role.level - 1) * PT64_LEVEL_BITS));
+> >  }
+> >
+> > +static gfn_t sptep_to_gfn(u64 *sptep)
+> > +{
+> > +     struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+> > +
+> > +     return kvm_mmu_page_get_gfn(sp, sptep - sp->spt);
+> > +}
+> > +
+> > +static unsigned int kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
+> > +{
+> > +     if (!sp->role.direct)
+> > +             return sp->shadowed_translation[index].access;
+> > +
+> > +     return sp->role.access;
+> > +}
+> > +
+> > +static unsigned int sptep_to_access(u64 *sptep)
+> > +{
+> > +     struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+> > +
+> > +     return kvm_mmu_page_get_access(sp, sptep - sp->spt);
+> > +}
+> > +
+> >  static void kvm_mmu_page_set_gfn_access(struct kvm_mmu_page *sp, int index,
+> >                                       gfn_t gfn, u32 access)
+> >  {
+> > @@ -912,6 +939,9 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
+> >       return count;
+> >  }
+> >
+> > +static struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
+> > +                                      const struct kvm_memory_slot *slot);
+> > +
+> >  static void
+> >  pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
+> >                          struct pte_list_desc *desc, int i,
+> > @@ -2125,6 +2155,23 @@ static struct kvm_mmu_page *__kvm_mmu_find_shadow_page(struct kvm *kvm,
+> >       return sp;
+> >  }
+> >
+> > +static struct kvm_mmu_page *kvm_mmu_find_direct_sp(struct kvm *kvm, gfn_t gfn,
+> > +                                                union kvm_mmu_page_role role)
+> > +{
+> > +     struct kvm_mmu_page *sp;
+> > +     LIST_HEAD(invalid_list);
+> > +
+> > +     BUG_ON(!role.direct);
+> > +
+> > +     sp = __kvm_mmu_find_shadow_page(kvm, gfn, role, &invalid_list);
+> > +
+> > +     /* Direct SPs are never unsync. */
+> > +     WARN_ON_ONCE(sp && sp->unsync);
+> > +
+> > +     kvm_mmu_commit_zap_page(kvm, &invalid_list);
+> > +     return sp;
+> > +}
+> > +
+> >  /*
+> >   * Looks up an existing SP for the given gfn and role if one exists. The
+> >   * return SP is guaranteed to be synced.
+> > @@ -6063,12 +6110,266 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+> >               kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
+> >  }
+> >
+> > +static int prepare_to_split_huge_page(struct kvm *kvm,
+> > +                                   const struct kvm_memory_slot *slot,
+> > +                                   u64 *huge_sptep,
+> > +                                   struct kvm_mmu_page **spp,
+> > +                                   bool *flush,
+> > +                                   bool *dropped_lock)
+> > +{
+> > +     int r = 0;
+> > +
+> > +     *dropped_lock = false;
+> > +
+> > +     if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES)
+> > +             return -ENOSPC;
+> > +
+> > +     if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
+> > +             goto drop_lock;
+> > +
+>
+> Not immediately clear on whether there'll be case that *spp is set within
+> the current function.  Some sanity check might be nice?
+>
+> > +     *spp = kvm_mmu_alloc_direct_sp_for_split(true);
+> > +     if (r)
+> > +             goto drop_lock;
+> > +
+> > +     return 0;
+> > +
+> > +drop_lock:
+> > +     if (*flush)
+> > +             kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+> > +
+> > +     *flush = false;
+> > +     *dropped_lock = true;
+> > +
+> > +     write_unlock(&kvm->mmu_lock);
+> > +     cond_resched();
+> > +     *spp = kvm_mmu_alloc_direct_sp_for_split(false);
+> > +     if (!*spp)
+> > +             r = -ENOMEM;
+> > +     write_lock(&kvm->mmu_lock);
+> > +
+> > +     return r;
+> > +}
+> > +
+> > +static struct kvm_mmu_page *kvm_mmu_get_sp_for_split(struct kvm *kvm,
+> > +                                                  const struct kvm_memory_slot *slot,
+> > +                                                  u64 *huge_sptep,
+> > +                                                  struct kvm_mmu_page **spp)
+> > +{
+> > +     struct kvm_mmu_page *split_sp;
+> > +     union kvm_mmu_page_role role;
+> > +     unsigned int access;
+> > +     gfn_t gfn;
+> > +
+> > +     gfn = sptep_to_gfn(huge_sptep);
+> > +     access = sptep_to_access(huge_sptep);
+> > +
+> > +     /*
+> > +      * Huge page splitting always uses direct shadow pages since we are
+> > +      * directly mapping the huge page GFN region with smaller pages.
+> > +      */
+> > +     role = kvm_mmu_child_role(huge_sptep, true, access);
+> > +     split_sp = kvm_mmu_find_direct_sp(kvm, gfn, role);
+> > +
+> > +     /*
+> > +      * Opt not to split if the lower-level SP already exists. This requires
+> > +      * more complex handling as the SP may be already partially filled in
+> > +      * and may need extra pte_list_desc structs to update parent_ptes.
+> > +      */
+> > +     if (split_sp)
+> > +             return NULL;
+>
+> This smells tricky..
+>
+> Firstly we're trying to lookup the existing SPs that has shadowed this huge
+> page in split way, with the access bits fetched from the shadow cache (so
+> without hugepage nx effect).  However could the pages be mapped with
+> different permissions from the currently hugely mapped page?
+>
+> IIUC all these is for the fact that we can't allocate pte_list_desc and we
+> want to make sure we won't make the pte list to be >1.
+>
+> But I also see that the pte_list check below...
+>
+> > +
+> > +     swap(split_sp, *spp);
+> > +     init_shadow_page(kvm, split_sp, slot, gfn, role);
+> > +     trace_kvm_mmu_get_page(split_sp, true);
+> > +
+> > +     return split_sp;
+> > +}
+> > +
+> > +static int kvm_mmu_split_huge_page(struct kvm *kvm,
+> > +                                const struct kvm_memory_slot *slot,
+> > +                                u64 *huge_sptep, struct kvm_mmu_page **spp,
+> > +                                bool *flush)
+> > +
+> > +{
+> > +     struct kvm_mmu_page *split_sp;
+> > +     u64 huge_spte, split_spte;
+> > +     int split_level, index;
+> > +     unsigned int access;
+> > +     u64 *split_sptep;
+> > +     gfn_t split_gfn;
+> > +
+> > +     split_sp = kvm_mmu_get_sp_for_split(kvm, slot, huge_sptep, spp);
+> > +     if (!split_sp)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     /*
+> > +      * Since we did not allocate pte_list_desc_structs for the split, we
+> > +      * cannot add a new parent SPTE to parent_ptes. This should never happen
+> > +      * in practice though since this is a fresh SP.
+> > +      *
+> > +      * Note, this makes it safe to pass NULL to __link_shadow_page() below.
+> > +      */
+> > +     if (WARN_ON_ONCE(split_sp->parent_ptes.val))
+> > +             return -EINVAL;
+> > +
+> > +     huge_spte = READ_ONCE(*huge_sptep);
+> > +
+> > +     split_level = split_sp->role.level;
+> > +     access = split_sp->role.access;
+> > +
+> > +     for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
+> > +             split_sptep = &split_sp->spt[index];
+> > +             split_gfn = kvm_mmu_page_get_gfn(split_sp, index);
+> > +
+> > +             BUG_ON(is_shadow_present_pte(*split_sptep));
+> > +
+> > +             /*
+> > +              * Since we did not allocate pte_list_desc structs for the
+> > +              * split, we can't add a new SPTE that maps this GFN.
+> > +              * Skipping this SPTE means we're only partially mapping the
+> > +              * huge page, which means we'll need to flush TLBs before
+> > +              * dropping the MMU lock.
+> > +              *
+> > +              * Note, this make it safe to pass NULL to __rmap_add() below.
+> > +              */
+> > +             if (gfn_to_rmap(split_gfn, split_level, slot)->val) {
+> > +                     *flush = true;
+> > +                     continue;
+> > +             }
+>
+> ... here.
+>
+> IIUC this check should already be able to cover all the cases and it's
+> accurate on the fact that we don't want to grow any rmap to >1 len.
+>
+> > +
+> > +             split_spte = make_huge_page_split_spte(
+> > +                             huge_spte, split_level + 1, index, access);
+> > +
+> > +             mmu_spte_set(split_sptep, split_spte);
+> > +             __rmap_add(kvm, NULL, slot, split_sptep, split_gfn, access);
+>
+> __rmap_add() with a NULL cache pointer is weird.. same as
+> __link_shadow_page() below.
+>
+> I'll stop here for now I guess.. Have you considered having rmap allocation
+> ready altogether, rather than making this intermediate step but only add
+> that later?  Because all these look hackish to me..  It's also possible
+> that I missed something important, if so please shoot.
 
-By default, two vCPUs are started and the following ioctl commands
-or hypercalls are sent to them in sequence, to simulate how they
-are used in VMM and the linux guest:
+I'd be happy to do it that way. The reasons I broke it up into the
+intermediate steps are:
+ - At Google we only support up to including this patch. We don't
+handle the cases where the rmap or parent_ptes list need to grow.
+ - It seemed like a good way to break up the support into smaller
+patches. But I think this backfired since the intermediate steps
+introduce their own complexity such as passing in NULL to
+__rmap_add().
 
-   kvm_check_cap(KVM_CAP_ARM_SDEI)
-   KVM_SDEI_CMD_GET_VERSION
-   KVM_SDEI_CMD_SET_EXPOSED_EVENT      (expose event)
-
-   SDEI_1_0_FN_SDEI_VERSION
-   SDEI_1_1_FN_SDEI_FEATURES           (SDEI capability probing)
-   SDEI_1_0_FN_SDEI_SHARED_RESET       (restart SDEI)
-   SDEI_1_0_FN_SDEI_PE_UNMASK          (CPU online)
-
-   SDEI_1_0_FN_SDEI_EVENT_GET_INFO
-   SDEI_1_0_FN_SDEI_EVENT_REGISTER     (register event)
-   SDEI_1_0_FN_SDEI_EVENT_ENABLE       (enable event)
-   SDEI_1_1_FN_SDEI_EVENT_SIGNAL       (event injection)
-
-   SDEI_1_0_FN_SDEI_EVENT_DISABLE      (disable event)
-   SDEI_1_0_FN_SDEI_EVENT_UNREGISTER   (unregister event)
-   SDEI_1_0_FN_SDEI_PE_MASK            (CPU offline)
-
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- tools/testing/selftests/kvm/Makefile       |   1 +
- tools/testing/selftests/kvm/aarch64/sdei.c | 525 +++++++++++++++++++++
- 2 files changed, 526 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/sdei.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 17c3f0749f05..4e4c03cc316b 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -105,6 +105,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
- TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
-+TEST_GEN_PROGS_aarch64 += aarch64/sdei
- TEST_GEN_PROGS_aarch64 += demand_paging_test
- TEST_GEN_PROGS_aarch64 += dirty_log_test
- TEST_GEN_PROGS_aarch64 += dirty_log_perf_test
-diff --git a/tools/testing/selftests/kvm/aarch64/sdei.c b/tools/testing/selftests/kvm/aarch64/sdei.c
-new file mode 100644
-index 000000000000..2a7d816ce438
---- /dev/null
-+++ b/tools/testing/selftests/kvm/aarch64/sdei.c
-@@ -0,0 +1,525 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * ARM SDEI test
-+ *
-+ * Copyright (C) 2022 Red Hat, Inc.
-+ *
-+ * Author(s): Gavin Shan <gshan@redhat.com>
-+ */
-+
-+#define _GNU_SOURCE
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <string.h>
-+#include <pthread.h>
-+#include <linux/bitmap.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "linux/arm_sdei.h"
-+#include "asm/kvm_sdei_state.h"
-+
-+#define NR_VCPUS	2
-+#define SDEI_EVENT_NUM	KVM_SDEI_DEFAULT_EVENT
-+
-+#define VCPU_COMMAND_IDLE		0
-+#define VCPU_COMMAND_EXIT		1
-+
-+struct vcpu_command {
-+	const char	*name;
-+	uint64_t	command;
-+};
-+
-+struct sdei_feature {
-+	uint16_t	shared_slots;
-+	uint16_t	private_slots;
-+	uint8_t		relative_mode;
-+};
-+
-+struct sdei_event_info {
-+	uint8_t		type;
-+	uint8_t		priority;
-+	uint8_t		signaled;
-+};
-+
-+struct sdei_event_signal {
-+	uint8_t		handled;
-+	uint8_t		irq;
-+	uint64_t	status;
-+	uint64_t	pc;
-+	uint64_t	pstate;
-+	uint64_t	regs[18];
-+};
-+
-+struct sdei_state {
-+	uint64_t	command;
-+	uint64_t	num;
-+	uint64_t	status;
-+	union {
-+		uint64_t			version;
-+		struct sdei_feature		feature;
-+		struct sdei_event_info		info;
-+		struct sdei_event_signal	signal;
-+	};
-+
-+	uint8_t		command_completed;
-+};
-+
-+struct vcpu_state {
-+	struct kvm_vm		*vm;
-+	uint32_t		vcpu_id;
-+	pthread_t		thread;
-+	struct sdei_state	state;
-+};
-+
-+static struct vcpu_state vcpu_states[NR_VCPUS];
-+static struct vcpu_command vcpu_commands[] = {
-+	{ "VERSION",          SDEI_1_0_FN_SDEI_VERSION          },
-+	{ "FEATURES",         SDEI_1_1_FN_SDEI_FEATURES         },
-+	{ "PRIVATE_RESET",    SDEI_1_0_FN_SDEI_PRIVATE_RESET    },
-+	{ "SHARED_RESET",     SDEI_1_0_FN_SDEI_SHARED_RESET     },
-+	{ "PE_UNMASK",        SDEI_1_0_FN_SDEI_PE_UNMASK        },
-+	{ "EVENT_GET_INFO",   SDEI_1_0_FN_SDEI_EVENT_GET_INFO   },
-+	{ "EVENT_REGISTER",   SDEI_1_0_FN_SDEI_EVENT_REGISTER   },
-+	{ "EVENT_ENABLE",     SDEI_1_0_FN_SDEI_EVENT_ENABLE     },
-+	{ "EVENT_SIGNAL",     SDEI_1_1_FN_SDEI_EVENT_SIGNAL     },
-+	{ "PE_MASK",          SDEI_1_0_FN_SDEI_PE_MASK          },
-+	{ "EVENT_DISABLE",    SDEI_1_0_FN_SDEI_EVENT_DISABLE    },
-+	{ "EVENT_UNREGISTER", SDEI_1_0_FN_SDEI_EVENT_UNREGISTER },
-+};
-+
-+static inline int64_t smccc(uint32_t func, uint64_t arg0, uint64_t arg1,
-+			    uint64_t arg2, uint64_t arg3, uint64_t arg4)
-+{
-+	int64_t ret;
-+
-+	asm volatile (
-+		"mov    x0, %1\n"
-+		"mov    x1, %2\n"
-+		"mov    x2, %3\n"
-+		"mov    x3, %4\n"
-+		"mov    x4, %5\n"
-+		"mov    x5, %6\n"
-+		"hvc    #0\n"
-+		"mov    %0, x0\n"
-+	: "=r" (ret) : "r" (func), "r" (arg0), "r" (arg1),
-+	"r" (arg2), "r" (arg3), "r" (arg4) :
-+	"x0", "x1", "x2", "x3", "x4", "x5");
-+
-+	return ret;
-+}
-+
-+static inline bool is_error(int64_t status)
-+{
-+	if (status == SDEI_NOT_SUPPORTED      ||
-+	    status == SDEI_INVALID_PARAMETERS ||
-+	    status == SDEI_DENIED             ||
-+	    status == SDEI_PENDING            ||
-+	    status == SDEI_OUT_OF_RESOURCE)
-+		return true;
-+
-+	return false;
-+}
-+
-+static void guest_irq_handler(struct ex_regs *regs)
-+{
-+	int vcpu_id = guest_get_vcpuid();
-+	struct sdei_state *state = &vcpu_states[vcpu_id].state;
-+
-+	WRITE_ONCE(state->signal.irq, true);
-+}
-+
-+static void sdei_event_handler(uint64_t num, uint64_t arg,
-+			       uint64_t pc, uint64_t pstate)
-+{
-+	struct sdei_state *state = (struct sdei_state *)arg;
-+	uint64_t status;
-+
-+	status = smccc(SDEI_1_0_FN_SDEI_EVENT_STATUS, num, 0, 0, 0, 0);
-+	WRITE_ONCE(state->signal.status, status);
-+
-+	WRITE_ONCE(state->signal.pc, pc);
-+	WRITE_ONCE(state->signal.pstate, pstate);
-+
-+	status = smccc(SDEI_1_0_FN_SDEI_EVENT_CONTEXT, 0, 0, 0, 0, 0);
-+	WRITE_ONCE(state->signal.regs[0], status);
-+	status = smccc(SDEI_1_0_FN_SDEI_EVENT_CONTEXT, 1, 0, 0, 0, 0);
-+	WRITE_ONCE(state->signal.regs[1], status);
-+	status = smccc(SDEI_1_0_FN_SDEI_EVENT_CONTEXT, 2, 0, 0, 0, 0);
-+	WRITE_ONCE(state->signal.regs[2], status);
-+	status = smccc(SDEI_1_0_FN_SDEI_EVENT_CONTEXT, 3, 0, 0, 0, 0);
-+	WRITE_ONCE(state->signal.regs[3], status);
-+
-+	WRITE_ONCE(state->signal.handled, true);
-+	smccc(SDEI_1_0_FN_SDEI_EVENT_COMPLETE_AND_RESUME,
-+	      num, 0, 0, 0, 0);
-+}
-+
-+static bool sdei_event_wait(struct sdei_state *state,
-+			    uint64_t timeout_in_seconds)
-+{
-+	uint64_t limit, count = 0;
-+
-+	limit = (timeout_in_seconds * 1000000) / 10;
-+
-+	while (1) {
-+		if (READ_ONCE(state->signal.handled))
-+			return true;
-+
-+		if (++count >= limit)
-+			return false;
-+
-+		/*
-+		 * We issues HVC calls here to ensure the injected
-+		 * event can be delivered in time.
-+		 */
-+		smccc(SDEI_1_0_FN_SDEI_EVENT_GET_INFO,
-+		      READ_ONCE(state->num), SDEI_EVENT_INFO_EV_TYPE,
-+		      0, 0, 0);
-+
-+		usleep(10);
-+	}
-+
-+	return false;
-+}
-+
-+static void guest_code(int vcpu_id)
-+{
-+	struct sdei_state *state;
-+	uint64_t command, last_command = -1UL, num, status;
-+
-+	state = &vcpu_states[vcpu_id].state;
-+
-+	while (1) {
-+		command = READ_ONCE(state->command);
-+		if (command == last_command)
-+			continue;
-+
-+		num = READ_ONCE(state->num);
-+		switch (command) {
-+		case VCPU_COMMAND_IDLE:
-+			WRITE_ONCE(state->status, SDEI_SUCCESS);
-+			break;
-+		case SDEI_1_0_FN_SDEI_VERSION:
-+			status = smccc(command, 0, 0, 0, 0, 0);
-+			WRITE_ONCE(state->status, status);
-+			if (is_error(status))
-+				break;
-+
-+			WRITE_ONCE(state->version, status);
-+			break;
-+		case SDEI_1_0_FN_SDEI_PRIVATE_RESET:
-+		case SDEI_1_0_FN_SDEI_SHARED_RESET:
-+		case SDEI_1_0_FN_SDEI_PE_UNMASK:
-+		case SDEI_1_0_FN_SDEI_PE_MASK:
-+			status = smccc(command, 0, 0, 0, 0, 0);
-+			WRITE_ONCE(state->status, status);
-+			break;
-+		case SDEI_1_1_FN_SDEI_FEATURES:
-+			status = smccc(command, 0, 0, 0, 0, 0);
-+			WRITE_ONCE(state->status, status);
-+			if (is_error(status))
-+				break;
-+
-+			WRITE_ONCE(state->feature.shared_slots,
-+				   (status & 0xffff0000) >> 16);
-+			WRITE_ONCE(state->feature.private_slots,
-+				   (status & 0x0000ffff));
-+			status = smccc(command, 1, 0, 0, 0, 0);
-+			WRITE_ONCE(state->status, status);
-+			if (is_error(status))
-+				break;
-+
-+			WRITE_ONCE(state->feature.relative_mode, status);
-+			break;
-+		case SDEI_1_0_FN_SDEI_EVENT_GET_INFO:
-+			status = smccc(command, num,
-+				       SDEI_EVENT_INFO_EV_TYPE, 0, 0, 0);
-+			WRITE_ONCE(state->status, status);
-+			if (is_error(status))
-+				break;
-+
-+			WRITE_ONCE(state->info.type, status);
-+			status = smccc(command, num,
-+				       SDEI_EVENT_INFO_EV_PRIORITY, 0, 0, 0);
-+			WRITE_ONCE(state->status, status);
-+			if (is_error(status))
-+				break;
-+
-+			WRITE_ONCE(state->info.priority, status);
-+			status = smccc(command, num,
-+				       SDEI_EVENT_INFO_EV_SIGNALED, 0, 0, 0);
-+			if (is_error(status))
-+				break;
-+
-+			WRITE_ONCE(state->info.signaled, status);
-+			break;
-+		case SDEI_1_0_FN_SDEI_EVENT_REGISTER:
-+			status = smccc(command, num,
-+				       (uint64_t)sdei_event_handler,
-+				       (uint64_t)state,
-+				       SDEI_EVENT_REGISTER_RM_ANY, 0);
-+			WRITE_ONCE(state->status, status);
-+			break;
-+		case SDEI_1_0_FN_SDEI_EVENT_ENABLE:
-+		case SDEI_1_0_FN_SDEI_EVENT_DISABLE:
-+		case SDEI_1_0_FN_SDEI_EVENT_UNREGISTER:
-+			status = smccc(command, num, 0, 0, 0, 0);
-+			WRITE_ONCE(state->status, status);
-+			break;
-+		case SDEI_1_1_FN_SDEI_EVENT_SIGNAL:
-+			status = smccc(command, num, (uint64_t)state, 0, 0, 0);
-+			WRITE_ONCE(state->status, status);
-+			if (is_error(status))
-+				break;
-+
-+			if (!sdei_event_wait(state, 5))
-+				WRITE_ONCE(state->status, SDEI_DENIED);
-+
-+			break;
-+		case VCPU_COMMAND_EXIT:
-+			WRITE_ONCE(state->status, SDEI_SUCCESS);
-+			GUEST_DONE();
-+			break;
-+		default:
-+			WRITE_ONCE(state->status, SDEI_INVALID_PARAMETERS);
-+		}
-+
-+		last_command = command;
-+		WRITE_ONCE(state->command_completed, true);
-+	}
-+}
-+
-+static void *vcpu_thread(void *arg)
-+{
-+	struct vcpu_state *state = arg;
-+
-+	vcpu_run(state->vm, state->vcpu_id);
-+
-+	return NULL;
-+}
-+
-+static bool vcpu_wait(struct kvm_vm *vm, int timeout_in_seconds)
-+{
-+	unsigned long count, limit;
-+	int i;
-+
-+	count = 0;
-+	limit = (timeout_in_seconds * 1000000) / 50;
-+	while (1) {
-+		for (i = 0; i < NR_VCPUS; i++) {
-+			sync_global_from_guest(vm, vcpu_states[i].state);
-+			if (!vcpu_states[i].state.command_completed)
-+				break;
-+		}
-+
-+		if (i >= NR_VCPUS)
-+			return true;
-+
-+		if (++count > limit)
-+			return false;
-+
-+		usleep(50);
-+	}
-+
-+	return false;
-+}
-+
-+static void vcpu_send_command(struct kvm_vm *vm, uint64_t command)
-+{
-+	int i;
-+
-+	for (i = 0; i < NR_VCPUS; i++) {
-+		memset(&vcpu_states[i].state, 0,
-+		       sizeof(vcpu_states[0].state));
-+		vcpu_states[i].state.num = SDEI_EVENT_NUM;
-+		vcpu_states[i].state.status = SDEI_SUCCESS;
-+		vcpu_states[i].state.command = command;
-+		vcpu_states[i].state.command_completed = false;
-+
-+		sync_global_to_guest(vm, vcpu_states[i].state);
-+	}
-+}
-+
-+static bool vcpu_check_state(struct kvm_vm *vm)
-+{
-+	int i, j, ret;
-+
-+	for (i = 0; i < NR_VCPUS; i++)
-+		sync_global_from_guest(vm, vcpu_states[i].state);
-+
-+	for (i = 0; i < NR_VCPUS; i++) {
-+		if (is_error(vcpu_states[i].state.status))
-+			return false;
-+
-+		for (j = 0; j < NR_VCPUS; j++) {
-+			ret = memcmp(&vcpu_states[i].state,
-+				     &vcpu_states[j].state,
-+				     sizeof(vcpu_states[0].state));
-+			if (ret)
-+				return false;
-+		}
-+	}
-+
-+	return true;
-+}
-+
-+static void vcpu_dump_state(int index)
-+{
-+	struct sdei_state *state = &vcpu_states[0].state;
-+
-+	pr_info("--- %s\n", vcpu_commands[index].name);
-+	switch (state->command) {
-+	case SDEI_1_0_FN_SDEI_VERSION:
-+		pr_info("    Version:              %ld.%ld (vendor: 0x%lx)\n",
-+			SDEI_VERSION_MAJOR(state->version),
-+			SDEI_VERSION_MINOR(state->version),
-+			SDEI_VERSION_VENDOR(state->version));
-+		break;
-+	case SDEI_1_1_FN_SDEI_FEATURES:
-+		pr_info("    Shared event slots:   %d\n",
-+			state->feature.shared_slots);
-+		pr_info("    Private event slots:  %d\n",
-+			state->feature.private_slots);
-+		pr_info("    Relative mode:        %s\n",
-+			state->feature.relative_mode ? "Yes" : "No");
-+			break;
-+	case SDEI_1_0_FN_SDEI_EVENT_GET_INFO:
-+		pr_info("    Type:                 %s\n",
-+			state->info.type == SDEI_EVENT_TYPE_SHARED ?
-+			"Shared" : "Private");
-+		pr_info("    Priority:             %s\n",
-+			state->info.priority == SDEI_EVENT_PRIORITY_NORMAL ?
-+			"Normal" : "Critical");
-+		pr_info("    Signaled:             %s\n",
-+			state->info.signaled ? "Yes" : "No");
-+		break;
-+	case SDEI_1_1_FN_SDEI_EVENT_SIGNAL:
-+		pr_info("    Handled:              %s\n",
-+			state->signal.handled ? "Yes" : "No");
-+		pr_info("    IRQ:                  %s\n",
-+			state->signal.irq ? "Yes" : "No");
-+		pr_info("    Status:               %s-%s-%s\n",
-+			state->signal.status & (1 << SDEI_EVENT_STATUS_REGISTERED) ?
-+			"Registered" : "x",
-+			state->signal.status & (1 << SDEI_EVENT_STATUS_ENABLED) ?
-+			"Enabled" : "x",
-+			state->signal.status & (1 << SDEI_EVENT_STATUS_RUNNING) ?
-+			"Running" : "x");
-+		pr_info("    PC/PSTATE:            %016lx %016lx\n",
-+			state->signal.pc, state->signal.pstate);
-+		pr_info("    Regs:                 %016lx %016lx %016lx %016lx\n",
-+			state->signal.regs[0], state->signal.regs[1],
-+			state->signal.regs[2], state->signal.regs[3]);
-+		break;
-+	}
-+
-+	if (index == ARRAY_SIZE(vcpu_commands))
-+		pr_info("\n");
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_sdei_cmd cmd;
-+	struct kvm_sdei_exposed_event_state exposed_event;
-+	uint32_t vcpu_ids[NR_VCPUS];
-+	int i, ret;
-+
-+	if (!kvm_check_cap(KVM_CAP_ARM_SDEI)) {
-+		pr_info("SDEI not supported\n");
-+		return 0;
-+	}
-+
-+	/* Create VM */
-+	for (i = 0; i < NR_VCPUS; i++) {
-+		vcpu_states[i].vcpu_id = i;
-+		vcpu_ids[i] = i;
-+	}
-+
-+	vm = vm_create_default_with_vcpus(NR_VCPUS, 0, 0,
-+					  guest_code, vcpu_ids);
-+	vm_init_descriptor_tables(vm);
-+	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT,
-+				     guest_irq_handler);
-+
-+	ucall_init(vm, NULL);
-+
-+	/* Ensure the version is v1.0.0 */
-+	cmd.cmd = KVM_SDEI_CMD_GET_VERSION;
-+	cmd.version = 0;
-+	vm_ioctl(vm, KVM_ARM_SDEI_COMMAND, &cmd);
-+	if (cmd.version != 0x10000) {
-+		pr_info("v%d.%d.%d doesn't match with v1.0.0\n",
-+			(cmd.version & 0xFF0000) >> 16,
-+			(cmd.version & 0xFF00) >> 8,
-+			(cmd.version & 0xFF));
-+		return 0;
-+	}
-+
-+	/* Expose the default SDEI event */
-+	exposed_event.num = SDEI_EVENT_NUM;
-+	exposed_event.type = SDEI_EVENT_TYPE_PRIVATE;
-+	exposed_event.priority = SDEI_EVENT_PRIORITY_NORMAL;
-+	exposed_event.signaled = 1;
-+	exposed_event.notifier = 0;
-+	cmd.cmd = KVM_SDEI_CMD_SET_EXPOSED_EVENT;
-+	cmd.count = 1;
-+	cmd.exposed_event_state = &exposed_event;
-+	vm_ioctl(vm, KVM_ARM_SDEI_COMMAND, &cmd);
-+
-+	/* Start the vCPUs */
-+	vcpu_send_command(vm, VCPU_COMMAND_IDLE);
-+	for (i = 0; i < NR_VCPUS; i++) {
-+		vcpu_states[i].vm = vm;
-+		vcpu_args_set(vm, i, 1, i);
-+		vcpu_init_descriptor_tables(vm, i);
-+
-+		ret = pthread_create(&vcpu_states[i].thread, NULL,
-+				     vcpu_thread, &vcpu_states[i]);
-+		TEST_ASSERT(!ret, "Failed to create vCPU-%d pthread\n", i);
-+	}
-+
-+	/* Wait the idle command to complete */
-+	ret = vcpu_wait(vm, 5);
-+	TEST_ASSERT(ret, "Timeout to execute IDLE command\n");
-+
-+	/* Start the tests */
-+	pr_info("\n");
-+	pr_info("    NR_VCPUS: %d    SDEI Event: 0x%08x\n\n",
-+		NR_VCPUS, SDEI_EVENT_NUM);
-+	for (i = 0; i < ARRAY_SIZE(vcpu_commands); i++) {
-+		/*
-+		 * We depends on SDEI_1_1_FN_SDEI_EVENT_SIGNAL hypercall
-+		 * to inject SDEI event. The number of the injected event
-+		 * must be zero. So we have to skip the corresponding test
-+		 * if the SDEI event number isn't zero.
-+		 */
-+		if (SDEI_EVENT_NUM != 0x0 &&
-+		    vcpu_commands[i].command == SDEI_1_1_FN_SDEI_EVENT_SIGNAL)
-+			continue;
-+
-+		vcpu_send_command(vm, vcpu_commands[i].command);
-+		ret = vcpu_wait(vm, 5);
-+		if (!ret) {
-+			pr_info("%s: Timeout\n", vcpu_commands[i].name);
-+			return -1;
-+		}
-+
-+		ret = vcpu_check_state(vm);
-+		if (!ret) {
-+			pr_info("%s: Fail\n", vcpu_commands[i].name);
-+			return -1;
-+		}
-+
-+		vcpu_dump_state(i);
-+	}
-+
-+	/* Terminate the guests */
-+	pr_info("\n    Result: OK\n\n");
-+	vcpu_send_command(vm, VCPU_COMMAND_EXIT);
-+	sleep(1);
-+
-+	return 0;
-+}
--- 
-2.23.0
-
+>
+> Thanks,
+>
+> > +     }
+> > +
+> > +     /*
+> > +      * Replace the huge spte with a pointer to the populated lower level
+> > +      * page table. Since we are making this change without a TLB flush vCPUs
+> > +      * will see a mix of the split mappings and the original huge mapping,
+> > +      * depending on what's currently in their TLB. This is fine from a
+> > +      * correctness standpoint since the translation will either be identical
+> > +      * or non-present. To account for non-present mappings, the TLB will be
+> > +      * flushed prior to dropping the MMU lock.
+> > +      */
+> > +     __drop_large_spte(kvm, huge_sptep, false);
+> > +     __link_shadow_page(NULL, huge_sptep, split_sp);
+> > +
+> > +     return 0;
+> > +}
+>
+> --
+> Peter Xu
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
