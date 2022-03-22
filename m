@@ -2,73 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A4BC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 22 Mar 2022 03:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A36BEC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 22 Mar 2022 04:42:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D6E449EEF;
-	Mon, 21 Mar 2022 23:30:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 00C8943479;
+	Tue, 22 Mar 2022 00:42:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3SfNSLYYv47c; Mon, 21 Mar 2022 23:30:57 -0400 (EDT)
+	with ESMTP id 1M59alQlKNE6; Tue, 22 Mar 2022 00:41:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62A7849EAA;
-	Mon, 21 Mar 2022 23:30:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA83C49ED8;
+	Tue, 22 Mar 2022 00:41:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8483349E44
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 23:30:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 455A949ED6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 00:41:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZKWG-oUHLF5q for <kvmarm@lists.cs.columbia.edu>;
- Mon, 21 Mar 2022 23:30:55 -0400 (EDT)
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com
- [209.85.216.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C7B240C10
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 23:30:55 -0400 (EDT)
-Received: by mail-pj1-f52.google.com with SMTP id gb19so14637048pjb.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 20:30:55 -0700 (PDT)
+ with ESMTP id Vo3orccUz0eO for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2022 00:41:56 -0400 (EDT)
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com
+ [209.85.216.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2895B43479
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 00:41:56 -0400 (EDT)
+Received: by mail-pj1-f45.google.com with SMTP id
+ mm17-20020a17090b359100b001c6da62a559so1385685pjb.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 21 Mar 2022 21:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vHhSiR4NEl9sHSjdl1ma5WrsausBMeT/k+B8si8EB+I=;
- b=EirvhGafGNcJ8JIzxwmt3w8wqVW7VQQCgNGmwsfNJyM5G8N8vnyIINJrANxjcZX1HU
- sxkz4TwWf2aaOud7nv7hMfVWj5QsqOBD0/QKS7Bx01STIjEpTASjIULsGMs32X6JRTN6
- 7ENoD/2JMxZgitgMpawhuyOFyPG9DaZ1bOgvIqHaM1XLABtR9hLHHw64+zNXKN+d9zot
- 27BOebUK+Ur+fzD42eaKjvU3Qi3/lD0sC/N1rqpY6xkd+Ei2ogb+2byLVW1R+8ilbWnw
- FUSgmLzro3VwVdExVS5FEh6vtyB47vCSU0aeUAwnCW1D+QgZNkfr06jS5o2Nr6rZUZYB
- 9X7w==
+ :cc; bh=I30fMtOFrftRRp+ZK8GvM5pRdzD/fkbHxTk7j1WjRNU=;
+ b=U6GwH72H5Gth87PY0906tE1wnf+Z+7E4ybKfeq6vtJry2Bs4Ml3VrJdPDd4aGlhpIe
+ 0wQbFHzDGdg5UIo+9SkGPfwd8fqzDsNgSuRtGbhHa+l5g49SGtFxrqI6Mfn+FTNPhCDF
+ JhrD1h2yojsa9gwk1D2N0r/r67BJIc6pymK4haewk8lHLOjD4CykZ+DunoelIQhkDeuT
+ eKxgoqRTSfF4Kse8e20k7BEq8XHvNbZQXBzogtYOGqBQpqlJGn0J5V/wVd70kb8YCh5v
+ 4l9dHMHSbX5qyH0wCY/4QUOYt1U1Tw6atyohBgT4r5dbpUdlsfReDzrGVLTJvaTQ5w8/
+ 4s2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=vHhSiR4NEl9sHSjdl1ma5WrsausBMeT/k+B8si8EB+I=;
- b=jY69u7ZszYBqHM8xs/omIq6uqbCPqymouRpM8rWOiX15ORpXH7mRwsbsTAvgn7OCYz
- EVdpDl6/w1C4feWaUbLoCfeMfUS7s21/SslHriZuGb+wdetHue4UJMOBDRbv4Vq338zm
- b4edaVDyffwdSlFv6Ajd12bgOiCKVHc5wNzMdTrd+PJ+QjwT/yR3XHiIaJQZMbpt253b
- ACX0VB4tUHG930ZQP4g1XCrcNhGymjEG55qKmi+ANW/hc2g1DjvoNvZMlBhTEnSXpkg6
- zZu9KoaOkJHDTmvub+5e2S+yHOEni+4S1q/l0zVZHgS3LXkOUONOVyGfrjmOVfmXDK/4
- +6MQ==
-X-Gm-Message-State: AOAM533NGPfIqEztlRN1TOVnSPua4puQ3CFP3d8Afif1SYRnhWZU+img
- doNlLes/qrgVH2xlCAnKNSfyj1TzA9mgf2Tg7C+iiA==
-X-Google-Smtp-Source: ABdhPJy3GzdAtZ9zwFJ0Bdk3Wa4NlT1lmI0Dn1dcyAmuw0V4DSomEvnW7tgxmmsnbKkUftURU6j5v/g3XrKaVml9LfE=
+ bh=I30fMtOFrftRRp+ZK8GvM5pRdzD/fkbHxTk7j1WjRNU=;
+ b=ZZZVuigr1Fioi5Y/vemNV+Gubkk69WFfBjQ3tBpWSxRMauVoqxZQlCBIOqSLDinNxr
+ UBeiztu5QQtcRLBAHXGr0kzCMClv689PrBPdsQGwGmJCC6T3kOs33xRvWy8cOAG2OvYp
+ xgdXuiUr+QAelKKgWB4YDU/Fwiz4lbB3XNuMqld5KWa5k5HBeh02qAw9PXgMXbsmd30F
+ ykflbFzr4KDbdvDze8DjQOO4OWS7qL3AXELXwfTvgKx5IJw977QQ4QmgqL8VHNC4CNdt
+ IAPwOfZNUMIBGjS6sbi6SguOqggwcGC1NmCFnRz25aXofc4OK8mzRKMtcHMnyNL6Pt+d
+ XZwQ==
+X-Gm-Message-State: AOAM532YgjusC47/IYOvP8uwa7HoSgnJsqbEmSog3HU+l0DM3KAQmghI
+ NUIwE1GPlnd5OaXczLbj6oV+oHk+8aOd4JJphDFSYg==
+X-Google-Smtp-Source: ABdhPJyGjOgv68/pB4ZQ6ie/RkmNrofIEy9Np05CrErKIjvd8UHlcfRLPU14yC2Z5KMc1SrLQK+oaTiM1zXYrATE5Ec=
 X-Received: by 2002:a17:90b:1a8a:b0:1c5:f707:93a6 with SMTP id
- ng10-20020a17090b1a8a00b001c5f70793a6mr2565266pjb.110.1647919854371; Mon, 21
- Mar 2022 20:30:54 -0700 (PDT)
+ ng10-20020a17090b1a8a00b001c5f70793a6mr2804463pjb.110.1647924115093; Mon, 21
+ Mar 2022 21:41:55 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220321050804.2701035-1-reijiw@google.com>
- <20220321050804.2701035-3-reijiw@google.com>
- <YjgYh89k8s+w34FQ@google.com>
-In-Reply-To: <YjgYh89k8s+w34FQ@google.com>
+References: <20220318193831.482349-1-oupton@google.com>
+ <20220318193831.482349-3-oupton@google.com>
+In-Reply-To: <20220318193831.482349-3-oupton@google.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 21 Mar 2022 20:30:38 -0700
-Message-ID: <CAAeT=Fyju6Pi4XAxJnTJ20PPJj1wVF_fPLWMFvx5D0H7UovETg@mail.gmail.com>
-Subject: Re: [PATCH v5 2/2] KVM: arm64: selftests: Introduce vcpu_width_config
-To: Oliver Upton <oupton@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+Date: Mon, 21 Mar 2022 21:41:39 -0700
+Message-ID: <CAAeT=FwR-=U_0WvKqV4UTCmo8x1=atBVtTQeirwiF3XCo+S=1g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from
+ AArch32
+To: Oliver Upton <oupton@google.com>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -86,31 +87,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
+On 3/18/22 12:38 PM, Oliver Upton wrote:
+> The SMCCC does not allow the SMC64 calling convention to be used from
+> AArch32. While KVM checks to see if the calling convention is allowed in
+> PSCI_1_0_FN_PSCI_FEATURES, it does not actually prevent calls to
+> unadvertised PSCI v1.0+ functions.
+>
+> Check to see if the requested function is allowed from the guest's
+> execution state. Deny the call if it is not.
+>
+> Fixes: d43583b890e7 ("KVM: arm64: Expose PSCI SYSTEM_RESET2 call to the guest")
+> Cc: Will Deacon <will@kernel.org>
+> Signed-off-by: Oliver Upton <oupton@google.com>
 
-On Sun, Mar 20, 2022 at 11:17 PM Oliver Upton <oupton@google.com> wrote:
->
-> Hi Reiji,
->
-> On Sun, Mar 20, 2022 at 10:08:04PM -0700, Reiji Watanabe wrote:
-> > Introduce a test for aarch64 that ensures non-mixed-width vCPUs
-> > (all 64bit vCPUs or all 32bit vcPUs) can be configured, and
-> > mixed-width vCPUs cannot be configured.
-> >
-> > Reviewed-by: Andrew Jones <drjones@redhat.com>
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
->
-> Tiny nits, but looks fine to me. Only bother addressing if you do
-> another spin, otherwise:
->
-> Reviewed-by: Oliver Upton <oupton@google.com>
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
-Thank you for the review!
-Since I would like to fix one of your comments (the typo) at least,
-I will respin the series (and will address all the comments).
+BTW, considering the new kvm_psci_check_allowed_function()implementation
+in the patch-1, it might be better to call kvm_psci_check_allowed_function()
+from kvm_psci_call() instead?  Then, we could avoid the similar issue
+next time we support a newer PSCI version.
 
 Thanks,
 Reiji
+
+
+> ---
+>   arch/arm64/kvm/psci.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> index cd3ee947485f..0d771468b708 100644
+> --- a/arch/arm64/kvm/psci.c
+> +++ b/arch/arm64/kvm/psci.c
+> @@ -318,6 +318,10 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+>       if (minor > 1)
+>               return -EINVAL;
+>
+> +     val = kvm_psci_check_allowed_function(vcpu, psci_fn);
+> +     if (val)
+> +             goto out;
+> +
+>       switch(psci_fn) {
+>       case PSCI_0_2_FN_PSCI_VERSION:
+>               val = minor == 0 ? KVM_ARM_PSCI_1_0 : KVM_ARM_PSCI_1_1;
+> @@ -378,6 +382,7 @@ static int kvm_psci_1_x_call(struct kvm_vcpu *vcpu, u32 minor)
+>               return kvm_psci_0_2_call(vcpu);
+>       }
+>
+> +out:
+>       smccc_set_retval(vcpu, val, 0, 0, 0);
+>       return ret;
+>   }
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
