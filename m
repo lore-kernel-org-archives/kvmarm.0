@@ -2,69 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09772C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 09:57:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 327B4C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 09:57:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B7BB04A0FE;
-	Wed, 23 Mar 2022 05:57:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E340349F04;
+	Wed, 23 Mar 2022 05:57:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bwa1vAM1yiPS; Wed, 23 Mar 2022 05:57:20 -0400 (EDT)
+	with ESMTP id wRZULhSkzKjF; Wed, 23 Mar 2022 05:57:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BFC24B08E;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 436594B091;
 	Wed, 23 Mar 2022 05:57:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 33AEB49F19
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 18:30:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C38F8405AA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 18:33:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wXeb6rjqcPfI for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2022 18:30:42 -0400 (EDT)
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com
- [209.85.208.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C91849EE1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 18:30:41 -0400 (EDT)
-Received: by mail-lj1-f179.google.com with SMTP id h11so25920065ljb.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 15:30:41 -0700 (PDT)
+ with ESMTP id R0enuqu3EZxu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2022 18:33:47 -0400 (EDT)
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com
+ [209.85.208.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A1C2E4012A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 18:33:47 -0400 (EDT)
+Received: by mail-lj1-f169.google.com with SMTP id r22so25922484ljd.4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 15:33:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6C0VjdCibQefdFArpO2DUnsXQA3a5kOhFYGWARoK0ng=;
- b=MtxBqgU4fKDJGR32yDNgrmZJHVZ9bb2nYLZL1tpRrFZwetiJIn2bt+LK4GS5a9FE5z
- VSPQClN4wmv6t2ZS3+SThHgq+PTzoGZq9WwphTds4WaaDJdV9wLjRQpgZHXFo04LFK45
- DbaKwmn1MdC1W7oub9gJLVmt5D8P4MEz1fP9/LgQ/6jSqje2aE9tMYh2pUN8eBLuP7qB
- udL4gP5YkOBOuV/Q88HWPp0T5BcfMPOLoR6L4dUQPfvZn57wp9e+uFder/QNBPdTndt+
- VeiKQCAW7TVguWPR+wPjehqbqxcuqPr3qQWGhkmcTKwqPIpCQL2ZKGEShVUUNvzQVTAa
- ri3w==
+ :cc; bh=S07AH0WG+avsPfFFCXY8ruiMhMyQ+txMHAKVZKwWZ2A=;
+ b=Ng0nwZCHfZEOXPG+X8Pkkd1bBwYRJci6byKPVfO8KwVkFPEmh4d6JEu5kno4ppdDfb
+ 1RQSt98sr3n340+L4uIAp5gai8+EKW8VSgLRq3Dh0UnGflkTkuZ2sZc47297Pho+UquI
+ kXDnPv+NeMCyPS0UhLu8H5+rWGv5jergWXzAgvq9C4KnJIY5Nc0yRUGQHGoJuSbQnUUe
+ v/xhLLAGJhkGOVEar3pyS9crtf+PN7vJkCqTXvtyLTXVaVAe9Mmj+aVrqLsszya2DOva
+ 9mbVAhG8k75adaPiEGB198YWR+wIZIt/EDNNOdGBCY6odjFtePaKWLY/j2kg5fDdiOPR
+ 99Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=6C0VjdCibQefdFArpO2DUnsXQA3a5kOhFYGWARoK0ng=;
- b=YvPLo5fAqzMa192esbx5kLta6jScN34ZrVvLggUXKb2rkj23DHBMHmPMawCXFS+ObD
- hJrcRSnb+ZCjeIbGMg20KBmoR3vRfdU8GWBjRzfm93Tqjd5SgujnNaL9mEeuRdygZ253
- G1M/D4PvaJmdeGYhkOzDzqUYQ/U1mY3uGC9j+QcBfnsS6jQ+0hwf2mzo1sCjmgVn3a9e
- +93KlvN9Q/x+dr4uGSs4TmXKeCfq2QCKyZQLLg0OysQiSmbGRgZSX481kskfor4+pNz5
- LIXahHGWRiyQtUy7mY28/zKjMb26PWDJJKaAQ7nihnrGofRjQel2BOoxpFFuevyeId27
- pDTw==
-X-Gm-Message-State: AOAM5323qLnsgOLm1v/DTtX6iIQU+8zjEe4tMd9zWHW0bjn5dFcX0B7q
- q+M3XHlqjEfDtvKONqC5Y5vr7yuuUAAaEWLssJUGlQ==
-X-Google-Smtp-Source: ABdhPJzVn7Ue1RCjw9fF5Wh1a2QmXc4MY9QvN0TqD0+X9MMkibqMAaH0yMU5CoBRsExNt7Oq9j3MqODGm4HDDa8jxEw=
+ bh=S07AH0WG+avsPfFFCXY8ruiMhMyQ+txMHAKVZKwWZ2A=;
+ b=Z31Fjlm85t6VmcFXquncsCwSYeIE7rNofuaTnPmxy1Et7N5ShTG2d3xTCigh6vfQhv
+ ZX66v4PulhkduZDWCiPIA2cKl9tYjqKNcPwunbb/avXD9BRJKmf+B2HX27YXaJGowbmi
+ BIXyK2kxAQEyIIMBC0xf5enOzaABU1e2aVVfmX1x0w5qqC25CQbDUJpoxNvh7SMOc0EG
+ wO8XAusgymRgFqRGjrEGs5LY78NU+Nw+k9aJna2KWV48ZY8VlBwy0aVOcDnXcADJsCG4
+ BjIbOq0ntFr4V0Oc98spkK00wA5JGeuQuIjSL88HpNYvCkgwwArIiMNZTZ6De5t4ApPg
+ docA==
+X-Gm-Message-State: AOAM532vFz440Q2DGBLfyV64SIzpCNDsAp3Yln/6Opm4Kv1DSgVUocAv
+ RiKQAOsCyTcyME99kNIczF2uyg9Y5ob6+KaKbQbjJA==
+X-Google-Smtp-Source: ABdhPJworeA778z1gBXZTTzxjh4xsrDQFhXkFHaqJJL/0AKV8N60E1I4tQX6QbLoILy+wNmtvlVaubKG+aPV7dB41VU=
 X-Received: by 2002:a2e:9119:0:b0:247:e306:1379 with SMTP id
- m25-20020a2e9119000000b00247e3061379mr20387823ljg.361.1647988240437; Tue, 22
- Mar 2022 15:30:40 -0700 (PDT)
+ m25-20020a2e9119000000b00247e3061379mr20396060ljg.361.1647988425050; Tue, 22
+ Mar 2022 15:33:45 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-9-dmatlack@google.com>
- <YjBkm8mYKNc5sdpU@xz-m1.local>
-In-Reply-To: <YjBkm8mYKNc5sdpU@xz-m1.local>
+ <20220311002528.2230172-11-dmatlack@google.com>
+ <YjBo9iuSBm1hbqXz@xz-m1.local>
+In-Reply-To: <YjBo9iuSBm1hbqXz@xz-m1.local>
 From: David Matlack <dmatlack@google.com>
-Date: Tue, 22 Mar 2022 15:30:14 -0700
-Message-ID: <CALzav=d82wAqcLQdGOfS7r95SSG3g=yKcY1hRc3fziZfNSHpzg@mail.gmail.com>
-Subject: Re: [PATCH v2 08/26] KVM: x86/mmu: Link spt to sp during allocation
+Date: Tue, 22 Mar 2022 15:33:18 -0700
+Message-ID: <CALzav=fPeXcKbrdguPKBt13awjPt3+3AB_2hBWo_M9U9sKinWw@mail.gmail.com>
+Subject: Re: [PATCH v2 10/26] KVM: x86/mmu: Use common code to free
+ kvm_mmu_page structs
 To: Peter Xu <peterx@redhat.com>
 X-Mailman-Approved-At: Wed, 23 Mar 2022 05:57:13 -0400
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
@@ -96,57 +97,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 15, 2022 at 3:04 AM Peter Xu <peterx@redhat.com> wrote:
+On Tue, Mar 15, 2022 at 3:23 AM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Fri, Mar 11, 2022 at 12:25:10AM +0000, David Matlack wrote:
-> > Link the shadow page table to the sp (via set_page_private()) during
-> > allocation rather than initialization. This is a more logical place to
-> > do it because allocation time is also where we do the reverse link
-> > (setting sp->spt).
-> >
-> > This creates one extra call to set_page_private(), but having multiple
-> > calls to set_page_private() is unavoidable anyway. We either do
-> > set_page_private() during allocation, which requires 1 per allocation
-> > function, or we do it during initialization, which requires 1 per
-> > initialization function.
-> >
-> > No functional change intended.
-> >
-> > Suggested-by: Ben Gardon <bgardon@google.com>
-> > Signed-off-by: David Matlack <dmatlack@google.com>
+> On Fri, Mar 11, 2022 at 12:25:12AM +0000, David Matlack wrote:
+> >  static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
+> >  {
+> > -     free_page((unsigned long)sp->spt);
+> > -     kmem_cache_free(mmu_page_header_cache, sp);
+> > +     kvm_mmu_free_shadow_page(sp);
+> >  }
 >
-> Ah I should have read one more patch before commenting in previous one..
->
-> Personally I (a little bit) like the other way around, since if with this
-> in mind ideally we should also keep the use_mmu_page accounting in
-> allocation helper:
->
->   kvm_mod_used_mmu_pages(vcpu->kvm, 1);
+> Perhaps tdp_mmu_free_sp() can be dropped altogether with this?
 
-The TDP MMU doesn't call kvm_mod_used_mmu_pages() when it allocates
-SPs. So that would prevent sharing kvm_mmu_alloc_shadow_page() with
-the TDP MMU in patch 11.
-
-Ben pointed out that we link the the page to sp->spt during
-allocation, so it makes sense to do the reverse link at the same time.
-Also, the set_page_private() call is common between the TDP MMU and
-shadow MMU, so it makes sense to do it in the SP allocation code since
-the allocation functions are shared between the two MMUs.
-
-
-
-
+It certainly can but I prefer to keep it for 2 reasons:
+ - Smaller diff.
+ - It mirrors tdp_mmu_alloc_sp(), which I prefer to keep as well but
+I'll explain that in the next patch.
 
 >
-> But then we dup yet another line to all elsewheres as long as sp allocated.
->
-> IOW, in my opinion the helpers should service 1st on code deduplications
-> rather than else.  No strong opinion though..
-
-
-
->
-> Thanks,
+> Reviewed-by: Peter Xu <peterx@redhat.com>
 >
 > --
 > Peter Xu
