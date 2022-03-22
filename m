@@ -2,75 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D0AC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 09:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3980BC433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 09:57:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A8EA49E49;
-	Wed, 23 Mar 2022 05:26:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A96149F4E;
+	Wed, 23 Mar 2022 05:57:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Ni3ONUiVkaT2; Wed, 23 Mar 2022 05:26:12 -0400 (EDT)
+	with ESMTP id GbqmiXTXf9nl; Wed, 23 Mar 2022 05:57:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23AB449EF8;
-	Wed, 23 Mar 2022 05:26:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A3B49F58;
+	Wed, 23 Mar 2022 05:57:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2D5649EEF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 05:26:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F18DE49E37
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:17:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x-GwHS+jwKyF for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Mar 2022 05:26:09 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B37F749E49
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 05:26:09 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 82067617AC;
- Wed, 23 Mar 2022 09:26:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE8EEC340E8;
- Wed, 23 Mar 2022 09:26:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1648027567;
- bh=6o8eSL9XfXN3YyWF8WOf0UgeocTfb9Qxb/lKmNgQD3k=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=TFK9YzhcOSM+7+DW03OfGZ6iv4ZXu8m+2lyggptU4cD5cN+dAqP54VpzFohtjD2W3
- Jk8zJZaf7iP8YyfFpWU9jNzxFJsZHNOobxbqodw6pTt7XD7e7P2EWskhbvt41TvLR4
- kdOd7fNlSKnHaBjLkJPY+SZf2nyneZpk/QR/FgChqDC5ugUODivxijDFUpBdxl9sow
- JfC6jtEkuyWzUYBROPdFF0fkVcPe6tFk+6mxuzlWYJpeG0uICd6TknefMz70rdHrjm
- W0HK/R3Y3cgCp5gYT7bkpcrSX5i8IUu3Fpeh5F1lfi7ir18s2bZj8XdjDh5y2jXT1U
- GqPxjryM9Nm2Q==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nWxFl-00GSfx-Eq; Wed, 23 Mar 2022 09:26:05 +0000
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu,
-	Oliver Upton <oupton@google.com>
-Subject: Re: [PATCH v2 0/3] KVM: arm64: Fixes for SMC64 SYSTEM_RESET2 calls
-Date: Wed, 23 Mar 2022 09:26:02 +0000
-Message-Id: <164802753806.768438.14771552683123752395.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220322183538.2757758-1-oupton@google.com>
-References: <20220322183538.2757758-1-oupton@google.com>
+ with ESMTP id rqye5F7PHXlZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2022 14:17:27 -0400 (EDT)
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com
+ [209.85.167.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC29A411C7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 14:17:27 -0400 (EDT)
+Received: by mail-lf1-f44.google.com with SMTP id 5so13021507lfp.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2022 11:17:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=rjXWwDt+piFjEizKBPLIwkQ3oNcecYs/t2+aRfZKR2Q=;
+ b=e0SsUFEnYUMCyRAkGyLVow0+R4bFdfmash3hSguwzYMReIozuymckocyM5BR/BZLJg
+ F/po3/TlVjopsmXJ41juFAnRzPe45KNaRNkzN0MtvjZ9mBPCEsZrjkO6ujDAemvwda96
+ rl80jZRhNG2l/NMfwbStZ6I+jDlhs/HdozQzWkjJ80csfkdMlVM4vYTOYFFyjfHkCzzd
+ 9/mg9mIusJIiJ41q4kWg6sKjFXIQgUQguTqgxHiq8PkCHtwIR6pYWShWbrYo5MzF8yp5
+ bQ749BhKFyRlGHbieptNt6y4VPTEPjdhkDnJ0TPl0KSwq8Nl847v1G4lQzpS2egtD3Nu
+ R/sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=rjXWwDt+piFjEizKBPLIwkQ3oNcecYs/t2+aRfZKR2Q=;
+ b=7609Ix/CaejJxG/hZlFK6z+717Rwe/860XxIm0SKk+GnpEGd+ll2xOCAP2OR6boxIA
+ XoIIwVrmgpkDx0E1+bD1C7ZInvJZGtAN8petqTJloiphAmHGTwtBytMHX80x6ktZhvDD
+ NjNcuEDGqdHxgVbxZbv9/cBcSs0HJmhMJSqX6iuuzcuzgUtxP0VgZ5x6QhV4OfF3o79M
+ W3F5KJPwcVAfVcZbRKTKrOppt0d7sfHfIgG32YF76fhQrSURIdjBaUsf7rCZoT8BCdxr
+ ik2J9208eIAYeIpWI0isTO5L0GoysFltVxUNA5ooR3g9824jwLjbDw0DefW/2KtqJe2L
+ bvCw==
+X-Gm-Message-State: AOAM531SNL7YYF4+QkDV5ezv2dy/14ocAdMLOjt/pdv3LcFvezpaVW0g
+ 7EBlwaUvSx1H++rEfxjEOuSQgcyvqGGIuL/kNd18Dw==
+X-Google-Smtp-Source: ABdhPJxTpXDCogH6wFEbXP5cV7bKAnz+C/vzgCxatvwG3tgn9N4H9nX6rT0RugIgjr0sQJpMf/ysU29QMVGOZ9XlHbA=
+X-Received: by 2002:ac2:57db:0:b0:44a:23ce:b7f5 with SMTP id
+ k27-20020ac257db000000b0044a23ceb7f5mr9953556lfo.235.1647973045570; Tue, 22
+ Mar 2022 11:17:25 -0700 (PDT)
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, oupton@google.com,
- ricarkol@google.com, pshier@google.com, reijiw@google.com,
- suzuki.poulose@arm.com, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, will@kernel.org, pbonzini@redhat.com,
- alexandru.elisei@arm.com, james.morse@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- linux-arm-kernel@lists.infradead.org
+References: <20220311002528.2230172-1-dmatlack@google.com>
+ <20220311002528.2230172-2-dmatlack@google.com>
+ <YjBC1ZLio2iPkZ0V@xz-m1.local>
+In-Reply-To: <YjBC1ZLio2iPkZ0V@xz-m1.local>
+From: David Matlack <dmatlack@google.com>
+Date: Tue, 22 Mar 2022 11:16:59 -0700
+Message-ID: <CALzav=dx2rm7xm07x0iEMiS1jzNoU2cOT-mtA9=P6C1riOe2AQ@mail.gmail.com>
+Subject: Re: [PATCH v2 01/26] KVM: x86/mmu: Optimize MMU page cache lookup for
+ all direct SPs
+To: Peter Xu <peterx@redhat.com>
+X-Mailman-Approved-At: Wed, 23 Mar 2022 05:57:13 -0400
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,36 +97,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 22 Mar 2022 18:35:35 +0000, Oliver Upton wrote:
-> This series addresses a couple of issues with how KVM exposes SMC64
-> calls to its guest. It is currently possible for an AArch32 guest to
-> discover the SMC64 SYSTEM_RESET2 function (via
-> PSCI_1_0_FN_PSCI_FEATURES) and even make a call to it. SMCCC does not
-> allow for 64 bit calls to be made from a 32 bit state.
-> 
-> Patch 1 cleans up the way we filter SMC64 calls in PSCI. Using a switch
-> with case statements for each possibly-filtered function is asking for
-> trouble. Instead, pivot off of the bit that indicates the desired
-> calling convention. This plugs the PSCI_FEATURES hole for SYSTEM_RESET2.
-> 
-> [...]
+On Tue, Mar 15, 2022 at 12:40 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Fri, Mar 11, 2022 at 12:25:03AM +0000, David Matlack wrote:
+> > Commit fb58a9c345f6 ("KVM: x86/mmu: Optimize MMU page cache lookup for
+> > fully direct MMUs") skipped the unsync checks and write flood clearing
+> > for full direct MMUs. We can extend this further and skip the checks for
+> > all direct shadow pages. Direct shadow pages are never marked unsynced
+> > or have a non-zero write-flooding count.
+>
+> Nit: IMHO it's better to spell out the exact functional change, IIUC those
+> are the direct mapped SPs where guest uses huge pages but host uses only
+> small pages for the shadowing?
 
-Applied to fixes, thanks!
+Yes that's correct. I'll include that in the commit message in the next version.
 
-[1/3] KVM: arm64: Generally disallow SMC64 for AArch32 guests
-      commit: 905ec3226f8150f73838a36cb79ba79e1d789e8e
-[2/3] KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from AArch32
-      commit: 3e1b3dbad320e1532fdf09e5b80e35d62a0fd82b
-[3/3] KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler
-      commit: 8872d9b3e35a0ecb80d6413bba403d4aaf49af63
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+>
+> >
+> > Checking sp->role.direct alos generates better code than checking
+> > direct_map because, due to register pressure, direct_map has to get
+> > shoved onto the stack and then pulled back off.
+> >
+> > No functional change intended.
+> >
+> > Reviewed-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+>
+> --
+> Peter Xu
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
