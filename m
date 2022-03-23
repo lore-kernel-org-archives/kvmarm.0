@@ -2,79 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68918C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 17:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A149FC433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 19:22:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3C2249F4E;
-	Wed, 23 Mar 2022 13:55:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01F7A49EEE;
+	Wed, 23 Mar 2022 15:22:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tS2YK5yVidu2; Wed, 23 Mar 2022 13:55:18 -0400 (EDT)
+	with ESMTP id 1Odeo7uCZyb6; Wed, 23 Mar 2022 15:22:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A16DC49F28;
-	Wed, 23 Mar 2022 13:55:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAF6B49E37;
+	Wed, 23 Mar 2022 15:22:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0BED49F28
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 13:55:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E1B440D0B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 15:22:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vsZdFIdBUub1 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Mar 2022 13:55:15 -0400 (EDT)
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com
- [209.85.166.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7D6149EDE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 13:55:15 -0400 (EDT)
-Received: by mail-io1-f51.google.com with SMTP id b16so2633598ioz.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 10:55:15 -0700 (PDT)
+ with ESMTP id FcD+MrTO-eim for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Mar 2022 15:22:17 -0400 (EDT)
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com
+ [209.85.166.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6504240C95
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 15:22:17 -0400 (EDT)
+Received: by mail-io1-f43.google.com with SMTP id c23so2926943ioi.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 12:22:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=PqjJXkRPd2m4fHW7zLlzzJ1D2JbPgS4DO8KeESR34/E=;
- b=kZu2MlxKm4TNZBvgOghSAFo5NR+ctEUYlJYRRkIiuzmM1ykFamILWWhzDO8EMecPc5
- 6xqgOn/gtlYLunFPctAB5ciFAEBoydz51eJoeCrf4JgSA2IQsHs69Eg2r8HDQKX5JRd2
- dkkOpKB8CsPeJKN2OpskZlknijt9Ks0Rai/VLmPJN1QXbDspVqFwqJ12VvyU7ud1NnEa
- FZU/oyiEvjEKCG8GCoUNu48GDPeHdXrtRgyeSojd5KcqMrSPbYbn0f0zcigRH3CVSJhG
- O9cC8Gc99HbfDjaRM/SYGn352eUwoVqcC9hPyJ/TAHzQUj22374hoTMB4lxoEB02y+DF
- fPUQ==
+ bh=JlMssrBS5MsWzr4IlAQ1DcKlCFmfRWojcGydLqsuTtY=;
+ b=SMG6cDmX+eXpRQ94AqhVqDKxEoEuWDo5YwwCRBPkxeUSTJIBdfNA7sSU3zJkicwEgb
+ aHqD6tW07HceqvJp6mNptONcqESdKtAJ4t4iK3VaQCsSF0JIO8nocEaUyLVKxno1lDKp
+ 6jbLYrMGLdeGqdhZ7MJissy9yA8ijNrm81J9D8pA8iklFPVM1EdLrAGKIt4r+cOZDoq/
+ ZStvN0KQGX3lb7eNnqtliwowc3pZHjYv1PYJECBaXM0/o50dQdb25DOueNGYXNr9fPZp
+ BMdZg0S7oX94Ty2B1QvUD17nhtXKWcKacDcl0Vr8Nix9ZDHa/GzSMHOmW+53X80mxxh1
+ lVgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=PqjJXkRPd2m4fHW7zLlzzJ1D2JbPgS4DO8KeESR34/E=;
- b=2SMDQLAgVv56Nb/XYKlLlQAmdKkOWSUijPLwxPoGX1nkqnEuN7nzfTkk3IEEtYeAPH
- lneLXqMq/QLH+pMrD84rSpLkjP8nIwe8olKTqlvUzIjqbnr7USsNNk4MEtQtw6PS0il5
- v8wjROjPHp+L9WLdVmBH5+EoEGr5xbQ+H0bLjlyScsgbUjES4/uNE0y4G1ss6H4Tvl3E
- yCoxqH2lscr2V0d2jiFq+bxzYcS4eFx142ogM7wCDlyq/VE6fzgBT4JUvdyCuYq53HFV
- rZPzGLnnCJt2kozJPSDBZxvsA/mhKx1Dsb9d8fDNiKOBSg8oB6jCUhmmKoyTZdO0HWQ4
- tDug==
-X-Gm-Message-State: AOAM5339gslyHdXO0dldjILAdqeCxOgt+5FUltwIar4v+Y4xpJ6UrWJg
- yWwFCgaqEx1ncE6EVdvumi/tJA==
-X-Google-Smtp-Source: ABdhPJwR2B0E+l4rro6BffINpb+kaE4XruvntOQYHgHUtjRPfYY26xFlWw65UnkzQlX4TCJMWBFoeA==
-X-Received: by 2002:a05:6638:218f:b0:321:3fa6:79b8 with SMTP id
- s15-20020a056638218f00b003213fa679b8mr632693jaj.206.1648058114784; 
- Wed, 23 Mar 2022 10:55:14 -0700 (PDT)
+ bh=JlMssrBS5MsWzr4IlAQ1DcKlCFmfRWojcGydLqsuTtY=;
+ b=x3EWRmRpDcYpX2cWhaDN8oRFj983O0EdlwbVh8e2bhXPtgBQq9vUQSnPojIjN8L9DF
+ TL4S1pj3uaw3oRhxLzz3CJtIuxXOZbkkEDWxEFAhOU5knGYicIiXHBAOzmQ4tOLy0WcI
+ Jt8MQ2Cy5H6VGiy1UH63LoMDPlkJrVhGrEAHK/3O+p9ZTk63qFcEultjuwOuSM7ja00c
+ q8BAc7WS8uEahwDI+YfoDRW6KSgU5Ndm1McmTOSFlei18bcILQei5ndkp17yuVDQoDX6
+ vAu3WxnlUOqNREjDpQvbCtPg9c1qUYjYfK9PGUgx2imcOmmMYzGeXqva0J8ZoSTMP/h0
+ zLBQ==
+X-Gm-Message-State: AOAM532cgc5IfOnIB3AgnlXFEBgdE8CTfctQqRCyifp4TUfnL5H0pdyu
+ JMsg90XFwBOFrJVT8k6kRyyyaQ==
+X-Google-Smtp-Source: ABdhPJwngJg/5LHhODSUq+zIVlvVV5bBB3J5MW1sVvzghvqD9c55m4X7Zxu6PadTGaeTnZhTx2kmgQ==
+X-Received: by 2002:a05:6602:1493:b0:649:1890:cffd with SMTP id
+ a19-20020a056602149300b006491890cffdmr844378iow.167.1648063336566; 
+ Wed, 23 Mar 2022 12:22:16 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- f4-20020a92b504000000b002c21ef70a81sm357051ile.7.2022.03.23.10.55.13
+ d3-20020a056e020c0300b002c7b42b4b0esm422584ile.65.2022.03.23.12.22.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 23 Mar 2022 10:55:14 -0700 (PDT)
-Date: Wed, 23 Mar 2022 17:55:10 +0000
+ Wed, 23 Mar 2022 12:22:15 -0700 (PDT)
+Date: Wed, 23 Mar 2022 19:22:12 +0000
 From: Oliver Upton <oupton@google.com>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v5 19/22] KVM: arm64: Support SDEI ioctl commands on vCPU
-Message-ID: <Yjte/g4yG+gw7vnt@google.com>
-References: <20220322080710.51727-1-gshan@redhat.com>
- <20220322080710.51727-20-gshan@redhat.com>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v6 02/25] KVM: arm64: Save ID registers' sanitized value
+ per guest
+Message-ID: <YjtzZI8Lw2uzjm90@google.com>
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-3-reijiw@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220322080710.51727-20-gshan@redhat.com>
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <20220311044811.1980336-3-reijiw@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,48 +93,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 22, 2022 at 04:07:07PM +0800, Gavin Shan wrote:
-> This supports ioctl commands on vCPU to manage the various object.
-> It's primarily used by VMM to accomplish migration. The ioctl
-> commands introduced by this are highlighted as below:
+Hi Reiji,
+
+On Thu, Mar 10, 2022 at 08:47:48PM -0800, Reiji Watanabe wrote:
+> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+> Use the saved ones when ID registers are read by the guest or
+> userspace (via KVM_GET_ONE_REG).
 > 
->    * KVM_SDEI_CMD_GET_VCPU_EVENT_COUNT
->      Return the total count of vCPU events, which have been queued
->      on the target vCPU.
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 12 ++++++
+>  arch/arm64/kvm/arm.c              |  1 +
+>  arch/arm64/kvm/sys_regs.c         | 65 ++++++++++++++++++++++++-------
+>  3 files changed, 63 insertions(+), 15 deletions(-)
 > 
->    * KVM_SDEI_CMD_GET_VCPU_EVENT
->    * KVM_SDEI_CMD_SET_VCPU_EVENT
->      Get or set vCPU events.
-> 
->    * KVM_SDEI_CMD_GET_VCPU_STATE
->    * KVM_SDEI_CMD_SET_VCPU_STATE
->      Get or set vCPU state.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2869259e10c0..c041e5afe3d2 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -101,6 +101,13 @@ struct kvm_s2_mmu {
+>  struct kvm_arch_memory_slot {
+>  };
+>  
+> +/*
+> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> + * where 0<=crm<8, 0<=op2<8.
 
-All of this GET/SET stuff can probably be added to KVM_{GET,SET}_ONE_REG
-immediately. Just introduce new registers any time a new event comes
-along. The only event we have at the end of this series is the
-software-signaled event, with async PF coming later right?
+Doesn't the Feature ID register scheme only apply to CRm={1-7},
+op2={0-7}? I believe CRm=0, op2={1-4,7} are in fact UNDEFINED, not RAZ
+like the other ranges. Furthermore, the registers that are defined in
+that range do not go through the read_id_reg() plumbing.
 
-Some special consideration is likely necessary to avoid adding a
-register for every u64 chunk of data. I don't think we need to afford
-userspace any illusion of granularity with these, and can probably lump
-it all under one giant pseudoregister.
+> + */
+> +#define KVM_ARM_ID_REG_MAX_NUM	64
+> +#define IDREG_IDX(id)		((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> +
+>  struct kvm_arch {
+>  	struct kvm_s2_mmu mmu;
+>  
+> @@ -137,6 +144,9 @@ struct kvm_arch {
+>  	/* Memory Tagging Extension enabled for the guest */
+>  	bool mte_enabled;
+>  	bool ran_once;
+> +
+> +	/* ID registers for the guest. */
+> +	u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
 
->    * KVM_SDEI_CMD_INJECT_EVENT
->      Inject SDEI event.
+This is a decently large array. Should we embed it in kvm_arch or
+allocate at init?
 
-What events are we going to allow userspace to inject? IIUC, the
-software-signaled event is an IPI and really under the control of the
-guest. Async PF is entriely under KVM control.
+[...]
 
-I do agree that having some form of event injection would be great. VM
-providers have found it useful to allow users to NMI their VMs when they
-get wedged. I just believe that userspace should not be able to trigger
-events that have a defined meaning and are under full KVM ownership.
+> +
+> +/*
+> + * Set the guest's ID registers that are defined in sys_reg_descs[]
+> + * with ID_SANITISED() to the host's sanitized value.
+> + */
+> +void set_default_id_regs(struct kvm *kvm)
 
-IMO, unless the async PF changes need to go out to userspace, you could
-probably skip event injection for now and only worry about SDEI within a
-VM.
+nit, more relevant if you take the above suggestion: maybe call it
+kvm_init_id_regs()?
+
+> +{
+> +	int i;
+> +	u32 id;
+> +	const struct sys_reg_desc *rd;
+> +	u64 val;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
+
+You could avoid walking the entire system register table, since we
+already know the start and end values for the Feature ID register range.
+
+maybe:
+
+  #define FEATURE_ID_RANGE_START	SYS_ID_PFR0_EL1
+  #define FEATURE_ID_RANGE_END		sys_reg(3, 0, 0, 7, 7)
+
+  u32 sys_reg;
+
+  for (sys_reg = FEATURE_ID_RANGE_START; sys_reg <= FEATURE_ID_RANGE_END; sys_reg++)
+
+But, it depends on if this check is necessary:
+
+> +		rd = &sys_reg_descs[i];
+> +		if (rd->access != access_id_reg)
+> +			/* Not ID register, or hidden/reserved ID register */
+> +			continue;
+
+Which itself is dependent on whether KVM is going to sparsely or
+verbosely define its feature filtering tables per the other thread. So
+really only bother with this if that is the direction you're going.
 
 --
 Thanks,
