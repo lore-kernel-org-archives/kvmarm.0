@@ -2,71 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6B1C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 12:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77058C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 12:46:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D37549F0B;
-	Wed, 23 Mar 2022 08:40:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DFCBF49EFC;
+	Wed, 23 Mar 2022 08:46:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oOu8SbiSK0WG; Wed, 23 Mar 2022 08:40:52 -0400 (EDT)
+	with ESMTP id SK1asWrY4JB7; Wed, 23 Mar 2022 08:46:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A80549EF6;
-	Wed, 23 Mar 2022 08:40:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5EE949F00;
+	Wed, 23 Mar 2022 08:46:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 187A449ED7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 08:40:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2AEB49EF6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 08:46:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uG3ckSbSErRf for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Mar 2022 08:40:48 -0400 (EDT)
+ with ESMTP id 3uULRWpMi8m8 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Mar 2022 08:46:52 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A879C49EF3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 08:40:48 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AE0B49EF3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 08:46:52 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1648039248;
+ s=mimecast20190719; t=1648039611;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EFFzrMoeCc+vtGGQUpI0c3WJGOuV+lzt7PoTPoO5vXg=;
- b=hrqHiLvalTFvHZq5kk9GmWXTEcsH5+NBiBw0hFj/eL2og6YLIKYNtuq+NrlgEk3sM7AxM+
- TT6ZY0BleZ/cEfrkYIDilDRpE/l+iSaxYlBBeRZvTj9il5wX0Ln9T4dCjrmCqXYTONR61T
- RJSRrsM5YMwpBSEM2EjPdtmjHOIfVwo=
+ bh=DTnFtVcodyoIwIXV9QxS/vo7a2K9rOATfHER2lAcBYs=;
+ b=D5udak05osjVDH0IED2H5KlgJOUVIUbQkmRl7cKZGMMj2dNvJlcj6PIenAZun/gHqmQ2UN
+ WNzXXQPwPEXLJW9XX6gmfTl5DbTVRV6fs5iMAJbvkGprMynRvW5m7bqqd9LvyAu9ALyCbd
+ cCPMw4zf+TpTwzpUhiOHGiyebh1ytPY=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-250-yjcbSrvrOCe8umxWptf5wQ-1; Wed, 23 Mar 2022 08:40:43 -0400
-X-MC-Unique: yjcbSrvrOCe8umxWptf5wQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com
- [10.11.54.7])
+ us-mta-115-gHMvhEejPxqhMi7HhzDauQ-1; Wed, 23 Mar 2022 08:46:48 -0400
+X-MC-Unique: gHMvhEejPxqhMi7HhzDauQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.10])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 87CB63C01B95;
- Wed, 23 Mar 2022 12:40:42 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E0BD23810D56;
+ Wed, 23 Mar 2022 12:46:47 +0000 (UTC)
 Received: from [10.72.12.33] (ovpn-12-33.pek2.redhat.com [10.72.12.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E037C140262B;
- Wed, 23 Mar 2022 12:40:36 +0000 (UTC)
-Subject: Re: [PATCH v5 02/22] KVM: arm64: Add SDEI virtualization
- infrastructure
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 66F2C401E78;
+ Wed, 23 Mar 2022 12:46:43 +0000 (UTC)
+Subject: Re: [PATCH v5 03/22] KVM: arm64: Support SDEI_VERSION hypercall
 To: Oliver Upton <oupton@google.com>
 References: <20220322080710.51727-1-gshan@redhat.com>
- <20220322080710.51727-3-gshan@redhat.com> <YjpRArSezR3gVv2K@google.com>
+ <20220322080710.51727-4-gshan@redhat.com> <YjoPxLAMIPobBzS0@google.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <c178489c-9e52-f5b2-4ff8-4f1328c08208@redhat.com>
-Date: Wed, 23 Mar 2022 20:40:33 +0800
+Message-ID: <d8e151e5-080b-dc87-b7e0-9031a7928853@redhat.com>
+Date: Wed, 23 Mar 2022 20:46:40 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <YjpRArSezR3gVv2K@google.com>
+In-Reply-To: <YjoPxLAMIPobBzS0@google.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
  shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
  vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
@@ -89,189 +88,58 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Oliver,
 
-On 3/23/22 6:43 AM, Oliver Upton wrote:
-> On Tue, Mar 22, 2022 at 04:06:50PM +0800, Gavin Shan wrote:
->> Software Delegated Exception Interface (SDEI) provides a mechanism for
->> registering and servicing system events. Those system events are high
->> priority events, which must be serviced immediately. It's going to be
->> used by Asynchronous Page Fault (APF) to deliver notification from KVM
->> to guest. It's noted that SDEI is defined by ARM DEN0054C specification.
-> 
-> I'm guessing that you're using linked lists for stitching all of this
-> together because the specification provides for 24 bits of event
-> encoding. However, it seems that there will be a finite number of events
-> in KVM. So the APF stuff and a software signaled event.
-> 
-> Given that the number of events in KVM is rather small, would it make
-> more sense to do away with the overhead of linked lists and having the
-> state just represented in a static or allocated array? I think you can
-> cram all of the VM scoped event state into a single structure and hang
-> the implementation off of that.
-> 
-
-Yes, the number of events in KVM is small. Including the events for Async
-PF and the software signaled event, 8 events would be enough currently. In
-the meanwhile, there are several types of objects for various events. Some
-of them can be put into static array, while the left might need static array
-of pointers to avoid the linked list:
-
-    struct kvm_sdei_exposed_event/state         on struct kvm_arch
-           size: 24 bytes
-           static array, 8 entries
-    struct kvm_sdei_registered_event/state      on struct kvm_arch
-           size: 9KB
-           static array of pointers, still need allocate them dynamically, 8 entries
-    struct kvm_sdei_vcpu_event/state            on struct kvm_vcpu_arch
-           size: 16 bytes
-           static array, 8 entries
-
-
->> This introduces SDEI virtualization infrastructure where the SDEI events
->> are registered and manipulated by the guest through hypercall. The SDEI
->> event is delivered to one specific vCPU by KVM once it's raised. This
->> introduces data structures to represent the needed objects to support
->> the feature, which is highlighted as below. As those objects could be
->> migrated between VMs, these data structures are partially exposed to
->> user space.
->>
->>     * kvm_sdei_exposed_event
->>       The exposed events are determined and added by VMM through ioctl
->>       interface. Only the exposed events can be registered from the
->>       guest.
->>
->>     * kvm_sdei_registered_event
->>       The events that have been registered from the guest through the
->>       SDEI_1_0_FN_SDEI_EVENT_REGISTER hypercall.
->>
->>     * kvm_sdei_vcpu_event
->>       The events that have been delivered to the target vCPU.
->>
->>     * kvm_sdei_vcpu
->>       Used to save the preempted context when the SDEI event is serviced
->>       and delivered. After the SDEI event handling is completed, the
->>       execution is resumed from the preempted context.
->>
->>     * kvm_sdei_kvm
->>       Place holder for the exposed and registered events.
-> 
-> It might be a good idea to expand these a bit and move them into
-> comments on each of the structures.
-> 
-
-Sure, I will do in next respin.
-
->> The error of SDEI_NOT_SUPPORTED is returned for all SDEI hypercalls for
->> now. They will be supported in the subsequent patches.
+On 3/23/22 2:04 AM, Oliver Upton wrote:
+> On Tue, Mar 22, 2022 at 04:06:51PM +0800, Gavin Shan wrote:
+>> This supports SDEI_VERSION hypercall by returning v1.1, which is
+>> the specification version we're following. The vendor is set to
+>> 'KVM'.
 >>
 >> Signed-off-by: Gavin Shan <gshan@redhat.com>
 >> ---
->>   arch/arm64/include/asm/kvm_host.h            |   3 +
->>   arch/arm64/include/asm/kvm_sdei.h            | 171 +++++++++++++
->>   arch/arm64/include/uapi/asm/kvm.h            |   1 +
->>   arch/arm64/include/uapi/asm/kvm_sdei_state.h |  72 ++++++
->>   arch/arm64/kvm/Makefile                      |   2 +-
->>   arch/arm64/kvm/arm.c                         |   8 +
->>   arch/arm64/kvm/hypercalls.c                  |  21 ++
->>   arch/arm64/kvm/sdei.c                        | 244 +++++++++++++++++++
->>   include/uapi/linux/arm_sdei.h                |   2 +
->>   9 files changed, 523 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/include/asm/kvm_sdei.h
->>   create mode 100644 arch/arm64/include/uapi/asm/kvm_sdei_state.h
->>   create mode 100644 arch/arm64/kvm/sdei.c
+>>   arch/arm64/kvm/sdei.c | 10 ++++++++++
+>>   1 file changed, 10 insertions(+)
 >>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 031e3a2537fc..5d37e046a458 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -113,6 +113,8 @@ struct kvm_arch {
->>   	/* Interrupt controller */
->>   	struct vgic_dist	vgic;
+>> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
+>> index 8a9b477b8977..5a3a64cd6e84 100644
+>> --- a/arch/arm64/kvm/sdei.c
+>> +++ b/arch/arm64/kvm/sdei.c
+>> @@ -118,6 +118,14 @@ static bool remove_all_vcpu_events(struct kvm_vcpu *vcpu,
+>>   	return pending;
+>>   }
 >>   
->> +	struct kvm_sdei_kvm *sdei;
->> +
+>> +static unsigned long hypercall_version(struct kvm_vcpu *vcpu)
+>> +{
+>> +	/* v1.1 and the vendor is KVM */
+>> +	return (1UL << SDEI_VERSION_MAJOR_SHIFT) |
+>> +	       (1UL << SDEI_VERSION_MINOR_SHIFT) |
+>> +	       0x4b564d;
 > 
-> nit: avoid repeating 'kvm'. struct kvm_sdei should be descriptive enough
-> :)
+> It looks like the SDEI specification states that the vendor-defined
+> version number is 32 bits. Could we just use one of the
+> ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_{0,3} values instead?
 > 
-
-Indeed, "struct kvm_sdei" is better :)
-
->>   	/* Mandated version of PSCI */
->>   	u32 psci_version;
->>   
->> @@ -338,6 +340,7 @@ struct kvm_vcpu_arch {
->>   	 * Anything that is not used directly from assembly code goes
->>   	 * here.
->>   	 */
->> +	struct kvm_sdei_vcpu *sdei;
->>
+> ASCII 'KVM' is neat, but in reality guest software will just throw it in
+> a macro regardless. Might as well use one of the values we've already
+> trained it to use :-)
 > 
-> nit: put your scoping tokens at the beginning of a symbol name, so
-> 'struct kvm_vcpu_sdei'.
-> 
-> [...]
+> Also, it would appear that guest discovery of SDEI relies upon KVM
+> reporting a valid SDEI version. IMO, this patch should come at the very
+> end when KVM actually implements SDEI.
 > 
 
-Yep, "struct kvm_vcpu_sdei" is the one I will have in next respin :)
+Yeah, I was sticky to the pattern of "KVM". However, I think it's good
+to reuse the existing one. Lets use ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2
+if you agree. Its first two characters are "VM" at least.
 
->> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
->> index 202b8c455724..3c20fee72bb4 100644
->> --- a/arch/arm64/kvm/hypercalls.c
->> +++ b/arch/arm64/kvm/hypercalls.c
->> @@ -5,6 +5,7 @@
->>   #include <linux/kvm_host.h>
->>   
->>   #include <asm/kvm_emulate.h>
->> +#include <asm/kvm_sdei.h>
->>   
->>   #include <kvm/arm_hypercalls.h>
->>   #include <kvm/arm_psci.h>
->> @@ -151,6 +152,26 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
->>   	case ARM_SMCCC_TRNG_RND32:
->>   	case ARM_SMCCC_TRNG_RND64:
->>   		return kvm_trng_call(vcpu);
->> +	case SDEI_1_0_FN_SDEI_VERSION:
->> +	case SDEI_1_0_FN_SDEI_EVENT_REGISTER:
->> +	case SDEI_1_0_FN_SDEI_EVENT_ENABLE:
->> +	case SDEI_1_0_FN_SDEI_EVENT_DISABLE:
->> +	case SDEI_1_0_FN_SDEI_EVENT_CONTEXT:
->> +	case SDEI_1_0_FN_SDEI_EVENT_COMPLETE:
->> +	case SDEI_1_0_FN_SDEI_EVENT_COMPLETE_AND_RESUME:
->> +	case SDEI_1_0_FN_SDEI_EVENT_UNREGISTER:
->> +	case SDEI_1_0_FN_SDEI_EVENT_STATUS:
->> +	case SDEI_1_0_FN_SDEI_EVENT_GET_INFO:
->> +	case SDEI_1_0_FN_SDEI_EVENT_ROUTING_SET:
->> +	case SDEI_1_0_FN_SDEI_PE_MASK:
->> +	case SDEI_1_0_FN_SDEI_PE_UNMASK:
->> +	case SDEI_1_0_FN_SDEI_INTERRUPT_BIND:
->> +	case SDEI_1_0_FN_SDEI_INTERRUPT_RELEASE:
->> +	case SDEI_1_1_FN_SDEI_EVENT_SIGNAL:
->> +	case SDEI_1_0_FN_SDEI_PRIVATE_RESET:
->> +	case SDEI_1_0_FN_SDEI_SHARED_RESET:
->> +	case SDEI_1_1_FN_SDEI_FEATURES:
-> 
-> Consider only adding switch statements for hypercalls when they're
-> actually implemented.
-> 
-> Additionally, while this isn't directly related to your patch, I do have
-> a gripe about kvm_hvc_call_handler(). It is really ugly that we
-> enumerate the specific hypercalls we support, and otherwise fall through
-> to PSCI.
-> 
-> IMO, a cleaner approach would be to have kvm_hvc_call_handler() simply
-> route a particular service range/service owner to the appropriate
-> handler. We can then terminate individual hypercalls in those handlers,
-> avoiding a catch-all switch such as this one is currently.
-> 
+It's fine to return the version here because the SDEI capability isn't
+exposed yet. It means no events have been exposed and able to be
+registered. However, It's also fine to move this patch after the
+following one:
 
-Yes, I agree. I can have a separate patch as preparatory work to
-route the range of hypercalls to their owner for further handling.
-In this way, we can route the range of SDEI hypercalls to its own
-handler. I will figure it out in next respin.
+[PATCH v5 16/22] KVM: arm64: Support SDEI_EVENT_{COMPLETE, COMPLETE_AND_RESUME} hypercall
 
 Thanks,
 Gavin
-
 
 _______________________________________________
 kvmarm mailing list
