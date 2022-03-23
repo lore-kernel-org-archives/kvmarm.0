@@ -2,78 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA0FC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 20:44:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D105C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 22:22:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3325D411D2;
-	Wed, 23 Mar 2022 16:44:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6362949EFD;
+	Wed, 23 Mar 2022 18:22:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id raWwg6AL3OuH; Wed, 23 Mar 2022 16:44:34 -0400 (EDT)
+	with ESMTP id ZYG6vA4L5Owa; Wed, 23 Mar 2022 18:22:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 013A449F1F;
-	Wed, 23 Mar 2022 16:44:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A01249F24;
+	Wed, 23 Mar 2022 18:22:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BACB949EB5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 16:44:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5322D49F22
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 18:22:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZT+fFDId0PWJ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Mar 2022 16:44:31 -0400 (EDT)
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com
- [209.85.166.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B19C411D2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 16:44:31 -0400 (EDT)
-Received: by mail-io1-f43.google.com with SMTP id h63so3176112iof.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 13:44:31 -0700 (PDT)
+ with ESMTP id FwLefz7pg7fs for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Mar 2022 18:22:49 -0400 (EDT)
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com
+ [209.85.215.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2577349EFD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 18:22:49 -0400 (EDT)
+Received: by mail-pg1-f171.google.com with SMTP id s72so2328929pgc.5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 15:22:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=fBYzqNvet64/0krUr0ciJEOs0VfPj+5SgRq8wB41m/Y=;
- b=lLOyeDE2K2xnQP2wIsZs+7lFjAZSUj+oUmRol43y2da5eJOostn3fkxHSFqFT1OEoE
- DLJLBtgCvey2Y6GmWH+AVUYWVDk5ms0Pn4hWGrwF5nL+TJ/T5R2fktQIlF/lcushiszq
- W4PP9+tx8xGR6cgtFo3T9retLiCapuKxPzlGCopIMxn623ciKn/lu7rUK4ar8gVKrWWH
- /zln0ndb20fztc0l9AiKPOzEFe4T4YxiHzKoYrpDJHBNnYyuYe38LJcdKWb3HF98Wcip
- ZJU9aEkYve+mZv7RHs5kvtHOYKRGHNuDy9LZWztx70CdbisJJ8L2vp5eYA5qa2UF8S6+
- y8cA==
+ bh=yuhCT1XYYGgw1dNBRxPY3XRz8+9xX+vJlVURnfEK72s=;
+ b=a6UMluZevPKT+3Dg9RSgS2V8HA5VIKtIYAYHNtZAilzCYPLEkP61tf7mwIeq9BnxHV
+ X0SgovhpKa/+gqiVJN6lWUp1uqPIgn+vMHpzy4VXM3c5yJiRCCC7UOKbGbnjbjkhLAE7
+ RHoBAkQ9xUgD9dL1xMdBPTjxKpnSLtsHOUrHXa/tPYiz85ecbU2IYJE4lBhgWY8zKwGF
+ vqpuZjlGklfvuQhQrNXTf+r2eBpbhmqcZmGyDOFQNN46b1i50uXvRmRLSPk2NVi2GwpT
+ 8vFYEZYuHVzaBo1/gI+EK2Y8aj0KQFDtW7xPe3JsxzKdlPYgnKKD2PAnzmnuMs1FyqJE
+ PHDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=fBYzqNvet64/0krUr0ciJEOs0VfPj+5SgRq8wB41m/Y=;
- b=v3qaLB7Ad2+NJ49JKuuImJihwdJaA+CWovwXgilXZJI3tHJnd0G6xApBs7NCLD24qe
- 9gXyA/MnYwPlcs/txqJJZi80BzmLDSHHgyusJ8idZLLqCgUYfkNK6kIqBjPbyFLlBzQL
- oEmV+i4O2LNotn1xXGBiys50oBgedSe/vZ7+DCNVZrrYrrm2sEhg/aC6U1sjBKMC39kg
- SD0zsLGomPtbvPLwaH+TopnI8tguKHDupAwf8q12siq0wBSkDt0/sQ+lCpx4QxF8ndOJ
- 6uOJpwa+95HW/bAVRUTwv78q/Y0a0SXZkcLlT/Mn+OeiCQ3ZhCD9xgU8BYPfW+TP99wR
- qj5g==
-X-Gm-Message-State: AOAM531Kc/ADWmlZrQPRdmAX+tkOHLVj2tPCJF8AV/yteZeQQXpaS9f7
- aU7xxcqXRILQdhQimMOFCE9Q/Q==
-X-Google-Smtp-Source: ABdhPJw3ZsqPYgRWN2t8hFdvcwjyxZrgb4iSxxaz6Qmr0jj4ImtSi0dpxqgCuiywJjF12eN2LenMAA==
-X-Received: by 2002:a05:6602:1409:b0:5e7:487:133c with SMTP id
- t9-20020a056602140900b005e70487133cmr986456iov.196.1648068270491; 
- Wed, 23 Mar 2022 13:44:30 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- k5-20020a6bf705000000b00649a2634725sm470970iog.17.2022.03.23.13.44.29
+ bh=yuhCT1XYYGgw1dNBRxPY3XRz8+9xX+vJlVURnfEK72s=;
+ b=UTLVzLXrknjXH88MeqjplAwuJghuHtMu83+cfpACY/G1j3SRO/IlA8AxNKnNrAstKN
+ 5E7BKUAo1J9pGkyFcQF8NGBrp7Dfv8dV5AldBGCzxYPEh1UppJ3VtOiiGpqZ+09q3ace
+ mgsRxmYGXSiCPmuTyHF4c3iAAYear5lwRUbTU4cPS+FcVTdiOJvdCVp+2fMZXWB83hDA
+ jz6vdQTOtkU1XcWj9kjTwfQyE7bE2qlNELIgfSX6DwHs/o98YL9VugN+8ECSrxamjbqE
+ gCbzXDn2Z/eLVMBCknOH9JRgiFLa+gzrGn+2PUlgOFC/w1LkQW+q5o9VWhJUlFDG6wpx
+ FKCg==
+X-Gm-Message-State: AOAM530TxxxMghhzQ0l7Q97eK7h7mluGz2eediFKE4nWAVM/ijNbPTRG
+ rfd7alpuILewFt2+AHoiQyHrog==
+X-Google-Smtp-Source: ABdhPJzfVU2lcXkwbXmRJ0QbmK41CUoL1lq9MqK1Ux1D5KLG5O0S8v51famIcyUnsJNrUX/Wy/YeJQ==
+X-Received: by 2002:a63:7f0e:0:b0:381:54ca:6fd0 with SMTP id
+ a14-20020a637f0e000000b0038154ca6fd0mr1631352pgd.524.1648074167926; 
+ Wed, 23 Mar 2022 15:22:47 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150]) by smtp.gmail.com with ESMTPSA id
+ fy9-20020a17090b020900b001c690bc05c4sm675504pjb.0.2022.03.23.15.22.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 23 Mar 2022 13:44:29 -0700 (PDT)
-Date: Wed, 23 Mar 2022 20:44:26 +0000
-From: Oliver Upton <oupton@google.com>
-To: Ricardo Koller <ricarkol@google.com>
+ Wed, 23 Mar 2022 15:22:47 -0700 (PDT)
+Date: Wed, 23 Mar 2022 15:22:43 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Oliver Upton <oupton@google.com>
 Subject: Re: [PATCH v6 11/25] KVM: arm64: Add remaining ID registers to
  id_reg_desc_table
-Message-ID: <YjuGqunshjhCoIs5@google.com>
+Message-ID: <Yjuds73S1sO1UpJI@google.com>
 References: <20220311044811.1980336-1-reijiw@google.com>
  <20220311044811.1980336-12-reijiw@google.com>
  <Yjt6qvYliEDqzF9j@google.com> <Yjt/bJidLEPsiPfQ@google.com>
+ <YjuGqunshjhCoIs5@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <Yjt/bJidLEPsiPfQ@google.com>
+In-Reply-To: <YjuGqunshjhCoIs5@google.com>
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
  Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
  Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
@@ -94,43 +95,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Mar 23, 2022 at 01:13:32PM -0700, Ricardo Koller wrote:
-> On Wed, Mar 23, 2022 at 07:53:14PM +0000, Oliver Upton wrote:
-> > Hi Reiji,
-> > 
-> > On Thu, Mar 10, 2022 at 08:47:57PM -0800, Reiji Watanabe wrote:
-> > > Add hidden or reserved ID registers, and remaining ID registers,
-> > > which don't require special handling, to id_reg_desc_table.
-> > > Add 'flags' field to id_reg_desc, which is used to indicates hiddden
-> > > or reserved registers. Since now id_reg_desc_init() is called even
-> > > for hidden/reserved registers, change it to not do anything for them.
+On Wed, Mar 23, 2022 at 08:44:26PM +0000, Oliver Upton wrote:
+> On Wed, Mar 23, 2022 at 01:13:32PM -0700, Ricardo Koller wrote:
+> > On Wed, Mar 23, 2022 at 07:53:14PM +0000, Oliver Upton wrote:
+> > > Hi Reiji,
 > > > 
-> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > On Thu, Mar 10, 2022 at 08:47:57PM -0800, Reiji Watanabe wrote:
+> > > > Add hidden or reserved ID registers, and remaining ID registers,
+> > > > which don't require special handling, to id_reg_desc_table.
+> > > > Add 'flags' field to id_reg_desc, which is used to indicates hiddden
+> > > > or reserved registers. Since now id_reg_desc_init() is called even
+> > > > for hidden/reserved registers, change it to not do anything for them.
+> > > > 
+> > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > 
+> > > I think there is a very important detail of the series that probably
+> > > should be highlighted. We are only allowing AArch64 feature registers to
+> > > be configurable, right? AArch32 feature registers remain visible with
+> > > their default values passed through to the guest. If you've already
+> > > stated this as a precondition elsewhere then my apologies for the noise.
 > > 
-> > I think there is a very important detail of the series that probably
-> > should be highlighted. We are only allowing AArch64 feature registers to
-> > be configurable, right? AArch32 feature registers remain visible with
-> > their default values passed through to the guest. If you've already
-> > stated this as a precondition elsewhere then my apologies for the noise.
+> > Aren't AArch64 ID regs architecturally mapped to their AArch32
+> > counterparts?  They should show the same values.  I'm not sure if it's a
+> > problem (and if KVM is faithful to that rule),
 > 
-> Aren't AArch64 ID regs architecturally mapped to their AArch32
-> counterparts?  They should show the same values.  I'm not sure if it's a
-> problem (and if KVM is faithful to that rule),
+> I believe it's a bit more subtle than that. The AArch32 feature registers
+> are architecturally mapped to certain encodings accessible from AArch64.
+> For example, ID_PFR0_EL1 is actually a 64 bit register where bits [31:0]
+> map to the ID_PFR0 AArch32 register. ID_PFR0_EL1 is only accessible from
+> AArch64 with the MRS instruction, and ID_PFR0 is only accessible from
+> AArch32 with the MRC instruction. KVM just so happens to handle both of
+> these reads from the same sys_reg_desc.
+> 
+> AFAIK, there does not exist a direct bit mapping between the
+> ID_*_EL1 <-> ID_AA64*_EL1 registers. But hey, could be wrong :)
 
-I believe it's a bit more subtle than that. The AArch32 feature registers
-are architecturally mapped to certain encodings accessible from AArch64.
-For example, ID_PFR0_EL1 is actually a 64 bit register where bits [31:0]
-map to the ID_PFR0 AArch32 register. ID_PFR0_EL1 is only accessible from
-AArch64 with the MRS instruction, and ID_PFR0 is only accessible from
-AArch32 with the MRC instruction. KVM just so happens to handle both of
-these reads from the same sys_reg_desc.
+I think you are right. ID_PFR0_EL1[31:0] doesn't even have the same
+field as ID_AA64PFR0_EL1[31:0]. The only exception would be RAS which is
+at [31:28] on both, but it doesn't say anywhere that ID_PFR0_EL1.RAS
+maps architecturally to ID_AA64PFR0_EL1.RAS. So, I think we can assume
+it doesn't (?).
 
-AFAIK, there does not exist a direct bit mapping between the
-ID_*_EL1 <-> ID_AA64*_EL1 registers. But hey, could be wrong :)
-
---
 Thanks,
-Oliver
+Ricardo
+
+> 
+> --
+> Thanks,
+> Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
