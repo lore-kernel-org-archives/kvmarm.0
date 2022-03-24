@@ -2,70 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1916C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 15:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B25AAC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 16:23:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 283BC49F3E;
-	Thu, 24 Mar 2022 11:44:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 11BAA4B0EF;
+	Thu, 24 Mar 2022 12:23:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qIIFko3BPGS1; Thu, 24 Mar 2022 11:43:58 -0400 (EDT)
+	with ESMTP id YOH7OrpryGtP; Thu, 24 Mar 2022 12:23:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6557410BB;
-	Thu, 24 Mar 2022 11:43:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9CDB4B0DF;
+	Thu, 24 Mar 2022 12:23:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79B07410BB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 11:43:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C87AC49F22
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 12:23:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JNo7ZYK358xY for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2022 11:43:56 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3216240BBF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 11:43:56 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id
- h11-20020a5d430b000000b001f01a35a86fso1809786wrq.4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 08:43:56 -0700 (PDT)
+ with ESMTP id fad1Vnk0a64v for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Mar 2022 12:23:15 -0400 (EDT)
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com
+ [209.85.215.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A85940C02
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 12:23:15 -0400 (EDT)
+Received: by mail-pg1-f169.google.com with SMTP id q19so4228446pgm.6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 09:23:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=rWoUPKu0AaJWm8l2aQCNG1PmHsFWS0Tjs1BlR+KeXSo=;
- b=F42fUyJCuMK5arWCFGN29kI5mU1nxES6fc2W7TIjsAOLovM99OY8KNdVq/oTHni2mF
- E7ovxFATJU9oVS/0qDYxcaoyl7zlGDJYMMEoFT33/qBygNRaeenX7k4Y3fYFLGzVIgDD
- 91aRQP543zaepKPUwi+uYrTl4byb/pE+gn2DW7113WbzDcqabEfx1/J9gqZx5hkT5Z6Y
- Z9/MA0ILTViF7rYYYSpzAasabejhJjvMGMpU4rMoAZRZn0JlC4kpT6hQt/Sd9Hmph8jB
- +pY1zBgLwVoa8Pca1UkqN6Yq/DNN/GCcPAKmkB98G9sVMakZZgm2cWR307aseM60oYIP
- 9X6A==
+ h=message-id:date:mime-version:user-agent:subject:content-language:to
+ :cc:references:from:in-reply-to:content-transfer-encoding;
+ bh=uXjHZDJVvGjT9+tCQuhnhtKNhXNwmcy0iq/6HwiZK08=;
+ b=ZSK5ZkdzYQDO0cEAHxpJYlN22xojbHSf/blD76rCVVBf26r5iLwhmhQ2dUo6YqE43e
+ vk3cwoLvlxJNd9AIZN6lnHRtasNyl4F8MVf0uaK46a1XJlptageUEWmXuY2htaHZ/ZyZ
+ jHIbSbcQiv1r9Fx4Ua1OnnGyawuUTUV48LY0R2g2DTmwJzl0s94TOsOhdEk0rT5hJD+N
+ 8/6W0EUwyl+hJp+XqZUZYw41Ei9ysNeHTsEc4xZvYyLjakrHk69yoE0Eg9KJB/WLPhPu
+ kvId6q+HK203qegslvPkiYKzAYvh3C4WOoZQAHdZQwkXZoZU7hd5AMIqmKnRfmv/bfgt
+ GTvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=rWoUPKu0AaJWm8l2aQCNG1PmHsFWS0Tjs1BlR+KeXSo=;
- b=43qfz+jH5stu1Z4SWFiVZ3jS0SPgauN3NAhSJtm95rRTm3qxFE7qtMf7sP9E3xc86N
- YuGhIiBi8eh1AAPwJ7WUoEDKNhH79VqKu4msu7azqhOPb8TPV/I7FrT/dZNVW6Thpgl1
- o5URnWO+hFVEunnbzgCpeLtODfHQJnIsQ+3SfADnsQtJUp0AFlqzhlhFjc92K265DLYr
- S6a2zc8fba/ucaNCwsVF6c39NjnUpeDy2VyqVX7lFnarVhkLcCDGaY+5zxjA0BW1FBPL
- 3ANzQx0PF0MKg/wcJlUuqGD60ptrFg8+vC/xSLntxvMikhFnEweMwk0d0T2otX4vdPWy
- x+uQ==
-X-Gm-Message-State: AOAM531iPFDhgFd7tbPR3L3jGQYdr3FlwRnQYclA42anL6kloLA4Tqts
- sZE1qRZb72t2zEYgKxnplJZ63DaySq2cFOYb/f0=
-X-Google-Smtp-Source: ABdhPJx0dUAc+CPGDR5fCVWncoXBTYBEoFnp3BZG+yihBm+1aLnW1hvzxkvOCAtA/5o6APLgOSlW+cYrdOQktSzt0fg=
-X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
- (user=sebastianene job=sendgmr) by 2002:a1c:7518:0:b0:381:c77:ceec
- with SMTP
- id o24-20020a1c7518000000b003810c77ceecmr5353400wmc.57.1648136624209; Thu, 24
- Mar 2022 08:43:44 -0700 (PDT)
-Date: Thu, 24 Mar 2022 15:43:05 +0000
-Message-Id: <20220324154304.2572891-1-sebastianene@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH kvmtool v1] Make --no-pvtime command argument arm specific
-From: Sebastian Ene <sebastianene@google.com>
-To: kvm@vger.kernel.org
-Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=uXjHZDJVvGjT9+tCQuhnhtKNhXNwmcy0iq/6HwiZK08=;
+ b=Ph5O2ay9Trm3rUHFbBVxbToUAh3gmgDD1UzmqWwaCxjXAwVp+LaAllVwxEOtm7I+Kb
+ 4ixeR5HnVrQLgDcQk7W9FQkdzEqRaQYNgphUeiGylV9owgETjXWNw3vm30fBhFQqbxmY
+ 05e2Krbf+mmuJBGjDQ/2oUq2iy5uGwzCfc664jdGYdYqBXsiaNtqU5SiKCanJlkKTfEg
+ bsRtZbnw4y4Lwvmz9/8dCz1f66PL16uf4makBfExts+tDFJFToLbIwkLPOJ+kaWxboV+
+ l93F+rKu3YU/1gvgjxXuyaprFK+HXJH44M2vAxuzcnMO4Wrf565ysOoAOMWPYp2bEzOa
+ vg8Q==
+X-Gm-Message-State: AOAM533iUwt2ir9hz8h9AkEWoWLBA8wNkepch7EHPCFatkNxgxPw5DQa
+ 2dMmWFyT6pCuutP89pUyRj63ig==
+X-Google-Smtp-Source: ABdhPJwD+IBhf3QMsnVdq71Xhv26Nh25rsYZwWkB1ESJwYqDhPQZN905r3P2Z4pzcGIGI9cn0VNaYw==
+X-Received: by 2002:a05:6a00:2484:b0:4fa:997e:3290 with SMTP id
+ c4-20020a056a00248400b004fa997e3290mr5859221pfv.37.1648138994270; 
+ Thu, 24 Mar 2022 09:23:14 -0700 (PDT)
+Received: from [192.168.86.237]
+ (107-203-254-183.lightspeed.sntcca.sbcglobal.net. [107.203.254.183])
+ by smtp.gmail.com with ESMTPSA id
+ w12-20020a056a0014cc00b004f790cdbf9dsm4276831pfu.183.2022.03.24.09.23.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 24 Mar 2022 09:23:13 -0700 (PDT)
+Message-ID: <8adf6145-085e-9868-b2f8-65dfbdb5d88f@google.com>
+Date: Thu, 24 Mar 2022 09:23:10 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH v6 02/25] KVM: arm64: Save ID registers' sanitized value
+ per guest
+Content-Language: en-US
+To: Oliver Upton <oupton@google.com>
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-3-reijiw@google.com> <YjtzZI8Lw2uzjm90@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+In-Reply-To: <YjtzZI8Lw2uzjm90@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,100 +92,125 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The stolen time option is available only for aarch64 and is enabled by
-default. Move the option that disables stolen time functionality in the
-arch specific path.
+Hi Oliver,
 
-Signed-off-by: Sebastian Ene <sebastianene@google.com>
----
- arm/aarch64/include/kvm/kvm-config-arch.h | 5 +++--
- arm/aarch64/pvtime.c                      | 4 ++--
- arm/include/arm-common/kvm-config-arch.h  | 1 +
- builtin-run.c                             | 2 --
- include/kvm/kvm-config.h                  | 1 -
- 5 files changed, 6 insertions(+), 7 deletions(-)
+On 3/23/22 12:22 PM, Oliver Upton wrote:
+> Hi Reiji,
+> 
+> On Thu, Mar 10, 2022 at 08:47:48PM -0800, Reiji Watanabe wrote:
+>> Introduce id_regs[] in kvm_arch as a storage of guest's ID registers,
+>> and save ID registers' sanitized value in the array at KVM_CREATE_VM.
+>> Use the saved ones when ID registers are read by the guest or
+>> userspace (via KVM_GET_ONE_REG).
+>>
+>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+>> ---
+>>   arch/arm64/include/asm/kvm_host.h | 12 ++++++
+>>   arch/arm64/kvm/arm.c              |  1 +
+>>   arch/arm64/kvm/sys_regs.c         | 65 ++++++++++++++++++++++++-------
+>>   3 files changed, 63 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 2869259e10c0..c041e5afe3d2 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -101,6 +101,13 @@ struct kvm_s2_mmu {
+>>   struct kvm_arch_memory_slot {
+>>   };
+>>   
+>> +/*
+>> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+>> + * where 0<=crm<8, 0<=op2<8.
+> 
+> Doesn't the Feature ID register scheme only apply to CRm={1-7},
+> op2={0-7}? I believe CRm=0, op2={1-4,7} are in fact UNDEFINED, not RAZ
+> like the other ranges. Furthermore, the registers that are defined in
+> that range do not go through the read_id_reg() plumbing.
 
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43d..a9b0576 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -8,8 +8,9 @@
- 			"Create PMUv3 device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
--			"Layout Randomization (KASLR)"),
--
-+			"Layout Randomization (KASLR)"),		\
-+	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
-+			" stolen time"),
- #include "arm-common/kvm-config-arch.h"
- 
- #endif /* KVM__KVM_CONFIG_ARCH_H */
-diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
-index 2f5774e..a49cf3e 100644
---- a/arm/aarch64/pvtime.c
-+++ b/arm/aarch64/pvtime.c
-@@ -48,13 +48,13 @@ int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
- 	bool has_stolen_time;
- 	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
- 		ARM_PVTIME_STRUCT_SIZE;
--	struct kvm_config *kvm_cfg = NULL;
-+	struct kvm_config_arch *kvm_cfg = NULL;
- 	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
- 		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
- 		.attr	= KVM_ARM_VCPU_PVTIME_IPA
- 	};
- 
--	kvm_cfg = &vcpu->kvm->cfg;
-+	kvm_cfg = &vcpu->kvm->cfg.arch;
- 	if (kvm_cfg->no_pvtime)
- 		return 0;
- 
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46..9f97778 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -12,6 +12,7 @@ struct kvm_config_arch {
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-+	bool no_pvtime;
- };
- 
- int irqchip_parser(const struct option *opt, const char *arg, int unset);
-diff --git a/builtin-run.c b/builtin-run.c
-index 7c8be9d..9a1a0c1 100644
---- a/builtin-run.c
-+++ b/builtin-run.c
-@@ -128,8 +128,6 @@ void kvm_run_set_wrapper_sandbox(void)
- 			" rootfs"),					\
- 	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
- 			"Hugetlbfs path"),				\
--	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
--			" stolen time"),				\
- 									\
- 	OPT_GROUP("Kernel options:"),					\
- 	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
-diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-index 48adf27..6a5720c 100644
---- a/include/kvm/kvm-config.h
-+++ b/include/kvm/kvm-config.h
-@@ -62,7 +62,6 @@ struct kvm_config {
- 	bool no_dhcp;
- 	bool ioport_debug;
- 	bool mmio_debug;
--	bool no_pvtime;
- };
- 
- #endif
--- 
-2.35.1.894.gb6a874cedc-goog
 
+Will fix this.
+
+
+> 
+>> + */
+>> +#define KVM_ARM_ID_REG_MAX_NUM	64
+>> +#define IDREG_IDX(id)		((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+>> +
+>>   struct kvm_arch {
+>>   	struct kvm_s2_mmu mmu;
+>>   
+>> @@ -137,6 +144,9 @@ struct kvm_arch {
+>>   	/* Memory Tagging Extension enabled for the guest */
+>>   	bool mte_enabled;
+>>   	bool ran_once;
+>> +
+>> +	/* ID registers for the guest. */
+>> +	u64 id_regs[KVM_ARM_ID_REG_MAX_NUM];
+> 
+> This is a decently large array. Should we embed it in kvm_arch or
+> allocate at init?
+
+
+What is the reason why you think you might want to allocate it at init ?
+
+  
+> [...]
+> 
+>> +
+>> +/*
+>> + * Set the guest's ID registers that are defined in sys_reg_descs[]
+>> + * with ID_SANITISED() to the host's sanitized value.
+>> + */
+>> +void set_default_id_regs(struct kvm *kvm)
+> 
+> nit, more relevant if you take the above suggestion: maybe call it
+> kvm_init_id_regs()?
+> 
+>> +{
+>> +	int i;
+>> +	u32 id;
+>> +	const struct sys_reg_desc *rd;
+>> +	u64 val;
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(sys_reg_descs); i++) {
+> 
+> You could avoid walking the entire system register table, since we
+> already know the start and end values for the Feature ID register range.> 
+> maybe:
+> 
+>    #define FEATURE_ID_RANGE_START	SYS_ID_PFR0_EL1
+>    #define FEATURE_ID_RANGE_END		sys_reg(3, 0, 0, 7, 7)
+> 
+>    u32 sys_reg;
+> 
+>    for (sys_reg = FEATURE_ID_RANGE_START; sys_reg <= FEATURE_ID_RANGE_END; sys_reg++)
+> 
+> But, it depends on if this check is necessary:
+>
+>> +		rd = &sys_reg_descs[i];
+>> +		if (rd->access != access_id_reg)
+>> +			/* Not ID register, or hidden/reserved ID register */
+>> +			continue;
+> 
+> Which itself is dependent on whether KVM is going to sparsely or
+> verbosely define its feature filtering tables per the other thread. So
+> really only bother with this if that is the direction you're going.
+
+Even just going through for ID register ranges, we should do the check
+to skip hidden/reserved ID registers (not to call read_sanitised_ftr_reg).
+
+Yes, it's certainly possible to avoid walking the entire system register,
+and I will fix it.  The reason why I didn't care it so much was just
+because the code (walking the entire system register) will be removed by
+the following patches:)
+
+Thanks,
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
