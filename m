@@ -2,75 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 528FAC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 23 Mar 2022 22:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F88C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 02:26:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DFE44B08D;
-	Wed, 23 Mar 2022 18:54:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C621740BF0;
+	Wed, 23 Mar 2022 22:26:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YbDaI0ihFche; Wed, 23 Mar 2022 18:54:32 -0400 (EDT)
+	with ESMTP id 8Bp6H5NW3-Ol; Wed, 23 Mar 2022 22:26:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 705154B091;
-	Wed, 23 Mar 2022 18:54:31 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82BAC49F3E;
+	Wed, 23 Mar 2022 22:26:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 015E249F0A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 18:54:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D5A7949F35
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 22:26:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ry+M5N0Gqagx for <kvmarm@lists.cs.columbia.edu>;
- Wed, 23 Mar 2022 18:54:28 -0400 (EDT)
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
- [209.85.210.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D353D49F4C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 18:54:27 -0400 (EDT)
-Received: by mail-pf1-f201.google.com with SMTP id
- x186-20020a627cc3000000b004fa939658c5so1666242pfc.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 15:54:27 -0700 (PDT)
+ with ESMTP id 2NohWxPAUHKV for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 23 Mar 2022 22:26:35 -0400 (EDT)
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com
+ [209.85.166.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A691D49F33
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 22:26:35 -0400 (EDT)
+Received: by mail-io1-f41.google.com with SMTP id z7so3963295iom.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 19:26:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=rIGGxCKW6wA4RApzu/HCVy5JcPZMFgCPd5kmjCwZ9O0=;
- b=piZXHjsIkJ450mWbYKngbm3r2F9EiJqQAxZ1le7FNtfC3xFdjIpPNCmarUWoufU8L3
- APRC/TKWSo17t4ibuolc+YTfas8qlKhUpSzpv9fSQ1UYbRxuhDMfHFFI0Zw3EKMeqRPP
- tdiSYUtt4QD0aPgJo618/IEPivUwPL74tuWT4Xf+bZxaQ+cHeB7HgZnc2c9KWLU8bIfL
- VKWheO/kLL+g7KwzZ/Vmv5fb42buxWcMZT5/At2It1a1F5UHUhcB8QqXbK6DE+KL73W4
- 5DY4pccU40444jrVf5F7sgOd/4wrWaKlIW7hC8wpeGVChUrDxVXzVlGTsJzMXHfJHgN8
- h12g==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=890X9ZlW/q/ZeZqirs7HvcNCWN7aGL7evmsesPaQNmQ=;
+ b=rxX998mFFfKKFwyAeeJOshWSPWoXTtcDGc2Rs99n2aE5JPs2wCNBni5DWMWGDK5FKx
+ Q7lLIGEqmOvSWff8vXIyOD5ZNt/HCfvrjTYtRVygUmtaS7rEK4hsmBPgiNSjolAwPt9B
+ bEcqIk7A9aVcGT6tLAygknW8s63iFNnBVF7O1b6flHzqX0rdAHmWJFaDpNyRrWbESTdW
+ w7w3go6IUFDbYKQPt+ig5iHmLmSpZdvceZhiU0rhomRZs+M2kx+IhNEDhVI3yxhdh2hX
+ HG8dyKnD5kbiK/15DzoJOKw6fGH74ySt5vJZPCnhT2FsMkINzT7lCURMaC2F4D6EI9AF
+ vl5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=rIGGxCKW6wA4RApzu/HCVy5JcPZMFgCPd5kmjCwZ9O0=;
- b=T9TSO4Y8PgiECFpyZi0emVgyUs1VkBLR18wiHtutQHtrvTT80ro8j5t+qDnqe690N8
- IJreFjYqJ7qTjatpzQV1+QGfBu50fOwjI02jjTFWJigw0UgRJW7i2CKg0NEGOs6INWXn
- quofPPbNVx5pA8h66Y3b2TzT3WBC4HBEDMyAmG3R/dlmcKtwTA4xMBTHjPvQoA5P4UkN
- qwfhqppU2BJqoHVEEif7oM6VBTecH861eCJFr5isxnfV6mEKjw4lrIBYy1VbalQg91I5
- iy+BSb0ZmdMxJJnRZdcQa6VaisDyTAw8d7XjlwffaKdehxPY3GUoSO1KO6vtCJ7KtXsd
- TvOA==
-X-Gm-Message-State: AOAM5325AJXRMardNVRcgW6jlxiRVCrjRAN3Dbdh1WBH3XhgDbcYvneq
- G1aeX1O7h2XZHqsXoCE5mo5S6jlDpQKF8A==
-X-Google-Smtp-Source: ABdhPJyQoyjnUIA1nAFuaTRO6TMxt5W14CprA5TK+iqbEUoBmU6oXnnhTS2xfse4MRrVKkMft9PG8GnMgAdGXw==
-X-Received: from ricarkol2.c.googlers.com
- ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:902:a501:b0:153:f956:29f0 with SMTP
- id s1-20020a170902a50100b00153f95629f0mr2583559plq.120.1648076067074; Wed, 23
- Mar 2022 15:54:27 -0700 (PDT)
-Date: Wed, 23 Mar 2022 15:54:05 -0700
-In-Reply-To: <20220323225405.267155-1-ricarkol@google.com>
-Message-Id: <20220323225405.267155-12-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20220323225405.267155-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH v2 11/11] KVM: selftests: aarch64: Add mix of tests into
- page_fault_test
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com
-Cc: maz@kernel.org, bgardon@google.com, pbonzini@redhat.com,
- axelrasmussen@google.com
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=890X9ZlW/q/ZeZqirs7HvcNCWN7aGL7evmsesPaQNmQ=;
+ b=XXefXv/AAyiknL3+OhH3Mfq/X5r7nICYSBPALL+ZmEXKbDS7S/hy41nrOlwDRd+Aq4
+ IQPdN/cK2zxmBf1KlV6r40R01sxQ2RWoPZ6ySJHqPAQ58rzyWCgwxXP7kSju3F0X0KcU
+ bpCPt38PTXlaqzExmU0Eu2YXBJFSC3jke34KiVDynRV6qOMvs3PH6CnVF1VgVoVIGgNj
+ dYQ5GJlodH4i2o6xYMq8G0gTlXNWpgzSoot/CENoAxu3ZbN6ZWW19xC9TjhpexEiKwJg
+ 2xq/vdsejhfo9CDDwl9mKfHdfEJmd9TVAuE+8Gm/yIkWLhCe6rO8v7Sg51ow61ap6aSP
+ wbkA==
+X-Gm-Message-State: AOAM532ggHL4LDvJGY286aZBljQLpVuaNQW5cZkAkTnyFh+rwUmdywh2
+ J1PhCcH71uWr7LZwu13XlDwyqw==
+X-Google-Smtp-Source: ABdhPJwIwB7dsVZCMZPmvWaa1HkqW3/JHdv1qtXXns+LPlUOuyK0nCVpB3hi5nVUva0OPPnhM1Z1Sg==
+X-Received: by 2002:a05:6638:3043:b0:314:7ce2:4a6e with SMTP id
+ u3-20020a056638304300b003147ce24a6emr1650582jak.258.1648088794648; 
+ Wed, 23 Mar 2022 19:26:34 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ a3-20020a5ec303000000b006496b4dd21csm774433iok.5.2022.03.23.19.26.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 23 Mar 2022 19:26:33 -0700 (PDT)
+Date: Thu, 24 Mar 2022 02:26:30 +0000
+From: Oliver Upton <oupton@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v6 11/25] KVM: arm64: Add remaining ID registers to
+ id_reg_desc_table
+Message-ID: <YjvW1lLT1sVZf0jK@google.com>
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-12-reijiw@google.com>
+ <Yjt6qvYliEDqzF9j@google.com> <Yjt/bJidLEPsiPfQ@google.com>
+ <YjuGqunshjhCoIs5@google.com> <Yjuds73S1sO1UpJI@google.com>
+ <YjueX2DOxjoc/d4j@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <YjueX2DOxjoc/d4j@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,211 +96,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add some mix of tests into page_fault_test, like stage 2 faults on
-memslots marked for both userfaultfd and dirty-logging.
+On Wed, Mar 23, 2022 at 10:25:35PM +0000, Oliver Upton wrote:
+> On Wed, Mar 23, 2022 at 03:22:43PM -0700, Ricardo Koller wrote:
+> > On Wed, Mar 23, 2022 at 08:44:26PM +0000, Oliver Upton wrote:
+> > > On Wed, Mar 23, 2022 at 01:13:32PM -0700, Ricardo Koller wrote:
+> > > > On Wed, Mar 23, 2022 at 07:53:14PM +0000, Oliver Upton wrote:
+> > > > > Hi Reiji,
+> > > > > 
+> > > > > On Thu, Mar 10, 2022 at 08:47:57PM -0800, Reiji Watanabe wrote:
+> > > > > > Add hidden or reserved ID registers, and remaining ID registers,
+> > > > > > which don't require special handling, to id_reg_desc_table.
+> > > > > > Add 'flags' field to id_reg_desc, which is used to indicates hiddden
+> > > > > > or reserved registers. Since now id_reg_desc_init() is called even
+> > > > > > for hidden/reserved registers, change it to not do anything for them.
+> > > > > > 
+> > > > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > > > 
+> > > > > I think there is a very important detail of the series that probably
+> > > > > should be highlighted. We are only allowing AArch64 feature registers to
+> > > > > be configurable, right? AArch32 feature registers remain visible with
+> > > > > their default values passed through to the guest. If you've already
+> > > > > stated this as a precondition elsewhere then my apologies for the noise.
+> > > > 
+> > > > Aren't AArch64 ID regs architecturally mapped to their AArch32
+> > > > counterparts?  They should show the same values.  I'm not sure if it's a
+> > > > problem (and if KVM is faithful to that rule),
+> > > 
+> > > I believe it's a bit more subtle than that. The AArch32 feature registers
+> > > are architecturally mapped to certain encodings accessible from AArch64.
+> > > For example, ID_PFR0_EL1 is actually a 64 bit register where bits [31:0]
+> > > map to the ID_PFR0 AArch32 register. ID_PFR0_EL1 is only accessible from
+> > > AArch64 with the MRS instruction, and ID_PFR0 is only accessible from
+> > > AArch32 with the MRC instruction. KVM just so happens to handle both of
+> > > these reads from the same sys_reg_desc.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- .../selftests/kvm/aarch64/page_fault_test.c   | 148 ++++++++++++++++++
- 1 file changed, 148 insertions(+)
+Ughhhhh.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index e6607f903bc1..f1a5bf081a5b 100644
---- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -399,6 +399,12 @@ static int uffd_test_read_handler(int mode, int uffd, struct uffd_msg *msg)
- 	return uffd_generic_handler(mode, uffd, msg, &memslot[TEST], false);
- }
- 
-+static int uffd_no_handler(int mode, int uffd, struct uffd_msg *msg)
-+{
-+	TEST_FAIL("There was no UFFD fault expected.");
-+	return -1;
-+}
-+
- static void punch_hole_in_memslot(struct kvm_vm *vm,
- 		struct memslot_desc *memslot)
- {
-@@ -912,6 +918,30 @@ int main(int argc, char *argv[])
- #define TEST_S1PTW_ON_HOLE_UFFD_AF(__a, __uffd_handler)				\
- 	TEST_S1PTW_ON_HOLE_UFFD(__a, __uffd_handler, __AF_TEST_ARGS)
- 
-+#define __DIRTY_LOG_TEST							\
-+	.test_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.guest_test_check	= { guest_check_write_in_dirty_log, },		\
-+
-+#define __DIRTY_LOG_S1PTW_TEST							\
-+	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
-+	.guest_test_check	= { guest_check_s1ptw_wr_in_dirty_log, },	\
-+
-+#define TEST_WRITE_DIRTY_LOG_AND_S1PTW_ON_UFFD(__a, __uffd_handler, ...)	\
-+	TEST_S1PTW_ON_HOLE_UFFD(__a, __uffd_handler,				\
-+			__DIRTY_LOG_TEST __VA_ARGS__)
-+
-+#define TEST_WRITE_ON_DIRTY_LOG_AND_UFFD(__a, __uffd_handler, ...)		\
-+	TEST_ACCESS_ON_HOLE_UFFD(__a, __uffd_handler,				\
-+			__DIRTY_LOG_TEST __VA_ARGS__)
-+
-+#define TEST_WRITE_UFFD_AND_S1PTW_ON_DIRTY_LOG(__a, __uffd_handler, ...)	\
-+	TEST_ACCESS_ON_HOLE_UFFD(__a, __uffd_handler,				\
-+			__DIRTY_LOG_S1PTW_TEST __VA_ARGS__)
-+
-+#define TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(__a, __uffd_handler, ...)		\
-+	TEST_S1PTW_ON_HOLE_UFFD(__a, __uffd_handler,				\
-+			__DIRTY_LOG_S1PTW_TEST __VA_ARGS__)
-+
- #define TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD(__a, __th, __ph, ...)		\
- {										\
- 	.name			= SNAME(ACCESS_S1PTW_ON_HOLE_UFFD ## _ ## __a),	\
-@@ -1015,6 +1045,10 @@ int main(int argc, char *argv[])
- 	.guest_prepare		= { guest_set_ha, guest_check_lse, },		\
- 	.guest_test_check	= { guest_check_pte_af, }
- 
-+#define __NULL_UFFD_HANDLERS							\
-+	.uffd_test_handler	= uffd_no_handler,				\
-+	.uffd_pt_handler	= uffd_no_handler
-+
- #define	TEST_WRITE_ON_RO_MEMSLOT_AF(__a)					\
- 	TEST_WRITE_ON_RO_MEMSLOT(__a, __AF_TEST_IN_RO_MEMSLOT_ARGS)
- 
-@@ -1105,6 +1139,37 @@ int main(int argc, char *argv[])
- #define TEST_EXEC_AND_S1PTW_AF_ON_RO_MEMSLOT(__a) 				\
- 	TEST_EXEC_AND_S1PTW_ON_RO_MEMSLOT(__a, __AF_TEST_IN_RO_MEMSLOT_ARGS)
- 
-+#define TEST_WRITE_AND_S1PTW_AF_ON_RO_MEMSLOT_WITH_UFFD(__a)			\
-+	TEST_WRITE_AND_S1PTW_ON_RO_MEMSLOT(__a, __NULL_UFFD_HANDLERS)
-+#define TEST_READ_AND_S1PTW_ON_RO_MEMSLOT_WITH_UFFD(__a)			\
-+	TEST_READ_AND_S1PTW_ON_RO_MEMSLOT(__a, __NULL_UFFD_HANDLERS)
-+#define TEST_CM_AND_S1PTW_AF_ON_RO_MEMSLOT_WITH_UFFD(__a)			\
-+	TEST_CM_AND_S1PTW_ON_RO_MEMSLOT(__a, __NULL_UFFD_HANDLERS)
-+#define TEST_EXEC_AND_S1PTW_AF_ON_RO_MEMSLOT_WITH_UFFD(__a)			\
-+	TEST_EXEC_AND_S1PTW_ON_RO_MEMSLOT(__a, __NULL_UFFD_HANDLERS)
-+
-+#define	TEST_WRITE_ON_RO_DIRTY_LOG_MEMSLOT(__a, ...)				\
-+{										\
-+	.name			= SNAME(WRITE_ON_RO_MEMSLOT ## _ ## __a),	\
-+	.test_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
-+	.guest_test		= __a,						\
-+	.guest_test_check	= { guest_check_no_write_in_dirty_log, },	\
-+	.mmio_handler		= mmio_on_test_gpa_handler,			\
-+	.expected_events	= { .mmio_exits = 1, },				\
-+	__VA_ARGS__								\
-+}
-+
-+#define	TEST_CM_ON_RO_DIRTY_LOG_MEMSLOT(__a, ...)				\
-+{										\
-+	.name			= SNAME(WRITE_ON_RO_MEMSLOT ## _ ## __a),	\
-+	.test_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
-+	.guest_test		= __a,						\
-+	.guest_test_check	= { guest_check_no_write_in_dirty_log, },	\
-+	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
-+	.expected_events	= { .fail_vcpu_runs = 1, },			\
-+	__VA_ARGS__								\
-+}
-+
- static struct test_desc tests[] = {
- 	/* Check that HW is setting the AF (sanity checks). */
- 	TEST_HW_ACCESS_FLAG(guest_test_read64),
-@@ -1223,6 +1288,65 @@ static struct test_desc tests[] = {
- 	TEST_ACCESS_AND_S1PTW_ON_HOLE_UFFD_AF(guest_test_exec,
- 			uffd_test_read_handler, uffd_pt_write_handler),
- 
-+	/* Write into a memslot marked for both dirty logging and UFFD. */
-+	TEST_WRITE_ON_DIRTY_LOG_AND_UFFD(guest_test_write64,
-+			uffd_test_write_handler),
-+	/* Note that the cas uffd handler is for a read. */
-+	TEST_WRITE_ON_DIRTY_LOG_AND_UFFD(guest_test_cas,
-+			uffd_test_read_handler, __PREPARE_LSE_TEST_ARGS),
-+	TEST_WRITE_ON_DIRTY_LOG_AND_UFFD(guest_test_dc_zva,
-+			uffd_test_write_handler),
-+	TEST_WRITE_ON_DIRTY_LOG_AND_UFFD(guest_test_st_preidx,
-+			uffd_test_write_handler),
-+
-+	/*
-+	 * Access whose s1ptw faults on a hole that's marked for both dirty
-+	 * logging and UFFD.
-+	 */
-+	TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(guest_test_read64,
-+			uffd_pt_write_handler),
-+	TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(guest_test_cas,
-+			uffd_pt_write_handler, __PREPARE_LSE_TEST_ARGS),
-+	TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(guest_test_ld_preidx,
-+			uffd_pt_write_handler),
-+	TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(guest_test_exec,
-+			uffd_pt_write_handler),
-+	TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(guest_test_write64,
-+			uffd_pt_write_handler),
-+	TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(guest_test_st_preidx,
-+			uffd_pt_write_handler),
-+	TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(guest_test_dc_zva,
-+			uffd_pt_write_handler),
-+	TEST_S1PTW_ON_DIRTY_LOG_AND_UFFD(guest_test_at,
-+			uffd_pt_write_handler),
-+
-+	/*
-+	 * Write on a memslot marked for dirty logging whose related s1ptw
-+	 * is on a hole marked with UFFD.
-+	 */
-+	TEST_WRITE_DIRTY_LOG_AND_S1PTW_ON_UFFD(guest_test_write64,
-+			uffd_pt_write_handler),
-+	TEST_WRITE_DIRTY_LOG_AND_S1PTW_ON_UFFD(guest_test_cas,
-+			uffd_pt_write_handler, __PREPARE_LSE_TEST_ARGS),
-+	TEST_WRITE_DIRTY_LOG_AND_S1PTW_ON_UFFD(guest_test_dc_zva,
-+			uffd_pt_write_handler),
-+	TEST_WRITE_DIRTY_LOG_AND_S1PTW_ON_UFFD(guest_test_st_preidx,
-+			uffd_pt_write_handler),
-+
-+	/*
-+	 * Write on a memslot that's on a hole marked with UFFD, whose related
-+	 * sp1ptw is on a memslot marked for dirty logging.
-+	 */
-+	TEST_WRITE_UFFD_AND_S1PTW_ON_DIRTY_LOG(guest_test_write64,
-+			uffd_test_write_handler),
-+	/* Note that the uffd handler is for a read. */
-+	TEST_WRITE_UFFD_AND_S1PTW_ON_DIRTY_LOG(guest_test_cas,
-+			uffd_test_read_handler, __PREPARE_LSE_TEST_ARGS),
-+	TEST_WRITE_UFFD_AND_S1PTW_ON_DIRTY_LOG(guest_test_dc_zva,
-+			uffd_test_write_handler),
-+	TEST_WRITE_UFFD_AND_S1PTW_ON_DIRTY_LOG(guest_test_st_preidx,
-+			uffd_test_write_handler),
-+
- 	/* Access on readonly memslot (sanity check). */
- 	TEST_WRITE_ON_RO_MEMSLOT(guest_test_write64),
- 	TEST_READ_ON_RO_MEMSLOT(guest_test_read64),
-@@ -1290,6 +1414,30 @@ static struct test_desc tests[] = {
- 	TEST_CM_AND_S1PTW_AF_ON_RO_MEMSLOT(guest_test_st_preidx),
- 	TEST_EXEC_AND_S1PTW_AF_ON_RO_MEMSLOT(guest_test_exec),
- 
-+	/*
-+	 * Access on a memslot marked as readonly with also dirty log tracking.
-+	 * There should be no write in the dirty log.
-+	 */
-+	TEST_WRITE_ON_RO_DIRTY_LOG_MEMSLOT(guest_test_write64),
-+	TEST_CM_ON_RO_DIRTY_LOG_MEMSLOT(guest_test_cas,
-+			__PREPARE_LSE_TEST_ARGS),
-+	TEST_CM_ON_RO_DIRTY_LOG_MEMSLOT(guest_test_dc_zva),
-+	TEST_CM_ON_RO_DIRTY_LOG_MEMSLOT(guest_test_st_preidx),
-+
-+	/*
-+	 * Access on a RO memslot with S1PTW also on a RO memslot, while also
-+	 * having those memslot regions marked for UFFD fault handling.  The
-+	 * result is that UFFD fault handlers should not be called.
-+	 */
-+	TEST_WRITE_AND_S1PTW_AF_ON_RO_MEMSLOT_WITH_UFFD(guest_test_write64),
-+	TEST_READ_AND_S1PTW_ON_RO_MEMSLOT_WITH_UFFD(guest_test_read64),
-+	TEST_READ_AND_S1PTW_ON_RO_MEMSLOT_WITH_UFFD(guest_test_ld_preidx),
-+	TEST_CM_AND_S1PTW_ON_RO_MEMSLOT(guest_test_cas,
-+			__PREPARE_LSE_TEST_ARGS __NULL_UFFD_HANDLERS),
-+	TEST_CM_AND_S1PTW_AF_ON_RO_MEMSLOT_WITH_UFFD(guest_test_dc_zva),
-+	TEST_CM_AND_S1PTW_AF_ON_RO_MEMSLOT_WITH_UFFD(guest_test_st_preidx),
-+	TEST_EXEC_AND_S1PTW_AF_ON_RO_MEMSLOT_WITH_UFFD(guest_test_exec),
-+
- 	{ 0 },
- };
- 
--- 
-2.35.1.894.gb6a874cedc-goog
+We actually clear HCR_EL2.TID3 for AArch32 guests, so AArch32 EL1 reads
+straight from hardware. Considering the work we put in to make sure
+feature registers are consistent system-wide and the limitations on
+certain features, this is plain wrong.
 
+I have a series that addresses this but need to go find some 32 bit
+hardware to test with :)
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
