@@ -2,79 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4E9C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 04:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCABC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 06:00:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F24449F33;
-	Thu, 24 Mar 2022 00:07:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BBA24A105;
+	Thu, 24 Mar 2022 02:00:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QC8xpt7oIsy2; Thu, 24 Mar 2022 00:07:55 -0400 (EDT)
+	with ESMTP id h7QPNEYdA3LV; Thu, 24 Mar 2022 02:00:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AD7049EEF;
-	Thu, 24 Mar 2022 00:07:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9E1C4A11C;
+	Thu, 24 Mar 2022 02:00:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FAED49ED7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 00:07:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D0DE4A0FE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:00:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I3p+5cf5pusv for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2022 00:07:52 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F31740FF0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 00:07:51 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1648094871;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0fkEZc+cdXddFpyjDOTE5EXhIOuXdRohucX74uCvG4U=;
- b=di2RXBPlLzC20KLR9fuLj7oA7uwsFMVYo/ztXC4RT9wROfWA+6Z7iU1wAWOsmQ3UStmFGr
- 57qG8QtZQzzkqeBLERQg8pmk/7IgHdHeDGB8jQmWXM3Qtp3AyC3C6Q353kkzV7JxeSS4CQ
- oqlMOYEY65DIy5+qIxJRrvE/iKr1rH8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-jdGNZksWNH6DvdDpEFU2Hw-1; Thu, 24 Mar 2022 00:07:46 -0400
-X-MC-Unique: jdGNZksWNH6DvdDpEFU2Hw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
- [10.11.54.6])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 55A9D185A7B2;
- Thu, 24 Mar 2022 04:07:46 +0000 (UTC)
-Received: from [10.72.12.33] (ovpn-12-33.pek2.redhat.com [10.72.12.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EE4B2166B2D;
- Thu, 24 Mar 2022 04:07:37 +0000 (UTC)
-Subject: Re: [PATCH v5 03/22] KVM: arm64: Support SDEI_VERSION hypercall
-To: Oliver Upton <oupton@google.com>
-References: <20220322080710.51727-1-gshan@redhat.com>
- <20220322080710.51727-4-gshan@redhat.com> <YjoPxLAMIPobBzS0@google.com>
- <d8e151e5-080b-dc87-b7e0-9031a7928853@redhat.com>
- <YjtLVqBbL0jyFFZy@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <6f217836-45fb-8833-7bb1-5dc822826f56@redhat.com>
-Date: Thu, 24 Mar 2022 12:07:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id TMwbz4989AYu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Mar 2022 02:00:43 -0400 (EDT)
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com
+ [209.85.215.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D29994A104
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:00:42 -0400 (EDT)
+Received: by mail-pg1-f169.google.com with SMTP id t14so3026092pgr.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 23:00:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=t3czBkYyoHFg7UJyKxX9VIgCHCyrFQ4XAs2LDl9neps=;
+ b=TA83IRs9/p7oKXnSveX6TI3Vj5Ybd/zTmzI6jGDtPoD7QGlG5vqQbcO7hjIRdnfcYW
+ LKq4gDkPgb7k9kpY71Z5RtRqdQ/BBV8nsKmb/DUs9TWkD7o16960BgpH2V7gwcGwOofb
+ lWoRShYl4LaVlyF3UqT/CEstw/OgwrJqv6+CJTG68Ay7ADjXL2cTqNcBntsgqB+OOHNo
+ 1HFfdE8EzszeOzP7cKV+p3lYy27mRKHseyqEiOFdYXfXE3b2+D5IZfbEy/u4uIWmjbKj
+ vEcdGLUodL+4B76S7kWAr5KFpXKKTFff7GVqq4oCWePPI3+ZBqZwZkgK+dZjO0cnNux2
+ L2kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=t3czBkYyoHFg7UJyKxX9VIgCHCyrFQ4XAs2LDl9neps=;
+ b=TwH7BjwmyWTY5gJucv83zEWTCXKLY4TrSoWfTCvfp/C46KDjpE9X+AVA4G12/AZpbD
+ TdH7MvhDj+bol6d/568HCD6Oi/K0GEGxWK7XvkwcHeHe5KV1fwn+SQXRUxvpohAo/P2I
+ +KE6lXyH7ThrDJDTufYiwv7nSp1IMDmp3s4T8q8KQkP3bh5NeEbG7K7Q2ZVV5WdhICmC
+ ssY8733yp+ik1NYtxj04Ug5Xhkqg7VtfBcCQvGHC2w+W9MNi2kBGqB5dUeg2CEJF++qg
+ UGmFrWpFoIPZTRVtDytatIoYxyx/3NLzQDLHnO9Kt6B1f07QAWerTMrSE/zLR6mByfyk
+ mwUA==
+X-Gm-Message-State: AOAM531GojbeQAiQ1Cp19rxMFzerQJD82CzikQJS+OShHmF/C/hj7yT5
+ ORPwrszu+bHdHhtzaKfgkd6+U6wjtK45SteIHMtz2Xc3QNV/7Nms
+X-Google-Smtp-Source: ABdhPJzFKhg99WAnPGSmAok3ONRhr2z+aCSI9fpBJ9ZLnS92ko1dp5e3Osel3T/L88y8KOgEXAnGC7E2tyRVBlJjz2w=
+X-Received: by 2002:a65:56cb:0:b0:378:82ed:d74 with SMTP id
+ w11-20020a6556cb000000b0037882ed0d74mr2784915pgs.491.1648101641606; Wed, 23
+ Mar 2022 23:00:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YjtLVqBbL0jyFFZy@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-2-reijiw@google.com>
+ <Yjl96UQ7lUovKBWD@google.com>
+ <CAAeT=FzELqXZiWjZ9aRNqYRbX0zx6LdhETiZUS+CMvax2vLRQw@mail.gmail.com>
+ <YjrG0xiubC108tIN@google.com>
+In-Reply-To: <YjrG0xiubC108tIN@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Wed, 23 Mar 2022 23:00:25 -0700
+Message-ID: <CAAeT=FxEwuwg310vhWQeBJ9UouHNaJNcPqvbLYh7nXp7aFFq=Q@mail.gmail.com>
+Subject: Re: [PATCH v6 01/25] KVM: arm64: Introduce a validation function for
+ an ID register
+To: Oliver Upton <oupton@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -83,71 +84,150 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Oliver,
 
-On 3/24/22 12:31 AM, Oliver Upton wrote:
-> On Wed, Mar 23, 2022 at 08:46:40PM +0800, Gavin Shan wrote:
->> On 3/23/22 2:04 AM, Oliver Upton wrote:
->>> On Tue, Mar 22, 2022 at 04:06:51PM +0800, Gavin Shan wrote:
->>>> This supports SDEI_VERSION hypercall by returning v1.1, which is
->>>> the specification version we're following. The vendor is set to
->>>> 'KVM'.
->>>>
->>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>>> ---
->>>>    arch/arm64/kvm/sdei.c | 10 ++++++++++
->>>>    1 file changed, 10 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
->>>> index 8a9b477b8977..5a3a64cd6e84 100644
->>>> --- a/arch/arm64/kvm/sdei.c
->>>> +++ b/arch/arm64/kvm/sdei.c
->>>> @@ -118,6 +118,14 @@ static bool remove_all_vcpu_events(struct kvm_vcpu *vcpu,
->>>>    	return pending;
->>>>    }
->>>> +static unsigned long hypercall_version(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +	/* v1.1 and the vendor is KVM */
->>>> +	return (1UL << SDEI_VERSION_MAJOR_SHIFT) |
->>>> +	       (1UL << SDEI_VERSION_MINOR_SHIFT) |
->>>> +	       0x4b564d;
->>>
->>> It looks like the SDEI specification states that the vendor-defined
->>> version number is 32 bits. Could we just use one of the
->>> ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_{0,3} values instead?
->>>
->>> ASCII 'KVM' is neat, but in reality guest software will just throw it in
->>> a macro regardless. Might as well use one of the values we've already
->>> trained it to use :-)
->>>
->>> Also, it would appear that guest discovery of SDEI relies upon KVM
->>> reporting a valid SDEI version. IMO, this patch should come at the very
->>> end when KVM actually implements SDEI.
->>>
->>
->> Yeah, I was sticky to the pattern of "KVM". However, I think it's good
->> to reuse the existing one. Lets use ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2
->> if you agree. Its first two characters are "VM" at least.
-> 
-> Sounds fine to me. The only other nit I'd say is we should define a
-> macro for it too, something like:
-> 
->    #define KVM_SDEI_VENDOR	ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2
-> 
+> > > I have some concerns regarding the API between cpufeature and KVM that's
+> > > being proposed here. It would appear that we are adding some of KVM's
+> > > implementation details into the cpufeature code. In particular, I see
+> > > that KVM's limitations on AA64DFR0 are being copied here.
+> >
+> > I assume "KVM's limitation details" you meant is about
+> > ftr_id_aa64dfr0_kvm.
+> > Entries in arm64_ftr_bits_kvm_override shouldn't be added based
+> > on KVM's implementation.  When cpufeature.c doesn't handle lower level
+> > of (or fewer) features as the "safe" value for fields, the field should
+> > be added to arm64_ftr_bits_kvm_override.  As PMUVER and DEBUGVER are not
+> > treated as LOWER_SAFE, they were added in arm64_ftr_bits_kvm_override.
+>
+> I believe the fact that KVM is more permissive on PMUVER and DEBUGVER
+> than cpufeature is in fact a detail of KVM, no? read_id_reg() already
 
-Agreed, and the macro will be put into arch/arm64/include/asm/kvm_sdei.h.
-arch/arm64/include/uapi/asm/kvm_sdei_state.h isn't the right place because
-the dependent macro ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 isn't exposed by
-ABI.
+What cpufeature knows is that consumers of the validation function
+needs the validation of each field based on ID register schemes that
+are described in Arm ARM (basically lower safe).
+As lower values of PMUVER/DEBUGVER indicates lower level of features
+or fewer level of features, those entries are to provide validation
+based on that.  So, entries in arm64_ftr_bits_kvm_override will be added
+to adjust cpufeture's behavior based on ID register schemes, and KVM may
+or may not use them.
+
+I need to remove the word "kvm" from variable/function/structure names
+and put more clear comments:)
+
+> implicitly trusts the cpufeature code filtering and applies additional
+> limitations on top of what we get back. Similarly, there are fields
+> where KVM is more restrictive than cpufeature (ID_AA64DFR0_PMSVER).
+>
+> Each of those constraints could theoretically be expressed as an
+> arm64_ftr_bits structure within KVM.
+
+It's not impossible but it's a bit tricky (With __arm64_ftr_reg_valid(),
+it might look straight forward, but I don't think that treats FTR_EXACT
+correctly. Please see update_cpu_ftr_reg).
+
+> > Having said that, although ftr_id_aa64dfr0 has PMUVER as signed field,
+> > I didn't fix that in ftr_id_aa64dfr0_kvm, and the code abused that....
+> > I should make PMUVER unsigned field, and fix cpufeature.c to validate
+> > the field based on its special ID scheme for cleaner abstraction.
+>
+> Good point. AA64DFR0 is an annoying register :)
+>
+> > (And KVM should skip the cpufeature.c's PMUVER validation using
+> >  id_reg_desc's ignore_mask and have KVM validate it locally based on
+> >  the KVM's special requirement)
+> >
+> >
+> > > Additionally, I think it would be preferable to expose this in a manner
+> > > that does not require CONFIG_KVM guards in other parts of the kernel.
+> > >
+> > > WDYT about having KVM keep its set of feature overrides and otherwise
+> > > rely on the kernel's feature tables? I messed around with the idea a
+> > > bit until I could get something workable (attached). I only compile
+> > > tested this :)
+> >
+> > Thanks for the proposal!
+> > But, providing the overrides to arm64_ftr_reg_valid() means that its
+> > consumer knows implementation details of cpufeture.c (values of entries
+> > in arm64_ftr_regs[]), which is a similar abstraction problem I want to
+> > avoid (the default validation by cpufeature.c should be purely based on
+> > ID schemes even with this option).
+>
+> It is certainly a matter of where you choose to draw those lines. We already
+> do bank on the implementation details of cpufeature.c quite heavily, its
+> just stuffed away behind read_sanitised_ftr_reg(). Now we have KVM bits and
+> pieces in cpufeature.c and might wind up forcing others to clean up our dirty
+> laundry in the future.
+
+As I mentioned above, they aren't KVM specific.
+
+> It also seems to me that if I wanted to raise the permitted DEBUGVER for KVM,
+> would I have to make a change outside of KVM.
+
+Could you elaborate this a little more?
+
+More specific concern I have about providing the override (with the
+existing arm64_ftr_bits) would be when field values of arm64_ftr_bits
+(i.e. LOWER_SAFE to EXACT) in cpufeature are changed due to kernel's
+implementation reasons, which might affect KVM (may need to pass
+extra override to arm64_ftr_reg_valid).
+But, by having cpufeature provide the validation based on the ID
+register schemes, cpufeature should be changed to provide the same
+validation in that case (i.e. if DFR0.PERFMON is changed from LOWER_SAFE
+to EXACT like AA64DFR0.PMUVER, DFR0.PERFMON should be added in
+arm64_ftr_bits_kvm_override with LOWER_SAFE).
+
+So, if I go with the option to provide override to cpufeature, IMHO it
+would be preferable for cpufeature to provide the validation based
+on ID schemes instead of with the current need-based policy (, which
+might get changed) for clear separation.
+
+> > Another option that I considered earlier was having a full set of
+> > arm64_ftr_bits in KVM for its validation. At the time, I thought
+> > statically) having a full set of arm64_ftr_bits in KVM is not good in
+> > terms of maintenance.  But, considering that again, since most of
+> > fields are unsigned and lower safe fields, and KVM doesn't necessarily
+> > have to statically have a full set of arm64_ftr_bits
+>
+> I think the argument could be made for KVM having its own static +
+> verbose cpufeature tables. We've already been bitten by scenarios where
+
+What does "verbose cpufeature tables" mean ?
+
+> cpufeature exposes a feature that we simply do not virtualize in KVM.
+> That really can become a game of whack-a-mole. commit 96f4f6809bee
+> ("KVM: arm64: Don't advertise FEAT_SPE to guests") is a good example,
+> and I can really see no end to these sorts of issues without an
+> overhaul. We'd need to also find a way to leverage the existing
+> infrasturcture for working out a system-wide safe value, but this time
+> with KVM's table of registers.
+> KVM would then need to take a change to expose any new feature that has
+> no involvement of EL2. Personally, I'd take that over the possibility of
+> another unhandled feature slipping through and blowing up a guest kernel
+> when running on newer hardware.
+
+Userspace with configurable ID registers would eliminate such problems
+on known systems, but I agree that KVM itself should prevent it.
+It will be inconvenient for some people, but it would be safer in general.
+
+> > (dynamically generate during KVM's initialization)
+>
+> This was another one of my concerns with the current state of this
+> patch. I found the register table construction at runtime hard to
+> follow. I think it could be avoided with a helper that has a prescribed
+> set of rules (caller-provided field definition takes precedence over the
+> general one).
+
+Sure, I will improve that if I continue to keep the current way.
+With the option of having a separate KVM's arm64_ftr_bits,
+the code will be very different, but I will keep that in mind.
 
 Thanks,
-Gavin
-
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
