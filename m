@@ -2,77 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCABC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 06:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECEF7C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 06:44:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BBA24A105;
-	Thu, 24 Mar 2022 02:00:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BE5749F20;
+	Thu, 24 Mar 2022 02:44:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h7QPNEYdA3LV; Thu, 24 Mar 2022 02:00:45 -0400 (EDT)
+	with ESMTP id jaUtaAjGMKu8; Thu, 24 Mar 2022 02:44:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9E1C4A11C;
-	Thu, 24 Mar 2022 02:00:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C26F249F49;
+	Thu, 24 Mar 2022 02:44:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D0DE4A0FE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:00:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2E0D49F17
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:44:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TMwbz4989AYu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2022 02:00:43 -0400 (EDT)
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com
- [209.85.215.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D29994A104
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:00:42 -0400 (EDT)
-Received: by mail-pg1-f169.google.com with SMTP id t14so3026092pgr.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 23:00:42 -0700 (PDT)
+ with ESMTP id 3IQHJh+UniWc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Mar 2022 02:44:36 -0400 (EDT)
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com
+ [209.85.216.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 62A5149F0E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:44:36 -0400 (EDT)
+Received: by mail-pj1-f41.google.com with SMTP id b8so3893050pjb.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 23:44:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=t3czBkYyoHFg7UJyKxX9VIgCHCyrFQ4XAs2LDl9neps=;
- b=TA83IRs9/p7oKXnSveX6TI3Vj5Ybd/zTmzI6jGDtPoD7QGlG5vqQbcO7hjIRdnfcYW
- LKq4gDkPgb7k9kpY71Z5RtRqdQ/BBV8nsKmb/DUs9TWkD7o16960BgpH2V7gwcGwOofb
- lWoRShYl4LaVlyF3UqT/CEstw/OgwrJqv6+CJTG68Ay7ADjXL2cTqNcBntsgqB+OOHNo
- 1HFfdE8EzszeOzP7cKV+p3lYy27mRKHseyqEiOFdYXfXE3b2+D5IZfbEy/u4uIWmjbKj
- vEcdGLUodL+4B76S7kWAr5KFpXKKTFff7GVqq4oCWePPI3+ZBqZwZkgK+dZjO0cnNux2
- L2kg==
+ :cc; bh=g92GNbyRw2zP4NyiWEWVoR29xzKSW1YDOFU5CW6awjI=;
+ b=W4GNbRWFeYIGRK4Kd7v0BV7d/8+EzcVQiKjbyIzkj5P3MuR5r+MRKX9NhxplmdKQDG
+ h8WJzXqIT4A+HtJuFsxwdcEqw4e4OmMkge71MMjZX6cAHKOeJxIUAA7PoZ0oQwcy3gr2
+ fIkcPWrt7XSykEo1w+cXHy0g0PolVivZf8uxR1KBcRa/C2rOiNZZ4GvnwKQEquHpSZ/U
+ 0T4yNv6LDdymEHb+hx3KavSwMNsBgEzA5sTHbpRFeV64zSfbMVyJjvAc9+bl5w8S8h//
+ 9JF1hrq2ZNjq885slruDknDbG7C3hZD3JrbAuC1iCofwjLsqVdOqqEniNERfVGXM+FgQ
+ ib1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=t3czBkYyoHFg7UJyKxX9VIgCHCyrFQ4XAs2LDl9neps=;
- b=TwH7BjwmyWTY5gJucv83zEWTCXKLY4TrSoWfTCvfp/C46KDjpE9X+AVA4G12/AZpbD
- TdH7MvhDj+bol6d/568HCD6Oi/K0GEGxWK7XvkwcHeHe5KV1fwn+SQXRUxvpohAo/P2I
- +KE6lXyH7ThrDJDTufYiwv7nSp1IMDmp3s4T8q8KQkP3bh5NeEbG7K7Q2ZVV5WdhICmC
- ssY8733yp+ik1NYtxj04Ug5Xhkqg7VtfBcCQvGHC2w+W9MNi2kBGqB5dUeg2CEJF++qg
- UGmFrWpFoIPZTRVtDytatIoYxyx/3NLzQDLHnO9Kt6B1f07QAWerTMrSE/zLR6mByfyk
- mwUA==
-X-Gm-Message-State: AOAM531GojbeQAiQ1Cp19rxMFzerQJD82CzikQJS+OShHmF/C/hj7yT5
- ORPwrszu+bHdHhtzaKfgkd6+U6wjtK45SteIHMtz2Xc3QNV/7Nms
-X-Google-Smtp-Source: ABdhPJzFKhg99WAnPGSmAok3ONRhr2z+aCSI9fpBJ9ZLnS92ko1dp5e3Osel3T/L88y8KOgEXAnGC7E2tyRVBlJjz2w=
-X-Received: by 2002:a65:56cb:0:b0:378:82ed:d74 with SMTP id
- w11-20020a6556cb000000b0037882ed0d74mr2784915pgs.491.1648101641606; Wed, 23
- Mar 2022 23:00:41 -0700 (PDT)
+ bh=g92GNbyRw2zP4NyiWEWVoR29xzKSW1YDOFU5CW6awjI=;
+ b=MFsPzKuGfMpRUs3XDyKzR/l0WJqB6QHdK79okWgxfCYQH9lyeEE977zhuUb6XdowiV
+ TafmJgk8YDoHy6KudqgIXQfwtmfs7bDJe3mSZSvsI/W8jUFpWnbEvVLeG3iBLoKDfHDV
+ 6nHEEJe4M5nunYpjHGJoHVFLX8HouEf9NOquSQ2FSApsGVhPYPiEE/RVICp+9vxnYmyz
+ Ry33CrMTYdBAIoX67ATplNouDBriHZzD0yUyK9gigT33PgAaAIvq8fOgLwOg34Jp1xHS
+ i+7RxVllIOG5UdBa0QZRJZmO5AK2PPCN2uetftMaeCIsrKsuDNSgTwa0T5+qhVUSCeDw
+ R0Eg==
+X-Gm-Message-State: AOAM5330cZkFR/oSFpDwsJ81/QOuJnMn83+lqGDs5koKtMb2CR2TtHMd
+ llqHoHuEBtwzMlqU542hiKT+FXNPDvvzeHAdPrGlTw==
+X-Google-Smtp-Source: ABdhPJxNinvVGW4deP+GBGN8X1rgQnrl5ZgxEDZnW3lw1JKkzdIl06MSnl7IU0ErWLwb3H3bXRi167e2wOA/hFXCuCk=
+X-Received: by 2002:a17:902:c9c2:b0:154:68e7:7c5a with SMTP id
+ q2-20020a170902c9c200b0015468e77c5amr4185987pld.122.1648104275145; Wed, 23
+ Mar 2022 23:44:35 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220311044811.1980336-1-reijiw@google.com>
- <20220311044811.1980336-2-reijiw@google.com>
- <Yjl96UQ7lUovKBWD@google.com>
- <CAAeT=FzELqXZiWjZ9aRNqYRbX0zx6LdhETiZUS+CMvax2vLRQw@mail.gmail.com>
- <YjrG0xiubC108tIN@google.com>
-In-Reply-To: <YjrG0xiubC108tIN@google.com>
+References: <20220311174001.605719-1-oupton@google.com>
+ <20220311174001.605719-10-oupton@google.com>
+ <CAAeT=FyGUZMy-TUZuHu+bZtUY9NfjBQ79JKBX0xK4kEqFTO1OQ@mail.gmail.com>
+ <YjlxkE2h6K9cTOTP@google.com>
+In-Reply-To: <YjlxkE2h6K9cTOTP@google.com>
 From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 23 Mar 2022 23:00:25 -0700
-Message-ID: <CAAeT=FxEwuwg310vhWQeBJ9UouHNaJNcPqvbLYh7nXp7aFFq=Q@mail.gmail.com>
-Subject: Re: [PATCH v6 01/25] KVM: arm64: Introduce a validation function for
- an ID register
+Date: Wed, 23 Mar 2022 23:44:19 -0700
+Message-ID: <CAAeT=FwMCOy_0kVU+ZJw+J5QUnJQ6BhBxvDYMf0axz-Xyjo4LQ@mail.gmail.com>
+Subject: Re: [PATCH v4 09/15] KVM: arm64: Add support for userspace to suspend
+ a vCPU
 To: Oliver Upton <oupton@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Cc: Marc Zyngier <maz@kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+ Peter Shier <pshier@google.com>, kvm-riscv@lists.infradead.org,
+ Atish Patra <atishp@atishpatra.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,140 +92,201 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Oliver,
 
-> > > I have some concerns regarding the API between cpufeature and KVM that's
-> > > being proposed here. It would appear that we are adding some of KVM's
-> > > implementation details into the cpufeature code. In particular, I see
-> > > that KVM's limitations on AA64DFR0 are being copied here.
+On Mon, Mar 21, 2022 at 11:49 PM Oliver Upton <oupton@google.com> wrote:
+>
+> On Mon, Mar 21, 2022 at 11:19:33PM -0700, Reiji Watanabe wrote:
+> > Hi Oliver,
 > >
-> > I assume "KVM's limitation details" you meant is about
-> > ftr_id_aa64dfr0_kvm.
-> > Entries in arm64_ftr_bits_kvm_override shouldn't be added based
-> > on KVM's implementation.  When cpufeature.c doesn't handle lower level
-> > of (or fewer) features as the "safe" value for fields, the field should
-> > be added to arm64_ftr_bits_kvm_override.  As PMUVER and DEBUGVER are not
-> > treated as LOWER_SAFE, they were added in arm64_ftr_bits_kvm_override.
->
-> I believe the fact that KVM is more permissive on PMUVER and DEBUGVER
-> than cpufeature is in fact a detail of KVM, no? read_id_reg() already
-
-What cpufeature knows is that consumers of the validation function
-needs the validation of each field based on ID register schemes that
-are described in Arm ARM (basically lower safe).
-As lower values of PMUVER/DEBUGVER indicates lower level of features
-or fewer level of features, those entries are to provide validation
-based on that.  So, entries in arm64_ftr_bits_kvm_override will be added
-to adjust cpufeture's behavior based on ID register schemes, and KVM may
-or may not use them.
-
-I need to remove the word "kvm" from variable/function/structure names
-and put more clear comments:)
-
-> implicitly trusts the cpufeature code filtering and applies additional
-> limitations on top of what we get back. Similarly, there are fields
-> where KVM is more restrictive than cpufeature (ID_AA64DFR0_PMSVER).
->
-> Each of those constraints could theoretically be expressed as an
-> arm64_ftr_bits structure within KVM.
-
-It's not impossible but it's a bit tricky (With __arm64_ftr_reg_valid(),
-it might look straight forward, but I don't think that treats FTR_EXACT
-correctly. Please see update_cpu_ftr_reg).
-
-> > Having said that, although ftr_id_aa64dfr0 has PMUVER as signed field,
-> > I didn't fix that in ftr_id_aa64dfr0_kvm, and the code abused that....
-> > I should make PMUVER unsigned field, and fix cpufeature.c to validate
-> > the field based on its special ID scheme for cleaner abstraction.
->
-> Good point. AA64DFR0 is an annoying register :)
->
-> > (And KVM should skip the cpufeature.c's PMUVER validation using
-> >  id_reg_desc's ignore_mask and have KVM validate it locally based on
-> >  the KVM's special requirement)
-> >
-> >
-> > > Additionally, I think it would be preferable to expose this in a manner
-> > > that does not require CONFIG_KVM guards in other parts of the kernel.
+> > On Fri, Mar 11, 2022 at 9:41 AM Oliver Upton <oupton@google.com> wrote:
 > > >
-> > > WDYT about having KVM keep its set of feature overrides and otherwise
-> > > rely on the kernel's feature tables? I messed around with the idea a
-> > > bit until I could get something workable (attached). I only compile
-> > > tested this :)
+> > > Introduce a new MP state, KVM_MP_STATE_SUSPENDED, which indicates a vCPU
+> > > is in a suspended state. In the suspended state the vCPU will block
+> > > until a wakeup event (pending interrupt) is recognized.
+> > >
+> > > Add a new system event type, KVM_SYSTEM_EVENT_WAKEUP, to indicate to
+> > > userspace that KVM has recognized one such wakeup event. It is the
+> > > responsibility of userspace to then make the vCPU runnable, or leave it
+> > > suspended until the next wakeup event.
+> > >
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+> > >  Documentation/virt/kvm/api.rst    | 37 +++++++++++++++++++++++++++++--
+> > >  arch/arm64/include/asm/kvm_host.h |  1 +
+> > >  arch/arm64/kvm/arm.c              | 35 +++++++++++++++++++++++++++++
+> > >  include/uapi/linux/kvm.h          |  2 ++
+> > >  4 files changed, 73 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > index 5625c08b4a0e..426bcdc1216d 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -1482,14 +1482,43 @@ Possible values are:
+> > >                                   [s390]
+> > >     KVM_MP_STATE_LOAD             the vcpu is in a special load/startup state
+> > >                                   [s390]
+> > > +   KVM_MP_STATE_SUSPENDED        the vcpu is in a suspend state and is waiting
+> > > +                                 for a wakeup event [arm64]
+> > >     ==========================    ===============================================
+> > >
+> > >  On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
+> > >  in-kernel irqchip, the multiprocessing state must be maintained by userspace on
+> > >  these architectures.
+> > >
+> > > -For arm64/riscv:
+> > > -^^^^^^^^^^^^^^^^
+> > > +For arm64:
+> > > +^^^^^^^^^^
+> > > +
+> > > +If a vCPU is in the KVM_MP_STATE_SUSPENDED state, KVM will emulate the
+> > > +architectural execution of a WFI instruction.
+> > > +
+> > > +If a wakeup event is recognized, KVM will exit to userspace with a
+> > > +KVM_SYSTEM_EVENT exit, where the event type is KVM_SYSTEM_EVENT_WAKEUP. If
+> > > +userspace wants to honor the wakeup, it must set the vCPU's MP state to
+> > > +KVM_MP_STATE_RUNNABLE. If it does not, KVM will continue to await a wakeup
+> > > +event in subsequent calls to KVM_RUN.
+> > > +
+> > > +.. warning::
+> > > +
+> > > +     If userspace intends to keep the vCPU in a SUSPENDED state, it is
+> > > +     strongly recommended that userspace take action to suppress the
+> > > +     wakeup event (such as masking an interrupt). Otherwise, subsequent
+> > > +     calls to KVM_RUN will immediately exit with a KVM_SYSTEM_EVENT_WAKEUP
+> > > +     event and inadvertently waste CPU cycles.
+> > > +
+> > > +     Additionally, if userspace takes action to suppress a wakeup event,
+> > > +     it is strongly recommended that it also restore the vCPU to its
 > >
-> > Thanks for the proposal!
-> > But, providing the overrides to arm64_ftr_reg_valid() means that its
-> > consumer knows implementation details of cpufeture.c (values of entries
-> > in arm64_ftr_regs[]), which is a similar abstraction problem I want to
-> > avoid (the default validation by cpufeature.c should be purely based on
-> > ID schemes even with this option).
+> > Nit: s/restore/restores/ ?
+> >
+> >
+> > > +     original state when the vCPU is made RUNNABLE again. For example,
+> > > +     if userspace masked a pending interrupt to suppress the wakeup,
+> > > +     the interrupt should be unmasked before returning control to the
+> > > +     guest.
+> > > +
+> > > +For riscv:
+> > > +^^^^^^^^^^
+> > >
+> > >  The only states that are valid are KVM_MP_STATE_STOPPED and
+> > >  KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
+> > > @@ -5914,6 +5943,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
+> > >    #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+> > >    #define KVM_SYSTEM_EVENT_RESET          2
+> > >    #define KVM_SYSTEM_EVENT_CRASH          3
+> > > +  #define KVM_SYSTEM_EVENT_WAKEUP         4
+> > >                         __u32 type;
+> > >                         __u64 flags;
+> > >                 } system_event;
+> > > @@ -5938,6 +5968,9 @@ Valid values for 'type' are:
+> > >     has requested a crash condition maintenance. Userspace can choose
+> > >     to ignore the request, or to gather VM memory core dump and/or
+> > >     reset/shutdown of the VM.
+> > > + - KVM_SYSTEM_EVENT_WAKEUP -- the guest is in a suspended state and KVM
+> >
+> > Nit: Shouldn't 'the guest' be 'the vcpu' ?
+> >
+> > > +   has recognized a wakeup event. Userspace may honor this event by marking
+> > > +   the exiting vCPU as runnable, or deny it and call KVM_RUN again.
+> > >
+> > >  Valid flags are:
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index da58eb96d2a8..899f2c0b4c7b 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -46,6 +46,7 @@
+> > >  #define KVM_REQ_RECORD_STEAL   KVM_ARCH_REQ(3)
+> > >  #define KVM_REQ_RELOAD_GICv4   KVM_ARCH_REQ(4)
+> > >  #define KVM_REQ_RELOAD_PMU     KVM_ARCH_REQ(5)
+> > > +#define KVM_REQ_SUSPEND                KVM_ARCH_REQ(6)
+> > >
+> > >  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+> > >                                      KVM_DIRTY_LOG_INITIALLY_SET)
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index 8eed0556ccaa..b94efa05d869 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -444,6 +444,18 @@ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
+> > >         return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_STOPPED;
+> > >  }
+> > >
+> > > +static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       vcpu->arch.mp_state.mp_state = KVM_MP_STATE_SUSPENDED;
+> > > +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> > > +       kvm_vcpu_kick(vcpu);
+> > > +}
+> > > +
+> > > +static bool kvm_arm_vcpu_suspended(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_SUSPENDED;
+> > > +}
+> > > +
+> > >  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+> > >                                     struct kvm_mp_state *mp_state)
+> > >  {
+> > > @@ -464,6 +476,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+> > >         case KVM_MP_STATE_STOPPED:
+> > >                 kvm_arm_vcpu_power_off(vcpu);
+> > >                 break;
+> > > +       case KVM_MP_STATE_SUSPENDED:
+> > > +               kvm_arm_vcpu_suspend(vcpu);
+> > > +               break;
+> > >         default:
+> > >                 ret = -EINVAL;
+> > >         }
+> > > @@ -648,6 +663,23 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
+> > >         preempt_enable();
+> > >  }
+> > >
+> > > +static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       if (!kvm_arm_vcpu_suspended(vcpu))
+> > > +               return 1;
+> > > +
+> > > +       kvm_vcpu_wfi(vcpu);
+> > > +
+> > > +       /*
+> > > +        * The suspend state is sticky; we do not leave it until userspace
+> > > +        * explicitly marks the vCPU as runnable. Request that we suspend again
+> > > +        * later.
+> > > +        */
+> > > +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> > > +       kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_WAKEUP, 0);
+> > > +       return 0;
+> > > +}
+> > > +
+> > >  /**
+> > >   * check_vcpu_requests - check and handle pending vCPU requests
+> > >   * @vcpu:      the VCPU pointer
+> > > @@ -686,6 +718,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+> > >                 if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
+> > >                         kvm_pmu_handle_pmcr(vcpu,
+> > >                                             __vcpu_sys_reg(vcpu, PMCR_EL0));
+> > > +
+> > > +               if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
+> > > +                       return kvm_vcpu_suspend(vcpu);
+> >
+> > It appears that one of the cases that kvm_vcpu_suspend() returns
+> > is when a pending signal is detected, and the exit reason will be
+> > KVM_EXIT_SYSTEM_EVENT in this case.  On the other hand, when a
+> > pending signal is detected earlier in xfer_to_guest_mode_handle_work(),
+> > KVM_RUN returns -EINTR even if the vCPU is in KVM_MP_STATE_SUSPENDED
+> > state. Shouldn't those behaviors be consistent ? (Perhaps -EINTR?)
 >
-> It is certainly a matter of where you choose to draw those lines. We already
-> do bank on the implementation details of cpufeature.c quite heavily, its
-> just stuffed away behind read_sanitised_ftr_reg(). Now we have KVM bits and
-> pieces in cpufeature.c and might wind up forcing others to clean up our dirty
-> laundry in the future.
-
-As I mentioned above, they aren't KVM specific.
-
-> It also seems to me that if I wanted to raise the permitted DEBUGVER for KVM,
-> would I have to make a change outside of KVM.
-
-Could you elaborate this a little more?
-
-More specific concern I have about providing the override (with the
-existing arm64_ftr_bits) would be when field values of arm64_ftr_bits
-(i.e. LOWER_SAFE to EXACT) in cpufeature are changed due to kernel's
-implementation reasons, which might affect KVM (may need to pass
-extra override to arm64_ftr_reg_valid).
-But, by having cpufeature provide the validation based on the ID
-register schemes, cpufeature should be changed to provide the same
-validation in that case (i.e. if DFR0.PERFMON is changed from LOWER_SAFE
-to EXACT like AA64DFR0.PMUVER, DFR0.PERFMON should be added in
-arm64_ftr_bits_kvm_override with LOWER_SAFE).
-
-So, if I go with the option to provide override to cpufeature, IMHO it
-would be preferable for cpufeature to provide the validation based
-on ID schemes instead of with the current need-based policy (, which
-might get changed) for clear separation.
-
-> > Another option that I considered earlier was having a full set of
-> > arm64_ftr_bits in KVM for its validation. At the time, I thought
-> > statically) having a full set of arm64_ftr_bits in KVM is not good in
-> > terms of maintenance.  But, considering that again, since most of
-> > fields are unsigned and lower safe fields, and KVM doesn't necessarily
-> > have to statically have a full set of arm64_ftr_bits
+> Great catch!
 >
-> I think the argument could be made for KVM having its own static +
-> verbose cpufeature tables. We've already been bitten by scenarios where
-
-What does "verbose cpufeature tables" mean ?
-
-> cpufeature exposes a feature that we simply do not virtualize in KVM.
-> That really can become a game of whack-a-mole. commit 96f4f6809bee
-> ("KVM: arm64: Don't advertise FEAT_SPE to guests") is a good example,
-> and I can really see no end to these sorts of issues without an
-> overhaul. We'd need to also find a way to leverage the existing
-> infrasturcture for working out a system-wide safe value, but this time
-> with KVM's table of registers.
-> KVM would then need to take a change to expose any new feature that has
-> no involvement of EL2. Personally, I'd take that over the possibility of
-> another unhandled feature slipping through and blowing up a guest kernel
-> when running on newer hardware.
-
-Userspace with configurable ID registers would eliminate such problems
-on known systems, but I agree that KVM itself should prevent it.
-It will be inconvenient for some people, but it would be safer in general.
-
-> > (dynamically generate during KVM's initialization)
+> I should probably check that the vCPU is actually runnable with
+> kvm_arch_vcpu_runnable() before setting up a system event exit. That is
+> after all what the documentation of this whole API says it does, right?
+> :)
 >
-> This was another one of my concerns with the current state of this
-> patch. I found the register table construction at runtime hard to
-> follow. I think it could be avoided with a helper that has a prescribed
-> set of rules (caller-provided field definition takes precedence over the
-> general one).
+> If the vCPU thread were poked for any other reason this should return 1
+> and let the kvm_vcpu_exit_request()/xfer_to_guest_mode_handle_work()
+> pairing clean up anything else.
 
-Sure, I will improve that if I continue to keep the current way.
-With the option of having a separate KVM's arm64_ftr_bits,
-the code will be very different, but I will keep that in mind.
+Yes, that sounds good.
 
 Thanks,
 Reiji
