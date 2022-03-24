@@ -2,82 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C40C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 09:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1916C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 15:44:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B77C49ED1;
-	Thu, 24 Mar 2022 05:04:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 283BC49F3E;
+	Thu, 24 Mar 2022 11:44:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gbkfnNVLISDC; Thu, 24 Mar 2022 05:04:47 -0400 (EDT)
+	with ESMTP id qIIFko3BPGS1; Thu, 24 Mar 2022 11:43:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 388A149F0A;
-	Thu, 24 Mar 2022 05:04:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6557410BB;
+	Thu, 24 Mar 2022 11:43:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6745F49ED1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 05:04:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79B07410BB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 11:43:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cC26myccbVq1 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2022 05:04:45 -0400 (EDT)
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com
- [209.85.166.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1088149EBB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 05:04:44 -0400 (EDT)
-Received: by mail-io1-f44.google.com with SMTP id e22so4609206ioe.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:04:44 -0700 (PDT)
+ with ESMTP id JNo7ZYK358xY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Mar 2022 11:43:56 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3216240BBF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 11:43:56 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id
+ h11-20020a5d430b000000b001f01a35a86fso1809786wrq.4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 08:43:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=hLMKV9xpskYCVwglq78GATmb0tIIibhlp1DIF9X1vs4=;
- b=M3lv1AuPL0bisoKr/J5KZ1FwUPCvwXbvAdzS/hiR5rP244r3TgkDcow2eDyuuEGDDk
- c+o7pktkIbCOubIuKY//azUU3n3YZptU38aBU2aBOnCJc2ubkDny33EkQ7NTXmR/o0ll
- GM1Ij/CWFNFkd5ucVKDI7wHASjpbDf1r0PWQslsdP0QiCHzfD3zYGVN3LkRjYnifBrDc
- Rq4nypvBxisQf7lVWW3s394AXXfIZhqmEAJOvxObl2qZUzpbyvutVBPq2WsD4ofBWJfT
- khfLN1696wse01rBubQKvjAbYq1UDLd2og8pI292HKgkwdFyi6zd/u8gHhPCvaNAwnKb
- YgTg==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=rWoUPKu0AaJWm8l2aQCNG1PmHsFWS0Tjs1BlR+KeXSo=;
+ b=F42fUyJCuMK5arWCFGN29kI5mU1nxES6fc2W7TIjsAOLovM99OY8KNdVq/oTHni2mF
+ E7ovxFATJU9oVS/0qDYxcaoyl7zlGDJYMMEoFT33/qBygNRaeenX7k4Y3fYFLGzVIgDD
+ 91aRQP543zaepKPUwi+uYrTl4byb/pE+gn2DW7113WbzDcqabEfx1/J9gqZx5hkT5Z6Y
+ Z9/MA0ILTViF7rYYYSpzAasabejhJjvMGMpU4rMoAZRZn0JlC4kpT6hQt/Sd9Hmph8jB
+ +pY1zBgLwVoa8Pca1UkqN6Yq/DNN/GCcPAKmkB98G9sVMakZZgm2cWR307aseM60oYIP
+ 9X6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=hLMKV9xpskYCVwglq78GATmb0tIIibhlp1DIF9X1vs4=;
- b=FX4LWTMnSLmXQALsss0GEQyN9VMCWAxO3vvuYutyELiDvlMH4c/tD4YGDOsmeLiKNo
- 9XRVkUJPqepRy6r1iEqCxM8YGaRamteDDH3ywa9uVx88QE0MVYA62hHibi173hlb8TYo
- X8Hzvg28UrlMxfz6OUiIqfxDekGzLAtctUd+VXOh/7lF4bVDqtEfFyfReLLcLGAoR6Qs
- rqUN9l9xO9iJ32KqrMJTAfXE6jHRLS4xQ4vnjA8CUxjHW6MpsXF9WIC2ub1ONxKL52Or
- 2Gkqm3CXBadubg/eWE7LA9MFrm4NvR4jA7qvLCVsmLS3wCaLigGjMTtgajpuhHRH4Z3b
- 5Daw==
-X-Gm-Message-State: AOAM532IJkNgMWqcZian+8L2lox/sDAVuTuvq8yfVFfsZxdIYsveBBls
- LG2j9+NV1kyMfD5Z1nYDhjQEmA==
-X-Google-Smtp-Source: ABdhPJy2wQnPDXYvg4eqx/57EAShdK7goC7DKCpVmFwW7MpIDLqBzkUr18ydysDB5iUU99AzRq2VJg==
-X-Received: by 2002:a05:6638:b25:b0:317:3c79:d625 with SMTP id
- c5-20020a0566380b2500b003173c79d625mr2223397jab.63.1648112684101; 
- Thu, 24 Mar 2022 02:04:44 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- b1-20020a92a041000000b002c8214b2f65sm1235267ilm.61.2022.03.24.02.04.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 24 Mar 2022 02:04:43 -0700 (PDT)
-Date: Thu, 24 Mar 2022 09:04:40 +0000
-From: Oliver Upton <oupton@google.com>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v5 02/22] KVM: arm64: Add SDEI virtualization
- infrastructure
-Message-ID: <Yjw0KFZ+DG0A1KxK@google.com>
-References: <20220322080710.51727-1-gshan@redhat.com>
- <20220322080710.51727-3-gshan@redhat.com>
- <YjtUufdsWYxqdGa+@google.com>
- <4d4e5645-4443-c233-6d25-97e68d804512@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <4d4e5645-4443-c233-6d25-97e68d804512@redhat.com>
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=rWoUPKu0AaJWm8l2aQCNG1PmHsFWS0Tjs1BlR+KeXSo=;
+ b=43qfz+jH5stu1Z4SWFiVZ3jS0SPgauN3NAhSJtm95rRTm3qxFE7qtMf7sP9E3xc86N
+ YuGhIiBi8eh1AAPwJ7WUoEDKNhH79VqKu4msu7azqhOPb8TPV/I7FrT/dZNVW6Thpgl1
+ o5URnWO+hFVEunnbzgCpeLtODfHQJnIsQ+3SfADnsQtJUp0AFlqzhlhFjc92K265DLYr
+ S6a2zc8fba/ucaNCwsVF6c39NjnUpeDy2VyqVX7lFnarVhkLcCDGaY+5zxjA0BW1FBPL
+ 3ANzQx0PF0MKg/wcJlUuqGD60ptrFg8+vC/xSLntxvMikhFnEweMwk0d0T2otX4vdPWy
+ x+uQ==
+X-Gm-Message-State: AOAM531iPFDhgFd7tbPR3L3jGQYdr3FlwRnQYclA42anL6kloLA4Tqts
+ sZE1qRZb72t2zEYgKxnplJZ63DaySq2cFOYb/f0=
+X-Google-Smtp-Source: ABdhPJx0dUAc+CPGDR5fCVWncoXBTYBEoFnp3BZG+yihBm+1aLnW1hvzxkvOCAtA/5o6APLgOSlW+cYrdOQktSzt0fg=
+X-Received: from sene.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:27c4])
+ (user=sebastianene job=sendgmr) by 2002:a1c:7518:0:b0:381:c77:ceec
+ with SMTP
+ id o24-20020a1c7518000000b003810c77ceecmr5353400wmc.57.1648136624209; Thu, 24
+ Mar 2022 08:43:44 -0700 (PDT)
+Date: Thu, 24 Mar 2022 15:43:05 +0000
+Message-Id: <20220324154304.2572891-1-sebastianene@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
+Subject: [PATCH kvmtool v1] Make --no-pvtime command argument arm specific
+From: Sebastian Ene <sebastianene@google.com>
+To: kvm@vger.kernel.org
+Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,143 +82,95 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Mar 24, 2022 at 02:54:00PM +0800, Gavin Shan wrote:
-> > > +#define KVM_SDEI_DEFAULT_EVENT	0
-> > > +
-> > > +#define KVM_SDEI_MAX_VCPUS	512	/* Aligned to 64 */
-> > > +#define KVM_SDEI_MAX_EVENTS	128
-> > 
-> > I would *strongly* recommend against having these limits. I find the
-> > vCPU limit especially concerning, because we're making KVM_MAX_VCPUS
-> > ABI, which it definitely is not. Anything that deals with a vCPU should
-> > be accessed through a vCPU FD (and thus agnostic to the maximum number
-> > of vCPUs) to avoid such a complication.
-> > 
-> 
-> For KVM_SDEI_DEFAULT_EVENT, which corresponds to the software signaled
-> event. As you suggested on PATCH[15/22], we can't assume its usage.
-> I will define it with SDEI_SW_SIGNALED_EVENT in uapi/linux/arm_sdei.h
-> 
-> For KVM_SDEI_MAX_EVENTS, it will be moved from this header file to
-> kvm_sdei.h after static arrays to hold the data structures or their
-> pointers are used, as you suggested early for this patch (PATCH[02/22]).
-> 
-> There are two types of (SDEI) events: shared and private. For the private
-> event, it can be registered independently from the vcpus. It also means
-> the address and argument for the entry points, corresponding to @ep_address
-> and @ep_arg in struct kvm_sdei_registered_event, can be different on
-> the individual vcpus. However, all the registered/enabled states and
-> the entry point address and argument are same on all vcpus for the shared
-> event. KVM_SDEI_MAX_VCPUS was introduced to use same data structure to
-> represent both shared and private event.
+The stolen time option is available only for aarch64 and is enabled by
+default. Move the option that disables stolen time functionality in the
+arch specific path.
 
-You're providing a great deal of abstraction around the SDEI
-specification, but I really am unconvinced that KVM needs that. This
-series needs to add support for a single SDEI event (event 0) and async
-PF to follow. Since we are going to support a static set of events under
-KVM I believe a lot of the complexity in this design should fade away.
+Signed-off-by: Sebastian Ene <sebastianene@google.com>
+---
+ arm/aarch64/include/kvm/kvm-config-arch.h | 5 +++--
+ arm/aarch64/pvtime.c                      | 4 ++--
+ arm/include/arm-common/kvm-config-arch.h  | 1 +
+ builtin-run.c                             | 2 --
+ include/kvm/kvm-config.h                  | 1 -
+ 5 files changed, 6 insertions(+), 7 deletions(-)
 
-> > > +struct kvm_sdei_exposed_event_state {
-> > > +	__u64	num;
-> > > +
-> > > +	__u8	type;
-> > > +	__u8	signaled;
-> > > +	__u8	priority;
-> > > +	__u8	padding[5];
-> > > +	__u64	notifier;
-> > 
-> > Wait, isn't this a kernel function pointer!?
-> > 
-> 
-> Yeah, it is a kernel function pointer, used by Async PF to know if
-> the corresponding event has been handled or not. Async PF can cancel
-> the previously injected event for performance concerns. Either Async PF
-> or SDEI needs to migrate it. To keep SDEI transparent enough to Async PF,
-> SDEI is responsible for its migration.
+diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
+index 04be43d..a9b0576 100644
+--- a/arm/aarch64/include/kvm/kvm-config-arch.h
++++ b/arm/aarch64/include/kvm/kvm-config-arch.h
+@@ -8,8 +8,9 @@
+ 			"Create PMUv3 device"),				\
+ 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
+ 			"Specify random seed for Kernel Address Space "	\
+-			"Layout Randomization (KASLR)"),
+-
++			"Layout Randomization (KASLR)"),		\
++	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
++			" stolen time"),
+ #include "arm-common/kvm-config-arch.h"
+ 
+ #endif /* KVM__KVM_CONFIG_ARCH_H */
+diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+index 2f5774e..a49cf3e 100644
+--- a/arm/aarch64/pvtime.c
++++ b/arm/aarch64/pvtime.c
+@@ -48,13 +48,13 @@ int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+ 	bool has_stolen_time;
+ 	u64 pvtime_guest_addr = ARM_PVTIME_BASE + vcpu->cpu_id *
+ 		ARM_PVTIME_STRUCT_SIZE;
+-	struct kvm_config *kvm_cfg = NULL;
++	struct kvm_config_arch *kvm_cfg = NULL;
+ 	struct kvm_device_attr pvtime_attr = (struct kvm_device_attr) {
+ 		.group	= KVM_ARM_VCPU_PVTIME_CTRL,
+ 		.attr	= KVM_ARM_VCPU_PVTIME_IPA
+ 	};
+ 
+-	kvm_cfg = &vcpu->kvm->cfg;
++	kvm_cfg = &vcpu->kvm->cfg.arch;
+ 	if (kvm_cfg->no_pvtime)
+ 		return 0;
+ 
+diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
+index 5734c46..9f97778 100644
+--- a/arm/include/arm-common/kvm-config-arch.h
++++ b/arm/include/arm-common/kvm-config-arch.h
+@@ -12,6 +12,7 @@ struct kvm_config_arch {
+ 	u64		kaslr_seed;
+ 	enum irqchip_type irqchip;
+ 	u64		fw_addr;
++	bool no_pvtime;
+ };
+ 
+ int irqchip_parser(const struct option *opt, const char *arg, int unset);
+diff --git a/builtin-run.c b/builtin-run.c
+index 7c8be9d..9a1a0c1 100644
+--- a/builtin-run.c
++++ b/builtin-run.c
+@@ -128,8 +128,6 @@ void kvm_run_set_wrapper_sandbox(void)
+ 			" rootfs"),					\
+ 	OPT_STRING('\0', "hugetlbfs", &(cfg)->hugetlbfs_path, "path",	\
+ 			"Hugetlbfs path"),				\
+-	OPT_BOOLEAN('\0', "no-pvtime", &(cfg)->no_pvtime, "Disable"	\
+-			" stolen time"),				\
+ 									\
+ 	OPT_GROUP("Kernel options:"),					\
+ 	OPT_STRING('k', "kernel", &(cfg)->kernel_filename, "kernel",	\
+diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
+index 48adf27..6a5720c 100644
+--- a/include/kvm/kvm-config.h
++++ b/include/kvm/kvm-config.h
+@@ -62,7 +62,6 @@ struct kvm_config {
+ 	bool no_dhcp;
+ 	bool ioport_debug;
+ 	bool mmio_debug;
+-	bool no_pvtime;
+ };
+ 
+ #endif
+-- 
+2.35.1.894.gb6a874cedc-goog
 
-But this is a UAPI header, why would we even consider giving userspace a
-window into the kernel like this? Couldn't userspace crash the kernel by
-writing whatever it wants to this field, knowing that it will call it as
-a function pointer?
-
-Security aside, there's no guarantee that a function winds up at the
-same address between compiler versions or kernel versions.
-
-Overall, I don't think that userspace should have the ability to add
-arbitrary SDEI events. KVM takes ownership of its own vendor-specific
-ABI in patch 3/22 by declaring its vendor identifier, so any new events
-we support must remain within KVM. There is going to be some state that
-will need to be migrated for KVM's SDEI events, that ought to be
-surfaced to userspace through the KVM_{GET,SET}_ONE_REG ioctls.
-
-Given that there isn't much userspace involvement to make SDEI
-work, do you think it would be possible to drop the proposed UAPI from
-your series and work on enabling software-signaled SDEI events within
-KVM first? By this I mean a VM running under KVM shouldn't require any
-ioctls to make it work.
-
-In so doing, we can discover exactly what the mechanics look like in KVM
-and only then talk about the necessary UAPI to migrate state. One piece
-of the mechanics that is top of mind which I'd like to see addressed is
-the use of linked lists and the preallocations that have been made in
-structures. KVM will know how many events exist at compile time, so we
-can represent these statically.
-
-> > > +};
-> > > +
-> > > +struct kvm_sdei_registered_event_state {
-> > 
-> > You should fold these fields together with kvm_sdei_exposed_event_state
-> > into a single 'kvm_sdei_event' structure:
-> > 
-> 
-> @route_mode and @route_affinity can't be configured or modified until
-> the event is registered. Besides, they're only valid to the shared
-> events. For private events, they don't have the routing needs. It means
-> those two fields would be part of struct kvm_sdei_registered_event instead
-> of kvm_sdei_exposed_event.
-> 
-> 
-> > > +	__u64	num;
-> > > +
-> > > +	__u8	route_mode;
-> > > +	__u8	padding[3];
-> > > +	__u64	route_affinity;
-> > 
-> > And these shouldn't be UAPI at the VM scope. Each of these properties
-> > could be accessed via a synthetic/'pseudo-firmware' register on a vCPU FD:
-> > 
-> 
-> They're accessed through vcpu or kvm fd depending on what type the event
-> is. For the VM-owned shared event, they're accessed through KVM fd. For the
-> vcpu-owned private event, they're accessed through vcpu fd.
-
-Some of the state that you represent in struct kvm_sdei_registered_event_state
-is really per-vCPU state. Any time that there's data available at a vCPU
-granularity userspace should access it with a vCPU FD.
-
-> I'm not sure if I catch the idea to have a synthetic register and I'm to
-> confirm. If I'm correct, you're talking about the "IMPLEMENTATION DEFINED"
-> system register, whose OP0 and CRn are 0B11 and 0B1x11. If two implementation
-> defined registers can be adopted, I don't think we need to expose anything
-> through ABI. All the operations and the needed data can be passed through
-> the system registers.
-
-No, I'm not talking about the guest-facing interface. I'm talking about
-what gets exposed to userspace to migrate the VM's state. For parts of
-the guest that do not map to an architectural construct, we've defined
-the concept of a firmware pseudo-register. What that really means is we
-expose a register to userspace that is inaccessible from the guest which
-migrates KVM's nonarchitected state. We are abusing the fact that VMMs
-will save/restore whatever registers are reported on KVM_GET_REG_LIST to
-trick it into migrating KVM state, and it has worked quite nicely to
-avoid adding new ioctls for new features. It also means that older VMMs
-are capable of utilizing new KVM features, so long as they obey the
-prescribed rules.
-
---
-Thanks,
-Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
