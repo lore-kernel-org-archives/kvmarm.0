@@ -2,81 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECEF7C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 06:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E3FC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 06:54:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4BE5749F20;
-	Thu, 24 Mar 2022 02:44:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B10054A11C;
+	Thu, 24 Mar 2022 02:54:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jaUtaAjGMKu8; Thu, 24 Mar 2022 02:44:39 -0400 (EDT)
+	with ESMTP id QuC27GVq+Ds8; Thu, 24 Mar 2022 02:54:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C26F249F49;
-	Thu, 24 Mar 2022 02:44:39 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CCDE49F20;
+	Thu, 24 Mar 2022 02:54:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2E0D49F17
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:44:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43B414141A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:54:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3IQHJh+UniWc for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2022 02:44:36 -0400 (EDT)
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com
- [209.85.216.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 62A5149F0E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:44:36 -0400 (EDT)
-Received: by mail-pj1-f41.google.com with SMTP id b8so3893050pjb.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 23 Mar 2022 23:44:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=g92GNbyRw2zP4NyiWEWVoR29xzKSW1YDOFU5CW6awjI=;
- b=W4GNbRWFeYIGRK4Kd7v0BV7d/8+EzcVQiKjbyIzkj5P3MuR5r+MRKX9NhxplmdKQDG
- h8WJzXqIT4A+HtJuFsxwdcEqw4e4OmMkge71MMjZX6cAHKOeJxIUAA7PoZ0oQwcy3gr2
- fIkcPWrt7XSykEo1w+cXHy0g0PolVivZf8uxR1KBcRa/C2rOiNZZ4GvnwKQEquHpSZ/U
- 0T4yNv6LDdymEHb+hx3KavSwMNsBgEzA5sTHbpRFeV64zSfbMVyJjvAc9+bl5w8S8h//
- 9JF1hrq2ZNjq885slruDknDbG7C3hZD3JrbAuC1iCofwjLsqVdOqqEniNERfVGXM+FgQ
- ib1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=g92GNbyRw2zP4NyiWEWVoR29xzKSW1YDOFU5CW6awjI=;
- b=MFsPzKuGfMpRUs3XDyKzR/l0WJqB6QHdK79okWgxfCYQH9lyeEE977zhuUb6XdowiV
- TafmJgk8YDoHy6KudqgIXQfwtmfs7bDJe3mSZSvsI/W8jUFpWnbEvVLeG3iBLoKDfHDV
- 6nHEEJe4M5nunYpjHGJoHVFLX8HouEf9NOquSQ2FSApsGVhPYPiEE/RVICp+9vxnYmyz
- Ry33CrMTYdBAIoX67ATplNouDBriHZzD0yUyK9gigT33PgAaAIvq8fOgLwOg34Jp1xHS
- i+7RxVllIOG5UdBa0QZRJZmO5AK2PPCN2uetftMaeCIsrKsuDNSgTwa0T5+qhVUSCeDw
- R0Eg==
-X-Gm-Message-State: AOAM5330cZkFR/oSFpDwsJ81/QOuJnMn83+lqGDs5koKtMb2CR2TtHMd
- llqHoHuEBtwzMlqU542hiKT+FXNPDvvzeHAdPrGlTw==
-X-Google-Smtp-Source: ABdhPJxNinvVGW4deP+GBGN8X1rgQnrl5ZgxEDZnW3lw1JKkzdIl06MSnl7IU0ErWLwb3H3bXRi167e2wOA/hFXCuCk=
-X-Received: by 2002:a17:902:c9c2:b0:154:68e7:7c5a with SMTP id
- q2-20020a170902c9c200b0015468e77c5amr4185987pld.122.1648104275145; Wed, 23
- Mar 2022 23:44:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220311174001.605719-1-oupton@google.com>
- <20220311174001.605719-10-oupton@google.com>
- <CAAeT=FyGUZMy-TUZuHu+bZtUY9NfjBQ79JKBX0xK4kEqFTO1OQ@mail.gmail.com>
- <YjlxkE2h6K9cTOTP@google.com>
-In-Reply-To: <YjlxkE2h6K9cTOTP@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Wed, 23 Mar 2022 23:44:19 -0700
-Message-ID: <CAAeT=FwMCOy_0kVU+ZJw+J5QUnJQ6BhBxvDYMf0axz-Xyjo4LQ@mail.gmail.com>
-Subject: Re: [PATCH v4 09/15] KVM: arm64: Add support for userspace to suspend
- a vCPU
+ with ESMTP id 4-Dn+lnogEkc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Mar 2022 02:54:14 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E3A441014
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:54:14 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1648104853;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uqxLCdovFgJL3F6d8oL7OZj3s1uofXe6x4kAqL3R+ZE=;
+ b=WNynCwWhLybu5kQOgXqZdV0JzGoSUrrXrvXKXSE1MGnu52qNBHsFCwp93o+l2bwpS48/Oj
+ Udav5B5tx9gj0DMgNKmLYFQc1zxdJ/PFboNpRmEkMvPmtsp4MLbGb6A2NU/WbFxr+5Q6j4
+ 0eoBQwOaYtYv6/Gfgp3jgCaESmT848g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-275-EWgYXsDqMoebXbULwH5HzA-1; Thu, 24 Mar 2022 02:54:10 -0400
+X-MC-Unique: EWgYXsDqMoebXbULwH5HzA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.1])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B19A61C05AC4;
+ Thu, 24 Mar 2022 06:54:09 +0000 (UTC)
+Received: from [10.72.12.33] (ovpn-12-33.pek2.redhat.com [10.72.12.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AC0140CF8ED;
+ Thu, 24 Mar 2022 06:54:04 +0000 (UTC)
+Subject: Re: [PATCH v5 02/22] KVM: arm64: Add SDEI virtualization
+ infrastructure
 To: Oliver Upton <oupton@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
- kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
- Peter Shier <pshier@google.com>, kvm-riscv@lists.infradead.org,
- Atish Patra <atishp@atishpatra.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Jim Mattson <jmattson@google.com>
+References: <20220322080710.51727-1-gshan@redhat.com>
+ <20220322080710.51727-3-gshan@redhat.com> <YjtUufdsWYxqdGa+@google.com>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <4d4e5645-4443-c233-6d25-97e68d804512@redhat.com>
+Date: Thu, 24 Mar 2022 14:54:00 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <YjtUufdsWYxqdGa+@google.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
+ shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
+ vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -85,211 +82,239 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Oliver,
 
-On Mon, Mar 21, 2022 at 11:49 PM Oliver Upton <oupton@google.com> wrote:
->
-> On Mon, Mar 21, 2022 at 11:19:33PM -0700, Reiji Watanabe wrote:
-> > Hi Oliver,
-> >
-> > On Fri, Mar 11, 2022 at 9:41 AM Oliver Upton <oupton@google.com> wrote:
-> > >
-> > > Introduce a new MP state, KVM_MP_STATE_SUSPENDED, which indicates a vCPU
-> > > is in a suspended state. In the suspended state the vCPU will block
-> > > until a wakeup event (pending interrupt) is recognized.
-> > >
-> > > Add a new system event type, KVM_SYSTEM_EVENT_WAKEUP, to indicate to
-> > > userspace that KVM has recognized one such wakeup event. It is the
-> > > responsibility of userspace to then make the vCPU runnable, or leave it
-> > > suspended until the next wakeup event.
-> > >
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> > > ---
-> > >  Documentation/virt/kvm/api.rst    | 37 +++++++++++++++++++++++++++++--
-> > >  arch/arm64/include/asm/kvm_host.h |  1 +
-> > >  arch/arm64/kvm/arm.c              | 35 +++++++++++++++++++++++++++++
-> > >  include/uapi/linux/kvm.h          |  2 ++
-> > >  4 files changed, 73 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > > index 5625c08b4a0e..426bcdc1216d 100644
-> > > --- a/Documentation/virt/kvm/api.rst
-> > > +++ b/Documentation/virt/kvm/api.rst
-> > > @@ -1482,14 +1482,43 @@ Possible values are:
-> > >                                   [s390]
-> > >     KVM_MP_STATE_LOAD             the vcpu is in a special load/startup state
-> > >                                   [s390]
-> > > +   KVM_MP_STATE_SUSPENDED        the vcpu is in a suspend state and is waiting
-> > > +                                 for a wakeup event [arm64]
-> > >     ==========================    ===============================================
-> > >
-> > >  On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
-> > >  in-kernel irqchip, the multiprocessing state must be maintained by userspace on
-> > >  these architectures.
-> > >
-> > > -For arm64/riscv:
-> > > -^^^^^^^^^^^^^^^^
-> > > +For arm64:
-> > > +^^^^^^^^^^
-> > > +
-> > > +If a vCPU is in the KVM_MP_STATE_SUSPENDED state, KVM will emulate the
-> > > +architectural execution of a WFI instruction.
-> > > +
-> > > +If a wakeup event is recognized, KVM will exit to userspace with a
-> > > +KVM_SYSTEM_EVENT exit, where the event type is KVM_SYSTEM_EVENT_WAKEUP. If
-> > > +userspace wants to honor the wakeup, it must set the vCPU's MP state to
-> > > +KVM_MP_STATE_RUNNABLE. If it does not, KVM will continue to await a wakeup
-> > > +event in subsequent calls to KVM_RUN.
-> > > +
-> > > +.. warning::
-> > > +
-> > > +     If userspace intends to keep the vCPU in a SUSPENDED state, it is
-> > > +     strongly recommended that userspace take action to suppress the
-> > > +     wakeup event (such as masking an interrupt). Otherwise, subsequent
-> > > +     calls to KVM_RUN will immediately exit with a KVM_SYSTEM_EVENT_WAKEUP
-> > > +     event and inadvertently waste CPU cycles.
-> > > +
-> > > +     Additionally, if userspace takes action to suppress a wakeup event,
-> > > +     it is strongly recommended that it also restore the vCPU to its
-> >
-> > Nit: s/restore/restores/ ?
-> >
-> >
-> > > +     original state when the vCPU is made RUNNABLE again. For example,
-> > > +     if userspace masked a pending interrupt to suppress the wakeup,
-> > > +     the interrupt should be unmasked before returning control to the
-> > > +     guest.
-> > > +
-> > > +For riscv:
-> > > +^^^^^^^^^^
-> > >
-> > >  The only states that are valid are KVM_MP_STATE_STOPPED and
-> > >  KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
-> > > @@ -5914,6 +5943,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
-> > >    #define KVM_SYSTEM_EVENT_SHUTDOWN       1
-> > >    #define KVM_SYSTEM_EVENT_RESET          2
-> > >    #define KVM_SYSTEM_EVENT_CRASH          3
-> > > +  #define KVM_SYSTEM_EVENT_WAKEUP         4
-> > >                         __u32 type;
-> > >                         __u64 flags;
-> > >                 } system_event;
-> > > @@ -5938,6 +5968,9 @@ Valid values for 'type' are:
-> > >     has requested a crash condition maintenance. Userspace can choose
-> > >     to ignore the request, or to gather VM memory core dump and/or
-> > >     reset/shutdown of the VM.
-> > > + - KVM_SYSTEM_EVENT_WAKEUP -- the guest is in a suspended state and KVM
-> >
-> > Nit: Shouldn't 'the guest' be 'the vcpu' ?
-> >
-> > > +   has recognized a wakeup event. Userspace may honor this event by marking
-> > > +   the exiting vCPU as runnable, or deny it and call KVM_RUN again.
-> > >
-> > >  Valid flags are:
-> > >
-> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > index da58eb96d2a8..899f2c0b4c7b 100644
-> > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > @@ -46,6 +46,7 @@
-> > >  #define KVM_REQ_RECORD_STEAL   KVM_ARCH_REQ(3)
-> > >  #define KVM_REQ_RELOAD_GICv4   KVM_ARCH_REQ(4)
-> > >  #define KVM_REQ_RELOAD_PMU     KVM_ARCH_REQ(5)
-> > > +#define KVM_REQ_SUSPEND                KVM_ARCH_REQ(6)
-> > >
-> > >  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
-> > >                                      KVM_DIRTY_LOG_INITIALLY_SET)
-> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > index 8eed0556ccaa..b94efa05d869 100644
-> > > --- a/arch/arm64/kvm/arm.c
-> > > +++ b/arch/arm64/kvm/arm.c
-> > > @@ -444,6 +444,18 @@ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
-> > >         return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_STOPPED;
-> > >  }
-> > >
-> > > +static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +       vcpu->arch.mp_state.mp_state = KVM_MP_STATE_SUSPENDED;
-> > > +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
-> > > +       kvm_vcpu_kick(vcpu);
-> > > +}
-> > > +
-> > > +static bool kvm_arm_vcpu_suspended(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +       return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_SUSPENDED;
-> > > +}
-> > > +
-> > >  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
-> > >                                     struct kvm_mp_state *mp_state)
-> > >  {
-> > > @@ -464,6 +476,9 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-> > >         case KVM_MP_STATE_STOPPED:
-> > >                 kvm_arm_vcpu_power_off(vcpu);
-> > >                 break;
-> > > +       case KVM_MP_STATE_SUSPENDED:
-> > > +               kvm_arm_vcpu_suspend(vcpu);
-> > > +               break;
-> > >         default:
-> > >                 ret = -EINVAL;
-> > >         }
-> > > @@ -648,6 +663,23 @@ void kvm_vcpu_wfi(struct kvm_vcpu *vcpu)
-> > >         preempt_enable();
-> > >  }
-> > >
-> > > +static int kvm_vcpu_suspend(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +       if (!kvm_arm_vcpu_suspended(vcpu))
-> > > +               return 1;
-> > > +
-> > > +       kvm_vcpu_wfi(vcpu);
-> > > +
-> > > +       /*
-> > > +        * The suspend state is sticky; we do not leave it until userspace
-> > > +        * explicitly marks the vCPU as runnable. Request that we suspend again
-> > > +        * later.
-> > > +        */
-> > > +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
-> > > +       kvm_vcpu_set_system_event_exit(vcpu, KVM_SYSTEM_EVENT_WAKEUP, 0);
-> > > +       return 0;
-> > > +}
-> > > +
-> > >  /**
-> > >   * check_vcpu_requests - check and handle pending vCPU requests
-> > >   * @vcpu:      the VCPU pointer
-> > > @@ -686,6 +718,9 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
-> > >                 if (kvm_check_request(KVM_REQ_RELOAD_PMU, vcpu))
-> > >                         kvm_pmu_handle_pmcr(vcpu,
-> > >                                             __vcpu_sys_reg(vcpu, PMCR_EL0));
-> > > +
-> > > +               if (kvm_check_request(KVM_REQ_SUSPEND, vcpu))
-> > > +                       return kvm_vcpu_suspend(vcpu);
-> >
-> > It appears that one of the cases that kvm_vcpu_suspend() returns
-> > is when a pending signal is detected, and the exit reason will be
-> > KVM_EXIT_SYSTEM_EVENT in this case.  On the other hand, when a
-> > pending signal is detected earlier in xfer_to_guest_mode_handle_work(),
-> > KVM_RUN returns -EINTR even if the vCPU is in KVM_MP_STATE_SUSPENDED
-> > state. Shouldn't those behaviors be consistent ? (Perhaps -EINTR?)
->
-> Great catch!
->
-> I should probably check that the vCPU is actually runnable with
-> kvm_arch_vcpu_runnable() before setting up a system event exit. That is
-> after all what the documentation of this whole API says it does, right?
-> :)
->
-> If the vCPU thread were poked for any other reason this should return 1
-> and let the kvm_vcpu_exit_request()/xfer_to_guest_mode_handle_work()
-> pairing clean up anything else.
+On 3/24/22 1:11 AM, Oliver Upton wrote:
+> More comments, didn't see exactly how all of these structures are
+> getting used.
+> 
 
-Yes, that sounds good.
+Ok, thanks for your review and comments.
+
+> On Tue, Mar 22, 2022 at 04:06:50PM +0800, Gavin Shan wrote:
+> 
+> [...]
+> 
+>> diff --git a/arch/arm64/include/uapi/asm/kvm_sdei_state.h b/arch/arm64/include/uapi/asm/kvm_sdei_state.h
+>> new file mode 100644
+>> index 000000000000..b14844230117
+>> --- /dev/null
+>> +++ b/arch/arm64/include/uapi/asm/kvm_sdei_state.h
+>> @@ -0,0 +1,72 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+>> +/*
+>> + * Definitions of various KVM SDEI event states.
+>> + *
+>> + * Copyright (C) 2022 Red Hat, Inc.
+>> + *
+>> + * Author(s): Gavin Shan <gshan@redhat.com>
+>> + */
+>> +
+>> +#ifndef _UAPI__ASM_KVM_SDEI_STATE_H
+>> +#define _UAPI__ASM_KVM_SDEI_STATE_H
+>> +
+>> +#ifndef __ASSEMBLY__
+>> +#include <linux/types.h>
+>> +
+>> +/*
+>> + * The software signaled event is the default one, which is
+>> + * defined in v1.1 specification.
+>> + */
+>> +#define KVM_SDEI_INVALID_EVENT	0xFFFFFFFF
+> 
+> Isn't the constraint that bit 31 must be zero? (DEN 0054C 4.4 "Event
+> number allocation")
+> 
+
+Yes, bit 31 of the event number should be zero. So this is invalid
+event number, used by struct kvm_sdei_vcpu_state::critical_num
+and normal_num to indicate if there is event being handled on the
+corresponding vcpu. When those fields are set to KVM_SDEI_INVALID_EVENT,
+no event is being handled on the vcpu.
+
+>> +#define KVM_SDEI_DEFAULT_EVENT	0
+>> +
+>> +#define KVM_SDEI_MAX_VCPUS	512	/* Aligned to 64 */
+>> +#define KVM_SDEI_MAX_EVENTS	128
+> 
+> I would *strongly* recommend against having these limits. I find the
+> vCPU limit especially concerning, because we're making KVM_MAX_VCPUS
+> ABI, which it definitely is not. Anything that deals with a vCPU should
+> be accessed through a vCPU FD (and thus agnostic to the maximum number
+> of vCPUs) to avoid such a complication.
+> 
+
+For KVM_SDEI_DEFAULT_EVENT, which corresponds to the software signaled
+event. As you suggested on PATCH[15/22], we can't assume its usage.
+I will define it with SDEI_SW_SIGNALED_EVENT in uapi/linux/arm_sdei.h
+
+For KVM_SDEI_MAX_EVENTS, it will be moved from this header file to
+kvm_sdei.h after static arrays to hold the data structures or their
+pointers are used, as you suggested early for this patch (PATCH[02/22]).
+
+There are two types of (SDEI) events: shared and private. For the private
+event, it can be registered independently from the vcpus. It also means
+the address and argument for the entry points, corresponding to @ep_address
+and @ep_arg in struct kvm_sdei_registered_event, can be different on
+the individual vcpus. However, all the registered/enabled states and
+the entry point address and argument are same on all vcpus for the shared
+event. KVM_SDEI_MAX_VCPUS was introduced to use same data structure to
+represent both shared and private event.
+
+If the data belongs to particular vcpu should be accessed through the
+vcpu fd, then we need to split or reorganize the data struct as below.
+
+     /*
+      * The events are exposed through ioctl interface or similar
+      * mechanism (synthetic system registers?) before they can be
+      * registered. struct kvm_sdei_exposed_event instance is reserved
+      * from the kvm's static array on receiving the ioctl command
+      * from VMM.
+      */
+     struct kvm_sdei_exposed_event {
+         __u32   num;
+
+         __u8    type;
+         __u8    signaled;
+         __u8    priority;
+         __u8    padding;
+     };
+
+     /*
+      * The struct kvm_sdei_registered_event instance is allocated or
+      * reserved from the static array. For the shared event, the instance
+      * is linked to kvm, but it will be allocated or reserved from vcpu's
+      * static array and linked to the vcpu if it's a private event.
+      *
+      * The instance is only allocated and reserved upon SDEI_EVENT_REGISTER
+      * hypercall.
+      */
+     struct kvm_sdei_registered_event {
+         __u32   num
+
+#define KVM_SDEI_EVENT_STATE_REGISTERED         (1 << 0)
+#define KVM_SDEI_EVENT_STATE_ENABLE             (1 << 1)
+#define KVM_SDEI_EVENT_STATE_UNREGISTER_PENDING (1 << 2)
+         __u8    state;
+         __u8	route_mode;
+         __u8    padding[2];
+         __u64   route_affinity;
+         __u64	ep_address;
+         __u64	ep_arg;
+         __u64   notifier;
+     }
+
+>> +struct kvm_sdei_exposed_event_state {
+>> +	__u64	num;
+>> +
+>> +	__u8	type;
+>> +	__u8	signaled;
+>> +	__u8	priority;
+>> +	__u8	padding[5];
+>> +	__u64	notifier;
+> 
+> Wait, isn't this a kernel function pointer!?
+> 
+
+Yeah, it is a kernel function pointer, used by Async PF to know if
+the corresponding event has been handled or not. Async PF can cancel
+the previously injected event for performance concerns. Either Async PF
+or SDEI needs to migrate it. To keep SDEI transparent enough to Async PF,
+SDEI is responsible for its migration.
+
+>> +};
+>> +
+>> +struct kvm_sdei_registered_event_state {
+> 
+> You should fold these fields together with kvm_sdei_exposed_event_state
+> into a single 'kvm_sdei_event' structure:
+> 
+
+@route_mode and @route_affinity can't be configured or modified until
+the event is registered. Besides, they're only valid to the shared
+events. For private events, they don't have the routing needs. It means
+those two fields would be part of struct kvm_sdei_registered_event instead
+of kvm_sdei_exposed_event.
+
+
+>> +	__u64	num;
+>> +
+>> +	__u8	route_mode;
+>> +	__u8	padding[3];
+>> +	__u64	route_affinity;
+> 
+> And these shouldn't be UAPI at the VM scope. Each of these properties
+> could be accessed via a synthetic/'pseudo-firmware' register on a vCPU FD:
+> 
+
+They're accessed through vcpu or kvm fd depending on what type the event
+is. For the VM-owned shared event, they're accessed through KVM fd. For the
+vcpu-owned private event, they're accessed through vcpu fd.
+
+I'm not sure if I catch the idea to have a synthetic register and I'm to
+confirm. If I'm correct, you're talking about the "IMPLEMENTATION DEFINED"
+system register, whose OP0 and CRn are 0B11 and 0B1x11. If two implementation
+defined registers can be adopted, I don't think we need to expose anything
+through ABI. All the operations and the needed data can be passed through
+the system registers.
+
+     SYS_REG_SDEI_COMMAND
+         Receives commands like to expose event, register event and change
+         vcpu state etc.
+     SYS_REG_SDEI_DATA
+         The needed data corresponding to the received command.
+
+However, I'm not positive that synthetic register can be used here. When
+Mark Rutland review "PATCH[RFC v1] Async PF support", the implementation
+defined registers can't be used in a very limited way. That time, a set
+of implementation defined registers are defined to identify the asynchronous
+page faults and access to the control data block. However, the idea was
+rejected. Later on, Marc recommended SDEI for Async PF.
+
+https://www.spinics.net/lists/kvm-arm/msg40315.html
+
+
+>> +	__u64	ep_address[KVM_SDEI_MAX_VCPUS];
+>> +	__u64	ep_arg[KVM_SDEI_MAX_VCPUS];
+>> +	__u64	registered[KVM_SDEI_MAX_VCPUS/64];
+>> +	__u64	enabled[KVM_SDEI_MAX_VCPUS/64];
+>> +	__u64	unregister_pending[KVM_SDEI_MAX_VCPUS/64];
+>> +};
+>> +
+>> +struct kvm_sdei_vcpu_event_state {
+>> +	__u64	num;
+>> +
+>> +	__u32	event_count;
+>> +	__u32	padding;
+>> +};
+>> +
+>> +struct kvm_sdei_vcpu_regs_state {
+>> +	__u64	regs[18];
+>> +	__u64	pc;
+>> +	__u64	pstate;
+>> +};
+>> +
+>> +struct kvm_sdei_vcpu_state {
+> 
+> Same goes here, I strongly recommend you try to expose this through the
+> KVM_{GET,SET}_ONE_REG interface if at all possible since it
+> significantly reduces the UAPI burden, both on KVM to maintain it and
+> VMMs to actually use it.
+> 
+
+Yeah, it's much convenient to use the implementation defined register here.
+However, I'm not positive if we can do this. Please see the details I
+provided above :)
 
 Thanks,
-Reiji
+Gavin
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
