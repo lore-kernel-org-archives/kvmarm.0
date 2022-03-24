@@ -2,78 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E3FC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 06:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EEDC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 24 Mar 2022 07:38:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B10054A11C;
-	Thu, 24 Mar 2022 02:54:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0A274B086;
+	Thu, 24 Mar 2022 03:38:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QuC27GVq+Ds8; Thu, 24 Mar 2022 02:54:20 -0400 (EDT)
+	with ESMTP id i-Sg4lzlyjKC; Thu, 24 Mar 2022 03:38:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CCDE49F20;
-	Thu, 24 Mar 2022 02:54:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64BC14A119;
+	Thu, 24 Mar 2022 03:38:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 43B414141A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:54:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B1EA4A0FE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 03:38:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4-Dn+lnogEkc for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2022 02:54:14 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E3A441014
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 02:54:14 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1648104853;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uqxLCdovFgJL3F6d8oL7OZj3s1uofXe6x4kAqL3R+ZE=;
- b=WNynCwWhLybu5kQOgXqZdV0JzGoSUrrXrvXKXSE1MGnu52qNBHsFCwp93o+l2bwpS48/Oj
- Udav5B5tx9gj0DMgNKmLYFQc1zxdJ/PFboNpRmEkMvPmtsp4MLbGb6A2NU/WbFxr+5Q6j4
- 0eoBQwOaYtYv6/Gfgp3jgCaESmT848g=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-275-EWgYXsDqMoebXbULwH5HzA-1; Thu, 24 Mar 2022 02:54:10 -0400
-X-MC-Unique: EWgYXsDqMoebXbULwH5HzA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com
- [10.11.54.1])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B19A61C05AC4;
- Thu, 24 Mar 2022 06:54:09 +0000 (UTC)
-Received: from [10.72.12.33] (ovpn-12-33.pek2.redhat.com [10.72.12.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AC0140CF8ED;
- Thu, 24 Mar 2022 06:54:04 +0000 (UTC)
-Subject: Re: [PATCH v5 02/22] KVM: arm64: Add SDEI virtualization
- infrastructure
-To: Oliver Upton <oupton@google.com>
-References: <20220322080710.51727-1-gshan@redhat.com>
- <20220322080710.51727-3-gshan@redhat.com> <YjtUufdsWYxqdGa+@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <4d4e5645-4443-c233-6d25-97e68d804512@redhat.com>
-Date: Thu, 24 Mar 2022 14:54:00 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id TsdpvBXKrfvm for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Mar 2022 03:38:01 -0400 (EDT)
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com
+ [209.85.166.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11D2B4A0FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 03:38:00 -0400 (EDT)
+Received: by mail-il1-f171.google.com with SMTP id e18so2636243ilr.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 00:38:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=qEd63tIHMzkTiVmix/zg5Kepcn4SZRubYZZ/89R7on8=;
+ b=jKz9hFzC1npUxMvPjw2v2QBb2R3g5FzAGFs0wFMmeWF2nY8HLH+jyEA6rg6Ry39w8v
+ FDsopU9fYI7Pc7UgQFdshHTKC70tg6pKTUtRzBHs98YU6fwEjdhCPtxxRx8EH3+d8KcY
+ n5ke898/AG6x//tWxLv+g9iryK6mDQbODSbM+DUA9WGjyKugNl1fPSNrSkQxrzK0jW02
+ xr10uHLGt2xYo1COLDQGU8hni9ZD7CXr7inEXZa6ZzsYRZGg9aDZo6HGdwUjClnHrXon
+ 2Jv3P6FRFO3kyZB+Y2mCXM6ic1j2uSjqLXWiNrMXwM7nIlhVD4qs7J7dIuSW3h5VYe1O
+ ZLNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=qEd63tIHMzkTiVmix/zg5Kepcn4SZRubYZZ/89R7on8=;
+ b=0FbwFZ2H5gFwL+estos11i52cyD/RYz/CdLYv8QNiIue9nVAdLbnGCegNidBzje0CA
+ OY99qg8QGp5uFIJR7xRNpWa8+Y+KYCpAcnIpQB+TtDwrFEa4ZZnQXg1rxGJqrZH8c/5X
+ Llh/cvBlTSa4zFZ30cos+0y0noLnXbAo+U9kbLEpC6l7zUynXsUfyapZx+puDhdevrJQ
+ ltiBqmvi8ChUUuRvBh8g81OryHvxDtdutOMjde+ivkrO+degAfQSH0XOWrJV+dJCYv+Z
+ HCYqlsqI1UXYzTlGizhqH5hWutf5UFEPu322QTqTxGntZR6USNL9CN4fvZzcmSgr/0m6
+ XzAQ==
+X-Gm-Message-State: AOAM530Vn76dAveZsEpxGwbi1jlIiyMa01aSkRT+QFGfpVvyohZ5UqAM
+ zHThhkYLJcEw1f6FUN3gh563Pg==
+X-Google-Smtp-Source: ABdhPJzC+kBxrijRCsVFsazTYtmdKoMBi4MqBzTj6FEmvblV/o8eXsvmpCIHcyepqbMA6aJNEcp91Q==
+X-Received: by 2002:a05:6e02:16c7:b0:2c7:e458:d863 with SMTP id
+ 7-20020a056e0216c700b002c7e458d863mr1997250ilx.71.1648107480057; 
+ Thu, 24 Mar 2022 00:38:00 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ f4-20020a92b504000000b002c21ef70a81sm1201411ile.7.2022.03.24.00.37.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 24 Mar 2022 00:37:59 -0700 (PDT)
+Date: Thu, 24 Mar 2022 07:37:56 +0000
+From: Oliver Upton <oupton@google.com>
+To: Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v6 01/25] KVM: arm64: Introduce a validation function for
+ an ID register
+Message-ID: <Yjwf1BpigvzlT8r9@google.com>
+References: <20220311044811.1980336-1-reijiw@google.com>
+ <20220311044811.1980336-2-reijiw@google.com>
+ <Yjl96UQ7lUovKBWD@google.com>
+ <CAAeT=FzELqXZiWjZ9aRNqYRbX0zx6LdhETiZUS+CMvax2vLRQw@mail.gmail.com>
+ <YjrG0xiubC108tIN@google.com>
+ <CAAeT=FxEwuwg310vhWQeBJ9UouHNaJNcPqvbLYh7nXp7aFFq=Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <YjtUufdsWYxqdGa+@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <CAAeT=FxEwuwg310vhWQeBJ9UouHNaJNcPqvbLYh7nXp7aFFq=Q@mail.gmail.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -82,239 +92,171 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
+Hi Reiji,
 
-On 3/24/22 1:11 AM, Oliver Upton wrote:
-> More comments, didn't see exactly how all of these structures are
-> getting used.
+On Wed, Mar 23, 2022 at 11:00:25PM -0700, Reiji Watanabe wrote:
+> Hi Oliver,
 > 
-
-Ok, thanks for your review and comments.
-
-> On Tue, Mar 22, 2022 at 04:06:50PM +0800, Gavin Shan wrote:
+> > > > I have some concerns regarding the API between cpufeature and KVM that's
+> > > > being proposed here. It would appear that we are adding some of KVM's
+> > > > implementation details into the cpufeature code. In particular, I see
+> > > > that KVM's limitations on AA64DFR0 are being copied here.
+> > >
+> > > I assume "KVM's limitation details" you meant is about
+> > > ftr_id_aa64dfr0_kvm.
+> > > Entries in arm64_ftr_bits_kvm_override shouldn't be added based
+> > > on KVM's implementation.  When cpufeature.c doesn't handle lower level
+> > > of (or fewer) features as the "safe" value for fields, the field should
+> > > be added to arm64_ftr_bits_kvm_override.  As PMUVER and DEBUGVER are not
+> > > treated as LOWER_SAFE, they were added in arm64_ftr_bits_kvm_override.
+> >
+> > I believe the fact that KVM is more permissive on PMUVER and DEBUGVER
+> > than cpufeature is in fact a detail of KVM, no? read_id_reg() already
 > 
-> [...]
+> What cpufeature knows is that consumers of the validation function
+> needs the validation of each field based on ID register schemes that
+> are described in Arm ARM (basically lower safe).
+> As lower values of PMUVER/DEBUGVER indicates lower level of features
+> or fewer level of features, those entries are to provide validation
+> based on that.  So, entries in arm64_ftr_bits_kvm_override will be added
+> to adjust cpufeture's behavior based on ID register schemes, and KVM may
+> or may not use them.
 > 
->> diff --git a/arch/arm64/include/uapi/asm/kvm_sdei_state.h b/arch/arm64/include/uapi/asm/kvm_sdei_state.h
->> new file mode 100644
->> index 000000000000..b14844230117
->> --- /dev/null
->> +++ b/arch/arm64/include/uapi/asm/kvm_sdei_state.h
->> @@ -0,0 +1,72 @@
->> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
->> +/*
->> + * Definitions of various KVM SDEI event states.
->> + *
->> + * Copyright (C) 2022 Red Hat, Inc.
->> + *
->> + * Author(s): Gavin Shan <gshan@redhat.com>
->> + */
->> +
->> +#ifndef _UAPI__ASM_KVM_SDEI_STATE_H
->> +#define _UAPI__ASM_KVM_SDEI_STATE_H
->> +
->> +#ifndef __ASSEMBLY__
->> +#include <linux/types.h>
->> +
->> +/*
->> + * The software signaled event is the default one, which is
->> + * defined in v1.1 specification.
->> + */
->> +#define KVM_SDEI_INVALID_EVENT	0xFFFFFFFF
+> I need to remove the word "kvm" from variable/function/structure names
+> and put more clear comments:)
+
+I'll admit I definitely drilled down on the fact that KVM is the only
+actual user of these, and not the fact that it was realigning the fields
+with the Arm ARM :)
+
+> > implicitly trusts the cpufeature code filtering and applies additional
+> > limitations on top of what we get back. Similarly, there are fields
+> > where KVM is more restrictive than cpufeature (ID_AA64DFR0_PMSVER).
+> >
+> > Each of those constraints could theoretically be expressed as an
+> > arm64_ftr_bits structure within KVM.
 > 
-> Isn't the constraint that bit 31 must be zero? (DEN 0054C 4.4 "Event
-> number allocation")
+> It's not impossible but it's a bit tricky (With __arm64_ftr_reg_valid(),
+> it might look straight forward, but I don't think that treats FTR_EXACT
+> correctly. Please see update_cpu_ftr_reg).
+>
+
+Ah right. __arm64_ftr_reg_valid() needs to trust either the value that
+comes from the boot CPU, or ->safe_val if the cores are different in the
+system. And what does it mean if the caller specified FTR_EXACT?
+
+I'll think on this more if I have any other suggestions.
+
+[...]
+
+> > It also seems to me that if I wanted to raise the permitted DEBUGVER for KVM,
+> > would I have to make a change outside of KVM.
 > 
+> Could you elaborate this a little more?
 
-Yes, bit 31 of the event number should be zero. So this is invalid
-event number, used by struct kvm_sdei_vcpu_state::critical_num
-and normal_num to indicate if there is event being handled on the
-corresponding vcpu. When those fields are set to KVM_SDEI_INVALID_EVENT,
-no event is being handled on the vcpu.
+Urgh. Ignore me, I fixated to heavily on the SAFE_VAL you used for
+DEBUGVER, not the fact that it was LOWER_SAFE.
 
->> +#define KVM_SDEI_DEFAULT_EVENT	0
->> +
->> +#define KVM_SDEI_MAX_VCPUS	512	/* Aligned to 64 */
->> +#define KVM_SDEI_MAX_EVENTS	128
+> More specific concern I have about providing the override (with the
+> existing arm64_ftr_bits) would be when field values of arm64_ftr_bits
+> (i.e. LOWER_SAFE to EXACT) in cpufeature are changed due to kernel's
+> implementation reasons, which might affect KVM (may need to pass
+> extra override to arm64_ftr_reg_valid).
+> But, by having cpufeature provide the validation based on the ID
+> register schemes, cpufeature should be changed to provide the same
+> validation in that case (i.e. if DFR0.PERFMON is changed from LOWER_SAFE
+> to EXACT like AA64DFR0.PMUVER, DFR0.PERFMON should be added in
+> arm64_ftr_bits_kvm_override with LOWER_SAFE).
 > 
-> I would *strongly* recommend against having these limits. I find the
-> vCPU limit especially concerning, because we're making KVM_MAX_VCPUS
-> ABI, which it definitely is not. Anything that deals with a vCPU should
-> be accessed through a vCPU FD (and thus agnostic to the maximum number
-> of vCPUs) to avoid such a complication.
+> So, if I go with the option to provide override to cpufeature, IMHO it
+> would be preferable for cpufeature to provide the validation based
+> on ID schemes instead of with the current need-based policy (, which
+> might get changed) for clear separation.
+
+Sounds good. Per your suggestion above, changing the
+naming/documentation around what is being added to cpufeature removes
+the confusion that it relates to KVM and really is a precise
+implementation of the rules in the Arm ARM.
+
+> > > Another option that I considered earlier was having a full set of
+> > > arm64_ftr_bits in KVM for its validation. At the time, I thought
+> > > statically) having a full set of arm64_ftr_bits in KVM is not good in
+> > > terms of maintenance.  But, considering that again, since most of
+> > > fields are unsigned and lower safe fields, and KVM doesn't necessarily
+> > > have to statically have a full set of arm64_ftr_bits
+> >
+> > I think the argument could be made for KVM having its own static +
+> > verbose cpufeature tables. We've already been bitten by scenarios where
 > 
+> What does "verbose cpufeature tables" mean ?
 
-For KVM_SDEI_DEFAULT_EVENT, which corresponds to the software signaled
-event. As you suggested on PATCH[15/22], we can't assume its usage.
-I will define it with SDEI_SW_SIGNALED_EVENT in uapi/linux/arm_sdei.h
+Currently KVM implements a sparsely-defined denylist on top of whatever
+we get back from read_sanitised_ftr_reg(). We do not have an absolute
+upper bound for all fields in the feature registers, so there are times
+where unsupported features leak through to the guest much like the SPE
+commit I mentioned below.
 
-For KVM_SDEI_MAX_EVENTS, it will be moved from this header file to
-kvm_sdei.h after static arrays to hold the data structures or their
-pointers are used, as you suggested early for this patch (PATCH[02/22]).
+What I am suggesting is that KVM define an absolute limit on what it
+virtualizes for *all* fields, including what is presently RAZ. We have
+absolutely no idea whether or not we can virtualize new features that
+come in later revisions of the spec. It does mean we will need to
+raise those limits from time to time, but would rather do that than
+accidentally expose a feature we cannot virtualize.
 
-There are two types of (SDEI) events: shared and private. For the private
-event, it can be registered independently from the vcpus. It also means
-the address and argument for the entry points, corresponding to @ep_address
-and @ep_arg in struct kvm_sdei_registered_event, can be different on
-the individual vcpus. However, all the registered/enabled states and
-the entry point address and argument are same on all vcpus for the shared
-event. KVM_SDEI_MAX_VCPUS was introduced to use same data structure to
-represent both shared and private event.
-
-If the data belongs to particular vcpu should be accessed through the
-vcpu fd, then we need to split or reorganize the data struct as below.
-
-     /*
-      * The events are exposed through ioctl interface or similar
-      * mechanism (synthetic system registers?) before they can be
-      * registered. struct kvm_sdei_exposed_event instance is reserved
-      * from the kvm's static array on receiving the ioctl command
-      * from VMM.
-      */
-     struct kvm_sdei_exposed_event {
-         __u32   num;
-
-         __u8    type;
-         __u8    signaled;
-         __u8    priority;
-         __u8    padding;
-     };
-
-     /*
-      * The struct kvm_sdei_registered_event instance is allocated or
-      * reserved from the static array. For the shared event, the instance
-      * is linked to kvm, but it will be allocated or reserved from vcpu's
-      * static array and linked to the vcpu if it's a private event.
-      *
-      * The instance is only allocated and reserved upon SDEI_EVENT_REGISTER
-      * hypercall.
-      */
-     struct kvm_sdei_registered_event {
-         __u32   num
-
-#define KVM_SDEI_EVENT_STATE_REGISTERED         (1 << 0)
-#define KVM_SDEI_EVENT_STATE_ENABLE             (1 << 1)
-#define KVM_SDEI_EVENT_STATE_UNREGISTER_PENDING (1 << 2)
-         __u8    state;
-         __u8	route_mode;
-         __u8    padding[2];
-         __u64   route_affinity;
-         __u64	ep_address;
-         __u64	ep_arg;
-         __u64   notifier;
-     }
-
->> +struct kvm_sdei_exposed_event_state {
->> +	__u64	num;
->> +
->> +	__u8	type;
->> +	__u8	signaled;
->> +	__u8	priority;
->> +	__u8	padding[5];
->> +	__u64	notifier;
+> > cpufeature exposes a feature that we simply do not virtualize in KVM.
+> > That really can become a game of whack-a-mole. commit 96f4f6809bee
+> > ("KVM: arm64: Don't advertise FEAT_SPE to guests") is a good example,
+> > and I can really see no end to these sorts of issues without an
+> > overhaul. We'd need to also find a way to leverage the existing
+> > infrasturcture for working out a system-wide safe value, but this time
+> > with KVM's table of registers.
+> > KVM would then need to take a change to expose any new feature that has
+> > no involvement of EL2. Personally, I'd take that over the possibility of
+> > another unhandled feature slipping through and blowing up a guest kernel
+> > when running on newer hardware.
 > 
-> Wait, isn't this a kernel function pointer!?
+> Userspace with configurable ID registers would eliminate such problems
+> on known systems, but I agree that KVM itself should prevent it.
+> It will be inconvenient for some people, but it would be safer in general.
+
+We cannot require userspace to write to these registers to run a guest
+given the fact that the present ABI doesn't. Given that fact, KVM is
+still responsible for having sane default values for these registers.
+
+If a field that we do not handle implies a feature we do not virtualize
+on newer hardware, invariably our guest will see it and likely panic
+when it realizes the vCPU is out of spec.
+
+Maybe the feature bits tables is a bit extreme given the fact that it
+does define the architected handling of each field. I think the upper
+bound on register values I mentioned above would do the trick and avoid
+copy/pasting a whole set of structures we don't desperately need.
+
+> > > (dynamically generate during KVM's initialization)
+> >
+> > This was another one of my concerns with the current state of this
+> > patch. I found the register table construction at runtime hard to
+> > follow. I think it could be avoided with a helper that has a prescribed
+> > set of rules (caller-provided field definition takes precedence over the
+> > general one).
 > 
+> Sure, I will improve that if I continue to keep the current way.
+> With the option of having a separate KVM's arm64_ftr_bits,
+> the code will be very different, but I will keep that in mind.
 
-Yeah, it is a kernel function pointer, used by Async PF to know if
-the corresponding event has been handled or not. Async PF can cancel
-the previously injected event for performance concerns. Either Async PF
-or SDEI needs to migrate it. To keep SDEI transparent enough to Async PF,
-SDEI is responsible for its migration.
+arm64_ftr_bits might be a bit extreme in KVM after all, I'll retract
+that suggestion in favor of what I said above :)
 
->> +};
->> +
->> +struct kvm_sdei_registered_event_state {
-> 
-> You should fold these fields together with kvm_sdei_exposed_event_state
-> into a single 'kvm_sdei_event' structure:
-> 
+Thanks for being patient working through all of this with me.
 
-@route_mode and @route_affinity can't be configured or modified until
-the event is registered. Besides, they're only valid to the shared
-events. For private events, they don't have the routing needs. It means
-those two fields would be part of struct kvm_sdei_registered_event instead
-of kvm_sdei_exposed_event.
-
-
->> +	__u64	num;
->> +
->> +	__u8	route_mode;
->> +	__u8	padding[3];
->> +	__u64	route_affinity;
-> 
-> And these shouldn't be UAPI at the VM scope. Each of these properties
-> could be accessed via a synthetic/'pseudo-firmware' register on a vCPU FD:
-> 
-
-They're accessed through vcpu or kvm fd depending on what type the event
-is. For the VM-owned shared event, they're accessed through KVM fd. For the
-vcpu-owned private event, they're accessed through vcpu fd.
-
-I'm not sure if I catch the idea to have a synthetic register and I'm to
-confirm. If I'm correct, you're talking about the "IMPLEMENTATION DEFINED"
-system register, whose OP0 and CRn are 0B11 and 0B1x11. If two implementation
-defined registers can be adopted, I don't think we need to expose anything
-through ABI. All the operations and the needed data can be passed through
-the system registers.
-
-     SYS_REG_SDEI_COMMAND
-         Receives commands like to expose event, register event and change
-         vcpu state etc.
-     SYS_REG_SDEI_DATA
-         The needed data corresponding to the received command.
-
-However, I'm not positive that synthetic register can be used here. When
-Mark Rutland review "PATCH[RFC v1] Async PF support", the implementation
-defined registers can't be used in a very limited way. That time, a set
-of implementation defined registers are defined to identify the asynchronous
-page faults and access to the control data block. However, the idea was
-rejected. Later on, Marc recommended SDEI for Async PF.
-
-https://www.spinics.net/lists/kvm-arm/msg40315.html
-
-
->> +	__u64	ep_address[KVM_SDEI_MAX_VCPUS];
->> +	__u64	ep_arg[KVM_SDEI_MAX_VCPUS];
->> +	__u64	registered[KVM_SDEI_MAX_VCPUS/64];
->> +	__u64	enabled[KVM_SDEI_MAX_VCPUS/64];
->> +	__u64	unregister_pending[KVM_SDEI_MAX_VCPUS/64];
->> +};
->> +
->> +struct kvm_sdei_vcpu_event_state {
->> +	__u64	num;
->> +
->> +	__u32	event_count;
->> +	__u32	padding;
->> +};
->> +
->> +struct kvm_sdei_vcpu_regs_state {
->> +	__u64	regs[18];
->> +	__u64	pc;
->> +	__u64	pstate;
->> +};
->> +
->> +struct kvm_sdei_vcpu_state {
-> 
-> Same goes here, I strongly recommend you try to expose this through the
-> KVM_{GET,SET}_ONE_REG interface if at all possible since it
-> significantly reduces the UAPI burden, both on KVM to maintain it and
-> VMMs to actually use it.
-> 
-
-Yeah, it's much convenient to use the implementation defined register here.
-However, I'm not positive if we can do this. Please see the details I
-provided above :)
-
-Thanks,
-Gavin
-
-
+--
+Best,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
