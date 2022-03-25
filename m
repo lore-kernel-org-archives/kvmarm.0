@@ -2,74 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D2BC433F5
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Mar 2022 06:11:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D2DC433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Mar 2022 07:00:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 208944B0B6;
-	Fri, 25 Mar 2022 02:11:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0543C4B0DE;
+	Fri, 25 Mar 2022 03:00:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id m1bJdy3S8lG1; Fri, 25 Mar 2022 02:11:36 -0400 (EDT)
+	with ESMTP id bB+45MKIqkaN; Fri, 25 Mar 2022 03:00:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0DB44B0B9;
-	Fri, 25 Mar 2022 02:11:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4B594B086;
+	Fri, 25 Mar 2022 03:00:05 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AA744B0B6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2022 02:11:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DC0C849F56
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2022 03:00:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lmJs2U+dUpSM for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Mar 2022 02:11:35 -0400 (EDT)
+ with ESMTP id HE5y24Pr-MKj for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Mar 2022 03:00:03 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F08D849F38
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2022 02:11:34 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61FA549F29
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2022 03:00:03 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1648188694;
+ s=mimecast20190719; t=1648191603;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wuTRsT/Tz6ofz67ssIJ6RwjRRnXFcLV1cw3Q00t4VHc=;
- b=RfKoT5tciV009QvJCBWFej0ijY2vSNL3rO29jgYUxveuD1GX/gMRIK3SxEiZFE7BFMgPcZ
- gzDB93l3Tb0ZGbzZ0WVhq8Ywm7oXMxGsv02/ky4F7iDoi4a22mJNjJ5RMZn8PJNOHYlmtp
- FkMTCQisFlsmuhBNiLp4jEYCxiggNZ4=
+ bh=JsouGytxzF/421Vl9Qb6fg1tOCzthwpBsJFvMy8Q+wg=;
+ b=VMH7GJRA6XC1rE3uIBhhfebKID3c9WTcnwlkVcBsRsybRxfu05nh+Ou5C5XfIWy/Xzc5yW
+ AKKQIyER4s1DSKiFbELH0812A5SlO43MsdApfkF7OswmaoKGo+M7oVwLJbcKlGVkcd71o8
+ /VP7Rpx72Movy4dKYe0dr+lA8RISa8U=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-116-LzbVV2nSPrSAJp3HCQboTA-1; Fri, 25 Mar 2022 02:11:33 -0400
-X-MC-Unique: LzbVV2nSPrSAJp3HCQboTA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com
- [10.11.54.10])
+ us-mta-607-NPp4tiUiMC6YdeRmVNPoEg-1; Fri, 25 Mar 2022 03:00:01 -0400
+X-MC-Unique: NPp4tiUiMC6YdeRmVNPoEg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.9])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4883801E67;
- Fri, 25 Mar 2022 06:11:22 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A6BB0802803;
+ Fri, 25 Mar 2022 07:00:00 +0000 (UTC)
 Received: from [10.72.12.33] (ovpn-12-33.pek2.redhat.com [10.72.12.33])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B6273401053;
- Fri, 25 Mar 2022 06:11:14 +0000 (UTC)
-Subject: Re: [PATCH v5 03/22] KVM: arm64: Support SDEI_VERSION hypercall
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C32A454B976;
+ Fri, 25 Mar 2022 06:59:55 +0000 (UTC)
+Subject: Re: [PATCH v5 18/22] KVM: arm64: Support SDEI ioctl commands on VM
 To: Oliver Upton <oupton@google.com>
 References: <20220322080710.51727-1-gshan@redhat.com>
- <20220322080710.51727-4-gshan@redhat.com> <YjoPxLAMIPobBzS0@google.com>
- <d8e151e5-080b-dc87-b7e0-9031a7928853@redhat.com>
- <YjtLVqBbL0jyFFZy@google.com>
- <6f217836-45fb-8833-7bb1-5dc822826f56@redhat.com>
- <YjwiQ10CE5AtoM4Y@google.com>
+ <20220322080710.51727-19-gshan@redhat.com> <YjtYuk+Jx1dFPQQ9@google.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <09814baf-3107-5fa9-f92c-cc271f384c4a@redhat.com>
-Date: Fri, 25 Mar 2022 14:11:11 +0800
+Message-ID: <eae10132-a02d-b341-bdf5-be1b2096be4c@redhat.com>
+Date: Fri, 25 Mar 2022 14:59:52 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <YjwiQ10CE5AtoM4Y@google.com>
+In-Reply-To: <YjtYuk+Jx1dFPQQ9@google.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
  shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
  vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
@@ -92,38 +88,83 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Oliver,
 
-On 3/24/22 3:48 PM, Oliver Upton wrote:
-> On Thu, Mar 24, 2022 at 12:07:34PM +0800, Gavin Shan wrote:
-> 
-> [...]
-> 
->>>> Yeah, I was sticky to the pattern of "KVM". However, I think it's good
->>>> to reuse the existing one. Lets use ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2
->>>> if you agree. Its first two characters are "VM" at least.
->>>
->>> Sounds fine to me. The only other nit I'd say is we should define a
->>> macro for it too, something like:
->>>
->>>     #define KVM_SDEI_VENDOR	ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2
->>>
+On 3/24/22 1:28 AM, Oliver Upton wrote:
+> On Tue, Mar 22, 2022 at 04:07:06PM +0800, Gavin Shan wrote:
+>> This supports ioctl commands on VM to manage the various objects.
+>> It's primarily used by VMM to accomplish migration. The ioctl
+>> commands introduced by this are highlighted as below:
 >>
->> Agreed, and the macro will be put into arch/arm64/include/asm/kvm_sdei.h.
->> arch/arm64/include/uapi/asm/kvm_sdei_state.h isn't the right place because
->> the dependent macro ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2 isn't exposed by
->> ABI.
+>>     * KVM_SDEI_CMD_GET_VERSION
+>>       Retrieve the version of current implementation. It's different
+>>       from the version of the followed SDEI specification. This version
+>>       is used to indicates what functionalities documented in the SDEI
+>>       specification have been supported or not supported.
 > 
-> The argument could definitely be made that our vendor ID should be
-> promoted to UAPI. Even though linux is the only known user of our
-> vendor-specific hypercalls, nothing is stopping other software from
-> using them. Beyond that, these values should really never change anyway.
+> Don't we need a way to set the version as well? KVM is very much
+> responsible for upholding ABI of older specs. So, if a VMM and guest
+> expect SDEI v1.1, we can't just forcibly raise it to something else
+> during a migration.
 > 
-> It isn't a big deal if you add it to internal headers, either, as the
-> only known consumer will be the kernel.
+> The PSCI implementation is a great example of how KVM has grown its
+> implementation in line with a specification, all the while preserving
+> backwards compatibility.
 > 
 
-Sure. Lets add it into include/asm/kvm_sdei.h in next respin. We can
-expose it when it is needed. For now, I do think Linux is the only
-user.
+The only information feed by VMM is the exposed events. The events
+can't be registered from guest kernel, and raised from host to guest
+kernel until it's exposed by VMM. Besides, the exposed events will
+be defined staticly in host/KVM as we discussed on PATCH[02/22]. We
+also discussed to eliminate those ioctl commands. So I think we needn't
+to add KVM_SDEI_CMD_SET_VERSION. Further more, the version is only a
+concern to host itself if the migration can be done through the
+firmware pseudo system registers since the migration compatibility
+is the only concern to VMM (QEMU).
+
+Yes, Currently, 0.1/0.2/1.0 versions are supported by PSCI. 0.1 is
+picked until VMM asks for 0.2 and 1.0 explicitly. However, it seems
+QEMU isn't using 1.0 PSCI yet and maybe more patch is needed to enable
+it.
+
+>>     * KVM_SDEI_CMD_GET_EXPOSED_EVENT_COUNT
+>>       Return the total count of exposed events.
+>>
+>>     * KVM_SDEI_CMD_GET_EXPOSED_EVENT
+>>     * KVM_SDEI_CMD_SET_EXPOSED_EVENT
+>>       Get or set exposed event
+>>
+>>     * KVM_SDEI_CMD_GET_REGISTERED_EVENT_COUNT
+>>       Return the total count of registered events.
+>>
+>>     * KVM_SDEI_CMD_GET_REGISTERED_EVENT
+>>     * KVM_SDEI_CMD_SET_REGISTERED_EVENT
+>>       Get or set registered event.
+> 
+> Any new UAPI needs to be documented in Documentation/virt/kvm/api.rst
+> 
+> Additionally, we desperately need a better, generic way to save/restore
+> VM scoped state. IMO, we should only be adding ioctls if we are
+> affording userspace a meaningful interface. Every save/restore pair of
+> ioctls winds up wasting precious ioctl numbers and requires userspace
+> take a change to read/write an otherwise opaque value.
+> 
+> Marc had made some suggestions in this area already that Raghavendra
+> experimented with [1], and I think its time to meaningfully consider
+> our options. Basically, KVM_GET_REG_LIST needs to convey whether a
+> particular register is VM or vCPU state. We only need to save/restore a
+> VM state register once. That way, userspace doesn't have to care about
+> the underlying data and the next piece of VM state that comes along
+> doesn't require an ioctl nr nor VMM participation.
+> 
+> [1]: http://lore.kernel.org/r/20220224172559.4170192-3-rananta@google.com
+> 
+
+Thanks for the pointer to Raghavendra's series. The firmware pseudo
+system registers have been classified into VM and VCPU scoped in the
+series. I think it fits the SDEI migration requirements very well.
+The shared events can even be migrated through the VM scoped firmware
+pseudo system registers. However, I don't plan to support it in next
+revision (v6) as currently needed events are all private. I may
+spend more time to go through Raghavendra's series later.
 
 Thanks,
 Gavin
