@@ -2,48 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E89C4332F
-	for <kvmarm@archiver.kernel.org>; Fri, 25 Mar 2022 11:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D73C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 25 Mar 2022 13:06:27 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 750864B128;
-	Fri, 25 Mar 2022 07:16:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EBAB4B13D;
+	Fri, 25 Mar 2022 09:06:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cohxjThkPa3k; Fri, 25 Mar 2022 07:16:19 -0400 (EDT)
+	with ESMTP id XSDtJkF4cdJ5; Fri, 25 Mar 2022 09:06:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 151324B150;
-	Fri, 25 Mar 2022 07:16:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 28DED49EEB;
+	Fri, 25 Mar 2022 09:06:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 18D5B49F24
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 21:06:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 773B549ED9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2022 09:06:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id l2mVb9NRlBQU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2022 21:06:23 -0400 (EDT)
-Received: from nksmu.kylinos.cn (mailgw.kylinos.cn [123.150.8.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DB124141A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2022 21:06:22 -0400 (EDT)
-X-UUID: 472edb777a68478da73749e381aa8236-20220325
-X-UUID: 472edb777a68478da73749e381aa8236-20220325
-Received: from cs2c.com.cn [(172.17.111.24)] by nksmu.kylinos.cn
- (envelope-from <xieming@kylinos.cn>) (Generic MTA)
- with ESMTP id 1192625635; Fri, 25 Mar 2022 09:05:32 +0800
-Received: by cs2c.com.cn (NSMail, from userid 10001)
- id BB9CB383E604; Fri, 25 Mar 2022 09:06:17 +0800 (CST)
-From: =?UTF-8?B?6LCi5piO?= <xieming@kylinos.cn>
-Subject: =?UTF-8?B?5Zue5aSNOiBSZTogW1BBVENIXSBrdm06IGZpeCBncHUgcGFzc3Rocm91Z2ggaW50byB2bSBvbiBhcm02NA==?=
-To: =?UTF-8?B?TWFyYyBaeW5naWVy?= <maz@kernel.org>,
-Date: Fri, 25 Mar 2022 09:06:17 +0800
-X-Mailer: NSMAIL 6.0
-Message-ID: <1zpfpvw7azf-1zpgztpmct8@nsmail6.0>
-References: 7fbec7b1c2eaa805cb9e846e7e915707@kernel.org
-X-Delaysendtime: Fri, 25 Mar 2022 09:06:17 +0800
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary=nsmail-1zqn3tof13y-1zqn3tof13z
-X-ns-mid: webmail-623d1589-1zqja085
-X-Mailman-Approved-At: Fri, 25 Mar 2022 07:16:15 -0400
+ with ESMTP id vAgXOP9x5AZl for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Mar 2022 09:06:23 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2D6149E17
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2022 09:06:22 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by sin.source.kernel.org (Postfix) with ESMTPS id B235ECE2938;
+ Fri, 25 Mar 2022 13:06:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 299A0C340E9;
+ Fri, 25 Mar 2022 13:06:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1648213578;
+ bh=swW6vKfLJ/bg7/isdfkMnhqLLtpKDbNCQcaqcFU5LGk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:From;
+ b=leJoBTbbKeHcaYKmkZdhnopLbgbqQdNdQS18MW4ruJlC8bhzQ1UiNfgNcPysjk1x8
+ jaIwMf+bI3J4ZKNzy7ale35o1lno1ySk7ZuDaTicy/GjIHg+hSCPYAKpyJeZrwOZ3S
+ CDpaa+G+9sHv4Bys6eYShOL1XvgzlgKexTe6B4RF+3btqLhXXoxRZI9pqbUV3ucNpy
+ Lc6RklQZWFrOMwslgpsMCcYYxk3sIX3NXGqOXuEiptbvPFNCHcmjUvBLuSLLtCLUxz
+ 8QwyTLH+hbDDk8tR4xVj5B/RrPeuZeQgxb+Et1ECOrKph47wdXTByPztoELrzEMtEB
+ awlgPFafxkFcw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nXjdw-00GuwY-1A; Fri, 25 Mar 2022 13:06:16 +0000
+Date: Fri, 25 Mar 2022 13:06:15 +0000
+Message-ID: <87ils25ghk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: =?UTF-8?B?6LCi5piO?= <xieming@kylinos.cn>
+Subject: Re: =?UTF-8?B?5Zue5aSNOg==?= Re: [PATCH] kvm: fix gpu passthrough
+ into vm on arm64
+In-Reply-To: <1zpfpvw7azf-1zpgztpmct8@nsmail6.0>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: xieming@kylinos.cn, christoffer.dall@arm.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 Cc: linux-kernel@vger.kernel.org, christoffer.dall@arm.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -57,155 +80,23 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This message is in MIME format.
-
---nsmail-1zqn3tof13y-1zqn3tof13z
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-ICZuYnNwOyAmbmJzcDs8c3BhbiBzdHlsZT0iYm94LXNpemluZzogYm9yZGVy
-LWJveDsgY29sb3I6IHJnYigxNTMsIDE1MywgMTUzKTsgZm9udC1mYW1pbHk6
-IHRhaG9tYSwgJnF1b3Q7TWljcm9zb2Z0IFlhSGVpJnF1b3Q7LCDlvq7ova/p
-m4Xpu5EsIOWui+S9kywgJnF1b3Q7TWFsZ3VuIEdvdGhpYyZxdW90Oywgc2Fu
-cy1zZXJpZjsgZm9udC1zaXplOiAxNHB4OyBmb250LXZhcmlhbnQtbnVtZXJp
-Yzogbm9ybWFsOyBmb250LXZhcmlhbnQtZWFzdC1hc2lhbjogbm9ybWFsOyBs
-aW5lLWhlaWdodDogMjFweDsgYmFja2dyb3VuZC1jb2xvcjogcmdiKDI1NSwg
-MjU1LCAyNTUpOyI+PHNwYW4gY2xhc3M9InNraXAiIHN0eWxlPSJib3gtc2l6
-aW5nOiBib3JkZXItYm94OyI+PGEgZGF0YS1rZXl3b3JkPSJ0aGFua3MiIHN0
-eWxlPSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBjdXJzb3I6IHBvaW50ZXI7
-IGNvbG9yOiByZ2IoNDMsIDExOSwgMTk3KTsgb3V0bGluZTogbm9uZTsgLXdl
-YmtpdC10YXAtaGlnaGxpZ2h0LWNvbG9yOiB0cmFuc3BhcmVudDsgbGluZS1o
-ZWlnaHQ6IDE0cHg7IGZvbnQtc2l6ZTogMTVweDsgZm9udC13ZWlnaHQ6IDcw
-MDsiPnRoYW5rczwvYT48c3BhbiBjbGFzcz0iQXBwbGUtY29udmVydGVkLXNw
-YWNlIj4mbmJzcDs8L3NwYW4+PGEgZGF0YS1rZXl3b3JkPSJmb3IiIHN0eWxl
-PSJib3gtc2l6aW5nOiBib3JkZXItYm94OyBjdXJzb3I6IHBvaW50ZXI7IGNv
-bG9yOiByZ2IoNDMsIDExOSwgMTk3KTsgb3V0bGluZTogbm9uZTsgLXdlYmtp
-dC10YXAtaGlnaGxpZ2h0LWNvbG9yOiB0cmFuc3BhcmVudDsgbGluZS1oZWln
-aHQ6IDE0cHg7IGZvbnQtc2l6ZTogMTVweDsgZm9udC13ZWlnaHQ6IDcwMDsi
-PmZvcjwvYT48c3BhbiBjbGFzcz0iQXBwbGUtY29udmVydGVkLXNwYWNlIj4m
-bmJzcDs8L3NwYW4+PGEgZGF0YS1rZXl3b3JkPSJ5b3VyIiBzdHlsZT0iYm94
-LXNpemluZzogYm9yZGVyLWJveDsgY3Vyc29yOiBwb2ludGVyOyBjb2xvcjog
-cmdiKDQzLCAxMTksIDE5Nyk7IG91dGxpbmU6IG5vbmU7IC13ZWJraXQtdGFw
-LWhpZ2hsaWdodC1jb2xvcjogdHJhbnNwYXJlbnQ7IGxpbmUtaGVpZ2h0OiAx
-NHB4OyBmb250LXNpemU6IDE1cHg7IGZvbnQtd2VpZ2h0OiA3MDA7Ij55b3Vy
-PC9hPjxzcGFuIGNsYXNzPSJBcHBsZS1jb252ZXJ0ZWQtc3BhY2UiPiZuYnNw
-Ozwvc3Bhbj48YSBkYXRhLWtleXdvcmQ9InJlcGx5IiBzdHlsZT0iYm94LXNp
-emluZzogYm9yZGVyLWJveDsgY3Vyc29yOiBwb2ludGVyOyBjb2xvcjogcmdi
-KDQzLCAxMTksIDE5Nyk7IG91dGxpbmU6IG5vbmU7IC13ZWJraXQtdGFwLWhp
-Z2hsaWdodC1jb2xvcjogdHJhbnNwYXJlbnQ7IGxpbmUtaGVpZ2h0OiAxNHB4
-OyBmb250LXNpemU6IDE1cHg7IGZvbnQtd2VpZ2h0OiA3MDA7Ij5yZXBseSAh
-PC9hPjwvc3Bhbj48L3NwYW4+PGJyPiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZu
-YnNwO3lvdSBhcmUgcmlnaHQsJm5ic3A7ICdJZiB0aGUgZGV2aWNlIHN1cHBv
-cnRzIE5PUk1BTF9OQywgdGhpcyBzaG91bGQ8YnIgc3R5bGU9IndoaXRlLXNw
-YWNlOiBub3JtYWw7Ij5iZSBrbm93biBieSB0aGUgaG9zdCBrZXJuZWwgYW5k
-IGV4cG9zZWQgdG8gS1ZNJ++8jCBhY2NvcmRkaW5nIHRoZSBrdm0gY29tYmlu
-aW5nIHJ1bGVzIG9uIGFybTY077yMIHN0YWdlMSBpcyBzZXR0aW5nIHRvIE5P
-Uk1BTF9OQ++8jCBzbyBjYW4gd2UgYWRkIGEgY29uZGl0aW9uYWwganVkZW1l
-bnQgd2hlbiBpb3JlbWFwcGluZyBvbiBzdGFnZTIsJm5ic3A7IGlmIHRoZSBk
-ZXZpY2Ugc3VwcHVydCBOT1JNQUxfTkMgd2Ugc2V0dGluZyB0aGUgbWVtb3J5
-IGF0dHJpYnV0ZSB0byBQQUdFX1MyX05DID88cD48L3A+PHA+PGJyPjwvcD48
-cD48L3A+PGRpdiBpZD0icmUiIHN0eWxlPSJtYXJnaW4tbGVmdDowLjVlbTtw
-YWRkaW5nLWxlZnQ6MC41ZW07Ym9yZGVyLWxlZnQ6MXB4IHNvbGlkIGdyZWVu
-OyI+PGJyPjxicj48YnI+CiAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDs8
-ZGl2IHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiNmNWY3ZmEiPjxiPuS4u+OA
-gOmimO+8mjwvYj48c3BhbiBpZD0ic3ViamVjdCI+UmU6IFtQQVRDSF0ga3Zt
-OiBmaXggZ3B1IHBhc3N0aHJvdWdoIGludG8gdm0gb24gYXJtNjQ8L3NwYW4+
-CiAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOzxi
-cj48Yj7ml6XjgIDmnJ/vvJo8L2I+PHNwYW4gaWQ9ImRhdGUiPjIwMjItMDMt
-MjMgMTg6MTI8L3NwYW4+CiAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsg
-Jm5ic3A7ICZuYnNwOzxicj48Yj7lj5Hku7bkurrvvJo8L2I+PHNwYW4gaWQ9
-ImZyb20iPk1hcmMgWnluZ2llcjwvc3Bhbj4KICZuYnNwOyAmbmJzcDsgJm5i
-c3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7PGJyPjxiPuaUtuS7tuS6uu+8mjwv
-Yj48c3BhbiBpZD0idG8iPnhpZW1pbmc8L3NwYW4+CiAmbmJzcDsgJm5ic3A7
-ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOwogJm5ic3A7ICZuYnNwOyAm
-bmJzcDsgJm5ic3A7PC9kaXY+PGJyPgogJm5ic3A7ICZuYnNwOyAmbmJzcDsg
-Jm5ic3A7PGRpdiBpZD0iY29udGVudCI+PGRpdiBjbGFzcz0idmlld2VyX3Bh
-cnQiPjxkaXY+UGxlYXNlIHVzZSBteSAqd29ya2luZyogZW1haWwgYWRkcmVz
-cyAobG9vayBpbiB0aGUgTUFJTlRBSU5FUlMgZmlsZSBmb3IgPGJyPnRoZSB1
-cC10by1kYXRlIG9uZSkuPGJyPjxicj5PbiAyMDIyLTAzLTIzIDAxOjI1LCB4
-aWVtaW5nIHdyb3RlOjxicj4mZ3Q7IDEpIHdoZW4gcGFzc3Rocm91Z2ggc29t
-ZSBwY2llIGRldmljZSwgc3VjaCBhcyBBTUQgZ3B1cyw8YnI+Jmd0OyAmbmJz
-cDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsga3ZtIHdpbGwgcmVwb3J0OiJVbnN1
-cHBvcnRlZCBGU0M6IiBlcnIuPGJyPjxicj5QbGVhc2UgZGV0YWlsIHRoaXMu
-IFdoYXQgdmFsdWVzIG9mIEZTQz8gSW4gd2hhdCBjaXJjdW1zdGFuY2VzPzxi
-cj48YnI+Jmd0OyA8YnI+Jmd0OyAyKSB0aGUgbWFpbiByZWFzb24gaXMga3Zt
-IHNldHRpbmcgbWVtb3J5IHR5cGUgdG88YnI+Jmd0OyAmbmJzcDsgJm5ic3A7
-UEFHRV9TMl9ERVZJQ0UoREVWSUNFX25HblJFKSwgYnV0IGluIGd1ZXN0b3Ms
-IGFsbCBvZiBkZXZpY2UgaW8gPGJyPiZndDsgbWVtb3J5PGJyPiZndDsgJm5i
-c3A7ICZuYnNwO3R5cGUgd2hlbiBpb3JlbWFwcGluZyAoaW5jbHVkaW5nIGdw
-dSBkcml2ZXIgVFRNIG1lbW9yeSB0eXBlKSBpczxicj4mZ3Q7ICZuYnNwOyAm
-bmJzcDtzZXR0aW5nIHRvIE1UX05PUk1BTF9OQy48YnI+Jmd0OyA8YnI+Jmd0
-OyAzKSBhY2NvcmRpbmcgdG8gQVJNNjQgc3RhZ2UxJmFtcDtzdGFnZTIgY29u
-YmluaW5nIHJ1bGVzLjxicj4mZ3Q7ICZuYnNwOyAmbmJzcDttZW1vcnkgdHlw
-ZSBhdHRyaWJ1dGVzIGNvbWJpbmluZyBydWxlczo8YnI+Jmd0OyAmbmJzcDsg
-Jm5ic3A7Tm9ybWFsLVdCICZsdDsgTm9ybWFsLVdUICZsdDsgJm5ic3A7Tm9y
-bWFsTkMgJmx0OyAmbmJzcDtEZXZpY2UtR1JFICZsdDsgJm5ic3A7RGV2aWNl
-LW5HUkUgJmx0Ozxicj4mZ3Q7ICZuYnNwOyAmbmJzcDtEZXZpY2VuR25SRSAm
-bHQ7IERldmljZS1uR25SbkU8YnI+Jmd0OyAmbmJzcDsgJm5ic3A7Tm9ybWFs
-LVdCIGlzIHdlYWtlc3QsRGV2aWNlLW5HblJuRSBpcyBzdHJvbmdlc3QuPGJy
-PiZndDsgPGJyPiZndDsgJm5ic3A7ICZuYnNwO3JlZmZlcnJpbmcgdG8gJ0Fy
-bSBBcmNoaXRlY3R1cmUgUmVmZXJlbmNlIE1hbnVhbCBBcm12OCw8YnI+Jmd0
-OyAmbmJzcDsgJm5ic3A7Zm9yIEFybXY4LUEgYXJjaGl0ZWN0dXJlIHByb2Zp
-bGUnIHBkZiwgY2hhcHRlciBCMi44PGJyPiZndDsgJm5ic3A7ICZuYnNwO3Jl
-ZmZlcnJpbmcgdG8gJ0FSTSBTeXN0ZW0gTWVtb3J5IE1hbmFnZW1lbnQgVW5p
-dCBBcmNoaXRlY3R1cmU8YnI+Jmd0OyAmbmJzcDsgJm5ic3A7U3BlY2lmaWNh
-dGlvbiBTTU1VIGFyY2hpdGVjdHVyZSB2ZXJzaW9uIDMuMCBhbmQgdmVyc2lv
-biAzLjEnIHBkZiw8YnI+Jmd0OyAmbmJzcDsgJm5ic3A7Y2hhcHRlciAxMy4x
-LjU8YnI+Jmd0OyA8YnI+Jmd0OyA0KSB0aGVyZWZvcmUsIHRoZSBJL08gbWVt
-b3J5IGF0dHJpYnV0ZSBvZiB0aGUgVk0gaXMgc2V0dGluZyB0bzxicj4mZ3Q7
-ICZuYnNwOyAmbmJzcDtEZXZpY2VuR25SRSBpcyBhIGJpZyBtaXN0YWtlLiBp
-dCBjYXVzZXMgYWxsIGRldmljZSBtZW1vcnkgYWNjZXNzaW5nIDxicj4mZ3Q7
-IGluPGJyPiZndDsgJm5ic3A7ICZuYnNwO3RoZSB2aXJ0dWFsIG1hY2hpbmUg
-bXVzdCBiZSBhbGlnbmVkLjxicj4mZ3Q7IDxicj4mZ3Q7ICZuYnNwOyAmbmJz
-cDtUbyBzdW1tYXJpemU6IHN0YWdlMiBtZW1vcnkgdHlwZSBjYW5ub3QgYmUg
-c3Ryb25nZXIgdGhhbiBzdGFnZTEgaW48YnI+Jmd0OyAmbmJzcDsgJm5ic3A7
-YXJtNjQgYXJjaHRlY2h0dXJlLjxicj48YnI+SG93IGRvIHlvdSBzdWdnZXN0
-IEtWTSBmaW5kcyBvdXQgYWJvdXQgd2hhdCB0aGUgZ3Vlc3Qgd2FudHMgYW5k
-PGJyPndoYXQgdGhlIGRldmljZSBzdXBwb3J0cz88YnI+PGJyPiZndDsgPGJy
-PiZndDsgU2lnbmVkLW9mZi1ieTogeGllbWluZzx4aWVtaW5nQGt5bGlub3Mu
-Y24+PGJyPiZndDsgLS0tPGJyPiZndDsgJm5ic3A7dmlydC9rdm0vYXJtL21t
-dS5jIHwgMiArLTxicj4mZ3Q7ICZuYnNwOzEgZmlsZSBjaGFuZ2VkLCAxIGlu
-c2VydGlvbigrKSwgMSBkZWxldGlvbigtKTxicj4mZ3Q7IDxicj4mZ3Q7IGRp
-ZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vbW11LmMgYi92aXJ0L2t2bS9hcm0v
-bW11LmM8YnI+Jmd0OyBpbmRleCAxMTEwM2I3NWM1OTYuLjliN2ZiMTNmNDU0
-NiAxMDA2NDQ8YnI+Jmd0OyAtLS0gYS92aXJ0L2t2bS9hcm0vbW11LmM8YnI+
-Jmd0OyArKysgYi92aXJ0L2t2bS9hcm0vbW11LmM8YnI+Jmd0OyBAQCAtMTIw
-OSw3ICsxMjA5LDcgQEAgaW50IGt2bV9waHlzX2FkZHJfaW9yZW1hcChzdHJ1
-Y3Qga3ZtICprdm0sPGJyPiZndDsgcGh5c19hZGRyX3QgZ3Vlc3RfaXBhLDxi
-cj4mZ3Q7ICZuYnNwOwlwZm4gPSBfX3BoeXNfdG9fcGZuKHBhKTs8YnI+Jmd0
-OyA8YnI+Jmd0OyAmbmJzcDsJZm9yIChhZGRyID0gZ3Vlc3RfaXBhOyBhZGRy
-ICZsdDsgZW5kOyBhZGRyICs9IFBBR0VfU0laRSkgezxicj4mZ3Q7IC0JCXB0
-ZV90IHB0ZSA9IHBmbl9wdGUocGZuLCBQQUdFX1MyX0RFVklDRSk7PGJyPiZn
-dDsgKwkJcHRlX3QgcHRlID0gcGZuX3B0ZShwZm4sIFBBR0VfUzIpOzxicj4m
-Z3Q7IDxicj4mZ3Q7ICZuYnNwOwkJaWYgKHdyaXRhYmxlKTxicj4mZ3Q7ICZu
-YnNwOwkJCXB0ZSA9IGt2bV9zMnB0ZV9ta3dyaXRlKHB0ZSk7PGJyPjxicj5O
-bywgdGhpcyBjYW5ub3QgYmUgYSBibGFua2V0IGNoYW5nZS4gVGhpcyBtZWFu
-cyB0aGF0IHRoZTxicj5ndWVzdCB3aWxsIGJlIGFibGUgdG8gb2J0YWluIGEg
-Y2FjaGVhYmxlIG1hcHBpbmcgb24gZGV2aWNlcyw8YnI+YWxsb3cgcmVvcmRl
-cmluZywgYW5kIG90aGVyIHRoaW5ncyB0aGF0IGFyZSBsaWtlbHkgdG8gKmJy
-ZWFrKjxicj50aGUgc3lzdGVtLiBZb3UgYWxzbyBoYXZlIG5vIGJ1c2luZXNz
-IGNhbGxpbmcgdGhpcyBmdW5jdGlvbjxicj5vdXRzaWRlIG9mIEtWTS48YnI+
-PGJyPllvdSBhcmUgYXNraW5nIHVzIHRvIHRydXN0IHRoZSBndWVzdC4gVGhl
-cmUgaXMgbm8gd2F5IHRoaXM8YnI+aXMgYWNjZXB0YWJsZS4gSWYgdGhlIGRl
-dmljZSBzdXBwb3J0cyBOT1JNQUxfTkMsIHRoaXMgc2hvdWxkPGJyPmJlIGtu
-b3duIGJ5IHRoZSBob3N0IGtlcm5lbCBhbmQgZXhwb3NlZCB0byBLVk0uPGJy
-Pjxicj5UaGFua3MsPGJyPjxicj4gJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5i
-c3A7IE0uPGJyPi0tIDxicj5KYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0IHNt
-ZWxscyBmdW5ueS4uLjxicj48L3hpZW1pbmdAa3lsaW5vcy5jbj48L2Rpdj48
-L2Rpdj48L2Rpdj48L2Rpdj4=
-
---nsmail-1zqn3tof13y-1zqn3tof13z
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---nsmail-1zqn3tof13y-1zqn3tof13z--
+T24gRnJpLCAyNSBNYXIgMjAyMiAwMTowNjoxNyArMDAwMCwK6LCi5piOIDx4aWVtaW5nQGt5bGlu
+b3MuY24+IHdyb3RlOgo+IAo+ICAgIHRoYW5rcyBmb3IgeW91ciByZXBseSAhCj4gICAgICAgIHlv
+dSBhcmUgcmlnaHQsICdJZiB0aGUgZGV2aWNlIHN1cHBvcnRzIE5PUk1BTF9OQywgdGhpcyBzaG91
+bGQKPiBiZSBrbm93biBieSB0aGUgaG9zdCBrZXJuZWwgYW5kIGV4cG9zZWQgdG8gS1ZNJ++8jCBh
+Y2NvcmRkaW5nIHRoZSBrdm0KPiBjb21iaW5pbmcgcnVsZXMgb24gYXJtNjTvvIwgc3RhZ2UxIGlz
+IHNldHRpbmcgdG8gTk9STUFMX05D77yMIHNvIGNhbgo+IHdlIGFkZCBhIGNvbmRpdGlvbmFsIGp1
+ZGVtZW50IHdoZW4gaW9yZW1hcHBpbmcgb24gc3RhZ2UyLCBpZiB0aGUKPiBkZXZpY2Ugc3VwcHVy
+dCBOT1JNQUxfTkMgd2Ugc2V0dGluZyB0aGUgbWVtb3J5IGF0dHJpYnV0ZSB0bwo+IFBBR0VfUzJf
+TkMgPwoKVGhlIHF1ZXN0aW9uIHJlbWFpbnM6IGhvdyBkbyB5b3UgY29udmV5IHRoYXQgY2FwYWJp
+bGl0eSB0byB0aGUgaG9zdD8KVGhlcmUgaXMgbm90aGluZyBjdXJyZW50bHkgdGVsbGluZyBLVk0g
+d2hhdCBtZW1vcnkgdHlwZSB0byB1c2UuCgoJTS4KCi0tIApXaXRob3V0IGRldmlhdGlvbiBmcm9t
+IHRoZSBub3JtLCBwcm9ncmVzcyBpcyBub3QgcG9zc2libGUuCl9fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
+c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
+L2xpc3RpbmZvL2t2bWFybQo=
