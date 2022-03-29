@@ -2,79 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B6CC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 01:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D91F3C433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 03:20:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFEAE4B178;
-	Mon, 28 Mar 2022 21:57:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 287D94B1A2;
+	Mon, 28 Mar 2022 23:20:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uoFfx6DPI1mn; Mon, 28 Mar 2022 21:57:33 -0400 (EDT)
+	with ESMTP id w90XSJKM0S68; Mon, 28 Mar 2022 23:20:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A6E44B13E;
-	Mon, 28 Mar 2022 21:57:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E50074B1A0;
+	Mon, 28 Mar 2022 23:20:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 023824B131
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 21:57:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 331074B1A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 23:20:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 35YMzpcXdqbo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Mar 2022 21:57:31 -0400 (EDT)
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com
- [209.85.214.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96FF44B0DB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 21:57:31 -0400 (EDT)
-Received: by mail-pl1-f172.google.com with SMTP id w4so16288520ply.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 18:57:31 -0700 (PDT)
+ with ESMTP id OTHMH8IH-XkH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Mar 2022 23:20:14 -0400 (EDT)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6F354B137
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 23:20:14 -0400 (EDT)
+Received: by mail-pj1-f73.google.com with SMTP id
+ j15-20020a17090a2a8f00b001c6d6b729f1so759489pjd.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 20:20:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zzqizdfMhDFC7k74H2iOE4HZaWJn95Ti241LRXZIhhE=;
- b=R+kN3S1eIzfKeFkGBaiwxiQv3/FBJUHyJTljzyH/at/8lhwM3QIGA8hie5RdzRkWEC
- nUV8gAiqCi97QePeoKIV3IxBAfuYxYF2+8ZKXY2E5Kpr9zcELASArzOYw9EZ7jh++gqP
- PUOYnaON9OnNyzIjO13iUV9mX5aV0Xw3uf5qLK9Ucmg9lEMd8MzWOaq6SyaLAicsJyHX
- L/fcITcIQBl6KE/B8piUe2muqXybOXtPn1eKT6pwbr6pTGvKQOk65RRSSA4n8ebb6/vl
- BqQvnaTHAfc8M2t5TJ5TxbNTs5a9nv1tTi0ex/NY5WTEcms4QyXB2J/iG9D+4Ybr8FPK
- a0Lg==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=sAGNmdLtBshVUh/KYJEFMIapacr3RW4pw1K+CiinPIg=;
+ b=V/TJBz/iUJlEmkrMTjYoIS6WDNFPx87ejo/7vs1jet6SMwswMc4CzXzDjCkjps9egi
+ 127Cak4S3T6A/M28y5M1f1Hq86/nSXOBXnoz72c23voqPqxWYFWZnI6jzEb9ALYSAl/O
+ eGM1GpOhJqrK/YSjdMpQwtvKFgIf31Cug8pGvOqxfsVfzfQU8QfaPEZNq4phzhj41nvT
+ k5hPTFeGQsTKOd4ZJxaWR3C6ZwgDnjG1fyOQNb32py8ITkbMR7b6t6M/rg30q+JVozO0
+ 4vUgt86FSv6oIZvyLwC5YYTggVgcEthH8FWTKJcsX4HBs8fSrk0+4D3QqCPcYjRtH2bR
+ AGQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zzqizdfMhDFC7k74H2iOE4HZaWJn95Ti241LRXZIhhE=;
- b=6qWUVFgk7PkUwdlJUDdS4Nj4F6WH3FmAbcDtJSKd/VH722/OikNyEB21ooN9p+GKYI
- hj8GIG9Y/PQfszaE6acMAUjImWZ5Vxx8Orj0nBO3wfvWyZpOAqZ27WfaotspOgwUbFAo
- gxm2zwhVfmUdIUrAr/5A8o4VLrwqeoyPi90JvmxdeQIiT5OybYmoLdccZE4GMD52lc7k
- giraAYn9vABM9RhB7V+G3ufAHRXPx1hi9abLUlgWRA8syTNUIUOLwDXLK09ZruROJjBf
- PQmmFuwLKquGe5pW0N3BsjTumbfcWnT/fK/DEl7RHUWfxJbf7A2cD+rm3XDBatEfwt/k
- cg7w==
-X-Gm-Message-State: AOAM531bpiV3PM0+jZROIpnj4cgLzatbW2EpkpNDH22CQQwRaEZr/6VO
- DgLqe5bFxjTVQd4zM0easnO6Z8qr04VxGX+4AJmOFA==
-X-Google-Smtp-Source: ABdhPJx/ElUzxz1e2uidlOy7bhAdJuoC2iXQEVXSzT96Z/EvE7bvbDGmuHu9ZA3ZdG8FIZnitaqcRTmGjB/tzJBxpTU=
-X-Received: by 2002:a17:902:da88:b0:156:2b13:81c5 with SMTP id
- j8-20020a170902da8800b001562b1381c5mr1572397plx.138.1648519050367; Mon, 28
- Mar 2022 18:57:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220311044811.1980336-1-reijiw@google.com>
- <20220311044811.1980336-2-reijiw@google.com>
- <Yjl96UQ7lUovKBWD@google.com>
- <CAAeT=FzELqXZiWjZ9aRNqYRbX0zx6LdhETiZUS+CMvax2vLRQw@mail.gmail.com>
- <YjrG0xiubC108tIN@google.com>
- <CAAeT=FxEwuwg310vhWQeBJ9UouHNaJNcPqvbLYh7nXp7aFFq=Q@mail.gmail.com>
- <Yjwf1BpigvzlT8r9@google.com>
-In-Reply-To: <Yjwf1BpigvzlT8r9@google.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=sAGNmdLtBshVUh/KYJEFMIapacr3RW4pw1K+CiinPIg=;
+ b=AEBBcAJACXLBywDGoM1GM8o8fkgU1tnj5L5v5hL6+byp1EVVD1KfHDR0Nx0BSEnVrH
+ 3fzpsLYeGkU6svvFe4TOim22NzQQQS0WqVtggSndNa4ceE6ocmG+gV6htxwga3kjzkhg
+ ba3vV1q83/sLgc7RTgKnqJdpF3pdSHTscs3Zn80CYM/IIo9Zj72FP+upE5fQKVqxoqmJ
+ YPRb54djpiN3gUT/i0Wu6D5qVd5aNRTBoNoNcleHty2E89ZuYYT77pQ0eq8800cvxmZ1
+ Ga5DKR5nggU8DJL36bbbv3+xpyJLaASHopK+gbBxRC6HsUbmJjc8KS0AuiTNuhxAI0b1
+ KL6w==
+X-Gm-Message-State: AOAM533viwxkOtCj4LqFlsr4lD9RdJb4KQJ6O3W0QS/b0YYFO+c3ZG+Y
+ jhYxorIqDKmfKmoIGL9AAgfeck7rU7I=
+X-Google-Smtp-Source: ABdhPJzL7MMvXVrrnBv7niD9JFw1J92Bl4gjNXuXN74eGBsYjblpq85cVrz7O16dqYjfIYwFFLWZVajk8pI=
+X-Received: from reiji-vws-sp.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
+ (user=reijiw job=sendgmr) by 2002:a05:6a00:2310:b0:4fa:7eb1:e855 with SMTP id
+ h16-20020a056a00231000b004fa7eb1e855mr26199966pfh.14.1648524013695; Mon, 28
+ Mar 2022 20:20:13 -0700 (PDT)
+Date: Mon, 28 Mar 2022 20:19:22 -0700
+Message-Id: <20220329031924.619453-1-reijiw@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1021.g381101b075-goog
+Subject: [PATCH v6 0/2] KVM: arm64: mixed-width check should be skipped for
+ uninitialized vCPUs
 From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 28 Mar 2022 18:57:14 -0700
-Message-ID: <CAAeT=FySq8rWnyxwgdbgdfDQDk=be0=PhsnKTyZhuvU5-=kU7g@mail.gmail.com>
-Subject: Re: [PATCH v6 01/25] KVM: arm64: Introduce a validation function for
- an ID register
-To: Oliver Upton <oupton@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Will Deacon <will@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,136 +85,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
- Hi Oliver,
+KVM allows userspace to configure either all EL1 32bit or 64bit vCPUs
+for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
+if the vcpu's register width is consistent with all other vCPUs'.
+Since the checking is done even against vCPUs that are not initialized
+(KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
+are erroneously treated as 64bit vCPU, which causes the function to
+incorrectly detect a mixed-width VM.
 
-> > > implicitly trusts the cpufeature code filtering and applies additional
-> > > limitations on top of what we get back. Similarly, there are fields
-> > > where KVM is more restrictive than cpufeature (ID_AA64DFR0_PMSVER).
-> > >
-> > > Each of those constraints could theoretically be expressed as an
-> > > arm64_ftr_bits structure within KVM.
-> >
-> > It's not impossible but it's a bit tricky (With __arm64_ftr_reg_valid(),
-> > it might look straight forward, but I don't think that treats FTR_EXACT
-> > correctly. Please see update_cpu_ftr_reg).
-> >
->
-> Ah right. __arm64_ftr_reg_valid() needs to trust either the value that
-> comes from the boot CPU, or ->safe_val if the cores are different in the
-> system. And what does it mean if the caller specified FTR_EXACT?
+This series will fix this problem by introducing a new VM flag that
+indicates the guest needs to be configured with all 32bit or 64bit
+vCPUs and checking vcpu's register width against the new flag at
+the vcpu's KVM_ARM_VCPU_INIT (instead of against other vCPUs'
+register width).
 
-What I was trying to say is __arm64_ftr_reg_valid() should check
-if the 'bits' are the same as 'safe_bits' and should treat 'bits'
-as safe if they are the same instead of calling arm64_ftr_field_valid()
-as update_cpu_ftr_reg does.
-In my understanding, FTR_EXACT doesn't mean only 'ftrp->safe_val'
-is a safe value, but if two values are different, 'ftrp->safe_val'
-is the only safe value.
+Patch-1 introduces KVM_ARCH_FLAG_EL1_32BIT and
+KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED bits for kvm->arch.flags and
+uses them to check vcpu's register width to fix the problem.
 
-> > More specific concern I have about providing the override (with the
-> > existing arm64_ftr_bits) would be when field values of arm64_ftr_bits
-> > (i.e. LOWER_SAFE to EXACT) in cpufeature are changed due to kernel's
-> > implementation reasons, which might affect KVM (may need to pass
-> > extra override to arm64_ftr_reg_valid).
-> > But, by having cpufeature provide the validation based on the ID
-> > register schemes, cpufeature should be changed to provide the same
-> > validation in that case (i.e. if DFR0.PERFMON is changed from LOWER_SAFE
-> > to EXACT like AA64DFR0.PMUVER, DFR0.PERFMON should be added in
-> > arm64_ftr_bits_kvm_override with LOWER_SAFE).
-> >
-> > So, if I go with the option to provide override to cpufeature, IMHO it
-> > would be preferable for cpufeature to provide the validation based
-> > on ID schemes instead of with the current need-based policy (, which
-> > might get changed) for clear separation.
->
-> Sounds good. Per your suggestion above, changing the
-> naming/documentation around what is being added to cpufeature removes
-> the confusion that it relates to KVM and really is a precise
-> implementation of the rules in the Arm ARM.
->
-> > > cpufeature exposes a feature that we simply do not virtualize in KVM.
-> > > That really can become a game of whack-a-mole. commit 96f4f6809bee
-> > > ("KVM: arm64: Don't advertise FEAT_SPE to guests") is a good example,
-> > > and I can really see no end to these sorts of issues without an
-> > > overhaul. We'd need to also find a way to leverage the existing
-> > > infrasturcture for working out a system-wide safe value, but this time
-> > > with KVM's table of registers.
-> > > KVM would then need to take a change to expose any new feature that has
-> > > no involvement of EL2. Personally, I'd take that over the possibility of
-> > > another unhandled feature slipping through and blowing up a guest kernel
-> > > when running on newer hardware.
-> >
-> > Userspace with configurable ID registers would eliminate such problems
-> > on known systems, but I agree that KVM itself should prevent it.
-> > It will be inconvenient for some people, but it would be safer in general.
->
-> We cannot require userspace to write to these registers to run a guest
-> given the fact that the present ABI doesn't. Given that fact, KVM is
-> still responsible for having sane default values for these registers.
->
-> If a field that we do not handle implies a feature we do not virtualize
-> on newer hardware, invariably our guest will see it and likely panic
-> when it realizes the vCPU is out of spec.
+Patch-2 introduces a selftest that can test non-mixed-width vCPUs (all
+64bit vCPUs or all 32bit vcPUs) can be configured, and mixed-width
+vCPUs cannot be configured.
 
-I completely agree on this, and I will work on this separately from
-this series as it is a different issue from what this series tries
-to address.
+The series is based on kvmarm/fixes at:
 
+  commit 8872d9b3e35a ("KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler")
 
-> Maybe the feature bits tables is a bit extreme given the fact that it
-> does define the architected handling of each field. I think the upper
-> bound on register values I mentioned above would do the trick and avoid
-> copy/pasting a whole set of structures we don't desperately need.
+v6:
+  - Fix typo and minor nits in the selftests [Oliver]
 
-Yes, I have been thinking the same (having a max register value for each
-register rather than having a max value for each field).
+v5: https://lore.kernel.org/all/20220321050804.2701035-1-reijiw@google.com/
+  - Rebase to kvmarm/next (and drop the patch-1 "KVM: arm64: Generalise
+    VM features into a set of flags")
+  - Use kernel-doc style comments for kvm_set_vm_width() [Oliver]
+  - Change kvm_set_vm_width() to use if/else instead of a ternary
+    operator for KVM_ARCH_FLAG_EL1_32BIT check [Oliver]
 
+v4: https://lore.kernel.org/all/20220314061959.3349716-1-reijiw@google.com/
+  - Use different implementation of vcpu_el1_is_32bit() depending on
+    the context. [Marc]
+  - Rename kvm_register_width_check_or_init() to kvm_set_vm_width(), and
+    call it from kvm_rest_vcpu() instead of from kvm_vcpu_set_target()
+  - Remove vcpu_allowed_register_width(), and does the same checking
+    in kvm_set_vm_width() instead.
 
-> > > > (dynamically generate during KVM's initialization)
-> > >
-> > > This was another one of my concerns with the current state of this
-> > > patch. I found the register table construction at runtime hard to
-> > > follow. I think it could be avoided with a helper that has a prescribed
-> > > set of rules (caller-provided field definition takes precedence over the
-> > > general one).
-> >
-> > Sure, I will improve that if I continue to keep the current way.
-> > With the option of having a separate KVM's arm64_ftr_bits,
-> > the code will be very different, but I will keep that in mind.
->
-> arm64_ftr_bits might be a bit extreme in KVM after all, I'll retract
-> that suggestion in favor of what I said above :)
+v3: https://lore.kernel.org/all/20220303035408.3708241-1-reijiw@google.com/
+  - Introduced 'flags' to kvm_arch, and use bits of the flags for
+    a set of booleans for VM feature.
+  - Changed 'el1_reg_width' to two bits of 'flags' of kvm_arch.
 
-Having a full set of arm64_ftr_bits in KVM I meant here is the one that
-I mentioned earlier, and I am inclined to go with the option rather than
-having cpufeature provide ID scheme based validation and the override
-validation.  With that, KVM will still use a validation function that
-cpufeture will provide, but as it is done only based on arm64_ftr_bits
-provided by KVM (FTR_UNSIGNED + LOWER_SAFE entries will be generated
-during KVM init, and the other entries will be statically defined in
-KVM).
+v2: https://lore.kernel.org/all/20220118041923.3384602-1-reijiw@google.com/
+  - Introduced 'el1_reg_width' for kvm_arch and use it to check vcpu's
+    register width against the flag at the vcpu's KVM_ARM_VCPU_INIT.
 
-Compared to this separate arm64_ftr_bits option, there are two things
-that I don't like a bit about the ID scheme based validation option.
-One is special changes we will make in cpufeature to provide ID scheme based
-validation (like for ID_AA64DFR0_EL0.PMUVER) as needed won't be used
-by KVM when KVM needs another implementation (our efforts might be
-wasted).  The other is (I think) it's pretty easy to forget to make
-changes in cpufeature to provide ID scheme based validation for new
-fields when needed.
-Along with future changes to set the maximum limit for each ID register
-field, I would think this separate arm64_ftr_bits option could provide
-a safer way for KVM to control/maintain feature visibilities for the
-guest more independently with smaller maintenance cost.
+v1: https://lore.kernel.org/all/20220110054042.1079932-1-reijiw@google.com/
 
-The downside of having the separate arm64_ftr_bits will be that there
-are extra static arm64_ftr_bits entries that need to be defined for
-FTR_SIGNED + LOWER_SAFE. It's a so big deal though because there are
-just 6(?) of such entries, and I don't think we will newly have many
-of such entries.
+[1] https://lore.kernel.org/all/20210715163159.1480168-2-maz@kernel.org/
 
-Thanks,
-Reiji
+Reiji Watanabe (2):
+  KVM: arm64: mixed-width check should be skipped for uninitialized
+    vCPUs
+  KVM: arm64: selftests: Introduce vcpu_width_config
+
+ arch/arm64/include/asm/kvm_emulate.h          |  27 ++--
+ arch/arm64/include/asm/kvm_host.h             |  10 ++
+ arch/arm64/kvm/reset.c                        |  65 ++++++----
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/vcpu_width_config.c | 122 ++++++++++++++++++
+ 6 files changed, 196 insertions(+), 30 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
+
+-- 
+2.35.1.1021.g381101b075-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
