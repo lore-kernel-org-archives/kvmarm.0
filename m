@@ -2,77 +2,163 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DD2DC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 08:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F48C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 11:22:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F7E4A193;
-	Tue, 29 Mar 2022 04:52:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E30649F5A;
+	Tue, 29 Mar 2022 07:22:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@oracle.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@oracle.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id r9g9F1-cELSs; Tue, 29 Mar 2022 04:52:13 -0400 (EDT)
+	with ESMTP id 2YUf4D97J1FK; Tue, 29 Mar 2022 07:22:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E571B49F1D;
-	Tue, 29 Mar 2022 04:52:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 848E54A11C;
+	Tue, 29 Mar 2022 07:22:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CFCC49ED6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 04:52:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6199C49F35
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 07:22:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0MwnKQkx7-5M for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Mar 2022 04:52:10 -0400 (EDT)
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com
- [209.85.160.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94E9849ED1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 04:52:10 -0400 (EDT)
-Received: by mail-oa1-f50.google.com with SMTP id
- 586e51a60fabf-d39f741ba0so17988899fac.13
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 01:52:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=yh6AuG9IckzNvRQeXQKuveivl+kTumRkfY/4NQ/pRog=;
- b=k4554vdLwNxvbLkDO/Cg7YxiP+eBCb/+10WgpmKChoFxsJ6STHREdiqNvHE4KHcgzG
- TAwlbsAUzbODudVX3h6qcMj23C8wBdFuWpR0jHqCH81yN2eHp1zz7FX3WCLRYO48A+VD
- IX5X9VfRld8LeSRBS1uTyX+JGc1SzFZY3X5g7M8YPg2FZ/T5MiNAfSWC9ZyjzPoLRxqV
- 7GnwPgrEZnUJozGpKboL5qt0a7XDKmM4K6y5kkFglFpvlcf+UfcDzTLUc7w1ySvk8u64
- COHqcQTgVNsypan9h6C0KmGXLa0auDs+m0S8lbcs5rU6/4FUC7l/wy1V+BCA3UUEwTqn
- sTaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=yh6AuG9IckzNvRQeXQKuveivl+kTumRkfY/4NQ/pRog=;
- b=KD68u8htDFLHjyyGCPIhQMpnxZ1rc8K4lHcBFcGUETaQjHWHzWbBh+uU5QyeKk7HYs
- 3pD61/rHesdKdna37kNVWG5JRv1ZQjctkf1EJPxcaszPN0/4sawuvrCMe8tg7DLi27Jq
- lB5i16TQaBFy4mcyOnXLEVN45SI5GwLQ4DjP14H9FIlLVEjprigelTjeu4qu2rVjLCbf
- ikGlbZBV63+PPKknPqUxf0TEHYrvdN28zqkptMeesP/AbXiFhxDZbOdCG3BiN31KMRII
- /dW1JHXNMUvO9Zq6Y/UOyQSBIbxXBZVpsoYNPEIh16gCRuJOMj6Z9bqjhzRdtyTrLAnK
- 6vyg==
-X-Gm-Message-State: AOAM5339VK2XXJmR6x70+quiE1TxHNBo9F27HQT+n3LcYTKpdyTYutCI
- x7Pfx21WdAXyw4M843AcE/Q/X/QReOofSGGh4RMJvw==
-X-Google-Smtp-Source: ABdhPJy180LyIuA4UrIMn+oVVTp0OCCg9U3actS4AbJ+52Uk8dOPML79X+zP5WsoO0BPtOeyIzayUveIP92dbzCDIY0=
-X-Received: by 2002:a05:6870:700f:b0:dd:9f77:9a97 with SMTP id
- u15-20020a056870700f00b000dd9f779a97mr1639788oae.146.1648543929646; Tue, 29
- Mar 2022 01:52:09 -0700 (PDT)
+ with ESMTP id 3TQovbt+JSyU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Mar 2022 07:22:06 -0400 (EDT)
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com
+ [205.220.177.32])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2666410DA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 07:22:05 -0400 (EDT)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+ by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22T8oV9p017301; 
+ Tue, 29 Mar 2022 11:21:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=pIQF0atBJk3ldLL9JrEjPGv/r+jD2npHziUAM/zDrJM=;
+ b=zPvs/vTh4mxS4TBZUinPHDFg3Ste1Qjk572L0DPW2ej7Qvwy08QbRjsepT/dDeQVgEnh
+ l/6LFE114B1Y4oUE9rH6vX4uEaqksNUZeywA1cDywC3thKhKe1vU5XIDN3DvRLCrB1rL
+ U2wPL67SlL3czkyM4YMYEN48C+YsNUIb8ZB9m8Dsvp1SfhKDMF1HiP8Hh4x2ibcTgQhf
+ TLZk74FCvKgddpoJSY/7KOGvNjZ5pqqf8su/JpIHmY1lYOY8UZ9S62yUhCWKpmFM/X2b
+ m5c12Wb8sibtCjKsbdJqJL+wtuXOXxjDzt2YDXruO4+LKZYBwCaBg/QXfKbXdIp6KVZj RA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by mx0b-00069f02.pphosted.com with ESMTP id 3f1s8cp6cr-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 29 Mar 2022 11:21:59 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 22TBE9qk158034;
+ Tue, 29 Mar 2022 11:21:58 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com
+ (mail-mw2nam12lp2042.outbound.protection.outlook.com [104.47.66.42])
+ by userp3020.oracle.com with ESMTP id 3f1v9ffx38-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 29 Mar 2022 11:21:58 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c8goq9z+E+1+epN98LSbgRs8uaYLmDUY+3JnQHouNEZ2guf9+y1vFPH9GeeMLTzwG4I6G5QKY1Ty07Klao3YfmZEUWTvsiupCHkzY7c//NyLcqhbMP1Zlgc21gSAQGVIyil0QyXaFlVhoy11jF7Vc4hsc4m+FCcByLxT8dNEnVrf9RBXhKwdMHPGBm4Y4baC3x3c0SJonlLJC1cPYu9ZfVVvIAtYs/bYnKk5BzJt6EkuWZruXfjGfWSoaGxP2Z9qQk+B90qc2UIrcoMh1mK629CUC5fW+Z+v7qBCU4zEs4aGjOE+S6kbAkGkOr9CIagVNRDUtoWMseTdYPusus0PMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pIQF0atBJk3ldLL9JrEjPGv/r+jD2npHziUAM/zDrJM=;
+ b=gA/Y4oUuNJPDtpRx/EwYiH0h+RObKZP433BmWBt91DpE7L/yNw0BiJVtZmZwlYbOmazw3+jnqei1eWGGfzrnvz3inc3vpO1OWrEHOzCnZvp+LZ+VxX2+ZWx6ricpZuZNlXHwRnMhdJMZnOfq+3WOo1fKrUBJuavjExQ+i3EmjmmHoDvWKiopJituW602POP5LSXas1A1HwL9MUkZH9NoZAnabfVQMuHWiFOBCz2iVkAEl/PDmBhlktiVYYPwL3Qv68LUq84Mo7+9KReS1lz9PsPBAvzHtiw0MdvTPr+FuOgZWR//BupQtdg4Ysnz73INET/DvXlEcgYgH39qurl3hw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pIQF0atBJk3ldLL9JrEjPGv/r+jD2npHziUAM/zDrJM=;
+ b=nHx5MCFIVg3plmmCASQvdMj8WWToBSrNaKZ5PzYhqH1VGqOkY6Z8o6pw4mkes9ZGrua/WUUJXvpbXKd0VYR4iqyvmfLJX+zfvysmvUMA9y8U8YoYuzdQIejD6drOP6XPS7v3u0JaxyEowOGF89ht3x2fQbd5+Fw+Sr00JHXC2mM=
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by DS7PR10MB5120.namprd10.prod.outlook.com
+ (2603:10b6:5:3a5::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.16; Tue, 29 Mar
+ 2022 11:21:55 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::d4e7:ee60:f060:e20c]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::d4e7:ee60:f060:e20c%7]) with mapi id 15.20.5081.025; Tue, 29 Mar 2022
+ 11:21:55 +0000
+Date: Tue, 29 Mar 2022 14:21:42 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: yuzhe <yuzhe@nfschina.com>
+Subject: Re: [PATCH] KVM: arm64: vgic-debug: remove unnecessary type castings
+Message-ID: <20220329112141.GZ3293@kadam>
+References: <20220328103836.2829-1-yuzhe@nfschina.com>
+ <87h77ifbbd.wl-maz@kernel.org>
+ <0f4cf955-ca2b-626f-867e-5a0ecfe68ca1@nfschina.com>
+Content-Disposition: inline
+In-Reply-To: <0f4cf955-ca2b-626f-867e-5a0ecfe68ca1@nfschina.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: MR2P264CA0114.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:500:33::30) To MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28)
 MIME-Version: 1.0
-References: <20220314200148.2695206-1-kaleshsingh@google.com>
- <20220314200148.2695206-8-kaleshsingh@google.com>
-In-Reply-To: <20220314200148.2695206-8-kaleshsingh@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 29 Mar 2022 09:51:33 +0100
-Message-ID: <CA+EHjTwQRUCjvcMHNe1f0kPBdU=vS+f2+e_eefhnJDR4s73cQA@mail.gmail.com>
-Subject: Re: [PATCH v6 7/8] KVM: arm64: Unwind and dump nVHE HYP stacktrace
-To: Kalesh Singh <kaleshsingh@google.com>
-Cc: kvmarm@lists.cs.columbia.edu, kernel-team@android.com,
- Andrew Walbran <qwandor@google.com>, will@kernel.org,
- Peter Collingbourne <pcc@google.com>, maz@kernel.org,
- linux-kernel@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, surenb@google.com,
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 485a5d5a-2b6d-40c1-7a9d-08da117654de
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5120:EE_
+X-Microsoft-Antispam-PRVS: <DS7PR10MB512031ABBF2E72586A12FA078E1E9@DS7PR10MB5120.namprd10.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: OXfM/oH64y/oXZ0QwK51wH8DB+P/kgVKtW+uCcHRaeKz6B+7w2m4n4/O4jJJ/tF37viKZNfsCbO3APzn0sIgy1PQ372nqo+DAjjFKh3TNDvoNDF4SDmLACPR+tm5h3Q+kJ1sco9HTVsYl2WtnIV4y97RMOCrmf5byqbfpdR+ODRVrfAV3aVxW42LGK3RYv7uLYNacSPTGHfeTQMAtcUwBGDdbnE3F+vOaYtyMBWW+Poq9MIV9dJPn7HnS7UYXIebcf8p2BLSQgtdvagGUjDkiQglChsk6fCcfNnkosGxblib+9YB/lalIYnBwyJtn4XqF/AfMsA1tR/ybhJKchwyeAWFqs6BxQZlXrK07OVzrk62spg4nysz9HqKAEgVHLDpJUNiP2/jRkrOGRDwaEGJBWpsbMw2fEn4NBNveRFuWvMvAHarna1D7/bZOZuEPn38Mfu5gqJ1sbqZpM4DjBKH5YpdzxIJ3VvrYQ0EvYVYXJS1Gx1dbPpVPeaq22j7hxiLiySHNicHtVxLIKbxLxhcgQuGNTpedcpSowAE8EYoNQeG8zhTERCAZEjuEGOb/q1hi8CYrpkFjbM7iy57JLjAY8z93Rva50E3AtJBwPv7fwxHKKSu3//aUGSgOniWYmTqZuAlq2UAr13cXmnbA7fknF7iofxf65euezKhaM4NX2tlRHgk/sERvTHYAf5NiThqOXYeYp30kxhziayB1hMVdw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:MWHPR1001MB2365.namprd10.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(13230001)(7916004)(366004)(8676002)(4326008)(66556008)(66476007)(66946007)(4744005)(6916009)(316002)(38100700002)(38350700002)(44832011)(2906002)(86362001)(7416002)(5660300002)(8936002)(9686003)(6512007)(26005)(186003)(6486002)(508600001)(1076003)(6506007)(52116002)(33716001)(6666004)(33656002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ipE0Tm3KumJvOtMIKitKHT2LtshzBHQ5BicgLn0m94lCYR72u+q5N0285Jfx?=
+ =?us-ascii?Q?6aTaPpqg+VFW5W+chP9E639Gcp5Xwdjx7+FUSlaKP9tlxN1IZKeJoABU6ZyE?=
+ =?us-ascii?Q?/sZ/arv0J5LA8Df8mi9nEMuxy7v+u17VyuNWSV7cANZdrLvfS6nulnSokFvJ?=
+ =?us-ascii?Q?x+31fbvgL8yYpjpOOnPBlXFSsjICCr39NPQ64fuVJPerUZtVcDv40R+vn6E5?=
+ =?us-ascii?Q?MB2Fkc4pml+drsqdQjq/i0ZC05qjFdktrevHdmaLhtC5np6mBk9vqPHCFafY?=
+ =?us-ascii?Q?G/NgRXFQL8OzrmZnReinq90mJ4LVQcB3C4d7xr51eV7raMNxWJOfe8bBsloH?=
+ =?us-ascii?Q?4sdypb0eUfxgI4I944UKTaBybsAdCO7eTzI0secD1ZEZh78RnAeMw0yl9O/3?=
+ =?us-ascii?Q?XHTY2950wtmZKpWu0cCxUxVYZY35hWAAnHtNYtF2IBweBqrax22hi3dMyAqB?=
+ =?us-ascii?Q?ftP9HUPDXgT2ipcAbhVR/JtLxUNTyNk08rDlMotS6xUOG3A5ACdWQ5In+0VB?=
+ =?us-ascii?Q?ATdzNvzVQrZDsbmMzSpkDR1LIwlEhZzM7f368Xeg7UUsJM4BAtzRtoXU/ZQg?=
+ =?us-ascii?Q?HA1X3KRQb4CDya3iGfoyD6KY5YPF0HlZiF75Em2p2glvie6DGWKsABCwPz9D?=
+ =?us-ascii?Q?F8qa6NVMEYvHPJjdiYq2Kt7z4jpg+l8dgBIqqDIG0jVsOanUYPTEngmu+5Nk?=
+ =?us-ascii?Q?mLw/M6aVio+oXyRCqc+rJH4LpsTzldR4ycIfz2PC6A4/L6H7u8dbdY21WA5J?=
+ =?us-ascii?Q?JSn6G5cvbWs/D/5gvh51SXhvWCXMvcIMcmdu2xcnfupwFR4dHW2O1POOUPCv?=
+ =?us-ascii?Q?1aLxR8a7MI0h6TDtvl/BDDHJSB/HJOIVDVd+RRrE2be0UZnK9VU2Fwqg87+/?=
+ =?us-ascii?Q?MpIHhRWgxXK/+105BnRc4ECg6uBKIi2lvzH2X/Jkp1ogWjSXi1c6roVKOcGa?=
+ =?us-ascii?Q?4hteTjjzj1KxpwXFIgmiUgZd7ZJAqjnLkoz+ulYtBmdt8k4wtiwm+FCpD3+6?=
+ =?us-ascii?Q?wVXk7thdiuatefXRPhGbIrZeGOGlI21A/mkeUE6WZJapByotHCieyVTmTLHN?=
+ =?us-ascii?Q?lotFHvWN+oSZkv8Jqpppk0X0GOLioGC1nXuewX1qxZavMCa+PRtSgIT6r+4f?=
+ =?us-ascii?Q?pMC1FxZBV5F3DaGNS6YCGCZm8TBBL/rJIp2QfNmD/BYUSWMFeN1vrLuUcXzU?=
+ =?us-ascii?Q?+KzNb/mKNkpYDOWNORZ3xwX3SzwveBQuDxTe6IFVx/XhA9hb9qEkpRensiwA?=
+ =?us-ascii?Q?mmXZqWssVNqkEB4IPUJXMpPnhTmMMD3k3D6tDDAlq6ypH/ymmOBjKuGOVzUW?=
+ =?us-ascii?Q?R6OIDLpZyE9n+PJwUIBUPnWyEl7KY4610TRrwJyfbk7UfxTyje9BC64YCamD?=
+ =?us-ascii?Q?1gUMVhpPOCeEIA2Nir8HEsD7WgwijuQvsfSYRXOmVxIw3SAsWvMfNtkTaYZI?=
+ =?us-ascii?Q?f3OtYvNAS/S8wLgYjl09rOgefpnnvmkY/dSo/OZeZS9AgQxVfS/wcnfxMFZs?=
+ =?us-ascii?Q?JeEQ4YSZXg2idrC1q+0L4sEYEgUA3v275IMs3C2PGlEHaCVCu46QQVV+Sf0V?=
+ =?us-ascii?Q?jkcnjvD+gX6cErIKNlVUtRyEmkXqIumF7Jx+71e85EaWkfnwtAjix6T0NPa0?=
+ =?us-ascii?Q?WLDeIEHkEA6p4TPzrn5Ecyw/M4M4CLt2duLXqFLI0kBvYuss1YQud5bQ9cfH?=
+ =?us-ascii?Q?i3dMXFnCR4exePYEmWmuOZasHe7IeqNLwn6hA/i3OJQsEIMRVMGLZdixdaw1?=
+ =?us-ascii?Q?uOIHgkjBHtVJ8ET+0DbLN0nNRZ9zTFI=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 485a5d5a-2b6d-40c1-7a9d-08da117654de
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Mar 2022 11:21:55.6369 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3I2lb4o0tYM6D41PmmD0TY59HxwV1w5sLe0Ns+8NhSMH9UIpqT/tn0nB/eeGcOxt4Ptq2H7yxNThVqm0+3n4WBAw/IeimBJ3ug6K7GKBito=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5120
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10300
+ signatures=694973
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ malwarescore=0 spamscore=0
+ adultscore=0 mlxlogscore=999 phishscore=0 suspectscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2203290068
+X-Proofpoint-GUID: fHJDs-FibyebYre15nAmQFr-NI6guaUa
+X-Proofpoint-ORIG-GUID: fHJDs-FibyebYre15nAmQFr-NI6guaUa
+Cc: kernel-janitors@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ linux-kernel@vger.kernel.org, liqiong@nfschina.com, catalin.marinas@arm.com,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -90,497 +176,19 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Kalesh,
+On Tue, Mar 29, 2022 at 02:14:16PM +0800, yuzhe wrote:
+> > > @@ -229,7 +229,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+> > >   static int vgic_debug_show(struct seq_file *s, void *v)
+> > >   {
+> > > -	struct kvm *kvm = (struct kvm *)s->private;
+> > > +	struct kvm *kvm = s->private;
+> > >   	struct vgic_state_iter *iter = (struct vgic_state_iter *)v;
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+This cast is unnecessary.  Look for others as well.
 
-On Mon, Mar 14, 2022 at 8:06 PM Kalesh Singh <kaleshsingh@google.com> wrote:
->
-> Unwind the stack in EL1, when CONFIG_NVHE_EL2_DEBUG is enabled.
-> This is possible because CONFIG_NVHE_EL2_DEBUG disables the host
-> stage-2 protection on hyp_panic(), allowing the host to access
-> the hypervisor stack pages in EL1.
->
-> A simple stack overflow test produces the following output:
->
-> [  580.376051][  T412] kvm: nVHE hyp panic at: ffffffc0116145c4!
-> [  580.378034][  T412] kvm [412]: nVHE HYP call trace:
-> [  580.378591][  T412] kvm [412]:  [<ffffffc011614934>]
-> [  580.378993][  T412] kvm [412]:  [<ffffffc01160fa48>]
-> [  580.379386][  T412] kvm [412]:  [<ffffffc0116145dc>]  // Non-terminating recursive call
-> [  580.379772][  T412] kvm [412]:  [<ffffffc0116145dc>]
-> [  580.380158][  T412] kvm [412]:  [<ffffffc0116145dc>]
-> [  580.380544][  T412] kvm [412]:  [<ffffffc0116145dc>]
-> [  580.380928][  T412] kvm [412]:  [<ffffffc0116145dc>]
-> . . .
->
-> Since nVHE hyp symbols are not included by kallsyms to avoid issues
-> with aliasing, we fallback to the vmlinux addresses. Symbolizing the
-> addresses is handled in the next patch in this series.
->
-> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+regards,
+dan carpenter
 
-Tested-by: Fuad Tabba <tabba@google.com>
-Reviewed-by: Fuad Tabba <tabba@google.com>
-
-Thanks,
-/fuad
-
-
-
-> ---
->
-> Changes in v4:
->   - Update commit text and struct kvm_nvhe_panic_info kernel-doc comment
->     to clarify that CONFIG_NVHE_EL2_DEBUG only disables the host stage-2
->     protection on hyp_panic(), per Fuad
->   - Update NVHE_EL2_DEBUG Kconfig description to clarify that the
->     hypervisor stack trace is printed when hyp_panic() is called, per Fuad
->
-> Changes in v3:
->   - The nvhe hyp stack unwinder now makes use of the core logic from the
->     regular kernel unwinder to avoid duplication, per Mark
->
-> Changes in v2:
->   - Add cpu_prepare_nvhe_panic_info()
->   - Move updating the panic info to hyp_panic(), so that unwinding also
->     works for conventional nVHE Hyp-mode.
->
->
->  arch/arm64/include/asm/kvm_asm.h    |  20 +++
->  arch/arm64/include/asm/stacktrace.h |  12 ++
->  arch/arm64/kernel/stacktrace.c      | 210 +++++++++++++++++++++++++---
->  arch/arm64/kvm/Kconfig              |   5 +-
->  arch/arm64/kvm/arm.c                |   2 +-
->  arch/arm64/kvm/handle_exit.c        |   3 +
->  arch/arm64/kvm/hyp/nvhe/switch.c    |  18 +++
->  7 files changed, 244 insertions(+), 26 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 2e277f2ed671..4abcf93c6662 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -176,6 +176,26 @@ struct kvm_nvhe_init_params {
->         unsigned long vtcr;
->  };
->
-> +#ifdef CONFIG_NVHE_EL2_DEBUG
-> +/**
-> + * struct kvm_nvhe_panic_info - nVHE hypervisor panic info.
-> + * @hyp_stack_base:             hyp VA of the hyp_stack base.
-> + * @hyp_overflow_stack_base:    hyp VA of the hyp_overflow_stack base.
-> + * @fp:                         hyp FP where the backtrace begins.
-> + * @pc:                         hyp PC where the backtrace begins.
-> + *
-> + * Used by the host in EL1 to dump the nVHE hypervisor backtrace on
-> + * hyp_panic. This is possible because CONFIG_NVHE_EL2_DEBUG disables
-> + * the host stage 2 protection on hyp_panic(). See: __hyp_do_panic()
-> + */
-> +struct kvm_nvhe_panic_info {
-> +       unsigned long hyp_stack_base;
-> +       unsigned long hyp_overflow_stack_base;
-> +       unsigned long fp;
-> +       unsigned long pc;
-> +};
-> +#endif /* CONFIG_NVHE_EL2_DEBUG */
-> +
->  /* Translate a kernel address @ptr into its equivalent linear mapping */
->  #define kvm_ksym_ref(ptr)                                              \
->         ({                                                              \
-> diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
-> index e77cdef9ca29..18611a51cf14 100644
-> --- a/arch/arm64/include/asm/stacktrace.h
-> +++ b/arch/arm64/include/asm/stacktrace.h
-> @@ -22,6 +22,10 @@ enum stack_type {
->         STACK_TYPE_OVERFLOW,
->         STACK_TYPE_SDEI_NORMAL,
->         STACK_TYPE_SDEI_CRITICAL,
-> +#ifdef CONFIG_NVHE_EL2_DEBUG
-> +       STACK_TYPE_KVM_NVHE_HYP,
-> +       STACK_TYPE_KVM_NVHE_OVERFLOW,
-> +#endif /* CONFIG_NVHE_EL2_DEBUG */
->         __NR_STACK_TYPES
->  };
->
-> @@ -147,4 +151,12 @@ static inline bool on_accessible_stack(const struct task_struct *tsk,
->         return false;
->  }
->
-> +#ifdef CONFIG_NVHE_EL2_DEBUG
-> +void kvm_nvhe_dump_backtrace(unsigned long hyp_offset);
-> +#else
-> +static inline void kvm_nvhe_dump_backtrace(unsigned long hyp_offset)
-> +{
-> +}
-> +#endif /* CONFIG_NVHE_EL2_DEBUG */
-> +
->  #endif /* __ASM_STACKTRACE_H */
-> diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
-> index e4103e085681..6ec85cb69b1f 100644
-> --- a/arch/arm64/kernel/stacktrace.c
-> +++ b/arch/arm64/kernel/stacktrace.c
-> @@ -15,6 +15,8 @@
->
->  #include <asm/irq.h>
->  #include <asm/pointer_auth.h>
-> +#include <asm/kvm_asm.h>
-> +#include <asm/kvm_hyp.h>
->  #include <asm/stack_pointer.h>
->  #include <asm/stacktrace.h>
->
-> @@ -64,26 +66,15 @@ NOKPROBE_SYMBOL(start_backtrace);
->   * records (e.g. a cycle), determined based on the location and fp value of A
->   * and the location (but not the fp value) of B.
->   */
-> -static int notrace unwind_frame(struct task_struct *tsk,
-> -                               struct stackframe *frame)
-> +static int notrace __unwind_frame(struct stackframe *frame, struct stack_info *info,
-> +               unsigned long (*translate_fp)(unsigned long, enum stack_type))
->  {
->         unsigned long fp = frame->fp;
-> -       struct stack_info info;
-> -
-> -       if (!tsk)
-> -               tsk = current;
-> -
-> -       /* Final frame; nothing to unwind */
-> -       if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
-> -               return -ENOENT;
->
->         if (fp & 0x7)
->                 return -EINVAL;
->
-> -       if (!on_accessible_stack(tsk, fp, 16, &info))
-> -               return -EINVAL;
-> -
-> -       if (test_bit(info.type, frame->stacks_done))
-> +       if (test_bit(info->type, frame->stacks_done))
->                 return -EINVAL;
->
->         /*
-> @@ -94,28 +85,62 @@ static int notrace unwind_frame(struct task_struct *tsk,
->          *
->          * TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
->          * TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
-> +        * KVM_NVHE_HYP -> KVM_NVHE_OVERFLOW
->          *
->          * ... but the nesting itself is strict. Once we transition from one
->          * stack to another, it's never valid to unwind back to that first
->          * stack.
->          */
-> -       if (info.type == frame->prev_type) {
-> +       if (info->type == frame->prev_type) {
->                 if (fp <= frame->prev_fp)
->                         return -EINVAL;
->         } else {
->                 set_bit(frame->prev_type, frame->stacks_done);
->         }
->
-> +       /* Record fp as prev_fp before attempting to get the next fp */
-> +       frame->prev_fp = fp;
-> +
-> +       /*
-> +        * If fp is not from the current address space perform the
-> +        * necessary translation before dereferencing it to get next fp.
-> +        */
-> +       if (translate_fp)
-> +               fp = translate_fp(fp, info->type);
-> +       if (!fp)
-> +               return -EINVAL;
-> +
->         /*
->          * Record this frame record's values and location. The prev_fp and
-> -        * prev_type are only meaningful to the next unwind_frame() invocation.
-> +        * prev_type are only meaningful to the next __unwind_frame() invocation.
->          */
->         frame->fp = READ_ONCE_NOCHECK(*(unsigned long *)(fp));
->         frame->pc = READ_ONCE_NOCHECK(*(unsigned long *)(fp + 8));
-> -       frame->prev_fp = fp;
-> -       frame->prev_type = info.type;
-> -
->         frame->pc = ptrauth_strip_insn_pac(frame->pc);
-> +       frame->prev_type = info->type;
-> +
-> +       return 0;
-> +}
-> +
-> +static int notrace unwind_frame(struct task_struct *tsk, struct stackframe *frame)
-> +{
-> +       unsigned long fp = frame->fp;
-> +       struct stack_info info;
-> +       int err;
-> +
-> +       if (!tsk)
-> +               tsk = current;
-> +
-> +       /* Final frame; nothing to unwind */
-> +       if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
-> +               return -ENOENT;
-> +
-> +       if (!on_accessible_stack(tsk, fp, 16, &info))
-> +               return -EINVAL;
-> +
-> +       err = __unwind_frame(frame, &info, NULL);
-> +       if (err)
-> +               return err;
->
->  #ifdef CONFIG_FUNCTION_GRAPH_TRACER
->         if (tsk->ret_stack &&
-> @@ -143,20 +168,27 @@ static int notrace unwind_frame(struct task_struct *tsk,
->  }
->  NOKPROBE_SYMBOL(unwind_frame);
->
-> -static void notrace walk_stackframe(struct task_struct *tsk,
-> -                                   struct stackframe *frame,
-> -                                   bool (*fn)(void *, unsigned long), void *data)
-> +static void notrace __walk_stackframe(struct task_struct *tsk, struct stackframe *frame,
-> +               bool (*fn)(void *, unsigned long), void *data,
-> +               int (*unwind_frame_fn)(struct task_struct *tsk, struct stackframe *frame))
->  {
->         while (1) {
->                 int ret;
->
->                 if (!fn(data, frame->pc))
->                         break;
-> -               ret = unwind_frame(tsk, frame);
-> +               ret = unwind_frame_fn(tsk, frame);
->                 if (ret < 0)
->                         break;
->         }
->  }
-> +
-> +static void notrace walk_stackframe(struct task_struct *tsk,
-> +                                   struct stackframe *frame,
-> +                                   bool (*fn)(void *, unsigned long), void *data)
-> +{
-> +       __walk_stackframe(tsk, frame, fn, data, unwind_frame);
-> +}
->  NOKPROBE_SYMBOL(walk_stackframe);
->
->  static bool dump_backtrace_entry(void *arg, unsigned long where)
-> @@ -210,3 +242,135 @@ noinline notrace void arch_stack_walk(stack_trace_consume_fn consume_entry,
->
->         walk_stackframe(task, &frame, consume_entry, cookie);
->  }
-> +
-> +#ifdef CONFIG_NVHE_EL2_DEBUG
-> +DECLARE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-> +DECLARE_KVM_NVHE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], hyp_overflow_stack);
-> +DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_panic_info, kvm_panic_info);
-> +
-> +static inline bool kvm_nvhe_on_overflow_stack(unsigned long sp, unsigned long size,
-> +                                struct stack_info *info)
-> +{
-> +       struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
-> +       unsigned long low = (unsigned long)panic_info->hyp_overflow_stack_base;
-> +       unsigned long high = low + PAGE_SIZE;
-> +
-> +       return on_stack(sp, size, low, high, STACK_TYPE_KVM_NVHE_OVERFLOW, info);
-> +}
-> +
-> +static inline bool kvm_nvhe_on_hyp_stack(unsigned long sp, unsigned long size,
-> +                                struct stack_info *info)
-> +{
-> +       struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
-> +       unsigned long low = (unsigned long)panic_info->hyp_stack_base;
-> +       unsigned long high = low + PAGE_SIZE;
-> +
-> +       return on_stack(sp, size, low, high, STACK_TYPE_KVM_NVHE_HYP, info);
-> +}
-> +
-> +static inline bool kvm_nvhe_on_accessible_stack(unsigned long sp, unsigned long size,
-> +                                      struct stack_info *info)
-> +{
-> +       if (info)
-> +               info->type = STACK_TYPE_UNKNOWN;
-> +
-> +       if (kvm_nvhe_on_hyp_stack(sp, size, info))
-> +               return true;
-> +       if (kvm_nvhe_on_overflow_stack(sp, size, info))
-> +               return true;
-> +
-> +       return false;
-> +}
-> +
-> +static unsigned long kvm_nvhe_hyp_stack_kern_va(unsigned long addr)
-> +{
-> +       struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
-> +       unsigned long hyp_base, kern_base, hyp_offset;
-> +
-> +       hyp_base = (unsigned long)panic_info->hyp_stack_base;
-> +       hyp_offset = addr - hyp_base;
-> +
-> +       kern_base = (unsigned long)*this_cpu_ptr(&kvm_arm_hyp_stack_page);
-> +
-> +       return kern_base + hyp_offset;
-> +}
-> +
-> +static unsigned long kvm_nvhe_overflow_stack_kern_va(unsigned long addr)
-> +{
-> +       struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
-> +       unsigned long hyp_base, kern_base, hyp_offset;
-> +
-> +       hyp_base = (unsigned long)panic_info->hyp_overflow_stack_base;
-> +       hyp_offset = addr - hyp_base;
-> +
-> +       kern_base = (unsigned long)this_cpu_ptr_nvhe_sym(hyp_overflow_stack);
-> +
-> +       return kern_base + hyp_offset;
-> +}
-> +
-> +/*
-> + * Convert KVM nVHE hypervisor stack VA to a kernel VA.
-> + *
-> + * The nVHE hypervisor stack is mapped in the flexible 'private' VA range, to allow
-> + * for guard pages below the stack. Consequently, the fixed offset address
-> + * translation macros won't work here.
-> + *
-> + * The kernel VA is calculated as an offset from the kernel VA of the hypervisor
-> + * stack base. See: kvm_nvhe_hyp_stack_kern_va(),  kvm_nvhe_overflow_stack_kern_va()
-> + */
-> +static unsigned long kvm_nvhe_stack_kern_va(unsigned long addr,
-> +                                       enum stack_type type)
-> +{
-> +       switch (type) {
-> +       case STACK_TYPE_KVM_NVHE_HYP:
-> +               return kvm_nvhe_hyp_stack_kern_va(addr);
-> +       case STACK_TYPE_KVM_NVHE_OVERFLOW:
-> +               return kvm_nvhe_overflow_stack_kern_va(addr);
-> +       default:
-> +               return 0UL;
-> +       }
-> +}
-> +
-> +static int notrace kvm_nvhe_unwind_frame(struct task_struct *tsk,
-> +                                       struct stackframe *frame)
-> +{
-> +       struct stack_info info;
-> +
-> +       if (!kvm_nvhe_on_accessible_stack(frame->fp, 16, &info))
-> +               return -EINVAL;
-> +
-> +       return  __unwind_frame(frame, &info, kvm_nvhe_stack_kern_va);
-> +}
-> +
-> +static bool kvm_nvhe_dump_backtrace_entry(void *arg, unsigned long where)
-> +{
-> +       unsigned long va_mask = GENMASK_ULL(vabits_actual - 1, 0);
-> +       unsigned long hyp_offset = (unsigned long)arg;
-> +
-> +       where &= va_mask;       /* Mask tags */
-> +       where += hyp_offset;    /* Convert to kern addr */
-> +
-> +       kvm_err("[<%016lx>] %pB\n", where, (void *)where);
-> +
-> +       return true;
-> +}
-> +
-> +static void notrace kvm_nvhe_walk_stackframe(struct task_struct *tsk,
-> +                                   struct stackframe *frame,
-> +                                   bool (*fn)(void *, unsigned long), void *data)
-> +{
-> +       __walk_stackframe(tsk, frame, fn, data, kvm_nvhe_unwind_frame);
-> +}
-> +
-> +void kvm_nvhe_dump_backtrace(unsigned long hyp_offset)
-> +{
-> +       struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr_nvhe_sym(kvm_panic_info);
-> +       struct stackframe frame;
-> +
-> +       start_backtrace(&frame, panic_info->fp, panic_info->pc);
-> +       pr_err("nVHE HYP call trace:\n");
-> +       kvm_nvhe_walk_stackframe(NULL, &frame, kvm_nvhe_dump_backtrace_entry,
-> +                                       (void *)hyp_offset);
-> +       pr_err("---- end of nVHE HYP call trace ----\n");
-> +}
-> +#endif /* CONFIG_NVHE_EL2_DEBUG */
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 8a5fbbf084df..a7be4ef35fbf 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -51,8 +51,9 @@ config NVHE_EL2_DEBUG
->         depends on KVM
->         help
->           Say Y here to enable the debug mode for the non-VHE KVM EL2 object.
-> -         Failure reports will BUG() in the hypervisor. This is intended for
-> -         local EL2 hypervisor development.
-> +         Failure reports will BUG() in the hypervisor; and calls to hyp_panic()
-> +         will result in printing the hypervisor call stack.
-> +         This is intended for local EL2 hypervisor development.
->
->           If unsure, say N.
->
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 72be7e695d8d..c7216ce1d55c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -49,7 +49,7 @@ DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
->
->  DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->
-> -static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-> +DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
->  unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
->  DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
->
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index e3140abd2e2e..ff69dff33700 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -17,6 +17,7 @@
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/debug-monitors.h>
-> +#include <asm/stacktrace.h>
->  #include <asm/traps.h>
->
->  #include <kvm/arm_hypercalls.h>
-> @@ -326,6 +327,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
->                 kvm_err("nVHE hyp panic at: %016llx!\n", elr_virt + hyp_offset);
->         }
->
-> +       kvm_nvhe_dump_backtrace(hyp_offset);
-> +
->         /*
->          * Hyp has panicked and we're going to handle that by panicking the
->          * kernel. The kernel offset will be revealed in the panic so we're
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index efc20273a352..b8ecffc47424 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -37,6 +37,22 @@ DEFINE_PER_CPU(unsigned long, kvm_hyp_vector);
->  #ifdef CONFIG_NVHE_EL2_DEBUG
->  DEFINE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], hyp_overflow_stack)
->         __aligned(16);
-> +DEFINE_PER_CPU(struct kvm_nvhe_panic_info, kvm_panic_info);
-> +
-> +static inline void cpu_prepare_nvhe_panic_info(void)
-> +{
-> +       struct kvm_nvhe_panic_info *panic_info = this_cpu_ptr(&kvm_panic_info);
-> +       struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
-> +
-> +       panic_info->hyp_stack_base = (unsigned long)(params->stack_hyp_va - PAGE_SIZE);
-> +       panic_info->hyp_overflow_stack_base = (unsigned long)this_cpu_ptr(hyp_overflow_stack);
-> +       panic_info->fp = (unsigned long)__builtin_frame_address(0);
-> +       panic_info->pc = _THIS_IP_;
-> +}
-> + #else
-> +static inline void cpu_prepare_nvhe_panic_info(void)
-> +{
-> +}
->  #endif
->
->  static void __activate_traps(struct kvm_vcpu *vcpu)
-> @@ -360,6 +376,8 @@ asmlinkage void __noreturn hyp_panic(void)
->         struct kvm_cpu_context *host_ctxt;
->         struct kvm_vcpu *vcpu;
->
-> +       cpu_prepare_nvhe_panic_info();
-> +
->         host_ctxt = &this_cpu_ptr(&kvm_host_data)->host_ctxt;
->         vcpu = host_ctxt->__hyp_running_vcpu;
->
-> --
-> 2.35.1.723.g4982287a31-goog
->
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
