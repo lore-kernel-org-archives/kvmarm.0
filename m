@@ -2,56 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98DBCC433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 12:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43007C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 12:55:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E3BD649F49;
-	Tue, 29 Mar 2022 08:55:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0AFC4A11C;
+	Tue, 29 Mar 2022 08:55:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DWiqU8x-WTdn; Tue, 29 Mar 2022 08:55:52 -0400 (EDT)
+	with ESMTP id aTELA0feNNbZ; Tue, 29 Mar 2022 08:55:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62FFE49F31;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7908249F4A;
 	Tue, 29 Mar 2022 08:55:52 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E278740BED
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 03:26:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA8949DFF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 06:21:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GyLHdd7Ioywk for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Mar 2022 03:26:20 -0400 (EDT)
-Received: from ha.nfschina.com (mail.nfschina.com [124.16.136.209])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EEFB40BDC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 03:26:20 -0400 (EDT)
+ with ESMTP id XlguHELdW5cJ for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Mar 2022 06:21:08 -0400 (EDT)
+Received: from ha.nfschina.com (unknown [124.16.136.209])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F07940FD6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 06:21:08 -0400 (EDT)
 Received: from localhost (unknown [127.0.0.1])
- by ha.nfschina.com (Postfix) with ESMTP id BF6B51E80D7E;
- Tue, 29 Mar 2022 15:25:42 +0800 (CST)
+ by ha.nfschina.com (Postfix) with ESMTP id 177B71E80D85;
+ Tue, 29 Mar 2022 18:20:31 +0800 (CST)
 X-Virus-Scanned: amavisd-new at test.com
 Received: from ha.nfschina.com ([127.0.0.1])
  by localhost (ha.nfschina.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9r--XoVcY8pM; Tue, 29 Mar 2022 15:25:40 +0800 (CST)
-Received: from [18.165.124.108] (unknown [101.228.248.165])
+ with ESMTP id DkKIvnZ9PCZ3; Tue, 29 Mar 2022 18:20:28 +0800 (CST)
+Received: from ubuntu.localdomain (unknown [101.228.248.165])
  (Authenticated sender: yuzhe@nfschina.com)
- by ha.nfschina.com (Postfix) with ESMTPA id 6921A1E80D70;
- Tue, 29 Mar 2022 15:25:39 +0800 (CST)
-Message-ID: <49b93407-dee3-b3bb-6d36-d6f94e9b16bf@nfschina.com>
-Date: Tue, 29 Mar 2022 15:26:11 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] KVM: arm64: vgic-debug: remove unnecessary type castings
-To: Marc Zyngier <maz@kernel.org>
+ by ha.nfschina.com (Postfix) with ESMTPA id 8DE961E80D84;
+ Tue, 29 Mar 2022 18:20:27 +0800 (CST)
+From: Yu Zhe <yuzhe@nfschina.com>
+To: maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com
+Subject: [PATCH] KVM: arm64: vgic: remove unnecessary type castings
+Date: Tue, 29 Mar 2022 03:20:59 -0700
+Message-Id: <20220329102059.268983-1-yuzhe@nfschina.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220328103836.2829-1-yuzhe@nfschina.com>
 References: <20220328103836.2829-1-yuzhe@nfschina.com>
- <87h77ifbbd.wl-maz@kernel.org>
- <0f4cf955-ca2b-626f-867e-5a0ecfe68ca1@nfschina.com>
- <87r16li6e7.wl-maz@kernel.org>
-From: yuzhe <yuzhe@nfschina.com>
-In-Reply-To: <87r16li6e7.wl-maz@kernel.org>
+MIME-Version: 1.0
 X-Mailman-Approved-At: Tue, 29 Mar 2022 08:55:51 -0400
-Cc: will@kernel.org, catalin.marinas@arm.com, kernel-janitors@vger.kernel.org,
- linux-kernel@vger.kernel.org, liqiong@nfschina.com,
+Cc: justin.he@arm.com, keescook@chromium.org, Yu Zhe <yuzhe@nfschina.com>,
+ catalin.marinas@arm.com, kernel-janitors@vger.kernel.org,
+ linux-kernel@vger.kernel.org, samitolvanen@google.com, will@kernel.org,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -64,28 +62,78 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-5ZyoIDIwMjIvMy8yOSAxNTowNywgTWFyYyBaeW5naWVyIOWGmemBkzoKCj4gT24gVHVlLCAyOSBN
-YXIgMjAyMiAwNzoxNDoxNiArMDEwMCwKPiB5dXpoZSA8eXV6aGVAbmZzY2hpbmEuY29tPiB3cm90
-ZToKPj4+PiBAQCAtMjI5LDcgKzIyOSw3IEBAIHN0YXRpYyB2b2lkIHByaW50X2lycV9zdGF0ZShz
-dHJ1Y3Qgc2VxX2ZpbGUgKnMsIHN0cnVjdCB2Z2ljX2lycSAqaXJxLAo+Pj4+ICAgICAgc3RhdGlj
-IGludCB2Z2ljX2RlYnVnX3Nob3coc3RydWN0IHNlcV9maWxlICpzLCB2b2lkICp2KQo+Pj4+ICAg
-IHsKPj4+PiAtCXN0cnVjdCBrdm0gKmt2bSA9IChzdHJ1Y3Qga3ZtICopcy0+cHJpdmF0ZTsKPj4+
-PiArCXN0cnVjdCBrdm0gKmt2bSA9IHMtPnByaXZhdGU7Cj4+Pj4gICAgCXN0cnVjdCB2Z2ljX3N0
-YXRlX2l0ZXIgKml0ZXIgPSAoc3RydWN0IHZnaWNfc3RhdGVfaXRlciAqKXY7Cj4+PiBIb3cgYWJv
-dXQgeW91IGZ1bGx5IGdldCByaWQgb2YgdGhlIHVubmVjZXNzYXJ5IGNhc3RzIHRoZW4/Cj4+Pgo+
-Pj4gCU0uCj4+IEkgZG9uJ3Qga25vdyB3aGF0IHlvdSBleGFjdGx5IG1lYW4uIEkgZm9sbG93IHRo
-ZQo+PiBrZXJuZWwtamFuaXRvcnMvVE9ETyBMaXN0IHRvIGdldCByaWQgb2YgdGhlIHVubmVjZXNz
-YXJ5IGNhc3RzLiAgQW5kCj4+IEkgY2hlY2tlZCBhbGwgdGhlIGNvZGUgaW4gdGhlIGFyY2ggZGly
-ZWN0b3J5IGFuZCBmb3VuZCB0aGVzZSBpc3N1ZXMuCj4gTGV0IG1lIHF1b3RlIHRoZSBsaW5lcyBh
-Z2FpbjoKPgo+Pj4+ICAgICAgc3RhdGljIGludCB2Z2ljX2RlYnVnX3Nob3coc3RydWN0IHNlcV9m
-aWxlICpzLCB2b2lkICp2KQo+IFsuLi5dCj4+Pj4gICAgCXN0cnVjdCB2Z2ljX3N0YXRlX2l0ZXIg
-Kml0ZXIgPSAoc3RydWN0IHZnaWNfc3RhdGVfaXRlciAqKXY7Cj4gRG8geW91IHNlZSB3aGF0IEkg
-bWVhbj8KPgo+IAlNLgoKR290IGl0LCB0aGFua3MuIEkgd2lsbCBjaGVjayBhZ2FpbiBhbmQgcmVz
-dWJtaXQuCgp5dXpoZQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0
-dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+remove unnecessary casts.
+
+Signed-off-by: Yu Zhe <yuzhe@nfschina.com>
+---
+ arch/arm64/kvm/vgic/vgic-debug.c | 10 +++++-----
+ arch/arm64/kvm/vgic/vgic-its.c   |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
+index f38c40a76251..78cde687383c 100644
+--- a/arch/arm64/kvm/vgic/vgic-debug.c
++++ b/arch/arm64/kvm/vgic/vgic-debug.c
+@@ -82,7 +82,7 @@ static bool end_of_vgic(struct vgic_state_iter *iter)
+ 
+ static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
+ {
+-	struct kvm *kvm = (struct kvm *)s->private;
++	struct kvm *kvm = s->private;
+ 	struct vgic_state_iter *iter;
+ 
+ 	mutex_lock(&kvm->lock);
+@@ -110,7 +110,7 @@ static void *vgic_debug_start(struct seq_file *s, loff_t *pos)
+ 
+ static void *vgic_debug_next(struct seq_file *s, void *v, loff_t *pos)
+ {
+-	struct kvm *kvm = (struct kvm *)s->private;
++	struct kvm *kvm = s->private;
+ 	struct vgic_state_iter *iter = kvm->arch.vgic.iter;
+ 
+ 	++*pos;
+@@ -122,7 +122,7 @@ static void *vgic_debug_next(struct seq_file *s, void *v, loff_t *pos)
+ 
+ static void vgic_debug_stop(struct seq_file *s, void *v)
+ {
+-	struct kvm *kvm = (struct kvm *)s->private;
++	struct kvm *kvm = s->private;
+ 	struct vgic_state_iter *iter;
+ 
+ 	/*
+@@ -229,8 +229,8 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
+ 
+ static int vgic_debug_show(struct seq_file *s, void *v)
+ {
+-	struct kvm *kvm = (struct kvm *)s->private;
+-	struct vgic_state_iter *iter = (struct vgic_state_iter *)v;
++	struct kvm *kvm = s->private;
++	struct vgic_state_iter *iter = v;
+ 	struct vgic_irq *irq;
+ 	struct kvm_vcpu *vcpu = NULL;
+ 	unsigned long flags;
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 089fc2ffcb43..2e13402be3bd 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -2143,7 +2143,7 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+ 				void *ptr, void *opaque)
+ {
+-	struct its_device *dev = (struct its_device *)opaque;
++	struct its_device *dev = opaque;
+ 	struct its_collection *collection;
+ 	struct kvm *kvm = its->dev->kvm;
+ 	struct kvm_vcpu *vcpu = NULL;
+-- 
+2.25.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
