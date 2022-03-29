@@ -2,71 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 063BFC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 03:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE64C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 03:22:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7908F412AF;
-	Mon, 28 Mar 2022 23:21:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD0E84B1C3;
+	Mon, 28 Mar 2022 23:21:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UfNYcp7Vtj3w; Mon, 28 Mar 2022 23:21:10 -0400 (EDT)
+	with ESMTP id 9kIxEE8s7gOq; Mon, 28 Mar 2022 23:21:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2772C4B1A2;
-	Mon, 28 Mar 2022 23:21:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 88BDB4B137;
+	Mon, 28 Mar 2022 23:21:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83E264120D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 23:21:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D483B40D0B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 23:21:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XzcOPcuzYsKo for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Mar 2022 23:21:07 -0400 (EDT)
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
- [209.85.216.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A74440D0B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 23:21:07 -0400 (EDT)
-Received: by mail-pj1-f73.google.com with SMTP id
- gk23-20020a17090b119700b001c65a1baa01so8352308pjb.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 20:21:06 -0700 (PDT)
+ with ESMTP id eYC3qZv8SUpS for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Mar 2022 23:21:56 -0400 (EDT)
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
+ [209.85.128.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 911974120D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 23:21:56 -0400 (EDT)
+Received: by mail-yw1-f201.google.com with SMTP id
+ 00721157ae682-2e9ae7bd8deso84612437b3.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 20:21:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=LmStsPZHwym48s0jdcVtSE1tYT0ApQdrS0D37AGFyKs=;
- b=fEasP1jMds0SprfAzrb6nU+tQ1xM/FQ9csAdEfGCOCN52KVy7P1IdJmecVUkWrxlY6
- ae9tKpwqxxEwi6ZZ6VOKCs45FzPPoy4qcauOCUU0/cQ/JOp+Vjydj2DYAFPMsMXwb/S3
- FFbsM6bMh9bbLgcJVLvBFb2tyTvzewi7HhXUk0xDJCQmRkADDhgCLLAksx5yyuCXOE5+
- 6GxLbyKyU8ulLL6zayZ769648cDK0cQzMhQAp8yukTVs29tXBs0LjOYXugoCOaW9UX47
- N9sqxliF4yKXIiSdWrbi7GClPxebI7h+RYiHCnv0i0OQItlwKz+ED4h2qTUVF06Kz74b
- FTTg==
+ :cc; bh=7iMUePCdm48RwGI5QpprEBWmHvkOkE/Zq9CohlSdcbk=;
+ b=QkJcDHwJyhURTxTUFsi16+avdBoFXNI12eZ6wczhcQrFCymIWWU+jQ5QVXcBJs6jiW
+ jnU3t8qA58tAaUlnvILo3aHsjsWptm5+y295qLEna4IsoIroFzZVPhjZ+L2wlTyZ1f0t
+ X1bDbupjs+GiokEVEG/awPbvpyN3hJcS64AbcNFpJ99wU9YtwlsIUMU8n6hMGTlvNvPb
+ 28l4aoCHpPBbGLVMrkRuZqcq4vs5tRwd6W+SFaWpicM0RDYvcUr2cTU7GgyYYTO8zlvE
+ lp4hoeMaLf6aR2Mr2iRjS4pB+zj6+2EtjWc4MRpbrL26KCa7BG+/+8fCIyu5F7TmXAAT
+ i2oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=LmStsPZHwym48s0jdcVtSE1tYT0ApQdrS0D37AGFyKs=;
- b=NSo5v5WSJDuZuzc1UeCFY8Vid/cppB7Y5pp+YJciaxxgbAo8taNSmDaXJHhMVYJ8/U
- oNSWVrR0tNbW3vnDIXp3YaSyTBUfv7ljq3w3ncWgDqfAtr6ZiTKN2oWgWaMFz9VZ6B2V
- FUBP8SY5G6cN84ovm7hBF89FisnQlr/RkTS3FG4PrpjvelSIxGiq5sLk+8Ysn5KfZSry
- n4Jcg/P5hO9DOxCOe5e5XEzm4Q//ZzaiTUReNZnfDBMsLbZNxy7ptnf3nJwPDKjaHEH9
- d/pela7C5apcFtNsXJUZXVdH2WmtfRRmMgWZ2qrRBUQbQoB7t6KNXWz33DuAlYrBXaB6
- ai6w==
-X-Gm-Message-State: AOAM530CGpFyx8iMpIRB9663aqDYq0JRknhimIFce6/5MBjVWoJkQisk
- Mpb5BPnE7ZVHLOFyhnNmg7WkvruWXwo=
-X-Google-Smtp-Source: ABdhPJzbFFZl49TTWscmlE01uLye5VCnvj3jOie2HZt20RAmPW3WeAPBiEL14vNtP9wsaPZ4qw/o9ZsSdMs=
+ bh=7iMUePCdm48RwGI5QpprEBWmHvkOkE/Zq9CohlSdcbk=;
+ b=lu2h6n4cugBTsJQTuP98sdAimkeN+wQ9Sw8fjjRIK8U8Bm9oYlVV3iXF0Luq48c29Z
+ uGCeOPVzivbZSFprhodBy61YKfkWH6dc9LAKtoyKofPBXTnHprQa6QVCqH/rNRuCLeHd
+ nn1U5qO13xze+AmEmXGppri73sWlGLsFfL8kGuUHHHrwjolTzBFZ/V46u+eeKHxin01J
+ 31glXcezwfRkrdgK5JB/DV/0B8DG2bZ+ved1EWf0I3x10AJurQBF6aRD8ir1IpvaAyGw
+ YXeqHgI6HZEgaatuIG101+zGym1qoahGlmdxLcKNMycHaoCP+Bs4hIYTkwsAytALHVCR
+ 1fWQ==
+X-Gm-Message-State: AOAM532yyy44FzSIPOBQeARV5cr1aFUhSz0nMb7Pw/GJsd5EY71gubdR
+ 5HXYno3Bd7c+SdH7w2npMz0vxdHcxdw=
+X-Google-Smtp-Source: ABdhPJxFsAU62XiTogfF9PaZsbu/nfGu6WWhivIcQYgbqiCjn/RjOeffXjytLV4Gi6o7okfa6fKzIw/q1yc=
 X-Received: from reiji-vws-sp.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:902:edc4:b0:151:5fbb:5f44 with SMTP id
- q4-20020a170902edc400b001515fbb5f44mr29013494plk.34.1648524066244; Mon, 28
- Mar 2022 20:21:06 -0700 (PDT)
-Date: Mon, 28 Mar 2022 20:19:23 -0700
+ (user=reijiw job=sendgmr) by 2002:a25:a0c5:0:b0:633:63da:5ead with SMTP id
+ i5-20020a25a0c5000000b0063363da5eadmr26964307ybm.412.1648524116006; Mon, 28
+ Mar 2022 20:21:56 -0700 (PDT)
+Date: Mon, 28 Mar 2022 20:19:24 -0700
 In-Reply-To: <20220329031924.619453-1-reijiw@google.com>
-Message-Id: <20220329031924.619453-2-reijiw@google.com>
+Message-Id: <20220329031924.619453-3-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220329031924.619453-1-reijiw@google.com>
 X-Mailer: git-send-email 2.35.1.1021.g381101b075-goog
-Subject: [PATCH v6 1/2] KVM: arm64: mixed-width check should be skipped for
- uninitialized vCPUs
+Subject: [PATCH v6 2/2] KVM: arm64: selftests: Introduce vcpu_width_config
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -88,206 +87,172 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM allows userspace to configure either all EL1 32bit or 64bit vCPUs
-for a guest.  At vCPU reset, vcpu_allowed_register_width() checks
-if the vcpu's register width is consistent with all other vCPUs'.
-Since the checking is done even against vCPUs that are not initialized
-(KVM_ARM_VCPU_INIT has not been done) yet, the uninitialized vCPUs
-are erroneously treated as 64bit vCPU, which causes the function to
-incorrectly detect a mixed-width VM.
+Introduce a test for aarch64 that ensures non-mixed-width vCPUs
+(all 64bit vCPUs or all 32bit vcPUs) can be configured, and
+mixed-width vCPUs cannot be configured.
 
-Introduce KVM_ARCH_FLAG_EL1_32BIT and KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED
-bits for kvm->arch.flags.  A value of the EL1_32BIT bit indicates that
-the guest needs to be configured with all 32bit or 64bit vCPUs, and
-a value of the REG_WIDTH_CONFIGURED bit indicates if a value of the
-EL1_32BIT bit is valid (already set up). Values in those bits are set at
-the first KVM_ARM_VCPU_INIT for the guest based on KVM_ARM_VCPU_EL1_32BIT
-configuration for the vCPU.
-
-Check vcpu's register width against those new bits at the vcpu's
-KVM_ARM_VCPU_INIT (instead of against other vCPUs' register width).
-
-Fixes: 66e94d5cafd4 ("KVM: arm64: Prevent mixed-width VM creation")
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 Reviewed-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 27 ++++++++----
- arch/arm64/include/asm/kvm_host.h    | 10 +++++
- arch/arm64/kvm/reset.c               | 65 ++++++++++++++++++----------
- 3 files changed, 72 insertions(+), 30 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/vcpu_width_config.c | 122 ++++++++++++++++++
+ 3 files changed, 124 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index d62405ce3e6d..7496deab025a 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -43,10 +43,22 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
- 
- void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
- 
-+#if defined(__KVM_VHE_HYPERVISOR__) || defined(__KVM_NVHE_HYPERVISOR__)
- static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
- {
- 	return !(vcpu->arch.hcr_el2 & HCR_RW);
- }
-+#else
-+static __always_inline bool vcpu_el1_is_32bit(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = vcpu->kvm;
-+
-+	WARN_ON_ONCE(!test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED,
-+			       &kvm->arch.flags));
-+
-+	return test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
-+}
-+#endif
- 
- static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- {
-@@ -72,15 +84,14 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 |= HCR_TVM;
- 	}
- 
--	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
-+	if (vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
--
--	/*
--	 * TID3: trap feature register accesses that we virtualise.
--	 * For now this is conditional, since no AArch32 feature regs
--	 * are currently virtualised.
--	 */
--	if (!vcpu_el1_is_32bit(vcpu))
-+	else
-+		/*
-+		 * TID3: trap feature register accesses that we virtualise.
-+		 * For now this is conditional, since no AArch32 feature regs
-+		 * are currently virtualised.
-+		 */
- 		vcpu->arch.hcr_el2 |= HCR_TID3;
- 
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 0e96087885fe..f7781c5e0c6a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -127,6 +127,16 @@ struct kvm_arch {
- #define KVM_ARCH_FLAG_MTE_ENABLED			1
- 	/* At least one vCPU has ran in the VM */
- #define KVM_ARCH_FLAG_HAS_RAN_ONCE			2
-+	/*
-+	 * The following two bits are used to indicate the guest's EL1
-+	 * register width configuration. A value of KVM_ARCH_FLAG_EL1_32BIT
-+	 * bit is valid only when KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED is set.
-+	 * Otherwise, the guest's EL1 register width has not yet been
-+	 * determined yet.
-+	 */
-+#define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		3
-+#define KVM_ARCH_FLAG_EL1_32BIT				4
-+
- 	unsigned long flags;
- 
- 	/*
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index ecc40c8cd6f6..bc8b3909640f 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -181,27 +181,46 @@ static int kvm_vcpu_enable_ptrauth(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
--static bool vcpu_allowed_register_width(struct kvm_vcpu *vcpu)
-+/**
-+ * kvm_set_vm_width() - set a register width for the guest
-+ * @kvm: Pointer to the KVM struct
-+ * @is32bit: Whether the register width of the guest is 32-bit or not (64-bit)
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index dce7de7755e6..4e884e29b2a8 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -3,6 +3,7 @@
+ /aarch64/debug-exceptions
+ /aarch64/get-reg-list
+ /aarch64/psci_cpu_on_test
++/aarch64/vcpu_width_config
+ /aarch64/vgic_init
+ /aarch64/vgic_irq
+ /s390x/memop
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 0e4926bc9a58..06a5a982123e 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -104,6 +104,7 @@ TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
+ TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
+ TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
+ TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
++TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
+ TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
+ TEST_GEN_PROGS_aarch64 += aarch64/vgic_irq
+ TEST_GEN_PROGS_aarch64 += demand_paging_test
+diff --git a/tools/testing/selftests/kvm/aarch64/vcpu_width_config.c b/tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
+new file mode 100644
+index 000000000000..6e9402679229
+--- /dev/null
++++ b/tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
+@@ -0,0 +1,122 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * vcpu_width_config - Test KVM_ARM_VCPU_INIT() with KVM_ARM_VCPU_EL1_32BIT.
 + *
-+ * Set KVM_ARCH_FLAG_EL1_32BIT bit in kvm->arch.flags based on @is32bit
-+ * and also set KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED bit in the flags.
-+ * When REG_WIDTH_CONFIGURED bit is already set in the flags, @is32bit
-+ * must be consistent with the value of FLAG_EL1_32BIT bit in the flags.
++ * Copyright (c) 2022 Google LLC.
 + *
-+ * Return: 0 on success, negative error code on failure.
++ * This is a test that ensures that non-mixed-width vCPUs (all 64bit vCPUs
++ * or all 32bit vcPUs) can be configured and mixed-width vCPUs cannot be
++ * configured.
 + */
-+static int kvm_set_vm_width(struct kvm *kvm, bool is32bit)
- {
--	struct kvm_vcpu *tmp;
--	bool is32bit;
--	unsigned long i;
-+	lockdep_assert_held(&kvm->lock);
 +
-+	if (test_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags)) {
-+		/*
-+		 * The guest's register width is already configured.
-+		 * Make sure that @is32bit is consistent with it.
-+		 */
-+		if (is32bit == test_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags))
-+			return 0;
-+		else
-+			return -EINVAL;
++#include "kvm_util.h"
++#include "processor.h"
++#include "test_util.h"
++
++
++/*
++ * Add a vCPU, run KVM_ARM_VCPU_INIT with @init1, and then
++ * add another vCPU, and run KVM_ARM_VCPU_INIT with @init2.
++ */
++static int add_init_2vcpus(struct kvm_vcpu_init *init1,
++			   struct kvm_vcpu_init *init2)
++{
++	struct kvm_vm *vm;
++	int ret;
++
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++
++	vm_vcpu_add(vm, 0);
++	ret = _vcpu_ioctl(vm, 0, KVM_ARM_VCPU_INIT, init1);
++	if (ret)
++		goto free_exit;
++
++	vm_vcpu_add(vm, 1);
++	ret = _vcpu_ioctl(vm, 1, KVM_ARM_VCPU_INIT, init2);
++
++free_exit:
++	kvm_vm_free(vm);
++	return ret;
++}
++
++/*
++ * Add two vCPUs, then run KVM_ARM_VCPU_INIT for one vCPU with @init1,
++ * and run KVM_ARM_VCPU_INIT for another vCPU with @init2.
++ */
++static int add_2vcpus_init_2vcpus(struct kvm_vcpu_init *init1,
++				  struct kvm_vcpu_init *init2)
++{
++	struct kvm_vm *vm;
++	int ret;
++
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++
++	vm_vcpu_add(vm, 0);
++	vm_vcpu_add(vm, 1);
++
++	ret = _vcpu_ioctl(vm, 0, KVM_ARM_VCPU_INIT, init1);
++	if (ret)
++		goto free_exit;
++
++	ret = _vcpu_ioctl(vm, 1, KVM_ARM_VCPU_INIT, init2);
++
++free_exit:
++	kvm_vm_free(vm);
++	return ret;
++}
++
++/*
++ * Tests that two 64bit vCPUs can be configured, two 32bit vCPUs can be
++ * configured, and two mixed-width vCPUs cannot be configured.
++ * Each of those three cases, configure vCPUs in two different orders.
++ * The one is running KVM_CREATE_VCPU for 2 vCPUs, and then running
++ * KVM_ARM_VCPU_INIT for them.
++ * The other is running KVM_CREATE_VCPU and KVM_ARM_VCPU_INIT for a vCPU,
++ * and then run those commands for another vCPU.
++ */
++int main(void)
++{
++	struct kvm_vcpu_init init1, init2;
++	struct kvm_vm *vm;
++	int ret;
++
++	if (!kvm_check_cap(KVM_CAP_ARM_EL1_32BIT)) {
++		print_skip("KVM_CAP_ARM_EL1_32BIT is not supported");
++		exit(KSFT_SKIP);
 +	}
- 
--	is32bit = vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT);
- 	if (!cpus_have_const_cap(ARM64_HAS_32BIT_EL1) && is32bit)
--		return false;
-+		return -EINVAL;
- 
- 	/* MTE is incompatible with AArch32 */
--	if (kvm_has_mte(vcpu->kvm) && is32bit)
--		return false;
-+	if (kvm_has_mte(kvm) && is32bit)
-+		return -EINVAL;
- 
--	/* Check that the vcpus are either all 32bit or all 64bit */
--	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
--		if (vcpu_has_feature(tmp, KVM_ARM_VCPU_EL1_32BIT) != is32bit)
--			return false;
--	}
-+	if (is32bit)
-+		set_bit(KVM_ARCH_FLAG_EL1_32BIT, &kvm->arch.flags);
- 
--	return true;
-+	set_bit(KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED, &kvm->arch.flags);
++
++	/* Get the preferred target type and copy that to init2 for later use */
++	vm = vm_create(VM_MODE_DEFAULT, DEFAULT_GUEST_PHY_PAGES, O_RDWR);
++	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init1);
++	kvm_vm_free(vm);
++	init2 = init1;
++
++	/* Test with 64bit vCPUs */
++	ret = add_init_2vcpus(&init1, &init1);
++	TEST_ASSERT(ret == 0,
++		    "Configuring 64bit EL1 vCPUs failed unexpectedly");
++	ret = add_2vcpus_init_2vcpus(&init1, &init1);
++	TEST_ASSERT(ret == 0,
++		    "Configuring 64bit EL1 vCPUs failed unexpectedly");
++
++	/* Test with 32bit vCPUs */
++	init1.features[0] = (1 << KVM_ARM_VCPU_EL1_32BIT);
++	ret = add_init_2vcpus(&init1, &init1);
++	TEST_ASSERT(ret == 0,
++		    "Configuring 32bit EL1 vCPUs failed unexpectedly");
++	ret = add_2vcpus_init_2vcpus(&init1, &init1);
++	TEST_ASSERT(ret == 0,
++		    "Configuring 32bit EL1 vCPUs failed unexpectedly");
++
++	/* Test with mixed-width vCPUs  */
++	init1.features[0] = 0;
++	init2.features[0] = (1 << KVM_ARM_VCPU_EL1_32BIT);
++	ret = add_init_2vcpus(&init1, &init2);
++	TEST_ASSERT(ret != 0,
++		    "Configuring mixed-width vCPUs worked unexpectedly");
++	ret = add_2vcpus_init_2vcpus(&init1, &init2);
++	TEST_ASSERT(ret != 0,
++		    "Configuring mixed-width vCPUs worked unexpectedly");
 +
 +	return 0;
- }
- 
- /**
-@@ -230,10 +249,17 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	u32 pstate;
- 
- 	mutex_lock(&vcpu->kvm->lock);
--	reset_state = vcpu->arch.reset_state;
--	WRITE_ONCE(vcpu->arch.reset_state.reset, false);
-+	ret = kvm_set_vm_width(vcpu->kvm,
-+			       vcpu_has_feature(vcpu, KVM_ARM_VCPU_EL1_32BIT));
-+	if (!ret) {
-+		reset_state = vcpu->arch.reset_state;
-+		WRITE_ONCE(vcpu->arch.reset_state.reset, false);
-+	}
- 	mutex_unlock(&vcpu->kvm->lock);
- 
-+	if (ret)
-+		return ret;
-+
- 	/* Reset PMU outside of the non-preemptible section */
- 	kvm_pmu_vcpu_reset(vcpu);
- 
-@@ -260,14 +286,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--	if (!vcpu_allowed_register_width(vcpu)) {
--		ret = -EINVAL;
--		goto out;
--	}
--
- 	switch (vcpu->arch.target) {
- 	default:
--		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
-+		if (vcpu_el1_is_32bit(vcpu)) {
- 			pstate = VCPU_RESET_PSTATE_SVC;
- 		} else {
- 			pstate = VCPU_RESET_PSTATE_EL1;
++}
 -- 
 2.35.1.1021.g381101b075-goog
 
