@@ -2,78 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E66C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 08:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A105C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 08:51:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A82284A100;
-	Tue, 29 Mar 2022 04:51:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BF93D49ED6;
+	Tue, 29 Mar 2022 04:51:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id temfmVylTef7; Tue, 29 Mar 2022 04:51:44 -0400 (EDT)
+	with ESMTP id OdQc0MdkO2MS; Tue, 29 Mar 2022 04:51:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 611C049EF2;
-	Tue, 29 Mar 2022 04:51:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87C7549F13;
+	Tue, 29 Mar 2022 04:51:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49EEF49EEB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 04:51:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5413949ED6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 04:51:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1aq6G5xj6Ip9 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Mar 2022 04:51:42 -0400 (EDT)
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com
- [209.85.160.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 324B249EF2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 04:51:42 -0400 (EDT)
-Received: by mail-oa1-f41.google.com with SMTP id
- 586e51a60fabf-de48295467so18023964fac.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 01:51:42 -0700 (PDT)
+ with ESMTP id bqbGUu2s2xN1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Mar 2022 04:51:52 -0400 (EDT)
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com
+ [209.85.167.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2043649DED
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 04:51:52 -0400 (EDT)
+Received: by mail-oi1-f182.google.com with SMTP id q189so18335845oia.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 01:51:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VJe5O/dIYvnfHgc69g0ehLPKljcP5RKzYK2S6ZDVOnE=;
- b=Uba6bE+82Py38fI3DPMkzE6lkUD0b/uApAHybu4BE6FTGoLWsQpNaC2VhN6RdAAIbL
- F8/DEKspBDMmWd8Jw+7HQgx+ynr9i6mN1aiqNpxajiOoBV2yDzvroGFL3siW+MkNqrnX
- jcxJTBRWxa7Wf9mhwUfWT/6utLuJFzzHV3iIwtdA4NK5NRAaWPwyqGMe82wv8awpU44N
- q+3oKwp/reccSUIQBFI9jC6ZG+CRkojREJH+JZXJe9VgEkrc4rUugOPsB9VVEDoJ3mXk
- T+aNBI33U7vN9UoMvZxpDF6ROVXQsH+yI522YkW0qsNdVZsvcmC+NeWkBK1EBMlY1B6n
- vRxg==
+ :cc; bh=R1lsy9bMwR3ErUveqedAk8smNA0HigoGBjxLcyNF7Hk=;
+ b=rbrvbYiedyRBSdRYe6ZGpIj7XvntHQia/rB4xtJJLFMus5eHqW8Pemvzxfr7NXac3+
+ JMagcc+W0AMpYApVy0+MqLkvwibf2VVZpVXknche0g03NNv8sC8YGGdNshJ1aeGD77Vq
+ +NUWztvMoJTf0Essh7f73pRj5H7P9WnWHuDIvQsYVAGDITzwiCixYW/cSEru53TjZ0uy
+ 9LwegnaV7o/2eVro98LRwh5SbzGJfPzrHl/3oY0n4GZr/fNy/fW3o39UrP7PGtNZ8+Po
+ Y11i0R1NhlQOcMom/HNueNTgjCC0DqT2Wm5JQAvSRD1NFwVqYJD/GePT68iWk1buWSjB
+ qByg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=VJe5O/dIYvnfHgc69g0ehLPKljcP5RKzYK2S6ZDVOnE=;
- b=AtpqOJmsUp3CpikrhCWBasYP8eCkzroF2sgUj8xyLsM6Cz506G9cybI0TSJHMYnGAG
- 1lJmsRLeFgkZfgyigc4ZDeVkzQ1gOcrD34/78mEX/K9CvfeGxEmKXeyUrV5XckMWdbl4
- D/M7oycejmdRAAIoHP2i7OC9/bNYSKrtrLxF+3sXkvjXBccndkcsNVsqMzWjBBgAEQS+
- py8CrQzQoy5/tQLfsLiI2td16ZMN9RgQgsudFReXnd/zS2102poqvwLuXuwScuB788Ra
- PwW1PaGuqHYFGAGoO1Hl972V9xjWdUI07waY/hZ98t7VemwNPXfFNjswQlkW7TWGF/hR
- PZYQ==
-X-Gm-Message-State: AOAM532kZSarC+cBFQGJA8fsYx7pOGp0zP4s6PQH4wrFaMRw6QK0caap
- Kfc4zfGs/ORcVVEusfnClivr+UKphFwK43iaUyMuDg==
-X-Google-Smtp-Source: ABdhPJzQnNB1enU6Vkw99LKFBHjurfLKTPpi/C2YL5+IsoNf/fgBuvf7UOzi/nLVp7bF67JAE1XzNk8Susa0c79YPd0=
-X-Received: by 2002:a05:6870:700f:b0:dd:9f77:9a97 with SMTP id
- u15-20020a056870700f00b000dd9f779a97mr1639234oae.146.1648543901566; Tue, 29
- Mar 2022 01:51:41 -0700 (PDT)
+ bh=R1lsy9bMwR3ErUveqedAk8smNA0HigoGBjxLcyNF7Hk=;
+ b=MWlzfMZW1g99cuCpfOXNk6cCpnZPiv2Wlf5suRDSLU8K8mBw3Z2MZKu7W3pyzAwpav
+ dCTQEOuxabAlMWNeBcFtbpYGmA0r7ng8o1yMvvaOAYQacznzw+YDOqwEkQhAcRa1639V
+ PnxO4xhqD264uDb8Mndke/wG9v9Ol6w8S+hoDak/n7uBjqP884Yb/wtnHZIBA+3ramIg
+ 70OhJM6NaqUi9Py1FfOwafs3/cHZyAsfuWmUgY2vXz6MVKoHI7SXlw7rZDI8dmWlgtc1
+ 51w9S4P3bspUojvXBFpQZQbId/oWOVLfylOGPtAnNzpJZMzbm4AU5khkCFPVlL3iL8Ib
+ d04Q==
+X-Gm-Message-State: AOAM533DdpT82thr10SB1AW+dfOavcm/f2A6pOi2Djn6dmeIY7JFNpOj
+ 4d+GNvX44nAdhaEZ6j1WnFZo4OXNyT5hHmc55Jj08g==
+X-Google-Smtp-Source: ABdhPJy/th1u/rMCaWZtzYowW7LJ1M2NUGV8icqQ2gVGgJiqN6PQR2SlsJkh6eQ+HBd+YiFyvJrCKH5iVJxXzxXwfpc=
+X-Received: by 2002:aca:180b:0:b0:2f7:23ae:8cd1 with SMTP id
+ h11-20020aca180b000000b002f723ae8cd1mr1592160oih.146.1648543911401; Tue, 29
+ Mar 2022 01:51:51 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220314200148.2695206-1-kaleshsingh@google.com>
- <20220314200148.2695206-6-kaleshsingh@google.com>
-In-Reply-To: <20220314200148.2695206-6-kaleshsingh@google.com>
+ <20220314200148.2695206-9-kaleshsingh@google.com>
+In-Reply-To: <20220314200148.2695206-9-kaleshsingh@google.com>
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 29 Mar 2022 09:51:05 +0100
-Message-ID: <CA+EHjTxkug-92zR5sr7icry8KWuksAt6PBt95QTjtkYonF7-Ng@mail.gmail.com>
-Subject: Re: [PATCH v6 5/8] KVM: arm64: Detect and handle hypervisor stack
- overflows
+Date: Tue, 29 Mar 2022 09:51:15 +0100
+Message-ID: <CA+EHjTx-c8e1oHh-A=6aaSxHxdrsuhtsjrwosjFLsWP9Zizmhw@mail.gmail.com>
+Subject: Re: [PATCH v6 8/8] KVM: arm64: Symbolize the nVHE HYP backtrace
 To: Kalesh Singh <kaleshsingh@google.com>
-Cc: kernel-team@android.com, Andrew Walbran <qwandor@google.com>,
- will@kernel.org, Peter Collingbourne <pcc@google.com>, maz@kernel.org,
- linux-kernel@vger.kernel.org,
+Cc: kernel-team@android.com, will@kernel.org,
+ Peter Collingbourne <pcc@google.com>, maz@kernel.org,
+ linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
  "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, Mark Brown <broonie@kernel.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
  Catalin Marinas <catalin.marinas@arm.com>, surenb@google.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,14 +91,32 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Kalesh,
 
-
-On Mon, Mar 14, 2022 at 8:05 PM Kalesh Singh <kaleshsingh@google.com> wrote:
+On Mon, Mar 14, 2022 at 8:07 PM Kalesh Singh <kaleshsingh@google.com> wrote:
 >
-> The hypervisor stacks (for both nVHE Hyp mode and nVHE protected mode)
-> are aligned such  that any valid stack address has PAGE_SHIFT bit as 1.
-> This allows us to conveniently check for overflow in the exception entry
-> without corrupting any GPRs. We won't recover from a stack overflow so
-> panic the hypervisor.
+> Reintroduce the __kvm_nvhe_ symbols in kallsyms, ignoring the local
+> symbols in this namespace. The local symbols are not informative and
+> can cause aliasing issues when symbolizing the addresses.
+>
+> With the necessary symbols now in kallsyms we can symbolize nVHE
+> stacktrace addresses using the %pB print format specifier.
+>
+> Example call trace:
+>
+> [   98.916444][  T426] kvm [426]: nVHE hyp panic at: [<ffffffc0096156fc>] __kvm_nvhe_overflow_stack+0x8/0x34!
+> [   98.918360][  T426] nVHE HYP call trace:
+> [   98.918692][  T426] kvm [426]: [<ffffffc009615aac>] __kvm_nvhe_cpu_prepare_nvhe_panic_info+0x4c/0x68
+> [   98.919545][  T426] kvm [426]: [<ffffffc0096159a4>] __kvm_nvhe_hyp_panic+0x2c/0xe8
+> [   98.920107][  T426] kvm [426]: [<ffffffc009615ad8>] __kvm_nvhe_hyp_panic_bad_stack+0x10/0x10
+> [   98.920665][  T426] kvm [426]: [<ffffffc009610a4c>] __kvm_nvhe___kvm_hyp_host_vector+0x24c/0x794
+> [   98.921292][  T426] kvm [426]: [<ffffffc009615718>] __kvm_nvhe_overflow_stack+0x24/0x34
+> . . .
+>
+> [   98.973382][  T426] kvm [426]: [<ffffffc009615718>] __kvm_nvhe_overflow_stack+0x24/0x34
+> [   98.973816][  T426] kvm [426]: [<ffffffc0096152f4>] __kvm_nvhe___kvm_vcpu_run+0x38/0x438
+> [   98.974255][  T426] kvm [426]: [<ffffffc009616f80>] __kvm_nvhe_handle___kvm_vcpu_run+0x1c4/0x364
+> [   98.974719][  T426] kvm [426]: [<ffffffc009616928>] __kvm_nvhe_handle_trap+0xa8/0x130
+> [   98.975152][  T426] kvm [426]: [<ffffffc009610064>] __kvm_nvhe___host_exit+0x64/0x64
+> [   98.975588][  T426] ---- end of nVHE HYP call trace ----
 >
 > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 
@@ -110,87 +127,63 @@ Thanks,
 /fuad
 
 
+
 > ---
 >
-> Changes in v5:
->   - Valid stack addresses now have PAGE_SHIFT bit as 1 instead of 0
->
-> Changes in v3:
->   - Remove test_sp_overflow macro, per Mark
->   - Add asmlinkage attribute for hyp_panic, hyp_panic_bad_stack, per Ard
+> Changes in v2:
+>   - Fix printk warnings - %p expects (void *)
 >
 >
->  arch/arm64/kvm/hyp/nvhe/host.S   | 24 ++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/switch.c |  7 ++++++-
->  2 files changed, 30 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/handle_exit.c | 13 +++++--------
+>  scripts/kallsyms.c           |  2 +-
+>  2 files changed, 6 insertions(+), 9 deletions(-)
 >
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index 3d613e721a75..be6d844279b1 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -153,6 +153,18 @@ SYM_FUNC_END(__host_hvc)
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index ff69dff33700..3a5c32017c6b 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -296,13 +296,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+>         u64 elr_in_kimg = __phys_to_kimg(elr_phys);
+>         u64 hyp_offset = elr_in_kimg - kaslr_offset() - elr_virt;
+>         u64 mode = spsr & PSR_MODE_MASK;
+> +       u64 panic_addr = elr_virt + hyp_offset;
 >
->  .macro invalid_host_el2_vect
->         .align 7
-> +
-> +       /*
-> +        * Test whether the SP has overflowed, without corrupting a GPR.
-> +        * nVHE hypervisor stacks are aligned so that the PAGE_SHIFT bit
-> +        * of SP should always be 1.
-> +        */
-> +       add     sp, sp, x0                      // sp' = sp + x0
-> +       sub     x0, sp, x0                      // x0' = sp' - x0 = (sp + x0) - x0 = sp
-> +       tbz     x0, #PAGE_SHIFT, .L__hyp_sp_overflow\@
-> +       sub     x0, sp, x0                      // x0'' = sp' - x0' = (sp + x0) - sp = x0
-> +       sub     sp, sp, x0                      // sp'' = sp' - x0 = (sp + x0) - x0 = sp
-> +
->         /* If a guest is loaded, panic out of it. */
->         stp     x0, x1, [sp, #-16]!
->         get_loaded_vcpu x0, x1
-> @@ -165,6 +177,18 @@ SYM_FUNC_END(__host_hvc)
->          * been partially clobbered by __host_enter.
->          */
->         b       hyp_panic
-> +
-> +.L__hyp_sp_overflow\@:
-> +       /*
-> +        * Reset SP to the top of the stack, to allow handling the hyp_panic.
-> +        * This corrupts the stack but is ok, since we won't be attempting
-> +        * any unwinding here.
-> +        */
-> +       ldr_this_cpu    x0, kvm_init_params + NVHE_INIT_STACK_HYP_VA, x1
-> +       mov     sp, x0
-> +
-> +       bl      hyp_panic_bad_stack
-> +       ASM_BUG()
->  .endm
+> -       /*
+> -        * The nVHE hyp symbols are not included by kallsyms to avoid issues
+> -        * with aliasing. That means that the symbols cannot be printed with the
+> -        * "%pS" format specifier, so fall back to the vmlinux address if
+> -        * there's no better option.
+> -        */
+>         if (mode != PSR_MODE_EL2t && mode != PSR_MODE_EL2h) {
+>                 kvm_err("Invalid host exception to nVHE hyp!\n");
+>         } else if (ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
+> @@ -322,9 +317,11 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+>                 if (file)
+>                         kvm_err("nVHE hyp BUG at: %s:%u!\n", file, line);
+>                 else
+> -                       kvm_err("nVHE hyp BUG at: %016llx!\n", elr_virt + hyp_offset);
+> +                       kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
+> +                                       (void *)panic_addr);
+>         } else {
+> -               kvm_err("nVHE hyp panic at: %016llx!\n", elr_virt + hyp_offset);
+> +               kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
+> +                               (void *)panic_addr);
+>         }
 >
->  .macro invalid_host_el1_vect
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 6410d21d8695..703a5d3f611b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -347,7 +347,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->         return exit_code;
->  }
->
-> -void __noreturn hyp_panic(void)
-> +asmlinkage void __noreturn hyp_panic(void)
->  {
->         u64 spsr = read_sysreg_el2(SYS_SPSR);
->         u64 elr = read_sysreg_el2(SYS_ELR);
-> @@ -369,6 +369,11 @@ void __noreturn hyp_panic(void)
->         unreachable();
->  }
->
-> +asmlinkage void __noreturn hyp_panic_bad_stack(void)
-> +{
-> +       hyp_panic();
-> +}
-> +
->  asmlinkage void kvm_unexpected_el2_exception(void)
->  {
->         return __kvm_unexpected_el2_exception();
+>         kvm_nvhe_dump_backtrace(hyp_offset);
+> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> index 54ad86d13784..19aba43d9da4 100644
+> --- a/scripts/kallsyms.c
+> +++ b/scripts/kallsyms.c
+> @@ -111,7 +111,7 @@ static bool is_ignored_symbol(const char *name, char type)
+>                 ".LASANPC",             /* s390 kasan local symbols */
+>                 "__crc_",               /* modversions */
+>                 "__efistub_",           /* arm64 EFI stub namespace */
+> -               "__kvm_nvhe_",          /* arm64 non-VHE KVM namespace */
+> +               "__kvm_nvhe_$",         /* arm64 local symbols in non-VHE KVM namespace */
+>                 "__AArch64ADRPThunk_",  /* arm64 lld */
+>                 "__ARMV5PILongThunk_",  /* arm lld */
+>                 "__ARMV7PILongThunk_",
 > --
 > 2.35.1.723.g4982287a31-goog
 >
