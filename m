@@ -2,76 +2,52 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B7DC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 07:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A17C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 07:08:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 540EC4B0B6;
-	Tue, 29 Mar 2022 03:07:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C11B49F04;
+	Tue, 29 Mar 2022 03:08:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wSVcijrsLjLD; Tue, 29 Mar 2022 03:07:24 -0400 (EDT)
+	with ESMTP id ekv6CJjm79+H; Tue, 29 Mar 2022 03:08:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1DBE4B0C0;
-	Tue, 29 Mar 2022 03:07:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BD354B0B6;
+	Tue, 29 Mar 2022 03:08:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E5E44B0B6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 03:07:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E51749F14
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 02:14:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oqjaEU4g+nMk for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Mar 2022 03:07:22 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B070340C31
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 03:07:22 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 9F63461529;
- Tue, 29 Mar 2022 07:07:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC48C2BBE4;
- Tue, 29 Mar 2022 07:07:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1648537640;
- bh=nQUP/FbGXeuylpTH5/b3zyp7BFtDjtEua/L88aOE6cc=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=LOsDzegZzfHWobPhUSjo+fS0pkmNbYdNkDxNG5AEmOj/qltw5OBAdpLcwyr4crcqx
- L5NEsAWfpVcS1Zi0Ioy8GKmC8SHSTJVdarhmySpt9QgA87E4X1VnBBGVPIde/MPmID
- Zrii/Ov86Mcz2jdmJ3lT/ZSrn4spzwjSNgv19jjLFncof4C6ddR3Y6rSrcBuC53M/c
- uuX0uClv2TgkEAgb66bNcVVpQNkzFsYAfMlWdzTi4jEIMWvVYYHTLjlTK645Ln6ZdE
- ZeayuFwvK+a1Wpg7w73Ple9E994Yq5CbHmgQUL3puRjtNWiLzkOPPW8URlBs2uzmM8
- fh6AhpaJemo9g==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
- helo=wait-a-minute.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nZ5wj-00HaMS-BO; Tue, 29 Mar 2022 08:07:17 +0100
-Date: Tue, 29 Mar 2022 08:07:12 +0100
-Message-ID: <87r16li6e7.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: yuzhe <yuzhe@nfschina.com>
+ with ESMTP id 0PE2DGKHnBTk for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Mar 2022 02:14:24 -0400 (EDT)
+Received: from ha.nfschina.com (mail.nfschina.com [124.16.136.209])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2A2343C72
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 02:14:24 -0400 (EDT)
+Received: from localhost (unknown [127.0.0.1])
+ by ha.nfschina.com (Postfix) with ESMTP id 6261E1E80D78;
+ Tue, 29 Mar 2022 14:13:47 +0800 (CST)
+X-Virus-Scanned: amavisd-new at test.com
+Received: from ha.nfschina.com ([127.0.0.1])
+ by localhost (ha.nfschina.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BrCJMHfyAm77; Tue, 29 Mar 2022 14:13:44 +0800 (CST)
+Received: from [18.165.124.108] (unknown [101.228.248.165])
+ (Authenticated sender: yuzhe@nfschina.com)
+ by ha.nfschina.com (Postfix) with ESMTPA id EB7331E80D75;
+ Tue, 29 Mar 2022 14:13:43 +0800 (CST)
+Message-ID: <0f4cf955-ca2b-626f-867e-5a0ecfe68ca1@nfschina.com>
+Date: Tue, 29 Mar 2022 14:14:16 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
 Subject: Re: [PATCH] KVM: arm64: vgic-debug: remove unnecessary type castings
-In-Reply-To: <0f4cf955-ca2b-626f-867e-5a0ecfe68ca1@nfschina.com>
+To: Marc Zyngier <maz@kernel.org>
 References: <20220328103836.2829-1-yuzhe@nfschina.com>
  <87h77ifbbd.wl-maz@kernel.org>
- <0f4cf955-ca2b-626f-867e-5a0ecfe68ca1@nfschina.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: yuzhe@nfschina.com, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- will@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- liqiong@nfschina.com, kernel-janitors@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+From: yuzhe <yuzhe@nfschina.com>
+In-Reply-To: <87h77ifbbd.wl-maz@kernel.org>
+X-Mailman-Approved-At: Tue, 29 Mar 2022 03:08:01 -0400
 Cc: will@kernel.org, catalin.marinas@arm.com, kernel-janitors@vger.kernel.org,
  linux-kernel@vger.kernel.org, liqiong@nfschina.com,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
@@ -86,41 +62,48 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 29 Mar 2022 07:14:16 +0100,
-yuzhe <yuzhe@nfschina.com> wrote:
-> 
-> >> @@ -229,7 +229,7 @@ static void print_irq_state(struct seq_file *s, struct vgic_irq *irq,
-> >>     static int vgic_debug_show(struct seq_file *s, void *v)
-> >>   {
-> >> -	struct kvm *kvm = (struct kvm *)s->private;
-> >> +	struct kvm *kvm = s->private;
-> >>   	struct vgic_state_iter *iter = (struct vgic_state_iter *)v;
-> > How about you fully get rid of the unnecessary casts then?
-> > 
-> > 	M.
-> 
-> I don't know what you exactly mean. I follow the
-> kernel-janitors/TODO List to get rid of the unnecessary casts.  And
-> I checked all the code in the arch directory and found these issues.
-
-Let me quote the lines again:
-
-> >>     static int vgic_debug_show(struct seq_file *s, void *v)
-[...]
-> >>   	struct vgic_state_iter *iter = (struct vgic_state_iter *)v;
-
-Do you see what I mean?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+5ZyoIDIwMjIvMy8yOCAyMTozNiwgTWFyYyBaeW5naWVyIOWGmemBkzoKCj4gT24gTW9uLCAyOCBN
+YXIgMjAyMiAxMTozODozNiArMDEwMCwKPiB5dXpoZSA8eXV6aGVAbmZzY2hpbmEuY29tPiB3cm90
+ZToKPj4gcmVtb3ZlIHVubmVjZXNzYXJ5IGNhc3RpbmdzLCBmcm9tICJ2b2lkICoiIHRvICJzdHJ1
+Y3Qga3ZtICoiCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IHl1emhlIDx5dXpoZUBuZnNjaGluYS5jb20+
+Cj4+IC0tLQo+PiAgIGFyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy1kZWJ1Zy5jIHwgOCArKysrLS0t
+LQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pCj4+
+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtZGVidWcuYyBiL2FyY2gv
+YXJtNjQva3ZtL3ZnaWMvdmdpYy1kZWJ1Zy5jCj4+IGluZGV4IGYzOGM0MGE3NjI1MS4uOTI3ZTVj
+MWY2NTBkIDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtZGVidWcuYwo+
+PiArKysgYi9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtZGVidWcuYwo+PiBAQCAtODIsNyArODIs
+NyBAQCBzdGF0aWMgYm9vbCBlbmRfb2ZfdmdpYyhzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVy
+KQo+PiAgIAo+PiAgIHN0YXRpYyB2b2lkICp2Z2ljX2RlYnVnX3N0YXJ0KHN0cnVjdCBzZXFfZmls
+ZSAqcywgbG9mZl90ICpwb3MpCj4+ICAgewo+PiAtCXN0cnVjdCBrdm0gKmt2bSA9IChzdHJ1Y3Qg
+a3ZtICopcy0+cHJpdmF0ZTsKPj4gKwlzdHJ1Y3Qga3ZtICprdm0gPSBzLT5wcml2YXRlOwo+PiAg
+IAlzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVyOwo+PiAgIAo+PiAgIAltdXRleF9sb2NrKCZr
+dm0tPmxvY2spOwo+PiBAQCAtMTEwLDcgKzExMCw3IEBAIHN0YXRpYyB2b2lkICp2Z2ljX2RlYnVn
+X3N0YXJ0KHN0cnVjdCBzZXFfZmlsZSAqcywgbG9mZl90ICpwb3MpCj4+ICAgCj4+ICAgc3RhdGlj
+IHZvaWQgKnZnaWNfZGVidWdfbmV4dChzdHJ1Y3Qgc2VxX2ZpbGUgKnMsIHZvaWQgKnYsIGxvZmZf
+dCAqcG9zKQo+PiAgIHsKPj4gLQlzdHJ1Y3Qga3ZtICprdm0gPSAoc3RydWN0IGt2bSAqKXMtPnBy
+aXZhdGU7Cj4+ICsJc3RydWN0IGt2bSAqa3ZtID0gcy0+cHJpdmF0ZTsKPj4gICAJc3RydWN0IHZn
+aWNfc3RhdGVfaXRlciAqaXRlciA9IGt2bS0+YXJjaC52Z2ljLml0ZXI7Cj4+ICAgCj4+ICAgCSsr
+KnBvczsKPj4gQEAgLTEyMiw3ICsxMjIsNyBAQCBzdGF0aWMgdm9pZCAqdmdpY19kZWJ1Z19uZXh0
+KHN0cnVjdCBzZXFfZmlsZSAqcywgdm9pZCAqdiwgbG9mZl90ICpwb3MpCj4+ICAgCj4+ICAgc3Rh
+dGljIHZvaWQgdmdpY19kZWJ1Z19zdG9wKHN0cnVjdCBzZXFfZmlsZSAqcywgdm9pZCAqdikKPj4g
+ICB7Cj4+IC0Jc3RydWN0IGt2bSAqa3ZtID0gKHN0cnVjdCBrdm0gKilzLT5wcml2YXRlOwo+PiAr
+CXN0cnVjdCBrdm0gKmt2bSA9IHMtPnByaXZhdGU7Cj4+ICAgCXN0cnVjdCB2Z2ljX3N0YXRlX2l0
+ZXIgKml0ZXI7Cj4+ICAgCj4+ICAgCS8qCj4+IEBAIC0yMjksNyArMjI5LDcgQEAgc3RhdGljIHZv
+aWQgcHJpbnRfaXJxX3N0YXRlKHN0cnVjdCBzZXFfZmlsZSAqcywgc3RydWN0IHZnaWNfaXJxICpp
+cnEsCj4+ICAgCj4+ICAgc3RhdGljIGludCB2Z2ljX2RlYnVnX3Nob3coc3RydWN0IHNlcV9maWxl
+ICpzLCB2b2lkICp2KQo+PiAgIHsKPj4gLQlzdHJ1Y3Qga3ZtICprdm0gPSAoc3RydWN0IGt2bSAq
+KXMtPnByaXZhdGU7Cj4+ICsJc3RydWN0IGt2bSAqa3ZtID0gcy0+cHJpdmF0ZTsKPj4gICAJc3Ry
+dWN0IHZnaWNfc3RhdGVfaXRlciAqaXRlciA9IChzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICopdjsK
+PiBIb3cgYWJvdXQgeW91IGZ1bGx5IGdldCByaWQgb2YgdGhlIHVubmVjZXNzYXJ5IGNhc3RzIHRo
+ZW4/Cj4KPiAJTS4KCkkgZG9uJ3Qga25vdyB3aGF0IHlvdSBleGFjdGx5IG1lYW4uIEkgZm9sbG93
+IHRoZSBrZXJuZWwtamFuaXRvcnMvVE9ETyBMaXN0IHRvIGdldCByaWQgb2YgdGhlIHVubmVjZXNz
+YXJ5IGNhc3RzLgpBbmQgSSBjaGVja2VkIGFsbCB0aGUgY29kZSBpbiB0aGUgYXJjaCBkaXJlY3Rv
+cnkgYW5kIGZvdW5kIHRoZXNlIGlzc3Vlcy4KCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
+L2t2bWFybQo=
