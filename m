@@ -2,54 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A17C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 07:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C57C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 08:51:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C11B49F04;
-	Tue, 29 Mar 2022 03:08:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC91349F19;
+	Tue, 29 Mar 2022 04:51:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ekv6CJjm79+H; Tue, 29 Mar 2022 03:08:03 -0400 (EDT)
+	with ESMTP id rq7rZmyhNXOM; Tue, 29 Mar 2022 04:51:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BD354B0B6;
-	Tue, 29 Mar 2022 03:08:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB2D749EFF;
+	Tue, 29 Mar 2022 04:51:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E51749F14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 02:14:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3970149EEE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 04:51:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0PE2DGKHnBTk for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Mar 2022 02:14:24 -0400 (EDT)
-Received: from ha.nfschina.com (mail.nfschina.com [124.16.136.209])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A2A2343C72
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 02:14:24 -0400 (EDT)
-Received: from localhost (unknown [127.0.0.1])
- by ha.nfschina.com (Postfix) with ESMTP id 6261E1E80D78;
- Tue, 29 Mar 2022 14:13:47 +0800 (CST)
-X-Virus-Scanned: amavisd-new at test.com
-Received: from ha.nfschina.com ([127.0.0.1])
- by localhost (ha.nfschina.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BrCJMHfyAm77; Tue, 29 Mar 2022 14:13:44 +0800 (CST)
-Received: from [18.165.124.108] (unknown [101.228.248.165])
- (Authenticated sender: yuzhe@nfschina.com)
- by ha.nfschina.com (Postfix) with ESMTPA id EB7331E80D75;
- Tue, 29 Mar 2022 14:13:43 +0800 (CST)
-Message-ID: <0f4cf955-ca2b-626f-867e-5a0ecfe68ca1@nfschina.com>
-Date: Tue, 29 Mar 2022 14:14:16 +0800
+ with ESMTP id CCod+5EMlWAF for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Mar 2022 04:51:15 -0400 (EDT)
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com
+ [209.85.160.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E8C5949EEB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 04:51:14 -0400 (EDT)
+Received: by mail-oa1-f41.google.com with SMTP id
+ 586e51a60fabf-d6ca46da48so17968491fac.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2022 01:51:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=J/eRk2ImRzThvCuDLwHzf4xR9PAnPCdQO7PLIDrEyk0=;
+ b=nnyN0eihHxUrf+TwB7MLpcpSf2tlQiGtoqCXDg7me/90+B5CbLAw5kc3Bi+PsvIN08
+ G/8PYgbLWcDtMgLWGyssOW3y5RdhVrfh4XcLmCEEtCPfd18v+MUQRD5U8f3uChLsoBTU
+ 0xzbkVUbS8C+VVZk3Ug5I7bK/oK7wYc1FbF0vlj4egoDQdFVPOrIymd7LKW6fye9Rm+r
+ ucXN1UdGW7STFAWgSHaE9lZ0OH0Un4+/C+b1NrE/lDou7KCXORuAhRPGPlQEv1hCgMia
+ E4YNeclPGTx8FxuxSLv2kOdtOiNPxd/YwlTD6QgLVtPoNvf+1rR2rNKgToxFg624S4Lh
+ 3Ttg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=J/eRk2ImRzThvCuDLwHzf4xR9PAnPCdQO7PLIDrEyk0=;
+ b=AWMoTgIkoi7dWr4CyetbU6L0Xp2TXReBX3WV7znbUS1SH+9UHVJi2RpeA42mXTKWuu
+ kDbqpI51rbgzOhOf7tdNY2JNdOVhHYe+h09IWxKdSpX1IZob/QGF23I12Qgm/Kw/vwg3
+ Cq1SHkcgDHwzx4P9rlRZsRyheJawS/b1WEuhd2iuuMUA7etnjK9TIrkDrbs9BiDz10ys
+ sqljy1bksVsCuW31ks0XmJ23BH/IPPsgDxs8ovmi2nanjZp0hd6K3fwq8aDXtMdQZ6pn
+ TrgQ07NNXOgrcwDJ5Iepfw3qpkpU8+E1fRFcPUZopkDbLDx/BwmpZBsHVJnpgCQ0IchN
+ ETSQ==
+X-Gm-Message-State: AOAM531PSoY2sqetehV+lSaMuZ+dhYkOpAMlnenRT3sV8IOUYDvP4MZu
+ K4ef9/cFMfQkriGmxHDC9GSLnyDz6KX3TyNCJA4ptg==
+X-Google-Smtp-Source: ABdhPJwBs4l3xPrJ86QqdOmfqcuVD/NvIViycAprqNRRQDkwaU6W1i5RBinZQBRbLLzO2uklz/Epgwa7l41lkeLUKZ4=
+X-Received: by 2002:a05:6870:8196:b0:dd:e471:8bb5 with SMTP id
+ k22-20020a056870819600b000dde4718bb5mr814608oae.294.1648543874076; Tue, 29
+ Mar 2022 01:51:14 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] KVM: arm64: vgic-debug: remove unnecessary type castings
-To: Marc Zyngier <maz@kernel.org>
-References: <20220328103836.2829-1-yuzhe@nfschina.com>
- <87h77ifbbd.wl-maz@kernel.org>
-From: yuzhe <yuzhe@nfschina.com>
-In-Reply-To: <87h77ifbbd.wl-maz@kernel.org>
-X-Mailman-Approved-At: Tue, 29 Mar 2022 03:08:01 -0400
-Cc: will@kernel.org, catalin.marinas@arm.com, kernel-janitors@vger.kernel.org,
- linux-kernel@vger.kernel.org, liqiong@nfschina.com,
+References: <20220314200148.2695206-1-kaleshsingh@google.com>
+ <20220314200148.2695206-2-kaleshsingh@google.com>
+In-Reply-To: <20220314200148.2695206-2-kaleshsingh@google.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Tue, 29 Mar 2022 09:50:38 +0100
+Message-ID: <CA+EHjTxx7RoLods=9xz4RZF3FSFZdH+7kwcHCurpUqAD+mtgzA@mail.gmail.com>
+Subject: Re: [PATCH v6 1/8] KVM: arm64: Introduce hyp_alloc_private_va_range()
+To: Kalesh Singh <kaleshsingh@google.com>
+Cc: kernel-team@android.com, will@kernel.org,
+ Peter Collingbourne <pcc@google.com>, maz@kernel.org,
+ linux-kernel@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, surenb@google.com,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -62,48 +84,181 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-5ZyoIDIwMjIvMy8yOCAyMTozNiwgTWFyYyBaeW5naWVyIOWGmemBkzoKCj4gT24gTW9uLCAyOCBN
-YXIgMjAyMiAxMTozODozNiArMDEwMCwKPiB5dXpoZSA8eXV6aGVAbmZzY2hpbmEuY29tPiB3cm90
-ZToKPj4gcmVtb3ZlIHVubmVjZXNzYXJ5IGNhc3RpbmdzLCBmcm9tICJ2b2lkICoiIHRvICJzdHJ1
-Y3Qga3ZtICoiCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IHl1emhlIDx5dXpoZUBuZnNjaGluYS5jb20+
-Cj4+IC0tLQo+PiAgIGFyY2gvYXJtNjQva3ZtL3ZnaWMvdmdpYy1kZWJ1Zy5jIHwgOCArKysrLS0t
-LQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDQgZGVsZXRpb25zKC0pCj4+
-Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtZGVidWcuYyBiL2FyY2gv
-YXJtNjQva3ZtL3ZnaWMvdmdpYy1kZWJ1Zy5jCj4+IGluZGV4IGYzOGM0MGE3NjI1MS4uOTI3ZTVj
-MWY2NTBkIDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtZGVidWcuYwo+
-PiArKysgYi9hcmNoL2FybTY0L2t2bS92Z2ljL3ZnaWMtZGVidWcuYwo+PiBAQCAtODIsNyArODIs
-NyBAQCBzdGF0aWMgYm9vbCBlbmRfb2ZfdmdpYyhzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVy
-KQo+PiAgIAo+PiAgIHN0YXRpYyB2b2lkICp2Z2ljX2RlYnVnX3N0YXJ0KHN0cnVjdCBzZXFfZmls
-ZSAqcywgbG9mZl90ICpwb3MpCj4+ICAgewo+PiAtCXN0cnVjdCBrdm0gKmt2bSA9IChzdHJ1Y3Qg
-a3ZtICopcy0+cHJpdmF0ZTsKPj4gKwlzdHJ1Y3Qga3ZtICprdm0gPSBzLT5wcml2YXRlOwo+PiAg
-IAlzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICppdGVyOwo+PiAgIAo+PiAgIAltdXRleF9sb2NrKCZr
-dm0tPmxvY2spOwo+PiBAQCAtMTEwLDcgKzExMCw3IEBAIHN0YXRpYyB2b2lkICp2Z2ljX2RlYnVn
-X3N0YXJ0KHN0cnVjdCBzZXFfZmlsZSAqcywgbG9mZl90ICpwb3MpCj4+ICAgCj4+ICAgc3RhdGlj
-IHZvaWQgKnZnaWNfZGVidWdfbmV4dChzdHJ1Y3Qgc2VxX2ZpbGUgKnMsIHZvaWQgKnYsIGxvZmZf
-dCAqcG9zKQo+PiAgIHsKPj4gLQlzdHJ1Y3Qga3ZtICprdm0gPSAoc3RydWN0IGt2bSAqKXMtPnBy
-aXZhdGU7Cj4+ICsJc3RydWN0IGt2bSAqa3ZtID0gcy0+cHJpdmF0ZTsKPj4gICAJc3RydWN0IHZn
-aWNfc3RhdGVfaXRlciAqaXRlciA9IGt2bS0+YXJjaC52Z2ljLml0ZXI7Cj4+ICAgCj4+ICAgCSsr
-KnBvczsKPj4gQEAgLTEyMiw3ICsxMjIsNyBAQCBzdGF0aWMgdm9pZCAqdmdpY19kZWJ1Z19uZXh0
-KHN0cnVjdCBzZXFfZmlsZSAqcywgdm9pZCAqdiwgbG9mZl90ICpwb3MpCj4+ICAgCj4+ICAgc3Rh
-dGljIHZvaWQgdmdpY19kZWJ1Z19zdG9wKHN0cnVjdCBzZXFfZmlsZSAqcywgdm9pZCAqdikKPj4g
-ICB7Cj4+IC0Jc3RydWN0IGt2bSAqa3ZtID0gKHN0cnVjdCBrdm0gKilzLT5wcml2YXRlOwo+PiAr
-CXN0cnVjdCBrdm0gKmt2bSA9IHMtPnByaXZhdGU7Cj4+ICAgCXN0cnVjdCB2Z2ljX3N0YXRlX2l0
-ZXIgKml0ZXI7Cj4+ICAgCj4+ICAgCS8qCj4+IEBAIC0yMjksNyArMjI5LDcgQEAgc3RhdGljIHZv
-aWQgcHJpbnRfaXJxX3N0YXRlKHN0cnVjdCBzZXFfZmlsZSAqcywgc3RydWN0IHZnaWNfaXJxICpp
-cnEsCj4+ICAgCj4+ICAgc3RhdGljIGludCB2Z2ljX2RlYnVnX3Nob3coc3RydWN0IHNlcV9maWxl
-ICpzLCB2b2lkICp2KQo+PiAgIHsKPj4gLQlzdHJ1Y3Qga3ZtICprdm0gPSAoc3RydWN0IGt2bSAq
-KXMtPnByaXZhdGU7Cj4+ICsJc3RydWN0IGt2bSAqa3ZtID0gcy0+cHJpdmF0ZTsKPj4gICAJc3Ry
-dWN0IHZnaWNfc3RhdGVfaXRlciAqaXRlciA9IChzdHJ1Y3QgdmdpY19zdGF0ZV9pdGVyICopdjsK
-PiBIb3cgYWJvdXQgeW91IGZ1bGx5IGdldCByaWQgb2YgdGhlIHVubmVjZXNzYXJ5IGNhc3RzIHRo
-ZW4/Cj4KPiAJTS4KCkkgZG9uJ3Qga25vdyB3aGF0IHlvdSBleGFjdGx5IG1lYW4uIEkgZm9sbG93
-IHRoZSBrZXJuZWwtamFuaXRvcnMvVE9ETyBMaXN0IHRvIGdldCByaWQgb2YgdGhlIHVubmVjZXNz
-YXJ5IGNhc3RzLgpBbmQgSSBjaGVja2VkIGFsbCB0aGUgY29kZSBpbiB0aGUgYXJjaCBkaXJlY3Rv
-cnkgYW5kIGZvdW5kIHRoZXNlIGlzc3Vlcy4KCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
-bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
-L2t2bWFybQo=
+Hi Kalesh,
+
+
+On Mon, Mar 14, 2022 at 8:02 PM Kalesh Singh <kaleshsingh@google.com> wrote:
+>
+> hyp_alloc_private_va_range() can be used to reserve private VA ranges
+> in the nVHE hypervisor. Allocations are aligned based on the order of
+> the requested size.
+>
+> This will be used to implement stack guard pages for KVM nVHE hypervisor
+> (nVHE Hyp mode / not pKVM), in a subsequent patch in the series.
+>
+> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+
+This looks good to me. I have also tested this entire series, and your
+enhancements will make debugging easier.
+
+Tested-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Thanks,
+/fuad
+
+
+
+> ---
+>
+> Changes in v6:
+>   - Update kernel-doc for hyp_alloc_private_va_range()
+>     and add return description, per Stephen
+>   - Update hyp_alloc_private_va_range() to return an int error code,
+>     per Stephen
+>   - Replace IS_ERR() checks with IS_ERR_VALUE() check, per Stephen
+>   - Clean up goto, per Stephen
+>
+> Changes in v5:
+>   - Align private allocations based on the order of their size, per Marc
+>
+> Changes in v4:
+>   - Handle null ptr in hyp_alloc_private_va_range() and replace
+>     IS_ERR_OR_NULL checks in callers with IS_ERR checks, per Fuad
+>   - Fix kernel-doc comments format, per Fuad
+>
+> Changes in v3:
+>   - Handle null ptr in IS_ERR_OR_NULL checks, per Mark
+>
+>
+>  arch/arm64/include/asm/kvm_mmu.h |  1 +
+>  arch/arm64/kvm/mmu.c             | 66 +++++++++++++++++++++-----------
+>  2 files changed, 45 insertions(+), 22 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 81839e9a8a24..3cc9aa25f510 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -153,6 +153,7 @@ static __always_inline unsigned long __kern_hyp_va(unsigned long v)
+>  int kvm_share_hyp(void *from, void *to);
+>  void kvm_unshare_hyp(void *from, void *to);
+>  int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot);
+> +int hyp_alloc_private_va_range(size_t size, unsigned long *haddr);
+>  int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+>                            void __iomem **kaddr,
+>                            void __iomem **haddr);
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index bc2aba953299..7326d683c500 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -457,23 +457,22 @@ int create_hyp_mappings(void *from, void *to, enum kvm_pgtable_prot prot)
+>         return 0;
+>  }
+>
+> -static int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+> -                                       unsigned long *haddr,
+> -                                       enum kvm_pgtable_prot prot)
+> +
+> +/**
+> + * hyp_alloc_private_va_range - Allocates a private VA range.
+> + * @size:      The size of the VA range to reserve.
+> + * @haddr:     The hypervisor virtual start address of the allocation.
+> + *
+> + * The private virtual address (VA) range is allocated below io_map_base
+> + * and aligned based on the order of @size.
+> + *
+> + * Return: 0 on success or negative error code on failure.
+> + */
+> +int hyp_alloc_private_va_range(size_t size, unsigned long *haddr)
+>  {
+>         unsigned long base;
+>         int ret = 0;
+>
+> -       if (!kvm_host_owns_hyp_mappings()) {
+> -               base = kvm_call_hyp_nvhe(__pkvm_create_private_mapping,
+> -                                        phys_addr, size, prot);
+> -               if (IS_ERR_OR_NULL((void *)base))
+> -                       return PTR_ERR((void *)base);
+> -               *haddr = base;
+> -
+> -               return 0;
+> -       }
+> -
+>         mutex_lock(&kvm_hyp_pgd_mutex);
+>
+>         /*
+> @@ -484,30 +483,53 @@ static int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+>          *
+>          * The allocated size is always a multiple of PAGE_SIZE.
+>          */
+> -       size = PAGE_ALIGN(size + offset_in_page(phys_addr));
+> -       base = io_map_base - size;
+> +       base = io_map_base - PAGE_ALIGN(size);
+> +
+> +       /* Align the allocation based on the order of its size */
+> +       base = ALIGN_DOWN(base, PAGE_SIZE << get_order(size));
+>
+>         /*
+>          * Verify that BIT(VA_BITS - 1) hasn't been flipped by
+>          * allocating the new area, as it would indicate we've
+>          * overflowed the idmap/IO address range.
+>          */
+> -       if ((base ^ io_map_base) & BIT(VA_BITS - 1))
+> +       if (!base || (base ^ io_map_base) & BIT(VA_BITS - 1))
+>                 ret = -ENOMEM;
+>         else
+> -               io_map_base = base;
+> +               *haddr = io_map_base = base;
+>
+>         mutex_unlock(&kvm_hyp_pgd_mutex);
+>
+> +       return ret;
+> +}
+> +
+> +static int __create_hyp_private_mapping(phys_addr_t phys_addr, size_t size,
+> +                                       unsigned long *haddr,
+> +                                       enum kvm_pgtable_prot prot)
+> +{
+> +       unsigned long addr;
+> +       int ret = 0;
+> +
+> +       if (!kvm_host_owns_hyp_mappings()) {
+> +               addr = kvm_call_hyp_nvhe(__pkvm_create_private_mapping,
+> +                                        phys_addr, size, prot);
+> +               if (IS_ERR_VALUE(addr))
+> +                       return addr;
+> +               *haddr = addr;
+> +
+> +               return 0;
+> +       }
+> +
+> +       size += offset_in_page(phys_addr);
+> +       ret = hyp_alloc_private_va_range(size, &addr);
+>         if (ret)
+> -               goto out;
+> +               return ret;
+>
+> -       ret = __create_hyp_mappings(base, size, phys_addr, prot);
+> +       ret = __create_hyp_mappings(addr, size, phys_addr, prot);
+>         if (ret)
+> -               goto out;
+> +               return ret;
+>
+> -       *haddr = base + offset_in_page(phys_addr);
+> -out:
+> +       *haddr = addr + offset_in_page(phys_addr);
+>         return ret;
+>  }
+>
+> --
+> 2.35.1.723.g4982287a31-goog
+>
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
