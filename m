@@ -2,76 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA366C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 28 Mar 2022 16:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D286AC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 29 Mar 2022 01:13:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30ADD49F4A;
-	Mon, 28 Mar 2022 12:56:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32B784B1C3;
+	Mon, 28 Mar 2022 21:13:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Urc7hM+88ziQ; Mon, 28 Mar 2022 12:56:06 -0400 (EDT)
+	with ESMTP id KLpMJAnaBCCZ; Mon, 28 Mar 2022 21:13:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED7B84B0E6;
-	Mon, 28 Mar 2022 12:56:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DB424B178;
+	Mon, 28 Mar 2022 21:13:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A11124B092
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 12:56:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D6E849EFE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 21:13:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ASi6RAxXMV0v for <kvmarm@lists.cs.columbia.edu>;
- Mon, 28 Mar 2022 12:56:04 -0400 (EDT)
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com
- [209.85.128.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29C9A49F4A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 12:56:04 -0400 (EDT)
-Received: by mail-wm1-f52.google.com with SMTP id
- p12-20020a05600c430c00b0038cbdf52227so8945316wme.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 09:56:04 -0700 (PDT)
+ with ESMTP id PvxPhDvGYTRl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 28 Mar 2022 21:13:10 -0400 (EDT)
+Received: from mail-ot1-f74.google.com (mail-ot1-f74.google.com
+ [209.85.210.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 318E34B119
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 21:13:10 -0400 (EDT)
+Received: by mail-ot1-f74.google.com with SMTP id
+ c1-20020a9d67c1000000b005b2353e2c03so9058170otn.8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 28 Mar 2022 18:13:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:cc;
- bh=wdmr5jjdh07/KzOxKbpgA6wD042XekYuzlBRUsPQIMc=;
- b=UaauX/6NVwjFUGEyL1HMvGum0Lk8XovETWGfLSDc+nQQXnYuentU/sD+L33XyvxUEa
- q0UK5/lZlNjEZC7yY9flxH8l82GFIt113i7maptShsxPgoV2xW4qZli9V1G0qAFKICjO
- 1Bwajkyv9rAFDwmwd3JM3C/Kws8N323Rl/LuO2wZIsrCODv33dfc8xhUOD61xsSLqC1N
- 37ndc5sP+JSX5AL//NH+FhynFK/VyT+NVap3NdVjrEV7HRrz/2QqDXK4baxEs2GauK7Q
- TMJpXN0rAPLxH+/gD7OznB29TpeOv1KJ5lxE1UJyUlYzQwoa2EqrN3P3OSuMyKdyDu7b
- XmhA==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=nYlE+C/axixPppHHbcO/XGK1yVRHkszjXFRKMgmo2rQ=;
+ b=tUZNXLhTPTopRQyZVbL8Vxdk++9/mwdVfpzx2zNYKV1d3E/6Kg6zw6o0PSKaWu26Y1
+ pG1gfCQFJzSZdys9ABwQ1NIBkX62MZJ6XdDGpjd9VvNaS4Pm/4M6RTUzEVwDm4VUEY3c
+ AvbGNQLFPOEUxr2O9hbCT0Y6CXJ9zQykHhFNsZtgolLyid4BWiF7gsm9Mq6N7Oo3XtjT
+ 3m7EebjNmgk1vWU5ojSN1cvxV/nuAyN7B/NiGZ7H6PDfg6IEVoA1zXw3Ru+QOaR+RX7l
+ j280fbEy7glIONhzteHunuyH7rmj9wuQ3Swek9km8eOogW1f+hVDtsHIyG8/Lrc/9uoM
+ ub3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:cc;
- bh=wdmr5jjdh07/KzOxKbpgA6wD042XekYuzlBRUsPQIMc=;
- b=kUl8B+0bJzQWwrNYYyYJ3m+mI4GkTBUkqr4q6NPKmcFZ7lXkWTxX6GohVeKLr5Fer8
- ZyGMCurkmtSiY+go2cku9GARuKTwsKIE8+QrMHTZ+ZG4eAQdSMYqUTwzDgBsCbxcCrYi
- q43pAqYeijwC5p9Wgk7LuPib0VjMu+LnKq3BEvkpuZYKd9daT6ygJvW5Pgote2LF0Yga
- mP9cGCbnPbvUvsKcoEszqt5J56kSdkzLxizFP6/dcHpzVAM1w+/3L1mz5spUlodz8dwD
- nJG7fUf7IbV4w11aPuYY7BaCQS6UrbL0DukyMXffpd783Wgw6x5sJ2ZMZdVBfrTvxiVA
- PyTg==
-X-Gm-Message-State: AOAM5330+WuyMGr/vGK38+NTgriL77P2/CmCDn0MAkOeczSB5hxySNqs
- BobfuxrJbaTlHFyFwynuiTbYKs6a5kllifbesL2lbw==
-X-Received: by 2002:a05:600c:1553:b0:38c:90fb:d3ca with SMTP id
- f19-20020a05600c155300b0038c90fbd3camt105383wmg.158.1648486562719; Mon, 28
- Mar 2022 09:56:02 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220314200148.2695206-1-kaleshsingh@google.com>
-In-Reply-To: <20220314200148.2695206-1-kaleshsingh@google.com>
-From: Kalesh Singh <kaleshsingh@google.com>
-Date: Mon, 28 Mar 2022 09:55:51 -0700
-Message-ID: <CAC_TJvdXaYZcAA0STQkhSo0SLhai-QUrSLmzDMAKH29QJZmZEQ@mail.gmail.com>
-Subject: Re: [PATCH v6 0/8] KVM: arm64: Hypervisor stack enhancements
-Cc: "Cc: Android Kernel" <kernel-team@android.com>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, Will Deacon <will@kernel.org>,
- Peter Collingbourne <pcc@google.com>, Marc Zyngier <maz@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Suren Baghdasaryan <surenb@google.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=nYlE+C/axixPppHHbcO/XGK1yVRHkszjXFRKMgmo2rQ=;
+ b=RnmDYogfDkmmVnrReV/fU0MKjQ+sbG+CReoB1F1Hf08MKbVaY9CTvPDgZ7Rq2KS0An
+ vY5morQqxi6Mah1R8ZnN5e0FtP4ICsTHOqJzQuHVLHe8fsxogdNun4KiZEEYahCz4Xyj
+ 4trAp7wDA5Iz2tIGI8o118sQLU/cOFImEZPQNr8qh2LuG1Zayh4k8TZsRH1nbgeQ/nWW
+ hTocYYKz8m0HetXQyPy79I5xZzxqJml07EjmveNs1egutdFvcu0ji39y3/t0MGAijVk0
+ Vm8P3LzMtDHl+Rs0+sk/fHOM3uK8H4jhA70VcgUIxOU+WUzVJHEaUh7urSUJlG/0cYkB
+ 2mNQ==
+X-Gm-Message-State: AOAM531w1XkEfJ58mFN2IlGX9WFEFYudqIlqZJdCA6GJMyYZ1GDaDCFP
+ zgnsLHrREadidVNPH7+7g5NTKD0/oxCG5H6OArqb6mKHG9AMculVCUo+YWro35akZKZZ7oiXGic
+ zktV4AbjM2zq4WmwmIYWSkpEOe+U0wzoujydpAFYYSZEDa6AYd55/CMvRAhigD5+eFTnQHQ==
+X-Google-Smtp-Source: ABdhPJwwujhcPW9Bu1rOL7Be1SGcb234TZlpdxtAkIVxfUSk/Vnz+sZ0hNqbYylYDqlhN4vDVQTbAJrgTQ8=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a9d:6f07:0:b0:5b2:38e8:41f7 with
+ SMTP id
+ n7-20020a9d6f07000000b005b238e841f7mr113246otq.308.1648516389241; Mon, 28 Mar
+ 2022 18:13:09 -0700 (PDT)
+Date: Tue, 29 Mar 2022 01:12:58 +0000
+Message-Id: <20220329011301.1166265-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1021.g381101b075-goog
+Subject: [PATCH 0/3] KVM: arm64: Limit feature register reads from AArch32
+From: Oliver Upton <oupton@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,108 +84,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Mar 14, 2022 at 1:02 PM Kalesh Singh <kaleshsingh@google.com> wrote:
->
-> Hi all,
->
-> This is v6 of the nVHE hypervisor stack enhancements. Addresses some
-> refactoring/cleanup and documentation improvments from Stephen,
-> and rebased on 5.17-rc8.
+KVM/arm64 does not restrict the guest's view of the AArch32 feature
+registers when read from AArch32. HCR_EL2.TID3 is cleared for AArch32
+guests, meaning that register reads come straight from hardware. This is
+problematic as KVM relies on read_sanitised_ftr_reg() to expose a set of
+features consistent for a particular system.
 
-Friendly ping on this :). I've addressed all feedback received in this
-latest version.
+Appropriate handlers must first be put in place for CP10 and CP15 ID
+register accesses before setting TID3. Rather than exhaustively
+enumerating each of the encodings for CP10 and CP15 registers, take the
+lazy route and aim the register accesses at the AArch64 system register
+table.
 
-Thanks,
-Kalesh
+Patch 1 reroutes the CP15 registers into the AArch64 table, taking care
+to immediately RAZ undefined ranges of registers. This is done to avoid
+possibly conflicting with encodings for future AArch64 registers.
 
->
-> Previous versions can be found at:
-> v5: https://lore.kernel.org/r/20220307184935.1704614-1-kaleshsingh@google.com/
-> v4: https://lore.kernel.org/r/20220225033548.1912117-1-kaleshsingh@google.com/
-> v3: https://lore.kernel.org/r/20220224051439.640768-1-kaleshsingh@google.com/
-> v2: https://lore.kernel.org/r/20220222165212.2005066-1-kaleshsingh@google.com/
-> v1: https://lore.kernel.org/r/20220210224220.4076151-1-kaleshsingh@google.com/
->
-> The previous cover letter has been copied below for convenience.
->
-> Thanks,
-> Kalesh
->
-> -----
->
-> This series is based on 5.17-rc8 and adds the following stack features to
-> the KVM nVHE hypervisor:
->
-> == Hyp Stack Guard Pages ==
->
-> Based on the technique used by arm64 VMAP_STACK to detect overflow.
-> i.e. the stack is aligned such that the 'stack shift' bit of any valid
-> SP is 1. The 'stack shift' bit can be tested in the exception entry to
-> detect overflow without corrupting GPRs.
->
-> == Hyp Stack Unwinder ==
->
-> The unwinding and dumping of the hyp stack is not enabled by default and
-> depends on CONFIG_NVHE_EL2_DEBUG to avoid potential information leaks.
->
-> When CONFIG_NVHE_EL2_DEBUG is enabled the host stage 2 protection is
-> disabled, allowing the host to read the hypervisor stack pages and unwind
-> the stack from EL1. This allows us to print the hypervisor stacktrace
-> before panicking the host; as shown below.
->
-> Example call trace:
->
-> [   98.916444][  T426] kvm [426]: nVHE hyp panic at: [<ffffffc0096156fc>] __kvm_nvhe_overflow_stack+0x8/0x34!
-> [   98.918360][  T426] nVHE HYP call trace:
-> [   98.918692][  T426] kvm [426]: [<ffffffc009615aac>] __kvm_nvhe_cpu_prepare_nvhe_panic_info+0x4c/0x68
-> [   98.919545][  T426] kvm [426]: [<ffffffc0096159a4>] __kvm_nvhe_hyp_panic+0x2c/0xe8
-> [   98.920107][  T426] kvm [426]: [<ffffffc009615ad8>] __kvm_nvhe_hyp_panic_bad_stack+0x10/0x10
-> [   98.920665][  T426] kvm [426]: [<ffffffc009610a4c>] __kvm_nvhe___kvm_hyp_host_vector+0x24c/0x794
-> [   98.921292][  T426] kvm [426]: [<ffffffc009615718>] __kvm_nvhe_overflow_stack+0x24/0x34
-> . . .
->
-> [   98.973382][  T426] kvm [426]: [<ffffffc009615718>] __kvm_nvhe_overflow_stack+0x24/0x34
-> [   98.973816][  T426] kvm [426]: [<ffffffc0096152f4>] __kvm_nvhe___kvm_vcpu_run+0x38/0x438
-> [   98.974255][  T426] kvm [426]: [<ffffffc009616f80>] __kvm_nvhe_handle___kvm_vcpu_run+0x1c4/0x364
-> [   98.974719][  T426] kvm [426]: [<ffffffc009616928>] __kvm_nvhe_handle_trap+0xa8/0x130
-> [   98.975152][  T426] kvm [426]: [<ffffffc009610064>] __kvm_nvhe___host_exit+0x64/0x64
-> [   98.975588][  T426] ---- end of nVHE HYP call trace ----
->
->
->
->
-> Kalesh Singh (8):
->   KVM: arm64: Introduce hyp_alloc_private_va_range()
->   KVM: arm64: Introduce pkvm_alloc_private_va_range()
->   KVM: arm64: Add guard pages for KVM nVHE hypervisor stack
->   KVM: arm64: Add guard pages for pKVM (protected nVHE) hypervisor stack
->   KVM: arm64: Detect and handle hypervisor stack overflows
->   KVM: arm64: Add hypervisor overflow stack
->   KVM: arm64: Unwind and dump nVHE HYP stacktrace
->   KVM: arm64: Symbolize the nVHE HYP backtrace
->
->  arch/arm64/include/asm/kvm_asm.h     |  21 +++
->  arch/arm64/include/asm/kvm_mmu.h     |   4 +
->  arch/arm64/include/asm/stacktrace.h  |  12 ++
->  arch/arm64/kernel/stacktrace.c       | 210 ++++++++++++++++++++++++---
->  arch/arm64/kvm/Kconfig               |   5 +-
->  arch/arm64/kvm/arm.c                 |  41 +++++-
->  arch/arm64/kvm/handle_exit.c         |  16 +-
->  arch/arm64/kvm/hyp/include/nvhe/mm.h |   6 +-
->  arch/arm64/kvm/hyp/nvhe/host.S       |  29 ++++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c   |  18 ++-
->  arch/arm64/kvm/hyp/nvhe/mm.c         |  78 ++++++----
->  arch/arm64/kvm/hyp/nvhe/setup.c      |  31 +++-
->  arch/arm64/kvm/hyp/nvhe/switch.c     |  30 +++-
->  arch/arm64/kvm/mmu.c                 |  70 ++++++---
->  scripts/kallsyms.c                   |   2 +-
->  15 files changed, 477 insertions(+), 96 deletions(-)
->
->
-> base-commit: 09688c0166e76ce2fb85e86b9d99be8b0084cdf9
-> --
-> 2.35.1.723.g4982287a31-goog
->
+Patch 2 installs an exit handler for the CP10 ID registers and also
+relies on the general AArch64 register handler to implement reads.
+
+Finally, patch 3 actually sets TID3 for AArch32 guests, providing
+known-safe values for feature register accesses.
+
+I'll leave it as an exercise for the reader to decide whether or not I'm
+being _too_ lazy here ;-)
+
+Series applies cleanly to kvmarm/fixes at commit:
+
+  8872d9b3e35a ("KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler")
+
+Tested with AArch32 kvm-unit-tests and booting an AArch32 debian image
+on a Raspberry Pi 4. Nothing seems to have gone up in smoke yet...
+
+Oliver Upton (3):
+  KVM: arm64: Wire up CP15 feature registers to their AArch64
+    equivalents
+  KVM: arm64: Plumb cp10 ID traps through the AArch64 sysreg handler
+  KVM: arm64: Start trapping ID registers for 32 bit guests
+
+ arch/arm64/include/asm/kvm_emulate.h |   8 --
+ arch/arm64/include/asm/kvm_host.h    |   1 +
+ arch/arm64/kvm/handle_exit.c         |   1 +
+ arch/arm64/kvm/sys_regs.c            | 128 +++++++++++++++++++++++++++
+ 4 files changed, 130 insertions(+), 8 deletions(-)
+
+-- 
+2.35.1.1021.g381101b075-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
