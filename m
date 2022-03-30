@@ -2,88 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A7AC433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Mar 2022 14:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B50C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Mar 2022 18:30:33 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A36134B0F7;
-	Wed, 30 Mar 2022 10:28:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 422E940B03;
+	Wed, 30 Mar 2022 14:30:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VFdEZLsJz3Ot; Wed, 30 Mar 2022 10:28:20 -0400 (EDT)
+	with ESMTP id rW0xHoSj-Ilt; Wed, 30 Mar 2022 14:30:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 724B24B1EF;
-	Wed, 30 Mar 2022 10:28:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E338449EBC;
+	Wed, 30 Mar 2022 14:30:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92E0B4B14C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 10:28:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09BD5408C1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 14:30:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4RBWEYeUDdS8 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Mar 2022 10:28:17 -0400 (EDT)
+ with ESMTP id d6Uk1Rg-BWca for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Mar 2022 14:30:29 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 853D34B0F7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 10:28:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A92A74087B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 14:30:29 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1648650497;
+ s=mimecast20190719; t=1648665029;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=0MdzdhvbcfTH7B0x9nhddVD3XG1EagzEGRM2HvvMoaM=;
- b=URkSKNdrjdGvwpy+7NhX/C2hgs298shyXZ1qiTMwEoKzUTpc5vFGUSmW6+Pl5Bx+QTGSwc
- C0MCHhfzu79GFwJLKwsx2beB7hsnmLnnXn2q60CokUrXTKgkbQiLqP+2w2/LSTH75JuGEd
- tAJmfghaPXFaR+L8dSjVo4q/NIcxhm8=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=RZbGTsE6fj+tWEXGzmO8DRMy8Cnx5er20TMqeDcb2Ps=;
+ b=DNf8MTKDF/DYRQViU+G0054tVcBrV29xlB5AVaRq1F6oTI5H9NslWB3riFQWDbjAS9ChsF
+ 3YgfJWlthEoAL7MyomwYm5byiLkqS1sfYgpQ/9yb8IH/2Xkfp8R4QXZ2Gs52CDLPinnBdB
+ NQbmvixveVtJbdm0WnOxQhfWrpicavU=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-629-U059LcO_M0WGdo4NLXe9dg-1; Wed, 30 Mar 2022 10:28:13 -0400
-X-MC-Unique: U059LcO_M0WGdo4NLXe9dg-1
-Received: by mail-qv1-f71.google.com with SMTP id
- ba7-20020ad45527000000b0044105fb3d5fso16183655qvb.8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 07:28:13 -0700 (PDT)
+ us-mta-211-fZIUPFY-OsmuaSYzVwVCAg-1; Wed, 30 Mar 2022 14:30:27 -0400
+X-MC-Unique: fZIUPFY-OsmuaSYzVwVCAg-1
+Received: by mail-qv1-f70.google.com with SMTP id
+ k20-20020ad44714000000b00440fd2c4a0aso16675229qvz.20
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 11:30:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=0MdzdhvbcfTH7B0x9nhddVD3XG1EagzEGRM2HvvMoaM=;
- b=lXLJFwK+cwg/3Bz5QGqXMG6PoDFcEplgDBRFz1Z67iDCCuJWtbqRuqT2zdLESc7UVQ
- aZMD/YdSEy2Vu8glB+eyqGxJ3rmC6ECXX+v7vTUaYs5E8w/HymWoJZUT14duhcXe/rvQ
- c3wehGgskz4R8O0zH6xGSBd198ukY8TId8XGcPZmPaOnsyapUXUa8lan1jGmjrHDBfXx
- y7R2hcb6lyfgRFD6ux+RymIg6kBKk04xwywirjXgcwRFc6Kr3DClki54Bip3MYrUtY3J
- 1K3c81+352mG08OncS4LbMGV5d3K48/+XidaU7quSgUHQxZiCpeTVJIx1QVMupSqDGDN
- EghQ==
-X-Gm-Message-State: AOAM533j++cCDhwG67RMVmEMH01lVK6PrAtI3nAUzJ/OOpCHCCZbqje6
- qk5h5v1qfw13pdf4lvv3NLE0Q7tos+46Uq7xRIaAE/Fs2uedTZd+E5Sj/WoNX3GhjrlFTQnwrip
- ljKWyEi+daHeagvigH4pQp0Q2
-X-Received: by 2002:ac8:580d:0:b0:2e1:c641:8c21 with SMTP id
- g13-20020ac8580d000000b002e1c6418c21mr32693449qtg.677.1648650492838; 
- Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxj9mfWzYsrvAU4I7K8iuYgWUFquDhfKr86ywKhvihB398kljxjsCy0kviStlHnrVX/SZQbLA==
-X-Received: by 2002:ac8:580d:0:b0:2e1:c641:8c21 with SMTP id
- g13-20020ac8580d000000b002e1c6418c21mr32693412qtg.677.1648650492602; 
- Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
+ bh=RZbGTsE6fj+tWEXGzmO8DRMy8Cnx5er20TMqeDcb2Ps=;
+ b=d692CvVwzWb8EneHg7hXHwD/X+DDpssuZTXohWM4GV5eLl4ONW/8WplqeCUZDmBpun
+ 7XjjuGjGXZSmuHLrktL62nkAzYnIedNbGphPo4gb4VccXoM9KRWx+XjjL/cIc/kFApnh
+ HAg24K+9kvdNBlUBsjdPT/yD85Ou8J6L1gavXyGnBFYBYPHaKBxXI9sJo7wWRV8akLCb
+ EJ2H0fyrHq+SctL65WGJggPL6xu6tBxTlf/ezhK4irBr7oJPxMed+axH9kD13Me1wmAd
+ WVGb9OHSSCxSMCwIq7MNhUu39u6qD3uXG6p5IQiPRL8FVxZXkwPUY2UWJyWWXJ0e+7rW
+ omOw==
+X-Gm-Message-State: AOAM531t+b1OW/uh9IlSIYh2lZkL5qDICnueUBORRRvQbcNbtpdgoLO2
+ /qB4Lr5L/x7cnZMBbzoFt02KZ2mX/tv8mc5pZ+3sY4fxIMP21nMK3NYn3gQMAsPEaWFVQmZuH4H
+ 8kbObu01UfHhatmkK3TlokiL5
+X-Received: by 2002:a37:414c:0:b0:67e:6d68:c585 with SMTP id
+ o73-20020a37414c000000b0067e6d68c585mr756748qka.196.1648665026790; 
+ Wed, 30 Mar 2022 11:30:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxV7GTt34CXdG/qDCogIthPSHMHYYlDRsKEVG6uvoZamRv82rxB1y8ernA5KphBy4D/a0zmOw==
+X-Received: by 2002:a37:414c:0:b0:67e:6d68:c585 with SMTP id
+ o73-20020a37414c000000b0067e6d68c585mr756718qka.196.1648665026496; 
+ Wed, 30 Mar 2022 11:30:26 -0700 (PDT)
 Received: from xz-m1.local
  (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
  by smtp.gmail.com with ESMTPSA id
- d12-20020a05620a158c00b00648ec3fcbdfsm10572195qkk.72.2022.03.30.07.28.11
+ p13-20020a05622a048d00b002e1ce0c627csm18698113qtx.58.2022.03.30.11.30.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
-Date: Wed, 30 Mar 2022 10:28:10 -0400
+ Wed, 30 Mar 2022 11:30:26 -0700 (PDT)
+Date: Wed, 30 Mar 2022 14:30:24 -0400
 From: Peter Xu <peterx@redhat.com>
 To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v2 05/26] KVM: x86/mmu: Rename shadow MMU functions that
- deal with shadow pages
-Message-ID: <YkRo+rJwYJoOmXmW@xz-m1.local>
+Subject: Re: [PATCH v2 16/26] KVM: x86/mmu: Cache the access bits of shadowed
+ translations
+Message-ID: <YkShwFaRqlQpyL87@xz-m1.local>
 References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-6-dmatlack@google.com>
- <YjBTtz6wo/zQEHCv@xz-m1.local>
- <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
+ <20220311002528.2230172-17-dmatlack@google.com>
+ <YjGgjTnP/9sG8L+2@xz-m1.local>
+ <CALzav=fZQYC7YyTbZqbkYTYVUXCq4skc6pkQ2S59BoSxbkKUhw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
+In-Reply-To: <CALzav=fZQYC7YyTbZqbkYTYVUXCq4skc6pkQ2S59BoSxbkKUhw@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -118,29 +118,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 22, 2022 at 02:35:25PM -0700, David Matlack wrote:
-> On Tue, Mar 15, 2022 at 1:52 AM Peter Xu <peterx@redhat.com> wrote:
+On Tue, Mar 22, 2022 at 03:51:54PM -0700, David Matlack wrote:
+> On Wed, Mar 16, 2022 at 1:32 AM Peter Xu <peterx@redhat.com> wrote:
 > >
-> > On Fri, Mar 11, 2022 at 12:25:07AM +0000, David Matlack wrote:
-> > > Rename 3 functions:
+> > On Fri, Mar 11, 2022 at 12:25:18AM +0000, David Matlack wrote:
+> > > In order to split a huge page we need to know what access bits to assign
+> > > to the role of the new child page table. This can't be easily derived
+> > > from the huge page SPTE itself since KVM applies its own access policies
+> > > on top, such as for HugePage NX.
 > > >
-> > >   kvm_mmu_get_page()   -> kvm_mmu_get_shadow_page()
-> > >   kvm_mmu_alloc_page() -> kvm_mmu_alloc_shadow_page()
-> > >   kvm_mmu_free_page()  -> kvm_mmu_free_shadow_page()
-> > >
-> > > This change makes it clear that these functions deal with shadow pages
-> > > rather than struct pages. Prefer "shadow_page" over the shorter "sp"
-> > > since these are core routines.
-> > >
-> > > Signed-off-by: David Matlack <dmatlack@google.com>
+> > > We could walk the guest page tables to determine the correct access
+> > > bits, but that is difficult to plumb outside of a vCPU fault context.
+> > > Instead, we can store the original access bits for each leaf SPTE
+> > > alongside the GFN in the gfns array. The access bits only take up 3
+> > > bits, which leaves 61 bits left over for gfns, which is more than
+> > > enough. So this change does not require any additional memory.
 > >
-> > Acked-by: Peter Xu <peterx@redhat.com>
+> > I have a pure question on why eager page split needs to worry on hugepage
+> > nx..
+> >
+> > IIUC that was about forbidden huge page being mapped as executable.  So
+> > afaiu the only missing bit that could happen if we copy over the huge page
+> > ptes is the executable bit.
+> >
+> > But then?  I think we could get a page fault on fault->exec==true on the
+> > split small page (because when we copy over it's cleared, even though the
+> > page can actually be executable), but it should be well resolved right
+> > after that small page fault.
+> >
+> > The thing is IIUC this is a very rare case, IOW, it should mostly not
+> > happen in 99% of the use case?  And there's a slight penalty when it
+> > happens, but only perf-wise.
+> >
+> > As I'm not really fluent with the code base, perhaps I missed something?
 > 
-> What's the reason to use Acked-by for this patch but Reviewed-by for others?
+> You're right that we could get away with not knowing the shadowed
+> access permissions to assign to the child SPTEs when splitting a huge
+> SPTE. We could just copy the huge SPTE access permissions and then let
+> the execute bit be repaired on fault (although those faults would be a
+> performance cost).
+> 
+> But the access permissions are also needed to lookup an existing
+> shadow page (or create a new shadow page) to use to split the huge
+> page. For example, let's say we are going to split a huge page that
+> does not have execute permissions enabled. That could be because NX
+> HugePages are enabled or because we are shadowing a guest translation
+> that does not allow execution (or both). We wouldn't want to propagate
+> the no-execute permission into the child SP role.access if the
+> shadowed translation really does allow execution (and vice versa).
 
-A weak version of r-b?  I normally don't do the rename when necessary (and
-I'm pretty poor at naming..), in this case I don't have a strong opinion.
-I should have left nothing then it's less confusing. :)
+Then the follow up (pure) question is what will happen if we simply
+propagate the no-exec permission into the child SP?
+
+I think that only happens with direct sptes where guest used huge pages
+because that's where the shadow page will be huge, so IIUC that's checked
+here when the small page fault triggers:
+
+static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+				   unsigned direct_access)
+{
+	if (is_shadow_present_pte(*sptep) && !is_large_pte(*sptep)) {
+		struct kvm_mmu_page *child;
+
+		/*
+		 * For the direct sp, if the guest pte's dirty bit
+		 * changed form clean to dirty, it will corrupt the
+		 * sp's access: allow writable in the read-only sp,
+		 * so we should update the spte at this point to get
+		 * a new sp with the correct access.
+		 */
+		child = to_shadow_page(*sptep & PT64_BASE_ADDR_MASK);
+		if (child->role.access == direct_access)
+			return;
+
+		drop_parent_pte(child, sptep);
+		kvm_flush_remote_tlbs_with_address(vcpu->kvm, child->gfn, 1);
+	}
+}
+
+Due to missing EXEC the role.access check will not match with direct
+access, which is the guest pgtable value which has EXEC set.  Then IIUC
+we'll simply drop the no-exec SP and replace it with a new one with exec
+perm.  The question is, would that untimately work too?
+
+Even if that works, I agree this sounds tricky because we're potentially
+caching fake sp.role conditionally and it seems we never do that before.
+It's just that the other option that you proposed here seems to add other
+way of complexity on caching spte permission information while kvm doesn't
+do either before.  IMHO we need to see which is the best trade off.
+
+I could have missed something else, though.
+
+Thanks,
 
 -- 
 Peter Xu
