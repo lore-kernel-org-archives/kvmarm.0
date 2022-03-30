@@ -2,88 +2,88 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 129D9C433FE
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Mar 2022 14:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A7AC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 30 Mar 2022 14:28:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 788BC4B1FC;
-	Wed, 30 Mar 2022 10:25:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A36134B0F7;
+	Wed, 30 Mar 2022 10:28:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YzI7nhuksjtL; Wed, 30 Mar 2022 10:25:57 -0400 (EDT)
+	with ESMTP id VFdEZLsJz3Ot; Wed, 30 Mar 2022 10:28:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A1B14B14C;
-	Wed, 30 Mar 2022 10:25:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 724B24B1EF;
+	Wed, 30 Mar 2022 10:28:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D59CC4B0F7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 10:25:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92E0B4B14C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 10:28:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K3KtpEkzNXsB for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Mar 2022 10:25:54 -0400 (EDT)
+ with ESMTP id 4RBWEYeUDdS8 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Mar 2022 10:28:17 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 857734B0EF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 10:25:54 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 853D34B0F7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 10:28:17 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1648650354;
+ s=mimecast20190719; t=1648650497;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=zvLJ8hpn4uLcUl3yh6ObtYr+cK026HnJjPhO9peO7nY=;
- b=FvBufFmGwYrPHrWsfiSDhcVGYVUUJMRxKvu/gewthwFfrfNwqk4rkTMqkixfU+SaL7gyZe
- ZOcVRTzfpcgLnteUV2/f6Uo/g1A6oPWZQEq7IrUbmF6Kz9vgU6F1EDoEwCxXM6fTjtLdGv
- A3Wd/bHHDXgUp+CV+awx4fZORqBFIY0=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=0MdzdhvbcfTH7B0x9nhddVD3XG1EagzEGRM2HvvMoaM=;
+ b=URkSKNdrjdGvwpy+7NhX/C2hgs298shyXZ1qiTMwEoKzUTpc5vFGUSmW6+Pl5Bx+QTGSwc
+ C0MCHhfzu79GFwJLKwsx2beB7hsnmLnnXn2q60CokUrXTKgkbQiLqP+2w2/LSTH75JuGEd
+ tAJmfghaPXFaR+L8dSjVo4q/NIcxhm8=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-142-w6iACVSdO7GRwkfX_m2SOg-1; Wed, 30 Mar 2022 10:25:52 -0400
-X-MC-Unique: w6iACVSdO7GRwkfX_m2SOg-1
-Received: by mail-qt1-f198.google.com with SMTP id
- u8-20020ac858c8000000b002e1b3ceb167so17515723qta.10
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 07:25:52 -0700 (PDT)
+ us-mta-629-U059LcO_M0WGdo4NLXe9dg-1; Wed, 30 Mar 2022 10:28:13 -0400
+X-MC-Unique: U059LcO_M0WGdo4NLXe9dg-1
+Received: by mail-qv1-f71.google.com with SMTP id
+ ba7-20020ad45527000000b0044105fb3d5fso16183655qvb.8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 07:28:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=zvLJ8hpn4uLcUl3yh6ObtYr+cK026HnJjPhO9peO7nY=;
- b=j5VRSwtVV7bYaMeVLI50IZUenQ6m2AE7tcbLPcVimgZhNSvkV3Mlz1YEUynDVeU3aV
- oTIsINWa4sUo+oL7GG+vOl27T8Ks01ZNvf8qOCZH7tpRF+dgP6aIiBdASQhfjGKHsajV
- BA2+2dUSdL6zUQTEfD55i+BrRiUgD8blqEzmhJRNhCUmoFBPstJW2Kh1XjIPrM/cssJq
- wvWopLjf46Q7ynYSWe38EEBnoP3d6pV1LEaxUvZXtr2GtgDej1JooTE7d6uJQCoAgWw0
- pyfV3tF3WC7CcZlEHnOuFZsx9BVsDZXGNoI/w5mY1X5E86jCbD/UddHvKI/vKKh7DyUQ
- o9DA==
-X-Gm-Message-State: AOAM530kPV2MjnGVIAysOwt6nGz1EtcayYJYpD6o3x+t3bNGr6a7vBQI
- /TOxpoGR7WfaJSLb86D9twVAXpN75FQqMmG7+34zvH38sh8W/ID3wHX7OgA/YRlziZSsU5TNs+v
- JURa9/osksCcn3G4oypySUo2p
-X-Received: by 2002:a05:620a:d8b:b0:67b:1371:1796 with SMTP id
- q11-20020a05620a0d8b00b0067b13711796mr23958849qkl.415.1648650351531; 
- Wed, 30 Mar 2022 07:25:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw/r6U4mfqyrEs1oP/UnFbQv8EJ+XyurLMqYNaOVonYcHLEFbhhLYUdoEZC2YnVcD0Y5xCzUQ==
-X-Received: by 2002:a05:620a:d8b:b0:67b:1371:1796 with SMTP id
- q11-20020a05620a0d8b00b0067b13711796mr23958817qkl.415.1648650351226; 
- Wed, 30 Mar 2022 07:25:51 -0700 (PDT)
+ bh=0MdzdhvbcfTH7B0x9nhddVD3XG1EagzEGRM2HvvMoaM=;
+ b=lXLJFwK+cwg/3Bz5QGqXMG6PoDFcEplgDBRFz1Z67iDCCuJWtbqRuqT2zdLESc7UVQ
+ aZMD/YdSEy2Vu8glB+eyqGxJ3rmC6ECXX+v7vTUaYs5E8w/HymWoJZUT14duhcXe/rvQ
+ c3wehGgskz4R8O0zH6xGSBd198ukY8TId8XGcPZmPaOnsyapUXUa8lan1jGmjrHDBfXx
+ y7R2hcb6lyfgRFD6ux+RymIg6kBKk04xwywirjXgcwRFc6Kr3DClki54Bip3MYrUtY3J
+ 1K3c81+352mG08OncS4LbMGV5d3K48/+XidaU7quSgUHQxZiCpeTVJIx1QVMupSqDGDN
+ EghQ==
+X-Gm-Message-State: AOAM533j++cCDhwG67RMVmEMH01lVK6PrAtI3nAUzJ/OOpCHCCZbqje6
+ qk5h5v1qfw13pdf4lvv3NLE0Q7tos+46Uq7xRIaAE/Fs2uedTZd+E5Sj/WoNX3GhjrlFTQnwrip
+ ljKWyEi+daHeagvigH4pQp0Q2
+X-Received: by 2002:ac8:580d:0:b0:2e1:c641:8c21 with SMTP id
+ g13-20020ac8580d000000b002e1c6418c21mr32693449qtg.677.1648650492838; 
+ Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxj9mfWzYsrvAU4I7K8iuYgWUFquDhfKr86ywKhvihB398kljxjsCy0kviStlHnrVX/SZQbLA==
+X-Received: by 2002:ac8:580d:0:b0:2e1:c641:8c21 with SMTP id
+ g13-20020ac8580d000000b002e1c6418c21mr32693412qtg.677.1648650492602; 
+ Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
 Received: from xz-m1.local
  (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
  by smtp.gmail.com with ESMTPSA id
- f34-20020a05622a1a2200b002e1a35ed1desm18226730qtb.94.2022.03.30.07.25.49
+ d12-20020a05620a158c00b00648ec3fcbdfsm10572195qkk.72.2022.03.30.07.28.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 30 Mar 2022 07:25:50 -0700 (PDT)
-Date: Wed, 30 Mar 2022 10:25:49 -0400
+ Wed, 30 Mar 2022 07:28:12 -0700 (PDT)
+Date: Wed, 30 Mar 2022 10:28:10 -0400
 From: Peter Xu <peterx@redhat.com>
 To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v2 03/26] KVM: x86/mmu: Derive shadow MMU page role from
- parent
-Message-ID: <YkRobUbpk1bM2zBQ@xz-m1.local>
+Subject: Re: [PATCH v2 05/26] KVM: x86/mmu: Rename shadow MMU functions that
+ deal with shadow pages
+Message-ID: <YkRo+rJwYJoOmXmW@xz-m1.local>
 References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-4-dmatlack@google.com>
- <YjBLFZWtdfwhNosG@xz-m1.local>
- <CALzav=dAW999FKid08Ry0YxPA+3Dt8HERrbn6YMkAnk0h+4h_A@mail.gmail.com>
+ <20220311002528.2230172-6-dmatlack@google.com>
+ <YjBTtz6wo/zQEHCv@xz-m1.local>
+ <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CALzav=dAW999FKid08Ry0YxPA+3Dt8HERrbn6YMkAnk0h+4h_A@mail.gmail.com>
+In-Reply-To: <CALzav=c0ccztDULiVMwR4K20iYc0WH53ApeOCorhjKwaMNL5Sg@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -118,49 +118,29 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 22, 2022 at 11:30:07AM -0700, David Matlack wrote:
-> > > +static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
-> > > +{
-> > > +     struct kvm_mmu_page *parent_sp = sptep_to_sp(sptep);
-> > > +     union kvm_mmu_page_role role;
-> > > +
-> > > +     role = parent_sp->role;
-> > > +     role.level--;
-> > > +     role.access = access;
-> > > +     role.direct = direct;
-> > > +
-> > > +     /*
-> > > +      * If the guest has 4-byte PTEs then that means it's using 32-bit,
-> > > +      * 2-level, non-PAE paging. KVM shadows such guests using 4 PAE page
-> > > +      * directories, each mapping 1/4 of the guest's linear address space
-> > > +      * (1GiB). The shadow pages for those 4 page directories are
-> > > +      * pre-allocated and assigned a separate quadrant in their role.
-> > > +      *
-> > > +      * Since we are allocating a child shadow page and there are only 2
-> > > +      * levels, this must be a PG_LEVEL_4K shadow page. Here the quadrant
-> > > +      * will either be 0 or 1 because it maps 1/2 of the address space mapped
-> > > +      * by the guest's PG_LEVEL_4K page table (or 4MiB huge page) that it
-> > > +      * is shadowing. In this case, the quadrant can be derived by the index
-> > > +      * of the SPTE that points to the new child shadow page in the page
-> > > +      * directory (parent_sp). Specifically, every 2 SPTEs in parent_sp
-> > > +      * shadow one half of a guest's page table (or 4MiB huge page) so the
-> > > +      * quadrant is just the parity of the index of the SPTE.
-> > > +      */
-> > > +     if (role.has_4_byte_gpte) {
-> > > +             BUG_ON(role.level != PG_LEVEL_4K);
-> > > +             role.quadrant = (sptep - parent_sp->spt) % 2;
-> > > +     }
+On Tue, Mar 22, 2022 at 02:35:25PM -0700, David Matlack wrote:
+> On Tue, Mar 15, 2022 at 1:52 AM Peter Xu <peterx@redhat.com> wrote:
 > >
-> > This made me wonder whether role.quadrant can be dropped, because it seems
-> > it can be calculated out of the box with has_4_byte_gpte, level and spte
-> > offset.  I could have missed something, though..
+> > On Fri, Mar 11, 2022 at 12:25:07AM +0000, David Matlack wrote:
+> > > Rename 3 functions:
+> > >
+> > >   kvm_mmu_get_page()   -> kvm_mmu_get_shadow_page()
+> > >   kvm_mmu_alloc_page() -> kvm_mmu_alloc_shadow_page()
+> > >   kvm_mmu_free_page()  -> kvm_mmu_free_shadow_page()
+> > >
+> > > This change makes it clear that these functions deal with shadow pages
+> > > rather than struct pages. Prefer "shadow_page" over the shorter "sp"
+> > > since these are core routines.
+> > >
+> > > Signed-off-by: David Matlack <dmatlack@google.com>
+> >
+> > Acked-by: Peter Xu <peterx@redhat.com>
 > 
-> I think you're right that we could compute it on-the-fly. But it'd be
-> non-trivial to remove since it's currently used to ensure the sp->role
-> and sp->gfn uniquely identifies each shadow page (e.g. when checking
-> for collisions in the mmu_page_hash).
+> What's the reason to use Acked-by for this patch but Reviewed-by for others?
 
-Makes sense.
+A weak version of r-b?  I normally don't do the rename when necessary (and
+I'm pretty poor at naming..), in this case I don't have a strong opinion.
+I should have left nothing then it's less confusing. :)
 
 -- 
 Peter Xu
