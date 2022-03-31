@@ -2,106 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 533DDC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 30 Mar 2022 18:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD2FAC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 31 Mar 2022 05:45:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A813049DED;
-	Wed, 30 Mar 2022 14:34:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D75A4B224;
+	Thu, 31 Mar 2022 01:45:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HGOLrHw0pm+f; Wed, 30 Mar 2022 14:34:28 -0400 (EDT)
+	with ESMTP id rU2fXdemlIQ2; Thu, 31 Mar 2022 01:45:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A54D49EB1;
-	Wed, 30 Mar 2022 14:34:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 133F34B1C0;
+	Thu, 31 Mar 2022 01:45:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72BAB49E49
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 14:34:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BABA4B105
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 01:45:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TRaN3jCMNbOH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Mar 2022 14:34:26 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCDF049DED
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 14:34:25 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1648665265;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=BO423QJpHjYuJkP0ZfVrkV5p4JcZ6+8e4Hhk2wmOLQ4=;
- b=irXBaQGlWjn8xxvUtHFR1Nx1ZqBp5AO3u9OgTUkkmW7UeQgaMNZvhYdHcAve+QWmVTpugk
- VLgpjhD1JgBNdSAK+Qc35RNbnZIVQaKO/CUa5P4MAKYXu2fZQvqA+qbr8fQfKE8yhyRW6j
- sk6YS/Yx0A7PNpOmsmU262X30YSsuuw=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-597-nNP6-NhaMEGCD_3hUv8XVw-1; Wed, 30 Mar 2022 14:34:24 -0400
-X-MC-Unique: nNP6-NhaMEGCD_3hUv8XVw-1
-Received: by mail-qv1-f71.google.com with SMTP id
- kj4-20020a056214528400b0044399a9bb4cso111770qvb.15
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 11:34:24 -0700 (PDT)
+ with ESMTP id 9Q-C3mNPPHCC for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Mar 2022 01:45:52 -0400 (EDT)
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com
+ [209.85.216.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 680F14B0FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 01:45:52 -0400 (EDT)
+Received: by mail-pj1-f52.google.com with SMTP id
+ gp15-20020a17090adf0f00b001c7cd11b0b3so1633368pjb.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2022 22:45:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=3CahhRbHJliYCk8SCDDE9S8QhZBX4JDzO4bMq29WbPA=;
+ b=DU1PRXajt9xwfySAfcfZDJAERfhEW5QUfqxmSWYqAe8ZqnbjXoU7T2y+cgjV03qCMI
+ rOYQYaW0AmJDCDyzXzZEdGViZT3wYZxAp/nKOZ3hxuVIjfjltg5pIBj2CkhbJCRyOubT
+ skipLBveK+Sq1QT60UKZh2/thi+U/sxFIfTTPhExIDyf6+gV07F3rZT16lhchjVO5ALC
+ CFsr+AOZ7A6WKM8WQ+GCO8YM3P2JV3EeAL2zE7q6KcfBn/gno1I5TakOH2tUDCdMuFwY
+ e3yL5g6+UoCGwO9sLnXj/JAQNNtHHbr1h6/uSBNcmKM48ajuRI6gdm4Lm/M+w6fdEV2X
+ Xntw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=BO423QJpHjYuJkP0ZfVrkV5p4JcZ6+8e4Hhk2wmOLQ4=;
- b=2U7ny4zCAWbbDx9HVg8of/fL6ZZmNwGwxu2Gmu50zwiKCCkVLWAYtkCRNcPCZBwOWY
- 3sg3QOysm7NLBAc3r56Mvivl7B3a/RGZ4HhYmD+4xc4jJq80pjuJPqebivZxdBp3TI67
- p/NptY/SCm5GMIYMEaVYgj4TJq43ge8Tvvhn3NH8uoKYboQRC8d4eIbRUzSzrUKPP6Qh
- ZLqMIFOqnuEjH9WjT9iBKb+g+e3GUiDW7bSL0i+lm8MkgcCnFmc7xDtfvBqg6XwG/szW
- Dv9jVZ24wZXdPIkwGWS6t7sjQGD9eAz9PdSI8uSx0/LfrnUAW7nwC2wZ2474rnvxdXwB
- Jr1g==
-X-Gm-Message-State: AOAM531CDAwXjUHNSEKEyc2aMy+bWLJoqeSxonxdJEdQBHbBWt1zkqRR
- OWfjlE5wPEsKMLeCs4B6Q/HCMLrHrAOBsZ2Izzi3Y2AhDe+ryH8UNPZUiFt6ve5G5XEdE9d5+VH
- Lu6zTLQJxU9xPARtawJ1Uy4JB
-X-Received: by 2002:a05:6214:52:b0:440:f824:a7f3 with SMTP id
- c18-20020a056214005200b00440f824a7f3mr680775qvr.125.1648665263566; 
- Wed, 30 Mar 2022 11:34:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwpEYagEUKrFreUNZJWPbgOd2iyA4mWjJAcuNj/S06/ZmWXmhH8bpHqRFw8Cg5TxB9Aa+BVhQ==
-X-Received: by 2002:a05:6214:52:b0:440:f824:a7f3 with SMTP id
- c18-20020a056214005200b00440f824a7f3mr680755qvr.125.1648665263302; 
- Wed, 30 Mar 2022 11:34:23 -0700 (PDT)
-Received: from xz-m1.local
- (cpec09435e3e0ee-cmc09435e3e0ec.cpe.net.cable.rogers.com. [99.241.198.116])
- by smtp.gmail.com with ESMTPSA id
- m14-20020a05622a054e00b002e2072cffe6sm17042300qtx.5.2022.03.30.11.34.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 30 Mar 2022 11:34:23 -0700 (PDT)
-Date: Wed, 30 Mar 2022 14:34:21 -0400
-From: Peter Xu <peterx@redhat.com>
-To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v2 20/26] KVM: x86/mmu: Extend Eager Page Splitting to
- the shadow MMU
-Message-ID: <YkSirYT6s8YtUr4w@xz-m1.local>
-References: <20220311002528.2230172-1-dmatlack@google.com>
- <20220311002528.2230172-21-dmatlack@google.com>
- <YjG7Zh4zwTDsO3L1@xz-m1.local>
- <CALzav=fRFzbGEVhdMSwhX1Gs1++DGW6MOWvKzeQ-RTtLsus=SQ@mail.gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=3CahhRbHJliYCk8SCDDE9S8QhZBX4JDzO4bMq29WbPA=;
+ b=G0+LyYEanyGcaClgZZ/ybZliH3XzXHWUYiqjGk3GAJuFJVfEoYYJh6pHgw2wPlsJ5I
+ T9LiANa4PQsUss3wFh1Hi3B1iq2qwc9sVjhO+h3sENbB2gDZQ2esVTACDhzSR+zdHs8W
+ ql7WtnukE1FFArb85Y3t6KlkNZ4E7O+RCKQ5Qd+Z4br6IMYYm+qgHa3VUNcP4/Hc9Vqa
+ eDAHAZEcWEKyj7Ui0FKXgI7dhvQPg1140hpBsmSXrOhDEGcsosUKP/bBzaIhUBDJyMb8
+ qE1boXCHSyBZb/6zs+xyT0XvOZvT2m3iNpJg1WMLA61/BsqZamPRz+aVCG46YJkkHdTS
+ T3xA==
+X-Gm-Message-State: AOAM5335R6GVsRiXxehbrtuuIe+5EBuWlLUwoYYl93nR2Eox8fFWVA4t
+ 1MsILkvmmzMzbMzBlFK+/Ldb1yDyzTRCNpF5ajVeXA==
+X-Google-Smtp-Source: ABdhPJwWSAFR9Xjp4XYSMhEU8GleXUItke2DRjJSACYT/izT484PG4Cixo6aO3WMmw4+zkFkm/aKPwA4OBzo/q5yowA=
+X-Received: by 2002:a17:902:da88:b0:156:2b13:81c5 with SMTP id
+ j8-20020a170902da8800b001562b1381c5mr3690705plx.138.1648705551272; Wed, 30
+ Mar 2022 22:45:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CALzav=fRFzbGEVhdMSwhX1Gs1++DGW6MOWvKzeQ-RTtLsus=SQ@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+References: <20220329011301.1166265-1-oupton@google.com>
+ <20220329011301.1166265-2-oupton@google.com>
+In-Reply-To: <20220329011301.1166265-2-oupton@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Wed, 30 Mar 2022 22:45:35 -0700
+Message-ID: <CAAeT=FwR_hy3kYn2SgHELWb4F9mUmRemXWxOoiF=H23q-gzEjw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Wire up CP15 feature registers to their
+ AArch64 equivalents
+To: Oliver Upton <oupton@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -118,46 +86,133 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Mar 22, 2022 at 04:58:08PM -0700, David Matlack wrote:
-> > > +static int prepare_to_split_huge_page(struct kvm *kvm,
-> > > +                                   const struct kvm_memory_slot *slot,
-> > > +                                   u64 *huge_sptep,
-> > > +                                   struct kvm_mmu_page **spp,
-> > > +                                   bool *flush,
-> > > +                                   bool *dropped_lock)
-> > > +{
-> > > +     int r = 0;
-> > > +
-> > > +     *dropped_lock = false;
-> > > +
-> > > +     if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES)
-> > > +             return -ENOSPC;
-> > > +
-> > > +     if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
-> > > +             goto drop_lock;
-> > > +
-> >
-> > Not immediately clear on whether there'll be case that *spp is set within
-> > the current function.  Some sanity check might be nice?
-> 
-> Sorry I'm not sure what you mean here. What kind of sanity check did
-> you have in mind?
+Hi Oliver,
 
-Something like "WARN_ON_ONCE(*spp);"?
+On Mon, Mar 28, 2022 at 6:13 PM Oliver Upton <oupton@google.com> wrote:
+>
+> KVM currently does not trap ID register accesses from an AArch32 EL1.
+> This is painful for a couple of reasons. Certain unimplemented features
+> are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
+> architecture to v8.0. Additionally, we attempt to paper over
+> heterogeneous systems by using register values that are safe
+> system-wide. All this hard work is completely sidestepped because KVM
+> does not set TID3 for AArch32 guests.
+>
+> Fix up handling of CP15 feature registers by simply rerouting to their
+> AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
+> to fix up the oddball CP10 feature registers still.
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 66 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 66 insertions(+)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dd34b5ab51d4..30771f950027 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2339,6 +2339,65 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+>         return 1;
+>  }
+>
+> +static int emulate_sys_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params);
+> +
+> +/**
+> + * kvm_emulate_cp15_id_reg() - Handles an MRC trap on a guest CP15 access where
+> + *                            CRn=0, which corresponds to the AArch32 feature
+> + *                            registers.
+> + * @vcpu: the vCPU pointer
+> + * @params: the system register access parameters.
+> + *
+> + * Our cp15 system register tables do not enumerate the AArch32 feature
+> + * registers. Conveniently, our AArch64 table does, and the AArch32 system
+> + * register encoding can be trivially remapped into the AArch64 for the feature
+> + * registers: Append op0=3, leaving op1, CRn, CRm, and op2 the same.
+> + *
+> + * According to DDI0487G.b G7.3.1, paragraph "Behavior of VMSAv8-32 32-bit
+> + * System registers with (coproc=0b1111, CRn==c0)", read accesses from this
+> + * range are either UNKNOWN or RES0. Rerouting remains architectural as we
+> + * treat undefined registers in this range as RAZ.
+> + */
+> +static int kvm_emulate_cp15_id_reg(struct kvm_vcpu *vcpu,
+> +                                  struct sys_reg_params *params)
+> +{
+> +       int Rt = kvm_vcpu_sys_get_rt(vcpu);
+> +       int ret = 1;
+> +
+> +       params->Op0 = 3;
 
-> 
-> >
-> > > +     *spp = kvm_mmu_alloc_direct_sp_for_split(true);
-> > > +     if (r)
-> > > +             goto drop_lock;
-> > > +
-> > > +     return 0;
+Nit: Shouldn't we restore the original Op0 after emulate_sys_reg() ?
+(unhandled_cp_access() prints Op0. Restoring the original one
+ would be more robust against future changes)
+
+> +
+> +       /*
+> +        * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
+> +        * Avoid conflicting with future expansion of AArch64 feature registers
+> +        * and simply treat them as RAZ here.
+> +        */
+> +       if (params->CRm > 3)
+> +               params->regval = 0;
+> +       else
+> +               ret = emulate_sys_reg(vcpu, params);
+> +
+> +       /* Treat impossible writes to RO registers as UNDEFINED */
+> +       if (params->is_write)
+
+This checking can be done even before calling emulate_sys_reg().
+BTW, __access_id_reg() also injects UNDEFINED when p->is_write is true.
+
+> +               unhandled_cp_access(vcpu, params);
+> +       else
+> +               vcpu_set_reg(vcpu, Rt, params->regval);
+> +
+> +       return ret;
+> +}
+> +
+> +/**
+> + * kvm_is_cp15_id_reg() - Returns true if the specified CP15 register is an
+> + *                       AArch32 ID register.
+> + * @params: the system register access parameters
+> + *
+> + * Note that CP15 ID registers where CRm=0 are excluded from this check, as they
+> + * are already correctly handled in the CP15 register table.
+
+I don't think this is true for all of the registers:)
+I think at least some of them are not trapped (TCMTR, TLBTR,
+REVIDR, etc), and I don't think they are handled in the CP15
+register table.
 
 Thanks,
+Reiji
 
--- 
-Peter Xu
 
+> + */
+> +static inline bool kvm_is_cp15_id_reg(struct sys_reg_params *params)
+> +{
+> +       return params->CRn == 0 && params->Op1 == 0 && params->CRm != 0;
+> +}
+> +
+>  /**
+>   * kvm_handle_cp_32 -- handles a mrc/mcr trap on a guest CP14/CP15 access
+>   * @vcpu: The VCPU pointer
+> @@ -2360,6 +2419,13 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+>         params.Op1 = (esr >> 14) & 0x7;
+>         params.Op2 = (esr >> 17) & 0x7;
+>
+> +       /*
+> +        * Certain AArch32 ID registers are handled by rerouting to the AArch64
+> +        * system register table.
+> +        */
+> +       if (ESR_ELx_EC(esr) == ESR_ELx_EC_CP15_32 && kvm_is_cp15_id_reg(&params))
+> +               return kvm_emulate_cp15_id_reg(vcpu, &params);
+> +
+>         if (!emulate_cp(vcpu, &params, global, nr_global)) {
+>                 if (!params.is_write)
+>                         vcpu_set_reg(vcpu, Rt, params.regval);
+> --
+> 2.35.1.1021.g381101b075-goog
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
