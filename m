@@ -2,65 +2,87 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93AA7C433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 14:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 515B8C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 16:24:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 053E34B263;
-	Fri,  1 Apr 2022 10:35:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0FF749E2C;
+	Fri,  1 Apr 2022 12:24:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VttDJCbv7thJ; Fri,  1 Apr 2022 10:35:02 -0400 (EDT)
+	with ESMTP id 6HdUxxXgbhK1; Fri,  1 Apr 2022 12:24:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFE6F4B202;
-	Fri,  1 Apr 2022 10:35:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9303049E36;
+	Fri,  1 Apr 2022 12:24:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 657C74B18F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 10:35:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98E5C4B1A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 15:57:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kb4El6Nt0s9t for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Apr 2022 10:35:00 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA5AB4B164
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 10:34:59 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 6919EB82522;
- Fri,  1 Apr 2022 14:34:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83411C340F2;
- Fri,  1 Apr 2022 14:34:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1648823695;
- bh=h6tEdTEiLa3QMvSfq+L4/ZRy7SJQezJ633iJ7+1klsM=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=EKZP1uH6QieLhU1pKEh5QHV6RWg5Wn4FfbYgBQttlgxK6eVkX1PLtQ4ObTM5lWEbL
- JiHCFX7swmVdIsAx0XZrVjXCCd+WjM/mdpKK/JTHsDhaNkRLQylKxJYUgcsNskVLdK
- 0e9HKKGNpviJ6+G2ALc/6mN3HiAdGLYD+/3IMDyUBShSzSbqRZNAD4SJPQ5xWWteP3
- HFWDb7aVeFy80u+duOMleA9xYyzH7aiVk1G/Qe4JPoSGbCOtQlVkKXuSvR2vi8VUoA
- odI6C/1oPjEPgzewb5L8qMbqmFUdI3bPWu+9VbyLN3Ddc3TCNXdKMkaZ0LNrGl4sOb
- 8eC3XRWGeFbvQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 042/109] KVM: arm64: Do not change the PMU event
- filter after a VCPU has run
-Date: Fri,  1 Apr 2022 10:31:49 -0400
-Message-Id: <20220401143256.1950537-42-sashal@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220401143256.1950537-1-sashal@kernel.org>
-References: <20220401143256.1950537-1-sashal@kernel.org>
+ with ESMTP id 17PaXb9kKAfc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Mar 2022 15:57:50 -0400 (EDT)
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com
+ [209.85.208.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7CBBE4B1AB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 15:57:50 -0400 (EDT)
+Received: by mail-lj1-f175.google.com with SMTP id s13so1201231ljd.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 12:57:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pTe27Qc9aU9mrh9Xska5d8/rYGqxPk37jFPTpeO0UrM=;
+ b=cM+XYBWkQOvd6IpcK95d5PqkmE8Zj/rsE4HM7KyzFR+6DlwGlrOGTFvjtZpdC9Aguj
+ ESLCoJHA6QKBbqz7zUq2+E4v6HH/ZVXTMUYngj6O/43jTiLxBhJi3bfgeUXDEUrKXO08
+ jlLXoMJrlDu0ntHa4lYeB+e2z1Fh9359EEd57bYrB062nhgLtDMXJSITG9Z6Kf3Ed3Fi
+ mthSWhv5B5HSBNA0vYd6c5UqJ/fLBKbFciLMVvj0n4okgDzj36jXxbYKZr9X1J8Auxr+
+ KBfDAEbrqLEltDXdCTGVk7I9BVY+6Ofz+qmkKRTQ2zs3SMS+MOlVbg/b0NYQ27XQppJ0
+ WsuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pTe27Qc9aU9mrh9Xska5d8/rYGqxPk37jFPTpeO0UrM=;
+ b=IU8L2XR0bvzXHZvuFPiEYzTQ5afMe2QXIFMDcMN4nEFNxY8wCKSNgCrY9+TmLJL9kw
+ NntOUH1M9wFinSlJXNVRmJhzx9sDqNY4cB37MZcxzxN8HoVIilY82LntQAWu4ysO7xZq
+ BVBSnT+F0YAiVLXhc9es5+5/+m0VEJTUTic+T2N5tJacbq3zRv7RFBe9ZnTGDOBouu5V
+ DF7qyuxxlI7cBsi4qiGPi+gDY5NwX9pkYATXUSyps5KJFTzWUzayM/P1tMr+XinEO47Z
+ HOHKWikF598DHRiz3BuQqAYovxbaAtng76Fr6pY7J+USadq2Hvn9dXIaWEmP+4pZ/plI
+ qpxw==
+X-Gm-Message-State: AOAM530n+0lq8/KBwqPlVT0RPbZ37SXuW3qixQzg7zuWYX6p0plhUacd
+ YAKk3VB/IxEXRjBrbI5Uy+qD3mEZEiZTTQfp+KhkkA==
+X-Google-Smtp-Source: ABdhPJw9+gcr6sgJpKfiIcWS6ZH8RxhxtcabitgSKfJZiaZHQP81kNDhjMCQEcxa3zOxAKVi/mFm6Pv92XT19v/VvHs=
+X-Received: by 2002:a2e:390c:0:b0:248:1b88:d6c4 with SMTP id
+ g12-20020a2e390c000000b002481b88d6c4mr11250384lja.49.1648756669056; Thu, 31
+ Mar 2022 12:57:49 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Cc: Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org, will@kernel.org,
- corbet@lwn.net, Marc Zyngier <maz@kernel.org>, linux-doc@vger.kernel.org,
- catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20220311002528.2230172-1-dmatlack@google.com>
+ <20220311002528.2230172-21-dmatlack@google.com>
+ <YjG7Zh4zwTDsO3L1@xz-m1.local>
+ <CALzav=fRFzbGEVhdMSwhX1Gs1++DGW6MOWvKzeQ-RTtLsus=SQ@mail.gmail.com>
+ <YkSirYT6s8YtUr4w@xz-m1.local>
+In-Reply-To: <YkSirYT6s8YtUr4w@xz-m1.local>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 31 Mar 2022 12:57:22 -0700
+Message-ID: <CALzav=ceTVGviFzCP0BfUP74DmkBkBnRo5wczGq+2j05MdetMw@mail.gmail.com>
+Subject: Re: [PATCH v2 20/26] KVM: x86/mmu: Extend Eager Page Splitting to the
+ shadow MMU
+To: Peter Xu <peterx@redhat.com>
+X-Mailman-Approved-At: Fri, 01 Apr 2022 12:24:11 -0400
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -77,165 +99,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Marc Zyngier <maz@kernel.org>
+On Wed, Mar 30, 2022 at 11:34 AM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Mar 22, 2022 at 04:58:08PM -0700, David Matlack wrote:
+> > > > +static int prepare_to_split_huge_page(struct kvm *kvm,
+> > > > +                                   const struct kvm_memory_slot *slot,
+> > > > +                                   u64 *huge_sptep,
+> > > > +                                   struct kvm_mmu_page **spp,
+> > > > +                                   bool *flush,
+> > > > +                                   bool *dropped_lock)
+> > > > +{
+> > > > +     int r = 0;
+> > > > +
+> > > > +     *dropped_lock = false;
+> > > > +
+> > > > +     if (kvm_mmu_available_pages(kvm) <= KVM_MIN_FREE_MMU_PAGES)
+> > > > +             return -ENOSPC;
+> > > > +
+> > > > +     if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
+> > > > +             goto drop_lock;
+> > > > +
+> > >
+> > > Not immediately clear on whether there'll be case that *spp is set within
+> > > the current function.  Some sanity check might be nice?
+> >
+> > Sorry I'm not sure what you mean here. What kind of sanity check did
+> > you have in mind?
+>
+> Something like "WARN_ON_ONCE(*spp);"?
 
-[ Upstream commit 5177fe91e4cf78a659aada2c9cf712db4d788481 ]
+Ah I see. I was confused because the previous version of this code
+checked if *spp is already set and, if so, skipped the allocation. But
+I accidentally introduced a memory leak here when I implemented Ben'
+suggestion to defer alloc_memory_for_split() to a subsequent commit.
+I'll fix this in v3.
 
-Userspace can specify which events a guest is allowed to use with the
-KVM_ARM_VCPU_PMU_V3_FILTER attribute. The list of allowed events can be
-identified by a guest from reading the PMCEID{0,1}_EL0 registers.
-
-Changing the PMU event filter after a VCPU has run can cause reads of the
-registers performed before the filter is changed to return different values
-than reads performed with the new event filter in place. The architecture
-defines the two registers as read-only, and this behaviour contradicts
-that.
-
-Keep track when the first VCPU has run and deny changes to the PMU event
-filter to prevent this from happening.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-[ Alexandru E: Added commit message, updated ioctl documentation ]
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20220127161759.53553-2-alexandru.elisei@arm.com
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- Documentation/virt/kvm/devices/vcpu.rst |  2 +-
- arch/arm64/include/asm/kvm_host.h       |  1 +
- arch/arm64/kvm/arm.c                    |  4 +++
- arch/arm64/kvm/pmu-emul.c               | 33 +++++++++++++++----------
- 4 files changed, 26 insertions(+), 14 deletions(-)
-
-diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
-index 60a29972d3f1..d063aaee5bb7 100644
---- a/Documentation/virt/kvm/devices/vcpu.rst
-+++ b/Documentation/virt/kvm/devices/vcpu.rst
-@@ -70,7 +70,7 @@ irqchip.
- 	 -ENODEV  PMUv3 not supported or GIC not initialized
- 	 -ENXIO   PMUv3 not properly configured or in-kernel irqchip not
- 	 	  configured as required prior to calling this attribute
--	 -EBUSY   PMUv3 already initialized
-+	 -EBUSY   PMUv3 already initialized or a VCPU has already run
- 	 -EINVAL  Invalid filter range
- 	 =======  ======================================================
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index d016f27af6da..8c7ba346d713 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -137,6 +137,7 @@ struct kvm_arch {
- 
- 	/* Memory Tagging Extension enabled for the guest */
- 	bool mte_enabled;
-+	bool ran_once;
- };
- 
- struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 1eadf9088880..6f3be4d44abe 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -629,6 +629,10 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 	if (kvm_vm_is_protected(kvm))
- 		kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
- 
-+	mutex_lock(&kvm->lock);
-+	kvm->arch.ran_once = true;
-+	mutex_unlock(&kvm->lock);
-+
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index a5e4bbf5e68f..c996fc562da4 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -921,6 +921,8 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
- 
- int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- {
-+	struct kvm *kvm = vcpu->kvm;
-+
- 	if (!kvm_vcpu_has_pmu(vcpu))
- 		return -ENODEV;
- 
-@@ -938,7 +940,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		int __user *uaddr = (int __user *)(long)attr->addr;
- 		int irq;
- 
--		if (!irqchip_in_kernel(vcpu->kvm))
-+		if (!irqchip_in_kernel(kvm))
- 			return -EINVAL;
- 
- 		if (get_user(irq, uaddr))
-@@ -948,7 +950,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		if (!(irq_is_ppi(irq) || irq_is_spi(irq)))
- 			return -EINVAL;
- 
--		if (!pmu_irq_is_valid(vcpu->kvm, irq))
-+		if (!pmu_irq_is_valid(kvm, irq))
- 			return -EINVAL;
- 
- 		if (kvm_arm_pmu_irq_initialized(vcpu))
-@@ -963,7 +965,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		struct kvm_pmu_event_filter filter;
- 		int nr_events;
- 
--		nr_events = kvm_pmu_event_mask(vcpu->kvm) + 1;
-+		nr_events = kvm_pmu_event_mask(kvm) + 1;
- 
- 		uaddr = (struct kvm_pmu_event_filter __user *)(long)attr->addr;
- 
-@@ -975,12 +977,17 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		     filter.action != KVM_PMU_EVENT_DENY))
- 			return -EINVAL;
- 
--		mutex_lock(&vcpu->kvm->lock);
-+		mutex_lock(&kvm->lock);
-+
-+		if (kvm->arch.ran_once) {
-+			mutex_unlock(&kvm->lock);
-+			return -EBUSY;
-+		}
- 
--		if (!vcpu->kvm->arch.pmu_filter) {
--			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
--			if (!vcpu->kvm->arch.pmu_filter) {
--				mutex_unlock(&vcpu->kvm->lock);
-+		if (!kvm->arch.pmu_filter) {
-+			kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
-+			if (!kvm->arch.pmu_filter) {
-+				mutex_unlock(&kvm->lock);
- 				return -ENOMEM;
- 			}
- 
-@@ -991,17 +998,17 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 			 * events, the default is to allow.
- 			 */
- 			if (filter.action == KVM_PMU_EVENT_ALLOW)
--				bitmap_zero(vcpu->kvm->arch.pmu_filter, nr_events);
-+				bitmap_zero(kvm->arch.pmu_filter, nr_events);
- 			else
--				bitmap_fill(vcpu->kvm->arch.pmu_filter, nr_events);
-+				bitmap_fill(kvm->arch.pmu_filter, nr_events);
- 		}
- 
- 		if (filter.action == KVM_PMU_EVENT_ALLOW)
--			bitmap_set(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
-+			bitmap_set(kvm->arch.pmu_filter, filter.base_event, filter.nevents);
- 		else
--			bitmap_clear(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
-+			bitmap_clear(kvm->arch.pmu_filter, filter.base_event, filter.nevents);
- 
--		mutex_unlock(&vcpu->kvm->lock);
-+		mutex_unlock(&kvm->lock);
- 
- 		return 0;
- 	}
--- 
-2.34.1
-
+>
+> >
+> > >
+> > > > +     *spp = kvm_mmu_alloc_direct_sp_for_split(true);
+> > > > +     if (r)
+> > > > +             goto drop_lock;
+> > > > +
+> > > > +     return 0;
+>
+> Thanks,
+>
+> --
+> Peter Xu
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
