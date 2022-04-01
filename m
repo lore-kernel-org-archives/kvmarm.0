@@ -2,87 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9172CC433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 18:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B267AC433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 19:47:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 335094B2A2;
-	Fri,  1 Apr 2022 14:21:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CA554B265;
+	Fri,  1 Apr 2022 15:47:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id iR3XWXF9uNIc; Fri,  1 Apr 2022 14:21:16 -0400 (EDT)
+	with ESMTP id UThw+RbCUp4n; Fri,  1 Apr 2022 15:47:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C763F4B306;
-	Fri,  1 Apr 2022 14:20:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86B3B4B206;
+	Fri,  1 Apr 2022 15:47:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58AFD4B263
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:56:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93D614B206
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 15:47:05 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ot8fagV8cqLW for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Apr 2022 13:56:39 -0400 (EDT)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17F4A4B26B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:56:39 -0400 (EDT)
-Received: by mail-pf1-f202.google.com with SMTP id
- y189-20020a6264c6000000b004faecedcb81so2010087pfb.7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Apr 2022 10:56:39 -0700 (PDT)
+ with ESMTP id 1I400oGu9WUi for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Apr 2022 15:47:04 -0400 (EDT)
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com
+ [209.85.166.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 241554B202
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 15:47:04 -0400 (EDT)
+Received: by mail-il1-f202.google.com with SMTP id
+ q6-20020a056e0215c600b002c2c4091914so2434037ilu.14
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Apr 2022 12:47:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=whi7VXODCYStZwZ0yhJ9hj7iu8dCf643usT2exONxAs=;
- b=fuN0d8N9vFpmGZgcbUnIPl1/u50XpVyZVJS25Zl8sNb/QRw8cVTyJ5dMdqA5+b4+ZF
- uSZa76VjUdHU0qH1Va5a1zhK0stt4d5uFxMsf6ivJGXpSjoisa6ZlsqPiy1q//ZG6dgK
- E70U/wr8WlB5MVNjCZS6zluBKURb/ry6bmDWBkudFenFfsRDpzcJwK8g9cWgZalXPg39
- dhNKu56TjS2VbFJgtFxwT7wFpAedLoTQxO4/+9hOW6Wb4II8CrKPKuliva4BSCXXUE2Q
- 8/Bl+aR/+ltV30PKrHQhHQgNsOJUQvLBay/8SjLanwL99lfTbrvVCd2W7FugWSH6scXf
- 43Pw==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=sGASyLBse2klm//8WmPcxLcR/0G/i4NUGrOkS5QfPwU=;
+ b=p0I9TS+BxRlThc6cRuQsH+gXHlKHv9krEacz1VjAY7yKZldMuM5KnvSIVJAQtqZWIS
+ ms13dhQL/oagduEMMikCqjI8fe0Il26LNT4mfIaDFyCY8UQ4wcJpW8wMXaYxc3WuQIvM
+ mdupkhdVzZsef3F/9BV50VLdItdtPFVndfUr8B7o+MvldUqTjvZbRKJ4tsw9C7RhnT0p
+ tGTUvq4GpmepsRjB3Z/NSlhaV+un8Bv1yvLJDUlr7lbjuUIICAFyOhRIeFBAwVHssCcM
+ Q9rHvYe8T5j5uPcJ8tt3uaaz+/fFeykQyO7tsCryee8WEis3fkdBS6GJ/JuEmEt1u6Fi
+ TtSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=whi7VXODCYStZwZ0yhJ9hj7iu8dCf643usT2exONxAs=;
- b=1X3EoW5pX9wvVg/JT5tUO6jZJoS94bbSSqZK35q8xZH8dpJ/zaNgGkUnCO7AZBRKGi
- Aq5Z3Psv4OiheSEX+wa87f12PQUCOoCYZ9eUDNwzeeleghHcXtVfUEm0hFjHIY2vUdPX
- CzLTOSjTwGKTrDv/jVT0j+vhCHeReowRBU8SZeyf2Tcv7Ao9BifwARMyemkNHmbnmsxf
- Hy+gGIRxtf4+Ufj03D+VWYixB7yzreVrw7R6C2kff+gE9OwFcE1HKx08vWuRYosb4Srv
- uRByoO+CzH7YZFb/Pct0LhY05nNf6S0M4ytJJ4Zt9EOAP8i1fdzJFNBvrLGMRRxhTPi0
- CuEQ==
-X-Gm-Message-State: AOAM532/QTzr/c5pTZUDYfdfyio3K58gx/FTx9q4cxNipnYDHYSBl3mO
- +pbKFdG8uDq3N6dLIMVpSHLJYZ7wLltBmg==
-X-Google-Smtp-Source: ABdhPJzrOoFK0CXfNiBHYff/Ss14MY3SHaY29S4xt2lMgr9gQfCmCewctxWArdepbXNkov7vRSKMSJUb4tjYpQ==
-X-Received: from dmatlack-heavy.c.googlers.com
- ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a05:6a00:1ca1:b0:4fa:7e80:6957 with SMTP
- id y33-20020a056a001ca100b004fa7e806957mr12069429pfw.33.1648835798210; Fri,
- 01 Apr 2022 10:56:38 -0700 (PDT)
-Date: Fri,  1 Apr 2022 17:55:54 +0000
-In-Reply-To: <20220401175554.1931568-1-dmatlack@google.com>
-Message-Id: <20220401175554.1931568-24-dmatlack@google.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=sGASyLBse2klm//8WmPcxLcR/0G/i4NUGrOkS5QfPwU=;
+ b=6qcCQFXDgk1/By2858qeH8lPUC9enD9rD9rVSM4g5+KhLu7hR0hzz2ojN69Bn4uR6+
+ 2fIchuYEPJ0MkyxBnZDG1bU7G0jS0Ce91n5u6hse4rTqmqua5XK0qsDlyMz6N0MdOqDB
+ veaN2Tsw+7v6Hst/995j1NytdIkDny1Saue3yuj5/k2lI0PWW5ATTTtDPVQpJZIV1jdv
+ +uKr0CCKFNjq6e/IqiEwYKnXDWmmSiZuMBb3K+OxM2HvD9f+25wxuVDYJqXqD4vzp9jS
+ TXmd/+oPIDz0C78k+qaVQh4wQUrqw7y6tdBZmvRmcPCEhNln38HPDpUaTGBmN2i0Bggi
+ E4vQ==
+X-Gm-Message-State: AOAM532cv0vpx2QNI/aqmfnmBArUFN4BeNRGJ2N3UdZ2QGCuSR9u2y18
+ fD8JCnG74Bfa0AFcUYck+jUJF+TXeuwAAucXOlVft0n9R0Hn0zKGQ+Vvn3DDFVLsvQdOuXBXzOR
+ 6Rxc1/BtUWiLcs6AamDi1ZfiWqDJd1iZcm79puua5FnPRM+MS1aPh09vqBkTxM/FDtzzEZw==
+X-Google-Smtp-Source: ABdhPJzdy78X78ccSq0ir+N3gnYKV5tuuxTZVy7a3oFEuCUTAisBEAFvByvYnHiaUoeXiQdHX+wqwT+YhWE=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a05:6e02:1c46:b0:2c9:f0a8:2d32
+ with SMTP id
+ d6-20020a056e021c4600b002c9f0a82d32mr641920ilg.54.1648842423330; Fri, 01 Apr
+ 2022 12:47:03 -0700 (PDT)
+Date: Fri,  1 Apr 2022 19:46:52 +0000
+Message-Id: <20220401194652.950240-1-oupton@google.com>
 Mime-Version: 1.0
-References: <20220401175554.1931568-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v3 23/23] KVM: selftests: Map x86_64 guest virtual memory with
- huge pages
-From: David Matlack <dmatlack@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-X-Mailman-Approved-At: Fri, 01 Apr 2022 14:20:42 -0400
-Cc: Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>, David Matlack <dmatlack@google.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, maciej.szmigiero@oracle.com,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+Subject: [PATCH v2] KVM: arm64: Don't split hugepages outside of MMU write lock
+From: Oliver Upton <oupton@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,92 +84,132 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Override virt_map() in x86_64 selftests to use the largest page size
-possible when mapping guest virtual memory. This enables testing eager
-page splitting with shadow paging (e.g. kvm_intel.ept=N), as it allows
-KVM to shadow guest memory with huge pages.
+It is possible to take a stage-2 permission fault on a page larger than
+PAGE_SIZE. For example, when running a guest backed by 2M HugeTLB, KVM
+eagerly maps at the largest possible block size. When dirty logging is
+enabled on a memslot, KVM does *not* eagerly split these 2M stage-2
+mappings and instead clears the write bit on the pte.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
+Since dirty logging is always performed at PAGE_SIZE granularity, KVM
+lazily splits these 2M block mappings down to PAGE_SIZE in the stage-2
+fault handler. This operation must be done under the write lock. Since
+commit f783ef1c0e82 ("KVM: arm64: Add fast path to handle permission
+relaxation during dirty logging"), the stage-2 fault handler
+conditionally takes the read lock on permission faults with dirty
+logging enabled. To that end, it is possible to split a 2M block mapping
+while only holding the read lock.
+
+The problem is demonstrated by running kvm_page_table_test with 2M
+anonymous HugeTLB, which splats like so:
+
+  WARNING: CPU: 5 PID: 15276 at arch/arm64/kvm/hyp/pgtable.c:153 stage2_map_walk_leaf+0x124/0x158
+
+  [...]
+
+  Call trace:
+  stage2_map_walk_leaf+0x124/0x158
+  stage2_map_walker+0x5c/0xf0
+  __kvm_pgtable_walk+0x100/0x1d4
+  __kvm_pgtable_walk+0x140/0x1d4
+  __kvm_pgtable_walk+0x140/0x1d4
+  kvm_pgtable_walk+0xa0/0xf8
+  kvm_pgtable_stage2_map+0x15c/0x198
+  user_mem_abort+0x56c/0x838
+  kvm_handle_guest_abort+0x1fc/0x2a4
+  handle_exit+0xa4/0x120
+  kvm_arch_vcpu_ioctl_run+0x200/0x448
+  kvm_vcpu_ioctl+0x588/0x664
+  __arm64_sys_ioctl+0x9c/0xd4
+  invoke_syscall+0x4c/0x144
+  el0_svc_common+0xc4/0x190
+  do_el0_svc+0x30/0x8c
+  el0_svc+0x28/0xcc
+  el0t_64_sync_handler+0x84/0xe4
+  el0t_64_sync+0x1a4/0x1a8
+
+Fix the issue by only acquiring the read lock if the guest faulted on a
+PAGE_SIZE granule w/ dirty logging enabled. Add a WARN to catch locking
+bugs in future changes.
+
+Fixes: f783ef1c0e82 ("KVM: arm64: Add fast path to handle permission relaxation during dirty logging")
+Cc: Jing Zhang <jingzhangos@google.com>
+Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h  |  6 ++++
- tools/testing/selftests/kvm/lib/kvm_util.c    |  4 +--
- .../selftests/kvm/lib/x86_64/processor.c      | 31 +++++++++++++++++++
- 3 files changed, 39 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 37db341d4cc5..efb228d2fbf7 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -470,6 +470,12 @@ enum x86_page_size {
- 	X86_PAGE_SIZE_2M,
- 	X86_PAGE_SIZE_1G,
- };
+Applies cleanly to kvmarm/fixes at the following commit:
+
+  8872d9b3e35a ("KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler")
+
+Tested the patch by running KVM selftests. Additionally, I did 10
+iterations of the kvm_page_table_test with 2M anon HugeTLB memory.
+
+It is expected that this patch will cause fault serialization in the
+pathological case where all vCPUs are faulting on the same granule of
+memory, as every vCPU will attempt to acquire the write lock. The only
+safe way to cure this contention is to dissolve pages eagerly outside of
+the stage-2 fault handler (like x86).
+
+v1: https://lore.kernel.org/kvmarm/20220331213844.2894006-1-oupton@google.com/
+
+v1 -> v2:
+ - Drop impossible check for !use_read_lock before
+   kvm_pgtable_stage2_map() (Reiji)
+ - Codify the requirement to hold the write lock to call
+   kvm_pgtable_stage2_map() with a WARN
+
+ arch/arm64/kvm/mmu.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 0d19259454d8..53ae2c0640bc 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1079,7 +1079,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	gfn_t gfn;
+ 	kvm_pfn_t pfn;
+ 	bool logging_active = memslot_is_logging(memslot);
+-	bool logging_perm_fault = false;
++	bool use_read_lock = false;
+ 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
+ 	unsigned long vma_pagesize, fault_granule;
+ 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
+@@ -1114,7 +1114,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (logging_active) {
+ 		force_pte = true;
+ 		vma_shift = PAGE_SHIFT;
+-		logging_perm_fault = (fault_status == FSC_PERM && write_fault);
++		use_read_lock = (fault_status == FSC_PERM && write_fault &&
++				 fault_granule == PAGE_SIZE);
+ 	} else {
+ 		vma_shift = get_vma_page_shift(vma, hva);
+ 	}
+@@ -1218,7 +1219,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	 * logging dirty logging, only acquire read lock for permission
+ 	 * relaxation.
+ 	 */
+-	if (logging_perm_fault)
++	if (use_read_lock)
+ 		read_lock(&kvm->mmu_lock);
+ 	else
+ 		write_lock(&kvm->mmu_lock);
+@@ -1268,6 +1269,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
+ 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
+ 	} else {
++		WARN_ONCE(use_read_lock, "Attempted stage-2 map outside of write lock\n");
 +
-+static inline size_t page_size_bytes(enum x86_page_size page_size)
-+{
-+	return 1UL << (page_size * 9 + 12);
-+}
-+
- void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
- 		   enum x86_page_size page_size);
+ 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
+ 					     __pfn_to_phys(pfn), prot,
+ 					     memcache);
+@@ -1280,7 +1283,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	}
  
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 1665a220abcb..60198587236d 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -1432,8 +1432,8 @@ vm_vaddr_t vm_vaddr_alloc_page(struct kvm_vm *vm)
-  * Within the VM given by @vm, creates a virtual translation for
-  * @npages starting at @vaddr to the page range starting at @paddr.
-  */
--void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
--	      unsigned int npages)
-+void __weak virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
-+		     unsigned int npages)
- {
- 	size_t page_size = vm->page_size;
- 	size_t size = npages * page_size;
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 9f000dfb5594..7df84292d5de 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -282,6 +282,37 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
- 	__virt_pg_map(vm, vaddr, paddr, X86_PAGE_SIZE_4K);
- }
- 
-+void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, unsigned int npages)
-+{
-+	size_t size = (size_t) npages * vm->page_size;
-+	size_t vend = vaddr + size;
-+	enum x86_page_size page_size;
-+	size_t stride;
-+
-+	TEST_ASSERT(vaddr + size > vaddr, "Vaddr overflow");
-+	TEST_ASSERT(paddr + size > paddr, "Paddr overflow");
-+
-+	/*
-+	 * Map the region with all 1G pages if possible, falling back to all
-+	 * 2M pages, and finally all 4K pages. This could be improved to use
-+	 * a mix of page sizes so that more of the region is mapped with large
-+	 * pages.
-+	 */
-+	for (page_size = X86_PAGE_SIZE_1G; page_size >= X86_PAGE_SIZE_4K; page_size--) {
-+		stride = page_size_bytes(page_size);
-+
-+		if (!(vaddr % stride) && !(paddr % stride) && !(size % stride))
-+			break;
-+	}
-+
-+	TEST_ASSERT(page_size >= X86_PAGE_SIZE_4K,
-+		    "Cannot map unaligned region: vaddr 0x%lx paddr 0x%lx npages 0x%x\n",
-+		    vaddr, paddr, npages);
-+
-+	for (; vaddr < vend; vaddr += stride, paddr += stride)
-+		__virt_pg_map(vm, vaddr, paddr, page_size);
-+}
-+
- static struct pageTableEntry *_vm_get_page_table_entry(struct kvm_vm *vm, int vcpuid,
- 						       uint64_t vaddr)
- {
+ out_unlock:
+-	if (logging_perm_fault)
++	if (use_read_lock)
+ 		read_unlock(&kvm->mmu_lock);
+ 	else
+ 		write_unlock(&kvm->mmu_lock);
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
