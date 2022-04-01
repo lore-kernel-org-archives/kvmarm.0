@@ -2,52 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C595C433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 16:24:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CBB9C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 16:49:09 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C25E549EC1;
-	Fri,  1 Apr 2022 12:24:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDA1E4B134;
+	Fri,  1 Apr 2022 12:49:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0QlFTbY88z2u; Fri,  1 Apr 2022 12:24:14 -0400 (EDT)
+	with ESMTP id U3ufXGZz9h2S; Fri,  1 Apr 2022 12:49:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D2EAC4B1C5;
-	Fri,  1 Apr 2022 12:24:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E03349E5F;
+	Fri,  1 Apr 2022 12:49:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 218094B282
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 06:14:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86C3D40C95
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 12:49:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FFlr-xAXtbhm for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Apr 2022 06:14:46 -0400 (EDT)
-Received: from nksmu.kylinos.cn (mailgw.kylinos.cn [123.150.8.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EC3B24B24D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 06:14:44 -0400 (EDT)
-X-UUID: 2b37edf3aa0d4de39f017586e300f8ec-20220401
-X-GW-Reason: 11101
-X-Policy-Incident: 5pS25Lu25Lq66LaF6L+HNeS6uumcgOimgeWuoeaguA==
-X-Content-Feature: ica/max.line-size 118 audit/email.address 1 meta/cnt.alert 1
-X-UUID: 2b37edf3aa0d4de39f017586e300f8ec-20220401
-Received: from cs2c.com.cn [(172.17.111.24)] by nksmu.kylinos.cn
- (envelope-from <xieming@kylinos.cn>) (Generic MTA)
- with ESMTP id 1694784454; Fri, 01 Apr 2022 17:07:47 +0800
-X-ns-mid: postfix-6246C11A-3080797115
-Received: from localhost.localdomain (unknown [172.20.12.223])
- by cs2c.com.cn (NSMail) with ESMTPA id 0F2E8383C640;
- Fri,  1 Apr 2022 09:08:42 +0000 (UTC)
-From: xieming <xieming@kylinos.cn>
-To: marc.zyngier@arm.com, linux@armlinux.org.uk, catalin.marinas@arm.com,
- will.deacon@arm.com, alex.williamson@redhat.com, sashal@kernel.org
-Subject: [PATCH v2] kvm/arm64: fixed passthrough gpu into vm on arm64
-Date: Fri,  1 Apr 2022 17:08:28 +0800
-Message-Id: <20220401090828.614167-1-xieming@kylinos.cn>
-X-Mailer: git-send-email 2.27.0
-MIME-Version: 1.0
-X-Mailman-Approved-At: Fri, 01 Apr 2022 12:24:11 -0400
-Cc: xieming@kylinos.cn, kvmarm@lists.cs.columbia.edu,
+ with ESMTP id ubu41RNRrKti for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Apr 2022 12:49:04 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23D9D40C23
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 12:49:04 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 98FC361CBB;
+ Fri,  1 Apr 2022 16:49:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02540C340EC;
+ Fri,  1 Apr 2022 16:49:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1648831742;
+ bh=Q7xkMN9lfi4IJffUuB8VvpeF+YJTc1OHOUWtd3UE+EA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=BIg+XwPKwBJbVY4YLTI3r0FnmtKbcZjwuGN5zjQ+w7aRWZU+y9nJ1FBzOwut1QclT
+ 42G0nHKl8/cADyAQ6NYg3KIm5ZGu88jc2hGcI8E1bRrIFsFq3Y+OOZt+STQ+948mRZ
+ 2BogPHc3j/YJQL9Gy4HNYWOC6bkVEZ7FP07HXdKo4TqNKwmbRxgYxWUjbMWLK3zzSf
+ G7G1TjiFtVqx1ZGQRRET5V3f1Sq8Uu8BKh/ev9N2FkI0R+gW3YKB1YnLBh1lSM4d3W
+ mfT5FoD1QJ1oM80YXhTuEjpefucg1Y/1pajNBSdFudokT6F2mHtVDLfMrrxUyrRkOL
+ phJCu+ul8Zhaw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1naKSJ-000rxZ-J8; Fri, 01 Apr 2022 17:48:59 +0100
+Date: Fri, 01 Apr 2022 17:48:59 +0100
+Message-ID: <87tubcbvgk.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: xieming <xieming@kylinos.cn>
+Subject: Re: [PATCH v2] kvm/arm64: fixed passthrough gpu into vm on arm64
+In-Reply-To: <20220401090828.614167-1-xieming@kylinos.cn>
+References: <20220401090828.614167-1-xieming@kylinos.cn>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: xieming@kylinos.cn, linux@armlinux.org.uk,
+ catalin.marinas@arm.com, will@kernel.org, alex.williamson@redhat.com,
+ sashal@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: sashal@kernel.org, catalin.marinas@arm.com, linux@armlinux.org.uk,
+ linux-kernel@vger.kernel.org, alex.williamson@redhat.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -64,193 +87,149 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-when passthrough some pcie device, such as gpus(including
-Nvidia and AMD),kvm will report:"Unsupported FSC: EC=0x24
-xFSC=0x21 ESR_EL2=0x92000061" err.the main reason is vfio
-ioremap vga memory type by DEVICE_nGnRnE, and kvm setting
-memory type to PAGE_S2_DEVICE(DEVICE_nGnRE), but in guestos,
-all of device io memory type when ioremapping (including gpu
-driver TTM memory type) is setting to MT_NORMAL_NC.
+Xieming,
 
-according to ARM64 stage1&stage2 conbining rules.
-memory type attributes combining rules:
-Normal-WB<Normal-WT<NormalNC<Device-GRE<Device-nGRE<
-DevicenGnRE<Device-nGnRnE
-Normal-WB is weakest,Device-nGnRnE is strongest.
+This is the second time I fix email addresses for you. Next time, I
+simply won't bother replying.
 
-refferring to 'Arm Architecture Reference Manual Armv8,
-for Armv8-A architecture profile' pdf, chapter B2.8
-refferring to 'ARM System Memory Management Unit Architecture
-Specification SMMU architecture version 3.0 and version 3.1' pdf,
-chapter 13.1.5
+On Fri, 01 Apr 2022 10:08:28 +0100,
+xieming <xieming@kylinos.cn> wrote:
+> 
+> when passthrough some pcie device, such as gpus(including
+> Nvidia and AMD),kvm will report:"Unsupported FSC: EC=0x24
+> xFSC=0x21 ESR_EL2=0x92000061" err.the main reason is vfio
 
-therefore, the I/O memory attribute of the VM is setting to
-DevicenGnRE maybe is a mistake. it causes all device memory
-accessing in the virtual machine must be aligned.
+I have asked you to describe how you get there, and you still haven't
+bothered replying.
 
-To summarize: stage2 memory type cannot be stronger than stage1
-in arm64 archtechture.
+> ioremap vga memory type by DEVICE_nGnRnE, and kvm setting
+> memory type to PAGE_S2_DEVICE(DEVICE_nGnRE), but in guestos,
+> all of device io memory type when ioremapping (including gpu
+> driver TTM memory type) is setting to MT_NORMAL_NC.
+> 
+> according to ARM64 stage1&stage2 conbining rules.
+> memory type attributes combining rules:
+> Normal-WB<Normal-WT<NormalNC<Device-GRE<Device-nGRE<
+> DevicenGnRE<Device-nGnRnE
+> Normal-WB is weakest,Device-nGnRnE is strongest.
+> 
+> refferring to 'Arm Architecture Reference Manual Armv8,
+> for Armv8-A architecture profile' pdf, chapter B2.8
+> refferring to 'ARM System Memory Management Unit Architecture
+> Specification SMMU architecture version 3.0 and version 3.1' pdf,
+> chapter 13.1.5
+> 
+> therefore, the I/O memory attribute of the VM is setting to
+> DevicenGnRE maybe is a mistake. it causes all device memory
+> accessing in the virtual machine must be aligned.
+> 
+> To summarize: stage2 memory type cannot be stronger than stage1
+> in arm64 archtechture.
 
-Signed-off-by: xieming <xieming@kylinos.cn>
----
- arch/arm/include/asm/kvm_mmu.h        |  3 ++-
- arch/arm64/include/asm/kvm_mmu.h      |  3 ++-
- arch/arm64/include/asm/memory.h       |  4 +++-
- arch/arm64/include/asm/pgtable-prot.h |  2 +-
- drivers/vfio/pci/vfio_pci.c           |  7 +++++++
- virt/kvm/arm/mmu.c                    | 19 ++++++++++++++++---
- virt/kvm/arm/vgic/vgic-v2.c           |  2 +-
- 7 files changed, 32 insertions(+), 8 deletions(-)
+You are plain wrong. It can, and most of the time, it *must*.
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 523c499e42db..5c7869d25b62 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -64,7 +64,8 @@ void stage2_unmap_vm(struct kvm *kvm);
- int kvm_alloc_stage2_pgd(struct kvm *kvm);
- void kvm_free_stage2_pgd(struct kvm *kvm);
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
--			  phys_addr_t pa, unsigned long size, bool writable);
-+			  phys_addr_t pa, unsigned long size,
-+			  bool writable, bool writecombine);
- 
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
- 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index b2558447c67d..3f98286c7498 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -158,7 +158,8 @@ void stage2_unmap_vm(struct kvm *kvm);
- int kvm_alloc_stage2_pgd(struct kvm *kvm);
- void kvm_free_stage2_pgd(struct kvm *kvm);
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
--			  phys_addr_t pa, unsigned long size, bool writable);
-+			  phys_addr_t pa, unsigned long size,
-+			  bool writable, bool writecombine);
- 
- int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
- 
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index 56562ff01076..22565cc8ec20 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -158,13 +158,15 @@
-  * Memory types for Stage-2 translation
-  */
- #define MT_S2_NORMAL		0xf
-+#define MT_S2_NORMAL_NC		0x5
- #define MT_S2_DEVICE_nGnRE	0x1
- 
- /*
-  * Memory types for Stage-2 translation when ID_AA64MMFR2_EL1.FWB is 0001
-- * Stage-2 enforces Normal-WB and Device-nGnRE
-+ * Stage-2 enforces Normal-WB and Device-nGnRE and Normal-NC
-  */
- #define MT_S2_FWB_NORMAL	6
-+#define MT_S2_FWB_NORMAL_NC	5
- #define MT_S2_FWB_DEVICE_nGnRE	1
- 
- #ifdef CONFIG_ARM64_4K_PAGES
-diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
-index af547be1779b..b94e93135fea 100644
---- a/arch/arm64/include/asm/pgtable-prot.h
-+++ b/arch/arm64/include/asm/pgtable-prot.h
-@@ -88,8 +88,8 @@
- 	})
- 
- #define PAGE_S2			__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL) | PTE_S2_RDONLY | PAGE_S2_XN)
-+#define PAGE_S2_NC		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(NORMAL_NC) | PTE_S2_RDONLY | PAGE_S2_XN)
- #define PAGE_S2_DEVICE		__pgprot(_PROT_DEFAULT | PAGE_S2_MEMATTR(DEVICE_nGnRE) | PTE_S2_RDONLY | PAGE_S2_XN)
--
- #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_VALID) | PTE_PROT_NONE | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN)
- /* shared+writable pages are clean by default, hence PTE_RDONLY|PTE_WRITE */
- #define PAGE_SHARED		__pgprot(_PAGE_DEFAULT | PTE_USER | PTE_RDONLY | PTE_NG | PTE_PXN | PTE_UXN | PTE_WRITE)
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index 51b791c750f1..6f66efb71743 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -1452,7 +1452,14 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
- 	}
- 
- 	vma->vm_private_data = vdev;
-+#ifdef CONFIG_ARM64
-+	if (vfio_pci_is_vga(pdev))
-+		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
-+	else
-+		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-+#else
- 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
-+#endif
- 	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
- 
- 	/*
-diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
-index 11103b75c596..a46a58696834 100644
---- a/virt/kvm/arm/mmu.c
-+++ b/virt/kvm/arm/mmu.c
-@@ -206,6 +206,17 @@ static inline void kvm_pgd_populate(pgd_t *pgdp, pud_t *pudp)
- 	dsb(ishst);
- }
- 
-+/**
-+ * is_vma_write_combine - check if VMA is mapped with writecombine or not
-+ * Return true if VMA mapped with MT_NORMAL_NC otherwise fasle
-+ */
-+static inline bool is_vma_write_combine(struct vm_area_struct *vma)
-+{
-+	pteval_t pteval = pgprot_val(vma->vm_page_prot);
-+
-+	return ((pteval & PTE_ATTRINDX_MASK) == PTE_ATTRINDX(MT_NORMAL_NC));
-+}
-+
- /*
-  * Unmapping vs dcache management:
-  *
-@@ -1198,7 +1209,8 @@ static int stage2_pmdp_test_and_clear_young(pmd_t *pmd)
-  * @size:	The size of the mapping
-  */
- int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
--			  phys_addr_t pa, unsigned long size, bool writable)
-+			  phys_addr_t pa, unsigned long size,
-+			  bool writable, bool writecombine)
- {
- 	phys_addr_t addr, end;
- 	int ret = 0;
-@@ -1209,7 +1221,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
- 	pfn = __phys_to_pfn(pa);
- 
- 	for (addr = guest_ipa; addr < end; addr += PAGE_SIZE) {
--		pte_t pte = pfn_pte(pfn, PAGE_S2_DEVICE);
-+		pte_t pte = pfn_pte(pfn, writecombine ? PAGE_S2_NC : PAGE_S2_DEVICE);
- 
- 		if (writable)
- 			pte = kvm_s2pte_mkwrite(pte);
-@@ -2135,7 +2147,8 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 
- 			ret = kvm_phys_addr_ioremap(kvm, gpa, pa,
- 						    vm_end - vm_start,
--						    writable);
-+						    writable,
-+						    is_vma_write_combine(vma));
- 			if (ret)
- 				break;
- 		}
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 91b14dfacd1d..bc9f5a9a1fd9 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -352,7 +352,7 @@ int vgic_v2_map_resources(struct kvm *kvm)
- 	if (!static_branch_unlikely(&vgic_v2_cpuif_trap)) {
- 		ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
- 					    kvm_vgic_global_state.vcpu_base,
--					    KVM_VGIC_V2_CPU_SIZE, true);
-+					    KVM_VGIC_V2_CPU_SIZE, true, false);
- 		if (ret) {
- 			kvm_err("Unable to remap VGIC CPU to VCPU\n");
- 			goto out;
+> 
+> Signed-off-by: xieming <xieming@kylinos.cn>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h        |  3 ++-
+>  arch/arm64/include/asm/kvm_mmu.h      |  3 ++-
+>  arch/arm64/include/asm/memory.h       |  4 +++-
+>  arch/arm64/include/asm/pgtable-prot.h |  2 +-
+>  drivers/vfio/pci/vfio_pci.c           |  7 +++++++
+>  virt/kvm/arm/mmu.c                    | 19 ++++++++++++++++---
+>  virt/kvm/arm/vgic/vgic-v2.c           |  2 +-
+>  7 files changed, 32 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 523c499e42db..5c7869d25b62 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+
+This file has been removed from the tree *over two years ago*.
+
+> @@ -64,7 +64,8 @@ void stage2_unmap_vm(struct kvm *kvm);
+>  int kvm_alloc_stage2_pgd(struct kvm *kvm);
+>  void kvm_free_stage2_pgd(struct kvm *kvm);
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> -			  phys_addr_t pa, unsigned long size, bool writable);
+> +			  phys_addr_t pa, unsigned long size,
+> +			  bool writable, bool writecombine);
+>  
+>  int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>  
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index b2558447c67d..3f98286c7498 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -158,7 +158,8 @@ void stage2_unmap_vm(struct kvm *kvm);
+>  int kvm_alloc_stage2_pgd(struct kvm *kvm);
+>  void kvm_free_stage2_pgd(struct kvm *kvm);
+>  int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> -			  phys_addr_t pa, unsigned long size, bool writable);
+> +			  phys_addr_t pa, unsigned long size,
+> +			  bool writable, bool writecombine);
+
+NAK. For a start, there is no such thing as 'write-combine' in the ARM
+architecture, and I'm not convinced you can equate WC to Normal-NC.
+See the previous discussion at [1].
+
+[1] https://lore.kernel.org/r/20210429162906.32742-1-sdonthineni@nvidia.com
+
+[...]
+
+> diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> index 51b791c750f1..6f66efb71743 100644
+> --- a/drivers/vfio/pci/vfio_pci.c
+> +++ b/drivers/vfio/pci/vfio_pci.c
+> @@ -1452,7 +1452,14 @@ static int vfio_pci_mmap(void *device_data, struct vm_area_struct *vma)
+>  	}
+>  
+>  	vma->vm_private_data = vdev;
+> +#ifdef CONFIG_ARM64
+> +	if (vfio_pci_is_vga(pdev))
+> +		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+> +	else
+> +		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+
+No. That's completely unacceptable. Who says that some VGA (who the
+hell implements VGA these days?) implies any sort of attribute other
+than device memory? This may work for your particular device under
+your own circumstances. Can it be generalised? No.
+
+And as Jason pointed out, this is likely to break userspace.
+
+> +#else
+>  	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> +#endif
+>  	vma->vm_pgoff = (pci_resource_start(pdev, index) >> PAGE_SHIFT) + pgoff;
+>  
+>  	/*
+> diff --git a/virt/kvm/arm/mmu.c b/virt/kvm/arm/mmu.c
+> index 11103b75c596..a46a58696834 100644
+> --- a/virt/kvm/arm/mmu.c
+> +++ b/virt/kvm/arm/mmu.c
+> @@ -206,6 +206,17 @@ static inline void kvm_pgd_populate(pgd_t *pgdp, pud_t *pudp)
+>  	dsb(ishst);
+>  }
+>  
+> +/**
+> + * is_vma_write_combine - check if VMA is mapped with writecombine or not
+> + * Return true if VMA mapped with MT_NORMAL_NC otherwise fasle
+> + */
+> +static inline bool is_vma_write_combine(struct vm_area_struct *vma)
+> +{
+> +	pteval_t pteval = pgprot_val(vma->vm_page_prot);
+> +
+> +	return ((pteval & PTE_ATTRINDX_MASK) == PTE_ATTRINDX(MT_NORMAL_NC));
+> +}
+
+Again, you are making tons of assumptions here, none of which are
+acceptable as is.
+
+	M.
+
 -- 
-2.27.0
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
