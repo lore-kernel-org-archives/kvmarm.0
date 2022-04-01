@@ -2,73 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E011DC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 31 Mar 2022 21:38:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB11C433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 01:08:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E3C84B1D4;
-	Thu, 31 Mar 2022 17:38:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AD514B261;
+	Thu, 31 Mar 2022 21:08:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lIHqIMHmLUI9; Thu, 31 Mar 2022 17:38:53 -0400 (EDT)
+	with ESMTP id U-f1prPZUDlB; Thu, 31 Mar 2022 21:08:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED7FF4291D;
-	Thu, 31 Mar 2022 17:38:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F27F44B259;
+	Thu, 31 Mar 2022 21:08:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C27540BDC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 17:38:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28A854B20F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 21:08:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Oc1VNI4kcL2f for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Mar 2022 17:38:52 -0400 (EDT)
+ with ESMTP id 6QIdQOam1J7D for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Mar 2022 21:08:40 -0400 (EDT)
 Received: from mail-il1-f202.google.com (mail-il1-f202.google.com
  [209.85.166.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A3D94078F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 17:38:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E49EC40597
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 21:08:39 -0400 (EDT)
 Received: by mail-il1-f202.google.com with SMTP id
- x1-20020a056e020f0100b002c98fce9c13so637517ilj.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 14:38:52 -0700 (PDT)
+ q6-20020a056e0215c600b002c2c4091914so858800ilu.14
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2022 18:08:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:message-id:mime-version:subject:from:to:cc;
- bh=EBvLSPzxeZwoRgmfMBjBkf8t4T2CICbfEAFJBAeKCK0=;
- b=N1oCH65ejmsf2GfWQpfX392jUH9OvfYS363sYxEwWMmHjXJjiHar2RSx7zoUsw9h1C
- 3JQYsfnRK55SWEmEeCFwU5uSoMCc5HhDBo8STMMNf3fF2uNsuVk1Ze/I5oq70ddPB/mv
- KbSsqTWnzMmheLREHqpfPHneXzqE4v0MBJ5BgWyOKCwg7OWLquQ0eHfMM0X18RfTRsqy
- XD9kDTye3NDaPYLMYIkwHM2qtOq33WbTXyCpdxnrBhp7BAfzehYfwmZf8mMW8k8trjCO
- lp0yWS7Xepe9s9f6KRXhfSVs0LHpMDqE7c8L75d4bwR++OQsOqq1u8RA0dwoBq3Z7JjX
- /Qxg==
+ bh=kL9d/s0Mnyvvq5xceGf8t2Ku5ZfUJAPmTPk2nXEvlGU=;
+ b=N2eqlZ8z3YFz3XyEkuOB+8wTp8T2vu7nAJ3SBPyPPNG2EXyKjBs2zPReQsCNcgR62/
+ GgomeeOiuFgJj2EaUihw08Xev8ZvqIS3N4tYW2pm2uTP4ru4dIVNrNv8M2pcnDYbMpzi
+ etIJvz6Q1i4ZUe9P85kyqhOCjztZjX0V6innFelwk/ZSnFAQ+QYvl/1KY0OjeRKSp63J
+ ltTOL14JzHH+dM2+1yJFOEFF0jbRCJM8Zocyzj4RDtfpInxk6j49zUy34U0BUd1W4ONP
+ 7jehSV8LgeGFLwVEbex+LM9J5KNqZGeK3YkxooMZAKby5lcazJXLQsqQrRcjeKfAh2UT
+ JVhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=EBvLSPzxeZwoRgmfMBjBkf8t4T2CICbfEAFJBAeKCK0=;
- b=gjGzfe31CpoZmUPYawbY4UewaleS/eWvTKSFazHztJOiJ16uHdtbBdovLX0rZ65n5q
- P8xDb+uwglKUVoF7Nx0CX/bcJ6czFiYO+zi2HSxCGb+WuX6g3YQWem4D59fRyE4rscNT
- PhhO/S05Sph9aoXVxN8WVS2F5Er4t5V6nfFjMJQHchosQJ5QlI5nPrTF0Kr5IUo7eai5
- coZZJXowGfxWwxp0Qzr/JJB0TdVjMRLNcKx3iGpcLLcePYGXh86l7Z6OyewS63uUgKC/
- NfZwppVcpT2m624rHI5xoLGthlB82/aPkuV0MmeX/fgRY5/tuBgKl/bnHD2aCXWnWlA5
- lZDw==
-X-Gm-Message-State: AOAM532fXk9E9qigJdQchuNFzELbQEgXNe83chRlJyuytoTYHpriDt3U
- eYVA6W0ruvoahDCCNGy+tEhjZ8/2ezUoEc6QTVNuEESJOppZKBdywc1sHS6WFIF6emDrep9L048
- 6qQqdEeZTyjH06UD57Qt0QGL1NLohtfCdmx9z+FGGmwa2e4nOpJ5jarOhpJUR+S64NfWKYg==
-X-Google-Smtp-Source: ABdhPJyWD5Z8mog1lrNmFeB3Sj9lloObcBlu4DMRGN5AyclNoy+a82Sff9gvBtxPsYrcjqqbU4Xa8wmxPiA=
+ bh=kL9d/s0Mnyvvq5xceGf8t2Ku5ZfUJAPmTPk2nXEvlGU=;
+ b=qhRGEywMIcsLcaXJU/Hf9odn4DETtfKJd7JupN0v001Jx8xkMVw/LxsHEeTY9cFxBa
+ IvowLN5yqhW0rSpJSFVS9bxQAPaSAqhxSylhsREWt7uCtLh0ofENUrGUBCavOPJd1iPD
+ SyTQx7uZ6UPUclMAzO3wDPdiAi6TJZBX5gigivdtNbmeOFDtEqdQUrccoK+gVdZdhmC7
+ N7PiR4bWgGGzJsx+Zd0wNMlp2hJpWpM/9Gxm5RHo5V+M60Zoqfxwus4g8XOHBemAIsxd
+ d7JJoJhVBqqKgaiGqJA6c5uhGOQEtesbVNSv4CoEyMN0WFsPqMu7B3Hfmz3/FM9SHsRM
+ VfQQ==
+X-Gm-Message-State: AOAM533uvayKnvkhf17qP7hqdjhptDLvHVWMtmf72fA/152JEvaI/zGc
+ gRtrQirZd/yoMn52Wq0vGVPhWURQBypU/Jg6jn0DUUtKl8JrJ2jm7mtvjP+zP18l13XNT0e7MP0
+ 1Ka/Wxzyjg+OiRNzSiqwSIEBwpySafJXJuU0XYFJhUSkHtxVuWKF+jFSko/iOw9UF61kujw==
+X-Google-Smtp-Source: ABdhPJxQnq7pKml6XanwOMnHzHv9EDXFtxgBk58x0mq9HUGV2OjLa88lb/ZOZv8EHc19z+AoKhav5b9MVFE=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6602:1494:b0:649:5967:e7c7
+ (user=oupton job=sendgmr) by 2002:a05:6e02:1e06:b0:2c8:2707:71d
  with SMTP id
- a20-20020a056602149400b006495967e7c7mr15590609iow.49.1648762731335; Thu, 31
- Mar 2022 14:38:51 -0700 (PDT)
-Date: Thu, 31 Mar 2022 21:38:44 +0000
-Message-Id: <20220331213844.2894006-1-oupton@google.com>
+ g6-20020a056e021e0600b002c82707071dmr14141413ila.39.1648775319144; Thu, 31
+ Mar 2022 18:08:39 -0700 (PDT)
+Date: Fri,  1 Apr 2022 01:08:29 +0000
+Message-Id: <20220401010832.3425787-1-oupton@google.com>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH] KVM: arm64: Don't split hugepages outside of MMU write lock
+Subject: [PATCH v2 0/3] KVM: arm64: Limit feature register reads from AArch32
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- linux-arm-kernel@lists.infradead.org
+ Peter Shier <pshier@google.com>, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,145 +84,67 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-It is possible to take a stage-2 permission fault on a page larger than
-PAGE_SIZE. For example, when running a guest backed by 2M HugeTLB, KVM
-eagerly maps at the largest possible block size. When dirty logging is
-enabled on a memslot, KVM does *not* eagerly split these 2M stage-2
-mappings and instead clears the write bit on the pte.
+KVM/arm64 does not restrict the guest's view of the AArch32 feature
+registers when read from AArch32. HCR_EL2.TID3 is cleared for AArch32
+guests, meaning that register reads come straight from hardware. This is
+problematic as KVM relies on read_sanitised_ftr_reg() to expose a set of
+features consistent for a particular system.
 
-Since dirty logging is always performed at PAGE_SIZE granularity, KVM
-lazily splits these 2M block mappings down to PAGE_SIZE in the stage-2
-fault handler. This operation must be done under the write lock. Since
-commit f783ef1c0e82 ("KVM: arm64: Add fast path to handle permission
-relaxation during dirty logging"), the stage-2 fault handler
-conditionally takes the read lock on permission faults with dirty
-logging enabled. To that end, it is possible to split a 2M block mapping
-while only holding the read lock.
+Appropriate handlers must first be put in place for CP10 and CP15 ID
+register accesses before setting TID3. Rather than exhaustively
+enumerating each of the encodings for CP10 and CP15 registers, take the
+lazy route and aim the register accesses at the AArch64 system register
+table.
 
-The problem is demonstrated by running kvm_page_table_test with 2M
-anonymous HugeTLB, which splats like so:
+Patch 1 reroutes the CP15 registers into the AArch64 table, taking care
+to immediately RAZ undefined ranges of registers. This is done to avoid
+possibly conflicting with encodings for future AArch64 registers.
 
-  WARNING: CPU: 5 PID: 15276 at arch/arm64/kvm/hyp/pgtable.c:153 stage2_map_walk_leaf+0x124/0x158
+Patch 2 installs an exit handler for the CP10 ID registers and also
+relies on the general AArch64 register handler to implement reads.
 
-  [...]
+Finally, patch 3 actually sets TID3 for AArch32 guests, providing
+known-safe values for feature register accesses.
 
-  Call trace:
-  stage2_map_walk_leaf+0x124/0x158
-  stage2_map_walker+0x5c/0xf0
-  __kvm_pgtable_walk+0x100/0x1d4
-  __kvm_pgtable_walk+0x140/0x1d4
-  __kvm_pgtable_walk+0x140/0x1d4
-  kvm_pgtable_walk+0xa0/0xf8
-  kvm_pgtable_stage2_map+0x15c/0x198
-  user_mem_abort+0x56c/0x838
-  kvm_handle_guest_abort+0x1fc/0x2a4
-  handle_exit+0xa4/0x120
-  kvm_arch_vcpu_ioctl_run+0x200/0x448
-  kvm_vcpu_ioctl+0x588/0x664
-  __arm64_sys_ioctl+0x9c/0xd4
-  invoke_syscall+0x4c/0x144
-  el0_svc_common+0xc4/0x190
-  do_el0_svc+0x30/0x8c
-  el0_svc+0x28/0xcc
-  el0t_64_sync_handler+0x84/0xe4
-  el0t_64_sync+0x1a4/0x1a8
-
-Fix the issue by only acquiring the read lock if the guest faulted on a
-PAGE_SIZE granule w/ dirty logging enabled. Since it is possible for the
-faulting IPA to get collapsed into a larger block mapping until the read
-lock is acquired, retry the faulting instruction any time that the fault
-cannot be fixed by relaxing permissions. In so doing, the fault handler
-will acquire the write lock for the subsequent fault on a larger
-PAGE_SIZE mapping and split the block safely behind the write lock.
-
-Fixes: f783ef1c0e82 ("KVM: arm64: Add fast path to handle permission relaxation during dirty logging")
-Cc: Jing Zhang <jingzhangos@google.com>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
-
-Applies cleanly to kvmarm/fixes at the following commit:
+Series applies cleanly to kvmarm/fixes at commit:
 
   8872d9b3e35a ("KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler")
 
-Tested the patch by running KVM selftests. Additionally, I did 10
-iterations of the kvm_page_table_test with 2M anon HugeTLB memory.
+There is an argument that the series is in fact a bug fix for running
+AArch32 VMs on heterogeneous systems. To that end, it could be
+blamed/backported to when we first knew better:
 
-It is expected that this patch will cause fault serialization in the
-pathological case where all vCPUs are faulting on the same granule of
-memory, as every vCPU will attempt to acquire the write lock. The only
-safe way to cure this contention is to dissolve pages eagerly outside of
-the stage-2 fault handler (like x86).
+  93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
 
- arch/arm64/kvm/mmu.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+But I left that tag off as in the aforementioned change skipping
+AArch32 was intentional.
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 0d19259454d8..9384325bf3df 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1079,7 +1079,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	gfn_t gfn;
- 	kvm_pfn_t pfn;
- 	bool logging_active = memslot_is_logging(memslot);
--	bool logging_perm_fault = false;
-+	bool use_read_lock = false;
- 	unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
- 	unsigned long vma_pagesize, fault_granule;
- 	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-@@ -1114,7 +1114,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (logging_active) {
- 		force_pte = true;
- 		vma_shift = PAGE_SHIFT;
--		logging_perm_fault = (fault_status == FSC_PERM && write_fault);
-+		use_read_lock = (fault_status == FSC_PERM && write_fault &&
-+				 fault_granule == PAGE_SIZE);
- 	} else {
- 		vma_shift = get_vma_page_shift(vma, hva);
- 	}
-@@ -1218,7 +1219,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * logging dirty logging, only acquire read lock for permission
- 	 * relaxation.
- 	 */
--	if (logging_perm_fault)
-+	if (use_read_lock)
- 		read_lock(&kvm->mmu_lock);
- 	else
- 		write_lock(&kvm->mmu_lock);
-@@ -1267,10 +1268,24 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 */
- 	if (fault_status == FSC_PERM && vma_pagesize == fault_granule) {
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
--	} else {
-+	} else if (!use_read_lock) {
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
- 					     __pfn_to_phys(pfn), prot,
- 					     memcache);
-+
-+	/*
-+	 * The read lock is taken if the FSC indicates that the guest faulted on
-+	 * a PAGE_SIZE granule. It is possible that the stage-2 fault raced with
-+	 * a map operation that collapsed the faulted address into a larger
-+	 * block mapping.
-+	 *
-+	 * Since KVM splits mappings down to PAGE_SIZE when dirty logging is
-+	 * enabled, it is necessary to hold the write lock for faults where
-+	 * fault_granule > PAGE_SIZE. Retry the faulting instruction and acquire
-+	 * the write lock on the next exit.
-+	 */
-+	} else {
-+		ret = -EAGAIN;
- 	}
- 
- 	/* Mark the page dirty only if the fault is handled successfully */
-@@ -1280,7 +1295,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	}
- 
- out_unlock:
--	if (logging_perm_fault)
-+	if (use_read_lock)
- 		read_unlock(&kvm->mmu_lock);
- 	else
- 		write_unlock(&kvm->mmu_lock);
+Tested with AArch32 kvm-unit-tests and booting an AArch32 debian guest
+on a Raspberry Pi 4.
+
+v1: https://lore.kernel.org/kvmarm/20220329011301.1166265-1-oupton@google.com/
+
+v1 -> v2:
+ - Actually set TID3! Oops.
+ - Refactor kvm_emulate_cp15_id_reg() to check preconditions before
+   proceeding to emulation (Reiji)
+ - Tighten up comment on kvm_is_cp15_id_reg() to indicate that the only
+   other trapped ID register (CTR) is already handled in the cp15
+   register table (Reiji)
+
+Oliver Upton (3):
+  KVM: arm64: Wire up CP15 feature registers to their AArch64
+    equivalents
+  KVM: arm64: Plumb cp10 ID traps through the AArch64 sysreg handler
+  KVM: arm64: Start trapping ID registers for 32 bit guests
+
+ arch/arm64/include/asm/kvm_arm.h     |   3 +-
+ arch/arm64/include/asm/kvm_emulate.h |   8 --
+ arch/arm64/include/asm/kvm_host.h    |   1 +
+ arch/arm64/kvm/handle_exit.c         |   1 +
+ arch/arm64/kvm/sys_regs.c            | 129 +++++++++++++++++++++++++++
+ 5 files changed, 133 insertions(+), 9 deletions(-)
+
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
