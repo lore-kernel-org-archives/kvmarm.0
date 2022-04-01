@@ -2,50 +2,87 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263E4C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 18:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7264DC4332F
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 18:20:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 997A74B2DC;
-	Fri,  1 Apr 2022 14:20:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E04024B2B8;
+	Fri,  1 Apr 2022 14:20:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id laRYDyrNzL8V; Fri,  1 Apr 2022 14:20:43 -0400 (EDT)
+	with ESMTP id LEyG9In1RIr0; Fri,  1 Apr 2022 14:20:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BB464B293;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 791324B2C3;
 	Fri,  1 Apr 2022 14:20:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12A994B21E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:53:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BC604B20F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:56:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TEZCG1CFH39t for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Apr 2022 13:53:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 640244B216
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:53:09 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D79E11FB;
- Fri,  1 Apr 2022 10:53:08 -0700 (PDT)
-Received: from localhost.localdomain (unknown [10.119.36.138])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A60A13F66F;
- Fri,  1 Apr 2022 10:53:07 -0700 (PDT)
-From: Chase Conklin <chase.conklin@arm.com>
-To: maz@kernel.org
-Subject: Re: [PATCH v6 60/64] KVM: arm64: nv: Sync nested timer state with
- ARMv8.4
-Date: Fri,  1 Apr 2022 12:51:50 -0500
-Message-Id: <20220401175150.88298-1-chase.conklin@arm.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20220128121912.509006-61-maz@kernel.org>
-References: <20220128121912.509006-61-maz@kernel.org>
-MIME-Version: 1.0
+ with ESMTP id 3UWnXA4fzRmF for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Apr 2022 13:56:03 -0400 (EDT)
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
+ [209.85.215.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E5194B216
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:56:03 -0400 (EDT)
+Received: by mail-pg1-f201.google.com with SMTP id
+ e12-20020a63544c000000b003985d5888a8so2000544pgm.15
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Apr 2022 10:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=IZRim+LrWsbKLhWGtCJAPIUqsiasbKStOmO5lLjRFP8=;
+ b=OZ/CKz/kS7tsC+5ET9TAryRE1kCwgOMM6JGu+otu2+fefVt4XEH8bXii6Cm3AUtLCN
+ Gw9osJsofH3J6mv+Pa2qF4AgPyuVpqfC38Nn1tKiG+M3EKrlbdGH2QPh3j9eewzu59lx
+ ICuKCxkiGaO+YeoyVNcW7Nro8EgWUt56TC8bmJ6E3nLjN6WPFH2wT9SX/X9xZP2ZiF17
+ FJmRQTr/BPkOe9FVzGO8FNFlXg4UfuMC8jzLYVLEELEQwUE4jThW/O/paupXC7lWuxy1
+ jJcoNEaCMLN9riLuRhRPnUtblhKer7FLcbWvKt2OPcW3oc7aFw2S1ONaKDFn48FfppNp
+ IR4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=IZRim+LrWsbKLhWGtCJAPIUqsiasbKStOmO5lLjRFP8=;
+ b=cjluRMz6N9hiBImeyf8PbgOfnymQ8BRfCoRNkmzZeRVzoHnL86f7hdrWP2hGZxT/mN
+ sKE5UiDfXqIci7gWKkZer+UbuA4SrOdO3EupaA2zXJoncA2I3fs/zh2sEZHtElx2ZBGU
+ BEGS/0Zk/Jsstcg1pqO22jX24+Wg3FVeRpoFsmBVclgjIfdaNSzdekMon3ZgFZQrSQDb
+ Er6jeVzcV9GQED3vwGiO4sfotfoq+JBxakvg93Umv/xsp+Qy/FeXONOrJc/HSPCFs1eL
+ CX4kGyhwrWm6SPuPF38dOWiRhvHJQ7I5KcrzUb4vddVaweCeAeebPEBrleKqMiiS5aHP
+ uCXA==
+X-Gm-Message-State: AOAM530E5ltCDCfJOdK/kQuuYKOq0XHTfJPFvcQ1rNaTIW/FQf1GPQFD
+ H3HGUi9Hfod8GgnguI67viUZ0/peTFCoUA==
+X-Google-Smtp-Source: ABdhPJw5vwbBPjHYSVeggYwsZsRSNlx5RqVJMTrxoIjsNKWoBtog3ECYJyqS377WsBTJdAeMsxOsjt/Joc7/Ug==
+X-Received: from dmatlack-heavy.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a62:6403:0:b0:4fa:c74c:83c5 with SMTP id
+ y3-20020a626403000000b004fac74c83c5mr11997208pfb.30.1648835762419; Fri, 01
+ Apr 2022 10:56:02 -0700 (PDT)
+Date: Fri,  1 Apr 2022 17:55:32 +0000
+In-Reply-To: <20220401175554.1931568-1-dmatlack@google.com>
+Message-Id: <20220401175554.1931568-2-dmatlack@google.com>
+Mime-Version: 1.0
+References: <20220401175554.1931568-1-dmatlack@google.com>
+X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
+Subject: [PATCH v3 01/23] KVM: x86/mmu: Optimize MMU page cache lookup for all
+ direct SPs
+From: David Matlack <dmatlack@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Fri, 01 Apr 2022 14:20:42 -0400
-Cc: kvmarm@lists.cs.columbia.edu, kernel-team@android.com, kvm@vger.kernel.org,
- andre.przywara@arm.com, christoffer.dall@arm.com, chase.conklin@arm.com,
- mihai.carabas@oracle.com, gankulkarni@os.amperecomputing.com,
- linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org
+Cc: Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>, David Matlack <dmatlack@google.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, maciej.szmigiero@oracle.com,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -62,121 +99,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+Commit fb58a9c345f6 ("KVM: x86/mmu: Optimize MMU page cache lookup for
+fully direct MMUs") skipped the unsync checks and write flood clearing
+for full direct MMUs. We can extend this further to skip the checks for
+all direct shadow pages. Direct shadow pages in indirect MMUs (i.e.
+shadow paging) are used when shadowing a guest huge page with smaller
+pages. Such direct shadow pages, like their counterparts in fully direct
+MMUs, are never marked unsynced or have a non-zero write-flooding count.
 
-On Fri, 28 Jan 2022 12:19:08 +0000, Marc Zyngier wrote:
-> From: Christoffer Dall <christoffer.dall at arm.com>
->
-> Emulating the ARMv8.4-NV timers is a bit odd, as the timers can
-> be reconfigured behind our back without the hypervisor even
-> noticing. In the VHE case, that's an actual regression in the
-> architecture...
+Checking sp->role.direct also generates better code than checking
+direct_map because, due to register pressure, direct_map has to get
+shoved onto the stack and then pulled back off.
 
-In addition to that, I belive that the vEL2's view of CNTy_CTL_ELx.ISTATUS can
-get out of sync with the corresponding timer conditions. Currently, the values
-are kept in NVMem and updated only during a put of a vCPU.
+No functional change intended.
 
-I'd like to say that this could be fixed by updating the NVMem copies on each
-entry into vEL2, but that doesn't prevent them from getting out of sync while
-the vEL2 is still running. Provided that the host takes a timer interrupt
-whenever a vEL2 timer condition is satisfied, the host should have a chance to
-update the NVMem copy before the vEL2 can see an out of sync value. Even still,
-I think there is still a small window where vEL2 can read the NVMem copy after
-the timer condition is met but before the host timer interrupt fires. In
-practice, that might not not be a huge issue.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The only other option I can see is to trap the accesses (which for the virtual
-timer requires FEAT_ECV). At least that would prevent the timers from being
-configured behind the host's back...
-
-Thanks,
-Chase
-
->
-> Signed-off-by: Christoffer Dall <christoffer.dall at arm.com>
-> Signed-off-by: Marc Zyngier <maz at kernel.org>
-> ---
->  arch/arm64/kvm/arch_timer.c  | 37 ++++++++++++++++++++++++++++++++++++
->  arch/arm64/kvm/arm.c         |  3 +++
->  include/kvm/arm_arch_timer.h |  1 +
->  3 files changed, 41 insertions(+)
->
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 5e4f93605d36..2371796b1ab5 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -785,6 +785,43 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->  	set_cntvoff(0);
->  }
->  
-> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu)
-> +{
-> +	if (!is_hyp_ctxt(vcpu))
-> +		return;
-> +
-> +	/*
-> +	 * Guest hypervisors using ARMv8.4 enhanced nested virt support have
-> +	 * their EL1 timer register accesses redirected to the VNCR page.
-> +	 */
-> +	if (!vcpu_el2_e2h_is_set(vcpu)) {
-> +		/*
-> +		 * For a non-VHE guest hypervisor, we update the hardware
-> +		 * timer registers with the latest value written by the guest
-> +		 * to the VNCR page and let the hardware take care of the
-> +		 * rest.
-> +		 */
-> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CTL_EL0),  SYS_CNTV_CTL);
-> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
-> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CTL_EL0),  SYS_CNTP_CTL);
-> +		write_sysreg_el0(__vcpu_sys_reg(vcpu, CNTP_CVAL_EL0), SYS_CNTP_CVAL);
-> +	} else {
-> +		/*
-> +		 * For a VHE guest hypervisor, the emulated state (which
-> +		 * is stored in the VNCR page) could have been updated behind
-> +		 * our back, and we must reset the emulation of the timers.
-> +		 */
-> +
-> +		struct timer_map map;
-> +		get_timer_map(vcpu, &map);
-> +
-> +		soft_timer_cancel(&map.emul_vtimer->hrtimer);
-> +		soft_timer_cancel(&map.emul_ptimer->hrtimer);
-> +		timer_emulate(map.emul_vtimer);
-> +		timer_emulate(map.emul_ptimer);
-> +	}
-> +}
-> +
->  /*
->   * With a userspace irqchip we have to check if the guest de-asserted the
->   * timer and if so, unmask the timer irq signal on the host interrupt
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index ac7d89c1e987..4c47a66eac8c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -936,6 +936,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  		if (static_branch_unlikely(&userspace_irqchip_in_use))
->  			kvm_timer_sync_user(vcpu);
->  
-> +		if (vcpu_has_nv2(vcpu))
-> +			kvm_timer_sync_nested(vcpu);
-> +
->  		kvm_arch_vcpu_ctxsync_fp(vcpu);
->  
->  		/*
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index 0a76dac8cb6a..89b08e5b456e 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -68,6 +68,7 @@ int kvm_timer_hyp_init(bool);
->  int kvm_timer_enable(struct kvm_vcpu *vcpu);
->  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu);
->  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
-> +void kvm_timer_sync_nested(struct kvm_vcpu *vcpu);
->  void kvm_timer_sync_user(struct kvm_vcpu *vcpu);
->  bool kvm_timer_should_notify_user(struct kvm_vcpu *vcpu);
->  void kvm_timer_update_run(struct kvm_vcpu *vcpu);
-> -- 
-> 2.30.2
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 1361eb4599b4..dbfda133adbe 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2034,7 +2034,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 					     int direct,
+ 					     unsigned int access)
+ {
+-	bool direct_mmu = vcpu->arch.mmu->direct_map;
+ 	union kvm_mmu_page_role role;
+ 	struct hlist_head *sp_list;
+ 	unsigned quadrant;
+@@ -2075,7 +2074,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 			continue;
+ 		}
+ 
+-		if (direct_mmu)
++		/* unsync and write-flooding only apply to indirect SPs. */
++		if (sp->role.direct)
+ 			goto trace_get_page;
+ 
+ 		if (sp->unsync) {
+-- 
+2.35.1.1094.g7c7d902a7c-goog
 
 _______________________________________________
 kvmarm mailing list
