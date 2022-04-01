@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 439D0C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6879BC4332F
 	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 18:21:08 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F09FC4B2D2;
-	Fri,  1 Apr 2022 14:21:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2200F4B29C;
+	Fri,  1 Apr 2022 14:21:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id z8cijqi7H6YP; Fri,  1 Apr 2022 14:21:06 -0400 (EDT)
+	with ESMTP id xLDtnSqCVff0; Fri,  1 Apr 2022 14:21:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0158A4B2BA;
-	Fri,  1 Apr 2022 14:20:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B91994B2E6;
+	Fri,  1 Apr 2022 14:20:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CEDF4B216
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:56:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBCF34B20F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:56:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A93XZ042b2Tz for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Apr 2022 13:56:29 -0400 (EDT)
+ with ESMTP id UxLeQSMhi0GB for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Apr 2022 13:56:24 -0400 (EDT)
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
  [209.85.216.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB9FF4B27C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:56:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81BAB4B216
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 13:56:24 -0400 (EDT)
 Received: by mail-pj1-f73.google.com with SMTP id
- o15-20020a17090aac0f00b001c6595a43dbso1931995pjq.4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Apr 2022 10:56:28 -0700 (PDT)
+ m24-20020a17090b069800b001c7de0243a2so1628573pjz.9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Apr 2022 10:56:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=N+Yt2vLgKrZHcuNVUsOj9eJGBLy1X2SsKXkQhye+WRI=;
- b=Qr6kriferOcm7AIY4k/KBQ72DaTvRRltjRQh/5ECnhmB7SaEkrHaUEXakckg6PNkRI
- UqnATSklWc+8zALzY6JKcjXGFe1SfBq6T8EoKDzLpY6jLE2QLs0t53yQ/skVLxXtxGPc
- SbCNotOgDY1raopFMdahKZ5R9WaFB1/m5rObgP9wTILsP2yEOkos0mtBOC4YzivxawyR
- A6HVPHEPfUothLkegc9HrO+kBmoz4HMGCFgxA1bBAmyGBat3PADxzlV+wjdNE3FggTSW
- FImW+j6GQKwF5ZJexZpan7VjGim/N71Uhn5jXmS5VsRXU7NBV1T63G8bmnjgkl+Uvk8D
- elaw==
+ :cc; bh=6nXa09mmt/6fKuSSqvfCsyYP8ACA5E/75PQkFkVUSuM=;
+ b=EjkKGkzp3sFVKutQ7HKMWIknnxfZtmcm1Uv7rWc8W3rzaUUCvWJ/WDcOR+lAkqZDBN
+ 8si82TCM2H9vua5OYF3I9On/pnmiMmZjbHw7FjG8TJgHo0DU9fAMb4jRpwje9wriV6Gc
+ Xxy2A9lqTCeYgoOvDvLH9nxii+AKEutfjVGG+FEkzE0CqPLVWfBDdeTsQqtjxHQYXxQQ
+ RAvTE1OzMWxA71F8Zf6SKr8BUsFVr2tcj0btjFJfDEergnYTo3L1ot7Ye37Yn2UMMWeP
+ gjthXPgtBWHa7s1v+UFaMNe7hCjtbhb5SIcmbO/Vbko9K+g5ICEgluBdl3/o4WoqMJei
+ t0vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=N+Yt2vLgKrZHcuNVUsOj9eJGBLy1X2SsKXkQhye+WRI=;
- b=GmSjZo5rsgE1XHJZ+bk9OFs0M7sOldAqAnJFapjB9vnTLg+LdM0EMtmLPGEeUC5k0S
- qk5/rQgqDRi5I1sUEty7SdiUzuMWu52TyQLuGMcm5RnlQsNB9m9yBhbGyy5Dx9Jxq+pp
- lyccm1ZwQ0IWdU5LqqnZpZNtyGVXbywZVXYRFluM0SiEfNH5gRdeF1lgxaZ3Nk+Do4FP
- QTJLGG1SV1YxuoN63OAgHE2uRGUdUUCbsxHmtu4yXL/n74RixzI2XBSO80B84go2D+hi
- cX+oDdMBLmpBv/jmCBHu4dXXQ89askvjvsD7j1UeAn5bZcF3zE4tzoZR0jfNN25Cmssj
- ex+Q==
-X-Gm-Message-State: AOAM531p/Ud+QIo3JabTPTg6su4ApW6L1Qay41BtBE7WBCZLNvxoJ/w6
- umbtIYp84R+RPcm2DeY2DzkyOt2UBUe7ng==
-X-Google-Smtp-Source: ABdhPJwplQwfsWEVcDA4UHiGwuSL/A4oELiqXDjC0LjFD0RE2g1bBGBlZDUBl9Lc3mLD3IwFfsHZo9b9soqNMw==
+ bh=6nXa09mmt/6fKuSSqvfCsyYP8ACA5E/75PQkFkVUSuM=;
+ b=rx1BbUTUEejPSaY6Ib2baq93d3Jag/lF2gNcuE6hRzeOUK3KXGmqkgg8ZNUNjRrPXn
+ oB/lWISS5+bqrzZKr/a8t90zcYfGbt51QbJUy8gQMklGW+gIrDGDhyo5yCmUmm35U86h
+ nNr8EzqO15EjXS4eSwcm+13t66XM4ejLfyzZ46auqMkLw6B+gpLsx8lj72lxsSRxH73O
+ slwpKOAEMKUXFIt1YjW0S5u7pw+c7rxTeVGffkcsOhZ6IYpkrIafLwx/aWKPyEWqQhrY
+ mpvPD4Zlesqwe3v0zxcdqfaHijg6bHdAsqZbD4U7Bj/D3MQx5kVc1Cb6uJBhnKaSImsj
+ EQsg==
+X-Gm-Message-State: AOAM533UBg9X4fCLjiFHkQy5i3xaAb1ZFt59PoKNd6nMLUDloDqvWINM
+ b4WMivtXuXLE3VNZoNXlecS1vCrCHpqYXw==
+X-Google-Smtp-Source: ABdhPJxTUcosla4+mIbtqxvUm22jFAX4QiyWBPyvxtfD4VUdc7Cj5IRmQn5lIj5TzvvvJYTw/mjAo71ZpLvBXA==
 X-Received: from dmatlack-heavy.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:3e44:b0:1c9:8365:5753 with SMTP
- id t4-20020a17090a3e4400b001c983655753mr13236316pjm.60.1648835788080; Fri, 01
- Apr 2022 10:56:28 -0700 (PDT)
-Date: Fri,  1 Apr 2022 17:55:48 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:4b44:b0:1c7:41d:9428 with SMTP id
+ mi4-20020a17090b4b4400b001c7041d9428mr13003517pjb.85.1648835783718; Fri, 01
+ Apr 2022 10:56:23 -0700 (PDT)
+Date: Fri,  1 Apr 2022 17:55:45 +0000
 In-Reply-To: <20220401175554.1931568-1-dmatlack@google.com>
-Message-Id: <20220401175554.1931568-18-dmatlack@google.com>
+Message-Id: <20220401175554.1931568-15-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220401175554.1931568-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v3 17/23] KVM: x86/mmu: Extend make_huge_page_split_spte() for
- the shadow MMU
+Subject: [PATCH v3 14/23] KVM: x86/mmu: Decouple rmap_add() and
+ link_shadow_page() from kvm_vcpu
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Fri, 01 Apr 2022 14:20:42 -0400
@@ -99,93 +99,146 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Currently make_huge_page_split_spte() assumes execute permissions can be
-granted to any 4K SPTE when splitting huge pages. This is true for the
-TDP MMU but is not necessarily true for the shadow MMU, since we may be
-splitting a huge page that shadows a non-executable guest huge page.
-
-To fix this, pass in the child shadow page where the huge page will be
-split and derive the execution permission from the shadow page's role.
-This is correct because huge pages are always split with direct shadow
-page and thus the shadow page role contains the correct access
-permissions.
+Allow adding new entries to the rmap and linking shadow pages without a
+struct kvm_vcpu pointer by moving the implementation of rmap_add() and
+link_shadow_page() into inner helper functions.
 
 No functional change intended.
 
+Reviewed-by: Ben Gardon <bgardon@google.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/spte.c    | 13 +++++++------
- arch/x86/kvm/mmu/spte.h    |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c |  2 +-
- 3 files changed, 9 insertions(+), 8 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 44 +++++++++++++++++++++++++-----------------
+ 1 file changed, 26 insertions(+), 18 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index d10189d9c877..ef6537c6f5ef 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -216,10 +216,11 @@ static u64 make_spte_executable(u64 spte)
-  * This is used during huge page splitting to build the SPTEs that make up the
-  * new page table.
-  */
--u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index)
-+u64 make_huge_page_split_spte(u64 huge_spte, struct kvm_mmu_page *sp, int index)
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 39d9cccbdc7e..7305a8c625c0 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -725,11 +725,6 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+ 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+ }
+ 
+-static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_vcpu *vcpu)
+-{
+-	return kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_pte_list_desc_cache);
+-}
+-
+ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
  {
-+	bool exec_allowed = sp->role.access & ACC_EXEC_MASK;
-+	int child_level = sp->role.level;
- 	u64 child_spte;
--	int child_level;
+ 	kmem_cache_free(pte_list_desc_cache, pte_list_desc);
+@@ -874,7 +869,7 @@ gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu, gfn_t gfn,
+ /*
+  * Returns the number of pointers in the rmap chain, not counting the new one.
+  */
+-static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
++static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
+ 			struct kvm_rmap_head *rmap_head)
+ {
+ 	struct pte_list_desc *desc;
+@@ -885,7 +880,7 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
+ 		rmap_head->val = (unsigned long)spte;
+ 	} else if (!(rmap_head->val & 1)) {
+ 		rmap_printk("%p %llx 1->many\n", spte, *spte);
+-		desc = mmu_alloc_pte_list_desc(vcpu);
++		desc = kvm_mmu_memory_cache_alloc(cache);
+ 		desc->sptes[0] = (u64 *)rmap_head->val;
+ 		desc->sptes[1] = spte;
+ 		desc->spte_count = 2;
+@@ -897,7 +892,7 @@ static int pte_list_add(struct kvm_vcpu *vcpu, u64 *spte,
+ 		while (desc->spte_count == PTE_LIST_EXT) {
+ 			count += PTE_LIST_EXT;
+ 			if (!desc->more) {
+-				desc->more = mmu_alloc_pte_list_desc(vcpu);
++				desc->more = kvm_mmu_memory_cache_alloc(cache);
+ 				desc = desc->more;
+ 				desc->spte_count = 0;
+ 				break;
+@@ -1596,8 +1591,10 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
  
- 	if (WARN_ON_ONCE(!is_shadow_present_pte(huge_spte)))
- 		return 0;
-@@ -228,7 +229,6 @@ u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index)
- 		return 0;
+ #define RMAP_RECYCLE_THRESHOLD 1000
  
- 	child_spte = huge_spte;
--	child_level = huge_level - 1;
+-static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+-		     u64 *spte, gfn_t gfn)
++static void __rmap_add(struct kvm *kvm,
++		       struct kvm_mmu_memory_cache *cache,
++		       const struct kvm_memory_slot *slot,
++		       u64 *spte, gfn_t gfn)
+ {
+ 	struct kvm_mmu_page *sp;
+ 	struct kvm_rmap_head *rmap_head;
+@@ -1606,15 +1603,21 @@ static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+ 	sp = sptep_to_sp(spte);
+ 	kvm_mmu_page_set_gfn(sp, spte - sp->spt, gfn);
+ 	rmap_head = gfn_to_rmap(gfn, sp->role.level, slot);
+-	rmap_count = pte_list_add(vcpu, spte, rmap_head);
++	rmap_count = pte_list_add(cache, spte, rmap_head);
  
- 	/*
- 	 * The child_spte already has the base address of the huge page being
-@@ -241,10 +241,11 @@ u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index)
- 		child_spte &= ~PT_PAGE_SIZE_MASK;
- 
- 		/*
--		 * When splitting to a 4K page, mark the page executable as the
--		 * NX hugepage mitigation no longer applies.
-+		 * When splitting to a 4K page where execution is allowed, mark
-+		 * the page executable as the NX hugepage mitigation no longer
-+		 * applies.
- 		 */
--		if (is_nx_huge_page_enabled())
-+		if (exec_allowed && is_nx_huge_page_enabled())
- 			child_spte = make_spte_executable(child_spte);
+ 	if (rmap_count > RMAP_RECYCLE_THRESHOLD) {
+-		kvm_unmap_rmapp(vcpu->kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
++		kvm_unmap_rmapp(kvm, rmap_head, NULL, gfn, sp->role.level, __pte(0));
+ 		kvm_flush_remote_tlbs_with_address(
+-				vcpu->kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
++				kvm, sp->gfn, KVM_PAGES_PER_HPAGE(sp->role.level));
  	}
+ }
  
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 73f12615416f..921ea77f1b5e 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -415,7 +415,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
- 	       u64 old_spte, bool prefetch, bool can_unsync,
- 	       bool host_writable, u64 *new_spte);
--u64 make_huge_page_split_spte(u64 huge_spte, int huge_level, int index);
-+u64 make_huge_page_split_spte(u64 huge_spte, struct kvm_mmu_page *sp, int index);
- u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
- u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
- u64 mark_spte_for_access_track(u64 spte);
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index a04262bc34e2..36d241405ecc 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1455,7 +1455,7 @@ static int tdp_mmu_split_huge_page(struct kvm *kvm, struct tdp_iter *iter,
- 	 * not been linked in yet and thus is not reachable from any other CPU.
- 	 */
- 	for (i = 0; i < PT64_ENT_PER_PAGE; i++)
--		sp->spt[i] = make_huge_page_split_spte(huge_spte, level, i);
-+		sp->spt[i] = make_huge_page_split_spte(huge_spte, sp, i);
++static void rmap_add(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
++		     u64 *spte, gfn_t gfn)
++{
++	__rmap_add(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, slot, spte, gfn);
++}
++
+ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ {
+ 	bool young = false;
+@@ -1682,13 +1685,13 @@ static unsigned kvm_page_table_hashfn(gfn_t gfn)
+ 	return hash_64(gfn, KVM_MMU_HASH_SHIFT);
+ }
  
- 	/*
- 	 * Replace the huge spte with a pointer to the populated lower level
+-static void mmu_page_add_parent_pte(struct kvm_vcpu *vcpu,
++static void mmu_page_add_parent_pte(struct kvm_mmu_memory_cache *cache,
+ 				    struct kvm_mmu_page *sp, u64 *parent_pte)
+ {
+ 	if (!parent_pte)
+ 		return;
+ 
+-	pte_list_add(vcpu, parent_pte, &sp->parent_ptes);
++	pte_list_add(cache, parent_pte, &sp->parent_ptes);
+ }
+ 
+ static void mmu_page_remove_parent_pte(struct kvm_mmu_page *sp,
+@@ -2304,8 +2307,8 @@ static void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator)
+ 	__shadow_walk_next(iterator, *iterator->sptep);
+ }
+ 
+-static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+-			     struct kvm_mmu_page *sp)
++static void __link_shadow_page(struct kvm_mmu_memory_cache *cache, u64 *sptep,
++			       struct kvm_mmu_page *sp)
+ {
+ 	u64 spte;
+ 
+@@ -2315,12 +2318,17 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+ 
+ 	mmu_spte_set(sptep, spte);
+ 
+-	mmu_page_add_parent_pte(vcpu, sp, sptep);
++	mmu_page_add_parent_pte(cache, sp, sptep);
+ 
+ 	if (sp->unsync_children || sp->unsync)
+ 		mark_unsync(sptep);
+ }
+ 
++static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep, struct kvm_mmu_page *sp)
++{
++	__link_shadow_page(&vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
++}
++
+ static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ 				   unsigned direct_access)
+ {
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
