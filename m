@@ -2,64 +2,64 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27028C433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 14:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 544AFC433F5
+	for <kvmarm@archiver.kernel.org>; Fri,  1 Apr 2022 14:28:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C54DC4B120;
-	Fri,  1 Apr 2022 10:28:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AE994B0BD;
+	Fri,  1 Apr 2022 10:28:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cc29+FBgBJGo; Fri,  1 Apr 2022 10:28:44 -0400 (EDT)
+	with ESMTP id xRjzT3WQ+A9N; Fri,  1 Apr 2022 10:28:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 963714B26B;
-	Fri,  1 Apr 2022 10:28:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C051240BFA;
+	Fri,  1 Apr 2022 10:28:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D0184B12C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 10:28:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4939940B9F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 10:28:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X1aqBwwwc+Hx for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Apr 2022 10:28:41 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 46EDB4B2A8
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 10:28:41 -0400 (EDT)
+ with ESMTP id Qn+igH9lOF0S for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Apr 2022 10:28:52 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1AEF40B85
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2022 10:28:52 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id C4AC461CAE;
- Fri,  1 Apr 2022 14:28:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B31DC2BBE4;
- Fri,  1 Apr 2022 14:28:38 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id A1F49B82510;
+ Fri,  1 Apr 2022 14:28:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D67C36AE2;
+ Fri,  1 Apr 2022 14:28:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1648823320;
- bh=fnYaDxJ7uaS/SP7Ui3FGqO635IVj63CD0EGocJ9Mak8=;
+ s=k20201202; t=1648823329;
+ bh=6Ul5pp7XIfNXKABwQ047h2r/t7RmSYZJneM1eZnztl8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=QrWWR30Aec1Hrbu5U4bxnxvQRrwX63FeyYxROo+F62Vwt3Sj7RnN5hLwK2HslKDrI
- riEp3JEUbc0TzPHqfJVhqsUSZu71yVvuMpPpkXnY1jfUHWGDsZVsBx+Gf6hz4GC/OR
- dolgr26vfKfWz2VOQMGJrusyjmSOojpx1q4FfgH+6lL1oQ63fgcnAOhQlGPuA7dVA7
- NX1Uwl/mc/pqpLbI0l2bLZNPPHKM/hUPA1q13ec+yRNUcrTJDBaSgXcvIqmEQu61bq
- 2h5KTvqFZJWSzzSeIO/oaED3g/NDvpuUHxRNbnJmfVBC0sefoV9RZYzR1Z206SVPt2
- 7G/Ruz8ZlK29A==
+ b=ud4T8fx7Byeq8FaZjoBkAFahxSdfMKd+aF4E2hTGa4gi30af0LfuxiQYgu2tad+Ag
+ zNr88f6FpwoaicirSrFgt3BpdBwO0FpNzdfmYvFAN5FkP8LP8/Z/rkLQe3NvOHlAVR
+ y2kU+85sZgzIgYYBOegoJHOhnmmcQOv5axPu8FjxHGhdG9LMQlDAPgzlEwH68GJk/n
+ 1w/TPQ7KcZAEz1+eHrMTx6KsoU9/n6CulDQu5KKESh9MUVj6wm+X6woxaWbw8AqeWI
+ oC6OqIYFEXpR9GGNCc0xNs+pasNzoyBMpGvBeG7ZlZNYUJg7UrtRuhE8HkwUHhxgWx
+ TEiib36xWKhFw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.17 056/149] kvm: selftests: aarch64: use a tighter
- assert in vgic_poke_irq()
-Date: Fri,  1 Apr 2022 10:24:03 -0400
-Message-Id: <20220401142536.1948161-56-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.17 059/149] KVM: arm64: Do not change the PMU event
+ filter after a VCPU has run
+Date: Fri,  1 Apr 2022 10:24:06 -0400
+Message-Id: <20220401142536.1948161-59-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220401142536.1948161-1-sashal@kernel.org>
 References: <20220401142536.1948161-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-Cc: Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
- Marc Zyngier <maz@kernel.org>, linux-kselftest@vger.kernel.org,
- pbonzini@redhat.com, shuah@kernel.org, kvmarm@lists.cs.columbia.edu,
+Cc: Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org, will@kernel.org,
+ corbet@lwn.net, Marc Zyngier <maz@kernel.org>, linux-doc@vger.kernel.org,
+ catalin.marinas@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -77,49 +77,162 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Ricardo Koller <ricarkol@google.com>
+From: Marc Zyngier <maz@kernel.org>
 
-[ Upstream commit b53de63a89244c196d8a2ea76b6754e3fdb4b626 ]
+[ Upstream commit 5177fe91e4cf78a659aada2c9cf712db4d788481 ]
 
-vgic_poke_irq() checks that the attr argument passed to the vgic device
-ioctl is sane. Make this check tighter by moving it to after the last
-attr update.
+Userspace can specify which events a guest is allowed to use with the
+KVM_ARM_VCPU_PMU_V3_FILTER attribute. The list of allowed events can be
+identified by a guest from reading the PMCEID{0,1}_EL0 registers.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
-Reported-by: Reiji Watanabe <reijiw@google.com>
-Cc: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Changing the PMU event filter after a VCPU has run can cause reads of the
+registers performed before the filter is changed to return different values
+than reads performed with the new event filter in place. The architecture
+defines the two registers as read-only, and this behaviour contradicts
+that.
+
+Keep track when the first VCPU has run and deny changes to the PMU event
+filter to prevent this from happening.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
-Link: https://lore.kernel.org/r/20220127030858.3269036-6-ricarkol@google.com
+[ Alexandru E: Added commit message, updated ioctl documentation ]
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Link: https://lore.kernel.org/r/20220127161759.53553-2-alexandru.elisei@arm.com
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- tools/testing/selftests/kvm/lib/aarch64/vgic.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ Documentation/virt/kvm/devices/vcpu.rst |  2 +-
+ arch/arm64/include/asm/kvm_host.h       |  1 +
+ arch/arm64/kvm/arm.c                    |  4 +++
+ arch/arm64/kvm/pmu-emul.c               | 33 +++++++++++++++----------
+ 4 files changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/vgic.c b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-index 7c876ccf9294..5d45046c1b80 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/vgic.c
-@@ -140,9 +140,6 @@ static void vgic_poke_irq(int gic_fd, uint32_t intid,
- 	uint64_t val;
- 	bool intid_is_private = INTID_IS_SGI(intid) || INTID_IS_PPI(intid);
+diff --git a/Documentation/virt/kvm/devices/vcpu.rst b/Documentation/virt/kvm/devices/vcpu.rst
+index 60a29972d3f1..d063aaee5bb7 100644
+--- a/Documentation/virt/kvm/devices/vcpu.rst
++++ b/Documentation/virt/kvm/devices/vcpu.rst
+@@ -70,7 +70,7 @@ irqchip.
+ 	 -ENODEV  PMUv3 not supported or GIC not initialized
+ 	 -ENXIO   PMUv3 not properly configured or in-kernel irqchip not
+ 	 	  configured as required prior to calling this attribute
+-	 -EBUSY   PMUv3 already initialized
++	 -EBUSY   PMUv3 already initialized or a VCPU has already run
+ 	 -EINVAL  Invalid filter range
+ 	 =======  ======================================================
  
--	/* Check that the addr part of the attr is within 32 bits. */
--	assert(attr <= KVM_DEV_ARM_VGIC_OFFSET_MASK);
--
- 	uint32_t group = intid_is_private ? KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
- 					  : KVM_DEV_ARM_VGIC_GRP_DIST_REGS;
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 031e3a2537fc..8234626a945a 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -136,6 +136,7 @@ struct kvm_arch {
  
-@@ -152,6 +149,9 @@ static void vgic_poke_irq(int gic_fd, uint32_t intid,
- 		attr += SZ_64K;
- 	}
+ 	/* Memory Tagging Extension enabled for the guest */
+ 	bool mte_enabled;
++	bool ran_once;
+ };
  
-+	/* Check that the addr part of the attr is within 32 bits. */
-+	assert((attr & ~KVM_DEV_ARM_VGIC_OFFSET_MASK) == 0);
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 4dca6ffd03d4..85a2a75f4498 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -634,6 +634,10 @@ int kvm_arch_vcpu_run_pid_change(struct kvm_vcpu *vcpu)
+ 	if (kvm_vm_is_protected(kvm))
+ 		kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
+ 
++	mutex_lock(&kvm->lock);
++	kvm->arch.ran_once = true;
++	mutex_unlock(&kvm->lock);
 +
- 	/*
- 	 * All calls will succeed, even with invalid intid's, as long as the
- 	 * addr part of the attr is within 32 bits (checked above). An invalid
+ 	return ret;
+ }
+ 
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index fbcfd4ec6f92..bc771bc1a041 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -924,6 +924,8 @@ static bool pmu_irq_is_valid(struct kvm *kvm, int irq)
+ 
+ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
++	struct kvm *kvm = vcpu->kvm;
++
+ 	if (!kvm_vcpu_has_pmu(vcpu))
+ 		return -ENODEV;
+ 
+@@ -941,7 +943,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		int __user *uaddr = (int __user *)(long)attr->addr;
+ 		int irq;
+ 
+-		if (!irqchip_in_kernel(vcpu->kvm))
++		if (!irqchip_in_kernel(kvm))
+ 			return -EINVAL;
+ 
+ 		if (get_user(irq, uaddr))
+@@ -951,7 +953,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		if (!(irq_is_ppi(irq) || irq_is_spi(irq)))
+ 			return -EINVAL;
+ 
+-		if (!pmu_irq_is_valid(vcpu->kvm, irq))
++		if (!pmu_irq_is_valid(kvm, irq))
+ 			return -EINVAL;
+ 
+ 		if (kvm_arm_pmu_irq_initialized(vcpu))
+@@ -966,7 +968,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		struct kvm_pmu_event_filter filter;
+ 		int nr_events;
+ 
+-		nr_events = kvm_pmu_event_mask(vcpu->kvm) + 1;
++		nr_events = kvm_pmu_event_mask(kvm) + 1;
+ 
+ 		uaddr = (struct kvm_pmu_event_filter __user *)(long)attr->addr;
+ 
+@@ -978,12 +980,17 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		     filter.action != KVM_PMU_EVENT_DENY))
+ 			return -EINVAL;
+ 
+-		mutex_lock(&vcpu->kvm->lock);
++		mutex_lock(&kvm->lock);
++
++		if (kvm->arch.ran_once) {
++			mutex_unlock(&kvm->lock);
++			return -EBUSY;
++		}
+ 
+-		if (!vcpu->kvm->arch.pmu_filter) {
+-			vcpu->kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
+-			if (!vcpu->kvm->arch.pmu_filter) {
+-				mutex_unlock(&vcpu->kvm->lock);
++		if (!kvm->arch.pmu_filter) {
++			kvm->arch.pmu_filter = bitmap_alloc(nr_events, GFP_KERNEL_ACCOUNT);
++			if (!kvm->arch.pmu_filter) {
++				mutex_unlock(&kvm->lock);
+ 				return -ENOMEM;
+ 			}
+ 
+@@ -994,17 +1001,17 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 			 * events, the default is to allow.
+ 			 */
+ 			if (filter.action == KVM_PMU_EVENT_ALLOW)
+-				bitmap_zero(vcpu->kvm->arch.pmu_filter, nr_events);
++				bitmap_zero(kvm->arch.pmu_filter, nr_events);
+ 			else
+-				bitmap_fill(vcpu->kvm->arch.pmu_filter, nr_events);
++				bitmap_fill(kvm->arch.pmu_filter, nr_events);
+ 		}
+ 
+ 		if (filter.action == KVM_PMU_EVENT_ALLOW)
+-			bitmap_set(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
++			bitmap_set(kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+ 		else
+-			bitmap_clear(vcpu->kvm->arch.pmu_filter, filter.base_event, filter.nevents);
++			bitmap_clear(kvm->arch.pmu_filter, filter.base_event, filter.nevents);
+ 
+-		mutex_unlock(&vcpu->kvm->lock);
++		mutex_unlock(&kvm->lock);
+ 
+ 		return 0;
+ 	}
 -- 
 2.34.1
 
