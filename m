@@ -2,73 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE40C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 14:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D426C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 16:46:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB1C04B2A3;
-	Mon,  4 Apr 2022 10:47:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54E134B290;
+	Mon,  4 Apr 2022 12:46:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@ziepe.ca
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4zMitFtRnyDo; Mon,  4 Apr 2022 10:47:18 -0400 (EDT)
+	with ESMTP id f6FMs2a56L0m; Mon,  4 Apr 2022 12:46:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72E414B2BB;
-	Mon,  4 Apr 2022 10:47:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 090234B2A5;
+	Mon,  4 Apr 2022 12:46:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77E884B295
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 10:47:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7978E48F9C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 09:24:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wQYLW4N9dlEb for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2022 10:47:16 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C0B24B23F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 10:47:16 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 52F4E6157F;
- Mon,  4 Apr 2022 14:47:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACF52C340EE;
- Mon,  4 Apr 2022 14:47:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1649083634;
- bh=UBiyTVY3jPw/kwQGsGmG7CA9LhSqHRjUGhLmpR6GJSw=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=GS/UArGSQ0mETeN+At6tSC8ePgdvJBSwHTE9iT/5gdMwzo987FY7nWSCqUY524rPP
- +gwMBz5gj94MRY1pTgOhczQ5r47bOtpYUihQeZF1cFA3oNZaCVMHcgzt9YRnW7ZP3r
- 9NcTUeaWXvbSZZ8DYujxu7lzECSIupm08EeFr05/U8QHXdmPKpNIXZjq3cNZDf9muJ
- kXuz4/gX7Cd3e8JJa4UHAwsjBNaXeZD00KYXDnmuaY9/CUlHtahHxt6tWQzHD7Q06k
- AXEBfb7Kz+UXaU8OxmkoA31/nQwXZK8rS2QEfL5E/0l0itPNQHEyWX7F6Z4zUhVpJk
- kGXLORkMShjCA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nbNz5-001Wuy-Np; Mon, 04 Apr 2022 15:47:12 +0100
-Date: Mon, 04 Apr 2022 15:47:11 +0100
-Message-ID: <87o81gc3dc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
+ with ESMTP id In6wyFJuhu5h for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2022 09:24:08 -0400 (EDT)
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com
+ [209.85.222.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4ED8B49E46
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 09:24:08 -0400 (EDT)
+Received: by mail-qk1-f172.google.com with SMTP id w141so7555313qkb.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 06:24:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ziepe.ca; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=Dj909oRaNRb7301+COOAr97OsAL18eivV1Pl1t4/Y+Y=;
+ b=R2BOiI73bs4bhzycM+H031R9LnpSNDl9hKlfXb/Dsoc/YoMnaNNRKuQM34krIxm7bA
+ UdsRcGSrXdyKB/quZlwiHCdQaKXaV+f12rnrSF+IMmSYVRVeRgWOr1Rs7fay6xmOVLY8
+ gSTwID3IsnJpPaf4UShy9BcWjNLRqILCMZ+ILJ3BbBwQLna9/74cnfwKsp8+RXQ6WYz9
+ dITlk4nDyLpanZaCHbh4P8ed9NWhbgc+yoMtAyXPlBDSHqcsPyowJ4JOOSG3rDrQZvfw
+ sFTcXv/Ie18QUyJRu8j5PZ+bBcdiGYnl/hzo2dqUc/Yc3Pwe1Ut+ImfYz41fTLY4VEPS
+ sT9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Dj909oRaNRb7301+COOAr97OsAL18eivV1Pl1t4/Y+Y=;
+ b=G91fERIQbEs6uvhSpMj2ALLGWjR79e1hbKy/pa1RNzK2aU0L5cQoBA3FvXomPvFJiJ
+ nJ0bPogX3JTBuXovZXq7UMpPvCMHRd5Rmcq+gwLwt3zXdOH0bSo+sQkAt5+lw5EmF1x3
+ jC+Q4/kb5ZNT4rtsgGV5EU2L+VymGWc1foDD6PSIhI1f1yLtdAPX1MQSydNOeqrM6lQi
+ 81po13Hkp0SRehCyXhSkfMlcw4rPIwDIIdfVyDPCM3kAHlIpxBIILkS2oWjW2kmXLx7m
+ k9lV9uVzeT1srA3cbektKUZ1OWxnmiuWxWud7YAuVJ3d6ZDvXxJobWREdhkLZ4qMeVrH
+ aERw==
+X-Gm-Message-State: AOAM530awEKTqjXc2VaKTkAvpSizDDbTYkbgyd4pDsg2jIfnmEn8UQ9y
+ KRMoPf/2lCF9ue9FN3PNvyOOUQ==
+X-Google-Smtp-Source: ABdhPJwd0cXQeoez8xJ261ZBrwRTk36GjcX534AnDsLUP+ScvuOwmJyyalnuuG5orGBA0Q0zQDNBsg==
+X-Received: by 2002:a37:c4c:0:b0:67b:2b35:762 with SMTP id
+ 73-20020a370c4c000000b0067b2b350762mr13415114qkm.6.1649078647740; 
+ Mon, 04 Apr 2022 06:24:07 -0700 (PDT)
+Received: from ziepe.ca ([206.223.160.26]) by smtp.gmail.com with ESMTPSA id
+ d126-20020a37b484000000b0067e60283d08sm6476475qkf.40.2022.04.04.06.24.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 Apr 2022 06:24:07 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94) (envelope-from <jgg@ziepe.ca>)
+ id 1nbMgf-00CAIu-Pe; Mon, 04 Apr 2022 10:24:05 -0300
+Date: Mon, 4 Apr 2022 10:24:05 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH v2] kvm/arm64: fixed passthrough gpu into vm on arm64
-In-Reply-To: <20220404132405.GQ64706@ziepe.ca>
+Message-ID: <20220404132405.GQ64706@ziepe.ca>
 References: <20220401090828.614167-1-xieming@kylinos.cn>
- <87tubcbvgk.wl-maz@kernel.org> <20220404132405.GQ64706@ziepe.ca>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jgg@ziepe.ca, xieming@kylinos.cn, sashal@kernel.org,
- catalin.marinas@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org,
- alex.williamson@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <87tubcbvgk.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <87tubcbvgk.wl-maz@kernel.org>
+X-Mailman-Approved-At: Mon, 04 Apr 2022 12:46:48 -0400
 Cc: sashal@kernel.org, catalin.marinas@arm.com, linux@armlinux.org.uk,
  linux-kernel@vger.kernel.org, xieming <xieming@kylinos.cn>,
  alex.williamson@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
@@ -89,49 +94,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 04 Apr 2022 14:24:05 +0100,
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> 
-> On Fri, Apr 01, 2022 at 05:48:59PM +0100, Marc Zyngier wrote:
-> 
-> > NAK. For a start, there is no such thing as 'write-combine' in the ARM
-> > architecture, and I'm not convinced you can equate WC to Normal-NC.
-> > See the previous discussion at [1].
-> > 
-> > [1] https://lore.kernel.org/r/20210429162906.32742-1-sdonthineni@nvidia.com
-> 
-> We've had a lot of discussions with ARM related to how this works with
-> drivers like mlx5 that use WC.
-> 
-> ARM has now published some guidance on this:
-> 
-> https://community.arm.com/arm-research/m/resources/1012
+On Fri, Apr 01, 2022 at 05:48:59PM +0100, Marc Zyngier wrote:
 
-Nicely buried where nobody would dare looking.
-
+> NAK. For a start, there is no such thing as 'write-combine' in the ARM
+> architecture, and I'm not convinced you can equate WC to Normal-NC.
+> See the previous discussion at [1].
 > 
-> As an ecosystem we seem to be drifting toward Normal-NC for this
-> behavior (largely because it is what Linux does). At least that is
-> what we are testing and qualifing ARM CPUs against mlx5 with.
-> 
-> I'm guessing it will turn into a SBSA like thing where the ARM ARM is
-> kind of vauge but a SOC has to implement Normal-NC in a certain way to
-> be functional for the server market.
+> [1] https://lore.kernel.org/r/20210429162906.32742-1-sdonthineni@nvidia.com
 
-The main issue is that this equivalence isn't architected, so people
-can build whatever they want. SBSA means nothing to KVM (or Linux at
-large), and there is currently no way to describe which devices are
-safe to map as Normal-NC vs Device.
+We've had a lot of discussions with ARM related to how this works with
+drivers like mlx5 that use WC.
 
-We either have to take userspace's word for it, or rely on some other
-heuristics (do this for PCIe, but not anything else). None of which
-are entirely safe. Not to mention that no currently available CPU
-implements FEAT_DGH.
+ARM has now published some guidance on this:
 
-	M.
+https://community.arm.com/arm-research/m/resources/1012
 
--- 
-Without deviation from the norm, progress is not possible.
+As an ecosystem we seem to be drifting toward Normal-NC for this
+behavior (largely because it is what Linux does). At least that is
+what we are testing and qualifing ARM CPUs against mlx5 with.
+
+I'm guessing it will turn into a SBSA like thing where the ARM ARM is
+kind of vauge but a SOC has to implement Normal-NC in a certain way to
+be functional for the server market.
+
+Jason
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
