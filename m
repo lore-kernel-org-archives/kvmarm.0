@@ -2,80 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EA8C433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 17:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5730DC433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 18:21:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CB754B2AB;
-	Mon,  4 Apr 2022 13:57:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B84294B2C6;
+	Mon,  4 Apr 2022 14:21:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PuLD8Lfpe3yL; Mon,  4 Apr 2022 13:57:22 -0400 (EDT)
+	with ESMTP id kXJmqon0MXt5; Mon,  4 Apr 2022 14:21:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 340D64B156;
-	Mon,  4 Apr 2022 13:57:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 971BD4B23F;
+	Mon,  4 Apr 2022 14:21:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B1D749F55
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 13:57:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1A0A4B1CA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 14:21:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Fp0J14Zvtns9 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2022 13:57:20 -0400 (EDT)
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com
- [209.85.166.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4045D49EE4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 13:57:20 -0400 (EDT)
-Received: by mail-il1-f181.google.com with SMTP id x9so7458295ilc.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 10:57:20 -0700 (PDT)
+ with ESMTP id brmax97Ol9cO for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2022 14:21:28 -0400 (EDT)
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com
+ [209.85.166.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DD144B092
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 14:21:28 -0400 (EDT)
+Received: by mail-il1-f202.google.com with SMTP id
+ s14-20020a056e021a0e00b002c7c03a5d81so6638049ild.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 11:21:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=GmQMDW9Kl2RXHFpra8Cb+yFdRaCEgtk0WeuxWIun/PE=;
- b=T/YID3m7jqfMsZdI5yipTxP6mq1tBCIPkkaeRZEOGXJXCRTNAVRLgO6d3oGPKiaIsM
- hB1IuYXuYvxwGnm/jAntlYOH177EGDJShNXiQsKuSX5zmuTfztgeEwn8fCn3X5foUENF
- tSPmbGrEqNTLnjaKU1LnFelmOozabOJ/CJhjHjgSpIDgJsIVglglRlphqOF6I5tZB4fN
- RjXIJozATO4FyKzOy/3PbchB4/uuHz062rsh7sbqfMMWRA2/+03t3OuXgIyBsGiXxQuP
- s6lHlTJrjRufZd9tiwr5+a8oqSI3d98djdhUvx2xfaAT94UiQ2BSWSf8Or0aJ0TjXzUY
- Cssw==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=8WwwRyCeCeMlIzr9SxYzcSTADq8P7PlbsRggytaLcp4=;
+ b=VQaIdErXUgdjfuVxv831Q/UJ1CWc5wWY7lxH3zvCVtXh16fjW923ZCg+YZuUsWju3h
+ 4ILe42584P0T1xmue23EdXWW7PxQVhSS77wXAmPxATMxy/cGsyGIM6bUkch6ZVyRElCQ
+ rYfBdRc5h8GB9QfjxeOjmesVjpoFyeeH8Zu3wSnbSfQxQ3f/BrQJ4KI3CO5dBC0PNy47
+ Yq8oCV8PCHMfzHfZRdiUAWzfhsKGQ1Hpzi816xxYXKutJYAFxMS/T/Z1CZFLs+IWzaVH
+ muqotKois0KT0BZ6aZswP/2F+KHpolFWLj99t2uLkL2he7pDHDC+m/o+W1S/4MwTh6cX
+ aMtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=GmQMDW9Kl2RXHFpra8Cb+yFdRaCEgtk0WeuxWIun/PE=;
- b=Hq88tu4Hgew4AhKK0M7mK1Cjpu3cEkHTIJ54LL6LsTwSKWy1U1WJ3EgBjzZzmmfUq/
- mP4fYvDT0Zo6HouTaDqM0l0xft1Uhd9RVi8e/c/6wFt8Vn1JeM8S0EZO67JR7JEcXDdI
- 8dhVP1cB0ExG77JEmOoaDilANUe/ijnuVG1fd8Sy8kcrGwAGKiQ1H00zC/MrO/1Rl7oT
- bwzDmiyXKvFNxTt2+n8bQhwCCgSUfkJgIOPtnFqyxmwAvKZyzJpKwBS2D1B1W5RJoBpR
- IJnjXtz1/8y2iWrDYNLPgmgIC2bI0zInZHY4bG2wjuNXV3XORKqAfc/U3oTWwYZbc5IK
- xakQ==
-X-Gm-Message-State: AOAM5338EKYiDPa/cyYJm0aCaDRw9nd6tFVBjT470bHZ8bQsnByQGq8j
- UJI6cMCdhJkatVWMpE8Cu5o7fw==
-X-Google-Smtp-Source: ABdhPJyxcxrXm46aKYYcD84LuHXVzCCX7Rui8hCXMmO19c75bw55+ZX3BLOKGyUKxAuIXD3PlAjPvg==
-X-Received: by 2002:a92:3405:0:b0:2c8:70ad:fa86 with SMTP id
- b5-20020a923405000000b002c870adfa86mr483750ila.268.1649095039360; 
- Mon, 04 Apr 2022 10:57:19 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- d15-20020a92d78f000000b002ca4c409d1asm1036438iln.83.2022.04.04.10.57.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 Apr 2022 10:57:18 -0700 (PDT)
-Date: Mon, 4 Apr 2022 17:57:14 +0000
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=8WwwRyCeCeMlIzr9SxYzcSTADq8P7PlbsRggytaLcp4=;
+ b=KLFvJC0+/FQDxGGOsE0jkTTJW5ICNQslnIIDrYJ2dc8jcwqUmno9CDqtduLEDiRuFA
+ ANYikC6QSbyKoBoKGRZR5/ITlvpK3Iqowxz4uqkbKs5XQOH5Ed0p7djAtFG2HxKRtP1N
+ /vjtIfzUo0jU00QJxJNCF97g5+n3j1sZhJhv2CVyFsJymWQP1vD9ZwdNuWZe2ldkfkeS
+ eaR56A848hAeexshzJA0bhPShzFpEh72SMcIHUCTf568qezdSEtM4gi6WEl+z3kcYdql
+ RWGxai0gQeyt4xthzr4toCUBn9JJ3PC7RURw+rRa3WQgJf1rTrk5cEZNYitOXq8ySust
+ lbbw==
+X-Gm-Message-State: AOAM533hnLrRDwIdN9LRSdUkNDldLURYd5T8g0VsQz0DhAt958Tv743L
+ YJVjGwwmcaGPSD6FHY/NYWNLclMJoYut/xZu9VM30RwMzOSG2MWDAU4EQoDVYvd0fdii0Dx6vUX
+ +M9frJq8jvRi2LzDFiqHg28wQwMquSC/8xVcazSAUnWFCE2FBjYJcc3Y6lCdobuLyt0Y9RA==
+X-Google-Smtp-Source: ABdhPJwvPmo526HelrAxxb/UEnfhShlEth+Y810soIVt6pAr1nUtlqyUQGi/Lx6WU18UFIH94tuineOFKlE=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a6b:e40a:0:b0:64c:8ce1:3757 with
+ SMTP id
+ u10-20020a6be40a000000b0064c8ce13757mr727788iog.106.1649096487896; Mon, 04
+ Apr 2022 11:21:27 -0700 (PDT)
+Date: Mon,  4 Apr 2022 18:21:16 +0000
+Message-Id: <20220404182119.3561025-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
+Subject: [PATCH v2 0/3] KVM: Fix use-after-free in debugfs
 From: Oliver Upton <oupton@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH 2/4] KVM: Only log about debugfs directory collision once
-Message-ID: <Yksxeo7IhzyFS8AM@google.com>
-References: <20220402174044.2263418-1-oupton@google.com>
- <20220402174044.2263418-3-oupton@google.com>
- <Yksr6etwnN0iW8ZH@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yksr6etwnN0iW8ZH@google.com>
+To: kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, stable@kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Peter Shier <pshier@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -93,62 +85,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Sean,
+Funny enough, dirty_log_perf_test on arm64 highlights some issues around
+the use of debugfs in KVM. The test leaks a GIC FD across test
+iterations, and as such the associated VM is never destroyed.
+Nonetheless, the VM FD is reused for the next VM, which collides with
+the old debugfs directory.
 
-On Mon, Apr 04, 2022 at 05:33:29PM +0000, Sean Christopherson wrote:
-> On Sat, Apr 02, 2022, Oliver Upton wrote:
-> > In all likelihood, a debugfs directory name collision is the result of a
-> > userspace bug. If userspace closes the VM fd without releasing all
-> > references to said VM then the debugfs directory is never cleaned.
-> > 
-> > Even a ratelimited print statement can fill up dmesg, making it
-> > particularly annoying for the person debugging what exactly went wrong.
-> > Furthermore, a userspace that wants to be a nuisance could clog up the
-> > logs by deliberately holding a VM reference after closing the VM fd.
-> > 
-> > Dial back logging to print at most once, given that userspace is most
-> > likely to blame. Leave the statement in place for the small chance that
-> > KVM actually got it wrong.
-> > 
-> > Cc: stable@kernel.org
-> > Fixes: 85cd39af14f4 ("KVM: Do not leak memory for duplicate debugfs directories")
-> 
-> I don't think this warrants Cc: stable@, the whole point of ratelimiting printk is
-> to guard against this sort of thing.  If a ratelimited printk can bring down the
-> kernel and/or logging infrastructure, then the kernel is misconfigured for the
-> environment.
+Where things get off is when the vgic-state debugfs file is created. KVM
+does not check if the VM directory exists before creating the file,
+which results in the file being added to the root of debugfs when the
+aforementioned collision occurs.
 
-Good point.
+Since KVM relies on deleting the VM directory to clean up all associated
+files, the errant vgic-state file never gets cleaned up. Poking the file
+after the VM is destroyed is a use-after-free :)
 
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 69c318fdff61..38b30bd60f34 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -959,7 +959,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
-> >  	mutex_lock(&kvm_debugfs_lock);
-> >  	dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
-> >  	if (dent) {
-> > -		pr_warn_ratelimited("KVM: debugfs: duplicate directory %s\n", dir_name);
-> > +		pr_warn_once("KVM: debugfs: duplicate directory %s\n", dir_name);
-> 
-> I don't see how printing once is going to be usefull for a human debugger.  If we
-> want to get rid of the ratelimited print, why not purge it entirely?
+Patch 1 shuts the door on any mistaken debugfs file creations by
+initializing kvm->debugfs_dentry with ERR_PTR() instead of NULL.
 
-I'd really like to drop it altogether. I've actually looked at several
-instances of this printk firing internally, and all of it had to do with
-some leak in userspace.
+The last two patches ensure the GIC FD actually gets closed by the
+selftests that use it. Patch 2 is a genuine bug fix since it will create
+multiple VMs for a single test run. The arch_timer test also happens to
+leak the GIC FD, though it is benign since the test creates a single VM.
+Patch 3 gets the arch_timer test to follow the well-behaved pattern.
 
-I'll pull this patch out of the series for v2 and maybe just propose we
-drop it altogether.
+Applies cleanly to the second KVM pull (tagged kvm-5.18-2), at commit:
 
---
-Thanks,
-Oliver
+  c15e0ae42c8e ("KVM: x86: fix sending PV IPI")
+
+Tested on an Ampere Altra system in the following combinations:
+
+  - Bad kernel + fixed selftests
+  - Fixed kernel + bad selftests
+
+In both cases there was no vgic-state file at the root of debugfs.
+
+v1: https://lore.kernel.org/kvm/20220402174044.2263418-1-oupton@google.com/
+
+v1 -> v2:
+ - Initialize kvm->debugfs_dentry to ERR_PTR(-ENOENT) to prevent the
+   creation of all VM debug files, not just vgic-state.
+ - Leave logging as-is for now. Consider dropping altogether in a later
+   patch (Sean)
+ - Collect R-b from Jing
+
+Oliver Upton (3):
+  KVM: Don't create VM debugfs files outside of the VM directory
+  selftests: KVM: Don't leak GIC FD across dirty log test iterations
+  selftests: KVM: Free the GIC FD when cleaning up in arch_timer
+
+ .../selftests/kvm/aarch64/arch_timer.c        | 15 +++++---
+ .../selftests/kvm/dirty_log_perf_test.c       | 34 +++++++++++++++++--
+ virt/kvm/kvm_main.c                           | 10 ++++--
+ 3 files changed, 50 insertions(+), 9 deletions(-)
+
+-- 
+2.35.1.1094.g7c7d902a7c-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
