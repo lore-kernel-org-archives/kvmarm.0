@@ -2,71 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B57C433F5
-	for <kvmarm@archiver.kernel.org>; Sun,  3 Apr 2022 15:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDAE5C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 01:51:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EDF584B1AB;
-	Sun,  3 Apr 2022 11:47:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E730849EBD;
+	Sun,  3 Apr 2022 21:51:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sf5KJp4nsJgD; Sun,  3 Apr 2022 11:47:35 -0400 (EDT)
+	with ESMTP id AgNkYDia7HS2; Sun,  3 Apr 2022 21:51:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C8C584B21E;
-	Sun,  3 Apr 2022 11:47:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D7DE94B0EF;
+	Sun,  3 Apr 2022 21:51:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C07D4B1AB
- for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Apr 2022 11:47:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EDE94A5A0
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Apr 2022 21:51:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nbsJqgqoOJOf for <kvmarm@lists.cs.columbia.edu>;
- Sun,  3 Apr 2022 11:47:33 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 590614B17B
- for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Apr 2022 11:47:33 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1649000853;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xGb1wvVClVIB5502nscW3b3M6oaGhW5PvhB4rV0GUWg=;
- b=P31yk2Pd7/Umi3oVq6vNTHK5+A9k/mqkeDxNKAYwWbJW2zQiMMxwwvlRw4Tr0iZwznhHbC
- AjmY1wMCKQuKo6eTPc8qKFftK1uxPN2/9IOrnWyQARxKr6zPjsRXudaxUqfvGWn9/4SaAP
- mYDDQiFWtrEe2ouYTzy1DC5BO4013MI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-447-3oMwTB21O2eg4adoNk9Kww-1; Sun, 03 Apr 2022 11:47:28 -0400
-X-MC-Unique: 3oMwTB21O2eg4adoNk9Kww-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com
- [10.11.54.9])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C391C2999B22;
- Sun,  3 Apr 2022 15:47:25 +0000 (UTC)
-Received: from [10.72.12.82] (ovpn-12-82.pek2.redhat.com [10.72.12.82])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 046C2432498;
- Sun,  3 Apr 2022 15:47:11 +0000 (UTC)
-Subject: Re: [PATCH v6 00/18] Support SDEI Virtualization
-From: Gavin Shan <gshan@redhat.com>
-To: kvmarm@lists.cs.columbia.edu
-References: <20220403153911.12332-1-gshan@redhat.com>
-Message-ID: <a3bf5b44-0ab8-fd85-5557-6c496fd68bc1@redhat.com>
-Date: Sun, 3 Apr 2022 23:47:07 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id ZNa1iYnaEm4k for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  3 Apr 2022 21:51:33 -0400 (EDT)
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com
+ [209.85.214.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08AA249EBD
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  3 Apr 2022 21:51:32 -0400 (EDT)
+Received: by mail-pl1-f170.google.com with SMTP id y6so6974116plg.2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 03 Apr 2022 18:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/HPdEv1u1dHBI9/8ZBUeRoQdCX9qorofNrQMRHwE/GM=;
+ b=TH7dk7njieIgZMTiOMnEIMvq+kdoMWSqtMYSxG5nKkNG4lplBb6nOcZElTyYhgdDrp
+ hR9rgg9oE2w1A7L4evuBKkZ258pqZoWl2wBuPX3QeTUN0fsmzRuh3Mi6Yxn1H37IQqg3
+ X80ZJeF8GbE73f1zPSqOYhkLWEUPe0NE+5q76iLvJZ+4uFD40aOTQ8rkoBvoF0xBvVie
+ CWx92BLBNo6CsWPLZOmC5jsJ/d8/XNmGI+oyuCS8ixp3agIFVepWHZjPhNcTQWmvgMX8
+ GgSAV2Bj+pC7Xv0vAQQJIXIDDv67tLEX4dg644wEjpR/Eq+2cR+xwBxdTEZ3JJLdkvxM
+ sqXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/HPdEv1u1dHBI9/8ZBUeRoQdCX9qorofNrQMRHwE/GM=;
+ b=5y10+NjZp8T60DAQs1m+SAqCr5tSTaaK/G0Bb4tU+AB3TpzWwoiSFLpNYJ8P/WVtBJ
+ SfjLWwegvGSFKbRQHCCx16Apc3Ezt/t6BAt/oXFgm/Nc5/4InLHi6Kqy7wlkbV7AJccR
+ zZVZ3BwB7gxSYsJbHfznDELcfAfbXjCf//w1c4wWmz972geGdl5NgD3y4pFwqTHxhbOD
+ Wti8VpvBUVR/6Jtgk+t21dUspDKxDyrZI1jC8tEzBBBK3d8pHK2XITCr/nMZvSydgxQY
+ lCbPGn3sPK9dVqfVtEVElR9MJ8hV+DzGiDMlKp9TVPBhV2iDNqqbVIKh1s1+QawkZgEk
+ Lgxg==
+X-Gm-Message-State: AOAM531TAAaPPSq+NnpA7HMNW3SqGU7lXYth73v+GCNIr3rmZMkOhjY6
+ fCJWApPs+HWyHw512k3lnT9AKEwl7wk865ZyWKzutQ==
+X-Google-Smtp-Source: ABdhPJxyxERsq7XOg9dz4MNtcUQNW88b6cSv75PSoe0iFwSBsyc+IpLz523KkiK7LrRy69grM1vP5GttYQgnmHlw9TY=
+X-Received: by 2002:a17:902:c215:b0:153:8d90:a108 with SMTP id
+ 21-20020a170902c21500b001538d90a108mr21434704pll.172.1649037091972; Sun, 03
+ Apr 2022 18:51:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20220403153911.12332-1-gshan@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org
+References: <20220401010832.3425787-1-oupton@google.com>
+ <20220401010832.3425787-2-oupton@google.com>
+In-Reply-To: <20220401010832.3425787-2-oupton@google.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Sun, 3 Apr 2022 18:51:16 -0700
+Message-ID: <CAAeT=Fy=aUNHq7zWYxYOLWvR-nOZr5Gdvu1yNiOisgtJ3SF1pw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Wire up CP15 feature registers to
+ their AArch64 equivalents
+To: Oliver Upton <oupton@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -78,79 +80,28 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 4/3/22 11:38 PM, Gavin Shan wrote:
-> This series intends to virtualize Software Delegated Exception Interface
-> (SDEI), which is defined by DEN0054C (v1.1). It allows the hypervisor to
-> deliver NMI-alike SDEI event to guest and it's needed by Async PF to
-> deliver page-not-present notification from hypervisor to guest. The code
-> and the required qemu changes can be found from:
-> 
->     https://developer.arm.com/documentation/den0054/c
->     https://github.com/gwshan/linux    ("kvm/arm64_sdei")
->     https://github.com/gwshan/qemu     ("kvm/arm64_sdei")
-> 
-> The design is quite strightforward by following the specification. The
-> (SDEI) events are classified into the shared and private ones according
-> to their scope. The shared event is system or VM scoped, but the private
-> event is vcpu scoped. This implementation doesn't support the shared
-> event because all the needed events are private. Besides, the migration
-> isn't supported by implementation and it's something to be supported
-> in future.
-> 
-> There are several objects (data structures) introduced to help on the
-> event registration, enablement, disablement, unregistration, reset,
-> delivery and handling.
-> 
->    * kvm_sdei_exposed_event
->      The event which are defined and exposed by KVM. The event can't
->      be registered until it's exposed. Besides, all the information
->      in this event can't be changed after it's exposed.
->      
->    * kvm_sdei_event
->      The events are created based on the exposed events. Their states
->      are changed when hypercalls are received or they are delivered
->      to guest for handling.
->      
->    * kvm_sdei_vcpu_context
->      The vcpu context helps to handle events. The interrupted context
->      is saved before the event handler is executed, and restored after
->      the event handler is to finish.
->      
->    * kvm_sdei_vcpu
->      Place holder for all objects for one particular VCPU.
-> 
-> The patches are organized as below:
-> 
->    PATCH[01-02] Preparatory work to extend smccc_get_argx() and refactor
->                 hypercall routing mechanism
->    PATCH[03]    Adds SDEI virtualization infrastructure
->    PATCH[04-16] Supports various SDEI hypercalls and event handling
->    PATCH[17]    Exposes SDEI capability
->    PATCH[18]    Adds SDEI selftest case
->    
-> The previous revisions can be found:
-> 
->    v5: https://lore.kernel.org/kvmarm/20220322080710.51727-1-gshan@redhat.com/
->    v4: https://lore.kernel.org/kvmarm/20210815001352.81927-1-gshan@redhat.com/
->    v3: https://lore.kernel.org/kvmarm/20210507083124.43347-1-gshan@redhat.com/
->    v2: https://lore.kernel.org/kvmarm/20210209032733.99996-1-gshan@redhat.com/
->    v1: https://lore.kernel.org/kvmarm/20200817100531.83045-1-gshan@redhat.com/
-> 
+On Thu, Mar 31, 2022 at 6:08 PM Oliver Upton <oupton@google.com> wrote:
+>
+> KVM currently does not trap ID register accesses from an AArch32 EL1.
+> This is painful for a couple of reasons. Certain unimplemented features
+> are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
+> architecture to v8.0. Additionally, we attempt to paper over
+> heterogeneous systems by using register values that are safe
+> system-wide. All this hard work is completely sidestepped because KVM
+> does not set TID3 for AArch32 guests.
+>
+> Fix up handling of CP15 feature registers by simply rerouting to their
+> AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
+> to fix up the oddball CP10 feature registers still.
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
 
-I'm explicitly copying Oliver, James, Mark and Shannon to avoid resending this series.
-It seems they have been skipped even I explicitly copied them by 'git send-email --cc=<email-addr>'.
-
-[...]
-
-Thanks,
-Gavin
-
-
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
