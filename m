@@ -2,81 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D426C433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 16:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D9C1C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 17:33:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 54E134B290;
-	Mon,  4 Apr 2022 12:46:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E713B4B2AB;
+	Mon,  4 Apr 2022 13:33:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@ziepe.ca
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f6FMs2a56L0m; Mon,  4 Apr 2022 12:46:49 -0400 (EDT)
+	with ESMTP id o+lRIBJDdsjA; Mon,  4 Apr 2022 13:33:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 090234B2A5;
-	Mon,  4 Apr 2022 12:46:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B462D4B23F;
+	Mon,  4 Apr 2022 13:33:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7978E48F9C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 09:24:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8635A49F4C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 13:33:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id In6wyFJuhu5h for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2022 09:24:08 -0400 (EDT)
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com
- [209.85.222.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4ED8B49E46
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 09:24:08 -0400 (EDT)
-Received: by mail-qk1-f172.google.com with SMTP id w141so7555313qkb.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 06:24:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ziepe.ca; s=google;
+ with ESMTP id 1Lq9DIgBcNJZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2022 13:33:35 -0400 (EDT)
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com
+ [209.85.216.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B3E449F29
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 13:33:35 -0400 (EDT)
+Received: by mail-pj1-f42.google.com with SMTP id
+ j20-20020a17090ae61400b001ca9553d073so3649905pjy.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 10:33:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=Dj909oRaNRb7301+COOAr97OsAL18eivV1Pl1t4/Y+Y=;
- b=R2BOiI73bs4bhzycM+H031R9LnpSNDl9hKlfXb/Dsoc/YoMnaNNRKuQM34krIxm7bA
- UdsRcGSrXdyKB/quZlwiHCdQaKXaV+f12rnrSF+IMmSYVRVeRgWOr1Rs7fay6xmOVLY8
- gSTwID3IsnJpPaf4UShy9BcWjNLRqILCMZ+ILJ3BbBwQLna9/74cnfwKsp8+RXQ6WYz9
- dITlk4nDyLpanZaCHbh4P8ed9NWhbgc+yoMtAyXPlBDSHqcsPyowJ4JOOSG3rDrQZvfw
- sFTcXv/Ie18QUyJRu8j5PZ+bBcdiGYnl/hzo2dqUc/Yc3Pwe1Ut+ImfYz41fTLY4VEPS
- sT9A==
+ bh=3eEb1Fbi03Tqfrd9+V/qD2RzIsPJ4iRE2QaaWt7eods=;
+ b=l/xcKvP+X/QNDFo8xztJ73QES2Bgc0urPyjP8JRiWoVOq7xTRLys6nwW8ykl/7cTKd
+ QoKEoYcj9dyoHPKku12UZfF5UyXIUp+ZVpz+cxWV9sWRVB1ae0+hkVGKeUFMsK9jUu2F
+ lwCfZWPoxX8GfuuLJ8ecimBfibmEtZxJq1kwvqzoaWxoEQbrgOeTLOZgV6c3wRJEEeQx
+ rCtwRHS1vfYQZwpsM3vnxgWTVgBZ66YUQIfmChct9n8ArkKRUgBO2Rt49Uxq2WUSblwM
+ WQUlsfWFVlj/hPdKjyWf1QFXQntETu4xbL4dJOTqNP0N7lFCJZOAfmvDeVZEy4+yfyoX
+ HXUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=Dj909oRaNRb7301+COOAr97OsAL18eivV1Pl1t4/Y+Y=;
- b=G91fERIQbEs6uvhSpMj2ALLGWjR79e1hbKy/pa1RNzK2aU0L5cQoBA3FvXomPvFJiJ
- nJ0bPogX3JTBuXovZXq7UMpPvCMHRd5Rmcq+gwLwt3zXdOH0bSo+sQkAt5+lw5EmF1x3
- jC+Q4/kb5ZNT4rtsgGV5EU2L+VymGWc1foDD6PSIhI1f1yLtdAPX1MQSydNOeqrM6lQi
- 81po13Hkp0SRehCyXhSkfMlcw4rPIwDIIdfVyDPCM3kAHlIpxBIILkS2oWjW2kmXLx7m
- k9lV9uVzeT1srA3cbektKUZ1OWxnmiuWxWud7YAuVJ3d6ZDvXxJobWREdhkLZ4qMeVrH
- aERw==
-X-Gm-Message-State: AOAM530awEKTqjXc2VaKTkAvpSizDDbTYkbgyd4pDsg2jIfnmEn8UQ9y
- KRMoPf/2lCF9ue9FN3PNvyOOUQ==
-X-Google-Smtp-Source: ABdhPJwd0cXQeoez8xJ261ZBrwRTk36GjcX534AnDsLUP+ScvuOwmJyyalnuuG5orGBA0Q0zQDNBsg==
-X-Received: by 2002:a37:c4c:0:b0:67b:2b35:762 with SMTP id
- 73-20020a370c4c000000b0067b2b350762mr13415114qkm.6.1649078647740; 
- Mon, 04 Apr 2022 06:24:07 -0700 (PDT)
-Received: from ziepe.ca ([206.223.160.26]) by smtp.gmail.com with ESMTPSA id
- d126-20020a37b484000000b0067e60283d08sm6476475qkf.40.2022.04.04.06.24.06
+ bh=3eEb1Fbi03Tqfrd9+V/qD2RzIsPJ4iRE2QaaWt7eods=;
+ b=2+8jTxdsC0m9cNypmXFhVyfFU/bOGSMTroDcfPr4azCQKYFG8qhw/aEIb5ZoTfWKCM
+ yBtCjSSwNa57xuypUbXKpcKbXbBwGf5jvd2/mxlCwtO9/B8dTDH5ixlqW5osf39QBJtG
+ upTho5NrwlGe1vIc/hdjv0XMBYLbZfpb0dM+BbMjYdiiRtzUBfVcdA+arE8W9glDK1s2
+ fvwaiFGs6Q2sGCO7BJn3CBH+Rn5bhB788SuPLff6T8haHLGIqa92W8zQFRiibpl9csRP
+ DHPb0q3h5lSSexXWRzWFRqGx9h+Le30ncQs8iRzib5Ev5neFr6DTB6V1VM1il23HnCOS
+ mJNw==
+X-Gm-Message-State: AOAM5336Lu13md9bzL1syJm6yc7R6OicijTACo4viZcyXDZN2NDb/Yl5
+ O0E/qf7V2R1cXRowvTY6Qsr8HA==
+X-Google-Smtp-Source: ABdhPJxYv9sp2wZAlY2XXftWgMKjZXUHM83ydJOkHJkf644kZkqhPJr0fwd+bpDuyqb2kqscBTDZJw==
+X-Received: by 2002:a17:903:22c9:b0:156:9c66:5cf4 with SMTP id
+ y9-20020a17090322c900b001569c665cf4mr768264plg.22.1649093613751; 
+ Mon, 04 Apr 2022 10:33:33 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
+ x67-20020a623146000000b004fdf02851e5sm6463233pfx.220.2022.04.04.10.33.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 Apr 2022 06:24:07 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94) (envelope-from <jgg@ziepe.ca>)
- id 1nbMgf-00CAIu-Pe; Mon, 04 Apr 2022 10:24:05 -0300
-Date: Mon, 4 Apr 2022 10:24:05 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2] kvm/arm64: fixed passthrough gpu into vm on arm64
-Message-ID: <20220404132405.GQ64706@ziepe.ca>
-References: <20220401090828.614167-1-xieming@kylinos.cn>
- <87tubcbvgk.wl-maz@kernel.org>
+ Mon, 04 Apr 2022 10:33:32 -0700 (PDT)
+Date: Mon, 4 Apr 2022 17:33:29 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH 2/4] KVM: Only log about debugfs directory collision once
+Message-ID: <Yksr6etwnN0iW8ZH@google.com>
+References: <20220402174044.2263418-1-oupton@google.com>
+ <20220402174044.2263418-3-oupton@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <87tubcbvgk.wl-maz@kernel.org>
-X-Mailman-Approved-At: Mon, 04 Apr 2022 12:46:48 -0400
-Cc: sashal@kernel.org, catalin.marinas@arm.com, linux@armlinux.org.uk,
- linux-kernel@vger.kernel.org, xieming <xieming@kylinos.cn>,
- alex.williamson@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+In-Reply-To: <20220402174044.2263418-3-oupton@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, stable@kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -94,30 +93,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Apr 01, 2022 at 05:48:59PM +0100, Marc Zyngier wrote:
-
-> NAK. For a start, there is no such thing as 'write-combine' in the ARM
-> architecture, and I'm not convinced you can equate WC to Normal-NC.
-> See the previous discussion at [1].
+On Sat, Apr 02, 2022, Oliver Upton wrote:
+> In all likelihood, a debugfs directory name collision is the result of a
+> userspace bug. If userspace closes the VM fd without releasing all
+> references to said VM then the debugfs directory is never cleaned.
 > 
-> [1] https://lore.kernel.org/r/20210429162906.32742-1-sdonthineni@nvidia.com
+> Even a ratelimited print statement can fill up dmesg, making it
+> particularly annoying for the person debugging what exactly went wrong.
+> Furthermore, a userspace that wants to be a nuisance could clog up the
+> logs by deliberately holding a VM reference after closing the VM fd.
+> 
+> Dial back logging to print at most once, given that userspace is most
+> likely to blame. Leave the statement in place for the small chance that
+> KVM actually got it wrong.
+> 
+> Cc: stable@kernel.org
+> Fixes: 85cd39af14f4 ("KVM: Do not leak memory for duplicate debugfs directories")
 
-We've had a lot of discussions with ARM related to how this works with
-drivers like mlx5 that use WC.
+I don't think this warrants Cc: stable@, the whole point of ratelimiting printk is
+to guard against this sort of thing.  If a ratelimited printk can bring down the
+kernel and/or logging infrastructure, then the kernel is misconfigured for the
+environment.
 
-ARM has now published some guidance on this:
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 69c318fdff61..38b30bd60f34 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -959,7 +959,7 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+>  	mutex_lock(&kvm_debugfs_lock);
+>  	dent = debugfs_lookup(dir_name, kvm_debugfs_dir);
+>  	if (dent) {
+> -		pr_warn_ratelimited("KVM: debugfs: duplicate directory %s\n", dir_name);
+> +		pr_warn_once("KVM: debugfs: duplicate directory %s\n", dir_name);
 
-https://community.arm.com/arm-research/m/resources/1012
-
-As an ecosystem we seem to be drifting toward Normal-NC for this
-behavior (largely because it is what Linux does). At least that is
-what we are testing and qualifing ARM CPUs against mlx5 with.
-
-I'm guessing it will turn into a SBSA like thing where the ARM ARM is
-kind of vauge but a SOC has to implement Normal-NC in a certain way to
-be functional for the server market.
-
-Jason
+I don't see how printing once is going to be usefull for a human debugger.  If we
+want to get rid of the ratelimited print, why not purge it entirely?
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
