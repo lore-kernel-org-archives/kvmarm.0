@@ -2,70 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B19FC4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8EA5C433EF
 	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 21:46:58 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7AB14B2BC;
-	Mon,  4 Apr 2022 17:46:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 57A9B4B1CB;
+	Mon,  4 Apr 2022 17:46:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id UYEAWd3SWVje; Mon,  4 Apr 2022 17:46:55 -0400 (EDT)
+	with ESMTP id c6iEOxHunt6e; Mon,  4 Apr 2022 17:46:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CC0C84B2BD;
-	Mon,  4 Apr 2022 17:46:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9AB24B29D;
+	Mon,  4 Apr 2022 17:46:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA38B4B1D2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 17:46:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D56F94B2AE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 17:46:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kFs0BgrE-dRk for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2022 17:46:52 -0400 (EDT)
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
- [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBC484B1C7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 17:46:51 -0400 (EDT)
-Received: by mail-pj1-f74.google.com with SMTP id
- oo16-20020a17090b1c9000b001c6d21e8c04so299183pjb.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 14:46:51 -0700 (PDT)
+ with ESMTP id 9XlN8iaondQH for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2022 17:46:53 -0400 (EDT)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 555064B1C5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 17:46:53 -0400 (EDT)
+Received: by mail-pl1-f202.google.com with SMTP id
+ a5-20020a170902ecc500b00156762be487so2090871plh.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 14:46:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=0Da54QmQhPyKSBpywHOsh755eaM//izhUjRyQA01ctw=;
- b=XG9czNznMGcfKiIl+XNBLnFq9gYuIbGgu/srSxcykchYxyNcgEjCouI7EjWMM1m8sg
- EtnSxq4Cl6wqHEkPoFJ492qPNOaRbJ+/XxP/BBHDNJ8hp2DIxtQ212KYyu1ucSWm2XQ7
- HWKCvaEB2jAQu3pZ/c09midtZzBib6caokg+2YzhzpA3RqJLG25oMxohBUxCDzWJhTOq
- 3nyIp3FOWFOUzSamSGN2pSWBLM0q5noKSFgXBC8QEinYixPLWYE9QIWs9h1K4KYM9jyY
- Nv/edooPmXgeRlfP1OaFPf/pXtlkwjzeAbocN4rqaxj/TFVITfj179JicelnJw4kYZhG
- xsLA==
+ :cc; bh=EpzYPIId3toN6lnpwE7//Kv7vnYiXXcE3HX3LOeufj8=;
+ b=ADdbpl7fGO7XNTv+qokZDpR3BC+4Xk5QOICIEgVBXuvEXX6bg7XG5ZsEPLGVaOC6CY
+ yqcv/t20RdYgAJpZkRouIz/Kv8cYqdaDUqlyVdVAvhinN+E9NK1DMA3QXifoZZZXtgZr
+ MDXNouEdWd16AOTrvD+jBseZmH29gvvj0tP2Za6GcVZz/BTBRX6dakg4iYX0WpHVLKMz
+ rnxUnl3Glern7AGDL0+w8bXfIaKGPLwKvT95UzlJv863t/lrK91Jvab6GC4C4lVWWlol
+ N8fI/eJfy/32Wcg7+ZmehXARxGsua0K/osxg3+n7Qu+7l+D87kezp/OfjykCTJ7Ff1Vg
+ Z5Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=0Da54QmQhPyKSBpywHOsh755eaM//izhUjRyQA01ctw=;
- b=AUUY8WjSG0ZFjD0dAqd0jRXRmzNWHACdwqy04o9KVZHw71kO7W6ZUUOBzm7BucDKcr
- nGzoONHiEPSYlOjDKtNIfWChl/l0M/+OYa1JpYsKt1uo7vSU3ytfnwjGtJ/Yp2R6Z0YX
- kFPTpGrMQcw7EGdzKXFAcKdkeZar9GRSTBO5OEJFHNnk3t5PYhaAYrFLCOqP8g3lAUB5
- eyzCzKUl0sPcDgx1CibIbRWZlkS5YZY237orb9yCz72nd5THoT1pa/FHExbDBH/vtp0A
- TijOzw4+TxKyt3ikjffwNVphVGxKoxht1eEhtDDD1MY/LGegmSg5tazvuwarXSVOmP1N
- F7mw==
-X-Gm-Message-State: AOAM530vlQf9LdD6ReUXb15YzKqHrdSV5mqzwMi3df0EjZYpwte+clvM
- Z7iSVRoQ7I4diyG42pqyZ+hSht/TKYQOQg==
-X-Google-Smtp-Source: ABdhPJznrg23OQjzBeXSFiYfrfxDtxSloiR8sIApdjlg8nZ6pmkGjqGeZmqBqj8j7t9bcbEpPCHqb5o2qr32Gw==
+ bh=EpzYPIId3toN6lnpwE7//Kv7vnYiXXcE3HX3LOeufj8=;
+ b=STkmg1WiFZkurQ1qVHCde96B9zqMEBix+wyEzEzm6lqxRcL8Z3gGslD4qUy+/ckGK4
+ crKgBZACo+Bfwme4hXzBUZaHBBgLwaf2WeRuHK95qx0CiANlcU2nMqzYr5y8VwVORGPc
+ LJYBH+1sTIY7CsCb7qCUj4yZMxsmX5unjyBSBcUEHdsGoLdoEZ7qjRvC+ce/DiG5ExZv
+ OGHbAQk1nQOe1QV7wMccXkNUwz5UoU9d5b79/awQ1GqPuw468Og1EmMfu+wY4aUSB65m
+ wOEpFwF0ocCQeH5ApNbv5B06jkD+yZSxl21PbxqVoi8pWvM5+B7s72+rHTtfRj0s+sEv
+ oBVw==
+X-Gm-Message-State: AOAM532Fv9eqLt80PbhR85jeDo1Qn8dqd/X5z0yc0WCedDasHnOwbYGv
+ 3K6NEuQk3uo5Ck84RoZKdOKZcb5j7fh1yg==
+X-Google-Smtp-Source: ABdhPJxCPzGIOYW/Yw+YHa6qwQI1i7RVVnQvud6r/OOSe273W8nHp0BijzpnhTcHHz05cbnGD6y8pKB5DcPQDw==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6a00:228f:b0:4fa:e4c9:7b3b with SMTP
- id f15-20020a056a00228f00b004fae4c97b3bmr148188pfe.61.1649108810982; Mon, 04
- Apr 2022 14:46:50 -0700 (PDT)
-Date: Mon,  4 Apr 2022 14:46:41 -0700
+ (user=ricarkol job=sendgmr) by 2002:a17:902:f1ca:b0:156:9dae:4cfe with SMTP
+ id e10-20020a170902f1ca00b001569dae4cfemr258454plc.6.1649108812438; Mon, 04
+ Apr 2022 14:46:52 -0700 (PDT)
+Date: Mon,  4 Apr 2022 14:46:42 -0700
 In-Reply-To: <20220404214642.3201659-1-ricarkol@google.com>
-Message-Id: <20220404214642.3201659-4-ricarkol@google.com>
+Message-Id: <20220404214642.3201659-5-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20220404214642.3201659-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.35.1.1094.g7c7d902a7c-goog
-Subject: [PATCH v4 3/4] KVM: arm64: selftests: add arch_timer_edge_cases
+Subject: [PATCH v4 4/4] KVM: arm64: selftests: add edge cases tests into
+ arch_timer_edge_cases
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com
 Cc: maz@kernel.org, pbonzini@redhat.com
@@ -85,661 +86,435 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add an arch_timer edge-cases selftest. For now, just add some basic
-sanity checks, and some stress conditions (like waiting for the timers
-while re-scheduling the vcpu). The next commit will add the actual edge
-case tests.
-
-This test fails without a867e9d0cc1 "KVM: arm64: Don't miss pending
-interrupts for suspended vCPU".
+Add tests that validates some edge cases related to the virtual
+arch-timer:
+- timers in the past, including TVALs that rollover from 0.
+- timers across counter roll-overs.
+- moving counters ahead and behind pending timers.
+- reprograming timers.
+- the same timer condition firing multiple times.
+- masking/unmasking using the timer control mask.
 
 Reviewed-by: Reiji Watanabe <reijiw@google.com>
-Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../kvm/aarch64/arch_timer_edge_cases.c       | 608 ++++++++++++++++++
- 3 files changed, 610 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
+ .../kvm/aarch64/arch_timer_edge_cases.c       | 300 +++++++++++++++++-
+ 1 file changed, 298 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index dce7de7755e6..8f7e0123dd28 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- /aarch64/arch_timer
-+/aarch64/arch_timer_edge_cases
- /aarch64/debug-exceptions
- /aarch64/get-reg-list
- /aarch64/psci_cpu_on_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 0e4926bc9a58..17a0f32cfc91 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -101,6 +101,7 @@ TEST_GEN_PROGS_x86_64 += kvm_binary_stats_test
- TEST_GEN_PROGS_x86_64 += system_counter_offset_test
- 
- TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
-+TEST_GEN_PROGS_aarch64 += aarch64/arch_timer_edge_cases
- TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
- TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
- TEST_GEN_PROGS_aarch64 += aarch64/psci_cpu_on_test
 diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c b/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
-new file mode 100644
-index 000000000000..5f1e9c050b99
---- /dev/null
+index 5f1e9c050b99..fa8d1dca9118 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
 +++ b/tools/testing/selftests/kvm/aarch64/arch_timer_edge_cases.c
-@@ -0,0 +1,608 @@
-+// SPDX-License-Identifier: GPL-2.0-only
+@@ -2,6 +2,12 @@
+ /*
+  * arch_timer_edge_cases.c - Tests the aarch64 timer IRQ functionality.
+  *
++ * The test validates some edge cases related to the virtual arch-timer:
++ * - timers across counter roll-overs.
++ * - moving counters ahead and behind pending timers.
++ * - reprograming timers.
++ * - the same timer condition firing multiple times.
++ *
+  * Some of these tests program timers and then wait indefinitely for them to
+  * fire.  We rely on having a timeout mechanism in the "runner", like
+  * tools/testing/selftests/kselftest/runner.sh.
+@@ -45,6 +51,9 @@
+ /* Number of runs. */
+ #define NR_TEST_ITERS_DEF		5
+ 
++/* Default "long" wait test time in ms. */
++#define LONG_WAIT_TEST_MS		100
++
+ /* Shared with IRQ handler. */
+ volatile struct test_vcpu_shared_data {
+ 	int handled;
+@@ -53,6 +62,8 @@ volatile struct test_vcpu_shared_data {
+ struct test_args {
+ 	/* Virtual or physical timer and counter tests. */
+ 	enum arch_timer timer;
++	/* Delay used in the test_long_timer_delays test. */
++	uint64_t long_wait_ms;
+ 	/* Number of iterations. */
+ 	int iterations;
+ };
+@@ -60,6 +71,7 @@ struct test_args {
+ struct test_args test_args = {
+ 	/* Only testing VIRTUAL timers for now. */
+ 	.timer = VIRTUAL,
++	.long_wait_ms = LONG_WAIT_TEST_MS,
+ 	.iterations = NR_TEST_ITERS_DEF,
+ };
+ 
+@@ -67,10 +79,25 @@ static int vtimer_irq, ptimer_irq;
+ 
+ enum sync_cmd {
+ 	SET_REG_KVM_REG_ARM_TIMER_CNT,
++	USERSPACE_USLEEP,
+ 	USERSPACE_SCHED_YIELD,
+ 	USERSPACE_MIGRATE_SELF,
+ };
+ 
++typedef void (*sleep_method_t)(uint64_t usec);
++
++static void sleep_poll(uint64_t usec);
++static void sleep_sched_poll(uint64_t usec);
++static void sleep_in_userspace(uint64_t usec);
++static void sleep_migrate(uint64_t usec);
++
++sleep_method_t sleep_method[] = {
++	sleep_poll,
++	sleep_sched_poll,
++	sleep_migrate,
++	sleep_in_userspace,
++};
++
+ typedef void (*wait_method_t)(void);
+ 
+ static void wait_for_non_spurious_irq(void);
+@@ -123,6 +150,9 @@ static uint32_t next_pcpu(void)
+ #define USERSPACE_MIGRATE_VCPU()						\
+ 	USERSPACE_CMD(USERSPACE_MIGRATE_SELF)
+ 
++#define SLEEP_IN_USERSPACE(__usecs)						\
++	GUEST_SYNC_ARGS(USERSPACE_USLEEP, (__usecs), 0, 0, 0)
++
+ static void guest_irq_handler(struct ex_regs *regs)
+ {
+ 	unsigned int intid = gic_get_and_ack_irq();
+@@ -260,6 +290,33 @@ static void wait_migrate_poll_for_irq(void)
+ 	poll_for_non_spurious_irq(true, USERSPACE_MIGRATE_SELF);
+ }
+ 
 +/*
-+ * arch_timer_edge_cases.c - Tests the aarch64 timer IRQ functionality.
-+ *
-+ * Some of these tests program timers and then wait indefinitely for them to
-+ * fire.  We rely on having a timeout mechanism in the "runner", like
-+ * tools/testing/selftests/kselftest/runner.sh.
-+ *
-+ * Copyright (c) 2022, Google LLC.
++ * Both sleep_sched_poll and sleep_migrate temporarily check that the timer in
++ * use (test_args.timer) is the virtual one. That's because the sleep
++ * implementation polls on the physical one.
 + */
 +
-+#define _GNU_SOURCE
-+
-+#include <stdlib.h>
-+#include <pthread.h>
-+#include <linux/kvm.h>
-+#include <linux/sizes.h>
-+#include <linux/bitmap.h>
-+#include <sched.h>
-+#include <sys/sysinfo.h>
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "delay.h"
-+#include "arch_timer.h"
-+#include "gic.h"
-+#include "vgic.h"
-+
-+#define VCPUID				0
-+
-+#define CVAL_MAX			(~0ULL)
-+/* tval is a signed 32-bit int. */
-+#define TVAL_MAX			INT_MAX
-+#define TVAL_MIN			INT_MIN
-+
-+#define GICD_BASE_GPA			0x8000000ULL
-+#define GICR_BASE_GPA			0x80A0000ULL
-+
-+/* After how much time we say there is no IRQ. */
-+#define TIMEOUT_NO_IRQ_US		(50 * 1000LL)
-+
-+/* A nice counter value to use as the starting one for most tests. */
-+#define DEF_CNT				(CVAL_MAX / 2)
-+
-+/* Number of runs. */
-+#define NR_TEST_ITERS_DEF		5
-+
-+/* Shared with IRQ handler. */
-+volatile struct test_vcpu_shared_data {
-+	int handled;
-+} shared_data;
-+
-+struct test_args {
-+	/* Virtual or physical timer and counter tests. */
-+	enum arch_timer timer;
-+	/* Number of iterations. */
-+	int iterations;
-+};
-+
-+struct test_args test_args = {
-+	/* Only testing VIRTUAL timers for now. */
-+	.timer = VIRTUAL,
-+	.iterations = NR_TEST_ITERS_DEF,
-+};
-+
-+static int vtimer_irq, ptimer_irq;
-+
-+enum sync_cmd {
-+	SET_REG_KVM_REG_ARM_TIMER_CNT,
-+	USERSPACE_SCHED_YIELD,
-+	USERSPACE_MIGRATE_SELF,
-+};
-+
-+typedef void (*wait_method_t)(void);
-+
-+static void wait_for_non_spurious_irq(void);
-+static void wait_poll_for_irq(void);
-+static void wait_sched_poll_for_irq(void);
-+static void wait_migrate_poll_for_irq(void);
-+
-+wait_method_t wait_method[] = {
-+	wait_for_non_spurious_irq,
-+	wait_poll_for_irq,
-+	wait_sched_poll_for_irq,
-+	wait_migrate_poll_for_irq,
-+};
-+
-+enum timer_view {
-+	TIMER_CVAL,
-+	TIMER_TVAL,
-+};
-+
-+/* Pair of pcpus for the test to alternate between. */
-+static int pcpus[2] = {-1, -1};
-+static int pcpus_idx;
-+
-+static uint32_t next_pcpu(void)
-+{
-+	pcpus_idx = 1 - pcpus_idx;
-+	return pcpus[pcpus_idx];
-+}
-+
-+#define ASSERT_IRQS_HANDLED_2(__nr, arg1, arg2) do {				\
-+	int __h = shared_data.handled;						\
-+	GUEST_ASSERT_4(__h == (__nr), __h, __nr, arg1, arg2);			\
-+} while (0)
-+
-+#define ASSERT_IRQS_HANDLED_1(__nr, arg1)					\
-+	ASSERT_IRQS_HANDLED_2((__nr), arg1, 0)
-+
-+#define ASSERT_IRQS_HANDLED(__nr)						\
-+	ASSERT_IRQS_HANDLED_2((__nr), 0, 0)
-+
-+#define SET_COUNTER(__ctr, __t)							\
-+	GUEST_SYNC_ARGS(SET_REG_KVM_REG_ARM_TIMER_CNT, (__ctr), (__t), 0, 0)
-+
-+#define USERSPACE_CMD(__cmd)							\
-+	GUEST_SYNC_ARGS(__cmd, 0, 0, 0, 0)
-+
-+#define USERSPACE_SCHEDULE()							\
-+	USERSPACE_CMD(USERSPACE_SCHED_YIELD)
-+
-+#define USERSPACE_MIGRATE_VCPU()						\
-+	USERSPACE_CMD(USERSPACE_MIGRATE_SELF)
-+
-+static void guest_irq_handler(struct ex_regs *regs)
-+{
-+	unsigned int intid = gic_get_and_ack_irq();
-+	uint64_t cnt, cval;
-+	uint32_t ctl;
-+
-+	if (intid == IAR_SPURIOUS)
-+		return;
-+
-+	GUEST_ASSERT(gic_irq_get_pending(intid));
-+
-+	ctl = timer_get_ctl(test_args.timer);
-+	cnt = timer_get_cntct(test_args.timer);
-+	cval = timer_get_cval(test_args.timer);
-+
-+	GUEST_ASSERT_1(ctl & CTL_ISTATUS, ctl);
-+
-+	/* Disable and mask the timer. */
-+	timer_set_ctl(test_args.timer, CTL_IMASK);
-+	GUEST_ASSERT(!gic_irq_get_pending(intid));
-+
-+	shared_data.handled++;
-+
-+	/* The IRQ should not fire before time. */
-+	GUEST_ASSERT_2(cnt >= cval, cnt, cval);
-+
-+	gic_set_eoi(intid);
-+}
-+
-+/*
-+ * Sleep for usec microseconds by polling in the guest (userspace=0) or in
-+ * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHEDULE).
-+ */
-+static void guest_poll(enum arch_timer timer, uint64_t usec,
-+		bool userspace, enum sync_cmd userspace_cmd)
-+{
-+	uint64_t cycles = usec_to_cycles(usec);
-+	uint64_t start = timer_get_cntct(timer);
-+
-+	/*
-+	 * TODO: Take care of roll-overs. Right now, we are fine as we use the
-+	 * virtual timer/counter for all of our roll-over tests, and so we can use
-+	 * the physical counter for this function. Assert this (temporarily):
-+	 */
-+	GUEST_ASSERT(test_args.timer == VIRTUAL && timer == PHYSICAL);
-+
-+	while ((timer_get_cntct(timer) - start) < cycles) {
-+		if (userspace)
-+			USERSPACE_CMD(userspace_cmd);
-+		else
-+			cpu_relax();
-+	}
-+}
-+
-+static void sleep_poll(uint64_t usec)
++static void sleep_sched_poll(uint64_t usec)
 +{
 +	if (test_args.timer == VIRTUAL)
-+		guest_poll(PHYSICAL, usec, false, -1);
++		guest_poll(PHYSICAL, usec, true, USERSPACE_SCHED_YIELD);
 +	else
 +		GUEST_ASSERT(0); /* Not implemented. */
 +}
 +
-+static void program_timer_irq(uint64_t xval, uint32_t ctl, enum timer_view tv)
++static void sleep_migrate(uint64_t usec)
 +{
-+	shared_data.handled = 0;
-+
-+	switch (tv) {
-+	case TIMER_CVAL:
-+		timer_set_cval(test_args.timer, xval);
-+		timer_set_ctl(test_args.timer, ctl);
-+		break;
-+	case TIMER_TVAL:
-+		timer_set_tval(test_args.timer, xval);
-+		timer_set_ctl(test_args.timer, ctl);
-+		break;
-+	default:
-+		GUEST_ASSERT(0);
-+	}
++	if (test_args.timer == VIRTUAL)
++		guest_poll(PHYSICAL, usec, true, USERSPACE_MIGRATE_SELF);
++	else
++		GUEST_ASSERT(0); /* Not implemented. */
 +}
 +
++static void sleep_in_userspace(uint64_t usec)
++{
++	SLEEP_IN_USERSPACE(usec);
++}
++
+ /*
+  * Reset the timer state to some nice values like the counter not being close
+  * to the edge, and the control register masked and disabled.
+@@ -284,6 +341,156 @@ static void test_timer(uint64_t reset_cnt, uint64_t xval,
+ 	local_irq_enable();
+ }
+ 
 +/*
-+ * Should be called with IRQs masked.
++ * Set the counter to just below the edge (CVAL_MAX) and set a timer that
++ * crosses it over.
 + */
-+static void wait_for_non_spurious_irq(void)
++static void test_timers_across_rollovers(void)
 +{
-+	int h = shared_data.handled;
-+
-+	/* Wait for the IRQ handler to process an interrupt */
-+	while (h == shared_data.handled) {
-+		asm volatile("wfi\n"
-+			     "msr daifclr, #2\n"
-+			     /* handle IRQ */
-+			     "isb\n"
-+			     "msr daifset, #2\n"
-+			     : : : "memory");
-+	}
-+}
-+
-+/*
-+ * Wait for an non-spurious IRQ by polling in the guest (userspace=0) or in
-+ * userspace (e.g., userspace=1 and userspace_cmd=USERSPACE_SCHED_YIELD).
-+ *
-+ * Should be called with IRQs masked. Not really needed like the wfi above, but
-+ * it should match the others.
-+ */
-+static void poll_for_non_spurious_irq(bool userspace,
-+		enum sync_cmd userspace_cmd)
-+{
-+	int h;
-+
-+	h = shared_data.handled;
-+
-+	local_irq_enable();
-+	while (h == shared_data.handled) {
-+		if (userspace)
-+			USERSPACE_CMD(userspace_cmd);
-+		else
-+			cpu_relax();
-+	}
-+	local_irq_disable();
-+}
-+
-+static void wait_poll_for_irq(void)
-+{
-+	poll_for_non_spurious_irq(false, -1);
-+}
-+
-+static void wait_sched_poll_for_irq(void)
-+{
-+	poll_for_non_spurious_irq(true, USERSPACE_SCHED_YIELD);
-+}
-+
-+static void wait_migrate_poll_for_irq(void)
-+{
-+	poll_for_non_spurious_irq(true, USERSPACE_MIGRATE_SELF);
-+}
-+
-+/*
-+ * Reset the timer state to some nice values like the counter not being close
-+ * to the edge, and the control register masked and disabled.
-+ */
-+static void reset_timer_state(uint64_t cnt)
-+{
-+	SET_COUNTER(cnt, test_args.timer);
-+	timer_set_ctl(test_args.timer, CTL_IMASK);
-+}
-+
-+static void test_timer(uint64_t reset_cnt, uint64_t xval,
-+		wait_method_t wm, enum timer_view tv)
-+{
-+	local_irq_disable();
-+
-+	reset_timer_state(reset_cnt);
-+
-+	program_timer_irq(xval, CTL_ENABLE, tv);
-+	wm();
-+
-+	ASSERT_IRQS_HANDLED_1(1, tv);
-+	local_irq_enable();
-+}
-+
-+static void test_basic_functionality(void)
-+{
-+	int32_t tval = (int32_t)msec_to_cycles(10);
-+	uint64_t cval;
++	uint64_t edge_minus_5ms = CVAL_MAX - msec_to_cycles(5);
 +	int i;
 +
 +	for (i = 0; i < ARRAY_SIZE(wait_method); i++) {
 +		wait_method_t wm = wait_method[i];
 +
-+		cval = DEF_CNT + msec_to_cycles(10);
-+
-+		test_timer(DEF_CNT, cval, wm, TIMER_CVAL);
-+		test_timer(DEF_CNT, tval, wm, TIMER_TVAL);
++		test_timer(edge_minus_5ms, msec_to_cycles(10), wm, TIMER_TVAL);
++		test_timer(edge_minus_5ms, TVAL_MAX, wm, TIMER_TVAL);
++		test_timer(edge_minus_5ms, TVAL_MIN, wm, TIMER_TVAL);
 +	}
 +}
 +
-+/*
-+ * This test checks basic timer behavior without actually firing timers, things
-+ * like: the relationship between cval and tval, tval down-counting.
-+ */
-+static void timers_sanity_checks(bool use_sched)
++/* Check that timer control masks actually mask a timer being fired. */
++static void test_timer_control_masked(sleep_method_t guest_sleep)
 +{
-+	uint64_t cval;
-+
 +	reset_timer_state(DEF_CNT);
 +
-+	local_irq_disable();
++	/* Local IRQs are not masked at this point. */
 +
-+	/* cval in the past */
-+	timer_set_cval(test_args.timer, timer_get_cntct(test_args.timer) - 1);
-+	if (use_sched)
-+		USERSPACE_SCHEDULE();
-+	GUEST_ASSERT(timer_get_tval(test_args.timer) < 0);
++	program_timer_irq(-1, CTL_ENABLE | CTL_IMASK, TIMER_TVAL);
 +
-+	/* tval in the past */
-+	timer_set_tval(test_args.timer, -1);
-+	if (use_sched)
-+		USERSPACE_SCHEDULE();
-+	GUEST_ASSERT(timer_get_cval(test_args.timer) <
-+			timer_get_cntct(test_args.timer));
++	/* Assume no IRQ after waiting TIMEOUT_NO_IRQ_US microseconds */
++	guest_sleep(TIMEOUT_NO_IRQ_US);
 +
-+	/* tval larger than TVAL_MAX. */
-+	cval = timer_get_cntct(test_args.timer) + 2ULL * TVAL_MAX - 1;
-+	timer_set_cval(test_args.timer, cval);
-+	if (use_sched)
-+		USERSPACE_SCHEDULE();
-+	GUEST_ASSERT(timer_get_tval(test_args.timer) <= 0);
-+	GUEST_ASSERT_EQ(cval, timer_get_cval(test_args.timer));
-+
-+	/* tval should keep down-counting from 0 to -1. */
-+	SET_COUNTER(DEF_CNT, test_args.timer);
-+	timer_set_tval(test_args.timer, 0);
-+	if (use_sched)
-+		USERSPACE_SCHEDULE();
-+	/* We just need 1 counter tick to pass. */
-+	sleep_poll(1);
-+	GUEST_ASSERT(timer_get_tval(test_args.timer) < 0);
-+
-+	local_irq_enable();
-+
-+	/* Mask and disable any pending timer. */
++	ASSERT_IRQS_HANDLED(0);
 +	timer_set_ctl(test_args.timer, CTL_IMASK);
 +}
 +
-+static void test_timers_sanity_checks(void)
++/* Test masking/unmasking a timer using the timer mask (not the IRQ mask). */
++static void test_timer_control_mask_then_unmask(wait_method_t wm)
 +{
-+	timers_sanity_checks(false);
-+	/* Check how KVM saves/restores these edge-case values. */
-+	timers_sanity_checks(true);
++	reset_timer_state(DEF_CNT);
++	program_timer_irq(-1, CTL_ENABLE | CTL_IMASK, TIMER_TVAL);
++
++	/* No IRQs because the timer is still masked. */
++	ASSERT_IRQS_HANDLED(0);
++
++	/* Unmask the timer, and then get an IRQ. */
++	local_irq_disable();
++	timer_set_ctl(test_args.timer, CTL_ENABLE);
++	wm();
++
++	ASSERT_IRQS_HANDLED(1);
++	local_irq_enable();
 +}
 +
-+static void guest_run_iteration(void)
++/*
++ * Set a timer at the edge, and wait with irqs masked for so long that the
++ * counter rolls over and the "Timer Condition" doesn't apply anymore.  We
++ * should not get an IRQ fired.
++ */
++static void test_irq_masked_timer_across_rollover(sleep_method_t guest_sleep)
 +{
-+	test_timers_sanity_checks();
-+	test_basic_functionality();
++	local_irq_disable();
++	reset_timer_state(CVAL_MAX - msec_to_cycles(5));
++
++	program_timer_irq(-1, CTL_ENABLE, TIMER_TVAL);
++
++	GUEST_ASSERT(timer_get_ctl(test_args.timer) & CTL_ISTATUS);
++	guest_sleep(10 * 1000LL);
++	GUEST_ASSERT((timer_get_ctl(test_args.timer) & CTL_ISTATUS) == 0);
++
++	local_irq_enable();
++	isb();
++
++	ASSERT_IRQS_HANDLED(0);
 +}
 +
-+static void guest_code(void)
++static void test_control_masks(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(sleep_method); i++)
++		test_timer_control_masked(sleep_method[i]);
++
++	for (i = 0; i < ARRAY_SIZE(wait_method); i++)
++		test_timer_control_mask_then_unmask(wait_method[i]);
++
++	for (i = 0; i < ARRAY_SIZE(sleep_method); i++)
++		test_irq_masked_timer_across_rollover(sleep_method[i]);
++}
++
++static void test_fire_a_timer_multiple_times(wait_method_t wm, int num)
 +{
 +	int i;
 +
 +	local_irq_disable();
++	reset_timer_state(DEF_CNT);
 +
-+	gic_init(GIC_V3, 1, (void *)GICD_BASE_GPA, (void *)GICR_BASE_GPA);
++	program_timer_irq(0, CTL_ENABLE, TIMER_TVAL);
 +
-+	timer_set_ctl(test_args.timer, CTL_IMASK);
-+	timer_set_ctl(PHYSICAL, CTL_IMASK);
++	for (i = 1; i <= num; i++) {
++		wm();
 +
-+	gic_irq_enable(vtimer_irq);
-+	gic_irq_enable(ptimer_irq);
++		/*
++		 * The IRQ handler masked and disabled the timer.
++		 * Enable and unmmask it again.
++		 */
++		timer_set_ctl(test_args.timer, CTL_ENABLE);
++
++		ASSERT_IRQS_HANDLED(i);
++	}
++
 +	local_irq_enable();
-+
-+	for (i = 0; i < test_args.iterations; i++) {
-+		GUEST_SYNC(i);
-+		guest_run_iteration();
-+	}
-+
-+	GUEST_DONE();
 +}
 +
-+static void migrate_self(uint32_t new_pcpu)
++static void test_timers_fired_multiple_times(void)
 +{
-+	int ret;
-+	cpu_set_t cpuset;
-+	pthread_t thread;
++	int i;
 +
-+	thread = pthread_self();
-+
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(new_pcpu, &cpuset);
-+
-+	pr_debug("Migrating from %u to %u\n", sched_getcpu(), new_pcpu);
-+
-+	ret = pthread_setaffinity_np(thread, sizeof(cpuset), &cpuset);
-+
-+	TEST_ASSERT(ret == 0, "Failed to migrate to pCPU: %u; ret: %d\n",
-+			new_pcpu, ret);
++	for (i = 0; i < ARRAY_SIZE(wait_method); i++)
++		test_fire_a_timer_multiple_times(wait_method[i], 1000);
 +}
 +
++/* Set a timer for cval1 then reprogram it to cval2. */
++static void test_reprogram_timer(wait_method_t wm, bool use_sched,
++		uint64_t cnt, uint64_t cval1, uint64_t cval2)
++{
++	local_irq_disable();
++	reset_timer_state(cnt);
++
++	program_timer_irq(cval1, CTL_ENABLE, TIMER_CVAL);
++
++	if (use_sched)
++		USERSPACE_SCHEDULE();
++
++	timer_set_cval(test_args.timer, cval2);
++
++	wm();
++
++	local_irq_enable();
++	ASSERT_IRQS_HANDLED(1);
++};
++
++static void test_reprogram_timers(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(wait_method); i++) {
++		test_reprogram_timer(wait_method[i], true, 0, CVAL_MAX, 0);
++		test_reprogram_timer(wait_method[i], true, 0, CVAL_MAX, 0);
++	}
++}
++
+ static void test_basic_functionality(void)
+ {
+ 	int32_t tval = (int32_t)msec_to_cycles(10);
+@@ -355,10 +562,86 @@ static void test_timers_sanity_checks(void)
+ 	timers_sanity_checks(true);
+ }
+ 
 +/*
-+ * Set the two pcpus that the test will use to alternate between. Default to
-+ * use the current cpu as pcpus[0] and the one right after in the affinity set
-+ * as pcpus[1].
++ * Set the counter to cnt_1, the [c|t]val to xval, the counter to cnt_2, and
++ * then wait for an IRQ.
 + */
-+static void set_default_pcpus(void)
++static void test_set_counter_after_programming_timer(uint64_t cnt_1,
++		uint64_t xval, uint64_t cnt_2, wait_method_t wm,
++		enum timer_view tv)
 +{
-+	int curr = sched_getcpu();
-+	cpu_set_t cpuset;
-+	long i;
++	local_irq_disable();
 +
-+	pcpus[0] = curr;
++	SET_COUNTER(cnt_1, test_args.timer);
++	timer_set_ctl(test_args.timer, CTL_IMASK);
 +
-+	sched_getaffinity(getpid(), sizeof(cpu_set_t), &cpuset);
-+	for (i = (curr + 1) % CPU_SETSIZE; i != curr; i = (i + 1) % CPU_SETSIZE) {
-+		if (CPU_ISSET(i, &cpuset)) {
-+			pcpus[1] = i;
-+			break;
-+		}
-+	}
++	program_timer_irq(xval, CTL_ENABLE, tv);
++	SET_COUNTER(cnt_2, test_args.timer);
++	wm();
 +
-+	TEST_ASSERT(pcpus[1] != -1, "Couldn't find a second pcpu.");
-+	pr_debug("pcpus: %d %d\n", pcpus[0], pcpus[1]);
++	ASSERT_IRQS_HANDLED(1);
++	local_irq_enable();
 +}
 +
-+static void kvm_set_cntxct(struct kvm_vm *vm, uint64_t cnt, enum arch_timer timer)
++/* Set a timer and then move the counter ahead of it. */
++static void test_move_counters_after_timers(void)
 +{
-+	TEST_ASSERT(timer == VIRTUAL,
-+		"Only supports setting the virtual counter for now.");
++	int i;
 +
-+	struct kvm_one_reg reg = {
-+		.id = KVM_REG_ARM_TIMER_CNT,
-+		.addr = (uint64_t)&cnt,
-+	};
-+	vcpu_set_reg(vm, 0, &reg);
-+}
++	for (i = 0; i < ARRAY_SIZE(wait_method); i++) {
++		wait_method_t wm = wait_method[i];
 +
-+static void handle_sync(struct kvm_vm *vm, struct ucall *uc)
-+{
-+	enum sync_cmd cmd = uc->args[1];
-+	uint64_t val = uc->args[2];
-+	enum arch_timer timer = uc->args[3];
-+
-+	switch (cmd) {
-+	case SET_REG_KVM_REG_ARM_TIMER_CNT:
-+		kvm_set_cntxct(vm, val, timer);
-+		break;
-+	case USERSPACE_SCHED_YIELD:
-+		sched_yield();
-+		break;
-+	case USERSPACE_MIGRATE_SELF:
-+		migrate_self(next_pcpu());
-+		break;
-+	default:
-+		break;
++		test_set_counter_after_programming_timer(0, DEF_CNT,
++				DEF_CNT + 1, wm, TIMER_CVAL);
++		test_set_counter_after_programming_timer(CVAL_MAX, 1,
++				2, wm, TIMER_CVAL);
++		test_set_counter_after_programming_timer(0, TVAL_MAX,
++				(uint64_t)TVAL_MAX + 1, wm, TIMER_TVAL);
 +	}
 +}
 +
-+static void test_run(struct kvm_vm *vm)
++static void test_timers_in_the_past(void)
 +{
-+	struct ucall uc;
-+	int stage = 0;
++	int i;
 +
-+	/* Start on the first pcpu. */
-+	migrate_self(pcpus[0]);
++	for (i = 0; i < ARRAY_SIZE(wait_method); i++) {
++		wait_method_t wm = wait_method[i];
 +
-+	sync_global_to_guest(vm, test_args);
-+
-+	for (stage = 0; ; stage++) {
-+		vcpu_run(vm, VCPUID);
-+		switch (get_ucall(vm, VCPUID, &uc)) {
-+		case UCALL_SYNC:
-+			handle_sync(vm, &uc);
-+			break;
-+		case UCALL_DONE:
-+			goto out;
-+		case UCALL_ABORT:
-+			TEST_FAIL("%s at %s:%ld\n\tvalues: %lu, %lu; %lu",
-+				(const char *)uc.args[0], __FILE__, uc.args[1],
-+				uc.args[2], uc.args[3], uc.args[4]);
-+			goto out;
-+		default:
-+			TEST_FAIL("Unexpected guest exit\n");
-+		}
++		test_timer(DEF_CNT, DEF_CNT - 1, wm, TIMER_CVAL);
++		test_timer(DEF_CNT, TVAL_MIN, wm, TIMER_TVAL);
++		test_timer(CVAL_MAX, 0, wm, TIMER_CVAL);
++		test_timer(DEF_CNT, 0, wm, TIMER_CVAL);
++		test_timer(DEF_CNT, 0, wm, TIMER_TVAL);
 +	}
-+
-+out:
-+	return;
 +}
 +
-+static void test_init_timer_irq(struct kvm_vm *vm)
++static void test_long_timer_delays(void)
 +{
-+	int vcpu_fd = vcpu_get_fd(vm, VCPUID);
++	uint64_t wait_ms = test_args.long_wait_ms;
++	int i;
 +
-+	kvm_device_access(vcpu_fd, KVM_ARM_VCPU_TIMER_CTRL,
-+			KVM_ARM_VCPU_TIMER_IRQ_PTIMER, &ptimer_irq, false);
-+	kvm_device_access(vcpu_fd, KVM_ARM_VCPU_TIMER_CTRL,
-+			KVM_ARM_VCPU_TIMER_IRQ_VTIMER, &vtimer_irq, false);
++	for (i = 0; i < ARRAY_SIZE(wait_method); i++) {
++		wait_method_t wm = wait_method[i];
 +
-+	sync_global_to_guest(vm, ptimer_irq);
-+	sync_global_to_guest(vm, vtimer_irq);
-+
-+	pr_debug("ptimer_irq: %d; vtimer_irq: %d\n", ptimer_irq, vtimer_irq);
-+}
-+
-+static struct kvm_vm *test_vm_create(void)
-+{
-+	struct kvm_vm *vm;
-+	int ret;
-+
-+	vm = vm_create_default(VCPUID, 0, guest_code);
-+
-+	vm_init_descriptor_tables(vm);
-+	vm_install_exception_handler(vm, VECTOR_IRQ_CURRENT, guest_irq_handler);
-+
-+	vcpu_init_descriptor_tables(vm, 0);
-+
-+	ucall_init(vm, NULL);
-+	test_init_timer_irq(vm);
-+	ret = vgic_v3_setup(vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
-+	if (ret < 0) {
-+		print_skip("Failed to create vgic-v3");
-+		exit(KSFT_SKIP);
++		test_timer(0, msec_to_cycles(wait_ms), wm, TIMER_CVAL);
++		test_timer(0, msec_to_cycles(wait_ms), wm, TIMER_TVAL);
 +	}
-+
-+	return vm;
 +}
 +
-+static void test_print_help(char *name)
-+{
-+	pr_info("Usage: %s [-h] [-i iterations] [-w] [-p pcpu1,pcpu2]\n",
-+		name);
-+	pr_info("\t-i: Number of iterations (default: %u)\n",
-+		NR_TEST_ITERS_DEF);
-+	pr_info("\t-p: Pair of pcpus for the vcpus to alternate between.\n");
-+	pr_info("\t-h: Print this help message\n");
-+}
+ static void guest_run_iteration(void)
+ {
+ 	test_timers_sanity_checks();
+ 	test_basic_functionality();
 +
-+static bool parse_args(int argc, char *argv[])
-+{
-+	int opt, ret;
++	test_timers_in_the_past();
++	test_timers_across_rollovers();
 +
-+	while ((opt = getopt(argc, argv, "hi:p:")) != -1) {
-+		switch (opt) {
-+		case 'i':
-+			test_args.iterations = atoi(optarg);
-+			if (test_args.iterations <= 0) {
-+				print_skip("Positive value needed for -i");
++	test_move_counters_after_timers();
++	test_reprogram_timers();
++
++	test_control_masks();
++
++	test_timers_fired_multiple_times();
+ }
+ 
+ static void guest_code(void)
+@@ -381,6 +664,7 @@ static void guest_code(void)
+ 		guest_run_iteration();
+ 	}
+ 
++	test_long_timer_delays();
+ 	GUEST_DONE();
+ }
+ 
+@@ -450,6 +734,9 @@ static void handle_sync(struct kvm_vm *vm, struct ucall *uc)
+ 	case SET_REG_KVM_REG_ARM_TIMER_CNT:
+ 		kvm_set_cntxct(vm, val, timer);
+ 		break;
++	case USERSPACE_USLEEP:
++		usleep(val);
++		break;
+ 	case USERSPACE_SCHED_YIELD:
+ 		sched_yield();
+ 		break;
+@@ -533,11 +820,13 @@ static struct kvm_vm *test_vm_create(void)
+ 
+ static void test_print_help(char *name)
+ {
+-	pr_info("Usage: %s [-h] [-i iterations] [-w] [-p pcpu1,pcpu2]\n",
++	pr_info("Usage: %s [-h] [-i iterations] [-p pcpu1,pcpu2] [-l long_wait_ms]\n",
+ 		name);
+ 	pr_info("\t-i: Number of iterations (default: %u)\n",
+ 		NR_TEST_ITERS_DEF);
+ 	pr_info("\t-p: Pair of pcpus for the vcpus to alternate between.\n");
++	pr_info("\t-l: Delta (in ms) used for long wait time test (default: %u)\n",
++		LONG_WAIT_TEST_MS);
+ 	pr_info("\t-h: Print this help message\n");
+ }
+ 
+@@ -545,7 +834,7 @@ static bool parse_args(int argc, char *argv[])
+ {
+ 	int opt, ret;
+ 
+-	while ((opt = getopt(argc, argv, "hi:p:")) != -1) {
++	while ((opt = getopt(argc, argv, "hi:p:l:")) != -1) {
+ 		switch (opt) {
+ 		case 'i':
+ 			test_args.iterations = atoi(optarg);
+@@ -569,6 +858,13 @@ static bool parse_args(int argc, char *argv[])
+ 				goto err;
+ 			}
+ 			break;
++		case 'l':
++			test_args.long_wait_ms = atoi(optarg);
++			if (test_args.long_wait_ms <= 0) {
++				print_skip("Positive value needed for -l");
 +				goto err;
 +			}
 +			break;
-+		case 'p':
-+			ret = sscanf(optarg, "%u,%u", &pcpus[0], &pcpus[1]);
-+			if (ret != 2) {
-+				print_skip("Could not parse the pcpus string");
-+				goto err;
-+			}
-+			if (!is_cpu_eligible_to_run(pcpus[0])) {
-+				print_skip("Invalid pcpu %d", pcpus[0]);
-+				goto err;
-+			}
-+			if (!is_cpu_eligible_to_run(pcpus[1])) {
-+				print_skip("Invalid pcpu %d", pcpus[1]);
-+				goto err;
-+			}
-+			break;
-+		case 'h':
-+		default:
-+			goto err;
-+		}
-+	}
-+
-+	return true;
-+
-+err:
-+	test_print_help(argv[0]);
-+	return false;
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vm *vm;
-+
-+	/* Tell stdout not to buffer its content */
-+	setbuf(stdout, NULL);
-+
-+	if (!parse_args(argc, argv))
-+		exit(KSFT_SKIP);
-+
-+	if (get_nprocs() < 2) {
-+		print_skip("Need at least 2 online pcpus");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	if (pcpus[0] == -1 || pcpus[1] == -1)
-+		set_default_pcpus();
-+
-+	vm = test_vm_create();
-+	test_run(vm);
-+	kvm_vm_free(vm);
-+
-+	return 0;
-+}
+ 		case 'h':
+ 		default:
+ 			goto err;
 -- 
 2.35.1.1094.g7c7d902a7c-goog
 
