@@ -2,77 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C40C433FE
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 10:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE40C433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 14:47:20 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3EED49EFC;
-	Mon,  4 Apr 2022 06:54:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB1C04B2A3;
+	Mon,  4 Apr 2022 10:47:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LuYLofDchzb8; Mon,  4 Apr 2022 06:54:35 -0400 (EDT)
+	with ESMTP id 4zMitFtRnyDo; Mon,  4 Apr 2022 10:47:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6C704A500;
-	Mon,  4 Apr 2022 06:54:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 72E414B2BB;
+	Mon,  4 Apr 2022 10:47:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B96949EFC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 06:54:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77E884B295
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 10:47:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n8bL6nA9GrgO for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2022 06:54:34 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3838549EFB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 06:54:34 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1649069674;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x9+MGQ9pc0+gu5/aAz5h5cWsJ9sz5YMy85FxqLq15ig=;
- b=B010EvDDVi0HOTmFzpRWGeuXnIzvrBjwiFichyFzzxXyLJoAWvpxnn195TlioaiUOk47pf
- M//PcuoVUh0tWj38/UnkHUnjMdYLk5YqVFGXGgHP8vtzXmaFq+MUQ3CCjCSWorq+UovJpB
- L10ZK45CcJlgpN84RcKtKrdW9KTGTLI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-557-rgKEaItKOT6OFJFE16bHMQ-1; Mon, 04 Apr 2022 06:54:29 -0400
-X-MC-Unique: rgKEaItKOT6OFJFE16bHMQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
- [10.11.54.8])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id wQYLW4N9dlEb for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2022 10:47:16 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C0B24B23F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 10:47:16 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 58B1128EC103;
- Mon,  4 Apr 2022 10:54:28 +0000 (UTC)
-Received: from [10.72.12.126] (ovpn-12-126.pek2.redhat.com [10.72.12.126])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BFD3DC584FA;
- Mon,  4 Apr 2022 10:54:21 +0000 (UTC)
-Subject: Re: [PATCH] KVM: arm64: fix returnvar.cocci warnings
-To: kernel test robot <lkp@intel.com>, kvmarm@lists.cs.columbia.edu
-References: <20220403153911.12332-11-gshan@redhat.com>
- <YkrH6t5QVUREfijB@fdced1fdac95>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <3afd08d2-223c-ea02-0983-616fee32e587@redhat.com>
-Date: Mon, 4 Apr 2022 18:54:18 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <YkrH6t5QVUREfijB@fdced1fdac95>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-Cc: kbuild-all@lists.01.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- eauger@redhat.com, shan.gavin@gmail.com, Jonathan.Cameron@huawei.com,
- pbonzini@redhat.com, vkuznets@redhat.com, will@kernel.org
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 52F4E6157F;
+ Mon,  4 Apr 2022 14:47:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACF52C340EE;
+ Mon,  4 Apr 2022 14:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1649083634;
+ bh=UBiyTVY3jPw/kwQGsGmG7CA9LhSqHRjUGhLmpR6GJSw=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=GS/UArGSQ0mETeN+At6tSC8ePgdvJBSwHTE9iT/5gdMwzo987FY7nWSCqUY524rPP
+ +gwMBz5gj94MRY1pTgOhczQ5r47bOtpYUihQeZF1cFA3oNZaCVMHcgzt9YRnW7ZP3r
+ 9NcTUeaWXvbSZZ8DYujxu7lzECSIupm08EeFr05/U8QHXdmPKpNIXZjq3cNZDf9muJ
+ kXuz4/gX7Cd3e8JJa4UHAwsjBNaXeZD00KYXDnmuaY9/CUlHtahHxt6tWQzHD7Q06k
+ AXEBfb7Kz+UXaU8OxmkoA31/nQwXZK8rS2QEfL5E/0l0itPNQHEyWX7F6Z4zUhVpJk
+ kGXLORkMShjCA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nbNz5-001Wuy-Np; Mon, 04 Apr 2022 15:47:12 +0100
+Date: Mon, 04 Apr 2022 15:47:11 +0100
+Message-ID: <87o81gc3dc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v2] kvm/arm64: fixed passthrough gpu into vm on arm64
+In-Reply-To: <20220404132405.GQ64706@ziepe.ca>
+References: <20220401090828.614167-1-xieming@kylinos.cn>
+ <87tubcbvgk.wl-maz@kernel.org> <20220404132405.GQ64706@ziepe.ca>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jgg@ziepe.ca, xieming@kylinos.cn, sashal@kernel.org,
+ catalin.marinas@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org,
+ alex.williamson@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: sashal@kernel.org, catalin.marinas@arm.com, linux@armlinux.org.uk,
+ linux-kernel@vger.kernel.org, xieming <xieming@kylinos.cn>,
+ alex.williamson@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -81,59 +84,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 4/4/22 6:26 PM, kernel test robot wrote:
-> From: kernel test robot <lkp@intel.com>
+On Mon, 04 Apr 2022 14:24:05 +0100,
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 > 
-> arch/arm64/kvm/sdei.c:346:15-18: Unneeded variable: "ret". Return "SDEI_SUCCESS" on line 352
+> On Fri, Apr 01, 2022 at 05:48:59PM +0100, Marc Zyngier wrote:
 > 
+> > NAK. For a start, there is no such thing as 'write-combine' in the ARM
+> > architecture, and I'm not convinced you can equate WC to Normal-NC.
+> > See the previous discussion at [1].
+> > 
+> > [1] https://lore.kernel.org/r/20210429162906.32742-1-sdonthineni@nvidia.com
 > 
->   Remove unneeded variable used to store return value.
+> We've had a lot of discussions with ARM related to how this works with
+> drivers like mlx5 that use WC.
 > 
-> Generated by: scripts/coccinelle/misc/returnvar.cocci
+> ARM has now published some guidance on this:
 > 
-> CC: Gavin Shan <gshan@redhat.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: kernel test robot <lkp@intel.com>
-> ---
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Gavin-Shan/Support-SDEI-Virtualization/20220403-234350
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git be2d3ecedd9911fbfd7e55cc9ceac5f8b79ae4cf
-> :::::: branch date: 19 hours ago
-> :::::: commit date: 19 hours ago
-> 
->   arch/arm64/kvm/sdei.c |    3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> --- a/arch/arm64/kvm/sdei.c
-> +++ b/arch/arm64/kvm/sdei.c
-> @@ -343,13 +343,12 @@ out:
->   static unsigned long hypercall_mask(struct kvm_vcpu *vcpu, bool mask)
->   {
->   	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
-> -	unsigned long ret = SDEI_SUCCESS;
->   
->   	spin_lock(&vsdei->lock);
->   	vsdei->masked = mask ? 1 : 0;
->   	spin_unlock(&vsdei->lock);
->   
-> -	return ret;
-> +	return SDEI_SUCCESS;
->   }
->   
->   int kvm_sdei_call(struct kvm_vcpu *vcpu)
-> 
+> https://community.arm.com/arm-research/m/resources/1012
 
-Thanks for reporting the warning. I will fold the changes in next respin
-if needed.
+Nicely buried where nobody would dare looking.
 
-Thanks,
-Gavin
+> 
+> As an ecosystem we seem to be drifting toward Normal-NC for this
+> behavior (largely because it is what Linux does). At least that is
+> what we are testing and qualifing ARM CPUs against mlx5 with.
+> 
+> I'm guessing it will turn into a SBSA like thing where the ARM ARM is
+> kind of vauge but a SOC has to implement Normal-NC in a certain way to
+> be functional for the server market.
 
+The main issue is that this equivalence isn't architected, so people
+can build whatever they want. SBSA means nothing to KVM (or Linux at
+large), and there is currently no way to describe which devices are
+safe to map as Normal-NC vs Device.
+
+We either have to take userspace's word for it, or rely on some other
+heuristics (do this for PCIe, but not anything else). None of which
+are entirely safe. Not to mention that no currently available CPU
+implements FEAT_DGH.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
