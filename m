@@ -2,75 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74CB7C433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Apr 2022 01:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF44FC433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Apr 2022 01:56:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BC3E24B0B6;
-	Mon,  4 Apr 2022 21:53:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FFCA4B1BF;
+	Mon,  4 Apr 2022 21:56:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9qCaMqxYrGFK; Mon,  4 Apr 2022 21:53:33 -0400 (EDT)
+	with ESMTP id HrRRDnoNSrl5; Mon,  4 Apr 2022 21:56:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1C444B133;
-	Mon,  4 Apr 2022 21:53:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 159174B133;
+	Mon,  4 Apr 2022 21:56:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EA144B133
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 21:53:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE5414B0B6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 21:56:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wvKoQKmXSdkF for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2022 21:53:31 -0400 (EDT)
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com
- [209.85.216.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68BE74B0B6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 21:53:31 -0400 (EDT)
-Received: by mail-pj1-f54.google.com with SMTP id u14so6629247pjj.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 18:53:31 -0700 (PDT)
+ with ESMTP id 0-hCREvbIvGr for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2022 21:56:34 -0400 (EDT)
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com
+ [209.85.216.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BAC5649F5B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 21:56:34 -0400 (EDT)
+Received: by mail-pj1-f42.google.com with SMTP id
+ g15-20020a17090adb0f00b001caa9a230c7so1064307pjv.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 18:56:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=s1jP08lvjc+iEpUnhqHS81takUv7ectwk3mZXZaMX7A=;
- b=hKqK2Pm2eE7pi3Ug4MDSplWp6AxG/hOn5Qku1eSKQhG9yDshjLSjZBsk1GryTF+1Ye
- LMX8CJHD2NmLxUjWfI432ZBJm3E8MZAz1B82TFwrvg6H6JZ5SXBqwZyupGGPYmVOm8d7
- orqCrKIGjiH5ewtJlE2rGiQwCxTSLtIXPnF1kNbyl7/gVPSVvPQFAlG6oJHzsi2iXQmr
- iNg/aNvho1x1E9wnQ4GTOxGYdXlWWVbthRX0NHng5F+dYV4m7GFYpWFkeE12KcI+LMy7
- YCITxwMBqEAXS7JbfWHZcHEEyT+/LLTHlCXzri/ju5TTcYmDleiEmRL+QGKc5Kk3NH52
- cHlg==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=JSEiQNEgLzNehCj2N1qkt1yiYw63ndtI615+rA0Q68c=;
+ b=doQ/goBnkxA1rXnSX2lWlFdMlYnisYl+4a64cEDjt4d8YzNnz8CAWfKyRO0k2UDWp3
+ eimyFaHqy7RuD7uW+YKCg2D+tO9Urj2A1PqgtVbm+Nnd9lmCdJK2nHV3zC6g8wchg0po
+ EaoEmtaomW1JjS8xcC5rJyu+4I136n2Px9Jom3i/eLDvWco4n6m5dAB5IAe22At3nmK1
+ mt2rgfwkjjsgBGE1NmLrXLgwmlY28a6pBfzPkXCAMVa/Ox5RfM/bvd/fRmUBUzn9Rptt
+ F5jB8iCuuCnuqn7Ks8MwKPmoJ4v0SfQSKO8NsSLDMrWn2qw3tn5CrrOlmB4WQ2BDH1Jy
+ L+7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=s1jP08lvjc+iEpUnhqHS81takUv7ectwk3mZXZaMX7A=;
- b=FCFonAVyOkK4ZaQN1vG31xuQB12RO+jnjq0tuTw4lSggNgI6B9knon8yUZ50ZYSEtv
- I+tXa9tcBGdcyoKJYvap2JIeS3xf80R6762wCleTIDBpT1YVmHpdUyJ2HVsS1Lq/Ihbn
- LPtx2ryIAW12D90kQuZLOuW8avZ8ETILZF05O0+u0xeWjRY0N4fbhdCmnACxcNlGzn0r
- 9U/9ecyHHVfRvCmdGV6g9fgK7ybCtaClxvTZ2BWmx7xDeMaPw16CERXbKQQjHGCjY+NK
- L0Ihg7Nx2NWG3HAmIygCzYFrNRkqvdCdkmp6r46ZVIz7DkpTMe9NtdsE8jiNRQdVMbbO
- X6Qg==
-X-Gm-Message-State: AOAM530yV9W3a2e+H1g69bw/PyJ+uIM21jrrE7Hw/+t+1NcGpi6ltKnO
- c2ZkZ8trL9oARkFiFUJC3IxO1nV5ACchbUuUDfAFSA==
-X-Google-Smtp-Source: ABdhPJy3M4KOifOVTacqoNTW1CPwfWP6Y9YsIhhYUubrpWrjIexOpeAwjfsgkWyb/C+hfOn/XAg/ItUHqA6cerQoWLA=
-X-Received: by 2002:a17:902:c1ca:b0:156:a187:b7ee with SMTP id
- c10-20020a170902c1ca00b00156a187b7eemr1035059plc.122.1649123610270; Mon, 04
- Apr 2022 18:53:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220401010832.3425787-1-oupton@google.com>
- <20220401010832.3425787-4-oupton@google.com>
- <CAAeT=Fz4cB_SoZCMkOp9cEuMbY+M+ieQ6PTBcvCOQRwGkGv9pA@mail.gmail.com>
- <YkqGP/OaKK7LpKF2@google.com>
-In-Reply-To: <YkqGP/OaKK7LpKF2@google.com>
-From: Reiji Watanabe <reijiw@google.com>
-Date: Mon, 4 Apr 2022 18:53:14 -0700
-Message-ID: <CAAeT=FzeV=zL68EjeX0hWfQ5LLBBqoxFdqZXP=VRW5jZ15rc7Q@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Start trapping ID registers for 32 bit
- guests
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=JSEiQNEgLzNehCj2N1qkt1yiYw63ndtI615+rA0Q68c=;
+ b=uJGTXsChJL0Pj1biWuXX7SI038m32kt9S9KkAJKylCgnx63ivfAvRsq/6TFN5lytMt
+ 3vb1dtx6B3AFAmy648/Eg77NV8+Nj4h+epf9xax0QHtR2LK1xGZ0oMo519Jdvp0GEb4q
+ nOlCo0p8QPcBnDjTs72Kl/Q7lFrZ573l1XW1cOJ7ZpjxV4actVdcOgunUlBBF0lNdlpS
+ NbLZLWEcr6y4b37T/2mfMotNnmeHuD2EBe5YoXleqVziOx8bqxf/DAGYJvLEdkuVA7AG
+ rju40aRxcZkFXWscY6WiMi0SoeRTZa1EnS5AHsoVXaOjdUr6JmwFZ3K2aryb8v1pjZTj
+ 1PYA==
+X-Gm-Message-State: AOAM533TgSqtStpiDF9DuXF8mxmErNtDjNjLM4sevTMOdPnL5zHKh+mQ
+ YDs2p5bTS7odiyCl06apsMnbXg==
+X-Google-Smtp-Source: ABdhPJyYa3VBrowXUAjAkU9zJ0ErXJB1Zdb8TUzr4UXplkvPF68iJEuVxlpzwhQwo7HJQlI/66koCQ==
+X-Received: by 2002:a17:902:a9c7:b0:156:8951:651d with SMTP id
+ b7-20020a170902a9c700b001568951651dmr1117931plr.79.1649123793565; 
+ Mon, 04 Apr 2022 18:56:33 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150]) by smtp.gmail.com with ESMTPSA id
+ f21-20020a056a00239500b004fb02a7a45bsm13475625pfc.214.2022.04.04.18.56.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 Apr 2022 18:56:32 -0700 (PDT)
+Date: Mon, 4 Apr 2022 18:56:29 -0700
+From: Ricardo Koller <ricarkol@google.com>
 To: Oliver Upton <oupton@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v4 2/4] KVM: selftests: add is_cpu_eligible_to_run()
+ utility function
+Message-ID: <YkuhzRAiyt+M8RLi@google.com>
+References: <20220404214642.3201659-1-ricarkol@google.com>
+ <20220404214642.3201659-3-ricarkol@google.com>
+ <YkuJrYL6wL5P5JY/@google.com>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <YkuJrYL6wL5P5JY/@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,44 +93,80 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
+On Tue, Apr 05, 2022 at 12:13:33AM +0000, Oliver Upton wrote:
+> Hi Ricardo,
+> 
+> On Mon, Apr 04, 2022 at 02:46:40PM -0700, Ricardo Koller wrote:
+> > Add is_cpu_eligible_to_run() utility function, which checks whether the current
+> > process, or one of its threads, is eligible to run on a particular CPU.
+> > This information is obtained using sched_getaffinity.
+> > 
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > ---
+> >  .../testing/selftests/kvm/include/test_util.h |  2 ++
+> >  tools/testing/selftests/kvm/lib/test_util.c   | 20 ++++++++++++++++++-
+> >  2 files changed, 21 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+> > index 99e0dcdc923f..a7653f369b6c 100644
+> > --- a/tools/testing/selftests/kvm/include/test_util.h
+> > +++ b/tools/testing/selftests/kvm/include/test_util.h
+> > @@ -143,4 +143,6 @@ static inline void *align_ptr_up(void *x, size_t size)
+> >  	return (void *)align_up((unsigned long)x, size);
+> >  }
+> >  
+> > +bool is_cpu_eligible_to_run(int pcpu);
+> > +
+> >  #endif /* SELFTEST_KVM_TEST_UTIL_H */
+> > diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> > index 6d23878bbfe1..7813a68333c0 100644
+> > --- a/tools/testing/selftests/kvm/lib/test_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> > @@ -4,6 +4,7 @@
+> >   *
+> >   * Copyright (C) 2020, Google LLC.
+> >   */
+> > +#define _GNU_SOURCE
+> >  
+> >  #include <assert.h>
+> >  #include <ctype.h>
+> > @@ -13,7 +14,9 @@
+> >  #include <sys/stat.h>
+> >  #include <sys/syscall.h>
+> >  #include <linux/mman.h>
+> > -#include "linux/kernel.h"
+> > +#include <linux/kernel.h>
+> > +#include <sched.h>
+> > +#include <sys/sysinfo.h>
+> >  
+> >  #include "test_util.h"
+> >  
+> > @@ -334,3 +337,18 @@ long get_run_delay(void)
+> >  
+> >  	return val[1];
+> >  }
+> > +
+> > +bool is_cpu_eligible_to_run(int pcpu)
+> > +{
+> > +	cpu_set_t cpuset;
+> > +	long i, nprocs;
+> > +
+> > +	nprocs = get_nprocs_conf();
+> > +	sched_getaffinity(0, sizeof(cpu_set_t), &cpuset);
+> > +	for (i = 0; i < nprocs; i++) {
+> > +		if (i == pcpu)
+> > +			return CPU_ISSET(i, &cpuset);
+> > +	}
+> 
+> I don't think you need the loop and can just do CPU_ISSET(pcpu, &cpuset),
+> right?
 
-On Sun, Apr 3, 2022 at 10:46 PM Oliver Upton <oupton@google.com> wrote:
->
-> Hi Reiji,
->
-> On Sun, Apr 03, 2022 at 09:45:15PM -0700, Reiji Watanabe wrote:
-> > On Thu, Mar 31, 2022 at 6:08 PM Oliver Upton <oupton@google.com> wrote:
-> > >
-> > > To date KVM has not trapped ID register accesses from AArch32, meaning
-> > > that guests get an unconstrained view of what hardware supports. This
-> > > can be a serious problem because we try to base the guest's feature
-> > > registers on values that are safe system-wide. Furthermore, KVM does not
-> > > implement the latest ISA in the PMU and Debug architecture, so we
-> > > constrain these fields to supported values.
-> > >
-> > > Since KVM now correctly handles CP15 and CP10 register traps, we no
-> > > longer need to clear HCR_EL2.TID3 for 32 bit guests and will instead
-> > > emulate reads with their safe values.
-> > >
-> > > Signed-off-by: Oliver Upton <oupton@google.com>
-> >
-> > Reviewed-by: Reiji Watanabe <reijiw@google.com>
-> >
-> > BTW, due to this, on a system that supports PMUv3, ID_DFR0_E1 value will
-> > become 0 for the aarch32 guest without PMUv3. This is the correct behavior,
-> > but it affects migration.  I'm not sure how much we should care about
-> > migration of the aarch32 guest though (and it will be resolved once ID
-> > registers become configurable anyway).
->
-> I believe userspace has been accessing the sanitised values of these
-> feature registers the entire time, so we should be OK on the UAPI side.
+Oops, definitely not. Thanks for catching this.
 
-You are right:)
-I totally forgot this was just about trapping. Sorry for the noise.
-
-Thanks,
-Reiji
+> 
+> --
+> Thanks,
+> Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
