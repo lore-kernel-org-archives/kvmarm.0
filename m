@@ -2,82 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8AAC433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  4 Apr 2022 23:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C16EC433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Apr 2022 00:13:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 494FE4B285;
-	Mon,  4 Apr 2022 19:19:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7675E4B156;
+	Mon,  4 Apr 2022 20:13:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id N1VIRHHYFO+4; Mon,  4 Apr 2022 19:19:33 -0400 (EDT)
+	with ESMTP id GDqhTmLUEexN; Mon,  4 Apr 2022 20:13:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EA2441003;
-	Mon,  4 Apr 2022 19:19:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5233C4B1D0;
+	Mon,  4 Apr 2022 20:13:40 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88B1141003
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 19:19:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F109B4B1D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 20:13:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dz3vctYBsF-l for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2022 19:19:30 -0400 (EDT)
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com
- [209.85.166.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6FD2A40597
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 19:19:30 -0400 (EDT)
-Received: by mail-io1-f48.google.com with SMTP id g21so13181527iom.13
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 16:19:30 -0700 (PDT)
+ with ESMTP id qzZEdWRqhKeK for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2022 20:13:38 -0400 (EDT)
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com
+ [209.85.166.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB5FB4B156
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2022 20:13:37 -0400 (EDT)
+Received: by mail-il1-f173.google.com with SMTP id e9so8075732ilu.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2022 17:13:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=4HQuxb/8RWMSgNIJitUFJzaBlGJWxUNK7LO21+WkcG4=;
- b=Et2iWkTnW2r9yego6aq6wuHaWBZ4EPhFdAlYbpl3fySBWEZ2suJ7cmpKbqAZVDEYJV
- penv5MLm4ibzzjyZiCG+sRGdi8Owm7364yw8WjIBdlTFlfXoBJO7+FNNr9McLPDqsk/+
- Wk3JJz1J8PkUOamRTT2csAmTyuLOZGX07uWOwgNGZ1je/MbzCba3qb/ZUCyBExVSbyUT
- pMee689hFU90nSNMhNGDq3sULdZzSgRygc/zJleZXc6y0m6EZ+663aM9zSvn4AgP6AsS
- 4zwbH01jcZUOsOFgfWw1EUdI9wee7r/o5gNsIU9levXCN6L9MQE2pBXPeWowZWRd2Rr2
- JePA==
+ bh=6uDd17eqwT3Kpy62aoXwkm+HeQSk1YT26c4Ib6umdL4=;
+ b=eXNk/+Eq0+HjpVZOXFXfe7cNbm+VUddUNlWtr1BGApmmRektjC1jvbuB0FfCDevYlS
+ nmKmxsMSuWq3gko2J21n3r7+bYdamBpe+zL6GcVWC9Kwql/kIqZ/Rivjy31cQJ616Oyq
+ /ASpc2xBTdORjFXO+FeZvQCM7YbXooHUoy8p2AUJZbnQpCDJVG4CXMSoQ2fZLyq9tGD3
+ fGcWw/QvSypvvRoIrJKNjfOJmYwgC3od/HgjWXFMe9DnHleiv80upavVoVsLdvOmui/G
+ flswyJeDv1J18vUhyNBh5cw5WJ37p4yBJYY3Ds1vuz5TQGAezs4zT2P0cRs7KdfJ1Drt
+ Qxzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=4HQuxb/8RWMSgNIJitUFJzaBlGJWxUNK7LO21+WkcG4=;
- b=sj1E4HZ5Rw9QvPZjGYcq00NXfR0rEeVCleT09pOWIyCiCapX0r7HtIyUOGG0DbyTvH
- hytGnVytEIETsuQOvuJDXamP51hoHWkHdFgvnZRu614LJ9Qja4IVzckiFbrpjUa60fHk
- q2v84HbzER4OLR5TTaTfCg52Le2+6VQjmcbXeyxEXAR82/8wyRbpbR3uouj0k00vaH/n
- DQ10kAw5u8oG1mA7nDbDhVLffFjLn8beSh1c4C7/5QVCo7gllrzwZqD9077R4f51EoTT
- q9dj63+fjiriiEIxeQxGH4Hz3RtsRcVWE24chjlhVWQnO8uqJpo+WZjvUtwWzyeuZMSE
- U5Mw==
-X-Gm-Message-State: AOAM531L7YKcC3ch46qWPgKr/BsgPXkndqz8dxhIJqSwJpPKIhm+MZzl
- Hj+JKFeCK5bq0Euxk1wnN9m53g==
-X-Google-Smtp-Source: ABdhPJybHp4SBT2pqY9bfoXsSLyxE3+imCY7mtDDFkk9g25hqxAWHP1Ohh8UmDjlZHjJtCgPNsazsQ==
-X-Received: by 2002:a05:6602:80a:b0:649:f33:ecb2 with SMTP id
- z10-20020a056602080a00b006490f33ecb2mr344836iow.150.1649114369644; 
- Mon, 04 Apr 2022 16:19:29 -0700 (PDT)
+ bh=6uDd17eqwT3Kpy62aoXwkm+HeQSk1YT26c4Ib6umdL4=;
+ b=TxWYvRG1eo22xlBnqeWacMq8UvB8DymgOeUle6PlYiBnvNTI9lp435bdpF8m0viyWg
+ Gsyv4kcvQRvVdFotoazGBfkF2W/q+4u4FKtuiytWaoTmlMTQxzQtHgEI+/IYu4qH3H/b
+ cx9f35aeMuPhob9b3W2pketn4t0mzSoYLRPyEqOrTRk2zLO/iZLi1r5ibeqUCjtH/GyZ
+ edHUvpJ3dWBUkJB5Kz7S0rYYm/3o2NCOWazA5VoTKCV3O9uzd8NhJxqznkmkLT+44dxg
+ rF1cXGTyFZnZOer50oM01e/jGNw/hzN163j9F8GQITjDZBwkwjKyD+uFzvTWz3IF/82c
+ JF0Q==
+X-Gm-Message-State: AOAM533d15HEgRy5qK1RgKYOWySM3n2gIO2IsfOJkg0qyvUe89xUKMNA
+ Pki5iHaaKjy0v1qgWElDs5+CnA==
+X-Google-Smtp-Source: ABdhPJxmyC1L9wkkrUUenUb5ORTP4NSkIcJ3Bf8yc58eH9UEbTTh92WpCfYd6OwYBVX+KUckN6tkZw==
+X-Received: by 2002:a05:6e02:1b0f:b0:2c7:9ec2:1503 with SMTP id
+ i15-20020a056e021b0f00b002c79ec21503mr398706ilv.209.1649117617127; 
+ Mon, 04 Apr 2022 17:13:37 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- s10-20020a6b740a000000b006413d13477dsm7067073iog.33.2022.04.04.16.19.28
+ y8-20020a920908000000b002ca38acaa60sm2802439ilg.81.2022.04.04.17.13.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 Apr 2022 16:19:28 -0700 (PDT)
-Date: Mon, 4 Apr 2022 23:19:25 +0000
+ Mon, 04 Apr 2022 17:13:36 -0700 (PDT)
+Date: Tue, 5 Apr 2022 00:13:33 +0000
 From: Oliver Upton <oupton@google.com>
-To: Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH v2 2/3] KVM: arm64: Plumb cp10 ID traps through the
- AArch64 sysreg handler
-Message-ID: <Ykt8/Q5LLpZdgLu5@google.com>
-References: <20220401010832.3425787-1-oupton@google.com>
- <20220401010832.3425787-3-oupton@google.com>
- <CAAeT=FxSTL2MEBP-_vcUxJ57+F1X0EshU4R2+kNNEf5k1jJXig@mail.gmail.com>
- <YkqCAcPCnqYofspa@google.com>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH v4 2/4] KVM: selftests: add is_cpu_eligible_to_run()
+ utility function
+Message-ID: <YkuJrYL6wL5P5JY/@google.com>
+References: <20220404214642.3201659-1-ricarkol@google.com>
+ <20220404214642.3201659-3-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <YkqCAcPCnqYofspa@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20220404214642.3201659-3-ricarkol@google.com>
+Cc: kvm@vger.kernel.org, maz@kernel.org, pbonzini@redhat.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,41 +91,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Apr 04, 2022 at 05:28:33AM +0000, Oliver Upton wrote:
-> Hi Reiji,
-> 
-> On Sun, Apr 03, 2022 at 08:57:47PM -0700, Reiji Watanabe wrote:
-> > > +int kvm_handle_cp10_id(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +       int Rt = kvm_vcpu_sys_get_rt(vcpu);
-> > > +       u32 esr = kvm_vcpu_get_esr(vcpu);
-> > > +       struct sys_reg_params params;
-> > > +       int ret;
-> > > +
-> > > +       /* UNDEF on any unhandled register or an attempted write */
-> > > +       if (!kvm_esr_cp10_id_to_sys64(esr, &params) || params.is_write) {
-> > > +               kvm_inject_undefined(vcpu);
-> > 
-> > Nit: For debugging, it might be more useful to use unhandled_cp_access()
-> > (, which needs to be changed to support ESR_ELx_EC_CP10_ID though)
-> > rather than directly calling kvm_inject_undefined().
-> 
-> A very worthy nit, you spotted my laziness in shunting straight to
-> kvm_inject_undefined() :)
-> 
-> Thinking about this a bit more deeply, this code should be dead. The
-> only time either of these conditions would happen is on a broken
-> implementation. Probably should still handle it gracefully in case the
-> CP10 handling in KVM becomes (or is in my own patch!) busted.
+Hi Ricardo,
 
-Actually, on second thought: any objections to leaving this as-is?
-kvm_esr_cp10_id_to_sys64() spits out sys_reg_params that point at the
-MRS alias for the VMRS register. Even if that call succeeds, the params
-that get printed out by unhandled_cp_access() do not match the actual
-register the guest was accessing. And if the call fails, ->Op2 is
-uninitialized.
+On Mon, Apr 04, 2022 at 02:46:40PM -0700, Ricardo Koller wrote:
+> Add is_cpu_eligible_to_run() utility function, which checks whether the current
+> process, or one of its threads, is eligible to run on a particular CPU.
+> This information is obtained using sched_getaffinity.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../testing/selftests/kvm/include/test_util.h |  2 ++
+>  tools/testing/selftests/kvm/lib/test_util.c   | 20 ++++++++++++++++++-
+>  2 files changed, 21 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+> index 99e0dcdc923f..a7653f369b6c 100644
+> --- a/tools/testing/selftests/kvm/include/test_util.h
+> +++ b/tools/testing/selftests/kvm/include/test_util.h
+> @@ -143,4 +143,6 @@ static inline void *align_ptr_up(void *x, size_t size)
+>  	return (void *)align_up((unsigned long)x, size);
+>  }
+>  
+> +bool is_cpu_eligible_to_run(int pcpu);
+> +
+>  #endif /* SELFTEST_KVM_TEST_UTIL_H */
+> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+> index 6d23878bbfe1..7813a68333c0 100644
+> --- a/tools/testing/selftests/kvm/lib/test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/test_util.c
+> @@ -4,6 +4,7 @@
+>   *
+>   * Copyright (C) 2020, Google LLC.
+>   */
+> +#define _GNU_SOURCE
+>  
+>  #include <assert.h>
+>  #include <ctype.h>
+> @@ -13,7 +14,9 @@
+>  #include <sys/stat.h>
+>  #include <sys/syscall.h>
+>  #include <linux/mman.h>
+> -#include "linux/kernel.h"
+> +#include <linux/kernel.h>
+> +#include <sched.h>
+> +#include <sys/sysinfo.h>
+>  
+>  #include "test_util.h"
+>  
+> @@ -334,3 +337,18 @@ long get_run_delay(void)
+>  
+>  	return val[1];
+>  }
+> +
+> +bool is_cpu_eligible_to_run(int pcpu)
+> +{
+> +	cpu_set_t cpuset;
+> +	long i, nprocs;
+> +
+> +	nprocs = get_nprocs_conf();
+> +	sched_getaffinity(0, sizeof(cpu_set_t), &cpuset);
+> +	for (i = 0; i < nprocs; i++) {
+> +		if (i == pcpu)
+> +			return CPU_ISSET(i, &cpuset);
+> +	}
 
-Sorry for backtracking here.
+I don't think you need the loop and can just do CPU_ISSET(pcpu, &cpuset),
+right?
 
 --
 Thanks,
