@@ -2,74 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B23FC433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Apr 2022 15:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B79BC433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  5 Apr 2022 17:55:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D11464B15E;
-	Tue,  5 Apr 2022 11:27:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5AA34B0F7;
+	Tue,  5 Apr 2022 13:55:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@ziepe.ca
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8tsiBAZkswbq; Tue,  5 Apr 2022 11:27:24 -0400 (EDT)
+	with ESMTP id vnJSmm2RAUmm; Tue,  5 Apr 2022 13:55:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BF294B133;
-	Tue,  5 Apr 2022 11:27:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D6014A36B;
+	Tue,  5 Apr 2022 13:55:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8146449F3D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2022 11:27:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C18964A500
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2022 12:51:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fqlUGOi18jrS for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Apr 2022 11:27:22 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DBB449F00
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2022 11:27:22 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 98286B81D56;
- Tue,  5 Apr 2022 15:27:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5077BC385A1;
- Tue,  5 Apr 2022 15:27:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1649172439;
- bh=/DCV2yNrKkFlY3sIbdS1XuH+VrVl+6Ab+68ybP9HpLo=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=MQXOeijMhEla1Cj7eLgmWmBBIFH+rD4Yhwlpz5yfgJEglmi5blaz/z/69bzWNy8Hp
- Kl8ydUGN/efnr+Anz3HD609aOSf8AXdRpRXkUcQU8BTWc6gu6i9IhO3JNGfI3zAv1t
- Rrtwe2LSGOGJJc5yhRqqTtJ+xjk+Z6ZSxQ8ViZwNCzAw5dZ/kojGe3S4DshwYwtGl7
- e30G+K1sCT6iLyV/s37CXqa3kJskUB/MRMiPE39QzkcBOGFqHjS3eaAmO5eeNQCAb/
- 7Wu9BcjYRSmVjbKRVCyqbzNucLjdfXMJS8I8tYYykk8PZOclYMyj4woISfh+zEjaBN
- ttOKK2YPvID4w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nbl5Q-001sAH-Oh; Tue, 05 Apr 2022 16:27:16 +0100
-Date: Tue, 05 Apr 2022 16:27:16 +0100
-Message-ID: <87mtgzblez.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Jason Gunthorpe <jgg@ziepe.ca>
+ with ESMTP id 06LDS66GnSs0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Apr 2022 12:51:37 -0400 (EDT)
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com
+ [209.85.160.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 826B049F4A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2022 12:51:37 -0400 (EDT)
+Received: by mail-qt1-f177.google.com with SMTP id s11so12107531qtc.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Apr 2022 09:51:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ziepe.ca; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=DZaRsWyX31QD4hA+oZZqyItqPWIM69HLGIh6hYg0oQE=;
+ b=SKkJTRBQcHwyVWbzY1Q0fFJTZmB73lmVPAnSYhBqVVK1scWpN4Ob8A00UKCaM387r4
+ AfciYNdmHkeH/JlcNCEIyV1xeDIc/xO8CTsUpaQ9Nfm8m45bDswB5zCngl2vpuILNw3p
+ CQ1zD0Vrk72EXS9N1dpOrZ0cMsRqoFy9Avyd7aRjyfzieiSJVwJ72RCA3g7oJFF6OHxk
+ gtWdCx9YOOio9pgRwfesVCtbshpogXUCTFcLuqPtNJmArFM1fFUWc0MMu7tetlaOELml
+ FSV82Fy2929wV82QLNafqtOMhBmRY2JlpLyGnh5N53amH3Rg+Lv9Du2jfa44f15e9Vn8
+ HFxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=DZaRsWyX31QD4hA+oZZqyItqPWIM69HLGIh6hYg0oQE=;
+ b=YKeAgZPYvWtwWxmE02bOApLOwQ8TOoOprhQlC/R7DWX3FGkZgFLFajIdDluw4Y1teW
+ eQj6TCIghzrP/SiWZN0AZi1+9ACtuNWP600+Kq1g6SpA1ODuDwzRjd+eFlve5+AMq8S0
+ zTA+wrMJ40yKXHKzfp4TS+xpS3OVVgcAm7ZANASnUxrThl9s9NM7U7o40gU/RGbWZ5NF
+ wQV4dw96V7VUxvJ8/i+YBA33kCC4T7QARp++wj1lkqJ2H1Ag2R80RNvE3c3+GfqFRxtC
+ 2Txsg4wW5ihCHL/UEUTsYX2AF/PkQ6kb7tvFahy+l2A0hrtxtZTzeRjOSLp7/UR+5h0H
+ e2eg==
+X-Gm-Message-State: AOAM532Yj2rgVu5nWxgG0C8/KgDp2xT4w3G9lD8n5YlvLe+fJ9TCja7V
+ sDFAOM7V6S/pGIlJ3xpSB8GZNA==
+X-Google-Smtp-Source: ABdhPJyqiRVuBFpx9bRzvsG3XiF+NGW1XPncA04INZy3n5mHw4hVYOyIPXq4yrbKNu2ipSi3tYvOvg==
+X-Received: by 2002:a05:622a:1d5:b0:2e1:a8b8:3ee8 with SMTP id
+ t21-20020a05622a01d500b002e1a8b83ee8mr3675968qtw.346.1649177497004; 
+ Tue, 05 Apr 2022 09:51:37 -0700 (PDT)
+Received: from ziepe.ca
+ (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net.
+ [142.162.113.129]) by smtp.gmail.com with ESMTPSA id
+ s13-20020a05620a0bcd00b0067afe7dd3ffsm9182055qki.49.2022.04.05.09.51.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 05 Apr 2022 09:51:36 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94) (envelope-from <jgg@ziepe.ca>)
+ id 1nbmP0-00D9J9-QM; Tue, 05 Apr 2022 13:51:34 -0300
+Date: Tue, 5 Apr 2022 13:51:34 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Marc Zyngier <maz@kernel.org>
 Subject: Re: [PATCH v2] kvm/arm64: fixed passthrough gpu into vm on arm64
-In-Reply-To: <20220404170202.GR64706@ziepe.ca>
+Message-ID: <20220405165134.GS64706@ziepe.ca>
 References: <20220401090828.614167-1-xieming@kylinos.cn>
  <87tubcbvgk.wl-maz@kernel.org> <20220404132405.GQ64706@ziepe.ca>
  <87o81gc3dc.wl-maz@kernel.org> <20220404170202.GR64706@ziepe.ca>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: jgg@ziepe.ca, xieming@kylinos.cn, sashal@kernel.org,
- catalin.marinas@arm.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org,
- alex.williamson@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+ <87mtgzblez.wl-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <87mtgzblez.wl-maz@kernel.org>
+X-Mailman-Approved-At: Tue, 05 Apr 2022 13:55:47 -0400
 Cc: sashal@kernel.org, catalin.marinas@arm.com, linux@armlinux.org.uk,
  linux-kernel@vger.kernel.org, xieming <xieming@kylinos.cn>,
  alex.williamson@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
@@ -90,96 +98,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 04 Apr 2022 18:02:02 +0100,
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> 
-> On Mon, Apr 04, 2022 at 03:47:11PM +0100, Marc Zyngier wrote:
-> > > I'm guessing it will turn into a SBSA like thing where the ARM ARM is
-> > > kind of vauge but a SOC has to implement Normal-NC in a certain way to
-> > > be functional for the server market.
+On Tue, Apr 05, 2022 at 04:27:16PM +0100, Marc Zyngier wrote:
+> On Mon, 04 Apr 2022 18:02:02 +0100,
+> Jason Gunthorpe <jgg@ziepe.ca> wrote:
 > > 
-> > The main issue is that this equivalence isn't architected, so people
-> > can build whatever they want. SBSA means nothing to KVM (or Linux at
-> > large), and there is currently no way to describe which devices are
-> > safe to map as Normal-NC vs Device.
+> > On Mon, Apr 04, 2022 at 03:47:11PM +0100, Marc Zyngier wrote:
+> > > > I'm guessing it will turn into a SBSA like thing where the ARM ARM is
+> > > > kind of vauge but a SOC has to implement Normal-NC in a certain way to
+> > > > be functional for the server market.
+> > > 
+> > > The main issue is that this equivalence isn't architected, so people
+> > > can build whatever they want. SBSA means nothing to KVM (or Linux at
+> > > large), and there is currently no way to describe which devices are
+> > > safe to map as Normal-NC vs Device.
+> > 
+> > And people have, we know of some ARM SOC's that don't work fully with
+> > NORMAL_NC for this usage. That is already a problem for baremetal
+> > Linux, let alone KVM..
+> > 
+> > That is why I likened it to SBSA - if you want to build a server SOC
+> > that works with existing server software, you have to support
+> > NORMAL_NC in this way. Even if it isn't architected.
 > 
-> And people have, we know of some ARM SOC's that don't work fully with
-> NORMAL_NC for this usage. That is already a problem for baremetal
-> Linux, let alone KVM..
+> I see it the other way around. If it isn't architected (and in this
+> case not even detectable in a scalable way), it simply isn't
+> supportable by SW.
+
+Except the software already supports it. Catalin decided NORMAL_NC
+would be how Linux works in 2014 in commit de2db7432917 ("arm64: Make
+DMA coherent and strongly ordered mappings not executable")
+
+There are 47 places under drivers/ that call pgprot_writecombine()
+already, and if you make a "server" kind of chip you are likely to
+encounter these drivers and must support them. Linux has created a
+de-facto spec here.
+
+While I agree the current situation in ARM64 is not nice and could be
+improved, it has been supported by SW this way for a long time
+already.
+
+> > I didn't quite understand your other remarks though - is there a
+> > problem here? It seems like yes from the other thread you pointed at?
 > 
-> That is why I likened it to SBSA - if you want to build a server SOC
-> that works with existing server software, you have to support
-> NORMAL_NC in this way. Even if it isn't architected.
+> The main issue is that we have no idea what the behaviour is on a
+> given implementation, and no way to even detect that for a given
+> device, NORMAL_NC is a memory type that won't cause any issue.
 
-I see it the other way around. If it isn't architected (and in this
-case not even detectable in a scalable way), it simply isn't
-supportable by SW.
+I agree with this, but that is a driver problem for calling
+pgprot_writecombine() not a KVM problem. vfio is just another driver
+in this sense.
 
-> The KVM challenge, at least, is to support a CPU with working
-> NORMAL_NC to create VM that emulates the same CPU with working
-> NORMAL_NC.
-> 
-> I didn't quite understand your other remarks though - is there a
-> problem here? It seems like yes from the other thread you pointed at?
+We already have arch_can_pci_mmap_wc() which is a half attempt to
+solve this problem, but ARM64 doesn't wire it up.
 
-The main issue is that we have no idea what the behaviour is on a
-given implementation, and no way to even detect that for a given
-device, NORMAL_NC is a memory type that won't cause any issue.
+We've also gone far enough down this path for long enough that we
+can't break all the existing systems that are working this way
+already. So I expect any future accomodation would be some FW
+indication that NORMAL_NC doesn't work for pgprot_writecombine(),
+probably in DT and probably for an embedded focused chip. Maybe
+combined with a quirk list of non-working CPU IDs or something.
 
-> I would think that KVM should mirror the process page table
-> configuration into the KVM page table and make this into a userspace
-> problem?
-
-But what makes it safe to do this the first place? There are tons of
-HW out there that will simply issue a SError if you generate an
-unaligned access targeting the right device, and letting userspace
-decide on this is simply not acceptable.
-
-> That turns it into a VFIO problem to negotiate with userspace and set
-> the proper pgprot. At least VFIO has a better chance than KVM to
-> consult DT or something to learn about the specific device's
-> properties.
-> 
-> I don't know how VFIO/qemu/etc can make this all work automatically
-> correctly 100% of the time. It seems to me it is the same problem as
-> just basic baremetal "WC" is troubled on ARM in general today. Maybe
-> some tables and a command line option in qemu is the best we can hope
-> for.
-
-Having a firmware description of what can be mapped with what
-attributes would be pretty useful indeed. Not sure how that scales,
-but the platform definitely needs to advertise *something* so that we
-can allow userspace to say something.
-
-> 
-> Long ago I asked that the ARM folks could come with some Linux
-> definition of all the WC-like modes and some arch calls to indicate
-> which one(s) should be used. Nobody seemed interested in doing that,
-> so the above SOC was left non-working in mainline Linux..
-> 
-> > We either have to take userspace's word for it, or rely on some other
-> > heuristics (do this for PCIe, but not anything else). None of which
-> > are entirely safe. Not to mention that no currently available CPU
-> > implements FEAT_DGH.
-> 
-> DHG is an optimization, not a functional requirement. Currently
-> available CPUs use one of the more expensive barriers that are
-> architected to include DHG behavior.
-> 
-> In any event, this is an important optimization. It is why ARMv9 is
-> introducing a new instruction specifically to optmize it.
-
-ARMv9? No, seems like it was introduced in the v8.7 time frame, and
-allowed retroactively from v8.0. N2 has it, but A510 doesn't, while V1
-(an ARMv8.3 part) has it. But at least it is slowly creeping into
-implementations.
+Wire it up to arch_can_pci_mmap_wc() and you hvae something reasonable -
+except that none of the 47 drivers actually use this call
+today. Sigh.
 
 Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Jason
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
