@@ -2,60 +2,63 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52CD5C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9DDAC433FE
 	for <kvmarm@archiver.kernel.org>; Tue,  5 Apr 2022 18:23:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3A554B1D2;
-	Tue,  5 Apr 2022 14:23:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8637A4B119;
+	Tue,  5 Apr 2022 14:23:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YUBBR418PDuw; Tue,  5 Apr 2022 14:23:50 -0400 (EDT)
+	with ESMTP id 3irgC1uJUUi6; Tue,  5 Apr 2022 14:23:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1D454B165;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D82FB4B1A2;
 	Tue,  5 Apr 2022 14:23:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 247E84B108
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 561224B105
  for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2022 14:23:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bxCGh685lfnq for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Apr 2022 14:23:47 -0400 (EDT)
+ with ESMTP id 27wY0n49Dzjt for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Apr 2022 14:23:48 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D14524B105
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2B744B119
  for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2022 14:23:47 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id DB71A618C2;
- Tue,  5 Apr 2022 18:23:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B31CC385A1;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3F24E618DE;
+ Tue,  5 Apr 2022 18:23:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 944ECC385A0;
  Tue,  5 Apr 2022 18:23:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
  s=k20201202; t=1649183026;
- bh=MT34i3NW3JADdGI6xe3eQ37kdM+Xptj9/0tewFfhRaU=;
- h=From:To:Cc:Subject:Date:From;
- b=ivAX2SkCr/F6j1p9yhjHAUcWidmARRrcGQFrRXq+OCcDt3PTz+V3Z29Ta253hbuNU
- iQEs0jYpLyA/tGDqhK6HezeLFwoBmvClWqOIicugUiBNiV0CtWA8mWL0XwQfvhESwh
- hS+PBwCEAsDWXCvW3EggXCnnXzXdSzzRJI62plOKkDw53BdMdP3xR0mXWvd16//Wgb
- KVFZqFRftjTfBgTwr1ZpnYODLS9kgzkH5rKhQvwubcJDWRvT7vHliRf7hiNARo0icB
- gGvq5Dqjc8Sf0D66orwCsobHCuwE11aSLZ6iNtl1YA+S5450QRcfBU/Bb9PLIFfV/n
- jO2Nyf34BXTVA==
+ bh=tNRgh36uMhTXneCtr+tsi5ywN59JVKY9S+Jo3H7DGU4=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=WSHChb4q0JZX9UjEPzJQdyUJAUj6LeYQDPJh0zyrHuLJHoHAk6pdhF/pY41q0bVes
+ SoiIh3e5LP3jcJbWj5QbS/I+kdUH93T8JaPdiUT0Nip2YUeyqSrTPyWk9/5RTunQTP
+ 6fG8KblMwekKHGSJmwphuLLc/7cY5TkuwZd4uBUiiEeULTuv7UgJn+rb1gsLwWBg0J
+ goU5rQn3jIgJvygpkyzNvSsahsiQQxGqcjlLUpYVwfzT/Ps2u2hlKirGfOowLxhAbd
+ +w+sP7Yup3wikrokSQLRtfGkG14YWGIwFr4sYVxu0AR1AkqHPYrwnrw9kaGjh1dzoK
+ haNJ2mbG8/alQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nbnqB-001tdH-Nl; Tue, 05 Apr 2022 19:23:43 +0100
+ id 1nbnqC-001tdH-BB; Tue, 05 Apr 2022 19:23:44 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
  kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 0/4] KVM: arm64: vgic-v3: MMIO-based LPI invalidation and co
-Date: Tue,  5 Apr 2022 19:23:23 +0100
-Message-Id: <20220405182327.205520-1-maz@kernel.org>
+Subject: [PATCH v2 2/4] KVM: arm64: vgic-v3: Expose GICR_CTLR.RWP when
+ disabling LPIs
+Date: Tue,  5 Apr 2022 19:23:25 +0100
+Message-Id: <20220405182327.205520-3-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220405182327.205520-1-maz@kernel.org>
+References: <20220405182327.205520-1-maz@kernel.org>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
 X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
@@ -83,49 +86,155 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since revision IHI0069G of the GICv3 spec, an implementation is
-allowed to implement MMIO-based LPI invalidation, without having to
-support RVPEI (which is essentially a GICv4.1 feature).
+When disabling LPIs, a guest needs to poll GICR_CTLR.RWP in order
+to be sure that the write has taken effect. We so far reported it
+as 0, as we didn't advertise that LPIs could be turned off the
+first place.
 
-This has the potential to make workloads using heavy LPI invalidation
-fare a bit better, as they don't need to lock the access to the
-command queue.
+Start tracking this state during which LPIs are being disabled,
+and expose the 'in progress' state via the RWP bit.
 
-Similarly, an implementation can now expose that it allows LPIs to be
-turned off, something that we always supported.
+We also take this opportunity to disallow enabling LPIs and programming
+GICR_{PEND,PROP}BASER while LPI disabling is in progress, as allowed by
+the architecture (UNPRED behaviour).
 
-This series implements both these features, exposing the new
-GICR_{INVLPIR,INVALLR,SYNCR} registers, transitions of the
-GICR_CTLR.RWP bit on LPI disabling, and finally exposes these to
-userspace and the guest with a new GICD_IIDR revision (and the ability
-to save/restore it).
+We don't advertise the feature to the guest yet (which is allowed by
+the architecture).
 
-This series has been extremely useful to debug related GIC features,
-and will be complemented by a few GIC driver patches.
+Reviewed-by: Oliver Upton <oupton@google.com>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/vgic/vgic-its.c     |  2 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c | 36 ++++++++++++++++++++++--------
+ arch/arm64/kvm/vgic/vgic.h         |  1 +
+ include/kvm/arm_vgic.h             |  4 ++--
+ 4 files changed, 31 insertions(+), 12 deletions(-)
 
-* From v1 [1]:
-  - Fixed CES and IR bit numbers (shrug...)
-  - Plenty of small fixes all over the shop thanks to Oliver
-  - Rebased on top of 5.18-rc1
-
-[1] https://lore.kernel.org/r/20220314164044.772709-1-maz@kernel.org
-
-Marc Zyngier (4):
-  irqchip/gic-v3: Exposes bit values for GICR_CTLR.{IR,CES}
-  KVM: arm64: vgic-v3: Expose GICR_CTLR.RWP when disabling LPIs
-  KVM: arm64: vgic-v3: Implement MMIO-based LPI invalidation
-  KVM: arm64: vgic-v3: Advertise GICR_CTLR.{IR,CES} as a new GICD_IIDR
-    revision
-
- arch/arm64/kvm/vgic/vgic-init.c    |   7 +-
- arch/arm64/kvm/vgic/vgic-its.c     |  64 ++++++++++-----
- arch/arm64/kvm/vgic/vgic-mmio-v2.c |  18 ++++-
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 125 ++++++++++++++++++++++++++---
- arch/arm64/kvm/vgic/vgic.h         |  10 +++
- include/kvm/arm_vgic.h             |   8 +-
- include/linux/irqchip/arm-gic-v3.h |   2 +
- 7 files changed, 195 insertions(+), 39 deletions(-)
-
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 089fc2ffcb43..8371c5a9639c 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -683,7 +683,7 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 	if (!vcpu)
+ 		return E_ITS_INT_UNMAPPED_INTERRUPT;
+ 
+-	if (!vcpu->arch.vgic_cpu.lpis_enabled)
++	if (!vgic_lpis_enabled(vcpu))
+ 		return -EBUSY;
+ 
+ 	vgic_its_cache_translation(kvm, its, devid, eventid, ite->irq);
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+index 58e40b4874f8..b5ef7e15bb66 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
+@@ -221,6 +221,13 @@ static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
+ 	vgic_put_irq(vcpu->kvm, irq);
+ }
+ 
++bool vgic_lpis_enabled(struct kvm_vcpu *vcpu)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++
++	return atomic_read(&vgic_cpu->ctlr) == GICR_CTLR_ENABLE_LPIS;
++}
++
+ static unsigned long vgic_mmio_read_v3r_ctlr(struct kvm_vcpu *vcpu,
+ 					     gpa_t addr, unsigned int len)
+ {
+@@ -229,26 +236,38 @@ static unsigned long vgic_mmio_read_v3r_ctlr(struct kvm_vcpu *vcpu,
+ 	return vgic_cpu->lpis_enabled ? GICR_CTLR_ENABLE_LPIS : 0;
+ }
+ 
+-
+ static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
+ 				     gpa_t addr, unsigned int len,
+ 				     unsigned long val)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+-	bool was_enabled = vgic_cpu->lpis_enabled;
++	u32 ctlr;
+ 
+ 	if (!vgic_has_its(vcpu->kvm))
+ 		return;
+ 
+-	vgic_cpu->lpis_enabled = val & GICR_CTLR_ENABLE_LPIS;
++	if (!(val & GICR_CTLR_ENABLE_LPIS)) {
++		/*
++		 * Don't disable if RWP is set, as there already an
++		 * ongoing disable. Funky guest...
++		 */
++		ctlr = atomic_cmpxchg_acquire(&vgic_cpu->ctlr,
++					      GICR_CTLR_ENABLE_LPIS,
++					      GICR_CTLR_RWP);
++		if (ctlr != GICR_CTLR_ENABLE_LPIS)
++			return;
+ 
+-	if (was_enabled && !vgic_cpu->lpis_enabled) {
+ 		vgic_flush_pending_lpis(vcpu);
+ 		vgic_its_invalidate_cache(vcpu->kvm);
+-	}
++		atomic_set_release(&vgic_cpu->ctlr, 0);
++	} else {
++		ctlr = atomic_cmpxchg_acquire(&vgic_cpu->ctlr, 0,
++					      GICR_CTLR_ENABLE_LPIS);
++		if (ctlr != 0)
++			return;
+ 
+-	if (!was_enabled && vgic_cpu->lpis_enabled)
+ 		vgic_enable_lpis(vcpu);
++	}
+ }
+ 
+ static bool vgic_mmio_vcpu_rdist_is_last(struct kvm_vcpu *vcpu)
+@@ -478,11 +497,10 @@ static void vgic_mmio_write_propbase(struct kvm_vcpu *vcpu,
+ 				     unsigned long val)
+ {
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	u64 old_propbaser, propbaser;
+ 
+ 	/* Storing a value with LPIs already enabled is undefined */
+-	if (vgic_cpu->lpis_enabled)
++	if (vgic_lpis_enabled(vcpu))
+ 		return;
+ 
+ 	do {
+@@ -513,7 +531,7 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
+ 	u64 old_pendbaser, pendbaser;
+ 
+ 	/* Storing a value with LPIs already enabled is undefined */
+-	if (vgic_cpu->lpis_enabled)
++	if (vgic_lpis_enabled(vcpu))
+ 		return;
+ 
+ 	do {
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index 3fd6c86a7ef3..a21e9b602ff2 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -308,6 +308,7 @@ static inline bool vgic_dist_overlap(struct kvm *kvm, gpa_t base, size_t size)
+ 		(base < d->vgic_dist_base + KVM_VGIC_V3_DIST_SIZE);
+ }
+ 
++bool vgic_lpis_enabled(struct kvm_vcpu *vcpu);
+ int vgic_copy_lpi_list(struct kvm *kvm, struct kvm_vcpu *vcpu, u32 **intid_ptr);
+ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index bb30a6803d9f..fdf1c2c322e5 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -347,8 +347,8 @@ struct vgic_cpu {
+ 
+ 	/* Contains the attributes and gpa of the LPI pending tables. */
+ 	u64 pendbaser;
+-
+-	bool lpis_enabled;
++	/* GICR_CTLR.{ENABLE_LPIS,RWP} */
++	atomic_t ctlr;
+ 
+ 	/* Cache guest priority bits */
+ 	u32 num_pri_bits;
 -- 
 2.34.1
 
