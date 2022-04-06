@@ -2,74 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2274BC433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  5 Apr 2022 18:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20973C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Apr 2022 07:10:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CDA4B49EE4;
-	Tue,  5 Apr 2022 14:23:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 659CA4B1A2;
+	Wed,  6 Apr 2022 03:10:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cmPz6ylOn52S; Tue,  5 Apr 2022 14:23:54 -0400 (EDT)
+	with ESMTP id OUMbygLQkIPk; Wed,  6 Apr 2022 03:10:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 32AFA4B175;
-	Tue,  5 Apr 2022 14:23:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 247044B1C4;
+	Wed,  6 Apr 2022 03:10:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52B744B1DB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2022 14:23:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E64C4B1C4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 03:10:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nOpqUSbFaWla for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Apr 2022 14:23:52 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D83404B1B5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2022 14:23:49 -0400 (EDT)
+ with ESMTP id M85FwWP2OH4S for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2022 03:10:12 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0F1DC4B176
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 03:10:11 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 5F6D6B81F85;
- Tue,  5 Apr 2022 18:23:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F43C385A7;
- Tue,  5 Apr 2022 18:23:47 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 10DF261A0D;
+ Wed,  6 Apr 2022 07:10:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70572C385A1;
+ Wed,  6 Apr 2022 07:10:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1649183027;
- bh=ZrnXsHBiZRWUJYaEeIvp3oOr1cjkMN1M11qiZbsnzyw=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=RsMG6TEgg3vQvp6ZPz2VS2n6kN7zm6/l+yTbJhKClC9PMB4UTkGD0mZ4DPou1xZax
- BZ1mA3/80i8GMs6Eo43IZHDd36+aue06EI+qWk/f5W61pAI+B3J6mMLySaImudRe9/
- qvEmzEA+7MJqBJjxOUz0FMJA4GaU4IZ8QptHjoDofgVxvTaoStWrUsj0vH31Ni09Wp
- b2NU1jjL7cH0de/rj+XbsMkjBHqrVxIhTFBzsgkxNaJ5ezAKMrscVrEecFbr5RLVaI
- nvlYhv5FCQD/ppM8niQwuUeWCZACUSH4RKesUgcx3gzvEMJUCSjcrsAnWLSGySpkHb
- nA7LEO4KOxpZw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ s=k20201202; t=1649229010;
+ bh=mVDxM1dhB2/8ewK05J3b9YYTZKETXEF2oeIq+WeG7ts=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=qGMMpaXEavl0KV7Z8YOSFB4sNhaYoJN9i5O6BOQlrMIQJeBWgfvLPNVT16518VZ0H
+ eziDsVpB/4jisIBDK/DBJ4ykhVqLfFF8aO+wz0k2ZZNVCJy581ufQ602aYNU3xHL//
+ 438BBSNm9LPtZrwrGnrE+/Xc/BL1XamZb7VBtlN9F7VLFLP99vBJMDjz6SgGChS4M9
+ tz4ojrRVfa6TCB3TdCUU/ftWmQs02uXAfNbeVsYOHO/fs19bYKc+9gEu7RaBtbn2RZ
+ 0VQHKIS/WPB8a//i/2jaZClivO/TCmhXloamwrV7+kJN1gLakoVRRsZOX2BNG91U5j
+ vmiU/kMGjqlsA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29]
+ helo=billy-the-mountain.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nbnqC-001tdH-RL; Tue, 05 Apr 2022 19:23:44 +0100
+ id 1nbznr-0025gP-LZ; Wed, 06 Apr 2022 08:10:07 +0100
+Date: Wed, 06 Apr 2022 08:10:00 +0100
+Message-ID: <87fsmqvgaf.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 4/4] KVM: arm64: vgic-v3: Advertise GICR_CTLR.{IR,
- CES} as a new GICD_IIDR revision
-Date: Tue,  5 Apr 2022 19:23:27 +0100
-Message-Id: <20220405182327.205520-5-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220405182327.205520-1-maz@kernel.org>
-References: <20220405182327.205520-1-maz@kernel.org>
-MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, andre.przywara@arm.com, eric.auger@redhat.com,
- oupton@google.com, lorenzo.pieralisi@arm.com, kernel-team@android.com
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v2 1/3] KVM: Don't create VM debugfs files outside of the
+ VM directory
+In-Reply-To: <20220404182119.3561025-2-oupton@google.com>
+References: <20220404182119.3561025-1-oupton@google.com>
+ <20220404182119.3561025-2-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ pshier@google.com, ricarkol@google.com, reijiw@google.com, pbonzini@redhat.com,
+ seanjc@google.com, stable@kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
- Andre Przywara <andre.przywara@arm.com>, kernel-team@android.com
+Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>, stable@kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,159 +91,79 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Since adversising GICR_CTLR.{IC,CES} is directly observable from
-a guest, we need to make it selectable from userspace.
+Hi Oliver,
 
-For that, bump the default GICD_IIDR revision and let userspace
-downgrade it to the previous default. For GICv2, the two distributor
-revisions are strictly equivalent.
+On Mon, 04 Apr 2022 19:21:17 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Unfortunately, there is no guarantee that KVM was able to instantiate a
+> debugfs directory for a particular VM. To that end, KVM shouldn't even
+> attempt to create new debugfs files in this case. If the specified
+> parent dentry is NULL, debugfs_create_file() will instantiate files at
+> the root of debugfs.
+> 
+> For arm64, it is possible to create the vgic-state file outside of a
+> VM directory, the file is not cleaned up when a VM is destroyed.
+> Nonetheless, the corresponding struct kvm is freed when the VM is
+> destroyed.
+> 
+> Nip the problem in the bud for all possible errant debugfs file
+> creations by initializing kvm->debugfs_dentry to -ENOENT. In so doing,
+> debugfs_create_file() will fail instead of creating the file in the root
+> directory.
+> 
+> Cc: stable@kernel.org
+> Fixes: 929f45e32499 ("kvm: no need to check return value of debugfs_create functions")
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 70e05af5ebea..04a426e65cb8 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -932,7 +932,7 @@ static void kvm_destroy_vm_debugfs(struct kvm *kvm)
+>  	int kvm_debugfs_num_entries = kvm_vm_stats_header.num_desc +
+>  				      kvm_vcpu_stats_header.num_desc;
+>  
+> -	if (!kvm->debugfs_dentry)
+> +	if (!IS_ERR(kvm->debugfs_dentry))
+>  		return;
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/vgic/vgic-init.c    |  7 ++++++-
- arch/arm64/kvm/vgic/vgic-mmio-v2.c | 18 +++++++++++++++---
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 23 +++++++++++++++++++++--
- arch/arm64/kvm/vgic/vgic.h         |  5 +++++
- include/kvm/arm_vgic.h             |  3 +++
- 5 files changed, 50 insertions(+), 6 deletions(-)
+Shouldn't this condition be inverted? It certainly looks odd.
 
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index fc00304fe7d8..f84e04f334c6 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -319,7 +319,12 @@ int vgic_init(struct kvm *kvm)
- 
- 	vgic_debug_init(kvm);
- 
--	dist->implementation_rev = 2;
-+	/*
-+	 * If userspace didn't set the GIC implementation revision,
-+	 * default to the latest and greatest. You know want it.
-+	 */
-+	if (!dist->implementation_rev)
-+		dist->implementation_rev = KVM_VGIC_IMP_REV_LATEST;
- 	dist->initialized = true;
- 
- out:
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v2.c b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-index 12e4c223e6b8..77a67e9d3d14 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v2.c
-@@ -73,9 +73,13 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
- 					   gpa_t addr, unsigned int len,
- 					   unsigned long val)
- {
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	u32 reg;
-+
- 	switch (addr & 0x0c) {
- 	case GIC_DIST_IIDR:
--		if (val != vgic_mmio_read_v2_misc(vcpu, addr, len))
-+		reg = vgic_mmio_read_v2_misc(vcpu, addr, len);
-+		if ((reg ^ val) & ~GICD_IIDR_REVISION_MASK)
- 			return -EINVAL;
- 
- 		/*
-@@ -87,8 +91,16 @@ static int vgic_mmio_uaccess_write_v2_misc(struct kvm_vcpu *vcpu,
- 		 * migration from old kernels to new kernels with legacy
- 		 * userspace.
- 		 */
--		vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
--		return 0;
-+		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
-+		switch (reg) {
-+		case KVM_VGIC_IMP_REV_2:
-+		case KVM_VGIC_IMP_REV_3:
-+			vcpu->kvm->arch.vgic.v2_groups_user_writable = true;
-+			dist->implementation_rev = reg;
-+			return 0;
-+		default:
-+			return -EINVAL;
-+		}
- 	}
- 
- 	vgic_mmio_write_v2_misc(vcpu, addr, len, val);
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 9824c773427d..f7aa7bcd6fb8 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -155,13 +155,27 @@ static int vgic_mmio_uaccess_write_v3_misc(struct kvm_vcpu *vcpu,
- 					   unsigned long val)
- {
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	u32 reg;
- 
- 	switch (addr & 0x0c) {
- 	case GICD_TYPER2:
--	case GICD_IIDR:
- 		if (val != vgic_mmio_read_v3_misc(vcpu, addr, len))
- 			return -EINVAL;
- 		return 0;
-+	case GICD_IIDR:
-+		reg = vgic_mmio_read_v3_misc(vcpu, addr, len);
-+		if ((reg ^ val) & ~GICD_IIDR_REVISION_MASK)
-+			return -EINVAL;
-+
-+		reg = FIELD_GET(GICD_IIDR_REVISION_MASK, reg);
-+		switch (reg) {
-+		case KVM_VGIC_IMP_REV_2:
-+		case KVM_VGIC_IMP_REV_3:
-+			dist->implementation_rev = reg;
-+			return 0;
-+		default:
-+			return -EINVAL;
-+		}
- 	case GICD_CTLR:
- 		/* Not a GICv4.1? No HW SGIs */
- 		if (!kvm_vgic_global_state.has_gicv4_1)
-@@ -232,8 +246,13 @@ static unsigned long vgic_mmio_read_v3r_ctlr(struct kvm_vcpu *vcpu,
- 					     gpa_t addr, unsigned int len)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	unsigned long val;
-+
-+	val = atomic_read(&vgic_cpu->ctlr);
-+	if (vgic_get_implementation_rev(vcpu) >= KVM_VGIC_IMP_REV_3)
-+		val |= GICR_CTLR_IR | GICR_CTLR_CES;
- 
--	return vgic_cpu->lpis_enabled ? GICR_CTLR_ENABLE_LPIS : 0;
-+	return val;
- }
- 
- static void vgic_mmio_write_v3r_ctlr(struct kvm_vcpu *vcpu,
-diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 1d04a900f3e3..4c6bdd321faa 100644
---- a/arch/arm64/kvm/vgic/vgic.h
-+++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -98,6 +98,11 @@
- #define DEBUG_SPINLOCK_BUG_ON(p)
- #endif
- 
-+static inline u32 vgic_get_implementation_rev(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->kvm->arch.vgic.implementation_rev;
-+}
-+
- /* Requires the irq_lock to be held by the caller. */
- static inline bool irq_is_pending(struct vgic_irq *irq)
- {
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 401236f97cf2..2d8f2e90edc2 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -231,6 +231,9 @@ struct vgic_dist {
- 
- 	/* Implementation revision as reported in the GICD_IIDR */
- 	u32			implementation_rev;
-+#define KVM_VGIC_IMP_REV_2	2 /* GICv2 restorable groups */
-+#define KVM_VGIC_IMP_REV_3	3 /* GICv3 GICR_CTLR.{IW,CES,RWP} */
-+#define KVM_VGIC_IMP_REV_LATEST	KVM_VGIC_IMP_REV_3
- 
- 	/* Userspace can write to GICv2 IGROUPR */
- 	bool			v2_groups_user_writable;
+>  
+>  	debugfs_remove_recursive(kvm->debugfs_dentry);
+> @@ -955,6 +955,12 @@ static int kvm_create_vm_debugfs(struct kvm *kvm, int fd)
+>  	int kvm_debugfs_num_entries = kvm_vm_stats_header.num_desc +
+>  				      kvm_vcpu_stats_header.num_desc;
+>  
+> +	/*
+> +	 * Force subsequent debugfs file creations to fail if the VM directory
+> +	 * is not created.
+> +	 */
+> +	kvm->debugfs_dentry = ERR_PTR(-ENOENT);
+> +
+>  	if (!debugfs_initialized())
+>  		return 0;
+>  
+> @@ -5479,7 +5485,7 @@ static void kvm_uevent_notify_change(unsigned int type, struct kvm *kvm)
+>  	}
+>  	add_uevent_var(env, "PID=%d", kvm->userspace_pid);
+>  
+> -	if (kvm->debugfs_dentry) {
+> +	if (!IS_ERR(kvm->debugfs_dentry)) {
+>  		char *tmp, *p = kmalloc(PATH_MAX, GFP_KERNEL_ACCOUNT);
+>  
+>  		if (p) {
+
+Thanks,
+
+	M.
+
 -- 
-2.34.1
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
