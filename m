@@ -2,81 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B61C433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Apr 2022 17:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A623C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Apr 2022 18:51:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B00C949EF8;
-	Wed,  6 Apr 2022 13:59:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A2B9741174;
+	Wed,  6 Apr 2022 14:51:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9ktKIAV+zdBC; Wed,  6 Apr 2022 13:59:09 -0400 (EDT)
+	with ESMTP id v8Ks4YAzCeKU; Wed,  6 Apr 2022 14:51:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C22D49EBA;
-	Wed,  6 Apr 2022 13:59:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62D7F49E17;
+	Wed,  6 Apr 2022 14:51:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C86CC49E20
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 13:59:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00CC341174
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 14:51:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zgoz9djslRtz for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Apr 2022 13:59:07 -0400 (EDT)
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com
- [209.85.166.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C71D649E1A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 13:59:07 -0400 (EDT)
-Received: by mail-io1-f45.google.com with SMTP id h63so3857028iof.12
- for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2022 10:59:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=uzEOiJ6yDVmM4HwbN1L4uOpeHV1JQRyCSJYZVvMlr1o=;
- b=motzZ0l4IuCGRfjFIbn/j/l6b/79dg82LGotCDSKTUlBOlU79sQkFVQlJY/zgNuuGO
- qrc6E+V7IDoo1WNAtR9oz02dK3FVRHsx6cwF+L0lbfMjdJbKqLzRmKJQQOFZ/18+f9Wv
- ywS3sVrMYOheluSEb1K9sTiCJQi1PCOVm+iFMXiGqwXKzB1W57TZgXccUUBHE71bGQif
- aJFn1HhosoMK2BV6YkjK9rprCz8cEHwbJgky7RalXATFkXLSHLjc4fG7u3xTBzdIurXC
- kyyZrWzB34DR1pRnhgCsaopxNoUTmGkQ6d0llq+91D1FtRqZAS+HSJMP4ZQUhGkhYe1h
- MRRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=uzEOiJ6yDVmM4HwbN1L4uOpeHV1JQRyCSJYZVvMlr1o=;
- b=6Ig2R8F/ytpw73X7Q0v4gn6LrICdhWYwumL3bfF0d5CaqacjU5gIDpb6POHuE8eqOb
- 361ZBLwQfS4dWJOhUlywIHfHrnTPTUjWkdoSjoeoA4fevxceP0bIF5gI5F5JvzgyuEOw
- cEFjPTFpE1QY+zuZDykbUsjw5zsLGlxL1PZM3xiJKjbucDxYefgYCHDevI2zyR1U1g1/
- nvdPMlYC3UwWdEuN55/v+MbSonE7WW/6xYaSI6F1tn/C7HONiRtzanBIjqdAFHhAXZVh
- 5L9Z4oqochlGzAh02624ggXCzfJBpagcdTeXDXFaAnmq6nmnzUN8iud9GkMLacVdu6H6
- j1wg==
-X-Gm-Message-State: AOAM533Xhu0bIOnQebHZ1kuofL7Agqs+3porst27DWaDW9S+k4LAaFbj
- W+yur4ESFIvUqeDhuwlYCq/HbQ==
-X-Google-Smtp-Source: ABdhPJxLKN+3WYbccJPvru/x2ek/ZrRCnqaiXkp6CDMNszfPgh1LY5ykqVNoCgkQNqIn3Xt1jtTcLA==
-X-Received: by 2002:a5e:c702:0:b0:64d:1640:9f8c with SMTP id
- f2-20020a5ec702000000b0064d16409f8cmr180542iop.176.1649267946850; 
- Wed, 06 Apr 2022 10:59:06 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- t8-20020a056e02010800b002ca36a382c5sm6339873ilm.52.2022.04.06.10.59.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Apr 2022 10:59:06 -0700 (PDT)
-Date: Wed, 6 Apr 2022 17:59:02 +0000
-From: Oliver Upton <oupton@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2 1/3] KVM: Don't create VM debugfs files outside of the
- VM directory
-Message-ID: <Yk3U5tfqBQBOeSs+@google.com>
-References: <20220404182119.3561025-1-oupton@google.com>
- <20220404182119.3561025-2-oupton@google.com>
- <87fsmqvgaf.wl-maz@kernel.org>
+ with ESMTP id MDiwEeZUVcun for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2022 14:51:07 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05BCD49E17
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 14:51:06 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 1D182618E5;
+ Wed,  6 Apr 2022 18:51:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EDC7C385A3;
+ Wed,  6 Apr 2022 18:50:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1649271065;
+ bh=2fT+20Z739gNXrMUeQltBNML4IctEm0mvhoLD0BqRsY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=XSiP2cDt1x0DqNO2Zkcw/tFGQnVFNVwo+wo36rzGp9fKkEZdMtEM25bZcYVWSy6gd
+ MrZlVB+fddCQ/0nqJUZ5jIh/a2eBXR2NeDllcrJanw7oZYg4xl+w9A4729bk/nqjln
+ CMKsgZCcibH2Fnln0QAkjSu8vKyH/Bq0byanmZ6j7TmaZEXlz1IcKel5ZMn55Gnk7K
+ D5y5OwOHdswAQ6VccJLrwsJ4MzmqaEhUhB5jc1gxvXE48C247v8jqCF/gK2DeOeYZh
+ 60Wak0CcIlGHFbvU1LVUCYhG7OIuPy5ndy/aY1/GUsbaABdidnwynV+3ZuwZedd3ti
+ FpIpN14uWXe9A==
+Date: Wed, 6 Apr 2022 19:50:52 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Szabolcs Nagy <Szabolcs.Nagy@arm.com>
+Subject: Re: [PATCH v12 06/40] arm64/sme: Provide ABI documentation for SME
+Message-ID: <Yk3hDLe8Cce8zkvI@sirena.org.uk>
+References: <20220225165923.1474372-1-broonie@kernel.org>
+ <20220225165923.1474372-7-broonie@kernel.org>
+ <20220311172051.GA257833@arm.com> <YiuYMcR8zk73eBLo@sirena.org.uk>
+ <YkXRUlaoyDKQqndc@arm.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87fsmqvgaf.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>, stable@kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <YkXRUlaoyDKQqndc@arm.com>
+X-Cookie: Look ere ye leap.
+Cc: Marc Zyngier <maz@kernel.org>,
+ Basant KumarDwivedi <Basant.KumarDwivedi@arm.com>,
+ Will Deacon <will@kernel.org>, Luis Machado <Luis.Machado@arm.com>,
+ Catalin Marinas <Catalin.Marinas@arm.com>, Alan Hayward <Alan.Hayward@arm.com>,
+ "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
+ "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+ Salil Akerkar <Salil.Akerkar@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,60 +76,62 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============1963391041374537850=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 06, 2022 at 08:10:00AM +0100, Marc Zyngier wrote:
-> Hi Oliver,
-> 
-> On Mon, 04 Apr 2022 19:21:17 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-> > 
-> > Unfortunately, there is no guarantee that KVM was able to instantiate a
-> > debugfs directory for a particular VM. To that end, KVM shouldn't even
-> > attempt to create new debugfs files in this case. If the specified
-> > parent dentry is NULL, debugfs_create_file() will instantiate files at
-> > the root of debugfs.
-> > 
-> > For arm64, it is possible to create the vgic-state file outside of a
-> > VM directory, the file is not cleaned up when a VM is destroyed.
-> > Nonetheless, the corresponding struct kvm is freed when the VM is
-> > destroyed.
-> > 
-> > Nip the problem in the bud for all possible errant debugfs file
-> > creations by initializing kvm->debugfs_dentry to -ENOENT. In so doing,
-> > debugfs_create_file() will fail instead of creating the file in the root
-> > directory.
-> > 
-> > Cc: stable@kernel.org
-> > Fixes: 929f45e32499 ("kvm: no need to check return value of debugfs_create functions")
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  virt/kvm/kvm_main.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 70e05af5ebea..04a426e65cb8 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -932,7 +932,7 @@ static void kvm_destroy_vm_debugfs(struct kvm *kvm)
-> >  	int kvm_debugfs_num_entries = kvm_vm_stats_header.num_desc +
-> >  				      kvm_vcpu_stats_header.num_desc;
-> >  
-> > -	if (!kvm->debugfs_dentry)
-> > +	if (!IS_ERR(kvm->debugfs_dentry))
-> >  		return;
-> 
-> Shouldn't this condition be inverted? It certainly looks odd.
 
-Err... Yep, this is plain wrong. Let me fix this obvious mistake.
+--===============1963391041374537850==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="H1j3yX+RCi/MNkHL"
+Content-Disposition: inline
 
---
-Thanks,
-Oliver
+
+--H1j3yX+RCi/MNkHL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Mar 31, 2022 at 04:05:38PM +0000, Szabolcs Nagy wrote:
+
+> i think it's slightly better to treat ZA like TPIDR2,
+> so only clear if CLONE_SETTLS is set.
+
+> otherwise in principle the child can return to the frame
+> where ZA was used and expect it to work (it's hard to
+> come up with a reason why would some code do that, but
+> this is valid in a single-threaded fork child).
+
+=46rom an implementation point of view it's a bit clearer if we just
+always preserve PSTATE.ZA and ZA contents on clone() and clear them on
+exec.  Do you see a problem with that?
+
+--H1j3yX+RCi/MNkHL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmJN4QsACgkQJNaLcl1U
+h9D/0Af/X1DilGAOK3sriwKJp5fLyyuDLxIFTmLf9TjhEV4uEC9eB8UJsletqocL
++v7AV/5HwBHKEgvMsbfwpGseBv50gcsQDFsqoW7oxanOYYqzM8HRYoLnDWdficvJ
+1wWCX6YKDmMAwk1l0RxACHCWEa2kUP2DBP+R9hM0AQxJJA7TLp3uynOSpiTTFj/G
+XYiKrekc9LKiFYK75M9M0pmdN5yU0vRUVMoM5ktKxoyGwrM6ti6TGHOR4i9MWcMr
+oYZhizp9w4mkngBuOSYyx/hXmrzonZ2czTAoDER0BMjkVyyCD8GiVE/o6zAJnZ5x
+vbmt37o9xQoZ52+YJfzipOm70jAZow==
+=KTCH
+-----END PGP SIGNATURE-----
+
+--H1j3yX+RCi/MNkHL--
+
+--===============1963391041374537850==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1963391041374537850==--
