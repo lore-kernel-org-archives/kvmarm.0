@@ -2,78 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C353C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  6 Apr 2022 13:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A09F1C433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  6 Apr 2022 15:07:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E54474B1C9;
-	Wed,  6 Apr 2022 09:22:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F3E794B1BF;
+	Wed,  6 Apr 2022 11:07:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LJ3sqgcL6C4q; Wed,  6 Apr 2022 09:22:42 -0400 (EDT)
+	with ESMTP id ZJ6plRB3w2gY; Wed,  6 Apr 2022 11:07:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E423F4B1A2;
-	Wed,  6 Apr 2022 09:22:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B9464B10A;
+	Wed,  6 Apr 2022 11:07:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA1F34B18A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 09:22:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A8394B10A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 11:07:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lON5jiS3DSLv for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Apr 2022 09:22:37 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2EB4B4B188
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 09:22:37 -0400 (EDT)
+ with ESMTP id ezUUbAi7kVH1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2022 11:07:34 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F29A84B08E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2022 11:07:33 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 9CE14614B3;
- Wed,  6 Apr 2022 13:22:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08C2DC385A7;
- Wed,  6 Apr 2022 13:22:36 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 9CEACB82341;
+ Wed,  6 Apr 2022 15:07:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40A13C385A1;
+ Wed,  6 Apr 2022 15:07:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1649251356;
- bh=TLyvTgiqSYYjMHPC+UQMx0cLGBFAbPTGSNIZDD5qmEE=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=BRcBrf+6Ca4lrZIXmPFpnu3aoqjnUw8Z6cGxpjYO6fDettqwmZVCSZOBIDjbNq5YO
- i5dzuDYR466yR9B0fywX8ZLS4PfkvRVA3d5dgswxve5JR04uo5sl6q1eF5FS8iRgbt
- GwlSaGapzZSML6khLQC38qPSgzf4Vcu6K0tQvETDYD/0PA4/4eAakoulI0mdHDq+UM
- E9gaEVbSo/U0Ob/Nj1VCvMzAms8bYJaOpLrryGksX2erF/kPMQhBcBmkF5A4NqPuoz
- Qw94e16voGukyrwBeUu708IJvfk0MmtInmz6xMhBXUBoPGp45bobwDs9thZs76CmOW
- M53nCiiglPPcQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ s=k20201202; t=1649257651;
+ bh=OH5Vs2pkCQzyprkWqtv+Y2S5HXpl2IhezXKj5Uwq7w8=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=NG2hLdddP0PReWbXTspP6hD/83FPTSDlP4/IIulv9jC0Lb9pnFE1V+jVEgDsM+PJ7
+ +JGEtGWGJpqHc8lkiLidc+IqL5S2RRBFGY4ABClo82VMlr3clJpL4DxlI4yvikcuK2
+ 0vuxZla4v18HxGgzuOqKSSZuJ1RRQO3DpIyKoTp+XQtR7wrTO8LIYT90kCQlz87IXC
+ vX9NJCtGvtcHLBQ1SlWt8ws3bkbfniFTxpsatpK9hsIkRxlqYYe/OKctw3QJhJKCVJ
+ Bp7EpnJA8nHyOTEa8MggCVJSSpc1NJqoz0GpwgPgXq88D68Jrw0mbnLYiBjryaUSMh
+ TJz+7OHWwd33Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nc5cH-002AfU-Jz; Wed, 06 Apr 2022 14:22:33 +0100
+ id 1nc7Fo-002CZl-RG; Wed, 06 Apr 2022 16:07:28 +0100
+Date: Wed, 06 Apr 2022 16:07:28 +0100
+Message-ID: <87lewib68f.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- Yu Zhe <yuzhe@nfschina.com>, james.morse@arm.com
-Subject: Re: [PATCH] KVM: arm64: vgic: remove unnecessary type castings
-Date: Wed,  6 Apr 2022 14:22:31 +0100
-Message-Id: <164925133306.3716042.8666897986559310118.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220329102059.268983-1-yuzhe@nfschina.com>
-References: <20220328103836.2829-1-yuzhe@nfschina.com>
- <20220329102059.268983-1-yuzhe@nfschina.com>
-MIME-Version: 1.0
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v2 1/3] KVM: arm64: Wire up CP15 feature registers to
+ their AArch64 equivalents
+In-Reply-To: <20220401010832.3425787-2-oupton@google.com>
+References: <20220401010832.3425787-1-oupton@google.com>
+ <20220401010832.3425787-2-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- yuzhe@nfschina.com, james.morse@arm.com, keescook@chromium.org,
- ricarkol@google.com, justin.he@arm.com, linux-arm-kernel@lists.infradead.org,
- samitolvanen@google.com, kernel-janitors@vger.kernel.org,
- catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, will@kernel.org,
- linux-kernel@vger.kernel.org
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ pshier@google.com, ricarkol@google.com, reijiw@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: justin.he@arm.com, keescook@chromium.org, catalin.marinas@arm.com,
- kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
- samitolvanen@google.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Peter Shier <pshier@google.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,21 +88,217 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 29 Mar 2022 03:20:59 -0700, Yu Zhe wrote:
-> remove unnecessary casts.
+On Fri, 01 Apr 2022 02:08:30 +0100,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> KVM currently does not trap ID register accesses from an AArch32 EL1.
+> This is painful for a couple of reasons. Certain unimplemented features
+> are visible to AArch32 EL1, as we limit PMU to version 3 and the debug
+> architecture to v8.0. Additionally, we attempt to paper over
+> heterogeneous systems by using register values that are safe
+> system-wide. All this hard work is completely sidestepped because KVM
+> does not set TID3 for AArch32 guests.
+> 
+> Fix up handling of CP15 feature registers by simply rerouting to their
+> AArch64 aliases. Punt setting HCR_EL2.TID3 to a later change, as we need
+> to fix up the oddball CP10 feature registers still.
+> 
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 68 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 68 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index dd34b5ab51d4..8b791256a5b4 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2339,6 +2339,67 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+>  	return 1;
+>  }
+>  
+> +static int emulate_sys_reg(struct kvm_vcpu *vcpu, struct sys_reg_params *params);
+> +
+> +/**
+> + * kvm_emulate_cp15_id_reg() - Handles an MRC trap on a guest CP15 access where
+> + *			       CRn=0, which corresponds to the AArch32 feature
+> + *			       registers.
+> + * @vcpu: the vCPU pointer
+> + * @params: the system register access parameters.
+> + *
+> + * Our cp15 system register tables do not enumerate the AArch32 feature
+> + * registers. Conveniently, our AArch64 table does, and the AArch32 system
+> + * register encoding can be trivially remapped into the AArch64 for the feature
+> + * registers: Append op0=3, leaving op1, CRn, CRm, and op2 the same.
+> + *
+> + * According to DDI0487G.b G7.3.1, paragraph "Behavior of VMSAv8-32 32-bit
+> + * System registers with (coproc=0b1111, CRn==c0)", read accesses from this
+> + * range are either UNKNOWN or RES0. Rerouting remains architectural as we
+> + * treat undefined registers in this range as RAZ.
+> + */
+> +static int kvm_emulate_cp15_id_reg(struct kvm_vcpu *vcpu,
+> +				   struct sys_reg_params *params)
+> +{
+> +	int Rt = kvm_vcpu_sys_get_rt(vcpu);
+> +	int ret = 1;
+> +
+> +	/* Treat impossible writes to RO registers as UNDEFINED */
+> +	if (params->is_write) {
+> +		unhandled_cp_access(vcpu, params);
+> +		return 1;
+> +	}
+> +
+> +	params->Op0 = 3;
+> +
+> +	/*
+> +	 * All registers where CRm > 3 are known to be UNKNOWN/RAZ from AArch32.
+> +	 * Avoid conflicting with future expansion of AArch64 feature registers
+> +	 * and simply treat them as RAZ here.
+> +	 */
+> +	if (params->CRm > 3)
+> +		params->regval = 0;
+> +	else
+> +		ret = emulate_sys_reg(vcpu, params);
+> +
+> +	vcpu_set_reg(vcpu, Rt, params->regval);
 
-Applied to fixes, thanks!
+It feels odd to update Rt without checking whether the read has
+succeeded. In your case, this is harmless, but would break with the
+approach I'm outlining below.
 
-[1/1] KVM: arm64: vgic: remove unnecessary type castings
-      commit: c707663e81ef48d279719e97fd86acef835a2671
+> +	return ret;
+> +}
+> +
+> +/**
+> + * kvm_is_cp15_id_reg() - Returns true if the specified CP15 register is an
+> + *			  AArch32 ID register.
+> + * @params: the system register access parameters
+> + *
+> + * Note that CP15 ID registers where CRm=0 are excluded from this check. The
+> + * only register trapped in the CRm=0 range is CTR, which is already handled in
+> + * the cp15 register table.
 
-Cheers,
+There is also the fact that CTR_EL0 has Op1=3 while CTR has Op1=0,
+which prevents it from fitting in your scheme.
+
+> + */
+> +static inline bool kvm_is_cp15_id_reg(struct sys_reg_params *params)
+> +{
+> +	return params->CRn == 0 && params->Op1 == 0 && params->CRm != 0;
+> +}
+> +
+>  /**
+>   * kvm_handle_cp_32 -- handles a mrc/mcr trap on a guest CP14/CP15 access
+>   * @vcpu: The VCPU pointer
+> @@ -2360,6 +2421,13 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+>  	params.Op1 = (esr >> 14) & 0x7;
+>  	params.Op2 = (esr >> 17) & 0x7;
+>  
+> +	/*
+> +	 * Certain AArch32 ID registers are handled by rerouting to the AArch64
+> +	 * system register table.
+> +	 */
+> +	if (ESR_ELx_EC(esr) == ESR_ELx_EC_CP15_32 && kvm_is_cp15_id_reg(&params))
+> +		return kvm_emulate_cp15_id_reg(vcpu, &params);
+
+I think this is a bit ugly. We reach this point from a function that
+was cp15-specific, and now we are reconstructing the context. I'd
+rather this is moved to kvm_handle_cp15_32(), and treated there
+(untested):
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7b45c040cc27..a071d89ace92 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2350,28 +2350,21 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+  * @run:  The kvm_run struct
+  */
+ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
++			    struct sys_reg_params *params,
+ 			    const struct sys_reg_desc *global,
+ 			    size_t nr_global)
+ {
+-	struct sys_reg_params params;
+-	u32 esr = kvm_vcpu_get_esr(vcpu);
+ 	int Rt  = kvm_vcpu_sys_get_rt(vcpu);
+ 
+-	params.CRm = (esr >> 1) & 0xf;
+-	params.regval = vcpu_get_reg(vcpu, Rt);
+-	params.is_write = ((esr & 1) == 0);
+-	params.CRn = (esr >> 10) & 0xf;
+-	params.Op0 = 0;
+-	params.Op1 = (esr >> 14) & 0x7;
+-	params.Op2 = (esr >> 17) & 0x7;
++	params->regval = vcpu_get_reg(vcpu, Rt);
+ 
+-	if (!emulate_cp(vcpu, &params, global, nr_global)) {
+-		if (!params.is_write)
+-			vcpu_set_reg(vcpu, Rt, params.regval);
++	if (!emulate_cp(vcpu, params, global, nr_global)) {
++		if (!params->is_write)
++			vcpu_set_reg(vcpu, Rt, params->regval);
+ 		return 1;
+ 	}
+ 
+-	unhandled_cp_access(vcpu, &params);
++	unhandled_cp_access(vcpu, params);
+ 	return 1;
+ }
+ 
+@@ -2382,7 +2375,14 @@ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu)
+ 
+ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_handle_cp_32(vcpu, cp15_regs, ARRAY_SIZE(cp15_regs));
++	struct sys_reg_params params;
++
++	params = esr_cp1x_32_to_params(kvm_vcpu_get_esr(vcpu));
++
++	if (params.Op1 == 0 && params.CRn == 0 && params.CRm)
++		return kvm_emulate_cp15_id_reg(vcpu, &params);
++
++	return kvm_handle_cp_32(vcpu, &params, cp15_regs, ARRAY_SIZE(cp15_regs));
+ }
+ 
+ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu)
+@@ -2392,7 +2392,11 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu)
+ 
+ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_handle_cp_32(vcpu, cp14_regs, ARRAY_SIZE(cp14_regs));
++	struct sys_reg_params params;
++
++	params = esr_cp1x_32_to_params(kvm_vcpu_get_esr(vcpu));
++
++	return kvm_handle_cp_32(vcpu, &params, cp14_regs, ARRAY_SIZE(cp14_regs));
+ }
+ 
+ static bool is_imp_def_sys_reg(struct sys_reg_params *params)
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index cc0cc95a0280..fd4b2bb8c782 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -35,6 +35,13 @@ struct sys_reg_params {
+ 				  .Op2 = ((esr) >> 17) & 0x7,                  \
+ 				  .is_write = !((esr) & 1) })
+ 
++#define esr_cp1x_32_to_params(esr)					       \
++	((struct sys_reg_params){ .Op1 = ((esr) >> 14) & 0x7,                  \
++				  .CRn = ((esr) >> 10) & 0xf,                  \
++				  .CRm = ((esr) >> 1) & 0xf,                   \
++				  .Op2 = ((esr) >> 17) & 0x7,                  \
++				  .is_write = !((esr) & 1) })
++
+ struct sys_reg_desc {
+ 	/* Sysreg string for debug */
+ 	const char *name;
+
+
+What do you think?
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
