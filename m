@@ -2,46 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 089D0C433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  7 Apr 2022 16:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39163C433F5
+	for <kvmarm@archiver.kernel.org>; Thu,  7 Apr 2022 17:24:32 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 29C4C4A500;
-	Thu,  7 Apr 2022 12:23:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E0B640719;
+	Thu,  7 Apr 2022 13:24:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0FEZ9wkJxBz3; Thu,  7 Apr 2022 12:23:47 -0400 (EDT)
+	with ESMTP id mFaHKC4O27I5; Thu,  7 Apr 2022 13:24:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 060DE4A534;
-	Thu,  7 Apr 2022 12:23:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B45B640C31;
+	Thu,  7 Apr 2022 13:24:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C40C49F09
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Apr 2022 12:23:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CAC0140C2B
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Apr 2022 13:24:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lnqeXrdJF30l for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Apr 2022 12:23:40 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FF1B4B120
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Apr 2022 12:23:40 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 96E0D15DB;
- Thu,  7 Apr 2022 09:23:39 -0700 (PDT)
-Received: from e121798.cable.virginm.net (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 1B6A83F73B;
- Thu,  7 Apr 2022 09:23:37 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: catalin.marinas@arm.com, will@kernel.org,
- linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com,
- suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, mark.rutland@arm.com
-Subject: [PATCH 3/5] arm64: Treat ESR_ELx as a 64bit register
-Date: Thu,  7 Apr 2022 17:23:25 +0100
-Message-Id: <20220407162327.396183-4-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220407162327.396183-1-alexandru.elisei@arm.com>
-References: <20220407162327.396183-1-alexandru.elisei@arm.com>
+ with ESMTP id nT0TjSSqxwT0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 Apr 2022 13:24:26 -0400 (EDT)
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com
+ [209.85.219.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A1CE4052C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Apr 2022 13:24:25 -0400 (EDT)
+Received: by mail-yb1-f169.google.com with SMTP id x131so10738871ybe.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 Apr 2022 10:24:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UxIETUQzLj37YwcaDZgtW+hcuSBKPfQz6PFagx/GWec=;
+ b=jx6hFftNkSDIgg/vhatmPk581BTPgc4Z2bVFL2hZM35yMA/6phrtV3a77jIlt3g9sa
+ HxjpFdidZJCnMaV8FlWpD7GXm0qonhfYapuOX1PFemdqwOaJJz7IJ33onFF4IqFXfUtV
+ r7w1hiLq8WGo33PQHCTmCyFNimADwCkhWZWKmTEoqSp1s0mZfSknBcbOhyslzigIgXtk
+ +J4S9QOb/fm2nx7uH8x8dEDzWWt+CRnKKK83ZGRxmkJjd0zVDtVF6tP/XsFFKLt80S0V
+ Qdps5lhDc9eIFEnkoyPSMcolAFTVowTMc4gfu9vEwDux3rtcM/uGHK1mIZ0B7qBhbZSB
+ BBmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UxIETUQzLj37YwcaDZgtW+hcuSBKPfQz6PFagx/GWec=;
+ b=Yl0GKu9/xJJ4XhYR3fcef4+TxArFx8FCv5tf5pHXA0FOHP9xcOZoJvMkJKYB/iDWBm
+ FscS6ZMPbMox/EoF3+PDdnAYAGK4Q5ePzfFyTqub+6+L0P9+7ml7jsv6iziX3WZIA5Hm
+ R3T5VI+JaNthGsYLpUz9J89myPw1p8eJ0jI7rmiHayqThU/omg35zuGWYb0SwgoJZ28W
+ eUXHd3LkBCTXjnzwT0c6DWD/8QI7K3L/ra9VR4B3e1fM2ahjVgHIMGA3i9qp3VkIA9jk
+ j/3zoNcN85wNe6rrPq18NQ1q4Q4ymFJRk/FBsvZMEvmBjRo8la5G/2RtEiuBU0P/ICl+
+ ZV+g==
+X-Gm-Message-State: AOAM533rkQ+N+Vheo+tcJumr9xGMyVdKzIjdJUjRD8P+RQ0IlA9rLPdM
+ rJcz+oLq8PbljXvQxJs2blTulQrS7zvuVopRl6kerA==
+X-Google-Smtp-Source: ABdhPJzfhzd2NzheiN7g3GpSyicX10ZkSc4FOQDTeaDcZjxlW2Oum8i3jlXwh5rxjLaoD+xGu2M27UnuG3Kz3EIMUu0=
+X-Received: by 2002:a25:8a0c:0:b0:63d:d026:ebaa with SMTP id
+ g12-20020a258a0c000000b0063dd026ebaamr10066668ybl.509.1649352265166; Thu, 07
+ Apr 2022 10:24:25 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220407011605.1966778-1-rananta@google.com>
+ <20220407011605.1966778-3-rananta@google.com>
+ <87ilrlb6un.wl-maz@kernel.org>
+In-Reply-To: <87ilrlb6un.wl-maz@kernel.org>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Thu, 7 Apr 2022 10:24:14 -0700
+Message-ID: <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
+Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall
+ bitmap firmware registers
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -58,968 +87,463 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In the initial release of the ARM Architecture Reference Manual for
-ARMv8-A, the ESR_ELx registers were defined as 32-bit registers. This
-changed in 2018 with version D.a (ARM DDI 0487D.a) of the architecture,
-when they became 64-bit registers, with bits [63:32] defined as RES0. In
-version G.a, a new field was added to ESR_ELx, ISS2, which covers bits
-[36:32].  This field is used when the Armv8.7 extension FEAT_LS64 is
-implemented.
+Hi Marc,
 
-As a result of the evolution of the register width, Linux stores it as
-both a 64-bit value and a 32-bit value, which hasn't affected correctness
-so far as Linux only uses the lower 32 bits of the register.
+On Thu, Apr 7, 2022 at 2:07 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Raghavendra,
+>
+> On Thu, 07 Apr 2022 02:15:57 +0100,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> >
+> > KVM regularly introduces new hypercall services to the guests without
+> > any consent from the userspace. This means, the guests can observe
+> > hypercall services in and out as they migrate across various host
+> > kernel versions. This could be a major problem if the guest
+> > discovered a hypercall, started using it, and after getting migrated
+> > to an older kernel realizes that it's no longer available. Depending
+> > on how the guest handles the change, there's a potential chance that
+> > the guest would just panic.
+> >
+> > As a result, there's a need for the userspace to elect the services
+> > that it wishes the guest to discover. It can elect these services
+> > based on the kernels spread across its (migration) fleet. To remedy
+> > this, extend the existing firmware psuedo-registers, such as
+>
+> nit: pseudo
+>
+> > KVM_REG_ARM_PSCI_VERSION, but by creating a new COPROC register space
+> > for all the hypercall services available.
+> >
+> > These firmware registers are categorized based on the service call
+> > owners, but unlike the existing firmware psuedo-registers, they hold
+>
+> nit: pseudo again
+>
+> > the features supported in the form of a bitmap.
+> >
+> > During the VM initialization, the registers are set to upper-limit of
+> > the features supported by the corresponding registers. It's expected
+> > that the VMMs discover the features provided by each register via
+> > GET_ONE_REG, and writeback the desired values using SET_ONE_REG.
+>
+> nit: write back
+>
+> > KVM allows this modification only until the VM has started.
+> >
+> > Some of the standard features are not mapped to any bits of the
+> > registers. But since they can recreate the original problem of
+> > making it available without userspace's consent, they need to
+> > be explicitly added to the hvc_func_default_allowed_list[]. Any
+> > function-id that's not enabled via the bitmap, or not listed in
+> > hvc_func_default_allowed_list[], will be returned as
+> > SMCCC_RET_NOT_SUPPORTED to the guest.
+> >
+> > Older userspace code can simply ignore the feature and the
+> > hypercall services will be exposed unconditionally to the guests,
+> > thus ensuring backward compatibility.
+> >
+> > In this patch, the framework adds the register only for ARM's standard
+> > secure services (owner value 4). Currently, this includes support only
+> > for ARM True Random Number Generator (TRNG) service, with bit-0 of the
+> > register representing mandatory features of v1.0. Other services are
+> > momentarily added in the upcoming patches.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h |  12 ++++
+> >  arch/arm64/include/uapi/asm/kvm.h |   9 +++
+> >  arch/arm64/kvm/arm.c              |   1 +
+> >  arch/arm64/kvm/guest.c            |   8 ++-
+> >  arch/arm64/kvm/hypercalls.c       | 102 ++++++++++++++++++++++++++++++
+> >  include/kvm/arm_hypercalls.h      |   7 ++
+> >  include/kvm/arm_psci.h            |  12 ++++
+> >  7 files changed, 149 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index e3b25dc6c367..6e663383d7b4 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -101,6 +101,15 @@ struct kvm_s2_mmu {
+> >  struct kvm_arch_memory_slot {
+> >  };
+> >
+> > +/**
+> > + * struct kvm_smccc_features: Descriptor the hypercall services exposed to the guests
+> > + *
+> > + * @std_bmap: Bitmap of standard secure service calls
+> > + */
+> > +struct kvm_smccc_features {
+> > +     u64 std_bmap;
+>
+> Consider using 'unsigned long' for bitmaps.
+>
+Sure.
 
-Make the register type consistent and always treat it as 64-bit wide. The
-register is redefined as an "unsigned long", which is an unsigned
-double-word (64-bit quantity) for the LP64 machine (aapcs64 [1], Table 1,
-page 14). The type was chosen because "unsigned int" is the most frequent
-type for ESR_ELx and because FAR_ELx, which is used together with ESR_ELx
-in exception handling, is also declared as "unsigned long". The 64-bit type
-also makes adding support for architectural features that use fields above
-bit 31 easier in the future.
+> > +};
+> > +
+> >  struct kvm_arch {
+> >       struct kvm_s2_mmu mmu;
+> >
+> > @@ -140,6 +149,9 @@ struct kvm_arch {
+> >
+> >       u8 pfr0_csv2;
+> >       u8 pfr0_csv3;
+> > +
+> > +     /* Hypercall features firmware registers' descriptor */
+> > +     struct kvm_smccc_features smccc_feat;
+> >  };
+> >
+> >  struct kvm_vcpu_fault_info {
+> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> > index c1b6ddc02d2f..56e4bc58a355 100644
+> > --- a/arch/arm64/include/uapi/asm/kvm.h
+> > +++ b/arch/arm64/include/uapi/asm/kvm.h
+> > @@ -332,6 +332,15 @@ struct kvm_arm_copy_mte_tags {
+> >  #define KVM_ARM64_SVE_VLS_WORDS      \
+> >       ((KVM_ARM64_SVE_VQ_MAX - KVM_ARM64_SVE_VQ_MIN) / 64 + 1)
+> >
+> > +/* Bitmap feature firmware registers */
+> > +#define KVM_REG_ARM_FW_FEAT_BMAP             (0x0016 << KVM_REG_ARM_COPROC_SHIFT)
+> > +#define KVM_REG_ARM_FW_FEAT_BMAP_REG(r)              (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+> > +                                             KVM_REG_ARM_FW_FEAT_BMAP |      \
+> > +                                             ((r) & 0xffff))
+> > +
+> > +#define KVM_REG_ARM_STD_BMAP                 KVM_REG_ARM_FW_FEAT_BMAP_REG(0)
+> > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
+>
+> I'm really in two minds about this. Having one bit per service is easy
+> from an implementation perspective, but is also means that this
+> disallow fine grained control over which hypercalls are actually
+> available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
+> implements both, how does the selection mechanism works? You will
+> need a version selector (a la PSCI), which defeats this API somehow
+> (and renders the name of the #define invalid).
+>
+> I wonder if a more correct way to look at this is to enumerate the
+> hypercalls themselves (all 5 of them), though coming up with an
+> encoding is tricky (RNG32 and RNG64 would clash, for example).
+>
+> Thoughts?
+>
+I was on the fence about this too. The TRNG spec (ARM DEN 0098,
+Table-4) mentions that v1.0 should have VERSION, FEATURES, GET_UUID,
+and RND as mandatory features. Hence, if KVM advertised that it
+supports TRNG v1.0, I thought it would be best to expose all or
+nothing of v1.0 by guarding them with a single bit.
+Broadly, the idea is to have a bit per version. If v1.1 comes along,
+we can have another bit for that. If it's not too ugly to implement,
+we can be a little more aggressive and ensure that userspace doesn't
+enable v1.1 without enabling v1.0.
 
-The KVM hypervisor will receive a similar update in a subsequent patch.
+> > +
+> >  /* Device Control API: ARM VGIC */
+> >  #define KVM_DEV_ARM_VGIC_GRP_ADDR    0
+> >  #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS       1
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 523bc934fe2f..a37fadbd617e 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -156,6 +156,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+> >       kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
+> >
+> >       set_default_spectre(kvm);
+> > +     kvm_arm_init_hypercalls(kvm);
+> >
+> >       return ret;
+> >  out_free_stage2_pgd:
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index 0d5cca56cbda..8c607199cad1 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -756,7 +756,9 @@ int kvm_arm_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >
+> >       switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+> >       case KVM_REG_ARM_CORE:  return get_core_reg(vcpu, reg);
+> > -     case KVM_REG_ARM_FW:    return kvm_arm_get_fw_reg(vcpu, reg);
+> > +     case KVM_REG_ARM_FW:
+> > +     case KVM_REG_ARM_FW_FEAT_BMAP:
+> > +             return kvm_arm_get_fw_reg(vcpu, reg);
+> >       case KVM_REG_ARM64_SVE: return get_sve_reg(vcpu, reg);
+> >       }
+> >
+> > @@ -774,7 +776,9 @@ int kvm_arm_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >
+> >       switch (reg->id & KVM_REG_ARM_COPROC_MASK) {
+> >       case KVM_REG_ARM_CORE:  return set_core_reg(vcpu, reg);
+> > -     case KVM_REG_ARM_FW:    return kvm_arm_set_fw_reg(vcpu, reg);
+> > +     case KVM_REG_ARM_FW:
+> > +     case KVM_REG_ARM_FW_FEAT_BMAP:
+> > +             return kvm_arm_set_fw_reg(vcpu, reg);
+> >       case KVM_REG_ARM64_SVE: return set_sve_reg(vcpu, reg);
+> >       }
+> >
+> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> > index fa6d9378d8e7..cf04b5ee5f56 100644
+> > --- a/arch/arm64/kvm/hypercalls.c
+> > +++ b/arch/arm64/kvm/hypercalls.c
+> > @@ -58,6 +58,53 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
+> >       val[3] = lower_32_bits(cycles);
+> >  }
+> >
+> > +/*
+> > + * List of function-ids that are not gated with the bitmapped feature
+> > + * firmware registers, and are to be allowed for servicing the call by default.
+> > + */
+> > +static const u32 hvc_func_default_allowed_list[] = {
+> > +     ARM_SMCCC_VERSION_FUNC_ID,
+> > +     ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
+> > +     ARM_SMCCC_HV_PV_TIME_FEATURES,
+> > +     ARM_SMCCC_HV_PV_TIME_ST,
+> > +     ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID,
+> > +     ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
+> > +     ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
+> > +};
+> > +
+> > +static bool kvm_hvc_call_default_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+> > +{
+> > +     unsigned int i;
+> > +
+> > +     for (i = 0; i < ARRAY_SIZE(hvc_func_default_allowed_list); i++)
+> > +             if (func_id == hvc_func_default_allowed_list[i])
+> > +                     return true;
+>
+> Huh, this really is ugly. This array is bound to become bigger over
+> time, meaning that the average hypercall time is going to increase. At
+> the very least, this should be turned into a switch/case statement, as
+> the compile is pretty good at building a search tree (better than this
+> naive loop, for a start), and we have those everywhere else.
+>
+Makes sense. I'll make it a switch-case.
 
-[1] https://github.com/ARM-software/abi-aa/releases/download/2021Q3/aapcs64.pdf
+> > +
+> > +     return kvm_psci_func_id_is_valid(vcpu, func_id);
+> > +}
+> > +
+> > +static bool kvm_arm_fw_reg_feat_enabled(u64 reg_bmap, u64 feat_bit)
+> > +{
+> > +     return reg_bmap & feat_bit;
+> > +}
+>
+> We really don't need to reimplement test_bit().
+>
+Right, I forgot about test_bit() :)
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/include/asm/debug-monitors.h |  4 +-
- arch/arm64/include/asm/esr.h            |  6 +--
- arch/arm64/include/asm/exception.h      | 28 +++++-----
- arch/arm64/include/asm/system_misc.h    |  4 +-
- arch/arm64/include/asm/traps.h          | 12 ++---
- arch/arm64/kernel/debug-monitors.c      | 12 ++---
- arch/arm64/kernel/entry-common.c        |  6 +--
- arch/arm64/kernel/fpsimd.c              |  6 +--
- arch/arm64/kernel/hw_breakpoint.c       |  4 +-
- arch/arm64/kernel/kgdb.c                |  6 +--
- arch/arm64/kernel/probes/kprobes.c      |  4 +-
- arch/arm64/kernel/probes/uprobes.c      |  4 +-
- arch/arm64/kernel/traps.c               | 66 +++++++++++------------
- arch/arm64/mm/fault.c                   | 70 ++++++++++++-------------
- 14 files changed, 116 insertions(+), 116 deletions(-)
+> > +
+> > +static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
+> > +{
+> > +     struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+> > +
+> > +     switch (func_id) {
+> > +     case ARM_SMCCC_TRNG_VERSION:
+> > +     case ARM_SMCCC_TRNG_FEATURES:
+> > +     case ARM_SMCCC_TRNG_GET_UUID:
+> > +     case ARM_SMCCC_TRNG_RND32:
+> > +     case ARM_SMCCC_TRNG_RND64:
+> > +             return kvm_arm_fw_reg_feat_enabled(smccc_feat->std_bmap,
+> > +                                             KVM_REG_ARM_STD_BIT_TRNG_V1_0);
+> > +     default:
+> > +             return kvm_hvc_call_default_allowed(vcpu, func_id);
+> > +     }
+> > +}
+> > +
+> >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >  {
+> >       u32 func_id = smccc_get_function(vcpu);
+> > @@ -65,6 +112,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >       u32 feature;
+> >       gpa_t gpa;
+> >
+> > +     if (!kvm_hvc_call_allowed(vcpu, func_id))
+> > +             goto out;
+> > +
+> >       switch (func_id) {
+> >       case ARM_SMCCC_VERSION_FUNC_ID:
+> >               val[0] = ARM_SMCCC_VERSION_1_1;
+> > @@ -155,6 +205,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >               return kvm_psci_call(vcpu);
+> >       }
+> >
+> > +out:
+> >       smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
+> >       return 1;
+> >  }
+> > @@ -164,8 +215,16 @@ static const u64 kvm_arm_fw_reg_ids[] = {
+> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
+> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
+> > +     KVM_REG_ARM_STD_BMAP,
+> >  };
+> >
+> > +void kvm_arm_init_hypercalls(struct kvm *kvm)
+> > +{
+> > +     struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
+> > +
+> > +     smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
+> > +}
+> > +
+> >  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+> >  {
+> >       return ARRAY_SIZE(kvm_arm_fw_reg_ids);
+> > @@ -237,6 +296,7 @@ static int get_kernel_wa_level(u64 regid)
+> >
+> >  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >  {
+> > +     struct kvm_smccc_features *smccc_feat = &vcpu->kvm->arch.smccc_feat;
+> >       void __user *uaddr = (void __user *)(long)reg->addr;
+> >       u64 val;
+> >
+> > @@ -249,6 +309,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >       case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+> >               val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
+> >               break;
+> > +     case KVM_REG_ARM_STD_BMAP:
+> > +             val = READ_ONCE(smccc_feat->std_bmap);
+> > +             break;
+> >       default:
+> >               return -ENOENT;
+> >       }
+> > @@ -259,6 +322,43 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >       return 0;
+> >  }
+> >
+> > +static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
+> > +{
+> > +     int ret = 0;
+> > +     struct kvm *kvm = vcpu->kvm;
+> > +     struct kvm_smccc_features *smccc_feat = &kvm->arch.smccc_feat;
+> > +     u64 *fw_reg_bmap, fw_reg_features;
+> > +
+> > +     switch (reg_id) {
+> > +     case KVM_REG_ARM_STD_BMAP:
+> > +             fw_reg_bmap = &smccc_feat->std_bmap;
+> > +             fw_reg_features = KVM_ARM_SMCCC_STD_FEATURES;
+> > +             break;
+> > +     default:
+> > +             return -ENOENT;
+> > +     }
+> > +
+> > +     /* Check for unsupported bit */
+> > +     if (val & ~fw_reg_features)
+> > +             return -EINVAL;
+> > +
+> > +     mutex_lock(&kvm->lock);
+> > +
+> > +     /*
+> > +      * If the VM (any vCPU) has already started running, return success
+> > +      * if there's no change in the value. Else, return -EBUSY.
+>
+> No, this should *always* fail if a vcpu has started. Otherwise, you
+> start allowing hard to spot races.
+>
+The idea came from the fact that userspace could spawn multiple
+threads to configure the vCPU registers. Since we don't have the
+VM-scoped registers yet, it may be possible that userspace has issued
+a KVM_RUN on one of the vCPU, while the others are lagging behind and
+still configuring the registers. The slower threads may see -EBUSY and
+could panic. But if you feel that it's an overkill and the userspace
+should deal with it, we can return EBUSY for all writes after KVM_RUN.
 
-diff --git a/arch/arm64/include/asm/debug-monitors.h b/arch/arm64/include/asm/debug-monitors.h
-index 00c291067e57..7b7e05c02691 100644
---- a/arch/arm64/include/asm/debug-monitors.h
-+++ b/arch/arm64/include/asm/debug-monitors.h
-@@ -64,7 +64,7 @@ struct task_struct;
- 
- struct step_hook {
- 	struct list_head node;
--	int (*fn)(struct pt_regs *regs, unsigned int esr);
-+	int (*fn)(struct pt_regs *regs, unsigned long esr);
- };
- 
- void register_user_step_hook(struct step_hook *hook);
-@@ -75,7 +75,7 @@ void unregister_kernel_step_hook(struct step_hook *hook);
- 
- struct break_hook {
- 	struct list_head node;
--	int (*fn)(struct pt_regs *regs, unsigned int esr);
-+	int (*fn)(struct pt_regs *regs, unsigned long esr);
- 	u16 imm;
- 	u16 mask; /* These bits are ignored when comparing with imm */
- };
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 7356e2f05755..9d18f82c57d5 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -330,14 +330,14 @@
- #ifndef __ASSEMBLY__
- #include <asm/types.h>
- 
--static inline bool esr_is_data_abort(u32 esr)
-+static inline bool esr_is_data_abort(unsigned long esr)
- {
--	const u32 ec = ESR_ELx_EC(esr);
-+	const unsigned long ec = ESR_ELx_EC(esr);
- 
- 	return ec == ESR_ELx_EC_DABT_LOW || ec == ESR_ELx_EC_DABT_CUR;
- }
- 
--const char *esr_get_class_string(u32 esr);
-+const char *esr_get_class_string(unsigned long esr);
- #endif /* __ASSEMBLY */
- 
- #endif /* __ASM_ESR_H */
-diff --git a/arch/arm64/include/asm/exception.h b/arch/arm64/include/asm/exception.h
-index 339477dca551..0e6535aa78c2 100644
---- a/arch/arm64/include/asm/exception.h
-+++ b/arch/arm64/include/asm/exception.h
-@@ -19,9 +19,9 @@
- #define __exception_irq_entry	__kprobes
- #endif
- 
--static inline u32 disr_to_esr(u64 disr)
-+static inline unsigned long disr_to_esr(u64 disr)
- {
--	unsigned int esr = ESR_ELx_EC_SERROR << ESR_ELx_EC_SHIFT;
-+	unsigned long esr = ESR_ELx_EC_SERROR << ESR_ELx_EC_SHIFT;
- 
- 	if ((disr & DISR_EL1_IDS) == 0)
- 		esr |= (disr & DISR_EL1_ESR_MASK);
-@@ -57,23 +57,23 @@ asmlinkage void call_on_irq_stack(struct pt_regs *regs,
- 				  void (*func)(struct pt_regs *));
- asmlinkage void asm_exit_to_user_mode(struct pt_regs *regs);
- 
--void do_mem_abort(unsigned long far, unsigned int esr, struct pt_regs *regs);
-+void do_mem_abort(unsigned long far, unsigned long esr, struct pt_regs *regs);
- void do_undefinstr(struct pt_regs *regs);
- void do_bti(struct pt_regs *regs);
--void do_debug_exception(unsigned long addr_if_watchpoint, unsigned int esr,
-+void do_debug_exception(unsigned long addr_if_watchpoint, unsigned long esr,
- 			struct pt_regs *regs);
--void do_fpsimd_acc(unsigned int esr, struct pt_regs *regs);
--void do_sve_acc(unsigned int esr, struct pt_regs *regs);
--void do_fpsimd_exc(unsigned int esr, struct pt_regs *regs);
--void do_sysinstr(unsigned int esr, struct pt_regs *regs);
--void do_sp_pc_abort(unsigned long addr, unsigned int esr, struct pt_regs *regs);
--void bad_el0_sync(struct pt_regs *regs, int reason, unsigned int esr);
--void do_cp15instr(unsigned int esr, struct pt_regs *regs);
-+void do_fpsimd_acc(unsigned long esr, struct pt_regs *regs);
-+void do_sve_acc(unsigned long esr, struct pt_regs *regs);
-+void do_fpsimd_exc(unsigned long esr, struct pt_regs *regs);
-+void do_sysinstr(unsigned long esr, struct pt_regs *regs);
-+void do_sp_pc_abort(unsigned long addr, unsigned long esr, struct pt_regs *regs);
-+void bad_el0_sync(struct pt_regs *regs, int reason, unsigned long esr);
-+void do_cp15instr(unsigned long esr, struct pt_regs *regs);
- void do_el0_svc(struct pt_regs *regs);
- void do_el0_svc_compat(struct pt_regs *regs);
--void do_ptrauth_fault(struct pt_regs *regs, unsigned int esr);
--void do_serror(struct pt_regs *regs, unsigned int esr);
-+void do_ptrauth_fault(struct pt_regs *regs, unsigned long esr);
-+void do_serror(struct pt_regs *regs, unsigned long esr);
- void do_notify_resume(struct pt_regs *regs, unsigned long thread_flags);
- 
--void panic_bad_stack(struct pt_regs *regs, unsigned int esr, unsigned long far);
-+void panic_bad_stack(struct pt_regs *regs, unsigned long esr, unsigned long far);
- #endif	/* __ASM_EXCEPTION_H */
-diff --git a/arch/arm64/include/asm/system_misc.h b/arch/arm64/include/asm/system_misc.h
-index 305a7157c6a6..0eb7709422e2 100644
---- a/arch/arm64/include/asm/system_misc.h
-+++ b/arch/arm64/include/asm/system_misc.h
-@@ -23,9 +23,9 @@ void die(const char *msg, struct pt_regs *regs, int err);
- struct siginfo;
- void arm64_notify_die(const char *str, struct pt_regs *regs,
- 		      int signo, int sicode, unsigned long far,
--		      int err);
-+		      unsigned long err);
- 
--void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned int,
-+void hook_debug_fault_code(int nr, int (*fn)(unsigned long, unsigned long,
- 					     struct pt_regs *),
- 			   int sig, int code, const char *name);
- 
-diff --git a/arch/arm64/include/asm/traps.h b/arch/arm64/include/asm/traps.h
-index 54f32a0675df..6e5826470bea 100644
---- a/arch/arm64/include/asm/traps.h
-+++ b/arch/arm64/include/asm/traps.h
-@@ -24,7 +24,7 @@ struct undef_hook {
- 
- void register_undef_hook(struct undef_hook *hook);
- void unregister_undef_hook(struct undef_hook *hook);
--void force_signal_inject(int signal, int code, unsigned long address, unsigned int err);
-+void force_signal_inject(int signal, int code, unsigned long address, unsigned long err);
- void arm64_notify_segfault(unsigned long addr);
- void arm64_force_sig_fault(int signo, int code, unsigned long far, const char *str);
- void arm64_force_sig_mceerr(int code, unsigned long far, short lsb, const char *str);
-@@ -57,7 +57,7 @@ static inline int in_entry_text(unsigned long ptr)
-  * errors share the same encoding as an all-zeros encoding from a CPU that
-  * doesn't support RAS.
-  */
--static inline bool arm64_is_ras_serror(u32 esr)
-+static inline bool arm64_is_ras_serror(unsigned long esr)
- {
- 	WARN_ON(preemptible());
- 
-@@ -77,9 +77,9 @@ static inline bool arm64_is_ras_serror(u32 esr)
-  * We treat them as Uncontainable.
-  * Non-RAS SError's are reported as Uncontained/Uncategorized.
-  */
--static inline u32 arm64_ras_serror_get_severity(u32 esr)
-+static inline unsigned long arm64_ras_serror_get_severity(unsigned long esr)
- {
--	u32 aet = esr & ESR_ELx_AET;
-+	unsigned long aet = esr & ESR_ELx_AET;
- 
- 	if (!arm64_is_ras_serror(esr)) {
- 		/* Not a RAS error, we can't interpret the ESR. */
-@@ -98,6 +98,6 @@ static inline u32 arm64_ras_serror_get_severity(u32 esr)
- 	return aet;
- }
- 
--bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned int esr);
--void __noreturn arm64_serror_panic(struct pt_regs *regs, u32 esr);
-+bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned long esr);
-+void __noreturn arm64_serror_panic(struct pt_regs *regs, unsigned long esr);
- #endif
-diff --git a/arch/arm64/kernel/debug-monitors.c b/arch/arm64/kernel/debug-monitors.c
-index 4f3661eeb7ec..bf9fe71589bc 100644
---- a/arch/arm64/kernel/debug-monitors.c
-+++ b/arch/arm64/kernel/debug-monitors.c
-@@ -202,7 +202,7 @@ void unregister_kernel_step_hook(struct step_hook *hook)
-  * So we call all the registered handlers, until the right handler is
-  * found which returns zero.
-  */
--static int call_step_hook(struct pt_regs *regs, unsigned int esr)
-+static int call_step_hook(struct pt_regs *regs, unsigned long esr)
- {
- 	struct step_hook *hook;
- 	struct list_head *list;
-@@ -238,7 +238,7 @@ static void send_user_sigtrap(int si_code)
- 			      "User debug trap");
- }
- 
--static int single_step_handler(unsigned long unused, unsigned int esr,
-+static int single_step_handler(unsigned long unused, unsigned long esr,
- 			       struct pt_regs *regs)
- {
- 	bool handler_found = false;
-@@ -299,11 +299,11 @@ void unregister_kernel_break_hook(struct break_hook *hook)
- 	unregister_debug_hook(&hook->node);
- }
- 
--static int call_break_hook(struct pt_regs *regs, unsigned int esr)
-+static int call_break_hook(struct pt_regs *regs, unsigned long esr)
- {
- 	struct break_hook *hook;
- 	struct list_head *list;
--	int (*fn)(struct pt_regs *regs, unsigned int esr) = NULL;
-+	int (*fn)(struct pt_regs *regs, unsigned long esr) = NULL;
- 
- 	list = user_mode(regs) ? &user_break_hook : &kernel_break_hook;
- 
-@@ -312,7 +312,7 @@ static int call_break_hook(struct pt_regs *regs, unsigned int esr)
- 	 * entirely not preemptible, and we can use rcu list safely here.
- 	 */
- 	list_for_each_entry_rcu(hook, list, node) {
--		unsigned int comment = esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
-+		unsigned long comment = esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
- 
- 		if ((comment & ~hook->mask) == hook->imm)
- 			fn = hook->fn;
-@@ -322,7 +322,7 @@ static int call_break_hook(struct pt_regs *regs, unsigned int esr)
- }
- NOKPROBE_SYMBOL(call_break_hook);
- 
--static int brk_handler(unsigned long unused, unsigned int esr,
-+static int brk_handler(unsigned long unused, unsigned long esr,
- 		       struct pt_regs *regs)
- {
- 	if (call_break_hook(regs, esr) == DBG_HOOK_HANDLED)
-diff --git a/arch/arm64/kernel/entry-common.c b/arch/arm64/kernel/entry-common.c
-index 878c65aa7206..6ba10edfb49c 100644
---- a/arch/arm64/kernel/entry-common.c
-+++ b/arch/arm64/kernel/entry-common.c
-@@ -282,13 +282,13 @@ extern void (*handle_arch_irq)(struct pt_regs *);
- extern void (*handle_arch_fiq)(struct pt_regs *);
- 
- static void noinstr __panic_unhandled(struct pt_regs *regs, const char *vector,
--				      unsigned int esr)
-+				      unsigned long esr)
- {
- 	arm64_enter_nmi(regs);
- 
- 	console_verbose();
- 
--	pr_crit("Unhandled %s exception on CPU%d, ESR 0x%08x -- %s\n",
-+	pr_crit("Unhandled %s exception on CPU%d, ESR 0x%016lx -- %s\n",
- 		vector, smp_processor_id(), esr,
- 		esr_get_class_string(esr));
- 
-@@ -818,7 +818,7 @@ UNHANDLED(el0t, 32, error)
- #ifdef CONFIG_VMAP_STACK
- asmlinkage void noinstr handle_bad_stack(struct pt_regs *regs)
- {
--	unsigned int esr = read_sysreg(esr_el1);
-+	unsigned long esr = read_sysreg(esr_el1);
- 	unsigned long far = read_sysreg(far_el1);
- 
- 	arm64_enter_nmi(regs);
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index 47af76e53221..22bf0cfe236b 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -1004,7 +1004,7 @@ void fpsimd_release_task(struct task_struct *dead_task)
-  * would have disabled the SVE access trap for userspace during
-  * ret_to_user, making an SVE access trap impossible in that case.
-  */
--void do_sve_acc(unsigned int esr, struct pt_regs *regs)
-+void do_sve_acc(unsigned long esr, struct pt_regs *regs)
- {
- 	/* Even if we chose not to use SVE, the hardware could still trap: */
- 	if (unlikely(!system_supports_sve()) || WARN_ON(is_compat_task())) {
-@@ -1046,7 +1046,7 @@ void do_sve_acc(unsigned int esr, struct pt_regs *regs)
- /*
-  * Trapped FP/ASIMD access.
-  */
--void do_fpsimd_acc(unsigned int esr, struct pt_regs *regs)
-+void do_fpsimd_acc(unsigned long esr, struct pt_regs *regs)
- {
- 	/* TODO: implement lazy context saving/restoring */
- 	WARN_ON(1);
-@@ -1055,7 +1055,7 @@ void do_fpsimd_acc(unsigned int esr, struct pt_regs *regs)
- /*
-  * Raise a SIGFPE for the current process.
-  */
--void do_fpsimd_exc(unsigned int esr, struct pt_regs *regs)
-+void do_fpsimd_exc(unsigned long esr, struct pt_regs *regs)
- {
- 	unsigned int si_code = FPE_FLTUNK;
- 
-diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel/hw_breakpoint.c
-index 712e97c03e54..2a7f21314cde 100644
---- a/arch/arm64/kernel/hw_breakpoint.c
-+++ b/arch/arm64/kernel/hw_breakpoint.c
-@@ -617,7 +617,7 @@ NOKPROBE_SYMBOL(toggle_bp_registers);
- /*
-  * Debug exception handlers.
-  */
--static int breakpoint_handler(unsigned long unused, unsigned int esr,
-+static int breakpoint_handler(unsigned long unused, unsigned long esr,
- 			      struct pt_regs *regs)
- {
- 	int i, step = 0, *kernel_step;
-@@ -751,7 +751,7 @@ static int watchpoint_report(struct perf_event *wp, unsigned long addr,
- 	return step;
- }
- 
--static int watchpoint_handler(unsigned long addr, unsigned int esr,
-+static int watchpoint_handler(unsigned long addr, unsigned long esr,
- 			      struct pt_regs *regs)
- {
- 	int i, step = 0, *kernel_step, access, closest_match = 0;
-diff --git a/arch/arm64/kernel/kgdb.c b/arch/arm64/kernel/kgdb.c
-index 2aede780fb80..cda9c1e9864f 100644
---- a/arch/arm64/kernel/kgdb.c
-+++ b/arch/arm64/kernel/kgdb.c
-@@ -232,14 +232,14 @@ int kgdb_arch_handle_exception(int exception_vector, int signo,
- 	return err;
- }
- 
--static int kgdb_brk_fn(struct pt_regs *regs, unsigned int esr)
-+static int kgdb_brk_fn(struct pt_regs *regs, unsigned long esr)
- {
- 	kgdb_handle_exception(1, SIGTRAP, 0, regs);
- 	return DBG_HOOK_HANDLED;
- }
- NOKPROBE_SYMBOL(kgdb_brk_fn)
- 
--static int kgdb_compiled_brk_fn(struct pt_regs *regs, unsigned int esr)
-+static int kgdb_compiled_brk_fn(struct pt_regs *regs, unsigned long esr)
- {
- 	compiled_break = 1;
- 	kgdb_handle_exception(1, SIGTRAP, 0, regs);
-@@ -248,7 +248,7 @@ static int kgdb_compiled_brk_fn(struct pt_regs *regs, unsigned int esr)
- }
- NOKPROBE_SYMBOL(kgdb_compiled_brk_fn);
- 
--static int kgdb_step_brk_fn(struct pt_regs *regs, unsigned int esr)
-+static int kgdb_step_brk_fn(struct pt_regs *regs, unsigned long esr)
- {
- 	if (!kgdb_single_step)
- 		return DBG_HOOK_ERROR;
-diff --git a/arch/arm64/kernel/probes/kprobes.c b/arch/arm64/kernel/probes/kprobes.c
-index d9dfa82c1f18..d1d182320245 100644
---- a/arch/arm64/kernel/probes/kprobes.c
-+++ b/arch/arm64/kernel/probes/kprobes.c
-@@ -335,7 +335,7 @@ static void __kprobes kprobe_handler(struct pt_regs *regs)
- }
- 
- static int __kprobes
--kprobe_breakpoint_ss_handler(struct pt_regs *regs, unsigned int esr)
-+kprobe_breakpoint_ss_handler(struct pt_regs *regs, unsigned long esr)
- {
- 	struct kprobe_ctlblk *kcb = get_kprobe_ctlblk();
- 	unsigned long addr = instruction_pointer(regs);
-@@ -359,7 +359,7 @@ static struct break_hook kprobes_break_ss_hook = {
- };
- 
- static int __kprobes
--kprobe_breakpoint_handler(struct pt_regs *regs, unsigned int esr)
-+kprobe_breakpoint_handler(struct pt_regs *regs, unsigned long esr)
- {
- 	kprobe_handler(regs);
- 	return DBG_HOOK_HANDLED;
-diff --git a/arch/arm64/kernel/probes/uprobes.c b/arch/arm64/kernel/probes/uprobes.c
-index 9be668f3f034..d49aef2657cd 100644
---- a/arch/arm64/kernel/probes/uprobes.c
-+++ b/arch/arm64/kernel/probes/uprobes.c
-@@ -166,7 +166,7 @@ int arch_uprobe_exception_notify(struct notifier_block *self,
- }
- 
- static int uprobe_breakpoint_handler(struct pt_regs *regs,
--		unsigned int esr)
-+				     unsigned long esr)
- {
- 	if (uprobe_pre_sstep_notifier(regs))
- 		return DBG_HOOK_HANDLED;
-@@ -175,7 +175,7 @@ static int uprobe_breakpoint_handler(struct pt_regs *regs,
- }
- 
- static int uprobe_single_step_handler(struct pt_regs *regs,
--		unsigned int esr)
-+				      unsigned long esr)
- {
- 	struct uprobe_task *utask = current->utask;
- 
-diff --git a/arch/arm64/kernel/traps.c b/arch/arm64/kernel/traps.c
-index 0529fd57567e..da24a4c4f58b 100644
---- a/arch/arm64/kernel/traps.c
-+++ b/arch/arm64/kernel/traps.c
-@@ -242,7 +242,7 @@ static void arm64_show_signal(int signo, const char *str)
- 	static DEFINE_RATELIMIT_STATE(rs, DEFAULT_RATELIMIT_INTERVAL,
- 				      DEFAULT_RATELIMIT_BURST);
- 	struct task_struct *tsk = current;
--	unsigned int esr = tsk->thread.fault_code;
-+	unsigned long esr = tsk->thread.fault_code;
- 	struct pt_regs *regs = task_pt_regs(tsk);
- 
- 	/* Leave if the signal won't be shown */
-@@ -253,7 +253,7 @@ static void arm64_show_signal(int signo, const char *str)
- 
- 	pr_info("%s[%d]: unhandled exception: ", tsk->comm, task_pid_nr(tsk));
- 	if (esr)
--		pr_cont("%s, ESR 0x%08x, ", esr_get_class_string(esr), esr);
-+		pr_cont("%s, ESR 0x%016lx, ", esr_get_class_string(esr), esr);
- 
- 	pr_cont("%s", str);
- 	print_vma_addr(KERN_CONT " in ", regs->pc);
-@@ -287,7 +287,7 @@ void arm64_force_sig_ptrace_errno_trap(int errno, unsigned long far,
- 
- void arm64_notify_die(const char *str, struct pt_regs *regs,
- 		      int signo, int sicode, unsigned long far,
--		      int err)
-+		      unsigned long err)
- {
- 	if (user_mode(regs)) {
- 		WARN_ON(regs != current_pt_regs());
-@@ -439,7 +439,7 @@ static int call_undef_hook(struct pt_regs *regs)
- 	return fn ? fn(regs, instr) : 1;
- }
- 
--void force_signal_inject(int signal, int code, unsigned long address, unsigned int err)
-+void force_signal_inject(int signal, int code, unsigned long address, unsigned long err)
- {
- 	const char *desc;
- 	struct pt_regs *regs = current_pt_regs();
-@@ -506,7 +506,7 @@ void do_bti(struct pt_regs *regs)
- }
- NOKPROBE_SYMBOL(do_bti);
- 
--void do_ptrauth_fault(struct pt_regs *regs, unsigned int esr)
-+void do_ptrauth_fault(struct pt_regs *regs, unsigned long esr)
- {
- 	/*
- 	 * Unexpected FPAC exception or pointer authentication failure in
-@@ -532,7 +532,7 @@ NOKPROBE_SYMBOL(do_ptrauth_fault);
- 		uaccess_ttbr0_disable();			\
- 	}
- 
--static void user_cache_maint_handler(unsigned int esr, struct pt_regs *regs)
-+static void user_cache_maint_handler(unsigned long esr, struct pt_regs *regs)
- {
- 	unsigned long tagged_address, address;
- 	int rt = ESR_ELx_SYS64_ISS_RT(esr);
-@@ -572,7 +572,7 @@ static void user_cache_maint_handler(unsigned int esr, struct pt_regs *regs)
- 		arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
- }
- 
--static void ctr_read_handler(unsigned int esr, struct pt_regs *regs)
-+static void ctr_read_handler(unsigned long esr, struct pt_regs *regs)
- {
- 	int rt = ESR_ELx_SYS64_ISS_RT(esr);
- 	unsigned long val = arm64_ftr_reg_user_value(&arm64_ftr_reg_ctrel0);
-@@ -591,7 +591,7 @@ static void ctr_read_handler(unsigned int esr, struct pt_regs *regs)
- 	arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
- }
- 
--static void cntvct_read_handler(unsigned int esr, struct pt_regs *regs)
-+static void cntvct_read_handler(unsigned long esr, struct pt_regs *regs)
- {
- 	int rt = ESR_ELx_SYS64_ISS_RT(esr);
- 
-@@ -599,7 +599,7 @@ static void cntvct_read_handler(unsigned int esr, struct pt_regs *regs)
- 	arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
- }
- 
--static void cntfrq_read_handler(unsigned int esr, struct pt_regs *regs)
-+static void cntfrq_read_handler(unsigned long esr, struct pt_regs *regs)
- {
- 	int rt = ESR_ELx_SYS64_ISS_RT(esr);
- 
-@@ -607,7 +607,7 @@ static void cntfrq_read_handler(unsigned int esr, struct pt_regs *regs)
- 	arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
- }
- 
--static void mrs_handler(unsigned int esr, struct pt_regs *regs)
-+static void mrs_handler(unsigned long esr, struct pt_regs *regs)
- {
- 	u32 sysreg, rt;
- 
-@@ -618,15 +618,15 @@ static void mrs_handler(unsigned int esr, struct pt_regs *regs)
- 		force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc, 0);
- }
- 
--static void wfi_handler(unsigned int esr, struct pt_regs *regs)
-+static void wfi_handler(unsigned long esr, struct pt_regs *regs)
- {
- 	arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
- }
- 
- struct sys64_hook {
--	unsigned int esr_mask;
--	unsigned int esr_val;
--	void (*handler)(unsigned int esr, struct pt_regs *regs);
-+	unsigned long esr_mask;
-+	unsigned long esr_val;
-+	void (*handler)(unsigned long esr, struct pt_regs *regs);
- };
- 
- static const struct sys64_hook sys64_hooks[] = {
-@@ -675,7 +675,7 @@ static const struct sys64_hook sys64_hooks[] = {
- };
- 
- #ifdef CONFIG_COMPAT
--static bool cp15_cond_valid(unsigned int esr, struct pt_regs *regs)
-+static bool cp15_cond_valid(unsigned long esr, struct pt_regs *regs)
- {
- 	int cond;
- 
-@@ -695,7 +695,7 @@ static bool cp15_cond_valid(unsigned int esr, struct pt_regs *regs)
- 	return aarch32_opcode_cond_checks[cond](regs->pstate);
- }
- 
--static void compat_cntfrq_read_handler(unsigned int esr, struct pt_regs *regs)
-+static void compat_cntfrq_read_handler(unsigned long esr, struct pt_regs *regs)
- {
- 	int reg = (esr & ESR_ELx_CP15_32_ISS_RT_MASK) >> ESR_ELx_CP15_32_ISS_RT_SHIFT;
- 
-@@ -712,7 +712,7 @@ static const struct sys64_hook cp15_32_hooks[] = {
- 	{},
- };
- 
--static void compat_cntvct_read_handler(unsigned int esr, struct pt_regs *regs)
-+static void compat_cntvct_read_handler(unsigned long esr, struct pt_regs *regs)
- {
- 	int rt = (esr & ESR_ELx_CP15_64_ISS_RT_MASK) >> ESR_ELx_CP15_64_ISS_RT_SHIFT;
- 	int rt2 = (esr & ESR_ELx_CP15_64_ISS_RT2_MASK) >> ESR_ELx_CP15_64_ISS_RT2_SHIFT;
-@@ -737,7 +737,7 @@ static const struct sys64_hook cp15_64_hooks[] = {
- 	{},
- };
- 
--void do_cp15instr(unsigned int esr, struct pt_regs *regs)
-+void do_cp15instr(unsigned long esr, struct pt_regs *regs)
- {
- 	const struct sys64_hook *hook, *hook_base;
- 
-@@ -778,7 +778,7 @@ void do_cp15instr(unsigned int esr, struct pt_regs *regs)
- NOKPROBE_SYMBOL(do_cp15instr);
- #endif
- 
--void do_sysinstr(unsigned int esr, struct pt_regs *regs)
-+void do_sysinstr(unsigned long esr, struct pt_regs *regs)
- {
- 	const struct sys64_hook *hook;
- 
-@@ -842,7 +842,7 @@ static const char *esr_class_str[] = {
- 	[ESR_ELx_EC_BRK64]		= "BRK (AArch64)",
- };
- 
--const char *esr_get_class_string(u32 esr)
-+const char *esr_get_class_string(unsigned long esr)
- {
- 	return esr_class_str[ESR_ELx_EC(esr)];
- }
-@@ -851,7 +851,7 @@ const char *esr_get_class_string(u32 esr)
-  * bad_el0_sync handles unexpected, but potentially recoverable synchronous
-  * exceptions taken from EL0.
-  */
--void bad_el0_sync(struct pt_regs *regs, int reason, unsigned int esr)
-+void bad_el0_sync(struct pt_regs *regs, int reason, unsigned long esr)
- {
- 	unsigned long pc = instruction_pointer(regs);
- 
-@@ -867,7 +867,7 @@ void bad_el0_sync(struct pt_regs *regs, int reason, unsigned int esr)
- DEFINE_PER_CPU(unsigned long [OVERFLOW_STACK_SIZE/sizeof(long)], overflow_stack)
- 	__aligned(16);
- 
--void panic_bad_stack(struct pt_regs *regs, unsigned int esr, unsigned long far)
-+void panic_bad_stack(struct pt_regs *regs, unsigned long esr, unsigned long far)
- {
- 	unsigned long tsk_stk = (unsigned long)current->stack;
- 	unsigned long irq_stk = (unsigned long)this_cpu_read(irq_stack_ptr);
-@@ -876,7 +876,7 @@ void panic_bad_stack(struct pt_regs *regs, unsigned int esr, unsigned long far)
- 	console_verbose();
- 	pr_emerg("Insufficient stack space to handle exception!");
- 
--	pr_emerg("ESR: 0x%08x -- %s\n", esr, esr_get_class_string(esr));
-+	pr_emerg("ESR: 0x%016lx -- %s\n", esr, esr_get_class_string(esr));
- 	pr_emerg("FAR: 0x%016lx\n", far);
- 
- 	pr_emerg("Task stack:     [0x%016lx..0x%016lx]\n",
-@@ -897,11 +897,11 @@ void panic_bad_stack(struct pt_regs *regs, unsigned int esr, unsigned long far)
- }
- #endif
- 
--void __noreturn arm64_serror_panic(struct pt_regs *regs, u32 esr)
-+void __noreturn arm64_serror_panic(struct pt_regs *regs, unsigned long esr)
- {
- 	console_verbose();
- 
--	pr_crit("SError Interrupt on CPU%d, code 0x%08x -- %s\n",
-+	pr_crit("SError Interrupt on CPU%d, code 0x%016lx -- %s\n",
- 		smp_processor_id(), esr, esr_get_class_string(esr));
- 	if (regs)
- 		__show_regs(regs);
-@@ -912,9 +912,9 @@ void __noreturn arm64_serror_panic(struct pt_regs *regs, u32 esr)
- 	unreachable();
- }
- 
--bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned int esr)
-+bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned long esr)
- {
--	u32 aet = arm64_ras_serror_get_severity(esr);
-+	unsigned long aet = arm64_ras_serror_get_severity(esr);
- 
- 	switch (aet) {
- 	case ESR_ELx_AET_CE:	/* corrected error */
-@@ -944,7 +944,7 @@ bool arm64_is_fatal_ras_serror(struct pt_regs *regs, unsigned int esr)
- 	}
- }
- 
--void do_serror(struct pt_regs *regs, unsigned int esr)
-+void do_serror(struct pt_regs *regs, unsigned long esr)
- {
- 	/* non-RAS errors are not containable */
- 	if (!arm64_is_ras_serror(esr) || arm64_is_fatal_ras_serror(regs, esr))
-@@ -965,7 +965,7 @@ int is_valid_bugaddr(unsigned long addr)
- 	return 1;
- }
- 
--static int bug_handler(struct pt_regs *regs, unsigned int esr)
-+static int bug_handler(struct pt_regs *regs, unsigned long esr)
- {
- 	switch (report_bug(regs->pc, regs)) {
- 	case BUG_TRAP_TYPE_BUG:
-@@ -990,7 +990,7 @@ static struct break_hook bug_break_hook = {
- 	.imm = BUG_BRK_IMM,
- };
- 
--static int reserved_fault_handler(struct pt_regs *regs, unsigned int esr)
-+static int reserved_fault_handler(struct pt_regs *regs, unsigned long esr)
- {
- 	pr_err("%s generated an invalid instruction at %pS!\n",
- 		"Kernel text patching",
-@@ -1012,7 +1012,7 @@ static struct break_hook fault_break_hook = {
- #define KASAN_ESR_SIZE_MASK	0x0f
- #define KASAN_ESR_SIZE(esr)	(1 << ((esr) & KASAN_ESR_SIZE_MASK))
- 
--static int kasan_handler(struct pt_regs *regs, unsigned int esr)
-+static int kasan_handler(struct pt_regs *regs, unsigned long esr)
- {
- 	bool recover = esr & KASAN_ESR_RECOVER;
- 	bool write = esr & KASAN_ESR_WRITE;
-@@ -1055,11 +1055,11 @@ static struct break_hook kasan_break_hook = {
-  * Initial handler for AArch64 BRK exceptions
-  * This handler only used until debug_traps_init().
-  */
--int __init early_brk64(unsigned long addr, unsigned int esr,
-+int __init early_brk64(unsigned long addr, unsigned long esr,
- 		struct pt_regs *regs)
- {
- #ifdef CONFIG_KASAN_SW_TAGS
--	unsigned int comment = esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
-+	unsigned long comment = esr & ESR_ELx_BRK64_ISS_COMMENT_MASK;
- 
- 	if ((comment & ~KASAN_BRK_MASK) == KASAN_BRK_IMM)
- 		return kasan_handler(regs, esr) != DBG_HOOK_HANDLED;
-diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
-index 77341b160aca..c9a0e24bba1f 100644
---- a/arch/arm64/mm/fault.c
-+++ b/arch/arm64/mm/fault.c
-@@ -43,7 +43,7 @@
- #include <asm/traps.h>
- 
- struct fault_info {
--	int	(*fn)(unsigned long far, unsigned int esr,
-+	int	(*fn)(unsigned long far, unsigned long esr,
- 		      struct pt_regs *regs);
- 	int	sig;
- 	int	code;
-@@ -53,17 +53,17 @@ struct fault_info {
- static const struct fault_info fault_info[];
- static struct fault_info debug_fault_info[];
- 
--static inline const struct fault_info *esr_to_fault_info(unsigned int esr)
-+static inline const struct fault_info *esr_to_fault_info(unsigned long esr)
- {
- 	return fault_info + (esr & ESR_ELx_FSC);
- }
- 
--static inline const struct fault_info *esr_to_debug_fault_info(unsigned int esr)
-+static inline const struct fault_info *esr_to_debug_fault_info(unsigned long esr)
- {
- 	return debug_fault_info + DBG_ESR_EVT(esr);
- }
- 
--static void data_abort_decode(unsigned int esr)
-+static void data_abort_decode(unsigned long esr)
- {
- 	pr_alert("Data abort info:\n");
- 
-@@ -85,11 +85,11 @@ static void data_abort_decode(unsigned int esr)
- 		 (esr & ESR_ELx_WNR) >> ESR_ELx_WNR_SHIFT);
- }
- 
--static void mem_abort_decode(unsigned int esr)
-+static void mem_abort_decode(unsigned long esr)
- {
- 	pr_alert("Mem abort info:\n");
- 
--	pr_alert("  ESR = 0x%08x\n", esr);
-+	pr_alert("  ESR = 0x%08lx\n", esr);
- 	pr_alert("  EC = 0x%02lx: %s, IL = %u bits\n",
- 		 ESR_ELx_EC(esr), esr_get_class_string(esr),
- 		 (esr & ESR_ELx_IL) ? 32 : 16);
-@@ -99,7 +99,7 @@ static void mem_abort_decode(unsigned int esr)
- 	pr_alert("  EA = %lu, S1PTW = %lu\n",
- 		 (esr & ESR_ELx_EA) >> ESR_ELx_EA_SHIFT,
- 		 (esr & ESR_ELx_S1PTW) >> ESR_ELx_S1PTW_SHIFT);
--	pr_alert("  FSC = 0x%02x: %s\n", (esr & ESR_ELx_FSC),
-+	pr_alert("  FSC = 0x%02lx: %s\n", (esr & ESR_ELx_FSC),
- 		 esr_to_fault_info(esr)->name);
- 
- 	if (esr_is_data_abort(esr))
-@@ -229,20 +229,20 @@ int ptep_set_access_flags(struct vm_area_struct *vma,
- 	return 1;
- }
- 
--static bool is_el1_instruction_abort(unsigned int esr)
-+static bool is_el1_instruction_abort(unsigned long esr)
- {
- 	return ESR_ELx_EC(esr) == ESR_ELx_EC_IABT_CUR;
- }
- 
--static bool is_el1_data_abort(unsigned int esr)
-+static bool is_el1_data_abort(unsigned long esr)
- {
- 	return ESR_ELx_EC(esr) == ESR_ELx_EC_DABT_CUR;
- }
- 
--static inline bool is_el1_permission_fault(unsigned long addr, unsigned int esr,
-+static inline bool is_el1_permission_fault(unsigned long addr, unsigned long esr,
- 					   struct pt_regs *regs)
- {
--	unsigned int fsc_type = esr & ESR_ELx_FSC_TYPE;
-+	unsigned long fsc_type = esr & ESR_ELx_FSC_TYPE;
- 
- 	if (!is_el1_data_abort(esr) && !is_el1_instruction_abort(esr))
- 		return false;
-@@ -258,7 +258,7 @@ static inline bool is_el1_permission_fault(unsigned long addr, unsigned int esr,
- }
- 
- static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
--							unsigned int esr,
-+							unsigned long esr,
- 							struct pt_regs *regs)
- {
- 	unsigned long flags;
-@@ -290,7 +290,7 @@ static bool __kprobes is_spurious_el1_translation_fault(unsigned long addr,
- }
- 
- static void die_kernel_fault(const char *msg, unsigned long addr,
--			     unsigned int esr, struct pt_regs *regs)
-+			     unsigned long esr, struct pt_regs *regs)
- {
- 	bust_spinlocks(1);
- 
-@@ -308,7 +308,7 @@ static void die_kernel_fault(const char *msg, unsigned long addr,
- }
- 
- #ifdef CONFIG_KASAN_HW_TAGS
--static void report_tag_fault(unsigned long addr, unsigned int esr,
-+static void report_tag_fault(unsigned long addr, unsigned long esr,
- 			     struct pt_regs *regs)
- {
- 	/*
-@@ -320,11 +320,11 @@ static void report_tag_fault(unsigned long addr, unsigned int esr,
- }
- #else
- /* Tag faults aren't enabled without CONFIG_KASAN_HW_TAGS. */
--static inline void report_tag_fault(unsigned long addr, unsigned int esr,
-+static inline void report_tag_fault(unsigned long addr, unsigned long esr,
- 				    struct pt_regs *regs) { }
- #endif
- 
--static void do_tag_recovery(unsigned long addr, unsigned int esr,
-+static void do_tag_recovery(unsigned long addr, unsigned long esr,
- 			   struct pt_regs *regs)
- {
- 
-@@ -339,9 +339,9 @@ static void do_tag_recovery(unsigned long addr, unsigned int esr,
- 	isb();
- }
- 
--static bool is_el1_mte_sync_tag_check_fault(unsigned int esr)
-+static bool is_el1_mte_sync_tag_check_fault(unsigned long esr)
- {
--	unsigned int fsc = esr & ESR_ELx_FSC;
-+	unsigned long fsc = esr & ESR_ELx_FSC;
- 
- 	if (!is_el1_data_abort(esr))
- 		return false;
-@@ -352,7 +352,7 @@ static bool is_el1_mte_sync_tag_check_fault(unsigned int esr)
- 	return false;
- }
- 
--static void __do_kernel_fault(unsigned long addr, unsigned int esr,
-+static void __do_kernel_fault(unsigned long addr, unsigned long esr,
- 			      struct pt_regs *regs)
- {
- 	const char *msg;
-@@ -393,7 +393,7 @@ static void __do_kernel_fault(unsigned long addr, unsigned int esr,
- 	die_kernel_fault(msg, addr, esr, regs);
- }
- 
--static void set_thread_esr(unsigned long address, unsigned int esr)
-+static void set_thread_esr(unsigned long address, unsigned long esr)
- {
- 	current->thread.fault_address = address;
- 
-@@ -441,7 +441,7 @@ static void set_thread_esr(unsigned long address, unsigned int esr)
- 			 * exception level). Fail safe by not providing an ESR
- 			 * context record at all.
- 			 */
--			WARN(1, "ESR 0x%x is not DABT or IABT from EL0\n", esr);
-+			WARN(1, "ESR 0x%lx is not DABT or IABT from EL0\n", esr);
- 			esr = 0;
- 			break;
- 		}
-@@ -450,7 +450,7 @@ static void set_thread_esr(unsigned long address, unsigned int esr)
- 	current->thread.fault_code = esr;
- }
- 
--static void do_bad_area(unsigned long far, unsigned int esr,
-+static void do_bad_area(unsigned long far, unsigned long esr,
- 			struct pt_regs *regs)
- {
- 	unsigned long addr = untagged_addr(far);
-@@ -501,7 +501,7 @@ static vm_fault_t __do_page_fault(struct mm_struct *mm, unsigned long addr,
- 	return handle_mm_fault(vma, addr, mm_flags, regs);
- }
- 
--static bool is_el0_instruction_abort(unsigned int esr)
-+static bool is_el0_instruction_abort(unsigned long esr)
- {
- 	return ESR_ELx_EC(esr) == ESR_ELx_EC_IABT_LOW;
- }
-@@ -510,12 +510,12 @@ static bool is_el0_instruction_abort(unsigned int esr)
-  * Note: not valid for EL1 DC IVAC, but we never use that such that it
-  * should fault. EL0 cannot issue DC IVAC (undef).
-  */
--static bool is_write_abort(unsigned int esr)
-+static bool is_write_abort(unsigned long esr)
- {
- 	return (esr & ESR_ELx_WNR) && !(esr & ESR_ELx_CM);
- }
- 
--static int __kprobes do_page_fault(unsigned long far, unsigned int esr,
-+static int __kprobes do_page_fault(unsigned long far, unsigned long esr,
- 				   struct pt_regs *regs)
- {
- 	const struct fault_info *inf;
-@@ -671,7 +671,7 @@ static int __kprobes do_page_fault(unsigned long far, unsigned int esr,
- }
- 
- static int __kprobes do_translation_fault(unsigned long far,
--					  unsigned int esr,
-+					  unsigned long esr,
- 					  struct pt_regs *regs)
- {
- 	unsigned long addr = untagged_addr(far);
-@@ -683,19 +683,19 @@ static int __kprobes do_translation_fault(unsigned long far,
- 	return 0;
- }
- 
--static int do_alignment_fault(unsigned long far, unsigned int esr,
-+static int do_alignment_fault(unsigned long far, unsigned long esr,
- 			      struct pt_regs *regs)
- {
- 	do_bad_area(far, esr, regs);
- 	return 0;
- }
- 
--static int do_bad(unsigned long far, unsigned int esr, struct pt_regs *regs)
-+static int do_bad(unsigned long far, unsigned long esr, struct pt_regs *regs)
- {
- 	return 1; /* "fault" */
- }
- 
--static int do_sea(unsigned long far, unsigned int esr, struct pt_regs *regs)
-+static int do_sea(unsigned long far, unsigned long esr, struct pt_regs *regs)
- {
- 	const struct fault_info *inf;
- 	unsigned long siaddr;
-@@ -725,7 +725,7 @@ static int do_sea(unsigned long far, unsigned int esr, struct pt_regs *regs)
- 	return 0;
- }
- 
--static int do_tag_check_fault(unsigned long far, unsigned int esr,
-+static int do_tag_check_fault(unsigned long far, unsigned long esr,
- 			      struct pt_regs *regs)
- {
- 	/*
-@@ -805,7 +805,7 @@ static const struct fault_info fault_info[] = {
- 	{ do_bad,		SIGKILL, SI_KERNEL,	"unknown 63"			},
- };
- 
--void do_mem_abort(unsigned long far, unsigned int esr, struct pt_regs *regs)
-+void do_mem_abort(unsigned long far, unsigned long esr, struct pt_regs *regs)
- {
- 	const struct fault_info *inf = esr_to_fault_info(esr);
- 	unsigned long addr = untagged_addr(far);
-@@ -825,14 +825,14 @@ void do_mem_abort(unsigned long far, unsigned int esr, struct pt_regs *regs)
- }
- NOKPROBE_SYMBOL(do_mem_abort);
- 
--void do_sp_pc_abort(unsigned long addr, unsigned int esr, struct pt_regs *regs)
-+void do_sp_pc_abort(unsigned long addr, unsigned long esr, struct pt_regs *regs)
- {
- 	arm64_notify_die("SP/PC alignment exception", regs, SIGBUS, BUS_ADRALN,
- 			 addr, esr);
- }
- NOKPROBE_SYMBOL(do_sp_pc_abort);
- 
--int __init early_brk64(unsigned long addr, unsigned int esr,
-+int __init early_brk64(unsigned long addr, unsigned long esr,
- 		       struct pt_regs *regs);
- 
- /*
-@@ -852,7 +852,7 @@ static struct fault_info __refdata debug_fault_info[] = {
- };
- 
- void __init hook_debug_fault_code(int nr,
--				  int (*fn)(unsigned long, unsigned int, struct pt_regs *),
-+				  int (*fn)(unsigned long, unsigned long, struct pt_regs *),
- 				  int sig, int code, const char *name)
- {
- 	BUG_ON(nr < 0 || nr >= ARRAY_SIZE(debug_fault_info));
-@@ -885,7 +885,7 @@ static void debug_exception_exit(struct pt_regs *regs)
- }
- NOKPROBE_SYMBOL(debug_exception_exit);
- 
--void do_debug_exception(unsigned long addr_if_watchpoint, unsigned int esr,
-+void do_debug_exception(unsigned long addr_if_watchpoint, unsigned long esr,
- 			struct pt_regs *regs)
- {
- 	const struct fault_info *inf = esr_to_debug_fault_info(esr);
--- 
-2.25.1
+> > +      */
+> > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
+> > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
+> > +             goto out;
+> > +     }
+> > +
+> > +     WRITE_ONCE(*fw_reg_bmap, val);
+>
+> I'm not sure what this WRITE_ONCE guards against. Do you expect
+> concurrent reads at this stage?
+>
+Again, the assumption here is that userspace could have multiple
+threads reading and writing to these registers. Without the VM scoped
+registers in place, we may end up with a read/write to the same memory
+location for all the vCPUs.
 
+> > +out:
+> > +     mutex_unlock(&kvm->lock);
+> > +     return ret;
+> > +}
+> > +
+> >  int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >  {
+> >       void __user *uaddr = (void __user *)(long)reg->addr;
+> > @@ -337,6 +437,8 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> >                       return -EINVAL;
+> >
+> >               return 0;
+> > +     case KVM_REG_ARM_STD_BMAP:
+> > +             return kvm_arm_set_fw_reg_bmap(vcpu, reg->id, val);
+> >       default:
+> >               return -ENOENT;
+> >       }
+> > diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+> > index 5d38628a8d04..fd3ff350ee9d 100644
+> > --- a/include/kvm/arm_hypercalls.h
+> > +++ b/include/kvm/arm_hypercalls.h
+> > @@ -6,6 +6,12 @@
+> >
+> >  #include <asm/kvm_emulate.h>
+> >
+> > +/* Last valid bits of the bitmapped firmware registers */
+> > +#define KVM_REG_ARM_STD_BMAP_BIT_MAX         0
+> > +
+> > +#define KVM_ARM_SMCCC_STD_FEATURES \
+> > +     GENMASK_ULL(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
+> > +
+> >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
+> >
+> >  static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
+> > @@ -42,6 +48,7 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
+> >
+> >  struct kvm_one_reg;
+> >
+> > +void kvm_arm_init_hypercalls(struct kvm *kvm);
+> >  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
+> >  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+> >  int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> > diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+> > index 6e55b9283789..d7a87367de56 100644
+> > --- a/include/kvm/arm_psci.h
+> > +++ b/include/kvm/arm_psci.h
+> > @@ -36,6 +36,18 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
+> >       return KVM_ARM_PSCI_0_1;
+> >  }
+> >
+> > +static inline bool kvm_psci_func_id_is_valid(struct kvm_vcpu *vcpu, u32 func_id)
+> > +{
+> > +     /* PSCI 0.1 doesn't comply with the standard SMCCC */
+> > +     if (kvm_psci_version(vcpu) == KVM_ARM_PSCI_0_1)
+> > +             return (func_id == KVM_PSCI_FN_CPU_OFF || func_id == KVM_PSCI_FN_CPU_ON);
+> > +
+> > +     if (ARM_SMCCC_OWNER_NUM(func_id) == ARM_SMCCC_OWNER_STANDARD &&
+> > +             ARM_SMCCC_FUNC_NUM(func_id) >= 0 && ARM_SMCCC_FUNC_NUM(func_id) <= 0x1f)
+> > +             return true;
+> > +
+> > +     return false;
+> > +}
+>
+> Why the inline function? Do you expect this to be shared with
+> something else? If not, I'd rather you move it into the caller.
+>
+Well, no plans to share as of yet. Will move it to psci.c
+
+> >
+> >  int kvm_psci_call(struct kvm_vcpu *vcpu);
+> >
+>
+
+Thanks for the review, Marc. I'll fix all the other nits.
+
+Regards,
+Raghavendra
+
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
