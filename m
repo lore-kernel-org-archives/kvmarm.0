@@ -2,69 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8A6C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Apr 2022 15:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77FBFC433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Apr 2022 16:31:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 94BB749E43;
-	Fri,  8 Apr 2022 11:07:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6E484B1EF;
+	Fri,  8 Apr 2022 12:31:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id VIAnEhjIQN9c; Fri,  8 Apr 2022 11:07:58 -0400 (EDT)
+	with ESMTP id Uz-Gao8jFT+L; Fri,  8 Apr 2022 12:31:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 67C2849DF6;
-	Fri,  8 Apr 2022 11:07:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA89F4B1CA;
+	Fri,  8 Apr 2022 12:31:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE40449B07
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 11:07:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16A024B1CA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 12:31:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z37r4xKDxuGI for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2022 11:07:55 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5195411BD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 11:07:55 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 81B6A61EA5;
- Fri,  8 Apr 2022 15:07:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD969C385A3;
- Fri,  8 Apr 2022 15:07:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1649430473;
- bh=5j8bxG+Xf5JcARca/W0PU8fTbYvFa41eJ4g77CdktOU=;
- h=From:To:Cc:Subject:Date:From;
- b=OwUH05q+9KXFfOSC4yZMPKORuPjU2H+csDTW56fdTil9Rcr3EV6aFZ81NwQs2NcHw
- jgUkyvGNLZA/DrjBi3v+MPfPAToU+tXsQxN+D0krBSo31CprBCbej/u5sNdDMz+IRG
- pmLOnIsm+7z3hB29qdYykcPmUH5UEh1zdXAljBGhp8qewIqpOnj2eRaCcpjDYL4muA
- xa//E8oFKVOJ9pHjhoIDT8GDblUy5WJ1TPbN709l7HohctsAZNu2FTnLcJZhbwrTHR
- GeeV2lYcIwAeKX9ky1WOAi0OTJF8Z/ip7SI43EY8esIeUvM8hdQUmgmVt6f4Cs/c7v
- bjGtVHB7xj/VQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1ncqDH-002o1A-Bu; Fri, 08 Apr 2022 16:07:51 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 5.18, take #1
-Date: Fri,  8 Apr 2022 16:07:46 +0100
-Message-Id: <20220408150746.260017-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+ with ESMTP id ciAOSuSIkI9m for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2022 12:31:24 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A2444B1C6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 12:31:24 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1649435483;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ezLScb0qdXlLkCxr8k3PZJ3/cAq1WRV512yu5EznY7Q=;
+ b=OFu/AgnAEWAwchySWkEKtuQTooL7PJmguDAu6EJh03JTUoclVE31DvvdS25xbD+F/PnpLl
+ ezM6hN4GLCj1LBHkBs1SnMNJrmrFAM8GhPYhKDWb95/sUD+SLqzeDb8ZxDhK0NBMbQteIa
+ EahUTbtbuD88pau5IH1AxFzb+2duLH4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-651-qLrRTnRpPcmGaRrEQyVkNw-1; Fri, 08 Apr 2022 12:31:22 -0400
+X-MC-Unique: qLrRTnRpPcmGaRrEQyVkNw-1
+Received: by mail-wr1-f69.google.com with SMTP id
+ q15-20020adfab0f000000b002060c75e65aso2373598wrc.5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2022 09:31:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=ezLScb0qdXlLkCxr8k3PZJ3/cAq1WRV512yu5EznY7Q=;
+ b=Y2a+IMtpiGGJgPAdEMF2qt23SKJvdgsUBjsMlvoJ7Kn0PuOZbcllik5XtdL0LQRD6J
+ ok4mAQI1jrSNz6ia30Qf4QvOfrI9Hyfis9eHNlFrs/2kdxGMbzQKVjGq1Wj4OeECusgQ
+ noyThopqQr3F35H0YAHAWXDKCvOXs3dGql+SIPOlWuiaZYESgF6g5mD04aKwwGPRypIg
+ Ps9wjXGbHkAqhe+u89NTygVpI+ZAbC8TEWIZgbMdECtXFV+BBX8jbgCB4qV7qmTskM7m
+ Tm2YG14iP6YoiXm9x2uz4OkxD7S7D2hl5wypa0cwBc9ZQD7emkFOy4OzFb43Q5KkbxR3
+ U/aQ==
+X-Gm-Message-State: AOAM530UDf24p1YKk51iywzkTHGYX/VZZiDEV5d3jGzq30IfNYHyqNjB
+ MtpYRa8iQphsQVOuWc7MmQi7G5sfwMmngAHAMUDuSMCxwK25Hu/MITQpn5nHFdS9XzAe9OHkVuX
+ J8luC9G39ke97iFW7aYAV3bi1
+X-Received: by 2002:a5d:548e:0:b0:206:cdc:ff90 with SMTP id
+ h14-20020a5d548e000000b002060cdcff90mr15013836wrv.629.1649435481317; 
+ Fri, 08 Apr 2022 09:31:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxCB5NscNj/iZkhXNq3pILYqo7/vfybBBnq7QfRmjpblGzXeWKUQmZgNePGg763G/vT+dXKDg==
+X-Received: by 2002:a5d:548e:0:b0:206:cdc:ff90 with SMTP id
+ h14-20020a5d548e000000b002060cdcff90mr15013816wrv.629.1649435481124; 
+ Fri, 08 Apr 2022 09:31:21 -0700 (PDT)
+Received: from [10.32.181.87] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
+ by smtp.googlemail.com with ESMTPSA id
+ i13-20020a0560001acd00b002078e242847sm3133436wry.97.2022.04.08.09.31.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 08 Apr 2022 09:31:20 -0700 (PDT)
+Message-ID: <d28770af-f764-e5a2-1de6-e9d3bc8e27f1@redhat.com>
+Date: Fri, 8 Apr 2022 18:31:19 +0200
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, drjones@redhat.com,
- jingzhangos@google.com, oupton@google.com, reijiw@google.com, will@kernel.org,
- yuzhe@nfschina.com, james.morse@arm.com, suzuki.poulose@arm.com,
- alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.18, take #1
+To: Marc Zyngier <maz@kernel.org>
+References: <20220408150746.260017-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220408150746.260017-1-maz@kernel.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
 Cc: kernel-team@android.com, kvm@vger.kernel.org, Yu Zhe <yuzhe@nfschina.com>,
  Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -79,83 +102,24 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Paolo,
+On 4/8/22 17:07, Marc Zyngier wrote:
+> Hi Paolo,
+> 
+> Here's the first batches of fixes for 5.18 (most of it courtesy of
+> Oliver). The two important items here are a MMU rwlock fix when
+> splitting block mappings, and a debugfs registration issue resulting
+> in a potentially spectacular outcome.
 
-Here's the first batches of fixes for 5.18 (most of it courtesy of
-Oliver). The two important items here are a MMU rwlock fix when
-splitting block mappings, and a debugfs registration issue resulting
-in a potentially spectacular outcome.
+Pulled, thanks.  I am not sure I will be able to send it out before 
+Monday, though.
 
-Please pull,
+Paolo
 
-	M.
-
-The following changes since commit 3123109284176b1532874591f7c81f3837bbdc17:
-
-  Linux 5.18-rc1 (2022-04-03 14:08:21 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.18-1
-
-for you to fetch changes up to 21db83846683d3987666505a3ec38f367708199a:
-
-  selftests: KVM: Free the GIC FD when cleaning up in arch_timer (2022-04-07 08:46:13 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.18, take #1
-
-- Some PSCI fixes after introducing PSCIv1.1 and SYSTEM_RESET2
-
-- Fix the MMU write-lock not being taken on THP split
-
-- Fix mixed-width VM handling
-
-- Fix potential UAF when debugfs registration fails
-
-- Various selftest updates for all of the above
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      KVM: selftests: get-reg-list: Add KVM_REG_ARM_FW_REG(3)
-
-Oliver Upton (7):
-      KVM: arm64: Generally disallow SMC64 for AArch32 guests
-      KVM: arm64: Actually prevent SMC64 SYSTEM_RESET2 from AArch32
-      KVM: arm64: Drop unneeded minor version check from PSCI v1.x handler
-      KVM: arm64: Don't split hugepages outside of MMU write lock
-      KVM: Don't create VM debugfs files outside of the VM directory
-      selftests: KVM: Don't leak GIC FD across dirty log test iterations
-      selftests: KVM: Free the GIC FD when cleaning up in arch_timer
-
-Reiji Watanabe (2):
-      KVM: arm64: mixed-width check should be skipped for uninitialized vCPUs
-      KVM: arm64: selftests: Introduce vcpu_width_config
-
-Yu Zhe (1):
-      KVM: arm64: vgic: Remove unnecessary type castings
-
- arch/arm64/include/asm/kvm_emulate.h               |  27 +++--
- arch/arm64/include/asm/kvm_host.h                  |  10 ++
- arch/arm64/kvm/mmu.c                               |  11 +-
- arch/arm64/kvm/psci.c                              |  31 +++---
- arch/arm64/kvm/reset.c                             |  65 +++++++----
- arch/arm64/kvm/vgic/vgic-debug.c                   |  10 +-
- arch/arm64/kvm/vgic/vgic-its.c                     |   2 +-
- tools/testing/selftests/kvm/.gitignore             |   1 +
- tools/testing/selftests/kvm/Makefile               |   1 +
- tools/testing/selftests/kvm/aarch64/arch_timer.c   |  15 ++-
- tools/testing/selftests/kvm/aarch64/get-reg-list.c |  14 ++-
- .../selftests/kvm/aarch64/vcpu_width_config.c      | 122 +++++++++++++++++++++
- tools/testing/selftests/kvm/dirty_log_perf_test.c  |  34 +++++-
- virt/kvm/kvm_main.c                                |  10 +-
- 14 files changed, 285 insertions(+), 68 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/aarch64/vcpu_width_config.c
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
