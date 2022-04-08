@@ -2,95 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77FBFC433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Apr 2022 16:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 082F2C4332F
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Apr 2022 16:59:58 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6E484B1EF;
-	Fri,  8 Apr 2022 12:31:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A7574A0FD;
+	Fri,  8 Apr 2022 12:59:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Uz-Gao8jFT+L; Fri,  8 Apr 2022 12:31:26 -0400 (EDT)
+	with ESMTP id cDR-OGbvJv2W; Fri,  8 Apr 2022 12:59:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EA89F4B1CA;
-	Fri,  8 Apr 2022 12:31:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F2474B0EF;
+	Fri,  8 Apr 2022 12:59:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 16A024B1CA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 12:31:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3058249EC2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 12:59:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ciAOSuSIkI9m for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2022 12:31:24 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A2444B1C6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 12:31:24 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1649435483;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ezLScb0qdXlLkCxr8k3PZJ3/cAq1WRV512yu5EznY7Q=;
- b=OFu/AgnAEWAwchySWkEKtuQTooL7PJmguDAu6EJh03JTUoclVE31DvvdS25xbD+F/PnpLl
- ezM6hN4GLCj1LBHkBs1SnMNJrmrFAM8GhPYhKDWb95/sUD+SLqzeDb8ZxDhK0NBMbQteIa
- EahUTbtbuD88pau5IH1AxFzb+2duLH4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-651-qLrRTnRpPcmGaRrEQyVkNw-1; Fri, 08 Apr 2022 12:31:22 -0400
-X-MC-Unique: qLrRTnRpPcmGaRrEQyVkNw-1
-Received: by mail-wr1-f69.google.com with SMTP id
- q15-20020adfab0f000000b002060c75e65aso2373598wrc.5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2022 09:31:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=ezLScb0qdXlLkCxr8k3PZJ3/cAq1WRV512yu5EznY7Q=;
- b=Y2a+IMtpiGGJgPAdEMF2qt23SKJvdgsUBjsMlvoJ7Kn0PuOZbcllik5XtdL0LQRD6J
- ok4mAQI1jrSNz6ia30Qf4QvOfrI9Hyfis9eHNlFrs/2kdxGMbzQKVjGq1Wj4OeECusgQ
- noyThopqQr3F35H0YAHAWXDKCvOXs3dGql+SIPOlWuiaZYESgF6g5mD04aKwwGPRypIg
- Ps9wjXGbHkAqhe+u89NTygVpI+ZAbC8TEWIZgbMdECtXFV+BBX8jbgCB4qV7qmTskM7m
- Tm2YG14iP6YoiXm9x2uz4OkxD7S7D2hl5wypa0cwBc9ZQD7emkFOy4OzFb43Q5KkbxR3
- U/aQ==
-X-Gm-Message-State: AOAM530UDf24p1YKk51iywzkTHGYX/VZZiDEV5d3jGzq30IfNYHyqNjB
- MtpYRa8iQphsQVOuWc7MmQi7G5sfwMmngAHAMUDuSMCxwK25Hu/MITQpn5nHFdS9XzAe9OHkVuX
- J8luC9G39ke97iFW7aYAV3bi1
-X-Received: by 2002:a5d:548e:0:b0:206:cdc:ff90 with SMTP id
- h14-20020a5d548e000000b002060cdcff90mr15013836wrv.629.1649435481317; 
- Fri, 08 Apr 2022 09:31:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxCB5NscNj/iZkhXNq3pILYqo7/vfybBBnq7QfRmjpblGzXeWKUQmZgNePGg763G/vT+dXKDg==
-X-Received: by 2002:a5d:548e:0:b0:206:cdc:ff90 with SMTP id
- h14-20020a5d548e000000b002060cdcff90mr15013816wrv.629.1649435481124; 
- Fri, 08 Apr 2022 09:31:21 -0700 (PDT)
-Received: from [10.32.181.87] (nat-pool-mxp-t.redhat.com. [149.6.153.186])
- by smtp.googlemail.com with ESMTPSA id
- i13-20020a0560001acd00b002078e242847sm3133436wry.97.2022.04.08.09.31.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 08 Apr 2022 09:31:20 -0700 (PDT)
-Message-ID: <d28770af-f764-e5a2-1de6-e9d3bc8e27f1@redhat.com>
-Date: Fri, 8 Apr 2022 18:31:19 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.18, take #1
-To: Marc Zyngier <maz@kernel.org>
-References: <20220408150746.260017-1-maz@kernel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20220408150746.260017-1-maz@kernel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Language: en-US
-Cc: kernel-team@android.com, kvm@vger.kernel.org, Yu Zhe <yuzhe@nfschina.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id b0x2peNHVuI1 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2022 12:59:55 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E25B049EBE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 12:59:54 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id C8CEF62158;
+ Fri,  8 Apr 2022 16:59:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DA17C385A3;
+ Fri,  8 Apr 2022 16:59:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1649437193;
+ bh=hezvIR97K/d6etxHTUv4PJyXJtleS81JAhoNf2K+8hI=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=pJvyoIX8LUcDdClF6OFL1/JUuOZNt2xQp37DthOnlJeEXcZ56oLmJkFbQtZwerNyc
+ OhbWw6+aLK6oGjqw6b25PfyzLj/AER9VlLmiAM+LQ/5i8MhbiDdri4zZWMHRT70gZb
+ beYDmMBo+z6TAuKrplYTcbLyPGZ0hxlxcjjCAv4GZcfa7rmmNE0Tm8ScvVtZiDwK0/
+ HPUz15e3Z+HLPa200pCAwdmPKO8rqplGm8IR0Vt9Qf0SBL+hZjTlKybHoFqlK5ywtl
+ +h7sEDyDqpVv9V7oeXyMTXXtQf9LODvrgCG8l409Qh2jN/UJJskyutVqSOhdcpYZEt
+ bcpiteTImFr1A==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=billy-the-mountain.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1ncrxe-002pMe-Kb; Fri, 08 Apr 2022 17:59:50 +0100
+Date: Fri, 08 Apr 2022 17:59:42 +0100
+Message-ID: <87v8vj1pfl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall
+ bitmap firmware registers
+In-Reply-To: <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
+References: <20220407011605.1966778-1-rananta@google.com>
+ <20220407011605.1966778-3-rananta@google.com>
+ <87ilrlb6un.wl-maz@kernel.org>
+ <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ catalin.marinas@arm.com, will@kernel.org, pshier@google.com,
+ ricarkol@google.com, oupton@google.com, reijiw@google.com,
+ jingzhangos@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,24 +91,94 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 4/8/22 17:07, Marc Zyngier wrote:
-> Hi Paolo,
+On Thu, 07 Apr 2022 18:24:14 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Here's the first batches of fixes for 5.18 (most of it courtesy of
-> Oliver). The two important items here are a MMU rwlock fix when
-> splitting block mappings, and a debugfs registration issue resulting
-> in a potentially spectacular outcome.
+> Hi Marc,
+> 
+> > > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
+> >
+> > I'm really in two minds about this. Having one bit per service is easy
+> > from an implementation perspective, but is also means that this
+> > disallow fine grained control over which hypercalls are actually
+> > available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
+> > implements both, how does the selection mechanism works? You will
+> > need a version selector (a la PSCI), which defeats this API somehow
+> > (and renders the name of the #define invalid).
+> >
+> > I wonder if a more correct way to look at this is to enumerate the
+> > hypercalls themselves (all 5 of them), though coming up with an
+> > encoding is tricky (RNG32 and RNG64 would clash, for example).
+> >
+> > Thoughts?
+> >
+> I was on the fence about this too. The TRNG spec (ARM DEN 0098,
+> Table-4) mentions that v1.0 should have VERSION, FEATURES, GET_UUID,
+> and RND as mandatory features. Hence, if KVM advertised that it
+> supports TRNG v1.0, I thought it would be best to expose all or
+> nothing of v1.0 by guarding them with a single bit.
+> Broadly, the idea is to have a bit per version. If v1.1 comes along,
+> we can have another bit for that. If it's not too ugly to implement,
+> we can be a little more aggressive and ensure that userspace doesn't
+> enable v1.1 without enabling v1.0.
 
-Pulled, thanks.  I am not sure I will be able to send it out before 
-Monday, though.
+OK, that'd be assuming that we'll never see a service where version A
+is incompatible with version B and that we have to exclude one or the
+other. Meh. Let's cross that bridge once it is actually built.
 
-Paolo
+[...]
 
+> > > +     mutex_lock(&kvm->lock);
+> > > +
+> > > +     /*
+> > > +      * If the VM (any vCPU) has already started running, return success
+> > > +      * if there's no change in the value. Else, return -EBUSY.
+> >
+> > No, this should *always* fail if a vcpu has started. Otherwise, you
+> > start allowing hard to spot races.
+> >
+> The idea came from the fact that userspace could spawn multiple
+> threads to configure the vCPU registers. Since we don't have the
+> VM-scoped registers yet, it may be possible that userspace has issued
+> a KVM_RUN on one of the vCPU, while the others are lagging behind and
+> still configuring the registers. The slower threads may see -EBUSY and
+> could panic. But if you feel that it's an overkill and the userspace
+> should deal with it, we can return EBUSY for all writes after KVM_RUN.
+
+I'd rather have that. There already is stuff that rely on things not
+changing once a vcpu has run, so I'd rather be consistent.
+
+>
+> > > +      */
+> > > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
+> > > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
+> > > +             goto out;
+> > > +     }
+> > > +
+> > > +     WRITE_ONCE(*fw_reg_bmap, val);
+> >
+> > I'm not sure what this WRITE_ONCE guards against. Do you expect
+> > concurrent reads at this stage?
+> >
+> Again, the assumption here is that userspace could have multiple
+> threads reading and writing to these registers. Without the VM scoped
+> registers in place, we may end up with a read/write to the same memory
+> location for all the vCPUs.
+
+We only have one vcpu updating this at any given time (that's what the
+lock ensures). A simple write should be OK, as far as I can tell.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
