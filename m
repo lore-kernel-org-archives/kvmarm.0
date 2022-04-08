@@ -2,77 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31600C433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  8 Apr 2022 17:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A2CC433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  8 Apr 2022 20:04:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93BCA4B1BF;
-	Fri,  8 Apr 2022 13:34:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5D3F400CF;
+	Fri,  8 Apr 2022 16:03:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4afGXDPqsyn2; Fri,  8 Apr 2022 13:34:55 -0400 (EDT)
+	with ESMTP id HSe+TNTVuaPq; Fri,  8 Apr 2022 16:03:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 507994B130;
-	Fri,  8 Apr 2022 13:34:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 920EF4B1D8;
+	Fri,  8 Apr 2022 16:03:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D72949B0A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 13:34:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A9E34B1D8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 16:03:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MLIEPBP1ky-K for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2022 13:34:53 -0400 (EDT)
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com
- [209.85.219.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D07AD41021
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 13:34:53 -0400 (EDT)
-Received: by mail-yb1-f176.google.com with SMTP id l36so16284765ybj.12
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2022 10:34:53 -0700 (PDT)
+ with ESMTP id vaRMAaH5+1Ny for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2022 16:03:55 -0400 (EDT)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7BA64B1D5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 16:03:55 -0400 (EDT)
+Received: by mail-pj1-f73.google.com with SMTP id
+ l2-20020a17090ad10200b001ca56de815aso5872768pju.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2022 13:03:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Jd42eljeoA7am6iun/EUSb1/8DBUsy7OfKLkpCfQnwI=;
- b=LCmXkljF/PTt+d5imunqFnne5A0MjGLtTl1xSjGaE0A5FsH+fLknxoJFEWyEWwjgnO
- /4HSeVhdLNK52NjIYtcP/h0qXSOrEpVM1ysII5gkbbxdG8ideLw0TrAkHoOBPZHeXKus
- pR1pnrTNIOXO7xPIapV0Hfy2GnHgaRnrhr/wMG1hReEJkvPiChzVc9gzgb7Puz3MRNQm
- 3Cjzu8TaYow5v5QZ/JnvRso6K2M3Uxvgb0yEdEGOV2jEYUdG0tmFsttOJKlVR4P9HgrQ
- cCZz469HW8rEd5ZXwyQ0P7kgBAUurURAbHxE4ZXbZ9yCYeBKNtze6BsUx4OieqJLGnX4
- 8p0Q==
+ h=date:message-id:mime-version:subject:from:cc;
+ bh=uL4T8x7PjGlhNU0AUZ082p/RK2qsDuZaw90ql6pSgAk=;
+ b=OVGsPQrYXwHuNe31ITOhye0y5tdZdj03XTVkCx5cOcyhrwhRfEDyKUSS1JIVjLaN/o
+ XqeiY7Ly5Fd4YffB7xzCjxD+MsinUrXhkz1IX7fbJ7YF7DZo8EhlMIDvzWl16oEAi5Tg
+ 5GF7VQRqe3GCtryeQKKxcwfbA5cFkUyRL2b2TauXhZGh+Gkt1Q31YZXFgd0l9bDLJMaQ
+ /SPTq1Zz+YJuAWJM4LZCaf65GbiCLYw4hygxl3QvtvGA7UUcsg5mrpvZYjihEgGjWbPC
+ qUbD6DyMRsBchsR35e+T7yn5MH9/TED3jrkIjqCb4v/veg9ZrDip6Ui6iUFahq+zA8X9
+ 8s2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Jd42eljeoA7am6iun/EUSb1/8DBUsy7OfKLkpCfQnwI=;
- b=HZR9efcDHPCJWnhQsFEnuJZzFwDVJYIqShMBpYtrHiowCOK00Y5C5MVvvIg37lilPj
- 49grB+flkOjj2xYxeyyiTXplyGLZBxA79TvIfdMAxYJ/8U737R5eN0AiKUzNwR/6gelf
- Fu3WJZyxV/IQaIgamlUbmX9ySCd1UjJNVlGz6j80tYNajpefsaEheLkwH31YALISIIXX
- hQrh4LeD3ZihK/qWtaM+tBKa/JvbES2PmHi/vt5sRRWTAOf7Wuc8HHBej72t1T4utqOt
- d9wPcatl/osO9/FNCyFV54xMU0Rb3Ysb8dpmmOQA+k1SITB6z9f1ZQsyJ2LnWrzt8Qlh
- krVg==
-X-Gm-Message-State: AOAM533QQhUwo+24H6+6J0gLAx9y/yOT6L4iWhj69SsjDhKZ8aI8oBdg
- X55mlQZWkWUtEYdtTeXYMZwK58eKkit55gQB1py+0A==
-X-Google-Smtp-Source: ABdhPJyJF/Vu21u1Ybk49qtraB/Ha/OoaBBpU4AzP6a6DQvrKFHEfKt9PFNVhB8Y0En5o6Xn94X9VMasp0/Xh92pKhg=
-X-Received: by 2002:a25:dfc4:0:b0:63d:b28e:93ec with SMTP id
- w187-20020a25dfc4000000b0063db28e93ecmr15429921ybg.474.1649439293125; Fri, 08
- Apr 2022 10:34:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220407011605.1966778-1-rananta@google.com>
- <20220407011605.1966778-3-rananta@google.com>
- <87ilrlb6un.wl-maz@kernel.org>
- <CAJHc60yFD=osoifUpB4LBNo93eVq9zNV41bnu7uBZ0HsBGbMeA@mail.gmail.com>
- <87v8vj1pfl.wl-maz@kernel.org>
-In-Reply-To: <87v8vj1pfl.wl-maz@kernel.org>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Fri, 8 Apr 2022 10:34:42 -0700
-Message-ID: <CAJHc60wwXyC=cgpBHf4XXcpvuN=+HW2hjiOX+NidQ2euRHb-qg@mail.gmail.com>
-Subject: Re: [PATCH v5 02/10] KVM: arm64: Setup a framework for hypercall
- bitmap firmware registers
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:cc;
+ bh=uL4T8x7PjGlhNU0AUZ082p/RK2qsDuZaw90ql6pSgAk=;
+ b=LUTR+NBf8lEUBsnXhnpsySjceRBh02/kD+m5noWAhu28dZseG6kr+p5E5++h5ESNPp
+ nZuznU7rHxbwmgtUmlBl0T5mXmDYfMzHYLMcaPsZgTHi9gyam5ZlE76bWWe9XVfax4EX
+ YePxVIQbezC8HxKxB8XYMfzlUeGtM9YbHpQA/eL1RFbIAFn6qB9qtIuzYRsHdcJUBces
+ 56RR9eWcck/LVsbGmepcEOt4rLEfiQMDK6n4okbccT8UEN494Vz7cxsnmNAw2lR9umVa
+ P/ummQtoD0OyBMPUEJRO9OhdlY69MjUP2L1TyLjcE24vSKpLSFAOCwc0D3lpGqNyCx+r
+ /SdQ==
+X-Gm-Message-State: AOAM530m9P2U9Hq4j1WlOD+61dg5E8vehUCtwmAHGXE7oIydVw12Cxb5
+ qeXQPFnvijEf7lxmW3aCEeNjcZc36DPesaZnsg==
+X-Google-Smtp-Source: ABdhPJyiunI3puMJj1X39Qi2X/Kl8I3Sm0IuMT8hRzbT/V7JmfxVLYcFkeHruDPMJTX5Vy4HLKMcgBC/SSaYRfJ+Bg==
+X-Received: from kaleshsingh.mtv.corp.google.com
+ ([2620:15c:211:200:f0ed:c8a:dab7:ecc2])
+ (user=kaleshsingh job=sendgmr) by 2002:a17:903:216:b0:156:1e8d:a81 with SMTP
+ id r22-20020a170903021600b001561e8d0a81mr20473765plh.140.1649448234615; Fri,
+ 08 Apr 2022 13:03:54 -0700 (PDT)
+Date: Fri,  8 Apr 2022 13:03:23 -0700
+Message-Id: <20220408200349.1529080-1-kaleshsingh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.1178.g4f1659d476-goog
+Subject: [PATCH v7 0/6] KVM: arm64: Hypervisor stack enhancements
+From: Kalesh Singh <kaleshsingh@google.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, Andrew Walbran <qwandor@google.com>,
+ maz@kernel.org, Masahiro Yamada <masahiroy@kernel.org>,
+ kernel-team@android.com, surenb@google.com,
+ linux-arm-kernel@lists.infradead.org,
+ Nick Desaulniers <ndesaulniers@google.com>, linux-kernel@vger.kernel.org,
+ Changbin Du <changbin.du@intel.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,100 +87,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Apr 8, 2022 at 9:59 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Thu, 07 Apr 2022 18:24:14 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > Hi Marc,
-> >
-> > > > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
-> > >
-> > > I'm really in two minds about this. Having one bit per service is easy
-> > > from an implementation perspective, but is also means that this
-> > > disallow fine grained control over which hypercalls are actually
-> > > available. If tomorrow TRNG 1.1 adds a new hypercall and that KVM
-> > > implements both, how does the selection mechanism works? You will
-> > > need a version selector (a la PSCI), which defeats this API somehow
-> > > (and renders the name of the #define invalid).
-> > >
-> > > I wonder if a more correct way to look at this is to enumerate the
-> > > hypercalls themselves (all 5 of them), though coming up with an
-> > > encoding is tricky (RNG32 and RNG64 would clash, for example).
-> > >
-> > > Thoughts?
-> > >
-> > I was on the fence about this too. The TRNG spec (ARM DEN 0098,
-> > Table-4) mentions that v1.0 should have VERSION, FEATURES, GET_UUID,
-> > and RND as mandatory features. Hence, if KVM advertised that it
-> > supports TRNG v1.0, I thought it would be best to expose all or
-> > nothing of v1.0 by guarding them with a single bit.
-> > Broadly, the idea is to have a bit per version. If v1.1 comes along,
-> > we can have another bit for that. If it's not too ugly to implement,
-> > we can be a little more aggressive and ensure that userspace doesn't
-> > enable v1.1 without enabling v1.0.
->
-> OK, that'd be assuming that we'll never see a service where version A
-> is incompatible with version B and that we have to exclude one or the
-> other. Meh. Let's cross that bridge once it is actually built.
->
-> [...]
->
-> > > > +     mutex_lock(&kvm->lock);
-> > > > +
-> > > > +     /*
-> > > > +      * If the VM (any vCPU) has already started running, return success
-> > > > +      * if there's no change in the value. Else, return -EBUSY.
-> > >
-> > > No, this should *always* fail if a vcpu has started. Otherwise, you
-> > > start allowing hard to spot races.
-> > >
-> > The idea came from the fact that userspace could spawn multiple
-> > threads to configure the vCPU registers. Since we don't have the
-> > VM-scoped registers yet, it may be possible that userspace has issued
-> > a KVM_RUN on one of the vCPU, while the others are lagging behind and
-> > still configuring the registers. The slower threads may see -EBUSY and
-> > could panic. But if you feel that it's an overkill and the userspace
-> > should deal with it, we can return EBUSY for all writes after KVM_RUN.
->
-> I'd rather have that. There already is stuff that rely on things not
-> changing once a vcpu has run, so I'd rather be consistent.
->
-Sure, I'll return EBUSY if the VM has started regardless of the incoming value.
-> >
-> > > > +      */
-> > > > +     if (test_bit(KVM_ARCH_FLAG_HAS_RAN_ONCE, &kvm->arch.flags)) {
-> > > > +             ret = *fw_reg_bmap != val ? -EBUSY : 0;
-> > > > +             goto out;
-> > > > +     }
-> > > > +
-> > > > +     WRITE_ONCE(*fw_reg_bmap, val);
-> > >
-> > > I'm not sure what this WRITE_ONCE guards against. Do you expect
-> > > concurrent reads at this stage?
-> > >
-> > Again, the assumption here is that userspace could have multiple
-> > threads reading and writing to these registers. Without the VM scoped
-> > registers in place, we may end up with a read/write to the same memory
-> > location for all the vCPUs.
->
-> We only have one vcpu updating this at any given time (that's what the
-> lock ensures). A simple write should be OK, as far as I can tell.
->
-I agree that a write against another write should be fine without the
-WRITE_ONCE. But my little concern was this write against a read
-(unsure how userspace accesses these registers). I'm guessing it
-shouldn't hurt to keep them in place, no? :)
+Hi all,
 
-Regards,
-Raghavendra
+This is v7 of the nVHE hypervisor stack enhancements. This version is based
+on 5.18-rc1 and drops the hypervisor stack unwinding and overflow-stack
+patches. These require further discussion and will be resent separately.
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Previous versions can be found at: 
+v6: https://lore.kernel.org/r/20220314200148.2695206-1-kaleshsingh@google.com/
+v5: https://lore.kernel.org/r/20220307184935.1704614-1-kaleshsingh@google.com/
+v4: https://lore.kernel.org/r/20220225033548.1912117-1-kaleshsingh@google.com/
+v3: https://lore.kernel.org/r/20220224051439.640768-1-kaleshsingh@google.com/
+v2: https://lore.kernel.org/r/20220222165212.2005066-1-kaleshsingh@google.com/
+v1: https://lore.kernel.org/r/20220210224220.4076151-1-kaleshsingh@google.com/
+
+Thanks,
+Kalesh
+
+-----
+
+This series is based on 5.18-rc1 and adds stack guard pages to nVHE and pKVM
+hypervisor; and symbolization of hypervisor addresses.
+
+The guard page stack overflow detection is based on the technique used by
+arm64 VMAP_STACK. i.e. the stack is aligned such that the 'stack shift' bit 
+of any valid SP is 1. The 'stack shift' bit can be tested in the exception
+entry to detect overflow without corrupting GPRs.
+
+Kalesh Singh (6):
+  KVM: arm64: Introduce hyp_alloc_private_va_range()
+  KVM: arm64: Introduce pkvm_alloc_private_va_range()
+  KVM: arm64: Add guard pages for KVM nVHE hypervisor stack
+  KVM: arm64: Add guard pages for pKVM (protected nVHE) hypervisor stack
+  KVM: arm64: Detect and handle hypervisor stack overflows
+  KVM: arm64: Symbolize the nVHE HYP addresses
+
+ arch/arm64/include/asm/kvm_asm.h     |  1 +
+ arch/arm64/include/asm/kvm_mmu.h     |  4 ++
+ arch/arm64/kvm/arm.c                 | 39 ++++++++++++--
+ arch/arm64/kvm/handle_exit.c         | 13 ++---
+ arch/arm64/kvm/hyp/include/nvhe/mm.h |  6 ++-
+ arch/arm64/kvm/hyp/nvhe/host.S       | 24 +++++++++
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c   | 18 ++++++-
+ arch/arm64/kvm/hyp/nvhe/mm.c         | 78 ++++++++++++++++++----------
+ arch/arm64/kvm/hyp/nvhe/setup.c      | 31 +++++++++--
+ arch/arm64/kvm/hyp/nvhe/switch.c     |  7 ++-
+ arch/arm64/kvm/mmu.c                 | 70 ++++++++++++++++---------
+ scripts/kallsyms.c                   |  2 +-
+ 12 files changed, 223 insertions(+), 70 deletions(-)
+
+
+base-commit: 3123109284176b1532874591f7c81f3837bbdc17
+-- 
+2.35.1.1178.g4f1659d476-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
