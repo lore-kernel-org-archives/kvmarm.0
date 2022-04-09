@@ -2,78 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDA5C433FE
-	for <kvmarm@archiver.kernel.org>; Sat,  9 Apr 2022 00:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A526C433EF
+	for <kvmarm@archiver.kernel.org>; Sat,  9 Apr 2022 00:40:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CD7141071;
-	Fri,  8 Apr 2022 20:02:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B92164B1D0;
+	Fri,  8 Apr 2022 20:40:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ji8ysKzhc-0W; Fri,  8 Apr 2022 20:02:34 -0400 (EDT)
+	with ESMTP id ap3DwQ4KnGoh; Fri,  8 Apr 2022 20:40:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E24E949EED;
-	Fri,  8 Apr 2022 20:02:34 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81D7E4B1E0;
+	Fri,  8 Apr 2022 20:40:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A247412AF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 20:02:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55D9E4B1A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 20:40:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X6wdcGkSw7aW for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2022 20:02:32 -0400 (EDT)
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com
- [209.85.215.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A5BB141071
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 20:02:32 -0400 (EDT)
-Received: by mail-pg1-f174.google.com with SMTP id c2so9066364pga.10
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2022 17:02:32 -0700 (PDT)
+ with ESMTP id T38FZ4Oc1fDR for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2022 20:40:01 -0400 (EDT)
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com
+ [209.85.210.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 465324B1A0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2022 20:40:01 -0400 (EDT)
+Received: by mail-pf1-f171.google.com with SMTP id bo5so9832786pfb.4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2022 17:40:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to;
- bh=e2UFjk4BMnk+zP4UK0Oe7cRWvUTvvv2vQZFG2iTsfwM=;
- b=mdX7iP5bZ0QKDVpxEfl6JaRv0SNJilcGM7Go8YYeEz4gRMixSlW3qkCfkPK79y6RlU
- 7/F17ratHj7AGZmESWeAsvGLabxpVpOu8N2tikaIOw7/UAqJv+g+iG30qnes71/NujAQ
- 2zz/5YDsD9xVfIKxApF2cVw8CAb0LCjXj33B5MetmlMhp5ZSZSLnwuW8PIsjywbaqicX
- Rlo7KwTT7w36OlXkiyh4WBwIjEEgEopDHnOLsTV9NwPjmYV2cZXzlD/ilmsX/IHdjQmw
- 3gV/E7Z8D+MjQVn04swpk/fD42Z0WN0IvoNmshVAofDlSGfpwESdiI3owTY0tkT8NFLA
- G0YQ==
+ :content-disposition:in-reply-to;
+ bh=VZz44nmQ769NskmU1+rSj1kgQ7eEgmL84RyrglKPKlU=;
+ b=hDG6N87X2mOxxCOCXXKUWOcaI826FpS5EoPhQJZu2dORSprAcsRFAElLaAchgm9JOc
+ 6aWNWoTK0riqGAg5yhneIUYXDrCc+fGj3H7kK7mXEHIlpTFzEJW/uo/BmtZGNeswC4nd
+ PbmESxnPTnEseYvaH22WEqAMzyjNqP7va9Cy/08YzQ+8Zp7oRhZV7H2uOAWtwOJwR64j
+ C1XpU2RhBAmDNFKLPpLhftnPQdVrdTUUBk5NAt0Csjzufq0YZ246p/rCAHmwpT6hnZDF
+ gCIIkrVBCCM0ekFXDZVmyYk5Ax0gSZAvTp7mqghQynS+ToMez9bXma7soou9cwqLW7g0
+ 3GkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=e2UFjk4BMnk+zP4UK0Oe7cRWvUTvvv2vQZFG2iTsfwM=;
- b=aWJqQ+zVhgjYENVniKVdQpBZkt8ReSQiBXT64knRb6/EssKFR1fqhT7m5rNOWfx453
- tILMHSVdCShLkVizyqeYLRfaUuWBvvL32P4dued1rfYTQB/bALrC9Z6XQLB0r1YBvKkD
- W0uuiaMSv4hA92vMXzHy4y7CU0mOdqUhiYXDpNjxn1LQZm5tCjCzH4nqg/94sAwN6yow
- 8ZyC+hGg0DmeIYsAmetRdvNukg6ywnyOEV/VzNDwKpnVtNq/20rMIdTz9w5xTSkbFF5M
- rPWa5poi1e/sJKEbXOT3R/qzOZ29p59SQAf7qjVdl4f4D+7SxW4fSEOaVHgu8ZD529UY
- ckEQ==
-X-Gm-Message-State: AOAM530GoOJqH/jAHIHNkdREXT4OzSoJ7HizEKiSYGmV2dmEMOwoliOI
- svsLP4g1Ff9AjYBAZKoBECH1Hw==
-X-Google-Smtp-Source: ABdhPJz2NQbeCFpFKvK/llHsQ85xKlEatkwNAY/T4PMI36jEC0CY8gsBFafanPSUhYPrIUBR0RTv+g==
-X-Received: by 2002:a05:6a00:1a10:b0:4fa:ed5a:6697 with SMTP id
- g16-20020a056a001a1000b004faed5a6697mr22026865pfv.81.1649462551487; 
- Fri, 08 Apr 2022 17:02:31 -0700 (PDT)
+ :mime-version:content-disposition:in-reply-to;
+ bh=VZz44nmQ769NskmU1+rSj1kgQ7eEgmL84RyrglKPKlU=;
+ b=a/Pq/ZgJEep0CRdoSoAI604+GUFDnxX0qAx6c9tF8GCNSLn8AxedId7jTGL+W3S03Q
+ RzLtSv20RSFo62e2iZIzfbqKrD/lXU/Tq/lsEIj7B14yjV/9mqnq+yEbLW+KvBzJTkkl
+ 0LKAirIgWH4x5wKvLZU1y+d/ErhCjyvk873hJ/tbXwk02iq7j2a6ltCybcILOD22vYKg
+ qVB1sgqjrBE1loQq2jkBOpSvwOIxc0ItSI+jUOnnJy1zvSrDLY7ppNuQVGN3yozSc7f3
+ BGZJcxJByxAsK3okvDKpQLqayQJ31vQ025B0yA5bVNC5TrzWFnq2CxTMFbRaXrXWPllm
+ lqtw==
+X-Gm-Message-State: AOAM5329TB02yOtVlUudlQ2tvDo8d5gcbDIf/C6Kk88VwIfFdPSN/9e0
+ sO4TchWV1+ukNK4WJlzYvKQmgA==
+X-Google-Smtp-Source: ABdhPJy9qpY4+K63QvK5VhUfvYFRHJk9uYqLUbpgv47CS1Vcvf2kVPQru+XKAuYVywEBn/XAV7z39w==
+X-Received: by 2002:a63:5520:0:b0:399:8cd:5f62 with SMTP id
+ j32-20020a635520000000b0039908cd5f62mr17547409pgb.12.1649464800133; 
+ Fri, 08 Apr 2022 17:40:00 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
- v4-20020a622f04000000b005057a24d478sm3641759pfv.121.2022.04.08.17.02.30
+ m8-20020a056a00080800b004faa4e113bfsm28586836pfk.154.2022.04.08.17.39.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 Apr 2022 17:02:30 -0700 (PDT)
-Date: Sat, 9 Apr 2022 00:02:27 +0000
+ Fri, 08 Apr 2022 17:39:59 -0700 (PDT)
+Date: Sat, 9 Apr 2022 00:39:55 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v3 16/23] KVM: x86/mmu: Cache the access bits of shadowed
- translations
-Message-ID: <YlDNE55k9DNf/v2+@google.com>
+Subject: Re: [PATCH v3 22/23] KVM: x86/mmu: Support Eager Page Splitting in
+ the shadow MMU
+Message-ID: <YlDV27ediz+rBuLd@google.com>
 References: <20220401175554.1931568-1-dmatlack@google.com>
- <20220401175554.1931568-17-dmatlack@google.com>
+ <20220401175554.1931568-23-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220401175554.1931568-17-dmatlack@google.com>
+In-Reply-To: <20220401175554.1931568-23-dmatlack@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
  <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -98,133 +97,72 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gRnJpLCBBcHIgMDEsIDIwMjIsIERhdmlkIE1hdGxhY2sgd3JvdGU6Cj4gQEAgLTczMyw3ICs3
-MzMsNyBAQCBzdGF0aWMgdm9pZCBtbXVfZnJlZV9wdGVfbGlzdF9kZXNjKHN0cnVjdCBwdGVfbGlz
-dF9kZXNjICpwdGVfbGlzdF9kZXNjKQo+ICBzdGF0aWMgZ2ZuX3Qga3ZtX21tdV9wYWdlX2dldF9n
-Zm4oc3RydWN0IGt2bV9tbXVfcGFnZSAqc3AsIGludCBpbmRleCkKPiAgewo+ICAJaWYgKCFzcC0+
-cm9sZS5kaXJlY3QpCj4gLQkJcmV0dXJuIHNwLT5nZm5zW2luZGV4XTsKPiArCQlyZXR1cm4gc3At
-PnNoYWRvd2VkX3RyYW5zbGF0aW9uW2luZGV4XS5nZm47Cj4gIAo+ICAJcmV0dXJuIHNwLT5nZm4g
-KyAoaW5kZXggPDwgKChzcC0+cm9sZS5sZXZlbCAtIDEpICogUFQ2NF9MRVZFTF9CSVRTKSk7Cj4g
-IH0KPiBAQCAtNzQxLDcgKzc0MSw3IEBAIHN0YXRpYyBnZm5fdCBrdm1fbW11X3BhZ2VfZ2V0X2dm
-bihzdHJ1Y3Qga3ZtX21tdV9wYWdlICpzcCwgaW50IGluZGV4KQo+ICBzdGF0aWMgdm9pZCBrdm1f
-bW11X3BhZ2Vfc2V0X2dmbihzdHJ1Y3Qga3ZtX21tdV9wYWdlICpzcCwgaW50IGluZGV4LCBnZm5f
-dCBnZm4pCgpUaGlzIHNob3VsZCBiZSByZXBsYWNlZCB3aXRoIGEgc2luZ2xlIGhlbHBlciB0byBz
-ZXQgdGhlIGdmbithY2Nlc3MuICBVbmRlciBubwpjaXJjdW1zdGFuY2Ugc2hvdWxkIF9qdXN0XyB0
-aGUgZ2ZuIGNoYW5nZSwgYW5kIHRoYXQgd2lsbCBhbGxvdyB1cyB0byBvcHRpbWl6ZQp3cml0aW5n
-IHRoZSBlbnRyeS4gIE1vcmUgYmVsb3cuCgo+ICB7Cj4gIAlpZiAoIXNwLT5yb2xlLmRpcmVjdCkg
-ewo+IC0JCXNwLT5nZm5zW2luZGV4XSA9IGdmbjsKPiArCQlzcC0+c2hhZG93ZWRfdHJhbnNsYXRp
-b25baW5kZXhdLmdmbiA9IGdmbjsKPiAgCQlyZXR1cm47Cj4gIAl9Cj4gIAo+IEBAIC03NTIsNiAr
-NzUyLDQ3IEBAIHN0YXRpYyB2b2lkIGt2bV9tbXVfcGFnZV9zZXRfZ2ZuKHN0cnVjdCBrdm1fbW11
-X3BhZ2UgKnNwLCBpbnQgaW5kZXgsIGdmbl90IGdmbikKPiAgCQkJCSAgIGt2bV9tbXVfcGFnZV9n
-ZXRfZ2ZuKHNwLCBpbmRleCksIGdmbik7Cj4gIH0KPiAgCj4gK3N0YXRpYyB2b2lkIGt2bV9tbXVf
-cGFnZV9zZXRfYWNjZXNzKHN0cnVjdCBrdm1fbW11X3BhZ2UgKnNwLCBpbnQgaW5kZXgsIHUzMiBh
-Y2Nlc3MpCj4gK3sKPiArCWlmICghc3AtPnJvbGUuZGlyZWN0KSB7Cj4gKwkJc3AtPnNoYWRvd2Vk
-X3RyYW5zbGF0aW9uW2luZGV4XS5hY2Nlc3MgPSBhY2Nlc3M7Cj4gKwkJcmV0dXJuOwo+ICsJfQo+
-ICsKPiArCWlmIChXQVJOX09OKGFjY2VzcyAhPSBzcC0+cm9sZS5hY2Nlc3MpKQo+ICsJCXByX2Vy
-cl9yYXRlbGltaXRlZCgiYWNjZXNzIG1pc21hdGNoIHVuZGVyIGRpcmVjdCBwYWdlICVsbHggIgoK
-TE9MLCBJIHJlYWxpemUgdGhpcyBpcyBub3QgeW91ciBjb2RlLCBidXQgcmF0ZWxpbWl0aW5nIHVu
-ZGVyIGEgV0FSTiBhaW4ndCBnb25uYQpoZWxwIG11Y2ggOi0pCgpUaGlzIGFsc28gZ2VuZXJhdGVz
-IGEgd2FybmluZyBhbmQgZmFpbHMgdG8gY29tcGlsZSB3aXRoIEtWTV9XRVJST1I9eSwgdGhvdWdo
-IEkKYmVsaWV2ZSB0aGUgdGVzdCBib3RzIGFscmVhZHkgcmVwb3J0ZWQgdGhhdC4KCgphcmNoL3g4
-Ni9rdm0vbW11L21tdS5jOiBJbiBmdW5jdGlvbiDigJhrdm1fbW11X3BhZ2Vfc2V0X2FjY2Vzc+KA
-mToKaW5jbHVkZS9saW51eC9rZXJuX2xldmVscy5oOjU6MjU6IGVycm9yOiBmb3JtYXQg4oCYJWxs
-eOKAmSBleHBlY3RzIGFyZ3VtZW50IG9mIHR5cGUg4oCYbG9uZyBsb25nIHVuc2lnbmVkIGludOKA
-mSwgYnV0IGFyZ3VtZW50IDMgaGFzIHR5cGUg4oCYaW504oCZIFstV2Vycm9yPWZvcm1hdD1dCiAg
-ICA1IHwgI2RlZmluZSBLRVJOX1NPSCAgICAgICAgIlwwMDEiICAgICAgICAgIC8qIEFTQ0lJIFN0
-YXJ0IE9mIEhlYWRlciAqLwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fgpp
-bmNsdWRlL2xpbnV4L3ByaW50ay5oOjQxODoyNTogbm90ZTogaW4gZGVmaW5pdGlvbiBvZiBtYWNy
-byDigJhwcmludGtfaW5kZXhfd3JhcOKAmQogIDQxOCB8ICAgICAgICAgICAgICAgICBfcF9mdW5j
-KF9mbXQsICMjX19WQV9BUkdTX18pOyAgICAgICAgICAgICAgICAgICAgICAgICAgIFwKICAgICAg
-fCAgICAgICAgICAgICAgICAgICAgICAgICBefn5+CmluY2x1ZGUvbGludXgvcHJpbnRrLmg6NjQw
-OjE3OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8g4oCYcHJpbnRr4oCZCiAgNjQwIHwgICAg
-ICAgICAgICAgICAgIHByaW50ayhmbXQsICMjX19WQV9BUkdTX18pOyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgXAogICAgICB8ICAgICAgICAgICAgICAgICBefn5+fn4KaW5jbHVkZS9saW51
-eC9wcmludGsuaDo2NTQ6OTogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvIOKAmHByaW50a19y
-YXRlbGltaXRlZOKAmQogIDY1NCB8ICAgICAgICAgcHJpbnRrX3JhdGVsaW1pdGVkKEtFUk5fRVJS
-IHByX2ZtdChmbXQpLCAjI19fVkFfQVJHU19fKQogICAgICB8ICAgICAgICAgXn5+fn5+fn5+fn5+
-fn5+fn5+CmluY2x1ZGUvbGludXgva2Vybl9sZXZlbHMuaDoxMToyNTogbm90ZTogaW4gZXhwYW5z
-aW9uIG9mIG1hY3JvIOKAmEtFUk5fU09I4oCZCiAgIDExIHwgI2RlZmluZSBLRVJOX0VSUiAgICAg
-ICAgS0VSTl9TT0ggIjMiICAgIC8qIGVycm9yIGNvbmRpdGlvbnMgKi8KICAgICAgfCAgICAgICAg
-ICAgICAgICAgICAgICAgICBefn5+fn5+fgppbmNsdWRlL2xpbnV4L3ByaW50ay5oOjY1NDoyODog
-bm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvIOKAmEtFUk5fRVJS4oCZCiAgNjU0IHwgICAgICAg
-ICBwcmludGtfcmF0ZWxpbWl0ZWQoS0VSTl9FUlIgcHJfZm10KGZtdCksICMjX19WQV9BUkdTX18p
-CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn4KYXJjaC94ODYva3Zt
-L21tdS9tbXUuYzo3NjM6MTc6IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyDigJhwcl9lcnJf
-cmF0ZWxpbWl0ZWTigJkKICA3NjMgfCAgICAgICAgICAgICAgICAgcHJfZXJyX3JhdGVsaW1pdGVk
-KCJhY2Nlc3MgbWlzbWF0Y2ggdW5kZXIgZGlyZWN0IHBhZ2UgJWxseCAiCiAgICAgIHwgICAgICAg
-ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fgoKCj4gKwkJCQkgICAiKGV4cGVjdGVkICVsbHgs
-IGdvdCAlbGx4KVxuIiwKPiArCQkJCSAgIGt2bV9tbXVfcGFnZV9nZXRfZ2ZuKHNwLCBpbmRleCks
-Cj4gKwkJCQkgICBzcC0+cm9sZS5hY2Nlc3MsIGFjY2Vzcyk7Cj4gK30KPiArCj4gKy8qCj4gKyAq
-IEZvciBsZWFmIFNQVEVzLCBmZXRjaCB0aGUgKmd1ZXN0KiBhY2Nlc3MgcGVybWlzc2lvbnMgYmVp
-bmcgc2hhZG93ZWQuIE5vdGUKPiArICogdGhhdCB0aGUgU1BURSBpdHNlbGYgbWF5IGhhdmUgYSBt
-b3JlIGNvbnN0cmFpbmVkIGFjY2VzcyBwZXJtaXNzaW9ucyB0aGF0Cj4gKyAqIHdoYXQgdGhlIGd1
-ZXN0IGVuZm9yY2VzLiBGb3IgZXhhbXBsZSwgYSBndWVzdCBtYXkgY3JlYXRlIGFuIGV4ZWN1dGFi
-bGUKPiArICogaHVnZSBQVEUgYnV0IEtWTSBtYXkgZGlzYWxsb3cgZXhlY3V0aW9uIHRvIG1pdGln
-YXRlIGlUTEIgbXVsdGloaXQuCj4gKyAqLwo+ICtzdGF0aWMgdTMyIGt2bV9tbXVfcGFnZV9nZXRf
-YWNjZXNzKHN0cnVjdCBrdm1fbW11X3BhZ2UgKnNwLCBpbnQgaW5kZXgpCj4gK3sKPiArCWlmICgh
-c3AtPnJvbGUuZGlyZWN0KQo+ICsJCXJldHVybiBzcC0+c2hhZG93ZWRfdHJhbnNsYXRpb25baW5k
-ZXhdLmFjY2VzczsKPiArCj4gKwkvKgo+ICsJICogRm9yIGRpcmVjdCBNTVVzIChlLmcuIFREUCBv
-ciBub24tcGFnaW5nIGd1ZXN0cykgdGhlcmUgYXJlIG5vICpndWVzdCoKPiArCSAqIGFjY2VzcyBw
-ZXJtaXNzaW9ucyBiZWluZyBzaGFkb3dlZC4gU28gd2UgY2FuIGp1c3QgcmV0dXJuIEFDQ19BTEwK
-PiArCSAqIGhlcmUuCj4gKwkgKgo+ICsJICogRm9yIGluZGlyZWN0IE1NVXMgKHNoYWRvdyBwYWdp
-bmcpLCBkaXJlY3Qgc2hhZG93IHBhZ2VzIGV4aXN0IHdoZW4gS1ZNCj4gKwkgKiBpcyBzaGFkb3dp
-bmcgYSBndWVzdCBodWdlIHBhZ2Ugd2l0aCBzbWFsbGVyIHBhZ2VzLCBzaW5jZSB0aGUgZ3Vlc3QK
-PiArCSAqIGh1Z2UgcGFnZSBpcyBiZWluZyBkaXJlY3RseSBtYXBwZWQuIEluIHRoaXMgY2FzZSB0
-aGUgZ3Vlc3QgYWNjZXNzCj4gKwkgKiBwZXJtaXNzaW9ucyBiZWluZyBzaGFkb3dlZCBhcmUgdGhl
-IGFjY2VzcyBwZXJtaXNzaW9ucyBvZiB0aGUgaHVnZQo+ICsJICogcGFnZS4KPiArCSAqCj4gKwkg
-KiBJbiBib3RoIGNhc2VzLCBzcC0+cm9sZS5hY2Nlc3MgY29udGFpbnMgZXhhY3RseSB3aGF0IHdl
-IHdhbnQuCj4gKwkgKi8KPiArCXJldHVybiBzcC0+cm9sZS5hY2Nlc3M7Cj4gK30KCi4uLgoKPiBk
-aWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL21tdS9tbXVfaW50ZXJuYWwuaCBiL2FyY2gveDg2L2t2
-bS9tbXUvbW11X2ludGVybmFsLmgKPiBpbmRleCBiNmUyMmJhOWM2NTQuLjNmNzZmNGMxYWU1OSAx
-MDA2NDQKPiAtLS0gYS9hcmNoL3g4Ni9rdm0vbW11L21tdV9pbnRlcm5hbC5oCj4gKysrIGIvYXJj
-aC94ODYva3ZtL21tdS9tbXVfaW50ZXJuYWwuaAo+IEBAIC0zMiw2ICszMiwxOCBAQCBleHRlcm4g
-Ym9vbCBkYmc7Cj4gIAo+ICB0eXBlZGVmIHU2NCBfX3JjdSAqdGRwX3B0ZXBfdDsKPiAgCj4gKy8q
-Cj4gKyAqIFN0b3JlcyB0aGUgcmVzdWx0IG9mIHRoZSBndWVzdCB0cmFuc2xhdGlvbiBiZWluZyBz
-aGFkb3dlZCBieSBhbiBTUFRFLiBLVk0KPiArICogc2hhZG93cyB0d28gdHlwZXMgb2YgZ3Vlc3Qg
-dHJhbnNsYXRpb25zOiBuR1BBIC0+IEdQQSAoc2hhZG93IEVQVC9OUFQpIGFuZAo+ICsgKiBHVkEg
-LT4gR1BBICh0cmFkaXRpb25hbCBzaGFkb3cgcGFnaW5nKS4gSW4gYm90aCBjYXNlcyB0aGUgcmVz
-dWx0IG9mIHRoZQo+ICsgKiB0cmFuc2xhdGlvbiBpcyBhIEdQQSBhbmQgYSBzZXQgb2YgYWNjZXNz
-IGNvbnN0cmFpbnRzLgo+ICsgKi8KPiArc3RydWN0IHNoYWRvd2VkX3RyYW5zbGF0aW9uX2VudHJ5
-IHsKPiArCS8qIE5vdGUsIEdGTnMgY2FuIGhhdmUgYXQgbW9zdCA2NCAtIFBBR0VfU0hJRlQgPSA1
-MiBiaXRzLiAqLwo+ICsJdTY0IGdmbjo1MjsKPiArCXU2NCBhY2Nlc3M6MzsKCkEgYml0ZmllbGQg
-aXMgY29tcGxldGVseSB1bm5lY2Vzc2FyeSBhbmQgZ2VuZXJhdGVzIGJhZCBjb2RlLiAgQXMgaXMs
-IGl0IGdlbmVyYXRlcwpfcmVhbGx5XyBiYWQgY29kZSBiZWNhdXNlIGV4dHJhY3RpbmcgYW5kIHNl
-dHRpbmcgcmVxdWlyZXMgbm9uLXN0YW5kYXJkIDY0LWJpdCB2YWx1ZQptYXNrcywgbXVsdGlwbGUg
-b3BlcmF0aW9ucywgYW5kIGFjY2Vzc2VzIHRvIHVuYWxpZ25lZCBkYXRhLiAgVGhlIGdlbmVyYXRl
-ZCBjb2RlIGNhbgpiZSBtYWRlIHNsaWdodGx5IGxlc3MgYXdmdWwgYnkgdXNpbmcgYSBmdWxseSBi
-eXRlIGZvciBhY2Nlc3MgYW5kIDY0IGJpdHMgZm9yIEdGTiwKYnV0IGl0IHN0aWxsIHN1Y2tzIGNv
-bXBhcmVkIHRvIHdoYXQgd2UgY2FuIGhhbmQgZ2VuZXJhdGUuCgpUaGUgb3RoZXIgYXNwZWN0IG9m
-IHRoaXMgaXMgdGhhdCByZXRyaWV2aW5nIHRoZSBHRk4gaXMgYSBmcmVxdWVudCBvcGVyYXRpb24s
-CndoZXJlYXMgdGhlIGFjY2VzcyBpcyBhbG1vc3QgbmV2ZXIgcmVhZC4gIEkuZS4gd2Ugc2hvdWxk
-IGJpYXMgZm9yIHJlYWRpbmcgdGhlIEdGTgphYm92ZSBhbGwgZWxzZS4KClRoZSBzaW1wbGUgYW5k
-IG9idmlvdXMgdGhpbmcgaXMgdG8gbm90IHJlaW52ZW50IHRoZSB3aGVlbC4gIEdGTiA9IChHUEEg
-Pj4gUEFHRV9TSElGVCksCmFuZCBpZ25vcmluZyBOWCwgYWNjZXNzIGxpdmVzIGluIHRoZSBsb3dl
-ciAxMiBiaXRzIG9mIGEgUFRFLiAgVGhlbiByZWFkaW5nIHRoZSBHRk4gaXMKYSBzaW1wbGUgU0hS
-LCBhbmQgcmVhZGluZyBhY2Nlc3MgaW5mbyBpcyBhIHNpbXBsZSBBTkQuCgpXZSBtaWdodCBhbHNv
-IGJlIGFibGUgdG8gb3B0aW1pemUgRk5BTUUoc3luY19wYWdlKSwgYnV0IEkgZG9uJ3QgY2FyZSBt
-dWNoIGFib3V0CnRoYXQsIGl0J3MgcmFyZWx5IHVzZWQgZm9yIG5lc3RlZCBURFAuCgpTbywga2Vl
-cCB0cmFuc2xhdGlvbl9lbnRyeSBhIGdmbl90ICosIHRoZW4gZG86CgpzdGF0aWMgZ2ZuX3Qga3Zt
-X21tdV9wYWdlX2dldF9nZm4oc3RydWN0IGt2bV9tbXVfcGFnZSAqc3AsIGludCBpbmRleCkKewoJ
-aWYgKCFzcC0+cm9sZS5kaXJlY3QpCgkJcmV0dXJuIHNwLT5zaGFkb3dlZF90cmFuc2xhdGlvbltp
-bmRleF0gPj4gUEFHRV9TSElGVDsKCglyZXR1cm4gc3AtPmdmbiArIChpbmRleCA8PCAoKHNwLT5y
-b2xlLmxldmVsIC0gMSkgKiBQVDY0X0xFVkVMX0JJVFMpKTsKfQoKc3RhdGljIHZvaWQga3ZtX21t
-dV9wYWdlX3NldF90cmFuc2xhdGlvbihzdHJ1Y3Qga3ZtX21tdV9wYWdlICpzcCwgaW50IGluZGV4
-LAoJCQkJCSBnZm5fdCBnZm4sIHVuc2lnbmVkIGludCBhY2Nlc3MpCnsKCWlmICghc3AtPnJvbGUu
-ZGlyZWN0KSB7CgkJc3AtPnNoYWRvd2VkX3RyYW5zbGF0aW9uW2luZGV4XSA9IChnZm4gPDwgUEFH
-RV9TSElGVCkgfCBhY2Nlc3M7CgkJcmV0dXJuOwoJfQoKCWlmIChXQVJOX09OKGdmbiAhPSBrdm1f
-bW11X3BhZ2VfZ2V0X2dmbihzcCwgaW5kZXgpKSkKCQlwcl9lcnJfcmF0ZWxpbWl0ZWQoImdmbiBt
-aXNtYXRjaCB1bmRlciBkaXJlY3QgcGFnZSAlbGx4ICIKCQkJCSAgICIoZXhwZWN0ZWQgJWxseCwg
-Z290ICVsbHgpXG4iLAoJCQkJICAgc3AtPmdmbiwKCQkJCSAgIGt2bV9tbXVfcGFnZV9nZXRfZ2Zu
-KHNwLCBpbmRleCksIGdmbik7Cn0KCnN0YXRpYyB2b2lkIGt2bV9tbXVfcGFnZV9zZXRfYWNjZXNz
-KHN0cnVjdCBrdm1fbW11X3BhZ2UgKnNwLCBpbnQgaW5kZXgsCgkJCQkgICAgdW5zaWduZWQgaW50
-IGFjY2VzcykKewoJaWYgKHNwLT5yb2xlLmRpcmVjdCkKCQlyZXR1cm47CgoJc3AtPnNoYWRvd2Vk
-X3RyYW5zbGF0aW9uW2luZGV4XSAmPSBQQUdFX01BU0s7CglzcC0+c2hhZG93ZWRfdHJhbnNsYXRp
-b25baW5kZXhdIHw9IGFjY2VzczsKfQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
-aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
-YXJtCg==
+On Fri, Apr 01, 2022, David Matlack wrote:
+> Add support for Eager Page Splitting pages that are mapped by the shadow
+> MMU. Walk through the rmap first splitting all 1GiB pages to 2MiB pages,
+> and then splitting all 2MiB pages to 4KiB pages.
+> 
+> Splitting huge pages mapped by the shadow MMU requries dealing with some
+> extra complexity beyond that of the TDP MMU:
+> 
+> (1) The shadow MMU has a limit on the number of shadow pages that are
+>     allowed to be allocated. So, as a policy, Eager Page Splitting
+>     refuses to split if there are KVM_MIN_FREE_MMU_PAGES or fewer
+>     pages available.
+> 
+> (2) Huge pages may be mapped by indirect shadow pages which have the
+>     possibility of being unsync. As a policy we opt not to split such
+>     pages as their translation may no longer be valid.
+
+This shouldn't be possible, shadow pages whose role is > 4k are always write-protected
+and not allowed to become unsync.
+
+> 
+> (3) Splitting a huge page may end up re-using an existing lower level
+>     shadow page tables. This is unlike the TDP MMU which always allocates
+>     new shadow page tables when splitting.
+
+...
+
+> +static void kvm_mmu_split_huge_page(struct kvm *kvm,
+> +				    const struct kvm_memory_slot *slot,
+> +				    u64 *huge_sptep, struct kvm_mmu_page **spp)
+> +
+> +{
+> +	struct kvm_mmu_memory_cache *cache = &kvm->arch.huge_page_split_desc_cache;
+> +	u64 huge_spte = READ_ONCE(*huge_sptep);
+> +	struct kvm_mmu_page *sp;
+> +	bool flush = false;
+> +	u64 *sptep, spte;
+> +	gfn_t gfn;
+> +	int index;
+> +
+> +	sp = kvm_mmu_get_sp_for_split(kvm, slot, huge_sptep, spp);
+> +
+> +	for (index = 0; index < PT64_ENT_PER_PAGE; index++) {
+> +		sptep = &sp->spt[index];
+> +		gfn = kvm_mmu_page_get_gfn(sp, index);
+> +
+> +		/*
+> +		 * sp may have populated page table entries, e.g. if this huge
+> +		 * page is aliased by multiple sptes with the same access
+> +		 * permissions. We know the sptes will be mapping the same
+> +		 * gfn-to-pfn translation since sp is direct. However, a given
+> +		 * spte may point to an even lower level page table. We don't
+> +		 * know if that lower level page table is completely filled in,
+> +		 * i.e. we may be effectively unmapping a region of memory, so
+> +		 * we must flush the TLB.
+
+Random side topic, please avoid "we" and other pronouns in comments and changelogs,
+it gets real easy to lose track of what a pronoun is referring to, especially in
+changelogs where "we" might be KVM, might be the kernel, might be the team that's
+using the patch, might be an author that's prone to illeism, etc...
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
