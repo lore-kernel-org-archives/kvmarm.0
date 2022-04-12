@@ -2,86 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1CF8C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Apr 2022 11:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B992C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Apr 2022 11:30:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2883D4B0F1;
-	Tue, 12 Apr 2022 07:14:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 606AE4B2A0;
+	Tue, 12 Apr 2022 07:30:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nlzu+hAvfIRC; Tue, 12 Apr 2022 07:14:13 -0400 (EDT)
+	with ESMTP id 2Sd5gzU9mnaF; Tue, 12 Apr 2022 07:30:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDC884B1C5;
-	Tue, 12 Apr 2022 07:14:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 06BB94B2AE;
+	Tue, 12 Apr 2022 07:30:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C773E49EFD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2022 19:41:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B740A4B2A8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 07:30:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bbKpDCPno425 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Apr 2022 19:41:41 -0400 (EDT)
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com
- [209.85.208.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D4B649E29
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2022 19:41:41 -0400 (EDT)
-Received: by mail-lj1-f172.google.com with SMTP id s13so22060592ljd.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2022 16:41:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=q17E+fHKk5Th+BI8Tj0S78AdPyNKUlnW29K14ISNtBQ=;
- b=K40jOpUlphvQ1cZf+e6cBGIBVFGLKJ32IXPMsUg6Rud+5raoGXjJePu9S+gTTXt6v7
- /2Wlva2b9ZfJ9DvZ1GBzZ6IQAtAg5Hrqlz9BfcQ/6TgJPw3F4GS1tcEN4SL31y2MWglr
- 4YhIx9f2ECjJjuKdFnLJmJb1+nLyfpRutN+BaCAHdUisS2MjReeVv4zgH1m4XsuV+Aab
- tuQzoLW8vVTpGloaHRidtvcPBfFEV3LAwG7hoJQYRpFKBSIgAjYcJ/c5rFgC90V1LHtq
- Rqy57u+h/U5mlPQmy35ygdhnBhQMZAVguU2DxuHInAwgvT/uoVKCDo2VTZcJZn+CrvQf
- +tCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=q17E+fHKk5Th+BI8Tj0S78AdPyNKUlnW29K14ISNtBQ=;
- b=8Os89psk4fS0lUQry36oPaJf7fC9W6K/S5Vuhz2GqcqnriUHwUNC69NCRbHZKWWPkE
- LCHqBND5QHiUS2ryJTMUL8yU/3+iGhGDJcqHBeJb6KYbjF1/v2eNlU2vd06B83Bg69U3
- dyvVihKurR6rXHTm1jQJe25amHC/M6gVJU2hTajA62ecAJ3NDMXL47BC992s9T//k8rg
- NBYXaoRbNyT8VwEmHvvNVtLf49w+UI5v3pk97Z41FoNrzq1XX7zSjGTPP76bBLvxCt0+
- x5RsDLd8hmEVBytixSTHDddK7jXWVRYvHk+LAOt3ISCPnwh8V8lRz355gEZzltxh2w2k
- i1sA==
-X-Gm-Message-State: AOAM533yVK2yVZ5YNXqwlREHeQGLvBUc+HzapjoKFAUw3fifeBF4Xo2/
- zObxJhnJV1yjjN5I6/P7O9MEYnrCc7v2gaBdO6IrSw==
-X-Google-Smtp-Source: ABdhPJxYGp7OwrMeWKTpxOiX1rp3z1eskcZp4s0ucsF/ixzgk8f54RP2AiNfWLG9/o9mz9UGBiWkKsUwgELcxFw2weQ=
-X-Received: by 2002:a05:651c:54c:b0:249:9d06:24ef with SMTP id
- q12-20020a05651c054c00b002499d0624efmr21986148ljp.331.1649720499710; Mon, 11
- Apr 2022 16:41:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220401175554.1931568-1-dmatlack@google.com>
- <YlRhiF1O71TWQr5r@google.com>
- <CALzav=f_WY7xH_MV8-gJPAVmj1KjE_LvXupL7aA5n-vCjTETNw@mail.gmail.com>
- <YlSLuZphElMyF2sG@google.com>
-In-Reply-To: <YlSLuZphElMyF2sG@google.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 11 Apr 2022 16:41:12 -0700
-Message-ID: <CALzav=fGucZOZjbVE2+9PZVf1p+jP7GBYDpPph5PoU552LELsw@mail.gmail.com>
-Subject: Re: [PATCH v3 00/23] KVM: Extend Eager Page Splitting to the shadow
- MMU
-To: Sean Christopherson <seanjc@google.com>
-X-Mailman-Approved-At: Tue, 12 Apr 2022 07:14:13 -0400
-Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+ with ESMTP id q6FC39-DR9Wr for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Apr 2022 07:30:52 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6794E4B2A0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 07:30:52 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id F0544619D2;
+ Tue, 12 Apr 2022 11:30:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63C66C385A5;
+ Tue, 12 Apr 2022 11:30:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1649763050;
+ bh=uK7N36K2e4+xCv93RcufURlLVYNraBsK39xdEe7/GeA=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ND5kNCf7TIkZreRHnS4vubaMurYaENmc1qkFxoCH1WOFPiqg3rzOwE1IQmyLb5KnT
+ pA9bW2ZEnuU6U8B9y39V3c02FR2O+IJW/Nf0unjV5oppC2j8i+81vK9f3KdD5kHn6f
+ yovd35lPYxFYaKV1f5+aX/nSZwsADsYnXeHU57RudRXdAHJEerpMaszrBRfvPLYVUu
+ zK/3SWTM7TlDlcDva/xWI3K2MdrRsGCEu/Fx1RJwwfJpCVhd1/ktvkyYI6GNGcuze8
+ 1oP9aZ9CFlp7o/tB+OaOWkLr2Wad8768jGmQ8zFFObeAop9aY0i2JTm+dI0CloKZkC
+ 3PHWQeFt/21Pg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1neEjP-003kda-Q0; Tue, 12 Apr 2022 12:30:47 +0100
+Date: Tue, 12 Apr 2022 12:30:47 +0100
+Message-ID: <87bkx6bkt4.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 5/5] KVM: arm64: uapi: Add kvm_debug_exit_arch.hsr_high
+In-Reply-To: <YlQGh6Ky2oqrS89y@e121798.cambridge.arm.com>
+References: <20220407162327.396183-1-alexandru.elisei@arm.com>
+ <20220407162327.396183-6-alexandru.elisei@arm.com>
+ <87ee28auff.wl-maz@kernel.org>
+ <YlQGh6Ky2oqrS89y@e121798.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, mark.rutland@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: catalin.marinas@arm.com, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,183 +88,121 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Apr 11, 2022 at 1:12 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Apr 11, 2022, David Matlack wrote:
-> > On Mon, Apr 11, 2022 at 10:12 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > Circling back to eager page splitting, this series could be reworked to take the
-> > > first step of forking FNAME(page_fault), FNAME(fetch) and kvm_mmu_get_page() in
-> > > order to provide the necessary path for reworking nested MMU page faults.  Then it
-> > > can remove unsync and shrinker support for nested MMUs.  With those gone,
-> > > dissecting the nested MMU variant of kvm_mmu_get_page() should be simpler/cleaner
-> > > than dealing with the existing kvm_mmu_get_page(), i.e. should eliminate at least
-> > > some of the complexity/churn.
-> >
-> > These sound like useful improvements but I am not really seeing the
-> > value of sequencing them before this series:
-> >
-> >  - IMO the "churn" in patches 1-14 are a net improvement to the
-> > existing code. They improve readability by decomposing the shadow page
-> > creation path into smaller functions with better names, reduce the
-> > amount of redundant calculations, and reduce the dependence on struct
-> > kvm_vcpu where it is not needed. Even if eager page splitting is
-> > completely dropped I think they would be useful to merge.
->
-> I definitely like some of patches 1-14, probably most after a few read throughs.
-> But there are key parts that I do not like that are motivated almost entirely by
-> the desire to support page splitting.  Specifically, I don't like splitting the
-> logic of finding a page, and I don't like having a separate alloc vs. initializer
-> (though I'm guessing this will be needed somewhere to split huge pages for nested
-> MMUs).
->
-> E.g. I'd prefer the "get" flow look like the below (completely untested, for
-> discussion purposes only).  There's still churn, but the core loop is almost
-> entirely unchanged.
->
-> And it's not just this series, I don't want future improvements nested TDP to have
-> to deal with the legacy baggage.
+On Mon, 11 Apr 2022 11:46:09 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On Fri, Apr 08, 2022 at 08:47:00AM +0100, Marc Zyngier wrote:
+> > Hi Alex,
+> > 
+> > On Thu, 07 Apr 2022 17:23:27 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > When userspace is debugging a VM, the kvm_debug_exit_arch part of the
+> > > kvm_run struct contains arm64 specific debug information: the ESR_EL2
+> > > value, encoded in the field "hsr", and the address of the instruction
+> > > that caused the exception, encoded in the field "far".
+> > > 
+> > > Linux has moved to treating ESR_EL2 as a 64-bit register, but unfortunately
+> > > kvm_debug_exit_arch.hsr cannot be changed to match because that would
+> > > change the memory layout of the struct on big endian machines:
+> > > 
+> > > Current layout:			| Layout with "hsr" extended to 64 bits:
+> > > 				|
+> > > offset 0: ESR_EL2[31:0] (hsr)   | offset 0: ESR_EL2[61:32] (hsr[61:32])
+> > > offset 4: padding		| offset 4: ESR_EL2[31:0]  (hsr[31:0])
+> > > offset 8: FAR_EL2[61:0] (far)	| offset 8: FAR_EL2[61:0]  (far)
+> > > 
+> > > which breaks existing code.
+> > > 
+> > > The padding is inserted by the compiler because the "far" field must be
+> > > aligned to 8 bytes (each field must be naturally aligned - aapcs64 [1],
+> > > page 18) and the struct itself must be aligned to 8 bytes (the struct must
+> > > be aligned to the maximum alignment of its fields - aapcs64, page 18),
+> > > which means that "hsr" must be aligned to 8 bytes as it is the first field
+> > > in the struct.
+> > > 
+> > > To avoid changing the struct size and layout for the existing fields, add a
+> > > new field, "hsr_high", which replaces the existing padding. "hsr_high" will
+> > > be used to hold the ESR_EL2[61:32] bits of the register. The memory layout,
+> > > both on big and little endian machine, becomes:
+> > > 
+> > > Layout with "hsr_high" added:
+> > > 
+> > > offset 0: ESR_EL2[31:0]  (hsr)
+> > > offset 4: ESR_EL2[61:32] (hsr_high)
+> > > offset 8: FAR_EL2[61:0]  (far)
+> > 
+> > My concern with this change is that it isn't clear what the padding is
+> > currently initialised to, and I don't think there is any guarantee
+> > that it is zeroed. With that, a new userspace on an old kernel would
+> > interpret hsr_high, and potentially observe stuff that wasn't supposed
+> > to be interpreted.
+> 
+> You are right, I didn't think about this scenario. Did some digging, and
+> C99 explicitely states that padding is uninitialized (September 7, 2007,
+> draft, page 38), so I assume that it's the same for C89 (couldn't find a
+> free source for the standard).
+> 
+> > 
+> > That's yet another mistake in our userspace ABI (where is the time
+> > machine when you need it?).
+> 
+> To avoid this sort of thing happening in the future, KVM/arm64 could
+> mandate that all structs that are part of the userspace API have the
+> padding explicitly declared as a struct field and that padding must always
+> be set to zero by userspace before a syscall.
 
-One thing that would be helpful is if you can explain in a bit more
-specifically what you'd like to see. Part of the reason why I prefer
-to sequence your proposal after eager page splitting is that I do not
-fully understand what you're proposing, and how complex it would be.
-e.g. Forking FNAME(fetch), FNAME(page_fault), and kvm_mmu_get_page()
-for nested MMUs does not sound like less churn.
+That's what we were aiming for for most structures, but clearly missed
+some. Debug is obviously an unloved part of the architecture.
 
-From my perspective, this series is a net improvement to the
-readability and maintainability of existing code, while adding a
-performance improvement (eager page splitting). All of the changes you
-are proposing can still be implemented on top if and when they become
-a priority (including merging {,__}kvm_find_shadow_page()). And if we
-limit eager page splitting to nested MMUs, we don't have to worry
-about maintaining eager page splitting with TDP shadow MMU or legacy
-shadow paging over time.
+> KVM would then check that the
+> padding is zero and return -EINVAL if userspace didn't clear it correctly,
+> to enforce this convention. I think that should be forward compatible with
+> repurposing the padding to add another field, unless 0 has a special
+> meaning for the field that is added, which I believe to be highly unlikely.
+> 
+> > 
+> > In order to do this, we must advertise to userspace that we provide
+> > more information. This probably means adding a flag of some sort to
+> > kvm_run (there are at least 128 bits of x86 stuff that can be readily
+> > reclaimed).
+> 
+> We could add a flag to kvm_run.flags that is set only when
+> kvm_run.exit_reason == KVM_EXIT_DEBUG, something like
+> KVM_DEBUG_ARM_HSR_HIGH_SET (or PRESENT). flags has 16 bits which are unused
+> today, so I don't think it's too costly to use one bit for this.
 
+That'd be a sensible approach. We use any for KVM/arm64 yet, and this
+is all arch-specific anyway.
 
->
-> Waaaay off topic, why do we still bother with stat.max_mmu_page_hash_collision?
-> I assume it was originally added to tune the hashing logic?  At this point is it
-> anything but wasted cycles?
->
-> static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm_vcpu *vcpu,
->                                                      gfn_t gfn,
->                                                      unsigned int gfn_hash,
->                                                      union kvm_mmu_page_role role)
-> {
->         struct hlist_head *sp_list = &kvm->arch.mmu_page_hash[gfn_hash];
->         struct kvm_mmu_page *sp;
->         LIST_HEAD(invalid_list);
->
->         int collisions = 0;
->
->         for_each_valid_sp(kvm, sp, sp_list) {
->                 if (sp->gfn != gfn) {
->                         collisions++;
->                         continue;
->                 }
->
->                 if (sp->role.word != role.word) {
->                         /*
->                          * If the guest is creating an upper-level page, zap
->                          * unsync pages for the same gfn.  While it's possible
->                          * the guest is using recursive page tables, in all
->                          * likelihood the guest has stopped using the unsync
->                          * page and is installing a completely unrelated page.
->                          * Unsync pages must not be left as is, because the new
->                          * upper-level page will be write-protected.
->                          */
->                         if (role.level > PG_LEVEL_4K && sp->unsync)
->                                 kvm_mmu_prepare_zap_page(vcpu->kvm, sp, invalid_list);
->
->                         continue;
->                 }
->
->                 /* unsync and write-flooding only apply to indirect SPs. */
->                 if (sp->role.direct)
->                         goto out;
->
->                 if (sp->unsync) {
->                         /*
->                          * The page is good, but is stale.  kvm_sync_page does
->                          * get the latest guest state, but (unlike mmu_unsync_children)
->                          * it doesn't write-protect the page or mark it synchronized!
->                          * This way the validity of the mapping is ensured, but the
->                          * overhead of write protection is not incurred until the
->                          * guest invalidates the TLB mapping.  This allows multiple
->                          * SPs for a single gfn to be unsync.
->                          *
->                          * If the sync fails, the page is zapped.  If so, break
->                          * in order to rebuild it.
->                          */
->                         if (!kvm_sync_page(vcpu, sp, &invalid_list))
->                                 break;
->
->                         WARN_ON(!list_empty(&invalid_list));
->                         kvm_flush_remote_tlbs(vcpu->kvm);
->                 }
->
->                 __clear_sp_write_flooding_count(sp);
->                 goto out;
->         }
->
->         sp = NULL;
->
-> out:
->         if (collisions > kvm->stat.max_mmu_page_hash_collisions)
->                 kvm->stat.max_mmu_page_hash_collisions = collisions;
->
->         kvm_mmu_commit_zap_page(vcpu->kvm, &invalid_list);
->         return sp;
-> }
->
-> static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
->                                                       gfn_t gfn,
->                                                       unsigned int gfn_hash,
->                                                       union kvm_mmu_page_role role)
-> {
->         struct kvm_mmu_page *sp = __kvm_mmu_alloc_shadow_page(vcpu, role.direct);
->         struct kvm_memory_slot *slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
->         struct hlist_head *sp_list = &kvm->arch.mmu_page_hash[gfn_hash];
->
->         ++kvm->stat.mmu_cache_miss;
->
->         sp->gfn = gfn;
->         sp->role = role;
->         sp->mmu_valid_gen = kvm->arch.mmu_valid_gen;
->
->         /*
->          * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
->          * depends on valid pages being added to the head of the list.  See
->          * comments in kvm_zap_obsolete_pages().
->          */
->         list_add(&sp->link, &kvm->arch.active_mmu_pages);
->         kvm_mod_used_mmu_pages(kvm, 1);
->
->         sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
->         hlist_add_head(&sp->hash_link, sp_list);
->
->         if (!role.direct)
->                 account_shadowed(kvm, slot, sp);
-> }
->
->
-> static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
->                                                     gfn_t gfn,
->                                                     union kvm_mmu_page_role role)
-> {
->         unsigned int gfn_hash = kvm_page_table_hashfn(gfn);
->         struct kvm_mmu_page *sp;
->         bool created = false;
->
->         sp = kvm_mmu_find_shadow_page(vcpu, gfn, gfn_hash, role);
->         if (!sp) {
->                 created = true;
->                 sp = kvm_mmu_alloc_shadow_page(vcpu, gfn, gfn_hash, role);
->         }
->
->         trace_kvm_mmu_get_page(sp, created);
->         return sp;
-> }
+> 
+> One other option would be to wait to expose the upper 32 bits until KVM
+> supports a hardware feature that makes use of those bits. That means
+> advertising the feature to userspace, which KVM might or might not want to
+> do. And KVM today doesn't do any sanitisation/masking on the hsr value that
+> is reported to userspace, and tying hsr_high to a particular feature might
+> mean that KVM will have to sanitise the upper bits if said feature is
+> opt-in by userspace.
+> 
+> My preference is for the first approach because the second approach looks
+> more complicated.
+
++1.
+
+> There's always the option to wait until KVM makes use of the upper 32 bits
+> and decide then, when we have more information.
+
+The sooner, the better. Updating userspace takes *years*, so let's do
+it ASAP.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
