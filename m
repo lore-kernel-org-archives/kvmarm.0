@@ -2,48 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F095C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Apr 2022 13:33:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD3FFC433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Apr 2022 16:42:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BB79E4B28D;
-	Tue, 12 Apr 2022 09:33:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 44B074B234;
+	Tue, 12 Apr 2022 12:42:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TJUWiQdkqyg8; Tue, 12 Apr 2022 09:33:00 -0400 (EDT)
+	with ESMTP id n9pwP6FAiiZy; Tue, 12 Apr 2022 12:42:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D5824B2E3;
-	Tue, 12 Apr 2022 09:32:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8600B4B241;
+	Tue, 12 Apr 2022 12:42:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C584F4B2F4
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:32:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9890E4B234
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 12:42:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id m1WO9n-l3Vw0 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Apr 2022 09:32:56 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E86714B2BA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:32:55 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E412150C;
- Tue, 12 Apr 2022 06:32:55 -0700 (PDT)
-Received: from e121798.arm.com (unknown [10.57.11.98])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 288353F70D;
- Tue, 12 Apr 2022 06:32:54 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: will@kernel.org, julien.thierry.kdev@gmail.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- mark.rutland@arm.com, andre.przywara@arm.com
-Subject: [PATCH v3 kvmtool 11/11] arm64: Add --vcpu-affinity command line
- argument
-Date: Tue, 12 Apr 2022 14:32:31 +0100
-Message-Id: <20220412133231.35355-12-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220412133231.35355-1-alexandru.elisei@arm.com>
-References: <20220412133231.35355-1-alexandru.elisei@arm.com>
+ with ESMTP id s35Jw58Rumjw for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Apr 2022 12:42:12 -0400 (EDT)
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com
+ [209.85.219.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2F414B231
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 12:42:11 -0400 (EDT)
+Received: by mail-yb1-f179.google.com with SMTP id z33so34091608ybh.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:42:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uAePugcgi5o8QTcK8LtKXSDf0e0z0pUy2pyRe/5eKqk=;
+ b=p5kTMH0bnMq3gzHGAtBBycsJ6iunAwxInbAcoe8bb7uHzwSrK7OntMX5jsCs90RIvC
+ Dkkv11JjJD3BGh/I2Z9v862ZpnuZ9a1oCGIdi8hGy9oaOMbJRRe7lyp1nB+3cEjUtSBq
+ fuTJ7LK8EyolNZG0Sl0pGPn7uTAI0QaYFWvtg+uNLfNcPTRjjFt2FbWstGbxpgsdvvFf
+ YqpQ+T7+6aaHGc6Tx2isMY8MRiKnw8chy77a8MMW4sN+oAiHB7ljJVXFupAJjSiTHHeR
+ umwCgLawLKThycATadiNCong0TpkTRY/oYeobfpKByMY5aJAC+cWVy8tBlbxMFWdkcE8
+ AhKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uAePugcgi5o8QTcK8LtKXSDf0e0z0pUy2pyRe/5eKqk=;
+ b=1DUl7jQbcMmaktaSuGOCsfSk/eqnAjztvZQPMGCxmxaSvjflJd0Bh6T4DxmxClrXWt
+ W+uRMiKGj+Y1OLn3UUEyS3uh2+xdAX3+0yGXkcBlHJhoMYWO6x0Fhj1CDqzs7qg4fcK/
+ a3U6pngbtWHYPGWPUCBqDNZ/G6c1OehgXeCCn+EFVR99bOE+0+LXfX/dRiEgf8WRmJPj
+ UhXLCmq/RTes1GjZwkXflKIuYC/I9BXlT2eTsLMNl3WroaUr5N9zAtz8elZtRqRqQrbM
+ Aw+ZRpuG9Je64Uyu5jyM/6e1UZuR+pdPUkrsKyqO/AaBI30ajxjLTIl9x1PJpHbPuwkk
+ dzxA==
+X-Gm-Message-State: AOAM532C2+D5ZiKYptZlpQJGLynEnUQXhOtU8muQPNCehMXS2QSJHapb
+ TjspCufqgi5IoiPOHz/XrhsWhLka2prWOr7tjH+6uw==
+X-Google-Smtp-Source: ABdhPJxXRbAEFMJnkuQalyahRsi29VKHQOQ/y9ua8eJpe2COpjPKxb7ojZaHC0tVYKJOIWRJ4MgiqAtlbsGE/dXF41k=
+X-Received: by 2002:a25:9387:0:b0:641:32bd:ba72 with SMTP id
+ a7-20020a259387000000b0064132bdba72mr10938836ybm.474.1649781731047; Tue, 12
+ Apr 2022 09:42:11 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220407011605.1966778-1-rananta@google.com>
+ <20220407011605.1966778-2-rananta@google.com>
+ <6797f003-85f2-d1af-c106-c17091268a55@redhat.com>
+In-Reply-To: <6797f003-85f2-d1af-c106-c17091268a55@redhat.com>
+From: Raghavendra Rao Ananta <rananta@google.com>
+Date: Tue, 12 Apr 2022 09:41:58 -0700
+Message-ID: <CAJHc60x82Az_NeiCmPznp6aidT5ER=Gud=KfZQ07mD5w7So8cA@mail.gmail.com>
+Subject: Re: [PATCH v5 01/10] KVM: arm64: Factor out firmware register
+ handling from psci.c
+To: Gavin Shan <gshan@redhat.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -60,303 +88,496 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a new command line argument, --vcpu-affinity, to set the CPU affinity
-for the VCPUs. The affinity is expressed as a cpulist and will apply to all
-VCPU threads.
+Hi Gavin,
 
-This gives the user a second option for choosing the PMU on a heterogeneous
-system. The PMU setup code, when --vcpu-affinity is specified, will search
-for the PMU associated with the CPUs specified with this command line
-argument instead of the PMU associated with the CPU on which the main
-thread is executing.
+On Tue, Apr 12, 2022 at 12:07 AM Gavin Shan <gshan@redhat.com> wrote:
+>
+> Hi Raghavendra,
+>
+> On 4/7/22 9:15 AM, Raghavendra Rao Ananta wrote:
+> > Common hypercall firmware register handing is currently employed
+> > by psci.c. Since the upcoming patches add more of these registers,
+> > it's better to move the generic handling to hypercall.c for a
+> > cleaner presentation.
+> >
+> > While we are at it, collect all the firmware registers under
+> > fw_reg_ids[] to help implement kvm_arm_get_fw_num_regs() and
+> > kvm_arm_copy_fw_reg_indices() in a generic way. Also, define
+> > KVM_REG_FEATURE_LEVEL_MASK using a GENMASK instead.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> > Reviewed-by: Oliver Upton <oupton@google.com>
+> > ---
+> >   arch/arm64/kvm/guest.c       |   2 +-
+> >   arch/arm64/kvm/hypercalls.c  | 185 +++++++++++++++++++++++++++++++++++
+> >   arch/arm64/kvm/psci.c        | 183 ----------------------------------
+> >   include/kvm/arm_hypercalls.h |   7 ++
+> >   include/kvm/arm_psci.h       |   7 --
+> >   5 files changed, 193 insertions(+), 191 deletions(-)
+> >
+>
+> Apart from the below nits:
+>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+>
+> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> > index 7e15b03fbdf8..0d5cca56cbda 100644
+> > --- a/arch/arm64/kvm/guest.c
+> > +++ b/arch/arm64/kvm/guest.c
+> > @@ -18,7 +18,7 @@
+> >   #include <linux/string.h>
+> >   #include <linux/vmalloc.h>
+> >   #include <linux/fs.h>
+> > -#include <kvm/arm_psci.h>
+> > +#include <kvm/arm_hypercalls.h>
+> >   #include <asm/cputype.h>
+> >   #include <linux/uaccess.h>
+> >   #include <asm/fpsimd.h>
+> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+> > index 202b8c455724..fa6d9378d8e7 100644
+> > --- a/arch/arm64/kvm/hypercalls.c
+> > +++ b/arch/arm64/kvm/hypercalls.c
+> > @@ -158,3 +158,188 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+> >       smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
+> >       return 1;
+> >   }
+> > +
+> > +static const u64 kvm_arm_fw_reg_ids[] = {
+> > +     KVM_REG_ARM_PSCI_VERSION,
+> > +     KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1,
+> > +     KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
+> > +     KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
+> > +};
+> > +
+> > +int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+> > +{
+> > +     return ARRAY_SIZE(kvm_arm_fw_reg_ids);
+> > +}
+> > +
+> > +int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+> > +{
+> > +     int i;
+> > +
+> > +     for (i = 0; i < ARRAY_SIZE(kvm_arm_fw_reg_ids); i++) {
+> > +             if (put_user(kvm_arm_fw_reg_ids[i], uindices++))
+> > +                     return -EFAULT;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+>
+> Since we're here, I think we can make this function to return 'ARRAY_SIZE(kvm_arm_fw_reg_ids)',
+> to be consistent with copy_{core, sve}_reg_indices(). With the return value fixed, additional
+> patch can use @ret in kvm_arm_copy_reg_indices().
+>
+Well we can, however, since this is mostly refactoring, I didn't want
+to change the original functionality of the code.
+The only caller of this is kvm_arm_copy_reg_indices()
+(arch/arm64/kvm/guest.c), which only checks for 'ret < 0'.
+Also, do you have a need for it? If yes, I can change it in the next revision.
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/aarch64/include/kvm/kvm-config-arch.h |  7 +-
- arm/aarch64/kvm-cpu.c                     |  9 +++
- arm/aarch64/kvm.c                         | 32 +++++++++
- arm/aarch64/pmu.c                         | 79 +++++++++++++++++------
- arm/include/arm-common/kvm-arch.h         |  7 ++
- arm/include/arm-common/kvm-config-arch.h  |  1 +
- include/linux/cpumask.h                   |  5 ++
- 7 files changed, 118 insertions(+), 22 deletions(-)
+> > +#define KVM_REG_FEATURE_LEVEL_WIDTH  4
+> > +#define KVM_REG_FEATURE_LEVEL_MASK   GENMASK(KVM_REG_FEATURE_LEVEL_WIDTH, 0)
+> > +
+>
+> It seems 'BIT()' is replaced with 'GENMASK' in the movement, but it's not mentioned
+> in the commit log. I guess it'd better to mention it if you agree.
+>
+The last sentence of the commit text mentions this :)
+Please let me know if it's not clear.
 
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index b08ee60ee1c4..eae8080d3fd9 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -1,15 +1,20 @@
- #ifndef KVM__KVM_CONFIG_ARCH_H
- #define KVM__KVM_CONFIG_ARCH_H
- 
-+int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset);
-+
- #define ARM_OPT_ARCH_RUN(cfg)						\
- 	OPT_BOOLEAN('\0', "aarch32", &(cfg)->aarch32_guest,		\
- 			"Run AArch32 guest"),				\
- 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
- 			"Create PMUv3 device. The emulated PMU will be" \
- 			" set to the PMU associated with the"		\
--			" main thread"),				\
-+			" main thread, unless --vcpu-affinity is set"),	\
- 	OPT_BOOLEAN('\0', "disable-mte", &(cfg)->mte_disabled,		\
- 			"Disable Memory Tagging Extension"),		\
-+	OPT_CALLBACK('\0', "vcpu-affinity", kvm, "cpulist",  		\
-+			"Specify the CPU affinity that will apply to "	\
-+			"all VCPUs", vcpu_affinity_parser, kvm),	\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
- 			"Layout Randomization (KASLR)"),		\
-diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-index 3b6224a599c8..4ac0fafae06b 100644
---- a/arm/aarch64/kvm-cpu.c
-+++ b/arm/aarch64/kvm-cpu.c
-@@ -88,7 +88,16 @@ static void reset_vcpu_aarch64(struct kvm_cpu *vcpu)
- {
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_one_reg reg;
-+	cpu_set_t *affinity;
- 	u64 data;
-+	int ret;
-+
-+	affinity = kvm->arch.vcpu_affinity_cpuset;
-+	if (affinity) {
-+		ret = sched_setaffinity(0, sizeof(cpu_set_t), affinity);
-+		if (ret == -1)
-+			die_perror("sched_setaffinity");
-+	}
- 
- 	reg.addr = (u64)&data;
- 
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index 28d608d98831..1b992dd592d4 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -3,8 +3,40 @@
- #include <asm/image.h>
- 
- #include <linux/byteorder.h>
-+#include <linux/cpumask.h>
-+
- #include <kvm/util.h>
- 
-+int vcpu_affinity_parser(const struct option *opt, const char *arg, int unset)
-+{
-+	struct kvm *kvm = opt->ptr;
-+	const char *cpulist = arg;
-+	cpumask_t *cpumask;
-+	int cpu, ret;
-+
-+	kvm->cfg.arch.vcpu_affinity = cpulist;
-+
-+	cpumask = calloc(1, cpumask_size());
-+	if (!cpumask)
-+		die_perror("calloc");
-+
-+	ret = cpulist_parse(cpulist, cpumask);
-+	if (ret) {
-+		free(cpumask);
-+		return ret;
-+	}
-+
-+	kvm->arch.vcpu_affinity_cpuset = CPU_ALLOC(NR_CPUS);
-+	if (!kvm->arch.vcpu_affinity_cpuset)
-+		die_perror("CPU_ALLOC");
-+	CPU_ZERO_S(CPU_ALLOC_SIZE(NR_CPUS), kvm->arch.vcpu_affinity_cpuset);
-+
-+	for_each_cpu(cpu, cpumask)
-+		CPU_SET(cpu, kvm->arch.vcpu_affinity_cpuset);
-+
-+	return 0;
-+}
-+
- /*
-  * Return the TEXT_OFFSET value that the guest kernel expects. Note
-  * that pre-3.17 kernels expose this value using the native endianness
-diff --git a/arm/aarch64/pmu.c b/arm/aarch64/pmu.c
-index 869a150cd6d3..5f189b32b6d0 100644
---- a/arm/aarch64/pmu.c
-+++ b/arm/aarch64/pmu.c
-@@ -49,34 +49,19 @@ static void set_pmu_attr(struct kvm_cpu *vcpu, void *addr, u64 attr)
-  */
- #define PMU_ID_MAXLEN		12
- 
--/*
-- * In the case of homogeneous systems, there only one hardware PMU, and all
-- * VCPUs will use the same PMU, regardless of where the attribute gets set.
-- *
-- * For heterogeneous systems, the assumption is that the user has pinned the VM
-- * (via taskset or similar) to a set of CPUs that share the same hardware PMU.
-- * This simplifies things for kvmtool, as correctness is not affected by setting
-- * the PMU for each VCPU from the main thread, instead of setting it from each
-- * individual VCPU thread.
-- */
--static int find_pmu(void)
-+static int find_pmu_cpumask(struct kvm *kvm, cpumask_t *cpumask)
- {
-+	cpumask_t pmu_cpumask, tmp;
- 	char buf[PMU_ID_MAXLEN];
- 	struct dirent *dirent;
- 	char *cpulist, *path;
- 	int pmu_id = -ENXIO;
- 	unsigned long val;
--	cpumask_t cpumask;
- 	ssize_t fd_sz;
--	int this_cpu;
- 	int fd, ret;
- 	DIR *dir;
- 
--	memset(buf, 0, PMU_ID_MAXLEN);
--
--	this_cpu = sched_getcpu();
--	if (this_cpu < 0)
--		return -errno;
-+	memset(buf, 0, sizeof(buf));
- 
- 	cpulist = calloc(1, PAGE_SIZE);
- 	if (!cpulist)
-@@ -112,15 +97,27 @@ static int find_pmu(void)
- 		}
- 		close(fd);
- 
--		ret = cpulist_parse(cpulist, &cpumask);
-+		ret = cpulist_parse(cpulist, &pmu_cpumask);
- 		if (ret) {
- 			pmu_id = ret;
- 			goto out_free;
- 		}
- 
--		if (!cpumask_test_cpu(this_cpu, &cpumask))
-+		if (!cpumask_and(&tmp, cpumask, &pmu_cpumask))
- 			goto next_dir;
- 
-+		/*
-+		 * One CPU cannot more than one PMU, hence the set of CPUs which
-+		 * share PMU A and the set of CPUs which share PMU B are
-+		 * disjoint. If the target CPUs and the current PMU have at
-+		 * least one CPU in common, but the target CPUs is not a subset
-+		 * of the current PMU, then a PMU which is associated with all
-+		 * the target CPUs does not exist. Stop searching for a PMU when
-+		 * this happens.
-+		 */
-+		if (!cpumask_subset(cpumask, &pmu_cpumask))
-+			goto out_free;
-+
- 		strcpy(&path[strlen(path) - 4], "type");
- 		fd = open(path, O_RDONLY);
- 		if (fd < 0)
-@@ -154,6 +151,46 @@ out_free:
- 	return pmu_id;
- }
- 
-+/*
-+ * In the case of homogeneous systems, there only one hardware PMU, and all
-+ * VCPUs will use the same PMU, regardless of the physical CPUs on which the
-+ * VCPU threads will be executing.
-+ *
-+ * For heterogeneous systems, there are 2 ways for the user to ensure that the
-+ * VM runs on CPUs that have the same PMU:
-+ *
-+ * 1. By pinning the entire VM to the desired CPUs, in which case kvmtool will
-+ * choose the PMU associated with the CPU on which the main thread is executing
-+ * (the thread that calls find_pmu()).
-+ *
-+ * 2. By setting the affinity mask for the VCPUs with the --vcpu-affinity
-+ * command line argument. All CPUs in the affinity mask must have the same PMU,
-+ * otherwise kvmtool will not be able to set a PMU.
-+ */
-+static int find_pmu(struct kvm *kvm)
-+{
-+	cpumask_t *cpumask;
-+	int i, this_cpu;
-+
-+	cpumask = calloc(1, cpumask_size());
-+	if (!cpumask)
-+		die_perror("calloc");
-+
-+	if (!kvm->arch.vcpu_affinity_cpuset) {
-+		this_cpu = sched_getcpu();
-+		if (this_cpu < 0)
-+			return -errno;
-+		cpumask_set_cpu(this_cpu, cpumask);
-+	} else {
-+		for (i = 0; i < CPU_SETSIZE; i ++) {
-+			if (CPU_ISSET(i, kvm->arch.vcpu_affinity_cpuset))
-+				cpumask_set_cpu(i, cpumask);
-+		}
-+	}
-+
-+	return find_pmu_cpumask(kvm, cpumask);
-+}
-+
- void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- {
- 	const char compatible[] = "arm,armv8-pmuv3";
-@@ -174,7 +211,7 @@ void pmu__generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 		return;
- 
- 	if (pmu_has_attr(kvm->cpus[0], KVM_ARM_VCPU_PMU_V3_SET_PMU)) {
--		pmu_id = find_pmu();
-+		pmu_id = find_pmu(kvm);
- 		if (pmu_id < 0) {
- 			pr_debug("Failed to find a PMU (errno: %d), "
- 				 "PMU events might not work", -pmu_id);
-diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
-index 43b1f77df394..fc55360d4d15 100644
---- a/arm/include/arm-common/kvm-arch.h
-+++ b/arm/include/arm-common/kvm-arch.h
-@@ -2,6 +2,11 @@
- #define ARM_COMMON__KVM_ARCH_H
- 
- #include <stdbool.h>
-+#ifndef _GNU_SOURCE
-+#define _GNU_SOURCE
-+#endif
-+#include <sched.h>
-+
- #include <linux/const.h>
- #include <linux/types.h>
- 
-@@ -105,6 +110,8 @@ struct kvm_arch {
- 	u64	initrd_guest_start;
- 	u64	initrd_size;
- 	u64	dtb_guest_start;
-+
-+	cpu_set_t *vcpu_affinity_cpuset;
- };
- 
- #endif /* ARM_COMMON__KVM_ARCH_H */
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index cdcbf235ac4e..9949bfe47ba8 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -5,6 +5,7 @@
- 
- struct kvm_config_arch {
- 	const char	*dump_dtb_filename;
-+	const char	*vcpu_affinity;
- 	unsigned int	force_cntfrq;
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
-diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-index c4be06621cf4..e6b764b5dd89 100644
---- a/include/linux/cpumask.h
-+++ b/include/linux/cpumask.h
-@@ -11,6 +11,11 @@ typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
- 
- #define cpumask_bits(maskp)	((maskp)->bits)
- 
-+static inline unsigned int cpumask_size(void)
-+{
-+	return BITS_TO_LONGS(NR_CPUS) * sizeof(long);
-+}
-+
- static inline void cpumask_set_cpu(int cpu, cpumask_t *dstp)
- {
- 	set_bit(cpu, cpumask_bits(dstp));
--- 
-2.25.1
+> > +/*
+> > + * Convert the workaround level into an easy-to-compare number, where higher
+> > + * values mean better protection.
+> > + */
+> > +static int get_kernel_wa_level(u64 regid)
+> > +{
+> > +     switch (regid) {
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+> > +             switch (arm64_get_spectre_v2_state()) {
+> > +             case SPECTRE_VULNERABLE:
+> > +                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
+> > +             case SPECTRE_MITIGATED:
+> > +                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL;
+> > +             case SPECTRE_UNAFFECTED:
+> > +                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED;
+> > +             }
+> > +             return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+> > +             switch (arm64_get_spectre_v4_state()) {
+> > +             case SPECTRE_MITIGATED:
+> > +                     /*
+> > +                      * As for the hypercall discovery, we pretend we
+> > +                      * don't have any FW mitigation if SSBS is there at
+> > +                      * all times.
+> > +                      */
+> > +                     if (cpus_have_final_cap(ARM64_SSBS))
+> > +                             return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
+> > +                     fallthrough;
+> > +             case SPECTRE_UNAFFECTED:
+> > +                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED;
+> > +             case SPECTRE_VULNERABLE:
+> > +                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
+> > +             }
+> > +             break;
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+> > +             switch (arm64_get_spectre_bhb_state()) {
+> > +             case SPECTRE_VULNERABLE:
+> > +                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL;
+> > +             case SPECTRE_MITIGATED:
+> > +                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_AVAIL;
+> > +             case SPECTRE_UNAFFECTED:
+> > +                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_REQUIRED;
+> > +             }
+> > +             return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL;
+> > +     }
+> > +
+> > +     return -EINVAL;
+> > +}
+> > +
+> > +int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > +{
+> > +     void __user *uaddr = (void __user *)(long)reg->addr;
+> > +     u64 val;
+> > +
+> > +     switch (reg->id) {
+> > +     case KVM_REG_ARM_PSCI_VERSION:
+> > +             val = kvm_psci_version(vcpu);
+> > +             break;
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+> > +             val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
+> > +             break;
+> > +     default:
+> > +             return -ENOENT;
+> > +     }
+> > +
+> > +     if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
+> > +             return -EFAULT;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > +{
+> > +     void __user *uaddr = (void __user *)(long)reg->addr;
+> > +     u64 val;
+> > +     int wa_level;
+> > +
+> > +     if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
+> > +             return -EFAULT;
+> > +
+> > +     switch (reg->id) {
+> > +     case KVM_REG_ARM_PSCI_VERSION:
+> > +     {
+> > +             bool wants_02;
+> > +
+> > +             wants_02 = test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features);
+> > +
+> > +             switch (val) {
+> > +             case KVM_ARM_PSCI_0_1:
+> > +                     if (wants_02)
+> > +                             return -EINVAL;
+> > +                     vcpu->kvm->arch.psci_version = val;
+> > +                     return 0;
+> > +             case KVM_ARM_PSCI_0_2:
+> > +             case KVM_ARM_PSCI_1_0:
+> > +             case KVM_ARM_PSCI_1_1:
+> > +                     if (!wants_02)
+> > +                             return -EINVAL;
+> > +                     vcpu->kvm->arch.psci_version = val;
+> > +                     return 0;
+> > +             }
+> > +             break;
+> > +     }
+> > +
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+> > +             if (val & ~KVM_REG_FEATURE_LEVEL_MASK)
+> > +                     return -EINVAL;
+> > +
+> > +             if (get_kernel_wa_level(reg->id) < val)
+> > +                     return -EINVAL;
+> > +
+> > +             return 0;
+> > +
+> > +     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+> > +             if (val & ~(KVM_REG_FEATURE_LEVEL_MASK |
+> > +                         KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED))
+> > +                     return -EINVAL;
+> > +
+> > +             /* The enabled bit must not be set unless the level is AVAIL. */
+> > +             if ((val & KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED) &&
+> > +                 (val & KVM_REG_FEATURE_LEVEL_MASK) != KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL)
+> > +                     return -EINVAL;
+> > +
+> > +             /*
+> > +              * Map all the possible incoming states to the only two we
+> > +              * really want to deal with.
+> > +              */
+> > +             switch (val & KVM_REG_FEATURE_LEVEL_MASK) {
+> > +             case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL:
+> > +             case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN:
+> > +                     wa_level = KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
+> > +                     break;
+> > +             case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL:
+> > +             case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
+> > +                     wa_level = KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED;
+> > +                     break;
+> > +             default:
+> > +                     return -EINVAL;
+> > +             }
+> > +
+> > +             /*
+> > +              * We can deal with NOT_AVAIL on NOT_REQUIRED, but not the
+> > +              * other way around.
+> > +              */
+> > +             if (get_kernel_wa_level(reg->id) < wa_level)
+> > +                     return -EINVAL;
+> > +
+> > +             return 0;
+> > +     default:
+> > +             return -ENOENT;
+> > +     }
+> > +
+> > +     return -EINVAL;
+> > +}
+> > diff --git a/arch/arm64/kvm/psci.c b/arch/arm64/kvm/psci.c
+> > index 372da09a2fab..bdfa93ca57d1 100644
+> > --- a/arch/arm64/kvm/psci.c
+> > +++ b/arch/arm64/kvm/psci.c
+> > @@ -439,186 +439,3 @@ int kvm_psci_call(struct kvm_vcpu *vcpu)
+> >               return -EINVAL;
+> >       }
+> >   }
+> > -
+> > -int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
+> > -{
+> > -     return 4;               /* PSCI version and three workaround registers */
+> > -}
+> > -
+> > -int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
+> > -{
+> > -     if (put_user(KVM_REG_ARM_PSCI_VERSION, uindices++))
+> > -             return -EFAULT;
+> > -
+> > -     if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1, uindices++))
+> > -             return -EFAULT;
+> > -
+> > -     if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2, uindices++))
+> > -             return -EFAULT;
+> > -
+> > -     if (put_user(KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3, uindices++))
+> > -             return -EFAULT;
+> > -
+> > -     return 0;
+> > -}
+> > -
+> > -#define KVM_REG_FEATURE_LEVEL_WIDTH  4
+> > -#define KVM_REG_FEATURE_LEVEL_MASK   (BIT(KVM_REG_FEATURE_LEVEL_WIDTH) - 1)
+> > -
+> > -/*
+> > - * Convert the workaround level into an easy-to-compare number, where higher
+> > - * values mean better protection.
+> > - */
+> > -static int get_kernel_wa_level(u64 regid)
+> > -{
+> > -     switch (regid) {
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+> > -             switch (arm64_get_spectre_v2_state()) {
+> > -             case SPECTRE_VULNERABLE:
+> > -                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
+> > -             case SPECTRE_MITIGATED:
+> > -                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL;
+> > -             case SPECTRE_UNAFFECTED:
+> > -                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED;
+> > -             }
+> > -             return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL;
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+> > -             switch (arm64_get_spectre_v4_state()) {
+> > -             case SPECTRE_MITIGATED:
+> > -                     /*
+> > -                      * As for the hypercall discovery, we pretend we
+> > -                      * don't have any FW mitigation if SSBS is there at
+> > -                      * all times.
+> > -                      */
+> > -                     if (cpus_have_final_cap(ARM64_SSBS))
+> > -                             return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
+> > -                     fallthrough;
+> > -             case SPECTRE_UNAFFECTED:
+> > -                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED;
+> > -             case SPECTRE_VULNERABLE:
+> > -                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
+> > -             }
+> > -             break;
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+> > -             switch (arm64_get_spectre_bhb_state()) {
+> > -             case SPECTRE_VULNERABLE:
+> > -                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL;
+> > -             case SPECTRE_MITIGATED:
+> > -                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_AVAIL;
+> > -             case SPECTRE_UNAFFECTED:
+> > -                     return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_REQUIRED;
+> > -             }
+> > -             return KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3_NOT_AVAIL;
+> > -     }
+> > -
+> > -     return -EINVAL;
+> > -}
+> > -
+> > -int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > -{
+> > -     void __user *uaddr = (void __user *)(long)reg->addr;
+> > -     u64 val;
+> > -
+> > -     switch (reg->id) {
+> > -     case KVM_REG_ARM_PSCI_VERSION:
+> > -             val = kvm_psci_version(vcpu);
+> > -             break;
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+> > -             val = get_kernel_wa_level(reg->id) & KVM_REG_FEATURE_LEVEL_MASK;
+> > -             break;
+> > -     default:
+> > -             return -ENOENT;
+> > -     }
+> > -
+> > -     if (copy_to_user(uaddr, &val, KVM_REG_SIZE(reg->id)))
+> > -             return -EFAULT;
+> > -
+> > -     return 0;
+> > -}
+> > -
+> > -int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+> > -{
+> > -     void __user *uaddr = (void __user *)(long)reg->addr;
+> > -     u64 val;
+> > -     int wa_level;
+> > -
+> > -     if (copy_from_user(&val, uaddr, KVM_REG_SIZE(reg->id)))
+> > -             return -EFAULT;
+> > -
+> > -     switch (reg->id) {
+> > -     case KVM_REG_ARM_PSCI_VERSION:
+> > -     {
+> > -             bool wants_02;
+> > -
+> > -             wants_02 = test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features);
+> > -
+> > -             switch (val) {
+> > -             case KVM_ARM_PSCI_0_1:
+> > -                     if (wants_02)
+> > -                             return -EINVAL;
+> > -                     vcpu->kvm->arch.psci_version = val;
+> > -                     return 0;
+> > -             case KVM_ARM_PSCI_0_2:
+> > -             case KVM_ARM_PSCI_1_0:
+> > -             case KVM_ARM_PSCI_1_1:
+> > -                     if (!wants_02)
+> > -                             return -EINVAL;
+> > -                     vcpu->kvm->arch.psci_version = val;
+> > -                     return 0;
+> > -             }
+> > -             break;
+> > -     }
+> > -
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1:
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3:
+> > -             if (val & ~KVM_REG_FEATURE_LEVEL_MASK)
+> > -                     return -EINVAL;
+> > -
+> > -             if (get_kernel_wa_level(reg->id) < val)
+> > -                     return -EINVAL;
+> > -
+> > -             return 0;
+> > -
+> > -     case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2:
+> > -             if (val & ~(KVM_REG_FEATURE_LEVEL_MASK |
+> > -                         KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED))
+> > -                     return -EINVAL;
+> > -
+> > -             /* The enabled bit must not be set unless the level is AVAIL. */
+> > -             if ((val & KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED) &&
+> > -                 (val & KVM_REG_FEATURE_LEVEL_MASK) != KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL)
+> > -                     return -EINVAL;
+> > -
+> > -             /*
+> > -              * Map all the possible incoming states to the only two we
+> > -              * really want to deal with.
+> > -              */
+> > -             switch (val & KVM_REG_FEATURE_LEVEL_MASK) {
+> > -             case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL:
+> > -             case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN:
+> > -                     wa_level = KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL;
+> > -                     break;
+> > -             case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_AVAIL:
+> > -             case KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
+> > -                     wa_level = KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED;
+> > -                     break;
+> > -             default:
+> > -                     return -EINVAL;
+> > -             }
+> > -
+> > -             /*
+> > -              * We can deal with NOT_AVAIL on NOT_REQUIRED, but not the
+> > -              * other way around.
+> > -              */
+> > -             if (get_kernel_wa_level(reg->id) < wa_level)
+> > -                     return -EINVAL;
+> > -
+> > -             return 0;
+> > -     default:
+> > -             return -ENOENT;
+> > -     }
+> > -
+> > -     return -EINVAL;
+> > -}
+> > diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
+> > index 0e2509d27910..5d38628a8d04 100644
+> > --- a/include/kvm/arm_hypercalls.h
+> > +++ b/include/kvm/arm_hypercalls.h
+> > @@ -40,4 +40,11 @@ static inline void smccc_set_retval(struct kvm_vcpu *vcpu,
+> >       vcpu_set_reg(vcpu, 3, a3);
+> >   }
+> >
+> > +struct kvm_one_reg;
+> > +
+> > +int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
+> > +int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+> > +int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> > +int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> > +
+> >   #endif
+> > diff --git a/include/kvm/arm_psci.h b/include/kvm/arm_psci.h
+> > index 68b96c3826c3..6e55b9283789 100644
+> > --- a/include/kvm/arm_psci.h
+> > +++ b/include/kvm/arm_psci.h
+> > @@ -39,11 +39,4 @@ static inline int kvm_psci_version(struct kvm_vcpu *vcpu)
+> >
+> >   int kvm_psci_call(struct kvm_vcpu *vcpu);
+> >
+> > -struct kvm_one_reg;
+> > -
+> > -int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu);
+> > -int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices);
+> > -int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> > -int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg);
+> > -
+> >   #endif /* __KVM_ARM_PSCI_H__ */
+> >
+>
+> Thanks,
+> Gavin
+Thank you for the review, Gavin.
 
+Regards,
+Raghavendra
+>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
