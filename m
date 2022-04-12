@@ -2,59 +2,60 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 600C6C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Apr 2022 13:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0E8C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Apr 2022 13:14:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF2CC4B28A;
-	Tue, 12 Apr 2022 09:14:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EB6F4B2C5;
+	Tue, 12 Apr 2022 09:14:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tYG3z7SshBCN; Tue, 12 Apr 2022 09:14:01 -0400 (EDT)
+	with ESMTP id gLp5oQ-UrbTH; Tue, 12 Apr 2022 09:14:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EA554B2C3;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACAF94B2CC;
 	Tue, 12 Apr 2022 09:14:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38E434B2B2
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 675444B25A
  for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:13:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cGVZBFQZy3px for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id cN7CoXp1fuO2 for <kvmarm@lists.cs.columbia.edu>;
  Tue, 12 Apr 2022 09:13:56 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1BA624B285
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1DC044B287
  for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:13:56 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 931ED61A00;
- Tue, 12 Apr 2022 13:13:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9483C385B4;
+ by ams.source.kernel.org (Postfix) with ESMTPS id CC599B81B5D;
  Tue, 12 Apr 2022 13:13:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8139FC385A6;
+ Tue, 12 Apr 2022 13:13:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1649769234;
- bh=ozZe6zkm6YfsS4fpe1Qy1Aj7/ayH8KRXRzvRtrC6w+k=;
+ s=k20201202; t=1649769233;
+ bh=SpKp3TCBsOBkzmGD30AlbWzu/c5WczQQXE0rta2jfmY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=oXYLZkstBh33GfSwm9DEU+pUMhOXKXPhotiYqdVYuCwdlETC7yhAXdPLTE87DT04N
- 0YglHLB8fDlnSvK10sfSiZGlnh5XujW1RkALw5L0ccivKuNuK7BbsoW5mFgMtyNvb4
- CvpwSMn9R7OLAcXObFss/dVbTTgGFT+DjoWEwZUIWVj/ZQrw5NZPw+QqYsUW2BY5TV
- U7O3YGMmEYZ76OUQBPC41oTtbMwONa+fDzKb9q2Rzs5P8H6+h0pIGaDwe1amsdXux+
- DTjHOqlzPTrlDLz6+4ywKbIwN8KPBwphn8/TPS8eaUm8ZLodkvL0m1N0se5PMgmiNf
- kKL5RKV5VE1hw==
+ b=pDDrQf7AiYZQslPFKSED5wqcAyN1pNVPNYZl6UrznnRPS1460iecM9izlYi39L1wB
+ s5B9ZRWHuoKmcPYqZnV2TYXpPU0qxRAa+2IvkXSfJOtZuN8aLXQBPXW+1xe9MYY5r/
+ 5byiBblzk0/Bjj8W3hydnihzaD2/bSucsq19gYaAO7svPQ9NX5ikflPbP0aQ3s1XLs
+ HGaLiJ+EZqJjL2HWCxzGVsapq1zGmMF7YifJ4aZSxBWmmQXKg5OzP5X/lJLMr7LDXb
+ q08NQP49c4NuQLGg8yJbZaT9Vll/a/ebXlmMsadnNFQz+OxeqTtrhXsoUs8FxJEBoQ
+ wpflEv4CtI8FQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1neGLA-003mvX-KP; Tue, 12 Apr 2022 14:13:52 +0100
+ id 1neGL9-003mvX-DR; Tue, 12 Apr 2022 14:13:51 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  kvm@vger.kernel.org
-Subject: [PATCH 07/10] KVM: arm64: Expose the WFXT feature to guests
-Date: Tue, 12 Apr 2022 14:13:00 +0100
-Message-Id: <20220412131303.504690-8-maz@kernel.org>
+Subject: [PATCH 01/10] arm64: Expand ESR_ELx_WFx_ISS_TI to match its ARMv8.7
+ definition
+Date: Tue, 12 Apr 2022 14:12:54 +0100
+Message-Id: <20220412131303.504690-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220412131303.504690-1-maz@kernel.org>
 References: <20220412131303.504690-1-maz@kernel.org>
@@ -85,57 +86,43 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Plumb in the capability, and expose WFxT to guests when available.
+Starting with FEAT_WFXT in ARMv8.7, the TI field in the ISS
+that is reported on a WFx trap is expanded by one bit to
+allow the description of WFET and WFIT.
+
+Special care is taken to exclude the WFxT bit from the mask
+used to match WFI so that it also matches WFIT when trapped from
+EL0.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 12 ++++++++++++
- arch/arm64/kvm/sys_regs.c      |  2 ++
- 2 files changed, 14 insertions(+)
+ arch/arm64/include/asm/esr.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index d72c4b4d389c..db6d9ab685e5 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -237,6 +237,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar2[] = {
- 	ARM64_FTR_BITS(FTR_VISIBLE_IF_IS_ENABLED(CONFIG_ARM64_PTR_AUTH),
- 		       FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_GPA3_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_RPRES_SHIFT, 4, 0),
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_NONSTRICT, FTR_LOWER_SAFE, ID_AA64ISAR2_WFXT_SHIFT, 4, 0),
- 	ARM64_FTR_END,
- };
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index d52a0b269ee8..65c2201b11b2 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -133,7 +133,8 @@
+ #define ESR_ELx_CV		(UL(1) << 24)
+ #define ESR_ELx_COND_SHIFT	(20)
+ #define ESR_ELx_COND_MASK	(UL(0xF) << ESR_ELx_COND_SHIFT)
+-#define ESR_ELx_WFx_ISS_TI	(UL(1) << 0)
++#define ESR_ELx_WFx_ISS_TI	(UL(3) << 0)
++#define ESR_ELx_WFx_ISS_WFxT	(UL(2) << 0)
+ #define ESR_ELx_WFx_ISS_WFI	(UL(0) << 0)
+ #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+ #define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
+@@ -146,7 +147,8 @@
+ #define DISR_EL1_ESR_MASK	(ESR_ELx_AET | ESR_ELx_EA | ESR_ELx_FSC)
  
-@@ -2442,6 +2443,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.matches = has_cpuid_feature,
- 		.min_field_value = 1,
- 	},
-+	{
-+		.desc = "WFx with timeout",
-+		.capability = ARM64_HAS_WFXT,
-+		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
-+		.sys_reg = SYS_ID_AA64ISAR2_EL1,
-+		.sign = FTR_UNSIGNED,
-+		.field_pos = ID_AA64ISAR2_WFXT_SHIFT,
-+		.field_width = 4,
-+		.matches = has_cpuid_feature,
-+		.min_field_value = ID_AA64ISAR2_WFXT_SUPPORTED,
-+	},
- 	{},
- };
+ /* ESR value templates for specific events */
+-#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK | ESR_ELx_WFx_ISS_TI)
++#define ESR_ELx_WFx_MASK	(ESR_ELx_EC_MASK |			\
++				 (ESR_ELx_WFx_ISS_TI & ~ESR_ELx_WFx_ISS_WFxT))
+ #define ESR_ELx_WFx_WFI_VAL	((ESR_ELx_EC_WFx << ESR_ELx_EC_SHIFT) |	\
+ 				 ESR_ELx_WFx_ISS_WFI)
  
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7b45c040cc27..cc9a77546cc0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1144,6 +1144,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 		if (!vcpu_has_ptrauth(vcpu))
- 			val &= ~(ARM64_FEATURE_MASK(ID_AA64ISAR2_APA3) |
- 				 ARM64_FEATURE_MASK(ID_AA64ISAR2_GPA3));
-+		if (!cpus_have_final_cap(ARM64_HAS_WFXT))
-+			val &= ~ARM64_FEATURE_MASK(ID_AA64ISAR2_WFXT);
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
- 		/* Limit debug to ARMv8.0 */
 -- 
 2.34.1
 
