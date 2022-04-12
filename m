@@ -2,43 +2,44 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 537BDC433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 12 Apr 2022 13:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A39D7C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 12 Apr 2022 13:32:59 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01AEA4B2EC;
-	Tue, 12 Apr 2022 09:32:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 59A104B2B6;
+	Tue, 12 Apr 2022 09:32:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Y4GeVU2e7bj5; Tue, 12 Apr 2022 09:32:55 -0400 (EDT)
+	with ESMTP id E12jPhzt++IG; Tue, 12 Apr 2022 09:32:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6B454B2B1;
-	Tue, 12 Apr 2022 09:32:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 23E5D4B2CD;
+	Tue, 12 Apr 2022 09:32:57 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ECB204B262
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:32:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4DA94B1F4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:32:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3e--B5JBXLQ3 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Apr 2022 09:32:52 -0400 (EDT)
+ with ESMTP id 9G-U08UmYR7a for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Apr 2022 09:32:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CEF074B297
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:32:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BFD24B2A8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2022 09:32:52 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 81E281516;
- Tue, 12 Apr 2022 06:32:50 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 33FBF150C;
+ Tue, 12 Apr 2022 06:32:52 -0700 (PDT)
 Received: from e121798.arm.com (unknown [10.57.11.98])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id F10033F70D;
- Tue, 12 Apr 2022 06:32:48 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C3C1D3F70D;
+ Tue, 12 Apr 2022 06:32:50 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: will@kernel.org, julien.thierry.kdev@gmail.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
  mark.rutland@arm.com, andre.przywara@arm.com
-Subject: [PATCH v3 kvmtool 08/11] Add cpumask functions
-Date: Tue, 12 Apr 2022 14:32:28 +0100
-Message-Id: <20220412133231.35355-9-alexandru.elisei@arm.com>
+Subject: [PATCH v3 kvmtool 09/11] update_headers.sh: Sync ABI headers with
+ Linux v5.18-rc2
+Date: Tue, 12 Apr 2022 14:32:29 +0100
+Message-Id: <20220412133231.35355-10-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220412133231.35355-1-alexandru.elisei@arm.com>
 References: <20220412133231.35355-1-alexandru.elisei@arm.com>
@@ -59,662 +60,92 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add a handful of cpumask functions, some of which will be used when
-dealing with different PMUs on heterogeneous systems.
-
-The maximum number of CPUs in a system, NR_CPUS, which dictates the size of
-the cpumask, has been taken from the Kconfig file for each architecture,
-from Linux version 5.16.
-
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- Makefile                         |   2 +
- arm/aarch32/include/asm/kernel.h |   8 +
- arm/aarch64/include/asm/kernel.h |   8 +
- include/linux/bitmap.h           |  71 +++++++++
- include/linux/bitops.h           |   2 +
- include/linux/bits.h             |   8 +
- include/linux/cpumask.h          |  62 ++++++++
- include/linux/find.h             |  30 ++++
- include/linux/kernel.h           |   6 +
- mips/include/asm/kernel.h        |   8 +
- powerpc/include/asm/kernel.h     |   8 +
- util/bitmap.c                    | 256 +++++++++++++++++++++++++++++++
- util/find.c                      |  40 +++++
- x86/include/asm/kernel.h         |   8 +
- 14 files changed, 517 insertions(+)
- create mode 100644 arm/aarch32/include/asm/kernel.h
- create mode 100644 arm/aarch64/include/asm/kernel.h
- create mode 100644 include/linux/bitmap.h
- create mode 100644 include/linux/bits.h
- create mode 100644 include/linux/cpumask.h
- create mode 100644 include/linux/find.h
- create mode 100644 mips/include/asm/kernel.h
- create mode 100644 powerpc/include/asm/kernel.h
- create mode 100644 util/bitmap.c
- create mode 100644 util/find.c
- create mode 100644 x86/include/asm/kernel.h
+ arm/aarch64/include/asm/kvm.h | 11 +++++++++++
+ include/linux/kvm.h           | 15 +++++++++++++--
+ 2 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 31274353656d..9e67c7637b1e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -89,6 +89,8 @@ OBJS	+= net/uip/buf.o
- OBJS	+= net/uip/csum.o
- OBJS	+= net/uip/dhcp.o
- OBJS	+= kvm-cmd.o
-+OBJS	+= util/bitmap.o
-+OBJS	+= util/find.o
- OBJS	+= util/init.o
- OBJS    += util/iovec.o
- OBJS	+= util/rbtree.o
-diff --git a/arm/aarch32/include/asm/kernel.h b/arm/aarch32/include/asm/kernel.h
-new file mode 100644
-index 000000000000..61296094deb1
---- /dev/null
-+++ b/arm/aarch32/include/asm/kernel.h
-@@ -0,0 +1,8 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef __ASM_KERNEL_H
-+#define __ASM_KERNEL_H
-+
-+#define NR_CPUS	32
-+
-+#endif /* __ASM_KERNEL_H */
-diff --git a/arm/aarch64/include/asm/kernel.h b/arm/aarch64/include/asm/kernel.h
-new file mode 100644
-index 000000000000..a2a8d9ed4059
---- /dev/null
-+++ b/arm/aarch64/include/asm/kernel.h
-@@ -0,0 +1,8 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef __ASM_KERNEL_H
-+#define __ASM_KERNEL_H
-+
-+#define NR_CPUS	4096
-+
-+#endif /* __ASM_KERNEL_H */
-diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-new file mode 100644
-index 000000000000..3b203461415a
---- /dev/null
-+++ b/include/linux/bitmap.h
-@@ -0,0 +1,71 @@
-+#ifndef KVM__BITMAP_H
-+#define KVM__BITMAP_H
-+
-+#include <stdbool.h>
-+#include <string.h>
-+
-+#include "linux/bitops.h"
-+
-+#define DECLARE_BITMAP(name,bits) \
-+	unsigned long name[BITS_TO_LONGS(bits)]
-+
-+#define BITMAP_FIRST_WORD_MASK(start) (~0UL << ((start) & (BITS_PER_LONG - 1)))
-+#define BITMAP_LAST_WORD_MASK(nbits) (~0UL >> (-(nbits) & (BITS_PER_LONG - 1)))
-+
-+static inline void bitmap_zero(unsigned long *dst, unsigned int nbits)
-+{
-+	unsigned int len = BITS_TO_LONGS(nbits) * sizeof(unsigned long);
-+	memset(dst, 0, len);
-+}
-+
-+#if __BYTE_ORDER__ ==  __ORDER_LITTLE_ENDIAN__
-+#define BITMAP_MEM_ALIGNMENT 8
-+#else
-+#define BITMAP_MEM_ALIGNMENT (8 * sizeof(unsigned long))
-+#endif
-+#define BITMAP_MEM_MASK (BITMAP_MEM_ALIGNMENT - 1)
-+
-+void __bitmap_set(unsigned long *map, unsigned int start, int len);
-+
-+static inline void bitmap_set(unsigned long *map, unsigned int start,
-+		unsigned int nbits)
-+{
-+	if (__builtin_constant_p(nbits) && nbits == 1)
-+		set_bit(start, map);
-+	else if (__builtin_constant_p(start & BITMAP_MEM_MASK) &&
-+		 IS_ALIGNED(start, BITMAP_MEM_ALIGNMENT) &&
-+		 __builtin_constant_p(nbits & BITMAP_MEM_MASK) &&
-+		 IS_ALIGNED(nbits, BITMAP_MEM_ALIGNMENT))
-+		memset((char *)map + start / 8, 0xff, nbits / 8);
-+	else
-+		__bitmap_set(map, start, nbits);
-+}
-+
-+bool __bitmap_and(unsigned long *dst, const unsigned long *src1,
-+		  const unsigned long *src2, unsigned int nbits);
-+
-+static inline bool bitmap_and(unsigned long *dst, const unsigned long *src1,
-+			      const unsigned long *src2, unsigned int nbits)
-+{
-+	if (nbits >= 0 && nbits <= BITS_PER_LONG)
-+		return (*dst = *src1 & *src2 & BITMAP_LAST_WORD_MASK(nbits)) != 0;
-+
-+	return __bitmap_and(dst, src1, src2, nbits);
-+}
-+
-+int bitmap_parselist(const char *buf, unsigned long *maskp, int nmaskbits);
-+
-+bool __bitmap_subset(const unsigned long *bitmap1, const unsigned long *bitmap2,
-+		     unsigned int nbits);
-+
-+static inline bool bitmap_subset(const unsigned long *src1,
-+				 const unsigned long *src2, unsigned int nbits)
-+{
-+	if (nbits >= 0 && nbits <= BITS_PER_LONG)
-+		return !((*src1 & ~(*src2)) & BITMAP_LAST_WORD_MASK(nbits));
-+
-+	return __bitmap_subset(src1, src2, nbits);
-+}
-+
-+
-+#endif /* KVM__BITMAP_H */
-diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-index 3d31f0acf48e..ae33922f5743 100644
---- a/include/linux/bitops.h
-+++ b/include/linux/bitops.h
-@@ -11,6 +11,8 @@
- #define BITS_PER_BYTE           8
- #define BITS_TO_LONGS(nr)       DIV_ROUND_UP(nr, BITS_PER_BYTE * sizeof(long))
+diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
+index 323e251ed37b..c1b6ddc02d2f 100644
+--- a/arm/aarch64/include/asm/kvm.h
++++ b/arm/aarch64/include/asm/kvm.h
+@@ -367,6 +367,7 @@ struct kvm_arm_copy_mte_tags {
+ #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+ #define   KVM_ARM_VCPU_PMU_V3_INIT	1
+ #define   KVM_ARM_VCPU_PMU_V3_FILTER	2
++#define   KVM_ARM_VCPU_PMU_V3_SET_PMU	3
+ #define KVM_ARM_VCPU_TIMER_CTRL		1
+ #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+ #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
+@@ -418,6 +419,16 @@ struct kvm_arm_copy_mte_tags {
+ #define KVM_PSCI_RET_INVAL		PSCI_RET_INVALID_PARAMS
+ #define KVM_PSCI_RET_DENIED		PSCI_RET_DENIED
  
-+#define BIT_WORD(nr)		((nr) / BITS_PER_LONG)
++/* arm64-specific kvm_run::system_event flags */
++/*
++ * Reset caused by a PSCI v1.1 SYSTEM_RESET2 call.
++ * Valid only when the system event has a type of KVM_SYSTEM_EVENT_RESET.
++ */
++#define KVM_SYSTEM_EVENT_RESET_FLAG_PSCI_RESET2	(1ULL << 0)
 +
- static inline void set_bit(int nr, unsigned long *addr)
- {
- 	addr[nr / BITS_PER_LONG] |= 1UL << (nr % BITS_PER_LONG);
-diff --git a/include/linux/bits.h b/include/linux/bits.h
-new file mode 100644
-index 000000000000..37271dd32633
---- /dev/null
-+++ b/include/linux/bits.h
-@@ -0,0 +1,8 @@
-+#ifndef LINUX__BITS_H_
-+#define LINUX__BITS_H_
++/* run->fail_entry.hardware_entry_failure_reason codes. */
++#define KVM_EXIT_FAIL_ENTRY_CPU_UNSUPPORTED	(1ULL << 0)
 +
-+#define GENMASK(h, l) \
-+	((~0UL - (1UL << (l)) + 1) & \
-+	 (~0UL >> (BITS_PER_LONG - 1 - (h))))
-+
-+#endif /* LINUX__BITS_H */
-diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-new file mode 100644
-index 000000000000..c4be06621cf4
---- /dev/null
-+++ b/include/linux/cpumask.h
-@@ -0,0 +1,62 @@
-+#ifndef LINUX__CPUMASK_H
-+#define LINUX__CPUMASK_H
-+
-+#include <stdbool.h>
-+
-+#include "linux/bitmap.h"
-+#include "linux/find.h"
-+#include "linux/kernel.h"
-+
-+typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
-+
-+#define cpumask_bits(maskp)	((maskp)->bits)
-+
-+static inline void cpumask_set_cpu(int cpu, cpumask_t *dstp)
-+{
-+	set_bit(cpu, cpumask_bits(dstp));
-+}
-+
-+static inline void cpumask_clear_cpu(int cpu, cpumask_t *dstp)
-+{
-+	clear_bit(cpu, cpumask_bits(dstp));
-+}
-+
-+static inline bool cpumask_test_cpu(int cpu, const cpumask_t *cpumask)
-+{
-+	return test_bit(cpu, cpumask_bits((cpumask)));
-+}
-+
-+static inline void cpumask_clear(cpumask_t *dstp)
-+{
-+	bitmap_zero(cpumask_bits(dstp), NR_CPUS);
-+}
-+
-+static inline bool cpumask_and(cpumask_t *dstp, cpumask_t *src1p,
-+			       cpumask_t *src2p)
-+{
-+	return bitmap_and(cpumask_bits(dstp), cpumask_bits(src1p),
-+			  cpumask_bits(src2p), NR_CPUS);
-+}
-+
-+static inline unsigned int cpumask_next(int n, const struct cpumask *srcp)
-+{
-+	return find_next_bit(cpumask_bits(srcp), NR_CPUS, n + 1);
-+}
-+
-+#define for_each_cpu(cpu, maskp)			\
-+	for ((cpu) = -1;				\
-+	     (cpu) = cpumask_next((cpu), (maskp)),	\
-+	     (cpu) < NR_CPUS;)
-+
-+static inline int cpulist_parse(const char *buf, cpumask_t *dstp)
-+{
-+	return bitmap_parselist(buf, cpumask_bits(dstp), NR_CPUS);
-+}
-+
-+static inline bool cpumask_subset(const  cpumask_t *src1p,
-+				  const  cpumask_t *src2p)
-+{
-+	return bitmap_subset(cpumask_bits(src1p), cpumask_bits(src2p), NR_CPUS);
-+}
-+
-+#endif /* LINUX__CPUMASK_H */
-diff --git a/include/linux/find.h b/include/linux/find.h
-new file mode 100644
-index 000000000000..22819150d146
---- /dev/null
-+++ b/include/linux/find.h
-@@ -0,0 +1,30 @@
-+#ifndef LINUX__FIND_H
-+#define LINUX__FIND_H
-+
-+#include <stddef.h>
-+
-+#include "linux/bitops.h"
-+#include "linux/bits.h"
-+
-+unsigned long _find_next_bit(const unsigned long *addr1,
-+		const unsigned long *addr2, unsigned long nbits,
-+		unsigned long start, unsigned long invert);
-+
-+static inline
-+unsigned long find_next_bit(const unsigned long *addr, unsigned long size,
-+			    unsigned long offset)
-+{
-+	if (size >= 0 && size <= BITS_PER_LONG) {
-+		unsigned long val;
-+
-+		if (offset >= size)
-+			return size;
-+
-+		val = *addr & GENMASK(size - 1, offset);
-+		return val ? (unsigned long)__builtin_ctzl(val) : size;
-+	}
-+
-+	return _find_next_bit(addr, NULL, size, offset, 0);
-+}
-+
-+#endif /* LINUX__FIND_H */
-diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-index f2bff5f12b61..6c22f1c06f6d 100644
---- a/include/linux/kernel.h
-+++ b/include/linux/kernel.h
-@@ -2,10 +2,16 @@
- #ifndef KVM__LINUX_KERNEL_H_
- #define KVM__LINUX_KERNEL_H_
+ #endif
  
-+#include "asm/kernel.h"
-+
-+#define __round_mask(x, y)	((__typeof__(x))((y)-1))
-+#define round_down(x, y)	((x) & ~__round_mask(x, y))
-+
- #define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
+ #endif /* __ARM_KVM_H__ */
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index 507ee1f2aa96..91a6fe4e02c0 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -562,9 +562,12 @@ struct kvm_s390_mem_op {
+ 	__u32 op;		/* type of operation */
+ 	__u64 buf;		/* buffer in userspace */
+ 	union {
+-		__u8 ar;	/* the access register number */
++		struct {
++			__u8 ar;	/* the access register number */
++			__u8 key;	/* access key, ignored if flag unset */
++		};
+ 		__u32 sida_offset; /* offset into the sida */
+-		__u8 reserved[32]; /* should be set to 0 */
++		__u8 reserved[32]; /* ignored */
+ 	};
+ };
+ /* types for kvm_s390_mem_op->op */
+@@ -572,9 +575,12 @@ struct kvm_s390_mem_op {
+ #define KVM_S390_MEMOP_LOGICAL_WRITE	1
+ #define KVM_S390_MEMOP_SIDA_READ	2
+ #define KVM_S390_MEMOP_SIDA_WRITE	3
++#define KVM_S390_MEMOP_ABSOLUTE_READ	4
++#define KVM_S390_MEMOP_ABSOLUTE_WRITE	5
+ /* flags for kvm_s390_mem_op->flags */
+ #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
+ #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
++#define KVM_S390_MEMOP_F_SKEY_PROTECTION	(1ULL << 2)
  
- #define ALIGN(x,a)		__ALIGN_MASK(x,(typeof(x))(a)-1)
- #define __ALIGN_MASK(x,mask)	(((x)+(mask))&~(mask))
-+#define IS_ALIGNED(x, a)	(((x) & ((typeof(x))(a) - 1)) == 0)
+ /* for KVM_INTERRUPT */
+ struct kvm_interrupt {
+@@ -1135,6 +1141,9 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_XSAVE2 208
+ #define KVM_CAP_SYS_ATTRIBUTES 209
+ #define KVM_CAP_PPC_AIL_MODE_3 210
++#define KVM_CAP_S390_MEM_OP_EXTENSION 211
++#define KVM_CAP_PMU_CAPABILITY 212
++#define KVM_CAP_DISABLE_QUIRKS2 213
  
- #ifndef offsetof
- #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
-diff --git a/mips/include/asm/kernel.h b/mips/include/asm/kernel.h
-new file mode 100644
-index 000000000000..cbceffd02acd
---- /dev/null
-+++ b/mips/include/asm/kernel.h
-@@ -0,0 +1,8 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef __ASM_KERNEL_H
-+#define __ASM_KERNEL_H
-+
-+#define NR_CPUS	256
-+
-+#endif /* __ASM_KERNEL_H */
-diff --git a/powerpc/include/asm/kernel.h b/powerpc/include/asm/kernel.h
-new file mode 100644
-index 000000000000..7b4fe88efd65
---- /dev/null
-+++ b/powerpc/include/asm/kernel.h
-@@ -0,0 +1,8 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef __ASM_KERNEL_H
-+#define __ASM_KERNEL_H
-+
-+#define NR_CPUS	2048
-+
-+#endif /* __ASM_KERNEL_H */
-diff --git a/util/bitmap.c b/util/bitmap.c
-new file mode 100644
-index 000000000000..8bae1c91499d
---- /dev/null
-+++ b/util/bitmap.c
-@@ -0,0 +1,256 @@
-+/*
-+ * Taken from Linux kernel version v5.15.
-+ */
-+#include <ctype.h>
-+#include <limits.h>
-+#include <stdlib.h>
-+#include <strings.h>
-+
-+#include "linux/bitmap.h"
-+#include "linux/bitops.h"
-+#include "linux/err.h"
-+
-+/*
-+ * Region 9-38:4/10 describes the following bitmap structure:
-+ * 0	   9  12    18			38	     N
-+ * .........****......****......****..................
-+ *	    ^  ^     ^			 ^	     ^
-+ *      start  off   group_len	       end	 nbits
-+ */
-+struct region {
-+	unsigned int start;
-+	unsigned int off;
-+	unsigned int group_len;
-+	unsigned int end;
-+	unsigned int nbits;
-+};
-+
-+void __bitmap_set(unsigned long *map, unsigned int start, int len)
-+{
-+	unsigned long *p = map + BIT_WORD(start);
-+	const unsigned int size = start + len;
-+	int bits_to_set = BITS_PER_LONG - (start % BITS_PER_LONG);
-+	unsigned long mask_to_set = BITMAP_FIRST_WORD_MASK(start);
-+
-+	while (len - bits_to_set >= 0) {
-+		*p |= mask_to_set;
-+		len -= bits_to_set;
-+		bits_to_set = BITS_PER_LONG;
-+		mask_to_set = ~0UL;
-+		p++;
-+	}
-+	if (len) {
-+		mask_to_set &= BITMAP_LAST_WORD_MASK(size);
-+		*p |= mask_to_set;
-+	}
-+}
-+
-+static void bitmap_set_region(const struct region *r, unsigned long *bitmap)
-+{
-+	unsigned int start;
-+
-+	for (start = r->start; start <= r->end; start += r->group_len)
-+		bitmap_set(bitmap, start, min(r->end - start + 1, r->off));
-+}
-+
-+static inline bool __end_of_region(char c)
-+{
-+	return isspace(c) || c == ',';
-+}
-+
-+static inline bool end_of_str(char c)
-+{
-+	return c == '\0' || c == '\n';
-+}
-+
-+static inline bool end_of_region(char c)
-+{
-+	return __end_of_region(c) || end_of_str(c);
-+}
-+
-+/*
-+ * The format allows commas and whitespaces at the beginning
-+ * of the region.
-+ */
-+static const char *bitmap_find_region(const char *str)
-+{
-+	while (__end_of_region(*str))
-+		str++;
-+
-+	return end_of_str(*str) ? NULL : str;
-+}
-+
-+static int bitmap_check_region(const struct region *r)
-+{
-+	if (r->start > r->end || r->group_len == 0 || r->off > r->group_len)
-+		return -EINVAL;
-+
-+	if (r->end >= r->nbits)
-+		return -ERANGE;
-+
-+	return 0;
-+}
-+
-+static const char *bitmap_getnum(const char *str, unsigned int *num,
-+				 unsigned int lastbit)
-+{
-+	unsigned long long n;
-+	char *endptr;
-+
-+	if (str[0] == 'N') {
-+		*num = lastbit;
-+		return str + 1;
-+	}
-+
-+	n = strtoll(str, &endptr, 10);
-+	/* No digits found. */
-+	if (n == 0 && endptr == str)
-+		return ERR_PTR(-EINVAL);
-+	/* Check for overflows and negative numbers. */
-+	if (n == ULLONG_MAX || n != (unsigned long)n || n != (unsigned int)n)
-+		return ERR_PTR(-EOVERFLOW);
-+
-+	*num = n;
-+	return endptr;
-+}
-+
-+static const char *bitmap_parse_region(const char *str, struct region *r)
-+{
-+	unsigned int lastbit = r->nbits - 1;
-+
-+	if (!strncasecmp(str, "all", 3)) {
-+		r->start = 0;
-+		r->end = lastbit;
-+		str += 3;
-+
-+		goto check_pattern;
-+	}
-+
-+	str = bitmap_getnum(str, &r->start, lastbit);
-+	if (IS_ERR(str))
-+		return str;
-+
-+	if (end_of_region(*str))
-+		goto no_end;
-+
-+	if (*str != '-')
-+		return ERR_PTR(-EINVAL);
-+
-+	str = bitmap_getnum(str + 1, &r->end, lastbit);
-+	if (IS_ERR(str))
-+		return str;
-+
-+check_pattern:
-+	if (end_of_region(*str))
-+		goto no_pattern;
-+
-+	if (*str != ':')
-+		return ERR_PTR(-EINVAL);
-+
-+	str = bitmap_getnum(str + 1, &r->off, lastbit);
-+	if (IS_ERR(str))
-+		return str;
-+
-+	if (*str != '/')
-+		return ERR_PTR(-EINVAL);
-+
-+	return bitmap_getnum(str + 1, &r->group_len, lastbit);
-+
-+no_end:
-+	r->end = r->start;
-+no_pattern:
-+	r->off = r->end + 1;
-+	r->group_len = r->end + 1;
-+
-+	return end_of_str(*str) ? NULL : str;
-+}
-+
-+/**
-+ * bitmap_parselist - convert list format ASCII string to bitmap
-+ * @buf: read user string from this buffer; must be terminated
-+ *    with a \0 or \n.
-+ * @maskp: write resulting mask here
-+ * @nmaskbits: number of bits in mask to be written
-+ *
-+ * Input format is a comma-separated list of decimal numbers and
-+ * ranges.  Consecutively set bits are shown as two hyphen-separated
-+ * decimal numbers, the smallest and largest bit numbers set in
-+ * the range.
-+ * Optionally each range can be postfixed to denote that only parts of it
-+ * should be set. The range will divided to groups of specific size.
-+ * From each group will be used only defined amount of bits.
-+ * Syntax: range:used_size/group_size
-+ * Example: 0-1023:2/256 ==> 0,1,256,257,512,513,768,769
-+ * The value 'N' can be used as a dynamically substituted token for the
-+ * maximum allowed value; i.e (nmaskbits - 1).  Keep in mind that it is
-+ * dynamic, so if system changes cause the bitmap width to change, such
-+ * as more cores in a CPU list, then any ranges using N will also change.
-+ *
-+ * Returns: 0 on success, -errno on invalid input strings. Error values:
-+ *
-+ *   - ``-EINVAL``: wrong region format
-+ *   - ``-EINVAL``: invalid character in string
-+ *   - ``-ERANGE``: bit number specified too large for mask
-+ *   - ``-EOVERFLOW``: integer overflow in the input parameters
-+ */
-+int bitmap_parselist(const char *buf, unsigned long *maskp, int nmaskbits)
-+{
-+	struct region r;
-+	long ret;
-+
-+	r.nbits = nmaskbits;
-+	bitmap_zero(maskp, r.nbits);
-+
-+	while (buf) {
-+		buf = bitmap_find_region(buf);
-+		if (buf == NULL)
-+			return 0;
-+
-+		buf = bitmap_parse_region(buf, &r);
-+		if (IS_ERR(buf))
-+			return PTR_ERR(buf);
-+
-+		ret = bitmap_check_region(&r);
-+		if (ret)
-+			return ret;
-+
-+		bitmap_set_region(&r, maskp);
-+	}
-+
-+	return 0;
-+}
-+
-+bool __bitmap_and(unsigned long *dst, const unsigned long *src1,
-+		  const unsigned long *src2, unsigned int nbits)
-+{
-+	unsigned int lim = nbits / BITS_PER_LONG;
-+	unsigned long result = 0;
-+	unsigned int k;
-+
-+	for (k = 0; k < lim; k++)
-+		result |= (dst[k] = src1[k] & src2[k]);
-+
-+	if (nbits % BITS_PER_LONG) {
-+		result |= (dst[k] = src1[k] & src2[k] &
-+			   BITMAP_LAST_WORD_MASK(nbits));
-+	}
-+
-+	return result != 0;
-+}
-+
-+bool __bitmap_subset(const unsigned long *bitmap1, const unsigned long *bitmap2,
-+		     unsigned int nbits)
-+{
-+	unsigned int k, lim = nbits / BITS_PER_LONG;
-+
-+	for (k = 0; k < lim; k++)
-+		if (bitmap1[k] & ~bitmap2[k])
-+			return false;
-+
-+	if (nbits % BITS_PER_LONG) {
-+		if ((bitmap1[k] & ~bitmap2[k]) & BITMAP_LAST_WORD_MASK(nbits))
-+			return false;
-+	}
-+
-+	return true;
-+}
-diff --git a/util/find.c b/util/find.c
-new file mode 100644
-index 000000000000..a438f2388e00
---- /dev/null
-+++ b/util/find.c
-@@ -0,0 +1,40 @@
-+/*
-+ * Taken from Linux kernel version v5.16.
-+ */
-+#include "linux/bitmap.h"
-+#include "linux/find.h"
-+#include "linux/kernel.h"
-+
-+unsigned long _find_next_bit(const unsigned long *addr1,
-+		const unsigned long *addr2, unsigned long nbits,
-+		unsigned long start, unsigned long invert)
-+{
-+	unsigned long tmp, mask;
-+
-+	if (start >= nbits)
-+		return nbits;
-+
-+	tmp = addr1[start / BITS_PER_LONG];
-+	if (addr2)
-+		tmp &= addr2[start / BITS_PER_LONG];
-+	tmp ^= invert;
-+
-+	/* Handle 1st word. */
-+	mask = BITMAP_FIRST_WORD_MASK(start);
-+	tmp &= mask;
-+
-+	start = round_down(start, BITS_PER_LONG);
-+
-+	while (!tmp) {
-+		start += BITS_PER_LONG;
-+		if (start >= nbits)
-+			return nbits;
-+
-+		tmp = addr1[start / BITS_PER_LONG];
-+		if (addr2)
-+			tmp &= addr2[start / BITS_PER_LONG];
-+		tmp ^= invert;
-+	}
-+
-+	return min(start + __builtin_ctzl(tmp), nbits);
-+}
-diff --git a/x86/include/asm/kernel.h b/x86/include/asm/kernel.h
-new file mode 100644
-index 000000000000..87fad2a0300a
---- /dev/null
-+++ b/x86/include/asm/kernel.h
-@@ -0,0 +1,8 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef _ASM_KERNEL_H
-+#define _ASM_KERNEL_H
-+
-+#define NR_CPUS	8196
-+
-+#endif /* _ASM_KERNEL_H */
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1971,6 +1980,8 @@ struct kvm_dirty_gfn {
+ #define KVM_BUS_LOCK_DETECTION_OFF             (1 << 0)
+ #define KVM_BUS_LOCK_DETECTION_EXIT            (1 << 1)
+ 
++#define KVM_PMU_CAP_DISABLE                    (1 << 0)
++
+ /**
+  * struct kvm_stats_header - Header of per vm/vcpu binary statistics data.
+  * @flags: Some extra information for header, always 0 for now.
 -- 
 2.25.1
 
