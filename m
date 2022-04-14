@@ -2,79 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34196C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 14 Apr 2022 17:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE103C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 14 Apr 2022 19:48:52 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A873D40C29;
-	Thu, 14 Apr 2022 13:06:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15D2449F4A;
+	Thu, 14 Apr 2022 15:48:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oLLtpxg4BGyl; Thu, 14 Apr 2022 13:06:08 -0400 (EDT)
+	with ESMTP id Xds1-Og+xHI8; Thu, 14 Apr 2022 15:48:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05A8E49F14;
-	Thu, 14 Apr 2022 13:06:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A7094B0B4;
+	Thu, 14 Apr 2022 15:48:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD36B411C7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2022 13:06:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C994D49F55
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2022 12:48:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3Pck2z8EvYKg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Apr 2022 13:06:05 -0400 (EDT)
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com
- [209.85.128.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D1A740C29
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2022 13:06:04 -0400 (EDT)
-Received: by mail-yw1-f169.google.com with SMTP id
- 00721157ae682-2eafabbc80aso61660087b3.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2022 10:06:04 -0700 (PDT)
+ with ESMTP id vlpJB5yjw0ro for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2022 12:48:18 -0400 (EDT)
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com
+ [209.85.167.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42EDA49E10
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2022 12:48:18 -0400 (EDT)
+Received: by mail-lf1-f43.google.com with SMTP id x33so10165413lfu.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2022 09:48:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8FncpDyJrwuRFXzkHfkmw8cO+5rJ1nS25HZyNzVQgAo=;
- b=PtJy3Lbs9qxhKHo4bC+JW5ENQp8QM/Fhk0uFaKKp4Us40fcytDYKYxqaKd+HvOdHJe
- mwpqwomNyt4F+DDGcba+5PScYUXoQFHp8n8oUXpGtkI6dl+9j+VfSs/cAVu3sBK1dgue
- kq5sB1+qlIHk/SaKOE60hkI1SIJkpEPz4r7s6J1nc33db7bxfPw3VRGZoUGyyk3G14et
- UOk2lINkmfc8MQcMxf3PvDXsArabjognSaiOm/nNrymeZghKMPpUX6FZql6ABryE+DJR
- hIpGxVjrTHh2ICNtqKdAolHnZdkdby+nzgx6cON+t+3IZwuAyShGziM2VH8zbKKFl3m5
- V91g==
+ :cc:content-transfer-encoding;
+ bh=GTnxN2EsXf7ieA0fobbMxJGrUwua/adr0ftiCPpCUzQ=;
+ b=E9X+HevX/munaDaFP2+L4BTUvOLjQ3Atyl/N5WHb0hix11i3pVfzmc3PEzJoSUYkNB
+ kKbmjOfHBGc3o+T+HXmwcyk+IPoD7qfYclxNjV7BLaOZXmi2w333teJgRcWg/nw0ocCw
+ dj3NuceO6AACJKn5xXJi6OoRoRiWoOgTbBRE5xCnUnt6b1B3JsqdGmziR6FpmkxzluTc
+ cPBMcE2j+uQtolIJbw/WoSYVgBLvFu4oFiBnDsukX8xkcly7cBRY0aHIaK2+aq66Gj3G
+ 9iDZGJWTpgfKzz6/wsCLyg/mB0ju2t+lOtzeVyuEUsOEf3/1af+6f90MYFLDQ4fK41P0
+ o9sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8FncpDyJrwuRFXzkHfkmw8cO+5rJ1nS25HZyNzVQgAo=;
- b=z1ks8ZgSkSN54UUeztk7s18Bz1wDYkVwplcTwc5tZE/vM2YIiP2EV2F+21Le/qG/pe
- cTGt8LVzkOPqpaSmSsSztxef9BNFgSi3T7zaJLdwaCNWKrfnpof7k7YVWj63R2XxG7wI
- bz0Bevi72g4c4m1R9waJH7aYnUGyyZjvjhs7LnVYcJupTWDdKkzxmEwzUQAvBusBI4NJ
- 42mu3Jn4xnoTRMXxTXyCH0OJSG7aJmFi4db9cSMLpSIz/0+1XKM09b8NOoF/pozwnVdc
- yAZxZCa6f3e7GT9FwvKc+T985Hhs2SmOcKOQqP+3GwUE7DepMSJmc767vQG/uzYVCEDj
- H+hA==
-X-Gm-Message-State: AOAM531FGXmi5bfCPTcVYkHrEeRbe7VxbVtVUyAYR2ml0qWwIQfpm/T2
- PG7CN6+JMS/EooucSbaZScFbkb05kizJwhpcKcBs/A==
-X-Google-Smtp-Source: ABdhPJxcXSYpARM6hoHSfqy8G8TnHxliR+byMigSHHxsIZtKlKpvYWzcA7P5xAs10k0rRnNkaXCMt8hDZ/OGAWZKvQ0=
-X-Received: by 2002:a81:58c1:0:b0:2eb:faf0:1e25 with SMTP id
- m184-20020a8158c1000000b002ebfaf01e25mr2693077ywb.311.1649955964102; Thu, 14
- Apr 2022 10:06:04 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=GTnxN2EsXf7ieA0fobbMxJGrUwua/adr0ftiCPpCUzQ=;
+ b=SGxA9abgtyaFlyk2G1JTNaaZfcFKSkWCws3sn8jz/VVkQSCINNPEoNSjBBECtKnv41
+ PZUlpgeTEfazFDudzu0j8nSkIADBON7ZBkPKRVtxRzdDl/NzDoagLKyGtiMlyOMoQq4I
+ zUizlh87AyTcqnqVgmgAb6Sc7/RD4iTfHV9gpTP2Q++J+HNe+p4AWDnf1C96EATqrjaQ
+ i7lC4pXhuNvFNSdyRKuJn9Jlseal0HCPdsTCoXuZUSIM6l3Nj0onoZsKY96oG++AnBKe
+ kwpN+g7Jgmsj81jow1jjLlyzfhZKG2pR4KhjxXcRNoJh9fbJOcyAyF/fIEr1AlmgIK0v
+ xiEw==
+X-Gm-Message-State: AOAM5305ALx5th6dL+O01pQxtWtrAOUKsTpfFhdojIVoyqrVNpAnJ4NG
+ ElERsOGkqRq/z5/foxyHPio7JoPddUpbQafhl3xezQ==
+X-Google-Smtp-Source: ABdhPJxlX3xjitRrl/Un3A8yoTtpZQfxnASYEEhBfhrSiF6WomrTewtGPfnVL5HO2q+whTsAMFSLhLgqVTad6UPvK1Q=
+X-Received: by 2002:a05:6512:1285:b0:46b:a899:1111 with SMTP id
+ u5-20020a056512128500b0046ba8991111mr2517893lfs.190.1649954896726; Thu, 14
+ Apr 2022 09:48:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220407011605.1966778-1-rananta@google.com>
- <20220407011605.1966778-5-rananta@google.com>
- <06b7539f-c5c0-843d-7617-a35a9f1d0e60@redhat.com>
- <CAJHc60y_rbTd4uX6aZCkt_P46EgM4QKXg5YXGzit3oweSzh8Sg@mail.gmail.com>
- <b01164d2-4c2a-0c7b-3837-35e95fb1b14c@redhat.com>
-In-Reply-To: <b01164d2-4c2a-0c7b-3837-35e95fb1b14c@redhat.com>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Thu, 14 Apr 2022 10:05:52 -0700
-Message-ID: <CAJHc60waHRxx54e1ki-NUvOfpBrdZxm1Et8g5K0k=qTE6nhTcQ@mail.gmail.com>
-Subject: Re: [PATCH v5 04/10] KVM: arm64: Add vendor hypervisor firmware
- register
-To: Gavin Shan <gshan@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20220401175554.1931568-1-dmatlack@google.com>
+ <20220401175554.1931568-17-dmatlack@google.com>
+ <YlDNE55k9DNf/v2+@google.com>
+In-Reply-To: <YlDNE55k9DNf/v2+@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Thu, 14 Apr 2022 09:47:49 -0700
+Message-ID: <CALzav=dt+xKfk5n9o6AP0+PEUpoyB6UN5ktxT4+hZEQNbODdSA@mail.gmail.com>
+Subject: Re: [PATCH v3 16/23] KVM: x86/mmu: Cache the access bits of shadowed
+ translations
+To: Sean Christopherson <seanjc@google.com>
+X-Mailman-Approved-At: Thu, 14 Apr 2022 15:48:49 -0400
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,249 +93,152 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 13, 2022 at 6:04 PM Gavin Shan <gshan@redhat.com> wrote:
->
-> Hi Raghavendra,
->
-> On 4/14/22 12:59 AM, Raghavendra Rao Ananta wrote:
-> > On Tue, Apr 12, 2022 at 8:59 PM Gavin Shan <gshan@redhat.com> wrote:
-> >> On 4/7/22 9:15 AM, Raghavendra Rao Ananta wrote:
-> >>> Introduce the firmware register to hold the vendor specific
-> >>> hypervisor service calls (owner value 6) as a bitmap. The
-> >>> bitmap represents the features that'll be enabled for the
-> >>> guest, as configured by the user-space. Currently, this
-> >>> includes support for KVM-vendor features, and Precision Time
-> >>> Protocol (PTP), represented by bit-0 and bit-1 respectively.
-> >>>
-> >>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> >>> ---
-> >>>    arch/arm64/include/asm/kvm_host.h |  2 ++
-> >>>    arch/arm64/include/uapi/asm/kvm.h |  4 ++++
-> >>>    arch/arm64/kvm/hypercalls.c       | 21 +++++++++++++++++----
-> >>>    include/kvm/arm_hypercalls.h      |  4 ++++
-> >>>    4 files changed, 27 insertions(+), 4 deletions(-)
-> >>>
-> >>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >>> index 20165242ebd9..b79161bad69a 100644
-> >>> --- a/arch/arm64/include/asm/kvm_host.h
-> >>> +++ b/arch/arm64/include/asm/kvm_host.h
-> >>> @@ -106,10 +106,12 @@ struct kvm_arch_memory_slot {
-> >>>     *
-> >>>     * @std_bmap: Bitmap of standard secure service calls
-> >>>     * @std_hyp_bmap: Bitmap of standard hypervisor service calls
-> >>> + * @vendor_hyp_bmap: Bitmap of vendor specific hypervisor service calls
-> >>>     */
-> >>>    struct kvm_smccc_features {
-> >>>        u64 std_bmap;
-> >>>        u64 std_hyp_bmap;
-> >>> +     u64 vendor_hyp_bmap;
-> >>>    };
-> >>>
-> >>>    struct kvm_arch {
-> >>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> >>> index 67353bf4e69d..9a5ac0ed4113 100644
-> >>> --- a/arch/arm64/include/uapi/asm/kvm.h
-> >>> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> >>> @@ -344,6 +344,10 @@ struct kvm_arm_copy_mte_tags {
-> >>>    #define KVM_REG_ARM_STD_HYP_BMAP            KVM_REG_ARM_FW_FEAT_BMAP_REG(1)
-> >>>    #define KVM_REG_ARM_STD_HYP_BIT_PV_TIME             BIT(0)
-> >>>
-> >>> +#define KVM_REG_ARM_VENDOR_HYP_BMAP          KVM_REG_ARM_FW_FEAT_BMAP_REG(2)
-> >>> +#define KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT BIT(0)
-> >>> +#define KVM_REG_ARM_VENDOR_HYP_BIT_PTP               BIT(1)
-> >>> +
-> >>>    /* Device Control API: ARM VGIC */
-> >>>    #define KVM_DEV_ARM_VGIC_GRP_ADDR   0
-> >>>    #define KVM_DEV_ARM_VGIC_GRP_DIST_REGS      1
-> >>> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> >>> index 64ae6c7e7145..80836c341fd3 100644
-> >>> --- a/arch/arm64/kvm/hypercalls.c
-> >>> +++ b/arch/arm64/kvm/hypercalls.c
-> >>> @@ -66,8 +66,6 @@ static const u32 hvc_func_default_allowed_list[] = {
-> >>>        ARM_SMCCC_VERSION_FUNC_ID,
-> >>>        ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-> >>>        ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID,
-> >>> -     ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
-> >>> -     ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID,
-> >>>    };
-> >>>
-> >>>    static bool kvm_hvc_call_default_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-> >>> @@ -102,6 +100,12 @@ static bool kvm_hvc_call_allowed(struct kvm_vcpu *vcpu, u32 func_id)
-> >>>        case ARM_SMCCC_HV_PV_TIME_ST:
-> >>>                return kvm_arm_fw_reg_feat_enabled(smccc_feat->std_hyp_bmap,
-> >>>                                        KVM_REG_ARM_STD_HYP_BIT_PV_TIME);
-> >>> +     case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
-> >>> +             return kvm_arm_fw_reg_feat_enabled(smccc_feat->vendor_hyp_bmap,
-> >>> +                                     KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT);
-> >>> +     case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> >>> +             return kvm_arm_fw_reg_feat_enabled(smccc_feat->vendor_hyp_bmap,
-> >>> +                                     KVM_REG_ARM_VENDOR_HYP_BIT_PTP);
-> >>>        default:
-> >>>                return kvm_hvc_call_default_allowed(vcpu, func_id);
-> >>>        }
-> >>
-> >> I guess we may return SMCCC_RET_NOT_SUPPORTED for ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID
-> >> if KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT isn't set? Otherwise, we need explain it
-> >> in the commit log.
-> >>
-> > ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID is a part of the hvc
-> > allowed-list (hvc_func_default_allowed_list[]), which means it's not
-> > associated with any feature bit and is always enabled. If the guest
-> > were to issue ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, we'd end up in
-> > the 'default' case and the kvm_hvc_call_default_allowed() would return
-> > 'true'. This is documented in patch 2/10.
-> >
->
-> I think I might not make myself clear and sorry for that. The point is
-> the following hvc calls should be belonging to 'Vendor Specific Hypervisor
-> Service', or I'm wrong. If I'm correct, VENDOR_HYP_CALL_UID_FUNC_ID
-> should be disallowed if bit#0 isn't set in @vendor_hyp_bmap.
->
->      ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID
->      ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID
->      ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID
->
-> ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID was introduced by commit 6e085e0ac9cf
-> ("arm/arm64: Probe for the presence of KVM hypervisor"). According to the
-> commit log, the identifier and supported (vendor specific) feature list
-> is returned by this call and ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID.
-> So the users depend on both calls to probe the supported features or
-> services. So it seems incorrect to allow ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID
-> even the 'Vendor Specific Hypervisor Service' is disabled and bit#0
-> is cleared in @vendor_hyp_bmap by users.
->
-Hm, it was a grey area for me since the FEATURES_FUNC_ID didn't
-broadcast the presence of UID_FUNC_ID. But what you said makes sense.
-UID_FUNC_ID should tag along with FEATURES_FUNC_ID. I can merge both
-of them under bit-0.
-Thanks for sharing the background.
-
-Regards,
-Raghavendra
-
-> >> KVM_REG_ARM_VENDOR_HYP_BIT_{FUNC_FEAT, PTP} aren't parallel to each other.
-> >> I think PTP can't be on if KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT is off.
-> >>
-> > Actually we went through this scenario [1]. Of course, we can build
-> > some logic around it to make sure that the userspace does the right
-> > thing, but at this point the consensus is that, unless it's an issue
-> > for KVM, it's treated as a userspace bug.
-> >
->
-> Thanks for the pointer. I chime in late and I didn't check the reviewing
-> history on this series. Hopefully I didn't bring too much confusing comments
-> to you.
->
-> I think it's fine by treating it as a userspace bug, but it would be nice
-> to add comments somewhere if you agree.
->
-> >>> @@ -194,8 +198,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >>>                val[3] = ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3;
-> >>>                break;
-> >>>        case ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID:
-> >>> -             val[0] = BIT(ARM_SMCCC_KVM_FUNC_FEATURES);
-> >>> -             val[0] |= BIT(ARM_SMCCC_KVM_FUNC_PTP);
-> >>> +             val[0] = smccc_feat->vendor_hyp_bmap;
-> >>>                break;
-> >>>        case ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID:
-> >>>                kvm_ptp_get_time(vcpu, val);
-> >>> @@ -222,6 +225,7 @@ static const u64 kvm_arm_fw_reg_ids[] = {
-> >>>        KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_3,
-> >>>        KVM_REG_ARM_STD_BMAP,
-> >>>        KVM_REG_ARM_STD_HYP_BMAP,
-> >>> +     KVM_REG_ARM_VENDOR_HYP_BMAP,
-> >>>    };
-> >>>
-> >>>    void kvm_arm_init_hypercalls(struct kvm *kvm)
-> >>> @@ -230,6 +234,7 @@ void kvm_arm_init_hypercalls(struct kvm *kvm)
-> >>>
-> >>>        smccc_feat->std_bmap = KVM_ARM_SMCCC_STD_FEATURES;
-> >>>        smccc_feat->std_hyp_bmap = KVM_ARM_SMCCC_STD_HYP_FEATURES;
-> >>> +     smccc_feat->vendor_hyp_bmap = KVM_ARM_SMCCC_VENDOR_HYP_FEATURES;
-> >>>    }
-> >>>
-> >>>    int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
-> >>> @@ -322,6 +327,9 @@ int kvm_arm_get_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >>>        case KVM_REG_ARM_STD_HYP_BMAP:
-> >>>                val = READ_ONCE(smccc_feat->std_hyp_bmap);
-> >>>                break;
-> >>> +     case KVM_REG_ARM_VENDOR_HYP_BMAP:
-> >>> +             val = READ_ONCE(smccc_feat->vendor_hyp_bmap);
-> >>> +             break;
-> >>>        default:
-> >>>                return -ENOENT;
-> >>>        }
-> >>> @@ -348,6 +356,10 @@ static int kvm_arm_set_fw_reg_bmap(struct kvm_vcpu *vcpu, u64 reg_id, u64 val)
-> >>>                fw_reg_bmap = &smccc_feat->std_hyp_bmap;
-> >>>                fw_reg_features = KVM_ARM_SMCCC_STD_HYP_FEATURES;
-> >>>                break;
-> >>> +     case KVM_REG_ARM_VENDOR_HYP_BMAP:
-> >>> +             fw_reg_bmap = &smccc_feat->vendor_hyp_bmap;
-> >>> +             fw_reg_features = KVM_ARM_SMCCC_VENDOR_HYP_FEATURES;
-> >>> +             break;
-> >>>        default:
-> >>>                return -ENOENT;
-> >>>        }
-> >>
-> >> If KVM_REG_ARM_VENDOR_HYP_BIT_{FUNC_FEAT, PTP} aren't parallel to each other,
-> >> special code is needed to gurantee PTP is cleared if VENDOR_HYP is disabled.
-> >>
-> > Please see the above comment :)
-> >
->
-> Thanks for the pointer and explanation :)
->
-> >>> @@ -453,6 +465,7 @@ int kvm_arm_set_fw_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
-> >>>                return 0;
-> >>>        case KVM_REG_ARM_STD_BMAP:
-> >>>        case KVM_REG_ARM_STD_HYP_BMAP:
-> >>> +     case KVM_REG_ARM_VENDOR_HYP_BMAP:
-> >>>                return kvm_arm_set_fw_reg_bmap(vcpu, reg->id, val);
-> >>>        default:
-> >>>                return -ENOENT;
-> >>> diff --git a/include/kvm/arm_hypercalls.h b/include/kvm/arm_hypercalls.h
-> >>> index b0915d8c5b81..eaf4f6b318a8 100644
-> >>> --- a/include/kvm/arm_hypercalls.h
-> >>> +++ b/include/kvm/arm_hypercalls.h
-> >>> @@ -9,6 +9,7 @@
-> >>>    /* Last valid bits of the bitmapped firmware registers */
-> >>>    #define KVM_REG_ARM_STD_BMAP_BIT_MAX                0
-> >>>    #define KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX    0
-> >>> +#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX  1
-> >>>
-> >>>    #define KVM_ARM_SMCCC_STD_FEATURES \
-> >>>        GENMASK_ULL(KVM_REG_ARM_STD_BMAP_BIT_MAX, 0)
-> >>> @@ -16,6 +17,9 @@
-> >>>    #define KVM_ARM_SMCCC_STD_HYP_FEATURES \
-> >>>        GENMASK_ULL(KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX, 0)
-> >>>
-> >>> +#define KVM_ARM_SMCCC_VENDOR_HYP_FEATURES \
-> >>> +     GENMASK_ULL(KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX, 0)
-> >>> +
-> >>>    int kvm_hvc_call_handler(struct kvm_vcpu *vcpu);
-> >>>
-> >>>    static inline u32 smccc_get_function(struct kvm_vcpu *vcpu)
-> >>>
-> >>
-> >
-> > Thanks for the review.
-> >
->
-> No worries and sorry for the late chime-in :)
->
-> >
-> > [1]: https://lore.kernel.org/lkml/YjA1AzZPlPV20kMj@google.com/
-> >
->
-> Thanks,
-> Gavin
->
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gRnJpLCBBcHIgOCwgMjAyMiBhdCA1OjAyIFBNIFNlYW4gQ2hyaXN0b3BoZXJzb24gPHNlYW5q
+Y0Bnb29nbGUuY29tPiB3cm90ZToKPgo+IE9uIEZyaSwgQXByIDAxLCAyMDIyLCBEYXZpZCBNYXRs
+YWNrIHdyb3RlOgo+ID4gQEAgLTczMyw3ICs3MzMsNyBAQCBzdGF0aWMgdm9pZCBtbXVfZnJlZV9w
+dGVfbGlzdF9kZXNjKHN0cnVjdCBwdGVfbGlzdF9kZXNjICpwdGVfbGlzdF9kZXNjKQo+ID4gIHN0
+YXRpYyBnZm5fdCBrdm1fbW11X3BhZ2VfZ2V0X2dmbihzdHJ1Y3Qga3ZtX21tdV9wYWdlICpzcCwg
+aW50IGluZGV4KQo+ID4gIHsKPiA+ICAgICAgIGlmICghc3AtPnJvbGUuZGlyZWN0KQo+ID4gLSAg
+ICAgICAgICAgICByZXR1cm4gc3AtPmdmbnNbaW5kZXhdOwo+ID4gKyAgICAgICAgICAgICByZXR1
+cm4gc3AtPnNoYWRvd2VkX3RyYW5zbGF0aW9uW2luZGV4XS5nZm47Cj4gPgo+ID4gICAgICAgcmV0
+dXJuIHNwLT5nZm4gKyAoaW5kZXggPDwgKChzcC0+cm9sZS5sZXZlbCAtIDEpICogUFQ2NF9MRVZF
+TF9CSVRTKSk7Cj4gPiAgfQo+ID4gQEAgLTc0MSw3ICs3NDEsNyBAQCBzdGF0aWMgZ2ZuX3Qga3Zt
+X21tdV9wYWdlX2dldF9nZm4oc3RydWN0IGt2bV9tbXVfcGFnZSAqc3AsIGludCBpbmRleCkKPiA+
+ICBzdGF0aWMgdm9pZCBrdm1fbW11X3BhZ2Vfc2V0X2dmbihzdHJ1Y3Qga3ZtX21tdV9wYWdlICpz
+cCwgaW50IGluZGV4LCBnZm5fdCBnZm4pCj4KPiBUaGlzIHNob3VsZCBiZSByZXBsYWNlZCB3aXRo
+IGEgc2luZ2xlIGhlbHBlciB0byBzZXQgdGhlIGdmbithY2Nlc3MuICBVbmRlciBubwo+IGNpcmN1
+bXN0YW5jZSBzaG91bGQgX2p1c3RfIHRoZSBnZm4gY2hhbmdlLCBhbmQgdGhhdCB3aWxsIGFsbG93
+IHVzIHRvIG9wdGltaXplCj4gd3JpdGluZyB0aGUgZW50cnkuICBNb3JlIGJlbG93Lgo+Cj4gPiAg
+ewo+ID4gICAgICAgaWYgKCFzcC0+cm9sZS5kaXJlY3QpIHsKPiA+IC0gICAgICAgICAgICAgc3At
+PmdmbnNbaW5kZXhdID0gZ2ZuOwo+ID4gKyAgICAgICAgICAgICBzcC0+c2hhZG93ZWRfdHJhbnNs
+YXRpb25baW5kZXhdLmdmbiA9IGdmbjsKPiA+ICAgICAgICAgICAgICAgcmV0dXJuOwo+ID4gICAg
+ICAgfQo+ID4KPiA+IEBAIC03NTIsNiArNzUyLDQ3IEBAIHN0YXRpYyB2b2lkIGt2bV9tbXVfcGFn
+ZV9zZXRfZ2ZuKHN0cnVjdCBrdm1fbW11X3BhZ2UgKnNwLCBpbnQgaW5kZXgsIGdmbl90IGdmbikK
+PiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGt2bV9tbXVfcGFnZV9nZXRfZ2Zu
+KHNwLCBpbmRleCksIGdmbik7Cj4gPiAgfQo+ID4KPiA+ICtzdGF0aWMgdm9pZCBrdm1fbW11X3Bh
+Z2Vfc2V0X2FjY2VzcyhzdHJ1Y3Qga3ZtX21tdV9wYWdlICpzcCwgaW50IGluZGV4LCB1MzIgYWNj
+ZXNzKQo+ID4gK3sKPiA+ICsgICAgIGlmICghc3AtPnJvbGUuZGlyZWN0KSB7Cj4gPiArICAgICAg
+ICAgICAgIHNwLT5zaGFkb3dlZF90cmFuc2xhdGlvbltpbmRleF0uYWNjZXNzID0gYWNjZXNzOwo+
+ID4gKyAgICAgICAgICAgICByZXR1cm47Cj4gPiArICAgICB9Cj4gPiArCj4gPiArICAgICBpZiAo
+V0FSTl9PTihhY2Nlc3MgIT0gc3AtPnJvbGUuYWNjZXNzKSkKPiA+ICsgICAgICAgICAgICAgcHJf
+ZXJyX3JhdGVsaW1pdGVkKCJhY2Nlc3MgbWlzbWF0Y2ggdW5kZXIgZGlyZWN0IHBhZ2UgJWxseCAi
+Cj4KPiBMT0wsIEkgcmVhbGl6ZSB0aGlzIGlzIG5vdCB5b3VyIGNvZGUsIGJ1dCByYXRlbGltaXRp
+bmcgdW5kZXIgYSBXQVJOIGFpbid0IGdvbm5hCj4gaGVscCBtdWNoIDotKQoKSGEhIFllYWggdGhp
+cyBzaWxseS4gSSdsbCBzZWUgYWJvdXQgYWRkaW5nIGEgcHJlY3Vyc29yIHBhdGNoIHRvIG1ha2UK
+aXQgbGVzcyB0ZXJyaWJsZS4KCj4KPiBUaGlzIGFsc28gZ2VuZXJhdGVzIGEgd2FybmluZyBhbmQg
+ZmFpbHMgdG8gY29tcGlsZSB3aXRoIEtWTV9XRVJST1I9eSwgdGhvdWdoIEkKPiBiZWxpZXZlIHRo
+ZSB0ZXN0IGJvdHMgYWxyZWFkeSByZXBvcnRlZCB0aGF0Lgo+Cj4KPiBhcmNoL3g4Ni9rdm0vbW11
+L21tdS5jOiBJbiBmdW5jdGlvbiDigJhrdm1fbW11X3BhZ2Vfc2V0X2FjY2Vzc+KAmToKPiBpbmNs
+dWRlL2xpbnV4L2tlcm5fbGV2ZWxzLmg6NToyNTogZXJyb3I6IGZvcm1hdCDigJglbGx44oCZIGV4
+cGVjdHMgYXJndW1lbnQgb2YgdHlwZSDigJhsb25nIGxvbmcgdW5zaWduZWQgaW504oCZLCBidXQg
+YXJndW1lbnQgMyBoYXMgdHlwZSDigJhpbnTigJkgWy1XZXJyb3I9Zm9ybWF0PV0KPiAgICAgNSB8
+ICNkZWZpbmUgS0VSTl9TT0ggICAgICAgICJcMDAxIiAgICAgICAgICAvKiBBU0NJSSBTdGFydCBP
+ZiBIZWFkZXIgKi8KPiAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fgo+IGlu
+Y2x1ZGUvbGludXgvcHJpbnRrLmg6NDE4OjI1OiBub3RlOiBpbiBkZWZpbml0aW9uIG9mIG1hY3Jv
+IOKAmHByaW50a19pbmRleF93cmFw4oCZCj4gICA0MTggfCAgICAgICAgICAgICAgICAgX3BfZnVu
+YyhfZm10LCAjI19fVkFfQVJHU19fKTsgICAgICAgICAgICAgICAgICAgICAgICAgICBcCj4gICAg
+ICAgfCAgICAgICAgICAgICAgICAgICAgICAgICBefn5+Cj4gaW5jbHVkZS9saW51eC9wcmludGsu
+aDo2NDA6MTc6IG5vdGU6IGluIGV4cGFuc2lvbiBvZiBtYWNybyDigJhwcmludGvigJkKPiAgIDY0
+MCB8ICAgICAgICAgICAgICAgICBwcmludGsoZm10LCAjI19fVkFfQVJHU19fKTsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIFwKPiAgICAgICB8ICAgICAgICAgICAgICAgICBefn5+fn4KPiBp
+bmNsdWRlL2xpbnV4L3ByaW50ay5oOjY1NDo5OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8g
+4oCYcHJpbnRrX3JhdGVsaW1pdGVk4oCZCj4gICA2NTQgfCAgICAgICAgIHByaW50a19yYXRlbGlt
+aXRlZChLRVJOX0VSUiBwcl9mbXQoZm10KSwgIyNfX1ZBX0FSR1NfXykKPiAgICAgICB8ICAgICAg
+ICAgXn5+fn5+fn5+fn5+fn5+fn5+Cj4gaW5jbHVkZS9saW51eC9rZXJuX2xldmVscy5oOjExOjI1
+OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8g4oCYS0VSTl9TT0jigJkKPiAgICAxMSB8ICNk
+ZWZpbmUgS0VSTl9FUlIgICAgICAgIEtFUk5fU09IICIzIiAgICAvKiBlcnJvciBjb25kaXRpb25z
+ICovCj4gICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fgo+IGluY2x1ZGUv
+bGludXgvcHJpbnRrLmg6NjU0OjI4OiBub3RlOiBpbiBleHBhbnNpb24gb2YgbWFjcm8g4oCYS0VS
+Tl9FUlLigJkKPiAgIDY1NCB8ICAgICAgICAgcHJpbnRrX3JhdGVsaW1pdGVkKEtFUk5fRVJSIHBy
+X2ZtdChmbXQpLCAjI19fVkFfQVJHU19fKQo+ICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXn5+fn5+fn4KPiBhcmNoL3g4Ni9rdm0vbW11L21tdS5jOjc2MzoxNzogbm90ZTogaW4g
+ZXhwYW5zaW9uIG9mIG1hY3JvIOKAmHByX2Vycl9yYXRlbGltaXRlZOKAmQo+ICAgNzYzIHwgICAg
+ICAgICAgICAgICAgIHByX2Vycl9yYXRlbGltaXRlZCgiYWNjZXNzIG1pc21hdGNoIHVuZGVyIGRp
+cmVjdCBwYWdlICVsbHggIgo+ICAgICAgIHwgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+
+fn5+fgo+Cj4KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICIoZXhwZWN0ZWQg
+JWxseCwgZ290ICVsbHgpXG4iLAo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+a3ZtX21tdV9wYWdlX2dldF9nZm4oc3AsIGluZGV4KSwKPiA+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHNwLT5yb2xlLmFjY2VzcywgYWNjZXNzKTsKPiA+ICt9Cj4gPiArCj4gPiAr
+LyoKPiA+ICsgKiBGb3IgbGVhZiBTUFRFcywgZmV0Y2ggdGhlICpndWVzdCogYWNjZXNzIHBlcm1p
+c3Npb25zIGJlaW5nIHNoYWRvd2VkLiBOb3RlCj4gPiArICogdGhhdCB0aGUgU1BURSBpdHNlbGYg
+bWF5IGhhdmUgYSBtb3JlIGNvbnN0cmFpbmVkIGFjY2VzcyBwZXJtaXNzaW9ucyB0aGF0Cj4gPiAr
+ICogd2hhdCB0aGUgZ3Vlc3QgZW5mb3JjZXMuIEZvciBleGFtcGxlLCBhIGd1ZXN0IG1heSBjcmVh
+dGUgYW4gZXhlY3V0YWJsZQo+ID4gKyAqIGh1Z2UgUFRFIGJ1dCBLVk0gbWF5IGRpc2FsbG93IGV4
+ZWN1dGlvbiB0byBtaXRpZ2F0ZSBpVExCIG11bHRpaGl0Lgo+ID4gKyAqLwo+ID4gK3N0YXRpYyB1
+MzIga3ZtX21tdV9wYWdlX2dldF9hY2Nlc3Moc3RydWN0IGt2bV9tbXVfcGFnZSAqc3AsIGludCBp
+bmRleCkKPiA+ICt7Cj4gPiArICAgICBpZiAoIXNwLT5yb2xlLmRpcmVjdCkKPiA+ICsgICAgICAg
+ICAgICAgcmV0dXJuIHNwLT5zaGFkb3dlZF90cmFuc2xhdGlvbltpbmRleF0uYWNjZXNzOwo+ID4g
+Kwo+ID4gKyAgICAgLyoKPiA+ICsgICAgICAqIEZvciBkaXJlY3QgTU1VcyAoZS5nLiBURFAgb3Ig
+bm9uLXBhZ2luZyBndWVzdHMpIHRoZXJlIGFyZSBubyAqZ3Vlc3QqCj4gPiArICAgICAgKiBhY2Nl
+c3MgcGVybWlzc2lvbnMgYmVpbmcgc2hhZG93ZWQuIFNvIHdlIGNhbiBqdXN0IHJldHVybiBBQ0Nf
+QUxMCj4gPiArICAgICAgKiBoZXJlLgo+ID4gKyAgICAgICoKPiA+ICsgICAgICAqIEZvciBpbmRp
+cmVjdCBNTVVzIChzaGFkb3cgcGFnaW5nKSwgZGlyZWN0IHNoYWRvdyBwYWdlcyBleGlzdCB3aGVu
+IEtWTQo+ID4gKyAgICAgICogaXMgc2hhZG93aW5nIGEgZ3Vlc3QgaHVnZSBwYWdlIHdpdGggc21h
+bGxlciBwYWdlcywgc2luY2UgdGhlIGd1ZXN0Cj4gPiArICAgICAgKiBodWdlIHBhZ2UgaXMgYmVp
+bmcgZGlyZWN0bHkgbWFwcGVkLiBJbiB0aGlzIGNhc2UgdGhlIGd1ZXN0IGFjY2Vzcwo+ID4gKyAg
+ICAgICogcGVybWlzc2lvbnMgYmVpbmcgc2hhZG93ZWQgYXJlIHRoZSBhY2Nlc3MgcGVybWlzc2lv
+bnMgb2YgdGhlIGh1Z2UKPiA+ICsgICAgICAqIHBhZ2UuCj4gPiArICAgICAgKgo+ID4gKyAgICAg
+ICogSW4gYm90aCBjYXNlcywgc3AtPnJvbGUuYWNjZXNzIGNvbnRhaW5zIGV4YWN0bHkgd2hhdCB3
+ZSB3YW50Lgo+ID4gKyAgICAgICovCj4gPiArICAgICByZXR1cm4gc3AtPnJvbGUuYWNjZXNzOwo+
+ID4gK30KPgo+IC4uLgo+Cj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYva3ZtL21tdS9tbXVfaW50
+ZXJuYWwuaCBiL2FyY2gveDg2L2t2bS9tbXUvbW11X2ludGVybmFsLmgKPiA+IGluZGV4IGI2ZTIy
+YmE5YzY1NC4uM2Y3NmY0YzFhZTU5IDEwMDY0NAo+ID4gLS0tIGEvYXJjaC94ODYva3ZtL21tdS9t
+bXVfaW50ZXJuYWwuaAo+ID4gKysrIGIvYXJjaC94ODYva3ZtL21tdS9tbXVfaW50ZXJuYWwuaAo+
+ID4gQEAgLTMyLDYgKzMyLDE4IEBAIGV4dGVybiBib29sIGRiZzsKPiA+Cj4gPiAgdHlwZWRlZiB1
+NjQgX19yY3UgKnRkcF9wdGVwX3Q7Cj4gPgo+ID4gKy8qCj4gPiArICogU3RvcmVzIHRoZSByZXN1
+bHQgb2YgdGhlIGd1ZXN0IHRyYW5zbGF0aW9uIGJlaW5nIHNoYWRvd2VkIGJ5IGFuIFNQVEUuIEtW
+TQo+ID4gKyAqIHNoYWRvd3MgdHdvIHR5cGVzIG9mIGd1ZXN0IHRyYW5zbGF0aW9uczogbkdQQSAt
+PiBHUEEgKHNoYWRvdyBFUFQvTlBUKSBhbmQKPiA+ICsgKiBHVkEgLT4gR1BBICh0cmFkaXRpb25h
+bCBzaGFkb3cgcGFnaW5nKS4gSW4gYm90aCBjYXNlcyB0aGUgcmVzdWx0IG9mIHRoZQo+ID4gKyAq
+IHRyYW5zbGF0aW9uIGlzIGEgR1BBIGFuZCBhIHNldCBvZiBhY2Nlc3MgY29uc3RyYWludHMuCj4g
+PiArICovCj4gPiArc3RydWN0IHNoYWRvd2VkX3RyYW5zbGF0aW9uX2VudHJ5IHsKPiA+ICsgICAg
+IC8qIE5vdGUsIEdGTnMgY2FuIGhhdmUgYXQgbW9zdCA2NCAtIFBBR0VfU0hJRlQgPSA1MiBiaXRz
+LiAqLwo+ID4gKyAgICAgdTY0IGdmbjo1MjsKPiA+ICsgICAgIHU2NCBhY2Nlc3M6MzsKPgo+IEEg
+Yml0ZmllbGQgaXMgY29tcGxldGVseSB1bm5lY2Vzc2FyeSBhbmQgZ2VuZXJhdGVzIGJhZCBjb2Rl
+LiAgQXMgaXMsIGl0IGdlbmVyYXRlcwo+IF9yZWFsbHlfIGJhZCBjb2RlIGJlY2F1c2UgZXh0cmFj
+dGluZyBhbmQgc2V0dGluZyByZXF1aXJlcyBub24tc3RhbmRhcmQgNjQtYml0IHZhbHVlCj4gbWFz
+a3MsIG11bHRpcGxlIG9wZXJhdGlvbnMsIGFuZCBhY2Nlc3NlcyB0byB1bmFsaWduZWQgZGF0YS4g
+IFRoZSBnZW5lcmF0ZWQgY29kZSBjYW4KPiBiZSBtYWRlIHNsaWdodGx5IGxlc3MgYXdmdWwgYnkg
+dXNpbmcgYSBmdWxseSBieXRlIGZvciBhY2Nlc3MgYW5kIDY0IGJpdHMgZm9yIEdGTiwKPiBidXQg
+aXQgc3RpbGwgc3Vja3MgY29tcGFyZWQgdG8gd2hhdCB3ZSBjYW4gaGFuZCBnZW5lcmF0ZS4KPgo+
+IFRoZSBvdGhlciBhc3BlY3Qgb2YgdGhpcyBpcyB0aGF0IHJldHJpZXZpbmcgdGhlIEdGTiBpcyBh
+IGZyZXF1ZW50IG9wZXJhdGlvbiwKPiB3aGVyZWFzIHRoZSBhY2Nlc3MgaXMgYWxtb3N0IG5ldmVy
+IHJlYWQuICBJLmUuIHdlIHNob3VsZCBiaWFzIGZvciByZWFkaW5nIHRoZSBHRk4KPiBhYm92ZSBh
+bGwgZWxzZS4KPgo+IFRoZSBzaW1wbGUgYW5kIG9idmlvdXMgdGhpbmcgaXMgdG8gbm90IHJlaW52
+ZW50IHRoZSB3aGVlbC4gIEdGTiA9IChHUEEgPj4gUEFHRV9TSElGVCksCj4gYW5kIGlnbm9yaW5n
+IE5YLCBhY2Nlc3MgbGl2ZXMgaW4gdGhlIGxvd2VyIDEyIGJpdHMgb2YgYSBQVEUuICBUaGVuIHJl
+YWRpbmcgdGhlIEdGTiBpcwo+IGEgc2ltcGxlIFNIUiwgYW5kIHJlYWRpbmcgYWNjZXNzIGluZm8g
+aXMgYSBzaW1wbGUgQU5ELgo+Cj4gV2UgbWlnaHQgYWxzbyBiZSBhYmxlIHRvIG9wdGltaXplIEZO
+QU1FKHN5bmNfcGFnZSksIGJ1dCBJIGRvbid0IGNhcmUgbXVjaCBhYm91dAo+IHRoYXQsIGl0J3Mg
+cmFyZWx5IHVzZWQgZm9yIG5lc3RlZCBURFAuCj4KPiBTbywga2VlcCB0cmFuc2xhdGlvbl9lbnRy
+eSBhIGdmbl90ICosIHRoZW4gZG86CgpMb29rcyBnb29kLCB3aWxsIGRvIGluIHY0LgoKPgo+IHN0
+YXRpYyBnZm5fdCBrdm1fbW11X3BhZ2VfZ2V0X2dmbihzdHJ1Y3Qga3ZtX21tdV9wYWdlICpzcCwg
+aW50IGluZGV4KQo+IHsKPiAgICAgICAgIGlmICghc3AtPnJvbGUuZGlyZWN0KQo+ICAgICAgICAg
+ICAgICAgICByZXR1cm4gc3AtPnNoYWRvd2VkX3RyYW5zbGF0aW9uW2luZGV4XSA+PiBQQUdFX1NI
+SUZUOwo+Cj4gICAgICAgICByZXR1cm4gc3AtPmdmbiArIChpbmRleCA8PCAoKHNwLT5yb2xlLmxl
+dmVsIC0gMSkgKiBQVDY0X0xFVkVMX0JJVFMpKTsKPiB9Cj4KPiBzdGF0aWMgdm9pZCBrdm1fbW11
+X3BhZ2Vfc2V0X3RyYW5zbGF0aW9uKHN0cnVjdCBrdm1fbW11X3BhZ2UgKnNwLCBpbnQgaW5kZXgs
+Cj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnZm5fdCBnZm4sIHVu
+c2lnbmVkIGludCBhY2Nlc3MpCj4gewo+ICAgICAgICAgaWYgKCFzcC0+cm9sZS5kaXJlY3QpIHsK
+PiAgICAgICAgICAgICAgICAgc3AtPnNoYWRvd2VkX3RyYW5zbGF0aW9uW2luZGV4XSA9IChnZm4g
+PDwgUEFHRV9TSElGVCkgfCBhY2Nlc3M7Cj4gICAgICAgICAgICAgICAgIHJldHVybjsKPiAgICAg
+ICAgIH0KPgo+ICAgICAgICAgaWYgKFdBUk5fT04oZ2ZuICE9IGt2bV9tbXVfcGFnZV9nZXRfZ2Zu
+KHNwLCBpbmRleCkpKQo+ICAgICAgICAgICAgICAgICBwcl9lcnJfcmF0ZWxpbWl0ZWQoImdmbiBt
+aXNtYXRjaCB1bmRlciBkaXJlY3QgcGFnZSAlbGx4ICIKPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICIoZXhwZWN0ZWQgJWxseCwgZ290ICVsbHgpXG4iLAo+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgc3AtPmdmbiwKPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIGt2bV9tbXVfcGFnZV9nZXRfZ2ZuKHNwLCBpbmRleCksIGdmbik7Cj4gfQo+
+Cj4gc3RhdGljIHZvaWQga3ZtX21tdV9wYWdlX3NldF9hY2Nlc3Moc3RydWN0IGt2bV9tbXVfcGFn
+ZSAqc3AsIGludCBpbmRleCwKPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1
+bnNpZ25lZCBpbnQgYWNjZXNzKQo+IHsKPiAgICAgICAgIGlmIChzcC0+cm9sZS5kaXJlY3QpCj4g
+ICAgICAgICAgICAgICAgIHJldHVybjsKPgo+ICAgICAgICAgc3AtPnNoYWRvd2VkX3RyYW5zbGF0
+aW9uW2luZGV4XSAmPSBQQUdFX01BU0s7Cj4gICAgICAgICBzcC0+c2hhZG93ZWRfdHJhbnNsYXRp
+b25baW5kZXhdIHw9IGFjY2VzczsKPiB9Cj4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
+dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
+a3ZtYXJtCg==
