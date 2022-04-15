@@ -2,68 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E37F4C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 15 Apr 2022 21:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF4AC4332F
+	for <kvmarm@archiver.kernel.org>; Fri, 15 Apr 2022 21:59:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3AAA549F20;
-	Fri, 15 Apr 2022 17:59:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 58CF749F1C;
+	Fri, 15 Apr 2022 17:59:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0Q0tJ+UO+1vz; Fri, 15 Apr 2022 17:59:11 -0400 (EDT)
+	with ESMTP id THUP4gszWj2U; Fri, 15 Apr 2022 17:59:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 183A9402DB;
-	Fri, 15 Apr 2022 17:59:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 35A7949ED3;
+	Fri, 15 Apr 2022 17:59:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F43A49EE8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2022 17:59:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 103A140037
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2022 17:59:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fmUMRt06szdm for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id FczcDFsKeHru for <kvmarm@lists.cs.columbia.edu>;
  Fri, 15 Apr 2022 17:59:09 -0400 (EDT)
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com
- [209.85.166.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2C9E449ED3
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
+ [209.85.128.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E709349EE1
  for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2022 17:59:09 -0400 (EDT)
-Received: by mail-io1-f73.google.com with SMTP id
- k20-20020a5e9314000000b00649d55ffa67so5415730iom.20
+Received: by mail-yw1-f202.google.com with SMTP id
+ 00721157ae682-2d2d45c0df7so75869177b3.1
  for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2022 14:59:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=azDjsls2ryR6MvWQFRJeidQvMbLl/RHlutDUFGfidAA=;
- b=St531rEB8UEZ21SaQwTTbIns6sfG2sQXxLuoLYkm2ISxMGI/wJkdfTpDg/wdOjVd6u
- 5NgtnY1srEpZgvXon4FAZpeLfDIiZr0tsroBjIOvySTRgLGmE1lKquuTRLkiW+BdwiJX
- u5e2iX5vFXKK6FzVPrRHhi8bmCjQNt180OYAsPlgS58CqOAD+XDVxLvcI5+rz836fDV0
- S4qWTFlKLSB3nDd2HmJcWFiqKhkDpj55dxeIduTAEpbTpKgOpI/pcexEL0Gpu4GfY3b/
- W09FwZGDQ3ZVIEU8EGV5KGCTli+M0U/j//S4bQF+bDil4Oss9TqOnbR5akxyOmNhJciY
- 7kbA==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=Tyg2Q1CJQYh6kqJKn5I8WsZWhqynGf1zv3GZVnyVrPI=;
+ b=bs/o3a1yI+YtQKTec7tfylXXQu4M6ad2QWFFL62JX+gXbwqO9FEus3pkH+ThX+JPAr
+ JPEPreeCxgkfcEjZxuDSMTLLZUbJYuMNUMiPP28ZaBVQA8xAoGGJwyWWqjUTVOr9w+H1
+ scbsRRQ4oV/0Ko6nzOrL8D58Z+zUc2quNieeYqKnL4/2GddH6EUAGmW8TUmhdokw0buR
+ c0G9PrlnzO6Zct/R0EMtBthEbtbkFluRFT3bcL6Benpi1sBm1BLEUooH5TD8OFDM9SNB
+ FGX1+tPIQqSDfmOl4/bgqfhcbkyjAEMmpAUImOqM0PuNfNbC+i60/UI9Bsp0mp7hYMtn
+ Jqnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=azDjsls2ryR6MvWQFRJeidQvMbLl/RHlutDUFGfidAA=;
- b=fX6ElNnM/pbZwOW0u8/5XOCSHTPBoORWfmJSEj0ONWet1XtMJ2Gx358KFyVN1GJzxD
- Kh06vW/j41mAiyxCmNhxhpLk1eOrLCo+Ne8bf2Qok8XjHutFpBT7hqXK05j3af9dtl/M
- wmc+00Tw1/AKiRkPMty6QlHpweKMd+Z7IuHq8aXHi3ONAChuKJjfy0qVTvPV9cz+o+al
- f0Uf8ifmrD/UPg3vIS8oesJ6Y04zw37Vdl/11Wn/GMN4KD0dAxVREvV4zENtgW0wVrJV
- WTLH0STUR80WhywYOUPJlX+KjDT98eDtTtBuIHhnnyyBAJkJyN8sOOm9Lyw7rwfrWYZo
- qoTA==
-X-Gm-Message-State: AOAM531Bgy2oU4BnqX4u64aJAq9KoodFyPJx5DSLNAwHHG9+q4ypxXko
- snYc++iIrPJH0/RqhxAjN3AMdpzzpD3IxvvSqRTaRa937ngPG1lxye2swsIQwi0IK1SJlJVxB9E
- nVjNv1grQskTs2hUxnMmb25MHDQIK9C449LqfVnjbVeBlZkktMJyrtru//G5kX9mwTww3ag==
-X-Google-Smtp-Source: ABdhPJyaiGfZk8c4zniStiF0Dq12dWJ0NDJB0+KYENL3HMx1WDG/wo59ZZ+XTTzQKwEfJUnyLOdPyHvyxnU=
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=Tyg2Q1CJQYh6kqJKn5I8WsZWhqynGf1zv3GZVnyVrPI=;
+ b=Gw3Kv6Dkuvvk+WBwTqXtlAKz6VylLyX8HATELoDTbHwzgU89UZanLzdv5IHjiJ8Qqh
+ gdK7ff8W8j/VYb1u7ELHIncH9Oy26A1UdZwn6vvAjQUtB03Zn6Qr8NOuKJFZpxTiYweK
+ CA3LPpiy876DSykHK9hCUSIzEXcyks+OTg4fnleZS0GBH7dc4AZ4kjKVolDYMo4VR0Sv
+ 6um4cs78hYPkWNDW2CFCGX24wKVHvVElavkC9azv9Cs+1fzP0NdkM3IK2NexIJjFxtsh
+ pTzx3LNZBdxrn05rpSw+th0VJxpc/g6a9MZkStQsegDfKPTf5X9gQXVKMYrkkP6zgpU8
+ le7w==
+X-Gm-Message-State: AOAM533qRPvXgta9TRn8ad5F25bu0p4cogmEUDH+sYtJFFfkB9my8UIx
+ ujIuQrQpFoeFVBiUm6VdVxdQpGv/FCZHAOEdHH5L/uCaCn5urYPBbdfNpVRqzJiBMpdEMzEPxTx
+ qTu8HCBAL9kKzhZDu3xeswBnE+83wSSe140PzLr6lNXks5zvQngqjWS/MPKRcWhN+pM6jrA==
+X-Google-Smtp-Source: ABdhPJxEvl0U3CkvkcrBAn3HsWtsYmV0z/JZVUMkoVOPtU1p1JiWR679eaZiC7C8eGZtheHJa4oZ8Gi2BLk=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6602:29d2:b0:64c:753c:c490
+ (user=oupton job=sendgmr) by 2002:a05:6902:544:b0:641:4007:1da8
  with SMTP id
- z18-20020a05660229d200b0064c753cc490mr347648ioq.90.1650059948422; Fri, 15 Apr
- 2022 14:59:08 -0700 (PDT)
-Date: Fri, 15 Apr 2022 21:58:44 +0000
-Message-Id: <20220415215901.1737897-1-oupton@google.com>
+ z4-20020a056902054400b0064140071da8mr1070971ybs.195.1650059949262; Fri, 15
+ Apr 2022 14:59:09 -0700 (PDT)
+Date: Fri, 15 Apr 2022 21:58:45 +0000
+In-Reply-To: <20220415215901.1737897-1-oupton@google.com>
+Message-Id: <20220415215901.1737897-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20220415215901.1737897-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [RFC PATCH 00/17] KVM: arm64: Parallelize stage 2 fault handling
+Subject: [RFC PATCH 01/17] KVM: arm64: Directly read owner id field in
+ stage2_pte_is_counted()
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -86,110 +90,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Presently KVM only takes a read lock for stage 2 faults if it believes
-the fault can be fixed by relaxing permissions on a PTE (write unprotect
-for dirty logging). Otherwise, stage 2 faults grab the write lock, which
-predictably can pile up all the vCPUs in a sufficiently large VM.
+A subsequent change to KVM will make use of additional bits in invalid
+ptes. Prepare for said change by explicitly checking the valid bit and
+owner fields in stage2_pte_is_counted()
 
-The x86 port of KVM has what it calls the TDP MMU. Basically, it is an
-MMU protected by the combination of a read-write lock and RCU, allowing
-page walkers to traverse in parallel.
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ arch/arm64/kvm/hyp/pgtable.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-This series is strongly inspired by the mechanics of the TDP MMU,
-making use of RCU to protect parallel walks. Note that the TLB
-invalidation mechanics are a bit different between x86 and ARM, so we
-need to use the 'break-before-make' sequence to split/collapse a
-block/table mapping, respectively.
-
-Nonetheless, using atomics on the break side allows fault handlers to
-acquire exclusive access to a PTE (lets just call it locked). Once the
-PTE lock is acquired it is then safe to assume exclusive access.
-
-Special consideration is required when pruning the page tables in
-parallel. Suppose we are collapsing a table into a block. Allowing
-parallel faults means that a software walker could be in the middle of
-a lower level traversal when the table is unlinked. Table
-walkers that prune the paging structures must now 'lock' all descendent
-PTEs, effectively asserting exclusive ownership of the substructure
-(no other walker can install something to an already locked pte).
-
-Additionally, for parallel walks we need to punt the freeing of table
-pages to the next RCU sync, as there could be multiple observers of the
-table until all walkers exit the RCU critical section. For this I
-decided to cram an rcu_head into page private data for every table page.
-We wind up spending a bit more on table pages now, but lazily allocating
-for rcu callbacks probably doesn't make a lot of sense. Not only would
-we need a large cache of them (think about installing a level 1 block)
-to wire up callbacks on all descendent tables, but we also then need to
-spend memory to actually free memory.
-
-I tried to organize these patches as best I could w/o introducing
-intermediate breakage.
-
-The first 5 patches are meant mostly as prepatory reworks, and, in the
-case of RCU a nop.
-
-Patch 6 is quite large, but I had a hard time deciding how to change the
-way we link/unlink tables to use atomics without breaking things along
-the way.
-
-Patch 7 probably should come before patch 6, as it informs the other
-read-side fault (perm relax) about when a map is in progress so it'll
-back off.
-
-Patches 8-10 take care of the pruning case, actually locking the child ptes
-instead of simply dropping table page references along the way. Note
-that we cannot assume a pte points to a table/page at this point, hence
-the same helper is called for pre- and leaf-traversal. Guide the
-recursion based on what got yanked from the PTE.
-
-Patches 11-14 wire up everything to schedule rcu callbacks on
-to-be-freed table pages. rcu_barrier() is called on the way out from
-tearing down a stage 2 page table to guarantee all memory associated
-with the VM has actually been cleaned up.
-
-Patches 15-16 loop in the fault handler to the new table traversal game.
-
-Lastly, patch 17 is a nasty bit of debugging residue to spot possible
-table page leaks. Please don't laugh ;-)
-
-Smoke tested with KVM selftests + kvm_page_table_test w/ 2M hugetlb to
-exercise the table pruning code. Haven't done anything beyond this,
-sending as an RFC now to get eyes on the code.
-
-Applies to commit fb649bda6f56 ("Merge tag 'block-5.18-2022-04-15' of
-git://git.kernel.dk/linux-block")
-
-Oliver Upton (17):
-  KVM: arm64: Directly read owner id field in stage2_pte_is_counted()
-  KVM: arm64: Only read the pte once per visit
-  KVM: arm64: Return the next table from map callbacks
-  KVM: arm64: Protect page table traversal with RCU
-  KVM: arm64: Take an argument to indicate parallel walk
-  KVM: arm64: Implement break-before-make sequence for parallel walks
-  KVM: arm64: Enlighten perm relax path about parallel walks
-  KVM: arm64: Spin off helper for initializing table pte
-  KVM: arm64: Tear down unlinked page tables in parallel walk
-  KVM: arm64: Assume a table pte is already owned in post-order
-    traversal
-  KVM: arm64: Move MMU cache init/destroy into helpers
-  KVM: arm64: Stuff mmu page cache in sub struct
-  KVM: arm64: Setup cache for stage2 page headers
-  KVM: arm64: Punt last page reference to rcu callback for parallel walk
-  KVM: arm64: Allow parallel calls to kvm_pgtable_stage2_map()
-  KVM: arm64: Enable parallel stage 2 MMU faults
-  TESTONLY: KVM: arm64: Add super lazy accounting of stage 2 table pages
-
- arch/arm64/include/asm/kvm_host.h     |   5 +-
- arch/arm64/include/asm/kvm_mmu.h      |   2 +
- arch/arm64/include/asm/kvm_pgtable.h  |  14 +-
- arch/arm64/kvm/arm.c                  |   4 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c |  13 +-
- arch/arm64/kvm/hyp/nvhe/setup.c       |  13 +-
- arch/arm64/kvm/hyp/pgtable.c          | 518 +++++++++++++++++++-------
- arch/arm64/kvm/mmu.c                  | 120 ++++--
- 8 files changed, 503 insertions(+), 186 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+index 2cb3867eb7c2..e1506da3e2fb 100644
+--- a/arch/arm64/kvm/hyp/pgtable.c
++++ b/arch/arm64/kvm/hyp/pgtable.c
+@@ -172,6 +172,11 @@ static kvm_pte_t kvm_init_invalid_leaf_owner(u8 owner_id)
+ 	return FIELD_PREP(KVM_INVALID_PTE_OWNER_MASK, owner_id);
+ }
+ 
++static u8 kvm_invalid_pte_owner(kvm_pte_t pte)
++{
++	return FIELD_GET(KVM_INVALID_PTE_OWNER_MASK, pte);
++}
++
+ static int kvm_pgtable_visitor_cb(struct kvm_pgtable_walk_data *data, u64 addr,
+ 				  u32 level, kvm_pte_t *ptep,
+ 				  enum kvm_pgtable_walk_flags flag)
+@@ -679,7 +684,7 @@ static bool stage2_pte_is_counted(kvm_pte_t pte)
+ 	 * encode ownership of a page to another entity than the page-table
+ 	 * owner, whose id is 0.
+ 	 */
+-	return !!pte;
++	return kvm_pte_valid(pte) || kvm_invalid_pte_owner(pte);
+ }
+ 
+ static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
