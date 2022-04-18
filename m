@@ -2,62 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B7E5C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Apr 2022 10:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CC0C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Apr 2022 10:17:01 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D6EB34B10C;
-	Mon, 18 Apr 2022 06:09:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EC0E14B1B6;
+	Mon, 18 Apr 2022 06:17:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aHfBXO4QR72O; Mon, 18 Apr 2022 06:09:27 -0400 (EDT)
+	with ESMTP id PwjumRowt4Ei; Mon, 18 Apr 2022 06:16:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 926F843482;
-	Mon, 18 Apr 2022 06:09:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B91EE4B1BF;
+	Mon, 18 Apr 2022 06:16:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8510E410F3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 06:09:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E40734B190
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 06:16:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IC6TAY6iqz4I for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Apr 2022 06:09:25 -0400 (EDT)
+ with ESMTP id ppviozINzeb3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Apr 2022 06:16:57 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1AFFE41049
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 06:09:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F2BE49F10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 06:16:57 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id C9D51B80E66;
- Mon, 18 Apr 2022 10:09:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8577FC385A7;
- Mon, 18 Apr 2022 10:09:22 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 1EFABB80E6C;
+ Mon, 18 Apr 2022 10:16:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC422C385A1;
+ Mon, 18 Apr 2022 10:16:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1650276562;
- bh=TwWZh5ydoGNDbA/2K1N4I1qvcZf/L/ndLI81g5OpeGM=;
+ s=k20201202; t=1650277014;
+ bh=sn8LtADJr/kuHONig4ALQa+jzV9bRZPgGffWgVWEgOw=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=kBqdAvO+Hss1W1O7ibP08osJiUufMkPO80GVoafqBf72T1J7BpCQFgCOT8V+gH6Fv
- /eMmtOuiJ+5iThWiwvV8b6WY4hfARSSbYEHJhCjgTWwX2FzpBiBlUHOZ+BUQ6MCEPZ
- FX9xFRkxgkiIqpHQhym5H0hHYUWPOHKfqEjdWwl5ImEF1juFc4pbh5xPZ/jDnIGGdl
- 3zL9t7cNqSQNmdGlBOOms+vWIdNpmQD8/iLOSxQebSqYo79pa0fkWPHr+Rw1QuznUh
- +e5SULzRU1cZP/0ZL1MZlbaToB5Gc4NW0+ddQgdbokXk9q2xouCwhikrZ3Vda0HOYL
- DeZYoPNvavShg==
+ b=UWd35W7euxaP8Y9oD7A4JbjYyeF2p+ai9Z11MtDfn9Ua/l0kgpuBuhJdif2nXWWNg
+ pMCEBHklHFjAYX6QEsZWZfEX3nXhxIlbqtTkF2BTl+WRqIocpo8chDAf0RNI9yxxF1
+ tyYvU+ZDAjaH8CmyHEy/zY00q3kA1fvfGsPUv73ZDed6f62mcwc3OC2bvErxzcIdyB
+ 8V2x6/A+V7Gl4c9xo/CgTtXEOR/j1ckisKjETdJqoy3oNEv2PtJPFwDPyr8wxeTGU4
+ ruEiWyRdGSM2rrB/zpBsPA1fuwsIiZQ14fSwQDzZDHRHJOfK4SQVSGVfQQhrfXcqM7
+ JdOdgJfFTV81A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1ngOJs-004yh4-1V; Mon, 18 Apr 2022 11:09:20 +0100
-Date: Mon, 18 Apr 2022 11:09:19 +0100
-Message-ID: <87v8v6aek0.wl-maz@kernel.org>
+ id 1ngOR8-004yl0-Eg; Mon, 18 Apr 2022 11:16:51 +0100
+Date: Mon, 18 Apr 2022 11:16:50 +0100
+Message-ID: <87tuaqae7h.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v7 5/6] KVM: arm64: Detect and handle hypervisor stack
- overflows
-In-Reply-To: <20220408200349.1529080-6-kaleshsingh@google.com>
+Subject: Re: [PATCH v7 6/6] KVM: arm64: Symbolize the nVHE HYP addresses
+In-Reply-To: <20220408200349.1529080-7-kaleshsingh@google.com>
 References: <20220408200349.1529080-1-kaleshsingh@google.com>
- <20220408200349.1529080-6-kaleshsingh@google.com>
+ <20220408200349.1529080-7-kaleshsingh@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,16 +66,18 @@ X-SA-Exim-Rcpt-To: kaleshsingh@google.com, will@kernel.org, qperret@google.com,
  tabba@google.com, surenb@google.com, kernel-team@android.com,
  james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
  catalin.marinas@arm.com, qwandor@google.com, mark.rutland@arm.com,
- ardb@kernel.org, yuzenghui@huawei.com, drjones@redhat.com, nathan@kernel.org,
- masahiroy@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+ ardb@kernel.org, drjones@redhat.com, nathan@kernel.org, masahiroy@kernel.org,
+ ndesaulniers@google.com, changbin.du@intel.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: Andrew Walbran <qwandor@google.com>, will@kernel.org,
- kernel-team@android.com, Masahiro Yamada <masahiroy@kernel.org>,
- linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
- Nathan Chancellor <nathan@kernel.org>, linux-arm-kernel@lists.infradead.org,
+Cc: Nick Desaulniers <ndesaulniers@google.com>,
+ Andrew Walbran <qwandor@google.com>, will@kernel.org, kernel-team@android.com,
+ Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, Nathan Chancellor <nathan@kernel.org>,
+ Changbin Du <changbin.du@intel.com>, linux-arm-kernel@lists.infradead.org,
  Catalin Marinas <catalin.marinas@arm.com>, surenb@google.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -94,115 +95,101 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 08 Apr 2022 21:03:28 +0100,
+On Fri, 08 Apr 2022 21:03:29 +0100,
 Kalesh Singh <kaleshsingh@google.com> wrote:
 > 
-> The hypervisor stacks (for both nVHE Hyp mode and nVHE protected mode)
-> are aligned such  that any valid stack address has PAGE_SHIFT bit as 1.
-> This allows us to conveniently check for overflow in the exception entry
-> without corrupting any GPRs. We won't recover from a stack overflow so
-> panic the hypervisor.
+> Reintroduce the __kvm_nvhe_ symbols in kallsyms, ignoring the local
+> symbols in this namespace. The local symbols are not informative and
+> can cause aliasing issues when symbolizing the addresses.
+> 
+> With the necessary symbols now in kallsyms we can symbolize nVHE
+> addresses using the %p print format specifier:
+> 
+> [   98.916444][  T426] kvm [426]: nVHE hyp panic at: [<ffffffc0096156fc>] __kvm_nvhe_overflow_stack+0x8/0x34!
 > 
 > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
 > Tested-by: Fuad Tabba <tabba@google.com>
 > Reviewed-by: Fuad Tabba <tabba@google.com>
 > ---
 > 
-> Changes in v7:
+> Changes in v6:
 >   - Add Fuad's Reviewed-by and Tested-by tags.
-> 
-> Changes in v5:
->   - Valid stack addresses now have PAGE_SHIFT bit as 1 instead of 0
-> 
-> Changes in v3:
->   - Remove test_sp_overflow macro, per Mark
->   - Add asmlinkage attribute for hyp_panic, hyp_panic_bad_stack, per Ard
+>   
+> Changes in v2:
+>   - Fix printk warnings - %p expects (void *)
 > 
 > 
->  arch/arm64/kvm/hyp/nvhe/host.S   | 24 ++++++++++++++++++++++++
->  arch/arm64/kvm/hyp/nvhe/switch.c |  7 ++++++-
->  2 files changed, 30 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/handle_exit.c | 13 +++++--------
+>  scripts/kallsyms.c           |  2 +-
+>  2 files changed, 6 insertions(+), 9 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index 3d613e721a75..be6d844279b1 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -153,6 +153,18 @@ SYM_FUNC_END(__host_hvc)
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 97fe14aab1a3..a377b871bf58 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -295,13 +295,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+>  	u64 elr_in_kimg = __phys_to_kimg(elr_phys);
+>  	u64 hyp_offset = elr_in_kimg - kaslr_offset() - elr_virt;
+>  	u64 mode = spsr & PSR_MODE_MASK;
+> +	u64 panic_addr = elr_virt + hyp_offset;
 >  
->  .macro invalid_host_el2_vect
->  	.align 7
-> +
-> +	/*
-> +	 * Test whether the SP has overflowed, without corrupting a GPR.
-> +	 * nVHE hypervisor stacks are aligned so that the PAGE_SHIFT bit
-> +	 * of SP should always be 1.
-> +	 */
-> +	add	sp, sp, x0			// sp' = sp + x0
-> +	sub	x0, sp, x0			// x0' = sp' - x0 = (sp + x0) - x0 = sp
-> +	tbz	x0, #PAGE_SHIFT, .L__hyp_sp_overflow\@
-> +	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
-> +	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
-> +
->  	/* If a guest is loaded, panic out of it. */
->  	stp	x0, x1, [sp, #-16]!
->  	get_loaded_vcpu x0, x1
-> @@ -165,6 +177,18 @@ SYM_FUNC_END(__host_hvc)
->  	 * been partially clobbered by __host_enter.
->  	 */
->  	b	hyp_panic
-> +
-> +.L__hyp_sp_overflow\@:
-> +	/*
-> +	 * Reset SP to the top of the stack, to allow handling the hyp_panic.
-> +	 * This corrupts the stack but is ok, since we won't be attempting
-> +	 * any unwinding here.
-> +	 */
-> +	ldr_this_cpu	x0, kvm_init_params + NVHE_INIT_STACK_HYP_VA, x1
-> +	mov	sp, x0
-> +
-> +	bl	hyp_panic_bad_stack
+> -	/*
+> -	 * The nVHE hyp symbols are not included by kallsyms to avoid issues
+> -	 * with aliasing. That means that the symbols cannot be printed with the
+> -	 * "%pS" format specifier, so fall back to the vmlinux address if
+> -	 * there's no better option.
+> -	 */
+>  	if (mode != PSR_MODE_EL2t && mode != PSR_MODE_EL2h) {
+>  		kvm_err("Invalid host exception to nVHE hyp!\n");
+>  	} else if (ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
+> @@ -321,9 +316,11 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
+>  		if (file)
+>  			kvm_err("nVHE hyp BUG at: %s:%u!\n", file, line);
+>  		else
+> -			kvm_err("nVHE hyp BUG at: %016llx!\n", elr_virt + hyp_offset);
+> +			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
+> +					(void *)panic_addr);
+>  	} else {
+> -		kvm_err("nVHE hyp panic at: %016llx!\n", elr_virt + hyp_offset);
+> +		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
+> +				(void *)panic_addr);
+>  	}
+>  
+>  	/*
+> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+> index 8caabddf817c..ad2c93640a92 100644
+> --- a/scripts/kallsyms.c
+> +++ b/scripts/kallsyms.c
+> @@ -111,7 +111,7 @@ static bool is_ignored_symbol(const char *name, char type)
+>  		".L",			/* local labels, .LBB,.Ltmpxxx,.L__unnamed_xx,.LASANPC, etc. */
+>  		"__crc_",		/* modversions */
+>  		"__efistub_",		/* arm64 EFI stub namespace */
+> -		"__kvm_nvhe_",		/* arm64 non-VHE KVM namespace */
+> +		"__kvm_nvhe_$",		/* arm64 local symbols in non-VHE KVM namespace */
+>  		"__AArch64ADRPThunk_",	/* arm64 lld */
+>  		"__ARMV5PILongThunk_",	/* arm lld */
+>  		"__ARMV7PILongThunk_",
 
-Why bl? You clearly don't expect to return here, given that you have
-an ASM_BUG() right below, and that you are calling a __no_return
-function. I think we should be consistent with the rest of the code
-and just do a simple branch.
+If you are sanitising this, shouldn'tt you also apply the same rules
+as the rest of the kernel for non-'__-kvm_nvhe_' symbols? For example,
+I see a long list of .L* symbols:
 
-It also gives us a chance to preserve an extra register from the
-context.
+0000000000000000 r __kvm_nvhe_.L144721
+0000000000000090 r __kvm_nvhe_.L144721
+00000000000000b4 r __kvm_nvhe_.L144721
+00000000000004b0 r __kvm_nvhe_.L144721
+000000000000051c r __kvm_nvhe_.L144721
+0000000000000650 r __kvm_nvhe_.L144721
+0000000000000694 r __kvm_nvhe_.L144721
+0000000000000761 r __kvm_nvhe_.L144721
+00000000000007a7 r __kvm_nvhe_.L144721
+00000000000007c7 r __kvm_nvhe_.L144721
+0000000000000814 r __kvm_nvhe_.L144721
+0000000000000b08 r __kvm_nvhe_.L144721
+0000000000003200 r __kvm_nvhe_.L144721
 
-> +	ASM_BUG()
->  .endm
->  
->  .macro invalid_host_el1_vect
-> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-> index 6410d21d8695..703a5d3f611b 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-> @@ -347,7 +347,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
->  	return exit_code;
->  }
->  
-> -void __noreturn hyp_panic(void)
-> +asmlinkage void __noreturn hyp_panic(void)
->  {
->  	u64 spsr = read_sysreg_el2(SYS_SPSR);
->  	u64 elr = read_sysreg_el2(SYS_ELR);
-> @@ -369,6 +369,11 @@ void __noreturn hyp_panic(void)
->  	unreachable();
->  }
->  
-> +asmlinkage void __noreturn hyp_panic_bad_stack(void)
-> +{
-> +	hyp_panic();
-> +}
-> +
->  asmlinkage void kvm_unexpected_el2_exception(void)
->  {
->  	return __kvm_unexpected_el2_exception();
-> -- 
-> 2.35.1.1178.g4f1659d476-goog
-> 
-> 
+(83 of them in total on a local build) that I think should also be
+trimmed.
 
 Thanks,
 
