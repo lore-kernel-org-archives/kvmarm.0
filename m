@@ -2,80 +2,86 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D886DC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 18 Apr 2022 02:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E620C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 18 Apr 2022 10:01:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4714A4B10C;
-	Sun, 17 Apr 2022 22:54:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A8B2E4B103;
+	Mon, 18 Apr 2022 06:01:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 30GSYDK+VvS8; Sun, 17 Apr 2022 22:54:20 -0400 (EDT)
+	with ESMTP id k9yDa6XsnRjz; Mon, 18 Apr 2022 06:01:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B93F4404FD;
-	Sun, 17 Apr 2022 22:54:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CFCF4B1E1;
+	Mon, 18 Apr 2022 06:01:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0525E404FD
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Apr 2022 22:54:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 268534B103
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 06:01:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LaNEo09qxuwC for <kvmarm@lists.cs.columbia.edu>;
- Sun, 17 Apr 2022 22:54:17 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99A2E404A0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 17 Apr 2022 22:54:17 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1650250457;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SAA55/OcVLuGltaWPBBCrOhinXHqpswrBBNXxyLN+Rc=;
- b=gftgfjV9shPvDoUPfoH/M4I0EBnL7T6LyTcbiHsrXIcEI/1t2X408v+18PZsJjp7nYjtZ6
- MrXl6o+SOnIZDnfM95cGfCcRO+6f1o5aJKean74oJbi+0GjSlPfwf0C9dN0Qcv1LJPNPes
- 7s3e/necceM/lGeBl0T8llwZ1d8NbCA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-568-Qwn9yRcYNxGw18zXIgXPpA-1; Sun, 17 Apr 2022 22:54:12 -0400
-X-MC-Unique: Qwn9yRcYNxGw18zXIgXPpA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com
- [10.11.54.2])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id 9NT2EGG+CSZX for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Apr 2022 06:01:23 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFC1A4B0F7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 06:01:23 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4BB45101AA42;
- Mon, 18 Apr 2022 02:54:11 +0000 (UTC)
-Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3608B40F4961;
- Mon, 18 Apr 2022 02:54:03 +0000 (UTC)
-Subject: Re: [PATCH v5 00/10] KVM: arm64: Add support for hypercall services
- selection
-To: Marc Zyngier <maz@kernel.org>
-References: <20220407011605.1966778-1-rananta@google.com>
- <92eb2304-9259-0461-247f-d3a4e5eb4fd5@redhat.com>
- <8735iebu48.wl-maz@kernel.org>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <8d257221-e3bf-b5fc-5cf4-01f9fff53eca@redhat.com>
-Date: Mon, 18 Apr 2022 10:53:59 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <8735iebu48.wl-maz@kernel.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+ by dfw.source.kernel.org (Postfix) with ESMTPS id BCCC36119B;
+ Mon, 18 Apr 2022 10:01:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D942C385A7;
+ Mon, 18 Apr 2022 10:01:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1650276082;
+ bh=58hSBSLrjx6v6M4mAOKijWKEjXw1WVtJOTUJiGLqYoc=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=HfrYEnwCeJhwwbhSTvoXJTwEp3Dg8c+SqBTmtNinSWEBp8cGMW48I80tbwqY9f9lM
+ 7YPudmc/pTNsvltW3sKPN1UBkYtgphSMU5TeKcx6ggvhn9xOFMgvTIpcv5TQR6X397
+ DoYRylfBlOb8Y4/nwdMSwrD+hiU08Stttn6I88o2rKNFZJXlabBYG1Yrgqs43pczqH
+ ish42gHLrxtkszBVSl+jwSOG06mNf3PCwnappv8HHiyBXXVqszrsPu+mVGQK+KOS1v
+ 9aAE/HATd96G18T+3RyyCMQA92NQ1y4P70c6fU4HYptdEidxU6h63fBiBtMcPXn8Fe
+ rztTQD654P5wA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1ngOC7-004ycO-LZ; Mon, 18 Apr 2022 11:01:19 +0100
+Date: Mon, 18 Apr 2022 11:01:19 +0100
+Message-ID: <87wnfmaexc.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH v7 3/6] KVM: arm64: Add guard pages for KVM nVHE
+ hypervisor stack
+In-Reply-To: <20220408200349.1529080-4-kaleshsingh@google.com>
+References: <20220408200349.1529080-1-kaleshsingh@google.com>
+ <20220408200349.1529080-4-kaleshsingh@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kaleshsingh@google.com, will@kernel.org, qperret@google.com,
+ tabba@google.com, surenb@google.com, kernel-team@android.com,
+ james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+ catalin.marinas@arm.com, mark.rutland@arm.com, drjones@redhat.com,
+ ndesaulniers@google.com, masahiroy@kernel.org, changbin.du@intel.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Nick Desaulniers <ndesaulniers@google.com>, will@kernel.org,
+ kernel-team@android.com, Masahiro Yamada <masahiroy@kernel.org>,
+ linux-kernel@vger.kernel.org, Changbin Du <changbin.du@intel.com>,
+ linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>, surenb@google.com,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -84,121 +90,169 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Marc,
+On Fri, 08 Apr 2022 21:03:26 +0100,
+Kalesh Singh <kaleshsingh@google.com> wrote:
+> 
+> Map the stack pages in the flexible private VA range and allocate
+> guard pages below the stack as unbacked VA space. The stack is aligned
+> so that any valid stack address has PAGE_SHIFT bit as 1 - this is used
+> for overflow detection (implemented in a subsequent patch in the series).
+> 
+> Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> Tested-by: Fuad Tabba <tabba@google.com>
+> Reviewed-by: Fuad Tabba <tabba@google.com>
+> ---
+> 
+> Changes in v7:
+>   - Add Fuad's Reviewed-by and Tested-by tags.
+> 
+> Changes in v6:
+>   - Update call to hyp_alloc_private_va_range() (return val and params)
+> 
+> Changes in v5:
+>   - Use a single allocation for stack and guard pages to ensure they
+>     are contiguous, per Marc
+> 
+> Changes in v4:
+>   - Replace IS_ERR_OR_NULL check with IS_ERR check now that
+>     hyp_alloc_private_va_range() returns an error for null
+>     pointer, per Fuad
+>   - Format comments to < 80 cols, per Fuad
+> 
+> Changes in v3:
+>   - Handle null ptr in IS_ERR_OR_NULL checks, per Mark
+> 
+> 
+>  arch/arm64/include/asm/kvm_asm.h |  1 +
+>  arch/arm64/include/asm/kvm_mmu.h |  3 +++
+>  arch/arm64/kvm/arm.c             | 39 +++++++++++++++++++++++++++++---
+>  arch/arm64/kvm/mmu.c             |  4 ++--
+>  4 files changed, 42 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index d5b0386ef765..2e277f2ed671 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -169,6 +169,7 @@ struct kvm_nvhe_init_params {
+>  	unsigned long tcr_el2;
+>  	unsigned long tpidr_el2;
+>  	unsigned long stack_hyp_va;
+> +	unsigned long stack_pa;
+>  	phys_addr_t pgd_pa;
+>  	unsigned long hcr_el2;
+>  	unsigned long vttbr;
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index a50cbb5ba402..b805316c4866 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -117,6 +117,9 @@ alternative_cb_end
+>  #include <asm/mmu_context.h>
+>  #include <asm/kvm_host.h>
+>  
+> +extern struct kvm_pgtable *hyp_pgtable;
+> +extern struct mutex kvm_hyp_pgd_mutex;
 
-On 4/15/22 4:58 PM, Marc Zyngier wrote:
-> On Fri, 15 Apr 2022 07:44:55 +0100,
-> Gavin Shan <gshan@redhat.com> wrote:
->> On 4/7/22 9:15 AM, Raghavendra Rao Ananta wrote:
->>> Continuing the discussion from [1], the series tries to add support
->>> for the userspace to elect the hypercall services that it wishes
->>> to expose to the guest, rather than the guest discovering them
->>> unconditionally. The idea employed by the series was taken from
->>> [1] as suggested by Marc Z.
->>>
->>> In a broad sense, the concept is similar to the current implementation
->>> of PSCI interface- create a 'firmware psuedo-register' to handle the
->>> firmware revisions. The series extends this idea to all the other
->>> hypercalls such as TRNG (True Random Number Generator), PV_TIME
->>> (Paravirtualized Time), and PTP (Precision Time protocol).
->>>
->>> For better categorization and future scaling, these firmware registers
->>> are categorized based on the service call owners. Also, unlike the
->>> existing firmware psuedo-registers, they hold the features supported
->>> in the form of a bitmap.
->>>
->>> During the VM initialization, the registers holds an upper-limit of
->>> the features supported by each one of them. It's expected that the
->>> userspace discover the features provided by each register via GET_ONE_REG,
->>> and writeback the desired values using SET_ONE_REG. KVM allows this
->>> modification only until the VM has started.
->>>
->>> Some of the standard function-ids, such as ARM_SMCCC_VERSION_FUNC_ID,
->>> need not be associated with a feature bit. For such ids, the series
->>> introduced an allowed-list, hvc_func_default_allowed_list[], that holds
->>> all such ids. As a result, the functions that are not elected by userspace,
->>> or if they are not a part of this allowed-list, will be denied for when
->>> the guests invoke them.
->>>
->>> Older VMMs can simply ignore this interface and the hypercall services
->>> will be exposed unconditionally to the guests, thus ensuring backward
->>> compatibility.
->>>
->>
->> [...]
->>
->> I rethinking about the design again and just get one question. Hopefully,
->> someone have the answer for us. The newly added 3 pseudo registers and
->> the existing ones like KVM_REG_ARM_PSCI_VERSION are all tied up with
->> vcpu, instead of VM. I don't think it's correct. I'm not sure if VM-scoped
->> pseudo registers aren't allowed by ARM architecture or the effort isn't
->> worthy to support it.
-> 
-> We have had that discussion before (around version 2 of this series,
-> if I remember well).
-> 
+I'd rather you don't expose this at all.
 
-Yeah, I'm chime-in this series lately. There must be some discussions,
-including this topic, I missed :)
+> +
+>  void kvm_update_va_mask(struct alt_instr *alt,
+>  			__le32 *origptr, __le32 *updptr, int nr_inst);
+>  void kvm_compute_layout(void);
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 523bc934fe2f..5687c0175151 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1483,7 +1483,6 @@ static void cpu_prepare_hyp_mode(int cpu)
+>  	tcr |= (idmap_t0sz & GENMASK(TCR_TxSZ_WIDTH - 1, 0)) << TCR_T0SZ_OFFSET;
+>  	params->tcr_el2 = tcr;
+>  
+> -	params->stack_hyp_va = kern_hyp_va(per_cpu(kvm_arm_hyp_stack_page, cpu) + PAGE_SIZE);
+>  	params->pgd_pa = kvm_mmu_get_httbr();
+>  	if (is_protected_kvm_enabled())
+>  		params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
+> @@ -1933,14 +1932,48 @@ static int init_hyp_mode(void)
+>  	 * Map the Hyp stack pages
+>  	 */
+>  	for_each_possible_cpu(cpu) {
+> +		struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
+>  		char *stack_page = (char *)per_cpu(kvm_arm_hyp_stack_page, cpu);
+> -		err = create_hyp_mappings(stack_page, stack_page + PAGE_SIZE,
+> -					  PAGE_HYP);
+> +		unsigned long hyp_addr;
+>  
+> +		/*
+> +		 * Allocate a contiguous HYP private VA range for the stack
+> +		 * and guard page. The allocation is also aligned based on
+> +		 * the order of its size.
+> +		 */
+> +		err = hyp_alloc_private_va_range(PAGE_SIZE * 2, &hyp_addr);
+> +		if (err) {
+> +			kvm_err("Cannot allocate hyp stack guard page\n");
+> +			goto out_err;
+> +		}
+> +
+> +		/*
+> +		 * Since the stack grows downwards, map the stack to the page
+> +		 * at the higher address and leave the lower guard page
+> +		 * unbacked.
+> +		 *
+> +		 * Any valid stack address now has the PAGE_SHIFT bit as 1
+> +		 * and addresses corresponding to the guard page have the
+> +		 * PAGE_SHIFT bit as 0 - this is used for overflow detection.
+> +		 */
+> +		mutex_lock(&kvm_hyp_pgd_mutex);
+> +		err = kvm_pgtable_hyp_map(hyp_pgtable, hyp_addr + PAGE_SIZE,
+> +					PAGE_SIZE, __pa(stack_page), PAGE_HYP);
+> +		mutex_unlock(&kvm_hyp_pgd_mutex);
 
->>
->> These pseudo registers are introduced to present the available hypercalls,
->> and then they can be disabled from userspace. In the implementation, these 3
->> registers are vcpu scoped. It means that multiple vcpus can be asymmetric
->> in terms of usable hypercalls. For example, ARM_SMCCC_TRNG hypercalls
->> can be enabled on vcpu0, but disabled on vcpu1. I don't think it's expected.
-> 
-> No, that's not the way this is supposed to work. These hypercalls are
-> of course global, even if the accessor is per-vcpu. This is similar to
-> tons of other things, such as some of the PMU data, the timer virtual
-> offset... the list goes on. If that's not what this code does, then it
-> is a bug and it needs to be fixed.
-> 
+The mutex (and the HYP page table structure) really should stay
+private to the MMU code. Just add a new helper that will take the lock
+and use hyp_pgtable.
 
-Ok.
-
->> On the other hand, the information stored in these 3 registers needs to
->> be migrated through {GET,SET}_ONE_REG by VMM (QEMU). all the information
->> stored in these 3 registers are all same on all vcpus, which is exactly
->> as we expect. In migration circumstance, we're transporting identical
->> information for all vcpus and it's unnecessary.
-> 
-> Yes, we all understand that. My response to that was (and still is):
-> 
-> - There is no need to invent a new userspace interface. The one we
->    have is terrible enough, and we don't need another square wheel that
->    would need to be maintained beside the existing one.
-> 
-> - Let's say we have 1024 new pseudo-registers, 1024 vcpus, 64bit regs:
->    that's 8MB worth of extra data. This is not insignificant, but also
->    not really a problem given that such a large VM is probably attached
->    to a proportionally large amount of memory. In practice, we're
->    talking of less than 10 registers, and less than 100 vcpus. A crazy
->    8kB at most. Who cares?
-> 
-> - If this is eventually deemed to be a *real* scalability problem, we
->    can always expose a map of registers that are global, and let
->    userspace know that it can elide the rest. Problem solved, backward
->    compatibility preserved. And I'm willing to bet that we won't need
->    it in my lifetime.
-> 
-
-The reason why I raised question is just to check if it's a missed
-point in the design. As I said, I obviously missed the previous
-discussions and glad that this has been discussed through.
-
-Thanks for the details. Yes, it's totally fine to migrate 8KB data.
-Besides, VMM (QEMU) can choose to do migration on one single vcpu,
-instead of all of them, as you said.
+>  		if (err) {
+>  			kvm_err("Cannot map hyp stack\n");
+>  			goto out_err;
+>  		}
+> +
+> +		/*
+> +		 * Save the stack PA in nvhe_init_params. This will be needed
+> +		 * to recreate the stack mapping in protected nVHE mode.
+> +		 * __hyp_pa() won't do the right thing there, since the stack
+> +		 * has been mapped in the flexible private VA space.
+> +		 */
+> +		params->stack_pa = __pa(stack_page);
+> +
+> +		params->stack_hyp_va = hyp_addr + (2 * PAGE_SIZE);
+>  	}
+>  
+>  	for_each_possible_cpu(cpu) {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 3d3efea4e991..a54f00bd06cc 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -22,8 +22,8 @@
+>  
+>  #include "trace.h"
+>  
+> -static struct kvm_pgtable *hyp_pgtable;
+> -static DEFINE_MUTEX(kvm_hyp_pgd_mutex);
+> +struct kvm_pgtable *hyp_pgtable;
+> +DEFINE_MUTEX(kvm_hyp_pgd_mutex);
+>  
+>  static unsigned long hyp_idmap_start;
+>  static unsigned long hyp_idmap_end;
 
 Thanks,
-Gavin
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
