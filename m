@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2503AC433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E412C433EF
 	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 06:58:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CE7A74B24E;
-	Tue, 19 Apr 2022 02:58:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 05E984B236;
+	Tue, 19 Apr 2022 02:58:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id K37Thgy3YBV9; Tue, 19 Apr 2022 02:58:05 -0400 (EDT)
+	with ESMTP id QRkAAvHm9+Xv; Tue, 19 Apr 2022 02:58:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5F144B28A;
-	Tue, 19 Apr 2022 02:58:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DC744B284;
+	Tue, 19 Apr 2022 02:58:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D305D4B1F1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:58:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD8A54B218
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Pa8QjiEN5JY7 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Apr 2022 02:57:59 -0400 (EDT)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7424A4B202
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:59 -0400 (EDT)
-Received: by mail-pl1-f201.google.com with SMTP id
- e18-20020a17090301d200b00158faee4449so3116236plh.21
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 23:57:59 -0700 (PDT)
+ with ESMTP id Wycdj5OXTztr for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Apr 2022 02:57:57 -0400 (EDT)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77D024B23F
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:56 -0400 (EDT)
+Received: by mail-pj1-f74.google.com with SMTP id
+ l7-20020a17090b078700b001d090271f1dso1192572pjz.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 23:57:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=xBTLHLT7VrzBgTmY/Z5pWtMxjNk9GRjM0Wsv/9rlNHc=;
- b=VXqtSraq8cu7MS05g2E9z+XuvMzeSXl2fFGX5Y01D5E/dIxxlzx8ieTe37RrjIk3U8
- Qh9dlqkHr26rlE7cUeUJ722X9fORrcSyls/mjjfEdxkk7qv/i5exSe67vJL6znd7Jmxj
- XQleVnWUgNa/U6XHeLU4cVi7jJbuACQra/1UYgGqj4K+tkf/7sFnacr1qvJFFrXMhwrq
- LjiCU6LR5oMDmzv/AEuJDND+2wNX7EIcualNNJMKjPM+NXlYzs2C04kgPXIuXt8MTbBE
- VzdBDFwig9oH+F/vqkUZNWb/QeEljHfxo03ihPpY/Au8WjocLvzfT43Yox/2khE42Mcv
- XECg==
+ :cc; bh=YLQ/jtBXlP9biEBlw29VzMlxGtkHK85JhXdSg1Dey2k=;
+ b=eAw4dTke4ES4lJseM7OQ6Z/1m7Omzg+78Rf0GXMt1GNKwDyp38SZ6TmEaeL41gIF3V
+ O3W2n9UMmq+6M2Dlqx7kPsxjW9QwgcacCCvhksep5fJ2ps5tbZ4U6zJw0q2UO/Zml3ym
+ 9BCmmDCprmbgGdLCXrZdHzt/XmNLdUXEBH4TBQs6gcdzLkC7ybe3KRk952sC/b6zHZSA
+ iAvYXo/EGdqGvbO71ux5zx0vlb30A3xe8dM0BJSX6BxG1QZD+7b6D7VD8d30WtVdba9j
+ P00CX0knXDaWtBD1id8WQ6fLIy/E99z+vOOTA5nnERYy6RpDQtJR1OgHZ37/lfhfTb+s
+ RrxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=xBTLHLT7VrzBgTmY/Z5pWtMxjNk9GRjM0Wsv/9rlNHc=;
- b=vZMl2c3CS6nJKLBY7meGl7gRqSEqkEXsm7Ayur/1Miv7k60f8mNejeSc0sopx28mhf
- jyG25HOmwZAEdfu27UN03LKN9rId9QcNX6Rd7V8WLKgX7GPUCH6t7Gf/YjU6RAaKNtyF
- NtVKJ6dY0IY2AO3r8qXzbhCJwjUsGSIvXyjeg80VLHiWhvvB/VTVoaDUjGfwp4V5ZaM6
- 3vA+3hzIK3uQDmo0X+6/icf5HzBc/eF9tzOdFQTMcDu0yE6bp+KsBNRwUtYwmDqkd8mp
- 2dMp+rhFQYc35CPKOcZUdFZ6fDsHQJXo/+YiHANIy9Fur4Xk18M1MbxO/gQrapk6UYg+
- 2nvw==
-X-Gm-Message-State: AOAM530HExl4it/pEwxESrlSbUg9esbrzwAwFSq5g3eUwhRQ/g/o93cX
- L0vYdnANntzFovF2fRP/0voJFYH0Wfw=
-X-Google-Smtp-Source: ABdhPJwdi9SagPghJ2ANdJN9l35v2yt6f3eckRDsDVajt8Roakd+ylnifLm17O2VDNHE6Bdtl1/igHdjhO4=
+ bh=YLQ/jtBXlP9biEBlw29VzMlxGtkHK85JhXdSg1Dey2k=;
+ b=pI6AhrYy/AMoohSFrVZZCPwDI5alpQzWPFZmBSM8EbB5+j0ZkhV5NUzPjvsi7eHKB3
+ qK9VkJifx6h6h0kHGZ3OSasL6qq3sUYwc23Ztg516C0ywsHABaRy69VpOJtW5uMtB6k3
+ 0WIQgB+czHEev4feEIoj6ZzpskNgWjTtXtXWhdGjiUXePv5mInFEk6D3th3x88jXYTyY
+ pnLQLc2SkAXWf5xpoDXk2Dtsu/rT2a5KiPaMa2Yme7zRh8Ktk96dH+zqWKjUBTDVWDfR
+ 3wLXyHd4WCYGduIFyCF10OvlC12f5RTN2Kr0kS7o+wAojwdgudBS19nNWeuYE8y7/J3J
+ /cig==
+X-Gm-Message-State: AOAM5325+epUR3W37fxtU/8ZfZeTR8Rp1j7JdolHVslOTgX70w7RRQ46
+ 06fdu8i4UsgwPQHLP5CjN1ZtHmOdITI=
+X-Google-Smtp-Source: ABdhPJwTql5uKFd/srdQQoG38aaRxnbuF6PS3EHwIAVgiky4Itg3RMnrRk+AFOPWQpN2BRiBLUohcU6eXZw=
 X-Received: from reiji-vws-sp.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:90b:390d:b0:1d2:7a7d:170e with SMTP id
- ob13-20020a17090b390d00b001d27a7d170emr13243483pjb.230.1650351478693; Mon, 18
- Apr 2022 23:57:58 -0700 (PDT)
-Date: Mon, 18 Apr 2022 23:55:39 -0700
+ (user=reijiw job=sendgmr) by 2002:a17:90b:4b07:b0:1d1:8a08:5096 with SMTP id
+ lx7-20020a17090b4b0700b001d18a085096mr16807088pjb.91.1650351475734; Mon, 18
+ Apr 2022 23:57:55 -0700 (PDT)
+Date: Mon, 18 Apr 2022 23:55:37 -0700
 In-Reply-To: <20220419065544.3616948-1-reijiw@google.com>
-Message-Id: <20220419065544.3616948-34-reijiw@google.com>
+Message-Id: <20220419065544.3616948-32-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220419065544.3616948-1-reijiw@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v7 33/38] KVM: arm64: selftests: Add helpers to extract a
- field of ID registers
+Subject: [PATCH v7 31/38] KVM: arm64: Trap disabled features of
+ ID_AA64ISAR1_EL1
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -88,63 +88,71 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce a couple of helpers to extract a field of ID registers.
+Add feature_config_ctrl for PTRAUTH, which is indicated in
+ID_AA64ISAR1_EL1, to program configuration register to trap
+guest's using the feature when it is not exposed to the guest.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- .../selftests/kvm/include/aarch64/processor.h |  5 ++++
- .../selftests/kvm/lib/aarch64/processor.c     | 27 +++++++++++++++++++
- 2 files changed, 32 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 8f9f46979a00..e12411fec822 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -185,4 +185,9 @@ static inline void local_irq_disable(void)
- 	asm volatile("msr daifset, #3" : : : "memory");
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 6a8ed59d8d90..0e3cff91f41d 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -299,6 +299,15 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+ 	(cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR2_GPA3_SHIFT) >= \
+ 	 ID_AA64ISAR2_GPA3_ARCHITECTED)
+ 
++/*
++ * Return true if ptrauth needs to be trapped.
++ * (i.e. if ptrauth is supported on the host but not exposed to the guest)
++ */
++static bool vcpu_need_trap_ptrauth(struct kvm_vcpu *vcpu)
++{
++	return (system_has_full_ptr_auth() && !vcpu_has_ptrauth(vcpu));
++}
++
+ /*
+  * Feature information to program configuration register to trap or disable
+  * guest's using a feature when the feature is not exposed to the guest.
+@@ -394,6 +403,11 @@ static void feature_lor_trap_activate(struct kvm_vcpu *vcpu)
+ 	feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TLOR, 0);
  }
  
-+int extract_signed_field(uint64_t val, int field, int width);
-+unsigned int extract_unsigned_field(uint64_t val, int field, int width);
-+int cpuid_extract_ftr(uint64_t val, int field, bool sign);
-+int cpuid_extract_sftr(uint64_t val, int field);
-+unsigned int cpuid_extract_uftr(uint64_t val, int field);
- #endif /* SELFTEST_KVM_PROCESSOR_H */
-diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-index 9343d82519b4..c55f7dfc8567 100644
---- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-@@ -500,3 +500,30 @@ void __attribute__((constructor)) init_guest_modes(void)
- {
-        guest_modes_append_default();
- }
-+
-+/* Helpers to get a feature field from ID register value */
-+int extract_signed_field(uint64_t val, int field, int width)
++static void feature_ptrauth_trap_activate(struct kvm_vcpu *vcpu)
 +{
-+	return (int64_t)(val << (64 - width - field)) >> (64 - width);
++	feature_trap_activate(vcpu, VCPU_HCR_EL2, 0, HCR_API | HCR_APK);
 +}
 +
-+unsigned int extract_unsigned_field(uint64_t val, int field, int width)
-+{
-+	return (uint64_t)(val << (64 - width - field)) >> (64 - width);
-+}
+ /* For ID_AA64PFR0_EL1 */
+ static struct feature_config_ctrl ftr_ctrl_ras = {
+ 	.ftr_reg = SYS_ID_AA64PFR0_EL1,
+@@ -462,6 +476,12 @@ static struct feature_config_ctrl ftr_ctrl_lor = {
+ 	.trap_activate = feature_lor_trap_activate,
+ };
+ 
++/* For SYS_ID_AA64ISAR1_EL1 */
++static struct feature_config_ctrl ftr_ctrl_ptrauth = {
++	.ftr_need_trap = vcpu_need_trap_ptrauth,
++	.trap_activate = feature_ptrauth_trap_activate,
++};
 +
-+int cpuid_extract_ftr(uint64_t val, int field, bool sign)
-+{
-+	return (sign) ? extract_signed_field(val, field, 4) :
-+			extract_unsigned_field(val, field, 4);
-+}
-+
-+int cpuid_extract_sftr(uint64_t val, int field)
-+{
-+	return cpuid_extract_ftr(val, field, true);
-+}
-+
-+unsigned int cpuid_extract_uftr(uint64_t val, int field)
-+{
-+	return cpuid_extract_ftr(val, field, false);
-+}
+ #define __FTR_BITS(ftr_sign, ftr_type, bit_pos, safe) {		\
+ 	.sign = ftr_sign,					\
+ 	.type = ftr_type,					\
+@@ -4416,6 +4436,10 @@ static struct id_reg_desc id_aa64isar1_el1_desc = {
+ 		U_FTR_BITS(FTR_EXACT, ID_AA64ISAR1_APA_SHIFT, 0),
+ 		U_FTR_BITS(FTR_EXACT, ID_AA64ISAR1_API_SHIFT, 0),
+ 	},
++	.trap_features = &(const struct feature_config_ctrl *[]) {
++		&ftr_ctrl_ptrauth,
++		NULL,
++	},
+ };
+ 
+ static struct id_reg_desc id_aa64isar2_el1_desc = {
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
