@@ -2,51 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E03C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 15:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA08C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 17:38:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A63324B1D5;
-	Tue, 19 Apr 2022 11:35:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 291284B190;
+	Tue, 19 Apr 2022 13:38:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pISAUSgGaggL; Tue, 19 Apr 2022 11:35:53 -0400 (EDT)
+	with ESMTP id 3Qdfe1Q2VnEF; Tue, 19 Apr 2022 13:38:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD6164B1E7;
-	Tue, 19 Apr 2022 11:35:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0684D4B1FA;
+	Tue, 19 Apr 2022 13:38:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB66F4B1D1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 11:35:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 163E94B1AF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 13:38:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id u87q97vzRVAe for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Apr 2022 11:35:51 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1575E4B19D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 11:35:50 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7968B106F;
- Tue, 19 Apr 2022 08:35:50 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D4573F766;
- Tue, 19 Apr 2022 08:35:49 -0700 (PDT)
-Date: Tue, 19 Apr 2022 16:35:43 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Will Deacon <will@kernel.org>
-Subject: Re: KVM/arm64: SPE: Translate VA to IPA on a stage 2 fault instead
- of pinning VM memory
-Message-ID: <Yl7Wsmnp5APkD9oF@monolith.localdoman>
-References: <Yl6+JWaP+mq2Nc0b@monolith.localdoman>
- <20220419141012.GB6143@willie-the-truck>
- <Yl7KewpTj+7NSonf@monolith.localdoman>
- <20220419145945.GC6186@willie-the-truck>
- <Yl7TKXY09ZA61aYT@monolith.localdoman>
+ with ESMTP id GgJnft53ObEd for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Apr 2022 13:38:09 -0400 (EDT)
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com
+ [209.85.221.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0606F4B190
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 13:38:08 -0400 (EDT)
+Received: by mail-wr1-f49.google.com with SMTP id q3so22801138wrj.7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 10:38:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4Hcnu+Y1xvTQT/d8TtH/DkfZU528Zec6EC6l/WHUGtw=;
+ b=CIQjN/Q+4uhjvLGUdKIpDCetpFRAAL1b0jKxHI6pNWCWGj6uodyebfvqMYTJH9JHXZ
+ REqxLvl8ztnJYis9WD5FWWeEhOcyDAQQLn1SHMd8KmuTQDoR0imYRPzXRHhWqrmbNH1S
+ QyrafESTkKiLUc57QNe1bvNaiDLi5rMGQl1aBjzi1Lqq9xiIXyRoInIF9/N3XLQGtL6+
+ 3DAfFDiRIZYwqyq8olQkz3ucGHnwIV7yAF8ne+XvwiDO7pTHxn9NC2KIea7xtpNuUzhj
+ BPOnr2fxwdBodOYuwTPaW8gRvxdvu9PA2Pn5ijwjgwpAKqtIus+L19F9dim0h2U+bXsp
+ sWSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4Hcnu+Y1xvTQT/d8TtH/DkfZU528Zec6EC6l/WHUGtw=;
+ b=6nViZvu8Ogas9bkt2rNfz5f5Mr29dMpFeR0Qr40MYs9OL2cuU3gcCrc+GKqzwxFU6M
+ +budVIMhThGiEaRLiBf08Wp5H2m7vKTSP4FjPUSdW6RgP5FxSnl3Yt6hAWh8Rui6GGgh
+ 7856mUkchHHrgbHIjqc2XLROdWWzDsm6tErkA6RQlqphGGEehlacaz4c2y1ms6MQrW6s
+ 0saFIjhoieokQnMC3iLQqwwiL3FQAThZyaezhtZ4WibGRltOno8KsC8JOUSNiJwRx67k
+ E080+5TrTJCPPro+Rlnf1E+gp9wIQyerrHcrOGdyrIc53+I0nzzdDRjErayky3bd+M3W
+ cPiQ==
+X-Gm-Message-State: AOAM531SezbvHWk4H07tfCSpaYbke3VIfqD/a1BrvQ9gB4PqYKqZZ17f
+ k6H4A/5jf2xTaPAXVVSkEMo+VdNCArNZsFlD2v48Pg==
+X-Google-Smtp-Source: ABdhPJzpHnn5Va+Zva11H7oHeOnzsrgG/lcYPxvwzn3M3FVNvkOV1Y1fDhhCyXgdlAWLhZa4n6At69/woFeeGpnw7nU=
+X-Received: by 2002:a5d:42cd:0:b0:207:af3f:79c9 with SMTP id
+ t13-20020a5d42cd000000b00207af3f79c9mr12547729wrr.577.1650389887738; Tue, 19
+ Apr 2022 10:38:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yl7TKXY09ZA61aYT@monolith.localdoman>
-Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+References: <20220314200148.2695206-1-kaleshsingh@google.com>
+ <20220314200148.2695206-8-kaleshsingh@google.com>
+ <CA+EHjTwQRUCjvcMHNe1f0kPBdU=vS+f2+e_eefhnJDR4s73cQA@mail.gmail.com>
+ <CAC_TJveNRaDFcQGo9-eqKa3=1DnuVDs4U+ye795VcJ1ozVkMyg@mail.gmail.com>
+ <YlbXHg64HK2d3dgm@FVFF77S0Q05N>
+In-Reply-To: <YlbXHg64HK2d3dgm@FVFF77S0Q05N>
+From: Kalesh Singh <kaleshsingh@google.com>
+Date: Tue, 19 Apr 2022 10:37:56 -0700
+Message-ID: <CAC_TJveJYFkHPQLYdL8SCEAwMPgwpF_-ctMqKJ9w=eDa_M0u5w@mail.gmail.com>
+Subject: Re: [PATCH v6 7/8] KVM: arm64: Unwind and dump nVHE HYP stacktrace
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
+ <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
+ "Cc: Android Kernel" <kernel-team@android.com>,
+ Andrew Walbran <qwandor@google.com>, Will Deacon <will@kernel.org>,
+ Peter Collingbourne <pcc@google.com>, Marc Zyngier <maz@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, Stephen Boyd <swboyd@chromium.org>,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Suren Baghdasaryan <surenb@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -63,114 +94,72 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Wed, Apr 13, 2022 at 6:59 AM Mark Rutland <mark.rutland@arm.com> wrote:
+>
+> Hi Kalesh,
+>
+> Sorry for the radiosilence.
+>
+> I see that in v7 you've dropped the stacktrace bits for now; I'm just
+> commenting here fot future reference.
+>
+> On Thu, Mar 31, 2022 at 12:22:05PM -0700, Kalesh Singh wrote:
+> > Hi everyone,
+> >
+> > There has been expressed interest in having hypervisor stack unwinding
+> > in production Android builds.
+> >
+> > The current design targets NVHE_EL2_DEBUG enabled builds and is not
+> > suitable for production environments, since this config disables host
+> > stage-2 protection on hyp_panic() which breaks security guarantees.
+> > The benefit of this approach is that the stack unwinding can happen at
+> > EL1 and allows us to reuse most of the unwinding logic from the host
+> > kernel unwinder.
+> >
+> > Proposal for how this can be done without disabling host stage-2 protection:
+> >   - The host allocates a "panic_info" page and shares it with the hypervisor.
+> >   - On hyp_panic(), the hypervisor can unwind and dump its stack
+> > addresses to the shared page.
+> >   - The host can read out this information and symbolize these addresses.
+> >
+> > This would allow for getting hyp stack traces in production while
+> > preserving the security model. The downside being that the core
+> > unwinding logic would be duplicated at EL2.
+> >
+> > Are there any objections to making this change?
+>
+> I'm fine with the concept of splitting the unwind and logging steps; this is
+> akin to doing:
+>
+>         stack_trace_save_tsk(...);
+>         ...
+>         stack_trace_print(...);
+>
+> ... and I'm fine with having a stack_trace_save_hyp(...) variant.
+>
+> However, I would like to ensure that we're reusing logic rather than
+> duplicating it wholesale.
 
-On Tue, Apr 19, 2022 at 04:20:09PM +0100, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Tue, Apr 19, 2022 at 03:59:46PM +0100, Will Deacon wrote:
-> > On Tue, Apr 19, 2022 at 03:44:02PM +0100, Alexandru Elisei wrote:
-> > > On Tue, Apr 19, 2022 at 03:10:13PM +0100, Will Deacon wrote:
-> > > > On Tue, Apr 19, 2022 at 02:51:05PM +0100, Alexandru Elisei wrote:
-> > > > > 2. The stage 2 fault is reported asynchronously via an interrupt, which
-> > > > > means there will be a window where profiling is stopped from the moment SPE
-> > > > > triggers the fault and when the PE taks the interrupt. This blackout window
-> > > > > is obviously not present when running on bare metal, as there is no second
-> > > > > stage of address translation being performed.
-> > > > 
-> > > > Are these faults actually recoverable? My memory is a bit hazy here, but I
-> > > > thought SPE buffer data could be written out in whacky ways such that even
-> > > > a bog-standard page fault could result in uncoverable data loss (i.e. DL=1),
-> > > > and so pinning is the only game in town.
-> > > 
-> > > Ah, I forgot about that, I think you're right (ARM DDI 0487H.a, page
-> > > D10-5177):
-> > > 
-> > > "The architecture does not require that a sample record is written
-> > > sequentially by the SPU, only that:
-> > > [..]
-> > > - On a Profiling Buffer management interrupt, PMBSR_EL1.DL indicates
-> > >   whether PMBPTR_EL1 points to the first byte after the last complete
-> > >   sample record.
-> > > - On an MMU fault or synchronous External abort, PMBPTR_EL1 serves as a
-> > >   Fault Address Register."
-> > > 
-> > > and (page D10-5179):
-> > > 
-> > > "If a write to the Profiling Buffer generates a fault and PMBSR_EL1.S is 0,
-> > > then a Profiling Buffer management event is generated:
-> > > [..]
-> > > - If PMBPTR_EL1 is not the address of the first byte after the last
-> > >   complete sample record written by the SPU, then PMBSR_EL1.DL is set to 1.
-> > >   Otherwise, PMBSR_EL1.DL is unchanged."
-> > > 
-> > > Since there is no way to know the record size (well, unless
-> > > PMSIDR_EL1.MaxSize == PMBIDR_EL1.Align, but that's not an architectural
-> > > requirement), it means that KVM cannot restore the write pointer to the
-> > > address of the last complete record + 1, to allow the guest to resume
-> > > profiling without corrupted records.
-> > > 
-> > > > 
-> > > > A funkier approach might be to defer pinning of the buffer until the SPE is
-> > > > enabled and avoid pinning all of VM memory that way, although I can't
-> > > > immediately tell how flexible the architecture is in allowing you to cache
-> > > > the base/limit values.
-> > > 
-> > > A guest can use this to pin the VM memory (or a significant part of it),
-> > > either by doing it on purpose, or by allocating new buffers as they get
-> > > full. This will probably result in KVM killing the VM if the pinned memory
-> > > is larger than ulimit's max locked memory, which I believe is going to be a
-> > > bad experience for the user caught unaware. Unless we don't want KVM to
-> > > take ulimit into account when pinning the memory, which as far as I can
-> > > goes against KVM's approach so far.
-> > 
-> > Yeah, it gets pretty messy and ulimit definitely needs to be taken into
-> > account, as it is today.
-> > 
-> > That said, we could just continue if the pinning fails and the guest gets to
-> > keep the pieces if we get a stage-2 fault -- putting the device into an
-> > error state and re-injecting the interrupt should cause the perf session in
-> > the guest to fail gracefully. I don't think the complexity is necessarily
-> > worth it, but pinning all of guest memory is really crap so it's worth
-> > thinking about alternatives.
-> 
-> On the subject of pinning the memory when guest enables SPE, the guest can
-> configure SPE to profile userspace only. Programming is done at EL1, and in
-> this case SPE is disabled. KVM doesn't trap the ERET to EL0, so the only
-> sensible thing to do here is to pin the memory when SPE is disabled. If it
-> fails, then how should KVM notify the guest that something went wrong when
-> SPE is disabled? KVM could inject an interrupt, as those are asynchronous
-> and one could (rather weakly) argue that the interrupt might have been
-> raised because of something that happened in the previous profiling
-> session, but what if the guest never enabled SPE? What if the guest is in
-> the middle of configuring SPE and the interrupt handler isn't even set? Or
-> should KVM not use an interrupt to report error conditions to the guest, in
-> which case, how can the guest detect that SPE is stopped?
+Agreed. Although some reimplementation may be unavoidable, as we can't
+safely link against kernel code from the protected KVM hypervisor.
+Perhaps we can move some of the common logic to a shared header that
+can be included in both places (host, hyp), WDYT?
 
-Come to think of it, KVM can defer injecting the interrupt until after an
-exit from the guest when the guest was executing at EL0 (and profiling
-would have been enabled from the guest's point of view). I think this
-should work, as a delay between the condition that causes an interrupt and
-the PE taking the said interrupt is expected.
+> There are some changes I would like to make to the
+> stacktrace code in the near future that might make that a bit easier, e.g.
+> reworking the stack transition checks to be table-driven, and factoring out the
+> way we handle return trampolines.
 
-Thoughts?
-
-I too would prefer not to have to pin the entire VM memory, and asking from
-userspace to increase max locked memory to the size of the VM memory looks
-a lot better to me.
+Sounds good to me.
 
 Thanks,
-Alex
-
-> 
-> Both options don't look particularly appealing to me.
-> 
+Kalesh
+>
+> I'll Cc you on changes to the stacktrace code. There are some preparatory
+> cleanups I'd like to get out of the way first which I'll send shortly.
+>
 > Thanks,
-> Alex
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Mark.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
