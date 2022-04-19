@@ -2,70 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B5ECC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 06:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F3BC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 06:57:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F29B4B1FB;
-	Tue, 19 Apr 2022 02:57:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CA464B20D;
+	Tue, 19 Apr 2022 02:57:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id y56TBAFDpYvH; Tue, 19 Apr 2022 02:57:28 -0400 (EDT)
+	with ESMTP id 1bPQ5xR3fySm; Tue, 19 Apr 2022 02:57:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 017434B204;
-	Tue, 19 Apr 2022 02:57:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2996F4B1FD;
+	Tue, 19 Apr 2022 02:57:30 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDCFE49EF2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E0B64B1C9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6LuUfHtDokRO for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Apr 2022 02:57:25 -0400 (EDT)
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
- [209.85.214.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E5DC4B1ED
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:24 -0400 (EDT)
-Received: by mail-pl1-f202.google.com with SMTP id
- k2-20020a170902ba8200b0015613b12004so9240653pls.22
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 23:57:24 -0700 (PDT)
+ with ESMTP id Wo6bv9fNo+ge for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Apr 2022 02:57:27 -0400 (EDT)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C9BB4B232
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:26 -0400 (EDT)
+Received: by mail-pj1-f74.google.com with SMTP id
+ 38-20020a17090a09a900b001cb95d9ea46so10128686pjo.7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 23:57:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=5GFeg0Qhkqt0F/Jtoeb93WWvQllcpb+IlKZnd70ZJik=;
- b=Fv4yxIMKsOfPGl1VWc42zdtocbfbfZISNCLx3NGwULK0h1JKlUIWpfnlR/UL/RRMyA
- eKMYR3vCEvPzuoFW6dKiSVM7mNuCTj58732pG3PZ8cRx/V/jpgNu+AzLyMznTWkU7AYm
- XEbug58FYBe7rIGRKQkJPaCRjF6EBPjlknVNwBqVFn/SJT1P9Opmpy/2CQpay9I+WDBe
- hZwitU1DkclcjVe3OR1Fg1KMkZ5GPGfwYoC4VNzLLHXq+DhNlaG572W/i2tRZU+M/i+i
- Wp5xaAMVEBc0q1E5xZnp3K5MrJ62+uiDQ2cSm3mL+VFCJUUn4k8M7XbGWaLgDE7OWKPp
- ttBg==
+ :cc; bh=/vjKAR/Lgrfopo8hEj0HEcKOQxQlZW68o1SkmclVnl4=;
+ b=lzf/QpdqQv9uzaV5AJLSdksISlhdMJg0/X4yt3SQ6Pbv0hF+PdxOMJ8pLE+rdZv61f
+ i15qaeHVtYUyP2dfbRSZD25p4C+rxzvhNV9nTEdGdED+ftIuvIRX25CuQu7SsRHKay0I
+ YG15YkYFJ5L5ER/Zlz9Lcy7QJPO3/2Pguy2ljgPmnfmTnwIn/U+BDnLd59tE5llgaax2
+ QlBXRvDLgcj/dqlkHez/TKqYPZBwwn9BUAGjjkRm4puiWejX/Kpf36vPPJRPn+7i7tqr
+ zy+Ew1QFJeF2Kin3d8ZeIH0wYeZGlKFCjcM7cAb5Ib41YdGcj2wXN2yIFxLOuyzLvU3S
+ gxog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=5GFeg0Qhkqt0F/Jtoeb93WWvQllcpb+IlKZnd70ZJik=;
- b=qrB3Abj4Yyi64EVJ9SOA3521cJ8EAHrhBnyqX3TAvijrqIIcLwPbj3D+30dE2o5i1r
- Pxw7YrotUspncHkOBALWNpXsIhISQz+V2LXsY6+ZAaDdgWlp63bn46ANVtrw70HwOTay
- WRnLyRE11SyXk8t7j0UeuKcW/guGpgN5/w/X3ATnBDK4VUzjICYvEVN9/dizJh7l3lqQ
- MNxOzfoyy9QTRArJ7wMK4Df5nOfFwitqVSebV9Y5wpMl1Y3ASYb0IEp4m6nmoi1ACMid
- n9nONI0khVbWomTUb3MX66yQvaUCmytMrv2hIAVp+MGS6+jJ5DN4wyO4x4rc9SrUdt/7
- 7wWw==
-X-Gm-Message-State: AOAM532VZLldlGxBWAo2pTC5SI0MuiMeAm/GzrUGjb8Kkb6FOA7uI4F9
- Jg9MaOKbHIUCYf4aZGXm831EnXw8Cio=
-X-Google-Smtp-Source: ABdhPJxWTrb+BY8xwpwyXUFdaoymj4StHXGAR+lBoWQZOnAwK6U8eNBK6/ve0byeXMAGA0OzQxHDtDdAAhc=
+ bh=/vjKAR/Lgrfopo8hEj0HEcKOQxQlZW68o1SkmclVnl4=;
+ b=SLMqTKQEimHS777Tv9xhVrePjAWnKfmeksXIlv33HSnPn71BY754lCWDE6fmEEiqh6
+ 2DeQDRGy/eR/7pYDxtbca8GwFHhcdk+EAHFVbC9Ij+l9CgoAyZyKAAuISE9FZyOAKLc/
+ 7cxuboIHsJ/qbybbKnzBDwEMeAA7n1pGFeI3+S3F5v/zh6sFSbfXBottWFKeboP2cTrw
+ t7/L4EwoJyGCQ1mkaUo9c4RHmsdWucMn0x8dZafrZyHE2dx7LjKWryV7jaCE6LFdRiVR
+ nR55SYLVMmVHoXi+D+qah9HYpY9GyNT0dZq552bTCmy2OsN5ajVyt5CuaDXXpmuvpFwt
+ qVsA==
+X-Gm-Message-State: AOAM5300iDcRcFg0ccPdcuBLwu/rIvJH9vWFsmPEq0FtT9RdtOMvULcp
+ jvWSKAdEAlj81WPfpojx8070MCoq+7Q=
+X-Google-Smtp-Source: ABdhPJwLgiVYSYP5oQPSjEjSHx+cLaLtR0/2B0FVBvNOlRvoxy7xj829DfShZuFzYw4gbA0oeKTgAhX0I3s=
 X-Received: from reiji-vws-sp.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:902:9696:b0:158:f809:310e with SMTP id
- n22-20020a170902969600b00158f809310emr9827150plp.16.1650351443506; Mon, 18
- Apr 2022 23:57:23 -0700 (PDT)
-Date: Mon, 18 Apr 2022 23:55:17 -0700
+ (user=reijiw job=sendgmr) by 2002:a05:6a00:10c7:b0:4fd:9ee6:4130 with SMTP id
+ d7-20020a056a0010c700b004fd9ee64130mr16718408pfu.84.1650351445278; Mon, 18
+ Apr 2022 23:57:25 -0700 (PDT)
+Date: Mon, 18 Apr 2022 23:55:18 -0700
 In-Reply-To: <20220419065544.3616948-1-reijiw@google.com>
-Message-Id: <20220419065544.3616948-12-reijiw@google.com>
+Message-Id: <20220419065544.3616948-13-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220419065544.3616948-1-reijiw@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v7 11/38] KVM: arm64: Make ID_AA64MMFR0_EL1 writable
+Subject: [PATCH v7 12/38] KVM: arm64: Add a KVM flag indicating emulating
+ debug regs access is needed
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -87,175 +88,123 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This patch adds id_reg_desc for ID_AA64MMFR0_EL1 to make it
-writable by userspace.
+Highest numbered breakpoints must be context aware breakpoints
+(as specified by Arm ARM).  If the number of non-context aware
+breakpoints for the guest is decreased by userspace, simply narrowing
+the breakpoints will be problematic because it will lead to
+narrowing context aware breakpoints for the guest.
 
-Since ID_AA64MMFR0_EL1 stage 2 granule size fields don't follow the
-standard ID scheme, we need a special handling to validate those fields.
+Introduce KVM_ARCH_FLAG_EMULATE_DEBUG_REGS for kvm->arch.flags to
+indicate trapping debug reg access is needed, and enable the trapping
+when the flag is set.  Set the new flag at the first KVM_RUN if the
+number of non-context aware breakpoints for the guest is decreased
+by userspace.
+
+No code sets the new flag yet since ID_AA64DFR0_EL1 is not configurable
+by userspace.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 133 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 133 insertions(+)
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ arch/arm64/kvm/debug.c            |  7 ++++++-
+ arch/arm64/kvm/sys_regs.c         | 35 +++++++++++++++++++++++++++++++
+ 3 files changed, 44 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a43fddd58e68..dbed94e759a8 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -136,6 +136,8 @@ struct kvm_arch {
+ 	 */
+ #define KVM_ARCH_FLAG_REG_WIDTH_CONFIGURED		3
+ #define KVM_ARCH_FLAG_EL1_32BIT				4
++	/* Access to debug registers need to be emulated ? */
++#define KVM_ARCH_FLAG_EMULATE_DEBUG_REGS		5
+ 
+ 	unsigned long flags;
+ 
+@@ -786,6 +788,7 @@ long kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+ 
+ void set_default_id_regs(struct kvm *kvm);
+ int kvm_set_id_reg_feature(struct kvm *kvm, u32 id, u8 field_shift, u8 fval);
++void kvm_vcpu_breakpoint_config(struct kvm_vcpu *vcpu);
+ 
+ /* Guest/host FPSIMD coordination helpers */
+ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+index 4fd5c216c4bb..6eb146d908f8 100644
+--- a/arch/arm64/kvm/debug.c
++++ b/arch/arm64/kvm/debug.c
+@@ -106,10 +106,14 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+ 	 *  (KVM_GUESTDBG_USE_HW is set).
+ 	 *  - The guest is not using debug (KVM_ARM64_DEBUG_DIRTY is clear).
+ 	 *  - The guest has enabled the OS Lock (debug exceptions are blocked).
++	 *  - The guest's access to debug registers needs to be emulated
++	 *    (the number of non-context aware breakpoints for the guest
++	 *     is decreased by userspace).
+ 	 */
+ 	if ((vcpu->guest_debug & KVM_GUESTDBG_USE_HW) ||
+ 	    !(vcpu->arch.flags & KVM_ARM64_DEBUG_DIRTY) ||
+-	    kvm_vcpu_os_lock_enabled(vcpu))
++	    kvm_vcpu_os_lock_enabled(vcpu) ||
++	    test_bit(KVM_ARCH_FLAG_EMULATE_DEBUG_REGS, &vcpu->kvm->arch.flags))
+ 		vcpu->arch.mdcr_el2 |= MDCR_EL2_TDA;
+ 
+ 	trace_kvm_arm_set_dreg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+@@ -124,6 +128,7 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+  */
+ void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu)
+ {
++	kvm_vcpu_breakpoint_config(vcpu);
+ 	preempt_disable();
+ 	kvm_arm_setup_mdcr_el2(vcpu);
+ 	preempt_enable();
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index ba2e6dac7774..b68ae53af792 100644
+index b68ae53af792..f4aae4ccffd0 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -542,6 +542,118 @@ static int validate_id_aa64isar2_el1(struct kvm_vcpu *vcpu,
- 	return 0;
+@@ -844,6 +844,41 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
+ 	}
  }
  
++#define AA64DFR0_BRPS(v)	\
++	((u8)cpuid_feature_extract_unsigned_field(v, ID_AA64DFR0_BRPS_SHIFT))
++#define AA64DFR0_CTX_CMPS(v)	\
++	((u8)cpuid_feature_extract_unsigned_field(v, ID_AA64DFR0_CTX_CMPS_SHIFT))
++
 +/*
-+ * Check if the requested stage2 translation granule size indicated in
-+ * @mmfr0 is also indicated in @mmfr0_lim.
-+ * If TGranX_2 field is zero, the value must be validated based on TGranX
-+ * field because that indicates the feature support is identified in
-+ * TGranX field.
-+ * This function relies on the fact TGranX fields are validated before
-+ * through arm64_check_features.
++ * Set KVM_ARCH_FLAG_EMULATE_DEBUG_REGS in the VM flags when the number of
++ * non-context aware breakpoints for the guest is decreased by userspace
++ * (meaning that debug register accesses need to be emulated).
 + */
-+static int aa64mmfr0_tgran2_check(int field, u64 mmfr0, u64 mmfr0_lim)
++void kvm_vcpu_breakpoint_config(struct kvm_vcpu *vcpu)
 +{
-+	s64 tgran2, lim_tgran2, rtgran1;
-+	int f1;
-+	bool is_signed;
-+
-+	tgran2 = cpuid_feature_extract_unsigned_field(mmfr0, field);
-+	lim_tgran2 = cpuid_feature_extract_unsigned_field(mmfr0_lim, field);
-+	if (tgran2 && lim_tgran2)
-+		/*
-+		 * We don't need to check TGranX field. We can simply
-+		 * compare tgran2 and lim_tgran2.
-+		 */
-+		return (tgran2 > lim_tgran2) ? -E2BIG : 0;
-+
-+	if (tgran2 == lim_tgran2)
-+		/*
-+		 * Both of them are zero.  Since TGranX in @mmfr0 is already
-+		 * validated by arm64_check_features, tgran2 must be fine.
-+		 */
-+		return 0;
++	u64 p_val = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
++	u64 v_val = read_id_reg_with_encoding(vcpu, SYS_ID_AA64DFR0_EL1);
++	u8 v_nbpn, p_nbpn;
++	struct kvm *kvm = vcpu->kvm;
 +
 +	/*
-+	 * Either tgran2 or lim_tgran2 is zero.
-+	 * Need stage1 granule size to validate tgran2.
++	 * Check the number of normal (non-context aware) breakpoints
++	 * for the guest and the host.
 +	 */
-+
-+	/*
-+	 * Get TGranX's bit position by subtracting 12 from TGranX_2's bit
-+	 * position.
-+	 */
-+	f1 = field - 12;
-+
-+	/* TGran4/TGran64 is signed and TGran16 is unsigned field. */
-+	is_signed = (f1 == ID_AA64MMFR0_TGRAN16_SHIFT) ? false : true;
-+
-+	/*
-+	 * If tgran2 == 0 (&& lim_tgran2 != 0), the requested stage2 granule
-+	 * size is indicated in the stage1 granule size field of @mmfr0.
-+	 * So, validate the stage1 granule size against the stage2 limit
-+	 * granule size.
-+	 * If lim_tgran2 == 0 (&& tgran2 != 0), the stage2 limit granule size
-+	 * is indicated in the stage1 granule size field of @mmfr0_lim.
-+	 * So, validate the requested stage2 granule size against the stage1
-+	 * limit granule size.
-+	 */
-+
-+	 /* Get the relevant stage1 granule size to validate tgran2 */
-+	if (tgran2 == 0)
-+		/* The requested stage1 granule size */
-+		rtgran1 = cpuid_feature_extract_field(mmfr0, f1, is_signed);
-+	else /* lim_tgran2 == 0 */
-+		/* The stage1 limit granule size */
-+		rtgran1 = cpuid_feature_extract_field(mmfr0_lim, f1, is_signed);
-+
-+	/*
-+	 * Adjust the value of rtgran1 to compare with stage2 granule size,
-+	 * which indicates: 1: Not supported, 2: Supported, etc.
-+	 */
-+	if (is_signed)
-+		/* For signed, -1: Not supported, 0: Supported, etc. */
-+		rtgran1 += 0x2;
-+	else
-+		/* For unsigned, 0: Not supported, 1: Supported, etc. */
-+		rtgran1 += 0x1;
-+
-+	if ((tgran2 == 0) && (rtgran1 > lim_tgran2))
++	v_nbpn = AA64DFR0_BRPS(v_val) - AA64DFR0_CTX_CMPS(v_val);
++	p_nbpn = AA64DFR0_BRPS(p_val) - AA64DFR0_CTX_CMPS(p_val);
++	if (v_nbpn >= p_nbpn)
 +		/*
-+		 * The requested stage1 granule size (== the requested stage2
-+		 * granule size) is larger than the stage2 limit granule size.
++		 * Nothing to do if the number of normal breakpoints for the
++		 * guest is not decreased by userspace (meaning KVM doesn't
++		 * need to emulate an access of debug registers).
 +		 */
-+		return -E2BIG;
-+	else if ((lim_tgran2 == 0) && (tgran2 > rtgran1))
-+		/*
-+		 * The requested stage2 granule size is larger than the stage1
-+		 * limit granulze size (== the stage2 limit granule size).
-+		 */
-+		return -E2BIG;
++		return;
 +
-+	return 0;
++	if (!test_bit(KVM_ARCH_FLAG_EMULATE_DEBUG_REGS, &kvm->arch.flags))
++		set_bit(KVM_ARCH_FLAG_EMULATE_DEBUG_REGS, &kvm->arch.flags);
 +}
 +
-+static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
-+				     const struct id_reg_desc *id_reg, u64 val)
-+{
-+	u64 limit = id_reg->vcpu_limit_val;
-+	int ret;
-+
-+	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN4_2_SHIFT, val, limit);
-+	if (ret)
-+		return ret;
-+
-+	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN64_2_SHIFT, val, limit);
-+	if (ret)
-+		return ret;
-+
-+	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN16_2_SHIFT, val, limit);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- static void init_id_aa64pfr0_el1_desc(struct id_reg_desc *id_reg)
- {
- 	u64 limit = id_reg->vcpu_limit_val;
-@@ -3413,6 +3525,24 @@ static struct id_reg_desc id_aa64isar2_el1_desc = {
- 	},
- };
- 
-+static struct id_reg_desc id_aa64mmfr0_el1_desc = {
-+	.reg_desc = ID_SANITISED(ID_AA64MMFR0_EL1),
-+	/*
-+	 * When TGranX_2 value is 0, validity of the value depend on TGranX
-+	 * value, and TGranX_2 value must be validated against TGranX value,
-+	 * which is done by validate_id_aa64mmfr0_el1.
-+	 * So, skip the regular validity checking for TGranX_2 fields.
-+	 */
-+	.ignore_mask = ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN4_2) |
-+		       ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN64_2) |
-+		       ARM64_FEATURE_MASK(ID_AA64MMFR0_TGRAN16_2),
-+	.validate = validate_id_aa64mmfr0_el1,
-+	.ftr_bits = {
-+		S_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_TGRAN64_SHIFT, ID_AA64MMFR0_TGRAN64_NI),
-+		S_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_TGRAN4_SHIFT, ID_AA64MMFR0_TGRAN4_NI),
-+	},
-+};
-+
- #define ID_DESC(id_reg_name, id_reg_desc)	\
- 	[IDREG_IDX(SYS_##id_reg_name)] = (id_reg_desc)
- 
-@@ -3426,6 +3556,9 @@ static struct id_reg_desc *id_reg_desc_table[KVM_ARM_ID_REG_MAX_NUM] = {
- 	ID_DESC(ID_AA64ISAR0_EL1, &id_aa64isar0_el1_desc),
- 	ID_DESC(ID_AA64ISAR1_EL1, &id_aa64isar1_el1_desc),
- 	ID_DESC(ID_AA64ISAR2_EL1, &id_aa64isar2_el1_desc),
-+
-+	/* CRm=7 */
-+	ID_DESC(ID_AA64MMFR0_EL1, &id_aa64mmfr0_el1_desc),
- };
- 
- static inline struct id_reg_desc *get_id_reg_desc(u32 id)
+ /*
+  * We want to avoid world-switching all the DBG registers all the
+  * time:
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
