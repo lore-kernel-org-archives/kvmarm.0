@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FDFC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 06:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60885C433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 06:58:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 65CED4B256;
-	Tue, 19 Apr 2022 02:58:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 18A6F4B25F;
+	Tue, 19 Apr 2022 02:58:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id udoD4VRsXY3Q; Tue, 19 Apr 2022 02:58:00 -0400 (EDT)
+	with ESMTP id xNm6xvHRjcKz; Tue, 19 Apr 2022 02:58:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 41E684B23A;
-	Tue, 19 Apr 2022 02:58:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 652654B235;
+	Tue, 19 Apr 2022 02:58:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E2FE4B20C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 747774B235
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:59 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pgztfT5PkBvA for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Apr 2022 02:57:57 -0400 (EDT)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBEDB4B227
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:53 -0400 (EDT)
-Received: by mail-pl1-f201.google.com with SMTP id
- q6-20020a170902eb8600b001588e49dcaaso9254564plg.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 23:57:53 -0700 (PDT)
+ with ESMTP id lKG5YZGgMDd6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Apr 2022 02:57:58 -0400 (EDT)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F40874B234
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:57 -0400 (EDT)
+Received: by mail-pj1-f74.google.com with SMTP id
+ t24-20020a17090a449800b001d2d6e740c3so766899pjg.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 23:57:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=6xPTbO2+lphyYIiZZ7nszYhBXnFaCQQSE3MHungiG3k=;
- b=It96CsYEpNqOcLwAVOb9ZqqedaZuQTEj/TXyGKgn91DGN1sbhJ2YzVPkGyHNPtG0Nv
- aNAZtDspBnw31IkOSfsaQRnyOa1+vukEVhRRJuyFETlx+Xga9HV7nASuyNJsYJd6eFZO
- Z24gMEtrO+U5npwqvSLXDznZlYHSyFsmBAFIFZoEMTLt46ZN4DzUxj55xgjRqSxJ6hm5
- euhJuYDyTiUwy8G6uL3tc5CKsuhmecf0ulBOQZbgyj0Zgb0i2TxRTfji88zGyTtAvcIk
- KyaEUd4bs969tANr4AJvZOIcTWBIOCB3bZmNr5U2nuMhhVOvPHgX0HvX8PSt923l0aer
- fGuw==
+ :cc; bh=NuyHwIdLopy65edSNneYdDxbRUfisj8CwS/EiSJPzd8=;
+ b=JuUUKKxB0c/5jIWsiYKyQ96v92kR8U04zVTmghfJqxxpOX8oOFxp3i2Z2Nh093oYyp
+ H0/kx9a1P/1ubVd3lZh6kDtH/OiOf71OtqLY72YPtLpY8YP3ffOIP/lEAVsJQSBvHYot
+ vzBxzkQhgwMMo9LdW17weQLrbPW108wD8tKY1Wbzlos4ZAFAKrE5q0N/q3ZNwaUf4SuT
+ cdlO0hLMTuo62b1V7ayXsfaOxdiaZeIynR2WqLtL3z1lshngrZDzOiNr4pCJeXSHE/TC
+ ruUHeK7oqyDFbziR9rKDw4GGtuul/EAGF4K2GLLmivhjb0emsW0h1fQUYia2GZAa0et3
+ 2qFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=6xPTbO2+lphyYIiZZ7nszYhBXnFaCQQSE3MHungiG3k=;
- b=lz0T4MH0v7z64CYzhLd+lz12DgEbcXirPcSMsFKOuLUj0UBcozKoz3LJ1Ds+0qD6hm
- CAdSVjkw/wekfCB6ehIiYbDhoXMhEN0Hl44vyVdPdzwrlriWgpQ/AP7e4Xk6F7Ekuc2n
- fx/5oxBLJmHtd9rA9DTVwnPT5h0Rsy/ybxTxkIM1w7zMWlAJ+LRTsIgKKFGOHSjVi4Ie
- 9gK4jBztz9F4cPVYjyKwBPQwF+dzakYmGyJ0M8CZNadwJH1LU/oS2B7XKBz4YC6MT7eL
- lzFDadcmrpm5aYbTbYcUhkicml0X8GqjT69UjqPgiArjNbpqpbuxvyysUEKQuTTv4Krj
- G7fA==
-X-Gm-Message-State: AOAM5312Yjo6UnPaw1s2zufIifJs1Dqrb44/dGbsjm4mX8LdiazlN9C7
- RtXjqvxKsViYnYhoM0BoVZV0cVQwLXg=
-X-Google-Smtp-Source: ABdhPJy3D0n5a+z17jnE0L3OXrhl0HuwRJ6F1nYYDplfhvW3GN0Q2u9zJiIaYhrSBbwPfSrzLKaQHN+kyIk=
+ bh=NuyHwIdLopy65edSNneYdDxbRUfisj8CwS/EiSJPzd8=;
+ b=IKGbXmtmLsGWjijKsuESd2LmrT2KBe9p71oN/7EeiNkrfKJPZrROBzwWW2+kYncBgj
+ ij4qY+n5cvkFy9TrgJF63olo5+fI3sT1AGBNLakzHz9AFckL6iuRaMD5fXL7PJY2q3bI
+ SA7bP8dvrr7NGxum1Nxe0h5kWrgx8u7nXh+NJW1rhn78qcFUF1a7AwWgnAdKeZR1tr5D
+ WmFoAT4Maq9nmrFyOKsoJrrdc+DpL5BSgO2sLfbSM5jFSyUScDVhoByjFM4HoLYRAIVn
+ acoFbV7c26bBuLZYGkv+n+kPfZm5Fj1dG69WsdsLnh7JW2WVIjRTDnvg7wwh1BJUQ6cM
+ rujg==
+X-Gm-Message-State: AOAM530sltpUFTCqlGIiS75va4fwJrSKRH2t6Nn/gwI3dD1yFCdq21Cd
+ vQeG++xQol/HRU7aYX1wmVv1mLl3YDI=
+X-Google-Smtp-Source: ABdhPJydE7fDS2laiwWJTKLimV4fAMnUFfC2eflrLVOosa8XXTixDdxvFoVs0mgS6AY3uBwDt69iQ8327ek=
 X-Received: from reiji-vws-sp.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a05:6a00:1490:b0:4fb:1544:bc60 with SMTP id
- v16-20020a056a00149000b004fb1544bc60mr16144093pfu.73.1650351472945; Mon, 18
- Apr 2022 23:57:52 -0700 (PDT)
-Date: Mon, 18 Apr 2022 23:55:35 -0700
+ (user=reijiw job=sendgmr) by 2002:a63:1141:0:b0:39c:b664:c508 with SMTP id
+ 1-20020a631141000000b0039cb664c508mr13579700pgr.49.1650351477273; Mon, 18 Apr
+ 2022 23:57:57 -0700 (PDT)
+Date: Mon, 18 Apr 2022 23:55:38 -0700
 In-Reply-To: <20220419065544.3616948-1-reijiw@google.com>
-Message-Id: <20220419065544.3616948-30-reijiw@google.com>
+Message-Id: <20220419065544.3616948-33-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220419065544.3616948-1-reijiw@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v7 29/38] KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
+Subject: [PATCH v7 32/38] KVM: arm64: Add kunit test for trap initialization
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -87,105 +87,251 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Add feature_config_ctrl for PMUv3, PMS and TraceFilt, which are
-indicated in ID_AA64DFR0_EL1, to program configuration registers
-to trap guest's using those features when they are not exposed to
-the guest.
+Add KUnit tests for functions in arch/arm64/kvm/sys_regs_test.c
+that activates traps for disabled features.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 64 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ arch/arm64/kvm/sys_regs_test.c | 219 +++++++++++++++++++++++++++++++++
+ 1 file changed, 219 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 10f366957ce9..a09c910198d6 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -365,6 +365,30 @@ static void feature_mte_trap_activate(struct kvm_vcpu *vcpu)
- 	feature_trap_activate(vcpu, VCPU_HCR_EL2, HCR_TID5, HCR_DCT | HCR_ATA);
+diff --git a/arch/arm64/kvm/sys_regs_test.c b/arch/arm64/kvm/sys_regs_test.c
+index dff146fe0e62..f9b032032ec3 100644
+--- a/arch/arm64/kvm/sys_regs_test.c
++++ b/arch/arm64/kvm/sys_regs_test.c
+@@ -1041,6 +1041,222 @@ static void validate_id_reg_test(struct kunit *test)
+ 	}
  }
  
-+static void feature_trace_trap_activate(struct kvm_vcpu *vcpu)
++struct trap_config_test {
++	u64 set;
++	u64 clear;
++	u64 prev_val;
++	u64 expect_val;
++};
++
++struct trap_config_test trap_params[] = {
++	{0x30000800000, 0, 0, 0x30000800000},
++	{0, 0x30000800000, 0, 0},
++	{0x30000800000, 0, (u64)-1, (u64)-1},
++	{0, 0x30000800000, (u64)-1, (u64)0xfffffcffff7fffff},
++};
++
++static void trap_case_to_desc(struct trap_config_test *t, char *desc)
 +{
-+	if (has_vhe())
-+		feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPACR_EL1_TTA, 0);
-+	else
-+		feature_trap_activate(vcpu, VCPU_CPTR_EL2, CPTR_EL2_TTA, 0);
++	snprintf(desc, KUNIT_PARAM_DESC_SIZE,
++		 "trap - set:0x%llx, clear:0x%llx, prev_val:0x%llx\n",
++		 t->set, t->clear, t->prev_val);
 +}
 +
-+static void feature_pmuv3_trap_activate(struct kvm_vcpu *vcpu)
++KUNIT_ARRAY_PARAM(trap, trap_params, trap_case_to_desc);
++
++/* Tests for feature_trap_activate(). */
++static void feature_trap_activate_test(struct kunit *test)
 +{
-+	feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TPM, 0);
++	struct kvm_vcpu *vcpu;
++	const struct trap_config_test *trap = test->param_value;
++
++	vcpu = test_kvm_vcpu_init(test);
++	KUNIT_ASSERT_TRUE(test, vcpu);
++
++	/* Test for HCR_EL2 */
++	vcpu->arch.hcr_el2 = trap->prev_val;
++	feature_trap_activate(vcpu, VCPU_HCR_EL2, trap->set, trap->clear);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2, trap->expect_val);
++
++	/* Test for MDCR_EL2 */
++	vcpu->arch.mdcr_el2 = trap->prev_val;
++	feature_trap_activate(vcpu, VCPU_MDCR_EL2, trap->set, trap->clear);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.mdcr_el2, trap->expect_val);
++
++	/* Test for CPTR_EL2 */
++	vcpu->arch.cptr_el2 = trap->prev_val;
++	feature_trap_activate(vcpu, VCPU_CPTR_EL2, trap->set, trap->clear);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.cptr_el2, trap->expect_val);
 +}
 +
-+static void feature_pms_trap_activate(struct kvm_vcpu *vcpu)
++static u64 test_trap_set0;
++static u64 test_trap_clear0;
++static void test_trap_activate0(struct kvm_vcpu *vcpu)
 +{
-+	feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TPMS,
-+			      MDCR_EL2_E2PB_MASK << MDCR_EL2_E2PB_SHIFT);
++	feature_trap_activate(vcpu, VCPU_HCR_EL2,
++			      test_trap_set0, test_trap_clear0);
 +}
 +
-+static void feature_tracefilt_trap_activate(struct kvm_vcpu *vcpu)
++static u64 test_trap_set1;
++static u64 test_trap_clear1;
++static void test_trap_activate1(struct kvm_vcpu *vcpu)
 +{
-+	feature_trap_activate(vcpu, VCPU_MDCR_EL2, MDCR_EL2_TTRF, 0);
++	feature_trap_activate(vcpu, VCPU_HCR_EL2,
++			      test_trap_set1, test_trap_clear1);
 +}
 +
- /* For ID_AA64PFR0_EL1 */
- static struct feature_config_ctrl ftr_ctrl_ras = {
- 	.ftr_reg = SYS_ID_AA64PFR0_EL1,
-@@ -391,6 +415,39 @@ static struct feature_config_ctrl ftr_ctrl_mte = {
- 	.trap_activate = feature_mte_trap_activate,
++static u64 test_trap_set2;
++static u64 test_trap_clear2;
++static void test_trap_activate2(struct kvm_vcpu *vcpu)
++{
++	feature_trap_activate(vcpu, VCPU_HCR_EL2,
++			      test_trap_set2, test_trap_clear2);
++}
++
++
++static void setup_feature_config_ctrl(struct feature_config_ctrl *config,
++				      u32 id, int shift, int min, bool sign,
++				      void *fn)
++{
++	memset(config, 0, sizeof(*config));
++	config->ftr_reg = id;
++	config->ftr_shift = shift;
++	config->ftr_min = min;
++	config->ftr_signed = sign;
++	config->trap_activate = fn;
++}
++
++/*
++ * Tests for id_reg_features_trap_activate.
++ * Setup a id_reg_desc with three entries in id_reg_desc->trap_features[].
++ * Check if the config register is updated to enable trap for the disabled
++ * features.
++ */
++static void id_reg_features_trap_activate_test(struct kunit *test)
++{
++	struct kvm_vcpu *vcpu;
++	u32 id;
++	u64 cfg_set, cfg_clear, id_reg_sys_val, id_reg_val;
++	struct id_reg_desc id_reg_data = {};
++	struct feature_config_ctrl config0, config1, config2;
++	struct feature_config_ctrl *trap_features[] = {
++		&config0, &config1, &config2, NULL,
++	};
++
++	vcpu = test_kvm_vcpu_init(test);
++	KUNIT_EXPECT_TRUE(test, vcpu);
++	if (!vcpu)
++		return;
++
++	/* Setup id_reg_desc */
++	id_reg_sys_val = 0x7777777777777777;
++	id = SYS_ID_AA64DFR0_EL1;
++	set_sys_desc((struct sys_reg_desc *)&id_reg_data.reg_desc, id);
++	id_reg_data.sys_val = id_reg_sys_val;
++	id_reg_data.vcpu_limit_val  = (u64)-1;
++	id_reg_data.trap_features =
++			(const struct feature_config_ctrl *(*)[])trap_features;
++
++	/* Setup the 1st feature_config_ctrl */
++	test_trap_set0 = 0x3;
++	test_trap_clear0 = 0x0;
++	setup_feature_config_ctrl(&config0, id, 60, 2, FTR_UNSIGNED,
++				  &test_trap_activate0);
++
++	/* Setup the 2nd feature_config_ctrl */
++	test_trap_set1 = 0x30000040;
++	test_trap_clear1 = 0x40000000;
++	setup_feature_config_ctrl(&config1, id, 0, 1, FTR_UNSIGNED,
++				  &test_trap_activate1);
++
++	/* Setup the 3rd feature_config_ctrl */
++	test_trap_set2 = 0x30000000800;
++	test_trap_clear2 = 0x40000000000;
++	setup_feature_config_ctrl(&config2, id, 4, 0, FTR_SIGNED,
++				  &test_trap_activate2);
++
++#define	ftr_dis(cfg)	\
++	((u64)(((cfg)->ftr_min - 1) & 0xf) << (cfg)->ftr_shift)
++
++#define	ftr_en(cfg)	\
++	((u64)(cfg)->ftr_min << (cfg)->ftr_shift)
++
++	/* Test with features enabled for config0, 1 and 2 */
++	id_reg_val = ftr_en(&config0) | ftr_en(&config1) | ftr_en(&config2);
++	write_kvm_id_reg(vcpu->kvm, id, id_reg_val);
++	vcpu->arch.hcr_el2 = 0;
++	id_reg_features_trap_activate(vcpu, &id_reg_data);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2, 0);
++
++
++	/* Test with features disabled for config0 only */
++	id_reg_val = ftr_dis(&config0) | ftr_en(&config1) | ftr_en(&config2);
++	write_kvm_id_reg(vcpu->kvm, id, id_reg_val);
++	vcpu->arch.hcr_el2 = 0;
++	cfg_set = test_trap_set0;
++	cfg_clear = test_trap_clear0;
++
++	id_reg_features_trap_activate(vcpu, &id_reg_data);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2 & cfg_set, cfg_set);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2 & cfg_clear, 0);
++
++
++	/* Test with features disabled for config0 and config1  */
++	id_reg_val = ftr_dis(&config0) | ftr_dis(&config1) | ftr_en(&config2);
++	write_kvm_id_reg(vcpu->kvm, id, id_reg_val);
++	vcpu->arch.hcr_el2 = 0;
++
++	cfg_set = test_trap_set0 | test_trap_set1;
++	cfg_clear = test_trap_clear0 | test_trap_clear1;
++
++	id_reg_features_trap_activate(vcpu, &id_reg_data);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2 & cfg_set, cfg_set);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2 & cfg_clear, 0);
++
++
++	/* Test with features disabled for config0, config1, and config2 */
++	id_reg_val = ftr_dis(&config0) | ftr_dis(&config1) | ftr_dis(&config2);
++	write_kvm_id_reg(vcpu->kvm, id, id_reg_val);
++	vcpu->arch.hcr_el2 = 0;
++
++	cfg_set = test_trap_set0 | test_trap_set1 | test_trap_set2;
++	cfg_clear = test_trap_clear0 | test_trap_clear1 | test_trap_clear2;
++
++	id_reg_features_trap_activate(vcpu, &id_reg_data);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2 & cfg_set, cfg_set);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2 & cfg_clear, 0);
++
++
++	/* Test with id_reg_data.trap_features = NULL */
++	id_reg_data.trap_features = NULL;
++	vcpu->arch.hcr_el2 = 0;
++	id_reg_features_trap_activate(vcpu, &id_reg_data);
++	KUNIT_EXPECT_EQ(test, vcpu->arch.hcr_el2, 0);
++}
++
++/* Tests for vcpu_need_trap_ptrauth(). */
++static void vcpu_need_trap_ptrauth_test(struct kunit *test)
++{
++	struct kvm_vcpu *vcpu;
++
++	vcpu = test_kvm_vcpu_init(test);
++	KUNIT_EXPECT_TRUE(test, vcpu);
++	if (!vcpu)
++		return;
++
++	if (system_has_full_ptr_auth()) {
++		/* Tests with PTRAUTH disabled vCPU */
++		KUNIT_EXPECT_TRUE(test, vcpu_need_trap_ptrauth(vcpu));
++
++		/* Tests with PTRAUTH enabled vCPU */
++		vcpu->arch.flags |= KVM_ARM64_GUEST_HAS_PTRAUTH;
++
++		KUNIT_EXPECT_FALSE(test, vcpu_need_trap_ptrauth(vcpu));
++	} else {
++		KUNIT_EXPECT_FALSE(test, vcpu_need_trap_ptrauth(vcpu));
++	}
++}
++
+ static struct kunit_case kvm_sys_regs_test_cases[] = {
+ 	KUNIT_CASE_PARAM(vcpu_id_reg_feature_frac_check_test, frac_gen_params),
+ 	KUNIT_CASE_PARAM(validate_id_aa64mmfr0_tgran2_test, tgran4_2_gen_params),
+@@ -1056,6 +1272,9 @@ static struct kunit_case kvm_sys_regs_test_cases[] = {
+ 	KUNIT_CASE(validate_id_dfr0_el1_test),
+ 	KUNIT_CASE(validate_mvfr1_el1_test),
+ 	KUNIT_CASE(validate_id_reg_test),
++	KUNIT_CASE(vcpu_need_trap_ptrauth_test),
++	KUNIT_CASE_PARAM(feature_trap_activate_test, trap_gen_params),
++	KUNIT_CASE(id_reg_features_trap_activate_test),
+ 	{}
  };
  
-+/* For ID_AA64DFR0_EL1 */
-+static struct feature_config_ctrl ftr_ctrl_trace = {
-+	.ftr_reg = SYS_ID_AA64DFR0_EL1,
-+	.ftr_shift = ID_AA64DFR0_TRACEVER_SHIFT,
-+	.ftr_min = 1,
-+	.ftr_signed = FTR_UNSIGNED,
-+	.trap_activate = feature_trace_trap_activate,
-+};
-+
-+static struct feature_config_ctrl ftr_ctrl_pmuv3 = {
-+	.ftr_reg = SYS_ID_AA64DFR0_EL1,
-+	.ftr_shift = ID_AA64DFR0_PMUVER_SHIFT,
-+	.ftr_min = ID_AA64DFR0_PMUVER_8_0,
-+	.ftr_signed = FTR_UNSIGNED,
-+	.trap_activate = feature_pmuv3_trap_activate,
-+};
-+
-+static struct feature_config_ctrl ftr_ctrl_pms = {
-+	.ftr_reg = SYS_ID_AA64DFR0_EL1,
-+	.ftr_shift = ID_AA64DFR0_PMSVER_SHIFT,
-+	.ftr_min = ID_AA64DFR0_PMSVER_8_2,
-+	.ftr_signed = FTR_UNSIGNED,
-+	.trap_activate = feature_pms_trap_activate,
-+};
-+
-+static struct feature_config_ctrl ftr_ctrl_tracefilt = {
-+	.ftr_reg = SYS_ID_AA64DFR0_EL1,
-+	.ftr_shift = ID_AA64DFR0_TRACE_FILT_SHIFT,
-+	.ftr_min = 1,
-+	.ftr_signed = FTR_UNSIGNED,
-+	.trap_activate = feature_tracefilt_trap_activate,
-+};
-+
- #define __FTR_BITS(ftr_sign, ftr_type, bit_pos, safe) {		\
- 	.sign = ftr_sign,					\
- 	.type = ftr_type,					\
-@@ -4389,6 +4446,13 @@ static struct id_reg_desc id_aa64dfr0_el1_desc = {
- 	.ftr_bits = {
- 		S_FTR_BITS(FTR_LOWER_SAFE, ID_AA64DFR0_DOUBLELOCK_SHIFT, 0xf),
- 	},
-+	.trap_features = &(const struct feature_config_ctrl *[]) {
-+		&ftr_ctrl_trace,
-+		&ftr_ctrl_pmuv3,
-+		&ftr_ctrl_pms,
-+		&ftr_ctrl_tracefilt,
-+		NULL,
-+	},
- };
- 
- static struct id_reg_desc id_dfr0_el1_desc = {
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
