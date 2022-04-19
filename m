@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F99C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 06:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 053BEC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 06:57:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9527C4B1F5;
-	Tue, 19 Apr 2022 02:57:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF54D4B22A;
+	Tue, 19 Apr 2022 02:57:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id emAwefR4MZOm; Tue, 19 Apr 2022 02:57:47 -0400 (EDT)
+	with ESMTP id GpfDBZCRadPE; Tue, 19 Apr 2022 02:57:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E26E4B262;
-	Tue, 19 Apr 2022 02:57:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8954B4B234;
+	Tue, 19 Apr 2022 02:57:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B18084B20C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 368844B1BF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 35l2JWJUfkHG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Apr 2022 02:57:43 -0400 (EDT)
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
- [209.85.214.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B691749EF2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:42 -0400 (EDT)
-Received: by mail-pl1-f202.google.com with SMTP id
- n4-20020a170902f60400b00158d1f2d442so6108618plg.18
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 23:57:42 -0700 (PDT)
+ with ESMTP id pmZAAvGY-Z6l for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Apr 2022 02:57:47 -0400 (EDT)
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
+ [209.85.214.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7692D4B219
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 02:57:45 -0400 (EDT)
+Received: by mail-pl1-f201.google.com with SMTP id
+ i10-20020a170902e48a00b00153f493fa9aso9252729ple.17
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 23:57:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=U4uOGGGNJJAvE+8qhBWKzG6xiqX6UboPrGG2sNPZOY8=;
- b=BewbNlPjPqMatcm5XCUJOCpQZV4IoUW4ifHD5JfI6GHGlRBqW2sLCDsPuTDMbF2jUH
- Wlv1w+R+Edq3e7b8T/1GKHqWp2fKfCDQosSdPRzW1wXYl688u7L0nZNPdsN1cV8hUJlj
- dA7dU+yyYorRaosHIs3zf7EDl5GaiYDINtqkhAEv928ecEPq4g9QENwKQkaqEVUO+EdU
- kLtR11yTTd7eAasAJcwfVzE8tSgBo/4cH2y9b/7wc9XFcuKMcMQ188Jx2nOlz6c8Pt6r
- 4SpvFqlxMnxNrUpursSPLQOzcC+Kc38iLMoD9FEUJ9QWJjCdK6M8OTNlU4b8jYjVazsJ
- NFYw==
+ :cc; bh=2o+9+ttxTMbUox0oufQJ1Md0n9qMzaibk65fn3H8nu0=;
+ b=Q54o7m9xWjnYBqzeN6GjnzxQeOUjpDfivGAzBNRDiiIAWNmc3ejzX1qRRDQwRRs3Yh
+ LXm+jCcXuvWeH2qFXu45oVgPBTVjA+XD6MMIOFWztN/nsdAQBFGoMPEQ17/94etPTos7
+ FIT7eXhJ5eRo0b+MvLUQGWcw6ZaVQkix6gNk86FGXttskL2xOqzt37vW9lJAEuHG045K
+ BJvrcROiIalDnQwYUKs8rGHgeG7Js5UrVo3nCMA/IleYZQkhP3w8RFMfEy9HmJ44YS7Z
+ sz2bYOcptD6MJUt1sn5R0334bxvVmStMnKu9oXQyDLKEsjW47/qZVoXo6c+5ZwE1VGRN
+ c2yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=U4uOGGGNJJAvE+8qhBWKzG6xiqX6UboPrGG2sNPZOY8=;
- b=j620lvRWF1Chi8NA2lIpxvPNwKEw407Wmb/iaH8knxB9q3UZ4So3NTSZf5DkTztyvB
- N0XcP5rmA3OUOXutj1Iy2Tk72eiAh6W4o8NLYM677aCHzMkZCq0G1Ht4pPlSv8tdbmua
- 6Ag/7aUhEaezar50xMKs6l5K3oqhN7eq8g0YgxqtZyY1fVkLKsnjFnfnEF8eZoGQ0mUr
- taEw2+d9HaZjZOVY1Ptn+DU1Q+4DuA02XPOODfs/Lt9vDCtz9XRezH4n699JXLpui3v+
- mbkrvMwwWEaLuhVLhqEGPH0Zy82mVofOoo68w2iDnLq2jpTyHfxeXDYV4Pl11z3qV+f4
- P4Zg==
-X-Gm-Message-State: AOAM533NwfG5tq2Lx2C3QUL/Ni/4yKDVeAVElACyoU8RUiAmBNrwO7da
- lBzW5VTzjDRWKJOBKoKrIH5wSVz0AAs=
-X-Google-Smtp-Source: ABdhPJwNvsMFXxj/P4c/uyL22/CuuuumZEIUldC8yuu2qFzsobmd9UhZjjZnKg5gGPfNpCl6SSEUeTinmLA=
+ bh=2o+9+ttxTMbUox0oufQJ1Md0n9qMzaibk65fn3H8nu0=;
+ b=c0652Y2FikykRUPUdGg3QAO115AbyXCafTfQoumcYOxYiu9UXoMogq4iUmY2qScYbL
+ V2sA6Trtit2PEmEnftikjfLlcBbZLg0Mw+u2KiFqhj/msvtAgjJWYkeF3O3NhrfSPogi
+ KH1lNaU97CPk75uv8hr4vsQdo6HxTT8rlH6KGDaIGK5PjU09f8Rk8+VrX3zur43nqjrc
+ 5Jgk365XrluqC8Y6IwATT3hlHxrcU5NSY/aP3UuQrR//DBykeGmEw1ioc8j4nZWgfAvk
+ xfjWSOqL4ZcDamoa5yfRkuwFR4d7xlFG94SQzr3ljjbpBZ1rZ8yVKjL6t5myBXpyTNiB
+ E1eQ==
+X-Gm-Message-State: AOAM531f2w7MeTnZb5YhFvJ18eRMv6hFs2ZfwfNNJucgVMq7Zkh1Ft92
+ IKaIga7XvC/T/IMbkDucSGWHLO8fkBQ=
+X-Google-Smtp-Source: ABdhPJxyb3FmsWLgQqrhUeKnK1tWXDMw3rSUdbZQuckMXcJXZVAhIMqU09FQ5AnJ6GwTEg35SUY2yt83suM=
 X-Received: from reiji-vws-sp.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:90a:cc0b:b0:1cb:8351:a47e with SMTP id
- b11-20020a17090acc0b00b001cb8351a47emr17191716pju.67.1650351461844; Mon, 18
- Apr 2022 23:57:41 -0700 (PDT)
-Date: Mon, 18 Apr 2022 23:55:28 -0700
+ (user=reijiw job=sendgmr) by 2002:a63:bf0e:0:b0:386:361f:e97a with SMTP id
+ v14-20020a63bf0e000000b00386361fe97amr13141907pgf.552.1650351464723; Mon, 18
+ Apr 2022 23:57:44 -0700 (PDT)
+Date: Mon, 18 Apr 2022 23:55:30 -0700
 In-Reply-To: <20220419065544.3616948-1-reijiw@google.com>
-Message-Id: <20220419065544.3616948-23-reijiw@google.com>
+Message-Id: <20220419065544.3616948-25-reijiw@google.com>
 Mime-Version: 1.0
 References: <20220419065544.3616948-1-reijiw@google.com>
 X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [PATCH v7 22/38] KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE
- capability
+Subject: [PATCH v7 24/38] KVM: arm64: Use vcpu->arch cptr_el2 to track value
+ of cptr_el2 for VHE
 From: Reiji Watanabe <reijiw@google.com>
 To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -88,74 +88,91 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Introduce a new capability KVM_CAP_ARM_ID_REG_CONFIGURABLE to indicate
-that ID registers are writable by userspace.
+Track the baseline guest value for cptr_el2 in struct kvm_vcpu_arch
+for VHE.  Use this value when setting cptr_el2 for the guest.
+
+Currently this value is unchanged, but the following patches will set
+trapping bits based on features supported for the guest.
+
+No functional change intended.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- Documentation/virt/kvm/api.rst | 16 ++++++++++++++++
- arch/arm64/kvm/arm.c           |  1 +
- include/uapi/linux/kvm.h       |  1 +
- 3 files changed, 18 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h | 16 ++++++++++++++++
+ arch/arm64/kvm/arm.c             |  5 ++++-
+ arch/arm64/kvm/hyp/vhe/switch.c  | 14 ++------------
+ 3 files changed, 22 insertions(+), 13 deletions(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 85c7abc51af5..e2e7b08e64c1 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -2601,6 +2601,14 @@ EINVAL.
- After the vcpu's SVE configuration is finalized, further attempts to
- write this register will fail with EPERM.
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 1767ded83888..3f74fb16104e 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -288,6 +288,22 @@
+ 				 GENMASK(19, 14) |	\
+ 				 BIT(11))
  
-+The arm64 ID registers with encoding Op0=3, Op1=0, CRn=0, 1<=CRm<8, 0<=Op2<8
-+are allowed to modified by userspace only for AArch64 EL1 vCPUs if
-+KVM_CAP_ARM_ID_REG_CONFIGURABLE is available.
-+They become immutable after calling KVM_RUN on any of the
-+vcpus in the guest (modifying values of those registers will fail).
-+Those ID registers are always immutable for AArch32 EL1 vCPUs, which
-+KVM_ARM_VCPU_EL1_32BIT is configured for, even when
-+KVM_CAP_ARM_ID_REG_CONFIGURABLE is available.
- 
- MIPS registers are mapped using the lower 32 bits.  The upper 16 of that is
- the register group type:
-@@ -7724,6 +7732,14 @@ At this time, KVM_PMU_CAP_DISABLE is the only capability.  Setting
- this capability will disable PMU virtualization for that VM.  Usermode
- should adjust CPUID leaf 0xA to reflect that the PMU is disabled.
- 
-+8.35 KVM_CAP_ARM_ID_REG_CONFIGURABLE
-+------------------------------------
++/*
++ * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
++ * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
++ * except for some missing controls, such as TAM.
++ * In this case, CPTR_EL2.TAM has the same position with or without
++ * VHE (HCR.E2H == 1) which allows us to use here the CPTR_EL2.TAM
++ * shift value for trapping the AMU accesses.
++ */
++#define CPTR_EL2_VHE_GUEST_DEFAULT	(CPACR_EL1_TTA | CPTR_EL2_TAM)
 +
-+:Architectures: arm64
++/*
++ * Bits that are copied from vcpu->arch.cptr_el2 to set cptr_el2 for
++ * guest with VHE.
++ */
++#define CPTR_EL2_VHE_GUEST_TRACKED_MASK	(CPACR_EL1_TTA | CPTR_EL2_TAM)
 +
-+This capability indicates that userspace can modify the ID registers
-+via KVM_SET_ONE_REG ioctl.
-+
- 9. Known KVM API problems
- =========================
- 
+ /* Hyp Debug Configuration Register bits */
+ #define MDCR_EL2_E2TB_MASK	(UL(0x3))
+ #define MDCR_EL2_E2TB_SHIFT	(UL(24))
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5c1cee04aa95..b4db368948cc 100644
+index b4db368948cc..e80c059b41d5 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -211,6 +211,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_VCPU_ATTRIBUTES:
- 	case KVM_CAP_PTP_KVM:
-+	case KVM_CAP_ARM_ID_REG_CONFIGURABLE:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 91a6fe4e02c0..171f1d0ea1e1 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1144,6 +1144,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_S390_MEM_OP_EXTENSION 211
- #define KVM_CAP_PMU_CAPABILITY 212
- #define KVM_CAP_DISABLE_QUIRKS2 213
-+#define KVM_CAP_ARM_ID_REG_CONFIGURABLE 214
+@@ -1123,7 +1123,10 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	}
  
- #ifdef KVM_CAP_IRQ_ROUTING
+ 	vcpu_reset_hcr(vcpu);
+-	vcpu->arch.cptr_el2 = CPTR_EL2_DEFAULT;
++	if (has_vhe())
++		vcpu->arch.cptr_el2 = CPTR_EL2_VHE_GUEST_DEFAULT;
++	else
++		vcpu->arch.cptr_el2 = CPTR_EL2_DEFAULT;
  
+ 	/*
+ 	 * Handle the "start in power-off" case.
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index 262dfe03134d..066dc4629f02 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -40,20 +40,10 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
+ 	___activate_traps(vcpu);
+ 
+ 	val = read_sysreg(cpacr_el1);
+-	val |= CPACR_EL1_TTA;
++	val &= ~CPTR_EL2_VHE_GUEST_TRACKED_MASK;
++	val |= (vcpu->arch.cptr_el2 & CPTR_EL2_VHE_GUEST_TRACKED_MASK);
+ 	val &= ~(CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN);
+ 
+-	/*
+-	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
+-	 * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
+-	 * except for some missing controls, such as TAM.
+-	 * In this case, CPTR_EL2.TAM has the same position with or without
+-	 * VHE (HCR.E2H == 1) which allows us to use here the CPTR_EL2.TAM
+-	 * shift value for trapping the AMU accesses.
+-	 */
+-
+-	val |= CPTR_EL2_TAM;
+-
+ 	if (update_fp_enabled(vcpu)) {
+ 		if (vcpu_has_sve(vcpu))
+ 			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
 -- 
 2.36.0.rc0.470.gd361397f0d-goog
 
