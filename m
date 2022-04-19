@@ -2,68 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C51C43219
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 11:25:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127EFC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 11:25:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A50F049EFE;
-	Tue, 19 Apr 2022 07:25:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AF54B4B22A;
+	Tue, 19 Apr 2022 07:25:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gxeev9PEaxjw; Tue, 19 Apr 2022 07:25:40 -0400 (EDT)
+	with ESMTP id XwGUj7BwwX1P; Tue, 19 Apr 2022 07:25:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 246A04B240;
-	Tue, 19 Apr 2022 07:25:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 460724B22C;
+	Tue, 19 Apr 2022 07:25:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D74C440B6C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 07:25:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27E8840B6C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 07:25:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rn9w0v1TzpoB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Apr 2022 07:25:34 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D51CE49EFE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 07:25:32 -0400 (EDT)
+ with ESMTP id 2rRFHGgI-uSM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 19 Apr 2022 07:25:39 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F9334B1A2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2022 07:25:39 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 97E11B817FB;
- Tue, 19 Apr 2022 11:25:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C21CBC385AD;
- Tue, 19 Apr 2022 11:25:26 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 0D2046135A;
+ Tue, 19 Apr 2022 11:25:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7587C385AE;
+ Tue, 19 Apr 2022 11:25:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1650367530;
- bh=J+dyG7QFvE6dvBo1woO7PdEkxAJWkglSxUIN59CRX8k=;
+ s=k20201202; t=1650367538;
+ bh=ctS7H/CeiOhoqzJ2YDVKb6KaMteDAVDglOQt4cf6B7E=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Md9wfF+jEuntXn10CIHzQUkCtB0W/xakw4lPNqbZdCcMxZ0IvpZHLKzXff30Vp1co
- VEPB4ACJyQh+nlWzsYOea6ETvBpgrm/9oSUt2Ig76XzdInx+esxjeK3ZOhxj7ZT6V8
- 4qMuViT5Pe45oDloGFgLl4XotTZq9d2K8308Lfml7SbBZO1BnUksVPf1nlTUf+NgtL
- nX6Ld2JDQGumBwyQZ/ihvvu1hnxHK4fU1ca+PbpVX8DJm6+fFFfGtmnHgQnInz1cgA
- B/ya5D18225yzxnrUdqONTueXlpH9ckjhVr7gi0nJ8/u9+jCmJsOqgNZP6Re6fK7LD
- w0tgOe0QBVrqw==
+ b=o9eSHdJW5E+dSb9Rcb1bzv8ciEkTjFKW4PcBxNKP/+fUZUVuapy7Q6iky12rckUPp
+ WWuKEpV5/STSpNEGH2fRywX23XGPfQqtGttHrc3ILCDbTrOu4D3FL5GSi3kZaJbEXU
+ hK2r5Wz/t+xVxk45tCJ4TExBDkW4TxamGYAwj2eVcXFNu9z5y/9wmHm0HWjici5QXn
+ EakGLIpDlXo4eMudNBCvUAGoNDcpQ1X9/OwwuKigp5TnxK5hkOft3coPz3sELK1+nn
+ bGgAYK+v6JX50+AuCjwA31W4OpK9DkBmNT8RjRs1NTngFI883aX2yDgNk5mmwDY4q7
+ mroggvisDUa2A==
 From: Mark Brown <broonie@kernel.org>
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
  Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
  Shuah Khan <shuah@kernel.org>
-Subject: [PATCH v14 30/39] kselftest/arm64: Add tests for TPIDR2
-Date: Tue, 19 Apr 2022 12:22:38 +0100
-Message-Id: <20220419112247.711548-31-broonie@kernel.org>
+Subject: [PATCH v14 32/39] kselftest/arm64: sme: Provide streaming mode SVE
+ stress test
+Date: Tue, 19 Apr 2022 12:22:40 +0100
+Message-Id: <20220419112247.711548-33-broonie@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220419112247.711548-1-broonie@kernel.org>
 References: <20220419112247.711548-1-broonie@kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9077; h=from:subject;
- bh=J+dyG7QFvE6dvBo1woO7PdEkxAJWkglSxUIN59CRX8k=;
- b=owEBbAGT/pANAwAKASTWi3JdVIfQAcsmYgBiXpt/LcL33bi4jWtgTB6qLq24uN1DxJr+gCLjcXKo
- xgynPSSJATIEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYl6bfwAKCRAk1otyXVSH0LhCB/
- j7nwYnpf1FaSO8lfjKvD6YUnBxDhCMJXOSaCM/tBuuggidsQiPEY93wq/z/ZnfLm642nfht/4w8g9J
- 5xfb+J5r46MsJRcLlQITcNwIhKsMIP3qkkOCJrZ685eXIkeDNFuQGEeIOsGI0Dm8Y4qF4LvBsrCEXf
- 63pokqnLuFa7Y/ejctzcc/6jyCAHgf+TE5cNcx6WxtW7G7dcBxlhGVe31Pr5gm+5zWgAC6opxNJmWv
- KMRd0uityPEEQt1thW3xLSPTZCykuhoGSwXTm/XTg7E8L20TldECumX8gcpJtiqD166nN1UYXdHij9
- qPu48oAXZ7FocXYAKsrJDWa1EugWg=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4967; h=from:subject;
+ bh=ctS7H/CeiOhoqzJ2YDVKb6KaMteDAVDglOQt4cf6B7E=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBiXpuB7Xs9FvxvvinxdDJxf/HRrH5fN7ruQDhsMa1m
+ T91z7UaJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCYl6bgQAKCRAk1otyXVSH0Fh1B/
+ 0U/JIsO0HL4DrmJKTra0CXsD2pgOAEF40IjEMjJQo73E/Dy+jyUOBMsDU5Qbm3+omEYCydoCLBH4Xp
+ Z4VvV2pOZ6Ah7QFhvauTTW8dbOc4+3EAvv7g7e9zEI6RW42/ed8phY2IY4hHaIifDx7t+feTOMasY7
+ 8yrQbtGfaOJ53aU0h1ItSsEoYiGRN8VhpcfIqtlYIqF0nDAmK+LMSwgNAsMC5aOfUp91Of6hj3v4sA
+ Hmlgev/+VWCim8mxUdmK4U1Wf3YN+Q/0IvMJbZZao5flvmRk9rOFfXLt0k8/1Rn1B3pbcdOSC1DBDr
+ ufcrx30LbagSekwRUJT4xPOVkhp5lq
 X-Developer-Key: i=broonie@kernel.org; a=openpgp;
  fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
 Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
@@ -88,367 +89,207 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The Scalable Matrix Extension adds a new system register TPIDR2 intended to
-be used by libc for its own thread specific use, add some kselftests which
-exercise the ABI for it.
+One of the features of SME is the addition of streaming mode, in which we
+have access to a set of streaming mode SVE registers at the SME vector
+length. Since these are accessed using the SVE instructions let's reuse
+the existing SVE stress test for testing with a compile time option for
+controlling the few small differences needed:
 
-Since this test should with some adjustment work for TPIDR and any other
-similar registers added in future add tests for it in a separate
-directory rather than placing it with the other floating point tests,
-nothing existing looked suitable so I created a new test directory
-called "abi".
-
-Since this feature is intended to be used by libc the test is built as
-freestanding code using nolibc so we don't end up with the test program
-and libc both trying to manage the register simultaneously and
-distrupting each other. As a result of being written using nolibc rather
-than using hwcaps to identify if SME is available in the system we check
-for the default SME vector length configuration in proc, adding hwcap
-support to nolibc seems like disproportionate effort and didn't feel
-entirely idiomatic for what nolibc is trying to do.
+ - Enter streaming mode immediately on starting the program.
+ - In streaming mode FFR is removed so skip reading and writing FFR.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
 Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 ---
- tools/testing/selftests/arm64/abi/.gitignore |   1 +
- tools/testing/selftests/arm64/abi/Makefile   |   9 +-
- tools/testing/selftests/arm64/abi/tpidr2.c   | 298 +++++++++++++++++++
- 3 files changed, 307 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/arm64/abi/tpidr2.c
+ tools/testing/selftests/arm64/fp/.gitignore  |  1 +
+ tools/testing/selftests/arm64/fp/Makefile    |  3 +
+ tools/testing/selftests/arm64/fp/ssve-stress | 59 ++++++++++++++++++++
+ tools/testing/selftests/arm64/fp/sve-test.S  | 20 +++++++
+ 4 files changed, 83 insertions(+)
+ create mode 100644 tools/testing/selftests/arm64/fp/ssve-stress
 
-diff --git a/tools/testing/selftests/arm64/abi/.gitignore b/tools/testing/selftests/arm64/abi/.gitignore
-index b79cf5814c23..b9e54417250d 100644
---- a/tools/testing/selftests/arm64/abi/.gitignore
-+++ b/tools/testing/selftests/arm64/abi/.gitignore
-@@ -1 +1,2 @@
- syscall-abi
-+tpidr2
-diff --git a/tools/testing/selftests/arm64/abi/Makefile b/tools/testing/selftests/arm64/abi/Makefile
-index 96eba974ac8d..c8d7f2495eb2 100644
---- a/tools/testing/selftests/arm64/abi/Makefile
-+++ b/tools/testing/selftests/arm64/abi/Makefile
-@@ -1,8 +1,15 @@
- # SPDX-License-Identifier: GPL-2.0
- # Copyright (C) 2021 ARM Limited
+diff --git a/tools/testing/selftests/arm64/fp/.gitignore b/tools/testing/selftests/arm64/fp/.gitignore
+index 6e9a610c5e5d..5729a5b1adfc 100644
+--- a/tools/testing/selftests/arm64/fp/.gitignore
++++ b/tools/testing/selftests/arm64/fp/.gitignore
+@@ -5,5 +5,6 @@ rdvl-sve
+ sve-probe-vls
+ sve-ptrace
+ sve-test
++ssve-test
+ vec-syscfg
+ vlset
+diff --git a/tools/testing/selftests/arm64/fp/Makefile b/tools/testing/selftests/arm64/fp/Makefile
+index a224fff8082b..e6643c9b0474 100644
+--- a/tools/testing/selftests/arm64/fp/Makefile
++++ b/tools/testing/selftests/arm64/fp/Makefile
+@@ -5,6 +5,7 @@ TEST_GEN_PROGS := sve-ptrace sve-probe-vls vec-syscfg
+ TEST_PROGS_EXTENDED := fp-pidbench fpsimd-test fpsimd-stress \
+ 	rdvl-sme rdvl-sve \
+ 	sve-test sve-stress \
++	ssve-test ssve-stress \
+ 	vlset
  
--TEST_GEN_PROGS := syscall-abi
-+TEST_GEN_PROGS := syscall-abi tpidr2
+ all: $(TEST_GEN_PROGS) $(TEST_PROGS_EXTENDED)
+@@ -19,6 +20,8 @@ sve-ptrace: sve-ptrace.o
+ sve-probe-vls: sve-probe-vls.o rdvl.o
+ sve-test: sve-test.o asm-utils.o
+ 	$(CC) -nostdlib $^ -o $@
++ssve-test: sve-test.S asm-utils.o
++	$(CC) -DSSVE -nostdlib $^ -o $@
+ vec-syscfg: vec-syscfg.o rdvl.o
+ vlset: vlset.o
  
- include ../../lib.mk
- 
- $(OUTPUT)/syscall-abi: syscall-abi.c syscall-abi-asm.S
-+
-+# Build with nolibc since TPIDR2 is intended to be actively managed by
-+# libc and we're trying to test the functionality that it depends on here.
-+$(OUTPUT)/tpidr2: tpidr2.c
-+	$(CC) -fno-asynchronous-unwind-tables -fno-ident -s -Os -nostdlib \
-+		-static -include ../../../../include/nolibc/nolibc.h \
-+		-ffreestanding -Wall $^ -o $@ -lgcc
-diff --git a/tools/testing/selftests/arm64/abi/tpidr2.c b/tools/testing/selftests/arm64/abi/tpidr2.c
+diff --git a/tools/testing/selftests/arm64/fp/ssve-stress b/tools/testing/selftests/arm64/fp/ssve-stress
 new file mode 100644
-index 000000000000..351a098b503a
+index 000000000000..e2bd2cc184ad
 --- /dev/null
-+++ b/tools/testing/selftests/arm64/abi/tpidr2.c
-@@ -0,0 +1,298 @@
-+// SPDX-License-Identifier: GPL-2.0-only
++++ b/tools/testing/selftests/arm64/fp/ssve-stress
+@@ -0,0 +1,59 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0-only
++# Copyright (C) 2015-2019 ARM Limited.
++# Original author: Dave Martin <Dave.Martin@arm.com>
 +
-+#include <linux/sched.h>
-+#include <linux/wait.h>
++set -ue
 +
-+#define SYS_TPIDR2 "S3_3_C13_C0_5"
++NR_CPUS=`nproc`
 +
-+#define EXPECTED_TESTS 5
++pids=
++logs=
 +
-+static void putstr(const char *str)
-+{
-+	write(1, str, strlen(str));
++cleanup () {
++	trap - INT TERM CHLD
++	set +e
++
++	if [ -n "$pids" ]; then
++		kill $pids
++		wait $pids
++		pids=
++	fi
++
++	if [ -n "$logs" ]; then
++		cat $logs
++		rm $logs
++		logs=
++	fi
 +}
 +
-+static void putnum(unsigned int num)
-+{
-+	char c;
-+
-+	if (num / 10)
-+		putnum(num / 10);
-+
-+	c = '0' + (num % 10);
-+	write(1, &c, 1);
++interrupt () {
++	cleanup
++	exit 0
 +}
 +
-+static int tests_run;
-+static int tests_passed;
-+static int tests_failed;
-+static int tests_skipped;
-+
-+static void set_tpidr2(uint64_t val)
-+{
-+	asm volatile (
-+		"msr	" SYS_TPIDR2 ", %0\n"
-+		:
-+		: "r"(val)
-+		: "cc");
++child_died () {
++	cleanup
++	exit 1
 +}
 +
-+static uint64_t get_tpidr2(void)
-+{
-+	uint64_t val;
++trap interrupt INT TERM EXIT
 +
-+	asm volatile (
-+		"mrs	%0, " SYS_TPIDR2 "\n"
-+		: "=r"(val)
-+		:
-+		: "cc");
++for x in `seq 0 $((NR_CPUS * 4))`; do
++	log=`mktemp`
++	logs=$logs\ $log
++	./ssve-test >$log &
++	pids=$pids\ $!
++done
 +
-+	return val;
-+}
++# Wait for all child processes to be created:
++sleep 10
 +
-+static void print_summary(void)
-+{
-+	if (tests_passed + tests_failed + tests_skipped != EXPECTED_TESTS)
-+		putstr("# UNEXPECTED TEST COUNT: ");
++while :; do
++	kill -USR1 $pids
++done &
++pids=$pids\ $!
 +
-+	putstr("# Totals: pass:");
-+	putnum(tests_passed);
-+	putstr(" fail:");
-+	putnum(tests_failed);
-+	putstr(" xfail:0 xpass:0 skip:");
-+	putnum(tests_skipped);
-+	putstr(" error:0\n");
-+}
++wait
 +
-+/* Processes should start with TPIDR2 == 0 */
-+static int default_value(void)
-+{
-+	return get_tpidr2() == 0;
-+}
++exit 1
+diff --git a/tools/testing/selftests/arm64/fp/sve-test.S b/tools/testing/selftests/arm64/fp/sve-test.S
+index f5b1b48ffff2..589264231a2d 100644
+--- a/tools/testing/selftests/arm64/fp/sve-test.S
++++ b/tools/testing/selftests/arm64/fp/sve-test.S
+@@ -13,6 +13,7 @@
+ #include <asm/unistd.h>
+ #include "assembler.h"
+ #include "asm-offsets.h"
++#include "sme-inst.h"
+ 
+ #define NZR	32
+ #define NPR	16
+@@ -156,6 +157,7 @@ endfunction
+ // We fill the upper lanes of FFR with zeros.
+ // Beware: corrupts P0.
+ function setup_ffr
++#ifndef SSVE
+ 	mov	x4, x30
+ 
+ 	and	w0, w0, #0x3
+@@ -178,6 +180,9 @@ function setup_ffr
+ 	wrffr	p0.b
+ 
+ 	ret	x4
++#else
++	ret
++#endif
+ endfunction
+ 
+ // Trivial memory compare: compare x2 bytes starting at address x0 with
+@@ -260,6 +265,7 @@ endfunction
+ // Beware -- corrupts P0.
+ // Clobbers x0-x5.
+ function check_ffr
++#ifndef SSVE
+ 	mov	x3, x30
+ 
+ 	ldr	x4, =scratch
+@@ -280,6 +286,9 @@ function check_ffr
+ 	mov	x2, x5
+ 	mov	x30, x3
+ 	b	memcmp
++#else
++	ret
++#endif
+ endfunction
+ 
+ // Any SVE register modified here can cause corruption in the main
+@@ -295,10 +304,12 @@ function irritator_handler
+ 	movi	v0.8b, #1
+ 	movi	v9.16b, #2
+ 	movi	v31.8b, #3
++#ifndef SSVE
+ 	// And P0
+ 	rdffr	p0.b
+ 	// And FFR
+ 	wrffr	p15.b
++#endif
+ 
+ 	ret
+ endfunction
+@@ -359,6 +370,11 @@ endfunction
+ .globl _start
+ function _start
+ _start:
++#ifdef SSVE
++	puts	"Streaming mode "
++	smstart_sm
++#endif
 +
-+/* If we set TPIDR2 we should read that value */
-+static int write_read(void)
-+{
-+	set_tpidr2(getpid());
+ 	// Sanity-check and report the vector length
+ 
+ 	rdvl	x19, #8
+@@ -407,6 +423,10 @@ _start:
+ 	orr	w2, w2, #SA_NODEFER
+ 	bl	setsignal
+ 
++#ifdef SSVE
++	smstart_sm		// syscalls will have exited streaming mode
++#endif
 +
-+	return getpid() == get_tpidr2();
-+}
-+
-+/* If we set a value we should read the same value after scheduling out */
-+static int write_sleep_read(void)
-+{
-+	set_tpidr2(getpid());
-+
-+	msleep(100);
-+
-+	return getpid() == get_tpidr2();
-+}
-+
-+/*
-+ * If we fork the value in the parent should be unchanged and the
-+ * child should start with the same value and be able to set its own
-+ * value.
-+ */
-+static int write_fork_read(void)
-+{
-+	pid_t newpid, waiting, oldpid;
-+	int status;
-+
-+	set_tpidr2(getpid());
-+
-+	oldpid = getpid();
-+	newpid = fork();
-+	if (newpid == 0) {
-+		/* In child */
-+		if (get_tpidr2() != oldpid) {
-+			putstr("# TPIDR2 changed in child: ");
-+			putnum(get_tpidr2());
-+			putstr("\n");
-+			exit(0);
-+		}
-+
-+		set_tpidr2(getpid());
-+		if (get_tpidr2() == getpid()) {
-+			exit(1);
-+		} else {
-+			putstr("# Failed to set TPIDR2 in child\n");
-+			exit(0);
-+		}
-+	}
-+	if (newpid < 0) {
-+		putstr("# fork() failed: -");
-+		putnum(-newpid);
-+		putstr("\n");
-+		return 0;
-+	}
-+
-+	for (;;) {
-+		waiting = waitpid(newpid, &status, 0);
-+
-+		if (waiting < 0) {
-+			if (errno == EINTR)
-+				continue;
-+			putstr("# waitpid() failed: ");
-+			putnum(errno);
-+			putstr("\n");
-+			return 0;
-+		}
-+		if (waiting != newpid) {
-+			putstr("# waitpid() returned wrong PID\n");
-+			return 0;
-+		}
-+
-+		if (!WIFEXITED(status)) {
-+			putstr("# child did not exit\n");
-+			return 0;
-+		}
-+
-+		if (getpid() != get_tpidr2()) {
-+			putstr("# TPIDR2 corrupted in parent\n");
-+			return 0;
-+		}
-+
-+		return WEXITSTATUS(status);
-+	}
-+}
-+
-+/*
-+ * sys_clone() has a lot of per architecture variation so just define
-+ * it here rather than adding it to nolibc, plus the raw API is a
-+ * little more convenient for this test.
-+ */
-+static int sys_clone(unsigned long clone_flags, unsigned long newsp,
-+		     int *parent_tidptr, unsigned long tls,
-+		     int *child_tidptr)
-+{
-+	return my_syscall5(__NR_clone, clone_flags, newsp, parent_tidptr, tls,
-+			   child_tidptr);
-+}
-+
-+/*
-+ * If we clone with CLONE_SETTLS then the value in the parent should
-+ * be unchanged and the child should start with zero and be able to
-+ * set its own value.
-+ */
-+static int write_clone_read(void)
-+{
-+	int parent_tid, child_tid;
-+	pid_t parent, waiting;
-+	int ret, status;
-+
-+	parent = getpid();
-+	set_tpidr2(parent);
-+
-+	ret = sys_clone(CLONE_SETTLS, 0, &parent_tid, 0, &child_tid);
-+	if (ret == -1) {
-+		putstr("# clone() failed\n");
-+		putnum(errno);
-+		putstr("\n");
-+		return 0;
-+	}
-+
-+	if (ret == 0) {
-+		/* In child */
-+		if (get_tpidr2() != 0) {
-+			putstr("# TPIDR2 non-zero in child: ");
-+			putnum(get_tpidr2());
-+			putstr("\n");
-+			exit(0);
-+		}
-+
-+		if (gettid() == 0)
-+			putstr("# Child TID==0\n");
-+		set_tpidr2(gettid());
-+		if (get_tpidr2() == gettid()) {
-+			exit(1);
-+		} else {
-+			putstr("# Failed to set TPIDR2 in child\n");
-+			exit(0);
-+		}
-+	}
-+
-+	for (;;) {
-+		waiting = wait4(ret, &status, __WCLONE, NULL);
-+
-+		if (waiting < 0) {
-+			if (errno == EINTR)
-+				continue;
-+			putstr("# wait4() failed: ");
-+			putnum(errno);
-+			putstr("\n");
-+			return 0;
-+		}
-+		if (waiting != ret) {
-+			putstr("# wait4() returned wrong PID ");
-+			putnum(waiting);
-+			putstr("\n");
-+			return 0;
-+		}
-+
-+		if (!WIFEXITED(status)) {
-+			putstr("# child did not exit\n");
-+			return 0;
-+		}
-+
-+		if (parent != get_tpidr2()) {
-+			putstr("# TPIDR2 corrupted in parent\n");
-+			return 0;
-+		}
-+
-+		return WEXITSTATUS(status);
-+	}
-+}
-+
-+#define run_test(name)			     \
-+	if (name()) {			     \
-+		tests_passed++;		     \
-+	} else {			     \
-+		tests_failed++;		     \
-+		putstr("not ");		     \
-+	}				     \
-+	putstr("ok ");			     \
-+	putnum(++tests_run);		     \
-+	putstr(" " #name "\n");
-+
-+int main(int argc, char **argv)
-+{
-+	int ret, i;
-+
-+	putstr("TAP version 13\n");
-+	putstr("1..");
-+	putnum(EXPECTED_TESTS);
-+	putstr("\n");
-+
-+	putstr("# PID: ");
-+	putnum(getpid());
-+	putstr("\n");
-+
-+	/*
-+	 * This test is run with nolibc which doesn't support hwcap and
-+	 * it's probably disproportionate to implement so instead check
-+	 * for the default vector length configuration in /proc.
-+	 */
-+	ret = open("/proc/sys/abi/sme_default_vector_length", O_RDONLY, 0);
-+	if (ret >= 0) {
-+		run_test(default_value);
-+		run_test(write_read);
-+		run_test(write_sleep_read);
-+		run_test(write_fork_read);
-+		run_test(write_clone_read);
-+
-+	} else {
-+		putstr("# SME support not present\n");
-+
-+		for (i = 0; i < EXPECTED_TESTS; i++) {
-+			putstr("ok ");
-+			putnum(i);
-+			putstr(" skipped, TPIDR2 not supported\n");
-+		}
-+
-+		tests_skipped += EXPECTED_TESTS;
-+	}
-+
-+	print_summary();
-+
-+	return 0;
-+}
+ 	mov	x22, #0		// generation number, increments per iteration
+ .Ltest_loop:
+ 	rdvl	x0, #8
 -- 
 2.30.2
 
