@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C54C433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 02:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB5FCC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 19 Apr 2022 02:26:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4975C4B104;
-	Mon, 18 Apr 2022 22:22:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 560A74B091;
+	Mon, 18 Apr 2022 22:26:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OhTGdHcg-uZZ; Mon, 18 Apr 2022 22:22:10 -0400 (EDT)
+	with ESMTP id lSG2x8+iQjcw; Mon, 18 Apr 2022 22:26:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 053124A11C;
-	Mon, 18 Apr 2022 22:22:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E80624B0D6;
+	Mon, 18 Apr 2022 22:26:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E80294A11C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 22:22:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C4F749EE6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 22:26:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QaXDYx9QKs0X for <kvmarm@lists.cs.columbia.edu>;
- Mon, 18 Apr 2022 22:22:06 -0400 (EDT)
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com
- [209.85.221.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85EDE49EE6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 22:22:06 -0400 (EDT)
-Received: by mail-wr1-f54.google.com with SMTP id g18so20507369wrb.10
- for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 19:22:06 -0700 (PDT)
+ with ESMTP id Goh1d9BcfhUk for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Apr 2022 22:26:10 -0400 (EDT)
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com
+ [209.85.221.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF7B74B0D6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 22:26:10 -0400 (EDT)
+Received: by mail-wr1-f45.google.com with SMTP id w4so20524229wrg.12
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2022 19:26:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=n+VD1ZLkqdIRZk14tkWWBvFTuLPHtENe5xxNWUW39oc=;
- b=Ed89L1TbCOHX0GMewIVyqVWOHKCwpZFh6Xboc1pomP5SRDGBMLlWHTE2CQyILMFqpF
- Vtv9jDZNsrHIU592acO7LeV0XpwY/UnF6tXS9lRZzWtSV2doVXSdUFWUa6OOzGVgvgGq
- 2/vacyYGKcySeT6hLAslemI33GnQwtOFeceIpRvwSfBVjGFxvhy2J5n2eaXoQAgohQun
- vKCw0fe5gY2JHUrbRATR41VIwQDYUTxtBbO3mt4gb4ySRlsTWik58f+e0Bt6OlMXoXCr
- Ew40jqusTkSv8EMI0a2bYezSy9FjY7QBP0YdhEDi4ZxyCgXr+6WFc+gqhAeINrM9B73n
- cP9Q==
+ :cc; bh=KTq4Y6MG952cbTvHOp9S8QrMczzWgHAuOZaPcb2lyOA=;
+ b=EE29iXYuMVb/GLtdNuB3Ye8GMB7xgcyCRPY7fLBQyIzdUPoANUNve0iXc2zy4OIY4w
+ sqlHmycM+WcT12q2QZ0joUMdkAaZwEYIsfEi6Xob+InHwkkQztaP46mx10bjQEbNDgOV
+ rQ/Cztvrnw5o22jB1RbJYxUK8a99jKnqP2RsLyx70bd5XfrhEQvTdLOWC12xctMwupfK
+ u/x9Rkt1sh2KKpmIBMSb32Y3ixhpe0nn/9puHUiTQa11UXmFw+cTTMi7K7mVjT9ncxMJ
+ 6R5K2NBkCgD/0Eny6ATML4nWAjPH9ODoBn9EPOAaqfIUK71S0vkkrmiRa6TsUOTgoFo2
+ 4qzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=n+VD1ZLkqdIRZk14tkWWBvFTuLPHtENe5xxNWUW39oc=;
- b=Q2Y2MgiO5mINtMeU79D75ASPXzlUXCtIghPKv/UjViw1glyXJQjvGAMcp1TpJXbM1z
- QhfD0HUD6P6gx+i3DWirtjMwwOmrsLBo/xzeimDlXXrcSVxEsyxNN2k1nu4ryPZTiRnF
- AURlmBuO8FbHgwiF1VQzR0ew4Jn/+J1a42QSapUGDXKYvC6anZi8aRHl9I6FHiYRgt3k
- 1ltCl7YNqz5T0145z6AUknfClXbRAGHlMm8/LniPdJFpwCM67RyC63zFsYtvNGngtgsN
- NnfI8Jnl9J0MeR+MJgXKdLv1lCeH9sMIjMaJ2nIlU/GcWa8NyEqrAo916fjVYPo7MgXc
- xDMA==
-X-Gm-Message-State: AOAM530mdvxKozFhPzYkSiIjd34N0eERHuc0r+Q8HR8ZP52f42Ii5w7F
- Qb46HcQbQJwLQK8yl1mbf1yuiyeN8Z8MqZUf0ur0Jw==
-X-Google-Smtp-Source: ABdhPJxDZsRjY1yyiT9xyWlpyKGcb/9NBMknXlqpDTDxx0KSq1BjuaoOenMyQwXm9jUUi8hrDt7biKcLIlxbeJ3LqtE=
-X-Received: by 2002:a5d:528b:0:b0:203:d928:834c with SMTP id
- c11-20020a5d528b000000b00203d928834cmr10226506wrv.500.1650334925196; Mon, 18
- Apr 2022 19:22:05 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=KTq4Y6MG952cbTvHOp9S8QrMczzWgHAuOZaPcb2lyOA=;
+ b=vpjlSqacGj+BX/05JMUAt+ta/jXaekbEHuNm/2aAAXz2xkoYTYPFP2iU8p5TVqUHFl
+ fXp302788I0S+QXCScm8ZcDexpT5nSX6tKBFPcwpjjknJQ6Ry3tqLHk5wqCy4xbqgxlo
+ QBinOhk0349RRkS3yS0U+q7dYfeZsffbF0dVVLJq3D57HhP3+pVvTTNoX4fRwwpRzUx4
+ lolFnO+BpmBOEbusxJGkvyu2l16eCjFgb+Aoi/CS8IFkINQIvmhHqJ2+/lIwo9XtdzI1
+ MjcobNgo/3xL+9Fpu1TJhE/qrCKEVrtHD+yFy8zLu726kG7UiIuiQZY5WdX8TQW80nuB
+ ScsQ==
+X-Gm-Message-State: AOAM532ZVkHl/4IuZPf15VHz9C0/wENtEsDJ87CCF8lYntO7Jq+tbxAc
+ t5NXBmg3coL5/NMj64DFj4So+zex/BpjcHKYN/wLEg==
+X-Google-Smtp-Source: ABdhPJyxCGSlBiOKFfGmT8l9+r/CXUB9ViouaEaAAckadAPOZhmFEmo7/f9noRPmK8DbOVuocEbFln61pb9OOJRTcVw=
+X-Received: by 2002:adf:eb86:0:b0:1e6:8c92:af6b with SMTP id
+ t6-20020adfeb86000000b001e68c92af6bmr9930705wrn.116.1650335169435; Mon, 18
+ Apr 2022 19:26:09 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220408200349.1529080-1-kaleshsingh@google.com>
- <20220408200349.1529080-2-kaleshsingh@google.com>
- <87bkx8cdt4.wl-maz@kernel.org>
-In-Reply-To: <87bkx8cdt4.wl-maz@kernel.org>
+ <20220408200349.1529080-4-kaleshsingh@google.com>
+ <87wnfmaexc.wl-maz@kernel.org>
+In-Reply-To: <87wnfmaexc.wl-maz@kernel.org>
 From: Kalesh Singh <kaleshsingh@google.com>
-Date: Mon, 18 Apr 2022 19:21:54 -0700
-Message-ID: <CAC_TJvd7wqad6SGKfG5+2tOHEjCcJttsG01supYEd_4sezP7pg@mail.gmail.com>
-Subject: Re: [PATCH v7 1/6] KVM: arm64: Introduce hyp_alloc_private_va_range()
+Date: Mon, 18 Apr 2022 19:25:58 -0700
+Message-ID: <CAC_TJvfK3zJ_dN-0E3xJOWjdDybU12UfocoMf6-ji_swExas_Q@mail.gmail.com>
+Subject: Re: [PATCH v7 3/6] KVM: arm64: Add guard pages for KVM nVHE
+ hypervisor stack
 To: Marc Zyngier <maz@kernel.org>
 Cc: Nick Desaulniers <ndesaulniers@google.com>, Will Deacon <will@kernel.org>,
  "Cc: Android Kernel" <kernel-team@android.com>,
@@ -86,127 +86,178 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gU3VuLCBBcHIgMTAsIDIwMjIgYXQgMTE6NTIgUE0gTWFyYyBaeW5naWVyIDxtYXpAa2VybmVs
-Lm9yZz4gd3JvdGU6Cj4KPiBPbiBGcmksIDA4IEFwciAyMDIyIDIxOjAzOjI0ICswMTAwLAo+IEth
-bGVzaCBTaW5naCA8a2FsZXNoc2luZ2hAZ29vZ2xlLmNvbT4gd3JvdGU6Cj4gPgo+ID4gaHlwX2Fs
-bG9jX3ByaXZhdGVfdmFfcmFuZ2UoKSBjYW4gYmUgdXNlZCB0byByZXNlcnZlIHByaXZhdGUgVkEg
-cmFuZ2VzCj4gPiBpbiB0aGUgblZIRSBoeXBlcnZpc29yLiBBbGxvY2F0aW9ucyBhcmUgYWxpZ25l
-ZCBiYXNlZCBvbiB0aGUgb3JkZXIgb2YKPiA+IHRoZSByZXF1ZXN0ZWQgc2l6ZS4KPiA+Cj4gPiBU
-aGlzIHdpbGwgYmUgdXNlZCB0byBpbXBsZW1lbnQgc3RhY2sgZ3VhcmQgcGFnZXMgZm9yIEtWTSBu
-VkhFIGh5cGVydmlzb3IKPiA+IChuVkhFIEh5cCBtb2RlIC8gbm90IHBLVk0pLCBpbiBhIHN1YnNl
-cXVlbnQgcGF0Y2ggaW4gdGhlIHNlcmllcy4KPiA+Cj4gPiBTaWduZWQtb2ZmLWJ5OiBLYWxlc2gg
-U2luZ2ggPGthbGVzaHNpbmdoQGdvb2dsZS5jb20+Cj4gPiBUZXN0ZWQtYnk6IEZ1YWQgVGFiYmEg
-PHRhYmJhQGdvb2dsZS5jb20+Cj4gPiBSZXZpZXdlZC1ieTogRnVhZCBUYWJiYSA8dGFiYmFAZ29v
-Z2xlLmNvbT4KPiA+IC0tLQo+ID4KPiA+IENoYW5nZXMgaW4gdjc6Cj4gPiAgIC0gQWRkIEZ1YWQn
-cyBSZXZpZXdlZC1ieSBhbmQgVGVzdGVkLWJ5IHRhZ3MuCj4gPgo+ID4gQ2hhbmdlcyBpbiB2NjoK
-PiA+ICAgLSBVcGRhdGUga2VybmVsLWRvYyBmb3IgaHlwX2FsbG9jX3ByaXZhdGVfdmFfcmFuZ2Uo
-KQo+ID4gICAgIGFuZCBhZGQgcmV0dXJuIGRlc2NyaXB0aW9uLCBwZXIgU3RlcGhlbgo+ID4gICAt
-IFVwZGF0ZSBoeXBfYWxsb2NfcHJpdmF0ZV92YV9yYW5nZSgpIHRvIHJldHVybiBhbiBpbnQgZXJy
-b3IgY29kZSwKPiA+ICAgICBwZXIgU3RlcGhlbgo+ID4gICAtIFJlcGxhY2UgSVNfRVJSKCkgY2hl
-Y2tzIHdpdGggSVNfRVJSX1ZBTFVFKCkgY2hlY2ssIHBlciBTdGVwaGVuCj4gPiAgIC0gQ2xlYW4g
-dXAgZ290bywgcGVyIFN0ZXBoZW4KPiA+Cj4gPiBDaGFuZ2VzIGluIHY1Ogo+ID4gICAtIEFsaWdu
-IHByaXZhdGUgYWxsb2NhdGlvbnMgYmFzZWQgb24gdGhlIG9yZGVyIG9mIHRoZWlyIHNpemUsIHBl
-ciBNYXJjCj4gPgo+ID4gQ2hhbmdlcyBpbiB2NDoKPiA+ICAgLSBIYW5kbGUgbnVsbCBwdHIgaW4g
-aHlwX2FsbG9jX3ByaXZhdGVfdmFfcmFuZ2UoKSBhbmQgcmVwbGFjZQo+ID4gICAgIElTX0VSUl9P
-Ul9OVUxMIGNoZWNrcyBpbiBjYWxsZXJzIHdpdGggSVNfRVJSIGNoZWNrcywgcGVyIEZ1YWQKPiA+
-ICAgLSBGaXgga2VybmVsLWRvYyBjb21tZW50cyBmb3JtYXQsIHBlciBGdWFkCj4gPgo+ID4gQ2hh
-bmdlcyBpbiB2MzoKPiA+ICAgLSBIYW5kbGUgbnVsbCBwdHIgaW4gSVNfRVJSX09SX05VTEwgY2hl
-Y2tzLCBwZXIgTWFyawo+ID4KPiA+Cj4gPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fbW11
-LmggfCAgMSArCj4gPiAgYXJjaC9hcm02NC9rdm0vbW11LmMgICAgICAgICAgICAgfCA2NiArKysr
-KysrKysrKysrKysrKysrKystLS0tLS0tLS0tLQo+ID4gIDIgZmlsZXMgY2hhbmdlZCwgNDUgaW5z
-ZXJ0aW9ucygrKSwgMjIgZGVsZXRpb25zKC0pCj4gPgo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJt
-NjQvaW5jbHVkZS9hc20va3ZtX21tdS5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fbW11
-LmgKPiA+IGluZGV4IDc0NzM1YTg2NGVlZS4uYTUwY2JiNWJhNDAyIDEwMDY0NAo+ID4gLS0tIGEv
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fbW11LmgKPiA+ICsrKyBiL2FyY2gvYXJtNjQvaW5j
-bHVkZS9hc20va3ZtX21tdS5oCj4gPiBAQCAtMTU0LDYgKzE1NCw3IEBAIHN0YXRpYyBfX2Fsd2F5
-c19pbmxpbmUgdW5zaWduZWQgbG9uZyBfX2tlcm5faHlwX3ZhKHVuc2lnbmVkIGxvbmcgdikKPiA+
-ICBpbnQga3ZtX3NoYXJlX2h5cCh2b2lkICpmcm9tLCB2b2lkICp0byk7Cj4gPiAgdm9pZCBrdm1f
-dW5zaGFyZV9oeXAodm9pZCAqZnJvbSwgdm9pZCAqdG8pOwo+ID4gIGludCBjcmVhdGVfaHlwX21h
-cHBpbmdzKHZvaWQgKmZyb20sIHZvaWQgKnRvLCBlbnVtIGt2bV9wZ3RhYmxlX3Byb3QgcHJvdCk7
-Cj4gPiAraW50IGh5cF9hbGxvY19wcml2YXRlX3ZhX3JhbmdlKHNpemVfdCBzaXplLCB1bnNpZ25l
-ZCBsb25nICpoYWRkcik7Cj4gPiAgaW50IGNyZWF0ZV9oeXBfaW9fbWFwcGluZ3MocGh5c19hZGRy
-X3QgcGh5c19hZGRyLCBzaXplX3Qgc2l6ZSwKPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICB2
-b2lkIF9faW9tZW0gKiprYWRkciwKPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICB2b2lkIF9f
-aW9tZW0gKipoYWRkcik7Cj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vbW11LmMgYi9h
-cmNoL2FybTY0L2t2bS9tbXUuYwo+ID4gaW5kZXggMGQxOTI1OTQ1NGQ4Li4zZDNlZmVhNGU5OTEg
-MTAwNjQ0Cj4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9tbXUuYwo+ID4gKysrIGIvYXJjaC9hcm02
-NC9rdm0vbW11LmMKPiA+IEBAIC00NTcsMjMgKzQ1NywyMiBAQCBpbnQgY3JlYXRlX2h5cF9tYXBw
-aW5ncyh2b2lkICpmcm9tLCB2b2lkICp0bywgZW51bSBrdm1fcGd0YWJsZV9wcm90IHByb3QpCj4g
-PiAgICAgICByZXR1cm4gMDsKPiA+ICB9Cj4gPgo+ID4gLXN0YXRpYyBpbnQgX19jcmVhdGVfaHlw
-X3ByaXZhdGVfbWFwcGluZyhwaHlzX2FkZHJfdCBwaHlzX2FkZHIsIHNpemVfdCBzaXplLAo+ID4g
-LSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1bnNpZ25lZCBsb25nICpoYWRk
-ciwKPiA+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZW51bSBrdm1fcGd0
-YWJsZV9wcm90IHByb3QpCj4gPiArCj4gPiArLyoqCj4gPiArICogaHlwX2FsbG9jX3ByaXZhdGVf
-dmFfcmFuZ2UgLSBBbGxvY2F0ZXMgYSBwcml2YXRlIFZBIHJhbmdlLgo+ID4gKyAqIEBzaXplOiAg
-ICBUaGUgc2l6ZSBvZiB0aGUgVkEgcmFuZ2UgdG8gcmVzZXJ2ZS4KPiA+ICsgKiBAaGFkZHI6ICAg
-VGhlIGh5cGVydmlzb3IgdmlydHVhbCBzdGFydCBhZGRyZXNzIG9mIHRoZSBhbGxvY2F0aW9uLgo+
-ID4gKyAqCj4gPiArICogVGhlIHByaXZhdGUgdmlydHVhbCBhZGRyZXNzIChWQSkgcmFuZ2UgaXMg
-YWxsb2NhdGVkIGJlbG93IGlvX21hcF9iYXNlCj4gPiArICogYW5kIGFsaWduZWQgYmFzZWQgb24g
-dGhlIG9yZGVyIG9mIEBzaXplLgo+ID4gKyAqCj4gPiArICogUmV0dXJuOiAwIG9uIHN1Y2Nlc3Mg
-b3IgbmVnYXRpdmUgZXJyb3IgY29kZSBvbiBmYWlsdXJlLgo+ID4gKyAqLwo+ID4gK2ludCBoeXBf
-YWxsb2NfcHJpdmF0ZV92YV9yYW5nZShzaXplX3Qgc2l6ZSwgdW5zaWduZWQgbG9uZyAqaGFkZHIp
-Cj4gPiAgewo+ID4gICAgICAgdW5zaWduZWQgbG9uZyBiYXNlOwo+ID4gICAgICAgaW50IHJldCA9
-IDA7Cj4gPgo+ID4gLSAgICAgaWYgKCFrdm1faG9zdF9vd25zX2h5cF9tYXBwaW5ncygpKSB7Cj4g
-PiAtICAgICAgICAgICAgIGJhc2UgPSBrdm1fY2FsbF9oeXBfbnZoZShfX3Brdm1fY3JlYXRlX3By
-aXZhdGVfbWFwcGluZywKPiA+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IHBoeXNfYWRkciwgc2l6ZSwgcHJvdCk7Cj4gPiAtICAgICAgICAgICAgIGlmIChJU19FUlJfT1Jf
-TlVMTCgodm9pZCAqKWJhc2UpKQo+ID4gLSAgICAgICAgICAgICAgICAgICAgIHJldHVybiBQVFJf
-RVJSKCh2b2lkICopYmFzZSk7Cj4gPiAtICAgICAgICAgICAgICpoYWRkciA9IGJhc2U7Cj4gPiAt
-Cj4gPiAtICAgICAgICAgICAgIHJldHVybiAwOwo+ID4gLSAgICAgfQo+ID4gLQo+ID4gICAgICAg
-bXV0ZXhfbG9jaygma3ZtX2h5cF9wZ2RfbXV0ZXgpOwo+ID4KPiA+ICAgICAgIC8qCj4gPiBAQCAt
-NDg0LDMwICs0ODMsNTMgQEAgc3RhdGljIGludCBfX2NyZWF0ZV9oeXBfcHJpdmF0ZV9tYXBwaW5n
-KHBoeXNfYWRkcl90IHBoeXNfYWRkciwgc2l6ZV90IHNpemUsCj4gPiAgICAgICAgKgo+ID4gICAg
-ICAgICogVGhlIGFsbG9jYXRlZCBzaXplIGlzIGFsd2F5cyBhIG11bHRpcGxlIG9mIFBBR0VfU0la
-RS4KPiA+ICAgICAgICAqLwo+ID4gLSAgICAgc2l6ZSA9IFBBR0VfQUxJR04oc2l6ZSArIG9mZnNl
-dF9pbl9wYWdlKHBoeXNfYWRkcikpOwo+ID4gLSAgICAgYmFzZSA9IGlvX21hcF9iYXNlIC0gc2l6
-ZTsKPiA+ICsgICAgIGJhc2UgPSBpb19tYXBfYmFzZSAtIFBBR0VfQUxJR04oc2l6ZSk7Cj4gPiAr
-Cj4gPiArICAgICAvKiBBbGlnbiB0aGUgYWxsb2NhdGlvbiBiYXNlZCBvbiB0aGUgb3JkZXIgb2Yg
-aXRzIHNpemUgKi8KPiA+ICsgICAgIGJhc2UgPSBBTElHTl9ET1dOKGJhc2UsIFBBR0VfU0laRSA8
-PCBnZXRfb3JkZXIoc2l6ZSkpOwo+ID4KPiA+ICAgICAgIC8qCj4gPiAgICAgICAgKiBWZXJpZnkg
-dGhhdCBCSVQoVkFfQklUUyAtIDEpIGhhc24ndCBiZWVuIGZsaXBwZWQgYnkKPiA+ICAgICAgICAq
-IGFsbG9jYXRpbmcgdGhlIG5ldyBhcmVhLCBhcyBpdCB3b3VsZCBpbmRpY2F0ZSB3ZSd2ZQo+ID4g
-ICAgICAgICogb3ZlcmZsb3dlZCB0aGUgaWRtYXAvSU8gYWRkcmVzcyByYW5nZS4KPiA+ICAgICAg
-ICAqLwo+ID4gLSAgICAgaWYgKChiYXNlIF4gaW9fbWFwX2Jhc2UpICYgQklUKFZBX0JJVFMgLSAx
-KSkKPiA+ICsgICAgIGlmICghYmFzZSB8fCAoYmFzZSBeIGlvX21hcF9iYXNlKSAmIEJJVChWQV9C
-SVRTIC0gMSkpCj4KPiBJIGRvbid0IGdldCB0aGlzICchYmFzZScgY2hlY2suIFdoeSBpc24ndCBp
-dCBlbmNvbXBhc3NlZCBieSB0aGUKPiAnVkFfQklUUyAtIDEnIGZsaXAgY2hlY2s/CgpIaSBNYXJj
-LCBZb3UncmUgcmlnaHQuIFRoZSBmbGlwIGNoZWNrIGhhbmRsZXMgdGhpcyBhcyB3ZWxsLiBJ4oCZ
-bGwgZHJvcAppbiB0aGUgbmV4dCB2ZXJzaW9uLgoKPgo+ID4gICAgICAgICAgICAgICByZXQgPSAt
-RU5PTUVNOwo+ID4gICAgICAgZWxzZQo+ID4gLSAgICAgICAgICAgICBpb19tYXBfYmFzZSA9IGJh
-c2U7Cj4gPiArICAgICAgICAgICAgICpoYWRkciA9IGlvX21hcF9iYXNlID0gYmFzZTsKPiA+Cj4g
-PiAgICAgICBtdXRleF91bmxvY2soJmt2bV9oeXBfcGdkX211dGV4KTsKPiA+Cj4gPiArICAgICBy
-ZXR1cm4gcmV0Owo+ID4gK30KPiA+ICsKPiA+ICtzdGF0aWMgaW50IF9fY3JlYXRlX2h5cF9wcml2
-YXRlX21hcHBpbmcocGh5c19hZGRyX3QgcGh5c19hZGRyLCBzaXplX3Qgc2l6ZSwKPiA+ICsgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgdW5zaWduZWQgbG9uZyAqaGFkZHIsCj4g
-PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVudW0ga3ZtX3BndGFibGVf
-cHJvdCBwcm90KQo+ID4gK3sKPiA+ICsgICAgIHVuc2lnbmVkIGxvbmcgYWRkcjsKPiA+ICsgICAg
-IGludCByZXQgPSAwOwo+ID4gKwo+ID4gKyAgICAgaWYgKCFrdm1faG9zdF9vd25zX2h5cF9tYXBw
-aW5ncygpKSB7Cj4gPiArICAgICAgICAgICAgIGFkZHIgPSBrdm1fY2FsbF9oeXBfbnZoZShfX3Br
-dm1fY3JlYXRlX3ByaXZhdGVfbWFwcGluZywKPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIHBoeXNfYWRkciwgc2l6ZSwgcHJvdCk7Cj4gPiArICAgICAgICAgICAgIGlm
-IChJU19FUlJfVkFMVUUoYWRkcikpCj4gPiArICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIGFk
-ZHI7Cj4gPiArICAgICAgICAgICAgICpoYWRkciA9IGFkZHI7Cj4gPiArCj4gPiArICAgICAgICAg
-ICAgIHJldHVybiAwOwo+ID4gKyAgICAgfQo+ID4gKwo+ID4gKyAgICAgc2l6ZSArPSBvZmZzZXRf
-aW5fcGFnZShwaHlzX2FkZHIpOwo+Cj4gVGhpcyBoYXJkbHkgbWFrZXMgYW55IHNlbnNlIG9uIGl0
-cyBvd24uIEkgZ2V0IGl0IHRoYXQgaXQgaXMgc3RpbGwKPiBkb2luZyB0aGUgcmlnaHQgdGhpbmcg
-YXMgaHlwX2FsbG9jX3ByaXZhdGVfdmFfcmFuZ2UoKSB3aWxsIGZpeCBpdCB1cCwKPiBidXQgSSdk
-IHJhdGhlciB5b3Uga2VlcCB0aGUgUEFHRV9BTElHTigpIGhlcmUsIGV2ZW4gaWYgaXQgZW5kcyB1
-cAo+IGJlaW5nIGR1cGxpY2F0ZWQuCgpBY2sKClRoYW5rcywKS2FsZXNoCgo+Cj4gPiArICAgICBy
-ZXQgPSBoeXBfYWxsb2NfcHJpdmF0ZV92YV9yYW5nZShzaXplLCAmYWRkcik7Cj4gPiAgICAgICBp
-ZiAocmV0KQo+ID4gLSAgICAgICAgICAgICBnb3RvIG91dDsKPiA+ICsgICAgICAgICAgICAgcmV0
-dXJuIHJldDsKPiA+Cj4gPiAtICAgICByZXQgPSBfX2NyZWF0ZV9oeXBfbWFwcGluZ3MoYmFzZSwg
-c2l6ZSwgcGh5c19hZGRyLCBwcm90KTsKPiA+ICsgICAgIHJldCA9IF9fY3JlYXRlX2h5cF9tYXBw
-aW5ncyhhZGRyLCBzaXplLCBwaHlzX2FkZHIsIHByb3QpOwo+ID4gICAgICAgaWYgKHJldCkKPiA+
-IC0gICAgICAgICAgICAgZ290byBvdXQ7Cj4gPiArICAgICAgICAgICAgIHJldHVybiByZXQ7Cj4g
-Pgo+ID4gLSAgICAgKmhhZGRyID0gYmFzZSArIG9mZnNldF9pbl9wYWdlKHBoeXNfYWRkcik7Cj4g
-PiAtb3V0Ogo+ID4gKyAgICAgKmhhZGRyID0gYWRkciArIG9mZnNldF9pbl9wYWdlKHBoeXNfYWRk
-cik7Cj4gPiAgICAgICByZXR1cm4gcmV0Owo+ID4gIH0KPiA+Cj4KPiBUaGFua3MsCj4KPiAgICAg
-ICAgIE0uCj4KPiAtLQo+IFdpdGhvdXQgZGV2aWF0aW9uIGZyb20gdGhlIG5vcm0sIHByb2dyZXNz
-IGlzIG5vdCBwb3NzaWJsZS4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1
-Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Mon, Apr 18, 2022 at 3:01 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Fri, 08 Apr 2022 21:03:26 +0100,
+> Kalesh Singh <kaleshsingh@google.com> wrote:
+> >
+> > Map the stack pages in the flexible private VA range and allocate
+> > guard pages below the stack as unbacked VA space. The stack is aligned
+> > so that any valid stack address has PAGE_SHIFT bit as 1 - this is used
+> > for overflow detection (implemented in a subsequent patch in the series).
+> >
+> > Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
+> > Tested-by: Fuad Tabba <tabba@google.com>
+> > Reviewed-by: Fuad Tabba <tabba@google.com>
+> > ---
+> >
+> > Changes in v7:
+> >   - Add Fuad's Reviewed-by and Tested-by tags.
+> >
+> > Changes in v6:
+> >   - Update call to hyp_alloc_private_va_range() (return val and params)
+> >
+> > Changes in v5:
+> >   - Use a single allocation for stack and guard pages to ensure they
+> >     are contiguous, per Marc
+> >
+> > Changes in v4:
+> >   - Replace IS_ERR_OR_NULL check with IS_ERR check now that
+> >     hyp_alloc_private_va_range() returns an error for null
+> >     pointer, per Fuad
+> >   - Format comments to < 80 cols, per Fuad
+> >
+> > Changes in v3:
+> >   - Handle null ptr in IS_ERR_OR_NULL checks, per Mark
+> >
+> >
+> >  arch/arm64/include/asm/kvm_asm.h |  1 +
+> >  arch/arm64/include/asm/kvm_mmu.h |  3 +++
+> >  arch/arm64/kvm/arm.c             | 39 +++++++++++++++++++++++++++++---
+> >  arch/arm64/kvm/mmu.c             |  4 ++--
+> >  4 files changed, 42 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> > index d5b0386ef765..2e277f2ed671 100644
+> > --- a/arch/arm64/include/asm/kvm_asm.h
+> > +++ b/arch/arm64/include/asm/kvm_asm.h
+> > @@ -169,6 +169,7 @@ struct kvm_nvhe_init_params {
+> >       unsigned long tcr_el2;
+> >       unsigned long tpidr_el2;
+> >       unsigned long stack_hyp_va;
+> > +     unsigned long stack_pa;
+> >       phys_addr_t pgd_pa;
+> >       unsigned long hcr_el2;
+> >       unsigned long vttbr;
+> > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > index a50cbb5ba402..b805316c4866 100644
+> > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > @@ -117,6 +117,9 @@ alternative_cb_end
+> >  #include <asm/mmu_context.h>
+> >  #include <asm/kvm_host.h>
+> >
+> > +extern struct kvm_pgtable *hyp_pgtable;
+> > +extern struct mutex kvm_hyp_pgd_mutex;
+>
+> I'd rather you don't expose this at all.
+>
+> > +
+> >  void kvm_update_va_mask(struct alt_instr *alt,
+> >                       __le32 *origptr, __le32 *updptr, int nr_inst);
+> >  void kvm_compute_layout(void);
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 523bc934fe2f..5687c0175151 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -1483,7 +1483,6 @@ static void cpu_prepare_hyp_mode(int cpu)
+> >       tcr |= (idmap_t0sz & GENMASK(TCR_TxSZ_WIDTH - 1, 0)) << TCR_T0SZ_OFFSET;
+> >       params->tcr_el2 = tcr;
+> >
+> > -     params->stack_hyp_va = kern_hyp_va(per_cpu(kvm_arm_hyp_stack_page, cpu) + PAGE_SIZE);
+> >       params->pgd_pa = kvm_mmu_get_httbr();
+> >       if (is_protected_kvm_enabled())
+> >               params->hcr_el2 = HCR_HOST_NVHE_PROTECTED_FLAGS;
+> > @@ -1933,14 +1932,48 @@ static int init_hyp_mode(void)
+> >        * Map the Hyp stack pages
+> >        */
+> >       for_each_possible_cpu(cpu) {
+> > +             struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
+> >               char *stack_page = (char *)per_cpu(kvm_arm_hyp_stack_page, cpu);
+> > -             err = create_hyp_mappings(stack_page, stack_page + PAGE_SIZE,
+> > -                                       PAGE_HYP);
+> > +             unsigned long hyp_addr;
+> >
+> > +             /*
+> > +              * Allocate a contiguous HYP private VA range for the stack
+> > +              * and guard page. The allocation is also aligned based on
+> > +              * the order of its size.
+> > +              */
+> > +             err = hyp_alloc_private_va_range(PAGE_SIZE * 2, &hyp_addr);
+> > +             if (err) {
+> > +                     kvm_err("Cannot allocate hyp stack guard page\n");
+> > +                     goto out_err;
+> > +             }
+> > +
+> > +             /*
+> > +              * Since the stack grows downwards, map the stack to the page
+> > +              * at the higher address and leave the lower guard page
+> > +              * unbacked.
+> > +              *
+> > +              * Any valid stack address now has the PAGE_SHIFT bit as 1
+> > +              * and addresses corresponding to the guard page have the
+> > +              * PAGE_SHIFT bit as 0 - this is used for overflow detection.
+> > +              */
+> > +             mutex_lock(&kvm_hyp_pgd_mutex);
+> > +             err = kvm_pgtable_hyp_map(hyp_pgtable, hyp_addr + PAGE_SIZE,
+> > +                                     PAGE_SIZE, __pa(stack_page), PAGE_HYP);
+> > +             mutex_unlock(&kvm_hyp_pgd_mutex);
+>
+> The mutex (and the HYP page table structure) really should stay
+> private to the MMU code. Just add a new helper that will take the lock
+> and use hyp_pgtable.
+
+Agreed. I think we can expose __create_hyp_mappings() instead here.
+
+Thanks,
+Kalesh
+
+>
+> >               if (err) {
+> >                       kvm_err("Cannot map hyp stack\n");
+> >                       goto out_err;
+> >               }
+> > +
+> > +             /*
+> > +              * Save the stack PA in nvhe_init_params. This will be needed
+> > +              * to recreate the stack mapping in protected nVHE mode.
+> > +              * __hyp_pa() won't do the right thing there, since the stack
+> > +              * has been mapped in the flexible private VA space.
+> > +              */
+> > +             params->stack_pa = __pa(stack_page);
+> > +
+> > +             params->stack_hyp_va = hyp_addr + (2 * PAGE_SIZE);
+> >       }
+> >
+> >       for_each_possible_cpu(cpu) {
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 3d3efea4e991..a54f00bd06cc 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -22,8 +22,8 @@
+> >
+> >  #include "trace.h"
+> >
+> > -static struct kvm_pgtable *hyp_pgtable;
+> > -static DEFINE_MUTEX(kvm_hyp_pgd_mutex);
+> > +struct kvm_pgtable *hyp_pgtable;
+> > +DEFINE_MUTEX(kvm_hyp_pgd_mutex);
+> >
+> >  static unsigned long hyp_idmap_start;
+> >  static unsigned long hyp_idmap_end;
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
