@@ -2,43 +2,43 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AF7C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20AC8C433FE
 	for <kvmarm@archiver.kernel.org>; Thu, 21 Apr 2022 10:06:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2E224B2BC;
-	Thu, 21 Apr 2022 06:06:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C01B94B2C3;
+	Thu, 21 Apr 2022 06:06:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MLAfmzIHiAmv; Thu, 21 Apr 2022 06:06:09 -0400 (EDT)
+	with ESMTP id Yv4oOKzEsJMD; Thu, 21 Apr 2022 06:06:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7468D4B2BE;
-	Thu, 21 Apr 2022 06:06:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F2F74B2C4;
+	Thu, 21 Apr 2022 06:06:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E3614B29E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1411B4B2B9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ug7E3Yy664zE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Apr 2022 06:06:06 -0400 (EDT)
+ with ESMTP id n2xHwHkkka+C for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Apr 2022 06:06:07 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E979C4B3EB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2D694B29E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:07 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 541421480;
- Thu, 21 Apr 2022 03:06:05 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F89A1515;
+ Thu, 21 Apr 2022 03:06:07 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 771EB3F766;
- Thu, 21 Apr 2022 03:06:03 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CDEB3F766;
+ Thu, 21 Apr 2022 03:06:05 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: catalin.marinas@arm.com, will@kernel.org,
  linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com,
  suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, mark.rutland@arm.com
-Subject: [PATCH v2 1/5] arm64: Make ESR_ELx_xVC_IMM_MASK compatible with
- assembly
-Date: Thu, 21 Apr 2022 11:05:43 +0100
-Message-Id: <20220421100547.873761-2-alexandru.elisei@arm.com>
+Subject: [PATCH v2 2/5] arm64: compat: Do not treat syscall number as ESR_ELx
+ for a bad syscall
+Date: Thu, 21 Apr 2022 11:05:44 +0100
+Message-Id: <20220421100547.873761-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.36.0
 In-Reply-To: <20220421100547.873761-1-alexandru.elisei@arm.com>
 References: <20220421100547.873761-1-alexandru.elisei@arm.com>
@@ -59,31 +59,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-ESR_ELx_xVC_IMM_MASK is used as a mask for the immediate value for the
-HVC/SMC instructions. The header file is included by assembly files (like
-entry.S) and ESR_ELx_xVC_IMM_MASK is not conditioned on __ASSEMBLY__ being
-undefined. Use the UL() macro for defining the constant's size, as that is
-compatible with both C code and assembly, whereas the UL suffix only works
-for C code.
+If a compat process tries to execute an unknown system call above the
+__ARM_NR_COMPAT_END number, the kernel sends a SIGILL signal to the
+offending process. Information about the error is printed to dmesg in
+compat_arm_syscall() -> arm64_notify_die() -> arm64_force_sig_fault() ->
+arm64_show_signal().
+
+arm64_show_signal() interprets a non-zero value for
+current->thread.fault_code as an exception syndrome and displays the
+message associated with the ESR_ELx.EC field (bits 31:26).
+current->thread.fault_code is set in compat_arm_syscall() ->
+arm64_notify_die() with the bad syscall number instead of a valid ESR_ELx
+value. This means that the ESR_ELx.EC field has the value that the user set
+for the syscall number and the kernel can end up printing bogus exception
+messages*. For example, for the syscall number 0x68000000, which evaluates
+to ESR_ELx.EC value of 0x1A (ESR_ELx_EC_FPAC) the kernel prints this error:
+
+[   18.349161] syscall[300]: unhandled exception: ERET/ERETAA/ERETAB, ESR 0x68000000, Oops - bad compat syscall(2) in syscall[10000+50000]
+[   18.350639] CPU: 2 PID: 300 Comm: syscall Not tainted 5.18.0-rc1 #79
+[   18.351249] Hardware name: Pine64 RockPro64 v2.0 (DT)
+[..]
+
+which is misleading, as the bad compat syscall has nothing to do with
+pointer authentication.
+
+Stop arm64_show_signal() from printing exception syndrome information by
+having compat_arm_syscall() set the ESR_ELx value to 0, as it has no
+meaning for an invalid system call number. The example above now becomes:
+
+[   19.935275] syscall[301]: unhandled exception: Oops - bad compat syscall(2) in syscall[10000+50000]
+[   19.936124] CPU: 1 PID: 301 Comm: syscall Not tainted 5.18.0-rc1-00005-g7e08006d4102 #80
+[   19.936894] Hardware name: Pine64 RockPro64 v2.0 (DT)
+[..]
+
+which although shows less information because the syscall number,
+wrongfully advertised as the ESR value, is missing, it is better than
+showing plainly wrong information. The syscall number can be easily
+obtained with strace.
+
+*A 32-bit value above or equal to 0x8000_0000 is interpreted as a negative
+integer in compat_arm_syscal() and the condition scno < __ARM_NR_COMPAT_END
+evaluates to true; the syscall will exit to userspace in this case with the
+ENOSYS error code instead of arm64_notify_die() being called.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/include/asm/esr.h | 2 +-
+ arch/arm64/kernel/sys_compat.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index d52a0b269ee8..7356e2f05755 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -136,7 +136,7 @@
- #define ESR_ELx_WFx_ISS_TI	(UL(1) << 0)
- #define ESR_ELx_WFx_ISS_WFI	(UL(0) << 0)
- #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
--#define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
-+#define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
+diff --git a/arch/arm64/kernel/sys_compat.c b/arch/arm64/kernel/sys_compat.c
+index 12c6864e51e1..df14336c3a29 100644
+--- a/arch/arm64/kernel/sys_compat.c
++++ b/arch/arm64/kernel/sys_compat.c
+@@ -113,6 +113,6 @@ long compat_arm_syscall(struct pt_regs *regs, int scno)
+ 	addr = instruction_pointer(regs) - (compat_thumb_mode(regs) ? 2 : 4);
  
- #define DISR_EL1_IDS		(UL(1) << 24)
- /*
+ 	arm64_notify_die("Oops - bad compat syscall(2)", regs,
+-			 SIGILL, ILL_ILLTRP, addr, scno);
++			 SIGILL, ILL_ILLTRP, addr, 0);
+ 	return 0;
+ }
 -- 
 2.36.0
 
