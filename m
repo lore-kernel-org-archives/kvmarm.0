@@ -2,59 +2,44 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D980CC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Apr 2022 09:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45747C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Apr 2022 10:06:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E2FE4B284;
-	Thu, 21 Apr 2022 05:00:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B5F964B2B5;
+	Thu, 21 Apr 2022 06:06:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AsKQ7tSYRfar; Thu, 21 Apr 2022 05:00:53 -0400 (EDT)
+	with ESMTP id vIjbgToErTT6; Thu, 21 Apr 2022 06:06:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AF1C4B286;
-	Thu, 21 Apr 2022 05:00:53 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 576C84B2B7;
+	Thu, 21 Apr 2022 06:06:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 110194B284
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 05:00:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D7B84B3D6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LXwLycqvQ0kC for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Apr 2022 05:00:46 -0400 (EDT)
+ with ESMTP id BuOVSolPtj9C for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Apr 2022 06:06:04 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B3A104B280
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 05:00:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA16C4B34B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:03 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 256611477;
- Thu, 21 Apr 2022 02:00:46 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.76.146])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DD1C03F766;
- Thu, 21 Apr 2022 02:00:42 -0700 (PDT)
-Date: Thu, 21 Apr 2022 10:00:36 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v6 7/8] KVM: arm64: Unwind and dump nVHE HYP stacktrace
-Message-ID: <YmEdNME45PJr5w+Y@FVFF77S0Q05N>
-References: <20220314200148.2695206-1-kaleshsingh@google.com>
- <20220314200148.2695206-8-kaleshsingh@google.com>
- <CA+EHjTwQRUCjvcMHNe1f0kPBdU=vS+f2+e_eefhnJDR4s73cQA@mail.gmail.com>
- <CAC_TJveNRaDFcQGo9-eqKa3=1DnuVDs4U+ye795VcJ1ozVkMyg@mail.gmail.com>
- <YlbXHg64HK2d3dgm@FVFF77S0Q05N>
- <CAC_TJveJYFkHPQLYdL8SCEAwMPgwpF_-ctMqKJ9w=eDa_M0u5w@mail.gmail.com>
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 309A91477;
+ Thu, 21 Apr 2022 03:06:03 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A6B823F766;
+ Thu, 21 Apr 2022 03:06:01 -0700 (PDT)
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: catalin.marinas@arm.com, will@kernel.org,
+ linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, mark.rutland@arm.com
+Subject: [PATCH v2 0/5] arm64: Treat ESR_ELx as a 64-bit register
+Date: Thu, 21 Apr 2022 11:05:42 +0100
+Message-Id: <20220421100547.873761-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.36.0
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAC_TJveJYFkHPQLYdL8SCEAwMPgwpF_-ctMqKJ9w=eDa_M0u5w@mail.gmail.com>
-Cc: "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
- "Cc: Android Kernel" <kernel-team@android.com>,
- Andrew Walbran <qwandor@google.com>, Will Deacon <will@kernel.org>,
- Peter Collingbourne <pcc@google.com>, Marc Zyngier <maz@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Stephen Boyd <swboyd@chromium.org>,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- Mark Brown <broonie@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Suren Baghdasaryan <surenb@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -71,36 +56,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Apr 19, 2022 at 10:37:56AM -0700, Kalesh Singh wrote:
-> On Wed, Apr 13, 2022 at 6:59 AM Mark Rutland <mark.rutland@arm.com> wrote:
-> > I'm fine with the concept of splitting the unwind and logging steps; this is
-> > akin to doing:
-> >
-> >         stack_trace_save_tsk(...);
-> >         ...
-> >         stack_trace_print(...);
-> >
-> > ... and I'm fine with having a stack_trace_save_hyp(...) variant.
-> >
-> > However, I would like to ensure that we're reusing logic rather than
-> > duplicating it wholesale.
-> 
-> Agreed. Although some reimplementation may be unavoidable, as we can't
-> safely link against kernel code from the protected KVM hypervisor.
+The ESR_EL{1,2} registers were originally 32-bit, then were extended to
+64-bit with the upper 32 bits RES0, and in ARM DDI 0487H.a the FEAT_LS64
+feature was added which now makes use of the upper bits. This series aims
+to teach Linux to treat it consistently as a 64-bit register with the goal
+of making it easier to add support in the future for features that use the
+upper 32 bits.
 
-Sure; I just mean that we have one implementation, even if that gets recompiled
-in separate objects for different contexts.
+Patches #1 ("arm64: Make ESR_ELx_xVC_IMM_MASK compatible with assembly")
+and #2 ("arm64: compat: Do not treat syscall number as ESR_ELx for a bad
+syscall") are fixes for some minor issues which I found while working on
+changing ESR_ELx to 64-bit.
 
-> Perhaps we can move some of the common logic to a shared header that
-> can be included in both places (host, hyp), WDYT?
+Patches #3 ("arm64: Treat ESR_ELx as a 64bit register") and #4 ("KVM:
+arm64: Treat ESR_EL2 as a 64-bit register") are where the ESR_ELx registers
+are changed to 64-bit. I chose to make the KVM changes a separate patch
+because KVM prefers to use u64 for the registers.
 
-My rough thinking was that we'd build the same stacktrace.c file (reworked from
-the current one) as stracktrace.o and stacktrace.nvhe.o, but moving things
-around into headers is also an option. Either way will need some
-experimentation.
+And in patch #5 ("KVM: arm64: uapi: Add kvm_debug_exit_arch.hsr_high") I
+add a new field to the user API struct kvm_debug_exit_arch that represents
+the higher 32 bits, and a flag to go with it (details in the patch).
 
-Thanks,
-Mark.
+Tested by running ltp for about a day and kvm-unit-tests on a rockpro64.
+
+Changes in v2:
+
+* Added the KVM_DEBUG_ARCH_HSR_HIGH_VALID kvm_run flag to patch #5 ("KVM:
+  arm64: uapi: Add kvm_debug_exit_arch.hsr_high"), and updated the commit
+  message to match (Marc)
+* Rebased on top of v5.18-rc3.
+
+Alexandru Elisei (5):
+  arm64: Make ESR_ELx_xVC_IMM_MASK compatible with assembly
+  arm64: compat: Do not treat syscall number as ESR_ELx for a bad
+    syscall
+  arm64: Treat ESR_ELx as a 64-bit register
+  KVM: arm64: Treat ESR_EL2 as a 64-bit register
+  KVM: arm64: uapi: Add kvm_debug_exit_arch.hsr_high
+
+ arch/arm64/include/asm/debug-monitors.h |  4 +-
+ arch/arm64/include/asm/esr.h            |  8 +--
+ arch/arm64/include/asm/exception.h      | 28 +++++-----
+ arch/arm64/include/asm/kvm_emulate.h    |  6 +--
+ arch/arm64/include/asm/kvm_host.h       |  2 +-
+ arch/arm64/include/asm/kvm_ras.h        |  2 +-
+ arch/arm64/include/asm/system_misc.h    |  4 +-
+ arch/arm64/include/asm/traps.h          | 12 ++---
+ arch/arm64/include/uapi/asm/kvm.h       |  2 +
+ arch/arm64/kernel/debug-monitors.c      | 12 ++---
+ arch/arm64/kernel/entry-common.c        |  6 +--
+ arch/arm64/kernel/fpsimd.c              |  6 +--
+ arch/arm64/kernel/hw_breakpoint.c       |  4 +-
+ arch/arm64/kernel/kgdb.c                |  6 +--
+ arch/arm64/kernel/probes/kprobes.c      |  4 +-
+ arch/arm64/kernel/probes/uprobes.c      |  4 +-
+ arch/arm64/kernel/sys_compat.c          |  2 +-
+ arch/arm64/kernel/traps.c               | 66 +++++++++++------------
+ arch/arm64/kvm/handle_exit.c            | 16 +++---
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c      |  2 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c         |  4 +-
+ arch/arm64/kvm/inject_fault.c           |  4 +-
+ arch/arm64/kvm/sys_regs.c               |  4 +-
+ arch/arm64/mm/fault.c                   | 70 ++++++++++++-------------
+ 25 files changed, 142 insertions(+), 138 deletions(-)
+
+-- 
+2.36.0
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
