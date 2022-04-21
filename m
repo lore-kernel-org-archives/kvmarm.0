@@ -2,69 +2,69 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D5CC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 22 Apr 2022 17:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7753DC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Apr 2022 17:50:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BFCDF4B252;
-	Fri, 22 Apr 2022 13:50:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BC154B28B;
+	Fri, 22 Apr 2022 13:50:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id ncM-tzb-WvNZ; Fri, 22 Apr 2022 13:50:48 -0400 (EDT)
+	with ESMTP id 9Hxkr5rnKXU4; Fri, 22 Apr 2022 13:50:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63C1D4B28B;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 82D5E4B293;
 	Fri, 22 Apr 2022 13:50:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B66CD4B26A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 12:28:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBF2B4B208
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 12:31:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bIW34tBON06u for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Apr 2022 12:28:49 -0400 (EDT)
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com
- [209.85.219.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 699224B268
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 12:28:49 -0400 (EDT)
-Received: by mail-yb1-f173.google.com with SMTP id v10so898376ybe.5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 09:28:49 -0700 (PDT)
+ with ESMTP id ByJrvGOQZa1W for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Apr 2022 12:31:03 -0400 (EDT)
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com
+ [209.85.219.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A1F394B10C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 12:31:03 -0400 (EDT)
+Received: by mail-yb1-f179.google.com with SMTP id g14so6371027ybj.12
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 09:31:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Q8KjLP1ge6CAoQAgMyteAhGdc8R9b0Iwu1CbYU0QQX4=;
- b=CqNIj/zOCypJLipQuaEFIj7/HD2atvqJ0uUBCe49uKo0kO0SHINqVVrjlaDqeYDAZR
- bAKx3M9A9Q0gA3BiaqR5QGSxrnIpvK5r2BWpMk7PDvLvrl4ipiS2NYoUj4vqOk0KWWrM
- OrRdpyxWnHlZRnBeKonn4dOGH+FadwcvHiDztfe6fxP6wymeQ+THyqa6aFQrGbLVnw74
- BuzES2xxXbHQKYPW4j/2qy4TuJSynnKlRxo4wd2kBnKFSLtmHC6gkKPtW7vn5NWpc6sS
- qMBuXInD+TPKuDbCkD9fs5xkh+3UQHjBOFgrzdbBelaam+es7LEOjV6NLAykJR8cBM5v
- dvlg==
+ :cc; bh=85KhqeJYci7KtDV6WnG3kCKWzEDclQTTPrHp0DkW/4I=;
+ b=S7qrv0c9ibm9ObfrK3N2O6JQD0lgfWJP3iX06KjZsLuEmxFHObUR5eAz8SdwO5Nm3p
+ vzT/oJjHKWXzpWA73Q/qJMuaOnsvvJEvki+yBtUMKAnOjGXxv+NNRJyegojLmEymoMPN
+ X+A9ktZZ9XWy4cgPZ3cvSqhIkvpuTZDdzkL7qF3Myx6sorEGHfPtcFmVMP4oAcJY1+Ou
+ FKxllXtwprwzxlaOy1GKs6996L7ExTBCTRz1YZpPIv7zWcGJqJ1GpYN9HZvWn9vjrmdq
+ qfEMwiV9qAwvWzx2jdBivNrjiXTrlNhvAaO1SW+++UfneqJ8yeSipAyPGWyA0pZL8gZY
+ 8X1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Q8KjLP1ge6CAoQAgMyteAhGdc8R9b0Iwu1CbYU0QQX4=;
- b=y+1NyKtbjv7kinUy294/1TwcfNWeImmn8WJfDiqQCUjpmi3WT+xhtnSKLXoE9Y2PUd
- j7eB4pvdX4MUOvO7vTt6zMrJ1Cdqt+q70OsbVd2sDTJXc4JWHxgnKEx2JKPh6O1Uw0yT
- UXPB1qxWR4svA5NuBWf2r67SpkbErLXb3ngRBwBTOkbF3xodjlXYlyrcjHijRFB3mw//
- gQeHOFttMGq1B2pURq3/cqo5Z4UooBBk51lq4rwsnta9HzoIoSDKpWkRQjRk3aiiT6Tr
- cYqdMuL8wvcKDOTodwLkcsQEx+B7QYwrEwRuV6llKpPoEJ884l2PJ1Eao7aRmezrWNgv
- 6qIw==
-X-Gm-Message-State: AOAM5337wChXKd2Kc5csp4WWC0gnnmxFQRrD579uWA3zYZEt8zm0iI5E
- 8l3FJNqa6PJKPX32Fh3LvebkW8ywnzTUJQX+MGOGeA==
-X-Google-Smtp-Source: ABdhPJyFf1PQK+nJfwVXpStSPYFXSi6lgr/C7HjJzsJXnb9Mp1L3UDEiWHJBDsupjDNpUxAX7Xzm8RxfgnwHZEmZUZw=
-X-Received: by 2002:a25:2408:0:b0:641:d07e:6ca with SMTP id
- k8-20020a252408000000b00641d07e06camr454993ybk.341.1650558528698; Thu, 21 Apr
- 2022 09:28:48 -0700 (PDT)
+ bh=85KhqeJYci7KtDV6WnG3kCKWzEDclQTTPrHp0DkW/4I=;
+ b=MbESLfO7pNK5SrQYKF+7NDlkUldznxOPZPPREavS6Q6Vd6ZOvrXQnGc6Sy359chjWT
+ RO0KhyT6Fv3+W7IWXLX84zCalxwrL9ib36BxyHokr9MiUuXSP9Ue9JWhTUHlmfJUMPq1
+ GTIhiijbysWTvDSQ3h8Jk0xs64x5gkSLwLNlbfiuGOBNnjQdWYU2k3vffEv9FPSRoUVx
+ 1S42z1zrynmmjadMLkGKF8Q7Ai+kbsnUvMSKuBElOVS4YZhjPRyTBfzrwlwuuQTY3Xsp
+ 8w0Y5vKmODgpHTabuuC3AAB6Y7knM2tQKZsxdJpH41ayl+iVdGc4rLtwQQqo0mdFlw+u
+ rzrw==
+X-Gm-Message-State: AOAM532+zM59pigNeVRnij2HiR/JKrWxZWlcH6HbfmcStEwPhSS9G/1i
+ Jwz4EJ529+8V4kc3qWZORWa+HjaoDHGwtlM17ABgHg==
+X-Google-Smtp-Source: ABdhPJxI3f+nxc2oRFOpDB/a5OEQMffl8ehlvKNFIdsC9CIQ+joF/lNpYwk0ZFH/AYir2u09DHK53XcQqGK8liK6Wj8=
+X-Received: by 2002:a25:8546:0:b0:61e:1d34:ec71 with SMTP id
+ f6-20020a258546000000b0061e1d34ec71mr451287ybn.259.1650558662967; Thu, 21 Apr
+ 2022 09:31:02 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-15-oupton@google.com>
-In-Reply-To: <20220415215901.1737897-15-oupton@google.com>
+ <CANgfPd8V5AdH0dEAox2PvKJpqDrqmfJyiwoLpxEGqVfb7EEP9Q@mail.gmail.com>
+ <CAOQ_QsieUXOFXLkZ=ya0RUpU8Mv2sd9hmskwEW99tH26cjjX_A@mail.gmail.com>
+In-Reply-To: <CAOQ_QsieUXOFXLkZ=ya0RUpU8Mv2sd9hmskwEW99tH26cjjX_A@mail.gmail.com>
 From: Ben Gardon <bgardon@google.com>
-Date: Thu, 21 Apr 2022 09:28:37 -0700
-Message-ID: <CANgfPd-pK6jT4Sw_WCzyyHY9v3dj6O6SDPEt5Br1ws76H1Xx6w@mail.gmail.com>
-Subject: Re: [RFC PATCH 14/17] KVM: arm64: Punt last page reference to rcu
- callback for parallel walk
+Date: Thu, 21 Apr 2022 09:30:52 -0700
+Message-ID: <CANgfPd80wTYX92Q9dP7irMdZW+Y0_VNFQ19xJaf5DvndEaa7dw@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/17] KVM: arm64: Parallelize stage 2 fault handling
 To: Oliver Upton <oupton@google.com>
 X-Mailman-Approved-At: Fri, 22 Apr 2022 13:50:47 -0400
 Cc: kvm <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
@@ -88,184 +88,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
+On Tue, Apr 19, 2022 at 11:36 AM Oliver Upton <oupton@google.com> wrote:
 >
-> It is possible that a table page remains visible to another thread until
-> the next rcu synchronization event. To that end, we cannot drop the last
-> page reference synchronous with post-order traversal for a parallel
-> table walk.
+> On Tue, Apr 19, 2022 at 10:57 AM Ben Gardon <bgardon@google.com> wrote:
+> >
+> > On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > Presently KVM only takes a read lock for stage 2 faults if it believes
+> > > the fault can be fixed by relaxing permissions on a PTE (write unprotect
+> > > for dirty logging). Otherwise, stage 2 faults grab the write lock, which
+> > > predictably can pile up all the vCPUs in a sufficiently large VM.
+> > >
+> > > The x86 port of KVM has what it calls the TDP MMU. Basically, it is an
+> > > MMU protected by the combination of a read-write lock and RCU, allowing
+> > > page walkers to traverse in parallel.
+> > >
+> > > This series is strongly inspired by the mechanics of the TDP MMU,
+> > > making use of RCU to protect parallel walks. Note that the TLB
+> > > invalidation mechanics are a bit different between x86 and ARM, so we
+> > > need to use the 'break-before-make' sequence to split/collapse a
+> > > block/table mapping, respectively.
+> > >
+> > > Nonetheless, using atomics on the break side allows fault handlers to
+> > > acquire exclusive access to a PTE (lets just call it locked). Once the
+> > > PTE lock is acquired it is then safe to assume exclusive access.
+> > >
+> > > Special consideration is required when pruning the page tables in
+> > > parallel. Suppose we are collapsing a table into a block. Allowing
+> > > parallel faults means that a software walker could be in the middle of
+> > > a lower level traversal when the table is unlinked. Table
+> > > walkers that prune the paging structures must now 'lock' all descendent
+> > > PTEs, effectively asserting exclusive ownership of the substructure
+> > > (no other walker can install something to an already locked pte).
+> > >
+> > > Additionally, for parallel walks we need to punt the freeing of table
+> > > pages to the next RCU sync, as there could be multiple observers of the
+> > > table until all walkers exit the RCU critical section. For this I
+> > > decided to cram an rcu_head into page private data for every table page.
+> > > We wind up spending a bit more on table pages now, but lazily allocating
+> > > for rcu callbacks probably doesn't make a lot of sense. Not only would
+> > > we need a large cache of them (think about installing a level 1 block)
+> > > to wire up callbacks on all descendent tables, but we also then need to
+> > > spend memory to actually free memory.
+> >
+> > FWIW we used a similar approach in early versions of the TDP MMU, but
+> > instead of page->private used page->lru so that more metadata could be
+> > stored in page->private.
+> > Ultimately that ended up being too limiting and we decided to switch
+> > to just using the associated struct kvm_mmu_page as the list element.
+> > I don't know if ARM has an equivalent construct though.
 >
-> Schedule an rcu callback to clean up the child table page for parallel
-> walks.
->
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/include/asm/kvm_pgtable.h |  3 ++
->  arch/arm64/kvm/hyp/pgtable.c         | 24 +++++++++++++--
->  arch/arm64/kvm/mmu.c                 | 44 +++++++++++++++++++++++++++-
->  3 files changed, 67 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_pgtable.h b/arch/arm64/include/asm/kvm_pgtable.h
-> index 74955aba5918..52e55e00f0ca 100644
-> --- a/arch/arm64/include/asm/kvm_pgtable.h
-> +++ b/arch/arm64/include/asm/kvm_pgtable.h
-> @@ -81,6 +81,8 @@ static inline bool kvm_level_supports_block_mapping(u32 level)
->   * @put_page:                  Decrement the refcount on a page. When the
->   *                             refcount reaches 0 the page is automatically
->   *                             freed.
-> + * @free_table:                        Drop the last page reference, possibly in the
-> + *                             next RCU sync if doing a shared walk.
->   * @page_count:                        Return the refcount of a page.
->   * @phys_to_virt:              Convert a physical address into a virtual
->   *                             address mapped in the current context.
-> @@ -98,6 +100,7 @@ struct kvm_pgtable_mm_ops {
->         void            (*get_page)(void *addr);
->         void            (*put_page)(void *addr);
->         int             (*page_count)(void *addr);
-> +       void            (*free_table)(void *addr, bool shared);
->         void*           (*phys_to_virt)(phys_addr_t phys);
->         phys_addr_t     (*virt_to_phys)(void *addr);
->         void            (*dcache_clean_inval_poc)(void *addr, size_t size);
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 121818d4c33e..a9a48edba63b 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -147,12 +147,19 @@ static inline void kvm_pgtable_walk_end(void)
->  {}
->
->  #define kvm_dereference_ptep   rcu_dereference_raw
-> +
-> +static inline void kvm_pgtable_destroy_barrier(void)
-> +{}
-> +
->  #else
->  #define kvm_pgtable_walk_begin rcu_read_lock
->
->  #define kvm_pgtable_walk_end   rcu_read_unlock
->
->  #define kvm_dereference_ptep   rcu_dereference
-> +
-> +#define kvm_pgtable_destroy_barrier    rcu_barrier
-> +
->  #endif
->
->  static kvm_pte_t *kvm_pte_follow(kvm_pte_t pte, struct kvm_pgtable_mm_ops *mm_ops)
-> @@ -1063,7 +1070,12 @@ static int stage2_map_walk_table_post(u64 addr, u64 end, u32 level,
->                 childp = kvm_pte_follow(*old, mm_ops);
->         }
->
-> -       mm_ops->put_page(childp);
-> +       /*
-> +        * If we do not have exclusive access to the page tables it is possible
-> +        * the unlinked table remains visible to another thread until the next
-> +        * rcu synchronization.
-> +        */
-> +       mm_ops->free_table(childp, shared);
->         mm_ops->put_page(ptep);
->
->         return ret;
-> @@ -1203,7 +1215,7 @@ static int stage2_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
->                                                kvm_granule_size(level));
->
->         if (childp)
-> -               mm_ops->put_page(childp);
-> +               mm_ops->free_table(childp, shared);
->
->         return 0;
->  }
-> @@ -1433,7 +1445,7 @@ static int stage2_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
->         mm_ops->put_page(ptep);
->
->         if (kvm_pte_table(*old, level))
-> -               mm_ops->put_page(kvm_pte_follow(*old, mm_ops));
-> +               mm_ops->free_table(kvm_pte_follow(*old, mm_ops), shared);
->
->         return 0;
->  }
-> @@ -1452,4 +1464,10 @@ void kvm_pgtable_stage2_destroy(struct kvm_pgtable *pgt)
->         pgd_sz = kvm_pgd_pages(pgt->ia_bits, pgt->start_level) * PAGE_SIZE;
->         pgt->mm_ops->free_pages_exact(pgt->pgd, pgd_sz);
->         pgt->pgd = NULL;
-> +
-> +       /*
-> +        * Guarantee that all unlinked subtrees associated with the stage2 page
-> +        * table have also been freed before returning.
-> +        */
-> +       kvm_pgtable_destroy_barrier();
+> ARM currently doesn't have any metadata it needs to tie with the table
+> pages. We just do very basic page reference counting for every valid
+> PTE. I was going to link together pages (hence the page header), but
+> we actually do not have a functional need for it at the moment. In
+> fact, struct page::rcu_head would probably fit the bill and we can
+> avoid extra metadata/memory for the time being.
 
-Why do we need to wait for in-flight RCU callbacks to finish here?
-Is this function only used on VM teardown and we just want to make
-sure all the memory is freed or is something actually depending on
-this behavior?
+Ah, right! I page::rcu_head was the field I was thinking of.
 
->  }
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index cc6ed6b06ec2..6ecf37009c21 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -98,9 +98,50 @@ static bool kvm_is_device_pfn(unsigned long pfn)
->  static void *stage2_memcache_zalloc_page(void *arg)
->  {
->         struct kvm_mmu_caches *mmu_caches = arg;
-> +       struct stage2_page_header *hdr;
-> +       void *addr;
 >
->         /* Allocated with __GFP_ZERO, so no need to zero */
-> -       return kvm_mmu_memory_cache_alloc(&mmu_caches->page_cache);
-> +       addr = kvm_mmu_memory_cache_alloc(&mmu_caches->page_cache);
-> +       if (!addr)
-> +               return NULL;
-> +
-> +       hdr = kvm_mmu_memory_cache_alloc(&mmu_caches->header_cache);
-> +       if (!hdr) {
-> +               free_page((unsigned long)addr);
-> +               return NULL;
-> +       }
-> +
-> +       hdr->page = virt_to_page(addr);
-> +       set_page_private(hdr->page, (unsigned long)hdr);
-> +       return addr;
-> +}
-> +
-> +static void stage2_free_page_now(struct stage2_page_header *hdr)
-> +{
-> +       WARN_ON(page_ref_count(hdr->page) != 1);
-> +
-> +       __free_page(hdr->page);
-> +       kmem_cache_free(stage2_page_header_cache, hdr);
-> +}
-> +
-> +static void stage2_free_page_rcu_cb(struct rcu_head *head)
-> +{
-> +       struct stage2_page_header *hdr = container_of(head, struct stage2_page_header,
-> +                                                     rcu_head);
-> +
-> +       stage2_free_page_now(hdr);
-> +}
-> +
-> +static void stage2_free_table(void *addr, bool shared)
-> +{
-> +       struct page *page = virt_to_page(addr);
-> +       struct stage2_page_header *hdr = (struct stage2_page_header *)page_private(page);
-> +
-> +       if (shared)
-> +               call_rcu(&hdr->rcu_head, stage2_free_page_rcu_cb);
-> +       else
-> +               stage2_free_page_now(hdr);
->  }
+> Perhaps best to keep it simple and do the rest when we have a genuine
+> need for it.
+
+Completely agree. I'm surprised that ARM doesn't have a need for a
+metadata structure associated with each page of the stage 2 paging
+structure, but if you don't need it, that definitely makes things
+simpler.
+
 >
->  static void *kvm_host_zalloc_pages_exact(size_t size)
-> @@ -613,6 +654,7 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
->         .free_pages_exact       = free_pages_exact,
->         .get_page               = kvm_host_get_page,
->         .put_page               = kvm_host_put_page,
-> +       .free_table             = stage2_free_table,
->         .page_count             = kvm_host_page_count,
->         .phys_to_virt           = kvm_host_va,
->         .virt_to_phys           = kvm_host_pa,
 > --
-> 2.36.0.rc0.470.gd361397f0d-goog
->
+> Thanks,
+> Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
