@@ -2,42 +2,42 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A5CC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Apr 2022 10:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D4DC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Apr 2022 10:06:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E1844B2C0;
-	Thu, 21 Apr 2022 06:06:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A090449ED7;
+	Thu, 21 Apr 2022 06:06:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WAv21DKIj++w; Thu, 21 Apr 2022 06:06:18 -0400 (EDT)
+	with ESMTP id X-kXmc7CJJ0g; Thu, 21 Apr 2022 06:06:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DBD414B2DC;
-	Thu, 21 Apr 2022 06:06:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0203D4B2C8;
+	Thu, 21 Apr 2022 06:06:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 715654B284
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE8414B2DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RoZuJ3vZ1URQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Apr 2022 06:06:12 -0400 (EDT)
+ with ESMTP id QKiQE3xLh4KD for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Apr 2022 06:06:13 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B80AE4B2BE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63B104B2E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 06:06:13 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 542C51480;
- Thu, 21 Apr 2022 03:06:11 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C0401515;
+ Thu, 21 Apr 2022 03:06:13 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B7C373F766;
- Thu, 21 Apr 2022 03:06:09 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A05A3F766;
+ Thu, 21 Apr 2022 03:06:11 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: catalin.marinas@arm.com, will@kernel.org,
  linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com,
  suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, mark.rutland@arm.com
-Subject: [PATCH v2 4/5] KVM: arm64: Treat ESR_EL2 as a 64-bit register
-Date: Thu, 21 Apr 2022 11:05:46 +0100
-Message-Id: <20220421100547.873761-5-alexandru.elisei@arm.com>
+Subject: [PATCH v2 5/5] KVM: arm64: uapi: Add kvm_debug_exit_arch.hsr_high
+Date: Thu, 21 Apr 2022 11:05:47 +0100
+Message-Id: <20220421100547.873761-6-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.36.0
 In-Reply-To: <20220421100547.873761-1-alexandru.elisei@arm.com>
 References: <20220421100547.873761-1-alexandru.elisei@arm.com>
@@ -58,236 +58,81 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-ESR_EL2 was defined as a 32-bit register in the initial release of the
-ARM Architecture Manual for Armv8-A, and was later extended to 64 bits,
-with bits [63:32] RES0. ARMv8.7 introduced FEAT_LS64, which makes use of
-bits [36:32].
+When userspace is debugging a VM, the kvm_debug_exit_arch part of the
+kvm_run struct contains arm64 specific debug information: the ESR_EL2
+value, encoded in the field "hsr", and the address of the instruction
+that caused the exception, encoded in the field "far".
 
-KVM treats ESR_EL1 as a 64-bit register when saving and restoring the
-guest context, but ESR_EL2 is handled as a 32-bit register. Start
-treating ESR_EL2 as a 64-bit register to allow KVM to make use of the
-most significant 32 bits in the future.
+Linux has moved to treating ESR_EL2 as a 64-bit register, but unfortunately
+kvm_debug_exit_arch.hsr cannot be changed because that would change the
+memory layout of the struct on big endian machines:
 
-The type chosen to represent ESR_EL2 is u64, as that is consistent with the
-notation KVM overwhelmingly uses today (u32), and how the rest of the
-registers are declared.
+Current layout:			| Layout with "hsr" extended to 64 bits:
+				|
+offset 0: ESR_EL2[31:0] (hsr)   | offset 0: ESR_EL2[61:32] (hsr[61:32])
+offset 4: padding		| offset 4: ESR_EL2[31:0]  (hsr[31:0])
+offset 8: FAR_EL2[61:0] (far)	| offset 8: FAR_EL2[61:0]  (far)
+
+which breaks existing code.
+
+The padding is inserted by the compiler because the "far" field must be
+aligned to 8 bytes (each field must be naturally aligned - aapcs64 [1],
+page 18), and the struct itself must be aligned to 8 bytes (the struct must
+be aligned to the maximum alignment of its fields - aapcs64, page 18),
+which means that "hsr" must be aligned to 8 bytes as it is the first field
+in the struct.
+
+To avoid changing the struct size and layout for the existing fields, add a
+new field, "hsr_high", which replaces the existing padding. "hsr_high" will
+be used to hold the ESR_EL2[61:32] bits of the register. The memory layout,
+both on big and little endian machine, becomes:
+
+offset 0: ESR_EL2[31:0]  (hsr)
+offset 4: ESR_EL2[61:32] (hsr_high)
+offset 8: FAR_EL2[61:0]  (far)
+
+The padding that the compiler inserts for the current struct layout is
+unitialized. To prevent an updated userspace running on an old kernel
+mistaking the padding for a valid "hsr_high" value, add a new flag,
+KVM_DEBUG_ARCH_HSR_HIGH_VALID, to kvm_run->flags to let userspace know that
+"hsr_high" holds a valid ESR_EL2[61:32] value.
+
+[1] https://github.com/ARM-software/abi-aa/releases/download/2021Q3/aapcs64.pdf
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h    |  6 +++---
- arch/arm64/include/asm/kvm_host.h       |  2 +-
- arch/arm64/include/asm/kvm_ras.h        |  2 +-
- arch/arm64/kvm/handle_exit.c            | 14 +++++++-------
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c      |  2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c         |  4 ++--
- arch/arm64/kvm/inject_fault.c           |  4 ++--
- arch/arm64/kvm/sys_regs.c               |  4 ++--
- 9 files changed, 20 insertions(+), 20 deletions(-)
+ arch/arm64/include/uapi/asm/kvm.h | 2 ++
+ arch/arm64/kvm/handle_exit.c      | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 7496deab025a..ab19a7317e12 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -235,14 +235,14 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
- 	return mode != PSR_MODE_EL0t;
- }
- 
--static __always_inline u32 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
-+static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
- {
- 	return vcpu->arch.fault.esr_el2;
- }
- 
- static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
- {
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
- 
- 	if (esr & ESR_ELx_CV)
- 		return (esr & ESR_ELx_COND_MASK) >> ESR_ELx_COND_SHIFT;
-@@ -373,7 +373,7 @@ static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
- 
- static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
- {
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
- 	return ESR_ELx_SYS64_ISS_RT(esr);
- }
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 94a27a7520f4..850430d15cd0 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -153,7 +153,7 @@ struct kvm_arch {
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index c1b6ddc02d2f..695324b6f92e 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -139,8 +139,10 @@ struct kvm_guest_debug_arch {
+ 	__u64 dbg_wvr[KVM_ARM_MAX_DBG_REGS];
  };
  
- struct kvm_vcpu_fault_info {
--	u32 esr_el2;		/* Hyp Syndrom Register */
-+	u64 esr_el2;		/* Hyp Syndrom Register */
- 	u64 far_el2;		/* Hyp Fault Address Register */
- 	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
- 	u64 disr_el1;		/* Deferred [SError] Status Register */
-diff --git a/arch/arm64/include/asm/kvm_ras.h b/arch/arm64/include/asm/kvm_ras.h
-index 8ac6ee77437c..87e10d9a635b 100644
---- a/arch/arm64/include/asm/kvm_ras.h
-+++ b/arch/arm64/include/asm/kvm_ras.h
-@@ -14,7 +14,7 @@
-  * Was this synchronous external abort a RAS notification?
-  * Returns '0' for errors handled by some RAS subsystem, or -ENOENT.
-  */
--static inline int kvm_handle_guest_sea(phys_addr_t addr, unsigned int esr)
-+static inline int kvm_handle_guest_sea(phys_addr_t addr, u64 esr)
- {
- 	/* apei_claim_sea(NULL) expects to mask interrupts itself */
- 	lockdep_assert_irqs_enabled();
++#define KVM_DEBUG_ARCH_HSR_HIGH_VALID	1
+ struct kvm_debug_exit_arch {
+ 	__u32 hsr;
++	__u32 hsr_high;	/* ESR_EL2[61:32] */
+ 	__u64 far;	/* used for watchpoints */
+ };
+ 
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 97fe14aab1a3..93d92130d36c 100644
+index 93d92130d36c..fd5b6773e3a2 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -26,7 +26,7 @@
- 
- typedef int (*exit_handle_fn)(struct kvm_vcpu *);
- 
--static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u32 esr)
-+static void kvm_handle_guest_serror(struct kvm_vcpu *vcpu, u64 esr)
- {
- 	if (!arm64_is_ras_serror(esr) || arm64_is_fatal_ras_serror(NULL, esr))
- 		kvm_inject_vabt(vcpu);
-@@ -117,10 +117,10 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
- static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_run *run = vcpu->run;
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
+@@ -121,6 +121,8 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
  
  	run->exit_reason = KVM_EXIT_DEBUG;
--	run->debug.arch.hsr = esr;
-+	run->debug.arch.hsr = lower_32_bits(esr);
+ 	run->debug.arch.hsr = lower_32_bits(esr);
++	run->debug.arch.hsr_high = upper_32_bits(esr);
++	run->flags |= KVM_DEBUG_ARCH_HSR_HIGH_VALID;
  
  	if (ESR_ELx_EC(esr) == ESR_ELx_EC_WATCHPT_LOW)
  		run->debug.arch.far = vcpu->arch.fault.far_el2;
-@@ -130,9 +130,9 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu)
- 
- static int kvm_handle_unknown_ec(struct kvm_vcpu *vcpu)
- {
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
- 
--	kvm_pr_unimpl("Unknown exception class: esr: %#08x -- %s\n",
-+	kvm_pr_unimpl("Unknown exception class: esr: %#016llx -- %s\n",
- 		      esr, esr_get_class_string(esr));
- 
- 	kvm_inject_undefined(vcpu);
-@@ -187,7 +187,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 
- static exit_handle_fn kvm_get_exit_handler(struct kvm_vcpu *vcpu)
- {
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
- 	u8 esr_ec = ESR_ELx_EC(esr);
- 
- 	return arm_exit_handlers[esr_ec];
-@@ -334,6 +334,6 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 	 */
- 	kvm_err("Hyp Offset: 0x%llx\n", hyp_offset);
- 
--	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%016lx\n",
-+	panic("HYP panic:\nPS:%08llx PC:%016llx ESR:%016llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%016lx\n",
- 	      spsr, elr_virt, esr, far, hpfar, par, vcpu);
- }
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 5d31f6c64c8c..37d9f211c200 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -266,7 +266,7 @@ static inline bool handle_tx2_tvm(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
--static inline bool esr_is_ptrauth_trap(u32 esr)
-+static inline bool esr_is_ptrauth_trap(u64 esr)
- {
- 	switch (esr_sys64_to_sysreg(esr)) {
- 	case SYS_APIAKEYLO_EL1:
-diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-index 33f5181af330..619f94fc95fa 100644
---- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-+++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-@@ -33,7 +33,7 @@ u64 id_aa64mmfr2_el1_sys_val;
-  */
- static void inject_undef64(struct kvm_vcpu *vcpu)
- {
--	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-+	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
- 
- 	*vcpu_pc(vcpu) = read_sysreg_el2(SYS_ELR);
- 	*vcpu_cpsr(vcpu) = read_sysreg_el2(SYS_SPSR);
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 4fb419f7b8b6..6cb638b184b1 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -473,7 +473,7 @@ static int __vgic_v3_bpr_min(void)
- 
- static int __vgic_v3_get_group(struct kvm_vcpu *vcpu)
- {
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
- 	u8 crm = (esr & ESR_ELx_SYS64_ISS_CRM_MASK) >> ESR_ELx_SYS64_ISS_CRM_SHIFT;
- 
- 	return crm != 8;
-@@ -1016,7 +1016,7 @@ static void __vgic_v3_write_ctlr(struct kvm_vcpu *vcpu, u32 vmcr, int rt)
- int __vgic_v3_perform_cpuif_access(struct kvm_vcpu *vcpu)
- {
- 	int rt;
--	u32 esr;
-+	u64 esr;
- 	u32 vmcr;
- 	void (*fn)(struct kvm_vcpu *, u32, int);
- 	bool is_read;
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index b47df73e98d7..3664e30f5694 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -18,7 +18,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- {
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
- 	bool is_aarch32 = vcpu_mode_is_32bit(vcpu);
--	u32 esr = 0;
-+	u64 esr = 0;
- 
- 	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1		|
- 			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
-@@ -50,7 +50,7 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 
- static void inject_undef64(struct kvm_vcpu *vcpu)
- {
--	u32 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
-+	u64 esr = (ESR_ELx_EC_UNKNOWN << ESR_ELx_EC_SHIFT);
- 
- 	vcpu->arch.flags |= (KVM_ARM64_EXCEPT_AA64_EL1		|
- 			     KVM_ARM64_EXCEPT_AA64_ELx_SYNC	|
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7b45c040cc27..2bde95662bbf 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2304,7 +2304,7 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- 			    size_t nr_global)
- {
- 	struct sys_reg_params params;
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
- 	int Rt = kvm_vcpu_sys_get_rt(vcpu);
- 	int Rt2 = (esr >> 10) & 0x1f;
- 
-@@ -2354,7 +2354,7 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
- 			    size_t nr_global)
- {
- 	struct sys_reg_params params;
--	u32 esr = kvm_vcpu_get_esr(vcpu);
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
- 	int Rt  = kvm_vcpu_sys_get_rt(vcpu);
- 
- 	params.CRm = (esr >> 1) & 0xf;
 -- 
 2.36.0
 
