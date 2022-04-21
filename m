@@ -2,82 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA3CC35274
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Apr 2022 16:46:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0604C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 21 Apr 2022 17:16:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B2CA49EE3;
-	Thu, 21 Apr 2022 12:46:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 20C4A4B27C;
+	Thu, 21 Apr 2022 13:16:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Y3N4z90FM3FU; Thu, 21 Apr 2022 12:46:41 -0400 (EDT)
+	with ESMTP id yAsCSLDnRn69; Thu, 21 Apr 2022 13:16:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BAED4B268;
-	Thu, 21 Apr 2022 12:46:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB324B21A;
+	Thu, 21 Apr 2022 13:16:54 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DA9149EE3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 12:46:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C42084B231
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 13:16:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AvahFHSdNLL9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Apr 2022 12:46:39 -0400 (EDT)
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com
- [209.85.166.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B99549F22
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 12:46:39 -0400 (EDT)
-Received: by mail-il1-f180.google.com with SMTP id r17so3415721iln.9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 09:46:39 -0700 (PDT)
+ with ESMTP id qA9m0DziE-uN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 21 Apr 2022 13:16:51 -0400 (EDT)
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com
+ [209.85.166.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9CE944B21A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 13:16:51 -0400 (EDT)
+Received: by mail-il1-f179.google.com with SMTP id o5so3471390ils.11
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 10:16:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=ckFrAKsgzMvhyYwd1DVzzN/3nS9H6cXtvsMtyZqX9aM=;
- b=GGnQsYCBc7m0sb4hHXxmKxyVDlaKtiaUHTSkrcsRbKdnF/OLl9BH9pkaG8KmPePwAH
- GFnZvAnXZTNxNDVxKvJkJmlFGbDhiP+zy8Z3LECciut3GiViyDXLAAuyDjhcvgvCHd95
- 9RZno8WXANvk1HA27qMQsBhii5EMRryAqFjMHiA6jQZ89AnnpaarP0duHppYZ+nG5SZv
- c66Bk7ryt53J/3iOloBULhibsniEkSISPrkGaQYvqiUq2fcHGaw89VI+6Wveqzv+9dxy
- ZR/Jw0K3SrcDXPSnc73yUsx4FXiPdd6DMCbMoeCWI5y1g2cc4geCxc1qUCY15L7+5TuW
- 3xfA==
+ bh=XzhY22rtiJ4F18tBLtgYTs/jI9h0RWvVOlQ+tRau+5o=;
+ b=pK42OJHT0CeEuc0jhItLyks4fe+Xnjx0pc5hU0u/pCXZcWmvdLl+OE/12crIT84m1F
+ VJVkgDjOAeSiFct9qEntE2I7HQ1FsGWVdJ86FpnqgNsfTfFHKscoqGSRaypz7Xt4ApBh
+ ZWPI/IJ+v4WeM4TVbVbI0n82DvePsALfkbz2hG6tI9YDWgnZK9vxY7tbZj+zXBgU2Z5E
+ oe3zu+r8g49xPpC22rBu0pNm4L+j/CKW6d9J3NRboLuKc2JLq8Hp75N/p14Gkc0TadDu
+ Vi1nIgZNnu6KydVo6ByWz3Ztrc+m4Ejx2hSRQF+gUi4ZgBi6hO1FnbAGc8yqszaU6zwx
+ Njag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=ckFrAKsgzMvhyYwd1DVzzN/3nS9H6cXtvsMtyZqX9aM=;
- b=xxdXICmdgO+IkvHlMGedTcZC1nITFOy9Wjcxg2GCB174L56wE4ERe2bJmh+KYZHWQF
- RqqoL+NML+eGK4+vig/MDT72GWdS8PwYDYMlJi2adz7KZSRzSRwub0ATtnRt6ifYuZ3g
- m/z9uy3w9dtbPozOwAwPZxPu/flRl3INT8PVZ2P79dV2tjCN1o/rcsHjMuSZw5OQMbxQ
- LT++g2tmSvkb4cM9FVFWP/UsDsr+Duf0CRxWt4ii/76jEAPEpGSMee6jnVR0VU/N8NFO
- ZSJ6OsEd1m7AE1KB0PpAr3t/kRiyOKs10MBg7d++u9zs6tPw547IGWXIbXdcx3qXwbT/
- Anug==
-X-Gm-Message-State: AOAM531mC+3daKaYGCkdHOM0cFmP529IRssG3uEId0Kh92R/CKVBK2im
- QJdaAE69AlVuYt75yWZLkwQsNw==
-X-Google-Smtp-Source: ABdhPJxWbQuijQVv7g9clCzQllXZaGyUynAlG+W8mud7Ir6TVd5bJHybLM8Rf2hpLE1AQFIvqx0Uow==
-X-Received: by 2002:a05:6e02:1d83:b0:2cc:1dbc:7c34 with SMTP id
- h3-20020a056e021d8300b002cc1dbc7c34mr285019ila.315.1650559598456; 
- Thu, 21 Apr 2022 09:46:38 -0700 (PDT)
+ bh=XzhY22rtiJ4F18tBLtgYTs/jI9h0RWvVOlQ+tRau+5o=;
+ b=t9z/BlbEQk6WplIzxSPrctXpbtsilUv1ROg7ob1PiOc7jepGPmtrDbjoZtf62vbs7f
+ rmf4+jYOPGu/OskbKnpeFia05Jp0qAaOAb335kkLzmnLbvm2MryAthrMqH+aJIgXMgnI
+ Zl54kQkH75qVal4ZBToLyZQb7GtYH5Zpqldf+Csy9zSXnp2W8mPuKYkWmkLZ5I4hbzbZ
+ 12f38RkyBPbAIW2m2CUZGQBuJ93mvML7t8OAfp4DdEDSD+yKkGbioVdasTiRS4WzjZr4
+ Ie1uaLpoiqnH2QIf1rRvFq+WDJ6k8wJY+gQqVZPbUbjnW0sF7BIWXtcRoUH/9yHRQ9iK
+ ss4Q==
+X-Gm-Message-State: AOAM532KN0jtlphbhmb6nUBl6maGqTYoX4H9P1QEsTIS0DObX5OvZmdm
+ NWFOhwJIszqxBqca2jrycJLgqA==
+X-Google-Smtp-Source: ABdhPJz6XkmJvX5hjmcdaIfdUbIKzuxRz6hJn/RCOLM3kCv4aIyILwYHTuG617IunDBh4Y458w/0tg==
+X-Received: by 2002:a05:6e02:b41:b0:2cc:55ae:91b0 with SMTP id
+ f1-20020a056e020b4100b002cc55ae91b0mr334271ilu.126.1650561410732; 
+ Thu, 21 Apr 2022 10:16:50 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- p6-20020a0566022b0600b0064c59797e67sm15044931iov.46.2022.04.21.09.46.37
+ n12-20020a92dd0c000000b002cac22690b6sm12524629ilm.0.2022.04.21.10.16.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 Apr 2022 09:46:37 -0700 (PDT)
-Date: Thu, 21 Apr 2022 16:46:34 +0000
+ Thu, 21 Apr 2022 10:16:49 -0700 (PDT)
+Date: Thu, 21 Apr 2022 17:16:46 +0000
 From: Oliver Upton <oupton@google.com>
 To: Ben Gardon <bgardon@google.com>
-Subject: Re: [RFC PATCH 16/17] KVM: arm64: Enable parallel stage 2 MMU faults
-Message-ID: <YmGKaoStt9Lf9xOP@google.com>
+Subject: Re: [RFC PATCH 10/17] KVM: arm64: Assume a table pte is already
+ owned in post-order traversal
+Message-ID: <YmGRfoVUuDZ2YTyc@google.com>
 References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-17-oupton@google.com>
- <CANgfPd9bb213hsdKTMW9K0EsVLuKEKCF8V0pb6xM1qfnRj1qfw@mail.gmail.com>
+ <20220415215901.1737897-11-oupton@google.com>
+ <CANgfPd-LZf1tkSiFTkJ-rww4Cmaign4bJRsg1KWm5eA2P5=j+A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <CANgfPd9bb213hsdKTMW9K0EsVLuKEKCF8V0pb6xM1qfnRj1qfw@mail.gmail.com>
+In-Reply-To: <CANgfPd-LZf1tkSiFTkJ-rww4Cmaign4bJRsg1KWm5eA2P5=j+A@mail.gmail.com>
 Cc: kvm <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
  Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,70 +94,39 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Apr 21, 2022 at 09:35:27AM -0700, Ben Gardon wrote:
+On Thu, Apr 21, 2022 at 09:11:37AM -0700, Ben Gardon wrote:
 > On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
 > >
-> > Voila! Since the map walkers are able to work in parallel there is no
-> > need to take the write lock on a stage 2 memory abort. Relax locking
-> > on map operations and cross fingers we got it right.
+> > For parallel walks that collapse a table into a block KVM ensures a
+> > locked invalid pte is visible to all observers in pre-order traversal.
+> > As such, there is no need to try breaking the pte again.
 > 
-> Might be worth a healthy sprinkle of lockdep on the functions taking
-> "shared" as an argument, just to make sure the wrong value isn't going
-> down a callstack you didn't expect.
+> When you're doing the pre and post-order traversals, are they
+> implemented as separate traversals from the root, or is it a kind of
+> pre and post-order where non-leaf nodes are visited on the way down
+> and on the way up?
 
-If we're going to go this route we might need to just punch a pointer
-to the vCPU through to the stage 2 table walker. All of this plumbing is
-built around the idea that there are multiple tables to manage and
-needn't be in the context of a vCPU/VM, which is why I went the WARN()
-route instead of better lockdep assertions.
+The latter. We do one walk of the tables and fire the appropriate
+visitor callbacks based on what part of the walk we're in.
 
-> >
-> > Signed-off-by: Oliver Upton <oupton@google.com>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 21 +++------------------
-> >  1 file changed, 3 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 63cf18cdb978..2881051c3743 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1127,7 +1127,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >         gfn_t gfn;
-> >         kvm_pfn_t pfn;
-> >         bool logging_active = memslot_is_logging(memslot);
-> > -       bool use_read_lock = false;
-> >         unsigned long fault_level = kvm_vcpu_trap_get_fault_level(vcpu);
-> >         unsigned long vma_pagesize, fault_granule;
-> >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_R;
-> > @@ -1162,8 +1161,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >         if (logging_active) {
-> >                 force_pte = true;
-> >                 vma_shift = PAGE_SHIFT;
-> > -               use_read_lock = (fault_status == FSC_PERM && write_fault &&
-> > -                                fault_granule == PAGE_SIZE);
-> >         } else {
-> >                 vma_shift = get_vma_page_shift(vma, hva);
-> >         }
-> > @@ -1267,15 +1264,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >         if (exec_fault && device)
-> >                 return -ENOEXEC;
-> >
-> > -       /*
-> > -        * To reduce MMU contentions and enhance concurrency during dirty
-> > -        * logging dirty logging, only acquire read lock for permission
-> > -        * relaxation.
-> > -        */
-> > -       if (use_read_lock)
-> > -               read_lock(&kvm->mmu_lock);
-> > -       else
-> > -               write_lock(&kvm->mmu_lock);
-> > +       read_lock(&kvm->mmu_lock);
-> > +
-> 
-> Ugh, I which we could get rid of the analogous ugly block on x86.
+> I assume either could be made to work, but the re-traversal from the
+> root probably minimizes TLB flushes, whereas the pre-and-post-order
+> would be a more efficient walk?
 
-Maybe we could fold it in to a MMU macro in the arch-generic scope?
-Conditional locking is smelly, I was very pleased to delete these lines :)
+When we need to start doing operations on a whole range of memory this
+way I completely agree (collapse to 2M, shatter to 4K for a memslot,
+etc.).
+
+For the current use cases of the stage 2 walker, to coalesce TLBIs we'd
+need a better science around when to do blast all of stage 2 vs. TLBI with
+an IPA argument. IOW, we go through a decent bit of trouble to avoid
+flushing all of stage 2 unless deemed necessary. And the other unfortunate
+thing about that is I doubt observations are portable between implementations
+so the point where we cut over to a full flush is likely highly dependent
+on the microarch.
+
+Later revisions of the ARM architecture bring us TLBI instructions that
+take a range argument, which could help a lot in this department.
 
 --
 Thanks,
