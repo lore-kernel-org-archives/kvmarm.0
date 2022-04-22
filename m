@@ -2,83 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D038C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 21 Apr 2022 18:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1EC5C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 22 Apr 2022 06:29:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 969714B1FC;
-	Thu, 21 Apr 2022 14:52:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F7214B106;
+	Fri, 22 Apr 2022 02:29:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OtEGV1Gg1+FO; Thu, 21 Apr 2022 14:52:44 -0400 (EDT)
+	with ESMTP id nTf9U48cl0Dt; Fri, 22 Apr 2022 02:29:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A8074B201;
-	Thu, 21 Apr 2022 14:52:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 047524B186;
+	Fri, 22 Apr 2022 02:29:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBFCC4B1F2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 14:52:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EDE24A369
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 02:29:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sjSgIbfb5P9X for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Apr 2022 14:52:41 -0400 (EDT)
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com
- [209.85.166.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7995A4B1AF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 14:52:41 -0400 (EDT)
-Received: by mail-io1-f51.google.com with SMTP id r12so6295389iod.6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 11:52:41 -0700 (PDT)
+ with ESMTP id iUehlwe8FIlp for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Apr 2022 02:28:58 -0400 (EDT)
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com
+ [209.85.167.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D96F849F1C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 02:28:58 -0400 (EDT)
+Received: by mail-oi1-f173.google.com with SMTP id a10so8025077oif.9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2022 23:28:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=swSRzKm5q0U28ACmf4EZZ+mBiZZlElbUcKa/JVKE+ZM=;
- b=Y9EwVZt3dzwUlz1pJbNp8azm9sUrHMHSeQIs/PBxwUytNGxZ115TNfL02V9tL8hebs
- ZEG03FG2kHM+3NIQg3cJDdNbXBR0MV30yoV/0Tix/F8/IOIedGuZcaoiW2HPmqiXG3yS
- ndxajDvVKTZRtUIzRYj/W5l5REF/lu55Uy/0fxSS9aTaFqftB6vJpoy2eauW53zrerbN
- 4Qyf7UQmjdozkvARuY2twSIgusgRapZSMOFzTkcQyJXe+9FMqmYEVb5Hu+7ad6jzsrD8
- GKH9PJ/IarpqPV8r3GBF5uYT97FNePpt8AHpNxBvbqjtHE6ePVpfv67H19NeEH+I8goE
- BfGw==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2YWi9PwvVdEM0HB43jsjfg0IWMgD51LMEFZSeiWndxg=;
+ b=TBAtKYXaj7gRac0H6foE+CfRBOC3mqIjG1B9A/V3qWahVD90ScAevLFadpzFIfHWMo
+ q3v2UcDl8loMG6SKDmWckEoyfW21mWyNaicMhdQDmQmQXcRAAH4QRXapuXpeWx29o169
+ jYLSRV6n5jSJTtsKIT0HI1ZWGqaOVIhxiSNtOa8cycp14GqJuQUo7w6cNcUPBnJxeGBo
+ xRK2BNTMCgxw/mtQpHEz5ALhkYO0lr52xW9j+xAxvLaqHrzRIbujq4ZaUD64f/35db7D
+ BXxaw/mZ2Y3UO210yW8LSNDO072F3KhYghpw4FN5eqOKYPv/Y+6Pkz/n8eEX0tI3Woyf
+ /q/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=swSRzKm5q0U28ACmf4EZZ+mBiZZlElbUcKa/JVKE+ZM=;
- b=gzZHC6PAAWSt0UH0KnW+QtfR5PRG+UxjeXmxWjhO9NjbOHMCFHESNQ38Yl6AslWsTe
- n9Fs4ms0YSPcGcUdIi/4Ci6yxmEViSck7TuKXfZ70Xtnu8xhonzP8zf64M72JmnHR70R
- HqMlJQZZ75uKbtBYbVCkvma5E0q/efzANqCF8BiwR0PEhvqc/SRSn+ncrnScS/vGpAnc
- ry2Dxy4qXEzCInIw5ErbHqRUToEF7kCfzHIBxzRfHCkAStroVkzpKM9Bi4n0oWqVkE4Z
- n3ViBmWd65DW+Kwt9zncL1m6tbjzWRDUpOsX88Nj5Sjq7nTMtH8/hxd9oe0gTvsdFFoX
- mX4w==
-X-Gm-Message-State: AOAM530wWJ5bfbqww7EKQXcrhhrnV4wXY7T6/4DvCd9Gg0VgXwrkL9X9
- g8OuZH4iNYIIH+OKeuPTRG0vmQ==
-X-Google-Smtp-Source: ABdhPJzOfxLyJiiz19R6ch1LlTTcyvQsX0IvVMdBe8ACUJmzB7QDS67cWKXDVE64Ltcl/mJlJaRoFA==
-X-Received: by 2002:a5d:9c87:0:b0:657:2670:35a8 with SMTP id
- p7-20020a5d9c87000000b00657267035a8mr522670iop.42.1650567160292; 
- Thu, 21 Apr 2022 11:52:40 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- t11-20020a922c0b000000b002c85834eb06sm12931384ile.47.2022.04.21.11.52.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 Apr 2022 11:52:38 -0700 (PDT)
-Date: Thu, 21 Apr 2022 18:52:34 +0000
-From: Oliver Upton <oupton@google.com>
-To: Ben Gardon <bgardon@google.com>
-Subject: Re: [RFC PATCH 06/17] KVM: arm64: Implement break-before-make
- sequence for parallel walks
-Message-ID: <YmGn8hVSGWvna02R@google.com>
-References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-7-oupton@google.com>
- <CANgfPd8RLDtmFks0BLEVyHPaEANF93d4iJxHt3n6cKewQsBLuA@mail.gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2YWi9PwvVdEM0HB43jsjfg0IWMgD51LMEFZSeiWndxg=;
+ b=Ru4h1QL/jtztAyIQNmXuVbHUzS31H8W8IOs22pYUCDH5MrVcW9OUojG2Oxm57Ne7LM
+ Zqg+rbvtQe0b/TXA3O+6A06fLtMD/FZEtyJFnAnaQzE/p9TTrfXeY3d2Ppw3q74OAsrY
+ PwNdh07WATcma2ou5v0/7bztQVj8E7aCFvGJFY6KIrI/PopTt7bSSN66u2wUKQlGYftL
+ 23iZnzrsAC/qId5+iGsbfQuH8rL/10zRt1o4Rmp1k3/ZILdLPHoI/bWsBNcUd5wJEy81
+ UzUNNLWOTNGX2J7bt86MM8DxcapGe/DwQ7HqXs8tgDH4Q4tqKtRfsvq3pFdDXaUjTJZJ
+ hGCg==
+X-Gm-Message-State: AOAM530P0XeTpt8be6k3RoTlTXnMOK3ny8dj7S2jr8R0rAJZIFSJP136
+ 5QlIVOlMubCT+VXNUqI8/Fll1TWoxYe414cKj+Nv1g==
+X-Google-Smtp-Source: ABdhPJxR3crf8EBrlb5/vTF5q+PqdAJqznmICkhS1aNRrg57nagdTceYjBKH6EQVCZzkwygdv7G1n0vmZfih0//G1eQ=
+X-Received: by 2002:a05:6808:d4c:b0:322:e7de:fffe with SMTP id
+ w12-20020a0568080d4c00b00322e7defffemr5003846oik.107.1650608938033; Thu, 21
+ Apr 2022 23:28:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CANgfPd8RLDtmFks0BLEVyHPaEANF93d4iJxHt3n6cKewQsBLuA@mail.gmail.com>
-Cc: kvm <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, David Matlack <dmatlack@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel@lists.infradead.org
+References: <20220409184549.1681189-1-oupton@google.com>
+ <20220409184549.1681189-8-oupton@google.com>
+ <CAAeT=FzURZmYfsLJnWMXufBiaZ6Wypan+xK4WxOSM=p=kEnYxA@mail.gmail.com>
+ <CAOQ_Qsg2oNx8Ke7wGy1sU-5Ruq8uCWMKU5VkvTn=co6oRhhXww@mail.gmail.com>
+In-Reply-To: <CAOQ_Qsg2oNx8Ke7wGy1sU-5Ruq8uCWMKU5VkvTn=co6oRhhXww@mail.gmail.com>
+From: Reiji Watanabe <reijiw@google.com>
+Date: Thu, 21 Apr 2022 23:28:42 -0700
+Message-ID: <CAAeT=Fx5Nb0EJ+6825fYxAxF9bK5DHOXNmJiSVGP=JVSbWuCrQ@mail.gmail.com>
+Subject: Re: [PATCH v5 07/13] KVM: arm64: Add support for userspace to suspend
+ a vCPU
+To: Oliver Upton <oupton@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
+ kvm@vger.kernel.org, Joerg Roedel <joro@8bytes.org>,
+ Peter Shier <pshier@google.com>, kvm-riscv@lists.infradead.org,
+ Atish Patra <atishp@atishpatra.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Jim Mattson <jmattson@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,106 +90,169 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Apr 21, 2022 at 09:57:32AM -0700, Ben Gardon wrote:
-> On Fri, Apr 15, 2022 at 2:59 PM Oliver Upton <oupton@google.com> wrote:
+Hi Oliver,
+
+On Wed, Apr 20, 2022 at 8:24 PM Oliver Upton <oupton@google.com> wrote:
+>
+> Hi Reiji,
+>
+> On Wed, Apr 20, 2022 at 8:13 PM Reiji Watanabe <reijiw@google.com> wrote:
 > >
-> > The ARM architecture requires that software use the 'break-before-make'
-> > sequence whenever memory is being remapped. An additional requirement of
-> > parallel page walks is a mechanism to ensure exclusive access to a pte,
-> > thereby avoiding two threads changing the pte and invariably stomping on
-> > one another.
+> > Hi Oliver,
 > >
-> > Roll the two concepts together into a new helper to implement the
-> > 'break' sequence. Use a special invalid pte value to indicate that the
-> > pte is under the exclusive control of a thread. If software walkers are
-> > traversing the tables in parallel, use an atomic compare-exchange to
-> > break the pte. Retry execution on a failed attempt to break the pte, in
-> > the hopes that either the instruction will succeed or the pte lock will
-> > be successfully acquired.
+> > On Sat, Apr 9, 2022 at 11:46 AM Oliver Upton <oupton@google.com> wrote:
+> > >
+> > > Introduce a new MP state, KVM_MP_STATE_SUSPENDED, which indicates a vCPU
+> > > is in a suspended state. In the suspended state the vCPU will block
+> > > until a wakeup event (pending interrupt) is recognized.
+> > >
+> > > Add a new system event type, KVM_SYSTEM_EVENT_WAKEUP, to indicate to
+> > > userspace that KVM has recognized one such wakeup event. It is the
+> > > responsibility of userspace to then make the vCPU runnable, or leave it
+> > > suspended until the next wakeup event.
+> > >
+> > > Signed-off-by: Oliver Upton <oupton@google.com>
+> > > ---
+> > >  Documentation/virt/kvm/api.rst    | 37 +++++++++++++++++++++--
+> > >  arch/arm64/include/asm/kvm_host.h |  1 +
+> > >  arch/arm64/kvm/arm.c              | 49 +++++++++++++++++++++++++++++++
+> > >  include/uapi/linux/kvm.h          |  2 ++
+> > >  4 files changed, 87 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > > index d13fa6600467..d104e34ad703 100644
+> > > --- a/Documentation/virt/kvm/api.rst
+> > > +++ b/Documentation/virt/kvm/api.rst
+> > > @@ -1476,14 +1476,43 @@ Possible values are:
+> > >                                   [s390]
+> > >     KVM_MP_STATE_LOAD             the vcpu is in a special load/startup state
+> > >                                   [s390]
+> > > +   KVM_MP_STATE_SUSPENDED        the vcpu is in a suspend state and is waiting
+> > > +                                 for a wakeup event [arm64]
+> > >     ==========================    ===============================================
+> > >
+> > >  On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
+> > >  in-kernel irqchip, the multiprocessing state must be maintained by userspace on
+> > >  these architectures.
+> > >
+> > > -For arm64/riscv:
+> > > -^^^^^^^^^^^^^^^^
+> > > +For arm64:
+> > > +^^^^^^^^^^
+> > > +
+> > > +If a vCPU is in the KVM_MP_STATE_SUSPENDED state, KVM will emulate the
+> > > +architectural execution of a WFI instruction.
+> > > +
+> > > +If a wakeup event is recognized, KVM will exit to userspace with a
+> > > +KVM_SYSTEM_EVENT exit, where the event type is KVM_SYSTEM_EVENT_WAKEUP. If
+> > > +userspace wants to honor the wakeup, it must set the vCPU's MP state to
+> > > +KVM_MP_STATE_RUNNABLE. If it does not, KVM will continue to await a wakeup
+> > > +event in subsequent calls to KVM_RUN.
+> > > +
+> > > +.. warning::
+> > > +
+> > > +     If userspace intends to keep the vCPU in a SUSPENDED state, it is
+> > > +     strongly recommended that userspace take action to suppress the
+> > > +     wakeup event (such as masking an interrupt). Otherwise, subsequent
+> > > +     calls to KVM_RUN will immediately exit with a KVM_SYSTEM_EVENT_WAKEUP
+> > > +     event and inadvertently waste CPU cycles.
+> > > +
+> > > +     Additionally, if userspace takes action to suppress a wakeup event,
+> > > +     it is strongly recommended that it also restores the vCPU to its
+> > > +     original state when the vCPU is made RUNNABLE again. For example,
+> > > +     if userspace masked a pending interrupt to suppress the wakeup,
+> > > +     the interrupt should be unmasked before returning control to the
+> > > +     guest.
+> > > +
+> > > +For riscv:
+> > > +^^^^^^^^^^
+> > >
+> > >  The only states that are valid are KVM_MP_STATE_STOPPED and
+> > >  KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
+> > > @@ -5985,6 +6014,7 @@ should put the acknowledged interrupt vector into the 'epr' field.
+> > >    #define KVM_SYSTEM_EVENT_SHUTDOWN       1
+> > >    #define KVM_SYSTEM_EVENT_RESET          2
+> > >    #define KVM_SYSTEM_EVENT_CRASH          3
+> > > +  #define KVM_SYSTEM_EVENT_WAKEUP         4
+> > >                         __u32 type;
+> > >                         __u64 flags;
+> > >                 } system_event;
+> > > @@ -6009,6 +6039,9 @@ Valid values for 'type' are:
+> > >     has requested a crash condition maintenance. Userspace can choose
+> > >     to ignore the request, or to gather VM memory core dump and/or
+> > >     reset/shutdown of the VM.
+> > > + - KVM_SYSTEM_EVENT_WAKEUP -- the exiting vCPU is in a suspended state and
+> > > +   KVM has recognized a wakeup event. Userspace may honor this event by
+> > > +   marking the exiting vCPU as runnable, or deny it and call KVM_RUN again.
+> > >
+> > >  Valid flags are:
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > > index f3f93d48e21a..46027b9b80ca 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -46,6 +46,7 @@
+> > >  #define KVM_REQ_RECORD_STEAL   KVM_ARCH_REQ(3)
+> > >  #define KVM_REQ_RELOAD_GICv4   KVM_ARCH_REQ(4)
+> > >  #define KVM_REQ_RELOAD_PMU     KVM_ARCH_REQ(5)
+> > > +#define KVM_REQ_SUSPEND                KVM_ARCH_REQ(6)
+> > >
+> > >  #define KVM_DIRTY_LOG_MANUAL_CAPS   (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE | \
+> > >                                      KVM_DIRTY_LOG_INITIALLY_SET)
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index efe54aba5cce..e9641b86d375 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -444,6 +444,18 @@ bool kvm_arm_vcpu_stopped(struct kvm_vcpu *vcpu)
+> > >         return vcpu->arch.mp_state.mp_state == KVM_MP_STATE_STOPPED;
+> > >  }
+> > >
+> > > +static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       vcpu->arch.mp_state.mp_state = KVM_MP_STATE_SUSPENDED;
+> > > +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> > > +       kvm_vcpu_kick(vcpu);
 > >
-> > Avoid unnecessary DSBs and TLBIs by only completing the sequence if the
-> > evicted pte was valid. For counted non-table ptes drop the reference
-> > immediately. Otherwise, references on tables are dropped in post-order
-> > traversal as the walker must recurse on the pruned subtree.
+> > > +static void kvm_arm_vcpu_suspend(struct kvm_vcpu *vcpu)
+> > > +{
+> > > +       vcpu->arch.mp_state.mp_state = KVM_MP_STATE_SUSPENDED;
+> > > +       kvm_make_request(KVM_REQ_SUSPEND, vcpu);
+> > > +       kvm_vcpu_kick(vcpu);
 > >
-> > All of the new atomics do nothing (for now), as there are a few other
-> > bits of the map walker that need to be addressed before actually walking
-> > in parallel.
-> 
-> I want to make sure I understand the make before break / PTE locking
-> patterns here.
-> Please check my understanding of the following cases:
-> 
-> Case 1: Change a leaf PTE (for some reason)
-> 1. Traverse the page table to the leaf
-> 2. Invalidate the leaf PTE, replacing it with a locked PTE
-> 3. Flush TLBs
-> 4. Replace the locked PTE with the new value
-> 
-> In this case, no need to lock the parent SPTEs, right? This is pretty simple.
+> > Considering the patch 8 will remove the call to kvm_vcpu_kick()
+> > (BTW, I wonder why you wanted to make that change in the patch-8
+> > instead of the patch-7),
+>
+> Squashed the diff into the wrong patch! Marc pointed out this is of
+> course cargo-culted as I was following the pattern laid down by
+> KVM_REQ_SLEEP :)
 
-Right, if we're changing the OA of a leaf PTE. If we are just adjusting
-attributes on a leaf we go through stage2_attr_walker(), which skips
-step 2 and does the rest in this order: 1, 4, 3.
+I see. Thanks for the clarification !
 
-> Case 2:  Drop a page table
-> 1. Traverse to some non-leaf PTE
-> 2. Lock the PTE, invalidating it
-> 3. Recurse into the child page table
-> 4. Lock the PTEs in the child page table. (We need to lock ALL the
-> PTEs here right? I don't think we'd get away with locking only the
-> valid ones)
+> > it looks like we could use the mp_state
+> > KVM_MP_STATE_SUSPENDED instead of using KVM_REQ_SUSPEND.
+> > What is the reason why you prefer to introduce KVM_REQ_SUSPEND
+> > rather than simply using KVM_MP_STATE_SUSPENDED ?
+>
+> I was trying to avoid any heavy refactoring in adding new
+> functionality here, as we handle KVM_MP_STATE_STOPPED similarly (make
+> a request). ARM is definitely a bit different than x86 in the way that
+> we handle the MP states, as x86 doesn't bounce through vCPU requests
+> to do it and instead directly checks the mp_state value.
 
-Right. We can just skip some of the TLBI/DSB dance when making an
-invalid->invalid transition.
+The difference from KVM_MP_STATE_STOPPED is that kvm_arm_vcpu_power_off()
+calls kvm_vcpu_kick(), which made me think having KVM_REQ_SLEEP was
+reasonable (it appears kvm_vcpu_kick() won't be needed there due to
+the same reason as kvm_arm_vcpu_suspend).
 
-> 5. Flush TLBs
-> 6. Unlock the PTE from 2
-> 7. Free the child page after an RCU grace period (via callback)
-> 
-> Case 3: Drop a range of leaf PTEs
-> 1. Traverse the page table to the first leaf
-> 2. For each leaf in the range:
->         a. Invalidate the leaf PTE, replacing it with a locked PTE
-> 3. Flush TLBs
-> 4. unlock the locked PTEs
-> 
-> In this case we have to lock ALL PTEs in the range too, right? My
-> worry about the whole locking scheme is making sure each thread
-> correctly remembers which PTEs it locked versus which might have been
-> locked by other threads.
+> Do you think it's fair to defer on repainting to a later series? We
+> probably will need to touch up the main run loop quite a lot along the
+> way.
 
-Isn't exclusivity accomplished by checking what you get back from the
-xchg()? If I get a locked PTE back, some other thread owns the PTE. If I
-get anything else, then I've taken ownership of that PTE.
+Yes, I'm fine with that :-)
 
-> On x86 we solved this by only locking one SPTE at a time, flushing,
-> then fixing it, but if you're locking a bunch at once it might get
-> complicated.
-> Making this locking scheme work without demolishing performance seems hard.
-
-We only change at most a single active PTE per fault on the stage 2 MMU.
-We do one of three things on that path:
-
- 1. Install a page/block PTE to an empty PTE
- 2. Replace a table PTE with a block PTE
- 3. Replace a block PTE with a table PTE
-
-1 is pretty cheap and can skip flushes altogether.
-
-2 only requires a single TLBI (a big, painful flush of the stage 2 context),
-but child PTEs needn't be flushed.
-
-3 also requires a single TLBI, but can be done with an IPA and level
-hint.
-
-Perhaps the answer is to push teardown into the rcu callback altogether,
-IOW don't mess with links in the subtree until then. At that point
-there's no need for TLBIs nor atomics.
-
---
 Thanks,
-Oliver
+Reiji
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
