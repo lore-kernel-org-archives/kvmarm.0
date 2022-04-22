@@ -2,71 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3651CC433F5
-	for <kvmarm@archiver.kernel.org>; Sat, 23 Apr 2022 08:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E31C433FE
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Apr 2022 08:57:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6FD64B286;
-	Sat, 23 Apr 2022 04:57:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A3A3F4B0F5;
+	Sat, 23 Apr 2022 04:57:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TXPrhwVnh2Qf; Sat, 23 Apr 2022 04:57:08 -0400 (EDT)
+	with ESMTP id suti2YMG4WTH; Sat, 23 Apr 2022 04:57:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE1814B1CA;
-	Sat, 23 Apr 2022 04:57:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0837D4B278;
+	Sat, 23 Apr 2022 04:57:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09D0540C31
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:05:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD6CC4A11C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:05:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kOUghxYo6hHL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Apr 2022 17:05:50 -0400 (EDT)
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com
- [209.85.219.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DCDDB4A104
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:05:50 -0400 (EDT)
-Received: by mail-yb1-f201.google.com with SMTP id
- r5-20020a258285000000b0064577f2c8adso5011802ybk.21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 14:05:50 -0700 (PDT)
+ with ESMTP id 1jzuAEQ3Eyw9 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Apr 2022 17:05:52 -0400 (EDT)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7FA8840C31
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:05:52 -0400 (EDT)
+Received: by mail-pg1-f202.google.com with SMTP id
+ l14-20020a63f30e000000b0039cc65bdc47so5648845pgh.17
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 14:05:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=ktDpzPoEdSrcrUnITrmIICEFHz35bcwHx2m+itC59DQ=;
- b=NuUyT27h7C++sSsmxph7YDVnlVq9JEo2qNd/NHlqu/pFwe1ZaK/DqFkIUFejxWDZ+L
- HCFTyNkmdUQQpAdlAE2EkZPO7+NrKCh3q/AAd7bXPDPhOya7e3i6fTvDCMG8t6hQE5Nd
- LlAD1nOHAruz6us2mg92VCm+qVkIiLQazVDQ+39JAk9pvNX4s290hmOx785CWQUF5t8l
- A5vwsOA/rpOEPfHSx7Z1ShpIwVYbjqEzdgZPGBXOf3vJFRbopVHdJd29zqqqJTdtpec3
- qba+yk3xoqB4ftlQhK5uXzW3eBe511TeE4WQjoUUhYWhQBZEwMZ0EgCcCM4XOXGcpVi/
- 6mZw==
+ :cc; bh=zNWYQ7iy7Yr89sIEde3cCb/Lt3WEldLKJ8vXDlDeSiQ=;
+ b=Ppu58rFHVoI6iW5s1gyFZJw/q+6CTvIq3bwkrX6Bfha1v9ELmxlhB6kBdaxuhU8ALA
+ oZJOS2zzPK79Cbz2PaFtDvWjGOXqa3Vag3MWGfOPw2XmGt9fNogG4PyBnIzfzwu0Cr2Z
+ Z9Yd3xVeeD1MsLLmQbE33yT6gDJNnLmzjIhiqgCNEusUBTkk2ljA7jNZeivTms/fsolS
+ 8ruvMsny7ijFMPJnejhTGx2b5qhO8OcB3N+OLEFjJPIKmS4RB11u8nQzg8mef19nDz4C
+ hY7FnXWyO5/aoBz1LUQ06kXu09Mes4okVgaK01vet3BEhu0IBB9fZXiQPVzHWDrd/mUO
+ dnWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=ktDpzPoEdSrcrUnITrmIICEFHz35bcwHx2m+itC59DQ=;
- b=6e0ZN8DXUklL//aa9xHIapkM6e/jdLkvJd+dRkpVVGpXQsln01pSDAdyxaqaZE6VEc
- D9RJVbcj6ISCjNKPqAAbqKsk1eLso1xFDujBkJNXxNlG4M/PPR0Sg+rjKOcVSfY43Jk4
- IsbJPnx5jCXo2MPnirbQImpT0OZ/dFYd9xa8BxrDXdkAXOPA96edsMkObbWfCwmKZJyz
- NzVFZCtIqRYo3fJVaE+rBtyV1P+dPrACXje6nEWcGQeWNj8ZXb4xFtxmdLyJqUd+u0Cl
- KYNnNSbONqTpl8SmVvXaLFI41511elaYX/kfAwCEfxWLDsaaCqniS/sb6lrebdtlFKCG
- 1Llw==
-X-Gm-Message-State: AOAM532RuaPl0PPG5m+T5kFnNRZ3dGMAhfBPlzLF4XvY+Cj742rMh+Y5
- pMgr14KoC2yu0rkl9bleoDbdTH2HzMQmWQ==
-X-Google-Smtp-Source: ABdhPJznlbTfpPgBcQWgSKtg2XkP7301qyrPyti3UXIeeQDW4BgY3Xl7oEU2Sfv4r0Q1kAkWzLGJ5G98i8gXew==
+ bh=zNWYQ7iy7Yr89sIEde3cCb/Lt3WEldLKJ8vXDlDeSiQ=;
+ b=OkXsMgwGNqHIAmcouSGNIM7n165+vCBgbo2HfJ5mnvoYFfPFtwpLebX1jux0PQi8hj
+ 13AOixFDapryrmULHcNNV2JbdvfQqHB8XeFQgQDx19HnRirc1YkZ47tAsBIs4IpdYWUx
+ UESeg8idDshrEWF5pYdcfulbWOVpZA3rZK8kShQPvwuWTctXT4vFW1//He8Opn31Ub4A
+ IV1x07dA/PVDLoWgZD7l1lE9jTy3b2bRLyrRT174TCX43Dvhf2CNdJ/NChoBaUJgqXEV
+ 0RX2ZGJ7lgN7H0iGvZuXpDXIsbbaD6RGJPkpO2Af0Y5rUa39vQNaDAUSMfZYlU9zhF3G
+ bN1A==
+X-Gm-Message-State: AOAM5305eTN5RNcTgJLz7pLqKjpNsQ9u7QxzbIsoC69pipxMcyGhOnQq
+ 59X7/61PqCRSpakJb0hvPc4ijdeVGwHyFA==
+X-Google-Smtp-Source: ABdhPJyWKXLx2/uwe0ElKVg7hOGiMwOVxhtzWi1NrbfYjD0XJGhsQ6VUWZmhsGO7iXcdNSRimP+xg/0T9I02hg==
 X-Received: from dmatlack-heavy.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a25:bb4a:0:b0:633:92a6:c35 with SMTP id
- b10-20020a25bb4a000000b0063392a60c35mr6239899ybk.121.1650661550035; Fri, 22
- Apr 2022 14:05:50 -0700 (PDT)
-Date: Fri, 22 Apr 2022 21:05:27 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:903:18f:b0:15a:d3e:1e47 with SMTP id
+ z15-20020a170903018f00b0015a0d3e1e47mr6631600plg.54.1650661551615; Fri, 22
+ Apr 2022 14:05:51 -0700 (PDT)
+Date: Fri, 22 Apr 2022 21:05:28 +0000
 In-Reply-To: <20220422210546.458943-1-dmatlack@google.com>
-Message-Id: <20220422210546.458943-2-dmatlack@google.com>
+Message-Id: <20220422210546.458943-3-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220422210546.458943-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH v4 01/20] KVM: x86/mmu: Optimize MMU page cache lookup for all
- direct SPs
+Subject: [PATCH v4 02/20] KVM: x86/mmu: Use a bool for direct
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Sat, 23 Apr 2022 04:57:06 -0400
@@ -99,51 +98,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Commit fb58a9c345f6 ("KVM: x86/mmu: Optimize MMU page cache lookup for
-fully direct MMUs") skipped the unsync checks and write flood clearing
-for full direct MMUs. We can extend this further to skip the checks for
-all direct shadow pages. Direct shadow pages in indirect MMUs (i.e.
-shadow paging) are used when shadowing a guest huge page with smaller
-pages. Such direct shadow pages, like their counterparts in fully direct
-MMUs, are never marked unsynced or have a non-zero write-flooding count.
-
-Checking sp->role.direct also generates better code than checking
-direct_map because, due to register pressure, direct_map has to get
-shoved onto the stack and then pulled back off.
+The parameter "direct" can either be true or false, and all of the
+callers pass in a bool variable or true/false literal, so just use the
+type bool.
 
 No functional change intended.
 
 Reviewed-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
  arch/x86/kvm/mmu/mmu.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 69a30d6d1e2b..3de4cce317e4 100644
+index 3de4cce317e4..dc20eccd6a77 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2028,7 +2028,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 					     int direct,
+@@ -1703,7 +1703,7 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
+ 	mmu_spte_clear_no_track(parent_pte);
+ }
+ 
+-static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct)
++static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, bool direct)
+ {
+ 	struct kvm_mmu_page *sp;
+ 
+@@ -2025,7 +2025,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 					     gfn_t gfn,
+ 					     gva_t gaddr,
+ 					     unsigned level,
+-					     int direct,
++					     bool direct,
  					     unsigned int access)
  {
--	bool direct_mmu = vcpu->arch.mmu->root_role.direct;
  	union kvm_mmu_page_role role;
- 	struct hlist_head *sp_list;
- 	unsigned quadrant;
-@@ -2070,7 +2069,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 			continue;
- 		}
- 
--		if (direct_mmu)
-+		/* unsync and write-flooding only apply to indirect SPs. */
-+		if (sp->role.direct)
- 			goto trace_get_page;
- 
- 		if (sp->unsync) {
-
-base-commit: 150866cd0ec871c765181d145aa0912628289c8a
 -- 
 2.36.0.rc2.479.g8af0fa9b8e-goog
 
