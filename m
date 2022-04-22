@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B95C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF2FC433EF
 	for <kvmarm@archiver.kernel.org>; Sat, 23 Apr 2022 08:57:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D3444B0F7;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5196A4B21A;
 	Sat, 23 Apr 2022 04:57:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mpkl9JHihBIB; Sat, 23 Apr 2022 04:57:13 -0400 (EDT)
+	with ESMTP id 7da6fwtCfLxu; Sat, 23 Apr 2022 04:57:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A37C4B296;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 917884B299;
 	Sat, 23 Apr 2022 04:57:07 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 856E94A11C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:06:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE3B649F1C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:06:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tJnkwxEk6Csp for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Apr 2022 17:05:59 -0400 (EDT)
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
- [209.85.214.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 602294A0FD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:05:59 -0400 (EDT)
-Received: by mail-pl1-f202.google.com with SMTP id
- j10-20020a170903024a00b0015a1050d608so5394035plh.8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 14:05:59 -0700 (PDT)
+ with ESMTP id wWiuui3AQ2kY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Apr 2022 17:06:00 -0400 (EDT)
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
+ [209.85.215.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C3D7D4A11C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:06:00 -0400 (EDT)
+Received: by mail-pg1-f201.google.com with SMTP id
+ q13-20020a638c4d000000b003821725ad66so5625239pgn.23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 14:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=G+IdVJXdYDhurbFroRPmjGDa1DIMEsmyq4Ddc1Azx9o=;
- b=EeyUWY2A4YUtjFoIIod7jT45VsiREZstTaA42bdkZqFNKhVo2SMK/fMIxUhW4DH1tp
- M2aI2Xj1/z4SM30Fmts5NZSRb/yoSP93dC/g5wuByUiwqviCCQZMHJd8+awIag9yc0aG
- N/ppv0ovSpjzHUSA4IrZNIOQK1lRLQIAbn4qQVfPHn+gEeo7QsmjPUzlemhWbjQtgcBz
- FSAj1Hs6lPvHcFyL8Ojoy+4pfj0q+QMsO3hDv221SOACAhNlSJ4zDYZxCZIPdsIjhE7L
- j7xzpZWeRlNkkq3GimoL+K1SHkhvKTMVcYFOO4Mnu7lrezdT7tjUjU6LkPdPgUwbjy0Q
- M9NQ==
+ :cc; bh=EZ6lXuaS+fWlhXKNn5Z8JpVAcYLp2zeP1jB8K8WPgIo=;
+ b=c9IZvAf9/lbIbolLkPnD9B93ep9zv/hzix3WCn+e74Fmjb2P/4TE+CBLjJ8hDC2Mq9
+ cDB//hDlGC6hZ4KlHcTLpYqfZG1xGE+cd+VRxeSUJu6Hm7Aiuxb3wdIRPkUGu/gMv3uE
+ YDQlVgY4NqfyftIukn7TVeVdRCf9XNubptM2eOgvVPOXcUX4+v/ynPLsVe4mBj96Unad
+ JW9x5rF/GyAlRqRU9p5r5qy7//mNfVEJdH4cH5thRpqGPtRs5FWt/YtMEViwXxugkbSl
+ c/r6R21ZsBPm04eZkSMBQ3truwm/JD9O31lNnAaIXX3xIG/vUJTk+FM8rq6d+8Xc1mWI
+ XtTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=G+IdVJXdYDhurbFroRPmjGDa1DIMEsmyq4Ddc1Azx9o=;
- b=TAa+WUxMJzwZ3jIj2xoLCVtCVNFAt+IG6oZBp2JdESGIT7P0hZVVKiJZsaw68piKpv
- Em7sCdnnaqFuW9DsciCSgLwQHQpHpa5s7ZXd2wnh3ZKlrIr9MH66sIbgdKDmLRj2j3oS
- MXhgBQpE9kX1SiSQsijikbA+wzBlZzZoDh/y1NHfnXgkqo4Lki71Z6/Gh/mvrX0TGVSF
- ukGb3julSTwv8IR3KQXRwmqOdUAa2u+ha00SU3Il/E3jGYyqrXZYiNkMu9RF3SYCnIfW
- 0YpSZbR6kQzWwMSRg/tQ9zhmWMhpw6L/PrCgA5wTM1ZcIBecKEhDRb4TtHSaduhEdMOw
- H1Ig==
-X-Gm-Message-State: AOAM532Mpu/vZtFXXiJFnOUkcSdgTFt3d7uQ81tv/Nkp7/Dpyxpsts59
- 2JVlsXnkiDwdOzfNivVB2QTJTIvbF1DvWQ==
-X-Google-Smtp-Source: ABdhPJwwvXSyIvHO4DIC1Zg0E+/dsC/+AVEA3dqe0F5WNIeQzUllDkrwU+ob9coEjnUqWO2CMgBhrQNjgYpxUQ==
+ bh=EZ6lXuaS+fWlhXKNn5Z8JpVAcYLp2zeP1jB8K8WPgIo=;
+ b=Agh8PuqK1zBN6amL3Xc5dIrgKDIY/xA1m5GJcLP/LeOU0zZ4MmPYXUCpnoyHgfIoE2
+ mfVyMBtt0X4zaqPpthYG7+rU07Ve/+SxAdwTExVryFiZbFeC/GI5wSxjVeqyCWhp6qas
+ 2W5ul4G4bGtMnCgnSxctbuGuK5ku3cHgpYVCbHfJFxYcAJ5STlDXFB9yL0d9U3n0b9ES
+ u83hkXY0ACpSg/03PCrUskOreYaiZcsRalEGo6djjycLSxl1sOBAYJ5dxrDCy0AkM3zD
+ R6bG3SVedxcnlLG4cjrF6syOf9q3FFy/YFgiMwPz0cUg2CsO/MqzEm/e1qlMA7yLC7f2
+ afAw==
+X-Gm-Message-State: AOAM530TEdzSU/h6bJdbppbG5K8k4Fr0MoODGV2gjWVefcVMH6CgAt6f
+ P/ubVudbMNozAU+D3HJAi+WIb0Bydymz5w==
+X-Google-Smtp-Source: ABdhPJzeRPLDKYvrDf1cDSUjbw4PRRYcM20/mlPk3ZQsllbTvdzlIbLo6Pq0AisuhgcyHRC442gDS2XxX07z5w==
 X-Received: from dmatlack-heavy.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a62:170b:0:b0:50a:6901:b633 with SMTP id
- 11-20020a62170b000000b0050a6901b633mr6951474pfx.34.1650661558373; Fri, 22 Apr
- 2022 14:05:58 -0700 (PDT)
-Date: Fri, 22 Apr 2022 21:05:32 +0000
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:1a05:b0:50c:f9b5:6c7e with SMTP
+ id g5-20020a056a001a0500b0050cf9b56c7emr2359480pfv.55.1650661559952; Fri, 22
+ Apr 2022 14:05:59 -0700 (PDT)
+Date: Fri, 22 Apr 2022 21:05:33 +0000
 In-Reply-To: <20220422210546.458943-1-dmatlack@google.com>
-Message-Id: <20220422210546.458943-7-dmatlack@google.com>
+Message-Id: <20220422210546.458943-8-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220422210546.458943-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH v4 06/20] KVM: x86/mmu: Rename shadow MMU functions that deal
- with shadow pages
+Subject: [PATCH v4 07/20] KVM: x86/mmu: Move guest PT write-protection to
+ account_shadowed()
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Sat, 23 Apr 2022 04:57:06 -0400
@@ -99,77 +99,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Rename 2 functions:
+Move the code that write-protects newly-shadowed guest page tables into
+account_shadowed(). This avoids a extra gfn-to-memslot lookup and is a
+more logical place for this code to live. But most importantly, this
+reduces kvm_mmu_alloc_shadow_page()'s reliance on having a struct
+kvm_vcpu pointer, which will be necessary when creating new shadow pages
+during VM ioctls for eager page splitting.
 
-  kvm_mmu_get_page() -> kvm_mmu_get_shadow_page()
-  kvm_mmu_free_page() -> kvm_mmu_free_shadow_page()
-
-This change makes it clear that these functions deal with shadow pages
-rather than struct pages. It also aligns these functions with the naming
-scheme for kvm_mmu_find_shadow_page() and kvm_mmu_alloc_shadow_page().
-
-Prefer "shadow_page" over the shorter "sp" since these are core
-functions and the line lengths aren't terrible.
+Note, it is safe to drop the role.level == PG_LEVEL_4K check since
+account_shadowed() returns early if role.level > PG_LEVEL_4K.
 
 No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 7d03320f6e08..fa7846760887 100644
+index fa7846760887..4f894db88bbf 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1665,7 +1665,7 @@ static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
- 	percpu_counter_add(&kvm_total_used_mmu_pages, nr);
+@@ -807,6 +807,9 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 						    KVM_PAGE_TRACK_WRITE);
+ 
+ 	kvm_mmu_gfn_disallow_lpage(slot, gfn);
++
++	if (kvm_mmu_slot_gfn_write_protect(kvm, slot, gfn, PG_LEVEL_4K))
++		kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
  }
  
--static void kvm_mmu_free_page(struct kvm_mmu_page *sp)
-+static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
- {
- 	MMU_WARN_ON(!is_empty_shadow_page(sp->spt));
- 	hlist_del(&sp->hash_link);
-@@ -2109,8 +2109,9 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
+ void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+@@ -2100,11 +2103,9 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
+ 	sp->gfn = gfn;
+ 	sp->role = role;
+ 	hlist_add_head(&sp->hash_link, sp_list);
+-	if (!role.direct) {
++
++	if (!role.direct)
+ 		account_shadowed(vcpu->kvm, sp);
+-		if (role.level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
+-			kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
+-	}
+ 
  	return sp;
  }
- 
--static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
--					     union kvm_mmu_page_role role)
-+static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
-+						    gfn_t gfn,
-+						    union kvm_mmu_page_role role)
- {
- 	struct hlist_head *sp_list;
- 	struct kvm_mmu_page *sp;
-@@ -2170,7 +2171,7 @@ static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
- 	union kvm_mmu_page_role role;
- 
- 	role = kvm_mmu_child_role(sptep, direct, access);
--	return kvm_mmu_get_page(vcpu, gfn, role);
-+	return kvm_mmu_get_shadow_page(vcpu, gfn, role);
- }
- 
- static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
-@@ -2446,7 +2447,7 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- 
- 	list_for_each_entry_safe(sp, nsp, invalid_list, link) {
- 		WARN_ON(!sp->role.invalid || sp->root_count);
--		kvm_mmu_free_page(sp);
-+		kvm_mmu_free_shadow_page(sp);
- 	}
- }
- 
-@@ -3373,7 +3374,7 @@ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
- 	if (role.has_4_byte_gpte)
- 		role.quadrant = quadrant;
- 
--	sp = kvm_mmu_get_page(vcpu, gfn, role);
-+	sp = kvm_mmu_get_shadow_page(vcpu, gfn, role);
- 	++sp->root_count;
- 
- 	return __pa(sp->spt);
 -- 
 2.36.0.rc2.479.g8af0fa9b8e-goog
 
