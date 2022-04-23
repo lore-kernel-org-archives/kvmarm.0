@@ -2,80 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC135C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 22 Apr 2022 21:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71639C4332F
+	for <kvmarm@archiver.kernel.org>; Sat, 23 Apr 2022 00:03:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 38C774A49C;
-	Fri, 22 Apr 2022 17:49:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DD12549F5B;
+	Fri, 22 Apr 2022 20:03:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id X9rvb-GhggvN; Fri, 22 Apr 2022 17:49:05 -0400 (EDT)
+	with ESMTP id Zsgg3m08yYOA; Fri, 22 Apr 2022 20:03:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 857764B0C2;
-	Fri, 22 Apr 2022 17:49:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 712444A11C;
+	Fri, 22 Apr 2022 20:03:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EA0B4A193
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:49:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF47B49F24
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 20:03:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SwOLM3t6X083 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Apr 2022 17:49:03 -0400 (EDT)
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com
- [209.85.166.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58F8C49F44
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:49:03 -0400 (EDT)
-Received: by mail-io1-f44.google.com with SMTP id r12so9972494iod.6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 14:49:03 -0700 (PDT)
+ with ESMTP id ZhClQSa-LW63 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 Apr 2022 20:03:36 -0400 (EDT)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 192B949EE0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 20:03:36 -0400 (EDT)
+Received: by mail-pl1-f202.google.com with SMTP id
+ f11-20020a170902684b00b00158c67ef30cso5596766pln.7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2022 17:03:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Wqxk/7BWwKhDbIHiaUdzBDMbMgVZ3yRG1SK0Ix0NMTU=;
- b=O+rU6Jlxdx3sjpU8SpvNtEOHSoylnhjDYkTP99JS87zk8xt54LYOPh9o+072XLOaDk
- Z+89i8rH7C1ZPQn2mGJdCB/CRnsvE9pAcJ6FybN+4xfCpCQchsdI/HaoIAg3bJEnZVkH
- k9UbKMzgATyYX+W2rdi15ekS3g21egGW25TECXUlBGB2fwT/zOu7jkwEKqOt1Kn7kM0k
- CRgDO4poVjqs8ZZF/NUSYqpsUOpt5vnnNZM1iBFbuTI1talVCJ/QI389nAFjLTgHNTVn
- bz7T3wvgKTZ3YKhseH5iHl1qpH/kWFVS3ceWAy2W+kSylWmnHJQkP6vIhxoqxUxH/peV
- Wpyg==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=I25CgQrC03wUH8djR8sT/DJu7ots1TCSoyKpEeegV7I=;
+ b=SQ+BxBqt76bJMvu7Mq8z0tuuvAkO96pNooJa1ZlctEAxCNml3/gsedozXuT9/f82Ic
+ ktm0n69EWKscdtrkX21UIo5ryATG8t5fSAZL+2Nanw4QMYuc0krcAi/vEBy5F/lqk94t
+ LXAXfD70IWLHIBH2RFIfOIvxwaiFbwaAXF72m8cKHO2dN8ws+hxP9NKjOjGmOZRLnvxY
+ UvCrDdUv52d6Vsrlp1m7sWxKTF2/m45gCMvN/0Y1Fg+BeoPOXHLcrd3OEo2GPVES0h3q
+ 8F4DrgeFgCjeOg97Y9Pbi2ySQS133gOIOEocTE6tvw1mmSTSQ0eJaggiH0bl7VXTr82w
+ vZQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Wqxk/7BWwKhDbIHiaUdzBDMbMgVZ3yRG1SK0Ix0NMTU=;
- b=K+5jyUejxdLJ8EMxARx+FvpL+Q11AKDQ8lygmRWmmD32c8ae/kTUAgm16DeofUQN6E
- KnWuyTYIG1W1QP4ZNzAf8eDMmMzqhxtlwY0722c8z58HAgN/FYjwFDrIllGq8TO6WtE5
- HIDIKJcuja7Vtrsd+TkzcaOVD/SqK8bD7ura0KCyQhZAZzHU7n1qviwl/oecNEODu98z
- c60/5tNn2gU7nsLqjLEems+e0+ThjpXuvrJ+CWmZsy7+/1XKX6LTMl6YfF/aD2tpmQsI
- K36HkXRUSmkZhaPXZOrehOh9DhQug4UefPaV3sW9p8xC5nEqhwII35Frny/Tes6q5l7c
- cZTQ==
-X-Gm-Message-State: AOAM530xnoTSc0c5VL5S4f9VyPYSdEB/bL/oFWlgD1a8DG26WA9vyg2K
- 8YVvl/KE1M7O3qZ4WdemVptHSA==
-X-Google-Smtp-Source: ABdhPJxFrY69lvePMpjbME6SDx+A/cbPBDwjdJ1k4CPYAtnQCgb9hI+2EQqelXg5xz5r5XBurSZ4Hw==
-X-Received: by 2002:a05:6638:d06:b0:326:ba0:347 with SMTP id
- q6-20020a0566380d0600b003260ba00347mr2922518jaj.68.1650664142366; 
- Fri, 22 Apr 2022 14:49:02 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- l14-20020a05660227ce00b00645ebb013c1sm2690453ios.45.2022.04.22.14.49.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 Apr 2022 14:49:01 -0700 (PDT)
-Date: Fri, 22 Apr 2022 21:48:58 +0000
-From: Oliver Upton <oupton@google.com>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 03/18] KVM: arm64: Add SDEI virtualization
- infrastructure
-Message-ID: <YmMiyt/TDjJt0mdG@google.com>
-References: <20220403153911.12332-1-gshan@redhat.com>
- <20220403153911.12332-4-gshan@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220403153911.12332-4-gshan@redhat.com>
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=I25CgQrC03wUH8djR8sT/DJu7ots1TCSoyKpEeegV7I=;
+ b=lYtRagWr5+sZ6OItXJt+IuREVg/mm4u0XIpu8GOox5a3eTNficUJX+AfjcbJGbUlhD
+ jfH3TlUOWoQkLoBVHGa2KpENjGk4Q1B9awVHCqyXPUATNpG+olz8+BiX+eewObPHXf6h
+ b1VqajOPi1dHg4mRBcrOI/cjBUlaRvKnWfj7Ixiqn6fQ0OMKAQratjFmRQh08k2zBV4T
+ DlG6Y7ZpwSE2QQbGGwOpWAAg5usAJpTH8X3K8cI6/0mxesbZk5AtI7Wk3F51fCaQhPI5
+ NTUqC6QmS3Bu+7+v4Flps8AKbWDO7GaCfoQArjp6g0t0aU9FuDERWcInK25qN4Yv//LY
+ da1A==
+X-Gm-Message-State: AOAM530w6wuiWlVyynomEGGF7hEXw7NqLE3weDh4Ms1P3S9avpkv4VVE
+ 44Akfuy9EkYSTh020jpQ5bPRTd9al9P8
+X-Google-Smtp-Source: ABdhPJwuZihfx6qJUrmmHuxp5VAUYuLU2X4R5NvRYhrQdTyMfTkVJ/u60r5eZoWMOv+odY5vjyCIDY42iIkK
+X-Received: from rananta-virt.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a17:902:a712:b0:158:9e75:686c with SMTP id
+ w18-20020a170902a71200b001589e75686cmr7451022plq.56.1650672214882; Fri, 22
+ Apr 2022 17:03:34 -0700 (PDT)
+Date: Sat, 23 Apr 2022 00:03:19 +0000
+Message-Id: <20220423000328.2103733-1-rananta@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
+Subject: [PATCH v6 0/9] KVM: arm64: Add support for hypercall services
+ selection
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>, 
+ James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,346 +88,224 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Apr 03, 2022 at 11:38:56PM +0800, Gavin Shan wrote:
-> Software Delegated Exception Interface (SDEI) provides a mechanism
-> for registering and servicing system events, as defined by ARM DEN0054C
-> specification. One of these events will be used by Asynchronous Page
-> Fault (Async PF) to deliver notifications from host to guest.
-> 
-> The events are classified into shared and private ones according to
-> their scopes. The shared events are system or VM scoped, but the
-> private events are CPU or VCPU scoped. The shared events can be
-> registered, enabled, unregistered and reset through hypercalls
-> issued from any VCPU. However, the private events are registered,
-> enabled, unregistered and reset on the calling VCPU through
-> hypercalls. Besides, the events are also classified into critical
-> and normal events according their priority. During event delivery
-> and handling, the normal event can be preempted by another critical
-> event, but not in reverse way. The critical event is never preempted
-> by another normal event.
+Hello,
 
-We don't have any need for critical events though, right? We should avoid
-building out the plumbing around the concept of critical events until
-there is an actual use case for it.
+Continuing the discussion from [1], the series tries to add support
+for the userspace to elect the hypercall services that it wishes
+to expose to the guest, rather than the guest discovering them
+unconditionally. The idea employed by the series was taken from
+[1] as suggested by Marc Z.
 
-> This introduces SDEI virtualization infrastructure for various objects
-> used in the implementation. Currently, we don't support the shared
-> event.
-> 
->   * kvm_sdei_exposed_event
->     The event which are defined and exposed by KVM. The event can't
->     be registered until it's exposed. Besides, all the information
->     in this event can't be changed after it's exposed.
-> 
->   * kvm_sdei_event
->     The events are created based on the exposed events. Their states
->     are changed when hypercalls are received or they are delivered
->     to guest for handling.
-> 
->   * kvm_sdei_vcpu_context
->     The vcpu context helps to handle events. The interrupted context
->     is saved before the event handler is executed, and restored after
->     the event handler is to finish.
-> 
->   * kvm_sdei_vcpu
->     Place holder for all objects for one particular VCPU.
-> 
-> The error of SDEI_NOT_SUPPORTED is returned for all hypercalls for now.
-> They will be supported one by one in the subsequent patches.
-> 
-> Link: https://developer.arm.com/documentation/den0054/latest
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |   1 +
->  arch/arm64/include/asm/kvm_sdei.h | 148 ++++++++++++++++++++++++++++++
->  arch/arm64/kvm/Makefile           |   2 +-
->  arch/arm64/kvm/arm.c              |   4 +
->  arch/arm64/kvm/hypercalls.c       |   3 +
->  arch/arm64/kvm/sdei.c             |  98 ++++++++++++++++++++
->  include/uapi/linux/arm_sdei.h     |   4 +
->  7 files changed, 259 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/include/asm/kvm_sdei.h
->  create mode 100644 arch/arm64/kvm/sdei.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index e3b25dc6c367..7644a400c4a8 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -343,6 +343,7 @@ struct kvm_vcpu_arch {
->  	 * Anything that is not used directly from assembly code goes
->  	 * here.
->  	 */
-> +	struct kvm_sdei_vcpu *sdei;
->  
->  	/*
->  	 * Guest registers we preserve during guest debugging.
-> diff --git a/arch/arm64/include/asm/kvm_sdei.h b/arch/arm64/include/asm/kvm_sdei.h
-> new file mode 100644
-> index 000000000000..2dbfb3ae0a48
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/kvm_sdei.h
-> @@ -0,0 +1,148 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Definitions of various KVM SDEI events.
-> + *
-> + * Copyright (C) 2022 Red Hat, Inc.
-> + *
-> + * Author(s): Gavin Shan <gshan@redhat.com>
-> + */
-> +
-> +#ifndef __ARM64_KVM_SDEI_H__
-> +#define __ARM64_KVM_SDEI_H__
-> +
-> +#include <uapi/linux/arm_sdei.h>
-> +#include <linux/arm-smccc.h>
-> +#include <linux/bits.h>
-> +#include <linux/spinlock.h>
-> +
-> +/*
-> + * The event which are defined and exposed by KVM. The event can't
-> + * be registered until it's exposed. Besides, all the information
-> + * in this event can't be changed after it's exposed.
-> + */
+In a broad sense, the concept is similar to the current implementation
+of PSCI interface- create a 'firmware psuedo-register' to handle the
+firmware revisions. The series extends this idea to all the other
+hypercalls such as TRNG (True Random Number Generator), PV_TIME
+(Paravirtualized Time), and PTP (Precision Time protocol).
 
-kernel doc style comments are highly preferable when describing a
-complex struct. Figuring out what each of the fields mean is not
-obvious.
+For better categorization and future scaling, these firmware registers
+are categorized based on the service call owners. Also, unlike the
+existing firmware psuedo-registers, they hold the features supported
+in the form of a bitmap.
 
-> +struct kvm_sdei_exposed_event {
-> +	unsigned int	num;
-> +	unsigned char	type;
-> +	unsigned char	signaled;
+During the VM initialization, the registers holds an upper-limit of
+the features supported by each one of them. It's expected that the
+userspace discover the features provided by each register via GET_ONE_REG,
+and writeback the desired values using SET_ONE_REG. KVM allows this
+modification only until the VM has started.
 
-what is this used for?
+Some of the standard function-ids, such as ARM_SMCCC_VERSION_FUNC_ID,
+need not be associated with a feature bit. For such ids, the series
+introduced an allowed-list (in kvm_hvc_call_default_allowed()), that holds
+all such ids. As a result, the functions that are not elected by userspace,
+or if they are not a part of this allowed-list, will be denied for when
+the guests invoke them.
 
-> +	unsigned char	priority;
-> +};
+Older VMMs can simply ignore this interface and the hypercall services
+will be exposed unconditionally to the guests, thus ensuring backward
+compatibility.
 
-I don't think we have a need for this struct. ::type will always be set
-to PRIVATE and ::priority will always be NORMAL.
+The patches are based off of mainline kernel 5.18-rc3, with the selftest
+patches from [2] applied.
 
-> +/*
-> + * Currently, only the private events are supported. The events are
-> + * created based on the exposed events and their states are changed
-> + * when hypercalls are received or they are delivered to guest for
-> + * handling.
-> + */
-> +struct kvm_sdei_event {
-> +	struct kvm_sdei_exposed_event	*exposed_event;
+Patch-1 factors out the non-PSCI related interface from psci.c to
+hypercalls.c, as the series would extend the list in the upcoming
+patches.
 
-I'm not following what is meant by an exposed event. By default the
-KVM will expose all of the events to its guests.
+Patch-2 sets up the framework for the bitmap firmware psuedo-registers.
+It includes read/write support for the registers, and a helper to check
+if a particular hypercall service is supported for the guest.
+It also adds the register KVM_REG_ARM_STD_HYP_BMAP to support ARM's
+standard secure services.
 
-> +	unsigned char			route_mode;
-> +	unsigned long			route_affinity;
+Patch-3 introduces the firmware register, KVM_REG_ARM_STD_HYP_BMAP,
+which holds the standard hypervisor services (such as PV_TIME).
 
-If we only have private events, do we need to worry about routing?
+Patch-4 introduces the firmware register, KVM_REG_ARM_VENDOR_HYP_BMAP,
+which holds the vendor specific hypercall services.
 
-> +	unsigned long			ep_address;
-> +	unsigned long			ep_arg;
-> +#define KVM_SDEI_EVENT_STATE_REGISTERED		BIT(0)
-> +#define KVM_SDEI_EVENT_STATE_ENABLED		BIT(1)
-> +#define KVM_SDEI_EVENT_STATE_UNREGISTER_PENDING	BIT(2)
-> +	unsigned long			state;
+Patch-5,6 Add the necessary documentation for the newly added firmware
+registers.
 
-Isn't this state actually local to a PE (not VM) for private events?
+Patch-7 imports the SMCCC definitions from linux/arm-smccc.h into tools/
+for further use in selftests.
 
-> +	unsigned long			event_count;
-> +};
-> +
-> +/*
-> + * The vcpu context helps to handle events. The preempted or interrupted
-> + * context is saved before the event handler is executed, and restored
-> + * after the event handler is to finish. The event with normal priority
-> + * can be preempted by the one with critical priority. So there can be
-> + * two contexts on one particular vcpu for the events with normal and
-> + * critical priority separately.
-> + */
-> +struct kvm_sdei_vcpu_context {
-> +	struct kvm_sdei_event	*event;
+Patch-8 adds the selftest to test the guest (using 'hvc') and userspace
+interfaces (SET/GET_ONE_REG).
 
-Do we need this if we disallow nesting events?
+Patch-9 adds these firmware registers into the get-reg-list selftest.
 
-> +	unsigned long		regs[18];
-> +	unsigned long		pc;
-> +	unsigned long		pstate;
-> +};
-> +
-> +struct kvm_sdei_vcpu {
-> +	spinlock_t			lock;
+[1]: https://lore.kernel.org/kvmarm/874kbcpmlq.wl-maz@kernel.org/T/
+[2]: https://lore.kernel.org/all/20220409184549.1681189-1-oupton@google.com/
 
-Why do we need a lock? This state should only ever be messed with in the
-context of a single vCPU to which we already have exclusive access.
+Regards,
+Raghavendra
 
-> +	struct kvm_sdei_event		*events;
-> +	unsigned char			masked;
-> +	unsigned long			critical_event_count;
-> +	unsigned long			normal_event_count;
-> +	struct kvm_sdei_vcpu_context	context[SDEI_EVENT_PRIORITY_CRITICAL + 1];
-> +};
-> +
-> +/*
-> + * According to SDEI specification (v1.1), the event number spans 32-bits
-> + * and the lower 24-bits are used as the (real) event number. I don't
-> + * think we can use that much event numbers in one system. So we reserve
-> + * two bits from the 24-bits real event number, to indicate its types:
-> + * physical or virtual event. One reserved bit is enough for now, but
-> + * two bits are reserved for possible extension in future.
-> + *
-> + * The physical events are owned by firmware while the virtual events
-> + * are used by VMM and KVM.
+v5 -> v6:
 
-Doesn't KVM own everything? I don't see how the guest could interact
-with another SDEI implementation.
+Addressed the comments by Marc and Gavin:
 
-> + */
-> +#define KVM_SDEI_EVENT_NUM_TYPE_SHIFT	22
-> +#define KVM_SDEI_EVENT_NUM_TYPE_MASK	(3 << KVM_SDEI_EVENT_NUM_TYPE_SHIFT)
-> +#define KVM_SDEI_EVENT_NUM_TYPE_PHYS	0
-> +#define KVM_SDEI_EVENT_NUM_TYPE_VIRT	1
-> +
-> +static inline bool kvm_sdei_is_virtual(unsigned int num)
-> +{
-> +	unsigned int type;
-> +
-> +	type = (num & KVM_SDEI_EVENT_NUM_TYPE_MASK) >>
-> +	       KVM_SDEI_EVENT_NUM_TYPE_SHIFT;
-> +	if (type == KVM_SDEI_EVENT_NUM_TYPE_VIRT)
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
-> +static inline bool kvm_sdei_is_sw_signaled(unsigned int num)
-> +{
-> +	return num == SDEI_SW_SIGNALED_EVENT;
-> +}
+- Bitmaps are represented using 'unsigned long' inctead of 'u64' (Marc).
+- Replaced the array holding the allowed-list,
+  hvc_func_default_allowed_list[], which looked up the func_id using a
+  loop, with a switch-case statement (Marc).
+- kvm_arm_set_fw_reg_bmap() now always returns -EBUSY for any 'write' of
+  the bitmap value after the VM has started running. Documentation is
+  adjusted accordingly (Marc).
+- kvm_psci_func_id_is_valid() is moved from an inline function to
+  kvm/psci.c (Marc).
+- Merged ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID into bit-0 of the vendor
+  hypervisor firmware register (Gavin).
+- Macro optimizations and replace arg0 with arg1 (to comply with KVM
+  convention) in hypercalls.c selftest (Gavin).
+- Dropped the patch v5 10/10 (Add KVM_REG_ARM_FW_REG(3) to get-reg-list)
+  as it was already uploaded by Andrew.
+- Fixed typos
 
-Couldn't the caller just check the event number on their own?
+v4 -> v5:
 
-> +static inline bool kvm_sdei_is_supported(unsigned int num)
-> +{
-> +	return kvm_sdei_is_sw_signaled(num) ||
-> +	       kvm_sdei_is_virtual(num);
-> +}
+Addressed comments by Oliver (thank you!):
 
-Is there ever going to be a situation where KVM has defined a new event
-but doesn't actually support it?
+- Rebased the series to accommodate ARM_SMCCC_ARCH_WORKAROUND_3
+  and PSCI 1.1 changes, and capturing VM's first run.
+- Removed the patches related to register scoping (v4 02/13 and
+  03/13). I plan to re-introduce them in its own series.
+- Dropped the patch that captures VM's first run.
+- Moved the bitmap feature firmware registers to its own CORPOC
+  space (0x0016).
+- Move the KVM_REG_ARM_*_BIT_MAX definitions from uapi header
+  to internal header (arm_hypercalls.h).
+- Renamed the hypercall descriptor to 'struct kvm_smccc_features',
+  and kvm_hvc_call_supported() to kvm_hvc_call_allowed().
+- Introduced an allowed-list to hold the function-ids that aren't
+  represented by feature-bits.
+- Introduced kvm_psci_func_id_is_valid() to check if a given
+  function-id is a valid PSCI id, which is used in
+  kvm_hvc_call_allowed().
+- Introduced KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT as bit-0 of
+  KVM_REG_ARM_VENDOR_HYP_BMAP register and
+  KVM_REG_ARM_VENDOR_HYP_BIT_PTP is moved to bit-1.
+- Updated the arm-smccc.h import to include the definition of
+  ARM_SMCCC_ARCH_WORKAROUND_3.
+- Introduced the KVM_REG_ARM_FW_FEAT_BMAP COPROC definition to
+  get-reg-list selftest.
+- Created a new patch to include KVM_REG_ARM_FW_REG(3) in
+  get-reg-list.
 
-> +static inline bool kvm_sdei_is_critical(unsigned char priority)
-> +{
-> +	return priority == SDEI_EVENT_PRIORITY_CRITICAL;
-> +}
-> +
-> +static inline bool kvm_sdei_is_normal(unsigned char priority)
-> +{
-> +	return priority == SDEI_EVENT_PRIORITY_NORMAL;
-> +}
-> +
-> +#define KVM_SDEI_REGISTERED_EVENT_FUNC(func, field)			\
-> +static inline bool kvm_sdei_is_##func(struct kvm_sdei_event *event)	\
-> +{									\
-> +	return !!(event->state & KVM_SDEI_EVENT_STATE_##field);		\
-> +}									\
-> +									\
-> +static inline void kvm_sdei_set_##func(struct kvm_sdei_event *event)	\
-> +{									\
-> +	event->state |= KVM_SDEI_EVENT_STATE_##field;			\
-> +}									\
-> +									\
-> +static inline void kvm_sdei_clear_##func(struct kvm_sdei_event *event)	\
-> +{									\
-> +	event->state &= ~KVM_SDEI_EVENT_STATE_##field;			\
-> +}
-> +
-> +KVM_SDEI_REGISTERED_EVENT_FUNC(registered, REGISTERED)
-> +KVM_SDEI_REGISTERED_EVENT_FUNC(enabled, ENABLED)
-> +KVM_SDEI_REGISTERED_EVENT_FUNC(unregister_pending, UNREGISTER_PENDING)
 
-Are there any particular concerns about open coding the bitwise
-operations that are getting wrapped here? test_bit()/set_bit() is also a
-helpful construct.
+v3 -> v4
 
-> +/* APIs */
-> +int kvm_sdei_call(struct kvm_vcpu *vcpu);
-> +void kvm_sdei_create_vcpu(struct kvm_vcpu *vcpu);
-> +void kvm_sdei_destroy_vcpu(struct kvm_vcpu *vcpu);
-> +
-> +#endif /* __ARM64_KVM_SDEI_H__ */
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 261644b1a6bb..d6ced92ae3f0 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -14,7 +14,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->  	 inject_fault.o va_layout.o handle_exit.o \
->  	 guest.o debug.o reset.o sys_regs.o \
->  	 vgic-sys-reg-v3.o fpsimd.o pmu.o pkvm.o \
-> -	 arch_timer.o trng.o vmid.o \
-> +	 arch_timer.o trng.o vmid.o sdei.o \
->  	 vgic/vgic.o vgic/vgic-init.o \
->  	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
->  	 vgic/vgic-v3.o vgic/vgic-v4.o \
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 523bc934fe2f..227c0e390571 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -38,6 +38,7 @@
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_mmu.h>
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_sdei.h>
->  #include <asm/sections.h>
->  
->  #include <kvm/arm_hypercalls.h>
-> @@ -331,6 +332,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  
->  	kvm_arm_pvtime_vcpu_init(&vcpu->arch);
->  
-> +	kvm_sdei_create_vcpu(vcpu);
-> +
->  	vcpu->arch.hw_mmu = &vcpu->kvm->arch.mmu;
->  
->  	err = kvm_vgic_vcpu_init(vcpu);
-> @@ -352,6 +355,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
->  	kvm_timer_vcpu_terminate(vcpu);
->  	kvm_pmu_vcpu_destroy(vcpu);
-> +	kvm_sdei_destroy_vcpu(vcpu);
->  
->  	kvm_arm_vcpu_destroy(vcpu);
->  }
-> diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> index b659387d8919..6aa027a4cee8 100644
-> --- a/arch/arm64/kvm/hypercalls.c
-> +++ b/arch/arm64/kvm/hypercalls.c
-> @@ -5,6 +5,7 @@
->  #include <linux/kvm_host.h>
->  
->  #include <asm/kvm_emulate.h>
-> +#include <asm/kvm_sdei.h>
->  
->  #include <kvm/arm_hypercalls.h>
->  #include <kvm/arm_psci.h>
-> @@ -93,6 +94,8 @@ static int kvm_hvc_standard(struct kvm_vcpu *vcpu, u32 func)
->  	case PSCI_1_1_FN_SYSTEM_RESET2:
->  	case PSCI_1_1_FN64_SYSTEM_RESET2:
->  		return kvm_psci_call(vcpu);
-> +	case SDEI_1_0_FN_SDEI_VERSION ... SDEI_1_1_FN_SDEI_FEATURES:
-> +		return kvm_sdei_call(vcpu);
+Addressed comments and took suggestions by Reiji, Oliver, Marc,
+Sean and Jim:
 
-I mentioned in another thread, but reraising here on the new diff.
-Prefer using the defined function [start, end] range in this switch
-statement.
+- Renamed and moved the VM has run once check to arm64.
+- Introduced the capability to dynamically modify the register
+  encodings to include the scope information.
+- Replaced mutex_lock with READ_ONCE and WRITE_ONCE when the
+  bitmaps are accessed.
+- The hypercalls selftest re-runs with KVM_CAP_ARM_REG_SCOPE
+  enabled.
 
-Overall, I think this still puts a lot of abstraction around the concept
-of SDEI events, even though we have a very narrow use case for it in KVM
-for now. Removing all of the plumbing for critical and shared events
-should help collapse this quite a bit.
+v2 -> v3
 
---
-Thanks,
-Oliver
+Addressed comments by Marc and Andrew:
+
+- Dropped kvm_vcpu_has_run_once() implementation.
+- Redifined kvm_vm_has_run_once() as kvm_vm_has_started() in the core
+  KVM code that introduces a new field, 'vm_started', to track this.
+- KVM_CAP_ARM_HVC_FW_REG_BMAP returns the number of psuedo-firmware
+  bitmap registers upon a 'read'. Support for 'write' removed.
+- Removed redundant spinlock, 'fw_reg_bmap_enabled' fields from the
+  hypercall descriptor structure.
+- A separate sub-struct to hold the bitmap info is removed. The bitmap
+  info is directly stored in the hypercall descriptor structure
+  (struct kvm_hvc_desc).
+
+v1 -> v2
+
+Addressed comments by Oliver (thanks!):
+
+- Introduced kvm_vcpu_has_run_once() and kvm_vm_has_run_once() in the
+  core kvm code, rather than relying on ARM specific
+  vcpu->arch.has_run_once.
+- Writing to KVM_REG_ARM_PSCI_VERSION is done in hypercalls.c itself,
+  rather than separating out to psci.c.
+- Introduced KVM_CAP_ARM_HVC_FW_REG_BMAP to enable the extension.
+- Tracks the register accesses from VMM to decide whether to sanitize
+  a register or not, as opposed to sanitizing upon the first 'write'
+  in v1.
+- kvm_hvc_call_supported() is implemented using a direct switch-case
+  statement, instead of looping over all the registers to pick the
+  register for the function-id.
+- Replaced the register bit definitions with #defines, instead of enums.
+- Removed the patch v1-06/08 that imports the firmware register
+  definitions as it's not needed.
+- Separated out the documentations in its own patch, and the renaming
+  of hypercalls.rst to psci.rst into another patch.
+- Add the new firmware registers to get-reg-list KVM selftest.
+
+v1: https://lore.kernel.org/kvmarm/20211102002203.1046069-1-rananta@google.com/
+v2: https://lore.kernel.org/kvmarm/20211113012234.1443009-1-rananta@google.com/
+v3: https://lore.kernel.org/linux-arm-kernel/20220104194918.373612-1-rananta@google.com/
+v4: https://lore.kernel.org/lkml/20220224172559.4170192-1-rananta@google.com/
+v5: https://lore.kernel.org/lkml/20220407011605.1966778-1-rananta@google.com/
+
+Raghavendra Rao Ananta (9):
+  KVM: arm64: Factor out firmware register handling from psci.c
+  KVM: arm64: Setup a framework for hypercall bitmap firmware registers
+  KVM: arm64: Add standard hypervisor firmware register
+  KVM: arm64: Add vendor hypervisor firmware register
+  Docs: KVM: Rename psci.rst to hypercalls.rst
+  Docs: KVM: Add doc for the bitmap firmware registers
+  tools: Import ARM SMCCC definitions
+  selftests: KVM: aarch64: Introduce hypercall ABI test
+  selftests: KVM: aarch64: Add the bitmap firmware registers to
+    get-reg-list
+
+ Documentation/virt/kvm/api.rst                |  16 +
+ Documentation/virt/kvm/arm/hypercalls.rst     | 135 +++++++
+ Documentation/virt/kvm/arm/psci.rst           |  77 ----
+ arch/arm64/include/asm/kvm_host.h             |  16 +
+ arch/arm64/include/uapi/asm/kvm.h             |  16 +
+ arch/arm64/kvm/arm.c                          |   1 +
+ arch/arm64/kvm/guest.c                        |  10 +-
+ arch/arm64/kvm/hypercalls.c                   | 313 +++++++++++++++-
+ arch/arm64/kvm/psci.c                         | 186 +---------
+ include/kvm/arm_hypercalls.h                  |  17 +
+ include/kvm/arm_psci.h                        |   9 +-
+ tools/include/linux/arm-smccc.h               | 193 ++++++++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/get-reg-list.c      |   8 +
+ .../selftests/kvm/aarch64/hypercalls.c        | 335 ++++++++++++++++++
+ 16 files changed, 1065 insertions(+), 269 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/hypercalls.rst
+ delete mode 100644 Documentation/virt/kvm/arm/psci.rst
+ create mode 100644 tools/include/linux/arm-smccc.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
+
+-- 
+2.36.0.rc2.479.g8af0fa9b8e-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
