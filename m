@@ -2,72 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53CBBC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 17:14:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56736C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 17:26:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C41144B19F;
-	Mon, 25 Apr 2022 13:14:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D03EB4B266;
+	Mon, 25 Apr 2022 13:26:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id thnL08rr1H2v; Mon, 25 Apr 2022 13:14:20 -0400 (EDT)
+	with ESMTP id xNc89xIB6yHr; Mon, 25 Apr 2022 13:26:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDD154A19A;
-	Mon, 25 Apr 2022 13:14:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CBEDA4B24D;
+	Mon, 25 Apr 2022 13:26:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AB4B4B262
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:14:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 88EC14B242
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:26:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Y1Bqy95XJvxz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Apr 2022 13:14:17 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D881F4B241
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:14:17 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id B74F661521;
- Mon, 25 Apr 2022 17:14:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F3DC385A7;
- Mon, 25 Apr 2022 17:14:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1650906856;
- bh=30Xz83WjEjlPuGd160S3OWJ2GpjN1lAzqyn8HINC7ls=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=spuipJBRHJwnDWhFTncEFli4zdLKIZZbYgxNMmI1s8C3wJh9cHq9Dpwmx/Dm0VimT
- XLWE5qIiybFAzOWn1AZ8esybrFrlnwYsuaGVLuz5pzj2aAc9ifnAE/jTGJXpJ8QIr7
- nnS+CC/BhzPLTfpvK32WsVncQjf9XqzsOqq9oOqqd5uDy1NS8FNtEabu3uf9GSmuZ/
- Z2bxovHHu3PlkzxN//yxqIX8+Vnn0yHXSN93ZtJl9n3qD8lrzjx8AGO87gzPulhNai
- pdEzhOmUYLPEy8xzz/Bqi3ku6qRxLtiCf31ibq6mGtD7RDapXiJBxZ5LBMkkDAhXvC
- 6WzL43KHXu8Cg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nj2Ht-006qcE-Iv; Mon, 25 Apr 2022 18:14:13 +0100
-Date: Mon, 25 Apr 2022 18:14:13 +0100
-Message-ID: <875ymx9jbu.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
+ with ESMTP id so3N6tMmppwb for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Apr 2022 13:26:41 -0400 (EDT)
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com
+ [209.85.167.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 712DB4B229
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:26:41 -0400 (EDT)
+Received: by mail-lf1-f50.google.com with SMTP id x17so27439433lfa.10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 10:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ha/LOnKGhTGVaztiB1JL1yTrZhDFJAw4NzQBXSs32Ng=;
+ b=ACxvZKfaGvgVZaysmoOgq+T93j3yCM4R01sMQMFvsNCcg2mSZRVtHmalMKsO15xE2C
+ kNPcuM//xAXKxdPasBwQ0p3tUJhi98neEiJfFnKLW/U8J32zyh95szJpqh+tZWXHfumb
+ DBUosvntVNDoifE1mIcDRE6/BjJ6y5b1v+C+HCaHScoRdVxgafrL9S8X/CelblJ6GYBZ
+ +IIPH7XjHcLmHqJUis4wR8pB4H5g1uZnIC8e1x6+bB+LTDWNqkrvHJZKngsWFtFDEtO+
+ Nyn260vtbZF9nLDeNde1lqsQ1xDwypX5e0PpE5v5DbBWx+g9Pa+Yioul3sa92SXdoqVw
+ yVrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ha/LOnKGhTGVaztiB1JL1yTrZhDFJAw4NzQBXSs32Ng=;
+ b=CvT2zibqfjnfJPt3aJqixvV+l9tflSYTeL//eZ1pNQxIwvw2m5GyabjH96RPe1SecQ
+ P8ZQ6Cvv9gShPh0sLkYmtwGUMHRrPJE5ZUk/CHjnvfTzrgv8uWjw9rL6aNFoj2rTPlCC
+ TJDEJeVUfrwsVLc18MyGXYEvZ8OdUomu8cC3F7MPFpQsj2VrmyEb4+a7PxufzHeKwUjK
+ RBcNXolQ2UigJgkAAEFX3lc+zvprMBK1niXkPQ5RLtEwkNreDO+imGpVgQWOPbdTMZw9
+ 2m4G1x+9UfjjZjjS0wzt2zzopuAzTXAMPl/hfTPYtxK5z1dxgr0qJAnoif58zHUsNvuQ
+ v2oA==
+X-Gm-Message-State: AOAM53326s1QW+tfXfr6nYbKq0rFovLWlFr9u6dYQZK+KDQatHwEC9yo
+ brh7P+jCa/fdrlABuAq0vtUpq7yF/csIoZVCUxpFRg==
+X-Google-Smtp-Source: ABdhPJzM68lr0W5NEFudBKNRx7c+jwYJA0+DOpxrKiFAHQo8gznQckMNvnnqklGGRaUrAoL3MDJQ9O53GhnJXFjOark=
+X-Received: by 2002:ac2:4ac9:0:b0:471:f6da:640d with SMTP id
+ m9-20020ac24ac9000000b00471f6da640dmr9106672lfp.286.1650907599836; Mon, 25
+ Apr 2022 10:26:39 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220425145530.723858-1-alexandru.elisei@arm.com>
+ <875ymx9jbu.wl-maz@kernel.org>
+In-Reply-To: <875ymx9jbu.wl-maz@kernel.org>
+From: Oliver Upton <oupton@google.com>
+Date: Mon, 25 Apr 2022 10:26:28 -0700
+Message-ID: <CAOQ_Qsj+jVT49Lb9GgkYE8OEE2K_0qEJ1YstHvH3crpCNQehtQ@mail.gmail.com>
 Subject: Re: [PATCH] KVM/arm64: Don't emulate a PMU for 32-bit guests if
  feature not set
-In-Reply-To: <20220425145530.723858-1-alexandru.elisei@arm.com>
-References: <20220425145530.723858-1-alexandru.elisei@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
- suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, oupton@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+To: Marc Zyngier <maz@kernel.org>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -85,37 +83,21 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-[+ Oliver]
+Howdy,
 
-Hi Alex,
+On Mon, Apr 25, 2022 at 10:14 AM Marc Zyngier <maz@kernel.org> wrote:
+> Although I'm not opposed to this as an immediate workaround to avoid
+> the ugly crash, I think sanitising the AArch32 regs is the way to go.
+> Oliver had a stab at this a few weeks back[1], but this seem to have
+> stalled.
 
-On Mon, 25 Apr 2022 15:55:30 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> kvm->arch.arm_pmu is set when userspace attempts to set the first PMU
-> attribute. As certain attributes are mandatory, arm_pmu ends up always
-> being set to a valid arm_pmu, otherwise KVM will refuse to run the VCPU.
-> However, this only happens if the VCPU has the PMU feature. If the VCPU
-> doesn't have the feature bit set, kvm->arch.arm_pmu will be left
-> uninitialized and equal to NULL.
+Planning on sending out a new spin this week, I had been juggling a
+few too many things since mailing that one out :) I was honestly
+surprised nothing had blown up yet!
 
-Although I'm not opposed to this as an immediate workaround to avoid
-the ugly crash, I think sanitising the AArch32 regs is the way to go.
-Oliver had a stab at this a few weeks back[1], but this seem to have
-stalled.
-
-Could you have a look and see if anything was missing (the patches
-needed some rework, but I haven't checked whether DFR0 was correctly
-handled or not).
-
+--
 Thanks,
-
-	M.
-
-[1] https://lore.kernel.org/r/20220401010832.3425787-1-oupton@google.com
-
--- 
-Without deviation from the norm, progress is not possible.
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
