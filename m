@@ -2,76 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA58C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 17:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53CBBC433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 17:14:22 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71B4D4B26A;
-	Mon, 25 Apr 2022 13:12:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C41144B19F;
+	Mon, 25 Apr 2022 13:14:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KtRbaN0I2bI0; Mon, 25 Apr 2022 13:12:47 -0400 (EDT)
+	with ESMTP id thnL08rr1H2v; Mon, 25 Apr 2022 13:14:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 664B34B287;
-	Mon, 25 Apr 2022 13:12:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BDD154A19A;
+	Mon, 25 Apr 2022 13:14:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EEF504B241
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:12:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0AB4B4B262
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:14:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fpRTHrZpx-s0 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Apr 2022 13:12:45 -0400 (EDT)
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com
- [209.85.208.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEA9A4B298
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:12:44 -0400 (EDT)
-Received: by mail-lj1-f169.google.com with SMTP id bn33so18659650ljb.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 10:12:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=N7fee2Yrx0qNzoi9PdXZ5hx4nrnlVdrW/GV2fmMxG2M=;
- b=acRadtvAlYLUZrCmq9O5iI5dPYliXwwNI96yUgxN2vvYnQyHFYWbIq3YSk6wxSOnDA
- GX9RTiQdnHyQtA4OQ7FAx/eRuBe2F7nW7K20QiBw/g4p0zT/aDNIb6GoMhyOYCqluUsp
- w966oKCZq/KG44LRlyljtZupZ4wx32aOVe7+Hy5Wp+N7xnx+tccplGXtnJVAGCdgqJyB
- 1sBDmWynVnSD+y20tg/j5uLrhve94nndrnKPQyKku8wVj2d2fT/EX/EyAnZIXYqJGaZp
- x6AKN+qlvspopkwCnb+v9+yZhH/oDM5Srj9sWSLPXfpmXjBom7/BSqtbI/xONPkGOToT
- 8cJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=N7fee2Yrx0qNzoi9PdXZ5hx4nrnlVdrW/GV2fmMxG2M=;
- b=QGy2f4J2Es8Ty5L+hDg/IUr2x0hj9QmVuDZReYgTWjI/dxDGK97ZS0VRP/O5LT41uB
- QuE77m0HIHHCT6GL+V7+MeyN1cvhc7DItv7sOWUNvfz5kb9s8J3mJfxihXGCH9BZ2S84
- jwf/RrqifjsdAmh+Epdhq7b01FptlHPDDSL2466U+6ZhCZPPOplpTTQg47HOnhhQZbFt
- bCmK0jTlf95mAtbjHIokr4uzU/NaMTlIWnLzpLj/fAGOXhYIjUJ6OnqGnZy2D801KW0M
- MAM7F1ggQeI4ft9QZRRdYEiPkRBBFYtW+OIoXlNCWIet6lLYfLTRhIM5bDmaS5Z07Uz4
- WPxA==
-X-Gm-Message-State: AOAM53096UiHjEcpJJ2Uc5OWU/g3sRXvmxi40OmoeuA/jK0mgUo/8HG7
- ajTDX8AGJAbVKlUa+kzI/KrZfWQu6Fv11Rh3tDwHiQ==
-X-Google-Smtp-Source: ABdhPJxUrJi15zmGDPYrRdXhEhm6WWYpITF+DKeRbw52izZPXspEXizuIrsiftQCpGs1t6FoJos6DDldjOwxUQ8ZRFY=
-X-Received: by 2002:a2e:5c6:0:b0:24f:5bd:5f89 with SMTP id
- 189-20020a2e05c6000000b0024f05bd5f89mr7433707ljf.170.1650906763210; 
- Mon, 25 Apr 2022 10:12:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220423000328.2103733-1-rananta@google.com>
- <20220423000328.2103733-5-rananta@google.com>
- <CAAeT=Fyc3=uoOdeXrLKfYxKtL3PFV0U_Bwj_g+bca_Em63wGhw@mail.gmail.com>
- <CAJHc60zR4Pa=y-Y4Dp27FoAvqpBrONCN727KbnhSoxNGRiBGuA@mail.gmail.com>
-In-Reply-To: <CAJHc60zR4Pa=y-Y4Dp27FoAvqpBrONCN727KbnhSoxNGRiBGuA@mail.gmail.com>
-From: Oliver Upton <oupton@google.com>
-Date: Mon, 25 Apr 2022 10:12:32 -0700
-Message-ID: <CAOQ_QsjFtyy1AFq5c-jLSY-r9fWEL4H5fuKNbt9QcFirnU2wmg@mail.gmail.com>
-Subject: Re: [PATCH v6 4/9] KVM: arm64: Add vendor hypervisor firmware register
-To: Raghavendra Rao Ananta <rananta@google.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
- Linux ARM <linux-arm-kernel@lists.infradead.org>
+ with ESMTP id Y1Bqy95XJvxz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Apr 2022 13:14:17 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D881F4B241
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:14:17 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B74F661521;
+ Mon, 25 Apr 2022 17:14:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F3DC385A7;
+ Mon, 25 Apr 2022 17:14:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1650906856;
+ bh=30Xz83WjEjlPuGd160S3OWJ2GpjN1lAzqyn8HINC7ls=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=spuipJBRHJwnDWhFTncEFli4zdLKIZZbYgxNMmI1s8C3wJh9cHq9Dpwmx/Dm0VimT
+ XLWE5qIiybFAzOWn1AZ8esybrFrlnwYsuaGVLuz5pzj2aAc9ifnAE/jTGJXpJ8QIr7
+ nnS+CC/BhzPLTfpvK32WsVncQjf9XqzsOqq9oOqqd5uDy1NS8FNtEabu3uf9GSmuZ/
+ Z2bxovHHu3PlkzxN//yxqIX8+Vnn0yHXSN93ZtJl9n3qD8lrzjx8AGO87gzPulhNai
+ pdEzhOmUYLPEy8xzz/Bqi3ku6qRxLtiCf31ibq6mGtD7RDapXiJBxZ5LBMkkDAhXvC
+ 6WzL43KHXu8Cg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nj2Ht-006qcE-Iv; Mon, 25 Apr 2022 18:14:13 +0100
+Date: Mon, 25 Apr 2022 18:14:13 +0100
+Message-ID: <875ymx9jbu.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH] KVM/arm64: Don't emulate a PMU for 32-bit guests if
+ feature not set
+In-Reply-To: <20220425145530.723858-1-alexandru.elisei@arm.com>
+References: <20220425145530.723858-1-alexandru.elisei@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, oupton@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,34 +85,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Apr 25, 2022 at 9:52 AM Raghavendra Rao Ananta
-<rananta@google.com> wrote:
+[+ Oliver]
 
-[...]
+Hi Alex,
 
-> > > +#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX    1
-> >
-> > Nit: IMHO perhaps it might be more convenient to define the MAX macro
-> > in arch/arm64/include/uapi/asm/kvm.h like below for maintenance ?
-> > (The same comments are applied to other KVM_REG_ARM_*_BMAP_BIT_MAX)
-> >
-> > #define KVM_REG_ARM_VENDOR_HYP_BIT_MAX KVM_REG_ARM_VENDOR_HYP_BIT_PTP
-> >
-> We have been going back and forth on this :)
-> It made sense for me to keep it in uapi as well, but I took Oliver's
-> suggestion of keeping it outside of uapi since this is something that
-> could be constantly changing [1].
+On Mon, 25 Apr 2022 15:55:30 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> kvm->arch.arm_pmu is set when userspace attempts to set the first PMU
+> attribute. As certain attributes are mandatory, arm_pmu ends up always
+> being set to a valid arm_pmu, otherwise KVM will refuse to run the VCPU.
+> However, this only happens if the VCPU has the PMU feature. If the VCPU
+> doesn't have the feature bit set, kvm->arch.arm_pmu will be left
+> uninitialized and equal to NULL.
 
-The maximum set of features in a given bitmap register is a property
-of the running system, not the headers chosen at compile time. There
-is an illusion of ABI breakage when adding new bits to the registers
-if we've declared the max bit in UAPI. We also define
-KVM_VCPU_MAX_FEATURES outside of UAPI, even though it is related to
-the KVM_ARM_VCPU_INIT ioctl.
+Although I'm not opposed to this as an immediate workaround to avoid
+the ugly crash, I think sanitising the AArch32 regs is the way to go.
+Oliver had a stab at this a few weeks back[1], but this seem to have
+stalled.
 
---
+Could you have a look and see if anything was missing (the patches
+needed some rework, but I haven't checked whether DFR0 was correctly
+handled or not).
+
 Thanks,
-Oliver
+
+	M.
+
+[1] https://lore.kernel.org/r/20220401010832.3425787-1-oupton@google.com
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
