@@ -2,67 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C58C4C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 18:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A8BC433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 18:55:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2369D4B14C;
-	Mon, 25 Apr 2022 14:55:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CE6C4B172;
+	Mon, 25 Apr 2022 14:55:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Bf91QzPkYNkQ; Mon, 25 Apr 2022 14:55:40 -0400 (EDT)
+	with ESMTP id FMQaQPCz5aBV; Mon, 25 Apr 2022 14:55:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5B884B176;
-	Mon, 25 Apr 2022 14:55:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 146204B1AB;
+	Mon, 25 Apr 2022 14:55:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B31834B0B6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 14:55:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31D014B14C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 14:55:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BT7+rdpQD821 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Apr 2022 14:55:38 -0400 (EDT)
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com
- [209.85.215.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79A6949F21
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 14:55:38 -0400 (EDT)
-Received: by mail-pg1-f201.google.com with SMTP id
- bj12-20020a056a02018c00b003a9eebaad34so9709570pgb.10
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 11:55:38 -0700 (PDT)
+ with ESMTP id 4CgjKzxVC36v for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Apr 2022 14:55:39 -0400 (EDT)
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
+ [209.85.214.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA47449F21
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 14:55:39 -0400 (EDT)
+Received: by mail-pl1-f201.google.com with SMTP id
+ g12-20020a170902740c00b0015d243ff163so1396566pll.19
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 11:55:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=9uTx7aTaC/NLaRkZRYuxSBWgFNaFafQzTssLeV88+wE=;
- b=Vi135yAFeO7udOCeaAa8g8PncqQD2Ti8D7eIsZ9O8PAJC26ERr+D4WKGvoixtnbZ2L
- dS/iSNj7XHFYkqFy8Up8eXFm+y0Vo2GhK8LiEqFwVmQ477NM8lLnuXifuwtpL0QP/XXG
- SzNIiUEB1BdR+K/o5y5QHPjTqjl5BoqbnrmC5CcG+ZZJ/Myi9hPqtJdr0iYNQWvP/QCA
- n3Ssf09NH9HuWxTyV+oBoDu7wA1mzHvbyq6fKKnncF9StIwEtFO43Ni5HD8NkkLpyWjg
- FSTGxuZcQ7GCPGA/GOHjKIBWWf20DAtfZOTBBIxRK/a1cdrWcUXsuxwzCkI2qwKNHRj8
- i64A==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=App4pplJsXE3FSLveDz2wmuYECqKUpv5nRO4FPRMmdg=;
+ b=OieVH6OuAfaxBsYvBLUU1Sm/Bcg4piHqTSLuniJiKMzzb4Xb16uXADea01sLsL4MAK
+ wDX1d7cBRGuFcE+zVI9UdbPijX959HcyTqyEj8Oyd9CHx2RbY5Gg/UJKckIzoXNhjpwG
+ nlOhyym9t3CatcGPYQBzDGTjL2MQn7KXkNBfwGSvIJ3duLRNfDFmeVoLSvFVFsnPs2Gc
+ uQeFF/yYp/aPspxGQiRHZuuzJlJFax+r3NvffkHFw1mh5gDg4zSzuIQIY8ofV//yr9FX
+ ULdcMozo96Szyd446gkKtArxqxKEmj/Zi3hgjOCYZmsmT9D50KOdAZkZnTNwGGXYrT2I
+ wMxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=9uTx7aTaC/NLaRkZRYuxSBWgFNaFafQzTssLeV88+wE=;
- b=HHjHKUDwSEPOrX4pcUxv295pfVcobsekqiCdUWP1ZfVRVM0dCOQ7jVipUPk1TA6it1
- yUbSr8FpTMCnX/kvr4DEx+YEzeD/tzojgrcWrawi+e44yMA/tFP2FUVuS+S5epoGQLCA
- /Z96y8TZXfho9wrVeHV9NEO3ThlwiW+BcI8diZNnB6fC7+VGrdLMxo3EV4lV/mX89fsp
- 979Ds2pkwrgLa9zBD8jUpJNsK4EadE3bJl64FiAuK/Ndw2R3sSrJzXVs9fM/P7h3rOBN
- xNcGqO63B8NxqKm8DqqWfHMpXxA/8FH9F/Vcucbl21xi+xaFqhUB+cu53nzrYnNn9VCL
- AjMg==
-X-Gm-Message-State: AOAM530dTw300heUhiJzX00+wTgL53zwVmiixtw/f4bG4nky8RM0L+Cl
- Rit/yFyJwURPCKqunVbpy1eYQ3wylwtnHA==
-X-Google-Smtp-Source: ABdhPJzOSq9KMsDtiV7Cd14lQTX8+JymxLFUZW8dIG/X1TgjjURDXo3mDbViGv4RE7oF9qVFy4VQIL1bAyTxdw==
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=App4pplJsXE3FSLveDz2wmuYECqKUpv5nRO4FPRMmdg=;
+ b=qfIdkR9g//4sKmIkp8uRTQhAolT7oH90ycZE31+FxMbGOGPugx50S0bZI24OceBaCi
+ zEbzOBC375y7LMaSi/7iDmPChC7dqZCSadTLM6S7yIatxKatPw+EOQd8mPIK/smJJYYV
+ +FIT4nkuOjGQUcOB0L5QitMiX5E1MpN/J55bMKdFKE5Wc4neds9OCi9feufqjHMAvJ2Z
+ XzMWCZ3REqKDCB6hMdyElxfixFcqg7e2vGgsDia+QOvT30wqNb/U5Ly33SXd6S0BhM/x
+ SAdckRr+Sqg5zaObmoNTZg6k+/+7rcvnRfLrw9oQ13+uX3W8AzM2yCJ8tM3+/aFs1+Cd
+ Bnrw==
+X-Gm-Message-State: AOAM532KX5PixaQFRkJEUXetGuAURUR4wMQ+cJqAMdUR8ohBVr6lyT47
+ 9XEpUpd9z1d0+WxKGPcdgKRY7zTDBeTiHg==
+X-Google-Smtp-Source: ABdhPJzYxv4uwobEhJ21IyQVq7NfTTMu6gZl02k/SyTvc11h4OxfW1IUxPS6HRejSd+Y+JUa91cic71EvRwL+Q==
 X-Received: from ricarkol2.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:90a:c986:b0:1d9:56e7:4e83 with SMTP
- id w6-20020a17090ac98600b001d956e74e83mr692123pjt.1.1650912936913; Mon, 25
- Apr 2022 11:55:36 -0700 (PDT)
-Date: Mon, 25 Apr 2022 11:55:30 -0700
-Message-Id: <20220425185534.57011-1-ricarkol@google.com>
+ (user=ricarkol job=sendgmr) by 2002:a17:902:9041:b0:159:e08:5f4b with SMTP id
+ w1-20020a170902904100b001590e085f4bmr19351313plz.33.1650912938814; Mon, 25
+ Apr 2022 11:55:38 -0700 (PDT)
+Date: Mon, 25 Apr 2022 11:55:31 -0700
+In-Reply-To: <20220425185534.57011-1-ricarkol@google.com>
+Message-Id: <20220425185534.57011-2-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20220425185534.57011-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH 0/4] KVM: arm64: vgic: Misc ITS fixes
+Subject: [PATCH 1/4] KVM: arm64: vgic: Check that new ITEs could be saved in
+ guest memory
 From: Ricardo Koller <ricarkol@google.com>
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: andre.przywara@arm.com, pshier@google.com, maz@kernel.org,
@@ -83,57 +87,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The purpose of this series is to help debugging failed ITS saves and
-restores.  Failures can be due to misconfiguration on the guest side:
-tables with bogus base addresses, or the guest overwriting L1 indirect
-tables. KVM can't do much in these cases, but one thing it can do to help
-is raising errors as soon as possible. Here are a couple of cases where
-KVM could do more:
+A command that adds an entry into an ITS table that is not in guest
+memory should fail, as any command should be treated as if it was
+actually saving entries in guest memory (KVM doesn't until saving).
+Add the corresponding check for the ITT when adding ITEs.
 
-- A command that adds an entry into an ITS table that is not in guest
-  memory should fail, as any command should be treated as if it was
-  actually saving entries in guest memory (KVM doesn't until saving).  KVM
-  does this check for collections and devices (using vgic_its_check_id),
-  but it doesn't for the ITT (Interrupt Translation Table). Commit #1 adds
-  the missing check.
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arch/arm64/kvm/vgic/vgic-its.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-- Restoring the ITS tables does some checks for corrupted tables, but not
-  as many as in a save.  For example, a device ID overflowing the table
-  will be detected on save but not on restore.  The consequence is that
-  restoring a corrupted table won't be detected until the next save;
-  including the ITS not working as expected after the restore. As an
-  example, if the guest sets tables overlapping each other, this would most
-  likely result in some corrupted table; and this is what we would see from
-  the host point of view:
-
-	guest sets bogus baser addresses
-	save ioctl
-	restore ioctl
-	save ioctl (fails)
-
-  This failed save could happen many days after the first operation, so it
-  would be hard to track down. Commit #2 adds some checks into restore:
-  like checking that the ITE entries are not repeated.
-
-- Restoring a corrupted collection entry is being ignored. Commit #3 fixes
-  this while trying to organize the code so to make the bug more obvious
-  next time.
-
-Finally, failed restores should clean up all intermediate state. Commit #4
-takes care of cleaning up everything created until the restore was deemed a
-failure.
-
-Tested with kvm-unit-tests ITS tests.
-
-Ricardo Koller (4):
-  KVM: arm64: vgic: Check that new ITEs could be saved in guest memory
-  KVM: arm64: vgic: Add more checks when restoring ITS tables
-  KVM: arm64: vgic: Do not ignore vgic_its_restore_cte failures
-  KVM: arm64: vgic: Undo work in failed ITS restores
-
- arch/arm64/kvm/vgic/vgic-its.c | 91 ++++++++++++++++++++++++++++++----
- 1 file changed, 80 insertions(+), 11 deletions(-)
-
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index 2e13402be3bd..d7c1a3a01af4 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -976,6 +976,37 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+ 	return ret;
+ }
+ 
++/*
++ * Check whether an event ID can be stored in the corresponding Interrupt
++ * Translation Table, which starts at device->itt_addr.
++ */
++static bool vgic_its_check_ite(struct vgic_its *its, struct its_device *device,
++		u32 event_id)
++{
++	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
++	int ite_esz = abi->ite_esz;
++	gpa_t gpa;
++	gfn_t gfn;
++	int idx;
++	bool ret;
++
++	/* max table size is: BIT_ULL(device->num_eventid_bits) * ite_esz */
++	if (event_id >= BIT_ULL(device->num_eventid_bits))
++		return false;
++
++	gpa = device->itt_addr + event_id * ite_esz;
++	gfn = gpa >> PAGE_SHIFT;
++
++	idx = srcu_read_lock(&its->dev->kvm->srcu);
++	ret = kvm_is_visible_gfn(its->dev->kvm, gfn);
++	srcu_read_unlock(&its->dev->kvm->srcu, idx);
++	return ret;
++}
++
++/*
++ * Adds a new collection into the ITS collection table.
++ * Returns 0 on success, and a negative error value for generic errors.
++ */
+ static int vgic_its_alloc_collection(struct vgic_its *its,
+ 				     struct its_collection **colp,
+ 				     u32 coll_id)
+@@ -1076,6 +1107,9 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+ 	if (find_ite(its, device_id, event_id))
+ 		return 0;
+ 
++	if (!vgic_its_check_ite(its, device, event_id))
++		return E_ITS_MAPTI_ID_OOR;
++
+ 	collection = find_collection(its, coll_id);
+ 	if (!collection) {
+ 		int ret = vgic_its_alloc_collection(its, &collection, coll_id);
 -- 
 2.36.0.rc2.479.g8af0fa9b8e-goog
 
