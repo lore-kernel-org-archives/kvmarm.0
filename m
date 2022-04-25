@@ -2,43 +2,46 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00DB4C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 11:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 464D3C433FE
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 11:45:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7243F49EBE;
-	Mon, 25 Apr 2022 07:45:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CAB6249EF3;
+	Mon, 25 Apr 2022 07:45:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Eb7XLMZolKbN; Mon, 25 Apr 2022 07:44:58 -0400 (EDT)
+	with ESMTP id DuuMkJvgzA2I; Mon, 25 Apr 2022 07:45:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6678749E32;
-	Mon, 25 Apr 2022 07:44:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8373049F4A;
+	Mon, 25 Apr 2022 07:45:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC3E949E1E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 07:44:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B2A049EBE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 07:45:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 68V71gttk6X6 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Apr 2022 07:44:56 -0400 (EDT)
+ with ESMTP id 8sdISRZiNP6u for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Apr 2022 07:44:59 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 77D33408BA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 07:44:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48E3A49E1E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 07:44:59 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C43CC1FB;
- Mon, 25 Apr 2022 04:44:55 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D7F1ED1;
+ Mon, 25 Apr 2022 04:44:57 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5CBF73F73B;
- Mon, 25 Apr 2022 04:44:54 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 119C13F73B;
+ Mon, 25 Apr 2022 04:44:55 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: catalin.marinas@arm.com, will@kernel.org,
  linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com,
  suzuki.poulose@arm.com, kvmarm@lists.cs.columbia.edu, mark.rutland@arm.com
-Subject: [PATCH v3 0/5] arm64: Treat ESR_ELx as a 64-bit register
-Date: Mon, 25 Apr 2022 12:44:39 +0100
-Message-Id: <20220425114444.368693-1-alexandru.elisei@arm.com>
+Subject: [PATCH v3 1/5] arm64: Make ESR_ELx_xVC_IMM_MASK compatible with
+ assembly
+Date: Mon, 25 Apr 2022 12:44:40 +0100
+Message-Id: <20220425114444.368693-2-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.36.0
+In-Reply-To: <20220425114444.368693-1-alexandru.elisei@arm.com>
+References: <20220425114444.368693-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -56,82 +59,31 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The ESR_EL{1,2} registers were originally 32-bit, then were extended to
-64-bit with the upper 32 bits RES0, and in ARM DDI 0487H.a the FEAT_LS64
-feature was added which now makes use of the upper bits. This series aims
-to teach Linux to treat it consistently as a 64-bit register with the goal
-of making it easier to add support in the future for features that use the
-upper 32 bits.
+ESR_ELx_xVC_IMM_MASK is used as a mask for the immediate value for the
+HVC/SMC instructions. The header file is included by assembly files (like
+entry.S) and ESR_ELx_xVC_IMM_MASK is not conditioned on __ASSEMBLY__ being
+undefined. Use the UL() macro for defining the constant's size, as that is
+compatible with both C code and assembly, whereas the UL suffix only works
+for C code.
 
-Patches #1 ("arm64: Make ESR_ELx_xVC_IMM_MASK compatible with assembly")
-and #2 ("arm64: compat: Do not treat syscall number as ESR_ELx for a bad
-syscall") are fixes for some minor issues which I found while working on
-changing ESR_ELx to 64-bit.
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ arch/arm64/include/asm/esr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patches #3 ("arm64: Treat ESR_ELx as a 64bit register") and #4 ("KVM:
-arm64: Treat ESR_EL2 as a 64-bit register") are where the ESR_ELx registers
-are changed to 64-bit. I chose to make the KVM changes a separate patch
-because KVM prefers to use u64 for the registers.
-
-And in patch #5 ("KVM: arm64: uapi: Add kvm_debug_exit_arch.hsr_high") I
-add a new field to the user API struct kvm_debug_exit_arch that represents
-the higher 32 bits, and a flag to go with it (details in the patch).
-
-Tested by running ltp for a few hours (minimal changes from the previous
-version) and kvm-unit-tests on a rockpro64.
-
-Changes in v3:
-
-* Rebased on top of v5.18-rc4
-* Clear kvm_run->flags in kvm_arch_vcpu_ioctl_run() in patch #5 ("KVM:
-  arm64: uapi: Add kvm_debug_exit_arch.hsr_high")
-* Documented KVM_DEBUG_ARCH_HSR_HIGH_VALID.
-
-Changes in v2:
-
-* Added the KVM_DEBUG_ARCH_HSR_HIGH_VALID kvm_run flag to patch #5 ("KVM:
-  arm64: uapi: Add kvm_debug_exit_arch.hsr_high"), and updated the commit
-  message to match (Marc)
-* Rebased on top of v5.18-rc3.
-
-
-Alexandru Elisei (5):
-  arm64: Make ESR_ELx_xVC_IMM_MASK compatible with assembly
-  arm64: compat: Do not treat syscall number as ESR_ELx for a bad
-    syscall
-  arm64: Treat ESR_ELx as a 64-bit register
-  KVM: arm64: Treat ESR_EL2 as a 64-bit register
-  KVM: arm64: uapi: Add kvm_debug_exit_arch.hsr_high
-
- Documentation/virt/kvm/api.rst          |  2 +
- arch/arm64/include/asm/debug-monitors.h |  4 +-
- arch/arm64/include/asm/esr.h            |  8 +--
- arch/arm64/include/asm/exception.h      | 28 +++++-----
- arch/arm64/include/asm/kvm_emulate.h    |  6 +--
- arch/arm64/include/asm/kvm_host.h       |  2 +-
- arch/arm64/include/asm/kvm_ras.h        |  2 +-
- arch/arm64/include/asm/system_misc.h    |  4 +-
- arch/arm64/include/asm/traps.h          | 12 ++---
- arch/arm64/include/uapi/asm/kvm.h       |  2 +
- arch/arm64/kernel/debug-monitors.c      | 12 ++---
- arch/arm64/kernel/entry-common.c        |  6 +--
- arch/arm64/kernel/fpsimd.c              |  6 +--
- arch/arm64/kernel/hw_breakpoint.c       |  4 +-
- arch/arm64/kernel/kgdb.c                |  6 +--
- arch/arm64/kernel/probes/kprobes.c      |  4 +-
- arch/arm64/kernel/probes/uprobes.c      |  4 +-
- arch/arm64/kernel/sys_compat.c          |  2 +-
- arch/arm64/kernel/traps.c               | 66 +++++++++++------------
- arch/arm64/kvm/arm.c                    |  1 +
- arch/arm64/kvm/handle_exit.c            | 16 +++---
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/hyp/nvhe/sys_regs.c      |  2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c         |  4 +-
- arch/arm64/kvm/inject_fault.c           |  4 +-
- arch/arm64/kvm/sys_regs.c               |  4 +-
- arch/arm64/mm/fault.c                   | 70 ++++++++++++-------------
- 27 files changed, 145 insertions(+), 138 deletions(-)
-
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index d52a0b269ee8..7356e2f05755 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -136,7 +136,7 @@
+ #define ESR_ELx_WFx_ISS_TI	(UL(1) << 0)
+ #define ESR_ELx_WFx_ISS_WFI	(UL(0) << 0)
+ #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+-#define ESR_ELx_xVC_IMM_MASK	((1UL << 16) - 1)
++#define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
+ 
+ #define DISR_EL1_IDS		(UL(1) << 24)
+ /*
 -- 
 2.36.0
 
