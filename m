@@ -2,74 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0697BC433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 18:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 216B4C4332F
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 23:53:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AD3AE4B1BD;
-	Mon, 25 Apr 2022 14:55:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F6274B10A;
+	Mon, 25 Apr 2022 19:53:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id nFKYsSP39KOo; Mon, 25 Apr 2022 14:55:50 -0400 (EDT)
+	with ESMTP id SFor8Tg9sNbH; Mon, 25 Apr 2022 19:53:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93A714B17B;
-	Mon, 25 Apr 2022 14:55:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0467A4B187;
+	Mon, 25 Apr 2022 19:53:50 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8271349F21
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 14:55:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C91049EC3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 19:53:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KhEt-FOmkchK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Apr 2022 14:55:44 -0400 (EDT)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59C1F4B1D3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 14:55:44 -0400 (EDT)
-Received: by mail-pf1-f202.google.com with SMTP id
- j17-20020a62b611000000b004fa6338bd77so10854677pff.10
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 11:55:44 -0700 (PDT)
+ with ESMTP id iV-17KhdpzlP for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Apr 2022 19:53:47 -0400 (EDT)
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com
+ [209.85.219.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F10664B08E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 19:53:46 -0400 (EDT)
+Received: by mail-yb1-f202.google.com with SMTP id
+ u9-20020a25b7c9000000b0064636cb9078so7116040ybj.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 16:53:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=0RIUNhOPqpB+HcP2HwzsrrOFF3qCqP329tLBYuBd67E=;
- b=YUTYT09C4kUYu097db2oy0wYcB4QiZZpF+ibqTmsgCmrs0tnYAEmD1oyhU6xNPpSDW
- 5YP/UqRtFcrWZXnePhoDgo+2HnniJew9a7i7T30m1yV0NMqnuLNiQ9vOauLFB5MiMirh
- 2M9cMFb6XYUpCbI+DyDG516WwrYEjHRD8UtKr9lwcOW2CpKWgaeuKrsmihegBL5WKTwm
- hG8uGNdRabATH4vdvi0yblgUk/RpebKYOCC0r56jGyO7vGyjRBJMa0diVvqm0Je7VZO9
- D9IEooRyyehKCATo7KIqh++6HsJk6p2ay6lItJX+Lo0wiKpjgrrhAyyt08AqdISWX9aE
- YwUw==
+ :cc; bh=7I/ymirdAiT7TDA2OEpHDGEYZgcTkJFO31W7cy5XbpM=;
+ b=GIEXDRW1lPHYxJDlewu1cQeA6Q+QhOYQG/Xg8+PRoE5TU9K+EszCSi+GS/y1yYdqKQ
+ k/hrOFfkpq5XjEnBTx1gg0IKP9CD+wqs+KYV8IBKykKdf6qgUHxeHd55YceasrVFn9mw
+ o9HKcPVnYwI3o4aMI2OPjArD2rckzGSvUFmrO9xNvkgk8klD1nMq/kohI2CdazTjq5Jf
+ Ak0UhNEI4w4AqZKNdd5wNvgAXTUDy724YE2e5d8zmzpUkKbcZxng8IF+DponlhaL7c8x
+ LL6EDVRikFw7s5dE77bM9YkXLHYb5Nfbwh93Bes5BL+1D2/4yHIP4wXj4e8Sme3DIay7
+ twfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=0RIUNhOPqpB+HcP2HwzsrrOFF3qCqP329tLBYuBd67E=;
- b=thZrS/vfYLRnor7EVj22JHWipHLkA4nHypux2FGpa85wVr3r4aidFRj2FvCLBaBND6
- kdgqIhYRrQ2yRvCiW9L4Vj8RLK5kOWCXqeA8duL379TV1z2/HABXqpRQHVQBbtTT+qQe
- 8mfyBy5vv4Vts5ZF7mLoSp49zV3gfq/Rqd72ZQfMgASVZXYR15ogvIu1gRZjrAvXLvri
- uLE1PJ34TUeZI7fCZvScCrSi+0H/OdvzMtfkNMwT+WlAaK3ep7Hh1YHb0ypcuXdPoFwz
- NIq3eoYccviQKomXaWKI3w8QZkq7sh969p+BmNfFRueoyiKA3w5CYiH6XqQ8WjruJFkI
- J0XQ==
-X-Gm-Message-State: AOAM530p9JRXN0WcHy97j/Np3vhfpS1UOHXUnziMfi3BVECrilNCQwPw
- Uiyo22uruXUfplXvRHGsvR4n5AB51KCv2g==
-X-Google-Smtp-Source: ABdhPJx8DPrpG0gMUTloJ8fmF2POFuQ8JOkOuYjgYs6Rc/ZB8KM3MbtQp2ca0WZCFkoAaDYMHM6jfYkmP+v+1A==
-X-Received: from ricarkol2.c.googlers.com
- ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:902:d509:b0:15c:fd46:8db with SMTP id
- b9-20020a170902d50900b0015cfd4608dbmr9292897plg.52.1650912943558; Mon, 25 Apr
- 2022 11:55:43 -0700 (PDT)
-Date: Mon, 25 Apr 2022 11:55:34 -0700
-In-Reply-To: <20220425185534.57011-1-ricarkol@google.com>
-Message-Id: <20220425185534.57011-5-ricarkol@google.com>
+ bh=7I/ymirdAiT7TDA2OEpHDGEYZgcTkJFO31W7cy5XbpM=;
+ b=Y+uJCmHxCpE1ZD/688hyUahaVL8szIiITe3BdqvoR7tXzIZYWRIkIiwOBFEBIQHuQe
+ 9ML+fy04vKrp8JGDqFpqwW0P8M1FV8EY5E+7lhJklg9YAmN+cZNd0xAAOYc1B4sBDfDy
+ Kj/MjAUVn+O8G9xzXXkms5fJnQ/kfsPFi/81xbj9SoGl8DtW4BtCGQhpfLgM9KLbpG8g
+ NUCsippxRO34NUeIu+hq6b6ch1q3gQm3K3ZB0YA2KsUNUmJjb4gvUajbWpsSdroHRIWx
+ UNg9x0zSCZBbHvr35m/qKupMFW9MwbGtFlhv4S5SBLXUWiv9JRtPLA2VHY3FTGeP/8Sc
+ Rzpw==
+X-Gm-Message-State: AOAM532448qV9lqhSppDVA13K3CoWjQRWkkoN7sftBRRUU8H6UFf59o4
+ RucBHiks66te57ujQKN0ug61bKSliA+PjCcgt/tBjaYolG6esAYiDxg1i5SvuinwdZuASE4itot
+ 7pANEmSbaa6yQSeIj/4F/aVHxKFWvrwDpTjf2XF9HGbNezIuudnMPAUVxYNHje8THx5Kf+g==
+X-Google-Smtp-Source: ABdhPJyjGc04tDLhhnCLskCP5jrH+A6ez9JfIN9/o5bxHFb6wiRVScPynPJ1gA3GO95ctuwxRLPE7a7ohO0=
+X-Received: from oupton3.c.googlers.com
+ ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
+ (user=oupton job=sendgmr) by 2002:a25:240c:0:b0:645:d54e:830f with SMTP id
+ k12-20020a25240c000000b00645d54e830fmr16918344ybk.34.1650930826367; Mon, 25
+ Apr 2022 16:53:46 -0700 (PDT)
+Date: Mon, 25 Apr 2022 23:53:38 +0000
+In-Reply-To: <20220425235342.3210912-1-oupton@google.com>
+Message-Id: <20220425235342.3210912-2-oupton@google.com>
 Mime-Version: 1.0
-References: <20220425185534.57011-1-ricarkol@google.com>
+References: <20220425235342.3210912-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH 4/4] KVM: arm64: vgic: Undo work in failed ITS restores
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: andre.przywara@arm.com, pshier@google.com, maz@kernel.org,
- pbonzini@redhat.com
+Subject: [PATCH v3 1/5] KVM: arm64: Return a bool from emulate_cp()
+From: Oliver Upton <oupton@google.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,63 +87,75 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Failed ITS restores should clean up all state restored until the
-failure. There is some cleanup present for this situation, but it's not
-complete. Add the missing free's.
+KVM indicates success/failure in several ways, but generally an integer
+is used when conditionally bouncing to userspace is involved. That is
+not the case from emulate_cp(); just use a bool instead.
 
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
+No functional change intended.
+
+Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 4ece649e2493..200ac59edaf9 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2229,8 +2229,10 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
- 		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7b45c040cc27..36895c163eae 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2246,27 +2246,27 @@ static void perform_access(struct kvm_vcpu *vcpu,
+  * @table: array of trap descriptors
+  * @num: size of the trap descriptor array
+  *
+- * Return 0 if the access has been handled, and -1 if not.
++ * Return true if the access has been handled, false if not.
+  */
+-static int emulate_cp(struct kvm_vcpu *vcpu,
+-		      struct sys_reg_params *params,
+-		      const struct sys_reg_desc *table,
+-		      size_t num)
++static bool emulate_cp(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *params,
++		       const struct sys_reg_desc *table,
++		       size_t num)
+ {
+ 	const struct sys_reg_desc *r;
  
- 	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
--	if (IS_ERR(irq))
-+	if (IS_ERR(irq)) {
-+		its_free_ite(kvm, ite);
- 		return PTR_ERR(irq);
-+	}
- 	ite->irq = irq;
+ 	if (!table)
+-		return -1;	/* Not handled */
++		return false;	/* Not handled */
  
- 	return offset;
-@@ -2498,6 +2500,9 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
- 	if (ret > 0)
- 		ret = 0;
+ 	r = find_reg(params, table, num);
  
-+	if (ret < 0)
-+		vgic_its_free_device_list(its->dev->kvm, its);
-+
- 	return ret;
- }
- 
-@@ -2624,6 +2629,9 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
- 		read += cte_esz;
+ 	if (r) {
+ 		perform_access(vcpu, params, r);
+-		return 0;
++		return true;
  	}
  
-+	if (ret < 0)
-+		vgic_its_free_collection_list(its->dev->kvm, its);
-+
- 	return ret;
+ 	/* Not handled */
+-	return -1;
++	return false;
  }
  
-@@ -2655,7 +2663,10 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
- 	if (ret)
- 		return ret;
+ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
+@@ -2330,7 +2330,7 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 	 * potential register operation in the case of a read and return
+ 	 * with success.
+ 	 */
+-	if (!emulate_cp(vcpu, &params, global, nr_global)) {
++	if (emulate_cp(vcpu, &params, global, nr_global)) {
+ 		/* Split up the value between registers for the read side */
+ 		if (!params.is_write) {
+ 			vcpu_set_reg(vcpu, Rt, lower_32_bits(params.regval));
+@@ -2365,7 +2365,7 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+ 	params.Op1 = (esr >> 14) & 0x7;
+ 	params.Op2 = (esr >> 17) & 0x7;
  
--	return vgic_its_restore_device_tables(its);
-+	ret = vgic_its_restore_device_tables(its);
-+	if (ret)
-+		vgic_its_free_collection_list(its->dev->kvm, its);
-+	return ret;
- }
- 
- static int vgic_its_commit_v0(struct vgic_its *its)
+-	if (!emulate_cp(vcpu, &params, global, nr_global)) {
++	if (emulate_cp(vcpu, &params, global, nr_global)) {
+ 		if (!params.is_write)
+ 			vcpu_set_reg(vcpu, Rt, params.regval);
+ 		return 1;
 -- 
 2.36.0.rc2.479.g8af0fa9b8e-goog
 
