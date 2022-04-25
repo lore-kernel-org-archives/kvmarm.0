@@ -2,75 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA9CC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 16:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA58C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 17:12:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ABB64B285;
-	Mon, 25 Apr 2022 12:53:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71B4D4B26A;
+	Mon, 25 Apr 2022 13:12:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id b31MH07juu73; Mon, 25 Apr 2022 12:53:35 -0400 (EDT)
+	with ESMTP id KtRbaN0I2bI0; Mon, 25 Apr 2022 13:12:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 547D54B262;
-	Mon, 25 Apr 2022 12:53:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 664B34B287;
+	Mon, 25 Apr 2022 13:12:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DDAD4B1F0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 12:53:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EEF504B241
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:12:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Flaaph-YIeyU for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Apr 2022 12:53:33 -0400 (EDT)
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com
- [209.85.167.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 459704B1E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 12:53:33 -0400 (EDT)
-Received: by mail-lf1-f53.google.com with SMTP id t25so27275969lfg.7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 09:53:33 -0700 (PDT)
+ with ESMTP id fpRTHrZpx-s0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Apr 2022 13:12:45 -0400 (EDT)
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com
+ [209.85.208.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEA9A4B298
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 13:12:44 -0400 (EDT)
+Received: by mail-lj1-f169.google.com with SMTP id bn33so18659650ljb.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 10:12:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lFX89zd3C09/F/da+MWhhY/H7yp7bOfk0UUh8vYzbDA=;
- b=h3X062wr4reZNOSNqsPwBEA4pU1JtqQic1Pt+nu09PtSC3yZTlVycPw8uy6r2U/cF3
- RRUFxFfVe7Jw0whY9XTZ+PNcOBDgNu0LT/Dd/Fkr59rQHxDXX28IurmgMb9NK5E6bM2r
- 4uodDhWSaI1ssO5e4Bv8EeF/h9u4Z7cy/cvXq8UyrSmpRQYo46OQxVynhXXIltvGjeCS
- Y2m78X7EQh24TvV73BrOpLWttDP1CB2UAVxi9/B65zAJqNNgV42vaKgYZrFwG3XlXvnM
- TbQSoyIOlip1PQAiSbwvhS3y/EigIi49W6S131QZWG4gKw3x0EPShexhX9hnOb3fJ2q8
- UxAQ==
+ :cc; bh=N7fee2Yrx0qNzoi9PdXZ5hx4nrnlVdrW/GV2fmMxG2M=;
+ b=acRadtvAlYLUZrCmq9O5iI5dPYliXwwNI96yUgxN2vvYnQyHFYWbIq3YSk6wxSOnDA
+ GX9RTiQdnHyQtA4OQ7FAx/eRuBe2F7nW7K20QiBw/g4p0zT/aDNIb6GoMhyOYCqluUsp
+ w966oKCZq/KG44LRlyljtZupZ4wx32aOVe7+Hy5Wp+N7xnx+tccplGXtnJVAGCdgqJyB
+ 1sBDmWynVnSD+y20tg/j5uLrhve94nndrnKPQyKku8wVj2d2fT/EX/EyAnZIXYqJGaZp
+ x6AKN+qlvspopkwCnb+v9+yZhH/oDM5Srj9sWSLPXfpmXjBom7/BSqtbI/xONPkGOToT
+ 8cJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=lFX89zd3C09/F/da+MWhhY/H7yp7bOfk0UUh8vYzbDA=;
- b=gzjJlwX1dofJO4V0InR4i1ELUU9E5t7krNdrKSR4Jw2dOONw/cR7IyfFg/f0kJlOb3
- quGc+2jRZx7SXD8oq7k7NjpMLNsU34BDdv8ElsIkU62DFC+SifWrPCgHmBEu2Px1YK01
- V4DS9qUPlnKaUpFiF50zcsb2hL1qtGPYf2xIQYuhrkeK105klK5U+/UyJJYdy4XVeXsV
- lfozpyP71noedjC5sTsb0/OGGagi2jUsK/CtI7aUZR91G+wwxC0zScnM/8uP7ucOsbpP
- D8YehKI5sz3lR79sIaGuRLkgoxMWTDWmjfTQGBiepzTSFHtUfEXMMFHQbdbarENrrFjk
- Blxg==
-X-Gm-Message-State: AOAM531Hyt7YaQdl6oPgYp05n27KvnkX64Wr2Cv0YS4IEYS8RrFKLhZ3
- 3B6iIzTSxKaWmxZeygCUhyQmkR+GtT11kTW5gdijWQ==
-X-Google-Smtp-Source: ABdhPJxm0hhBPf1OejlR39+65w6wi69xjDsU+RXUC7QhOXAMerhUh52wj0ODeBwvmUu+3x+HKLKmoPD+gqYXCSdbxjU=
-X-Received: by 2002:a05:6512:131b:b0:44b:75d:e3d0 with SMTP id
- x27-20020a056512131b00b0044b075de3d0mr13469528lfu.685.1650905611670; Mon, 25
- Apr 2022 09:53:31 -0700 (PDT)
+ bh=N7fee2Yrx0qNzoi9PdXZ5hx4nrnlVdrW/GV2fmMxG2M=;
+ b=QGy2f4J2Es8Ty5L+hDg/IUr2x0hj9QmVuDZReYgTWjI/dxDGK97ZS0VRP/O5LT41uB
+ QuE77m0HIHHCT6GL+V7+MeyN1cvhc7DItv7sOWUNvfz5kb9s8J3mJfxihXGCH9BZ2S84
+ jwf/RrqifjsdAmh+Epdhq7b01FptlHPDDSL2466U+6ZhCZPPOplpTTQg47HOnhhQZbFt
+ bCmK0jTlf95mAtbjHIokr4uzU/NaMTlIWnLzpLj/fAGOXhYIjUJ6OnqGnZy2D801KW0M
+ MAM7F1ggQeI4ft9QZRRdYEiPkRBBFYtW+OIoXlNCWIet6lLYfLTRhIM5bDmaS5Z07Uz4
+ WPxA==
+X-Gm-Message-State: AOAM53096UiHjEcpJJ2Uc5OWU/g3sRXvmxi40OmoeuA/jK0mgUo/8HG7
+ ajTDX8AGJAbVKlUa+kzI/KrZfWQu6Fv11Rh3tDwHiQ==
+X-Google-Smtp-Source: ABdhPJxUrJi15zmGDPYrRdXhEhm6WWYpITF+DKeRbw52izZPXspEXizuIrsiftQCpGs1t6FoJos6DDldjOwxUQ8ZRFY=
+X-Received: by 2002:a2e:5c6:0:b0:24f:5bd:5f89 with SMTP id
+ 189-20020a2e05c6000000b0024f05bd5f89mr7433707ljf.170.1650906763210; 
+ Mon, 25 Apr 2022 10:12:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-7-oupton@google.com>
- <Yma6fEoRstvmu6sd@google.com>
-In-Reply-To: <Yma6fEoRstvmu6sd@google.com>
+References: <20220423000328.2103733-1-rananta@google.com>
+ <20220423000328.2103733-5-rananta@google.com>
+ <CAAeT=Fyc3=uoOdeXrLKfYxKtL3PFV0U_Bwj_g+bca_Em63wGhw@mail.gmail.com>
+ <CAJHc60zR4Pa=y-Y4Dp27FoAvqpBrONCN727KbnhSoxNGRiBGuA@mail.gmail.com>
+In-Reply-To: <CAJHc60zR4Pa=y-Y4Dp27FoAvqpBrONCN727KbnhSoxNGRiBGuA@mail.gmail.com>
 From: Oliver Upton <oupton@google.com>
-Date: Mon, 25 Apr 2022 09:53:20 -0700
-Message-ID: <CAOQ_QshYttK+e9PQdp+vZo2w7NN8oGVAQm8LC+DBP5gs+5fLwA@mail.gmail.com>
-Subject: Re: [RFC PATCH 06/17] KVM: arm64: Implement break-before-make
- sequence for parallel walks
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Ben Gardon <bgardon@google.com>,
- David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Date: Mon, 25 Apr 2022 10:12:32 -0700
+Message-ID: <CAOQ_QsjFtyy1AFq5c-jLSY-r9fWEL4H5fuKNbt9QcFirnU2wmg@mail.gmail.com>
+Subject: Re: [PATCH v6 4/9] KVM: arm64: Add vendor hypervisor firmware register
+To: Raghavendra Rao Ananta <rananta@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,18 +88,30 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Apr 25, 2022 at 8:13 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Apr 15, 2022, Oliver Upton wrote:
-> > The ARM architecture requires that software use the 'break-before-make'
-> > sequence whenever memory is being remapped.
->
-> What does "remapped" mean here?  Changing the pfn?  Promoting/demoting to/from a
-> huge page?
+On Mon, Apr 25, 2022 at 9:52 AM Raghavendra Rao Ananta
+<rananta@google.com> wrote:
 
-Both, but in the case of this series it is mostly concerned with
-promotion/demotion. I'll make this language a bit more precise next
-time around.
+[...]
+
+> > > +#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX    1
+> >
+> > Nit: IMHO perhaps it might be more convenient to define the MAX macro
+> > in arch/arm64/include/uapi/asm/kvm.h like below for maintenance ?
+> > (The same comments are applied to other KVM_REG_ARM_*_BMAP_BIT_MAX)
+> >
+> > #define KVM_REG_ARM_VENDOR_HYP_BIT_MAX KVM_REG_ARM_VENDOR_HYP_BIT_PTP
+> >
+> We have been going back and forth on this :)
+> It made sense for me to keep it in uapi as well, but I took Oliver's
+> suggestion of keeping it outside of uapi since this is something that
+> could be constantly changing [1].
+
+The maximum set of features in a given bitmap register is a property
+of the running system, not the headers chosen at compile time. There
+is an illusion of ABI breakage when adding new bits to the registers
+if we've declared the max bit in UAPI. We also define
+KVM_VCPU_MAX_FEATURES outside of UAPI, even though it is related to
+the KVM_ARM_VCPU_INIT ioctl.
 
 --
 Thanks,
