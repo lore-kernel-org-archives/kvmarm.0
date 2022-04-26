@@ -2,82 +2,94 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8842C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 07:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 261A6C4332F
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 07:35:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 169C7410F3;
-	Tue, 26 Apr 2022 03:24:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 95F074B1EF;
+	Tue, 26 Apr 2022 03:35:09 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PufvFMxCjsdE; Tue, 26 Apr 2022 03:24:41 -0400 (EDT)
+	with ESMTP id 4jMS92eJkuXt; Tue, 26 Apr 2022 03:35:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EDC843482;
-	Tue, 26 Apr 2022 03:24:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EB20F4B1CA;
+	Tue, 26 Apr 2022 03:35:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0DDC41174
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 03:24:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 171294B156
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 03:35:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id c9pzNR0rqhRC for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Apr 2022 03:24:38 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7384D410F3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 03:24:38 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1650957878;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Wq0cX5f/tSHQNq0CGIDaJqE3zMD36/mEnx1ziP9dP9M=;
- b=MoFjMM5TNxN2DPSNlbh1q84IaIcn5INctVtvOZKxunG3Jod1V2dFZp22d2xBDMUczIQPPM
- P9n0mR0xtE/3hFcsETL/D6hqKN1r8JSRMp6Geukd9oOb0ZeKknXUmyIyRrGnCQmBaqU3xB
- t/fQzMMuVwuaBmEMcH1Oyi/2QUT53Oc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-609-u9WXaItiN1Ctt2Q916m_Gw-1; Tue, 26 Apr 2022 03:24:32 -0400
-X-MC-Unique: u9WXaItiN1Ctt2Q916m_Gw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com
- [10.11.54.7])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D9A7B811E76;
- Tue, 26 Apr 2022 07:24:31 +0000 (UTC)
-Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BDE42145BA44;
- Tue, 26 Apr 2022 07:24:24 +0000 (UTC)
-Subject: Re: [PATCH v6 7/9] tools: Import ARM SMCCC definitions
-To: Raghavendra Rao Ananta <rananta@google.com>, Marc Zyngier
- <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
- James Morse <james.morse@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>
-References: <20220423000328.2103733-1-rananta@google.com>
- <20220423000328.2103733-8-rananta@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <867b0aeb-97f4-8fc0-b37a-42946a1e65ad@redhat.com>
-Date: Tue, 26 Apr 2022 15:24:20 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id fL3GYeFwg6Dt for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Apr 2022 03:35:01 -0400 (EDT)
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com
+ [209.85.166.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8D0F64B150
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 03:35:01 -0400 (EDT)
+Received: by mail-il1-f170.google.com with SMTP id t4so10863435ilo.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 00:35:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=T6uVKqz/bxBh0XcbvcuRA0UyoUPF9VXe65F1cQD8y4Q=;
+ b=ObEunFSl4crRLGfpGD9vb4uNjucdcW+SwMC5wjs68ErQM98eX2dd/1bhFqvb4MQrUZ
+ aNBQiYOEZs6DAFrjwy4GxIX9P710BE5dNtb9ren8SoNbyoDCq1JSrqMW6bcxyN3g457u
+ /+gBpA8szyFlMBKjZqPcqtIcg53tpCAgbfmBRZ+EQiSDL0bYkiLUkJAuAA+ESILGYbW5
+ jVcb61+A+66M7v7MKaJKTdQY27E/r9amtlm20dB0rHCxpqld0qjq5eRsqvCmPNleg1uA
+ MTGwgfxKApBNNdQAeaBp8qoeybFa8FJ6gos+fYTUTeB4wg78apx7w8FkSb2oMxvxLXSe
+ mDTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=T6uVKqz/bxBh0XcbvcuRA0UyoUPF9VXe65F1cQD8y4Q=;
+ b=kaCRyVX3MQDBoDZMgnDip5UbEzGJCFT+mZsl8jS6oU3kd6buAyksUnMFwNuaStql2C
+ NfM1QPfEHPghY1ZrFg78GSMQ+/gwn7LGTrzF1vOFOo/HTy88VpaQDqQdyD22SjSx8wWw
+ DILKUuZPomohvf/4SGm43dHkcEkb75GMo8fqy2JKtHFUzumTrWmhigUyeadAud/2+821
+ juoJHAXXetk5ySXFA3UGc6Mffhsu/GqSJuyUJtw8sLB0O3iD/YidvyDRCovA320GU61q
+ oO03UQl8QLl5Q1PJM6+RyJAJeUCQCz9zn2aau3vs9gfPzsnbIMQryfUwqnnR9uoppPA3
+ 35cQ==
+X-Gm-Message-State: AOAM533VCkAsgPlRfkysJouqCW1lLiC8ZUvV1lKIUKbWXTvZ24diLeLE
+ PHctjo0tEoPWzXbxdhvYeExNuw==
+X-Google-Smtp-Source: ABdhPJzzgIPYx4mfeq03H4D4LkohxnIEdiAlT4JnSJ/rUPy7BWzzJro8BOalbut4cMQo3UF9wiXwfw==
+X-Received: by 2002:a05:6e02:b23:b0:2cd:89db:f685 with SMTP id
+ e3-20020a056e020b2300b002cd89dbf685mr5194103ilu.296.1650958500701; 
+ Tue, 26 Apr 2022 00:35:00 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ w5-20020a05660205c500b006546d0b5f6dsm9257784iox.41.2022.04.26.00.34.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 26 Apr 2022 00:34:59 -0700 (PDT)
+Date: Tue, 26 Apr 2022 07:34:56 +0000
+From: Oliver Upton <oupton@google.com>
+To: Yosry Ahmed <yosryahmed@google.com>
+Subject: Re: [PATCH v3 4/6] KVM: arm64/mmu: count KVM page table pages in
+ pagetable stats
+Message-ID: <YmegoB/fBkfwaE5z@google.com>
+References: <20220426053904.3684293-1-yosryahmed@google.com>
+ <20220426053904.3684293-5-yosryahmed@google.com>
 MIME-Version: 1.0
-In-Reply-To: <20220423000328.2103733-8-rananta@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20220426053904.3684293-5-yosryahmed@google.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
+ linux-mm@kvack.org, kvmarm@lists.cs.columbia.edu,
+ Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
+ Huacai Chen <chenhuacai@kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Johannes Weiner <hannes@cmpxchg.org>, Shakeel Butt <shakeelb@google.com>,
+ Atish Patra <atishp@atishpatra.org>, cgroups@vger.kernel.org,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ Jim Mattson <jmattson@google.com>, linux-mips@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -86,224 +98,73 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On 4/23/22 8:03 AM, Raghavendra Rao Ananta wrote:
-> Import the standard SMCCC definitions from include/linux/arm-smccc.h.
+Hi Yosry,
+
+On Tue, Apr 26, 2022 at 05:39:02AM +0000, Yosry Ahmed wrote:
+> Count the pages used by KVM in arm64 for page tables in pagetable stats.
 > 
-> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Account pages allocated for PTEs in pgtable init functions and
+> kvm_set_table_pte().
+> 
+> Since most page table pages are freed using put_page(), add a helper
+> function put_pte_page() that checks if this is the last ref for a pte
+> page before putting it, and unaccounts stats accordingly.
+> 
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
 > ---
->   tools/include/linux/arm-smccc.h | 193 ++++++++++++++++++++++++++++++++
->   1 file changed, 193 insertions(+)
->   create mode 100644 tools/include/linux/arm-smccc.h
+>  arch/arm64/kernel/image-vars.h |  3 ++
+>  arch/arm64/kvm/hyp/pgtable.c   | 50 +++++++++++++++++++++-------------
+>  2 files changed, 34 insertions(+), 19 deletions(-)
 > 
+> diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
+> index 241c86b67d01..25bf058714f6 100644
+> --- a/arch/arm64/kernel/image-vars.h
+> +++ b/arch/arm64/kernel/image-vars.h
+> @@ -143,6 +143,9 @@ KVM_NVHE_ALIAS(__hyp_rodata_end);
+>  /* pKVM static key */
+>  KVM_NVHE_ALIAS(kvm_protected_mode_initialized);
+>  
+> +/* Called by kvm_account_pgtable_pages() to update pagetable stats */
+> +KVM_NVHE_ALIAS(__mod_lruvec_page_state);
+> +
+>  #endif /* CONFIG_KVM */
+>  
+>  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 2cb3867eb7c2..53e13c3313e9 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -152,6 +152,7 @@ static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
+>  
+>  	WARN_ON(kvm_pte_valid(old));
+>  	smp_store_release(ptep, pte);
+> +	kvm_account_pgtable_pages((void *)childp, +1);
 
-Reviewed-by: Gavin Shan <gshan@redhat.com>
+What page tables do we want to account? KVM on ARM manages several page
+tables.
 
-> diff --git a/tools/include/linux/arm-smccc.h b/tools/include/linux/arm-smccc.h
-> new file mode 100644
-> index 000000000000..63ce9bebccd3
-> --- /dev/null
-> +++ b/tools/include/linux/arm-smccc.h
-> @@ -0,0 +1,193 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (c) 2015, Linaro Limited
-> + */
-> +#ifndef __LINUX_ARM_SMCCC_H
-> +#define __LINUX_ARM_SMCCC_H
-> +
-> +#include <linux/const.h>
-> +
-> +/*
-> + * This file provides common defines for ARM SMC Calling Convention as
-> + * specified in
-> + * https://developer.arm.com/docs/den0028/latest
-> + *
-> + * This code is up-to-date with version DEN 0028 C
-> + */
-> +
-> +#define ARM_SMCCC_STD_CALL	        _AC(0,U)
-> +#define ARM_SMCCC_FAST_CALL	        _AC(1,U)
-> +#define ARM_SMCCC_TYPE_SHIFT		31
-> +
-> +#define ARM_SMCCC_SMC_32		0
-> +#define ARM_SMCCC_SMC_64		1
-> +#define ARM_SMCCC_CALL_CONV_SHIFT	30
-> +
-> +#define ARM_SMCCC_OWNER_MASK		0x3F
-> +#define ARM_SMCCC_OWNER_SHIFT		24
-> +
-> +#define ARM_SMCCC_FUNC_MASK		0xFFFF
-> +
-> +#define ARM_SMCCC_IS_FAST_CALL(smc_val)	\
-> +	((smc_val) & (ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT))
-> +#define ARM_SMCCC_IS_64(smc_val) \
-> +	((smc_val) & (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT))
-> +#define ARM_SMCCC_FUNC_NUM(smc_val)	((smc_val) & ARM_SMCCC_FUNC_MASK)
-> +#define ARM_SMCCC_OWNER_NUM(smc_val) \
-> +	(((smc_val) >> ARM_SMCCC_OWNER_SHIFT) & ARM_SMCCC_OWNER_MASK)
-> +
-> +#define ARM_SMCCC_CALL_VAL(type, calling_convention, owner, func_num) \
-> +	(((type) << ARM_SMCCC_TYPE_SHIFT) | \
-> +	((calling_convention) << ARM_SMCCC_CALL_CONV_SHIFT) | \
-> +	(((owner) & ARM_SMCCC_OWNER_MASK) << ARM_SMCCC_OWNER_SHIFT) | \
-> +	((func_num) & ARM_SMCCC_FUNC_MASK))
-> +
-> +#define ARM_SMCCC_OWNER_ARCH		0
-> +#define ARM_SMCCC_OWNER_CPU		1
-> +#define ARM_SMCCC_OWNER_SIP		2
-> +#define ARM_SMCCC_OWNER_OEM		3
-> +#define ARM_SMCCC_OWNER_STANDARD	4
-> +#define ARM_SMCCC_OWNER_STANDARD_HYP	5
-> +#define ARM_SMCCC_OWNER_VENDOR_HYP	6
-> +#define ARM_SMCCC_OWNER_TRUSTED_APP	48
-> +#define ARM_SMCCC_OWNER_TRUSTED_APP_END	49
-> +#define ARM_SMCCC_OWNER_TRUSTED_OS	50
-> +#define ARM_SMCCC_OWNER_TRUSTED_OS_END	63
-> +
-> +#define ARM_SMCCC_FUNC_QUERY_CALL_UID  0xff01
-> +
-> +#define ARM_SMCCC_QUIRK_NONE		0
-> +#define ARM_SMCCC_QUIRK_QCOM_A6		1 /* Save/restore register a6 */
-> +
-> +#define ARM_SMCCC_VERSION_1_0		0x10000
-> +#define ARM_SMCCC_VERSION_1_1		0x10001
-> +#define ARM_SMCCC_VERSION_1_2		0x10002
-> +#define ARM_SMCCC_VERSION_1_3		0x10003
-> +
-> +#define ARM_SMCCC_1_3_SVE_HINT		0x10000
-> +
-> +#define ARM_SMCCC_VERSION_FUNC_ID					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   0, 0)
-> +
-> +#define ARM_SMCCC_ARCH_FEATURES_FUNC_ID					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   0, 1)
-> +
-> +#define ARM_SMCCC_ARCH_SOC_ID						\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   0, 2)
-> +
-> +#define ARM_SMCCC_ARCH_WORKAROUND_1					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   0, 0x8000)
-> +
-> +#define ARM_SMCCC_ARCH_WORKAROUND_2					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   0, 0x7fff)
-> +
-> +#define ARM_SMCCC_ARCH_WORKAROUND_3					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   0, 0x3fff)
-> +
-> +#define ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-> +			   ARM_SMCCC_FUNC_QUERY_CALL_UID)
-> +
-> +/* KVM UID value: 28b46fb6-2ec5-11e9-a9ca-4b564d003a74 */
-> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_0	0xb66fb428U
-> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_1	0xe911c52eU
-> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_2	0x564bcaa9U
-> +#define ARM_SMCCC_VENDOR_HYP_UID_KVM_REG_3	0x743a004dU
-> +
-> +/* KVM "vendor specific" services */
-> +#define ARM_SMCCC_KVM_FUNC_FEATURES		0
-> +#define ARM_SMCCC_KVM_FUNC_PTP			1
-> +#define ARM_SMCCC_KVM_FUNC_FEATURES_2		127
-> +#define ARM_SMCCC_KVM_NUM_FUNCS			128
-> +
-> +#define ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID			\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-> +			   ARM_SMCCC_KVM_FUNC_FEATURES)
-> +
-> +#define SMCCC_ARCH_WORKAROUND_RET_UNAFFECTED	1
-> +
-> +/*
-> + * ptp_kvm is a feature used for time sync between vm and host.
-> + * ptp_kvm module in guest kernel will get service from host using
-> + * this hypercall ID.
-> + */
-> +#define ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,				\
-> +			   ARM_SMCCC_SMC_32,				\
-> +			   ARM_SMCCC_OWNER_VENDOR_HYP,			\
-> +			   ARM_SMCCC_KVM_FUNC_PTP)
-> +
-> +/* ptp_kvm counter type ID */
-> +#define KVM_PTP_VIRT_COUNTER			0
-> +#define KVM_PTP_PHYS_COUNTER			1
-> +
-> +/* Paravirtualised time calls (defined by ARM DEN0057A) */
-> +#define ARM_SMCCC_HV_PV_TIME_FEATURES				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_64,			\
-> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
-> +			   0x20)
-> +
-> +#define ARM_SMCCC_HV_PV_TIME_ST					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_64,			\
-> +			   ARM_SMCCC_OWNER_STANDARD_HYP,	\
-> +			   0x21)
-> +
-> +/* TRNG entropy source calls (defined by ARM DEN0098) */
-> +#define ARM_SMCCC_TRNG_VERSION					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_32,			\
-> +			   ARM_SMCCC_OWNER_STANDARD,		\
-> +			   0x50)
-> +
-> +#define ARM_SMCCC_TRNG_FEATURES					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_32,			\
-> +			   ARM_SMCCC_OWNER_STANDARD,		\
-> +			   0x51)
-> +
-> +#define ARM_SMCCC_TRNG_GET_UUID					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_32,			\
-> +			   ARM_SMCCC_OWNER_STANDARD,		\
-> +			   0x52)
-> +
-> +#define ARM_SMCCC_TRNG_RND32					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_32,			\
-> +			   ARM_SMCCC_OWNER_STANDARD,		\
-> +			   0x53)
-> +
-> +#define ARM_SMCCC_TRNG_RND64					\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,			\
-> +			   ARM_SMCCC_SMC_64,			\
-> +			   ARM_SMCCC_OWNER_STANDARD,		\
-> +			   0x53)
-> +
-> +/*
-> + * Return codes defined in ARM DEN 0070A
-> + * ARM DEN 0070A is now merged/consolidated into ARM DEN 0028 C
-> + */
-> +#define SMCCC_RET_SUCCESS			0
-> +#define SMCCC_RET_NOT_SUPPORTED			-1
-> +#define SMCCC_RET_NOT_REQUIRED			-2
-> +#define SMCCC_RET_INVALID_PARAMETER		-3
-> +
-> +#endif /*__LINUX_ARM_SMCCC_H*/
-> 
+For regular KVM, the host kernel manages allocations for the hyp stage 1
+tables in addition to the stage 2 tables used for a particular VM. The
+former is system overhead whereas the latter could be attributed to a
+guest VM.
 
+I imagine protected KVM is out of scope, since it actually manages its
+own allocations outside of the host kernel.
+
+Given this, I would recommend adding the accounting hooks to mmu.c as
+that is where we alloc/free table pages and it is in the host address
+space. kvm_s2_mm_ops and kvm_hyp_mm_ops point to all the relevant
+functions, though the latter is only relevant if we want to count system
+page tables too.
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
