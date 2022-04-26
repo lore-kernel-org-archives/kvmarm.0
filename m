@@ -2,87 +2,129 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA237C43219
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 21:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C270C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 22:14:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E96340C95;
-	Tue, 26 Apr 2022 17:19:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D28840BE7;
+	Tue, 26 Apr 2022 18:14:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@samsung.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id K+9zw7j-DO8Q; Tue, 26 Apr 2022 17:19:42 -0400 (EDT)
+	with ESMTP id Wofhn9WchIFq; Tue, 26 Apr 2022 18:14:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7B084B1F0;
-	Tue, 26 Apr 2022 17:19:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D49F408A7;
+	Tue, 26 Apr 2022 18:14:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFB584B1AB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 15:34:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C5F940658
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 18:14:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MnJ6hep7q+Op for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Apr 2022 15:34:05 -0400 (EDT)
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com
- [209.85.128.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B222C4B192
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 15:34:05 -0400 (EDT)
-Received: by mail-wm1-f43.google.com with SMTP id
- m22-20020a05600c3b1600b00393ed50777aso2208004wms.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 12:34:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HdglKt24ulKLWyX0LsILT516ozly9pUWvxRymOVkqGI=;
- b=D9ihhOYCzfSq6PHe75gU3OheUI3W9iH7N3JyrClUp6au/zHYy/RjIQ+jFjvmiw3I9o
- uU7o/2RsJb0OvTjqDki2JlEYfTgugeTS76dPfA3259nEGmWh42vCXrHa6/5V7/2johUN
- +QaWhuSllkcd3/yIwhHQc0dL4v+1u2xt3a0+X1HNRFS3ddbQntWN7TwV79pXNZP4tjWY
- q9oDYLmA6GmRpsibkQ3SJm8PJsmjU0ySPtDfndPYlEEAFXG22uifNwS/0VoF2zqchWyZ
- YeBZmMfcWMAOzmPfGY/zoiJYCO20nTusS/8yz+ffjxEMcUZ2DMbLY7V/1myPVVFJC4B1
- X+8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=HdglKt24ulKLWyX0LsILT516ozly9pUWvxRymOVkqGI=;
- b=QtvSyzWdrUMb5dKp4QN+t1xdCTUxZZaTHklXcO1hvsaLZRHScNlkx87PvYRexoC/vd
- 7XHfO1MWpUpUOi7OBqEFmeKdydhWta/SrEFqTpHNiNOui8voSlILXhhcrrvG1ryFprom
- VU49jV0wZTr8m1iCca2SU0k2iqdL+34KIEF8+uL2aeLAoGZaPze3CUuCOGDdqKYutOkF
- 1gYjURxkuqX16zjpTgu5hX1bG6I8AlIypDLoLT5ISaETM5cn8+r1qnjwkCk+lpWnuTrp
- vGNwxHZKhaix9v7sgbpfs2u4qJ0YKhTdJNRVkbysaYBaZorvJHB59dWk8afkiiuvpfP9
- axyg==
-X-Gm-Message-State: AOAM532za1IcDAF2ncqkqeAdqftXNnxDGny6Ucod518+aVgd2jrw1Gbg
- eDySPdBm87PzJQtconDoj8S1SM15SmkP3wHTrSuw8w==
-X-Google-Smtp-Source: ABdhPJxfcXYYWDf1qEw77YopXVh9hGlDN3ohweZv6hh7qehoXVg7JxTIKYy8mWq0Lcp0jdkpbGhhqEQXGML1k1dn1J0=
-X-Received: by 2002:a05:600c:4e46:b0:393:f5fb:b3df with SMTP id
- e6-20020a05600c4e4600b00393f5fbb3dfmr4865915wmq.80.1651001644438; Tue, 26 Apr
- 2022 12:34:04 -0700 (PDT)
+ with ESMTP id eXyb99F3YPUV for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Apr 2022 18:14:36 -0400 (EDT)
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com
+ [210.118.77.12])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2970D40472
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 18:14:36 -0400 (EDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+ by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
+ 20220426221434euoutp022f8b9b64da4fb570761db1e9aa6781fa~pkgHNrQ-M3036830368euoutp02V
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 22:14:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com
+ 20220426221434euoutp022f8b9b64da4fb570761db1e9aa6781fa~pkgHNrQ-M3036830368euoutp02V
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+ s=mail20170921; t=1651011274;
+ bh=IPQk0Q4k6d8MBvUz+9ejX0OyAjlYSg/gyEoYmMCjOKQ=;
+ h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+ b=c89szdQsAqye3i3gDVOJO1ceZs0G4Roj86/10zF1ZeHL7T64MwRAteXyxr0pVOFL6
+ 5QSguS62LvxvkWerdy40ibDhR8vdLaiUdteN4DzevsNAEd3XbaVRUnE9cP6GzOloHn
+ gWGi1QnvUd466neJs+QeNSvG1TbsuKTxV7Tq1Tnk=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+ eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+ 20220426221434eucas1p2be4b0c6ae9323a3c69fb142dbe142e50~pkgG1t_-_1767917679eucas1p2q;
+ Tue, 26 Apr 2022 22:14:34 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+ eusmges1new.samsung.com (EUCPMTA) with SMTP id 46.A7.10009.ACE68626; Tue, 26
+ Apr 2022 23:14:34 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+ eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+ 20220426221433eucas1p253f6350eacf87d8cac2c05adc903656e~pkgFoSNEn3138331383eucas1p2G;
+ Tue, 26 Apr 2022 22:14:33 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+ eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+ 20220426221433eusmtrp217fa12bd618a4c127c3632bdcc4c5f61~pkgFm-M8u0332303323eusmtrp2k;
+ Tue, 26 Apr 2022 22:14:33 +0000 (GMT)
+X-AuditID: cbfec7f2-e95ff70000002719-51-62686ecad992
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+ eusmgms2.samsung.com (EUCPMTA) with SMTP id 06.68.09404.8CE68626; Tue, 26
+ Apr 2022 23:14:33 +0100 (BST)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+ eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+ 20220426221432eusmtip2bf09fbbbace97124dcdd7cd3e8aa62f7~pkgEvO3E10048000480eusmtip2h;
+ Tue, 26 Apr 2022 22:14:32 +0000 (GMT)
+Message-ID: <64573cca-4bd6-a65e-0ba2-867c6488e82c@samsung.com>
+Date: Wed, 27 Apr 2022 00:14:32 +0200
 MIME-Version: 1.0
-References: <20220426053904.3684293-1-yosryahmed@google.com>
- <20220426053904.3684293-5-yosryahmed@google.com>
- <874k2falbk.wl-maz@kernel.org>
-In-Reply-To: <874k2falbk.wl-maz@kernel.org>
-From: Yosry Ahmed <yosryahmed@google.com>
-Date: Tue, 26 Apr 2022 12:33:28 -0700
-Message-ID: <CAJD7tkZ-mrhCXoR0ZONjJ7kuAuzWED8Dcjkw6mv812-3uSo_Cg@mail.gmail.com>
-Subject: Re: [PATCH v3 4/6] KVM: arm64/mmu: count KVM page table pages in
- pagetable stats
-To: Marc Zyngier <maz@kernel.org>
-X-Mailman-Approved-At: Tue, 26 Apr 2022 17:19:39 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>,
- Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Linux-MM <linux-mm@kvack.org>, kvmarm@lists.cs.columbia.edu,
- Joerg Roedel <joro@8bytes.org>, Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Shakeel Butt <shakeelb@google.com>, Atish Patra <atishp@atishpatra.org>,
- cgroups@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- linux-mips@vger.kernel.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- kvm-riscv@lists.infradead.org, Johannes Weiner <hannes@cmpxchg.org>,
- linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+ Gecko/20100101 Thunderbird/91.8.0
+Subject: Re: [PATCH v14 27/39] arm64/sme: Provide Kconfig for SME
+Content-Language: en-US
+To: Mark Brown <broonie@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier
+ <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan
+ <shuah@kernel.org>
+From: Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20220419112247.711548-28-broonie@kernel.org>
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrMKsWRmVeSWpSXmKPExsWy7djP87qn8jKSDDY3iVhMPGVtMX3lZTaL
+ Nz0mFlMfPmGzeL+sh9Hi/r7lTBYfTx1nt9j0+BqrxfQ779kspjR3MFlMOTaF3WLnnJOsFkfW
+ 2ltMebmO3WLv9GWsFjNv32a0WHr8P5NFyx1TByGPNfPWMHpsWtXJ5rF/7hp2j/Ob1jB7bF5S
+ 7/F5k1wAWxSXTUpqTmZZapG+XQJXxv6OJ0wF8yUr9ix6ztzAeFGki5GTQ0LAROLHrOksXYxc
+ HEICKxglrp49xAjhfGGUaGl/AuV8ZpQ4e+kOO0zLxz9PoVqWM0rMunuAHcL5CNSy5x0jSBWv
+ gJ3EmU1tYB0sAqoS22afYYKIC0qcnPmEBcQWFUiSmLvvHnMXIweHsICjxNrP1SBhZgFxiVtP
+ 5jOBzBQRuMkocabxNzOIwyzwhFmi6+8NsGY2AUOJrrddbCA2p4CVxLclb5gguuUlmrfOBmuQ
+ ENjMKfF8xhJmiLtdJPru9bFA2MISr45vgfpHRuL/TpB1HEB2vsTfGcYQ4QqJa6/XQLVaS9w5
+ 94sNpIRZQFNi/S59iGpHifffEiFMPokbbwUhDuCTmLRtOjNEmFeio00IYoaaxKzj6+BWHrxw
+ iXkCo9IspDCZheT5WUhemYWwdgEjyypG8dTS4tz01GLDvNRyveLE3OLSvHS95PzcTYzAdHf6
+ 3/FPOxjnvvqod4iRiYPxEKMEB7OSCO89xYwkId6UxMqq1KL8+KLSnNTiQ4zSHCxK4rzJmRsS
+ hQTSE0tSs1NTC1KLYLJMHJxSDUx2Jn94ptr13zBOiC/KVSk3avI7vivo+zn25C87qye6VG0s
+ sT33amHpBuuWRX/fW13Zv2HdhNC4vQ6vPV5cUX3yLamAb66N0plD9gxnXer/6fJVFM3h9FwT
+ 7GW08+KD2bMWF0RMYGTYxuX3Jaf6s7L+Xc2Az95PP+RE6Kv53mT8Oyn8yr2VPKtn+QRNO3yp
+ 0sVemjXqgJz4z4b+LTOX/Nms/txN+83n/I/Pw7hMLqmXhLirvGuy5Ogva3D/776i865s9I1g
+ Jrt/b3SS7CMe2b6ZU3DvWlN1mpjpmfkqly+/XZM9u+zqpPAFlusaw5duuK/QuDrzq+7MANYF
+ ry6czNKasbWwZ29sV0hDQOHCz7uVWIozEg21mIuKEwHziR8a5gMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrOIsWRmVeSWpSXmKPExsVy+t/xe7on8zKSDH5tYrSYeMraYvrKy2wW
+ b3pMLKY+fMJm8X5ZD6PF/X3LmSw+njrObrHp8TVWi+l33rNZTGnuYLKYcmwKu8XOOSdZLY6s
+ tbeY8nIdu8Xe6ctYLWbevs1osfT4fyaLljumDkIea+atYfTYtKqTzWP/3DXsHuc3rWH22Lyk
+ 3uPzJrkAtig9m6L80pJUhYz84hJbpWhDCyM9Q0sLPSMTSz1DY/NYKyNTJX07m5TUnMyy1CJ9
+ uwS9jP0dT5gK5ktW7Fn0nLmB8aJIFyMnh4SAicTHP09Zuhi5OIQEljJKXP4wlQkiISNxcloD
+ K4QtLPHnWhcbRNF7RomP7zaxgCR4BewkzmxqYwexWQRUJbbNPsMEEReUODnzCViNqECSxItt
+ zxm7GDk4hAUcJdZ+rgYJMwuIS9x6Mp8JZKaIwE1GiW39FxkhEi+YJXbeB5spJJAhcerLabA4
+ m4ChRNdbkCM4OTgFrCS+LXnDBFFvJtG1tQuqV16ieets5gmMQrOQnDELyb5ZSFpmIWlZwMiy
+ ilEktbQ4Nz232EivODG3uDQvXS85P3cTIzDGtx37uWUH48pXH/UOMTJxMB5ilOBgVhLhvaeY
+ kSTEm5JYWZValB9fVJqTWnyI0RQYFhOZpUST84FJJq8k3tDMwNTQxMzSwNTSzFhJnNezoCNR
+ SCA9sSQ1OzW1ILUIpo+Jg1OqgWn3n7UnzyUV63lOlH72pzL3x+qcqEjOE62tU/+lfJkrvutQ
+ 8R2fDM9sF6kPd2/zl++T0zNlU/s1V+FCNJdFWKKJ2K/bM3dcX33svO5/ndLme7zrMnzWGW/s
+ qp3XbSP26lxd/O9JShqTf97q7lfJFJ19KX3J6f3VXjafP18zf/kqufZ80tSkQHf/L6+DZ7O8
+ DMmZ81Kl5VUHY/WpJHEb2euru/c9m5TtcfGWlf4ChoMHlt3/s1kqzvVx35N4C9k3PG7MKrs9
+ hEp+Kmzu2PNm+t4THxY/vSvcYCYya/Gx/RFzeSZw1bDN26mmeL3u8U3v/UdXTT0gPHNLTH8w
+ q/6HeyxctzbPveIu87og8GLOFE4OJZbijERDLeai4kQAQLSW4XoDAAA=
+X-CMS-MailID: 20220426221433eucas1p253f6350eacf87d8cac2c05adc903656e
+X-Msg-Generator: CA
+X-RootMTR: 20220426221433eucas1p253f6350eacf87d8cac2c05adc903656e
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220426221433eucas1p253f6350eacf87d8cac2c05adc903656e
+References: <20220419112247.711548-1-broonie@kernel.org>
+ <20220419112247.711548-28-broonie@kernel.org>
+ <CGME20220426221433eucas1p253f6350eacf87d8cac2c05adc903656e@eucas1p2.samsung.com>
+Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Luis Machado <luis.machado@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kselftest@vger.kernel.org,
+ Alan Hayward <alan.hayward@arm.com>, kvmarm@lists.cs.columbia.edu,
+ Salil Akerkar <Salil.Akerkar@arm.com>,
+ Luca Salabrino <luca.scalabrino@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -94,146 +136,66 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Thanks a lot for taking the time to look at this!
-
-On Tue, Apr 26, 2022 at 8:58 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Tue, 26 Apr 2022 06:39:02 +0100,
-> Yosry Ahmed <yosryahmed@google.com> wrote:
-> >
-> > Count the pages used by KVM in arm64 for page tables in pagetable stats.
-> >
-> > Account pages allocated for PTEs in pgtable init functions and
-> > kvm_set_table_pte().
-> >
-> > Since most page table pages are freed using put_page(), add a helper
-> > function put_pte_page() that checks if this is the last ref for a pte
-> > page before putting it, and unaccounts stats accordingly.
-> >
-> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> > ---
-> >  arch/arm64/kernel/image-vars.h |  3 ++
-> >  arch/arm64/kvm/hyp/pgtable.c   | 50 +++++++++++++++++++++-------------
-> >  2 files changed, 34 insertions(+), 19 deletions(-)
-> >
-> > diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-> > index 241c86b67d01..25bf058714f6 100644
-> > --- a/arch/arm64/kernel/image-vars.h
-> > +++ b/arch/arm64/kernel/image-vars.h
-> > @@ -143,6 +143,9 @@ KVM_NVHE_ALIAS(__hyp_rodata_end);
-> >  /* pKVM static key */
-> >  KVM_NVHE_ALIAS(kvm_protected_mode_initialized);
-> >
-> > +/* Called by kvm_account_pgtable_pages() to update pagetable stats */
-> > +KVM_NVHE_ALIAS(__mod_lruvec_page_state);
->
-> This cannot be right. It means that this function will be called
-> directly from the EL2 code when in protected mode, and will result in
-> extreme fireworks.  There is no way you can call core kernel stuff
-> like this from this context.
->
-> Please do not add random symbols to this list just for the sake of
-> being able to link the kernel.
-
-Excuse my ignorance, this is my first time touching kvm code. Thanks a
-lot for pointing this out.
-
->
-> > +
-> >  #endif /* CONFIG_KVM */
-> >
-> >  #endif /* __ARM64_KERNEL_IMAGE_VARS_H */
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index 2cb3867eb7c2..53e13c3313e9 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -152,6 +152,7 @@ static void kvm_set_table_pte(kvm_pte_t *ptep, kvm_pte_t *childp,
-> >
-> >       WARN_ON(kvm_pte_valid(old));
-> >       smp_store_release(ptep, pte);
-> > +     kvm_account_pgtable_pages((void *)childp, +1);
->
-> Why the + sign?
-
-I am following conventions in other existing stat accounting hooks
-(e.g. kvm_mod_used_mmu_pages(vcpu->kvm, +1) call in
-arch/x86/kvm/mmu/mmu.c), but I can certainly remove it if you think
-this is better.
-
->
-> >  }
-> >
-> >  static kvm_pte_t kvm_init_valid_leaf_pte(u64 pa, kvm_pte_t attr, u32 level)
-> > @@ -326,6 +327,14 @@ int kvm_pgtable_get_leaf(struct kvm_pgtable *pgt, u64 addr,
-> >       return ret;
-> >  }
-> >
-> > +static void put_pte_page(kvm_pte_t *ptep, struct kvm_pgtable_mm_ops *mm_ops)
-> > +{
-> > +     /* If this is the last page ref, decrement pagetable stats first. */
-> > +     if (!mm_ops->page_count || mm_ops->page_count(ptep) == 1)
-> > +             kvm_account_pgtable_pages((void *)ptep, -1);
-> > +     mm_ops->put_page(ptep);
-> > +}
-> > +
-> >  struct hyp_map_data {
-> >       u64                             phys;
-> >       kvm_pte_t                       attr;
-> > @@ -488,10 +497,10 @@ static int hyp_unmap_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >
-> >       dsb(ish);
-> >       isb();
-> > -     mm_ops->put_page(ptep);
-> > +     put_pte_page(ptep, mm_ops);
-> >
-> >       if (childp)
-> > -             mm_ops->put_page(childp);
-> > +             put_pte_page(childp, mm_ops);
-> >
-> >       return 0;
-> >  }
-> > @@ -522,6 +531,7 @@ int kvm_pgtable_hyp_init(struct kvm_pgtable *pgt, u32 va_bits,
-> >       pgt->pgd = (kvm_pte_t *)mm_ops->zalloc_page(NULL);
-> >       if (!pgt->pgd)
-> >               return -ENOMEM;
-> > +     kvm_account_pgtable_pages((void *)pgt->pgd, +1);
-> >
-> >       pgt->ia_bits            = va_bits;
-> >       pgt->start_level        = KVM_PGTABLE_MAX_LEVELS - levels;
-> > @@ -541,10 +551,10 @@ static int hyp_free_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
-> >       if (!kvm_pte_valid(pte))
-> >               return 0;
-> >
-> > -     mm_ops->put_page(ptep);
-> > +     put_pte_page(ptep, mm_ops);
-> >
-> >       if (kvm_pte_table(pte, level))
-> > -             mm_ops->put_page(kvm_pte_follow(pte, mm_ops));
-> > +             put_pte_page(kvm_pte_follow(pte, mm_ops), mm_ops);
->
-> OK, I see the pattern. I don't think this workable as such. I'd rather
-> the callbacks themselves (put_page, zalloc_page*) call into the
-> accounting code when it makes sense, rather than spreading the
-> complexity and having to special case the protected case.
->
-
-This makes sense. I am working on moving calls to
-kvm_account_pgtable_pages to callbacks in mmu.c in the next version
-(stage2_memcache_zalloc_page, kvm_host_put_page, etc).
-
-
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+SGkgTWFyaywKCk9uIDE5LjA0LjIwMjIgMTM6MjIsIE1hcmsgQnJvd24gd3JvdGU6Cj4gTm93IHRo
+YXQgYmFzbGluZSBzdXBwb3J0IGZvciB0aGUgU2NhbGFibGUgTWF0cml4IEV4dGVuc2lvbiAoU01F
+KSBpcyBwcmVzZW50Cj4gaW50cm9kdWNlIHRoZSBLY29uZmlnIG9wdGlvbiBhbGxvd2luZyBpdCB0
+byBiZSBidWlsdC4gV2hpbGUgdGhlIGZlYXR1cmUKPiByZWdpc3RlcnMgZG9uJ3QgaW1wb3NlIGEg
+c3Ryb25nIHJlcXVpcmVtZW50IGZvciBhIHN5c3RlbSB3aXRoIFNNRSB0bwo+IHN1cHBvcnQgU1ZF
+IGF0IHJ1bnRpbWUgdGhlIHN1cHBvcnQgZm9yIHN0cmVhbWluZyBtb2RlIFNWRSBpcyBtb3N0bHkK
+PiBzaGFyZWQgd2l0aCBub3JtYWwgU1ZFIHNvIGRlcGVuZCBvbiBTVkUuCj4KPiBTaWduZWQtb2Zm
+LWJ5OiBNYXJrIEJyb3duIDxicm9vbmllQGtlcm5lbC5vcmc+Cj4gUmV2aWV3ZWQtYnk6IENhdGFs
+aW4gTWFyaW5hcyA8Y2F0YWxpbi5tYXJpbmFzQGFybS5jb20+CgpUaGlzIHBhdGNoc2V0IGxhbmRl
+ZCBpbiBsaW51eCBuZXh0LTIwMjIwNDI2LiBCeSBkZWZhdWx0IFNNRSBpcyBlbmFibGVkIAphbmQg
+aXQgYnJlYWtzIENQVSBob3QtcGx1ZyBvbiBhbGwgbXkgYXJtNjQgdGVzdCBzeXN0ZW1zLiBCaXNl
+Y3QgcG9pbnRzIAp0aGlzIHBhdGNoLCBiZWNhdXNlIGl0IGZpbmFsbHkgZW5hYmxlcyB0aGlzIGZl
+YXR1cmUuIEhlcmUgaXMgYSByZXBvcnQgCmZyb20gUUVNVSdzIGFybTY0IHZpcnQgbWFjaGluZToK
+CiMgZm9yIGkgaW4gL3N5cy9kZXZpY2VzL3N5c3RlbS9jcHUvY3B1WzEtOV07IGRvIGVjaG8gMCA+
+JGkvb25saW5lOyBkb25lCnBzY2k6IENQVTEga2lsbGVkIChwb2xsZWQgMCBtcykKIyBjYXQgL3By
+b2MvY3B1aW5mbyB8IGdyZXAgcHJvY2Vzc29yIHwgd2MgLWwKMQojIGZvciBpIGluIC9zeXMvZGV2
+aWNlcy9zeXN0ZW0vY3B1L2NwdVsxLTldOyBkbyBlY2hvIDEgPiRpL29ubGluZTsgZG9uZQotLS0t
+LS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0tLS0tLS0Ka2VybmVsIEJVRyBhdCBhcmNoL2FybTY0
+L2tlcm5lbC9jcHVmZWF0dXJlLmM6MTM1MyEKSW50ZXJuYWwgZXJyb3I6IE9vcHMgLSBCVUc6IDAg
+WyMxXSBQUkVFTVBUIFNNUApNb2R1bGVzIGxpbmtlZCBpbjogYmx1ZXRvb3RoIGVjZGhfZ2VuZXJp
+YyBlY2MgcmZraWxsIGlwdjYKQ1BVOiAxIFBJRDogMCBDb21tOiBzd2FwcGVyLzEgTm90IHRhaW50
+ZWQgNS4xOC4wLXJjMysgIzQ4OTEKSGFyZHdhcmUgbmFtZTogbGludXgsZHVtbXktdmlydCAoRFQp
+CnBzdGF0ZTogMjAwMDAxYzUgKG56Q3YgZEFJRiAtUEFOIC1VQU8gLVRDTyAtRElUIC1TU0JTIEJU
+WVBFPS0tKQpwYyA6IF9fcmVhZF9zeXNyZWdfYnlfZW5jb2RpbmcrMHgzNTAvMHgzNTQKbHIgOiBo
+YXNfY3B1aWRfZmVhdHVyZSsweDZjLzB4ZTAKLi4uCkNhbGwgdHJhY2U6CiDCoF9fcmVhZF9zeXNy
+ZWdfYnlfZW5jb2RpbmcrMHgzNTAvMHgzNTQKIMKgaGFzX2NwdWlkX2ZlYXR1cmUrMHg2Yy8weGUw
+CiDCoHZlcmlmeV9sb2NhbF9jcHVfY2FwcysweDk4LzB4MTMwCiDCoGNoZWNrX2xvY2FsX2NwdV9j
+YXBhYmlsaXRpZXMrMHgyYy8weDI3MAogwqBzZWNvbmRhcnlfc3RhcnRfa2VybmVsKzB4YzAvMHgx
+NzAKIMKgX19zZWNvbmRhcnlfc3dpdGNoZWQrMHhhMC8weGE0CkNvZGU6IGQ1MzgwMmQzIDE3ZmZm
+ZjQ5IGQ1MzgwMjMzIDE3ZmZmZjQ3IChkNDIxMDAwMCkKLS0tWyBlbmQgdHJhY2UgMDAwMDAwMDAw
+MDAwMDAwMCBdLS0tCktlcm5lbCBwYW5pYyAtIG5vdCBzeW5jaW5nOiBBdHRlbXB0ZWQgdG8ga2ls
+bCB0aGUgaWRsZSB0YXNrIQpTTVA6IHN0b3BwaW5nIHNlY29uZGFyeSBDUFVzCktlcm5lbCBPZmZz
+ZXQ6IDB4NGU4MWZiNjAwMDAwIGZyb20gMHhmZmZmODAwMDA4MDAwMDAwClBIWVNfT0ZGU0VUOiAw
+eGZmZmY5OGYyNDAwMDAwMDAKQ1BVIGZlYXR1cmVzOiAweDQ0MCwwMDAzM2MwOCwwMDAwMTA4NgpN
+ZW1vcnkgTGltaXQ6IG5vbmUKLS0tWyBlbmQgS2VybmVsIHBhbmljIC0gbm90IHN5bmNpbmc6IEF0
+dGVtcHRlZCB0byBraWxsIHRoZSBpZGxlIHRhc2shIF0tLS0KCkRpc2FibGluZyBTTUUgb24gdG9w
+IG9mIG5leHQtMjAyMjA0MjYgaGlkZXMgdGhpcyBpc3N1ZS4KCj4gLS0tCj4gICBhcmNoL2FybTY0
+L0tjb25maWcgfCAxMSArKysrKysrKysrKwo+ICAgMSBmaWxlIGNoYW5nZWQsIDExIGluc2VydGlv
+bnMoKykKPgo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L0tjb25maWcgYi9hcmNoL2FybTY0L0tj
+b25maWcKPiBpbmRleCA1N2M0Yzk5NTk2NWYuLjA4OTc5ODQ5MThlOCAxMDA2NDQKPiAtLS0gYS9h
+cmNoL2FybTY0L0tjb25maWcKPiArKysgYi9hcmNoL2FybTY0L0tjb25maWcKPiBAQCAtMTkzOSw2
+ICsxOTM5LDE3IEBAIGNvbmZpZyBBUk02NF9TVkUKPiAgIAkgIGJvb3RpbmcgdGhlIGtlcm5lbC4g
+IElmIHVuc3VyZSBhbmQgeW91IGFyZSBub3Qgb2JzZXJ2aW5nIHRoZXNlCj4gICAJICBzeW1wdG9t
+cywgeW91IHNob3VsZCBhc3N1bWUgdGhhdCBpdCBpcyBzYWZlIHRvIHNheSBZLgo+ICAgCj4gK2Nv
+bmZpZyBBUk02NF9TTUUKPiArCWJvb2wgIkFSTSBTY2FsYWJsZSBNYXRyaXggRXh0ZW5zaW9uIHN1
+cHBvcnQiCj4gKwlkZWZhdWx0IHkKPiArCWRlcGVuZHMgb24gQVJNNjRfU1ZFCj4gKwloZWxwCj4g
+KwkgIFRoZSBTY2FsYWJsZSBNYXRyaXggRXh0ZW5zaW9uIChTTUUpIGlzIGFuIGV4dGVuc2lvbiB0
+byB0aGUgQUFyY2g2NAo+ICsJICBleGVjdXRpb24gc3RhdGUgd2hpY2ggdXRpbGlzZXMgYSBzdWJz
+dGFudGlhbCBzdWJzZXQgb2YgdGhlIFNWRQo+ICsJICBpbnN0cnVjdGlvbiBzZXQsIHRvZ2V0aGVy
+IHdpdGggdGhlIGFkZGl0aW9uIG9mIG5ldyBhcmNoaXRlY3R1cmFsCj4gKwkgIHJlZ2lzdGVyIHN0
+YXRlIGNhcGFibGUgb2YgaG9sZGluZyB0d28gZGltZW5zaW9uYWwgbWF0cml4IHRpbGVzIHRvCj4g
+KwkgIGVuYWJsZSB2YXJpb3VzIG1hdHJpeCBvcGVyYXRpb25zLgo+ICsKPiAgIGNvbmZpZyBBUk02
+NF9NT0RVTEVfUExUUwo+ICAgCWJvb2wgIlVzZSBQTFRzIHRvIGFsbG93IG1vZHVsZSBtZW1vcnkg
+dG8gc3BpbGwgb3ZlciBpbnRvIHZtYWxsb2MgYXJlYSIKPiAgIAlkZXBlbmRzIG9uIE1PRFVMRVMK
+CkJlc3QgcmVnYXJkcwotLSAKTWFyZWsgU3p5cHJvd3NraSwgUGhEClNhbXN1bmcgUiZEIEluc3Rp
+dHV0ZSBQb2xhbmQKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRw
+czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
