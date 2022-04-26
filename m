@@ -2,77 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2977C433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 17:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A51C433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 21:18:38 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4923F40BE7;
-	Tue, 26 Apr 2022 13:35:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D8DB4B1FE;
+	Tue, 26 Apr 2022 17:18:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dkmi82CX53Bi; Tue, 26 Apr 2022 13:34:59 -0400 (EDT)
+	with ESMTP id kxnzmvGGesYE; Tue, 26 Apr 2022 17:18:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 193D541014;
-	Tue, 26 Apr 2022 13:34:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 672544B1F2;
+	Tue, 26 Apr 2022 17:18:36 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B808140BE7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 13:34:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02CC84B1ED
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 17:18:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J+OkkE1ZjuTG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Apr 2022 13:34:56 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7640F40BCF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 13:34:56 -0400 (EDT)
+ with ESMTP id CqjCCUzeHK5Z for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Apr 2022 17:18:33 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 970A44B1EC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 17:18:33 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 8FE236153C;
- Tue, 26 Apr 2022 17:34:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFDC6C385A4;
- Tue, 26 Apr 2022 17:34:52 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id E415DB82353;
+ Tue, 26 Apr 2022 21:18:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FA84C385A0;
+ Tue, 26 Apr 2022 21:18:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1650994493;
- bh=QlCeVmaTIzYpkU1ozYLeC73MQquWV/1ULsequJfZYUg=;
+ s=k20201202; t=1651007910;
+ bh=8f3lO6dfdoKe8ke0lndZvWlEYYmm+jgmcOHxg3DxCRc=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=mV2OwYADBWSDYyJG3uHV+/jSthN2FqaulMSTWfZrTPipxaRZRj01KaCghXV0H2kgA
- TdA9zmAFWJF4YLclD++12Zg7q/uHWg430RNNZ6es9CGu8PpbT8DzOrO1fRuNP3i4rO
- ArtW59gnj8AqVFJcDEBEyAN3uYk0+O+D1QSXYmFxZkcOp3hxQ96uL/npAyWnhby5uF
- SU+YpZlJpcRyCVqvy0jrdGsMHZOtqYDG2XBwgeR3jiqnt2DCQPfzV2jszQStYJPdO0
- YxEPnl4+XE6zkLia2lF82/4Sl4ifPjHrylUUiqF1LGvpPHMFccawXob5mGEAC7/rTF
- CVi0HCt/juQWQ==
+ b=ZI2dGVkcjaHrC5YQ2Y7xLOgkgK7EaOCrIlEfHWEHMVkNk/cn/nh6HRPrFKJgZFf8Q
+ qeH5EmKSHPlNcEqvGQMXdtZNvkmeHtPL6OWWYaP9Lumeij1BeC23Th6cGsueCvAGxH
+ U+i5DOkWcM7MU+utQqaVyH+uViyELpkxDf6PIpVELm30PwNW3e91bnow/c+Mp+5tag
+ 6m8EWfHjeFdZACab3uheJuuRwRotuOTuzk+T0UmncPanhl8qzogtdcWxjQ5t8ggGAO
+ XqghafKcWtYDgu+m8U09ViGtRuftDkguiNSqW0AyLRCITECNrHmDWmrewRchNb43+q
+ mFsJCoe5bnATw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1njP5O-0079Ta-AF; Tue, 26 Apr 2022 18:34:50 +0100
-Date: Tue, 26 Apr 2022 18:34:49 +0100
-Message-ID: <8735hzague.wl-maz@kernel.org>
+ id 1njSZo-007Ctm-2j; Tue, 26 Apr 2022 22:18:28 +0100
+Date: Tue, 26 Apr 2022 22:18:27 +0100
+Message-ID: <871qxja6ho.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH 1/4] KVM: arm64: vgic: Check that new ITEs could be saved
- in guest memory
-In-Reply-To: <Ymgb8+dOEs03GvAX@google.com>
-References: <20220425185534.57011-1-ricarkol@google.com>
- <20220425185534.57011-2-ricarkol@google.com>
- <871qxkcws3.wl-maz@kernel.org> <Ymgb8+dOEs03GvAX@google.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 2/2] KVM/arm64: Print emulated register table name when it
+ is unsorted
+In-Reply-To: <20220425163904.859195-3-alexandru.elisei@arm.com>
+References: <20220425163904.859195-1-alexandru.elisei@arm.com>
+ <20220425163904.859195-3-alexandru.elisei@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, andre.przywara@arm.com,
- drjones@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com,
- oupton@google.com, reijiw@google.com, pshier@google.com
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
+ suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kvm@vger.kernel.org, andre.przywara@arm.com, pshier@google.com,
- pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -89,89 +86,45 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 26 Apr 2022 17:21:07 +0100,
-Ricardo Koller <ricarkol@google.com> wrote:
+On Mon, 25 Apr 2022 17:39:03 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> On Tue, Apr 26, 2022 at 05:07:40AM +0100, Marc Zyngier wrote:
-> > On Mon, 25 Apr 2022 19:55:31 +0100,
-> > Ricardo Koller <ricarkol@google.com> wrote:
-> > > 
-> > > A command that adds an entry into an ITS table that is not in guest
-> > > memory should fail, as any command should be treated as if it was
-> > > actually saving entries in guest memory (KVM doesn't until saving).
-> > > Add the corresponding check for the ITT when adding ITEs.
-> > > 
-> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > > ---
-> > >  arch/arm64/kvm/vgic/vgic-its.c | 34 ++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 34 insertions(+)
-> > > 
-> > > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-> > > index 2e13402be3bd..d7c1a3a01af4 100644
-> > > --- a/arch/arm64/kvm/vgic/vgic-its.c
-> > > +++ b/arch/arm64/kvm/vgic/vgic-its.c
-> > > @@ -976,6 +976,37 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
-> > >  	return ret;
-> > >  }
-> > >  
-> > > +/*
-> > > + * Check whether an event ID can be stored in the corresponding Interrupt
-> > > + * Translation Table, which starts at device->itt_addr.
-> > > + */
-> > > +static bool vgic_its_check_ite(struct vgic_its *its, struct its_device *device,
-> > > +		u32 event_id)
-> > > +{
-> > > +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
-> > > +	int ite_esz = abi->ite_esz;
-> > > +	gpa_t gpa;
-> > > +	gfn_t gfn;
-> > > +	int idx;
-> > > +	bool ret;
-> > > +
-> > > +	/* max table size is: BIT_ULL(device->num_eventid_bits) * ite_esz */
-> > > +	if (event_id >= BIT_ULL(device->num_eventid_bits))
-> > > +		return false;
-> > 
-> > We have already checked this condition, it seems.
-> > 
-> > > +
-> > > +	gpa = device->itt_addr + event_id * ite_esz;
-> > > +	gfn = gpa >> PAGE_SHIFT;
-> > > +
-> > > +	idx = srcu_read_lock(&its->dev->kvm->srcu);
-> > > +	ret = kvm_is_visible_gfn(its->dev->kvm, gfn);
-> > > +	srcu_read_unlock(&its->dev->kvm->srcu, idx);
-> > > +	return ret;
-> > 
-> > Why should we care? If the guest doesn't give us the memory that is
-> > required, that's its problem.
+> When a sysreg table entry is out-of-order, KVM attempts to print the
+> address of the table:
 > 
-> The issue is that if the guest does that, then the pause will fail and
-> we won't be able to migrate the VM. This series objective is to help
-> with failed migrations due to the ITS. This commit tries to do it by
-> avoiding them.
-
-But the guest is buggy, isn't it? No memory, no cookie! ;-)
-
-I understand that you want save/restore to be predictable even when
-the guest is too crap for words. I think clarifying this in your
-commit message would help.
-
-> > The only architectural requirement is
-> > that the EID fits into the device table. There is no guarantee that
-> > the ITS will actually write to the memory.
+> [    0.143881] kvm [1]: sys_reg table (____ptrval____) out of order (0)
 > 
-> If I understand it correctly, failing the command in this case would
-> also be architectural (right?). If the ITS tries to write the new
-> entry into memory immediately, then the command would fail. This
-> proposed check is just making this assumption.
+> Printing the name of the table instead of a pointer is more helpful in this
+> case:
+> 
+> [    0.143881] kvm [1]: sys_reg table sys_reg_descs out of order (0)
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 57302048afd0..7b62a2daf056 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -2188,18 +2188,18 @@ static const struct sys_reg_desc cp15_64_regs[] = {
+>  };
+>  
+>  static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
+> -			       bool is_32)
+> +			       const char *table_name, bool is_32)
+>  {
+>  	unsigned int i;
+>  
+>  	for (i = 0; i < n; i++) {
+>  		if (!is_32 && table[i].reg && !table[i].reset) {
+> -			kvm_err("sys_reg table %p entry %d lacks reset\n", table, i);
+> +			kvm_err("sys_reg table %s entry %d lacks reset\n", table_name, i);
 
-Neither behaviour is architectural (they are both allowed, but none
-is required). Not providing the memory, however, is unpredictable.
-
-I'm OK with your approach because it makes things consistent (we fail
-early rather than late). But the commit message doesn't really reflect
-that (it sort of hints to it, but not in a clear way).
+Instead of passing a table name, could we simply use something like
+%pS? If this works, it would be a good indication of both what table
+and what entry in that table is at fault.
 
 Thanks,
 
