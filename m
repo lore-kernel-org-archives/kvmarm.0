@@ -2,46 +2,89 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B3AC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 09:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B18FC433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 15:23:29 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B7114B16F;
-	Tue, 26 Apr 2022 05:34:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75F004B099;
+	Tue, 26 Apr 2022 11:23:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hZpLI1uR1Yzp; Tue, 26 Apr 2022 05:34:56 -0400 (EDT)
+	with ESMTP id C4L7-ruvIIL5; Tue, 26 Apr 2022 11:23:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D8A734B1A9;
-	Tue, 26 Apr 2022 05:34:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 37F494B17C;
+	Tue, 26 Apr 2022 11:23:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4FB04B12C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 05:34:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 781FF4B1C4
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 01:39:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f-be04wjkfaT for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Apr 2022 05:34:54 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 616BC49EE6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 05:34:54 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D6F5123A;
- Tue, 26 Apr 2022 02:34:53 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C1E843F73B;
- Tue, 26 Apr 2022 02:34:52 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH RESEND 2/2] KVM/arm64: Print emulated register table name when
- it is unsorted
-Date: Tue, 26 Apr 2022 10:34:39 +0100
-Message-Id: <20220426093439.12159-3-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.36.0
-In-Reply-To: <20220426093439.12159-1-alexandru.elisei@arm.com>
-References: <20220426093439.12159-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
+ with ESMTP id yt1St-udItx3 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Apr 2022 01:39:19 -0400 (EDT)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 22F624B1BD
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 01:39:19 -0400 (EDT)
+Received: by mail-pf1-f201.google.com with SMTP id
+ m8-20020a62a208000000b0050593296139so11616780pff.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 22:39:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=wiy4ZFErG6M19mqQHUKpS1yTWJiAAlT4dR/xLvJk6Hw=;
+ b=FnVqBEYT/x+/otkeQ3+MGU8nRgioALOZEJyWRms+DoU60vLvG4knvZ85+k1mr3tVc0
+ vqArKWu7LcXihZYZOL7dZijR1qW/fUI1ogYdryU7KR30je7tEjpL7SWeqEnnd/Z0l+6p
+ oQzkcbfWngpMAliZPhAsfXTSWCnwz8fWFa74DRSIzlIoZx+NC9CPJeMNUZ3R63A72PJf
+ QZcKxPUm3H1SOIAqby7P9meP48e3oR4Bh8C/ma3u+fJEHhbZdFo9brPFPEbwbLiTho1C
+ Qvh2BmXNRXBqnJccxzxqqdYZqemamQonwCzTKOX5d0cQHIkgbJ7rHfmHl0679wZSmYIx
+ AFng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=wiy4ZFErG6M19mqQHUKpS1yTWJiAAlT4dR/xLvJk6Hw=;
+ b=F0py3sy1EEmEq8i2+B9LXF7GK2LGw9ApMWuYc+AkaBFk1l/IFH3QQwDPc0r4aXzY0H
+ DXYTckoSxLy5C1lUUdc4RFXmAGqGp5vL6dxjeMriDbx9hbUkax/kN4gNTQB/ZXiccGXZ
+ uY5LAtDQJ/lah+3/OKKSs7uk+X7PckQWp2tVx3rxmzvIfhgVekZvf2vG6/33F+Dp1F7/
+ T9s1NOLuY/V9X0LpPY61hmD0uAZe/PduPC03G9m6+1EH+/g0J6ZKb8VTB05HNan6ZsuV
+ yvlqdfMQxCKMaoxWeZ2xEHc+lm+JqfkxEZejPtg4MEJWiMo4//UZduPZQWNftxITARvR
+ mkuw==
+X-Gm-Message-State: AOAM5327GJT10CA0s7j+Mk+aBig2/kx8RfWtx+Cmm6x+rIec7nQDKYLD
+ 7yfwff47u8FceZw0ttyPcUKjst3gf0Kiv8DU
+X-Google-Smtp-Source: ABdhPJxvg8pZpaAGbW2v0JTDOhNhWaI7b9G2UFmwsQAHLCDtYBjVtAQ+AyjheoLnE1s4SzV5HxUjB6H2aYquwIV1
+X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
+ (user=yosryahmed job=sendgmr) by 2002:a05:6a00:8c8:b0:4fe:ecb:9b8f
+ with SMTP
+ id s8-20020a056a0008c800b004fe0ecb9b8fmr22623121pfu.55.1650951557634; Mon, 25
+ Apr 2022 22:39:17 -0700 (PDT)
+Date: Tue, 26 Apr 2022 05:38:58 +0000
+Message-Id: <20220426053904.3684293-1-yosryahmed@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
+Subject: [PATCH v3 0/6] KVM: mm: count KVM page table pages in memory stats
+From: Yosry Ahmed <yosryahmed@google.com>
+To: Sean Christopherson <seanjc@google.com>,
+ Huacai Chen <chenhuacai@kernel.org>, 
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Anup Patel <anup@brainfault.org>, 
+ Atish Patra <atishp@atishpatra.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
+ Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>, 
+ Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+ Shakeel Butt <shakeelb@google.com>, James Morse <james.morse@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, 
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Marc Zyngier <maz@kernel.org>, 
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>
+X-Mailman-Approved-At: Tue, 26 Apr 2022 11:23:27 -0400
+Cc: kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Yosry Ahmed <yosryahmed@google.com>,
+ linux-mm@kvack.org, kvm-riscv@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, cgroups@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -58,70 +101,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-When a sysreg table entry is out-of-order, KVM attempts to print the
-address of the table:
+We keep track of several kernel memory stats (total kernel memory, page
+tables, stack, vmalloc, etc) on multiple levels (global, per-node,
+per-memcg, etc). These stats give insights to users to how much memory
+is used by the kernel and for what purposes.
 
-[    0.143881] kvm [1]: sys_reg table (____ptrval____) out of order (0)
+Currently, memory used by kvm for its page tables is not accounted in
+any of those kernel memory stats. This patch series accounts the memory
+pages used by KVM for page tables in those stats in a new
+NR_SECONDARY_PAGETABLE stat.
 
-Printing the name of the table instead of a pointer is more helpful in this
-case:
+The riscv and mips patches are not tested due to lack of
+resources. Feel free to test or drop them.
 
-[    0.143881] kvm [1]: sys_reg table sys_reg_descs out of order (0)
+Changes in V3:
+- Added NR_SECONDARY_PAGETABLE instead of piggybacking on NR_PAGETABLE
+  stats.
 
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+Changes in V2:
+- Added accounting stats for other archs than x86.
+- Changed locations in the code where x86 KVM page table stats were
+  accounted based on suggestions from Sean Christopherson.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 57302048afd0..7b62a2daf056 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2188,18 +2188,18 @@ static const struct sys_reg_desc cp15_64_regs[] = {
- };
- 
- static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
--			       bool is_32)
-+			       const char *table_name, bool is_32)
- {
- 	unsigned int i;
- 
- 	for (i = 0; i < n; i++) {
- 		if (!is_32 && table[i].reg && !table[i].reset) {
--			kvm_err("sys_reg table %p entry %d lacks reset\n", table, i);
-+			kvm_err("sys_reg table %s entry %d lacks reset\n", table_name, i);
- 			return false;
- 		}
- 
- 		if (i && cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
--			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
-+			kvm_err("sys_reg table %s out of order (%d)\n", table_name, i - 1);
- 			return false;
- 		}
- 	}
-@@ -2866,12 +2866,14 @@ int kvm_sys_reg_table_init(void)
- 	struct sys_reg_desc clidr;
- 
- 	/* Make sure tables are unique and in order. */
--	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
--	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
--	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
--	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
--	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
--	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false);
-+	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs),
-+				    "sys_reg_descs", false);
-+	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), "cp14_regs", true);
-+	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), "cp14_64_regs", true);
-+	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), "cp15_regs", true);
-+	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), "cp15_64_regs", true);
-+	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs),
-+				    "invariant_sys_regs", false);
- 
- 	if (!valid)
- 		return -EINVAL;
+
+Yosry Ahmed (6):
+  mm: add NR_SECONDARY_PAGETABLE stat
+  KVM: mmu: add a helper to account page table pages used by KVM.
+  KVM: x86/mmu: count KVM page table pages in pagetable stats
+  KVM: arm64/mmu: count KVM page table pages in pagetable stats
+  KVM: riscv/mmu: count KVM page table pages in pagetable stats
+  KVM: mips/mmu: count KVM page table pages in pagetable stats
+
+ arch/arm64/kernel/image-vars.h |  3 ++
+ arch/arm64/kvm/hyp/pgtable.c   | 50 +++++++++++++++++++++-------------
+ arch/mips/kvm/mips.c           |  1 +
+ arch/mips/kvm/mmu.c            |  9 +++++-
+ arch/riscv/kvm/mmu.c           | 26 +++++++++++++-----
+ arch/x86/kvm/mmu/mmu.c         | 16 +++++++++--
+ arch/x86/kvm/mmu/tdp_mmu.c     | 16 +++++++++--
+ drivers/base/node.c            |  2 ++
+ fs/proc/meminfo.c              |  2 ++
+ include/linux/kvm_host.h       |  9 ++++++
+ include/linux/mmzone.h         |  1 +
+ mm/memcontrol.c                |  1 +
+ mm/page_alloc.c                |  6 +++-
+ mm/vmstat.c                    |  1 +
+ 14 files changed, 111 insertions(+), 32 deletions(-)
+
 -- 
-2.36.0
+2.36.0.rc2.479.g8af0fa9b8e-goog
 
 _______________________________________________
 kvmarm mailing list
