@@ -2,76 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25D89C43217
-	for <kvmarm@archiver.kernel.org>; Mon, 25 Apr 2022 23:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A15C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 26 Apr 2022 04:07:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CD8264B1A2;
-	Mon, 25 Apr 2022 19:53:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 443284B159;
+	Tue, 26 Apr 2022 00:07:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PzW+szHZ-s5l; Mon, 25 Apr 2022 19:53:56 -0400 (EDT)
+	with ESMTP id EGWYXr7VELco; Tue, 26 Apr 2022 00:07:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9200C4B1A9;
-	Mon, 25 Apr 2022 19:53:56 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D9F134B137;
+	Tue, 26 Apr 2022 00:07:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D09364B172
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 19:53:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A50864B10A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 00:07:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3MgOLPFMRkpN for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Apr 2022 19:53:54 -0400 (EDT)
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com
- [209.85.214.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40B294B1CB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 19:53:54 -0400 (EDT)
-Received: by mail-pl1-f201.google.com with SMTP id
- q6-20020a170902eb8600b0015d1f318e82so2214272plg.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Apr 2022 16:53:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=IxHNHx5wJBVm+rn+jgN7nIqGaCqRxbvwWyLEAglKnWI=;
- b=BO1aKVrSqDD9Ar0XuW9GCnstLd6dqzKgozWJIYb2AWXq+i9HInlKJW+JM8QQ7DwNfq
- BzCri9AGFee+/Cg03nTnxQknM85IOpD1VLlaks2DOYHxTnDc0GDUtxrn8jFmyoc7Iwya
- LrB+PzlU7uNFxxEbFBLUDx5GqzUBM7Du2WHaUmp1uEqjJpahl6fY2OEUueuS+fJmFePz
- a6GUInOaDxJD1otn6Q5byCPbTRs090t5DzYKPvMKlUexwbyBZUActCjMi/Rb70jJQGGo
- AnZYlz5v/iyJreScwHMG3OgX0zXV7QcvUfaDMbRUc+hIMqqSyjWDHX4b1AwE+Ci//r06
- uqfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=IxHNHx5wJBVm+rn+jgN7nIqGaCqRxbvwWyLEAglKnWI=;
- b=mlX8eOjGp63bHB4ndllDWnfHGm68kGNJL3ymbQnv9UojzJQuVBvMJtXAGa4d4jX5WL
- DnHNj0as9hnLrDluXXKwA+2O3Bh9VjeEiYSTXDjUOYwHnsXJLJF6hvKiYQ/TULgSO1yM
- pq774RLng8JI5VguIQ4B6+hicfo6DV+7kJsEt6Ui9Wi8jOozdVM57GBEJUeEUTd+nwpy
- yVyeIkDmJ1q6feM7dHAhconstyhVZLTtiHuUbtvXNgRZYm24W3yB8c/09A0fO93Qr+Lh
- vRLe882gt2Tg+jEnszr3UpnyeYoFdzNVlW23XlJRYJSIiAwVgJQuJOlxsKRYp9QPVaKY
- qJZQ==
-X-Gm-Message-State: AOAM531lKeyv42ZHswdgWOahal0mGM98r6Q2uv1/mT+oFbyvMJ4JISN+
- CKY3bXcWExfhpa9N0tM+kvbeF5FH6P8BheEvwsupJGrMXiP/FSCT4dzVOh6hi2Arx4HEN2mnhny
- NkdoFWrxdbl1LLPy/15hs1udSnmviT+OxqqWGhqHvfc0O7S21r/GQa08Pk2oMzMXO77SzJQ==
-X-Google-Smtp-Source: ABdhPJy8VMFMNE9Q7UkBKYVM4qUrLDosnMII9dPPPSbr5WKYB/hKuYfHo0mtNOfXwW2DsxYsAqekF2bfA/Q=
-X-Received: from oupton3.c.googlers.com
- ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a17:90a:9105:b0:1d2:9e98:7e1e with SMTP id
- k5-20020a17090a910500b001d29e987e1emr1694934pjo.0.1650930832927; Mon, 25 Apr
- 2022 16:53:52 -0700 (PDT)
-Date: Mon, 25 Apr 2022 23:53:42 +0000
-In-Reply-To: <20220425235342.3210912-1-oupton@google.com>
-Message-Id: <20220425235342.3210912-6-oupton@google.com>
-Mime-Version: 1.0
-References: <20220425235342.3210912-1-oupton@google.com>
-X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH v3 5/5] KVM: arm64: Start trapping ID registers for 32 bit
- guests
-From: Oliver Upton <oupton@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id ydpwRwqKO8yU for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Apr 2022 00:07:49 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 38EFE4B0CB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 00:07:49 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 3EADC617F7;
+ Tue, 26 Apr 2022 04:07:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1935C385A0;
+ Tue, 26 Apr 2022 04:07:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1650946067;
+ bh=SDHs3zTqIo9VsMzOH0uSwrAJvVTROZ4UuNBe+gEwAkk=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=ZrS5lFE8KIGJ15khhlW+CvSqUAUqM154cGvtoZqj10fgwmm5v1Pg0NCwhUn+nCvAt
+ SBGuMdyawRIRaqRLceGYGRQaLnSxBTICKUDuSl9QrngAyslwslR5R8oY71NGJRlTfZ
+ 1nJ7/4D7y6HohyMuNYKcDnJIANqiZiD2CojbilQk4iat84P4OLjonnzN8cMxYBd1W6
+ 5Xr6YYEYCubSw2r92NVUhl0gPepWd8sMrjMC3EiEOqz6zEK+0+xwR3KhU0RW660V5l
+ +aB7v0fQ5hp3NQmXhq90asX0A/JplLLxKqYubKiOdYIiC4tB+4ZQ5vom5qwm8/QVtA
+ cR3gY6x8bo80g==
+Received: from [64.125.41.58] (helo=billy-the-mountain.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1njCUK-006wPU-PO; Tue, 26 Apr 2022 05:07:45 +0100
+Date: Tue, 26 Apr 2022 05:07:40 +0100
+Message-ID: <871qxkcws3.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Ricardo Koller <ricarkol@google.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: vgic: Check that new ITEs could be saved
+ in guest memory
+In-Reply-To: <20220425185534.57011-2-ricarkol@google.com>
+References: <20220425185534.57011-1-ricarkol@google.com>
+ <20220425185534.57011-2-ricarkol@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 64.125.41.58
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com, andre.przywara@arm.com,
+ drjones@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com,
+ oupton@google.com, reijiw@google.com, pshier@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, andre.przywara@arm.com, pshier@google.com,
+ pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,63 +88,98 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-To date KVM has not trapped ID register accesses from AArch32, meaning
-that guests get an unconstrained view of what hardware supports. This
-can be a serious problem because we try to base the guest's feature
-registers on values that are safe system-wide. Furthermore, KVM does not
-implement the latest ISA in the PMU and Debug architecture, so we
-constrain these fields to supported values.
+On Mon, 25 Apr 2022 19:55:31 +0100,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> A command that adds an entry into an ITS table that is not in guest
+> memory should fail, as any command should be treated as if it was
+> actually saving entries in guest memory (KVM doesn't until saving).
+> Add the corresponding check for the ITT when adding ITEs.
+> 
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 34 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 34 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 2e13402be3bd..d7c1a3a01af4 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -976,6 +976,37 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+>  	return ret;
+>  }
+>  
+> +/*
+> + * Check whether an event ID can be stored in the corresponding Interrupt
+> + * Translation Table, which starts at device->itt_addr.
+> + */
+> +static bool vgic_its_check_ite(struct vgic_its *its, struct its_device *device,
+> +		u32 event_id)
+> +{
+> +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> +	int ite_esz = abi->ite_esz;
+> +	gpa_t gpa;
+> +	gfn_t gfn;
+> +	int idx;
+> +	bool ret;
+> +
+> +	/* max table size is: BIT_ULL(device->num_eventid_bits) * ite_esz */
+> +	if (event_id >= BIT_ULL(device->num_eventid_bits))
+> +		return false;
 
-Since KVM now correctly handles CP15 and CP10 register traps, we no
-longer need to clear HCR_EL2.TID3 for 32 bit guests and will instead
-emulate reads with their safe values.
+We have already checked this condition, it seems.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
----
- arch/arm64/include/asm/kvm_arm.h     | 3 ++-
- arch/arm64/include/asm/kvm_emulate.h | 7 -------
- 2 files changed, 2 insertions(+), 8 deletions(-)
+> +
+> +	gpa = device->itt_addr + event_id * ite_esz;
+> +	gfn = gpa >> PAGE_SHIFT;
+> +
+> +	idx = srcu_read_lock(&its->dev->kvm->srcu);
+> +	ret = kvm_is_visible_gfn(its->dev->kvm, gfn);
+> +	srcu_read_unlock(&its->dev->kvm->srcu, idx);
+> +	return ret;
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 1767ded83888..b5de102928d8 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -80,11 +80,12 @@
-  * FMO:		Override CPSR.F and enable signaling with VF
-  * SWIO:	Turn set/way invalidates into set/way clean+invalidate
-  * PTW:		Take a stage2 fault if a stage1 walk steps in device memory
-+ * TID3:	Trap EL1 reads of group 3 ID registers
-  */
- #define HCR_GUEST_FLAGS (HCR_TSC | HCR_TSW | HCR_TWE | HCR_TWI | HCR_VM | \
- 			 HCR_BSU_IS | HCR_FB | HCR_TACR | \
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW | HCR_TLOR | \
--			 HCR_FMO | HCR_IMO | HCR_PTW )
-+			 HCR_FMO | HCR_IMO | HCR_PTW | HCR_TID3 )
- #define HCR_VIRT_EXCP_MASK (HCR_VSE | HCR_VI | HCR_VF)
- #define HCR_HOST_NVHE_FLAGS (HCR_RW | HCR_API | HCR_APK | HCR_ATA)
- #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 7496deab025a..ab5c66b77bb0 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -86,13 +86,6 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 
- 	if (vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
--	else
--		/*
--		 * TID3: trap feature register accesses that we virtualise.
--		 * For now this is conditional, since no AArch32 feature regs
--		 * are currently virtualised.
--		 */
--		vcpu->arch.hcr_el2 |= HCR_TID3;
- 
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
- 	    vcpu_el1_is_32bit(vcpu))
+Why should we care? If the guest doesn't give us the memory that is
+required, that's its problem. The only architectural requirement is
+that the EID fits into the device table. There is no guarantee that
+the ITS will actually write to the memory.
+
+And if you feel that there is a strong need to have this, surely you
+can reuse some of the vgic_its_check_id() code.
+
+> +}
+> +
+> +/*
+> + * Adds a new collection into the ITS collection table.
+> + * Returns 0 on success, and a negative error value for generic errors.
+
+Not only. A positive error can also be returned for an out of range
+condition.
+
+> + */
+>  static int vgic_its_alloc_collection(struct vgic_its *its,
+>  				     struct its_collection **colp,
+>  				     u32 coll_id)
+> @@ -1076,6 +1107,9 @@ static int vgic_its_cmd_handle_mapi(struct kvm *kvm, struct vgic_its *its,
+>  	if (find_ite(its, device_id, event_id))
+>  		return 0;
+>  
+> +	if (!vgic_its_check_ite(its, device, event_id))
+> +		return E_ITS_MAPTI_ID_OOR;
+> +
+>  	collection = find_collection(its, coll_id);
+>  	if (!collection) {
+>  		int ret = vgic_its_alloc_collection(its, &collection, coll_id);
+> -- 
+> 2.36.0.rc2.479.g8af0fa9b8e-goog
+> 
+> 
+
+Thanks,
+
+	M.
+
 -- 
-2.36.0.rc2.479.g8af0fa9b8e-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
