@@ -2,82 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B392C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Apr 2022 02:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEFFC433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Apr 2022 07:58:14 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64E5E4B192;
-	Tue, 26 Apr 2022 22:10:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CF6404B10A;
+	Wed, 27 Apr 2022 03:58:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id D2Ptk4IzH1G2; Tue, 26 Apr 2022 22:09:58 -0400 (EDT)
+	with ESMTP id uow41CBW-4On; Wed, 27 Apr 2022 03:58:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 729F249F5B;
-	Tue, 26 Apr 2022 22:09:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD924B0BA;
+	Wed, 27 Apr 2022 03:58:12 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0669A49E49
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 22:09:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0BD24A0FE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 03:58:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ak+lGcEmxnY1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Apr 2022 22:09:55 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08F8840C02
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Apr 2022 22:09:54 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1651025394;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7bkyrH5c2hKUcaITiGmdDBOvO8zmEbp3dCpxTZkvZz4=;
- b=NqROqt611M9lTdYvl6KzYbG/fVXA3iPgm/lfDAaTQ6YjmEg78n71xEsxS7D8FmzysJAVEK
- hNDZomAph2dL+6HkI7Zd7FbIooCvxTOA0HhkxICuGcpebghAWi9pTfzbVcsl4DAytYM8bh
- rwrCueM/Rdo8ieu9jH2BCl28OdEouJw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-378-n4KVVouZOf-54OhBmwSxKA-1; Tue, 26 Apr 2022 22:09:53 -0400
-X-MC-Unique: n4KVVouZOf-54OhBmwSxKA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com
- [10.11.54.9])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6AD76833963;
- Wed, 27 Apr 2022 02:09:52 +0000 (UTC)
-Received: from [10.72.13.230] (ovpn-13-230.pek2.redhat.com [10.72.13.230])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 424A05673BD;
- Wed, 27 Apr 2022 02:09:44 +0000 (UTC)
-Subject: Re: [PATCH v6 8/9] selftests: KVM: aarch64: Introduce hypercall ABI
- test
-To: Raghavendra Rao Ananta <rananta@google.com>
-References: <20220423000328.2103733-1-rananta@google.com>
- <20220423000328.2103733-9-rananta@google.com>
- <896e95a1-6a3e-c524-4951-8fae9697b85e@redhat.com>
- <CAJHc60z_+O09u0wB9=PnuEu3bZC0tQG93iWbjTP7-WvnN-FEnQ@mail.gmail.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <85a332a0-541e-648a-db98-eff894737338@redhat.com>
-Date: Wed, 27 Apr 2022 10:09:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id cc5TQ06VVgv5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Apr 2022 03:58:10 -0400 (EDT)
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com
+ [209.85.167.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 614F849F5D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 03:58:10 -0400 (EDT)
+Received: by mail-lf1-f49.google.com with SMTP id w19so1672742lfu.11
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 00:58:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9PcZYugoosgvVnbdsZsc0xpKvyrWtHg79ZtXXeZRMbY=;
+ b=WJtmISRCRmUGRqZ40V4ownvVDk+QVBiVcl5+tyj5WsSZG/OsqzOVlTZMlXd/ypwlDB
+ YSeu2mYG+3+G+1zMSw42AxI98xIdYm7amNPjkdf5s5ttH3vUJ5JdJLww5DS9xO6IPh/h
+ VEB37i8qKrAKezwBvUw3SNxevJZD2kgZsX9M79p4Tkd5etidXN27EJSnXOM20i+Jg0U8
+ 90rZWRbSqgqL5XpcW4cbTaY+kRYbua8cJS5kQEfFaaZWZc2nj6QVRnWajDGHMTS44EeW
+ XV9I81dmnMVy7iZXE/w8oUZA/5KhY6drS85g27UbVtUJnoAN+yxXCDZREC4u2PzAmfGx
+ GdUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9PcZYugoosgvVnbdsZsc0xpKvyrWtHg79ZtXXeZRMbY=;
+ b=B72HhK3QE4d0C0mTZ4uPLLp/9rHHM4zw8tpcDbyOUqk++wBTIqvzuyVXEbI2qIDKCq
+ bbomiWBs0QXSFpFGVUAllrrPVpN0OHgrgKBjhFEe0QiDTShjGqhOSUrVbiNdiZrJE+xj
+ tTXhi+C/z7i7VsQEXH0MsZhP6oM2y9KyWV0vaFpKNuFjDZQv21fIGUwtBn+G6QPRDiKI
+ pelH+x2ClXMGdmRGBH5Jkk8xSd9BIRr/6o0Wr7Lk0E7kE29d7mp6bR75Npg5uBsbjLBH
+ HVMUbB5UUyr2WJb1TlGst0FelE644hTx7b7DEf7risKucY5DrTB7LywW6oLaBAKSHQBf
+ FE0g==
+X-Gm-Message-State: AOAM533kp5VVhqb80KS2xyHL5Mob9Rt6Wd6Q56eHBXLUVz7i+Bnm/z5N
+ 8RPDqJbJ0VpMbSeRVZR7WKDFmJCP6voDS50fjO0VGg==
+X-Google-Smtp-Source: ABdhPJz1hXVXX+ILBY0Tjus56mOuV1K/gPdovpJ3Niy+2DcRkhQqCpXhp2ln3z2sSEiPc9L6DmeMpRoF8GzoF3UXQyY=
+X-Received: by 2002:a05:6512:b0e:b0:44a:a5a0:f60e with SMTP id
+ w14-20020a0565120b0e00b0044aa5a0f60emr20128758lfu.669.1651046288291; Wed, 27
+ Apr 2022 00:58:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAJHc60z_+O09u0wB9=PnuEu3bZC0tQG93iWbjTP7-WvnN-FEnQ@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu,
+References: <20220425145530.723858-1-alexandru.elisei@arm.com>
+ <Yment8uGahyB+wgK@google.com> <Yme02Tw3WdbXBAR1@monolith.localdoman>
+In-Reply-To: <Yme02Tw3WdbXBAR1@monolith.localdoman>
+From: Oliver Upton <oupton@google.com>
+Date: Wed, 27 Apr 2022 00:57:57 -0700
+Message-ID: <CAOQ_Qsj47JkEn-sOhKCAKyZnetsKqpWvBALnfAzyMfMy=eqOHg@mail.gmail.com>
+Subject: Re: [PATCH] KVM/arm64: Don't emulate a PMU for 32-bit guests if
+ feature not set
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: maz@kernel.org, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -86,453 +79,91 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Raghavendra,
+Hi Alex,
 
-On 4/27/22 12:59 AM, Raghavendra Rao Ananta wrote:
-> On Tue, Apr 26, 2022 at 12:50 AM Gavin Shan <gshan@redhat.com> wrote:
->> On 4/23/22 8:03 AM, Raghavendra Rao Ananta wrote:
->>> Introduce a KVM selftest to check the hypercall interface
->>> for arm64 platforms. The test validates the user-space'
->>> [GET|SET]_ONE_REG interface to read/write the psuedo-firmware
->>> registers as well as its effects on the guest upon certain
->>> configurations.
->>>
->>> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
->>> ---
->>>    tools/testing/selftests/kvm/.gitignore        |   1 +
->>>    tools/testing/selftests/kvm/Makefile          |   1 +
->>>    .../selftests/kvm/aarch64/hypercalls.c        | 335 ++++++++++++++++++
->>>    3 files changed, 337 insertions(+)
->>>    create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
->>>
->>
->> There are comments about @false_hvc_info[] and some nits, as below.
->> Please evaluate and improve if it makes sense to you. Otherwise, it
->> looks good to me:
->>
->> Reviewed-by: Gavin Shan <gshan@redhat.com>
->>
->>> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
->>> index 1bb575dfc42e..b17e464ec661 100644
->>> --- a/tools/testing/selftests/kvm/.gitignore
->>> +++ b/tools/testing/selftests/kvm/.gitignore
->>> @@ -2,6 +2,7 @@
->>>    /aarch64/arch_timer
->>>    /aarch64/debug-exceptions
->>>    /aarch64/get-reg-list
->>> +/aarch64/hypercalls
->>>    /aarch64/psci_test
->>>    /aarch64/vcpu_width_config
->>>    /aarch64/vgic_init
->>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
->>> index c2cf4d318296..97eef0c03d3b 100644
->>> --- a/tools/testing/selftests/kvm/Makefile
->>> +++ b/tools/testing/selftests/kvm/Makefile
->>> @@ -105,6 +105,7 @@ TEST_GEN_PROGS_x86_64 += system_counter_offset_test
->>>    TEST_GEN_PROGS_aarch64 += aarch64/arch_timer
->>>    TEST_GEN_PROGS_aarch64 += aarch64/debug-exceptions
->>>    TEST_GEN_PROGS_aarch64 += aarch64/get-reg-list
->>> +TEST_GEN_PROGS_aarch64 += aarch64/hypercalls
->>>    TEST_GEN_PROGS_aarch64 += aarch64/psci_test
->>>    TEST_GEN_PROGS_aarch64 += aarch64/vcpu_width_config
->>>    TEST_GEN_PROGS_aarch64 += aarch64/vgic_init
->>> diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
->>> new file mode 100644
->>> index 000000000000..f404343a0ae3
->>> --- /dev/null
->>> +++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
->>> @@ -0,0 +1,335 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +
->>> +/* hypercalls: Check the ARM64's psuedo-firmware bitmap register interface.
->>> + *
->>> + * The test validates the basic hypercall functionalities that are exposed
->>> + * via the psuedo-firmware bitmap register. This includes the registers'
->>> + * read/write behavior before and after the VM has started, and if the
->>> + * hypercalls are properly masked or unmasked to the guest when disabled or
->>> + * enabled from the KVM userspace, respectively.
->>> + */
->>> +
->>> +#include <errno.h>
->>> +#include <linux/arm-smccc.h>
->>> +#include <asm/kvm.h>
->>> +#include <kvm_util.h>
->>> +
->>> +#include "processor.h"
->>> +
->>> +#define FW_REG_ULIMIT_VAL(max_feat_bit) (GENMASK(max_feat_bit, 0))
->>> +
->>> +/* Last valid bits of the bitmapped firmware registers */
->>> +#define KVM_REG_ARM_STD_BMAP_BIT_MAX         0
->>> +#define KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX     0
->>> +#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX  1
->>> +
->>> +struct kvm_fw_reg_info {
->>> +     uint64_t reg;           /* Register definition */
->>> +     uint64_t max_feat_bit;  /* Bit that represents the upper limit of the feature-map */
->>> +};
->>> +
->>> +#define FW_REG_INFO(r)                       \
->>> +     {                                       \
->>> +             .reg = r,                       \
->>> +             .max_feat_bit = r##_BIT_MAX,    \
->>> +     }
->>> +
->>> +static const struct kvm_fw_reg_info fw_reg_info[] = {
->>> +     FW_REG_INFO(KVM_REG_ARM_STD_BMAP),
->>> +     FW_REG_INFO(KVM_REG_ARM_STD_HYP_BMAP),
->>> +     FW_REG_INFO(KVM_REG_ARM_VENDOR_HYP_BMAP),
->>> +};
->>> +
->>> +enum test_stage {
->>> +     TEST_STAGE_REG_IFACE,
->>> +     TEST_STAGE_HVC_IFACE_FEAT_DISABLED,
->>> +     TEST_STAGE_HVC_IFACE_FEAT_ENABLED,
->>> +     TEST_STAGE_HVC_IFACE_FALSE_INFO,
->>> +     TEST_STAGE_END,
->>> +};
->>> +
->>> +static int stage = TEST_STAGE_REG_IFACE;
->>> +
->>> +struct test_hvc_info {
->>> +     uint32_t func_id;
->>> +     uint64_t arg1;
->>> +};
->>> +
->>> +#define TEST_HVC_INFO(f, a1) \
->>> +     {                       \
->>> +             .func_id = f,   \
->>> +             .arg1 = a1,     \
->>> +     }
->>> +
->>> +static const struct test_hvc_info hvc_info[] = {
->>> +     /* KVM_REG_ARM_STD_BMAP */
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_VERSION, 0),
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_FEATURES, ARM_SMCCC_TRNG_RND64),
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_GET_UUID, 0),
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_RND32, 0),
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_RND64, 0),
->>> +
->>> +     /* KVM_REG_ARM_STD_HYP_BMAP */
->>> +     TEST_HVC_INFO(ARM_SMCCC_ARCH_FEATURES_FUNC_ID, ARM_SMCCC_HV_PV_TIME_FEATURES),
->>> +     TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_FEATURES, ARM_SMCCC_HV_PV_TIME_ST),
->>> +     TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_ST, 0),
->>> +
->>> +     /* KVM_REG_ARM_VENDOR_HYP_BMAP */
->>> +     TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID,
->>> +                     ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
->>> +     TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID, 0),
->>> +     TEST_HVC_INFO(ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID, KVM_PTP_VIRT_COUNTER),
->>> +};
->>> +
->>> +/* Feed false hypercall info to test the KVM behavior */
->>> +static const struct test_hvc_info false_hvc_info[] = {
->>> +     /* Feature support check against a different family of hypercalls */
->>> +     TEST_HVC_INFO(ARM_SMCCC_TRNG_FEATURES, ARM_SMCCC_VENDOR_HYP_KVM_PTP_FUNC_ID),
->>> +     TEST_HVC_INFO(ARM_SMCCC_ARCH_FEATURES_FUNC_ID, ARM_SMCCC_TRNG_RND64),
->>> +     TEST_HVC_INFO(ARM_SMCCC_HV_PV_TIME_FEATURES, ARM_SMCCC_TRNG_RND64),
->>> +};
->>> +
->>
->> I don't see too much benefits of @false_hvc_info[] because
->> NOT_SUPPORTED is always returned from its test case. I think
->> it and its test case can be removed if you agree. I'm not
->> sure if it was suggested by somebody else.
->>
-> While this is not exactly testing the bitmap firmware registers, the
-> idea behind introducing false_hvc_info[] was to introduce some
-> negative tests and see if KVM handles it well. Especially with
-> *_FEATURES func_ids, we can accidentally introduce functional bugs in
-> KVM, and these would act as our safety net. I was planning to also
-> test with some reserved hypercall numbers, just to test if the kernel
-> doesn't panic for some reason.
-> 
+On Tue, Apr 26, 2022 at 2:01 AM Alexandru Elisei
+<alexandru.elisei@arm.com> wrote:
+> > > The odroid-c4 is somewhat of a special case, because Linux doesn't probe
+> > > the PMU. But the above errors can easily be reproduced on any hardware,
+> > > with or without a PMU driver, as long as userspace doesn't set the PMU
+> > > feature.
+> >
+> > This note has me wondering if we could do more negative testing with
+> > kvm-unit-tests just by selectively turning on/off features, with the
+> > expectation that tests either skip or pass.
+>
+> I'm not sure that that can be accomplished right now. kvm-unit-tests
+> supports only qemu as an automated test runner, and qemu enables the PMU by
+> default. I don't know if it can be disabled, it would be nice if it could.
+> I stumbled upon this by mistake, when I ran kvmtool without enabling the
+> PMU (the default in kvmtool is to not have it enabled).
+>
+> If it is possible to disable PMU emulation from the qemu's command line,
+> then it should be as simple as writing a test that expects all PMU register
+> accesses to trigger an undefined exception (and adding a new test
+> definition).
 
-Ok, thanks for the explanation. It makes sense to me.
+You can disable the PMU with QEMU by specifying pmu=off in the -cpu
+argument, among other things.
 
->>> +static void guest_test_hvc(const struct test_hvc_info *hc_info)
->>> +{
->>> +     unsigned int i;
->>> +     struct arm_smccc_res res;
->>> +     unsigned int hvc_info_arr_sz;
->>> +
->>> +     hvc_info_arr_sz =
->>> +     hc_info == hvc_info ? ARRAY_SIZE(hvc_info) : ARRAY_SIZE(false_hvc_info);
->>> +
->>> +     for (i = 0; i < hvc_info_arr_sz; i++, hc_info++) {
->>> +             memset(&res, 0, sizeof(res));
->>> +             smccc_hvc(hc_info->func_id, hc_info->arg1, 0, 0, 0, 0, 0, 0, &res);
->>> +
->>> +             switch (stage) {
->>> +             case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
->>> +             case TEST_STAGE_HVC_IFACE_FALSE_INFO:
->>> +                     GUEST_ASSERT_3(res.a0 == SMCCC_RET_NOT_SUPPORTED,
->>> +                                     res.a0, hc_info->func_id, hc_info->arg1);
->>> +                     break;
->>> +             case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
->>> +                     GUEST_ASSERT_3(res.a0 != SMCCC_RET_NOT_SUPPORTED,
->>> +                                     res.a0, hc_info->func_id, hc_info->arg1);
->>> +                     break;
->>> +             default:
->>> +                     GUEST_ASSERT_1(0, stage);
->>> +             }
->>> +     }
->>> +}
->>> +
->>> +static void guest_code(void)
->>> +{
->>> +     while (stage != TEST_STAGE_END) {
->>> +             switch (stage) {
->>> +             case TEST_STAGE_REG_IFACE:
->>> +                     break;
->>> +             case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
->>> +             case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
->>> +                     guest_test_hvc(hvc_info);
->>> +                     break;
->>> +             case TEST_STAGE_HVC_IFACE_FALSE_INFO:
->>> +                     guest_test_hvc(false_hvc_info);
->>> +                     break;
->>> +             default:
->>> +                     GUEST_ASSERT_1(0, stage);
->>> +             }
->>> +
->>> +             GUEST_SYNC(stage);
->>> +     }
->>> +
->>> +     GUEST_DONE();
->>> +}
->>> +
->>> +static int set_fw_reg(struct kvm_vm *vm, uint64_t id, uint64_t val)
->>> +{
->>> +     struct kvm_one_reg reg = {
->>> +             .id = id,
->>> +             .addr = (uint64_t)&val,
->>> +     };
->>> +
->>> +     return _vcpu_ioctl(vm, 0, KVM_SET_ONE_REG, &reg);
->>> +}
->>> +
->>> +static void get_fw_reg(struct kvm_vm *vm, uint64_t id, uint64_t *addr)
->>> +{
->>> +     struct kvm_one_reg reg = {
->>> +             .id = id,
->>> +             .addr = (uint64_t)addr,
->>> +     };
->>> +
->>> +     vcpu_ioctl(vm, 0, KVM_GET_ONE_REG, &reg);
->>> +}
->>> +
->>> +struct st_time {
->>> +     uint32_t rev;
->>> +     uint32_t attr;
->>> +     uint64_t st_time;
->>> +};
->>> +
->>> +#define STEAL_TIME_SIZE              ((sizeof(struct st_time) + 63) & ~63)
->>> +#define ST_GPA_BASE          (1 << 30)
->>> +
->>> +static void steal_time_init(struct kvm_vm *vm)
->>> +{
->>> +     uint64_t st_ipa = (ulong)ST_GPA_BASE;
->>> +     unsigned int gpages;
->>> +     struct kvm_device_attr dev = {
->>> +             .group = KVM_ARM_VCPU_PVTIME_CTRL,
->>> +             .attr = KVM_ARM_VCPU_PVTIME_IPA,
->>> +             .addr = (uint64_t)&st_ipa,
->>> +     };
->>> +
->>> +     gpages = vm_calc_num_guest_pages(VM_MODE_DEFAULT, STEAL_TIME_SIZE);
->>> +     vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS, ST_GPA_BASE, 1, gpages, 0);
->>> +
->>> +     vcpu_ioctl(vm, 0, KVM_SET_DEVICE_ATTR, &dev);
->>> +}
->>> +
->>> +static void test_fw_regs_before_vm_start(struct kvm_vm *vm)
->>> +{
->>> +     uint64_t val;
->>> +     unsigned int i;
->>> +     int ret;
->>> +
->>> +     for (i = 0; i < ARRAY_SIZE(fw_reg_info); i++) {
->>> +             const struct kvm_fw_reg_info *reg_info = &fw_reg_info[i];
->>> +
->>> +             /* First 'read' should be an upper limit of the features supported */
->>> +             get_fw_reg(vm, reg_info->reg, &val);
->>> +             TEST_ASSERT(val == FW_REG_ULIMIT_VAL(reg_info->max_feat_bit),
->>> +                     "Expected all the features to be set for reg: 0x%lx; expected: 0x%lx; read: 0x%lx\n",
->>> +                     reg_info->reg, FW_REG_ULIMIT_VAL(reg_info->max_feat_bit), val);
->>> +
->>> +             /* Test a 'write' by disabling all the features of the register map */
->>> +             ret = set_fw_reg(vm, reg_info->reg, 0);
->>> +             TEST_ASSERT(ret == 0,
->>> +                     "Failed to clear all the features of reg: 0x%lx; ret: %d\n",
->>> +                     reg_info->reg, errno);
->>> +
->>> +             get_fw_reg(vm, reg_info->reg, &val);
->>> +             TEST_ASSERT(val == 0,
->>> +                     "Expected all the features to be cleared for reg: 0x%lx\n", reg_info->reg);
->>> +
->>> +             /*
->>> +              * Test enabling a feature that's not supported.
->>> +              * Avoid this check if all the bits are occupied.
->>> +              */
->>> +             if (reg_info->max_feat_bit < 63) {
->>> +                     ret = set_fw_reg(vm, reg_info->reg, BIT(reg_info->max_feat_bit + 1));
->>> +                     TEST_ASSERT(ret != 0 && errno == EINVAL,
->>> +                     "Unexpected behavior or return value (%d) while setting an unsupported feature for reg: 0x%lx\n",
->>> +                     errno, reg_info->reg);
->>> +             }
->>> +     }
->>> +}
->>
->> Just in case :)
->>
->>        ret = set_fw_reg(vm, reg_info->reg, GENMASK(63, reg_info->max_feat_bit + 1));
->>
-> It may be better to cover the entire range, but to test only the
-> (max_feat_bit + 1) gives us the advantage of checking if there's any
-> discrepancy between the kernel and the test, now that *_BIT_MAX are
-> not a part of UAPI headers.
-> 
-> Probably also include your test along with the existing one?
+> If it is not possible to do this with qemu, then we would have to wait
+> until kvm-unit-tests can use kvmtool as the test runner. I have an RFC sent
+> for that [1], I need to get back to it.
+>
+> Another option would be to have this as a kselftest, although I don't know
+> how easy it is to register an exception handler in a kselftest. The test
+> could be further expanded to other registers gated by a VCPU feature being
+> set.
 
-Thanks for your explanation again. Lets keep it as it is then.
+We definitely have the plumbing for exception handlers in selftests,
+aarch64/debug-exceptions.c is an example. My thought was more general
++ rather lazy. For any combination of CPU features, expect that
+kvm-unit-tests should either pass or skip. If they fail or blow up the
+host then probably a good indicator of a KVM bug.
 
->>
->>> +
->>> +static void test_fw_regs_after_vm_start(struct kvm_vm *vm)
->>> +{
->>> +     uint64_t val;
->>> +     unsigned int i;
->>> +     int ret;
->>> +
->>> +     for (i = 0; i < ARRAY_SIZE(fw_reg_info); i++) {
->>> +             const struct kvm_fw_reg_info *reg_info = &fw_reg_info[i];
->>> +
->>> +             /*
->>> +              * Before starting the VM, the test clears all the bits.
->>> +              * Check if that's still the case.
->>> +              */
->>> +             get_fw_reg(vm, reg_info->reg, &val);
->>> +             TEST_ASSERT(val == 0,
->>> +                     "Expected all the features to be cleared for reg: 0x%lx\n",
->>> +                     reg_info->reg);
->>> +
->>> +             /*
->>> +              * Set all the features for this register again. KVM shouldn't
->>> +              * allow this as the VM is running.
->>> +              */
->>> +             ret = set_fw_reg(vm, reg_info->reg, FW_REG_ULIMIT_VAL(reg_info->max_feat_bit));
->>> +             TEST_ASSERT(ret != 0 && errno == EBUSY,
->>> +             "Unexpected behavior or return value (%d) while setting a feature while VM is running for reg: 0x%lx\n",
->>> +             errno, reg_info->reg);
->>> +     }
->>> +}
->>> +
->>
->> I guess you want to check -EBUSY is returned. In that case,
->> the comments here could be clearer, something like below
->> to emphasize '-EBUSY'.
->>
->>           /*
->>            * After VM runs for once, -EBUSY should be returned on attempt
->>            * to set features. Check if the correct errno is returned.
->>            */
->>
-> Sounds good.
-> 
->>> +static struct kvm_vm *test_vm_create(void)
->>> +{
->>> +     struct kvm_vm *vm;
->>> +
->>> +     vm = vm_create_default(0, 0, guest_code);
->>> +
->>> +     ucall_init(vm, NULL);
->>> +     steal_time_init(vm);
->>> +
->>> +     return vm;
->>> +}
->>> +
->>> +static struct kvm_vm *test_guest_stage(struct kvm_vm *vm)
->>> +{
->>> +     struct kvm_vm *ret_vm = vm;
->>> +
->>> +     pr_debug("Stage: %d\n", stage);
->>> +
->>> +     switch (stage) {
->>> +     case TEST_STAGE_REG_IFACE:
->>> +             test_fw_regs_after_vm_start(vm);
->>> +             break;
->>> +     case TEST_STAGE_HVC_IFACE_FEAT_DISABLED:
->>> +             /* Start a new VM so that all the features are now enabled by default */
->>> +             kvm_vm_free(vm);
->>> +             ret_vm = test_vm_create();
->>> +             break;
->>> +     case TEST_STAGE_HVC_IFACE_FEAT_ENABLED:
->>> +     case TEST_STAGE_HVC_IFACE_FALSE_INFO:
->>> +             break;
->>> +     default:
->>> +             TEST_FAIL("Unknown test stage: %d\n", stage);
->>> +     }
->>> +
->>> +     stage++;
->>> +     sync_global_to_guest(vm, stage);
->>> +
->>> +     return ret_vm;
->>> +}
->>> +
->>> +static void test_run(void)
->>> +{
->>> +     struct kvm_vm *vm;
->>> +     struct ucall uc;
->>> +     bool guest_done = false;
->>> +
->>> +     vm = test_vm_create();
->>> +
->>> +     test_fw_regs_before_vm_start(vm);
->>> +
->>> +     while (!guest_done) {
->>> +             vcpu_run(vm, 0);
->>> +
->>> +             switch (get_ucall(vm, 0, &uc)) {
->>> +             case UCALL_SYNC:
->>> +                     vm = test_guest_stage(vm);
->>> +                     break;
->>> +             case UCALL_DONE:
->>> +                     guest_done = true;
->>> +                     break;
->>> +             case UCALL_ABORT:
->>> +                     TEST_FAIL("%s at %s:%ld\n\tvalues: 0x%lx, 0x%lx; 0x%lx, stage: %u",
->>> +                     (const char *)uc.args[0], __FILE__, uc.args[1],
->>> +                     uc.args[2], uc.args[3], uc.args[4], stage);
->>> +                     break;
->>> +             default:
->>> +                     TEST_FAIL("Unexpected guest exit\n");
->>> +             }
->>> +     }
->>> +
->>> +     kvm_vm_free(vm);
->>> +}
->>> +
->>> +int main(void)
->>> +{
->>> +     setbuf(stdout, NULL);
->>> +
->>> +     test_run();
->>> +     return 0;
->>> +}
->>>
+> [1] https://lore.kernel.org/kvmarm/20210702163122.96110-1-alexandru.elisei@arm.com/
+
+Thanks for the link, I'll have a peek.
+
+> >
+> > > Work around the fact that KVM advertises a PMU even when the VCPU feature
+> > > is not set by gating all PMU emulation on the feature. The guest can still
+> > > access the registers without KVM injecting an undefined exception.
+> >
+> > We're going to need something similar even after KVM conditionally
+> > advertises the PMU.
+> >
+> > WDYT about wiring up sys_reg_desc::visibility for the AArch32 PMU
+> > registers? For now just treat them as REG_RAZ (probably extend this to
+> > imply WI too) then promote to REG_HIDDEN in a later patch.
+>
+> I was thinking you can simply use .visibility = pmu_visibility, like it's
+> done with the PMU_SYS_REG macro:
+
+Right -- I completely agree this is where we should be when AArch32
+feature registers are trapped.
+
+Seems to me all the AArch32 feature register trap logic should come
+later on as there's a nonzero chance I introduced a bug :) Shall we
+stop the bleeding w/ your originally proposed patch? Doesn't seem any
+more objectionable than what we're already doing.
 
 [...]
 
-Thanks,
-Gavin
+> I've renamed AA32_ZEROHIGH -> AA32_DIRECT. Feel free to use the snippet as
+> you see fit (or not at all).
 
+To avoid shamelessly plagiarizing: may I package up what you have
+below as a commit coming from you?
+
+--
+Thanks,
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
