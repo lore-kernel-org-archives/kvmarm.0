@@ -2,79 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C2CC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Apr 2022 18:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1621FC433FE
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Apr 2022 18:48:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5AB44B17C;
-	Wed, 27 Apr 2022 14:47:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id A1C1049F46;
+	Wed, 27 Apr 2022 14:48:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wC0C+Fs0ZUGb; Wed, 27 Apr 2022 14:47:58 -0400 (EDT)
+	with ESMTP id LGu9HdFGbANW; Wed, 27 Apr 2022 14:48:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 582AD4B183;
-	Wed, 27 Apr 2022 14:47:58 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 817384B1BF;
+	Wed, 27 Apr 2022 14:48:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A7BA408F4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 14:47:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52AA249F46
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 14:48:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CN+h0vz-hiPJ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Apr 2022 14:47:56 -0400 (EDT)
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
- [209.85.128.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0E88A4089E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 14:47:56 -0400 (EDT)
-Received: by mail-yw1-f201.google.com with SMTP id
- 00721157ae682-2f825f8c944so24268467b3.15
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 11:47:56 -0700 (PDT)
+ with ESMTP id QbapU4rIVd7s for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Apr 2022 14:48:18 -0400 (EDT)
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
+ [209.85.216.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E76814089E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 14:48:17 -0400 (EDT)
+Received: by mail-pj1-f73.google.com with SMTP id
+ mm2-20020a17090b358200b001bf529127dfso1460999pjb.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 11:48:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:cc;
- bh=fd6rMU9yqWWeAt9OZ2FqZhtlChWn8Za3hhMR5JrXjl8=;
- b=g/8e3IN0KagfolpJ4ruEAWQvaAufar6vLj47xotGnSf8mMZjVOlNIEEiZSYg/TyXli
- y1cTgzqP1K6Pdoe+qSvha0OKdiUMQpWYTcmuiOKOP3mu4F3LxJYx/xXtG/TGYioaaUQz
- GZzpV+hBQT6uppGReMBCQnIjFqVZS5a+FuC5ZhuuteRQ31C9I1Pp4d3dqvgjOaXst0Lf
- NY2LD9CeD57+6skYrVb5cJRCoZr8AzISEIPPfFUIwP5b4nCpqxsIkRbXegw4YzfDSgan
- PIE637wzT91aGH/VdAk/EhJSxBY1c4k4WJICtOwh4RBJbTly7BRw4GB72vCvovLouaDo
- JKUg==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=W31J+NXrVsC6+MO2Lwj0kB41xQsk0gH6sl8VC4G0Hhw=;
+ b=FESEaVxAwhhRxp009/PbfkU87OUhtLSXa32rvs7Sy1rWU0fM9GFCw5A3ulYIQlSwgF
+ hsymoNj32M8/ZLy0y54HR9w9x8Z8oYHlYOc0TmBwHpeLJMLwgeHs3TrV4FNvGbDFuvvt
+ XyvHEn41GBYC5Du+JHk4EFcMGoFQiDHuJOMoVzdMKfOgGPEzRvEsue/01R49rkbM/9b2
+ RsqFZzJB4cMmtGJr2G0U7BwT80PFoVDwDn1/xsPOmbDYYxzUItfAlrxrmCwTvp2kWy6w
+ HdDHBWxWkNAJHhmxBAAC/mV4UanmAA5bkIU9Bz5iiqMiMDyFkUFAYoE7dxNKPPvZSk48
+ S0/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:cc;
- bh=fd6rMU9yqWWeAt9OZ2FqZhtlChWn8Za3hhMR5JrXjl8=;
- b=XxAY2HRTtyvAQJaDAVNWirw4pGIBQ12mmG7oQeRORNhsuXlEOUeQfg9zY1vgNfhXNs
- m3sxs5FS3oBdxXruExUCRifiw0iniIqZCMKVSHcZVW60YQozD8k2celF6VJu9VHRFh6A
- 3LKYJZpryyozSi6iDPD8tPPYBSnDmtNI3eLrwLh+sFTdNymMqLj06Zt4gq+7B2CnRY96
- rguBaC/mdfpuFej92tLx15nG8/7EYMpiOfQO7qqFSZMcN0B2O63yT0UtzI54WoFyR5kR
- IwDbmEgTC6+7dfcVqP2k2Zqm+MrmsOFTT54kQWDfGbquf3et1SHL0k/IDB8FfUz7ZtcG
- M8qg==
-X-Gm-Message-State: AOAM532W5iYfDYeenxXGEjlw9cE1cdY9jtIerocb3ICu0WpFB89jYHOQ
- YkD1AIiRnypR8jNlCgu+IUbnYqa2LQWctAZRpA==
-X-Google-Smtp-Source: ABdhPJyOdBmB4vZPfSZNHktzrjvSV3WgelUopqbYoPUTMVI8+cnDshbn+jqXWwUIw/SzQtu2NNUcE7qT5WdN23ottA==
-X-Received: from kaleshsingh.mtv.corp.google.com
- ([2620:15c:211:200:16ec:6da0:8cc5:5f24])
- (user=kaleshsingh job=sendgmr) by 2002:a25:6652:0:b0:645:d4c1:eb7 with SMTP
- id z18-20020a256652000000b00645d4c10eb7mr25152746ybm.412.1651085275548; Wed,
- 27 Apr 2022 11:47:55 -0700 (PDT)
-Date: Wed, 27 Apr 2022 11:46:56 -0700
-In-Reply-To: <20220427184716.1949239-1-kaleshsingh@google.com>
-Message-Id: <20220427184716.1949239-2-kaleshsingh@google.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=W31J+NXrVsC6+MO2Lwj0kB41xQsk0gH6sl8VC4G0Hhw=;
+ b=3ysMrJxy3AUIt6sxNqxRAZrxU6VOyABMAmc3Mck8/OIk2I0AAi5RtYHVQSOuE086Y+
+ vYbIDSrE85+diJq+XCikNMUItb8JcX0DcWaoqSxphG6q8ecm1p1TOTZsZw2SFubnCyVF
+ 2Q6js2phKhsVjGq2cF9FSrSUuFv5pUwMoUR5yi5sit3Qdf90vHXPPcn3TnSzVnltqpzH
+ +5oHBFTrjQKJ3JQ6e+2zq0DyV4Hibn+ZuxqDpMcCmij4olsrFfXJYFis+/0YQvW9i/vp
+ C8RiIQaRxsMPi1Jm271uix2r4gixVJa7q5IpUbRsGzd79MT0yyyYifkQdgC9n5wmyzTg
+ UbGA==
+X-Gm-Message-State: AOAM533cdSY6yQP3bMFl2W/L3H7YCoTY+rs+H4Pp1yknEJrm4XtfnOzs
+ e6SYA/pYazXGZu0k0+K5vUoyytWUkpkzJg==
+X-Google-Smtp-Source: ABdhPJwPe8FNq1K7NbxdZ9TP/wTRtiQjsYQUJ4+BrlzwseokJPagTVD2W3Cq84m7PQ7pNxDPRSa8a14AiQHXxg==
+X-Received: from ricarkol2.c.googlers.com
+ ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a62:2742:0:b0:505:89a5:2023 with SMTP id
+ n63-20020a622742000000b0050589a52023mr31612943pfn.18.1651085296858; Wed, 27
+ Apr 2022 11:48:16 -0700 (PDT)
+Date: Wed, 27 Apr 2022 11:48:10 -0700
+Message-Id: <20220427184814.2204513-1-ricarkol@google.com>
 Mime-Version: 1.0
-References: <20220427184716.1949239-1-kaleshsingh@google.com>
-X-Mailer: git-send-email 2.36.0.rc2.479.g8af0fa9b8e-goog
-Subject: [PATCH 1/4] KVM: arm64: Compile stacktrace.nvhe.o
-From: Kalesh Singh <kaleshsingh@google.com>
-Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- surenb@google.com, Mark Brown <broonie@kernel.org>,
- Peter Collingbourne <pcc@google.com>, linux-kernel@vger.kernel.org,
- Masami Hiramatsu <mhiramat@kernel.org>
+X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
+Subject: [PATCH v2 0/4] KVM: arm64: vgic: Misc ITS fixes
+From: Ricardo Koller <ricarkol@google.com>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: andre.przywara@arm.com, pshier@google.com, maz@kernel.org,
+ pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,220 +83,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Recompile stack unwinding code for use with the nVHE hypervisor. This is
-a preparatory patch that will allow reusing most of the kernel unwinding
-logic in the nVHE hypervisor.
+The purpose of this series is to help debugging failed ITS saves and
+restores.  Failures can be due to misconfiguration on the guest side:
+tables with bogus base addresses, or the guest overwriting L1 indirect
+tables. KVM can't do much in these cases, but one thing it can do to help
+is raising errors as soon as possible. Here are a couple of cases where
+KVM could do more:
 
-Suggested-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
----
- arch/arm64/include/asm/stacktrace.h | 18 ++++---
- arch/arm64/kernel/stacktrace.c      | 73 ++++++++++++++++++-----------
- arch/arm64/kvm/hyp/nvhe/Makefile    |  3 +-
- 3 files changed, 60 insertions(+), 34 deletions(-)
+- A command that adds an entry into an ITS table that is not in guest
+  memory should fail, as any command should be treated as if it was
+  actually saving entries in guest memory (KVM doesn't until saving).  KVM
+  does this check for collections and devices (using vgic_its_check_id),
+  but it doesn't for the ITT (Interrupt Translation Table). Commit #1 adds
+  the missing check.
 
-diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
-index aec9315bf156..f5af9a94c5a6 100644
---- a/arch/arm64/include/asm/stacktrace.h
-+++ b/arch/arm64/include/asm/stacktrace.h
-@@ -16,12 +16,14 @@
- #include <asm/sdei.h>
- 
- enum stack_type {
--	STACK_TYPE_UNKNOWN,
-+#ifndef __KVM_NVHE_HYPERVISOR__
- 	STACK_TYPE_TASK,
- 	STACK_TYPE_IRQ,
- 	STACK_TYPE_OVERFLOW,
- 	STACK_TYPE_SDEI_NORMAL,
- 	STACK_TYPE_SDEI_CRITICAL,
-+#endif /* !__KVM_NVHE_HYPERVISOR__ */
-+	STACK_TYPE_UNKNOWN,
- 	__NR_STACK_TYPES
- };
- 
-@@ -31,11 +33,6 @@ struct stack_info {
- 	enum stack_type type;
- };
- 
--extern void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk,
--			   const char *loglvl);
--
--DECLARE_PER_CPU(unsigned long *, irq_stack_ptr);
--
- static inline bool on_stack(unsigned long sp, unsigned long size,
- 			    unsigned long low, unsigned long high,
- 			    enum stack_type type, struct stack_info *info)
-@@ -54,6 +51,12 @@ static inline bool on_stack(unsigned long sp, unsigned long size,
- 	return true;
- }
- 
-+#ifndef __KVM_NVHE_HYPERVISOR__
-+extern void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk,
-+			   const char *loglvl);
-+
-+DECLARE_PER_CPU(unsigned long *, irq_stack_ptr);
-+
- static inline bool on_irq_stack(unsigned long sp, unsigned long size,
- 				struct stack_info *info)
- {
-@@ -88,6 +91,7 @@ static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
- static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
- 			struct stack_info *info) { return false; }
- #endif
-+#endif /* !__KVM_NVHE_HYPERVISOR__ */
- 
- 
- /*
-@@ -101,6 +105,7 @@ static inline bool on_accessible_stack(const struct task_struct *tsk,
- 	if (info)
- 		info->type = STACK_TYPE_UNKNOWN;
- 
-+#ifndef __KVM_NVHE_HYPERVISOR__
- 	if (on_task_stack(tsk, sp, size, info))
- 		return true;
- 	if (tsk != current || preemptible())
-@@ -111,6 +116,7 @@ static inline bool on_accessible_stack(const struct task_struct *tsk,
- 		return true;
- 	if (on_sdei_stack(sp, size, info))
- 		return true;
-+#endif /* !__KVM_NVHE_HYPERVISOR__ */
- 
- 	return false;
- }
-diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
-index 0467cb79f080..a84e38d41d38 100644
---- a/arch/arm64/kernel/stacktrace.c
-+++ b/arch/arm64/kernel/stacktrace.c
-@@ -81,23 +81,19 @@ NOKPROBE_SYMBOL(unwind_init);
-  * records (e.g. a cycle), determined based on the location and fp value of A
-  * and the location (but not the fp value) of B.
-  */
--static int notrace unwind_next(struct task_struct *tsk,
--			       struct unwind_state *state)
-+static int notrace __unwind_next(struct task_struct *tsk,
-+				 struct unwind_state *state,
-+				 struct stack_info *info)
- {
- 	unsigned long fp = state->fp;
--	struct stack_info info;
--
--	/* Final frame; nothing to unwind */
--	if (fp == (unsigned long)task_pt_regs(tsk)->stackframe)
--		return -ENOENT;
- 
- 	if (fp & 0x7)
- 		return -EINVAL;
- 
--	if (!on_accessible_stack(tsk, fp, 16, &info))
-+	if (!on_accessible_stack(tsk, fp, 16, info))
- 		return -EINVAL;
- 
--	if (test_bit(info.type, state->stacks_done))
-+	if (test_bit(info->type, state->stacks_done))
- 		return -EINVAL;
- 
- 	/*
-@@ -113,7 +109,7 @@ static int notrace unwind_next(struct task_struct *tsk,
- 	 * stack to another, it's never valid to unwind back to that first
- 	 * stack.
- 	 */
--	if (info.type == state->prev_type) {
-+	if (info->type == state->prev_type) {
- 		if (fp <= state->prev_fp)
- 			return -EINVAL;
- 	} else {
-@@ -127,7 +123,45 @@ static int notrace unwind_next(struct task_struct *tsk,
- 	state->fp = READ_ONCE_NOCHECK(*(unsigned long *)(fp));
- 	state->pc = READ_ONCE_NOCHECK(*(unsigned long *)(fp + 8));
- 	state->prev_fp = fp;
--	state->prev_type = info.type;
-+	state->prev_type = info->type;
-+
-+	return 0;
-+}
-+NOKPROBE_SYMBOL(__unwind_next);
-+
-+static int notrace unwind_next(struct task_struct *tsk,
-+			       struct unwind_state *state);
-+
-+static void notrace unwind(struct task_struct *tsk,
-+			   struct unwind_state *state,
-+			   stack_trace_consume_fn consume_entry, void *cookie)
-+{
-+	while (1) {
-+		int ret;
-+
-+		if (!consume_entry(cookie, state->pc))
-+			break;
-+		ret = unwind_next(tsk, state);
-+		if (ret < 0)
-+			break;
-+	}
-+}
-+NOKPROBE_SYMBOL(unwind);
-+
-+#ifndef __KVM_NVHE_HYPERVISOR__
-+static int notrace unwind_next(struct task_struct *tsk,
-+			       struct unwind_state *state)
-+{
-+	struct stack_info info;
-+	int err;
-+
-+	/* Final frame; nothing to unwind */
-+	if (state->fp == (unsigned long)task_pt_regs(tsk)->stackframe)
-+		return -ENOENT;
-+
-+	err = __unwind_next(tsk, state, &info);
-+	if (err)
-+		return err;
- 
- 	state->pc = ptrauth_strip_insn_pac(state->pc);
- 
-@@ -157,22 +191,6 @@ static int notrace unwind_next(struct task_struct *tsk,
- }
- NOKPROBE_SYMBOL(unwind_next);
- 
--static void notrace unwind(struct task_struct *tsk,
--			   struct unwind_state *state,
--			   stack_trace_consume_fn consume_entry, void *cookie)
--{
--	while (1) {
--		int ret;
--
--		if (!consume_entry(cookie, state->pc))
--			break;
--		ret = unwind_next(tsk, state);
--		if (ret < 0)
--			break;
--	}
--}
--NOKPROBE_SYMBOL(unwind);
--
- static bool dump_backtrace_entry(void *arg, unsigned long where)
- {
- 	char *loglvl = arg;
-@@ -224,3 +242,4 @@ noinline notrace void arch_stack_walk(stack_trace_consume_fn consume_entry,
- 
- 	unwind(task, &state, consume_entry, cookie);
- }
-+#endif /* !__KVM_NVHE_HYPERVISOR__ */
-diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-index f9fe4dc21b1f..c0ff0d6fc403 100644
---- a/arch/arm64/kvm/hyp/nvhe/Makefile
-+++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-@@ -14,7 +14,8 @@ lib-objs := $(addprefix ../../../lib/, $(lib-objs))
- 
- obj-y := timer-sr.o sysreg-sr.o debug-sr.o switch.o tlb.o hyp-init.o host.o \
- 	 hyp-main.o hyp-smp.o psci-relay.o early_alloc.o page_alloc.o \
--	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o
-+	 cache.o setup.o mm.o mem_protect.o sys_regs.o pkvm.o \
-+	 ../../../kernel/stacktrace.o
- obj-y += ../vgic-v3-sr.o ../aarch32.o ../vgic-v2-cpuif-proxy.o ../entry.o \
- 	 ../fpsimd.o ../hyp-entry.o ../exception.o ../pgtable.o
- obj-$(CONFIG_DEBUG_LIST) += list_debug.o
+- Restoring the ITS tables does some checks for corrupted tables, but not
+  as many as in a save.  For example, a device ID overflowing the table
+  will be detected on save but not on restore.  The consequence is that
+  restoring a corrupted table won't be detected until the next save;
+  including the ITS not working as expected after the restore. As an
+  example, if the guest sets tables overlapping each other, this would most
+  likely result in some corrupted table; and this is what we would see from
+  the host point of view:
+
+	guest sets bogus baser addresses
+	save ioctl
+	restore ioctl
+	save ioctl (fails)
+
+  This failed save could happen many days after the first operation, so it
+  would be hard to track down. Commit #2 adds some checks into restore:
+  like checking that the ITE entries are not repeated.
+
+- Restoring a corrupted collection entry is being ignored. Commit #3 fixes
+  this while trying to organize the code so to make the bug more obvious
+  next time.
+
+Finally, failed restores should clean up all intermediate state. Commit #4
+takes care of cleaning up everything created until the restore was deemed a
+failure.
+
+v1: https://lore.kernel.org/kvmarm/20220425185534.57011-1-ricarkol@google.com/
+v1 -> v2:
+- moved alloc_collection comment to its respective commit. [marc]
+- refactored check_ite to reuse some code from check_id. [marc]
+- rewrote all commit messages. [marc]
+
+Tested with kvm-unit-tests ITS tests.
+
+Ricardo Koller (4):
+  KVM: arm64: vgic: Check that new ITEs could be saved in guest memory
+  KVM: arm64: vgic: Add more checks when restoring ITS tables
+  KVM: arm64: vgic: Do not ignore vgic_its_restore_cte failures
+  KVM: arm64: vgic: Undo work in failed ITS restores
+
+ arch/arm64/kvm/vgic/vgic-its.c | 112 +++++++++++++++++++++++++--------
+ 1 file changed, 87 insertions(+), 25 deletions(-)
+
 -- 
-2.36.0.rc2.479.g8af0fa9b8e-goog
+2.36.0.464.gb9c8b46e94-goog
 
 _______________________________________________
 kvmarm mailing list
