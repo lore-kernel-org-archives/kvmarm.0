@@ -2,68 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C969CC433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Apr 2022 17:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBD8C433EF
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Apr 2022 17:55:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 716A54B156;
-	Wed, 27 Apr 2022 13:14:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id EFF994B1D2;
+	Wed, 27 Apr 2022 13:55:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 554ksIDeSpEr; Wed, 27 Apr 2022 13:14:41 -0400 (EDT)
+	with ESMTP id qSQVLk75cxzy; Wed, 27 Apr 2022 13:55:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F4D240BDF;
-	Wed, 27 Apr 2022 13:14:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id CFAB249ECE;
+	Wed, 27 Apr 2022 13:55:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41A9140BBF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 13:14:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31AE249E36
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 13:55:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yp5qNQ2Y9i6G for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Apr 2022 13:14:39 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 338124083E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 13:14:39 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 8502861E1D;
- Wed, 27 Apr 2022 17:14:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E129AC385A9;
- Wed, 27 Apr 2022 17:14:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1651079677;
- bh=1Wyh8HAQGleHtCXp63QH7fWGdVyOUhsSM+yv05Z8elw=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=VJjI+yPUj/93d5Yww+huZrME56O8muQF4VW5ow0L+Uu29fJA6xhv6GlKKQbzgj17j
- jC187r2Foq4IBQ3URPZbgESLFL/xLgqqAEUJqh06sUc2BbRX3RnobTWb5+OSjAQgye
- +N3oQHj5OHBqf3vpLbLeDlVgFiE/HD1j2EbgNUABCb8qS2xYxOrq033ydwJX3vZEgI
- ApSQ4pdqE2SMfIoyRdf5wmsgxmcedu1UxWfZpSbr0yDfcDSnhM7o01IVJNqaqa/d7V
- Wt6bpcnNaNvoQpg6U0n6KU8gnQMuWTYNW8dmaZPWU6DY8hRRkoO/xVk+X8S/+lrmkD
- CDv5L3Y3FE9RQ==
-Date: Wed, 27 Apr 2022 18:14:31 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Qian Cai <quic_qiancai@quicinc.com>
-Subject: Re: [PATCH v14 00/39] arm64/sme: Initial support for the Scalable
- Matrix Extension
-Message-ID: <Yml599vM948wXt6g@sirena.org.uk>
-References: <20220419112247.711548-1-broonie@kernel.org>
- <20220427170858.GA2009@qian>
+ with ESMTP id EVq+k9FoP4o7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Apr 2022 13:55:00 -0400 (EDT)
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com
+ [209.85.210.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E894149B0A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 13:54:59 -0400 (EDT)
+Received: by mail-pf1-f180.google.com with SMTP id a11so2216136pff.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 10:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=MT32fDJjlSBzqa3QKuJ5nhMxgjthrXwBcbluFoTXiG8=;
+ b=XrlZ0sC0DN1ViPQWIG+U1AYra+oQuWHZkOZa7i5jc3k++0oqDF0bxhJqZ7tVFcmarW
+ 6cJKqw2Q4vHIV6xRS2XNlsL859y9bSmxd1a1FPkc/wAFtBLNmF5MrhZXdovor6LdsEJk
+ aYvOQM6rNaQIOXwonX+Ei9B6kNXnQxvQqeAwziq6/D92gSLXNnC4L+piFYKCw/UqE851
+ HZ3KGyFTaRQeZYdCviIedcXzT3s/P5/bmRRZYuJ3XRjDMxjhHfVSDr5Ir6Dzz+/+P1J3
+ 2NtMoL+3dshT0GKulhTWOGITsveQVRxoKDuu4t+2qeULzydJSHhCFlUWNjmHb6SAi56N
+ co9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=MT32fDJjlSBzqa3QKuJ5nhMxgjthrXwBcbluFoTXiG8=;
+ b=tIDUfkozsAVl/uN1ci2ZUB1jOPcbFc5pHzr4b7wW61zZU44hmQ/z0AVvAA6pZ+6X5j
+ D1XpwRMaAyOX+vUeX7ZBuroHzfVgNDs0bNZFWK5P5io50T0XzBYAKmD5KhnuDa8Ge28g
+ 7DBEqFLVyhrCTsZhkpG3daEq2vdMFFos3/E1t7+e1oZWnd2f0UuBt+7Fa2r+zOT/2gYN
+ v45vXWlbb6cO3JFLQRv6pexYtCaozNGCT0eAH9WRIIh+X122V1RmJPyIjMCbqXijYBD+
+ tGEZKGE33iF940ex2WVPXuXPwdiYn/bHbPcYr8Al/kXehjb7HlDe/9SOj+gk1r2a5ylD
+ PwZg==
+X-Gm-Message-State: AOAM533dJqUUIggtedtJlzwNZEbxnySfZwxENYGORwsM3FbvIy0Ub+2x
+ ahlei6jQ8iJTiVdEocQF2swncg==
+X-Google-Smtp-Source: ABdhPJz5Dn0oFvNCe+SmriYc4GHgZrKoad23n7swbCCTGMvsAmMooBVrKAFcuF4wUp3NnwokJpfCOQ==
+X-Received: by 2002:a63:4c0f:0:b0:39d:b7f6:fdb9 with SMTP id
+ z15-20020a634c0f000000b0039db7f6fdb9mr25257993pga.601.1651082098525; 
+ Wed, 27 Apr 2022 10:54:58 -0700 (PDT)
+Received: from google.com (150.12.83.34.bc.googleusercontent.com.
+ [34.83.12.150]) by smtp.gmail.com with ESMTPSA id
+ f16-20020aa78b10000000b0050a81508653sm19375044pfd.198.2022.04.27.10.54.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 Apr 2022 10:54:57 -0700 (PDT)
+Date: Wed, 27 Apr 2022 10:54:54 -0700
+From: Ricardo Koller <ricarkol@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 1/4] KVM: arm64: vgic: Check that new ITEs could be saved
+ in guest memory
+Message-ID: <YmmDbtOUHMbcg2nV@google.com>
+References: <20220425185534.57011-1-ricarkol@google.com>
+ <20220425185534.57011-2-ricarkol@google.com>
+ <871qxkcws3.wl-maz@kernel.org> <Ymgb8+dOEs03GvAX@google.com>
+ <8735hzague.wl-maz@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20220427170858.GA2009@qian>
-X-Cookie: Buckle up!
-Cc: Marc Zyngier <maz@kernel.org>,
- Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alan Hayward <alan.hayward@arm.com>,
- Salil Akerkar <Salil.Akerkar@arm.com>, linux-kselftest@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
- Luca Salabrino <luca.scalabrino@arm.com>
+Content-Disposition: inline
+In-Reply-To: <8735hzague.wl-maz@kernel.org>
+Cc: kvm@vger.kernel.org, andre.przywara@arm.com, pshier@google.com,
+ pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -75,63 +88,106 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============4769536904539388517=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+On Tue, Apr 26, 2022 at 06:34:49PM +0100, Marc Zyngier wrote:
+> On Tue, 26 Apr 2022 17:21:07 +0100,
+> Ricardo Koller <ricarkol@google.com> wrote:
+> > 
+> > On Tue, Apr 26, 2022 at 05:07:40AM +0100, Marc Zyngier wrote:
+> > > On Mon, 25 Apr 2022 19:55:31 +0100,
+> > > Ricardo Koller <ricarkol@google.com> wrote:
+> > > > 
+> > > > A command that adds an entry into an ITS table that is not in guest
+> > > > memory should fail, as any command should be treated as if it was
+> > > > actually saving entries in guest memory (KVM doesn't until saving).
+> > > > Add the corresponding check for the ITT when adding ITEs.
+> > > > 
+> > > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > > > ---
+> > > >  arch/arm64/kvm/vgic/vgic-its.c | 34 ++++++++++++++++++++++++++++++++++
+> > > >  1 file changed, 34 insertions(+)
+> > > > 
+> > > > diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> > > > index 2e13402be3bd..d7c1a3a01af4 100644
+> > > > --- a/arch/arm64/kvm/vgic/vgic-its.c
+> > > > +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> > > > @@ -976,6 +976,37 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
+> > > >  	return ret;
+> > > >  }
+> > > >  
+> > > > +/*
+> > > > + * Check whether an event ID can be stored in the corresponding Interrupt
+> > > > + * Translation Table, which starts at device->itt_addr.
+> > > > + */
+> > > > +static bool vgic_its_check_ite(struct vgic_its *its, struct its_device *device,
+> > > > +		u32 event_id)
+> > > > +{
+> > > > +	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+> > > > +	int ite_esz = abi->ite_esz;
+> > > > +	gpa_t gpa;
+> > > > +	gfn_t gfn;
+> > > > +	int idx;
+> > > > +	bool ret;
+> > > > +
+> > > > +	/* max table size is: BIT_ULL(device->num_eventid_bits) * ite_esz */
+> > > > +	if (event_id >= BIT_ULL(device->num_eventid_bits))
+> > > > +		return false;
+> > > 
+> > > We have already checked this condition, it seems.
+> > > 
+> > > > +
+> > > > +	gpa = device->itt_addr + event_id * ite_esz;
+> > > > +	gfn = gpa >> PAGE_SHIFT;
+> > > > +
+> > > > +	idx = srcu_read_lock(&its->dev->kvm->srcu);
+> > > > +	ret = kvm_is_visible_gfn(its->dev->kvm, gfn);
+> > > > +	srcu_read_unlock(&its->dev->kvm->srcu, idx);
+> > > > +	return ret;
+> > > 
+> > > Why should we care? If the guest doesn't give us the memory that is
+> > > required, that's its problem.
+> > 
+> > The issue is that if the guest does that, then the pause will fail and
+> > we won't be able to migrate the VM. This series objective is to help
+> > with failed migrations due to the ITS. This commit tries to do it by
+> > avoiding them.
+> 
+> But the guest is buggy, isn't it? No memory, no cookie! ;-)
+> 
+> I understand that you want save/restore to be predictable even when
+> the guest is too crap for words. I think clarifying this in your
+> commit message would help.
+> 
+> > > The only architectural requirement is
+> > > that the EID fits into the device table. There is no guarantee that
+> > > the ITS will actually write to the memory.
+> > 
+> > If I understand it correctly, failing the command in this case would
+> > also be architectural (right?). If the ITS tries to write the new
+> > entry into memory immediately, then the command would fail. This
+> > proposed check is just making this assumption.
+> 
+> Neither behaviour is architectural (they are both allowed, but none
+> is required). Not providing the memory, however, is unpredictable.
+> 
+> I'm OK with your approach because it makes things consistent (we fail
+> early rather than late). But the commit message doesn't really reflect
+> that (it sort of hints to it, but not in a clear way).
+> 
 
---===============4769536904539388517==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="SPfSU1Fp6tBwB5Ei"
-Content-Disposition: inline
+Sounds good, will do that, thanks.
 
-
---SPfSU1Fp6tBwB5Ei
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Apr 27, 2022 at 01:08:58PM -0400, Qian Cai wrote:
-> On Tue, Apr 19, 2022 at 12:22:08PM +0100, Mark Brown wrote:
-
-> > but not SVE, SME is an ARMv9 feature and SVE is mandatory for ARMv9.
-> > The code attempts to handle any such systems that are encountered but
-> > this hasn't been tested extensively.
->=20
-> Running CPU offline/online on a Neoverse-N1 server will trigger a crash.
-
-Can you try with=20
-
-   https://lore.kernel.org/r/20220427130828.162615-1-broonie@kernel.org
-
-please?
-
---SPfSU1Fp6tBwB5Ei
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmJpefYACgkQJNaLcl1U
-h9D1cAf+Onw5Pv5V2hKpJvcA5UX72wxZZ5Ln0Tt1QZLj8ao+nwGOLjwfk9EsK1Vd
-h5lSxFF5OlEPCcmcKAbeoxzBv+j5YdlW5ifiHToAt7faO67xrTBI8EZBWXTqp6Ht
-qANgoQvint2TO0GNxmkjSnI4itbJ2552NLuGSA7sdEevyat94D6gWeJqqiLShsDa
-c7DbFEdzWX+AQrGzJ24vzGHCSG5AmA5VFnl9kqxA7aBouymENDc0EzDMPv6h72tH
-blNLM01jSkNMvMiT6Z2okfgeXdHZ1u9ZgVof8w9skZeyt4ZtoPgGKSytliSZTu6i
-ug033/8MxGzNUKABtp7oxitOR8+O8Q==
-=bIU0
------END PGP SIGNATURE-----
-
---SPfSU1Fp6tBwB5Ei--
-
---===============4769536904539388517==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
+> Thanks,
+> 
+> 	M.
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4769536904539388517==--
