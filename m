@@ -2,72 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 004F9C433F5
-	for <kvmarm@archiver.kernel.org>; Wed, 27 Apr 2022 20:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0760C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 27 Apr 2022 21:10:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E60C4B10B;
-	Wed, 27 Apr 2022 16:56:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F91349E45;
+	Wed, 27 Apr 2022 17:10:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XQcILFysJ+Tm; Wed, 27 Apr 2022 16:56:35 -0400 (EDT)
+	with ESMTP id 9Z7JmMFPFmlC; Wed, 27 Apr 2022 17:10:08 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D0D74B1B7;
-	Wed, 27 Apr 2022 16:56:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D50B14B1B6;
+	Wed, 27 Apr 2022 17:10:08 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 892684B1B0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 16:56:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1E2E49E45
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 17:10:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t5cgjDhIfEl1 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Apr 2022 16:56:33 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 58DBB4B10B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 16:56:33 -0400 (EDT)
+ with ESMTP id SBukKEiH1bXS for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 Apr 2022 17:10:06 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0D2149DED
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 17:10:06 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 614C161D89;
- Wed, 27 Apr 2022 20:56:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C93A8C385A7;
- Wed, 27 Apr 2022 20:56:31 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 22BFDB82AD2;
+ Wed, 27 Apr 2022 21:10:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1E93C385A7;
+ Wed, 27 Apr 2022 21:10:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1651092991;
- bh=rLVcyN3m1o4NBQ4KXZfmGW3JJipI7i1iyBhD/MVLcvc=;
+ s=k20201202; t=1651093803;
+ bh=12d6/CBzd02oZvju7Qb4kipcwNr/RTQQkKKMy0Kf12g=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=C+ooMPfMJ8MnwAzCV5RuGFZgzvOndjjKYoXSdNlkc/evxuVSjYfuHsWO77lCSOmuD
- J+p7zpnVqPJ4/F1/uiTH2jMioMZ27NQ//Ekw0BsQATr5YFMKbOFrj0DwUtAuc0Hduf
- ljlb3OHuP68m/CKJ9c2N5ZE+l2D4+POQCz1dtRtnR57dFADijhMeNOlRErpbVM9410
- zhAXzf9bvBIul9/aEbl1wdcNLoUwHALhW0wDm6L+Pkm1MmpXp+3x321BTB/yM+ysqy
- r4Gl+lrlDNoua00527hX7MXPQp/FltbDBXsyJ+bvmFH1yHlAK/Em1g0SPeC7v4CU37
- Q+74g+AYxRoAw==
+ b=twwMhuUM80iWBGPxpkH6nihQbKdGbY8ApqTOdU9m3p7gW4vXcLj+Nr2ypQMqPy2W2
+ rV72B33XDzC/nevkPH5MUV8x8P7r+UAoThbsyGEYzJAIV+NKp3cgg+THJjQJLupPg2
+ k+ZtpnDcIj1YEjmYVH8AN9EHlBiKzP9h8gJ8zzrX8jbwgS538/qMPU2gYs2//i1vNY
+ JO+/Graaii7w6EhWj3VkNFc1KFXlWRcw/S9wDncsD08nBe1Nqr7KAZvuN/rMPxlUF0
+ TuJvPYhgm4FfB/TvrNa0QXTnrUuJNR/2/qGQDGGE7jJmWlZsLWgrhL6BfsAPTMsYLv
+ imqE6HD+7yNLw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1njoi5-007TR7-7R; Wed, 27 Apr 2022 21:56:29 +0100
-Date: Wed, 27 Apr 2022 21:56:29 +0100
-Message-ID: <87zgk68cua.wl-maz@kernel.org>
+ id 1njovB-007Tda-95; Wed, 27 Apr 2022 22:10:01 +0100
+Date: Wed, 27 Apr 2022 22:10:01 +0100
+Message-ID: <87y1zq8c7q.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 2/2] KVM/arm64: Print emulated register table name when it
- is unsorted
-In-Reply-To: <YmkZQE1dUR2ajMeJ@monolith.localdoman>
-References: <20220425163904.859195-1-alexandru.elisei@arm.com>
- <20220425163904.859195-3-alexandru.elisei@arm.com>
- <871qxja6ho.wl-maz@kernel.org>
- <YmkZQE1dUR2ajMeJ@monolith.localdoman>
+Subject: Re: [PATCH] KVM/arm64: Don't emulate a PMU for 32-bit guests if
+ feature not set
+In-Reply-To: <YmkQw8UGFOTFlI1q@monolith.localdoman>
+References: <20220425145530.723858-1-alexandru.elisei@arm.com>
+ <Yment8uGahyB+wgK@google.com>
+ <Yme02Tw3WdbXBAR1@monolith.localdoman>
+ <CAOQ_Qsj47JkEn-sOhKCAKyZnetsKqpWvBALnfAzyMfMy=eqOHg@mail.gmail.com>
+ <YmkQw8UGFOTFlI1q@monolith.localdoman>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, james.morse@arm.com,
- suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, oupton@google.com,
+ james.morse@arm.com, suzuki.poulose@arm.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
@@ -88,71 +89,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 27 Apr 2022 11:21:52 +0100,
+On Wed, 27 Apr 2022 10:45:39 +0100,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
 > Hi,
 > 
-> On Tue, Apr 26, 2022 at 10:18:27PM +0100, Marc Zyngier wrote:
-> > On Mon, 25 Apr 2022 17:39:03 +0100,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > 
-> > > When a sysreg table entry is out-of-order, KVM attempts to print the
-> > > address of the table:
-> > > 
-> > > [    0.143881] kvm [1]: sys_reg table (____ptrval____) out of order (0)
-> > > 
-> > > Printing the name of the table instead of a pointer is more helpful in this
-> > > case:
-> > > 
-> > > [    0.143881] kvm [1]: sys_reg table sys_reg_descs out of order (0)
-> > > 
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  arch/arm64/kvm/sys_regs.c | 20 +++++++++++---------
-> > >  1 file changed, 11 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > > index 57302048afd0..7b62a2daf056 100644
-> > > --- a/arch/arm64/kvm/sys_regs.c
-> > > +++ b/arch/arm64/kvm/sys_regs.c
-> > > @@ -2188,18 +2188,18 @@ static const struct sys_reg_desc cp15_64_regs[] = {
-> > >  };
-> > >  
-> > >  static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
-> > > -			       bool is_32)
-> > > +			       const char *table_name, bool is_32)
-> > >  {
-> > >  	unsigned int i;
-> > >  
-> > >  	for (i = 0; i < n; i++) {
-> > >  		if (!is_32 && table[i].reg && !table[i].reset) {
-> > > -			kvm_err("sys_reg table %p entry %d lacks reset\n", table, i);
-> > > +			kvm_err("sys_reg table %s entry %d lacks reset\n", table_name, i);
+> On Wed, Apr 27, 2022 at 12:57:57AM -0700, Oliver Upton wrote:
+> > Hi Alex,
 > > 
-> > Instead of passing a table name, could we simply use something like
-> > %pS? If this works, it would be a good indication of both what table
-> > and what entry in that table is at fault.
+> > Seems to me all the AArch32 feature register trap logic should come
+> > later on as there's a nonzero chance I introduced a bug :) Shall we
+> > stop the bleeding w/ your originally proposed patch? Doesn't seem any
+> > more objectionable than what we're already doing.
 > 
-> With the change:
-> 
-> -                       kvm_err("sys_reg table %s out of order (%d)\n", table_name, i - 1);
-> +                       kvm_err("sys_reg table %pS out of order (%d)\n", &table[i - 1], i - 1);
-> 
-> 
-> this is what KVM prints with %pS if the second entry is out-of-order:
-> 
-> [    0.143698] kvm [1]: sys_reg table sys_reg_descs+0x50/0x7490 out of order (1)
-> 
-> There's redundant information now, the entry can be calculated from the
-> table offset, but printing the offset directly is certainly convenient.
-> 
-> I like it more than passing the table name, if you agree I'll send a v2
-> with this change.
+> I am leaning towards merging this patch to prevent people from seeing the
+> splat, and when the AArch32 ID reg series gets merged it can be reverted.
+> But in the end it's up to Marc to decide what he prefers.
 
-Yup, seems like a valuable change.
+Yeah, I'd like to plug this ASAP. I'll queue the workaround for 5.18,
+and we can rework that the proper way for 5.19.
 
-Thanks,
+Thanks to both for working on it together, much appreciated.
 
 	M.
 
