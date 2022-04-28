@@ -2,44 +2,44 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E7CC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 15:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A43DC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 15:56:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BEAED4B268;
-	Thu, 28 Apr 2022 11:56:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B114B4B26D;
+	Thu, 28 Apr 2022 11:56:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id YmnzYYiI72mm; Thu, 28 Apr 2022 11:56:25 -0400 (EDT)
+	with ESMTP id sxExJu9AJvE2; Thu, 28 Apr 2022 11:56:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 138C84B2AF;
-	Thu, 28 Apr 2022 11:56:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E02A4B2B6;
+	Thu, 28 Apr 2022 11:56:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B9F9C4B25C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE31E4B27F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YvqyKYIde4nk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2022 11:56:22 -0400 (EDT)
+ with ESMTP id c9kPBIAWa-e2 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2022 11:56:24 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48B2A4B2AB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D74734B279
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:23 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D5E0314BF;
- Thu, 28 Apr 2022 08:56:21 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A55921474;
+ Thu, 28 Apr 2022 08:56:23 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 502CB3F774;
- Thu, 28 Apr 2022 08:56:20 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1EF623F774;
+ Thu, 28 Apr 2022 08:56:21 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: julien.thierry.kdev@gmail.com, will@kernel.org, maz@kernel.org,
  suzuki.poulose@arm.com, julien@xen.org,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  james.morse@arm.com
-Subject: [PATCH kvmtool 09/15] kvm__arch_init: Remove hugetlbfs_path and
- ram_size as parameters
-Date: Thu, 28 Apr 2022 16:55:56 +0100
-Message-Id: <20220428155602.29445-10-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 10/15] arm/arm64: Consolidate RAM initialization in
+ kvm__init_ram()
+Date: Thu, 28 Apr 2022 16:55:57 +0100
+Message-Id: <20220428155602.29445-11-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.36.0
 In-Reply-To: <20220428155602.29445-1-alexandru.elisei@arm.com>
 References: <20220428155602.29445-1-alexandru.elisei@arm.com>
@@ -63,158 +63,93 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Julien Grall <julien.grall@arm.com>
 
-The kvm struct already contains a pointer to the configuration, which
-contains both hugetlbfs_path and ram_size, so is it not necessary to pass
-them as arguments to kvm__arch_init().
+RAM initialization is unnecessarily split between kvm__init_ram() and
+kvm__arch_init(). Move all code related to RAM initialization to
+kvm__init_ram(), making the code easier to follow and to modify.
+
+One thing to note is that the initialization order is slightly altered:
+kvm__arch_enable_mte() and gic__create() are now called before mmap'ing the
+guest RAM. That is perfectly fine, as they don't use the host's mapping of
+the guest memory.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/kvm.c         | 7 ++++---
- include/kvm/kvm.h | 2 +-
- kvm.c             | 2 +-
- mips/kvm.c        | 7 ++++---
- powerpc/kvm.c     | 5 +++--
- riscv/kvm.c       | 7 ++++---
- x86/kvm.c         | 4 +++-
- 7 files changed, 20 insertions(+), 14 deletions(-)
+ arm/kvm.c | 52 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
 
 diff --git a/arm/kvm.c b/arm/kvm.c
-index af0feae495d7..bd44aa350796 100644
+index bd44aa350796..abcccfabf59e 100644
 --- a/arm/kvm.c
 +++ b/arm/kvm.c
-@@ -57,7 +57,7 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
- {
- }
+@@ -26,9 +26,34 @@ bool kvm__arch_cpu_supports_vm(void)
  
--void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
-+void kvm__arch_init(struct kvm *kvm)
+ void kvm__init_ram(struct kvm *kvm)
  {
- 	/*
- 	 * Allocate guest memory. We must align our buffer to 64K to
-@@ -65,9 +65,10 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 	 * If using THP, then our minimal alignment becomes 2M.
- 	 * 2M trumps 64K, so let's go with that.
- 	 */
--	kvm->ram_size = ram_size;
+-	int err;
+ 	u64 phys_start, phys_size;
+ 	void *host_mem;
++	int err;
++
++	/*
++	 * Allocate guest memory. We must align our buffer to 64K to
++	 * correlate with the maximum guest page size for virtio-mmio.
++	 * If using THP, then our minimal alignment becomes 2M.
++	 * 2M trumps 64K, so let's go with that.
++	 */
 +	kvm->ram_size = kvm->cfg.ram_size;
- 	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
--	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, hugetlbfs_path,
++	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
 +	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
 +						kvm->cfg.hugetlbfs_path,
- 						kvm->arch.ram_alloc_size);
++						kvm->arch.ram_alloc_size);
++
++	if (kvm->arch.ram_alloc_start == MAP_FAILED)
++		die("Failed to map %lld bytes for guest memory (%d)",
++		    kvm->arch.ram_alloc_size, errno);
++
++	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
++					SZ_2M);
++
++	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
++		MADV_MERGEABLE);
++
++	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
++		MADV_HUGEPAGE);
  
- 	if (kvm->arch.ram_alloc_start == MAP_FAILED)
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index 9f7b2fb26e95..640b76c095f9 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -189,7 +189,7 @@ void kvm__remove_socket(const char *name);
+ 	phys_start	= ARM_MEMORY_AREA;
+ 	phys_size	= kvm->ram_size;
+@@ -59,31 +84,6 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
  
- void kvm__arch_validate_cfg(struct kvm *kvm);
- void kvm__arch_set_cmdline(char *cmdline, bool video);
--void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size);
-+void kvm__arch_init(struct kvm *kvm);
- void kvm__arch_delete_ram(struct kvm *kvm);
- int kvm__arch_setup_firmware(struct kvm *kvm);
- int kvm__arch_free_firmware(struct kvm *kvm);
-diff --git a/kvm.c b/kvm.c
-index 952ef1fbb41c..42b881217df6 100644
---- a/kvm.c
-+++ b/kvm.c
-@@ -479,7 +479,7 @@ int kvm__init(struct kvm *kvm)
- 		goto err_vm_fd;
- 	}
- 
--	kvm__arch_init(kvm, kvm->cfg.hugetlbfs_path, kvm->cfg.ram_size);
-+	kvm__arch_init(kvm);
- 
- 	INIT_LIST_HEAD(&kvm->mem_banks);
- 	kvm__init_ram(kvm);
-diff --git a/mips/kvm.c b/mips/kvm.c
-index f5b137f46dff..d8610cf81b94 100644
---- a/mips/kvm.c
-+++ b/mips/kvm.c
-@@ -61,12 +61,13 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
- }
- 
- /* Architecture-specific KVM init */
--void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
-+void kvm__arch_init(struct kvm *kvm)
+ void kvm__arch_init(struct kvm *kvm)
  {
- 	int ret;
- 
--	kvm->ram_start = mmap_anon_or_hugetlbfs(kvm, hugetlbfs_path, ram_size);
--	kvm->ram_size = ram_size;
-+	kvm->ram_size = kvm->cfg.ram_size;
-+	kvm->ram_start = mmap_anon_or_hugetlbfs(kvm, kvm->cfg.hugetlbfs_path,
-+						kvm->ram_size);
- 
- 	if (kvm->ram_start == MAP_FAILED)
- 		die("out of memory");
-diff --git a/powerpc/kvm.c b/powerpc/kvm.c
-index 3215b579f5dc..d281b070fd0e 100644
---- a/powerpc/kvm.c
-+++ b/powerpc/kvm.c
-@@ -92,12 +92,13 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
- }
- 
- /* Architecture-specific KVM init */
--void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
-+void kvm__arch_init(struct kvm *kvm)
- {
-+	const char *hugetlbfs_path = kvm->cfg.hugetlbfs_path;
- 	int cap_ppc_rma;
- 	unsigned long hpt;
- 
--	kvm->ram_size		= ram_size;
-+	kvm->ram_size		= kvm->cfg.ram_size;
- 
- 	/* Map "default" hugetblfs path to the standard 16M mount point */
- 	if (hugetlbfs_path && !strcmp(hugetlbfs_path, "default"))
-diff --git a/riscv/kvm.c b/riscv/kvm.c
-index 7fb496282f4c..c46660772aa0 100644
---- a/riscv/kvm.c
-+++ b/riscv/kvm.c
-@@ -56,7 +56,7 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
- {
- }
- 
--void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
-+void kvm__arch_init(struct kvm *kvm)
- {
- 	/*
- 	 * Allocate guest memory. We must align our buffer to 64K to
-@@ -64,9 +64,10 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 	 * If using THP, then our minimal alignment becomes 2M.
- 	 * 2M trumps 64K, so let's go with that.
- 	 */
--	kvm->ram_size = min(ram_size, (u64)RISCV_MAX_MEMORY(kvm));
-+	kvm->ram_size = min(kvm->cfg.ram_size, (u64)RISCV_MAX_MEMORY(kvm));
- 	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
--	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, hugetlbfs_path,
-+	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
-+						kvm->cfg.hugetlbfs_path,
- 						kvm->arch.ram_alloc_size);
- 
- 	if (kvm->arch.ram_alloc_start == MAP_FAILED)
-diff --git a/x86/kvm.c b/x86/kvm.c
-index 6683a5c81d49..24b0305a1841 100644
---- a/x86/kvm.c
-+++ b/x86/kvm.c
-@@ -134,9 +134,11 @@ void kvm__arch_set_cmdline(char *cmdline, bool video)
- }
- 
- /* Architecture-specific KVM init */
--void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
-+void kvm__arch_init(struct kvm *kvm)
- {
-+	const char *hugetlbfs_path = kvm->cfg.hugetlbfs_path;
- 	struct kvm_pit_config pit_config = { .flags = 0, };
-+	u64 ram_size = kvm->cfg.ram_size;
- 	int ret;
- 
- 	ret = ioctl(kvm->vm_fd, KVM_SET_TSS_ADDR, 0xfffbd000);
+-	/*
+-	 * Allocate guest memory. We must align our buffer to 64K to
+-	 * correlate with the maximum guest page size for virtio-mmio.
+-	 * If using THP, then our minimal alignment becomes 2M.
+-	 * 2M trumps 64K, so let's go with that.
+-	 */
+-	kvm->ram_size = kvm->cfg.ram_size;
+-	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
+-	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm,
+-						kvm->cfg.hugetlbfs_path,
+-						kvm->arch.ram_alloc_size);
+-
+-	if (kvm->arch.ram_alloc_start == MAP_FAILED)
+-		die("Failed to map %lld bytes for guest memory (%d)",
+-		    kvm->arch.ram_alloc_size, errno);
+-
+-	kvm->ram_start = (void *)ALIGN((unsigned long)kvm->arch.ram_alloc_start,
+-					SZ_2M);
+-
+-	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+-		MADV_MERGEABLE);
+-
+-	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
+-		MADV_HUGEPAGE);
+-
+ 	/* Create the virtual GIC. */
+ 	if (gic__create(kvm, kvm->cfg.arch.irqchip))
+ 		die("Failed to create virtual GIC");
 -- 
 2.36.0
 
