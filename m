@@ -2,79 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E60D2C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 19:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72906C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 19:59:13 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 560744B261;
-	Thu, 28 Apr 2022 15:56:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E5E704B240;
+	Thu, 28 Apr 2022 15:59:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@kernel.org
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DgdeJw7qIhR1; Thu, 28 Apr 2022 15:56:04 -0400 (EDT)
+	with ESMTP id uMd7sDGeRNJ4; Thu, 28 Apr 2022 15:59:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EA644B222;
-	Thu, 28 Apr 2022 15:56:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA96A4B248;
+	Thu, 28 Apr 2022 15:59:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDDC84B1F2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 15:56:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 550224B230
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 15:59:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZRrfkUQ66OYQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2022 15:55:57 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B1AEA4B1EF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 15:55:57 -0400 (EDT)
+ with ESMTP id g4465PPzQ3Yh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2022 15:59:10 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E6374B1EF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 15:59:10 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id DF1C360E8F;
- Thu, 28 Apr 2022 19:55:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 469DBC385AD;
- Thu, 28 Apr 2022 19:55:56 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 04D3CCE2DAD;
+ Thu, 28 Apr 2022 19:59:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 561D2C385AF;
+ Thu, 28 Apr 2022 19:59:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1651175756;
- bh=vRnZSRIcTqcHKCeWjmxMZBxVcLsxLI+m8lZ+XQEEza8=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=fUaqFQwLZ+kPqathikKDuZJIaOcX/OYkWvMud/2Qz5gdLLidFxSkYPPZxr1PSU9Xs
- c3HxamY4IAekJMXwYztltninPRKr1Due435Q+1gTAeqOEGO35Dvd8KHySUb/wqeKiD
- IK54zoxiEFBA9GXosZaccafRQzweNNc3wtrm4JqcdipGg4AyDQmVq3UkOpae/5hyND
- QigfMuiwx+KbhsPWuT9bzpXHYrSSdSxSAGAZxkJn+KpUJ+Gt2HJud1ECcPhaXGhGY+
- ksgSWmA1pXiuFh9aEjlAyRxzBukftfVNPEVn2Wsu4ON/nt/IudxV9rB3v+1RA9TDEC
- FAfJpvgTgzSvA==
+ s=k20201202; t=1651175940;
+ bh=2VpuXfSni30Kb/eTw7UZLyG2wBlPNOJWkggE1bbFFCE=;
+ h=From:To:Subject:Date:In-Reply-To:References:From;
+ b=DVDCnGs+zqo2oLW52P6WQB/+50WL+4HDCfG9fI9/Gba5nc9y5zW2ucTmC4TQsEm+K
+ SecChsBnoav7wo53YNj5wrGJc3a1SRogPz9ErxmMZiszJfQTnYBwXXTtFrcsO4+H0G
+ q+q+YNKncBWM/wXcKf6ysHqmFKKTt5CSchjG/xK0AJpSdOSY4nhLWhmRoDTHZzHwlL
+ OrHzT8/7kDigQMDU8ntPSOhBwB9H4somfY9++KgwwcqIEye3YIS62iHzoEQxuCsMny
+ GvEJC0p3mkN+rVdjmOOtcHJXGzSyJiCh/mjgvgMPx2qUGMB56ulmgVoVjrqnwgJO/V
+ 7lrO103GhcHIQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nkAEz-007l9y-Qp; Thu, 28 Apr 2022 20:55:53 +0100
+ id 1nkAHy-007lBY-0K; Thu, 28 Apr 2022 20:58:58 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v8 0/6] KVM: arm64: Hypervisor stack enhancements
-Date: Thu, 28 Apr 2022 20:55:50 +0100
-Message-Id: <165117574186.3115452.6818682378273681624.b4-ty@kernel.org>
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+ Alexandru Elisei <alexandru.elisei@arm.com>, james.morse@arm.com,
+ suzuki.poulose@arm.com
+Subject: Re: [PATCH] KVM/arm64: Don't emulate a PMU for 32-bit guests if
+ feature not set
+Date: Thu, 28 Apr 2022 20:58:54 +0100
+Message-Id: <165117592520.3115569.6681600496977267947.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220420214317.3303360-1-kaleshsingh@google.com>
-References: <20220420214317.3303360-1-kaleshsingh@google.com>
+In-Reply-To: <20220425145530.723858-1-alexandru.elisei@arm.com>
+References: <20220425145530.723858-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kaleshsingh@google.com, mark.rutland@arm.com,
- james.morse@arm.com, tabba@google.com, masahiroy@kernel.org, surenb@google.com,
- kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- linux-arm-kernel@lists.infradead.org, ardb@kernel.org, will@kernel.org,
- qperret@google.com, linux-kernel@vger.kernel.org, alexandru.elisei@arm.com,
- yuzenghui@huawei.com, changbin.du@intel.com, kernel-team@android.com,
- nathan@kernel.org
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com,
+ james.morse@arm.com, suzuki.poulose@arm.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, will@kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>,
- Masahiro Yamada <masahiroy@kernel.org>, linux-kernel@vger.kernel.org,
- Nathan Chancellor <nathan@kernel.org>, Changbin Du <changbin.du@intel.com>,
- linux-arm-kernel@lists.infradead.org, surenb@google.com,
- kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,35 +84,20 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 20 Apr 2022 14:42:51 -0700, Kalesh Singh wrote:
-> This is v8 of the nVHE hypervisor stack enhancements. This version is based
-> on 5.18-rc3.
-> 
-> Previous versions can be found at:
-> v7: https://lore.kernel.org/r/20220408200349.1529080-1-kaleshsingh@google.com/
-> v6: https://lore.kernel.org/r/20220314200148.2695206-1-kaleshsingh@google.com/
-> v5: https://lore.kernel.org/r/20220307184935.1704614-1-kaleshsingh@google.com/
-> v4: https://lore.kernel.org/r/20220225033548.1912117-1-kaleshsingh@google.com/
-> v3: https://lore.kernel.org/r/20220224051439.640768-1-kaleshsingh@google.com/
-> v2: https://lore.kernel.org/r/20220222165212.2005066-1-kaleshsingh@google.com/
-> v1: https://lore.kernel.org/r/20220210224220.4076151-1-kaleshsingh@google.com/
+On Mon, 25 Apr 2022 15:55:30 +0100, Alexandru Elisei wrote:
+> kvm->arch.arm_pmu is set when userspace attempts to set the first PMU
+> attribute. As certain attributes are mandatory, arm_pmu ends up always
+> being set to a valid arm_pmu, otherwise KVM will refuse to run the VCPU.
+> However, this only happens if the VCPU has the PMU feature. If the VCPU
+> doesn't have the feature bit set, kvm->arch.arm_pmu will be left
+> uninitialized and equal to NULL.
 > 
 > [...]
 
-Applied to next, thanks!
+Applied to fixes, thanks!
 
-[1/6] KVM: arm64: Introduce hyp_alloc_private_va_range()
-      commit: 92abe0f81e1385afd8f1dc66206b5be9a514899b
-[2/6] KVM: arm64: Introduce pkvm_alloc_private_va_range()
-      commit: f922c13e778d6d5343d4576be785a8204c595113
-[3/6] KVM: arm64: Add guard pages for KVM nVHE hypervisor stack
-      commit: ce3354318a57875dc59f4bb841662e95bfba03db
-[4/6] KVM: arm64: Add guard pages for pKVM (protected nVHE) hypervisor stack
-      commit: 1a919b17ef012ca0572bae759c27e5ea02bfb47f
-[5/6] KVM: arm64: Detect and handle hypervisor stack overflows
-      commit: 66de19fad9ef47c5376a99bb2b00661f1c788a94
-[6/6] KVM: arm64: Symbolize the nVHE HYP addresses
-      commit: 6ccf9cb557bd32073b0d68baed97f1bd8a40ff1d
+[1/1] KVM/arm64: Don't emulate a PMU for 32-bit guests if feature not set
+      commit: 8f6379e207e7d834065a080f407a60d67349d961
 
 Cheers,
 
