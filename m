@@ -2,44 +2,43 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5505FC43217
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 15:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C4EC433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 15:56:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EE9BC4B2A3;
-	Thu, 28 Apr 2022 11:56:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C6134B26C;
+	Thu, 28 Apr 2022 11:56:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id arWtElOsQlq3; Thu, 28 Apr 2022 11:56:20 -0400 (EDT)
+	with ESMTP id GaNwkOZdzQWB; Thu, 28 Apr 2022 11:56:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7BF4F4B29B;
-	Thu, 28 Apr 2022 11:56:20 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCD394B2B4;
+	Thu, 28 Apr 2022 11:56:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4BFC4B284
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 104934B27F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CAbWck2I26SR for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2022 11:56:16 -0400 (EDT)
+ with ESMTP id x0FoQaQ-C8h1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2022 11:56:18 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 54BDA49E44
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C727F4B268
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:18 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AAA314BF;
- Thu, 28 Apr 2022 08:56:15 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 657781477;
+ Thu, 28 Apr 2022 08:56:18 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A98A23F774;
- Thu, 28 Apr 2022 08:56:13 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0438D3F774;
+ Thu, 28 Apr 2022 08:56:16 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: julien.thierry.kdev@gmail.com, will@kernel.org, maz@kernel.org,
  suzuki.poulose@arm.com, julien@xen.org,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  james.morse@arm.com
-Subject: [PATCH kvmtool 05/15] arm/arm64: Fail if RAM size is too large for
- 32-bit guests
-Date: Thu, 28 Apr 2022 16:55:52 +0100
-Message-Id: <20220428155602.29445-6-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 07/15] arm/arm64: Kill the ARM_MAX_MEMORY() macro
+Date: Thu, 28 Apr 2022 16:55:54 +0100
+Message-Id: <20220428155602.29445-8-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.36.0
 In-Reply-To: <20220428155602.29445-1-alexandru.elisei@arm.com>
 References: <20220428155602.29445-1-alexandru.elisei@arm.com>
@@ -60,63 +59,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-For 64-bit guests, kvmtool exists with an error in kvm__get_vm_type() if
-the memory size is larger than what KVM supports. For 32-bit guests, the
-RAM size is silently rounded down to ARM_LOMAP_MAX_MEMORY in
-kvm__arch_init().
+For 32-bit guests, the maximum memory size is represented by the define
+ARM_LOMAP_MAX_MEMORY, which ARM_MAX_MEMORY() returns.
 
-Be consistent and exit with an error when the user has configured the
-wrong RAM size for 32-bit guests.
+For 64-bit guests, the RAM size is checked against the maximum allowed
+by KVM in kvm__get_vm_type().
+
+There are no users left for the ARM_MAX_MEMORY() macro, remove it.
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arm/aarch32/kvm.c | 4 ++++
- arm/aarch64/kvm.c | 5 +++++
- arm/kvm.c         | 2 +-
- 3 files changed, 10 insertions(+), 1 deletion(-)
+ arm/aarch32/include/kvm/kvm-arch.h |  2 --
+ arm/aarch64/include/kvm/kvm-arch.h | 16 ----------------
+ 2 files changed, 18 deletions(-)
 
-diff --git a/arm/aarch32/kvm.c b/arm/aarch32/kvm.c
-index ae33ac92479a..9d68d7a15ee2 100644
---- a/arm/aarch32/kvm.c
-+++ b/arm/aarch32/kvm.c
-@@ -2,4 +2,8 @@
+diff --git a/arm/aarch32/include/kvm/kvm-arch.h b/arm/aarch32/include/kvm/kvm-arch.h
+index 5616b27e257e..467fb09175b8 100644
+--- a/arm/aarch32/include/kvm/kvm-arch.h
++++ b/arm/aarch32/include/kvm/kvm-arch.h
+@@ -8,8 +8,6 @@
+ struct kvm;
+ static inline void kvm__arch_enable_mte(struct kvm *kvm) {}
  
- void kvm__arch_validate_cfg(struct kvm *kvm)
- {
-+	if (kvm->cfg.ram_size > ARM_LOMAP_MAX_MEMORY) {
-+		die("RAM size 0x%llx exceeds maximum allowed 0x%llx",
-+		    kvm->cfg.ram_size, ARM_LOMAP_MAX_MEMORY);
-+	}
- }
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index b66a285b6359..73b2c5970f28 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -7,6 +7,11 @@
+-#define ARM_MAX_MEMORY(...)	ARM_LOMAP_MAX_MEMORY
+-
+ #define MAX_PAGE_SIZE	SZ_4K
  
- void kvm__arch_validate_cfg(struct kvm *kvm)
- {
-+	if (kvm->cfg.arch.aarch32_guest &&
-+	    kvm->cfg.ram_size > ARM_LOMAP_MAX_MEMORY) {
-+		die("RAM size 0x%llx exceeds maximum allowed 0x%llx",
-+		    kvm->cfg.ram_size, ARM_LOMAP_MAX_MEMORY);
-+	}
- }
+ #include "arm-common/kvm-arch.h"
+diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
+index 9124f6919d0f..ff857ca6e7b4 100644
+--- a/arm/aarch64/include/kvm/kvm-arch.h
++++ b/arm/aarch64/include/kvm/kvm-arch.h
+@@ -8,22 +8,6 @@ unsigned long long kvm__arch_get_kern_offset(struct kvm *kvm, int fd);
+ int kvm__arch_get_ipa_limit(struct kvm *kvm);
+ void kvm__arch_enable_mte(struct kvm *kvm);
  
- /*
-diff --git a/arm/kvm.c b/arm/kvm.c
-index c5913000e1ed..af0feae495d7 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -65,7 +65,7 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 	 * If using THP, then our minimal alignment becomes 2M.
- 	 * 2M trumps 64K, so let's go with that.
- 	 */
--	kvm->ram_size = min(ram_size, (u64)ARM_MAX_MEMORY(kvm));
-+	kvm->ram_size = ram_size;
- 	kvm->arch.ram_alloc_size = kvm->ram_size + SZ_2M;
- 	kvm->arch.ram_alloc_start = mmap_anon_or_hugetlbfs(kvm, hugetlbfs_path,
- 						kvm->arch.ram_alloc_size);
+-#define ARM_MAX_MEMORY(kvm)	({					\
+-	u64 max_ram;							\
+-									\
+-	if ((kvm)->cfg.arch.aarch32_guest) {				\
+-		max_ram = ARM_LOMAP_MAX_MEMORY;				\
+-	} else {							\
+-		int ipabits = kvm__arch_get_ipa_limit(kvm);		\
+-		if (ipabits <= 0)					\
+-			max_ram = ARM_HIMAP_MAX_MEMORY;			\
+-		else							\
+-			max_ram = (1ULL << ipabits) - ARM_MEMORY_AREA;	\
+-	}								\
+-									\
+-	max_ram;							\
+-})
+-
+ #define MAX_PAGE_SIZE	SZ_64K
+ 
+ #include "arm-common/kvm-arch.h"
 -- 
 2.36.0
 
