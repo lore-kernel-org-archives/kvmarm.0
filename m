@@ -2,78 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66651C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 14:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C953C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 15:23:11 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 029C54B284;
-	Thu, 28 Apr 2022 10:51:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 788A54B25C;
+	Thu, 28 Apr 2022 11:23:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@quicinc.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 03RicFzo9xsk; Thu, 28 Apr 2022 10:51:16 -0400 (EDT)
+	with ESMTP id Mrhq6ndK9XyL; Thu, 28 Apr 2022 11:23:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CE5C4B26C;
-	Thu, 28 Apr 2022 10:51:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D8D44B260;
+	Thu, 28 Apr 2022 11:23:10 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CB8F4B1B6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 17:08:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C90904B256
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:23:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id f-ifUVWq9ymS for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Apr 2022 17:08:06 -0400 (EDT)
-Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3822A4B1B5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Apr 2022 17:08:06 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1651093686; x=1682629686;
- h=date:from:to:cc:subject:message-id:references:
- mime-version:in-reply-to;
- bh=72myrHNOElx0NFEdtvKq9LM47tdwhmLkiKszPoSGAUg=;
- b=FsUicBLT6rFFGVwFI6mYHp0OAEMcplCrnkYxMl8d37mG477zEXDAH6eV
- tZuDJRtuhGebCG6CcpF2i+idrbS4u6JoqR2k5Ehj9ssv6jts4sjYyiR4i
- W4zD1iGIy3ANcvwPj+b8nb31KHgoPIjhL4zA4gdhnlh0QbH8nG4crIoQO E=;
-Received: from ironmsg07-lv.qualcomm.com ([10.47.202.151])
- by alexa-out.qualcomm.com with ESMTP; 27 Apr 2022 14:08:05 -0700
-X-QCInternal: smtphost
-Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
- by ironmsg07-lv.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 27 Apr 2022 14:08:04 -0700
-Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
- nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Wed, 27 Apr 2022 14:08:04 -0700
-Received: from qian (10.80.80.8) by nalasex01a.na.qualcomm.com (10.47.209.196)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Wed, 27 Apr
- 2022 14:08:02 -0700
-Date: Wed, 27 Apr 2022 17:08:00 -0400
-From: Qian Cai <quic_qiancai@quicinc.com>
-To: Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v14 00/39] arm64/sme: Initial support for the Scalable
- Matrix Extension
-Message-ID: <20220427210800.GB2047@qian>
-References: <20220419112247.711548-1-broonie@kernel.org>
- <20220427170858.GA2009@qian> <Yml599vM948wXt6g@sirena.org.uk>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yml599vM948wXt6g@sirena.org.uk>
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-Mailman-Approved-At: Thu, 28 Apr 2022 10:51:13 -0400
-Cc: Marc Zyngier <maz@kernel.org>,
- Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alan Hayward <alan.hayward@arm.com>,
- Salil Akerkar <Salil.Akerkar@arm.com>, linux-kselftest@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>, Shuah
- Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Luca Salabrino <luca.scalabrino@arm.com>
+ with ESMTP id bPM-7+48iKAS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2022 11:23:07 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 614224B24D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:23:07 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id B6C7161F71;
+ Thu, 28 Apr 2022 15:23:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89E8CC385AA;
+ Thu, 28 Apr 2022 15:23:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651159385;
+ bh=a+g7kB1z4KoOUj5wf8DAfU3CDt6Jxq6eIpCUJLbn5n4=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=PbSACN0rbItX49rjK7eSne4lvayB2pyOPyuARhcjXZK/g1FU3CCGTF9Kee2tVT8H4
+ Y9NUNSqkKqVNgiCj3tXSa9Rhg16RqouOXyJIvSHlDRdwIZXQSwYWijMCfDNTP8HOH6
+ YglNhEQTFGx/43Hh6LNu4bzv7c2Q3bl010WiE4djB6fFpCloYBh0xhkGBp1SJTyDqi
+ BITDyDBZqbkGv+c8EDnobZGUE3AN6mWCukrk0pUM7UidGff0oFNVuv57Lpydouz+Xg
+ 5ZgBypNRBZpcnxZnqv+Q4bvMBGqFCSHdY0cpg1+8GzNQ7XnJ+vtZMOEQcTsey0cNOi
+ lCQp2O1ew26eQ==
+Received: from [104.133.9.104] (helo=billy-the-mountain.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nk5yw-007huq-MB; Thu, 28 Apr 2022 16:23:03 +0100
+Date: Thu, 28 Apr 2022 16:22:58 +0100
+Message-ID: <87zgk5b5bh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2] KVM: arm64: Inject exception on out-of-IPA-range
+ translation fault
+In-Reply-To: <YmpUXWRJc3Kq3wGE@monolith.localdoman>
+References: <20220427220434.3097449-1-maz@kernel.org>
+ <YmpUXWRJc3Kq3wGE@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 104.133.9.104
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com,
+ qperret@google.com, will@kernel.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Christoffer Dall <christoffer.dall@arm.com>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,23 +89,132 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, Apr 27, 2022 at 06:14:31PM +0100, Mark Brown wrote:
-> On Wed, Apr 27, 2022 at 01:08:58PM -0400, Qian Cai wrote:
-> > On Tue, Apr 19, 2022 at 12:22:08PM +0100, Mark Brown wrote:
+On Thu, 28 Apr 2022 09:46:21 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> > > but not SVE, SME is an ARMv9 feature and SVE is mandatory for ARMv9.
-> > > The code attempts to handle any such systems that are encountered but
-> > > this hasn't been tested extensively.
+> Hi,
+> 
+> On Wed, Apr 27, 2022 at 11:04:34PM +0100, Marc Zyngier wrote:
+> > When taking a translation fault for an IPA that is outside of
+> > the range defined by the hypervisor (between the HW PARange and
+> > the IPA range), we stupidly treat it as an IO and forward the access
+> > to userspace. Of course, userspace can't do much with it, and things
+> > end badly.
 > > 
-> > Running CPU offline/online on a Neoverse-N1 server will trigger a crash.
+> > Arguably, the guest is braindead, but we should at least catch the
+> > case and inject an exception.
+> > 
+> > Check the faulting IPA against:
+> > - the sanitised PARange: inject an address size fault
+> > - the IPA size: inject an abort
+> > 
+> > Reported-by: Christoffer Dall <christoffer.dall@arm.com>
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h |  1 +
+> >  arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
+> >  arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
+> >  3 files changed, 48 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index 7496deab025a..f71358271b71 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+> >  void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+> >  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> >  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+> >  
+> >  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+> >  
+> > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > index b47df73e98d7..ba20405d2dc2 100644
+> > --- a/arch/arm64/kvm/inject_fault.c
+> > +++ b/arch/arm64/kvm/inject_fault.c
+> > @@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> >  		inject_abt64(vcpu, true, addr);
+> >  }
+> >  
+> > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+> > +{
+> > +	unsigned long addr, esr;
+> > +
+> > +	addr  = kvm_vcpu_get_fault_ipa(vcpu);
+> > +	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+> > +
+> > +	if (kvm_vcpu_trap_is_iabt(vcpu))
+> > +		kvm_inject_pabt(vcpu, addr);
+> > +	else
+> > +		kvm_inject_dabt(vcpu, addr);
+> > +
+> > +	/*
+> > +	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
+> > +	 * Size Fault at level 0, as if exceeding PARange.
+> > +	 *
+> > +	 * Non-LPAE guests will only get the external abort, as there
+> > +	 * is no way to to describe the ASF.
+> > +	 */
+> > +	if (vcpu_el1_is_32bit(vcpu) &&
+> > +	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
+> > +		return;
+> > +
+> > +	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
+> > +	esr &= ~GENMASK_ULL(5, 0);
+> > +	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
+> > +}
+> > +
+> >  /**
+> >   * kvm_inject_undefined - inject an undefined instruction into the guest
+> >   * @vcpu: The vCPU in which to inject the exception
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 53ae2c0640bc..5400fc020164 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1337,6 +1337,25 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> >  	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+> >  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+> >  
+> > +	if (fault_status == FSC_FAULT) {
+> > +		/* Beyond sanitised PARange (which is the IPA limit) */
+> > +		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> > +			kvm_inject_size_fault(vcpu);
+> > +			return 1;
+> > +		}
+> > +
+> > +		/* Falls between the IPA range and the PARange? */
+> > +		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
+> > +			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+> > +
+> > +			if (is_iabt)
+> > +				kvm_inject_pabt(vcpu, fault_ipa);
+> > +			else
+> > +				kvm_inject_dabt(vcpu, fault_ipa);
+> > +			return 1;
+> > +		}
 > 
-> Can you try with 
-> 
->    https://lore.kernel.org/r/20220427130828.162615-1-broonie@kernel.org
-> 
-> please?
+> Doesn't KVM treat faults outside a valid memslot (aka guest RAM) as MMIO
+> aborts? From the guest's point of view, the IPA is valid because it's
+> inside the HW PARange, so it's not entirely impossible that the VMM put a
+> device there.
 
-Yes, it works fine so far.
+Sure. But the generated IPA is outside of the range the VMM has asked
+to handle. The IPA space describes the whole of the guest address
+space, and there shouldn't be anything outside of it.
+
+We actually state in the documentation that the IPA Size limit *is*
+the physical address size for the VM. If the VMM places something
+outside if the IPA space and still expect something to be reported to
+it, we have a problem (in some cases, we may want to actually put page
+tables in place even for MMIO that traps to userspace -- see my
+earlier work on MMIO guard).
+
+Does it make sense to you?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
