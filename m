@@ -2,48 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26637C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 08:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E92C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 09:19:35 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B65D4B26F;
-	Thu, 28 Apr 2022 04:46:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C11E40FAA;
+	Thu, 28 Apr 2022 05:19:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V3LzZsWfG6j6; Thu, 28 Apr 2022 04:46:24 -0400 (EDT)
+	with ESMTP id JIml1XgWPSmT; Thu, 28 Apr 2022 05:19:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 244104B260;
-	Thu, 28 Apr 2022 04:46:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E0A7411C7;
+	Thu, 28 Apr 2022 05:19:34 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA29C4B231
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 04:46:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C673040F9C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 05:19:32 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x4YyhZYw5sqE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2022 04:46:22 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 370A84B1EF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 04:46:22 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BD9FF1474;
- Thu, 28 Apr 2022 01:46:21 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 09E693F774;
- Thu, 28 Apr 2022 01:46:19 -0700 (PDT)
-Date: Thu, 28 Apr 2022 09:46:21 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2] KVM: arm64: Inject exception on out-of-IPA-range
- translation fault
-Message-ID: <YmpUXWRJc3Kq3wGE@monolith.localdoman>
-References: <20220427220434.3097449-1-maz@kernel.org>
+ with ESMTP id 4SDyz22EOUJQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2022 05:19:31 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B05F340E62
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 05:19:31 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 4F58E612C5;
+ Thu, 28 Apr 2022 09:19:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 700BEC385A0;
+ Thu, 28 Apr 2022 09:19:26 +0000 (UTC)
+Date: Thu, 28 Apr 2022 10:19:22 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v14 04/39] arm64/sme: Provide ABI documentation for SME
+Message-ID: <YmpcGpSYpoiprngy@arm.com>
+References: <20220419112247.711548-1-broonie@kernel.org>
+ <20220419112247.711548-5-broonie@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220427220434.3097449-1-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Christoffer Dall <christoffer.dall@arm.com>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20220419112247.711548-5-broonie@kernel.org>
+Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
+ Szabolcs Nagy <szabolcs.nagy@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Shuah Khan <skhan@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Salil Akerkar <Salil.Akerkar@arm.com>,
+ Luca Salabrino <luca.scalabrino@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -60,123 +66,42 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
+On Tue, Apr 19, 2022 at 12:22:12PM +0100, Mark Brown wrote:
+> +* There are a number of optional SME features, presence of these is reported
+> +  through AT_HWCAP2 through:
+> +
+> +	HWCAP2_SME_I16I64
+> +	HWCAP2_SME_F64F64
+> +	HWCAP2_SME_I8I32
+> +	HWCAP2_SME_F16F32
+> +	HWCAP2_SME_B16F32
+> +	HWCAP2_SME_F32F32
+> +	HWCAP2_SME_FA64
 
-On Wed, Apr 27, 2022 at 11:04:34PM +0100, Marc Zyngier wrote:
-> When taking a translation fault for an IPA that is outside of
-> the range defined by the hypervisor (between the HW PARange and
-> the IPA range), we stupidly treat it as an IO and forward the access
-> to userspace. Of course, userspace can't do much with it, and things
-> end badly.
-> 
-> Arguably, the guest is braindead, but we should at least catch the
-> case and inject an exception.
-> 
-> Check the faulting IPA against:
-> - the sanitised PARange: inject an address size fault
-> - the IPA size: inject an abort
-> 
-> Reported-by: Christoffer Dall <christoffer.dall@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/kvm_emulate.h |  1 +
->  arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
->  arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
->  3 files changed, 48 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 7496deab025a..f71358271b71 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
->  void kvm_inject_vabt(struct kvm_vcpu *vcpu);
->  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
->  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
-> +void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
->  
->  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> index b47df73e98d7..ba20405d2dc2 100644
-> --- a/arch/arm64/kvm/inject_fault.c
-> +++ b/arch/arm64/kvm/inject_fault.c
-> @@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
->  		inject_abt64(vcpu, true, addr);
->  }
->  
-> +void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-> +{
-> +	unsigned long addr, esr;
-> +
-> +	addr  = kvm_vcpu_get_fault_ipa(vcpu);
-> +	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> +
-> +	if (kvm_vcpu_trap_is_iabt(vcpu))
-> +		kvm_inject_pabt(vcpu, addr);
-> +	else
-> +		kvm_inject_dabt(vcpu, addr);
-> +
-> +	/*
-> +	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
-> +	 * Size Fault at level 0, as if exceeding PARange.
-> +	 *
-> +	 * Non-LPAE guests will only get the external abort, as there
-> +	 * is no way to to describe the ASF.
-> +	 */
-> +	if (vcpu_el1_is_32bit(vcpu) &&
-> +	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
-> +		return;
-> +
-> +	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
-> +	esr &= ~GENMASK_ULL(5, 0);
-> +	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-> +}
-> +
->  /**
->   * kvm_inject_undefined - inject an undefined instruction into the guest
->   * @vcpu: The vCPU in which to inject the exception
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 53ae2c0640bc..5400fc020164 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1337,6 +1337,25 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
->  	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
->  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
->  
-> +	if (fault_status == FSC_FAULT) {
-> +		/* Beyond sanitised PARange (which is the IPA limit) */
-> +		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
-> +			kvm_inject_size_fault(vcpu);
-> +			return 1;
-> +		}
-> +
-> +		/* Falls between the IPA range and the PARange? */
-> +		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
-> +			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> +
-> +			if (is_iabt)
-> +				kvm_inject_pabt(vcpu, fault_ipa);
-> +			else
-> +				kvm_inject_dabt(vcpu, fault_ipa);
-> +			return 1;
-> +		}
+Marc pointed out that in combination with FEAT_WFxT, we used all the
+HWCAP2 bits (32). While we are ok for now, we'll soon need to look into
+what to do when the next features turn up. Some options:
 
-Doesn't KVM treat faults outside a valid memslot (aka guest RAM) as MMIO
-aborts? From the guest's point of view, the IPA is valid because it's
-inside the HW PARange, so it's not entirely impossible that the VMM put a
-device there.
+1. Only provide HWCAP2_SME and let the ID_AA64SMFR0_EL1 features be
+   probed via MRS emulation. It doesn't solve the problem but it buys us
+   a bit of time.
 
-Thanks,
-Alex
+2. Don't bother with any new HWCAPs, just rely on MRS emulation (we have
+   HWCAP_CPUID advertising this).
 
-> +	}
-> +
->  	/* Synchronous External Abort? */
->  	if (kvm_vcpu_abt_issea(vcpu)) {
->  		/*
-> -- 
-> 2.34.1
-> 
+3. Start using the upper 32-bit of HWCAP and HWCAP2 (we initially didn't
+   go into these as there was a slight chance of merging ILP32). Does
+   the libc rely on the upper bits for anything? Or does it just assume
+   a 32-bit HWCAPs layout?
+
+4. Introduce HWCAP3.
+
+Szabolcs, any thoughts?
+
+Thanks.
+
+-- 
+Catalin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
