@@ -2,44 +2,44 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D47C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 15:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD3FC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 15:56:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACDF64B26D;
-	Thu, 28 Apr 2022 11:56:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E79C04B2B2;
+	Thu, 28 Apr 2022 11:56:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yqWAqLC1mq8g; Thu, 28 Apr 2022 11:56:18 -0400 (EDT)
+	with ESMTP id wm9rzmlmYv8R; Thu, 28 Apr 2022 11:56:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AFA94B284;
-	Thu, 28 Apr 2022 11:56:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A6A34B2A3;
+	Thu, 28 Apr 2022 11:56:20 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 721B84B267
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73A524B28A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mt1UDlL7XaSM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2022 11:56:15 -0400 (EDT)
+ with ESMTP id O6InfzwjDfjq for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2022 11:56:17 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D22E34B26F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14A544B26F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 11:56:17 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C1111477;
- Thu, 28 Apr 2022 08:56:13 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BABD91474;
+ Thu, 28 Apr 2022 08:56:16 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0835C3F774;
- Thu, 28 Apr 2022 08:56:11 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 583EC3F774;
+ Thu, 28 Apr 2022 08:56:15 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: julien.thierry.kdev@gmail.com, will@kernel.org, maz@kernel.org,
  suzuki.poulose@arm.com, julien@xen.org,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
  james.morse@arm.com
-Subject: [PATCH kvmtool 04/15] builtin-run: Add arch hook to validate VM
- configuration
-Date: Thu, 28 Apr 2022 16:55:51 +0100
-Message-Id: <20220428155602.29445-5-alexandru.elisei@arm.com>
+Subject: [PATCH kvmtool 06/15] builtin_run: Allow standard size specifiers for
+ memory
+Date: Thu, 28 Apr 2022 16:55:53 +0100
+Message-Id: <20220428155602.29445-7-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.36.0
 In-Reply-To: <20220428155602.29445-1-alexandru.elisei@arm.com>
 References: <20220428155602.29445-1-alexandru.elisei@arm.com>
@@ -60,155 +60,121 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Architectures are free to set their own command line options. Add an
-architecture specific hook to validate these options.
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-For now, the hook does nothing, but it will be used in later patches.
+Allow the user to use the standard B (bytes), K (kilobytes), M (megabytes),
+G (gigabytes), T (terabytes) and P (petabytes) suffixes for memory size.
+When none are specified, the default is megabytes.
 
+Also raise an error if the guest specifies 0 as the memory size, instead
+of treating it as uninitialized, as kvmtool has done so far.
+
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- Makefile          | 3 ++-
- arm/aarch32/kvm.c | 5 +++++
- arm/aarch64/kvm.c | 4 ++++
- builtin-run.c     | 2 ++
- include/kvm/kvm.h | 1 +
- mips/kvm.c        | 4 ++++
- powerpc/kvm.c     | 4 ++++
- riscv/kvm.c       | 4 ++++
- x86/kvm.c         | 4 ++++
- 9 files changed, 30 insertions(+), 1 deletion(-)
- create mode 100644 arm/aarch32/kvm.c
+ builtin-run.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 61 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index e9121dc39d02..7149c22d75ac 100644
---- a/Makefile
-+++ b/Makefile
-@@ -167,6 +167,7 @@ ifeq ($(ARCH), arm)
- 	OBJS		+= $(OBJS_ARM_COMMON)
- 	OBJS		+= arm/aarch32/arm-cpu.o
- 	OBJS		+= arm/aarch32/kvm-cpu.o
-+	OBJS		+= arm/aarch32/kvm.o
- 	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
- 	ARCH_INCLUDE	+= -Iarm/aarch32/include
- 	CFLAGS		+= -march=armv7-a
-@@ -583,4 +584,4 @@ ifneq ($(MAKECMDGOALS),clean)
- 
- KVMTOOLS-VERSION-FILE:
- 	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
--endif
-\ No newline at end of file
-+endif
-diff --git a/arm/aarch32/kvm.c b/arm/aarch32/kvm.c
-new file mode 100644
-index 000000000000..ae33ac92479a
---- /dev/null
-+++ b/arm/aarch32/kvm.c
-@@ -0,0 +1,5 @@
-+#include "kvm/kvm.h"
-+
-+void kvm__arch_validate_cfg(struct kvm *kvm)
-+{
-+}
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index 28d608d98831..b66a285b6359 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -5,6 +5,10 @@
- #include <linux/byteorder.h>
- #include <kvm/util.h>
- 
-+void kvm__arch_validate_cfg(struct kvm *kvm)
-+{
-+}
-+
- /*
-  * Return the TEXT_OFFSET value that the guest kernel expects. Note
-  * that pre-3.17 kernels expose this value using the native endianness
 diff --git a/builtin-run.c b/builtin-run.c
-index 4491fd244f8c..2c37b91b6574 100644
+index 2c37b91b6574..0632a0c393a0 100644
 --- a/builtin-run.c
 +++ b/builtin-run.c
-@@ -531,6 +531,8 @@ static void kvm_run_validate_cfg(struct kvm *kvm)
- 				(unsigned long long)available_ram >> MB_SHIFT);
- 		}
- 	}
-+
-+	kvm__arch_validate_cfg(kvm);
+@@ -49,9 +49,11 @@
+ #include <ctype.h>
+ #include <stdio.h>
+ 
+-#define MB_SHIFT		(20)
+ #define KB_SHIFT		(10)
++#define MB_SHIFT		(20)
+ #define GB_SHIFT		(30)
++#define TB_SHIFT		(40)
++#define PB_SHIFT		(50)
+ 
+ __thread struct kvm_cpu *current_kvm_cpu;
+ 
+@@ -87,6 +89,60 @@ void kvm_run_set_wrapper_sandbox(void)
+ 	kvm_run_wrapper = KVM_RUN_SANDBOX;
  }
  
- static struct kvm *kvm_cmd_run_init(int argc, const char **argv)
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index 7b14b33b50ca..9f7b2fb26e95 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -187,6 +187,7 @@ int kvm__get_sock_by_instance(const char *name);
- int kvm__enumerate_instances(int (*callback)(const char *name, int pid));
- void kvm__remove_socket(const char *name);
- 
-+void kvm__arch_validate_cfg(struct kvm *kvm);
- void kvm__arch_set_cmdline(char *cmdline, bool video);
- void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size);
- void kvm__arch_delete_ram(struct kvm *kvm);
-diff --git a/mips/kvm.c b/mips/kvm.c
-index 3470dbb2e433..f5b137f46dff 100644
---- a/mips/kvm.c
-+++ b/mips/kvm.c
-@@ -12,6 +12,10 @@ struct kvm_ext kvm_req_ext[] = {
- 	{ 0, 0 }
- };
- 
-+void kvm__arch_validate_cfg(struct kvm *kvm)
++static int parse_mem_unit(char **next)
 +{
++	int shift = -1;
++
++	switch (**next) {
++	case 'B': case 'b': shift = 0; break;
++	case 'K': case 'k': shift = KB_SHIFT; break;
++	case 'M': case 'm': shift = MB_SHIFT; break;
++	case 'G': case 'g': shift = GB_SHIFT; break;
++	case 'T': case 't': shift = TB_SHIFT; break;
++	case 'P': case 'p': shift = PB_SHIFT; break;
++	}
++
++	if (shift == -1) {
++		/* The default is megabytes. */
++		shift = MB_SHIFT;
++	} else {
++		(*next)++;
++	}
++
++	return shift;
 +}
 +
- void kvm__arch_read_term(struct kvm *kvm)
- {
- 	virtio_console__inject_interrupt(kvm);
-diff --git a/powerpc/kvm.c b/powerpc/kvm.c
-index 702d67dca614..3215b579f5dc 100644
---- a/powerpc/kvm.c
-+++ b/powerpc/kvm.c
-@@ -48,6 +48,10 @@ struct kvm_ext kvm_req_ext[] = {
- 	{ 0, 0 }
- };
- 
-+void kvm__arch_validate_cfg(struct kvm *kvm)
++static u64 parse_mem_option(const char *nptr, char **next)
 +{
++	u64 shift;
++	u64 val;
++
++	val = strtoull(nptr, next, 10);
++	if (errno == ERANGE)
++		die("Memory too large: %s", nptr);
++	shift = parse_mem_unit(next);
++
++	if ((val << shift) < val)
++		die("Memory too large: %s", nptr);
++
++	return val << shift;
 +}
 +
- static uint32_t mfpvr(void)
- {
- 	uint32_t r;
-diff --git a/riscv/kvm.c b/riscv/kvm.c
-index 84e02779a91c..7fb496282f4c 100644
---- a/riscv/kvm.c
-+++ b/riscv/kvm.c
-@@ -13,6 +13,10 @@ struct kvm_ext kvm_req_ext[] = {
- 	{ 0, 0 },
- };
- 
-+void kvm__arch_validate_cfg(struct kvm *kvm)
++static int mem_parser(const struct option *opt, const char *arg, int unset)
 +{
++	struct kvm *kvm = opt->ptr;
++	char *next;
++
++	kvm->cfg.ram_size = parse_mem_option(arg, &next);
++	if (kvm->cfg.ram_size == 0)
++		die("Invalid RAM size: %s", arg);
++
++	if (*next != '\0')
++		die("Invalid memory specifier: %s", arg);
++
++	return 0;
 +}
 +
- bool kvm__arch_cpu_supports_vm(void)
- {
- 	/* The KVM capability check is enough. */
-diff --git a/x86/kvm.c b/x86/kvm.c
-index 3e0f0b743f8c..6683a5c81d49 100644
---- a/x86/kvm.c
-+++ b/x86/kvm.c
-@@ -35,6 +35,10 @@ struct kvm_ext kvm_req_ext[] = {
- 	{ 0, 0 }
- };
+ #ifndef OPT_ARCH_RUN
+ #define OPT_ARCH_RUN(...)
+ #endif
+@@ -97,8 +153,10 @@ void kvm_run_set_wrapper_sandbox(void)
+ 	OPT_STRING('\0', "name", &(cfg)->guest_name, "guest name",	\
+ 			"A name for the guest"),			\
+ 	OPT_INTEGER('c', "cpus", &(cfg)->nrcpus, "Number of CPUs"),	\
+-	OPT_U64('m', "mem", &(cfg)->ram_size, "Virtual machine memory"	\
+-		" size in MB."),					\
++	OPT_CALLBACK('m', "mem", NULL, "size[BKMGTP]",			\
++		     "Virtual machine memory size. The default unit"	\
++		     " of measurement is megabytes (M)",		\
++		     mem_parser, kvm),					\
+ 	OPT_CALLBACK('d', "disk", kvm, "image or rootfs_dir", "Disk "	\
+ 			" image or rootfs directory", img_name_parser,	\
+ 			kvm),						\
+@@ -522,8 +580,6 @@ static void kvm_run_validate_cfg(struct kvm *kvm)
+ 		pr_warning("Ignoring initrd file when loading a firmware image");
  
-+void kvm__arch_validate_cfg(struct kvm *kvm)
-+{
-+}
-+
- bool kvm__arch_cpu_supports_vm(void)
- {
- 	struct cpuid_regs regs;
+ 	if (kvm->cfg.ram_size) {
+-		/* User specifies RAM size in megabytes. */
+-		kvm->cfg.ram_size <<= MB_SHIFT;
+ 		available_ram = host_ram_size();
+ 		if (available_ram && kvm->cfg.ram_size > available_ram) {
+ 			pr_warning("Guest memory size %lluMB exceeds host physical RAM size %lluMB",
 -- 
 2.36.0
 
