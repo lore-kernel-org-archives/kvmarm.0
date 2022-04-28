@@ -2,42 +2,42 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EAC3C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 10:34:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC2FC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 10:34:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A31AC4B28E;
-	Thu, 28 Apr 2022 06:34:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 73A4E49F5B;
+	Thu, 28 Apr 2022 06:34:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id vmTbhj9lfptA; Thu, 28 Apr 2022 06:34:23 -0400 (EDT)
+	with ESMTP id rOhPgGHPldhI; Thu, 28 Apr 2022 06:34:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FD0F4B28F;
-	Thu, 28 Apr 2022 06:34:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EAC7400CF;
+	Thu, 28 Apr 2022 06:34:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AFC44B285
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 06:34:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0C744B28F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 06:34:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XCJy5B0CO7GN for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2022 06:34:21 -0400 (EDT)
+ with ESMTP id U+DEF-os79fu for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2022 06:34:24 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E756F4B297
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 06:34:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA2434B230
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 06:34:23 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 911DD1477;
- Thu, 28 Apr 2022 03:34:20 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6FF3D1474;
+ Thu, 28 Apr 2022 03:34:23 -0700 (PDT)
 Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8FCB23F774;
- Thu, 28 Apr 2022 03:34:19 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6D8E13F774;
+ Thu, 28 Apr 2022 03:34:22 -0700 (PDT)
 From: Alexandru Elisei <alexandru.elisei@arm.com>
 To: maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com,
  linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Subject: [PATCH v2 1/2] KVM/arm64: Don't BUG_ON() if emulated register table
+Subject: [PATCH v2 2/2] KVM/arm64: Print emulated register table name when it
  is unsorted
-Date: Thu, 28 Apr 2022 11:34:04 +0100
-Message-Id: <20220428103405.70884-2-alexandru.elisei@arm.com>
+Date: Thu, 28 Apr 2022 11:34:05 +0100
+Message-Id: <20220428103405.70884-3-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.36.0
 In-Reply-To: <20220428103405.70884-1-alexandru.elisei@arm.com>
 References: <20220428103405.70884-1-alexandru.elisei@arm.com>
@@ -58,142 +58,41 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-To emulate a register access, KVM uses a table of registers sorted by
-register encoding to speed up queries using binary search.
+When a sysreg table entry is out-of-order, KVM attempts to print the
+address of the table:
 
-When Linux boots, KVM checks that the table is sorted and uses a BUG_ON()
-statement to let the user know if it's not. The unfortunate side effect is
-that an unsorted sysreg table brings down the whole kernel, not just KVM,
-even though the rest of the kernel can function just fine without KVM. To
-make matters worse, on machines which lack a serial console, the user is
-left pondering why the machine is taking so long to boot.
+[    0.143911] kvm [1]: sys_reg table (____ptrval____) out of order (1)
 
-Improve this situation by returning an error from kvm_arch_init() if the
-sysreg tables are not in the correct order. The machine is still very much
-usable for the user, with the exception of virtualization, who can now
-easily determine what went wrong.
+Printing the name of the table instead of a pointer is more helpful in this
+case. The message has also been slightly tweaked to be point out the
+offending entry (and to match the missing reset error message):
 
-A minor typo has also been corrected in the check_sysreg_table() function.
+[    0.143891] kvm [1]: sys_reg table sys_reg_descs+0x50/0x7490 entry 1 out of order
 
 Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 +-
- arch/arm64/kvm/arm.c              |  8 ++++++--
- arch/arm64/kvm/sys_regs.c         | 33 ++++++++++++++++++-------------
- 3 files changed, 26 insertions(+), 17 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 94a27a7520f4..39ca91cc1f01 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -686,7 +686,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu);
- 
- void kvm_reset_sys_regs(struct kvm_vcpu *vcpu);
- 
--void kvm_sys_reg_table_init(void);
-+int kvm_sys_reg_table_init(void);
- 
- /* MMIO helpers */
- void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 523bc934fe2f..ab365358747a 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1761,8 +1761,6 @@ static int init_subsystems(void)
- 
- 	kvm_register_perf_callbacks(NULL);
- 
--	kvm_sys_reg_table_init();
--
- out:
- 	if (err || !is_protected_kvm_enabled())
- 		on_each_cpu(_kvm_arch_hardware_disable, NULL, 1);
-@@ -2089,6 +2087,12 @@ int kvm_arch_init(void *opaque)
- 		return -ENODEV;
- 	}
- 
-+	err = kvm_sys_reg_table_init();
-+	if (err) {
-+		kvm_info("Error initializing system register tables");
-+		return err;
-+	}
-+
- 	in_hyp_mode = is_kernel_in_hyp_mode();
- 
- 	if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 7b45c040cc27..57302048afd0 100644
+index 57302048afd0..a84a556eeb8f 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2187,25 +2187,24 @@ static const struct sys_reg_desc cp15_64_regs[] = {
- 	{ SYS_DESC(SYS_AARCH32_CNTP_CVAL),    access_arch_timer },
- };
- 
--static int check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
--			      bool is_32)
-+static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
-+			       bool is_32)
- {
- 	unsigned int i;
+@@ -2194,12 +2194,12 @@ static bool check_sysreg_table(const struct sys_reg_desc *table, unsigned int n,
  
  	for (i = 0; i < n; i++) {
  		if (!is_32 && table[i].reg && !table[i].reset) {
--			kvm_err("sys_reg table %p entry %d has lacks reset\n",
--				table, i);
--			return 1;
-+			kvm_err("sys_reg table %p entry %d lacks reset\n", table, i);
-+			return false;
+-			kvm_err("sys_reg table %p entry %d lacks reset\n", table, i);
++			kvm_err("sys_reg table %pS entry %d lacks reset\n", &table[i], i);
+ 			return false;
  		}
  
  		if (i && cmp_sys_reg(&table[i-1], &table[i]) >= 0) {
- 			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
--			return 1;
-+			return false;
+-			kvm_err("sys_reg table %p out of order (%d)\n", table, i - 1);
++			kvm_err("sys_reg table %pS entry %d out of order\n", &table[i - 1], i - 1);
+ 			return false;
  		}
  	}
- 
--	return 0;
-+	return true;
- }
- 
- int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu)
-@@ -2860,18 +2859,22 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
- 	return write_demux_regids(uindices);
- }
- 
--void kvm_sys_reg_table_init(void)
-+int kvm_sys_reg_table_init(void)
- {
-+	bool valid = true;
- 	unsigned int i;
- 	struct sys_reg_desc clidr;
- 
- 	/* Make sure tables are unique and in order. */
--	BUG_ON(check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false));
--	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true));
--	BUG_ON(check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true));
--	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true));
--	BUG_ON(check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true));
--	BUG_ON(check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false));
-+	valid &= check_sysreg_table(sys_reg_descs, ARRAY_SIZE(sys_reg_descs), false);
-+	valid &= check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs), true);
-+	valid &= check_sysreg_table(cp14_64_regs, ARRAY_SIZE(cp14_64_regs), true);
-+	valid &= check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs), true);
-+	valid &= check_sysreg_table(cp15_64_regs, ARRAY_SIZE(cp15_64_regs), true);
-+	valid &= check_sysreg_table(invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs), false);
-+
-+	if (!valid)
-+		return -EINVAL;
- 
- 	/* We abuse the reset function to overwrite the table itself. */
- 	for (i = 0; i < ARRAY_SIZE(invariant_sys_regs); i++)
-@@ -2894,4 +2897,6 @@ void kvm_sys_reg_table_init(void)
- 			break;
- 	/* Clear all higher bits. */
- 	cache_levels &= (1 << (i*3))-1;
-+
-+	return 0;
- }
 -- 
 2.36.0
 
