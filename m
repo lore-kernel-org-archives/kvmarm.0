@@ -2,93 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF44C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 17:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79963C433FE
+	for <kvmarm@archiver.kernel.org>; Thu, 28 Apr 2022 17:56:05 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7359549EBE;
-	Thu, 28 Apr 2022 13:45:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E51034B223;
+	Thu, 28 Apr 2022 13:56:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AAyIeSFjsT9n; Thu, 28 Apr 2022 13:45:55 -0400 (EDT)
+	with ESMTP id baJsYCDAfoY3; Thu, 28 Apr 2022 13:56:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 660D24B10C;
-	Thu, 28 Apr 2022 13:45:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 86A7E4B0DD;
+	Thu, 28 Apr 2022 13:56:03 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D95BA49F28
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 13:45:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 18D6549F55
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 13:56:02 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XA+GZAboTaFL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2022 13:45:52 -0400 (EDT)
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com
- [209.85.166.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7002949E1E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 13:45:52 -0400 (EDT)
-Received: by mail-io1-f49.google.com with SMTP id 125so7261310iov.10
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 10:45:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=rYkNgcXPFsN0AZS9Gdq00dTATV9XxHLGEv5CoQhxVgg=;
- b=hzMsoV3D0yJ0Unlop+rpTzklIYhRnWH7ICsyDlDVFdcLE9BIlkNP73Wm+4oXNVuiB8
- plJ8GuyyvEt6ZXQbKxd1muNdZzq09naSLXrKhBTeETybRl01LEoPVDN68ktaYn9l0zsi
- yoyQHHe1wradnURDVY6+HNGMMkWazXFQRLoTut+ycpEUb54hblTXLdMjgsITAqGXMdx5
- 3Y8FH49L78ooub0KNRfiN5ke97caoBhhHNMCuuOQncS7BD/mI1wPI6p0qS0ilNo4Z01F
- oWlrVzL07peONZe79tOTcyd8YQZsNWlwpVd98T9TgcHmPXq0Kuzw5WruzgVtu+f1uIoR
- iH0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=rYkNgcXPFsN0AZS9Gdq00dTATV9XxHLGEv5CoQhxVgg=;
- b=NbsME7MI1xCtmjZsCFZ3Q2ziYyo0+zoyPpiJMpbA0+TqM702aZxnG8Ar00NC8bvQSe
- xjB5KLSQns/+QKCX+7Nsd1IitMmxkKDHuupOo7ONnnfwxSz75jbkyJRALzD+DriW7DBU
- yskoFdjfG/0/WJf0OumOdXbVr5S4t/pnqbmzn5mVvDohMFp9N95zwwihz+An0Y9+vF87
- 80xqD6PaMTunhXTEhiAasCSOobrz1iCxlIVxXjsDdZ/rV0WJrpk+soxfPLvs162feomV
- wnJDUFbNoC9Y0ZS1a5NvQt45Fsthm8WB1dNSmnqBR5dm9ubO7G9jrbUDzlbttdRJlMyj
- fmsA==
-X-Gm-Message-State: AOAM533sU75vR438qcqqtkIY4tgCbvER0jI6nTS9JU3AU0rMT5I6UVIE
- Z+c56TCoTnwknzO346XIPj43hQ==
-X-Google-Smtp-Source: ABdhPJx/sYY/i7dOFt3+PaiV4KhSUz6X+tqTVPbVDr2OqPDCjEE/yaOau4YnhKo+v4gz0/SI7nAHRg==
-X-Received: by 2002:a02:cc48:0:b0:32b:14:4186 with SMTP id
- i8-20020a02cc48000000b0032b00144186mr6761137jaq.189.1651167951414; 
- Thu, 28 Apr 2022 10:45:51 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- f15-20020a056e020c6f00b002cbc9935527sm269640ilj.83.2022.04.28.10.45.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 Apr 2022 10:45:50 -0700 (PDT)
-Date: Thu, 28 Apr 2022 17:45:47 +0000
-From: Oliver Upton <oupton@google.com>
-To: Yosry Ahmed <yosryahmed@google.com>
-Subject: Re: [PATCH v3 4/6] KVM: arm64/mmu: count KVM page table pages in
- pagetable stats
-Message-ID: <YmrSywSU1ezREvT6@google.com>
-References: <20220426053904.3684293-1-yosryahmed@google.com>
- <20220426053904.3684293-5-yosryahmed@google.com>
- <YmegoB/fBkfwaE5z@google.com>
- <CAJD7tkY-WZKcyer=TbWF0dVfOhvZO7hqPN=AYCDZe1f+2HA-QQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CAJD7tkY-WZKcyer=TbWF0dVfOhvZO7hqPN=AYCDZe1f+2HA-QQ@mail.gmail.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>,
- Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Linux-MM <linux-mm@kvack.org>, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Huacai Chen <chenhuacai@kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Johannes Weiner <hannes@cmpxchg.org>, Shakeel Butt <shakeelb@google.com>,
- Atish Patra <atishp@atishpatra.org>, cgroups@vger.kernel.org,
- Vitaly Kuznetsov <vkuznets@redhat.com>, linux-arm-kernel@lists.infradead.org,
- Jim Mattson <jmattson@google.com>, linux-mips@vger.kernel.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- kvm-riscv@lists.infradead.org, linux-fsdevel@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
+ with ESMTP id 5UvCU2qj--MN for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2022 13:56:00 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 959B149F46
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2022 13:56:00 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id D317362129;
+ Thu, 28 Apr 2022 17:55:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09B79C385A0;
+ Thu, 28 Apr 2022 17:55:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651168559;
+ bh=9Ml85O4d//534qMzyIAeeAr/06aIbwxqBxRD6bQ89qE=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=pcByehuR3uAqe8ECB/Bf+xD/cMGL204bxqSWuhOkIOh9NM+wMRDriHh5yLc4Tp2e3
+ 6yNB3Zc7eJJ6KtUN5PyMntWc2vQjGNUn+8m2tnkSzfdDBXTpQB+CYz2zHybQvixF3w
+ 6wx65ZyfCgwhECrf/9hOOIyJZ3yPyGJFM+/14zGW8xZcuwX/EMg9YPbqTTYqYI3zSJ
+ xQ5d1g5ik0t4bpXM/DLUzcwyY0bh8I+EHmJMfRjNh3y7tpZSLt/UP+6s9exfHro7f9
+ mWQasWyXnqIqPwbJtb96ZFW4xQ+QpulcyqN4F+semQj+d35N2O2X71PVIS44Ud4hE9
+ P2iejsTjVg1gg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nk8Mu-007k5d-Ll; Thu, 28 Apr 2022 18:55:56 +0100
+Date: Thu, 28 Apr 2022 18:55:56 +0100
+Message-ID: <87v8ut853n.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH v2] KVM: arm64: Inject exception on out-of-IPA-range
+ translation fault
+In-Reply-To: <Ymq7qUU67DoXTmkP@monolith.localdoman>
+References: <20220427220434.3097449-1-maz@kernel.org>
+ <YmpUXWRJc3Kq3wGE@monolith.localdoman>
+ <87zgk5b5bh.wl-maz@kernel.org>
+ <Ymq7qUU67DoXTmkP@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com,
+ qperret@google.com, will@kernel.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Christoffer Dall <christoffer.dall@arm.com>, kernel-team@android.com,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -105,43 +91,184 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, Apr 26, 2022 at 12:27:57PM -0700, Yosry Ahmed wrote:
-> > What page tables do we want to account? KVM on ARM manages several page
-> > tables.
-> >
-> > For regular KVM, the host kernel manages allocations for the hyp stage 1
-> > tables in addition to the stage 2 tables used for a particular VM. The
-> > former is system overhead whereas the latter could be attributed to a
-> > guest VM.
+On Thu, 28 Apr 2022 17:07:21 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Honestly I would love to get your input on this. The main motivation
-> here is to give users insights on the kernel memory usage on their
-> system (or in a cgroup). We currently have NR_PAGETABLE stats for
-> normal kernel page tables (allocated using
-> __pte_alloc_one()/pte_free()), this shows up in /proc/meminfo,
-> /path/to/cgroup/memory.stat, and node stats. The idea is to add
-> NR_SECONDARY_PAGETABLE that should include the memory used for kvm
-> pagetables, which should be a separate category (no overlap). What
-> gets included or not depends on the semantics of KVM and what exactly
-> falls under the category of secondary pagetables from the user's pov.
+> Hi,
 > 
-> Currently it looks like s2 page table allocations get accounted to
-> kmem of memory control groups (GFP_KERNEL_ACCOUNT), while hyp page
-> table allocations do not (GFP_KERNEL). So we could either follow this
-> and only account s2 page table allocations in the stats, or make hyp
-> allocations use GFP_KERNEL_ACCOUNT as well and add them to the stats.
-> Let me know what you think.
+> On Thu, Apr 28, 2022 at 04:22:58PM +0100, Marc Zyngier wrote:
+> > On Thu, 28 Apr 2022 09:46:21 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > Hi,
+> > > 
+> > > On Wed, Apr 27, 2022 at 11:04:34PM +0100, Marc Zyngier wrote:
+> > > > When taking a translation fault for an IPA that is outside of
+> > > > the range defined by the hypervisor (between the HW PARange and
+> > > > the IPA range), we stupidly treat it as an IO and forward the access
+> > > > to userspace. Of course, userspace can't do much with it, and things
+> > > > end badly.
+> > > > 
+> > > > Arguably, the guest is braindead, but we should at least catch the
+> > > > case and inject an exception.
+> > > > 
+> > > > Check the faulting IPA against:
+> > > > - the sanitised PARange: inject an address size fault
+> > > > - the IPA size: inject an abort
+> > > > 
+> > > > Reported-by: Christoffer Dall <christoffer.dall@arm.com>
+> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_emulate.h |  1 +
+> > > >  arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
+> > > >  arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
+> > > >  3 files changed, 48 insertions(+)
+> > > > 
+> > > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > > > index 7496deab025a..f71358271b71 100644
+> > > > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > > > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > > > @@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
+> > > >  void kvm_inject_vabt(struct kvm_vcpu *vcpu);
+> > > >  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> > > >  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
+> > > > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
+> > > >  
+> > > >  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
+> > > >  
+> > > > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> > > > index b47df73e98d7..ba20405d2dc2 100644
+> > > > --- a/arch/arm64/kvm/inject_fault.c
+> > > > +++ b/arch/arm64/kvm/inject_fault.c
+> > > > @@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+> > > >  		inject_abt64(vcpu, true, addr);
+> > > >  }
+> > > >  
+> > > > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +	unsigned long addr, esr;
+> > > > +
+> > > > +	addr  = kvm_vcpu_get_fault_ipa(vcpu);
+> > > > +	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+> > > > +
+> > > > +	if (kvm_vcpu_trap_is_iabt(vcpu))
+> > > > +		kvm_inject_pabt(vcpu, addr);
+> > > > +	else
+> > > > +		kvm_inject_dabt(vcpu, addr);
+> > > > +
+> > > > +	/*
+> > > > +	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
+> > > > +	 * Size Fault at level 0, as if exceeding PARange.
+> > > > +	 *
+> > > > +	 * Non-LPAE guests will only get the external abort, as there
+> > > > +	 * is no way to to describe the ASF.
+> > > > +	 */
+> > > > +	if (vcpu_el1_is_32bit(vcpu) &&
+> > > > +	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
+> > > > +		return;
+> > > > +
+> > > > +	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
+> > > > +	esr &= ~GENMASK_ULL(5, 0);
+> > > > +	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
+> > > > +}
+> > > > +
+> > > >  /**
+> > > >   * kvm_inject_undefined - inject an undefined instruction into the guest
+> > > >   * @vcpu: The vCPU in which to inject the exception
+> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > > index 53ae2c0640bc..5400fc020164 100644
+> > > > --- a/arch/arm64/kvm/mmu.c
+> > > > +++ b/arch/arm64/kvm/mmu.c
+> > > > @@ -1337,6 +1337,25 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
+> > > >  	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
+> > > >  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
+> > > >  
+> > > > +	if (fault_status == FSC_FAULT) {
+> > > > +		/* Beyond sanitised PARange (which is the IPA limit) */
+> > > > +		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
+> > > > +			kvm_inject_size_fault(vcpu);
+> > > > +			return 1;
+> > > > +		}
+> > > > +
+> > > > +		/* Falls between the IPA range and the PARange? */
+> > > > +		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
+> > > > +			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
+> > > > +
+> > > > +			if (is_iabt)
+> > > > +				kvm_inject_pabt(vcpu, fault_ipa);
+> > > > +			else
+> > > > +				kvm_inject_dabt(vcpu, fault_ipa);
+> > > > +			return 1;
+> > > > +		}
+> > > 
+> > > Doesn't KVM treat faults outside a valid memslot (aka guest RAM) as MMIO
+> > > aborts? From the guest's point of view, the IPA is valid because it's
+> > > inside the HW PARange, so it's not entirely impossible that the VMM put a
+> > > device there.
+> > 
+> > Sure. But the generated IPA is outside of the range the VMM has asked
+> > to handle. The IPA space describes the whole of the guest address
+> > space, and there shouldn't be anything outside of it.
+> > 
+> > We actually state in the documentation that the IPA Size limit *is*
+> > the physical address size for the VM. If the VMM places something
+> > outside if the IPA space and still expect something to be reported to
+> > it, we have a problem (in some cases, we may want to actually put page
+> > tables in place even for MMIO that traps to userspace -- see my
+> > earlier work on MMIO guard).
+> 
+> If you mean this bit:
+> 
+> On arm64, the physical address size for a VM (IPA Size limit) is limited
+> to 40bits by default. The limit can be configured if the host supports the
+> extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
+> KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
+> identifier, where IPA_Bits is the maximum width of any physical
+> address used by the VM.
+>
+> And then below there is this paragraph:
+> 
+> Please note that configuring the IPA size does not affect the capability
+> exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
+> **size of the address translated by the stage2 level (guest physical to
+> host physical address translations)**.
 
-I think it is reasonable to just focus on stage 2 table allocations and
-ignore all else. As Marc pointed out it isn't workable in other
-contexts anyway (pKVM), and keeps the patch tidy too.
+I don't see that as a contradiction. It just says that we don't
+repaint PARange.
 
-GFP_KERNEL_ACCOUNT for hyp allocations wouldn't make sense, as it is
-done at init to build out the system page tables for EL2.
+> 
+> Emphasis added by me.
+> 
+> It looks to me like the two paragraph state different things, first says
+> the IPA size caps "the physical address size for a VM", the second that it
+> caps the RAM size - "size of the address translated by the stage 2 level.
 
---
-Thanks,
-Oliver
+That's not the way I understand it. It just gives a textbook
+definition of the IPA space. And to be clear, this is just an
+implementation detail. We should be able to populate all full IPA
+space with faulting entries and keep the behaviour the same.
+
+> I have no problem with either, but it looks confusing.
+> 
+> So if a VMM that wants to put devices above RAM it must make sure that the
+> IPA size is extended to match, did I get that right?
+
+Yes. Anything that is reacheable by a memory transaction has to fit in
+the IPA space.
+
+> I'm also a bit confused about the rationale. Why is the PARange exposed to
+> the guest in effect the wrong value, because the true PARange is defined by
+> IPA size?
+
+PARange and IPA range don't have the same granularity. You can't
+express a PARange of 37 bits, for example, while it is perfectly
+possible for the IPA range. And they do cover two different concepts:
+the IPA space means nothing to the guest.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
