@@ -2,52 +2,65 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D12C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Apr 2022 10:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22963C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Apr 2022 12:47:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E0E254B0DF;
-	Fri, 29 Apr 2022 06:44:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B654B1F2;
+	Fri, 29 Apr 2022 08:47:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PhhsWssjQsdw; Fri, 29 Apr 2022 06:44:30 -0400 (EDT)
+	with ESMTP id e83TCvjmM-eX; Fri, 29 Apr 2022 08:47:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A74849EAE;
-	Fri, 29 Apr 2022 06:44:30 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75F864B202;
+	Fri, 29 Apr 2022 08:47:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3269140597
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 06:44:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 763A64B1F2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 08:47:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1S5so3m7Hhte for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Apr 2022 06:44:27 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A11E64B28A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 06:44:27 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 21BE01063;
- Fri, 29 Apr 2022 03:44:27 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 68F1B3F73B;
- Fri, 29 Apr 2022 03:44:25 -0700 (PDT)
-Date: Fri, 29 Apr 2022 11:44:27 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v2] KVM: arm64: Inject exception on out-of-IPA-range
- translation fault
-Message-ID: <YmvBi/BF7rA43lqr@monolith.localdoman>
-References: <20220427220434.3097449-1-maz@kernel.org>
- <YmpUXWRJc3Kq3wGE@monolith.localdoman>
- <87zgk5b5bh.wl-maz@kernel.org>
- <Ymq7qUU67DoXTmkP@monolith.localdoman>
- <87v8ut853n.wl-maz@kernel.org>
+ with ESMTP id mvD1KZi-UAMk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Apr 2022 08:47:37 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D7AB4B119
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 08:47:37 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 98608B8350C;
+ Fri, 29 Apr 2022 12:47:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A44F5C385A7;
+ Fri, 29 Apr 2022 12:47:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651236454;
+ bh=l/ZXIC0BCgutI+C22NZVWcDfaMSWrQgzViGseNxj74A=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=PqBY/U2kPgctQjMbW7NYk09e+E6gjTLk27xNt9PBseyjFJEBFaYP693SiHoDnTu13
+ CojqRn0cz2h4rZiomocJVYg38i4Ls2QLCIPWtRF5Hqj0AxzWLY27VT2x8jIs04Xroe
+ 7LIXp6SUXjLUwi2HP6m0Rxf56oZ+SaFA6/wSIFd5YzGjG6Oxi6p2XBPLERnZchCyWS
+ BT8wYrRCMWw1TC/c4gtD6gmJKznP7rfbOrUC+Y7xX6tDm+ZKi1omHOhlOfXXYloM2Z
+ oaSfy5cXhTzG7Qp/P1VeLqlalcSRjwPmP5i6NJmW5Jsx2JnZmIZjrA+ov1Fz1+tlz0
+ 1mEumpFxTP/vA==
+Date: Fri, 29 Apr 2022 13:47:26 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Kalesh Singh <kaleshsingh@google.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: Compile stacktrace.nvhe.o
+Message-ID: <YmveXly9117jbWKr@sirena.org.uk>
+References: <20220427184716.1949239-1-kaleshsingh@google.com>
+ <20220427184716.1949239-2-kaleshsingh@google.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87v8ut853n.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Christoffer Dall <christoffer.dall@arm.com>, kernel-team@android.com,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20220427184716.1949239-2-kaleshsingh@google.com>
+X-Cookie: Are you still an ALCOHOLIC?
+Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ surenb@google.com, Peter Collingbourne <pcc@google.com>,
+ linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -59,193 +72,65 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============5250749274581553776=="
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi,
 
-On Thu, Apr 28, 2022 at 06:55:56PM +0100, Marc Zyngier wrote:
-> On Thu, 28 Apr 2022 17:07:21 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi,
-> > 
-> > On Thu, Apr 28, 2022 at 04:22:58PM +0100, Marc Zyngier wrote:
-> > > On Thu, 28 Apr 2022 09:46:21 +0100,
-> > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > > 
-> > > > Hi,
-> > > > 
-> > > > On Wed, Apr 27, 2022 at 11:04:34PM +0100, Marc Zyngier wrote:
-> > > > > When taking a translation fault for an IPA that is outside of
-> > > > > the range defined by the hypervisor (between the HW PARange and
-> > > > > the IPA range), we stupidly treat it as an IO and forward the access
-> > > > > to userspace. Of course, userspace can't do much with it, and things
-> > > > > end badly.
-> > > > > 
-> > > > > Arguably, the guest is braindead, but we should at least catch the
-> > > > > case and inject an exception.
-> > > > > 
-> > > > > Check the faulting IPA against:
-> > > > > - the sanitised PARange: inject an address size fault
-> > > > > - the IPA size: inject an abort
-> > > > > 
-> > > > > Reported-by: Christoffer Dall <christoffer.dall@arm.com>
-> > > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > > ---
-> > > > >  arch/arm64/include/asm/kvm_emulate.h |  1 +
-> > > > >  arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
-> > > > >  arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
-> > > > >  3 files changed, 48 insertions(+)
-> > > > > 
-> > > > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > > > > index 7496deab025a..f71358271b71 100644
-> > > > > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > > > > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > > > > @@ -40,6 +40,7 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu);
-> > > > >  void kvm_inject_vabt(struct kvm_vcpu *vcpu);
-> > > > >  void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr);
-> > > > >  void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
-> > > > > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu);
-> > > > >  
-> > > > >  void kvm_vcpu_wfi(struct kvm_vcpu *vcpu);
-> > > > >  
-> > > > > diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-> > > > > index b47df73e98d7..ba20405d2dc2 100644
-> > > > > --- a/arch/arm64/kvm/inject_fault.c
-> > > > > +++ b/arch/arm64/kvm/inject_fault.c
-> > > > > @@ -145,6 +145,34 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
-> > > > >  		inject_abt64(vcpu, true, addr);
-> > > > >  }
-> > > > >  
-> > > > > +void kvm_inject_size_fault(struct kvm_vcpu *vcpu)
-> > > > > +{
-> > > > > +	unsigned long addr, esr;
-> > > > > +
-> > > > > +	addr  = kvm_vcpu_get_fault_ipa(vcpu);
-> > > > > +	addr |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> > > > > +
-> > > > > +	if (kvm_vcpu_trap_is_iabt(vcpu))
-> > > > > +		kvm_inject_pabt(vcpu, addr);
-> > > > > +	else
-> > > > > +		kvm_inject_dabt(vcpu, addr);
-> > > > > +
-> > > > > +	/*
-> > > > > +	 * If AArch64 or LPAE, set FSC to 0 to indicate an Address
-> > > > > +	 * Size Fault at level 0, as if exceeding PARange.
-> > > > > +	 *
-> > > > > +	 * Non-LPAE guests will only get the external abort, as there
-> > > > > +	 * is no way to to describe the ASF.
-> > > > > +	 */
-> > > > > +	if (vcpu_el1_is_32bit(vcpu) &&
-> > > > > +	    !(vcpu_read_sys_reg(vcpu, TCR_EL1) & TTBCR_EAE))
-> > > > > +		return;
-> > > > > +
-> > > > > +	esr = vcpu_read_sys_reg(vcpu, ESR_EL1);
-> > > > > +	esr &= ~GENMASK_ULL(5, 0);
-> > > > > +	vcpu_write_sys_reg(vcpu, esr, ESR_EL1);
-> > > > > +}
-> > > > > +
-> > > > >  /**
-> > > > >   * kvm_inject_undefined - inject an undefined instruction into the guest
-> > > > >   * @vcpu: The vCPU in which to inject the exception
-> > > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > > index 53ae2c0640bc..5400fc020164 100644
-> > > > > --- a/arch/arm64/kvm/mmu.c
-> > > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > > @@ -1337,6 +1337,25 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
-> > > > >  	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
-> > > > >  	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
-> > > > >  
-> > > > > +	if (fault_status == FSC_FAULT) {
-> > > > > +		/* Beyond sanitised PARange (which is the IPA limit) */
-> > > > > +		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
-> > > > > +			kvm_inject_size_fault(vcpu);
-> > > > > +			return 1;
-> > > > > +		}
-> > > > > +
-> > > > > +		/* Falls between the IPA range and the PARange? */
-> > > > > +		if (fault_ipa >= BIT_ULL(vcpu->arch.hw_mmu->pgt->ia_bits)) {
-> > > > > +			fault_ipa |= kvm_vcpu_get_hfar(vcpu) & GENMASK(11, 0);
-> > > > > +
-> > > > > +			if (is_iabt)
-> > > > > +				kvm_inject_pabt(vcpu, fault_ipa);
-> > > > > +			else
-> > > > > +				kvm_inject_dabt(vcpu, fault_ipa);
-> > > > > +			return 1;
-> > > > > +		}
-> > > > 
-> > > > Doesn't KVM treat faults outside a valid memslot (aka guest RAM) as MMIO
-> > > > aborts? From the guest's point of view, the IPA is valid because it's
-> > > > inside the HW PARange, so it's not entirely impossible that the VMM put a
-> > > > device there.
-> > > 
-> > > Sure. But the generated IPA is outside of the range the VMM has asked
-> > > to handle. The IPA space describes the whole of the guest address
-> > > space, and there shouldn't be anything outside of it.
-> > > 
-> > > We actually state in the documentation that the IPA Size limit *is*
-> > > the physical address size for the VM. If the VMM places something
-> > > outside if the IPA space and still expect something to be reported to
-> > > it, we have a problem (in some cases, we may want to actually put page
-> > > tables in place even for MMIO that traps to userspace -- see my
-> > > earlier work on MMIO guard).
-> > 
-> > If you mean this bit:
-> > 
-> > On arm64, the physical address size for a VM (IPA Size limit) is limited
-> > to 40bits by default. The limit can be configured if the host supports the
-> > extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> > KVM_VM_TYPE_ARM_IPA_SIZE(IPA_Bits) to set the size in the machine type
-> > identifier, where IPA_Bits is the maximum width of any physical
-> > address used by the VM.
-> >
-> > And then below there is this paragraph:
-> > 
-> > Please note that configuring the IPA size does not affect the capability
-> > exposed by the guest CPUs in ID_AA64MMFR0_EL1[PARange]. It only affects
-> > **size of the address translated by the stage2 level (guest physical to
-> > host physical address translations)**.
-> 
-> I don't see that as a contradiction. It just says that we don't
-> repaint PARange.
-> 
-> > 
-> > Emphasis added by me.
-> > 
-> > It looks to me like the two paragraph state different things, first says
-> > the IPA size caps "the physical address size for a VM", the second that it
-> > caps the RAM size - "size of the address translated by the stage 2 level.
-> 
-> That's not the way I understand it. It just gives a textbook
-> definition of the IPA space. And to be clear, this is just an
-> implementation detail. We should be able to populate all full IPA
-> space with faulting entries and keep the behaviour the same.
-> 
-> > I have no problem with either, but it looks confusing.
-> > 
-> > So if a VMM that wants to put devices above RAM it must make sure that the
-> > IPA size is extended to match, did I get that right?
-> 
-> Yes. Anything that is reacheable by a memory transaction has to fit in
-> the IPA space.
-> 
-> > I'm also a bit confused about the rationale. Why is the PARange exposed to
-> > the guest in effect the wrong value, because the true PARange is defined by
-> > IPA size?
-> 
-> PARange and IPA range don't have the same granularity. You can't
-> express a PARange of 37 bits, for example, while it is perfectly
-> possible for the IPA range. And they do cover two different concepts:
-> the IPA space means nothing to the guest.
+--===============5250749274581553776==
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Y3YSke25lSrZY+/w"
+Content-Disposition: inline
 
-I see, thank you for the detailed explanation!
 
-Thanks,
-Alex
+--Y3YSke25lSrZY+/w
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Wed, Apr 27, 2022 at 11:46:56AM -0700, Kalesh Singh wrote:
+
+> Recompile stack unwinding code for use with the nVHE hypervisor. This is
+> a preparatory patch that will allow reusing most of the kernel unwinding
+> logic in the nVHE hypervisor.
+
+This is substantially more than just the build change that the changelog
+would seem to indicate...  it would I think be clearer to split this up
+further with the code changes separated out and explained a bit more.
+It's not just recompling the code for nVHE, there's also refactoring to
+split out changes that don't apply in nVHE hypervisor like all the task
+related code which is needed but not mentioned in the changlog at all.
+Possibly a patch or two for the code motion then a separate patch for
+the ifdefs and build changes?
+
+I *think* the code is all fine but I'd need to go through it a few more
+times to be sure I didn't miss anything.
+
+--Y3YSke25lSrZY+/w
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmJr3l0ACgkQJNaLcl1U
+h9DBXAf/cLhAZeKbkJs3LEkvnKGiulU0FIY+O9WBWvNL1mfn2AlN4TJrfv6vBsg9
+DvcKZBSqLs1cPow78FoQoKxyhXLW93diLBiFnHQbRSpxTRDJNv5dln5BApd/rX1x
+UGKUFo2BXhBdes9xUpXQcnbVp3uLHWA7T3kzsr9yz5idTnhWd+51DLQYLHvJRo/n
+byZODs7JPbiSyB/28DKkQy+/gVSj9vP+gOsXDRBNDECWr19FDcbXje2TYWfV6aUK
+3COthbPNESl1tPvLfUuDTCjPTOhaKCAkIIXt7uDk5ofr74AHqR2r05Tfz+R0o6SB
+OMVfgIypmtPQ2B246uUEOGwDwJAJYQ==
+=vcwd
+-----END PGP SIGNATURE-----
+
+--Y3YSke25lSrZY+/w--
+
+--===============5250749274581553776==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============5250749274581553776==--
