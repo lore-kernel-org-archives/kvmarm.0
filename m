@@ -2,67 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FE8C433EF
-	for <kvmarm@archiver.kernel.org>; Sat, 30 Apr 2022 15:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE670C433F5
+	for <kvmarm@archiver.kernel.org>; Sat, 30 Apr 2022 15:48:25 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FE574B2AB;
-	Sat, 30 Apr 2022 11:48:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C98A4B278;
+	Sat, 30 Apr 2022 11:48:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wFAi+p4UAxjf; Sat, 30 Apr 2022 11:48:23 -0400 (EDT)
+	with ESMTP id 89wOg76pEUg6; Sat, 30 Apr 2022 11:48:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 003454B27D;
-	Sat, 30 Apr 2022 11:48:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F6524B295;
+	Sat, 30 Apr 2022 11:48:23 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 786E14B0C0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 16:11:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14BCD4B091
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 16:11:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3TX2WZfrmUjk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Apr 2022 16:11:46 -0400 (EDT)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5213D40BE7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 16:11:46 -0400 (EDT)
-Received: by mail-pf1-f202.google.com with SMTP id
- x9-20020a056a000bc900b0050d919e9c9bso3362561pfu.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 13:11:46 -0700 (PDT)
+ with ESMTP id xwZ6QBLTpT5U for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Apr 2022 16:11:49 -0400 (EDT)
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
+ [209.85.215.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0EE0C40BE7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 16:11:49 -0400 (EDT)
+Received: by mail-pg1-f202.google.com with SMTP id
+ bj12-20020a056a02018c00b003a9eebaad34so4208345pgb.10
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 13:11:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=an+yRArve5ZrSQoHDO73aNF7aPP+aWpAaWAPrlB9pIk=;
- b=rVCOmuzI6Jkg0VCtxq3Vv4tNhvcYa/7dy0aktfX+JU+3ABY/r1NuUYg6gNufzdzZyl
- TDx1/jOeHCUYV9kesQSDCM7gJuIkuCPZ3CI4xBiGyBYzao4KJxWyjV/wpOnUty7d2gkO
- xxgzezsPH49IA+C2wqMwqPUxHg+sr/u2pJ62e25BKh1gnBlY4tBxVuP6uCBRMMN8Bn0A
- o1aa0m514YE3U+J37NsZZ2A48FIIXDI4WlykXmRNEDZ9x5sTM9dO2kFgrvtI4EV9z//v
- PwFQ3hahtu5wgS2IyOj4qxw1dMwLZ0jJ58K/MjgmBn8W0hkXkDKsnnvkTtmina/ADpu8
- G4Uw==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=HQRALrLqPLOKdX3/Qrvlj2304W4cY881g6B2XTfjhjE=;
+ b=e1Gj1cFIx7qA9DjuG4CERdhHtwjjaMyqc0jE42K6DIa/HcAF7kLYbOh7A4zE3CfdpC
+ MXLc5TLYF/85xAw4JqYk5Z+4VaQG+kEY5rcUmOxE6tic9A7AB/r3soW+wIKvxsx6s6sb
+ dwf/GudGOtBTMTSquKo6sp/pI7w4IG3EJ9Ed+c2JR8p72budxuezZoM2UOclpII5lS61
+ jLjhhkg61TxTY5Ps6VReS8PPdn/lF7OSnXOocjCyRcBRNrRTP7mhwtpcGmbPstkKa1Z3
+ UjsKnboQEBlCrWAyY27GIJsYPsHmlwb5DzS1Loav7ERt/ViNzQEWA6OAJ7ojRdb9jzbP
+ ysnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=an+yRArve5ZrSQoHDO73aNF7aPP+aWpAaWAPrlB9pIk=;
- b=o79QauoGAgNRNThGilGt7XFTCcuk4LjSZ9e3ZvaGGRw65ANpsQ2ZlFlowSosumySzc
- PJ6iHhXk36oGvjU5jK5kJoTi8P/RrzlZY+AMEsbtPzsCWyhaXobOLx8pxW9aD3j8T0rx
- WgQWoll9M9BMa3U5N9KH9jno95A4so6Vn1gJj4uqdovBpe2xWQbrBs2XyloldOUaXZym
- tEuXWnsve6IuzOZw6sMQRCMahrfp+K8Gn6XUp808IPE7o4bVRK9w7SlBOl1Bd83hxmJV
- mTKlEj48QtnBV9rAXy1lRBatJGEWCJWZ3a05Mw4Snoec9P3nRiwoxua34xsbMTkFqcCl
- jVVw==
-X-Gm-Message-State: AOAM531c1lx2CP5fqL/2SO5mMTFi9/H6uUEzpvVqVVFHrpc4V234wZdL
- 8cDXtuehz5XQYDVwIWbgjuxqlyGc5Ow4i6I4
-X-Google-Smtp-Source: ABdhPJxGZ1WYv4PcG6KKKG7/eOxb6RjoyzIw3GgB/7NGUVZUE3/7d2UGeWsMnv6NDpe3G1grI1WrkTwZdxjSyZ2c
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=HQRALrLqPLOKdX3/Qrvlj2304W4cY881g6B2XTfjhjE=;
+ b=l4UuYWG01NdhK59R1JKnhX8YEkp54KM78+k4rlPOUMZLCJExSFWyqZoQqyJMXIkgbj
+ YHdR2/hwAxBL+VS7tqwz5CU0yHjCQJb03As9ZetT/fsV31KhutpcagV/augVVKKJXPky
+ hc4BvVP1p0rxg6sCd9VFpS2EwuVVVfqZ9/Tg64iB5qanCZflWxEWRRfj8V4skHvafFiD
+ Mz3t2iXEy7WC7EnX+ryqOaFRTPMQ8xcmP7FxKAElC5769UCcEcIKM2RaP8ha0V/Hhtvc
+ GoVS1BCD2wrBmKP/ZqgH3OgNjfKmQll4+YPuAIOuZ4zkr65a6wJ31wenXpTy2rgm/E/3
+ bvTg==
+X-Gm-Message-State: AOAM530N96uhn8TT5h1qef2PKToBN5jx1++a4Isi8B8rE5mo81sGwc3m
+ cOm+gpRStg2KswTjPYOKyLsrVyYCZDQ0oEPx
+X-Google-Smtp-Source: ABdhPJyFiTvIOFIZYo+38It2ytGBtkvfsnlq74KMff/yRu6trFEODoofBTp8U5qgZN1B+vJQKJMiROSbmndcmE1m
 X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
- (user=yosryahmed job=sendgmr) by
- 2002:a17:90a:e510:b0:1d9:ee23:9fa1 with SMTP
- id t16-20020a17090ae51000b001d9ee239fa1mr438392pjy.0.1651263104394; Fri, 29
- Apr 2022 13:11:44 -0700 (PDT)
-Date: Fri, 29 Apr 2022 20:11:27 +0000
-Message-Id: <20220429201131.3397875-1-yosryahmed@google.com>
+ (user=yosryahmed job=sendgmr) by 2002:a62:87cd:0:b0:50d:bf61:3de9
+ with SMTP
+ id i196-20020a6287cd000000b0050dbf613de9mr906362pfe.16.1651263107958; Fri, 29
+ Apr 2022 13:11:47 -0700 (PDT)
+Date: Fri, 29 Apr 2022 20:11:29 +0000
+In-Reply-To: <20220429201131.3397875-1-yosryahmed@google.com>
+Message-Id: <20220429201131.3397875-3-yosryahmed@google.com>
 Mime-Version: 1.0
+References: <20220429201131.3397875-1-yosryahmed@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v4 0/4] KVM: mm: count KVM mmu usage in memory stats
+Subject: [PATCH v4 2/4] KVM: mmu: add a helper to account memory used by KVM
+ mmu.
 From: Yosry Ahmed <yosryahmed@google.com>
 To: Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
  Zefan Li <lizefan.x@bytedance.com>, Marc Zyngier <maz@kernel.org>, 
@@ -94,57 +98,35 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-We keep track of several kernel memory stats (total kernel memory, page
-tables, stack, vmalloc, etc) on multiple levels (global, per-node,
-per-memcg, etc). These stats give insights to users to how much memory
-is used by the kernel and for what purposes.
+Add a helper to account pages used by KVM for page tables in secondary
+pagetable stats. This function will be used by subsequent patches in
+different archs.
 
-Currently, memory used by kvm mmu is not accounted in any of those
-kernel memory stats. This patch series accounts the memory pages
-used by KVM for page tables in those stats in a new
-NR_SECONDARY_PAGETABLE stat.
-
+Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
 ---
+ include/linux/kvm_host.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Changes in V4:
-- Changed accounting hooks in arm64 to only account s2 page tables and
-  refactored them to a much cleaner form, based on recommendations from
-  Oliver Upton and Marc Zyngier.
-- Dropped patches for mips and riscv. I am not interested in those archs
-  anyway and don't have the resources to test them. I posted them for
-  completeness but it doesn't seem like anyone was interested.
-
-Changes in V3:
-- Added NR_SECONDARY_PAGETABLE instead of piggybacking on NR_PAGETABLE
-  stats.
-
-Changes in V2:
-- Added accounting stats for other archs than x86.
-- Changed locations in the code where x86 KVM page table stats were
-  accounted based on suggestions from Sean Christopherson.
-
----
-
-Yosry Ahmed (4):
-  mm: add NR_SECONDARY_PAGETABLE to count secondary page table uses.
-  KVM: mmu: add a helper to account memory used by KVM mmu.
-  KVM: x86/mmu: count KVM mmu usage in secondary pagetable stats.
-  KVM: arm64/mmu: count KVM s2 mmu usage in secondary pagetable stats
-
- Documentation/admin-guide/cgroup-v2.rst |  5 ++++
- Documentation/filesystems/proc.rst      |  4 +++
- arch/arm64/kvm/mmu.c                    | 35 ++++++++++++++++++++++---
- arch/x86/kvm/mmu/mmu.c                  | 16 +++++++++--
- arch/x86/kvm/mmu/tdp_mmu.c              | 16 +++++++++--
- drivers/base/node.c                     |  2 ++
- fs/proc/meminfo.c                       |  2 ++
- include/linux/kvm_host.h                |  9 +++++++
- include/linux/mmzone.h                  |  1 +
- mm/memcontrol.c                         |  1 +
- mm/page_alloc.c                         |  6 ++++-
- mm/vmstat.c                             |  1 +
- 12 files changed, 89 insertions(+), 9 deletions(-)
-
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 252ee4a61b58..54cc4634053c 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2221,6 +2221,15 @@ static inline void kvm_handle_signal_exit(struct kvm_vcpu *vcpu)
+ }
+ #endif /* CONFIG_KVM_XFER_TO_GUEST_WORK */
+ 
++/*
++ * If nr > 1, we assume virt is the address of the first page of a block of
++ * pages that were allocated together (i.e accounted together).
++ */
++static inline void kvm_account_pgtable_pages(void *virt, int nr)
++{
++	mod_lruvec_page_state(virt_to_page(virt), NR_SECONDARY_PAGETABLE, nr);
++}
++
+ /*
+  * This defines how many reserved entries we want to keep before we
+  * kick the vcpu to the userspace to avoid dirty ring full.  This
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
