@@ -2,79 +2,82 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A21DC433EF
-	for <kvmarm@archiver.kernel.org>; Sat, 30 Apr 2022 15:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FE8C433EF
+	for <kvmarm@archiver.kernel.org>; Sat, 30 Apr 2022 15:48:24 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E94704B1D1;
-	Sat, 30 Apr 2022 11:03:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FE574B2AB;
+	Sat, 30 Apr 2022 11:48:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7yAYyDWVJ+IX; Sat, 30 Apr 2022 11:03:42 -0400 (EDT)
+	with ESMTP id wFAi+p4UAxjf; Sat, 30 Apr 2022 11:48:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C092E4B220;
-	Sat, 30 Apr 2022 11:03:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 003454B27D;
+	Sat, 30 Apr 2022 11:48:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B80E4B214
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 11:03:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 786E14B0C0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 16:11:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AbT7i2B0zQ7J for <kvmarm@lists.cs.columbia.edu>;
- Sat, 30 Apr 2022 11:03:41 -0400 (EDT)
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com
- [209.85.166.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21CBB4B1D4
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 11:03:41 -0400 (EDT)
-Received: by mail-il1-f173.google.com with SMTP id h11so1015668ila.5
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 08:03:41 -0700 (PDT)
+ with ESMTP id 3TX2WZfrmUjk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Apr 2022 16:11:46 -0400 (EDT)
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
+ [209.85.210.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5213D40BE7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 16:11:46 -0400 (EDT)
+Received: by mail-pf1-f202.google.com with SMTP id
+ x9-20020a056a000bc900b0050d919e9c9bso3362561pfu.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 13:11:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=bN+KlP95Qh+8AzcCi+O6jrxnnkr4fpqjrAoo7JZUIrQ=;
- b=C6qrrrvEsqgjFf0tfTBiY7jTg89Sp2IS2uml7YJ6VowC8dsRhzZ/tCkleGdXdpmIe3
- bnwPgwQNjENrtPZ+7b77dZqd6+tThC3P4fVZc7B+gG9dSkZIv0rBGRfJgO39Xmrcyy0X
- U7D3aHufAIRj9Xe1NhyE+wd9bufDs7KsHRWXlEx8riPpWoXgPpwu3ICs/mpaZQCYcf4q
- F4jGI0lEmsprK9a2i2AaFf6V+6v8iVaXZISI5JOHrNAC2MV1L2K/v9Ej1j4l2ltdPOIu
- H4UPlfwV7dXiQJUyYdmOcjn0xXBpoUZmFnsUoVT35QINXgGsUDpe8P9LRIQquIhICFq2
- iwHQ==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=an+yRArve5ZrSQoHDO73aNF7aPP+aWpAaWAPrlB9pIk=;
+ b=rVCOmuzI6Jkg0VCtxq3Vv4tNhvcYa/7dy0aktfX+JU+3ABY/r1NuUYg6gNufzdzZyl
+ TDx1/jOeHCUYV9kesQSDCM7gJuIkuCPZ3CI4xBiGyBYzao4KJxWyjV/wpOnUty7d2gkO
+ xxgzezsPH49IA+C2wqMwqPUxHg+sr/u2pJ62e25BKh1gnBlY4tBxVuP6uCBRMMN8Bn0A
+ o1aa0m514YE3U+J37NsZZ2A48FIIXDI4WlykXmRNEDZ9x5sTM9dO2kFgrvtI4EV9z//v
+ PwFQ3hahtu5wgS2IyOj4qxw1dMwLZ0jJ58K/MjgmBn8W0hkXkDKsnnvkTtmina/ADpu8
+ G4Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=bN+KlP95Qh+8AzcCi+O6jrxnnkr4fpqjrAoo7JZUIrQ=;
- b=lihKzNlFDyxbxizbhcaVrS84by/o3m1zbEVtql1BD8ka95iHJtC0/8N2oqLaO8EjVh
- rbCxXeEwginJ5WwlQzdvwREz12jko1qqAOOckwVpcrR3hu167TuTYfT5SzUlcNO2XGlM
- /3ZIBRD64LKnd1+mPIsiw4vQ8ysy072ERrYkl3a5TjCZ60JXqdZlG1ld6P3aerYxnCWS
- /7vrInMWqGj+4hHMiCLYO0tb+ceKzF3MAKK1DtLVPKjLOpta+h66wy9vfeCgcbVqNBXQ
- 2ofZKErdxjsjuJK3jNbGvYPkTas6Vdmvovye1dzkD2T0ay1YGasesotsqv/K7Cys664t
- XvCg==
-X-Gm-Message-State: AOAM530LC1j3AZ5DQ2NpB7Q3QYt0gYnTvs5wcRhi+G3fBIcYem2rIrtq
- 5ySPjYQ/rW1Eu5vA487/ceugaA==
-X-Google-Smtp-Source: ABdhPJyM5TByhnNMF+jWGfM3cRLjNBIHWo0ESp/jYAqpetPFRpUFDymt8/tMOtck9wvrr7VrV9KjLQ==
-X-Received: by 2002:a05:6e02:1748:b0:2cd:a0ea:8ff4 with SMTP id
- y8-20020a056e02174800b002cda0ea8ff4mr1694967ill.269.1651331020330; 
- Sat, 30 Apr 2022 08:03:40 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- x18-20020a056602211200b0065a47e16f36sm679878iox.8.2022.04.30.08.03.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 30 Apr 2022 08:03:39 -0700 (PDT)
-Date: Sat, 30 Apr 2022 15:03:36 +0000
-From: Oliver Upton <oupton@google.com>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 06/18] KVM: arm64: Support SDEI_EVENT_CONTEXT hypercall
-Message-ID: <Ym1PyIQY4m4/9IVi@google.com>
-References: <20220403153911.12332-1-gshan@redhat.com>
- <20220403153911.12332-7-gshan@redhat.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220403153911.12332-7-gshan@redhat.com>
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=an+yRArve5ZrSQoHDO73aNF7aPP+aWpAaWAPrlB9pIk=;
+ b=o79QauoGAgNRNThGilGt7XFTCcuk4LjSZ9e3ZvaGGRw65ANpsQ2ZlFlowSosumySzc
+ PJ6iHhXk36oGvjU5jK5kJoTi8P/RrzlZY+AMEsbtPzsCWyhaXobOLx8pxW9aD3j8T0rx
+ WgQWoll9M9BMa3U5N9KH9jno95A4so6Vn1gJj4uqdovBpe2xWQbrBs2XyloldOUaXZym
+ tEuXWnsve6IuzOZw6sMQRCMahrfp+K8Gn6XUp808IPE7o4bVRK9w7SlBOl1Bd83hxmJV
+ mTKlEj48QtnBV9rAXy1lRBatJGEWCJWZ3a05Mw4Snoec9P3nRiwoxua34xsbMTkFqcCl
+ jVVw==
+X-Gm-Message-State: AOAM531c1lx2CP5fqL/2SO5mMTFi9/H6uUEzpvVqVVFHrpc4V234wZdL
+ 8cDXtuehz5XQYDVwIWbgjuxqlyGc5Ow4i6I4
+X-Google-Smtp-Source: ABdhPJxGZ1WYv4PcG6KKKG7/eOxb6RjoyzIw3GgB/7NGUVZUE3/7d2UGeWsMnv6NDpe3G1grI1WrkTwZdxjSyZ2c
+X-Received: from yosry.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2327])
+ (user=yosryahmed job=sendgmr) by
+ 2002:a17:90a:e510:b0:1d9:ee23:9fa1 with SMTP
+ id t16-20020a17090ae51000b001d9ee239fa1mr438392pjy.0.1651263104394; Fri, 29
+ Apr 2022 13:11:44 -0700 (PDT)
+Date: Fri, 29 Apr 2022 20:11:27 +0000
+Message-Id: <20220429201131.3397875-1-yosryahmed@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
+Subject: [PATCH v4 0/4] KVM: mm: count KVM mmu usage in memory stats
+From: Yosry Ahmed <yosryahmed@google.com>
+To: Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+ Zefan Li <lizefan.x@bytedance.com>, Marc Zyngier <maz@kernel.org>, 
+ James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Wanpeng Li <wanpengli@tencent.com>, Jim Mattson <jmattson@google.com>, 
+ Joerg Roedel <joro@8bytes.org>, Andrew Morton <akpm@linux-foundation.org>, 
+ Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
+ Shakeel Butt <shakeelb@google.com>, Oliver Upton <oupton@google.com>
+X-Mailman-Approved-At: Sat, 30 Apr 2022 11:48:22 -0400
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Yosry Ahmed <yosryahmed@google.com>, linux-mm@kvack.org,
+ cgroups@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,51 +94,60 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, Apr 03, 2022 at 11:38:59PM +0800, Gavin Shan wrote:
-> This supports SDEI_EVENT_CONTEXT hypercall. It's used by the guest
-> to retrieve the registers (x0 - x17) from the interrupted or preempted
-> context in the event handler. The interrupted or preempted context
-> is saved prior to handling the event by executing its handler and
-> restored after that.
-> 
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  arch/arm64/kvm/sdei.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
-> index 941263578b30..af5d11b8eb2f 100644
-> --- a/arch/arm64/kvm/sdei.c
-> +++ b/arch/arm64/kvm/sdei.c
-> @@ -140,6 +140,37 @@ static unsigned long hypercall_enable(struct kvm_vcpu *vcpu, bool enable)
->  	return ret;
->  }
->  
-> +static unsigned long hypercall_context(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
-> +	struct kvm_sdei_vcpu_context *context;
-> +	unsigned long param_id = smccc_get_arg(vcpu, 1);
-> +	unsigned long ret = SDEI_SUCCESS;
-> +
-> +	spin_lock(&vsdei->lock);
-> +
-> +	/* Check if we have events are being handled */
-> +	context = &vsdei->context[SDEI_EVENT_PRIORITY_CRITICAL];
-> +	context = context->event ? context : NULL;
-> +	context = context ? : &vsdei->context[SDEI_EVENT_PRIORITY_NORMAL];
-> +	context = context->event ? context : NULL;
-> +	if (!context) {
-> +		ret = SDEI_DENIED;
-> +		goto unlock;
-> +	}
+We keep track of several kernel memory stats (total kernel memory, page
+tables, stack, vmalloc, etc) on multiple levels (global, per-node,
+per-memcg, etc). These stats give insights to users to how much memory
+is used by the kernel and for what purposes.
 
-Eek! You'll probably be able to drop all of this and just check the SDEI
-active flag.
+Currently, memory used by kvm mmu is not accounted in any of those
+kernel memory stats. This patch series accounts the memory pages
+used by KVM for page tables in those stats in a new
+NR_SECONDARY_PAGETABLE stat.
 
---
-Thanks,
-Oliver
+---
+
+Changes in V4:
+- Changed accounting hooks in arm64 to only account s2 page tables and
+  refactored them to a much cleaner form, based on recommendations from
+  Oliver Upton and Marc Zyngier.
+- Dropped patches for mips and riscv. I am not interested in those archs
+  anyway and don't have the resources to test them. I posted them for
+  completeness but it doesn't seem like anyone was interested.
+
+Changes in V3:
+- Added NR_SECONDARY_PAGETABLE instead of piggybacking on NR_PAGETABLE
+  stats.
+
+Changes in V2:
+- Added accounting stats for other archs than x86.
+- Changed locations in the code where x86 KVM page table stats were
+  accounted based on suggestions from Sean Christopherson.
+
+---
+
+Yosry Ahmed (4):
+  mm: add NR_SECONDARY_PAGETABLE to count secondary page table uses.
+  KVM: mmu: add a helper to account memory used by KVM mmu.
+  KVM: x86/mmu: count KVM mmu usage in secondary pagetable stats.
+  KVM: arm64/mmu: count KVM s2 mmu usage in secondary pagetable stats
+
+ Documentation/admin-guide/cgroup-v2.rst |  5 ++++
+ Documentation/filesystems/proc.rst      |  4 +++
+ arch/arm64/kvm/mmu.c                    | 35 ++++++++++++++++++++++---
+ arch/x86/kvm/mmu/mmu.c                  | 16 +++++++++--
+ arch/x86/kvm/mmu/tdp_mmu.c              | 16 +++++++++--
+ drivers/base/node.c                     |  2 ++
+ fs/proc/meminfo.c                       |  2 ++
+ include/linux/kvm_host.h                |  9 +++++++
+ include/linux/mmzone.h                  |  1 +
+ mm/memcontrol.c                         |  1 +
+ mm/page_alloc.c                         |  6 ++++-
+ mm/vmstat.c                             |  1 +
+ 12 files changed, 89 insertions(+), 9 deletions(-)
+
+-- 
+2.36.0.464.gb9c8b46e94-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
