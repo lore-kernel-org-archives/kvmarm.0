@@ -2,65 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C111C433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 29 Apr 2022 13:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7327C433EF
+	for <kvmarm@archiver.kernel.org>; Fri, 29 Apr 2022 15:36:27 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0BDC4B201;
-	Fri, 29 Apr 2022 09:24:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E58F649F1D;
+	Fri, 29 Apr 2022 11:36:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 61a7n0lZsVlO; Fri, 29 Apr 2022 09:24:51 -0400 (EDT)
+	with ESMTP id DtmeGh2cQV-s; Fri, 29 Apr 2022 11:36:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A863E410DE;
-	Fri, 29 Apr 2022 09:24:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D888149F44;
+	Fri, 29 Apr 2022 11:36:25 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE9AD40D0B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 09:24:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4978F49F1D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 11:36:24 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id liZUn14nfNAJ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 Apr 2022 09:24:49 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9624F40B85
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 09:24:49 -0400 (EDT)
+ with ESMTP id BKNv8L7vhQyN for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Apr 2022 11:36:23 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D7C949EF8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2022 11:36:23 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 3FF7AB8330E;
- Fri, 29 Apr 2022 13:24:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F392C385A7;
- Fri, 29 Apr 2022 13:24:41 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id DDB30621F9;
+ Fri, 29 Apr 2022 15:36:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49B66C385A7;
+ Fri, 29 Apr 2022 15:36:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1651238686;
- bh=9+eEncYlwkaV6r7GtViKcetUKKSK0ecyfUig/hEuNnI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=pd8vtQRrdIPSpq1EqtjnJq0eFGUCemeJ8qRCc6/mp1U4semEJtdCm+6dxfmJgfSZE
- 8u7QiQi9R1yTxU0m4zWQzNZjprqJigsVkbBRrny13IoxZt/oHP8cQ3H55LiEkdZY5m
- LNLh9sa4jUjgqVAcIQ1pHpNwq76ytrX+aLafrTUyJhRdL7lpMAqwrdBcKd3s22xHn2
- /l1M6zW3wVAhafuQwVIWzyd+pDd7ipu4LClnblpstPSt13CEIwENngNKl0mUFg9adD
- pMcM97FQ48W7QNV/QV5j6IbeHpKDLMuyhivJgo7g+LxfszKPs1wjSS+zUpUc/Nu8j+
- 2Eg0ccvi2Z2HA==
-Date: Fri, 29 Apr 2022 14:24:38 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH 4/4] KVM: arm64: Unwind and dump nVHE hypervisor stacktrace
-Message-ID: <YmvnFuAIBjQxQfqM@sirena.org.uk>
-References: <20220427184716.1949239-1-kaleshsingh@google.com>
- <20220427184716.1949239-5-kaleshsingh@google.com>
+ s=k20201202; t=1651246581;
+ bh=BAgz6vYtSujJ/yUysgj+N8ugRgXzdEi+Mw7D0wyLeiY=;
+ h=From:To:Cc:Subject:Date:From;
+ b=iLgRz1NCf3HCJlCsT34FlyrY375tBr2mgNMV87dGuI0zj9N8pag/ky7noWuO6b6x9
+ xfg5nx2D6jBBnNSHfO1KZw+w/qBVt1o7V5RQbtjpEgYfrrjohPZPr0MgfU6wyJPlxb
+ 0fPq3TUluj5H0pt72CyvpyD0xt+xKB7gWHxUDd58OC8gUgln/kuQmFdZcjDidOkH8K
+ vSkCzVQjnZQFw2UMijH5XXtI6kxpTnjxmZxAPYWsj6J/lWECz+Fa1lEpisx4DyasJ6
+ JBngxjusFW0I58PWnCzilB7GfTInrKxqQQhxQ0CQUguttLEiY4z1zElFpgKGroAer9
+ lDSyN7igAf3oQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nkSfK-007ySy-OM; Fri, 29 Apr 2022 16:36:18 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [GIT PULL] KVM/arm64 fixes for 5.18, take #2
+Date: Fri, 29 Apr 2022 16:36:15 +0100
+Message-Id: <20220429153615.710743-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-In-Reply-To: <20220427184716.1949239-5-kaleshsingh@google.com>
-X-Cookie: Are you still an ALCOHOLIC?
-Cc: Kefeng Wang <wangkefeng.wang@huawei.com>, Marco Elver <elver@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- surenb@google.com, Peter Collingbourne <pcc@google.com>,
- linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com,
+ christoffer.dall@arm.com, qperret@google.com, will@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, kernel-team@android.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org,
+ Christoffer Dall <christoffer.dall@arm.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -72,75 +79,61 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: multipart/mixed; boundary="===============7575757855625283946=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+Paolo,
 
---===============7575757855625283946==
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KmavymclFYg5AbyJ"
-Content-Disposition: inline
+Here's a trio of fixes for 5.18. Nothing terribly interesting, but
+nonetheless important fixes (two of the bugs are related to AArch32).
 
+Please pull,
 
---KmavymclFYg5AbyJ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+	M.
 
-On Wed, Apr 27, 2022 at 11:46:59AM -0700, Kalesh Singh wrote:
-> On hyp_panic(), the hypervisor dumps the addresses for its stacktrace
-> entries to a page shared with the host. The host then symbolizes and
-> prints the hyp stacktrace before panicking itself.
->=20
-> Example stacktrace:
->=20
-> [  122.051187] kvm [380]: Invalid host exception to nVHE hyp!
-> [  122.052467] kvm [380]: nVHE HYP call trace:
-> [  122.052814] kvm [380]: [<ffff800008f5b550>] __kvm_nvhe___pkvm_vcpu_ini=
-t_traps+0x1f0/0x1f0
-> [  122.053865] kvm [380]: [<ffff800008f560f0>] __kvm_nvhe_hyp_panic+0x130=
-/0x1c0
-> [  122.054367] kvm [380]: [<ffff800008f56190>] __kvm_nvhe___kvm_vcpu_run+=
-0x10/0x10
-> [  122.054878] kvm [380]: [<ffff800008f57a40>] __kvm_nvhe_handle___kvm_vc=
-pu_run+0x30/0x50
-> [  122.055412] kvm [380]: [<ffff800008f57d2c>] __kvm_nvhe_handle_trap+0xb=
-c/0x160
-> [  122.055911] kvm [380]: [<ffff800008f56864>] __kvm_nvhe___host_exit+0x6=
-4/0x64
-> [  122.056417] kvm [380]: ---- end of nVHE HYP call trace ----
+The following changes since commit 21db83846683d3987666505a3ec38f367708199a:
 
-This will be really helpful!
+  selftests: KVM: Free the GIC FD when cleaning up in arch_timer (2022-04-07 08:46:13 +0100)
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
+are available in the Git repository at:
 
---KmavymclFYg5AbyJ
-Content-Type: application/pgp-signature; name="signature.asc"
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.18-2
 
------BEGIN PGP SIGNATURE-----
+for you to fetch changes up to 85ea6b1ec915c9dd90caf3674b203999d8c7e062:
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmJr5xYACgkQJNaLcl1U
-h9AKIwf+L8bCCODKWgL1wYrEellpME7cjpfW7uY6BxNZBEZJ6V+CuQxbHx7shY1D
-qc/lcT1/R3JS7INc3mLr0Nw1K5UxC3jHXujCFw0LezQtuC5243YayR1J+v20WtHu
-dia7rJkm6qSPMBbfkJ0IFAn2jCioXZJjeEUld6Q601dktI5CgD0P3gWdm7SoZ/SB
-ORt2nNPMVhH571i+HBAeVN5lkk5Y7d8XnlNkqGsnhDiMhZPkg1qrgvcFivsu9HOW
-ub+n9WLPOLK0PrZhttDvYnOCiUhNsFI6k3wfujbF0ulDN7GO7giLr6z9dVTq+HFg
-G4mI/GfeiPZigTdZ3Uz6dGuiirqvTg==
-=x5xf
------END PGP SIGNATURE-----
+  KVM: arm64: Inject exception on out-of-IPA-range translation fault (2022-04-27 23:02:23 +0100)
 
---KmavymclFYg5AbyJ--
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.18, take #2
 
---===============7575757855625283946==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+- Take care of faults occuring between the PARange and
+  IPA range by injecting an exception
 
+- Fix S2 faults taken from a host EL0 in protected mode
+
+- Work around Oops caused by a PMU access from a 32bit
+  guest when PMU has been created. This is a temporary
+  bodge until we fix it for good.
+
+----------------------------------------------------------------
+Alexandru Elisei (1):
+      KVM/arm64: Don't emulate a PMU for 32-bit guests if feature not set
+
+Marc Zyngier (1):
+      KVM: arm64: Inject exception on out-of-IPA-range translation fault
+
+Will Deacon (1):
+      KVM: arm64: Handle host stage-2 faults from 32-bit EL0
+
+ arch/arm64/include/asm/kvm_emulate.h |  1 +
+ arch/arm64/kvm/hyp/nvhe/host.S       | 18 +++++++++---------
+ arch/arm64/kvm/inject_fault.c        | 28 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/mmu.c                 | 19 +++++++++++++++++++
+ arch/arm64/kvm/pmu-emul.c            | 23 ++++++++++++++++++++++-
+ 5 files changed, 79 insertions(+), 10 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
 https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============7575757855625283946==--
