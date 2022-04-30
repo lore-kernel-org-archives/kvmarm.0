@@ -2,83 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF94DC433EF
-	for <kvmarm@archiver.kernel.org>; Sat, 30 Apr 2022 14:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB6CC433EF
+	for <kvmarm@archiver.kernel.org>; Sat, 30 Apr 2022 14:54:50 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 64F01411D2;
-	Sat, 30 Apr 2022 10:16:55 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B4F1940E62;
+	Sat, 30 Apr 2022 10:54:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qF+50S1Fl6HY; Sat, 30 Apr 2022 10:16:54 -0400 (EDT)
+	with ESMTP id teY4nZMqeGgM; Sat, 30 Apr 2022 10:54:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B2294B0BE;
-	Sat, 30 Apr 2022 10:16:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EDDA49ED2;
+	Sat, 30 Apr 2022 10:54:48 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B01143C96
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 10:16:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5545B40E62
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 10:54:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EEHbY46UXn1s for <kvmarm@lists.cs.columbia.edu>;
- Sat, 30 Apr 2022 10:16:52 -0400 (EDT)
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com
- [209.85.166.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB9D5411D2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 10:16:51 -0400 (EDT)
-Received: by mail-io1-f53.google.com with SMTP id f2so12094967ioh.7
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 07:16:51 -0700 (PDT)
+ with ESMTP id 0TMZuMu6CHpY for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 30 Apr 2022 10:54:46 -0400 (EDT)
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com
+ [209.85.166.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1224040D05
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 10:54:46 -0400 (EDT)
+Received: by mail-il1-f169.google.com with SMTP id y11so5632593ilp.4
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 Apr 2022 07:54:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=PNUkiMcCvuqau25R+EENrrWPTYBEDVmpTh7ORFLGfdQ=;
- b=V5ewJa5J23zM0KK4rrTVTkAiVJ/H28FHkYVWnfpJ3enYsHDRuCr7ybFix6+yPH6qtX
- b1tYX8kPl1TKvrEWFpQpoLCjMNSJ2SOsqjy2LnZ7mK4S1faBrQxvDz4e8Z/tes+7IT5p
- zr0etttNhsUpECK3hF+7Px6H6fEY+0SLcGLbUIjQjAmTgc9I7Ik6+QfP2eNH4OSjAOkk
- CLbNEVsYYY2O6uNiVBxyu7YLtMpcgl/adK0QkIGi54g671vik+F80kUdVP7mXcrbMlDp
- 8R3lsQDBUO+tYdS4LND9ZHnhFlN4c+Cuiiq212y/NOV3VPaYtoicSvj6lt7jSdREqfH/
- MIqA==
+ bh=NnGCAeCGdC2rOPLY2oMqMtD1zv1olyIAR5RFlZYS+gA=;
+ b=a/7ueX23zIupx6WHoMqsapfnlyIq6LOELnCnD7v1Sa5KY95hYZMyfm4kahYII9lfMr
+ OzuaTO5pOFUxYfWJytz3ZEBgygOm3+nIKWiEU38lJlVC/9jlZpxFCsbkDxHErAnKsowW
+ pFvE4MFmkuiUfs34FkO5FLsWQQq2EfwKagrOEsZW/m3lEnSWlw0+mpb49DKrnAmMcZMK
+ Ppk04Z95OUdqvN6s7NtQ3BBeuMAoC2La8ei0fczLIKjXwDp0bPdfRhin+exVl+ZftEG5
+ 7Om6qYJufbu7hba+ffEJPiOM8LteFXGTIsUr3XJSi3PGu6zIJSuo+9kCKEJ96Q7bpxeW
+ +jlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=PNUkiMcCvuqau25R+EENrrWPTYBEDVmpTh7ORFLGfdQ=;
- b=S0eG9J8uZ1z6K9Ggh3/VlFYyQaeBGBOMz88fZxg4LZXqMJoQI4VmonL2Fd+dTrO/bE
- /yR3ViwIi4MgjCatVQKsbPfEei7Oc8gr/th5Cjj96CsRb3ZAk3VdNQtvV9lafS93ckm4
- EYJmo+jbC6+p38/5HuGnt/l0/dL/Sxl2D5q/mI2epx4NZzFvkQnxn4MuM/0nf7weUNQD
- re4p9oy5rEWuEytjLSlAfqAgriNvvYwoeFyky0ms8sxAO5BHrYj/jXNlghyy2IlIJQlh
- F3oNPhZLmGp/JSe2DkCXrvjaDv9pysj3gNNm4GZ9KKURqJiXmyC9/R0Hd/GKEW+MSvQh
- chlA==
-X-Gm-Message-State: AOAM530LmifpciOB5yQKg/uEA6InVG2hym6VXMlfLcW+YLEQ8xogcX9L
- w9C0iVxCN5FrZBbavFlpnrYShw==
-X-Google-Smtp-Source: ABdhPJy2facdBmo8TiAJfeKbYsZTLzGRDMY35o+oE7ykZeUGdIqdkyQtBzx0u+yMiyryxC4hgqaoEw==
-X-Received: by 2002:a05:6602:482:b0:614:b990:28c9 with SMTP id
- y2-20020a056602048200b00614b99028c9mr1651794iov.6.1651328211000; 
- Sat, 30 Apr 2022 07:16:51 -0700 (PDT)
+ bh=NnGCAeCGdC2rOPLY2oMqMtD1zv1olyIAR5RFlZYS+gA=;
+ b=SSqmLpej5NPxje5oGUQQ8HcWL+G1BQf3kqeRmCu0LTdqzis7aWqCixwaJWFKD0wewO
+ NY2EJk17sSE6Ot4bXMivv39sZc/HsL4YQ95lbrQ6Eh8NBK3xjyOPTVhea7V/rqrNhLzR
+ /SHgqAE5peYHxN/JWs3ONC2+BvKjxqFkM1FvQaSCqMpG4KWSCGVBR/ZNVS1rHm9yoi3o
+ JrXzyql1vuzdjDCHsRwQmIeKmC4d79F/g2fI2NHhDnhhMqaceSen1vbqTj0/bSeVhVPc
+ gK0NOV2JMt8b7oPan1L9I7DRdzX3ip5SDo3JCLqUYWWfCO4ExkGCBGRk2jVjrYlIddyu
+ plDQ==
+X-Gm-Message-State: AOAM531+nMr/ZkpDsNAeei5P+Y4Xqsvu0FmKpgQYLvNlAB1Wbg/IATqO
+ o2qZvsTgwYVEgTXICAWQwu46JQ==
+X-Google-Smtp-Source: ABdhPJwyEZqyYROVRVGoDYDjRfNcz69FnbV5ZW8qR0u1NGaJiGU05f6rGpiezo8BzP0zPRfv7lW4wA==
+X-Received: by 2002:a92:ca0b:0:b0:2cc:45da:de13 with SMTP id
+ j11-20020a92ca0b000000b002cc45dade13mr1731044ils.146.1651330485174; 
+ Sat, 30 Apr 2022 07:54:45 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- y89-20020a029562000000b0032b3a78174asm1459351jah.14.2022.04.30.07.16.50
+ z5-20020a05663803a500b0032b5b40c82dsm382616jap.65.2022.04.30.07.54.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 30 Apr 2022 07:16:50 -0700 (PDT)
-Date: Sat, 30 Apr 2022 14:16:46 +0000
+ Sat, 30 Apr 2022 07:54:44 -0700 (PDT)
+Date: Sat, 30 Apr 2022 14:54:41 +0000
 From: Oliver Upton <oupton@google.com>
 To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v6 03/18] KVM: arm64: Add SDEI virtualization
- infrastructure
-Message-ID: <Ym1EztjkJIHrg4Qz@google.com>
+Subject: Re: [PATCH v6 04/18] KVM: arm64: Support SDEI_EVENT_REGISTER hypercall
+Message-ID: <Ym1Nsaq/ERUx/ebD@google.com>
 References: <20220403153911.12332-1-gshan@redhat.com>
- <20220403153911.12332-4-gshan@redhat.com>
- <YmMiyt/TDjJt0mdG@google.com>
- <36899ea9-e8bd-27b2-8dfb-75b76eab50d7@redhat.com>
- <YmRI7Bh7fWCYLUGT@google.com>
- <0e26da1a-00bb-3d63-a8bf-6cd3271b0a38@redhat.com>
- <Ymr45B+8xTlhi7vk@google.com>
- <96711526-c4f3-3b50-c015-beba8cc9fcc9@redhat.com>
+ <20220403153911.12332-5-gshan@redhat.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <96711526-c4f3-3b50-c015-beba8cc9fcc9@redhat.com>
+In-Reply-To: <20220403153911.12332-5-gshan@redhat.com>
 Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
  shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
  vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
@@ -100,137 +93,79 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Gavin,
 
-On Sat, Apr 30, 2022 at 07:38:29PM +0800, Gavin Shan wrote:
-> Thank you for the comments and details. It should work by using bitmaps
-> to represent event's states. I will adopt your proposed structs in next
-> respin. However, there are more states needed. So I would adjust
-> "struct kvm_sdei_vcpu" like below in next respin.
+On Sun, Apr 03, 2022 at 11:38:57PM +0800, Gavin Shan wrote:
+> This supports SDEI_EVENT_REGISTER hypercall, which is used by guest
+> to register event. The event won't be raised until it's registered
+> and enabled. For those KVM owned events, they can't be registered
+> if they aren't exposed.
 > 
->     struct kvm_sdei_vcpu {
->         unsigned long registered;    /* the event is registered or not                 */
->         unsigned long enabled;       /* the event is enabled or not                    */
->         unsigned long unregistering; /* the event is pending for unregistration        */
-
-I'm not following why we need to keep track of the 'pending unregister'
-state directly. Is it not possible to infer from (active && !registered)?
-
->         unsigned long pending;       /* the event is pending for delivery and handling */
->         unsigned long active;        /* the event is currently being handled           */
+> Signed-off-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  arch/arm64/kvm/sdei.c | 78 +++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 78 insertions(+)
 > 
->         :
->         <this part is just like what you suggested>
->     };
-> 
-> I rename @pending to @unregister. Besides, there are two states added:
-> 
->    @pending: Indicate there has one event has been injected. The next step
->              for the event is to deliver it for handling. For one particular
->              event, we allow one pending event in the maximum.
+> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
+> index 3507e33ec00e..89c1b231cb60 100644
+> --- a/arch/arm64/kvm/sdei.c
+> +++ b/arch/arm64/kvm/sdei.c
+> @@ -25,6 +25,81 @@ static struct kvm_sdei_exposed_event exposed_events[] = {
+>  	for (idx = 0, event = &exposed_events[0];	\
+>  	     idx < ARRAY_SIZE(exposed_events);		\
+>  	     idx++, event++)
+> +#define kvm_sdei_for_each_event(vsdei, event, idx)	\
+> +	for (idx = 0, event = &vsdei->events[0];	\
+> +	     idx < ARRAY_SIZE(exposed_events);		\
+> +	     idx++, event++)
+> +
+> +static struct kvm_sdei_event *find_event(struct kvm_vcpu *vcpu,
+> +					 unsigned int num)
+> +{
+> +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
+> +	struct kvm_sdei_event *event;
+> +	int i;
+> +
+> +	kvm_sdei_for_each_event(vsdei, event, i) {
+> +		if (event->exposed_event->num == num)
+> +			return event;
+> +	}
+> +
+> +	return NULL;
+> +}
 
-Right, if an event retriggers when it is pending we still dispatch a
-single event to the guest. And since we're only doing normal priority
-events, it is entirely implementation defined which gets dispatched
-first.
+I imagine you'll drop this hunk in the next spin.
 
->    @active:  Indicate the event is currently being handled. The information
->              stored in 'struct kvm_sdei_event_context' instance can be
->              correlated with the event.
+> +static unsigned long hypercall_register(struct kvm_vcpu *vcpu)
 
-Does this need to be a bitmap though? We can't ever have more than one
-SDEI event active at a time since this is private to a vCPU.
+Hmm, hypercall_ is not a very descriptive scope. Could you instead do
+something like kvm_sdei_?
 
-> Furthermore, it's fair enough to put the (vcpu) mask state into 'flags'
-> field of struct kvm_vcpu_arch :)
+so for this one, kvm_sdei_event_register()? Provides decent context
+clues to connect back to the spec as well.
 
-I think you can get away with putting active in there too, I don't see
-why we need more than a single bit for this info.
+> +{
+> +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
+> +	struct kvm_sdei_event *event;
+> +	unsigned int num = smccc_get_arg(vcpu, 1);
+> +	unsigned long ep_address = smccc_get_arg(vcpu, 2);
+> +	unsigned long ep_arg = smccc_get_arg(vcpu, 3);
 
-> > > > > > Do we need this if we disallow nesting events?
-> > > > > > 
-> > > > > 
-> > > > > Yes, we need this. "event == NULL" is used as indication of invalid
-> > > > > context. @event is the associated SDEI event when the context is
-> > > > > valid.
-> > > > 
-> > > > What if we use some other plumbing to indicate the state of the vCPU? MP
-> > > > state comes to mind, for example.
-> > > > 
-> > > 
-> > > Even the indication is done by another state, kvm_sdei_vcpu_context still
-> > > need to be linked (associated) with the event. After the vCPU context becomes
-> > > valid after the event is delivered, we still need to know the associated
-> > > event when some of hypercalls are triggered. SDEI_1_0_FN_SDEI_EVENT_COMPLETE
-> > > is one of the examples, we need to decrease struct kvm_sdei_event::event_count
-> > > for the hypercall.
-> > 
-> > Why do we need to keep track of how many times an event has been
-> > signaled? Nothing in SDEI seems to suggest that the number of event
-> > signals corresponds to the number of times the handler is invoked. In
-> > fact, the documentation on SDEI_EVENT_SIGNAL corroborates this:
-> > 
-> > """
-> > The event has edgetriggered semantics and the number of event signals
-> > may not correspond to the number of times the handler is invoked in the
-> > target PE.
-> > """
-> > 
-> > DEN0054C 5.1.16.1
-> > 
-> > So perhaps we queue at most 1 pending event for the guest.
-> > 
-> > I'd also like to see if anyone else has thoughts on the topic, as I'd
-> > hate for you to go back to the whiteboard again in the next spin.
-> > 
-> 
-> Agreed. In next respin, we will have one pending event at most. Error
-> can be returned if user attempts to inject event whose pending state
-> (struct kvm_sdei_vcpu::pending) has been set.
+We discussed using some structure to track the registered context of an
+event. Maybe just build it on the stack then assign it in the array?
 
-I don't believe we can do that. The SDEI_EVENT_SIGNAL call should succeed,
-even if the event was already pending.
+> +	unsigned long route_mode = smccc_get_arg(vcpu, 4);
 
-> Indeed, the hardest part is to determine the data structures and
-> functions we need. Oliver, your valuable comments are helping to
-> bring this series to the right track. However, I do think it's
-> helpful if somebody else can confirm the outcomes from the previous
-> discussions. I'm not sure if Marc has time for a quick scan and provide
-> comments.
-> 
-> I would summarize the outcomes from our discussions, to help Marc
-> or others to confirm:
+This is really 'flags'. route_mode is bit[0]. I imagine we don't want to
+support relative mode, so bit[1] is useless for us in that case too.
 
-Going to take a look at some of your later patches as well, just a heads
-up.
+The spec is somewhat imprecise on what happens for reserved flags. The
+prototype in section 5.1.2 of [1] suggests that reserved bits must be
+zero, but 5.1.2.3 'Client responsibilities' does not state that invalid
+flags result in an error.
 
-> - Drop support for the shared event.
-> - Dropsupport for the critical event.
-> - The events in the implementations are all private and can be signaled
->   (raised) by software.
-> - Drop migration support for now, and we will consider it using
->   pseudo firmware registers. So add-on patches are expected to support
->   the migration in future.
+Arm TF certainly rejects unexpected flags [2].
 
-Migration will be supported in a future spin of this series, not a
-subsequent one right? :) I had just made the suggestion because there was
-a lot of renovations that we were discussing.
-
-> - Drop locking mechanism. All the functions are executed in vcpu context.
-
-Well, not entirely. Just need to make sure atomics are used to post
-events to another vCPU in the case of SDEI_EVENT_SIGNAL.
-
-set_bit() fits the bill here, as we've discussed.
-
-> - To use the data struct as you suggested. Besides, the vcpu's mask
->   state is put to struct kvm_arch_vcpu::flags.
->   enum kvm_sdei_event
->   struct kvm_sdei_event_handler
->   struct kvm_sdei_event_context
->   struct kvm_sdei_vcpu
-> 
-> Thanks,
-> Gavin
->
+[1]: DEN0054C https://developer.arm.com/documentation/den0054/latest
+[2]: https://github.com/ARM-software/arm-trusted-firmware/blob/66c3906e4c32d675eb06bd081de8a3359f76b84c/services/std_svc/sdei/sdei_main.c#L260
 
 --
 Thanks,
