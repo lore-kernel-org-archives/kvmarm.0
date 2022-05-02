@@ -2,76 +2,75 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE577C433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 16:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29E51C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 19:12:36 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 486D84B23A;
-	Mon,  2 May 2022 12:55:03 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 43BEF4B218;
+	Mon,  2 May 2022 15:12:35 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7HcFdGHPmfU1; Mon,  2 May 2022 12:55:02 -0400 (EDT)
+	with ESMTP id 1FHk6irC1XnE; Mon,  2 May 2022 15:12:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 36EDC4B1A9;
-	Mon,  2 May 2022 12:55:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F1F584B139;
+	Mon,  2 May 2022 15:12:33 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 222EA49EE6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 12:55:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DEE2E4B11C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 15:12:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id byHcJ9nKtkHK for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 May 2022 12:54:59 -0400 (EDT)
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com
- [209.85.208.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2F2549EB2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 12:54:58 -0400 (EDT)
-Received: by mail-lj1-f172.google.com with SMTP id q185so19075135ljb.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 May 2022 09:54:58 -0700 (PDT)
+ with ESMTP id PysT2SGpg-eN for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 May 2022 15:12:30 -0400 (EDT)
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com
+ [209.85.128.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFF6D4A7FD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 15:12:30 -0400 (EDT)
+Received: by mail-yw1-f201.google.com with SMTP id
+ 00721157ae682-2f8bbaa6b16so81686937b3.14
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 May 2022 12:12:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tuwSXDS47usg98UbOCK/I9oPEzbY53h2cc8iNFbvNdQ=;
- b=aMhh8jxi4MJNkWjHLMMsq21pu+OlopMpNWh/ZkcBXDP72LSQ4XoW3ys9Aid/fsiFyo
- 6f33+KLowYyiwr5MPmEx92h34cmNTRYgDAIVeUP2R88OpMo9h8QovxDHFK3K2MgcpUKz
- ozK4fCy0XFBENiG1s2ch0aKV/O5ZaTi/x/rf3Gu3d/Ty0zraKgMEMbwQcDjlCH+O5H5M
- jNvG/4k8zJtPPOkFF25ROWlzpr84s1xlORhrOMkw2L/V/mYnL6wRS4MiqeHULVlFyJ/P
- 5XgedszkbvcnOnkQ/YO2on9T3IYpk0esfVTWBj0ne3SrkozSH0e7Ug//kG0aP0qbR925
- 4x6w==
+ h=date:message-id:mime-version:subject:from:cc;
+ bh=uV3AMgXfaKdpLzrKDgt2Pftc7Y3s541BqTPcU4XvOsc=;
+ b=f/f3SDrAnawn000xkOkHhrYZWDBT/8Cfw436AFLd7ZGxWqX2AndGj6iIOi9pFxg9Lu
+ c33w4E0W3pJafd0pLQ7kM+38rflKqPdINJwxPvlkEcM9yPSifoU2cXy2eZQgwskzblUc
+ ZHWFN5SCm40eX/3Ntni/B2HAKTUKBbTBwHvSx3ykdEb1t9AbkLnxKyabLTk4rSAUbfFz
+ GpCR3RXHSIMIryrvEiju/VgLVKQQkM61eujNeTaggZt7ybDKDRRkndV5NPsx3+Cair4K
+ fPXJuHxCkPpbMqLH8CProCushBiyS/Ic8u4Kne6k3YlaVo4L97+BQUR11iFgCmGvubgH
+ je1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tuwSXDS47usg98UbOCK/I9oPEzbY53h2cc8iNFbvNdQ=;
- b=IziPFTENVzJQnxVphWN2difAQqhJluy5rsLaXFosz9KinCpx1vQgY2GBVSmGTYbdbu
- d6B/dIoARmRxVl21KpTJRPyD1VdY9ZpdwTx1CdIw0TN3B2VUWGj7Tuy5dLDgH+u2wySE
- f7Wor9bwwVTL91/QfaDq0b3E0ImWgf9+e8vj43y6l0fjZaqa1ZNaH25F0AHdLw35aX0T
- 5VZZ86glfeuiAk2sQ+KSqKVEUTIyVPANIL6qbJaAevtpZfm/j3Rxwtic7fMiJbbDQYQW
- XKcjGJfn7boRBxcS0Mamg9cAo2jvkkfme84Uzh0TOMHMBUlD/1a6i51wMRIQ9DLO/2MD
- in1w==
-X-Gm-Message-State: AOAM531AITdTW4WcDR347RZ2+QnyCEBwLiu5Y9VlYfsI9IyZIImmipFI
- CpJ3eOzzOUuqs5h64hJ4zCL5mp2jza2oBPmRJFEDgg==
-X-Google-Smtp-Source: ABdhPJxidiAuNREg4SBCMW3M8snJ5Qcx2YyO7ESaLOxRuKvXGNp4UO7ALmr+WQsQqrydLCtL70Bgahl47Xz4JvKAbVg=
-X-Received: by 2002:a05:651c:104f:b0:24f:3fc4:1892 with SMTP id
- x15-20020a05651c104f00b0024f3fc41892mr8053610ljm.399.1651510497220; Mon, 02
- May 2022 09:54:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220420214317.3303360-1-kaleshsingh@google.com>
- <165117574186.3115452.6818682378273681624.b4-ty@kernel.org>
-In-Reply-To: <165117574186.3115452.6818682378273681624.b4-ty@kernel.org>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:cc;
+ bh=uV3AMgXfaKdpLzrKDgt2Pftc7Y3s541BqTPcU4XvOsc=;
+ b=st/gne/vg/RHSuCOJ5oTIxd+KvgVG4p4n3FX+bd5p70QkWDXYpzk5Es6zfdrlWZjsG
+ uyL7JBdMkzEBaf7fZZLrEbdU1EO/lk9CV+89r+nsvhq5xEKLnFOt/FEa8bTHOdztX0XX
+ He4NAQlU041WfJneRlGO1P8tedI+1aGJptOtQgHEHAH3+po4s2DGNfXFVY45iyj/jQgV
+ KdAasbo7Ni7Y1FaAWHox2cnpAUJfEANbPEZtzgH77xQBmukCzdYYqO17UNIisWpQT5G6
+ nWqIr0n05PhTwfhWMedW12JDCZHisNqbSqtGU+x1rx3N/aw9H3avowf8M5irl96FopAF
+ uiWA==
+X-Gm-Message-State: AOAM531Agsgl5k6TSmgL5r5pHB4FcPuOQ4huybFmQfs/RjFGX24oPnyD
+ Rqe0DLEm8w+Y1IsM2R5y9+XWJ8gMlH9C630Fqg==
+X-Google-Smtp-Source: ABdhPJw3anR5PV2AbjH4cWd8FKWezlG379Lha/KDbqGyzNif8TIgOLLb8qPZNat5PHuda44OzO6PJQ55Yf4E13DL8Q==
+X-Received: from kaleshsingh.mtv.corp.google.com
+ ([2620:15c:211:200:55c:7548:7073:c14f])
+ (user=kaleshsingh job=sendgmr) by 2002:a5b:b4a:0:b0:649:15ed:1b87 with SMTP
+ id b10-20020a5b0b4a000000b0064915ed1b87mr10856706ybr.374.1651518750235; Mon,
+ 02 May 2022 12:12:30 -0700 (PDT)
+Date: Mon,  2 May 2022 12:12:00 -0700
+Message-Id: <20220502191222.4192768-1-kaleshsingh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
+Subject: [PATCH v2 0/5] KVM nVHE Hypervisor stack unwinder
 From: Kalesh Singh <kaleshsingh@google.com>
-Date: Mon, 2 May 2022 09:54:45 -0700
-Message-ID: <CAC_TJve+n8gXbG_XY_rb+DC7399SSmP6BRc5x7X=cvht50XLYA@mail.gmail.com>
-Subject: Re: [PATCH v8 0/6] KVM: arm64: Hypervisor stack enhancements
-To: Marc Zyngier <maz@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>
-Cc: "Cc: Android Kernel" <kernel-team@android.com>,
- Will Deacon <will@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Changbin Du <changbin.du@intel.com>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, Suren Baghdasaryan <surenb@google.com>,
- kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
+ will@kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+ "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
+ surenb@google.com, broonie@kernel.org, Peter Collingbourne <pcc@google.com>,
+ linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,59 +87,65 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Apr 28, 2022 at 12:55 PM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Wed, 20 Apr 2022 14:42:51 -0700, Kalesh Singh wrote:
-> > This is v8 of the nVHE hypervisor stack enhancements. This version is based
-> > on 5.18-rc3.
-> >
-> > Previous versions can be found at:
-> > v7: https://lore.kernel.org/r/20220408200349.1529080-1-kaleshsingh@google.com/
-> > v6: https://lore.kernel.org/r/20220314200148.2695206-1-kaleshsingh@google.com/
-> > v5: https://lore.kernel.org/r/20220307184935.1704614-1-kaleshsingh@google.com/
-> > v4: https://lore.kernel.org/r/20220225033548.1912117-1-kaleshsingh@google.com/
-> > v3: https://lore.kernel.org/r/20220224051439.640768-1-kaleshsingh@google.com/
-> > v2: https://lore.kernel.org/r/20220222165212.2005066-1-kaleshsingh@google.com/
-> > v1: https://lore.kernel.org/r/20220210224220.4076151-1-kaleshsingh@google.com/
-> >
-> > [...]
->
-> Applied to next, thanks!
->
-> [1/6] KVM: arm64: Introduce hyp_alloc_private_va_range()
->       commit: 92abe0f81e1385afd8f1dc66206b5be9a514899b
-> [2/6] KVM: arm64: Introduce pkvm_alloc_private_va_range()
->       commit: f922c13e778d6d5343d4576be785a8204c595113
-> [3/6] KVM: arm64: Add guard pages for KVM nVHE hypervisor stack
->       commit: ce3354318a57875dc59f4bb841662e95bfba03db
-> [4/6] KVM: arm64: Add guard pages for pKVM (protected nVHE) hypervisor stack
->       commit: 1a919b17ef012ca0572bae759c27e5ea02bfb47f
-> [5/6] KVM: arm64: Detect and handle hypervisor stack overflows
->       commit: 66de19fad9ef47c5376a99bb2b00661f1c788a94
-> [6/6] KVM: arm64: Symbolize the nVHE HYP addresses
->       commit: 6ccf9cb557bd32073b0d68baed97f1bd8a40ff1d
+Hi all,
 
-Thanks for applying these Marc.
+This v2 of the nVHE hypervisor stack unwinder. The previous version was
+posted at:
+v1: https://lore.kernel.org/lkml/20220427184716.1949239-1-kaleshsingh@google.com/
 
-I was wondering if instead of taking these through kvm-arm64/next,
-could Catalin consolidated these in arm64 for-next/core with Mark
-Ruthland's and Madhavan's stacktrace patches[1]? This avoids conflict
-and would allow for the hypervisor unwinding changes[2] to apply
-cleanly.
+The series is based on arm64 for-next/core and is also dependent on
+kvm-arm64/hyp-stack-guard [1].
 
-[1] https://lore.kernel.org/r/20220413145910.3060139-1-mark.rutland@arm.com/
-[2]  https://lore.kernel.org/r/20220427184716.1949239-1-kaleshsingh@google.com/
+The main changes in this version is splitting some patches into more
+incremental changes, per Mark Brown
+
+The relevant parts of the previous cover letter are copied below for
+convenience.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/hyp-stack-guard
 
 Thanks,
 Kalesh
->
-> Cheers,
->
->         M.
-> --
-> Without deviation from the norm, progress is not possible.
->
->
+
+-------
+
+This new version of the unwinder splits the unwinding and dumping
+of the stack between the hypervisor and host:
+  - The hypervisor unwinds its stack and dumps the address entries
+    into a page shared with the host.
+  - The host then symnolizes and prints the hyp stacktrace from
+    the shared page.
+
+The new approach doesn't depend on CONFIG_NVHE_EL2_DEBUG,
+and allows dumping hyp stacktraces in prodcution environments
+(!CONFIG_NVHE_EL2_DEBUG).
+
+arm64/kernel/stacktrace.c is compiled twice: stacktrace.o for the
+host kernel and stacktrace.nvhe.o for the hypervisor. This allows
+reusing most of the host unwinding logic in the nVHE hypervisor.
+
+
+Kalesh Singh (5):
+  KVM: arm64: Factor out common stack unwinding logic
+  KVM: arm64: Compile stacktrace.nvhe.o
+  KVM: arm64: Add hypervisor overflow stack
+  KVM: arm64: Allocate shared stacktrace pages
+  KVM: arm64: Unwind and dump nVHE hypervisor stacktrace
+
+ arch/arm64/include/asm/kvm_asm.h    |   1 +
+ arch/arm64/include/asm/stacktrace.h |  58 +++++++++--
+ arch/arm64/kernel/stacktrace.c      | 151 +++++++++++++++++++++++-----
+ arch/arm64/kvm/arm.c                |  34 +++++++
+ arch/arm64/kvm/handle_exit.c        |   4 +
+ arch/arm64/kvm/hyp/nvhe/Makefile    |   3 +-
+ arch/arm64/kvm/hyp/nvhe/host.S      |   9 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c     |  11 ++
+ arch/arm64/kvm/hyp/nvhe/switch.c    |   4 +
+ 9 files changed, 231 insertions(+), 44 deletions(-)
+
+-- 
+2.36.0.464.gb9c8b46e94-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
