@@ -2,78 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA09C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 19:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9714C433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 23:39:04 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 756004B1BC;
-	Mon,  2 May 2022 15:14:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 322DF4B286;
+	Mon,  2 May 2022 19:39:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pgn4eFOqV1XZ; Mon,  2 May 2022 15:14:40 -0400 (EDT)
+	with ESMTP id hIQ-mpyOx72H; Mon,  2 May 2022 19:39:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E63D49EB5;
-	Mon,  2 May 2022 15:14:40 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B87E54B1FA;
+	Mon,  2 May 2022 19:39:02 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BDCB340C31
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 15:14:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 711E94B1D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 19:39:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sX72ykcd4qLx for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 May 2022 15:14:37 -0400 (EDT)
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
- [209.85.128.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 510D740B85
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 15:14:37 -0400 (EDT)
-Received: by mail-yw1-f202.google.com with SMTP id
- 00721157ae682-2f8398e99dcso143401147b3.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 May 2022 12:14:37 -0700 (PDT)
+ with ESMTP id 7wAuoNGoOJ6v for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 May 2022 19:38:59 -0400 (EDT)
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
+ [209.85.216.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F1AF4B1BA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 19:38:59 -0400 (EDT)
+Received: by mail-pj1-f74.google.com with SMTP id
+ t24-20020a17090a449800b001d2d6e740c3so355265pjg.9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 May 2022 16:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:cc;
- bh=ipd0BefF9+t+n+BDA9qzK3ST29aGb9VMcXpg3CY250w=;
- b=fVIpIWNh7zPAAtchL34lpjR7VmL/rbh4QOlccErxfDjE0KYgyhgo2f9JKaAV/B3tWD
- MxCiCYhVyv8F63UsENToArfPZvAslNNo/Qu68rLtSkLkLg9ua9HMGyv2Nwe9/7AASh5i
- BobIpUh/UB0odGf+AoWdO8myMUZ0IUbReLTbxNOv5+D/GCt/2m92U7fGxLg18Ez67ZQb
- 4BfiJuZV3qHm+pzU441EVuhASuGcXposOq/D+cF3Ta0bcF5i+xaTZbMzyo2ZpZzCyc/i
- RaFq8+0+xm8tJblNw9lckgnQdTdMhtsMg1l2UKHbKKSdrNqXCz/AvtrbKkQhuMv1NF1i
- USPA==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=p7us8BZf0fK1RrSD6y3PdjBRGI3gB6CktXng+w8fit8=;
+ b=ZFtXfGzbmAJt3k1RJe4no9H5OjZL/uK5Zt0HNoiErHqBqSoz71OwvmHLW6HHVqw48M
+ paWxhHQiADMiWxG9eOrAwIBQC3P5UH9RrImw8cdehFtXM2f9n8EtIKfLTRkbxrJr9PEU
+ 4ZLlSBRYVpIIdBuQkydEN15hsaHS3yUnPpS2fvxI29+3pSLuRbVWf3Y41u1xBWenx6wp
+ vyWsjpFOm/HRiJSxLq+QpCk8FME5/qYaynxVkF1pS3LXBPl7vT0SQKDT0vO6n9jOc2uD
+ nC3CMP25k+1hU5/c1/VbGvxMJ97eeIjPs2UHXZ/coJ+6t81nleuFA3DCvSNpQnITbLb2
+ dQvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:cc;
- bh=ipd0BefF9+t+n+BDA9qzK3ST29aGb9VMcXpg3CY250w=;
- b=jZPGYMcMmV5O4QeMBh/Kvc+JLuml4yXhSkCjzNiDFWlDq8q5g4nT7JKPptaz503iah
- x5PyuawwfyLP/08PZ541lHnGNyrVPDSHsUhrLF/XOjh4w7GKDl9mAjeAby3JRc1baIGv
- dHwbKXttmuU675Jm2jWbYl20D2TyOhwI4T69en69igGao+560rcWMmRJMdtQwxG8xms1
- tyA7nIr1VSCvPZyuq3Zm1SMfQypM37qXNqiAOQW88J5gMv9vAC5+8OG52vs30HHGHpgB
- VcseNiCZSI2Ixhl/9uuDwjwFQL9UgmL4ZOI9pPuw/HrTiVBXuY4ZT8HYivEaz+XhYVaj
- PXww==
-X-Gm-Message-State: AOAM531x4uwbVkK5YBz6gess+ghgsCjpK1r5KeNuwMlDuc1pXKiY4qx+
- 4x/dIGrer6XD6QDMHUxqygcqcUu72Yh5tVvBWQ==
-X-Google-Smtp-Source: ABdhPJzHCwIdJBjgxBAhHOPW83nydzx6a6Ghl99nsHDS8GeBKfnj+2gJ4yayUqDCoRfzGDmOaLGKU5KAvcjqU3rRPw==
-X-Received: from kaleshsingh.mtv.corp.google.com
- ([2620:15c:211:200:55c:7548:7073:c14f])
- (user=kaleshsingh job=sendgmr) by 2002:a81:2492:0:b0:2eb:250d:9cd8 with SMTP
- id k140-20020a812492000000b002eb250d9cd8mr12136698ywk.238.1651518876776; Mon,
- 02 May 2022 12:14:36 -0700 (PDT)
-Date: Mon,  2 May 2022 12:12:05 -0700
-In-Reply-To: <20220502191222.4192768-1-kaleshsingh@google.com>
-Message-Id: <20220502191222.4192768-6-kaleshsingh@google.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=p7us8BZf0fK1RrSD6y3PdjBRGI3gB6CktXng+w8fit8=;
+ b=NccpcCV/XyDaLFybRyIA0PbVjqpoMT9rBMiJMJMX6xLW3WZCPyjdwyi3FGhIHL4dg6
+ z8kGPdBzSPL+e7lN326qSeNyrDa+ibgqjSz+l7D9Aalcxi7p2bIKfTwiiB/37U8NGzi8
+ upZLbP8Nwdq22U6mF49qbeKbWrduonm8IClR0hw5wdgLaTi/Xpl96b+8BvWbA5Tjikgf
+ OT9b7TOu9Knm5C11jVTSgp0O4a/nitE65k+UQKLkUhkKVOGsIRbJ4ilKkMq/egrPkzEk
+ aLPjC9BM1zcWey2dcnof9iV/rbsKqoXpux7ECmaSXtGfVhluMz+RvSu1bxQ20c+gtsnd
+ rZQw==
+X-Gm-Message-State: AOAM533KzcB1r4lSiBvf/5tC4miEM973mw7xTvYT8cOqsAXKWbDA1I4I
+ YTUus95iOrkM/rIsFc/m37Hwn54ODwlG
+X-Google-Smtp-Source: ABdhPJwf4ixwRgkC/4vK073vja+uTjkR9lkJA8OfzTI/L1mkBxBA/FIGRn2PdKec/lBJjYP3/0OfZfI/OStR
+X-Received: from rananta-virt.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a17:902:e848:b0:15e:ad4f:8cde with SMTP id
+ t8-20020a170902e84800b0015ead4f8cdemr4523017plg.60.1651534737969; Mon, 02 May
+ 2022 16:38:57 -0700 (PDT)
+Date: Mon,  2 May 2022 23:38:44 +0000
+Message-Id: <20220502233853.1233742-1-rananta@google.com>
 Mime-Version: 1.0
-References: <20220502191222.4192768-1-kaleshsingh@google.com>
 X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v2 5/5] KVM: arm64: Unwind and dump nVHE hypervisor stacktrace
-From: Kalesh Singh <kaleshsingh@google.com>
-Cc: Kefeng Wang <wangkefeng.wang@huawei.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov <ast@kernel.org>,
- will@kernel.org, kvmarm@lists.cs.columbia.edu, maz@kernel.org,
- "Madhavan T. Venkataraman" <madvenka@linux.microsoft.com>,
- linux-arm-kernel@lists.infradead.org, kernel-team@android.com,
- surenb@google.com, broonie@kernel.org, Peter Collingbourne <pcc@google.com>,
- linux-kernel@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>
+Subject: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services
+ selection
+From: Raghavendra Rao Ananta <rananta@google.com>
+To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>, 
+ James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,267 +88,234 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On hyp_panic(), the hypervisor dumps the addresses for its stacktrace
-entries to a page shared with the host. The host then symbolizes and
-prints the hyp stacktrace before panicking itself.
+Hello,
 
-Example stacktrace:
+Continuing the discussion from [1], the series tries to add support
+for the userspace to elect the hypercall services that it wishes
+to expose to the guest, rather than the guest discovering them
+unconditionally. The idea employed by the series was taken from
+[1] as suggested by Marc Z.
 
-[  122.051187] kvm [380]: Invalid host exception to nVHE hyp!
-[  122.052467] kvm [380]: nVHE HYP call trace:
-[  122.052814] kvm [380]: [<ffff800008f5b550>] __kvm_nvhe___pkvm_vcpu_init_traps+0x1f0/0x1f0
-[  122.053865] kvm [380]: [<ffff800008f560f0>] __kvm_nvhe_hyp_panic+0x130/0x1c0
-[  122.054367] kvm [380]: [<ffff800008f56190>] __kvm_nvhe___kvm_vcpu_run+0x10/0x10
-[  122.054878] kvm [380]: [<ffff800008f57a40>] __kvm_nvhe_handle___kvm_vcpu_run+0x30/0x50
-[  122.055412] kvm [380]: [<ffff800008f57d2c>] __kvm_nvhe_handle_trap+0xbc/0x160
-[  122.055911] kvm [380]: [<ffff800008f56864>] __kvm_nvhe___host_exit+0x64/0x64
-[  122.056417] kvm [380]: ---- end of nVHE HYP call trace ----
+In a broad sense, the concept is similar to the current implementation
+of PSCI interface- create a 'firmware psuedo-register' to handle the
+firmware revisions. The series extends this idea to all the other
+hypercalls such as TRNG (True Random Number Generator), PV_TIME
+(Paravirtualized Time), and PTP (Precision Time protocol).
 
-Signed-off-by: Kalesh Singh <kaleshsingh@google.com>
-Reviewed-by: Mark Brown <broonie@kernel.org>
----
+For better categorization and future scaling, these firmware registers
+are categorized based on the service call owners. Also, unlike the
+existing firmware psuedo-registers, they hold the features supported
+in the form of a bitmap.
 
-Changes in v2:
-  - Add Mark's Reviewed-by tag
+During the VM initialization, the registers holds an upper-limit of
+the features supported by each one of them. It's expected that the
+userspace discover the features provided by each register via GET_ONE_REG,
+and writeback the desired values using SET_ONE_REG. KVM allows this
+modification only until the VM has started.
 
- arch/arm64/include/asm/stacktrace.h | 42 ++++++++++++++--
- arch/arm64/kernel/stacktrace.c      | 75 +++++++++++++++++++++++++++++
- arch/arm64/kvm/handle_exit.c        |  4 ++
- arch/arm64/kvm/hyp/nvhe/switch.c    |  4 ++
- 4 files changed, 121 insertions(+), 4 deletions(-)
+Some of the standard function-ids, such as ARM_SMCCC_VERSION_FUNC_ID,
+need not be associated with a feature bit. For such ids, the series
+introduced an allowed-list (in kvm_hvc_call_default_allowed()), that holds
+all such ids. As a result, the functions that are not elected by userspace,
+or if they are not a part of this allowed-list, will be denied for when
+the guests invoke them.
 
-diff --git a/arch/arm64/include/asm/stacktrace.h b/arch/arm64/include/asm/stacktrace.h
-index f5af9a94c5a6..3063912107b0 100644
---- a/arch/arm64/include/asm/stacktrace.h
-+++ b/arch/arm64/include/asm/stacktrace.h
-@@ -5,6 +5,7 @@
- #ifndef __ASM_STACKTRACE_H
- #define __ASM_STACKTRACE_H
- 
-+#include <linux/kvm_host.h>
- #include <linux/percpu.h>
- #include <linux/sched.h>
- #include <linux/sched/task_stack.h>
-@@ -19,10 +20,12 @@ enum stack_type {
- #ifndef __KVM_NVHE_HYPERVISOR__
- 	STACK_TYPE_TASK,
- 	STACK_TYPE_IRQ,
--	STACK_TYPE_OVERFLOW,
- 	STACK_TYPE_SDEI_NORMAL,
- 	STACK_TYPE_SDEI_CRITICAL,
-+#else /* __KVM_NVHE_HYPERVISOR__ */
-+	STACK_TYPE_HYP,
- #endif /* !__KVM_NVHE_HYPERVISOR__ */
-+	STACK_TYPE_OVERFLOW,
- 	STACK_TYPE_UNKNOWN,
- 	__NR_STACK_TYPES
- };
-@@ -55,6 +58,9 @@ static inline bool on_stack(unsigned long sp, unsigned long size,
- extern void dump_backtrace(struct pt_regs *regs, struct task_struct *tsk,
- 			   const char *loglvl);
- 
-+extern void hyp_dump_backtrace(unsigned long hyp_offset);
-+
-+DECLARE_PER_CPU(unsigned long, kvm_arm_hyp_stacktrace_page);
- DECLARE_PER_CPU(unsigned long *, irq_stack_ptr);
- 
- static inline bool on_irq_stack(unsigned long sp, unsigned long size,
-@@ -91,8 +97,32 @@ static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
- static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
- 			struct stack_info *info) { return false; }
- #endif
--#endif /* !__KVM_NVHE_HYPERVISOR__ */
-+#else /* __KVM_NVHE_HYPERVISOR__ */
-+
-+extern void hyp_save_backtrace(void);
-+
-+DECLARE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], overflow_stack);
-+DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
-+
-+static inline bool on_overflow_stack(unsigned long sp, unsigned long size,
-+				 struct stack_info *info)
-+{
-+	unsigned long low = (unsigned long)this_cpu_ptr(overflow_stack);
-+	unsigned long high = low + PAGE_SIZE;
-+
-+	return on_stack(sp, size, low, high, STACK_TYPE_OVERFLOW, info);
-+}
-+
-+static inline bool on_hyp_stack(unsigned long sp, unsigned long size,
-+				 struct stack_info *info)
-+{
-+	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
-+	unsigned long high = params->stack_hyp_va;
-+	unsigned long low = high - PAGE_SIZE;
- 
-+	return on_stack(sp, size, low, high, STACK_TYPE_HYP, info);
-+}
-+#endif /* !__KVM_NVHE_HYPERVISOR__ */
- 
- /*
-  * We can only safely access per-cpu stacks from current in a non-preemptible
-@@ -105,6 +135,9 @@ static inline bool on_accessible_stack(const struct task_struct *tsk,
- 	if (info)
- 		info->type = STACK_TYPE_UNKNOWN;
- 
-+	if (on_overflow_stack(sp, size, info))
-+		return true;
-+
- #ifndef __KVM_NVHE_HYPERVISOR__
- 	if (on_task_stack(tsk, sp, size, info))
- 		return true;
-@@ -112,10 +145,11 @@ static inline bool on_accessible_stack(const struct task_struct *tsk,
- 		return false;
- 	if (on_irq_stack(sp, size, info))
- 		return true;
--	if (on_overflow_stack(sp, size, info))
--		return true;
- 	if (on_sdei_stack(sp, size, info))
- 		return true;
-+#else /* __KVM_NVHE_HYPERVISOR__ */
-+	if (on_hyp_stack(sp, size, info))
-+		return true;
- #endif /* !__KVM_NVHE_HYPERVISOR__ */
- 
- 	return false;
-diff --git a/arch/arm64/kernel/stacktrace.c b/arch/arm64/kernel/stacktrace.c
-index f346b4c66f1c..c81dea9760ac 100644
---- a/arch/arm64/kernel/stacktrace.c
-+++ b/arch/arm64/kernel/stacktrace.c
-@@ -104,6 +104,7 @@ static int notrace __unwind_next(struct task_struct *tsk,
- 	 *
- 	 * TASK -> IRQ -> OVERFLOW -> SDEI_NORMAL
- 	 * TASK -> SDEI_NORMAL -> SDEI_CRITICAL -> OVERFLOW
-+	 * HYP -> OVERFLOW
- 	 *
- 	 * ... but the nesting itself is strict. Once we transition from one
- 	 * stack to another, it's never valid to unwind back to that first
-@@ -242,7 +243,81 @@ noinline notrace void arch_stack_walk(stack_trace_consume_fn consume_entry,
- 
- 	unwind(task, &state, consume_entry, cookie);
- }
-+
-+/**
-+ * Symbolizes and dumps the hypervisor backtrace from the shared
-+ * stacktrace page.
-+ */
-+noinline notrace void hyp_dump_backtrace(unsigned long hyp_offset)
-+{
-+	unsigned long *stacktrace_pos =
-+		(unsigned long *)*this_cpu_ptr(&kvm_arm_hyp_stacktrace_page);
-+	unsigned long va_mask = GENMASK_ULL(vabits_actual - 1, 0);
-+	unsigned long pc = *stacktrace_pos++;
-+
-+	kvm_err("nVHE HYP call trace:\n");
-+
-+	while (pc) {
-+		pc &= va_mask;		/* Mask tags */
-+		pc += hyp_offset;	/* Convert to kern addr */
-+		kvm_err("[<%016lx>] %pB\n", pc, (void *)pc);
-+		pc = *stacktrace_pos++;
-+	}
-+
-+	kvm_err("---- end of nVHE HYP call trace ----\n");
-+}
- #else /* __KVM_NVHE_HYPERVISOR__ */
- DEFINE_PER_CPU(unsigned long [PAGE_SIZE/sizeof(long)], overflow_stack)
- 	__aligned(16);
-+
-+static int notrace unwind_next(struct task_struct *tsk,
-+			       struct unwind_state *state)
-+{
-+	struct stack_info info;
-+
-+	return __unwind_next(tsk, state, &info);
-+}
-+
-+/**
-+ * Saves a hypervisor stacktrace entry (address) to the shared stacktrace page.
-+ */
-+static bool hyp_save_backtrace_entry(void *arg, unsigned long where)
-+{
-+	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
-+	unsigned long **stacktrace_pos = (unsigned long **)arg;
-+	unsigned long stacktrace_start, stacktrace_end;
-+
-+	stacktrace_start = (unsigned long)params->stacktrace_hyp_va;
-+	stacktrace_end = stacktrace_start + PAGE_SIZE - (2 * sizeof(long));
-+
-+	if ((unsigned long) *stacktrace_pos > stacktrace_end)
-+		return false;
-+
-+	/* Save the entry to the current pos in stacktrace page */
-+	**stacktrace_pos = where;
-+
-+	/* A zero entry delimits the end of the stacktrace. */
-+	*(*stacktrace_pos + 1) = 0UL;
-+
-+	/* Increment the current pos */
-+	++*stacktrace_pos;
-+
-+	return true;
-+}
-+
-+/**
-+ * Saves hypervisor stacktrace to the shared stacktrace page.
-+ */
-+noinline notrace void hyp_save_backtrace(void)
-+{
-+	struct kvm_nvhe_init_params *params = this_cpu_ptr(&kvm_init_params);
-+	void *stacktrace_start = (void *)params->stacktrace_hyp_va;
-+	struct unwind_state state;
-+
-+	unwind_init(&state, (unsigned long)__builtin_frame_address(0),
-+			_THIS_IP_);
-+
-+	unwind(NULL, &state, hyp_save_backtrace_entry, &stacktrace_start);
-+}
-+
- #endif /* !__KVM_NVHE_HYPERVISOR__ */
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 2e61a987b0d5..f1a6b556ec32 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -17,6 +17,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_mmu.h>
- #include <asm/debug-monitors.h>
-+#include <asm/stacktrace.h>
- #include <asm/traps.h>
- 
- #include <kvm/arm_hypercalls.h>
-@@ -325,6 +326,9 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
- 				(void *)panic_addr);
- 	}
- 
-+	/* Dump the hypervisor stacktrace */
-+	hyp_dump_backtrace(hyp_offset);
-+
- 	/*
- 	 * Hyp has panicked and we're going to handle that by panicking the
- 	 * kernel. The kernel offset will be revealed in the panic so we're
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 978f1b94fb25..95d810e86c7d 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -25,6 +25,7 @@
- #include <asm/fpsimd.h>
- #include <asm/debug-monitors.h>
- #include <asm/processor.h>
-+#include <asm/stacktrace.h>
- 
- #include <nvhe/fixed_config.h>
- #include <nvhe/mem_protect.h>
-@@ -395,6 +396,9 @@ asmlinkage void __noreturn hyp_panic(void)
- 		__sysreg_restore_state_nvhe(host_ctxt);
- 	}
- 
-+	/* Save the hypervisor stacktrace */
-+	hyp_save_backtrace();
-+
- 	__hyp_do_panic(host_ctxt, spsr, elr, par);
- 	unreachable();
- }
+Older VMMs can simply ignore this interface and the hypercall services
+will be exposed unconditionally to the guests, thus ensuring backward
+compatibility.
+
+The patches are based off of mainline kernel 5.18-rc5, with the selftest
+patches from [2] applied.
+
+Patch-1 factors out the non-PSCI related interface from psci.c to
+hypercalls.c, as the series would extend the list in the upcoming
+patches.
+
+Patch-2 sets up the framework for the bitmap firmware psuedo-registers.
+It includes read/write support for the registers, and a helper to check
+if a particular hypercall service is supported for the guest.
+It also adds the register KVM_REG_ARM_STD_HYP_BMAP to support ARM's
+standard secure services.
+
+Patch-3 introduces the firmware register, KVM_REG_ARM_STD_HYP_BMAP,
+which holds the standard hypervisor services (such as PV_TIME).
+
+Patch-4 introduces the firmware register, KVM_REG_ARM_VENDOR_HYP_BMAP,
+which holds the vendor specific hypercall services.
+
+Patch-5,6 Add the necessary documentation for the newly added firmware
+registers.
+
+Patch-7 imports the SMCCC definitions from linux/arm-smccc.h into tools/
+for further use in selftests.
+
+Patch-8 adds the selftest to test the guest (using 'hvc') and userspace
+interfaces (SET/GET_ONE_REG).
+
+Patch-9 adds these firmware registers into the get-reg-list selftest.
+
+[1]: https://lore.kernel.org/kvmarm/874kbcpmlq.wl-maz@kernel.org/T/
+[2]: https://lore.kernel.org/all/20220409184549.1681189-1-oupton@google.com/
+
+Regards,
+Raghavendra
+
+v6 -> v7:
+
+Addressed the comments by Gavin and Reiji:
+
+- kvm_arm_set_fw_reg_bmap() is optimzed to avoid unnecessary
+  serialization of kvm->lock by checking for the KVM_ARCH_FLAG_HAS_RAN_ONCE
+  flag or for a bitmap update before taking the lock (Reiji).
+- kvm_psci_func_id_is_valid() avoids depending on *vcpu to figure out
+  if the PSCI version is 0.1. Instead, it checks the same using KVM_PSCI_FN()
+  for range 0 to 3 (Reiji).
+- Fixed typos and comments (Gavin). 
+
+v5 -> v6:
+
+Addressed the comments by Marc and Gavin:
+
+- Bitmaps are represented using 'unsigned long' inctead of 'u64' (Marc).
+- Replaced the array holding the allowed-list,
+  hvc_func_default_allowed_list[], which looked up the func_id using a
+  loop, with a switch-case statement (Marc).
+- kvm_arm_set_fw_reg_bmap() now always returns -EBUSY for any 'write' of
+  the bitmap value after the VM has started running. Documentation is
+  adjusted accordingly (Marc).
+- kvm_psci_func_id_is_valid() is moved from an inline function to
+  kvm/psci.c (Marc).
+- Merged ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID into bit-0 of the vendor
+  hypervisor firmware register (Gavin).
+- Macro optimizations and replace arg0 with arg1 (to comply with KVM
+  convention) in hypercalls.c selftest (Gavin).
+- Dropped the patch v5 10/10 (Add KVM_REG_ARM_FW_REG(3) to get-reg-list)
+  as it was already uploaded by Andrew.
+- Fixed typos
+
+v4 -> v5:
+
+Addressed comments by Oliver (thank you!):
+
+- Rebased the series to accommodate ARM_SMCCC_ARCH_WORKAROUND_3
+  and PSCI 1.1 changes, and capturing VM's first run.
+- Removed the patches related to register scoping (v4 02/13 and
+  03/13). I plan to re-introduce them in its own series.
+- Dropped the patch that captures VM's first run.
+- Moved the bitmap feature firmware registers to its own CORPOC
+  space (0x0016).
+- Move the KVM_REG_ARM_*_BIT_MAX definitions from uapi header
+  to internal header (arm_hypercalls.h).
+- Renamed the hypercall descriptor to 'struct kvm_smccc_features',
+  and kvm_hvc_call_supported() to kvm_hvc_call_allowed().
+- Introduced an allowed-list to hold the function-ids that aren't
+  represented by feature-bits.
+- Introduced kvm_psci_func_id_is_valid() to check if a given
+  function-id is a valid PSCI id, which is used in
+  kvm_hvc_call_allowed().
+- Introduced KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT as bit-0 of
+  KVM_REG_ARM_VENDOR_HYP_BMAP register and
+  KVM_REG_ARM_VENDOR_HYP_BIT_PTP is moved to bit-1.
+- Updated the arm-smccc.h import to include the definition of
+  ARM_SMCCC_ARCH_WORKAROUND_3.
+- Introduced the KVM_REG_ARM_FW_FEAT_BMAP COPROC definition to
+  get-reg-list selftest.
+- Created a new patch to include KVM_REG_ARM_FW_REG(3) in
+  get-reg-list.
+
+
+v3 -> v4
+
+Addressed comments and took suggestions by Reiji, Oliver, Marc,
+Sean and Jim:
+
+- Renamed and moved the VM has run once check to arm64.
+- Introduced the capability to dynamically modify the register
+  encodings to include the scope information.
+- Replaced mutex_lock with READ_ONCE and WRITE_ONCE when the
+  bitmaps are accessed.
+- The hypercalls selftest re-runs with KVM_CAP_ARM_REG_SCOPE
+  enabled.
+
+v2 -> v3
+
+Addressed comments by Marc and Andrew:
+
+- Dropped kvm_vcpu_has_run_once() implementation.
+- Redifined kvm_vm_has_run_once() as kvm_vm_has_started() in the core
+  KVM code that introduces a new field, 'vm_started', to track this.
+- KVM_CAP_ARM_HVC_FW_REG_BMAP returns the number of psuedo-firmware
+  bitmap registers upon a 'read'. Support for 'write' removed.
+- Removed redundant spinlock, 'fw_reg_bmap_enabled' fields from the
+  hypercall descriptor structure.
+- A separate sub-struct to hold the bitmap info is removed. The bitmap
+  info is directly stored in the hypercall descriptor structure
+  (struct kvm_hvc_desc).
+
+v1 -> v2
+
+Addressed comments by Oliver (thanks!):
+
+- Introduced kvm_vcpu_has_run_once() and kvm_vm_has_run_once() in the
+  core kvm code, rather than relying on ARM specific
+  vcpu->arch.has_run_once.
+- Writing to KVM_REG_ARM_PSCI_VERSION is done in hypercalls.c itself,
+  rather than separating out to psci.c.
+- Introduced KVM_CAP_ARM_HVC_FW_REG_BMAP to enable the extension.
+- Tracks the register accesses from VMM to decide whether to sanitize
+  a register or not, as opposed to sanitizing upon the first 'write'
+  in v1.
+- kvm_hvc_call_supported() is implemented using a direct switch-case
+  statement, instead of looping over all the registers to pick the
+  register for the function-id.
+- Replaced the register bit definitions with #defines, instead of enums.
+- Removed the patch v1-06/08 that imports the firmware register
+  definitions as it's not needed.
+- Separated out the documentations in its own patch, and the renaming
+  of hypercalls.rst to psci.rst into another patch.
+- Add the new firmware registers to get-reg-list KVM selftest.
+
+v1: https://lore.kernel.org/kvmarm/20211102002203.1046069-1-rananta@google.com/
+v2: https://lore.kernel.org/kvmarm/20211113012234.1443009-1-rananta@google.com/
+v3: https://lore.kernel.org/linux-arm-kernel/20220104194918.373612-1-rananta@google.com/
+v4: https://lore.kernel.org/lkml/20220224172559.4170192-1-rananta@google.com/
+v5: https://lore.kernel.org/lkml/20220407011605.1966778-1-rananta@google.com/
+v6: https://lore.kernel.org/kvmarm/20220423000328.2103733-1-rananta@google.com/
+
+Raghavendra Rao Ananta (9):
+  KVM: arm64: Factor out firmware register handling from psci.c
+  KVM: arm64: Setup a framework for hypercall bitmap firmware registers
+  KVM: arm64: Add standard hypervisor firmware register
+  KVM: arm64: Add vendor hypervisor firmware register
+  Docs: KVM: Rename psci.rst to hypercalls.rst
+  Docs: KVM: Add doc for the bitmap firmware registers
+  tools: Import ARM SMCCC definitions
+  selftests: KVM: aarch64: Introduce hypercall ABI test
+  selftests: KVM: aarch64: Add the bitmap firmware registers to
+    get-reg-list
+
+ Documentation/virt/kvm/api.rst                |  16 +
+ Documentation/virt/kvm/arm/hypercalls.rst     | 135 +++++++
+ Documentation/virt/kvm/arm/psci.rst           |  77 ----
+ arch/arm64/include/asm/kvm_host.h             |  16 +
+ arch/arm64/include/uapi/asm/kvm.h             |  16 +
+ arch/arm64/kvm/arm.c                          |   1 +
+ arch/arm64/kvm/guest.c                        |  10 +-
+ arch/arm64/kvm/hypercalls.c                   | 325 ++++++++++++++++-
+ arch/arm64/kvm/psci.c                         | 186 +---------
+ include/kvm/arm_hypercalls.h                  |  17 +
+ include/kvm/arm_psci.h                        |   9 +-
+ tools/include/linux/arm-smccc.h               | 193 ++++++++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/get-reg-list.c      |   8 +
+ .../selftests/kvm/aarch64/hypercalls.c        | 336 ++++++++++++++++++
+ 16 files changed, 1078 insertions(+), 269 deletions(-)
+ create mode 100644 Documentation/virt/kvm/arm/hypercalls.rst
+ delete mode 100644 Documentation/virt/kvm/arm/psci.rst
+ create mode 100644 tools/include/linux/arm-smccc.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
+
 -- 
 2.36.0.464.gb9c8b46e94-goog
 
