@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D89EFC433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 03:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0339EC433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 03:06:00 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D4504B292;
-	Sun,  1 May 2022 23:05:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 69AA84B274;
+	Sun,  1 May 2022 23:06:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id S+2ru7wEvAXX; Sun,  1 May 2022 23:05:00 -0400 (EDT)
+	with ESMTP id 5HIYfVK40NSQ; Sun,  1 May 2022 23:05:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EBA7B4B26E;
-	Sun,  1 May 2022 23:05:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DC444B10C;
+	Sun,  1 May 2022 23:05:59 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF8A149F3E
- for <kvmarm@lists.cs.columbia.edu>; Sun,  1 May 2022 23:04:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CF6749F5D
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  1 May 2022 23:05:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4FwfJTlpdn7c for <kvmarm@lists.cs.columbia.edu>;
- Sun,  1 May 2022 23:04:57 -0400 (EDT)
+ with ESMTP id 7sUXYFSsoBtp for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  1 May 2022 23:05:56 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A62BA410FF
- for <kvmarm@lists.cs.columbia.edu>; Sun,  1 May 2022 23:04:57 -0400 (EDT)
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24D1249F44
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  1 May 2022 23:05:56 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1651460697;
+ s=mimecast20190719; t=1651460755;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LIk0gbsSq+JZ6Ardj/siE8ahXgUcdMEBM+JGnLF1ssc=;
- b=BOYtMelgM+tjfbvoUo5OXdtYrOFE+XEN2ET9aYrNp1CCmZMugk7F2uIJ50CnTXHbGG+5bj
- Q8qn3GOKpHvx+ODFkdOCZBZ7lo8k0yJzZBJ8OELBqnQjmGCsC/J4BnU3Lrfr6Hf1DBdotc
- 8H7nWg8LtjgM2TIGsBq2qgZEC9AsAf8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=qfBorVSUOCzQ7q3zYlG2+R/WTZRAKdQmUnILyiogGHk=;
+ b=EA1i97A2tlkcoU6h/5SpwqMb3V69yNYJ/7NNuYurlukYsjzHHPzNeXT+f8nmj3wG7dOBIW
+ eVUX6LHAOMoWXguioIUpeaTR3oeuw6u9TM0RKkxCWsKZnNpHFxf30Aa6d/8iXQo9e1opDX
+ F3LcapHA9QjIUpLzj2Chod7hOZgBSsg=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-8-Hk5HYOmAN22ONjP6yxoWkQ-1; Sun, 01 May 2022 23:04:54 -0400
-X-MC-Unique: Hk5HYOmAN22ONjP6yxoWkQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com
- [10.11.54.9])
+ us-mta-43-6GRA4kaIMLWNyA4Yy77asw-1; Sun, 01 May 2022 23:05:51 -0400
+X-MC-Unique: 6GRA4kaIMLWNyA4Yy77asw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.1])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF8D485A5BE;
- Mon,  2 May 2022 03:04:53 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 38EA61E13783;
+ Mon,  2 May 2022 03:05:51 +0000 (UTC)
 Received: from [10.72.12.86] (ovpn-12-86.pek2.redhat.com [10.72.12.86])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 33DDD550849;
- Mon,  2 May 2022 03:04:46 +0000 (UTC)
-Subject: Re: [PATCH v6 14/18] KVM: arm64: Support SDEI_EVENT_SIGNAL hypercall
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44B7040869CB;
+ Mon,  2 May 2022 03:05:44 +0000 (UTC)
+Subject: Re: [PATCH v6 15/18] KVM: arm64: Support SDEI_FEATURES hypercall
 To: Oliver Upton <oupton@google.com>
 References: <20220403153911.12332-1-gshan@redhat.com>
- <20220403153911.12332-15-gshan@redhat.com> <Ym2q2fUwPXNDcMjQ@google.com>
+ <20220403153911.12332-16-gshan@redhat.com> <Ym4uyaGGhPXlnkHQ@google.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <d4819173-ad19-94aa-443d-3428f68ad929@redhat.com>
-Date: Mon, 2 May 2022 11:04:44 +0800
+Message-ID: <9a522677-cfee-5a72-af27-8a401546ad14@redhat.com>
+Date: Mon, 2 May 2022 11:05:42 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <Ym2q2fUwPXNDcMjQ@google.com>
+In-Reply-To: <Ym4uyaGGhPXlnkHQ@google.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
  shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
  vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
@@ -88,56 +88,39 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Oliver,
 
-On 5/1/22 5:32 AM, Oliver Upton wrote:
-> On Sun, Apr 03, 2022 at 11:39:07PM +0800, Gavin Shan wrote:
->> This supports SDEI_EVENT_SIGNAL hypercall. It's used by guest
->> to inject event, whose number must be zero to the specified
->> vCPU. As the shared event isn't supported, calling vCPU is
->> assumed to be the target.
+On 5/1/22 2:55 PM, Oliver Upton wrote:
+> On Sun, Apr 03, 2022 at 11:39:08PM +0800, Gavin Shan wrote:
+>> This supports SDEI_FEATURES hypercall. It's used by guest to
+>> retrieve the supported features, which are number of slots for
+>> the interrupt binding events and relative mode for the event
+>> handler. Currently, none of them is supported.
 >>
 >> Signed-off-by: Gavin Shan <gshan@redhat.com>
 >> ---
->>   arch/arm64/kvm/sdei.c | 45 +++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 45 insertions(+)
+>>   arch/arm64/kvm/sdei.c | 20 ++++++++++++++++++++
+>>   1 file changed, 20 insertions(+)
 >>
 >> diff --git a/arch/arm64/kvm/sdei.c b/arch/arm64/kvm/sdei.c
->> index ebdbe7810cf0..e1f6ab9800ee 100644
+>> index e1f6ab9800ee..ab0b7b5e3191 100644
 >> --- a/arch/arm64/kvm/sdei.c
 >> +++ b/arch/arm64/kvm/sdei.c
->> @@ -455,6 +455,48 @@ static unsigned long hypercall_mask(struct kvm_vcpu *vcpu, bool mask)
+>> @@ -527,6 +527,23 @@ static unsigned long hypercall_reset(struct kvm_vcpu *vcpu, bool private)
 >>   	return ret;
 >>   }
 >>   
->> +static unsigned long hypercall_signal(struct kvm_vcpu *vcpu)
+>> +static unsigned long hypercall_features(struct kvm_vcpu *vcpu)
 >> +{
->> +	struct kvm_sdei_vcpu *vsdei = vcpu->arch.sdei;
->> +	struct kvm_sdei_event *event;
->> +	unsigned int num = smccc_get_arg(vcpu, 1);
->> +	unsigned long ret = SDEI_SUCCESS;
+>> +	unsigned long feature = smccc_get_arg(vcpu, 1);
+>> +	unsigned long ret;
 >> +
->> +	/*
->> +	 * The event must be the software signaled one, whose number
->> +	 * is zero.
->> +	 */
->> +	if (!kvm_sdei_is_sw_signaled(num)) {
->> +		ret = SDEI_INVALID_PARAMETERS;
->> +		goto out;
->> +	}
->> +
->> +	spin_lock(&vsdei->lock);
->> +
->> +	/* Check if the vcpu has been masked */
->> +	if (vsdei->masked) {
->> +		ret = SDEI_INVALID_PARAMETERS;
->> +		goto unlock;
->> +	}
+>> +	switch (feature) {
+>> +	case 0: /* BIND_SLOTS */
+>> +	case 1: /* RELATIVE_MODE */
 > 
-> You should still be able to signal an event if the vCPU is masked. Just
-> means the bit will rot in the pending bitmap until the vCPU is unmasked.
+> Can you create macros for these?
 > 
 
-Nice point! The event pending state is set if vCPU is masked. However,
-it's not becoming active until the vCPU is unmasked :)
+Surely I will do. Thanks for your review and comments :)
 
 Thanks,
 Gavin
