@@ -2,79 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DBCC433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 07:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD50C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 07:38:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C40614B0DE;
-	Mon,  2 May 2022 03:28:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C7DA849EF3;
+	Mon,  2 May 2022 03:38:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OGjGDhUFiGrR; Mon,  2 May 2022 03:28:42 -0400 (EDT)
+	with ESMTP id jYmgibzUZcQz; Mon,  2 May 2022 03:38:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 780FD4B12E;
-	Mon,  2 May 2022 03:28:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 983544B0D0;
+	Mon,  2 May 2022 03:38:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 26D024B0DE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:28:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C3FA49F05
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:38:37 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uPd6++a69h4p for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 May 2022 03:28:40 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 112E34B0D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:28:40 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1651476519;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EywQlrSHGmaFztkZ6nGxOyoDkOWNb3RCFHAorrh5itE=;
- b=MJxeX3beQJ4nOvpqkUxjulY8vIOjT9e2M1IaOREIG029aV6jToGaGoaF5tiNYAUx5hML2l
- bWJhpT4E0d4U9nnQkkiYa5xL2Z5lfU8WEZSx/oC+i7kX13maEN6isi8MnpbiaHTH3PyV26
- GMW3Oiet7xJIc1DWlnM13dllC+foFJU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-561-29NrMOZXMyqurb0Nic8wWA-1; Mon, 02 May 2022 03:28:34 -0400
-X-MC-Unique: 29NrMOZXMyqurb0Nic8wWA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
- [10.11.54.3])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2689F1014A67;
- Mon,  2 May 2022 07:28:34 +0000 (UTC)
-Received: from [10.72.12.86] (ovpn-12-86.pek2.redhat.com [10.72.12.86])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 19C92112D165;
- Mon,  2 May 2022 07:28:27 +0000 (UTC)
-Subject: Re: [PATCH v6 04/18] KVM: arm64: Support SDEI_EVENT_REGISTER hypercall
-To: Oliver Upton <oupton@google.com>
+ with ESMTP id DYPJ77t4UeR2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 May 2022 03:38:34 -0400 (EDT)
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com
+ [209.85.166.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D298C49EF3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:38:34 -0400 (EDT)
+Received: by mail-io1-f52.google.com with SMTP id f2so15018825ioh.7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 May 2022 00:38:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=GPkNxE2r6P0xG3q/R7zfqzTrygEF3DAcqbdmgZiq2s0=;
+ b=sCjuqeXJ9DCpoV1lQZ3M1xkzDHYEbWrrb+jsdTHqJB+kPx7YW+DS0fPHMMusOaTbBf
+ UwISChxKC4zWaO+uzfsdTxi9lOWf9OIgLc1PMUTvLrQ9T36aA1+Ey6n3dPew/979MJhs
+ KQflJzjLOIEmkUKeRMdbBeUcWVKeqG0DaybXe6oNqhLxvwSMmvEAVs+rcQw9n0OkOqqN
+ yUQ7o+/qUit8hGWFJfsmlowJWJIPyt/XqRZFjwidmDTYkt1lw/32UNLfB+gFPBvhn0jT
+ yTM/T2R4627TLJ4HSM+J4G63hU/xfkd45M62WWnyGObjL/s5dqrufqvVn/CDY4GGUjSx
+ wh3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=GPkNxE2r6P0xG3q/R7zfqzTrygEF3DAcqbdmgZiq2s0=;
+ b=ilFPSqYfw3lBRmDTovLEHKiPdCyHmv2BzPciMXXvERjD4K8RbeTQDaAPx7aE3sBS2I
+ Eh4mT4bYW7qjhTT9AbUAx1ieQ0g13BpSaVaSpPeEuLZgAUhwBQ+hW/ViKaShfZSH1Loi
+ F6gQCCpSG/ar8/vPftYb1CYW97WS0bdwwBHdBqYQw1GBnX9UhBNOjpQuHm+ArdctmKJ0
+ uCsLzRXTOXP19LNORR0iMBX8C+NpfmjJHACFVLs6uerai1CoTLfVcHOLqEa48wkGTuqR
+ 5u9ztucrF5yPoxgLGMZaoRinrosrxlSTmgH32x2G928ZlgXJQSHfcMkqB0ggmZ2NW48+
+ F2Qg==
+X-Gm-Message-State: AOAM530FkTUwQF02mTKUvNxH3NdLzwUpEfx0pWlIOdExW1jn1j3484uD
+ 4pjjnaHepnGsRMyQUASz+4gyYg==
+X-Google-Smtp-Source: ABdhPJyjhIe2znQiZB9jWAMBJcQm0B6Fv4anyhMrjJ5mNDxihDCEre28mU7PNuGJ+PLTTB3+fTcdGg==
+X-Received: by 2002:a05:6638:2494:b0:32b:4c44:aaf1 with SMTP id
+ x20-20020a056638249400b0032b4c44aaf1mr4447202jat.224.1651477113989; 
+ Mon, 02 May 2022 00:38:33 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ a10-20020a92330a000000b002cde6e352c8sm2507300ilf.18.2022.05.02.00.38.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 May 2022 00:38:33 -0700 (PDT)
+Date: Mon, 2 May 2022 07:38:29 +0000
+From: Oliver Upton <oupton@google.com>
+To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v6 13/18] KVM: arm64: Support
+ SDEI_EVENT_{COMPLETE,COMPLETE_AND_RESUME} hypercall
+Message-ID: <Ym+KdY2y2vzMeDOL@google.com>
 References: <20220403153911.12332-1-gshan@redhat.com>
- <20220403153911.12332-5-gshan@redhat.com> <Ym1Nsaq/ERUx/ebD@google.com>
- <6e7cb20d-24c4-b357-8830-a68ff05638fe@redhat.com>
- <Ym9TarUE6+lJ0izt@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <a6122234-907a-4ede-26fc-872c196c5912@redhat.com>
-Date: Mon, 2 May 2022 15:28:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ <20220403153911.12332-14-gshan@redhat.com>
+ <Ym4tzRL0iMxyumJe@google.com>
+ <ba094956-2e58-4913-527a-af79475ee949@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <Ym9TarUE6+lJ0izt@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+Content-Disposition: inline
+In-Reply-To: <ba094956-2e58-4913-527a-af79475ee949@redhat.com>
 Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
  shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
  vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -83,48 +89,54 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
-
-On 5/2/22 11:43 AM, Oliver Upton wrote:
-> On Mon, May 02, 2022 at 10:55:51AM +0800, Gavin Shan wrote:
->>>> +	unsigned long route_mode = smccc_get_arg(vcpu, 4);
->>>
->>> This is really 'flags'. route_mode is bit[0]. I imagine we don't want to
->>> support relative mode, so bit[1] is useless for us in that case too.
->>>
->>> The spec is somewhat imprecise on what happens for reserved flags. The
->>> prototype in section 5.1.2 of [1] suggests that reserved bits must be
->>> zero, but 5.1.2.3 'Client responsibilities' does not state that invalid
->>> flags result in an error.
->>>
->>> Arm TF certainly rejects unexpected flags [2].
->>>
->>> [1]: DEN0054C https://developer.arm.com/documentation/den0054/latest
->>> [2]: https://github.com/ARM-software/arm-trusted-firmware/blob/66c3906e4c32d675eb06bd081de8a3359f76b84c/services/std_svc/sdei/sdei_main.c#L260
->>>
->>
->> Yes, This chunk of code is still stick to old specification. Lets
->> improve in next respin:
->>
->>     - Rename @route_mode to @flags
->>     - Reject if the reserved bits are set.
->>     - Reject if relative mode (bit#1) is selected.
->>     - Reject if routing mode (bit#0) isn't RM_ANY (0).
+On Mon, May 02, 2022 at 02:19:30PM +0800, Gavin Shan wrote:
+> Hi Oliver,
 > 
-> Bit[0] is ignored for private events, actually. So we really just reject
-> if any of bit[63:1] are set.
+> On 5/1/22 2:50 PM, Oliver Upton wrote:
+> > On Sun, Apr 03, 2022 at 11:39:06PM +0800, Gavin Shan wrote:
+> > > This supports SDEI_EVENT_{COMPLETE, COMPLETE_AND_RESUME} hypercall.
+> > > They are used by guest to notify the completion of event in its
+> > > handler. The previously interrupted or preempted context is restored
+> > > like below.
+> > > 
+> > >     * x0 - x17, PC and PState are restored to what values we had in
+> > >       the interrupted or preempted context.
+> > > 
+> > >     * If it's SDEI_EVENT_COMPLETE_AND_RESUME hypercall, IRQ exception
+> > >       is injected.
+> > 
+> > I don't think that's how COMPLETE_AND_RESUME works. The caller specifies an
+> > address at which it would like to begin execution within the client
+> > exception level.
+> > 
+> > SDEI spec suggests this behaves like a synchronous exception. DEN 0054C
+> > 5.2.2 'Event Resume Context' speaks more about how it is supposed to
+> > work.
+> > 
 > 
+> It's actually the linux convention. If the event handler, which was
+> specified in previous hypercall to EVENT_REGISTER, returns success,
+> the (linux) client calls into COMPLETE_AND_RESUME and the resume
+> address is specified with FIQ vector offset. More details can be
+> found from arch/arm64/kernel::sdei.c::do_sdei_event().
 
-It makes sense to me. Thanks for your confirm :)
+Right -- but look at what its doing. It returns the address at which it
+wants to resume execution.
 
+arch/arm64/kernel.entry.S::__sdei_asm_handler winds up passing this as
+an argument to COMPLETE_AND_RESUME. Also, what would happen if we run
+something that isn't Linux inside of KVM? This is why I suggested
+implementing COMPLETE_AND_RESUME in line with the specification, not
+based on what the kernel is presently doing.
+
+--
 Thanks,
-Gavin
-
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
