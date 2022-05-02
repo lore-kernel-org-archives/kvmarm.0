@@ -2,79 +2,72 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33956C433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 07:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DBCC433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 07:28:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B02834B14C;
-	Mon,  2 May 2022 03:26:02 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C40614B0DE;
+	Mon,  2 May 2022 03:28:43 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id oimbPEdYvgH6; Mon,  2 May 2022 03:26:01 -0400 (EDT)
+	with ESMTP id OGjGDhUFiGrR; Mon,  2 May 2022 03:28:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 021AF4B0DE;
-	Mon,  2 May 2022 03:26:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 780FD4B12E;
+	Mon,  2 May 2022 03:28:42 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1E324B0DE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:25:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26D024B0DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:28:41 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G7cmXLDWcZQc for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 May 2022 03:25:57 -0400 (EDT)
+ with ESMTP id uPd6++a69h4p for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 May 2022 03:28:40 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EC6B4B0D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:25:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 112E34B0D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:28:40 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1651476356;
+ s=mimecast20190719; t=1651476519;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WQiIsUIyn8Y6BpyeDFKijqoXHSq8EzeA4ooMIOtNlRk=;
- b=Srf1sOSUA6Z4HDoOGapaCWDombtml+iIUSw8+eqgXUr6rnpstrK5WmRjJYCQLxY1fOJsE1
- +h7FQBp7JFgjGpYEH3ltw3kh2pBR3xpbNLf81psdMk0HB5z1kxF+Ao1Uz6cJTPGOdm46hM
- K+YesMhCzCxsuaW3YKaqIJHM3zU3Juo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ bh=EywQlrSHGmaFztkZ6nGxOyoDkOWNb3RCFHAorrh5itE=;
+ b=MJxeX3beQJ4nOvpqkUxjulY8vIOjT9e2M1IaOREIG029aV6jToGaGoaF5tiNYAUx5hML2l
+ bWJhpT4E0d4U9nnQkkiYa5xL2Z5lfU8WEZSx/oC+i7kX13maEN6isi8MnpbiaHTH3PyV26
+ GMW3Oiet7xJIc1DWlnM13dllC+foFJU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-261-CKbFpMLbPBab97z5D1flNw-1; Mon, 02 May 2022 03:25:50 -0400
-X-MC-Unique: CKbFpMLbPBab97z5D1flNw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com
- [10.11.54.7])
+ us-mta-561-29NrMOZXMyqurb0Nic8wWA-1; Mon, 02 May 2022 03:28:34 -0400
+X-MC-Unique: 29NrMOZXMyqurb0Nic8wWA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+ [10.11.54.3])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1FFD229AB3FF;
- Mon,  2 May 2022 07:25:50 +0000 (UTC)
+ by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2689F1014A67;
+ Mon,  2 May 2022 07:28:34 +0000 (UTC)
 Received: from [10.72.12.86] (ovpn-12-86.pek2.redhat.com [10.72.12.86])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 03E291460E5A;
- Mon,  2 May 2022 07:25:43 +0000 (UTC)
-Subject: Re: [PATCH v6 03/18] KVM: arm64: Add SDEI virtualization
- infrastructure
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 19C92112D165;
+ Mon,  2 May 2022 07:28:27 +0000 (UTC)
+Subject: Re: [PATCH v6 04/18] KVM: arm64: Support SDEI_EVENT_REGISTER hypercall
 To: Oliver Upton <oupton@google.com>
 References: <20220403153911.12332-1-gshan@redhat.com>
- <20220403153911.12332-4-gshan@redhat.com> <YmMiyt/TDjJt0mdG@google.com>
- <36899ea9-e8bd-27b2-8dfb-75b76eab50d7@redhat.com>
- <YmRI7Bh7fWCYLUGT@google.com>
- <0e26da1a-00bb-3d63-a8bf-6cd3271b0a38@redhat.com>
- <Ymr45B+8xTlhi7vk@google.com>
- <96711526-c4f3-3b50-c015-beba8cc9fcc9@redhat.com>
- <Ym1EztjkJIHrg4Qz@google.com>
- <62f06a03-d6fc-3803-a2d2-7a85cf733459@redhat.com>
- <Ym9So9YariC0M7Zu@google.com>
+ <20220403153911.12332-5-gshan@redhat.com> <Ym1Nsaq/ERUx/ebD@google.com>
+ <6e7cb20d-24c4-b357-8830-a68ff05638fe@redhat.com>
+ <Ym9TarUE6+lJ0izt@google.com>
 From: Gavin Shan <gshan@redhat.com>
-Message-ID: <2d631426-17fd-e7e3-5c62-eda547732bb7@redhat.com>
-Date: Mon, 2 May 2022 15:25:40 +0800
+Message-ID: <a6122234-907a-4ede-26fc-872c196c5912@redhat.com>
+Date: Mon, 2 May 2022 15:28:24 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <Ym9So9YariC0M7Zu@google.com>
+In-Reply-To: <Ym9TarUE6+lJ0izt@google.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
  shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
  vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
@@ -97,257 +90,37 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 Hi Oliver,
 
-On 5/2/22 11:40 AM, Oliver Upton wrote:
-> On Mon, May 02, 2022 at 10:35:08AM +0800, Gavin Shan wrote:
->> On 4/30/22 10:16 PM, Oliver Upton wrote:
->>> On Sat, Apr 30, 2022 at 07:38:29PM +0800, Gavin Shan wrote:
->>>> Thank you for the comments and details. It should work by using bitmaps
->>>> to represent event's states. I will adopt your proposed structs in next
->>>> respin. However, there are more states needed. So I would adjust
->>>> "struct kvm_sdei_vcpu" like below in next respin.
->>>>
->>>>       struct kvm_sdei_vcpu {
->>>>           unsigned long registered;    /* the event is registered or not                 */
->>>>           unsigned long enabled;       /* the event is enabled or not                    */
->>>>           unsigned long unregistering; /* the event is pending for unregistration        */
+On 5/2/22 11:43 AM, Oliver Upton wrote:
+> On Mon, May 02, 2022 at 10:55:51AM +0800, Gavin Shan wrote:
+>>>> +	unsigned long route_mode = smccc_get_arg(vcpu, 4);
 >>>
->>> I'm not following why we need to keep track of the 'pending unregister'
->>> state directly. Is it not possible to infer from (active && !registered)?
+>>> This is really 'flags'. route_mode is bit[0]. I imagine we don't want to
+>>> support relative mode, so bit[1] is useless for us in that case too.
+>>>
+>>> The spec is somewhat imprecise on what happens for reserved flags. The
+>>> prototype in section 5.1.2 of [1] suggests that reserved bits must be
+>>> zero, but 5.1.2.3 'Client responsibilities' does not state that invalid
+>>> flags result in an error.
+>>>
+>>> Arm TF certainly rejects unexpected flags [2].
+>>>
+>>> [1]: DEN0054C https://developer.arm.com/documentation/den0054/latest
+>>> [2]: https://github.com/ARM-software/arm-trusted-firmware/blob/66c3906e4c32d675eb06bd081de8a3359f76b84c/services/std_svc/sdei/sdei_main.c#L260
 >>>
 >>
->> The event can be unregistered and reseted through hypercalls when it's
->> being handled. In this case, the unregistration for the event can't
->> be done immediately and has to be delayed until the handling is finished.
->> The unregistration pending state is used in this case. Yes, it's
->> correct we also can use (active & !registered) to represent the state.
+>> Yes, This chunk of code is still stick to old specification. Lets
+>> improve in next respin:
+>>
+>>     - Rename @route_mode to @flags
+>>     - Reject if the reserved bits are set.
+>>     - Reject if relative mode (bit#1) is selected.
+>>     - Reject if routing mode (bit#0) isn't RM_ANY (0).
 > 
-> I don't believe there is any delay in the unregistration of an event.
-> The state is only meant to imply that the handler must complete before
-> software can re-register for the event.
-> 
-> The event state machine from 6.1 can be encoded using 3 bits, which is
-> exactly what we see in Table 13 of DEN0054C.
-> 
-> I'm sorry for being pedantic, but avoiding duplication of state reduces
-> the chance of bugs + makes things a bit easier to reason about.
+> Bit[0] is ignored for private events, actually. So we really just reject
+> if any of bit[63:1] are set.
 > 
 
- From section 6.1 and table 13 in DEN0054C, it's true there are just 3-bits
-for the event states: reigstered/unregistered, enabled/disabled, running/not_running.
-The unregistration-pending state is somewhat related to implementation, similar
-to the pending state we have. The unregistration-pending state isn't explicitly
-defined by the specification. However, the state is implicitly stated by the
-specification. For example, there are statements about it in section 5.1.18
-and 5.1.18.2:
-
-    It is expected that no private event handlers would have the event
-    handler property handler-running set to TRUE. If an event handler
-    is running, unregister will be pending until the event is completed.
-
-Oliver, how about to adjust struct kvm_sdei_vcpu like below. With the
-changes, struct kvm_sdei_vcpu::unregistering is dropped, to match with
-the specification strictly.
-
-    struct kvm_sdei_vcpu {
-        unsigned long registered;
-        unsigned long enabled;
-        unsigned long running;        // renamed from 'active' to match the specification strictly
-        unsigned long pending;        // event pending for delivery
-           :
-    };
-
-    state                          @registered  @enabled  @running  @pending
-    --------------------------------------------------------------------------------
-    unregistered                   0            0         0/1       0
-    registered-disabled            1            0         0         0/1
-    registered-enabled             1            1         0/1       0/1
-    handler-running                0/1          0/1       1         0/1
-
-We can use the specific encoding to represent the unregistration-pending.
-
-    state                          @registered  @enabled  @running  @pending
-    -------------------------------------------------------------------------
-    handler-running                0            0          1        0
-
-Thanks for your valuable comments, Oliver. I'm not starting to work on
-v7 yet. I also would like to make everything clear before that. In that
-case, it will be easier for you to review next revision :)
-
->>>>           unsigned long pending;       /* the event is pending for delivery and handling */
->>>>           unsigned long active;        /* the event is currently being handled           */
->>>>
->>>>           :
->>>>           <this part is just like what you suggested>
->>>>       };
->>>>
->>>> I rename @pending to @unregister. Besides, there are two states added:
->>>>
->>>>      @pending: Indicate there has one event has been injected. The next step
->>>>                for the event is to deliver it for handling. For one particular
->>>>                event, we allow one pending event in the maximum.
->>>
->>> Right, if an event retriggers when it is pending we still dispatch a
->>> single event to the guest. And since we're only doing normal priority
->>> events, it is entirely implementation defined which gets dispatched
->>> first.
->>>
->>
->> Yep, we will simply rely on find_first_bit() for the priority. It means
->> the software signaled event, whose number is zero, will have the highest
->> priority.
->>
->>>>      @active:  Indicate the event is currently being handled. The information
->>>>                stored in 'struct kvm_sdei_event_context' instance can be
->>>>                correlated with the event.
->>>
->>> Does this need to be a bitmap though? We can't ever have more than one
->>> SDEI event active at a time since this is private to a vCPU.
->>>
->>
->> Yes, one event is active at most on one particular vCPU. So tt don't
->> have to be a bitmap necessarily. The reason I proposed to use bitmap
->> for this state is to having all (event) states represented by bitmaps.
->> In this way, all states are managed in a unified fashion. The alternative
->> way is to have "unsigned long active_event", which traces the active
->> event number. It also consumes 8-bytes when live migration is concerned.
->> So I prefer a bitmap :)
->>
-> 
-> The small benefit of using the event number is that we can address all
-> events in 8 bytes, whereas we'd need to extend the bitmap for >64
-> events. I suppose we'll run into that issue either way, since the
-> pending, registered, and enabled portions are also bitmaps.
-> 
-> When live migration is in scope we should probably bark at userspace if
-> it attempts to set more than a single bit in the register.
-> 
-
-Even it's unlikely to support the shared event, bitmap will help in that
-case. I'm not sure about other VMM, the pseudo firmware registers are
-almost transparent to user space in QEMU. They're accessed and no one
-cares the values reading from and writing to these registers in QEMU ;-)
-
-Please refer to the above reply for more details :)
-
->>>> Furthermore, it's fair enough to put the (vcpu) mask state into 'flags'
->>>> field of struct kvm_vcpu_arch :)
->>>
->>> I think you can get away with putting active in there too, I don't see
->>> why we need more than a single bit for this info.
->>>
->>
->> Not really. We just need one single bit for vCPU's mask state. We need
->> multiple bits for event's active state, depending on how many events are
->> supported. We need to know which event is currently active at least.
->> For now, there are only two supported events (0/1), but one single bit
->> is still not enough because there are 3 states: (1) software signaled
->> event is active. (2) async pf event is active. (3) none of them is
->> active.
->>
->> Lets use a bitmap for the event active state as I said above, if you
->> don't strongly object :)
->>
->>>>>>>>> Do we need this if we disallow nesting events?
->>>>>>>>>
->>>>>>>>
->>>>>>>> Yes, we need this. "event == NULL" is used as indication of invalid
->>>>>>>> context. @event is the associated SDEI event when the context is
->>>>>>>> valid.
->>>>>>>
->>>>>>> What if we use some other plumbing to indicate the state of the vCPU? MP
->>>>>>> state comes to mind, for example.
->>>>>>>
->>>>>>
->>>>>> Even the indication is done by another state, kvm_sdei_vcpu_context still
->>>>>> need to be linked (associated) with the event. After the vCPU context becomes
->>>>>> valid after the event is delivered, we still need to know the associated
->>>>>> event when some of hypercalls are triggered. SDEI_1_0_FN_SDEI_EVENT_COMPLETE
->>>>>> is one of the examples, we need to decrease struct kvm_sdei_event::event_count
->>>>>> for the hypercall.
->>>>>
->>>>> Why do we need to keep track of how many times an event has been
->>>>> signaled? Nothing in SDEI seems to suggest that the number of event
->>>>> signals corresponds to the number of times the handler is invoked. In
->>>>> fact, the documentation on SDEI_EVENT_SIGNAL corroborates this:
->>>>>
->>>>> """
->>>>> The event has edgetriggered semantics and the number of event signals
->>>>> may not correspond to the number of times the handler is invoked in the
->>>>> target PE.
->>>>> """
->>>>>
->>>>> DEN0054C 5.1.16.1
->>>>>
->>>>> So perhaps we queue at most 1 pending event for the guest.
->>>>>
->>>>> I'd also like to see if anyone else has thoughts on the topic, as I'd
->>>>> hate for you to go back to the whiteboard again in the next spin.
->>>>>
->>>>
->>>> Agreed. In next respin, we will have one pending event at most. Error
->>>> can be returned if user attempts to inject event whose pending state
->>>> (struct kvm_sdei_vcpu::pending) has been set.
->>>
->>> I don't believe we can do that. The SDEI_EVENT_SIGNAL call should succeed,
->>> even if the event was already pending.
->>>
->>
->> I rethinking it a bit. Yes, you're correct. In this specific case, the
->> event handler is running for multiple events.
->>
->>>> Indeed, the hardest part is to determine the data structures and
->>>> functions we need. Oliver, your valuable comments are helping to
->>>> bring this series to the right track. However, I do think it's
->>>> helpful if somebody else can confirm the outcomes from the previous
->>>> discussions. I'm not sure if Marc has time for a quick scan and provide
->>>> comments.
->>>>
->>>> I would summarize the outcomes from our discussions, to help Marc
->>>> or others to confirm:
->>>
->>> Going to take a look at some of your later patches as well, just a heads
->>> up.
->>>
->>
->> Yep, thanks again for your valuable comments :)
->>
->>>> - Drop support for the shared event.
->>>> - Dropsupport for the critical event.
->>>> - The events in the implementations are all private and can be signaled
->>>>     (raised) by software.
->>>> - Drop migration support for now, and we will consider it using
->>>>     pseudo firmware registers. So add-on patches are expected to support
->>>>     the migration in future.
->>>
->>> Migration will be supported in a future spin of this series, not a
->>> subsequent one right? :) I had just made the suggestion because there was
->>> a lot of renovations that we were discussing.
->>>
->>
->> I prefer a separate series to support migration after this series gets
->> merged. There are couple of reasons to do so: (1) The migration depends
->> on Raghavendra's series to support for hypercall services selection.
->> The series is close to be merged, but not happen yet. The SDEI is one
->> of the hypercall services at least. SDEI's pseudo firmware registers
->> for migration will be managed by the infrastructure. (2) I would focus
->> on the core functinality for now. In this way, we give migration space.
->> For example, the data structures needs sorts of adjustments for migration,
->> just in case.
-> 
-> Although merging this series w/o support for LM would mean that a guest
-> using SDEI could potentially explode when migrated, right? We can't
-> break it to implement something else.
-> 
-
-Yes. I even had the code for migration for v6, which is really coarse and
-needs to be polished. If two VMs are mismatched in terms of SDEI support,
-the migration fails. With Raghavendra's series to support for hypercall
-services selection, we can make SDEI migration opt-in to some extent at
-least. For example, the migration from where SDEI isn't supported to
-the destination VM where SDEI is supported. It's helping people to finish
-forwards upgrade.
-
-    git@github.com:gwshan/linux.git  (branch: kvm/arm64_sdei)
+It makes sense to me. Thanks for your confirm :)
 
 Thanks,
 Gavin
