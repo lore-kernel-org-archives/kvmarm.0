@@ -2,78 +2,90 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2EEC433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 06:20:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A49C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 07:24:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E081A49EF1;
-	Mon,  2 May 2022 02:20:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9889D4B12E;
+	Mon,  2 May 2022 03:24:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mgfGUqfmZSOA; Mon,  2 May 2022 02:20:09 -0400 (EDT)
+	with ESMTP id UvznTFmT9YZX; Mon,  2 May 2022 03:24:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 98A7249EF2;
-	Mon,  2 May 2022 02:20:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D92149EFF;
+	Mon,  2 May 2022 03:24:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7830D49EEF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 02:20:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 70661410F7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:24:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aNX1X+wM7lzj for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 May 2022 02:20:07 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.133.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4480649EED
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 02:20:07 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1651472406;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cZZThdhRROTvuVV09GGb7zDPJE/vDXcJufVUbNP+IP0=;
- b=fJl+FqFZ/sPUOj04Vaga9AYwmhXMUkMXS2VXIrvMSRllaCcJDyoT4nM+NKa+9FW1JIZLEV
- 49zPE68m+fam0Qdzr2/cl8sXQ6NJrP236MW1j5q04M6bi3WttT46PlJpDIie197KyjXCGJ
- 0bKRpCJeUF8X0UC0jCy+uiN8MMOtqVU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-286-SkRvhGPvPaG0-OP_rM3sNA-1; Mon, 02 May 2022 02:19:40 -0400
-X-MC-Unique: SkRvhGPvPaG0-OP_rM3sNA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com
- [10.11.54.8])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0A287866DF4;
- Mon,  2 May 2022 06:19:40 +0000 (UTC)
-Received: from [10.72.12.86] (ovpn-12-86.pek2.redhat.com [10.72.12.86])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 341C6C27E91;
- Mon,  2 May 2022 06:19:33 +0000 (UTC)
-Subject: Re: [PATCH v6 13/18] KVM: arm64: Support
- SDEI_EVENT_{COMPLETE,COMPLETE_AND_RESUME} hypercall
-To: Oliver Upton <oupton@google.com>
-References: <20220403153911.12332-1-gshan@redhat.com>
- <20220403153911.12332-14-gshan@redhat.com> <Ym4tzRL0iMxyumJe@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <ba094956-2e58-4913-527a-af79475ee949@redhat.com>
-Date: Mon, 2 May 2022 14:19:30 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ with ESMTP id 3sslJCe71qjB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 May 2022 03:24:33 -0400 (EDT)
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com
+ [209.85.166.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 377FD40AFA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 03:24:33 -0400 (EDT)
+Received: by mail-io1-f43.google.com with SMTP id r27so10342614iot.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 May 2022 00:24:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=U3yK116U7QtcL5LqxzCgKsq8iaHrCKZT63ym/sXbAKc=;
+ b=Bzi+R0R7QaC+1bjX2bo/eUhZOcarNK1lhHQK3BnkDNsZ/YQ2kF65HgubGNE1g9QjAF
+ VClt8yFpYSC5oht9s5BVdGzylLx1SGefdWn/yZSkP43v9ZQ/U115ldRP4mIaned4xy+i
+ XIOYoMJFeLcWOEhr5AxcXnBEpdEmwdLfO6uO7xJ6U4GX4NaQbgjWU8WH2H/DzUzqOLnG
+ Y07pCf3IIYshAUYH77brXREcB5+CeW72v1d84nST1hyzetu4eMbN4GXW/ybvmO2gKA4z
+ 6cXwi4THka5cWO2I5lnhUndPk6YD5GJn9zIhAtE8MWZojqFyir63YUwehSgoAGHPtqPb
+ sMAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=U3yK116U7QtcL5LqxzCgKsq8iaHrCKZT63ym/sXbAKc=;
+ b=gR6r1YBjBKIlIKxPWrXITOtf4HgqFhvLO2RZ1/QpdzTl3tZhwnLyhjJIuTAtmt2ILS
+ EaXWLZtrg4u+6+Ll+XsjJNdDE+q/8uRQyiMwx7U7ngpJybQTy8w9w65XBHOmvvNt2tp5
+ kXAlUSOUacRjw5w5qQMTe8y+zxY3Z2fIUrBAVBoanOM+0rscCFa1Dp3L6ZEcJ42LsTR+
+ iq3hxEDMcpSyJ1fcM2ZscRUCpYBsqEGBXTn4Wxl9s+EQWEykdvoX6ehRy/TnclOPdvkP
+ SP6cr4P9MEWdw3qLflryTrEk4RSdjvzz1ELooCEE+o67mxudBn3JOxlZawpPIZeAHtnt
+ xg4Q==
+X-Gm-Message-State: AOAM533tkjIPbGdNJEo1DM+monYBz1FKRPPwwpd4zYEufNJswjJQFCx3
+ Qe33NcoIZQxxO7Y0/uOHK/B0Gw==
+X-Google-Smtp-Source: ABdhPJxeI2hWA90VpSmXaKqPppDo5J6dwWDCrTz4glAq2DiVVqCq9f3COwPcysvhW/KDXqg9MvY5ZQ==
+X-Received: by 2002:a05:6638:2643:b0:323:c3e3:fcec with SMTP id
+ n3-20020a056638264300b00323c3e3fcecmr4517508jat.289.1651476272267; 
+ Mon, 02 May 2022 00:24:32 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ z7-20020a926507000000b002cde6e352e5sm2494262ilb.47.2022.05.02.00.24.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 May 2022 00:24:31 -0700 (PDT)
+Date: Mon, 2 May 2022 07:24:28 +0000
+From: Oliver Upton <oupton@google.com>
+To: Yosry Ahmed <yosryahmed@google.com>
+Subject: Re: [PATCH v4 4/4] KVM: arm64/mmu: count KVM s2 mmu usage in
+ secondary pagetable stats
+Message-ID: <Ym+HLD/U0wwrxtaB@google.com>
+References: <20220429201131.3397875-1-yosryahmed@google.com>
+ <20220429201131.3397875-5-yosryahmed@google.com>
 MIME-Version: 1.0
-In-Reply-To: <Ym4tzRL0iMxyumJe@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Disposition: inline
+In-Reply-To: <20220429201131.3397875-5-yosryahmed@google.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
+ linux-mm@kvack.org, Zefan Li <lizefan.x@bytedance.com>,
+ kvmarm@lists.cs.columbia.edu, Marc Zyngier <maz@kernel.org>,
+ Joerg Roedel <joro@8bytes.org>, Shakeel Butt <shakeelb@google.com>,
+ cgroups@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ linux-kernel@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
+ Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -82,44 +94,45 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
+Hi Yosry,
 
-On 5/1/22 2:50 PM, Oliver Upton wrote:
-> On Sun, Apr 03, 2022 at 11:39:06PM +0800, Gavin Shan wrote:
->> This supports SDEI_EVENT_{COMPLETE, COMPLETE_AND_RESUME} hypercall.
->> They are used by guest to notify the completion of event in its
->> handler. The previously interrupted or preempted context is restored
->> like below.
->>
->>     * x0 - x17, PC and PState are restored to what values we had in
->>       the interrupted or preempted context.
->>
->>     * If it's SDEI_EVENT_COMPLETE_AND_RESUME hypercall, IRQ exception
->>       is injected.
+On Fri, Apr 29, 2022 at 08:11:31PM +0000, Yosry Ahmed wrote:
+> Count the pages used by KVM in arm64 for stage2 mmu in secondary pagetable
+> stats.
 > 
-> I don't think that's how COMPLETE_AND_RESUME works. The caller specifies an
-> address at which it would like to begin execution within the client
-> exception level.
+> Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 35 +++++++++++++++++++++++++++++++----
+>  1 file changed, 31 insertions(+), 4 deletions(-)
 > 
-> SDEI spec suggests this behaves like a synchronous exception. DEN 0054C
-> 5.2.2 'Event Resume Context' speaks more about how it is supposed to
-> work.
-> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 53ae2c0640bc..fc5030307cce 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -92,9 +92,13 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+>  static void *stage2_memcache_zalloc_page(void *arg)
+>  {
+>  	struct kvm_mmu_memory_cache *mc = arg;
+> +	void *virt;
+>  
+>  	/* Allocated with __GFP_ZERO, so no need to zero */
+> -	return kvm_mmu_memory_cache_alloc(mc);
+> +	virt = kvm_mmu_memory_cache_alloc(mc);
+> +	if (virt)
+> +		kvm_account_pgtable_pages(virt, +1);
 
-It's actually the linux convention. If the event handler, which was
-specified in previous hypercall to EVENT_REGISTER, returns success,
-the (linux) client calls into COMPLETE_AND_RESUME and the resume
-address is specified with FIQ vector offset. More details can be
-found from arch/arm64/kernel::sdei.c::do_sdei_event().
+Sorry I didn't say it last time around, would now be a good time to
+clean up the funky sign convention of kvm_mod_used_mmu_pages()? Or limit
+the funk to just x86 :)
 
+--
 Thanks,
-Gavin
-
+Oliver
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
