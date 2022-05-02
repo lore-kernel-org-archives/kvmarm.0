@@ -2,87 +2,94 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8DFC433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 08:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F75C433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  2 May 2022 09:48:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CB364B1F7;
-	Mon,  2 May 2022 04:24:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 262A14B278;
+	Mon,  2 May 2022 05:48:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@redhat.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id leYmvzjlreHb; Mon,  2 May 2022 04:24:04 -0400 (EDT)
+	with ESMTP id 8gcR7tyiBv6K; Mon,  2 May 2022 05:48:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3331449EF6;
-	Mon,  2 May 2022 04:24:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DA3064B12C;
+	Mon,  2 May 2022 05:48:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F2BA49EF6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 04:24:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD1084B09C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 05:48:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zD7bwdx424xV for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 May 2022 04:24:01 -0400 (EDT)
-Received: from us-smtp-delivery-124.mimecast.com
- (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5996F49EF0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 04:24:01 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1651479840;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bFjPQJ4gs0bSHs76Svu0ngyI6tX2L+HSW5bxHt+dBUk=;
- b=ar3DGrZcGF2KUoBrGJTsy6YuQ/Rjmw9p4oIQtz0b6ekG51tWGspGVbB4Z+AJX4UjFAsUBW
- xBJhbPtvSt3ilwFSupmdt16zfisHe2kB91H5EaCLAA00iB42+Yp3V0yFX5/jBkb1Zyu6iG
- ItZpPr/Or+rLcGu9Pt2B+yCzREP2qSU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-629-42pL4FRSMGWZ-kxRO2QG-Q-1; Mon, 02 May 2022 04:23:55 -0400
-X-MC-Unique: 42pL4FRSMGWZ-kxRO2QG-Q-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com
- [10.11.54.10])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ with ESMTP id 6kHQaTL0dzFi for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 May 2022 05:48:30 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 72F794B099
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 05:48:30 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4330985A5A8;
- Mon,  2 May 2022 08:23:55 +0000 (UTC)
-Received: from [10.72.12.86] (ovpn-12-86.pek2.redhat.com [10.72.12.86])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BDA4416146;
- Mon,  2 May 2022 08:23:48 +0000 (UTC)
-Subject: Re: [PATCH v6 03/18] KVM: arm64: Add SDEI virtualization
- infrastructure
+ by ams.source.kernel.org (Postfix) with ESMTPS id 6211DB815C8;
+ Mon,  2 May 2022 09:48:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE57CC385A4;
+ Mon,  2 May 2022 09:48:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651484907;
+ bh=km8t5GpWZMuY8sFBom7Ai4dq7ayaMW+RDKrREB38Qpw=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=dBpvmz6sEN1MJSCG6kftcwf2X41LKcoSP+2cvL+Mu7aaUuifXIn2IzlCzjSlKhIBn
+ mGw6RHBuQhmpr6g9XCDrg7a5LrfailJ/55TjXnF0zMiXKdcFyrgY1K7g445sPce5L8
+ oMqDksVZbBO2MK43HzGadn8kLatdYQVxmDgu5X0E45DWFURQATkuzFSyYfj0nAAYOu
+ NFzKof5QKEpKbVfPAbMrjyO9EGWXQS6nO+WnqUbBQCu6Mpb+O1VxYF5bC6P6nS6oZr
+ JpJlAIognaEJvVN0T9GVOhGfuEZHtJOTLtEntvW6vfDMlw7BTGjHAg/mN2w3ftJty/
+ rSxiqU4ncTzfw==
+Received: from sofa.misterjones.org ([185.219.108.64]
+ helo=wait-a-minute.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nlSfI-008O7L-OG; Mon, 02 May 2022 10:48:24 +0100
+Date: Mon, 02 May 2022 10:49:05 +0100
+Message-ID: <87k0b4i7se.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oupton@google.com>
-References: <YmMiyt/TDjJt0mdG@google.com>
- <36899ea9-e8bd-27b2-8dfb-75b76eab50d7@redhat.com>
- <YmRI7Bh7fWCYLUGT@google.com>
- <0e26da1a-00bb-3d63-a8bf-6cd3271b0a38@redhat.com>
- <Ymr45B+8xTlhi7vk@google.com>
- <96711526-c4f3-3b50-c015-beba8cc9fcc9@redhat.com>
- <Ym1EztjkJIHrg4Qz@google.com>
- <62f06a03-d6fc-3803-a2d2-7a85cf733459@redhat.com>
- <Ym9So9YariC0M7Zu@google.com>
- <2d631426-17fd-e7e3-5c62-eda547732bb7@redhat.com>
- <Ym+O+JLU5e9NUs39@google.com>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <a5b81935-50e6-72c5-58bc-bf591f9b826e@redhat.com>
-Date: Mon, 2 May 2022 16:23:45 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <Ym+O+JLU5e9NUs39@google.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
-Cc: maz@kernel.org, linux-kernel@vger.kernel.org, eauger@redhat.com,
- shan.gavin@gmail.com, Jonathan.Cameron@huawei.com, pbonzini@redhat.com,
- vkuznets@redhat.com, will@kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH v4 4/4] KVM: arm64/mmu: count KVM s2 mmu usage in
+ secondary pagetable stats
+In-Reply-To: <Ym+HLD/U0wwrxtaB@google.com>
+References: <20220429201131.3397875-1-yosryahmed@google.com>
+ <20220429201131.3397875-5-yosryahmed@google.com>
+ <Ym+HLD/U0wwrxtaB@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, yosryahmed@google.com, tj@kernel.org,
+ hannes@cmpxchg.org, lizefan.x@bytedance.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+ jmattson@google.com, joro@8bytes.org, akpm@linux-foundation.org,
+ mhocko@kernel.org, roman.gushchin@linux.dev, shakeelb@google.com,
+ cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, linux-mm@kvack.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+ Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
+ Yosry Ahmed <yosryahmed@google.com>, linux-mm@kvack.org,
+ Zefan Li <lizefan.x@bytedance.com>, kvmarm@lists.cs.columbia.edu,
+ Joerg Roedel <joro@8bytes.org>, Shakeel Butt <shakeelb@google.com>,
+ cgroups@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
+ linux-kernel@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>,
+ Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
-Reply-To: Gavin Shan <gshan@redhat.com>
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -91,123 +98,52 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
-
-On 5/2/22 3:57 PM, Oliver Upton wrote:
-> On Mon, May 02, 2022 at 03:25:40PM +0800, Gavin Shan wrote:
->> Oliver, how about to adjust struct kvm_sdei_vcpu like below. With the
->> changes, struct kvm_sdei_vcpu::unregistering is dropped, to match with
->> the specification strictly.
->>
->>     struct kvm_sdei_vcpu {
->>         unsigned long registered;
->>         unsigned long enabled;
->>         unsigned long running;        // renamed from 'active' to match the specification strictly
->>         unsigned long pending;        // event pending for delivery
->>            :
->>     };
->>
->>     state                          @registered  @enabled  @running  @pending
->>     --------------------------------------------------------------------------------
->>     unregistered                   0            0         0/1       0
->>     registered-disabled            1            0         0         0/1
->>     registered-enabled             1            1         0/1       0/1
->>     handler-running                0/1          0/1       1         0/1
->>
->> We can use the specific encoding to represent the unregistration-pending.
->>
->>     state                          @registered  @enabled  @running  @pending
->>     -------------------------------------------------------------------------
->>     handler-running                0            0          1        0
+On Mon, 02 May 2022 08:24:28 +0100,
+Oliver Upton <oupton@google.com> wrote:
 > 
-> Right, this is what I had in mind. This encodes the
-> 'handler-unregister-pending' state.
+> Hi Yosry,
 > 
-
-Cool, Thanks for your confirm. I think we're on same page for the
-data structures now. With this, I'm able to start working on next
-revision. Oliver, I'm sorry for taking you too much time to reach
-to the point :)
-
->> Thanks for your valuable comments, Oliver. I'm not starting to work on
->> v7 yet. I also would like to make everything clear before that. In that
->> case, it will be easier for you to review next revision :)
->>
->>>>>>            unsigned long pending;       /* the event is pending for delivery and handling */
->>>>>>            unsigned long active;        /* the event is currently being handled           */
->>>>>>
->>>>>>            :
->>>>>>            <this part is just like what you suggested>
->>>>>>        };
->>>>>>
->>>>>> I rename @pending to @unregister. Besides, there are two states added:
->>>>>>
->>>>>>       @pending: Indicate there has one event has been injected. The next step
->>>>>>                 for the event is to deliver it for handling. For one particular
->>>>>>                 event, we allow one pending event in the maximum.
->>>>>
->>>>> Right, if an event retriggers when it is pending we still dispatch a
->>>>> single event to the guest. And since we're only doing normal priority
->>>>> events, it is entirely implementation defined which gets dispatched
->>>>> first.
->>>>>
->>>>
->>>> Yep, we will simply rely on find_first_bit() for the priority. It means
->>>> the software signaled event, whose number is zero, will have the highest
->>>> priority.
->>>>
->>>>>>       @active:  Indicate the event is currently being handled. The information
->>>>>>                 stored in 'struct kvm_sdei_event_context' instance can be
->>>>>>                 correlated with the event.
->>>>>
->>>>> Does this need to be a bitmap though? We can't ever have more than one
->>>>> SDEI event active at a time since this is private to a vCPU.
->>>>>
->>>>
->>>> Yes, one event is active at most on one particular vCPU. So tt don't
->>>> have to be a bitmap necessarily. The reason I proposed to use bitmap
->>>> for this state is to having all (event) states represented by bitmaps.
->>>> In this way, all states are managed in a unified fashion. The alternative
->>>> way is to have "unsigned long active_event", which traces the active
->>>> event number. It also consumes 8-bytes when live migration is concerned.
->>>> So I prefer a bitmap :)
->>>>
->>>
->>> The small benefit of using the event number is that we can address all
->>> events in 8 bytes, whereas we'd need to extend the bitmap for >64
->>> events. I suppose we'll run into that issue either way, since the
->>> pending, registered, and enabled portions are also bitmaps.
->>>
->>> When live migration is in scope we should probably bark at userspace if
->>> it attempts to set more than a single bit in the register.
->>>
->>
->> Even it's unlikely to support the shared event, bitmap will help in that
->> case. I'm not sure about other VMM, the pseudo firmware registers are
->> almost transparent to user space in QEMU. They're accessed and no one
->> cares the values reading from and writing to these registers in QEMU ;-)
+> On Fri, Apr 29, 2022 at 08:11:31PM +0000, Yosry Ahmed wrote:
+> > Count the pages used by KVM in arm64 for stage2 mmu in secondary pagetable
+> > stats.
+> > 
+> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
+> > ---
+> >  arch/arm64/kvm/mmu.c | 35 +++++++++++++++++++++++++++++++----
+> >  1 file changed, 31 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 53ae2c0640bc..fc5030307cce 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -92,9 +92,13 @@ static bool kvm_is_device_pfn(unsigned long pfn)
+> >  static void *stage2_memcache_zalloc_page(void *arg)
+> >  {
+> >  	struct kvm_mmu_memory_cache *mc = arg;
+> > +	void *virt;
+> >  
+> >  	/* Allocated with __GFP_ZERO, so no need to zero */
+> > -	return kvm_mmu_memory_cache_alloc(mc);
+> > +	virt = kvm_mmu_memory_cache_alloc(mc);
+> > +	if (virt)
+> > +		kvm_account_pgtable_pages(virt, +1);
 > 
-> Regardless of whether userspace actually manipulates the registers we
-> should still reject unsupported values. For example:
-> 
-> Let's say the VM is started on a kernel that introduced yet another SDEI
-> widget outside of your series. The VM was migrated back to an older
-> kernel w/o the SDEI widget, and as such the VMM attempts to set the
-> widget bit. Since the old kernel doesn't know what to do with the value
-> it should return EINVAL to userspace.
-> 
+> Sorry I didn't say it last time around, would now be a good time to
+> clean up the funky sign convention of kvm_mod_used_mmu_pages()? Or limit
+> the funk to just x86 :)
 
-Yep, agreed. Thanks for the examples and details. Lets have more
-discussion when the series to support migration is posted.
+Indeed. I pointed this out in my initial review of this series, and
+expected these to be gone by now.
 
-Thanks,
-Gavin
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
