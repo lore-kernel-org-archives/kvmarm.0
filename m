@@ -2,77 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF05FC433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 21:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 655A5C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 21:14:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C7C44B139;
-	Tue,  3 May 2022 17:09:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BCCCF4B120;
+	Tue,  3 May 2022 17:14:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h26Q0K8lQ6qd; Tue,  3 May 2022 17:09:43 -0400 (EDT)
+	with ESMTP id dzbl-VfQC-74; Tue,  3 May 2022 17:14:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DA2E49EBE;
-	Tue,  3 May 2022 17:09:43 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ACC5749EFB;
+	Tue,  3 May 2022 17:14:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20EDE43479
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 17:09:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAE9149EF1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 17:14:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 73BnYa1JdQnt for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 17:09:41 -0400 (EDT)
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com
- [209.85.219.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D00B4089A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 17:09:41 -0400 (EDT)
-Received: by mail-yb1-f181.google.com with SMTP id y76so33282503ybe.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 14:09:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=4fiXOSargbkmqorI6WusV2qGhD3iqsqBH5PjRfunjuA=;
- b=YoNJVD72g3AVg+3aeTpK8KNgGmRrdH21U6jGrIF4yTt28emi7xJOvR/HVHHovuFaVi
- Rd+rn0a8n7qTEglfwFmqhABF0y3SYRRRrmknTwyamT3woWJY7QvpPos6aPXoaNRQJ2oV
- B2VptOYHCq2ctdiq3rOLXvB7cTCEBFxxlta1hd9rw1xOAdhwINOkLE7bA29UfIHpgFe1
- Hi91a1cNyIXPOEJMCLjMi/mGqk+JQ7EGfMXLspEaH/MUkinOK6Hl+zjrf4PxxZfQKJdc
- H7PHfoB0QvVbHEfxf1qjOczuwlVUt+tWhFVrhaqw0qsMVX2ApZ2DOZRrlXestDqBC8FU
- lZEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=4fiXOSargbkmqorI6WusV2qGhD3iqsqBH5PjRfunjuA=;
- b=hi3rug1V93YIaV49hE8ubXJkO8HgbnHhnp3gIFKkzT3x+5VizivzSCNgueMFc1/N77
- JNQMhcPFFWdYeuYO+8UhvLDSRzPM+FnheYMAobflW2ULx5zN4iuGxbUdhW7l8UTQe0kB
- kQUTGOnMQ2QksRAbOjeqgfsNgI39EY9eNqNisk4E4TsjIWO2U/CtdN+X+5lc4H5ePg+V
- OzZCB3ErCWLyIuOEqKv/yQcBhv2KcS0NjffgQg7HAvtRj/zRDwgLUeVLgWoBWVPKKxxQ
- WOzUe6qJ+SvkE9bSwx37MAVpmbEpLBJVS1wlu4FH3vgF1VcnDU+S1p64s2FqXfZrcxnz
- v/6w==
-X-Gm-Message-State: AOAM533fmUiLMOpeJvpXZVSdF+vQ/AJMMWm8bjFQAZFkxsocL5zYE0sx
- 8cxjQOwuh5Evr/e+J7PdygGhj58oBfRfag88Pr2phQ==
-X-Google-Smtp-Source: ABdhPJwbHPh4pTxe5Aps2H2tu8JbsnM+d6wHpFw0d/yrdwjO15HqS7ozkDExBWLCf3hEz5mOJ+dkfiEmK/8p91Cr1A4=
-X-Received: by 2002:a25:b095:0:b0:649:d59e:4c07 with SMTP id
- f21-20020a25b095000000b00649d59e4c07mr5306279ybj.627.1651612180307; Tue, 03
- May 2022 14:09:40 -0700 (PDT)
+ with ESMTP id 7DRkhKF-b1Xz for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 17:14:37 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E15B49EB2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 17:14:37 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by sin.source.kernel.org (Postfix) with ESMTPS id AC9C9CE2264;
+ Tue,  3 May 2022 21:14:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECB33C385A4;
+ Tue,  3 May 2022 21:14:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651612470;
+ bh=Z+qBVyuiKyHCjqN2cFxue54ljZPsduykzYWjN4ET7iQ=;
+ h=From:To:Cc:Subject:Date:From;
+ b=X026q+MxHHIHh5x2jk5t/EVzRTVi4HKlrwquyoDd8TUWyHcbH3NPMfnAHqPF5roYQ
+ k0aFUramlaWP+kZO7amlehN0Z3Z5mwFrhWVM9ieT6d58FoI3su+okys3JnBq2LqDuW
+ VASb7z0je69iC2Y3z6p/9uAXmSDBWw71HRsf5PiCwxAs8qdS4HmeTMpmej+gZsOk1J
+ G3URyqBo2BYabZ64xLINaLPMAHYKEJjrstVqDBoPeasF0/gE1/wBJIvyyXa0jzTCAp
+ iffq7XkS9PPiBh93A3/igFIbWgELqTjw8FeUGn6mGWpD9eEfVmKZz84UnpitUFaOYk
+ j/Sw1P8sGm2jg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nlzql-008kLI-Cv; Tue, 03 May 2022 22:14:27 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] KVM: arm64: vgic-v3: Consistently populate ID_AA64PFR0_EL1.GIC
+Date: Tue,  3 May 2022 22:14:24 +0100
+Message-Id: <20220503211424.3375263-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20220502233853.1233742-1-rananta@google.com>
- <878rri8r78.wl-maz@kernel.org>
- <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
- <878rriicez.wl-maz@kernel.org>
-In-Reply-To: <878rriicez.wl-maz@kernel.org>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 3 May 2022 14:09:29 -0700
-Message-ID: <CAJHc60w1F7RAgJkv5PRuJtKjTw1gUaYmZk885AVhPLF2h6YbkQ@mail.gmail.com>
-Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services
- selection
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel@android.com,
+ stable@vger.kernel.org, peter.maydell@linaro.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel@android.com, stable@vger.kernel.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,75 +77,51 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-T24gVHVlLCBNYXkgMywgMjAyMiBhdCAxOjMzIFBNIE1hcmMgWnluZ2llciA8bWF6QGtlcm5lbC5v
-cmc+IHdyb3RlOgo+Cj4gT24gVHVlLCAwMyBNYXkgMjAyMiAxOTo0OToxMyArMDEwMCwKPiBSYWdo
-YXZlbmRyYSBSYW8gQW5hbnRhIDxyYW5hbnRhQGdvb2dsZS5jb20+IHdyb3RlOgo+ID4KPiA+IEhp
-IE1hcmMsCj4gPgo+ID4gT24gVHVlLCBNYXkgMywgMjAyMiBhdCAxMDoyNCBBTSBNYXJjIFp5bmdp
-ZXIgPG1hekBrZXJuZWwub3JnPiB3cm90ZToKPiA+ID4KPiA+ID4gT24gVHVlLCAwMyBNYXkgMjAy
-MiAwMDozODo0NCArMDEwMCwKPiA+ID4gUmFnaGF2ZW5kcmEgUmFvIEFuYW50YSA8cmFuYW50YUBn
-b29nbGUuY29tPiB3cm90ZToKPiA+ID4gPgo+ID4gPiA+IEhlbGxvLAo+ID4gPiA+Cj4gPiA+ID4g
-Q29udGludWluZyB0aGUgZGlzY3Vzc2lvbiBmcm9tIFsxXSwgdGhlIHNlcmllcyB0cmllcyB0byBh
-ZGQgc3VwcG9ydAo+ID4gPiA+IGZvciB0aGUgdXNlcnNwYWNlIHRvIGVsZWN0IHRoZSBoeXBlcmNh
-bGwgc2VydmljZXMgdGhhdCBpdCB3aXNoZXMKPiA+ID4gPiB0byBleHBvc2UgdG8gdGhlIGd1ZXN0
-LCByYXRoZXIgdGhhbiB0aGUgZ3Vlc3QgZGlzY292ZXJpbmcgdGhlbQo+ID4gPiA+IHVuY29uZGl0
-aW9uYWxseS4gVGhlIGlkZWEgZW1wbG95ZWQgYnkgdGhlIHNlcmllcyB3YXMgdGFrZW4gZnJvbQo+
-ID4gPiA+IFsxXSBhcyBzdWdnZXN0ZWQgYnkgTWFyYyBaLgo+ID4gPgo+ID4gPiBBcyBpdCB0b29r
-IHNvbWUgdGltZSB0byBnZXQgdGhlcmUsIGFuZCB0aGF0IHRoZXJlIHdhcyBzdGlsbCBhIGJ1bmNo
-IG9mCj4gPiA+IHRoaW5ncyB0byBhZGRyZXNzLCBJJ3ZlIHRha2VuIHRoZSBsaWJlcnR5IHRvIGFw
-cGx5IG15IG93biBmaXhlcyB0byB0aGUKPiA+ID4gc2VyaWVzLgo+ID4gPgo+ID4gPiBQbGVhc2Ug
-aGF2ZSBhIGxvb2sgYXQgWzFdLCBhbmQgbGV0IG1lIGtub3cgaWYgeW91J3JlIE9LIHdpdGggdGhl
-Cj4gPiA+IHJlc3VsdC4gSWYgeW91IGFyZSwgSSdsbCBtZXJnZSB0aGUgc2VyaWVzIGZvciA1LjE5
-Lgo+ID4gPgo+ID4gPiBUaGFua3MsCj4gPiA+Cj4gPiA+ICAgICAgICAgTS4KPiA+ID4KPiA+IFRo
-YW5rIHlvdSBmb3Igc3BlZWRpbmcgdXAgdGhlIHByb2Nlc3M7IGFwcHJlY2lhdGUgaXQuIEhvd2V2
-ZXIsIHRoZQo+ID4gc2VyaWVzJ3Mgc2VsZnRlc3QgcGF0Y2hlcyBoYXZlIGEgZGVwZW5kZW5jeSBv
-biBPbGl2ZXIncwo+ID4gUFNDSV9TWVNURU1fU1VTUEVORCdzIHNlbGZ0ZXN0IHBhdGNoZXMgWzFd
-WzJdLiBDYW4gd2UgcHVsbCB0aGVtIGluCj4gPiB0b28/Cj4KPiBVcmdoLi4uIEkgZ3Vlc3MgdGhp
-cyBpcyB0aGUgdGltZSB0byBzZXQgc29tZSBncm91bmQgcnVsZXM6Cj4KPiAtIFBsZWFzZSBkb24n
-dCBpbnRyb2R1Y2UgZGVwZW5kZW5jaWVzIGJldHdlZW4gc2VyaWVzLCB0aGF0J3MKPiAgIHVubWFu
-YWdlYWJsZS4gSSByZWFsbHkgbmVlZCB0byBzZWUgZWFjaCBzZXJpZXMgaW5kZXBlbmRlbnRseSwg
-YW5kIGlmCj4gICB0aGVyZSBpcyBhIG1lcmdlIGNvbmZsaWN0LCB0aGF0J3MgbXkgam9iIHRvIGZp
-eCAoYW5kIEkgZG9uJ3QgcmVhbGx5Cj4gICBtaW5kKS4KPgo+IC0gSWYgdGhlcmUgaXMgYSBkZXBl
-bmRlbmN5IGJldHdlZW4gc2VyaWVzLCBwbGVhc2UgcG9zdCBhIHZlcnNpb24gb2YKPiAgIHRoZSBy
-ZXF1aXJlZCBwYXRjaGVzIGFzIGEgcHJlZml4IHRvIHlvdXIgc2VyaWVzLCBhc3N1bWluZyB0aGlz
-Cj4gICBwcmVmaXggaXMgaXRzZWxmIHN0YW5kYWxvbmUuIElmIGl0IGlzbid0LCB0aGVuIHNvbWV0
-aGluZyByZWFsbHkgaXMKPiAgIHdyb25nLCBhbmQgdGhlIHNlcmllcyBzaG91bGQgYmUgcmVzcGxp
-dC4KPgo+IC0gWW91IGFsc28gc2hvdWxkIGJlIGJhc2luZyB5b3VyIHNlcmllcyBvbiBhbiAqb2Zm
-aWNpYWwqIHRhZyBmcm9tCj4gICBMaW51cycgdHJlZSAocHJlZmVyYWJseSAtcmMxLCAtcmMyIG9y
-IC1yYzMpLCBhbmQgbm90IHNvbWV0aGluZwo+ICAgcmFuZG9tIGxpa2UgYW55IG9kZCBjb21taXQg
-ZnJvbSB0aGUgS1ZNIHRyZWUgKEkgaGFkIGNvbmZsaWN0cyB3aGlsZQo+ICAgYXBwbHlpbmcgdGhp
-cyBvbiAtcmMzLCBwcm9iYWJseSBkdWUgdG8gdGhlIG5vbi1hZHZlcnRpc2VkIGRlcGVuZGVuY3kK
-PiAgIG9uIE9saXZlcidzIHNlcmllcykuCj4KVGhhbmtzIGZvciBwaWNraW5nIHRoZSBkZXBlbmRl
-bmN5IHBhdGNoZXMuIEknbGwga2VlcCB0aGVzZSBtaW5kIHRoZQpuZXh0IHRpbWUgSSBwdXNoIGNo
-YW5nZXMuCgo+ID4KPiA+IGFhcmNoNjQvaHlwZXJjYWxscy5jOiBJbiBmdW5jdGlvbiDigJhndWVz
-dF90ZXN0X2h2Y+KAmToKPiA+IGFhcmNoNjQvaHlwZXJjYWxscy5jOjk1OjMwOiBlcnJvcjogc3Rv
-cmFnZSBzaXplIG9mIOKAmHJlc+KAmSBpc27igJl0IGtub3duCj4gPiAgICA5NSB8ICAgICAgICAg
-c3RydWN0IGFybV9zbWNjY19yZXMgcmVzOwo+ID4gICAgICAgfCAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIF5+fgo+ID4gYWFyY2g2NC9oeXBlcmNhbGxzLmM6MTAzOjE3OiB3YXJuaW5nOiBp
-bXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbgo+ID4g4oCYc21jY2NfaHZj4oCZIFstV2lt
-cGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQo+ID4gICAxMDMgfCAgICAgICAgICAgICAgICAg
-c21jY2NfaHZjKGhjX2luZm8tPmZ1bmNfaWQsIGhjX2luZm8tPmFyZzEsIDAsCj4gPiAwLCAwLCAw
-LCAwLCAwLCAmcmVzKTsKPiA+ICAgICAgIHwgICAgICAgICAgICAgICAgIF5+fn5+fn5+fgo+ID4K
-Pgo+IEkndmUgcGlja2VkIHRoZSB0d28gcGF0Y2hlcywgd2hpY2ggbWVhbnMgdGhleSB3aWxsIG1v
-c3QgbGlrZWx5IGFwcGVhcgo+IHR3aWNlIGluIHRoZSBoaXN0b3J5LiBJbiB0aGUgZnV0dXJlLCBw
-bGVhc2UgcmVhY2ggb3V0IHNvIHRoYXQgd2UgY2FuCj4gb3JnYW5pc2UgdGhpcyBiZXR0ZXIuCj4K
-PiA+IEFsc28sIGp1c3QgYSBjb3VwbGUgb2YgcmVhZGFiaWxpdHkgbml0cyBpbiB0aGUgZml4ZWQg
-dmVyc2lvbjoKPiA+Cj4gPiAxLiBQYXRjaC0yLzksIGh5cGVyY2FsbC5jOmt2bV9odmNfY2FsbF9k
-ZWZhdWx0X2FsbG93ZWQoKSwgaW4gdGhlCj4gPiAnZGVmYXVsdCcgY2FzZSwgZG8geW91IHRoaW5r
-IHdlIHNob3VsZCBwcm9iYWJseSBhZGQgYSBzbWFsbCBjb21tZW50Cj4gPiB0aGF0IG1lbnRpb25z
-IHdlIGFyZSBjaGVja2luZyBmb3IgZnVuY19pZCBpbiB0aGUgUFNDSSByYW5nZT8KPgo+IER1bXBl
-ZCBhIG9uZS1saW5lciB0aGVyZS4KPgo+ID4gMi4gUGF0Y2gtMi85LCBhcm1faHlwZXJjYWxsLmgs
-IGNsZWFyIGFsbCB0aGUgbWFjcm9zIGluIHRoaXMgcGF0Y2gKPiA+IGl0c2VsZiBpbnN0ZWFkIG9m
-IGRvaW5nIGl0IGluIGluY3JlbWVudHMgKHVubGVzcyB0aGVyZSdzIHNvbWUgcmVhc29uCj4gPiB0
-aGF0IEknbSBtaXNzaW5nKT8KPgo+IEFoLCByZWJhc2luZyBsZWZ0b3ZlcnMsIG5vdyBnb25lLgo+
-Cj4gSSd2ZSBwdXNoZWQgYW4gdXBkYXRlZCBicmFuY2ggYWdhaW4sIHBsZWFzZSBoYXZlIGEgbG9v
-ay4KPgpUaGFua3MgZm9yIGFkZHJlc3NpbmcgdGhlc2UuIFRoZSBzZXJpZXMgbG9va3MgZ29vZCBu
-b3cuCgpSZWdhcmRzLApSYWdoYXZlbmRyYQo+ICAgICAgICAgTS4KPgo+IC0tCj4gV2l0aG91dCBk
-ZXZpYXRpb24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
-aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
-YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+When adding support for the slightly wonky Apple M1, we had to
+populate ID_AA64PFR0_EL1.GIC==1 to present something to the guest,
+as the HW itself doesn't advertise the feature.
+
+However, we gated this on the in-kernel irqchip being created.
+This causes some trouble for QEMU, which snapshots the state of
+the registers before creating a virtual GIC, and then tries to
+restore these registers once the GIC has been created.  Obviously,
+between the two stages, ID_AA64PFR0_EL1.GIC has changed value,
+and the write fails.
+
+The fix is to actually emulate the HW, and always populate the
+field if the HW is capable of it.
+
+Fixes: 562e530fd770 ("KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3")
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ arch/arm64/kvm/sys_regs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7b45c040cc27..adf408c09cdb 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1123,8 +1123,7 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
+ 		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3);
+ 		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
+-		if (irqchip_in_kernel(vcpu->kvm) &&
+-		    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
++		if (kvm_vgic_global_state.type == VGIC_V3) {
+ 			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
+ 			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
+ 		}
+-- 
+2.34.1
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
