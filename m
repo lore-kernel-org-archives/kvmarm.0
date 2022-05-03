@@ -2,85 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E931C433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 19:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4D3C433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 20:33:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 945EA49F22;
-	Tue,  3 May 2022 15:41:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A8049E43;
+	Tue,  3 May 2022 16:33:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7Pr7404xR1ht; Tue,  3 May 2022 15:41:50 -0400 (EDT)
+	with ESMTP id XnnrkAX2qIZp; Tue,  3 May 2022 16:33:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C13149F2E;
-	Tue,  3 May 2022 15:41:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EC1B4B120;
+	Tue,  3 May 2022 16:33:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2FFD649F2A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 15:41:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DEB8F4B0B3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 16:33:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KUplK+6UM4er for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 15:41:47 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEB2C49F22
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 15:41:47 -0400 (EDT)
+ with ESMTP id lAeCRVcf3UAG for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 16:33:44 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 83C3749E43
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 16:33:44 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id F0BF3B81DA0;
- Tue,  3 May 2022 19:41:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB6DC385A9;
- Tue,  3 May 2022 19:41:44 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id D7A45611FD;
+ Tue,  3 May 2022 20:33:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4210FC385A4;
+ Tue,  3 May 2022 20:33:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1651606904;
- bh=NG94txh+wND3OC7140pcpYGPVjRs1x+nXgpG24yMmfU=;
+ s=k20201202; t=1651610023;
+ bh=+S+gI1rUYoYq98LrroKUD/OVNIAreoq4PC0e3oaD+DM=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=fTc7B894+zfEF/Ma2g4dJtQhjrNeMsFOCFlDcVHnbmYQlPjq9DBbryPnkvZkEfuzB
- 3ARA0WYl34O10FIHYd5USTMbmpatTX+aMY7kzUfDGjTjuxIhRDqpFwRChhoIuSsh4R
- DT5+VArmkueWsGt9Wl7oYB6w6Nz6+vX4dZAx5ikEvcUAIUkZfTFkAGF843wnMmf0MB
- U0o2KAQsUd87BVjwthgDbo6TQFl6RhPGjN6AW14/mVIHKM410kIzHlzHfPV8lx9PDn
- Bpt7man9BxvlvvodgvhLUOD9UwCdyAp/8gpQeWsIfn0JgNLXG4pcdgJRw22ahidhU2
- MC4D5gJh2farQ==
+ b=q6x1lzU+6y4QJQE53ZAVYfNknpKqET8REpetEZQOASqdJqet0iFBjVOQXjdxCNW4j
+ 4yCJzqLFjtQ1hF0FsD4bjwdTYumlcYknmcnG00CnhjFSJNsl3mpWhcrxANWjStmP+2
+ GdGBOX0Rh4RQzXuRGojk34t2bw2lfhwxVk8QYOlfIK16nVF/smo5oiVSLrIgLpEWPa
+ qrvhFY4BLfC9/WgqlPOhIKXnrE9tVcVlDDZpQJEgNC4knATTysgnvtqvNNWvdlQ3c3
+ gtSsrM95ANJIndvWT5eukBbKDhcjtFLsUVQjx49n42kpHhevPAGkcRV+g+o+zatF0V
+ DoI+2rKPXiglQ==
 Received: from sofa.misterjones.org ([185.219.108.64]
  helo=wait-a-minute.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nlyP0-008jAx-4W; Tue, 03 May 2022 20:41:42 +0100
-Date: Tue, 03 May 2022 20:41:41 +0100
-Message-ID: <87a6byietm.wl-maz@kernel.org>
+ id 1nlzDI-008jtX-PA; Tue, 03 May 2022 21:33:40 +0100
+Date: Tue, 03 May 2022 21:33:40 +0100
+Message-ID: <878rriicez.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Kalesh Singh <kaleshsingh@google.com>
-Subject: Re: [PATCH v8 0/6] KVM: arm64: Hypervisor stack enhancements
-In-Reply-To: <CAC_TJve+n8gXbG_XY_rb+DC7399SSmP6BRc5x7X=cvht50XLYA@mail.gmail.com>
-References: <20220420214317.3303360-1-kaleshsingh@google.com>
- <165117574186.3115452.6818682378273681624.b4-ty@kernel.org>
- <CAC_TJve+n8gXbG_XY_rb+DC7399SSmP6BRc5x7X=cvht50XLYA@mail.gmail.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services
+ selection
+In-Reply-To: <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
+References: <20220502233853.1233742-1-rananta@google.com>
+ <878rri8r78.wl-maz@kernel.org>
+ <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kaleshsingh@google.com, catalin.marinas@arm.com,
- mark.rutland@arm.com, james.morse@arm.com, tabba@google.com,
- masahiroy@kernel.org, surenb@google.com, kvmarm@lists.cs.columbia.edu,
- suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, ardb@kernel.org,
- will@kernel.org, qperret@google.com, linux-kernel@vger.kernel.org,
- alexandru.elisei@arm.com, yuzenghui@huawei.com, changbin.du@intel.com,
- kernel-team@android.com, nathan@kernel.org
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ catalin.marinas@arm.com, will@kernel.org, pshier@google.com,
+ ricarkol@google.com, oupton@google.com, reijiw@google.com,
+ jingzhangos@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: "Cc: Android Kernel" <kernel-team@android.com>,
- Will Deacon <will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
- Masahiro Yamada <masahiroy@kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Changbin Du <changbin.du@intel.com>,
- "moderated list:ARM64 PORT \(AARCH64 ARCHITECTURE\)"
- <linux-arm-kernel@lists.infradead.org>, Suren Baghdasaryan <surenb@google.com>,
- kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -92,67 +90,68 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, 02 May 2022 17:54:45 +0100,
-Kalesh Singh <kaleshsingh@google.com> wrote:
-> 
-> On Thu, Apr 28, 2022 at 12:55 PM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Wed, 20 Apr 2022 14:42:51 -0700, Kalesh Singh wrote:
-> > > This is v8 of the nVHE hypervisor stack enhancements. This version is based
-> > > on 5.18-rc3.
-> > >
-> > > Previous versions can be found at:
-> > > v7: https://lore.kernel.org/r/20220408200349.1529080-1-kaleshsingh@google.com/
-> > > v6: https://lore.kernel.org/r/20220314200148.2695206-1-kaleshsingh@google.com/
-> > > v5: https://lore.kernel.org/r/20220307184935.1704614-1-kaleshsingh@google.com/
-> > > v4: https://lore.kernel.org/r/20220225033548.1912117-1-kaleshsingh@google.com/
-> > > v3: https://lore.kernel.org/r/20220224051439.640768-1-kaleshsingh@google.com/
-> > > v2: https://lore.kernel.org/r/20220222165212.2005066-1-kaleshsingh@google.com/
-> > > v1: https://lore.kernel.org/r/20220210224220.4076151-1-kaleshsingh@google.com/
-> > >
-> > > [...]
-> >
-> > Applied to next, thanks!
-> >
-> > [1/6] KVM: arm64: Introduce hyp_alloc_private_va_range()
-> >       commit: 92abe0f81e1385afd8f1dc66206b5be9a514899b
-> > [2/6] KVM: arm64: Introduce pkvm_alloc_private_va_range()
-> >       commit: f922c13e778d6d5343d4576be785a8204c595113
-> > [3/6] KVM: arm64: Add guard pages for KVM nVHE hypervisor stack
-> >       commit: ce3354318a57875dc59f4bb841662e95bfba03db
-> > [4/6] KVM: arm64: Add guard pages for pKVM (protected nVHE) hypervisor stack
-> >       commit: 1a919b17ef012ca0572bae759c27e5ea02bfb47f
-> > [5/6] KVM: arm64: Detect and handle hypervisor stack overflows
-> >       commit: 66de19fad9ef47c5376a99bb2b00661f1c788a94
-> > [6/6] KVM: arm64: Symbolize the nVHE HYP addresses
-> >       commit: 6ccf9cb557bd32073b0d68baed97f1bd8a40ff1d
-> 
-> Thanks for applying these Marc.
-> 
-> I was wondering if instead of taking these through kvm-arm64/next,
-> could Catalin consolidated these in arm64 for-next/core with Mark
-> Ruthland's and Madhavan's stacktrace patches[1]? This avoids conflict
-> and would allow for the hypervisor unwinding changes[2] to apply
-> cleanly.
-
-So far, there hasn't been any reported conflict. If Catalin needs to
-merge the branch or part of it, it is stable anyway and can be pulled
-from anywhere.
-
-As for the rest of the stacktrace stuff, I haven't had a look yet.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVHVlLCAwMyBNYXkgMjAyMiAxOTo0OToxMyArMDEwMCwKUmFnaGF2ZW5kcmEgUmFvIEFuYW50
+YSA8cmFuYW50YUBnb29nbGUuY29tPiB3cm90ZToKPiAKPiBIaSBNYXJjLAo+IAo+IE9uIFR1ZSwg
+TWF5IDMsIDIwMjIgYXQgMTA6MjQgQU0gTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4gd3Jv
+dGU6Cj4gPgo+ID4gT24gVHVlLCAwMyBNYXkgMjAyMiAwMDozODo0NCArMDEwMCwKPiA+IFJhZ2hh
+dmVuZHJhIFJhbyBBbmFudGEgPHJhbmFudGFAZ29vZ2xlLmNvbT4gd3JvdGU6Cj4gPiA+Cj4gPiA+
+IEhlbGxvLAo+ID4gPgo+ID4gPiBDb250aW51aW5nIHRoZSBkaXNjdXNzaW9uIGZyb20gWzFdLCB0
+aGUgc2VyaWVzIHRyaWVzIHRvIGFkZCBzdXBwb3J0Cj4gPiA+IGZvciB0aGUgdXNlcnNwYWNlIHRv
+IGVsZWN0IHRoZSBoeXBlcmNhbGwgc2VydmljZXMgdGhhdCBpdCB3aXNoZXMKPiA+ID4gdG8gZXhw
+b3NlIHRvIHRoZSBndWVzdCwgcmF0aGVyIHRoYW4gdGhlIGd1ZXN0IGRpc2NvdmVyaW5nIHRoZW0K
+PiA+ID4gdW5jb25kaXRpb25hbGx5LiBUaGUgaWRlYSBlbXBsb3llZCBieSB0aGUgc2VyaWVzIHdh
+cyB0YWtlbiBmcm9tCj4gPiA+IFsxXSBhcyBzdWdnZXN0ZWQgYnkgTWFyYyBaLgo+ID4KPiA+IEFz
+IGl0IHRvb2sgc29tZSB0aW1lIHRvIGdldCB0aGVyZSwgYW5kIHRoYXQgdGhlcmUgd2FzIHN0aWxs
+IGEgYnVuY2ggb2YKPiA+IHRoaW5ncyB0byBhZGRyZXNzLCBJJ3ZlIHRha2VuIHRoZSBsaWJlcnR5
+IHRvIGFwcGx5IG15IG93biBmaXhlcyB0byB0aGUKPiA+IHNlcmllcy4KPiA+Cj4gPiBQbGVhc2Ug
+aGF2ZSBhIGxvb2sgYXQgWzFdLCBhbmQgbGV0IG1lIGtub3cgaWYgeW91J3JlIE9LIHdpdGggdGhl
+Cj4gPiByZXN1bHQuIElmIHlvdSBhcmUsIEknbGwgbWVyZ2UgdGhlIHNlcmllcyBmb3IgNS4xOS4K
+PiA+Cj4gPiBUaGFua3MsCj4gPgo+ID4gICAgICAgICBNLgo+ID4KPiBUaGFuayB5b3UgZm9yIHNw
+ZWVkaW5nIHVwIHRoZSBwcm9jZXNzOyBhcHByZWNpYXRlIGl0LiBIb3dldmVyLCB0aGUKPiBzZXJp
+ZXMncyBzZWxmdGVzdCBwYXRjaGVzIGhhdmUgYSBkZXBlbmRlbmN5IG9uIE9saXZlcidzCj4gUFND
+SV9TWVNURU1fU1VTUEVORCdzIHNlbGZ0ZXN0IHBhdGNoZXMgWzFdWzJdLiBDYW4gd2UgcHVsbCB0
+aGVtIGluCj4gdG9vPwoKVXJnaC4uLiBJIGd1ZXNzIHRoaXMgaXMgdGhlIHRpbWUgdG8gc2V0IHNv
+bWUgZ3JvdW5kIHJ1bGVzOgoKLSBQbGVhc2UgZG9uJ3QgaW50cm9kdWNlIGRlcGVuZGVuY2llcyBi
+ZXR3ZWVuIHNlcmllcywgdGhhdCdzCiAgdW5tYW5hZ2VhYmxlLiBJIHJlYWxseSBuZWVkIHRvIHNl
+ZSBlYWNoIHNlcmllcyBpbmRlcGVuZGVudGx5LCBhbmQgaWYKICB0aGVyZSBpcyBhIG1lcmdlIGNv
+bmZsaWN0LCB0aGF0J3MgbXkgam9iIHRvIGZpeCAoYW5kIEkgZG9uJ3QgcmVhbGx5CiAgbWluZCku
+CgotIElmIHRoZXJlIGlzIGEgZGVwZW5kZW5jeSBiZXR3ZWVuIHNlcmllcywgcGxlYXNlIHBvc3Qg
+YSB2ZXJzaW9uIG9mCiAgdGhlIHJlcXVpcmVkIHBhdGNoZXMgYXMgYSBwcmVmaXggdG8geW91ciBz
+ZXJpZXMsIGFzc3VtaW5nIHRoaXMKICBwcmVmaXggaXMgaXRzZWxmIHN0YW5kYWxvbmUuIElmIGl0
+IGlzbid0LCB0aGVuIHNvbWV0aGluZyByZWFsbHkgaXMKICB3cm9uZywgYW5kIHRoZSBzZXJpZXMg
+c2hvdWxkIGJlIHJlc3BsaXQuCgotIFlvdSBhbHNvIHNob3VsZCBiZSBiYXNpbmcgeW91ciBzZXJp
+ZXMgb24gYW4gKm9mZmljaWFsKiB0YWcgZnJvbQogIExpbnVzJyB0cmVlIChwcmVmZXJhYmx5IC1y
+YzEsIC1yYzIgb3IgLXJjMyksIGFuZCBub3Qgc29tZXRoaW5nCiAgcmFuZG9tIGxpa2UgYW55IG9k
+ZCBjb21taXQgZnJvbSB0aGUgS1ZNIHRyZWUgKEkgaGFkIGNvbmZsaWN0cyB3aGlsZQogIGFwcGx5
+aW5nIHRoaXMgb24gLXJjMywgcHJvYmFibHkgZHVlIHRvIHRoZSBub24tYWR2ZXJ0aXNlZCBkZXBl
+bmRlbmN5CiAgb24gT2xpdmVyJ3Mgc2VyaWVzKS4KCj4gCj4gYWFyY2g2NC9oeXBlcmNhbGxzLmM6
+IEluIGZ1bmN0aW9uIOKAmGd1ZXN0X3Rlc3RfaHZj4oCZOgo+IGFhcmNoNjQvaHlwZXJjYWxscy5j
+Ojk1OjMwOiBlcnJvcjogc3RvcmFnZSBzaXplIG9mIOKAmHJlc+KAmSBpc27igJl0IGtub3duCj4g
+ICAgOTUgfCAgICAgICAgIHN0cnVjdCBhcm1fc21jY2NfcmVzIHJlczsKPiAgICAgICB8ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXn5+Cj4gYWFyY2g2NC9oeXBlcmNhbGxzLmM6MTAzOjE3
+OiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbgo+IOKAmHNtY2NjX2h2
+Y+KAmSBbLVdpbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KPiAgIDEwMyB8ICAgICAgICAg
+ICAgICAgICBzbWNjY19odmMoaGNfaW5mby0+ZnVuY19pZCwgaGNfaW5mby0+YXJnMSwgMCwKPiAw
+LCAwLCAwLCAwLCAwLCAmcmVzKTsKPiAgICAgICB8ICAgICAgICAgICAgICAgICBefn5+fn5+fn4K
+PgoKSSd2ZSBwaWNrZWQgdGhlIHR3byBwYXRjaGVzLCB3aGljaCBtZWFucyB0aGV5IHdpbGwgbW9z
+dCBsaWtlbHkgYXBwZWFyCnR3aWNlIGluIHRoZSBoaXN0b3J5LiBJbiB0aGUgZnV0dXJlLCBwbGVh
+c2UgcmVhY2ggb3V0IHNvIHRoYXQgd2UgY2FuCm9yZ2FuaXNlIHRoaXMgYmV0dGVyLgoKPiBBbHNv
+LCBqdXN0IGEgY291cGxlIG9mIHJlYWRhYmlsaXR5IG5pdHMgaW4gdGhlIGZpeGVkIHZlcnNpb246
+Cj4gCj4gMS4gUGF0Y2gtMi85LCBoeXBlcmNhbGwuYzprdm1faHZjX2NhbGxfZGVmYXVsdF9hbGxv
+d2VkKCksIGluIHRoZQo+ICdkZWZhdWx0JyBjYXNlLCBkbyB5b3UgdGhpbmsgd2Ugc2hvdWxkIHBy
+b2JhYmx5IGFkZCBhIHNtYWxsIGNvbW1lbnQKPiB0aGF0IG1lbnRpb25zIHdlIGFyZSBjaGVja2lu
+ZyBmb3IgZnVuY19pZCBpbiB0aGUgUFNDSSByYW5nZT8KCkR1bXBlZCBhIG9uZS1saW5lciB0aGVy
+ZS4KCj4gMi4gUGF0Y2gtMi85LCBhcm1faHlwZXJjYWxsLmgsIGNsZWFyIGFsbCB0aGUgbWFjcm9z
+IGluIHRoaXMgcGF0Y2gKPiBpdHNlbGYgaW5zdGVhZCBvZiBkb2luZyBpdCBpbiBpbmNyZW1lbnRz
+ICh1bmxlc3MgdGhlcmUncyBzb21lIHJlYXNvbgo+IHRoYXQgSSdtIG1pc3NpbmcpPwoKQWgsIHJl
+YmFzaW5nIGxlZnRvdmVycywgbm93IGdvbmUuCgpJJ3ZlIHB1c2hlZCBhbiB1cGRhdGVkIGJyYW5j
+aCBhZ2FpbiwgcGxlYXNlIGhhdmUgYSBsb29rLgoKCU0uCgotLSAKV2l0aG91dCBkZXZpYXRpb24g
+ZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBvc3NpYmxlLgpfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
+bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
+bG1hbi9saXN0aW5mby9rdm1hcm0K
