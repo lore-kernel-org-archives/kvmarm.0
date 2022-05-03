@@ -2,83 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BBCC433F5
-	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 13:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE61C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 14:17:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 616224B12E;
-	Tue,  3 May 2022 09:31:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F12B24B1BC;
+	Tue,  3 May 2022 10:17:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gMa0qT4JhwCI; Tue,  3 May 2022 09:31:34 -0400 (EDT)
+	with ESMTP id Szw5ovxHi0vh; Tue,  3 May 2022 10:17:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BD3D4B17C;
-	Tue,  3 May 2022 09:31:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9D784B152;
+	Tue,  3 May 2022 10:17:32 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F05B449F3E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 14:47:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DA334B13E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 10:17:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5FTAJ2aA18cH for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 May 2022 14:47:02 -0400 (EDT)
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com
- [209.85.128.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D52B44B0C0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 May 2022 14:47:02 -0400 (EDT)
-Received: by mail-yw1-f177.google.com with SMTP id
- 00721157ae682-2ebf4b91212so157895117b3.8
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 May 2022 11:47:02 -0700 (PDT)
+ with ESMTP id UwuImrgjLi6f for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 10:17:30 -0400 (EDT)
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com
+ [209.85.218.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35C7C49EC1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 10:17:30 -0400 (EDT)
+Received: by mail-ej1-f49.google.com with SMTP id dk23so33732349ejb.8
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 07:17:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=u9wSiuSwEdY5mnTnkaPbFc68dMNs+2B7Kv3x/mlBROY=;
- b=B5EJ0yX/6p4KphD4mHUJ1Rf/ah2ZGGbyCj3/Fg8jz6NZgaKjFGHXri9nWa56usJkQV
- i315aF1sZwZQCXuqR1GAJi/UydKqqqyJKrMK8NO2ltYq2E6LzRLcZv32EwENsp7gEeoz
- iSHMNZvgfxxeDjj5++SiliEGaOkXpt+a8RHyXVhO5DpOnU48kj++PVL3oUiAbWHvgwWt
- /8Cr6IfX5ViwgwukGvi0D67RRVTS2aaUOaOIh181LsfJrySzqwochKRZSrWUxxtwgj0X
- utkbg7G1h+72m4iLsTXSquLZ7P0i2NJO3VNDlb1N0tn+bpBJNirD0jDtdQa9nWw8JgOP
- HsHw==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=fbgMapne1rH6/kKlRXWbC6sN+d3viTII31UcYeBu5g4=;
+ b=p5StzTBTAohsMwlL6jHQBWtTQobIcqESt3kLVZnkNHJSG2DdBFZF7Tgs5QaZmPnlCr
+ F1l8QZ0lnzdHlhRVHnwsSRNzlNALEMzZuSnQCxowMh6uXeXOg3ZbmSEabk7olar1pdpp
+ 9pZRvS+REXlThgWE/quskEMYIGVZw1x55jioiJE011eju4WdbP9ZextM5/dSqGnzJ/OA
+ Ip3n3G3Q5wiRXN3pJWPKqD+r0Wk199FnUkUPdXWP8Vhe6xFQIDSvsecKYYscAjJp/an6
+ Yukn9oKICYgAyT+VGWoiAnlgJf7HCdoInuF1DHTluTYZYb7iUxSiRZ05KmZ0heDnRw16
+ aUzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=u9wSiuSwEdY5mnTnkaPbFc68dMNs+2B7Kv3x/mlBROY=;
- b=WtkqIER4B39Rtn0KoGhagfTPEprA9vcwAfA4/BuDHqx7oSPsUmc3ZkAb0ISnpfnod5
- moX2l56Eqho1QLF/NdHKQ8QQCPxMM+fwaE0/ddJB/V+wNP0Z/OGYzrm1nrdkoTE1NCTO
- GKykAD5MW2WWGNxru7OC+JK1FS0XY+8mwsFm0dleYLmiJep5Fs/AbCD2jwopDUgy9o1Z
- WN4ZsQM6/88bU2kI5oAPoOTCrp0+r48JG2Jzb5AAQ85qfVJWiRJi6HknGVJO2UjYREUF
- XOkDRcu3NQjvQ7rIuSzluBTnm5sJ0/C3CAwOQIfKgEo4PSCRx5SAQK5xFx2TfFtaXjwQ
- 09dw==
-X-Gm-Message-State: AOAM531KR68W9mldajLniyPIPWVZL09STZ3UsaC5i6xUeVjlJWKEnNt0
- pkemxwpCDjXkHAMsp2uelcS2JJa2oF+nV/PxLnGXRw==
-X-Google-Smtp-Source: ABdhPJwxpqbxXyab8ESki88sczGcbJxWGMwzL5arJQ5jrtTs062e6/AT9v4MrGSdRY/uVxIocNtDe7xab3HHmq5sxbI=
-X-Received: by 2002:a81:dd07:0:b0:2eb:f701:286e with SMTP id
- e7-20020a81dd07000000b002ebf701286emr11872882ywn.341.1651517222179; Mon, 02
- May 2022 11:47:02 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=fbgMapne1rH6/kKlRXWbC6sN+d3viTII31UcYeBu5g4=;
+ b=hJLpYgl90nfh1oZKaBm+ovajc+4TZF24Rrh1JFnnuaPZkwIObM+0oFLHvYp+KQu+OR
+ cTZWqWjN4u/5KHKdoNwynboHcTbZyaChjAvl6A0qBn2FxiKLZFPdnvLX6G2EefKUYZ9Q
+ Ft5HV/ORYEc7frNlZzS3NgVPuvtg4oFCJHNefHNaoDkYgT2xujWQHy/ku+8WterbLOya
+ oCQNEF12jEAs4z0Cs1iCgV5BVg/wVomU5kI033GyTyrMJYyxFbWEOU6fooY5ZITcf7Hb
+ QUolrFOPVTdZbCWGivmvRu/paglWVA7ooQ10Nb1Odkg4pJ6k8asPR2HHQ66Ogr/tOMV3
+ h5Ow==
+X-Gm-Message-State: AOAM533IGsRXj1YdNjL9SSITqjvXoRvBDPxWuhVyCILK2nrg8E1ovmZP
+ YlLOfuotAoQxC8UIGfQPxmOZYg==
+X-Google-Smtp-Source: ABdhPJzSpQ9MzxynGtzoIUDLeJ/DfizCDd1t2kS5FNmZLRZhA9C+R6Uh6yCEZ5JtfHxxtU8soK6nAQ==
+X-Received: by 2002:a17:906:d555:b0:6da:ac8c:f66b with SMTP id
+ cr21-20020a170906d55500b006daac8cf66bmr15765063ejc.107.1651587448896; 
+ Tue, 03 May 2022 07:17:28 -0700 (PDT)
+Received: from google.com (30.171.91.34.bc.googleusercontent.com.
+ [34.91.171.30]) by smtp.gmail.com with ESMTPSA id
+ hg13-20020a1709072ccd00b006f3ef214df3sm4657306ejc.89.2022.05.03.07.17.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 May 2022 07:17:28 -0700 (PDT)
+Date: Tue, 3 May 2022 14:17:25 +0000
+From: Quentin Perret <qperret@google.com>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [RFC PATCH 09/17] KVM: arm64: Tear down unlinked page tables in
+ parallel walk
+Message-ID: <YnE5dfaC3HpXli26@google.com>
+References: <20220415215901.1737897-1-oupton@google.com>
+ <20220415215901.1737897-10-oupton@google.com>
+ <YmFactP0GnSp3vEv@google.com> <YmGJGIrNVmdqYJj8@google.com>
+ <YmLRLf2GQSgA97Kr@google.com> <YmMTC2f0DiAU5OtZ@google.com>
 MIME-Version: 1.0
-References: <20220429201131.3397875-1-yosryahmed@google.com>
- <20220429201131.3397875-2-yosryahmed@google.com>
- <87ilqoi77b.wl-maz@kernel.org>
-In-Reply-To: <87ilqoi77b.wl-maz@kernel.org>
-From: Yosry Ahmed <yosryahmed@google.com>
-Date: Mon, 2 May 2022 11:46:26 -0700
-Message-ID: <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-To: Marc Zyngier <maz@kernel.org>
-X-Mailman-Approved-At: Tue, 03 May 2022 09:31:31 -0400
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Linux-MM <linux-mm@kvack.org>, Zefan Li <lizefan.x@bytedance.com>,
- kvmarm@lists.cs.columbia.edu, Joerg Roedel <joro@8bytes.org>,
- Shakeel Butt <shakeelb@google.com>, cgroups@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Tejun Heo <tj@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Disposition: inline
+In-Reply-To: <YmMTC2f0DiAU5OtZ@google.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, Ben Gardon <bgardon@google.com>,
+ David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,81 +95,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 2, 2022 at 3:01 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 29 Apr 2022 21:11:28 +0100,
-> Yosry Ahmed <yosryahmed@google.com> wrote:
-> >
-> > Add NR_SECONDARY_PAGETABLE stat to count secondary page table uses, e.g.
-> > KVM mmu. This provides more insights on the kernel memory used
-> > by a workload.
-> >
-> > This stat will be used by subsequent patches to count KVM mmu
-> > memory usage.
-> >
-> > Signed-off-by: Yosry Ahmed <yosryahmed@google.com>
-> > ---
-> >  Documentation/admin-guide/cgroup-v2.rst | 5 +++++
-> >  Documentation/filesystems/proc.rst      | 4 ++++
-> >  drivers/base/node.c                     | 2 ++
-> >  fs/proc/meminfo.c                       | 2 ++
-> >  include/linux/mmzone.h                  | 1 +
-> >  mm/memcontrol.c                         | 1 +
-> >  mm/page_alloc.c                         | 6 +++++-
-> >  mm/vmstat.c                             | 1 +
-> >  8 files changed, 21 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-> > index 69d7a6983f78..828cb6b6f918 100644
-> > --- a/Documentation/admin-guide/cgroup-v2.rst
-> > +++ b/Documentation/admin-guide/cgroup-v2.rst
-> > @@ -1312,6 +1312,11 @@ PAGE_SIZE multiple when read back.
-> >         pagetables
-> >                  Amount of memory allocated for page tables.
-> >
-> > +       secondary_pagetables
-> > +             Amount of memory allocated for secondary page tables,
-> > +             this currently includes KVM mmu allocations on x86
-> > +             and arm64.
->
-> Can you please explain what the rationale is for this? We already
-> account for the (arm64) S2 PTs as a userspace allocation (see
+On Friday 22 Apr 2022 at 20:41:47 (+0000), Oliver Upton wrote:
+> On Fri, Apr 22, 2022 at 04:00:45PM +0000, Quentin Perret wrote:
+> > On Thursday 21 Apr 2022 at 16:40:56 (+0000), Oliver Upton wrote:
+> > > The other option would be to not touch the subtree at all until the rcu
+> > > callback, as at that point software will not tweak the tables any more.
+> > > No need for atomics/spinning and can just do a boring traversal.
+> > 
+> > Right that is sort of what I had in mind. Note that I'm still trying to
+> > make my mind about the overall approach -- I can see how RCU protection
+> > provides a rather elegant solution to this problem, but this makes the
+> > whole thing inaccessible to e.g. pKVM where RCU is a non-starter.
+> 
+> Heh, figuring out how to do this for pKVM seemed hard hence my lazy
+> attempt :)
+> 
+> > A
+> > possible alternative that comes to mind would be to have all walkers
+> > take references on the pages as they walk down, and release them on
+> > their way back, but I'm still not sure how to make this race-safe. I'll
+> > have a think ...
+> 
+> Does pKVM ever collapse tables into blocks? That is the only reason any
+> of this mess ever gets roped in. If not I think it is possible to get
+> away with a rwlock with unmap on the write side and everything else on
+> the read side, right?
+> 
+> As far as regular KVM goes we get in this business when disabling dirty
+> logging on a memslot. Guest faults will lazily collapse the tables back
+> into blocks. An equally valid implementation would be just to unmap the
+> whole memslot and have the guest build out the tables again, which could
+> work with the aforementioned rwlock.
 
-This can be considered as continuation for that work. The mentioned
-commit accounts S2 PTs to the VM process cgroup kernel memory. We have
-stats for the total kernel memory, and some fine-grained categories of
-that, like (pagetables, stack, slab, etc.).
+Apologies for the delay on this one, I was away for a while.
 
-This patch just adds another category to give further insights into
-what exactly is using kernel memory.
-
-> 115bae923ac8bb29ee635). You are saying that this is related to a
-> 'workload', but given that the accounting is global, I fail to see how
-> you can attribute these allocations on a particular VM.
-
-The main motivation is having the memcg stats, which give attribution
-to workloads. If you think it's more appropriate, we can add it as a
-memcg-only stat, like MEMCG_VMALLOC (see 4e5aa1f4c2b4 ("memcg: add
-per-memcg vmalloc stat")). The only reason I made this as a global
-stat too is to be consistent with NR_PAGETABLE.
-
->
-> What do you plan to do for IOMMU page tables? After all, they serve
-> the exact same purpose, and I'd expect these to be handled the same
-> way (i.e. why is this KVM specific?).
-
-The reason this was named NR_SECONDARY_PAGTABLE instead of
-NR_KVM_PAGETABLE is exactly that. To leave room to incrementally
-account other types of secondary page tables to this stat. It is just
-that we are currently interested in the KVM MMU usage.
-
->
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+Yup, that all makes sense. FWIW the pKVM use-case I have in mind is
+slightly different. Specifically, in the pKVM world the hypervisor
+maintains a stage-2 for the host, that is all identity mapped. So we use
+nice big block mappings as much as we can. But when a protected guest
+starts, the hypervisor needs to break down the host stage-2 blocks to
+unmap the 4K guest pages from the host (which is where the protection
+comes from in pKVM). And when the guest is torn down, the host can
+reclaim its pages, hence putting us in a position to coallesce its
+stage-2 into nice big blocks again. Note that none of this coallescing
+is currently implemented even in our pKVM prototype, so it's a bit
+unfair to ask you to deal with this stuff now, but clearly it'd be cool
+if there was a way we could make these things coexist and even ideally
+share some code...
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
