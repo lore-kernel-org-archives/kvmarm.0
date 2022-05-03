@@ -2,172 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4078DC433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 08:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB2CC433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 10:31:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 977B04A49C;
-	Tue,  3 May 2022 04:13:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0DE849ED5;
+	Tue,  3 May 2022 06:31:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@armh.onmicrosoft.com
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@armh.onmicrosoft.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id puwWZiU9aE34; Tue,  3 May 2022 04:13:41 -0400 (EDT)
+	with ESMTP id TMnWFm3-OV5U; Tue,  3 May 2022 06:31:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 374F44A7FD;
-	Tue,  3 May 2022 04:13:41 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 51D104B0D9;
+	Tue,  3 May 2022 06:31:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 968B74A49C
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 04:13:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EC3E4B0BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 06:31:13 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 704mK2M9xgiI for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 04:13:39 -0400 (EDT)
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com
- (mail-eopbgr60048.outbound.protection.outlook.com [40.107.6.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B37849EE3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 04:13:38 -0400 (EDT)
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
- b=DtonobMMBrYkEQAQCD1QO2MOYgZUvdV05rpcreupgY2MUbzJouOwwAqqBmRNj0Rls18TGyCfiVxfqrtCPcGuxsjj9jQ1tWtnxl+1EERyhag4hdkm0PA68DP244mRhDEtzkIa+YFyaqSwRHZpcLF9YFf0z9BBJbMKnYlGA0qKlXaQnoOIsDfPmj5PEDM7pUI1o+D9P69fvAfmjaNEGJlYt8cK4c5S12vTUVPl7PAUn1nD7kblj8U5Wqj+UIOH6Pn6LnHNEw9LMYbOdF0K7Cm308cueuR+kuDX36ARfGCt3b7PrRrA48GjLRyI4a62/8PQEe7ZyVCRDE6T+wIwy6oK0w==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=12P3TpUwPZFrXtxik6iYyEVWFTiih5G83nj9vFeYXTs=;
- b=k/OaB1VTX00u1eYbhDZ39gtAhYE/1DigyjDloIDI3MmGJBuv3UQWt3sdq9tZvNWmS9hyeTblTxvnZmgBVvHAto4485e782+mEBmVO9YGqsL8ZH0sikW/Sipty5Y0EprsOEbutU5p47hUOrqunv/BKhLRouTkvo0ShT5CZgLThnGVd1TftdFiztnyCigfUiFPW80z4Y1NFEql6XDE4EWuDhFv11kBuoAIslWAFzT/eR9P9tADIYUvavvg3P2hy1Iy5cYXb1I2yFKKt0UjQuABnWNL3NkZgjiM/uyZcx8F8Np7JVzp2vcOFPfT/WQndcYKE3exDOMID+FEUS2UMHOvjA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 63.35.35.123) smtp.rcpttodomain=lists.cs.columbia.edu smtp.mailfrom=arm.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
- dkim=pass (signature was verified) header.d=armh.onmicrosoft.com; arc=pass (0
- oda=1 ltdi=1 spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
- dmarc=[1,1,header.from=arm.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=12P3TpUwPZFrXtxik6iYyEVWFTiih5G83nj9vFeYXTs=;
- b=oxLcyTNlUUZXOVmI3aGeXsdGDrD2enp+GkVHVZqqytfhSaZ9Q+sXyXVH3YzVFdSqLgf1XySxflfHgO5R7QtuWI84RDSL4xvWRMWv+eJSLuE/E20P3NCNxHhicfgxwLymLh5fgHU72GS6DL8smsvixMs7PmNNxibQ6poF2LBIvEY=
-Received: from AS9PR06CA0057.eurprd06.prod.outlook.com (2603:10a6:20b:463::33)
- by AM5PR0802MB2481.eurprd08.prod.outlook.com (2603:10a6:203:a0::7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.12; Tue, 3 May
- 2022 08:13:35 +0000
-Received: from AM5EUR03FT030.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:20b:463:cafe::e9) by AS9PR06CA0057.outlook.office365.com
- (2603:10a6:20b:463::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.12 via Frontend
- Transport; Tue, 3 May 2022 08:13:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM5EUR03FT030.mail.protection.outlook.com (10.152.16.117) with
- Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5206.12 via Frontend Transport; Tue, 3 May 2022 08:13:34 +0000
-Received: ("Tessian outbound facaf1373bbd:v118");
- Tue, 03 May 2022 08:13:34 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: b02e5ef33f797400
-X-CR-MTA-TID: 64aa7808
-Received: from 8bf7a89e5314.2
- by 64aa7808-outbound-1.mta.getcheckrecipient.com id
- CEA04689-D191-4A71-9508-1BB37F29BDD8.1; 
- Tue, 03 May 2022 08:13:27 +0000
-Received: from EUR03-AM5-obe.outbound.protection.outlook.com
- by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 8bf7a89e5314.2
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
- Tue, 03 May 2022 08:13:27 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j/4ms4zDht8g0p6y61Ye9jnEPZ/mJdogLUbGEbiHY+3rWDvX8y3U2Z634H9vY2JxnFZc6cLWmp8efM39icwfZm/QE/+21vRmGBMKGOBHxQxmSGHl4BDKfavdsPRzjLynTHDGQI7tZCQx/CGw5qyUtnml8DcfNx3vlzzqYIn1afG4Y/G/vy4N2jX6ftBVx54jKm1AbnX1hqxubaIde7z+QEL3Z4CkqsK2z2gGOdYu2JVsUSh/rtzfalgFcDGzEMK9GkQ4YINdSozR0YtvPA+AAnbYjtLsabmVnb7R2iVHHEw1a+d1nk7eiMEoHMbZlp6XD/a9QDi6s0Y3Zd4a/4gB8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=12P3TpUwPZFrXtxik6iYyEVWFTiih5G83nj9vFeYXTs=;
- b=mamvmsyF7qnaOQpWE2btRbHI00yfkn9J68aFnGBfIz224F9s3D2sVoDkOAk9ZMEwkjzUQ0p0WWlQ1pw6p8WrqUSO6N9e7VW2J7qOW+zUainz5TgOv3m1/LVMtWqU2OZkKClbpvxbc9RQJY9DzU+2hu9Wq5Ni8nz5crn9tPn1mac5RUkpXEYZdwRubm54zhHKW8IBnbayYuOGL3KgBRNne7BO0kYo+lTgBxFmX4HwWP1Zh+5AcdwXmaOQXgZ2O18mVlj7LqaMTblnkx4D4S+V2oeF6nJaDDhf0vwSV6WjEiIH6xUoCh8qGdXoJQi/iXjDGWY1uXG9KamQ3JcBMt3YcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=12P3TpUwPZFrXtxik6iYyEVWFTiih5G83nj9vFeYXTs=;
- b=oxLcyTNlUUZXOVmI3aGeXsdGDrD2enp+GkVHVZqqytfhSaZ9Q+sXyXVH3YzVFdSqLgf1XySxflfHgO5R7QtuWI84RDSL4xvWRMWv+eJSLuE/E20P3NCNxHhicfgxwLymLh5fgHU72GS6DL8smsvixMs7PmNNxibQ6poF2LBIvEY=
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-Received: from DB9PR08MB7179.eurprd08.prod.outlook.com (2603:10a6:10:2cc::19)
- by DB7PR08MB3404.eurprd08.prod.outlook.com (2603:10a6:10:4c::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.19; Tue, 3 May
- 2022 08:13:25 +0000
-Received: from DB9PR08MB7179.eurprd08.prod.outlook.com
- ([fe80::9ccc:fe7c:19e5:bfa6]) by DB9PR08MB7179.eurprd08.prod.outlook.com
- ([fe80::9ccc:fe7c:19e5:bfa6%4]) with mapi id 15.20.5206.024; Tue, 3 May 2022
- 08:13:25 +0000
-Date: Tue, 3 May 2022 09:13:11 +0100
-From: Szabolcs Nagy <szabolcs.nagy@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v14 04/39] arm64/sme: Provide ABI documentation for SME
-Message-ID: <YnDkF1cfR+cL18Gu@arm.com>
-References: <20220419112247.711548-1-broonie@kernel.org>
- <20220419112247.711548-5-broonie@kernel.org>
- <YmpcGpSYpoiprngy@arm.com>
-Content-Disposition: inline
-In-Reply-To: <YmpcGpSYpoiprngy@arm.com>
-X-ClientProxiedBy: AM0PR04CA0048.eurprd04.prod.outlook.com
- (2603:10a6:208:1::25) To DB9PR08MB7179.eurprd08.prod.outlook.com
- (2603:10a6:10:2cc::19)
+ with ESMTP id 0xRwS5Z8pnF7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 06:31:12 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19D704B091
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 06:31:12 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 5B3B3B81D40;
+ Tue,  3 May 2022 10:31:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F31DC385A9;
+ Tue,  3 May 2022 10:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651573869;
+ bh=hdMtNCaYZb86oM3x0a1mVVawEaUeAE4STWQUnxJJi7c=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=pyOU36JoQjIY3f3xcV03lOxBlmovJ70oM98C7WYLtygXDq8nSkLE9m8Qd1vnAT05u
+ FnbS2lrnrvrmoWjfW4TiY6oOT1S8yU7fMTzJen/TfnuVbYuFSSKQLWgY2Q5RNwLQp9
+ IrTSDPwn1pVX5LTYZiryHhDhXUwUsCMkMTYMsObJXnWV703f4h8QKe7zNbdpY9q1KW
+ EDq0pS8TMBX5CpQzIxL1kNTU9XFV3K22C8McPEnVMufYq94kPXxY5iU1n9rTuAcTnK
+ nZEHV4SN9CSag2DBiq68Yo3FGI+9WQeF91CvA521w9XXcfW4FP8usQu9WKJDw6aYBt
+ SXtVOKGmzU9Qw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nlpoA-008cWg-Mt; Tue, 03 May 2022 11:31:06 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.cs.columbia.edu,
+	Oliver Upton <oupton@google.com>
+Subject: Re: [PATCH v4 0/7] KVM: arm64: Limit feature register reads from
+ AArch32
+Date: Tue,  3 May 2022 11:31:02 +0100
+Message-Id: <165157375706.3129182.12268321822257676050.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220503060205.2823727-1-oupton@google.com>
+References: <20220503060205.2823727-1-oupton@google.com>
 MIME-Version: 1.0
-X-MS-Office365-Filtering-Correlation-Id: d7085fb4-4f78-42ea-73d4-08da2cdcd185
-X-MS-TrafficTypeDiagnostic: DB7PR08MB3404:EE_|AM5EUR03FT030:EE_|AM5PR0802MB2481:EE_
-X-Microsoft-Antispam-PRVS: <AM5PR0802MB24815850FA3ACCB6810BDCB5EDC09@AM5PR0802MB2481.eurprd08.prod.outlook.com>
-x-checkrecipientrouted: true
-NoDisclaimer: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: yyHrF39+cYledTiMQLPD1KlKvPcVy06NoJp+8gX/OYoryZrYo5S3AUPELOULTHAKj504Nw1irZvwCo4NOJZ5z313VL6L/22rbYNbioEaLQmZ4wTTT2+LJvwiQiJIJMY0unEcddayOKIqshcypFHZeb+fRcWf2BGPPoee8qipVmJ8SOu/KQtdY+0UDrxyR59vpEi9Mh06BeOZIw9fq1t9/JcukIkQEPGuZrNUCLQAhCn5knDeuKSjbdCyGW7nSayAzXlE1l2egsH97RQE3RyoB25oW4/apuHdQZJL9sucX9sLvjO2tji01bG6xqtEy7qkh+OyIr4P+3eEEZfMoM1E2VfGRaBAcDqukdWULwHOURjWQ/+QQVA/TNQXCebd9y4QSTfzDfo1qU0X2Px9Jljq70NmDlAAMeiHeN8Nc+wM4AbscKl4GsT9MWvdO/+fgnpLpXJ28+hZksJ0GZDZEBmIcL9rYrA1yZ+rDkhVnFPwRHFkbe6JdBFL4A2lsfEatU5aIh5602u3/fLcfS8d/+eLQfbGJ3XcPJxIZ0zveOp8meQ65L5SU9sF/sfmmCsIPXvyLdX12We8viYY7LZWBfVUdgw7iLoE5OOpItCPT7jgydEYnjzQPGyTIIOwv81ETMcySbkRGsg65BoT1+1wzccCwlSINr6zY+4kFrWmW48QIAnqGb/8dIBDp0QAyJatccWkCmfhcraEidFy1vYpvUXgdA==
-X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255; CTRY:; LANG:en;
- SCL:1; SRV:; IPV:NLI; SFV:NSPM; H:DB9PR08MB7179.eurprd08.prod.outlook.com;
- PTR:; CAT:NONE;
- SFS:(13230001)(4636009)(366004)(6486002)(86362001)(6636002)(6512007)(26005)(66476007)(66946007)(4326008)(66556008)(6506007)(6862004)(8676002)(508600001)(316002)(6666004)(38100700002)(54906003)(36756003)(37006003)(2906002)(8936002)(5660300002)(2616005)(186003)(44832011)(67856001);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3404
-Original-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arm.com;
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT030.eop-EUR03.prod.protection.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs: 0a863e43-6aed-4b8f-0fda-08da2cdccc16
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1SrrVJnonb6djI7GI/L59aRcejaJHdSBRn3DcVJ/WeEGLH76FaAEMKSrpIByMVKERPF0Q+rk53HHTaGatlU3wXaESoFAn0gQaamXMyq+FpkA6GrOFHQ3TP5KiDqZBUZuES51TPd2BuYXxQgMmP3uMbO4LYWYfwn5XCcC9ytcVNEFQthsbDW2TdbpGuuv33Nd0tvYl1lyCp3GpBQqQhK6WuKhNkrbCyCEuaxjmGZuSlNkjR+bPiUn4VXk3roT/r4XtePHgw7O3/EGdLUbvNlcGjVCJSEbHCgxIpM6bL/jUEoGSNEseEtahNXQVOAKSWPrll3r2XoGl7g1hRTAV2w78q6MgrTPDX6gFLeUwMZEujwEO59Q+CaTcvtHQqPKD+9sD+q0eW3m0cPqF08Am6roNWwN8KLe2fc07uld1cXv880Z6tL576noVh7LCJNvcmGDXrwdYK7VtgulWb5NyvZ78+f4suIHR6y5+qnn6fp8T7cYE7XucgXAe5oRbwLoVQiqHgJUFp52kLSlDHU4LxRp0vY/vF0dVc/OVfs/LQB3Try/Fxt6MHuDAh52Me7tCRJltJyZ0m4GODiURSyMfcvmVSq4Hs1MwmNZej5oVFtOUwvC4oVY+MNeinsrR6oH9mO3KnHLzKIcB++AEgPG3DTSXQEuYst3WHvQmBeqwEA232buVJEEzeBTMaaiB0CLgFz44WrlwqO1mVmPQknxR89o3Q==
-X-Forefront-Antispam-Report: CIP:63.35.35.123; CTRY:IE; LANG:en; SCL:1; SRV:;
- IPV:CAL; SFV:NSPM; H:64aa7808-outbound-1.mta.getcheckrecipient.com;
- PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; CAT:NONE;
- SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(82310400005)(2906002)(36860700001)(47076005)(26005)(70586007)(2616005)(336012)(6666004)(6506007)(6512007)(186003)(6862004)(54906003)(6636002)(5660300002)(4326008)(86362001)(356005)(37006003)(81166007)(316002)(70206006)(8936002)(8676002)(36756003)(6486002)(508600001)(40460700003)(44832011)(67856001);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2022 08:13:34.5383 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7085fb4-4f78-42ea-73d4-08da2cdcd185
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
- Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: AM5EUR03FT030.eop-EUR03.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2481
-Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
- Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
- Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
- Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
- Salil Akerkar <Salil.Akerkar@arm.com>,
- Luca Salabrino <luca.scalabrino@arm.com>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, oupton@google.com,
+ suzuki.poulose@arm.com, ricarkol@google.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ james.morse@arm.com, reijiw@google.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -184,49 +86,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The 04/28/2022 10:19, Catalin Marinas wrote:
-> On Tue, Apr 19, 2022 at 12:22:12PM +0100, Mark Brown wrote:
-> > +* There are a number of optional SME features, presence of these is reported
-> > +  through AT_HWCAP2 through:
-> > +
-> > +	HWCAP2_SME_I16I64
-> > +	HWCAP2_SME_F64F64
-> > +	HWCAP2_SME_I8I32
-> > +	HWCAP2_SME_F16F32
-> > +	HWCAP2_SME_B16F32
-> > +	HWCAP2_SME_F32F32
-> > +	HWCAP2_SME_FA64
+On Tue, 3 May 2022 06:01:58 +0000, Oliver Upton wrote:
+> KVM/arm64 does not restrict the guest's view of the AArch32 feature
+> registers when read from AArch32. HCR_EL2.TID3 is cleared for AArch32
+> guests, meaning that register reads come straight from hardware. This is
+> problematic as KVM relies on read_sanitised_ftr_reg() to expose a set of
+> features consistent for a particular system.
 > 
-> Marc pointed out that in combination with FEAT_WFxT, we used all the
-> HWCAP2 bits (32). While we are ok for now, we'll soon need to look into
-> what to do when the next features turn up. Some options:
+> Appropriate handlers must first be put in place for CP10 and CP15 ID
+> register accesses before setting TID3. Rather than exhaustively
+> enumerating each of the encodings for CP10 and CP15 registers, take the
+> lazy route and aim the register accesses at the AArch64 system register
+> table.
 > 
-> 1. Only provide HWCAP2_SME and let the ID_AA64SMFR0_EL1 features be
->    probed via MRS emulation. It doesn't solve the problem but it buys us
->    a bit of time.
-> 
-> 2. Don't bother with any new HWCAPs, just rely on MRS emulation (we have
->    HWCAP_CPUID advertising this).
-> 
-> 3. Start using the upper 32-bit of HWCAP and HWCAP2 (we initially didn't
->    go into these as there was a slight chance of merging ILP32). Does
->    the libc rely on the upper bits for anything? Or does it just assume
->    a 32-bit HWCAPs layout?
+> [...]
 
-top 2 bits of a 64bit AT_HWCAP should be reserved for libc.
-(glibc uses them internally)
+Applied to next, thanks!
 
-otherwise glibc can work with 64bit hwcaps.
+Note that I have dropped the revert for now, as the original patch
+lives in a separate branch. I'll clean things up at -rc1.
 
-> 
-> 4. Introduce HWCAP3.
-> 
-> Szabolcs, any thoughts?
+[1/7] KVM: arm64: Return a bool from emulate_cp()
+      commit: 001bb819994cd1bd037b6aefdb233f1720ee2126
+[2/7] KVM: arm64: Don't write to Rt unless sys_reg emulation succeeds
+      commit: 28eda7b5e82489b9dcffc630af68c207552b4f4d
+[3/7] KVM: arm64: Wire up CP15 feature registers to their AArch64 equivalents
+      commit: e65197666773f39e4378161925e5a1c7771cff29
+[4/7] KVM: arm64: Plumb cp10 ID traps through the AArch64 sysreg handler
+      commit: 9369bc5c5e35985f38d04bd98c6d28a032e84b17
+[5/7] KVM: arm64: Start trapping ID registers for 32 bit guests
+      commit: fd1264c4ca610a99d52c35a37e5551eec442723d
+[6/7] KVM/arm64: Hide AArch32 PMU registers when not available
+      commit: a9e192cd4fc738469448803693c9dc730898b8f1
 
-i'd go with AT_HWCAP3 and keep using the bottom 32bit for now.
-(this requires some new code in glibc, but not excessive)
+Cheers,
 
-thanks.
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
