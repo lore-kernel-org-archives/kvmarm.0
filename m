@@ -2,79 +2,102 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFEB4C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 18:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 393BBC433F5
+	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 19:40:58 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A9724B18F;
-	Tue,  3 May 2022 14:49:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 773C94B176;
+	Tue,  3 May 2022 15:40:57 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FbKowe92JWek; Tue,  3 May 2022 14:49:26 -0400 (EDT)
+	with ESMTP id pCCIum3duCnn; Tue,  3 May 2022 15:40:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C8984B0DF;
-	Tue,  3 May 2022 14:49:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 42C544B092;
+	Tue,  3 May 2022 15:40:56 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F1B8349EF1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 14:49:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3BE0E49F22
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 15:40:55 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8pZX6BOd1bEl for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 14:49:23 -0400 (EDT)
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com
- [209.85.128.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7E624B086
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 14:49:23 -0400 (EDT)
-Received: by mail-yw1-f176.google.com with SMTP id
- 00721157ae682-2f7d621d1caso189672397b3.11
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 11:49:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=2RVFHg4J+XiYNHLd6mO9jBpgTMA8wJDRHLKt8HLDZag=;
- b=D8eHTcfTZf0aangD3/F507rAzlAJhrb5z3tZDy1kbX20PciK6IfBwz/4PNfuleSx0Q
- Q0xU7/YQtPzsLyeLgw1EAa1R8W73BCJmdkq5MMpFtJNdr6ZvwYyxjYSWDH3eTqNsXRMB
- tbCxbVWfMhpiKcj3/ASXTdhk5YNGZjKX6kOl5X4ZHYOs4V0Fa+ZbhGRjXdYgY/Erom7f
- kmCXngcb/dxpkWWMSzCaE7lFNfN+fVCBzvJ/rNdquW8eZvEpSpOqjnzlsDZ+HgIWJEnj
- vduTalPXsNoQB+nme19yLfsZu0p6LTEluDGahZfkayRKYiJqoVrjAQpWzOGig+3e8eto
- 7PAA==
+ with ESMTP id NRWL65+vcucn for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 15:40:54 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34A264B0B3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 15:40:54 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1651606852;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qyazgKmNz6MvewagZP0q+tDesycMY+RcOXxoB9vbg74=;
+ b=aN6vzCgpEx6x/kWX3eq3hdaxDIq9v4azfSN0FzXf9QxTzKnndNAC6a+xWBhQeEqkTPnKiF
+ JD0z/MrXNdc70tUFodMBtx5fEKyx+QhX/pK0GlZ3NCaV0k2iuhuByfSoNttpwktv7K8rB2
+ KjmSJD+xMTIy4J5+Qk6/FhS9fCFESis=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-587-4k-ayDagPPOAZ7M0mVSUpw-1; Tue, 03 May 2022 15:40:51 -0400
+X-MC-Unique: 4k-ayDagPPOAZ7M0mVSUpw-1
+Received: by mail-qv1-f71.google.com with SMTP id
+ p3-20020a05621421e300b004562c4a6b08so14038566qvj.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 12:40:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=2RVFHg4J+XiYNHLd6mO9jBpgTMA8wJDRHLKt8HLDZag=;
- b=UmdMntc98p/9um3OlnPm0+CB6hiwjHh514jC2ffnE/P8wa6hiajd6fDfPG/TRVOYnY
- XRXQRMIlBJXe6vNBxDwYxTf4uDi6yjdkq7xXDSU7jrpFZoKoi08wNpWPvlWwCEXf3UcM
- Cd8odXjA83fQWtfiv/ttV/1kji8xpD43sFxBi2jSaFcWmcci4kcJyfRqu6oCG+zq61qO
- iEP0AZU4hAl+1ne310PSY2tOuvZpbWZEP/i2mRkOuJyQkPIiS2ySiDp+8F0Lq3ygdw/3
- 8rkuGtuzIFdqNcDPHfEeF0nFnGCyn6LQNJcj2AZ0E9hDqQXGZg+ML3Vo5l3SYgLnc4qM
- hZ8Q==
-X-Gm-Message-State: AOAM5304Wxg6quX08z75rxzqBI3Mxq5LPPUjbc64mE7k8xIcTzK6HA4R
- UXpF33NTBSxDtScVthmsUgv4e/Lf0E+TjPrh5fjJgQ==
-X-Google-Smtp-Source: ABdhPJwlC5LLT8qc2EBu/75ZFoBSCD2aheEv/0F0Bxd/JtnhVZiAZdUSCNlpn7PYi6ZP9gaCJKYUVW6yxjrPsLKdXKQ=
-X-Received: by 2002:a0d:dd90:0:b0:2f8:5459:486e with SMTP id
- g138-20020a0ddd90000000b002f85459486emr16835296ywe.427.1651603763187; Tue, 03
- May 2022 11:49:23 -0700 (PDT)
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:reply-to
+ :subject:content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=qyazgKmNz6MvewagZP0q+tDesycMY+RcOXxoB9vbg74=;
+ b=fAdy3lSrc9LF/+CoXuXVe4bgG0uH1/TV/TeVbm03V4kS8FNUAyiELvW/ej/u9NiAcQ
+ yuaKEwqdiQ0ZE9at+bdN6/uZ4bzJ8Vqf1guz0StFgyAqVlHCoA2yfkNWuZv5U3fMZZEV
+ 1z9nEvUyvBvaq1JrxqSnb7unMQrhjnNv10AnCcag0CJY3A6bhhXPcXR9FHmQE/8TeBN2
+ 2EddGRqA/3283u2C7CEEBrxH+JsekSRhleDT9Mz3ad4ktk+wVkbcKHUwDSo0L2+ZdJZh
+ sCU1yxSRdfGN3JhC9NotQTjggH5+gisV0Z3cLeTYx+/xp25U0XWKeEkINxKtfGHWm8SC
+ RHvA==
+X-Gm-Message-State: AOAM531dwBq5ZrtaBjc3MJhuuqDIEbXEDwuimTkNbrEKDWiUaMjwth+p
+ Lu9htMfKyWnhnMWclcCF8lN9PNKZlmvpXa3YJXd+T8MKmGVlWtFyRj9/N/57wRx6b7wjLZIuaJ6
+ 8OGz393xxkYS66NMh3pygyjkP
+X-Received: by 2002:ac8:7f0a:0:b0:2f1:f60d:2b39 with SMTP id
+ f10-20020ac87f0a000000b002f1f60d2b39mr16038540qtk.470.1651606850800; 
+ Tue, 03 May 2022 12:40:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyUzjOo6cdaooCBJoI2l9Mjw62a4uKABfTpoWuDdloGnEHRUre3/Lrt0n+yxqvJ2c59h8moIA==
+X-Received: by 2002:ac8:7f0a:0:b0:2f1:f60d:2b39 with SMTP id
+ f10-20020ac87f0a000000b002f1f60d2b39mr16038516qtk.470.1651606850552; 
+ Tue, 03 May 2022 12:40:50 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id
+ s15-20020a05620a030f00b0069fc13ce254sm6152999qkm.133.2022.05.03.12.40.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 May 2022 12:40:49 -0700 (PDT)
+Message-ID: <7b5f03d4-1db1-c2c4-c7d6-9e6be3a427e2@redhat.com>
+Date: Tue, 3 May 2022 21:40:44 +0200
 MIME-Version: 1.0
-References: <20220502233853.1233742-1-rananta@google.com>
- <878rri8r78.wl-maz@kernel.org>
-In-Reply-To: <878rri8r78.wl-maz@kernel.org>
-From: Raghavendra Rao Ananta <rananta@google.com>
-Date: Tue, 3 May 2022 11:49:13 -0700
-Message-ID: <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
-Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services
- selection
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v2 4/4] KVM: arm64: vgic: Undo work in failed ITS restores
+To: Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu
+References: <20220427184814.2204513-1-ricarkol@google.com>
+ <20220427184814.2204513-5-ricarkol@google.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20220427184814.2204513-5-ricarkol@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: andre.przywara@arm.com, pshier@google.com, maz@kernel.org,
+ pbonzini@redhat.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -83,50 +106,92 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-SGkgTWFyYywKCk9uIFR1ZSwgTWF5IDMsIDIwMjIgYXQgMTA6MjQgQU0gTWFyYyBaeW5naWVyIDxt
-YXpAa2VybmVsLm9yZz4gd3JvdGU6Cj4KPiBPbiBUdWUsIDAzIE1heSAyMDIyIDAwOjM4OjQ0ICsw
-MTAwLAo+IFJhZ2hhdmVuZHJhIFJhbyBBbmFudGEgPHJhbmFudGFAZ29vZ2xlLmNvbT4gd3JvdGU6
-Cj4gPgo+ID4gSGVsbG8sCj4gPgo+ID4gQ29udGludWluZyB0aGUgZGlzY3Vzc2lvbiBmcm9tIFsx
-XSwgdGhlIHNlcmllcyB0cmllcyB0byBhZGQgc3VwcG9ydAo+ID4gZm9yIHRoZSB1c2Vyc3BhY2Ug
-dG8gZWxlY3QgdGhlIGh5cGVyY2FsbCBzZXJ2aWNlcyB0aGF0IGl0IHdpc2hlcwo+ID4gdG8gZXhw
-b3NlIHRvIHRoZSBndWVzdCwgcmF0aGVyIHRoYW4gdGhlIGd1ZXN0IGRpc2NvdmVyaW5nIHRoZW0K
-PiA+IHVuY29uZGl0aW9uYWxseS4gVGhlIGlkZWEgZW1wbG95ZWQgYnkgdGhlIHNlcmllcyB3YXMg
-dGFrZW4gZnJvbQo+ID4gWzFdIGFzIHN1Z2dlc3RlZCBieSBNYXJjIFouCj4KPiBBcyBpdCB0b29r
-IHNvbWUgdGltZSB0byBnZXQgdGhlcmUsIGFuZCB0aGF0IHRoZXJlIHdhcyBzdGlsbCBhIGJ1bmNo
-IG9mCj4gdGhpbmdzIHRvIGFkZHJlc3MsIEkndmUgdGFrZW4gdGhlIGxpYmVydHkgdG8gYXBwbHkg
-bXkgb3duIGZpeGVzIHRvIHRoZQo+IHNlcmllcy4KPgo+IFBsZWFzZSBoYXZlIGEgbG9vayBhdCBb
-MV0sIGFuZCBsZXQgbWUga25vdyBpZiB5b3UncmUgT0sgd2l0aCB0aGUKPiByZXN1bHQuIElmIHlv
-dSBhcmUsIEknbGwgbWVyZ2UgdGhlIHNlcmllcyBmb3IgNS4xOS4KPgo+IFRoYW5rcywKPgo+ICAg
-ICAgICAgTS4KPgpUaGFuayB5b3UgZm9yIHNwZWVkaW5nIHVwIHRoZSBwcm9jZXNzOyBhcHByZWNp
-YXRlIGl0LiBIb3dldmVyLCB0aGUKc2VyaWVzJ3Mgc2VsZnRlc3QgcGF0Y2hlcyBoYXZlIGEgZGVw
-ZW5kZW5jeSBvbiBPbGl2ZXIncwpQU0NJX1NZU1RFTV9TVVNQRU5EJ3Mgc2VsZnRlc3QgcGF0Y2hl
-cyBbMV1bMl0uIENhbiB3ZSBwdWxsIHRoZW0gaW4KdG9vPwoKYWFyY2g2NC9oeXBlcmNhbGxzLmM6
-IEluIGZ1bmN0aW9uIOKAmGd1ZXN0X3Rlc3RfaHZj4oCZOgphYXJjaDY0L2h5cGVyY2FsbHMuYzo5
-NTozMDogZXJyb3I6IHN0b3JhZ2Ugc2l6ZSBvZiDigJhyZXPigJkgaXNu4oCZdCBrbm93bgogICA5
-NSB8ICAgICAgICAgc3RydWN0IGFybV9zbWNjY19yZXMgcmVzOwogICAgICB8ICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXn5+CmFhcmNoNjQvaHlwZXJjYWxscy5jOjEwMzoxNzogd2Fybmlu
-ZzogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24K4oCYc21jY2NfaHZj4oCZIFstV2lt
-cGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogIDEwMyB8ICAgICAgICAgICAgICAgICBzbWNj
-Y19odmMoaGNfaW5mby0+ZnVuY19pZCwgaGNfaW5mby0+YXJnMSwgMCwKMCwgMCwgMCwgMCwgMCwg
-JnJlcyk7CiAgICAgIHwgICAgICAgICAgICAgICAgIF5+fn5+fn5+fgoKQWxzbywganVzdCBhIGNv
-dXBsZSBvZiByZWFkYWJpbGl0eSBuaXRzIGluIHRoZSBmaXhlZCB2ZXJzaW9uOgoKMS4gUGF0Y2gt
-Mi85LCBoeXBlcmNhbGwuYzprdm1faHZjX2NhbGxfZGVmYXVsdF9hbGxvd2VkKCksIGluIHRoZQon
-ZGVmYXVsdCcgY2FzZSwgZG8geW91IHRoaW5rIHdlIHNob3VsZCBwcm9iYWJseSBhZGQgYSBzbWFs
-bCBjb21tZW50CnRoYXQgbWVudGlvbnMgd2UgYXJlIGNoZWNraW5nIGZvciBmdW5jX2lkIGluIHRo
-ZSBQU0NJIHJhbmdlPwoyLiBQYXRjaC0yLzksIGFybV9oeXBlcmNhbGwuaCwgY2xlYXIgYWxsIHRo
-ZSBtYWNyb3MgaW4gdGhpcyBwYXRjaAppdHNlbGYgaW5zdGVhZCBvZiBkb2luZyBpdCBpbiBpbmNy
-ZW1lbnRzICh1bmxlc3MgdGhlcmUncyBzb21lIHJlYXNvbgp0aGF0IEknbSBtaXNzaW5nKT8KClJl
-Z2FyZHMsClJhZ2hhdmVuZHJhCgpbMV06IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2FsbC8yMDIy
-MDQwOTE4NDU0OS4xNjgxMTg5LTEwLW91cHRvbkBnb29nbGUuY29tLwpbMl06IGh0dHBzOi8vbG9y
-ZS5rZXJuZWwub3JnL2FsbC8yMDIyMDQwOTE4NDU0OS4xNjgxMTg5LTExLW91cHRvbkBnb29nbGUu
-Y29tLwoKPiBbMV0gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9n
-aXQvbWF6L2FybS1wbGF0Zm9ybXMuZ2l0L2xvZy8/aD1rdm0tYXJtNjQvaGNhbGwtc2VsZWN0aW9u
-Cj4KPiAtLQo+IFdpdGhvdXQgZGV2aWF0aW9uIGZyb20gdGhlIG5vcm0sIHByb2dyZXNzIGlzIG5v
-dCBwb3NzaWJsZS4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBz
-Oi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+Hi Ricardo,
+
+On 4/27/22 20:48, Ricardo Koller wrote:
+> Failed ITS restores should clean up all state restored until the
+> failure. There is some cleanup already present when failing to restore
+> some tables, but it's not complete. Add the missing cleanup.
+>
+> Note that this changes the behavior in case of a failed restore of the
+> device tables.
+I assume this is acceptable
+>
+> 	restore ioctl:
+> 	1. restore collection tables
+> 	2. restore device tables
+>
+> With this commit, failures in 2. clean up everything created so far,
+> including state created by 1.
+>
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  arch/arm64/kvm/vgic/vgic-its.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+> index 86c26aaa8275..c35534d7393a 100644
+> --- a/arch/arm64/kvm/vgic/vgic-its.c
+> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+> @@ -2222,8 +2222,10 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+>  		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
+>  
+>  	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
+> -	if (IS_ERR(irq))
+> +	if (IS_ERR(irq)) {
+> +		its_free_ite(kvm, ite);
+>  		return PTR_ERR(irq);
+> +	}
+>  	ite->irq = irq;
+>  
+>  	return offset;
+> @@ -2491,6 +2493,9 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
+>  	if (ret > 0)
+>  		ret = 0;
+>  
+> +	if (ret < 0)
+> +		vgic_its_free_device_list(its->dev->kvm, its);
+> +
+>  	return ret;
+>  }
+>  
+> @@ -2617,6 +2622,9 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
+>  		read += cte_esz;
+>  	}
+>  
+> +	if (ret < 0)
+> +		vgic_its_free_collection_list(its->dev->kvm, its);
+> +
+>  	return ret;
+>  }
+>  
+> @@ -2648,7 +2656,10 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
+>  	if (ret)
+>  		return ret;
+>  
+> -	return vgic_its_restore_device_tables(its);
+> +	ret = vgic_its_restore_device_tables(its);
+> +	if (ret)
+> +		vgic_its_free_collection_list(its->dev->kvm, its);
+> +	return ret;
+>  }
+>  
+>  static int vgic_its_commit_v0(struct vgic_its *its)
+
+Looks good to me.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+
+Eric
+
+
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
