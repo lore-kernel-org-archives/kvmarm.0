@@ -2,82 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE61C433EF
-	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 14:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 590D9C433EF
+	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 17:14:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F12B24B1BC;
-	Tue,  3 May 2022 10:17:33 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B6F3649ECC;
+	Tue,  3 May 2022 13:14:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Szw5ovxHi0vh; Tue,  3 May 2022 10:17:32 -0400 (EDT)
+	with ESMTP id OJ1P3dsqh740; Tue,  3 May 2022 13:14:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B9D784B152;
-	Tue,  3 May 2022 10:17:32 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 14D8449EED;
+	Tue,  3 May 2022 13:14:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DA334B13E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 10:17:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 107FB49ECC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 13:14:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UwuImrgjLi6f for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 10:17:30 -0400 (EDT)
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com
- [209.85.218.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35C7C49EC1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 10:17:30 -0400 (EDT)
-Received: by mail-ej1-f49.google.com with SMTP id dk23so33732349ejb.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 07:17:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=fbgMapne1rH6/kKlRXWbC6sN+d3viTII31UcYeBu5g4=;
- b=p5StzTBTAohsMwlL6jHQBWtTQobIcqESt3kLVZnkNHJSG2DdBFZF7Tgs5QaZmPnlCr
- F1l8QZ0lnzdHlhRVHnwsSRNzlNALEMzZuSnQCxowMh6uXeXOg3ZbmSEabk7olar1pdpp
- 9pZRvS+REXlThgWE/quskEMYIGVZw1x55jioiJE011eju4WdbP9ZextM5/dSqGnzJ/OA
- Ip3n3G3Q5wiRXN3pJWPKqD+r0Wk199FnUkUPdXWP8Vhe6xFQIDSvsecKYYscAjJp/an6
- Yukn9oKICYgAyT+VGWoiAnlgJf7HCdoInuF1DHTluTYZYb7iUxSiRZ05KmZ0heDnRw16
- aUzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=fbgMapne1rH6/kKlRXWbC6sN+d3viTII31UcYeBu5g4=;
- b=hJLpYgl90nfh1oZKaBm+ovajc+4TZF24Rrh1JFnnuaPZkwIObM+0oFLHvYp+KQu+OR
- cTZWqWjN4u/5KHKdoNwynboHcTbZyaChjAvl6A0qBn2FxiKLZFPdnvLX6G2EefKUYZ9Q
- Ft5HV/ORYEc7frNlZzS3NgVPuvtg4oFCJHNefHNaoDkYgT2xujWQHy/ku+8WterbLOya
- oCQNEF12jEAs4z0Cs1iCgV5BVg/wVomU5kI033GyTyrMJYyxFbWEOU6fooY5ZITcf7Hb
- QUolrFOPVTdZbCWGivmvRu/paglWVA7ooQ10Nb1Odkg4pJ6k8asPR2HHQ66Ogr/tOMV3
- h5Ow==
-X-Gm-Message-State: AOAM533IGsRXj1YdNjL9SSITqjvXoRvBDPxWuhVyCILK2nrg8E1ovmZP
- YlLOfuotAoQxC8UIGfQPxmOZYg==
-X-Google-Smtp-Source: ABdhPJzSpQ9MzxynGtzoIUDLeJ/DfizCDd1t2kS5FNmZLRZhA9C+R6Uh6yCEZ5JtfHxxtU8soK6nAQ==
-X-Received: by 2002:a17:906:d555:b0:6da:ac8c:f66b with SMTP id
- cr21-20020a170906d55500b006daac8cf66bmr15765063ejc.107.1651587448896; 
- Tue, 03 May 2022 07:17:28 -0700 (PDT)
-Received: from google.com (30.171.91.34.bc.googleusercontent.com.
- [34.91.171.30]) by smtp.gmail.com with ESMTPSA id
- hg13-20020a1709072ccd00b006f3ef214df3sm4657306ejc.89.2022.05.03.07.17.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 May 2022 07:17:28 -0700 (PDT)
-Date: Tue, 3 May 2022 14:17:25 +0000
-From: Quentin Perret <qperret@google.com>
-To: Oliver Upton <oupton@google.com>
-Subject: Re: [RFC PATCH 09/17] KVM: arm64: Tear down unlinked page tables in
- parallel walk
-Message-ID: <YnE5dfaC3HpXli26@google.com>
-References: <20220415215901.1737897-1-oupton@google.com>
- <20220415215901.1737897-10-oupton@google.com>
- <YmFactP0GnSp3vEv@google.com> <YmGJGIrNVmdqYJj8@google.com>
- <YmLRLf2GQSgA97Kr@google.com> <YmMTC2f0DiAU5OtZ@google.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <YmMTC2f0DiAU5OtZ@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Ben Gardon <bgardon@google.com>,
- David Matlack <dmatlack@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ with ESMTP id nMbf9iwbWkUl for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 13:14:12 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F22D49E3C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 13:14:12 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 4BF35B81D9A;
+ Tue,  3 May 2022 17:14:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE9B8C385A9;
+ Tue,  3 May 2022 17:14:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651598049;
+ bh=AplqjMJygV5N2GJ3+bH6/snyHg1GxYj0Pi04o+s5Et0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Hi6mCfouyVmjZxSVbORS/GhkRPnI8onFUPKaZL32RKjhslEyhjFCcgfoHKxl3MFD2
+ mp0RhJ/mF5wujJ+csCdONmvxh/iqPpooUX+SqLoMtumsgGEMUxsKDYu98tdyzxgBAy
+ NitGG9dXGgMCuq61CfZaA3pbu0G6Gx6hB5Z6SnIJtDnE/o6YzJrzTunYhIRdZieTTy
+ a1A+R9HMMO5jTOeiDYLmWEOSamfz1rm/PZRd19SrejUhKGJY42IIWuV2fHVXV83LUP
+ 2HbvLHn/rN/rrGo6gwV8mwrAaG+pj4VUPcc9E8aWlVLfsT/BggH0NLG8kyLm8Sj6CX
+ on/ZMB7FSaQPw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nlw6A-008hld-7y; Tue, 03 May 2022 18:14:06 +0100
+Date: Tue, 03 May 2022 18:14:06 +0100
+Message-ID: <87a6by8roh.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v7 6/9] Docs: KVM: Add doc for the bitmap firmware
+ registers
+In-Reply-To: <20220502233853.1233742-7-rananta@google.com>
+References: <20220502233853.1233742-1-rananta@google.com>
+ <20220502233853.1233742-7-rananta@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ catalin.marinas@arm.com, will@kernel.org, pshier@google.com,
+ ricarkol@google.com, oupton@google.com, reijiw@google.com,
+ jingzhangos@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, gshan@redhat.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -95,53 +93,192 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Friday 22 Apr 2022 at 20:41:47 (+0000), Oliver Upton wrote:
-> On Fri, Apr 22, 2022 at 04:00:45PM +0000, Quentin Perret wrote:
-> > On Thursday 21 Apr 2022 at 16:40:56 (+0000), Oliver Upton wrote:
-> > > The other option would be to not touch the subtree at all until the rcu
-> > > callback, as at that point software will not tweak the tables any more.
-> > > No need for atomics/spinning and can just do a boring traversal.
-> > 
-> > Right that is sort of what I had in mind. Note that I'm still trying to
-> > make my mind about the overall approach -- I can see how RCU protection
-> > provides a rather elegant solution to this problem, but this makes the
-> > whole thing inaccessible to e.g. pKVM where RCU is a non-starter.
+On Tue, 03 May 2022 00:38:50 +0100,
+Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Heh, figuring out how to do this for pKVM seemed hard hence my lazy
-> attempt :)
+> Add the documentation for the bitmap firmware registers in
+> hypercalls.rst and api.rst. This includes the details for
+> KVM_REG_ARM_STD_BMAP, KVM_REG_ARM_STD_HYP_BMAP, and
+> KVM_REG_ARM_VENDOR_HYP_BMAP registers.
 > 
-> > A
-> > possible alternative that comes to mind would be to have all walkers
-> > take references on the pages as they walk down, and release them on
-> > their way back, but I'm still not sure how to make this race-safe. I'll
-> > have a think ...
+> Since the document is growing to carry other hypercall related
+> information, make necessary adjustments to present the document
+> in a generic sense, rather than being PSCI focused.
 > 
-> Does pKVM ever collapse tables into blocks? That is the only reason any
-> of this mess ever gets roped in. If not I think it is possible to get
-> away with a rwlock with unmap on the write side and everything else on
-> the read side, right?
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> Reviewed-by: Gavin Shan <gshan@redhat.com>
+> ---
+>  Documentation/virt/kvm/api.rst            | 16 ++++
+>  Documentation/virt/kvm/arm/hypercalls.rst | 94 ++++++++++++++++++-----
+>  2 files changed, 92 insertions(+), 18 deletions(-)
 > 
-> As far as regular KVM goes we get in this business when disabling dirty
-> logging on a memslot. Guest faults will lazily collapse the tables back
-> into blocks. An equally valid implementation would be just to unmap the
-> whole memslot and have the guest build out the tables again, which could
-> work with the aforementioned rwlock.
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 4a900cdbc62e..8ae638be79fd 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2542,6 +2542,22 @@ arm64 firmware pseudo-registers have the following bit pattern::
+>  
+>    0x6030 0000 0014 <regno:16>
+>  
+> +arm64 bitmap feature firmware pseudo-registers have the following bit pattern::
+> +
+> +  0x6030 0000 0016 <regno:16>
+> +
+> +The bitmap feature firmware registers exposes the hypercall services that are
+> +available for userspace to configure. The set bits corresponds to the services
+> +that are available for the guests to access. By default, KVM sets all the
+> +supported bits during VM initialization. The userspace can discover the
+> +available services via KVM_GET_ONE_REG, and write back the bitmap corresponding
+> +to the features that it wishes guests to see via KVM_SET_ONE_REG.
+> +
+> +Note: These registers are immutable once any of the vCPUs of the VM has run at
+> +least once. A KVM_SET_ONE_REG in such a scenario will return a -EBUSY to userspace.
+> +
 
-Apologies for the delay on this one, I was away for a while.
+The placement is odd, as SVE uses ID 0x0015, and is *after* this.
 
-Yup, that all makes sense. FWIW the pKVM use-case I have in mind is
-slightly different. Specifically, in the pKVM world the hypervisor
-maintains a stage-2 for the host, that is all identity mapped. So we use
-nice big block mappings as much as we can. But when a protected guest
-starts, the hypervisor needs to break down the host stage-2 blocks to
-unmap the 4K guest pages from the host (which is where the protection
-comes from in pKVM). And when the guest is torn down, the host can
-reclaim its pages, hence putting us in a position to coallesce its
-stage-2 into nice big blocks again. Note that none of this coallescing
-is currently implemented even in our pKVM prototype, so it's a bit
-unfair to ask you to deal with this stuff now, but clearly it'd be cool
-if there was a way we could make these things coexist and even ideally
-share some code...
+> +(See Documentation/virt/kvm/arm/hypercalls.rst for more details.)
+> +
+>  arm64 SVE registers have the following bit patterns::
+>  
+>    0x6080 0000 0015 00 <n:5> <slice:5>   Zn bits[2048*slice + 2047 : 2048*slice]
+> diff --git a/Documentation/virt/kvm/arm/hypercalls.rst b/Documentation/virt/kvm/arm/hypercalls.rst
+> index d52c2e83b5b8..383ca766cf36 100644
+> --- a/Documentation/virt/kvm/arm/hypercalls.rst
+> +++ b/Documentation/virt/kvm/arm/hypercalls.rst
+> @@ -1,32 +1,32 @@
+>  .. SPDX-License-Identifier: GPL-2.0
+>  
+> -=========================================
+> -Power State Coordination Interface (PSCI)
+> -=========================================
+> +=======================
+> +ARM Hypercall Interface
+> +=======================
+>  
+> -KVM implements the PSCI (Power State Coordination Interface)
+> -specification in order to provide services such as CPU on/off, reset
+> -and power-off to the guest.
+> +KVM handles the hypercall services as requested by the guests. New hypercall
+> +services are regularly made available by the ARM specification or by KVM (as
+> +vendor services) if they make sense from a virtualization point of view.
+>  
+> -The PSCI specification is regularly updated to provide new features,
+> -and KVM implements these updates if they make sense from a virtualization
+> -point of view.
+> -
+> -This means that a guest booted on two different versions of KVM can
+> -observe two different "firmware" revisions. This could cause issues if
+> -a given guest is tied to a particular PSCI revision (unlikely), or if
+> -a migration causes a different PSCI version to be exposed out of the
+> -blue to an unsuspecting guest.
+> +This means that a guest booted on two different versions of KVM can observe
+> +two different "firmware" revisions. This could cause issues if a given guest
+> +is tied to a particular version of a hypercall service, or if a migration
+> +causes a different version to be exposed out of the blue to an unsuspecting
+> +guest.
+>  
+>  In order to remedy this situation, KVM exposes a set of "firmware
+>  pseudo-registers" that can be manipulated using the GET/SET_ONE_REG
+>  interface. These registers can be saved/restored by userspace, and set
+> -to a convenient value if required.
+> +to a convenient value as required.
+>  
+> -The following register is defined:
+> +The following registers are defined:
+>  
+>  * KVM_REG_ARM_PSCI_VERSION:
+>  
+> +  KVM implements the PSCI (Power State Coordination Interface)
+> +  specification in order to provide services such as CPU on/off, reset
+> +  and power-off to the guest.
+> +
+>    - Only valid if the vcpu has the KVM_ARM_VCPU_PSCI_0_2 feature set
+>      (and thus has already been initialized)
+>    - Returns the current PSCI version on GET_ONE_REG (defaulting to the
+> @@ -74,4 +74,62 @@ The following register is defined:
+>      KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED:
+>        The workaround is always active on this vCPU or it is not needed.
+>  
+> -.. [1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
+> +
+> +Bitmap Feature Firmware Registers
+> +---------------------------------
+> +
+> +Contrary to the above registers, the following registers exposes the hypercall
+> +services in the form of a feature-bitmap to the userspace. This bitmap is
+> +translated to the services that are available to the guest. There is a register
+> +defined per service call owner and can be accessed via GET/SET_ONE_REG interface.
+> +
+> +By default, these registers are set with the upper limit of the features that
+> +are supported. This way userspace can discover all the electable hypercall services
+> +via GET_ONE_REG. The user-space can write-back the desired bitmap back via
+> +SET_ONE_REG. The features for the registers that are untouched, probably because
+> +userspace isn't aware of them, will be exposed as is to the guest.
+> +
+> +Note that KVM would't allow the userspace to configure the registers anymore once
+> +any of the vCPUs has run at least once. Instead, it will return a -EBUSY.
+> +
+
+Formatting is a bit off. We try to stay within the 80 cols format for
+text documents such as this.
+
+> +The psuedo-firmware bitmap register are as follows:
+
+Typo.
+
+> +
+> +* KVM_REG_ARM_STD_BMAP:
+> +    Controls the bitmap of the ARM Standard Secure Service Calls.
+> +
+> +  The following bits are accepted:
+> +
+> +    Bit-0: KVM_REG_ARM_STD_BIT_TRNG_V1_0:
+> +      The bit represents the services offered under v1.0 of ARM True Random
+> +      Number Generator (TRNG) specification, ARM DEN0098.
+> +
+> +* KVM_REG_ARM_STD_HYP_BMAP:
+> +    Controls the bitmap of the ARM Standard Hypervisor Service Calls.
+> +
+> +  The following bits are accepted:
+> +
+> +    Bit-0: KVM_REG_ARM_STD_HYP_BIT_PV_TIME:
+> +      The bit represents the Paravirtualized Time service as represented by
+> +      ARM DEN0057A.
+> +
+> +* KVM_REG_ARM_VENDOR_HYP_BMAP:
+> +    Controls the bitmap of the Vendor specific Hypervisor Service Calls.
+> +
+> +  The following bits are accepted:
+> +
+> +    Bit-0: KVM_REG_ARM_VENDOR_HYP_BIT_FUNC_FEAT
+> +      The bit represents the ARM_SMCCC_VENDOR_HYP_KVM_FEATURES_FUNC_ID
+> +      and ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID function-ids.
+> +
+> +    Bit-1: KVM_REG_ARM_VENDOR_HYP_BIT_PTP:
+> +      The bit represents the Precision Time Protocol KVM service.
+> +
+> +Errors:
+> +
+> +    =======  =============================================================
+> +    -ENOENT   Unknown register accessed.
+> +    -EBUSY    Attempt a 'write' to the register after the VM has started.
+> +    -EINVAL   Invalid bitmap written to the register.
+> +    =======  =============================================================
+> +
+> +.. [1] https://developer.arm.com/-/media/developer/pdf/ARM_DEN_0070A_Firmware_interfaces_for_mitigating_CVE-2017-5715.pdf
+> \ No newline at end of file
+> -- 
+> 2.36.0.464.gb9c8b46e94-goog
+> 
+> 
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
