@@ -2,81 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 523BFC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 06:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C7A9C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 06:43:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id CCB1A4B11C;
-	Wed,  4 May 2022 02:35:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4D7D4B176;
+	Wed,  4 May 2022 02:43:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@quicinc.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sOU4wNgz6TMh; Wed,  4 May 2022 02:35:37 -0400 (EDT)
+	with ESMTP id ENBm302vKzeX; Wed,  4 May 2022 02:43:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A564D49F29;
-	Wed,  4 May 2022 02:35:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C54A04B105;
+	Wed,  4 May 2022 02:43:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31CF549F0C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 02:35:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AFD2E4B17D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 18:23:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lvE64GBK9iFG for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 May 2022 02:35:35 -0400 (EDT)
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com
- [209.85.166.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EECC549EF2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 02:35:34 -0400 (EDT)
-Received: by mail-io1-f47.google.com with SMTP id f4so574432iov.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 23:35:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=5vzaRTCV35kUkQfzNk+SKbEZOUsmK/lhYqqKeLrO+iA=;
- b=nY7I8v9LmP+4+y+Pl5sP80ms0losTfV9G/Y4PGylKqQxcdscu+cYTM+ORUo92C4kUt
- O7aDwIZq9zv1kk5qQCYC3SS8FWkEGveM1Huk39aQLx02Mj20oi6WhjeLWZDBe9OV7EWI
- rdN57Mw0ScAJPvugQHwUwkv9Q1Qkba/kaBpkxO2DnP0t1NUTZEkbCqCxtbYadsfI7XYg
- EHwpwS70sBGfwALZnLVWWslcWVF0my2IMURLbG7/TLEMOvb9A4QT57ksbl1We5aIKhaK
- Re++9wvrBCNiT7UJ5yppLUpD6+2A3bhjBU12ZS2pfjMgS6OhmD3a3x2WJBNmVOScw/i/
- /ANA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=5vzaRTCV35kUkQfzNk+SKbEZOUsmK/lhYqqKeLrO+iA=;
- b=W7p8N9UbfuIOWNT3Sp8c1qMmn3uuze4rMIQil910gYZ1shRzjRBGYD/DA9HOUnHk6F
- GKeEBRQ+cKSuv0pSQm170kY7t/jwRXwHdRZO+PCik901qqhjmKUoiaI+rARSfB0IPQje
- mM8lKrPc/PkjofpYmAzTfgRULtKghneWdyPcOC+SHhnTFeTb3xh/dg6fIGTgH78XSd+O
- XTwAzmFVtTIptbzW4ljliYLQcZ6XmhYgewOM0jWcrUMA1iIPYuQWcw5BDaxZmpfm40py
- vXF84TOaxJVvco+1Gt3noOk12KoqMFpTTQ0RSNbt/Os3Ffhu96K2EqDcbsNdSbcJRCHy
- 0iYw==
-X-Gm-Message-State: AOAM5316fQvBKQVJFb6NQ29Lr/d6m/7XrP/MWVVdSQku/tAFKoS4y+gA
- Lp7Ou3whYqNZyDIqLiQsEynO0w==
-X-Google-Smtp-Source: ABdhPJwbDoRQpuN7Pfwdsey3kldhkCPsI++0DJuLGbXAwnQJK4QnnF38LPx899UzWmlKxd1ScbQAZQ==
-X-Received: by 2002:a02:6f47:0:b0:32b:2be7:e3e4 with SMTP id
- b7-20020a026f47000000b0032b2be7e3e4mr7911068jae.305.1651646134045; 
- Tue, 03 May 2022 23:35:34 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- w26-20020a02b0da000000b0032b3a781784sm4480757jah.72.2022.05.03.23.35.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 May 2022 23:35:33 -0700 (PDT)
-Date: Wed, 4 May 2022 06:35:29 +0000
-From: Oliver Upton <oupton@google.com>
-To: Reiji Watanabe <reijiw@google.com>, h@google.com
-Subject: Re: [PATCH v7 01/38] KVM: arm64: Introduce a validation function for
- an ID register
-Message-ID: <YnIesawWNhBwZydM@google.com>
-References: <20220419065544.3616948-1-reijiw@google.com>
- <20220419065544.3616948-2-reijiw@google.com>
+ with ESMTP id K2Hg+qRppPy2 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 18:23:46 -0400 (EDT)
+Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com
+ [199.106.114.39])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 856F649EBE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 18:23:46 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1651616626; x=1683152626;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=xnDs4fqABVmtbO8EfV302QSHZqoqwEJa0N8z1KcZxsw=;
+ b=DOxD/Ncvqoz7tGGtrjLJQH6z6ruXNW2hI2MqRfE6lkml3/eqIRwSpDCa
+ 2cf8gqsb+BHgPUxxyg0msb17Wj1I8vlTCODFqlRKsjq28D187fhhvYBy7
+ OnzqPrXkYRidz0fB9XrLSPqU4Kh4pCc2UW04hxKR0eE0C2I8uGI2jRAs7 0=;
+Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 03 May 2022 15:23:45 -0700
+X-QCInternal: smtphost
+Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
+ by ironmsg-SD-alpha.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 03 May 2022 15:23:45 -0700
+Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
+ nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Tue, 3 May 2022 15:23:44 -0700
+Received: from qian (10.80.80.8) by nalasex01a.na.qualcomm.com (10.47.209.196)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Tue, 3 May 2022
+ 15:23:42 -0700
+Date: Tue, 3 May 2022 18:23:40 -0400
+From: Qian Cai <quic_qiancai@quicinc.com>
+To: Mark Brown <broonie@kernel.org>
+Subject: Re: [PATCH v14 00/39] arm64/sme: Initial support for the Scalable
+ Matrix Extension
+Message-ID: <YnGrbEt3oBBTly7u@qian>
+References: <20220419112247.711548-1-broonie@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220419065544.3616948-2-reijiw@google.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, Peng Liang <liangpeng10@huawei.com>,
- Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20220419112247.711548-1-broonie@kernel.org>
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-Mailman-Approved-At: Wed, 04 May 2022 02:43:28 -0400
+Cc: Marc Zyngier <maz@kernel.org>,
+ Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
+ Szabolcs Nagy <szabolcs.nagy@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Alan Hayward <alan.hayward@arm.com>,
+ Salil Akerkar <Salil.Akerkar@arm.com>, linux-kselftest@vger.kernel.org,
+ Shuah Khan <skhan@linuxfoundation.org>, Shuah
+ Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Luca Salabrino <luca.scalabrino@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -93,101 +90,62 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, Apr 18, 2022 at 11:55:07PM -0700, Reiji Watanabe wrote:
-> Introduce arm64_check_features(), which does a basic validity checking
-> of an ID register value against the register's limit value, which is
-> generally the host's sanitized value.
-> 
-> This function will be used by the following patches to check if an ID
-> register value that userspace tries to set for a guest can be supported
-> on the host.
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/include/asm/cpufeature.h |  1 +
->  arch/arm64/kernel/cpufeature.c      | 52 +++++++++++++++++++++++++++++
->  2 files changed, 53 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index c62e7e5e2f0c..7a009d4e18a6 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -634,6 +634,7 @@ void check_local_cpu_capabilities(void);
->  
->  u64 read_sanitised_ftr_reg(u32 id);
->  u64 __read_sysreg_by_encoding(u32 sys_id);
-> +int arm64_check_features(const struct arm64_ftr_bits *ftrp, u64 val, u64 limit);
->  
->  static inline bool cpu_supports_mixed_endian_el0(void)
->  {
-> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-> index d72c4b4d389c..dbbc69745f22 100644
-> --- a/arch/arm64/kernel/cpufeature.c
-> +++ b/arch/arm64/kernel/cpufeature.c
-> @@ -3239,3 +3239,55 @@ ssize_t cpu_show_meltdown(struct device *dev, struct device_attribute *attr,
->  		return sprintf(buf, "Vulnerable\n");
->  	}
->  }
-> +
-> +/**
-> + * arm64_check_features() - Check if a feature register value constitutes
-> + * a subset of features indicated by @limit.
-> + *
-> + * @ftrp: Pointer to an array of arm64_ftr_bits. It must be terminated by
-> + * an item whose width field is zero.
-> + * @val: The feature register value to check
-> + * @limit: The limit value of the feature register
-> + *
-> + * This function will check if each feature field of @val is the "safe" value
-> + * against @limit based on @ftrp[], each of which specifies the target field
-> + * (shift, width), whether or not the field is for a signed value (sign),
-> + * how the field is determined to be "safe" (type), and the safe value
-> + * (safe_val) when type == FTR_EXACT (safe_val won't be used by this
-> + * function when type != FTR_EXACT). Any other fields in arm64_ftr_bits
-> + * won't be used by this function. If a field value in @val is the same
-> + * as the one in @limit, it is always considered the safe value regardless
-> + * of the type. For register fields that are not in @ftrp[], only the value
-> + * in @limit is considered the safe value.
-> + *
-> + * Return: 0 if all the fields are safe. Otherwise, return negative errno.
-> + */
-> +int arm64_check_features(const struct arm64_ftr_bits *ftrp, u64 val, u64 limit)
-> +{
-> +	u64 mask = 0;
-> +
-> +	for (; ftrp->width; ftrp++) {
-> +		s64 f_val, f_lim, safe_val;
-> +
-> +		f_val = arm64_ftr_value(ftrp, val);
-> +		f_lim = arm64_ftr_value(ftrp, limit);
-> +		mask |= arm64_ftr_mask(ftrp);
-> +
-> +		if (f_val == f_lim)
-> +			safe_val = f_val;
-> +		else
-> +			safe_val = arm64_ftr_safe_value(ftrp, f_val, f_lim);
-> +
-> +		if (safe_val != f_val)
-> +			return -E2BIG;
-> +	}
-> +
-> +	/*
-> +	 * For fields that are not indicated in ftrp, values in limit are the
-> +	 * safe values.
-> +	 */
-> +	if ((val & ~mask) != (limit & ~mask))
-> +		return -E2BIG;
+On Tue, Apr 19, 2022 at 12:22:08PM +0100, Mark Brown wrote:
+> This series provides initial support for the ARMv9 Scalable Matrix
+> Extension (SME).  SME takes the approach used for vectors in SVE and
+> extends this to provide architectural support for matrix operations.  A
+> more detailed overview can be found in [1].
 
-This bit is interesting. Apologies if I paged out relevant context. What
-features are we trying to limit that exist outside of an arm64_ftr_bits
-definition? I'll follow the series and see if I figure out later :-P
+Set CONFIG_ARM64_SME=n fixed a warning while running libhugetlbfs tests.
 
-Generally speaking, though, it seems to me that we'd prefer to have an
-arm64_ftr_bits struct plumbed up for whatever hits this case.
+        /*
+         * There are several places where we assume that the order value is sane
+         * so bail out early if the request is out of bound.
+         */
+        if (unlikely(order >= MAX_ORDER)) {
+                WARN_ON_ONCE(!(gfp & __GFP_NOWARN));
+                return NULL;
+        }
 
---
-Thanks,
-Oliver
+ WARNING: CPU: 122 PID: 4025 at mm/page_alloc.c:5383 __alloc_pages
+ CPU: 122 PID: 4025 Comm: brk_near_huge Not tainted 5.18.0-rc5-next-20220503 #79
+ pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+ pc : __alloc_pages
+ lr : alloc_pages
+ sp : ffff8000505470f0
+ x29: ffff8000505470f0 x28: ffff40028b3535c0 x27: 0000000000000000
+ x26: 1ffff0000a0a8ea2 x25: ffff800050547510 x24: 0000000000000dc0
+ x23: ffff921ddb818000 x22: 000000000000000e x21: 1ffff0000a0a8e28
+ x20: 0000000000040dc0 x19: ffffae1848c61ae0 x18: ffffae18357e7d24
+ x17: ffffae182fb75778 x16: 1fffe8005166a7d8 x15: 000000000000001a
+ x14: 1fffe8005166a7cb x13: 0000000000000004 x12: ffff70000a0a8e03
+ x11: 1ffff0000a0a8e02 x10: 00000000f204f1f1 x9 : 000000000000f204
+ x8 : dfff800000000000 x7 : 00000000f3000000 x6 : 00000000f3f3f3f3
+ x5 : ffff70000a0a8e28 x4 : ffff40028b3535c0 x3 : 0000000000000000
+ x2 : 0000000000000001 x1 : 0000000000000001 x0 : 0000000000040dc0
+ Call trace:
+  __alloc_pages
+  alloc_pages
+  kmalloc_order
+  kmalloc_order_trace
+  __kmalloc
+  __regset_get
+  regset_get_alloc
+  fill_thread_core_info
+  fill_note_info
+  elf_core_dump
+  do_coredump
+  get_signal
+  do_signal
+  do_notify_resume
+  el0_svc
+  el0t_64_sync_handler
+  el0t_64_sync
+ irq event stamp: 28066
+ hardirqs last  enabled at (28065):  _raw_spin_unlock_irqrestore
+ hardirqs last disabled at (28066):  el1_dbg
+ softirqs last  enabled at (27438):  fpsimd_preserve_current_state
+ softirqs last disabled at (27436):  fpsimd_preserve_current_state
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
