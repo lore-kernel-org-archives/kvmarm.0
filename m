@@ -2,76 +2,172 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C8EC433FE
-	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 06:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4078DC433FE
+	for <kvmarm@archiver.kernel.org>; Tue,  3 May 2022 08:13:43 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0AB24B292;
-	Tue,  3 May 2022 02:02:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 977B04A49C;
+	Tue,  3 May 2022 04:13:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@armh.onmicrosoft.com
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@armh.onmicrosoft.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id up6PhAmAmyTn; Tue,  3 May 2022 02:02:23 -0400 (EDT)
+	with ESMTP id puwWZiU9aE34; Tue,  3 May 2022 04:13:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 950274B21F;
-	Tue,  3 May 2022 02:02:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 374F44A7FD;
+	Tue,  3 May 2022 04:13:41 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A73754B21F
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 02:02:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 968B74A49C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 04:13:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g-mvgaZlAvqO for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 02:02:20 -0400 (EDT)
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com
- [209.85.210.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 831BF4B23A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 02:02:20 -0400 (EDT)
-Received: by mail-pf1-f202.google.com with SMTP id
- j17-20020a62b611000000b004fa6338bd77so9012956pff.10
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 May 2022 23:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=lyIfp9262fAQLqy8qC0Pz4SUM4FAzF4N7A6nbmSHB2c=;
- b=NTvfdy6F18lFgUV8clR+0g6Lw3bcq5UgO40+92jzBn0iZGYe3Xw9MVeBL3+fvWQw5N
- LB3zzRWSU4HLPPJXB/Dyw7ffCQbjT5/AAfQ9WdrD5WumB7wAGc8Ii16bK1GqoyShUxFT
- T3kMr/bzKtBbctXnCXxWSUOFUbNsLWTvcedPoBzLgEc0OoGSRyBn6HFbR1QI6Sxm0ib1
- LETkvqwaLmlU1m3vcCJyPISK9GXof6Kzpm1nbZPFsnyvcGewnf1XII3NShtf5PlhixsL
- o+7dDUpiE1S+Xes0LqAZedN1LJOIxguMZTGVLGJBoZivv+psCSQs/f/P1ED6jOuNtCkh
- UBAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=lyIfp9262fAQLqy8qC0Pz4SUM4FAzF4N7A6nbmSHB2c=;
- b=JERVLSAfWGEOR3hS997T3wvL35e52md66TimQUEChKCZZpZGPMNecWJWrMn9pumGIi
- au18MpZ/K8B5CX5ZRy3lWtcuPyTfkri0PivNBugZIpsoFXQx0aHOWjQNIOriAmnK99a0
- 7HV0zSlV6a9bp8H+GH5adlIzwvy/ls7TscQOGWXcn1UFmt22B/8tR/xf3/wsebHa60HO
- 4Unzr37Ok16fEQdUkTxl0048Cht6JkUdyrmEv6j+IL9nvMz+T98TlS1ZVX26LRZA4fGl
- 6hxknWMHKRzQyOeZdNvr5mLOu6579fD/M9wmYfXlLIHuB5NZauVXq4Z6E6QEJFATERFR
- Qi2g==
-X-Gm-Message-State: AOAM531g39VDweAgw2G1RCQkhKP4gSWV4ZisJsOpmxCB7LBuLqCZH2cP
- kGBUXrsqqxTaKYC7Q1cWZgq6eI5EWrUCtOxMDenRCqU8piLPThhZ3hgFSoozhynGEXwNSpdf4nQ
- 1H+Yd2ygJFYOSE6XiMHQ1c7lkiAvwO3O3g5xLoScbd2Hc9cZxjS5zggr8rGwf0V63Yc9F6Q==
-X-Google-Smtp-Source: ABdhPJySoUR5II5RZFESdkmpRUNaWMWZc4db9m57Xb50n4CBJPr51KRBblc9PtMJAUv+qFnKQOynLlQ7TLQ=
-X-Received: from oupton3.c.googlers.com
- ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a17:90b:e89:b0:1dc:18dc:26a0 with SMTP id
- fv9-20020a17090b0e8900b001dc18dc26a0mr2986517pjb.188.1651557739605; Mon, 02
- May 2022 23:02:19 -0700 (PDT)
-Date: Tue,  3 May 2022 06:02:05 +0000
-In-Reply-To: <20220503060205.2823727-1-oupton@google.com>
-Message-Id: <20220503060205.2823727-8-oupton@google.com>
-Mime-Version: 1.0
-References: <20220503060205.2823727-1-oupton@google.com>
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v4 7/7] Revert "KVM/arm64: Don't emulate a PMU for 32-bit
- guests if feature not set"
-From: Oliver Upton <oupton@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id 704mK2M9xgiI for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 04:13:39 -0400 (EDT)
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com
+ (mail-eopbgr60048.outbound.protection.outlook.com [40.107.6.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B37849EE3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 04:13:38 -0400 (EDT)
+ARC-Seal: i=2; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=pass;
+ b=DtonobMMBrYkEQAQCD1QO2MOYgZUvdV05rpcreupgY2MUbzJouOwwAqqBmRNj0Rls18TGyCfiVxfqrtCPcGuxsjj9jQ1tWtnxl+1EERyhag4hdkm0PA68DP244mRhDEtzkIa+YFyaqSwRHZpcLF9YFf0z9BBJbMKnYlGA0qKlXaQnoOIsDfPmj5PEDM7pUI1o+D9P69fvAfmjaNEGJlYt8cK4c5S12vTUVPl7PAUn1nD7kblj8U5Wqj+UIOH6Pn6LnHNEw9LMYbOdF0K7Cm308cueuR+kuDX36ARfGCt3b7PrRrA48GjLRyI4a62/8PQEe7ZyVCRDE6T+wIwy6oK0w==
+ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=12P3TpUwPZFrXtxik6iYyEVWFTiih5G83nj9vFeYXTs=;
+ b=k/OaB1VTX00u1eYbhDZ39gtAhYE/1DigyjDloIDI3MmGJBuv3UQWt3sdq9tZvNWmS9hyeTblTxvnZmgBVvHAto4485e782+mEBmVO9YGqsL8ZH0sikW/Sipty5Y0EprsOEbutU5p47hUOrqunv/BKhLRouTkvo0ShT5CZgLThnGVd1TftdFiztnyCigfUiFPW80z4Y1NFEql6XDE4EWuDhFv11kBuoAIslWAFzT/eR9P9tADIYUvavvg3P2hy1Iy5cYXb1I2yFKKt0UjQuABnWNL3NkZgjiM/uyZcx8F8Np7JVzp2vcOFPfT/WQndcYKE3exDOMID+FEUS2UMHOvjA==
+ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
+ 63.35.35.123) smtp.rcpttodomain=lists.cs.columbia.edu smtp.mailfrom=arm.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=arm.com;
+ dkim=pass (signature was verified) header.d=armh.onmicrosoft.com; arc=pass (0
+ oda=1 ltdi=1 spf=[1,1,smtp.mailfrom=arm.com] dkim=[1,1,header.d=arm.com]
+ dmarc=[1,1,header.from=arm.com])
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=12P3TpUwPZFrXtxik6iYyEVWFTiih5G83nj9vFeYXTs=;
+ b=oxLcyTNlUUZXOVmI3aGeXsdGDrD2enp+GkVHVZqqytfhSaZ9Q+sXyXVH3YzVFdSqLgf1XySxflfHgO5R7QtuWI84RDSL4xvWRMWv+eJSLuE/E20P3NCNxHhicfgxwLymLh5fgHU72GS6DL8smsvixMs7PmNNxibQ6poF2LBIvEY=
+Received: from AS9PR06CA0057.eurprd06.prod.outlook.com (2603:10a6:20b:463::33)
+ by AM5PR0802MB2481.eurprd08.prod.outlook.com (2603:10a6:203:a0::7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.12; Tue, 3 May
+ 2022 08:13:35 +0000
+Received: from AM5EUR03FT030.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:463:cafe::e9) by AS9PR06CA0057.outlook.office365.com
+ (2603:10a6:20b:463::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5206.12 via Frontend
+ Transport; Tue, 3 May 2022 08:13:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ AM5EUR03FT030.mail.protection.outlook.com (10.152.16.117) with
+ Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5206.12 via Frontend Transport; Tue, 3 May 2022 08:13:34 +0000
+Received: ("Tessian outbound facaf1373bbd:v118");
+ Tue, 03 May 2022 08:13:34 +0000
+X-CheckRecipientChecked: true
+X-CR-MTA-CID: b02e5ef33f797400
+X-CR-MTA-TID: 64aa7808
+Received: from 8bf7a89e5314.2
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com id
+ CEA04689-D191-4A71-9508-1BB37F29BDD8.1; 
+ Tue, 03 May 2022 08:13:27 +0000
+Received: from EUR03-AM5-obe.outbound.protection.outlook.com
+ by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 8bf7a89e5314.2
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+ Tue, 03 May 2022 08:13:27 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j/4ms4zDht8g0p6y61Ye9jnEPZ/mJdogLUbGEbiHY+3rWDvX8y3U2Z634H9vY2JxnFZc6cLWmp8efM39icwfZm/QE/+21vRmGBMKGOBHxQxmSGHl4BDKfavdsPRzjLynTHDGQI7tZCQx/CGw5qyUtnml8DcfNx3vlzzqYIn1afG4Y/G/vy4N2jX6ftBVx54jKm1AbnX1hqxubaIde7z+QEL3Z4CkqsK2z2gGOdYu2JVsUSh/rtzfalgFcDGzEMK9GkQ4YINdSozR0YtvPA+AAnbYjtLsabmVnb7R2iVHHEw1a+d1nk7eiMEoHMbZlp6XD/a9QDi6s0Y3Zd4a/4gB8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=12P3TpUwPZFrXtxik6iYyEVWFTiih5G83nj9vFeYXTs=;
+ b=mamvmsyF7qnaOQpWE2btRbHI00yfkn9J68aFnGBfIz224F9s3D2sVoDkOAk9ZMEwkjzUQ0p0WWlQ1pw6p8WrqUSO6N9e7VW2J7qOW+zUainz5TgOv3m1/LVMtWqU2OZkKClbpvxbc9RQJY9DzU+2hu9Wq5Ni8nz5crn9tPn1mac5RUkpXEYZdwRubm54zhHKW8IBnbayYuOGL3KgBRNne7BO0kYo+lTgBxFmX4HwWP1Zh+5AcdwXmaOQXgZ2O18mVlj7LqaMTblnkx4D4S+V2oeF6nJaDDhf0vwSV6WjEiIH6xUoCh8qGdXoJQi/iXjDGWY1uXG9KamQ3JcBMt3YcA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=12P3TpUwPZFrXtxik6iYyEVWFTiih5G83nj9vFeYXTs=;
+ b=oxLcyTNlUUZXOVmI3aGeXsdGDrD2enp+GkVHVZqqytfhSaZ9Q+sXyXVH3YzVFdSqLgf1XySxflfHgO5R7QtuWI84RDSL4xvWRMWv+eJSLuE/E20P3NCNxHhicfgxwLymLh5fgHU72GS6DL8smsvixMs7PmNNxibQ6poF2LBIvEY=
+Authentication-Results-Original: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+Received: from DB9PR08MB7179.eurprd08.prod.outlook.com (2603:10a6:10:2cc::19)
+ by DB7PR08MB3404.eurprd08.prod.outlook.com (2603:10a6:10:4c::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.19; Tue, 3 May
+ 2022 08:13:25 +0000
+Received: from DB9PR08MB7179.eurprd08.prod.outlook.com
+ ([fe80::9ccc:fe7c:19e5:bfa6]) by DB9PR08MB7179.eurprd08.prod.outlook.com
+ ([fe80::9ccc:fe7c:19e5:bfa6%4]) with mapi id 15.20.5206.024; Tue, 3 May 2022
+ 08:13:25 +0000
+Date: Tue, 3 May 2022 09:13:11 +0100
+From: Szabolcs Nagy <szabolcs.nagy@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v14 04/39] arm64/sme: Provide ABI documentation for SME
+Message-ID: <YnDkF1cfR+cL18Gu@arm.com>
+References: <20220419112247.711548-1-broonie@kernel.org>
+ <20220419112247.711548-5-broonie@kernel.org>
+ <YmpcGpSYpoiprngy@arm.com>
+Content-Disposition: inline
+In-Reply-To: <YmpcGpSYpoiprngy@arm.com>
+X-ClientProxiedBy: AM0PR04CA0048.eurprd04.prod.outlook.com
+ (2603:10a6:208:1::25) To DB9PR08MB7179.eurprd08.prod.outlook.com
+ (2603:10a6:10:2cc::19)
+MIME-Version: 1.0
+X-MS-Office365-Filtering-Correlation-Id: d7085fb4-4f78-42ea-73d4-08da2cdcd185
+X-MS-TrafficTypeDiagnostic: DB7PR08MB3404:EE_|AM5EUR03FT030:EE_|AM5PR0802MB2481:EE_
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB24815850FA3ACCB6810BDCB5EDC09@AM5PR0802MB2481.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+NoDisclaimer: true
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: yyHrF39+cYledTiMQLPD1KlKvPcVy06NoJp+8gX/OYoryZrYo5S3AUPELOULTHAKj504Nw1irZvwCo4NOJZ5z313VL6L/22rbYNbioEaLQmZ4wTTT2+LJvwiQiJIJMY0unEcddayOKIqshcypFHZeb+fRcWf2BGPPoee8qipVmJ8SOu/KQtdY+0UDrxyR59vpEi9Mh06BeOZIw9fq1t9/JcukIkQEPGuZrNUCLQAhCn5knDeuKSjbdCyGW7nSayAzXlE1l2egsH97RQE3RyoB25oW4/apuHdQZJL9sucX9sLvjO2tji01bG6xqtEy7qkh+OyIr4P+3eEEZfMoM1E2VfGRaBAcDqukdWULwHOURjWQ/+QQVA/TNQXCebd9y4QSTfzDfo1qU0X2Px9Jljq70NmDlAAMeiHeN8Nc+wM4AbscKl4GsT9MWvdO/+fgnpLpXJ28+hZksJ0GZDZEBmIcL9rYrA1yZ+rDkhVnFPwRHFkbe6JdBFL4A2lsfEatU5aIh5602u3/fLcfS8d/+eLQfbGJ3XcPJxIZ0zveOp8meQ65L5SU9sF/sfmmCsIPXvyLdX12We8viYY7LZWBfVUdgw7iLoE5OOpItCPT7jgydEYnjzQPGyTIIOwv81ETMcySbkRGsg65BoT1+1wzccCwlSINr6zY+4kFrWmW48QIAnqGb/8dIBDp0QAyJatccWkCmfhcraEidFy1vYpvUXgdA==
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255; CTRY:; LANG:en;
+ SCL:1; SRV:; IPV:NLI; SFV:NSPM; H:DB9PR08MB7179.eurprd08.prod.outlook.com;
+ PTR:; CAT:NONE;
+ SFS:(13230001)(4636009)(366004)(6486002)(86362001)(6636002)(6512007)(26005)(66476007)(66946007)(4326008)(66556008)(6506007)(6862004)(8676002)(508600001)(316002)(6666004)(38100700002)(54906003)(36756003)(37006003)(2906002)(8936002)(5660300002)(2616005)(186003)(44832011)(67856001);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR08MB3404
+Original-Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arm.com;
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT030.eop-EUR03.prod.protection.outlook.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 0a863e43-6aed-4b8f-0fda-08da2cdccc16
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1SrrVJnonb6djI7GI/L59aRcejaJHdSBRn3DcVJ/WeEGLH76FaAEMKSrpIByMVKERPF0Q+rk53HHTaGatlU3wXaESoFAn0gQaamXMyq+FpkA6GrOFHQ3TP5KiDqZBUZuES51TPd2BuYXxQgMmP3uMbO4LYWYfwn5XCcC9ytcVNEFQthsbDW2TdbpGuuv33Nd0tvYl1lyCp3GpBQqQhK6WuKhNkrbCyCEuaxjmGZuSlNkjR+bPiUn4VXk3roT/r4XtePHgw7O3/EGdLUbvNlcGjVCJSEbHCgxIpM6bL/jUEoGSNEseEtahNXQVOAKSWPrll3r2XoGl7g1hRTAV2w78q6MgrTPDX6gFLeUwMZEujwEO59Q+CaTcvtHQqPKD+9sD+q0eW3m0cPqF08Am6roNWwN8KLe2fc07uld1cXv880Z6tL576noVh7LCJNvcmGDXrwdYK7VtgulWb5NyvZ78+f4suIHR6y5+qnn6fp8T7cYE7XucgXAe5oRbwLoVQiqHgJUFp52kLSlDHU4LxRp0vY/vF0dVc/OVfs/LQB3Try/Fxt6MHuDAh52Me7tCRJltJyZ0m4GODiURSyMfcvmVSq4Hs1MwmNZej5oVFtOUwvC4oVY+MNeinsrR6oH9mO3KnHLzKIcB++AEgPG3DTSXQEuYst3WHvQmBeqwEA232buVJEEzeBTMaaiB0CLgFz44WrlwqO1mVmPQknxR89o3Q==
+X-Forefront-Antispam-Report: CIP:63.35.35.123; CTRY:IE; LANG:en; SCL:1; SRV:;
+ IPV:CAL; SFV:NSPM; H:64aa7808-outbound-1.mta.getcheckrecipient.com;
+ PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; CAT:NONE;
+ SFS:(13230001)(4636009)(40470700004)(46966006)(36840700001)(82310400005)(2906002)(36860700001)(47076005)(26005)(70586007)(2616005)(336012)(6666004)(6506007)(6512007)(186003)(6862004)(54906003)(6636002)(5660300002)(4326008)(86362001)(356005)(37006003)(81166007)(316002)(70206006)(8936002)(8676002)(36756003)(6486002)(508600001)(40460700003)(44832011)(67856001);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2022 08:13:34.5383 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7085fb4-4f78-42ea-73d4-08da2cdcd185
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
+ Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-AuthSource: AM5EUR03FT030.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2481
+Cc: Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Will Deacon <will@kernel.org>, Luis Machado <luis.machado@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+ Mark Brown <broonie@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Alan Hayward <alan.hayward@arm.com>,
+ Shuah Khan <shuah@kernel.org>, kvmarm@lists.cs.columbia.edu,
+ Salil Akerkar <Salil.Akerkar@arm.com>,
+ Luca Salabrino <luca.scalabrino@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,106 +184,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This reverts commit 8f6379e207e7d834065a080f407a60d67349d961.
+The 04/28/2022 10:19, Catalin Marinas wrote:
+> On Tue, Apr 19, 2022 at 12:22:12PM +0100, Mark Brown wrote:
+> > +* There are a number of optional SME features, presence of these is reported
+> > +  through AT_HWCAP2 through:
+> > +
+> > +	HWCAP2_SME_I16I64
+> > +	HWCAP2_SME_F64F64
+> > +	HWCAP2_SME_I8I32
+> > +	HWCAP2_SME_F16F32
+> > +	HWCAP2_SME_B16F32
+> > +	HWCAP2_SME_F32F32
+> > +	HWCAP2_SME_FA64
+> 
+> Marc pointed out that in combination with FEAT_WFxT, we used all the
+> HWCAP2 bits (32). While we are ok for now, we'll soon need to look into
+> what to do when the next features turn up. Some options:
+> 
+> 1. Only provide HWCAP2_SME and let the ID_AA64SMFR0_EL1 features be
+>    probed via MRS emulation. It doesn't solve the problem but it buys us
+>    a bit of time.
+> 
+> 2. Don't bother with any new HWCAPs, just rely on MRS emulation (we have
+>    HWCAP_CPUID advertising this).
+> 
+> 3. Start using the upper 32-bit of HWCAP and HWCAP2 (we initially didn't
+>    go into these as there was a slight chance of merging ILP32). Does
+>    the libc rely on the upper bits for anything? Or does it just assume
+>    a 32-bit HWCAPs layout?
 
-The original change was not problematic but chose nonarchitected PMU
-register behavior over a NULL deref as KVM failed to hide the PMU in the
-ID_DFR0.
+top 2 bits of a 64bit AT_HWCAP should be reserved for libc.
+(glibc uses them internally)
 
-Since KVM now provides a sane value for ID_DFR0 and UNDEFs the guest for
-unsupported accesses, drop the unneeded checks in PMU register handlers.
+otherwise glibc can work with 64bit hwcaps.
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/arm64/kvm/pmu-emul.c | 23 +----------------------
- 1 file changed, 1 insertion(+), 22 deletions(-)
+> 
+> 4. Introduce HWCAP3.
+> 
+> Szabolcs, any thoughts?
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 3dc990ac4f44..78fdc443adc7 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -177,9 +177,6 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return 0;
--
- 	counter = kvm_pmu_get_pair_counter_value(vcpu, pmc);
- 
- 	if (kvm_pmu_pmc_is_chained(pmc) &&
-@@ -201,9 +198,6 @@ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val)
- {
- 	u64 reg;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	reg = (select_idx == ARMV8_PMU_CYCLE_IDX)
- 	      ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + select_idx;
- 	__vcpu_sys_reg(vcpu, reg) += (s64)val - kvm_pmu_get_counter_value(vcpu, select_idx);
-@@ -328,9 +322,6 @@ void kvm_pmu_enable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	struct kvm_pmc *pmc;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) || !val)
- 		return;
- 
-@@ -366,7 +357,7 @@ void kvm_pmu_disable_counter_mask(struct kvm_vcpu *vcpu, u64 val)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	struct kvm_pmc *pmc;
- 
--	if (!kvm_vcpu_has_pmu(vcpu) || !val)
-+	if (!val)
- 		return;
- 
- 	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-@@ -536,9 +527,6 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
- 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
- 	int i;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	if (!(__vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E))
- 		return;
- 
-@@ -588,9 +576,6 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
- {
- 	int i;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	if (val & ARMV8_PMU_PMCR_E) {
- 		kvm_pmu_enable_counter_mask(vcpu,
- 		       __vcpu_sys_reg(vcpu, PMCNTENSET_EL0));
-@@ -754,9 +739,6 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- {
- 	u64 reg, mask;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return;
--
- 	mask  =  ARMV8_PMU_EVTYPE_MASK;
- 	mask &= ~ARMV8_PMU_EVTYPE_EVENT;
- 	mask |= kvm_pmu_event_mask(vcpu->kvm);
-@@ -845,9 +827,6 @@ u64 kvm_pmu_get_pmceid(struct kvm_vcpu *vcpu, bool pmceid1)
- 	u64 val, mask = 0;
- 	int base, i, nr_events;
- 
--	if (!kvm_vcpu_has_pmu(vcpu))
--		return 0;
--
- 	if (!pmceid1) {
- 		val = read_sysreg(pmceid0_el0);
- 		base = 0;
--- 
-2.36.0.464.gb9c8b46e94-goog
+i'd go with AT_HWCAP3 and keep using the bottom 32bit for now.
+(this requires some new code in glibc, but not excessive)
 
+thanks.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
