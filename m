@@ -2,71 +2,81 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3ADC433EF
-	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 18:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E34BC433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 19:58:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB6F149F29;
-	Wed,  4 May 2022 14:55:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 99B9C49EDE;
+	Wed,  4 May 2022 15:58:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, body has been altered) header.i=@kernel.org
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id x1G-yHE7tchM; Wed,  4 May 2022 14:55:26 -0400 (EDT)
+	with ESMTP id 1q7P+4XL4ynB; Wed,  4 May 2022 15:58:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A65149F17;
-	Wed,  4 May 2022 14:55:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9605A4B11C;
+	Wed,  4 May 2022 15:58:49 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F4C649F04
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 14:55:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E96684B091
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 15:58:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zxqkFEZMXBuF for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 May 2022 14:55:24 -0400 (EDT)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28B1749EF2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 14:55:24 -0400 (EDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 1C773CE24B3;
- Wed,  4 May 2022 18:55:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541E5C385A4;
- Wed,  4 May 2022 18:55:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1651690517;
- bh=pG712z439yyrRfw7zAynun7bA7UKkGA/RKPiOnQrhG4=;
- h=From:To:Subject:Date:In-Reply-To:References:From;
- b=Dm/k7lXMxID75aVZEcWUsy7Hf2VvRJQExKv/keEOIhPU5ozTD1Oiqb7DRSQgf77ws
- ESGHPpZ1KaFNA2vM5QiNSuJD2AAmSX482BhfAICgVq/RUGzuHfGKkizStx2fne+keZ
- F6DSYaBKee70/IwYEam56JBy27P9vPlLPAk5znqF37utN4i6ToAjQd2ebIcGJFQnZZ
- cTGoU8cCtxbpMxOg/ycWx3sayBHRimjhj4JmfjLrZrW0wX/R4txAN09B5ATn9AM9LP
- u/liENnSp1F8lBDfa7346yN9fxoy8F7fWik3P5eBcxCRHiylE9QiJICQPcCbNeXBJc
- Ajw2KGmdUefOQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nmK9a-0090xB-Qx; Wed, 04 May 2022 19:55:14 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com
-Subject: Re: [PATCH v2 0/2] KVM/arm64: sys_reg_table_init() small improvements
-Date: Wed,  4 May 2022 19:55:12 +0100
-Message-Id: <165169050533.122765.3708868029385767320.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220428103405.70884-1-alexandru.elisei@arm.com>
-References: <20220428103405.70884-1-alexandru.elisei@arm.com>
+ with ESMTP id 5lKpYHVLVfhQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 May 2022 15:58:48 -0400 (EDT)
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com
+ [209.85.166.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F3B9E4B08A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 15:58:47 -0400 (EDT)
+Received: by mail-il1-f170.google.com with SMTP id z12so1552141ilp.8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 May 2022 12:58:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=GsfXoNKONKDKWhJHjg7OT8XgANJP2e9G7Mc1nVY0AYE=;
+ b=Aq1U8sdb7NiZVJWC4vUlChWXOfRbCGaFNjbSpc0WleExMf0SKkQUNrsAlYXljTlC8V
+ kIwakMFlClmc4+G6Yl7CQ/45/9xgObIBveZ7BjUWWP3+FAaW4C1aJyJALPCVD9lXJc+x
+ YJ++0U3IX23F9PeoHw9+6HPC3HlHHljxhgJrbOn5aAgZau7Q6TShdWIkw27qEr4r1db0
+ ySclaROjZ8pxDb8YfChQRlCjxbFar+IhUVYKk3BD08+hVk5gdraFe163Ypca8nO0QyxZ
+ DsoFqtJh0sAijvTR6s7QSXKCKou0s4gdKPXNW/z/rGUII4CS32K7EojcLfa8YVJI1oAs
+ x6EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20210112;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=GsfXoNKONKDKWhJHjg7OT8XgANJP2e9G7Mc1nVY0AYE=;
+ b=KOFXLxtdmIh80knXwah4DuPx2w8Hi9f2M3YIbOJD/GYVjB/ICTDhjqDTR/OG82U6g8
+ nZJH4BYRIWiOeITP9DgorZtJ/3J2zxgVRxNXLfWLTGRe/TMB89ojpzasEI3+xdn8q3hr
+ CaBrHFVTOMqelEMmyjuB88B5KN2SFmgjZy1FC2BShrq4VXJ5MMRLmNwnVjVdkHHXZesI
+ RkI6TCgwqonvdugjXJEgK/nvECT9iEWXFuQg6rNjHapQevHKCTSjQxq/FAVtHRgOG26l
+ ZQAxAghCjnMgF2utubpXdHsEnBckJvDQepFsNpMhMHxLQit9z3CbzDbOn+2wmU/58CwH
+ iR1Q==
+X-Gm-Message-State: AOAM532e1/56o/264VmBRN32VKxIOTfWqCYcjdJ656ZwOekaCYHEkYLu
+ tgENA+ooS7Aw6VXGJracrsK4YQ==
+X-Google-Smtp-Source: ABdhPJy5Bzj+uvdC2D+9IucvrmZ0XZi+3AvPJbXcQc72eVCSrPti9fdcCscTtD01OvFKOzl/PHzgiQ==
+X-Received: by 2002:a05:6e02:164f:b0:2cf:3244:665d with SMTP id
+ v15-20020a056e02164f00b002cf3244665dmr4183126ilu.170.1651694326903; 
+ Wed, 04 May 2022 12:58:46 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ t13-20020a02ccad000000b0032b3a7817afsm4928792jap.115.2022.05.04.12.58.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 May 2022 12:58:46 -0700 (PDT)
+Date: Wed, 4 May 2022 19:58:42 +0000
+From: Oliver Upton <oupton@google.com>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH] selftests: KVM: aarch64: Let hypercalls use UAPI
+ *_BIT_COUNT
+Message-ID: <YnLa8uH55/epyjlS@google.com>
+References: <20220504184415.1905224-1-rananta@google.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
- linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
- kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
+Content-Disposition: inline
+In-Reply-To: <20220504184415.1905224-1-rananta@google.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -83,34 +93,34 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, 28 Apr 2022 11:34:03 +0100, Alexandru Elisei wrote:
-> These are two small improvements to how KVM handles an out-of-order
-> sys_reg_desc table. These should only affect KVM developers, as the end
-> user should never see an error caused by an unsorted sys_reg_desc table.
+Hi Raghavendra,
+
+On Wed, May 04, 2022 at 06:44:15PM +0000, Raghavendra Rao Ananta wrote:
+> The hypercalls test currently defines its own *_BMAP_BIT_MAX macros to
+> define the last valid feature bit for each bitmap firmware register.
+> However, since these definitions are already present in the uapi header,
+> kvm.h, as *_BMAP_BIT_COUNT, and would help to keep the test updated as
+> features grow, use these instead.
+
+LOL, looks like I lost that one in the end! Still, the fact that you're
+patching the selftest highlights the fact that there is a nonzero chance
+of userspace using this value incorrectly expecting it to hold true
+across all kernels.
+
+Since this is the route going forward can we please consider documenting
+the fact that _BIT_COUNT *will* change and is not stable between kernel
+versions. Bad UAPI expectations could throw a wrench into this entire
+plan we've hatched for preserving hypercall ABI.
+
+Just a warning at the end of the register documentation would suffice.
+
+> No functional change intended.
 > 
-> Changes in v2:
-> 
-> * Tweaked how the error is detected and propagated in kvm_arch_init().
-> * Use %pS to print the table name and entry offset (Marc).
-> * Tweaked the error message to spell out that magic number refers to the
->   offending entry.
-> 
-> [...]
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 
-Applied to next, thanks!
+Besides considering the above hazard:
 
-[1/2] KVM/arm64: Don't BUG_ON() if emulated register table is unsorted
-      commit: f1f0c0cfeaa7c10eb536d9919bf3902af0e17bce
-[2/2] KVM/arm64: Print emulated register table name when it is unsorted
-      commit: 325031d4f39cfb1adf41708c1329e60b9abfbdac
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Reviewed-by: Oliver Upton <oupton@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
