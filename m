@@ -2,75 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4107AC433FE
-	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 03:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CEDC4332F
+	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 03:33:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A362F4B235;
-	Tue,  3 May 2022 23:25:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01F7249EC3;
+	Tue,  3 May 2022 23:33:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sBjaR4IUthfB; Tue,  3 May 2022 23:25:16 -0400 (EDT)
+	with ESMTP id 6qdxwTVeWtUA; Tue,  3 May 2022 23:33:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 093264B1FA;
-	Tue,  3 May 2022 23:25:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF1BB4A19A;
+	Tue,  3 May 2022 23:33:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF8524B132
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:25:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCBBA4A19A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:33:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4XXsGjuita58 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 23:25:14 -0400 (EDT)
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com
- [209.85.215.202])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B54EF4B1E0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:25:13 -0400 (EDT)
-Received: by mail-pg1-f202.google.com with SMTP id
- y17-20020a637d11000000b003ab06870074so91082pgc.15
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 20:25:13 -0700 (PDT)
+ with ESMTP id urbB2eVae5e0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 23:33:01 -0400 (EDT)
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com
+ [209.85.166.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7240E49EC3
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:33:01 -0400 (EDT)
+Received: by mail-io1-f50.google.com with SMTP id c125so300626iof.9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 20:33:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=O6gsi1VosCJ9Q+QJJSE7NIUXWalRHVe1tFy/2jVg0nU=;
- b=J2nRE+pM0k4FjNp2cMlnN8/gWRkViT6d6HglwgNSrVeXwgSSlC2eD0N42z2TxFenrK
- 1++90Z1DhXB+oCBWCaQUko3MtAX2Vwd7k7Tg1W8U1wFg4ebNTsyShXIVfZkQlXp61hpV
- P8TkYscwX69KGqwKqPYsXZHORIsX6xH+TgDrD+LwGi6A533g0QAbvuLY4DBvjChRlkuh
- uAKUg7eTOY8BCZ0zNkVkrc+zK8FyrgaDWWHxRBy50l5jAmd2A4PbUM4xe1EOHPswFwyu
- luobZxTR3exLfL81rO4/ZURyhjwdWEhoN7RcpAgHC25Ze+urfrMTfV3ojBPHk7Pyw04k
- jjPQ==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=MD7nPH76Zo4gzIjG6XroEYb+307Sv2T97DW30QPZNvQ=;
+ b=GCl3tUY0CxUSs2045e7bW3K3OMlsoVKLkDorqwMDkmosI+DarqkAsVZ4JutaruMtaq
+ VqOHlcJ06uzrO/wmARYsqy4RSsfaqwdhzD3Op9C9DJ5u3WeNoYMrxGWQJqnxWPKqFL+m
+ QRzSecp35sYjpDFlnSHnjh/mzL55frzR8ayJsgdjMS8lI8QEEt6j4UwSDAa+YE+WH32M
+ rV3TlIsrbFgDRyNTLm2bHTDSK86J1SDHWbQss+MyAldJlcz7OomuzVdYQ23f3ar+122V
+ j7OlhJvOkCtMEdVkoOKHFBAlv4QIa6gkZRCnrkWY8IjFhbXMImgVlCcrzHCLhXwUXHth
+ NoIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=O6gsi1VosCJ9Q+QJJSE7NIUXWalRHVe1tFy/2jVg0nU=;
- b=bb1pXR0WcTF+KNXnI/TBKVvgGe7DBmiFABUE5TB+g3epdgaEyk/ThjNcx60ARXPkAK
- R6xyC2xENAsr+EqIyraU6VSaPGcCYYf8JzY4D3md2Wy7ZBqzvOCHKSAEEKcffM5riHsa
- mnaEW5uFboxLwaPI7zS9eLoxXj4Q/xzmLCmIC8W3O3tg2OQuSX42FRaRbC5sjJnKfr1n
- YpdYBF0/emkxjAvpQwJHQllMGEHb1bQ5j8eRQ1H5r461dhs8+OT2V5dgKidTuisgM3VQ
- 7qP7YOxybiCancfB9TAY4Ujy4jMf0L79ZbBf0KdWcFMJpLPv47jrn3kcAN7w54tPWxfM
- RN9Q==
-X-Gm-Message-State: AOAM530CFDxwT9Mf1Dn1HSSucTdpJX4HBxo0N198y0gV+/c6Rv8+myCL
- TVZlD/+uQwexMyVfefFeQfAN2AYFVhUus7vRRJHrhEOhLUWtR1MY6z4wkiJ3psfVa5tApAk3QQU
- WZKYMQkfKuRLISC/bsgrfStQA0zFL5/Z99AqmCFXFf0qCShWOJBb67VsnO53J/D+dNkAljw==
-X-Google-Smtp-Source: ABdhPJzFv7NkWcBU+6vplhxBAUpwjxPW1/ACANI7rwBZF4ra9bVHx4OSHqKJtvMgIzFZVeY3+CTj/EOn3DA=
-X-Received: from oupton3.c.googlers.com
- ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a17:902:9309:b0:156:983d:2193 with SMTP id
- bc9-20020a170902930900b00156983d2193mr19155791plb.158.1651634713185; Tue, 03
- May 2022 20:25:13 -0700 (PDT)
-Date: Wed,  4 May 2022 03:24:46 +0000
-In-Reply-To: <20220504032446.4133305-1-oupton@google.com>
-Message-Id: <20220504032446.4133305-13-oupton@google.com>
-Mime-Version: 1.0
-References: <20220504032446.4133305-1-oupton@google.com>
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-Subject: [PATCH v6 12/12] selftests: KVM: Test SYSTEM_SUSPEND PSCI call
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=MD7nPH76Zo4gzIjG6XroEYb+307Sv2T97DW30QPZNvQ=;
+ b=oknuAoFyZZKBgluLOok0fxy/cltn4aewE3w4BQ7jLTNeMDwoSEk6pvOj4PlcnITrfs
+ kOjoOcp20pKZd5zbs9J1/IbKqYeTcnFm1A9ACRLZJSYAZyu0VeWC3Q05F/5qmuTodDjc
+ 22P+gSr6tSzwbK7c8sglsQjYdp7AK+sKReCjNgKyP1JrrB8iaPyzjOuos9qtK/u29UYb
+ AORZnVVYetEq5NqKen6XvSrnHgbqr5k//7L6id8r2Smq744aB33CBB0m4PM5OmhCK4uO
+ COwKijW+ZKVinZtsIKIgQJFdaZ4gUBy3/qg7ftjxC8ddJcYws+PD/lyGOqajFaqUvApd
+ WOdQ==
+X-Gm-Message-State: AOAM530VeGDEx3r0wJcnhoE0xV0W+Xfo4IIyQ3GopIo0uYIZy2iEFiIK
+ 0g0c0T8mQKR9qZFH0IuKL4Aafw==
+X-Google-Smtp-Source: ABdhPJy7vKJ/E6XbgDQRiEIsUnMlj/99SQ3gJhSHQZ0B1pirVzABIhS85iAuFB/rJZ2xJyY7/WLvCg==
+X-Received: by 2002:a6b:2b0b:0:b0:65a:4c08:7063 with SMTP id
+ r11-20020a6b2b0b000000b0065a4c087063mr6885026ior.92.1651635180562; 
+ Tue, 03 May 2022 20:33:00 -0700 (PDT)
+Received: from google.com (194.225.68.34.bc.googleusercontent.com.
+ [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
+ v18-20020a056e0213d200b002cbed258dcfsm3913760ilj.0.2022.05.03.20.32.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 May 2022 20:32:59 -0700 (PDT)
+Date: Wed, 4 May 2022 03:32:56 +0000
 From: Oliver Upton <oupton@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: vgic-v3: Consistently populate
+ ID_AA64PFR0_EL1.GIC
+Message-ID: <YnHz6Cw5ONR2e+KA@google.com>
+References: <20220503211424.3375263-1-maz@kernel.org>
+MIME-Version: 1.0
+Content-Disposition: inline
+In-Reply-To: <20220503211424.3375263-1-maz@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,108 +90,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Assert that the vCPU exits to userspace with KVM_SYSTEM_EVENT_SUSPEND if
-the guest calls PSCI SYSTEM_SUSPEND. Additionally, guarantee that the
-SMC32 and SMC64 flavors of this call are discoverable with the
-PSCI_FEATURES call.
+On Tue, May 03, 2022 at 10:14:24PM +0100, Marc Zyngier wrote:
+> When adding support for the slightly wonky Apple M1, we had to
+> populate ID_AA64PFR0_EL1.GIC==1 to present something to the guest,
+> as the HW itself doesn't advertise the feature.
+> 
+> However, we gated this on the in-kernel irqchip being created.
+> This causes some trouble for QEMU, which snapshots the state of
+> the registers before creating a virtual GIC, and then tries to
+> restore these registers once the GIC has been created.  Obviously,
+> between the two stages, ID_AA64PFR0_EL1.GIC has changed value,
+> and the write fails.
+> 
+> The fix is to actually emulate the HW, and always populate the
+> field if the HW is capable of it.
+> 
+> Fixes: 562e530fd770 ("KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- .../testing/selftests/kvm/aarch64/psci_test.c | 69 +++++++++++++++++++
- 1 file changed, 69 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
-index 535130d5e97f..88541de21c41 100644
---- a/tools/testing/selftests/kvm/aarch64/psci_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
-@@ -45,6 +45,25 @@ static uint64_t psci_affinity_info(uint64_t target_affinity,
- 	return res.a0;
- }
- 
-+static uint64_t psci_system_suspend(uint64_t entry_addr, uint64_t context_id)
-+{
-+	struct arm_smccc_res res;
-+
-+	smccc_hvc(PSCI_1_0_FN64_SYSTEM_SUSPEND, entry_addr, context_id,
-+		  0, 0, 0, 0, 0, &res);
-+
-+	return res.a0;
-+}
-+
-+static uint64_t psci_features(uint32_t func_id)
-+{
-+	struct arm_smccc_res res;
-+
-+	smccc_hvc(PSCI_1_0_FN_PSCI_FEATURES, func_id, 0, 0, 0, 0, 0, 0, &res);
-+
-+	return res.a0;
-+}
-+
- static void vcpu_power_off(struct kvm_vm *vm, uint32_t vcpuid)
- {
- 	struct kvm_mp_state mp_state = {
-@@ -137,8 +156,58 @@ static void host_test_cpu_on(void)
- 	kvm_vm_free(vm);
- }
- 
-+static void enable_system_suspend(struct kvm_vm *vm)
-+{
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_ARM_SYSTEM_SUSPEND,
-+	};
-+
-+	vm_enable_cap(vm, &cap);
-+}
-+
-+static void guest_test_system_suspend(void)
-+{
-+	uint64_t ret;
-+
-+	/* assert that SYSTEM_SUSPEND is discoverable */
-+	GUEST_ASSERT(!psci_features(PSCI_1_0_FN_SYSTEM_SUSPEND));
-+	GUEST_ASSERT(!psci_features(PSCI_1_0_FN64_SYSTEM_SUSPEND));
-+
-+	ret = psci_system_suspend(CPU_ON_ENTRY_ADDR, CPU_ON_CONTEXT_ID);
-+	GUEST_SYNC(ret);
-+}
-+
-+static void host_test_system_suspend(void)
-+{
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+
-+	vm = setup_vm(guest_test_system_suspend);
-+	enable_system_suspend(vm);
-+
-+	vcpu_power_off(vm, VCPU_ID_TARGET);
-+	run = vcpu_state(vm, VCPU_ID_SOURCE);
-+
-+	enter_guest(vm, VCPU_ID_SOURCE);
-+
-+	TEST_ASSERT(run->exit_reason == KVM_EXIT_SYSTEM_EVENT,
-+		    "Unhandled exit reason: %u (%s)",
-+		    run->exit_reason, exit_reason_str(run->exit_reason));
-+	TEST_ASSERT(run->system_event.type == KVM_SYSTEM_EVENT_SUSPEND,
-+		    "Unhandled system event: %u (expected: %u)",
-+		    run->system_event.type, KVM_SYSTEM_EVENT_SUSPEND);
-+
-+	kvm_vm_free(vm);
-+}
-+
- int main(void)
- {
-+	if (!kvm_check_cap(KVM_CAP_ARM_SYSTEM_SUSPEND)) {
-+		print_skip("KVM_CAP_ARM_SYSTEM_SUSPEND not supported");
-+		exit(KSFT_SKIP);
-+	}
-+
- 	host_test_cpu_on();
-+	host_test_system_suspend();
- 	return 0;
- }
--- 
-2.36.0.464.gb9c8b46e94-goog
-
+Reviewed-by: Oliver Upton <oupton@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
