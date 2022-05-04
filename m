@@ -2,83 +2,80 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C25DC433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 03:39:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A492C4332F
+	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 05:25:37 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB6C34B12C;
-	Tue,  3 May 2022 23:39:52 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B7D34B0B9;
+	Wed,  4 May 2022 01:25:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6c-EJxXn8KfC; Tue,  3 May 2022 23:39:51 -0400 (EDT)
+	with ESMTP id 7yMSxS73vOHu; Wed,  4 May 2022 01:25:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFA0341021;
-	Tue,  3 May 2022 23:39:51 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DE024B0DE;
+	Wed,  4 May 2022 01:25:35 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DBC341021
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:39:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ADC749F21
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 01:25:34 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id woeWKuhGcG-Y for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 23:39:48 -0400 (EDT)
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com
- [209.85.166.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C51C140FF0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:39:48 -0400 (EDT)
-Received: by mail-io1-f44.google.com with SMTP id o190so307876iof.10
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 20:39:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=TKFkaOZkalvLFPXwyy85GYdezcn8X//pTVrKI0zHMyM=;
- b=OKeMQH51cvKoQfQVe6saCkxUR73NoKar+XZu/9qav85QUB81nfSHCeoHN5ex2uOb//
- kO1M3kU546nhzKG8drhWWWIUs2t14S730C1HbWkI98KwrAgY1/vgN9VpljYTWsTGpYMT
- n40EgHXpIz0/SkKO51NFcsULQvGXL6ctkwg5DTTIAS2gYvCpejuSQQ4qph7SlokYXt9s
- VUvf8WdkLPYjIyQeFT1pil2GnBWaBey1n1lhrl6pQgJvg7/UckiVZ1X7UNBDOqmR4njo
- LBHY2e3LUD3qHU9CyE4PtJWxl3SB3/EAnWvg4FyKsiXUSQX++UDJY9f7JOtRyg/wBBgS
- UVsA==
+ with ESMTP id 7+Lv9eWl49gF for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 May 2022 01:25:33 -0400 (EDT)
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com
+ [209.85.128.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1F61F49F05
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 01:25:33 -0400 (EDT)
+Received: by mail-yw1-f171.google.com with SMTP id
+ 00721157ae682-2f7bb893309so4007777b3.12
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 22:25:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YbvOAJT4uwe4uxZaljDW/4uvXBb7LRgdeX0Ux1iDca0=;
+ b=m5Mcn0MAiBMq+DbL7oOoSr5m0g1uVNEK1A5YSRXexDLN+5XHp2/wFHIpJNDYQODvIF
+ zaBly7ujlJgnNrJ9ypssJz+woV4UyKKn2A68+/xs2JCjQ2CbcYQRuyKzDoubBnEBsZ6+
+ xar7udvnnZ+WjxZAUuwQ6w091tCaXg+oXEWk33vdJ2h1sxhb329r3UdB81DKJoddUxkG
+ AutMMOpaI/IJBnyw1ieTI+fNyMNfVXRz2mdhw81f1OIK+/8vYhSo/84lHyCkNwzPHCIe
+ RR7iHNaYBqpmr+R35M4QMStgrfaqDrkDfBGuWj6j1Zyd+QCQ8YDIbkuUWmJ9M/Q/jFoC
+ CI6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=TKFkaOZkalvLFPXwyy85GYdezcn8X//pTVrKI0zHMyM=;
- b=6F5Sdi8BmQ72NWhHnBGJJ+n+gF9BcBFixdCojdDXl+pYxKpN8Se9TMESxirIys1Vvl
- S+Froi2FVUwmZnn4N8pHFuXL2tFhneK1BuiB//bCM9NwnjGiLIJ3kiph34hRcdoOE/9G
- vDqK3xGBMqXiHCPqGKXxnjOV5Y7E60rZlGq9KsRQeQeGVegaSy/HazHVKnu/fqAFSSOF
- S75/bUn+DMcAljafQDa1HggvPstIokYwReFNYJ+XISwMGmDxFeJfy7dz8h5+8qkcYWCM
- IxMWCeUne8zNcNVQWBo+kOWF2h72/R0iK7AHDivAduSw3sWqJy5uhfOBshwFjoa6lgiO
- GeAQ==
-X-Gm-Message-State: AOAM532vTuGUxXp+YBnNyHelI/5igsPQlgLBIkhe8+BQHWYYC7YbwAJQ
- bKWSgCCcACuKcPSNSNVOeY5lsw==
-X-Google-Smtp-Source: ABdhPJwLTXJtAXiJwUCvEWggY3FV+wdRFZMRp+5BJmrk0AvQhZTFxdNQcILItIRCgxyMEkGbhuqhbA==
-X-Received: by 2002:a05:6602:2427:b0:657:b2ff:89c5 with SMTP id
- g7-20020a056602242700b00657b2ff89c5mr7163783iob.26.1651635587956; 
- Tue, 03 May 2022 20:39:47 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- x22-20020a029716000000b0032b3a781750sm4388413jai.20.2022.05.03.20.39.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 May 2022 20:39:47 -0700 (PDT)
-Date: Wed, 4 May 2022 03:39:43 +0000
-From: Oliver Upton <oupton@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services
- selection
-Message-ID: <YnH1f2cXcpdKsA3q@google.com>
-References: <20220502233853.1233742-1-rananta@google.com>
- <878rri8r78.wl-maz@kernel.org>
- <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
- <878rriicez.wl-maz@kernel.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YbvOAJT4uwe4uxZaljDW/4uvXBb7LRgdeX0Ux1iDca0=;
+ b=e9TWrOHto6s9bVyG7J8tRqbOoMNueu+lTXnzyyJhU9qtI2RHzk5Z0+Eh6vT6Bg1brq
+ DgFJVu5gPMXqCY9ZCXsX8kRJPgzoUtWSARzqOb0rH4XQNcTQX1YdIvZwUv5nip/eEjyN
+ 7BO48rwqM7vPcHIHLUIHay+K9mxkn/q7DZ9qTeq+qjxwcD7mPzQCxHEUZhMvvamcw1t7
+ 7EF7q9uq7BEs//7szZd3J8ROhAUWtN/LjlNKBq4rRO5Wjeojx9h+0DGEKadfnd80py5j
+ BYxdER/IhvXwrhfbktvxTyIXfO/xsHqNH5THUewaOO8Ai5scl8rv+gvX2ZovL4Aj+fhH
+ gV4g==
+X-Gm-Message-State: AOAM5305/KxSR/U03w0kM9gWlRcmKHsqpj7sMB/+uvWruGo4HlYks99A
+ UgMivIKeWRrHW9Pfu1GcpZVXTJG/Rc/Jdzevt2lANg==
+X-Google-Smtp-Source: ABdhPJwppChYPQrME4HisQzIkXdWnQOqvrfW7WftTEQuk37QN96vTzAdDbrEIAq/2VrukEj/2ny9oZ6sRCj0w7Ym0K8=
+X-Received: by 2002:a81:23ce:0:b0:2f8:ad74:1185 with SMTP id
+ j197-20020a8123ce000000b002f8ad741185mr18078136ywj.120.1651641932339; Tue, 03
+ May 2022 22:25:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <878rriicez.wl-maz@kernel.org>
-Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+References: <20220419112247.711548-1-broonie@kernel.org>
+ <YnGrbEt3oBBTly7u@qian> <YnHANG5cM0CS9ffm@sirena.org.uk>
+In-Reply-To: <YnHANG5cM0CS9ffm@sirena.org.uk>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Wed, 4 May 2022 10:55:21 +0530
+Message-ID: <CA+G9fYsRZKFXeiOQ0dp_-vL-3JimC5u75djvc1Ussv1cLsiUbA@mail.gmail.com>
+Subject: Re: [PATCH v14 00/39] arm64/sme: Initial support for the Scalable
+ Matrix Extension
+To: Mark Brown <broonie@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>,
+ Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
+ Luis Machado <luis.machado@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>,
+ Marc Zyngier <maz@kernel.org>, Alan Hayward <alan.hayward@arm.com>,
+ Qian Cai <quic_qiancai@quicinc.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kselftest@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Shuah Khan <skhan@linuxfoundation.org>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>,
+ Luca Salabrino <luca.scalabrino@arm.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -95,56 +92,109 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, May 03, 2022 at 09:33:40PM +0100, Marc Zyngier wrote:
-> On Tue, 03 May 2022 19:49:13 +0100,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Tue, May 3, 2022 at 10:24 AM Marc Zyngier <maz@kernel.org> wrote:
-> > >
-> > > On Tue, 03 May 2022 00:38:44 +0100,
-> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
-> > > >
-> > > > Hello,
-> > > >
-> > > > Continuing the discussion from [1], the series tries to add support
-> > > > for the userspace to elect the hypercall services that it wishes
-> > > > to expose to the guest, rather than the guest discovering them
-> > > > unconditionally. The idea employed by the series was taken from
-> > > > [1] as suggested by Marc Z.
-> > >
-> > > As it took some time to get there, and that there was still a bunch of
-> > > things to address, I've taken the liberty to apply my own fixes to the
-> > > series.
-> > >
-> > > Please have a look at [1], and let me know if you're OK with the
-> > > result. If you are, I'll merge the series for 5.19.
-> > >
-> > > Thanks,
-> > >
-> > >         M.
-> > >
-> > Thank you for speeding up the process; appreciate it. However, the
-> > series's selftest patches have a dependency on Oliver's
-> > PSCI_SYSTEM_SUSPEND's selftest patches [1][2]. Can we pull them in
-> > too?
+On Wed, 4 May 2022 at 05:22, Mark Brown <broonie@kernel.org> wrote:
+>
+> On Tue, May 03, 2022 at 06:23:40PM -0400, Qian Cai wrote:
+> > On Tue, Apr 19, 2022 at 12:22:08PM +0100, Mark Brown wrote:
+> > > This series provides initial support for the ARMv9 Scalable Matrix
+> > > Extension (SME).  SME takes the approach used for vectors in SVE and
+> > > extends this to provide architectural support for matrix operations.  A
+> > > more detailed overview can be found in [1].
+> >
+> > Set CONFIG_ARM64_SME=n fixed a warning while running libhugetlbfs tests.
+> >
+> >         /*
+> >          * There are several places where we assume that the order value is sane
+> >          * so bail out early if the request is out of bound.
+> >          */
+> >         if (unlikely(order >= MAX_ORDER)) {
+> >                 WARN_ON_ONCE(!(gfp & __GFP_NOWARN));
+> >                 return NULL;
+> >         }
+>
+> Ugh, right.  These variable sized register sets really don't map
+> entirely cleanly onto the ptrace interface but now you point it
+> out what the code has there is going to give a rather larger
+> number than is sensible.  Not fully checked but does the below
+> fix things?
+>
+> Thanks for your testing with this stuff, it's been really
+> helpful.
+>
+> diff --git a/arch/arm64/kernel/ptrace.c b/arch/arm64/kernel/ptrace.c
+> index 47d8a7472171..08c1cb43cf33 100644
+> --- a/arch/arm64/kernel/ptrace.c
+> +++ b/arch/arm64/kernel/ptrace.c
+> @@ -1447,8 +1447,8 @@ static const struct user_regset aarch64_regsets[] = {
+>         },
+>         [REGSET_ZA] = { /* SME ZA */
+>                 .core_note_type = NT_ARM_ZA,
+> -               .n = DIV_ROUND_UP(ZA_PT_ZA_SIZE(SVE_VQ_MAX), SVE_VQ_BYTES),
+> -               .size = SVE_VQ_BYTES,
+> +               .n = 1,
+> +               .size = ZA_PT_SIZE(SVE_VQ_MAX),
+>                 .align = SVE_VQ_BYTES,
+>                 .regset_get = za_get,
+>                 .set = za_set,
 
-Posted, BTW.
+I have tested this patch but the warning did not fix.
+Testing libhugetlbfs on qemu_arm64 triggering this warning.
 
-http://lore.kernel.org/kvmarm/20220504032446.4133305-1-oupton@google.com
+Kernel warning:
+-------------------
+[   13.266791] kauditd_printk_skb: 1 callbacks suppressed
+[   13.266794] audit: type=1701 audit(1651640394.652:25):
+auid=4294967295 uid=0 gid=0 ses=4294967295 pid=463
+comm=\"brk_near_huge\"
+exe=\"/usr/lib/libhugetlbfs/tests/obj64/brk_near_huge\" sig=6 res=1
+[   13.267376] ------------[ cut here ]------------
+[   13.267378] WARNING: CPU: 2 PID: 463 at mm/page_alloc.c:5368
+__alloc_pages+0x624/0xd50
+[   13.269956] Modules linked in: crct10dif_ce rfkill fuse
+[   13.270357] CPU: 2 PID: 463 Comm: brk_near_huge Not tainted
+5.18.0-rc4-next-20220429 #1
+[   13.270964] Hardware name: linux,dummy-virt (DT)
+[   13.271315] pstate: 20400005 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   13.271841] pc : __alloc_pages+0x624/0xd50
+[   13.272157] lr : alloc_pages+0xb8/0x170
+[   13.272451] sp : ffff800008873630
+[   13.272704] x29: ffff800008873630 x28: 000000000000000f x27: ffffb53cfad91650
+[   13.273248] x26: ffff0000c57f2c00 x25: ffff800008873c58 x24: 000000000000000f
+[   13.273788] x23: 0000000000000dc0 x22: 0000000000000000 x21: 000000000000000f
+[   13.274327] x20: ffffb53cfc8189a0 x19: 0000000000040dc0 x18: 0000000000000000
+[   13.274868] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+[   13.275406] x14: 0000000000000000 x13: 0000000000000000 x12: ffff0000ff7f5b58
+[   13.275945] x11: 0000000000000068 x10: ffffb53cfb77d000 x9 : ffffb53cf9d30e78
+[   13.276485] x8 : fffffc00038e0001 x7 : dead000000000100 x6 : 0000000000000001
+[   13.277021] x5 : 0000000000000000 x4 : ffff0000c55fe180 x3 : 0000000000000000
+[   13.277559] x2 : 0000000000000000 x1 : 0000000000000001 x0 : 0000000000040dc0
+[   13.278096] Call trace:
+[   13.278285]  __alloc_pages+0x624/0xd50
+[   13.278576]  alloc_pages+0xb8/0x170
+[   13.278844]  kmalloc_order+0x40/0x100
+[   13.279126]  kmalloc_order_trace+0x38/0x130
+[   13.279445]  __kmalloc+0x37c/0x3e0
+[   13.279707]  __regset_get+0xa0/0x104
+[   13.279983]  regset_get_alloc+0x20/0x2c
+[   13.280277]  elf_core_dump+0x3a8/0xd10
+[   13.280567]  do_coredump+0xe50/0x138c
+[   13.280850]  get_signal+0x860/0x920
+[   13.281119]  do_notify_resume+0x184/0x1480
+[   13.281428]  el0_svc+0xa8/0xc0
+[   13.281666]  el0t_64_sync_handler+0xbc/0x140
+[   13.281992]  el0t_64_sync+0x18c/0x190
+[   13.282273] ---[ end trace 0000000000000000 ]---
 
-> > 2. Patch-2/9, arm_hypercall.h, clear all the macros in this patch
-> > itself instead of doing it in increments (unless there's some reason
-> > that I'm missing)?
-> 
-> Ah, rebasing leftovers, now gone.
-> 
-> I've pushed an updated branch again, please have a look.
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-Series looks good with your additions. For the pile:
+url:
+https://lkft.validation.linaro.org/scheduler/job/4983793#L831
 
-Reviewed-by: Oliver Upton <oupton@google.com>
+Build link: https://builds.tuxbuild.com/28gVhSoYA4NRerhwD1gkY4QdHLt/
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
