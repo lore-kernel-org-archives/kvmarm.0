@@ -2,76 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55565C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 18:44:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3ADC433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 18:55:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A64E449F29;
-	Wed,  4 May 2022 14:44:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB6F149F29;
+	Wed,  4 May 2022 14:55:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id AfCcwVS5kcIe; Wed,  4 May 2022 14:44:23 -0400 (EDT)
+	with ESMTP id x1G-yHE7tchM; Wed,  4 May 2022 14:55:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FDAA40C52;
-	Wed,  4 May 2022 14:44:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A65149F17;
+	Wed,  4 May 2022 14:55:26 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F08D740B8D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 14:44:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F4C649F04
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 14:55:25 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FUFZG9F68Y4p for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 May 2022 14:44:21 -0400 (EDT)
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
- [209.85.216.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9C5C40AEA
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 14:44:21 -0400 (EDT)
-Received: by mail-pj1-f73.google.com with SMTP id
- t15-20020a17090a3b4f00b001d67e27715dso3326331pjf.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 May 2022 11:44:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=VCyTBnecYpNJdRLQCPsrzRcQbyCBtqwFjPmA2xqKa88=;
- b=YNx+vJHh5la1cqk7J51+Ly9mRTpv5jSKyWf75UCfc3ZOzIf9YBKLf7iKP1caXry4f2
- Qr0R9DNxiq560S3gHUdf4bSx/YjMrtnurM+IPCP1p/+8edfGwRboRhxREYbP56zp18Mn
- WzF3fBxbsYfmkBjcmDOGWD3gfgs+OVzowspbyrFoZcePIvyywBwRWkH5gahjMjcAFFny
- H3OSivgwBzQFGXneVm5nXwj5smH3Rd03MY2z9yHT7LYDIKv3WkgVsWms/VH2wKlZS7/d
- ACQ/ZzMZwM/BPd8U5F6qUMXU6EmwN8G32e0z2WtIUOYK2ZvzNd6M0LHaHWwFSxBB9pm0
- MJhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=VCyTBnecYpNJdRLQCPsrzRcQbyCBtqwFjPmA2xqKa88=;
- b=MVuv1gAAMEvi6ZI4qog2eA7+QSxyEBnGzNU7mhdrX2HyVMyVCuormJz3moQz/MxhEq
- Gmfjr1pkeFtF8zH2LbG91WEq9pvDxYWL0g/j3FK+uPqppXk5FTqga3eVAmGHmlD0PdQ5
- CqMN9hTwPcRsgbAq92Vs+FEjQJ849CFeI9VrCCfaPX/tkpzdiUODz30YCfTOlz4un1PF
- Heuh9Kh//VnPDLyvFfUqoTzCbMv4WmwWqd1OjoxBhYMftj89nLkD680e01tPDWcMKejI
- nfVgcLuf4zJAi5JXX+ZdP4puzPpjbVV9WvM/rvC3sflPcjYKt23G64fIjly9bwyD25bn
- rA3A==
-X-Gm-Message-State: AOAM531N+P3lsnOHUkH9L9Btr2ihDEQ+cwKIavFUXxeVFwiwY9A517Eq
- 2DGKDrx+PPSf5b/pzRq1M6a11yAYB+SE
-X-Google-Smtp-Source: ABdhPJxcxmOQZgwG7ijdgiiboeoF9R0zWhsHRFBvRXOGMQ63dEaW3j2rbPdrIFcHlR+d3fNJwVhWG1ZOtPrm
-X-Received: from rananta-virt.c.googlers.com
- ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
- (user=rananta job=sendgmr) by 2002:a05:6a00:1a4d:b0:50d:5921:1a8f with SMTP
- id h13-20020a056a001a4d00b0050d59211a8fmr21991848pfv.64.1651689860717; Wed,
- 04 May 2022 11:44:20 -0700 (PDT)
-Date: Wed,  4 May 2022 18:44:15 +0000
-Message-Id: <20220504184415.1905224-1-rananta@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
-Subject: [PATCH] selftests: KVM: aarch64: Let hypercalls use UAPI *_BIT_COUNT
-From: Raghavendra Rao Ananta <rananta@google.com>
-To: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>, 
- James Morse <james.morse@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Peter Shier <pshier@google.com>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ with ESMTP id zxqkFEZMXBuF for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 May 2022 14:55:24 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28B1749EF2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 14:55:24 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 1C773CE24B3;
+ Wed,  4 May 2022 18:55:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541E5C385A4;
+ Wed,  4 May 2022 18:55:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651690517;
+ bh=pG712z439yyrRfw7zAynun7bA7UKkGA/RKPiOnQrhG4=;
+ h=From:To:Subject:Date:In-Reply-To:References:From;
+ b=Dm/k7lXMxID75aVZEcWUsy7Hf2VvRJQExKv/keEOIhPU5ozTD1Oiqb7DRSQgf77ws
+ ESGHPpZ1KaFNA2vM5QiNSuJD2AAmSX482BhfAICgVq/RUGzuHfGKkizStx2fne+keZ
+ F6DSYaBKee70/IwYEam56JBy27P9vPlLPAk5znqF37utN4i6ToAjQd2ebIcGJFQnZZ
+ cTGoU8cCtxbpMxOg/ycWx3sayBHRimjhj4JmfjLrZrW0wX/R4txAN09B5ATn9AM9LP
+ u/liENnSp1F8lBDfa7346yN9fxoy8F7fWik3P5eBcxCRHiylE9QiJICQPcCbNeXBJc
+ Ajw2KGmdUefOQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nmK9a-0090xB-Qx; Wed, 04 May 2022 19:55:14 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com
+Subject: Re: [PATCH v2 0/2] KVM/arm64: sys_reg_table_init() small improvements
+Date: Wed,  4 May 2022 19:55:12 +0100
+Message-Id: <165169050533.122765.3708868029385767320.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220428103405.70884-1-alexandru.elisei@arm.com>
+References: <20220428103405.70884-1-alexandru.elisei@arm.com>
+MIME-Version: 1.0
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com,
+ linux-arm-kernel@lists.infradead.org, james.morse@arm.com,
+ kvmarm@lists.cs.columbia.edu, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,50 +83,33 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-The hypercalls test currently defines its own *_BMAP_BIT_MAX macros to
-define the last valid feature bit for each bitmap firmware register.
-However, since these definitions are already present in the uapi header,
-kvm.h, as *_BMAP_BIT_COUNT, and would help to keep the test updated as
-features grow, use these instead.
+On Thu, 28 Apr 2022 11:34:03 +0100, Alexandru Elisei wrote:
+> These are two small improvements to how KVM handles an out-of-order
+> sys_reg_desc table. These should only affect KVM developers, as the end
+> user should never see an error caused by an unsorted sys_reg_desc table.
+> 
+> Changes in v2:
+> 
+> * Tweaked how the error is detected and propagated in kvm_arch_init().
+> * Use %pS to print the table name and entry offset (Marc).
+> * Tweaked the error message to spell out that magic number refers to the
+>   offending entry.
+> 
+> [...]
 
-No functional change intended.
+Applied to next, thanks!
 
-Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
----
- tools/testing/selftests/kvm/aarch64/hypercalls.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+[1/2] KVM/arm64: Don't BUG_ON() if emulated register table is unsorted
+      commit: f1f0c0cfeaa7c10eb536d9919bf3902af0e17bce
+[2/2] KVM/arm64: Print emulated register table name when it is unsorted
+      commit: 325031d4f39cfb1adf41708c1329e60b9abfbdac
 
-diff --git a/tools/testing/selftests/kvm/aarch64/hypercalls.c b/tools/testing/selftests/kvm/aarch64/hypercalls.c
-index 41e0210b7a5e..dea019ec4dd9 100644
---- a/tools/testing/selftests/kvm/aarch64/hypercalls.c
-+++ b/tools/testing/selftests/kvm/aarch64/hypercalls.c
-@@ -18,20 +18,15 @@
- 
- #define FW_REG_ULIMIT_VAL(max_feat_bit) (GENMASK(max_feat_bit, 0))
- 
--/* Last valid bits of the bitmapped firmware registers */
--#define KVM_REG_ARM_STD_BMAP_BIT_MAX		0
--#define KVM_REG_ARM_STD_HYP_BMAP_BIT_MAX	0
--#define KVM_REG_ARM_VENDOR_HYP_BMAP_BIT_MAX	1
--
- struct kvm_fw_reg_info {
- 	uint64_t reg;		/* Register definition */
- 	uint64_t max_feat_bit;	/* Bit that represents the upper limit of the feature-map */
- };
- 
--#define FW_REG_INFO(r)			\
--	{					\
--		.reg = r,			\
--		.max_feat_bit = r##_BIT_MAX,	\
-+#define FW_REG_INFO(r)					\
-+	{						\
-+		.reg = r,				\
-+		.max_feat_bit = r##_BIT_COUNT - 1,	\
- 	}
- 
- static const struct kvm_fw_reg_info fw_reg_info[] = {
+Cheers,
+
+	M.
 -- 
-2.36.0.512.ge40c2bad7a-goog
+Without deviation from the norm, progress is not possible.
+
 
 _______________________________________________
 kvmarm mailing list
