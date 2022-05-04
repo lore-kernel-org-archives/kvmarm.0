@@ -2,79 +2,48 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED389C433F5
-	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 07:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C58C433EF
+	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 08:46:41 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5709649E46;
-	Wed,  4 May 2022 03:49:37 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B51A94B152;
+	Wed,  4 May 2022 04:46:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@linaro.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id KSat-bqHiLqI; Wed,  4 May 2022 03:49:36 -0400 (EDT)
+	with ESMTP id R7Tw5lOMjTaN; Wed,  4 May 2022 04:46:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3121C4079D;
-	Wed,  4 May 2022 03:49:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E9BA64B105;
+	Wed,  4 May 2022 04:46:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AAC3349F01
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 03:49:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56FFD49F02
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 03:48:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xtR3395faOUC for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 May 2022 03:49:33 -0400 (EDT)
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com
- [209.85.219.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A888D49F5D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 03:49:33 -0400 (EDT)
-Received: by mail-yb1-f174.google.com with SMTP id h10so1047503ybc.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 May 2022 00:49:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nBQmirpc3Jzz2WCciK0xB/dSEqZbT1cDbk6dglZ1uBg=;
- b=UWuFLon1MvAHgjqPhEcsa2mVgIRhCdr07mEbCxel2hphWlSVQEC4vO/TE58K6YyZLv
- KdAt54vTokh9rWbOgXiqqIdgwmze4KE0kfH5RlEB9gP2IihVKQ4HB8zODadKn0SFW26k
- de6LUjlASatkBMKZ8rLkDafvM05dV7myRgJqYbH20gjCTAsEaA/V8ylwnVx0USGyar/0
- PxhPc8MFAi3qcTEqrfb7IOHCNpRM95mGhf2hl7dCGiAJt8XsSWKLGUUXIEZXTdL3MN9q
- +xvgTb4qfIC8nJvdcouu4KSlN9DDpFJQAgNdjoObloqDkKcAqkppEi6ypjnHRzlqDC5d
- Da/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nBQmirpc3Jzz2WCciK0xB/dSEqZbT1cDbk6dglZ1uBg=;
- b=5M9jzY8kGtsYLz841YMcwB/8/vUEyZRsg5YehatK4fjNzHsdDS6MH25etr2OtU6CdM
- XyZObOR7WLeCoSncK3NuWJn3LIo88iMeakUXXt/zryK1V3PN8A3VCORugyRcSSM7g/oM
- GhUoGJWecPPbHqCnUWmCqWUFOhom+w8muUbABxCIrmu+x7R7WOJVTSzCeL/JOzwfJNpz
- tC7+ld2Yd5+JpVCyafuVeGkl6Wx7ElOvmlQqGi8n7Tl6LRi5G9m5iGHmymVw8f3SBhN7
- NSTMFMGwf+YspT6ng4gbg2ML7gB7QVskGVSG6gxVTAj7Zxr6BHfxDS5ENl+HxB5LSuf/
- yQTA==
-X-Gm-Message-State: AOAM532j963uV0WU63wnzqaTpik51jlc/q3scSV0Q2hPVFDmFdWKf7B1
- j5RgaMBI45HHOf+e0iu56CK/In/V4ciw6PAyKr/U6w==
-X-Google-Smtp-Source: ABdhPJyNB77zleiVNEcTCAgG3AS4key9sktPB70PVylNOO/cLnHmygWDMqHxwR+ZMCeE8XUmznCFoc3Cpri8uFEqgHI=
-X-Received: by 2002:a25:8045:0:b0:648:a9b3:96d0 with SMTP id
- a5-20020a258045000000b00648a9b396d0mr15786060ybn.88.1651650573002; Wed, 04
- May 2022 00:49:33 -0700 (PDT)
+ with ESMTP id fijXL19PoGoF for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 May 2022 03:48:13 -0400 (EDT)
+Received: from ozlabs.ru (ozlabs.ru [107.174.27.60])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7445649F01
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2022 03:48:13 -0400 (EDT)
+Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
+ by ozlabs.ru (Postfix) with ESMTP id C4CC680511;
+ Wed,  4 May 2022 03:48:09 -0400 (EDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: kvm-ppc@vger.kernel.org
+Subject: [PATCH kernel] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform
+ dependent
+Date: Wed,  4 May 2022 17:48:07 +1000
+Message-Id: <20220504074807.3616813-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20220419112247.711548-1-broonie@kernel.org>
- <YnGrbEt3oBBTly7u@qian> <YnHANG5cM0CS9ffm@sirena.org.uk>
-In-Reply-To: <YnHANG5cM0CS9ffm@sirena.org.uk>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Wed, 4 May 2022 13:19:21 +0530
-Message-ID: <CA+G9fYuqVq1G+zTamEqJDyaYqBSBQGkj5Qc6ZCZgBUj9qSP_Fg@mail.gmail.com>
-Subject: Re: [PATCH v14 00/39] arm64/sme: Initial support for the Scalable
- Matrix Extension
-To: Mark Brown <broonie@kernel.org>
-Cc: Shuah Khan <shuah@kernel.org>,
- Basant Kumar Dwivedi <Basant.KumarDwivedi@arm.com>,
- Luis Machado <luis.machado@arm.com>, Szabolcs Nagy <szabolcs.nagy@arm.com>,
- Marc Zyngier <maz@kernel.org>, Alan Hayward <alan.hayward@arm.com>,
- Qian Cai <quic_qiancai@quicinc.com>, linux-arm-kernel@lists.infradead.org,
- linux-kselftest@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
- Shuah Khan <skhan@linuxfoundation.org>, Will Deacon <will@kernel.org>,
- kvmarm@lists.cs.columbia.edu, Salil Akerkar <Salil.Akerkar@arm.com>,
- Luca Salabrino <luca.scalabrino@arm.com>
+X-Mailman-Approved-At: Wed, 04 May 2022 04:46:37 -0400
+Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+ Fabiano Rosas <farosas@linux.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ x86@kernel.org, linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Alex Williamson <alex.williamson@redhat.com>, kvm-riscv@lists.infradead.org,
+ Paolo Bonzini <pbonzini@redhat.com>, linux-riscv@lists.infradead.org,
+ linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,22 +60,132 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Wed, 4 May 2022 at 05:22, Mark Brown <broonie@kernel.org> wrote:
->
-> On Tue, May 03, 2022 at 06:23:40PM -0400, Qian Cai wrote:
-> > On Tue, Apr 19, 2022 at 12:22:08PM +0100, Mark Brown wrote:
-> > > This series provides initial support for the ARMv9 Scalable Matrix
-> > > Extension (SME).  SME takes the approach used for vectors in SVE and
-> > > extends this to provide architectural support for matrix operations.  A
-> > > more detailed overview can be found in [1].
-> >
-> > Set CONFIG_ARM64_SME=n fixed a warning while running libhugetlbfs tests.
+When introduced, IRQFD resampling worked on POWER8 with XICS. However
+KVM on POWER9 has never implemented it - the compatibility mode code
+("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
+XIVE mode does not handle INTx in KVM at all.
 
-I agree with this.
-The reported kernel warning gone with
- CONFIG_ARM64_SME=n
+This moved the capability support advertising to platforms and stops
+advertising it on XIVE, i.e. POWER9 and later.
 
-- Naresh
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+
+
+Or I could move this one together with KVM_CAP_IRQFD. Thoughts?
+
+---
+ arch/arm64/kvm/arm.c       | 3 +++
+ arch/mips/kvm/mips.c       | 3 +++
+ arch/powerpc/kvm/powerpc.c | 6 ++++++
+ arch/riscv/kvm/vm.c        | 3 +++
+ arch/s390/kvm/kvm-s390.c   | 3 +++
+ arch/x86/kvm/x86.c         | 3 +++
+ virt/kvm/kvm_main.c        | 1 -
+ 7 files changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 523bc934fe2f..092f0614bae3 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -210,6 +210,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_VCPU_ATTRIBUTES:
+ 	case KVM_CAP_PTP_KVM:
++#ifdef CONFIG_HAVE_KVM_IRQFD
++	case KVM_CAP_IRQFD_RESAMPLE:
++#endif
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index a25e0b73ee70..0f3de470a73e 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_SYNC_MMU:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
++#ifdef CONFIG_HAVE_KVM_IRQFD
++	case KVM_CAP_IRQFD_RESAMPLE:
++#endif
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_NR_VCPUS:
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 875c30c12db0..87698ffef3be 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -591,6 +591,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		break;
+ #endif
+ 
++#ifdef CONFIG_HAVE_KVM_IRQFD
++	case KVM_CAP_IRQFD_RESAMPLE:
++		r = !xive_enabled();
++		break;
++#endif
++
+ 	case KVM_CAP_PPC_ALLOC_HTAB:
+ 		r = hv_enabled;
+ 		break;
+diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+index c768f75279ef..b58579b386bb 100644
+--- a/arch/riscv/kvm/vm.c
++++ b/arch/riscv/kvm/vm.c
+@@ -63,6 +63,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_MP_STATE:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
++#ifdef CONFIG_HAVE_KVM_IRQFD
++	case KVM_CAP_IRQFD_RESAMPLE:
++#endif
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_NR_VCPUS:
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 156d1c25a3c1..85e093fc8d13 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -564,6 +564,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_S390_DIAG318:
+ 	case KVM_CAP_S390_MEM_OP_EXTENSION:
++#ifdef CONFIG_HAVE_KVM_IRQFD
++	case KVM_CAP_IRQFD_RESAMPLE:
++#endif
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0c0ca599a353..a0a7b769483d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4273,6 +4273,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_SYS_ATTRIBUTES:
+ 	case KVM_CAP_VAPIC:
+ 	case KVM_CAP_ENABLE_CAP:
++#ifdef CONFIG_HAVE_KVM_IRQFD
++	case KVM_CAP_IRQFD_RESAMPLE:
++#endif
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 70e05af5ebea..885e72e668a5 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4293,7 +4293,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ #endif
+ #ifdef CONFIG_HAVE_KVM_IRQFD
+ 	case KVM_CAP_IRQFD:
+-	case KVM_CAP_IRQFD_RESAMPLE:
+ #endif
+ 	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
+ 	case KVM_CAP_CHECK_EXTENSION_VM:
+-- 
+2.30.2
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
