@@ -2,78 +2,83 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CEDC4332F
-	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 03:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C25DC433F5
+	for <kvmarm@archiver.kernel.org>; Wed,  4 May 2022 03:39:53 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 01F7249EC3;
-	Tue,  3 May 2022 23:33:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id DB6C34B12C;
+	Tue,  3 May 2022 23:39:52 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6qdxwTVeWtUA; Tue,  3 May 2022 23:33:04 -0400 (EDT)
+	with ESMTP id 6c-EJxXn8KfC; Tue,  3 May 2022 23:39:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF1BB4A19A;
-	Tue,  3 May 2022 23:33:04 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id AFA0341021;
+	Tue,  3 May 2022 23:39:51 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCBBA4A19A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:33:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DBC341021
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:39:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id urbB2eVae5e0 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2022 23:33:01 -0400 (EDT)
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com
- [209.85.166.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7240E49EC3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:33:01 -0400 (EDT)
-Received: by mail-io1-f50.google.com with SMTP id c125so300626iof.9
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 20:33:01 -0700 (PDT)
+ with ESMTP id woeWKuhGcG-Y for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2022 23:39:48 -0400 (EDT)
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com
+ [209.85.166.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C51C140FF0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2022 23:39:48 -0400 (EDT)
+Received: by mail-io1-f44.google.com with SMTP id o190so307876iof.10
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2022 20:39:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=MD7nPH76Zo4gzIjG6XroEYb+307Sv2T97DW30QPZNvQ=;
- b=GCl3tUY0CxUSs2045e7bW3K3OMlsoVKLkDorqwMDkmosI+DarqkAsVZ4JutaruMtaq
- VqOHlcJ06uzrO/wmARYsqy4RSsfaqwdhzD3Op9C9DJ5u3WeNoYMrxGWQJqnxWPKqFL+m
- QRzSecp35sYjpDFlnSHnjh/mzL55frzR8ayJsgdjMS8lI8QEEt6j4UwSDAa+YE+WH32M
- rV3TlIsrbFgDRyNTLm2bHTDSK86J1SDHWbQss+MyAldJlcz7OomuzVdYQ23f3ar+122V
- j7OlhJvOkCtMEdVkoOKHFBAlv4QIa6gkZRCnrkWY8IjFhbXMImgVlCcrzHCLhXwUXHth
- NoIw==
+ bh=TKFkaOZkalvLFPXwyy85GYdezcn8X//pTVrKI0zHMyM=;
+ b=OKeMQH51cvKoQfQVe6saCkxUR73NoKar+XZu/9qav85QUB81nfSHCeoHN5ex2uOb//
+ kO1M3kU546nhzKG8drhWWWIUs2t14S730C1HbWkI98KwrAgY1/vgN9VpljYTWsTGpYMT
+ n40EgHXpIz0/SkKO51NFcsULQvGXL6ctkwg5DTTIAS2gYvCpejuSQQ4qph7SlokYXt9s
+ VUvf8WdkLPYjIyQeFT1pil2GnBWaBey1n1lhrl6pQgJvg7/UckiVZ1X7UNBDOqmR4njo
+ LBHY2e3LUD3qHU9CyE4PtJWxl3SB3/EAnWvg4FyKsiXUSQX++UDJY9f7JOtRyg/wBBgS
+ UVsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=MD7nPH76Zo4gzIjG6XroEYb+307Sv2T97DW30QPZNvQ=;
- b=oknuAoFyZZKBgluLOok0fxy/cltn4aewE3w4BQ7jLTNeMDwoSEk6pvOj4PlcnITrfs
- kOjoOcp20pKZd5zbs9J1/IbKqYeTcnFm1A9ACRLZJSYAZyu0VeWC3Q05F/5qmuTodDjc
- 22P+gSr6tSzwbK7c8sglsQjYdp7AK+sKReCjNgKyP1JrrB8iaPyzjOuos9qtK/u29UYb
- AORZnVVYetEq5NqKen6XvSrnHgbqr5k//7L6id8r2Smq744aB33CBB0m4PM5OmhCK4uO
- COwKijW+ZKVinZtsIKIgQJFdaZ4gUBy3/qg7ftjxC8ddJcYws+PD/lyGOqajFaqUvApd
- WOdQ==
-X-Gm-Message-State: AOAM530VeGDEx3r0wJcnhoE0xV0W+Xfo4IIyQ3GopIo0uYIZy2iEFiIK
- 0g0c0T8mQKR9qZFH0IuKL4Aafw==
-X-Google-Smtp-Source: ABdhPJy7vKJ/E6XbgDQRiEIsUnMlj/99SQ3gJhSHQZ0B1pirVzABIhS85iAuFB/rJZ2xJyY7/WLvCg==
-X-Received: by 2002:a6b:2b0b:0:b0:65a:4c08:7063 with SMTP id
- r11-20020a6b2b0b000000b0065a4c087063mr6885026ior.92.1651635180562; 
- Tue, 03 May 2022 20:33:00 -0700 (PDT)
+ bh=TKFkaOZkalvLFPXwyy85GYdezcn8X//pTVrKI0zHMyM=;
+ b=6F5Sdi8BmQ72NWhHnBGJJ+n+gF9BcBFixdCojdDXl+pYxKpN8Se9TMESxirIys1Vvl
+ S+Froi2FVUwmZnn4N8pHFuXL2tFhneK1BuiB//bCM9NwnjGiLIJ3kiph34hRcdoOE/9G
+ vDqK3xGBMqXiHCPqGKXxnjOV5Y7E60rZlGq9KsRQeQeGVegaSy/HazHVKnu/fqAFSSOF
+ S75/bUn+DMcAljafQDa1HggvPstIokYwReFNYJ+XISwMGmDxFeJfy7dz8h5+8qkcYWCM
+ IxMWCeUne8zNcNVQWBo+kOWF2h72/R0iK7AHDivAduSw3sWqJy5uhfOBshwFjoa6lgiO
+ GeAQ==
+X-Gm-Message-State: AOAM532vTuGUxXp+YBnNyHelI/5igsPQlgLBIkhe8+BQHWYYC7YbwAJQ
+ bKWSgCCcACuKcPSNSNVOeY5lsw==
+X-Google-Smtp-Source: ABdhPJwLTXJtAXiJwUCvEWggY3FV+wdRFZMRp+5BJmrk0AvQhZTFxdNQcILItIRCgxyMEkGbhuqhbA==
+X-Received: by 2002:a05:6602:2427:b0:657:b2ff:89c5 with SMTP id
+ g7-20020a056602242700b00657b2ff89c5mr7163783iob.26.1651635587956; 
+ Tue, 03 May 2022 20:39:47 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- v18-20020a056e0213d200b002cbed258dcfsm3913760ilj.0.2022.05.03.20.32.59
+ x22-20020a029716000000b0032b3a781750sm4388413jai.20.2022.05.03.20.39.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 May 2022 20:32:59 -0700 (PDT)
-Date: Wed, 4 May 2022 03:32:56 +0000
+ Tue, 03 May 2022 20:39:47 -0700 (PDT)
+Date: Wed, 4 May 2022 03:39:43 +0000
 From: Oliver Upton <oupton@google.com>
 To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: vgic-v3: Consistently populate
- ID_AA64PFR0_EL1.GIC
-Message-ID: <YnHz6Cw5ONR2e+KA@google.com>
-References: <20220503211424.3375263-1-maz@kernel.org>
+Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services
+ selection
+Message-ID: <YnH1f2cXcpdKsA3q@google.com>
+References: <20220502233853.1233742-1-rananta@google.com>
+ <878rri8r78.wl-maz@kernel.org>
+ <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
+ <878rriicez.wl-maz@kernel.org>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220503211424.3375263-1-maz@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, stable@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, kernel@android.com
+In-Reply-To: <878rriicez.wl-maz@kernel.org>
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -90,25 +95,54 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, May 03, 2022 at 10:14:24PM +0100, Marc Zyngier wrote:
-> When adding support for the slightly wonky Apple M1, we had to
-> populate ID_AA64PFR0_EL1.GIC==1 to present something to the guest,
-> as the HW itself doesn't advertise the feature.
+On Tue, May 03, 2022 at 09:33:40PM +0100, Marc Zyngier wrote:
+> On Tue, 03 May 2022 19:49:13 +0100,
+> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Tue, May 3, 2022 at 10:24 AM Marc Zyngier <maz@kernel.org> wrote:
+> > >
+> > > On Tue, 03 May 2022 00:38:44 +0100,
+> > > Raghavendra Rao Ananta <rananta@google.com> wrote:
+> > > >
+> > > > Hello,
+> > > >
+> > > > Continuing the discussion from [1], the series tries to add support
+> > > > for the userspace to elect the hypercall services that it wishes
+> > > > to expose to the guest, rather than the guest discovering them
+> > > > unconditionally. The idea employed by the series was taken from
+> > > > [1] as suggested by Marc Z.
+> > >
+> > > As it took some time to get there, and that there was still a bunch of
+> > > things to address, I've taken the liberty to apply my own fixes to the
+> > > series.
+> > >
+> > > Please have a look at [1], and let me know if you're OK with the
+> > > result. If you are, I'll merge the series for 5.19.
+> > >
+> > > Thanks,
+> > >
+> > >         M.
+> > >
+> > Thank you for speeding up the process; appreciate it. However, the
+> > series's selftest patches have a dependency on Oliver's
+> > PSCI_SYSTEM_SUSPEND's selftest patches [1][2]. Can we pull them in
+> > too?
+
+Posted, BTW.
+
+http://lore.kernel.org/kvmarm/20220504032446.4133305-1-oupton@google.com
+
+> > 2. Patch-2/9, arm_hypercall.h, clear all the macros in this patch
+> > itself instead of doing it in increments (unless there's some reason
+> > that I'm missing)?
 > 
-> However, we gated this on the in-kernel irqchip being created.
-> This causes some trouble for QEMU, which snapshots the state of
-> the registers before creating a virtual GIC, and then tries to
-> restore these registers once the GIC has been created.  Obviously,
-> between the two stages, ID_AA64PFR0_EL1.GIC has changed value,
-> and the write fails.
+> Ah, rebasing leftovers, now gone.
 > 
-> The fix is to actually emulate the HW, and always populate the
-> field if the HW is capable of it.
-> 
-> Fixes: 562e530fd770 ("KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> I've pushed an updated branch again, please have a look.
+
+Series looks good with your additions. For the pile:
 
 Reviewed-by: Oliver Upton <oupton@google.com>
 _______________________________________________
