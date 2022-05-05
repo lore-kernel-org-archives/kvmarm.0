@@ -2,77 +2,78 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C064C433EF
-	for <kvmarm@archiver.kernel.org>; Thu,  5 May 2022 22:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBAE0C433EF
+	for <kvmarm@archiver.kernel.org>; Thu,  5 May 2022 22:15:10 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3E164B128;
-	Thu,  5 May 2022 18:10:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C64349EB1;
+	Thu,  5 May 2022 18:15:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id I-7osSnY-DOz; Thu,  5 May 2022 18:10:35 -0400 (EDT)
+	with ESMTP id vE+tEFs05SmY; Thu,  5 May 2022 18:15:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78B254B186;
-	Thu,  5 May 2022 18:10:35 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DC974B190;
+	Thu,  5 May 2022 18:15:09 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C13BC4B186
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 18:10:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F13EA49E49
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 18:15:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZLKlLeRFOS-N for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 May 2022 18:10:33 -0400 (EDT)
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com
- [209.85.214.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 434B74B128
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 18:10:33 -0400 (EDT)
-Received: by mail-pl1-f178.google.com with SMTP id x18so5655275plg.6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 05 May 2022 15:10:33 -0700 (PDT)
+ with ESMTP id PGmD41i0koAX for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 May 2022 18:15:06 -0400 (EDT)
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com
+ [209.85.216.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC38F49E44
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 18:15:06 -0400 (EDT)
+Received: by mail-pj1-f46.google.com with SMTP id
+ z5-20020a17090a468500b001d2bc2743c4so5323597pjf.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 05 May 2022 15:15:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=4yANqmx2Ha2H5KKnZT4vayRpvNWYePsYuao7lny+AJM=;
- b=WbQtNTmD+Ll3JRwpNhBd4c/qZ7ZhI3rJDChU04IDGWARrptUSht8lO2pyXKueUKszR
- zxvkcbj4UNrrDCndk2TZ02kD+oFXEXd+YMm58AuZR/yxlohmpGUhM+5UKtK2plTMf4JP
- 2ud5uPhWODIRQy52Jy606FlgPkZii5ykeoLbqhaIQhU7zzlfVD9xFz19uBldHEUWxpPJ
- Jr/VL/9fvFPsuu15nPzSXepo62Xn5V1fBuW2gof7fs1K332ekNk6WtgjH6NgWGkweqrS
- HXl6ELl8SE6ge/fgDMMwYR1lwCldudc4HKLmkJtBeEDLEtgkViKqaNWxT/SZqtIa5TZS
- aoww==
+ bh=rhmYFBuuuGy1RxOFm4pAb+0D/79gx/RMlr5Dc55L7tE=;
+ b=Hevs7iSy4zrNQh8iUyApFus8Hf9y6uwirVrl404PJBhu4YCBeMs/nvv/PiBjRl+b9i
+ goS/roI0Sv6/OsNtAcxoeKDrrvT4LL4FxzU1MF23u9/kotSU7iUbeJiTEl0dKhoec8HI
+ 1g1ivpEqMwBvd+hGNePXFx1rDNZF7KcydiJOp+m2RS7cIFUDaycqErgr2PVPG0U7fSOq
+ skKBUtXQrXg71hEIZsbWE+vb7R0oG9f9JAsO7Z/Ov/52rUXtfu3vbd3dtaquznZRy3aW
+ rlOJ3uaUYC5GnvEOnDiOi70MiKyrjhRYDxUdUJG6fAoZ/btOiY9IbYZK0vT+0sp5ol/T
+ UEOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=4yANqmx2Ha2H5KKnZT4vayRpvNWYePsYuao7lny+AJM=;
- b=giuZAMzGvXaSY4RK8IpG/K8k9TXOI/k+7gs+RllcmGnxDJud6dc6L213qnjpqYjZlz
- qFYQWE+TINbvQ4FyyxXYpR5U5zYaTZqZBxBDLzdv04Iwa6iOqf4vwgmMZn+zbr7EMaMb
- suKEYtK7BDlGCzEf1vfnFYzMsPqzCUFJTFWTbMF4/q1BXjdRDXb+iZ6K81HlJyjWZYDV
- 9MITkhz6MO2GEvAiE7wPXp5hN9Q0qn9YB1EuKL4jqwygdVzt/j2osH6RfiwzaLRiomXe
- AehVRykJ+2KOqmEOJOdxHsog5iECzdL7cb+n6e9VesfY6HNxWbhv8T2712u6wGJkUD4a
- V9eQ==
-X-Gm-Message-State: AOAM530EKdoktTbk1bCr9vc2fIEOo5gh+u5soE3QG3lQCb3NB7urAZLk
- 2s9kDjAKsE/SgIu+AZ/sZo7dwQ==
-X-Google-Smtp-Source: ABdhPJzheC8ozkQRQlg0u//bWzdNAJ7gKjw8V68pwITeoxj4Y3vaCAJqiTmLvoMgLTNgmx9kjJjymw==
-X-Received: by 2002:a17:90b:4c8a:b0:1dc:6ff1:e2e1 with SMTP id
- my10-20020a17090b4c8a00b001dc6ff1e2e1mr436607pjb.217.1651788632009; 
- Thu, 05 May 2022 15:10:32 -0700 (PDT)
+ bh=rhmYFBuuuGy1RxOFm4pAb+0D/79gx/RMlr5Dc55L7tE=;
+ b=Kw0a75RO/eFFclSyul+LT1RNrKpEUs8LefNyfsqFDnCs3LzWRAo9cJwbjuymYcIFRJ
+ pGBD21uvZTF2/1dLPr4lcUFmX5xvyGV3nGghD50n5DPyEsNSSB0hplTBut3Q3R+o0d0E
+ 3oe3b4LLtE1NZmWLPfW593UK8YUmpPHRirqYBgGKunLvmWl2IoBa98xMhGdQcq8FtR4E
+ ptmifsE/gtEl1YJ7uJ9BauubxkfuPq6s/Hu+K0vds1iIygnvVosXZZFouBalM+RbcxgS
+ 0W5kpN0OE8RLEyaytivtxA2hVd4CGne5DtUFh2L0MM+AxFtWLdDtZ4JEFir6VOLRF1bj
+ E/2A==
+X-Gm-Message-State: AOAM531KEoL00NzbiJo3ZxgDFthG+QP6Lo319kQjuSpfZ+QqixrfHwzY
+ cf9nMrEJG8kW31BgeLV6//lbgA==
+X-Google-Smtp-Source: ABdhPJzsuSElxGPQgHtlbw0iGopvkRi5CXOoenk4IleklHGbnOGmfb8DaUwsp1YoXq+iTVmqk8ldWg==
+X-Received: by 2002:a17:902:9005:b0:158:e46e:688c with SMTP id
+ a5-20020a170902900500b00158e46e688cmr222968plp.173.1651788905567; 
+ Thu, 05 May 2022 15:15:05 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
- b12-20020a170902d50c00b0015e8d4eb21csm124933plg.102.2022.05.05.15.10.31
+ n23-20020a17090a929700b001d7f3bb11d7sm5793137pjo.53.2022.05.05.15.15.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 May 2022 15:10:31 -0700 (PDT)
-Date: Thu, 5 May 2022 22:10:28 +0000
+ Thu, 05 May 2022 15:15:05 -0700 (PDT)
+Date: Thu, 5 May 2022 22:15:01 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v4 05/20] KVM: x86/mmu: Consolidate shadow page
- allocation and initialization
-Message-ID: <YnRLVB+t0bLBeu+/@google.com>
+Subject: Re: [PATCH v4 06/20] KVM: x86/mmu: Rename shadow MMU functions that
+ deal with shadow pages
+Message-ID: <YnRMZZi6vskW9p60@google.com>
 References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-6-dmatlack@google.com>
+ <20220422210546.458943-7-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220422210546.458943-6-dmatlack@google.com>
+In-Reply-To: <20220422210546.458943-7-dmatlack@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
  <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -103,88 +104,24 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, Apr 22, 2022, David Matlack wrote:
-> Consolidate kvm_mmu_alloc_page() and kvm_mmu_alloc_shadow_page() under
-> the latter so that all shadow page allocation and initialization happens
-> in one place.
+> Rename 2 functions:
+> 
+>   kvm_mmu_get_page() -> kvm_mmu_get_shadow_page()
+>   kvm_mmu_free_page() -> kvm_mmu_free_shadow_page()
+> 
+> This change makes it clear that these functions deal with shadow pages
+> rather than struct pages. It also aligns these functions with the naming
+> scheme for kvm_mmu_find_shadow_page() and kvm_mmu_alloc_shadow_page().
+> 
+> Prefer "shadow_page" over the shorter "sp" since these are core
+> functions and the line lengths aren't terrible.
 > 
 > No functional change intended.
 > 
 > Signed-off-by: David Matlack <dmatlack@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 39 +++++++++++++++++----------------------
->  1 file changed, 17 insertions(+), 22 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 5582badf4947..7d03320f6e08 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1703,27 +1703,6 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
->  	mmu_spte_clear_no_track(parent_pte);
->  }
->  
-> -static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, bool direct)
-> -{
-> -	struct kvm_mmu_page *sp;
-> -
-> -	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> -	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-> -	if (!direct)
-> -		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
-> -	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-> -
-> -	/*
-> -	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
-> -	 * depends on valid pages being added to the head of the list.  See
-> -	 * comments in kvm_zap_obsolete_pages().
-> -	 */
-> -	sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
-> -	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
-> -	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
-> -	return sp;
-> -}
-> -
->  static void mark_unsync(u64 *spte);
->  static void kvm_mmu_mark_parents_unsync(struct kvm_mmu_page *sp)
->  {
-> @@ -2100,7 +2079,23 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
->  						      struct hlist_head *sp_list,
->  						      union kvm_mmu_page_role role)
->  {
-> -	struct kvm_mmu_page *sp = kvm_mmu_alloc_page(vcpu, role.direct);
-> +	struct kvm_mmu_page *sp;
-> +
-> +	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> +	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
-> +	if (!role.direct)
-> +		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
-> +
-> +	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-> +
-> +	/*
-> +	 * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
-> +	 * depends on valid pages being added to the head of the list.  See
-> +	 * comments in kvm_zap_obsolete_pages().
-> +	 */
-> +	sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
-> +	list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
-> +	kvm_mod_used_mmu_pages(vcpu->kvm, +1);
 
-To reduce churn later on, what about opportunistically grabbing vcpu->kvm in a
-local variable in this patch?
-
-Actually, at that point, it's a super trivial change, so you can probably just drop 
-
-	KVM: x86/mmu: Replace vcpu with kvm in kvm_mmu_alloc_shadow_page()
-
-and do the vcpu/kvm swap as part of
-
-	KVM: x86/mmu: Pass memory caches to allocate SPs separately
-
->  	sp->gfn = gfn;
->  	sp->role = role;
-> -- 
-> 2.36.0.rc2.479.g8af0fa9b8e-goog
-> 
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
