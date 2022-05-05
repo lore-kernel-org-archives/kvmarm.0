@@ -2,77 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5008DC433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  5 May 2022 22:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40315C433FE
+	for <kvmarm@archiver.kernel.org>; Thu,  5 May 2022 23:00:48 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A41944B21F;
-	Thu,  5 May 2022 18:51:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CE4C4B215;
+	Thu,  5 May 2022 19:00:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id cPbwcahvpLbf; Thu,  5 May 2022 18:51:47 -0400 (EDT)
+	with ESMTP id 3vdlao15tFug; Thu,  5 May 2022 19:00:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 605744B1F0;
-	Thu,  5 May 2022 18:51:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 62D344B1F0;
+	Thu,  5 May 2022 19:00:46 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 240704B1F0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 18:51:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 524324B1F0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 19:00:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LiAQuGwDEMIw for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 May 2022 18:51:44 -0400 (EDT)
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com
- [209.85.210.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C34A04B1BA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 18:51:44 -0400 (EDT)
-Received: by mail-pf1-f180.google.com with SMTP id x52so4785496pfu.11
- for <kvmarm@lists.cs.columbia.edu>; Thu, 05 May 2022 15:51:44 -0700 (PDT)
+ with ESMTP id 6BL6DoI9U-1H for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 May 2022 19:00:44 -0400 (EDT)
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com
+ [209.85.215.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3DD4E4B1EF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 19:00:44 -0400 (EDT)
+Received: by mail-pg1-f172.google.com with SMTP id 7so4708882pga.12
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 05 May 2022 16:00:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=s96H1umg/qV43/22C5Nl7ZCpsFN6ZXGIf/o3otHdHt8=;
- b=jsm2XbMzlpriHcwfe/0kOKXVy11FyfFWR1rwiMswYuBj3MK90WLoqIxsUysaUenNru
- w+Qo0MpA74zT+u8UowzpWq2pwRjUbrRRbWdeKjjmpIqM1Sb0wbIovDKg6c3RAvc6Uoad
- oLzc+INoLRj+x0uDEvn8irK06jUP/vzPL2dEwZONHsm67S/FWHN/Pewp+GP4G9rOAoyq
- 2yZaiyLj+utfBZD03HEG1IEGoY4LLpKt4St/1RNK4vCDUnseQnfpDh+a+ZulwZbZIuW3
- Jjv6ico/YqIGh536YOT3DHDDnVn5iYlV6G+OI7YOTUQH7SI6As6F/lAfW1SAzJsVhC7Q
- I+fQ==
+ bh=OynsI/Y1y6rsQh9WExR+1/Zkn9MMK8WgC1JkonenMkY=;
+ b=czdbdSz4ZFvCh9CDIv//7vre9DD/9YuCdL7EH5JN3DK0rF1o5+bTGuSgXwOZeSrk+p
+ p8f2JfvS0v+6umNaERHgOwIdoEi8v1/2zrslEUYWwlHeubYqiVmr34/AxEsei4oudhWF
+ CJw1/UWxbSaDoiU0lYFK9W30KO/wNOo18gChC4qkaV1TP5t1Sj1gQwYTlFKXOJwlMxlq
+ XeiXI6920NuTALp0ZQbe2zYhFBhwPP2emPNLXFFrtYyo4BIGE7RBJErDr0wdw4Tg7a0V
+ li/5C0KssxCA+9aZc5pkAacKGyoxzspvkeX6qENNBTjpWd2qQDkGsVy52938gVfWzJSk
+ QdKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=s96H1umg/qV43/22C5Nl7ZCpsFN6ZXGIf/o3otHdHt8=;
- b=57F8rnNcIOXf+q0LEdzck+pofWnRh3KqxXxIy3JypHcdwqHU9O0Eug4CLjHEzYuf5r
- V1cwvfiiABATZlYxaJCllpvjG+YkFb6y4vYwScDXKgiGgjhQPfcuDOK8lw2yxIeutm5h
- Psn9ihPSkmwSs/7K/02yXEkVGQMl4hz/01vK1bWQtUhNwgUugsBS0FlkQdgIcEyZfEfQ
- F5/bLeJUOz7si/kvHjg1M5LygJpHU8INSUBxNtsJ6IFKYjH9Hz4+Bg3TmCgfT0FFMSI9
- KF/utYg8MFZ6Pwldfvyzvs+SDa4lQBCdx6Ty55zuwfF1xawAg1pELRPSu088JsWW4GeE
- ov5Q==
-X-Gm-Message-State: AOAM531+gCBnDOt9/jXRF4SvGaqmQDM3f5Ub7RiBB6/1PChifSM9Z9C9
- 5oVKkFw4ATlBR3731PnDwkOHXA==
-X-Google-Smtp-Source: ABdhPJyCAW6StWjxRVvfp7RlyOBP2jZqbrBA7pmE/nSSvQ5s4y9qix3e0nUwHDNmFnbiUshcoMsJuQ==
-X-Received: by 2002:a63:1d6:0:b0:3c1:732a:3855 with SMTP id
- 205-20020a6301d6000000b003c1732a3855mr270000pgb.571.1651791103104; 
- Thu, 05 May 2022 15:51:43 -0700 (PDT)
+ bh=OynsI/Y1y6rsQh9WExR+1/Zkn9MMK8WgC1JkonenMkY=;
+ b=7aGj3ciwzAjHg3DMUKodtlYyfb0oioWd83IFFSasW+W44S8ts5+rUmO4g5SHC6KFF7
+ 2bmYyMXiy/59PwV8O+74KST8Rfg8F5BOWFWHHnafrVVRD+ha+69zr94RC3MRu4Z1CrHH
+ XUVK0/bQAVaWILFrCSGtwy+PXy02cdhN0LA/upISmlrbDSiFx5l9ln6a30GCDgMwGVJ6
+ lote1WSiVYV/VvijV/zc+YQFQd496Ilzg73g/XUE6Wqv84ms5cro6X0wwztyqT8mgCb7
+ v7HDLteRNIHxCPpZZ/kMhhl+nXd/YF9wpwMOIIC7+73M0TKm5Y+y3ZE9XJS95I0zxRut
+ i6nQ==
+X-Gm-Message-State: AOAM530CptjBMr0Fi4KLAdGhstCAhZzNMY49/xmKMpOn8/vlVw4cdTYh
+ UdhRykYsGzZ6Z2qeIJvZTKZ03Q==
+X-Google-Smtp-Source: ABdhPJxDu0wALLZyxGIddDUnRgsXc2qv3Ld2ZmjdwFGFx/UOM+F3BAohwM2FdgVKnvaNd70HiCM4nw==
+X-Received: by 2002:a63:6841:0:b0:3c1:a611:793e with SMTP id
+ d62-20020a636841000000b003c1a611793emr308309pgc.249.1651791642951; 
+ Thu, 05 May 2022 16:00:42 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com.
  [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
- cq21-20020a056a00331500b0050dc76281e0sm1848870pfb.186.2022.05.05.15.51.42
+ y18-20020a170902d65200b0015e8d4eb27fsm146862plh.201.2022.05.05.16.00.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 May 2022 15:51:42 -0700 (PDT)
-Date: Thu, 5 May 2022 22:51:39 +0000
+ Thu, 05 May 2022 16:00:42 -0700 (PDT)
+Date: Thu, 5 May 2022 23:00:39 +0000
 From: Sean Christopherson <seanjc@google.com>
 To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v4 07/20] KVM: x86/mmu: Move guest PT write-protection to
- account_shadowed()
-Message-ID: <YnRU+zN9T8Zf91Ei@google.com>
+Subject: Re: [PATCH v4 08/20] KVM: x86/mmu: Pass memory caches to allocate
+ SPs separately
+Message-ID: <YnRXFyTik32RIxNp@google.com>
 References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-8-dmatlack@google.com>
+ <20220422210546.458943-9-dmatlack@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220422210546.458943-8-dmatlack@google.com>
+In-Reply-To: <20220422210546.458943-9-dmatlack@google.com>
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
  <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
@@ -103,86 +103,60 @@ Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 On Fri, Apr 22, 2022, David Matlack wrote:
-> Move the code that write-protects newly-shadowed guest page tables into
-> account_shadowed(). This avoids a extra gfn-to-memslot lookup and is a
-> more logical place for this code to live. But most importantly, this
-> reduces kvm_mmu_alloc_shadow_page()'s reliance on having a struct
-> kvm_vcpu pointer, which will be necessary when creating new shadow pages
-> during VM ioctls for eager page splitting.
+> Refactor kvm_mmu_alloc_shadow_page() to receive the caches from which it
+> will allocate the various pieces of memory for shadow pages as a
+> parameter, rather than deriving them from the vcpu pointer. This will be
+> useful in a future commit where shadow pages are allocated during VM
+> ioctls for eager page splitting, and thus will use a different set of
+> caches.
 > 
-> Note, it is safe to drop the role.level == PG_LEVEL_4K check since
-> account_shadowed() returns early if role.level > PG_LEVEL_4K.
+> Preemptively pull the caches out all the way to
+> kvm_mmu_get_shadow_page() since eager page splitting will not be calling
+> kvm_mmu_alloc_shadow_page() directly.
 > 
 > No functional change intended.
 > 
 > Signed-off-by: David Matlack <dmatlack@google.com>
 > ---
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+...
 
->  arch/x86/kvm/mmu/mmu.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index fa7846760887..4f894db88bbf 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -807,6 +807,9 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
->  						    KVM_PAGE_TRACK_WRITE);
->  
->  	kvm_mmu_gfn_disallow_lpage(slot, gfn);
-> +
-> +	if (kvm_mmu_slot_gfn_write_protect(kvm, slot, gfn, PG_LEVEL_4K))
-> +		kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
->  }
->  
->  void account_huge_nx_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-> @@ -2100,11 +2103,9 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
->  	sp->gfn = gfn;
->  	sp->role = role;
->  	hlist_add_head(&sp->hash_link, sp_list);
-> -	if (!role.direct) {
-> +
-> +	if (!role.direct)
->  		account_shadowed(vcpu->kvm, sp);
-> -		if (role.level == PG_LEVEL_4K && kvm_vcpu_write_protect_gfn(vcpu, gfn))
+>  static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
+> +						      struct shadow_page_caches *caches,
 
-Huh.  Two thoughts.
+Definitely work doing the "kvm" capture in an earlier patch, and doing the s/vcpu/kvm
+here, the diff on top is tiny.  The shortlog/changelog would need minor tweaks, but
+that's not a big deal.
 
-1. Can you add a patch to drop kvm_vcpu_write_protect_gfn() entirely, i.e. convert
-   mmu_sync_children() to use kvm_mmu_slot_gfn_write_protect?  It's largely a moot
-   point, but only because mmu_sync_children() only operates on shadow pages that
-   are relevant to the current non-SMM/SMM role.  And _that_ holds true only because
-   KVM does kvm_mmu_reset_context() and drops roots for the vCPU on SMM transitions.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index da1c3cf91778..15784bab985f 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2084,13 +2084,12 @@ struct shadow_page_caches {
+        struct kvm_mmu_memory_cache *gfn_array_cache;
+ };
 
-   That'd be a good oppurtunity to move this pair into a helper:
+-static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
++static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+                                                      struct shadow_page_caches *caches,
+                                                      gfn_t gfn,
+                                                      struct hlist_head *sp_list,
+                                                      union kvm_mmu_page_role role)
+ {
+-       struct kvm *kvm = vcpu->kvm;
+        struct kvm_mmu_page *sp;
 
-   	slots = kvm_memslots_for_spte_role(kvm, sp->role);
-	slot = __gfn_to_memslot(slots, gfn);
+        sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
+@@ -2133,7 +2132,7 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
+        sp = kvm_mmu_find_shadow_page(vcpu, gfn, sp_list, role);
+        if (!sp) {
+                created = true;
+-               sp = kvm_mmu_alloc_shadow_page(vcpu, caches, gfn, sp_list, role);
++               sp = kvm_mmu_alloc_shadow_page(vcpu->kvm, caches, gfn, sp_list, role);
+        }
 
-2. This got me thinking...  Write-protecting for shadow paging should NOT be
-   associated with the vCPU or even the role.  The SMM memslots conceptually
-   operate on the same guest physical memory, SMM is just given access to memory
-   that is not present in the non-SMM memslots.
+        trace_kvm_mmu_get_page(sp, created);
 
-   If KVM creates SPTEs for non-SMM, then it needs to write-protect _all_ memslots
-   that contain the relevant gfn, e.g. if the guest takes an SMI and modifies the
-   non-SMM page tables, then KVM needs trap and emulate (or unsync) those writes.
-
-   The mess "works" because no sane SMM handler (kind of a contradiction in terms)
-   will modify non-SMM page tables, and vice versa.
-
-   The entire duplicate memslots approach is flawed.  Better would have been to
-   make SMM a flag and hide SMM-only memslots, not duplicated everything...
-
-> -			kvm_flush_remote_tlbs_with_address(vcpu->kvm, gfn, 1);
-> -	}
->  
->  	return sp;
->  }
-> -- 
-> 2.36.0.rc2.479.g8af0fa9b8e-goog
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
