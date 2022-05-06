@@ -2,91 +2,50 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D61C433FE
-	for <kvmarm@archiver.kernel.org>; Fri,  6 May 2022 19:47:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 196D8C433F5
+	for <kvmarm@archiver.kernel.org>; Sat,  7 May 2022 09:14:40 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FEDD49EE6;
-	Fri,  6 May 2022 15:47:22 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A2EB4B103;
+	Sat,  7 May 2022 05:14:40 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
-Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dfL7qZgj3aTp; Fri,  6 May 2022 15:47:21 -0400 (EDT)
+	with ESMTP id 75775Ow8zyso; Sat,  7 May 2022 05:14:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FAA94B11E;
-	Fri,  6 May 2022 15:47:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E4E574B22A;
+	Sat,  7 May 2022 05:14:38 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 54A4B4B11E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 15:47:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 062024B18A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 10:09:11 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id llM2xEtHR93l for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2022 15:47:19 -0400 (EDT)
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com
- [209.85.216.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17F6549EE6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 15:47:18 -0400 (EDT)
-Received: by mail-pj1-f48.google.com with SMTP id
- t11-20020a17090ad50b00b001d95bf21996so11701547pju.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 May 2022 12:47:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=nmr+AH6GUiQVKg/lqAG1BcDa6rkwmcO9PiTJLcm3vjM=;
- b=U2bwdDOISPfpNSZR7/BlxGhBrUPE80tEwKwbP78OiiiqRJAS7GEuBM4FtQq0mbcwwK
- 1eJ07Uq+ALubHgrrirJAgrVh3bK0cxESTZ41vWBDRSSoQ4p+EUYwSeotKxB+qT5dflR/
- 0bFjJQ++RP9GZ5CVlPHE7PUiV/zMVIvci8VDwW4+WVe5sP8iSYBwZ+CKqsBFvWgCL5XZ
- nhFyG8n+bNq4qzsVlIdX7CMJQzQPgQ0fuIKbiEXUwvOZ/+9gtadOW9UAfhFV+VjXFGAa
- oVoukit96tPbVfrWQ4mpFiFvUPZ2xpqRuq5IRIU93CVwGPX5dIzahsTxzlYlw1wfxEoO
- uZUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=nmr+AH6GUiQVKg/lqAG1BcDa6rkwmcO9PiTJLcm3vjM=;
- b=tKgEjmX5qbYi1oJyf9+GAI+aoFvi8Qp4rZ44rZdQLeyW3sXYKMQCbQcKi8Ti5XtYZd
- xS5QZAuFT+1CHHmPMVRFUsV7O6Ta6doCWj9qrEpenjrLESnRPJcMFMPEKyUhZvb84f1l
- edjC34DvYNGISkeyx29OX7CTDorEKHqAxPjN40Fio+gLj/bCokSrxM8dJhuwIJ1hz481
- jpDuMaObF/vk9Je5ng4smnurKuRwn6bunjnwCdc6+bLsBvzS/zpx+DsTi/qBOJYzqImN
- cr7Cad1OhCzKrvqBSA/ro1iuj2tZ8yQ+6uNfeUbd3a7S4X72igZ/JIesO5Zx1crIWXLr
- mpcg==
-X-Gm-Message-State: AOAM533K5DTKZ3wAOM621OlNl+dTmkfPO1FJ/AUWuAlJiGT5zeYN7sg9
- tL1M5AnzSnswQb12u31LrQW+Xg==
-X-Google-Smtp-Source: ABdhPJx2W2s0XDr5knnrxjU/QOn2nWMZ5XriOwGOqf4NFEZIHnzgq+6wjY1bPlgr+nIx5/fnbHXnhA==
-X-Received: by 2002:a17:902:ef45:b0:155:cede:5a9d with SMTP id
- e5-20020a170902ef4500b00155cede5a9dmr5107832plx.93.1651866437748; 
- Fri, 06 May 2022 12:47:17 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
- gt9-20020a17090af2c900b001dc1e6db7c2sm7599741pjb.57.2022.05.06.12.47.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 06 May 2022 12:47:16 -0700 (PDT)
-Date: Fri, 6 May 2022 19:47:13 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v4 15/20] KVM: x86/mmu: Cache the access bits of shadowed
- translations
-Message-ID: <YnV7QUOkYVg+Ktnl@google.com>
-References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-16-dmatlack@google.com>
+ with ESMTP id 2iUZ4TvTI1oN for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2022 10:09:09 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 74E084B177
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 10:09:09 -0400 (EDT)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DB8151596;
+ Fri,  6 May 2022 07:09:08 -0700 (PDT)
+Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com
+ [10.7.66.42])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EBD683F885;
+ Fri,  6 May 2022 07:09:07 -0700 (PDT)
+From: Nikos Nikoleris <nikos.nikoleris@arm.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH 05/23] arm/arm64: Add support for setting up
+ the PSCI conduit through ACPI
+Date: Fri,  6 May 2022 15:08:37 +0100
+Message-Id: <20220506140855.353337-6-nikos.nikoleris@arm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220506140855.353337-1-nikos.nikoleris@arm.com>
+References: <20220506140855.353337-1-nikos.nikoleris@arm.com>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220422210546.458943-16-dmatlack@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- maciej.szmigiero@oracle.com,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+X-ARM-No-Footer: FoSSMail
+X-Mailman-Approved-At: Sat, 07 May 2022 05:14:38 -0400
+Cc: Nikos Nikoleris <nikos.nikoleris@arm.com>, kvmarm@lists.cs.columbia.edu,
+ kvm@vger.kernel.org, jade.alglave@arm.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,96 +62,109 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Apr 22, 2022, David Matlack wrote:
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index a8a755e1561d..97bf53b29b88 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -978,7 +978,8 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
->  }
->  
->  /*
-> - * Using the cached information from sp->gfns is safe because:
-> + * Using the information in sp->shadowed_translation (kvm_mmu_page_get_gfn()
-> + * and kvm_mmu_page_get_access()) is safe because:
->   * - The spte has a reference to the struct page, so the pfn for a given gfn
->   *   can't change unless all sptes pointing to it are nuked first.
->   *
-> @@ -1052,12 +1053,15 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->  		if (sync_mmio_spte(vcpu, &sp->spt[i], gfn, pte_access))
->  			continue;
->  
-> -		if (gfn != sp->gfns[i]) {
-> +		if (gfn != kvm_mmu_page_get_gfn(sp, i)) {
->  			drop_spte(vcpu->kvm, &sp->spt[i]);
->  			flush = true;
->  			continue;
->  		}
->  
-> +		if (pte_access != kvm_mmu_page_get_access(sp, i))
-> +			kvm_mmu_page_set_access(sp, i, pte_access);
+In systems with ACPI support and when a DT is not provided, we can use
+the FADT to discover whether PSCI calls need to use smc or hvc
+calls. This change implements this but retains the default behavior;
+we check if a valid DT is provided, if not, we try to setup the PSCI
+conduit using ACPI.
 
-Very tangentially related, and more an FYI than anything else (I'll send a patch
-separately)...   Replying here because this got me wondering about the validity of
-pte_access.
+Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
+---
+ arm/Makefile.common |  1 +
+ lib/acpi.h          |  5 +++++
+ lib/arm/psci.c      | 23 ++++++++++++++++++++++-
+ lib/devicetree.c    |  2 +-
+ 4 files changed, 29 insertions(+), 2 deletions(-)
 
-There's an existing bug for nEPT here, which I proved after 3 hours of fighting
-with KUT's EPT tests (ugh).
-
-  1. execute-only EPT entries are supported
-  2. L1 creates a upper-level RW EPTE and a 4kb leaf RW EPTE
-  3. L2 accesses the address; KVM installs a SPTE
-  4. L1 modifies the leaf EPTE to be X-only, and does INVEPT
-  5. ept_sync_page() creates a SPTE with pte_access=0 / RWX=0
-
-The logic for pte_access (just above this code) is:
-
-		pte_access = sp->role.access;
-		pte_access &= FNAME(gpte_access)(gpte);
-
-The parent guest EPTE is 'RW', and so sp->role.access is 'RW'.  When the new 'X'
-EPTE is ANDed with the 'RW' parent protections, the result is a RWX=0 SPTE.  This
-is only possible if execute-only is supported, because otherwise PTEs are always
-readable, i.e. shadow_present_mask is non-zero.
-
-I don't think anything bad happens per se, but it's odd to have a !PRESENT in
-hardware, shadow-present SPTE.  I think the correct/easiest fix is:
-
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index b025decf610d..f8ea881cfce6 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -1052,7 +1052,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-                if (sync_mmio_spte(vcpu, &sp->spt[i], gfn, pte_access))
-                        continue;
-
--               if (gfn != sp->gfns[i]) {
-+               if ((!pte_access && !shadow_present_mask) || gfn != sp->gfns[i]) {
-                        drop_spte(vcpu->kvm, &sp->spt[i]);
-                        flush = true;
-                        continue;
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 75c9e87d446a..9ad60662beac 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -101,6 +101,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-        u64 spte = SPTE_MMU_PRESENT_MASK;
-        bool wrprot = false;
-
-+       WARN_ON_ONCE(!pte_access && !shadow_present_mask);
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 38385e0..8e9b3bb 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -38,6 +38,7 @@ cflatobjs += lib/alloc_page.o
+ cflatobjs += lib/vmalloc.o
+ cflatobjs += lib/alloc.o
+ cflatobjs += lib/devicetree.o
++cflatobjs += lib/acpi.o
+ cflatobjs += lib/pci.o
+ cflatobjs += lib/pci-host-generic.o
+ cflatobjs += lib/pci-testdev.o
+diff --git a/lib/acpi.h b/lib/acpi.h
+index 657e868..40392e3 100644
+--- a/lib/acpi.h
++++ b/lib/acpi.h
+@@ -130,6 +130,11 @@ struct acpi_table_fadt
+     u64 hypervisor_id;      /* Hypervisor Vendor ID (ACPI 6.0) */
+ }  __attribute__ ((packed));
+ 
++/* Masks for FADT ARM Boot Architecture Flags (arm_boot_flags) ACPI 5.1 */
 +
-        if (sp->role.ad_disabled)
-                spte |= SPTE_TDP_AD_DISABLED_MASK;
-        else if (kvm_mmu_page_ad_need_write_protect(sp))
++#define ACPI_FADT_PSCI_COMPLIANT    (1)         /* 00: [V5+] PSCI 0.2+ is implemented */
++#define ACPI_FADT_PSCI_USE_HVC      (1<<1)      /* 01: [V5+] HVC must be used instead of SMC as the PSCI conduit */
++
+ struct facs_descriptor_rev1
+ {
+     u32 signature;           /* ACPI Signature */
+diff --git a/lib/arm/psci.c b/lib/arm/psci.c
+index 9c031a1..0e96d19 100644
+--- a/lib/arm/psci.c
++++ b/lib/arm/psci.c
+@@ -6,6 +6,7 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
++#include <acpi.h>
+ #include <devicetree.h>
+ #include <asm/psci.h>
+ #include <asm/setup.h>
+@@ -56,7 +57,7 @@ void psci_system_off(void)
+ 	printf("CPU%d unable to do system off (error = %d)\n", smp_processor_id(), err);
+ }
+ 
+-void psci_set_conduit(void)
++static void psci_set_conduit_fdt(void)
+ {
+ 	const void *fdt = dt_fdt();
+ 	const struct fdt_property *method;
+@@ -75,3 +76,23 @@ void psci_set_conduit(void)
+ 	else
+ 		assert_msg(false, "Unknown PSCI conduit: %s", method->data);
+ }
++
++static void psci_set_conduit_acpi(void)
++{
++	struct acpi_table_fadt *fadt = find_acpi_table_addr(FACP_SIGNATURE);
++	assert_msg(fadt, "Unable to find ACPI FADT");
++	assert_msg(fadt->arm_boot_flags & ACPI_FADT_PSCI_COMPLIANT,
++		   "PSCI is not supported in this platfrom");
++	if (fadt->arm_boot_flags & ACPI_FADT_PSCI_USE_HVC)
++		psci_invoke = psci_invoke_hvc;
++	else
++		psci_invoke = psci_invoke_smc;
++}
++
++void psci_set_conduit(void)
++{
++	if (dt_available())
++		psci_set_conduit_fdt();
++	else
++		psci_set_conduit_acpi();
++}
+diff --git a/lib/devicetree.c b/lib/devicetree.c
+index 78c1f6f..3ff9d16 100644
+--- a/lib/devicetree.c
++++ b/lib/devicetree.c
+@@ -16,7 +16,7 @@ const void *dt_fdt(void)
+ 
+ bool dt_available(void)
+ {
+-	return fdt_check_header(fdt) == 0;
++	return fdt && fdt_check_header(fdt) == 0;
+ }
+ 
+ int dt_get_nr_cells(int fdtnode, u32 *nr_address_cells, u32 *nr_size_cells)
+-- 
+2.25.1
 
-
-> +
->  		sptep = &sp->spt[i];
->  		spte = *sptep;
->  		host_writable = spte & shadow_host_writable_mask;
-> -- 
-> 2.36.0.rc2.479.g8af0fa9b8e-goog
-> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
