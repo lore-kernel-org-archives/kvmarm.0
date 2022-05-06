@@ -2,73 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B2BC433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  6 May 2022 19:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D61C433FE
+	for <kvmarm@archiver.kernel.org>; Fri,  6 May 2022 19:47:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 53A144B11E;
-	Fri,  6 May 2022 15:18:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FEDD49EE6;
+	Fri,  6 May 2022 15:47:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dMWepPd-5HzS; Fri,  6 May 2022 15:18:27 -0400 (EDT)
+	with ESMTP id dfL7qZgj3aTp; Fri,  6 May 2022 15:47:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 557024B0F5;
-	Fri,  6 May 2022 15:18:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FAA94B11E;
+	Fri,  6 May 2022 15:47:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 576D64B104
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 15:18:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 54A4B4B11E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 15:47:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id g1Ud8jQOcmWB for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2022 15:18:25 -0400 (EDT)
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com
- [209.85.167.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 44CE749ECF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 15:18:25 -0400 (EDT)
-Received: by mail-lf1-f46.google.com with SMTP id u23so8474384lfc.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 May 2022 12:18:25 -0700 (PDT)
+ with ESMTP id llM2xEtHR93l for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2022 15:47:19 -0400 (EDT)
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com
+ [209.85.216.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 17F6549EE6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 15:47:18 -0400 (EDT)
+Received: by mail-pj1-f48.google.com with SMTP id
+ t11-20020a17090ad50b00b001d95bf21996so11701547pju.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 06 May 2022 12:47:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gq/gl/FI3wYJsrnbCzQm2bNyQ1Zxb9MLdkOQWzlXPQs=;
- b=W3zIs23sSWG8ORW1qlYtbDUPstZdw8G1+D8QTYT1TYtqO//vpXIcEcaPF2Nc3Lp38B
- gXSm/bWtZ8x2kxUzJDCyyk6ajyELFbkvOcbWKgyVckuBGH42VTsZbCpLntz/TzNupGcz
- dsui/cFSCapFC5YtMfQK/d92UVB0SQQKhzLuzI74PaSnlbOGPRDAEOEQVZc1ojfPlyAi
- h2WAFdv1J6CS4hqtchui+dlaPyW2dLDY4shPevrxJAp7dC6MwokbSp9Yj18deOv1auky
- Gan0xmQs+XCle+NxEUYT1UkIWKF4ZFJ2t8xu6PkU/5kP8qdPm9jFKjcckxkwwfkmcAIf
- xjbw==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=nmr+AH6GUiQVKg/lqAG1BcDa6rkwmcO9PiTJLcm3vjM=;
+ b=U2bwdDOISPfpNSZR7/BlxGhBrUPE80tEwKwbP78OiiiqRJAS7GEuBM4FtQq0mbcwwK
+ 1eJ07Uq+ALubHgrrirJAgrVh3bK0cxESTZ41vWBDRSSoQ4p+EUYwSeotKxB+qT5dflR/
+ 0bFjJQ++RP9GZ5CVlPHE7PUiV/zMVIvci8VDwW4+WVe5sP8iSYBwZ+CKqsBFvWgCL5XZ
+ nhFyG8n+bNq4qzsVlIdX7CMJQzQPgQ0fuIKbiEXUwvOZ/+9gtadOW9UAfhFV+VjXFGAa
+ oVoukit96tPbVfrWQ4mpFiFvUPZ2xpqRuq5IRIU93CVwGPX5dIzahsTxzlYlw1wfxEoO
+ uZUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gq/gl/FI3wYJsrnbCzQm2bNyQ1Zxb9MLdkOQWzlXPQs=;
- b=K5hSYqbRhWeVnx0tiANUvQL3KXRLH6BZW7/eFyZTH9880Zz12ZhD5v8y1UoqoZ7MSR
- 3YTOS/vJR58xPIsq3DQnyYc70nBMNWVSpNOFEqruX0Wg41W8qnedkzRJsBqMSYWrp2sh
- jYgmPcdZqmyDfxrN5DeM9KxXTzbMqUz/w7VBS2pvTHslnU6haxr7nFlPbXowcr7eVNgE
- SZ5ChD+8vejryegVIXRmQW7d8St/p58EtvBOp3OKr33vvkHqw/uPXEh0SOGHbSqDRiiJ
- ngHY3Q2FoKxUrLG/RgE+SzHmYlU37u7rRJZ9pQjlfXpmnl2ftlHXGlSPlshIOmd9J8VJ
- wpZg==
-X-Gm-Message-State: AOAM530DApzfrjiT474bPh50QK2XHEPxI4cBvmbVl1H03eQq5QkpjyNM
- CKTb2T087I0S6CR3n+FhBUrFGuurLUvonWsVNyqRAg==
-X-Google-Smtp-Source: ABdhPJyOL3mD8Xsc3l1JLJTNvCUhq8PVk6+DgYm/cn6njrwzIBFsD6kYOIC/2KdoP6kQKuXeQ9Er9jocaazqPLOT5AQ=
-X-Received: by 2002:a05:6512:1287:b0:473:b904:b27c with SMTP id
- u7-20020a056512128700b00473b904b27cmr3473357lfs.361.1651864703455; Fri, 06
- May 2022 12:18:23 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=nmr+AH6GUiQVKg/lqAG1BcDa6rkwmcO9PiTJLcm3vjM=;
+ b=tKgEjmX5qbYi1oJyf9+GAI+aoFvi8Qp4rZ44rZdQLeyW3sXYKMQCbQcKi8Ti5XtYZd
+ xS5QZAuFT+1CHHmPMVRFUsV7O6Ta6doCWj9qrEpenjrLESnRPJcMFMPEKyUhZvb84f1l
+ edjC34DvYNGISkeyx29OX7CTDorEKHqAxPjN40Fio+gLj/bCokSrxM8dJhuwIJ1hz481
+ jpDuMaObF/vk9Je5ng4smnurKuRwn6bunjnwCdc6+bLsBvzS/zpx+DsTi/qBOJYzqImN
+ cr7Cad1OhCzKrvqBSA/ro1iuj2tZ8yQ+6uNfeUbd3a7S4X72igZ/JIesO5Zx1crIWXLr
+ mpcg==
+X-Gm-Message-State: AOAM533K5DTKZ3wAOM621OlNl+dTmkfPO1FJ/AUWuAlJiGT5zeYN7sg9
+ tL1M5AnzSnswQb12u31LrQW+Xg==
+X-Google-Smtp-Source: ABdhPJx2W2s0XDr5knnrxjU/QOn2nWMZ5XriOwGOqf4NFEZIHnzgq+6wjY1bPlgr+nIx5/fnbHXnhA==
+X-Received: by 2002:a17:902:ef45:b0:155:cede:5a9d with SMTP id
+ e5-20020a170902ef4500b00155cede5a9dmr5107832plx.93.1651866437748; 
+ Fri, 06 May 2022 12:47:17 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
+ gt9-20020a17090af2c900b001dc1e6db7c2sm7599741pjb.57.2022.05.06.12.47.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 May 2022 12:47:16 -0700 (PDT)
+Date: Fri, 6 May 2022 19:47:13 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v4 15/20] KVM: x86/mmu: Cache the access bits of shadowed
+ translations
+Message-ID: <YnV7QUOkYVg+Ktnl@google.com>
+References: <20220422210546.458943-1-dmatlack@google.com>
+ <20220422210546.458943-16-dmatlack@google.com>
 MIME-Version: 1.0
-References: <20220311174001.605719-1-oupton@google.com>
- <20220311175717.616958-1-oupton@google.com>
- <20220506130101.GC22892@willie-the-truck>
-In-Reply-To: <20220506130101.GC22892@willie-the-truck>
-From: Oliver Upton <oupton@google.com>
-Date: Fri, 6 May 2022 12:18:12 -0700
-Message-ID: <CAOQ_QshP8NH0WkyDmqbfRf--+wyWNepqSgtSq2F_AxyeB-EaHA@mail.gmail.com>
-Subject: Re: [RFC PATCH kvmtool 0/5] ARM: Implement PSCI SYSTEM_SUSPEND
-To: Will Deacon <will@kernel.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
- Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Content-Disposition: inline
+In-Reply-To: <20220422210546.458943-16-dmatlack@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ maciej.szmigiero@oracle.com,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,23 +103,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Will,
+On Fri, Apr 22, 2022, David Matlack wrote:
+> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> index a8a755e1561d..97bf53b29b88 100644
+> --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> @@ -978,7 +978,8 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+>  }
+>  
+>  /*
+> - * Using the cached information from sp->gfns is safe because:
+> + * Using the information in sp->shadowed_translation (kvm_mmu_page_get_gfn()
+> + * and kvm_mmu_page_get_access()) is safe because:
+>   * - The spte has a reference to the struct page, so the pfn for a given gfn
+>   *   can't change unless all sptes pointing to it are nuked first.
+>   *
+> @@ -1052,12 +1053,15 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+>  		if (sync_mmio_spte(vcpu, &sp->spt[i], gfn, pte_access))
+>  			continue;
+>  
+> -		if (gfn != sp->gfns[i]) {
+> +		if (gfn != kvm_mmu_page_get_gfn(sp, i)) {
+>  			drop_spte(vcpu->kvm, &sp->spt[i]);
+>  			flush = true;
+>  			continue;
+>  		}
+>  
+> +		if (pte_access != kvm_mmu_page_get_access(sp, i))
+> +			kvm_mmu_page_set_access(sp, i, pte_access);
 
-On Fri, May 6, 2022 at 6:01 AM Will Deacon <will@kernel.org> wrote:
->
-> Looks like the kernel-side changes are queued now, so please can you resend
-> this series? I also think you can drop the AArch32 support, unless you see a
-> compelling reason for it?
+Very tangentially related, and more an FYI than anything else (I'll send a patch
+separately)...   Replying here because this got me wondering about the validity of
+pte_access.
 
-You bet. I was going to wait for 5.19-rc1 just for the dust to settle
-and get a stable number for the UAPI bits. I think the ARM changes
-have some light conflicts with SEV work in Paolo's tree.
+There's an existing bug for nEPT here, which I proved after 3 hours of fighting
+with KUT's EPT tests (ugh).
 
-All for dropping AArch32, means less work for me :-P
+  1. execute-only EPT entries are supported
+  2. L1 creates a upper-level RW EPTE and a 4kb leaf RW EPTE
+  3. L2 accesses the address; KVM installs a SPTE
+  4. L1 modifies the leaf EPTE to be X-only, and does INVEPT
+  5. ept_sync_page() creates a SPTE with pte_access=0 / RWX=0
 
---
-Thanks,
-Oliver
+The logic for pte_access (just above this code) is:
+
+		pte_access = sp->role.access;
+		pte_access &= FNAME(gpte_access)(gpte);
+
+The parent guest EPTE is 'RW', and so sp->role.access is 'RW'.  When the new 'X'
+EPTE is ANDed with the 'RW' parent protections, the result is a RWX=0 SPTE.  This
+is only possible if execute-only is supported, because otherwise PTEs are always
+readable, i.e. shadow_present_mask is non-zero.
+
+I don't think anything bad happens per se, but it's odd to have a !PRESENT in
+hardware, shadow-present SPTE.  I think the correct/easiest fix is:
+
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index b025decf610d..f8ea881cfce6 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -1052,7 +1052,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+                if (sync_mmio_spte(vcpu, &sp->spt[i], gfn, pte_access))
+                        continue;
+
+-               if (gfn != sp->gfns[i]) {
++               if ((!pte_access && !shadow_present_mask) || gfn != sp->gfns[i]) {
+                        drop_spte(vcpu->kvm, &sp->spt[i]);
+                        flush = true;
+                        continue;
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 75c9e87d446a..9ad60662beac 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -101,6 +101,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+        u64 spte = SPTE_MMU_PRESENT_MASK;
+        bool wrprot = false;
+
++       WARN_ON_ONCE(!pte_access && !shadow_present_mask);
++
+        if (sp->role.ad_disabled)
+                spte |= SPTE_TDP_AD_DISABLED_MASK;
+        else if (kvm_mmu_page_ad_need_write_protect(sp))
+
+
+> +
+>  		sptep = &sp->spt[i];
+>  		spte = *sptep;
+>  		host_writable = spte & shadow_host_writable_mask;
+> -- 
+> 2.36.0.rc2.479.g8af0fa9b8e-goog
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
