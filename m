@@ -2,41 +2,42 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB471C433EF
-	for <kvmarm@archiver.kernel.org>; Sat,  7 May 2022 09:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B05EC433FE
+	for <kvmarm@archiver.kernel.org>; Sat,  7 May 2022 09:14:51 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 690D94B1F2;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D4CAE49ECB;
 	Sat,  7 May 2022 05:14:50 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id kHPquWuL9t-r; Sat,  7 May 2022 05:14:48 -0400 (EDT)
+	with ESMTP id dfgkxR0aGURk; Sat,  7 May 2022 05:14:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DDEB24B29C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BBA884B2CC;
 	Sat,  7 May 2022 05:14:39 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F18B4B152
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 10:09:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C0114B1CB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 10:09:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Xoo4rP0b566Q for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2022 10:09:22 -0400 (EDT)
+ with ESMTP id i3gZKmKNvBuL for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2022 10:09:20 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 09E994B18A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 10:09:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C19244B177
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 10:09:20 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7A941570;
- Fri,  6 May 2022 07:09:21 -0700 (PDT)
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DACA1595;
+ Fri,  6 May 2022 07:09:20 -0700 (PDT)
 Received: from godel.lab.cambridge.arm.com (godel.lab.cambridge.arm.com
  [10.7.66.42])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C84753F885;
- Fri,  6 May 2022 07:09:20 -0700 (PDT)
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9E40A3F885;
+ Fri,  6 May 2022 07:09:19 -0700 (PDT)
 From: Nikos Nikoleris <nikos.nikoleris@arm.com>
 To: Andrew Jones <drjones@redhat.com>
-Subject: [kvm-unit-tests PATCH 17/23] arm64: Copy code from GNU-EFI
-Date: Fri,  6 May 2022 15:08:49 +0100
-Message-Id: <20220506140855.353337-18-nikos.nikoleris@arm.com>
+Subject: [kvm-unit-tests PATCH 16/23] arm/arm64: Add a setup sequence for
+ systems that boot through EFI
+Date: Fri,  6 May 2022 15:08:48 +0100
+Message-Id: <20220506140855.353337-17-nikos.nikoleris@arm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220506140855.353337-1-nikos.nikoleris@arm.com>
 References: <20220506140855.353337-1-nikos.nikoleris@arm.com>
@@ -61,329 +62,278 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-This change adds unmodified dependencies that we need from GNU-EFI in
-order to build arm64 EFI apps.
+This change implements an alternative setup sequence for the system
+when we are booting through EFI. The memory map is discovered through
+EFI boot services and devices through ACPI.
 
-GNU-EFI sources from  https://git.code.sf.net/p/gnu-efi/code v3.0.14
+This change is based on a change initially proposed by
+Andrew Jones <drjones@redhat.com>
 
 Signed-off-by: Nikos Nikoleris <nikos.nikoleris@arm.com>
 ---
- arm/efi/elf_aarch64_efi.lds |  63 +++++++++++++++++
- arm/efi/crt0-efi-aarch64.S  | 130 ++++++++++++++++++++++++++++++++++++
- arm/efi/reloc_aarch64.c     |  97 +++++++++++++++++++++++++++
- 3 files changed, 290 insertions(+)
- create mode 100644 arm/efi/elf_aarch64_efi.lds
- create mode 100644 arm/efi/crt0-efi-aarch64.S
- create mode 100644 arm/efi/reloc_aarch64.c
+ lib/linux/efi.h     |   1 +
+ lib/arm/asm/setup.h |   2 +
+ lib/arm/setup.c     | 179 +++++++++++++++++++++++++++++++++++++++++++-
+ arm/cstart.S        |   1 +
+ arm/cstart64.S      |   1 +
+ 5 files changed, 182 insertions(+), 2 deletions(-)
 
-diff --git a/arm/efi/elf_aarch64_efi.lds b/arm/efi/elf_aarch64_efi.lds
-new file mode 100644
-index 0000000..836d982
---- /dev/null
-+++ b/arm/efi/elf_aarch64_efi.lds
-@@ -0,0 +1,63 @@
-+OUTPUT_FORMAT("elf64-littleaarch64", "elf64-littleaarch64", "elf64-littleaarch64")
-+OUTPUT_ARCH(aarch64)
-+ENTRY(_start)
-+SECTIONS
-+{
-+  .text 0x0 : {
-+    _text = .;
-+    *(.text.head)
-+    *(.text)
-+    *(.text.*)
-+    *(.gnu.linkonce.t.*)
-+    *(.srodata)
-+    *(.rodata*)
-+    . = ALIGN(16);
-+  }
-+  _etext = .;
-+  _text_size = . - _text;
-+  .dynamic  : { *(.dynamic) }
-+  .data : ALIGN(4096)
-+  {
-+   _data = .;
-+   *(.sdata)
-+   *(.data)
-+   *(.data1)
-+   *(.data.*)
-+   *(.got.plt)
-+   *(.got)
+diff --git a/lib/linux/efi.h b/lib/linux/efi.h
+index d7401c9..73faa70 100644
+--- a/lib/linux/efi.h
++++ b/lib/linux/efi.h
+@@ -63,6 +63,7 @@ typedef guid_t efi_guid_t;
+ 	(c) & 0xff, ((c) >> 8) & 0xff, d } }
+ 
+ #define ACPI_TABLE_GUID EFI_GUID(0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d)
++#define ACPI_20_TABLE_GUID EFI_GUID(0x8868e871, 0xe4f1, 0x11d3,  0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81)
+ 
+ #define LOADED_IMAGE_PROTOCOL_GUID EFI_GUID(0x5b1b31a1, 0x9562, 0x11d2,  0x8e, 0x3f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b)
+ 
+diff --git a/lib/arm/asm/setup.h b/lib/arm/asm/setup.h
+index 64cd379..1a7e734 100644
+--- a/lib/arm/asm/setup.h
++++ b/lib/arm/asm/setup.h
+@@ -5,6 +5,7 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
++#include <efi.h>
+ #include <libcflat.h>
+ #include <asm/page.h>
+ #include <asm/pgtable-hwdef.h>
+@@ -37,5 +38,6 @@ extern unsigned int mem_region_get_flags(phys_addr_t paddr);
+ #define SMP_CACHE_BYTES		L1_CACHE_BYTES
+ 
+ void setup(const void *fdt, phys_addr_t freemem_start);
++efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo);
+ 
+ #endif /* _ASMARM_SETUP_H_ */
+diff --git a/lib/arm/setup.c b/lib/arm/setup.c
+index 2d67292..edd4dc5 100644
+--- a/lib/arm/setup.c
++++ b/lib/arm/setup.c
+@@ -34,7 +34,7 @@
+ #define NR_EXTRA_MEM_REGIONS	16
+ #define NR_INITIAL_MEM_REGIONS	(MAX_DT_MEM_REGIONS + NR_EXTRA_MEM_REGIONS)
+ 
+-extern unsigned long _etext;
++extern unsigned long _text, _etext, _data, _edata;
+ 
+ char *initrd;
+ u32 initrd_size;
+@@ -44,7 +44,10 @@ int nr_cpus;
+ 
+ static struct mem_region __initial_mem_regions[NR_INITIAL_MEM_REGIONS + 1];
+ struct mem_region *mem_regions = __initial_mem_regions;
+-phys_addr_t __phys_offset, __phys_end;
++phys_addr_t __phys_offset = (phys_addr_t)-1, __phys_end = 0;
 +
-+   /* the EFI loader doesn't seem to like a .bss section, so we stick
-+      it all into .data: */
-+   . = ALIGN(16);
-+   _bss = .;
-+   *(.sbss)
-+   *(.scommon)
-+   *(.dynbss)
-+   *(.bss)
-+   *(COMMON)
-+   . = ALIGN(16);
-+   _bss_end = .;
-+  }
++extern void exceptions_init(void);
++extern void asm_mmu_disable(void);
+ 
+ int mpidr_to_cpu(uint64_t mpidr)
+ {
+@@ -272,3 +275,175 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+ 	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
+ 		setup_vm();
+ }
 +
-+  .rela.dyn : { *(.rela.dyn) }
-+  .rela.plt : { *(.rela.plt) }
-+  .rela.got : { *(.rela.got) }
-+  .rela.data : { *(.rela.data) *(.rela.data*) }
-+  . = ALIGN(512);
-+  _edata = .;
-+  _data_size = . - _data;
-+
-+  . = ALIGN(4096);
-+  .dynsym   : { *(.dynsym) }
-+  . = ALIGN(4096);
-+  .dynstr   : { *(.dynstr) }
-+  . = ALIGN(4096);
-+  .note.gnu.build-id : { *(.note.gnu.build-id) }
-+  /DISCARD/ :
-+  {
-+    *(.rel.reloc)
-+    *(.eh_frame)
-+    *(.note.GNU-stack)
-+  }
-+  .comment 0 : { *(.comment) }
-+}
-diff --git a/arm/efi/crt0-efi-aarch64.S b/arm/efi/crt0-efi-aarch64.S
-new file mode 100644
-index 0000000..d50e78d
---- /dev/null
-+++ b/arm/efi/crt0-efi-aarch64.S
-@@ -0,0 +1,130 @@
-+/*
-+ * crt0-efi-aarch64.S - PE/COFF header for AArch64 EFI applications
-+ *
-+ * Copright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice and this list of conditions, without modification.
-+ * 2. The name of the author may not be used to endorse or promote products
-+ *    derived from this software without specific prior written permission.
-+ *
-+ * Alternatively, this software may be distributed under the terms of the
-+ * GNU General Public License as published by the Free Software Foundation;
-+ * either version 2 of the License, or (at your option) any later version.
-+ */
-+
-+	.section	.text.head
-+
-+	/*
-+	 * Magic "MZ" signature for PE/COFF
-+	 */
-+	.globl	ImageBase
-+ImageBase:
-+	.ascii	"MZ"
-+	.skip	58				// 'MZ' + pad + offset == 64
-+	.long	pe_header - ImageBase		// Offset to the PE header.
-+pe_header:
-+	.ascii	"PE"
-+	.short 	0
-+coff_header:
-+	.short	0xaa64				// AArch64
-+	.short	2				// nr_sections
-+	.long	0 				// TimeDateStamp
-+	.long	0				// PointerToSymbolTable
-+	.long	0				// NumberOfSymbols
-+	.short	section_table - optional_header	// SizeOfOptionalHeader
-+	.short	0x206				// Characteristics.
-+						// IMAGE_FILE_DEBUG_STRIPPED |
-+						// IMAGE_FILE_EXECUTABLE_IMAGE |
-+						// IMAGE_FILE_LINE_NUMS_STRIPPED
-+optional_header:
-+	.short	0x20b				// PE32+ format
-+	.byte	0x02				// MajorLinkerVersion
-+	.byte	0x14				// MinorLinkerVersion
-+	.long	_data - _start			// SizeOfCode
-+	.long	_data_size			// SizeOfInitializedData
-+	.long	0				// SizeOfUninitializedData
-+	.long	_start - ImageBase		// AddressOfEntryPoint
-+	.long	_start - ImageBase		// BaseOfCode
-+
-+extra_header_fields:
-+	.quad	0				// ImageBase
-+	.long	0x1000				// SectionAlignment
-+	.long	0x200				// FileAlignment
-+	.short	0				// MajorOperatingSystemVersion
-+	.short	0				// MinorOperatingSystemVersion
-+	.short	0				// MajorImageVersion
-+	.short	0				// MinorImageVersion
-+	.short	0				// MajorSubsystemVersion
-+	.short	0				// MinorSubsystemVersion
-+	.long	0				// Win32VersionValue
-+
-+	.long	_edata - ImageBase		// SizeOfImage
-+
-+	// Everything before the kernel image is considered part of the header
-+	.long	_start - ImageBase		// SizeOfHeaders
-+	.long	0				// CheckSum
-+	.short	EFI_SUBSYSTEM			// Subsystem
-+	.short	0				// DllCharacteristics
-+	.quad	0				// SizeOfStackReserve
-+	.quad	0				// SizeOfStackCommit
-+	.quad	0				// SizeOfHeapReserve
-+	.quad	0				// SizeOfHeapCommit
-+	.long	0				// LoaderFlags
-+	.long	0x6				// NumberOfRvaAndSizes
-+
-+	.quad	0				// ExportTable
-+	.quad	0				// ImportTable
-+	.quad	0				// ResourceTable
-+	.quad	0				// ExceptionTable
-+	.quad	0				// CertificationTable
-+	.quad	0				// BaseRelocationTable
-+
-+	// Section table
-+section_table:
-+	.ascii	".text\0\0\0"
-+	.long	_data - _start		// VirtualSize
-+	.long	_start - ImageBase	// VirtualAddress
-+	.long	_data - _start		// SizeOfRawData
-+	.long	_start - ImageBase	// PointerToRawData
-+
-+	.long	0		// PointerToRelocations (0 for executables)
-+	.long	0		// PointerToLineNumbers (0 for executables)
-+	.short	0		// NumberOfRelocations  (0 for executables)
-+	.short	0		// NumberOfLineNumbers  (0 for executables)
-+	.long	0x60000020	// Characteristics (section flags)
-+
-+	.ascii	".data\0\0\0"
-+	.long	_data_size		// VirtualSize
-+	.long	_data - ImageBase	// VirtualAddress
-+	.long	_data_size		// SizeOfRawData
-+	.long	_data - ImageBase	// PointerToRawData
-+
-+	.long	0		// PointerToRelocations (0 for executables)
-+	.long	0		// PointerToLineNumbers (0 for executables)
-+	.short	0		// NumberOfRelocations  (0 for executables)
-+	.short	0		// NumberOfLineNumbers  (0 for executables)
-+	.long	0xc0000040	// Characteristics (section flags)
-+
-+	.align		12
-+_start:
-+	stp		x29, x30, [sp, #-32]!
-+	mov		x29, sp
-+
-+	stp		x0, x1, [sp, #16]
-+	mov		x2, x0
-+	mov		x3, x1
-+	adr		x0, ImageBase
-+	adrp		x1, _DYNAMIC
-+	add		x1, x1, #:lo12:_DYNAMIC
-+	bl		_relocate
-+	cbnz		x0, 0f
-+
-+	ldp		x0, x1, [sp, #16]
-+	bl		efi_main
-+
-+0:	ldp		x29, x30, [sp], #32
-+	ret
-diff --git a/arm/efi/reloc_aarch64.c b/arm/efi/reloc_aarch64.c
-new file mode 100644
-index 0000000..0867279
---- /dev/null
-+++ b/arm/efi/reloc_aarch64.c
-@@ -0,0 +1,97 @@
-+/* reloc_aarch64.c - position independent x86 ELF shared object relocator
-+   Copyright (C) 2014 Linaro Ltd. <ard.biesheuvel@linaro.org>
-+   Copyright (C) 1999 Hewlett-Packard Co.
-+	Contributed by David Mosberger <davidm@hpl.hp.com>.
-+
-+    All rights reserved.
-+
-+    Redistribution and use in source and binary forms, with or without
-+    modification, are permitted provided that the following conditions
-+    are met:
-+
-+    * Redistributions of source code must retain the above copyright
-+      notice, this list of conditions and the following disclaimer.
-+    * Redistributions in binary form must reproduce the above
-+      copyright notice, this list of conditions and the following
-+      disclaimer in the documentation and/or other materials
-+      provided with the distribution.
-+    * Neither the name of Hewlett-Packard Co. nor the names of its
-+      contributors may be used to endorse or promote products derived
-+      from this software without specific prior written permission.
-+
-+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
-+    CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
-+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-+    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
-+    BE LIABLE FOR ANYDIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-+    TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-+    THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+    SUCH DAMAGE.
-+*/
++#ifdef CONFIG_EFI
 +
 +#include <efi.h>
-+#include <efilib.h>
 +
-+#include <elf.h>
-+
-+EFI_STATUS _relocate (long ldbase, Elf64_Dyn *dyn,
-+		      EFI_HANDLE image EFI_UNUSED,
-+		      EFI_SYSTEM_TABLE *systab EFI_UNUSED)
++static efi_status_t setup_rsdp(efi_bootinfo_t *efi_bootinfo)
 +{
-+	long relsz = 0, relent = 0;
-+	Elf64_Rela *rel = 0;
-+	unsigned long *addr;
-+	int i;
++	efi_status_t status;
++	struct rsdp_descriptor *rsdp;
 +
-+	for (i = 0; dyn[i].d_tag != DT_NULL; ++i) {
-+		switch (dyn[i].d_tag) {
-+			case DT_RELA:
-+				rel = (Elf64_Rela*)
-+					((unsigned long)dyn[i].d_un.d_ptr
-+					 + ldbase);
-+				break;
-+
-+			case DT_RELASZ:
-+				relsz = dyn[i].d_un.d_val;
-+				break;
-+
-+			case DT_RELAENT:
-+				relent = dyn[i].d_un.d_val;
-+				break;
-+
-+			default:
-+				break;
-+		}
++	/*
++	 * RSDP resides in an EFI_ACPI_RECLAIM_MEMORY region, which is not used
++	 * by kvm-unit-tests arm64 memory allocator. So it is not necessary to
++	 * copy the data structure to another memory region to prevent
++	 * unintentional overwrite.
++	 */
++	status = efi_get_system_config_table(ACPI_20_TABLE_GUID, (void **)&rsdp);
++	if (status != EFI_SUCCESS) {
++		return status;
 +	}
 +
-+	if (!rel && relent == 0)
-+		return EFI_SUCCESS;
++	set_efi_rsdp(rsdp);
 +
-+	if (!rel || relent == 0)
-+		return EFI_LOAD_ERROR;
-+
-+	while (relsz > 0) {
-+		/* apply the relocs */
-+		switch (ELF64_R_TYPE (rel->r_info)) {
-+			case R_AARCH64_NONE:
-+				break;
-+
-+			case R_AARCH64_RELATIVE:
-+				addr = (unsigned long *)
-+					(ldbase + rel->r_offset);
-+				*addr = ldbase + rel->r_addend;
-+				break;
-+
-+			default:
-+				break;
-+		}
-+		rel = (Elf64_Rela*) ((char *) rel + relent);
-+		relsz -= relent;
-+	}
 +	return EFI_SUCCESS;
 +}
++
++static efi_status_t efi_mem_init(efi_bootinfo_t *efi_bootinfo)
++{
++	int i;
++	unsigned long free_mem_pages = 0;
++	unsigned long free_mem_start = 0;
++	struct efi_boot_memmap *map = &(efi_bootinfo->mem_map);
++	efi_memory_desc_t *buffer = *map->map;
++	efi_memory_desc_t *d = NULL;
++	phys_addr_t base, top;
++	struct mem_region *r;
++	uintptr_t text = (uintptr_t)&_text, etext = __ALIGN((uintptr_t)&_etext, 4096);
++	uintptr_t data = (uintptr_t)&_data, edata = __ALIGN((uintptr_t)&_edata, 4096);
++
++	/*
++	 * Record the largest free EFI_CONVENTIONAL_MEMORY region
++	 * which will be used to set up the memory allocator, so that
++	 * the memory allocator can work in the largest free
++	 * continuous memory region.
++	 */
++	for (i = 0, r = &mem_regions[0]; i < *(map->map_size); i += *(map->desc_size), ++r) {
++		d = (efi_memory_desc_t *)(&((u8 *)buffer)[i]);
++
++		r->start = d->phys_addr;
++		r->end = d->phys_addr + d->num_pages * EFI_PAGE_SIZE;
++
++		switch(d->type) {
++		case EFI_RESERVED_TYPE:
++		case EFI_LOADER_DATA:
++		case EFI_BOOT_SERVICES_CODE:
++		case EFI_BOOT_SERVICES_DATA:
++		case EFI_RUNTIME_SERVICES_CODE:
++		case EFI_RUNTIME_SERVICES_DATA:
++		case EFI_UNUSABLE_MEMORY:
++		case EFI_ACPI_RECLAIM_MEMORY:
++		case EFI_ACPI_MEMORY_NVS:
++		case EFI_PAL_CODE:
++			r->flags = MR_F_RESERVED;
++			break;
++		case EFI_MEMORY_MAPPED_IO:
++		case EFI_MEMORY_MAPPED_IO_PORT_SPACE:
++			r->flags = MR_F_IO;
++			break;
++		case EFI_LOADER_CODE:
++			if (r->start <= text && r->end > text) {
++				/* This is the unit test region. Flag the code separately. */
++				phys_addr_t tmp = r->end;
++				assert(etext <= data);
++				assert(edata <= r->end);
++				r->flags = MR_F_CODE;
++				r->end = data;
++				++r;
++				r->start = data;
++				r->end = tmp;
++			} else {
++				r->flags = MR_F_RESERVED;
++			}
++			break;
++		case EFI_CONVENTIONAL_MEMORY:
++			if (free_mem_pages < d->num_pages) {
++				free_mem_pages = d->num_pages;
++				free_mem_start = d->phys_addr;
++			}
++			break;
++		}
++
++		if (!(r->flags & MR_F_IO)) {
++			if (r->start < __phys_offset)
++				__phys_offset = r->start;
++			if (r->end > __phys_end)
++				__phys_end = r->end;
++		}
++	}
++	__phys_end &= PHYS_MASK;
++	asm_mmu_disable();
++
++	if (free_mem_pages == 0) {
++		return EFI_OUT_OF_RESOURCES;
++	}
++	assert(sizeof(long) == 8 || free_mem_start < (3ul << 30));
++
++	phys_alloc_init(free_mem_start, free_mem_pages << EFI_PAGE_SHIFT);
++	phys_alloc_set_minimum_alignment(SMP_CACHE_BYTES);
++
++	phys_alloc_get_unused(&base, &top);
++	base = PAGE_ALIGN(base);
++	top = top & PAGE_MASK;
++	assert(sizeof(long) == 8 || !(base >> 32));
++	if (sizeof(long) != 8 && (top >> 32) != 0)
++		top = ((uint64_t)1 << 32);
++	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
++	page_alloc_ops_enable();
++
++	return EFI_SUCCESS;
++}
++
++efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
++{
++	efi_status_t status;
++
++	struct thread_info *ti = current_thread_info();
++	memset(ti, 0, sizeof(*ti));
++
++	exceptions_init();
++
++	status = efi_mem_init(efi_bootinfo);
++	if (status != EFI_SUCCESS) {
++		printf("Failed to initialize memory: ");
++		switch (status) {
++		case EFI_OUT_OF_RESOURCES:
++			printf("No free memory region\n");
++			break;
++		default:
++			printf("Unknown error\n");
++			break;
++		}
++		return status;
++	}
++
++	status = setup_rsdp(efi_bootinfo);
++	if (status != EFI_SUCCESS) {
++		printf("Cannot find RSDP in EFI system table\n");
++		return status;
++	}
++
++	psci_set_conduit();
++	cpu_init();
++	/* cpu_init must be called before thread_info_init */
++	thread_info_init(current_thread_info(), 0);
++	/* mem_init must be called before io_init */
++	io_init();
++
++	timer_save_state();
++	if (initrd) {
++		/* environ is currently the only file in the initrd */
++		char *env = malloc(initrd_size);
++		memcpy(env, initrd, initrd_size);
++		setup_env(env, initrd_size);
++	}
++
++	if (!(auxinfo.flags & AUXINFO_MMU_OFF))
++		setup_vm();
++
++	return EFI_SUCCESS;
++}
++
++#endif
+diff --git a/arm/cstart.S b/arm/cstart.S
+index dc324c5..66a55b9 100644
+--- a/arm/cstart.S
++++ b/arm/cstart.S
+@@ -256,6 +256,7 @@ asm_mmu_disable:
+  *
+  * Input r0 is the stack top, which is the exception stacks base
+  */
++.globl exceptions_init
+ exceptions_init:
+ 	mrc	p15, 0, r2, c1, c0, 0	@ read SCTLR
+ 	bic	r2, #CR_V		@ SCTLR.V := 0
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index 390feb9..55b41ea 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -276,6 +276,7 @@ asm_mmu_disable:
+  * Vectors
+  */
+ 
++.globl exceptions_init
+ exceptions_init:
+ 	adrp	x4, vector_table
+ 	add	x4, x4, :lo12:vector_table
 -- 
 2.25.1
 
