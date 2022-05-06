@@ -2,90 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A097C433FE
-	for <kvmarm@archiver.kernel.org>; Thu,  5 May 2022 23:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFB3C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  6 May 2022 10:16:01 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 948394B1E1;
-	Thu,  5 May 2022 19:47:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EB234B227;
+	Fri,  6 May 2022 06:16:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, body has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id aa91UnQ8239y; Thu,  5 May 2022 19:46:59 -0400 (EDT)
+	with ESMTP id 5AL1OE2J5did; Fri,  6 May 2022 06:16:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 776D84B248;
-	Thu,  5 May 2022 19:46:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E3184B202;
+	Fri,  6 May 2022 06:16:00 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0040D4B248
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 19:46:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF1424B1C4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 06:15:58 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p4ZiQku65fAO for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 May 2022 19:46:57 -0400 (EDT)
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com
- [209.85.215.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E44DB4B1E1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2022 19:46:56 -0400 (EDT)
-Received: by mail-pg1-f170.google.com with SMTP id g184so2303452pgc.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 05 May 2022 16:46:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=UXlxQWVPF63McNIcQ+A040lcStWvWFpvQxHMkE9R0XY=;
- b=At67K2Y4KGg6aRuQ7SBWpf7VNQtpqf3Y1lbdewqOCGIOp9dBYcGBoaWLhYEoSIqxQP
- Zv8nH9HNjn04xhBHJnvRuaqDorPQBLGEleKUtbDW9+CVyCrzSCnQUe906MMzyfvI5cOp
- cphDe1trwuzxUWWfrEjR8RLktm6BDp7pMrINwNHC2Lj6C6poV2839PsPY7xjZoNuG/Xo
- RlEuXTtiokG2+cELXEYgNDgGHfnw+t1XqQH+Kdhv2oEegEx3lEbHa5XnPuPB4TtJuR43
- /0OP26/oUVQBq/o9zTyABDxGo+Zk5+FzKWWuXZM90ikc+sDNWr4R7RlS/ZzuShzLvU/m
- BtzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=UXlxQWVPF63McNIcQ+A040lcStWvWFpvQxHMkE9R0XY=;
- b=eb67Z9NKlbhqgKzxyXVRFpjaFzQzYLv8AG4vWDL8LAH7Oax64wtwxXlxG4P+m+0Rl7
- 6Of4KF+o4SqcWjMfFO/Ic2h+0lbEPg5we4jxWjoPefuf9RSsQF8jFF3uabC5EjUNLM/e
- bWyv+PxUfsdOWPSGiWOTa7V7bWxfk3dEDr0el0h0nRo7BwTessPC14PtfWs/1Stkf1jI
- GXaq2gwO14r7pVF0AGs6j6WQ2QMJsNno/aZLfhEafVuRYpl5gFY+3aUAL/0O9XuZZgG8
- gJPteZS+1idcrRHIk9BcrBX4gLYgBdUAY6A3LNOId5ZJKrfDQHI0Y4bRCdaZqbQBRHhF
- NzrA==
-X-Gm-Message-State: AOAM531GeunZSBRuzPk15kjhVJUOjv7emfmQSCePOm3lD4hCYoKR8b6r
- sSoV7cXf/F70ULo5qy4079fvIw==
-X-Google-Smtp-Source: ABdhPJz58A4E/Uzn7xxWw89AW8b22CVIBbrmFsaLiw+m0NqSKF1b6yIOoFI8sXFMfGQhIvtZl+2WbA==
-X-Received: by 2002:a63:88c3:0:b0:3ab:2edc:b95b with SMTP id
- l186-20020a6388c3000000b003ab2edcb95bmr473166pgd.233.1651794415699; 
- Thu, 05 May 2022 16:46:55 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
- b10-20020a17090a550a00b001d954837197sm5814952pji.22.2022.05.05.16.46.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 May 2022 16:46:55 -0700 (PDT)
-Date: Thu, 5 May 2022 23:46:51 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v4 13/20] KVM: x86/mmu: Decouple rmap_add() and
- link_shadow_page() from kvm_vcpu
-Message-ID: <YnRh6yyGQZ+U31U1@google.com>
-References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-14-dmatlack@google.com>
+ with ESMTP id YTI2Ha2gjHO3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2022 06:15:57 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A71D94B1C3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 06:15:57 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 60DE5B834B0;
+ Fri,  6 May 2022 10:15:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EDB7C385A8;
+ Fri,  6 May 2022 10:15:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1651832155;
+ bh=y+tzwSruYnvQIpYknRPqekd7aZKY74EWIenjQ/h/TdA=;
+ h=From:To:Subject:Date:In-Reply-To:References:From;
+ b=qukciAp8LJmqFc0w4m8O2tOCaWx46VLUu+PL+EYb2peLXdZ8C8Y0SjQCgSIaxSBwb
+ QZYaBD4hc2PjdwQB0RWACuAVKEquym51+XFfN05YQZBBEv5kd8d10Zs64CxEYrkS5i
+ 3dUnD9DUIX+u+YbRKCeIUvSWd8zS/gvR7HhxdKbzJrDimiYCrla9jfqQ6tg4WSutKL
+ Qgsk8uq9e512sDioRQUsQwnOp9LwpbBchtaK38FfM011X7UAoNvxEVZnTPA3RcAqWd
+ 1GjSZHb5a1hVJBdsqLVEoeOzyPFyU7H3tQm/HlHNcWeokBDZF9kQuP7C2uweqhqJtx
+ agEErDfxqUmVQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nmv04-009QtE-HR; Fri, 06 May 2022 11:15:52 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Ard Biesheuvel <ardb@kernel.org>, dbrazdil@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Subject: Re: [PATCH] arm64: kvm: avoid unnecessary absolute addressing via
+ literals
+Date: Fri,  6 May 2022 11:15:49 +0100
+Message-Id: <165183214093.192117.6423497073962335554.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220428140350.3303481-1-ardb@kernel.org>
+References: <20220428140350.3303481-1-ardb@kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <20220422210546.458943-14-dmatlack@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- maciej.szmigiero@oracle.com,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ardb@kernel.org, dbrazdil@google.com,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -102,39 +82,27 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, Apr 22, 2022, David Matlack wrote:
-> -static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
-> -			     struct kvm_mmu_page *sp)
-> +static void __link_shadow_page(struct kvm_mmu_memory_cache *cache, u64 *sptep,
-> +			       struct kvm_mmu_page *sp)
->  {
->  	u64 spte;
->  
-> @@ -2297,12 +2300,17 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
->  
->  	mmu_spte_set(sptep, spte);
->  
-> -	mmu_page_add_parent_pte(vcpu, sp, sptep);
-> +	mmu_page_add_parent_pte(cache, sp, sptep);
->  
->  	if (sp->unsync_children || sp->unsync)
->  		mark_unsync(sptep);
->  }
->  
-> +static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep, struct kvm_mmu_page *sp)
+On Thu, 28 Apr 2022 16:03:50 +0200, Ard Biesheuvel wrote:
+> There are a few cases in the nVHE code where we take the absolute
+> address of a symbol via a literal pool entry, and subsequently translate
+> it to another address space (PA, kimg VA, kernel linear VA, etc).
+> Originally, this literal was needed because we relied on a different
+> translation for absolute references, but this is no longer the case, so
+> we can simply use relative addressing instead. This removes a couple of
+> RELA entries pointing into the .text segment.
 
-Nit, would prefer to wrap here, especially since __link_shadow_page() wraps.
+Applied to next, thanks!
 
-> +{
-> +	__link_shadow_page(&vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
-> +}
-> +
->  static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
->  				   unsigned direct_access)
->  {
-> -- 
-> 2.36.0.rc2.479.g8af0fa9b8e-goog
-> 
+[1/1] arm64: kvm: avoid unnecessary absolute addressing via literals
+      commit: 7ee74cc7ad7ef526e4383a3a3294b7039622eb37
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
