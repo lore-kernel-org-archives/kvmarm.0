@@ -2,72 +2,61 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 417ADC433EF
-	for <kvmarm@archiver.kernel.org>; Fri,  6 May 2022 10:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A98D1C433EF
+	for <kvmarm@archiver.kernel.org>; Fri,  6 May 2022 13:01:15 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AEA2E4B214;
-	Fri,  6 May 2022 06:16:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2123C4B278;
+	Fri,  6 May 2022 09:01:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hnoeCsYsojTL; Fri,  6 May 2022 06:16:23 -0400 (EDT)
+	with ESMTP id 0RA9SOUIgeUG; Fri,  6 May 2022 09:01:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6650D4B1F2;
-	Fri,  6 May 2022 06:16:23 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E8B4C4B208;
+	Fri,  6 May 2022 09:01:13 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10E2E4B1CB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 06:16:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F35F84B1BA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 09:01:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rGL+lrx9Szgi for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2022 06:16:21 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EA4724B1C3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 06:16:20 -0400 (EDT)
+ with ESMTP id YLWdgg0Gx0jr for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2022 09:01:11 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9110A4B17D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2022 09:01:11 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 4328462111;
- Fri,  6 May 2022 10:16:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C4A7C385AA;
- Fri,  6 May 2022 10:16:19 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id E64AEB834C5;
+ Fri,  6 May 2022 13:01:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FD3FC385A8;
+ Fri,  6 May 2022 13:01:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1651832179;
- bh=eNp+UUNZui7u6coUNS7PNxrxe2tkL04eKOUXm9fKysc=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=aG2fTzMLcidijec70O3RMF7AS8kQV2M3M/Ncl+vS0Of2b+6zzOrHH/lHZshuQPpaw
- yHiHvpJaR15aodDq0leNa4Eb37VQ8zcrg1Em3n5ZeZilprPRTX8x2Uq0z0z2wlmITb
- 4gX1lTugGTY0oOdgfmS6JwPfe0fN5cN9pjMZF0YX6czmtLC1DM3MexqYlJmXdxfqRj
- xD5hGbrK2o1IFDk+0Qwsz56xLWLGQ8B+i4YBIBGwv80RcXpDyz1LAEaOPjQONWaz8t
- +CF3qbKaOx9StUbG7amB8MhLytSzvo98I6DdUHp+Ho8LfIuoWBCGxaRmNoSUcNfc34
- pdpZZqMw/KRiA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
- by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
- TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
- (envelope-from <maz@kernel.org>)
- id 1nmv0T-009Qtg-5m; Fri, 06 May 2022 11:16:17 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH] KVM: arm64: nvhe: eliminate kernel-doc warnings
-Date: Fri,  6 May 2022 11:16:14 +0100
-Message-Id: <165183215982.192247.17735807567998554164.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220430050123.2844-1-rdunlap@infradead.org>
-References: <20220430050123.2844-1-rdunlap@infradead.org>
+ s=k20201202; t=1651842068;
+ bh=78TflA97GcDiKTkzTzNo81ow+4K3p0br6C/I8gs88JU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=MmYzcPDPbsRgbpJCkkBat3RoSxhsQbLi9panXSxtaUj1iBwDOvhk++5pG20q/h2cl
+ Zs86/1Rib61rKU8TyG4KyOhrS8kbUTc3VZfSqAZwlUxE2azkFmJ1Q56SpCxjymmBXp
+ Kv4W8OEksSNcvUu2PTH7nU33KJ+0v7cUYdwXOOdfBBySjlI4lBqNtEHOPypuH51hFy
+ pDABUsk6DoAys6rC1XMdf34zV37PJeO5LqryIANR7KHzkbvHhhqtRkdRWp8/TNc+E+
+ hG+YbdnspDCaQiXPauuvlrfoTzIilfnohOpuusykYVdgzB74ulERmx0pyOYVyd+qnk
+ ROp0WsRv4zRAQ==
+Date: Fri, 6 May 2022 14:01:01 +0100
+From: Will Deacon <will@kernel.org>
+To: Oliver Upton <oupton@google.com>
+Subject: Re: [RFC PATCH kvmtool 0/5] ARM: Implement PSCI SYSTEM_SUSPEND
+Message-ID: <20220506130101.GC22892@willie-the-truck>
+References: <20220311174001.605719-1-oupton@google.com>
+ <20220311175717.616958-1-oupton@google.com>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-kernel@vger.kernel.org, rdunlap@infradead.org,
- kvmarm@lists.cs.columbia.edu, alexandru.elisei@arm.com, suzuki.poulose@arm.com,
- james.morse@arm.com, lkp@intel.com, linux-arm-kernel@lists.infradead.org,
- dbrazdil@google.com, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Cc: kernel test robot <lkp@intel.com>, kvmarm@lists.cs.columbia.edu,
+Content-Disposition: inline
+In-Reply-To: <20220311175717.616958-1-oupton@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Cc: kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+ Peter Shier <pshier@google.com>, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -85,36 +74,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 29 Apr 2022 22:01:23 -0700, Randy Dunlap wrote:
-> Don't use begin-kernel-doc notation (/**) for comments that are not in
-> kernel-doc format.
+On Fri, Mar 11, 2022 at 05:57:12PM +0000, Oliver Upton wrote:
+> This is a prototype for supporting KVM_CAP_ARM_SYSTEM_SUSPEND on
+> kvmtool. The capability allows userspace to expose the SYSTEM_SUSPEND
+> PSCI call to its guests.
 > 
-> This prevents these kernel-doc warnings:
+> Implement SYSTEM_SUSPEND using KVM_MP_STATE_SUSPENDED, which emulates
+> the execution of a WFI instruction in the kernel. Resume the guest when
+> a wakeup event is recognized and reset it to the requested entry address
+> and context ID.
 > 
-> arch/arm64/kvm/hyp/nvhe/switch.c:126: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->  * Disable host events, enable guest events
-> arch/arm64/kvm/hyp/nvhe/switch.c:146: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->  * Disable guest events, enable host events
-> arch/arm64/kvm/hyp/nvhe/switch.c:164: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->  * Handler for protected VM restricted exceptions.
-> arch/arm64/kvm/hyp/nvhe/switch.c:176: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->  * Handler for protected VM MSR, MRS or System instruction execution in AArch64.
-> arch/arm64/kvm/hyp/nvhe/switch.c:196: warning: Function parameter or member 'vcpu' not described in 'kvm_handle_pvm_fpsimd'
-> arch/arm64/kvm/hyp/nvhe/switch.c:196: warning: Function parameter or member 'exit_code' not described in 'kvm_handle_pvm_fpsimd'
-> arch/arm64/kvm/hyp/nvhe/switch.c:196: warning: expecting prototype for Handler for protected floating(). Prototype was for kvm_handle_pvm_fpsimd() instead
+> Patches 2-4 are small reworks to more easily shoehorn PSCI support into
+> kvmtool.
+> 
+> Patch 5 adds some SMCCC handlers and makes use of them to implement PSCI
+> SYSTEM_SUSPEND. For now, just check the bare-minimum, that all vCPUs
+> besides the caller have stopped. There are also checks that can be made
+> against the requested entry address, but they are at the discretion of
+> the implementation.
+> 
+> Tested with 'echo mem > /sys/power/state' to see that the vCPU is in
+> fact placed in a suspended state for the PSCI call. Hacked the switch
+> statement to fall through to WAKEUP immediately after to verify the vCPU
+> is set up correctly for resume.
+> 
+> It would be nice if kvmtool actually provided a device good for wakeups,
+> since the RTC implementation has omitted any interrupt support.
+> 
+> kernel changes: http://lore.kernel.org/r/20220311174001.605719-1-oupton@google.com
+> 
+> Oliver Upton (5):
+>   TESTONLY: Sync KVM headers with pending changes
+>   Allow architectures to hook KVM_EXIT_SYSTEM_EVENT
+>   ARM: Stash vcpu_init in the vCPU structure
+>   ARM: Add a helper to re-init a vCPU
+>   ARM: Implement PSCI SYSTEM_SUSPEND
+> 
+>  arm/aarch32/kvm-cpu.c                 | 72 ++++++++++++++++++++
+>  arm/aarch64/kvm-cpu.c                 | 66 +++++++++++++++++++
+>  arm/include/arm-common/kvm-cpu-arch.h | 23 ++++---
+>  arm/kvm-cpu.c                         | 95 ++++++++++++++++++++++++++-
+>  arm/kvm.c                             |  9 +++
+>  include/kvm/kvm-cpu.h                 |  1 +
+>  include/linux/kvm.h                   | 21 ++++++
+>  kvm-cpu.c                             |  8 +++
+>  8 files changed, 283 insertions(+), 12 deletions(-)
 
-Applied to next, thanks!
+Looks like the kernel-side changes are queued now, so please can you resend
+this series? I also think you can drop the AArch32 support, unless you see a
+compelling reason for it?
 
-[1/1] KVM: arm64: nvhe: eliminate kernel-doc warnings
-      commit: bd61395ae8393f28f4b084702acd6f5f02b1f7c0
-
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Will
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
