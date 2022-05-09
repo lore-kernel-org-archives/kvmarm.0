@@ -2,78 +2,104 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4877EC433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 12:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBBFC433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 12:40:45 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 003134B2E6;
-	Mon,  9 May 2022 08:03:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CACE4B2FA;
+	Mon,  9 May 2022 08:40:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id s1pgCyX7R5xB; Mon,  9 May 2022 08:03:44 -0400 (EDT)
+	with ESMTP id L9eFOd6oH4MM; Mon,  9 May 2022 08:40:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 253764B2EB;
-	Mon,  9 May 2022 08:03:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id F377A4B2C5;
+	Mon,  9 May 2022 08:40:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA38F4A36B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 08:03:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A3254B2DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 08:40:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aX9XH89xJ3aN for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2022 08:03:41 -0400 (EDT)
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com
- [209.85.128.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D1494B2F6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 08:03:41 -0400 (EDT)
-Received: by mail-wm1-f73.google.com with SMTP id
- v124-20020a1cac82000000b003948b870a8dso1951926wme.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 05:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=AP8BJD+QDHGic4f82rKNyxQyu5IcsR8wiJftz0kCt7w=;
- b=W11ZAb9BcG9FC5CiXzLMy3NvRJU0fY73utyk+2sxKwqh7oxt0JGbE3o+2OqGw1ZP7B
- Snzx+FZjjyoeeWvqA2rDLmWvt7aHk3+GdNkPuiMDfTMCXY5en2gPKcqaI345EMLz5HN3
- y/+BRqcIBawmTf6NMgUCFRt59jv97GtBRALFDfQvPLCdm0AveeEAmUG87L+hxhr5w+F7
- wL1mo2lw+xOLv0NDTJ8K7/F39Y66HNLIye1wupFitjjnlQ9w3KAbg0HFU7tcw0RgddO4
- E0ahmiWGfdDIb19XCz4vqt0pCSVBjuaAfaOtHNc3XDNXDbvwNl5hamcVeRca7l98CTEj
- bUow==
+ with ESMTP id YCqPiuInMyI3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2022 08:40:41 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 223884B0C2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 08:40:41 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1652100040;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SUadK35yMNXsZHcgs6kL1o+WcgWzTvpYsG0KVUtggWM=;
+ b=UFfLwrxuQq6JenevjXw5y8vkSI9N/LJmcCOojv7WGKhejolDnGEW3tUOSNY08fkyoBex0M
+ OKJTKhFMd4+Cy4JofjJsDfrZ/bl61s6OCxvaAdcviBDUc95tTf31HiKV1YYZ78dk6rB8o9
+ VYzGZ1Iy2XkUYfiqtxVH3isKeCpz3Mk=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-456-YHFrsFkoPgmqxOJw2FcZiA-1; Mon, 09 May 2022 08:40:37 -0400
+X-MC-Unique: YHFrsFkoPgmqxOJw2FcZiA-1
+Received: by mail-wr1-f72.google.com with SMTP id
+ w20-20020adfd1b4000000b0020cbb4347e6so2186428wrc.17
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 05:40:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=AP8BJD+QDHGic4f82rKNyxQyu5IcsR8wiJftz0kCt7w=;
- b=CBzAE+xXH/z2XMufSlC04n+gwBDw7de7Eqp+uWlKwfl8EmlquG44yQoS8b4/pmAglf
- cG+gFtO+qEDyv6EzDA9aXOkaEeNAX6bPOVbuaDNbp1Kh5EwMUSiK02j0hPDHpYQNmezl
- tshc8jKyu/ttwx/78/qBDMqrSaCGRxkJ1Vmrpr4CpyLnOPgmtzmlIiRU9MYvNvmegUc0
- 4MIKCh44BKoZvVVCCMp4qKfGsfvEgc3TFkDeSrgg+H6cI8zC+0QUByoW/GDeRDWVj/Xd
- Jpgxlx9wzSIhla2Zq+1Ag7mBwPM6noX28pYALlbp98sBfaYoKp0kUIs4cElfHL8htgcD
- 7OXw==
-X-Gm-Message-State: AOAM533lAk7O+oOK0Ax2uH5wuNhbohadPIzx8SXukw/uBng6RvhdPVIE
- +IEccfa455ngV/2Zg+NHiorF4mnRZASZShxe4tcD03xWZjm5PrkFRDLLVdOWiwSjNu+RsC29PHO
- xNLH9IaMuyKS7LNX4WNFPLzCyhryjhCNHMt92kWTDId4f3CDC0L8ptX+5/m6GA0aiGhI=
-X-Google-Smtp-Source: ABdhPJwemWETEq1o00ZMXUdhOoB7QdauU8SdFbTVGnRprJ6KJ0RRhEQq4CvyqFrJFc7AIjTkqjO43sRKhQ==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:4e51:b0:394:513b:934
- with SMTP id
- e17-20020a05600c4e5100b00394513b0934mr15673131wmq.164.1652097820617; Mon, 09
- May 2022 05:03:40 -0700 (PDT)
-Date: Mon,  9 May 2022 12:03:30 +0000
-In-Reply-To: <20220509120330.3043773-1-tabba@google.com>
-Message-Id: <20220509120330.3043773-5-tabba@google.com>
-Mime-Version: 1.0
-References: <20220509120330.3043773-1-tabba@google.com>
-X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
-Subject: [PATCH v3 4/4] KVM: arm64: Reenable pmu in Protected Mode
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
- will@kernel.org, linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:reply-to
+ :subject:content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=SUadK35yMNXsZHcgs6kL1o+WcgWzTvpYsG0KVUtggWM=;
+ b=jVw0Ze2FLLq52lVCgmSUX4Vs2VO1HcqYepzSAIAg8qjf6JoSLPJuHK+Uvo3XhNhhmc
+ 7OcFKoVTXo96yjZSFoCHV2ilFFHLWTTyKEQHJWFSXV3xxl8mMhTjtscS9LtF25uVFDjT
+ 9YAWFGMMSAvc3QYX+AD3b3M7zIgZmoSobwW6PR8J7tEPKd3/EIfQ/M8ZajvadU4Eijim
+ xyzKq6nuGgWTCivPJCOHlEhfM9Ke+nzpjmor2wfDdQOBp0qbRr6UqdVrqmezogCfuFci
+ Urdgn9sOKGslGoU0fYFEdFGqDwuYZr/rLji7C9iubArpU1Be20KOwD7ZW7D0XM3XSa1W
+ nBrA==
+X-Gm-Message-State: AOAM532ot1DLHQPNpNAZ+VIeweGwY5nHByxBpOiBOJlGonRipm5ITkKC
+ wGYzTtVM7VM5Yp4I8pIK0NlDe4Ety9ua5wUexUlepqgjgnCEyon6xRi5CEuf3bWd51qpKeoigJJ
+ /juJKTrYgbxRLBxm8XlBEu4P4
+X-Received: by 2002:a5d:47ca:0:b0:20c:72c9:d3be with SMTP id
+ o10-20020a5d47ca000000b0020c72c9d3bemr13474747wrc.114.1652100036449; 
+ Mon, 09 May 2022 05:40:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJysvm3jkrqazePjRtdEnYu3kQ2p9NT6qTIcb4srvAfJimbVAhgFFtMASqJqwQfcuURt7qkeXg==
+X-Received: by 2002:a5d:47ca:0:b0:20c:72c9:d3be with SMTP id
+ o10-20020a5d47ca000000b0020c72c9d3bemr13474718wrc.114.1652100036144; 
+ Mon, 09 May 2022 05:40:36 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874?
+ ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+ by smtp.gmail.com with ESMTPSA id
+ b15-20020a7bc24f000000b003942a244ecfsm12770414wmj.20.2022.05.09.05.40.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 May 2022 05:40:35 -0700 (PDT)
+Message-ID: <20a4ca70-0dd5-75eb-0d09-234e3dceea40@redhat.com>
+Date: Mon, 9 May 2022 14:40:34 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v2 2/4] KVM: arm64: vgic: Add more checks when restoring
+ ITS tables
+To: Ricardo Koller <ricarkol@google.com>
+References: <20220427184814.2204513-1-ricarkol@google.com>
+ <20220427184814.2204513-3-ricarkol@google.com>
+ <b29fcba7-2599-bf1b-0720-26b05cc37fd4@redhat.com>
+ <YnKxbNuf4U1Zgjx5@google.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <YnKxbNuf4U1Zgjx5@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, andre.przywara@arm.com, pshier@google.com,
+ maz@kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
+Reply-To: eric.auger@redhat.com
 List-Id: Where KVM/ARM decisions are made <kvmarm.lists.cs.columbia.edu>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -87,30 +113,105 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that the pmu code does not access hyp data, reenable it in
-protected mode.
+Hi Ricardo,
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/pmu-emul.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+On 5/4/22 19:01, Ricardo Koller wrote:
+> On Tue, May 03, 2022 at 07:14:19PM +0200, Eric Auger wrote:
+>> Hi Ricardo,
+>>
+>> On 4/27/22 20:48, Ricardo Koller wrote:
+>>> Try to improve the predictability of ITS save/restores (and debuggability
+>>> of failed ITS saves) by failing early on restore when trying to read
+>>> corrupted tables.
+>>>
+>>> Restoring the ITS tables does some checks for corrupted tables, but not as
+>>> many as in a save: an overflowing device ID will be detected on save but
+>>> not on restore.  The consequence is that restoring a corrupted table won't
+>>> be detected until the next save; including the ITS not working as expected
+>>> after the restore.  As an example, if the guest sets tables overlapping
+>>> each other, which would most likely result in some corrupted table, this is
+>>> what we would see from the host point of view:
+>>>
+>>> 	guest sets base addresses that overlap each other
+>>> 	save ioctl
+>>> 	restore ioctl
+>>> 	save ioctl (fails)
+>>>
+>>> Ideally, we would like the first save to fail, but overlapping tables could
+>>> actually be intended by the guest. So, let's at least fail on the restore
+>>> with some checks: like checking that device and event IDs don't overflow
+>>> their tables.
+>>>
+>>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+>>> ---
+>>>  arch/arm64/kvm/vgic/vgic-its.c | 13 +++++++++++++
+>>>  1 file changed, 13 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+>>> index e14790750958..fb2d26a73880 100644
+>>> --- a/arch/arm64/kvm/vgic/vgic-its.c
+>>> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+>>> @@ -2198,6 +2198,12 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
+>>>  	if (!collection)
+>>>  		return -EINVAL;
+>>>  
+>>> +	if (find_ite(its, dev->device_id, event_id))
+>>> +		return -EINVAL;
+>> Unsure about that. Nothing in the arm-vgic-its.rst doc says that the
+>> KVM_DEV_ARM_ITS_RESTORE_TABLES ioctl cannot be called several times
+>> (although obviously useless)
+> In that case, maybe we could ignore the new repeated entry? or
+Maybe you can fail only in the case the ITE to be restored is different
+from the existing one? otherwise ignore.
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 3dc990ac4f44..11c43bed5f97 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -774,8 +774,7 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
- {
- 	struct arm_pmu_entry *entry;
- 
--	if (pmu->pmuver == 0 || pmu->pmuver == ID_AA64DFR0_PMUVER_IMP_DEF ||
--	    is_protected_kvm_enabled())
-+	if (pmu->pmuver == 0 || pmu->pmuver == ID_AA64DFR0_PMUVER_IMP_DEF)
- 		return;
- 
- 	mutex_lock(&arm_pmus_lock);
--- 
-2.36.0.512.ge40c2bad7a-goog
+Eric
+> overwrite the old one?  find_ite() only returns the first (device_id,
+> event_id) match. So, it's like the new one is ignored already.  The
+> arm arm says this about MAPI commands in this situation:
+>
+>     If there is an existing mapping for the EventID-DeviceID
+>     combination, behavior is UNPREDICTABLE.
+>
+> And, just in case, the main reason for adding this check was to avoid
+> failing the next ITS save. The idea is to try to fail as soon as
+> possible, not in possibly many days during the next migration attempt.
+>
+>>> +
+>>> +	if (!vgic_its_check_event_id(its, dev, event_id))
+>>> +		return -EINVAL;
+>>> +
+>>>  	ite = vgic_its_alloc_ite(dev, collection, event_id);
+>>>  	if (IS_ERR(ite))
+>>>  		return PTR_ERR(ite);
+>>> @@ -2319,6 +2325,7 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>>>  				void *ptr, void *opaque)
+>>>  {
+>>>  	struct its_device *dev;
+>>> +	u64 baser = its->baser_device_table;
+>>>  	gpa_t itt_addr;
+>>>  	u8 num_eventid_bits;
+>>>  	u64 entry = *(u64 *)ptr;
+>>> @@ -2339,6 +2346,12 @@ static int vgic_its_restore_dte(struct vgic_its *its, u32 id,
+>>>  	/* dte entry is valid */
+>>>  	offset = (entry & KVM_ITS_DTE_NEXT_MASK) >> KVM_ITS_DTE_NEXT_SHIFT;
+>>>  
+>>> +	if (find_its_device(its, id))
+>>> +		return -EINVAL;
+>> same here.
+>>> +
+>>> +	if (!vgic_its_check_id(its, baser, id, NULL))
+>>> +		return -EINVAL;
+>>> +
+>>>  	dev = vgic_its_alloc_device(its, id, itt_addr, num_eventid_bits);
+>>>  	if (IS_ERR(dev))
+>>>  		return PTR_ERR(dev);
+>> Thanks
+>>
+>> Eric
+>>
+> Thanks,
+> Ricardo
+>
 
 _______________________________________________
 kvmarm mailing list
