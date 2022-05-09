@@ -2,75 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 375E9C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 09:55:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C88C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 10:31:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DAAC94B2EA;
-	Mon,  9 May 2022 05:55:15 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 014CE4B2DC;
+	Mon,  9 May 2022 06:31:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 1-jbhNFIr+d2; Mon,  9 May 2022 05:55:14 -0400 (EDT)
+	with ESMTP id KJO8Lpb16Heb; Mon,  9 May 2022 06:31:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D14A94B2E4;
-	Mon,  9 May 2022 05:55:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B73DF4B2CA;
+	Mon,  9 May 2022 06:31:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06AA34B2B0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 05:55:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 117FC4B2CA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 06:31:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iEcIoRdUG9pr for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2022 05:55:13 -0400 (EDT)
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
- [209.85.221.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D23B4B2E1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 05:55:12 -0400 (EDT)
-Received: by mail-wr1-f73.google.com with SMTP id
- s14-20020adfa28e000000b0020ac7532f08so5571916wra.15
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 02:55:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=PhvZKBoe39U/3XMHmUVWsW2UFiJi51cRGJG2oMiPjk0=;
- b=gy9Pr03wH/mN/XB3LzRNi4hBUvdoPadX+6gSpKuCnO8uMZaRwee/T/cXmhwHPp7jOf
- UXJsDe4l5e5cWjkkXmPZ2VygdY5RrxCx4vLOlHuU4uWoxadyDvAiVPXbzEGX8PfF/I49
- 8X0EwOD9sETBcgUs4v+jKjuwUVo0OLMz5UQcbAL4VgtjqJQAXSjKbdh932vy1h7GQhDw
- k2dsFcS6jW843fUNI9r74FSxB569wCmInL4kHIoaA7FUMoSVmU5bMkfmKXNQtyjaw6vh
- OeRDNDDn3tM3aT8iyen4UTmwruuADa7fq9JoG5BbmOdevUKa/P1TlUVOXgAErFdIx0ZU
- gLSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=PhvZKBoe39U/3XMHmUVWsW2UFiJi51cRGJG2oMiPjk0=;
- b=nzJSXRQ+TVKZ5sZ/SaE6XOxhh47wwIu261/YVo8P2uAYCe475baFLCZy5ELnSmCyuo
- miSQgULZDv9sFxpXNfzMG1iNcQgF5e2pk2Sz70Q7oXXO3ieck0JfcIrAQcTcCxSUO2P6
- W62cRT5P10UTn2Wjm8xaE7Rhxjyhes0IMNIJ6R1UC2GHjd9tyrI9Xmk+lFPNqHm7cgJp
- InI4fsOoNQ+QA8Lj4yT8GtBkKmVApKAXxOcR2OT3Bs8oOEHq2C4wgutZLU0iM1/NrxIm
- KHXGqEnVQlT5ph90rcdrw7n5DAm97iN0obxcCYCzGIwfeLiwrxvs3VK6qqff+XFEX3a2
- kuZQ==
-X-Gm-Message-State: AOAM533LFpZ4A7IZe9ckUYaEmkG/5caIxTaG/brSHPkCuVmd8qwHOEIV
- 4EQkCaEdTc5g/1sheV+m9WIiuU6Pbk11E5iSRxIIKG7CJKr2qSjFm0ZlbBlD5GLh00QFDwZg+w7
- PjRHUfmO3C4c+u06sH/OWQCKTVOP+Pkksd0fvf3Uup+o/z99unVj4y75InrN4pO/gnBs=
-X-Google-Smtp-Source: ABdhPJyQpUMf+PyLIdfmlviF5r7R4hnQrrGQnxivrS16KdcOz4sztzVanuIea+fT+sX8qxj68vsB+2uq4Q==
-X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:2102:b0:394:2765:580c
- with SMTP id
- u2-20020a05600c210200b003942765580cmr15172324wml.150.1652090111772; Mon, 09
- May 2022 02:55:11 -0700 (PDT)
-Date: Mon,  9 May 2022 09:55:00 +0000
-In-Reply-To: <20220509095500.2408785-1-tabba@google.com>
-Message-Id: <20220509095500.2408785-5-tabba@google.com>
-Mime-Version: 1.0
+ with ESMTP id CP5eR2LNZBSA for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2022 06:31:18 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8C5B4B2C5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 06:31:18 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 94A4960F7C;
+ Mon,  9 May 2022 10:31:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F259AC385A8;
+ Mon,  9 May 2022 10:31:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1652092277;
+ bh=nCB481jj88Qz5Y0reD7Efn/bS+/FLmjmh3enacfHSu0=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=Kpuw6y1wKMO2Vd05V2I6xAVrTjnKYJv6H8tS1Hc3SYD3XjlLSQc2Wp7qAdaMwvys5
+ UfDBa5qz3e118I//N8Zi/EGtvTdu5YxPHQNnxjvtHF3PoMVNQuu/8Dy3LB1seOGf+8
+ 9NuiDF0U5cMdfV+YKPnoCT4bUP78Z6tyi14GBvr6SxAX2lQXSE7UDIDRqSNVvlCEkQ
+ Sy/ZHpGqLywKb+JOeeLVmSHaNNHYPVLd0/jVii2JDfwneFvHGV0T0a6yO/6ZzcN9U9
+ TX+9qSExFgGMbVDcCL1iP/+oKHr4vTYf3+TZhV+LTlFedkCWXl2mcUxeM1/gXX0t+1
+ G1KL0GsV7TgAg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1no0fa-009wDh-DF; Mon, 09 May 2022 11:31:14 +0100
+Date: Mon, 09 May 2022 11:31:14 +0100
+Message-ID: <87fslj6lql.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 3/4] KVM: arm64: Pass pmu events to hyp via vcpu
+In-Reply-To: <20220509095500.2408785-4-tabba@google.com>
 References: <20220509095500.2408785-1-tabba@google.com>
-X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
-Subject: [PATCH v2 4/4] KVM: arm64: Reenable pmu in Protected Mode
-From: Fuad Tabba <tabba@google.com>
-To: kvmarm@lists.cs.columbia.edu
-Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
- will@kernel.org, linux-arm-kernel@lists.infradead.org
+ <20220509095500.2408785-4-tabba@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: tabba@google.com, kvmarm@lists.cs.columbia.edu,
+ will@kernel.org, qperret@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ drjones@redhat.com, linux-arm-kernel@lists.infradead.org,
+ kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, catalin.marinas@arm.com, will@kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -87,33 +88,155 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Now that the pmu code does not access hyp data, reenable it in
-protected mode.
+On Mon, 09 May 2022 10:54:59 +0100,
+Fuad Tabba <tabba@google.com> wrote:
+> 
+> Instead of the host accessing hyp data directly, pass the pmu
+> events of the current cpu to hyp via the vcpu.
+> 
+> This adds 64 bits (in two fields) to the vcpu that need to be
+> synced before every vcpu run in nvhe and protected modes.
+> However, it isolates the hypervisor from the host, which allows
+> us to use pmu in protected mode in a subsequent patch.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Fuad Tabba <tabba@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  8 ++------
+>  arch/arm64/kvm/hyp/nvhe/switch.c  | 20 ++++++--------------
+>  arch/arm64/kvm/pmu-emul.c         |  3 +++
+>  arch/arm64/kvm/pmu.c              | 12 ++++--------
+>  include/kvm/arm_pmu.h             |  6 ++++++
+>  5 files changed, 21 insertions(+), 28 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index dfd360404dd8..90476e713643 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -273,14 +273,8 @@ struct kvm_cpu_context {
+>  	struct kvm_vcpu *__hyp_running_vcpu;
+>  };
+>  
+> -struct kvm_pmu_events {
+> -	u32 events_host;
+> -	u32 events_guest;
+> -};
+> -
+>  struct kvm_host_data {
+>  	struct kvm_cpu_context host_ctxt;
+> -	struct kvm_pmu_events pmu_events;
+>  };
+>  
+>  struct kvm_host_psci_config {
+> @@ -763,6 +757,7 @@ void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
+>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>  
+>  DECLARE_KVM_HYP_PER_CPU(struct kvm_host_data, kvm_host_data);
+> +DECLARE_PER_CPU(struct kvm_pmu_events, kvm_pmu_events);
+>  
+>  static inline void kvm_init_host_cpu_context(struct kvm_cpu_context *cpu_ctxt)
+>  {
+> @@ -821,6 +816,7 @@ void kvm_arch_vcpu_put_debug_state_flags(struct kvm_vcpu *vcpu);
+>  void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr);
+>  void kvm_clr_pmu_events(u32 clr);
+>  
+> +struct kvm_pmu_events *kvm_get_pmu_events(void);
+>  void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu);
+>  #else
+> diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+> index 0716163313d6..c61120ec8d1a 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> @@ -153,13 +153,9 @@ static void __hyp_vgic_restore_state(struct kvm_vcpu *vcpu)
+>  /*
+>   * Disable host events, enable guest events
+>   */
+> -static bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
+> +static bool __pmu_switch_to_guest(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_host_data *host;
+> -	struct kvm_pmu_events *pmu;
+> -
+> -	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
+> -	pmu = &host->pmu_events;
+> +	struct kvm_pmu_events *pmu = &vcpu->arch.pmu.events;
+>  
+>  	if (pmu->events_host)
+>  		write_sysreg(pmu->events_host, pmcntenclr_el0);
+> @@ -173,13 +169,9 @@ static bool __pmu_switch_to_guest(struct kvm_cpu_context *host_ctxt)
+>  /*
+>   * Disable guest events, enable host events
+>   */
+> -static void __pmu_switch_to_host(struct kvm_cpu_context *host_ctxt)
+> +static void __pmu_switch_to_host(struct kvm_vcpu *vcpu)
+>  {
+> -	struct kvm_host_data *host;
+> -	struct kvm_pmu_events *pmu;
+> -
+> -	host = container_of(host_ctxt, struct kvm_host_data, host_ctxt);
+> -	pmu = &host->pmu_events;
+> +	struct kvm_pmu_events *pmu = &vcpu->arch.pmu.events;
+>  
+>  	if (pmu->events_guest)
+>  		write_sysreg(pmu->events_guest, pmcntenclr_el0);
+> @@ -304,7 +296,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	host_ctxt->__hyp_running_vcpu = vcpu;
+>  	guest_ctxt = &vcpu->arch.ctxt;
+>  
+> -	pmu_switch_needed = __pmu_switch_to_guest(host_ctxt);
+> +	pmu_switch_needed = __pmu_switch_to_guest(vcpu);
+>  
+>  	__sysreg_save_state_nvhe(host_ctxt);
+>  	/*
+> @@ -366,7 +358,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
+>  	__debug_restore_host_buffers_nvhe(vcpu);
+>  
+>  	if (pmu_switch_needed)
+> -		__pmu_switch_to_host(host_ctxt);
+> +		__pmu_switch_to_host(vcpu);
+>  
+>  	/* Returning to host will clear PSR.I, remask PMR if needed */
+>  	if (system_uses_irq_prio_masking())
+> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> index 3dc990ac4f44..08d0551a4e43 100644
+> --- a/arch/arm64/kvm/pmu-emul.c
+> +++ b/arch/arm64/kvm/pmu-emul.c
+> @@ -406,6 +406,9 @@ static void kvm_pmu_update_state(struct kvm_vcpu *vcpu)
+>  	if (!kvm_vcpu_has_pmu(vcpu))
+>  		return;
+>  
+> +	if (!has_vhe())
+> +		pmu->events = *kvm_get_pmu_events();
 
-No functional change intended outside of protected mode.
+A bit of context:
 
-Signed-off-by: Fuad Tabba <tabba@google.com>
----
- arch/arm64/kvm/pmu-emul.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+		preempt_disable();
 
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index 08d0551a4e43..cf15d510c06d 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -777,8 +777,7 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
- {
- 	struct arm_pmu_entry *entry;
- 
--	if (pmu->pmuver == 0 || pmu->pmuver == ID_AA64DFR0_PMUVER_IMP_DEF ||
--	    is_protected_kvm_enabled())
-+	if (pmu->pmuver == 0 || pmu->pmuver == ID_AA64DFR0_PMUVER_IMP_DEF)
- 		return;
- 
- 	mutex_lock(&arm_pmus_lock);
+		/*
+		 * The VMID allocator only tracks active VMIDs per
+		 * physical CPU, and therefore the VMID allocated may not be
+		 * preserved on VMID roll-over if the task was preempted,
+		 * making a thread's VMID inactive. So we need to call
+		 * kvm_arm_vmid_update() in non-premptible context.
+		 */
+		kvm_arm_vmid_update(&vcpu->arch.hw_mmu->vmid);
+
+		kvm_pmu_flush_hwstate(vcpu);
+
+		local_irq_disable();
+
+You *still* are in a context where an interrupt can fire and mess
+things up behind your back. Not good. Also, this is now synchronised
+*twice* per run (once on flush, once on sync). Do we really need this?
+
+Thanks,
+
+	M.
+
 -- 
-2.36.0.512.ge40c2bad7a-goog
-
+Without deviation from the norm, progress is not possible.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
