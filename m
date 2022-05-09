@@ -2,79 +2,92 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2BCC433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 22:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 496B9C433EF
+	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 22:47:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4410B4B08B;
-	Mon,  9 May 2022 18:36:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C1E424B1A9;
+	Mon,  9 May 2022 18:47:22 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Tn3DNX1gCL3c; Mon,  9 May 2022 18:36:08 -0400 (EDT)
+	with ESMTP id bgkfkRSclWEv; Mon,  9 May 2022 18:47:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A4064B0C0;
-	Mon,  9 May 2022 18:36:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C65C4B10A;
+	Mon,  9 May 2022 18:47:21 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5CDA54B092
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 18:36:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E27B4B0DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 18:47:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6Q3bC+Obgnxk for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2022 18:36:05 -0400 (EDT)
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com
- [209.85.166.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E3B049EF0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 18:36:05 -0400 (EDT)
-Received: by mail-io1-f45.google.com with SMTP id z18so16875983iob.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 15:36:05 -0700 (PDT)
+ with ESMTP id eBCFWV54IorY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2022 18:47:19 -0400 (EDT)
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com
+ [209.85.214.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4054049E2B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 18:47:19 -0400 (EDT)
+Received: by mail-pl1-f174.google.com with SMTP id q4so12313532plr.11
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 15:47:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=OSnht+8VCAB6CRGae6+His6a8pPmQv2FFPIyTYc0Bpc=;
- b=pO3gpVng8y8atVOaJE0kjrwYtdT6e+MRQ4x1h47NCCzQvKnOUxu3/dgFV014FfNPjT
- GY4WhlrMBvSQ/Q5+EhWVnCjnTYjomy3sTe4nsGsSTtvhT5qgROC0SN0Zc/M5g7GtN+lE
- Ruq8fYoR7/k+P+vSGh9pYjzhFjuOh8/+ioB9Ui2NCxmJEOCYog3nvaUlxykBTI6qOrV5
- 32e26PmWjrVnm3dK2n6fWFOX/YmS0HJw91xrSPvU1SvbhE0uSgCTryB3ATilTo8NAAF5
- eP1arEqfXNoMSOAxX31QbP9xE5yd1P5sI7xXdVxWyFc1X9zwJhWR5bb+6BJIv7peaPW3
- B/Ow==
+ bh=HqfHpv0KlKI7R/yNkzZ4Z0O6e/LDYyZQrPZnAWmT71E=;
+ b=gBcOu1AAKpSXofktmoX+I7Bsue1fm8qXDW5SAW2z78o+w1vB0SSgx4IklNVsM6AAzZ
+ rRanfgSmN+B+INR8d1D8AkH0tSIFfSoPJ6A1yAUns87zIIglHwwo2m30NPBXwdX6TkWW
+ SEK+nrP1tpdnPeU3iaz+GJi7tRkKbBkzOi5H4MwWVtOkVkQ/68e+8sIXf2yl0Iu4H6Hw
+ OTlElUOOi39t2GII8YY4Ffe6Y2H/8k+QiYj5KX2vieq1bsIMVrRUSDXE38zuU0bl3Ntb
+ BAua97uPHpzdm6iAaITSrNyyPFguQ121LRQWWdm6DNlKn8HkFJ2uJNJ4JUyeP1z+xoqX
+ Ts5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=OSnht+8VCAB6CRGae6+His6a8pPmQv2FFPIyTYc0Bpc=;
- b=YUZq427yoN2BUDnihDi/3Pwvun5lzKP0De6S/S3kFx2b/AFeoDxujk+6bMBtRKq77S
- Xob2uwADiTAY5hQWn6n7zzRke1jZjeRECWVLWSTDTgRUswgjXHPeMUuIV8/DEfuQEJgF
- 53N/Ph98Vf/+6RW7NsQpR24TzTcHE63GWkAz/AMPu+2E+/Wg4u5PpJ4rHX+2V/lh64tT
- pcqmulh9Ca5xgtSz0/Sw/Th5/ifcJSC80bQS7HcID1JnEVObsiIk+DskJ8wy7SIXbp61
- BgTjxJZLuGTNabDbifuSX1gs8Vgb8lSOp2UFVpLDaxGTBwW9iAnUC0yYODvRrzMjWXJZ
- T4MA==
-X-Gm-Message-State: AOAM5313RSG7BGmbHpj5EBJUJL9Sn67MpFBJtP8G6x9rCMIF/5PAtGVf
- 3E3CFNpBbLqSXdFAdObBkeS1og==
-X-Google-Smtp-Source: ABdhPJycub8ue9uVjQrr3auGUDS3nibsPeiX1OCClK9zcna5Od9ajYwZLZtpHgtTe/lmKnlDJa3DbA==
-X-Received: by 2002:a05:6638:2104:b0:32c:26ac:4d8e with SMTP id
- n4-20020a056638210400b0032c26ac4d8emr3361940jaj.89.1652135764457; 
- Mon, 09 May 2022 15:36:04 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com.
- [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- g4-20020a056e02130400b002cde6e352c8sm3448252ilr.18.2022.05.09.15.36.03
+ bh=HqfHpv0KlKI7R/yNkzZ4Z0O6e/LDYyZQrPZnAWmT71E=;
+ b=MZs/LBd0C8gjcoiTKhSQwd3YG9/Jnhygm2YGkwNSwh6pJ6GtYKnQttYMmG6x2AFrco
+ Q/uv71GzM1WeDAf6nb6UgEpdO5BDkjXybDBfPZw2d5856N1nESxs5wL8nTburu8aMqII
+ pUMgeqCFCPU9VL9EeLWZuj722HUswitqJEY4FfhBzwAGWzKGOB4upF8NkB42GLEMADAx
+ /ntvp8QK8/O0LtFgwlJdThv4mxn7Iobuk7bT3RypOSirgnLqoB/MC7PZccAL27Xusi6Z
+ zVhHLG2be5IubuUhi8FlHsrGjuMdctOtDvAhG5ImP9+l3BofS/4RXxikHbGzM+xT992+
+ OrBA==
+X-Gm-Message-State: AOAM531gkfY0uPcCDY94kcWtA5XZxgI7sm23DXBlSYxDC8Y5SXUMt1VR
+ OHwXquLaCiIxDCYDhVA0mWWm/w==
+X-Google-Smtp-Source: ABdhPJzlAs+WsB2F0OyBXHzmXsCE5yKPzcqLqI7jJtlr5bkfm/U8b2uxGA/nhaBtBW85p0tqZlWDJg==
+X-Received: by 2002:a17:902:c2c7:b0:159:9f9:85f3 with SMTP id
+ c7-20020a170902c2c700b0015909f985f3mr18070842pla.18.1652136437989; 
+ Mon, 09 May 2022 15:47:17 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com.
+ [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
+ 3-20020a17090a018300b001cb978f906esm259814pjc.0.2022.05.09.15.47.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 May 2022 15:36:03 -0700 (PDT)
-Date: Mon, 9 May 2022 22:36:00 +0000
-From: Oliver Upton <oupton@google.com>
-To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v3 4/4] KVM: arm64: Reenable pmu in Protected Mode
-Message-ID: <YnmXULIsOO27g/8N@google.com>
-References: <20220509120330.3043773-1-tabba@google.com>
- <20220509120330.3043773-5-tabba@google.com>
+ Mon, 09 May 2022 15:47:17 -0700 (PDT)
+Date: Mon, 9 May 2022 22:47:14 +0000
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v4 20/20] KVM: x86/mmu: Extend Eager Page Splitting to
+ nested MMUs
+Message-ID: <YnmZ8jUaWHCuQ++r@google.com>
+References: <20220422210546.458943-1-dmatlack@google.com>
+ <20220422210546.458943-21-dmatlack@google.com>
+ <YnlFzMpJZNfFuFic@google.com>
+ <CALzav=fTTf8=u1i0pePxAHtuHr4Q_+N1-d8x09MtRk+6y250rw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220509120330.3043773-5-tabba@google.com>
-Cc: will@kernel.org, maz@kernel.org, catalin.marinas@arm.com,
- kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+In-Reply-To: <CALzav=fTTf8=u1i0pePxAHtuHr4Q_+N1-d8x09MtRk+6y250rw@mail.gmail.com>
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -91,40 +104,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Fuad,
-
-On Mon, May 09, 2022 at 12:03:30PM +0000, Fuad Tabba wrote:
-> Now that the pmu code does not access hyp data, reenable it in
-> protected mode.
+On Mon, May 09, 2022, David Matlack wrote:
+> On Mon, May 9, 2022 at 9:48 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > +static void kvm_nested_mmu_try_split_huge_pages(struct kvm *kvm,
+> > > +                                             const struct kvm_memory_slot *slot,
+> > > +                                             gfn_t start, gfn_t end,
+> > > +                                             int target_level)
+> > > +{
+> > > +     int level;
+> > > +
+> > > +     /*
+> > > +      * Split huge pages starting with KVM_MAX_HUGEPAGE_LEVEL and working
+> > > +      * down to the target level. This ensures pages are recursively split
+> > > +      * all the way to the target level. There's no need to split pages
+> > > +      * already at the target level.
+> > > +      */
+> > > +     for (level = KVM_MAX_HUGEPAGE_LEVEL; level > target_level; level--) {
+> >
+> > Unnecessary braces.
 > 
-> Signed-off-by: Fuad Tabba <tabba@google.com>
-> ---
->  arch/arm64/kvm/pmu-emul.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+> The brace is unnecessary, but when the inner statement is split across
+> multiple lines I tend to prefer using braces. (That's why I did the
+> same in the other patch and you had the same feedback.) I couldn't
+> find any guidance about this in CodingStyle so I'm fine with getting
+> rid of the braces if that's what you prefer.
+
+The style varies by subsystem, e.g. I believe perf requires braces in this case.
+Absent a "hard" rule, I value consistency above all else, e.g. because KVM doesn't
+(usually) include the braces, I started looking for the second statement, i.e. the
+lack of an opening brace is an indicator (to me at elast) that a loop/if contains
+a single statement.
+
+I actually like Golang's forced braces, but mostly because they are 100% mandatory
+and so all code is consistent.
+ 
+> > > +             slot_handle_level_range(kvm, slot,
+> > > +                                     nested_mmu_try_split_huge_pages,
+> > > +                                     level, level, start, end - 1,
+> > > +                                     true, false);
+> >
+> > IMO it's worth running over by 4 chars to drop 2 lines:
 > 
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index 3dc990ac4f44..11c43bed5f97 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -774,8 +774,7 @@ void kvm_host_pmu_init(struct arm_pmu *pmu)
->  {
->  	struct arm_pmu_entry *entry;
->  
-> -	if (pmu->pmuver == 0 || pmu->pmuver == ID_AA64DFR0_PMUVER_IMP_DEF ||
-> -	    is_protected_kvm_enabled())
-> +	if (pmu->pmuver == 0 || pmu->pmuver == ID_AA64DFR0_PMUVER_IMP_DEF)
+> Will do.
+> 
+> >
+> >         for (level = KVM_MAX_HUGEPAGE_LEVEL; level > target_level; level--)
+> >                 slot_handle_level_range(kvm, slot, nested_mmu_try_split_huge_pages,
+> >                                         level, level, start, end - 1, true, false);
+> > > +     }
+> > > +}
+> > > +
+> > >  /* Must be called with the mmu_lock held in write-mode. */
+> >
+> > Add a lockdep assertion, not a comment.
+> 
+> Agreed but this is an existing comment, so better left to a separate patch.
 
-IIUC, you intend to enable the PMU for non-pVM guests, right? Based on
-the pKVM feature registers + trap handlers I can see that pVM use of the
-PMU is in fact disabled. It'd be good to state in the commit message
-what is exactly intended for pVMs and non-pVMs.
-
-Since the PMU counters are disabled outright for pVMs, is there any
-value in context switching between host/guest in this case?
-
---
-Thanks,
-Oliver
+Doh, I mistook the /* for a +.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
