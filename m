@@ -2,72 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBDA5C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 06:04:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3629FC433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 06:04:57 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9278849EF2;
-	Tue, 10 May 2022 02:04:54 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E237E4B210;
+	Tue, 10 May 2022 02:04:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id gBca4-lXkOsE; Tue, 10 May 2022 02:04:53 -0400 (EDT)
+	with ESMTP id zCfYNd2rQx9M; Tue, 10 May 2022 02:04:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 75EFB4B2EF;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B8DED4B2F4;
 	Tue, 10 May 2022 02:04:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 657C549B13
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 18:10:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E7214B0C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 19:59:38 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z0IaXolOBfNc for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2022 18:10:30 -0400 (EDT)
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com
- [209.85.167.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC60143482
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 18:10:29 -0400 (EDT)
-Received: by mail-lf1-f44.google.com with SMTP id w19so26190056lfu.11
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 15:10:29 -0700 (PDT)
+ with ESMTP id R0AyjFIbQ1DL for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2022 19:59:37 -0400 (EDT)
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com
+ [209.85.208.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A46B4B092
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 19:59:36 -0400 (EDT)
+Received: by mail-lj1-f169.google.com with SMTP id t25so18939323ljd.6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 16:59:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Y3SxyHvVr6AH+P/u24p00J7QGdQlTw5xBytxlx411I4=;
- b=S60tcQa3hhufmPZu0YE5j8DGjNpr9+Xz6+r1QLkzNffsRYJt9O7Uiay7J06u+WGHsO
- FRdBDTXyRDxs0sb4jFpzyb0I2gAhY6qLwHxzn+fHbvRJYvkWt/mdu6HgDdDJMjaRhv4M
- k2v6WrcrLTxUT/6vuY/Fmao9um0wfDvw5AVQz0CPfJ1x3KdbKBcTcJliZIMHaLqe2N17
- wqg9E6EUiPqGOmUD2sHba1TaKRUGmx7ldg23iESQdhAnH9hPONHRzFuqQgy80qbRTXQ5
- sCNnWdqiDvc31mrZVe9lK6n7UCdLaBMArCHs9hIfjKPZR72os9w19C6XDfd+gMKjGurL
- ylfw==
+ :cc; bh=sv3pTpJTnWXaUyOjFBwaWrS/CLWAom11yfRsP9pioX8=;
+ b=VF6L1TPfm2H2grwGvQxjXB/rArUophBvKMYmM/4AEEpeIZrYdUdTkfOBkEk4BEbWI2
+ /BgJZ8DPOFsMFZ5/prlhmlOCXI7dMWlqrjCriPK4EOPMoBMidR/ccweduFs1gDKmRT2a
+ jSe0+YixmYg86Fdp+ChmxZ0pmebT4hiwVv3DgQ+7zzAAdiclAHaSsZx+fOvRaoxK4gQl
+ ntcTyXAntp2EDiFAzJWUKf/TOAG3zn5txtEp+PpXundea+M6c7weB3Tkwug4AMtjQHXw
+ PJuQq1IbklNK0Aix9p1bGOaT0nnOf65MjY4stPTNcj1Kn4OveQSBaQvqSlsF5pHRI33D
+ 4PtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Y3SxyHvVr6AH+P/u24p00J7QGdQlTw5xBytxlx411I4=;
- b=J03UusF96aJv4uZv8b+wAlonYccAAMQVY9KgaMPLVVcVEx70x/u6XuP5fQzcO7l5+F
- w+NktDucCUjC+H70fOQ5mO6lJmoPZKfjZPF5bNcuwpNm/TRu/vFWthkghUoxjEyEtDg7
- W4RWEcdApTSr+QfS38D7ybp/rSkD1C+o4fKCXEIZ0KNfi9vDnywS3S3VUIKYDIiWxmxn
- GvXA/ap4uEeGnODCqXZgLAJfJ7jrH83qYPMt54fFoHs7PQI1QZBkx9kEQGDHLSWWy+x5
- VCgUKKsah72qNllFH+zrb7nIKi5B0RnOmnOYWqxDCdHTdeEhq8u39HrXC0PlSn5fzczp
- Oe5Q==
-X-Gm-Message-State: AOAM530k921t9cGapxSsI1oUNPwsSoVm3z5yn1YvJQjGvv1+SLRBaY/F
- WUVbHhj86LpOe12Weii8ki+qKDpy9BqsVRT5uL1OOQ==
-X-Google-Smtp-Source: ABdhPJyR1jE0W+hmlWReJPCUYLeK5huzg3KxrqedKuY1tZTZITWULOmJnhwlVRMvBRaBsFK94zOY8WXJKHFijLCmdIM=
-X-Received: by 2002:ac2:5399:0:b0:472:1f95:85df with SMTP id
- g25-20020ac25399000000b004721f9585dfmr14049979lfh.102.1652134228070; Mon, 09
- May 2022 15:10:28 -0700 (PDT)
+ bh=sv3pTpJTnWXaUyOjFBwaWrS/CLWAom11yfRsP9pioX8=;
+ b=KXXcKst/jUipQDQhFo5s/wst84yg1Bu1RRmzq+s5PFQ+ZNJIOm4d9YAQ5pcF0DLWxS
+ DFaPJIZBa9qQK0YlKirMppyp0Xk9GhiQDOkfpGNLOpzmRbBGNBCd6STcVc+Qo7Y3QZBV
+ lzc0q4YeMWI/vHPHSNQUmpSpgtgVfA7FSABVQgV1OhnrVS9af3NodQiPD2FEwYfUrIqT
+ psRVGRc5+NdiszmXDKywOFH2169lN3CpoXdu+MxrcygptIX1kwszCwJvdS/p87/iHGW3
+ H4Vrf0nDtxS7J2dMR7K7m9IEFGrYcRMOWrxsDQVCPiEQgHFoL6jC0tI6kj+jXEW9JXWP
+ Baug==
+X-Gm-Message-State: AOAM533Rt91ZLZAP6y/h7iekK/AAfINR9ZjCb39s6ZMuD5wQdPmOmVZz
+ q8V2eOQr+MagGzvqCl9R5VSmJDxyvBZDg6+aYYcwug==
+X-Google-Smtp-Source: ABdhPJzzfhA9KvrCN94ITvdKe/AlJljESk7ftI2Q4cbLmACU7hg6vyw4MuMeMX20juJBAyGaRDpk8iTGMDcKRMFMUho=
+X-Received: by 2002:a2e:9e54:0:b0:250:d6c8:c2a6 with SMTP id
+ g20-20020a2e9e54000000b00250d6c8c2a6mr1219325ljk.16.1652140775207; Mon, 09
+ May 2022 16:59:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-4-dmatlack@google.com>
- <YnRGpDa/kG+9h7Jd@google.com>
-In-Reply-To: <YnRGpDa/kG+9h7Jd@google.com>
+ <20220422210546.458943-12-dmatlack@google.com>
+ <YnRerE5+FpwkUdQE@google.com>
+ <CALzav=de1=euis3WocTNBi+xNn1Ypo-GRROQNqmtAKk6q1NUqg@mail.gmail.com>
+ <YnmcOdZILo2LqhAW@google.com>
+In-Reply-To: <YnmcOdZILo2LqhAW@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Mon, 9 May 2022 15:10:01 -0700
-Message-ID: <CALzav=fK9T5YwbiTU1qq7DZuE3E+MVRGDTHpKch7W9jQ9AR8bA@mail.gmail.com>
-Subject: Re: [PATCH v4 03/20] KVM: x86/mmu: Derive shadow MMU page role from
- parent
-To: Sean Christopherson <seanjc@google.com>,
- Lai Jiangshan <jiangshanlai@gmail.com>
+Date: Mon, 9 May 2022 16:59:08 -0700
+Message-ID: <CALzav=cPS82CyXD-90_K+pTaxBVDQicJ0er+LFdns5TqxA6ubA@mail.gmail.com>
+Subject: Re: [PATCH v4 11/20] KVM: x86/mmu: Allow for NULL vcpu pointer in
+ __kvm_mmu_get_shadow_page()
+To: Sean Christopherson <seanjc@google.com>
 X-Mailman-Approved-At: Tue, 10 May 2022 02:04:42 -0400
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
@@ -98,240 +99,201 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, May 5, 2022 at 2:50 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, May 9, 2022 at 3:57 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Fri, Apr 22, 2022, David Matlack wrote:
-> > Instead of computing the shadow page role from scratch for every new
-> > page, derive most of the information from the parent shadow page.  This
-> > avoids redundant calculations and reduces the number of parameters to
-> > kvm_mmu_get_page().
+> On Mon, May 09, 2022, David Matlack wrote:
+> > On Thu, May 5, 2022 at 4:33 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Fri, Apr 22, 2022, David Matlack wrote:
+> > > > Allow the vcpu pointer in __kvm_mmu_get_shadow_page() to be NULL. Rename
+> > > > it to vcpu_or_null to prevent future commits from accidentally taking
+> > > > dependency on it without first considering the NULL case.
+> > > >
+> > > > The vcpu pointer is only used for syncing indirect shadow pages in
+> > > > kvm_mmu_find_shadow_page(). A vcpu pointer it not required for
+> > > > correctness since unsync pages can simply be zapped. But this should
+> > > > never occur in practice, since the only use-case for passing a NULL vCPU
+> > > > pointer is eager page splitting which will only request direct shadow
+> > > > pages (which can never be unsync).
+> > > >
+> > > > Even though __kvm_mmu_get_shadow_page() can gracefully handle a NULL
+> > > > vcpu, add a WARN() that will fire if __kvm_mmu_get_shadow_page() is ever
+> > > > called to get an indirect shadow page with a NULL vCPU pointer, since
+> > > > zapping unsync SPs is a performance overhead that should be considered.
+> > > >
+> > > > Signed-off-by: David Matlack <dmatlack@google.com>
+> > > > ---
+> > > >  arch/x86/kvm/mmu/mmu.c | 40 ++++++++++++++++++++++++++++++++--------
+> > > >  1 file changed, 32 insertions(+), 8 deletions(-)
+> > > >
+> > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > > index 04029c01aebd..21407bd4435a 100644
+> > > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > > @@ -1845,16 +1845,27 @@ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
+> > > >         &(_kvm)->arch.mmu_page_hash[kvm_page_table_hashfn(_gfn)])     \
+> > > >               if ((_sp)->gfn != (_gfn) || (_sp)->role.direct) {} else
+> > > >
+> > > > -static int kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+> > > > -                      struct list_head *invalid_list)
+> > > > +static int __kvm_sync_page(struct kvm *kvm, struct kvm_vcpu *vcpu_or_null,
+> > > > +                        struct kvm_mmu_page *sp,
+> > > > +                        struct list_head *invalid_list)
+> > > >  {
+> > > > -     int ret = vcpu->arch.mmu->sync_page(vcpu, sp);
+> > > > +     int ret = -1;
+> > > > +
+> > > > +     if (vcpu_or_null)
+> > >
+> > > This should never happen.  I like the idea of warning early, but I really don't
+> > > like that the WARN is far removed from the code that actually depends on @vcpu
+> > > being non-NULL. Case in point, KVM should have bailed on the WARN and never
+> > > reached this point.  And the inner __kvm_sync_page() is completely unnecessary.
 > >
-> > Preemptively split out the role calculation to a separate function for
-> > use in a following commit.
+> > Yeah that's fair.
 > >
-> > No functional change intended.
+> > >
+> > > I also don't love the vcpu_or_null terminology; I get the intent, but it doesn't
+> > > really help because understand why/when it's NULL.
 > >
-> > Reviewed-by: Peter Xu <peterx@redhat.com>
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c         | 96 +++++++++++++++++++++++-----------
-> >  arch/x86/kvm/mmu/paging_tmpl.h |  9 ++--
-> >  2 files changed, 71 insertions(+), 34 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index dc20eccd6a77..4249a771818b 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -2021,31 +2021,15 @@ static void clear_sp_write_flooding_count(u64 *spte)
-> >       __clear_sp_write_flooding_count(sptep_to_sp(spte));
-> >  }
-> >
-> > -static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> > -                                          gfn_t gfn,
-> > -                                          gva_t gaddr,
-> > -                                          unsigned level,
-> > -                                          bool direct,
-> > -                                          unsigned int access)
-> > +static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu, gfn_t gfn,
-> > +                                          union kvm_mmu_page_role role)
-> >  {
-> > -     union kvm_mmu_page_role role;
-> >       struct hlist_head *sp_list;
-> > -     unsigned quadrant;
-> >       struct kvm_mmu_page *sp;
-> >       int ret;
-> >       int collisions = 0;
-> >       LIST_HEAD(invalid_list);
-> >
-> > -     role = vcpu->arch.mmu->root_role;
-> > -     role.level = level;
-> > -     role.direct = direct;
-> > -     role.access = access;
-> > -     if (role.has_4_byte_gpte) {
-> > -             quadrant = gaddr >> (PAGE_SHIFT + (PT64_PT_BITS * level));
-> > -             quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
-> > -             role.quadrant = quadrant;
-> > -     }
-> > -
+> > Eh, I don't think it needs to encode why or when. It just needs to
+> > flag to the reader (and future code authors) that this vcpu pointer
+> > (unlike all other vcpu pointers in KVM) is NULL in certain cases.
 >
-> When you rebase to kvm/queue, the helper will need to deal with
+> My objection is that without the why/when, developers that aren't familiar with
+> this code won't know the rules for using vcpu_or_null.  E.g. I don't want to end
+> up with
 >
->         if (level <= vcpu->arch.mmu->cpu_role.base.level)
->                 role.passthrough = 0;
+>         if (vcpu_or_null)
+>                 do x;
+>         else
+>                 do y;
 >
-> KVM should never create a passthrough huge page, so I believe it's just a matter
-> of adding yet another boolean param to kvm_mmu_child_role().
+> because inevitably it'll become unclear whether or not that code is actually _correct_.
+> It might not #GP on a NULL pointer, but it doesn't mean it's correct.
 
-+Lai Jiangshan
-
-It looks like only root pages can be passthrough, so
-kvm_mmu_child_role() can hard-code passthrough to 0. Lai do you agree?
-
->
->
-> >       sp_list = &vcpu->kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
-> >       for_each_valid_sp(vcpu->kvm, sp, sp_list) {
-> >               if (sp->gfn != gfn) {
-> > @@ -2063,7 +2047,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
-> >                        * Unsync pages must not be left as is, because the new
-> >                        * upper-level page will be write-protected.
-> >                        */
-> > -                     if (level > PG_LEVEL_4K && sp->unsync)
-> > +                     if (role.level > PG_LEVEL_4K && sp->unsync)
-> >                               kvm_mmu_prepare_zap_page(vcpu->kvm, sp,
-> >                                                        &invalid_list);
-> >                       continue;
->
-> ...
->
-> > @@ -3310,12 +3338,21 @@ static int mmu_check_root(struct kvm_vcpu *vcpu, gfn_t root_gfn)
-> >       return ret;
-> >  }
-> >
-> > -static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, gva_t gva,
-> > +static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
-> >                           u8 level, bool direct)
-> >  {
-> > +     union kvm_mmu_page_role role;
-> >       struct kvm_mmu_page *sp;
-> >
-> > -     sp = kvm_mmu_get_page(vcpu, gfn, gva, level, direct, ACC_ALL);
-> > +     role = vcpu->arch.mmu->root_role;
-> > +     role.level = level;
-> > +     role.direct = direct;
-> > +     role.access = ACC_ALL;
-> > +
-> > +     if (role.has_4_byte_gpte)
-> > +             role.quadrant = quadrant;
->
-> Maybe add a comment explaining the PAE and 32-bit paging paths share a call for
-> allocating PDPTEs?  Otherwise it looks like passing a non-zero quadrant when the
-> guest doesn't have 4-byte PTEs should be a bug.
->
-> Hmm, even better, if the check is moved to the caller, then this can be:
->
->         role.level = level;
->         role.direct = direct;
->         role.access = ACC_ALL;
->         role.quadrant = quadrant;
->
->         WARN_ON_ONCE(quadrant && !role.has_4_byte_gpte));
->         WARN_ON_ONCE(direct && role.has_4_byte_gpte));
->
-> and no comment is necessary.
-
-Sure.
+Ah, right. And that's actually why I put the big comment and WARN in
+__kvm_mmu_get_shadow_page(). Readers could easily jump to where
+vcpu_or_null is passed in and see the rules around it. But if we move
+the WARN to the kvm_sync_page() call, I agree it will be harder for
+readers to know the rules and "vcpu_or_null" starts to become a risky
+variable.
 
 >
-> > +
-> > +     sp = kvm_mmu_get_page(vcpu, gfn, role);
-> >       ++sp->root_count;
+> > > I played around with casting, e.g. to/from an unsigned long or void *, to prevent
+> > > usage, but that doesn't work very well because 'unsigned long' ends up being
+> > > awkward/confusing, and 'void *' is easily lost on a function call.  And both
+> > > lose type safety :-(
 > >
-> >       return __pa(sp->spt);
-> > @@ -3349,8 +3386,8 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
-> >               for (i = 0; i < 4; ++i) {
-> >                       WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
+> > Yet another shortcoming of C :(
+>
+> And lack of closures, which would work very well here.
+>
+> > (The other being our other discussion about the RET_PF* return codes
+> > getting easily misinterpreted as KVM's magic return-to-user /
+> > continue-running-guest return codes.)
 > >
-> > -                     root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
-> > -                                           i << 30, PT32_ROOT_LEVEL, true);
-> > +                     root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT), i,
+> > Makes me miss Rust!
+> >
+> > >
+> > > All in all, I think I'd prefer this patch to simply be a KVM_BUG_ON() if
+> > > kvm_mmu_find_shadow_page() encounters an unsync page.  Less churn, and IMO there's
+> > > no real loss in robustness, e.g. we'd really have to screw up code review and
+> > > testing to introduce a null vCPU pointer dereference in this code.
+> >
+> > Agreed about moving the check here and dropping __kvm_sync_page(). But
+> > I would prefer to retain the vcpu_or_null name (or at least something
+> > other than "vcpu" to indicate there's something non-standard about
+> > this pointer).
 >
-> The @quadrant here can be hardcoded to '0', has_4_byte_gpte is guaranteed to be
-> false if the MMU is direct.  And then in the indirect path, set gva (and then
-> quadrant) based on 'i' iff the guest is using 32-bit paging.
+> The least awful idea I've come up with is wrapping the vCPU in a struct, e.g.
 >
-> Probably worth making it a separate patch just in case I'm forgetting something.
-> Lightly tested...
+>         struct sync_page_info {
+>                 void *vcpu;
+>         }
+>
+> That provides the contextual information I want, and also provides the hint that
+> something is odd about the vcpu, which you want.  It's like a very poor man's closure :-)
+>
+> The struct could even be passed by value to avoid the miniscule overhead, and to
+> make readers look extra hard because it's that much more wierd.
 
-Looks sane. I'll incorporate something like this in v5.
+Interesting idea. I'll give it a shot.
 
->
-> --
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Thu, 5 May 2022 14:19:35 -0700
-> Subject: [PATCH] KVM: x86/mmu: Pass '0' for @gva when allocating root with
->  8-byte gpte
->
-> Pass '0' instead of the "real" gva when allocating a direct PAE root,
-> a.k.a. a direct PDPTE, and when allocating indirect roots that shadow
-> 64-bit / 8-byte GPTEs.
->
-> Thee @gva is only needed if the root is shadowing 32-bit paging in the
-> guest, in which case KVM needs to use different shadow pages for each of
-> the two 4-byte GPTEs covered by KVM's 8-byte PAE SPTE.
->
-> For direct MMUs, there's obviously no shadowing, and for indirect MMU
->
-> In anticipation of moving the quadrant logic into mmu_alloc_root(), WARN
-> if a non-zero @gva is passed for !4-byte GPTEs, and WARN if 4-byte GPTEs
-> are ever combined with a direct root (there's no shadowing, so TDP roots
-> should ignore the GPTE size).
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
 >
 > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index dc20eccd6a77..6dfa3cfa8394 100644
+> index 3d102522804a..068be77a4fff 100644
 > --- a/arch/x86/kvm/mmu/mmu.c
 > +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3313,8 +3313,12 @@ static int mmu_check_root(struct kvm_vcpu *vcpu, gfn_t root_gfn)
->  static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, gva_t gva,
->                             u8 level, bool direct)
->  {
-> +       union kvm_mmu_page_role role = vcpu->arch.mmu->root_role;
->         struct kvm_mmu_page *sp;
+> @@ -2003,8 +2003,13 @@ static void clear_sp_write_flooding_count(u64 *spte)
+>         __clear_sp_write_flooding_count(sptep_to_sp(spte));
+>  }
 >
-> +       WARN_ON_ONCE(gva && !role.has_4_byte_gpte);
-> +       WARN_ON_ONCE(direct && role.has_4_byte_gpte);
+> +/* Wrapper to make it difficult to dereference a potentially NULL @vcpu. */
+> +struct sync_page_info {
+> +       void *vcpu;
+> +};
 > +
->         sp = kvm_mmu_get_page(vcpu, gfn, gva, level, direct, ACC_ALL);
->         ++sp->root_count;
+>  static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
+> -                                                    struct kvm_vcpu *vcpu,
+> +                                                    struct sync_page_info spi,
+>                                                      gfn_t gfn,
+>                                                      struct hlist_head *sp_list,
+>                                                      union kvm_mmu_page_role role)
+> @@ -2041,6 +2046,13 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
+>                         goto out;
 >
-> @@ -3349,8 +3353,8 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
->                 for (i = 0; i < 4; ++i) {
->                         WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
+>                 if (sp->unsync) {
+> +                       /*
+> +                        * Getting indirect shadow pages without a valid @spi
+> +                        * is not supported, i.e. this should never happen.
+> +                        */
+> +                       if (KVM_BUG_ON(!spi.vcpu, kvm))
+> +                               break;
+> +
+>                         /*
+>                          * The page is good, but is stale.  kvm_sync_page does
+>                          * get the latest guest state, but (unlike mmu_unsync_children)
+> @@ -2053,7 +2065,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
+>                          * If the sync fails, the page is zapped.  If so, break
+>                          * in order to rebuild it.
+>                          */
+> -                       ret = kvm_sync_page(vcpu, sp, &invalid_list);
+> +                       ret = kvm_sync_page(spi.vcpu, sp, &invalid_list);
+>                         if (ret < 0)
+>                                 break;
 >
-> -                       root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT),
-> -                                             i << 30, PT32_ROOT_LEVEL, true);
-> +                       root = mmu_alloc_root(vcpu, i << (30 - PAGE_SHIFT), 0,
-> +                                             PT32_ROOT_LEVEL, true);
->                         mmu->pae_root[i] = root | PT_PRESENT_MASK |
->                                            shadow_me_mask;
->                 }
-> @@ -3435,6 +3439,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->         u64 pdptrs[4], pm_mask;
->         gfn_t root_gfn, root_pgd;
->         hpa_t root;
-> +       gva_t gva;
->         unsigned i;
->         int r;
+> @@ -2120,7 +2132,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+>  }
 >
-> @@ -3508,6 +3513,7 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->                 }
->         }
+>  static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
+> -                                                     struct kvm_vcpu *vcpu,
+> +                                                     struct sync_page_info spi,
+>                                                       struct shadow_page_caches *caches,
+>                                                       gfn_t gfn,
+>                                                       union kvm_mmu_page_role role)
+> @@ -2131,7 +2143,7 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
 >
-> +       gva = 0;
->         for (i = 0; i < 4; ++i) {
->                 WARN_ON_ONCE(IS_VALID_PAE_ROOT(mmu->pae_root[i]));
+>         sp_list = &kvm->arch.mmu_page_hash[kvm_page_table_hashfn(gfn)];
 >
-> @@ -3517,9 +3523,11 @@ static int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
->                                 continue;
->                         }
->                         root_gfn = pdptrs[i] >> PAGE_SHIFT;
-> +               } else if (mmu->cpu_role.base.level == PT32_ROOT_LEVEL) {
-> +                       gva = i << 30;
->                 }
+> -       sp = kvm_mmu_find_shadow_page(kvm, vcpu, gfn, sp_list, role);
+> +       sp = kvm_mmu_find_shadow_page(kvm, spi, gfn, sp_list, role);
+>         if (!sp) {
+>                 created = true;
+>                 sp = kvm_mmu_alloc_shadow_page(kvm, caches, gfn, sp_list, role);
+> @@ -2151,7 +2163,11 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
+>                 .gfn_array_cache = &vcpu->arch.mmu_gfn_array_cache,
+>         };
 >
-> -               root = mmu_alloc_root(vcpu, root_gfn, i << 30,
-> +               root = mmu_alloc_root(vcpu, root_gfn, gva,
->                                       PT32_ROOT_LEVEL, false);
->                 mmu->pae_root[i] = root | pm_mask;
->         }
+> -       return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
+> +       struct sync_page_info spi = {
+> +               .vcpu = vcpu,
+> +       };
+> +
+> +       return __kvm_mmu_get_shadow_page(vcpu->kvm, spi, &caches, gfn, role);
+>  }
 >
-> base-commit: 8bae380ad7dd3c31266d3685841ea4ce574d462d
-> --
+>  static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 access)
 >
 _______________________________________________
 kvmarm mailing list
