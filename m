@@ -2,68 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB4BBC433EF
-	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 16:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A77FDC433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 16:26:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21E574B30D;
-	Mon,  9 May 2022 12:26:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DD2E4B302;
+	Mon,  9 May 2022 12:26:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LW6+4g4toCVz; Mon,  9 May 2022 12:26:17 -0400 (EDT)
+	with ESMTP id M65mLcRHX9KS; Mon,  9 May 2022 12:26:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id F101C4B2F4;
-	Mon,  9 May 2022 12:26:16 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C8204B306;
+	Mon,  9 May 2022 12:26:18 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 759134B20F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 12:26:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 046714B1B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 12:26:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rb75D5qLzdaj for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2022 12:26:14 -0400 (EDT)
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com
- [209.85.216.73])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6FC204B1B5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 12:26:14 -0400 (EDT)
-Received: by mail-pj1-f73.google.com with SMTP id
- t15-20020a17090a3b4f00b001d67e27715dso10828361pjf.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 09:26:14 -0700 (PDT)
+ with ESMTP id OtQqNCAYxmIZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2022 12:26:15 -0400 (EDT)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA6DD4B20F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 12:26:15 -0400 (EDT)
+Received: by mail-pf1-f201.google.com with SMTP id
+ cn13-20020a056a00340d00b0050e0f04e467so4931983pfb.21
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 09:26:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=24ZXTLzrcb04Vr94e2BinqljFa5PLSd+pPp++TfBpV4=;
- b=P2MUNiyZ52zkfiPjcTS8SbrOv+J4pIHeiuXQFaZnESg+NLVcCU4AR/+fuZgpSBJHvE
- rej/pBP0q29OlurWs27cZq38903lkbwzGDQrWMriEBwcQEe3UtVPAayTBp96OwiKgap+
- LxnYhTuP4ZWRpIebRHdev99As+Py+mvlCVMd3D2qN5Qmpq8aghskctCe/hfEfC249O+L
- 3n0gWT+eovPuEaB24iPZEmL9XqbtVwLE//FTCfavnJqsLwR6eOuJ/ZgMEPsWRJFbX9I8
- dfcd2f2RR2knl9FJNgaSc9pfkr2xrKpX4HOJPcQnVcrbmwKGZvCTvtme2vs6Y1WphhFs
- dGIg==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=ramO0+cEkxqJX3F8coHgv6jkuFbFeK102oolsavMu20=;
+ b=dzr2hls94IW3ClUuA2BSr4qrrnhWvuyEZI8nmXUIdiJHGzCNV42d2pewDNyyq80z8v
+ bWsUx/m5Ue/BW1YKhvz5ey2N7GtbjeXfSalL431rTrIhm9CbPH2N7m/FTSxFsyeD3qUp
+ vXJqArAH9zH6NJ6jgi3AYOdxSAZQ/zZ5hPibtfe7o8lwCwTgu6Cz50/+wdJ7XGjzpShB
+ ARsg0FK+LbtIxB0pYfEVUWq8IWxV5K/BYzouxazPSfK7emCZnaAacA2ohaNp1x+3aIGa
+ jyR/0vEsVlbDWN+XzL8wXDCFCcrU9hSGVTMq87y7rn8FTavQQDuIBOI5u0j2wnP/e64n
+ LqNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=24ZXTLzrcb04Vr94e2BinqljFa5PLSd+pPp++TfBpV4=;
- b=fH+TcDlesWCjdJ3xraZB1ArqrtkudJYH4rRZOouTeL1ciQ+ZodN7IZVp7Ykn7rC6KX
- UYNLsVpsfeqM0+LhZEwN1YUlyKcM74P1s2ihS8UZDeezoMwXQMECG7wQw8zbuncDRWjp
- 5K89d7A0k/E8Zg/7NW001utl2BgPUXKDgfLDPO+qf4o5oOkewYGYw299Z+1jAH1ouZrI
- 57Kkdafi7vLqprqKjdTYHdRjmEEC7zTFWKdxDiSsmuXKqU7VB5Zh2YXjRnwtMrd0O9Hb
- Eekqe2N30YgwnfTA8X17g6mbp6TAnzUflGtwKAmaGuCITCf1otAJfToj6iNEPx8wgW0J
- NgLw==
-X-Gm-Message-State: AOAM531SgSTWIwofGxUiXoZ7oJIXdULyguWmze3EPJYNUQKowVejH3kw
- XhEU1wjSMtquLvIhanXTQS/u9JHsSULtKflO/6dy2w+NoIJXA7li9l3stxw2+88ZDsNOoCtjt51
- gnFrP7FAFHYBVJu1oeq+yYXyVxex26vOyWgB9CW2mbQLejh+lilvrcLbUvsjSZeTMsV6e7A==
-X-Google-Smtp-Source: ABdhPJw1MOqIa/OCx3HluxWiZNUBlyVCmiV5/bxnPcSifyQh0atyvanFNrvtWw7hQl7rFciI7mrRmNlka6M=
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=ramO0+cEkxqJX3F8coHgv6jkuFbFeK102oolsavMu20=;
+ b=tPcCmrM+ugbgMB7Hs2djcPBuh5Sk7gYhYX+sYM3e0qbJ+NYV2UohfWjdqC0mpK03sh
+ 9TTwVfgwSwpv8sbwCzYd825tIJ5/ZJYL4Y2gsi0181oNcn1dROgSEH6h2w+InNGVDYkv
+ plGgBfrTfLYUqDvOn63vEAyBZOYaPEbguwZfSS8zfzajbwjISSiJUahnSxQTHRAxxIgZ
+ 2NnJWLpG7BH1tW3dx9fu5th0qlkRidMLncRM7D8gaTKntsj4V+8qdW188Ati/X0l1ulj
+ oAdxm7pg+fdWgQzye+TWhaJZkpusFEx1tUzbOEnOL0CHnggFRZnAkoZ6jwwjsuEuWbO4
+ OB8w==
+X-Gm-Message-State: AOAM531xp3uELram83X8SARk8QUKF4nK72GK8YSdaTurbq1voEWW/fkK
+ tWL+r6N5xFgvH94qxdhd/o4vH6RtBEase3eTC+lG/uzKd2L6R1ErLWYBqFLIve9AVqwlg/uXR+H
+ MMcZHxv2rTyvTGyWnKryWvTTQdmuszDct94Hl9ocrWYCKi3xN7J0mJKfNTdwvpledpYvoPw==
+X-Google-Smtp-Source: ABdhPJzdjvmm33Xww7qbolbHONdNzfLPiXVqOOHjncbxPv2g5srfZyPR6YVyWtFPJJJKmTvTXT956abVHGQ=
 X-Received: from oupton3.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a17:902:e94e:b0:15b:22a7:f593 with SMTP id
- b14-20020a170902e94e00b0015b22a7f593mr17113726pll.148.1652113573120; Mon, 09
- May 2022 09:26:13 -0700 (PDT)
-Date: Mon,  9 May 2022 16:25:57 +0000
-Message-Id: <20220509162559.2387784-1-oupton@google.com>
+ (user=oupton job=sendgmr) by 2002:a17:902:e74d:b0:15e:94f7:611e with SMTP id
+ p13-20020a170902e74d00b0015e94f7611emr17008035plf.37.1652113574927; Mon, 09
+ May 2022 09:26:14 -0700 (PDT)
+Date: Mon,  9 May 2022 16:25:58 +0000
+In-Reply-To: <20220509162559.2387784-1-oupton@google.com>
+Message-Id: <20220509162559.2387784-2-oupton@google.com>
 Mime-Version: 1.0
+References: <20220509162559.2387784-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
-Subject: [PATCH 0/2] KVM: arm64: Minor pKVM cleanups
+Subject: [PATCH 1/2] KVM: arm64: pkvm: Drop unnecessary FP/SIMD trap handler
 From: Oliver Upton <oupton@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
@@ -84,19 +87,57 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-I was reading through some of the pKVM stuff to get an idea of how it
-handles feature registers and spotted a few minor nits.
+The pVM-specific FP/SIMD trap handler just calls straight into the
+generic trap handler. Avoid the indirection and just call the hyp
+handler directly.
 
-Applies cleanly to 5.18-rc5.
+Note that the BUILD_BUG_ON() pattern is repeated in
+pvm_init_traps_aa64pfr0(), which is likely a better home for it.
 
-Oliver Upton (2):
-  KVM: arm64: pkvm: Drop unnecessary FP/SIMD trap handler
-  KVM: arm64: pkvm: Don't mask already zeroed FEAT_SVE
+No functional change intended.
 
- arch/arm64/kvm/hyp/nvhe/switch.c   | 19 +------------------
- arch/arm64/kvm/hyp/nvhe/sys_regs.c |  3 ---
- 2 files changed, 1 insertion(+), 21 deletions(-)
+Signed-off-by: Oliver Upton <oupton@google.com>
+---
+ arch/arm64/kvm/hyp/nvhe/switch.c | 19 +------------------
+ 1 file changed, 1 insertion(+), 18 deletions(-)
 
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 6410d21d8695..3dee2ad96e10 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -175,23 +175,6 @@ static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 		kvm_handle_pvm_sysreg(vcpu, exit_code));
+ }
+ 
+-/**
+- * Handler for protected floating-point and Advanced SIMD accesses.
+- *
+- * Returns true if the hypervisor has handled the exit, and control should go
+- * back to the guest, or false if it hasn't.
+- */
+-static bool kvm_handle_pvm_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+-{
+-	/* Linux guests assume support for floating-point and Advanced SIMD. */
+-	BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_FP),
+-				PVM_ID_AA64PFR0_ALLOW));
+-	BUILD_BUG_ON(!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64PFR0_ASIMD),
+-				PVM_ID_AA64PFR0_ALLOW));
+-
+-	return kvm_hyp_handle_fpsimd(vcpu, exit_code);
+-}
+-
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+@@ -207,7 +190,7 @@ static const exit_handler_fn pvm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_SYS64]		= kvm_handle_pvm_sys64,
+ 	[ESR_ELx_EC_SVE]		= kvm_handle_pvm_restricted,
+-	[ESR_ELx_EC_FP_ASIMD]		= kvm_handle_pvm_fpsimd,
++	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
+ 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
+ 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
 -- 
 2.36.0.512.ge40c2bad7a-goog
 
