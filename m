@@ -2,74 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E5DC43217
-	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 00:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15704C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 06:04:44 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BC2C4B1F3;
-	Mon,  9 May 2022 20:16:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7340E4B17B;
+	Tue, 10 May 2022 02:04:44 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DdNRLnXoacw5; Mon,  9 May 2022 20:16:46 -0400 (EDT)
+	with ESMTP id 6fNSX6W+HHKD; Tue, 10 May 2022 02:04:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A67E34B129;
-	Mon,  9 May 2022 20:16:45 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2928D4B1E0;
+	Tue, 10 May 2022 02:04:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4D344B20A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 20:16:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DD1A74A014
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 16:53:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O1t45ITjY8I6 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2022 20:16:43 -0400 (EDT)
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
- [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2CF14B14D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 20:16:43 -0400 (EDT)
-Received: by mail-pj1-f74.google.com with SMTP id
- q3-20020a17090a304300b001dd2130b435so1421582pjl.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 17:16:43 -0700 (PDT)
+ with ESMTP id rFAbVPawg4oY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2022 16:53:48 -0400 (EDT)
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com
+ [209.85.167.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DEDC49F4A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 16:53:48 -0400 (EDT)
+Received: by mail-lf1-f41.google.com with SMTP id u23so20226361lfc.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 13:53:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=QD0NrA0rKRp0pec8KTI6IW9xj1xL+jmM30atKcgc1k8=;
- b=IsPJS7H00adX3QCpXSD/mei1YnsTS2t4N0eGi1xaHGFE9rvLkH7wtUefVUaJfrzn2p
- 10u5MV81UqQWp3TpHepR6qIEBLGeFmlK0kDu2Kt0BEc1l5jB+ODl1tq//5JLEFO4wbaT
- 7KRRS+4714+Dzjthcko2VpxIjKNWkKbe7MEf1NPZoCBOzC7ijO+aAvZSqhnQr9JcxpYF
- +TZ9CyIGWmQXW6DZt9E+Ggsp1F88nhlZhYws0RTap6rjuNvr9klcWR2CgcYO2rS9wxtz
- SgY/DIZ1ud9YikCUqrQPR2gp6+hlA1XGmcXhy+0266rdssKkbAp8XzxMvoK4snDkZciU
- Jmkg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=juLv0tHpYyniXYJdhCO4IxrUzdGFAB7hgGLuXWxzzfQ=;
+ b=sRZ7gFCnwGjke9Wy7MLVeZ5O0pOeCU9NprkShjZhbejgMypvTgHE4yc3vifvxCNILW
+ kSIZJ/CoKbTAq+5dr8eFKZdVdVqRgUP3XWXoOUKk8XQb5nTv6W54BQcarUUUYhRKizgk
+ iujC3c1SKkL5XlpepNx1f1AOO4+7qMzGYgwTIZbbi1ptSn1ndmsmXhHpMMm6s2ZfSFZt
+ pyvC4L5K+czwRFO5op8YzGtjjgsEOAWeR0E5RddYpLcOWTKUCY9qQr3k+FTZxfIfuAj6
+ WIByklV6HkfKOcUB6vX/KH6jQodXZaEnZQc4VvsVPJbH0jRYWbhBUGhaj43wbYvDlPJb
+ 4UaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:in-reply-to:message-id:mime-version
- :references:subject:from:to:cc;
- bh=QD0NrA0rKRp0pec8KTI6IW9xj1xL+jmM30atKcgc1k8=;
- b=PlYczruEN5OqI2tm9rMNi0WafUTWgpNRMnGRbArCGof5MtWGqzwfstyZoksxLsjC/u
- Gk4jTS1GqlGARnp0woG5beKKAn4jdw4KosrTF7h3tV3eiwgf6ep8HNiH/Wv1M68yatgl
- 26Jqxc5kZIuMkBH+CAoasFxaqdOmsIqjAeKWWJLJdH1hg1yyTnzUKwB+Oclxmo9ZkdTO
- PpiWeJMMTfACoH/9gDZ1qePeNoXg3A7ouh1oGQChejxNJAwlSmlKDOfURTKvkBO9grQu
- 0HKBnrzsFeH+jpfh347RExQurmOlOM259LPbiuo3qqLw3I+xBQ/pE6YRxfB0dGy1qloA
- LsjA==
-X-Gm-Message-State: AOAM531Pen0FlZ3WByp2/KBa4ceb5PoF68QuPc5AfzNTv3Jt1uiIFI5x
- zwQZBwTlngNh2283n6iiEatMap179mIDvA==
-X-Google-Smtp-Source: ABdhPJxEsqmOiWFXOmG9gfTVXmnMY2awFbxdCsS4fVflAyYeQ7zgfAEbrQ7Klo1c6Bx3gWtqokF0wyTe4W0ZOQ==
-X-Received: from ricarkol2.c.googlers.com
- ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a05:6a00:15c2:b0:510:6d56:730 with SMTP
- id o2-20020a056a0015c200b005106d560730mr18178625pfu.62.1652141802619; Mon, 09
- May 2022 17:16:42 -0700 (PDT)
-Date: Mon,  9 May 2022 17:16:33 -0700
-In-Reply-To: <20220510001633.552496-1-ricarkol@google.com>
-Message-Id: <20220510001633.552496-5-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20220510001633.552496-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
-Subject: [PATCH v3 4/4] KVM: arm64: vgic: Undo work in failed ITS restores
-From: Ricardo Koller <ricarkol@google.com>
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: andre.przywara@arm.com, pshier@google.com, maz@kernel.org,
- pbonzini@redhat.com
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=juLv0tHpYyniXYJdhCO4IxrUzdGFAB7hgGLuXWxzzfQ=;
+ b=1tGIYpM0OhjkiPca9ZhPb3EgpMfJq9v2kXlxJS7zhY6d5y6OhlpgzcWUspd3xSaGXw
+ zsjJISkQjaPw6EMSo66CFkBavueMwYxGIV5B+sm67npmM0+jpX4rAMxU4G0ztJQir6En
+ sdBlgwf2I5iAcsEQbazA/M4FHVheEvuD/yr0ZOWQpTmxEcu+cpM+/7uZvC0Z2wkk2WMO
+ Ktb1Qg7M6Bgaox++twSiH/op482+bZiUKcTvl/NmpK5l9PtnfC2xuleNQabErf89KRCs
+ TMQZ8vQmaZpiGPD1tG3q+0CO/ITrHA7rgAEXbqkt1XHrUBJ+gyCWlMwwReS/YebvJW4g
+ uYkA==
+X-Gm-Message-State: AOAM530zT2Anz++wo5oECkYElqagvDUCiyXJ8NR0KFHbUSDWSzC4COZs
+ UQXitWPNm1t7wV8s08QHcW3Wiy8VGMrIycjown170w==
+X-Google-Smtp-Source: ABdhPJwFVmz6RcyS9btj/o1ZoybvFtU4h2ot2/ATLJyzYvOdSTHlqVpOgczeC9S/D+0ST2v4E6oNv/tLBiH0Fcx36+k=
+X-Received: by 2002:a19:8c1a:0:b0:472:315:48db with SMTP id
+ o26-20020a198c1a000000b00472031548dbmr13897928lfd.235.1652129626813; Mon, 09
+ May 2022 13:53:46 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220422210546.458943-1-dmatlack@google.com>
+ <20220422210546.458943-6-dmatlack@google.com>
+ <YnRLVB+t0bLBeu+/@google.com>
+In-Reply-To: <YnRLVB+t0bLBeu+/@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 9 May 2022 13:53:20 -0700
+Message-ID: <CALzav=cRwx2qSvtt1r=4W1b81jTjVMA4rZBxbtrmCwd_91__yg@mail.gmail.com>
+Subject: Re: [PATCH v4 05/20] KVM: x86/mmu: Consolidate shadow page allocation
+ and initialization
+To: Sean Christopherson <seanjc@google.com>
+X-Mailman-Approved-At: Tue, 10 May 2022 02:04:42 -0400
+Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -86,77 +97,96 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Failed ITS restores should clean up all state restored until the
-failure. There is some cleanup already present when failing to restore
-some tables, but it's not complete. Add the missing cleanup.
+On Thu, May 5, 2022 at 3:10 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Apr 22, 2022, David Matlack wrote:
+> > Consolidate kvm_mmu_alloc_page() and kvm_mmu_alloc_shadow_page() under
+> > the latter so that all shadow page allocation and initialization happens
+> > in one place.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 39 +++++++++++++++++----------------------
+> >  1 file changed, 17 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 5582badf4947..7d03320f6e08 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -1703,27 +1703,6 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
+> >       mmu_spte_clear_no_track(parent_pte);
+> >  }
+> >
+> > -static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, bool direct)
+> > -{
+> > -     struct kvm_mmu_page *sp;
+> > -
+> > -     sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+> > -     sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+> > -     if (!direct)
+> > -             sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
+> > -     set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+> > -
+> > -     /*
+> > -      * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
+> > -      * depends on valid pages being added to the head of the list.  See
+> > -      * comments in kvm_zap_obsolete_pages().
+> > -      */
+> > -     sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
+> > -     list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
+> > -     kvm_mod_used_mmu_pages(vcpu->kvm, +1);
+> > -     return sp;
+> > -}
+> > -
+> >  static void mark_unsync(u64 *spte);
+> >  static void kvm_mmu_mark_parents_unsync(struct kvm_mmu_page *sp)
+> >  {
+> > @@ -2100,7 +2079,23 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm_vcpu *vcpu,
+> >                                                     struct hlist_head *sp_list,
+> >                                                     union kvm_mmu_page_role role)
+> >  {
+> > -     struct kvm_mmu_page *sp = kvm_mmu_alloc_page(vcpu, role.direct);
+> > +     struct kvm_mmu_page *sp;
+> > +
+> > +     sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+> > +     sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+> > +     if (!role.direct)
+> > +             sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
+> > +
+> > +     set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+> > +
+> > +     /*
+> > +      * active_mmu_pages must be a FIFO list, as kvm_zap_obsolete_pages()
+> > +      * depends on valid pages being added to the head of the list.  See
+> > +      * comments in kvm_zap_obsolete_pages().
+> > +      */
+> > +     sp->mmu_valid_gen = vcpu->kvm->arch.mmu_valid_gen;
+> > +     list_add(&sp->link, &vcpu->kvm->arch.active_mmu_pages);
+> > +     kvm_mod_used_mmu_pages(vcpu->kvm, +1);
+>
+> To reduce churn later on, what about opportunistically grabbing vcpu->kvm in a
+> local variable in this patch?
+>
+> Actually, at that point, it's a super trivial change, so you can probably just drop
+>
+>         KVM: x86/mmu: Replace vcpu with kvm in kvm_mmu_alloc_shadow_page()
+>
+> and do the vcpu/kvm swap as part of
+>
+>         KVM: x86/mmu: Pass memory caches to allocate SPs separately
 
-Note that this changes the behavior in case of a failed restore of the
-device tables.
+I'm not sure it's any less churn, it's just doing the same amount of
+changes in fewer commits. Is there a benefit of using less commits? I
+can only think of downsides (harder to review, harder to bisect).
 
-	restore ioctl:
-	1. restore collection tables
-	2. restore device tables
-
-With this commit, failures in 2. clean up everything created so far,
-including state created by 1.
-
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arch/arm64/kvm/vgic/vgic-its.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index f34e09cc86dc..b50542c98d79 100644
---- a/arch/arm64/kvm/vgic/vgic-its.c
-+++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -2219,8 +2219,10 @@ static int vgic_its_restore_ite(struct vgic_its *its, u32 event_id,
- 		vcpu = kvm_get_vcpu(kvm, collection->target_addr);
- 
- 	irq = vgic_add_lpi(kvm, lpi_id, vcpu);
--	if (IS_ERR(irq))
-+	if (IS_ERR(irq)) {
-+		its_free_ite(kvm, ite);
- 		return PTR_ERR(irq);
-+	}
- 	ite->irq = irq;
- 
- 	return offset;
-@@ -2485,6 +2487,9 @@ static int vgic_its_restore_device_tables(struct vgic_its *its)
- 	if (ret > 0)
- 		ret = 0;
- 
-+	if (ret < 0)
-+		vgic_its_free_device_list(its->dev->kvm, its);
-+
- 	return ret;
- }
- 
-@@ -2615,6 +2620,9 @@ static int vgic_its_restore_collection_table(struct vgic_its *its)
- 	if (ret > 0)
- 		return 0;
- 
-+	if (ret < 0)
-+		vgic_its_free_collection_list(its->dev->kvm, its);
-+
- 	return ret;
- }
- 
-@@ -2646,7 +2654,10 @@ static int vgic_its_restore_tables_v0(struct vgic_its *its)
- 	if (ret)
- 		return ret;
- 
--	return vgic_its_restore_device_tables(its);
-+	ret = vgic_its_restore_device_tables(its);
-+	if (ret)
-+		vgic_its_free_collection_list(its->dev->kvm, its);
-+	return ret;
- }
- 
- static int vgic_its_commit_v0(struct vgic_its *its)
--- 
-2.36.0.512.ge40c2bad7a-goog
-
+>
+> >       sp->gfn = gfn;
+> >       sp->role = role;
+> > --
+> > 2.36.0.rc2.479.g8af0fa9b8e-goog
+> >
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
