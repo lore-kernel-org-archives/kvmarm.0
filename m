@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D70CAC433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 06:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F9F7C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 06:04:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 877424B20A;
-	Tue, 10 May 2022 02:04:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D5D2E4B210;
+	Tue, 10 May 2022 02:04:48 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DHisuf7WXa7E; Tue, 10 May 2022 02:04:47 -0400 (EDT)
+	with ESMTP id 7DinCcRCZUqn; Tue, 10 May 2022 02:04:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id A17914B29C;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA7B84B2B4;
 	Tue, 10 May 2022 02:04:43 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E195949F01
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 17:28:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B11349EBC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 17:30:08 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1pTWxljguHIu for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2022 17:28:14 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF8DB49EF2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 17:28:13 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id y32so26046732lfa.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 14:28:13 -0700 (PDT)
+ with ESMTP id P+-JBcR80U4f for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2022 17:30:07 -0400 (EDT)
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com
+ [209.85.208.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BE9A49EBB
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 17:30:07 -0400 (EDT)
+Received: by mail-lj1-f178.google.com with SMTP id q130so18588057ljb.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 14:30:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lLXDpS9aIKv2BOfm7qGe20v7/h2Jmvrj+hyHCut5ohw=;
- b=oyNullodeqUuuE421QfGbnwxO+DFaD2869iT7IedC61l5rZttPc/rSSzE78vqgW1qc
- /yDSeSm/xObDW0SQYPjuLw/oabxydsD1u1pqk6iDs+C4RePn/EBKPD26MXSn/Bqau+vE
- 0vOQ0geMRnQRwNm4gtwQvXfhzE5wxzP2IR9rDPAfNyK+lM2iV9Bq1y9YKNHQPxElg7dK
- HLSVmL0ZsXbI6xxQJD5n9kbgUSl73kAzVVOPO5r4rxxie5OCXNJsiaS4Mk11+iplA7nS
- pCdRT/tZG9CzS1KAbQLLw6d11fWTcP/PbyYKjlJt8m4+EMQMD/pL6baQwgIfp/nZSGYH
- OVEg==
+ :cc; bh=MvwsQDLTKMJTgQOuZM3iVmxfL3yQn70yj6MptUuzyQ4=;
+ b=KogQHf/McB9aIwAxL6BCyTJQgbxIayVYsDYOtKkeewIVQ3A710pUY39TcaMq8U+T88
+ gv5ruaQ8w1yni6W7HlnAW1N5dHfHt1WakHv8tKw4thLTmjxF5UXYrTav0m+YNbRZNcVT
+ +xVoGcPvGLNpEro0SP/zK6DkXhaiaFO9Y8/8D2b9GnaAOzzXtJ+VOxQ0//82acn4t0Vr
+ EyNaOMSqCvxhgna4lq3UZ1jUYA59iu4tqGmRv5m5PnsaV+jRbOkS28/53sy/KiAk4Ce5
+ 91WjSvdmCd1bOkDfCR6jDhvHCuzTjEWGIYJ0Tf8aeQw5yq6MjnvQwk+dlbeoHl04Hrif
+ 5Wzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=lLXDpS9aIKv2BOfm7qGe20v7/h2Jmvrj+hyHCut5ohw=;
- b=3z3LCW5SWnXy7j/TisVbxuGH2ivtiUIJrVHI/1BCw/1k/AIjYg1VlNMtED8S9mPAUw
- wuM4AduaGcMGqhr59fBosl8RYTW9S05dpX2CUpfBehtD9q25bUiqwDfEBEbEQE11cOjM
- L9JQhzIPk0gJ1iljRgwC7lwKNhqZi5MXpF2TOwa+NDgprTZdGZN2EDYgJwmYji5pkYWe
- 1sCkb/TLHeVtacz7LPTdt6sCvs0GyHd0Jml5MCk52SFAY2P9bxMGoPraiv5qXGM2C06d
- 6xpTl/i5xaUXdDZovdZxOwqe8XBMerpv3XvHqRcM3DdxpNgzq6boi9aoFIJ3S3fPQuT9
- KtFg==
-X-Gm-Message-State: AOAM530CWELHNbSCePvfSNVoi9pVo7usatLE3jlDb+74Cc7jw1WfCVHL
- fgBXaoSHSMl1dTEPwCJ1DccG1RKWdndhV2F6YJGeMg==
-X-Google-Smtp-Source: ABdhPJw+OcXl75VxXUJHRSc/tzKR8oEQPG36TfGqgX3Q27P6+ehDBJMpPmSmVmU2xY3hI4g12NO5ncUZ1l7YDKxM7wo=
-X-Received: by 2002:ac2:4c54:0:b0:473:a414:1768 with SMTP id
- o20-20020ac24c54000000b00473a4141768mr13960522lfk.537.1652131692052; Mon, 09
- May 2022 14:28:12 -0700 (PDT)
+ bh=MvwsQDLTKMJTgQOuZM3iVmxfL3yQn70yj6MptUuzyQ4=;
+ b=4ofo1uSwBTaIns5o+CFAsxpLkWOHznB9pVe+f4aSlisj1nbVSaUf+R2r8Hyz5YP3R0
+ Q9PPpWwiTeoMcpWNiIptV0sXhvLkkKlsNzKKAybyk78VPTFFsCje4vdUGB9V/4fyNOGK
+ QP8JM/3jz6bs1fkwDoGyg6C6r8WzxmmmDyYm/HVj7Cc7nIrplVK5SSXvf7jW0ohfm3lt
+ jSjmP2IIxOf/j7Y3keDIdVQjP9cPdXfi/luv39PtVmJXtCod2lDNkfhsc54hxYPYq/v7
+ EoX7TwDwnydXL/b3c/F495ynNE4M5vgtvqXvMD41BmGDs0JxPVnK5QHACOdrhzIV7X0m
+ NeBw==
+X-Gm-Message-State: AOAM5315vSDR1yfNJ1U5G/6CBSyO15R72QU+8NFhnBs0z3RwYA1ngGB2
+ XjTYyi1h/XkSefVjW/k+JTx18eUFfOJ1uC7LRmBTdg==
+X-Google-Smtp-Source: ABdhPJx+6UQM4mLeHjKTgMzcIwGXK2jygDZun4KACvit/KIbJo02fyOw9JvUPx0VkZs/cp8bQ8Ty95f5uyusbVuZ7zI=
+X-Received: by 2002:a2e:9e54:0:b0:250:d6c8:c2a6 with SMTP id
+ g20-20020a2e9e54000000b00250d6c8c2a6mr830767ljk.16.1652131805713; Mon, 09 May
+ 2022 14:30:05 -0700 (PDT)
 MIME-Version: 1.0
 References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-14-dmatlack@google.com>
- <YnRh6yyGQZ+U31U1@google.com>
-In-Reply-To: <YnRh6yyGQZ+U31U1@google.com>
+ <20220422210546.458943-16-dmatlack@google.com>
+ <Ynk84xydEn4/3xkT@google.com>
+In-Reply-To: <Ynk84xydEn4/3xkT@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Mon, 9 May 2022 14:27:45 -0700
-Message-ID: <CALzav=fSx2VdaLD=pz_wmESCSA8M0n1omLsy9UwSw1GHED7vgQ@mail.gmail.com>
-Subject: Re: [PATCH v4 13/20] KVM: x86/mmu: Decouple rmap_add() and
- link_shadow_page() from kvm_vcpu
+Date: Mon, 9 May 2022 14:29:38 -0700
+Message-ID: <CALzav=daCnHcUV7ffwvpMGcpdvV5vqHg0JD7Wfs-F6jfaJnfSA@mail.gmail.com>
+Subject: Re: [PATCH v4 15/20] KVM: x86/mmu: Cache the access bits of shadowed
+ translations
 To: Sean Christopherson <seanjc@google.com>
 X-Mailman-Approved-At: Tue, 10 May 2022 02:04:42 -0400
 Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
@@ -97,41 +97,63 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, May 5, 2022 at 4:46 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, May 9, 2022 at 9:10 AM Sean Christopherson <seanjc@google.com> wrote:
 >
 > On Fri, Apr 22, 2022, David Matlack wrote:
-> > -static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
-> > -                          struct kvm_mmu_page *sp)
-> > +static void __link_shadow_page(struct kvm_mmu_memory_cache *cache, u64 *sptep,
-> > +                            struct kvm_mmu_page *sp)
-> >  {
-> >       u64 spte;
+> > @@ -2820,7 +2861,10 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
 > >
-> > @@ -2297,12 +2300,17 @@ static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
+> >       if (!was_rmapped) {
+> >               WARN_ON_ONCE(ret == RET_PF_SPURIOUS);
+> > -             rmap_add(vcpu, slot, sptep, gfn);
+> > +             rmap_add(vcpu, slot, sptep, gfn, pte_access);
+> > +     } else {
+> > +             /* Already rmapped but the pte_access bits may have changed. */
+> > +             kvm_mmu_page_set_access(sp, sptep - sp->spt, pte_access);
+> >       }
 > >
-> >       mmu_spte_set(sptep, spte);
-> >
-> > -     mmu_page_add_parent_pte(vcpu, sp, sptep);
-> > +     mmu_page_add_parent_pte(cache, sp, sptep);
-> >
-> >       if (sp->unsync_children || sp->unsync)
-> >               mark_unsync(sptep);
+> >       return ret;
+>
+> ...
+>
+> > diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+> > index a8a755e1561d..97bf53b29b88 100644
+> > --- a/arch/x86/kvm/mmu/paging_tmpl.h
+> > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
+> > @@ -978,7 +978,8 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
 > >  }
 > >
-> > +static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep, struct kvm_mmu_page *sp)
+> >  /*
+> > - * Using the cached information from sp->gfns is safe because:
+> > + * Using the information in sp->shadowed_translation (kvm_mmu_page_get_gfn()
+> > + * and kvm_mmu_page_get_access()) is safe because:
+> >   * - The spte has a reference to the struct page, so the pfn for a given gfn
+> >   *   can't change unless all sptes pointing to it are nuked first.
+> >   *
+> > @@ -1052,12 +1053,15 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+> >               if (sync_mmio_spte(vcpu, &sp->spt[i], gfn, pte_access))
+> >                       continue;
+> >
+> > -             if (gfn != sp->gfns[i]) {
+> > +             if (gfn != kvm_mmu_page_get_gfn(sp, i)) {
+> >                       drop_spte(vcpu->kvm, &sp->spt[i]);
+> >                       flush = true;
+> >                       continue;
+> >               }
+> >
+> > +             if (pte_access != kvm_mmu_page_get_access(sp, i))
 >
-> Nit, would prefer to wrap here, especially since __link_shadow_page() wraps.
+> I think it makes sense to do this unconditionally, same as mmu_set_spte().  Or
+> make the mmu_set_spte() case conditional.  I don't have a strong preference either
+> way, but the two callers should be consistent with each other.
 
-Will do.
+I'll make them both unconditional.
 
 >
-> > +{
-> > +     __link_shadow_page(&vcpu->arch.mmu_pte_list_desc_cache, sptep, sp);
-> > +}
+> > +                     kvm_mmu_page_set_access(sp, i, pte_access);
 > > +
-> >  static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
-> >                                  unsigned direct_access)
-> >  {
+> >               sptep = &sp->spt[i];
+> >               spte = *sptep;
+> >               host_writable = spte & shadow_host_writable_mask;
 > > --
 > > 2.36.0.rc2.479.g8af0fa9b8e-goog
 > >
