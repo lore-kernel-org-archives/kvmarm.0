@@ -2,76 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD509C433F5
-	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 19:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A76DC433F5
+	for <kvmarm@archiver.kernel.org>; Mon,  9 May 2022 19:57:49 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5165D4B1DD;
-	Mon,  9 May 2022 15:42:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 110664B26E;
+	Mon,  9 May 2022 15:57:49 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Wut880BvXuoX; Mon,  9 May 2022 15:42:05 -0400 (EDT)
+	with ESMTP id bBt434Dp0C8A; Mon,  9 May 2022 15:57:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 472224B27E;
-	Mon,  9 May 2022 15:42:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C0A1C408AA;
+	Mon,  9 May 2022 15:57:47 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0A3A4B25C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 15:42:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68486408AA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 15:57:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CPX5zRito34u for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2022 15:42:03 -0400 (EDT)
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com
- [209.85.166.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A51734B1DD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 15:42:03 -0400 (EDT)
-Received: by mail-io1-f50.google.com with SMTP id e3so16450088ios.6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 12:42:03 -0700 (PDT)
+ with ESMTP id vyU4iJmKighQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2022 15:57:45 -0400 (EDT)
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com
+ [209.85.166.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4EA97408A7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2022 15:57:45 -0400 (EDT)
+Received: by mail-il1-f175.google.com with SMTP id z12so10040108ilp.8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 May 2022 12:57:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=Poa/XHm7RBN4xu5ZBa3++e981PAjmsDa6rgsRLJgu7w=;
- b=ZybCmqqLa1TXyZNi4b3l/y+waQtDIJl1O2rSQSLXULMuqCxRquDqdOnQ9MJABJ5dJ4
- Lig9ZFr5vUEjgOZZcuTI/2Aj+yGJ8Rz3UxN1zm9gItowLdHtweUv1VVCDmoqhJCEX752
- ltRBpDclvHOALnxo7ns4y2DP5QFHrIxbjangGc4ssU7ho1z/LmpqpZ7GM+FyiE/0AqZl
- 9utpIboDZ6oJjPYtUZEqy+DYTBzmJ26jmoa1DhgVjNCpbTeI1jWY6M4Nw2MGiSUwfSHt
- 2jyJxsLouEMuRKr9ZJS+0v1rbDw/E5zxOgzm8FiAuE0x4aC2qQOMidJMW9M/m5u+Whcc
- LW4Q==
+ bh=UREYdDElVT63DJ85rhyIs5tD66WOEgYZkl05/GC/WxA=;
+ b=Il/cOYnpyhm8Hs17rCt1yiTHqAg9YbsWT67w3eRco/qYj1x8NVVYhjfbLQn1Qjw0lO
+ b+8wNy8hspQwcpNQmc4yOdsBpj9tYxFsg5/Knh2XMm2F7+vmVlYRBiz6Ea23OhdQSAWq
+ NOZfVG3vx2rivbRKmeeVc+sHwyqhWoexOj2ykdAYchZdQ7P2VlQEZii4Z83birH2mFh+
+ 1AcQ7lCfHgsS7RU1l3lGYfX4VH8ors0qUJJYq0FnAossYl8z/l6no/SgsNYpvP/wrXky
+ I5jxIhIVJDsDirXDpD4yEW5kRE8mB0N8whGJZMMdEkxrgrXtxr6nam3HI59c34M/sHjw
+ Ibdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=Poa/XHm7RBN4xu5ZBa3++e981PAjmsDa6rgsRLJgu7w=;
- b=5rLoCyNWpswnbUO7kOFRyowri0sSWZlqBGOZQZdDobpKXQ9JrRC5mG5ohlZN6yscrt
- 2VLtH/nar58IIpfPVwf90tkW4m34ESLzOCZbJAaLyunoucbqn+0BiLmM0RDNVbMmg5Kc
- c/T+HhfwUm8O9AmqDOx+b+hcnX+s7DvCXYk2LgrjamVPsQxW26qoRsdvSBXXseraXqee
- bEI5+SWUKQ5eqTOQ9Ff+wzD3+4S1+w6D2xgNbxMZe63QCSApBLmehMZNtPGienKM8zR7
- A75LMVL///ruRjG3vDLdy6N+EvVjJ61qHv/3uRrM5oqMzWuxn4ce3IOh1EZSNrqVxBV7
- qDxQ==
-X-Gm-Message-State: AOAM53230oeVqtk4f410pCOihQa6xWGvTTV41K+/68qFy6NVizkf834P
- HruxhjhU19E7p37iUBw3K3P2xg==
-X-Google-Smtp-Source: ABdhPJyIaumo9OpsjTZGZAa6Fc/t5wdn8DelO8YshGZ5bop4Hjf3UFhrGxCvrh8CKvKq0KEyTq01sA==
-X-Received: by 2002:a5d:94c2:0:b0:60b:bd34:bb6f with SMTP id
- y2-20020a5d94c2000000b0060bbd34bb6fmr7003799ior.32.1652125322583; 
- Mon, 09 May 2022 12:42:02 -0700 (PDT)
+ bh=UREYdDElVT63DJ85rhyIs5tD66WOEgYZkl05/GC/WxA=;
+ b=GLYlYB/OVRqtd6dFXbMg83VBt2CvmkEqqOYjQCqbuHdsW4mLrW3uvftWl+j1OfkEjd
+ VxXAiSvKTZlitqsyWryAIUWN2+jdQcnj8o5IC7l1xIAHcgSlYK/z/96gjABsbUtJG+/+
+ XZVVxzkqHJGRF+xxMPXAgLH+et6qT5EYYu0xsCG9JwuMhR0FzV2Uzux9/BItr42YG5kJ
+ MuUDHz5q2V3Fp83ZjwFTJ+ru3PAY5yK4OA7toGFGGV7YvpONpkhGgxWSVXDwmYg3Pxqi
+ txlQmDFbHCXHwSOmFUoFkNzejjEqN7WBqzGmPwUxuusCNB6Z7XoE0+epEb3FzD9cG+h0
+ kQjQ==
+X-Gm-Message-State: AOAM530g1z2CFtQybiHPqYiskhdxAViF43FfRNmWMyCc+voTeN+JWKjf
+ qPycZXjDmtmCYlUgCrV77bdi6A==
+X-Google-Smtp-Source: ABdhPJwQCgWSG2CxUH+XCn8bLC5vpebAZgxkfDFCp3/9KeJqN4sbnJHyjrJOCHXYq04N6AvkoQa/Mg==
+X-Received: by 2002:a05:6e02:15c8:b0:2bd:fdca:18a8 with SMTP id
+ q8-20020a056e0215c800b002bdfdca18a8mr7509767ilu.320.1652126264533; 
+ Mon, 09 May 2022 12:57:44 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- p10-20020a92d68a000000b002cde6e352f4sm3351915iln.62.2022.05.09.12.42.01
+ 4-20020a92c644000000b002cde6e352e2sm3350687ill.44.2022.05.09.12.57.43
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 May 2022 12:42:01 -0700 (PDT)
-Date: Mon, 9 May 2022 19:41:58 +0000
+ Mon, 09 May 2022 12:57:43 -0700 (PDT)
+Date: Mon, 9 May 2022 19:57:40 +0000
 From: Oliver Upton <oupton@google.com>
 To: Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v3 1/4] KVM: arm64: Wrapper for getting pmu_events
-Message-ID: <YnluhqLgARCcERkh@google.com>
+Subject: Re: [PATCH v3 2/4] KVM: arm64: Repack struct kvm_pmu to reduce size
+Message-ID: <YnlyNPnwuxRcVlP8@google.com>
 References: <20220509120330.3043773-1-tabba@google.com>
- <20220509120330.3043773-2-tabba@google.com>
+ <20220509120330.3043773-3-tabba@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220509120330.3043773-2-tabba@google.com>
+In-Reply-To: <20220509120330.3043773-3-tabba@google.com>
 Cc: will@kernel.org, maz@kernel.org, catalin.marinas@arm.com,
  kernel-team@android.com, kvmarm@lists.cs.columbia.edu,
  linux-arm-kernel@lists.infradead.org
@@ -91,14 +91,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Mon, May 09, 2022 at 12:03:27PM +0000, Fuad Tabba wrote:
-> Eases migrating away from using hyp data and simplifies the code.
-> 
+On Mon, May 09, 2022 at 12:03:28PM +0000, Fuad Tabba wrote:
+> struct kvm_pmu has 2 holes using 10 bytes. This is instantiated
+> in all vcpus, so it adds up. This repacking removes all holes.
+
+nit: commit messages should be written in the imperative. So maybe
+'Repack the structure to remove all holes'.
+
 > No functional change intended.
 > 
 > Signed-off-by: Fuad Tabba <tabba@google.com>
 
+Otherwise:
+
 Reviewed-by: Oliver Upton <oupton@google.com>
+
+> ---
+>  include/kvm/arm_pmu.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 20193416d214..eaa8290b116f 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -21,12 +21,12 @@ struct kvm_pmc {
+>  };
+>  
+>  struct kvm_pmu {
+> -	int irq_num;
+> +	struct irq_work overflow_work;
+>  	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
+>  	DECLARE_BITMAP(chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
+> +	int irq_num;
+>  	bool created;
+>  	bool irq_level;
+> -	struct irq_work overflow_work;
+>  };
+>  
+>  struct arm_pmu_entry {
+> -- 
+> 2.36.0.512.ge40c2bad7a-goog
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
