@@ -2,72 +2,73 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F9DC433F5
-	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 09:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4010C433FE
+	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 09:57:17 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DF03749DF6;
-	Tue, 10 May 2022 05:46:14 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A4974B089;
+	Tue, 10 May 2022 05:57:17 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6QLKT0xJuh7H; Tue, 10 May 2022 05:46:13 -0400 (EDT)
+	with ESMTP id KoefZN-cSIyG; Tue, 10 May 2022 05:57:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id C4FFE49F3E;
-	Tue, 10 May 2022 05:46:13 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 170FD4B150;
+	Tue, 10 May 2022 05:57:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D12449ED2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 05:46:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 497F24B0F5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 05:57:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p85llp+hlfOL for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 May 2022 05:46:07 -0400 (EDT)
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com
- [209.85.167.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEBF449DF6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 05:46:07 -0400 (EDT)
-Received: by mail-oi1-f176.google.com with SMTP id v66so17945864oib.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 02:46:07 -0700 (PDT)
+ with ESMTP id Yw2STxP3cBfx for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 May 2022 05:57:13 -0400 (EDT)
+Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com
+ [209.85.221.73])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1546B4B0C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 05:57:13 -0400 (EDT)
+Received: by mail-wr1-f73.google.com with SMTP id
+ u26-20020adfb21a000000b0020ac48a9aa4so6839340wra.5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 02:57:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=o39NrF3LSVHYlVpwQr3bgKqf/zDQFHhHc4PtC81jizY=;
- b=SfCXjLw/VznGk6AzMLnh7lqE+0bjdTxIsbqedkWfVZqnAVpZe04Rtg0cAPR5Lm0vOw
- a1kDK6R6UBoc+F5Yl3KfbXmwnV6Cs4sXZNlaUnx1/SMPTpAyZQkLkF/c9D8aBrv01Iah
- tvG1ziIqkAHUJiTdG/zyHnWJUmkIImU8U2SPnPtDhy2YyWpsswc1M9nnhnmZ18vN+sZE
- jt7q/yvmNghXEQD0vNgIaZ2okgFiFQ1cF/kdeFLmaU8QY94W+1SMIvm9Jlxq+fbwdn2v
- P2tJNjrzzSCEvw3d1vtCJUmt5N51xAAbG3jSDRoljFkTgx8V7lFNvSPxaRxk90AGZSLH
- ZhNw==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=MtmAwqs8YXD/WNqsl0616lAaftWmFHAYLnEsrB1KhE4=;
+ b=ew+YDsEUoNHbNrWsYNdJdcGpH3TgT2wsvr5GWyUVKu+wt0F2/R//RpQyZ3ggJg+wLN
+ RilebVlNbX13rClyxSmkdJ08XLrdKnhl+cTKvCau1hrFEJzlOyXhp4dr3x97CVQW51d3
+ wOZFDIZ3No6yG3bxFXJpsLGA+i+JnAnJ5zMcIyQ/IT3cdKDIhdvzDqBPka01K7tQixWS
+ uBZgI25qSAPQ7chWT0yId+JULBKaBUN3i9HRdeGEpyLTw9nrtsjJDAWHNC4odg7a+gVO
+ bmfHTw65EWxeHvM1J/qgSZ2B8FQob4a0AHZe5D02U7twBIGz0owwEpdBI4JebNquI6Lj
+ +7Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=o39NrF3LSVHYlVpwQr3bgKqf/zDQFHhHc4PtC81jizY=;
- b=oL7eB5Tq3E9dUE50MrP83HeY+HOARaXR7aierpbG4iuDAGh/ZzlRHFWU6LOa+9P02k
- eVtIuzulhoLNgrmltnXd97+QIXxLPaa6xlhkWzLfjAT1afAjIbhviIqrzASdC1oNZxjY
- 7IxWXYQEujqre/YPg4k4xT8mWFefrqKLxbOQ+piZxV9WtfYxUoAQi50GaFVNdQNyxkg6
- C33HgBMQ87hztzXO5ZXENCjWvOjtY7iFUr0GOk53H3AZnudPhGpfOIYQYUSudaMFKDES
- fO2JB0rI+FUJmcf3MJlrUBgClPIYsk3gdOru1UzZEbVDXoe7vjTeJI7YtopwkMBdjdvi
- 5Fng==
-X-Gm-Message-State: AOAM5311O686/tFlUpqYjUBmG8nbkimktPGSdpv00Ob7QlO2BNfKU+mV
- +lvYgT+8AZQOJDewZrzsQYAwRJO2QVuwaDqvPfRMdw==
-X-Google-Smtp-Source: ABdhPJwLwLi6HfB/M1LmfOIjn+TH5lqS8GI3HaBOG4okjrcTmcuCVhyHfe6tbTsbpvj2w6SW3d8BLPBFZfrHl3Rc9Qo=
-X-Received: by 2002:aca:180b:0:b0:2f7:23ae:8cd1 with SMTP id
- h11-20020aca180b000000b002f723ae8cd1mr13435377oih.146.1652175966977; Tue, 10
- May 2022 02:46:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220509162559.2387784-1-oupton@google.com>
- <20220509162559.2387784-3-oupton@google.com>
-In-Reply-To: <20220509162559.2387784-3-oupton@google.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=MtmAwqs8YXD/WNqsl0616lAaftWmFHAYLnEsrB1KhE4=;
+ b=ccumUehfOvPcDCxVmm+nEVghiqOmykrIzNlOrL/et6obdU0XxVOX6RgNqHFuRP9c/v
+ +jf2mPEfS9uALjZ3TkqXNu0mL+UmfXoLR5Vb8YpjV997k+gihl9il8yerCKfvWHc2M9M
+ lq0zDMuTPZA9+tMis4WArRwfSqtHTktFfhEIcp7bqjU+INRZEDhUvyEfRyZW2BrINIxV
+ VP6F6GiGTnFUQprtN7m8pKImPJa8x5/vGTAwt63vTS7gY8za6p69ZxEkMeh9REgKgQP0
+ c9rnxUUnfPF+RgBBd5c18Ws5K4y2tN07SlrPokH/Ulfqyd5vnIg0GawihHBaxgWX1CyD
+ mbfA==
+X-Gm-Message-State: AOAM532lu+Kmr1ifslYonkz2l5XjIBCr3Ol8BJTDpkjTZNyeaqZhuvbp
+ sPYBWcx7tSess+iQyyqsKn1pac4e5DV/Croy52Bt9c7VRAsGBJl7uX0YV2f3e4OKYQJIv3Z8dR5
+ SWJInJcy6ExqWqqWASrS2rZC2rCCD/mGeUZFmyd3bnVkT91RS9Aa6W18IhbyVYyY6wi8=
+X-Google-Smtp-Source: ABdhPJw4V8FP3VXISHMvP+eBFRlmx3MmQxzndgE1sucyKQRc17P8zqP22OPaMbH4UkiBA4NsOppvDdCkbA==
+X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
+ (user=tabba job=sendgmr) by 2002:a7b:c414:0:b0:394:21dd:e24f with
+ SMTP id
+ k20-20020a7bc414000000b0039421dde24fmr20840132wmi.133.1652176631812; Tue, 10
+ May 2022 02:57:11 -0700 (PDT)
+Date: Tue, 10 May 2022 09:57:06 +0000
+Message-Id: <20220510095710.148178-1-tabba@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
+Subject: [PATCH v4 0/4] KVM: arm64: Do not communicate host pmu event changes
+ by accessing hyp data
 From: Fuad Tabba <tabba@google.com>
-Date: Tue, 10 May 2022 10:45:30 +0100
-Message-ID: <CA+EHjTztV9ZN4sQyS8BGxuROw4NY873LXve8LPjo417Ao6y4aQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: arm64: pkvm: Don't mask already zeroed FEAT_SVE
-To: Oliver Upton <oupton@google.com>
-Cc: kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
- will@kernel.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -84,45 +85,55 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hi Oliver,
+Hi,
 
+This series changes the way KVM communicates host pmu event changes to the
+hypervisor in nvhe and protected mode. Instead of accessing hyp data directly
+from the host, the data is passed to hyp via the loaded vcpu. This provides
+more isolation between the host and the hypervisor, and allows us to use pmu in
+protected mode.
 
-On Mon, May 9, 2022 at 5:26 PM Oliver Upton <oupton@google.com> wrote:
->
-> FEAT_SVE is already masked by the fixed configuration for
-> ID_AA64PFR0_EL1; don't try and mask it at runtime.
->
-> No functional change intended.
->
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
+This series is based on kvmarm/next (8c22fd2d4cfa).
 
-Reviewed-by: Fuad Tabba <tabba@google.com>
+Changes since V3 [1]:
+- Fix/clarify commit messages (Oliver)
+- Reduce scope of kvm_pmu_events (Oliver/Marc)
 
-Cheers,
+Changes since V2 [2]:
+- Update the guest view of the pmu events after interrupts have been disabled
+  (Marc)
+
+Changes since V1 [3]:
+- Repack struct kvm_pmu to remove all (two) holes (Marc)
+- Updating the guest's view of the pmu events before every vcpu run rather than
+  vcpu load to avoid missing updates (Marc)
+
+Thanks,
 /fuad
 
+[1] https://lore.kernel.org/all/20220509120330.3043773-1-tabba@google.com/
+[2] https://lore.kernel.org/all/20220509095500.2408785-1-tabba@google.com/
+[3] https://lore.kernel.org/linux-arm-kernel/20220408084052.3310931-1-tabba@google.com/
 
->  arch/arm64/kvm/hyp/nvhe/sys_regs.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> index 33f5181af330..3f5d7bd171c5 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
-> @@ -90,9 +90,6 @@ static u64 get_pvm_id_aa64pfr0(const struct kvm_vcpu *vcpu)
->         u64 set_mask = 0;
->         u64 allow_mask = PVM_ID_AA64PFR0_ALLOW;
->
-> -       if (!vcpu_has_sve(vcpu))
-> -               allow_mask &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> -
->         set_mask |= get_restricted_features_unsigned(id_aa64pfr0_el1_sys_val,
->                 PVM_ID_AA64PFR0_RESTRICT_UNSIGNED);
->
-> --
-> 2.36.0.512.ge40c2bad7a-goog
->
+Fuad Tabba (4):
+  KVM: arm64: Wrapper for getting pmu_events
+  KVM: arm64: Repack struct kvm_pmu to reduce size
+  KVM: arm64: Pass pmu events to hyp via vcpu
+  KVM: arm64: Reenable pmu in Protected Mode
+
+ arch/arm64/include/asm/kvm_host.h |  7 +-----
+ arch/arm64/kvm/arm.c              | 15 ++++++++++++
+ arch/arm64/kvm/hyp/nvhe/switch.c  | 20 +++++-----------
+ arch/arm64/kvm/pmu-emul.c         |  3 +--
+ arch/arm64/kvm/pmu.c              | 40 ++++++++++++++++++-------------
+ include/kvm/arm_pmu.h             | 10 ++++++--
+ 6 files changed, 54 insertions(+), 41 deletions(-)
+
+
+base-commit: 8c22fd2d4cfaab2ae3c5859496c894df58ab014b
+-- 
+2.36.0.512.ge40c2bad7a-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
