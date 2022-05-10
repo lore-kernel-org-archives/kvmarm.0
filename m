@@ -2,71 +2,71 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 089F4C433EF
-	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 09:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AD7C433EF
+	for <kvmarm@archiver.kernel.org>; Tue, 10 May 2022 09:57:21 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F6994B1AB;
-	Tue, 10 May 2022 05:57:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0503A49EE8;
+	Tue, 10 May 2022 05:57:21 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id MNJTgH+NojWt; Tue, 10 May 2022 05:57:17 -0400 (EDT)
+	with ESMTP id Og9g8NVlj4dT; Tue, 10 May 2022 05:57:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A9E549EFF;
-	Tue, 10 May 2022 05:57:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D74E4B19F;
+	Tue, 10 May 2022 05:57:19 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 23FE34B0C2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 05:57:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FD1C4B177
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 05:57:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rD8vZxbnWQ72 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 May 2022 05:57:15 -0400 (EDT)
+ with ESMTP id UwUVVuZ0ZJ3s for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 May 2022 05:57:17 -0400 (EDT)
 Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com
  [209.85.128.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 033D14B0F5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 05:57:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 18AE34B1B7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 05:57:17 -0400 (EDT)
 Received: by mail-wm1-f74.google.com with SMTP id
- e9-20020a05600c4e4900b00394779649b1so1046790wmq.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 02:57:14 -0700 (PDT)
+ n186-20020a1c27c3000000b00392ae974ca1so582710wmn.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2022 02:57:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=7tYpf+XT7mqI5zWxw47YWbNdAk9NQpBh8N59P16iZps=;
- b=JLXcjvk+IY4Z774b57vzytjw/LTp7NpJOIL/tlbDd9FP+oJ2WSZOpvoLPIZh9M9R2q
- vy2/eIwg8KGFk1sWxZ0ZGUa6Gn69nTU/XjdsN06Dyew10vGSQ/vs941bDwQGeTbagiE7
- 4waFgHP+qlXvZGc2EpRhP9IPYvxI48gw7buC1bp9wh3wOmprHaPKkC9HAmWHgTqYdlPS
- Bak4TpzVI7ZU9268sprBG1Hu8cBzzedrF4CPaOCaNI6Zzahd/+n7lvbYW6ULxexfigOm
- qGiGJOlRsEtAv96mwVGeeREn3LmSrbVdKiqoBOvuZg4vnKJ+zxZ47jPL5HB4Ks8y92a/
- csTQ==
+ :cc; bh=4qfi1EyfzrAF17+2Q3vwA2/NLnPP5Sk/AW+fkoZOXmg=;
+ b=Z35kcWzQCyc0/bgmoXEQqd04oE3P3i58RdxLoNVzcFf9aRRH2ZdLk8CKxbpiwmuekE
+ wmQb457pslsukEJOJbgp6RJM5XJAUf1svZqei9GW5UR+07V7fQkMUstay9+aCOsPVwxz
+ qQb8PUj20Ac8wsYwgFiAfCDNOJ/lAQCvXJ9covjO8jGSQhoTfMiIFEY97vShdao+1tym
+ 76DvaTxgSoSmHK6kAGvoeXmi/vXP1lZGfhJdx3vRb1aoGcLp0eEzJNaIO2IyoFftfItv
+ 9kmcuj87Et9SPGkBp4c4vgyqZXB4olQQgPVaTVs7pJ+QMl04tf1DAm0w1BNV8x7Q/mb9
+ DYUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=7tYpf+XT7mqI5zWxw47YWbNdAk9NQpBh8N59P16iZps=;
- b=ZDfygs/bESxF5a50A8OtFC0V8/UrgqCEkpH1o1D1WuWorf6A6e3KedG0/aEuRVyhsW
- eWRinlsHOyhdCPQV8rxkvo5zUKhfdFq5GTVYrxuAk4fJFBuqBlWtJzEmG0Om2k3PaEns
- V/TuHIVe7Tnl8PxowTKjpxrPnri5CeWt+6+i3D8p6Q1pFTfbdLzUPr+DU5C4odS6H94U
- 1eijn4dBicJsUyWAQy96FeNgEeFB5lMXBEcsmjRoJ1ROPxMRbh3LiPGqVHiXgzjHwRu9
- xcA5ql4F7wCgfJgsNDHy31wlxdsS+TE8ZQ4aKWLH30yyMfiKFqlg9nfk7N+Fa9HDv7wd
- pcfQ==
-X-Gm-Message-State: AOAM530i277+onXnRiJhTkJU0pY9xbWO/dfNvVziuBCLT33X6WXj7Wan
- UH+hQXK1o5l40HPkCs2MyTBDEJEJGtoi3eKZ9H4GwGt7XE75Y/H/ssh/uzLd2RwFr/Uux2MQRsl
- BymCEjHbYGOhBASyO9QKVhr/zbmej9LpWXXPhli4lLIeTnNkFfGRYQXv4PewmniAaf8E=
-X-Google-Smtp-Source: ABdhPJweAUnGLDe5eXP7PWtCeinDLLVpuencYzseISdW/noLsSVemwzynd4ZY3BhcPIG0+uLrQnO21B9qQ==
+ bh=4qfi1EyfzrAF17+2Q3vwA2/NLnPP5Sk/AW+fkoZOXmg=;
+ b=kUp6C+AwWQ9NJGXShkw4aVf1AdGcLdcb4Y/n8vD9cY/wBlbeixiD9uu/Gss4/yq7Ha
+ RTS0L5PyzBO+JOYWw5Y/aFz2rxE4FKrOVqnv5W/Ap///bbopi+3EWOmGlLtjcwv7Qstn
+ MKqlY3cPrjOpP11IHzzghrhNYBFdauiVZTr+2JqEBqnOlYd35+lFjj57kioA5W8tj1Zv
+ b5B1kmx6+sGOSGN0SNtGwtjQSTAr0P3BMSillM8xefzSiRXoeYiO38KgrHA+HMXbIT8s
+ Pmq1qOWIc0UEzFFjGJt+pZaOmg1LX4/Th13hV4BOK40qtnUHYh+MriU6vrc0xk9TA45H
+ ytww==
+X-Gm-Message-State: AOAM533X4nTytJtWGasxEWK35BgSSRGwnx2EYv78/acniKvYAlhaXVz1
+ U/Ogf1ihQ3/J45xhggJoZxAUErblcfFVxGX6jd7SmhvWLSBUhMPbEJ0R6grIdemYtuzWHwR8wsx
+ EpV/OqqjZE+URnbNeShT+8AhVwyg3tr/eAoPAsfm2IjTEMX/wOCpgDGQsC2/oCMD876Q=
+X-Google-Smtp-Source: ABdhPJx45MlpCKopCtV4MwMconf+bzC+zG0kq7MrmyagGdL8LTEIOWRQrf/j8rQrG1mUQKHBc7UCeGq4Wg==
 X-Received: from fuad.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:1613])
- (user=tabba job=sendgmr) by 2002:a05:600c:1553:b0:394:7642:7927
+ (user=tabba job=sendgmr) by 2002:a05:600c:4f8d:b0:394:939f:bd2f
  with SMTP id
- f19-20020a05600c155300b0039476427927mr21101313wmg.16.1652176633992; Tue, 10
- May 2022 02:57:13 -0700 (PDT)
-Date: Tue, 10 May 2022 09:57:07 +0000
+ n13-20020a05600c4f8d00b00394939fbd2fmr8148434wmq.16.1652176636198; Tue, 10
+ May 2022 02:57:16 -0700 (PDT)
+Date: Tue, 10 May 2022 09:57:08 +0000
 In-Reply-To: <20220510095710.148178-1-tabba@google.com>
-Message-Id: <20220510095710.148178-2-tabba@google.com>
+Message-Id: <20220510095710.148178-3-tabba@google.com>
 Mime-Version: 1.0
 References: <20220510095710.148178-1-tabba@google.com>
 X-Mailer: git-send-email 2.36.0.512.ge40c2bad7a-goog
-Subject: [PATCH v4 1/4] KVM: arm64: Wrapper for getting pmu_events
+Subject: [PATCH v4 2/4] KVM: arm64: Repack struct kvm_pmu to reduce size
 From: Fuad Tabba <tabba@google.com>
 To: kvmarm@lists.cs.columbia.edu
 Cc: kernel-team@android.com, maz@kernel.org, catalin.marinas@arm.com,
@@ -87,115 +87,37 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Eases migrating away from using hyp data and simplifies the code.
+struct kvm_pmu has 2 holes using 10 bytes. This is instantiated
+in all vcpus, so it adds up. Repack the structures to remove the
+holes.
 
 No functional change intended.
 
 Reviewed-by: Oliver Upton <oupton@google.com>
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/pmu.c | 42 ++++++++++++++++++++++++++----------------
- 1 file changed, 26 insertions(+), 16 deletions(-)
+ include/kvm/arm_pmu.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/pmu.c b/arch/arm64/kvm/pmu.c
-index 03a6c1f4a09a..4bd38ff34221 100644
---- a/arch/arm64/kvm/pmu.c
-+++ b/arch/arm64/kvm/pmu.c
-@@ -25,21 +25,31 @@ static bool kvm_pmu_switch_needed(struct perf_event_attr *attr)
- 	return (attr->exclude_host != attr->exclude_guest);
- }
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 20193416d214..eaa8290b116f 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -21,12 +21,12 @@ struct kvm_pmc {
+ };
  
-+static struct kvm_pmu_events *kvm_get_pmu_events(void)
-+{
-+	struct kvm_host_data *ctx = this_cpu_ptr_hyp_sym(kvm_host_data);
-+
-+	if (!ctx)
-+		return NULL;
-+
-+	return &ctx->pmu_events;
-+}
-+
- /*
-  * Add events to track that we may want to switch at guest entry/exit
-  * time.
-  */
- void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
- {
--	struct kvm_host_data *ctx = this_cpu_ptr_hyp_sym(kvm_host_data);
-+	struct kvm_pmu_events *pmu = kvm_get_pmu_events();
+ struct kvm_pmu {
+-	int irq_num;
++	struct irq_work overflow_work;
+ 	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
+ 	DECLARE_BITMAP(chained, ARMV8_PMU_MAX_COUNTER_PAIRS);
++	int irq_num;
+ 	bool created;
+ 	bool irq_level;
+-	struct irq_work overflow_work;
+ };
  
--	if (!kvm_arm_support_pmu_v3() || !ctx || !kvm_pmu_switch_needed(attr))
-+	if (!kvm_arm_support_pmu_v3() || !pmu || !kvm_pmu_switch_needed(attr))
- 		return;
- 
- 	if (!attr->exclude_host)
--		ctx->pmu_events.events_host |= set;
-+		pmu->events_host |= set;
- 	if (!attr->exclude_guest)
--		ctx->pmu_events.events_guest |= set;
-+		pmu->events_guest |= set;
- }
- 
- /*
-@@ -47,13 +57,13 @@ void kvm_set_pmu_events(u32 set, struct perf_event_attr *attr)
-  */
- void kvm_clr_pmu_events(u32 clr)
- {
--	struct kvm_host_data *ctx = this_cpu_ptr_hyp_sym(kvm_host_data);
-+	struct kvm_pmu_events *pmu = kvm_get_pmu_events();
- 
--	if (!kvm_arm_support_pmu_v3() || !ctx)
-+	if (!kvm_arm_support_pmu_v3() || !pmu)
- 		return;
- 
--	ctx->pmu_events.events_host &= ~clr;
--	ctx->pmu_events.events_guest &= ~clr;
-+	pmu->events_host &= ~clr;
-+	pmu->events_guest &= ~clr;
- }
- 
- #define PMEVTYPER_READ_CASE(idx)				\
-@@ -169,16 +179,16 @@ static void kvm_vcpu_pmu_disable_el0(unsigned long events)
-  */
- void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
- {
--	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
- 	u32 events_guest, events_host;
- 
- 	if (!kvm_arm_support_pmu_v3() || !has_vhe())
- 		return;
- 
- 	preempt_disable();
--	host = this_cpu_ptr_hyp_sym(kvm_host_data);
--	events_guest = host->pmu_events.events_guest;
--	events_host = host->pmu_events.events_host;
-+	pmu = kvm_get_pmu_events();
-+	events_guest = pmu->events_guest;
-+	events_host = pmu->events_host;
- 
- 	kvm_vcpu_pmu_enable_el0(events_guest);
- 	kvm_vcpu_pmu_disable_el0(events_host);
-@@ -190,15 +200,15 @@ void kvm_vcpu_pmu_restore_guest(struct kvm_vcpu *vcpu)
-  */
- void kvm_vcpu_pmu_restore_host(struct kvm_vcpu *vcpu)
- {
--	struct kvm_host_data *host;
-+	struct kvm_pmu_events *pmu;
- 	u32 events_guest, events_host;
- 
- 	if (!kvm_arm_support_pmu_v3() || !has_vhe())
- 		return;
- 
--	host = this_cpu_ptr_hyp_sym(kvm_host_data);
--	events_guest = host->pmu_events.events_guest;
--	events_host = host->pmu_events.events_host;
-+	pmu = kvm_get_pmu_events();
-+	events_guest = pmu->events_guest;
-+	events_host = pmu->events_host;
- 
- 	kvm_vcpu_pmu_enable_el0(events_host);
- 	kvm_vcpu_pmu_disable_el0(events_guest);
+ struct arm_pmu_entry {
 -- 
 2.36.0.512.ge40c2bad7a-goog
 
