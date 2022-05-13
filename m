@@ -2,71 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F618C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A11C4332F
 	for <kvmarm@archiver.kernel.org>; Sat, 14 May 2022 10:09:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 206DD4B187;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 63EB74B242;
 	Sat, 14 May 2022 06:09:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4a0ecUpvaQlt; Sat, 14 May 2022 06:09:16 -0400 (EDT)
+	with ESMTP id tG1JUqOO3Sc2; Sat, 14 May 2022 06:09:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E15D54B287;
-	Sat, 14 May 2022 06:08:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1123D4B18F;
+	Sat, 14 May 2022 06:08:58 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D16EA49EF6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 16:29:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBF3449EF6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 16:29:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DhJRhNLlORJZ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 May 2022 16:29:02 -0400 (EDT)
+ with ESMTP id fjKq7OI18Il3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 May 2022 16:29:04 -0400 (EDT)
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com
  [209.85.216.74])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C46A4408B3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 16:29:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7562408B3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 16:29:03 -0400 (EDT)
 Received: by mail-pj1-f74.google.com with SMTP id
  h23-20020a17090a051700b001dc9132f2e6so4467595pjh.6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 13:29:02 -0700 (PDT)
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 13:29:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=MjdBhjTMyWiNYLQ92OvnchEQMwpl50s0BF9gErhk/qw=;
- b=ivS4hX8UQGxzHHP4LGtA3lv7pXm+WFIaL4yzXYfj4TN74wHiqJ2mnN/xSg/tyeFBfV
- gw6yODIe00oPLxwtSIzDxMOPHk8YygDCpppBsrWabQDW886T+X9KcHQx6P0wqAWLi6G6
- Oq12jL1pT3oZoXZZbm2VEdHN2ZRk0UNEGj5nfc3CIfeQT6QYBGpPolu+7bNOWopmuCtu
- 2wU77snDk3sBFq8Mh0rlGpYpbXb7PBrlPdwOogsensPwJk6PImgFi+DiZosYx+nQBCVl
- 7TCDsOi/AVq3x+KDqTwvMT1M7KYS2ruDjGiO4C4MZBCTtaluVQbUZrw6gcAsHUcWyVaB
- G1Ww==
+ :cc; bh=HIEyJZRpr2jcyJ/fmafeFJZJ+wHC9HCHT15KsP+KWpI=;
+ b=iX2OHbcsw6FoAz7JEDK5rCc0tPJZ6WRbOZwRG6RKbT6jQXE17WlJGssIhPSuOfq4wg
+ XIWYuYcX7Qr2tZDPW/lhm/HFLaZITZv+aTjfF8YjFYU0sFPcSEKTdsQf8V8UCBPIFDaJ
+ zAX4r9SsXZT4d/vumXd9b2lJvSoFyEdn6BpoxZjDvlRUGV6YUGcOXw1I+2+xVxP9bJfS
+ W1UKZ0cG0kKiaF/jhb6RGWAroxpcUtuLqHG2/OVzXh3xkhppxtZHgOnppeAhPozEtFQE
+ kWNDFaxhB2KovtE4moxtaq1/N45e6JC2x9tkuceH94bEa+5M6j3HNICKGx6Yavc3s6Nc
+ H7bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=MjdBhjTMyWiNYLQ92OvnchEQMwpl50s0BF9gErhk/qw=;
- b=2y8eTNKnFc0yxnWlBzItJ+XP+Oc55HlZ/CgBYEM6aNoefc2LDic955zY4cF9689leV
- A5gAOFyCrko8EOzbaRawNhw+WgqOaKi5E8pVoJxs9Yfwy9f2GSqFyDkcHtxMgGedaWuz
- 1zSjDwUjS0LPkWf/Avfzp/vd0NKRWQ7pI7MgoYHJAdZT9I3KSkLd5CIcbxs/H8hKVsDr
- ZI7GjP8nUfQy568kIQo+tKqtjQ/Fhka6pEYJ8b7o7cqtmLXNOjL3wh5kQMDF5hFhFFUA
- zaiRaCkSvGKa1n3dqyJDyZS/IO2jtSLOGgPmVc9+robTcgih/NPdIJlsrCHrFXBJsUzs
- bWnw==
-X-Gm-Message-State: AOAM530EWl7LmJJT2+D9rpGAZex6lRLUKV6DGWoW++HUETgyFv2V7Bmn
- luyOswgaaHV+HTbdSYW3L+hZ+QxSsxnVCQ==
-X-Google-Smtp-Source: ABdhPJyVZi3NnOzXfmV774jkoebBCz9dvnFdL0cIiVAAWsfTHuZ9dvhZ/4bXdyVUsznBu4jmJrxZnADAlXLVNQ==
+ bh=HIEyJZRpr2jcyJ/fmafeFJZJ+wHC9HCHT15KsP+KWpI=;
+ b=ses790tfjDKGGsf3rk5zmonOlBxV2ckrR7hRgoqxiohWGc2GzJQwSSIDUzbt68Sizo
+ 8NNhZbdu2kzEBBEc5LRPHfGDRNnXVvA3ePR8CD0oqW+/exHtOWt5FxmzHw77BkTkTwnP
+ 6JMva2t+6RTt4x3c5Ujl6bgR8WQw9OM0YOKSdK40XxVWOeYwnZiG1ykr96YK8yysLwYH
+ X1fPlTj/Nf54ZjGWQ9IU9rwlh22KUddB7a1PopNFjZ1GY9/tuAefoIpDjgjJHGwQdHG2
+ tks+CLU3Kx3I6PMQ+kFyLTgMsFuHMz0T6UO14aEin2o+KVl5VSqhxk80STizPkk2mXJc
+ cJKw==
+X-Gm-Message-State: AOAM530D1BVm3/MQT/gkDMLIz43ZS+cr5n4Yv4GyKZ/tBfRBJo7BTLKF
+ +w1wyRCy3BfYhR5eLA4zrRkWlKJN3AvYmA==
+X-Google-Smtp-Source: ABdhPJybUih+bwE7FyOBg+qcGDi8Nof6ENpdkam6v1N4A8EAkz8f1UOC2uM61149paY4cu0ueKr5wo9dTOwczg==
 X-Received: from dmatlack-heavy.c.googlers.com
  ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:c952:b0:15e:9e3d:8e16 with SMTP
- id i18-20020a170902c95200b0015e9e3d8e16mr6532910pla.51.1652473741946; Fri, 13
- May 2022 13:29:01 -0700 (PDT)
-Date: Fri, 13 May 2022 20:28:16 +0000
+ (user=dmatlack job=sendgmr) by 2002:a62:cf44:0:b0:50d:6d18:17f9 with SMTP id
+ b65-20020a62cf44000000b0050d6d1817f9mr6142945pfg.63.1652473743414; Fri, 13
+ May 2022 13:29:03 -0700 (PDT)
+Date: Fri, 13 May 2022 20:28:17 +0000
 In-Reply-To: <20220513202819.829591-1-dmatlack@google.com>
-Message-Id: <20220513202819.829591-19-dmatlack@google.com>
+Message-Id: <20220513202819.829591-20-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20220513202819.829591-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
-Subject: [PATCH v5 18/21] KVM: x86/mmu: Zap collapsible SPTEs in shadow MMU at
- all possible levels
+Subject: [PATCH v5 19/21] KVM: x86/mmu: Refactor drop_large_spte()
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Sat, 14 May 2022 06:08:54 -0400
@@ -99,63 +98,68 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Currently KVM only zaps collapsible 4KiB SPTEs in the shadow MMU. This
-is fine for now since KVM never creates intermediate huge pages during
-dirty logging. In other words, KVM always replaces 1GiB pages directly
-with 4KiB pages, so there is no reason to look for collapsible 2MiB
-pages.
+drop_large_spte() drops a large SPTE if it exists and then flushes TLBs.
+Its helper function, __drop_large_spte(), does the drop without the
+flush.
 
-However, this will stop being true once the shadow MMU participates in
-eager page splitting. During eager page splitting, each 1GiB is first
-split into 2MiB pages and then those are split into 4KiB pages. The
-intermediate 2MiB pages may be left behind if an error condition causes
-eager page splitting to bail early.
+In preparation for eager page splitting, which will need to sometimes
+flush when dropping large SPTEs (and sometimes not), push the flushing
+logic down into __drop_large_spte() and add a bool parameter to control
+it.
 
 No functional change intended.
 
 Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b411b0d202c8..ef190dd77ccc 100644
+index ef190dd77ccc..4b40fa2e27eb 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6183,18 +6183,25 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 	return need_tlb_flush;
+@@ -1161,26 +1161,26 @@ static void drop_spte(struct kvm *kvm, u64 *sptep)
+ 		rmap_remove(kvm, sptep);
  }
  
-+static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
-+					   const struct kvm_memory_slot *slot)
-+{
-+	/*
-+	 * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
-+	 * pages that are already mapped at the maximum possible level.
-+	 */
-+	if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
-+			      PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1,
-+			      true))
-+		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-+}
-+
- void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 				   const struct kvm_memory_slot *slot)
+-
+-static bool __drop_large_spte(struct kvm *kvm, u64 *sptep)
++static void __drop_large_spte(struct kvm *kvm, u64 *sptep, bool flush)
  {
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
--		/*
--		 * Zap only 4k SPTEs since the legacy MMU only supports dirty
--		 * logging at a 4k granularity and never creates collapsible
--		 * 2m SPTEs during dirty logging.
--		 */
--		if (slot_handle_level_4k(kvm, slot, kvm_mmu_zap_collapsible_spte, true))
--			kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-+		kvm_rmap_zap_collapsible_sptes(kvm, slot);
- 		write_unlock(&kvm->mmu_lock);
- 	}
+-	if (is_large_pte(*sptep)) {
+-		WARN_ON(sptep_to_sp(sptep)->role.level == PG_LEVEL_4K);
+-		drop_spte(kvm, sptep);
+-		return true;
+-	}
++	struct kvm_mmu_page *sp;
  
+-	return false;
++	if (!is_large_pte(*sptep))
++		return;
++
++	sp = sptep_to_sp(sptep);
++	WARN_ON(sp->role.level == PG_LEVEL_4K);
++
++	drop_spte(kvm, sptep);
++
++	if (flush)
++		kvm_flush_remote_tlbs_with_address(kvm, sp->gfn,
++			KVM_PAGES_PER_HPAGE(sp->role.level));
+ }
+ 
+ static void drop_large_spte(struct kvm_vcpu *vcpu, u64 *sptep)
+ {
+-	if (__drop_large_spte(vcpu->kvm, sptep)) {
+-		struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+-
+-		kvm_flush_remote_tlbs_with_address(vcpu->kvm, sp->gfn,
+-			KVM_PAGES_PER_HPAGE(sp->role.level));
+-	}
++	return __drop_large_spte(vcpu->kvm, sptep, true);
+ }
+ 
+ /*
 -- 
 2.36.0.550.gb090851708-goog
 
