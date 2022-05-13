@@ -2,91 +2,74 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C13C433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 12 May 2022 23:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01CD1C433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 13 May 2022 09:26:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA0749F1F;
-	Thu, 12 May 2022 19:29:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5313E49F18;
+	Fri, 13 May 2022 05:26:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id FqJ90idXFGAC; Thu, 12 May 2022 19:29:46 -0400 (EDT)
+	with ESMTP id jPk2Elw7bDGb; Fri, 13 May 2022 05:26:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E54B849F14;
-	Thu, 12 May 2022 19:29:46 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 16CFF49F28;
+	Fri, 13 May 2022 05:26:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49CB249F09
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2022 19:29:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86F2C49F0F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 05:26:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vYsxd+pL9pLD for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 May 2022 19:29:44 -0400 (EDT)
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com
- [209.85.215.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0724B49F07
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2022 19:29:43 -0400 (EDT)
-Received: by mail-pg1-f177.google.com with SMTP id r71so5597090pgr.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 May 2022 16:29:43 -0700 (PDT)
+ with ESMTP id M72RNzp94o8M for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 May 2022 05:26:13 -0400 (EDT)
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com
+ [209.85.218.74])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 441F349E42
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 05:26:13 -0400 (EDT)
+Received: by mail-ej1-f74.google.com with SMTP id
+ ox8-20020a170907100800b006f9dc6e4a22so3875068ejb.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 02:26:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=/iy7DvZiK8nafA5XKuXqSqcNqBCZjj9/qjUXXJFqGpQ=;
- b=cWZf8gG13SFYJAbym+C3jUQYUcEqHiEmBSGcMRkGeKtHJpoPVjCJpboc2DabP5dHl4
- t2pGv+CgDWDeHxJP9tx6pCY9dSjjnguG4ekrfcrEUPi+LIH60qOBWqDT9YCyqkQV8C4/
- dSaySBo05+qtz5foTJQ9KZOVML5d+2f0Q7XlTuBAcMKJyVliAc9S9Hsa6xjkW2Sp6kD0
- 1UgaKp+HBuU30LUTW23SGQf4o5bUWN8CesvUXR+7waPEQ995rJuJyEfEpi5J8hby+7Aj
- Cx1uoQ+692VdjLzjahYMHQzslw6xA739laCwIfxc6iaGRPPEF0WSqEC8fNXQchv8WP2x
- CzyQ==
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=9O8T4d24GJyDP8cnDNbV2+/gozd6tLFGA4/uUL04NR0=;
+ b=iaKsTEqI7n6J/fP4v02bJyqUWoPtt5dhrjPs4ksBSNCBKOaXfDWwhOHzfJYQmcM+0l
+ Osrd15SpJ/MUZVIrB2FnK9UyK05ZdH+RsxYG+9/juYL0xN4508oz+GpVT+6S4G95JeVn
+ lzoKLMokWswGEorBviYK4hjGCsSNM4m8xdzn9TFgjxi2VEnFDGeyRURQzqIbIU6QbqJo
+ scrHRXgr3/gzL/+DzERkF9yhkcv8Kd+tWMyBpmqr45Eg/xE0MvCzOrJP1R4LehaAbjl8
+ Fq88TC29HBPTuxne5MzNIwAiVYuBgTZ8tWZXEKUE9VWNMUXuAoNg/SJwwN2JllFqQuKH
+ 0LVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=/iy7DvZiK8nafA5XKuXqSqcNqBCZjj9/qjUXXJFqGpQ=;
- b=Pj+Hlbj4IyGeUjmhxa+K4igbOKlu7n0WW+rINn9HrGgL+Ij1vLr9MMuyzIk9wDZD2o
- F5wXWdR+UT4lVTmddozrQhttie2h4i9BROZswTUhNFW6z/90AWndw24bHfE8UOZ4G815
- IXPknl9RSie+OA/I/QyLjHW5bKtpf7gXGR9P+zlQCYYXmiZ6VLhSYGpwBahNAXyckE7W
- D/CjnpgKIe8b0vqb9WXtLHAxkD4O0MTmoMcykhHQjKOAnoPDVHgxZHdm5vAiFLgBda3V
- trfjtkS+hJ44RyJkG+G9nlExMlvG68ZdsSXAU4nrq4ndzXqKSsV40o+SG+tSyd57l2ZW
- uiUQ==
-X-Gm-Message-State: AOAM532A/ddMkIz99LO51+VIf0vOZYxwQnREFNNgfd5f9qe9nDwPRCyV
- xLgPGG6xJ5pXmeR6IACk4EJcrw==
-X-Google-Smtp-Source: ABdhPJxxG6YUzPEUM5+g1vu/KK0sSWSbi9F/X2ppQRyP6w4zTtX0HAmpJ+CS2CQNyEouYPVZqp8oog==
-X-Received: by 2002:a63:d20e:0:b0:3db:5e25:26c with SMTP id
- a14-20020a63d20e000000b003db5e25026cmr1559604pgg.200.1652398182635; 
- Thu, 12 May 2022 16:29:42 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com.
- [35.185.214.157]) by smtp.gmail.com with ESMTPSA id
- n2-20020a622702000000b0050dc76281e7sm333832pfn.193.2022.05.12.16.29.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 May 2022 16:29:42 -0700 (PDT)
-Date: Thu, 12 May 2022 23:29:38 +0000
-From: Sean Christopherson <seanjc@google.com>
-To: Johannes Weiner <hannes@cmpxchg.org>
-Subject: Re: [PATCH v4 1/4] mm: add NR_SECONDARY_PAGETABLE to count secondary
- page table uses.
-Message-ID: <Yn2YYl98Vhh/UL0w@google.com>
-References: <20220429201131.3397875-1-yosryahmed@google.com>
- <20220429201131.3397875-2-yosryahmed@google.com>
- <87ilqoi77b.wl-maz@kernel.org>
- <CAJD7tkY7JF25XXUFq2mGroetMkfo-2zGOaQC94pjZE3D42+oaw@mail.gmail.com>
- <Yn2TGJ4vZ/fst+CY@cmpxchg.org>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <Yn2TGJ4vZ/fst+CY@cmpxchg.org>
-Cc: Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
- Roman Gushchin <roman.gushchin@linux.dev>, Michal Hocko <mhocko@kernel.org>,
- Yosry Ahmed <yosryahmed@google.com>, Linux-MM <linux-mm@kvack.org>,
- Zefan Li <lizefan.x@bytedance.com>, kvmarm@lists.cs.columbia.edu,
- Marc Zyngier <maz@kernel.org>, Joerg Roedel <joro@8bytes.org>,
- Shakeel Butt <shakeelb@google.com>, cgroups@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- linux-arm-kernel@lists.infradead.org, Jim Mattson <jmattson@google.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Tejun Heo <tj@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=9O8T4d24GJyDP8cnDNbV2+/gozd6tLFGA4/uUL04NR0=;
+ b=cQwWByiV8PPk0DgNPHhib7xl+G83APD8bq3z8ljCYoHLut2dTDHIC9I1P80LNEP7l2
+ THWM3r8854dASYD4qE/iqL4+IE7uNUJXciD3X2wsyEKXFHYiAxt65iJgjIBfn3ysvVmv
+ Yfg+OuolsoO1ENR7y+ztgX3iJ+sUiHMkItboTq66VP+ocE9Fc6E5HSJj/EMd1UX8kGlj
+ KLjDjkn3X3pwHTY9PVhsMY1FGfpezFbgg+0kvrVn30Ro+1CglO0DqohFanZxv7IXUX68
+ NMJLNU43zseJzrHuBLJpEDqIrw8GSTJaASo5epfcQ0W4hD8uTHbTzxA08PCXxE2FVdY8
+ 7TGQ==
+X-Gm-Message-State: AOAM531I2nBebFzzKSrTYNsJZEiwZeqDabpkfaZSii+Ws6npB97nVpAH
+ tRX9jBNENLqgFffLOmaUgpiS6dzq2iRT
+X-Google-Smtp-Source: ABdhPJzEbS2hvb75/jq83OEwqeWgJNKE9I/lr4SjkTANlLOQGKApCVrv++PbFYZ8MimaO9CjAM0i3IiAohaE
+X-Received: from big-boi.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:129])
+ (user=qperret job=sendgmr) by 2002:aa7:c656:0:b0:428:3280:a432 with SMTP id
+ z22-20020aa7c656000000b004283280a432mr39932843edr.396.1652433971840; Fri, 13
+ May 2022 02:26:11 -0700 (PDT)
+Date: Fri, 13 May 2022 09:26:07 +0000
+Message-Id: <20220513092607.35233-1-qperret@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [PATCH] KVM: arm64: Don't hypercall before EL2 init
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>, 
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, 
+ linux-kernel@vger.kernel.org
+Cc: kernel-team@android.com
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -103,66 +86,78 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, May 12, 2022, Johannes Weiner wrote:
-> Hey Yosry,
-> 
-> On Mon, May 02, 2022 at 11:46:26AM -0700, Yosry Ahmed wrote:
-> > On Mon, May 2, 2022 at 3:01 AM Marc Zyngier <maz@kernel.org> wrote:
-> > > 115bae923ac8bb29ee635). You are saying that this is related to a
-> > > 'workload', but given that the accounting is global, I fail to see how
-> > > you can attribute these allocations on a particular VM.
-> > 
-> > The main motivation is having the memcg stats, which give attribution
-> > to workloads. If you think it's more appropriate, we can add it as a
-> > memcg-only stat, like MEMCG_VMALLOC (see 4e5aa1f4c2b4 ("memcg: add
-> > per-memcg vmalloc stat")). The only reason I made this as a global
-> > stat too is to be consistent with NR_PAGETABLE.
-> 
-> Please no memcg-specific stats if a regular vmstat item is possible
-> and useful at the system level as well, like in this case. It's extra
-> memcg code, extra callbacks, and it doesn't have NUMA node awareness.
-> 
-> > > What do you plan to do for IOMMU page tables? After all, they serve
-> > > the exact same purpose, and I'd expect these to be handled the same
-> > > way (i.e. why is this KVM specific?).
-> > 
-> > The reason this was named NR_SECONDARY_PAGTABLE instead of
-> > NR_KVM_PAGETABLE is exactly that. To leave room to incrementally
-> > account other types of secondary page tables to this stat. It is just
-> > that we are currently interested in the KVM MMU usage.
-> 
-> Do you actually care at the supervisor level that this memory is used
-> for guest page tables?
+Will reported the following splat when running with Protected KVM
+enabled:
 
-Hmm, yes?  KVM does have a decent number of large-ish allocations that aren't
-for page tables, but except for page tables, the number/size of those allocations
-scales linearly with either the number of vCPUs or the amount of memory assigned
-to the VM (with no room for improvement barring KVM changes).
+[    2.427181] ------------[ cut here ]------------
+[    2.427668] WARNING: CPU: 3 PID: 1 at arch/arm64/kvm/mmu.c:489 __create_hyp_private_mapping+0x118/0x1ac
+[    2.428424] Modules linked in:
+[    2.429040] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.18.0-rc2-00084-g8635adc4efc7 #1
+[    2.429589] Hardware name: QEMU QEMU Virtual Machine, BIOS 0.0.0 02/06/2015
+[    2.430286] pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[    2.430734] pc : __create_hyp_private_mapping+0x118/0x1ac
+[    2.431091] lr : create_hyp_exec_mappings+0x40/0x80
+[    2.431377] sp : ffff80000803baf0
+[    2.431597] x29: ffff80000803bb00 x28: 0000000000000000 x27: 0000000000000000
+[    2.432156] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+[    2.432561] x23: ffffcd96c343b000 x22: 0000000000000000 x21: ffff80000803bb40
+[    2.433004] x20: 0000000000000004 x19: 0000000000001800 x18: 0000000000000000
+[    2.433343] x17: 0003e68cf7efdd70 x16: 0000000000000004 x15: fffffc81f602a2c8
+[    2.434053] x14: ffffdf8380000000 x13: ffffcd9573200000 x12: ffffcd96c343b000
+[    2.434401] x11: 0000000000000004 x10: ffffcd96c1738000 x9 : 0000000000000004
+[    2.434812] x8 : ffff80000803bb40 x7 : 7f7f7f7f7f7f7f7f x6 : 544f422effff306b
+[    2.435136] x5 : 000000008020001e x4 : ffff207d80a88c00 x3 : 0000000000000005
+[    2.435480] x2 : 0000000000001800 x1 : 000000014f4ab800 x0 : 000000000badca11
+[    2.436149] Call trace:
+[    2.436600]  __create_hyp_private_mapping+0x118/0x1ac
+[    2.437576]  create_hyp_exec_mappings+0x40/0x80
+[    2.438180]  kvm_init_vector_slots+0x180/0x194
+[    2.458941]  kvm_arch_init+0x80/0x274
+[    2.459220]  kvm_init+0x48/0x354
+[    2.459416]  arm_init+0x20/0x2c
+[    2.459601]  do_one_initcall+0xbc/0x238
+[    2.459809]  do_initcall_level+0x94/0xb4
+[    2.460043]  do_initcalls+0x54/0x94
+[    2.460228]  do_basic_setup+0x1c/0x28
+[    2.460407]  kernel_init_freeable+0x110/0x178
+[    2.460610]  kernel_init+0x20/0x1a0
+[    2.460817]  ret_from_fork+0x10/0x20
+[    2.461274] ---[ end trace 0000000000000000 ]---
 
-Off the top of my head, KVM's secondary page tables are the only allocations that
-don't scale linearly, especially when nested virtualization is in use.
+Indeed, the Protected KVM mode promotes __create_hyp_private_mapping()
+to a hypercall as EL1 no longer has access to the hypervisor's stage-1
+page-table. However, the call from kvm_init_vector_slots() happens after
+pKVM has been initialized on the primary CPU, but before it has been
+initialized on secondaries. As such, if the KVM initcall procedure is
+migrated from one CPU to another in this window, the hypercall may end up
+running on a CPU for which EL2 has not been initialized.
 
-> It seems to me you primarily care that it is reported *somewhere*
-> (hence the piggybacking off of NR_PAGETABLE at first). And whether
-> it's page tables or iommu tables or whatever else allocated for the
-> purpose of virtualization, it doesn't make much of a difference to the
-> host/cgroup that is tracking it, right?
-> 
-> (The proximity to nr_pagetable could also be confusing. A high page
-> table count can be a hint to userspace to enable THP. It seems
-> actionable in a different way than a high number of kvm page tables or
-> iommu page tables.)
+Fortunately, the pKVM hypervisor doesn't rely on the host to re-map the
+vectors in the private range, so the hypercall in question is in fact
+superfluous. Skip it when pKVM is enabled.
 
-I don't know about iommu page tables, but on the KVM side a high count can also
-be a good signal that enabling THP would be beneficial.  It's definitely actionable
-in a different way though too.
+Reported-by: Will Deacon <will@kernel.org>
+Signed-off-by: Quentin Perret <qperret@google.com>
+---
+ arch/arm64/kvm/arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> How about NR_VIRT? It's shorter, seems descriptive enough, less room
-> for confusion, and is more easily extensible in the future.
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 523bc934fe2f..7347c133efc4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1436,7 +1436,7 @@ static int kvm_init_vector_slots(void)
+ 	base = kern_hyp_va(kvm_ksym_ref(__bp_harden_hyp_vecs));
+ 	kvm_init_vector_slot(base, HYP_VECTOR_SPECTRE_DIRECT);
+ 
+-	if (kvm_system_needs_idmapped_vectors() && !has_vhe()) {
++	if (kvm_system_needs_idmapped_vectors() && !has_vhe() && !is_protected_kvm_enabled()) {
+ 		err = create_hyp_exec_mappings(__pa_symbol(__bp_harden_hyp_vecs),
+ 					       __BP_HARDEN_HYP_VECS_SZ, &base);
+ 		if (err)
+-- 
+2.36.0.550.gb090851708-goog
 
-I don't like NR_VIRT because VFIO/iommu can be used for non-virtualization things,
-and we'd be lying by omission unless KVM (and other users) updates all of its
-large-ish allocations to account them correctly.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
