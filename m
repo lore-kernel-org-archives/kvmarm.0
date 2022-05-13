@@ -2,93 +2,85 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A47C433F5
-	for <kvmarm@archiver.kernel.org>; Sat, 14 May 2022 10:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3947CC4332F
+	for <kvmarm@archiver.kernel.org>; Sat, 14 May 2022 10:09:02 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B446049EE9;
-	Sat, 14 May 2022 06:09:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D59F449EFB;
+	Sat, 14 May 2022 06:09:01 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id IXGwabx8Mutq; Sat, 14 May 2022 06:08:58 -0400 (EDT)
+	with ESMTP id UjyUE767F-FD; Sat, 14 May 2022 06:09:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D5704B1E9;
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B2CA24B1F8;
 	Sat, 14 May 2022 06:08:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E30E49EAA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 14:26:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DCD8F49F07
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 16:28:31 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5+d7i7XNTlJN for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 May 2022 14:26:58 -0400 (EDT)
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com
- [209.85.210.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EFE4A49EF6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 14:26:57 -0400 (EDT)
-Received: by mail-pf1-f177.google.com with SMTP id x23so8369359pff.9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 11:26:57 -0700 (PDT)
+ with ESMTP id gIxq5sVdVPvs for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 May 2022 16:28:30 -0400 (EDT)
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
+ [209.85.210.201])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D4A8A49EF6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 16:28:30 -0400 (EDT)
+Received: by mail-pf1-f201.google.com with SMTP id
+ g5-20020a62e305000000b0050d2dba0c5dso4469049pfh.8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 May 2022 13:28:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=f3nBn1LwcriRtnTdKkMxJqrXvUJa99h1XpX9rIbmPsc=;
- b=RhJ/oVsdfQd/xDIXzKmKW89BkOLc+aB9PbcUuGD8DhE/r1xIp+zmzF5kbvsJgECked
- iIDCEwz4polbRa9Kza2tvUk6jUn+c10xHR6SCkOweNd9d/plenEL5MksTH2Zx6zNGeKz
- VBz7ICQbeCFH4zDwa7cyQ5r9phyax2KPG0XaKgy/L4Fae3lWJOYMoavacX6i60ivO2OH
- Y0H7NAccqvn8wLt+movJmmQXzSIItkXTeqicXrylSCSAfE8CxKsphG4sNpJoRcLavqjo
- 5pjxkAIUhwC6CNq/bIGLGGwFkhGx74uXQXnbfxeKgn7oRxrBFscg5wrIvz11H3AXtWFf
- EifA==
+ h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+ :cc; bh=nd6Dxj+D3c/luGLy1QY1Ne5KCdEStn7D54niackY8Gg=;
+ b=lIVEL9NlTTvEk0jvQdHGYdcqrkD4LzOGT+wWlx67gTGwgZCjTYYlZT0CXziIbqm805
+ xEKGjNBHceio2qKgjjTz8s9D5VtcH+dahCCFdmRcTqau/OYncXoMwZfNVfZijldNuv9t
+ x/H0ytTC9mY//Xnze7OLPh7PnqyEe8fMWdiFNyA0LYDukR0MWxkuWuz89LLmeMUnb3Oe
+ v0KP285xw0HkbLpInenTzibDOT9o6C/Gd0WhPdssg4N88symfMODlZ+JGY+RaQNZ+zOR
+ A+TvhwsKTkkv6Ipa2LjdGJ7/AkMXZWaOORe18arUxR6aWUMglTc9tXO4XNDRNYNitv9G
+ 4f0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=f3nBn1LwcriRtnTdKkMxJqrXvUJa99h1XpX9rIbmPsc=;
- b=kRR/4kKYyJrZ4dJYy60aH90Ewy4wkgXB/ET1/zX0a7mk11qyKd49qXHTTlmTmTnyiK
- i93vT7cMZTVcWfMrSsQNgYT4IH+F3yDQn1yvWQLpBaPyH3KRvBuG0QFtJiihBx/JtxYP
- 02ruW0LvMK6DdksXBtTIe3vF03JZwLyG2i9PZphY/WJoClBkNhM+J0KkniooOfwfjfgN
- r+gRhxQy6yjxi+iC/jECdqVzkgvWkilorWpxuPc0CPA115WFw6ZOxQPF/TXwxbsCc2E4
- pyy4RxIN3GNIlPcif6dNkuogOzyQYil0A/TYEZGd4wEnRVCFzCWaNbD1BktpljsAGkqc
- pJNg==
-X-Gm-Message-State: AOAM533B/QetPoEGz9AxmVUC/EX1cPC2pL29jU6MndAzJqqZnCKWsUzG
- ATy3f/zCLCHkUS0Iz69BEgquwA==
-X-Google-Smtp-Source: ABdhPJx9wMHQkLxpxX6sjpmk8QGYH6lnHrQ2Dj8+GdFaKMu4dvSUQ4p0vrU3A0yjKp68wJ49odGJsA==
-X-Received: by 2002:a63:d747:0:b0:3db:74a9:ff92 with SMTP id
- w7-20020a63d747000000b003db74a9ff92mr5012769pgi.293.1652466416498; 
- Fri, 13 May 2022 11:26:56 -0700 (PDT)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com.
- [34.82.80.254]) by smtp.gmail.com with ESMTPSA id
- i12-20020a17090ad34c00b001d96bc27a57sm1896907pjx.54.2022.05.13.11.26.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 May 2022 11:26:55 -0700 (PDT)
-Date: Fri, 13 May 2022 18:26:51 +0000
+ h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=nd6Dxj+D3c/luGLy1QY1Ne5KCdEStn7D54niackY8Gg=;
+ b=7ywSbNffB9lE/9UpO0nLdZdppPlckl4mc+WyP5bbCxO+7f7pk6SgygIQbUwukx1gex
+ zssLUMJfP74/aNeS9nxDS+Zzq6ACk6sq0O+IHJVOnWYzoGJepFHVi9Y/6yRdFq5aAbgJ
+ H9Nk69JkiwyhbsjOD27nyuNq8Bjf+XIc8/Txkz6s8ihz2Valz+OO1ehyVrm+9kpC4Get
+ LXeKj8Cet3aJzUFT2Pyh9MHR8FPlak0cJGsdW6Ry0HH80xqkNDFxwZbh0NMQk0FeMtYm
+ e19l2cngnBiSz3IS92MoQaqRTJU73pBKO6/aaiWtOXzs7rlfYuym67l7wIsOw6+/IuNX
+ 92bA==
+X-Gm-Message-State: AOAM532JPLrLzNQ5Ysspx49PwOPq/3aqAeN2LtvYPxmAvbRthnkqolwF
+ nzTCz2eFJCJbo5+g6Vaig4OrTYlxC6IGjA==
+X-Google-Smtp-Source: ABdhPJxPNMW3m8DWDbKR8Cxzp87MsHzpapuqXK0x8Mkd7Lb+oA/CXzKK6BuuZIvN94SWRy5m3PsmasidYIIY8g==
+X-Received: from dmatlack-heavy.c.googlers.com
+ ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a17:90a:e510:b0:1d9:ee23:9fa1 with SMTP
+ id t16-20020a17090ae51000b001d9ee239fa1mr250707pjy.0.1652473708906; Fri, 13
+ May 2022 13:28:28 -0700 (PDT)
+Date: Fri, 13 May 2022 20:27:59 +0000
+In-Reply-To: <20220513202819.829591-1-dmatlack@google.com>
+Message-Id: <20220513202819.829591-2-dmatlack@google.com>
+Mime-Version: 1.0
+References: <20220513202819.829591-1-dmatlack@google.com>
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [PATCH v5 01/21] KVM: x86/mmu: Optimize MMU page cache lookup for all
+ direct SPs
 From: David Matlack <dmatlack@google.com>
-To: Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: [PATCH v4 03/20] KVM: x86/mmu: Derive shadow MMU page role from
- parent
-Message-ID: <Yn6i6yUkIKyzXb+j@google.com>
-References: <20220422210546.458943-1-dmatlack@google.com>
- <20220422210546.458943-4-dmatlack@google.com>
- <75fbbcb6-d9bb-3d30-0bf4-fbf925517d09@gmail.com>
- <CALzav=dmseUw6khErkiSV7T5K88QvaRvWvBpvrb6VNOQTE3bQQ@mail.gmail.com>
- <CAJhGHyDQn=atFmn5o2TREW9cSY5Tv1F1vsSekzor6uYQxDgcfQ@mail.gmail.com>
- <CALzav=e0VnYar=jUr+C=uhVf9O6NDXaHx2rW-+yUocdHVk39Mg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <CALzav=e0VnYar=jUr+C=uhVf9O6NDXaHx2rW-+yUocdHVk39Mg@mail.gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailman-Approved-At: Sat, 14 May 2022 06:08:54 -0400
-Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+Cc: Albert Ou <aou@eecs.berkeley.edu>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
+ Huacai Chen <chenhuacai@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
  "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
+ <linux-mips@vger.kernel.org>, David Matlack <dmatlack@google.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Palmer Dabbelt <palmer@dabbelt.com>,
  "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
  <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
+ Ben Gardon <bgardon@google.com>, maciej.szmigiero@oracle.com,
  "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
  <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -107,107 +99,53 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, May 12, 2022 at 09:10:59AM -0700, David Matlack wrote:
-> On Mon, May 9, 2022 at 7:58 PM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
-> > On Tue, May 10, 2022 at 5:04 AM David Matlack <dmatlack@google.com> wrote:
-> > > On Sat, May 7, 2022 at 1:28 AM Lai Jiangshan <jiangshanlai@gmail.com> wrote:
-> > > > On 2022/4/23 05:05, David Matlack wrote:
-> > > > > +     /*
-> > > > > +      * If the guest has 4-byte PTEs then that means it's using 32-bit,
-> > > > > +      * 2-level, non-PAE paging. KVM shadows such guests using 4 PAE page
-> > > > > +      * directories, each mapping 1/4 of the guest's linear address space
-> > > > > +      * (1GiB). The shadow pages for those 4 page directories are
-> > > > > +      * pre-allocated and assigned a separate quadrant in their role.
-> > > >
-> > > >
-> > > > It is not going to be true in patchset:
-> > > > [PATCH V2 0/7] KVM: X86/MMU: Use one-off special shadow page for special roots
-> > > >
-> > > > https://lore.kernel.org/lkml/20220503150735.32723-1-jiangshanlai@gmail.com/
-> > > >
-> > > > The shadow pages for those 4 page directories are also allocated on demand.
-> > >
-> > > Ack. I can even just drop this sentence in v5, it's just background information.
-> >
-> > No, if one-off special shadow pages are used.
-> >
-> > kvm_mmu_child_role() should be:
-> >
-> > +       if (role.has_4_byte_gpte) {
-> > +               if (role.level == PG_LEVEL_4K)
-> > +                       role.quadrant = (sptep - parent_sp->spt) % 2;
-> > +               if (role.level == PG_LEVEL_2M)
-> > +                       role.quadrant = (sptep - parent_sp->spt) % 4;
-> > +       }
-> >
-> >
-> > And if one-off special shadow pages are merged first.  You don't
-> > need any calculation in mmu_alloc_root(), you can just directly use
-> >     sp = kvm_mmu_get_page(vcpu, gfn, vcpu->arch.mmu->root_role);
-> > because vcpu->arch.mmu->root_role is always the real role of the root
-> > sp no matter if it is a normall root sp or an one-off special sp.
-> >
-> > I hope you will pardon me for my touting my patchset and asking
-> > people to review them in your threads.
-> 
-> I see what you mean now. If your series is queued I will rebase on top
-> with the appropriate changes. But for now I will continue to code
-> against kvm/queue.
+Commit fb58a9c345f6 ("KVM: x86/mmu: Optimize MMU page cache lookup for
+fully direct MMUs") skipped the unsync checks and write flood clearing
+for full direct MMUs. We can extend this further to skip the checks for
+all direct shadow pages. Direct shadow pages in indirect MMUs (i.e.
+shadow paging) are used when shadowing a guest huge page with smaller
+pages. Such direct shadow pages, like their counterparts in fully direct
+MMUs, are never marked unsynced or have a non-zero write-flooding count.
 
-Here is what I'm going with for v5:
+Checking sp->role.direct also generates better code than checking
+direct_map because, due to register pressure, direct_map has to get
+shoved onto the stack and then pulled back off.
 
-        /*
-         * If the guest has 4-byte PTEs then that means it's using 32-bit,
-         * 2-level, non-PAE paging. KVM shadows such guests with PAE paging
-         * (i.e. 8-byte PTEs). The difference in PTE size means that
-         * KVM must shadow each guest page table with multiple shadow page
-         * tables, which requires extra bookkeeping in the role.
-         *
-         * Specifically, to shadow the guest's page directory (which covers a
-         * 4GiB address space), KVM uses 4 PAE page directories, each mapping
-         * 1GiB of the address space. @role.quadrant encodes which quarter of
-         * the address space each maps.
-         *
-         * To shadow the guest's page tables (which each map a 4MiB region),
-         * KVM uses 2 PAE page tables, each mapping a 2MiB region. For these,
-         * @role.quadrant encodes which half of the region they map.
-         *
-         * Note, the 4 PAE page directories are pre-allocated and the quadrant
-         * assigned in mmu_alloc_root(). So only page tables need to be handled
-         * here.
-         */
-        if (role.has_4_byte_gpte) {
-                WARN_ON_ONCE(role.level != PG_LEVEL_4K);
-                role.quadrant = (sptep - parent_sp->spt) % 2;
-        }
+No functional change intended.
 
-Then to make it work with your series we can just apply this diff:
+Reviewed-by: Lai Jiangshan <jiangshanlai@gmail.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f7c4f08e8a69..0e0e2da2f37d 100644
+index efe5a3dca1e0..774810d8a2ed 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2131,14 +2131,10 @@ static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct, u32 a
-         * To shadow the guest's page tables (which each map a 4MiB region),
-         * KVM uses 2 PAE page tables, each mapping a 2MiB region. For these,
-         * @role.quadrant encodes which half of the region they map.
--        *
--        * Note, the 4 PAE page directories are pre-allocated and the quadrant
--        * assigned in mmu_alloc_root(). So only page tables need to be handled
--        * here.
-         */
-        if (role.has_4_byte_gpte) {
--               WARN_ON_ONCE(role.level != PG_LEVEL_4K);
--               role.quadrant = (sptep - parent_sp->spt) % 2;
-+               WARN_ON_ONCE(role.level > PG_LEVEL_2M);
-+               role.quadrant = (sptep - parent_sp->spt) % (1 << role.level);
-        }
+@@ -2026,7 +2026,6 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 					     int direct,
+ 					     unsigned int access)
+ {
+-	bool direct_mmu = vcpu->arch.mmu->root_role.direct;
+ 	union kvm_mmu_page_role role;
+ 	struct hlist_head *sp_list;
+ 	unsigned quadrant;
+@@ -2070,7 +2069,8 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
+ 			continue;
+ 		}
+ 
+-		if (direct_mmu)
++		/* unsync and write-flooding only apply to indirect SPs. */
++		if (sp->role.direct)
+ 			goto trace_get_page;
+ 
+ 		if (sp->unsync) {
+-- 
+2.36.0.550.gb090851708-goog
 
-        return role;
-
-If your series is queued first, I can resend a v6 with this change or Paolo can
-apply it. If mine is queued first then you can include this as part of your
-series.
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
