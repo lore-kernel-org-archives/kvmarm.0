@@ -2,73 +2,76 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8905C433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 15 May 2022 10:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F00C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 15 May 2022 11:10:30 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F9B749E42;
-	Sun, 15 May 2022 06:57:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2E0241174;
+	Sun, 15 May 2022 07:10:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id hwehSrVY-CAS; Sun, 15 May 2022 06:57:47 -0400 (EDT)
+	with ESMTP id V1ZPEuiux9+V; Sun, 15 May 2022 07:10:28 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 479074B187;
-	Sun, 15 May 2022 06:57:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0852412FC;
+	Sun, 15 May 2022 07:10:28 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AE68E49E42
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 06:57:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9000F40D26
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 07:10:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JPi4J4FeyFA1 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 15 May 2022 06:57:45 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0F4E49E36
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 06:57:45 -0400 (EDT)
+ with ESMTP id vz5qiBeRSSGT for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 15 May 2022 07:10:26 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2729D4088C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 07:10:26 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 37E6A60F35;
- Sun, 15 May 2022 10:57:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CADBC385B8;
- Sun, 15 May 2022 10:57:44 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id AE991B80BFA;
+ Sun, 15 May 2022 11:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FDB5C385B8;
+ Sun, 15 May 2022 11:10:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652612264;
- bh=IngVGMhyvDcAzEJp+1IFX4F6pqTo8h56mNttrbT3H00=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=SdGFlznuXAJsVUYKNJE3ZqwqeibHiRkAYY033FqE68YCP2VMtGgyjIjOs+mBVV0YD
- MIG52lVoWkQqibIpArm/pzd2Uki2slpHmtcTfnlkGeNkxWJU5PgD5prAfH97eU3k4l
- /PQX3VekdlSxWC/1RHvoBJfRIn+qChr5hu8bbnRJWQKg3cJeSp7FXwm6vVflWqZw51
- XNXSP+p+nmz6DAUzUEoNNTdsO9g3+HjrOBV/CXV181/ToKaZ0bxkP4oaQhTBGHkPBl
- UsQcQu1wikNdniipRXezA66kPBTTP3b6pS3MlVf7HEP5zclK83zwvexO5cP1Ipeorp
- sDnu1DPqH/eBA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=hot-poop.lan)
+ s=k20201202; t=1652613023;
+ bh=Gd6CxhhQA+J6DDYWjHtSX7GWX+S+94nD0R96QSRYaAE=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=g5SbddoS4M/ze5TTryBJTUWICz/d4a/TFbo0VqwMBdC2BNWUF5g6sdJwSsL3hXnj/
+ jSYb3DlROc8QZ3FKIhXLCtQZwr6aX6SbK30Zlw16pkVfDmZO5D1iDylZZp7IiRyDgX
+ ZpuIOYsWb0KHRNM364aUhjW8YMBd4UD1r0S27OtThr/TXmcjvVmL8vK+poR2kr3aXP
+ BVrqnrJmkiifOnlk0uQpMwlByScCUpUJGtlvxX3p1QI9HPC7KFQ1+F55Wo7kH3Blm2
+ QXEfBJxjqCuBwPvTwCc+VmkJcOW5ZOU+m6+hocPiNzkMUU0WiSWqeKVfXYQrfOYwab
+ vJ7rOgD5c13Tg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nqBwU-00BPnt-0t; Sun, 15 May 2022 11:57:42 +0100
+ id 1nqC8i-00BPt3-Re; Sun, 15 May 2022 12:10:20 +0100
+Date: Sun, 15 May 2022 12:10:20 +0100
+Message-ID: <87sfpb59wj.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.cs.columbia.edu,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v4 0/4] KVM: arm64: Do not communicate host pmu event
- changes by accessing hyp data
-Date: Sun, 15 May 2022 11:57:39 +0100
-Message-Id: <165261223450.3678424.17937450491948923943.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220510095710.148178-1-tabba@google.com>
-References: <20220510095710.148178-1-tabba@google.com>
-MIME-Version: 1.0
+To: Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH] KVM: arm64: Don't hypercall before EL2 init
+In-Reply-To: <20220513092607.35233-1-qperret@google.com>
+References: <20220513092607.35233-1-qperret@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, tabba@google.com,
- will@kernel.org, kernel-team@android.com, linux-arm-kernel@lists.infradead.org,
- catalin.marinas@arm.com
+X-SA-Exim-Rcpt-To: qperret@google.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
+ will@kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ kernel-team@android.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, will@kernel.org,
- linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -85,35 +88,93 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Tue, 10 May 2022 09:57:06 +0000, Fuad Tabba wrote:
-> This series changes the way KVM communicates host pmu event changes to the
-> hypervisor in nvhe and protected mode. Instead of accessing hyp data directly
-> from the host, the data is passed to hyp via the loaded vcpu. This provides
-> more isolation between the host and the hypervisor, and allows us to use pmu in
-> protected mode.
+On Fri, 13 May 2022 10:26:07 +0100,
+Quentin Perret <qperret@google.com> wrote:
 > 
-> This series is based on kvmarm/next (8c22fd2d4cfa).
+> Will reported the following splat when running with Protected KVM
+> enabled:
 > 
-> [...]
+> [    2.427181] ------------[ cut here ]------------
+> [    2.427668] WARNING: CPU: 3 PID: 1 at arch/arm64/kvm/mmu.c:489 __create_hyp_private_mapping+0x118/0x1ac
+> [    2.428424] Modules linked in:
+> [    2.429040] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.18.0-rc2-00084-g8635adc4efc7 #1
+> [    2.429589] Hardware name: QEMU QEMU Virtual Machine, BIOS 0.0.0 02/06/2015
+> [    2.430286] pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> [    2.430734] pc : __create_hyp_private_mapping+0x118/0x1ac
+> [    2.431091] lr : create_hyp_exec_mappings+0x40/0x80
+> [    2.431377] sp : ffff80000803baf0
+> [    2.431597] x29: ffff80000803bb00 x28: 0000000000000000 x27: 0000000000000000
+> [    2.432156] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
+> [    2.432561] x23: ffffcd96c343b000 x22: 0000000000000000 x21: ffff80000803bb40
+> [    2.433004] x20: 0000000000000004 x19: 0000000000001800 x18: 0000000000000000
+> [    2.433343] x17: 0003e68cf7efdd70 x16: 0000000000000004 x15: fffffc81f602a2c8
+> [    2.434053] x14: ffffdf8380000000 x13: ffffcd9573200000 x12: ffffcd96c343b000
+> [    2.434401] x11: 0000000000000004 x10: ffffcd96c1738000 x9 : 0000000000000004
+> [    2.434812] x8 : ffff80000803bb40 x7 : 7f7f7f7f7f7f7f7f x6 : 544f422effff306b
+> [    2.435136] x5 : 000000008020001e x4 : ffff207d80a88c00 x3 : 0000000000000005
+> [    2.435480] x2 : 0000000000001800 x1 : 000000014f4ab800 x0 : 000000000badca11
+> [    2.436149] Call trace:
+> [    2.436600]  __create_hyp_private_mapping+0x118/0x1ac
+> [    2.437576]  create_hyp_exec_mappings+0x40/0x80
+> [    2.438180]  kvm_init_vector_slots+0x180/0x194
+> [    2.458941]  kvm_arch_init+0x80/0x274
+> [    2.459220]  kvm_init+0x48/0x354
+> [    2.459416]  arm_init+0x20/0x2c
+> [    2.459601]  do_one_initcall+0xbc/0x238
+> [    2.459809]  do_initcall_level+0x94/0xb4
+> [    2.460043]  do_initcalls+0x54/0x94
+> [    2.460228]  do_basic_setup+0x1c/0x28
+> [    2.460407]  kernel_init_freeable+0x110/0x178
+> [    2.460610]  kernel_init+0x20/0x1a0
+> [    2.460817]  ret_from_fork+0x10/0x20
+> [    2.461274] ---[ end trace 0000000000000000 ]---
+> 
+> Indeed, the Protected KVM mode promotes __create_hyp_private_mapping()
+> to a hypercall as EL1 no longer has access to the hypervisor's stage-1
+> page-table. However, the call from kvm_init_vector_slots() happens after
+> pKVM has been initialized on the primary CPU, but before it has been
+> initialized on secondaries. As such, if the KVM initcall procedure is
+> migrated from one CPU to another in this window, the hypercall may end up
+> running on a CPU for which EL2 has not been initialized.
+> 
+> Fortunately, the pKVM hypervisor doesn't rely on the host to re-map the
+> vectors in the private range, so the hypercall in question is in fact
+> superfluous. Skip it when pKVM is enabled.
+> 
+> Reported-by: Will Deacon <will@kernel.org>
+> Signed-off-by: Quentin Perret <qperret@google.com>
+> ---
+>  arch/arm64/kvm/arm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 523bc934fe2f..7347c133efc4 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -1436,7 +1436,7 @@ static int kvm_init_vector_slots(void)
+>  	base = kern_hyp_va(kvm_ksym_ref(__bp_harden_hyp_vecs));
+>  	kvm_init_vector_slot(base, HYP_VECTOR_SPECTRE_DIRECT);
+>  
+> -	if (kvm_system_needs_idmapped_vectors() && !has_vhe()) {
+> +	if (kvm_system_needs_idmapped_vectors() && !has_vhe() && !is_protected_kvm_enabled()) {
+>  		err = create_hyp_exec_mappings(__pa_symbol(__bp_harden_hyp_vecs),
+>  					       __BP_HARDEN_HYP_VECS_SZ, &base);
+>  		if (err)
 
-Applied to next, thanks!
+Can we simplify the condition? ARM64_SPECTRE_V3A is only set when
+!VHE, and we already bail in kvm_patch_vector_branch() if we see
+VHE+V3A, because the combination makes no sense at all. I think this
+can be rewritten as:
 
-[1/4] KVM: arm64: Wrapper for getting pmu_events
-      commit: 3cb8a091a7016be0ee5420ff6c1928972e3ce23e
-[2/4] KVM: arm64: Repack struct kvm_pmu to reduce size
-      commit: e987a4c60f9755b2f7a19bf1b5ef2eb74c90579b
-[3/4] KVM: arm64: Pass pmu events to hyp via vcpu
-      commit: 84d751a019a9792f5b4884e1d598b603c360ec22
-[4/4] KVM: arm64: Reenable pmu in Protected Mode
-      commit: 722625c6f4c5b6a9953d6af04c7bb1a6e12830b3
+	if (kvm_system_needs_idmapped_vectors() &&
+	    !is_protected_lvm_enabled())
 
-Cheers,
+Thoughts?
 
 	M.
+
 -- 
 Without deviation from the norm, progress is not possible.
-
-
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
