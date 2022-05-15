@@ -2,76 +2,91 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F00C433F5
-	for <kvmarm@archiver.kernel.org>; Sun, 15 May 2022 11:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E19C433F5
+	for <kvmarm@archiver.kernel.org>; Sun, 15 May 2022 11:43:03 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E2E0241174;
-	Sun, 15 May 2022 07:10:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 106664B1AF;
+	Sun, 15 May 2022 07:43:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id V1ZPEuiux9+V; Sun, 15 May 2022 07:10:28 -0400 (EDT)
+	with ESMTP id x6okxlRzH86b; Sun, 15 May 2022 07:43:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B0852412FC;
-	Sun, 15 May 2022 07:10:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 78BC94B187;
+	Sun, 15 May 2022 07:43:01 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9000F40D26
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 07:10:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DCAF4B150
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 07:43:00 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vz5qiBeRSSGT for <kvmarm@lists.cs.columbia.edu>;
- Sun, 15 May 2022 07:10:26 -0400 (EDT)
+ with ESMTP id 3wyZvqm3UJ23 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 15 May 2022 07:42:58 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2729D4088C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 07:10:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AAB284B10A
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 07:42:58 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id AE991B80BFA;
- Sun, 15 May 2022 11:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FDB5C385B8;
- Sun, 15 May 2022 11:10:23 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 0881AB80CA7;
+ Sun, 15 May 2022 11:42:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83016C385B8;
+ Sun, 15 May 2022 11:42:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652613023;
- bh=Gd6CxhhQA+J6DDYWjHtSX7GWX+S+94nD0R96QSRYaAE=;
+ s=k20201202; t=1652614975;
+ bh=7dIbSSC/bm+DplSUSi0xigmR6pbZLkiHLoE4XzIM19M=;
  h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=g5SbddoS4M/ze5TTryBJTUWICz/d4a/TFbo0VqwMBdC2BNWUF5g6sdJwSsL3hXnj/
- jSYb3DlROc8QZ3FKIhXLCtQZwr6aX6SbK30Zlw16pkVfDmZO5D1iDylZZp7IiRyDgX
- ZpuIOYsWb0KHRNM364aUhjW8YMBd4UD1r0S27OtThr/TXmcjvVmL8vK+poR2kr3aXP
- BVrqnrJmkiifOnlk0uQpMwlByScCUpUJGtlvxX3p1QI9HPC7KFQ1+F55Wo7kH3Blm2
- QXEfBJxjqCuBwPvTwCc+VmkJcOW5ZOU+m6+hocPiNzkMUU0WiSWqeKVfXYQrfOYwab
- vJ7rOgD5c13Tg==
+ b=Rpvso4EBNT37tDYBsc9ObnOQUk00vKtVas7WliAOCjUUzdiLbHfFD+h7bwe30PB59
+ UaoTrP/EssBsJ0iT+cG3vQ8D1QeQlBX40eREQ29IBiw5ji1ZdBwnlJPUAf4JXZu1ak
+ kc3N2hlk0cbWjIBTdlAvsttPMDv+u41KescmWnsKxn7rRDO7XyxHgHvqiSHI33HkSB
+ GN68ze6eTNgYMB9IR7l+5/fxcAwfvwb51nvSZILeFEK6Eo6gU12fczb0Yxn/LXs0NL
+ hvND1HuhpGq8NIqc9kCY8yCNM7RbDqvj1mhYepKiGSOoPKrAMCXznvSTz9UG5dZlYp
+ ib4JQWSxVZSRQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
  by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
  TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
  (envelope-from <maz@kernel.org>)
- id 1nqC8i-00BPt3-Re; Sun, 15 May 2022 12:10:20 +0100
-Date: Sun, 15 May 2022 12:10:20 +0100
-Message-ID: <87sfpb59wj.wl-maz@kernel.org>
+ id 1nqCeC-00BQ2N-It; Sun, 15 May 2022 12:42:52 +0100
+Date: Sun, 15 May 2022 12:42:52 +0100
+Message-ID: <87r14v58eb.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
-To: Quentin Perret <qperret@google.com>
-Subject: Re: [PATCH] KVM: arm64: Don't hypercall before EL2 init
-In-Reply-To: <20220513092607.35233-1-qperret@google.com>
-References: <20220513092607.35233-1-qperret@google.com>
+To: David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v5 20/21] KVM: Allow for different capacities in
+ kvm_mmu_memory_cache structs
+In-Reply-To: <20220513202819.829591-21-dmatlack@google.com>
+References: <20220513202819.829591-1-dmatlack@google.com>
+ <20220513202819.829591-21-dmatlack@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: qperret@google.com, james.morse@arm.com,
- alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com,
- will@kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
- kernel-team@android.com
+X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com,
+ chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ seanjc@google.com, drjones@redhat.com, bgardon@google.com, peterx@redhat.com,
+ maciej.szmigiero@oracle.com, kvmarm@lists.cs.columbia.edu,
+ linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ pfeiner@google.com, jiangshanlai@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
  SAEximRunCond expanded to false
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Albert Ou <aou@eecs.berkeley.edu>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
+ <linux-mips@vger.kernel.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
+ <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ maciej.szmigiero@oracle.com,
+ "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
+ <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -88,88 +103,229 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Fri, 13 May 2022 10:26:07 +0100,
-Quentin Perret <qperret@google.com> wrote:
+On Fri, 13 May 2022 21:28:18 +0100,
+David Matlack <dmatlack@google.com> wrote:
 > 
-> Will reported the following splat when running with Protected KVM
-> enabled:
+> Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
+> declaration time rather than being fixed for all declarations. This will
+> be used in a follow-up commit to declare an cache in x86 with a capacity
+> of 512+ objects without having to increase the capacity of all caches in
+> KVM.
 > 
-> [    2.427181] ------------[ cut here ]------------
-> [    2.427668] WARNING: CPU: 3 PID: 1 at arch/arm64/kvm/mmu.c:489 __create_hyp_private_mapping+0x118/0x1ac
-> [    2.428424] Modules linked in:
-> [    2.429040] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.18.0-rc2-00084-g8635adc4efc7 #1
-> [    2.429589] Hardware name: QEMU QEMU Virtual Machine, BIOS 0.0.0 02/06/2015
-> [    2.430286] pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-> [    2.430734] pc : __create_hyp_private_mapping+0x118/0x1ac
-> [    2.431091] lr : create_hyp_exec_mappings+0x40/0x80
-> [    2.431377] sp : ffff80000803baf0
-> [    2.431597] x29: ffff80000803bb00 x28: 0000000000000000 x27: 0000000000000000
-> [    2.432156] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
-> [    2.432561] x23: ffffcd96c343b000 x22: 0000000000000000 x21: ffff80000803bb40
-> [    2.433004] x20: 0000000000000004 x19: 0000000000001800 x18: 0000000000000000
-> [    2.433343] x17: 0003e68cf7efdd70 x16: 0000000000000004 x15: fffffc81f602a2c8
-> [    2.434053] x14: ffffdf8380000000 x13: ffffcd9573200000 x12: ffffcd96c343b000
-> [    2.434401] x11: 0000000000000004 x10: ffffcd96c1738000 x9 : 0000000000000004
-> [    2.434812] x8 : ffff80000803bb40 x7 : 7f7f7f7f7f7f7f7f x6 : 544f422effff306b
-> [    2.435136] x5 : 000000008020001e x4 : ffff207d80a88c00 x3 : 0000000000000005
-> [    2.435480] x2 : 0000000000001800 x1 : 000000014f4ab800 x0 : 000000000badca11
-> [    2.436149] Call trace:
-> [    2.436600]  __create_hyp_private_mapping+0x118/0x1ac
-> [    2.437576]  create_hyp_exec_mappings+0x40/0x80
-> [    2.438180]  kvm_init_vector_slots+0x180/0x194
-> [    2.458941]  kvm_arch_init+0x80/0x274
-> [    2.459220]  kvm_init+0x48/0x354
-> [    2.459416]  arm_init+0x20/0x2c
-> [    2.459601]  do_one_initcall+0xbc/0x238
-> [    2.459809]  do_initcall_level+0x94/0xb4
-> [    2.460043]  do_initcalls+0x54/0x94
-> [    2.460228]  do_basic_setup+0x1c/0x28
-> [    2.460407]  kernel_init_freeable+0x110/0x178
-> [    2.460610]  kernel_init+0x20/0x1a0
-> [    2.460817]  ret_from_fork+0x10/0x20
-> [    2.461274] ---[ end trace 0000000000000000 ]---
+> This change requires each cache now specify its capacity at runtime,
+> since the cache struct itself no longer has a fixed capacity known at
+> compile time. To protect against someone accidentally defining a
+> kvm_mmu_memory_cache struct directly (without the extra storage), this
+> commit includes a WARN_ON() in kvm_mmu_topup_memory_cache().
 > 
-> Indeed, the Protected KVM mode promotes __create_hyp_private_mapping()
-> to a hypercall as EL1 no longer has access to the hypervisor's stage-1
-> page-table. However, the call from kvm_init_vector_slots() happens after
-> pKVM has been initialized on the primary CPU, but before it has been
-> initialized on secondaries. As such, if the KVM initcall procedure is
-> migrated from one CPU to another in this window, the hypercall may end up
-> running on a CPU for which EL2 has not been initialized.
+> In order to support different capacities, this commit changes the
+> objects pointer array to be dynamically allocated the first time the
+> cache is topped-up.
 > 
-> Fortunately, the pKVM hypervisor doesn't rely on the host to re-map the
-> vectors in the private range, so the hypercall in question is in fact
-> superfluous. Skip it when pKVM is enabled.
+> An alternative would be to lay out the objects array after the
+> kvm_mmu_memory_cache struct, which can be done at compile time. But that
+> change, unfortunately, adds some grottiness to arm64 and riscv, which
+> uses a function-local (i.e.  stack-allocated) kvm_mmu_memory_cache
+> struct. Since C does not allow anonymous structs in functions, the new
+> wrapper struct that contains kvm_mmu_memory_cache and the objects
+> pointer array, must be named, which means dealing with an outer and
+> inner struct. The outer struct can't be dropped since then there would
+> be no guarantee the kvm_mmu_memory_cache struct and objects array would
+> be laid out consecutively on the stack.
+
+You may want to drop this paragraph. Someone interested in the history
+can find it on the list.
+
 > 
-> Reported-by: Will Deacon <will@kernel.org>
-> Signed-off-by: Quentin Perret <qperret@google.com>
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
 > ---
->  arch/arm64/kvm/arm.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/arm64/kvm/arm.c      |  1 +
+>  arch/arm64/kvm/mmu.c      |  5 ++++-
+>  arch/mips/kvm/mips.c      |  2 ++
+>  arch/riscv/kvm/mmu.c      |  8 ++++----
+>  arch/riscv/kvm/vcpu.c     |  1 +
+>  arch/x86/kvm/mmu/mmu.c    |  9 +++++++++
+>  include/linux/kvm_types.h |  9 +++++++--
+>  virt/kvm/kvm_main.c       | 20 ++++++++++++++++++--
+>  8 files changed, 46 insertions(+), 9 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 523bc934fe2f..7347c133efc4 100644
+> index 7fceb855fa71..aa1e0c1659d4 100644
 > --- a/arch/arm64/kvm/arm.c
 > +++ b/arch/arm64/kvm/arm.c
-> @@ -1436,7 +1436,7 @@ static int kvm_init_vector_slots(void)
->  	base = kern_hyp_va(kvm_ksym_ref(__bp_harden_hyp_vecs));
->  	kvm_init_vector_slot(base, HYP_VECTOR_SPECTRE_DIRECT);
+> @@ -320,6 +320,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.target = -1;
+>  	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
 >  
-> -	if (kvm_system_needs_idmapped_vectors() && !has_vhe()) {
-> +	if (kvm_system_needs_idmapped_vectors() && !has_vhe() && !is_protected_kvm_enabled()) {
->  		err = create_hyp_exec_mappings(__pa_symbol(__bp_harden_hyp_vecs),
->  					       __BP_HARDEN_HYP_VECS_SZ, &base);
->  		if (err)
+> +	vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
+>  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>  
+>  	/* Set up the timer */
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 53ae2c0640bc..2f2ef6b60ff4 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -764,7 +764,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+>  {
+>  	phys_addr_t addr;
+>  	int ret = 0;
+> -	struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
+> +	struct kvm_mmu_memory_cache cache = {
+> +		.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
+> +		.gfp_zero = __GFP_ZERO,
+> +	};
+>  	struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+>  	enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+>  				     KVM_PGTABLE_PROT_R |
+> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> index a25e0b73ee70..45c7179144dc 100644
+> --- a/arch/mips/kvm/mips.c
+> +++ b/arch/mips/kvm/mips.c
+> @@ -387,6 +387,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  	if (err)
+>  		goto out_free_gebase;
+>  
+> +	vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
+> +
+>  	return 0;
+>  
+>  out_free_gebase:
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index f80a34fbf102..8c2338ecc246 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -347,10 +347,10 @@ static int stage2_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
+>  	int ret = 0;
+>  	unsigned long pfn;
+>  	phys_addr_t addr, end;
+> -	struct kvm_mmu_memory_cache pcache;
+> -
+> -	memset(&pcache, 0, sizeof(pcache));
+> -	pcache.gfp_zero = __GFP_ZERO;
+> +	struct kvm_mmu_memory_cache pcache = {
+> +		.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
+> +		.gfp_zero = __GFP_ZERO,
+> +	};
+>  
+>  	end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+>  	pfn = __phys_to_pfn(hpa);
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 6785aef4cbd4..bbcb9d4a04fb 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -94,6 +94,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  
+>  	/* Mark this VCPU never ran */
+>  	vcpu->arch.ran_atleast_once = false;
+> +	vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
+>  	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+>  
+>  	/* Setup ISA features available to VCPU */
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 4b40fa2e27eb..dad7e19ef8ed 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5803,12 +5803,21 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>  {
+>  	int ret;
+>  
+> +	vcpu->arch.mmu_pte_list_desc_cache.capacity =
+> +		KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
+>  	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+>  	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
+>  
+> +	vcpu->arch.mmu_page_header_cache.capacity =
+> +		KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
+>  	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+>  	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+>  
+> +	vcpu->arch.mmu_shadowed_info_cache.capacity =
+> +		KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
+> +
+> +	vcpu->arch.mmu_shadow_page_cache.capacity =
+> +		KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
+>  	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+>  
+>  	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index ac1ebb37a0ff..549103a4f7bc 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -83,14 +83,19 @@ struct gfn_to_pfn_cache {
+>   * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
+>   * holding MMU locks.  Note, these caches act more like prefetch buffers than
+>   * classical caches, i.e. objects are not returned to the cache on being freed.
+> + *
+> + * The storage for the cache object pointers is allocated dynamically when the
+> + * cache is topped-up. The capacity field defines the number of object pointers
+> + * available after the struct.
+>   */
+>  struct kvm_mmu_memory_cache {
+>  	int nobjs;
+> +	int capacity;
+>  	gfp_t gfp_zero;
+>  	struct kmem_cache *kmem_cache;
+> -	void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
+> +	void **objects;
+>  };
+> -#endif
+> +#endif /* KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE */
 
-Can we simplify the condition? ARM64_SPECTRE_V3A is only set when
-!VHE, and we already bail in kvm_patch_vector_branch() if we see
-VHE+V3A, because the combination makes no sense at all. I think this
-can be rewritten as:
+One thing that is missing here (and was already missing) is to make it
+plain that kvm_mmu_memory_cache can only be used in contexts where
+there are no concurrent accesses to the cache.
 
-	if (kvm_system_needs_idmapped_vectors() &&
-	    !is_protected_lvm_enabled())
+>  
+>  #define HALT_POLL_HIST_COUNT			32
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index e089db822c12..264e4107e06f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -371,12 +371,23 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
+>  
+>  int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
+>  {
+> +	gfp_t gfp = GFP_KERNEL_ACCOUNT;
+>  	void *obj;
+>  
+>  	if (mc->nobjs >= min)
+>  		return 0;
+> -	while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
+> -		obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
+> +
+> +	if (WARN_ON(mc->capacity == 0))
+> +		return -EINVAL;
+> +
+> +	if (!mc->objects) {
+> +		mc->objects = kvmalloc_array(sizeof(void *), mc->capacity, gfp);
+> +		if (!mc->objects)
+> +			return -ENOMEM;
+> +	}
+> +
+> +	while (mc->nobjs < mc->capacity) {
+> +		obj = mmu_memory_cache_alloc_obj(mc, gfp);
+>  		if (!obj)
+>  			return mc->nobjs >= min ? 0 : -ENOMEM;
+>  		mc->objects[mc->nobjs++] = obj;
+> @@ -397,6 +408,11 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+>  		else
+>  			free_page((unsigned long)mc->objects[--mc->nobjs]);
+>  	}
+> +
+> +	kvfree(mc->objects);
+> +
+> +	/* Note, must set to NULL to avoid use-after-free in the next top-up. */
+> +	mc->objects = NULL;
+>  }
+>  
+>  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
 
-Thoughts?
+Otherwise:
+
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
 	M.
 
