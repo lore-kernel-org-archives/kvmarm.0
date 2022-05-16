@@ -2,48 +2,84 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B2DDC433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 16 May 2022 15:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3B4C433EF
+	for <kvmarm@archiver.kernel.org>; Mon, 16 May 2022 16:44:39 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E77994B293;
-	Mon, 16 May 2022 11:55:48 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 15D584B2B2;
+	Mon, 16 May 2022 12:44:39 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
+Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id rHw7z6vv-RID; Mon, 16 May 2022 11:55:47 -0400 (EDT)
+	with ESMTP id QClT8IGrzgIF; Mon, 16 May 2022 12:44:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 947074B297;
-	Mon, 16 May 2022 11:55:47 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B3EE14B2A7;
+	Mon, 16 May 2022 12:44:37 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 344E14B28D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 11:55:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CBCB4B2A4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 12:44:36 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AsxrmHZhyGxs for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2022 11:55:44 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C8CF4B29E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 11:55:43 -0400 (EDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 617171063;
- Mon, 16 May 2022 08:55:43 -0700 (PDT)
-Received: from monolith.localdoman (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F092E3F73D;
- Mon, 16 May 2022 08:55:41 -0700 (PDT)
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
- suzuki.poulose@arm.com, julien@xen.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
- james.morse@arm.com
-Subject: [PATCH v2 kvmtool 12/12] arm64: Allow the user to specify the RAM
- base address
-Date: Mon, 16 May 2022 16:55:26 +0100
-Message-Id: <20220516155526.181694-13-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220516155526.181694-1-alexandru.elisei@arm.com>
-References: <20220516155526.181694-1-alexandru.elisei@arm.com>
-MIME-Version: 1.0
+ with ESMTP id SsiVetoMSCdJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2022 12:44:35 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 161664B2A1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 12:44:35 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 427DBB81258;
+ Mon, 16 May 2022 16:44:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4206C385AA;
+ Mon, 16 May 2022 16:44:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1652719472;
+ bh=CYEvraFOukMkXu6WJZExhFsNqffzBStRQaubVucF2VE=;
+ h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+ b=hQ3raqWSwFK4Im/gQu5BrQ4j5EyxbLqHUz+Thyw+Air6BDVAOJuI4kc6nzyOZ25OU
+ b1AY5WRVxEfX6D07dcOBR9dytT7129POMhLMkPhRECoHIpow/eHniKQmN8v6TxqUJV
+ tJixyVk71SO7PdcAHVfTeXZiyZVkkd5CwEajyv+QDZqiavEnxLHiwL/2xdBqhdWSmN
+ 4A3s5b1Svfd80b2zJy//vKyhJqZOMOaPIwhpcG+FpUJYzDEkcVA7zm4loAzpNzjGFT
+ Dleu4A7zeI1r9OS5GBL1rbamw5P5i4i0d7rnznuEpn/KsRQ8jpMJhqvFRfO1ZSnsZQ
+ 1f1tFAW7qheOA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nqdpc-00Bfyr-Tm; Mon, 16 May 2022 17:44:29 +0100
+Date: Mon, 16 May 2022 17:44:28 +0100
+Message-ID: <87ilq55swj.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH v7 0/9] KVM: arm64: Add support for hypercall services
+ selection
+In-Reply-To: <CAJHc60w1F7RAgJkv5PRuJtKjTw1gUaYmZk885AVhPLF2h6YbkQ@mail.gmail.com>
+References: <20220502233853.1233742-1-rananta@google.com>
+ <878rri8r78.wl-maz@kernel.org>
+ <CAJHc60xp=UQT_CX0zoiSjAmkS8JSe+NB5Gr+F5mmybjJAWkUtQ@mail.gmail.com>
+ <878rriicez.wl-maz@kernel.org>
+ <CAJHc60w1F7RAgJkv5PRuJtKjTw1gUaYmZk885AVhPLF2h6YbkQ@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: rananta@google.com, drjones@redhat.com, james.morse@arm.com,
+ alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com,
+ catalin.marinas@arm.com, will@kernel.org, pshier@google.com,
+ ricarkol@google.com, oupton@google.com, reijiw@google.com,
+ jingzhangos@google.com, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Peter Shier <pshier@google.com>,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -55,190 +91,112 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Allow the user to specify the RAM base address by using -m/--mem size@addr
-command line argument. The base address must be above 2GB, as to not
-overlap with the MMIO I/O region.
-
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- arm/aarch64/include/kvm/kvm-arch.h |  2 ++
- arm/aarch64/kvm.c                  |  5 ++++-
- arm/kvm.c                          |  7 +++++--
- builtin-run.c                      | 29 +++++++++++++++++++++++++----
- include/kvm/kvm-config.h           |  1 +
- include/kvm/kvm.h                  | 12 ++++++++++++
- 6 files changed, 49 insertions(+), 7 deletions(-)
-
-diff --git a/arm/aarch64/include/kvm/kvm-arch.h b/arm/aarch64/include/kvm/kvm-arch.h
-index ff857ca6e7b4..02d09a413831 100644
---- a/arm/aarch64/include/kvm/kvm-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-arch.h
-@@ -10,6 +10,8 @@ void kvm__arch_enable_mte(struct kvm *kvm);
- 
- #define MAX_PAGE_SIZE	SZ_64K
- 
-+#define ARCH_HAS_CFG_RAM_ADDRESS	1
-+
- #include "arm-common/kvm-arch.h"
- 
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index af8e7eae0da2..14ffae9e39dc 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -44,6 +44,9 @@ void kvm__arch_validate_cfg(struct kvm *kvm)
- 		die("RAM size 0x%llx exceeds maximum allowed 0x%llx",
- 		    kvm->cfg.ram_size, ARM_LOMAP_MAX_MEMORY);
- 	}
-+
-+	if (kvm->cfg.ram_addr < ARM_MEMORY_AREA)
-+		die("RAM address is below %luGB", ARM_MEMORY_AREA >> 30);
- }
- 
- u64 kvm__arch_default_ram_address(void)
-@@ -117,7 +120,7 @@ int kvm__get_vm_type(struct kvm *kvm)
- 		return 0;
- 
- 	/* Otherwise, compute the minimal required IPA size */
--	max_ipa = ARM_MEMORY_AREA + kvm->cfg.ram_size - 1;
-+	max_ipa = kvm->cfg.ram_addr + kvm->cfg.ram_size - 1;
- 	ipa_bits = max(32, fls_long(max_ipa));
- 	pr_debug("max_ipa %lx ipa_bits %d max_ipa_bits %d",
- 		 max_ipa, ipa_bits, max_ipa_bits);
-diff --git a/arm/kvm.c b/arm/kvm.c
-index abcccfabf59e..d51cc15d8b1c 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -55,7 +55,7 @@ void kvm__init_ram(struct kvm *kvm)
- 	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
- 		MADV_HUGEPAGE);
- 
--	phys_start	= ARM_MEMORY_AREA;
-+	phys_start	= kvm->cfg.ram_addr;
- 	phys_size	= kvm->ram_size;
- 	host_mem	= kvm->ram_start;
- 
-@@ -65,6 +65,9 @@ void kvm__init_ram(struct kvm *kvm)
- 		    "address 0x%llx [err %d]", phys_size, phys_start, err);
- 
- 	kvm->arch.memory_guest_start = phys_start;
-+
-+	pr_debug("RAM created at 0x%llx - 0x%llx",
-+		 phys_start, phys_start + phys_size - 1);
- }
- 
- void kvm__arch_delete_ram(struct kvm *kvm)
-@@ -201,7 +204,7 @@ bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
- 
- 	/* For default firmware address, lets load it at the begining of RAM */
- 	if (fw_addr == 0)
--		fw_addr = ARM_MEMORY_AREA;
-+		fw_addr = kvm->arch.memory_guest_start;
- 
- 	if (!validate_fw_addr(kvm, fw_addr))
- 		die("Bad firmware destination: 0x%016llx", fw_addr);
-diff --git a/builtin-run.c b/builtin-run.c
-index 57c58be55159..26e6e9974009 100644
---- a/builtin-run.c
-+++ b/builtin-run.c
-@@ -131,12 +131,22 @@ static u64 parse_mem_option(const char *nptr, char **next)
- static int mem_parser(const struct option *opt, const char *arg, int unset)
- {
- 	struct kvm *kvm = opt->ptr;
--	char *next;
-+	char *next, *nptr;
- 
- 	kvm->cfg.ram_size = parse_mem_option(arg, &next);
- 	if (kvm->cfg.ram_size == 0)
- 		die("Invalid RAM size: %s", arg);
- 
-+	kvm->cfg.ram_addr = kvm__arch_default_ram_address();
-+	if (kvm__arch_has_cfg_ram_address() && *next == '@') {
-+		next++;
-+		if (*next == '\0')
-+			die("Missing memory address: %s", arg);
-+
-+		nptr = next;
-+		kvm->cfg.ram_addr = parse_mem_option(nptr, &next);
-+	}
-+
- 	if (*next != '\0')
- 		die("Invalid memory specifier: %s", arg);
- 
-@@ -147,15 +157,26 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
- #define OPT_ARCH_RUN(...)
- #endif
- 
-+#ifdef ARCH_HAS_CFG_RAM_ADDRESS
-+#define MEM_OPT_HELP_SHORT	"size[BKMGTP][@addr[BKMGTP]]"
-+#define MEM_OPT_HELP_LONG						\
-+	"Virtual machine memory size and optional base address, both"	\
-+	" measured by default in megabytes (M)"
-+#else
-+#define MEM_OPT_HELP_SHORT	"size[BKMGTP]"
-+#define MEM_OPT_HELP_LONG						\
-+	"Virtual machine memory size, by default measured in"		\
-+	" in megabytes (M)"
-+#endif
-+
- #define BUILD_OPTIONS(name, cfg, kvm)					\
- 	struct option name[] = {					\
- 	OPT_GROUP("Basic options:"),					\
- 	OPT_STRING('\0', "name", &(cfg)->guest_name, "guest name",	\
- 			"A name for the guest"),			\
- 	OPT_INTEGER('c', "cpus", &(cfg)->nrcpus, "Number of CPUs"),	\
--	OPT_CALLBACK('m', "mem", NULL, "size[BKMGTP]",			\
--		     "Virtual machine memory size, by default measured"	\
--		     " in megabytes (M)", mem_parser, kvm),		\
-+	OPT_CALLBACK('m', "mem", NULL, MEM_OPT_HELP_SHORT,		\
-+		     MEM_OPT_HELP_LONG, mem_parser, kvm),		\
- 	OPT_CALLBACK('d', "disk", kvm, "image or rootfs_dir", "Disk "	\
- 			" image or rootfs directory", img_name_parser,	\
- 			kvm),						\
-diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-index 31bc89520d52..45fe1caaebce 100644
---- a/include/kvm/kvm-config.h
-+++ b/include/kvm/kvm-config.h
-@@ -23,6 +23,7 @@ struct kvm_config {
- 	struct kvm_config_arch arch;
- 	struct disk_image_params disk_image[MAX_DISK_IMAGES];
- 	struct vfio_device_params *vfio_devices;
-+	u64 ram_addr;		/* Guest memory physical base address, in bytes */
- 	u64 ram_size;		/* Guest memory size, in bytes */
- 	u8 num_net_devices;
- 	u8 num_vfio_devices;
-diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
-index 360430b78b1e..eb23e2f77310 100644
---- a/include/kvm/kvm.h
-+++ b/include/kvm/kvm.h
-@@ -197,6 +197,18 @@ int kvm__arch_free_firmware(struct kvm *kvm);
- bool kvm__arch_cpu_supports_vm(void);
- void kvm__arch_read_term(struct kvm *kvm);
- 
-+#ifdef ARCH_HAS_CFG_RAM_ADDRESS
-+static inline bool kvm__arch_has_cfg_ram_address(void)
-+{
-+	return true;
-+}
-+#else
-+static inline bool kvm__arch_has_cfg_ram_address(void)
-+{
-+	return false;
-+}
-+#endif
-+
- void *guest_flat_to_host(struct kvm *kvm, u64 offset);
- u64 host_to_guest_flat(struct kvm *kvm, void *ptr);
- 
--- 
-2.36.1
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+T24gVHVlLCAwMyBNYXkgMjAyMiAyMjowOToyOSArMDEwMCwKUmFnaGF2ZW5kcmEgUmFvIEFuYW50
+YSA8cmFuYW50YUBnb29nbGUuY29tPiB3cm90ZToKPiAKPiBPbiBUdWUsIE1heSAzLCAyMDIyIGF0
+IDE6MzMgUE0gTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9yZz4gd3JvdGU6Cj4gPgo+ID4gT24g
+VHVlLCAwMyBNYXkgMjAyMiAxOTo0OToxMyArMDEwMCwKPiA+IFJhZ2hhdmVuZHJhIFJhbyBBbmFu
+dGEgPHJhbmFudGFAZ29vZ2xlLmNvbT4gd3JvdGU6Cj4gPiA+Cj4gPiA+IEhpIE1hcmMsCj4gPiA+
+Cj4gPiA+IE9uIFR1ZSwgTWF5IDMsIDIwMjIgYXQgMTA6MjQgQU0gTWFyYyBaeW5naWVyIDxtYXpA
+a2VybmVsLm9yZz4gd3JvdGU6Cj4gPiA+ID4KPiA+ID4gPiBPbiBUdWUsIDAzIE1heSAyMDIyIDAw
+OjM4OjQ0ICswMTAwLAo+ID4gPiA+IFJhZ2hhdmVuZHJhIFJhbyBBbmFudGEgPHJhbmFudGFAZ29v
+Z2xlLmNvbT4gd3JvdGU6Cj4gPiA+ID4gPgo+ID4gPiA+ID4gSGVsbG8sCj4gPiA+ID4gPgo+ID4g
+PiA+ID4gQ29udGludWluZyB0aGUgZGlzY3Vzc2lvbiBmcm9tIFsxXSwgdGhlIHNlcmllcyB0cmll
+cyB0byBhZGQgc3VwcG9ydAo+ID4gPiA+ID4gZm9yIHRoZSB1c2Vyc3BhY2UgdG8gZWxlY3QgdGhl
+IGh5cGVyY2FsbCBzZXJ2aWNlcyB0aGF0IGl0IHdpc2hlcwo+ID4gPiA+ID4gdG8gZXhwb3NlIHRv
+IHRoZSBndWVzdCwgcmF0aGVyIHRoYW4gdGhlIGd1ZXN0IGRpc2NvdmVyaW5nIHRoZW0KPiA+ID4g
+PiA+IHVuY29uZGl0aW9uYWxseS4gVGhlIGlkZWEgZW1wbG95ZWQgYnkgdGhlIHNlcmllcyB3YXMg
+dGFrZW4gZnJvbQo+ID4gPiA+ID4gWzFdIGFzIHN1Z2dlc3RlZCBieSBNYXJjIFouCj4gPiA+ID4K
+PiA+ID4gPiBBcyBpdCB0b29rIHNvbWUgdGltZSB0byBnZXQgdGhlcmUsIGFuZCB0aGF0IHRoZXJl
+IHdhcyBzdGlsbCBhIGJ1bmNoIG9mCj4gPiA+ID4gdGhpbmdzIHRvIGFkZHJlc3MsIEkndmUgdGFr
+ZW4gdGhlIGxpYmVydHkgdG8gYXBwbHkgbXkgb3duIGZpeGVzIHRvIHRoZQo+ID4gPiA+IHNlcmll
+cy4KPiA+ID4gPgo+ID4gPiA+IFBsZWFzZSBoYXZlIGEgbG9vayBhdCBbMV0sIGFuZCBsZXQgbWUg
+a25vdyBpZiB5b3UncmUgT0sgd2l0aCB0aGUKPiA+ID4gPiByZXN1bHQuIElmIHlvdSBhcmUsIEkn
+bGwgbWVyZ2UgdGhlIHNlcmllcyBmb3IgNS4xOS4KPiA+ID4gPgo+ID4gPiA+IFRoYW5rcywKPiA+
+ID4gPgo+ID4gPiA+ICAgICAgICAgTS4KPiA+ID4gPgo+ID4gPiBUaGFuayB5b3UgZm9yIHNwZWVk
+aW5nIHVwIHRoZSBwcm9jZXNzOyBhcHByZWNpYXRlIGl0LiBIb3dldmVyLCB0aGUKPiA+ID4gc2Vy
+aWVzJ3Mgc2VsZnRlc3QgcGF0Y2hlcyBoYXZlIGEgZGVwZW5kZW5jeSBvbiBPbGl2ZXIncwo+ID4g
+PiBQU0NJX1NZU1RFTV9TVVNQRU5EJ3Mgc2VsZnRlc3QgcGF0Y2hlcyBbMV1bMl0uIENhbiB3ZSBw
+dWxsIHRoZW0gaW4KPiA+ID4gdG9vPwo+ID4KPiA+IFVyZ2guLi4gSSBndWVzcyB0aGlzIGlzIHRo
+ZSB0aW1lIHRvIHNldCBzb21lIGdyb3VuZCBydWxlczoKPiA+Cj4gPiAtIFBsZWFzZSBkb24ndCBp
+bnRyb2R1Y2UgZGVwZW5kZW5jaWVzIGJldHdlZW4gc2VyaWVzLCB0aGF0J3MKPiA+ICAgdW5tYW5h
+Z2VhYmxlLiBJIHJlYWxseSBuZWVkIHRvIHNlZSBlYWNoIHNlcmllcyBpbmRlcGVuZGVudGx5LCBh
+bmQgaWYKPiA+ICAgdGhlcmUgaXMgYSBtZXJnZSBjb25mbGljdCwgdGhhdCdzIG15IGpvYiB0byBm
+aXggKGFuZCBJIGRvbid0IHJlYWxseQo+ID4gICBtaW5kKS4KPiA+Cj4gPiAtIElmIHRoZXJlIGlz
+IGEgZGVwZW5kZW5jeSBiZXR3ZWVuIHNlcmllcywgcGxlYXNlIHBvc3QgYSB2ZXJzaW9uIG9mCj4g
+PiAgIHRoZSByZXF1aXJlZCBwYXRjaGVzIGFzIGEgcHJlZml4IHRvIHlvdXIgc2VyaWVzLCBhc3N1
+bWluZyB0aGlzCj4gPiAgIHByZWZpeCBpcyBpdHNlbGYgc3RhbmRhbG9uZS4gSWYgaXQgaXNuJ3Qs
+IHRoZW4gc29tZXRoaW5nIHJlYWxseSBpcwo+ID4gICB3cm9uZywgYW5kIHRoZSBzZXJpZXMgc2hv
+dWxkIGJlIHJlc3BsaXQuCj4gPgo+ID4gLSBZb3UgYWxzbyBzaG91bGQgYmUgYmFzaW5nIHlvdXIg
+c2VyaWVzIG9uIGFuICpvZmZpY2lhbCogdGFnIGZyb20KPiA+ICAgTGludXMnIHRyZWUgKHByZWZl
+cmFibHkgLXJjMSwgLXJjMiBvciAtcmMzKSwgYW5kIG5vdCBzb21ldGhpbmcKPiA+ICAgcmFuZG9t
+IGxpa2UgYW55IG9kZCBjb21taXQgZnJvbSB0aGUgS1ZNIHRyZWUgKEkgaGFkIGNvbmZsaWN0cyB3
+aGlsZQo+ID4gICBhcHBseWluZyB0aGlzIG9uIC1yYzMsIHByb2JhYmx5IGR1ZSB0byB0aGUgbm9u
+LWFkdmVydGlzZWQgZGVwZW5kZW5jeQo+ID4gICBvbiBPbGl2ZXIncyBzZXJpZXMpLgo+ID4KPiBU
+aGFua3MgZm9yIHBpY2tpbmcgdGhlIGRlcGVuZGVuY3kgcGF0Y2hlcy4gSSdsbCBrZWVwIHRoZXNl
+IG1pbmQgdGhlCj4gbmV4dCB0aW1lIEkgcHVzaCBjaGFuZ2VzLgo+IAo+ID4gPgo+ID4gPiBhYXJj
+aDY0L2h5cGVyY2FsbHMuYzogSW4gZnVuY3Rpb24g4oCYZ3Vlc3RfdGVzdF9odmPigJk6Cj4gPiA+
+IGFhcmNoNjQvaHlwZXJjYWxscy5jOjk1OjMwOiBlcnJvcjogc3RvcmFnZSBzaXplIG9mIOKAmHJl
+c+KAmSBpc27igJl0IGtub3duCj4gPiA+ICAgIDk1IHwgICAgICAgICBzdHJ1Y3QgYXJtX3NtY2Nj
+X3JlcyByZXM7Cj4gPiA+ICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn4K
+PiA+ID4gYWFyY2g2NC9oeXBlcmNhbGxzLmM6MTAzOjE3OiB3YXJuaW5nOiBpbXBsaWNpdCBkZWNs
+YXJhdGlvbiBvZiBmdW5jdGlvbgo+ID4gPiDigJhzbWNjY19odmPigJkgWy1XaW1wbGljaXQtZnVu
+Y3Rpb24tZGVjbGFyYXRpb25dCj4gPiA+ICAgMTAzIHwgICAgICAgICAgICAgICAgIHNtY2NjX2h2
+YyhoY19pbmZvLT5mdW5jX2lkLCBoY19pbmZvLT5hcmcxLCAwLAo+ID4gPiAwLCAwLCAwLCAwLCAw
+LCAmcmVzKTsKPiA+ID4gICAgICAgfCAgICAgICAgICAgICAgICAgXn5+fn5+fn5+Cj4gPiA+Cj4g
+Pgo+ID4gSSd2ZSBwaWNrZWQgdGhlIHR3byBwYXRjaGVzLCB3aGljaCBtZWFucyB0aGV5IHdpbGwg
+bW9zdCBsaWtlbHkgYXBwZWFyCj4gPiB0d2ljZSBpbiB0aGUgaGlzdG9yeS4gSW4gdGhlIGZ1dHVy
+ZSwgcGxlYXNlIHJlYWNoIG91dCBzbyB0aGF0IHdlIGNhbgo+ID4gb3JnYW5pc2UgdGhpcyBiZXR0
+ZXIuCj4gPgo+ID4gPiBBbHNvLCBqdXN0IGEgY291cGxlIG9mIHJlYWRhYmlsaXR5IG5pdHMgaW4g
+dGhlIGZpeGVkIHZlcnNpb246Cj4gPiA+Cj4gPiA+IDEuIFBhdGNoLTIvOSwgaHlwZXJjYWxsLmM6
+a3ZtX2h2Y19jYWxsX2RlZmF1bHRfYWxsb3dlZCgpLCBpbiB0aGUKPiA+ID4gJ2RlZmF1bHQnIGNh
+c2UsIGRvIHlvdSB0aGluayB3ZSBzaG91bGQgcHJvYmFibHkgYWRkIGEgc21hbGwgY29tbWVudAo+
+ID4gPiB0aGF0IG1lbnRpb25zIHdlIGFyZSBjaGVja2luZyBmb3IgZnVuY19pZCBpbiB0aGUgUFND
+SSByYW5nZT8KPiA+Cj4gPiBEdW1wZWQgYSBvbmUtbGluZXIgdGhlcmUuCj4gPgo+ID4gPiAyLiBQ
+YXRjaC0yLzksIGFybV9oeXBlcmNhbGwuaCwgY2xlYXIgYWxsIHRoZSBtYWNyb3MgaW4gdGhpcyBw
+YXRjaAo+ID4gPiBpdHNlbGYgaW5zdGVhZCBvZiBkb2luZyBpdCBpbiBpbmNyZW1lbnRzICh1bmxl
+c3MgdGhlcmUncyBzb21lIHJlYXNvbgo+ID4gPiB0aGF0IEknbSBtaXNzaW5nKT8KPiA+Cj4gPiBB
+aCwgcmViYXNpbmcgbGVmdG92ZXJzLCBub3cgZ29uZS4KPiA+Cj4gPiBJJ3ZlIHB1c2hlZCBhbiB1
+cGRhdGVkIGJyYW5jaCBhZ2FpbiwgcGxlYXNlIGhhdmUgYSBsb29rLgo+ID4KPiBUaGFua3MgZm9y
+IGFkZHJlc3NpbmcgdGhlc2UuIFRoZSBzZXJpZXMgbG9va3MgZ29vZCBub3cuCgpFeGNlcHQgaXQg
+ZG9lc24ndC4KCkkgaW50cm9kdWNlZCBhIGJ1ZyBieSBvdmVybHkgc2ltcGxpZnlpbmcga3ZtX2Fy
+bV9zZXRfZndfcmVnX2JtYXAoKSwgYXMKd2UgaGF2ZSB0byBhbGxvdyB1c2Vyc3BhY2Ugd3JpdGlu
+ZyB0aGUgKnNhbWUqIHZhbHVlLiBBcyBpdCB0dXJucyBvdXQsClFFTVUgcmVzdG9yZXMgYWxsIHRo
+ZSByZWdpc3RlcnMgb24gZWFjaCByZWJvb3QuIFdoaWNoIGFzIHRoZSB2Y3B1cwpoYXZlIGFsbCBy
+dW4uIFRoaXMgaW4gdHVybnMgdHJpZ2dlcnMgYW5vdGhlciBpc3N1ZSBpbiBRRU1VLCB3aGljaApp
+bnN0ZWFkIG9mIHRha2luZyB0aGUgaGludCBhbnMgc3RvcHBpbmcgdGhlcmUsIHNlbmRzIGFsbCB0
+aGUgdmNwdXMKaW50byB0aGUgZ3Vlc3QgaW4gb25lIGdvIHdpdGggcmFuZG9tIHN0YXRlcy4uLiBD
+cmFwIGhhcHBlbnMuCgpJJ2xsIHdlYXIgYSBicm93biBwYXBlciBiYWcgZm9yIHRoZSByZXN0IG9m
+IHRoZSBkYXkgYW5kIGFkZCB0aGUKZm9sbG93aW5nIHBhdGNoIHRvIHRoZSBicmFuY2guCgpUaGFu
+a3MsCgoJTS4KCkZyb20gNTI4YWRhMjgxMWJhMGJiMmIyZGI1YmYwZjgyOWI0OGM1MGYzYzEzYyBN
+b24gU2VwIDE3IDAwOjAwOjAwIDIwMDEKRnJvbTogTWFyYyBaeW5naWVyIDxtYXpAa2VybmVsLm9y
+Zz4KRGF0ZTogTW9uLCAxNiBNYXkgMjAyMiAxNzozMjo1NCArMDEwMApTdWJqZWN0OiBbUEFUQ0hd
+IEtWTTogYXJtNjQ6IEZpeCBoeXBlcmNhbGwgYml0bWFwIHdyaXRlYmFjayB3aGVuIHZjcHVzIGhh
+dmUKIGFscmVhZHkgcnVuCgpXZSBnZW5lcmFsbHkgd2FudCB0byBkaXNhbGxvdyBoeXBlcmNhbGwg
+Yml0bWFwcyBiZWluZyBjaGFuZ2VkCm9uY2UgdmNwdXMgaGF2ZSBhbHJlYWR5IHJ1bi4gQnV0IHdl
+IG11c3QgYWxsb3cgdGhlIHdyaXRlIGlmCnRoZSB3cml0dGVuIHZhbHVlIGlzIHVuY2hhbmdlZCBz
+byB0aGF0IHVzZXJzcGFjZSBjYW4gcmV3cml0ZQp0aGUgcmVnaXN0ZXIgZmlsZSBvbiByZWJvb3Qs
+IGZvciBleGFtcGxlLgoKV2l0aG91dCB0aGlzLCBhIFFFTVUtYmFzZWQgVk0gd2lsbCBmYWlsIHRv
+IHJlYm9vdCBjb3JyZWN0bHkuCgpUaGUgb3JpZ2luYWwgY29kZSB3YXMgY29ycmVjdCwgYW5kIGl0
+IGlzIG1lIHRoYXQgaW50cm9kdWNlZAp0aGUgcmVncmVzc2lvbi4KCkZpeGVzOiAwNTcxNGNhYjdk
+NjMgKCJLVk06IGFybTY0OiBTZXR1cCBhIGZyYW1ld29yayBmb3IgaHlwZXJjYWxsIGJpdG1hcCBm
+aXJtd2FyZSByZWdpc3RlcnMiKQpTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hekBrZXJu
+ZWwub3JnPgotLS0KIGFyY2gvYXJtNjQva3ZtL2h5cGVyY2FsbHMuYyB8IDMgKystCiAxIGZpbGUg
+Y2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXJj
+aC9hcm02NC9rdm0vaHlwZXJjYWxscy5jIGIvYXJjaC9hcm02NC9rdm0vaHlwZXJjYWxscy5jCmlu
+ZGV4IGNjYmQzY2VmYjkxYS4uYzlmNDAxZmEwMWE5IDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2
+bS9oeXBlcmNhbGxzLmMKKysrIGIvYXJjaC9hcm02NC9rdm0vaHlwZXJjYWxscy5jCkBAIC0zNzks
+NyArMzc5LDggQEAgc3RhdGljIGludCBrdm1fYXJtX3NldF9md19yZWdfYm1hcChzdHJ1Y3Qga3Zt
+X3ZjcHUgKnZjcHUsIHU2NCByZWdfaWQsIHU2NCB2YWwpCiAKIAltdXRleF9sb2NrKCZrdm0tPmxv
+Y2spOwogCi0JaWYgKHRlc3RfYml0KEtWTV9BUkNIX0ZMQUdfSEFTX1JBTl9PTkNFLCAma3ZtLT5h
+cmNoLmZsYWdzKSkgeworCWlmICh0ZXN0X2JpdChLVk1fQVJDSF9GTEFHX0hBU19SQU5fT05DRSwg
+Jmt2bS0+YXJjaC5mbGFncykgJiYKKwkgICAgdmFsICE9ICpmd19yZWdfYm1hcCkgewogCQlyZXQg
+PSAtRUJVU1k7CiAJCWdvdG8gb3V0OwogCX0KLS0gCjIuMzQuMQoKCi0tIApXaXRob3V0IGRldmlh
+dGlvbiBmcm9tIHRoZSBub3JtLCBwcm9ncmVzcyBpcyBub3QgcG9zc2libGUuCl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QK
+a3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVk
+dS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
