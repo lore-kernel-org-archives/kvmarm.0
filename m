@@ -2,78 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB49C433F5
-	for <kvmarm@archiver.kernel.org>; Mon, 16 May 2022 10:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDC87C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 16 May 2022 12:52:16 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D2EE4B1F8;
-	Mon, 16 May 2022 06:42:07 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 21BE54B23A;
+	Mon, 16 May 2022 08:52:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id xN8BWhE5qsua; Mon, 16 May 2022 06:42:06 -0400 (EDT)
+	with ESMTP id 07fb2rWsKY-F; Mon, 16 May 2022 08:52:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F7F4B11A;
-	Mon, 16 May 2022 06:42:06 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id D32324B236;
+	Mon, 16 May 2022 08:52:14 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C22B14B0DF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 06:42:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1BD74B236
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 08:52:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UXSB+S5Odlwv for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2022 06:42:03 -0400 (EDT)
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com
- [209.85.208.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E31D49F5D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 06:42:03 -0400 (EDT)
-Received: by mail-ed1-f50.google.com with SMTP id p26so1491142eds.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 03:42:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=erbXfCmeHocQjfL+rgDZPz13+JsufODTkqH4MW8FPkU=;
- b=P77DC0Il8yTtkstHIFJR8Nqlq8byFBHMvwFcvt4Nt22CzyvC/Fv+KdNgonw4S3OD3K
- 2LvZ1t/0q7xkgaqJ5UbQef9PLfEU7ibZjarM7y30f4syi3XrIkk66bNTygONFoWTGBsW
- T0zLbcuIOAC9Pea0Sj+b22Ih6ju5PVW+bGFZBfbQIQwsZ2smRedVpMeslKaL1/f8c8ws
- cpfStIYgXZGpFXthRtvUGpT3DV00iZ9sg3V6xgZDESod1iRqB5UonePNMTjP7uGf8dB4
- IBqMuAHh6o186Vqyr9HRq/GyB3509vT7hUFGMlFByEIaa6lwVHd0K6KyZqrr3pKGyAHv
- dkfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=erbXfCmeHocQjfL+rgDZPz13+JsufODTkqH4MW8FPkU=;
- b=pCgWJoSDy5cxP5f7LNwEDRflWy/Dl/ELbje0/1KZlaIcM8sLmE+zXBZNYw2hQncSQD
- uk9cZRakzWritpOlaS0ZA3LCIY0ycWp1DBwZqxmbJ9xFywG9zPhL3/3kR1Wcl+rPnHz6
- 9S/TV+GpBepXiEXSnGNPg16Ve/ZzY/GlLSDKjeUAjfBhNNztffkbwvrkv0lt/GLrLOIP
- nfgTanG9BkarDY6mK+GoH8cjA+KU0B+JEWj2WmtGcY2RsCKvoaSl7pPJYQ6M22uO8uwv
- k6xaTuX5HUdx/OGnFf+ygz6u03tWlWNlgmGTv2/MkULx/J9QZeMAn9X/ZPCiIXLV4PNq
- wDVg==
-X-Gm-Message-State: AOAM532i8x9xEzM7v7h9nkn5v569O8YC8BJvQakGXZxaeNTbvirHWrw7
- +d/g4f7ICCWaDnxlcIjJtUXzrg==
-X-Google-Smtp-Source: ABdhPJwCmZ7TsADf4yBSO70bp+4Cv2yZYtgdUiE6w+q/M7boOVpmbsE2ZQrGrh1nN3VKR0CPmxFF2w==
-X-Received: by 2002:a05:6402:2710:b0:427:d087:b with SMTP id
- y16-20020a056402271000b00427d087000bmr12509532edd.11.1652697721952; 
- Mon, 16 May 2022 03:42:01 -0700 (PDT)
-Received: from google.com (30.171.91.34.bc.googleusercontent.com.
- [34.91.171.30]) by smtp.gmail.com with ESMTPSA id
- ec33-20020a0564020d6100b0042ab48ea729sm1151662edb.88.2022.05.16.03.42.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 May 2022 03:42:01 -0700 (PDT)
-Date: Mon, 16 May 2022 10:41:58 +0000
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH] KVM: arm64: Don't hypercall before EL2 init
-Message-ID: <YoIqdiOoCf0A1hcV@google.com>
-References: <20220513092607.35233-1-qperret@google.com>
- <87sfpb59wj.wl-maz@kernel.org>
+ with ESMTP id o091khCiF079 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2022 08:52:11 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 977974B12E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 08:52:11 -0400 (EDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 158756121E;
+ Mon, 16 May 2022 12:52:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 762ACC385AA;
+ Mon, 16 May 2022 12:52:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=k20201202; t=1652705529;
+ bh=lMqrH8tUWPiPNpp7YGN4p4ypyHXlAjPKtD0Fl41tSJ4=;
+ h=From:To:Cc:Subject:Date:From;
+ b=gcqzLdfgWD+vGB1UXhXVa1Mdoe/NiQKF8S4HMwqLc05eiSy9OqShf6jLUYCEeylh7
+ zpgiZlU1J5+YPeFL1U41HUfAVVikwHQubO0In05+n30tl55iYWVgXeIlxMpLrtW5UD
+ NmIz314S5DVW8jwQY81kjsJaj/FI+AWNxKxZNNAFblZOK2UgwIDdNaDZ4PiWglOyZP
+ jPu3G/sSzlhXCyRd/tjmfZrT2f7/nenTW3sexkyHYduXnRXVRXLoEwAZxLC0reo/0N
+ VLSgG2uAEwYsuV9uDo1f09bWQ1Ke3YkJ6mdVmnSciqONmV2psqRRzFHYFGKGIsnlOe
+ dG83F1+xVYZhw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+ by disco-boy.misterjones.org with esmtpsa (TLS1.3) tls
+ TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (Exim 4.94.2)
+ (envelope-from <maz@kernel.org>)
+ id 1nqaCk-00Bc9J-FA; Mon, 16 May 2022 13:52:06 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [GIT PULL] KVM/arm64 fixes for 5.18, take #3
+Date: Mon, 16 May 2022 13:51:51 +0100
+Message-Id: <20220516125151.955808-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Disposition: inline
-In-Reply-To: <87sfpb59wj.wl-maz@kernel.org>
-Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, oupton@google.com,
+ peter.maydell@linaro.org, qperret@google.com, will@kernel.org,
+ james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+ kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
+ SAEximRunCond expanded to false
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
  kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
@@ -91,25 +83,49 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sunday 15 May 2022 at 12:10:20 (+0100), Marc Zyngier wrote:
-> Can we simplify the condition? ARM64_SPECTRE_V3A is only set when
-> !VHE, and we already bail in kvm_patch_vector_branch() if we see
-> VHE+V3A, because the combination makes no sense at all. I think this
-> can be rewritten as:
-> 
-> 	if (kvm_system_needs_idmapped_vectors() &&
-> 	    !is_protected_lvm_enabled())
-> 
-> Thoughts?
+Paolo,
 
-Yup I think this works as both CPUs that are vulnerable to V3A aren't
-VHE-capable. But if we ever get a VHE-capable CPU that's vulnerable I
-think the next call to create_hyp_exec_mappings() will BUG(). Perhaps
-the alternative would be to have has_spectre_v3a() say no in VHE to be
-on the safe side? That is, prevent the cap from being set to begin with.
+Here's the third (and hopefully final) set of fixes for 5.18. Two
+rather simple patches: one addressing a userspace-visible change in
+behaviour with GICv3, and a fix for pKVM in combination with CPUs
+affected by Spectre-v3a.
 
-Cheers,
-Quentin
+Please pull,
+
+	M.
+
+The following changes since commit 85ea6b1ec915c9dd90caf3674b203999d8c7e062:
+
+  KVM: arm64: Inject exception on out-of-IPA-range translation fault (2022-04-27 23:02:23 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.18-3
+
+for you to fetch changes up to 2e40316753ee552fb598e8da8ca0d20a04e67453:
+
+  KVM: arm64: Don't hypercall before EL2 init (2022-05-15 12:14:14 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.18, take #3
+
+- Correctly expose GICv3 support even if no irqchip is created
+  so that userspace doesn't observe it changing pointlessly
+  (fixing a regression with QEMU)
+
+- Don't issue a hypercall to set the id-mapped vectors when
+  protected mode is enabled
+
+----------------------------------------------------------------
+Marc Zyngier (1):
+      KVM: arm64: vgic-v3: Consistently populate ID_AA64PFR0_EL1.GIC
+
+Quentin Perret (1):
+      KVM: arm64: Don't hypercall before EL2 init
+
+ arch/arm64/kvm/arm.c      | 3 ++-
+ arch/arm64/kvm/sys_regs.c | 3 +--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
