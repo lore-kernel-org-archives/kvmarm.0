@@ -2,84 +2,79 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CB3C433EF
-	for <kvmarm@archiver.kernel.org>; Mon, 16 May 2022 07:17:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEB49C433F5
+	for <kvmarm@archiver.kernel.org>; Mon, 16 May 2022 10:42:07 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 243F54B1E9;
-	Mon, 16 May 2022 03:17:38 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D2EE4B1F8;
+	Mon, 16 May 2022 06:42:07 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@gmail.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4Oj-Tm4CarBc; Mon, 16 May 2022 03:17:36 -0400 (EDT)
+	with ESMTP id xN8BWhE5qsua; Mon, 16 May 2022 06:42:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id EEF8F4B08F;
-	Mon, 16 May 2022 03:17:36 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 27F7F4B11A;
+	Mon, 16 May 2022 06:42:06 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AB7F64965C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 02:55:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C22B14B0DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 06:42:04 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V0bBaDhqT6Cw for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2022 02:55:07 -0400 (EDT)
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com
- [209.85.219.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91EA24141A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 02:55:07 -0400 (EDT)
-Received: by mail-yb1-f170.google.com with SMTP id j2so25466938ybu.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 May 2022 23:55:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1dK2edFTU6ZA396mt6VL7asKfbqNWslhLCJG//w22WE=;
- b=WVYfP4NvxnHADNi+hRg6j3xIW9SSgkwiYdcc4w4LkOcObEbK4djJuGbyRgSNXfqRUc
- /OpAOGbxuX0XJVU+FZAjYzt6GgK2Z+C0SZukTADGxR5J3mtX3I5HAItHwW8nzVi6yVay
- HO+mhZ0KkyMX4E6/xxDVv1j6XmvTBkZT8N2qrsYsG7VZd30ddAmcKTEEj1X/ekScfmpI
- E1Ep5yaon/rUT9cGuvuGaHRt+iBlFR1trUiR46MoJ4KR+qtTNUlRRJ4IwqRPhW114le9
- DMvywKUWPGHv1WSyDW+cMm+0w2JQO+XgUC1uuhm5N/9Lmnaumrt3JJMYnTvjeMSP7ciz
- o5WA==
+ with ESMTP id UXSB+S5Odlwv for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 May 2022 06:42:03 -0400 (EDT)
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com
+ [209.85.208.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3E31D49F5D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 06:42:03 -0400 (EDT)
+Received: by mail-ed1-f50.google.com with SMTP id p26so1491142eds.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 03:42:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=erbXfCmeHocQjfL+rgDZPz13+JsufODTkqH4MW8FPkU=;
+ b=P77DC0Il8yTtkstHIFJR8Nqlq8byFBHMvwFcvt4Nt22CzyvC/Fv+KdNgonw4S3OD3K
+ 2LvZ1t/0q7xkgaqJ5UbQef9PLfEU7ibZjarM7y30f4syi3XrIkk66bNTygONFoWTGBsW
+ T0zLbcuIOAC9Pea0Sj+b22Ih6ju5PVW+bGFZBfbQIQwsZ2smRedVpMeslKaL1/f8c8ws
+ cpfStIYgXZGpFXthRtvUGpT3DV00iZ9sg3V6xgZDESod1iRqB5UonePNMTjP7uGf8dB4
+ IBqMuAHh6o186Vqyr9HRq/GyB3509vT7hUFGMlFByEIaa6lwVHd0K6KyZqrr3pKGyAHv
+ dkfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1dK2edFTU6ZA396mt6VL7asKfbqNWslhLCJG//w22WE=;
- b=UaANZkrzpBc7IJAg4nwHLWwoaPHiHu4VwLeVVym1fDhkrXrC57IvcqG4mqtvEwNWTW
- vr6ggS4fCwO24Ek8ivg3Ih7+bk6zy5DQBq+h+opfsvKQbr4bRhCyeWTYWGWORJtsaVwa
- qC95RFIqAWitC//B1f+hjYf7u5W+IaAgxYNVOF0tIDDJiL5MhVWB8yP+jcVfl4in63Ms
- mGf6/5GIFzuScoMxnr7ztDkugFl14OSOaem95qcyNDP/97dHHHxBbnl+FH+Txs9YG5tb
- 2IWFd5bpdabkwa4EBjEjipmZlerX3l2xt/2r82RSagy51USbIkHKP4bwE+AliZeBhsaB
- yYNw==
-X-Gm-Message-State: AOAM530Pzdj6hn4isnxesJhan+YkxNFnP8IzQRZ6R0oBJsARt6+88wSE
- rCRokDw3nQx0g84XWDxrWOh9lNxke49o0ZN1DKE=
-X-Google-Smtp-Source: ABdhPJzocFzE5rLFilLG6+T+z0h5XBshtuxJ3zJwJJbakycdvZGhiUOe/2JYCMFm7TDfi4FBy+rA24Yx8TOKnCEWpQ0=
-X-Received: by 2002:a25:cf42:0:b0:64d:8800:ade3 with SMTP id
- f63-20020a25cf42000000b0064d8800ade3mr5478053ybg.376.1652684107021; Sun, 15
- May 2022 23:55:07 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=erbXfCmeHocQjfL+rgDZPz13+JsufODTkqH4MW8FPkU=;
+ b=pCgWJoSDy5cxP5f7LNwEDRflWy/Dl/ELbje0/1KZlaIcM8sLmE+zXBZNYw2hQncSQD
+ uk9cZRakzWritpOlaS0ZA3LCIY0ycWp1DBwZqxmbJ9xFywG9zPhL3/3kR1Wcl+rPnHz6
+ 9S/TV+GpBepXiEXSnGNPg16Ve/ZzY/GlLSDKjeUAjfBhNNztffkbwvrkv0lt/GLrLOIP
+ nfgTanG9BkarDY6mK+GoH8cjA+KU0B+JEWj2WmtGcY2RsCKvoaSl7pPJYQ6M22uO8uwv
+ k6xaTuX5HUdx/OGnFf+ygz6u03tWlWNlgmGTv2/MkULx/J9QZeMAn9X/ZPCiIXLV4PNq
+ wDVg==
+X-Gm-Message-State: AOAM532i8x9xEzM7v7h9nkn5v569O8YC8BJvQakGXZxaeNTbvirHWrw7
+ +d/g4f7ICCWaDnxlcIjJtUXzrg==
+X-Google-Smtp-Source: ABdhPJwCmZ7TsADf4yBSO70bp+4Cv2yZYtgdUiE6w+q/M7boOVpmbsE2ZQrGrh1nN3VKR0CPmxFF2w==
+X-Received: by 2002:a05:6402:2710:b0:427:d087:b with SMTP id
+ y16-20020a056402271000b00427d087000bmr12509532edd.11.1652697721952; 
+ Mon, 16 May 2022 03:42:01 -0700 (PDT)
+Received: from google.com (30.171.91.34.bc.googleusercontent.com.
+ [34.91.171.30]) by smtp.gmail.com with ESMTPSA id
+ ec33-20020a0564020d6100b0042ab48ea729sm1151662edb.88.2022.05.16.03.42.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 May 2022 03:42:01 -0700 (PDT)
+Date: Mon, 16 May 2022 10:41:58 +0000
+From: Quentin Perret <qperret@google.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: arm64: Don't hypercall before EL2 init
+Message-ID: <YoIqdiOoCf0A1hcV@google.com>
+References: <20220513092607.35233-1-qperret@google.com>
+ <87sfpb59wj.wl-maz@kernel.org>
 MIME-Version: 1.0
-References: <20220513202819.829591-1-dmatlack@google.com>
- <20220513202819.829591-4-dmatlack@google.com>
-In-Reply-To: <20220513202819.829591-4-dmatlack@google.com>
-From: Lai Jiangshan <jiangshanlai@gmail.com>
-Date: Mon, 16 May 2022 14:54:55 +0800
-Message-ID: <CAJhGHyAU_5Esn6i-eeBNKOh4XenOc9_1aiF8N0+CeMF5yyhxew@mail.gmail.com>
-Subject: Re: [PATCH v5 03/21] KVM: x86/mmu: Derive shadow MMU page role from
- parent
-To: David Matlack <dmatlack@google.com>
-X-Mailman-Approved-At: Mon, 16 May 2022 03:17:36 -0400
-Cc: Marc Zyngier <maz@kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+Content-Disposition: inline
+In-Reply-To: <87sfpb59wj.wl-maz@kernel.org>
+Cc: kernel-team@android.com, Will Deacon <will@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,45 +91,25 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sat, May 14, 2022 at 4:28 AM David Matlack <dmatlack@google.com> wrote:
+On Sunday 15 May 2022 at 12:10:20 (+0100), Marc Zyngier wrote:
+> Can we simplify the condition? ARM64_SPECTRE_V3A is only set when
+> !VHE, and we already bail in kvm_patch_vector_branch() if we see
+> VHE+V3A, because the combination makes no sense at all. I think this
+> can be rewritten as:
+> 
+> 	if (kvm_system_needs_idmapped_vectors() &&
+> 	    !is_protected_lvm_enabled())
+> 
+> Thoughts?
 
-> -static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, gva_t gva,
-> +static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
->                             u8 level, bool direct)
->  {
-> +       union kvm_mmu_page_role role;
->         struct kvm_mmu_page *sp;
->
-> -       sp = kvm_mmu_get_page(vcpu, gfn, gva, level, direct, ACC_ALL);
-> +       role = vcpu->arch.mmu->root_role;
-> +       role.level = level;
-> +       role.direct = direct;
-> +       role.access = ACC_ALL;
-> +
-> +       if (role.has_4_byte_gpte)
-> +               role.quadrant = quadrant;
-> +
-> +       if (level <= vcpu->arch.mmu->cpu_role.base.level)
-> +               role.passthrough = 0;
-> +
+Yup I think this works as both CPUs that are vulnerable to V3A aren't
+VHE-capable. But if we ever get a VHE-capable CPU that's vulnerable I
+think the next call to create_hyp_exec_mappings() will BUG(). Perhaps
+the alternative would be to have has_spectre_v3a() say no in VHE to be
+on the safe side? That is, prevent the cap from being set to begin with.
 
-
-
-+       role.level = level;
-+
-+       if (role.has_4_byte_gpte)
-+               role.quadrant = quadrant;
-
-Only these lines are needed because of mmu->pae_root, others are
-the same as vcpu->arch.mmu->root_role.
-
-The argument @direct is vcpu->arch.mmu->root_role.direct.
-vcpu->arch.mmu->root_role.access is always set to be ACC_ALL.
-
-vcpu->arch.mmu->root_role.passthrough is 0 when mmu->pae_root is used.
-Or if vcpu->arch.mmu->root_role.passthrough is 1, @level must be 5
-and vcpu->arch.mmu->cpu_role.base.level must be 4, the code here
-is useless.
+Cheers,
+Quentin
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
