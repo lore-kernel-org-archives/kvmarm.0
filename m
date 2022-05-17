@@ -2,86 +2,94 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A08DC433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 17 May 2022 07:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B28A4C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 17 May 2022 14:42:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 317794B2B3;
-	Tue, 17 May 2022 03:02:57 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BA5B4B125;
+	Tue, 17 May 2022 10:42:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered) header.i=@google.com
+	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id mYOdL7IrxIMh; Tue, 17 May 2022 03:02:54 -0400 (EDT)
+	with ESMTP id 9C0TXd19NvDe; Tue, 17 May 2022 10:42:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 87E4C4B2FD;
-	Tue, 17 May 2022 03:02:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 81CC74B2CC;
+	Tue, 17 May 2022 10:42:16 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EBB749E3A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 19:23:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E3A64B19D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 10:42:15 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YiKaaTnn+vV7 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 May 2022 19:23:42 -0400 (EDT)
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com
- [209.85.167.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CDC6549E35
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 19:23:41 -0400 (EDT)
-Received: by mail-lf1-f45.google.com with SMTP id d15so28416835lfk.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 May 2022 16:23:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mAdtSNeS6TmpCVdiyZ+MhQWKa4AGB9C3E47ewQHSYZI=;
- b=og+3gSGphe72UiCVBGhux/vYBU/R+RxGf9Tp/UWuzMiWHuMe4WzaUPT06GwbJ/xwZ0
- Jccbg4xFat9evXeWcZN27lWxAtBwycnzpCl+i1FWUGa4I78iqj1Gp7FtsXHyIpycoI3u
- y7P4qLzBXItKkE0kHAMGXLgqg5LOjSfOHnNi5WlvKNKO39HAfl3VpikE5SbNH8WOGmFS
- vNiKQD/9SCAkZhDbXLV5LeMz1IizZcne7AkSg6c5So6HRCujOPwb8dcLby9bsU8juzk0
- +RJ0xGtcyVdmkPb5k7WIB2JIkeEJMLlTyZTXFa7LNCj8NOZlayB8/l7o6U+t3AwZ4REC
- 9Zyw==
+ with ESMTP id hOAdBsFdbkCc for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 May 2022 10:42:14 -0400 (EDT)
+Received: from us-smtp-delivery-124.mimecast.com
+ (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A16449F38
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 10:42:14 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1652798533;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=hTjqsV1Fp+r+noPld4SG87IVv2bHAbFunBtzqB6+vis=;
+ b=bZKBvBEodeHSdUe1ffOfv8NWU61sFikV2g/7xDPD/Ov+P8Ho1ajm81nNPeRuSNQEI8NGYc
+ tP9pE66EVHdjHEs/EWyW9qhODNjLK7hvTQUM+2dpgfE7p1gnuMuZxDjvR7EzsLfyb3ovqO
+ WsAUZ4uJ11hWIKjwnh6+HRzJuFENF/g=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-606-5HEgFhYOOCGcLQB0s2fFhw-1; Tue, 17 May 2022 10:42:12 -0400
+X-MC-Unique: 5HEgFhYOOCGcLQB0s2fFhw-1
+Received: by mail-ed1-f69.google.com with SMTP id
+ g10-20020a056402180a00b0042ab515d6c5so3692887edy.13
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 07:42:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mAdtSNeS6TmpCVdiyZ+MhQWKa4AGB9C3E47ewQHSYZI=;
- b=aqVV17grgnfZvVlzN7HBQe1lUk1zgOgUW+Adw/zq4D81A5HFdAJWyqfERpDkYLH82i
- TynWijPnQ4DPfLJ8LF57eBcHJOYlx0Q4GDTMEsOmfe97deSoTmGnnErwTZ/BzfDPU+TZ
- OTd3c54e0HeiTJAr3c8q28ofDjyK7S8ccA8FY5CmeedQ1vsDi5dpRRlYDQ7ZJSpKcv1c
- yxwpEj6BUHm+hKv7tl7QC/qiQQ3ZLiORZbrmZdRwK1Rd+F+/1bb/cNq85tNdCeswpG5Y
- 6PCnr0Tu0ljanGAKe4o3ihho9JMB7CaGySrCEMiREdYUgs497wyW/P4Q4yj3Z/5mSZQJ
- fjng==
-X-Gm-Message-State: AOAM530IEabad7zQqNfVz/PiYa3qatIkXzzWTmkP+Ys9t5PDD64ieQOd
- IixFTY85FP2JlYDTs9xRh3fLPlaf7vYpcRL49ubpRw==
-X-Google-Smtp-Source: ABdhPJws4HdDVdujOCaXPCc3SSRaYKeR6qK4tDtZHUJR/8vZS/kgK3JIoa7Td1t6aUS13xgIqrEMIZygqVSv1AjHl0I=
-X-Received: by 2002:a05:6512:398d:b0:473:a597:540a with SMTP id
- j13-20020a056512398d00b00473a597540amr15034756lfu.64.1652743419962; Mon, 16
- May 2022 16:23:39 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=hTjqsV1Fp+r+noPld4SG87IVv2bHAbFunBtzqB6+vis=;
+ b=MNt7zxaUMATCpF9ZpzS02JIDK186zS3zkrjWrCc+a+OOQQZ8/4azpIN9nzQ7HMs00i
+ UwvAfzx20WhdV1P2ccGBsfR0jfsD1F7tNmgX5FZ2+dmPTRDuAhI2B7bkfHDH+lVQgbkZ
+ eRw8s704ZZV/xNnDksfRsCC464vhz3sfRfnzZNVWsX9OiPH7cnUnhMJyH4DQxm/ISl46
+ lJbWzt0IFTnmv234UlD78b7eHtAMlmGZiTaRl49mpAjuAnPAZIZqUnZNkX346XMaWEdM
+ ewQstc3CcjsF58izzcYY517JKFSU8CET7pmXQQkPVa+hjWM36teBSU6ZPWR/Ilz7X6oE
+ OuNw==
+X-Gm-Message-State: AOAM5336lAUSfnPbrlEkQf6ZgPK6jrIgPEaRapsHWspeq1Ecw/eyYmzW
+ 5w1j/TlJdm0IrBYXQQSXsugqLexzGT3NyCCwA/NH3nEvTp9LP9MOPCWSmH9w5ru5sdUaIi+H78X
+ isDpINi84asIvEikgL8KCq+pK
+X-Received: by 2002:a05:6402:238f:b0:42a:98d8:ae1b with SMTP id
+ j15-20020a056402238f00b0042a98d8ae1bmr17423856eda.168.1652798530587; 
+ Tue, 17 May 2022 07:42:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJye0bbFmMONyTqmP3It4fL7QuUCBzVF03Vy8Tp5rLhkr7l+Xsej5oxl8SSRjnzPPSKeMkbGMg==
+X-Received: by 2002:a05:6402:238f:b0:42a:98d8:ae1b with SMTP id
+ j15-20020a056402238f00b0042a98d8ae1bmr17423824eda.168.1652798530348; 
+ Tue, 17 May 2022 07:42:10 -0700 (PDT)
+Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
+ by smtp.gmail.com with ESMTPSA id
+ e9-20020a056402104900b0042ac0e79bb6sm1853112edu.45.2022.05.17.07.42.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 17 May 2022 07:42:09 -0700 (PDT)
+Date: Tue, 17 May 2022 16:42:07 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Bill Wendling <morbo@google.com>
+Subject: Re: [kvm-unit-tests PATCH] arm64: Check for dynamic relocs with
+ readelf
+Message-ID: <20220517144207.662hyp276g3syzf2@gator>
+References: <20220504230446.2253109-1-morbo@google.com>
 MIME-Version: 1.0
-References: <20220513202819.829591-1-dmatlack@google.com>
- <20220513202819.829591-21-dmatlack@google.com>
- <CAAhSdy1yP-QUuGn10W-zZaET8_WHo0fdkWwGoP4-WySOXfaHGg@mail.gmail.com>
-In-Reply-To: <CAAhSdy1yP-QUuGn10W-zZaET8_WHo0fdkWwGoP4-WySOXfaHGg@mail.gmail.com>
-From: David Matlack <dmatlack@google.com>
-Date: Mon, 16 May 2022 16:23:13 -0700
-Message-ID: <CALzav=deCYK6XfqyuzS4chZ5a0kVMUbxr7Q5KwRYF5S7xPo_OA@mail.gmail.com>
-Subject: Re: [PATCH v5 20/21] KVM: Allow for different capacities in
- kvm_mmu_memory_cache structs
-To: Anup Patel <anup@brainfault.org>
-X-Mailman-Approved-At: Tue, 17 May 2022 03:02:25 -0400
-Cc: Albert Ou <aou@eecs.berkeley.edu>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <kvm@vger.kernel.org>, Marc Zyngier <maz@kernel.org>,
- Huacai Chen <chenhuacai@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR MIPS \(KVM/mips\)"
- <linux-mips@vger.kernel.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:KERNEL VIRTUAL MACHINE FOR RISC-V \(KVM/riscv\)"
- <kvm-riscv@lists.infradead.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Ben Gardon <bgardon@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>,
- "moderated list:KERNEL VIRTUAL MACHINE FOR ARM64 \(KVM/arm64\)"
- <kvmarm@lists.cs.columbia.edu>, Peter Feiner <pfeiner@google.com>
+In-Reply-To: <20220504230446.2253109-1-morbo@google.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Disposition: inline
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+ Zixuan Wang <zixuanwang@google.com>, Nikos Nikoleris <nikos.nikoleris@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -98,235 +106,73 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Sun, May 15, 2022 at 8:32 PM Anup Patel <anup@brainfault.org> wrote:
->
-> On Sat, May 14, 2022 at 1:59 AM David Matlack <dmatlack@google.com> wrote:
-> >
-> > Allow the capacity of the kvm_mmu_memory_cache struct to be chosen at
-> > declaration time rather than being fixed for all declarations. This will
-> > be used in a follow-up commit to declare an cache in x86 with a capacity
-> > of 512+ objects without having to increase the capacity of all caches in
-> > KVM.
-> >
-> > This change requires each cache now specify its capacity at runtime,
-> > since the cache struct itself no longer has a fixed capacity known at
-> > compile time. To protect against someone accidentally defining a
-> > kvm_mmu_memory_cache struct directly (without the extra storage), this
-> > commit includes a WARN_ON() in kvm_mmu_topup_memory_cache().
-> >
-> > In order to support different capacities, this commit changes the
-> > objects pointer array to be dynamically allocated the first time the
-> > cache is topped-up.
-> >
-> > An alternative would be to lay out the objects array after the
-> > kvm_mmu_memory_cache struct, which can be done at compile time. But that
-> > change, unfortunately, adds some grottiness to arm64 and riscv, which
-> > uses a function-local (i.e.  stack-allocated) kvm_mmu_memory_cache
-> > struct. Since C does not allow anonymous structs in functions, the new
-> > wrapper struct that contains kvm_mmu_memory_cache and the objects
-> > pointer array, must be named, which means dealing with an outer and
-> > inner struct. The outer struct can't be dropped since then there would
-> > be no guarantee the kvm_mmu_memory_cache struct and objects array would
-> > be laid out consecutively on the stack.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
->
-> Overall, this looks good to me. I wanted to try this patch with KVM RISC-V
-> but there are conflicts in include/linux/kvm_types.h and virt/kvm/kvm_main.c
+On Wed, May 04, 2022 at 04:04:46PM -0700, Bill Wendling wrote:
+> Clang's version of objdump doesn't recognize "setftest.elf" as a dynamic
+> object and produces an error stating such.
+> 
+> 	$ llvm-objdump -R ./arm/selftest.elf
+> 	arm/selftest.elf:	file format elf64-littleaarch64
+> 	llvm-objdump: error: './arm/selftest.elf': not a dynamic object
+> 
+> This causes the ARM64 "arch_elf_check" check to fail. Using "readelf
+> -rW" is a better option way to get the same information and produces the
+> same information in both binutils and LLVM.
+> 
+> Signed-off-by: Bill Wendling <morbo@google.com>
+> ---
+>  arm/Makefile.arm64 | 6 +++---
+>  configure          | 2 ++
+>  2 files changed, 5 insertions(+), 3 deletions(-)
 
-Hi Anup,
+Merged to https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git master
 
-I just sent another version rebased on top of the latest kvm/queue.
-Let me know if you are still seeing merge conflicts.
+Thanks,
+drew
 
->
-> Please take a look.
->
-> Regards,
-> Anup
->
-> > ---
-> >  arch/arm64/kvm/arm.c      |  1 +
-> >  arch/arm64/kvm/mmu.c      |  5 ++++-
-> >  arch/mips/kvm/mips.c      |  2 ++
-> >  arch/riscv/kvm/mmu.c      |  8 ++++----
-> >  arch/riscv/kvm/vcpu.c     |  1 +
-> >  arch/x86/kvm/mmu/mmu.c    |  9 +++++++++
-> >  include/linux/kvm_types.h |  9 +++++++--
-> >  virt/kvm/kvm_main.c       | 20 ++++++++++++++++++--
-> >  8 files changed, 46 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 7fceb855fa71..aa1e0c1659d4 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -320,6 +320,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >         vcpu->arch.target = -1;
-> >         bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> >
-> > +       vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-> >
-> >         /* Set up the timer */
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 53ae2c0640bc..2f2ef6b60ff4 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -764,7 +764,10 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> >  {
-> >         phys_addr_t addr;
-> >         int ret = 0;
-> > -       struct kvm_mmu_memory_cache cache = { 0, __GFP_ZERO, NULL, };
-> > +       struct kvm_mmu_memory_cache cache = {
-> > +               .capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
-> > +               .gfp_zero = __GFP_ZERO,
-> > +       };
-> >         struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> >                                      KVM_PGTABLE_PROT_R |
-> > diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> > index a25e0b73ee70..45c7179144dc 100644
-> > --- a/arch/mips/kvm/mips.c
-> > +++ b/arch/mips/kvm/mips.c
-> > @@ -387,6 +387,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >         if (err)
-> >                 goto out_free_gebase;
-> >
-> > +       vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> > +
-> >         return 0;
-> >
-> >  out_free_gebase:
-> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> > index f80a34fbf102..8c2338ecc246 100644
-> > --- a/arch/riscv/kvm/mmu.c
-> > +++ b/arch/riscv/kvm/mmu.c
-> > @@ -347,10 +347,10 @@ static int stage2_ioremap(struct kvm *kvm, gpa_t gpa, phys_addr_t hpa,
-> >         int ret = 0;
-> >         unsigned long pfn;
-> >         phys_addr_t addr, end;
-> > -       struct kvm_mmu_memory_cache pcache;
-> > -
-> > -       memset(&pcache, 0, sizeof(pcache));
-> > -       pcache.gfp_zero = __GFP_ZERO;
-> > +       struct kvm_mmu_memory_cache pcache = {
-> > +               .capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
-> > +               .gfp_zero = __GFP_ZERO,
-> > +       };
-> >
-> >         end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
-> >         pfn = __phys_to_pfn(hpa);
-> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> > index 6785aef4cbd4..bbcb9d4a04fb 100644
-> > --- a/arch/riscv/kvm/vcpu.c
-> > +++ b/arch/riscv/kvm/vcpu.c
-> > @@ -94,6 +94,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> >
-> >         /* Mark this VCPU never ran */
-> >         vcpu->arch.ran_atleast_once = false;
-> > +       vcpu->arch.mmu_page_cache.capacity = KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-> >
-> >         /* Setup ISA features available to VCPU */
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 4b40fa2e27eb..dad7e19ef8ed 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -5803,12 +5803,21 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
-> >  {
-> >         int ret;
-> >
-> > +       vcpu->arch.mmu_pte_list_desc_cache.capacity =
-> > +               KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
-> >         vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
-> >
-> > +       vcpu->arch.mmu_page_header_cache.capacity =
-> > +               KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
-> >         vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
-> >
-> > +       vcpu->arch.mmu_shadowed_info_cache.capacity =
-> > +               KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> > +
-> > +       vcpu->arch.mmu_shadow_page_cache.capacity =
-> > +               KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE;
-> >         vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
-> >
-> >         vcpu->arch.mmu = &vcpu->arch.root_mmu;
-> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> > index ac1ebb37a0ff..549103a4f7bc 100644
-> > --- a/include/linux/kvm_types.h
-> > +++ b/include/linux/kvm_types.h
-> > @@ -83,14 +83,19 @@ struct gfn_to_pfn_cache {
-> >   * MMU flows is problematic, as is triggering reclaim, I/O, etc... while
-> >   * holding MMU locks.  Note, these caches act more like prefetch buffers than
-> >   * classical caches, i.e. objects are not returned to the cache on being freed.
-> > + *
-> > + * The storage for the cache object pointers is allocated dynamically when the
-> > + * cache is topped-up. The capacity field defines the number of object pointers
-> > + * available after the struct.
-> >   */
-> >  struct kvm_mmu_memory_cache {
-> >         int nobjs;
-> > +       int capacity;
-> >         gfp_t gfp_zero;
-> >         struct kmem_cache *kmem_cache;
-> > -       void *objects[KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE];
-> > +       void **objects;
-> >  };
-> > -#endif
-> > +#endif /* KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE */
-> >
-> >  #define HALT_POLL_HIST_COUNT                   32
-> >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index e089db822c12..264e4107e06f 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -371,12 +371,23 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
-> >
-> >  int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min)
-> >  {
-> > +       gfp_t gfp = GFP_KERNEL_ACCOUNT;
-> >         void *obj;
-> >
-> >         if (mc->nobjs >= min)
-> >                 return 0;
-> > -       while (mc->nobjs < ARRAY_SIZE(mc->objects)) {
-> > -               obj = mmu_memory_cache_alloc_obj(mc, GFP_KERNEL_ACCOUNT);
-> > +
-> > +       if (WARN_ON(mc->capacity == 0))
-> > +               return -EINVAL;
-> > +
-> > +       if (!mc->objects) {
-> > +               mc->objects = kvmalloc_array(sizeof(void *), mc->capacity, gfp);
-> > +               if (!mc->objects)
-> > +                       return -ENOMEM;
-> > +       }
-> > +
-> > +       while (mc->nobjs < mc->capacity) {
-> > +               obj = mmu_memory_cache_alloc_obj(mc, gfp);
-> >                 if (!obj)
-> >                         return mc->nobjs >= min ? 0 : -ENOMEM;
-> >                 mc->objects[mc->nobjs++] = obj;
-> > @@ -397,6 +408,11 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
-> >                 else
-> >                         free_page((unsigned long)mc->objects[--mc->nobjs]);
-> >         }
-> > +
-> > +       kvfree(mc->objects);
-> > +
-> > +       /* Note, must set to NULL to avoid use-after-free in the next top-up. */
-> > +       mc->objects = NULL;
-> >  }
-> >
-> >  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
-> > --
-> > 2.36.0.550.gb090851708-goog
-> >
+
+
+> 
+> diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
+> index 6feac76f895f..42e18e771b3b 100644
+> --- a/arm/Makefile.arm64
+> +++ b/arm/Makefile.arm64
+> @@ -14,9 +14,9 @@ mno_outline_atomics := $(call cc-option, -mno-outline-atomics, "")
+>  CFLAGS += $(mno_outline_atomics)
+>  
+>  define arch_elf_check =
+> -	$(if $(shell ! $(OBJDUMP) -R $(1) >&/dev/null && echo "nok"),
+> -		$(error $(shell $(OBJDUMP) -R $(1) 2>&1)))
+> -	$(if $(shell $(OBJDUMP) -R $(1) | grep R_ | grep -v R_AARCH64_RELATIVE),
+> +	$(if $(shell ! $(READELF) -rW $(1) >&/dev/null && echo "nok"),
+> +		$(error $(shell $(READELF) -rW $(1) 2>&1)))
+> +	$(if $(shell $(READELF) -rW $(1) | grep R_ | grep -v R_AARCH64_RELATIVE),
+>  		$(error $(1) has unsupported reloc types))
+>  endef
+>  
+> diff --git a/configure b/configure
+> index 86c3095a245a..23085da7dcc5 100755
+> --- a/configure
+> +++ b/configure
+> @@ -12,6 +12,7 @@ cflags=
+>  ld=ld
+>  objcopy=objcopy
+>  objdump=objdump
+> +readelf=readelf
+>  ar=ar
+>  addr2line=addr2line
+>  arch=$(uname -m | sed -e 's/i.86/i386/;s/arm64/aarch64/;s/arm.*/arm/;s/ppc64.*/ppc64/')
+> @@ -372,6 +373,7 @@ CFLAGS=$cflags
+>  LD=$cross_prefix$ld
+>  OBJCOPY=$cross_prefix$objcopy
+>  OBJDUMP=$cross_prefix$objdump
+> +READELF=$cross_prefix$readelf
+>  AR=$cross_prefix$ar
+>  ADDR2LINE=$cross_prefix$addr2line
+>  TEST_DIR=$testdir
+> -- 
+> 2.36.0.464.gb9c8b46e94-goog
+> 
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
