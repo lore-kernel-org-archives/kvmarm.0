@@ -2,92 +2,95 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A77F0C433FE
-	for <kvmarm@archiver.kernel.org>; Tue, 17 May 2022 14:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCEB6C433F5
+	for <kvmarm@archiver.kernel.org>; Tue, 17 May 2022 17:27:47 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 26DD349F38;
-	Tue, 17 May 2022 10:43:28 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 255654B2B0;
+	Tue, 17 May 2022 13:27:47 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@redhat.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id E9cbtVlJAqju; Tue, 17 May 2022 10:43:26 -0400 (EDT)
+	with ESMTP id ED0Fd9r0or-R; Tue, 17 May 2022 13:27:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id BA9744B19D;
-	Tue, 17 May 2022 10:43:26 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E84D24B2BC;
+	Tue, 17 May 2022 13:27:45 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2297B4B093
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 10:43:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 284E04B2BC
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 13:27:45 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YpLkfYTK5hTI for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 May 2022 10:43:23 -0400 (EDT)
+ with ESMTP id WdW7P0anVFQY for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 May 2022 13:27:43 -0400 (EDT)
 Received: from us-smtp-delivery-124.mimecast.com
  (us-smtp-delivery-124.mimecast.com [170.10.129.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAEEC49F38
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 10:43:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1AEB4B2B0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 13:27:43 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1652798603;
+ s=mimecast20190719; t=1652808463;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EUOebm1848nquUkzsfc+CUVVZX634BgGKga1hmkbgcs=;
- b=BySSWBOsdFl1p4LMZ0VQBun434IOWp3wLUG4/pD39rFw56sWZO03+xHn+Z+BufGezYCFbO
- hN2QL7GW7TPY1s6ap3PuOR120D/ztuYzC5Bh6PwYXwQqHnYpV+7lHBgFRuLDY/ZpmYN3DH
- 5++HoKVAijEW+UIov03hT/ygfDvW0do=
+ bh=KKq680AnszBszJpoGIG9251C41AK5g6xGWKr2ftGslI=;
+ b=QpMRh8oezk6dysBJHOvRcDsO21N4LbiEjN+Xzw7PV+O5rRfpV+qKc/qB1Qcv3Bh8qM2Cqp
+ LOVmedBkLFCDUunhZK7+uVfED5J4wMRYY15LPWQnGrTg621ytFAXUUYz3uzaFKBBLzN0i8
+ qhEoO4KBEmd/bwJdP0BE37kGSsFiv+w=
 Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
  [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-491-yKOg1fFpNai6k8jaeuxHgw-1; Tue, 17 May 2022 10:43:22 -0400
-X-MC-Unique: yKOg1fFpNai6k8jaeuxHgw-1
+ us-mta-509-5_8dsOENMfq_arwP8LA1bg-1; Tue, 17 May 2022 13:27:40 -0400
+X-MC-Unique: 5_8dsOENMfq_arwP8LA1bg-1
 Received: by mail-ej1-f70.google.com with SMTP id
- qw30-20020a1709066a1e00b006f45e7f44b0so7495044ejc.5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 07:43:20 -0700 (PDT)
+ sc20-20020a1709078a1400b006f4a358c817so7694101ejc.16
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 10:27:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=EUOebm1848nquUkzsfc+CUVVZX634BgGKga1hmkbgcs=;
- b=Ym+qnpJvqqGLRSuwlowvn3YiHQQ5AoXx2R/yb7tvxk2Lls0S9eUr4McbTHhrmp+zyg
- 4djPfwBrjF8+YV9unh3/Z+jT3/TJm9pzkXPH8pp5Ls0SZCoBMayQa/bcivohBHN/EoB9
- JzCv0GRrNseYoUEG+JulcJUEm25MQ/k9jIJxehTgc0tgpicP0bLKiWbHp7NGbBpTgBJz
- Tc9WQBP/5mqPiVWUPQCg7rF15vaY9ib6Vkvc8eBS/0JlHXeMqNQ0db1/713sH+4WRkk2
- CQVgOj8Yi6qDyabtQdsQbU3Dm5sJaNXF6xhxWZ1n49Y6SXQczikfr+4vcaKEH5bd2FUj
- b7qQ==
-X-Gm-Message-State: AOAM532cl/oTmEafB8jCmYD3mI51HTzuLhdWFP9E561iZIYQwwRKw0s4
- mi1jV+vejJZv+yrkxK3LdnlE+QMkrntpHBubOIT4MNEtu5li0hpPDeEj28FQEEK6mjshQUkMGGM
- 3nGa/SoeRxSmRSwfp0IvajRQA
-X-Received: by 2002:a17:907:7e84:b0:6fe:2a21:1467 with SMTP id
- qb4-20020a1709077e8400b006fe2a211467mr10719932ejc.673.1652798599959; 
- Tue, 17 May 2022 07:43:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzlnoJM/lXQ64XKdKCEL4Apv61bFcxyV3tHdLZlG0EczC2ChtveMzId+2dKEbYOZdkVKaMbrw==
-X-Received: by 2002:a17:907:7e84:b0:6fe:2a21:1467 with SMTP id
- qb4-20020a1709077e8400b006fe2a211467mr10719913ejc.673.1652798599759; 
- Tue, 17 May 2022 07:43:19 -0700 (PDT)
-Received: from gator (cst2-173-79.cust.vodafone.cz. [31.30.173.79])
- by smtp.gmail.com with ESMTPSA id
- t23-20020aa7d717000000b0042ac7b34b4asm1153428edq.81.2022.05.17.07.43.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 17 May 2022 07:43:19 -0700 (PDT)
-Date: Tue, 17 May 2022 16:43:17 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [kvm-unit-tests PATCH] arm/run: Use TCG with qemu-system-arm on
- arm64 systems
-Message-ID: <20220517144317.ggdesc23xgxq6pnh@gator>
-References: <20220317165601.356466-1-alexandru.elisei@arm.com>
- <20220317174507.jt2rattmtetddvsq@gator>
- <YjN3xyfiLU2RUdGr@monolith.localdoman>
+ h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+ :content-language:to:cc:references:from:in-reply-to
+ :content-transfer-encoding;
+ bh=KKq680AnszBszJpoGIG9251C41AK5g6xGWKr2ftGslI=;
+ b=vTKRJD5E2NEihoJJJiXxCkBqntPuWTaSLkPPvmYJBs7H3iKhWYRyTVNR5rHsHFCOyM
+ g1neRlGvuYoppPByWzcZn6x55HLBp6xiVn0tLVwgTx2g75lq40b3zNj8fOGzhZwmkT/G
+ gDHoGFun8SW3Gf3FSEWR5ikV9nCmMDNC/XP5G2XCENo+hr6TUpUvqT5QuEbz3z+pR+5Q
+ oqbeNzHZ9c5qXE9ZUybOtKZlqs6Cf1RgcTF+YbY8wYTD8A22wb8YMeAe14jzMNxtkPk5
+ 9MrIC+7zD47FZt5UBwJf2xXKgBVWP94F7WzP0z7m6qY31BaqAPsKz+8rwkdE2EXIr7NZ
+ kP3w==
+X-Gm-Message-State: AOAM531gNRyjE9HasiaQKF2mNV7/F+xf+KaZNljLQMrdjE08PfwvPhHP
+ M9CyVioXdzkinnLHr13IPYjq7qhxJh1WEvkcRf/cPFudSYrgztFYimhTBnsftFyRO1Hb478VT+M
+ 07QF0rafioKoS/xlioY5RVQ//
+X-Received: by 2002:aa7:cd87:0:b0:427:f800:220d with SMTP id
+ x7-20020aa7cd87000000b00427f800220dmr20576170edv.112.1652808459213; 
+ Tue, 17 May 2022 10:27:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxC3PVDHfL41xd+PMS921zEyYofQiMDC6L+gf8Y0ZLX22T50TYUkDJEchPjpPGtx0JkS++qnA==
+X-Received: by 2002:aa7:cd87:0:b0:427:f800:220d with SMTP id
+ x7-20020aa7cd87000000b00427f800220dmr20576144edv.112.1652808459006; 
+ Tue, 17 May 2022 10:27:39 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.googlemail.com with ESMTPSA id
+ u2-20020aa7db82000000b0042617ba63a7sm7196571edt.49.2022.05.17.10.27.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 May 2022 10:27:38 -0700 (PDT)
+Message-ID: <64895c87-743f-191d-b28e-dc8f17508773@redhat.com>
+Date: Tue, 17 May 2022 19:27:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <YjN3xyfiLU2RUdGr@monolith.localdoman>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [GIT PULL] KVM/arm64 fixes for 5.18, take #3
+To: Marc Zyngier <maz@kernel.org>
+References: <20220516125151.955808-1-maz@kernel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20220516125151.955808-1-maz@kernel.org>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Disposition: inline
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Language: en-US
+Cc: kernel-team@android.com, kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -99,84 +102,60 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-On Thu, Mar 17, 2022 at 06:03:07PM +0000, Alexandru Elisei wrote:
-> Hi,
+On 5/16/22 14:51, Marc Zyngier wrote:
+> Paolo,
 > 
-> On Thu, Mar 17, 2022 at 06:45:07PM +0100, Andrew Jones wrote:
-> > On Thu, Mar 17, 2022 at 04:56:01PM +0000, Alexandru Elisei wrote:
-> > > From: Andrew Jones <drjones@redhat.com>
-> > > 
-> > > If the user sets QEMU=qemu-system-arm on arm64 systems, the tests can only
-> > > be run by using the TCG accelerator. In this case use TCG instead of KVM.
-> > > 
-> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > > [ Alex E: Added commit message ]
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  arm/run | 12 ++++++++++--
-> > >  1 file changed, 10 insertions(+), 2 deletions(-)
-> > > 
-> > > diff --git a/arm/run b/arm/run
-> > > index 28a0b4ad2729..128489125dcb 100755
-> > > --- a/arm/run
-> > > +++ b/arm/run
-> > > @@ -10,16 +10,24 @@ if [ -z "$KUT_STANDALONE" ]; then
-> > >  fi
-> > >  processor="$PROCESSOR"
-> > >  
-> > > -ACCEL=$(get_qemu_accelerator) ||
-> > > +accel=$(get_qemu_accelerator) ||
-> > >  	exit $?
-> > >  
-> > > -if [ "$ACCEL" = "kvm" ]; then
-> > > +if [ "$accel" = "kvm" ]; then
-> > >  	QEMU_ARCH=$HOST
-> > >  fi
-> > >  
-> > >  qemu=$(search_qemu_binary) ||
-> > >  	exit $?
-> > >  
-> > > +if [ "$QEMU" ] && [ -z "$ACCEL" ] &&
-> > > +   [ "$HOST" = "aarch64" ] && [ "$ARCH" = "arm" ] &&
-> > > +   [ "$(basename $QEMU)" = "qemu-system-arm" ]; then
-> > > +	accel=tcg
-> > > +fi
-> > > +
-> > > +ACCEL=$accel
-> > > +
-> > >  if ! $qemu -machine '?' 2>&1 | grep 'ARM Virtual Machine' > /dev/null; then
-> > >  	echo "$qemu doesn't support mach-virt ('-machine virt'). Exiting."
-> > >  	exit 2
-> > > -- 
-> > > 2.35.1
-> > >
-> > 
-> > Ha, OK, I guess you posting this is a strong vote in favor of this
-> > behavior. I've queued it
+> Here's the third (and hopefully final) set of fixes for 5.18. Two
+> rather simple patches: one addressing a userspace-visible change in
+> behaviour with GICv3, and a fix for pKVM in combination with CPUs
+> affected by Spectre-v3a.
 > 
-> Ah, yes, maybe I should've been more clear about it. I think this is more
-> intuitive for the new users who might not be very familiar with
-> run_tests.sh internals, and like you've said it won't break existing users
-> who had to set ACCEL=tcg to get the desired behaviour anyway.
+> Please pull,
 > 
-> Thanks you for queueing it so fast! Should probably have also mentioned
-> this as a comment in the commit, but I take full responsibility for
-> breaking stuff.
+> 	M.
 > 
-> Alex
+> The following changes since commit 85ea6b1ec915c9dd90caf3674b203999d8c7e062:
 > 
-> > 
-> > https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
+>    KVM: arm64: Inject exception on out-of-IPA-range translation fault (2022-04-27 23:02:23 +0100)
+> 
+> are available in the Git repository at:
+> 
+>    git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.18-3
+> 
+> for you to fetch changes up to 2e40316753ee552fb598e8da8ca0d20a04e67453:
+> 
+>    KVM: arm64: Don't hypercall before EL2 init (2022-05-15 12:14:14 +0100)
+> 
+> ----------------------------------------------------------------
+> KVM/arm64 fixes for 5.18, take #3
+> 
+> - Correctly expose GICv3 support even if no irqchip is created
+>    so that userspace doesn't observe it changing pointlessly
+>    (fixing a regression with QEMU)
+> 
+> - Don't issue a hypercall to set the id-mapped vectors when
+>    protected mode is enabled
+> 
+> ----------------------------------------------------------------
+> Marc Zyngier (1):
+>        KVM: arm64: vgic-v3: Consistently populate ID_AA64PFR0_EL1.GIC
+> 
+> Quentin Perret (1):
+>        KVM: arm64: Don't hypercall before EL2 init
+> 
+>   arch/arm64/kvm/arm.c      | 3 ++-
+>   arch/arm64/kvm/sys_regs.c | 3 +--
+>   2 files changed, 3 insertions(+), 3 deletions(-)
+> 
 
-I finally merged this.
+Pulled, thanks.
 
-Thanks,
-drew
+Paolo
 
 _______________________________________________
 kvmarm mailing list
