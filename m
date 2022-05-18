@@ -2,89 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE07C433EF
-	for <kvmarm@archiver.kernel.org>; Wed, 18 May 2022 07:32:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 051F0C433F5
+	for <kvmarm@archiver.kernel.org>; Wed, 18 May 2022 17:59:12 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6424B324;
-	Wed, 18 May 2022 03:32:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BD464B325;
+	Wed, 18 May 2022 13:59:12 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
-	(fail, message has been altered)
-	header.i=@ozlabs-ru.20210112.gappssmtp.com
+	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id L7+WtpGCxbF0; Wed, 18 May 2022 03:32:10 -0400 (EDT)
+	with ESMTP id Wd8evTvSvILK; Wed, 18 May 2022 13:59:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E2D24B319;
-	Wed, 18 May 2022 03:32:10 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E5484B31F;
+	Wed, 18 May 2022 13:59:11 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1105B4B308
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 02:27:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F0D54B309
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 13:59:10 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ygus0V+W-gz5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 May 2022 02:27:49 -0400 (EDT)
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com
- [209.85.214.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11BBE4B301
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 02:27:48 -0400 (EDT)
-Received: by mail-pl1-f174.google.com with SMTP id s14so862783plk.8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 May 2022 23:27:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
- h=message-id:date:mime-version:user-agent:subject:content-language:to
- :cc:references:from:in-reply-to:content-transfer-encoding;
- bh=75xfyRYdtbbnySXqxmJnPbT1F8O/OC516UJoNDb3t+I=;
- b=rU4jPYNN5+avyZvAhBPhq7YZ6GjdV3WB7hpSv3vUe8rapXH3vJwLu4MUdpNlxV7Vc7
- AV8lrXHmL8UpJxDY3siQzlIi1kvlEXBUds9/aloM3MCUVjIMrI4iBAGYA3gy0JSQINos
- J2NLdYng7g+nuuokCoIgmaPM+rIZ4qqyHTrVrqikCReYskpXMfmVSw50Tuf7ydEKBM2g
- PUMz0bT1ksqn8xtF4/6i6km4yBy40ueQ2nK1Qg8YPCIwQ/sBVS9ZuWg1r+69cmGh3Cvg
- 9pioG246hcisDKCTphyRZWV73OSMQekwe7OZpLnVyClkygpRM+XSdD6zw+4AQbzOaROG
- Zvcw==
+ with ESMTP id T7wxOtqpQ61t for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 May 2022 13:59:09 -0400 (EDT)
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com
+ [209.85.128.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BD024B2B7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 13:59:09 -0400 (EDT)
+Received: by mail-yw1-f202.google.com with SMTP id
+ 00721157ae682-2ff40ee8109so23181587b3.14
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 10:59:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
+ h=date:message-id:mime-version:subject:from:to:cc;
+ bh=6El377MID7rCecykOPvAUGyvktASztEGQkNHsDo4H6Q=;
+ b=JTvJ+pKPh0OV0kWy/CMIAehzpxr1kPLAluvEkkiTGTqb1w3iky98vPxfy4JpyAv15m
+ hpxjGgsQiB3GvVjAm2TgBwam4CVhDSrwQ83XeJZEsIaezBOop/ufsUEHi3MUstSEowXA
+ nlIp6Q9DzIKMYFWsUvAHwXZAVSfh4ZSyiSCf0SO774QCnOv3HzA+hprAWYzNDIRkl2VI
+ LDJIZS2zYibH6SEjLL+5kqd2ZlG+yUswJ9ouj3uz5Vhn8rDaGN1bUgUyr84KmL3tVD1s
+ Wu4qOkO54Wa27tIlq61/c86VJrQ83vfObBXPz/M2gfi+URn+b/Uaj/Mss7uq9WlLTpS4
+ tJaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
- h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
- :content-language:to:cc:references:from:in-reply-to
- :content-transfer-encoding;
- bh=75xfyRYdtbbnySXqxmJnPbT1F8O/OC516UJoNDb3t+I=;
- b=a2zy/vGTllZFytbCpSB10+Brm4dXxQR3rBwkBdu6EEalTS+8vGBmfqS/sIp6tDSZEk
- L9FG9YfIbGUqZDd+9UfMjiqPsV0NlrZCPO8VsWJqNSGKx8toSG7BgHf3qXA71EI7oBq8
- SIrCgvkcwBhRPEH2AMcwgXPbeVVr9d1bFg5ugPlPBKMWKSxsnz8uBiK/OGW47jV4uJPV
- hol9m3V1CtDmES3CS5o2A/Z7+R5w0YsAWSJhVmaWb5cEUqmUmOdYPee2drBjf/glWUAx
- 5SKDm2BhCU7avgj6KLWMw7EwLxZEyebqkJ8MZbCbH/OJi8PXnIQ7k8IX4IlWuayD/r61
- 9hUw==
-X-Gm-Message-State: AOAM532ft8ISNQKSaakHYAjJP0FHZ+NUPfpWlIi+sTVR8w4J2K1Sn6da
- xthfQcZPZ4gzG5eqDJAcV3Wmbg==
-X-Google-Smtp-Source: ABdhPJw8YU30pDANG+wArZ1ct34zmOOlVc4nOxwpHMfezBscu5qQRFfree+bbOiz/rSK3BWzuNhG2w==
-X-Received: by 2002:a17:90b:4f87:b0:1dd:100b:7342 with SMTP id
- qe7-20020a17090b4f8700b001dd100b7342mr39908296pjb.64.1652855267956; 
- Tue, 17 May 2022 23:27:47 -0700 (PDT)
-Received: from [10.61.2.177] (110-175-254-242.static.tpgi.com.au.
- [110.175.254.242]) by smtp.gmail.com with ESMTPSA id
- g3-20020a62f943000000b0050dc762815dsm895132pfm.55.2022.05.17.23.27.42
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 May 2022 23:27:47 -0700 (PDT)
-Message-ID: <0d4bb0fa-10c6-3f5a-34c8-293144b3fdbb@ozlabs.ru>
-Date: Wed, 18 May 2022 16:27:41 +1000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101
- Thunderbird/100.0
-Subject: Re: [PATCH kernel] KVM: PPC: Make KVM_CAP_IRQFD_RESAMPLE platform
- dependent
-Content-Language: en-US
-To: kvm-ppc@vger.kernel.org
-References: <20220504074807.3616813-1-aik@ozlabs.ru>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20220504074807.3616813-1-aik@ozlabs.ru>
-X-Mailman-Approved-At: Wed, 18 May 2022 03:32:09 -0400
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
- Fabiano Rosas <farosas@linux.ibm.com>, x86@kernel.org,
- linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alex Williamson <alex.williamson@redhat.com>, kvm-riscv@lists.infradead.org,
- Paolo Bonzini <pbonzini@redhat.com>, linux-riscv@lists.infradead.org,
- linuxppc-dev@lists.ozlabs.org, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+ h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+ bh=6El377MID7rCecykOPvAUGyvktASztEGQkNHsDo4H6Q=;
+ b=hH2S1hULcZ6kQmSseQodQSS5o3f0fyuUTBy6nihma6bmS4rLtTxgqncB3hnHgH2oXN
+ uW+JAL0BOaLGfuY5vSn5Mq+rNIaoWkYMmhVyBOMVqyJqoMAS4qBZuf2bamXmRjKk4buT
+ wfPWFER2l+AGWgCOYfjjxEdcBzJ7bUDbRgrgPLV5q6ARsGcZllLTWg5KqWEGytV7KkWc
+ Ryq2IaKEiHVdYB/DB+6Fhw/4nvueFL6mGB8IHRPWYCLoVuHQqnIPEBOOnRhguXVf/+0S
+ /yUF91DkB584TJa8DCJJQ+HQ+IOhqIBtGn6PF8a6swrnH+UK+mB+D9q8xvLAykdHwsEG
+ ptbg==
+X-Gm-Message-State: AOAM5326Tvq6UZDswD15Evv1zOO6Ki1dFEoUYZp/xeRnkzX9fCmwjBnW
+ 1M0WzFaBhBZ8uLN9u6nQEvxmVzK/3Ws=
+X-Google-Smtp-Source: ABdhPJzd/VIgYtDzCdo352e3DSjBzZ/3yJ+2/AXyM2iOJppq/zMlcRJgTF3VMNpFU0YSI03GqRoyktT5vNs=
+X-Received: from oupton3.c.googlers.com
+ ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
+ (user=oupton job=sendgmr) by 2002:a25:8387:0:b0:64d:ddc8:b481 with SMTP id
+ t7-20020a258387000000b0064dddc8b481mr847547ybk.644.1652896748601; Wed, 18 May
+ 2022 10:59:08 -0700 (PDT)
+Date: Wed, 18 May 2022 17:58:06 +0000
+Message-Id: <20220518175811.2758661-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
+Subject: [PATCH v2 0/5] KVM: Clean up debugfs+stats init/destroy
+From: Oliver Upton <oupton@google.com>
+To: kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -96,144 +77,57 @@ List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
 List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
 List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
+The way that KVM handles debugfs init/destroy is somewhat sloppy. Even
+though debugfs is stood up after kvm_create_vm(), it is torn down from
+kvm_destroy_vm(). There exists a window where we need to tear down a VM
+before debugfs is created, requiring delicate handling.
 
+This series cleans up the debugfs lifecycle by fully tying it to the
+VM's init/destroy pattern.
 
-On 5/4/22 17:48, Alexey Kardashevskiy wrote:
-> When introduced, IRQFD resampling worked on POWER8 with XICS. However
-> KVM on POWER9 has never implemented it - the compatibility mode code
-> ("XICS-on-XIVE") misses the kvm_notify_acked_irq() call and the native
-> XIVE mode does not handle INTx in KVM at all.
-> 
-> This moved the capability support advertising to platforms and stops
-> advertising it on XIVE, i.e. POWER9 and later.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> 
-> Or I could move this one together with KVM_CAP_IRQFD. Thoughts?
+First two patches hoist some unrelated stats initialization to a more
+appropriate place for kvm and kvm_vcpu.
 
+Second two patches are the meat of the series, changing around the
+initialization order to get an FD early and wiring in debugfs
+initialization to kvm_create_vm().
 
-Ping?
+Lastly, patch 5 is essentially a revert of Sean's fix [1] for a NULL deref
+in debugfs, though I stopped short of an outright revert since that one
+went to stable and is still entirely correct.
 
-> 
-> ---
->   arch/arm64/kvm/arm.c       | 3 +++
->   arch/mips/kvm/mips.c       | 3 +++
->   arch/powerpc/kvm/powerpc.c | 6 ++++++
->   arch/riscv/kvm/vm.c        | 3 +++
->   arch/s390/kvm/kvm-s390.c   | 3 +++
->   arch/x86/kvm/x86.c         | 3 +++
->   virt/kvm/kvm_main.c        | 1 -
->   7 files changed, 21 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 523bc934fe2f..092f0614bae3 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -210,6 +210,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   	case KVM_CAP_VCPU_ATTRIBUTES:
->   	case KVM_CAP_PTP_KVM:
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +#endif
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> index a25e0b73ee70..0f3de470a73e 100644
-> --- a/arch/mips/kvm/mips.c
-> +++ b/arch/mips/kvm/mips.c
-> @@ -1071,6 +1071,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_READONLY_MEM:
->   	case KVM_CAP_SYNC_MMU:
->   	case KVM_CAP_IMMEDIATE_EXIT:
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +#endif
->   		r = 1;
->   		break;
->   	case KVM_CAP_NR_VCPUS:
-> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-> index 875c30c12db0..87698ffef3be 100644
-> --- a/arch/powerpc/kvm/powerpc.c
-> +++ b/arch/powerpc/kvm/powerpc.c
-> @@ -591,6 +591,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   		break;
->   #endif
->   
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +		r = !xive_enabled();
-> +		break;
-> +#endif
-> +
->   	case KVM_CAP_PPC_ALLOC_HTAB:
->   		r = hv_enabled;
->   		break;
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index c768f75279ef..b58579b386bb 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -63,6 +63,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_READONLY_MEM:
->   	case KVM_CAP_MP_STATE:
->   	case KVM_CAP_IMMEDIATE_EXIT:
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +#endif
->   		r = 1;
->   		break;
->   	case KVM_CAP_NR_VCPUS:
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 156d1c25a3c1..85e093fc8d13 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -564,6 +564,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   	case KVM_CAP_S390_DIAG318:
->   	case KVM_CAP_S390_MEM_OP_EXTENSION:
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +#endif
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0c0ca599a353..a0a7b769483d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4273,6 +4273,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_SYS_ATTRIBUTES:
->   	case KVM_CAP_VAPIC:
->   	case KVM_CAP_ENABLE_CAP:
-> +#ifdef CONFIG_HAVE_KVM_IRQFD
-> +	case KVM_CAP_IRQFD_RESAMPLE:
-> +#endif
->   		r = 1;
->   		break;
->   	case KVM_CAP_EXIT_HYPERCALL:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 70e05af5ebea..885e72e668a5 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4293,7 +4293,6 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
->   #endif
->   #ifdef CONFIG_HAVE_KVM_IRQFD
->   	case KVM_CAP_IRQFD:
-> -	case KVM_CAP_IRQFD_RESAMPLE:
->   #endif
->   	case KVM_CAP_IOEVENTFD_ANY_LENGTH:
->   	case KVM_CAP_CHECK_EXTENSION_VM:
+Applies cleanly to v5.18-rc5, since [1] is currently missing from
+kvm/queue or kvm/next. Tested with KVM selftests and the reproducer
+mentioned in [1] on an Intel Skylake machine.
+
+[1] 5c697c367a66 ("KVM: Initialize debugfs_dentry when a VM is created to avoid NULL deref")
+
+v1: http://lore.kernel.org/r/20220415201542.1496582-1-oupton@google.com
+
+v1 -> v2:
+ - Don't conflate debugfs+stats. Initialize stats_id outside of the
+   context of debugfs (Sean)
+ - Pass around the FD as a string to avoid subsequent KVM changes
+   inappropriately using the FD (Sean)
+
+Oliver Upton (5):
+  KVM: Shove vm stats_id init into kvm_create_vm()
+  KVM: Shove vcpu stats_id init into kvm_vcpu_init()
+  KVM: Get an fd before creating the VM
+  KVM: Actually create debugfs in kvm_create_vm()
+  KVM: Hoist debugfs_dentry init to kvm_create_vm_debugfs() (again)
+
+ virt/kvm/kvm_main.c | 96 +++++++++++++++++++++++----------------------
+ 1 file changed, 49 insertions(+), 47 deletions(-)
 
 -- 
-Alexey
+2.36.1.124.g0e6072fb45-goog
+
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
