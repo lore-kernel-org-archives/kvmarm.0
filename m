@@ -2,70 +2,70 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F52EC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8389C433F5
 	for <kvmarm@archiver.kernel.org>; Wed, 18 May 2022 17:59:19 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B1F7C4B327;
-	Wed, 18 May 2022 13:59:18 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DC184B329;
+	Wed, 18 May 2022 13:59:19 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 9VLMxsW06ql5; Wed, 18 May 2022 13:59:17 -0400 (EDT)
+	with ESMTP id FM8fyBOif3iP; Wed, 18 May 2022 13:59:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 938814B328;
-	Wed, 18 May 2022 13:59:17 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FBD04B322;
+	Wed, 18 May 2022 13:59:15 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D3D8B4B326
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 13:59:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F90A4B31F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 13:59:14 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iOYb3OWcZsBD for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 May 2022 13:59:14 -0400 (EDT)
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com
- [209.85.210.201])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C71C14B31F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 13:59:14 -0400 (EDT)
-Received: by mail-pf1-f201.google.com with SMTP id
- a37-20020a056a001d2500b005103aab8d65so1481322pfx.16
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 10:59:14 -0700 (PDT)
+ with ESMTP id xkA853rPikqI for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 May 2022 13:59:13 -0400 (EDT)
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com
+ [209.85.214.202])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15F884B322
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 13:59:13 -0400 (EDT)
+Received: by mail-pl1-f202.google.com with SMTP id
+ jg18-20020a17090326d200b0016178ae1c69so1250891plb.6
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 10:59:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:in-reply-to:message-id:mime-version:references:subject:from:to
- :cc; bh=OZkEtfeO16+WBXKIrEVzWaZgX0pGEVfJdhpX9jyjq9s=;
- b=XJnCL2DYM9o+Jy3j+sEoMXrtNq6JAflArhwOtUHIjrEJ8kcHsgAPojP2qMv6peZSpu
- AVnDrXhMKunZ+7DZv8Ykv0Xkyb4dOPzi3bZnMCqecQ2bk5JiSZNRSl5Ll4UYCVlHOF9l
- vrMxF6Hgc8ELAaEsQW04jMYqjYJulXTOreiHeNdsa5Zv6D+y5WW11Ee6AKmwybmm8JX1
- SBi5k0bDcYSbA9Q4cQNcBwwYLFFiPoU6k2ncYTfq6vQQGTST7+g+Ay8IDn63zRbNrdUq
- VdqpFcYBnP9M/mrXKdjnnCiIAKV+DZB4adpHjcpMLZeJb3vOBQodZed2QVril2oAvOZP
- CQhA==
+ :cc; bh=ngCuMiQQu2crWaF3N2+jr0MQPsojQwzxANrtvFLoUs0=;
+ b=gEFnGQRvL1SNUeweZldlNB86h9cbsmE4kfueDxykeLC/dgnbC0SW+2zdJwA8PwDw3d
+ nJcI92lhr0cTAkYC081GdamU0nFn4qz63tbJnUHAWZZM7p0i5OC3efWKdPGxiDYYSOvn
+ US1kgaHZgh0AJrTlTCqeqJ0KWTTu5Vg5Zm/3+VdiiecTxvK+6Mc8P74ANC43GhnciX3l
+ klYm8L1zxexX5JH4E0wKhLTh05FhuSJb/RCh8FZMMnl2aduowRZrqhMoO3eQFiOXDC+E
+ 5xQtRe/6bAGUTFBmBJ/8cVelvh0swyS46siJSC75IlQtQyz52F8D0yN3qSHhIOJuvU7o
+ r2kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:in-reply-to:message-id:mime-version
  :references:subject:from:to:cc;
- bh=OZkEtfeO16+WBXKIrEVzWaZgX0pGEVfJdhpX9jyjq9s=;
- b=qKV9rwpQBvCr5nrzjSYqgT27C89UncMAjlNUNW3y174Eq6HEZ8bI/OQzFwrNODK7/G
- jHATCvZG14EGZejNtNG5paIfQiOxAWGjKN3gzDHxyp/qTcJBMKkCjNdahIC6xwjf3KXx
- 6gbfoCmk1NFg78C4QV5rdpBnBYzsVdZth1ZwZs6i95LO5yNNNtHayT+tjykocMZadFfZ
- cN4KSI1PEIytER+YVJzt0469BOvnwECAqvqZoSKauW6FsQny2bW9Voktt4k5tqHq2J8Y
- AlkVnWZacAhk4amAjV95gMtj7kKo9p4Sqw/QjwJpIXz4X4nvZRa9aIsMD1UqbHpfWecd
- ehTQ==
-X-Gm-Message-State: AOAM532WD8gBl1aQ9kiNA2Na7hjrZbWVcDd0qGihcK3gIO9Wl55MrAU3
- dZ7/Hgs7cso8vGqKB0Sdw5JX2PKiyfY=
-X-Google-Smtp-Source: ABdhPJx5Hvz7aJKam/sS0xyXJXyVtOFQQc1blLiFh+vfuuj+mPAMcQ+wZ2ANZdo1mfsv8fBY7dTmpQyN9J0=
+ bh=ngCuMiQQu2crWaF3N2+jr0MQPsojQwzxANrtvFLoUs0=;
+ b=4E4a+jzsWUFkr8+5TcxmwRT5fveTtimHUszW09oN/DfbIuUCT0f/64FtHq44PG0b/t
+ woiESIVdqPO/voKv1o005yZKQUOQF9167UvgoDypDqdgL1e/j6ShQKiP6DME4x5R7MT9
+ Gl3bL4qKA+E2PIYbRLN4nUHsdYsRXZejK/djeaA/Qh5eqAPw1bYBQqRk777vBDz5BcYy
+ zKiWRuahWrEidWnbnp5KL1g4VnTu12AQk+g11JT9s4LK7Ai8OQgzdbp53Ud9+YfS1ynw
+ 9BHMNz5jCGlgq7vdyv3w/+o6fxtsh7Jh+yrfugUk51zwcdnL2jSEVoZY/UwkK8/IfrPS
+ TdYg==
+X-Gm-Message-State: AOAM530a/vgxfBnUGbrq5qvrKGhQ5ImPjc+6/nQUXfCk3AZpDTT2tan2
+ X2jmrAIrVGh/708N1mef6OoXrkuWIvU=
+X-Google-Smtp-Source: ABdhPJyBeXg2Aa9RwjM1V9d2ErVROM4+cPUe/IbabCLnLVoPOu/rW/D34Dh5ELw+xdfdzqlCet6MBrjc+sk=
 X-Received: from oupton3.c.googlers.com
  ([fda3:e722:ac3:cc00:24:72f4:c0a8:21eb])
- (user=oupton job=sendgmr) by 2002:a05:6a00:22d4:b0:510:6d75:e3da with SMTP id
- f20-20020a056a0022d400b005106d75e3damr520307pfj.3.1652896753816; Wed, 18 May
- 2022 10:59:13 -0700 (PDT)
-Date: Wed, 18 May 2022 17:58:09 +0000
+ (user=oupton job=sendgmr) by 2002:a17:90a:2a8a:b0:1df:26ba:6333 with SMTP id
+ j10-20020a17090a2a8a00b001df26ba6333mr350472pjd.0.1652896751753; Wed, 18 May
+ 2022 10:59:11 -0700 (PDT)
+Date: Wed, 18 May 2022 17:58:08 +0000
 In-Reply-To: <20220518175811.2758661-1-oupton@google.com>
-Message-Id: <20220518175811.2758661-4-oupton@google.com>
+Message-Id: <20220518175811.2758661-3-oupton@google.com>
 Mime-Version: 1.0
 References: <20220518175811.2758661-1-oupton@google.com>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-Subject: [PATCH v2 3/5] KVM: Get an fd before creating the VM
+Subject: [PATCH v2 2/5] KVM: Shove vcpu stats_id init into kvm_vcpu_init()
 From: Oliver Upton <oupton@google.com>
 To: kvm@vger.kernel.org
 Cc: pbonzini@redhat.com, maz@kernel.org, kvmarm@lists.cs.columbia.edu
@@ -85,78 +85,40 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hoist fd init to the very beginning of kvm_create_vm() so we can make
-use of it in other init routines.
+Initialize the field alongside other kvm_vcpu fields. No functional
+change intended.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- virt/kvm/kvm_main.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
+ virt/kvm/kvm_main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 778151333ac0..87ccab74dc80 100644
+index 36dc9271d039..778151333ac0 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -4774,25 +4774,27 @@ EXPORT_SYMBOL_GPL(file_is_kvm);
- 
- static int kvm_dev_ioctl_create_vm(unsigned long type)
- {
--	int r;
-+	int r, fd;
- 	struct kvm *kvm;
- 	struct file *file;
- 
-+	fd = get_unused_fd_flags(O_CLOEXEC);
-+	if (fd < 0)
-+		return fd;
+@@ -440,6 +440,10 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
+ 	vcpu->ready = false;
+ 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
+ 	vcpu->last_used_slot = NULL;
 +
- 	kvm = kvm_create_vm(type);
--	if (IS_ERR(kvm))
--		return PTR_ERR(kvm);
-+	if (IS_ERR(kvm)) {
-+		r = PTR_ERR(kvm);
-+		goto put_fd;
-+	}
-+
- #ifdef CONFIG_KVM_MMIO
- 	r = kvm_coalesced_mmio_init(kvm);
- 	if (r < 0)
- 		goto put_kvm;
- #endif
--	r = get_unused_fd_flags(O_CLOEXEC);
--	if (r < 0)
--		goto put_kvm;
--
- 	file = anon_inode_getfile("kvm-vm", &kvm_vm_fops, kvm, O_RDWR);
- 	if (IS_ERR(file)) {
--		put_unused_fd(r);
- 		r = PTR_ERR(file);
- 		goto put_kvm;
- 	}
-@@ -4804,17 +4806,19 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
- 	 * care of doing kvm_put_kvm(kvm).
- 	 */
- 	if (kvm_create_vm_debugfs(kvm, r) < 0) {
--		put_unused_fd(r);
- 		fput(file);
--		return -ENOMEM;
-+		r = -ENOMEM;
-+		goto put_fd;
- 	}
- 	kvm_uevent_notify_change(KVM_EVENT_CREATE_VM, kvm);
- 
--	fd_install(r, file);
--	return r;
-+	fd_install(fd, file);
-+	return fd;
- 
- put_kvm:
- 	kvm_put_kvm(kvm);
-+put_fd:
-+	put_unused_fd(fd);
- 	return r;
++	/* Fill the stats id string for the vcpu */
++	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
++		 task_pid_nr(current), id);
  }
  
+ static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
+@@ -3807,10 +3811,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ 	if (r)
+ 		goto unlock_vcpu_destroy;
+ 
+-	/* Fill the stats id string for the vcpu */
+-	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
+-		 task_pid_nr(current), id);
+-
+ 	/* Now it's all set up, let userspace reach it */
+ 	kvm_get_kvm(kvm);
+ 	r = create_vcpu_fd(vcpu);
 -- 
 2.36.1.124.g0e6072fb45-goog
 
