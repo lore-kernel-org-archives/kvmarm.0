@@ -2,54 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21443C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B612C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:45:34 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D0D234B370;
-	Thu, 19 May 2022 09:45:29 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id E6C344B3D4;
+	Thu, 19 May 2022 09:45:33 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tD2IhRvj4Epr; Thu, 19 May 2022 09:45:27 -0400 (EDT)
+	with ESMTP id 3cBQE19T5QFQ; Thu, 19 May 2022 09:45:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 93F784B3AA;
-	Thu, 19 May 2022 09:45:27 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id B405A4B406;
+	Thu, 19 May 2022 09:45:31 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F2E1400D1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 999A74B3D4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:29 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O3Q4a33nRyvs for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2022 09:45:24 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CF8DF4B3C7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:24 -0400 (EDT)
+ with ESMTP id 75fjPWU7yB+d for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2022 09:45:27 -0400 (EDT)
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E635F4B38D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:26 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 65F2F6179F;
- Thu, 19 May 2022 13:45:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59C8AC34119;
- Thu, 19 May 2022 13:45:20 +0000 (UTC)
+ by sin.source.kernel.org (Postfix) with ESMTPS id 8FE31CE2466;
+ Thu, 19 May 2022 13:45:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F885C385B8;
+ Thu, 19 May 2022 13:45:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652967923;
- bh=3CjY4Pec448XotcyN2iqZqW/AXk9FKiq5AorkwA5PIo=;
+ s=k20201202; t=1652967919;
+ bh=Wd/HwkBqurC96ZGUbUiPBa09e91aiokQncSXqY2+W8A=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Ah5dMC5WL11TdBzKBFW4Bm7Zf9QsydkXGKdBlSpTd3G5QGJbK85WTN2cy469QC4ob
- /Ke2PCNB091Ze8VKttP1KicuACFtsKPLDbf24CemZhY1WpCwsnIwK16Ry1BBmcRU4V
- V4Ooe8GEU+9EvDOonvoO5BlORgY7iMI/1dlajlgTk/j03cJwQ89WlP3IFCKa7osB2v
- BTGEs6Abq4Tr/F35/f96HSYeol7vZc0gf6QUbYifbzXQYgPWmkqEfNFND86Mxc1zRh
- VI+zByOsw5wmlxrriGPanviEM+V75OACVZrfev4deRza+qgONZSTQpWJ+cD6DUDWk1
- WemTltlhe7UrQ==
+ b=nv0J7+q5DNpWtUyZflP18IUXGvVQz6kZ23wtPsn4EH1Zp0na7ewTMNMI/jESdl0jY
+ kaJLuZ1/UmO0i5rCxQu/II3wMQGm61PlpJcwlM7M9VjvLRAf9XmuSQk8gq4hhA76+J
+ UarGWnqVZ/uJ7PdpUbLO79QDVN75VZvQQ9TwBLMScAoQubJB0T2RMPkx/bCRmstMj7
+ IpPPr4YKqDMtLP3VwKpDFVbw1li75USzU3RJF8LIVfPo7DF+HKRPfs1tAvmFOPzf16
+ UUwgt3GfGVj23i2SUEuLWseCK13FrmD9oGSIbbE9JH3pbejdapr/o0Fa6b7+m1T2bD
+ lmy3TBRccp+0w==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 45/89] KVM: arm64: Add the {flush,
- sync}_timer_state() primitives
-Date: Thu, 19 May 2022 14:41:20 +0100
-Message-Id: <20220519134204.5379-46-will@kernel.org>
+Subject: [PATCH 44/89] KVM: arm64: Introduce predicates to check for protected
+ state
+Date: Thu, 19 May 2022 14:41:19 +0100
+Message-Id: <20220519134204.5379-45-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -76,74 +76,64 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Marc Zyngier <maz@kernel.org>
 
-In preparation for save/restore of the timer state at EL2 for protected
-VMs, introduce a couple of sync/flush primitives for the architected
-timer, in much the same way as we have for the GIC.
+In order to determine whether or not a VM or (shadow) vCPU are protected,
+introduce a helper function to query this state. For now, these will
+always return 'false' as the underlying field is never configured.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 34 ++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ arch/arm64/include/asm/kvm_host.h      |  6 ++----
+ arch/arm64/kvm/hyp/include/nvhe/pkvm.h | 13 +++++++++++++
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 58515e5d24ec..32e7e1cad00f 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -63,6 +63,38 @@ static void sync_vgic_state(struct kvm_vcpu *host_vcpu,
- 		WRITE_ONCE(host_cpu_if->vgic_lr[i], shadow_cpu_if->vgic_lr[i]);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index c55aadfdfd63..066eb7234bdd 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -164,6 +164,7 @@ struct kvm_pinned_page {
+ };
+ 
+ struct kvm_protected_vm {
++	bool enabled;
+ 	unsigned int shadow_handle;
+ 	struct mutex shadow_lock;
+ 	struct kvm_hyp_memcache teardown_mc;
+@@ -895,10 +896,7 @@ int kvm_set_ipa_limit(void);
+ #define __KVM_HAVE_ARCH_VM_ALLOC
+ struct kvm *kvm_arch_alloc_vm(void);
+ 
+-static inline bool kvm_vm_is_protected(struct kvm *kvm)
+-{
+-	return false;
+-}
++#define kvm_vm_is_protected(kvm)	((kvm)->arch.pkvm.enabled)
+ 
+ void kvm_init_protected_traps(struct kvm_vcpu *vcpu);
+ 
+diff --git a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+index f76af6e0177a..3997eb3dff55 100644
+--- a/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
++++ b/arch/arm64/kvm/hyp/include/nvhe/pkvm.h
+@@ -58,6 +58,19 @@ static inline struct kvm_shadow_vm *get_shadow_vm(struct kvm_vcpu *shadow_vcpu)
+ 	return get_shadow_state(shadow_vcpu)->shadow_vm;
  }
  
-+static void flush_timer_state(struct kvm_shadow_vcpu_state *shadow_state)
++static inline bool shadow_state_is_protected(struct kvm_shadow_vcpu_state *shadow_state)
 +{
-+	struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
-+
-+	if (!shadow_state_is_protected(shadow_state))
-+		return;
-+
-+	/*
-+	 * A shadow vcpu has no offset, and sees vtime == ptime. The
-+	 * ptimer is fully emulated by EL1 and cannot be trusted.
-+	 */
-+	write_sysreg(0, cntvoff_el2);
-+	isb();
-+	write_sysreg_el0(__vcpu_sys_reg(shadow_vcpu, CNTV_CVAL_EL0), SYS_CNTV_CVAL);
-+	write_sysreg_el0(__vcpu_sys_reg(shadow_vcpu, CNTV_CTL_EL0), SYS_CNTV_CTL);
++	return shadow_state->shadow_vm->kvm.arch.pkvm.enabled;
 +}
 +
-+static void sync_timer_state(struct kvm_shadow_vcpu_state *shadow_state)
++static inline bool vcpu_is_protected(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
++	if (!is_protected_kvm_enabled())
++		return false;
 +
-+	if (!shadow_state_is_protected(shadow_state))
-+		return;
-+
-+	/*
-+	 * Preserve the vtimer state so that it is always correct,
-+	 * even if the host tries to make a mess.
-+	 */
-+	__vcpu_sys_reg(shadow_vcpu, CNTV_CVAL_EL0) = read_sysreg_el0(SYS_CNTV_CVAL);
-+	__vcpu_sys_reg(shadow_vcpu, CNTV_CTL_EL0) = read_sysreg_el0(SYS_CNTV_CTL);
++	return shadow_state_is_protected(get_shadow_state(vcpu));
 +}
 +
- static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
- {
- 	struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
-@@ -85,6 +117,7 @@ static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
- 	shadow_vcpu->arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
- 
- 	flush_vgic_state(host_vcpu, shadow_vcpu);
-+	flush_timer_state(shadow_state);
- }
- 
- static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
-@@ -102,6 +135,7 @@ static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
- 	host_vcpu->arch.flags		= shadow_vcpu->arch.flags;
- 
- 	sync_vgic_state(host_vcpu, shadow_vcpu);
-+	sync_timer_state(shadow_state);
- }
- 
- static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
+ void hyp_shadow_table_init(void *tbl);
+ int __pkvm_init_shadow(struct kvm *kvm, unsigned long shadow_hva,
+ 		       size_t shadow_size, unsigned long pgd_hva);
 -- 
 2.36.1.124.g0e6072fb45-goog
 
