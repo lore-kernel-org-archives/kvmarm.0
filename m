@@ -2,53 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7BE0C4321E
-	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1682C38A2B
+	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:46:18 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B8BC4B439;
-	Thu, 19 May 2022 09:46:12 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 842ED4B3D9;
+	Thu, 19 May 2022 09:46:18 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id tOaEdFDI2FBo; Thu, 19 May 2022 09:46:11 -0400 (EDT)
+	with ESMTP id yWTIxCUz1aKW; Thu, 19 May 2022 09:46:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A86B4B442;
-	Thu, 19 May 2022 09:46:11 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6604F4B447;
+	Thu, 19 May 2022 09:46:17 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D1D54B3D9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:46:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 184654B3B8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:46:16 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GUhHunOwtp4U for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2022 09:46:09 -0400 (EDT)
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00AE04B424
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:46:09 -0400 (EDT)
+ with ESMTP id JgcVsKkSW1Ol for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2022 09:46:13 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF1BB4B44E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:46:13 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id 52119617D2;
- Thu, 19 May 2022 13:46:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9EEEC34100;
- Thu, 19 May 2022 13:46:03 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id D1E38B824D9;
+ Thu, 19 May 2022 13:46:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5E8FC385B8;
+ Thu, 19 May 2022 13:46:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652967967;
- bh=88e6OVrkJmSynl9ligIzRQd0lQ3ObHpfzQ+vy+gTKaY=;
+ s=k20201202; t=1652967971;
+ bh=gNfFOi6pd5y/KMC1EENc0l08zoMIj4rMl1P1lAcHzmI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=t7nbdcmc4S6MeEqTouC0TJGSjgHdW6wM8e+t4Ayg3eXGeT1aMD9Ua735ag0u7sU8S
- YsBa1mPe7z0pQjA/OrcAhieua+PTI+PrEldWuBdNdjy/ph5zumy/zOAd8RlGIPqYIX
- l8l4m4GyY2TYHO8fYCuWB3PW2qDyjcEC4H5RfeGH3f1LgasLCBpiTQaj29TV1p6OUX
- bKBoePq8DFe5DGLMnmq69HWYIPG7iKFeMRloyEtACj0Vswhd1CEsZWqFSf72uBSARc
- yGDbR35gjObq9re4epZynBw2hdicIHeriQLgGzsm0738+ONoiyCopDkYYADf2iMR2Y
- hV34CciKw9KqQ==
+ b=u6nFRAbTKYWiGRYq2O+qFR9S7ODm9TBeMw0yMLdLvLR/o74yXsoLWW4DrFBKaSsT1
+ 0vsUeJ2J5x3lKmZDM3DzioeP03cx9RPsw4ayjkiazraeWQUPpTssdRZoZkAnQWplWJ
+ IGrc6LSRZSXv6xum3n3ZBXvddcMIRhK6yXDbCbKEyRoCNwR5xwfMMYElYbbIiKW4DE
+ aGwDDY8rDzdvBJ+hPY3BBZJq2fiIDkR1n0vaS7ObwSB1jFR3ViSsYmzo0ISSwIhX+w
+ h96nvNClKHlT7x0CSd29JeyzM5Jai4cwvnVa7Zbc1hfw6O94eQP+YNvqmR0BHHfEC/
+ lCuQ55bVYcFsw==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 56/89] KVM: arm64: Check directly whether the vcpu is protected
-Date: Thu, 19 May 2022 14:41:31 +0100
-Message-Id: <20220519134204.5379-57-will@kernel.org>
+Subject: [PATCH 57/89] KVM: arm64: Trap debug break and watch from guest
+Date: Thu, 19 May 2022 14:41:32 +0100
+Message-Id: <20220519134204.5379-58-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -75,37 +75,50 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Fuad Tabba <tabba@google.com>
 
-Simpler code and ensures we're always looking at hyp state.
+Debug and trace are not currently supported for protected guests, so
+trap accesses to the related registers and emulate them as RAZ/WI.
 
 Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/switch.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/pkvm.c     |  2 +-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c | 11 +++++++++++
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
-index 9d2b971e8613..6bb979ee51cc 100644
---- a/arch/arm64/kvm/hyp/nvhe/switch.c
-+++ b/arch/arm64/kvm/hyp/nvhe/switch.c
-@@ -215,7 +215,7 @@ static const exit_handler_fn pvm_exit_handlers[] = {
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index c0403416ce1d..cd0712e13ab0 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -108,7 +108,7 @@ static void pvm_init_traps_aa64dfr0(struct kvm_vcpu *vcpu)
  
- static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
- {
--	if (unlikely(kvm_vm_is_protected(kern_hyp_va(vcpu->kvm))))
-+	if (unlikely(vcpu_is_protected(vcpu)))
- 		return pvm_exit_handlers;
+ 	/* Trap Debug */
+ 	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), feature_ids))
+-		mdcr_set |= MDCR_EL2_TDRA | MDCR_EL2_TDA | MDCR_EL2_TDE;
++		mdcr_set |= MDCR_EL2_TDRA | MDCR_EL2_TDA;
  
- 	return hyp_exit_handlers;
-@@ -234,9 +234,7 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
-  */
- static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
--	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
--
--	if (kvm_vm_is_protected(kvm) && vcpu_mode_is_32bit(vcpu)) {
-+	if (unlikely(vcpu_is_protected(vcpu) && vcpu_mode_is_32bit(vcpu))) {
- 		/*
- 		 * As we have caught the guest red-handed, decide that it isn't
- 		 * fit for purpose anymore by making the vcpu invalid. The VMM
+ 	/* Trap OS Double Lock */
+ 	if (!FIELD_GET(ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK), feature_ids))
+diff --git a/arch/arm64/kvm/hyp/nvhe/sys_regs.c b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+index ddea42d7baf9..e732826f9624 100644
+--- a/arch/arm64/kvm/hyp/nvhe/sys_regs.c
++++ b/arch/arm64/kvm/hyp/nvhe/sys_regs.c
+@@ -356,6 +356,17 @@ static const struct sys_reg_desc pvm_sys_reg_descs[] = {
+ 	/* Cache maintenance by set/way operations are restricted. */
+ 
+ 	/* Debug and Trace Registers are restricted. */
++	RAZ_WI(SYS_DBGBVRn_EL1(0)),
++	RAZ_WI(SYS_DBGBCRn_EL1(0)),
++	RAZ_WI(SYS_DBGWVRn_EL1(0)),
++	RAZ_WI(SYS_DBGWCRn_EL1(0)),
++	RAZ_WI(SYS_MDSCR_EL1),
++	RAZ_WI(SYS_OSLAR_EL1),
++	RAZ_WI(SYS_OSLSR_EL1),
++	RAZ_WI(SYS_OSDLR_EL1),
++
++	/* Group 1 ID registers */
++	RAZ_WI(SYS_REVIDR_EL1),
+ 
+ 	/* AArch64 mappings of the AArch32 ID registers */
+ 	/* CRm=1 */
 -- 
 2.36.1.124.g0e6072fb45-goog
 
