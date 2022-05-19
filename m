@@ -2,53 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A36C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C6C8C4332F
+	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:46:06 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B0A94B42E;
-	Thu, 19 May 2022 09:46:05 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 395734B44C;
+	Thu, 19 May 2022 09:46:06 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id TyEwS1eHVRwB; Thu, 19 May 2022 09:46:01 -0400 (EDT)
+	with ESMTP id s2xRWl7AKVRV; Thu, 19 May 2022 09:46:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D3EAC4B435;
-	Thu, 19 May 2022 09:46:00 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id ED08A4B3D8;
+	Thu, 19 May 2022 09:46:04 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A599F4B435
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3CC804B437
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:46:03 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id apn3ZYpFWDXr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2022 09:45:58 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A7DB44B436
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:57 -0400 (EDT)
+ with ESMTP id jhg9wZnw1S+5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2022 09:46:02 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E50B4B3CD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:46:01 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id C77E5B824A6;
- Thu, 19 May 2022 13:45:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13976C34115;
- Thu, 19 May 2022 13:45:51 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id 181F061783;
+ Thu, 19 May 2022 13:46:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A3E1C36AE5;
+ Thu, 19 May 2022 13:45:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652967955;
- bh=Us5TydH7WI/rZV15ZTqLlCPi3fuqooPfs40Aq0JtCjg=;
+ s=k20201202; t=1652967959;
+ bh=cvBKGfWFAbmH68bmeDTUSse0RpVg4TXL+HSHAKVcsow=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=idXjjs+cpv/cEMpS4QA91l1Pgcfz2v1VjEvHh9BL67YQCcesyaUttuJo+z+Q6SVUe
- 3ZkjlmSs3h/L3Mok08eil9KrEZoHjBeOL+zF6jYlGcO0sk4BPtni2QOlcpMBiaWdBN
- QFSUT/1vIn0niNb6oYpXUbBDCNbkVj2E1OEJM4Nd1jzQgZvF7U93cdVqFJhNM23/do
- gYCalGkUEUp5J0V9R39BrUvhWHbo8uO1YK4TInERx3eL37WRcCkJwDq9/ue7suyF+7
- pBqbs67lF+Ew9WYrG4u9ug70FpO4cNjD2iUPOXdFo0Yxiati2SyILe5k5MSTGhPSZx
- vON2IWksQBZuA==
+ b=XQp2SFcckGWaZ9r0J9knvbktkXOKat0vRrw0drOozmkrj5NmVw+v4Z1R1k2SIUxh/
+ tZNo0nxM6bw4OZGYXFVFUR2oF9sQ2KLHxFgTEMcna2qXdo7NDaeG3hkx+WH2jsnXiH
+ xlxQcV3WCwpZWdkEK6BnY/k5Ca1DblJjAl/yKHX6pct9uCx/nLEZa2UBebBkYHq9JZ
+ l0fQFEOiUQMJpeZbA51jyKB3gtseKc8z4xyhtMzLuWBxXsc2mphJwz61qYXJ1cNL/f
+ SimpwFLv03rxan7C6ccAVnO/6rzgBCSNmoIIWii5vMFHu+SEutvx5hKD5X4YPZmAmq
+ mmtHtc6gGT3FQ==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 53/89] KVM: arm64: Lazy host FP save/restore
-Date: Thu, 19 May 2022 14:41:28 +0100
-Message-Id: <20220519134204.5379-54-will@kernel.org>
+Subject: [PATCH 54/89] KVM: arm64: Reduce host/shadow vcpu state copying
+Date: Thu, 19 May 2022 14:41:29 +0100
+Message-Id: <20220519134204.5379-55-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -75,136 +75,64 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 
 From: Marc Zyngier <maz@kernel.org>
 
-Implement lazy save/restore of the host FPSIMD register state at EL2.
-This allows us to save/restore guest FPSIMD registers without involving
-the host and means that we can avoid having to repopulate the shadow
-register state on every flush.
+When running with pKVM enabled, protected guests run with a fixed CPU
+configuration and therefore features such as hardware debug and SVE are
+unavailable and their state does not need to be copied from the host
+structures on each flush operation. Although non-protected guests do
+require the host and shadow structures to be kept in-sync with each
+other, we can defer writing back to the host to an explicit sync
+hypercall, rather than doing it after every vCPU run.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 57 ++++++++++++++++++++++++++----
- 1 file changed, 51 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 2a12d6f710ef..228736a9ab40 100644
+index 228736a9ab40..e82c0faf6c81 100644
 --- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
 +++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -20,6 +20,14 @@
+@@ -196,17 +196,18 @@ static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
  
- #include <linux/irqchip/arm-gic-v3.h>
+ 		if (host_flags & KVM_ARM64_PKVM_STATE_DIRTY)
+ 			__flush_vcpu_state(shadow_state);
+-	}
  
-+/*
-+ * Host FPSIMD state. Written to when the guest accesses its own FPSIMD state,
-+ * and read when the guest state is live and we need to switch back to the host.
-+ *
-+ * Only valid when the KVM_ARM64_FP_ENABLED flag is set in the shadow structure.
-+ */
-+static DEFINE_PER_CPU(struct user_fpsimd_state, loaded_host_fpsimd_state);
-+
- DEFINE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+-	shadow_vcpu->arch.sve_state	= kern_hyp_va(host_vcpu->arch.sve_state);
+-	shadow_vcpu->arch.sve_max_vl	= host_vcpu->arch.sve_max_vl;
++		shadow_vcpu->arch.sve_state = kern_hyp_va(host_vcpu->arch.sve_state);
++		shadow_vcpu->arch.sve_max_vl = host_vcpu->arch.sve_max_vl;
  
- void __kvm_hyp_host_forward_smc(struct kvm_cpu_context *host_ctxt);
-@@ -195,10 +203,8 @@ static void flush_shadow_state(struct kvm_shadow_vcpu_state *shadow_state)
+-	shadow_vcpu->arch.hcr_el2	= host_vcpu->arch.hcr_el2;
+-	shadow_vcpu->arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
++		shadow_vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS & ~(HCR_RW | HCR_TWI | HCR_TWE);
++		shadow_vcpu->arch.hcr_el2 |= READ_ONCE(host_vcpu->arch.hcr_el2);
  
- 	shadow_vcpu->arch.hcr_el2	= host_vcpu->arch.hcr_el2;
- 	shadow_vcpu->arch.mdcr_el2	= host_vcpu->arch.mdcr_el2;
--	shadow_vcpu->arch.cptr_el2	= host_vcpu->arch.cptr_el2;
+-	shadow_vcpu->arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
++		shadow_vcpu->arch.mdcr_el2 = host_vcpu->arch.mdcr_el2;
++		shadow_vcpu->arch.debug_ptr = kern_hyp_va(host_vcpu->arch.debug_ptr);
++	}
  
- 	shadow_vcpu->arch.debug_ptr	= kern_hyp_va(host_vcpu->arch.debug_ptr);
--	shadow_vcpu->arch.host_fpsimd_state = host_vcpu->arch.host_fpsimd_state;
+-	shadow_vcpu->arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
++	shadow_vcpu->arch.vsesr_el2 = host_vcpu->arch.vsesr_el2;
  
- 	shadow_vcpu->arch.vsesr_el2	= host_vcpu->arch.vsesr_el2;
+ 	flush_vgic_state(host_vcpu, shadow_vcpu);
+ 	flush_timer_state(shadow_state);
+@@ -238,10 +239,10 @@ static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state,
+ 	unsigned long host_flags;
+ 	u8 esr_ec;
  
-@@ -235,7 +241,6 @@ static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state,
- 	host_vcpu->arch.ctxt		= shadow_vcpu->arch.ctxt;
- 
- 	host_vcpu->arch.hcr_el2		= shadow_vcpu->arch.hcr_el2;
--	host_vcpu->arch.cptr_el2	= shadow_vcpu->arch.cptr_el2;
- 
+-	host_vcpu->arch.ctxt		= shadow_vcpu->arch.ctxt;
+-
+-	host_vcpu->arch.hcr_el2		= shadow_vcpu->arch.hcr_el2;
+-
++	/*
++	 * Don't sync the vcpu GPR/sysreg state after a run. Instead,
++	 * leave it in the shadow until someone actually requires it.
++	 */
  	sync_vgic_state(host_vcpu, shadow_vcpu);
  	sync_timer_state(shadow_state);
-@@ -262,6 +267,27 @@ static void sync_shadow_state(struct kvm_shadow_vcpu_state *shadow_state,
- 	shadow_state->exit_code = exit_reason;
- }
  
-+static void fpsimd_host_restore(void)
-+{
-+	sysreg_clear_set(cptr_el2, CPTR_EL2_TZ | CPTR_EL2_TFP, 0);
-+	isb();
-+
-+	if (unlikely(is_protected_kvm_enabled())) {
-+		struct kvm_shadow_vcpu_state *shadow_state = pkvm_loaded_shadow_vcpu_state();
-+		struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
-+		struct user_fpsimd_state *host_fpsimd_state = this_cpu_ptr(&loaded_host_fpsimd_state);
-+
-+		__fpsimd_save_state(&shadow_vcpu->arch.ctxt.fp_regs);
-+		__fpsimd_restore_state(host_fpsimd_state);
-+
-+		shadow_vcpu->arch.flags &= ~KVM_ARM64_FP_ENABLED;
-+		shadow_vcpu->arch.flags |= KVM_ARM64_FP_HOST;
-+	}
-+
-+	if (system_supports_sve())
-+		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-+}
-+
- static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(unsigned int, shadow_handle, host_ctxt, 1);
-@@ -291,6 +317,9 @@ static void handle___pkvm_vcpu_load(struct kvm_cpu_context *host_ctxt)
- 		*last_ran = shadow_vcpu->vcpu_id;
- 	}
- 
-+	shadow_vcpu->arch.host_fpsimd_state = this_cpu_ptr(&loaded_host_fpsimd_state);
-+	shadow_vcpu->arch.flags |= KVM_ARM64_FP_HOST;
-+
- 	if (shadow_state_is_protected(shadow_state)) {
- 		/* Propagate WFx trapping flags, trap ptrauth */
- 		shadow_vcpu->arch.hcr_el2 &= ~(HCR_TWE | HCR_TWI |
-@@ -310,6 +339,10 @@ static void handle___pkvm_vcpu_put(struct kvm_cpu_context *host_ctxt)
- 
- 	if (shadow_state) {
- 		struct kvm_vcpu *host_vcpu = shadow_state->host_vcpu;
-+		struct kvm_vcpu *shadow_vcpu = &shadow_state->shadow_vcpu;
-+
-+		if (shadow_vcpu->arch.flags & KVM_ARM64_FP_ENABLED)
-+			fpsimd_host_restore();
- 
- 		if (!shadow_state_is_protected(shadow_state) &&
- 			!(READ_ONCE(host_vcpu->arch.flags) & KVM_ARM64_PKVM_STATE_DIRTY))
-@@ -377,6 +410,19 @@ static void handle___kvm_vcpu_run(struct kvm_cpu_context *host_ctxt)
- 		ret = __kvm_vcpu_run(&shadow_state->shadow_vcpu);
- 
- 		sync_shadow_state(shadow_state, ret);
-+
-+		if (shadow_state->shadow_vcpu.arch.flags & KVM_ARM64_FP_ENABLED) {
-+			/*
-+			 * The guest has used the FP, trap all accesses
-+			 * from the host (both FP and SVE).
-+			 */
-+			u64 reg = CPTR_EL2_TFP;
-+
-+			if (system_supports_sve())
-+				reg |= CPTR_EL2_TZ;
-+
-+			sysreg_clear_set(cptr_el2, 0, reg);
-+		}
- 	} else {
- 		ret = __kvm_vcpu_run(vcpu);
- 	}
-@@ -707,10 +753,9 @@ void handle_trap(struct kvm_cpu_context *host_ctxt)
- 	case ESR_ELx_EC_SMC64:
- 		handle_host_smc(host_ctxt);
- 		break;
-+	case ESR_ELx_EC_FP_ASIMD:
- 	case ESR_ELx_EC_SVE:
--		sysreg_clear_set(cptr_el2, CPTR_EL2_TZ, 0);
--		isb();
--		sve_cond_update_zcr_vq(ZCR_ELx_LEN_MASK, SYS_ZCR_EL2);
-+		fpsimd_host_restore();
- 		break;
- 	case ESR_ELx_EC_IABT_LOW:
- 	case ESR_ELx_EC_DABT_LOW:
 -- 
 2.36.1.124.g0e6072fb45-goog
 
