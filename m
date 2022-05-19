@@ -2,77 +2,77 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8315BC433EF
-	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 03:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45598C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 03:53:31 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id DE94A4B2A5;
-	Wed, 18 May 2022 23:48:09 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id C3F774B354;
+	Wed, 18 May 2022 23:53:30 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@google.com
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JrNyMJ1E7x8h; Wed, 18 May 2022 23:48:08 -0400 (EDT)
+	with ESMTP id vI6aowah5peK; Wed, 18 May 2022 23:53:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id AAC024B333;
-	Wed, 18 May 2022 23:48:08 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 849A74B341;
+	Wed, 18 May 2022 23:53:29 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0676E4B2DD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 23:48:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D782F4B33C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 23:53:27 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PR7gecih7xxJ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 May 2022 23:48:05 -0400 (EDT)
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com
- [209.85.166.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DA98B4B2A5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 23:48:05 -0400 (EDT)
-Received: by mail-io1-f46.google.com with SMTP id f4so4556142iov.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 20:48:05 -0700 (PDT)
+ with ESMTP id xt-pi5YV54Ld for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 May 2022 23:53:26 -0400 (EDT)
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com
+ [209.85.166.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2CFE4B2BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 23:53:26 -0400 (EDT)
+Received: by mail-io1-f52.google.com with SMTP id s23so4495918iog.13
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 May 2022 20:53:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20210112;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=V7aykxkpRlTrHcdok+1A8qMCzSLka/rVSLMo9eqIxnA=;
- b=nCjjPyCmNUJwmxdEVP2MJRlqhK1VkKhityQGd1WRlCSn1KQoYBU7MSH7G9iBptN0ZA
- K9F/9TOtJDNQ6HlNozRI9gtk+YKBCMp6p1alj9uaGotX3V4uQnc6RclOHQpJoMb8tC52
- kUfLP0MeMGnms+fOZi0nljeddiouf8PS1LChbh7rouNciJANho6lK6y6e8JZlw5oqc5i
- 1HW/FeboKCrQHRzUdaXSuUDy44kHr3JnrNSp55V38SMxTp48Bv65UUhRxDEegqsVbsRv
- x4UiPJUKeZDHotEucB35lECImraRroX9wvVueZLWO2rzVs2iSqBV4wTlAWP3cDy724d3
- UIvQ==
+ bh=lufChGhIEUsgvEbinQ26kGFNXQ3rJPqXruGsydqK3Q8=;
+ b=Ob5OHP1Cm2BDG5B8+mM1i3xAUIbpuTw6iH99FzXl3AB/gzmbRYt/8l9QgFDBFYjVF3
+ WyMOmZBvcKILAabVoUX3CboQXeIeoyKQkRct8SDIa3lN9r9P3NGsUSraMrUAt3CiPGcO
+ vutDZnp22fCSi4fzqIsjEWHnmT4d/E6FCBn+ZzpwYMOUAjZJVJw2aWtLp8FF3GgvIpSc
+ 4AZdVi/YVyCcEHLwcpnByKFo43lg3o9KEXvIY7QlZb9I69jl/Gvswdh6UBOgTeEyuruC
+ Fr8+m+lxuU8T8NXvg3Jeda/7q1JZl89/yvknXaK4WlTI/HPlLtCLH+Q40EG8NBC/IqxN
+ zwUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20210112;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=V7aykxkpRlTrHcdok+1A8qMCzSLka/rVSLMo9eqIxnA=;
- b=yc/tJVxamZkzNbY0YPNz2SOEeBJny+P0gIW5YHJPZJ3w/ksSIu9qHZcDcg9LJ8K92O
- uBBDWe1mhPLuAvFZp3giugBNC0VYuddWra2/Uy/stx9Z7siaWH9wqb1vwXfLGOyUF2Dk
- Os86ln6TNEfKVZkTp46wdnWrWBBFfL8mUMw758v0cvtMfa1QI7xFD7nh6tyjBptcXb2F
- FrYUmcc4D3sRmaM+oez7G3eVDedRaE4uvUgqFfAyZLB7xx9fEz7pwzqd70cch5cbGyMF
- /vlI0wdf9GomqjC0NvGAjYPYgCOoLm08N5PYOwjoCcMxTfPDoYk056aSH4FfcFupXWFX
- xQWg==
-X-Gm-Message-State: AOAM533BkY/7OFfquEeRTXY8ZxHARNGHQKMISh0K+uxMesld3cq6j1Qf
- 6T3DPNQUNMo2yOgm0nXa1uCFYQ==
-X-Google-Smtp-Source: ABdhPJyF43/gmULs/erOMWf06SK+pEavs8YWgCinIHa60Rx65dQweOqX0OpvpMJfoexchX+275tbQw==
-X-Received: by 2002:a05:6602:2f0c:b0:65a:d5f3:7572 with SMTP id
- q12-20020a0566022f0c00b0065ad5f37572mr1475954iow.22.1652932084930; 
- Wed, 18 May 2022 20:48:04 -0700 (PDT)
+ bh=lufChGhIEUsgvEbinQ26kGFNXQ3rJPqXruGsydqK3Q8=;
+ b=e6ULPQCj500hKTGg4ivkRHw9Sx6Yu3W4q7ZHTt1jKXMXs7yiKoRIoY2CSndo3HqzZJ
+ BEVUu++oJviWnEek9MN95okx6zY3t+VPXaX89IFUhbHMVaDeUQL6ynqZ4Y/oiLSiyOvW
+ XuL0kNStVj/mkVQVkqcziIMVoSuU54GcTIV5gHB83r1WQYEGCRmoNlnsKialX9Z3KoMs
+ 5lXTsPv/4nSewqKPUwzMwb/UICD3zw4xPJDYR1obVIp6Y/PV1OaczlGTnrLpcrbBke3G
+ Xc5M/g44OjGUT1zmL/RFrkNu+oEbEYfmK+srBgUFnFGNkA58Fb5UuBzR62CyrElsEsfG
+ GvNg==
+X-Gm-Message-State: AOAM530KZfsRS/uTFoL8HiyU3SIB91TAS9MaqHqgMjp1UlPs9qNe1EpA
+ W+J5M3uxyDDWpCScT4oggt1/Gg==
+X-Google-Smtp-Source: ABdhPJzHLuxQCrtYiefUcYjxdJJ2hDfZlHcdb0YN4AADKy0DKzgV1vNQp99haKIsXadjm4ZpAEcfhQ==
+X-Received: by 2002:a05:6602:2e8c:b0:64d:633a:4148 with SMTP id
+ m12-20020a0566022e8c00b0064d633a4148mr1432951iow.12.1652932405951; 
+ Wed, 18 May 2022 20:53:25 -0700 (PDT)
 Received: from google.com (194.225.68.34.bc.googleusercontent.com.
  [34.68.225.194]) by smtp.gmail.com with ESMTPSA id
- f1-20020a02a101000000b0032e833105fesm332923jag.177.2022.05.18.20.48.03
+ p7-20020a92c107000000b002cde6e35309sm993845ile.83.2022.05.18.20.53.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 18 May 2022 20:48:04 -0700 (PDT)
-Date: Thu, 19 May 2022 03:48:00 +0000
+ Wed, 18 May 2022 20:53:25 -0700 (PDT)
+Date: Thu, 19 May 2022 03:53:21 +0000
 From: Oliver Upton <oupton@google.com>
 To: Ricardo Koller <ricarkol@google.com>
-Subject: Re: [PATCH v3 02/13] KVM: selftests: aarch64: Add vm_get_pte_gpa
- library function
-Message-ID: <YoW98HI27sP5lHKR@google.com>
+Subject: Re: [PATCH v3 03/13] KVM: selftests: Add
+ vm_alloc_page_table_in_memslot library function
+Message-ID: <YoW/MXYqP/O7JyX6@google.com>
 References: <20220408004120.1969099-1-ricarkol@google.com>
- <20220408004120.1969099-3-ricarkol@google.com>
+ <20220408004120.1969099-4-ricarkol@google.com>
 MIME-Version: 1.0
 Content-Disposition: inline
-In-Reply-To: <20220408004120.1969099-3-ricarkol@google.com>
+In-Reply-To: <20220408004120.1969099-4-ricarkol@google.com>
 Cc: kvm@vger.kernel.org, maz@kernel.org, bgardon@google.com,
  pbonzini@redhat.com, axelrasmussen@google.com, kvmarm@lists.cs.columbia.edu
 X-BeenThere: kvmarm@lists.cs.columbia.edu
@@ -91,99 +91,46 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-Hey Ricardo,
-
-Sorry about my last email hitting your v2. I fudged my inbox filtering
-so v3 missed my explicit-cc inbox. Oops!
-
-On Thu, Apr 07, 2022 at 05:41:09PM -0700, Ricardo Koller wrote:
-> Add a library function (in-guest)
-
-This function is called from host userspace, no?
-
-> to get the GPA of the PTE of a
-> particular GVA.  This will be used in a future commit by a test to clear
-> and check the AF (access flag) of a particular page.
+On Thu, Apr 07, 2022 at 05:41:10PM -0700, Ricardo Koller wrote:
+> Add a library function to allocate a page-table physical page in a
+> particular memslot.  The default behavior is to create new page-table
+> pages in memslot 0.
 > 
+> Reviewed-by: Ben Gardon <bgardon@google.com>
 > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  .../selftests/kvm/include/aarch64/processor.h |  2 ++
->  .../selftests/kvm/lib/aarch64/processor.c     | 24 +++++++++++++++++--
->  2 files changed, 24 insertions(+), 2 deletions(-)
+>  tools/testing/selftests/kvm/include/kvm_util_base.h | 1 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c          | 8 +++++++-
+>  2 files changed, 8 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index 8f9f46979a00..caa572d83062 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -125,6 +125,8 @@ void vm_install_exception_handler(struct kvm_vm *vm,
->  void vm_install_sync_handler(struct kvm_vm *vm,
->  		int vector, int ec, handler_fn handler);
+> diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> index 4ed6aa049a91..3a69b35e37cc 100644
+> --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
+> +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+> @@ -306,6 +306,7 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+>  vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+>  			      vm_paddr_t paddr_min, uint32_t memslot);
+>  vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+> +vm_paddr_t vm_alloc_page_table_in_memslot(struct kvm_vm *vm, uint32_t pt_memslot);
 >  
-> +vm_paddr_t vm_get_pte_gpa(struct kvm_vm *vm, vm_vaddr_t gva);
-> +
->  static inline void cpu_relax(void)
->  {
->  	asm volatile("yield" ::: "memory");
-> diff --git a/tools/testing/selftests/kvm/lib/aarch64/processor.c b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> index 9343d82519b4..ee006d354b79 100644
-> --- a/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/aarch64/processor.c
-> @@ -139,7 +139,7 @@ void virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
->  	_virt_pg_map(vm, vaddr, paddr, attr_idx);
->  }
+>  /*
+>   * Create a VM with reasonable defaults
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index d8cf851ab119..e18f1c93e4b4 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -2386,9 +2386,15 @@ vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+>  /* Arbitrary minimum physical address used for virtual translation tables. */
+>  #define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
 >  
-> -vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
-> +vm_paddr_t vm_get_pte_gpa(struct kvm_vm *vm, vm_vaddr_t gva)
->  {
->  	uint64_t *ptep;
->  
-> @@ -162,7 +162,7 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
->  			goto unmapped_gva;
->  		/* fall through */
->  	case 2:
-> -		ptep = addr_gpa2hva(vm, pte_addr(vm, *ptep)) + pte_index(vm, gva) * 8;
-> +		ptep = (uint64_t *)(pte_addr(vm, *ptep) + pte_index(vm, gva) * 8);
-
-this seems a bit odd. ptep is an HVA in the above cases, but really a
-GPA here.
-
-Also -- not your code but the baked-in assumption that the stage-1 MMU
-always maps at leaf page granularity might be a bit of a mess if we ever
-do anything more interesting inside of the guest.
-
->  		if (!ptep)
->  			goto unmapped_gva;
->  		break;
-> @@ -170,6 +170,26 @@ vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
->  		TEST_FAIL("Page table levels must be 2, 3, or 4");
->  	}
->  
-> +	return (vm_paddr_t)ptep;
-> +
-> +unmapped_gva:
-> +	TEST_FAIL("No mapping for vm virtual address, gva: 0x%lx", gva);
-> +	exit(1);
-
-Isn't this just a workaround for the fact that TEST_FAIL() doesn't have
-the noreturn attribute specified somewhere?
-
-> +}
-> +
-> +vm_paddr_t addr_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+> +vm_paddr_t vm_alloc_page_table_in_memslot(struct kvm_vm *vm, uint32_t pt_memslot)
 > +{
-> +	uint64_t *ptep;
-> +	vm_paddr_t ptep_gpa;
-> +
-> +	ptep_gpa = vm_get_pte_gpa(vm, gva);
-> +	if (!ptep_gpa)
-> +		goto unmapped_gva;
+> +	return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR,
 
-This branch will never be taken since vm_get_pte_gpa() will explode on
-its own, right?
+Test code needs to plop the memslot with some space above
+PAGE_TABLE_MIN_PADDR then, right?
 
---
-Thanks,
-Oliver
+Reviewed-by: Oliver Upton <oupton@google.com>
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
