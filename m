@@ -2,54 +2,53 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98636C433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:44:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0ECC433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:44:23 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D5794B211;
-	Thu, 19 May 2022 09:44:21 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 7371A4B3F1;
+	Thu, 19 May 2022 09:44:23 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dtPuYgP7b-bV; Thu, 19 May 2022 09:44:19 -0400 (EDT)
+	with ESMTP id h-bhaYmi84ZJ; Thu, 19 May 2022 09:44:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id E1F524B33E;
-	Thu, 19 May 2022 09:44:19 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 093774B3CC;
+	Thu, 19 May 2022 09:44:22 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB8B64B37B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CC034B211
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:20 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wztYXoJb2q5I for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2022 09:44:17 -0400 (EDT)
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C2BA4B211
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:17 -0400 (EDT)
+ with ESMTP id xAydd+PQuwJb for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2022 09:44:18 -0400 (EDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A44104B32E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:18 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by sin.source.kernel.org (Postfix) with ESMTPS id 13B63CE2440;
- Thu, 19 May 2022 13:44:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2348C34100;
- Thu, 19 May 2022 13:44:08 +0000 (UTC)
+ by ams.source.kernel.org (Postfix) with ESMTPS id 9223FB824AB;
+ Thu, 19 May 2022 13:44:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA714C34116;
+ Thu, 19 May 2022 13:44:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652967852;
- bh=3RiCLx91vvFl1eY7jTdmSanbOyZssF2WI8MnbolxOp4=;
+ s=k20201202; t=1652967856;
+ bh=XiJyGdjmz/udxli+VDDlv2mvjpHlKF0LXKV580K0H/I=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=tVjz539inNrid512QIfuKXH8AgCnxGbY4bE+QRsfW30XUSmNgTTNGortoeqc7Z0bv
- owdABQKqQWhZ8ijGi6dMzjCaNADYiil1TVlW/++fgyqGa/BrkUuxh0zMWrzUaDxFqS
- kCSVqhtNuwUG6gsN2ipKCJ//+gai7qOy2R3KfmR2oMTGN1yDMVMZ3NryZv6DVxXcI2
- A3gChDgh6VLMeJhy4A2LWrvU+gJIDksmKpyHA2a25Omdz/vJrwJh5fCS0byIuRFWxc
- NgUrbxUbV3Eg5bzChzEbLzlKYpg/XppikPgSsfd7cdtM7stREYHTg7Uyq9986xt36r
- zDuAweUiltMnA==
+ b=o35ZVjNgcp6WbMMfwaQ8Z+yMSMZng8itxBUf8cnEvIIA2fC7eyymbhyw+YSWUV8Nk
+ 0DijcvQAsZQYX9Xqyo6Dlhht88ylyzMk3QxV+ulGlTOc6tmNKE+B5fUGMRTS7tGv/t
+ 9Pq4cQwSrRu6bJPX5nlRa+jXiXoHwqRDaa6xJGiAg+tyTpCgDZvuMNjp4PDLgibu6S
+ sBjmLsA1KBbE9BHI3pg7IkPRXRfRGeo636pOYBlMfHF8drGbAS+vn2MvkLg79JArGy
+ 7pRQ3txaBlLLSK/KU4dOYkHV2+865VxTaBGfFVQoXUk9sFqz5xxtqs4MlXe+xcwbTC
+ QpJtpd9xbkNIQ==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 27/89] KVM: arm64: Extend memory sharing to allow
- host-to-guest transitions
-Date: Thu, 19 May 2022 14:41:02 +0100
-Message-Id: <20220519134204.5379-28-will@kernel.org>
+Subject: [PATCH 28/89] KVM: arm64: Consolidate stage-2 init in one function
+Date: Thu, 19 May 2022 14:41:03 +0100
+Message-Id: <20220519134204.5379-29-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -74,200 +73,205 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-In preparation for handling guest stage-2 mappings at EL2, extend our
-memory protection mechanisms to support sharing of pages from the host
-to a specific guest.
+From: Quentin Perret <qperret@google.com>
 
-Signed-off-by: Will Deacon <will@kernel.org>
+The initialization of stage-2 page-tables of guests is currently split
+across two functions: kvm_init_stage2_mmu() and kvm_arm_setup_stage2().
+That is presumably for historical reasons as kvm_arm_setup_stage2()
+originates from the (now defunct) KVM port for 32bit Arm.
+
+Simplify this code path by merging both functions into one, and while at
+it make sure to map the kvm struct into the hypervisor stage-1 early on
+to simplify the failure path.
+
+Signed-off-by: Quentin Perret <qperret@google.com>
 ---
- arch/arm64/include/asm/kvm_host.h             |   8 +-
- arch/arm64/kvm/hyp/include/nvhe/mem_protect.h |   2 +
- arch/arm64/kvm/hyp/nvhe/mem_protect.c         | 100 ++++++++++++++++++
- 3 files changed, 108 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h  |  2 +-
+ arch/arm64/include/asm/kvm_host.h |  2 --
+ arch/arm64/include/asm/kvm_mmu.h  |  2 +-
+ arch/arm64/kvm/arm.c              | 27 +++++++++++++--------------
+ arch/arm64/kvm/mmu.c              | 27 ++++++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c            | 29 -----------------------------
+ 6 files changed, 41 insertions(+), 48 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 1767ded83888..98b60fa86853 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -134,7 +134,7 @@
+  * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
+  * not known to exist and will break with this configuration.
+  *
+- * The VTCR_EL2 is configured per VM and is initialised in kvm_arm_setup_stage2().
++ * The VTCR_EL2 is configured per VM and is initialised in kvm_init_stage2_mmu.
+  *
+  * Note that when using 4K pages, we concatenate two first level page tables
+  * together. With 16K pages, we concatenate 16 first level page tables.
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 32ac88e60e6b..264b1d2c4eb6 100644
+index 264b1d2c4eb6..3c6ed1f3887d 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -421,8 +421,12 @@ struct kvm_vcpu_arch {
- 	/* Don't run the guest (internal implementation need) */
- 	bool pause;
+@@ -865,8 +865,6 @@ int kvm_set_ipa_limit(void);
+ #define __KVM_HAVE_ARCH_VM_ALLOC
+ struct kvm *kvm_arch_alloc_vm(void);
  
--	/* Cache some mmu pages needed inside spinlock regions */
--	struct kvm_mmu_memory_cache mmu_page_cache;
-+	union {
-+		/* Cache some mmu pages needed inside spinlock regions */
-+		struct kvm_mmu_memory_cache mmu_page_cache;
-+		/* Pages to be donated to pkvm/EL2 if it runs out */
-+		struct kvm_hyp_memcache pkvm_memcache;
-+	};
+-int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type);
+-
+ static inline bool kvm_vm_is_protected(struct kvm *kvm)
+ {
+ 	return false;
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 74735a864eee..eaac8dec97de 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -162,7 +162,7 @@ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+ void free_hyp_pgds(void);
  
- 	/* Target CPU and feature flags */
- 	int target;
-diff --git a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-index ecedc545e608..364432276fe0 100644
---- a/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-+++ b/arch/arm64/kvm/hyp/include/nvhe/mem_protect.h
-@@ -57,6 +57,7 @@ extern struct host_kvm host_kvm;
- enum pkvm_component_id {
- 	PKVM_ID_HOST,
- 	PKVM_ID_HYP,
-+	PKVM_ID_GUEST,
- };
+ void stage2_unmap_vm(struct kvm *kvm);
+-int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu);
++int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type);
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 6a32eaf768e5..694ba3792e9d 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -135,28 +135,24 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ {
+ 	int ret;
  
- extern unsigned long hyp_nr_cpus;
-@@ -67,6 +68,7 @@ int __pkvm_host_unshare_hyp(u64 pfn);
- int __pkvm_host_reclaim_page(u64 pfn);
- int __pkvm_host_donate_hyp(u64 pfn, u64 nr_pages);
- int __pkvm_hyp_donate_host(u64 pfn, u64 nr_pages);
-+int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu);
+-	ret = kvm_arm_setup_stage2(kvm, type);
+-	if (ret)
+-		return ret;
+-
+-	ret = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu);
+-	if (ret)
+-		return ret;
+-
+ 	ret = kvm_share_hyp(kvm, kvm + 1);
+ 	if (ret)
+-		goto out_free_stage2_pgd;
++		return ret;
  
- bool addr_is_memory(phys_addr_t phys);
- int host_stage2_idmap_locked(phys_addr_t addr, u64 size, enum kvm_pgtable_prot prot);
-diff --git a/arch/arm64/kvm/hyp/nvhe/mem_protect.c b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-index adb6a880c684..2e92be8bb463 100644
---- a/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-+++ b/arch/arm64/kvm/hyp/nvhe/mem_protect.c
-@@ -579,11 +579,21 @@ struct pkvm_mem_transition {
- 			struct {
- 				u64	completer_addr;
- 			} hyp;
-+			struct {
-+				struct kvm_vcpu *vcpu;
-+			} guest;
- 		};
- 	} initiator;
+ 	ret = kvm_init_pvm(kvm);
+ 	if (ret)
+-		goto out_free_stage2_pgd;
++		goto err_unshare_kvm;
  
- 	struct {
- 		enum pkvm_component_id	id;
+ 	if (!zalloc_cpumask_var(&kvm->arch.supported_cpus, GFP_KERNEL)) {
+ 		ret = -ENOMEM;
+-		goto out_free_stage2_pgd;
++		goto err_unshare_kvm;
+ 	}
+ 	cpumask_copy(kvm->arch.supported_cpus, cpu_possible_mask);
+ 
++	ret = kvm_init_stage2_mmu(kvm, &kvm->arch.mmu, type);
++	if (ret)
++		goto err_free_cpumask;
 +
-+		union {
-+			struct {
-+				struct kvm_vcpu *vcpu;
-+				phys_addr_t phys;
-+			} guest;
-+		};
- 	} completer;
- };
+ 	kvm_vgic_early_init(kvm);
  
-@@ -847,6 +857,52 @@ static int hyp_complete_donation(u64 addr,
- 	return pkvm_create_mappings_locked(start, end, prot);
+ 	/* The maximum number of VCPUs is limited by the host's GIC model */
+@@ -164,9 +160,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 
+ 	set_default_spectre(kvm);
+ 
+-	return ret;
+-out_free_stage2_pgd:
+-	kvm_free_stage2_pgd(&kvm->arch.mmu);
++	return 0;
++
++err_free_cpumask:
++	free_cpumask_var(kvm->arch.supported_cpus);
++err_unshare_kvm:
++	kvm_unshare_hyp(kvm, kvm + 1);
+ 	return ret;
  }
  
-+static enum pkvm_page_state guest_get_page_state(kvm_pte_t pte)
-+{
-+	if (!kvm_pte_valid(pte))
-+		return PKVM_NOPAGE;
-+
-+	return pkvm_getstate(kvm_pgtable_stage2_pte_prot(pte));
-+}
-+
-+static int __guest_check_page_state_range(struct kvm_vcpu *vcpu, u64 addr,
-+					  u64 size, enum pkvm_page_state state)
-+{
-+	struct kvm_shadow_vm *vm = get_shadow_vm(vcpu);
-+	struct check_walk_data d = {
-+		.desired	= state,
-+		.get_page_state	= guest_get_page_state,
-+	};
-+
-+	hyp_assert_lock_held(&vm->lock);
-+	return check_page_state_range(&vm->pgt, addr, size, &d);
-+}
-+
-+static int guest_ack_share(u64 addr, const struct pkvm_mem_transition *tx,
-+			   enum kvm_pgtable_prot perms)
-+{
-+	u64 size = tx->nr_pages * PAGE_SIZE;
-+
-+	if (perms != KVM_PGTABLE_PROT_RWX)
-+		return -EPERM;
-+
-+	return __guest_check_page_state_range(tx->completer.guest.vcpu, addr,
-+					      size, PKVM_NOPAGE);
-+}
-+
-+static int guest_complete_share(u64 addr, const struct pkvm_mem_transition *tx,
-+				enum kvm_pgtable_prot perms)
-+{
-+	struct kvm_vcpu *vcpu = tx->completer.guest.vcpu;
-+	struct kvm_shadow_vm *vm = get_shadow_vm(vcpu);
-+	u64 size = tx->nr_pages * PAGE_SIZE;
-+	enum kvm_pgtable_prot prot;
-+
-+	prot = pkvm_mkstate(perms, PKVM_PAGE_SHARED_BORROWED);
-+	return kvm_pgtable_stage2_map(&vm->pgt, addr, size, tx->completer.guest.phys,
-+				      prot, &vcpu->arch.pkvm_memcache);
-+}
-+
- static int check_share(struct pkvm_mem_share *share)
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index e77686d54e9f..0071f035dde8 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -618,15 +618,40 @@ static struct kvm_pgtable_mm_ops kvm_s2_mm_ops = {
+  * kvm_init_stage2_mmu - Initialise a S2 MMU structure
+  * @kvm:	The pointer to the KVM structure
+  * @mmu:	The pointer to the s2 MMU structure
++ * @type:	The machine type of the virtual machine
+  *
+  * Allocates only the stage-2 HW PGD level table(s).
+  * Note we don't need locking here as this is only called when the VM is
+  * created, which can only be done once.
+  */
+-int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu)
++int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type)
  {
- 	const struct pkvm_mem_transition *tx = &share->tx;
-@@ -868,6 +924,9 @@ static int check_share(struct pkvm_mem_share *share)
- 	case PKVM_ID_HYP:
- 		ret = hyp_ack_share(completer_addr, tx, share->completer_prot);
- 		break;
-+	case PKVM_ID_GUEST:
-+		ret = guest_ack_share(completer_addr, tx, share->completer_prot);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -896,6 +955,9 @@ static int __do_share(struct pkvm_mem_share *share)
- 	case PKVM_ID_HYP:
- 		ret = hyp_complete_share(completer_addr, tx, share->completer_prot);
- 		break;
-+	case PKVM_ID_GUEST:
-+		ret = guest_complete_share(completer_addr, tx, share->completer_prot);
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -1262,6 +1324,44 @@ void hyp_unpin_shared_mem(void *from, void *to)
- 	host_unlock_component();
- }
++	u32 kvm_ipa_limit = get_kvm_ipa_limit();
+ 	int cpu, err;
+ 	struct kvm_pgtable *pgt;
++	u64 mmfr0, mmfr1;
++	u32 phys_shift;
++
++	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
++		return -EINVAL;
++
++	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
++	if (phys_shift) {
++		if (phys_shift > kvm_ipa_limit ||
++		    phys_shift < ARM64_MIN_PARANGE_BITS)
++			return -EINVAL;
++	} else {
++		phys_shift = KVM_PHYS_SHIFT;
++		if (phys_shift > kvm_ipa_limit) {
++			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
++				     current->comm);
++			return -EINVAL;
++		}
++	}
++
++	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
++	mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
++	kvm->arch.vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
  
-+int __pkvm_host_share_guest(u64 pfn, u64 gfn, struct kvm_vcpu *vcpu)
-+{
-+	int ret;
-+	u64 host_addr = hyp_pfn_to_phys(pfn);
-+	u64 guest_addr = hyp_pfn_to_phys(gfn);
-+	struct kvm_shadow_vm *vm = get_shadow_vm(vcpu);
-+	struct pkvm_mem_share share = {
-+		.tx	= {
-+			.nr_pages	= 1,
-+			.initiator	= {
-+				.id	= PKVM_ID_HOST,
-+				.addr	= host_addr,
-+				.host	= {
-+					.completer_addr = guest_addr,
-+				},
-+			},
-+			.completer	= {
-+				.id	= PKVM_ID_GUEST,
-+				.guest	= {
-+					.vcpu = vcpu,
-+					.phys = host_addr,
-+				},
-+			},
-+		},
-+		.completer_prot	= KVM_PGTABLE_PROT_RWX,
-+	};
-+
-+	host_lock_component();
-+	guest_lock_component(vm);
-+
-+	ret = do_share(&share);
-+
-+	guest_unlock_component(vm);
-+	host_unlock_component();
-+
-+	return ret;
-+}
-+
- static int hyp_zero_page(phys_addr_t phys)
- {
- 	void *addr;
+ 	if (mmu->pgt != NULL) {
+ 		kvm_err("kvm_arch already initialized?\n");
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index ecc40c8cd6f6..c07265ea72fd 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -370,32 +370,3 @@ int kvm_set_ipa_limit(void)
+ 
+ 	return 0;
+ }
+-
+-int kvm_arm_setup_stage2(struct kvm *kvm, unsigned long type)
+-{
+-	u64 mmfr0, mmfr1;
+-	u32 phys_shift;
+-
+-	if (type & ~KVM_VM_TYPE_ARM_IPA_SIZE_MASK)
+-		return -EINVAL;
+-
+-	phys_shift = KVM_VM_TYPE_ARM_IPA_SIZE(type);
+-	if (phys_shift) {
+-		if (phys_shift > kvm_ipa_limit ||
+-		    phys_shift < ARM64_MIN_PARANGE_BITS)
+-			return -EINVAL;
+-	} else {
+-		phys_shift = KVM_PHYS_SHIFT;
+-		if (phys_shift > kvm_ipa_limit) {
+-			pr_warn_once("%s using unsupported default IPA limit, upgrade your VMM\n",
+-				     current->comm);
+-			return -EINVAL;
+-		}
+-	}
+-
+-	mmfr0 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR0_EL1);
+-	mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+-	kvm->arch.vtcr = kvm_get_vtcr(mmfr0, mmfr1, phys_shift);
+-
+-	return 0;
+-}
 -- 
 2.36.1.124.g0e6072fb45-goog
 
