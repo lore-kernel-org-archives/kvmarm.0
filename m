@@ -2,54 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 060E8C433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B82D5C433EF
+	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:44:28 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id B047B4B3FD;
-	Thu, 19 May 2022 09:44:25 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 71AF44B3FE;
+	Thu, 19 May 2022 09:44:28 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id XMI+GsDkryjM; Thu, 19 May 2022 09:44:24 -0400 (EDT)
+	with ESMTP id hTVGCrGUAkiC; Thu, 19 May 2022 09:44:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 30CCF4B3D6;
-	Thu, 19 May 2022 09:44:24 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5E2254B401;
+	Thu, 19 May 2022 09:44:27 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C8464B3D8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 83DE54B3BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:26 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id REVfpq3zlOYY for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2022 09:44:21 -0400 (EDT)
+ with ESMTP id dTV2l8t4YMQG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2022 09:44:25 -0400 (EDT)
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E2FD4B3D9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79CD64B3F8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:25 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by dfw.source.kernel.org (Postfix) with ESMTPS id E1E2B61783;
+ by dfw.source.kernel.org (Postfix) with ESMTPS id DCDEC61798;
+ Thu, 19 May 2022 13:44:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA773C36AE5;
  Thu, 19 May 2022 13:44:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D38FBC34117;
- Thu, 19 May 2022 13:44:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652967860;
- bh=9Zu+1PM964G8VB/qecrYRRnyKHnt3EWZgmbLdhsUNTc=;
+ s=k20201202; t=1652967864;
+ bh=p7gI1CdAvMGFDucFGozIsSRUoT2cXsZgzqAgI+aWRJI=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=CV0ZGuRQXsTvx7y4SinA0e6Ox7OFe71U5wvIU+soixC4yNptm76juK7kEUF1h9SxX
- oYpeant1QNqop7yI6rv39FS2nZqWWzDrARyBU65hR9ArrGfPkeSIh8NpwE97ooMo+a
- z0IIs2FNE7b2inyibH/xINq5w+o/hiaC6wnOd/Kp/lgVcGC4kGvxLkZfHnH4VyTNwb
- eXLX4TlMeo9wsJtqFHIjr4uZ4AXEiEqU5Xaf2t4BAKkKw4bXDEZFw8t23CAmRmbMIY
- FLRtGPgTpZhgPyd9e7j2mfy8bbyTtEkUZybVZlZt8c2lRCTp4qPkRmx5SwTueyrIV2
- l8vZJZC129frg==
+ b=O7W4ZFQznwTwavYOMNgqoZkaJVWQsO9jN5kCKT1XWf5AaAmeKy3VxnW9sjsHkTLrG
+ TfY6Z1cv3xDm6oV5E3McihQcd+gS4Vyn0F611oNXQlegU9gA0keNPi0EzvSHc2haHl
+ NDdjUkPfBZFxp2ELKBx3uel0J7617Iv1ErnVXybdPJrzSMpd3Bif4Cg8eyF6eST2sk
+ jWX9PujhExD/LYygdXm3cXPKf98gQR2loIkkuIl4K4arnxGzaUUBCG9Da4gWbMAc3V
+ dsR4JViAgvGJnJWKzm5iSCzC6dwD1JRI63LsONf+4c9LakPeXQgPuvw+zYfW5JDy0O
+ Ef8kzB05GrtWA==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 29/89] KVM: arm64: Check for PTE validity when checking for
- executable/cacheable
-Date: Thu, 19 May 2022 14:41:04 +0100
-Message-Id: <20220519134204.5379-30-will@kernel.org>
+Subject: [PATCH 30/89] KVM: arm64: Do not allow memslot changes after first VM
+ run under pKVM
+Date: Thu, 19 May 2022 14:41:05 +0100
+Message-Id: <20220519134204.5379-31-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -74,57 +74,50 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Marc Zyngier <maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
 
-Don't blindly assume that the PTE is valid when checking whether
-it describes an executable or cacheable mapping.
+As the guest stage-2 page-tables will soon be managed entirely by EL2
+when pKVM is enabled, guest memory will be pinned and the MMU notifiers
+in the host will be unable to reconfigure mappings at EL2 other than
+destrroying the guest and reclaiming all of the memory.
 
-This makes sure that we don't issue CMOs for invalid mappings.
+Forbid memslot move/delete operations for VMs that have run under pKVM,
+returning -EPERM to userspace if such an operation is requested.
 
-Suggested-by: Will Deacon <will@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/pgtable.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/mmu.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index 1d300313009d..a6676fd14cf9 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -700,12 +700,12 @@ static void stage2_put_pte(kvm_pte_t *ptep, struct kvm_s2_mmu *mmu, u64 addr,
- static bool stage2_pte_cacheable(struct kvm_pgtable *pgt, kvm_pte_t pte)
- {
- 	u64 memattr = pte & KVM_PTE_LEAF_ATTR_LO_S2_MEMATTR;
--	return memattr == KVM_S2_MEMATTR(pgt, NORMAL);
-+	return kvm_pte_valid(pte) && memattr == KVM_S2_MEMATTR(pgt, NORMAL);
- }
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 0071f035dde8..67cac3340d49 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -1679,6 +1679,13 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 	hva_t hva, reg_end;
+ 	int ret = 0;
  
- static bool stage2_pte_executable(kvm_pte_t pte)
- {
--	return !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
-+	return kvm_pte_valid(pte) && !(pte & KVM_PTE_LEAF_ATTR_HI_S2_XN);
- }
- 
- static bool stage2_leaf_mapping_allowed(u64 addr, u64 end, u32 level,
-@@ -750,8 +750,7 @@ static int stage2_map_walker_try_leaf(u64 addr, u64 end, u32 level,
- 	/* Perform CMOs before installation of the guest stage-2 PTE */
- 	if (mm_ops->dcache_clean_inval_poc && stage2_pte_cacheable(pgt, new))
- 		mm_ops->dcache_clean_inval_poc(kvm_pte_follow(new, mm_ops),
--						granule);
--
-+					       granule);
- 	if (mm_ops->icache_inval_pou && stage2_pte_executable(new))
- 		mm_ops->icache_inval_pou(kvm_pte_follow(new, mm_ops), granule);
- 
-@@ -1148,7 +1147,7 @@ static int stage2_flush_walker(u64 addr, u64 end, u32 level, kvm_pte_t *ptep,
- 	struct kvm_pgtable_mm_ops *mm_ops = pgt->mm_ops;
- 	kvm_pte_t pte = *ptep;
- 
--	if (!kvm_pte_valid(pte) || !stage2_pte_cacheable(pgt, pte))
-+	if (!stage2_pte_cacheable(pgt, pte))
++	/* In protected mode, cannot modify memslots once a VM has run. */
++	if (is_protected_kvm_enabled() &&
++	    (change == KVM_MR_DELETE || change == KVM_MR_MOVE) &&
++	    kvm->arch.pkvm.shadow_handle) {
++		return -EPERM;
++	}
++
+ 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
+ 			change != KVM_MR_FLAGS_ONLY)
  		return 0;
+@@ -1755,6 +1762,10 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 	gpa_t gpa = slot->base_gfn << PAGE_SHIFT;
+ 	phys_addr_t size = slot->npages << PAGE_SHIFT;
  
- 	if (mm_ops->dcache_clean_inval_poc)
++	/* Stage-2 is managed by hyp in protected mode. */
++	if (is_protected_kvm_enabled())
++		return;
++
+ 	write_lock(&kvm->mmu_lock);
+ 	unmap_stage2_range(&kvm->arch.mmu, gpa, size);
+ 	write_unlock(&kvm->mmu_lock);
 -- 
 2.36.1.124.g0e6072fb45-goog
 
