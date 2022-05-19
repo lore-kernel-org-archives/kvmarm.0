@@ -2,53 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B4FC433FE
-	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0216C433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:45:46 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D7E04B42A;
-	Thu, 19 May 2022 09:45:44 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 746414B411;
+	Thu, 19 May 2022 09:45:46 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id bRgV3+GZSNsl; Thu, 19 May 2022 09:45:42 -0400 (EDT)
+	with ESMTP id UeL1t3YaPYgq; Thu, 19 May 2022 09:45:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 226124B421;
-	Thu, 19 May 2022 09:45:42 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 3A3F34B432;
+	Thu, 19 May 2022 09:45:44 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B6A144B415
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EFAC24B3D4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:42 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id orEdZTLMtOQL for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2022 09:45:38 -0400 (EDT)
+ with ESMTP id 2CxA5QDnNqFn for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2022 09:45:41 -0400 (EDT)
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B0D214B42C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA56D4B415
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:45:41 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id E14BEB8235B;
+ by ams.source.kernel.org (Postfix) with ESMTPS id 05F41B824AF;
+ Thu, 19 May 2022 13:45:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35805C385AA;
  Thu, 19 May 2022 13:45:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EFBBC34100;
- Thu, 19 May 2022 13:45:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652967935;
- bh=01scSGwFMX4UX/Fyks9TF9FRUQgO1lQ2Yumv8GkNuXU=;
+ s=k20201202; t=1652967939;
+ bh=HFRJpgCE92vv/8Xgnf9OmEXUkv8UW/YItxgJ7HnU+bc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=hsLv2QBDVEbJnkW9C6SNDZaSlM95bEV9jgWjWDC33tevmIDYfvPlgWQfBf2C29IE8
- PdrjeP1VGHB94FH6y35YbmYNC/i9JVfbJB+emajAZaoIzi95LKLCU+SwTbGWkUrS/p
- MoXyjdHnNQ6HAi/FTI8f+/qIX20stHS87CALlgAbqEbPAPGNrJkMgrFuPNFYLtm2n+
- rtC2wyfGHOJAFkgmrNzzWMiFXrTFkfPagj2sTYvDldt1HDi1Q1syEqX2xr8AcRuLV3
- wNRwecTcQNVScVjsq0sxNu66dlU02HnZfRA81vGhPJokr0hhQmWejRAF31YI9aeRzf
- q4kTZXgcig5Hw==
+ b=Ps84NFP9x4Ubm9E1OtA0g8yrueW1XFv9aVFu70FM0t0nZ2gNSTEdiE/MTqoLE144+
+ y6q8RYW3A1qiqSshj71BduHi7uz1tLUnAtG/3Z8Y5v4/yVCj6pIyFX8DbXyW+CXsLq
+ 0+7Lr7rTTsnFaISZPDvjVtEYWkqNKXjhBTYfgZxdhlVNp+HpdhSHqjRzG+ojnEgVeZ
+ G2Vv+kvmejx9Fx39uwt7nqKLwpVaiLan6DRASOodof+sKnzjhSScEDHfj/2tuao08S
+ i6zJ8qd0xpd5wDwScezFcFmld212A3c+RRqTvZvyj+maAheJKo/5Yb+znCuoIN0lPp
+ RMC1X3rsc6mYA==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 48/89] KVM: arm64: Skip __kvm_adjust_pc() for protected vcpus
-Date: Thu, 19 May 2022 14:41:23 +0100
-Message-Id: <20220519134204.5379-49-will@kernel.org>
+Subject: [PATCH 49/89] KVM: arm64: Add hyp per_cpu variable to track current
+ physical cpu number
+Date: Thu, 19 May 2022 14:41:24 +0100
+Message-Id: <20220519134204.5379-50-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -73,45 +74,66 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Marc Zyngier <maz@kernel.org>
+From: Fuad Tabba <tabba@google.com>
 
-Prevent the host from issuing arbitrary PC adjustments for protected
-vCPUs.
+Hyp cannot trust the equivalent variable at the host.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Fuad Tabba <tabba@google.com>
 ---
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h  | 3 +++
+ arch/arm64/kvm/arm.c              | 4 ++++
+ arch/arm64/kvm/hyp/nvhe/hyp-smp.c | 2 ++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 40cbf45800b7..86dff0dc05f3 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -275,9 +275,22 @@ static void handle___pkvm_host_map_guest(struct kvm_cpu_context *host_ctxt)
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 4adf7c2a77bd..e38869e88019 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -15,6 +15,9 @@
+ DECLARE_PER_CPU(struct kvm_cpu_context, kvm_hyp_ctxt);
+ DECLARE_PER_CPU(unsigned long, kvm_hyp_vector);
+ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
++DECLARE_PER_CPU(int, hyp_cpu_number);
++
++#define hyp_smp_processor_id() (__this_cpu_read(hyp_cpu_number))
  
- static void handle___kvm_adjust_pc(struct kvm_cpu_context *host_ctxt)
+ #define read_sysreg_elx(r,nvh,vh)					\
+ 	({								\
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 514519563976..3bb379f15c07 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -52,6 +52,7 @@ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+ 
+ static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+ DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
++DECLARE_KVM_NVHE_PER_CPU(int, hyp_cpu_number);
+ 
+ static bool vgic_present;
+ 
+@@ -1487,6 +1488,9 @@ static void cpu_prepare_hyp_mode(int cpu)
  {
--	DECLARE_REG(struct kvm_vcpu *, vcpu, host_ctxt, 1);
-+	struct kvm_shadow_vcpu_state *shadow_state;
-+	struct kvm_vcpu *vcpu;
+ 	struct kvm_nvhe_init_params *params = per_cpu_ptr_nvhe_sym(kvm_init_params, cpu);
+ 	unsigned long tcr;
++	int *hyp_cpu_number_ptr = per_cpu_ptr_nvhe_sym(hyp_cpu_number, cpu);
 +
-+	vcpu = get_current_vcpu(host_ctxt, 1, &shadow_state);
-+	if (!vcpu)
-+		return;
-+
-+	if (shadow_state) {
-+		/* This only applies to non-protected VMs */
-+		if (shadow_state_is_protected(shadow_state))
-+			return;
-+
-+		vcpu = &shadow_state->shadow_vcpu;
-+	}
++	*hyp_cpu_number_ptr = cpu;
  
--	__kvm_adjust_pc(kern_hyp_va(vcpu));
-+	__kvm_adjust_pc(vcpu);
- }
+ 	/*
+ 	 * Calculate the raw per-cpu offset without a translation from the
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+index 04d194583f1e..9fcb92abd0b5 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
+@@ -8,6 +8,8 @@
+ #include <asm/kvm_hyp.h>
+ #include <asm/kvm_mmu.h>
  
- static void handle___kvm_flush_vm_context(struct kvm_cpu_context *host_ctxt)
++DEFINE_PER_CPU(int, hyp_cpu_number);
++
+ /*
+  * nVHE copy of data structures tracking available CPU cores.
+  * Only entries for CPUs that were online at KVM init are populated.
 -- 
 2.36.1.124.g0e6072fb45-goog
 
