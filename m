@@ -2,53 +2,54 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C269DC433F5
-	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:44:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC8ABC433F5
+	for <kvmarm@archiver.kernel.org>; Thu, 19 May 2022 13:44:54 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AF0F4B211;
-	Thu, 19 May 2022 09:44:50 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 986944B3F2;
+	Thu, 19 May 2022 09:44:54 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Authentication-Results: mm01.cs.columbia.edu (amavisd-new); dkim=softfail
 	(fail, message has been altered) header.i=@kernel.org
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WtSjVsDwxY9v; Thu, 19 May 2022 09:44:49 -0400 (EDT)
+	with ESMTP id Dc2vaGtcMTRi; Thu, 19 May 2022 09:44:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 336C94B3EC;
-	Thu, 19 May 2022 09:44:49 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 581C94B3C8;
+	Thu, 19 May 2022 09:44:53 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E786E4B211
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56C6A4B3ED
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:51 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KtFMS3z8DICd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 May 2022 09:44:46 -0400 (EDT)
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA0244B28D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:46 -0400 (EDT)
+ with ESMTP id ALcsKe-Gy1ZZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 May 2022 09:44:49 -0400 (EDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 230304B28D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 May 2022 09:44:49 -0400 (EDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by ams.source.kernel.org (Postfix) with ESMTPS id 53301B824A6;
- Thu, 19 May 2022 13:44:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2201C385AA;
- Thu, 19 May 2022 13:44:40 +0000 (UTC)
+ by dfw.source.kernel.org (Postfix) with ESMTPS id A55826173E;
+ Thu, 19 May 2022 13:44:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99165C34116;
+ Thu, 19 May 2022 13:44:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=k20201202; t=1652967884;
- bh=4phMg5qKrrVOBZXC4vAMZ7uzsL/5lQSk91h6zsw+z5Q=;
+ s=k20201202; t=1652967888;
+ bh=zqVKKbCik0BT2NOr+vAjDmAd6qPp7FwhBrExj8PC3kE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=eYWUF7O+dZINKj8uUBJpxtiB+gKrfEI/2nL7l0N2Lr5z7rDx+cb0dAwDbLOcrYoGY
- WWM9Ip1wrYt2oIR8x34eqWc/uKJatACQ3BBWo6RdvTSOcuoRNh8aZriG5Ap+nN4Cc4
- sGlX1GkSoza2sWPCH+ZnmulcJRnnGkgoDUokF5hSoWC4MdHyh1CaQUtqIbf1Pq2/cj
- 44Oo9U2tqWNRXFu64vNzoRvFXHZ4k1EXABMGdZjLMcNNM95bacGWt9AFeQcQkDtmaS
- SexpSKJc2RvTJ75aUFSaXQ8Bz2JU2uOph3beGtY23t+1DAaeC55ZnsUby52r1F2Ij4
- /DfDowgaTA3fw==
+ b=jy8ugjMKFxgJUzCZw6EpncJky9cpGzBKD5/4kvwzMIa55oGxz246ROlAncFfRa1UM
+ 9hREYDF0Ni1ok99Q2uLXDG/J8/0/6J5jiusuaRlvOVYXiWwB7+ruivYt/MlDKcZUx8
+ VlEAZyJYVaL7c9KAz273kzz1aRLPFLdVps8hRYWMjDIt7yOAXlLzU9TOjnCjl6mfV0
+ RP6pk6GJtA0ldfTMZH4/t5gWXjAiqXhID8G8r9oz3Y3ije/2BPPtZQyIs7YV8J7kMb
+ 0RItXDoYdh/FH5aB3ziBvqo9CfIvsENgFpTOG4D8G1vPRYIVD0mdYI3xoongn169V4
+ mmz3pHulVGSkQ==
 From: Will Deacon <will@kernel.org>
 To: kvmarm@lists.cs.columbia.edu
-Subject: [PATCH 35/89] KVM: arm64: Unmap kvm_arm_hyp_percpu_base from the host
-Date: Thu, 19 May 2022 14:41:10 +0100
-Message-Id: <20220519134204.5379-36-will@kernel.org>
+Subject: [PATCH 36/89] KVM: arm64: Maintain a copy of 'kvm_arm_vmid_bits' at
+ EL2
+Date: Thu, 19 May 2022 14:41:11 +0100
+Message-Id: <20220519134204.5379-37-will@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220519134204.5379-1-will@kernel.org>
 References: <20220519134204.5379-1-will@kernel.org>
@@ -73,115 +74,74 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-From: Quentin Perret <qperret@google.com>
+Sharing 'kvm_arm_vmids_bits' between EL1 and EL2 allows the host to
+modify the variable arbitrarily, potentially leading to all sorts of
+shenanians as this is used to configure the VTTBR register for the
+guest stage-2.
 
-In pKVM mode, we can't trust the host not to mess with the hypervisor
-per-cpu offsets, so let's move the array containing them to the nVHE
-code.
+In preparation for unmapping host sections entirely from EL2, maintain
+a copy of 'kvm_arm_vmid_bits' and initialise it from the host value
+while it is still trusted.
 
-Signed-off-by: Quentin Perret <qperret@google.com>
+Signed-off-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h  | 4 ++--
- arch/arm64/kernel/image-vars.h    | 3 ---
- arch/arm64/kvm/arm.c              | 9 ++++-----
- arch/arm64/kvm/hyp/nvhe/hyp-smp.c | 2 ++
- 4 files changed, 8 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h | 2 ++
+ arch/arm64/kernel/image-vars.h   | 3 ---
+ arch/arm64/kvm/arm.c             | 1 +
+ arch/arm64/kvm/hyp/nvhe/pkvm.c   | 3 +++
+ 4 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 931a351da3f2..35b9d590bb74 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -110,7 +110,7 @@ enum __kvm_host_smccc_func {
- #define per_cpu_ptr_nvhe_sym(sym, cpu)						\
- 	({									\
- 		unsigned long base, off;					\
--		base = kvm_arm_hyp_percpu_base[cpu];				\
-+		base = kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu];		\
- 		off = (unsigned long)&CHOOSE_NVHE_SYM(sym) -			\
- 		      (unsigned long)&CHOOSE_NVHE_SYM(__per_cpu_start);		\
- 		base ? (typeof(CHOOSE_NVHE_SYM(sym))*)(base + off) : NULL;	\
-@@ -198,7 +198,7 @@ DECLARE_KVM_HYP_SYM(__kvm_hyp_vector);
- #define __kvm_hyp_init		CHOOSE_NVHE_SYM(__kvm_hyp_init)
- #define __kvm_hyp_vector	CHOOSE_HYP_SYM(__kvm_hyp_vector)
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index fd99cf09972d..6797eafe7890 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -124,4 +124,6 @@ extern u64 kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val);
+ extern u64 kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val);
  
--extern unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
-+extern unsigned long kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[];
- DECLARE_KVM_NVHE_SYM(__per_cpu_start);
- DECLARE_KVM_NVHE_SYM(__per_cpu_end);
- 
+ extern unsigned long kvm_nvhe_sym(__icache_flags);
++extern unsigned int kvm_nvhe_sym(kvm_arm_vmid_bits);
++
+ #endif /* __ARM64_KVM_HYP_H__ */
 diff --git a/arch/arm64/kernel/image-vars.h b/arch/arm64/kernel/image-vars.h
-index 4e3b6d618ac1..37a2d833851a 100644
+index 37a2d833851a..3e2489d23ff0 100644
 --- a/arch/arm64/kernel/image-vars.h
 +++ b/arch/arm64/kernel/image-vars.h
-@@ -102,9 +102,6 @@ KVM_NVHE_ALIAS(gic_nonsecure_priorities);
- KVM_NVHE_ALIAS(__start___kvm_ex_table);
- KVM_NVHE_ALIAS(__stop___kvm_ex_table);
+@@ -80,9 +80,6 @@ KVM_NVHE_ALIAS(nvhe_hyp_panic_handler);
+ /* Vectors installed by hyp-init on reset HVC. */
+ KVM_NVHE_ALIAS(__hyp_stub_vectors);
  
--/* Array containing bases of nVHE per-CPU memory regions. */
--KVM_NVHE_ALIAS(kvm_arm_hyp_percpu_base);
+-/* VMID bits set by the KVM VMID allocator */
+-KVM_NVHE_ALIAS(kvm_arm_vmid_bits);
 -
- /* PMU available static key */
- #ifdef CONFIG_HW_PERF_EVENTS
- KVM_NVHE_ALIAS(kvm_arm_pmu_available);
+ /* Kernel symbols needed for cpus_have_final/const_caps checks. */
+ KVM_NVHE_ALIAS(arm64_const_caps_ready);
+ KVM_NVHE_ALIAS(cpu_hwcap_keys);
 diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 5b41551a978b..c7b362db692f 100644
+index c7b362db692f..07d2ac6a5aff 100644
 --- a/arch/arm64/kvm/arm.c
 +++ b/arch/arm64/kvm/arm.c
-@@ -51,7 +51,6 @@ DEFINE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
- DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+@@ -1839,6 +1839,7 @@ static int kvm_hyp_init_protection(u32 hyp_va_bits)
+ 	kvm_nvhe_sym(id_aa64mmfr1_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+ 	kvm_nvhe_sym(id_aa64mmfr2_el1_sys_val) = read_sanitised_ftr_reg(SYS_ID_AA64MMFR2_EL1);
+ 	kvm_nvhe_sym(__icache_flags) = __icache_flags;
++	kvm_nvhe_sym(kvm_arm_vmid_bits) = kvm_arm_vmid_bits;
  
- static DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
--unsigned long kvm_arm_hyp_percpu_base[NR_CPUS];
- DECLARE_KVM_NVHE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
+ 	ret = create_hyp_mappings(addr, addr + hyp_mem_size, PAGE_HYP);
+ 	if (ret)
+diff --git a/arch/arm64/kvm/hyp/nvhe/pkvm.c b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+index 9cd2bf75ed88..b29142a09e36 100644
+--- a/arch/arm64/kvm/hyp/nvhe/pkvm.c
++++ b/arch/arm64/kvm/hyp/nvhe/pkvm.c
+@@ -15,6 +15,9 @@
+ /* Used by icache_is_vpipt(). */
+ unsigned long __icache_flags;
  
- static bool vgic_present;
-@@ -1800,13 +1799,13 @@ static void teardown_hyp_mode(void)
- 	free_hyp_pgds();
- 	for_each_possible_cpu(cpu) {
- 		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
--		free_pages(kvm_arm_hyp_percpu_base[cpu], nvhe_percpu_order());
-+		free_pages(kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu], nvhe_percpu_order());
- 	}
- }
- 
- static int do_pkvm_init(u32 hyp_va_bits)
- {
--	void *per_cpu_base = kvm_ksym_ref(kvm_arm_hyp_percpu_base);
-+	void *per_cpu_base = kvm_ksym_ref(kvm_nvhe_sym(kvm_arm_hyp_percpu_base));
- 	int ret;
- 
- 	preempt_disable();
-@@ -1907,7 +1906,7 @@ static int init_hyp_mode(void)
- 
- 		page_addr = page_address(page);
- 		memcpy(page_addr, CHOOSE_NVHE_SYM(__per_cpu_start), nvhe_percpu_size());
--		kvm_arm_hyp_percpu_base[cpu] = (unsigned long)page_addr;
-+		kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu] = (unsigned long)page_addr;
- 	}
- 
- 	/*
-@@ -1968,7 +1967,7 @@ static int init_hyp_mode(void)
- 	}
- 
- 	for_each_possible_cpu(cpu) {
--		char *percpu_begin = (char *)kvm_arm_hyp_percpu_base[cpu];
-+		char *percpu_begin = (char *)kvm_nvhe_sym(kvm_arm_hyp_percpu_base)[cpu];
- 		char *percpu_end = percpu_begin + nvhe_percpu_size();
- 
- 		/* Map Hyp percpu pages */
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-index 9f54833af400..04d194583f1e 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-smp.c
-@@ -23,6 +23,8 @@ u64 cpu_logical_map(unsigned int cpu)
- 	return hyp_cpu_logical_map[cpu];
- }
- 
-+unsigned long __ro_after_init kvm_arm_hyp_percpu_base[NR_CPUS];
++/* Used by kvm_get_vttbr(). */
++unsigned int kvm_arm_vmid_bits;
 +
- unsigned long __hyp_per_cpu_offset(unsigned int cpu)
- {
- 	unsigned long *cpu_base_array;
+ /*
+  * Set trap register values based on features in ID_AA64PFR0.
+  */
 -- 
 2.36.1.124.g0e6072fb45-goog
 
