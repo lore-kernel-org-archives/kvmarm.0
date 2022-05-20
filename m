@@ -2,44 +2,46 @@ Return-Path: <kvmarm-bounces@lists.cs.columbia.edu>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mm01.cs.columbia.edu (mm01.cs.columbia.edu [128.59.11.253])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F16EDC433EF
-	for <kvmarm@archiver.kernel.org>; Fri, 20 May 2022 12:39:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E12FC433F5
+	for <kvmarm@archiver.kernel.org>; Fri, 20 May 2022 13:30:56 +0000 (UTC)
 Received: from localhost (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A2D94B385;
-	Fri, 20 May 2022 08:39:01 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 60DB44B214;
+	Fri, 20 May 2022 09:30:56 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
 	by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pG-LfNh9OmMu; Fri, 20 May 2022 08:38:59 -0400 (EDT)
+	with ESMTP id Mh+tJ6WdEPYN; Fri, 20 May 2022 09:30:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu (localhost [127.0.0.1])
-	by mm01.cs.columbia.edu (Postfix) with ESMTP id D761B4B3B7;
-	Fri, 20 May 2022 08:38:59 -0400 (EDT)
+	by mm01.cs.columbia.edu (Postfix) with ESMTP id 203914B29B;
+	Fri, 20 May 2022 09:30:55 -0400 (EDT)
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FA4E4B3B6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2022 08:38:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD0CE4B214
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2022 09:30:53 -0400 (EDT)
 X-Virus-Scanned: at lists.cs.columbia.edu
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bFrTsGWH3Zzk for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 May 2022 08:38:56 -0400 (EDT)
+ with ESMTP id Si2LL+uKshIR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 May 2022 09:30:52 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D16F34B37E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2022 08:38:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BF504B1F7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 May 2022 09:30:52 -0400 (EDT)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2273F1477;
- Fri, 20 May 2022 05:38:56 -0700 (PDT)
-Received: from login2.euhpc.arm.com (login2.euhpc.arm.com [10.6.27.34])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 4742E3F718;
- Fri, 20 May 2022 05:38:55 -0700 (PDT)
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-To: linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu
-Subject: [PATCH kvmtool] aarch64: Give up with MTE for AArch32 guest
-Date: Fri, 20 May 2022 13:38:44 +0100
-Message-Id: <20220520123844.127733-1-vladimir.murzin@arm.com>
-X-Mailer: git-send-email 2.24.0
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAF451477;
+ Fri, 20 May 2022 06:30:51 -0700 (PDT)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 889D63F73D;
+ Fri, 20 May 2022 06:30:50 -0700 (PDT)
+Date: Fri, 20 May 2022 14:31:03 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: Re: [PATCH kvmtool] aarch64: Give up with MTE for AArch32 guest
+Message-ID: <YoeYF/J2O/cLXmXZ@monolith.localdoman>
+References: <20220520123844.127733-1-vladimir.murzin@arm.com>
 MIME-Version: 1.0
-Cc: will@kernel.org, maz@kernel.org
+Content-Disposition: inline
+In-Reply-To: <20220520123844.127733-1-vladimir.murzin@arm.com>
+Cc: maz@kernel.org, will@kernel.org, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 X-BeenThere: kvmarm@lists.cs.columbia.edu
 X-Mailman-Version: 2.1.14
 Precedence: list
@@ -56,33 +58,51 @@ Content-Transfer-Encoding: 7bit
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 
-KVM doesn't support combination of MTE and AArch32 guest, so do not
-even try.
+Hi Vladimir,
 
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
----
- arm/aarch64/kvm.c | 5 +++++
- 1 file changed, 5 insertions(+)
+When I run an --aarch32 guest with --debug this is the message that I'm
+getting:
 
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index 1b992dd..f3fe854 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -120,6 +120,11 @@ void kvm__arch_enable_mte(struct kvm *kvm)
- 		.cap = KVM_CAP_ARM_MTE,
- 	};
- 
-+	if (kvm->cfg.arch.aarch32_guest) {
-+		pr_debug("MTE is incompatible with AArch32");
-+		return;
-+	}
-+
- 	if (kvm->cfg.arch.mte_disabled) {
- 		pr_debug("MTE disabled by user");
- 		return;
--- 
-2.25.1
+  Info: (arm/aarch64/kvm.c) kvm__arch_enable_mte:146: MTE capability not available
 
+Would you mind elaborating on the merits of the message that you are
+proposing:
+
+  Info: (arm/aarch64/kvm.c) kvm__arch_enable_mte:124: MTE is incompatible with AArch32
+
+Is it because it explains why the capability is not available?
+
+Thanks,
+Alex
+
+On Fri, May 20, 2022 at 01:38:44PM +0100, Vladimir Murzin wrote:
+> KVM doesn't support combination of MTE and AArch32 guest, so do not
+> even try.
+> 
+> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> ---
+>  arm/aarch64/kvm.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+> index 1b992dd..f3fe854 100644
+> --- a/arm/aarch64/kvm.c
+> +++ b/arm/aarch64/kvm.c
+> @@ -120,6 +120,11 @@ void kvm__arch_enable_mte(struct kvm *kvm)
+>  		.cap = KVM_CAP_ARM_MTE,
+>  	};
+>  
+> +	if (kvm->cfg.arch.aarch32_guest) {
+> +		pr_debug("MTE is incompatible with AArch32");
+> +		return;
+> +	}
+> +
+>  	if (kvm->cfg.arch.mte_disabled) {
+>  		pr_debug("MTE disabled by user");
+>  		return;
+> -- 
+> 2.25.1
+> 
 _______________________________________________
 kvmarm mailing list
 kvmarm@lists.cs.columbia.edu
